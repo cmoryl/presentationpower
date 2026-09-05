@@ -213,14 +213,16 @@ export function fitOrbitLayout(
         let dy = b.y - a.y;
         let d = Math.hypot(dx, dy);
         const need = a.r + b.r + gap;
-        if (d >= need) continue;
+        if (d >= need * 1.01) continue;
         if (d < 0.0001) {
           // Perfectly stacked — separate along a stable diagonal.
           dx = 0.7071;
           dy = 0.7071;
           d = 1;
         }
-        const push = (need - d) / d;
+        // 1% slack absorbs the rounding back into percentages, so a pair that
+        // has just been separated never reads as touching again.
+        const push = (need * 1.01 - d) / d;
         const total = give[i]! + give[j]!;
         a.x -= dx * push * (give[i]! / total);
         a.y -= dy * push * (give[i]! / total);
