@@ -45,16 +45,32 @@ export type StatShape =
   | "waffle"
   | "donut"
   | "delta"
-  | "bullet";
+  | "bullet"
+  // ── second-wave presets ──
+  | "halo"
+  | "ribbon"
+  | "echo"
+  | "ticks"
+  | "pie"
+  | "area"
+  | "waterfall";
 
 /** Material treatment drawn behind the whole figure. */
-export type StatSurface = "plain" | "glass" | "plate" | "wash" | "emboss" | "outline";
+export type StatSurface =
+  | "plain"
+  | "glass"
+  | "plate"
+  | "wash"
+  | "emboss"
+  | "outline"
+  | "dotgrid"
+  | "stripes";
 
 /** Reveal choreography for a figure (all reduced-motion safe). */
-export type StatMotion = "none" | "rise" | "count" | "sweep";
+export type StatMotion = "none" | "rise" | "count" | "sweep" | "blur" | "drift";
 
 /** Optical weight of a figure inside a multi-stat arrangement. */
-export type StatEmphasis = "normal" | "hero" | "quiet";
+export type StatEmphasis = "normal" | "hero" | "quiet" | "monumental";
 
 export type StatShapePreset = {
   id: StatShape;
