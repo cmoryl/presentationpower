@@ -14,7 +14,7 @@ import {
   MIN_ORBIT_SIZE,
   patchOrbitPos,
   resetOrbitPos,
-  resolveOrbitLayout,
+  resolveFittedOrbitLayout,
 } from "@/lib/orbit-layout";
 
 type Props = {
@@ -30,7 +30,10 @@ export function OrbitLayoutPanel({ orbits, onChange }: Props) {
     () => (Array.isArray(orbits) ? (orbits as unknown[]) : []).slice(0, 3),
     [orbits],
   );
-  const positions = React.useMemo(() => resolveOrbitLayout(items), [items]);
+  // Show the collision-resolved placements, so the mini stage matches the
+  // slide: overlapping figures are pushed apart instead of stacking.
+  const positions = React.useMemo(() => resolveFittedOrbitLayout(items), [items]);
+  const collided = positions.some((p) => p.nudged);
   const stageRef = React.useRef<HTMLDivElement | null>(null);
   const [active, setActive] = React.useState(0);
   const dragging = React.useRef<number | null>(null);
@@ -169,6 +172,11 @@ export function OrbitLayoutPanel({ orbits, onChange }: Props) {
               <span className="tabular-nums text-black/40">
                 x {Math.round(p.x)}% · y {Math.round(p.y)}%
               </span>
+              {p.nudged && (
+                <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[11px] font-semibold text-amber-800">
+                  moved to clear an overlap
+                </span>
+              )}
               <button type="button" className={btnCls} onClick={() => onChange(resetOrbitPos(items, i))}>
                 Reset
               </button>
