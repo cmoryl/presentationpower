@@ -1060,11 +1060,14 @@ function pdfText(s: string): string {
 /** Stable file base for a regenerated panel, versioned by revision number. */
 export function londonPanelFileBase(
   panel: LondonPanel,
-  rev: number,
+  rev: number | "draft",
   colorSpace: LondonColorSpace = "rgb",
 ): string {
   const space = colorSpace === "cmyk" ? "-cmyk" : "";
-  return `r${String(rev).padStart(3, "0")}-${panelSlug(panel)}${space}`;
+  // An unpublished draft must never stamp a revision number that does not exist
+  // yet — it ships as `rdraft-` until the revision is published.
+  const tag = rev === "draft" ? "draft" : String(rev).padStart(3, "0");
+  return `r${tag}-${panelSlug(panel)}${space}`;
 }
 
 /**
@@ -1094,6 +1097,8 @@ export type LondonRevision = {
   panels: LondonPanel[];
   changes: LondonChange[];
   regen: LondonRegenPlan | Record<string, never>;
+  /** Catalogue ids deleted in this revision — they must stay deleted. */
+  removedIds: string[];
   restoredFrom: number | null;
   createdAt: string;
 };
@@ -1108,6 +1113,7 @@ export function baseRevision(): LondonRevision {
     panels: LONDON_PANELS,
     changes: [],
     regen: {},
+    removedIds: [],
     restoredFrom: null,
     createdAt: "2026-01-01T00:00:00.000Z",
   };
@@ -1120,7 +1126,12 @@ export function effectiveLondonPanels(revisions: LondonRevision[]): LondonPanel[
   // Items issued to the catalog AFTER a revision was cut (vendor booth kiosks,
   // for example) are appended so a published revision can never hide them.
   const known = new Set(latest.panels.map((p) => p.id));
-  return [...latest.panels, ...LONDON_PANELS.filter((p) => !known.has(p.id))];
+  // ...unless the revision explicitly removed them.
+  const removed = new Set(latest.removedIds ?? []);
+  return [
+    ...latest.panels,
+    ...LONDON_PANELS.filter((p) => !known.has(p.id) && !removed.has(p.id)),
+  ];
 }
 
 /** Panels present in `to` but not in `from` — used when restoring a revision. */
@@ -1158,6 +1169,19 @@ export function londonPanelSvgFor(
   pack: Record<string, { svg: string; ai: string }> | null | undefined,
 ): string {
   return matchesIssuedArtwork(panel, pack) ? pack![panel.id]!.svg : buildLondonPanelSvg(panel);
+}
+
+/**
+ * As `resolveLondonArtwork`, but the `.ai` side resolves supplied vendor booth
+ * artwork first — the builder any download or pack must use. The SVG side still
+ * comes from the packaged venue master when the panel matches the issued spec.
+ */
+export async function resolveLondonArtworkAsync(
+  panel: LondonPanel,
+  pack: Record<string, { svg: string; ai: string }> | null,
+): Promise<{ svg: string; ai: string | Uint8Array; source: "issued" | "rebuilt" }> {
+  const base = resolveLondonArtwork(panel, pack);
+  return { ...base, ai: await buildLondonPanelAiAsync(panel) };
 }
 
 export function resolveLondonArtwork(
