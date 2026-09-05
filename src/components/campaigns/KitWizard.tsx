@@ -266,10 +266,6 @@ export function KitWizard({
           }
         }
         setStep(WIZARD_STEPS.findIndex((s) => s.key === "review")); // jump to review
-        // Defer to next tick so state above has committed before snapshotting.
-        setTimeout(() => {
-          lastSavedSnapshot.current = snapshotKey();
-        }, 0);
       })
       .catch((err) => {
         toast.error(err instanceof Error ? err.message : "Failed to load saved kit");
@@ -284,8 +280,17 @@ export function KitWizard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kitId]);
 
-  async function handleSave() {
-    const name = kitName.trim();
+  // Snapshot the freshly-hydrated state so the Finish CTA can tell whether
+  // the user has changed anything since this saved kit was loaded.
+  useEffect(() => {
+    if (kitId && !hydrating) {
+      lastSavedSnapshot.current = snapshotKey();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrating]);
+
+  async function handleSave(nameOverride?: string) {
+    const name = (nameOverride ?? kitName).trim();
     if (!name) {
       toast.error("Give your kit a name first.");
       return;
@@ -1223,12 +1228,23 @@ export function KitWizard({
           Step {step + 1} of {WIZARD_STEPS.length} · {WIZARD_STEPS[step].label}
         </div>
         {isLast ? (
-          <Link
-            to={finishHref}
+          <button
+            type="button"
+            onClick={() => {
+              const hasHeadline = manualCopy.title.trim().length > 0;
+              const dirty = lastSavedSnapshot.current !== snapshotKey();
+              const needsPrompt = hasHeadline && (!savedKitId || dirty);
+              if (needsPrompt) {
+                setFinishDialogName(kitName || "");
+                setFinishDialogOpen(true);
+                return;
+              }
+              navigate({ to: finishHref }).catch(() => void 0);
+            }}
             className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]"
           >
             Finish <Check size={12} />
-          </Link>
+          </button>
         ) : (
           <button
             type="button"
@@ -1315,6 +1331,69 @@ export function KitWizard({
         mode={mode === "light" ? "light" : "dark"}
         copy={pickerCopy}
       />
+
+      {finishDialogOpen ? (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-[#03002C]/60 p-4 backdrop-blur-sm"
+          onClick={() => setFinishDialogOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Save this kit?"
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl"
+          >
+            <h3 className="text-base font-semibold text-[#03002C]">Save this kit?</h3>
+            <p className="mt-1 text-xs text-black/60">
+              You have unsaved changes. Save so it shows up in your kits, or leave without saving.
+            </p>
+            <label className="mt-3 block text-sm">
+              <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-black/50">
+                Kit name
+              </div>
+              <input
+                type="text"
+                value={finishDialogName}
+                onChange={(e) => setFinishDialogName(e.target.value)}
+                className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                maxLength={120}
+                autoFocus
+              />
+            </label>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setFinishDialogOpen(false);
+                  navigate({ to: finishHref }).catch(() => void 0);
+                }}
+                className="rounded-full border border-black/15 bg-white px-3.5 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5"
+              >
+                Leave without saving
+              </button>
+              <button
+                type="button"
+                disabled={saving}
+                onClick={async () => {
+                  const trimmed = finishDialogName.trim();
+                  if (!trimmed) {
+                    toast.error("Give your kit a name first.");
+                    return;
+                  }
+                  setKitName(trimmed);
+                  await handleSave(trimmed);
+                  setFinishDialogOpen(false);
+                  navigate({ to: finishHref }).catch(() => void 0);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3.5 py-1.5 text-xs font-medium text-white hover:bg-[#03002C] disabled:opacity-50"
+              >
+                <Save size={12} /> Save
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

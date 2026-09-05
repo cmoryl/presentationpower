@@ -2307,6 +2307,7 @@ export type Database = {
           created_at: string
           id: string
           note: string | null
+          overrides: Json
           panels: Json
           regen: Json
           removed_ids: Json
@@ -2319,6 +2320,7 @@ export type Database = {
           created_at?: string
           id?: string
           note?: string | null
+          overrides?: Json
           panels: Json
           regen?: Json
           removed_ids?: Json
@@ -2331,6 +2333,7 @@ export type Database = {
           created_at?: string
           id?: string
           note?: string | null
+          overrides?: Json
           panels?: Json
           regen?: Json
           removed_ids?: Json
