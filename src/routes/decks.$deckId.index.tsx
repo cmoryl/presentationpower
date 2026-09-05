@@ -7,6 +7,8 @@ import {
   statShapePreset,
   type StatLayout,
 } from "@/lib/stat-layouts";
+import { isStatArrangement, type StatArrangement } from "@/lib/stat-arrangements";
+
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { loadCloudDeck } from "@/lib/cloud-decks.functions";
 import { cloudDeckToLocal, type CloudDeckPayload } from "@/lib/cloud-deck-import";
