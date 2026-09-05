@@ -1798,7 +1798,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
       "certs[].label",
       "certs[].points[]",
       "certs[].logoUrl",
+      "certs[].logoUrlDark",
       "certs[].logoPath",
+
     ],
     lockedFields: ["footer", "logo"],
   },
