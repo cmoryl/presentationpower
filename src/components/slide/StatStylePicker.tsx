@@ -35,16 +35,20 @@ const capClass = "text-[9px] font-semibold uppercase tracking-[0.16em] text-blac
 
 
 /**
- * Slide-level stat typography control: pick the figure shape (including the
- * oversized-icon treatments) and, for icon shapes, the icon itself. Writes a
- * `statLayout` fragment onto the slide content, which `resolveStatLayout`
- * layers over the module's intentional default.
+ * Slide-level stat design control: figure shape (including the data-viz and
+ * oversized-icon treatments), the material behind it, its reveal beat, its
+ * optical weight, and — for the chart shapes — the authored data series. Writes
+ * a `statLayout` fragment onto the slide content, which `resolveStatLayout`
+ * layers over the module's intentional default. The multi-stat arrangement is a
+ * slide-level concern, so it is written as its own `statArrangement` field.
  */
 export function StatStylePicker({
   moduleLayout,
   value,
   onChange,
   onReset,
+  arrangement,
+  onArrangementChange,
 }: {
   /** The module's intentional default (shown as the inherited option). */
   moduleLayout: StatLayout;
@@ -52,6 +56,10 @@ export function StatStylePicker({
   value?: Partial<StatLayout> | null;
   onChange: (patch: Partial<StatLayout>) => void;
   onReset: () => void;
+  /** Current multi-stat arrangement for the slide, when the module supports one. */
+  arrangement?: StatArrangement;
+  /** Omit to hide the arrangement control (single-figure modules). */
+  onArrangementChange?: (next: StatArrangement) => void;
 }) {
   const shape: StatShape | "inherit" = value?.shape ?? "inherit";
   const effectiveShape = value?.shape ?? moduleLayout.shape ?? "auto";
@@ -59,6 +67,12 @@ export function StatStylePicker({
   const preset = statShapePreset(effectiveShape);
   const icon: StatIconName | "auto" = value?.icon ?? moduleLayout.icon ?? "auto";
   const progress = value?.progress ?? moduleLayout.progress ?? 0.72;
+  const surface = value?.surface ?? moduleLayout.surface ?? "plain";
+  const motion = value?.motion ?? moduleLayout.motion ?? "none";
+  const emphasis = value?.emphasis ?? moduleLayout.emphasis ?? "normal";
+  const series = value?.series ?? moduleLayout.series ?? [];
+
+
 
   const grouped = useMemo(() => {
     const out = new Map<string, typeof STAT_SHAPE_PRESETS>();
