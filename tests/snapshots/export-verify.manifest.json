@@ -239,9 +239,9 @@
     "verdant-corporate"
   ],
   "jobs": 6180,
-  "verifiedAt": "2026-09-04T23:30:06.418Z",
+  "verifiedAt": "2026-09-05T00:25:05.931Z",
   "coverage": "sampled",
-  "verifiedCells": 510,
+  "verifiedCells": 700,
   "sampledVariants": [
     "MV-BENTO-5",
     "MV-BENTO-6",
@@ -388,6 +388,7 @@
     "MV-PROC-SWIMLANE-FLOW",
     "MV-PROC-TIMELINE",
     "MV-PROC-TIMELINE-RAIL",
+    "MV-PROOF-CERT-ORBITS",
     "MV-PROOF-GROWTH-ORBITS",
     "MV-PROOF-LOGOS",
     "MV-PROOF-LOGOS-CATEGORIZED",
