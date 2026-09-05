@@ -1,5 +1,5 @@
 {
-  "fingerprint": "da70e08d",
+  "fingerprint": "4770fb39",
   "variants": [
     "MV-BENTO-5",
     "MV-BENTO-6",
@@ -178,6 +178,7 @@
     "MV-SPLIT-MANIFESTO",
     "MV-STAT-ACTUAL-TARGET",
     "MV-STAT-EDITORIAL-DASH",
+    "MV-STAT-GAUGE-STACK",
     "MV-STAT-HERO-NUMBER",
     "MV-STAT-IMAGE-TYPE",
     "MV-STAT-KPI-RAIL",
@@ -186,6 +187,8 @@
     "MV-STAT-PHOTO-BAND",
     "MV-STAT-PHOTO-TRIO",
     "MV-STAT-PORTRAIT-PROOF",
+    "MV-STAT-SPARK-HERO",
+    "MV-STAT-TICKER-STRIP",
     "MV-STAT-TYPE-WALL",
     "MV-TEAM-BIOS-3",
     "MV-TEAM-BIOS-4",
@@ -238,8 +241,8 @@
     "vapor-chrome",
     "verdant-corporate"
   ],
-  "jobs": 6180,
-  "verifiedAt": "2026-09-05T00:25:05.931Z",
+  "jobs": 6270,
+  "verifiedAt": "2026-09-05T22:22:40.991Z",
   "coverage": "sampled",
   "verifiedCells": 700,
   "sampledVariants": [
