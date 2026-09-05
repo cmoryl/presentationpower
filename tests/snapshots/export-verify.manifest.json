@@ -242,9 +242,9 @@
     "verdant-corporate"
   ],
   "jobs": 6270,
-  "verifiedAt": "2026-09-05T22:22:40.991Z",
+  "verifiedAt": "2026-09-05T23:10:44.692Z",
   "coverage": "sampled",
-  "verifiedCells": 700,
+  "verifiedCells": 904,
   "sampledVariants": [
     "MV-BENTO-5",
     "MV-BENTO-6",
@@ -423,6 +423,7 @@
     "MV-SPLIT-MANIFESTO",
     "MV-STAT-ACTUAL-TARGET",
     "MV-STAT-EDITORIAL-DASH",
+    "MV-STAT-GAUGE-STACK",
     "MV-STAT-HERO-NUMBER",
     "MV-STAT-IMAGE-TYPE",
     "MV-STAT-KPI-RAIL",
@@ -431,6 +432,8 @@
     "MV-STAT-PHOTO-BAND",
     "MV-STAT-PHOTO-TRIO",
     "MV-STAT-PORTRAIT-PROOF",
+    "MV-STAT-SPARK-HERO",
+    "MV-STAT-TICKER-STRIP",
     "MV-STAT-TYPE-WALL",
     "MV-TEAM-BIOS-3",
     "MV-TEAM-BIOS-4",

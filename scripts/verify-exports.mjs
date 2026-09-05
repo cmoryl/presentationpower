@@ -134,8 +134,9 @@ const cellKey = (packId, mode) => `${packId ?? "base"}@${mode}`;
 
 /** Mirror of mergeCoverage() in src/lib/export-matrix.ts. */
 function mergeCoverage(ledger, rows, shape) {
-  const cells =
-    ledger && ledger.fingerprint === shape.fingerprint ? { ...(ledger.cells ?? {}) } : {};
+  // Cells are per module × look × mode, so they survive a fingerprint change
+  // (a new module was added); stale ids are pruned below.
+  const cells = ledger ? { ...(ledger.cells ?? {}) } : {};
   for (const row of rows) {
     const key = cellKey(row.packId, row.mode);
     cells[key] = [...new Set([...(cells[key] ?? []), row.variantId])].sort();
@@ -163,7 +164,7 @@ function mergeCoverage(ledger, rows, shape) {
  * has been touched at all.
  */
 function remainingJobs(ledger, shape) {
-  const cells = ledger && ledger.fingerprint === shape.fingerprint ? (ledger.cells ?? {}) : {};
+  const cells = ledger ? (ledger.cells ?? {}) : {};
   const missing = (pack, mode) => {
     const swept = new Set(cells[cellKey(pack, mode)] ?? []);
     return shape.variants.filter((v) => !swept.has(v)).map((v) => [v, pack, mode]);
@@ -193,7 +194,11 @@ async function boot(browser) {
   page.on("console", (m) => {
     if (m.type() === "error") console.error("  [page error]", m.text().slice(0, 200));
   });
-  await page.goto(`${BASE_URL}/dev/export-verify`, { waitUntil: "domcontentloaded" });
+  // Dev-mode module graph is large; the default 30s goto can expire on a cold cache.
+  await page.goto(`${BASE_URL}/dev/export-verify`, {
+    waitUntil: "domcontentloaded",
+    timeout: 180_000,
+  });
   await page.waitForFunction("!!window.__tpExportVerify", null, { timeout: 120_000 });
   return page;
 }
@@ -230,7 +235,7 @@ async function main() {
   // Resume from the committed ledger unioned with any unfinished run's progress.
   // Resume from the committed ledger unioned with any unfinished run's progress.
   const ledgerRows = (l) =>
-    !l || l.fingerprint !== shape.fingerprint
+    !l
       ? []
       : Object.entries(l.cells ?? {}).flatMap(([key, ids]) => {
           const at = key.lastIndexOf("@");

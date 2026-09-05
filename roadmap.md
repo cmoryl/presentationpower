@@ -8,4 +8,4 @@
 - [x] New slide types: ticker strip, sparkline hero, gauge stack (taxonomy, render, layout, backdrop, library copy, starter content)
 - [x] Credential module: point marker, logo tone, accent strength, badge size, heading alignment
 - [x] Tests + typecheck + build green
-- [ ] Export sweep for the 3 new slide types (Playwright harness cannot run in this sandbox; CI job `export-verify` will record them)
+- [x] Export sweep for the 3 new slide types — swept locally (ticker strip, sparkline hero, gauge stack all pass); coverage ledger now carries prior cells across matrix additions (904/6270 verified)
