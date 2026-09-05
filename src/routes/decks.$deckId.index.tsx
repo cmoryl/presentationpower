@@ -827,6 +827,18 @@ function DeckEditor() {
                           })
                         }
                         onReset={() => updateField(deck.id, active.id, "statLayout", undefined)}
+                        arrangement={
+                          isStatArrangement(
+                            (active.content as Record<string, unknown>)?.statArrangement,
+                          )
+                            ? ((active.content as Record<string, unknown>)
+                                .statArrangement as StatArrangement)
+                            : "even"
+                        }
+                        onArrangementChange={(next) =>
+                          updateField(deck.id, active.id, "statArrangement", next)
+                        }
+
                       />
                     </EditorMenu>
 
