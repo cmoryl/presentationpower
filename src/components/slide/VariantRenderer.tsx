@@ -39,8 +39,10 @@ import {
   useTemplateIndustry,
 } from "./SlideTemplateContext";
 import { resolveSlideTemplate } from "@/lib/section-templates";
-import { StatLayoutProvider } from "./StatLayoutContext";
+import { StatArrangementProvider, StatLayoutProvider } from "./StatLayoutContext";
 import { resolveStatLayout } from "@/lib/stat-layouts";
+import { isStatArrangement } from "@/lib/stat-arrangements";
+
 import { enterpriseWhiteBrand, isEnterpriseWhite, type SlideSkin } from "@/lib/slide-skin";
 import { accentInk } from "@/lib/accent-tokens";
 import { useClientLogoPool } from "@/lib/client-logo-pool";
