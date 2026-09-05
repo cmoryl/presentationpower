@@ -12250,22 +12250,27 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       const m = /^(\S+)\s+(.+)$/.exec(h.trim());
       const figure = m && /^[+\-–~$€£]?\d/.test(m[1]) ? m[1] : "";
       const label = figure ? m![2] : h.trim();
-      s.addShape("rect", {
-        x,
-        y: tY,
-        w: tW,
-        h: tH,
-        fill: { color: p.surface },
-        line: { color: p.surface },
-      });
-      s.addShape("rect", {
-        x,
-        y: tY,
-        w: 0.05,
-        h: tH,
-        fill: { color: p.accent },
-        line: { color: p.accent },
-      });
+      if (st.statTile === "tile") {
+        s.addShape("rect", {
+          x,
+          y: tY,
+          w: tW,
+          h: tH,
+          fill: { color: p.surface },
+          line: { color: p.surface },
+        });
+      }
+      if (st.statTile !== "plain") {
+        s.addShape("rect", {
+          x,
+          y: tY,
+          w: 0.05,
+          h: tH,
+          fill: { color: p.accent },
+          line: { color: p.accent },
+        });
+      }
+
       s.addText(
         [
           ...(figure
