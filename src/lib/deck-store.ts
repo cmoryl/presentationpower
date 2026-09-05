@@ -19,6 +19,7 @@ import { variantSupportsImagery, variantSupportsVideo } from "./variant-media";
 import { track } from "./analytics-track";
 import { notifySlideEdit } from "./deck-feedback";
 import { pickVariedVariant } from "./module-variety";
+import { ORG_CREDENTIALS, ORG_FOUNDED } from "./print-library/org-facts";
 
 import type { SlideSkin } from "./slide-skin";
 import { hasTextFormats } from "./slide-text-format";
