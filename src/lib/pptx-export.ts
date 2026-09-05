@@ -12209,13 +12209,22 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     fontFace: "Geist",
   });
 
-  // Left: unframed programme statement — heading, stat tiles, ruled bullet rows
-  const CX = 0.6;
-  const CW = 5.3;
+  // Statement column — heading, stat tiles, ruled bullet rows. Geometry and
+  // treatment follow the module's `certStyle` customisation.
+  const st = resolveCertStyle(c.certStyle);
+  const TOTAL = 12.2;
+  const GAP = 0.5;
+  const usable = TOTAL - GAP;
+  const CW = (usable * st.split) / (st.split + 1.08);
+  const RW = usable - CW;
+  const cardsFirst = st.cardsSide === "left";
+  const CX = cardsFirst ? 0.6 + RW + GAP : 0.6;
+  const RX = cardsFirst ? 0.6 : CX + CW + GAP;
   const CY = 1.55;
   const CH = 5.2;
   const highlights = strList(c.cardHighlights).slice(0, 3);
   const points = strList(c.cardPoints).slice(0, 6);
+
 
   if (str(c.cardTitle)) {
     s.addText(str(c.cardTitle), {
