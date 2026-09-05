@@ -173,6 +173,105 @@ export function StatStylePicker({
         </label>
       )}
 
+      {preset.usesSeries && (
+        <label className="flex flex-col gap-1">
+          <span className={capClass}>Data series</span>
+          <input
+            type="text"
+            inputMode="decimal"
+            className={selectClass}
+            placeholder="e.g. 12, 18, 24, 31, 44"
+            defaultValue={series.join(", ")}
+            onBlur={(e) => {
+              const nums = e.target.value
+                .split(/[,\s]+/)
+                .map((t) => Number.parseFloat(t))
+                .filter((n) => Number.isFinite(n));
+              onChange({ series: nums.length >= 2 ? nums : undefined });
+            }}
+            aria-label="Stat data series"
+          />
+          <span className="text-[10px] leading-snug text-black/45">
+            Two or more numbers. The chart only draws from real values — leave this empty and the
+            figure shows the numeral alone.
+          </span>
+        </label>
+      )}
+
+      <label className="flex flex-col gap-1">
+        <span className={capClass}>Material</span>
+        <select
+          className={selectClass}
+          value={surface}
+          onChange={(e) => {
+            if (isStatSurface(e.target.value)) onChange({ surface: e.target.value });
+          }}
+        >
+          {STAT_SURFACE_PRESETS.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="flex flex-col gap-1">
+        <span className={capClass}>Reveal</span>
+        <select
+          className={selectClass}
+          value={motion}
+          onChange={(e) => {
+            if (isStatMotion(e.target.value)) onChange({ motion: e.target.value });
+          }}
+        >
+          {STAT_MOTION_PRESETS.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="flex flex-col gap-1">
+        <span className={capClass}>Weight</span>
+        <select
+          className={selectClass}
+          value={emphasis}
+          onChange={(e) => {
+            if (isStatEmphasis(e.target.value)) onChange({ emphasis: e.target.value });
+          }}
+        >
+          {STAT_EMPHASIS_PRESETS.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      {onArrangementChange && (
+        <label className="flex flex-col gap-1">
+          <span className={capClass}>Arrangement</span>
+          <select
+            className={selectClass}
+            value={arrangement ?? "even"}
+            onChange={(e) => {
+              if (isStatArrangement(e.target.value)) onArrangementChange(e.target.value);
+            }}
+          >
+            {STAT_ARRANGEMENT_PRESETS.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+          <span className="text-[10px] leading-snug text-black/45">
+            {STAT_ARRANGEMENT_PRESETS.find((p) => p.id === (arrangement ?? "even"))?.description}
+          </span>
+        </label>
+      )}
+
+
       {value && Object.keys(value).length > 0 && (
         <button
           type="button"
