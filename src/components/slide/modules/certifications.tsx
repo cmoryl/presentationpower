@@ -104,12 +104,19 @@ registerSlideModule({
                       className="flex min-w-0 flex-1 flex-col justify-between"
                       style={{
                         background: tileBg,
-                        borderLeft: `5px solid ${accent}`,
+                        borderLeft:
+                          st.statTile === "plain" ? undefined : `5px solid ${accent}`,
                         borderRadius: 4,
-                        padding: "18px 20px 16px",
+                        padding:
+                          st.statTile === "plain"
+                            ? "0 0 4px"
+                            : st.statTile === "rule"
+                              ? "2px 0 4px 18px"
+                              : "18px 20px 16px",
                         gap: 8,
                       }}
                     >
+
                       {figure && (
                         <span
                           style={{
