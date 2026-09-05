@@ -9,6 +9,8 @@ import { SlideFrame, SlideTitle, arr, s, strs, type Item } from "../module-kit";
 import { ClientLogoImg, pickLogoForMode } from "../client-logo";
 import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
+import { resolveCertStyle } from "@/lib/cert-style";
+
 
 const MAX_CERTS = 3;
 const MAX_POINTS = 6;
