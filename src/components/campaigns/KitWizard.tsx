@@ -934,7 +934,7 @@ export function KitWizard({
                 </label>
                 <button
                   type="button"
-                  onClick={handleSave}
+                  onClick={() => handleSave()}
                   disabled={saving || hydrating}
                   className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#03002C] disabled:opacity-50"
                 >
