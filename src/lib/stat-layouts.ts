@@ -118,6 +118,16 @@ export const STAT_SURFACE_PRESETS: Array<{
     label: "Outline card",
     description: "Hairline accent outline around the figure with no fill.",
   },
+  {
+    id: "dotgrid",
+    label: "Dot matrix",
+    description: "Field of accent dots behind the figure — technical, plotted texture.",
+  },
+  {
+    id: "stripes",
+    label: "Hairline stripes",
+    description: "Diagonal accent hairlines at a low alpha — a drafting-sheet material.",
+  },
 ];
 
 export const STAT_MOTION_PRESETS: Array<{
@@ -129,6 +139,8 @@ export const STAT_MOTION_PRESETS: Array<{
   { id: "rise", label: "Rise in", description: "Figure lifts and fades in on a staggered beat." },
   { id: "count", label: "Count up", description: "Numeral counts up to its value on reveal." },
   { id: "sweep", label: "Gauge sweep", description: "Meters and rings sweep to their value." },
+  { id: "blur", label: "Focus pull", description: "Figure sharpens from a soft blur into crisp type." },
+  { id: "drift", label: "Drift in", description: "Figure slides in from the leading edge and settles." },
 ];
 
 export const STAT_EMPHASIS_PRESETS: Array<{
