@@ -257,6 +257,47 @@ export const STAT_SHAPE_PRESETS: StatShapePreset[] = [
     usesIcon: true,
     usesProgress: true,
   },
+  {
+    id: "sparkline",
+    label: "Trend sparkline",
+    description: "Miniature accent trend line under the numeral with an end-point marker.",
+    family: "dataviz",
+    usesSeries: true,
+  },
+  {
+    id: "bars",
+    label: "Micro bar chart",
+    description: "Small column series beneath the numeral, last column inked as the current value.",
+    family: "dataviz",
+    usesSeries: true,
+  },
+  {
+    id: "waffle",
+    label: "Dot array",
+    description: "Ten-by-two dot array filled in proportion to the value — reads as a share.",
+    family: "dataviz",
+    usesProgress: true,
+  },
+  {
+    id: "donut",
+    label: "Share donut",
+    description: "Thick accent donut beside the numeral showing its share of the whole.",
+    family: "dataviz",
+    usesProgress: true,
+  },
+  {
+    id: "delta",
+    label: "Delta pill",
+    description: "Directional arrow pill beside the numeral calling out rise or fall.",
+    family: "dataviz",
+  },
+  {
+    id: "bullet",
+    label: "Bullet gauge",
+    description: "Banded bullet track with a target marker — actual against plan.",
+    family: "dataviz",
+    usesProgress: true,
+  },
 ];
 
 export const STAT_SHAPES: StatShape[] = STAT_SHAPE_PRESETS.map((p) => p.id);
@@ -267,6 +308,20 @@ export function statShapePreset(shape: StatShape): StatShapePreset {
 
 export function isStatShape(value: unknown): value is StatShape {
   return typeof value === "string" && (STAT_SHAPES as string[]).includes(value);
+}
+
+export function isStatSurface(value: unknown): value is StatSurface {
+  return (
+    typeof value === "string" && STAT_SURFACE_PRESETS.some((p) => (p.id as string) === value)
+  );
+}
+
+export function isStatMotion(value: unknown): value is StatMotion {
+  return typeof value === "string" && STAT_MOTION_PRESETS.some((p) => (p.id as string) === value);
+}
+
+export function isStatEmphasis(value: unknown): value is StatEmphasis {
+  return typeof value === "string" && STAT_EMPHASIS_PRESETS.some((p) => (p.id as string) === value);
 }
 
 export type StatLayout = {
@@ -280,7 +335,18 @@ export type StatLayout = {
   align?: "start" | "center";
   /** 0..1 fallback sweep for gauge/track shapes when the data has no ratio. */
   progress?: number;
+  /** Material drawn behind the figure. */
+  surface?: StatSurface;
+  /** Reveal choreography (reduced-motion safe). */
+  motion?: StatMotion;
+  /** Optical weight inside a multi-stat arrangement. */
+  emphasis?: StatEmphasis;
+  /** Data series for the sparkline / bar figures (normalised on render). */
+  series?: number[];
+  /** Direction for the delta pill. Inferred from the value when omitted. */
+  trend?: "up" | "down";
 };
+
 
 export const DEFAULT_STAT_LAYOUT: StatLayout = { shape: "auto", align: "start" };
 
