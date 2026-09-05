@@ -6,6 +6,10 @@ import {
   CERT_BADGE_SHAPES,
   CERT_CARD_LOOKS,
   CERT_LIMITS,
+  CERT_STAT_ALIGNS,
+  CERT_STAT_FIGURE_COLORS,
+  CERT_STAT_LABEL_CASES,
+  CERT_STAT_LAYOUTS,
   CERT_STAT_TILES,
   isDefaultCertStyle,
   patchCertStyle,
@@ -314,6 +318,40 @@ export function CertStylePanel({
         options={CERT_STAT_TILES}
         onPick={(statTile) => set({ statTile })}
       />
+      <Choices
+        label="Figure arrangement"
+        current={style.statLayout}
+        options={CERT_STAT_LAYOUTS}
+        onPick={(statLayout) => set({ statLayout })}
+      />
+      <Choices
+        label="Figure colour"
+        current={style.statFigureColor}
+        options={CERT_STAT_FIGURE_COLORS}
+        onPick={(statFigureColor) => set({ statFigureColor })}
+      />
+      <Choices
+        label="Figure label"
+        current={style.statLabelCase}
+        options={CERT_STAT_LABEL_CASES}
+        onPick={(statLabelCase) => set({ statLabelCase })}
+      />
+      <Choices
+        label="Figure alignment"
+        current={style.statAlign}
+        options={CERT_STAT_ALIGNS}
+        onPick={(statAlign) => set({ statAlign })}
+      />
+      <Slider
+        label="Figure size"
+        value={Math.round(style.statSize * 100)}
+        suffix="%"
+        min={70}
+        max={160}
+        step={5}
+        onChange={(v) => set({ statSize: v / 100 })}
+      />
+
       <Choices
         label="Spacing"
         current={style.density}
