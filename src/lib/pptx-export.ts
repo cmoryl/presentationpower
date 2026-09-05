@@ -12209,62 +12209,183 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     fontFace: "Geist",
   });
 
-  // Left: unframed programme statement
+  // Left: unframed programme statement — heading, stat tiles, ruled bullet rows
   const CX = 0.6;
   const CW = 5.3;
   const CY = 1.55;
   const CH = 5.2;
   const highlights = strList(c.cardHighlights).slice(0, 3);
   const points = strList(c.cardPoints).slice(0, 6);
-  s.addText(
-    [
-      ...(str(c.cardTitle)
-        ? [
-            {
-              text: `${str(c.cardTitle)}\n\n`,
-              options: { fontSize: 22, bold: true, color: p.primary },
-            },
-          ]
-        : []),
-      ...highlights.map((h) => ({
-        text: `${h.toUpperCase()}\n`,
-        options: { fontSize: 14, bold: true, color: p.accent },
-      })),
-      ...(points.length ? [{ text: "\n", options: { fontSize: 8 } }] : []),
-      ...points.map((pt) => ({
-        text: `• ${pt}\n`,
-        options: { fontSize: 14, color: p.ink },
-      })),
-    ],
-    {
+
+  if (str(c.cardTitle)) {
+    s.addText(str(c.cardTitle), {
       x: CX,
       y: CY,
       w: CW,
-      h: CH,
+      h: 0.9,
+      fontSize: 24,
+      bold: true,
+      color: p.primary,
       fontFace: "Geist",
-      valign: "top",
-      lineSpacingMultiple: 1.2,
-    },
-  );
+    });
+  }
 
-  // Right: credential cards, one per row
+  // Stat tiles: tinted tile + accent edge bar, big figure over small label
+  if (highlights.length) {
+    const tGap = 0.16;
+    const tW = (CW - tGap * (highlights.length - 1)) / highlights.length;
+    const tY = CY + 1.0;
+    const tH = 1.05;
+    highlights.forEach((h, i) => {
+      const x = CX + i * (tW + tGap);
+      const m = /^(\S+)\s+(.+)$/.exec(h.trim());
+      const figure = m && /^[+\-–~$€£]?\d/.test(m[1]) ? m[1] : "";
+      const label = figure ? m![2] : h.trim();
+      s.addShape("rect", {
+        x,
+        y: tY,
+        w: tW,
+        h: tH,
+        fill: { color: p.surface },
+        line: { color: p.surface },
+      });
+      s.addShape("rect", {
+        x,
+        y: tY,
+        w: 0.05,
+        h: tH,
+        fill: { color: p.accent },
+        line: { color: p.accent },
+      });
+      s.addText(
+        [
+          ...(figure
+            ? [
+                {
+                  text: `${figure}\n`,
+                  options: { fontSize: 22, bold: true, color: p.accent },
+                },
+              ]
+            : []),
+          {
+            text: label.toUpperCase(),
+            options: { fontSize: 10.5, bold: true, color: figure ? p.primary : p.accent },
+          },
+        ],
+        {
+          x: x + 0.18,
+          y: tY + 0.1,
+          w: tW - 0.3,
+          h: tH - 0.2,
+          fontFace: "Geist",
+          valign: "middle",
+          lineSpacingMultiple: 1.15,
+        },
+      );
+    });
+  }
+
+  // Ruled spec-sheet bullet block
+  if (points.length) {
+    const bY0 = CY + 2.35;
+    s.addShape("line", {
+      x: CX,
+      y: bY0,
+      w: CW,
+      h: 0,
+      line: { color: p.primary, width: 1.5 },
+    });
+    const rowH = Math.min(0.55, (CY + CH - bY0 - 0.1) / points.length);
+    points.forEach((pt, i) => {
+      const y = bY0 + 0.12 + i * rowH;
+      s.addShape("rect", {
+        x: CX,
+        y: y + 0.12,
+        w: 0.04,
+        h: rowH - 0.26,
+        fill: { color: p.accent },
+        line: { color: p.accent },
+      });
+      s.addText(String(i + 1).padStart(2, "0"), {
+        x: CX + 0.16,
+        y,
+        w: 0.4,
+        h: rowH - 0.06,
+        fontSize: 10,
+        bold: true,
+        color: p.accent,
+        fontFace: "Geist",
+        valign: "middle",
+      });
+      s.addText(pt, {
+        x: CX + 0.62,
+        y,
+        w: CW - 0.62,
+        h: rowH - 0.06,
+        fontSize: 13.5,
+        color: p.ink,
+        fontFace: "Geist",
+        valign: "middle",
+      });
+      s.addShape("line", {
+        x: CX,
+        y: y + rowH - 0.04,
+        w: CW,
+        h: 0,
+        line: { color: LIGHT_GRAY, width: 0.75 },
+      });
+    });
+  }
+
+  // Right: credential cards on a quiet band, staggered with ghost index
   const RX = 6.4;
   const RW = 6.4;
   const certs = arr(c.certs).slice(0, 3);
+  s.addShape("roundRect", {
+    x: RX - 0.2,
+    y: CY - 0.15,
+    w: RW + 0.4,
+    h: CH + 0.3,
+    rectRadius: EXPORT_RADIUS_IN.band,
+    fill: { color: p.surface, transparency: 55 },
+    line: { type: "none" },
+  });
   const gap = 0.18;
   const rowH = (CH - gap * Math.max(certs.length - 1, 0)) / Math.max(certs.length, 1);
   certs.forEach((cert, k) => {
     const y = CY + k * (rowH + gap);
+    const indent = k === 1 ? 0.28 : k === 2 ? 0.56 : 0;
+    const x = RX + indent;
+    const w = RW - indent;
     s.addShape("roundRect", {
-      x: RX,
+      x,
       y,
-      w: RW,
+      w,
       h: rowH,
       rectRadius: EXPORT_RADIUS_IN.media,
       fill: { color: p.surface },
       line: { color: LIGHT_GRAY },
     });
-    addCardSeam(s as never, { x: RX, y, w: RW }, p.accent, EXPORT_RADIUS_IN.media);
+    s.addShape("rect", {
+      x,
+      y: y + 0.06,
+      w: 0.07,
+      h: rowH - 0.12,
+      fill: { color: p.accent },
+      line: { color: p.accent },
+    });
+    s.addText(String(k + 1).padStart(2, "0"), {
+      x: x + w - 0.85,
+      y: y + 0.08,
+      w: 0.7,
+      h: 0.5,
+      fontSize: 26,
+      bold: true,
+      color: p.accent,
+      transparency: 70,
+      fontFace: "Geist",
+      align: "right",
+    });
     s.addText(
       [
         ...(str(cert.label)
@@ -12277,12 +12398,12 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
           : []),
         ...strList(cert.points)
           .slice(0, 6)
-          .map((b) => ({ text: `• ${b}\n`, options: { fontSize: 11, color: p.ink } })),
+          .map((b) => ({ text: `– ${b}\n`, options: { fontSize: 11, color: p.ink } })),
       ],
       {
-        x: RX + 0.28,
+        x: x + 0.3,
         y: y + 0.16,
-        w: RW - 0.56,
+        w: w - 0.95,
         h: rowH - 0.32,
         fontFace: "Geist",
         valign: "middle",
