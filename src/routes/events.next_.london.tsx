@@ -29,6 +29,10 @@ import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor";
+import {
+  londonLogoPlacements,
+  setLondonLogoPlacement,
+} from "@/lib/next-london-logo-placement";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { handleLondonDirectoryDownload } from "@/lib/london-directory-pdf";
