@@ -115,6 +115,8 @@ function noteExportLogo(ok: boolean) {
   activeIntegrity?.noteLogo(activeSlideIndex, ok, activeVariantId);
 }
 import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radius";
+import { resolveCertStyle } from "@/lib/cert-style";
+
 import { laneCornerRadiusIn, laneHeightIn, railBoxIn } from "@/lib/layer-stack-geometry";
 import {
   auditDeckGeometry,
