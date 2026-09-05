@@ -1,163 +1,7 @@
 {
-  "fingerprint": "bc2ec456",
-  "updatedAt": "2026-09-04T19:44:36.528Z",
+  "fingerprint": "da70e08d",
+  "updatedAt": "2026-09-05T00:25:05.925Z",
   "cells": {
-    "swiss-noir@light": [
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "neo-brutal@light": [
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "editorial-serif@light": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "vapor-chrome@light": [
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "midnight-neon@dark": [
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "desert-clay@light": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "blueprint-cyan@dark": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "bauhaus-primary@light": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "sage-linen@light": [
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "graphite-chrome@dark": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "atelier-lumen@light": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "onyx-couture@dark": [
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "optic-moire@light": [
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "cyber-terminal@dark": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "atlas-plate@dark": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "riso-woodcut@light": [
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "quant-grid@dark": [
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "retro-arcade@dark": [
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "marble-aureate@light": [
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "azulejo-tile@light": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "comic-panel@light": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "basalt-mono@dark": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "herbarium-press@light": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "deco-marquee@dark": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "cobalt-proposal@light": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "verdant-corporate@dark": [
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "crimson-editorial@light": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
-    "atelier-orange@light": [
-      "MV-BENTO-5",
-      "MV-CLOSE-THANKS",
-      "MV-OP-COVER",
-      "MV-VIZ-BOXPLOT"
-    ],
     "base@light": [
       "MV-BENTO-5",
       "MV-BENTO-6",
@@ -304,6 +148,7 @@
       "MV-PROC-SWIMLANE-FLOW",
       "MV-PROC-TIMELINE",
       "MV-PROC-TIMELINE-RAIL",
+      "MV-PROOF-CERT-ORBITS",
       "MV-PROOF-GROWTH-ORBITS",
       "MV-PROOF-LOGOS",
       "MV-PROOF-LOGOS-CATEGORIZED",
@@ -511,6 +356,7 @@
       "MV-PROC-SWIMLANE-FLOW",
       "MV-PROC-TIMELINE",
       "MV-PROC-TIMELINE-RAIL",
+      "MV-PROOF-CERT-ORBITS",
       "MV-PROOF-GROWTH-ORBITS",
       "MV-PROOF-LOGOS",
       "MV-PROOF-LOGOS-CATEGORIZED",
@@ -571,6 +417,350 @@
       "MV-VIZ-SUNBURST",
       "MV-VIZ-TREEMAP",
       "MV-VIZ-WATERFALL"
+    ],
+    "atlas-plate@dark": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE"
+    ],
+    "atelier-lumen@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE"
+    ],
+    "atelier-orange@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE"
+    ],
+    "azulejo-tile@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE"
+    ],
+    "basalt-mono@dark": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE"
+    ],
+    "comic-panel@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "desert-clay@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "marble-aureate@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "optic-moire@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "sage-linen@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "blueprint-cyan@dark": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE"
+    ],
+    "cyber-terminal@dark": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "graphite-chrome@dark": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "neo-brutal@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "retro-arcade@dark": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "vapor-chrome@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "cobalt-proposal@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE"
+    ],
+    "deco-marquee@dark": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "herbarium-press@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "onyx-couture@dark": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "riso-woodcut@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "verdant-corporate@dark": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "bauhaus-primary@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE"
+    ],
+    "crimson-editorial@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "editorial-serif@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "midnight-neon@dark": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "quant-grid@dark": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
+    ],
+    "swiss-noir@light": [
+      "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-CANVAS-BLANK",
+      "MV-CASE-LOGO-GRID",
+      "MV-CASE-METRICS",
+      "MV-CASE-SPREAD",
+      "MV-CASE-STORY"
     ]
   }
 }
