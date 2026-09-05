@@ -1379,12 +1379,41 @@ body.export-mode [data-print-surface] {
 .stat-reveal-sweep {
   animation: tp-stat-sweep 720ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
+@keyframes tp-stat-blur {
+  from {
+    opacity: 0;
+    filter: blur(14px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+@keyframes tp-stat-drift {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.stat-reveal-blur {
+  animation: tp-stat-blur 640ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.stat-reveal-drift {
+  animation: tp-stat-drift 560ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
 @media (prefers-reduced-motion: reduce) {
   .stat-reveal-rise,
-  .stat-reveal-sweep {
+  .stat-reveal-sweep,
+  .stat-reveal-blur,
+  .stat-reveal-drift {
     animation: none !important;
     opacity: 1;
     transform: none;
     clip-path: none;
+    filter: none;
   }
 }
