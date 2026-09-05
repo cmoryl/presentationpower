@@ -715,11 +715,10 @@ export function StatFigure({
   const revealClass =
     resolvedMotion === "rise"
       ? "stat-reveal-rise"
-      : resolvedMotion === "wipe"
-        ? "stat-reveal-wipe"
-        : resolvedMotion === "pop"
-          ? "stat-reveal-pop"
-          : "";
+      : resolvedMotion === "sweep"
+        ? "stat-reveal-sweep"
+        : "";
+
   const displayValue = useCountUpValue(value ?? "", resolvedMotion === "count");
   return (
     <div
