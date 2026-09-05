@@ -432,7 +432,7 @@ function LondonRevisePage() {
 
   const regenerate = async (
     panels: LondonPanel[],
-    rev: number,
+    rev: number | "draft",
     kind: "vector" | "raster",
     zipName?: string,
   ) => {
