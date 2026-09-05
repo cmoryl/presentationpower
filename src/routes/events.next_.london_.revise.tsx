@@ -432,7 +432,7 @@ function LondonRevisePage() {
 
   const regenerate = async (
     panels: LondonPanel[],
-    rev: number,
+    rev: number | "draft",
     kind: "vector" | "raster",
     zipName?: string,
   ) => {
@@ -468,7 +468,8 @@ function LondonRevisePage() {
     zip.file("manifest.csv", manifest.join("\n"));
     zip.file("qa-report.csv", qaReportCsv(reports));
     const blob = await zip.generateAsync({ type: "blob" });
-    download(blob, zipName ?? `NEXT-London-r${String(rev).padStart(3, "0")}-${kind}.zip`);
+    const revTag = rev === "draft" ? "draft" : String(rev).padStart(3, "0");
+    download(blob, zipName ?? `NEXT-London-r${revTag}-${kind}.zip`);
 
     const r = rollup(reports);
     setQa(reports);
@@ -497,13 +498,10 @@ function LondonRevisePage() {
         failure: `Could not rebuild ${panel.name}`,
       },
       async () => {
-        const rev = head.rev + (dirty ? 1 : 0);
-        await regenerate(
-          [panel],
-          rev,
-          "vector",
-          `NEXT-London-r${String(rev).padStart(3, "0")}-${panelSlug(panel)}.zip`,
-        );
+        // An unpublished draft carries no revision number yet.
+        const rev: number | "draft" = dirty ? "draft" : head.rev;
+        const tag = rev === "draft" ? "draft" : String(rev).padStart(3, "0");
+        await regenerate([panel], rev, "vector", `NEXT-London-r${tag}-${panelSlug(panel)}.zip`);
       },
     );
   };
@@ -522,7 +520,7 @@ function LondonRevisePage() {
         failure: "Regeneration failed",
       },
       async () => {
-        const rev = head.rev + 1;
+        const rev: number | "draft" = dirty ? "draft" : head.rev;
         if (vectorPanels.length) await regenerate(vectorPanels, rev, "vector");
         if (rasterPanels.length) await regenerate(rasterPanels, rev, "raster");
       },
@@ -539,6 +537,7 @@ function LondonRevisePage() {
           panels: draft,
           changes: changes as unknown as Record<string, unknown>[],
           regen: plan as unknown as Record<string, unknown>,
+          removedIds: removed,
           restoredFrom,
         },
       });

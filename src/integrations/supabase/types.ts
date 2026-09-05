@@ -2309,6 +2309,7 @@ export type Database = {
           note: string | null
           panels: Json
           regen: Json
+          removed_ids: Json
           restored_from: number | null
           rev: number
         }
@@ -2320,6 +2321,7 @@ export type Database = {
           note?: string | null
           panels: Json
           regen?: Json
+          removed_ids?: Json
           restored_from?: number | null
           rev: number
         }
@@ -2331,6 +2333,7 @@ export type Database = {
           note?: string | null
           panels?: Json
           regen?: Json
+          removed_ids?: Json
           restored_from?: number | null
           rev?: number
         }
@@ -3834,6 +3837,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_london_head_revision: { Args: never; Returns: Json }
       get_shared_deck: { Args: { _token: string }; Returns: Json }
       get_shared_deck_locales: {
         Args: { _token: string }
