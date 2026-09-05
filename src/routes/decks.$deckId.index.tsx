@@ -120,6 +120,8 @@ import { OrbitLayoutPanel } from "@/components/slide/OrbitLayoutPanel";
 import { LogoWallPanel } from "@/components/slide/LogoWallPanel";
 import { OrbitStylePanel } from "@/components/slide/OrbitStylePanel";
 import { OrbitContentPanel } from "@/components/slide/OrbitContentPanel";
+import { CertStylePanel } from "@/components/slide/CertStylePanel";
+
 import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPanel";
 
 import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
