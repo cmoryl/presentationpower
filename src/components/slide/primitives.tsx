@@ -418,6 +418,111 @@ const STAT_SPECS: Record<StatSize, { valuePx: number; unitPx: number; labelPx: n
 };
 
 /**
+ * Material treatment drawn behind a figure. Returns inline style only — the
+ * pane is the figure's own box so a surfaced stat still baseline-aligns with an
+ * unsurfaced neighbour.
+ */
+function statSurfaceStyle(
+  surface: StatSurface,
+  accentFig: string,
+  mode: "light" | "dark",
+  valuePx: number,
+): CSSProperties | null {
+  if (surface === "plain") return null;
+  const pad = `${Math.round(valuePx * 0.2)}px ${Math.round(valuePx * 0.22)}px`;
+  const radius = Math.round(valuePx * 0.14);
+  const dark = mode === "dark";
+  const base: CSSProperties = { padding: pad, borderRadius: radius };
+  if (surface === "glass") {
+    return {
+      ...base,
+      background: dark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.62)",
+      border: `1px solid ${dark ? "rgba(255,255,255,0.14)" : hexA(accentFig, 0.14)}`,
+      backdropFilter: "blur(18px) saturate(140%)",
+      WebkitBackdropFilter: "blur(18px) saturate(140%)",
+    };
+  }
+  if (surface === "plate") {
+    return {
+      ...base,
+      background: hexA(accentFig, dark ? 0.16 : 0.08),
+      border: `1px solid ${hexA(accentFig, dark ? 0.26 : 0.14)}`,
+    };
+  }
+  if (surface === "wash") {
+    return {
+      ...base,
+      background: `linear-gradient(150deg, ${hexA(accentFig, dark ? 0.26 : 0.14)} 0%, ${hexA(accentFig, 0)} 78%)`,
+    };
+  }
+  if (surface === "emboss") {
+    return {
+      ...base,
+      background: dark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.5)",
+      boxShadow: dark
+        ? "inset 0 1px 0 rgba(255,255,255,0.16), 0 18px 40px rgba(0,0,0,0.34)"
+        : "inset 0 1px 0 rgba(255,255,255,0.9), 0 16px 34px rgba(3,0,44,0.10)",
+    };
+  }
+  return { ...base, border: `1px solid ${hexA(accentFig, dark ? 0.34 : 0.2)}` };
+}
+
+/** Emphasis multiplier applied to the figure's type scale. */
+const EMPHASIS_SCALE: Record<StatEmphasis, number> = { normal: 1, hero: 1.2, quiet: 0.82 };
+
+/**
+ * Count-up on reveal. Runs once, respects `prefers-reduced-motion`, and only
+ * animates when the value really is a number — "6 wks → 9 days" must never be
+ * rewritten mid-flight into a fabricated intermediate figure.
+ */
+function useCountUpValue(value: string, active: boolean): string {
+  const [display, setDisplay] = useState(value);
+  const done = useRef(false);
+  useEffect(() => {
+    if (!active) {
+      setDisplay(value);
+      return;
+    }
+    const match = /^([^0-9-]*)(-?[\d,]*\.?\d+)(.*)$/.exec(value.trim());
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (!match || reduced || done.current) {
+      setDisplay(value);
+      return;
+    }
+    const [, prefix, numStr, suffix] = match;
+    const target = Number.parseFloat(numStr.replace(/,/g, ""));
+    if (!Number.isFinite(target)) {
+      setDisplay(value);
+      return;
+    }
+    const decimals = (numStr.split(".")[1] ?? "").length;
+    const grouped = numStr.includes(",");
+    const start = performance.now();
+    const dur = 900;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / dur);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const n = target * eased;
+      const body = grouped
+        ? n.toLocaleString(undefined, {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals,
+          })
+        : n.toFixed(decimals);
+      setDisplay(`${prefix}${body}${suffix}`);
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else done.current = true;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value, active]);
+  return display;
+}
+
+/**
  * Typographic SHAPE treatments for a statistic. A stat is composed as a
  * figure, not just set as type: the numeral is the primary shape and the
  * geometry around it is drawn in relation to its optical box. The catalog
