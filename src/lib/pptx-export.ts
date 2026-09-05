@@ -12412,18 +12412,19 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     }
     if (st.showIndex) {
       s.addText(String(k + 1).padStart(2, "0"), {
+        x: x + w - 0.85,
+        y: y + 0.08,
+        w: 0.7,
+        h: 0.5,
+        fontSize: 26,
+        bold: true,
+        color: p.accent,
+        transparency: 70,
+        fontFace: "Geist",
+        align: "right",
+      });
+    }
 
-      x: x + w - 0.85,
-      y: y + 0.08,
-      w: 0.7,
-      h: 0.5,
-      fontSize: 26,
-      bold: true,
-      color: p.accent,
-      transparency: 70,
-      fontFace: "Geist",
-      align: "right",
-    });
     s.addText(
       [
         ...(str(cert.label)
