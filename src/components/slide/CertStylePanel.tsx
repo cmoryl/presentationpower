@@ -472,6 +472,31 @@ export function CertStylePanel({
                     + Add point
                   </button>
                 </div>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <label className="flex flex-col gap-1">
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-black/45">
+                      Logo — light slides
+                    </span>
+                    <input
+                      className={FIELD}
+                      value={str(cert.logoUrl)}
+                      placeholder="https://…/logo-color.svg"
+                      onChange={(e) => patch({ logoUrl: e.target.value })}
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1">
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-black/45">
+                      Logo — dark slides
+                    </span>
+                    <input
+                      className={FIELD}
+                      value={str(cert.logoUrlDark)}
+                      placeholder="https://…/logo-white.svg"
+                      onChange={(e) => patch({ logoUrlDark: e.target.value })}
+                    />
+                  </label>
+                </div>
+
               </div>
             );
           })}
