@@ -17,7 +17,10 @@ export type StatArrangement =
   | "staircase"
   | "bento"
   | "split-ledger"
-  | "ticker";
+  | "ticker"
+  | "magazine"
+  | "ladder"
+  | "duo-lead";
 
 export type StatArrangementPreset = {
   id: StatArrangement;
@@ -63,6 +66,24 @@ export const STAT_ARRANGEMENT_PRESETS: StatArrangementPreset[] = [
     label: "Ticker band",
     description: "One tight horizontal band of figures divided by hairlines.",
     minItems: 3,
+  },
+  {
+    id: "magazine",
+    label: "Magazine lead",
+    description: "A full-width lead figure as the story opener, with the rest in a row beneath.",
+    minItems: 2,
+  },
+  {
+    id: "ladder",
+    label: "Vertical ladder",
+    description: "A single ruled column of figures — reads down a rail or sidebar.",
+    minItems: 2,
+  },
+  {
+    id: "duo-lead",
+    label: "Twin leads",
+    description: "Two equal hero figures side by side, supporting figures beneath.",
+    minItems: 2,
   },
 ];
 
