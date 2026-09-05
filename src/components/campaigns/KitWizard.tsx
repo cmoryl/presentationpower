@@ -191,6 +191,29 @@ export function KitWizard({
   const router = useRouter();
   const navigate = useNavigate();
 
+  // ─── Finish-CTA "unsaved changes" tracking ─────────────────────────────
+  // Snapshot of the fields that matter for "did this kit change since the
+  // last save" — compared against the current values when Finish is pressed.
+  const snapshotKey = () =>
+    JSON.stringify({
+      brandId,
+      mode,
+      profileId,
+      formatIds,
+      manualCopy,
+      attachEvent,
+      event,
+      nextDesign,
+      nextTrackId,
+      moduleLayoutId,
+      imageScrimPct,
+      imageUrl: imageUrl?.startsWith("data:") ? undefined : imageUrl,
+      kitLook,
+    });
+  const lastSavedSnapshot = useRef<string | null>(null);
+  const [finishDialogOpen, setFinishDialogOpen] = useState(false);
+  const [finishDialogName, setFinishDialogName] = useState("");
+
   // Hydrate all fields from a saved kit when kitId is provided.
   useEffect(() => {
     if (!kitId) return;
@@ -271,6 +294,10 @@ export function KitWizard({
       toast.error("Pick at least one format before saving.");
       return;
     }
+    const persistableImageUrl = imageUrl && !imageUrl.startsWith("data:") ? imageUrl : undefined;
+    if (imageUrl && imageUrl.startsWith("data:")) {
+      toast("Uploaded background isn't saved with the kit — pick it from the Division library to keep it");
+    }
     setSaving(true);
     try {
       const row = await saveKitFn({
@@ -294,6 +321,13 @@ export function KitWizard({
             // Keep the locked art direction on the row even when event facts
             // are off, so reopening the kit renders in the same look.
             ...(kitLook.lookId || kitLook.styleId ? { look: kitLook } : {}),
+            // Visual layout/imagery selections travel alongside look so
+            // reopening the kit restores the same composition.
+            visual: {
+              moduleLayoutId: moduleLayoutId ?? undefined,
+              imageScrimPct,
+              ...(persistableImageUrl ? { imageUrl: persistableImageUrl } : {}),
+            },
           },
           attachEvent,
           nextDesign,
