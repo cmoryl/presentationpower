@@ -28,21 +28,36 @@ registerSlideModule({
   variantIds: ["MV-PROOF-CERT-ORBITS"],
   render: ({ brand, pageNumber, c, mode, ink, isDark }) => {
     const accent = accentInk(brand.tokens.accent, mode, 4.5);
+    const st = resolveCertStyle(c.certStyle);
     const certs = arr(c.certs).slice(0, MAX_CERTS);
     const highlights = strs(c.cardHighlights).slice(0, MAX_HIGHLIGHTS).filter(Boolean);
     const points = strs(c.cardPoints).slice(0, MAX_POINTS).filter(Boolean);
-    const dense = certs.length >= 3;
+    const dense = certs.length >= 3 || st.density === "compact";
 
     const hairline = isDark ? "rgba(255,255,255,0.14)" : "rgba(10,15,28,0.12)";
-    const bandBg = isDark ? "rgba(255,255,255,0.045)" : "rgba(3,0,44,0.03)";
-    const cardBg = isDark ? "rgba(255,255,255,0.07)" : "#FFFFFF";
+    const bandBg = st.band
+      ? isDark
+        ? "rgba(255,255,255,0.045)"
+        : "rgba(3,0,44,0.03)"
+      : "transparent";
+    const cardBg =
+      st.cardLook === "outline"
+        ? "transparent"
+        : isDark
+          ? "rgba(255,255,255,0.07)"
+          : "#FFFFFF";
     const cardBorder = isDark ? "rgba(255,255,255,0.16)" : "rgba(10,15,28,0.1)";
-    const cardShadow = isDark
-      ? "0 18px 40px -22px rgba(0,0,0,0.7)"
-      : "0 18px 40px -24px rgba(3,0,44,0.25)";
-    const tileBg = isDark ? "rgba(255,255,255,0.06)" : "rgba(3,0,44,0.045)";
+    const cardShadow =
+      st.cardLook === "elevated"
+        ? isDark
+          ? "0 18px 40px -22px rgba(0,0,0,0.7)"
+          : "0 18px 40px -24px rgba(3,0,44,0.25)"
+        : "none";
+    const tileBg =
+      st.statTile === "tile" ? (isDark ? "rgba(255,255,255,0.06)" : "rgba(3,0,44,0.045)") : "transparent";
     const ghostIdx = isDark ? "rgba(255,255,255,0.1)" : "rgba(3,0,44,0.08)";
     const muted = isDark ? "rgba(255,255,255,0.6)" : "rgba(3,0,44,0.62)";
+    const cardsFirst = st.cardsSide === "left";
 
     return (
       <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -50,10 +65,21 @@ registerSlideModule({
 
         <div
           className="mt-10 grid min-h-0 flex-1 items-stretch"
-          style={{ gridTemplateColumns: "minmax(0, 0.92fr) minmax(0, 1.08fr)", gap: 56 }}
+          style={{
+            gridTemplateColumns: cardsFirst
+              ? `minmax(0, 1.08fr) minmax(0, ${st.split}fr)`
+              : `minmax(0, ${st.split}fr) minmax(0, 1.08fr)`,
+            gap: dense ? 44 : 56,
+          }}
         >
-          {/* ── Left: programme statement (unframed) ── */}
-          <div data-intro-item="" data-intro-step={1} className="flex min-w-0 flex-col">
+          {/* ── Statement column (unframed) ── */}
+          <div
+            data-intro-item=""
+            data-intro-step={1}
+            className="flex min-w-0 flex-col"
+            style={{ order: cardsFirst ? 2 : 1 }}
+          >
+
             {s(c.cardTitle) && (
               <div
                 style={{
