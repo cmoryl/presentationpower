@@ -147,7 +147,7 @@ export type OrbitStage = { w: number; h: number };
 
 /** Nominal stage the slide renderer gives the rings (1920×1080 canvas). */
 export function orbitStageSize(count: number): OrbitStage {
-  return { w: 860, h: orbitBaseSize(count) + 40 };
+  return { w: 860, h: Math.max(620, orbitBaseSize(count) + 40) };
 }
 
 export type FittedOrbit = OrbitPos & {
@@ -233,6 +233,31 @@ export function fitOrbitLayout(
     }
     for (let i = 0; i < pts.length; i += 1) clampIn(i);
     if (!moved) break;
+  }
+
+  // Safety net: if the stage is simply too tight for the authored sizes, the
+  // relaxation can stay wedged against the edges. Fall back to an even grid in
+  // reading order so figures still never sit on top of each other.
+  const stillColliding = () => {
+    for (let i = 0; i < pts.length; i += 1) {
+      for (let j = i + 1; j < pts.length; j += 1) {
+        const a = pts[i]!;
+        const b = pts[j]!;
+        if (Math.hypot(b.x - a.x, b.y - a.y) < a.r + b.r + gap * 0.5) return true;
+      }
+    }
+    return false;
+  };
+  if (stillColliding()) {
+    const cols = Math.min(pts.length, Math.max(1, Math.floor(stage.w / (base + gap))));
+    const rows = Math.ceil(pts.length / cols);
+    pts.forEach((p, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      p.x = ((col + 0.5) / cols) * stage.w;
+      p.y = ((row + 0.5) / rows) * stage.h;
+    });
+    for (let i = 0; i < pts.length; i += 1) clampIn(i);
   }
 
   return pts.map((p, i) => ({

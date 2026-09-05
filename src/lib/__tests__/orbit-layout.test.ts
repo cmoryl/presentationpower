@@ -55,7 +55,7 @@ describe("orbit stat placement", () => {
 });
 
 describe("orbit collision detection", () => {
-  const stage = { w: 860, h: 300 };
+  const stage = { w: 860, h: 620 };
   const base = 258;
 
   it("flags overlapping rings and clears ones that do not touch", () => {

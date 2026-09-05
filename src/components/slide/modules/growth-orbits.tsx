@@ -10,7 +10,7 @@ import { Kicker } from "../primitives";
 import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { formatStatValue } from "@/lib/stat-format";
-import { orbitBaseSize, resolveFittedOrbitLayout } from "@/lib/orbit-layout";
+import { orbitBaseSize, orbitStageSize, resolveFittedOrbitLayout } from "@/lib/orbit-layout";
 import {
   orbitDotColor,
   orbitRingColor,
@@ -135,7 +135,7 @@ registerSlideModule({
     // another figure.
     const positions = resolveFittedOrbitLayout(orbits, {
       base: ringSize,
-      stage: { w: 860, h: ringSize + 40 },
+      stage: orbitStageSize(orbits.length),
     });
 
 
@@ -303,7 +303,7 @@ registerSlideModule({
                 )}
               </div>
             )}
-            <div className="relative mt-8 w-full flex-1" style={{ minHeight: ringSize + 40 }}>
+            <div className="relative mt-8 w-full flex-1" style={{ minHeight: orbitStageSize(orbits.length).h }}>
               {orbits.map((o: Item, i) => {
                 const pos = positions[i]!;
                 const size = Math.round(ringSize * pos.size);
