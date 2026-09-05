@@ -266,6 +266,10 @@ export function KitWizard({
           }
         }
         setStep(WIZARD_STEPS.findIndex((s) => s.key === "review")); // jump to review
+        // Defer to next tick so state above has committed before snapshotting.
+        setTimeout(() => {
+          lastSavedSnapshot.current = snapshotKey();
+        }, 0);
       })
       .catch((err) => {
         toast.error(err instanceof Error ? err.message : "Failed to load saved kit");
@@ -335,6 +339,7 @@ export function KitWizard({
         },
       });
       setSavedKitId(row.id);
+      lastSavedSnapshot.current = snapshotKey();
       toast.success(savedKitId ? `Updated "${row.name}"` : `Saved "${row.name}" to your kits`);
       // Reflect the id in the URL so refresh keeps us editing the same row.
       if (!savedKitId) {
