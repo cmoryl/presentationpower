@@ -204,21 +204,24 @@ registerSlideModule({
                           flexShrink: 0,
                         }}
                       />
-                      <span
-                        aria-hidden
-                        data-decorative
-                        style={{
-                          fontSize: fillPx(17, "body"),
-                          fontWeight: 700,
-                          fontVariantNumeric: "tabular-nums",
-                          letterSpacing: "0.06em",
-                          color: muted,
-                          width: 30,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
+                      {st.numberedPoints && (
+                        <span
+                          aria-hidden
+                          data-decorative
+                          style={{
+                            fontSize: fillPx(17, "body"),
+                            fontWeight: 700,
+                            fontVariantNumeric: "tabular-nums",
+                            letterSpacing: "0.06em",
+                            color: muted,
+                            width: 30,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                      )}
+
                       <span
                         style={{
                           fontSize: fillPx(25, "body"),
