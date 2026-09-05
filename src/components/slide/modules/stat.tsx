@@ -211,19 +211,32 @@ registerSlideModule({
 
       case "MV-STAT-KPI-RAIL": {
         const items = arr(c.items).slice(0, 5);
+        // The set's composition is authored on the slide, so the rail can become
+        // a hero-led pair, a stepped staircase or an asymmetric bento without a
+        // different module. `even` reproduces the classic single ruled rail.
+        const plan = planStatArrangement(
+          isStatArrangement(c.statArrangement) ? c.statArrangement : "even",
+          items.length,
+          { maxCols: 5 },
+        );
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-            <div className="slide-fill-stretch mt-14 flex items-stretch">
+            <div className="slide-fill-stretch mt-14" style={statArrangementGridStyle(plan)}>
               {items.map((it, i) => {
                 const delta = s(it.delta);
                 const negative = delta.trim().startsWith("-");
+                const cellPlan = plan.cells[i];
                 return (
                   <div
                     key={i}
-                    className="slide-fill-center min-w-0 flex-1 px-10 first:pl-0 last:pr-0"
-                    style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}` }}
+                    className="slide-fill-center min-w-0 px-10 first:pl-0 last:pr-0"
+                    style={{
+                      ...statCellStyle(cellPlan),
+                      borderLeft: cellPlan.leadingRule ? `1px solid ${ink.hairline}` : "none",
+                    }}
                   >
+
                     <div
                       className="tabular-nums"
                       style={{
