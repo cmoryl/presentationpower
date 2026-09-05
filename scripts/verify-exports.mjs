@@ -194,7 +194,11 @@ async function boot(browser) {
   page.on("console", (m) => {
     if (m.type() === "error") console.error("  [page error]", m.text().slice(0, 200));
   });
-  await page.goto(`${BASE_URL}/dev/export-verify`, { waitUntil: "domcontentloaded" });
+  // Dev-mode module graph is large; the default 30s goto can expire on a cold cache.
+  await page.goto(`${BASE_URL}/dev/export-verify`, {
+    waitUntil: "domcontentloaded",
+    timeout: 180_000,
+  });
   await page.waitForFunction("!!window.__tpExportVerify", null, { timeout: 120_000 });
   return page;
 }
