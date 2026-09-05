@@ -44,6 +44,7 @@ import {
   auditAi,
   auditSvg,
   auditPng,
+  gateOnQa,
   qaReportCsv,
   qaSummary,
   rollup,
@@ -79,10 +80,7 @@ import {
   resolveLondonArtworkAsync,
 } from "@/lib/next-london-revise";
 
-import {
-  getLondonHeadRevision,
-  listLondonRevisions,
-} from "@/lib/next-london-revise.functions";
+import { getLondonHeadRevision } from "@/lib/next-london-revise.functions";
 import { onLondonRevisionPublished } from "@/lib/next-london-revision-live";
 
 /** Millimetres as inches — every signage spec reads in both units. */
