@@ -17,7 +17,10 @@ export type StatArrangement =
   | "staircase"
   | "bento"
   | "split-ledger"
-  | "ticker";
+  | "ticker"
+  | "magazine"
+  | "ladder"
+  | "duo-lead";
 
 export type StatArrangementPreset = {
   id: StatArrangement;
@@ -63,6 +66,24 @@ export const STAT_ARRANGEMENT_PRESETS: StatArrangementPreset[] = [
     label: "Ticker band",
     description: "One tight horizontal band of figures divided by hairlines.",
     minItems: 3,
+  },
+  {
+    id: "magazine",
+    label: "Magazine lead",
+    description: "A full-width lead figure as the story opener, with the rest in a row beneath.",
+    minItems: 2,
+  },
+  {
+    id: "ladder",
+    label: "Vertical ladder",
+    description: "A single ruled column of figures — reads down a rail or sidebar.",
+    minItems: 2,
+  },
+  {
+    id: "duo-lead",
+    label: "Twin leads",
+    description: "Two equal hero figures side by side, supporting figures beneath.",
+    minItems: 2,
   },
 ];
 
@@ -206,6 +227,65 @@ export function planStatArrangement(
         cell({ col: i + 1, row: 1, emphasis: "quiet", leadingRule: i > 0 }),
       ),
     };
+  }
+
+  if (effective === "magazine") {
+    // Lead figure spans the full bed on row 1; satellites share the rows below.
+    const rest = n - 1;
+    const cols = Math.max(1, Math.min(rest, maxCols));
+    return {
+      id: effective,
+      cols,
+      rows: 1 + Math.ceil(rest / cols),
+      gapX: 56,
+      gapY: 44,
+      cells: [
+        cell({ col: 1, row: 1, span: cols, emphasis: "hero" }),
+        ...Array.from({ length: rest }, (_, i) =>
+          cell({
+            col: (i % cols) + 1,
+            row: 2 + Math.floor(i / cols),
+            emphasis: "quiet",
+            leadingRule: i % cols > 0,
+          }),
+        ),
+      ],
+    };
+  }
+
+  if (effective === "ladder") {
+    // One column, every row ruled — a vertical rail of figures.
+    return {
+      id: effective,
+      cols: 1,
+      rows: n,
+      gapX: 0,
+      gapY: 36,
+      cells: Array.from({ length: n }, (_, i) =>
+        cell({ col: 1, row: i + 1, emphasis: i === 0 ? "hero" : "normal", leadingRule: i > 0 }),
+      ),
+    };
+  }
+
+  if (effective === "duo-lead") {
+    // Two equal heroes on row 1; anything else sits quietly beneath.
+    const rest = n - 2;
+    const cols = Math.max(2, Math.min(2 + rest, maxCols));
+    const cells: StatCellPlan[] = [
+      cell({ col: 1, row: 1, emphasis: "hero" }),
+      cell({ col: 2, row: 1, emphasis: "hero", leadingRule: true }),
+    ];
+    for (let i = 0; i < rest; i += 1) {
+      cells.push(
+        cell({
+          col: (i % cols) + 1,
+          row: 2 + Math.floor(i / cols),
+          emphasis: "quiet",
+          leadingRule: i % cols > 0,
+        }),
+      );
+    }
+    return { id: effective, cols, rows: rest > 0 ? 1 + Math.ceil(rest / cols) : 1, gapX: 52, gapY: 40, cells };
   }
 
   const cols = Math.min(n, maxCols);

@@ -13,6 +13,10 @@ export type CertStatLayout = "row" | "stack";
 export type CertStatFigureColor = "accent" | "ink";
 export type CertStatLabelCase = "upper" | "normal";
 export type CertStatAlign = "left" | "center";
+export type CertPointMarker = "number" | "dash" | "dot" | "none";
+export type CertLogoTone = "brand" | "mono";
+export type CertAccentRole = "mixed" | "strong" | "quiet";
+export type CertHeaderAlign = "left" | "center";
 
 export type CertStyle = {
   /** Which column the credential cards sit in. */
@@ -49,6 +53,16 @@ export type CertStyle = {
   statLabelCase: CertStatLabelCase;
   /** Text alignment inside each figure block. */
   statAlign: CertStatAlign;
+  /** Row marker for the spec-sheet points (number, dash, dot or none). */
+  pointMarker: CertPointMarker;
+  /** Credential marks at full brand colour or single-ink mono. */
+  logoTone: CertLogoTone;
+  /** How loudly the accent runs through the module. */
+  accentRole: CertAccentRole;
+  /** Scale applied to the credential badge area (0.8–1.4). */
+  badgeScale: number;
+  /** Alignment of the statement column heading. */
+  headerAlign: CertHeaderAlign;
 };
 
 export const DEFAULT_CERT_STYLE: CertStyle = {
@@ -71,6 +85,11 @@ export const DEFAULT_CERT_STYLE: CertStyle = {
   statFigureColor: "accent",
   statLabelCase: "upper",
   statAlign: "left",
+  pointMarker: "number",
+  logoTone: "brand",
+  accentRole: "mixed",
+  badgeScale: 1,
+  headerAlign: "left",
 };
 
 export const CERT_LIMITS = {
@@ -79,6 +98,7 @@ export const CERT_LIMITS = {
   stagger: { min: 0, max: 80, step: 2 },
   cardRadius: { min: 0, max: 20, step: 1 },
   statSize: { min: 0.7, max: 1.6, step: 0.05 },
+  badgeScale: { min: 0.8, max: 1.4, step: 0.05 },
 } as const;
 
 export const CERT_CARD_LOOKS: { id: CertCardLook; label: string }[] = [
@@ -117,6 +137,24 @@ export const CERT_STAT_LABEL_CASES: { id: CertStatLabelCase; label: string }[] =
 export const CERT_STAT_ALIGNS: { id: CertStatAlign; label: string }[] = [
   { id: "left", label: "Left" },
   { id: "center", label: "Centred" },
+];
+
+export const CERT_POINT_MARKERS: { id: CertPointMarker; label: string }[] = [
+  { id: "number", label: "Numbered" },
+  { id: "dash", label: "Dash" },
+  { id: "dot", label: "Dot" },
+  { id: "none", label: "No marker" },
+];
+
+export const CERT_LOGO_TONES: { id: CertLogoTone; label: string }[] = [
+  { id: "brand", label: "Brand colour" },
+  { id: "mono", label: "Single ink" },
+];
+
+export const CERT_ACCENT_ROLES: { id: CertAccentRole; label: string }[] = [
+  { id: "mixed", label: "Balanced" },
+  { id: "strong", label: "Strong" },
+  { id: "quiet", label: "Quiet" },
 ];
 
 function clamp(n: number, min: number, max: number, fallback: number): number {
@@ -169,6 +207,19 @@ export function resolveCertStyle(raw: unknown): CertStyle {
     statFigureColor: pick(o.statFigureColor, ["accent", "ink"] as const, d.statFigureColor),
     statLabelCase: pick(o.statLabelCase, ["upper", "normal"] as const, d.statLabelCase),
     statAlign: pick(o.statAlign, ["left", "center"] as const, d.statAlign),
+    pointMarker: pick(o.pointMarker, ["number", "dash", "dot", "none"] as const, d.pointMarker),
+    logoTone: pick(o.logoTone, ["brand", "mono"] as const, d.logoTone),
+    accentRole: pick(o.accentRole, ["mixed", "strong", "quiet"] as const, d.accentRole),
+    badgeScale:
+      Math.round(
+        clamp(
+          Number(o.badgeScale),
+          CERT_LIMITS.badgeScale.min,
+          CERT_LIMITS.badgeScale.max,
+          d.badgeScale,
+        ) * 20,
+      ) / 20,
+    headerAlign: pick(o.headerAlign, ["left", "center"] as const, d.headerAlign),
   };
 }
 

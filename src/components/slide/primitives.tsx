@@ -464,11 +464,34 @@ function statSurfaceStyle(
         : "inset 0 1px 0 rgba(255,255,255,0.9), 0 16px 34px rgba(3,0,44,0.10)",
     };
   }
+  if (surface === "dotgrid") {
+    const dot = Math.max(10, Math.round(valuePx * 0.09));
+    return {
+      ...base,
+      background: dark ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.55)",
+      backgroundImage: `radial-gradient(${hexA(accentFig, dark ? 0.3 : 0.2)} 1.4px, transparent 1.5px)`,
+      backgroundSize: `${dot}px ${dot}px`,
+      border: `1px solid ${hexA(accentFig, dark ? 0.16 : 0.1)}`,
+    };
+  }
+  if (surface === "stripes") {
+    const step = Math.max(9, Math.round(valuePx * 0.08));
+    return {
+      ...base,
+      background: `repeating-linear-gradient(135deg, ${hexA(accentFig, dark ? 0.1 : 0.07)} 0px, ${hexA(accentFig, dark ? 0.1 : 0.07)} 1.5px, transparent 1.5px, transparent ${step}px)`,
+      border: `1px solid ${hexA(accentFig, dark ? 0.14 : 0.09)}`,
+    };
+  }
   return { ...base, border: `1px solid ${hexA(accentFig, dark ? 0.34 : 0.2)}` };
 }
 
 /** Emphasis multiplier applied to the figure's type scale. */
-const EMPHASIS_SCALE: Record<StatEmphasis, number> = { normal: 1, hero: 1.2, quiet: 0.82 };
+const EMPHASIS_SCALE: Record<StatEmphasis, number> = {
+  normal: 1,
+  hero: 1.2,
+  monumental: 1.45,
+  quiet: 0.82,
+};
 
 /**
  * Count-up on reveal. Runs once, respects `prefers-reduced-motion`, and only
@@ -717,7 +740,11 @@ export function StatFigure({
       ? "stat-reveal-rise"
       : resolvedMotion === "sweep"
         ? "stat-reveal-sweep"
-        : "";
+        : resolvedMotion === "blur"
+          ? "stat-reveal-blur"
+          : resolvedMotion === "drift"
+            ? "stat-reveal-drift"
+            : "";
 
   const displayValue = useCountUpValue(value ?? "", resolvedMotion === "count");
   return (
@@ -984,6 +1011,151 @@ export function StatFigure({
           }}
         />
       )}
+      {resolvedShape === "halo" && (
+        <span
+          aria-hidden
+          data-decorative
+          className="pointer-events-none absolute"
+          style={{
+            width: `${Math.round(spec.valuePx * 2.1)}px`,
+            height: `${Math.round(spec.valuePx * 1.35)}px`,
+            top: `-${Math.round(spec.valuePx * 0.3)}px`,
+            left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.28)}px`,
+            transform: centeredShape ? "translateX(-50%)" : undefined,
+            borderRadius: "50%",
+            border: `${Math.max(3, Math.round(spec.valuePx * 0.03))}px solid ${hexA(aFig, mode === "dark" ? 0.3 : 0.2)}`,
+            boxShadow: `0 0 ${Math.round(spec.valuePx * 0.5)}px ${hexA(aFig, mode === "dark" ? 0.22 : 0.12)}`,
+            zIndex: 0,
+          }}
+        />
+      )}
+      {resolvedShape === "ribbon" && (
+        <span
+          aria-hidden
+          data-decorative
+          className="pointer-events-none absolute"
+          style={{
+            left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.06)}px`,
+            transform: centeredShape ? "translateX(-50%)" : undefined,
+            top: `${Math.round(spec.valuePx * 0.42)}px`,
+            height: `${Math.round(spec.valuePx * 0.34)}px`,
+            width: centeredShape ? "72%" : "104%",
+            background: hexA(aFig, mode === "dark" ? 0.2 : 0.12),
+            borderTop: `${Math.max(2, Math.round(spec.valuePx * 0.018))}px solid ${aFig}`,
+            zIndex: 0,
+          }}
+        />
+      )}
+      {resolvedShape === "echo" && !valueIsPhrase && (
+        <span
+          aria-hidden
+          data-decorative
+          className="pointer-events-none absolute select-none font-semibold tabular-nums"
+          style={{
+            fontSize: `min(${spec.valuePx}px, 20cqw)`,
+            lineHeight: 0.94,
+            letterSpacing: "-0.045em",
+            top: Math.round(spec.valuePx * 0.07),
+            left: centeredShape ? "50%" : Math.round(spec.valuePx * 0.05),
+            transform: centeredShape
+              ? `translateX(calc(-50% + ${Math.round(spec.valuePx * 0.05)}px))`
+              : undefined,
+            color: hexA(aFig, mode === "dark" ? 0.2 : 0.12),
+            whiteSpace: "nowrap",
+            zIndex: 0,
+          }}
+        >
+          {value || "—"}
+        </span>
+      )}
+      {resolvedShape === "ticks" &&
+        (() => {
+          // Instrument dial: 33 tick marks around a 270° sweep, filled by progress.
+          const total = 33;
+          const lit = Math.round(p * total);
+          const R = 92;
+          const cx = 100;
+          const cy = 100;
+          const tick = (i: number) => {
+            const a = (-225 + (270 * i) / (total - 1)) * (Math.PI / 180);
+            const inner = R - 12;
+            return {
+              x1: cx + Math.cos(a) * inner,
+              y1: cy + Math.sin(a) * inner,
+              x2: cx + Math.cos(a) * R,
+              y2: cy + Math.sin(a) * R,
+            };
+          };
+          return (
+            <svg
+              aria-hidden
+              viewBox="0 0 200 200"
+              className="pointer-events-none absolute"
+              style={{
+                width: `${Math.round(spec.valuePx * 1.95)}px`,
+                top: `-${Math.round(spec.valuePx * 0.42)}px`,
+                left: centeredShape ? "50%" : 0,
+                transform: centeredShape ? "translateX(-50%)" : undefined,
+                zIndex: 0,
+              }}
+            >
+              {Array.from({ length: total }, (_, i) => {
+                const t = tick(i);
+                return (
+                  <line
+                    key={i}
+                    {...t}
+                    stroke={i < lit ? aFig : hexA(aFig, mode === "dark" ? 0.2 : 0.13)}
+                    strokeWidth={i % 4 === 0 ? 5 : 2.6}
+                    strokeLinecap="round"
+                  />
+                );
+              })}
+            </svg>
+          );
+        })()}
+      {resolvedShape === "pie" &&
+        isPercentValue &&
+        (() => {
+          // Single bold wedge. Drawn as a thick stroked circle so the share is
+          // a dash offset — crisp at any size and export-safe.
+          const R = 80;
+          const circ = 2 * Math.PI * R;
+          return (
+            <svg
+              aria-hidden
+              data-decorative
+              viewBox="0 0 200 200"
+              className="pointer-events-none absolute"
+              style={{
+                width: `${Math.round(spec.valuePx * 1.9)}px`,
+                top: `-${Math.round(spec.valuePx * 0.44)}px`,
+                left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.16)}px`,
+                transform: centeredShape ? "translateX(-50%)" : undefined,
+                zIndex: 0,
+              }}
+            >
+              <circle
+                cx="100"
+                cy="100"
+                r={R}
+                fill="none"
+                stroke={hexA(aFig, mode === "dark" ? 0.16 : 0.1)}
+                strokeWidth={26}
+              />
+              <circle
+                cx="100"
+                cy="100"
+                r={R}
+                fill="none"
+                stroke={aFig}
+                strokeWidth={26}
+                strokeDasharray={`${circ * p} ${circ}`}
+                transform="rotate(-90 100 100)"
+              />
+            </svg>
+          );
+        })()}
       {resolvedShape === "icon-ghost" && StatIcon && (
         <span
           aria-hidden
@@ -1092,6 +1264,95 @@ export function StatFigure({
                   );
                 })
               )}
+            </svg>
+          );
+        })()}
+
+      {(resolvedShape === "area" || resolvedShape === "waterfall") &&
+        resolvedSeries.length >= 2 &&
+        (() => {
+          const w = 200;
+          const h = 60;
+          const min = Math.min(...resolvedSeries, 0);
+          const max = Math.max(...resolvedSeries);
+          const span = max - min || 1;
+          const yFor = (v: number) => h - 4 - ((v - min) / span) * (h - 12);
+          if (resolvedShape === "area") {
+            const step = w / (resolvedSeries.length - 1 || 1);
+            const pts = resolvedSeries.map((v, i) => `${i * step},${yFor(v)}`).join(" ");
+            return (
+              <svg
+                aria-hidden
+                data-decorative
+                viewBox={`0 0 ${w} ${h}`}
+                preserveAspectRatio="none"
+                className={`relative block ${centeredShape ? "mx-auto" : ""}`}
+                style={{
+                  width: centeredShape ? "58%" : "100%",
+                  height: Math.round(spec.valuePx * 0.34),
+                  marginBottom: Math.round(spec.valuePx * 0.1),
+                  zIndex: 1,
+                }}
+              >
+                <polygon
+                  points={`0,${h - 2} ${pts} ${w},${h - 2}`}
+                  fill={hexA(aFig, mode === "dark" ? 0.24 : 0.14)}
+                />
+                <polyline
+                  points={pts}
+                  fill="none"
+                  stroke={aFig}
+                  strokeWidth={3}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
+            );
+          }
+          // Micro waterfall: each bar climbs from the previous cumulative level.
+          const cumulative: number[] = [];
+          resolvedSeries.reduce((acc, v, i) => {
+            cumulative[i] = acc + v;
+            return cumulative[i];
+          }, 0);
+          const cMin = Math.min(0, ...cumulative);
+          const cMax = Math.max(...cumulative);
+          const cSpan = cMax - cMin || 1;
+          const cyFor = (v: number) => h - 4 - ((v - cMin) / cSpan) * (h - 12);
+          const barW = (w / resolvedSeries.length) * 0.62;
+          let prev = 0;
+          return (
+            <svg
+              aria-hidden
+              data-decorative
+              viewBox={`0 0 ${w} ${h}`}
+              preserveAspectRatio="none"
+              className={`relative block ${centeredShape ? "mx-auto" : ""}`}
+              style={{
+                width: centeredShape ? "58%" : "100%",
+                height: Math.round(spec.valuePx * 0.34),
+                marginBottom: Math.round(spec.valuePx * 0.1),
+                zIndex: 1,
+              }}
+            >
+              {resolvedSeries.map((v, i) => {
+                const from = prev;
+                prev = prev + v;
+                const top = cyFor(Math.max(from, prev));
+                const bottom = cyFor(Math.min(from, prev));
+                return (
+                  <rect
+                    key={i}
+                    x={i * (w / resolvedSeries.length) + (w / resolvedSeries.length - barW) / 2}
+                    y={top}
+                    width={barW}
+                    height={Math.max(2, bottom - top)}
+                    rx={1.5}
+                    fill={hexA(aFig, i === resolvedSeries.length - 1 ? 1 : 0.5)}
+                  />
+                );
+              })}
             </svg>
           );
         })()}

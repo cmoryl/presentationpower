@@ -45,16 +45,32 @@ export type StatShape =
   | "waffle"
   | "donut"
   | "delta"
-  | "bullet";
+  | "bullet"
+  // ── second-wave presets ──
+  | "halo"
+  | "ribbon"
+  | "echo"
+  | "ticks"
+  | "pie"
+  | "area"
+  | "waterfall";
 
 /** Material treatment drawn behind the whole figure. */
-export type StatSurface = "plain" | "glass" | "plate" | "wash" | "emboss" | "outline";
+export type StatSurface =
+  | "plain"
+  | "glass"
+  | "plate"
+  | "wash"
+  | "emboss"
+  | "outline"
+  | "dotgrid"
+  | "stripes";
 
 /** Reveal choreography for a figure (all reduced-motion safe). */
-export type StatMotion = "none" | "rise" | "count" | "sweep";
+export type StatMotion = "none" | "rise" | "count" | "sweep" | "blur" | "drift";
 
 /** Optical weight of a figure inside a multi-stat arrangement. */
-export type StatEmphasis = "normal" | "hero" | "quiet";
+export type StatEmphasis = "normal" | "hero" | "quiet" | "monumental";
 
 export type StatShapePreset = {
   id: StatShape;
@@ -102,6 +118,16 @@ export const STAT_SURFACE_PRESETS: Array<{
     label: "Outline card",
     description: "Hairline accent outline around the figure with no fill.",
   },
+  {
+    id: "dotgrid",
+    label: "Dot matrix",
+    description: "Field of accent dots behind the figure — technical, plotted texture.",
+  },
+  {
+    id: "stripes",
+    label: "Hairline stripes",
+    description: "Diagonal accent hairlines at a low alpha — a drafting-sheet material.",
+  },
 ];
 
 export const STAT_MOTION_PRESETS: Array<{
@@ -113,6 +139,8 @@ export const STAT_MOTION_PRESETS: Array<{
   { id: "rise", label: "Rise in", description: "Figure lifts and fades in on a staggered beat." },
   { id: "count", label: "Count up", description: "Numeral counts up to its value on reveal." },
   { id: "sweep", label: "Gauge sweep", description: "Meters and rings sweep to their value." },
+  { id: "blur", label: "Focus pull", description: "Figure sharpens from a soft blur into crisp type." },
+  { id: "drift", label: "Drift in", description: "Figure slides in from the leading edge and settles." },
 ];
 
 export const STAT_EMPHASIS_PRESETS: Array<{
@@ -122,6 +150,11 @@ export const STAT_EMPHASIS_PRESETS: Array<{
 }> = [
   { id: "normal", label: "Normal", description: "Standard weight in the arrangement." },
   { id: "hero", label: "Hero figure", description: "Enlarged, accent-inked lead statistic." },
+  {
+    id: "monumental",
+    label: "Monumental",
+    description: "Display-wall weight — the figure becomes the slide's artwork.",
+  },
   { id: "quiet", label: "Supporting", description: "Reduced weight so a hero figure leads." },
 ];
 
@@ -297,6 +330,52 @@ export const STAT_SHAPE_PRESETS: StatShapePreset[] = [
     description: "Banded bullet track with a target marker — actual against plan.",
     family: "dataviz",
     usesProgress: true,
+  },
+  {
+    id: "halo",
+    label: "Accent halo",
+    description: "Soft accent ring halo behind the numeral — no gauge, just glow geometry.",
+    family: "frame",
+  },
+  {
+    id: "ribbon",
+    label: "Baseline ribbon",
+    description: "Solid-edged accent ribbon struck behind the numeral's lower band.",
+    family: "counterform",
+  },
+  {
+    id: "echo",
+    label: "Offset echo",
+    description: "Duplicate numeral offset down-right as a solid low-alpha echo.",
+    family: "counterform",
+  },
+  {
+    id: "ticks",
+    label: "Ticked dial",
+    description: "Instrument dial of tick marks around the numeral, swept by progress.",
+    family: "gauge",
+    usesProgress: true,
+  },
+  {
+    id: "pie",
+    label: "Pie share",
+    description: "Single bold pie wedge showing the figure's share of the whole.",
+    family: "dataviz",
+    usesProgress: true,
+  },
+  {
+    id: "area",
+    label: "Area sparkline",
+    description: "Trend line with the area beneath it filled — reads as volume over time.",
+    family: "dataviz",
+    usesSeries: true,
+  },
+  {
+    id: "waterfall",
+    label: "Micro waterfall",
+    description: "Stepped cumulative bars showing how each period builds the total.",
+    family: "dataviz",
+    usesSeries: true,
   },
 ];
 

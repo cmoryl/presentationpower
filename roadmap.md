@@ -1,46 +1,12 @@
-# Roadmap
+# Roadmap — advanced stat & module design options
 
-- [x] Fix library multi-select toggle (dev double-updater + hydration lag)
-- [ ] Sales user: library deck -> save to My Files -> compare PDF/PPTX to editor
-- [ ] Client-brief deck: upload a real brief, build deck with video + bento + graph + stats,
-      save to My Files, then walk PDF and PPT export end to end
-
-## Slide fit (Aug 31)
-- [x] Clamp repeating collections to module capacity on every slide write (agent, MCP, copilot) so rows never render off the stage.
-- [x] Fix maturity-curve module caption layout: captions now wrap inside their per-level column band, one baseline each, no overlap.
-- [x] PPTX parity audit: checklist label/note pairing and maturity-curve captions match the build. The checklist "overlap" was a rasterizer artifact (html-to-image bakes computed heights but re-measures text in the foreignObject); capture now pins live line counts (`pinTextLineCounts` in slide-image-export.ts).
-
-- [x] PPTX export: drop brand-tint washes and legacy alpha-circle/vector decor objects from module exports (reported Sep 1 on downloaded live pptx)
-- [x] Quote family parity: StatFigure now drops a unit suffix when the value doesn't end in a numeral
-      (killed the "6 wks → 9 days%" artifact); captures pin the live line breaks per text leaf
-      (`liveLineSegments` in slide-image-export.ts) so rasters can't re-wrap and print through a
-      neighbour. MV-QUOTE-METRIC back to 0.9967 with the full quote intact; no drift across the sweep.
-
-- [x] VIZ family: MV-VIZ-WATERFALL / STACKED-AREA / RADAR / SLOPE / BUMP / GAUGE-GRID now export as real native PowerPoint charts (editable series + embedded worksheet). The remaining viz kinds (sankey, chord, treemap, sunburst, calendar heatmap, market map, beeswarm, dumbbell, gantt, boxplot, radial bar) have no native PowerPoint chart type and keep the design-exact vector plate.
-
-## Scrolling
-- [x] Fix pages that snap back to top / stop scrolling (router scroll restoration reset on auth SIGNED_IN re-emit)
-- [x] Audit agent + presentation pages for locked (non-scrolling) full-height layouts (no locked containers found)
-- [x] Restore native mouse-wheel scrolling in the deck editor by removing the root overflow/overscroll trap
-
-## Certification module restyle (Sep 5)
-- [x] Restyle MV-PROOF-CERT-ORBITS per picked direction (Architectural Enterprise Layout), with extra-stylized bottom-left (bullet zone) and bottom-right (credential cards zone); keep light/dark faces + PPTX export parity
-
-## Templates / looks (Sep 2)
-- [x] 28-look restyle gates: resumable coverage ledger (`tests/snapshots/export-verify.coverage.json`), `npm run verify:restyle` (+ `--shard k/n`, `--max`, `--workers`), sharded CI workflow, merge script, vitest coverage gate
-- [x] 28-look restyle matrix: swept all 6,120 cells (28 looks + house light/dark × 204 modules), 0 export failures, ledger + manifest report `coverage: "full"`. Mid-run checkpoints now land in `node_modules/.cache` so the dev-server watcher can't reload the harness mid-sweep.
-
-- [x] Modules page: old-template artifacting fixed (shorthand/longhand background patching left prior layers painted; ground surfaces now wait on the template registry too)
-
-## NEXT London signage (Sep 3)
-- [x] EPS-derived logo geometry, vertical pillar copy, scannable QR block on .svg/.ai masters + editor controls
-- [x] Replace the spherical "halo" ground with a low-angle chevron sweep (cloakroom / help desk / square panels)
-- [x] Verified QR + placement overrides persist in the live editor (tp-next-london-logo-placement-v1)
-- [x] Real signboard sizes: per-panel measured trim W/H + bleed per edge (tp-next-london-board-size-v1) drive print preview, safe area, raster tier and both masters
-- [x] Verified the .ai masters carry real EPS-derived NEXT lockup geometry (19 compound paths / 126 curve ops per panel) — no placeholder mark
-
-- London revise: mini panel thumbnails + click-to-enlarge aspect-correct preview; per-panel rebuild (.svg/.ai/PNG).
-
-## NEXT London vendor booths (Sep 3)
-- [x] Import the 10 supplied vendor booth kiosk templates (main wall 1830×2440mm + 2 return panels 660×2440mm) as London booth panels with their real artwork as the ground
-- [x] Add the 6 missing LifeSciNEXT booths (Contact Center, COA, Medical Writing, Live Conference/Events, Veeva TMS, Commercial for Life Sciences) — artwork pending, spec-built grounds
+- [x] stat-layouts.ts: shapes halo/ribbon/echo/ticks/pie/area/waterfall, surfaces dotgrid/stripes, motions blur/drift, emphasis monumental
+- [x] stat-arrangements.ts: magazine, ladder, duo-lead plans
+- [x] primitives.tsx: surface styles, monumental scale, blur/drift reveal classes, halo/ribbon/echo/ticks/pie/area/waterfall branches
+- [x] styles.css: tp-stat-blur / tp-stat-drift keyframes + reveal classes + reduced-motion guards
+- [ ] cert-style.ts: add pointMarker, logoTone, accentRole, badgeScale, headerAlign
+- [ ] CertStylePanel.tsx + certifications.tsx: wire the five new knobs
+- [ ] Taxonomy: new stat variants MV-STAT-TICKER-STRIP, MV-STAT-SPARK-HERO, MV-STAT-GAUGE-STACK (+ module-copy, deck-store seeds, MODULE_STAT_LAYOUTS, stat.tsx cases)
+- [ ] pptx-export.ts: honor new shapes/surfaces in emitSingleStatFigure + native stat emitters
+- [ ] Tests: extend stat-layouts/arrangements/cert-style tests; new variants render/export
+- [ ] Verify: tsgo, targeted vitest, full suite
