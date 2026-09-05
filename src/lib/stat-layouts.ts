@@ -38,7 +38,23 @@ export type StatShape =
   | "icon-ghost"
   | "icon-lead"
   | "icon-crest"
-  | "icon-tile";
+  | "icon-tile"
+  // ── data-viz figures ──
+  | "sparkline"
+  | "bars"
+  | "waffle"
+  | "donut"
+  | "delta"
+  | "bullet";
+
+/** Material treatment drawn behind the whole figure. */
+export type StatSurface = "plain" | "glass" | "plate" | "wash" | "emboss" | "outline";
+
+/** Reveal choreography for a figure (all reduced-motion safe). */
+export type StatMotion = "none" | "rise" | "count" | "sweep";
+
+/** Optical weight of a figure inside a multi-stat arrangement. */
+export type StatEmphasis = "normal" | "hero" | "quiet";
 
 export type StatShapePreset = {
   id: StatShape;
@@ -48,10 +64,67 @@ export type StatShapePreset = {
   /** Reads best when a 0..1 `progress` value is supplied. */
   usesProgress?: boolean;
   /** Grouping for pickers. */
-  family: "baseline" | "counterform" | "gauge" | "frame" | "editorial" | "icon";
+  family: "baseline" | "counterform" | "gauge" | "frame" | "editorial" | "icon" | "dataviz";
   /** Draws an oversized icon — reads best with `icon` set on the layout. */
   usesIcon?: boolean;
+  /** Reads a `series` of numbers when one is authored. */
+  usesSeries?: boolean;
 };
+
+export const STAT_SURFACE_PRESETS: Array<{
+  id: StatSurface;
+  label: string;
+  description: string;
+}> = [
+  { id: "plain", label: "No material", description: "The figure sits directly on the sheet." },
+  {
+    id: "glass",
+    label: "Frosted glass",
+    description: "Blurred translucent pane with a hairline edge behind the figure.",
+  },
+  {
+    id: "plate",
+    label: "Tinted plate",
+    description: "Solid low-alpha accent plate — grounds a figure on busy art.",
+  },
+  {
+    id: "wash",
+    label: "Gradient wash",
+    description: "Diagonal accent gradient fading out under the numeral.",
+  },
+  {
+    id: "emboss",
+    label: "Embossed",
+    description: "Soft inner highlight and shadow, so the figure reads as pressed metal.",
+  },
+  {
+    id: "outline",
+    label: "Outline card",
+    description: "Hairline accent outline around the figure with no fill.",
+  },
+];
+
+export const STAT_MOTION_PRESETS: Array<{
+  id: StatMotion;
+  label: string;
+  description: string;
+}> = [
+  { id: "none", label: "Static", description: "No reveal animation on the figure." },
+  { id: "rise", label: "Rise in", description: "Figure lifts and fades in on a staggered beat." },
+  { id: "count", label: "Count up", description: "Numeral counts up to its value on reveal." },
+  { id: "sweep", label: "Gauge sweep", description: "Meters and rings sweep to their value." },
+];
+
+export const STAT_EMPHASIS_PRESETS: Array<{
+  id: StatEmphasis;
+  label: string;
+  description: string;
+}> = [
+  { id: "normal", label: "Normal", description: "Standard weight in the arrangement." },
+  { id: "hero", label: "Hero figure", description: "Enlarged, accent-inked lead statistic." },
+  { id: "quiet", label: "Supporting", description: "Reduced weight so a hero figure leads." },
+];
+
 
 export const STAT_SHAPE_PRESETS: StatShapePreset[] = [
   {
