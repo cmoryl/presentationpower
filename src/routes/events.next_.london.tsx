@@ -60,7 +60,6 @@ import {
   londonPanelsByFloor,
   londonRasterWeightMb,
   londonScheduleCsv,
-  panelSlug,
   rasterSizeFor,
   recommendedPpi,
   type LondonArtwork,
@@ -299,6 +298,16 @@ function LondonSignagePage() {
   useEffect(() => {
     if (openPanel) setPpi(recommendedPpi(openPanel));
   }, [openPanel]);
+
+  // Opening the live editor starts from what was PUBLISHED: if this browser has
+  // no local override for the panel, seed it from the revision in force.
+  useEffect(() => {
+    if (!editing || !openPanel) return;
+    const seed = headOverrides.placements?.[openPanel.id];
+    if (seed && !londonLogoPlacements()[openPanel.id]) {
+      setLondonLogoPlacement(openPanel.id, seed);
+    }
+  }, [editing, openPanel, headOverrides]);
 
   const shown = floorId === "all" ? floors : floors.filter((f) => f.id === floorId);
   const styleCount = new Set(panels.map((p) => p.style)).size;
