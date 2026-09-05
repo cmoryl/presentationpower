@@ -1179,25 +1179,37 @@ export function StatFigure({
         </svg>
       )}
 
-      {resolvedShape === "halo" && (
+      {resolvedShape === "bullet" && isPercentValue && (
         <span
           aria-hidden
           data-decorative
-          data-accent-glow
-          className="pointer-events-none absolute"
+          className={`relative block ${centeredShape ? "mx-auto" : ""}`}
           style={{
-            width: Math.round(spec.valuePx * 1.5),
-            height: Math.round(spec.valuePx * 1.5),
+            width: centeredShape ? "58%" : "100%",
+            height: Math.max(8, Math.round(spec.valuePx * 0.085)),
+            marginTop: Math.round(spec.valuePx * 0.08),
             borderRadius: 999,
-            top: `-${Math.round(spec.valuePx * 0.3)}px`,
-            left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.22)}px`,
-            transform: centeredShape ? "translateX(-50%)" : undefined,
-            background: `radial-gradient(circle at 40% 35%, ${hexA(aFig, mode === "dark" ? 0.4 : 0.22)} 0%, ${hexA(aFig, 0)} 68%)`,
-            filter: "blur(2px)",
-            zIndex: 0,
+            background: hexA(aFig, mode === "dark" ? 0.18 : 0.12),
+            zIndex: 1,
           }}
-        />
+        >
+          {/* Achieved band */}
+          <span
+            className="absolute left-0 top-0 h-full"
+            style={{ width: `${Math.round(p * 100)}%`, borderRadius: 999, background: aFig }}
+          />
+          {/* Target tick — the qualitative marker a bullet chart reads against */}
+          <span
+            className="absolute top-[-30%] h-[160%]"
+            style={{
+              left: `${Math.min(98, Math.round(p * 100) + 12)}%`,
+              width: Math.max(2, Math.round(spec.valuePx * 0.018)),
+              background: mode === "dark" ? "rgba(255,255,255,0.78)" : hexA(aFig, 0.85),
+            }}
+          />
+        </span>
       )}
+
 
       {resolvedShape === "delta" && (
         <span
