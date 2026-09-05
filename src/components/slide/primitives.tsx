@@ -1,13 +1,14 @@
-import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideInk, useSlideMode } from "./SlideChrome";
 import { accentInk, accentTokens, hexA } from "@/lib/accent-tokens";
-import type { StatShape } from "@/lib/stat-layouts";
+import type { StatEmphasis, StatMotion, StatShape, StatSurface } from "@/lib/stat-layouts";
 import { inferStatIcon, statIconPreset, type StatIconName } from "@/lib/stat-icons";
 import { iconByName } from "@/lib/icon-library";
 import type { IconSizeToken } from "@/lib/iconography";
 import { useStatLayout } from "./StatLayoutContext";
 import { fillLeading, fillPx, typeBounds } from "@/lib/open-space-fill";
+
 
 /**
  * Editorial slide primitives — a small, disciplined typographic system used
