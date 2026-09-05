@@ -546,6 +546,12 @@ export function StatFigure({
   accent,
   icon,
   iconSize,
+  surface,
+  motion,
+  emphasis,
+  series,
+  trend,
+  revealIndex = 0,
 }: {
   brand: BrandMode;
   value: string;
@@ -576,6 +582,18 @@ export function StatFigure({
    * Slide Studio size change is reflected live on the figure.
    */
   iconSize?: IconSizeToken | string;
+  /** Material drawn behind the figure. Inherits the module layout when omitted. */
+  surface?: StatSurface;
+  /** Reveal choreography. Inherits the module layout when omitted. */
+  motion?: StatMotion;
+  /** Optical weight inside a multi-stat arrangement. */
+  emphasis?: StatEmphasis;
+  /** Data series for the sparkline / micro-bar figures. */
+  series?: number[];
+  /** Direction for the delta pill. Inferred from the value when omitted. */
+  trend?: "up" | "down";
+  /** Index in a stat set — staggers the reveal beat. */
+  revealIndex?: number;
 }) {
   const ink = useSlideInk();
   const mode = useSlideMode();
@@ -602,7 +620,20 @@ export function StatFigure({
       String(iconSize ?? "md")
     ] ?? 1;
   const isIconRow = resolvedShape === "icon-lead" || resolvedShape === "icon-tile";
-  const spec = STAT_SPECS[size];
+  const resolvedEmphasis: StatEmphasis = emphasis ?? moduleLayout.emphasis ?? "normal";
+  const eK = EMPHASIS_SCALE[resolvedEmphasis];
+  const baseSpec = STAT_SPECS[size];
+  const spec =
+    eK === 1
+      ? baseSpec
+      : {
+          valuePx: Math.round(baseSpec.valuePx * eK),
+          unitPx: Math.round(baseSpec.unitPx * eK),
+          labelPx: Math.round(baseSpec.labelPx * (eK > 1 ? 1.06 : 0.94)),
+        };
+  const resolvedSurface: StatSurface = surface ?? moduleLayout.surface ?? "plain";
+  const resolvedMotion: StatMotion = motion ?? moduleLayout.motion ?? "none";
+  const resolvedSeries = (series ?? moduleLayout.series ?? []).filter((n) => Number.isFinite(n));
   const shapeAccent = accent ?? brand.tokens.accent;
   const aTok = accentTokens(shapeAccent, mode === "dark" ? "dark" : "light");
   // Accent-derived ink: `aInk` for text, `aFig` for the primary graphic marks
@@ -615,6 +646,17 @@ export function StatFigure({
   const centeredShape = resolvedAlign === "center";
   const ruleWeight = Math.max(3, Math.round(spec.valuePx * 0.035));
   const ruleWidth = centeredShape ? "58%" : `${Math.min(100, Math.round(34 + p * 60))}%`;
+  const surfaceStyle = statSurfaceStyle(
+    resolvedSurface,
+    aFig,
+    mode === "dark" ? "dark" : "light",
+    baseSpec.valuePx,
+  );
+  const resolvedTrend: "up" | "down" =
+    trend ??
+    moduleLayout.trend ??
+    (/^-|↓|down|less|reduc/i.test(String(value ?? "")) ? "down" : "up");
+
 
   const vc = valueColor ?? ink.text;
   const uc = unitColor ?? ink.muted;
