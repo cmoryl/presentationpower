@@ -374,16 +374,28 @@ export const MODULE_STAT_LAYOUTS: Record<string, StatLayout> = {
   "MV-MATRIX-2X2": { shape: "frame", align: "start" },
 
   // Rails, dashboards and gauges — tracks and dials carry the ratio.
-  "MV-STAT-KPI-RAIL": { shape: "column", align: "start", progress: 0.72 },
-  "MV-KPI-DASHBOARD": { shape: "icon-tile", align: "start", progress: 0.72 },
-  "MV-STAT-ACTUAL-TARGET": { shape: "steps", align: "start", progress: 0.64 },
-  "MV-STAT-ORBIT": { shape: "dial", align: "center", progress: 0.7 },
-  "MV-DASH-GAUGE-ROW": { shape: "arc", align: "center", progress: 0.66 },
+  "MV-STAT-KPI-RAIL": { shape: "column", align: "start", progress: 0.72, motion: "sweep" },
+  "MV-KPI-DASHBOARD": {
+    shape: "icon-tile",
+    align: "start",
+    progress: 0.72,
+    surface: "glass",
+    motion: "count",
+  },
+  "MV-STAT-ACTUAL-TARGET": { shape: "bullet", align: "start", progress: 0.64, motion: "sweep" },
+  "MV-STAT-ORBIT": { shape: "dial", align: "center", progress: 0.7, motion: "sweep" },
+  "MV-DASH-GAUGE-ROW": { shape: "arc", align: "center", progress: 0.66, motion: "sweep" },
   "MV-DASH-PERFORMANCE": { shape: "column", align: "start", progress: 0.7 },
-  "MV-DASH-SUMMARY": { shape: "rule", align: "start" },
+  "MV-DASH-SUMMARY": { shape: "rule", align: "start", motion: "count" },
   "MV-DASH-REGION-STATS": { shape: "steps", align: "start", progress: 0.6 },
   "MV-DASH-REPORT-CARDS": { shape: "frame", align: "start" },
-  "MV-DASH-BREAKDOWN": { shape: "column", align: "start", progress: 0.6 },
+  "MV-DASH-BREAKDOWN": {
+    shape: "donut",
+    align: "start",
+    progress: 0.6,
+    surface: "plate",
+    motion: "sweep",
+  },
   "MV-LOC-WORLD-STATS": { shape: "steps", align: "start", progress: 0.58 },
 
   // Editorial / photography compositions — no busy geometry over media.
@@ -398,14 +410,15 @@ export const MODULE_STAT_LAYOUTS: Record<string, StatLayout> = {
   "MV-PROOF-TESTIMONIAL": { shape: "none", align: "start" },
 
   // Proof / context stat grids.
-  "MV-PROOF-STATS-2": { shape: "icon-lead", align: "start" },
-  "MV-PROOF-STATS-3": { shape: "icon-crest", align: "center" },
+  "MV-PROOF-STATS-2": { shape: "icon-lead", align: "start", motion: "rise" },
+  "MV-PROOF-STATS-3": { shape: "icon-crest", align: "center", motion: "rise" },
   "MV-PROOF-STATS-4": { shape: "icon-tile", align: "start", progress: 0.7 },
   "MV-CTX-STAT-GRID": { shape: "icon-crest", align: "center" },
   "MV-CTX-COST": { shape: "slab", align: "start", progress: 0.78 },
-  "MV-CTX-TREND": { shape: "column", align: "start", progress: 0.66 },
-  "MV-CASE-METRICS": { shape: "icon-lead", align: "start" },
+  "MV-CTX-TREND": { shape: "sparkline", align: "start", progress: 0.66, motion: "rise" },
+  "MV-CASE-METRICS": { shape: "delta", align: "start", motion: "count" },
   "MV-INS-OPPORTUNITY-SIZE": { shape: "ghost", align: "start" },
+
 };
 
 /** Family-level fallbacks applied when a module has no explicit entry. */
