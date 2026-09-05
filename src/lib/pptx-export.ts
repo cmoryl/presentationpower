@@ -12264,7 +12264,7 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       fill: { color: p.surface },
       line: { color: LIGHT_GRAY },
     });
-    addCardSeam({ addShape: s.addShape.bind(s), addText: s.addText.bind(s) }, { x: RX, y, w: RW }, p.accent.replace("#", ""));
+    addCardSeam(s as never, { x: RX, y, w: RW }, p.accent, EXPORT_RADIUS_IN.media);
     s.addText(
       [
         ...(str(cert.label)
