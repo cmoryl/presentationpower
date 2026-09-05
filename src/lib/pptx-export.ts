@@ -12302,6 +12302,19 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   // Ruled spec-sheet bullet block
   if (points.length) {
     const bY0 = CY + 2.35;
+    if (st.coversLabel.trim()) {
+      s.addText(st.coversLabel.toUpperCase(), {
+        x: CX,
+        y: bY0 - 0.36,
+        w: CW,
+        h: 0.3,
+        fontSize: 10,
+        bold: true,
+        charSpacing: 2,
+        color: p.accent,
+        fontFace: "Geist",
+      });
+    }
     s.addShape("line", {
       x: CX,
       y: bY0,
@@ -12310,6 +12323,7 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       line: { color: p.primary, width: 1.5 },
     });
     const rowH = Math.min(0.55, (CY + CH - bY0 - 0.1) / points.length);
+    const textX = CX + (st.numberedPoints ? 0.62 : 0.24);
     points.forEach((pt, i) => {
       const y = bY0 + 0.12 + i * rowH;
       s.addShape("rect", {
@@ -12320,21 +12334,23 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
         fill: { color: p.accent },
         line: { color: p.accent },
       });
-      s.addText(String(i + 1).padStart(2, "0"), {
-        x: CX + 0.16,
-        y,
-        w: 0.4,
-        h: rowH - 0.06,
-        fontSize: 10,
-        bold: true,
-        color: p.accent,
-        fontFace: "Geist",
-        valign: "middle",
-      });
+      if (st.numberedPoints) {
+        s.addText(String(i + 1).padStart(2, "0"), {
+          x: CX + 0.16,
+          y,
+          w: 0.4,
+          h: rowH - 0.06,
+          fontSize: 10,
+          bold: true,
+          color: p.accent,
+          fontFace: "Geist",
+          valign: "middle",
+        });
+      }
       s.addText(pt, {
-        x: CX + 0.62,
+        x: textX,
         y,
-        w: CW - 0.62,
+        w: CX + CW - textX,
         h: rowH - 0.06,
         fontSize: 13.5,
         color: p.ink,
@@ -12351,25 +12367,26 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     });
   }
 
-  // Right: credential cards on a quiet band, staggered with ghost index
-  const RX = 6.4;
-  const RW = 6.4;
+  // Credential cards on a quiet band, staggered with ghost index
   const certs = arr(c.certs).slice(0, 3);
-  s.addShape("roundRect", {
-    x: RX - 0.2,
-    y: CY - 0.15,
-    w: RW + 0.4,
-    h: CH + 0.3,
-    rectRadius: EXPORT_RADIUS_IN.band,
-    fill: { color: p.surface, transparency: 55 },
-    line: { type: "none" },
-  });
+  if (st.band) {
+    s.addShape("roundRect", {
+      x: RX - 0.2,
+      y: CY - 0.15,
+      w: RW + 0.4,
+      h: CH + 0.3,
+      rectRadius: EXPORT_RADIUS_IN.band,
+      fill: { color: p.surface, transparency: 55 },
+      line: { type: "none" },
+    });
+  }
   const gap = 0.18;
   const rowH = (CH - gap * Math.max(certs.length - 1, 0)) / Math.max(certs.length, 1);
+  const stagIn = (st.stagger / 1920) * 13.333;
   certs.forEach((cert, k) => {
     const y = CY + k * (rowH + gap);
-    const indent = k === 1 ? 0.28 : k === 2 ? 0.56 : 0;
-    const x = RX + indent;
+    const indent = stagIn * k;
+    const x = cardsFirst ? RX : RX + indent;
     const w = RW - indent;
     s.addShape("roundRect", {
       x,
@@ -12377,17 +12394,24 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       w,
       h: rowH,
       rectRadius: EXPORT_RADIUS_IN.media,
-      fill: { color: p.surface },
+      fill:
+        st.cardLook === "outline"
+          ? { color: p.surface, transparency: 100 }
+          : { color: p.surface },
       line: { color: LIGHT_GRAY },
     });
-    s.addShape("rect", {
-      x,
-      y: y + 0.06,
-      w: 0.07,
-      h: rowH - 0.12,
-      fill: { color: p.accent },
-      line: { color: p.accent },
-    });
+    if (st.accentBar > 0) {
+      s.addShape("rect", {
+        x,
+        y: y + 0.06,
+        w: (st.accentBar / 1920) * 13.333,
+        h: rowH - 0.12,
+        fill: { color: p.accent },
+        line: { color: p.accent },
+      });
+    }
+    if (st.showIndex)
+
     s.addText(String(k + 1).padStart(2, "0"), {
       x: x + w - 0.85,
       y: y + 0.08,
