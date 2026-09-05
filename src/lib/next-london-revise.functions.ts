@@ -5,12 +5,17 @@
 // "restore" publishes the old snapshot as a NEW revision and the trail stays
 // intact.
 import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
+import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { LondonRevision } from "@/lib/next-london-revise";
 
 const TABLE = "london_signage_revisions";
+
+const COLUMNS =
+  "id, rev, note, author_id, panels, changes, regen, removed_ids, restored_from, created_at";
 
 type Row = {
   id: string;
@@ -20,6 +25,7 @@ type Row = {
   panels: unknown;
   changes: unknown;
   regen: unknown;
+  removed_ids?: unknown;
   restored_from: number | null;
   created_at: string;
 };
@@ -33,6 +39,7 @@ function toRevision(row: Row): LondonRevision {
     panels: (Array.isArray(row.panels) ? row.panels : []) as LondonRevision["panels"],
     changes: (Array.isArray(row.changes) ? row.changes : []) as LondonRevision["changes"],
     regen: (row.regen ?? {}) as LondonRevision["regen"],
+    removedIds: (Array.isArray(row.removed_ids) ? row.removed_ids : []) as string[],
     restoredFrom: row.restored_from,
     createdAt: row.created_at,
   };
@@ -44,12 +51,39 @@ export const listLondonRevisions = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from(TABLE)
-      .select("id, rev, note, author_id, panels, changes, regen, restored_from, created_at")
+      .select(COLUMNS)
       .order("rev", { ascending: false })
       .limit(200);
     if (error) throw new Error(`Could not read the revision history: ${error.message}`);
     return { revisions: (data ?? []).map((r) => toRevision(r as Row)) };
   });
+
+/**
+ * The revision in force, for EVERY viewer of the public kit page. Reads through
+ * a SECURITY DEFINER RPC that returns the newest row without its author.
+ */
+export const getLondonHeadRevision = createServerFn({ method: "GET" }).handler(async () => {
+  const url = process.env.SUPABASE_URL!;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+  const supabasePublic = createClient<Database>(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      fetch: (input, init) => {
+        const h = new Headers(init?.headers);
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) {
+          h.delete("Authorization");
+        }
+        h.set("apikey", key);
+        return fetch(input, { ...init, headers: h });
+      },
+    },
+  });
+  const { data, error } = await supabasePublic.rpc("get_london_head_revision");
+  if (error) throw new Error(`Could not read the revision in force: ${error.message}`);
+  const row = (data ?? null) as Row | null;
+  return { revision: row ? toRevision(row) : null };
+});
+
 
 const PanelSchema = z.object({
   id: z.string(),
