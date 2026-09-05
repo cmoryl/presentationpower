@@ -1556,6 +1556,19 @@ function DeckEditor() {
 
               )}
 
+              {/* Credential proof split — layout, styling and content editor */}
+              {active && mv && mv.id === "MV-PROOF-CERT-ORBITS" && (
+                <div className="mt-6">
+                  <CertStylePanel
+                    content={active.content as Record<string, unknown>}
+                    onChangeField={(field, value) =>
+                      updateField(deck.id, active.id, field, value)
+                    }
+                  />
+                </div>
+              )}
+
+
               {/* Locations pin editor — only for MV-LOC-* variants */}
 
               {active && mv && mv.id.startsWith("MV-LOC-") && (
