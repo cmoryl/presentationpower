@@ -643,6 +643,11 @@ export function StatFigure({
   const aInk = aTok.ink;
   const aFig = aTok.figureInk;
   const p = Math.max(0, Math.min(1, progress ?? moduleLayout.progress ?? 0.72));
+  // Part-of-whole figures (dot grid, waffle, radial stack) claim a proportion of
+  // a total, so they may only be drawn when the value really is a percentage.
+  const isPercentValue =
+    String(unit ?? "").includes("%") || /%/.test(String(value ?? "")) || moduleLayout.progress !== undefined;
+
   const centeredShape = resolvedAlign === "center";
   const ruleWeight = Math.max(3, Math.round(spec.valuePx * 0.035));
   const ruleWidth = centeredShape ? "58%" : `${Math.min(100, Math.round(34 + p * 60))}%`;
