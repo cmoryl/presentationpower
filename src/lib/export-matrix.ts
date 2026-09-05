@@ -204,10 +204,13 @@ export function mergeCoverage(
   shape: ExportMatrixShape = exportMatrixShape(),
   now: string = new Date().toISOString(),
 ): CoverageLedger {
-  const base =
-    ledger && ledger.fingerprint === shape.fingerprint
-      ? { ...ledger, cells: { ...ledger.cells } }
-      : emptyCoverageLedger(shape);
+  // Carry previous cells forward even when the fingerprint moved. A cell records
+  // one module's export in one look × mode, so adding or removing a module never
+  // invalidates the modules already swept — the pruning below drops anything
+  // that no longer exists in the current matrix.
+  const base = ledger
+    ? { ...ledger, cells: { ...(ledger.cells ?? {}) } }
+    : emptyCoverageLedger(shape);
   for (const row of rows) {
     const key = coverageCellKey(row.packId, row.mode);
     const next = new Set(base.cells[key] ?? []);
