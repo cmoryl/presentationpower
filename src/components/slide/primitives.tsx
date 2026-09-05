@@ -1,13 +1,14 @@
-import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideInk, useSlideMode } from "./SlideChrome";
 import { accentInk, accentTokens, hexA } from "@/lib/accent-tokens";
-import type { StatShape } from "@/lib/stat-layouts";
+import type { StatEmphasis, StatMotion, StatShape, StatSurface } from "@/lib/stat-layouts";
 import { inferStatIcon, statIconPreset, type StatIconName } from "@/lib/stat-icons";
 import { iconByName } from "@/lib/icon-library";
 import type { IconSizeToken } from "@/lib/iconography";
 import { useStatLayout } from "./StatLayoutContext";
 import { fillLeading, fillPx, typeBounds } from "@/lib/open-space-fill";
+
 
 /**
  * Editorial slide primitives — a small, disciplined typographic system used
@@ -417,6 +418,111 @@ const STAT_SPECS: Record<StatSize, { valuePx: number; unitPx: number; labelPx: n
 };
 
 /**
+ * Material treatment drawn behind a figure. Returns inline style only — the
+ * pane is the figure's own box so a surfaced stat still baseline-aligns with an
+ * unsurfaced neighbour.
+ */
+function statSurfaceStyle(
+  surface: StatSurface,
+  accentFig: string,
+  mode: "light" | "dark",
+  valuePx: number,
+): CSSProperties | null {
+  if (surface === "plain") return null;
+  const pad = `${Math.round(valuePx * 0.2)}px ${Math.round(valuePx * 0.22)}px`;
+  const radius = Math.round(valuePx * 0.14);
+  const dark = mode === "dark";
+  const base: CSSProperties = { padding: pad, borderRadius: radius };
+  if (surface === "glass") {
+    return {
+      ...base,
+      background: dark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.62)",
+      border: `1px solid ${dark ? "rgba(255,255,255,0.14)" : hexA(accentFig, 0.14)}`,
+      backdropFilter: "blur(18px) saturate(140%)",
+      WebkitBackdropFilter: "blur(18px) saturate(140%)",
+    };
+  }
+  if (surface === "plate") {
+    return {
+      ...base,
+      background: hexA(accentFig, dark ? 0.16 : 0.08),
+      border: `1px solid ${hexA(accentFig, dark ? 0.26 : 0.14)}`,
+    };
+  }
+  if (surface === "wash") {
+    return {
+      ...base,
+      background: `linear-gradient(150deg, ${hexA(accentFig, dark ? 0.26 : 0.14)} 0%, ${hexA(accentFig, 0)} 78%)`,
+    };
+  }
+  if (surface === "emboss") {
+    return {
+      ...base,
+      background: dark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.5)",
+      boxShadow: dark
+        ? "inset 0 1px 0 rgba(255,255,255,0.16), 0 18px 40px rgba(0,0,0,0.34)"
+        : "inset 0 1px 0 rgba(255,255,255,0.9), 0 16px 34px rgba(3,0,44,0.10)",
+    };
+  }
+  return { ...base, border: `1px solid ${hexA(accentFig, dark ? 0.34 : 0.2)}` };
+}
+
+/** Emphasis multiplier applied to the figure's type scale. */
+const EMPHASIS_SCALE: Record<StatEmphasis, number> = { normal: 1, hero: 1.2, quiet: 0.82 };
+
+/**
+ * Count-up on reveal. Runs once, respects `prefers-reduced-motion`, and only
+ * animates when the value really is a number — "6 wks → 9 days" must never be
+ * rewritten mid-flight into a fabricated intermediate figure.
+ */
+function useCountUpValue(value: string, active: boolean): string {
+  const [display, setDisplay] = useState(value);
+  const done = useRef(false);
+  useEffect(() => {
+    if (!active) {
+      setDisplay(value);
+      return;
+    }
+    const match = /^([^0-9-]*)(-?[\d,]*\.?\d+)(.*)$/.exec(value.trim());
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (!match || reduced || done.current) {
+      setDisplay(value);
+      return;
+    }
+    const [, prefix, numStr, suffix] = match;
+    const target = Number.parseFloat(numStr.replace(/,/g, ""));
+    if (!Number.isFinite(target)) {
+      setDisplay(value);
+      return;
+    }
+    const decimals = (numStr.split(".")[1] ?? "").length;
+    const grouped = numStr.includes(",");
+    const start = performance.now();
+    const dur = 900;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / dur);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const n = target * eased;
+      const body = grouped
+        ? n.toLocaleString(undefined, {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals,
+          })
+        : n.toFixed(decimals);
+      setDisplay(`${prefix}${body}${suffix}`);
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else done.current = true;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value, active]);
+  return display;
+}
+
+/**
  * Typographic SHAPE treatments for a statistic. A stat is composed as a
  * figure, not just set as type: the numeral is the primary shape and the
  * geometry around it is drawn in relation to its optical box. The catalog
@@ -440,6 +546,12 @@ export function StatFigure({
   accent,
   icon,
   iconSize,
+  surface,
+  motion,
+  emphasis,
+  series,
+  trend,
+  revealIndex = 0,
 }: {
   brand: BrandMode;
   value: string;
@@ -470,6 +582,18 @@ export function StatFigure({
    * Slide Studio size change is reflected live on the figure.
    */
   iconSize?: IconSizeToken | string;
+  /** Material drawn behind the figure. Inherits the module layout when omitted. */
+  surface?: StatSurface;
+  /** Reveal choreography. Inherits the module layout when omitted. */
+  motion?: StatMotion;
+  /** Optical weight inside a multi-stat arrangement. */
+  emphasis?: StatEmphasis;
+  /** Data series for the sparkline / micro-bar figures. */
+  series?: number[];
+  /** Direction for the delta pill. Inferred from the value when omitted. */
+  trend?: "up" | "down";
+  /** Index in a stat set — staggers the reveal beat. */
+  revealIndex?: number;
 }) {
   const ink = useSlideInk();
   const mode = useSlideMode();
@@ -496,7 +620,20 @@ export function StatFigure({
       String(iconSize ?? "md")
     ] ?? 1;
   const isIconRow = resolvedShape === "icon-lead" || resolvedShape === "icon-tile";
-  const spec = STAT_SPECS[size];
+  const resolvedEmphasis: StatEmphasis = emphasis ?? moduleLayout.emphasis ?? "normal";
+  const eK = EMPHASIS_SCALE[resolvedEmphasis];
+  const baseSpec = STAT_SPECS[size];
+  const spec =
+    eK === 1
+      ? baseSpec
+      : {
+          valuePx: Math.round(baseSpec.valuePx * eK),
+          unitPx: Math.round(baseSpec.unitPx * eK),
+          labelPx: Math.round(baseSpec.labelPx * (eK > 1 ? 1.06 : 0.94)),
+        };
+  const resolvedSurface: StatSurface = surface ?? moduleLayout.surface ?? "plain";
+  const resolvedMotion: StatMotion = motion ?? moduleLayout.motion ?? "none";
+  const resolvedSeries = (series ?? moduleLayout.series ?? []).filter((n) => Number.isFinite(n));
   const shapeAccent = accent ?? brand.tokens.accent;
   const aTok = accentTokens(shapeAccent, mode === "dark" ? "dark" : "light");
   // Accent-derived ink: `aInk` for text, `aFig` for the primary graphic marks
@@ -506,9 +643,25 @@ export function StatFigure({
   const aInk = aTok.ink;
   const aFig = aTok.figureInk;
   const p = Math.max(0, Math.min(1, progress ?? moduleLayout.progress ?? 0.72));
+  // Part-of-whole figures (dot grid, waffle, radial stack) claim a proportion of
+  // a total, so they may only be drawn when the value really is a percentage.
+  const isPercentValue =
+    String(unit ?? "").includes("%") || /%/.test(String(value ?? "")) || moduleLayout.progress !== undefined;
+
   const centeredShape = resolvedAlign === "center";
   const ruleWeight = Math.max(3, Math.round(spec.valuePx * 0.035));
   const ruleWidth = centeredShape ? "58%" : `${Math.min(100, Math.round(34 + p * 60))}%`;
+  const surfaceStyle = statSurfaceStyle(
+    resolvedSurface,
+    aFig,
+    mode === "dark" ? "dark" : "light",
+    baseSpec.valuePx,
+  );
+  const resolvedTrend: "up" | "down" =
+    trend ??
+    moduleLayout.trend ??
+    (/^-|↓|down|less|reduc/i.test(String(value ?? "")) ? "down" : "up");
+
 
   const vc = valueColor ?? ink.text;
   const uc = unitColor ?? ink.muted;
@@ -557,14 +710,29 @@ export function StatFigure({
       ? `min(${Math.max(32, Math.round(spec.unitPx * 0.58))}px, 5.6cqw)`
       : `min(${spec.unitPx}px, 6.5cqw)`,
   );
+  // Choreography: a CSS-only reveal so it works in the editor, in Present mode
+  // and in a print/PDF pass (where the animation simply lands at its end state).
+  const revealClass =
+    resolvedMotion === "rise"
+      ? "stat-reveal-rise"
+      : resolvedMotion === "sweep"
+        ? "stat-reveal-sweep"
+        : "";
+
+  const displayValue = useCountUpValue(value ?? "", resolvedMotion === "count");
   return (
     <div
       data-stat-figure={size}
       data-stat-shape={resolvedShape}
-      className={`relative min-w-0 max-w-full overflow-hidden ${centeredShape ? "flex flex-col items-center text-center" : ""}`}
+      data-stat-surface={resolvedSurface}
+      data-stat-emphasis={resolvedEmphasis}
+      data-stat-motion={resolvedMotion}
+      className={`relative min-w-0 max-w-full overflow-hidden ${centeredShape ? "flex flex-col items-center text-center" : ""} ${revealClass}`}
       style={{
         containerType: "inline-size",
         contain: "inline-size",
+        animationDelay: revealClass ? `${revealIndex * 90}ms` : undefined,
+        ...surfaceStyle,
         ...(resolvedShape === "frame"
           ? {
               border: `${Math.max(1, Math.round(spec.valuePx * 0.008))}px solid ${hexA(aFig, mode === "dark" ? 0.4 : 0.28)}`,
@@ -572,7 +740,9 @@ export function StatFigure({
               padding: `${Math.round(spec.valuePx * 0.14)}px ${Math.round(spec.valuePx * 0.16)}px`,
             }
           : null),
-        ...(resolvedShape === "spine" ? { paddingLeft: Math.round(spec.valuePx * 0.16) } : null),
+        ...(resolvedShape === "spine"
+          ? { paddingLeft: Math.round(spec.valuePx * 0.16) }
+          : null),
         ...(resolvedShape === "bracket"
           ? {
               paddingLeft: Math.round(spec.valuePx * 0.16),
@@ -581,6 +751,7 @@ export function StatFigure({
           : null),
       }}
     >
+
       {(resolvedShape === "ghost" || resolvedShape === "auto") &&
         !valueIsPhrase &&
         (() => {
@@ -853,6 +1024,219 @@ export function StatFigure({
           />
         </span>
       )}
+
+      {/* ── Data-viz figures ───────────────────────────────────────────────
+          These treatments make a claim about DATA, so each one draws only
+          what the content actually supports: sparkline/bars need an authored
+          series, and the part-of-whole figures (dot grid, waffle, radial
+          stack) only render when the value genuinely is a percentage. A stat
+          that can't back the chart falls through to the bare numeral rather
+          than inventing a shape. */}
+      {(resolvedShape === "sparkline" || resolvedShape === "bars") &&
+        resolvedSeries.length >= 2 &&
+        (() => {
+          const w = 200;
+          const h = 60;
+          const min = Math.min(...resolvedSeries);
+          const max = Math.max(...resolvedSeries);
+          const span = max - min || 1;
+          const step = w / (resolvedSeries.length - 1 || 1);
+          const yFor = (v: number) => h - 4 - ((v - min) / span) * (h - 12);
+          const pts = resolvedSeries.map((v, i) => `${i * step},${yFor(v)}`).join(" ");
+          const barW = (w / resolvedSeries.length) * 0.62;
+          return (
+            <svg
+              aria-hidden
+              data-decorative
+              viewBox={`0 0 ${w} ${h}`}
+              preserveAspectRatio="none"
+              className={`relative block ${centeredShape ? "mx-auto" : ""}`}
+              style={{
+                width: centeredShape ? "58%" : "100%",
+                height: Math.round(spec.valuePx * 0.34),
+                marginBottom: Math.round(spec.valuePx * 0.1),
+                zIndex: 1,
+              }}
+            >
+              {resolvedShape === "sparkline" ? (
+                <>
+                  <polyline
+                    points={`${pts}`}
+                    fill="none"
+                    stroke={aFig}
+                    strokeWidth={3}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  <circle
+                    cx={(resolvedSeries.length - 1) * step}
+                    cy={yFor(resolvedSeries[resolvedSeries.length - 1])}
+                    r={4}
+                    fill={aFig}
+                  />
+                </>
+              ) : (
+                resolvedSeries.map((v, i) => {
+                  const y = yFor(v);
+                  return (
+                    <rect
+                      key={i}
+                      x={i * (w / resolvedSeries.length) + (w / resolvedSeries.length - barW) / 2}
+                      y={y}
+                      width={barW}
+                      height={Math.max(2, h - 4 - y)}
+                      rx={1.5}
+                      fill={hexA(aFig, i === resolvedSeries.length - 1 ? 1 : 0.42)}
+                    />
+                  );
+                })
+              )}
+            </svg>
+          );
+        })()}
+
+      {resolvedShape === "waffle" &&
+        isPercentValue &&
+        (() => {
+          const total = 20;
+          const on = Math.max(1, Math.round(p * total));
+          const dot = Math.round(spec.valuePx * 0.09);
+          return (
+            <span
+              aria-hidden
+              data-decorative
+              className={`relative grid ${centeredShape ? "mx-auto justify-center" : ""}`}
+              style={{
+                gridTemplateColumns: `repeat(10, ${dot}px)`,
+                gap: Math.max(3, Math.round(dot * 0.34)),
+                width: "fit-content",
+                marginBottom: Math.round(spec.valuePx * 0.1),
+                zIndex: 1,
+              }}
+            >
+              {Array.from({ length: total }, (_, i) => (
+                <span
+                  key={i}
+                  style={{
+                    width: dot,
+                    height: dot,
+                    borderRadius: 2,
+                    background: i < on ? aFig : hexA(aFig, mode === "dark" ? 0.18 : 0.13),
+                  }}
+                />
+              ))}
+            </span>
+          );
+        })()}
+
+      {resolvedShape === "donut" && isPercentValue && (
+        <svg
+
+          aria-hidden
+          data-decorative
+          viewBox="0 0 200 200"
+          className="pointer-events-none absolute"
+          style={{
+            width: `${Math.round(spec.valuePx * 2.05)}px`,
+            top: `-${Math.round(spec.valuePx * 0.5)}px`,
+            left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.18)}px`,
+            transform: centeredShape ? "translateX(-50%)" : undefined,
+            zIndex: 0,
+          }}
+        >
+          {[
+            { r: 92, k: 1, wdt: 9 },
+            { r: 74, k: 0.72, wdt: 7 },
+            { r: 58, k: 0.48, wdt: 5 },
+          ].map((ring) => {
+            const circ = 2 * Math.PI * ring.r;
+            return (
+              <g key={ring.r}>
+                <circle
+                  cx="100"
+                  cy="100"
+                  r={ring.r}
+                  fill="none"
+                  stroke={hexA(aFig, mode === "dark" ? 0.16 : 0.1)}
+                  strokeWidth={ring.wdt}
+                />
+                <circle
+                  cx="100"
+                  cy="100"
+                  r={ring.r}
+                  fill="none"
+                  stroke={hexA(aFig, 0.35 + 0.65 * ring.k)}
+                  strokeWidth={ring.wdt}
+                  strokeLinecap="round"
+                  strokeDasharray={circ}
+                  strokeDashoffset={circ * (1 - p * ring.k)}
+                  transform="rotate(-90 100 100)"
+                />
+              </g>
+            );
+          })}
+        </svg>
+      )}
+
+      {resolvedShape === "bullet" && isPercentValue && (
+        <span
+          aria-hidden
+          data-decorative
+          className={`relative block ${centeredShape ? "mx-auto" : ""}`}
+          style={{
+            width: centeredShape ? "58%" : "100%",
+            height: Math.max(8, Math.round(spec.valuePx * 0.085)),
+            marginTop: Math.round(spec.valuePx * 0.08),
+            borderRadius: 999,
+            background: hexA(aFig, mode === "dark" ? 0.18 : 0.12),
+            zIndex: 1,
+          }}
+        >
+          {/* Achieved band */}
+          <span
+            className="absolute left-0 top-0 h-full"
+            style={{ width: `${Math.round(p * 100)}%`, borderRadius: 999, background: aFig }}
+          />
+          {/* Target tick — the qualitative marker a bullet chart reads against */}
+          <span
+            className="absolute top-[-30%] h-[160%]"
+            style={{
+              left: `${Math.min(98, Math.round(p * 100) + 12)}%`,
+              width: Math.max(2, Math.round(spec.valuePx * 0.018)),
+              background: mode === "dark" ? "rgba(255,255,255,0.78)" : hexA(aFig, 0.85),
+            }}
+          />
+        </span>
+      )}
+
+
+      {resolvedShape === "delta" && (
+        <span
+          aria-hidden
+          data-decorative
+          className={`relative inline-flex items-center gap-1 ${centeredShape ? "mx-auto" : ""}`}
+          style={{
+            marginBottom: Math.round(spec.valuePx * 0.08),
+            padding: `${Math.round(spec.valuePx * 0.04)}px ${Math.round(spec.valuePx * 0.09)}px`,
+            borderRadius: 999,
+            width: "fit-content",
+            background: hexA(aFig, mode === "dark" ? 0.22 : 0.12),
+            color: aInk,
+            fontSize: Math.round(spec.labelPx * 0.95),
+            fontWeight: 600,
+            letterSpacing: "0.04em",
+            zIndex: 1,
+          }}
+        >
+          <span style={{ fontSize: Math.round(spec.labelPx * 1.15), lineHeight: 1 }}>
+            {resolvedTrend === "down" ? "▼" : "▲"}
+          </span>
+          {resolvedTrend === "down" ? "Down" : "Up"}
+        </span>
+      )}
+
+
       <div
         className={isIconRow ? "relative flex items-center" : "relative"}
         style={{ zIndex: 1, gap: isIconRow ? Math.round(spec.valuePx * 0.2) : undefined }}
@@ -916,7 +1300,7 @@ export function StatFigure({
               textOverflow: "clip",
             }}
           >
-            <span>{value || "—"}</span>
+            <span>{displayValue || "—"}</span>
             {unitText && !unitIsLong && (
               <span
                 className="ml-2 font-medium align-top"

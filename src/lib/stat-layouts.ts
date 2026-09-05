@@ -38,7 +38,23 @@ export type StatShape =
   | "icon-ghost"
   | "icon-lead"
   | "icon-crest"
-  | "icon-tile";
+  | "icon-tile"
+  // ── data-viz figures ──
+  | "sparkline"
+  | "bars"
+  | "waffle"
+  | "donut"
+  | "delta"
+  | "bullet";
+
+/** Material treatment drawn behind the whole figure. */
+export type StatSurface = "plain" | "glass" | "plate" | "wash" | "emboss" | "outline";
+
+/** Reveal choreography for a figure (all reduced-motion safe). */
+export type StatMotion = "none" | "rise" | "count" | "sweep";
+
+/** Optical weight of a figure inside a multi-stat arrangement. */
+export type StatEmphasis = "normal" | "hero" | "quiet";
 
 export type StatShapePreset = {
   id: StatShape;
@@ -48,10 +64,67 @@ export type StatShapePreset = {
   /** Reads best when a 0..1 `progress` value is supplied. */
   usesProgress?: boolean;
   /** Grouping for pickers. */
-  family: "baseline" | "counterform" | "gauge" | "frame" | "editorial" | "icon";
+  family: "baseline" | "counterform" | "gauge" | "frame" | "editorial" | "icon" | "dataviz";
   /** Draws an oversized icon — reads best with `icon` set on the layout. */
   usesIcon?: boolean;
+  /** Reads a `series` of numbers when one is authored. */
+  usesSeries?: boolean;
 };
+
+export const STAT_SURFACE_PRESETS: Array<{
+  id: StatSurface;
+  label: string;
+  description: string;
+}> = [
+  { id: "plain", label: "No material", description: "The figure sits directly on the sheet." },
+  {
+    id: "glass",
+    label: "Frosted glass",
+    description: "Blurred translucent pane with a hairline edge behind the figure.",
+  },
+  {
+    id: "plate",
+    label: "Tinted plate",
+    description: "Solid low-alpha accent plate — grounds a figure on busy art.",
+  },
+  {
+    id: "wash",
+    label: "Gradient wash",
+    description: "Diagonal accent gradient fading out under the numeral.",
+  },
+  {
+    id: "emboss",
+    label: "Embossed",
+    description: "Soft inner highlight and shadow, so the figure reads as pressed metal.",
+  },
+  {
+    id: "outline",
+    label: "Outline card",
+    description: "Hairline accent outline around the figure with no fill.",
+  },
+];
+
+export const STAT_MOTION_PRESETS: Array<{
+  id: StatMotion;
+  label: string;
+  description: string;
+}> = [
+  { id: "none", label: "Static", description: "No reveal animation on the figure." },
+  { id: "rise", label: "Rise in", description: "Figure lifts and fades in on a staggered beat." },
+  { id: "count", label: "Count up", description: "Numeral counts up to its value on reveal." },
+  { id: "sweep", label: "Gauge sweep", description: "Meters and rings sweep to their value." },
+];
+
+export const STAT_EMPHASIS_PRESETS: Array<{
+  id: StatEmphasis;
+  label: string;
+  description: string;
+}> = [
+  { id: "normal", label: "Normal", description: "Standard weight in the arrangement." },
+  { id: "hero", label: "Hero figure", description: "Enlarged, accent-inked lead statistic." },
+  { id: "quiet", label: "Supporting", description: "Reduced weight so a hero figure leads." },
+];
+
 
 export const STAT_SHAPE_PRESETS: StatShapePreset[] = [
   {
@@ -184,6 +257,47 @@ export const STAT_SHAPE_PRESETS: StatShapePreset[] = [
     usesIcon: true,
     usesProgress: true,
   },
+  {
+    id: "sparkline",
+    label: "Trend sparkline",
+    description: "Miniature accent trend line under the numeral with an end-point marker.",
+    family: "dataviz",
+    usesSeries: true,
+  },
+  {
+    id: "bars",
+    label: "Micro bar chart",
+    description: "Small column series beneath the numeral, last column inked as the current value.",
+    family: "dataviz",
+    usesSeries: true,
+  },
+  {
+    id: "waffle",
+    label: "Dot array",
+    description: "Ten-by-two dot array filled in proportion to the value — reads as a share.",
+    family: "dataviz",
+    usesProgress: true,
+  },
+  {
+    id: "donut",
+    label: "Share donut",
+    description: "Thick accent donut beside the numeral showing its share of the whole.",
+    family: "dataviz",
+    usesProgress: true,
+  },
+  {
+    id: "delta",
+    label: "Delta pill",
+    description: "Directional arrow pill beside the numeral calling out rise or fall.",
+    family: "dataviz",
+  },
+  {
+    id: "bullet",
+    label: "Bullet gauge",
+    description: "Banded bullet track with a target marker — actual against plan.",
+    family: "dataviz",
+    usesProgress: true,
+  },
 ];
 
 export const STAT_SHAPES: StatShape[] = STAT_SHAPE_PRESETS.map((p) => p.id);
@@ -194,6 +308,20 @@ export function statShapePreset(shape: StatShape): StatShapePreset {
 
 export function isStatShape(value: unknown): value is StatShape {
   return typeof value === "string" && (STAT_SHAPES as string[]).includes(value);
+}
+
+export function isStatSurface(value: unknown): value is StatSurface {
+  return (
+    typeof value === "string" && STAT_SURFACE_PRESETS.some((p) => (p.id as string) === value)
+  );
+}
+
+export function isStatMotion(value: unknown): value is StatMotion {
+  return typeof value === "string" && STAT_MOTION_PRESETS.some((p) => (p.id as string) === value);
+}
+
+export function isStatEmphasis(value: unknown): value is StatEmphasis {
+  return typeof value === "string" && STAT_EMPHASIS_PRESETS.some((p) => (p.id as string) === value);
 }
 
 export type StatLayout = {
@@ -207,7 +335,18 @@ export type StatLayout = {
   align?: "start" | "center";
   /** 0..1 fallback sweep for gauge/track shapes when the data has no ratio. */
   progress?: number;
+  /** Material drawn behind the figure. */
+  surface?: StatSurface;
+  /** Reveal choreography (reduced-motion safe). */
+  motion?: StatMotion;
+  /** Optical weight inside a multi-stat arrangement. */
+  emphasis?: StatEmphasis;
+  /** Data series for the sparkline / bar figures (normalised on render). */
+  series?: number[];
+  /** Direction for the delta pill. Inferred from the value when omitted. */
+  trend?: "up" | "down";
 };
+
 
 export const DEFAULT_STAT_LAYOUT: StatLayout = { shape: "auto", align: "start" };
 
@@ -235,16 +374,28 @@ export const MODULE_STAT_LAYOUTS: Record<string, StatLayout> = {
   "MV-MATRIX-2X2": { shape: "frame", align: "start" },
 
   // Rails, dashboards and gauges — tracks and dials carry the ratio.
-  "MV-STAT-KPI-RAIL": { shape: "column", align: "start", progress: 0.72 },
-  "MV-KPI-DASHBOARD": { shape: "icon-tile", align: "start", progress: 0.72 },
-  "MV-STAT-ACTUAL-TARGET": { shape: "steps", align: "start", progress: 0.64 },
-  "MV-STAT-ORBIT": { shape: "dial", align: "center", progress: 0.7 },
-  "MV-DASH-GAUGE-ROW": { shape: "arc", align: "center", progress: 0.66 },
+  "MV-STAT-KPI-RAIL": { shape: "column", align: "start", progress: 0.72, motion: "sweep" },
+  "MV-KPI-DASHBOARD": {
+    shape: "icon-tile",
+    align: "start",
+    progress: 0.72,
+    surface: "glass",
+    motion: "count",
+  },
+  "MV-STAT-ACTUAL-TARGET": { shape: "bullet", align: "start", progress: 0.64, motion: "sweep" },
+  "MV-STAT-ORBIT": { shape: "dial", align: "center", progress: 0.7, motion: "sweep" },
+  "MV-DASH-GAUGE-ROW": { shape: "arc", align: "center", progress: 0.66, motion: "sweep" },
   "MV-DASH-PERFORMANCE": { shape: "column", align: "start", progress: 0.7 },
-  "MV-DASH-SUMMARY": { shape: "rule", align: "start" },
+  "MV-DASH-SUMMARY": { shape: "rule", align: "start", motion: "count" },
   "MV-DASH-REGION-STATS": { shape: "steps", align: "start", progress: 0.6 },
   "MV-DASH-REPORT-CARDS": { shape: "frame", align: "start" },
-  "MV-DASH-BREAKDOWN": { shape: "column", align: "start", progress: 0.6 },
+  "MV-DASH-BREAKDOWN": {
+    shape: "donut",
+    align: "start",
+    progress: 0.6,
+    surface: "plate",
+    motion: "sweep",
+  },
   "MV-LOC-WORLD-STATS": { shape: "steps", align: "start", progress: 0.58 },
 
   // Editorial / photography compositions — no busy geometry over media.
@@ -259,14 +410,15 @@ export const MODULE_STAT_LAYOUTS: Record<string, StatLayout> = {
   "MV-PROOF-TESTIMONIAL": { shape: "none", align: "start" },
 
   // Proof / context stat grids.
-  "MV-PROOF-STATS-2": { shape: "icon-lead", align: "start" },
-  "MV-PROOF-STATS-3": { shape: "icon-crest", align: "center" },
+  "MV-PROOF-STATS-2": { shape: "icon-lead", align: "start", motion: "rise" },
+  "MV-PROOF-STATS-3": { shape: "icon-crest", align: "center", motion: "rise" },
   "MV-PROOF-STATS-4": { shape: "icon-tile", align: "start", progress: 0.7 },
   "MV-CTX-STAT-GRID": { shape: "icon-crest", align: "center" },
   "MV-CTX-COST": { shape: "slab", align: "start", progress: 0.78 },
-  "MV-CTX-TREND": { shape: "column", align: "start", progress: 0.66 },
-  "MV-CASE-METRICS": { shape: "icon-lead", align: "start" },
+  "MV-CTX-TREND": { shape: "sparkline", align: "start", progress: 0.66, motion: "rise" },
+  "MV-CASE-METRICS": { shape: "delta", align: "start", motion: "count" },
   "MV-INS-OPPORTUNITY-SIZE": { shape: "ghost", align: "start" },
+
 };
 
 /** Family-level fallbacks applied when a module has no explicit entry. */
@@ -304,8 +456,24 @@ export function parseStatLayout(input: unknown): Partial<StatLayout> | null {
   if (isStatIconName(icon)) out.icon = icon;
   const prog = o.statProgress ?? o.progress;
   if (typeof prog === "number" && Number.isFinite(prog)) out.progress = clamp01(prog);
+  const surface = o.statSurface ?? o.surface;
+  if (isStatSurface(surface)) out.surface = surface;
+  const motion = o.statMotion ?? o.motion;
+  if (isStatMotion(motion)) out.motion = motion;
+  const emphasis = o.statEmphasis ?? o.emphasis;
+  if (isStatEmphasis(emphasis)) out.emphasis = emphasis;
+  const series = o.statSeries ?? o.series;
+  if (Array.isArray(series)) {
+    const nums = series
+      .map((n) => (typeof n === "number" ? n : Number.parseFloat(String(n))))
+      .filter((n) => Number.isFinite(n));
+    if (nums.length >= 2) out.series = nums.slice(0, 24);
+  }
+  const trend = o.statTrend ?? o.trend;
+  if (trend === "up" || trend === "down") out.trend = trend;
   return Object.keys(out).length ? out : null;
 }
+
 
 /**
  * Resolution order (last wins): module default → slide content override →

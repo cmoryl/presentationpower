@@ -1,11 +1,22 @@
 import { useMemo } from "react";
 import {
+  STAT_EMPHASIS_PRESETS,
+  STAT_MOTION_PRESETS,
   STAT_SHAPE_PRESETS,
+  STAT_SURFACE_PRESETS,
+  isStatEmphasis,
+  isStatMotion,
   isStatShape,
+  isStatSurface,
   statShapePreset,
   type StatLayout,
   type StatShape,
 } from "@/lib/stat-layouts";
+import {
+  STAT_ARRANGEMENT_PRESETS,
+  isStatArrangement,
+  type StatArrangement,
+} from "@/lib/stat-arrangements";
 import { STAT_ICON_PRESETS, isStatIconName, type StatIconName } from "@/lib/stat-icons";
 
 const FAMILY_LABELS: Record<string, string> = {
@@ -15,22 +26,29 @@ const FAMILY_LABELS: Record<string, string> = {
   frame: "Frames",
   editorial: "Editorial",
   icon: "Oversized icons",
+  dataviz: "Data visuals",
 };
 
 const selectClass =
   "w-full rounded-lg border border-black/10 bg-white px-2 py-1.5 text-[11px] font-medium text-[#03002C] outline-none transition focus:border-[#003FC7]";
+const capClass = "text-[9px] font-semibold uppercase tracking-[0.16em] text-black/40";
+
 
 /**
- * Slide-level stat typography control: pick the figure shape (including the
- * oversized-icon treatments) and, for icon shapes, the icon itself. Writes a
- * `statLayout` fragment onto the slide content, which `resolveStatLayout`
- * layers over the module's intentional default.
+ * Slide-level stat design control: figure shape (including the data-viz and
+ * oversized-icon treatments), the material behind it, its reveal beat, its
+ * optical weight, and — for the chart shapes — the authored data series. Writes
+ * a `statLayout` fragment onto the slide content, which `resolveStatLayout`
+ * layers over the module's intentional default. The multi-stat arrangement is a
+ * slide-level concern, so it is written as its own `statArrangement` field.
  */
 export function StatStylePicker({
   moduleLayout,
   value,
   onChange,
   onReset,
+  arrangement,
+  onArrangementChange,
 }: {
   /** The module's intentional default (shown as the inherited option). */
   moduleLayout: StatLayout;
@@ -38,6 +56,10 @@ export function StatStylePicker({
   value?: Partial<StatLayout> | null;
   onChange: (patch: Partial<StatLayout>) => void;
   onReset: () => void;
+  /** Current multi-stat arrangement for the slide, when the module supports one. */
+  arrangement?: StatArrangement;
+  /** Omit to hide the arrangement control (single-figure modules). */
+  onArrangementChange?: (next: StatArrangement) => void;
 }) {
   const shape: StatShape | "inherit" = value?.shape ?? "inherit";
   const effectiveShape = value?.shape ?? moduleLayout.shape ?? "auto";
@@ -45,6 +67,12 @@ export function StatStylePicker({
   const preset = statShapePreset(effectiveShape);
   const icon: StatIconName | "auto" = value?.icon ?? moduleLayout.icon ?? "auto";
   const progress = value?.progress ?? moduleLayout.progress ?? 0.72;
+  const surface = value?.surface ?? moduleLayout.surface ?? "plain";
+  const motion = value?.motion ?? moduleLayout.motion ?? "none";
+  const emphasis = value?.emphasis ?? moduleLayout.emphasis ?? "normal";
+  const series = value?.series ?? moduleLayout.series ?? [];
+
+
 
   const grouped = useMemo(() => {
     const out = new Map<string, typeof STAT_SHAPE_PRESETS>();
@@ -144,6 +172,105 @@ export function StatStylePicker({
           />
         </label>
       )}
+
+      {preset.usesSeries && (
+        <label className="flex flex-col gap-1">
+          <span className={capClass}>Data series</span>
+          <input
+            type="text"
+            inputMode="decimal"
+            className={selectClass}
+            placeholder="e.g. 12, 18, 24, 31, 44"
+            defaultValue={series.join(", ")}
+            onBlur={(e) => {
+              const nums = e.target.value
+                .split(/[,\s]+/)
+                .map((t) => Number.parseFloat(t))
+                .filter((n) => Number.isFinite(n));
+              onChange({ series: nums.length >= 2 ? nums : undefined });
+            }}
+            aria-label="Stat data series"
+          />
+          <span className="text-[10px] leading-snug text-black/45">
+            Two or more numbers. The chart only draws from real values — leave this empty and the
+            figure shows the numeral alone.
+          </span>
+        </label>
+      )}
+
+      <label className="flex flex-col gap-1">
+        <span className={capClass}>Material</span>
+        <select
+          className={selectClass}
+          value={surface}
+          onChange={(e) => {
+            if (isStatSurface(e.target.value)) onChange({ surface: e.target.value });
+          }}
+        >
+          {STAT_SURFACE_PRESETS.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="flex flex-col gap-1">
+        <span className={capClass}>Reveal</span>
+        <select
+          className={selectClass}
+          value={motion}
+          onChange={(e) => {
+            if (isStatMotion(e.target.value)) onChange({ motion: e.target.value });
+          }}
+        >
+          {STAT_MOTION_PRESETS.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="flex flex-col gap-1">
+        <span className={capClass}>Weight</span>
+        <select
+          className={selectClass}
+          value={emphasis}
+          onChange={(e) => {
+            if (isStatEmphasis(e.target.value)) onChange({ emphasis: e.target.value });
+          }}
+        >
+          {STAT_EMPHASIS_PRESETS.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      {onArrangementChange && (
+        <label className="flex flex-col gap-1">
+          <span className={capClass}>Arrangement</span>
+          <select
+            className={selectClass}
+            value={arrangement ?? "even"}
+            onChange={(e) => {
+              if (isStatArrangement(e.target.value)) onArrangementChange(e.target.value);
+            }}
+          >
+            {STAT_ARRANGEMENT_PRESETS.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+          <span className="text-[10px] leading-snug text-black/45">
+            {STAT_ARRANGEMENT_PRESETS.find((p) => p.id === (arrangement ?? "even"))?.description}
+          </span>
+        </label>
+      )}
+
 
       {value && Object.keys(value).length > 0 && (
         <button

@@ -39,8 +39,10 @@ import {
   useTemplateIndustry,
 } from "./SlideTemplateContext";
 import { resolveSlideTemplate } from "@/lib/section-templates";
-import { StatLayoutProvider } from "./StatLayoutContext";
+import { StatArrangementProvider, StatLayoutProvider } from "./StatLayoutContext";
 import { resolveStatLayout } from "@/lib/stat-layouts";
+import { isStatArrangement } from "@/lib/stat-arrangements";
+
 import { enterpriseWhiteBrand, isEnterpriseWhite, type SlideSkin } from "@/lib/slide-skin";
 import { accentInk } from "@/lib/accent-tokens";
 import { useClientLogoPool } from "@/lib/client-logo-pool";
@@ -297,19 +299,26 @@ function VariantRendererInner(props: Props) {
                   slide mode to CSS (light mode kills text/content shadows). */}
                     <div data-slide-mode={mode} style={{ display: "contents" }}>
                       <StatLayoutProvider layout={resolveStatLayout(variant.id, c)}>
-                        {renderVariantBody({
-                          slide,
-                          variant,
-                          brand: themedBrand,
-                          pageNumber,
-                          c,
-                          mode,
-                          clientName: resolvedClient,
-                          clientLogoUrl: clientLogoUrl ?? null,
-                          dash,
-                          bareSurfaces,
-                        })}
+                        <StatArrangementProvider
+                          arrangement={
+                            isStatArrangement(c.statArrangement) ? c.statArrangement : "even"
+                          }
+                        >
+                          {renderVariantBody({
+                            slide,
+                            variant,
+                            brand: themedBrand,
+                            pageNumber,
+                            c,
+                            mode,
+                            clientName: resolvedClient,
+                            clientLogoUrl: clientLogoUrl ?? null,
+                            dash,
+                            bareSurfaces,
+                          })}
+                        </StatArrangementProvider>
                       </StatLayoutProvider>
+
                     </div>
                   </SlideFrameCtx.Provider>
                 </SlideSceneSeedContext.Provider>

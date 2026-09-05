@@ -1345,3 +1345,46 @@ body.export-mode [data-print-surface] {
 [data-slide-content-plane][data-authored-media="1"] > * > [aria-hidden].pointer-events-none.absolute.inset-0 {
   display: none !important;
 }
+
+/* -----------------------------------------------------------------------------
+   STAT FIGURE REVEAL CHOREOGRAPHY
+   Compositor-only reveals (transform / opacity / clip-path) for statistics, so a
+   stat set lands with a beat instead of appearing all at once. Stagger comes
+   from an inline animation-delay set per figure index. Reduced motion drops
+   straight to the end state — never a half-revealed numeral.
+----------------------------------------------------------------------------- */
+@keyframes tp-stat-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes tp-stat-sweep {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+.stat-reveal-rise {
+  animation: tp-stat-rise 620ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.stat-reveal-sweep {
+  animation: tp-stat-sweep 720ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stat-reveal-rise,
+  .stat-reveal-sweep {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
+}
