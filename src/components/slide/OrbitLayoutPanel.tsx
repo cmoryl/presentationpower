@@ -86,6 +86,12 @@ export function OrbitLayoutPanel({ orbits, onChange }: Props) {
         <p className="mt-1 text-xs text-black/50">
           Drag a figure to move it, or select one and use the arrow keys.
         </p>
+        {collided && (
+          <p className="mt-2 rounded-lg bg-amber-50 px-2 py-1 text-xs text-amber-800">
+            Two figures were overlapping, so they have been eased apart to keep every
+            number readable.
+          </p>
+        )}
       </header>
 
       <div
