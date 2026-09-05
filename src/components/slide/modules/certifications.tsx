@@ -95,7 +95,13 @@ registerSlideModule({
             )}
 
             {highlights.length > 0 && (
-              <div className="mt-8 flex" style={{ gap: 16 }}>
+              <div
+                className="mt-8 flex"
+                style={{
+                  gap: 16,
+                  flexDirection: st.statLayout === "stack" ? "column" : "row",
+                }}
+              >
                 {highlights.map((h, i) => {
                   const { figure, label } = splitStat(h);
                   return (
@@ -114,17 +120,19 @@ registerSlideModule({
                               ? "2px 0 4px 18px"
                               : "18px 20px 16px",
                         gap: 8,
+                        textAlign: st.statAlign === "center" ? "center" : undefined,
+                        alignItems: st.statAlign === "center" ? "center" : undefined,
                       }}
                     >
 
                       {figure && (
                         <span
                           style={{
-                            fontSize: fillPx(40, "display"),
+                            fontSize: fillPx(Math.round(40 * st.statSize), "display"),
                             fontWeight: 800,
                             lineHeight: 1,
                             letterSpacing: "-0.02em",
-                            color: accent,
+                            color: st.statFigureColor === "ink" ? ink.strong : accent,
                           }}
                         >
                           {figure}
@@ -135,8 +143,8 @@ registerSlideModule({
                           fontSize: fillPx(19, "body"),
                           fontWeight: 700,
                           lineHeight: 1.25,
-                          letterSpacing: "0.04em",
-                          textTransform: "uppercase",
+                          letterSpacing: st.statLabelCase === "upper" ? "0.04em" : "0",
+                          textTransform: st.statLabelCase === "upper" ? "uppercase" : "none",
                           color: figure ? ink.strong : accent,
                         }}
                       >
