@@ -12244,18 +12244,20 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   // Stat tiles: tinted tile + accent edge bar, big figure over small label
   if (highlights.length) {
     const tGap = 0.16;
-    const tW = (CW - tGap * (highlights.length - 1)) / highlights.length;
+    const stacked = st.statLayout === "stack";
+    const tW = stacked ? CW : (CW - tGap * (highlights.length - 1)) / highlights.length;
     const tY = CY + 1.0;
-    const tH = 1.05;
+    const tH = stacked ? 0.72 : 1.05;
     highlights.forEach((h, i) => {
-      const x = CX + i * (tW + tGap);
+      const x = stacked ? CX : CX + i * (tW + tGap);
+      const y = stacked ? tY + i * (tH + tGap) : tY;
       const m = /^(\S+)\s+(.+)$/.exec(h.trim());
       const figure = m && /^[+\-–~$€£]?\d/.test(m[1]) ? m[1] : "";
       const label = figure ? m![2] : h.trim();
       if (st.statTile === "tile") {
         s.addShape("rect", {
           x,
-          y: tY,
+          y,
           w: tW,
           h: tH,
           fill: { color: p.surface },
@@ -12265,7 +12267,7 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       if (st.statTile !== "plain") {
         s.addShape("rect", {
           x,
-          y: tY,
+          y,
           w: 0.05,
           h: tH,
           fill: { color: p.accent },
@@ -12279,21 +12281,26 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
             ? [
                 {
                   text: `${figure}\n`,
-                  options: { fontSize: 22, bold: true, color: p.accent },
+                  options: {
+                    fontSize: Math.round(22 * st.statSize),
+                    bold: true,
+                    color: st.statFigureColor === "ink" ? p.primary : p.accent,
+                  },
                 },
               ]
             : []),
           {
-            text: label.toUpperCase(),
+            text: st.statLabelCase === "upper" ? label.toUpperCase() : label,
             options: { fontSize: 10.5, bold: true, color: figure ? p.primary : p.accent },
           },
         ],
         {
           x: x + 0.18,
-          y: tY + 0.1,
+          y: y + 0.1,
           w: tW - 0.3,
           h: tH - 0.2,
           fontFace: "Geist",
+          align: st.statAlign === "center" ? "center" : "left",
           valign: "middle",
           lineSpacingMultiple: 1.15,
         },
@@ -12346,6 +12353,7 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
           bold: true,
           color: p.accent,
           fontFace: "Geist",
+          align: st.statAlign === "center" ? "center" : "left",
           valign: "middle",
         });
       }

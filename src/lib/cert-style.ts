@@ -9,6 +9,10 @@ export type CertCardLook = "elevated" | "flat" | "outline";
 export type CertBadgeShape = "square" | "round" | "none";
 export type CertStatTile = "tile" | "rule" | "plain";
 export type CertDensity = "comfortable" | "compact";
+export type CertStatLayout = "row" | "stack";
+export type CertStatFigureColor = "accent" | "ink";
+export type CertStatLabelCase = "upper" | "normal";
+export type CertStatAlign = "left" | "center";
 
 export type CertStyle = {
   /** Which column the credential cards sit in. */
@@ -35,6 +39,16 @@ export type CertStyle = {
   /** Heading above the spec-sheet block. */
   coversLabel: string;
   density: CertDensity;
+  /** Figures side by side or stacked in a column. */
+  statLayout: CertStatLayout;
+  /** Scale applied to the big figure type (0.7–1.6). */
+  statSize: number;
+  /** Big figure in the accent colour or the ink colour. */
+  statFigureColor: CertStatFigureColor;
+  /** Label typography case. */
+  statLabelCase: CertStatLabelCase;
+  /** Text alignment inside each figure block. */
+  statAlign: CertStatAlign;
 };
 
 export const DEFAULT_CERT_STYLE: CertStyle = {
@@ -52,6 +66,11 @@ export const DEFAULT_CERT_STYLE: CertStyle = {
   numberedPoints: true,
   coversLabel: "What it covers",
   density: "comfortable",
+  statLayout: "row",
+  statSize: 1,
+  statFigureColor: "accent",
+  statLabelCase: "upper",
+  statAlign: "left",
 };
 
 export const CERT_LIMITS = {
@@ -59,6 +78,7 @@ export const CERT_LIMITS = {
   accentBar: { min: 0, max: 14, step: 1 },
   stagger: { min: 0, max: 80, step: 2 },
   cardRadius: { min: 0, max: 20, step: 1 },
+  statSize: { min: 0.7, max: 1.6, step: 0.05 },
 } as const;
 
 export const CERT_CARD_LOOKS: { id: CertCardLook; label: string }[] = [
@@ -77,6 +97,26 @@ export const CERT_STAT_TILES: { id: CertStatTile; label: string }[] = [
   { id: "tile", label: "Tinted tile" },
   { id: "rule", label: "Accent rule" },
   { id: "plain", label: "Plain" },
+];
+
+export const CERT_STAT_LAYOUTS: { id: CertStatLayout; label: string }[] = [
+  { id: "row", label: "Side by side" },
+  { id: "stack", label: "Stacked" },
+];
+
+export const CERT_STAT_FIGURE_COLORS: { id: CertStatFigureColor; label: string }[] = [
+  { id: "accent", label: "Accent" },
+  { id: "ink", label: "Ink" },
+];
+
+export const CERT_STAT_LABEL_CASES: { id: CertStatLabelCase; label: string }[] = [
+  { id: "upper", label: "Uppercase" },
+  { id: "normal", label: "As typed" },
+];
+
+export const CERT_STAT_ALIGNS: { id: CertStatAlign; label: string }[] = [
+  { id: "left", label: "Left" },
+  { id: "center", label: "Centred" },
 ];
 
 function clamp(n: number, min: number, max: number, fallback: number): number {
@@ -120,6 +160,15 @@ export function resolveCertStyle(raw: unknown): CertStyle {
     numberedPoints: bool(o.numberedPoints, d.numberedPoints),
     coversLabel: typeof o.coversLabel === "string" ? o.coversLabel : d.coversLabel,
     density: pick(o.density, ["comfortable", "compact"] as const, d.density),
+    statLayout: pick(o.statLayout, ["row", "stack"] as const, d.statLayout),
+    statSize:
+      Math.round(
+        clamp(Number(o.statSize), CERT_LIMITS.statSize.min, CERT_LIMITS.statSize.max, d.statSize) *
+          20,
+      ) / 20,
+    statFigureColor: pick(o.statFigureColor, ["accent", "ink"] as const, d.statFigureColor),
+    statLabelCase: pick(o.statLabelCase, ["upper", "normal"] as const, d.statLabelCase),
+    statAlign: pick(o.statAlign, ["left", "center"] as const, d.statAlign),
   };
 }
 
