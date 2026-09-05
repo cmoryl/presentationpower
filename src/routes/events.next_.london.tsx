@@ -76,9 +76,13 @@ import {
   londonAiBytes,
   londonPanelSvgFor,
   resolveLondonArtwork,
+  resolveLondonArtworkAsync,
 } from "@/lib/next-london-revise";
 
-import { listLondonRevisions } from "@/lib/next-london-revise.functions";
+import {
+  getLondonHeadRevision,
+  listLondonRevisions,
+} from "@/lib/next-london-revise.functions";
 import { onLondonRevisionPublished } from "@/lib/next-london-revision-live";
 
 /** Millimetres as inches — every signage spec reads in both units. */
@@ -113,17 +117,6 @@ function download(blob: Blob, name: string) {
   a.download = name;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
-}
-
-/**
- * Blocks a download whose bytes disagree with the panel specification, and
- * surfaces tolerated deviations (e.g. the 6000 px ceiling) as a warning.
- */
-function gateOnQa(report: LondonQaReport) {
-  if (report.status === "fail") throw new Error(`QA failed — ${qaSummary(report)}`);
-  if (report.status === "warn") {
-    toast.warning(`${report.file} — QA warning`, { description: qaSummary(report) });
-  }
 }
 
 function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
@@ -234,7 +227,8 @@ function PanelCard({
 }
 
 function LondonSignagePage() {
-  const fetchRevisions = useServerFn(listLondonRevisions);
+  const fetchHead = useServerFn(getLondonHeadRevision);
+  const [headError, setHeadError] = useState(false);
   // `undefined` while the session resolves, `null` when signed out. The kit is
   // public — downloads and QA are available to everyone — but editor entry
   // points (revise workflow, production studio) are only shown to signed-in
@@ -274,22 +268,24 @@ function LondonSignagePage() {
   // swaps to the new spec without a reload.
   useEffect(() => onLondonRevisionPublished(() => setRevisionTick((n) => n + 1)), []);
 
+  // The revision in force is public: signed in or not, every viewer sees the
+  // spec that is actually being printed.
   useEffect(() => {
-    if (!userId) return;
     let live = true;
-    fetchRevisions({})
+    fetchHead({})
       .then((res) => {
         if (!live) return;
-        const inForce = effectiveLondonPanels(res.revisions);
+        setHeadError(false);
+        const inForce = effectiveLondonPanels(res.revision ? [res.revision] : []);
         if (inForce.length) setPanels(inForce);
       })
       .catch(() => {
-        /* Not signed in or history unavailable — the issued pack stands. */
+        if (live) setHeadError(true);
       });
     return () => {
       live = false;
     };
-  }, [fetchRevisions, userId, revisionTick]);
+  }, [fetchHead, revisionTick]);
 
   useEffect(() => {
     if (openPanel) setPpi(recommendedPpi(openPanel));
@@ -325,7 +321,12 @@ function LondonSignagePage() {
       },
       async () => {
         const pack = await packOrNull();
-        const art = resolveLondonArtwork(panel, pack);
+        // The `.ai` path always resolves supplied booth artwork, so a vendor
+        // booth downloads the real wall rather than the house ground.
+        const art =
+          fmt === "ai"
+            ? await resolveLondonArtworkAsync(panel, pack)
+            : resolveLondonArtwork(panel, pack);
         gateOnQa(fmt === "svg" ? auditSvg(panel, art.svg) : auditAi(panel, art.ai));
         if (fmt === "svg") {
           download(new Blob([art.svg], { type: "image/svg+xml" }), `${panelSlug(panel)}.svg`);
