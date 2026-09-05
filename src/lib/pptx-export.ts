@@ -12117,6 +12117,12 @@ function renderGrowthOrbits(
   const ringFace = resolveOrbitFace(c.orbitStyle, isDarkPalette(p) ? "dark" : "light");
   const ringHex = orbitRingColor(ringFace, p.accent).replace("#", "");
   const baseH = Math.min(1.95, avail / Math.max(orbits.length, 1) - 0.1);
+  // Same collision pass as the on-screen slide, in inches, so the exported
+  // rings never overlap each other or the edge of the stage.
+  const layout = fitOrbitLayout(rawLayout, {
+    stage: { w: RW, h: avail },
+    base: baseH,
+  });
   orbits.forEach((o, k) => {
     const pos = layout[k]!;
     const ringH = baseH * pos.size;
