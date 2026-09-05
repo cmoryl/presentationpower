@@ -443,8 +443,24 @@ export function parseStatLayout(input: unknown): Partial<StatLayout> | null {
   if (isStatIconName(icon)) out.icon = icon;
   const prog = o.statProgress ?? o.progress;
   if (typeof prog === "number" && Number.isFinite(prog)) out.progress = clamp01(prog);
+  const surface = o.statSurface ?? o.surface;
+  if (isStatSurface(surface)) out.surface = surface;
+  const motion = o.statMotion ?? o.motion;
+  if (isStatMotion(motion)) out.motion = motion;
+  const emphasis = o.statEmphasis ?? o.emphasis;
+  if (isStatEmphasis(emphasis)) out.emphasis = emphasis;
+  const series = o.statSeries ?? o.series;
+  if (Array.isArray(series)) {
+    const nums = series
+      .map((n) => (typeof n === "number" ? n : Number.parseFloat(String(n))))
+      .filter((n) => Number.isFinite(n));
+    if (nums.length >= 2) out.series = nums.slice(0, 24);
+  }
+  const trend = o.statTrend ?? o.trend;
+  if (trend === "up" || trend === "down") out.trend = trend;
   return Object.keys(out).length ? out : null;
 }
+
 
 /**
  * Resolution order (last wins): module default → slide content override →
