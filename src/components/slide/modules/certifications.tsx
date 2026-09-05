@@ -238,7 +238,7 @@ registerSlideModule({
             )}
           </div>
 
-          {/* ── Right: credential cards on a quiet band ── */}
+          {/* ── Credential cards on a quiet band ── */}
           <div
             data-intro-item=""
             data-intro-step={2}
@@ -248,43 +248,49 @@ registerSlideModule({
               borderRadius: 8,
               padding: dense ? "26px 30px" : "34px 38px",
               overflow: "hidden",
+              order: cardsFirst ? 1 : 2,
             }}
           >
-            {/* decorative quarter arc, bottom-right */}
-            <div
-              aria-hidden
-              data-decorative
-              style={{
-                position: "absolute",
-                right: -90,
-                bottom: -90,
-                width: 260,
-                height: 260,
-                borderRadius: "50%",
-                border: `1.5px solid ${hairline}`,
-                pointerEvents: "none",
-              }}
-            />
-            <div
-              aria-hidden
-              data-decorative
-              style={{
-                position: "absolute",
-                right: -40,
-                bottom: -40,
-                width: 160,
-                height: 160,
-                borderRadius: "50%",
-                background: isDark ? "rgba(255,255,255,0.05)" : "rgba(3,63,199,0.06)",
-                pointerEvents: "none",
-              }}
-            />
+            {/* decorative quarter arcs */}
+            {st.showArcs && (
+              <>
+                <div
+                  aria-hidden
+                  data-decorative
+                  style={{
+                    position: "absolute",
+                    right: -90,
+                    bottom: -90,
+                    width: 260,
+                    height: 260,
+                    borderRadius: "50%",
+                    border: `1.5px solid ${hairline}`,
+                    pointerEvents: "none",
+                  }}
+                />
+                <div
+                  aria-hidden
+                  data-decorative
+                  style={{
+                    position: "absolute",
+                    right: -40,
+                    bottom: -40,
+                    width: 160,
+                    height: 160,
+                    borderRadius: "50%",
+                    background: isDark ? "rgba(255,255,255,0.05)" : "rgba(3,63,199,0.06)",
+                    pointerEvents: "none",
+                  }}
+                />
+              </>
+            )}
 
             <div className="relative flex min-w-0 flex-col" style={{ gap: dense ? 16 : 22 }}>
               {certs.map((cert: Item, i) => {
                 const bullets = strs(cert.points).slice(0, MAX_POINTS).filter(Boolean);
                 const url = pickLogoForMode(cert, mode);
                 const path = s(cert.logoPath);
+                const indent = st.stagger * i;
                 return (
                   <div
                     key={i}
@@ -294,32 +300,36 @@ registerSlideModule({
                     style={{
                       background: cardBg,
                       border: `1px solid ${cardBorder}`,
-                      borderLeft: `7px solid ${accent}`,
-                      borderRadius: 6,
+                      borderLeft:
+                        st.accentBar > 0 ? `${st.accentBar}px solid ${accent}` : undefined,
+                      borderRadius: st.cardRadius,
                       boxShadow: cardShadow,
                       gap: 22,
                       padding: dense ? "20px 26px" : "26px 30px",
-                      marginLeft: i === 1 ? 26 : i === 2 ? 52 : 0,
+                      marginLeft: cardsFirst ? 0 : indent,
+                      marginRight: cardsFirst ? indent : 0,
                     }}
                   >
                     {/* ghost index numeral */}
-                    <span
-                      aria-hidden
-                      data-decorative
-                      style={{
-                        position: "absolute",
-                        top: 10,
-                        right: 18,
-                        fontSize: fillPx(44, "display"),
-                        fontWeight: 800,
-                        lineHeight: 1,
-                        letterSpacing: "-0.02em",
-                        color: ghostIdx,
-                        pointerEvents: "none",
-                      }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
+                    {st.showIndex && (
+                      <span
+                        aria-hidden
+                        data-decorative
+                        style={{
+                          position: "absolute",
+                          top: 10,
+                          right: 18,
+                          fontSize: fillPx(44, "display"),
+                          fontWeight: 800,
+                          lineHeight: 1,
+                          letterSpacing: "-0.02em",
+                          color: ghostIdx,
+                          pointerEvents: "none",
+                        }}
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                    )}
 
                     {(url || path) && (
                       <div
@@ -327,9 +337,12 @@ registerSlideModule({
                         style={{
                           width: dense ? 70 : 82,
                           height: dense ? 70 : 82,
-                          borderRadius: 6,
-                          background: "#FFFFFF",
-                          border: `1px solid ${isDark ? "rgba(255,255,255,0.2)" : "rgba(10,15,28,0.1)"}`,
+                          borderRadius: st.badge === "round" ? "50%" : 6,
+                          background: st.badge === "none" ? "transparent" : "#FFFFFF",
+                          border:
+                            st.badge === "none"
+                              ? undefined
+                              : `1px solid ${isDark ? "rgba(255,255,255,0.2)" : "rgba(10,15,28,0.1)"}`,
                         }}
                       >
                         <ClientLogoImg
@@ -341,6 +354,7 @@ registerSlideModule({
                         />
                       </div>
                     )}
+
 
                     <div className="min-w-0 flex-1">
                       {s(cert.label) && (
