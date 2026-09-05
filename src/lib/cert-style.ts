@@ -47,7 +47,7 @@ export const DEFAULT_CERT_STYLE: CertStyle = {
   cardRadius: 6,
   showIndex: true,
   showArcs: true,
-  badge: "square",
+  badge: "none",
   statTile: "tile",
   numberedPoints: true,
   coversLabel: "What it covers",

@@ -1783,7 +1783,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
         "certs[].label": { kind: "text", chars: 28 },
         "certs[].points[]": { kind: "text", chars: 34 },
         "certs[].logoUrl": { kind: "logo" },
+        "certs[].logoUrlDark": { kind: "logo" },
         "certs[].logoPath": { kind: "logo" },
+
       },
       titleChars: 44,
       bodyChars: 34,
@@ -1796,7 +1798,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
       "certs[].label",
       "certs[].points[]",
       "certs[].logoUrl",
+      "certs[].logoUrlDark",
       "certs[].logoPath",
+
     ],
     lockedFields: ["footer", "logo"],
   },
