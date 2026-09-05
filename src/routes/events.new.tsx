@@ -9,7 +9,10 @@ import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { KitWizard } from "@/components/campaigns/KitWizard";
 
-const SearchSchema = z.object({ kit: z.string().uuid().optional() });
+const SearchSchema = z.object({
+  kit: z.string().uuid().optional(),
+  profile: z.string().min(1).max(80).optional(),
+});
 
 export const Route = createFileRoute("/events/new")({
   validateSearch: (raw) => SearchSchema.parse(raw ?? {}),
@@ -34,12 +37,12 @@ export const Route = createFileRoute("/events/new")({
 });
 
 function EventsNewPage() {
-  const { kit } = Route.useSearch();
+  const { kit, profile } = Route.useSearch();
   return (
     <AppShell>
       <KitWizard
         surface="event"
-        defaultProfileId="event-kit"
+        defaultProfileId={profile ?? "event-kit"}
         backHref="/events"
         backLabel="Back to events"
         finishHref="/events"

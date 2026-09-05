@@ -738,7 +738,11 @@ export function KitWizard({
 
             <p className="mt-3 text-xs text-black/55">
               Prefer your favorited modules?{" "}
-              <Link to="/admin/campaigns/kit" className="text-[#003FC7] hover:underline">
+              <Link
+                to="/events/new"
+                search={{ profile: profileId }}
+                className="text-[#003FC7] hover:underline"
+              >
                 Switch to favorited-module flow →
               </Link>
             </p>
@@ -841,12 +845,17 @@ export function KitWizard({
                   onChange={(v) => setEvent({ ...event, hashtag: v })}
                   placeholder="#TPNext"
                 />
-                <TextField
-                  label="Start date"
-                  value={event.startDate ?? ""}
-                  onChange={(v) => setEvent({ ...event, startDate: v })}
-                  placeholder="YYYY-MM-DD"
-                />
+                <label className="block text-sm">
+                  <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-black/50">
+                    Start date
+                  </div>
+                  <input
+                    type="date"
+                    value={event.startDate ?? ""}
+                    onChange={(e) => setEvent({ ...event, startDate: e.target.value })}
+                    className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                  />
+                </label>
                 <TextField
                   label="Registration URL"
                   value={event.registrationUrl ?? ""}
