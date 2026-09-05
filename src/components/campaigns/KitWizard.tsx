@@ -37,7 +37,7 @@ import {
   type CampaignCopy,
 } from "@/lib/campaigns";
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
-import { campaignArtDirection, saveCampaignLook } from "@/lib/campaign-look";
+import { campaignArtDirection } from "@/lib/campaign-look";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { NextRenderer, NEXT_RENDER_TRACKS } from "@/components/campaigns/NextRenderer";
 import { NEXT_NAVY_SPEC } from "@/lib/next-brand-guide";
@@ -225,12 +225,21 @@ export function KitWizard({
             ?.look;
           if (stored?.lookId || stored?.styleId) {
             setKitLook({ lookId: stored.lookId, styleId: stored.styleId });
-            // Publish it as the division's campaign direction so social,
-            // event and digital assets generated later inherit the same look.
-            saveCampaignLook(row.brandId, {
-              ...(stored.lookId ? { lookId: stored.lookId } : {}),
-              ...(stored.styleId ? { styleId: stored.styleId } : {}),
-            });
+            // Note: opening a saved kit must not change the division's
+            // campaign direction — no saveCampaignLook call here.
+          }
+        }
+        {
+          const storedVisual = (
+            row.eventFacts as
+              | { visual?: { moduleLayoutId?: string | null; imageScrimPct?: number; imageUrl?: string } }
+              | null
+          )?.visual;
+          if (storedVisual) {
+            if (storedVisual.moduleLayoutId) setModuleLayoutId(storedVisual.moduleLayoutId);
+            if (typeof storedVisual.imageScrimPct === "number")
+              setImageScrimPct(storedVisual.imageScrimPct);
+            if (storedVisual.imageUrl) setImageUrl(storedVisual.imageUrl);
           }
         }
         setStep(WIZARD_STEPS.findIndex((s) => s.key === "review")); // jump to review
