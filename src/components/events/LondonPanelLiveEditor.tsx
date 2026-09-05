@@ -20,6 +20,15 @@ import {
 } from "@/lib/next-london-artwork";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { auditAi, auditSvg, gateOnQa } from "@/lib/london-signage-qa";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { NEXT_LONDON_AGENDA_URL } from "@/lib/next-event";
@@ -139,6 +148,12 @@ export interface LondonPanelLiveEditorProps {
   panel: LondonPanel;
   /** Other panel ids the "apply to all" action should copy placement onto. */
   siblingIds?: string[];
+  /**
+   * Revision the downloaded files belong to. Pass "draft" while the host has
+   * unpublished edits, so no file is stamped with a revision that does not
+   * exist yet.
+   */
+  revisionLabel: number | "draft";
   /** Called when the gradient style changes, so a host list can persist it. */
   onStyleChange?: (styleId: string) => void;
 }
@@ -146,6 +161,7 @@ export interface LondonPanelLiveEditorProps {
 export function LondonPanelLiveEditor({
   panel: input,
   siblingIds = [],
+  revisionLabel,
   onStyleChange,
 }: LondonPanelLiveEditorProps) {
   const placements = useLondonLogoPlacements();
@@ -155,6 +171,7 @@ export function LondonPanelLiveEditor({
 
   const [colorSpace, setColorSpace] = useState<LondonColorSpace>("rgb");
   const [printPreview, setPrintPreview] = useState(true);
+  const [applyOpen, setApplyOpen] = useState(false);
   const stageRef = useRef<HTMLDivElement | null>(null);
   // Stage size. A 12-metre signboard shown at 420px is unusable for fine
   // tuning, so the live print area can be widened — and at the two larger
@@ -262,7 +279,7 @@ export function LondonPanelLiveEditor({
     });
 
   const downloadPanel = async (kind: "svg" | "ai") => {
-    const base = londonPanelFileBase(panel, 1, colorSpace);
+    const base = londonPanelFileBase(panel, revisionLabel, colorSpace);
     // Same spec gate as the kit page: a file that disagrees with the panel
     // specification is never saved.
     let blob: Blob;
@@ -1177,17 +1194,42 @@ export function LondonPanelLiveEditor({
             <RotateCcw className="h-3.5 w-3.5" /> Reset panel
           </Button>
           {siblingIds.length > 0 ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-2"
-              onClick={() => {
-                copyLondonLogoPlacement(panel.id, siblingIds);
-                toast.success(`Placement applied to ${siblingIds.length} panels`);
-              }}
-            >
-              <Copy className="h-3.5 w-3.5" /> Apply to all
-            </Button>
+            <Dialog open={applyOpen} onOpenChange={setApplyOpen}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <Copy className="h-3.5 w-3.5" /> Apply to all
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Apply this panel to {siblingIds.length} other panels?</DialogTitle>
+                  <DialogDescription>
+                    This overwrites those panels and cannot be undone. It copies:
+                  </DialogDescription>
+                </DialogHeader>
+                <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                  <li>Lockup position, scale and colourway</li>
+                  <li>Headline text</li>
+                  <li>QR payload</li>
+                  <li>Ground zoom and offset</li>
+                </ul>
+                <DialogFooter>
+                  <Button variant="outline" size="sm" onClick={() => setApplyOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      copyLondonLogoPlacement(panel.id, siblingIds);
+                      setApplyOpen(false);
+                      toast.success(`Placement applied to ${siblingIds.length} panels`);
+                    }}
+                  >
+                    Apply to {siblingIds.length} panels
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           ) : (
             <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
               <Crosshair className="h-3.5 w-3.5" /> single panel
