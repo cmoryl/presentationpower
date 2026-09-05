@@ -1011,6 +1011,151 @@ export function StatFigure({
           }}
         />
       )}
+      {resolvedShape === "halo" && (
+        <span
+          aria-hidden
+          data-decorative
+          className="pointer-events-none absolute"
+          style={{
+            width: `${Math.round(spec.valuePx * 2.1)}px`,
+            height: `${Math.round(spec.valuePx * 1.35)}px`,
+            top: `-${Math.round(spec.valuePx * 0.3)}px`,
+            left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.28)}px`,
+            transform: centeredShape ? "translateX(-50%)" : undefined,
+            borderRadius: "50%",
+            border: `${Math.max(3, Math.round(spec.valuePx * 0.03))}px solid ${hexA(aFig, mode === "dark" ? 0.3 : 0.2)}`,
+            boxShadow: `0 0 ${Math.round(spec.valuePx * 0.5)}px ${hexA(aFig, mode === "dark" ? 0.22 : 0.12)}`,
+            zIndex: 0,
+          }}
+        />
+      )}
+      {resolvedShape === "ribbon" && (
+        <span
+          aria-hidden
+          data-decorative
+          className="pointer-events-none absolute"
+          style={{
+            left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.06)}px`,
+            transform: centeredShape ? "translateX(-50%)" : undefined,
+            top: `${Math.round(spec.valuePx * 0.42)}px`,
+            height: `${Math.round(spec.valuePx * 0.34)}px`,
+            width: centeredShape ? "72%" : "104%",
+            background: hexA(aFig, mode === "dark" ? 0.2 : 0.12),
+            borderTop: `${Math.max(2, Math.round(spec.valuePx * 0.018))}px solid ${aFig}`,
+            zIndex: 0,
+          }}
+        />
+      )}
+      {resolvedShape === "echo" && !valueIsPhrase && (
+        <span
+          aria-hidden
+          data-decorative
+          className="pointer-events-none absolute select-none font-semibold tabular-nums"
+          style={{
+            fontSize: `min(${spec.valuePx}px, 20cqw)`,
+            lineHeight: 0.94,
+            letterSpacing: "-0.045em",
+            top: Math.round(spec.valuePx * 0.07),
+            left: centeredShape ? "50%" : Math.round(spec.valuePx * 0.05),
+            transform: centeredShape
+              ? `translateX(calc(-50% + ${Math.round(spec.valuePx * 0.05)}px))`
+              : undefined,
+            color: hexA(aFig, mode === "dark" ? 0.2 : 0.12),
+            whiteSpace: "nowrap",
+            zIndex: 0,
+          }}
+        >
+          {value || "—"}
+        </span>
+      )}
+      {resolvedShape === "ticks" &&
+        (() => {
+          // Instrument dial: 33 tick marks around a 270° sweep, filled by progress.
+          const total = 33;
+          const lit = Math.round(p * total);
+          const R = 92;
+          const cx = 100;
+          const cy = 100;
+          const tick = (i: number) => {
+            const a = (-225 + (270 * i) / (total - 1)) * (Math.PI / 180);
+            const inner = R - 12;
+            return {
+              x1: cx + Math.cos(a) * inner,
+              y1: cy + Math.sin(a) * inner,
+              x2: cx + Math.cos(a) * R,
+              y2: cy + Math.sin(a) * R,
+            };
+          };
+          return (
+            <svg
+              aria-hidden
+              viewBox="0 0 200 200"
+              className="pointer-events-none absolute"
+              style={{
+                width: `${Math.round(spec.valuePx * 1.95)}px`,
+                top: `-${Math.round(spec.valuePx * 0.42)}px`,
+                left: centeredShape ? "50%" : 0,
+                transform: centeredShape ? "translateX(-50%)" : undefined,
+                zIndex: 0,
+              }}
+            >
+              {Array.from({ length: total }, (_, i) => {
+                const t = tick(i);
+                return (
+                  <line
+                    key={i}
+                    {...t}
+                    stroke={i < lit ? aFig : hexA(aFig, mode === "dark" ? 0.2 : 0.13)}
+                    strokeWidth={i % 4 === 0 ? 5 : 2.6}
+                    strokeLinecap="round"
+                  />
+                );
+              })}
+            </svg>
+          );
+        })()}
+      {resolvedShape === "pie" &&
+        isPercentValue &&
+        (() => {
+          // Single bold wedge. Drawn as a thick stroked circle so the share is
+          // a dash offset — crisp at any size and export-safe.
+          const R = 80;
+          const circ = 2 * Math.PI * R;
+          return (
+            <svg
+              aria-hidden
+              data-decorative
+              viewBox="0 0 200 200"
+              className="pointer-events-none absolute"
+              style={{
+                width: `${Math.round(spec.valuePx * 1.9)}px`,
+                top: `-${Math.round(spec.valuePx * 0.44)}px`,
+                left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.16)}px`,
+                transform: centeredShape ? "translateX(-50%)" : undefined,
+                zIndex: 0,
+              }}
+            >
+              <circle
+                cx="100"
+                cy="100"
+                r={R}
+                fill="none"
+                stroke={hexA(aFig, mode === "dark" ? 0.16 : 0.1)}
+                strokeWidth={26}
+              />
+              <circle
+                cx="100"
+                cy="100"
+                r={R}
+                fill="none"
+                stroke={aFig}
+                strokeWidth={26}
+                strokeDasharray={`${circ * p} ${circ}`}
+                transform="rotate(-90 100 100)"
+              />
+            </svg>
+          );
+        })()}
       {resolvedShape === "icon-ghost" && StatIcon && (
         <span
           aria-hidden
