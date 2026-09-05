@@ -24,7 +24,7 @@
 - [x] Restore native mouse-wheel scrolling in the deck editor by removing the root overflow/overscroll trap
 
 ## Certification module restyle (Sep 5)
-- [ ] Restyle MV-PROOF-CERT-ORBITS per picked direction (Architectural Enterprise Layout), with extra-stylized bottom-left (bullet zone) and bottom-right (credential cards zone); keep light/dark faces + PPTX export parity
+- [x] Restyle MV-PROOF-CERT-ORBITS per picked direction (Architectural Enterprise Layout), with extra-stylized bottom-left (bullet zone) and bottom-right (credential cards zone); keep light/dark faces + PPTX export parity
 
 ## Templates / looks (Sep 2)
 - [x] 28-look restyle gates: resumable coverage ledger (`tests/snapshots/export-verify.coverage.json`), `npm run verify:restyle` (+ `--shard k/n`, `--max`, `--workers`), sharded CI workflow, merge script, vitest coverage gate
