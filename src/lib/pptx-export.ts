@@ -12209,20 +12209,11 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     fontFace: "Geist",
   });
 
-  // Left card
+  // Left: unframed programme statement
   const CX = 0.6;
   const CW = 5.3;
   const CY = 1.55;
   const CH = 5.2;
-  s.addShape("roundRect", {
-    x: CX,
-    y: CY,
-    w: CW,
-    h: CH,
-    rectRadius: EXPORT_RADIUS_IN.media,
-    fill: { color: "FFFFFF" },
-    line: { color: LIGHT_GRAY },
-  });
   const highlights = strList(c.cardHighlights).slice(0, 3);
   const points = strList(c.cardPoints).slice(0, 6);
   s.addText(
@@ -12242,80 +12233,64 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       ...(points.length ? [{ text: "\n", options: { fontSize: 8 } }] : []),
       ...points.map((pt) => ({
         text: `• ${pt}\n`,
-        options: { fontSize: 14, color: "03002C" },
+        options: { fontSize: 14, color: p.ink },
       })),
     ],
     {
-      x: CX + 0.35,
-      y: CY + 0.35,
-      w: CW - 0.7,
-      h: CH - 0.7,
+      x: CX,
+      y: CY,
+      w: CW,
+      h: CH,
       fontFace: "Geist",
-      valign: "middle",
+      valign: "top",
       lineSpacingMultiple: 1.2,
     },
   );
 
-  // Right credentials
+  // Right: credential cards, one per row
   const RX = 6.4;
   const RW = 6.4;
-  const top = CY;
-  const avail = CH;
   const certs = arr(c.certs).slice(0, 3);
-  const layout: Array<[number, number, number]> =
-    certs.length >= 3
-      ? [
-          [34, 40, 0.98],
-          [72, 17, 0.94],
-          [70, 78, 0.94],
-        ]
-      : certs.length === 2
-        ? [
-            [36, 32, 1],
-            [66, 74, 1],
-          ]
-        : [[50, 50, 1.1]];
-  const ringFace = resolveOrbitFace(c.orbitStyle, isDarkPalette(p) ? "dark" : "light");
-  const ringHex = orbitRingColor(ringFace, p.accent).replace("#", "");
-  const base = Math.min(2.6, avail / Math.max(certs.length, 1) + 0.6);
+  const gap = 0.18;
+  const rowH = (CH - gap * Math.max(certs.length - 1, 0)) / Math.max(certs.length, 1);
   certs.forEach((cert, k) => {
-    const [px, py, size] = layout[k] ?? [50, 50, 1];
-    const d = base * size;
-    const ox = Math.min(RX + RW - d, Math.max(RX, RX + (px / 100) * RW - d / 2));
-    const oy = Math.min(top + avail - d, Math.max(top, top + (py / 100) * avail - d / 2));
-    s.addShape("ellipse", {
-      x: ox,
-      y: oy,
-      w: d,
-      h: d,
-      fill: { color: "FFFFFF", transparency: 100 },
-      line: {
-        color: ringHex,
-        width: ringFace.ringWidth,
-        transparency: 100 - ringFace.ringOpacity,
-      },
+    const y = CY + k * (rowH + gap);
+    s.addShape("roundRect", {
+      x: RX,
+      y,
+      w: RW,
+      h: rowH,
+      rectRadius: EXPORT_RADIUS_IN.media,
+      fill: { color: p.surface },
+      line: { color: LIGHT_GRAY },
     });
+    addCardSeam(s as never, { x: RX, y, w: RW }, p.accent, EXPORT_RADIUS_IN.media);
     s.addText(
       [
         ...(str(cert.label)
-          ? [{ text: `${str(cert.label)}\n`, options: { fontSize: 14, bold: true, color: p.primary } }]
+          ? [
+              {
+                text: `${str(cert.label)}\n`,
+                options: { fontSize: 15, bold: true, color: p.primary },
+              },
+            ]
           : []),
         ...strList(cert.points)
           .slice(0, 6)
           .map((b) => ({ text: `• ${b}\n`, options: { fontSize: 11, color: p.ink } })),
       ],
       {
-        x: ox + 0.14,
-        y: oy + 0.14,
-        w: d - 0.28,
-        h: d - 0.28,
+        x: RX + 0.28,
+        y: y + 0.16,
+        w: RW - 0.56,
+        h: rowH - 0.32,
         fontFace: "Geist",
-        align: "center",
         valign: "middle",
       },
     );
   });
 }
+
 
 // ── MV-RISK-MITIGATION ── risk → mitigation paired rows
 function renderRiskMitigation(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
