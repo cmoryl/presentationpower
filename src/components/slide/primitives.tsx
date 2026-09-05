@@ -1020,6 +1020,181 @@ export function StatFigure({
           />
         </span>
       )}
+
+      {/* ── Data-viz figures ───────────────────────────────────────────────
+          These treatments make a claim about DATA, so each one draws only
+          what the content actually supports: sparkline/bars need an authored
+          series, and the part-of-whole figures (dot grid, waffle, radial
+          stack) only render when the value genuinely is a percentage. A stat
+          that can't back the chart falls through to the bare numeral rather
+          than inventing a shape. */}
+      {(resolvedShape === "sparkline" || resolvedShape === "bars") &&
+        resolvedSeries.length >= 2 &&
+        (() => {
+          const w = 200;
+          const h = 60;
+          const min = Math.min(...resolvedSeries);
+          const max = Math.max(...resolvedSeries);
+          const span = max - min || 1;
+          const step = w / (resolvedSeries.length - 1 || 1);
+          const yFor = (v: number) => h - 4 - ((v - min) / span) * (h - 12);
+          const pts = resolvedSeries.map((v, i) => `${i * step},${yFor(v)}`).join(" ");
+          const barW = (w / resolvedSeries.length) * 0.62;
+          return (
+            <svg
+              aria-hidden
+              data-decorative
+              viewBox={`0 0 ${w} ${h}`}
+              preserveAspectRatio="none"
+              className={`relative block ${centeredShape ? "mx-auto" : ""}`}
+              style={{
+                width: centeredShape ? "58%" : "100%",
+                height: Math.round(spec.valuePx * 0.34),
+                marginBottom: Math.round(spec.valuePx * 0.1),
+                zIndex: 1,
+              }}
+            >
+              {resolvedShape === "sparkline" ? (
+                <>
+                  <polyline
+                    points={`${pts}`}
+                    fill="none"
+                    stroke={aFig}
+                    strokeWidth={3}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  <circle
+                    cx={(resolvedSeries.length - 1) * step}
+                    cy={yFor(resolvedSeries[resolvedSeries.length - 1])}
+                    r={4}
+                    fill={aFig}
+                  />
+                </>
+              ) : (
+                resolvedSeries.map((v, i) => {
+                  const y = yFor(v);
+                  return (
+                    <rect
+                      key={i}
+                      x={i * (w / resolvedSeries.length) + (w / resolvedSeries.length - barW) / 2}
+                      y={y}
+                      width={barW}
+                      height={Math.max(2, h - 4 - y)}
+                      rx={1.5}
+                      fill={hexA(aFig, i === resolvedSeries.length - 1 ? 1 : 0.42)}
+                    />
+                  );
+                })
+              )}
+            </svg>
+          );
+        })()}
+
+      {(resolvedShape === "dot-grid" || resolvedShape === "waffle") &&
+        isPercentValue &&
+        (() => {
+          const total = 20;
+          const on = Math.max(1, Math.round(p * total));
+          const dot = Math.round(spec.valuePx * (resolvedShape === "waffle" ? 0.09 : 0.075));
+          return (
+            <span
+              aria-hidden
+              data-decorative
+              className={`relative grid ${centeredShape ? "mx-auto justify-center" : ""}`}
+              style={{
+                gridTemplateColumns: `repeat(10, ${dot}px)`,
+                gap: Math.max(3, Math.round(dot * 0.34)),
+                width: "fit-content",
+                marginBottom: Math.round(spec.valuePx * 0.1),
+                zIndex: 1,
+              }}
+            >
+              {Array.from({ length: total }, (_, i) => (
+                <span
+                  key={i}
+                  style={{
+                    width: dot,
+                    height: dot,
+                    borderRadius: resolvedShape === "waffle" ? 2 : 999,
+                    background:
+                      i < on ? aFig : hexA(aFig, mode === "dark" ? 0.18 : 0.13),
+                  }}
+                />
+              ))}
+            </span>
+          );
+        })()}
+
+      {resolvedShape === "radial-stack" && isPercentValue && (
+        <svg
+          aria-hidden
+          data-decorative
+          viewBox="0 0 200 200"
+          className="pointer-events-none absolute"
+          style={{
+            width: `${Math.round(spec.valuePx * 2.05)}px`,
+            top: `-${Math.round(spec.valuePx * 0.5)}px`,
+            left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.18)}px`,
+            transform: centeredShape ? "translateX(-50%)" : undefined,
+            zIndex: 0,
+          }}
+        >
+          {[
+            { r: 92, k: 1, wdt: 9 },
+            { r: 74, k: 0.72, wdt: 7 },
+            { r: 58, k: 0.48, wdt: 5 },
+          ].map((ring) => {
+            const circ = 2 * Math.PI * ring.r;
+            return (
+              <g key={ring.r}>
+                <circle
+                  cx="100"
+                  cy="100"
+                  r={ring.r}
+                  fill="none"
+                  stroke={hexA(aFig, mode === "dark" ? 0.16 : 0.1)}
+                  strokeWidth={ring.wdt}
+                />
+                <circle
+                  cx="100"
+                  cy="100"
+                  r={ring.r}
+                  fill="none"
+                  stroke={hexA(aFig, 0.35 + 0.65 * ring.k)}
+                  strokeWidth={ring.wdt}
+                  strokeLinecap="round"
+                  strokeDasharray={circ}
+                  strokeDashoffset={circ * (1 - p * ring.k)}
+                  transform="rotate(-90 100 100)"
+                />
+              </g>
+            );
+          })}
+        </svg>
+      )}
+
+      {resolvedShape === "halo" && (
+        <span
+          aria-hidden
+          data-decorative
+          data-accent-glow
+          className="pointer-events-none absolute"
+          style={{
+            width: Math.round(spec.valuePx * 1.5),
+            height: Math.round(spec.valuePx * 1.5),
+            borderRadius: 999,
+            top: `-${Math.round(spec.valuePx * 0.3)}px`,
+            left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.22)}px`,
+            transform: centeredShape ? "translateX(-50%)" : undefined,
+            background: `radial-gradient(circle at 40% 35%, ${hexA(aFig, mode === "dark" ? 0.4 : 0.22)} 0%, ${hexA(aFig, 0)} 68%)`,
+            filter: "blur(2px)",
+            zIndex: 0,
+          }}
+        />
+      )}
+
       <div
         className={isIconRow ? "relative flex items-center" : "relative"}
         style={{ zIndex: 1, gap: isIconRow ? Math.round(spec.valuePx * 0.2) : undefined }}
