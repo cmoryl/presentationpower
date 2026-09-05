@@ -70,13 +70,29 @@ function exampleCopyForBrand(brandId: string) {
   );
 }
 
-const WIZARD_STEPS = [
-  { key: "brand", label: "Brand" },
-  { key: "content", label: "Content" },
-  { key: "profile", label: "Formats" },
-  { key: "event", label: "Event" },
-  { key: "review", label: "Review" },
-] as const;
+type WizardStepKey = "brand" | "content" | "profile" | "event" | "review";
+
+const STEP_LABELS: Record<WizardStepKey, string> = {
+  brand: "Brand",
+  content: "Content",
+  profile: "Formats",
+  event: "Event",
+  review: "Review",
+};
+
+/**
+ * Social surface keeps brand → content → formats → event → review (event
+ * facts are optional flavor, so copy can be drafted before them). Event
+ * surface runs brand → event → content → formats → review so the grounded
+ * copy drafter has event facts (city, date, venue) to ground on.
+ */
+function wizardStepsFor(surface: "social" | "event"): { key: WizardStepKey; label: string }[] {
+  const order: WizardStepKey[] =
+    surface === "event"
+      ? ["brand", "event", "content", "profile", "review"]
+      : ["brand", "content", "profile", "event", "review"];
+  return order.map((key) => ({ key, label: STEP_LABELS[key] }));
+}
 
 const EMPTY_EVENT: EventFacts = {
   name: "",
@@ -120,6 +136,7 @@ export function KitWizard({
         ? "event-kit"
         : "social-essentials";
 
+  const WIZARD_STEPS = useMemo(() => wizardStepsFor(surface), [surface]);
   const [step, setStep] = useState(0);
   const [brandId, setBrandId] = useState<string>("bm-tp-master");
   const [mode, setMode] = useState<"light" | "dark" | "both">("dark");
@@ -216,7 +233,7 @@ export function KitWizard({
             });
           }
         }
-        setStep(4); // jump to review
+        setStep(WIZARD_STEPS.findIndex((s) => s.key === "review")); // jump to review
       })
       .catch((err) => {
         toast.error(err instanceof Error ? err.message : "Failed to load saved kit");
@@ -385,9 +402,10 @@ export function KitWizard({
     });
   };
 
+  const currentStepKey = WIZARD_STEPS[step]?.key;
   const canNext = (() => {
-    if (step === 1) return manualCopy.title.trim().length > 0;
-    if (step === 2) return formatIds.length > 0;
+    if (currentStepKey === "content") return manualCopy.title.trim().length > 0;
+    if (currentStepKey === "profile") return formatIds.length > 0;
     return true;
   })();
 
@@ -452,9 +470,9 @@ export function KitWizard({
 
       {/* Step body */}
       <div className="min-h-[320px]">
-        {step === 0 && (
+        {currentStepKey === "brand" && (
           <StepCard
-            eyebrow="Step 1 of 5"
+            eyebrow={`Step ${step + 1} of ${WIZARD_STEPS.length}`}
             title="Which brand is this kit for?"
             description="Pick a division — accent, ink, surface, and logo lockup flow through every asset. You can override any of them later."
           >
@@ -522,9 +540,9 @@ export function KitWizard({
           </StepCard>
         )}
 
-        {step === 1 && (
+        {currentStepKey === "content" && (
           <StepCard
-            eyebrow="Step 2 of 5"
+            eyebrow={`Step ${step + 1} of ${WIZARD_STEPS.length}`}
             title="What's the message?"
             actions={
               <button
@@ -674,8 +692,8 @@ export function KitWizard({
           </StepCard>
         )}
 
-        {step === 2 && (
-          <StepCard eyebrow="Step 3 of 5" title="Which formats should ship?">
+        {currentStepKey === "profile" && (
+          <StepCard eyebrow={`Step ${step + 1} of ${WIZARD_STEPS.length}`} title="Which formats should ship?">
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {KIT_PROFILES.map((profile) => {
                 const selected = profile.id === profileId;
@@ -729,9 +747,9 @@ export function KitWizard({
           </StepCard>
         )}
 
-        {step === 3 && (
+        {currentStepKey === "event" && (
           <StepCard
-            eyebrow="Step 4 of 5"
+            eyebrow={`Step ${step + 1} of ${WIZARD_STEPS.length}`}
             title={surface === "event" ? "Event details" : "Event context (optional)"}
           >
             <label className="flex items-center gap-2 rounded-2xl border border-black/10 bg-white/70 p-3 text-sm">
@@ -787,9 +805,9 @@ export function KitWizard({
           </StepCard>
         )}
 
-        {step === 4 && (
+        {currentStepKey === "review" && (
           <StepCard
-            eyebrow="Step 5 of 5"
+            eyebrow={`Step ${step + 1} of ${WIZARD_STEPS.length}`}
             title={`Your kit · ${assets.length} asset${assets.length === 1 ? "" : "s"}`}
             actions={
               <div className="flex flex-wrap items-center gap-2">
