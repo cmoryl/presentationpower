@@ -12410,9 +12410,9 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
         line: { color: p.accent },
       });
     }
-    if (st.showIndex)
+    if (st.showIndex) {
+      s.addText(String(k + 1).padStart(2, "0"), {
 
-    s.addText(String(k + 1).padStart(2, "0"), {
       x: x + w - 0.85,
       y: y + 0.08,
       w: 0.7,
