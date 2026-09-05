@@ -1096,12 +1096,12 @@ export function StatFigure({
           );
         })()}
 
-      {(resolvedShape === "dot-grid" || resolvedShape === "waffle") &&
+      {resolvedShape === "waffle" &&
         isPercentValue &&
         (() => {
           const total = 20;
           const on = Math.max(1, Math.round(p * total));
-          const dot = Math.round(spec.valuePx * (resolvedShape === "waffle" ? 0.09 : 0.075));
+          const dot = Math.round(spec.valuePx * 0.09);
           return (
             <span
               aria-hidden
@@ -1121,9 +1121,8 @@ export function StatFigure({
                   style={{
                     width: dot,
                     height: dot,
-                    borderRadius: resolvedShape === "waffle" ? 2 : 999,
-                    background:
-                      i < on ? aFig : hexA(aFig, mode === "dark" ? 0.18 : 0.13),
+                    borderRadius: 2,
+                    background: i < on ? aFig : hexA(aFig, mode === "dark" ? 0.18 : 0.13),
                   }}
                 />
               ))}
@@ -1131,8 +1130,9 @@ export function StatFigure({
           );
         })()}
 
-      {resolvedShape === "radial-stack" && isPercentValue && (
+      {resolvedShape === "donut" && isPercentValue && (
         <svg
+
           aria-hidden
           data-decorative
           viewBox="0 0 200 200"
