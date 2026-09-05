@@ -5668,6 +5668,98 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     lockedFields: ["footer", "logo"],
   },
   {
+    id: "MV-STAT-TICKER-STRIP",
+    familyId: "MF-05",
+    name: "Stat — ticker strip",
+    description:
+      "A single unbroken ticker of figures divided by hairlines, each with a delta, reading as one continuous market strip",
+    permittedLayoutIds: ["LF-11", "LF-13"],
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 }, kicker: { kind: "text", chars: 80 } },
+      items: {
+        min: 3,
+        max: 6,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 60 },
+          delta: { kind: "number" },
+        },
+      },
+      titleChars: 80,
+    },
+    editableFields: [
+      "title",
+      "kicker",
+      "items[].value",
+      "items[].unit",
+      "items[].label",
+      "items[].delta",
+    ],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-STAT-SPARK-HERO",
+    familyId: "MF-05",
+    name: "Stat — sparkline hero",
+    description:
+      "One monumental figure carried on a filled trend sparkline, with up to three supporting figures beneath",
+    permittedLayoutIds: ["LF-11", "LF-13"],
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        kicker: { kind: "text", chars: 80 },
+        "stat.value": { kind: "number" },
+        "stat.unit": { kind: "text", chars: 24 },
+        "stat.label": { kind: "text", chars: 120 },
+      },
+      items: {
+        min: 0,
+        max: 3,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 60 },
+        },
+      },
+      titleChars: 80,
+    },
+    editableFields: [
+      "title",
+      "kicker",
+      "stat.value",
+      "stat.unit",
+      "stat.label",
+      "items[].value",
+      "items[].unit",
+      "items[].label",
+    ],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-STAT-GAUGE-STACK",
+    familyId: "MF-05",
+    name: "Stat — gauge stack",
+    description:
+      "Three to four percentage gauges stacked as arcs with their labels, for readiness, coverage and completion ratios",
+    permittedLayoutIds: ["LF-11", "LF-13"],
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 }, kicker: { kind: "text", chars: 80 } },
+      items: {
+        min: 2,
+        max: 4,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+        },
+      },
+      titleChars: 80,
+    },
+    editableFields: ["title", "kicker", "items[].value", "items[].unit", "items[].label"],
+    lockedFields: ["footer", "logo"],
+  },
+  {
     id: "MV-STAT-ORBIT",
     familyId: "MF-05",
     name: "Stat — orbiting distribution type",

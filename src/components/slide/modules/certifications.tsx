@@ -58,6 +58,12 @@ registerSlideModule({
     const ghostIdx = isDark ? "rgba(255,255,255,0.1)" : "rgba(3,0,44,0.08)";
     const muted = isDark ? "rgba(255,255,255,0.6)" : "rgba(3,0,44,0.62)";
     const cardsFirst = st.cardsSide === "left";
+    // How loudly the accent runs: quiet keeps decorative marks neutral, strong
+    // pushes the accent into the statement heading as well.
+    const decoAccent = st.accentRole === "quiet" ? muted : accent;
+    const headingColor = st.accentRole === "strong" ? accent : ink.strong;
+    const badgeBox = Math.round((dense ? 70 : 82) * st.badgeScale);
+    const centerHead = st.headerAlign === "center";
 
     return (
       <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -87,7 +93,8 @@ registerSlideModule({
                   fontWeight: 800,
                   lineHeight: 1.08,
                   letterSpacing: "-0.03em",
-                  color: ink.strong,
+                  color: headingColor,
+                  textAlign: centerHead ? "center" : undefined,
                 }}
               >
                 {s(c.cardTitle)}
@@ -208,27 +215,54 @@ registerSlideModule({
                           width: 4,
                           alignSelf: "stretch",
                           borderRadius: 2,
-                          background: accent,
+                          background: decoAccent,
                           flexShrink: 0,
                         }}
                       />
-                      {st.numberedPoints && (
-                        <span
-                          aria-hidden
-                          data-decorative
-                          style={{
-                            fontSize: fillPx(17, "body"),
-                            fontWeight: 700,
-                            fontVariantNumeric: "tabular-nums",
-                            letterSpacing: "0.06em",
-                            color: muted,
-                            width: 30,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                      )}
+                      {st.numberedPoints &&
+                        st.pointMarker !== "none" &&
+                        (st.pointMarker === "number" ? (
+                          <span
+                            aria-hidden
+                            data-decorative
+                            style={{
+                              fontSize: fillPx(17, "body"),
+                              fontWeight: 700,
+                              fontVariantNumeric: "tabular-nums",
+                              letterSpacing: "0.06em",
+                              color: muted,
+                              width: 30,
+                              flexShrink: 0,
+                            }}
+                          >
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                        ) : st.pointMarker === "dash" ? (
+                          <span
+                            aria-hidden
+                            data-decorative
+                            style={{
+                              width: 18,
+                              height: 2,
+                              borderRadius: 1,
+                              background: decoAccent,
+                              flexShrink: 0,
+                            }}
+                          />
+                        ) : (
+                          <span
+                            aria-hidden
+                            data-decorative
+                            style={{
+                              width: 8,
+                              height: 8,
+                              borderRadius: "50%",
+                              background: decoAccent,
+                              flexShrink: 0,
+                            }}
+                          />
+                        ))}
+
 
                       <span
                         style={{
@@ -343,8 +377,8 @@ registerSlideModule({
                       <div
                         className="flex shrink-0 items-center justify-center"
                         style={{
-                          width: dense ? 70 : 82,
-                          height: dense ? 70 : 82,
+                          width: badgeBox,
+                          height: badgeBox,
                           borderRadius: st.badge === "round" ? "50%" : 6,
                           background: st.badge === "none" ? "transparent" : "#FFFFFF",
                           border:
@@ -358,8 +392,18 @@ registerSlideModule({
                           path={path}
                           alt={`${s(cert.label)} badge`}
                           className="object-contain"
-                          style={{ maxWidth: "74%", maxHeight: "74%" }}
+                          style={{
+                            maxWidth: "74%",
+                            maxHeight: "74%",
+                            filter:
+                              st.logoTone === "mono"
+                                ? isDark
+                                  ? "grayscale(1) brightness(2.4)"
+                                  : "grayscale(1) contrast(1.15)"
+                                : undefined,
+                          }}
                         />
+
                       </div>
                     )}
 

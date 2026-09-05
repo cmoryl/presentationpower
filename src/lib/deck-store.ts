@@ -3859,6 +3859,40 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           { value: "0.9", unit: "%", label: "Query rate", delta: "-0.4pt" },
         ],
       };
+    case "MV-STAT-TICKER-STRIP":
+      return {
+        title: `${clientName} — the quarter on one line`,
+        kicker: "Ticker",
+        items: [
+          { value: "24.1", unit: "M", label: "Words delivered", delta: "+22%" },
+          { value: "99.4", unit: "%", label: "On-time rate", delta: "+1.2pt" },
+          { value: "4.2", unit: "days", label: "Median cycle", delta: "-18%" },
+          { value: "38", unit: "", label: "Markets live", delta: "+6" },
+          { value: "0.9", unit: "%", label: "Query rate", delta: "-0.4pt" },
+        ],
+      };
+    case "MV-STAT-SPARK-HERO":
+      return {
+        title: "The direction of travel",
+        kicker: "Trend",
+        stat: { value: "71", unit: "%", label: "Of content now routed through the managed pipeline" },
+        items: [
+          { value: "+22", unit: "%", label: "Volume growth" },
+          { value: "-31", unit: "%", label: "Cost per word" },
+          { value: "12", unit: "", label: "Platforms connected" },
+        ],
+      };
+    case "MV-STAT-GAUGE-STACK":
+      return {
+        title: "Programme readiness",
+        kicker: "Coverage",
+        items: [
+          { value: "92", unit: "%", label: "Locale coverage" },
+          { value: "78", unit: "%", label: "Automation in place" },
+          { value: "64", unit: "%", label: "Content connected" },
+          { value: "88", unit: "%", label: "Review SLA met" },
+        ],
+      };
     case "MV-STAT-ORBIT":
       return {
         title: "Where the volume sits",

@@ -38,6 +38,9 @@ registerSlideModule({
     "MV-STAT-HERO-NUMBER",
     "MV-STAT-TYPE-WALL",
     "MV-STAT-KPI-RAIL",
+    "MV-STAT-TICKER-STRIP",
+    "MV-STAT-SPARK-HERO",
+    "MV-STAT-GAUGE-STACK",
     "MV-STAT-ORBIT",
     "MV-STAT-ACTUAL-TARGET",
     "MV-STAT-EDITORIAL-DASH",
@@ -309,6 +312,146 @@ registerSlideModule({
           </SlideFrame>
         );
       }
+
+      case "MV-STAT-TICKER-STRIP": {
+        // One continuous strip: figures divided by hairlines, deltas beneath.
+        const items = arr(c.items).slice(0, 6);
+        const plan = planStatArrangement("ticker", items.length, { maxCols: 6 });
+        return (
+          <SlideFrame brand={brand} pageNumber={pageNumber}>
+            <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
+            <div className="slide-fill-stretch mt-16" style={statArrangementGridStyle(plan)}>
+              {items.map((it, i) => {
+                const cellPlan = plan.cells[i];
+                const delta = s(it.delta);
+                const negative = delta.trim().startsWith("-");
+                return (
+                  <div
+                    key={i}
+                    className="slide-fill-center min-w-0 px-9 first:pl-0 last:pr-0"
+                    style={{
+                      ...statCellStyle(cellPlan),
+                      borderLeft: cellPlan.leadingRule ? `1px solid ${ink.hairline}` : "none",
+                    }}
+                  >
+                    <StatFigure
+                      brand={brand}
+                      value={s(it.value)}
+                      unit={s(it.unit)}
+                      label={s(it.label)}
+                      size="lg"
+                      align="start"
+                      emphasis={cellPlan.emphasis}
+                      revealIndex={i}
+                    />
+                    {delta && (
+                      <div
+                        className="mt-4 tabular-nums"
+                        style={{
+                          fontSize: fillPx(22, "body"),
+                          fontWeight: 600,
+                          letterSpacing: "-0.01em",
+                          color: negative ? "#B42318" : "var(--slide-accent-text)",
+                        }}
+                      >
+                        {delta}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </SlideFrame>
+        );
+      }
+
+      case "MV-STAT-SPARK-HERO": {
+        // A monumental figure sitting on its own trend line, satellites beneath.
+        const stat = obj(c.stat);
+        const items = arr(c.items).slice(0, 3);
+        const series = arr(c.series)
+          .map((p) => Number(obj(p).value ?? p))
+          .filter((n) => Number.isFinite(n));
+        const trend = series.length >= 2 ? series : [12, 18, 16, 27, 31, 44, 58, 71];
+        return (
+          <SlideFrame brand={brand} pageNumber={pageNumber}>
+            <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
+            <div className="mt-12 grid min-h-0 flex-1 items-center gap-16" style={{ gridTemplateColumns: "1.15fr 1fr" }}>
+              <div className="min-w-0">
+                <StatFigure
+                  brand={brand}
+                  value={s(stat.value, "71")}
+                  unit={s(stat.unit, "%")}
+                  label={s(stat.label)}
+                  size="monumental"
+                  align="start"
+                  emphasis="monumental"
+                  shape="area"
+                  series={trend}
+                />
+              </div>
+              <div className="flex min-w-0 flex-col" style={{ gap: 28 }}>
+                {items.map((it, i) => (
+                  <div
+                    key={i}
+                    className="min-w-0"
+                    style={{ borderTop: `1px solid ${ink.hairline}`, paddingTop: 18 }}
+                  >
+                    <StatFigure
+                      brand={brand}
+                      value={s(it.value)}
+                      unit={s(it.unit)}
+                      label={s(it.label)}
+                      size="sm"
+                      align="start"
+                      emphasis="quiet"
+                      revealIndex={i + 1}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </SlideFrame>
+        );
+      }
+
+      case "MV-STAT-GAUGE-STACK": {
+        // Percentage ratios read fastest as arcs — one per row, evenly bedded.
+        const items = arr(c.items).slice(0, 4);
+        return (
+          <SlideFrame brand={brand} pageNumber={pageNumber}>
+            <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
+            <div
+              className="slide-fill-stretch mt-14 grid items-center"
+              style={{
+                gridTemplateColumns: `repeat(${Math.max(1, items.length)}, minmax(0, 1fr))`,
+                columnGap: 56,
+              }}
+            >
+              {items.map((it, i) => {
+                const pct = Number(String(s(it.value)).replace(/[^0-9.\-]/g, ""));
+                return (
+                  <div key={i} className="slide-fill-center min-w-0">
+                    <StatFigure
+                      brand={brand}
+                      value={s(it.value)}
+                      unit={s(it.unit, "%")}
+                      label={s(it.label)}
+                      size="lg"
+                      align="center"
+                      shape="arc"
+                      progress={Number.isFinite(pct) ? Math.min(1, Math.max(0, pct / 100)) : 0.7}
+                      revealIndex={i}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </SlideFrame>
+        );
+      }
+
+
 
       case "MV-STAT-ORBIT": {
         const stat = obj(c.stat);
