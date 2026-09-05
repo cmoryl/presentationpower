@@ -120,6 +120,8 @@ import { OrbitLayoutPanel } from "@/components/slide/OrbitLayoutPanel";
 import { LogoWallPanel } from "@/components/slide/LogoWallPanel";
 import { OrbitStylePanel } from "@/components/slide/OrbitStylePanel";
 import { OrbitContentPanel } from "@/components/slide/OrbitContentPanel";
+import { CertStylePanel } from "@/components/slide/CertStylePanel";
+
 import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPanel";
 
 import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
@@ -1555,6 +1557,19 @@ function DeckEditor() {
                 </div>
 
               )}
+
+              {/* Credential proof split — layout, styling and content editor */}
+              {active && mv && mv.id === "MV-PROOF-CERT-ORBITS" && (
+                <div className="mt-6">
+                  <CertStylePanel
+                    content={active.content as Record<string, unknown>}
+                    onChangeField={(field, value) =>
+                      updateField(deck.id, active.id, field, value)
+                    }
+                  />
+                </div>
+              )}
+
 
               {/* Locations pin editor — only for MV-LOC-* variants */}
 

@@ -115,6 +115,8 @@ function noteExportLogo(ok: boolean) {
   activeIntegrity?.noteLogo(activeSlideIndex, ok, activeVariantId);
 }
 import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radius";
+import { resolveCertStyle } from "@/lib/cert-style";
+
 import { laneCornerRadiusIn, laneHeightIn, railBoxIn } from "@/lib/layer-stack-geometry";
 import {
   auditDeckGeometry,
@@ -12209,13 +12211,22 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     fontFace: "Geist",
   });
 
-  // Left: unframed programme statement — heading, stat tiles, ruled bullet rows
-  const CX = 0.6;
-  const CW = 5.3;
+  // Statement column — heading, stat tiles, ruled bullet rows. Geometry and
+  // treatment follow the module's `certStyle` customisation.
+  const st = resolveCertStyle(c.certStyle);
+  const TOTAL = 12.2;
+  const GAP = 0.5;
+  const usable = TOTAL - GAP;
+  const CW = (usable * st.split) / (st.split + 1.08);
+  const RW = usable - CW;
+  const cardsFirst = st.cardsSide === "left";
+  const CX = cardsFirst ? 0.6 + RW + GAP : 0.6;
+  const RX = cardsFirst ? 0.6 : CX + CW + GAP;
   const CY = 1.55;
   const CH = 5.2;
   const highlights = strList(c.cardHighlights).slice(0, 3);
   const points = strList(c.cardPoints).slice(0, 6);
+
 
   if (str(c.cardTitle)) {
     s.addText(str(c.cardTitle), {
@@ -12241,22 +12252,27 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       const m = /^(\S+)\s+(.+)$/.exec(h.trim());
       const figure = m && /^[+\-–~$€£]?\d/.test(m[1]) ? m[1] : "";
       const label = figure ? m![2] : h.trim();
-      s.addShape("rect", {
-        x,
-        y: tY,
-        w: tW,
-        h: tH,
-        fill: { color: p.surface },
-        line: { color: p.surface },
-      });
-      s.addShape("rect", {
-        x,
-        y: tY,
-        w: 0.05,
-        h: tH,
-        fill: { color: p.accent },
-        line: { color: p.accent },
-      });
+      if (st.statTile === "tile") {
+        s.addShape("rect", {
+          x,
+          y: tY,
+          w: tW,
+          h: tH,
+          fill: { color: p.surface },
+          line: { color: p.surface },
+        });
+      }
+      if (st.statTile !== "plain") {
+        s.addShape("rect", {
+          x,
+          y: tY,
+          w: 0.05,
+          h: tH,
+          fill: { color: p.accent },
+          line: { color: p.accent },
+        });
+      }
+
       s.addText(
         [
           ...(figure
@@ -12288,6 +12304,19 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   // Ruled spec-sheet bullet block
   if (points.length) {
     const bY0 = CY + 2.35;
+    if (st.coversLabel.trim()) {
+      s.addText(st.coversLabel.toUpperCase(), {
+        x: CX,
+        y: bY0 - 0.36,
+        w: CW,
+        h: 0.3,
+        fontSize: 10,
+        bold: true,
+        charSpacing: 2,
+        color: p.accent,
+        fontFace: "Geist",
+      });
+    }
     s.addShape("line", {
       x: CX,
       y: bY0,
@@ -12296,6 +12325,7 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       line: { color: p.primary, width: 1.5 },
     });
     const rowH = Math.min(0.55, (CY + CH - bY0 - 0.1) / points.length);
+    const textX = CX + (st.numberedPoints ? 0.62 : 0.24);
     points.forEach((pt, i) => {
       const y = bY0 + 0.12 + i * rowH;
       s.addShape("rect", {
@@ -12306,21 +12336,23 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
         fill: { color: p.accent },
         line: { color: p.accent },
       });
-      s.addText(String(i + 1).padStart(2, "0"), {
-        x: CX + 0.16,
-        y,
-        w: 0.4,
-        h: rowH - 0.06,
-        fontSize: 10,
-        bold: true,
-        color: p.accent,
-        fontFace: "Geist",
-        valign: "middle",
-      });
+      if (st.numberedPoints) {
+        s.addText(String(i + 1).padStart(2, "0"), {
+          x: CX + 0.16,
+          y,
+          w: 0.4,
+          h: rowH - 0.06,
+          fontSize: 10,
+          bold: true,
+          color: p.accent,
+          fontFace: "Geist",
+          valign: "middle",
+        });
+      }
       s.addText(pt, {
-        x: CX + 0.62,
+        x: textX,
         y,
-        w: CW - 0.62,
+        w: CX + CW - textX,
         h: rowH - 0.06,
         fontSize: 13.5,
         color: p.ink,
@@ -12337,25 +12369,26 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     });
   }
 
-  // Right: credential cards on a quiet band, staggered with ghost index
-  const RX = 6.4;
-  const RW = 6.4;
+  // Credential cards on a quiet band, staggered with ghost index
   const certs = arr(c.certs).slice(0, 3);
-  s.addShape("roundRect", {
-    x: RX - 0.2,
-    y: CY - 0.15,
-    w: RW + 0.4,
-    h: CH + 0.3,
-    rectRadius: EXPORT_RADIUS_IN.band,
-    fill: { color: p.surface, transparency: 55 },
-    line: { type: "none" },
-  });
+  if (st.band) {
+    s.addShape("roundRect", {
+      x: RX - 0.2,
+      y: CY - 0.15,
+      w: RW + 0.4,
+      h: CH + 0.3,
+      rectRadius: EXPORT_RADIUS_IN.band,
+      fill: { color: p.surface, transparency: 55 },
+      line: { type: "none" },
+    });
+  }
   const gap = 0.18;
   const rowH = (CH - gap * Math.max(certs.length - 1, 0)) / Math.max(certs.length, 1);
+  const stagIn = (st.stagger / 1920) * 13.333;
   certs.forEach((cert, k) => {
     const y = CY + k * (rowH + gap);
-    const indent = k === 1 ? 0.28 : k === 2 ? 0.56 : 0;
-    const x = RX + indent;
+    const indent = stagIn * k;
+    const x = cardsFirst ? RX : RX + indent;
     const w = RW - indent;
     s.addShape("roundRect", {
       x,
@@ -12363,29 +12396,37 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       w,
       h: rowH,
       rectRadius: EXPORT_RADIUS_IN.media,
-      fill: { color: p.surface },
+      fill:
+        st.cardLook === "outline"
+          ? { color: p.surface, transparency: 100 }
+          : { color: p.surface },
       line: { color: LIGHT_GRAY },
     });
-    s.addShape("rect", {
-      x,
-      y: y + 0.06,
-      w: 0.07,
-      h: rowH - 0.12,
-      fill: { color: p.accent },
-      line: { color: p.accent },
-    });
-    s.addText(String(k + 1).padStart(2, "0"), {
-      x: x + w - 0.85,
-      y: y + 0.08,
-      w: 0.7,
-      h: 0.5,
-      fontSize: 26,
-      bold: true,
-      color: p.accent,
-      transparency: 70,
-      fontFace: "Geist",
-      align: "right",
-    });
+    if (st.accentBar > 0) {
+      s.addShape("rect", {
+        x,
+        y: y + 0.06,
+        w: (st.accentBar / 1920) * 13.333,
+        h: rowH - 0.12,
+        fill: { color: p.accent },
+        line: { color: p.accent },
+      });
+    }
+    if (st.showIndex) {
+      s.addText(String(k + 1).padStart(2, "0"), {
+        x: x + w - 0.85,
+        y: y + 0.08,
+        w: 0.7,
+        h: 0.5,
+        fontSize: 26,
+        bold: true,
+        color: p.accent,
+        transparency: 70,
+        fontFace: "Geist",
+        align: "right",
+      });
+    }
+
     s.addText(
       [
         ...(str(cert.label)
