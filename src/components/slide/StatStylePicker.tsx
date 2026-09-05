@@ -1,11 +1,22 @@
 import { useMemo } from "react";
 import {
+  STAT_EMPHASIS_PRESETS,
+  STAT_MOTION_PRESETS,
   STAT_SHAPE_PRESETS,
+  STAT_SURFACE_PRESETS,
+  isStatEmphasis,
+  isStatMotion,
   isStatShape,
+  isStatSurface,
   statShapePreset,
   type StatLayout,
   type StatShape,
 } from "@/lib/stat-layouts";
+import {
+  STAT_ARRANGEMENT_PRESETS,
+  isStatArrangement,
+  type StatArrangement,
+} from "@/lib/stat-arrangements";
 import { STAT_ICON_PRESETS, isStatIconName, type StatIconName } from "@/lib/stat-icons";
 
 const FAMILY_LABELS: Record<string, string> = {
@@ -15,10 +26,13 @@ const FAMILY_LABELS: Record<string, string> = {
   frame: "Frames",
   editorial: "Editorial",
   icon: "Oversized icons",
+  dataviz: "Data visuals",
 };
 
 const selectClass =
   "w-full rounded-lg border border-black/10 bg-white px-2 py-1.5 text-[11px] font-medium text-[#03002C] outline-none transition focus:border-[#003FC7]";
+const capClass = "text-[9px] font-semibold uppercase tracking-[0.16em] text-black/40";
+
 
 /**
  * Slide-level stat typography control: pick the figure shape (including the
