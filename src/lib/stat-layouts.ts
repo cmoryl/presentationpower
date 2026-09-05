@@ -454,6 +454,9 @@ export const MODULE_STAT_LAYOUTS: Record<string, StatLayout> = {
 
   // Rails, dashboards and gauges — tracks and dials carry the ratio.
   "MV-STAT-KPI-RAIL": { shape: "column", align: "start", progress: 0.72, motion: "sweep" },
+  "MV-STAT-TICKER-STRIP": { shape: "ticks", align: "start", progress: 0.68, motion: "drift" },
+  "MV-STAT-SPARK-HERO": { shape: "area", align: "start", motion: "blur" },
+  "MV-STAT-GAUGE-STACK": { shape: "arc", align: "center", progress: 0.7, motion: "sweep" },
   "MV-KPI-DASHBOARD": {
     shape: "icon-tile",
     align: "start",

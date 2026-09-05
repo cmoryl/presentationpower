@@ -83,4 +83,24 @@ describe("plans", () => {
   it("respects a column ceiling", () => {
     expect(planStatArrangement("even", 6, { maxCols: 3 }).cols).toBe(3);
   });
+
+  it("gives the magazine lead the full bed and rules its satellites", () => {
+    const plan = planStatArrangement("magazine", 5);
+    expect(plan.cells[0].emphasis).toBe("hero");
+    expect(plan.cells[0].span).toBe(plan.cols);
+    expect(plan.cells.slice(1).every((c) => c.row >= 2)).toBe(true);
+  });
+
+  it("stacks the ladder in one ruled column", () => {
+    const plan = planStatArrangement("ladder", 4);
+    expect(plan.cols).toBe(1);
+    expect(plan.rows).toBe(4);
+    expect(plan.cells.filter((c) => c.leadingRule).length).toBe(3);
+  });
+
+  it("leads the duo arrangement with two heroes", () => {
+    const plan = planStatArrangement("duo-lead", 4);
+    expect(plan.cells.slice(0, 2).every((c) => c.emphasis === "hero")).toBe(true);
+    expect(plan.cells.slice(2).every((c) => c.emphasis === "quiet")).toBe(true);
+  });
 });

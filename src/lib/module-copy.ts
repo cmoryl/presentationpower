@@ -94,6 +94,21 @@ const AUTHORED: Record<string, ModuleCopy> = {
     description:
       "Stacked lanes, each opening with an arrow-headed label and carrying three to four capability cells. Use it for architecture and platform stories where the layering itself is the argument.",
   },
+  "MV-STAT-TICKER-STRIP": {
+    caption: "A market ticker of the numbers that moved",
+    description:
+      "Three to six figures on one unbroken strip, divided by hairlines, each carrying a change value. Use it for a fast quarterly read where the movement matters as much as the level.",
+  },
+  "MV-STAT-SPARK-HERO": {
+    caption: "One headline number, drawn on its own trend",
+    description:
+      "A monumental figure sitting on a filled trend line, with up to three supporting figures ruled beside it. Use it when the direction of travel is the argument.",
+  },
+  "MV-STAT-GAUGE-STACK": {
+    caption: "Percentage ratios read as arcs",
+    description:
+      "Two to four gauges side by side, each an arc filled to its percentage with a label beneath. Use it for readiness, coverage and completion ratios.",
+  },
   "MV-INFO-PYRAMID": {
     caption: "Tiers from broad foundation to a single peak",
     description:

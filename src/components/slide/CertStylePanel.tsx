@@ -3,9 +3,12 @@
 // the credential cards themselves).
 
 import {
+  CERT_ACCENT_ROLES,
   CERT_BADGE_SHAPES,
   CERT_CARD_LOOKS,
   CERT_LIMITS,
+  CERT_LOGO_TONES,
+  CERT_POINT_MARKERS,
   CERT_STAT_ALIGNS,
   CERT_STAT_FIGURE_COLORS,
   CERT_STAT_LABEL_CASES,
@@ -311,6 +314,42 @@ export function CertStylePanel({
         current={style.badge}
         options={CERT_BADGE_SHAPES}
         onPick={(badge) => set({ badge })}
+      />
+      <Slider
+        label="Badge size"
+        value={Math.round(style.badgeScale * 100)}
+        suffix="%"
+        min={Math.round(CERT_LIMITS.badgeScale.min * 100)}
+        max={Math.round(CERT_LIMITS.badgeScale.max * 100)}
+        step={5}
+        onChange={(v) => set({ badgeScale: v / 100 })}
+      />
+      <Choices
+        label="Credential marks"
+        current={style.logoTone}
+        options={CERT_LOGO_TONES}
+        onPick={(logoTone) => set({ logoTone })}
+      />
+      <Choices
+        label="Accent strength"
+        current={style.accentRole}
+        options={CERT_ACCENT_ROLES}
+        onPick={(accentRole) => set({ accentRole })}
+      />
+      <Choices
+        label="Heading alignment"
+        current={style.headerAlign}
+        options={[
+          { id: "left" as const, label: "Left" },
+          { id: "center" as const, label: "Centred" },
+        ]}
+        onPick={(headerAlign) => set({ headerAlign })}
+      />
+      <Choices
+        label="Point marker"
+        current={style.pointMarker}
+        options={CERT_POINT_MARKERS}
+        onPick={(pointMarker) => set({ pointMarker })}
       />
       <Choices
         label="Figure treatment"

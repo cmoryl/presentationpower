@@ -53,4 +53,26 @@ describe("cert module customisation", () => {
     expect(isDefaultCertStyle(patched)).toBe(false);
     expect(isDefaultCertStyle(resetCertStyle())).toBe(true);
   });
+
+  it("accepts the presentation knobs and clamps the badge scale", () => {
+    const st = resolveCertStyle({
+      pointMarker: "dash",
+      logoTone: "mono",
+      accentRole: "quiet",
+      headerAlign: "center",
+      badgeScale: 9,
+    });
+    expect(st.pointMarker).toBe("dash");
+    expect(st.logoTone).toBe("mono");
+    expect(st.accentRole).toBe("quiet");
+    expect(st.headerAlign).toBe("center");
+    expect(st.badgeScale).toBe(1.4);
+  });
+
+  it("rejects unknown presentation values", () => {
+    const st = resolveCertStyle({ pointMarker: "star", accentRole: "loud", logoTone: "neon" });
+    expect(st.pointMarker).toBe(DEFAULT_CERT_STYLE.pointMarker);
+    expect(st.accentRole).toBe(DEFAULT_CERT_STYLE.accentRole);
+    expect(st.logoTone).toBe(DEFAULT_CERT_STYLE.logoTone);
+  });
 });
