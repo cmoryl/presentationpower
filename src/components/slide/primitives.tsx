@@ -1268,6 +1268,95 @@ export function StatFigure({
           );
         })()}
 
+      {(resolvedShape === "area" || resolvedShape === "waterfall") &&
+        resolvedSeries.length >= 2 &&
+        (() => {
+          const w = 200;
+          const h = 60;
+          const min = Math.min(...resolvedSeries, 0);
+          const max = Math.max(...resolvedSeries);
+          const span = max - min || 1;
+          const yFor = (v: number) => h - 4 - ((v - min) / span) * (h - 12);
+          if (resolvedShape === "area") {
+            const step = w / (resolvedSeries.length - 1 || 1);
+            const pts = resolvedSeries.map((v, i) => `${i * step},${yFor(v)}`).join(" ");
+            return (
+              <svg
+                aria-hidden
+                data-decorative
+                viewBox={`0 0 ${w} ${h}`}
+                preserveAspectRatio="none"
+                className={`relative block ${centeredShape ? "mx-auto" : ""}`}
+                style={{
+                  width: centeredShape ? "58%" : "100%",
+                  height: Math.round(spec.valuePx * 0.34),
+                  marginBottom: Math.round(spec.valuePx * 0.1),
+                  zIndex: 1,
+                }}
+              >
+                <polygon
+                  points={`0,${h - 2} ${pts} ${w},${h - 2}`}
+                  fill={hexA(aFig, mode === "dark" ? 0.24 : 0.14)}
+                />
+                <polyline
+                  points={pts}
+                  fill="none"
+                  stroke={aFig}
+                  strokeWidth={3}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
+            );
+          }
+          // Micro waterfall: each bar climbs from the previous cumulative level.
+          const cumulative: number[] = [];
+          resolvedSeries.reduce((acc, v, i) => {
+            cumulative[i] = acc + v;
+            return cumulative[i];
+          }, 0);
+          const cMin = Math.min(0, ...cumulative);
+          const cMax = Math.max(...cumulative);
+          const cSpan = cMax - cMin || 1;
+          const cyFor = (v: number) => h - 4 - ((v - cMin) / cSpan) * (h - 12);
+          const barW = (w / resolvedSeries.length) * 0.62;
+          let prev = 0;
+          return (
+            <svg
+              aria-hidden
+              data-decorative
+              viewBox={`0 0 ${w} ${h}`}
+              preserveAspectRatio="none"
+              className={`relative block ${centeredShape ? "mx-auto" : ""}`}
+              style={{
+                width: centeredShape ? "58%" : "100%",
+                height: Math.round(spec.valuePx * 0.34),
+                marginBottom: Math.round(spec.valuePx * 0.1),
+                zIndex: 1,
+              }}
+            >
+              {resolvedSeries.map((v, i) => {
+                const from = prev;
+                prev = prev + v;
+                const top = cyFor(Math.max(from, prev));
+                const bottom = cyFor(Math.min(from, prev));
+                return (
+                  <rect
+                    key={i}
+                    x={i * (w / resolvedSeries.length) + (w / resolvedSeries.length - barW) / 2}
+                    y={top}
+                    width={barW}
+                    height={Math.max(2, bottom - top)}
+                    rx={1.5}
+                    fill={hexA(aFig, i === resolvedSeries.length - 1 ? 1 : 0.5)}
+                  />
+                );
+              })}
+            </svg>
+          );
+        })()}
+
       {resolvedShape === "waffle" &&
         isPercentValue &&
         (() => {
