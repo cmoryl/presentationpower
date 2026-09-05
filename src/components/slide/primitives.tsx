@@ -1200,6 +1200,32 @@ export function StatFigure({
         />
       )}
 
+      {resolvedShape === "delta" && (
+        <span
+          aria-hidden
+          data-decorative
+          className={`relative inline-flex items-center gap-1 ${centeredShape ? "mx-auto" : ""}`}
+          style={{
+            marginBottom: Math.round(spec.valuePx * 0.08),
+            padding: `${Math.round(spec.valuePx * 0.04)}px ${Math.round(spec.valuePx * 0.09)}px`,
+            borderRadius: 999,
+            width: "fit-content",
+            background: hexA(aFig, mode === "dark" ? 0.22 : 0.12),
+            color: aInk,
+            fontSize: Math.round(spec.labelPx * 0.95),
+            fontWeight: 600,
+            letterSpacing: "0.04em",
+            zIndex: 1,
+          }}
+        >
+          <span style={{ fontSize: Math.round(spec.labelPx * 1.15), lineHeight: 1 }}>
+            {resolvedTrend === "down" ? "▼" : "▲"}
+          </span>
+          {resolvedTrend === "down" ? "Down" : "Up"}
+        </span>
+      )}
+
+
       <div
         className={isIconRow ? "relative flex items-center" : "relative"}
         style={{ zIndex: 1, gap: isIconRow ? Math.round(spec.valuePx * 0.2) : undefined }}
