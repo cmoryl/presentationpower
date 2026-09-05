@@ -21,7 +21,9 @@ const MAX_HIGHLIGHTS = 3;
 
 type Cert = { label?: unknown; points?: unknown; [k: string]: unknown };
 
+const str = (v: unknown) => (typeof v === "string" ? v : "");
 const strList = (v: unknown): string[] =>
+
   Array.isArray(v) ? v.map((x) => (typeof x === "string" ? x : String(x ?? ""))) : [];
 
 const certList = (v: unknown): Cert[] =>
