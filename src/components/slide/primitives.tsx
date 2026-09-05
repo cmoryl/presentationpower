@@ -464,11 +464,34 @@ function statSurfaceStyle(
         : "inset 0 1px 0 rgba(255,255,255,0.9), 0 16px 34px rgba(3,0,44,0.10)",
     };
   }
+  if (surface === "dotgrid") {
+    const dot = Math.max(10, Math.round(valuePx * 0.09));
+    return {
+      ...base,
+      background: dark ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.55)",
+      backgroundImage: `radial-gradient(${hexA(accentFig, dark ? 0.3 : 0.2)} 1.4px, transparent 1.5px)`,
+      backgroundSize: `${dot}px ${dot}px`,
+      border: `1px solid ${hexA(accentFig, dark ? 0.16 : 0.1)}`,
+    };
+  }
+  if (surface === "stripes") {
+    const step = Math.max(9, Math.round(valuePx * 0.08));
+    return {
+      ...base,
+      background: `repeating-linear-gradient(135deg, ${hexA(accentFig, dark ? 0.1 : 0.07)} 0px, ${hexA(accentFig, dark ? 0.1 : 0.07)} 1.5px, transparent 1.5px, transparent ${step}px)`,
+      border: `1px solid ${hexA(accentFig, dark ? 0.14 : 0.09)}`,
+    };
+  }
   return { ...base, border: `1px solid ${hexA(accentFig, dark ? 0.34 : 0.2)}` };
 }
 
 /** Emphasis multiplier applied to the figure's type scale. */
-const EMPHASIS_SCALE: Record<StatEmphasis, number> = { normal: 1, hero: 1.2, quiet: 0.82 };
+const EMPHASIS_SCALE: Record<StatEmphasis, number> = {
+  normal: 1,
+  hero: 1.2,
+  monumental: 1.45,
+  quiet: 0.82,
+};
 
 /**
  * Count-up on reveal. Runs once, respects `prefers-reduced-motion`, and only
@@ -717,7 +740,11 @@ export function StatFigure({
       ? "stat-reveal-rise"
       : resolvedMotion === "sweep"
         ? "stat-reveal-sweep"
-        : "";
+        : resolvedMotion === "blur"
+          ? "stat-reveal-blur"
+          : resolvedMotion === "drift"
+            ? "stat-reveal-drift"
+            : "";
 
   const displayValue = useCountUpValue(value ?? "", resolvedMotion === "count");
   return (
