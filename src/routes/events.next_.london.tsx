@@ -406,6 +406,16 @@ function LondonSignagePage() {
           </Link>
         )}
 
+        {headError && (
+          <p
+            role="alert"
+            className="mt-4 rounded-xl border border-[#E53D2E]/40 bg-[#E53D2E]/10 px-4 py-3 text-sm font-medium text-[#8f2318]"
+          >
+            Showing the issued pack — the revision in force could not be loaded. Do not send these
+            files to print.
+          </p>
+        )}
+
         <header className="mt-5 overflow-hidden rounded-2xl border border-black/10">
           <div
             className="px-6 py-9 sm:px-10 sm:py-12"
