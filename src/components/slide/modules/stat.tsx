@@ -12,6 +12,12 @@ import { AccentRule } from "../Connectors";
 import { OrbitDisc } from "../OrbitDisc";
 import { AccentTick, EDITORIAL_SERIF, moduleCardSurface } from "../flagship";
 import { DisplayTitle, Kicker, StatFigure, SupportingText } from "../primitives";
+import {
+  isStatArrangement,
+  planStatArrangement,
+  statArrangementGridStyle,
+  statCellStyle,
+} from "@/lib/stat-arrangements";
 import { fillPx, statPx, STAT_FIT_STYLE } from "@/lib/open-space-fill";
 import { hexA } from "@/lib/accent-tokens";
 import {
