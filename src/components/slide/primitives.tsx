@@ -705,14 +705,30 @@ export function StatFigure({
       ? `min(${Math.max(32, Math.round(spec.unitPx * 0.58))}px, 5.6cqw)`
       : `min(${spec.unitPx}px, 6.5cqw)`,
   );
+  // Choreography: a CSS-only reveal so it works in the editor, in Present mode
+  // and in a print/PDF pass (where the animation simply lands at its end state).
+  const revealClass =
+    resolvedMotion === "rise"
+      ? "stat-reveal-rise"
+      : resolvedMotion === "wipe"
+        ? "stat-reveal-wipe"
+        : resolvedMotion === "pop"
+          ? "stat-reveal-pop"
+          : "";
+  const displayValue = useCountUpValue(value ?? "", resolvedMotion === "count");
   return (
     <div
       data-stat-figure={size}
       data-stat-shape={resolvedShape}
-      className={`relative min-w-0 max-w-full overflow-hidden ${centeredShape ? "flex flex-col items-center text-center" : ""}`}
+      data-stat-surface={resolvedSurface}
+      data-stat-emphasis={resolvedEmphasis}
+      data-stat-motion={resolvedMotion}
+      className={`relative min-w-0 max-w-full overflow-hidden ${centeredShape ? "flex flex-col items-center text-center" : ""} ${revealClass}`}
       style={{
         containerType: "inline-size",
         contain: "inline-size",
+        animationDelay: revealClass ? `${revealIndex * 90}ms` : undefined,
+        ...surfaceStyle,
         ...(resolvedShape === "frame"
           ? {
               border: `${Math.max(1, Math.round(spec.valuePx * 0.008))}px solid ${hexA(aFig, mode === "dark" ? 0.4 : 0.28)}`,
@@ -720,7 +736,9 @@ export function StatFigure({
               padding: `${Math.round(spec.valuePx * 0.14)}px ${Math.round(spec.valuePx * 0.16)}px`,
             }
           : null),
-        ...(resolvedShape === "spine" ? { paddingLeft: Math.round(spec.valuePx * 0.16) } : null),
+        ...(resolvedShape === "spine"
+          ? { paddingLeft: Math.round(spec.valuePx * 0.16) }
+          : null),
         ...(resolvedShape === "bracket"
           ? {
               paddingLeft: Math.round(spec.valuePx * 0.16),
@@ -729,6 +747,7 @@ export function StatFigure({
           : null),
       }}
     >
+
       {(resolvedShape === "ghost" || resolvedShape === "auto") &&
         !valueIsPhrase &&
         (() => {
