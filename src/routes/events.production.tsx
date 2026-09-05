@@ -38,6 +38,7 @@ import {
 } from "@/lib/event-print-deliver";
 import { downloadAssetBlob } from "@/lib/asset-export";
 import { runWithExportFeedback, notifyBlocked } from "@/lib/export-feedback";
+import { NEXT_EVENT } from "@/lib/next-event";
 
 export const Route = createFileRoute("/events/production")({
   head: () => ({
@@ -80,8 +81,13 @@ function EventProductionPage() {
   const [issues, setIssues] = useState<SpecParseIssue[]>([]);
   const [parsed, setParsed] = useState(false);
 
-  const [eventName, setEventName] = useState("TransPerfect NEXT");
-  const [venue, setVenue] = useState("Javits Center, New York");
+  // Defaults come from the live event record, never a hard-coded past venue.
+  const [eventName, setEventName] = useState(NEXT_EVENT.name);
+  const [venue, setVenue] = useState(`${NEXT_EVENT.venue}, ${NEXT_EVENT.city}`);
+  const [dates, setDates] = useState(NEXT_EVENT.datesLabel);
+  // The printed call-to-action wording and the link/QR target are separate:
+  // artwork shows the words, the QR resolves the URL.
+  const [linkTarget, setLinkTarget] = useState<string>(NEXT_EVENT.registrationUrl);
   const [lookId, setLookId] = useState(DEFAULT_EVENT_LOOK_ID);
   const [brandId, setBrandId] = useState(BRAND_MODES[0]!.id);
   const [mode, setMode] = useState<"light" | "dark">("dark");
@@ -90,7 +96,7 @@ function EventProductionPage() {
     eyebrow: "Welcome to",
     title: "TransPerfect NEXT",
     summary: "Two days of language, technology and the teams behind global growth.",
-    cta: "next.transperfect.com",
+    cta: NEXT_EVENT.ctaLabel,
   });
 
   const [busy, setBusy] = useState(false);
@@ -350,6 +356,16 @@ function EventProductionPage() {
                   className={INPUT}
                 />
               </Field>
+              <Field label="Dates">
+                <input value={dates} onChange={(e) => setDates(e.target.value)} className={INPUT} />
+              </Field>
+              <Field label="Link / QR target">
+                <input
+                  value={linkTarget}
+                  onChange={(e) => setLinkTarget(e.target.value)}
+                  className={INPUT}
+                />
+              </Field>
             </div>
             <div className="flex flex-wrap items-center gap-4 text-xs">
               <label className="inline-flex min-h-11 items-center gap-2">
@@ -491,7 +507,7 @@ function EventProductionPage() {
                           summary: copy.summary,
                           cta: copy.cta,
                         }}
-                        facts={{ registrationUrl: copy.cta }}
+                        facts={{ registrationUrl: linkTarget, dates }}
                         displayShortEdge={previewShortEdge(format.aspect)}
                       />
                     </div>
