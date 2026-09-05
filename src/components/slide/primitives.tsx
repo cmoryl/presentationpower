@@ -1258,7 +1258,7 @@ export function StatFigure({
               textOverflow: "clip",
             }}
           >
-            <span>{value || "—"}</span>
+            <span>{displayValue || "—"}</span>
             {unitText && !unitIsLong && (
               <span
                 className="ml-2 font-medium align-top"
