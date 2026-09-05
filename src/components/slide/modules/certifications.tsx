@@ -167,7 +167,7 @@ registerSlideModule({
                       color: accent,
                     }}
                   >
-                    What it covers
+                    {st.coversLabel}
                   </span>
                   <span
                     aria-hidden
