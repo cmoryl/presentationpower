@@ -1,12 +1,11 @@
 # Roadmap — advanced stat & module design options
 
-- [x] stat-layouts.ts: shapes halo/ribbon/echo/ticks/pie/area/waterfall, surfaces dotgrid/stripes, motions blur/drift, emphasis monumental
-- [x] stat-arrangements.ts: magazine, ladder, duo-lead plans
-- [x] primitives.tsx: surface styles, monumental scale, blur/drift reveal classes, halo/ribbon/echo/ticks/pie/area/waterfall branches
-- [x] styles.css: tp-stat-blur / tp-stat-drift keyframes + reveal classes + reduced-motion guards
-- [ ] cert-style.ts: add pointMarker, logoTone, accentRole, badgeScale, headerAlign
-- [ ] CertStylePanel.tsx + certifications.tsx: wire the five new knobs
-- [ ] Taxonomy: new stat variants MV-STAT-TICKER-STRIP, MV-STAT-SPARK-HERO, MV-STAT-GAUGE-STACK (+ module-copy, deck-store seeds, MODULE_STAT_LAYOUTS, stat.tsx cases)
-- [ ] pptx-export.ts: honor new shapes/surfaces in emitSingleStatFigure + native stat emitters
-- [ ] Tests: extend stat-layouts/arrangements/cert-style tests; new variants render/export
-- [ ] Verify: tsgo, targeted vitest, full suite
+- [x] New figure treatments: halo, ribbon, echo, ticked dial, pie share, area sparkline, micro waterfall
+- [x] New materials: dot matrix, hairline stripes
+- [x] New reveals: focus pull (blur), drift in — with reduced-motion guards
+- [x] Monumental emphasis weight
+- [x] New multi-stat arrangements: magazine lead, ladder, duo lead
+- [x] New slide types: ticker strip, sparkline hero, gauge stack (taxonomy, render, layout, backdrop, library copy, starter content)
+- [x] Credential module: point marker, logo tone, accent strength, badge size, heading alignment
+- [x] Tests + typecheck + build green
+- [ ] Export sweep for the 3 new slide types (Playwright harness cannot run in this sandbox; CI job `export-verify` will record them)
