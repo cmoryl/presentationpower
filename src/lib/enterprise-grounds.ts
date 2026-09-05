@@ -521,6 +521,7 @@ export const GROUND_BY_LAYOUT: Partial<Record<string, EnterpriseGroundId>> = {
   // Logo walls, tables, matrices — stay quiet under dense content.
   "MV-PROOF-LOGOS": "quiet",
   "MV-PROOF-GROWTH-ORBITS": "quiet",
+  "MV-PROOF-CERT-ORBITS": "quiet",
   "MV-PROOF-LOGOS-STRIP": "media-shelf",
   "MV-PROOF-LOGOS-MARQUEE": "media-shelf",
   "MV-PROOF-LOGOS-FEATURED": "quiet",

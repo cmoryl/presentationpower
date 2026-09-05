@@ -29,7 +29,7 @@ const MAX_GROWTH = 4;
 const MAX_LOGOS = MAX_WALL_LOGOS;
 
 /** Hairline orbit ring: one full circle plus an offset arc with end nodes. */
-function OrbitRing({
+export function OrbitRing({
   accent,
   size,
   face,

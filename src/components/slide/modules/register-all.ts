@@ -24,5 +24,6 @@ import "./advanced";
 import "./editorial";
 import "./locations";
 import "./growth-orbits";
+import "./certifications";
 
 export {};

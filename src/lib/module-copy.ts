@@ -79,6 +79,11 @@ const AUTHORED: Record<string, ModuleCopy> = {
     description:
       "A split proof slide: a logo wall plus numbered growth figures on the left, up to three headline percentages in hairline orbit rings on the right. Use it for a corporate update where both scale and behavioural data need to land together.",
   },
+  "MV-PROOF-CERT-ORBITS": {
+    caption: "Certification card beside credential orbit rings",
+    description:
+      "A credentials slide: one programme card carrying its headline pass rates and qualifying criteria, with up to three standards set in hairline orbit rings alongside. Use it when accreditation is the proof point and each standard needs its own short list of requirements.",
+  },
   "MV-PROC-BEFORE-AFTER": {
     caption: "The workflow before, and after the change",
     description:

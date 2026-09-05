@@ -3482,6 +3482,9 @@ function renderAdvancedVariant(
     case "MV-PROOF-GROWTH-ORBITS":
       renderGrowthOrbits(s, c, p, itemLogos);
       return true;
+    case "MV-PROOF-CERT-ORBITS":
+      renderCertOrbits(s, c, p);
+      return true;
     case "MV-RISK-MITIGATION":
       renderRiskMitigation(s, c, p);
       return true;
@@ -12182,6 +12185,130 @@ function renderGrowthOrbits(
         y: oy + 0.12,
         w: ringH - 0.24,
         h: ringH - 0.24,
+        fontFace: "Geist",
+        align: "center",
+        valign: "middle",
+      },
+    );
+  });
+}
+
+// ── MV-PROOF-CERT-ORBITS ── programme card | certification orbit rings
+function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const strList = (v: unknown): string[] =>
+    Array.isArray(v) ? v.map((x) => str(x)).filter(Boolean) : [];
+
+  s.addText(str(c.title), {
+    x: 0.6,
+    y: 0.4,
+    w: 12.1,
+    h: 0.85,
+    fontSize: 34,
+    bold: true,
+    color: p.primary,
+    fontFace: "Geist",
+  });
+
+  // Left card
+  const CX = 0.6;
+  const CW = 5.3;
+  const CY = 1.55;
+  const CH = 5.2;
+  s.addShape("roundRect", {
+    x: CX,
+    y: CY,
+    w: CW,
+    h: CH,
+    rectRadius: EXPORT_RADIUS_IN.media,
+    fill: { color: "FFFFFF" },
+    line: { color: LIGHT_GRAY },
+  });
+  const highlights = strList(c.cardHighlights).slice(0, 3);
+  const points = strList(c.cardPoints).slice(0, 6);
+  s.addText(
+    [
+      ...(str(c.cardTitle)
+        ? [
+            {
+              text: `${str(c.cardTitle)}\n\n`,
+              options: { fontSize: 22, bold: true, color: p.primary },
+            },
+          ]
+        : []),
+      ...highlights.map((h) => ({
+        text: `${h.toUpperCase()}\n`,
+        options: { fontSize: 14, bold: true, color: p.accent },
+      })),
+      ...(points.length ? [{ text: "\n", options: { fontSize: 8 } }] : []),
+      ...points.map((pt) => ({
+        text: `• ${pt}\n`,
+        options: { fontSize: 14, color: "03002C" },
+      })),
+    ],
+    {
+      x: CX + 0.35,
+      y: CY + 0.35,
+      w: CW - 0.7,
+      h: CH - 0.7,
+      fontFace: "Geist",
+      valign: "middle",
+      lineSpacingMultiple: 1.2,
+    },
+  );
+
+  // Right credentials
+  const RX = 6.4;
+  const RW = 6.4;
+  const top = CY;
+  const avail = CH;
+  const certs = arr(c.certs).slice(0, 3);
+  const layout: Array<[number, number, number]> =
+    certs.length >= 3
+      ? [
+          [34, 40, 0.98],
+          [72, 17, 0.94],
+          [70, 78, 0.94],
+        ]
+      : certs.length === 2
+        ? [
+            [36, 32, 1],
+            [66, 74, 1],
+          ]
+        : [[50, 50, 1.1]];
+  const ringFace = resolveOrbitFace(c.orbitStyle, isDarkPalette(p) ? "dark" : "light");
+  const ringHex = orbitRingColor(ringFace, p.accent).replace("#", "");
+  const base = Math.min(2.6, avail / Math.max(certs.length, 1) + 0.6);
+  certs.forEach((cert, k) => {
+    const [px, py, size] = layout[k] ?? [50, 50, 1];
+    const d = base * size;
+    const ox = Math.min(RX + RW - d, Math.max(RX, RX + (px / 100) * RW - d / 2));
+    const oy = Math.min(top + avail - d, Math.max(top, top + (py / 100) * avail - d / 2));
+    s.addShape("ellipse", {
+      x: ox,
+      y: oy,
+      w: d,
+      h: d,
+      fill: { color: "FFFFFF", transparency: 100 },
+      line: {
+        color: ringHex,
+        width: ringFace.ringWidth,
+        transparency: 100 - ringFace.ringOpacity,
+      },
+    });
+    s.addText(
+      [
+        ...(str(cert.label)
+          ? [{ text: `${str(cert.label)}\n`, options: { fontSize: 14, bold: true, color: p.primary } }]
+          : []),
+        ...strList(cert.points)
+          .slice(0, 6)
+          .map((b) => ({ text: `• ${b}\n`, options: { fontSize: 11, color: p.ink } })),
+      ],
+      {
+        x: ox + 0.14,
+        y: oy + 0.14,
+        w: d - 0.28,
+        h: d - 0.28,
         fontFace: "Geist",
         align: "center",
         valign: "middle",

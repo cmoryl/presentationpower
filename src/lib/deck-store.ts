@@ -1655,6 +1655,46 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           },
         ],
       };
+    case "MV-PROOF-CERT-ORBITS":
+      return {
+        title: "Our commitment to quality",
+        cardTitle: "TransPerfect Linguist Certification (TLC)",
+        cardHighlights: ["6% technical field pass rate", "12% overall pass rate"],
+        cardPoints: [
+          "Subject matter expertise",
+          "Proven experience",
+          "Rigorous testing",
+          "Ongoing assessment",
+        ],
+        certs: [
+          {
+            label: "ISO 18587:2017",
+            points: [
+              "Demonstrated commitment to quality",
+              "Enhancement efficiency",
+              "Risk management",
+            ],
+          },
+          {
+            label: "ISO 9001:2015",
+            points: [
+              "Staffing & training",
+              "Language production",
+              "Information management",
+              "Quality control measures",
+            ],
+          },
+          {
+            label: "ISO 17100:2015",
+            points: [
+              "Personnel qualifications",
+              "Translation workflows",
+              "Technical resources",
+              "Communication procedures",
+            ],
+          },
+        ],
+      };
     case "MV-PROOF-LOGOS-STRIP":
       return {
         kicker: "Trusted by",
