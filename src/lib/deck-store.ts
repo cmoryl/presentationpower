@@ -19,6 +19,7 @@ import { variantSupportsImagery, variantSupportsVideo } from "./variant-media";
 import { track } from "./analytics-track";
 import { notifySlideEdit } from "./deck-feedback";
 import { pickVariedVariant } from "./module-variety";
+import { ORG_CREDENTIALS, ORG_FOUNDED } from "./print-library/org-facts";
 
 import type { SlideSkin } from "./slide-skin";
 import { hasTextFormats } from "./slide-text-format";
@@ -1627,31 +1628,31 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         items: clientPlaceholderItems(8),
         growthLabel: "Global growth",
         growth: [
-          { value: "32", label: "Years of strategic growth" },
-          { value: "21", label: "Key acquisitions", body: "since 2020" },
+          { value: "30+", label: "Years of global delivery", body: `Founded ${ORG_FOUNDED}` },
+          { value: "140+", label: "Cities with local teams", body: "Six continents" },
           {
-            value: "32",
-            label: "New regional offices",
-            body: "Local knowledge powering global delivery",
+            value: "10,000+",
+            label: "Employees worldwide",
+            body: "In-house teams, not brokered",
           },
         ],
-        statsTitle: "Specializing in areas that",
-        statsEmphasis: "matter",
+        statsTitle: "Scale that clients can",
+        statsEmphasis: "count on",
         orbits: [
           {
-            label: "Digital marketing",
-            value: "97%",
-            body: "Of users are influenced by a business's online presence.",
+            label: "Languages",
+            value: "200+",
+            body: "Supported across every major market.",
           },
           {
-            label: "Media",
-            value: "90%",
-            body: "Of our clients cite video as key to growing their global strategy.",
+            label: "Annual revenue",
+            value: "$1.3B",
+            body: "Privately held and profitable.",
           },
           {
-            label: "Events",
-            value: "70%",
-            body: "Awareness boost delivered by event marketing.",
+            label: "Quality systems",
+            value: "6",
+            body: "ISO-certified and independently audited.",
           },
         ],
       };
@@ -1668,7 +1669,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
         certs: [
           {
-            label: "ISO 18587:2017",
+            label: ORG_CREDENTIALS[2] ?? "ISO 18587:2017",
             points: [
               "Demonstrated commitment to quality",
               "Enhancement efficiency",
@@ -1676,7 +1677,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
             ],
           },
           {
-            label: "ISO 9001:2015",
+            label: ORG_CREDENTIALS[0] ?? "ISO 9001:2015",
             points: [
               "Staffing & training",
               "Language production",
@@ -1685,7 +1686,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
             ],
           },
           {
-            label: "ISO 17100:2015",
+            label: ORG_CREDENTIALS[1] ?? "ISO 17100:2015",
             points: [
               "Personnel qualifications",
               "Translation workflows",
