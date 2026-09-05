@@ -1669,7 +1669,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
         certs: [
           {
-            label: "ISO 18587:2017",
+            label: ORG_CREDENTIALS[2] ?? "ISO 18587:2017",
             points: [
               "Demonstrated commitment to quality",
               "Enhancement efficiency",
@@ -1677,7 +1677,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
             ],
           },
           {
-            label: "ISO 9001:2015",
+            label: ORG_CREDENTIALS[0] ?? "ISO 9001:2015",
             points: [
               "Staffing & training",
               "Language production",
@@ -1686,7 +1686,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
             ],
           },
           {
-            label: "ISO 17100:2015",
+            label: ORG_CREDENTIALS[1] ?? "ISO 17100:2015",
             points: [
               "Personnel qualifications",
               "Translation workflows",
