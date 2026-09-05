@@ -20,6 +20,9 @@ import {
 } from "@/lib/next-london-artwork";
 
 import { Button } from "@/components/ui/button";
+import { auditAi, auditSvg, gateOnQa } from "@/lib/london-signage-qa";
+import { runWithExportFeedback } from "@/lib/export-feedback";
+import { NEXT_LONDON_AGENDA_URL } from "@/lib/next-event";
 import { LondonPrintGuides, LondonPrintReadout } from "@/components/london/LondonPrintPreview";
 import { StepRepeatWallPanel } from "@/components/events/StepRepeatWallPanel";
 import { isStepRepeatPanel, mmToIn, useStepRepeatConfigs } from "@/lib/next-london-step-repeat";
