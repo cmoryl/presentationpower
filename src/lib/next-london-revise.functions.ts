@@ -110,6 +110,7 @@ const PublishSchema = z.object({
   panels: z.array(PanelSchema),
   changes: z.array(z.record(z.string(), z.unknown())),
   regen: z.record(z.string(), z.unknown()),
+  removedIds: z.array(z.string()).default([]),
   restoredFrom: z.number().int().optional(),
 });
 
@@ -159,9 +160,10 @@ export const publishLondonRevision = createServerFn({ method: "POST" })
         panels: data.panels as unknown as never,
         changes: data.changes as unknown as never,
         regen: data.regen as unknown as never,
+        removed_ids: data.removedIds as unknown as never,
         restored_from: data.restoredFrom ?? null,
       })
-      .select("id, rev, note, author_id, panels, changes, regen, restored_from, created_at")
+      .select(COLUMNS)
       .single();
 
     if (error) throw new Error(`Could not publish revision ${nextRev}: ${error.message}`);
