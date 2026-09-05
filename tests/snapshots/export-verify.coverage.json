@@ -1,6 +1,6 @@
 {
-  "fingerprint": "da70e08d",
-  "updatedAt": "2026-09-05T00:25:05.925Z",
+  "fingerprint": "4770fb39",
+  "updatedAt": "2026-09-05T23:10:44.688Z",
   "cells": {
     "base@light": [
       "MV-BENTO-5",
@@ -180,6 +180,7 @@
       "MV-SPLIT-MANIFESTO",
       "MV-STAT-ACTUAL-TARGET",
       "MV-STAT-EDITORIAL-DASH",
+      "MV-STAT-GAUGE-STACK",
       "MV-STAT-HERO-NUMBER",
       "MV-STAT-IMAGE-TYPE",
       "MV-STAT-KPI-RAIL",
@@ -188,6 +189,8 @@
       "MV-STAT-PHOTO-BAND",
       "MV-STAT-PHOTO-TRIO",
       "MV-STAT-PORTRAIT-PROOF",
+      "MV-STAT-SPARK-HERO",
+      "MV-STAT-TICKER-STRIP",
       "MV-STAT-TYPE-WALL",
       "MV-TEAM-BIOS-3",
       "MV-TEAM-BIOS-4",
@@ -388,6 +391,7 @@
       "MV-SPLIT-MANIFESTO",
       "MV-STAT-ACTUAL-TARGET",
       "MV-STAT-EDITORIAL-DASH",
+      "MV-STAT-GAUGE-STACK",
       "MV-STAT-HERO-NUMBER",
       "MV-STAT-IMAGE-TYPE",
       "MV-STAT-KPI-RAIL",
@@ -396,6 +400,8 @@
       "MV-STAT-PHOTO-BAND",
       "MV-STAT-PHOTO-TRIO",
       "MV-STAT-PORTRAIT-PROOF",
+      "MV-STAT-SPARK-HERO",
+      "MV-STAT-TICKER-STRIP",
       "MV-STAT-TYPE-WALL",
       "MV-TEAM-BIOS-3",
       "MV-TEAM-BIOS-4",
@@ -429,7 +435,14 @@
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
       "MV-CASE-STORY",
-      "MV-CLIENT-COMPARE"
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION"
     ],
     "atelier-lumen@light": [
       "MV-BENTO-5",
@@ -442,7 +455,15 @@
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
       "MV-CASE-STORY",
-      "MV-CLIENT-COMPARE"
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA"
     ],
     "atelier-orange@light": [
       "MV-BENTO-5",
@@ -455,7 +476,16 @@
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
       "MV-CASE-STORY",
-      "MV-CLIENT-COMPARE"
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE"
     ],
     "azulejo-tile@light": [
       "MV-BENTO-5",
@@ -468,7 +498,16 @@
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
       "MV-CASE-STORY",
-      "MV-CLIENT-COMPARE"
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE"
     ],
     "basalt-mono@dark": [
       "MV-BENTO-5",
@@ -481,7 +520,14 @@
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
       "MV-CASE-STORY",
-      "MV-CLIENT-COMPARE"
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION"
     ],
     "comic-panel@light": [
       "MV-BENTO-5",
@@ -493,7 +539,14 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA"
     ],
     "desert-clay@light": [
       "MV-BENTO-5",
@@ -505,7 +558,14 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA"
     ],
     "marble-aureate@light": [
       "MV-BENTO-5",
@@ -517,7 +577,13 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT"
     ],
     "optic-moire@light": [
       "MV-BENTO-5",
@@ -529,7 +595,12 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST"
     ],
     "sage-linen@light": [
       "MV-BENTO-5",
@@ -541,7 +612,13 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT"
     ],
     "blueprint-cyan@dark": [
       "MV-BENTO-5",
@@ -554,7 +631,15 @@
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
       "MV-CASE-STORY",
-      "MV-CLIENT-COMPARE"
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA"
     ],
     "cyber-terminal@dark": [
       "MV-BENTO-5",
@@ -566,7 +651,14 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA"
     ],
     "graphite-chrome@dark": [
       "MV-BENTO-5",
@@ -578,7 +670,13 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CTA"
     ],
     "neo-brutal@light": [
       "MV-BENTO-5",
@@ -590,7 +688,13 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT"
     ],
     "retro-arcade@dark": [
       "MV-BENTO-5",
@@ -602,7 +706,13 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT"
     ],
     "vapor-chrome@light": [
       "MV-BENTO-5",
@@ -614,7 +724,12 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST"
     ],
     "cobalt-proposal@light": [
       "MV-BENTO-5",
@@ -627,7 +742,16 @@
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
       "MV-CASE-STORY",
-      "MV-CLIENT-COMPARE"
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE"
     ],
     "deco-marquee@dark": [
       "MV-BENTO-5",
@@ -639,7 +763,15 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION"
     ],
     "herbarium-press@light": [
       "MV-BENTO-5",
@@ -651,7 +783,14 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA"
     ],
     "onyx-couture@dark": [
       "MV-BENTO-5",
@@ -663,7 +802,14 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-DECISION"
     ],
     "riso-woodcut@light": [
       "MV-BENTO-5",
@@ -675,7 +821,14 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA"
     ],
     "verdant-corporate@dark": [
       "MV-BENTO-5",
@@ -687,7 +840,13 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT"
     ],
     "bauhaus-primary@light": [
       "MV-BENTO-5",
@@ -700,7 +859,15 @@
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
       "MV-CASE-STORY",
-      "MV-CLIENT-COMPARE"
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA"
     ],
     "crimson-editorial@light": [
       "MV-BENTO-5",
@@ -712,7 +879,16 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA"
     ],
     "editorial-serif@light": [
       "MV-BENTO-5",
@@ -724,7 +900,15 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION"
     ],
     "midnight-neon@dark": [
       "MV-BENTO-5",
@@ -736,7 +920,14 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA"
     ],
     "quant-grid@dark": [
       "MV-BENTO-5",
@@ -748,7 +939,13 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT"
     ],
     "swiss-noir@light": [
       "MV-BENTO-5",
@@ -760,7 +957,14 @@
       "MV-CASE-LOGO-GRID",
       "MV-CASE-METRICS",
       "MV-CASE-SPREAD",
-      "MV-CASE-STORY"
+      "MV-CASE-STORY",
+      "MV-CLIENT-COMPARE",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-DECISION"
     ]
   }
 }
