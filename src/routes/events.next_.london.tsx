@@ -73,6 +73,10 @@ import {
 } from "@/lib/next-london-signage";
 import {
   effectiveLondonPanels,
+  EMPTY_LONDON_OVERRIDES,
+  londonOverrideOptions,
+  londonPanelFileBase,
+  type LondonOverrides,
   isAddedPanel,
   londonAiBytes,
   londonPanelSvgFor,
@@ -227,6 +231,11 @@ function PanelCard({
 function LondonSignagePage() {
   const fetchHead = useServerFn(getLondonHeadRevision);
   const [headError, setHeadError] = useState(false);
+  // The revision number and the design overrides in force. Every download,
+  // thumbnail and QA audit builds from THESE, never from the local stores, so a
+  // print master does not depend on the downloading browser.
+  const [headRev, setHeadRev] = useState(0);
+  const [headOverrides, setHeadOverrides] = useState<LondonOverrides>(EMPTY_LONDON_OVERRIDES);
   // `undefined` while the session resolves, `null` when signed out. The kit is
   // public — downloads and QA are available to everyone — but editor entry
   // points (revise workflow, production studio) are only shown to signed-in
@@ -274,6 +283,8 @@ function LondonSignagePage() {
       .then((res) => {
         if (!live) return;
         setHeadError(false);
+        setHeadRev(res.revision?.rev ?? 0);
+        setHeadOverrides(res.revision?.overrides ?? EMPTY_LONDON_OVERRIDES);
         const inForce = effectiveLondonPanels(res.revision ? [res.revision] : []);
         if (inForce.length) setPanels(inForce);
       })
@@ -296,6 +307,10 @@ function LondonSignagePage() {
 
   const target = openPanel ? rasterSizeFor(openPanel, ppi) : null;
 
+  /** Builder options for a panel, taken from the revision in force. */
+  const artOptions = (panel: LondonPanel) => londonOverrideOptions(panel.id, headOverrides);
+  const fileBase = (panel: LondonPanel) => londonPanelFileBase(panel, headRev);
+
   const packOrNull = async () => {
     if (artwork) return artwork;
     try {
@@ -309,8 +324,8 @@ function LondonSignagePage() {
   const downloadVector = (panel: LondonPanel, fmt: "svg" | "ai") =>
     runWithExportFeedback(
       {
-        pending: `Preparing ${panelSlug(panel)}.${fmt}…`,
-        success: `${panelSlug(panel)}.${fmt} downloaded`,
+        pending: `Preparing ${fileBase(panel)}.${fmt}…`,
+        success: `${fileBase(panel)}.${fmt} downloaded`,
         failure: "Vector download failed",
         successDescription:
           fmt === "ai"
@@ -323,33 +338,37 @@ function LondonSignagePage() {
         // booth downloads the real wall rather than the house ground.
         const art =
           fmt === "ai"
-            ? await resolveLondonArtworkAsync(panel, pack)
-            : resolveLondonArtwork(panel, pack);
+            ? await resolveLondonArtworkAsync(panel, pack, artOptions(panel))
+            : resolveLondonArtwork(panel, pack, artOptions(panel));
         gateOnQa(fmt === "svg" ? auditSvg(panel, art.svg) : auditAi(panel, art.ai));
         if (fmt === "svg") {
-          download(new Blob([art.svg], { type: "image/svg+xml" }), `${panelSlug(panel)}.svg`);
+          download(new Blob([art.svg], { type: "image/svg+xml" }), `${fileBase(panel)}.svg`);
           return;
         }
         // .ai is PDF-compatible binary — never let Blob UTF-8 the bytes.
         const bytes = londonAiBytes(art.ai);
-        download(new Blob([bytes], { type: "application/illustrator" }), `${panelSlug(panel)}.ai`);
+        download(new Blob([bytes], { type: "application/illustrator" }), `${fileBase(panel)}.ai`);
       },
     );
 
   const downloadRaster = (panel: LondonPanel) =>
     runWithExportFeedback(
       {
-        pending: `Rendering ${panelSlug(panel)} at ${ppi} ppi…`,
-        success: `${panelSlug(panel)}-${ppi}ppi.png downloaded`,
+        pending: `Rendering ${fileBase(panel)} at ${ppi} ppi…`,
+        success: `${fileBase(panel)}-${ppi}ppi.png downloaded`,
         failure: "Raster render failed",
         successDescription: "Lossless PNG, sized to bleed, triangular-PDF dither applied.",
       },
       async () => {
         const pack = await packOrNull();
         const size = rasterSizeFor(panel, ppi);
-        const blob = await renderDitheredPng(resolveLondonArtwork(panel, pack).svg, size.w, size.h);
+        const blob = await renderDitheredPng(
+          resolveLondonArtwork(panel, pack, artOptions(panel)).svg,
+          size.w,
+          size.h,
+        );
         gateOnQa(auditPng(panel, ppi, new Uint8Array(await blob.arrayBuffer())));
-        download(blob, `${panelSlug(panel)}-${ppi}ppi.png`);
+        download(blob, `${fileBase(panel)}-${ppi}ppi.png`);
       },
     );
 
@@ -381,7 +400,7 @@ function LondonSignagePage() {
         const pack = await packOrNull();
         const reports: LondonQaReport[] = [];
         for (const panel of panels) {
-          const art = resolveLondonArtwork(panel, pack);
+          const art = resolveLondonArtwork(panel, pack, artOptions(panel));
           reports.push(auditSvg(panel, art.svg), auditAi(panel, art.ai));
         }
         setQa(reports);
@@ -487,20 +506,12 @@ function LondonSignagePage() {
               </a>
 
               {userId ? (
-                <>
-                  <Link
-                    to="/events/next/london/revise"
-                    className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
-                  >
-                    <Ruler className="h-4 w-4" /> Revise specs &amp; regenerate
-                  </Link>
-                  <Link
-                    to="/events/production"
-                    className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
-                  >
-                    <Layers className="h-4 w-4" /> Open production studio
-                  </Link>
-                </>
+                <Link
+                  to="/events/next/london/revise"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
+                >
+                  <Ruler className="h-4 w-4" /> Revise &amp; regenerate
+                </Link>
               ) : null}
               <button
                 type="button"
@@ -659,7 +670,7 @@ function LondonSignagePage() {
                   <PanelCard
                     key={panel.id}
                     panel={panel}
-                    svg={londonPanelSvgFor(panel, artwork)}
+                    svg={londonPanelSvgFor(panel, artwork, artOptions(panel))}
                     onClick={setOpenPanel}
                   />
                 ))}
@@ -692,7 +703,7 @@ function LondonSignagePage() {
                       <PanelCard
                         key={panel.id}
                         panel={panel}
-                        svg={londonPanelSvgFor(panel, artwork)}
+                        svg={londonPanelSvgFor(panel, artwork, artOptions(panel))}
                         onClick={setOpenPanel}
                       />
                     ))}
@@ -725,7 +736,7 @@ function LondonSignagePage() {
               </p>
               {/* Cap the hero thumb so the tier preview and downloads stay in view. */}
               <div className="mx-auto w-full max-w-[240px]">
-                <PanelThumb panel={openPanel} svg={londonPanelSvgFor(openPanel, artwork)} />
+                <PanelThumb panel={openPanel} svg={londonPanelSvgFor(openPanel, artwork, artOptions(openPanel))} />
               </div>
 
               {londonVenueItemMeta(openPanel) ? (
@@ -815,6 +826,7 @@ function LondonSignagePage() {
                   <div className="mt-4">
                     <LondonPanelLiveEditor
                       panel={openPanel}
+                      revisionLabel={headRev}
                       siblingIds={panels.filter((p) => p.id !== openPanel.id).map((p) => p.id)}
                       onStyleChange={(styleId) => {
                         const style = styleId as LondonPanel["style"];
