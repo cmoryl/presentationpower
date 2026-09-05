@@ -71,8 +71,15 @@ import {
   useLondonBoardSizes,
 } from "@/lib/next-london-board-size";
 
-/** Default QR target: the live London agenda board. */
-const QR_DEFAULT_LINK = "https://transperfectelement.lovable.app/events/next/london/agenda";
+/** Default QR target: the live NEXT agenda board (single source of truth). */
+const QR_DEFAULT_LINK = NEXT_LONDON_AGENDA_URL;
+
+/**
+ * CMYK masters are hidden until every LONDON_STYLES stop has an approved build
+ * in next-london-cmyk APPROVED and QA is colourspace-aware. The code stays so
+ * the toggle can be switched back on once both land.
+ */
+const CMYK_ENABLED = false;
 
 function svgDataUrl(svg: string): string {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
@@ -253,20 +260,37 @@ export function LondonPanelLiveEditor({
 
   const downloadPanel = async (kind: "svg" | "ai") => {
     const base = londonPanelFileBase(panel, 1, colorSpace);
-    const blob =
-      kind === "svg"
-        ? new Blob([buildLondonPanelSvg(panel, art)], { type: "image/svg+xml" })
-        : new Blob([londonAiBytes(await buildLondonPanelAiAsync(panel, art))], {
-            type: "application/postscript",
-          });
+    // Same spec gate as the kit page: a file that disagrees with the panel
+    // specification is never saved.
+    let blob: Blob;
+    if (kind === "svg") {
+      const svg = buildLondonPanelSvg(panel, art);
+      gateOnQa(auditSvg(panel, svg));
+      blob = new Blob([svg], { type: "image/svg+xml" });
+    } else {
+      const ai = await buildLondonPanelAiAsync(panel, art);
+      gateOnQa(auditAi(panel, ai));
+      blob = new Blob([londonAiBytes(ai)], { type: "application/illustrator" });
+    }
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.download = `${base}.${kind}`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
-    toast.success(`${base}.${kind} downloaded · ${colorSpace.toUpperCase()}`);
+    toast.message(`${base}.${kind} · ${colorSpace.toUpperCase()}`);
   };
+
+  /** Download with the kit page's pending/success/failure feedback. */
+  const savePanel = (kind: "svg" | "ai") =>
+    runWithExportFeedback(
+      {
+        pending: `Preparing ${panel.name}.${kind}…`,
+        success: `${panel.name}.${kind} downloaded`,
+        failure: `Could not export ${panel.name}.${kind}`,
+      },
+      () => downloadPanel(kind),
+    );
 
   // Supplied artwork: read the real pixel size so the designer sees the true
   // print resolution at this board size, and so zooming warns before it softens.
@@ -1101,30 +1125,37 @@ export function LondonPanelLiveEditor({
 
         {/* Output + panel actions */}
         <div className="flex flex-wrap items-center gap-2">
-          {(["rgb", "cmyk"] as const).map((space) => (
-            <button
-              key={space}
-              type="button"
-              aria-pressed={colorSpace === space}
-              onClick={() => setColorSpace(space)}
-              className={`rounded-full border px-3 py-1 text-xs transition ${
-                colorSpace === space
-                  ? "border-primary bg-primary/10 text-foreground"
-                  : "border-border text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              {space === "rgb" ? "RGB · RIP separates" : "CMYK · print master"}
-            </button>
-          ))}
+          {CMYK_ENABLED
+            ? (["rgb", "cmyk"] as const).map((space) => (
+                <button
+                  key={space}
+                  type="button"
+                  aria-pressed={colorSpace === space}
+                  onClick={() => setColorSpace(space)}
+                  className={`rounded-full border px-3 py-1 text-xs transition ${
+                    colorSpace === space
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  {space === "rgb" ? "RGB · RIP separates" : "CMYK · print master"}
+                </button>
+              ))
+            : null}
           <Button
             variant="outline"
             size="sm"
             className="gap-2"
-            onClick={() => downloadPanel("svg")}
+            onClick={() => void savePanel("svg")}
           >
             <Download className="h-3.5 w-3.5" /> SVG
           </Button>
-          <Button variant="outline" size="sm" className="gap-2" onClick={() => downloadPanel("ai")}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => void savePanel("ai")}
+          >
             <Download className="h-3.5 w-3.5" /> AI
           </Button>
           {boothMaster ? (

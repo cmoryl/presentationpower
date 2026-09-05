@@ -35,6 +35,12 @@ export type NextDivision = {
   body: string;
 };
 
+/**
+ * Canonical live agenda board for NEXT 2026 London — the single URL any QR code
+ * or printed link must point at. The route is `/events/next/agendas`.
+ */
+export const NEXT_LONDON_AGENDA_URL = "https://presentationpower.lovable.app/events/next/agendas";
+
 export const NEXT_EVENT = {
   id: "next-2026",
   name: "TransPerfect NEXT 2026",
