@@ -82,9 +82,9 @@ function EventProductionPage() {
   const [parsed, setParsed] = useState(false);
 
   // Defaults come from the live event record, never a hard-coded past venue.
-  const [eventName, setEventName] = useState(NEXT_EVENT.name);
+  const [eventName, setEventName] = useState<string>(NEXT_EVENT.name);
   const [venue, setVenue] = useState(`${NEXT_EVENT.venue}, ${NEXT_EVENT.city}`);
-  const [dates, setDates] = useState(NEXT_EVENT.datesLabel);
+  const [dates, setDates] = useState<string>(NEXT_EVENT.datesLabel);
   // The printed call-to-action wording and the link/QR target are separate:
   // artwork shows the words, the QR resolves the URL.
   const [linkTarget, setLinkTarget] = useState<string>(NEXT_EVENT.registrationUrl);
@@ -507,7 +507,7 @@ function EventProductionPage() {
                           summary: copy.summary,
                           cta: copy.cta,
                         }}
-                        facts={{ registrationUrl: linkTarget, dates }}
+                        facts={{ registrationUrl: linkTarget }}
                         displayShortEdge={previewShortEdge(format.aspect)}
                       />
                     </div>
