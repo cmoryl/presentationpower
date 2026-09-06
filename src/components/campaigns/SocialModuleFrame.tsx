@@ -298,7 +298,10 @@ export function SocialModuleFrame({
   // pages silently shrink every band back down.
   const framePageHeight = shell
     ? Math.round(816 * (shell.contentHeight / (safe.width - shell.panelPad * 2)))
-    : Math.round(816 * (safe.height / safe.width));
+    : bleed
+      ? Math.round(816 * (bleed.height / bleed.width))
+      : Math.round(816 * (safe.height / safe.width));
+
 
   const frameBandPct = useMemo(() => {
     switch (aspectClass(format)) {
