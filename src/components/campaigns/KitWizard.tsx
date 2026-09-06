@@ -737,13 +737,13 @@ export function KitWizard({
             ) : null}
 
             <p className="mt-3 text-xs text-black/55">
-              Prefer your favorited modules?{" "}
+              Want a different bundle?{" "}
               <Link
                 to="/events/new"
                 search={{ profile: profileId }}
                 className="text-[#003FC7] hover:underline"
               >
-                Switch to favorited-module flow →
+                Change kit profile →
               </Link>
             </p>
           </StepCard>
