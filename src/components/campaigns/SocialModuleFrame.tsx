@@ -39,7 +39,15 @@ import {
 import { applyReliefToSection } from "@/lib/social-module-layouts";
 import { tallShellFit, tallShellGeometry } from "@/lib/social-tall-layouts";
 import { socialReflowSection } from "@/lib/social-reflow";
+import {
+  fullBleedGeometry,
+  fullBleedMode,
+  fullBleedPlanFor,
+  fullBleedSection,
+} from "@/lib/social-full-bleed";
 import { SocialTallShell } from "@/components/campaigns/SocialTallShell";
+import { SocialFullBleedShell } from "@/components/campaigns/SocialFullBleedShell";
+
 
 const SETTLE_BUDGET = 64;
 const MEASURE_BUDGET = 4;
@@ -117,7 +125,26 @@ export function SocialModuleFrame({
   // (stacked for story/portrait, condensed for a wide banner). Only then do the
   // fit ladders run — no amount of scaling turns a strip into a story.
   const tall = useMemo(() => socialReflowSection(section, aspectClass(format)), [section, format]);
-  const rendered = useMemo(() => applyReliefToSection(tall.section, relief), [tall, relief]);
+  // Photographic / hardware-led modules get a designed full-bleed composition on
+  // tall shapes: the picture (or the brand ground) leaves the type area and
+  // covers the frame, and the module itself is budgeted against a content box.
+  const bleedPlan = useMemo(
+    () =>
+      fullBleedPlanFor(
+        (tall.section as { variantId?: string }).variantId,
+        aspectClass(format),
+      ),
+    [tall, format],
+  );
+  const bleedSection = useMemo(
+    () => (bleedPlan ? fullBleedSection(tall.section, bleedPlan) : tall.section),
+    [tall, bleedPlan],
+  );
+  const bleed = useMemo(
+    () => (bleedPlan ? fullBleedGeometry(format, bleedPlan, safe) : null),
+    [bleedPlan, format, safe],
+  );
+  const rendered = useMemo(() => applyReliefToSection(bleedSection, relief), [bleedSection, relief]);
   const growth = SOCIAL_GROWTH_STEPS[Math.min(growthIndex, growthCeiling.current)];
   const air = SOCIAL_AIR_STEPS[Math.min(airIndex, airCeiling.current)];
   const measureKey = `${format}|${rendered.id}|${rendered.variantId}|${relief.level}|${growth}|${air}`;
@@ -130,7 +157,7 @@ export function SocialModuleFrame({
   // A restacked thin strip additionally needs a designed tall composition: the
   // module goes on a raised panel spanning the safe rect, so it is budgeted
   // against the panel's inner height rather than the whole frame.
-  const useShell = tall.plan?.source === "curated";
+  const useShell = tall.plan?.source === "curated" && !bleed;
   const shell = useMemo(() => (useShell ? tallShellGeometry(safe) : null), [useShell, safe]);
 
   const rawFit = useMemo(
@@ -141,10 +168,10 @@ export function SocialModuleFrame({
         relief,
         growth,
         air,
-        heightBudget: shell ? shell.contentHeight : undefined,
-        widthBudget: shell ? safe.width - shell.panelPad * 2 : undefined,
+        heightBudget: shell ? shell.contentHeight : bleed ? bleed.height : undefined,
+        widthBudget: shell ? safe.width - shell.panelPad * 2 : bleed ? bleed.width : undefined,
       }),
-    [format, naturalHeight, relief, growth, air, shell, safe],
+    [format, naturalHeight, relief, growth, air, shell, bleed, safe],
   );
   // Second pass: collapse the panel onto the module's real height so the shell's
   // bands, not an empty panel, take up the slack.
@@ -154,9 +181,15 @@ export function SocialModuleFrame({
   );
 
   const fit = useMemo(
-    () => (shellFitted ? withComposedFill(rawFit, shellFitted.composedHeight, format) : rawFit),
-    [rawFit, shellFitted, format],
+    () =>
+      shellFitted
+        ? withComposedFill(rawFit, shellFitted.composedHeight, format)
+        : bleed
+          ? withComposedFill(rawFit, bleed.composedHeight, format)
+          : rawFit,
+    [rawFit, shellFitted, bleed, format],
   );
+
 
 
 
@@ -273,7 +306,10 @@ export function SocialModuleFrame({
   // pages silently shrink every band back down.
   const framePageHeight = shell
     ? Math.round(816 * (shell.contentHeight / (safe.width - shell.panelPad * 2)))
-    : Math.round(816 * (safe.height / safe.width));
+    : bleed
+      ? Math.round(816 * (bleed.height / bleed.width))
+      : Math.round(816 * (safe.height / safe.width));
+
 
   const frameBandPct = useMemo(() => {
     switch (aspectClass(format)) {
@@ -290,8 +326,12 @@ export function SocialModuleFrame({
     }
   }, [format]);
 
-  const ink = mode === "dark" ? "#FFFFFF" : "#03002C";
+  // A full-bleed photograph carries its own contrast: the module's copy and the
+  // brand lockup reverse out over the scrim regardless of the kit's face.
+  const moduleMode = bleedPlan ? fullBleedMode(bleedPlan, mode) : mode;
+  const ink = bleedPlan?.kind === "photo" ? "#FFFFFF" : mode === "dark" ? "#FFFFFF" : "#03002C";
   const paper = mode === "dark" ? "#03002C" : "#FFFFFF";
+
 
   // Center the module inside the safe rect so short modules never leave a
   // lopsided band at one edge.
@@ -324,7 +364,7 @@ export function SocialModuleFrame({
         heroBandPct={frameBandPct}
       >
         <PrintDocModeProvider icons={relief.icons} iconStyle={PRINT_ICON_STYLE_DEFAULT}>
-          <PrintSectionRenderer section={rendered} mode={mode} accent={accent} />
+          <PrintSectionRenderer section={rendered} mode={moduleMode} accent={accent} />
         </PrintDocModeProvider>
       </PrintPageProvider>
     </div>
@@ -345,6 +385,8 @@ export function SocialModuleFrame({
         data-social-fit-air={air}
         data-social-panel-fill={Math.round(rawFit.fillPct * 100)}
         data-social-settled={settled.current.size}
+        data-social-bleed={bleedPlan ? bleedPlan.kind : undefined}
+
 
       >
 
@@ -374,9 +416,24 @@ export function SocialModuleFrame({
             }}
           />
 
-          {/* Live module, scaled into the safe rect (or into the tall shell's
-            panel when a thin strip has been restacked for a tall frame). */}
-          {shell ? (
+          {/* Live module: full-bleed composition for the photographic / hardware
+            modules, the tall shell for restacked thin strips, otherwise scaled
+            into the safe rect. */}
+          {bleed && bleedPlan ? (
+            <SocialFullBleedShell
+              geometry={bleed}
+              frame={{ width: format.width, height: format.height }}
+              accent={accent}
+              mode={mode}
+              imageUrl={(rendered as { imageUrl?: string }).imageUrl}
+              focalX={(rendered as { focalX?: number }).focalX}
+              focalY={(rendered as { focalY?: number }).focalY}
+            >
+              <div style={{ height: Math.min(fit.renderedHeight, bleed.height), overflow: "hidden" }}>
+                {moduleBlock}
+              </div>
+            </SocialFullBleedShell>
+          ) : shell ? (
             <SocialTallShell
               geometry={shellFitted ?? shell}
               safe={safe}
@@ -407,6 +464,7 @@ export function SocialModuleFrame({
               {moduleBlock}
             </div>
           )}
+
 
           {!hideLockup && brand ? (
             <div style={{ position: "absolute", left: safe.left, bottom: lockupPad }}>

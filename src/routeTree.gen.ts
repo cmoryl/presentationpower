@@ -73,6 +73,7 @@ import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as EventsAgentThreadIdRouteImport } from './routes/events-agent.$threadId'
 import { Route as DevUxDebugRouteImport } from './routes/dev.ux-debug'
+import { Route as DevSocialSweepRouteImport } from './routes/dev.social-sweep'
 import { Route as DevSocialCornersRouteImport } from './routes/dev.social-corners'
 import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
 import { Route as DevProposalQaRouteImport } from './routes/dev.proposal-qa'
@@ -495,6 +496,11 @@ const EventsAgentThreadIdRoute = EventsAgentThreadIdRouteImport.update({
 const DevUxDebugRoute = DevUxDebugRouteImport.update({
   id: '/dev/ux-debug',
   path: '/dev/ux-debug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevSocialSweepRoute = DevSocialSweepRouteImport.update({
+  id: '/dev/social-sweep',
+  path: '/dev/social-sweep',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevSocialCornersRoute = DevSocialCornersRouteImport.update({
@@ -1103,6 +1109,7 @@ export interface FileRoutesByFullPath {
   '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/social-corners': typeof DevSocialCornersRoute
+  '/dev/social-sweep': typeof DevSocialSweepRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
@@ -1267,6 +1274,7 @@ export interface FileRoutesByTo {
   '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/social-corners': typeof DevSocialCornersRoute
+  '/dev/social-sweep': typeof DevSocialSweepRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
@@ -1436,6 +1444,7 @@ export interface FileRoutesById {
   '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/social-corners': typeof DevSocialCornersRoute
+  '/dev/social-sweep': typeof DevSocialSweepRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
@@ -1606,6 +1615,7 @@ export interface FileRouteTypes {
     | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
     | '/dev/social-corners'
+    | '/dev/social-sweep'
     | '/dev/ux-debug'
     | '/events-agent/$threadId'
     | '/events/new'
@@ -1770,6 +1780,7 @@ export interface FileRouteTypes {
     | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
     | '/dev/social-corners'
+    | '/dev/social-sweep'
     | '/dev/ux-debug'
     | '/events-agent/$threadId'
     | '/events/new'
@@ -1938,6 +1949,7 @@ export interface FileRouteTypes {
     | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
     | '/dev/social-corners'
+    | '/dev/social-sweep'
     | '/dev/ux-debug'
     | '/events-agent/$threadId'
     | '/events/new'
@@ -2077,6 +2089,7 @@ export interface RootRouteChildren {
   DevProposalQaRoute: typeof DevProposalQaRoute
   DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
   DevSocialCornersRoute: typeof DevSocialCornersRoute
+  DevSocialSweepRoute: typeof DevSocialSweepRoute
   DevUxDebugRoute: typeof DevUxDebugRoute
   EventsAgentThreadIdRoute: typeof EventsAgentThreadIdRoute
   ForAdminRoute: typeof ForAdminRoute
@@ -2572,6 +2585,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/ux-debug'
       fullPath: '/dev/ux-debug'
       preLoaderRoute: typeof DevUxDebugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/social-sweep': {
+      id: '/dev/social-sweep'
+      path: '/dev/social-sweep'
+      fullPath: '/dev/social-sweep'
+      preLoaderRoute: typeof DevSocialSweepRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dev/social-corners': {
@@ -3530,6 +3550,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevProposalQaRoute: DevProposalQaRoute,
   DevSlidestageDemoRoute: DevSlidestageDemoRoute,
   DevSocialCornersRoute: DevSocialCornersRoute,
+  DevSocialSweepRoute: DevSocialSweepRoute,
   DevUxDebugRoute: DevUxDebugRoute,
   EventsAgentThreadIdRoute: EventsAgentThreadIdRoute,
   ForAdminRoute: ForAdminRoute,
