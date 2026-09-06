@@ -25,6 +25,7 @@ import searchKnowledge from "@/lib/mcp/tools/search-knowledge";
 import createShareLink from "@/lib/mcp/tools/create-share-link";
 import auditDeckVisuals from "@/lib/mcp/tools/audit-deck-visuals";
 import auditDeckCompleteness from "@/lib/mcp/tools/audit-deck-completeness";
+import exportDeck from "@/lib/mcp/tools/export-deck";
 
 type AnyToolDef = {
   name: string;
@@ -54,6 +55,7 @@ const AGENT_TOOLS: AnyToolDef[] = [
   createShareLink,
   auditDeckVisuals,
   auditDeckCompleteness,
+  exportDeck,
 ] as unknown as AnyToolDef[];
 
 /** Duck-typed ToolContext backed by the caller's Supabase bearer token. */
