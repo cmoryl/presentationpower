@@ -351,14 +351,6 @@ export type StepRepeatPlan = {
     plateShape: StepRepeatQrPlateShape;
   } | null;
 
-  /**
-   * Outliner for text tiles: returns SVG path data (mm, anchored centre) for a
-   * run of copy. Text tiles ship as outlines so a vendor machine without Geist
-   * cannot substitute a face and shift the wall.
-   */
-  outline?: (text: string, sizeMm: number, x: number, y: number) => { d: string };
-  /** Name of the face the outlines came from, recorded as metadata. */
-  faceName?: string;
   /** Ink colour for text tiles. */
   inkHex: string;
   tiles: StepRepeatTile[];
@@ -621,6 +613,14 @@ export type StepRepeatSvgOptions = {
   fontStack: string;
   fontWeight: number;
   tracking: number;
+  /**
+   * Outliner for text tiles: returns SVG path data (mm, anchored centre) for a
+   * run of copy. Text tiles ship as outlines so a vendor machine without Geist
+   * cannot substitute a face and shift the wall.
+   */
+  outline?: (text: string, sizeMm: number, x: number, y: number) => { d: string };
+  /** Name of the face the outlines came from, recorded as metadata. */
+  faceName?: string;
 };
 
 /**
