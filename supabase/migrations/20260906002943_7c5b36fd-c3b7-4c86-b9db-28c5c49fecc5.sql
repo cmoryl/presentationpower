@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS london_signage_revisions_rev_key ON public.london_signage_revisions (rev);
