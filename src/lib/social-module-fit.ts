@@ -83,7 +83,26 @@ export const SOCIAL_RELIEF_LADDER: SocialFitRelief[] = [
     dropMeta: true,
     note: "Headline-only reduction — consider a compact module",
   },
+  {
+    level: 5,
+    pageWidthScale: 1.72,
+    icons: false,
+    maxItems: 2,
+    dropSummary: true,
+    dropMeta: true,
+    note: "Condensed for a banner strip",
+  },
+  {
+    level: 6,
+    pageWidthScale: 1.98,
+    icons: false,
+    maxItems: 1,
+    dropSummary: true,
+    dropMeta: true,
+    note: "Fully condensed banner — single proof point",
+  },
 ];
+
 
 export const SOCIAL_RELIEF_MAX = SOCIAL_RELIEF_LADDER.length - 1;
 
@@ -184,7 +203,9 @@ export function pageWidthFor(relief: SocialFitRelief, growth = 1): number {
  * loop cannot oscillate: growth only ever steps up, and only while the
  * measured fill stays under the comfortable band.
  */
-export const SOCIAL_GROWTH_STEPS = [1, 1.12, 1.26, 1.42, 1.6, 1.8] as const;
+export const SOCIAL_GROWTH_STEPS = [
+  1, 1.12, 1.26, 1.42, 1.6, 1.8, 2.02, 2.26, 2.5, 2.8, 3.15, 3.55, 4,
+] as const;
 export const SOCIAL_GROWTH_MAX = SOCIAL_GROWTH_STEPS.length - 1;
 
 function clampGrowth(growth: number): number {
@@ -203,7 +224,7 @@ function clampGrowth(growth: number): number {
  * Same monotonic discipline as growth: quantized rungs, step up only, ceiling
  * pinned the moment a rung overflows.
  */
-export const SOCIAL_AIR_STEPS = [1, 1.25, 1.55, 1.9, 2.3] as const;
+export const SOCIAL_AIR_STEPS = [1, 1.25, 1.55, 1.9, 2.3, 2.8, 3.4, 4.1, 4.9] as const;
 export const SOCIAL_AIR_MAX = SOCIAL_AIR_STEPS.length - 1;
 
 function clampAir(air: number): number {
@@ -221,17 +242,65 @@ export const SOCIAL_FILL_TARGET = 0.86;
 export function fillTargetFor(format: SocialFormat): number {
   switch (aspectClass(format)) {
     case "landscape-wide":
-      return 0.74;
+      return 0.84;
     case "landscape":
-      return 0.82;
+      return 0.88;
     case "square":
-      return 0.9;
+      return 0.94;
     case "portrait":
-      return 0.9;
+      return 0.94;
     case "portrait-tall":
-      return 0.86;
+      return 0.92;
   }
 }
+
+/**
+ * SHAPE-AWARE LADDER CEILINGS
+ * ------------------------------------------------------------------------
+ * Tall frames (square / portrait / story) were the ones reading under-filled:
+ * they need to enlarge much further than a landscape frame before the module
+ * reaches the safe rect. Wide banner strips have the opposite problem — they
+ * must condense, so their enlargement ladders stay short.
+ */
+export function growthMaxFor(format: SocialFormat): number {
+  switch (aspectClass(format)) {
+    case "landscape-wide":
+      return 2;
+    case "landscape":
+      return 4;
+    case "square":
+    case "portrait":
+    case "portrait-tall":
+      return SOCIAL_GROWTH_MAX;
+  }
+}
+
+export function airMaxFor(format: SocialFormat): number {
+  switch (aspectClass(format)) {
+    case "landscape-wide":
+      return 2;
+    case "landscape":
+      return 3;
+    case "square":
+    case "portrait":
+    case "portrait-tall":
+      return SOCIAL_AIR_MAX;
+  }
+}
+
+/**
+ * Relief rung a frame shape *starts* at. A banner strip is roughly 1:3, so a
+ * page module authored for a portrait sheet can never fit it at native
+ * proportions — starting condensed removes the guaranteed-overflow rungs and
+ * gives every module a banner layout that fits, instead of one that clips.
+ */
+export function reliefFloorFor(format: SocialFormat, density?: "compact" | "standard" | "tall") {
+  const cls = aspectClass(format);
+  if (cls === "landscape-wide") return density === "compact" ? 2 : density === "tall" ? 4 : 3;
+  if (cls === "landscape") return density === "tall" ? 2 : 1;
+  return 0;
+}
+
 
 /**
  * Next growth rung to try, or null when the module already reads full enough

@@ -771,6 +771,7 @@ export function KitWizard({
                   brandId={brandId}
                   mode={mode === "light" ? "light" : "dark"}
                   displayShortEdge={240}
+                  density={moduleLayout.density}
                 />
               </div>
             ) : null}
@@ -1276,6 +1277,7 @@ export function KitWizard({
                                 brandId={asset.brandId}
                                 mode={asset.mode === "light" ? "light" : "dark"}
                                 displayShortEdge={displayShortEdge}
+                                density={moduleLayout.density}
                               />
                             ) : nextDesign ? (
                               <NextRenderer
@@ -1396,6 +1398,7 @@ export function KitWizard({
                       brandId={asset.brandId}
                       mode={asset.mode === "light" ? "light" : "dark"}
                       displayShortEdge={shortEdge}
+                      density={moduleLayout.density}
                     />
                   ) : nextDesign ? (
                     <NextRenderer
