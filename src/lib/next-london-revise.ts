@@ -850,24 +850,35 @@ export function buildLondonPanelAi(
       )
     : fillOp(brand.colourway === "dblue" ? "#03002C" : "#FFFFFF");
 
+  // Copy is OUTLINED into filled path objects — no /Font resource, no Tj, so a
+  // RIP cannot substitute a face. Centring uses the font's true advance.
+  const face = options.face ?? londonSignageFace();
+  const outlineOps = (d: string): string =>
+    svgPathToPdfOps(d, { scale: MM_TO_PT, x: 0, y: 0, artHeight: panel.bleedH });
+
   const copyOps = brand.copy
     ? (() => {
-        const size = brand.copySizeMm * MM_TO_PT;
-        const tracking = size * brand.copyTrackingEm;
-        const advance = brand.copy.length * (size * 0.62 + tracking);
-        const ax = brand.copyCentreMm * MM_TO_PT;
-        const ay = h - brand.copyBaselineMm * MM_TO_PT;
+        const run = outlineText(face, brand.copy, {
+          sizeMm: brand.copySizeMm,
+          trackingEm: brand.copyTrackingEm,
+          anchor: "middle",
+          x: brand.copyCentreMm,
+          y: brand.copyBaselineMm,
+          vertical: brand.copyVertical,
+        });
+        const ops = outlineOps(run.d);
+        if (!ops) return "";
         // Copy on a CMYK master follows the print contract: dark copy is 100K,
         // knockout copy is 0/0/0/0 — never a four-colour build.
-        // Vertical copy is a live text object rotated -90°, so it runs down the
-        // pillar and still re-types in Illustrator.
-        const tm = brand.copyVertical
-          ? `0 -1 1 0 ${f3(ax)} ${f3(ay + advance / 2)} Tm`
-          : `1 0 0 1 ${f3(ax - advance / 2)} ${f3(ay)} Tm`;
-        return (
-          `q ${copyInk} BT /F1 ${f3(size)} Tf ${f3(tracking)} Tc ` +
-          `${tm} (${pdfText(brand.copy)}) Tj ET Q\n`
-        );
+        // Vertical copy is the same outline run, rotated -90° about its anchor
+        // (the y-flip mirror of the SVG master's rotate(90 …)).
+        let spin = "";
+        if (brand.copyVertical) {
+          const px = brand.copyCentreMm * MM_TO_PT;
+          const py = h - brand.copyBaselineMm * MM_TO_PT;
+          spin = `0 -1 1 0 ${f3(px - py)} ${f3(py + px)} cm `;
+        }
+        return `q ${spin}${copyInk} ${ops} f Q\n`;
       })()
     : "";
 
@@ -892,20 +903,20 @@ export function buildLondonPanelAi(
         const code = modules ? `q ${fillOp(q.moduleInk)} ${modules} f Q\n` : "";
         const caption = q.caption
           ? (() => {
-              const cs = q.captionSizeMm * MM_TO_PT;
-              const advance = q.caption.length * cs * 0.62;
-              const anchorX = q.captionX * MM_TO_PT;
-              const cx =
-                q.captionAnchor === "start"
-                  ? anchorX
-                  : q.captionAnchor === "end"
-                    ? anchorX - advance
-                    : anchorX - advance / 2;
-              const cy = h - (q.y + q.size + pad + q.captionPadMm + q.captionSizeMm) * MM_TO_PT;
-              return (
-                `q ${copyInk} BT /F1 ${f3(cs)} Tf 1 0 0 1 ${f3(cx)} ${f3(cy)} Tm ` +
-                `(${pdfText(q.caption)}) Tj ET Q\n`
-              );
+              const run = outlineText(face, q.caption, {
+                sizeMm: q.captionSizeMm,
+                trackingEm: q.captionTracking,
+                anchor:
+                  q.captionAnchor === "end"
+                    ? "end"
+                    : q.captionAnchor === "start"
+                      ? "start"
+                      : "middle",
+                x: q.captionX,
+                y: q.y + q.size + pad + q.captionPadMm + q.captionSizeMm,
+              });
+              const ops = outlineOps(run.d);
+              return ops ? `q ${copyInk} ${ops} f Q\n` : "";
             })()
           : "";
         return plate + code + caption;
@@ -917,7 +928,19 @@ export function buildLondonPanelAi(
   // lists the hero lockup FIRST, so it is the top layer when the .ai is opened.
   // A photo wall's top layer is the repeat field itself: every mark, text tile
   // and QR is a live PDF object, so the wall stays fully editable in Illustrator.
-  const wallOps = wall ? stepRepeatPdfOps(wall, h, fillOp, copyInk) : "";
+  const wallOps = wall
+    ? stepRepeatPdfOps(wall, h, fillOp, copyInk, (text, sizeMm, x, y) =>
+        outlineOps(
+          outlineText(face, text, {
+            sizeMm,
+            trackingEm: LONDON_SIGNAGE_FONT.tracking,
+            anchor: "middle",
+            x,
+            y,
+          }).d,
+        ),
+      )
+    : "";
 
   // Ground: the vendor's placed artwork when supplied (zoom/pan honoured),
   // otherwise the live gradient shading.
@@ -973,7 +996,11 @@ export function buildLondonPanelAi(
       `/TPGradientKind /LiveShading /TPLockup (${pdfText(brand.art.source)}) ` +
       `/TPColorSpace (${cmyk ? `DeviceCMYK vibrant${vibrance}` : "DeviceRGB"}) ` +
       `/TPLockupColourway (${pdfText(brand.colourway)}) ` +
-      `/Resources << /Shading << /Sh0 6 0 R >> /Font << /F1 7 0 R >> ` +
+      `${brand.copy ? `/TPCopy (${pdfText(brand.copy)}) ` : ""}` +
+      `${brand.qr ? `/TPQr (${pdfText(brand.qr.data)}) ` : ""}` +
+      `${wall ? `/TPCopy (${pdfText(wall.config.text)}) ` : ""}` +
+      `/TPText 7 0 R ` +
+      `/Resources << /Shading << /Sh0 6 0 R >> ` +
       `${groundImage ? "/XObject << /ImGround 11 0 R >> " : ""}` +
       `/ExtGState << /GsWall << /Type /ExtGState /ca ${f3(wall ? wall.config.opacity : 1)} >> ${brewGs}>> ` +
       `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R >> >> /Contents 4 0 R >>`,
@@ -981,8 +1008,13 @@ export function buildLondonPanelAi(
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
       `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)} · ${pdfText(`${brand.orientation === "side" ? "side-by-side" : "stacked"} ${brand.colourway} lockup`)}) >>`,
     shadingDict,
-    `<< /Type /Font /Subtype /TrueType /BaseFont /${LONDON_SIGNAGE_FONT.pdfBaseFont} ` +
-      `/Encoding /WinAnsiEncoding /FirstChar 32 /LastChar 255 >>`,
+    // Object 7 used to be the (un-embedded) /Font. All copy is outlined now, so
+    // it carries the text as metadata instead — the object slot is kept so the
+    // OCG object numbers below stay stable.
+    `<< /Type /TPTextRecord /TPOutlined true /TPFace (${pdfText(face.name)})` +
+      `${brand.copy ? ` /TPCopy (${pdfText(brand.copy)})` : ""}` +
+      `${wall ? ` /TPCopy (${pdfText(wall.config.text)})` : ""}` +
+      `${brand.qr ? ` /TPQr (${pdfText(brand.qr.data)})` : ""} >>`,
     `<< /Type /OCG /Name (${wall ? "Step & repeat" : "Hero lockup"}) >>`,
     `<< /Type /OCG /Name (Copy) >>`,
     `<< /Type /OCG /Name (Ground) >>`,
