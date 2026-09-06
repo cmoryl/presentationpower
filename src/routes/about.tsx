@@ -42,6 +42,26 @@ type Pillar = {
 
 const CHANGELOG: Array<{ date: string; title: string; body: string }> = [
   {
+    date: "2026-09",
+    title: "NEXT London signage kit — outlined masters, gated downloads, live revisions",
+    body: "The London hub always shows the revision in force. Headline, caption and wall copy are outlined vector paths in every master, so no font travels with the file; every .svg, .ai and .png passes the signage QA gate before it is written; files are stamped with the published revision, or rdraft- when unpublished; and publishing pushes live to open pages. Step-and-repeat walls, door vinyls, four master pillars, booth artwork, print previews with trim/bleed/safe guides and click-to-enlarge thumbnails are all editable in place. CMYK output stays switched off until every colour stop has an approved press build.",
+  },
+  {
+    date: "2026-09",
+    title: "Floor maps, multi-day agendas and city badges",
+    body: "Top-down venue maps across seven floors with area icons, drawable custom areas, a branded design panel, an attendee-facing rooms-only mode, and PDF/SVG/CSV/ZIP export. Agendas run multi-day and multi-page with division listings and light/dark faces, and hub preview cards refresh the moment you save. City badge packs tell you the true standard of the file, warn when the PDF/X-4 wrap fails, and never rasterise authoring guides.",
+  },
+  {
+    date: "2026-09",
+    title: "Connector delivery — a finished deck from ChatGPT",
+    body: "The MCP connector now hands over the download as the deliverable: a complete, layered, editable PowerPoint file. It prefers module variants with a native PowerPoint renderer, flags each slide for pixel-true export, and only offers an optional in-app link when a large share of slides use heavy design plates.",
+  },
+  {
+    date: "2026-09",
+    title: "New proof & capability modules",
+    body: "Numbered phases, Growth proof split (logo wall + orbit statistics with collision handling and per-figure number formatting), Credential proof split (frameless credential marks, light and dark faces, editable stat design), Capability cards, and Device screen + benefits. All carry real company figures and export as editable PowerPoint objects.",
+  },
+  {
     date: "2026-08",
     title: "Element identity + Element System style packs (S29 · S30)",
     body: "The platform is TransPerfect Element. A dedicated Element product skin ships in light (S29) and dark (S30) with the five-brick Element logo, vibrant Element palette, and authored Element background plates — never the TransPerfect wordmark.",
