@@ -37,7 +37,8 @@ import {
 } from "@/lib/social-module-fit";
 
 import { applyReliefToSection } from "@/lib/social-module-layouts";
-import { socialTallSection, tallShellFit, tallShellGeometry } from "@/lib/social-tall-layouts";
+import { tallShellFit, tallShellGeometry } from "@/lib/social-tall-layouts";
+import { socialReflowSection } from "@/lib/social-reflow";
 import { SocialTallShell } from "@/components/campaigns/SocialTallShell";
 
 const SETTLE_BUDGET = 64;
@@ -111,10 +112,11 @@ export function SocialModuleFrame({
   const sectionKey = `${section.id}|${(section as { variantId?: string }).variantId ?? ""}|${JSON.stringify(section).length}`;
   const pinned = typeof reliefLevel === "number";
   const relief = reliefAt(pinned ? (reliefLevel as number) : autoLevel);
-  // Thin strips (inline quote, credential pills, icon strip, CTA band, expert
-  // card) are re-composed on their tall counterpart before anything is
-  // measured — no ladder can make a strip fill a story frame.
-  const tall = useMemo(() => socialTallSection(section, aspectClass(format)), [section, format]);
+  // Every module is relaid out for the shape first: the frame renders the
+  // sibling variant in the same family whose authored density suits this aspect
+  // (stacked for story/portrait, condensed for a wide banner). Only then do the
+  // fit ladders run — no amount of scaling turns a strip into a story.
+  const tall = useMemo(() => socialReflowSection(section, aspectClass(format)), [section, format]);
   const rendered = useMemo(() => applyReliefToSection(tall.section, relief), [tall, relief]);
   const growth = SOCIAL_GROWTH_STEPS[Math.min(growthIndex, growthCeiling.current)];
   const air = SOCIAL_AIR_STEPS[Math.min(airIndex, airCeiling.current)];
@@ -125,10 +127,11 @@ export function SocialModuleFrame({
   const naturalHeight = measured.h;
   const fresh = measured.key === measureKey;
 
-  // A restacked strip still needs a designed tall composition: the module goes
-  // on a raised panel that spans the safe rect, so the module is budgeted
+  // A restacked thin strip additionally needs a designed tall composition: the
+  // module goes on a raised panel spanning the safe rect, so it is budgeted
   // against the panel's inner height rather than the whole frame.
-  const shell = useMemo(() => (tall.plan ? tallShellGeometry(safe) : null), [tall.plan, safe]);
+  const useShell = tall.plan?.source === "curated";
+  const shell = useMemo(() => (useShell ? tallShellGeometry(safe) : null), [useShell, safe]);
 
   const rawFit = useMemo(
     () =>
