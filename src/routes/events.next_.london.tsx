@@ -325,6 +325,19 @@ function LondonSignagePage() {
   const artOptions = (panel: LondonPanel) => londonOverrideOptions(panel.id, headOverrides);
   const fileBase = (panel: LondonPanel) => londonPanelFileBase(panel, headRev);
 
+  // Previews outline their copy with the shipped signage face. Until it is in
+  // memory the synchronous builder throws by design, so the tile simply stays
+  // blank rather than taking the whole page down with it.
+  const previewSvg = (panel: LondonPanel): string | undefined => {
+    if (!faceReady) return undefined;
+    try {
+      return londonPanelSvgFor(panel, artwork, artOptions(panel));
+    } catch {
+      return undefined;
+    }
+  };
+
+
   const packOrNull = async () => {
     if (artwork) return artwork;
     try {
