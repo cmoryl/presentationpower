@@ -244,9 +244,9 @@
     "verdant-corporate"
   ],
   "jobs": 6330,
-  "verifiedAt": "2026-09-06T02:39:10.750Z",
+  "verifiedAt": "2026-09-06T03:15:13.429Z",
   "coverage": "sampled",
-  "verifiedCells": 1128,
+  "verifiedCells": 1132,
   "sampledVariants": [
     "MV-BENTO-5",
     "MV-BENTO-6",
@@ -414,9 +414,11 @@
     "MV-REC-NEXT",
     "MV-RISK-MITIGATION",
     "MV-ROADMAP-QUARTERS",
+    "MV-SHOW-DEVICE-QUAD",
     "MV-SHOW-LAPTOP",
     "MV-SHOW-MONITOR",
     "MV-SOL-ARCHITECTURE",
+    "MV-SOL-CAP-CARDS",
     "MV-SOL-FEATURE-LIST",
     "MV-SOL-PILLARS-2",
     "MV-SOL-PILLARS-3",

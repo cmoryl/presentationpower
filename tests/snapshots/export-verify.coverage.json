@@ -1,6 +1,6 @@
 {
   "fingerprint": "e8601562",
-  "updatedAt": "2026-09-06T02:39:10.735Z",
+  "updatedAt": "2026-09-06T03:15:13.416Z",
   "cells": {
     "base@light": [
       "MV-BENTO-5",
@@ -169,9 +169,11 @@
       "MV-REC-NEXT",
       "MV-RISK-MITIGATION",
       "MV-ROADMAP-QUARTERS",
+      "MV-SHOW-DEVICE-QUAD",
       "MV-SHOW-LAPTOP",
       "MV-SHOW-MONITOR",
       "MV-SOL-ARCHITECTURE",
+      "MV-SOL-CAP-CARDS",
       "MV-SOL-FEATURE-LIST",
       "MV-SOL-PILLARS-2",
       "MV-SOL-PILLARS-3",
@@ -380,9 +382,11 @@
       "MV-REC-NEXT",
       "MV-RISK-MITIGATION",
       "MV-ROADMAP-QUARTERS",
+      "MV-SHOW-DEVICE-QUAD",
       "MV-SHOW-LAPTOP",
       "MV-SHOW-MONITOR",
       "MV-SOL-ARCHITECTURE",
+      "MV-SOL-CAP-CARDS",
       "MV-SOL-FEATURE-LIST",
       "MV-SOL-PILLARS-2",
       "MV-SOL-PILLARS-3",
