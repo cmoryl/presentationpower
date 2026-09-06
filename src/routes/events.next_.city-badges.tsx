@@ -74,7 +74,7 @@ function CityBadgePage() {
   );
   const [versionName, setVersionName] = useState("City Series · Q4 run");
   const [notes, setNotes] = useState("");
-  const [guides, setGuides] = useState(true);
+  const [guides, setGuides] = useState(false);
   const [busy, setBusy] = useState(false);
   const plateRef = useRef<HTMLDivElement | null>(null);
   const backRef = useRef<HTMLDivElement | null>(null);
