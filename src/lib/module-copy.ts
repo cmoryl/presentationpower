@@ -79,6 +79,16 @@ const AUTHORED: Record<string, ModuleCopy> = {
     description:
       "A split proof slide: a logo wall plus numbered growth figures on the left, up to three headline percentages in hairline orbit rings on the right. Use it for a corporate update where both scale and behavioural data need to land together.",
   },
+  "MV-SOL-CAP-CARDS": {
+    caption: "Capability cards with photo, label band and bullets",
+    description:
+      "Two to four parallel cards, each led by its own photograph, a filled label band and a headline claim over a short bullet list. Use it when a story splits cleanly into named tracks — technology, services, products — and each track needs equal weight.",
+  },
+  "MV-SHOW-DEVICE-QUAD": {
+    caption: "Product screen beside a quad of icon benefits",
+    description:
+      "A device mockup carrying the product screen on one side, with two to six icon benefits set in a quad grid alongside. Use it when the interface itself is the proof and the payoffs need naming in a glance.",
+  },
   "MV-PROOF-CERT-ORBITS": {
     caption: "Certification card beside credential orbit rings",
     description:

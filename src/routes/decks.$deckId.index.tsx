@@ -123,6 +123,8 @@ import { LogoWallPanel } from "@/components/slide/LogoWallPanel";
 import { OrbitStylePanel } from "@/components/slide/OrbitStylePanel";
 import { OrbitContentPanel } from "@/components/slide/OrbitContentPanel";
 import { CertStylePanel } from "@/components/slide/CertStylePanel";
+import { CapabilityCardsPanel } from "@/components/slide/CapabilityCardsPanel";
+import { DeviceQuadPanel } from "@/components/slide/DeviceQuadPanel";
 
 import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPanel";
 
@@ -1585,6 +1587,43 @@ function DeckEditor() {
               )}
 
 
+              {/* Capability cards — structure, per-card imagery and card design */}
+              {active && mv && mv.id === "MV-SOL-CAP-CARDS" && (
+                <div className="mt-6">
+                  <CapabilityCardsPanel
+                    key={`cap-${active.id}`}
+                    cards={(active.content as Record<string, unknown>).cards}
+                    style={(active.content as Record<string, unknown>).capCardStyle}
+                    divisionId={deck.brandModeId}
+                    onChangeCards={(cards) => updateField(deck.id, active.id, "cards", cards)}
+                    onChangeStyle={(next) =>
+                      updateField(deck.id, active.id, "capCardStyle", next)
+                    }
+                  />
+                </div>
+              )}
+
+              {/* Device screen + benefit quad — benefits grid and layout knobs */}
+              {active && mv && mv.id === "MV-SHOW-DEVICE-QUAD" && (
+                <div className="mt-6">
+                  <DeviceQuadPanel
+                    key={`quad-${active.id}`}
+                    benefits={(active.content as Record<string, unknown>).benefits}
+                    style={(active.content as Record<string, unknown>).quadStyle}
+                    deviceKind={(active.content as Record<string, unknown>).deviceKind}
+                    deviceTone={(active.content as Record<string, unknown>).deviceTone}
+                    brandModeId={deck.brandModeId}
+                    onChangeBenefits={(rows) =>
+                      updateField(deck.id, active.id, "benefits", rows)
+                    }
+                    onChangeStyle={(next) => updateField(deck.id, active.id, "quadStyle", next)}
+                    onChangeField={(field, value) =>
+                      updateField(deck.id, active.id, field, value)
+                    }
+                  />
+                </div>
+              )}
+
               {/* Locations pin editor — only for MV-LOC-* variants */}
 
               {active && mv && mv.id.startsWith("MV-LOC-") && (
@@ -1680,7 +1719,8 @@ function DeckEditor() {
                             <SlideImageryPanel
                               title={
                                 active.variantId === "MV-SHOW-LAPTOP" ||
-                                active.variantId === "MV-SHOW-MONITOR"
+                                active.variantId === "MV-SHOW-MONITOR" ||
+                                active.variantId === "MV-SHOW-DEVICE-QUAD"
                                   ? "Device screen image"
                                   : undefined
                               }

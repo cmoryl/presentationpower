@@ -525,6 +525,8 @@ export const GROUND_BY_LAYOUT: Partial<Record<string, EnterpriseGroundId>> = {
   "MV-PROOF-LOGOS": "quiet",
   "MV-PROOF-GROWTH-ORBITS": "quiet",
   "MV-PROOF-CERT-ORBITS": "quiet",
+  "MV-SOL-CAP-CARDS": "quiet",
+  "MV-SHOW-DEVICE-QUAD": "quiet",
   "MV-PROOF-LOGOS-STRIP": "media-shelf",
   "MV-PROOF-LOGOS-MARQUEE": "media-shelf",
   "MV-PROOF-LOGOS-FEATURED": "quiet",
