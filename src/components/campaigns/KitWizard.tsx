@@ -455,6 +455,20 @@ export function KitWizard({
     });
   };
 
+  const toggleFormatGroup = (ids: string[]) => {
+    setFormatIds((prev) => {
+      const allOn = ids.every((id) => prev.includes(id));
+      return allOn ? prev.filter((x) => !ids.includes(x)) : [...new Set([...prev, ...ids])];
+    });
+    setRemoved((prev) => {
+      const next = new Set(prev);
+      for (const key of next) {
+        if (ids.some((id) => key.includes(`:${id}:`))) next.delete(key);
+      }
+      return next;
+    });
+  };
+
   const currentStepKey = WIZARD_STEPS[step]?.key;
   const canNext = (() => {
     if (currentStepKey === "content") return manualCopy.title.trim().length > 0;
