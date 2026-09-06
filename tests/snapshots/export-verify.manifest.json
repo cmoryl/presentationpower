@@ -1,5 +1,5 @@
 {
-  "fingerprint": "4770fb39",
+  "fingerprint": "e8601562",
   "variants": [
     "MV-BENTO-5",
     "MV-BENTO-6",
@@ -167,9 +167,11 @@
     "MV-REC-NEXT",
     "MV-RISK-MITIGATION",
     "MV-ROADMAP-QUARTERS",
+    "MV-SHOW-DEVICE-QUAD",
     "MV-SHOW-LAPTOP",
     "MV-SHOW-MONITOR",
     "MV-SOL-ARCHITECTURE",
+    "MV-SOL-CAP-CARDS",
     "MV-SOL-FEATURE-LIST",
     "MV-SOL-PILLARS-2",
     "MV-SOL-PILLARS-3",
@@ -241,10 +243,10 @@
     "vapor-chrome",
     "verdant-corporate"
   ],
-  "jobs": 6270,
-  "verifiedAt": "2026-09-05T23:10:44.692Z",
+  "jobs": 6330,
+  "verifiedAt": "2026-09-06T02:39:10.750Z",
   "coverage": "sampled",
-  "verifiedCells": 904,
+  "verifiedCells": 1128,
   "sampledVariants": [
     "MV-BENTO-5",
     "MV-BENTO-6",

@@ -1,6 +1,6 @@
 {
-  "fingerprint": "4770fb39",
-  "updatedAt": "2026-09-05T23:10:44.688Z",
+  "fingerprint": "e8601562",
+  "updatedAt": "2026-09-06T02:39:10.735Z",
   "cells": {
     "base@light": [
       "MV-BENTO-5",
@@ -442,7 +442,15 @@
       "MV-CLOSE-CHECKLIST",
       "MV-CLOSE-CONTACT",
       "MV-CLOSE-CTA",
-      "MV-CLOSE-DECISION"
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "atelier-lumen@light": [
       "MV-BENTO-5",
@@ -463,7 +471,15 @@
       "MV-CLOSE-CONTACT",
       "MV-CLOSE-CTA",
       "MV-CLOSE-DECISION",
-      "MV-CLOSE-DUAL-CTA"
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "atelier-orange@light": [
       "MV-BENTO-5",
@@ -485,7 +501,15 @@
       "MV-CLOSE-CTA",
       "MV-CLOSE-DECISION",
       "MV-CLOSE-DUAL-CTA",
-      "MV-CLOSE-METRIC-PROMISE"
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "azulejo-tile@light": [
       "MV-BENTO-5",
@@ -507,7 +531,15 @@
       "MV-CLOSE-CTA",
       "MV-CLOSE-DECISION",
       "MV-CLOSE-DUAL-CTA",
-      "MV-CLOSE-METRIC-PROMISE"
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "basalt-mono@dark": [
       "MV-BENTO-5",
@@ -527,7 +559,15 @@
       "MV-CLOSE-CHECKLIST",
       "MV-CLOSE-CONTACT",
       "MV-CLOSE-CTA",
-      "MV-CLOSE-DECISION"
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "comic-panel@light": [
       "MV-BENTO-5",
@@ -546,7 +586,15 @@
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
       "MV-CLOSE-CONTACT",
-      "MV-CLOSE-CTA"
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "desert-clay@light": [
       "MV-BENTO-5",
@@ -565,7 +613,15 @@
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
       "MV-CLOSE-CONTACT",
-      "MV-CLOSE-CTA"
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "marble-aureate@light": [
       "MV-BENTO-5",
@@ -583,7 +639,15 @@
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
-      "MV-CLOSE-CONTACT"
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "optic-moire@light": [
       "MV-BENTO-5",
@@ -600,7 +664,15 @@
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
-      "MV-CLOSE-CHECKLIST"
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "sage-linen@light": [
       "MV-BENTO-5",
@@ -618,7 +690,15 @@
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
-      "MV-CLOSE-CONTACT"
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "blueprint-cyan@dark": [
       "MV-BENTO-5",
@@ -639,7 +719,15 @@
       "MV-CLOSE-CONTACT",
       "MV-CLOSE-CTA",
       "MV-CLOSE-DECISION",
-      "MV-CLOSE-DUAL-CTA"
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "cyber-terminal@dark": [
       "MV-BENTO-5",
@@ -658,7 +746,15 @@
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
       "MV-CLOSE-CONTACT",
-      "MV-CLOSE-CTA"
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "graphite-chrome@dark": [
       "MV-BENTO-5",
@@ -676,7 +772,15 @@
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
-      "MV-CLOSE-CTA"
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "neo-brutal@light": [
       "MV-BENTO-5",
@@ -694,7 +798,15 @@
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
-      "MV-CLOSE-CONTACT"
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "retro-arcade@dark": [
       "MV-BENTO-5",
@@ -712,7 +824,15 @@
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
-      "MV-CLOSE-CONTACT"
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "vapor-chrome@light": [
       "MV-BENTO-5",
@@ -729,7 +849,15 @@
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
-      "MV-CLOSE-CHECKLIST"
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "cobalt-proposal@light": [
       "MV-BENTO-5",
@@ -751,7 +879,15 @@
       "MV-CLOSE-CTA",
       "MV-CLOSE-DECISION",
       "MV-CLOSE-DUAL-CTA",
-      "MV-CLOSE-METRIC-PROMISE"
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "deco-marquee@dark": [
       "MV-BENTO-5",
@@ -771,7 +907,15 @@
       "MV-CLOSE-CHECKLIST",
       "MV-CLOSE-CONTACT",
       "MV-CLOSE-CTA",
-      "MV-CLOSE-DECISION"
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "herbarium-press@light": [
       "MV-BENTO-5",
@@ -790,7 +934,15 @@
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
       "MV-CLOSE-CONTACT",
-      "MV-CLOSE-CTA"
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "onyx-couture@dark": [
       "MV-BENTO-5",
@@ -809,7 +961,15 @@
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
       "MV-CLOSE-CONTACT",
-      "MV-CLOSE-DECISION"
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "riso-woodcut@light": [
       "MV-BENTO-5",
@@ -828,7 +988,15 @@
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
       "MV-CLOSE-CONTACT",
-      "MV-CLOSE-CTA"
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "verdant-corporate@dark": [
       "MV-BENTO-5",
@@ -846,7 +1014,15 @@
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
-      "MV-CLOSE-CONTACT"
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "bauhaus-primary@light": [
       "MV-BENTO-5",
@@ -867,7 +1043,15 @@
       "MV-CLOSE-CONTACT",
       "MV-CLOSE-CTA",
       "MV-CLOSE-DECISION",
-      "MV-CLOSE-DUAL-CTA"
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "crimson-editorial@light": [
       "MV-BENTO-5",
@@ -888,7 +1072,15 @@
       "MV-CLOSE-CONTACT",
       "MV-CLOSE-CTA",
       "MV-CLOSE-DECISION",
-      "MV-CLOSE-DUAL-CTA"
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "editorial-serif@light": [
       "MV-BENTO-5",
@@ -908,7 +1100,15 @@
       "MV-CLOSE-CHECKLIST",
       "MV-CLOSE-CONTACT",
       "MV-CLOSE-CTA",
-      "MV-CLOSE-DECISION"
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "midnight-neon@dark": [
       "MV-BENTO-5",
@@ -927,7 +1127,15 @@
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
       "MV-CLOSE-CONTACT",
-      "MV-CLOSE-CTA"
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "quant-grid@dark": [
       "MV-BENTO-5",
@@ -945,7 +1153,15 @@
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
-      "MV-CLOSE-CONTACT"
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ],
     "swiss-noir@light": [
       "MV-BENTO-5",
@@ -964,7 +1180,15 @@
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
       "MV-CLOSE-CONTACT",
-      "MV-CLOSE-DECISION"
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-SPLIT",
+      "MV-COUNTDOWN",
+      "MV-GRAPH-TREEMAP",
+      "MV-OP-COVER",
+      "MV-PROC-TIMELINE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-QUOTE-METRIC",
+      "MV-VIZ-RADAR"
     ]
   }
 }
