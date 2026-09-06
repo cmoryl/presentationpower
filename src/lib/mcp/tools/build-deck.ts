@@ -4,6 +4,7 @@ import { errorResult, supabaseForUser, textResult } from "../supabase";
 import { auditVisualData } from "@/lib/agent/visual-data-gaps";
 import { resolveVariantSwap, applyIcon } from "@/lib/slide-ops";
 import { stylePackById } from "@/lib/style-packs";
+import { hasNativeVariantEmitter } from "@/lib/export-native-variants";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
 
 /**
