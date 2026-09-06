@@ -211,7 +211,16 @@ export function SocialModuleFrame({
       <div
         style={{ width: format.width * displayScale, height: format.height * displayScale }}
         className="relative overflow-hidden"
+        data-social-fit={fit.ok ? (fit.sparse ? "sparse" : "ok") : "overflow"}
+        data-social-fit-format={format.id}
+        data-social-fit-fill={Math.round(fit.fillPct * 100)}
+        data-social-fit-overflow={Math.round(fit.overflowPct * 100)}
+        data-social-fit-relief={relief.level}
+        data-social-fit-growth={growth}
+        data-social-fit-air={air}
+
       >
+
         <div
           style={{
             width: format.width,
