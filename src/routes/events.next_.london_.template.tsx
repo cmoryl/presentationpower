@@ -224,6 +224,7 @@ function LondonTemplatePage() {
     async (kind: "svg" | "ai") => {
       await loadLondonSignageFace();
       const base = londonPanelFileBase(panel, headRev, colorSpace);
+      try {
       let blob: Blob;
       if (kind === "svg") {
         const svgOut = buildLondonPanelSvg(panel, art);
@@ -240,7 +241,10 @@ function LondonTemplatePage() {
       link.download = `${base}.${kind}`;
       link.click();
       URL.revokeObjectURL(url);
-      toast.success(`${base}.${kind} downloaded · ${colorSpace.toUpperCase()}`);
+        toast.success(`${base}.${kind} downloaded · ${colorSpace.toUpperCase()}`);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Download blocked by QA");
+      }
     },
     [panel, art, colorSpace, headRev],
   );
