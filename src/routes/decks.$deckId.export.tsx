@@ -44,7 +44,13 @@ import type { ImageCompatReport } from "@/lib/export-image-report";
 import type { PptxValidationReport } from "@/lib/pptx-validate";
 import type { VisualValidationReport } from "@/lib/pptx-visual-validate";
 
-import { writeExportFidelity, type ExportFidelityId } from "@/lib/export-quality";
+import {
+  writeExportFidelity,
+  readExportFidelity,
+  visualThresholdFor,
+  type ExportFidelityId,
+} from "@/lib/export-quality";
+
 import { ArrowOverlapCheck } from "@/components/export/ArrowOverlapCheck";
 import { MobileDeckExport } from "@/components/export/MobileDeckExport";
 
@@ -67,8 +73,10 @@ export const Route = createFileRoute("/decks/$deckId/export")({
     fidelity:
       search["fidelity"] === "editable" ||
       search["fidelity"] === "layered" ||
+      search["fidelity"] === "build" ||
       search["fidelity"] === "exact"
         ? search["fidelity"]
+
         : undefined,
   }),
   component: ExportGate,
@@ -323,7 +331,14 @@ function ExportView() {
             });
           },
         });
-        visual = await validateExportedPptxVisuals(blob, refs);
+        // Exact Build Fidelity is held to the 99% target; looser modes keep
+        // their historical drift budget.
+        visual = await validateExportedPptxVisuals(
+          blob,
+          refs,
+          visualThresholdFor(readExportFidelity()),
+        );
+
       } catch (e) {
         console.warn("[deck-export-visual-validate] visual check unavailable:", e);
       }

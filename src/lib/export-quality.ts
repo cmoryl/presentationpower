@@ -162,13 +162,18 @@ export function writeExportQuality(id: ExportQualityId) {
 // Independently editable objects are the product, so "editable" is the default.
 // -----------------------------------------------------------------------------
 
-export type ExportFidelityId = "layered" | "exact" | "editable";
+export type ExportFidelityId = "layered" | "exact" | "editable" | "build";
 
 export const EXPORT_FIDELITIES: Array<{
   id: ExportFidelityId;
   label: string;
   note: string;
 }> = [
+  {
+    id: "build",
+    label: "Exact Build Fidelity",
+    note: "Rebuilt object-for-object from the slide on screen — no template interpretation. Gated at 99% visual match.",
+  },
   {
     id: "editable",
     label: "Editable · native objects",
@@ -193,8 +198,30 @@ export const DEFAULT_EXPORT_FIDELITY: ExportFidelityId = "editable";
 const FIDELITY_KEY = "tp:export-fidelity:v3";
 
 export function exportFidelityById(id: string | null | undefined): ExportFidelityId {
-  return id === "layered" || id === "exact" ? id : "editable";
+  return id === "layered" || id === "exact" || id === "build" ? id : "editable";
 }
+
+/**
+ * Both "build" and "editable" are driven by the SAME scene graph captured from
+ * the live slide component — there is no second layout engine. This flag is what
+ * the exporter consults instead of asking whether a module happens to have a
+ * hand-written PowerPoint renderer.
+ */
+export function usesSceneGraph(id: ExportFidelityId): boolean {
+  return id === "build" || id === "editable";
+}
+
+/**
+ * Minimum editor↔export visual similarity a fidelity is allowed to ship at.
+ * Exact Build Fidelity is held to the 99% target; the looser modes keep the
+ * historical drift budget.
+ */
+export function visualThresholdFor(id: ExportFidelityId): number {
+  if (id === "build") return 0.99;
+  if (id === "exact") return 0.97;
+  return 0.82;
+}
+
 
 export function readExportFidelity(): ExportFidelityId {
   if (typeof window === "undefined") return DEFAULT_EXPORT_FIDELITY;

@@ -1149,7 +1149,7 @@ export async function exportDeckToPptx(
   // exports lost their Bento media photographs: the pack ground was fine, but
   // no inset tile was ever measured. Only the GROUND REPLACEMENT is gated on
   // `packBackground`; the media measurement always happens.
-  if (fidelity === "editable" && typeof document !== "undefined") {
+  if ((fidelity === "editable" || fidelity === "build") && typeof document !== "undefined") {
     const endGround = telemetry.phase("plates");
     try {
       const { captureGroundPlates } = await import("./slide-exact-raster");
@@ -1263,10 +1263,17 @@ export async function exportDeckToPptx(
   // Those slides take the layered route instead: a design-exact graphic plate
   // captured from the real renderer, with the measured copy re-emitted as native
   // editable text boxes on top. Natively-drawn variants are untouched.
+  //
+  // "build" (Exact Build Fidelity) removes the exception: EVERY variant goes
+  // through the scene graph captured from the component the user is looking at,
+  // so no slide can be reinterpreted by a hand-written PowerPoint renderer.
   const platePolicyFor = (variantId: string) =>
-    fidelity === "layered" || needsGraphicPlate(variantId);
+    fidelity === "layered" || fidelity === "build" || needsGraphicPlate(variantId);
   const wantsPlatePass =
-    fidelity === "layered" || deck.slides.some((sl) => needsGraphicPlate(sl.variantId));
+    fidelity === "layered" ||
+    fidelity === "build" ||
+    deck.slides.some((sl) => needsGraphicPlate(sl.variantId));
+
   if (wantsPlatePass && typeof document !== "undefined") {
     const endPlates = telemetry.phase("plates");
     try {
@@ -2346,7 +2353,22 @@ export async function exportDeckToPptx(
   if (geometryRepair.repaired) {
     console.warn("[pptx-export] healed canvas geometry", geometryRepair);
   }
+  // Exact Build Fidelity contract: a slide that could not be captured from its
+  // own component is reported as UNSUPPORTED. It is never quietly substituted
+  // with a different, generic PowerPoint design.
+  const unsupportedBuild =
+    fidelity === "build"
+      ? deck.slides
+          .map((sl, i) => ({ sl, i }))
+          .filter(({ i }) => !layeredText[i]?.plate)
+          .map(
+            ({ sl, i }) =>
+              `Slide ${i + 1} (${sl.variantId}): no exact exporter — this component could not be captured from the build, so Exact Build Fidelity cannot guarantee a 1:1 match.`,
+          )
+      : [];
   const warnings = [
+    ...unsupportedBuild,
+
     ...integrity.warnings(),
     ...auditWarnings,
     ...geometryRepairWarnings(geometryRepair),
