@@ -1256,6 +1256,56 @@ export async function exportDeckToPptx(
       shapes?: import("./export-dom-decompose").DomShape[];
     }
   > = {};
+  /**
+   * Adopt a design plate as slide `i`'s background. Shared by the live capture
+   * pass and by replayed captures so both routes land identically.
+   */
+  const adoptPlate = (i: number, data: string) => {
+    const solidFallback =
+      backgroundPlans[i].kind === "solid"
+        ? (backgroundPlans[i] as { color: string }).color
+        : baseModeFor(i) === "light"
+          ? "FFFFFF"
+          : palette.primary;
+    backgroundPlans[i] = {
+      kind: "image",
+      data,
+      solidFallback,
+      fit: "cover",
+      zoom: 1,
+      offsetX: 0,
+      offsetY: 0,
+    };
+    layeredPlates[i] = data;
+    telemetry.notePlateBytes(i, data, deck.slides[i].variantId);
+    integrity.noteBackground(i, "plate", deck.slides[i].variantId);
+  };
+
+  // ---------------------------------------------------------------------------
+  // Replayed captures (server-side export).
+  //
+  // There is no DOM in the worker, so the capture passes below cannot run. The
+  // caller can instead supply the scene graph the app captured from the REAL
+  // rendered component, keyed by slide id. Replaying it takes the same layered
+  // route the browser takes — identical plate, identical measured text runs,
+  // identical native shapes — so the server export is not a second layout
+  // engine. Slides with no capture are left for the caller to report as
+  // unsupported; nothing is substituted here.
+  // ---------------------------------------------------------------------------
+  if (opts?.sceneCaptures) {
+    deck.slides.forEach((sl, i) => {
+      const cap = opts.sceneCaptures?.[sl.id];
+      if (!cap?.plate || layeredText[i]) return;
+      adoptPlate(i, cap.plate);
+      layeredText[i] = {
+        plate: cap.plate,
+        runs: (cap.runs ?? []) as import("./export-text-layer").TextRun[],
+        shapes: (cap.shapes ?? []) as import("./export-dom-decompose").DomShape[],
+      };
+      telemetry.noteTextRuns?.(i, cap.runs?.length ?? 0);
+    });
+  }
+
   // Graphic parity: in the shipping "editable" fidelity a slide is rebuilt in
   // OOXML — but only 118 variants have a bespoke native renderer. Every other
   // variant would fall through to the family-generic cards/bullets renderer and
