@@ -352,7 +352,7 @@ export function SocialModuleFrame({
         heroBandPct={frameBandPct}
       >
         <PrintDocModeProvider icons={relief.icons} iconStyle={PRINT_ICON_STYLE_DEFAULT}>
-          <PrintSectionRenderer section={rendered} mode={mode} accent={accent} />
+          <PrintSectionRenderer section={rendered} mode={moduleMode} accent={accent} />
         </PrintDocModeProvider>
       </PrintPageProvider>
     </div>
