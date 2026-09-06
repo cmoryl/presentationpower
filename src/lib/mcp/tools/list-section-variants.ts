@@ -2,12 +2,13 @@ import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { textResult } from "../supabase";
 import { SECTION_FRAMEWORKS, byId, variantsForSection } from "@/lib/taxonomy";
+import { hasNativeVariantEmitter } from "@/lib/export-native-variants";
 
 export default defineTool({
   name: "list_section_variants",
   title: "List section frameworks and variants",
   description:
-    "Browse the deck taxonomy. Without a section_id it lists every section framework; with one it lists the module variants permitted for that section and their allowed layouts.",
+    "Browse the deck taxonomy. Without a section_id it lists every section framework; with one it lists the module variants permitted for that section, their allowed layouts and whether the PowerPoint exporter has a dedicated renderer for each (hasNativePptxRenderer) — prefer those when the deck will be delivered as a .pptx.",
   inputSchema: {
     section_id: z
       .string()
@@ -42,6 +43,7 @@ export default defineTool({
         name: v.name,
         description: v.description,
         permittedLayoutIds: v.permittedLayoutIds,
+        hasNativePptxRenderer: hasNativeVariantEmitter(v.id),
       })),
     });
   },

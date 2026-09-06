@@ -4,6 +4,7 @@ import { errorResult, supabaseForUser, textResult } from "../supabase";
 import { auditVisualData } from "@/lib/agent/visual-data-gaps";
 import { resolveVariantSwap, applyIcon } from "@/lib/slide-ops";
 import { stylePackById } from "@/lib/style-packs";
+import { hasNativeVariantEmitter } from "@/lib/export-native-variants";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
 
 /**
@@ -196,8 +197,11 @@ export default defineTool({
         variant_id: s.variantId,
         layout_id: s.layoutId,
         mode: s.mode,
+        exports_natively: hasNativeVariantEmitter(s.variantId),
       })),
       editor_url: `/deck/${deckId}`,
+      pptx_delivery:
+        "Call export_deck next and give the user its download_url — that file is the finished editable deck. Slides with exports_natively: false still export complete; swap them for a native alternative only if the user wants pixel-exact design plates without opening the app.",
       visuals_needing_data: auditVisualData(
         planned.map((s) => ({
           position: s.position,
