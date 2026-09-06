@@ -33,6 +33,11 @@ import { AgentVisualPlan, planFromToolOutput } from "./AgentVisualPlan";
 import { AgentVisualPreview, visualPreviewFromToolOutput } from "./AgentVisualPreview";
 import { AgentVisualOptions, visualOptionsFromToolOutput } from "./AgentVisualOptions";
 import { AgentStatsMapping, statsMappingFromToolOutput } from "./AgentStatsMapping";
+import {
+  AgentDeckDownload,
+  EXPORT_DECK_TOOL_NAME,
+  deckDownloadFromToolOutput,
+} from "./AgentDeckDownload";
 import { STATS_MAPPING_TOOL_NAME } from "@/lib/agent/stats-mapping";
 import {
   DATA_VISUAL_PREVIEW_TOOL_NAME,
@@ -651,6 +656,16 @@ function MessageBubble({
                   onSubmit={(text) => onSubmit?.(text)}
                 />
               );
+            }
+            if (name === EXPORT_DECK_TOOL_NAME) {
+              const download = deckDownloadFromToolOutput(p.output);
+              if (!download)
+                return (
+                  <p key={i} className="text-xs text-foreground/50">
+                    Building the PowerPoint file…
+                  </p>
+                );
+              return <AgentDeckDownload key={i} download={download} />;
             }
             if (name === DATA_VISUAL_PREVIEW_TOOL_NAME) {
               const preview = visualPreviewFromToolOutput(p.output);
