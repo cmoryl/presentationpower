@@ -9,12 +9,15 @@
 //
 // The face is Geist Bold, shipped with the app at /fonts/Geist-Bold.ttf.
 
-// opentype.js is CommonJS: import the default export and destructure, so the
-// SSR module runner can load it as well as the browser bundle.
-import opentype from "opentype.js";
+// opentype.js ships a CommonJS build for dev SSR and an ESM build (named
+// exports only, no default) for the production bundle. A namespace import with
+// an interop unwrap resolves `parse` on both.
+import * as opentypeNs from "opentype.js";
 import type { Font } from "opentype.js";
 
-const parse = opentype.parse;
+const opentypeMod = ((opentypeNs as unknown as { default?: typeof opentypeNs }).default ??
+  opentypeNs) as typeof opentypeNs;
+const parse = opentypeMod.parse;
 
 /** Path to the shipped signage face, relative to the site root. */
 export const LONDON_SIGNAGE_FONT_URL = "/fonts/Geist-Bold.ttf";
