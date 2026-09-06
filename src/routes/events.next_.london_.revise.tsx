@@ -8,6 +8,7 @@
 // the whole panel snapshot as an append-only revision. Nothing overwrites
 // history: restoring an older revision republishes it forward.
 
+import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -444,6 +445,7 @@ function LondonRevisePage() {
     // live stores apply; a published revision passes its own snapshot.
     overrides?: LondonOverrides,
   ) => {
+    await loadLondonSignageFace();
     const { default: JSZip } = await import("jszip");
     const zip = new JSZip();
     const manifest: string[] = ["file,panel,room,trim_mm,bleed_mm,ppi,fingerprint,qa"];

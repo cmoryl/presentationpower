@@ -5,6 +5,7 @@
 // spec-compliant downloads: vector .ai / .svg for the RIP, plus dithered PNG
 // rasters generated in-browser at the spec resolution tiers.
 
+import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -346,6 +347,7 @@ function LondonSignagePage() {
             : "Live vector gradient sized to bleed.",
       },
       async () => {
+        await loadLondonSignageFace();
         const pack = await packOrNull();
         // The `.ai` path always resolves supplied booth artwork, so a vendor
         // booth downloads the real wall rather than the house ground.
@@ -373,6 +375,7 @@ function LondonSignagePage() {
         successDescription: "Lossless PNG, sized to bleed, triangular-PDF dither applied.",
       },
       async () => {
+        await loadLondonSignageFace();
         const pack = await packOrNull();
         const size = rasterSizeFor(panel, ppi);
         const blob = await renderDitheredPng(
@@ -410,6 +413,7 @@ function LondonSignagePage() {
         successDescription: "Trim, bleed, ppi tier and banding checked for every vector master.",
       },
       async () => {
+        await loadLondonSignageFace();
         const pack = await packOrNull();
         const reports: LondonQaReport[] = [];
         for (const panel of panels) {
