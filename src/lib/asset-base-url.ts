@@ -51,3 +51,14 @@ export async function responseToDataUrl(
   const bytes = new Uint8Array(await res.arrayBuffer());
   return `data:${mime};base64,${bytesToBase64(bytes)}`;
 }
+
+/**
+ * Retry cache-busting for asset fetches. The Cloudflare Worker export runtime
+ * rejects fetch's `cache` option with "Unsupported cache mode", so retries add
+ * a throwaway query param instead of asking for a `reload`.
+ */
+export function withCacheBuster(url: string, tryIndex: number): string {
+  if (tryIndex <= 0 || url.startsWith("data:") || url.startsWith("blob:")) return url;
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}__pptxRetry=${tryIndex}`;
+}

@@ -87,7 +87,7 @@ import { iconGlyphDataUrl, warmIconPacks } from "./pptx-icons";
 import { ExportIntegrity, retryAsset } from "./pptx-integrity";
 import type { DebugManifest } from "./export-debug";
 import { ExportTelemetry, type ExportTelemetryReport } from "./export-telemetry";
-import { bytesToBase64, resolveAssetUrl } from "./asset-base-url";
+import { bytesToBase64, resolveAssetUrl, withCacheBuster } from "./asset-base-url";
 import { fetchPptxVideo, placeSlideVideo, type PptxVideoAsset } from "./pptx-video";
 import { effectivePack } from "./effective-pack";
 import { isInfographicSpec, type InfographicSpec } from "./infographics/spec";
@@ -273,9 +273,11 @@ async function fetchAsDataUrlOnce(
     // `TypeError: Failed to fetch`), which was silently dropping every
     // logo/backdrop/imagery embed. Default `same-origin` credentials work
     // for /brand-logos, /public assets, and cross-origin CDNs alike.
-    const res = await fetch(resolveAssetUrl(url), {
+    // NOTE: do NOT pass a `cache` option — the Worker export runtime rejects
+    // every value ("TypeError: Unsupported cache mode"), which silently
+    // dropped all logos/backdrops. Retries bust caches via a query param.
+    const res = await fetch(withCacheBuster(resolveAssetUrl(url), tryIndex), {
       mode: "cors",
-      cache: tryIndex > 0 ? "reload" : "default",
     });
 
     if (!res.ok) {

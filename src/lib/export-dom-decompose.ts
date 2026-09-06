@@ -23,7 +23,7 @@ import { isAuthoringChrome } from "./export-chrome-suppress";
 import { STAGE_H, STAGE_W } from "./export-quality";
 import { resolveSvgMarkupVars } from "./export-svg-vars";
 import { classifyEffectStyle, effectSvgDataUrl } from "./export-effect-style";
-import { resolveAssetUrl, responseToDataUrl } from "./asset-base-url";
+import { resolveAssetUrl, responseToDataUrl, withCacheBuster } from "./asset-base-url";
 
 export interface DomColor {
   /** 6-digit uppercase hex, no `#`. */
@@ -1629,10 +1629,11 @@ async function inlineImage(src: string, w: number, h: number): Promise<string | 
     const { retryAsset } = await import("./pptx-integrity");
     const dataUrl = await retryAsset<string>(
       async (tryIndex) => {
-        const res = await fetch(resolveAssetUrl(src), {
-          mode: "cors",
-          cache: tryIndex > 0 ? "reload" : "default",
-        });
+        // The Worker runtime rejects the `cache` option outright
+        // ("Unsupported cache mode"), which dropped every asset in the
+        // headless export. Bust caches with a query param instead.
+        const target = withCacheBuster(resolveAssetUrl(src), tryIndex);
+        const res = await fetch(target, { mode: "cors" });
         if (!res.ok) return null;
         return responseToDataUrl(res);
       },
