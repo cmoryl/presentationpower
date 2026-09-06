@@ -1263,10 +1263,17 @@ export async function exportDeckToPptx(
   // Those slides take the layered route instead: a design-exact graphic plate
   // captured from the real renderer, with the measured copy re-emitted as native
   // editable text boxes on top. Natively-drawn variants are untouched.
+  //
+  // "build" (Exact Build Fidelity) removes the exception: EVERY variant goes
+  // through the scene graph captured from the component the user is looking at,
+  // so no slide can be reinterpreted by a hand-written PowerPoint renderer.
   const platePolicyFor = (variantId: string) =>
-    fidelity === "layered" || needsGraphicPlate(variantId);
+    fidelity === "layered" || fidelity === "build" || needsGraphicPlate(variantId);
   const wantsPlatePass =
-    fidelity === "layered" || deck.slides.some((sl) => needsGraphicPlate(sl.variantId));
+    fidelity === "layered" ||
+    fidelity === "build" ||
+    deck.slides.some((sl) => needsGraphicPlate(sl.variantId));
+
   if (wantsPlatePass && typeof document !== "undefined") {
     const endPlates = telemetry.phase("plates");
     try {
