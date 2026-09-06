@@ -706,6 +706,76 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
       },
     ],
   },
+  {
+    section: "NEXT London & live print jobs",
+    items: [
+      {
+        q: "What is the NEXT London kit?",
+        a: "The live print job for NEXT 2026 at the QEII Centre in London, 24–25 September 2026 — 54+ scenic panels plus step-and-repeat walls, door vinyls, pillars, booth artwork, badges, agendas and floor maps. Event → NEXT → London is the hub.",
+      },
+      {
+        q: "Which version of the artwork am I looking at?",
+        a: "Always the revision in force — the newest published revision, or the originally issued venue pack if nothing has been published yet. Vendors visiting the page without signing in see exactly the same thing.",
+      },
+      {
+        q: "How do revisions work?",
+        a: "Revisions are append-only. Each one snapshots panels, changes, placements, board sizes and step-and-repeat recipes, so nothing is overwritten and a removed panel stays removed. Publishing pushes the change live to open pages instantly.",
+      },
+      {
+        q: "Why are file names prefixed with r012 or rdraft?",
+        a: "Files are stamped with the revision they came from. Unpublished work is labelled rdraft- so a revision number is never printed on a file before that revision exists.",
+      },
+      {
+        q: "Do printers need our fonts?",
+        a: "No. Headlines, captions and wall copy in the print masters are outlined vector paths, not live text, so nothing can substitute a typeface. If the signage face can't be loaded the builder refuses to produce a master rather than silently substituting.",
+      },
+      {
+        q: "Can I move and resize the copy on a panel?",
+        a: "Yes. The live panel editor lets you reposition and resize headline, caption and QR blocks, with the changes clamped to the safe area and saved into the revision.",
+      },
+      {
+        q: "Is every download checked?",
+        a: "Yes. Every .svg, .ai and .png passes the signage QA gate before it is written — no download path bypasses it — and a failure is shown to you rather than quietly ignored.",
+      },
+      {
+        q: "Can I get CMYK signage files?",
+        a: "Not currently. RGB is the house colour space and CMYK output is switched off until every colour stop has an approved press build. We never silently convert brand RGB to CMYK.",
+      },
+      {
+        q: "Which files are press masters and which are proofs?",
+        a: "Panel SVG and .ai files are vector masters. Anything rasterised from the screen — badges, production studio images, social kit renders — is a proof and is labelled as one.",
+      },
+      {
+        q: "Can attendees use the floor maps?",
+        a: "Yes. Turn on rooms-only and the maps show room keys and areas without any signage marks or asset legend — that's the attendee-facing version. Maps cover seven floors and export as PDF, SVG, CSV or a ZIP of the set.",
+      },
+      {
+        q: "Where do event dates, venue and links come from?",
+        a: "One place only. Event facts and the printed URLs and QR targets are defined centrally, so a change flows to every panel, badge, agenda and directory at once.",
+      },
+    ],
+  },
+  {
+    section: "Connector (ChatGPT & MCP)",
+    items: [
+      {
+        q: "Can I use Element from ChatGPT?",
+        a: "Yes. Add the Element connector pointing at the app's /mcp endpoint and sign in. It exposes the taxonomy, knowledge, deck building and export as tools.",
+      },
+      {
+        q: "Is the deck it gives me finished?",
+        a: "Yes. The download link is a complete, layered, editable PowerPoint file — it is the deliverable, not a partial preview, and the connector is instructed never to send you back into the app to finish it.",
+      },
+      {
+        q: "So why does it sometimes offer an app link too?",
+        a: "Only when more than a third of the slides use heavy design plates that render richer in the app. It's an optional extra after your download, never a replacement for it.",
+      },
+      {
+        q: "How does it choose modules?",
+        a: "It prefers module variants with a native PowerPoint renderer and flags each planned slide for whether it exports pixel-true, so the file you download matches what the app would render.",
+      },
+    ],
+  },
 ];
 
 export const Route = createFileRoute("/faq")({
