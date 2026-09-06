@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import { toast } from "sonner";
+import { NEXT_APP_ORIGIN } from "@/lib/next-event";
 import {
   LONDON_PANELS,
   LONDON_STYLES,
@@ -41,7 +42,7 @@ const FOOT_Y = PH - 26;
 const BODY_TOP = HEAD_H + 26;
 const BODY_BOTTOM = FOOT_Y - 20;
 
-const SITE = "https://transperfectelement.lovable.app";
+const SITE = NEXT_APP_ORIGIN;
 const HUB = `${SITE}/events/next/london`;
 const TEMPLATE_URL = `${SITE}/events/next/london/template`;
 const REVISE_URL = `${SITE}/events/next/london/revise`;
