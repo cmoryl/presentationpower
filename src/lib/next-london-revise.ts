@@ -987,6 +987,10 @@ export function buildLondonPanelAi(
       (copyOps || qrOps ? `/OC /oc2 BDC\n${copyOps}${qrOps}EMC\n` : "") +
       (brand.lockupOn && logoOps ? `/OC /oc1 BDC\n${logoOps}EMC\n` : "");
 
+  // The copy actually printed on this master, kept as searchable metadata now
+  // that the visible copy is outlined geometry.
+  const copyMeta = wall ? wall.config.text : brand.copy;
+
   const objects: string[] = [
     `<< /Type /Catalog /Pages 2 0 R /OCProperties << /OCGs [8 0 R 9 0 R 10 0 R] ` +
       `/D << /Order [8 0 R 9 0 R 10 0 R] /ON [8 0 R 9 0 R 10 0 R] >> >> >>`,
@@ -996,9 +1000,8 @@ export function buildLondonPanelAi(
       `/TPGradientKind /LiveShading /TPLockup (${pdfText(brand.art.source)}) ` +
       `/TPColorSpace (${cmyk ? `DeviceCMYK vibrant${vibrance}` : "DeviceRGB"}) ` +
       `/TPLockupColourway (${pdfText(brand.colourway)}) ` +
-      `${brand.copy ? `/TPCopy (${pdfText(brand.copy)}) ` : ""}` +
+      `${copyMeta ? `/TPCopy (${pdfText(copyMeta)}) ` : ""}` +
       `${brand.qr ? `/TPQr (${pdfText(brand.qr.data)}) ` : ""}` +
-      `${wall ? `/TPCopy (${pdfText(wall.config.text)}) ` : ""}` +
       `/TPText 7 0 R ` +
       `/Resources << /Shading << /Sh0 6 0 R >> ` +
       `${groundImage ? "/XObject << /ImGround 11 0 R >> " : ""}` +
@@ -1012,8 +1015,7 @@ export function buildLondonPanelAi(
     // it carries the text as metadata instead — the object slot is kept so the
     // OCG object numbers below stay stable.
     `<< /Type /TPTextRecord /TPOutlined true /TPFace (${pdfText(face.name)})` +
-      `${brand.copy ? ` /TPCopy (${pdfText(brand.copy)})` : ""}` +
-      `${wall ? ` /TPCopy (${pdfText(wall.config.text)})` : ""}` +
+      `${copyMeta ? ` /TPCopy (${pdfText(copyMeta)})` : ""}` +
       `${brand.qr ? ` /TPQr (${pdfText(brand.qr.data)})` : ""} >>`,
     `<< /Type /OCG /Name (${wall ? "Step & repeat" : "Hero lockup"}) >>`,
     `<< /Type /OCG /Name (Copy) >>`,
@@ -1063,6 +1065,7 @@ function stepRepeatPdfOps(
   h: number,
   fillOp: (hex: string) => string,
   copyInk: string,
+  outlineOps: (text: string, sizeMm: number, x: number, y: number) => string,
 ): string {
   const rad = (plan.config.rotationDeg * Math.PI) / 180;
   const cos = Math.cos(rad);
@@ -1099,15 +1102,14 @@ function stepRepeatPdfOps(
         return paths ? `q ${alpha}${matrix}${paths}Q\n` : "";
       }
       if (tile.kind === "text") {
-        const size = tile.sizeMm * MM_TO_PT;
-        const tracking = size * LONDON_SIGNAGE_FONT.tracking;
-        const advance = plan.config.text.length * (size * 0.62 + tracking);
-        const x = (tile.x + tile.w / 2) * MM_TO_PT - advance / 2;
-        const y = h - (tile.y + tile.sizeMm) * MM_TO_PT;
-        return (
-          `q ${alpha}${matrix}${copyInk} BT /F1 ${f3(size)} Tf ${f3(tracking)} Tc ` +
-          `1 0 0 1 ${f3(x)} ${f3(y)} Tm (${pdfText(plan.config.text)}) Tj ET Q\n`
+        // Outlined run, centred on the tile with the font's true advance.
+        const ops = outlineOps(
+          plan.config.text,
+          tile.sizeMm,
+          tile.x + tile.w / 2,
+          tile.y + tile.sizeMm,
         );
+        return ops ? `q ${alpha}${matrix}${copyInk} ${ops} f Q\n` : "";
       }
       if (!plan.qr) return "";
       const size = tile.w * MM_TO_PT;
