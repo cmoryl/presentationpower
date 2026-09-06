@@ -171,7 +171,20 @@ export type SocialFitInput = {
   growth?: number;
   /** Air multiplier from the air ladder (1 = native internal padding). */
   air?: number;
+  /**
+   * Vertical space the module may actually use, in frame px. Defaults to the
+   * whole safe rect; a tall shell (see `social-tall-layouts.ts`) hands the
+   * module only the panel's inner height, so overflow is judged against the
+   * panel rather than the frame.
+   */
+  heightBudget?: number;
+  /**
+   * Horizontal space the module may use, in frame px. Defaults to the safe
+   * rect width; a tall shell hands the module the panel's inner width.
+   */
+  widthBudget?: number;
 };
+
 
 export type SocialFitResult = {
   /** Virtual page width the module renders at. */
@@ -343,26 +356,45 @@ export function computeSocialFit({
   relief,
   growth = 1,
   air = 1,
+  heightBudget,
+  widthBudget,
 }: SocialFitInput): SocialFitResult {
   const safe = socialSafeRect(format);
   const pageWidth = pageWidthFor(relief, growth);
-  const scale = safe.width / pageWidth;
+  const scale = (widthBudget && widthBudget > 0 ? widthBudget : safe.width) / pageWidth;
   const renderedHeight = naturalHeight * scale;
-  const overflowPx = renderedHeight - safe.height;
+  const budget = heightBudget && heightBudget > 0 ? heightBudget : safe.height;
+  const overflowPx = renderedHeight - budget;
   return {
     pageWidth,
     scale,
     renderedHeight,
     safe,
     overflowPx,
-    overflowPct: overflowPx / safe.height,
-    fillPct: renderedHeight / safe.height,
+    overflowPct: overflowPx / budget,
+    fillPct: renderedHeight / budget,
     fillTarget: fillTargetFor(format),
     air: clampAir(air),
     ok: overflowPx <= 1,
-    sparse: renderedHeight > 0 && renderedHeight < safe.height * 0.55,
+    sparse: renderedHeight > 0 && renderedHeight < budget * 0.55,
   };
 }
+
+/**
+ * Fill reported for a module that has been composed inside a tall shell. The
+ * shell itself occupies the safe rect, so the honest reading is how much of the
+ * frame the finished composition covers — not how tall the strip inside it is.
+ */
+export function withComposedFill(
+  fit: SocialFitResult,
+  composedHeight: number,
+  format: SocialFormat,
+): SocialFitResult {
+  const safe = socialSafeRect(format);
+  const fillPct = Math.min(1, composedHeight / safe.height);
+  return { ...fit, fillPct, sparse: fillPct < 0.55 };
+}
+
 
 /**
  * Next rung to try. Returns null when the module already fits, or when the
