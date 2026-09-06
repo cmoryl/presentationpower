@@ -10,12 +10,12 @@ import { z } from "zod";
 
 import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { LondonRevision } from "@/lib/next-london-revise";
+import { EMPTY_LONDON_OVERRIDES, type LondonOverrides, type LondonRevision } from "@/lib/next-london-revise";
 
 const TABLE = "london_signage_revisions";
 
 const COLUMNS =
-  "id, rev, note, author_id, panels, changes, regen, removed_ids, restored_from, created_at";
+  "id, rev, note, author_id, panels, changes, regen, removed_ids, overrides, restored_from, created_at";
 
 type Row = {
   id: string;
@@ -26,9 +26,24 @@ type Row = {
   changes: unknown;
   regen: unknown;
   removed_ids?: unknown;
+  overrides?: unknown;
   restored_from: number | null;
   created_at: string;
 };
+
+function toOverrides(value: unknown): LondonOverrides {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return EMPTY_LONDON_OVERRIDES;
+  const raw = value as Record<string, unknown>;
+  const map = (key: string) =>
+    raw[key] && typeof raw[key] === "object" && !Array.isArray(raw[key])
+      ? (raw[key] as Record<string, never>)
+      : {};
+  return {
+    placements: map("placements") as LondonOverrides["placements"],
+    boardSizes: map("boardSizes") as LondonOverrides["boardSizes"],
+    stepRepeat: map("stepRepeat") as LondonOverrides["stepRepeat"],
+  };
+}
 
 function toRevision(row: Row): LondonRevision {
   return {
@@ -40,6 +55,7 @@ function toRevision(row: Row): LondonRevision {
     changes: (Array.isArray(row.changes) ? row.changes : []) as LondonRevision["changes"],
     regen: (row.regen ?? {}) as LondonRevision["regen"],
     removedIds: (Array.isArray(row.removed_ids) ? row.removed_ids : []) as string[],
+    overrides: toOverrides(row.overrides),
     restoredFrom: row.restored_from,
     createdAt: row.created_at,
   };
@@ -111,6 +127,7 @@ const PublishSchema = z.object({
   changes: z.array(z.record(z.string(), z.unknown())),
   regen: z.record(z.string(), z.unknown()),
   removedIds: z.array(z.string()).default([]),
+  overrides: z.record(z.string(), z.unknown()).default({}),
   restoredFrom: z.number().int().optional(),
 });
 
@@ -161,6 +178,7 @@ export const publishLondonRevision = createServerFn({ method: "POST" })
         changes: data.changes as unknown as never,
         regen: data.regen as unknown as never,
         removed_ids: data.removedIds as unknown as never,
+        overrides: data.overrides as unknown as never,
         restored_from: data.restoredFrom ?? null,
       })
       .select(COLUMNS)

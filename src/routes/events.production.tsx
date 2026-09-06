@@ -5,7 +5,7 @@
 // look and copy, preview every size live, then deliver one package of press
 // PDFs plus Illustrator-openable .ai twins with a manifest.
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
   ClipboardList,
@@ -84,7 +84,6 @@ function EventProductionPage() {
   // Defaults come from the live event record, never a hard-coded past venue.
   const [eventName, setEventName] = useState<string>(NEXT_EVENT.name);
   const [venue, setVenue] = useState(`${NEXT_EVENT.venue}, ${NEXT_EVENT.city}`);
-  const [dates, setDates] = useState<string>(NEXT_EVENT.datesLabel);
   // The printed call-to-action wording and the link/QR target are separate:
   // artwork shows the words, the QR resolves the URL.
   const [linkTarget, setLinkTarget] = useState<string>(NEXT_EVENT.registrationUrl);
@@ -207,6 +206,14 @@ function EventProductionPage() {
           <h1 className="mt-3 break-words text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
             Spec sheet in, print package out
           </h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-foreground/70">
+            This package is rasterised from the on-screen previews — a quick proof, not a press
+            vector master. For NEXT 2026 London use the{" "}
+            <Link to="/events/next/london" className="font-semibold text-[#003FC7] underline">
+              scenic panel kit
+            </Link>
+            .
+          </p>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-foreground/60">
             Paste what the location team sent. Element reads every size, renders each piece on the
             event look with correct bleed and safe area, and delivers press PDFs plus
@@ -355,9 +362,6 @@ function EventProductionPage() {
                   onChange={(e) => setCopy({ ...copy, cta: e.target.value })}
                   className={INPUT}
                 />
-              </Field>
-              <Field label="Dates">
-                <input value={dates} onChange={(e) => setDates(e.target.value)} className={INPUT} />
               </Field>
               <Field label="Link / QR target">
                 <input

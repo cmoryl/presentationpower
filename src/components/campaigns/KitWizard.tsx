@@ -37,7 +37,7 @@ import {
   type CampaignCopy,
 } from "@/lib/campaigns";
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
-import { campaignArtDirection, saveCampaignLook } from "@/lib/campaign-look";
+import { campaignArtDirection } from "@/lib/campaign-look";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { NextRenderer, NEXT_RENDER_TRACKS } from "@/components/campaigns/NextRenderer";
 import { NEXT_NAVY_SPEC } from "@/lib/next-brand-guide";
@@ -70,13 +70,29 @@ function exampleCopyForBrand(brandId: string) {
   );
 }
 
-const WIZARD_STEPS = [
-  { key: "brand", label: "Brand" },
-  { key: "content", label: "Content" },
-  { key: "profile", label: "Formats" },
-  { key: "event", label: "Event" },
-  { key: "review", label: "Review" },
-] as const;
+type WizardStepKey = "brand" | "content" | "profile" | "event" | "review";
+
+const STEP_LABELS: Record<WizardStepKey, string> = {
+  brand: "Brand",
+  content: "Content",
+  profile: "Formats",
+  event: "Event",
+  review: "Review",
+};
+
+/**
+ * Social surface keeps brand → content → formats → event → review (event
+ * facts are optional flavor, so copy can be drafted before them). Event
+ * surface runs brand → event → content → formats → review so the grounded
+ * copy drafter has event facts (city, date, venue) to ground on.
+ */
+function wizardStepsFor(surface: "social" | "event"): { key: WizardStepKey; label: string }[] {
+  const order: WizardStepKey[] =
+    surface === "event"
+      ? ["brand", "event", "content", "profile", "review"]
+      : ["brand", "content", "profile", "event", "review"];
+  return order.map((key) => ({ key, label: STEP_LABELS[key] }));
+}
 
 const EMPTY_EVENT: EventFacts = {
   name: "",
@@ -120,6 +136,7 @@ export function KitWizard({
         ? "event-kit"
         : "social-essentials";
 
+  const WIZARD_STEPS = useMemo(() => wizardStepsFor(surface), [surface]);
   const [step, setStep] = useState(0);
   const [brandId, setBrandId] = useState<string>("bm-tp-master");
   const [mode, setMode] = useState<"light" | "dark" | "both">("dark");
@@ -174,6 +191,29 @@ export function KitWizard({
   const router = useRouter();
   const navigate = useNavigate();
 
+  // ─── Finish-CTA "unsaved changes" tracking ─────────────────────────────
+  // Snapshot of the fields that matter for "did this kit change since the
+  // last save" — compared against the current values when Finish is pressed.
+  const snapshotKey = () =>
+    JSON.stringify({
+      brandId,
+      mode,
+      profileId,
+      formatIds,
+      manualCopy,
+      attachEvent,
+      event,
+      nextDesign,
+      nextTrackId,
+      moduleLayoutId,
+      imageScrimPct,
+      imageUrl: imageUrl?.startsWith("data:") ? undefined : imageUrl,
+      kitLook,
+    });
+  const lastSavedSnapshot = useRef<string | null>(null);
+  const [finishDialogOpen, setFinishDialogOpen] = useState(false);
+  const [finishDialogName, setFinishDialogName] = useState("");
+
   // Hydrate all fields from a saved kit when kitId is provided.
   useEffect(() => {
     if (!kitId) return;
@@ -208,15 +248,24 @@ export function KitWizard({
             ?.look;
           if (stored?.lookId || stored?.styleId) {
             setKitLook({ lookId: stored.lookId, styleId: stored.styleId });
-            // Publish it as the division's campaign direction so social,
-            // event and digital assets generated later inherit the same look.
-            saveCampaignLook(row.brandId, {
-              ...(stored.lookId ? { lookId: stored.lookId } : {}),
-              ...(stored.styleId ? { styleId: stored.styleId } : {}),
-            });
+            // Note: opening a saved kit must not change the division's
+            // campaign direction — no saveCampaignLook call here.
           }
         }
-        setStep(4); // jump to review
+        {
+          const storedVisual = (
+            row.eventFacts as
+              | { visual?: { moduleLayoutId?: string | null; imageScrimPct?: number; imageUrl?: string } }
+              | null
+          )?.visual;
+          if (storedVisual) {
+            if (storedVisual.moduleLayoutId) setModuleLayoutId(storedVisual.moduleLayoutId);
+            if (typeof storedVisual.imageScrimPct === "number")
+              setImageScrimPct(storedVisual.imageScrimPct);
+            if (storedVisual.imageUrl) setImageUrl(storedVisual.imageUrl);
+          }
+        }
+        setStep(WIZARD_STEPS.findIndex((s) => s.key === "review")); // jump to review
       })
       .catch((err) => {
         toast.error(err instanceof Error ? err.message : "Failed to load saved kit");
@@ -231,8 +280,17 @@ export function KitWizard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kitId]);
 
-  async function handleSave() {
-    const name = kitName.trim();
+  // Snapshot the freshly-hydrated state so the Finish CTA can tell whether
+  // the user has changed anything since this saved kit was loaded.
+  useEffect(() => {
+    if (kitId && !hydrating) {
+      lastSavedSnapshot.current = snapshotKey();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrating]);
+
+  async function handleSave(nameOverride?: string) {
+    const name = (nameOverride ?? kitName).trim();
     if (!name) {
       toast.error("Give your kit a name first.");
       return;
@@ -244,6 +302,10 @@ export function KitWizard({
     if (formatIds.length === 0) {
       toast.error("Pick at least one format before saving.");
       return;
+    }
+    const persistableImageUrl = imageUrl && !imageUrl.startsWith("data:") ? imageUrl : undefined;
+    if (imageUrl && imageUrl.startsWith("data:")) {
+      toast("Uploaded background isn't saved with the kit — pick it from the Division library to keep it");
     }
     setSaving(true);
     try {
@@ -268,6 +330,13 @@ export function KitWizard({
             // Keep the locked art direction on the row even when event facts
             // are off, so reopening the kit renders in the same look.
             ...(kitLook.lookId || kitLook.styleId ? { look: kitLook } : {}),
+            // Visual layout/imagery selections travel alongside look so
+            // reopening the kit restores the same composition.
+            visual: {
+              moduleLayoutId: moduleLayoutId ?? undefined,
+              imageScrimPct,
+              ...(persistableImageUrl ? { imageUrl: persistableImageUrl } : {}),
+            },
           },
           attachEvent,
           nextDesign,
@@ -275,6 +344,7 @@ export function KitWizard({
         },
       });
       setSavedKitId(row.id);
+      lastSavedSnapshot.current = snapshotKey();
       toast.success(savedKitId ? `Updated "${row.name}"` : `Saved "${row.name}" to your kits`);
       // Reflect the id in the URL so refresh keeps us editing the same row.
       if (!savedKitId) {
@@ -385,9 +455,10 @@ export function KitWizard({
     });
   };
 
+  const currentStepKey = WIZARD_STEPS[step]?.key;
   const canNext = (() => {
-    if (step === 1) return manualCopy.title.trim().length > 0;
-    if (step === 2) return formatIds.length > 0;
+    if (currentStepKey === "content") return manualCopy.title.trim().length > 0;
+    if (currentStepKey === "profile") return formatIds.length > 0;
     return true;
   })();
 
@@ -452,9 +523,9 @@ export function KitWizard({
 
       {/* Step body */}
       <div className="min-h-[320px]">
-        {step === 0 && (
+        {currentStepKey === "brand" && (
           <StepCard
-            eyebrow="Step 1 of 5"
+            eyebrow={`Step ${step + 1} of ${WIZARD_STEPS.length}`}
             title="Which brand is this kit for?"
             description="Pick a division — accent, ink, surface, and logo lockup flow through every asset. You can override any of them later."
           >
@@ -522,9 +593,9 @@ export function KitWizard({
           </StepCard>
         )}
 
-        {step === 1 && (
+        {currentStepKey === "content" && (
           <StepCard
-            eyebrow="Step 2 of 5"
+            eyebrow={`Step ${step + 1} of ${WIZARD_STEPS.length}`}
             title="What's the message?"
             actions={
               <button
@@ -667,15 +738,19 @@ export function KitWizard({
 
             <p className="mt-3 text-xs text-black/55">
               Prefer your favorited modules?{" "}
-              <Link to="/admin/campaigns/kit" className="text-[#003FC7] hover:underline">
+              <Link
+                to="/events/new"
+                search={{ profile: profileId }}
+                className="text-[#003FC7] hover:underline"
+              >
                 Switch to favorited-module flow →
               </Link>
             </p>
           </StepCard>
         )}
 
-        {step === 2 && (
-          <StepCard eyebrow="Step 3 of 5" title="Which formats should ship?">
+        {currentStepKey === "profile" && (
+          <StepCard eyebrow={`Step ${step + 1} of ${WIZARD_STEPS.length}`} title="Which formats should ship?">
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {KIT_PROFILES.map((profile) => {
                 const selected = profile.id === profileId;
@@ -729,9 +804,9 @@ export function KitWizard({
           </StepCard>
         )}
 
-        {step === 3 && (
+        {currentStepKey === "event" && (
           <StepCard
-            eyebrow="Step 4 of 5"
+            eyebrow={`Step ${step + 1} of ${WIZARD_STEPS.length}`}
             title={surface === "event" ? "Event details" : "Event context (optional)"}
           >
             <label className="flex items-center gap-2 rounded-2xl border border-black/10 bg-white/70 p-3 text-sm">
@@ -770,12 +845,17 @@ export function KitWizard({
                   onChange={(v) => setEvent({ ...event, hashtag: v })}
                   placeholder="#TPNext"
                 />
-                <TextField
-                  label="Start date"
-                  value={event.startDate ?? ""}
-                  onChange={(v) => setEvent({ ...event, startDate: v })}
-                  placeholder="YYYY-MM-DD"
-                />
+                <label className="block text-sm">
+                  <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-black/50">
+                    Start date
+                  </div>
+                  <input
+                    type="date"
+                    value={event.startDate ?? ""}
+                    onChange={(e) => setEvent({ ...event, startDate: e.target.value })}
+                    className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                  />
+                </label>
                 <TextField
                   label="Registration URL"
                   value={event.registrationUrl ?? ""}
@@ -787,9 +867,9 @@ export function KitWizard({
           </StepCard>
         )}
 
-        {step === 4 && (
+        {currentStepKey === "review" && (
           <StepCard
-            eyebrow="Step 5 of 5"
+            eyebrow={`Step ${step + 1} of ${WIZARD_STEPS.length}`}
             title={`Your kit · ${assets.length} asset${assets.length === 1 ? "" : "s"}`}
             actions={
               <div className="flex flex-wrap items-center gap-2">
@@ -854,7 +934,7 @@ export function KitWizard({
                 </label>
                 <button
                   type="button"
-                  onClick={handleSave}
+                  onClick={() => handleSave()}
                   disabled={saving || hydrating}
                   className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#03002C] disabled:opacity-50"
                 >
@@ -1157,12 +1237,23 @@ export function KitWizard({
           Step {step + 1} of {WIZARD_STEPS.length} · {WIZARD_STEPS[step].label}
         </div>
         {isLast ? (
-          <Link
-            to={finishHref}
+          <button
+            type="button"
+            onClick={() => {
+              const hasHeadline = manualCopy.title.trim().length > 0;
+              const dirty = lastSavedSnapshot.current !== snapshotKey();
+              const needsPrompt = hasHeadline && (!savedKitId || dirty);
+              if (needsPrompt) {
+                setFinishDialogName(kitName || "");
+                setFinishDialogOpen(true);
+                return;
+              }
+              navigate({ to: finishHref }).catch(() => void 0);
+            }}
             className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]"
           >
             Finish <Check size={12} />
-          </Link>
+          </button>
         ) : (
           <button
             type="button"
@@ -1249,6 +1340,69 @@ export function KitWizard({
         mode={mode === "light" ? "light" : "dark"}
         copy={pickerCopy}
       />
+
+      {finishDialogOpen ? (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-[#03002C]/60 p-4 backdrop-blur-sm"
+          onClick={() => setFinishDialogOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Save this kit?"
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl"
+          >
+            <h3 className="text-base font-semibold text-[#03002C]">Save this kit?</h3>
+            <p className="mt-1 text-xs text-black/60">
+              You have unsaved changes. Save so it shows up in your kits, or leave without saving.
+            </p>
+            <label className="mt-3 block text-sm">
+              <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-black/50">
+                Kit name
+              </div>
+              <input
+                type="text"
+                value={finishDialogName}
+                onChange={(e) => setFinishDialogName(e.target.value)}
+                className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                maxLength={120}
+                autoFocus
+              />
+            </label>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setFinishDialogOpen(false);
+                  navigate({ to: finishHref }).catch(() => void 0);
+                }}
+                className="rounded-full border border-black/15 bg-white px-3.5 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5"
+              >
+                Leave without saving
+              </button>
+              <button
+                type="button"
+                disabled={saving}
+                onClick={async () => {
+                  const trimmed = finishDialogName.trim();
+                  if (!trimmed) {
+                    toast.error("Give your kit a name first.");
+                    return;
+                  }
+                  setKitName(trimmed);
+                  await handleSave(trimmed);
+                  setFinishDialogOpen(false);
+                  navigate({ to: finishHref }).catch(() => void 0);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3.5 py-1.5 text-xs font-medium text-white hover:bg-[#03002C] disabled:opacity-50"
+              >
+                <Save size={12} /> Save
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

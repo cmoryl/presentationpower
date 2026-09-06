@@ -14,9 +14,13 @@
 //                         revision is reproducible from its snapshot alone
 //
 // Version history is preserved because a revision stores the FULL panel
-// snapshot: any past revision can rebuild byte-identical artwork, and restoring
-// an old revision publishes it forward as a new revision rather than rewriting
-// the past.
+// snapshot AND (from the `overrides` column onward) the design overrides that
+// were in force — logo placements, measured board sizes and step-and-repeat
+// recipes. Those used to live only in the designing browser's localStorage, so
+// revisions published before that column carry `{}` and fall back to the
+// shipped defaults. From it onward a revision rebuilds byte-identical artwork
+// from its own snapshot, and restoring an old revision publishes it forward as
+// a new revision rather than rewriting the past.
 
 import {
   LONDON_PANELS,
@@ -67,11 +71,21 @@ import {
 } from "@/lib/next-london-brew";
 
 import {
+  applyLondonBoardSize,
+  type LondonBoardSize,
+  type LondonBoardSizeMap,
+} from "@/lib/next-london-board-size";
+import type {
+  LondonLogoPlacement,
+  LondonLogoPlacementMap,
+} from "@/lib/next-london-logo-placement";
+import {
   isStepRepeatPanel,
   stepRepeatConfig,
   stepRepeatPlan,
   stepRepeatSvgLayer,
   type StepRepeatConfig,
+  type StepRepeatMap,
   type StepRepeatPlan,
 } from "@/lib/next-london-step-repeat";
 
@@ -487,6 +501,17 @@ export type LondonArtOptions = {
    * Resolve it with `loadLondonGroundImage` (see next-london-artwork.ts).
    */
   groundImage?: LondonGroundImage | null;
+  /**
+   * Lockup/headline/QR placement for this panel. Supply it from a revision's
+   * snapshot so a print master never depends on the downloading browser's own
+   * stored overrides. Omitted = the local placement store (today's behaviour).
+   */
+  placement?: LondonLogoPlacement;
+  /**
+   * Measured signboard size for this panel, applied before anything is built.
+   * Omitted = the local board-size store (today's behaviour).
+   */
+  boardSize?: LondonBoardSize;
 };
 
 /**
@@ -512,7 +537,13 @@ export function londonGroundBox(
  * Rebuild a panel's SVG from its own specification: full-bleed artboard in mm,
  * live linear gradient, trim box marked as metadata only (never a drawn line).
  */
-export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOptions = {}): string {
+export function buildLondonPanelSvg(
+  panelIn: LondonPanel,
+  options: LondonArtOptions = {},
+): string {
+  const panel = options.boardSize
+    ? applyLondonBoardSize(panelIn, { [panelIn.id]: options.boardSize })
+    : panelIn;
   const cmyk = options.colorSpace === "cmyk";
   const vibrance = options.vibrance ?? 1;
   const stops = stopsFor(panel);
@@ -555,7 +586,7 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
       ? stepRepeatPlan(panel, options.stepRepeat ?? stepRepeatConfig(panel.id))
       : null;
 
-  const brand = londonBrandingPlan(panel);
+  const brand = londonBrandingPlan(panel, options.placement);
   const logoScale = brand.logo.w / brand.art.w;
   // HERO LOCKUP is layer 1: it is written last in paint order, so it sits on
   // top of the ground and the copy, and Illustrator lists it first in Layers.
@@ -696,7 +727,13 @@ function gradientRgb(stops: string[], t: number): [number, number, number] {
  * raster is embedded. Gouraud meshes were rejected here: RIPs read them fine
  * but Illustrator re-interprets them and the colours come in wrong.
  */
-export function buildLondonPanelAi(panel: LondonPanel, options: LondonArtOptions = {}): Uint8Array {
+export function buildLondonPanelAi(
+  panelIn: LondonPanel,
+  options: LondonArtOptions = {},
+): Uint8Array {
+  const panel = options.boardSize
+    ? applyLondonBoardSize(panelIn, { [panelIn.id]: options.boardSize })
+    : panelIn;
   const cmyk = options.colorSpace === "cmyk";
   const vibrance = options.vibrance ?? 1;
   const w = panel.bleedW * MM_TO_PT;
@@ -744,7 +781,7 @@ export function buildLondonPanelAi(panel: LondonPanel, options: LondonArtOptions
 
   // Brand layer: EPS-derived lockup outlines as live PDF paths, headline copy
   // as live Geist Bold text — both editable when the .ai is opened.
-  const brand = londonBrandingPlan(panel);
+  const brand = londonBrandingPlan(panel, options.placement);
   const logoScale = (brand.logo.w * MM_TO_PT) / brand.art.w;
   const logoOps = brand.art.paths
     .map((p) => {
@@ -1089,6 +1126,38 @@ export function fingerprint(input: string | Uint8Array): string {
 // Revisions
 // ---------------------------------------------------------------------------
 
+/**
+ * Design overrides snapshotted into a revision, so the print deliverable is
+ * reproducible from the revision alone rather than from local storage.
+ */
+export type LondonOverrides = {
+  placements: LondonLogoPlacementMap;
+  boardSizes: LondonBoardSizeMap;
+  stepRepeat: StepRepeatMap;
+};
+
+export const EMPTY_LONDON_OVERRIDES: LondonOverrides = {
+  placements: {},
+  boardSizes: {},
+  stepRepeat: {},
+};
+
+/** Per-panel builder options taken from a revision's snapshot. */
+export function londonOverrideOptions(
+  panelId: string,
+  overrides: LondonOverrides | null | undefined,
+): LondonArtOptions {
+  if (!overrides) return {};
+  const out: LondonArtOptions = {};
+  const placement = overrides.placements?.[panelId];
+  if (placement) out.placement = placement;
+  const boardSize = overrides.boardSizes?.[panelId];
+  if (boardSize) out.boardSize = boardSize;
+  const stepRepeat = overrides.stepRepeat?.[panelId];
+  if (stepRepeat) out.stepRepeat = stepRepeat;
+  return out;
+}
+
 export type LondonRevision = {
   id: string;
   rev: number;
@@ -1099,6 +1168,8 @@ export type LondonRevision = {
   regen: LondonRegenPlan | Record<string, never>;
   /** Catalogue ids deleted in this revision — they must stay deleted. */
   removedIds: string[];
+  /** Design overrides in force when this revision was published. */
+  overrides: LondonOverrides;
   restoredFrom: number | null;
   createdAt: string;
 };
@@ -1114,6 +1185,7 @@ export function baseRevision(): LondonRevision {
     changes: [],
     regen: {},
     removedIds: [],
+    overrides: EMPTY_LONDON_OVERRIDES,
     restoredFrom: null,
     createdAt: "2026-01-01T00:00:00.000Z",
   };
@@ -1167,8 +1239,11 @@ export function matchesIssuedArtwork(
 export function londonPanelSvgFor(
   panel: LondonPanel,
   pack: Record<string, { svg: string; ai: string }> | null | undefined,
+  options: LondonArtOptions = {},
 ): string {
-  return matchesIssuedArtwork(panel, pack) ? pack![panel.id]!.svg : buildLondonPanelSvg(panel);
+  return matchesIssuedArtwork(panel, pack)
+    ? pack![panel.id]!.svg
+    : buildLondonPanelSvg(panel, options);
 }
 
 /**
@@ -1179,14 +1254,16 @@ export function londonPanelSvgFor(
 export async function resolveLondonArtworkAsync(
   panel: LondonPanel,
   pack: Record<string, { svg: string; ai: string }> | null,
+  options: LondonArtOptions = {},
 ): Promise<{ svg: string; ai: string | Uint8Array; source: "issued" | "rebuilt" }> {
-  const base = resolveLondonArtwork(panel, pack);
-  return { ...base, ai: await buildLondonPanelAiAsync(panel) };
+  const base = resolveLondonArtwork(panel, pack, options);
+  return { ...base, ai: await buildLondonPanelAiAsync(panel, options) };
 }
 
 export function resolveLondonArtwork(
   panel: LondonPanel,
   pack: Record<string, { svg: string; ai: string }> | null,
+  options: LondonArtOptions = {},
 ): { svg: string; ai: string | Uint8Array; source: "issued" | "rebuilt" } {
   const issued = LONDON_PANELS.find((p) => p.id === panel.id);
   const entry = pack?.[panel.id];
@@ -1204,11 +1281,11 @@ export function resolveLondonArtwork(
     // the issued PDF-compatible masters contain shading dictionaries that
     // Illustrator reinterprets with a warning even though PDF renderers accept
     // them. The issued SVG remains the authoritative preview/master geometry.
-    return { svg: entry.svg, ai: buildLondonPanelAi(panel), source: "rebuilt" };
+    return { svg: entry.svg, ai: buildLondonPanelAi(panel, options), source: "rebuilt" };
   }
   return {
-    svg: buildLondonPanelSvg(panel),
-    ai: buildLondonPanelAi(panel),
+    svg: buildLondonPanelSvg(panel, options),
+    ai: buildLondonPanelAi(panel, options),
     source: "rebuilt",
   };
 }

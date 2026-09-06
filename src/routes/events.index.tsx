@@ -376,7 +376,7 @@ function EventsView() {
             {KIT_PROFILES.map((k) => (
               <Link
                 key={k.id}
-                to="/admin/campaigns/kit"
+                to="/events/new"
                 search={{ profile: k.id }}
                 className="group flex flex-col rounded-2xl border border-black/10 bg-white/80 p-4 transition hover:border-[#003FC7]/50"
               >
@@ -411,7 +411,7 @@ function EventsView() {
             </div>
           </div>
           <Link
-            to={favorites.size === 0 ? "/library" : "/admin/campaigns/kit"}
+            to={favorites.size === 0 ? "/library" : "/events/new"}
             className="rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]"
           >
             {favorites.size === 0 ? "Browse presentations →" : "Choose favorites →"}

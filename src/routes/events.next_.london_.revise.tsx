@@ -33,6 +33,9 @@ import { useSessionUser } from "@/hooks/use-session-user";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { LondonPanelThumb } from "@/components/events/LondonPanelThumb";
 import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor";
+import { londonBoardSizes } from "@/lib/next-london-board-size";
+import { londonLogoPlacements } from "@/lib/next-london-logo-placement";
+import { stepRepeatConfigs } from "@/lib/next-london-step-repeat";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import {
@@ -63,7 +66,9 @@ import {
   fingerprint,
   isAddedPanel,
   newLondonPanel,
+  londonOverrideOptions,
   londonPanelFileBase,
+  type LondonOverrides,
   planLondonRegeneration,
   regenerationSummary,
   type LondonEditMap,
@@ -435,6 +440,9 @@ function LondonRevisePage() {
     rev: number | "draft",
     kind: "vector" | "raster",
     zipName?: string,
+    // Design overrides to build from. Draft regeneration passes nothing, so the
+    // live stores apply; a published revision passes its own snapshot.
+    overrides?: LondonOverrides,
   ) => {
     const { default: JSZip } = await import("jszip");
     const zip = new JSZip();
@@ -444,9 +452,10 @@ function LondonRevisePage() {
     const reports: LondonQaReport[] = [];
     for (const panel of panels) {
       const base = londonPanelFileBase(panel, rev);
-      const svg = buildLondonPanelSvg(panel);
+      const opts = londonOverrideOptions(panel.id, overrides);
+      const svg = buildLondonPanelSvg(panel, opts);
       if (kind === "vector") {
-        const ai = await buildLondonPanelAiAsync(panel);
+        const ai = await buildLondonPanelAiAsync(panel, opts);
         const svgQa = auditSvg(panel, svg);
         const aiQa = auditAi(panel, ai);
         reports.push(svgQa, aiQa);
@@ -501,7 +510,13 @@ function LondonRevisePage() {
         // An unpublished draft carries no revision number yet.
         const rev: number | "draft" = dirty ? "draft" : head.rev;
         const tag = rev === "draft" ? "draft" : String(rev).padStart(3, "0");
-        await regenerate([panel], rev, "vector", `NEXT-London-r${tag}-${panelSlug(panel)}.zip`);
+        await regenerate(
+          [panel],
+          rev,
+          "vector",
+          `NEXT-London-r${tag}-${panelSlug(panel)}.zip`,
+          dirty ? undefined : head.overrides,
+        );
       },
     );
   };
@@ -521,8 +536,11 @@ function LondonRevisePage() {
       },
       async () => {
         const rev: number | "draft" = dirty ? "draft" : head.rev;
-        if (vectorPanels.length) await regenerate(vectorPanels, rev, "vector");
-        if (rasterPanels.length) await regenerate(rasterPanels, rev, "raster");
+        const revOverrides = dirty ? undefined : head.overrides;
+        if (vectorPanels.length)
+          await regenerate(vectorPanels, rev, "vector", undefined, revOverrides);
+        if (rasterPanels.length)
+          await regenerate(rasterPanels, rev, "raster", undefined, revOverrides);
       },
     );
   };
@@ -538,6 +556,13 @@ function LondonRevisePage() {
           changes: changes as unknown as Record<string, unknown>[],
           regen: plan as unknown as Record<string, unknown>,
           removedIds: removed,
+          // Snapshot the design overrides in force, so this revision is
+          // reproducible without the designer's own browser storage.
+          overrides: {
+            placements: londonLogoPlacements(),
+            boardSizes: londonBoardSizes(),
+            stepRepeat: stepRepeatConfigs(),
+          } satisfies LondonOverrides as unknown as Record<string, unknown>,
           restoredFrom,
         },
       });
@@ -1003,7 +1028,7 @@ function LondonRevisePage() {
                             success: `Revision ${rev.rev} artwork downloaded`,
                             failure: "Rebuild failed",
                           },
-                          () => regenerate(rev.panels, rev.rev, "vector"),
+                          () => regenerate(rev.panels, rev.rev, "vector", undefined, rev.overrides),
                         )
                       }
                       className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 px-2.5 py-1.5 text-xs font-medium text-[#03002C]"
@@ -1054,6 +1079,7 @@ function LondonRevisePage() {
               </p>
               <LondonPanelLiveEditor
                 panel={artPanel}
+                revisionLabel={dirty ? "draft" : head.rev}
                 siblingIds={visible.filter((p) => p.id !== artPanel.id).map((p) => p.id)}
                 onStyleChange={(styleId) => setField(artPanel.id, "style", styleId)}
               />
