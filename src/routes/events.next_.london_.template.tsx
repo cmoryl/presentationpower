@@ -35,6 +35,7 @@ import {
 } from "@/lib/next-london-revise";
 import { auditAi, auditSvg, gateOnQa } from "@/lib/london-signage-qa";
 import { getLondonHeadRevision } from "@/lib/next-london-revise.functions";
+import { NEXT_LONDON_AGENDA_URL } from "@/lib/next-event";
 import { cmykLabel, cmykToHex, londonCmykBuild } from "@/lib/next-london-cmyk";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
 import { LondonPrintGuides, LondonPrintReadout } from "@/components/london/LondonPrintPreview";
@@ -65,9 +66,6 @@ import {
   setLondonBoardSize,
   useLondonBoardSizes,
 } from "@/lib/next-london-board-size";
-
-/** Default QR target: the live London agenda board. */
-const LONDON_QR_DEFAULT_LINK = "https://transperfectelement.lovable.app/events/next/london/agenda";
 
 export const Route = createFileRoute("/events/next_/london_/template")({
   head: () => ({
