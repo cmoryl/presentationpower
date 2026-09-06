@@ -67,8 +67,10 @@ export const Route = createFileRoute("/decks/$deckId/export")({
     fidelity:
       search["fidelity"] === "editable" ||
       search["fidelity"] === "layered" ||
+      search["fidelity"] === "build" ||
       search["fidelity"] === "exact"
         ? search["fidelity"]
+
         : undefined,
   }),
   component: ExportGate,
