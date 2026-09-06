@@ -5,6 +5,7 @@
 // until the row scrolls into view — the full kit is 105 panels and each master
 // embeds the EPS lockup geometry.
 
+import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { buildLondonPanelSvg } from "@/lib/next-london-revise";
@@ -24,6 +25,7 @@ function toDataUrl(svg: string): string {
 }
 
 export function LondonPanelThumb({ panel, size = 72, className, onOpen }: LondonPanelThumbProps) {
+  const faceReady = useLondonSignageFace();
   const holder = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -59,15 +61,15 @@ export function LondonPanelThumb({ panel, size = 72, className, onOpen }: London
   const boothArt = londonBoothArtworkUrl(panel.id);
 
   const src = useMemo(() => {
-    if (!visible) return null;
     if (boothArt) return boothArt;
+    if (!visible || !faceReady) return null;
     try {
       return toDataUrl(buildLondonPanelSvg(panel));
     } catch {
       return null;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible, key, boothArt]);
+  }, [visible, faceReady, key, boothArt]);
 
   const art = src ? (
     <img
