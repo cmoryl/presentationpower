@@ -20,6 +20,7 @@ import {
   nextLogoFamily,
   NEXT_LOGO_FAMILIES,
 } from "@/lib/next-logo-vectors";
+import { NEXT_LONDON_AGENDA_URL } from "@/lib/next-event";
 import type { LondonPanel } from "@/lib/next-london-signage";
 import {
   DEFAULT_STEP_REPEAT,
@@ -42,8 +43,6 @@ import {
   useStepRepeatConfigs,
   type StepRepeatKind,
 } from "@/lib/next-london-step-repeat";
-
-const AGENDA_LINK = "https://transperfectelement.lovable.app/events/next/london/agenda";
 
 /** Families that ship a usable lockup, in catalogue order. */
 const FAMILY_IDS = Object.keys(NEXT_LOGO_FAMILIES);
@@ -365,7 +364,7 @@ export function StepRepeatWallPanel({ panel }: StepRepeatWallPanelProps) {
           variant="outline"
           size="sm"
           className="w-full gap-2"
-          onClick={() => set({ qrData: AGENDA_LINK })}
+          onClick={() => set({ qrData: NEXT_LONDON_AGENDA_URL })}
         >
           <QrCode className="h-3.5 w-3.5" /> Use the agenda code
         </Button>
