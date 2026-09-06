@@ -308,6 +308,90 @@ const GUIDES: Array<{ title: string; blurb: string; steps: string[] }> = [
       "Admin tables scroll horizontally so dense data stays readable.",
     ],
   },
+  {
+    title: "Build the NEXT London signage kit",
+    blurb: "Panels, walls and vinyls for the QEII Centre, ready for the printer.",
+    steps: [
+      "Open Event → NEXT → London. The page always shows the revision currently in force, so what you see is what the printer has.",
+      "Click any panel thumbnail to enlarge it, or open the live editor to move and resize headline, caption and QR blocks.",
+      "Switch between screen preview and print preview to check trim, bleed and safe-area guides at the real signboard size.",
+      "Download a panel as SVG, .ai or PNG — every file passes the signage QA gate first, and copy is written as outlined vector paths so no font is needed downstream.",
+      "Files are stamped with the published revision number; unpublished work saves as rdraft- so a number is never claimed before it exists.",
+    ],
+  },
+  {
+    title: "Publish a signage revision",
+    blurb: "Change artwork after the pack has gone out, without confusing the vendor.",
+    steps: [
+      "Open Event → NEXT → London → Revise.",
+      "Edit panel copy, placements, board sizes or step-and-repeat recipes — removals stay removed in every later revision.",
+      "Add a note describing what changed, then publish. The revision list is append-only, so history is never overwritten.",
+      "Publishing pushes live: the public London page and any open editor refresh to the new revision immediately.",
+    ],
+  },
+  {
+    title: "Design step-and-repeat walls, door vinyls and pillars",
+    blurb: "Large-format pieces with tile control and real inch readouts.",
+    steps: [
+      "In the London hub, pick the wall, vinyl or pillar you want and open its editor.",
+      "For walls, choose staggered or tiled, then set tile size, spacing and rotation — inch readouts update as you drag.",
+      "For pillars, set the vertical copy, its size and position, and the QR block with its own centring controls.",
+      "Preview at print scale, then download the master. Booth panels keep the vendor's supplied artwork embedded.",
+    ],
+  },
+  {
+    title: "Create multi-day, multi-page agendas",
+    blurb: "Session schedules that print and export cleanly.",
+    steps: [
+      "Open Event → NEXT → Agendas.",
+      "Add a day, then add sessions with time, title, speaker and room; pages break automatically when a day runs long.",
+      "Switch light/dark to check both faces, and use the division listing to produce a division-branded agenda.",
+      "Export as a deck, a print PDF, or push it to the hub preview cards — hub cards refresh as soon as you save.",
+    ],
+  },
+  {
+    title: "Produce floor maps for attendees",
+    blurb: "Top-down venue maps per floor, with or without signage marks.",
+    steps: [
+      "Open Event → NEXT → London → Maps. Pick a floor and filter by area category.",
+      "Turn on rooms-only for attendee-facing maps — signage assets and their legend drop out, leaving room keys and pins.",
+      "Use the design panel to set venue and event name, logo, logo height, single-ink mode and the brand colour strip.",
+      "Draw or drag custom areas, drop area icons, then export as PDF, SVG, CSV or a ZIP of every floor.",
+    ],
+  },
+  {
+    title: "Export city badges for press",
+    blurb: "Delegate badges as a print-ready pack.",
+    steps: [
+      "Open Event → NEXT → City badges and choose a city version.",
+      "Authoring guides are off by default and never rasterise into the file even when switched on.",
+      "Download the pack. The READ-ME states the true standard of the file you received.",
+      "If the PDF/X-4 wrap fails (usually offline) the zip is prefixed UNWRAPPED- and you are warned — re-export online before sending to press.",
+    ],
+  },
+  {
+    title: "Build a deck from ChatGPT (or any MCP client)",
+    blurb: "Use the connector when you'd rather not open the app.",
+    steps: [
+      "Add the Element connector in your assistant, pointing at the app's /mcp endpoint, and sign in when prompted.",
+      "Describe the deck you want — audience, division, story, length. The connector plans sections and picks module variants.",
+      "It prefers modules with a native PowerPoint renderer, so what you download matches what the app would render.",
+      "You get a download link to a complete, layered, editable .pptx — that file is the deliverable, not a preview.",
+      "Only if a large share of slides use heavy design plates will it also offer an optional in-app link for maximum fidelity.",
+    ],
+  },
+  {
+    title: "Use the newer proof and capability modules",
+    blurb: "Phases, growth proof, credentials, capability cards and device screens.",
+    steps: [
+      "Add the module from the library or ask the agent for it by name.",
+      "Numbered phases: add, remove and reorder phases and their tasks; each task carries its own icon and description.",
+      "Growth proof split: up to twelve client logos with row, scale and spacing control, drag-to-place figures, per-figure number formatting, and separate ring/orbit styling for light and dark.",
+      "Credential proof split: credentials sit in hairline orbit rings with no logo frames, two marks per credential for light and dark faces, and editable stat design.",
+      "Capability cards and Device screen + benefits: swap photos (upload, link or team library), edit label bands, bullets and benefit tiles, and set image share, card look and columns.",
+      "All of them export as editable PowerPoint objects.",
+    ],
+  },
 ];
 
 const FAQS: Array<{ section: string; items: QA[] }> = [
@@ -619,6 +703,130 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
       {
         q: "Can I install this as an app?",
         a: 'Yes. On iOS use Safari → Share → "Add to Home Screen". On Android/desktop Chrome, use the install icon in the address bar. Offline is not supported.',
+      },
+    ],
+  },
+  {
+    section: "Proof & capability modules",
+    items: [
+      {
+        q: "What is the Numbered phases module?",
+        a: "A vertical Discovery / build / scale style sequence. Add, remove and reorder phases and the tasks inside them; each task carries its own icon shown in a soft round tint, plus a description that also lands in the PowerPoint export.",
+      },
+      {
+        q: "What is the Growth proof split module?",
+        a: "A client logo wall top-left with headline statistics in orbit rings. You control up to twelve logos with rows, scale and spacing; drag figures into place; set each figure's label, prefix, suffix and decimals; and style ring colour, thickness and orbit dots separately for light and dark.",
+      },
+      {
+        q: "Do the orbit figures overlap if I add more?",
+        a: "No. Collision detection eases the figures apart automatically while keeping the first one closest to where you put it.",
+      },
+      {
+        q: "What is the Credential proof split module?",
+        a: "A raised programme card on the left with up to three credentials on the right in hairline orbit rings. Credential marks sit free with no box frames, each credential carries a light and a dark mark, and the stat design is editable — side-by-side or stacked, accent or ink numerals, uppercase or as-typed labels, alignment and size.",
+      },
+      {
+        q: "What are Capability cards and Device screen + benefits?",
+        a: "Capability cards is two to four cards, each with its own photo, coloured label band, lead claim and bullet list. Device screen + benefits pairs a product screen in a laptop or monitor with two to six icon benefit tiles. Both have knobs for image share, card look, gap, corners, columns, icon size and alignment.",
+      },
+      {
+        q: "Are the numbers in these modules real?",
+        a: "Yes. The defaults are the company's real figures, not sample data, and every number stays editable.",
+      },
+      {
+        q: "Do the newer modules export properly?",
+        a: "Yes — all of them export as real editable PowerPoint objects rather than flat pictures.",
+      },
+    ],
+  },
+  {
+    section: "Divisions & brand modes",
+    items: [
+      {
+        q: "Which brands can I produce for?",
+        a: "Eleven brand modes: enterprise, subcompany, division, product, TP Media, TP Legal, TP Games, TP Digital, TP Life Sciences, Trial Interactive, and co-brand. Switching mode re-themes the artifact and re-scopes the knowledge it is grounded on.",
+      },
+      {
+        q: "Is DataForce supported?",
+        a: "Yes. DataForce has its own approved logo set, hero video and poster, icon set and division content, so decks, print and kits can be produced in DataForce branding like any other division.",
+      },
+      {
+        q: "Do divisions still have their own accent colours?",
+        a: "No. Division accent colours were retired in August 2026 — every TransPerfect division renders in the approved enterprise palette in light and dark, and differs by lockup and copy instead. Element and co-brand keep their own palettes. Event signage is the one exception, where a division tint is allowed on the light end of the ground.",
+      },
+      {
+        q: "Which logo do I use where?",
+        a: "Approved lockups only, never distorted, recoloured or keylined, with a safe zone of 1.5× the T height. Trial Interactive uses its own marks and never the TransPerfect or Life Sciences mark; the Element skins use the Element five-brick mark and never the TransPerfect wordmark.",
+      },
+    ],
+  },
+  {
+    section: "NEXT London & live print jobs",
+    items: [
+      {
+        q: "What is the NEXT London kit?",
+        a: "The live print job for NEXT 2026 at the QEII Centre in London, 24–25 September 2026 — 54+ scenic panels plus step-and-repeat walls, door vinyls, pillars, booth artwork, badges, agendas and floor maps. Event → NEXT → London is the hub.",
+      },
+      {
+        q: "Which version of the artwork am I looking at?",
+        a: "Always the revision in force — the newest published revision, or the originally issued venue pack if nothing has been published yet. Vendors visiting the page without signing in see exactly the same thing.",
+      },
+      {
+        q: "How do revisions work?",
+        a: "Revisions are append-only. Each one snapshots panels, changes, placements, board sizes and step-and-repeat recipes, so nothing is overwritten and a removed panel stays removed. Publishing pushes the change live to open pages instantly.",
+      },
+      {
+        q: "Why are file names prefixed with r012 or rdraft?",
+        a: "Files are stamped with the revision they came from. Unpublished work is labelled rdraft- so a revision number is never printed on a file before that revision exists.",
+      },
+      {
+        q: "Do printers need our fonts?",
+        a: "No. Headlines, captions and wall copy in the print masters are outlined vector paths, not live text, so nothing can substitute a typeface. If the signage face can't be loaded the builder refuses to produce a master rather than silently substituting.",
+      },
+      {
+        q: "Can I move and resize the copy on a panel?",
+        a: "Yes. The live panel editor lets you reposition and resize headline, caption and QR blocks, with the changes clamped to the safe area and saved into the revision.",
+      },
+      {
+        q: "Is every download checked?",
+        a: "Yes. Every .svg, .ai and .png passes the signage QA gate before it is written — no download path bypasses it — and a failure is shown to you rather than quietly ignored.",
+      },
+      {
+        q: "Can I get CMYK signage files?",
+        a: "Not currently. RGB is the house colour space and CMYK output is switched off until every colour stop has an approved press build. We never silently convert brand RGB to CMYK.",
+      },
+      {
+        q: "Which files are press masters and which are proofs?",
+        a: "Panel SVG and .ai files are vector masters. Anything rasterised from the screen — badges, production studio images, social kit renders — is a proof and is labelled as one.",
+      },
+      {
+        q: "Can attendees use the floor maps?",
+        a: "Yes. Turn on rooms-only and the maps show room keys and areas without any signage marks or asset legend — that's the attendee-facing version. Maps cover seven floors and export as PDF, SVG, CSV or a ZIP of the set.",
+      },
+      {
+        q: "Where do event dates, venue and links come from?",
+        a: "One place only. Event facts and the printed URLs and QR targets are defined centrally, so a change flows to every panel, badge, agenda and directory at once.",
+      },
+    ],
+  },
+  {
+    section: "Connector (ChatGPT & MCP)",
+    items: [
+      {
+        q: "Can I use Element from ChatGPT?",
+        a: "Yes. Add the Element connector pointing at the app's /mcp endpoint and sign in. It exposes the taxonomy, knowledge, deck building and export as tools.",
+      },
+      {
+        q: "Is the deck it gives me finished?",
+        a: "Yes. The download link is a complete, layered, editable PowerPoint file — it is the deliverable, not a partial preview, and the connector is instructed never to send you back into the app to finish it.",
+      },
+      {
+        q: "So why does it sometimes offer an app link too?",
+        a: "Only when more than a third of the slides use heavy design plates that render richer in the app. It's an optional extra after your download, never a replacement for it.",
+      },
+      {
+        q: "How does it choose modules?",
+        a: "It prefers module variants with a native PowerPoint renderer and flags each planned slide for whether it exports pixel-true, so the file you download matches what the app would render.",
       },
     ],
   },
