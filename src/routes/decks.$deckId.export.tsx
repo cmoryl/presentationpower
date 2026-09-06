@@ -331,7 +331,14 @@ function ExportView() {
             });
           },
         });
-        visual = await validateExportedPptxVisuals(blob, refs);
+        // Exact Build Fidelity is held to the 99% target; looser modes keep
+        // their historical drift budget.
+        visual = await validateExportedPptxVisuals(
+          blob,
+          refs,
+          visualThresholdFor(readExportFidelity()),
+        );
+
       } catch (e) {
         console.warn("[deck-export-visual-validate] visual check unavailable:", e);
       }
