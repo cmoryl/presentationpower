@@ -326,8 +326,12 @@ export function SocialModuleFrame({
     }
   }, [format]);
 
-  const ink = mode === "dark" ? "#FFFFFF" : "#03002C";
+  // A full-bleed photograph carries its own contrast: the module's copy and the
+  // brand lockup reverse out over the scrim regardless of the kit's face.
+  const moduleMode = bleedPlan ? fullBleedMode(bleedPlan, mode) : mode;
+  const ink = bleedPlan?.kind === "photo" ? "#FFFFFF" : mode === "dark" ? "#FFFFFF" : "#03002C";
   const paper = mode === "dark" ? "#03002C" : "#FFFFFF";
+
 
   // Center the module inside the safe rect so short modules never leave a
   // lopsided band at one edge.
