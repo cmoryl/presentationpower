@@ -117,7 +117,26 @@ export function SocialModuleFrame({
   // (stacked for story/portrait, condensed for a wide banner). Only then do the
   // fit ladders run — no amount of scaling turns a strip into a story.
   const tall = useMemo(() => socialReflowSection(section, aspectClass(format)), [section, format]);
-  const rendered = useMemo(() => applyReliefToSection(tall.section, relief), [tall, relief]);
+  // Photographic / hardware-led modules get a designed full-bleed composition on
+  // tall shapes: the picture (or the brand ground) leaves the type area and
+  // covers the frame, and the module itself is budgeted against a content box.
+  const bleedPlan = useMemo(
+    () =>
+      fullBleedPlanFor(
+        (tall.section as { variantId?: string }).variantId,
+        aspectClass(format),
+      ),
+    [tall, format],
+  );
+  const bleedSection = useMemo(
+    () => (bleedPlan ? fullBleedSection(tall.section, bleedPlan) : tall.section),
+    [tall, bleedPlan],
+  );
+  const bleed = useMemo(
+    () => (bleedPlan ? fullBleedGeometry(format, bleedPlan, safe) : null),
+    [bleedPlan, format, safe],
+  );
+  const rendered = useMemo(() => applyReliefToSection(bleedSection, relief), [bleedSection, relief]);
   const growth = SOCIAL_GROWTH_STEPS[Math.min(growthIndex, growthCeiling.current)];
   const air = SOCIAL_AIR_STEPS[Math.min(airIndex, airCeiling.current)];
   const measureKey = `${format}|${rendered.id}|${rendered.variantId}|${relief.level}|${growth}|${air}`;
@@ -130,7 +149,7 @@ export function SocialModuleFrame({
   // A restacked thin strip additionally needs a designed tall composition: the
   // module goes on a raised panel spanning the safe rect, so it is budgeted
   // against the panel's inner height rather than the whole frame.
-  const useShell = tall.plan?.source === "curated";
+  const useShell = tall.plan?.source === "curated" && !bleed;
   const shell = useMemo(() => (useShell ? tallShellGeometry(safe) : null), [useShell, safe]);
 
   const rawFit = useMemo(
@@ -141,10 +160,10 @@ export function SocialModuleFrame({
         relief,
         growth,
         air,
-        heightBudget: shell ? shell.contentHeight : undefined,
-        widthBudget: shell ? safe.width - shell.panelPad * 2 : undefined,
+        heightBudget: shell ? shell.contentHeight : bleed ? bleed.height : undefined,
+        widthBudget: shell ? safe.width - shell.panelPad * 2 : bleed ? bleed.width : undefined,
       }),
-    [format, naturalHeight, relief, growth, air, shell, safe],
+    [format, naturalHeight, relief, growth, air, shell, bleed, safe],
   );
   // Second pass: collapse the panel onto the module's real height so the shell's
   // bands, not an empty panel, take up the slack.
@@ -154,9 +173,15 @@ export function SocialModuleFrame({
   );
 
   const fit = useMemo(
-    () => (shellFitted ? withComposedFill(rawFit, shellFitted.composedHeight, format) : rawFit),
-    [rawFit, shellFitted, format],
+    () =>
+      shellFitted
+        ? withComposedFill(rawFit, shellFitted.composedHeight, format)
+        : bleed
+          ? withComposedFill(rawFit, bleed.composedHeight, format)
+          : rawFit,
+    [rawFit, shellFitted, bleed, format],
   );
+
 
 
 
