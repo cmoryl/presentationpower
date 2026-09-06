@@ -19,6 +19,7 @@ import type { PrintSection } from "@/lib/print-assets.types";
 import { aspectClass, type SocialFormat } from "@/lib/social-formats";
 import {
   computeSocialFit,
+  withComposedFill,
   nextRelief,
   nextGrowthStep,
   nextAirStep,
@@ -36,7 +37,8 @@ import {
 } from "@/lib/social-module-fit";
 
 import { applyReliefToSection } from "@/lib/social-module-layouts";
-import { socialTallSection } from "@/lib/social-tall-layouts";
+import { socialTallSection, tallShellFit, tallShellGeometry } from "@/lib/social-tall-layouts";
+import { SocialTallShell } from "@/components/campaigns/SocialTallShell";
 
 const SETTLE_BUDGET = 64;
 const MEASURE_BUDGET = 4;
@@ -123,10 +125,36 @@ export function SocialModuleFrame({
   const naturalHeight = measured.h;
   const fresh = measured.key === measureKey;
 
-  const fit = useMemo(
-    () => computeSocialFit({ format, naturalHeight, relief, growth, air }),
-    [format, naturalHeight, relief, growth, air],
+  // A restacked strip still needs a designed tall composition: the module goes
+  // on a raised panel that spans the safe rect, so the module is budgeted
+  // against the panel's inner height rather than the whole frame.
+  const shell = useMemo(() => (tall.plan ? tallShellGeometry(safe) : null), [tall.plan, safe]);
+
+  const rawFit = useMemo(
+    () =>
+      computeSocialFit({
+        format,
+        naturalHeight,
+        relief,
+        growth,
+        air,
+        heightBudget: shell ? shell.contentHeight : undefined,
+        widthBudget: shell ? safe.width - shell.panelPad * 2 : undefined,
+      }),
+    [format, naturalHeight, relief, growth, air, shell, safe],
   );
+  // Second pass: collapse the panel onto the module's real height so the shell's
+  // bands, not an empty panel, take up the slack.
+  const shellFitted = useMemo(
+    () => (shell ? tallShellFit(shell, safe, rawFit.renderedHeight) : null),
+    [shell, safe, rawFit.renderedHeight],
+  );
+
+  const fit = useMemo(
+    () => (shellFitted ? withComposedFill(rawFit, shellFitted.composedHeight, format) : rawFit),
+    [rawFit, shellFitted, format],
+  );
+
 
 
   // Reset every ladder whenever the inputs change so we always start from the
@@ -195,7 +223,7 @@ export function SocialModuleFrame({
     settled.current.add(measureKey);
     if (settled.current.size > SETTLE_BUDGET) return;
 
-    if (!fit.ok) {
+    if (!rawFit.ok) {
       // Air is the newest and cheapest thing to give back.
       if (airIndex > 0) {
         airCeiling.current = Math.min(airCeiling.current, airIndex - 1);
@@ -210,21 +238,21 @@ export function SocialModuleFrame({
         return;
       }
       if (pinned) return;
-      const next = nextRelief(fit, relief);
+      const next = nextRelief(rawFit, relief);
       if (next) setAutoLevel(next.level);
       return;
     }
-    const grow = nextGrowthStep(fit, growthIndex);
+    const grow = nextGrowthStep(rawFit, growthIndex);
     if (grow !== null && grow <= growthCeiling.current) {
       setGrowthIndex(grow);
       return;
     }
     const growthExhausted =
       growthIndex >= Math.min(SOCIAL_GROWTH_MAX, growthCeiling.current) || grow === null;
-    const nextAir = nextAirStep(fit, airIndex, growthExhausted);
+    const nextAir = nextAirStep(rawFit, airIndex, growthExhausted);
     if (nextAir !== null && nextAir <= airCeiling.current) setAirIndex(nextAir);
     }
-  }, [pinned, naturalHeight, fresh, fit, relief, growthIndex, airIndex, measureKey]);
+  }, [pinned, naturalHeight, fresh, rawFit, relief, growthIndex, airIndex, measureKey]);
 
   useEffect(() => {
     if (naturalHeight > 0) onFit?.(fit, relief);
@@ -240,7 +268,9 @@ export function SocialModuleFrame({
   // Height must be expressed in the 816px-wide template coordinate system that
   // `cq()` normalises against — not in rendered px — otherwise growth-narrowed
   // pages silently shrink every band back down.
-  const framePageHeight = Math.round(816 * (safe.height / safe.width));
+  const framePageHeight = shell
+    ? Math.round(816 * (shell.contentHeight / (safe.width - shell.panelPad * 2)))
+    : Math.round(816 * (safe.height / safe.width));
 
   const frameBandPct = useMemo(() => {
     switch (aspectClass(format)) {
@@ -265,6 +295,38 @@ export function SocialModuleFrame({
   const top = safe.top + Math.max(0, (safe.height - fit.renderedHeight) / 2);
   const lockupPad = safe.left * 0.55;
 
+  const moduleBlock = (
+    <div
+      ref={measureRef}
+      className="[container-type:inline-size]"
+      style={{
+        width: fit.pageWidth,
+        transform: `scale(${fit.scale})`,
+        transformOrigin: "top left",
+        ["--print-page-pad" as string]: "0px",
+        ["--print-page-pad-top" as string]: "0px",
+        // Air ladder: multiplies only the module's internal padding so its own
+        // plates and surfaces reach the safe rect.
+        ["--print-fit-pad" as string]: String(fit.air),
+      }}
+    >
+      {/* The virtual sheet takes the FRAME's aspect (or the shell panel's), not
+        Letter's. Band and masthead heights are a share of page height, so this
+        is what makes a photo band fill a square post instead of sitting in a
+        letterbox. */}
+      <PrintPageProvider
+        size="Letter"
+        margin="standard"
+        heightPx={framePageHeight}
+        heroBandPct={frameBandPct}
+      >
+        <PrintDocModeProvider icons={relief.icons} iconStyle={PRINT_ICON_STYLE_DEFAULT}>
+          <PrintSectionRenderer section={rendered} mode={mode} accent={accent} />
+        </PrintDocModeProvider>
+      </PrintPageProvider>
+    </div>
+  );
+
   return (
     <VizSurfaceProvider surface="social">
       <div
@@ -278,6 +340,8 @@ export function SocialModuleFrame({
         data-social-tall={tall.plan ? tall.plan.to : undefined}
         data-social-fit-growth={growth}
         data-social-fit-air={air}
+        data-social-panel-fill={Math.round(rawFit.fillPct * 100)}
+        data-social-settled={settled.current.size}
 
       >
 
@@ -307,47 +371,39 @@ export function SocialModuleFrame({
             }}
           />
 
-          {/* Live module, scaled into the safe rect. */}
-          <div
-            style={{
-              position: "absolute",
-              left: safe.left,
-              top,
-              width: safe.width,
-              height: Math.min(fit.renderedHeight, safe.height),
-              overflow: "hidden",
-            }}
-          >
+          {/* Live module, scaled into the safe rect (or into the tall shell's
+            panel when a thin strip has been restacked for a tall frame). */}
+          {shell ? (
+            <SocialTallShell
+              geometry={shellFitted ?? shell}
+              safe={safe}
+              accent={accent}
+              mode={mode}
+              marker={tall.plan?.to.replace(/-/g, " ")}
+            >
+              <div
+                style={{
+                  height: Math.min(fit.renderedHeight, (shellFitted ?? shell).contentHeight),
+                  overflow: "hidden",
+                }}
+              >
+                {moduleBlock}
+              </div>
+            </SocialTallShell>
+          ) : (
             <div
-              ref={measureRef}
-              className="[container-type:inline-size]"
               style={{
-                width: fit.pageWidth,
-                transform: `scale(${fit.scale})`,
-                transformOrigin: "top left",
-                ["--print-page-pad" as string]: "0px",
-                ["--print-page-pad-top" as string]: "0px",
-                // Air ladder: multiplies only the module's internal padding so
-                // its own plates and surfaces reach the safe rect.
-                ["--print-fit-pad" as string]: String(fit.air),
+                position: "absolute",
+                left: safe.left,
+                top,
+                width: safe.width,
+                height: Math.min(fit.renderedHeight, safe.height),
+                overflow: "hidden",
               }}
             >
-              {/* The virtual sheet takes the FRAME's aspect, not Letter's. Band
-                and masthead heights are a share of page height, so this is what
-                makes a photo band fill a square post instead of sitting in a
-                letterbox. */}
-              <PrintPageProvider
-                size="Letter"
-                margin="standard"
-                heightPx={framePageHeight}
-                heroBandPct={frameBandPct}
-              >
-                <PrintDocModeProvider icons={relief.icons} iconStyle={PRINT_ICON_STYLE_DEFAULT}>
-                  <PrintSectionRenderer section={rendered} mode={mode} accent={accent} />
-                </PrintDocModeProvider>
-              </PrintPageProvider>
+              {moduleBlock}
             </div>
-          </div>
+          )}
 
           {!hideLockup && brand ? (
             <div style={{ position: "absolute", left: safe.left, bottom: lockupPad }}>

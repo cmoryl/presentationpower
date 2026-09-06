@@ -143,3 +143,75 @@ export function socialTallSection(section: PrintSection, cls: AspectClass): Soci
   if (!plan) return { section };
   return { section: applyTallPlan(section, plan), plan };
 }
+
+/* -------------------------------------------------------------------------
+ * TALL SHELL
+ * -------------------------------------------------------------------------
+ * A restacked variant is still a card, and a card is still shorter than a
+ * story frame. So on tall aspects the composition itself changes: the module
+ * sits on a raised panel that spans the safe rect, with an accent rule above
+ * it and a spec rail below. That is a designed tall layout — the module is
+ * never stretched, it is given furniture that legitimately fills the frame.
+ */
+
+export type SocialTallShellGeometry = {
+  /** Height of the accent rule band above the panel. */
+  headHeight: number;
+  /** Height of the spec rail below the panel. */
+  railHeight: number;
+  /** Outer height of the raised panel. */
+  panelHeight: number;
+  /** Padding inside the panel. */
+  panelPad: number;
+  /** Vertical space the module itself may use. */
+  contentHeight: number;
+  /** Total composed height (head + panel + rail). */
+  composedHeight: number;
+  /** Panel corner radius. */
+  radius: number;
+};
+
+/**
+ * Collapse the shell around the module's real rendered height: an empty white
+ * panel is not a design. The panel hugs its content and the space it gives back
+ * is handed to the head band (which then carries a display stack) and the spec
+ * rail, so the frame is filled with typography rather than void.
+ */
+export function tallShellFit(
+  base: SocialTallShellGeometry,
+  safe: { width: number; height: number },
+  renderedHeight: number,
+): SocialTallShellGeometry {
+  if (!(renderedHeight > 0)) return base;
+  const gap = Math.round(safe.height * 0.025);
+  const content = Math.min(base.contentHeight, renderedHeight);
+  const panelHeight = Math.max(120, Math.round(content + base.panelPad * 2));
+  const spare = Math.max(0, base.panelHeight - panelHeight);
+  return {
+    ...base,
+    panelHeight,
+    contentHeight: content,
+    headHeight: base.headHeight + Math.round(spare * 0.66),
+    railHeight: base.railHeight + (spare - Math.round(spare * 0.66)),
+    composedHeight: base.headHeight + Math.round(spare * 0.66) + gap * 2 + panelHeight +
+      base.railHeight + (spare - Math.round(spare * 0.66)),
+  };
+}
+
+/** Shell geometry for a safe rect, in frame px. */
+export function tallShellGeometry(safe: { width: number; height: number }): SocialTallShellGeometry {
+  const headHeight = Math.round(safe.height * 0.07);
+  const railHeight = Math.round(safe.height * 0.11);
+  const gap = Math.round(safe.height * 0.025);
+  const panelHeight = Math.max(160, safe.height - headHeight - railHeight - gap * 2);
+  const panelPad = Math.round(safe.width * 0.07);
+  return {
+    headHeight,
+    railHeight,
+    panelHeight,
+    panelPad,
+    contentHeight: Math.max(80, panelHeight - panelPad * 2),
+    composedHeight: headHeight + gap * 2 + panelHeight + railHeight,
+    radius: Math.round(safe.width * 0.045),
+  };
+}
