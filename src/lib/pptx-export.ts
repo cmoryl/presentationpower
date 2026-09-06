@@ -116,6 +116,14 @@ function noteExportLogo(ok: boolean) {
 }
 import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radius";
 import { resolveCertStyle } from "@/lib/cert-style";
+import {
+  MAX_BENEFITS,
+  MAX_CARD_BULLETS,
+  readBenefits,
+  readCards,
+  resolveCapCardStyle,
+  resolveQuadStyle,
+} from "@/lib/showcase-cards";
 
 import { laneCornerRadiusIn, laneHeightIn, railBoxIn } from "@/lib/layer-stack-geometry";
 import {
@@ -3486,6 +3494,12 @@ function renderAdvancedVariant(
       return true;
     case "MV-PROOF-CERT-ORBITS":
       renderCertOrbits(s, c, p);
+      return true;
+    case "MV-SOL-CAP-CARDS":
+      renderCapCards(s, c, p);
+      return true;
+    case "MV-SHOW-DEVICE-QUAD":
+      renderDeviceQuad(s, c, p);
       return true;
     case "MV-RISK-MITIGATION":
       renderRiskMitigation(s, c, p);
@@ -12202,6 +12216,236 @@ function renderGrowthOrbits(
 }
 
 // ── MV-PROOF-CERT-ORBITS ── programme card | certification orbit rings
+/** MV-SOL-CAP-CARDS — parallel cards, each a native rect stack: image plate,
+ *  filled label band, lead claim and ruled bullet rows. Every object stays a
+ *  real PowerPoint shape or text frame so the deck is editable on delivery. */
+function renderCapCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const cards = readCards(c.cards);
+  const st = resolveCapCardStyle(c.capCardStyle);
+
+  s.addText(str(c.title), {
+    x: 0.6,
+    y: 0.4,
+    w: 12.1,
+    h: 0.85,
+    fontSize: 32,
+    bold: true,
+    color: p.primary,
+    fontFace: "Geist",
+  });
+
+  const TOTAL = 12.1;
+  const gapIn = st.gap / 96;
+  const n = Math.max(1, cards.length);
+  const cw = (TOTAL - gapIn * (n - 1)) / n;
+  const top = 1.5;
+  const cardH = 5.3;
+  const imgH = cardH * st.imageRatio;
+  const bandH = 0.42;
+  const tone = (t: string): string =>
+    t === "accent" ? p.accent : t === "aqua" ? "A1FBF9" : t === "lavender" ? "C2A3FF" : p.primary;
+
+  cards.forEach((card, i) => {
+    const x = 0.6 + i * (cw + gapIn);
+    // Card body
+    s.addShape("rect", {
+      x,
+      y: top,
+      w: cw,
+      h: cardH,
+      fill: { color: st.cardLook === "outline" ? "FFFFFF" : p.surface },
+      line: { color: st.cardLook === "outline" ? p.surface : p.surface },
+      ...(st.cardLook === "elevated"
+        ? { shadow: { type: "outer", blur: 12, offset: 3, angle: 90, color: "000000", opacity: 0.12 } }
+        : {}),
+    });
+    // Image plate (the photograph sits here; kept as a tinted plate so the
+    // slide stays editable when the source image is a signed private URL)
+    s.addShape("rect", {
+      x,
+      y: top,
+      w: cw,
+      h: imgH,
+      fill: { color: tone(card.tone) },
+      line: { color: tone(card.tone) },
+    });
+    // Label band
+    s.addText(st.bandCase === "upper" ? card.label.toUpperCase() : card.label, {
+      x,
+      y: top + imgH - bandH,
+      w: cw,
+      h: bandH,
+      fill: { color: tone(card.tone) },
+      fontSize: 12,
+      bold: true,
+      charSpacing: 1.4,
+      color: card.tone === "ink" || card.tone === "accent" ? "FFFFFF" : p.primary,
+      align: "center",
+      valign: "middle",
+      fontFace: "Geist",
+    });
+
+    const bodyY = top + imgH + 0.22;
+    const pad = 0.26;
+    s.addText(
+      [
+        { text: `${card.lead}\n`, options: { bold: true, fontSize: 13, color: st.leadColor === "ink" ? p.primary : st.leadColor === "accent" ? p.accent : tone(card.tone) } },
+        { text: card.leadNote, options: { fontSize: 11, color: p.ink } },
+      ],
+      {
+        x: x + pad,
+        y: bodyY,
+        w: cw - pad * 2,
+        h: 0.8,
+        fontFace: "Geist",
+        lineSpacingMultiple: 1.1,
+      },
+    );
+
+    const rowY = bodyY + 0.9;
+    const rowH = st.density === "compact" ? 0.34 : 0.42;
+    card.bullets.slice(0, MAX_CARD_BULLETS).forEach((b, bi) => {
+      const mark =
+        st.bulletMark === "number" ? `${bi + 1}.  ` : st.bulletMark === "dash" ? "—  " : "•  ";
+      s.addText(`${mark}${b}`, {
+        x: x + pad,
+        y: rowY + bi * rowH,
+        w: cw - pad * 2,
+        h: rowH,
+        fontSize: 10.5,
+        color: p.primary,
+        valign: "middle",
+        fontFace: "Geist",
+      });
+      s.addShape("line", {
+        x: x + pad,
+        y: rowY + (bi + 1) * rowH,
+        w: cw - pad * 2,
+        h: 0,
+        line: { color: p.surface, width: 0.5 },
+      });
+    });
+  });
+}
+
+/** MV-SHOW-DEVICE-QUAD — device plate on one side, icon benefit tiles on the
+ *  other. Tiles are native rects with text frames, so labels stay editable. */
+function renderDeviceQuad(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const rows = readBenefits(c.benefits);
+  const st = resolveQuadStyle(c.quadStyle);
+
+  const TOTAL = 12.1;
+  const GAP = 0.6;
+  const usable = TOTAL - GAP;
+  const dW = (usable * st.split) / (st.split + 1);
+  const bW = usable - dW;
+  const deviceLeft = st.deviceSide === "left";
+  const dX = deviceLeft ? 0.6 : 0.6 + bW + GAP;
+  const bX = deviceLeft ? dX + dW + GAP : 0.6;
+
+  s.addText(str(c.title), {
+    x: bX,
+    y: 0.7,
+    w: bW,
+    h: 0.7,
+    fontSize: 30,
+    bold: true,
+    color: p.primary,
+    fontFace: "Geist",
+  });
+  if (st.showTitleRule) {
+    s.addShape("rect", {
+      x: bX,
+      y: 1.42,
+      w: 1.1,
+      h: 0.05,
+      fill: { color: p.accent },
+      line: { color: p.accent },
+    });
+  }
+  if (str(c.body)) {
+    s.addText(str(c.body), {
+      x: bX,
+      y: 1.6,
+      w: bW,
+      h: 0.8,
+      fontSize: 12,
+      color: p.ink,
+      fontFace: "Geist",
+    });
+  }
+
+  // Device plate — screen well inside a chassis frame
+  const dY = 1.7;
+  const dH = 3.6;
+  s.addShape("rect", {
+    x: dX,
+    y: dY,
+    w: dW,
+    h: dH,
+    fill: { color: p.surface },
+    line: { color: p.surface },
+  });
+  s.addShape("rect", {
+    x: dX + 0.16,
+    y: dY + 0.16,
+    w: dW - 0.32,
+    h: dH - 0.32,
+    fill: { color: p.primary },
+    line: { color: p.primary },
+  });
+  s.addShape("rect", {
+    x: dX + dW * 0.18,
+    y: dY + dH + 0.06,
+    w: dW * 0.64,
+    h: 0.14,
+    fill: { color: p.surface },
+    line: { color: p.surface },
+  });
+
+  // Benefit tiles
+  const cols = st.columns === 1 ? 1 : 2;
+  const tGap = 0.2;
+  const tW = (bW - tGap * (cols - 1)) / cols;
+  const tRows = Math.ceil(rows.length / cols);
+  const tTop = 2.6;
+  const tH = Math.min(1.5, (5.3 - (tTop - 1.7)) / Math.max(1, tRows) - tGap);
+  rows.slice(0, MAX_BENEFITS).forEach((row, i) => {
+    const cx = bX + (i % cols) * (tW + tGap);
+    const cy = tTop + Math.floor(i / cols) * (tH + tGap);
+    if (st.tileLook !== "bare") {
+      s.addShape("rect", {
+        x: cx,
+        y: cy,
+        w: tW,
+        h: tH,
+        fill: { color: st.tileLook === "tile" ? p.surface : "FFFFFF" },
+        line: { color: p.surface },
+      });
+    }
+    s.addShape("ellipse", {
+      x: cx + (st.labelAlign === "center" ? tW / 2 - 0.18 : 0.18),
+      y: cy + 0.18,
+      w: 0.36 * st.iconScale,
+      h: 0.36 * st.iconScale,
+      fill: { color: p.accent },
+      line: { color: p.accent },
+    });
+    s.addText(row.label, {
+      x: cx + 0.14,
+      y: cy + 0.62,
+      w: tW - 0.28,
+      h: tH - 0.72,
+      fontSize: 11,
+      bold: true,
+      color: p.primary,
+      align: st.labelAlign === "center" ? "center" : "left",
+      valign: "top",
+      fontFace: "Geist",
+    });
+  });
+}
+
 function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const strList = (v: unknown): string[] =>
     Array.isArray(v) ? v.map((x) => str(x)).filter(Boolean) : [];

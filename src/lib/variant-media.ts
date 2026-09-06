@@ -25,6 +25,7 @@ const IMAGE_VARIANT_IDS = new Set<string>([
   // Device showcases — the screenshot inside the laptop / monitor
   "MV-SHOW-LAPTOP",
   "MV-SHOW-MONITOR",
+  "MV-SHOW-DEVICE-QUAD",
   // Portrait quote uses a subject photo
   "MV-QUOTE-PORTRAIT",
   // CTA close card renders a supporting photo

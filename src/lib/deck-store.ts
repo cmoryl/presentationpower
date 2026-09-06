@@ -1656,6 +1656,64 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           },
         ],
       };
+    case "MV-SOL-CAP-CARDS":
+      return {
+        title: "TransPerfect brings you the power of AI",
+        cards: [
+          {
+            label: "Technology",
+            lead: "In-house R&D team:",
+            leadNote: "Gives you the power to personalize & scale",
+            bullets: [
+              "Proprietary neural machine translation",
+              "Third-party models & LLMs",
+              "In-house data scientists",
+              "Data security and privacy",
+            ],
+            tone: "ink",
+            mediaSeed: "technology",
+          },
+          {
+            label: "Services",
+            lead: "Client-powered feedback loop:",
+            leadNote: "We listen to what you want",
+            bullets: [
+              "Human post-editing",
+              "Specialized AI consulting",
+              "Pilots, programs, and proof of concepts",
+              "Content matrix development",
+            ],
+            tone: "accent",
+            mediaSeed: "services",
+          },
+          {
+            label: "Products",
+            lead: "Performance reporting & ongoing improvement:",
+            leadNote: "Leveraging intelligence to power your growth",
+            bullets: [
+              "Standalone portal",
+              "AI-powered workflows",
+              "Chrome and Outlook plugins, APIs, and custom integrations",
+            ],
+            tone: "ink",
+            mediaSeed: "products",
+          },
+        ],
+      };
+    case "MV-SHOW-DEVICE-QUAD":
+      return {
+        title: "Translation memory",
+        body: "Every approved segment is stored, reused and improved — so language costs fall as your content grows.",
+        deviceKind: "laptop",
+        deviceTone: "silver",
+        mediaSeed: "translation-memory",
+        benefits: [
+          { icon: "Sparkles", label: "AI enhanced" },
+          { icon: "Wallet", label: "Never pay to translate the same phrase twice" },
+          { icon: "Award", label: "Improved quality and consistency" },
+          { icon: "Rocket", label: "Faster time-to-market" },
+        ],
+      };
     case "MV-PROOF-CERT-ORBITS":
       return {
         title: "Our commitment to quality",
