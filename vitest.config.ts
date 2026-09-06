@@ -10,6 +10,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
+    setupFiles: ["tests/support/london-font.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
     exclude: ["**/node_modules/**", "tests/e2e/**", "**/dist/**", "**/.nitro/**"],
     // Several suites sweep whole catalogs (150+ signage panels, 200+ module

@@ -42,25 +42,6 @@ function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
   return out;
 }
 
-/** Node-side read, used by tests, scripts and any server-side build. */
-function readFromDisk(): LondonSignageFace | null {
-  try {
-    const nodeProcess = (globalThis as { process?: { versions?: { node?: string } } }).process;
-    if (!nodeProcess?.versions?.node) return null;
-    // Bundlers must not follow this into a browser bundle.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
-    const req: any = (globalThis as any).require ?? undefined;
-    const fs = req
-      ? req("node:fs")
-      : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ((globalThis as any).__londonFs ?? null);
-    if (!fs) return null;
-    return wrap(toArrayBuffer(fs.readFileSync(LONDON_SIGNAGE_FONT_FILE)));
-  } catch {
-    return null;
-  }
-}
-
 /**
  * Load (once) the Geist Bold face used by every London signage master. Resolves
  * from the shipped font file in the browser and from disk under Node.
@@ -104,11 +85,6 @@ export function londonSignageFaceReady(): boolean {
  */
 export function londonSignageFace(): LondonSignageFace {
   if (cached) return cached;
-  const disk = readFromDisk();
-  if (disk) {
-    cached = disk;
-    return cached;
-  }
   throw new Error(LONDON_SIGNAGE_FONT_MISSING);
 }
 
