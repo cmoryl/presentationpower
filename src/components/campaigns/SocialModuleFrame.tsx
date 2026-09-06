@@ -385,6 +385,8 @@ export function SocialModuleFrame({
         data-social-fit-air={air}
         data-social-panel-fill={Math.round(rawFit.fillPct * 100)}
         data-social-settled={settled.current.size}
+        data-social-bleed={bleedPlan ? bleedPlan.kind : undefined}
+
 
       >
 
