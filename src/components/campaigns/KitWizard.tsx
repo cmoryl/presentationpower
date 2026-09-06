@@ -28,7 +28,12 @@ import {
 } from "lucide-react";
 
 import { BRAND_MODES } from "@/lib/taxonomy";
-import { SOCIAL_FORMATS_BY_ID, KIT_PROFILES, getFormat } from "@/lib/social-formats";
+import {
+  SOCIAL_FORMATS_BY_ID,
+  KIT_PROFILES,
+  getFormat,
+  type FormatPlatform,
+} from "@/lib/social-formats";
 import {
   buildCampaignAssets,
   type EventFacts,
