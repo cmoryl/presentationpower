@@ -37,7 +37,8 @@ import {
 } from "@/lib/social-module-fit";
 
 import { applyReliefToSection } from "@/lib/social-module-layouts";
-import { socialTallSection, tallShellFit, tallShellGeometry } from "@/lib/social-tall-layouts";
+import { tallShellFit, tallShellGeometry } from "@/lib/social-tall-layouts";
+import { socialReflowSection } from "@/lib/social-reflow";
 import { SocialTallShell } from "@/components/campaigns/SocialTallShell";
 
 const SETTLE_BUDGET = 64;
