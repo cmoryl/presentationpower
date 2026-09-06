@@ -240,6 +240,8 @@ function BadgeGuides({ ppi }: { ppi: number }) {
       viewBox={`0 0 ${w} ${h}`}
       style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
       aria-hidden
+      data-bleed-guide="true"
+      data-export-ignore="true"
     >
       <rect
         x={0.5}
