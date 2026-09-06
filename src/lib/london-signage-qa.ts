@@ -25,7 +25,7 @@ import {
   LONDON_DOOR_ACCENT_WEIGHT,
   londonDivisionStops,
 } from "@/lib/next-london-division";
-import { londonPanelFamily } from "@/lib/next-london-branding";
+import { londonBrandingPlan, londonPanelFamily } from "@/lib/next-london-branding";
 
 const MM_TO_PT = 72 / 25.4;
 
@@ -226,6 +226,42 @@ export function auditSvg(panel: LondonPanel, svg: string): LondonQaReport {
           "vector gradient only",
           /<image/i.test(svg) ? "embedded raster found" : "vector gradient",
         ),
+    // Copy must be outlined vector paths: a live <text> element re-flows the
+    // moment a vendor machine substitutes a face for Geist.
+    (() => {
+      const liveText = /<text[\s>]/i.test(svg);
+      const outlined = /data-text="/.test(svg);
+      const wantsCopy = (() => {
+        try {
+          return Boolean(londonBrandingPlan(panel).copy);
+        } catch {
+          return false;
+        }
+      })();
+      return check(
+        "svg-no-live-text",
+        "Copy is outlined vector paths",
+        !liveText && (!wantsCopy || outlined),
+        "outlined paths only",
+        liveText
+          ? "live <text> element found"
+          : wantsCopy && !outlined
+            ? "headline copy missing from the master"
+            : "outlined paths",
+      );
+    })(),
+    (() => {
+      const payloads = [...svg.matchAll(/data-qr="([^"]*)"/g)].map((m) => m[1] ?? "");
+      const bad = payloads.filter((p) => p && !p.startsWith("https://"));
+      return check(
+        "qr-payload-https",
+        "QR payloads are https",
+        bad.length === 0,
+        "https:// only",
+        bad.length ? bad.join(", ") : payloads.length ? "https" : "no QR on this panel",
+        { warnOnly: true, note: "A non-https QR target can be blocked or warned on scan." },
+      );
+    })(),
   ];
 
   return {
@@ -336,6 +372,28 @@ export function auditAi(panel: LondonPanel, ai: string | Uint8Array): LondonQaRe
         note: "Vector-path blends print correctly but are less editable than a live shading.",
       },
     ),
+    (() => {
+      const liveFont = /\/Subtype\s*\/(TrueType|Type1)/.test(text) || / Tj/.test(text);
+      return check(
+        "ai-no-live-text",
+        "Copy is outlined vector paths",
+        !liveFont,
+        "no font resource, no text-showing operator",
+        liveFont ? "live text found" : "outlined paths",
+      );
+    })(),
+    (() => {
+      const payloads = [...text.matchAll(/\/TPQr\s*\(([^)]*)\)/g)].map((m) => m[1] ?? "");
+      const bad = payloads.filter((p) => p && !p.startsWith("https://"));
+      return check(
+        "qr-payload-https",
+        "QR payloads are https",
+        bad.length === 0,
+        "https:// only",
+        bad.length ? bad.join(", ") : payloads.length ? "https" : "no QR on this panel",
+        { warnOnly: true, note: "A non-https QR target can be blocked or warned on scan." },
+      );
+    })(),
     ...auditAiGradient(panel, text),
   ];
 

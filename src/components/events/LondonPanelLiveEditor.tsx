@@ -6,6 +6,8 @@
 // step. The editor is intentionally self-contained so it can be mounted in a
 // dialog from any panel listing.
 
+import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
+import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Copy, Crosshair, Download, Move, QrCode, RotateCcw, Ruler, Type } from "lucide-react";
 import { toast } from "sonner";
@@ -187,7 +189,11 @@ export function LondonPanelLiveEditor({
 
   const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
   const art = useMemo(() => ({ colorSpace, vibrance: 1 }), [colorSpace]);
-  const svg = useMemo(() => buildLondonPanelSvg(panel, art), [panel, placement, art, wallConfigs]);
+  const faceReady = useLondonSignageFace();
+  const svg = useMemo(
+    () => (faceReady ? buildLondonPanelSvg(panel, art) : ""),
+    [panel, placement, art, wallConfigs, faceReady],
+  );
   // Division items are restricted to the approved white lockups.
   const divisionAccent = londonDivisionAccent(plan.familyId);
   const colourways = useMemo(() => {
@@ -279,6 +285,7 @@ export function LondonPanelLiveEditor({
     });
 
   const downloadPanel = async (kind: "svg" | "ai") => {
+    await loadLondonSignageFace();
     const base = londonPanelFileBase(panel, revisionLabel, colorSpace);
     // Same spec gate as the kit page: a file that disagrees with the panel
     // specification is never saved.

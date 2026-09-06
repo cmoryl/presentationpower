@@ -8,6 +8,7 @@
 //   READ-ME.txt             geometry, colour and output notes
 // -----------------------------------------------------------------------------
 
+import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
 import JSZip from "jszip";
 import jsPDF from "jspdf";
 import { fetchIccProfile, wrapPdfAsX4 } from "./pdf-x4";
@@ -155,6 +156,9 @@ export async function exportPillarSign(opts: {
   ppi?: number;
   onProgress?: (p: PillarExportProgress) => void;
 }): Promise<PillarExportResult> {
+  // Copy is outlined into vector paths, so the signage face must be in memory
+  // before any master is built.
+  await loadLondonSignageFace();
   const { node, nativeWidth, nativeHeight, config } = opts;
   const ppi = opts.ppi ?? PILLAR_SPEC.rasterPpi;
   const slug = pillarSlug(config);

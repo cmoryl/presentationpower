@@ -61,6 +61,11 @@ import {
 } from "@/lib/next-london-cmyk";
 import { svgPathToPdfOps } from "@/lib/vector-path-pdf";
 import {
+  londonSignageFace,
+  outlineText,
+  type LondonSignageFace,
+} from "@/lib/next-london-text-outline";
+import {
   brewGsName,
   brewMotifAlphas,
   brewMotifPdfOps,
@@ -512,6 +517,12 @@ export type LondonArtOptions = {
    * Omitted = the local board-size store (today's behaviour).
    */
   boardSize?: LondonBoardSize;
+  /**
+   * Pre-loaded signage face used to outline every piece of copy. Omitted = the
+   * module-level cache (`loadLondonSignageFace()` must have resolved first);
+   * the builders throw rather than fall back to live, substitutable text.
+   */
+  face?: LondonSignageFace;
 };
 
 /**
@@ -609,17 +620,33 @@ export function buildLondonPanelSvg(
   const inkOnLight = brand.colourway === "dblue";
   const copyHex = inkOnLight ? "#03002C" : "#FFFFFF";
   const copyPaint = paintFor(copyHex);
-  // Vertical copy runs DOWN the panel — a 90° rotation about the anchor, so the
-  // text object stays live and re-typeable in Illustrator.
+  // Copy is OUTLINED, never live text: a vendor machine without Geist would
+  // substitute a face and move the headline. Centring uses the font's real
+  // advance width, not a per-character estimate.
+  const face = options.face ?? londonSignageFace();
+  // Vertical copy runs DOWN the panel — a 90° rotation about the anchor.
   const copyRotate = brand.copyVertical
     ? ` transform="rotate(90 ${brand.copyCentreMm.toFixed(2)} ${brand.copyBaselineMm.toFixed(2)})"`
     : "";
   const copyLayer = brand.copy
-    ? `<text data-layer="copy" data-layer-order="2" x="${brand.copyCentreMm.toFixed(2)}" y="${brand.copyBaselineMm.toFixed(2)}"` +
-      `${copyRotate} data-direction="${brand.copyVertical ? "vertical" : "horizontal"}"` +
-      ` text-anchor="middle" fill="${copyPaint.paint}"${copyPaint.meta} font-family="${LONDON_SIGNAGE_FONT.cssStack}"` +
-      ` font-weight="${LONDON_SIGNAGE_FONT.weight}" font-size="${brand.copySizeMm.toFixed(2)}"` +
-      ` letter-spacing="${(brand.copySizeMm * brand.copyTrackingEm).toFixed(3)}">${escapeXml(brand.copy)}</text>`
+    ? (() => {
+        const run = outlineText(face, brand.copy, {
+          sizeMm: brand.copySizeMm,
+          trackingEm: brand.copyTrackingEm,
+          anchor: "middle",
+          x: brand.copyCentreMm,
+          y: brand.copyBaselineMm,
+          vertical: brand.copyVertical,
+        });
+        return (
+          `<path data-layer="copy" data-layer-order="2" d="${run.d}"` +
+          `${copyRotate} data-direction="${brand.copyVertical ? "vertical" : "horizontal"}"` +
+          ` data-text="${escapeXml(brand.copy)}" data-font="${face.name}"` +
+          ` data-size-mm="${brand.copySizeMm.toFixed(2)}"` +
+          ` data-advance-mm="${run.advanceMm.toFixed(2)}"` +
+          ` fill="${copyPaint.paint}"${copyPaint.meta}/>`
+        );
+      })()
     : "";
 
   // QR: real encoded modules as vector geometry on a white plate, so the code
@@ -632,11 +659,20 @@ export function buildLondonPanelSvg(
         const ink = paintFor(q.moduleInk);
         const scale = q.size / q.modules;
         const caption = q.caption
-          ? `<text x="${q.captionX.toFixed(2)}" y="${(q.y + q.size + pad + q.captionPadMm + q.captionSizeMm).toFixed(2)}"` +
-            ` text-anchor="${q.captionAnchor}" fill="${copyPaint.paint}"${copyPaint.meta}` +
-            ` font-family="${LONDON_SIGNAGE_FONT.cssStack}" font-weight="${q.captionWeight}"` +
-            ` letter-spacing="${(q.captionSizeMm * q.captionTracking).toFixed(3)}"` +
-            ` font-size="${q.captionSizeMm.toFixed(2)}">${escapeXml(q.caption)}</text>`
+          ? (() => {
+              const run = outlineText(face, q.caption, {
+                sizeMm: q.captionSizeMm,
+                trackingEm: q.captionTracking,
+                anchor: q.captionAnchor === "end" ? "end" : q.captionAnchor === "start" ? "start" : "middle",
+                x: q.captionX,
+                y: q.y + q.size + pad + q.captionPadMm + q.captionSizeMm,
+              });
+              return (
+                `<path d="${run.d}" data-text="${escapeXml(q.caption)}" data-font="${face.name}"` +
+                ` data-size-mm="${q.captionSizeMm.toFixed(2)}"` +
+                ` fill="${copyPaint.paint}"${copyPaint.meta}/>`
+              );
+            })()
           : "";
         // A transparent code drops the plate so the modules print straight onto
         // the ground — only safe on flat, high-contrast art, and the designer's
@@ -653,6 +689,7 @@ export function buildLondonPanelSvg(
         );
       })()
     : "";
+
 
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${panel.bleedW}mm" height="${panel.bleedH}mm"`,
@@ -687,6 +724,15 @@ export function buildLondonPanelSvg(
           fontStack: LONDON_SIGNAGE_FONT.cssStack,
           fontWeight: LONDON_SIGNAGE_FONT.weight,
           tracking: LONDON_SIGNAGE_FONT.tracking,
+          outline: (text, sizeMm, x, y) =>
+            outlineText(face, text, {
+              sizeMm,
+              trackingEm: LONDON_SIGNAGE_FONT.tracking,
+              anchor: "middle",
+              x,
+              y,
+            }),
+          faceName: face.name,
         })
       : "",
     wall ? "" : copyLayer,
@@ -804,24 +850,35 @@ export function buildLondonPanelAi(
       )
     : fillOp(brand.colourway === "dblue" ? "#03002C" : "#FFFFFF");
 
+  // Copy is OUTLINED into filled path objects — no /Font resource, no Tj, so a
+  // RIP cannot substitute a face. Centring uses the font's true advance.
+  const face = options.face ?? londonSignageFace();
+  const outlineOps = (d: string): string =>
+    svgPathToPdfOps(d, { scale: MM_TO_PT, x: 0, y: 0, artHeight: panel.bleedH });
+
   const copyOps = brand.copy
     ? (() => {
-        const size = brand.copySizeMm * MM_TO_PT;
-        const tracking = size * brand.copyTrackingEm;
-        const advance = brand.copy.length * (size * 0.62 + tracking);
-        const ax = brand.copyCentreMm * MM_TO_PT;
-        const ay = h - brand.copyBaselineMm * MM_TO_PT;
+        const run = outlineText(face, brand.copy, {
+          sizeMm: brand.copySizeMm,
+          trackingEm: brand.copyTrackingEm,
+          anchor: "middle",
+          x: brand.copyCentreMm,
+          y: brand.copyBaselineMm,
+          vertical: brand.copyVertical,
+        });
+        const ops = outlineOps(run.d);
+        if (!ops) return "";
         // Copy on a CMYK master follows the print contract: dark copy is 100K,
         // knockout copy is 0/0/0/0 — never a four-colour build.
-        // Vertical copy is a live text object rotated -90°, so it runs down the
-        // pillar and still re-types in Illustrator.
-        const tm = brand.copyVertical
-          ? `0 -1 1 0 ${f3(ax)} ${f3(ay + advance / 2)} Tm`
-          : `1 0 0 1 ${f3(ax - advance / 2)} ${f3(ay)} Tm`;
-        return (
-          `q ${copyInk} BT /F1 ${f3(size)} Tf ${f3(tracking)} Tc ` +
-          `${tm} (${pdfText(brand.copy)}) Tj ET Q\n`
-        );
+        // Vertical copy is the same outline run, rotated -90° about its anchor
+        // (the y-flip mirror of the SVG master's rotate(90 …)).
+        let spin = "";
+        if (brand.copyVertical) {
+          const px = brand.copyCentreMm * MM_TO_PT;
+          const py = h - brand.copyBaselineMm * MM_TO_PT;
+          spin = `0 -1 1 0 ${f3(px - py)} ${f3(py + px)} cm `;
+        }
+        return `q ${spin}${copyInk} ${ops} f Q\n`;
       })()
     : "";
 
@@ -846,20 +903,20 @@ export function buildLondonPanelAi(
         const code = modules ? `q ${fillOp(q.moduleInk)} ${modules} f Q\n` : "";
         const caption = q.caption
           ? (() => {
-              const cs = q.captionSizeMm * MM_TO_PT;
-              const advance = q.caption.length * cs * 0.62;
-              const anchorX = q.captionX * MM_TO_PT;
-              const cx =
-                q.captionAnchor === "start"
-                  ? anchorX
-                  : q.captionAnchor === "end"
-                    ? anchorX - advance
-                    : anchorX - advance / 2;
-              const cy = h - (q.y + q.size + pad + q.captionPadMm + q.captionSizeMm) * MM_TO_PT;
-              return (
-                `q ${copyInk} BT /F1 ${f3(cs)} Tf 1 0 0 1 ${f3(cx)} ${f3(cy)} Tm ` +
-                `(${pdfText(q.caption)}) Tj ET Q\n`
-              );
+              const run = outlineText(face, q.caption, {
+                sizeMm: q.captionSizeMm,
+                trackingEm: q.captionTracking,
+                anchor:
+                  q.captionAnchor === "end"
+                    ? "end"
+                    : q.captionAnchor === "start"
+                      ? "start"
+                      : "middle",
+                x: q.captionX,
+                y: q.y + q.size + pad + q.captionPadMm + q.captionSizeMm,
+              });
+              const ops = outlineOps(run.d);
+              return ops ? `q ${copyInk} ${ops} f Q\n` : "";
             })()
           : "";
         return plate + code + caption;
@@ -871,7 +928,19 @@ export function buildLondonPanelAi(
   // lists the hero lockup FIRST, so it is the top layer when the .ai is opened.
   // A photo wall's top layer is the repeat field itself: every mark, text tile
   // and QR is a live PDF object, so the wall stays fully editable in Illustrator.
-  const wallOps = wall ? stepRepeatPdfOps(wall, h, fillOp, copyInk) : "";
+  const wallOps = wall
+    ? stepRepeatPdfOps(wall, h, fillOp, copyInk, (text, sizeMm, x, y) =>
+        outlineOps(
+          outlineText(face, text, {
+            sizeMm,
+            trackingEm: LONDON_SIGNAGE_FONT.tracking,
+            anchor: "middle",
+            x,
+            y,
+          }).d,
+        ),
+      )
+    : "";
 
   // Ground: the vendor's placed artwork when supplied (zoom/pan honoured),
   // otherwise the live gradient shading.
@@ -918,6 +987,10 @@ export function buildLondonPanelAi(
       (copyOps || qrOps ? `/OC /oc2 BDC\n${copyOps}${qrOps}EMC\n` : "") +
       (brand.lockupOn && logoOps ? `/OC /oc1 BDC\n${logoOps}EMC\n` : "");
 
+  // The copy actually printed on this master, kept as searchable metadata now
+  // that the visible copy is outlined geometry.
+  const copyMeta = wall ? wall.config.text : brand.copy;
+
   const objects: string[] = [
     `<< /Type /Catalog /Pages 2 0 R /OCProperties << /OCGs [8 0 R 9 0 R 10 0 R] ` +
       `/D << /Order [8 0 R 9 0 R 10 0 R] /ON [8 0 R 9 0 R 10 0 R] >> >> >>`,
@@ -927,7 +1000,10 @@ export function buildLondonPanelAi(
       `/TPGradientKind /LiveShading /TPLockup (${pdfText(brand.art.source)}) ` +
       `/TPColorSpace (${cmyk ? `DeviceCMYK vibrant${vibrance}` : "DeviceRGB"}) ` +
       `/TPLockupColourway (${pdfText(brand.colourway)}) ` +
-      `/Resources << /Shading << /Sh0 6 0 R >> /Font << /F1 7 0 R >> ` +
+      `${copyMeta ? `/TPCopy (${pdfText(copyMeta)}) ` : ""}` +
+      `${brand.qr ? `/TPQr (${pdfText(brand.qr.data)}) ` : ""}` +
+      `/TPText 7 0 R ` +
+      `/Resources << /Shading << /Sh0 6 0 R >> ` +
       `${groundImage ? "/XObject << /ImGround 11 0 R >> " : ""}` +
       `/ExtGState << /GsWall << /Type /ExtGState /ca ${f3(wall ? wall.config.opacity : 1)} >> ${brewGs}>> ` +
       `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R >> >> /Contents 4 0 R >>`,
@@ -935,8 +1011,12 @@ export function buildLondonPanelAi(
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
       `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)} · ${pdfText(`${brand.orientation === "side" ? "side-by-side" : "stacked"} ${brand.colourway} lockup`)}) >>`,
     shadingDict,
-    `<< /Type /Font /Subtype /TrueType /BaseFont /${LONDON_SIGNAGE_FONT.pdfBaseFont} ` +
-      `/Encoding /WinAnsiEncoding /FirstChar 32 /LastChar 255 >>`,
+    // Object 7 used to be the (un-embedded) /Font. All copy is outlined now, so
+    // it carries the text as metadata instead — the object slot is kept so the
+    // OCG object numbers below stay stable.
+    `<< /Type /TPTextRecord /TPOutlined true /TPFace (${pdfText(face.name)})` +
+      `${copyMeta ? ` /TPCopy (${pdfText(copyMeta)})` : ""}` +
+      `${brand.qr ? ` /TPQr (${pdfText(brand.qr.data)})` : ""} >>`,
     `<< /Type /OCG /Name (${wall ? "Step & repeat" : "Hero lockup"}) >>`,
     `<< /Type /OCG /Name (Copy) >>`,
     `<< /Type /OCG /Name (Ground) >>`,
@@ -985,6 +1065,7 @@ function stepRepeatPdfOps(
   h: number,
   fillOp: (hex: string) => string,
   copyInk: string,
+  outlineOps: (text: string, sizeMm: number, x: number, y: number) => string,
 ): string {
   const rad = (plan.config.rotationDeg * Math.PI) / 180;
   const cos = Math.cos(rad);
@@ -1021,15 +1102,14 @@ function stepRepeatPdfOps(
         return paths ? `q ${alpha}${matrix}${paths}Q\n` : "";
       }
       if (tile.kind === "text") {
-        const size = tile.sizeMm * MM_TO_PT;
-        const tracking = size * LONDON_SIGNAGE_FONT.tracking;
-        const advance = plan.config.text.length * (size * 0.62 + tracking);
-        const x = (tile.x + tile.w / 2) * MM_TO_PT - advance / 2;
-        const y = h - (tile.y + tile.sizeMm) * MM_TO_PT;
-        return (
-          `q ${alpha}${matrix}${copyInk} BT /F1 ${f3(size)} Tf ${f3(tracking)} Tc ` +
-          `1 0 0 1 ${f3(x)} ${f3(y)} Tm (${pdfText(plan.config.text)}) Tj ET Q\n`
+        // Outlined run, centred on the tile with the font's true advance.
+        const ops = outlineOps(
+          plan.config.text,
+          tile.sizeMm,
+          tile.x + tile.w / 2,
+          tile.y + tile.sizeMm,
         );
+        return ops ? `q ${alpha}${matrix}${copyInk} ${ops} f Q\n` : "";
       }
       if (!plan.qr) return "";
       const size = tile.w * MM_TO_PT;

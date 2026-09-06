@@ -15,6 +15,7 @@
 // its own measured footprint (wide entrance tower, slim till, thin wayfinding,
 // standard logo column) without re-drawing anything.
 
+import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
 import JSZip from "jszip";
 
 import { buildLondonPanelAi } from "./next-london-revise";
@@ -216,6 +217,9 @@ export async function exportMartBundle(opts?: {
   /** City/stop template to build. Defaults to the London reference kit. */
   stop?: MartStop;
 }): Promise<MartExportResult> {
+  // Copy is outlined into vector paths, so the signage face must be in memory
+  // before any master is built.
+  await loadLondonSignageFace();
   const stop = opts?.stop ?? LONDON_STOP;
   const allPillars = martStopPillars(stop);
   const pillars = opts?.pillarIds?.length
@@ -236,6 +240,9 @@ export async function exportMartBundle(opts?: {
 
   // ─────────────────────────────────────────────── pillar sets (vector build)
   for (const sign of pillars) {
+  // Copy is outlined into vector paths, so the signage face must be in memory
+  // before any master is built.
+  await loadLondonSignageFace();
     tick(`Building ${sign.name}`);
     const config = martStopPillarConfig(stop, sign);
     const geo = pillarGeometry(config);

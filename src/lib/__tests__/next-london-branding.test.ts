@@ -27,16 +27,18 @@ describe("London signage branding", () => {
     }
   });
 
-  it("emits live logo geometry and Geist Bold copy in both vector masters", () => {
+  it("emits live logo geometry and outlined Geist Bold copy in both vector masters", () => {
     const panel = LONDON_PANELS.find((p) => londonBrandingPlan(p).copy)!;
     const svg = buildLondonPanelSvg(panel);
     expect(svg).toContain('data-layer="hero-lockup"');
-    expect(svg).toContain('font-weight="700"');
+    expect(svg).toContain('data-font="Geist-Bold"');
+    expect(svg).toContain('data-text="');
     // Hero lockup is layer 1: painted last, so it sits above ground and copy.
     expect(svg.lastIndexOf('id="hero-lockup"')).toBeGreaterThan(svg.lastIndexOf('id="ground"'));
     const pdf = new TextDecoder("latin1").decode(buildLondonPanelAi(panel));
     expect(pdf).toContain("/TPLockup");
     expect(pdf).toContain("Geist-Bold");
+    expect(pdf).not.toContain(" Tj");
     expect(pdf).toContain(" 1 1 1 rg");
     // Real Illustrator layers, hero lockup listed first.
     expect(pdf).toContain("/Name (Hero lockup)");

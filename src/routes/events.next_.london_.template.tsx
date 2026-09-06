@@ -4,6 +4,8 @@
 // where the location team wants it on any individual panel, then generate the
 // full pack (.svg + .ai per panel, foldered by floor, with a manifest).
 
+import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
+import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -176,7 +178,11 @@ function LondonTemplatePage() {
   const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
   const art = useMemo(() => ({ colorSpace, vibrance }), [colorSpace, vibrance]);
   // Preview paints the chosen space, so a CMYK master is soft-proofed on screen.
-  const svg = useMemo(() => buildLondonPanelSvg(panel, art), [panel, placement, art]);
+  const faceReady = useLondonSignageFace();
+  const svg = useMemo(
+    () => (faceReady ? buildLondonPanelSvg(panel, art) : ""),
+    [panel, placement, art, faceReady],
+  );
   const familyLabel = nextLogoFamily(plan.familyId)?.label ?? "TransPerfect";
   const divisionAccent = londonDivisionAccent(plan.familyId);
   const colourways = useMemo(() => {
@@ -195,6 +201,7 @@ function LondonTemplatePage() {
   // Single-panel handoff: the exact masters the printer opens, hero lockup first.
   const downloadPanel = useCallback(
     async (kind: "svg" | "ai") => {
+      await loadLondonSignageFace();
       const base = londonPanelFileBase(panel, 1, colorSpace);
       const blob =
         kind === "svg"

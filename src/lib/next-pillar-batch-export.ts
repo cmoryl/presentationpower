@@ -12,6 +12,7 @@
 //   PRODUCTION-MANIFEST.txt             sizes, quantities, geometry, notes
 // -----------------------------------------------------------------------------
 
+import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
 import JSZip from "jszip";
 
 import { buildLondonPanelAi } from "./next-london-revise";
@@ -112,6 +113,9 @@ export async function exportPillarBatch(opts: {
   items: PillarBatchItem[];
   onProgress?: (p: PillarBatchProgress) => void;
 }): Promise<PillarBatchResult> {
+  // Copy is outlined into vector paths, so the signage face must be in memory
+  // before any master is built.
+  await loadLondonSignageFace();
   const items = opts.items.filter((i) => i.quantity > 0);
   if (items.length === 0) throw new Error("Pick at least one pillar size with a quantity");
 
