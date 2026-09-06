@@ -72,7 +72,10 @@ async function plate(node: HTMLElement, nativeW: number, nativeH: number, dpi: n
   return canvas;
 }
 
-function readme(config: CityBadgeConfig, name: string, dpi: number): string {
+function readme(config: CityBadgeConfig, name: string, dpi: number, x4: boolean): string {
+  const standardLine = x4
+    ? `Standard:        PDF/X-4 — GTS_PDF_X output intent (GRACoL 2013 CRPC6) embedded`
+    : `Standard:        plain PDF — PDF/X-4 wrap FAILED (offline?). Re-export online before sending to press.`;
   return [
     `TransPerfect NEXT — City Series attendee badge`,
     `Version: ${name}`,
@@ -88,7 +91,7 @@ function readme(config: CityBadgeConfig, name: string, dpi: number): string {
     `Colour:         convert to ${BADGE_SPEC.colorMode} at output; body text 100K`,
     `Export preset:  ${BADGE_SPEC.exportPreset}`,
     `Source template: ${BADGE_SPEC.sourceTemplate}`,
-    `Standard:        PDF/X-4 — GTS_PDF_X output intent (GRACoL 2013 CRPC6) embedded`,
+    standardLine,
     `Boxes:           MediaBox / BleedBox / TrimBox all set numerically for preflight`,
     ``,
     `pdf/   press file. Art runs to the bleed edge; crop marks sit in the slug.`,
