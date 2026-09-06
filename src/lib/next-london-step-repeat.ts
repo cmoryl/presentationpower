@@ -351,6 +351,14 @@ export type StepRepeatPlan = {
     plateShape: StepRepeatQrPlateShape;
   } | null;
 
+  /**
+   * Outliner for text tiles: returns SVG path data (mm, anchored centre) for a
+   * run of copy. Text tiles ship as outlines so a vendor machine without Geist
+   * cannot substitute a face and shift the wall.
+   */
+  outline?: (text: string, sizeMm: number, x: number, y: number) => { d: string };
+  /** Name of the face the outlines came from, recorded as metadata. */
+  faceName?: string;
   /** Ink colour for text tiles. */
   inkHex: string;
   tiles: StepRepeatTile[];
@@ -649,12 +657,19 @@ export function stepRepeatSvgLayer(
         );
       }
       if (tile.kind === "text") {
+        if (!options.outline) return "";
+        const run = options.outline(
+          plan.config.text,
+          tile.sizeMm,
+          tile.x + tile.w / 2,
+          tile.y + tile.sizeMm,
+        );
         return (
-          `<text data-tile="text" data-row="${tile.row}" data-col="${tile.col}"${spin}` +
-          ` x="${(tile.x + tile.w / 2).toFixed(2)}" y="${(tile.y + tile.sizeMm).toFixed(2)}" text-anchor="middle"` +
-          ` fill="${ink.paint}"${ink.meta} font-family="${options.fontStack}" font-weight="${options.fontWeight}"` +
-          ` font-size="${tile.sizeMm.toFixed(2)}" letter-spacing="${(tile.sizeMm * options.tracking).toFixed(3)}">` +
-          `${esc(plan.config.text)}</text>`
+          `<path data-tile="text" data-row="${tile.row}" data-col="${tile.col}"${spin}` +
+          ` d="${run.d}" data-text="${esc(plan.config.text)}"` +
+          ` data-font="${esc(options.faceName ?? options.fontStack)}"` +
+          ` data-size-mm="${tile.sizeMm.toFixed(2)}"` +
+          ` fill="${ink.paint}"${ink.meta}/>`
         );
       }
       if (!plan.qr) return "";
