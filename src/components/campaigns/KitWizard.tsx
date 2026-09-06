@@ -28,7 +28,12 @@ import {
 } from "lucide-react";
 
 import { BRAND_MODES } from "@/lib/taxonomy";
-import { SOCIAL_FORMATS_BY_ID, KIT_PROFILES, getFormat } from "@/lib/social-formats";
+import {
+  SOCIAL_FORMATS_BY_ID,
+  KIT_PROFILES,
+  getFormat,
+  type FormatPlatform,
+} from "@/lib/social-formats";
 import {
   buildCampaignAssets,
   type EventFacts,
@@ -56,6 +61,26 @@ import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
 import { GroundedCopyDrafter } from "@/components/campaigns/GroundedCopyDrafter";
 
 import { Download } from "lucide-react";
+
+/** Format picker groups — platform families with a small brand-accent marker
+ *  each (aqua/lavender stay under the 10% accent rule; blue leads). */
+const FORMAT_GROUPS: { id: string; label: string; accent: string; platforms: FormatPlatform[] }[] = [
+  { id: "meta", label: "Instagram & Facebook", accent: "#EC388A", platforms: ["instagram", "facebook"] },
+  { id: "linkedin", label: "LinkedIn", accent: "#003FC7", platforms: ["linkedin"] },
+  { id: "short", label: "Short-form video", accent: "#03002C", platforms: ["tiktok", "snapchat", "whatsapp"] },
+  { id: "google", label: "YouTube", accent: "#E53D2E", platforms: ["youtube"] },
+  { id: "social", label: "More social", accent: "#C2A3FF", platforms: ["x", "threads", "bluesky", "pinterest"] },
+  { id: "other", label: "Email & other", accent: "#A1FBF9", platforms: ["email", "generic", "signage"] },
+];
+
+/** Mini aspect-ratio glyph for a format chip — a bordered box whose w/h
+ *  inside a 14px square conveys 1:1 vs 4:5 vs 9:16 vs wide at a glance. */
+function formatGlyphStyle(aspect: number): { width: number; height: number } {
+  const MAX = 13;
+  const w = aspect >= 1 ? MAX : Math.max(4, Math.round(MAX * aspect));
+  const h = aspect >= 1 ? Math.max(4, Math.round(MAX / aspect)) : MAX;
+  return { width: w, height: h };
+}
 
 /** First playbook copy for a given brand — the canonical division voice. */
 function exampleCopyForBrand(brandId: string) {
@@ -455,6 +480,20 @@ export function KitWizard({
     });
   };
 
+  const toggleFormatGroup = (ids: string[]) => {
+    setFormatIds((prev) => {
+      const allOn = ids.every((id) => prev.includes(id));
+      return allOn ? prev.filter((x) => !ids.includes(x)) : [...new Set([...prev, ...ids])];
+    });
+    setRemoved((prev) => {
+      const next = new Set(prev);
+      for (const key of next) {
+        if (ids.some((id) => key.includes(`:${id}:`))) next.delete(key);
+      }
+      return next;
+    });
+  };
+
   const currentStepKey = WIZARD_STEPS[step]?.key;
   const canNext = (() => {
     if (currentStepKey === "content") return manualCopy.title.trim().length > 0;
@@ -774,29 +813,96 @@ export function KitWizard({
                 );
               })}
             </div>
-            <div className="mt-4 rounded-2xl border border-black/10 bg-white/60 p-4">
-              <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-black/50">
-                Formats in this kit ({formatIds.length})
+            <div className="mt-4 rounded-2xl border border-black/10 bg-gradient-to-b from-white to-[#F2F2F2]/60 p-4">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
+                  Formats in this kit
+                </div>
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/25 bg-[#003FC7]/[0.06] px-2.5 py-0.5 text-[10px] font-semibold text-[#003FC7]">
+                  {formatIds.length} selected
+                </div>
               </div>
-              <div className="flex flex-wrap gap-1.5">
-                {Object.values(SOCIAL_FORMATS_BY_ID).map((f) => {
-                  const on = formatIds.includes(f.id);
+              <div className="space-y-3">
+                {FORMAT_GROUPS.map((group) => {
+                  const formats = Object.values(SOCIAL_FORMATS_BY_ID).filter(
+                    (f) => group.platforms.includes(f.platform),
+                  );
+                  if (formats.length === 0) return null;
+                  const onCount = formats.filter((f) => formatIds.includes(f.id)).length;
                   return (
-                    <button
-                      key={f.id}
-                      type="button"
-                      onClick={() => toggleFormat(f.id)}
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] transition ${
-                        on
-                          ? "border-[#03002C] bg-[#03002C] text-white"
-                          : "border-black/15 bg-white text-black/60 hover:border-black/40"
-                      }`}
-                    >
-                      <span>{f.label}</span>
-                      <span className="text-[10px] opacity-70">
-                        {f.width}×{f.height}
-                      </span>
-                    </button>
+                    <div key={group.id}>
+                      <div className="mb-1.5 flex items-center gap-2">
+                        <span
+                          className="h-1.5 w-1.5 rounded-[2px]"
+                          style={{ background: group.accent }}
+                        />
+                        <span className="text-[10px] font-semibold uppercase tracking-widest text-black/45">
+                          {group.label}
+                        </span>
+                        <span className="text-[10px] text-black/35">
+                          {onCount}/{formats.length}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => toggleFormatGroup(formats.map((f) => f.id))}
+                          className="ml-auto text-[10px] font-medium text-[#003FC7] hover:underline"
+                        >
+                          {onCount === formats.length ? "Clear" : "All"}
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {formats.map((f) => {
+                          const on = formatIds.includes(f.id);
+                          return (
+                            <button
+                              key={f.id}
+                              type="button"
+                              onClick={() => toggleFormat(f.id)}
+                              aria-pressed={on}
+                              className={`group inline-flex items-center gap-2 rounded-xl border py-1.5 pl-2 pr-2.5 text-left text-[11px] transition ${
+                                on
+                                  ? "border-[#003FC7] bg-[#003FC7]/[0.08] text-[#03002C] shadow-[0_1px_2px_rgba(0,63,199,0.15)] ring-1 ring-[#003FC7]/30"
+                                  : "border-black/12 bg-white text-black/60 hover:border-[#003FC7]/40 hover:text-black/80"
+                              }`}
+                            >
+                              <span
+                                aria-hidden
+                                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border transition ${
+                                  on
+                                    ? "border-[#003FC7]/30 bg-[#003FC7]"
+                                    : "border-black/10 bg-[#F2F2F2] group-hover:border-[#003FC7]/30"
+                                }`}
+                              >
+                                <span
+                                  className={`rounded-[2px] border transition ${
+                                    on ? "border-white bg-white/25" : "border-black/40 bg-white"
+                                  }`}
+                                  style={formatGlyphStyle(f.aspect)}
+                                />
+                              </span>
+                              <span className="min-w-0">
+                                <span className="block truncate font-medium leading-tight">
+                                  {f.label}
+                                </span>
+                                <span
+                                  className={`block text-[9.5px] leading-tight ${
+                                    on ? "text-[#003FC7]/80" : "text-black/40"
+                                  }`}
+                                >
+                                  {f.width}×{f.height}
+                                </span>
+                              </span>
+                              {on && (
+                                <Check
+                                  className="ml-0.5 h-3 w-3 shrink-0 text-[#003FC7]"
+                                  strokeWidth={3}
+                                />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   );
                 })}
               </div>
