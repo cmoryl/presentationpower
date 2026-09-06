@@ -39,7 +39,15 @@ import {
 import { applyReliefToSection } from "@/lib/social-module-layouts";
 import { tallShellFit, tallShellGeometry } from "@/lib/social-tall-layouts";
 import { socialReflowSection } from "@/lib/social-reflow";
+import {
+  fullBleedGeometry,
+  fullBleedMode,
+  fullBleedPlanFor,
+  fullBleedSection,
+} from "@/lib/social-full-bleed";
 import { SocialTallShell } from "@/components/campaigns/SocialTallShell";
+import { SocialFullBleedShell } from "@/components/campaigns/SocialFullBleedShell";
+
 
 const SETTLE_BUDGET = 64;
 const MEASURE_BUDGET = 4;
