@@ -1149,7 +1149,7 @@ export async function exportDeckToPptx(
   // exports lost their Bento media photographs: the pack ground was fine, but
   // no inset tile was ever measured. Only the GROUND REPLACEMENT is gated on
   // `packBackground`; the media measurement always happens.
-  if (fidelity === "editable" && typeof document !== "undefined") {
+  if ((fidelity === "editable" || fidelity === "build") && typeof document !== "undefined") {
     const endGround = telemetry.phase("plates");
     try {
       const { captureGroundPlates } = await import("./slide-exact-raster");
