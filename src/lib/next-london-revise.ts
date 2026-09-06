@@ -609,17 +609,33 @@ export function buildLondonPanelSvg(
   const inkOnLight = brand.colourway === "dblue";
   const copyHex = inkOnLight ? "#03002C" : "#FFFFFF";
   const copyPaint = paintFor(copyHex);
-  // Vertical copy runs DOWN the panel — a 90° rotation about the anchor, so the
-  // text object stays live and re-typeable in Illustrator.
+  // Copy is OUTLINED, never live text: a vendor machine without Geist would
+  // substitute a face and move the headline. Centring uses the font's real
+  // advance width, not a per-character estimate.
+  const face = options.face ?? londonSignageFace();
+  // Vertical copy runs DOWN the panel — a 90° rotation about the anchor.
   const copyRotate = brand.copyVertical
     ? ` transform="rotate(90 ${brand.copyCentreMm.toFixed(2)} ${brand.copyBaselineMm.toFixed(2)})"`
     : "";
   const copyLayer = brand.copy
-    ? `<text data-layer="copy" data-layer-order="2" x="${brand.copyCentreMm.toFixed(2)}" y="${brand.copyBaselineMm.toFixed(2)}"` +
-      `${copyRotate} data-direction="${brand.copyVertical ? "vertical" : "horizontal"}"` +
-      ` text-anchor="middle" fill="${copyPaint.paint}"${copyPaint.meta} font-family="${LONDON_SIGNAGE_FONT.cssStack}"` +
-      ` font-weight="${LONDON_SIGNAGE_FONT.weight}" font-size="${brand.copySizeMm.toFixed(2)}"` +
-      ` letter-spacing="${(brand.copySizeMm * brand.copyTrackingEm).toFixed(3)}">${escapeXml(brand.copy)}</text>`
+    ? (() => {
+        const run = outlineText(face, brand.copy, {
+          sizeMm: brand.copySizeMm,
+          trackingEm: brand.copyTrackingEm,
+          anchor: "middle",
+          x: brand.copyCentreMm,
+          y: brand.copyBaselineMm,
+          vertical: brand.copyVertical,
+        });
+        return (
+          `<path data-layer="copy" data-layer-order="2" d="${run.d}"` +
+          `${copyRotate} data-direction="${brand.copyVertical ? "vertical" : "horizontal"}"` +
+          ` data-text="${escapeXml(brand.copy)}" data-font="${face.name}"` +
+          ` data-size-mm="${brand.copySizeMm.toFixed(2)}"` +
+          ` data-advance-mm="${run.advanceMm.toFixed(2)}"` +
+          ` fill="${copyPaint.paint}"${copyPaint.meta}/>`
+        );
+      })()
     : "";
 
   // QR: real encoded modules as vector geometry on a white plate, so the code
@@ -632,11 +648,20 @@ export function buildLondonPanelSvg(
         const ink = paintFor(q.moduleInk);
         const scale = q.size / q.modules;
         const caption = q.caption
-          ? `<text x="${q.captionX.toFixed(2)}" y="${(q.y + q.size + pad + q.captionPadMm + q.captionSizeMm).toFixed(2)}"` +
-            ` text-anchor="${q.captionAnchor}" fill="${copyPaint.paint}"${copyPaint.meta}` +
-            ` font-family="${LONDON_SIGNAGE_FONT.cssStack}" font-weight="${q.captionWeight}"` +
-            ` letter-spacing="${(q.captionSizeMm * q.captionTracking).toFixed(3)}"` +
-            ` font-size="${q.captionSizeMm.toFixed(2)}">${escapeXml(q.caption)}</text>`
+          ? (() => {
+              const run = outlineText(face, q.caption, {
+                sizeMm: q.captionSizeMm,
+                trackingEm: q.captionTracking,
+                anchor: q.captionAnchor === "end" ? "end" : q.captionAnchor === "start" ? "start" : "middle",
+                x: q.captionX,
+                y: q.y + q.size + pad + q.captionPadMm + q.captionSizeMm,
+              });
+              return (
+                `<path d="${run.d}" data-text="${escapeXml(q.caption)}" data-font="${face.name}"` +
+                ` data-size-mm="${q.captionSizeMm.toFixed(2)}"` +
+                ` fill="${copyPaint.paint}"${copyPaint.meta}/>`
+              );
+            })()
           : "";
         // A transparent code drops the plate so the modules print straight onto
         // the ground — only safe on flat, high-contrast art, and the designer's
@@ -653,6 +678,7 @@ export function buildLondonPanelSvg(
         );
       })()
     : "";
+
 
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${panel.bleedW}mm" height="${panel.bleedH}mm"`,
