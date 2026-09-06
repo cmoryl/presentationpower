@@ -820,8 +820,25 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
     items: [
       {
         q: "Can I use Element from ChatGPT?",
-        a: "Yes. Add the Element connector pointing at the app's /mcp endpoint and sign in. It exposes the taxonomy, knowledge, deck building and export as tools.",
+        a: "Yes. In ChatGPT go to Settings → Connectors → Add and point it at https://presentationpower.lovable.app/mcp, then sign in with your Element account. Turn the connector on inside the chat where you want to use it. It exposes the taxonomy, knowledge, deck building and export as tools.",
       },
+      {
+        q: "What exactly do I say to get a deck?",
+        a: "Describe it the way you would to a colleague: who it's for, which division or brand, the story, and roughly how many slides. It plans the sections, shows you the plan, and takes plain-language changes — swap this section, cut that slide, rewrite this headline — before you export.",
+      },
+      {
+        q: "How do I actually download the file?",
+        a: "Ask it to export. It replies with a download link to the finished PowerPoint file. Click it, open the .pptx in PowerPoint or Keynote, and edit it like any other deck.",
+      },
+      {
+        q: "Do I need to sign in each time?",
+        a: "No. You authorise the connector once; after that it works in any chat where the connector is enabled, and it only reaches the decks, brands and knowledge your account already has access to.",
+      },
+      {
+        q: "Is the deck saved anywhere?",
+        a: "Yes. It lands in your account like any other deck, so you can open it in Element afterwards, share a link, or export it again later.",
+      },
+
       {
         q: "Is the deck it gives me finished?",
         a: "Yes. The download link is a complete, layered, editable PowerPoint file — it is the deliverable, not a partial preview, and the connector is instructed never to send you back into the app to finish it.",
