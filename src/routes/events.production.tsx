@@ -5,7 +5,7 @@
 // look and copy, preview every size live, then deliver one package of press
 // PDFs plus Illustrator-openable .ai twins with a manifest.
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
   ClipboardList,
