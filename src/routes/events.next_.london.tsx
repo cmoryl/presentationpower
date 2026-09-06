@@ -7,6 +7,8 @@
 
 import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
 import { useEffect, useMemo, useState } from "react";
+
+import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -234,6 +236,7 @@ function PanelCard({
 
 function LondonSignagePage() {
   const fetchHead = useServerFn(getLondonHeadRevision);
+  const faceReady = useLondonSignageFace();
   const [headError, setHeadError] = useState(false);
   // The revision number and the design overrides in force. Every download,
   // thumbnail and QA audit builds from THESE, never from the local stores, so a
@@ -700,7 +703,7 @@ function LondonSignagePage() {
                   <PanelCard
                     key={panel.id}
                     panel={panel}
-                    svg={londonPanelSvgFor(panel, artwork, artOptions(panel))}
+                    svg={previewSvg(panel)}
                     onClick={setOpenPanel}
                   />
                 ))}
@@ -733,7 +736,7 @@ function LondonSignagePage() {
                       <PanelCard
                         key={panel.id}
                         panel={panel}
-                        svg={londonPanelSvgFor(panel, artwork, artOptions(panel))}
+                        svg={previewSvg(panel)}
                         onClick={setOpenPanel}
                       />
                     ))}
@@ -766,7 +769,7 @@ function LondonSignagePage() {
               </p>
               {/* Cap the hero thumb so the tier preview and downloads stay in view. */}
               <div className="mx-auto w-full max-w-[240px]">
-                <PanelThumb panel={openPanel} svg={londonPanelSvgFor(openPanel, artwork, artOptions(openPanel))} />
+                <PanelThumb panel={openPanel} svg={previewSvg(openPanel)} />
               </div>
 
               {londonVenueItemMeta(openPanel) ? (
