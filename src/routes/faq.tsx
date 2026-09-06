@@ -707,6 +707,60 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
     ],
   },
   {
+    section: "Proof & capability modules",
+    items: [
+      {
+        q: "What is the Numbered phases module?",
+        a: "A vertical Discovery / build / scale style sequence. Add, remove and reorder phases and the tasks inside them; each task carries its own icon shown in a soft round tint, plus a description that also lands in the PowerPoint export.",
+      },
+      {
+        q: "What is the Growth proof split module?",
+        a: "A client logo wall top-left with headline statistics in orbit rings. You control up to twelve logos with rows, scale and spacing; drag figures into place; set each figure's label, prefix, suffix and decimals; and style ring colour, thickness and orbit dots separately for light and dark.",
+      },
+      {
+        q: "Do the orbit figures overlap if I add more?",
+        a: "No. Collision detection eases the figures apart automatically while keeping the first one closest to where you put it.",
+      },
+      {
+        q: "What is the Credential proof split module?",
+        a: "A raised programme card on the left with up to three credentials on the right in hairline orbit rings. Credential marks sit free with no box frames, each credential carries a light and a dark mark, and the stat design is editable — side-by-side or stacked, accent or ink numerals, uppercase or as-typed labels, alignment and size.",
+      },
+      {
+        q: "What are Capability cards and Device screen + benefits?",
+        a: "Capability cards is two to four cards, each with its own photo, coloured label band, lead claim and bullet list. Device screen + benefits pairs a product screen in a laptop or monitor with two to six icon benefit tiles. Both have knobs for image share, card look, gap, corners, columns, icon size and alignment.",
+      },
+      {
+        q: "Are the numbers in these modules real?",
+        a: "Yes. The defaults are the company's real figures, not sample data, and every number stays editable.",
+      },
+      {
+        q: "Do the newer modules export properly?",
+        a: "Yes — all of them export as real editable PowerPoint objects rather than flat pictures.",
+      },
+    ],
+  },
+  {
+    section: "Divisions & brand modes",
+    items: [
+      {
+        q: "Which brands can I produce for?",
+        a: "Eleven brand modes: enterprise, subcompany, division, product, TP Media, TP Legal, TP Games, TP Digital, TP Life Sciences, Trial Interactive, and co-brand. Switching mode re-themes the artifact and re-scopes the knowledge it is grounded on.",
+      },
+      {
+        q: "Is DataForce supported?",
+        a: "Yes. DataForce has its own approved logo set, hero video and poster, icon set and division content, so decks, print and kits can be produced in DataForce branding like any other division.",
+      },
+      {
+        q: "Do divisions still have their own accent colours?",
+        a: "No. Division accent colours were retired in August 2026 — every TransPerfect division renders in the approved enterprise palette in light and dark, and differs by lockup and copy instead. Element and co-brand keep their own palettes. Event signage is the one exception, where a division tint is allowed on the light end of the ground.",
+      },
+      {
+        q: "Which logo do I use where?",
+        a: "Approved lockups only, never distorted, recoloured or keylined, with a safe zone of 1.5× the T height. Trial Interactive uses its own marks and never the TransPerfect or Life Sciences mark; the Element skins use the Element five-brick mark and never the TransPerfect wordmark.",
+      },
+    ],
+  },
+  {
     section: "NEXT London & live print jobs",
     items: [
       {
