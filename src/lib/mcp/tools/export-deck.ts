@@ -7,7 +7,7 @@ export default defineTool({
   name: "export_deck",
   title: "Export deck to PowerPoint",
   description:
-    "Build a layered, editable .pptx from a saved deck and return a private download link (valid 1 hour). Runs the native-shape export path, so slides whose artwork needs the in-app renderer are reported back instead of silently flattened.",
+    "Build an exact-build-fidelity .pptx from a saved deck and return a private download link (valid 1 hour). Every slide is rebuilt from the scene graph captured from the real rendered component, so the file matches the app 1:1. Slides with no current capture are reported as unsupported and left out — never substituted with a different design.",
   inputSchema: {
     deck_id: z.string().describe("The deck UUID, as returned by list_decks."),
     theme: z
@@ -66,13 +66,10 @@ export default defineTool({
       return errorResult(`Export uploaded but link failed: ${signed.error?.message ?? "no url"}`);
     }
 
-    // Full-fidelity alternative: this link opens the deck's export screen and
-    // fires the in-app export on load, so design plates render exactly as they
-    // do in the app. It is a refinement, never the primary deliverable — the
-    // file built above is a complete, editable, layered deck on its own.
-    const appExportUrl = `${publicOrigin()}/decks/${deck_id}/export?auto=pptx&fidelity=editable`;
-    const degradedCount = out.degradedSlides.length;
-    const plateHeavy = out.slideCount > 0 && degradedCount / out.slideCount > 1 / 3;
+    // Warm-up link: opening the deck's export screen in the app records a fresh
+    // capture of every slide, which is what an unsupported slide needs.
+    const warmUpUrl = `${publicOrigin()}/decks/${deck_id}/export?auto=pptx&fidelity=build`;
+    const unsupported = out.unsupportedSlides;
 
     return textResult({
       deck: out.deckTitle,
@@ -80,21 +77,20 @@ export default defineTool({
       slides: out.slideCount,
       download_url: signed.data.signedUrl,
       download_expires_in_seconds: 3600,
-      is_complete_editable_deck: true,
-      native_slides: out.slideCount - degradedCount,
-      slides_rendered_generically: out.degradedSlides,
+      fidelity: "exact-build",
+      exact_slides: out.exactSlides,
+      unsupported_slides: unsupported,
+      ...(unsupported.length ? { warm_up_url: warmUpUrl } : {}),
       failed_slides: out.failedSlides,
       warnings: out.warnings,
-      // Only surfaced when a real share of the deck would visibly differ.
-      ...(plateHeavy ? { optional_full_fidelity_url: appExportUrl } : {}),
       delivery_instruction: [
-        "Give the user download_url as the finished PowerPoint — it is the system-built deck: every slide present, fully layered and editable in PowerPoint.",
-        "Do NOT send the user to the app to export it themselves, and do NOT describe this file as partial or a fallback.",
-        plateHeavy
-          ? "Some slides use design plates the app renderer draws differently; after handing over the file you may mention optional_full_fidelity_url as an optional pixel-exact re-export."
-          : "No caveat is needed.",
+        "Give the user download_url as the finished PowerPoint. Every slide in it was rebuilt from the exact rendered build, fully layered and editable in PowerPoint.",
+        "Do NOT describe this file as a fallback, and do NOT send the user to the app to re-export the slides it contains.",
+        unsupported.length
+          ? "unsupported_slides is non-empty: name those slides to the user, say they were left out rather than redrawn, and offer warm_up_url — opening it once in the app records their exact appearance, after which this export includes them."
+          : "No caveat is needed: the whole deck exported at exact build fidelity.",
         out.failedSlides.length
-          ? "failed_slides is non-empty: name those slides to the user as the only ones that need attention."
+          ? "failed_slides is non-empty: name those slides to the user as needing attention."
           : "",
       ]
         .filter(Boolean)
