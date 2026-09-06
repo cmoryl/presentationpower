@@ -43,6 +43,7 @@ export default defineTool({
         name: v.name,
         description: v.description,
         permittedLayoutIds: v.permittedLayoutIds,
+        hasNativePptxRenderer: hasNativeVariantEmitter(v.id),
       })),
     });
   },
