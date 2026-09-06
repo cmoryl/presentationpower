@@ -687,6 +687,25 @@ function auditSlideEmissions(s: PptxGenJS.Slide, label: string): string[] {
 export type PptxExportResult = {
   blob?: Blob;
   failedSlides: string[];
+  /**
+   * The scene graph captured from the live components during this run. The app
+   * persists these so the server-side export (connector / API) can rebuild the
+   * same slides exactly, with no browser of its own.
+   */
+  captures?: Array<{
+    position: number;
+    slideId: string;
+    variantId: string;
+    mode: "light" | "dark";
+    plate: string;
+    runs: unknown[];
+    shapes: unknown[];
+  }>;
+  /**
+   * Slides that could not be captured from their own component and so cannot be
+   * guaranteed 1:1. Reported, never substituted with a different design.
+   */
+  unsupportedSlides?: Array<{ position: number; variantId: string }>;
   fileName?: string;
   /**
    * Anything that could not be embedded exactly as designed (a background plate
@@ -818,6 +837,21 @@ export async function exportDeckToPptx(
      * master section) and scrub full-bleed decor off the slide. Default true.
      */
     backgroundInMaster?: boolean;
+    /**
+     * Replayed scene graph, keyed by slide id: the capture the app made from the
+     * REAL rendered component (plate + measured text runs + native shapes).
+     * Supplied by the server-side export, which has no DOM of its own, so the
+     * headless file is rebuilt from the same scene graph the editor draws rather
+     * than re-interpreted by a hand-written PowerPoint renderer.
+     */
+    sceneCaptures?: Record<
+      string,
+      {
+        plate: string;
+        runs?: import("./export-text-layer").TextRun[];
+        shapes?: import("./export-dom-decompose").DomShape[];
+      }
+    > | null;
   },
 ): Promise<PptxExportResult> {
   const forceMode = opts?.forceMode;
@@ -2404,6 +2438,22 @@ export async function exportDeckToPptx(
     ...auditWarnings,
     ...geometryRepairWarnings(geometryRepair),
   ];
+  const captures = deck.slides
+    .map((sl, i) => ({ sl, i, cap: layeredText[i] }))
+    .filter((r) => Boolean(r.cap?.plate))
+    .map(({ sl, i, cap }) => ({
+      position: i,
+      slideId: sl.id,
+      variantId: sl.variantId,
+      mode: baseModeFor(i),
+      plate: cap!.plate,
+      runs: (cap!.runs ?? []) as unknown[],
+      shapes: (cap!.shapes ?? []) as unknown[],
+    }));
+  const unsupportedSlides = deck.slides
+    .map((sl, i) => ({ sl, i }))
+    .filter(({ sl, i }) => platePolicyFor(sl.variantId) && !layeredText[i]?.plate)
+    .map(({ sl, i }) => ({ position: i, variantId: sl.variantId }));
   const integritySummary = integrity.summary();
   const perf = telemetry.report();
   opts?.onTelemetry?.(perf);
@@ -2449,6 +2499,8 @@ export async function exportDeckToPptx(
     return {
       blob: deliverBlob,
       failedSlides,
+      captures,
+      unsupportedSlides,
       fileName: deliverName,
       warnings,
       integrity: integritySummary,
@@ -2469,6 +2521,8 @@ export async function exportDeckToPptx(
   }
   return {
     failedSlides,
+    captures,
+    unsupportedSlides,
     fileName: deliverName,
     warnings,
     integrity: integritySummary,
