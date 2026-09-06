@@ -6,7 +6,8 @@
 
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -32,6 +33,8 @@ import {
   londonPanelStops,
   type LondonColorSpace,
 } from "@/lib/next-london-revise";
+import { auditAi, auditSvg, gateOnQa } from "@/lib/london-signage-qa";
+import { getLondonHeadRevision } from "@/lib/next-london-revise.functions";
 import { cmykLabel, cmykToHex, londonCmykBuild } from "@/lib/next-london-cmyk";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
 import { LondonPrintGuides, LondonPrintReadout } from "@/components/london/LondonPrintPreview";
@@ -151,10 +154,28 @@ function LondonTemplatePage() {
   // Output colour space for every download on this page. RGB stays the house
   // default (the RIP separates); CMYK is the explicit vibrant-corrected master.
   const [colorSpace, setColorSpace] = useState<LondonColorSpace>("rgb");
+  // Filenames carry the revision in force, so a download from this page matches
+  // the kit page byte-for-byte in name as well as content.
+  const fetchHead = useServerFn(getLondonHeadRevision);
+  const [headRev, setHeadRev] = useState(0);
   const [vibrance, setVibrance] = useState(1);
   // Print preview: draws the real bleed / trim / safe boxes over the stage.
   const [printPreview, setPrintPreview] = useState(true);
   const stageRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    fetchHead({})
+      .then((res) => {
+        if (live) setHeadRev(res.revision?.rev ?? 0);
+      })
+      .catch(() => {
+        /* No revision reachable — fall back to the issued pack numbering. */
+      });
+    return () => {
+      live = false;
+    };
+  }, [fetchHead]);
 
   // Measured signboard sizes win over the shipped spec everywhere on this page.
   const boardSizes = useLondonBoardSizes();
@@ -202,13 +223,17 @@ function LondonTemplatePage() {
   const downloadPanel = useCallback(
     async (kind: "svg" | "ai") => {
       await loadLondonSignageFace();
-      const base = londonPanelFileBase(panel, 1, colorSpace);
-      const blob =
-        kind === "svg"
-          ? new Blob([buildLondonPanelSvg(panel, art)], { type: "image/svg+xml" })
-          : new Blob([londonAiBytes(await buildLondonPanelAiAsync(panel, art))], {
-              type: "application/postscript",
-            });
+      const base = londonPanelFileBase(panel, headRev, colorSpace);
+      let blob: Blob;
+      if (kind === "svg") {
+        const svgOut = buildLondonPanelSvg(panel, art);
+        gateOnQa(auditSvg(panel, svgOut));
+        blob = new Blob([svgOut], { type: "image/svg+xml" });
+      } else {
+        const ai = await buildLondonPanelAiAsync(panel, art);
+        gateOnQa(auditAi(panel, ai));
+        blob = new Blob([londonAiBytes(ai)], { type: "application/illustrator" });
+      }
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -217,7 +242,7 @@ function LondonTemplatePage() {
       URL.revokeObjectURL(url);
       toast.success(`${base}.${kind} downloaded · ${colorSpace.toUpperCase()}`);
     },
-    [panel, art, colorSpace],
+    [panel, art, colorSpace, headRev],
   );
 
   // Drag with window-level listeners so the pointer can leave the box.
