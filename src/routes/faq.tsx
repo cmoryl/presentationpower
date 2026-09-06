@@ -308,6 +308,90 @@ const GUIDES: Array<{ title: string; blurb: string; steps: string[] }> = [
       "Admin tables scroll horizontally so dense data stays readable.",
     ],
   },
+  {
+    title: "Build the NEXT London signage kit",
+    blurb: "Panels, walls and vinyls for the QEII Centre, ready for the printer.",
+    steps: [
+      "Open Event → NEXT → London. The page always shows the revision currently in force, so what you see is what the printer has.",
+      "Click any panel thumbnail to enlarge it, or open the live editor to move and resize headline, caption and QR blocks.",
+      "Switch between screen preview and print preview to check trim, bleed and safe-area guides at the real signboard size.",
+      "Download a panel as SVG, .ai or PNG — every file passes the signage QA gate first, and copy is written as outlined vector paths so no font is needed downstream.",
+      "Files are stamped with the published revision number; unpublished work saves as rdraft- so a number is never claimed before it exists.",
+    ],
+  },
+  {
+    title: "Publish a signage revision",
+    blurb: "Change artwork after the pack has gone out, without confusing the vendor.",
+    steps: [
+      "Open Event → NEXT → London → Revise.",
+      "Edit panel copy, placements, board sizes or step-and-repeat recipes — removals stay removed in every later revision.",
+      "Add a note describing what changed, then publish. The revision list is append-only, so history is never overwritten.",
+      "Publishing pushes live: the public London page and any open editor refresh to the new revision immediately.",
+    ],
+  },
+  {
+    title: "Design step-and-repeat walls, door vinyls and pillars",
+    blurb: "Large-format pieces with tile control and real inch readouts.",
+    steps: [
+      "In the London hub, pick the wall, vinyl or pillar you want and open its editor.",
+      "For walls, choose staggered or tiled, then set tile size, spacing and rotation — inch readouts update as you drag.",
+      "For pillars, set the vertical copy, its size and position, and the QR block with its own centring controls.",
+      "Preview at print scale, then download the master. Booth panels keep the vendor's supplied artwork embedded.",
+    ],
+  },
+  {
+    title: "Create multi-day, multi-page agendas",
+    blurb: "Session schedules that print and export cleanly.",
+    steps: [
+      "Open Event → NEXT → Agendas.",
+      "Add a day, then add sessions with time, title, speaker and room; pages break automatically when a day runs long.",
+      "Switch light/dark to check both faces, and use the division listing to produce a division-branded agenda.",
+      "Export as a deck, a print PDF, or push it to the hub preview cards — hub cards refresh as soon as you save.",
+    ],
+  },
+  {
+    title: "Produce floor maps for attendees",
+    blurb: "Top-down venue maps per floor, with or without signage marks.",
+    steps: [
+      "Open Event → NEXT → London → Maps. Pick a floor and filter by area category.",
+      "Turn on rooms-only for attendee-facing maps — signage assets and their legend drop out, leaving room keys and pins.",
+      "Use the design panel to set venue and event name, logo, logo height, single-ink mode and the brand colour strip.",
+      "Draw or drag custom areas, drop area icons, then export as PDF, SVG, CSV or a ZIP of every floor.",
+    ],
+  },
+  {
+    title: "Export city badges for press",
+    blurb: "Delegate badges as a print-ready pack.",
+    steps: [
+      "Open Event → NEXT → City badges and choose a city version.",
+      "Authoring guides are off by default and never rasterise into the file even when switched on.",
+      "Download the pack. The READ-ME states the true standard of the file you received.",
+      "If the PDF/X-4 wrap fails (usually offline) the zip is prefixed UNWRAPPED- and you are warned — re-export online before sending to press.",
+    ],
+  },
+  {
+    title: "Build a deck from ChatGPT (or any MCP client)",
+    blurb: "Use the connector when you'd rather not open the app.",
+    steps: [
+      "Add the Element connector in your assistant, pointing at the app's /mcp endpoint, and sign in when prompted.",
+      "Describe the deck you want — audience, division, story, length. The connector plans sections and picks module variants.",
+      "It prefers modules with a native PowerPoint renderer, so what you download matches what the app would render.",
+      "You get a download link to a complete, layered, editable .pptx — that file is the deliverable, not a preview.",
+      "Only if a large share of slides use heavy design plates will it also offer an optional in-app link for maximum fidelity.",
+    ],
+  },
+  {
+    title: "Use the newer proof and capability modules",
+    blurb: "Phases, growth proof, credentials, capability cards and device screens.",
+    steps: [
+      "Add the module from the library or ask the agent for it by name.",
+      "Numbered phases: add, remove and reorder phases and their tasks; each task carries its own icon and description.",
+      "Growth proof split: up to twelve client logos with row, scale and spacing control, drag-to-place figures, per-figure number formatting, and separate ring/orbit styling for light and dark.",
+      "Credential proof split: credentials sit in hairline orbit rings with no logo frames, two marks per credential for light and dark faces, and editable stat design.",
+      "Capability cards and Device screen + benefits: swap photos (upload, link or team library), edit label bands, bullets and benefit tiles, and set image share, card look and columns.",
+      "All of them export as editable PowerPoint objects.",
+    ],
+  },
 ];
 
 const FAQS: Array<{ section: string; items: QA[] }> = [
