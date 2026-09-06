@@ -7,6 +7,8 @@
 
 import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
 import { useEffect, useMemo, useState } from "react";
+
+import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -234,6 +236,7 @@ function PanelCard({
 
 function LondonSignagePage() {
   const fetchHead = useServerFn(getLondonHeadRevision);
+  const faceReady = useLondonSignageFace();
   const [headError, setHeadError] = useState(false);
   // The revision number and the design overrides in force. Every download,
   // thumbnail and QA audit builds from THESE, never from the local stores, so a
@@ -324,6 +327,19 @@ function LondonSignagePage() {
   /** Builder options for a panel, taken from the revision in force. */
   const artOptions = (panel: LondonPanel) => londonOverrideOptions(panel.id, headOverrides);
   const fileBase = (panel: LondonPanel) => londonPanelFileBase(panel, headRev);
+
+  // Previews outline their copy with the shipped signage face. Until it is in
+  // memory the synchronous builder throws by design, so the tile simply stays
+  // blank rather than taking the whole page down with it.
+  const previewSvg = (panel: LondonPanel): string | undefined => {
+    if (!faceReady) return undefined;
+    try {
+      return londonPanelSvgFor(panel, artwork, artOptions(panel));
+    } catch {
+      return undefined;
+    }
+  };
+
 
   const packOrNull = async () => {
     if (artwork) return artwork;
@@ -687,7 +703,7 @@ function LondonSignagePage() {
                   <PanelCard
                     key={panel.id}
                     panel={panel}
-                    svg={londonPanelSvgFor(panel, artwork, artOptions(panel))}
+                    svg={previewSvg(panel)}
                     onClick={setOpenPanel}
                   />
                 ))}
@@ -720,7 +736,7 @@ function LondonSignagePage() {
                       <PanelCard
                         key={panel.id}
                         panel={panel}
-                        svg={londonPanelSvgFor(panel, artwork, artOptions(panel))}
+                        svg={previewSvg(panel)}
                         onClick={setOpenPanel}
                       />
                     ))}
@@ -753,7 +769,7 @@ function LondonSignagePage() {
               </p>
               {/* Cap the hero thumb so the tier preview and downloads stay in view. */}
               <div className="mx-auto w-full max-w-[240px]">
-                <PanelThumb panel={openPanel} svg={londonPanelSvgFor(openPanel, artwork, artOptions(openPanel))} />
+                <PanelThumb panel={openPanel} svg={previewSvg(openPanel)} />
               </div>
 
               {londonVenueItemMeta(openPanel) ? (
