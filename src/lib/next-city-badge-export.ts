@@ -38,6 +38,8 @@ export type BadgeExportResult = {
   plate: { width: number; height: number; dpi: number };
   pdfBytes: number;
   proofBytes: number;
+  /** True when the PDF/X-4 wrapper succeeded; false means a plain PDF was shipped. */
+  x4: boolean;
 };
 
 function drawCropMarks(pdf: jsPDF, pageW: number, pageH: number, inset: number): void {
