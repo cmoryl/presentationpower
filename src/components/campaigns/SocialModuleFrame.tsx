@@ -402,9 +402,24 @@ export function SocialModuleFrame({
             }}
           />
 
-          {/* Live module, scaled into the safe rect (or into the tall shell's
-            panel when a thin strip has been restacked for a tall frame). */}
-          {shell ? (
+          {/* Live module: full-bleed composition for the photographic / hardware
+            modules, the tall shell for restacked thin strips, otherwise scaled
+            into the safe rect. */}
+          {bleed && bleedPlan ? (
+            <SocialFullBleedShell
+              geometry={bleed}
+              frame={{ width: format.width, height: format.height }}
+              accent={accent}
+              mode={mode}
+              imageUrl={(rendered as { imageUrl?: string }).imageUrl}
+              focalX={(rendered as { focalX?: number }).focalX}
+              focalY={(rendered as { focalY?: number }).focalY}
+            >
+              <div style={{ height: Math.min(fit.renderedHeight, bleed.height), overflow: "hidden" }}>
+                {moduleBlock}
+              </div>
+            </SocialFullBleedShell>
+          ) : shell ? (
             <SocialTallShell
               geometry={shellFitted ?? shell}
               safe={safe}
@@ -435,6 +450,7 @@ export function SocialModuleFrame({
               {moduleBlock}
             </div>
           )}
+
 
           {!hideLockup && brand ? (
             <div style={{ position: "absolute", left: safe.left, bottom: lockupPad }}>
