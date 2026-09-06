@@ -91,6 +91,15 @@ export function SocialModuleFrame({
   // surfaces reach the safe rect instead of floating in a letterbox.
   const [airIndex, setAirIndex] = useState(0);
   const airCeiling = useRef(airMaxFor(format));
+  // STRETCH — last resort for width-proportional modules. Growth and air both
+  // scale a module's height with its width, so a module that is intrinsically a
+  // thin strip (an inline quote, a credential pill row) still floats in a story
+  // frame with every ladder exhausted. Stretching gives the module's own root
+  // the full safe height, so its surface paints the frame instead of leaving a
+  // dead band. It latches on once and only resets with the frame inputs, which
+  // is what keeps the measure -> decide -> render loop from oscillating.
+  const [stretched, setStretched] = useState(false);
+  const [preStretchFill, setPreStretchFill] = useState<number | null>(null);
 
   const pinned = typeof reliefLevel === "number";
   const relief = reliefAt(pinned ? (reliefLevel as number) : autoLevel);
@@ -111,6 +120,8 @@ export function SocialModuleFrame({
     setAirIndex(0);
     growthCeiling.current = growthMaxFor(format);
     airCeiling.current = airMaxFor(format);
+    setStretched(false);
+    setPreStretchFill(null);
   }, [pinned, section, format, reliefFloor]);
 
   // Measure the module at the current virtual page width. rAF-coalesced and
@@ -171,8 +182,16 @@ export function SocialModuleFrame({
     const growthExhausted =
       growthIndex >= Math.min(SOCIAL_GROWTH_MAX, growthCeiling.current) || grow === null;
     const nextAir = nextAirStep(fit, airIndex, growthExhausted);
-    if (nextAir !== null && nextAir <= airCeiling.current) setAirIndex(nextAir);
-  }, [pinned, naturalHeight, fit, relief, growthIndex, airIndex]);
+    if (nextAir !== null && nextAir <= airCeiling.current) {
+      setAirIndex(nextAir);
+      return;
+    }
+    const airExhausted = airIndex >= Math.min(SOCIAL_AIR_MAX, airCeiling.current) || nextAir === null;
+    if (!stretched && growthExhausted && airExhausted && fit.fillPct < fit.fillTarget) {
+      setPreStretchFill(fit.fillPct);
+      setStretched(true);
+    }
+  }, [pinned, naturalHeight, fit, relief, growthIndex, airIndex, stretched]);
 
   useEffect(() => {
     if (naturalHeight > 0) onFit?.(fit, relief);
@@ -225,6 +244,10 @@ export function SocialModuleFrame({
         data-social-fit-relief={relief.level}
         data-social-fit-growth={growth}
         data-social-fit-air={air}
+        data-social-fit-stretch={stretched ? "1" : "0"}
+        data-social-fit-natural-fill={
+          preStretchFill === null ? undefined : Math.round(preStretchFill * 100)
+        }
 
       >
 
@@ -270,6 +293,7 @@ export function SocialModuleFrame({
               className="[container-type:inline-size]"
               style={{
                 width: fit.pageWidth,
+                ...(stretched ? { minHeight: safe.height / fit.scale } : null),
                 transform: `scale(${fit.scale})`,
                 transformOrigin: "top left",
                 ["--print-page-pad" as string]: "0px",
