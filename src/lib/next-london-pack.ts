@@ -4,6 +4,7 @@
 // `.svg` master and one `.ai` master per panel, foldered by floor, plus a
 // manifest listing trim, bleed, style, lockup and placement for every item.
 
+import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
 import JSZip from "jszip";
 import { LONDON_FLOORS, type LondonPanel } from "@/lib/next-london-signage";
 import { brandingSummary, londonBrandingPlan } from "@/lib/next-london-branding";
@@ -52,6 +53,9 @@ export async function buildLondonSignagePack(
     onProgress?: (done: number, total: number) => void;
   } = {},
 ): Promise<LondonPackResult> {
+  // Copy is outlined into vector paths, so the signage face must be in memory
+  // before any master is built.
+  await loadLondonSignageFace();
   const rev = options.revision ?? 1;
   const colorSpace: LondonColorSpace = options.colorSpace ?? "rgb";
   const art = { colorSpace, vibrance: options.vibrance ?? 1 };

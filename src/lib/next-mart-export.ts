@@ -217,6 +217,9 @@ export async function exportMartBundle(opts?: {
   /** City/stop template to build. Defaults to the London reference kit. */
   stop?: MartStop;
 }): Promise<MartExportResult> {
+  // Copy is outlined into vector paths, so the signage face must be in memory
+  // before any master is built.
+  await loadLondonSignageFace();
   const stop = opts?.stop ?? LONDON_STOP;
   const allPillars = martStopPillars(stop);
   const pillars = opts?.pillarIds?.length
