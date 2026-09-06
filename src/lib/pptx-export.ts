@@ -2353,7 +2353,22 @@ export async function exportDeckToPptx(
   if (geometryRepair.repaired) {
     console.warn("[pptx-export] healed canvas geometry", geometryRepair);
   }
+  // Exact Build Fidelity contract: a slide that could not be captured from its
+  // own component is reported as UNSUPPORTED. It is never quietly substituted
+  // with a different, generic PowerPoint design.
+  const unsupportedBuild =
+    fidelity === "build"
+      ? deck.slides
+          .map((sl, i) => ({ sl, i }))
+          .filter(({ i }) => !layeredText[i]?.plate)
+          .map(
+            ({ sl, i }) =>
+              `Slide ${i + 1} (${sl.variantId}): no exact exporter — this component could not be captured from the build, so Exact Build Fidelity cannot guarantee a 1:1 match.`,
+          )
+      : [];
   const warnings = [
+    ...unsupportedBuild,
+
     ...integrity.warnings(),
     ...auditWarnings,
     ...geometryRepairWarnings(geometryRepair),
