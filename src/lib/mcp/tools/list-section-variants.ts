@@ -2,6 +2,7 @@ import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { textResult } from "../supabase";
 import { SECTION_FRAMEWORKS, byId, variantsForSection } from "@/lib/taxonomy";
+import { hasNativeVariantEmitter } from "@/lib/export-native-variants";
 
 export default defineTool({
   name: "list_section_variants",
