@@ -1328,6 +1328,59 @@ export type Database = {
           },
         ]
       }
+      deck_slide_captures: {
+        Row: {
+          created_at: string
+          deck_id: string
+          fingerprint: string
+          id: string
+          mode: string
+          plate: string
+          position: number
+          runs: Json
+          shapes: Json
+          slide_id: string
+          updated_at: string
+          variant_id: string
+        }
+        Insert: {
+          created_at?: string
+          deck_id: string
+          fingerprint: string
+          id?: string
+          mode: string
+          plate: string
+          position?: number
+          runs?: Json
+          shapes?: Json
+          slide_id: string
+          updated_at?: string
+          variant_id: string
+        }
+        Update: {
+          created_at?: string
+          deck_id?: string
+          fingerprint?: string
+          id?: string
+          mode?: string
+          plate?: string
+          position?: number
+          runs?: Json
+          shapes?: Json
+          slide_id?: string
+          updated_at?: string
+          variant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deck_slide_captures_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deck_slides: {
         Row: {
           ai_change_log: Json

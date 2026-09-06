@@ -211,11 +211,18 @@ function ExportView() {
         failedSlides,
         warnings,
         telemetry,
+        captures,
         geometryRepair: repair,
       } = await exportDeckToPptx(deck, brand, {
         output: "blob",
         onTelemetry: setPerf,
       });
+      // Save the scene graph we just captured from the live components, so the
+      // server-side export (app API and the ChatGPT connector) can rebuild these
+      // exact slides without a browser of its own.
+      void import("@/lib/export-capture-publish").then((m) =>
+        m.publishSlideCaptures(deck, captures),
+      );
       setGeometryRepair(repair ?? null);
       // Explicit, separate signal: block geometry had to be healed on the way
       // out, so the file differs from what was stored on the deck.

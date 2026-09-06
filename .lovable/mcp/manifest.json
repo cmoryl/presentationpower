@@ -1017,7 +1017,7 @@
       {
         "name": "export_deck",
         "title": "Export deck to PowerPoint",
-        "description": "Build a layered, editable .pptx from a saved deck and return a private download link (valid 1 hour). Runs the native-shape export path, so slides whose artwork needs the in-app renderer are reported back instead of silently flattened.",
+        "description": "Build an exact-build-fidelity .pptx from a saved deck and return a private download link (valid 1 hour). Every slide is rebuilt from the scene graph captured from the real rendered component, so the file matches the app 1:1. Slides with no current capture are reported as unsupported and left out — never substituted with a different design.",
         "annotations": {
           "readOnlyHint": false,
           "destructiveHint": false,
