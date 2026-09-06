@@ -36,6 +36,10 @@ import {
 } from "@/lib/social-module-fit";
 
 import { applyReliefToSection } from "@/lib/social-module-layouts";
+import { socialTallSection } from "@/lib/social-tall-layouts";
+
+const SETTLE_BUDGET = 64;
+const MEASURE_BUDGET = 4;
 
 export type SocialModuleFrameProps = {
   format: SocialFormat;
@@ -79,7 +83,12 @@ export function SocialModuleFrame({
   const safe = useMemo(() => socialSafeRect(format), [format]);
 
   const measureRef = useRef<HTMLDivElement>(null);
-  const [naturalHeight, setNaturalHeight] = useState(0);
+  // A measurement is only trusted for the exact rung combination it was taken
+  // at. Without this key a stale height (from the previous module or the
+  // previous rung) reads as an overflow and permanently pins the ladder
+  // ceiling, which is what left tall frames stuck around a quarter full.
+  const [measured, setMeasured] = useState<{ h: number; key: string }>({ h: 0, key: "" });
+
   const reliefFloor = reliefFloorFor(format, density);
   const [autoLevel, setAutoLevel] = useState(reliefFloor);
   // Growth index climbs only while the module reads too small, and never past a
@@ -91,17 +100,34 @@ export function SocialModuleFrame({
   // surfaces reach the safe rect instead of floating in a letterbox.
   const [airIndex, setAirIndex] = useState(0);
   const airCeiling = useRef(airMaxFor(format));
+  const settled = useRef<Set<string>>(new Set());
+  // Some modules settle at two heights a fraction of a pixel apart (a card that
+  // reads its own container). Counting accepted measurements per rung and
+  // freezing after a few keeps that flutter from re-rendering forever.
+  const measureCount = useRef<Map<string, number>>(new Map());
 
+  const sectionKey = `${section.id}|${(section as { variantId?: string }).variantId ?? ""}|${JSON.stringify(section).length}`;
   const pinned = typeof reliefLevel === "number";
   const relief = reliefAt(pinned ? (reliefLevel as number) : autoLevel);
-  const rendered = useMemo(() => applyReliefToSection(section, relief), [section, relief]);
+  // Thin strips (inline quote, credential pills, icon strip, CTA band, expert
+  // card) are re-composed on their tall counterpart before anything is
+  // measured — no ladder can make a strip fill a story frame.
+  const tall = useMemo(() => socialTallSection(section, aspectClass(format)), [section, format]);
+  const rendered = useMemo(() => applyReliefToSection(tall.section, relief), [tall, relief]);
   const growth = SOCIAL_GROWTH_STEPS[Math.min(growthIndex, growthCeiling.current)];
   const air = SOCIAL_AIR_STEPS[Math.min(airIndex, airCeiling.current)];
+  const measureKey = `${format}|${rendered.id}|${rendered.variantId}|${relief.level}|${growth}|${air}`;
+  // Rendering always uses the last known height (zeroing it would change the
+  // rendered scale and feed the resize observer). Only the decide pass insists
+  // on a measurement taken at this exact rung combination.
+  const naturalHeight = measured.h;
+  const fresh = measured.key === measureKey;
 
   const fit = useMemo(
     () => computeSocialFit({ format, naturalHeight, relief, growth, air }),
     [format, naturalHeight, relief, growth, air],
   );
+
 
   // Reset every ladder whenever the inputs change so we always start from the
   // most generous rung — all three are monotonic, so this terminates.
@@ -111,7 +137,12 @@ export function SocialModuleFrame({
     setAirIndex(0);
     growthCeiling.current = growthMaxFor(format);
     airCeiling.current = airMaxFor(format);
-  }, [pinned, section, format, reliefFloor]);
+    settled.current = new Set();
+    measureCount.current = new Map();
+    // Keyed on the section's identity, not the object: the studio rebuilds the
+    // section on every render, and depending on the object restarted the
+    // ladders forever.
+  }, [pinned, sectionKey, format, reliefFloor]);
 
   // Measure the module at the current virtual page width. rAF-coalesced and
   // threshold-damped, the same discipline the print preview frame uses.
@@ -123,9 +154,14 @@ export function SocialModuleFrame({
     const measure = () => {
       raf = 0;
       const h = el.offsetHeight;
-      if (Math.abs(h - last) > 0.75) {
+      const seen = measureCount.current.get(measureKey) ?? 0;
+      if (Math.abs(h - last) > 0.75 && seen < MEASURE_BUDGET) {
         last = h;
-        setNaturalHeight(h);
+        measureCount.current.set(measureKey, seen + 1);
+        // Value-equal bail-out: the studio hands us a fresh section object on
+        // every render, so this effect re-runs constantly — returning the same
+        // state object is what stops that from becoming a render loop.
+        setMeasured((prev) => (prev.h === h && prev.key === measureKey ? prev : { h, key: measureKey }));
       }
     };
     measure();
@@ -138,12 +174,27 @@ export function SocialModuleFrame({
       if (raf) cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [rendered, fit.pageWidth, air]);
+  }, [rendered, fit.pageWidth, air, measureKey]);
+
 
   // Auto-escalate relief until the module clears the safe rect; when it clears
   // with room to spare, enlarge, then pad it out so the frame reads full.
   useEffect(() => {
-    if (naturalHeight <= 0) return;
+    if (naturalHeight <= 0 || !fresh) return;
+    // Each rung is decided on its own animation frame. Deciding synchronously
+    // made every rung a nested update, and a long ladder then tripped React's
+    // nested-update limit instead of finishing.
+    const frame = requestAnimationFrame(() => step());
+    return () => cancelAnimationFrame(frame);
+
+    function step() {
+    // Cycle guard: a rung combination is only ever decided once. Re-measuring
+    // the same combination cannot teach the ladder anything new, and stopping
+    // here is what keeps a pinned ceiling from ping-ponging forever.
+    if (settled.current.has(measureKey)) return;
+    settled.current.add(measureKey);
+    if (settled.current.size > SETTLE_BUDGET) return;
+
     if (!fit.ok) {
       // Air is the newest and cheapest thing to give back.
       if (airIndex > 0) {
@@ -172,7 +223,8 @@ export function SocialModuleFrame({
       growthIndex >= Math.min(SOCIAL_GROWTH_MAX, growthCeiling.current) || grow === null;
     const nextAir = nextAirStep(fit, airIndex, growthExhausted);
     if (nextAir !== null && nextAir <= airCeiling.current) setAirIndex(nextAir);
-  }, [pinned, naturalHeight, fit, relief, growthIndex, airIndex]);
+    }
+  }, [pinned, naturalHeight, fresh, fit, relief, growthIndex, airIndex, measureKey]);
 
   useEffect(() => {
     if (naturalHeight > 0) onFit?.(fit, relief);
@@ -223,6 +275,7 @@ export function SocialModuleFrame({
         data-social-fit-fill={Math.round(fit.fillPct * 100)}
         data-social-fit-overflow={Math.round(fit.overflowPct * 100)}
         data-social-fit-relief={relief.level}
+        data-social-tall={tall.plan ? tall.plan.to : undefined}
         data-social-fit-growth={growth}
         data-social-fit-air={air}
 

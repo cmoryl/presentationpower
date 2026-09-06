@@ -101,6 +101,15 @@ export const SOCIAL_RELIEF_LADDER: SocialFitRelief[] = [
     dropMeta: true,
     note: "Fully condensed banner — single proof point",
   },
+  {
+    level: 7,
+    pageWidthScale: 2.32,
+    icons: false,
+    maxItems: 1,
+    dropSummary: true,
+    dropMeta: true,
+    note: "Banner strip minimum — headline only",
+  },
 ];
 
 
@@ -296,7 +305,7 @@ export function airMaxFor(format: SocialFormat): number {
  */
 export function reliefFloorFor(format: SocialFormat, density?: "compact" | "standard" | "tall") {
   const cls = aspectClass(format);
-  if (cls === "landscape-wide") return density === "compact" ? 2 : density === "tall" ? 4 : 3;
+  if (cls === "landscape-wide") return density === "compact" ? 2 : density === "tall" ? 5 : 4;
   if (cls === "landscape") return density === "tall" ? 2 : 1;
   return 0;
 }
