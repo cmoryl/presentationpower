@@ -62,6 +62,26 @@ import { GroundedCopyDrafter } from "@/components/campaigns/GroundedCopyDrafter"
 
 import { Download } from "lucide-react";
 
+/** Format picker groups — platform families with a small brand-accent marker
+ *  each (aqua/lavender stay under the 10% accent rule; blue leads). */
+const FORMAT_GROUPS: { id: string; label: string; accent: string; platforms: FormatPlatform[] }[] = [
+  { id: "meta", label: "Instagram & Facebook", accent: "#EC388A", platforms: ["instagram", "facebook"] },
+  { id: "linkedin", label: "LinkedIn", accent: "#003FC7", platforms: ["linkedin"] },
+  { id: "short", label: "Short-form video", accent: "#03002C", platforms: ["tiktok", "snapchat", "whatsapp"] },
+  { id: "google", label: "YouTube", accent: "#E53D2E", platforms: ["youtube"] },
+  { id: "social", label: "More social", accent: "#C2A3FF", platforms: ["x", "threads", "bluesky", "pinterest"] },
+  { id: "other", label: "Email & other", accent: "#A1FBF9", platforms: ["email", "generic", "signage"] },
+];
+
+/** Mini aspect-ratio glyph for a format chip — a bordered box whose w/h
+ *  inside a 14px square conveys 1:1 vs 4:5 vs 9:16 vs wide at a glance. */
+function formatGlyphStyle(aspect: number): { width: number; height: number } {
+  const MAX = 13;
+  const w = aspect >= 1 ? MAX : Math.max(4, Math.round(MAX * aspect));
+  const h = aspect >= 1 ? Math.max(4, Math.round(MAX / aspect)) : MAX;
+  return { width: w, height: h };
+}
+
 /** First playbook copy for a given brand — the canonical division voice. */
 function exampleCopyForBrand(brandId: string) {
   const pb = SOCIAL_PLAYBOOKS.find((p) => p.subBrand === brandId);
