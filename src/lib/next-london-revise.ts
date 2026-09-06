@@ -61,6 +61,11 @@ import {
 } from "@/lib/next-london-cmyk";
 import { svgPathToPdfOps } from "@/lib/vector-path-pdf";
 import {
+  londonSignageFace,
+  outlineText,
+  type LondonSignageFace,
+} from "@/lib/next-london-text-outline";
+import {
   brewGsName,
   brewMotifAlphas,
   brewMotifPdfOps,
@@ -512,6 +517,12 @@ export type LondonArtOptions = {
    * Omitted = the local board-size store (today's behaviour).
    */
   boardSize?: LondonBoardSize;
+  /**
+   * Pre-loaded signage face used to outline every piece of copy. Omitted = the
+   * module-level cache (`loadLondonSignageFace()` must have resolved first);
+   * the builders throw rather than fall back to live, substitutable text.
+   */
+  face?: LondonSignageFace;
 };
 
 /**
@@ -713,6 +724,15 @@ export function buildLondonPanelSvg(
           fontStack: LONDON_SIGNAGE_FONT.cssStack,
           fontWeight: LONDON_SIGNAGE_FONT.weight,
           tracking: LONDON_SIGNAGE_FONT.tracking,
+          outline: (text, sizeMm, x, y) =>
+            outlineText(face, text, {
+              sizeMm,
+              trackingEm: LONDON_SIGNAGE_FONT.tracking,
+              anchor: "middle",
+              x,
+              y,
+            }),
+          faceName: face.name,
         })
       : "",
     wall ? "" : copyLayer,
