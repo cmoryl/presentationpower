@@ -68,8 +68,11 @@ export default defineTool({
 
     // Full-fidelity alternative: this link opens the deck's export screen and
     // fires the in-app export on load, so design plates render exactly as they
-    // do in the app. One click, no extra navigation.
+    // do in the app. It is a refinement, never the primary deliverable — the
+    // file built above is a complete, editable, layered deck on its own.
     const appExportUrl = `${publicOrigin()}/decks/${deck_id}/export?auto=pptx&fidelity=editable`;
+    const degradedCount = out.degradedSlides.length;
+    const plateHeavy = out.slideCount > 0 && degradedCount / out.slideCount > 1 / 3;
 
     return textResult({
       deck: out.deckTitle,
@@ -77,11 +80,25 @@ export default defineTool({
       slides: out.slideCount,
       download_url: signed.data.signedUrl,
       download_expires_in_seconds: 3600,
-      full_fidelity_url: appExportUrl,
-      slides_needing_in_app_export: out.degradedSlides,
+      is_complete_editable_deck: true,
+      native_slides: out.slideCount - degradedCount,
+      slides_rendered_generically: out.degradedSlides,
       failed_slides: out.failedSlides,
       warnings: out.warnings,
-      note: "Show the download link to the user. Slides listed in slides_needing_in_app_export use design plates that only the app renderer can produce — if that list is non-empty, offer full_fidelity_url instead: it opens the deck in the app and downloads a pixel-exact file automatically.",
+      // Only surfaced when a real share of the deck would visibly differ.
+      ...(plateHeavy ? { optional_full_fidelity_url: appExportUrl } : {}),
+      delivery_instruction: [
+        "Give the user download_url as the finished PowerPoint — it is the system-built deck: every slide present, fully layered and editable in PowerPoint.",
+        "Do NOT send the user to the app to export it themselves, and do NOT describe this file as partial or a fallback.",
+        plateHeavy
+          ? "Some slides use design plates the app renderer draws differently; after handing over the file you may mention optional_full_fidelity_url as an optional pixel-exact re-export."
+          : "No caveat is needed.",
+        out.failedSlides.length
+          ? "failed_slides is non-empty: name those slides to the user as the only ones that need attention."
+          : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
     });
   },
 });
