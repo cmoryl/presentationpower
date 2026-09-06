@@ -168,6 +168,7 @@ export async function exportCityBadge(opts: {
 
   const pdfBlob = pdf.output("blob");
   let pdfBuffer = await pdfBlob.arrayBuffer();
+  let x4 = false;
   try {
     const wrapped = await wrapPdfAsX4(new Uint8Array(pdfBuffer), {
       trimSize: { widthIn: BADGE_SPEC.trimW, heightIn: BADGE_SPEC.trimH },
@@ -182,6 +183,7 @@ export async function exportCityBadge(opts: {
       wrapped.byteOffset,
       wrapped.byteOffset + wrapped.byteLength,
     ) as ArrayBuffer;
+    x4 = true;
   } catch {
     // Offline: ship the plain press PDF rather than failing the export.
   }
@@ -201,14 +203,15 @@ export async function exportCityBadge(opts: {
   zip.file(`pdf/${slug}.pdf`, pdfBuffer);
   zip.file(`ai/${slug}.ai`, pdfBuffer);
   zip.file(`proof/${slug}-proof.png`, proofBuffer);
-  zip.file("READ-ME.txt", readme(config, versionName, effectiveDpi));
+  zip.file("READ-ME.txt", readme(config, versionName, effectiveDpi, x4));
   const blob = await zip.generateAsync({ type: "blob" });
 
   return {
     blob,
-    filename: `citynext-badge-${slug}.zip`,
+    filename: `${x4 ? "" : "UNWRAPPED-"}citynext-badge-${slug}.zip`,
     plate: { width: canvas.width, height: canvas.height, dpi: effectiveDpi },
     pdfBytes: pdfBuffer.byteLength,
     proofBytes: proofBuffer.byteLength,
+    x4,
   };
 }
