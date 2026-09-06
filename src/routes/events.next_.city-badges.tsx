@@ -132,6 +132,9 @@ function CityBadgePage() {
         id,
         description: `PDF + .ai + proof · plate ${result.plate.width}×${result.plate.height}px at ${result.plate.dpi} ppi`,
       });
+      if (!result.x4) {
+        toast.warning("Exported without PDF/X-4 wrap — re-export online before press", { id });
+      }
     } catch (e) {
       toast.error("Export failed", { id, description: (e as Error).message });
     } finally {
