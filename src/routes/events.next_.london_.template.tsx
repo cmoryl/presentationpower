@@ -729,7 +729,7 @@ function LondonTemplatePage() {
                   className="gap-2"
                   onClick={() =>
                     setLondonLogoPlacement(panel.id, {
-                      qr: `${LONDON_QR_DEFAULT_LINK}`,
+                      qr: NEXT_LONDON_AGENDA_URL,
                       qrScale: 1,
                       qrDx: 0,
                       qrDy: 0,
