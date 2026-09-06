@@ -230,6 +230,7 @@ function SocialModuleStudio() {
                   brandId={brandId}
                   mode={mode}
                   displayShortEdge={420}
+                  density={layout?.density}
                   reliefLevel={pinnedRelief === "auto" ? undefined : pinnedRelief}
                   showSafeArea={showSafe}
                   onFit={(f, r) => {

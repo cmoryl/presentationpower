@@ -153,6 +153,7 @@ export function SocialModulePicker({
                     brandId={brandId}
                     mode={mode}
                     displayShortEdge={168}
+                    density={layout.density}
                     hideLockup
                   />
                 </div>

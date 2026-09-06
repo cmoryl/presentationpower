@@ -23,6 +23,9 @@ import {
   nextGrowthStep,
   nextAirStep,
   SOCIAL_GROWTH_MAX,
+  growthMaxFor,
+  airMaxFor,
+  reliefFloorFor,
   SOCIAL_GROWTH_STEPS,
   SOCIAL_AIR_MAX,
   SOCIAL_AIR_STEPS,
@@ -49,6 +52,8 @@ export type SocialModuleFrameProps = {
   onFit?: (fit: SocialFitResult, relief: SocialFitRelief) => void;
   /** Hide the brand lockup (e.g. tiny picker thumbnails). */
   hideLockup?: boolean;
+  /** Module density — lets wide banner frames start at a condensed rung. */
+  density?: "compact" | "standard" | "tall";
 };
 
 function accentFor(brandId: string): string {
@@ -65,6 +70,7 @@ export function SocialModuleFrame({
   showSafeArea = false,
   onFit,
   hideLockup = false,
+  density,
 }: SocialModuleFrameProps) {
   const accent = accentFor(brandId);
   const brand = BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0];
@@ -74,16 +80,17 @@ export function SocialModuleFrame({
 
   const measureRef = useRef<HTMLDivElement>(null);
   const [naturalHeight, setNaturalHeight] = useState(0);
-  const [autoLevel, setAutoLevel] = useState(0);
+  const reliefFloor = reliefFloorFor(format, density);
+  const [autoLevel, setAutoLevel] = useState(reliefFloor);
   // Growth index climbs only while the module reads too small, and never past a
   // rung that already overflowed — that ceiling is what keeps the
   // measure/decide/render loop from oscillating.
   const [growthIndex, setGrowthIndex] = useState(0);
-  const growthCeiling = useRef(SOCIAL_GROWTH_MAX);
+  const growthCeiling = useRef(growthMaxFor(format));
   // Air index picks up where growth stops: it pads the module out so its own
   // surfaces reach the safe rect instead of floating in a letterbox.
   const [airIndex, setAirIndex] = useState(0);
-  const airCeiling = useRef(SOCIAL_AIR_MAX);
+  const airCeiling = useRef(airMaxFor(format));
 
   const pinned = typeof reliefLevel === "number";
   const relief = reliefAt(pinned ? (reliefLevel as number) : autoLevel);
@@ -99,12 +106,12 @@ export function SocialModuleFrame({
   // Reset every ladder whenever the inputs change so we always start from the
   // most generous rung — all three are monotonic, so this terminates.
   useEffect(() => {
-    if (!pinned) setAutoLevel(0);
+    if (!pinned) setAutoLevel(reliefFloor);
     setGrowthIndex(0);
     setAirIndex(0);
-    growthCeiling.current = SOCIAL_GROWTH_MAX;
-    airCeiling.current = SOCIAL_AIR_MAX;
-  }, [pinned, section, format.id]);
+    growthCeiling.current = growthMaxFor(format);
+    airCeiling.current = airMaxFor(format);
+  }, [pinned, section, format, reliefFloor]);
 
   // Measure the module at the current virtual page width. rAF-coalesced and
   // threshold-damped, the same discipline the print preview frame uses.
