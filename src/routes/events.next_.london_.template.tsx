@@ -225,22 +225,22 @@ function LondonTemplatePage() {
       await loadLondonSignageFace();
       const base = londonPanelFileBase(panel, headRev, colorSpace);
       try {
-      let blob: Blob;
-      if (kind === "svg") {
-        const svgOut = buildLondonPanelSvg(panel, art);
-        gateOnQa(auditSvg(panel, svgOut));
-        blob = new Blob([svgOut], { type: "image/svg+xml" });
-      } else {
-        const ai = await buildLondonPanelAiAsync(panel, art);
-        gateOnQa(auditAi(panel, ai));
-        blob = new Blob([londonAiBytes(ai)], { type: "application/illustrator" });
-      }
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${base}.${kind}`;
-      link.click();
-      URL.revokeObjectURL(url);
+        let blob: Blob;
+        if (kind === "svg") {
+          const svgOut = buildLondonPanelSvg(panel, art);
+          gateOnQa(auditSvg(panel, svgOut));
+          blob = new Blob([svgOut], { type: "image/svg+xml" });
+        } else {
+          const ai = await buildLondonPanelAiAsync(panel, art);
+          gateOnQa(auditAi(panel, ai));
+          blob = new Blob([londonAiBytes(ai)], { type: "application/illustrator" });
+        }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${base}.${kind}`;
+        link.click();
+        URL.revokeObjectURL(url);
         toast.success(`${base}.${kind} downloaded · ${colorSpace.toUpperCase()}`);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Download blocked by QA");
