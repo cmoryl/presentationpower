@@ -1356,26 +1356,7 @@ export async function exportDeckToPptx(
           quality: opts?.quality ?? null,
         };
       };
-      const applyPlate = (i: number, data: string) => {
-        const solidFallback =
-          backgroundPlans[i].kind === "solid"
-            ? (backgroundPlans[i] as { color: string }).color
-            : baseModeFor(i) === "light"
-              ? "FFFFFF"
-              : palette.primary;
-        backgroundPlans[i] = {
-          kind: "image",
-          data,
-          solidFallback,
-          fit: "cover",
-          zoom: 1,
-          offsetX: 0,
-          offsetY: 0,
-        };
-        layeredPlates[i] = data;
-        telemetry.notePlateBytes(i, data, deck.slides[i].variantId);
-        integrity.noteBackground(i, "plate", deck.slides[i].variantId);
-      };
+      const applyPlate = adoptPlate;
 
       if (targets.length > 0) {
         // The batch rasterizer reports (done, total); each tick closes the
