@@ -6,15 +6,17 @@
 // a link out to the full BoothHUB page for anyone who wants the editor.
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ExternalLink, Loader2, X } from "lucide-react";
+import { ExternalLink, Loader2, PencilRuler, X } from "lucide-react";
 
 import {
   BOOTHHUB_DIVISION_LABEL,
   boothHub3dEmbedUrl,
   boothHub3dPageUrl,
+  boothHubBuilderUrl,
   type BoothHub3dPlacement,
   type BoothHubDivisionId,
 } from "@/lib/boothhub-3d";
+
 
 export interface BoothHub3DViewerProps {
   /** Asset name shown in the header. */
@@ -40,6 +42,11 @@ export function BoothHub3DViewer({
 }: BoothHub3DViewerProps) {
   const [loaded, setLoaded] = useState(false);
   const [synced, setSynced] = useState(false);
+  // The saved BoothHUB build to show. Their viewer only has a stand when a
+  // build exists for this division under this plan name, so let people point at
+  // one instead of silently landing on "Booth unavailable".
+  const [planDraft, setPlanDraft] = useState("");
+  const [plan, setPlan] = useState("");
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -58,10 +65,11 @@ export function BoothHub3DViewer({
   // fresh record on every render, which would otherwise reload the build endlessly.
   const placeKey = JSON.stringify(placement ?? null);
   const embedUrl = useMemo(
-    () => boothHub3dEmbedUrl({ division, label: title, room, placement }),
+    () => boothHub3dEmbedUrl({ division, label: title, room, placement, variant: plan || null }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [division, title, room, placeKey],
+    [division, title, room, placeKey, plan],
   );
+
 
   // Every plan edit produces a new URL. Reload the build on it and flash a
   // short "updated" note so the change is visible, not silent.
@@ -94,13 +102,14 @@ export function BoothHub3DViewer({
           </div>
           <div className="flex items-center gap-2">
             <a
-              href={boothHub3dPageUrl({ division, placement })}
+              href={boothHub3dPageUrl({ division, placement, variant: plan || null })}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/35 bg-white px-4 py-2 text-[13px] font-semibold text-[#003FC7] hover:bg-[#E0E8F5]"
             >
               <ExternalLink className="h-4 w-4" /> Open in BoothHUB
             </a>
+
             <button
               type="button"
               onClick={onClose}
@@ -130,6 +139,47 @@ export function BoothHub3DViewer({
             className="h-full w-full border-0"
           />
         </div>
+        <footer className="flex flex-wrap items-center gap-2 border-t border-black/10 bg-white px-4 py-3">
+          <p className="min-w-[220px] flex-1 text-[11.5px] leading-[1.45] text-[#03002C]/65">
+            Seeing “Booth unavailable”? The {BOOTHHUB_DIVISION_LABEL[division]} stand has not been
+            built in BoothHUB yet, or it is saved under a different plan name. Build it there once
+            and this window shows it for every pin on this division.
+          </p>
+          <form
+            className="flex items-center gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setLoaded(false);
+              setPlan(planDraft.trim());
+            }}
+          >
+            <label className="text-[11.5px] font-semibold text-[#03002C]" htmlFor="bh-plan">
+              Plan name
+            </label>
+            <input
+              id="bh-plan"
+              value={planDraft}
+              onChange={(e) => setPlanDraft(e.target.value)}
+              placeholder="default"
+              className="w-40 rounded-full border border-[#03002C]/20 bg-white px-3 py-1.5 text-[12.5px] text-[#03002C] outline-none focus:border-[#003FC7] focus:ring-2 focus:ring-[#003FC7]/25"
+            />
+            <button
+              type="submit"
+              className="rounded-full bg-[#003FC7] px-3.5 py-1.5 text-[12.5px] font-semibold text-white hover:bg-[#03002C]"
+            >
+              Show
+            </button>
+          </form>
+          <a
+            href={boothHubBuilderUrl(division)}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white px-3.5 py-1.5 text-[12.5px] font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
+          >
+            <PencilRuler className="h-4 w-4" /> Build this stand
+          </a>
+        </footer>
+
       </div>
     </div>
   );
