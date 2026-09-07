@@ -22,6 +22,7 @@ import {
   isBoothPanel,
   londonBoothArtworkUrl,
   londonBoothNativeTemplate,
+  londonBoothScreenRect,
   londonVenueItemMeta,
   type LondonPanel,
 } from "@/lib/next-london-signage";
@@ -234,6 +235,14 @@ export function londonBrandingPlan(
   const liveW = panel.trimW - safe * 2;
   const liveH = panel.trimH - safe * 2;
 
+  // Trade Booth A ships a wall-mounted SCREEN, and the supplied shell marks its
+  // aperture. A monitor covers whatever is behind it, so the lockup is kept in
+  // the band ABOVE the screen and the copy stack starts BELOW it. Booth B has no
+  // screen, so this is null and the whole face stays live.
+  const screen = londonBoothScreenRect(panel);
+  const screenTop = screen ? screen.y : null;
+  const screenBottom = screen ? screen.y + screen.h : null;
+
   // Lockup width target: the mark is the hero on scenic panels, so it fills
   // most of the live area — horizontal lockups run widest, stacked marks stay
   // a little tighter on very wide trims.
@@ -242,7 +251,12 @@ export function londonBrandingPlan(
   const nudge = nudgeEarly;
   let logoW = liveW * widthShare * nudge.scale;
   let logoH = (art.h / art.w) * logoW;
-  const maxH = liveH * (orientation === "side" ? 0.44 : 0.58) * nudge.scale;
+  let maxH = liveH * (orientation === "side" ? 0.44 : 0.58) * nudge.scale;
+  if (screenTop !== null) {
+    // Band between the safe line and the screen, less a gap of a tenth of it.
+    const band = Math.max(20, screenTop - ((panel.bleedH - panel.trimH) / 2 + safe));
+    maxH = Math.min(maxH, band * 0.86);
+  }
   if (logoH > maxH) {
     logoH = maxH;
     logoW = (art.w / art.h) * logoH;
@@ -260,11 +274,14 @@ export function londonBrandingPlan(
   const centreX = marginX + panel.trimW / 2 - logoW / 2;
 
   // Stacked lockups sit on the upper third; horizontal lockups ride the lower
-  // band so the middle of a wide panel stays open for copy.
+  // band so the middle of a wide panel stays open for copy. On a screen wall the
+  // lockup is centred in the band above the aperture instead.
   const baseY =
-    orientation === "side"
-      ? marginY + panel.trimH - safe - logoH
-      : marginY + safe + liveH * (copy ? 0.06 : 0.28);
+    screenTop !== null
+      ? Math.max(marginY + safe, marginY + safe + (screenTop - (marginY + safe) - logoH) / 2)
+      : orientation === "side"
+        ? marginY + panel.trimH - safe - logoH
+        : marginY + safe + liveH * (copy ? 0.06 : 0.28);
 
   // Designer nudge, in trim fractions, clamped so the lockup stays on the sheet.
   const logoX = clamp(centreX + nudge.dx * panel.trimW, 0, panel.bleedW - logoW);
@@ -293,10 +310,15 @@ export function londonBrandingPlan(
       panel.bleedH,
     );
   } else {
-    const baseBaseline =
+    const stackTop =
       orientation === "side"
         ? marginY + safe + copySizeMm
         : logoY + logoH + Math.max(logoH * 0.5, copySizeMm * 1.2);
+    // On a screen wall the copy stack starts clear of the aperture.
+    const baseBaseline =
+      screenBottom !== null
+        ? Math.max(stackTop, screenBottom + copySizeMm * 1.35)
+        : stackTop;
     // Headline nudge, clamped so the cap band stays inside the sheet.
     copyBaselineMm = clamp(
       baseBaseline + nudge.textDy * panel.trimH,
@@ -326,7 +348,9 @@ export function londonBrandingPlan(
         );
         const y = clamp(
           marginY + panel.trimH - safe - qrSize - captionSizeMm * 2 + nudge.qrDy * panel.trimH,
-          0,
+          // A code behind the monitor cannot be scanned, so a screen wall keeps
+          // it below the aperture.
+          screenBottom !== null ? screenBottom + qrSize * 0.15 : 0,
           panel.bleedH - qrSize,
         );
         const rawCaption = nudge.qrCaption.trim();

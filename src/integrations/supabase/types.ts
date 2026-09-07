@@ -728,6 +728,7 @@ export type Database = {
           overlay: Json
           proof_path: string | null
           revision: number
+          shell_id: string
           slug: string
           sort_order: number
           source_file: string | null
@@ -750,6 +751,7 @@ export type Database = {
           overlay?: Json
           proof_path?: string | null
           revision?: number
+          shell_id?: string
           slug: string
           sort_order?: number
           source_file?: string | null
@@ -772,6 +774,7 @@ export type Database = {
           overlay?: Json
           proof_path?: string | null
           revision?: number
+          shell_id?: string
           slug?: string
           sort_order?: number
           source_file?: string | null

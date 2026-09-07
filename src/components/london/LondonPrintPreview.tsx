@@ -10,7 +10,7 @@
 
 import { AlertTriangle, CheckCircle2, Ruler } from "lucide-react";
 
-import type { LondonPanel } from "@/lib/next-london-signage";
+import { londonBoothScreenRect, type LondonPanel } from "@/lib/next-london-signage";
 import type { LondonBrandingPlan } from "@/lib/next-london-branding";
 import {
   boxStyle,
@@ -36,6 +36,17 @@ export function LondonPrintGuides({ panel, showCrop = true }: LondonPrintGuidesP
   const geo = londonPrintGeometry(panel);
   const trim = boxStyle(geo.trim);
   const safe = boxStyle(geo.safe);
+  // On the screen booth wall the monitor covers part of the face — draw the
+  // keep-clear aperture so nothing important is planned behind it.
+  const screenMm = londonBoothScreenRect(panel);
+  const screen = screenMm
+    ? {
+        left: `${(screenMm.x / panel.bleedW) * 100}%`,
+        top: `${(screenMm.y / panel.bleedH) * 100}%`,
+        width: `${(screenMm.w / panel.bleedW) * 100}%`,
+        height: `${(screenMm.h / panel.bleedH) * 100}%`,
+      }
+    : null;
 
   return (
     <div className="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -45,6 +56,17 @@ export function LondonPrintGuides({ panel, showCrop = true }: LondonPrintGuidesP
       <div className="absolute border-2 border-dashed border-white/90" style={trim} />
       {/* Safe = where copy and the lockup must stay. */}
       <div className="absolute border border-dashed border-emerald-300/90" style={safe} />
+
+      {screen ? (
+        <div
+          className="absolute border-2 border-dashed border-fuchsia-400/90 bg-fuchsia-500/10"
+          style={screen}
+        >
+          <div className="absolute left-1 top-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-fuchsia-200">
+            screen keep clear {mmShort(screenMm!.w)} × {mmShort(screenMm!.h)}
+          </div>
+        </div>
+      ) : null}
 
       {showCrop
         ? (
@@ -207,7 +229,8 @@ export function LondonPrintReadout({ panel, plan }: LondonPrintReadoutProps) {
       </div>
 
       <p className="mt-2 text-[11px] text-muted-foreground">
-        Red = bleed (the file), white dashed = trim (the cut), green dashed = safe. Artwork is
+        Red = bleed (the file), white dashed = trim (the cut), green dashed = safe, magenta =
+        the screen aperture on a booth wall with a monitor. Artwork is
         full-bleed to the red edge; shaped panels still take their cutting paths from the venue
         proofs.
       </p>

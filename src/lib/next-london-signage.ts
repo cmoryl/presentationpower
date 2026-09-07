@@ -14,6 +14,12 @@ import {
   type LondonBoothSpec,
 } from "@/lib/next-london-booths";
 import { nativeBoothTemplate } from "@/lib/next-london-booth-native";
+import {
+  boothScreenRectMm,
+  boothShellForSlug,
+  type BoothRectMm,
+  type LondonBoothShell,
+} from "@/lib/next-london-booth-shells";
 import { LONDON_VENUE_ITEMS, type LondonVenueItemSpec } from "@/lib/next-london-venue-items";
 
 export type LondonFloorId = "EXT" | "GF" | "2F" | "3F" | "4F" | "5F" | "6F";
@@ -1389,6 +1395,8 @@ export type LondonBoothPanelMeta = {
   panelId: string;
   booth: LondonBoothSpec;
   artboard: LondonBoothArtboard;
+  /** Which supplied trade-booth shell the wall is built on (screen / no screen). */
+  shell: LondonBoothShell;
 };
 
 function boothPanel(
@@ -1450,7 +1458,12 @@ export const LONDON_BOOTH_PANELS: LondonPanel[] = BOOTH_ROWS.map((row, i) =>
 export const LONDON_BOOTH_PANEL_META: Record<string, LondonBoothPanelMeta> = Object.fromEntries(
   LONDON_BOOTH_PANELS.map((panel, i) => [
     panel.id,
-    { panelId: panel.id, booth: BOOTH_ROWS[i]!.booth, artboard: BOOTH_ROWS[i]!.artboard },
+    {
+      panelId: panel.id,
+      booth: BOOTH_ROWS[i]!.booth,
+      artboard: BOOTH_ROWS[i]!.artboard,
+      shell: boothShellForSlug(BOOTH_ROWS[i]!.booth.id),
+    },
   ]),
 );
 
@@ -1490,6 +1503,29 @@ export function londonBoothNativeTemplate(panelId: string) {
 /** The vendor's Illustrator master — the print deliverable for a booth panel. */
 export function londonBoothMasterUrl(panelId: string): string | null {
   return LONDON_BOOTH_PANEL_META[panelId]?.booth.aiUrl ?? null;
+}
+
+/** The supplied trade-booth shell a booth panel is built on, when it is a booth. */
+export function londonBoothShell(panelId: string): LondonBoothShell | null {
+  return LONDON_BOOTH_PANEL_META[panelId]?.shell ?? null;
+}
+
+/**
+ * The screen keep-clear zone for a panel, in mm on the BLEED page (so guides and
+ * layout maths can use it directly). Null for a screenless shell or a
+ * non-booth panel. Scaled from the panel's live trim, so a booth re-issued at
+ * another stand size keeps a proportional aperture.
+ */
+export function londonBoothScreenRect(
+  panel: LondonPanel | { id: string; trimW: number; trimH: number; bleedW: number; bleedH: number },
+): BoothRectMm | null {
+  const meta = LONDON_BOOTH_PANEL_META[panel.id];
+  if (!meta) return null;
+  const rect = boothScreenRectMm(meta.shell, { trimW: panel.trimW, trimH: panel.trimH });
+  if (!rect) return null;
+  const marginX = (panel.bleedW - panel.trimW) / 2;
+  const marginY = (panel.bleedH - panel.trimH) / 2;
+  return { x: rect.x + marginX, y: rect.y + marginY, w: rect.w, h: rect.h };
 }
 
 LONDON_PANELS.push(...LONDON_BOOTH_PANELS);
