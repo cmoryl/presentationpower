@@ -105,6 +105,9 @@ function SocialDemoView() {
   );
   const kit = KIT_PROFILES_BY_ID[playbook.kitProfileId];
   const photoSet = getPhotoSet(playbook.subBrand);
+  // Imagery credit line — this campaign's own creative when it has a set,
+  // otherwise the division photography.
+  const artCredit = campaignArtCredit(playbook.id, playbook.subBrand);
   // Art direction. A social kit wears the SAME authored look family as its
   // division's event collateral (`channelLook`), so posts, event artwork and
   // print comps for one division read as one campaign end to end. The switcher
