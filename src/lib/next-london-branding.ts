@@ -21,6 +21,7 @@ import {
 import {
   isBoothPanel,
   londonBoothArtworkUrl,
+  londonBespokeNativeTemplate,
   londonBoothNativeTemplate,
   londonBoothScreenRect,
   londonVenueItemMeta,
@@ -267,7 +268,11 @@ export function londonBrandingPlan(
   // A booth with no supplied wall is app-built and ships default copy for every
   // slot. A booth with the vendor's own artwork starts with NO baked-on copy —
   // its wall already carries it — but every slot stays editable on top.
-  const native = londonBoothNativeTemplate(panel.id);
+  // Native templates are app-built faces: a vendor booth with no supplied wall,
+  // or a Bespoke scenic face whose artwork we own outright. Both ship default
+  // copy for every slot, and both stay fully editable on top.
+  const native =
+    londonBoothNativeTemplate(panel.id) ?? londonBespokeNativeTemplate(panel.id);
   const authored =
     nudge.text === null ? (native ? native.headline || null : pickCopy(panel)) : nudge.text.trim() || null;
   const copy = authored;
