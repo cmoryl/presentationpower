@@ -340,11 +340,27 @@ export function SocialModuleFrame({
     }
   }, [format]);
 
+  // Template ground: the look's authored background artwork for the scene this
+  // module belongs to. A full-bleed photograph owns the whole frame, so the
+  // plate stands down there rather than fighting the picture.
+  const family = useMemo(() => {
+    const vid = (section as { variantId?: string }).variantId;
+    return SOCIAL_MODULE_LAYOUTS.find((l) => l.variantId === vid)?.family ?? null;
+  }, [section]);
+  const plate = useMemo(
+    () => (bleedPlan ? null : socialGroundPlate(lookCode, family, section.id, groundTake)),
+    [bleedPlan, lookCode, family, section.id, groundTake],
+  );
+
   // A full-bleed photograph carries its own contrast: the module's copy and the
   // brand lockup reverse out over the scrim regardless of the kit's face.
-  const moduleMode = bleedPlan ? fullBleedMode(bleedPlan, mode) : mode;
-  const ink = bleedPlan?.kind === "photo" ? "#FFFFFF" : mode === "dark" ? "#FFFFFF" : "#03002C";
-  const paper = mode === "dark" ? "#03002C" : "#FFFFFF";
+  const moduleMode = bleedPlan ? fullBleedMode(bleedPlan, mode) : plate ? plate.mode : mode;
+  const ink =
+    bleedPlan?.kind === "photo" || (plate ? plate.mode === "dark" : mode === "dark")
+      ? "#FFFFFF"
+      : "#03002C";
+  const paper = plate ? plate.surface : mode === "dark" ? "#03002C" : "#FFFFFF";
+
 
 
   // Center the module inside the safe rect so short modules never leave a
