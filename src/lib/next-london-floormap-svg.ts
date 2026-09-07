@@ -718,7 +718,10 @@ export function assetMapSvg(
       londonFloorMarkers(panel.floor, opts.panels, opts.overrides).find(
         (m) => m.panelId === panel.id,
       ) ?? null;
-    const size = floorMapSize(plan);
+    // Size from the sheet, not the bare plan: when the card carries the numbered
+    // asset index the index needs its own band, or it prints over the plan.
+    const mapOpts = { ...opts, activePanelId: panel.id, footerNote: null } as const;
+    const size = floorMapSheetSize(panel.floor, mapOpts);
     const specH = 112;
     const w = size.w;
     /** Map block ends where the (suppressed) floor footer would have started. */
