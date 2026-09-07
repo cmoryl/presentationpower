@@ -1,6 +1,9 @@
 import { LONDON_BESPOKE_PANELS } from "@/lib/next-london-signage";
 import { buildLondonPanelSvg, buildLondonPanelAiAsync } from "@/lib/next-london-revise";
+import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
 import { auditSvg, auditAi, gateOnQa } from "@/lib/london-signage-qa";
+
+await loadLondonSignageFace();
 
 for (const p of LONDON_BESPOKE_PANELS) {
   const svg = buildLondonPanelSvg(p);
