@@ -202,6 +202,16 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
     textDx: clamp(p.textDx, -0.5, 0.5, 0),
     textDy: clamp(p.textDy, -0.5, 0.5, 0),
     textVertical: typeof p.textVertical === "boolean" ? p.textVertical : null,
+    sub: typeof p.sub === "string" ? p.sub.slice(0, LONDON_TEXT_MAX_CHARS) : null,
+    subScale: clamp(p.subScale, LONDON_TEXT_SCALE.min, LONDON_TEXT_SCALE.max, 1),
+    subTracking: clamp(
+      p.subTracking,
+      LONDON_TEXT_TRACKING.min,
+      LONDON_TEXT_TRACKING.max,
+      0,
+    ),
+    subDx: clamp(p.subDx, -0.5, 0.5, 0),
+    subDy: clamp(p.subDy, -0.5, 0.5, 0),
     qr:
       typeof p.qr === "string" && p.qr.trim().length > 0
         ? p.qr.trim().slice(0, LONDON_QR_MAX_CHARS)
