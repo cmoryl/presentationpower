@@ -27,7 +27,7 @@ import {
   SUMMARY_BAND,
 } from "@/lib/surface-tokens";
 import { cellAccent, cellWash, iconWellStyle, cellIconScale } from "./cell-controls";
-import { MAX_TASKS, clampPhases, readPhases, stageMetrics } from "@/lib/stage-phases";
+import { MAX_TASKS, clampPhases, readPhases, stageLabelFit, stageMetrics } from "@/lib/stage-phases";
 
 registerSlideModule({
   id: "family:process",
@@ -638,7 +638,15 @@ registerSlideModule({
                   const tasks = arr(st.items)
                     .slice(0, MAX_TASKS)
                     .map((t) => obj(t));
+                  // Shrink the medallion copy per stage so long stage names
+                  // stay inside the disc instead of running over the ring.
+                  const fit = stageLabelFit(s(st.label), {
+                    medallion: m.medallion,
+                    numeral: numeralSize,
+                    stageName: stageNameSize,
+                  });
                   return (
+
                     <React.Fragment key={si}>
                       {si > 0 && (
                         <div
@@ -721,12 +729,12 @@ registerSlideModule({
                             />
                             <div
                               data-on-media
-                              className="absolute inset-0 flex flex-col items-center justify-center px-[12%] text-center"
+                              className="absolute inset-0 flex flex-col items-center justify-center px-[14%] text-center"
                               style={{ color: "#FFFFFF" }}
                             >
                               <div
                                 style={{
-                                  fontSize: numeralSize,
+                                  fontSize: fit.numeral,
                                   fontWeight: 700,
                                   lineHeight: 1,
                                   letterSpacing: "-0.05em",
@@ -735,18 +743,21 @@ registerSlideModule({
                                 {s(st.stepNumber, String(si + 1))}
                               </div>
                               <div
-                                className="mt-2"
+                                className="mt-2 w-full"
                                 style={{
-                                  fontSize: stageNameSize,
+                                  fontSize: fit.stageName,
                                   fontWeight: 700,
                                   lineHeight: 1.08,
                                   letterSpacing: "-0.02em",
                                   textTransform: "uppercase",
+                                  overflowWrap: "anywhere",
+                                  ...clampLines(fit.maxLines),
                                 }}
                               >
                                 {s(st.label)}
                               </div>
                             </div>
+
                           </div>
                         </div>
 
