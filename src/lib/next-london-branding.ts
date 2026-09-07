@@ -349,6 +349,29 @@ export function londonBrandingPlan(
   const copyTrackingEm = LONDON_SIGNAGE_FONT.tracking + nudge.textTracking;
   const copyRunMm = copy ? londonCopyRunMm(copy, copySizeMm, copyTrackingEm) : 0;
 
+  // Subhead: a second, smaller line under the headline (or under the lockup when
+  // there is no headline). Its cap height and baseline are derived from the live
+  // area and the headline, never stored in absolute mm, so re-issuing a booth at
+  // another stand size re-lays the copy instead of stranding it.
+  const sub = nudge.sub && nudge.sub.trim() ? nudge.sub.trim() : null;
+  const subSizeMm = copySizeMm * 0.42 * nudge.subScale;
+  const subTrackingEm = LONDON_SIGNAGE_FONT.tracking + 0.02 + nudge.subTracking;
+  const subRunMm = sub ? londonCopyRunMm(sub, subSizeMm, subTrackingEm) : 0;
+  const subAnchorBaseline = copy
+    ? copyBaselineMm + (vertical ? 0 : copySizeMm * 0.55 + subSizeMm)
+    : logoY + logoH + Math.max(logoH * 0.4, subSizeMm * 1.6);
+  const subAnchorCentre = vertical
+    ? copyCentreMm + copySizeMm * 0.95
+    : marginX + panel.trimW / 2;
+  const subBaselineMm = vertical
+    ? clamp(subAnchorBaseline + nudge.subDy * panel.trimH, 0, panel.bleedH)
+    : clamp(
+        subAnchorBaseline + nudge.subDy * panel.trimH,
+        subSizeMm,
+        panel.bleedH - subSizeMm * 0.3,
+      );
+  const subCentreMm = clamp(subAnchorCentre + nudge.subDx * panel.trimW, 0, panel.bleedW);
+
   return {
     familyId,
     orientation,
