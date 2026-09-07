@@ -1,16 +1,6 @@
-// Supplied-wall coverage. Every bundled booth now ships as a NATIVE template
-// (brand plate + editable copy), but the supplied-artwork path stays live for
-// any booth whose master is replaced through the booth template editor — so
-// this suite runs with the native registry emptied, which is exactly the state
-// a booth is in once a vendor wall is uploaded over it.
-import { describe, expect, it, vi } from "vitest";
-
-vi.mock("@/lib/next-london-booth-native", () => ({
-  NATIVE_BOOTH_TEMPLATES: [],
-  isNativeBoothSlug: () => false,
-  nativeBoothTemplate: () => null,
-  nativeBoothPlateStyle: () => null,
-}));
+// Supplied-wall coverage: every bundled booth ships the vendor's own Illustrator
+// wall as its ground, embedded in the master, with our editable copy layer above.
+import { describe, expect, it } from "vitest";
 
 import { LONDON_PANELS, isBoothPanel, londonBoothArtworkUrl } from "@/lib/next-london-signage";
 import {
