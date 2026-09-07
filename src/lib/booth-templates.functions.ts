@@ -119,7 +119,7 @@ export const saveBoothTemplate = createServerFn({ method: "POST" })
     const revision = (current as Row).revision + 1;
     const { data: saved, error } = await supabase
       .from("booth_templates")
-      .update({ ...patch, revision })
+      .update({ ...patch, overlay: (patch.overlay ?? undefined) as never, revision })
       .eq("id", id)
       .select()
       .single();
@@ -129,7 +129,7 @@ export const saveBoothTemplate = createServerFn({ method: "POST" })
     const { error: versionError } = await supabase.from("booth_template_versions").insert({
       template_id: id,
       revision,
-      snapshot: saved as unknown as Record<string, unknown>,
+      snapshot: saved as never,
       note: note ?? null,
       created_by: userId,
     });
