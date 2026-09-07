@@ -717,6 +717,21 @@ function LondonSignagePage() {
                   />
                 ))}
               </div>
+              {boothTemplates.templates.length > 0 ? (
+                <BoothTemplatePanel
+                  templates={boothTemplates.templates}
+                  panelIdBySlug={Object.fromEntries(
+                    boothPanels.flatMap((panel) => {
+                      const meta = londonBoothPanelMeta(panel);
+                      return meta ? [[meta.booth.id, panel.id] as const] : [];
+                    }),
+                  )}
+                  canEdit={!!userId}
+                  saving={boothTemplates.saving}
+                  saveError={boothTemplates.saveError}
+                  onSave={boothTemplates.save}
+                />
+              ) : null}
             </div>
           ) : null}
 
