@@ -309,10 +309,15 @@ export function londonBrandingPlan(
       panel.bleedH,
     );
   } else {
-    const baseBaseline =
+    const stackTop =
       orientation === "side"
         ? marginY + safe + copySizeMm
         : logoY + logoH + Math.max(logoH * 0.5, copySizeMm * 1.2);
+    // On a screen wall the copy stack starts clear of the aperture.
+    const baseBaseline =
+      screenBottom !== null
+        ? Math.max(stackTop, screenBottom + copySizeMm * 1.35)
+        : stackTop;
     // Headline nudge, clamped so the cap band stays inside the sheet.
     copyBaselineMm = clamp(
       baseBaseline + nudge.textDy * panel.trimH,
