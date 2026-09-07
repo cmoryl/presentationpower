@@ -27,7 +27,7 @@ import {
   SUMMARY_BAND,
 } from "@/lib/surface-tokens";
 import { cellAccent, cellWash, iconWellStyle, cellIconScale } from "./cell-controls";
-import { MAX_TASKS, clampPhases, readPhases, stageMetrics } from "@/lib/stage-phases";
+import { MAX_TASKS, clampPhases, readPhases, stageLabelFit, stageMetrics } from "@/lib/stage-phases";
 
 registerSlideModule({
   id: "family:process",
