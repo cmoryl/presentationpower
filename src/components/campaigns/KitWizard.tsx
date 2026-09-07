@@ -55,6 +55,7 @@ import {
   printModuleFamilyMeta,
 } from "@/lib/social-module-layouts";
 import { reliefAt } from "@/lib/social-module-fit";
+import { useSelectablePacks } from "@/hooks/use-selectable-packs";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
@@ -804,6 +805,7 @@ export function KitWizard({
                   mode={mode === "light" ? "light" : "dark"}
                   displayShortEdge={240}
                   density={moduleLayout.density}
+                  lookCode={groundLook}
                 />
               </div>
             ) : null}
@@ -1310,6 +1312,7 @@ export function KitWizard({
                                 mode={asset.mode === "light" ? "light" : "dark"}
                                 displayShortEdge={displayShortEdge}
                                 density={moduleLayout.density}
+                                lookCode={groundLook}
                               />
                             ) : nextDesign ? (
                               <NextRenderer
@@ -1431,6 +1434,7 @@ export function KitWizard({
                       mode={asset.mode === "light" ? "light" : "dark"}
                       displayShortEdge={shortEdge}
                       density={moduleLayout.density}
+                      lookCode={groundLook}
                     />
                   ) : nextDesign ? (
                     <NextRenderer
