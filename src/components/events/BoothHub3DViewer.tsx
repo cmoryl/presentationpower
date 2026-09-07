@@ -101,6 +101,31 @@ export function BoothHub3DViewer({
 
 
 
+  const pageUrl = boothHub3dPageUrl({
+    division,
+    placement,
+    variant: plan || null,
+    shareToken,
+  });
+
+  // Can this browser give a 3D picture a graphics session at all? A window
+  // inside a window is often refused one, which is what BoothHUB reports as
+  // "Error creating WebGL context".
+  const [graphics, setGraphics] = useState<"unknown" | "ok" | "unavailable">("unknown");
+  useEffect(() => {
+    try {
+      const canvas = document.createElement("canvas");
+      const gl =
+        canvas.getContext("webgl2") ??
+        canvas.getContext("webgl") ??
+        canvas.getContext("experimental-webgl");
+      setGraphics(gl ? "ok" : "unavailable");
+      (gl as WebGLRenderingContext | null)?.getExtension("WEBGL_lose_context")?.loseContext();
+    } catch {
+      setGraphics("unavailable");
+    }
+  }, []);
+
   // Every plan edit produces a new URL. Reload the build on it and flash a
   // short "updated" note so the change is visible, not silent.
   const firstUrl = useRef(embedUrl);
@@ -112,6 +137,7 @@ export function BoothHub3DViewer({
     const t = window.setTimeout(() => setSynced(false), 2600);
     return () => window.clearTimeout(t);
   }, [embedUrl]);
+
 
   return (
     <div
@@ -160,6 +186,26 @@ export function BoothHub3DViewer({
               Updated from your plan edit
             </p>
           ) : null}
+          {/* The 3D picture needs a graphics session from the browser, and a
+              window inside a window (our preview) is often refused one. We can
+              only test our own document, but the answer is the same either way:
+              open it in a tab of its own. */}
+          {graphics === "unavailable" ? (
+            <div className="absolute inset-x-0 top-0 z-10 flex flex-wrap items-center justify-between gap-3 bg-[#FFEB66] px-4 py-2.5 text-[12.5px] text-[#03002C]">
+              <span className="min-w-[200px] flex-1">
+                This browser window can’t start a 3D picture here — it’s a graphics limit of a window
+                inside a window, not your stand. Open it in a tab of its own and it draws normally.
+              </span>
+              <a
+                href={pageUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-3.5 py-1.5 font-semibold text-white hover:opacity-90"
+              >
+                <ExternalLink className="h-4 w-4" /> Open in a new tab
+              </a>
+            </div>
+          ) : null}
           <iframe
             key={embedUrl}
             src={embedUrl}
@@ -169,6 +215,7 @@ export function BoothHub3DViewer({
             className="h-full w-full border-0"
           />
         </div>
+
         <footer className="flex flex-wrap items-end gap-3 border-t border-black/10 bg-white px-4 py-3">
           <p className="min-w-[220px] flex-1 text-[11.5px] leading-[1.45] text-[#03002C]/65">
             {shareToken ? (
