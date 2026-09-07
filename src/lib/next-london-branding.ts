@@ -21,10 +21,12 @@ import {
 import {
   isBoothPanel,
   londonBoothArtworkUrl,
+  londonBoothPanelMeta,
   londonVenueItemMeta,
   type LondonPanel,
 } from "@/lib/next-london-signage";
 import { londonSafeMm } from "@/lib/next-london-print-geometry";
+import { nativeBoothTemplate } from "@/lib/next-london-booth-native";
 import { buildPillarQr } from "@/lib/pillar-qr";
 import { PILLAR_CAPTION_FONTS } from "@/lib/next-pillar-masters";
 import {
@@ -147,6 +149,20 @@ export type LondonBrandingPlan = {
   subBaselineMm: number;
   /** Subhead centre, in mm from the left of the bleed box. */
   subCentreMm: number;
+  /** Body paragraph, already wrapped to the measure. Empty = no body. */
+  bodyLines: string[];
+  /** Cap height of the body copy, in mm. */
+  bodySizeMm: number;
+  /** Body tracking, in em. */
+  bodyTrackingEm: number;
+  /** Baseline-to-baseline body leading, in mm. */
+  bodyLeadingMm: number;
+  /** First body baseline, in mm from the top of the bleed box. */
+  bodyBaselineMm: number;
+  /** Body centre, in mm from the left of the bleed box. */
+  bodyCentreMm: number;
+  /** Body measure (wrap width), in mm. */
+  bodyMeasureMm: number;
   /** Clear space held around the lockup, in mm (1.5× the mark height rule). */
   clearMm: number;
   /** Scannable QR block, in mm, when the panel carries a code. */
@@ -234,7 +250,11 @@ export function londonBrandingPlan(
 
   // Copy: the note-derived headline unless the location team typed their own.
   // An empty string is a deliberate "no headline on this panel".
-  const authored = nudge.text === null ? pickCopy(panel) : nudge.text.trim() || null;
+  // Native booth templates ship their own default copy for every slot; a stored
+  // override always wins, and an empty string is a deliberate "leave it off".
+  const native = nativeBoothTemplate(londonBoothPanelMeta(panel)?.booth.id);
+  const authored =
+    nudge.text === null ? (native ? native.headline || null : pickCopy(panel)) : nudge.text.trim() || null;
   const copy = authored;
   const centreX = marginX + panel.trimW / 2 - logoW / 2;
 
@@ -353,7 +373,12 @@ export function londonBrandingPlan(
   // there is no headline). Its cap height and baseline are derived from the live
   // area and the headline, never stored in absolute mm, so re-issuing a booth at
   // another stand size re-lays the copy instead of stranding it.
-  const sub = nudge.sub && nudge.sub.trim() ? nudge.sub.trim() : null;
+  const sub =
+    nudge.sub === null
+      ? (native?.sub || null)
+      : nudge.sub.trim()
+        ? nudge.sub.trim()
+        : null;
   const subSizeMm = copySizeMm * 0.42 * nudge.subScale;
   const subTrackingEm = LONDON_SIGNAGE_FONT.tracking + 0.02 + nudge.subTracking;
   const subRunMm = sub ? londonCopyRunMm(sub, subSizeMm, subTrackingEm) : 0;
@@ -371,6 +396,32 @@ export function londonBrandingPlan(
         panel.bleedH - subSizeMm * 0.3,
       );
   const subCentreMm = clamp(subAnchorCentre + nudge.subDx * panel.trimW, 0, panel.bleedW);
+
+  // Body: a wrapped paragraph under the subhead, measured with the same run
+  // metric as the headline so the wrap holds at every stand size. Like the other
+  // slots its geometry is derived, never stored in absolute mm.
+  const bodyText =
+    nudge.body === null ? (native?.body || null) : nudge.body.trim() ? nudge.body.trim() : null;
+  const bodySizeMm = subSizeMm * 0.52 * nudge.bodyScale;
+  const bodyTrackingEm = LONDON_SIGNAGE_FONT.tracking + 0.01 + nudge.bodyTracking;
+  const bodyMeasureMm = liveW * nudge.bodyWidth;
+  const bodyLines = bodyText
+    ? wrapCopy(bodyText, bodySizeMm, bodyTrackingEm, bodyMeasureMm)
+    : [];
+  const bodyLeadingMm = bodySizeMm * 1.45;
+  const bodyAnchorBaseline =
+    (sub ? subBaselineMm + subSizeMm * 0.8 : copy ? copyBaselineMm + copySizeMm * 0.9 : logoY + logoH) +
+    bodySizeMm * 1.6;
+  const bodyBaselineMm = clamp(
+    bodyAnchorBaseline + nudge.bodyDy * panel.trimH,
+    bodySizeMm,
+    panel.bleedH - bodySizeMm * 0.3,
+  );
+  const bodyCentreMm = clamp(
+    marginX + panel.trimW / 2 + nudge.bodyDx * panel.trimW,
+    0,
+    panel.bleedW,
+  );
 
   return {
     familyId,
@@ -392,6 +443,13 @@ export function londonBrandingPlan(
     subRunMm,
     subBaselineMm,
     subCentreMm,
+    bodyLines,
+    bodySizeMm,
+    bodyTrackingEm,
+    bodyLeadingMm,
+    bodyBaselineMm,
+    bodyCentreMm,
+    bodyMeasureMm,
     clearMm: logoH * 0.25,
     qr,
     placement: nudge,
@@ -399,6 +457,33 @@ export function londonBrandingPlan(
     // the house lockup on their brand ground.
     lockupOn: nudge.lockup ?? !(isBoothPanel(panel) && !!londonBoothArtworkUrl(panel.id)),
   };
+}
+
+/**
+ * Greedy word wrap on the real run metric, so a native booth's body paragraph
+ * re-flows to the measure at any stand size. A single word longer than the
+ * measure is left on its own line rather than broken mid-word.
+ */
+export function wrapCopy(
+  text: string,
+  sizeMm: number,
+  trackingEm: number,
+  measureMm: number,
+): string[] {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let line = "";
+  for (const word of words) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (line && londonCopyRunMm(candidate, sizeMm, trackingEm) > measureMm) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = candidate;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
 }
 
 function clamp(value: number, lo: number, hi: number): number {

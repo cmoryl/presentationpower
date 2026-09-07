@@ -13,6 +13,10 @@ import {
   type LondonBoothArtboard,
   type LondonBoothSpec,
 } from "@/lib/next-london-booths";
+import {
+  isNativeBoothSlug,
+  nativeBoothTemplate,
+} from "@/lib/next-london-booth-native";
 import { LONDON_VENUE_ITEMS, type LondonVenueItemSpec } from "@/lib/next-london-venue-items";
 
 export type LondonFloorId = "EXT" | "GF" | "2F" | "3F" | "4F" | "5F" | "6F";
@@ -1395,15 +1399,23 @@ function boothPanel(
   artboard: LondonBoothArtboard,
   index: number,
 ): LondonPanel {
+  // A native booth is built by the app: its ground is the brand plate, not the
+  // vendor's flat wall, and every slot on it stays editable.
+  const native = nativeBoothTemplate(booth.id);
+  const plateStyle = native?.plateStyle ?? booth.style;
   const seed: LondonPanel = {
     id: `ldn-b${String(index + 1).padStart(2, "0")}`,
     floor: "GF",
     room: `${booth.vendor.toUpperCase()} BOOTH`,
-    proof: booth.sourceFile ?? "Artwork pending",
+    proof: native ? "Native template (app-built)" : (booth.sourceFile ?? "Artwork pending"),
     page: artboard.page,
     name: booth.vendor, // Keep short — dimensions are already in the spec metadata line below the card.
-    ground: artboard.previewUrl ? "Supplied booth artwork" : "Brand ground (artwork pending)",
-    style: LONDON_STYLES[booth.style] ? booth.style : "01-beam-violet-aqua",
+    ground: native
+      ? "Brand plate (native template)"
+      : artboard.previewUrl
+        ? "Supplied booth artwork"
+        : "Brand ground (artwork pending)",
+    style: LONDON_STYLES[plateStyle] ? plateStyle : "01-beam-violet-aqua",
     trimW: artboard.trimW,
     trimH: artboard.trimH,
     bleedW: artboard.trimW + (artboard.bleedMm ?? LONDON_BOOTH_BLEED_MM) * 2,
@@ -1458,7 +1470,12 @@ export function londonBoothPanelMeta(
  * file. Painted as the ground so previews match the real booth artwork.
  */
 export function londonBoothArtworkUrl(panelId: string): string | null {
-  return LONDON_BOOTH_PANEL_META[panelId]?.artboard.previewUrl ?? null;
+  const meta = LONDON_BOOTH_PANEL_META[panelId];
+  if (!meta) return null;
+  // Native booths carry no supplied wall: their ground is the live brand plate,
+  // so no proof is painted and nothing is embedded in the master.
+  if (isNativeBoothSlug(meta.booth.id)) return null;
+  return meta.artboard.previewUrl ?? null;
 }
 
 /** The vendor's Illustrator master — the print deliverable for a booth panel. */

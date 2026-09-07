@@ -18,7 +18,10 @@ import {
   LONDON_BOOTH_TRIM_PRESETS,
   resizeBoothArtboard,
 } from "@/lib/next-london-booths";
+import { nativeBoothTemplate } from "@/lib/next-london-booth-native";
 import {
+  LONDON_BODY_MAX_CHARS,
+  LONDON_BODY_WIDTH,
   LONDON_TEXT_MAX_CHARS,
   LONDON_TEXT_SCALE,
   londonLogoPlacement,
@@ -110,6 +113,9 @@ export function BoothTemplatePanel({
   };
 
   const panelId = panelIdBySlug[template.slug];
+  // Native booths are built by the app: brand plate plus editable slots, so the
+  // whole wall is ours and every slot exports as live Illustrator vector.
+  const native = nativeBoothTemplate(template.slug);
   // The copy layer is edited on the live panel and captured to the template, so
   // a re-issue at another stand size re-lays the same headline and subhead.
   const place = panelId ? (placements[panelId] ?? londonLogoPlacement(panelId)) : null;
@@ -134,6 +140,11 @@ export function BoothTemplatePanel({
         <span className="font-mono text-[11px] text-[#03002C]/55">
           {templates.length} stored · revision r{template.revision}
         </span>
+        {native ? (
+          <span className="rounded border border-[#003FC7]/30 bg-white px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#003FC7]">
+            Native template
+          </span>
+        ) : null}
         {!canEdit ? (
           <span className="rounded border border-[#03002C]/20 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#03002C]/60">
             Read only
@@ -145,6 +156,13 @@ export function BoothTemplatePanel({
         can be re-issued at another stand size or replaced with a new artwork round without a
         rebuild. Downloads always serve the stored master.
       </p>
+      {native ? (
+        <p className="mt-2 max-w-3xl text-[13px] leading-[1.5] text-[#003FC7]">
+          {template.vendor} is a native template: the background is a live brand plate, and the
+          headline, subhead, body and logo are all editable here. Nothing is a flattened image, so
+          the Illustrator download opens as editable vector artwork.
+        </p>
+      ) : null}
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
         <div>
@@ -320,7 +338,7 @@ export function BoothTemplatePanel({
         <div className="mt-5 rounded-xl border border-black/10 bg-white p-4">
           <span className={LABEL}>Copy and logo layer</span>
           <p className="mt-1 max-w-3xl text-[12px] leading-[1.5] text-[#03002C]/70">
-            Headline, subhead and lockup are held per booth and set from the trim box, so
+            Headline, subhead, body and lockup are held per booth and set from the trim box, so
             re-issuing at another stand size re-lays them. Both lines export as outlined
             Illustrator paths.
           </p>
@@ -349,6 +367,73 @@ export function BoothTemplatePanel({
                 disabled={!canEdit || saving}
                 value={place.sub ?? ""}
                 onChange={(e) => setPlace({ sub: e.target.value })}
+              />
+            </div>
+          </div>
+          <div className="mt-3">
+            <label className={LABEL} htmlFor="booth-body">
+              Body copy
+            </label>
+            <textarea
+              id="booth-body"
+              className={FIELD}
+              rows={3}
+              maxLength={LONDON_BODY_MAX_CHARS}
+              disabled={!canEdit || saving}
+              value={place.body ?? ""}
+              onChange={(e) => setPlace({ body: e.target.value })}
+            />
+            <p className="mt-1 font-mono text-[11px] text-[#03002C]/55">
+              Wraps to the measure below and re-flows at any stand size.
+            </p>
+          </div>
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            <div>
+              <label className={LABEL} htmlFor="booth-body-width">
+                Body measure
+              </label>
+              <input
+                id="booth-body-width"
+                className="mt-2 w-full"
+                type="range"
+                min={LONDON_BODY_WIDTH.min}
+                max={LONDON_BODY_WIDTH.max}
+                step={LONDON_BODY_WIDTH.step}
+                disabled={!canEdit || saving}
+                value={place.bodyWidth}
+                onChange={(e) => setPlace({ bodyWidth: Number(e.target.value) })}
+              />
+            </div>
+            <div>
+              <label className={LABEL} htmlFor="booth-body-scale">
+                Body size
+              </label>
+              <input
+                id="booth-body-scale"
+                className="mt-2 w-full"
+                type="range"
+                min={LONDON_TEXT_SCALE.min}
+                max={LONDON_TEXT_SCALE.max}
+                step={LONDON_TEXT_SCALE.step}
+                disabled={!canEdit || saving}
+                value={place.bodyScale}
+                onChange={(e) => setPlace({ bodyScale: Number(e.target.value) })}
+              />
+            </div>
+            <div>
+              <label className={LABEL} htmlFor="booth-body-dy">
+                Body drop
+              </label>
+              <input
+                id="booth-body-dy"
+                className="mt-2 w-full"
+                type="range"
+                min={-0.5}
+                max={0.5}
+                step={0.005}
+                disabled={!canEdit || saving}
+                value={place.bodyDy}
+                onChange={(e) => setPlace({ bodyDy: Number(e.target.value) })}
               />
             </div>
           </div>
