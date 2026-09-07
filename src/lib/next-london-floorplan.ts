@@ -7,14 +7,26 @@
 // schematic top-down plan per floor, and a deterministic placement for every
 // panel inside it.
 //
-// IMPORTANT — what this geometry is and is not. These plans are SCHEMATIC
-// install diagrams drawn from the venue's own room list and the floor/room
-// column of the print schedule. They are not a surveyed CAD plan and no
-// dimension here should be read as a measurement: zone sizes are drawn to be
-// legible, not to scale-check a truss. Every marker is placed by rule (see
-// placement below) so it lands in the right zone on the right face, and the
-// maps page lets the location team drag any marker to its real spot; those
-// corrections are what the crew signs off on.
+// PROVENANCE — where this layout comes from, and what it still is not.
+// The room roster, floor labels, room adjacency and the vertical cores are the
+// venue's real published layout: the QEII Centre "Floor by Floor" mini floor
+// plan pack (qeiicentre.london/downloads/QEII-Mini-Floor-Plan.pdf), the Spaces
+// pages for each room, and the published lift schedule
+// (QEII-Centre-Lift-Dimensions.pdf) which gives Core B — Storey's Gate, lifts
+// 1–3, serving L0–L5 — and Core A on the mews side, lifts 4–9. Where the venue
+// publishes an area it is honoured here: Churchill 720 m², third floor 2,142 m²
+// gross, Windsor 330 m² (510 m² joined to Cambridge), Mountbatten 351 m².
+// What is NOT published: the venue does not release per-room length × width or
+// ceiling heights (the room pages load a dimensions table client-side and it is
+// not in the downloadable pack), so individual room rectangles are proportioned
+// to the published areas and the real adjacency rather than surveyed. Treat
+// this as an install diagram, not a CAD plan: no single rectangle here should
+// be used to scale-check a truss. Every marker is placed by rule (see placement
+// below) so it lands in the right zone on the right face, and the maps page lets
+// the location team drag any marker to its real spot; those corrections are what
+// the crew signs off on. The first floor (Pickwick, Churchill Gallery) has no
+// signage in job 2281, so it carries no plan.
+
 //
 // Units are metres on a plan grid with the origin top-left, y increasing
 // "down" the page (screen coordinates), which keeps the SVG renderer trivial.
