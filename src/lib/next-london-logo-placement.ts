@@ -47,6 +47,20 @@ export type LondonLogoPlacement = {
    * tall, narrow sheets set their copy running DOWN the panel.
    */
   textVertical: boolean | null;
+  /**
+   * Subhead copy, set under the headline in Geist Bold at a smaller cap height.
+   * `null`/`""` means the panel carries no subhead. Position is derived from the
+   * trim box, so re-issuing a booth at another stand size re-lays the line.
+   */
+  sub: string | null;
+  /** Size multiplier on the planned subhead cap height. */
+  subScale: number;
+  /** Extra subhead letter-spacing, in em, on top of the signage tracking. */
+  subTracking: number;
+  /** Subhead horizontal nudge, as a fraction of the trim width. */
+  subDx: number;
+  /** Subhead vertical nudge, as a fraction of the trim height. */
+  subDy: number;
   /** QR payload. `null`/empty means the panel carries no code. */
   qr: string | null;
   /** Size multiplier on the planned QR block. */
