@@ -99,14 +99,42 @@ export function BoothHub3DViewer({
     [division, title, room, placeKey, plan, shareToken],
   );
 
-
-
   const pageUrl = boothHub3dPageUrl({
     division,
+    label: title,
+    room,
     placement,
     variant: plan || null,
     shareToken,
   });
+
+  // Live re-lay: hand the current placement straight to the viewer window as
+  // soon as it is up and again on every plan edit, so a listening build moves
+  // and resizes in place. The changed URL still reloads it as the fallback.
+  const frameRef = useRef<HTMLIFrameElement | null>(null);
+  const pushPlacement = () => {
+    const frame = frameRef.current?.contentWindow;
+    if (!frame) return;
+    try {
+      frame.postMessage(
+        boothHubPlacementMessage({
+          division,
+          label: title,
+          room,
+          placement,
+          variant: plan || null,
+          shareToken,
+        }),
+        BOOTHHUB_ORIGIN,
+      );
+    } catch {
+      /* the viewer may not be ready yet — the reload below still carries it */
+    }
+  };
+  useEffect(() => {
+    pushPlacement();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [division, title, room, placeKey, plan, shareToken, loaded]);
 
   // Can this browser give a 3D picture a graphics session at all? A window
   // inside a window is often refused one, which is what BoothHUB reports as
