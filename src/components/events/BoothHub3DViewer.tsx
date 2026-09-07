@@ -102,13 +102,14 @@ export function BoothHub3DViewer({
           </div>
           <div className="flex items-center gap-2">
             <a
-              href={boothHub3dPageUrl({ division, placement })}
+              href={boothHub3dPageUrl({ division, placement, variant: plan || null })}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/35 bg-white px-4 py-2 text-[13px] font-semibold text-[#003FC7] hover:bg-[#E0E8F5]"
             >
               <ExternalLink className="h-4 w-4" /> Open in BoothHUB
             </a>
+
             <button
               type="button"
               onClick={onClose}
