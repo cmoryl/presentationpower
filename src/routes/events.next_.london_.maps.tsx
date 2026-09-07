@@ -14,6 +14,8 @@ import {
   FileDown,
   Image as ImageIcon,
   Map as MapIcon,
+  Maximize2,
+  X,
   Package,
   Palette,
   RotateCcw,
@@ -121,6 +123,8 @@ function LondonMapsPage() {
   const [areas, setAreas] = useState<LondonCustomArea[]>([]);
   const [selectedAreaId, setSelectedAreaId] = useState<string | null>(null);
   const [areasOpen, setAreasOpen] = useState(false);
+  /** Large window: the same live editor, given the whole screen. */
+  const [expanded, setExpanded] = useState(false);
 
   // Corrections live per browser: the location team marks up positions on site
   // and the same browser keeps producing corrected maps.
@@ -240,9 +244,77 @@ function LondonMapsPage() {
     [overrides, persist],
   );
 
+  // The large window is a modal surface: Escape closes it and the page behind
+  // stops scrolling so the plan owns the screen.
+  useEffect(() => {
+    if (!expanded) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setExpanded(false);
+    };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [expanded]);
+
   const chip = "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors";
   const btn =
     "inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-4 py-2 text-[13px] font-semibold text-[#03002C] transition-colors hover:bg-white";
+
+  const floorMap = (
+    <LondonFloorMap
+      floor={floor}
+      panels={panels}
+      overrides={overrides}
+      onMove={move}
+      onResetOne={resetOne}
+      kinds={kinds}
+      selectedId={selectedId}
+      onSelect={setSelectedId}
+      editable={!attendee}
+      // Sectioned areas belong to the team, so they stay draggable even in the
+      // attendee guide where the signage pins are locked.
+      areasEditable
+      roomsOnly={attendee}
+      design={design}
+      areas={floorAreas}
+      onAreaChange={changeArea}
+      selectedAreaId={selectedAreaId}
+      onSelectArea={setSelectedAreaId}
+    />
+  );
+
+  const designPanel = (
+    <LondonMapDesignPanel design={design} onChange={applyDesign} roomsOnly={attendee} />
+  );
+
+  const areasPanel = planWithMine ? (
+    <LondonMapAreasPanel
+      plan={planWithMine}
+      areas={floorAreas}
+      selectedId={selectedAreaId}
+      onSelect={setSelectedAreaId}
+      onAdd={addArea}
+      onChange={changeArea}
+      onDuplicate={(a) => {
+        const copy = {
+          ...clampArea({ ...a, x: a.x + 1, y: a.y + 1 }, plan),
+          id: newLondonArea(floor).id,
+          label: `${a.label} copy`,
+        };
+        persistAreas([...areas, copy]);
+        setSelectedAreaId(copy.id);
+      }}
+      onRemove={(id) => {
+        persistAreas(areas.filter((a) => a.id !== id));
+        if (selectedAreaId === id) setSelectedAreaId(null);
+      }}
+      design={design}
+    />
+  ) : null;
 
   return (
     <AppShell bare={!userId}>
@@ -446,23 +518,27 @@ function LondonMapsPage() {
           </p>
 
           <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-            <LondonFloorMap
-              floor={floor}
-              panels={panels}
-              overrides={overrides}
-              onMove={move}
-              onResetOne={resetOne}
-              kinds={kinds}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-              editable={!attendee}
-              roomsOnly={attendee}
-              design={design}
-              areas={floorAreas}
-              onAreaChange={attendee ? undefined : changeArea}
-              selectedAreaId={selectedAreaId}
-              onSelectArea={setSelectedAreaId}
-            />
+            {expanded ? (
+              <div className="flex min-h-[16rem] flex-col items-start justify-center gap-2 rounded-2xl border border-dashed border-[#03002C]/20 bg-[#F5F8FD] p-6">
+                <p className="text-[13px] font-semibold text-[#03002C]">
+                  This plan is open in the large window.
+                </p>
+                <button type="button" className={btn} onClick={() => setExpanded(true)}>
+                  <Maximize2 className="h-4 w-4" /> Back to the large window
+                </button>
+              </div>
+            ) : (
+              <div>
+                {floorMap}
+                <button
+                  type="button"
+                  className={`${btn} mt-2.5`}
+                  onClick={() => setExpanded(true)}
+                >
+                  <Maximize2 className="h-4 w-4" /> Open large editor
+                </button>
+              </div>
+            )}
 
             <div className="min-w-0">
               <div className="flex flex-wrap gap-2">
@@ -512,42 +588,9 @@ function LondonMapsPage() {
                 </button>
               </div>
 
-              {designOpen ? (
-                <div className="mt-3">
-                  <LondonMapDesignPanel
-                    design={design}
-                    onChange={applyDesign}
-                    roomsOnly={attendee}
-                  />
-                </div>
-              ) : null}
+              {designOpen ? <div className="mt-3">{designPanel}</div> : null}
 
-              {areasOpen && planWithMine ? (
-                <div className="mt-3">
-                  <LondonMapAreasPanel
-                    plan={planWithMine}
-                    areas={floorAreas}
-                    selectedId={selectedAreaId}
-                    onSelect={setSelectedAreaId}
-                    onAdd={addArea}
-                    onChange={changeArea}
-                    onDuplicate={(a) => {
-                      const copy = {
-                        ...clampArea({ ...a, x: a.x + 1, y: a.y + 1 }, plan),
-                        id: newLondonArea(floor).id,
-                        label: `${a.label} copy`,
-                      };
-                      persistAreas([...areas, copy]);
-                      setSelectedAreaId(copy.id);
-                    }}
-                    onRemove={(id) => {
-                      persistAreas(areas.filter((a) => a.id !== id));
-                      if (selectedAreaId === id) setSelectedAreaId(null);
-                    }}
-                    design={design}
-                  />
-                </div>
-              ) : null}
+              {areasOpen && areasPanel ? <div className="mt-3">{areasPanel}</div> : null}
 
               {attendee ? (
                 <>
@@ -675,6 +718,46 @@ function LondonMapsPage() {
           </div>
         </section>
       </div>
+
+      {/* Large window — the same live editor, given the whole screen, with the
+          design and area controls beside it. State is shared, so anything moved
+          here is already moved on the page behind. */}
+      {expanded ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${plan?.label ?? "Floor"} live plan editor`}
+          className="fixed inset-0 z-50 flex flex-col bg-[#03002C]/70 p-3 backdrop-blur-sm sm:p-5"
+        >
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#F7F9FC] shadow-2xl">
+            <header className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 bg-white px-4 py-3">
+              <div className="min-w-0">
+                <h2 className="truncate text-[15px] font-semibold text-[#03002C]">
+                  {plan?.label ?? "Floor plan"} — live editor
+                </h2>
+                <p className="mt-0.5 text-[11.5px] text-[#03002C]/60">
+                  Drag an area to move it, pull its corner to size it. Scroll to zoom, drag the plan
+                  to pan. Press Escape to close.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setExpanded(false)}
+                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white px-4 py-2 text-[13px] font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
+              >
+                <X className="h-4 w-4" /> Close
+              </button>
+            </header>
+            <div className="grid min-h-0 flex-1 gap-4 overflow-y-auto p-4 xl:grid-cols-[minmax(0,1fr)_23rem] xl:overflow-hidden">
+              <div className="min-w-0 xl:overflow-y-auto">{floorMap}</div>
+              <div className="min-w-0 space-y-3 xl:overflow-y-auto">
+                {areasPanel}
+                {designPanel}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </AppShell>
   );
 }

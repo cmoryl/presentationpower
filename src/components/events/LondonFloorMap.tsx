@@ -53,6 +53,13 @@ export type LondonFloorMapProps = {
   onSelect: (panelId: string | null) => void;
   /** Read-only for signed-out viewers. */
   editable: boolean;
+  /**
+   * Whether the team's own sectioned areas can be dragged and resized. Areas are
+   * an overlay the team owns, so they stay editable in the attendee guide view
+   * where the signage pins are locked. Defaults to `editable`.
+   */
+  areasEditable?: boolean;
+
   /** Attendee view: rooms and breakouts only, no signage pins. */
   roomsOnly?: boolean;
   /** Live design — the editor previews exactly what will export. */
@@ -75,6 +82,7 @@ export function LondonFloorMap({
   selectedId,
   onSelect,
   editable,
+  areasEditable,
   roomsOnly = false,
   design = DEFAULT_MAP_DESIGN,
   areas,
@@ -303,7 +311,7 @@ export function LondonFloorMap({
             const own = isCustomAreaId(z.id);
             const mine = own ? areas?.find((a) => a.id === z.id) : undefined;
             const chosen = own && z.id === selectedAreaId;
-            const canEdit = editable && !!mine && !!onAreaChange;
+            const canEdit = (areasEditable ?? editable) && !!mine && !!onAreaChange;
             return (
               <div
                 key={z.id}
