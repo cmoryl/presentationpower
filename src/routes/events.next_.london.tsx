@@ -30,6 +30,8 @@ import { useServerFn } from "@tanstack/react-start";
 
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
+import { useBoothTemplates } from "@/hooks/use-booth-templates";
+import { BoothTemplatePanel } from "@/components/events/BoothTemplatePanel";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor";
 import {
@@ -251,7 +253,14 @@ function LondonSignagePage() {
   // The kit shows the panel set IN FORCE: the newest published revision, or the
   // issued venue pack when there is none (or when the viewer is not signed in).
   const [panels, setPanels] = useState<LondonPanel[]>(LONDON_PANELS);
-  const boothPanels = useMemo(() => panels.filter(isBoothPanel), [panels]);
+  // Booth masters live in the backend: applying them patches the booth specs
+  // and panel records in place, so `applied` is what re-renders the cards.
+  const boothTemplates = useBoothTemplates();
+  const boothPanels = useMemo(
+    () => panels.filter(isBoothPanel),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- templates mutate the panel records
+    [panels, boothTemplates.applied],
+  );
   const nonBoothPanels = useMemo(() => panels.filter((p) => !isBoothPanel(p)), [panels]);
   const floors = useMemo(() => londonPanelsByFloor(nonBoothPanels), [nonBoothPanels]);
   const [floorId, setFloorId] = useState<string>("all");
@@ -708,6 +717,21 @@ function LondonSignagePage() {
                   />
                 ))}
               </div>
+              {boothTemplates.templates.length > 0 ? (
+                <BoothTemplatePanel
+                  templates={boothTemplates.templates}
+                  panelIdBySlug={Object.fromEntries(
+                    boothPanels.flatMap((panel) => {
+                      const meta = londonBoothPanelMeta(panel);
+                      return meta ? [[meta.booth.id, panel.id] as const] : [];
+                    }),
+                  )}
+                  canEdit={!!userId}
+                  saving={boothTemplates.saving}
+                  saveError={boothTemplates.saveError}
+                  onSave={boothTemplates.save}
+                />
+              ) : null}
             </div>
           ) : null}
 
