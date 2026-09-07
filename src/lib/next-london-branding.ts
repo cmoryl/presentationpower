@@ -347,7 +347,9 @@ export function londonBrandingPlan(
         );
         const y = clamp(
           marginY + panel.trimH - safe - qrSize - captionSizeMm * 2 + nudge.qrDy * panel.trimH,
-          0,
+          // A code behind the monitor cannot be scanned, so a screen wall keeps
+          // it below the aperture.
+          screenBottom !== null ? screenBottom + qrSize * 0.15 : 0,
           panel.bleedH - qrSize,
         );
         const rawCaption = nudge.qrCaption.trim();
