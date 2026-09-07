@@ -68,7 +68,10 @@ export type BoothHub3dLinkOptions = {
   characters?: boolean;
   /** Where the asset stands, so the 3D build follows an edit on the plan. */
   placement?: BoothHub3dPlacement | null;
+  /** Name of the saved BoothHUB build to show. Omitted = their default plan. */
+  variant?: string | null;
 };
+
 
 /**
  * The live state of one asset on a floor sheet: floor, position in plan metres,
@@ -103,15 +106,22 @@ function placementParams(q: URLSearchParams, p?: BoothHub3dPlacement | null): vo
   if (Number.isFinite(p.heightMm as number)) q.set("h", String(Math.round(p.heightMm as number)));
 }
 
+/**
+ * BoothHUB shows a stand only when a saved build exists for that division and
+ * plan name; otherwise it answers "Booth unavailable". Its own default plan
+ * name is `default`, so we only send `variant` when a plan is named here.
+ */
+function baseParams(opts: BoothHub3dLinkOptions): URLSearchParams {
+  const q = new URLSearchParams({ embed: "1", public: "1", presenter: "1" });
+  if (opts.characters) q.set("characters", "1");
+  if (opts.variant) q.set("variant", opts.variant);
+  return q;
+}
+
 /** The chromeless, sign-in-free 3D viewer URL for an iframe. */
 export function boothHub3dEmbedUrl(opts: BoothHub3dLinkOptions): string {
-  const q = new URLSearchParams({
-    embed: "1",
-    public: "1",
-    presenter: "1",
-    chromeless: "1",
-  });
-  if (opts.characters) q.set("characters", "1");
+  const q = baseParams(opts);
+  q.set("chromeless", "1");
   if (opts.label) q.set("label", opts.label);
   if (opts.room) q.set("room", opts.room);
   placementParams(q, opts.placement);
@@ -120,11 +130,16 @@ export function boothHub3dEmbedUrl(opts: BoothHub3dLinkOptions): string {
 
 /** The same build opened as a full BoothHUB page in a new tab. */
 export function boothHub3dPageUrl(opts: BoothHub3dLinkOptions): string {
-  const q = new URLSearchParams({ embed: "1", public: "1", presenter: "1" });
-  if (opts.characters) q.set("characters", "1");
+  const q = baseParams(opts);
   placementParams(q, opts.placement);
   return `${BOOTHHUB_ORIGIN}/booths/${opts.division}/visit?${q.toString()}`;
 }
+
+/** Where a signed-in BoothHUB user designs this division's stand build. */
+export function boothHubBuilderUrl(division: BoothHubDivisionId): string {
+  return `${BOOTHHUB_ORIGIN}/booths/${division}/builder`;
+}
+
 
 
 export const BOOTHHUB_DIVISION_LABEL: Record<BoothHubDivisionId, string> = {
