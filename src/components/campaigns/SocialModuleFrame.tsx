@@ -47,6 +47,9 @@ import {
 } from "@/lib/social-full-bleed";
 import { SocialTallShell } from "@/components/campaigns/SocialTallShell";
 import { SocialFullBleedShell } from "@/components/campaigns/SocialFullBleedShell";
+import { socialGroundPlate } from "@/lib/social-template-ground";
+import { SOCIAL_MODULE_LAYOUTS } from "@/lib/social-module-layouts";
+
 
 
 const SETTLE_BUDGET = 64;
@@ -69,6 +72,14 @@ export type SocialModuleFrameProps = {
   hideLockup?: boolean;
   /** Module density — lets wide banner frames start at a condensed rung. */
   density?: "compact" | "standard" | "tall";
+  /**
+   * Approved look code (S01–S28, R01–R30, C-codes or a pack id). When set, the
+   * post paints that template's authored background artwork for the scene the
+   * module belongs to — the same ground the deck stage paints.
+   */
+  lookCode?: string | null;
+  /** Which of the look's four takes for the scene to paint. */
+  groundTake?: number;
 };
 
 function accentFor(brandId: string): string {
@@ -86,7 +97,10 @@ export function SocialModuleFrame({
   onFit,
   hideLockup = false,
   density,
+  lookCode = null,
+  groundTake = 0,
 }: SocialModuleFrameProps) {
+
   const accent = accentFor(brandId);
   const brand = BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0];
   const short = Math.min(format.width, format.height);
@@ -326,11 +340,27 @@ export function SocialModuleFrame({
     }
   }, [format]);
 
+  // Template ground: the look's authored background artwork for the scene this
+  // module belongs to. A full-bleed photograph owns the whole frame, so the
+  // plate stands down there rather than fighting the picture.
+  const family = useMemo(() => {
+    const vid = (section as { variantId?: string }).variantId;
+    return SOCIAL_MODULE_LAYOUTS.find((l) => l.variantId === vid)?.family ?? null;
+  }, [section]);
+  const plate = useMemo(
+    () => (bleedPlan ? null : socialGroundPlate(lookCode, family, section.id, groundTake)),
+    [bleedPlan, lookCode, family, section.id, groundTake],
+  );
+
   // A full-bleed photograph carries its own contrast: the module's copy and the
   // brand lockup reverse out over the scrim regardless of the kit's face.
-  const moduleMode = bleedPlan ? fullBleedMode(bleedPlan, mode) : mode;
-  const ink = bleedPlan?.kind === "photo" ? "#FFFFFF" : mode === "dark" ? "#FFFFFF" : "#03002C";
-  const paper = mode === "dark" ? "#03002C" : "#FFFFFF";
+  const moduleMode = bleedPlan ? fullBleedMode(bleedPlan, mode) : plate ? plate.mode : mode;
+  const ink =
+    bleedPlan?.kind === "photo" || (plate ? plate.mode === "dark" : mode === "dark")
+      ? "#FFFFFF"
+      : "#03002C";
+  const paper = plate ? plate.surface : mode === "dark" ? "#03002C" : "#FFFFFF";
+
 
 
   // Center the module inside the safe rect so short modules never leave a
@@ -386,8 +416,7 @@ export function SocialModuleFrame({
         data-social-panel-fill={Math.round(rawFit.fillPct * 100)}
         data-social-settled={settled.current.size}
         data-social-bleed={bleedPlan ? bleedPlan.kind : undefined}
-
-
+        data-social-ground={plate ? `${plate.code}:${plate.scene}` : undefined}
       >
 
         <div
@@ -402,19 +431,23 @@ export function SocialModuleFrame({
             overflow: "hidden",
           }}
         >
-          {/* Division aura ground — keeps social frames on-brand without fighting
-            the module's own surfaces. */}
+          {/* Ground. With a look selected the post paints that template's own
+            background artwork for this module's scene, so a kit matches the deck
+            built on the same look. Otherwise a division aura keeps the frame
+            on-brand without fighting the module's own surfaces. */}
           <span
             aria-hidden
             style={{
               position: "absolute",
               inset: 0,
-              background:
-                mode === "dark"
+              background: plate
+                ? plate.background
+                : mode === "dark"
                   ? `radial-gradient(120% 90% at 12% 0%, ${accent}55 0%, transparent 62%), radial-gradient(90% 70% at 100% 100%, ${accent}33 0%, transparent 60%)`
                   : `radial-gradient(120% 90% at 10% 0%, ${accent}1f 0%, transparent 60%), radial-gradient(90% 70% at 100% 100%, ${accent}14 0%, transparent 58%)`,
             }}
           />
+
 
           {/* Live module: full-bleed composition for the photographic / hardware
             modules, the tall shell for restacked thin strips, otherwise scaled

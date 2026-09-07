@@ -55,6 +55,7 @@ import {
   printModuleFamilyMeta,
 } from "@/lib/social-module-layouts";
 import { reliefAt } from "@/lib/social-module-fit";
+import { useSelectablePacks } from "@/hooks/use-selectable-packs";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
@@ -165,6 +166,9 @@ export function KitWizard({
   const [step, setStep] = useState(0);
   const [brandId, setBrandId] = useState<string>("bm-tp-master");
   const [mode, setMode] = useState<"light" | "dark" | "both">("dark");
+  const [groundLook, setGroundLook] = useState<string>("");
+  const groundPacks = useSelectablePacks();
+
   const [manualCopy, setManualCopy] = useState({
     title: "",
     summary: "",
@@ -629,6 +633,35 @@ export function KitWizard({
                 ))}
               </div>
             </div>
+
+            {/* Template background — posts can paint the same authored artwork a
+              deck built on that look paints, per module scene. */}
+            <div className="mt-3 rounded-2xl border border-black/10 bg-white/70 p-3">
+              <label
+                htmlFor="kit-ground-look"
+                className="mb-2 block text-[10px] font-semibold uppercase tracking-widest text-black/50"
+              >
+                Template background
+              </label>
+              <select
+                id="kit-ground-look"
+                value={groundLook}
+                onChange={(e) => setGroundLook(e.target.value)}
+                className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm"
+              >
+                <option value="">Division aura (default)</option>
+                {groundPacks.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.label}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-2 text-[11px] leading-relaxed text-black/55">
+                Uses the template's own background art for each module's scene —
+                covers, stats, quotes and logo walls each get their matching plate.
+              </p>
+            </div>
+
           </StepCard>
         )}
 
@@ -772,6 +805,7 @@ export function KitWizard({
                   mode={mode === "light" ? "light" : "dark"}
                   displayShortEdge={240}
                   density={moduleLayout.density}
+                  lookCode={groundLook}
                 />
               </div>
             ) : null}
@@ -1278,6 +1312,7 @@ export function KitWizard({
                                 mode={asset.mode === "light" ? "light" : "dark"}
                                 displayShortEdge={displayShortEdge}
                                 density={moduleLayout.density}
+                                lookCode={groundLook}
                               />
                             ) : nextDesign ? (
                               <NextRenderer
@@ -1399,6 +1434,7 @@ export function KitWizard({
                       mode={asset.mode === "light" ? "light" : "dark"}
                       displayShortEdge={shortEdge}
                       density={moduleLayout.density}
+                      lookCode={groundLook}
                     />
                   ) : nextDesign ? (
                     <NextRenderer
