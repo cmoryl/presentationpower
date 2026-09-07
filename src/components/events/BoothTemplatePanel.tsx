@@ -18,7 +18,13 @@ import {
   LONDON_BOOTH_TRIM_PRESETS,
   resizeBoothArtboard,
 } from "@/lib/next-london-booths";
-import { londonLogoPlacement } from "@/lib/next-london-logo-placement";
+import {
+  LONDON_TEXT_MAX_CHARS,
+  LONDON_TEXT_SCALE,
+  londonLogoPlacement,
+  setLondonLogoPlacement,
+  useLondonLogoPlacements,
+} from "@/lib/next-london-logo-placement";
 import type { BoothTemplatePatch } from "@/lib/booth-templates.functions";
 
 export type BoothTemplatePanelProps = {
