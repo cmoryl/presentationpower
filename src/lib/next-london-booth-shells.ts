@@ -20,8 +20,12 @@
 
 import shellAAi from "@/assets/london-booths/tradebooth-a-shell.ai?url";
 import shellAProof from "@/assets/london-booths/tradebooth-a-shell.jpg";
+import shellARender from "@/assets/london-booths/renders/tradebooth-a-render.jpg";
 import shellBAi from "@/assets/london-booths/tradebooth-b-shell.ai?url";
 import shellBProof from "@/assets/london-booths/tradebooth-b-shell.jpg";
+import shellBRender from "@/assets/london-booths/renders/tradebooth-b-render.jpg";
+
+
 
 export type LondonBoothShellId = "tradebooth-a" | "tradebooth-b";
 
@@ -47,8 +51,20 @@ export type LondonBoothShell = {
    * survives a re-issue at another stand size. Null on the screenless shell.
    */
   screen: { x: number; y: number; w: number; h: number } | null;
+  /**
+   * Photoreal in-situ visualisation of the blank shell standing in a room of
+   * this type. A visualisation only — never a survey photograph, and never a
+   * dimensional reference.
+   */
+  renderUrl: string;
+  /**
+   * Where the wall face sits inside that render, as fractions of the image, so
+   * a booth's own artwork can be laid onto the visualisation.
+   */
+  renderFace: { x: number; y: number; w: number; h: number };
   note: string;
 };
+
 
 /** Trim size and bleed shared by both supplied shells. */
 export const LONDON_BOOTH_SHELL_TRIM = { w: 1830, h: 2440, bleedMm: 100 } as const;
@@ -75,6 +91,8 @@ export const LONDON_BOOTH_SHELLS: LondonBoothShell[] = [
       w: SCREEN_MM.w / LONDON_BOOTH_SHELL_TRIM.w,
       h: SCREEN_MM.h / LONDON_BOOTH_SHELL_TRIM.h,
     },
+    renderUrl: shellARender,
+    renderFace: { x: 0.2435, y: 0.0505, w: 0.539, h: 0.892 },
     note:
       "Screen wall: a 1422 × 797 mm 16:9 monitor aperture sits centred, 405 mm below the trim top. " +
       "Keep logos and copy out of it — the lockup rides above the screen, copy below it.",
@@ -90,6 +108,8 @@ export const LONDON_BOOTH_SHELLS: LondonBoothShell[] = [
     bleedMm: LONDON_BOOTH_SHELL_TRIM.bleedMm,
     hasScreen: false,
     screen: null,
+    renderUrl: shellBRender,
+    renderFace: { x: 0.1855, y: 0.0555, w: 0.635, h: 0.877 },
     note: "No screen: the whole 1830 × 2440 mm face is live artwork.",
   },
 ];

@@ -33,6 +33,7 @@ import { useSessionUser } from "@/hooks/use-session-user";
 import { useBoothTemplates } from "@/hooks/use-booth-templates";
 import { BoothTemplatePanel } from "@/components/events/BoothTemplatePanel";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
+import { BoothRenderPreview } from "@/components/events/BoothRenderPreview";
 import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor";
 import {
   londonLogoPlacements,
@@ -862,6 +863,9 @@ function LondonSignagePage() {
                   </div>
                 ))}
               </dl>
+
+              {/* Partner booths: the finished stand, visualised in the room. */}
+              {isBoothPanel(openPanel) ? <BoothRenderPreview panel={openPanel} /> : null}
 
               {/* Check every resolution tier on screen before downloading. */}
               <LondonPpiPreview panel={openPanel} svg={artwork?.[openPanel.id]?.svg} />
