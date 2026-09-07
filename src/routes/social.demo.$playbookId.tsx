@@ -376,12 +376,12 @@ function SocialDemoView() {
           </div>
           <p className="mt-2 max-w-3xl text-xs text-black/60">{activeStyle.blurb}</p>
         </div>
-        {photoSet ? (
+        {artCredit ? (
           <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-xs text-black/60">
             <ImageIcon size={14} className="text-[#003FC7]" />
-            <span className="font-semibold text-[#03002C]">{photoSet.label}</span>
+            <span className="font-semibold text-[#03002C]">{artCredit.label}</span>
             <span aria-hidden>·</span>
-            <span>{photoSet.credit} — wide, square and vertical crops</span>
+            <span>{artCredit.credit} — wide, square and vertical crops</span>
           </div>
         ) : null}
         <DemoTranslateBar
