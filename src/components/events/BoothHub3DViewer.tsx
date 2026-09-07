@@ -53,6 +53,21 @@ export function BoothHub3DViewer({
   // one instead of silently landing on "Booth unavailable".
   const [planDraft, setPlanDraft] = useState("");
   const [plan, setPlan] = useState("");
+  // A BoothHUB share link opens the same build with no BoothHUB sign-in at all,
+  // so anyone here can view it. Remembered per division once pasted.
+  const [shareDraft, setShareDraft] = useState("");
+  const [shareToken, setShareToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(shareKey(division));
+      const token = parseBoothHubShareToken(saved);
+      setShareDraft(saved ?? "");
+      setShareToken(token);
+    } catch {
+      /* storage unavailable — the plan-name route still works */
+    }
+  }, [division]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -71,10 +86,19 @@ export function BoothHub3DViewer({
   // fresh record on every render, which would otherwise reload the build endlessly.
   const placeKey = JSON.stringify(placement ?? null);
   const embedUrl = useMemo(
-    () => boothHub3dEmbedUrl({ division, label: title, room, placement, variant: plan || null }),
+    () =>
+      boothHub3dEmbedUrl({
+        division,
+        label: title,
+        room,
+        placement,
+        variant: plan || null,
+        shareToken,
+      }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [division, title, room, placeKey, plan],
+    [division, title, room, placeKey, plan, shareToken],
   );
+
 
 
   // Every plan edit produces a new URL. Reload the build on it and flash a
