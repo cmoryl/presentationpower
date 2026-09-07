@@ -21,6 +21,7 @@ import {
   RotateCcw,
   SquareDashed,
   Table2,
+  Boxes,
 } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
@@ -63,6 +64,8 @@ import {
   type LondonCustomArea,
 } from "@/lib/next-london-floormap-areas";
 import { areaKindLabel } from "@/lib/next-london-floormap-icons";
+import { LondonBespokePanel } from "@/components/events/LondonBespokePanel";
+import { bespokeAreas, bespokeUnitsOnFloor } from "@/lib/next-london-bespoke";
 import { effectiveLondonPanels } from "@/lib/next-london-revise";
 import { listLondonRevisions } from "@/lib/next-london-revise.functions";
 import {
@@ -125,6 +128,8 @@ function LondonMapsPage() {
   const [areasOpen, setAreasOpen] = useState(false);
   /** Large window: the same live editor, given the whole screen. */
   const [expanded, setExpanded] = useState(false);
+  /** Draw the Bespoke scenic build units on the plan alongside the signage. */
+  const [showBuild, setShowBuild] = useState(true);
 
   // Corrections live per browser: the location team marks up positions on site
   // and the same browser keeps producing corrected maps.
@@ -186,15 +191,29 @@ function LondonMapsPage() {
   }, [floorPanels, kinds, query]);
   const selected = floorPanels.find((p) => p.id === selectedId) ?? null;
   const selectedMarker = selected ? londonMarkerFor(selected, panels, overrides) : null;
-  const installOpts = { panels, overrides, kinds, labels: true, design, areas };
+  // The Bespoke scenic units are drawn like any other sectioned area, so they
+  // print on every sheet and card. A user edit to one is stored under the same
+  // id and wins over the generated tile. Attendee guides drop them — visitors
+  // navigate by room, not by build.
+  const allAreas = useMemo(() => {
+    if (attendee || !showBuild) return areas;
+    const generated = bespokeAreas().filter((b) => !areas.some((a) => a.id === b.id));
+    return [...generated, ...areas];
+  }, [areas, attendee, showBuild]);
+  const installOpts = { panels, overrides, kinds, labels: true, design, areas: allAreas };
   const exportOpts = attendee
-    ? { panels, overrides, roomsOnly: true, labels: false, design, areas }
+    ? { panels, overrides, roomsOnly: true, labels: false, design, areas: allAreas }
     : installOpts;
-  const floorAreas = areasOnFloor(areas, floor);
-  const planWithMine = plan ? planWithAreas(plan, areas) : null;
+  const floorAreas = areasOnFloor(allAreas, floor);
+  const planWithMine = plan ? planWithAreas(plan, allAreas) : null;
 
-  const changeArea = (next: LondonCustomArea) =>
-    persistAreas(areas.map((a) => (a.id === next.id ? clampArea(next, plan) : a)));
+  const changeArea = (next: LondonCustomArea) => {
+    const clamped = clampArea(next, plan);
+    // A generated Bespoke tile has no stored row yet — moving it creates one.
+    if (!areas.some((a) => a.id === next.id)) return persistAreas([...areas, clamped]);
+    persistAreas(areas.map((a) => (a.id === next.id ? clamped : a)));
+  };
+
   const addArea = (kind: MapAreaKind) => {
     const area = newLondonArea(floor, kind, areaLabelFor(kind, floorAreas));
     persistAreas([...areas, area]);
@@ -590,11 +609,29 @@ function LondonMapsPage() {
                     ? "Hide areas"
                     : `Section off areas${floorAreas.length ? ` · ${floorAreas.length}` : ""}`}
                 </button>
+                <button
+                  type="button"
+                  className={btn}
+                  aria-pressed={showBuild}
+                  onClick={() => setShowBuild((v) => !v)}
+                >
+                  <Boxes className="h-4 w-4" />{" "}
+                  {showBuild
+                    ? `Hide scenic build · ${bespokeUnitsOnFloor(floor).length}`
+                    : "Show scenic build"}
+                </button>
               </div>
 
               {designOpen ? <div className="mt-3">{designPanel}</div> : null}
 
               {areasOpen && areasPanel ? <div className="mt-3">{areasPanel}</div> : null}
+
+              <div className="mt-4">
+                <LondonBespokePanel
+                  floor={floor}
+                  floorLabel={plan?.label ?? floor}
+                />
+              </div>
 
               {attendee ? (
                 <>
