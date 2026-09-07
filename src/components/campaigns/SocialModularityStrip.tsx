@@ -66,7 +66,7 @@ export function SocialModularityStrip({
             </div>
             <span className="font-mono text-[10px] text-black/40">{layout.variantId}</span>
           </div>
-          <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-4 flex flex-wrap items-end justify-center gap-5">
             {shapes.map(({ formatId, label, format }, i) => {
               const section = buildSocialModuleSection({ layout, copy, relief: RELIEF });
               // Alternate light and dark across the row so the strip shows both

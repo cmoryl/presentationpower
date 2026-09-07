@@ -315,7 +315,7 @@ function SocialDemoView() {
           title={`${localizedAssets.length} rendered assets · light + dark`}
           desc={
             photoSet
-              ? "Rendered right now from the deterministic pipeline. Dark variants use the division photography set — each ad size pulls the crop built for its aspect."
+              ? "Rendered right now from the deterministic pipeline, on this campaign's own creative — each ad size pulls the crop built for its aspect and fills the frame."
               : "Rendered right now from the deterministic pipeline. Configure to swap copy and cadence."
           }
         />
