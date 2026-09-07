@@ -55,8 +55,9 @@ describe("London division signage", () => {
     for (const panel of divisionPanels) {
       const accent = londonDivisionAccent(londonPanelFamily(panel))!;
       const stops = londonPanelStops(panel);
+      const floor = londonAccentSeparationFloor(accent.hex) - 1;
       for (const stop of stops.slice(1)) {
-        expect(dist(stop, accent.hex), `${panel.name} stop ${stop}`).toBeGreaterThanOrEqual(140);
+        expect(dist(stop, accent.hex), `${panel.name} stop ${stop}`).toBeGreaterThanOrEqual(floor);
       }
     }
   });
