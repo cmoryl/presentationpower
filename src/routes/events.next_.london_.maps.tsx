@@ -313,6 +313,11 @@ function LondonMapsPage() {
       }}
       selectedAreaId={selectedAreaId}
       onSelectArea={setSelectedAreaId}
+      onView3d={(id) => {
+        const panel = floorPanels.find((p) => p.id === id) ?? null;
+        if (panel) setViewer3d(panel);
+      }}
+
     />
   );
 
