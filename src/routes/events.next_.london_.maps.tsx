@@ -121,6 +121,8 @@ function LondonMapsPage() {
   const [areas, setAreas] = useState<LondonCustomArea[]>([]);
   const [selectedAreaId, setSelectedAreaId] = useState<string | null>(null);
   const [areasOpen, setAreasOpen] = useState(false);
+  /** Large window: the same live editor, given the whole screen. */
+  const [expanded, setExpanded] = useState(false);
 
   // Corrections live per browser: the location team marks up positions on site
   // and the same browser keeps producing corrected maps.
@@ -239,6 +241,22 @@ function LondonMapsPage() {
     },
     [overrides, persist],
   );
+
+  // The large window is a modal surface: Escape closes it and the page behind
+  // stops scrolling so the plan owns the screen.
+  useEffect(() => {
+    if (!expanded) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setExpanded(false);
+    };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [expanded]);
 
   const chip = "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors";
   const btn =
