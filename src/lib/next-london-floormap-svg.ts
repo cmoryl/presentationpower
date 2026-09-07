@@ -552,13 +552,20 @@ export type FloorMapOptions = {
   design?: MapDesign;
   /** Areas the team sectioned off themselves, merged on top of the venue rooms. */
   areas?: readonly LondonCustomArea[];
+  /**
+   * Draw this plan instead of the London plan for `floor`. Used by another
+   * venue in the same series, which reuses the whole sheet apparatus with its
+   * own rooms. Omit for every London sheet.
+   */
+  plan?: LondonFloorPlan | null;
 };
 
 /** Everything inside the <svg> wrapper, so the asset card can reuse it. */
 function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: FloorMapSize): string {
-  const base = londonFloorPlan(floor);
+  const base = opts.plan ?? londonFloorPlan(floor);
   if (!base) return "";
   const plan = planWithAreas(base, opts.areas);
+
   const ox = PAD;
   const oy = PAD + HEAD;
   const roomsOnly = opts.roomsOnly === true;
@@ -669,7 +676,7 @@ ${
 export function floorMapSheetSize(floor: LondonFloorId, opts: FloorMapOptions = {}): FloorMapSize {
   const restore = applyDesign(opts.design);
   try {
-    const base = londonFloorPlan(floor);
+    const base = opts.plan ?? londonFloorPlan(floor);
     if (!base) return { w: 0, h: 0 };
     const plan = planWithAreas(base, opts.areas);
     const size = floorMapSize(plan);
@@ -689,13 +696,18 @@ export function floorMapSheetSize(floor: LondonFloorId, opts: FloorMapOptions = 
 export function floorMapSvg(floor: LondonFloorId, opts: FloorMapOptions = {}): string {
   const restore = applyDesign(opts.design);
   try {
-    const plan = londonFloorPlan(floor);
+    const plan = opts.plan ?? londonFloorPlan(floor);
     if (!plan) return "";
     const size = floorMapSheetSize(floor, opts);
+    // The sheet's venue wording comes from the design (venueName), so another
+    // venue's sheet titles itself correctly without touching this renderer.
+    const venue = DESIGN.venueName.trim() || LONDON_VENUE.name;
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${size.w}" height="${size.h}" viewBox="0 0 ${size.w} ${size.h}" role="img" aria-label="${esc(
       opts.roomsOnly === true
-        ? `${plan.label} attendee floor guide — ${LONDON_VENUE.name}`
-        : `${plan.label} install map — ${LONDON_VENUE.name}`,
+        ? `${plan.label} attendee floor guide — ${venue}`
+        : `${plan.label} install map — ${venue}`,
+    )}">
+
     )}">
 <rect width="${size.w}" height="${size.h}" fill="${PAPER}" />
 ${floorMapContent(floor, opts, size)}
