@@ -70,7 +70,13 @@ export type BoothHub3dLinkOptions = {
   placement?: BoothHub3dPlacement | null;
   /** Name of the saved BoothHUB build to show. Omitted = their default plan. */
   variant?: string | null;
+  /**
+   * A BoothHUB share token. When present the viewer loads the share link, which
+   * needs no BoothHUB sign-in and no public-division switch.
+   */
+  shareToken?: string | null;
 };
+
 
 
 /**
@@ -118,8 +124,35 @@ function baseParams(opts: BoothHub3dLinkOptions): URLSearchParams {
   return q;
 }
 
+/**
+ * A BoothHUB share link works with no sign-in at all: the token is validated by
+ * a public function on their side, so an anonymous visitor (and our iframe) can
+ * read the build even when the division has not been switched to public.
+ * Accepts a pasted link or a bare token; returns null when neither is present.
+ */
+export function parseBoothHubShareToken(input?: string | null): string | null {
+  const raw = (input ?? "").trim();
+  if (!raw) return null;
+  const fromUrl = raw.match(/booth-review\/([^/?#\s]+)/i);
+  const token = fromUrl ? fromUrl[1] : raw;
+  return /^[A-Za-z0-9._-]{8,}$/.test(token) ? token : null;
+}
+
+/** The share-link viewer URL — readable without a BoothHUB sign-in. */
+export function boothHubShareEmbedUrl(token: string, opts?: { characters?: boolean }): string {
+  const q = new URLSearchParams({ embed: "1", public: "1", presenter: "1", chromeless: "1" });
+  if (opts?.characters) q.set("characters", "1");
+  return `${BOOTHHUB_ORIGIN}/booth-review/${encodeURIComponent(token)}?${q.toString()}`;
+}
+
+/** Where a signed-in BoothHUB user creates that share link for a division. */
+export function boothHubShareSetupUrl(division: BoothHubDivisionId): string {
+  return `${BOOTHHUB_ORIGIN}/booths/${division}`;
+}
+
 /** The chromeless, sign-in-free 3D viewer URL for an iframe. */
 export function boothHub3dEmbedUrl(opts: BoothHub3dLinkOptions): string {
+  if (opts.shareToken) return boothHubShareEmbedUrl(opts.shareToken, opts);
   const q = baseParams(opts);
   q.set("chromeless", "1");
   if (opts.label) q.set("label", opts.label);
@@ -128,12 +161,17 @@ export function boothHub3dEmbedUrl(opts: BoothHub3dLinkOptions): string {
   return `${BOOTHHUB_ORIGIN}/booths/${opts.division}/visit?${q.toString()}`;
 }
 
+
 /** The same build opened as a full BoothHUB page in a new tab. */
 export function boothHub3dPageUrl(opts: BoothHub3dLinkOptions): string {
+  if (opts.shareToken) {
+    return `${BOOTHHUB_ORIGIN}/booth-review/${encodeURIComponent(opts.shareToken)}`;
+  }
   const q = baseParams(opts);
   placementParams(q, opts.placement);
   return `${BOOTHHUB_ORIGIN}/booths/${opts.division}/visit?${q.toString()}`;
 }
+
 
 /** Where a signed-in BoothHUB user designs this division's stand build. */
 export function boothHubBuilderUrl(division: BoothHubDivisionId): string {

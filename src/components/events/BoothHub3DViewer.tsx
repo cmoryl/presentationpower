@@ -13,9 +13,15 @@ import {
   boothHub3dEmbedUrl,
   boothHub3dPageUrl,
   boothHubBuilderUrl,
+  boothHubShareSetupUrl,
+  parseBoothHubShareToken,
   type BoothHub3dPlacement,
   type BoothHubDivisionId,
 } from "@/lib/boothhub-3d";
+
+/** Where a division's pasted share link is remembered between sessions. */
+const shareKey = (division: string) => `boothhub:share:${division}`;
+
 
 
 export interface BoothHub3DViewerProps {
@@ -47,6 +53,21 @@ export function BoothHub3DViewer({
   // one instead of silently landing on "Booth unavailable".
   const [planDraft, setPlanDraft] = useState("");
   const [plan, setPlan] = useState("");
+  // A BoothHUB share link opens the same build with no BoothHUB sign-in at all,
+  // so anyone here can view it. Remembered per division once pasted.
+  const [shareDraft, setShareDraft] = useState("");
+  const [shareToken, setShareToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(shareKey(division));
+      const token = parseBoothHubShareToken(saved);
+      setShareDraft(saved ?? "");
+      setShareToken(token);
+    } catch {
+      /* storage unavailable — the plan-name route still works */
+    }
+  }, [division]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -65,10 +86,19 @@ export function BoothHub3DViewer({
   // fresh record on every render, which would otherwise reload the build endlessly.
   const placeKey = JSON.stringify(placement ?? null);
   const embedUrl = useMemo(
-    () => boothHub3dEmbedUrl({ division, label: title, room, placement, variant: plan || null }),
+    () =>
+      boothHub3dEmbedUrl({
+        division,
+        label: title,
+        room,
+        placement,
+        variant: plan || null,
+        shareToken,
+      }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [division, title, room, placeKey, plan],
+    [division, title, room, placeKey, plan, shareToken],
   );
+
 
 
   // Every plan edit produces a new URL. Reload the build on it and flash a
@@ -102,7 +132,7 @@ export function BoothHub3DViewer({
           </div>
           <div className="flex items-center gap-2">
             <a
-              href={boothHub3dPageUrl({ division, placement, variant: plan || null })}
+              href={boothHub3dPageUrl({ division, placement, variant: plan || null, shareToken })}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/35 bg-white px-4 py-2 text-[13px] font-semibold text-[#003FC7] hover:bg-[#E0E8F5]"
@@ -139,37 +169,71 @@ export function BoothHub3DViewer({
             className="h-full w-full border-0"
           />
         </div>
-        <footer className="flex flex-wrap items-center gap-2 border-t border-black/10 bg-white px-4 py-3">
+        <footer className="flex flex-wrap items-end gap-3 border-t border-black/10 bg-white px-4 py-3">
           <p className="min-w-[220px] flex-1 text-[11.5px] leading-[1.45] text-[#03002C]/65">
-            Seeing “Booth unavailable”? The {BOOTHHUB_DIVISION_LABEL[division]} stand has not been
-            built in BoothHUB yet, or it is saved under a different plan name. Build it there once
-            and this window shows it for every pin on this division.
+            {shareToken ? (
+              <>
+                Showing this stand through a BoothHUB share link, so it opens for anyone here
+                without a BoothHUB sign-in.
+              </>
+            ) : (
+              <>
+                Seeing “Booth unavailable”? Without a BoothHUB sign-in this window can only show a
+                stand that has been shared. Paste the {BOOTHHUB_DIVISION_LABEL[division]} share link
+                from BoothHUB below — it is remembered, so everyone here sees the build from then on.
+              </>
+            )}
           </p>
           <form
-            className="flex items-center gap-2"
+            className="flex items-end gap-2"
             onSubmit={(e) => {
               e.preventDefault();
+              const token = parseBoothHubShareToken(shareDraft);
               setLoaded(false);
-              setPlan(planDraft.trim());
+              setShareToken(token);
+              try {
+                if (token) window.localStorage.setItem(shareKey(division), shareDraft.trim());
+                else window.localStorage.removeItem(shareKey(division));
+              } catch {
+                /* storage unavailable */
+              }
             }}
           >
-            <label className="text-[11.5px] font-semibold text-[#03002C]" htmlFor="bh-plan">
-              Plan name
+            <label className="flex flex-col gap-1 text-[11.5px] font-semibold text-[#03002C]">
+              Share link
+              <input
+                value={shareDraft}
+                onChange={(e) => setShareDraft(e.target.value)}
+                placeholder="boothhub.lovable.app/booth-review/…"
+                className="w-64 rounded-full border border-[#03002C]/20 bg-white px-3 py-1.5 text-[12.5px] font-normal text-[#03002C] outline-none focus:border-[#003FC7] focus:ring-2 focus:ring-[#003FC7]/25"
+              />
             </label>
-            <input
-              id="bh-plan"
-              value={planDraft}
-              onChange={(e) => setPlanDraft(e.target.value)}
-              placeholder="default"
-              className="w-40 rounded-full border border-[#03002C]/20 bg-white px-3 py-1.5 text-[12.5px] text-[#03002C] outline-none focus:border-[#003FC7] focus:ring-2 focus:ring-[#003FC7]/25"
-            />
+            <label className="flex flex-col gap-1 text-[11.5px] font-semibold text-[#03002C]">
+              Plan name
+              <input
+                value={planDraft}
+                onChange={(e) => setPlanDraft(e.target.value)}
+                placeholder="default"
+                className="w-32 rounded-full border border-[#03002C]/20 bg-white px-3 py-1.5 text-[12.5px] font-normal text-[#03002C] outline-none focus:border-[#003FC7] focus:ring-2 focus:ring-[#003FC7]/25"
+              />
+            </label>
             <button
               type="submit"
-              className="rounded-full bg-[#003FC7] px-3.5 py-1.5 text-[12.5px] font-semibold text-white hover:bg-[#03002C]"
+              onClick={() => setPlan(planDraft.trim())}
+              className="rounded-full bg-[#003FC7] px-3.5 py-2 text-[12.5px] font-semibold text-white hover:bg-[#03002C]"
             >
               Show
             </button>
           </form>
+          <a
+            href={boothHubShareSetupUrl(division)}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-full border border-[#003FC7]/35 bg-white px-3.5 py-2 text-[12.5px] font-semibold text-[#003FC7] hover:bg-[#E0E8F5]"
+          >
+            Get a share link
+          </a>
+
           <a
             href={boothHubBuilderUrl(division)}
             target="_blank"
