@@ -479,9 +479,16 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
         ? `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="none" stroke="${style.accent}" stroke-width="1.4" stroke-dasharray="5 3" opacity="0.9" />`
         : "";
 
-      return `<g>${tile}${custom}${icon}${label}${dims}</g>`;
+      // Names come back separately so they can be drawn after every tile: a name
+      // that has to hang outside its own tile (a lift core against the plan edge)
+      // would otherwise be painted over by whichever room is drawn next.
+      return { body: `<g>${tile}${custom}${icon}</g>`, text: `<g>${label}${dims}</g>` };
     })
-    .join("");
+    .reduce((acc, part) => ({ body: acc.body + part.body, text: acc.text + part.text }), {
+      body: "",
+      text: "",
+    });
+
 
   const entries = plan.entries
     .map((e) => {
