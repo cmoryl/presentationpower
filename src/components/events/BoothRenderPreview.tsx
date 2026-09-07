@@ -18,10 +18,7 @@ import {
   type LondonBoothShell,
 } from "@/lib/next-london-booth-shells";
 import type { LondonPanel } from "@/lib/next-london-signage";
-import {
-  londonBoothArtworkUrl,
-  londonBoothPanelShell,
-} from "@/lib/next-london-signage";
+import { londonBoothArtworkUrl, londonBoothShell } from "@/lib/next-london-signage";
 
 export type BoothRenderPreviewProps = {
   panel: LondonPanel;
@@ -31,7 +28,7 @@ const DISCLAIMER =
   "Visualisation only — the artwork shown in a room of this type, not a survey photograph. Build and print to the trim and bleed above.";
 
 export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
-  const panelShell = londonBoothPanelShell(panel.id);
+  const panelShell = londonBoothShell(panel.id);
   const [shellId, setShellId] = useState<string>(
     panelShell?.id ?? LONDON_BOOTH_SHELLS[0]!.id,
   );
