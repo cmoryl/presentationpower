@@ -26,6 +26,9 @@ import {
 
 import { AppShell } from "@/components/AppShell";
 import { LondonFloorMap, londonKindsPresent } from "@/components/events/LondonFloorMap";
+import { BoothHub3DViewer } from "@/components/events/BoothHub3DViewer";
+import { boothHubDivisionFor } from "@/lib/boothhub-3d";
+
 import { LondonMapDesignPanel } from "@/components/events/LondonMapDesignPanel";
 import { LondonMapAreasPanel } from "@/components/events/LondonMapAreasPanel";
 import { useSessionUser } from "@/hooks/use-session-user";
@@ -810,6 +813,16 @@ function LondonMapsPage() {
           </div>
         </div>
       ) : null}
+
+      {viewer3d ? (
+        <BoothHub3DViewer
+          title={viewer3d.name}
+          room={viewer3d.room}
+          division={boothHubDivisionFor(viewer3d)}
+          onClose={() => setViewer3d(null)}
+        />
+      ) : null}
+
     </AppShell>
   );
 }
