@@ -417,17 +417,25 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
       // A narrow tile — a lift core, a stair, a light well — cannot hold its own
       // name at the left edge without the text running off the tile and, at the
       // edge of the plan, off the sheet. When the name is wider than the tile,
-      // hang it from the right-hand edge instead so it grows back across the
-      // plan rather than out of it.
-      const nameFits = (text: string, size: number) => text.length * size * 0.6 <= w - bar - 16;
+      // hang it from the right-hand edge so it grows back across the plan rather
+      // than out of it — unless the tile is against the left edge, where that
+      // would push the text off the other side, so there it stays left-anchored.
+      const planL = ox + 4;
       const nameAt = (text: string, size: number, baseline: number, opacity: number, weight = 600) => {
-        const fits = nameFits(text, size);
-        return `<text x="${n(fits ? x + bar + 9 : x + w - 6)}" y="${n(baseline)}"${
-          fits ? "" : ' text-anchor="end"'
+        const tw = text.length * size * 0.6;
+        let end = tw > w - bar - 16;
+        let ax = end ? x + w - 6 : x + bar + 9;
+        if (end && ax - tw < planL) {
+          end = false;
+          ax = Math.max(planL, x + bar + 9);
+        }
+        return `<text x="${n(ax)}" y="${n(baseline)}"${
+          end ? ' text-anchor="end"' : ""
         } font-family="${FONT}" font-size="${n(size)}" font-weight="${weight}" letter-spacing="0.9" fill="${NAVY}" opacity="${opacity}">${esc(
           text,
         )}</text>`;
       };
+
       // Attendee sheets centre a larger room name in the tile — there are no pins
       // to avoid, so the name can own the space and read from a phone.
       const label = roomsOnly
