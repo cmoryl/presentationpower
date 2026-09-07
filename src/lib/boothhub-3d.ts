@@ -207,7 +207,15 @@ export function boothHubShareSetupUrl(division: BoothHubDivisionId): string {
 
 /** The chromeless, sign-in-free 3D viewer URL for an iframe. */
 export function boothHub3dEmbedUrl(opts: BoothHub3dLinkOptions): string {
-  if (opts.shareToken) return boothHubShareEmbedUrl(opts.shareToken, opts);
+  if (opts.shareToken) {
+    return boothHubShareEmbedUrl(opts.shareToken, {
+      characters: opts.characters,
+      label: opts.label,
+      room: opts.room,
+      variant: opts.variant,
+      placement: opts.placement,
+    });
+  }
   const q = baseParams(opts);
   q.set("chromeless", "1");
   if (opts.label) q.set("label", opts.label);
