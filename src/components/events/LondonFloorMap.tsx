@@ -82,6 +82,7 @@ export function LondonFloorMap({
   selectedId,
   onSelect,
   editable,
+  areasEditable,
   roomsOnly = false,
   design = DEFAULT_MAP_DESIGN,
   areas,
@@ -310,7 +311,7 @@ export function LondonFloorMap({
             const own = isCustomAreaId(z.id);
             const mine = own ? areas?.find((a) => a.id === z.id) : undefined;
             const chosen = own && z.id === selectedAreaId;
-            const canEdit = editable && !!mine && !!onAreaChange;
+            const canEdit = (areasEditable ?? editable) && !!mine && !!onAreaChange;
             return (
               <div
                 key={z.id}
