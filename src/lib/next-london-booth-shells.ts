@@ -51,8 +51,20 @@ export type LondonBoothShell = {
    * survives a re-issue at another stand size. Null on the screenless shell.
    */
   screen: { x: number; y: number; w: number; h: number } | null;
+  /**
+   * Photoreal in-situ visualisation of the blank shell standing in a room of
+   * this type. A visualisation only — never a survey photograph, and never a
+   * dimensional reference.
+   */
+  renderUrl: string;
+  /**
+   * Where the wall face sits inside that render, as fractions of the image, so
+   * a booth's own artwork can be laid onto the visualisation.
+   */
+  renderFace: { x: number; y: number; w: number; h: number };
   note: string;
 };
+
 
 /** Trim size and bleed shared by both supplied shells. */
 export const LONDON_BOOTH_SHELL_TRIM = { w: 1830, h: 2440, bleedMm: 100 } as const;
