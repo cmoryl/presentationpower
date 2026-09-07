@@ -91,6 +91,8 @@ export const LONDON_BOOTH_SHELLS: LondonBoothShell[] = [
       w: SCREEN_MM.w / LONDON_BOOTH_SHELL_TRIM.w,
       h: SCREEN_MM.h / LONDON_BOOTH_SHELL_TRIM.h,
     },
+    renderUrl: shellARender,
+    renderFace: { x: 0.2435, y: 0.0505, w: 0.539, h: 0.892 },
     note:
       "Screen wall: a 1422 × 797 mm 16:9 monitor aperture sits centred, 405 mm below the trim top. " +
       "Keep logos and copy out of it — the lockup rides above the screen, copy below it.",
@@ -106,6 +108,8 @@ export const LONDON_BOOTH_SHELLS: LondonBoothShell[] = [
     bleedMm: LONDON_BOOTH_SHELL_TRIM.bleedMm,
     hasScreen: false,
     screen: null,
+    renderUrl: shellBRender,
+    renderFace: { x: 0.1855, y: 0.0555, w: 0.635, h: 0.877 },
     note: "No screen: the whole 1830 × 2440 mm face is live artwork.",
   },
 ];
