@@ -47,6 +47,9 @@ import {
 } from "@/lib/social-full-bleed";
 import { SocialTallShell } from "@/components/campaigns/SocialTallShell";
 import { SocialFullBleedShell } from "@/components/campaigns/SocialFullBleedShell";
+import { socialGroundPlate } from "@/lib/social-template-ground";
+import { SOCIAL_MODULE_LAYOUTS } from "@/lib/social-module-layouts";
+
 
 
 const SETTLE_BUDGET = 64;
