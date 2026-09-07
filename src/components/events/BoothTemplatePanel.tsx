@@ -11,6 +11,12 @@ import { useMemo, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
+  boothScreenDiagonalIn,
+  boothScreenRectMm,
+  boothShell,
+  LONDON_BOOTH_SHELLS,
+} from "@/lib/next-london-booth-shells";
+import {
   boothOverlayFromPlacement,
   type BoothTemplateRecord,
 } from "@/lib/booth-templates";
@@ -113,6 +119,13 @@ export function BoothTemplatePanel({
       setUploading(false);
     }
   };
+
+  const shell = boothShell(template.shell_id);
+  const screenRect = boothScreenRectMm(shell, {
+    trimW: template.trim_w,
+    trimH: template.trim_h,
+  });
+  const screenDiagonal = boothScreenDiagonalIn(shell);
 
   const panelId = panelIdBySlug[template.slug];
   // A booth with the vendor's supplied wall keeps that artwork as its ground;
