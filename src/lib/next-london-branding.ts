@@ -22,6 +22,7 @@ import {
   isBoothPanel,
   londonBoothArtworkUrl,
   londonBoothNativeTemplate,
+  londonBoothScreenRect,
   londonVenueItemMeta,
   type LondonPanel,
 } from "@/lib/next-london-signage";
