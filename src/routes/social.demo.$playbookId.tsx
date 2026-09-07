@@ -24,7 +24,10 @@ import {
   Star,
   Image as ImageIcon,
 } from "lucide-react";
-import { getPhotoSet, photoForFormat } from "@/lib/social-photography";
+import { getPhotoSet } from "@/lib/social-photography";
+import { campaignArtCredit, campaignImageForFormat } from "@/lib/social-campaign-art";
+import { demoFitPlan } from "@/lib/social-demo-fit";
+import { SocialModularityStrip } from "@/components/campaigns/SocialModularityStrip";
 import { readCampaignLookId, readCampaignStyleId, saveCampaignLook } from "@/lib/campaign-look";
 import {
   channelLook,
