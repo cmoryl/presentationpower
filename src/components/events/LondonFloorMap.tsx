@@ -521,8 +521,30 @@ export function LondonFloorMap({
                   />
                 </span>
               </button>
+              {active && onView3d ? (
+                <button
+                  type="button"
+                  onPointerDown={(ev) => ev.stopPropagation()}
+                  onClick={(ev) => {
+                    ev.stopPropagation();
+                    onView3d(m.panelId);
+                  }}
+                  title={`View ${m.name} in 3D`}
+                  aria-label={`View ${m.name} in 3D`}
+                  className="absolute z-30 inline-flex items-center gap-1 rounded-full bg-[#003FC7] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-white shadow-sm outline-offset-2 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#03002C]"
+                  style={{
+                    left: `${(m.x / plan.w) * 100}%`,
+                    top: `${(m.y / plan.h) * 100}%`,
+                    transform: `translate(-50%, ${m.y < 1.4 ? "170%" : "40%"}) scale(${1 / view.z})`,
+                  }}
+                >
+                  3D
+                </button>
+              ) : null}
+              </div>
             );
           })}
+
         </div>
 
         {/* North arrow + scale bar: fixed to the frame, unaffected by zoom. */}
