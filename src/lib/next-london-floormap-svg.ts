@@ -729,11 +729,7 @@ export function assetMapSvg(
     const h = base + specH + FOOT;
     const zone = marker ? plan.zones.find((z) => z.id === marker.zoneId) : null;
 
-    const body = floorMapContent(
-      panel.floor,
-      { ...opts, activePanelId: panel.id, footerNote: null },
-      size,
-    );
+    const body = floorMapContent(panel.floor, mapOpts, size);
 
     const specs: [string, string][] = [
       ["Asset", panel.name],
