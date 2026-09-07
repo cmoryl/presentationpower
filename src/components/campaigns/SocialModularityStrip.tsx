@@ -80,7 +80,7 @@ export function SocialModularityStrip({
                       section={section}
                       brandId={brandId}
                       mode={mode}
-                      displayShortEdge={format.width > format.height ? 176 : 240}
+                      displayShortEdge={format.width > format.height ? 176 : 204}
                       lookCode={lookCode ?? null}
                     />
                   </div>
