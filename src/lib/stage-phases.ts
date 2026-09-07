@@ -196,16 +196,16 @@ export function stageLabelFit(
   const text = String(label || "").trim();
   if (!text) return { stageName: base.stageName, numeral: base.numeral, maxLines: 3 };
   // Text column inside the disc: medallion minus the ring inset and padding.
-  const boxWidth = base.medallion * 0.78 * 0.76;
+  const boxWidth = base.medallion * 0.78 * 0.7;
   const words = text.split(/\s+/);
   const longest = words.reduce((m, w) => Math.max(m, w.length), 0);
   const totalChars = text.length;
   // Uppercase bold Geist averages ~0.62em per glyph.
-  const perChar = 0.62;
+  const perChar = 0.7;
   const maxLines = totalChars > 26 ? 4 : 3;
   const byWord = boxWidth / (longest * perChar);
   // Every line loses width near the circle edge, so assume ~86% average fill.
-  const byBlock = (boxWidth * 0.86 * maxLines) / (totalChars * perChar);
+  const byBlock = (boxWidth * 0.82 * maxLines) / (totalChars * perChar);
   const size = Math.max(12, Math.min(base.stageName, Math.floor(Math.min(byWord, byBlock))));
   // Pull the numeral down with a heavily shrunk label so the pair stays balanced.
   const ratio = size / base.stageName;
