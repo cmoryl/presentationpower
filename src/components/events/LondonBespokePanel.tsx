@@ -18,7 +18,7 @@ import {
   type BespokeUnit,
 } from "@/lib/next-london-bespoke";
 import { BESPOKE_RENDER_DISCLAIMER, bespokeRender } from "@/lib/next-london-bespoke-renders";
-import type { LondonFloorId } from "@/lib/next-london-signage";
+import { londonBespokeFacePanel, type LondonFloorId } from "@/lib/next-london-signage";
 
 export type LondonBespokePanelProps = {
   floor: LondonFloorId;
@@ -139,19 +139,32 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
                   <p className="mt-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">
                     Artwork we supply
                   </p>
+                  <p className="mt-1 text-[12px] text-[#03002C]/55">
+                    Faces marked as a template are built by us — headline, subhead, body and logo
+                    are editable in the signage editor and export as live Illustrator vector. Faces
+                    with a size to confirm carry no template until Bespoke publishes the dimension.
+                  </p>
                   <ul className="mt-1 space-y-1">
-                    {u.artwork.map((p) => (
-                      <li key={p.label} className="text-[12.5px] text-[#03002C]/75">
-                        <span className="font-medium text-[#03002C]">
-                          {p.qty > 1 ? `${p.qty} × ` : ""}
-                          {p.label}
-                        </span>{" "}
-                        — {bespokeSizeLabel(p.wMm, p.hMm)}
-                        {p.note ? (
-                          <span className="text-[#03002C]/55"> · {p.note}</span>
-                        ) : null}
-                      </li>
-                    ))}
+                    {u.artwork.map((p) => {
+                      const facePanel = londonBespokeFacePanel(u.id, p.label);
+                      return (
+                        <li key={p.label} className="text-[12.5px] text-[#03002C]/75">
+                          <span className="font-medium text-[#03002C]">
+                            {p.qty > 1 ? `${p.qty} × ` : ""}
+                            {p.label}
+                          </span>{" "}
+                          — {bespokeSizeLabel(p.wMm, p.hMm)}
+                          {p.note ? (
+                            <span className="text-[#03002C]/55"> · {p.note}</span>
+                          ) : null}
+                          {facePanel ? (
+                            <span className="ml-1.5 inline-flex items-center rounded-full bg-[#003FC7]/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#003FC7]">
+                              Editable template · {facePanel.id}
+                            </span>
+                          ) : null}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               </li>
