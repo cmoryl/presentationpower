@@ -135,6 +135,18 @@ export type LondonBrandingPlan = {
   copyAlign: "middle" | "start";
   /** True when the headline runs DOWN the panel (pillars and tall fascias). */
   copyVertical: boolean;
+  /** Optional subhead, set under the headline in Geist Bold. */
+  sub: string | null;
+  /** Cap height of the subhead, in mm. */
+  subSizeMm: number;
+  /** Subhead tracking, in em. */
+  subTrackingEm: number;
+  /** Subhead run length, in mm, at the current cap height and tracking. */
+  subRunMm: number;
+  /** Subhead baseline, in mm from the top of the bleed box. */
+  subBaselineMm: number;
+  /** Subhead centre, in mm from the left of the bleed box. */
+  subCentreMm: number;
   /** Clear space held around the lockup, in mm (1.5× the mark height rule). */
   clearMm: number;
   /** Scannable QR block, in mm, when the panel carries a code. */
