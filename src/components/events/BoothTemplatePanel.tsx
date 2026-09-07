@@ -110,6 +110,20 @@ export function BoothTemplatePanel({
   };
 
   const panelId = panelIdBySlug[template.slug];
+  // The copy layer is edited on the live panel and captured to the template, so
+  // a re-issue at another stand size re-lays the same headline and subhead.
+  const place = panelId ? (placements[panelId] ?? londonLogoPlacement(panelId)) : null;
+  const setPlace = (patchPlacement: Parameters<typeof setLondonLogoPlacement>[1]) => {
+    if (!panelId) return;
+    setLondonLogoPlacement(panelId, patchPlacement);
+  };
+  const saveCopyLayer = () => {
+    if (!panelId) return;
+    void patch(
+      { id: template.id, overlay: boothOverlayFromPlacement(londonLogoPlacement(panelId)) },
+      "Copy and logo layer saved to this booth template.",
+    );
+  };
 
   return (
     <section className="mt-8 rounded-2xl border border-black/10 bg-[#F2F2F2] p-5">
