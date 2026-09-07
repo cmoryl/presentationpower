@@ -5,13 +5,14 @@
 // BoothHUB sign-in and without its app chrome. Escape closes; the header keeps
 // a link out to the full BoothHUB page for anyone who wants the editor.
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ExternalLink, Loader2, X } from "lucide-react";
 
 import {
   BOOTHHUB_DIVISION_LABEL,
   boothHub3dEmbedUrl,
   boothHub3dPageUrl,
+  type BoothHub3dPlacement,
   type BoothHubDivisionId,
 } from "@/lib/boothhub-3d";
 
@@ -21,11 +22,24 @@ export interface BoothHub3DViewerProps {
   /** Venue room, shown beside the title. */
   room?: string | null;
   division: BoothHubDivisionId;
+  /**
+   * Live placement of the asset on the plan. Editing a pin or a scenic build
+   * changes this, which re-loads the walkthrough so the 3D view always shows
+   * the current position, facing and size.
+   */
+  placement?: BoothHub3dPlacement | null;
   onClose: () => void;
 }
 
-export function BoothHub3DViewer({ title, room, division, onClose }: BoothHub3DViewerProps) {
+export function BoothHub3DViewer({
+  title,
+  room,
+  division,
+  placement,
+  onClose,
+}: BoothHub3DViewerProps) {
   const [loaded, setLoaded] = useState(false);
+  const [synced, setSynced] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -40,7 +54,26 @@ export function BoothHub3DViewer({ title, room, division, onClose }: BoothHub3DV
     };
   }, [onClose]);
 
-  const embedUrl = boothHub3dEmbedUrl({ division, label: title, room });
+  // Keyed on the placement's values, not its object identity: the plan builds a
+  // fresh record on every render, which would otherwise reload the build endlessly.
+  const placeKey = JSON.stringify(placement ?? null);
+  const embedUrl = useMemo(
+    () => boothHub3dEmbedUrl({ division, label: title, room, placement }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [division, title, room, placeKey],
+  );
+
+  // Every plan edit produces a new URL. Reload the build on it and flash a
+  // short "updated" note so the change is visible, not silent.
+  const firstUrl = useRef(embedUrl);
+  useEffect(() => {
+    if (embedUrl === firstUrl.current) return;
+    firstUrl.current = embedUrl;
+    setLoaded(false);
+    setSynced(true);
+    const t = window.setTimeout(() => setSynced(false), 2600);
+    return () => window.clearTimeout(t);
+  }, [embedUrl]);
 
   return (
     <div
@@ -61,7 +94,7 @@ export function BoothHub3DViewer({ title, room, division, onClose }: BoothHub3DV
           </div>
           <div className="flex items-center gap-2">
             <a
-              href={boothHub3dPageUrl({ division })}
+              href={boothHub3dPageUrl({ division, placement })}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/35 bg-white px-4 py-2 text-[13px] font-semibold text-[#003FC7] hover:bg-[#E0E8F5]"
@@ -83,7 +116,13 @@ export function BoothHub3DViewer({ title, room, division, onClose }: BoothHub3DV
               <Loader2 className="h-4 w-4 animate-spin" /> Loading the 3D build…
             </div>
           ) : null}
+          {synced ? (
+            <p className="absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-full bg-[#003FC7] px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-lg">
+              Updated from your plan edit
+            </p>
+          ) : null}
           <iframe
+            key={embedUrl}
             src={embedUrl}
             title={`${title} 3D viewer`}
             onLoad={() => setLoaded(true)}

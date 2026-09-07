@@ -133,8 +133,11 @@ function LondonMapsPage() {
   const [expanded, setExpanded] = useState(false);
   /** Draw the Bespoke scenic build units on the plan alongside the signage. */
   const [showBuild, setShowBuild] = useState(true);
-  /** Asset currently open in the BoothHUB 3D viewer. */
-  const [viewer3d, setViewer3d] = useState<LondonPanel | null>(null);
+  /**
+   * Asset currently open in the BoothHUB 3D viewer, held by id so the window
+   * re-reads the live pin — moving or re-facing it updates the 3D build.
+   */
+  const [viewer3dId, setViewer3dId] = useState<string | null>(null);
 
 
   // Corrections live per browser: the location team marks up positions on site
@@ -196,6 +199,12 @@ function LondonMapsPage() {
     );
   }, [floorPanels, kinds, query]);
   const selected = floorPanels.find((p) => p.id === selectedId) ?? null;
+  // The asset in the 3D window, and its live placement: both re-derive from the
+  // panels and the on-screen corrections, so an edit flows straight into BoothHUB.
+  const viewer3dPanel = viewer3dId ? (panels.find((p) => p.id === viewer3dId) ?? null) : null;
+  const viewer3dMarker = viewer3dPanel
+    ? londonMarkerFor(viewer3dPanel, panels, overrides)
+    : null;
   const selectedMarker = selected ? londonMarkerFor(selected, panels, overrides) : null;
   // The Bespoke scenic units are drawn like any other sectioned area, so they
   // print on every sheet and card. A user edit to one is stored under the same
@@ -314,8 +323,7 @@ function LondonMapsPage() {
       selectedAreaId={selectedAreaId}
       onSelectArea={setSelectedAreaId}
       onView3d={(id) => {
-        const panel = floorPanels.find((p) => p.id === id) ?? null;
-        if (panel) setViewer3d(panel);
+        setViewer3dId(id);
       }}
 
     />
@@ -707,7 +715,7 @@ function LondonMapsPage() {
                             </button>
                             <button
                               type="button"
-                              onClick={() => setViewer3d(p)}
+                              onClick={() => setViewer3dId(p.id)}
                               title={`View ${p.name} in 3D`}
                               aria-label={`View ${p.name} in 3D`}
                               className={`inline-flex shrink-0 items-center gap-1 border-l border-black/5 px-3 text-[11px] font-semibold text-[#003FC7] transition-colors hover:bg-[#E0E8F5] ${
@@ -750,7 +758,7 @@ function LondonMapsPage() {
                     <button
                       type="button"
                       className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
-                      onClick={() => setViewer3d(selected)}
+                      onClick={() => setViewer3dId(selected.id)}
                     >
                       <Boxes className="h-4 w-4" /> View in 3D
                     </button>
@@ -831,12 +839,20 @@ function LondonMapsPage() {
         </div>
       ) : null}
 
-      {viewer3d ? (
+      {viewer3dPanel ? (
         <BoothHub3DViewer
-          title={viewer3d.name}
-          room={viewer3d.room}
-          division={boothHubDivisionFor(viewer3d)}
-          onClose={() => setViewer3d(null)}
+          title={viewer3dPanel.name}
+          room={viewer3dPanel.room}
+          division={boothHubDivisionFor(viewer3dPanel)}
+          placement={{
+            floor: viewer3dPanel.floor,
+            x: viewer3dMarker?.x ?? null,
+            y: viewer3dMarker?.y ?? null,
+            face: viewer3dMarker?.face ?? null,
+            widthMm: viewer3dPanel.trimW,
+            heightMm: viewer3dPanel.trimH,
+          }}
+          onClose={() => setViewer3dId(null)}
         />
       ) : null}
 

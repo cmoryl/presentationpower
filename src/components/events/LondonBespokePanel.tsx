@@ -218,6 +218,13 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
           title={view3d.name}
           room={view3d.room}
           division={boothHubDivisionFor({ name: view3d.name, room: view3d.room })}
+          placement={{
+            floor: view3d.floor,
+            x: view3d.anchor.x,
+            y: view3d.anchor.y,
+            widthMm: view3d.widthMm,
+            heightMm: view3d.heightMm,
+          }}
           onClose={() => setView3d(null)}
         />
       ) : null}
