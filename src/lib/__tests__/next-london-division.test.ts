@@ -4,6 +4,7 @@ import { LONDON_PANELS, LONDON_STYLES } from "@/lib/next-london-signage";
 import { londonBrandingPlan, londonPanelFamily } from "@/lib/next-london-branding";
 import { londonPanelStops, buildLondonPanelSvg } from "@/lib/next-london-revise";
 import {
+  londonAccentSeparationFloor,
   londonDivisionAccent,
   londonDivisionColourway,
   londonDivisionStops,
@@ -43,6 +44,23 @@ describe("London division signage", () => {
     expect(tinted[tinted.length - 1]).not.toBe(base[base.length - 1]);
     // Master-brand items are untouched.
     expect(londonDivisionStops("transperfect", base)).toEqual(base);
+  });
+
+  it("keeps every tinted stop clear of the accent hue the mark carries", () => {
+    const dist = (a: string, b: string) => {
+      const p = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+      const [ar, ag, ab] = p(a);
+      const [br, bg, bb] = p(b);
+      return Math.hypot(ar - br, ag - bg, ab - bb);
+    };
+    for (const panel of divisionPanels) {
+      const accent = londonDivisionAccent(londonPanelFamily(panel))!;
+      const stops = londonPanelStops(panel);
+      const floor = londonAccentSeparationFloor(accent.hex) - 1;
+      for (const stop of stops.slice(1)) {
+        expect(dist(stop, accent.hex), `${panel.name} stop ${stop}`).toBeGreaterThanOrEqual(floor);
+      }
+    }
   });
 
   it("carries the tinted ramp into panel masters", () => {

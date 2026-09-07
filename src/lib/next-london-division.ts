@@ -130,7 +130,7 @@ function mix(a: string, b: string, t: number): string {
 }
 
 /** Peak accent weight at the light end of the ramp. Deliberately restrained. */
-export const LONDON_DIVISION_ACCENT_WEIGHT = 0.34;
+export const LONDON_DIVISION_ACCENT_WEIGHT = 0.22;
 
 /**
  * Doors carry a stronger soft-focus accent than scenic panels: a door is a
@@ -138,12 +138,58 @@ export const LONDON_DIVISION_ACCENT_WEIGHT = 0.34;
  * obvious on it. The dark head stays untouched, which is what keeps every door
  * in the venue cohesive no matter which accent is blooming behind the mark.
  */
-export const LONDON_DOOR_ACCENT_WEIGHT = 0.56;
+export const LONDON_DOOR_ACCENT_WEIGHT = 0.38;
+
+/**
+ * The tint target is the accent pre-softened toward white. Mixing the raw
+ * accent into the ground lets the light end approach the very hue the
+ * lockup's accent chevron prints in, so the mark merges into its own
+ * background; softening first keeps the ground clearly a *tint*, never a
+ * field of the accent itself.
+ */
+const ACCENT_SOFTEN = 0.5;
+
+/**
+ * Minimum RGB distance any tinted stop must keep from the raw accent. Guards
+ * ramps whose light end already sits near an accent hue (e.g. the aqua ends
+ * against GlobalLink or DataForce cyan): if a stop would land too close to
+ * the accent, it is pulled back toward white until the separation holds, so
+ * the accent-chevron mark always reads against its ground.
+ *
+ * The floor is per-accent: pale accents (lavender, yellow) sit close to white
+ * itself, so an absolute floor is unreachable — the cap keeps a fixed share
+ * of the best separation white can offer instead.
+ */
+const ACCENT_MIN_SEPARATION = 150;
+const ACCENT_SEPARATION_WHITE_SHARE = 0.82;
+
+function rgbDistance(a: string, b: string): number {
+  const [ar, ag, ab] = parseHex(a);
+  const [br, bg, bb] = parseHex(b);
+  return Math.sqrt((ar - br) ** 2 + (ag - bg) ** 2 + (ab - bb) ** 2);
+}
+
+/** The separation floor a tinted stop must hold from this accent. */
+export function londonAccentSeparationFloor(accentHex: string): number {
+  return Math.min(ACCENT_MIN_SEPARATION, rgbDistance("#FFFFFF", accentHex) * ACCENT_SEPARATION_WHITE_SHARE);
+}
+
+/** Pull `stop` toward white until it stands clear of the raw accent. */
+function ensureAccentSeparation(stop: string, accentHex: string): string {
+  const floor = londonAccentSeparationFloor(accentHex);
+  let out = stop;
+  for (let i = 0; i < 48 && rgbDistance(out, accentHex) < floor; i++) {
+    out = mix(out, "#FFFFFF", 0.18);
+  }
+  return out;
+}
 
 /**
  * Tint a panel ramp with its division accent. The first stop (the dark head
  * that carries the lockup) is untouched; weight ramps up to `weight` (default
- * `LONDON_DIVISION_ACCENT_WEIGHT`) at the last stop.
+ * `LONDON_DIVISION_ACCENT_WEIGHT`) at the last stop. Every tinted stop is
+ * kept clear of the raw accent hue so the lockup's accent chevron never
+ * merges into the ground behind it.
  */
 export function londonDivisionStops(
   familyId: string,
@@ -152,10 +198,10 @@ export function londonDivisionStops(
 ): string[] {
   const accent = londonDivisionAccent(familyId);
   if (!accent || stops.length < 2) return stops;
+  const target = mix(accent.hex, "#FFFFFF", ACCENT_SOFTEN);
   const last = stops.length - 1;
   return stops.map((stop, i) => {
     const t = (i / last) ** 1.4 * weight;
-    return i === 0 ? stop : mix(stop, accent.hex, t);
-
+    return i === 0 ? stop : ensureAccentSeparation(mix(stop, target, t), accent.hex);
   });
 }
