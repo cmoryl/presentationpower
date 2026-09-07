@@ -165,6 +165,9 @@ export function KitWizard({
   const [step, setStep] = useState(0);
   const [brandId, setBrandId] = useState<string>("bm-tp-master");
   const [mode, setMode] = useState<"light" | "dark" | "both">("dark");
+  const [groundLook, setGroundLook] = useState<string>("");
+  const groundPacks = useSelectablePacks();
+
   const [manualCopy, setManualCopy] = useState({
     title: "",
     summary: "",
