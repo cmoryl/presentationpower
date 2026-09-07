@@ -292,9 +292,11 @@ export function bespokeSizeLabel(wMm: number | null, hMm: number | null): string
 /** Footprint label for a unit, or the honest unknown. */
 export function bespokeFootprintLabel(unit: BespokeUnit): string {
   if (unit.widthMm == null) return "Footprint to be confirmed with Bespoke";
-  const depth = unit.depthMm == null ? "—" : `${unit.depthMm}`;
-  const height = unit.heightMm == null ? "—" : `${unit.heightMm}`;
-  return `${unit.widthMm} × ${depth} mm footprint, ${height} mm high`;
+  const plan =
+    unit.depthMm == null
+      ? `${unit.widthMm} mm wide`
+      : `${unit.widthMm} × ${unit.depthMm} mm footprint`;
+  return unit.heightMm == null ? `${plan}, height to be confirmed` : `${plan}, ${unit.heightMm} mm high`;
 }
 
 /** Units scheduled on one floor, in drawing order. */
