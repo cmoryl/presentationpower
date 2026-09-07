@@ -62,6 +62,12 @@ export type LondonFloorMapProps = {
   areasEditable?: boolean;
   /** Remove one of the team's own areas straight from the plan. */
   onAreaRemove?: (id: string) => void;
+  /**
+   * Open the BoothHUB 3D walkthrough for a pinned asset. When given, every pin
+   * opens it on double-click and the selected pin carries a small 3D chip.
+   */
+  onView3d?: (panelId: string) => void;
+
 
   /** Attendee view: rooms and breakouts only, no signage pins. */
   roomsOnly?: boolean;
@@ -93,6 +99,8 @@ export function LondonFloorMap({
   editable,
   areasEditable,
   onAreaRemove,
+  onView3d,
+
   roomsOnly = false,
   design = DEFAULT_MAP_DESIGN,
   areas,
@@ -451,10 +459,17 @@ export function LondonFloorMap({
             const active = m.panelId === selectedId;
             const ink = active ? "#C4306E" : m.corrected ? "#0F9D58" : KIND_INK(m.kind);
             return (
+              <div key={m.panelId} className="contents">
               <button
-                key={m.panelId}
                 type="button"
+                onDoubleClick={(ev) => {
+                  if (!onView3d) return;
+                  ev.stopPropagation();
+                  ev.preventDefault();
+                  onView3d(m.panelId);
+                }}
                 onPointerDown={(ev) => {
+
                   ev.stopPropagation();
                   onSelect(m.panelId);
                   if (!editable) return;
@@ -506,8 +521,30 @@ export function LondonFloorMap({
                   />
                 </span>
               </button>
+              {active && onView3d ? (
+                <button
+                  type="button"
+                  onPointerDown={(ev) => ev.stopPropagation()}
+                  onClick={(ev) => {
+                    ev.stopPropagation();
+                    onView3d(m.panelId);
+                  }}
+                  title={`View ${m.name} in 3D`}
+                  aria-label={`View ${m.name} in 3D`}
+                  className="absolute z-30 inline-flex items-center gap-1 rounded-full bg-[#003FC7] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-white shadow-sm outline-offset-2 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#03002C]"
+                  style={{
+                    left: `${(m.x / plan.w) * 100}%`,
+                    top: `${(m.y / plan.h) * 100}%`,
+                    transform: `translate(-50%, ${m.y < 1.4 ? "170%" : "40%"}) scale(${1 / view.z})`,
+                  }}
+                >
+                  3D
+                </button>
+              ) : null}
+              </div>
             );
           })}
+
         </div>
 
         {/* North arrow + scale bar: fixed to the frame, unaffected by zoom. */}

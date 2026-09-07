@@ -5,7 +5,7 @@
 // listed here is also drawn on the floor sheet and printed on the plan set.
 
 import { useState } from "react";
-import { Download, Maximize2, X } from "lucide-react";
+import { Boxes, Download, Maximize2, X } from "lucide-react";
 
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import {
@@ -19,6 +19,8 @@ import {
 } from "@/lib/next-london-bespoke";
 import { BESPOKE_RENDER_DISCLAIMER, bespokeRender } from "@/lib/next-london-bespoke-renders";
 import { londonBespokeFacePanel, type LondonFloorId } from "@/lib/next-london-signage";
+import { BoothHub3DViewer } from "@/components/events/BoothHub3DViewer";
+import { boothHubDivisionFor } from "@/lib/boothhub-3d";
 
 export type LondonBespokePanelProps = {
   floor: LondonFloorId;
@@ -39,6 +41,8 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
   const units = bespokeUnitsOnFloor(floor);
   const drawing = bespokeFloorDrawing(floor);
   const [zoom, setZoom] = useState<{ src: string; label: string } | null>(null);
+  /** Scenic unit currently open in the BoothHUB 3D walkthrough. */
+  const [view3d, setView3d] = useState<BespokeUnit | null>(null);
 
   return (
     <section className="rounded-2xl border border-black/10 bg-white/70 p-5">
@@ -123,6 +127,13 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
                   {u.notes ? (
                     <p className="mt-1 text-[12.5px] text-[#03002C]/60">{u.notes}</p>
                   ) : null}
+                  <button
+                    type="button"
+                    className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-3.5 py-1.5 text-[12.5px] font-semibold text-white transition-opacity hover:opacity-90"
+                    onClick={() => setView3d(u)}
+                  >
+                    <Boxes className="h-3.5 w-3.5" /> View in 3D
+                  </button>
                   <p className="mt-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">
                     Parts
                   </p>
@@ -200,6 +211,15 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
             <p className="pt-3 text-[12px] text-white/70">{BESPOKE_RENDER_DISCLAIMER}</p>
           </div>
         </div>
+      ) : null}
+
+      {view3d ? (
+        <BoothHub3DViewer
+          title={view3d.name}
+          room={view3d.room}
+          division={boothHubDivisionFor({ name: view3d.name, room: view3d.room })}
+          onClose={() => setView3d(null)}
+        />
       ) : null}
     </section>
   );
