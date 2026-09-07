@@ -42,6 +42,11 @@ export function BoothHub3DViewer({
 }: BoothHub3DViewerProps) {
   const [loaded, setLoaded] = useState(false);
   const [synced, setSynced] = useState(false);
+  // The saved BoothHUB build to show. Their viewer only has a stand when a
+  // build exists for this division under this plan name, so let people point at
+  // one instead of silently landing on "Booth unavailable".
+  const [planDraft, setPlanDraft] = useState("");
+  const [plan, setPlan] = useState("");
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -60,10 +65,11 @@ export function BoothHub3DViewer({
   // fresh record on every render, which would otherwise reload the build endlessly.
   const placeKey = JSON.stringify(placement ?? null);
   const embedUrl = useMemo(
-    () => boothHub3dEmbedUrl({ division, label: title, room, placement }),
+    () => boothHub3dEmbedUrl({ division, label: title, room, placement, variant: plan || null }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [division, title, room, placeKey],
+    [division, title, room, placeKey, plan],
   );
+
 
   // Every plan edit produces a new URL. Reload the build on it and flash a
   // short "updated" note so the change is visible, not silent.
