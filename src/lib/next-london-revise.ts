@@ -1036,7 +1036,9 @@ export function buildLondonPanelAi(
   const content = wall
     ? `/OC /oc3 BDC\n${groundOps}EMC\n` + `/OC /oc1 BDC\n${wallOps}EMC\n`
     : `/OC /oc3 BDC\n${groundOps}${brewOps}EMC\n` +
-      (copyOps || qrOps ? `/OC /oc2 BDC\n${copyOps}${qrOps}EMC\n` : "") +
+      (copyOps || subOps || qrOps
+        ? `/OC /oc2 BDC\n${copyOps}${subOps}${qrOps}EMC\n`
+        : "") +
       (brand.lockupOn && logoOps ? `/OC /oc1 BDC\n${logoOps}EMC\n` : "");
 
   // The copy actually printed on this master, kept as searchable metadata now
