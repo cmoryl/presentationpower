@@ -400,6 +400,11 @@ export type SocialRendererProps = {
    *    the frame. Designed light layouts use this so the artwork never sits
    *    under the ink and every aspect gets a purpose-built crop. */
   imageLayout?: "bleed" | "panel";
+  /** 24–70 — photo panel size as a % of the safe box. Used when the asset has
+   *  no hand edit; a demo fit plan sets this per aspect so the frame fills. */
+  panelSizePct?: number;
+  /** 0.7–1.35 — copy stack scale when the asset has no hand edit. */
+  typeScale?: number;
 
   /** Template style skin — see src/lib/social-styles.ts. */
   styleId?: SocialStyleId;
@@ -424,6 +429,8 @@ export function SocialRenderer({
   imageUrl: imageUrlProp,
   imageScrimPct = 55,
   imageLayout: imageLayoutProp,
+  panelSizePct: panelSizePctProp,
+  typeScale: typeScaleProp,
 
   styleId,
   eventLogo,
@@ -514,8 +521,8 @@ export function SocialRenderer({
   const panelSide: "right" | "top" =
     edit?.panelSide ?? (cls === "landscape-wide" || cls === "landscape" ? "right" : "top");
   const panelGap = (short * 3.2) / 100;
-  const panelFrac =
-    edit?.panelSizePct != null ? Math.min(70, Math.max(24, edit.panelSizePct)) / 100 : null;
+  const panelPct = edit?.panelSizePct ?? panelSizePctProp;
+  const panelFrac = panelPct != null ? Math.min(70, Math.max(24, panelPct)) / 100 : null;
   const panelW =
     panelSide === "right"
       ? (format.width - safeInset.left - safeInset.right) *
@@ -586,7 +593,7 @@ export function SocialRenderer({
           : 0.86
         : 1) *
     (tune.copyScaleMul ?? 1) *
-    Math.min(1.35, Math.max(0.7, edit?.typeScale ?? 1)) *
+    Math.min(1.35, Math.max(0.7, edit?.typeScale ?? typeScaleProp ?? 1)) *
     safeFit;
   const titleLines =
     tune.titleLines ??

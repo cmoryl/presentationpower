@@ -24,7 +24,10 @@ import {
   Star,
   Image as ImageIcon,
 } from "lucide-react";
-import { getPhotoSet, photoForFormat } from "@/lib/social-photography";
+import { getPhotoSet } from "@/lib/social-photography";
+import { campaignArtCredit, campaignImageForFormat } from "@/lib/social-campaign-art";
+import { demoFitPlan } from "@/lib/social-demo-fit";
+import { SocialModularityStrip } from "@/components/campaigns/SocialModularityStrip";
 import { readCampaignLookId, readCampaignStyleId, saveCampaignLook } from "@/lib/campaign-look";
 import {
   channelLook,
@@ -102,6 +105,9 @@ function SocialDemoView() {
   );
   const kit = KIT_PROFILES_BY_ID[playbook.kitProfileId];
   const photoSet = getPhotoSet(playbook.subBrand);
+  // Imagery credit line — this campaign's own creative when it has a set,
+  // otherwise the division photography.
+  const artCredit = campaignArtCredit(playbook.id, playbook.subBrand);
   // Art direction. A social kit wears the SAME authored look family as its
   // division's event collateral (`channelLook`), so posts, event artwork and
   // print comps for one division read as one campaign end to end. The switcher
@@ -309,7 +315,7 @@ function SocialDemoView() {
           title={`${localizedAssets.length} rendered assets · light + dark`}
           desc={
             photoSet
-              ? "Rendered right now from the deterministic pipeline. Dark variants use the division photography set — each ad size pulls the crop built for its aspect."
+              ? "Rendered right now from the deterministic pipeline, on this campaign's own creative — each ad size pulls the crop built for its aspect and fills the frame."
               : "Rendered right now from the deterministic pipeline. Configure to swap copy and cadence."
           }
         />
@@ -373,12 +379,12 @@ function SocialDemoView() {
           </div>
           <p className="mt-2 max-w-3xl text-xs text-black/60">{activeStyle.blurb}</p>
         </div>
-        {photoSet ? (
+        {artCredit ? (
           <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-xs text-black/60">
             <ImageIcon size={14} className="text-[#003FC7]" />
-            <span className="font-semibold text-[#03002C]">{photoSet.label}</span>
+            <span className="font-semibold text-[#03002C]">{artCredit.label}</span>
             <span aria-hidden>·</span>
-            <span>{photoSet.credit} — wide, square and vertical crops</span>
+            <span>{artCredit.credit} — wide, square and vertical crops</span>
           </div>
         ) : null}
         <DemoTranslateBar
@@ -395,11 +401,14 @@ function SocialDemoView() {
           dir={tx.rtl ? "rtl" : undefined}
         >
           {localizedAssets.map((a) => {
-            // Both modes carry photography now. Dark variants run the photo
-            // full bleed; light variants crop it into a designed panel sized to
-            // the frame's own aspect, with the copy owning the rest.
-            const imageUrl = photoForFormat(playbook.subBrand, a.format);
-            const panel = a.mode === "light";
+            // Each demo asset wears this campaign's own creative, cropped for
+            // the frame's aspect. Dark variants run it full bleed; light
+            // variants crop it into a designed panel, and the fill plan sets how
+            // much of the frame the panel owns plus how hard the copy scales, so
+            // no size renders half-empty.
+            const imageUrl = campaignImageForFormat(playbook.id, playbook.subBrand, a.format);
+            const fit = demoFitPlan(a.format, a.mode);
+            const panel = fit.imageLayout === "panel";
             const editKey = socialEditKey(`social-demo:${playbook.id}:${styleId}`, a.id);
             return (
               <AssetPreviewCard
@@ -414,8 +423,10 @@ function SocialDemoView() {
                   mode: a.mode,
                   copy: a.copy,
                   imageUrl,
-                  imageLayout: panel ? "panel" : "bleed",
-                  imageScrimPct: 62,
+                  imageLayout: fit.imageLayout,
+                  imageScrimPct: fit.imageScrimPct,
+                  panelSizePct: fit.panelSizePct,
+                  typeScale: fit.typeScale,
                   styleId,
                 }}
                 badge={imageUrl ? (panel ? "Panel" : "Photo") : undefined}
@@ -428,6 +439,24 @@ function SocialDemoView() {
           })}
         </div>
       </section>
+
+      {/* Modularity — the same campaign copy re-laid through presentation
+          modules at three social shapes, light and dark. */}
+      <section>
+        <SectionHead
+          eyebrow="Modular"
+          title="Same story, different modules"
+          desc="Proof the build is modular: this campaign's copy dropped into presentation modules and re-laid for wide, square and story frames — each module re-composes itself for the space it gets."
+        />
+        <div className="mt-6">
+          <SocialModularityStrip
+            copy={playbook.copy}
+            brandId={playbook.subBrand}
+            lookCode={look.styleId ?? null}
+          />
+        </div>
+      </section>
+
 
       {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
       <section>
