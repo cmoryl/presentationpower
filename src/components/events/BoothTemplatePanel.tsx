@@ -18,7 +18,9 @@ import {
   LONDON_BOOTH_TRIM_PRESETS,
   resizeBoothArtboard,
 } from "@/lib/next-london-booths";
-import { nativeBoothTemplate } from "@/lib/next-london-booth-native";
+import { londonBoothNativeTemplate } from "@/lib/next-london-signage";
+
+
 import {
   LONDON_BODY_MAX_CHARS,
   LONDON_BODY_WIDTH,
@@ -113,9 +115,10 @@ export function BoothTemplatePanel({
   };
 
   const panelId = panelIdBySlug[template.slug];
-  // Native booths are built by the app: brand plate plus editable slots, so the
-  // whole wall is ours and every slot exports as live Illustrator vector.
-  const native = nativeBoothTemplate(template.slug);
+  // A booth with the vendor's supplied wall keeps that artwork as its ground;
+  // only a booth with no delivered artwork is built from a brand plate. Either
+  // way the headline, subhead, body and lockup layer above it is editable here.
+  const native = panelId ? londonBoothNativeTemplate(panelId) : null;
   // The copy layer is edited on the live panel and captured to the template, so
   // a re-issue at another stand size re-lays the same headline and subhead.
   const place = panelId ? (placements[panelId] ?? londonLogoPlacement(panelId)) : null;
@@ -142,7 +145,7 @@ export function BoothTemplatePanel({
         </span>
         {native ? (
           <span className="rounded border border-[#003FC7]/30 bg-white px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#003FC7]">
-            Native template
+            App-built template
           </span>
         ) : null}
         {!canEdit ? (
@@ -156,13 +159,11 @@ export function BoothTemplatePanel({
         can be re-issued at another stand size or replaced with a new artwork round without a
         rebuild. Downloads always serve the stored master.
       </p>
-      {native ? (
-        <p className="mt-2 max-w-3xl text-[13px] leading-[1.5] text-[#003FC7]">
-          {template.vendor} is a native template: the background is a live brand plate, and the
-          headline, subhead, body and logo are all editable here. Nothing is a flattened image, so
-          the Illustrator download opens as editable vector artwork.
-        </p>
-      ) : null}
+      <p className="mt-2 max-w-3xl text-[13px] leading-[1.5] text-[#003FC7]">
+        {native
+          ? `${template.vendor} has no supplied wall yet, so its background is a live brand plate — headline, subhead, body and logo are all editable here and export as vector.`
+          : `${template.vendor} keeps its supplied artwork as the wall. The headline, subhead, body and lockup below sit on top of it as an editable vector layer, and re-issuing the booth at another stand size re-lays them.`}
+      </p>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
         <div>

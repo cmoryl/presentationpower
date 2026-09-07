@@ -1,67 +1,57 @@
+// Supplied booth wall + EDITABLE COPY LAYER.
+//
+// The 15 partner booths ship the vendor's own Illustrator wall, and that wall
+// stays the ground. What we own is the layer above it — headline, subhead, body
+// and lockup — which is editable per booth, derived from the trim box (so a
+// re-issue at another stand size re-lays it) and exported as outlined vector.
 import { describe, expect, it } from "vitest";
 
 import { londonBrandingPlan, wrapCopy } from "@/lib/next-london-branding";
-import { NATIVE_BOOTH_TEMPLATES, nativeBoothTemplate } from "@/lib/next-london-booth-native";
-import {
-  buildLondonPanelAi,
-  buildLondonPanelAiAsync,
-  buildLondonPanelSvg,
-  londonAiBytes,
-} from "@/lib/next-london-revise";
+import { buildLondonPanelSvg } from "@/lib/next-london-revise";
 import { DEFAULT_LOGO_PLACEMENT } from "@/lib/next-london-logo-placement";
 import { auditSvg, gateOnQa } from "@/lib/london-signage-qa";
 import {
-  LONDON_BOOTH_PANEL_META,
-  LONDON_PANELS,
+  LONDON_BOOTH_PANELS,
   londonBoothArtworkUrl,
-  type LondonPanel,
+  londonBoothNativeTemplate,
 } from "@/lib/next-london-signage";
 
-const template = NATIVE_BOOTH_TEMPLATES[0]!;
+const panel = LONDON_BOOTH_PANELS[0]!;
 
-const panel: LondonPanel = LONDON_PANELS.find(
-  (p) => LONDON_BOOTH_PANEL_META[p.id]?.booth.id === template.slug,
-)!;
-
-describe("native booth template", () => {
-  it("resolves a panel for the pilot booth", () => {
-    expect(panel).toBeTruthy();
-    expect(nativeBoothTemplate(template.slug)).toBe(template);
+describe("booth wall with an editable copy layer", () => {
+  it("keeps the vendor's supplied artwork as the ground", () => {
+    expect(londonBoothArtworkUrl(panel.id)).toBeTruthy();
+    expect(panel.ground).toBe("Supplied booth artwork");
+    // A supplied wall is never treated as an app-built plate.
+    expect(londonBoothNativeTemplate(panel.id)).toBeNull();
   });
 
-  it("carries no supplied artwork — the ground is the brand plate", () => {
-    expect(londonBoothArtworkUrl(panel.id)).toBeNull();
-    expect(panel.ground).toContain("Brand plate");
-  });
-
-  it("ships editable headline, subhead, body and logo slots", () => {
+  it("starts with no baked-on copy so the wall reads as delivered", () => {
     const plan = londonBrandingPlan(panel, DEFAULT_LOGO_PLACEMENT);
-    expect(plan.copy).toBe(template.headline);
-    expect(plan.sub).toBe(template.sub);
-    expect(plan.bodyLines.length).toBeGreaterThan(1);
-    expect(plan.bodyLines.join(" ").replace(/\s+/g, " ")).toBe(
-      template.body.replace(/\s+/g, " "),
-    );
-    expect(plan.lockupOn).toBe(true);
-  });
-
-  it("honours a typed override and an explicit empty slot", () => {
-    const plan = londonBrandingPlan(panel, {
-      ...DEFAULT_LOGO_PLACEMENT,
-      text: "OUR OWN HEADLINE",
-      body: "",
-    });
-    expect(plan.copy).toBe("OUR OWN HEADLINE");
     expect(plan.bodyLines).toEqual([]);
   });
 
-  it("re-flows the body when the booth is re-issued at another stand size", () => {
-    // Copy is measured from the trim box, so a narrower stand wraps into more
-    // lines instead of running off the wall.
-    const base = londonBrandingPlan(panel, DEFAULT_LOGO_PLACEMENT);
+  it("accepts an editable headline, subhead and body on top", () => {
+    const plan = londonBrandingPlan(panel, {
+      ...DEFAULT_LOGO_PLACEMENT,
+      text: "OUR OWN HEADLINE",
+      sub: "SECOND LINE",
+      body: "Translation, review and publication in one governed workflow for every market.",
+    });
+    expect(plan.copy).toBe("OUR OWN HEADLINE");
+    expect(plan.sub).toBe("SECOND LINE");
+    expect(plan.bodyLines.length).toBeGreaterThan(0);
+  });
+
+  it("re-flows the copy when the booth is re-issued at another stand size", () => {
+    const place = {
+      ...DEFAULT_LOGO_PLACEMENT,
+      body: "Translation, review and publication in one governed workflow for every market.",
+    };
+    const base = londonBrandingPlan(panel, place);
     const narrow = londonBrandingPlan(
       { ...panel, trimW: panel.trimW * 0.4, bleedW: panel.bleedW * 0.4 },
-      DEFAULT_LOGO_PLACEMENT,
+      place,
     );
     expect(narrow.bodyLines.length).toBeGreaterThan(base.bodyLines.length);
     expect(narrow.bodyMeasureMm).toBeLessThan(base.bodyMeasureMm);
@@ -73,26 +63,9 @@ describe("native booth template", () => {
     expect(lines.join(" ")).toBe("alpha beta gamma delta");
   });
 
-  it("exports a vector svg master with the body as outlined paths", () => {
+  it("exports the copy layer as outlined paths that pass the print gate", () => {
     const svg = buildLondonPanelSvg(panel);
-    expect(svg).not.toContain("<image");
-    expect(svg).toContain("linearGradient");
-    expect(svg).toContain('data-layer="body"');
     expect(svg).not.toContain("<text");
-    const qa = auditSvg(panel, svg);
-    expect(() => gateOnQa(qa)).not.toThrow();
-  });
-
-  it("exports an Illustrator master with a live gradient and no raster", async () => {
-    const ai = new TextDecoder("latin1").decode(await buildLondonPanelAiAsync(panel));
-    expect(ai).toContain("/Sh0 sh");
-    expect(ai).not.toContain("/Subtype /Image");
-    expect(ai).not.toContain("/ImGround");
-    expect(ai).toMatch(/\/ShadingType\s*[23]/);
-    // Copy is outlined geometry, never a live /Font resource.
-    expect(ai).not.toContain("/Font");
-    expect(ai).toContain("/TPOutlined true");
-    const sync = new TextDecoder("latin1").decode(londonAiBytes(buildLondonPanelAi(panel)));
-    expect(sync).toContain("/Sh0 sh");
+    expect(() => gateOnQa(auditSvg(panel, svg))).not.toThrow();
   });
 });

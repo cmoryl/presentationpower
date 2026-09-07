@@ -13,10 +13,7 @@ import {
   type LondonBoothArtboard,
   type LondonBoothSpec,
 } from "@/lib/next-london-booths";
-import {
-  isNativeBoothSlug,
-  nativeBoothTemplate,
-} from "@/lib/next-london-booth-native";
+import { nativeBoothTemplate } from "@/lib/next-london-booth-native";
 import { LONDON_VENUE_ITEMS, type LondonVenueItemSpec } from "@/lib/next-london-venue-items";
 
 export type LondonFloorId = "EXT" | "GF" | "2F" | "3F" | "4F" | "5F" | "6F";
@@ -1399,23 +1396,26 @@ function boothPanel(
   artboard: LondonBoothArtboard,
   index: number,
 ): LondonPanel {
-  // A native booth is built by the app: its ground is the brand plate, not the
-  // vendor's flat wall, and every slot on it stays editable.
-  const native = nativeBoothTemplate(booth.id);
+  // The vendor's supplied wall is the ground whenever they have delivered one.
+  // The app-built plate is only the fallback for a booth with no artwork yet —
+  // either way the copy and lockup layer on top stays editable.
+  const supplied = !!artboard.previewUrl;
+  const native = supplied ? null : nativeBoothTemplate(booth.id);
   const plateStyle = native?.plateStyle ?? booth.style;
   const seed: LondonPanel = {
     id: `ldn-b${String(index + 1).padStart(2, "0")}`,
     floor: "GF",
     room: `${booth.vendor.toUpperCase()} BOOTH`,
-    proof: native ? "Native template (app-built)" : (booth.sourceFile ?? "Artwork pending"),
+    proof: booth.sourceFile ?? (native ? "Native template (app-built)" : "Artwork pending"),
     page: artboard.page,
     name: booth.vendor, // Keep short — dimensions are already in the spec metadata line below the card.
-    ground: native
-      ? "Brand plate (native template)"
-      : artboard.previewUrl
-        ? "Supplied booth artwork"
+    ground: supplied
+      ? "Supplied booth artwork"
+      : native
+        ? "Brand plate (native template)"
         : "Brand ground (artwork pending)",
     style: LONDON_STYLES[plateStyle] ? plateStyle : "01-beam-violet-aqua",
+
     trimW: artboard.trimW,
     trimH: artboard.trimH,
     bleedW: artboard.trimW + (artboard.bleedMm ?? LONDON_BOOTH_BLEED_MM) * 2,
@@ -1472,11 +1472,20 @@ export function londonBoothPanelMeta(
 export function londonBoothArtworkUrl(panelId: string): string | null {
   const meta = LONDON_BOOTH_PANEL_META[panelId];
   if (!meta) return null;
-  // Native booths carry no supplied wall: their ground is the live brand plate,
-  // so no proof is painted and nothing is embedded in the master.
-  if (isNativeBoothSlug(meta.booth.id)) return null;
   return meta.artboard.previewUrl ?? null;
 }
+
+/**
+ * The app-built template for a booth — only where the vendor has NOT supplied a
+ * wall. A supplied booth keeps its own artwork as the ground; the editable copy
+ * and lockup layer sits on top of it.
+ */
+export function londonBoothNativeTemplate(panelId: string) {
+  const meta = LONDON_BOOTH_PANEL_META[panelId];
+  if (!meta || meta.artboard.previewUrl) return null;
+  return nativeBoothTemplate(meta.booth.id);
+}
+
 
 /** The vendor's Illustrator master — the print deliverable for a booth panel. */
 export function londonBoothMasterUrl(panelId: string): string | null {
