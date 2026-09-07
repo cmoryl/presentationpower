@@ -638,7 +638,15 @@ registerSlideModule({
                   const tasks = arr(st.items)
                     .slice(0, MAX_TASKS)
                     .map((t) => obj(t));
+                  // Shrink the medallion copy per stage so long stage names
+                  // stay inside the disc instead of running over the ring.
+                  const fit = stageLabelFit(s(st.label), {
+                    medallion: m.medallion,
+                    numeral: numeralSize,
+                    stageName: stageNameSize,
+                  });
                   return (
+
                     <React.Fragment key={si}>
                       {si > 0 && (
                         <div
