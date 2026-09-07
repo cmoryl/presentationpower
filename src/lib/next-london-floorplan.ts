@@ -259,7 +259,7 @@ const PLANS: LondonFloorPlan[] = [
       },
       {
         id: "gf-core-b",
-        label: "Core B — Storey's Gate lifts & stairs",
+        label: "Core B — lifts & stairs",
         kind: "core",
         x: 1,
         y: 16,
@@ -270,7 +270,7 @@ const PLANS: LondonFloorPlan[] = [
       },
       {
         id: "gf-core-a",
-        label: "Core A — mews lifts & goods lift",
+        label: "Core A — mews lifts",
         kind: "core",
         x: 53,
         y: 16,
