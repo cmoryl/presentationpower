@@ -45,6 +45,22 @@ describe("London division signage", () => {
     expect(londonDivisionStops("transperfect", base)).toEqual(base);
   });
 
+  it("keeps every tinted stop clear of the accent hue the mark carries", () => {
+    const dist = (a: string, b: string) => {
+      const p = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+      const [ar, ag, ab] = p(a);
+      const [br, bg, bb] = p(b);
+      return Math.hypot(ar - br, ag - bg, ab - bb);
+    };
+    for (const panel of divisionPanels) {
+      const accent = londonDivisionAccent(londonPanelFamily(panel))!;
+      const stops = londonPanelStops(panel);
+      for (const stop of stops.slice(1)) {
+        expect(dist(stop, accent.hex), `${panel.name} stop ${stop}`).toBeGreaterThanOrEqual(140);
+      }
+    }
+  });
+
   it("carries the tinted ramp into panel masters", () => {
     const panel = divisionPanels[0]!;
     const stops = londonPanelStops(panel);
