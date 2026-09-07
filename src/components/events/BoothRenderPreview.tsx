@@ -6,9 +6,8 @@
 //   • The vendor proof is the full BLEED page (trim + 100 mm each edge), so it
 //     is scaled up by (trim + 2×bleed)/trim and offset by -bleed/trim, which
 //     lands the trim box of the artwork exactly on the trim face of the wall.
-//   • The monitor is drawn from `shell.screen`, which is the measured aperture
-//     as a fraction of trim, placed against the trim face — never against the
-//     bleed page — so it sits where the real cut-out sits.
+//   • The supplied partner artwork already contains the exact monitor aperture.
+//     It must not be covered by a second synthetic screen in the visualisation.
 //
 // A visualisation, never a survey photograph and never a dimensional reference:
 // the trim and bleed geometry on the panel card remains the authority.
@@ -135,28 +134,6 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
                 style={{
                   background:
                     "linear-gradient(115deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 42%, rgba(3,0,44,0.18) 100%)",
-                }}
-              />
-            </div>
-          ) : null}
-
-          {shell.screen ? (
-            <div
-              className="absolute bg-[#0A0A0C]"
-              style={{
-                left: `${shell.screen.x * 100}%`,
-                top: `${shell.screen.y * 100}%`,
-                width: `${shell.screen.w * 100}%`,
-                height: `${shell.screen.h * 100}%`,
-                boxShadow: "0 10px 24px rgba(3,0,44,0.45)",
-              }}
-            >
-              {/* Bezel, then the panel itself, at the measured aperture. */}
-              <div
-                className="absolute inset-[1.2%]"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #03002C 0%, #003FC7 65%, #0A5BF0 100%)",
                 }}
               />
             </div>
