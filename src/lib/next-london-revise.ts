@@ -649,6 +649,31 @@ export function buildLondonPanelSvg(
       })()
     : "";
 
+  // Subhead: the same outlined-path contract as the headline, one layer down.
+  const subRotate = brand.copyVertical
+    ? ` transform="rotate(90 ${brand.subCentreMm.toFixed(2)} ${brand.subBaselineMm.toFixed(2)})"`
+    : "";
+  const subLayer = brand.sub
+    ? (() => {
+        const run = outlineText(face, brand.sub, {
+          sizeMm: brand.subSizeMm,
+          trackingEm: brand.subTrackingEm,
+          anchor: "middle",
+          x: brand.subCentreMm,
+          y: brand.subBaselineMm,
+          vertical: brand.copyVertical,
+        });
+        return (
+          `<path data-layer="subhead" data-layer-order="2" d="${run.d}"` +
+          `${subRotate} data-direction="${brand.copyVertical ? "vertical" : "horizontal"}"` +
+          ` data-text="${escapeXml(brand.sub)}" data-font="${face.name}"` +
+          ` data-size-mm="${brand.subSizeMm.toFixed(2)}"` +
+          ` data-advance-mm="${run.advanceMm.toFixed(2)}"` +
+          ` fill="${copyPaint.paint}"${copyPaint.meta}/>`
+        );
+      })()
+    : "";
+
   // QR: real encoded modules as vector geometry on a white plate, so the code
   // stays crisp at any signage size and scans off a scenic ground.
   const qrLayer = brand.qr
