@@ -212,6 +212,15 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
           </div>
         </div>
       ) : null}
+
+      {view3d ? (
+        <BoothHub3DViewer
+          title={view3d.name}
+          room={view3d.room}
+          division={boothHubDivisionFor({ name: view3d.name, room: view3d.room })}
+          onClose={() => setView3d(null)}
+        />
+      ) : null}
     </section>
   );
 }
