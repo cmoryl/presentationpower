@@ -27,6 +27,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { LondonFloorMap, londonKindsPresent } from "@/components/events/LondonFloorMap";
 import { BoothHub3DViewer } from "@/components/events/BoothHub3DViewer";
+import { LondonRoomAccordion } from "@/components/events/LondonRoomAccordion";
 import { boothHubDivisionFor } from "@/lib/boothhub-3d";
 
 import { LondonMapDesignPanel } from "@/components/events/LondonMapDesignPanel";
@@ -657,21 +658,14 @@ function LondonMapsPage() {
                   <h3 className="mt-5 text-sm font-semibold text-[#03002C]">
                     Rooms and breakouts on this floor
                   </h3>
-                  <ul className="mt-2 max-h-[30rem] divide-y divide-black/5 overflow-y-auto rounded-xl border border-black/10 bg-white">
-                    {(planWithMine?.zones ?? [])
-                      .filter((z) => z.kind !== "circulation" && z.kind !== "core")
-                      .map((z) => (
-                        <li
-                          key={z.id}
-                          className="flex items-center justify-between gap-3 px-3 py-2 text-[13px] text-[#03002C]"
-                        >
-                          <span className="truncate font-medium">{z.label}</span>
-                          <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.1em] text-[#03002C]/55">
-                            {z.kind}
-                          </span>
-                        </li>
-                      ))}
-                  </ul>
+                  {planWithMine ? (
+                    <LondonRoomAccordion
+                      plan={planWithMine}
+                      panels={floorPanels}
+                      selectedId={selectedId}
+                      onSelectAsset={setSelectedId}
+                    />
+                  ) : null}
                 </>
               ) : (
                 <>
@@ -734,6 +728,18 @@ function LondonMapsPage() {
                       </li>
                     )}
                   </ul>
+
+                  <h3 className="mt-5 text-sm font-semibold text-[#03002C]">
+                    Rooms and breakouts on this floor
+                  </h3>
+                  {planWithMine ? (
+                    <LondonRoomAccordion
+                      plan={planWithMine}
+                      panels={floorPanels}
+                      selectedId={selectedId}
+                      onSelectAsset={setSelectedId}
+                    />
+                  ) : null}
                 </>
               )}
 
