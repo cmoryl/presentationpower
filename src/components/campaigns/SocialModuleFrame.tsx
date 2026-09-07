@@ -72,6 +72,14 @@ export type SocialModuleFrameProps = {
   hideLockup?: boolean;
   /** Module density — lets wide banner frames start at a condensed rung. */
   density?: "compact" | "standard" | "tall";
+  /**
+   * Approved look code (S01–S28, R01–R30, C-codes or a pack id). When set, the
+   * post paints that template's authored background artwork for the scene the
+   * module belongs to — the same ground the deck stage paints.
+   */
+  lookCode?: string | null;
+  /** Which of the look's four takes for the scene to paint. */
+  groundTake?: number;
 };
 
 function accentFor(brandId: string): string {
@@ -89,7 +97,10 @@ export function SocialModuleFrame({
   onFit,
   hideLockup = false,
   density,
+  lookCode = null,
+  groundTake = 0,
 }: SocialModuleFrameProps) {
+
   const accent = accentFor(brandId);
   const brand = BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0];
   const short = Math.min(format.width, format.height);
