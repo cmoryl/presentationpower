@@ -52,6 +52,7 @@ export function BoothTemplatePanel({
   const [selectedId, setSelectedId] = useState<string>(templates[0]?.id ?? "");
   const [status, setStatus] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const placements = useLondonLogoPlacements();
 
   const template = useMemo(
     () => templates.find((t) => t.id === selectedId) ?? templates[0] ?? null,
