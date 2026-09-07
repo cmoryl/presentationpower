@@ -238,9 +238,13 @@ export function BoothHub3DViewer({
           ) : null}
           <iframe
             key={embedUrl}
+            ref={frameRef}
             src={embedUrl}
             title={`${title} 3D viewer`}
-            onLoad={() => setLoaded(true)}
+            onLoad={() => {
+              setLoaded(true);
+              pushPlacement();
+            }}
             allow="fullscreen; xr-spatial-tracking"
             className="h-full w-full border-0"
           />
