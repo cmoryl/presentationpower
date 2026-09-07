@@ -459,10 +459,17 @@ export function LondonFloorMap({
             const active = m.panelId === selectedId;
             const ink = active ? "#C4306E" : m.corrected ? "#0F9D58" : KIND_INK(m.kind);
             return (
+              <div key={m.panelId} className="contents">
               <button
-                key={m.panelId}
                 type="button"
+                onDoubleClick={(ev) => {
+                  if (!onView3d) return;
+                  ev.stopPropagation();
+                  ev.preventDefault();
+                  onView3d(m.panelId);
+                }}
                 onPointerDown={(ev) => {
+
                   ev.stopPropagation();
                   onSelect(m.panelId);
                   if (!editable) return;
