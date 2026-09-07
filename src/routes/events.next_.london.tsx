@@ -253,7 +253,14 @@ function LondonSignagePage() {
   // The kit shows the panel set IN FORCE: the newest published revision, or the
   // issued venue pack when there is none (or when the viewer is not signed in).
   const [panels, setPanels] = useState<LondonPanel[]>(LONDON_PANELS);
-  const boothPanels = useMemo(() => panels.filter(isBoothPanel), [panels]);
+  // Booth masters live in the backend: applying them patches the booth specs
+  // and panel records in place, so `applied` is what re-renders the cards.
+  const boothTemplates = useBoothTemplates();
+  const boothPanels = useMemo(
+    () => panels.filter(isBoothPanel),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- templates mutate the panel records
+    [panels, boothTemplates.applied],
+  );
   const nonBoothPanels = useMemo(() => panels.filter((p) => !isBoothPanel(p)), [panels]);
   const floors = useMemo(() => londonPanelsByFloor(nonBoothPanels), [nonBoothPanels]);
   const [floorId, setFloorId] = useState<string>("all");
