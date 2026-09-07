@@ -180,3 +180,35 @@ export function stageMetrics(count: number, taskMax = 3) {
   };
 }
 
+
+/**
+ * Fit the stage name (and its numeral) inside the photo medallion.
+ *
+ * The medallion is a circle, so usable text width narrows away from the
+ * centre line. Long labels like "PROJECT ANALYSIS & PRE-FLIGHT" overran the
+ * ring at the fixed tier size; this shrinks the label until its longest word
+ * fits one line and the whole label fits the allowed number of lines.
+ */
+export function stageLabelFit(
+  label: string,
+  base: { medallion: number; numeral: number; stageName: number },
+) {
+  const text = String(label || "").trim();
+  if (!text) return { stageName: base.stageName, numeral: base.numeral, maxLines: 3 };
+  // Text column inside the disc: medallion minus the ring inset and padding.
+  const boxWidth = base.medallion * 0.78 * 0.76;
+  const words = text.split(/\s+/);
+  const longest = words.reduce((m, w) => Math.max(m, w.length), 0);
+  const totalChars = text.length;
+  // Uppercase bold Geist averages ~0.62em per glyph.
+  const perChar = 0.62;
+  const maxLines = totalChars > 26 ? 4 : 3;
+  const byWord = boxWidth / (longest * perChar);
+  // Every line loses width near the circle edge, so assume ~86% average fill.
+  const byBlock = (boxWidth * 0.86 * maxLines) / (totalChars * perChar);
+  const size = Math.max(12, Math.min(base.stageName, Math.floor(Math.min(byWord, byBlock))));
+  // Pull the numeral down with a heavily shrunk label so the pair stays balanced.
+  const ratio = size / base.stageName;
+  const numeral = Math.round(base.numeral * (ratio < 1 ? Math.max(0.6, 0.55 + ratio * 0.45) : 1));
+  return { stageName: size, numeral, maxLines };
+}
