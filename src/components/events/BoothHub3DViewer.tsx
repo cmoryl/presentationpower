@@ -6,15 +6,17 @@
 // a link out to the full BoothHUB page for anyone who wants the editor.
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ExternalLink, Loader2, X } from "lucide-react";
+import { ExternalLink, Loader2, PencilRuler, X } from "lucide-react";
 
 import {
   BOOTHHUB_DIVISION_LABEL,
   boothHub3dEmbedUrl,
   boothHub3dPageUrl,
+  boothHubBuilderUrl,
   type BoothHub3dPlacement,
   type BoothHubDivisionId,
 } from "@/lib/boothhub-3d";
+
 
 export interface BoothHub3DViewerProps {
   /** Asset name shown in the header. */
