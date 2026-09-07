@@ -678,6 +678,113 @@ export type Database = {
           },
         ]
       }
+      booth_template_versions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          note: string | null
+          revision: number
+          snapshot: Json
+          template_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          revision: number
+          snapshot: Json
+          template_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          revision?: number
+          snapshot?: Json
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booth_template_versions_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "booth_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booth_templates: {
+        Row: {
+          bleed_mm: number
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          master_content_type: string | null
+          master_path: string | null
+          overlay: Json
+          proof_path: string | null
+          revision: number
+          slug: string
+          sort_order: number
+          source_file: string | null
+          style: string
+          trim_h: number
+          trim_preset_id: string | null
+          trim_w: number
+          updated_at: string
+          vendor: string
+          venue: string
+        }
+        Insert: {
+          bleed_mm?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          master_content_type?: string | null
+          master_path?: string | null
+          overlay?: Json
+          proof_path?: string | null
+          revision?: number
+          slug: string
+          sort_order?: number
+          source_file?: string | null
+          style?: string
+          trim_h?: number
+          trim_preset_id?: string | null
+          trim_w?: number
+          updated_at?: string
+          vendor: string
+          venue?: string
+        }
+        Update: {
+          bleed_mm?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          master_content_type?: string | null
+          master_path?: string | null
+          overlay?: Json
+          proof_path?: string | null
+          revision?: number
+          slug?: string
+          sort_order?: number
+          source_file?: string | null
+          style?: string
+          trim_h?: number
+          trim_preset_id?: string | null
+          trim_w?: number
+          updated_at?: string
+          vendor?: string
+          venue?: string
+        }
+        Relationships: []
+      }
       brand_asset_chunks: {
         Row: {
           asset_id: string
