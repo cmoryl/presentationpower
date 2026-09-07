@@ -793,7 +793,7 @@ const PLANS: LondonFloorPlan[] = [
       },
       {
         id: "f5-exhibition",
-        label: "Fifth floor booths",
+        label: "Booths",
         kind: "exhibition",
         x: 34,
         y: 27,
