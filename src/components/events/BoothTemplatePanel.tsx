@@ -316,6 +316,105 @@ export function BoothTemplatePanel({
         </div>
       </div>
 
+      {place ? (
+        <div className="mt-5 rounded-xl border border-black/10 bg-white p-4">
+          <span className={LABEL}>Copy and logo layer</span>
+          <p className="mt-1 max-w-3xl text-[12px] leading-[1.5] text-[#03002C]/70">
+            Headline, subhead and lockup are held per booth and set from the trim box, so
+            re-issuing at another stand size re-lays them. Both lines export as outlined
+            Illustrator paths.
+          </p>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <div>
+              <label className={LABEL} htmlFor="booth-headline">
+                Headline
+              </label>
+              <input
+                id="booth-headline"
+                className={FIELD}
+                maxLength={LONDON_TEXT_MAX_CHARS}
+                disabled={!canEdit || saving}
+                value={place.text ?? ""}
+                onChange={(e) => setPlace({ text: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className={LABEL} htmlFor="booth-subhead">
+                Subhead
+              </label>
+              <input
+                id="booth-subhead"
+                className={FIELD}
+                maxLength={LONDON_TEXT_MAX_CHARS}
+                disabled={!canEdit || saving}
+                value={place.sub ?? ""}
+                onChange={(e) => setPlace({ sub: e.target.value })}
+              />
+            </div>
+          </div>
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            <div>
+              <label className={LABEL} htmlFor="booth-headline-scale">
+                Headline size
+              </label>
+              <input
+                id="booth-headline-scale"
+                className="mt-2 w-full"
+                type="range"
+                min={LONDON_TEXT_SCALE.min}
+                max={LONDON_TEXT_SCALE.max}
+                step={LONDON_TEXT_SCALE.step}
+                disabled={!canEdit || saving}
+                value={place.textScale}
+                onChange={(e) => setPlace({ textScale: Number(e.target.value) })}
+              />
+            </div>
+            <div>
+              <label className={LABEL} htmlFor="booth-subhead-scale">
+                Subhead size
+              </label>
+              <input
+                id="booth-subhead-scale"
+                className="mt-2 w-full"
+                type="range"
+                min={LONDON_TEXT_SCALE.min}
+                max={LONDON_TEXT_SCALE.max}
+                step={LONDON_TEXT_SCALE.step}
+                disabled={!canEdit || saving}
+                value={place.subScale}
+                onChange={(e) => setPlace({ subScale: Number(e.target.value) })}
+              />
+            </div>
+            <div>
+              <label className={LABEL} htmlFor="booth-subhead-dy">
+                Subhead drop
+              </label>
+              <input
+                id="booth-subhead-dy"
+                className="mt-2 w-full"
+                type="range"
+                min={-0.5}
+                max={0.5}
+                step={0.005}
+                disabled={!canEdit || saving}
+                value={place.subDy}
+                onChange={(e) => setPlace({ subDy: Number(e.target.value) })}
+              />
+            </div>
+          </div>
+          {canEdit ? (
+            <button
+              type="button"
+              className="mt-3 rounded-lg border border-[#003FC7]/30 px-3 py-2 text-[12px] font-medium text-[#003FC7] disabled:opacity-40"
+              disabled={saving}
+              onClick={saveCopyLayer}
+            >
+              Save copy and logo layer
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
       {status || saveError ? (
         <p
           role="status"
