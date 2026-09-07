@@ -629,6 +629,35 @@ export function KitWizard({
                 ))}
               </div>
             </div>
+
+            {/* Template background — posts can paint the same authored artwork a
+              deck built on that look paints, per module scene. */}
+            <div className="mt-3 rounded-2xl border border-black/10 bg-white/70 p-3">
+              <label
+                htmlFor="kit-ground-look"
+                className="mb-2 block text-[10px] font-semibold uppercase tracking-widest text-black/50"
+              >
+                Template background
+              </label>
+              <select
+                id="kit-ground-look"
+                value={groundLook}
+                onChange={(e) => setGroundLook(e.target.value)}
+                className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm"
+              >
+                <option value="">Division aura (default)</option>
+                {groundPacks.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-2 text-[11px] leading-relaxed text-black/55">
+                Uses the template's own background art for each module's scene —
+                covers, stats, quotes and logo walls each get their matching plate.
+              </p>
+            </div>
+
           </StepCard>
         )}
 
