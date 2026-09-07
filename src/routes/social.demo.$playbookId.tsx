@@ -398,11 +398,14 @@ function SocialDemoView() {
           dir={tx.rtl ? "rtl" : undefined}
         >
           {localizedAssets.map((a) => {
-            // Both modes carry photography now. Dark variants run the photo
-            // full bleed; light variants crop it into a designed panel sized to
-            // the frame's own aspect, with the copy owning the rest.
-            const imageUrl = photoForFormat(playbook.subBrand, a.format);
-            const panel = a.mode === "light";
+            // Each demo asset wears this campaign's own creative, cropped for
+            // the frame's aspect. Dark variants run it full bleed; light
+            // variants crop it into a designed panel, and the fill plan sets how
+            // much of the frame the panel owns plus how hard the copy scales, so
+            // no size renders half-empty.
+            const imageUrl = campaignImageForFormat(playbook.id, playbook.subBrand, a.format);
+            const fit = demoFitPlan(a.format, a.mode);
+            const panel = fit.imageLayout === "panel";
             const editKey = socialEditKey(`social-demo:${playbook.id}:${styleId}`, a.id);
             return (
               <AssetPreviewCard
@@ -417,8 +420,10 @@ function SocialDemoView() {
                   mode: a.mode,
                   copy: a.copy,
                   imageUrl,
-                  imageLayout: panel ? "panel" : "bleed",
-                  imageScrimPct: 62,
+                  imageLayout: fit.imageLayout,
+                  imageScrimPct: fit.imageScrimPct,
+                  panelSizePct: fit.panelSizePct,
+                  typeScale: fit.typeScale,
                   styleId,
                 }}
                 badge={imageUrl ? (panel ? "Panel" : "Photo") : undefined}
@@ -431,6 +436,24 @@ function SocialDemoView() {
           })}
         </div>
       </section>
+
+      {/* Modularity — the same campaign copy re-laid through presentation
+          modules at three social shapes, light and dark. */}
+      <section>
+        <SectionHead
+          eyebrow="Modular"
+          title="Same story, different modules"
+          desc="Proof the build is modular: this campaign's copy dropped into presentation modules and re-laid for wide, square and story frames — each module re-composes itself for the space it gets."
+        />
+        <div className="mt-6">
+          <SocialModularityStrip
+            copy={playbook.copy}
+            brandId={playbook.subBrand}
+            lookCode={look.styleId ?? null}
+          />
+        </div>
+      </section>
+
 
       {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
       <section>
