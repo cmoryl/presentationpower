@@ -19,6 +19,7 @@ import {
   londonFloorPlan,
   type LondonAssetKind,
   type LondonMarker,
+  type LondonFloorPlan,
   type LondonMarkerOverrides,
   type LondonZoneKind,
 } from "@/lib/next-london-floorplan";
@@ -72,6 +73,12 @@ export type LondonFloorMapProps = {
   onAreaChange?: (area: LondonCustomArea) => void;
   selectedAreaId?: string | null;
   onSelectArea?: (id: string | null) => void;
+  /**
+   * Draw this plan instead of the London plan for `floor` — used by another
+   * venue in the same series, which reuses this whole editor with its own
+   * rooms. Omit for every London map.
+   */
+  plan?: LondonFloorPlan | null;
 };
 
 export function LondonFloorMap({
@@ -92,10 +99,11 @@ export function LondonFloorMap({
   onAreaChange,
   selectedAreaId = null,
   onSelectArea,
+  plan: planOverride,
 }: LondonFloorMapProps) {
   const palette = mapPalette(design);
   const KIND_INK = (k: LondonAssetKind) => kindInkFor(k, design);
-  const base = londonFloorPlan(floor);
+  const base = planOverride ?? londonFloorPlan(floor);
   // The sectioned areas draw exactly as the export does: merged on top of the
   // venue rooms, so the screen is a true preview of the sheet.
   const plan = useMemo(() => (base ? planWithAreas(base, areas) : null), [base, areas]);

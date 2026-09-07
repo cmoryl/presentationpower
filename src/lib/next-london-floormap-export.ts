@@ -8,6 +8,7 @@ import { loadSvgImage } from "@/lib/london-panel-raster";
 import {
   LONDON_FLOOR_PLANS,
   londonMapCsv,
+  type LondonFloorPlan,
   type LondonAssetKind,
   type LondonMarkerOverrides,
 } from "@/lib/next-london-floorplan";
@@ -36,7 +37,27 @@ export type MapExportOptions = {
   design?: MapDesign;
   /** Areas the team sectioned off themselves. */
   areas?: readonly LondonCustomArea[];
+  /**
+   * Draw these plans instead of the London set — another venue in the series
+   * reusing the same sheets with its own rooms. Omit for every London export.
+   */
+  plans?: readonly LondonFloorPlan[];
+  /** Filename stem, e.g. "next-london". Defaults to the London kit. */
+  slug?: string;
 };
+
+/** Plans this export draws: the venue's own set, or London's. */
+function plansOf(opts: MapExportOptions): readonly LondonFloorPlan[] {
+  return opts.plans ?? LONDON_FLOOR_PLANS;
+}
+
+function planOf(opts: MapExportOptions, floor: LondonFloorId): LondonFloorPlan | null {
+  return plansOf(opts).find((p) => p.floor === floor) ?? null;
+}
+
+function stemOf(opts: MapExportOptions): string {
+  return opts.slug ?? "next-london";
+}
 
 /** Raster multiplier the design asks for, clamped to what a canvas can hold. */
 function scaleOf(opts: MapExportOptions): number {
@@ -79,25 +100,27 @@ async function pngDataUrl(svg: string, w: number, h: number, scale = 2): Promise
 }
 
 export function downloadFloorMapSvg(floor: LondonFloorId, opts: MapExportOptions) {
-  const svg = floorMapSvg(floor, opts);
+  const sheet = { ...opts, plan: planOf(opts, floor) };
+  const svg = floorMapSvg(floor, sheet);
   const kind = opts.roomsOnly ? "rooms" : "map";
   save(
     new Blob([svg], { type: "image/svg+xml" }),
-    `next-london-${kind}-${floor.toLowerCase()}.svg`,
+    `${stemOf(opts)}-${kind}-${floor.toLowerCase()}.svg`,
   );
 }
 
 export async function downloadFloorMapPng(floor: LondonFloorId, opts: MapExportOptions) {
-  const plan = LONDON_FLOOR_PLANS.find((p) => p.floor === floor);
+  const plan = planOf(opts, floor);
   if (!plan) return;
-  const { w, h } = floorMapSheetSize(floor, opts);
-  const blob = await mapPngBlob(floorMapSvg(floor, opts), w, h, scaleOf(opts));
-  save(blob, `next-london-${opts.roomsOnly ? "rooms" : "map"}-${floor.toLowerCase()}.png`);
+  const sheet = { ...opts, plan };
+  const { w, h } = floorMapSheetSize(floor, sheet);
+  const blob = await mapPngBlob(floorMapSvg(floor, sheet), w, h, scaleOf(opts));
+  save(blob, `${stemOf(opts)}-${opts.roomsOnly ? "rooms" : "map"}-${floor.toLowerCase()}.png`);
 }
 
 /** Attendee floor guide: one page per floor, rooms and breakouts only. */
 export async function downloadAttendeeMapPdf(opts: MapExportOptions) {
-  await buildFloorPdf({ ...opts, roomsOnly: true, labels: false }, "next-london-floor-guide.pdf");
+  await buildFloorPdf({ ...opts, roomsOnly: true, labels: false }, `${stemOf(opts)}-floor-guide.pdf`);
 }
 
 export function downloadAssetMapSvg(panel: LondonPanel, opts: MapExportOptions) {
@@ -116,8 +139,9 @@ export async function downloadAssetMapPng(panel: LondonPanel, opts: MapExportOpt
 /** Shared page-per-floor PDF builder for both the install set and the guide. */
 async function buildFloorPdf(opts: MapExportOptions, filename: string) {
   const design = opts.design ?? DEFAULT_MAP_DESIGN;
-  const first0 = LONDON_FLOOR_PLANS[0]!;
-  const fallback = floorMapSheetSize(first0.floor, opts);
+  const first0 = plansOf(opts)[0]!;
+  const fallback = floorMapSheetSize(first0.floor, { ...opts, plan: first0 });
+
   // "Sheet" paper sizes the page to the artwork itself, so nothing is letterboxed.
   const format = pdfFormatFor(design) ?? [
     Math.round(fallback.w * 0.75),
@@ -134,7 +158,7 @@ async function buildFloorPdf(opts: MapExportOptions, filename: string) {
   let first = true;
 
   const rooms = opts.roomsOnly === true;
-  const sheets = LONDON_FLOOR_PLANS.filter(
+  const sheets = plansOf(opts).filter(
     (plan) => rooms || opts.panels.some((p) => p.floor === plan.floor),
   );
 
@@ -144,6 +168,7 @@ async function buildFloorPdf(opts: MapExportOptions, filename: string) {
     first = false;
     const sheetOpts = {
       ...opts,
+      plan,
       labels: rooms ? false : true,
       footerNote: `${plan.label} · sheet ${i + 1} of ${sheets.length}`,
     };
@@ -166,7 +191,7 @@ async function buildFloorPdf(opts: MapExportOptions, filename: string) {
 
 /** One PDF page per floor — the install plan set the crew works from. */
 export async function downloadFloorMapPdf(opts: MapExportOptions) {
-  await buildFloorPdf({ ...opts, roomsOnly: false }, "next-london-install-maps.pdf");
+  await buildFloorPdf({ ...opts, roomsOnly: false }, `${stemOf(opts)}-install-maps.pdf`);
 }
 
 /** A zip with one location map per asset, plus the install schedule. */
@@ -223,6 +248,6 @@ export async function downloadAssetMapPack(opts: MapExportOptions) {
 export function downloadMapCsv(opts: MapExportOptions) {
   save(
     new Blob([londonMapCsv(opts.panels, opts.overrides)], { type: "text/csv" }),
-    "next-london-install-positions.csv",
+    `${stemOf(opts)}-install-positions.csv`,
   );
 }
