@@ -21,12 +21,12 @@ import {
 import {
   isBoothPanel,
   londonBoothArtworkUrl,
-  londonBoothPanelMeta,
+  londonBoothNativeTemplate,
   londonVenueItemMeta,
   type LondonPanel,
 } from "@/lib/next-london-signage";
 import { londonSafeMm } from "@/lib/next-london-print-geometry";
-import { nativeBoothTemplate } from "@/lib/next-london-booth-native";
+
 import { buildPillarQr } from "@/lib/pillar-qr";
 import { PILLAR_CAPTION_FONTS } from "@/lib/next-pillar-masters";
 import {
@@ -250,9 +250,10 @@ export function londonBrandingPlan(
 
   // Copy: the note-derived headline unless the location team typed their own.
   // An empty string is a deliberate "no headline on this panel".
-  // Native booth templates ship their own default copy for every slot; a stored
-  // override always wins, and an empty string is a deliberate "leave it off".
-  const native = nativeBoothTemplate(londonBoothPanelMeta(panel)?.booth.id);
+  // A booth with no supplied wall is app-built and ships default copy for every
+  // slot. A booth with the vendor's own artwork starts with NO baked-on copy —
+  // its wall already carries it — but every slot stays editable on top.
+  const native = londonBoothNativeTemplate(panel.id);
   const authored =
     nudge.text === null ? (native ? native.headline || null : pickCopy(panel)) : nudge.text.trim() || null;
   const copy = authored;
