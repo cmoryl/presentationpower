@@ -503,7 +503,7 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
     })
     .join("");
 
-  return `${ground}<g>${grid.join("")}</g>${zones}${entries}`;
+  return `${ground}<g>${grid.join("")}</g>${zones.body}${zones.text}${entries}`;
 }
 
 /** Measured scale bar: four 2.5 m ticks with end figures, cartographic style. */
