@@ -10,9 +10,11 @@ import { ExternalLink, Loader2, PencilRuler, X } from "lucide-react";
 
 import {
   BOOTHHUB_DIVISION_LABEL,
+  BOOTHHUB_ORIGIN,
   boothHub3dEmbedUrl,
   boothHub3dPageUrl,
   boothHubBuilderUrl,
+  boothHubPlacementMessage,
   boothHubShareSetupUrl,
   parseBoothHubShareToken,
   type BoothHub3dPlacement,
