@@ -273,11 +273,14 @@ export function londonBrandingPlan(
   const centreX = marginX + panel.trimW / 2 - logoW / 2;
 
   // Stacked lockups sit on the upper third; horizontal lockups ride the lower
-  // band so the middle of a wide panel stays open for copy.
+  // band so the middle of a wide panel stays open for copy. On a screen wall the
+  // lockup is centred in the band above the aperture instead.
   const baseY =
-    orientation === "side"
-      ? marginY + panel.trimH - safe - logoH
-      : marginY + safe + liveH * (copy ? 0.06 : 0.28);
+    screenTop !== null
+      ? Math.max(marginY + safe, marginY + safe + (screenTop - (marginY + safe) - logoH) / 2)
+      : orientation === "side"
+        ? marginY + panel.trimH - safe - logoH
+        : marginY + safe + liveH * (copy ? 0.06 : 0.28);
 
   // Designer nudge, in trim fractions, clamped so the lockup stays on the sheet.
   const logoX = clamp(centreX + nudge.dx * panel.trimW, 0, panel.bleedW - logoW);
