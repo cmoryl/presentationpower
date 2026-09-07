@@ -14,7 +14,9 @@ import {
   bespokeFootprintLabel,
   bespokeSizeLabel,
   bespokeArtworkCsv,
+  bespokeUnitAsArea,
   bespokeUnitsOnFloor,
+
   type BespokeUnit,
 } from "@/lib/next-london-bespoke";
 import { BESPOKE_RENDER_DISCLAIMER, bespokeRender } from "@/lib/next-london-bespoke-renders";
@@ -218,16 +220,23 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
           title={view3d.name}
           room={view3d.room}
           division={boothHubDivisionFor({ name: view3d.name, room: view3d.room })}
-          placement={{
-            floor: view3d.floor,
-            x: view3d.anchor.x,
-            y: view3d.anchor.y,
-            widthMm: view3d.widthMm,
-            heightMm: view3d.heightMm,
-          }}
+          // BoothHUB expects the spot in plan metres, the same units the signage
+          // pins send. A unit's `anchor` is a fraction of its venue zone, so the
+          // plan area is what carries the real position.
+          placement={(() => {
+            const area = bespokeUnitAsArea(view3d);
+            return {
+              floor: view3d.floor,
+              x: area ? area.x + area.w / 2 : null,
+              y: area ? area.y + area.h / 2 : null,
+              widthMm: view3d.widthMm,
+              heightMm: view3d.heightMm,
+            };
+          })()}
           onClose={() => setView3d(null)}
         />
       ) : null}
+
     </section>
   );
 }
