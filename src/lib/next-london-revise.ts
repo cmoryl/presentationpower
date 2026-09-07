@@ -761,6 +761,7 @@ export function buildLondonPanelSvg(
         })
       : "",
     wall ? "" : copyLayer,
+    wall ? "" : subLayer,
     wall ? "" : qrLayer,
     // Booths that ship the vendor's own branded artwork start without a second,
     // generated lockup — the designer can switch it on per booth.
