@@ -282,6 +282,10 @@ function LondonMapsPage() {
       design={design}
       areas={floorAreas}
       onAreaChange={changeArea}
+      onAreaRemove={(id) => {
+        persistAreas(areas.filter((a) => a.id !== id));
+        if (selectedAreaId === id) setSelectedAreaId(null);
+      }}
       selectedAreaId={selectedAreaId}
       onSelectArea={setSelectedAreaId}
     />
