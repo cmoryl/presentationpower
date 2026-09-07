@@ -164,10 +164,14 @@ export function boothHub3dEmbedUrl(opts: BoothHub3dLinkOptions): string {
 
 /** The same build opened as a full BoothHUB page in a new tab. */
 export function boothHub3dPageUrl(opts: BoothHub3dLinkOptions): string {
+  if (opts.shareToken) {
+    return `${BOOTHHUB_ORIGIN}/booth-review/${encodeURIComponent(opts.shareToken)}`;
+  }
   const q = baseParams(opts);
   placementParams(q, opts.placement);
   return `${BOOTHHUB_ORIGIN}/booths/${opts.division}/visit?${q.toString()}`;
 }
+
 
 /** Where a signed-in BoothHUB user designs this division's stand build. */
 export function boothHubBuilderUrl(division: BoothHubDivisionId): string {
