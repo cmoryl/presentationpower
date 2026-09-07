@@ -66,7 +66,42 @@ export type BoothHub3dLinkOptions = {
   room?: string | null;
   /** Load BoothHUB's photoreal figures for scale. Off by default (heavier). */
   characters?: boolean;
+  /** Where the asset stands, so the 3D build follows an edit on the plan. */
+  placement?: BoothHub3dPlacement | null;
 };
+
+/**
+ * The live state of one asset on a floor sheet: floor, position in plan metres,
+ * which way it faces and its printed size. Passed to BoothHUB so the 3D build
+ * matches the plan, and used as the viewer's cache key — every field that can
+ * be edited on the plan is in here, so any edit re-loads the walkthrough.
+ */
+export type BoothHub3dPlacement = {
+  floor?: string | null;
+  /** Plan position in metres, origin top-left. */
+  x?: number | null;
+  y?: number | null;
+  /** Which wall/direction the face points at. */
+  face?: string | null;
+  /** Trim size in mm. */
+  widthMm?: number | null;
+  heightMm?: number | null;
+};
+
+function round2(v: number): number {
+  return Math.round(v * 100) / 100;
+}
+
+/** Placement params, in a stable order so the same state yields the same URL. */
+function placementParams(q: URLSearchParams, p?: BoothHub3dPlacement | null): void {
+  if (!p) return;
+  if (p.floor) q.set("floor", p.floor);
+  if (Number.isFinite(p.x as number)) q.set("x", String(round2(p.x as number)));
+  if (Number.isFinite(p.y as number)) q.set("y", String(round2(p.y as number)));
+  if (p.face) q.set("face", p.face);
+  if (Number.isFinite(p.widthMm as number)) q.set("w", String(Math.round(p.widthMm as number)));
+  if (Number.isFinite(p.heightMm as number)) q.set("h", String(Math.round(p.heightMm as number)));
+}
 
 /** The chromeless, sign-in-free 3D viewer URL for an iframe. */
 export function boothHub3dEmbedUrl(opts: BoothHub3dLinkOptions): string {
@@ -79,6 +114,7 @@ export function boothHub3dEmbedUrl(opts: BoothHub3dLinkOptions): string {
   if (opts.characters) q.set("characters", "1");
   if (opts.label) q.set("label", opts.label);
   if (opts.room) q.set("room", opts.room);
+  placementParams(q, opts.placement);
   return `${BOOTHHUB_ORIGIN}/booths/${opts.division}/visit?${q.toString()}`;
 }
 
@@ -86,8 +122,10 @@ export function boothHub3dEmbedUrl(opts: BoothHub3dLinkOptions): string {
 export function boothHub3dPageUrl(opts: BoothHub3dLinkOptions): string {
   const q = new URLSearchParams({ embed: "1", public: "1", presenter: "1" });
   if (opts.characters) q.set("characters", "1");
+  placementParams(q, opts.placement);
   return `${BOOTHHUB_ORIGIN}/booths/${opts.division}/visit?${q.toString()}`;
 }
+
 
 export const BOOTHHUB_DIVISION_LABEL: Record<BoothHubDivisionId, string> = {
   corporate: "TransPerfect corporate",
