@@ -684,11 +684,11 @@ function LondonMapsPage() {
                       listed.map((p) => {
                         const active = p.id === selectedId;
                         return (
-                          <li key={p.id}>
+                          <li key={p.id} className="flex items-stretch">
                             <button
                               type="button"
                               onClick={() => setSelectedId(active ? null : p.id)}
-                              className={`flex w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors ${
+                              className={`flex min-w-0 flex-1 items-center justify-between gap-3 px-3 py-2 text-left transition-colors ${
                                 active ? "bg-[#E0E8F5]" : "hover:bg-[#F7F9FC]"
                               }`}
                             >
@@ -705,8 +705,20 @@ function LondonMapsPage() {
                                 {p.trimW}×{p.trimH}
                               </span>
                             </button>
+                            <button
+                              type="button"
+                              onClick={() => setViewer3d(p)}
+                              title={`View ${p.name} in 3D`}
+                              aria-label={`View ${p.name} in 3D`}
+                              className={`inline-flex shrink-0 items-center gap-1 border-l border-black/5 px-3 text-[11px] font-semibold text-[#003FC7] transition-colors hover:bg-[#E0E8F5] ${
+                                active ? "bg-[#E0E8F5]" : ""
+                              }`}
+                            >
+                              <Boxes className="h-3.5 w-3.5" /> 3D
+                            </button>
                           </li>
                         );
+
                       })
                     ) : (
                       <li className="px-3 py-4 text-[12.5px] text-[#03002C]/60">
