@@ -659,14 +659,27 @@ function MessageBubble({
             }
             if (name === EXPORT_DECK_TOOL_NAME) {
               const download = deckDownloadFromToolOutput(p.output);
-              if (!download)
+              if (!download) {
+                // The export refused (e.g. no exact capture of the slides yet):
+                // say so instead of spinning on "Building…" forever.
+                const failText = toolErrorText(p.output);
+                const settled = p.state === "output-error" || p.state === "output-available";
+                if (failText || settled)
+                  return (
+                    <p key={i} className="text-xs text-amber-700 dark:text-amber-400">
+                      {failText ||
+                        "The PowerPoint could not be built. Open the deck once in the app so its slides are recorded, then ask again."}
+                    </p>
+                  );
                 return (
                   <p key={i} className="text-xs text-foreground/50">
                     Building the PowerPoint file…
                   </p>
                 );
+              }
               return <AgentDeckDownload key={i} download={download} />;
             }
+
             if (name === DATA_VISUAL_PREVIEW_TOOL_NAME) {
               const preview = visualPreviewFromToolOutput(p.output);
               if (!preview)
