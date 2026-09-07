@@ -13,9 +13,15 @@ import {
   boothHub3dEmbedUrl,
   boothHub3dPageUrl,
   boothHubBuilderUrl,
+  boothHubShareSetupUrl,
+  parseBoothHubShareToken,
   type BoothHub3dPlacement,
   type BoothHubDivisionId,
 } from "@/lib/boothhub-3d";
+
+/** Where a division's pasted share link is remembered between sessions. */
+const shareKey = (division: string) => `boothhub:share:${division}`;
+
 
 
 export interface BoothHub3DViewerProps {
