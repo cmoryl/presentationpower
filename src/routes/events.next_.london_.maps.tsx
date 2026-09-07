@@ -26,6 +26,9 @@ import {
 
 import { AppShell } from "@/components/AppShell";
 import { LondonFloorMap, londonKindsPresent } from "@/components/events/LondonFloorMap";
+import { BoothHub3DViewer } from "@/components/events/BoothHub3DViewer";
+import { boothHubDivisionFor } from "@/lib/boothhub-3d";
+
 import { LondonMapDesignPanel } from "@/components/events/LondonMapDesignPanel";
 import { LondonMapAreasPanel } from "@/components/events/LondonMapAreasPanel";
 import { useSessionUser } from "@/hooks/use-session-user";
@@ -130,6 +133,9 @@ function LondonMapsPage() {
   const [expanded, setExpanded] = useState(false);
   /** Draw the Bespoke scenic build units on the plan alongside the signage. */
   const [showBuild, setShowBuild] = useState(true);
+  /** Asset currently open in the BoothHUB 3D viewer. */
+  const [viewer3d, setViewer3d] = useState<LondonPanel | null>(null);
+
 
   // Corrections live per browser: the location team marks up positions on site
   // and the same browser keeps producing corrected maps.
@@ -726,6 +732,13 @@ function LondonMapsPage() {
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
                       type="button"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+                      onClick={() => setViewer3d(selected)}
+                    >
+                      <Boxes className="h-4 w-4" /> View in 3D
+                    </button>
+                    <button
+                      type="button"
                       className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
                       onClick={() => downloadAssetMapSvg(selected, exportOpts)}
                     >
@@ -748,6 +761,7 @@ function LondonMapsPage() {
                       <ImageIcon className="h-4 w-4" /> Location card (PNG)
                     </button>
                   </div>
+
                 </div>
               ) : (
                 <p className="mt-4 rounded-xl border border-black/10 bg-white p-4 text-[12.5px] leading-relaxed text-[#03002C]/70">
@@ -799,6 +813,16 @@ function LondonMapsPage() {
           </div>
         </div>
       ) : null}
+
+      {viewer3d ? (
+        <BoothHub3DViewer
+          title={viewer3d.name}
+          room={viewer3d.room}
+          division={boothHubDivisionFor(viewer3d)}
+          onClose={() => setViewer3d(null)}
+        />
+      ) : null}
+
     </AppShell>
   );
 }
