@@ -416,8 +416,7 @@ export function SocialModuleFrame({
         data-social-panel-fill={Math.round(rawFit.fillPct * 100)}
         data-social-settled={settled.current.size}
         data-social-bleed={bleedPlan ? bleedPlan.kind : undefined}
-
-
+        data-social-ground={plate ? `${plate.code}:${plate.scene}` : undefined}
       >
 
         <div
@@ -432,19 +431,23 @@ export function SocialModuleFrame({
             overflow: "hidden",
           }}
         >
-          {/* Division aura ground — keeps social frames on-brand without fighting
-            the module's own surfaces. */}
+          {/* Ground. With a look selected the post paints that template's own
+            background artwork for this module's scene, so a kit matches the deck
+            built on the same look. Otherwise a division aura keeps the frame
+            on-brand without fighting the module's own surfaces. */}
           <span
             aria-hidden
             style={{
               position: "absolute",
               inset: 0,
-              background:
-                mode === "dark"
+              background: plate
+                ? plate.background
+                : mode === "dark"
                   ? `radial-gradient(120% 90% at 12% 0%, ${accent}55 0%, transparent 62%), radial-gradient(90% 70% at 100% 100%, ${accent}33 0%, transparent 60%)`
                   : `radial-gradient(120% 90% at 10% 0%, ${accent}1f 0%, transparent 60%), radial-gradient(90% 70% at 100% 100%, ${accent}14 0%, transparent 58%)`,
             }}
           />
+
 
           {/* Live module: full-bleed composition for the photographic / hardware
             modules, the tall shell for restacked thin strips, otherwise scaled
