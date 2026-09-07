@@ -70,7 +70,13 @@ export type BoothHub3dLinkOptions = {
   placement?: BoothHub3dPlacement | null;
   /** Name of the saved BoothHUB build to show. Omitted = their default plan. */
   variant?: string | null;
+  /**
+   * A BoothHUB share token. When present the viewer loads the share link, which
+   * needs no BoothHUB sign-in and no public-division switch.
+   */
+  shareToken?: string | null;
 };
+
 
 
 /**
