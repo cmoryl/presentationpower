@@ -1,4 +1,17 @@
+// Supplied-wall coverage. Every bundled booth now ships as a NATIVE template
+// (brand plate + editable copy), but the supplied-artwork path stays live for
+// any booth whose master is replaced through the booth template editor — so
+// this suite runs with the native registry emptied, which is exactly the state
+// a booth is in once a vendor wall is uploaded over it.
 import { describe, expect, it, vi } from "vitest";
+
+vi.mock("@/lib/next-london-booth-native", () => ({
+  NATIVE_BOOTH_TEMPLATES: [],
+  isNativeBoothSlug: () => false,
+  nativeBoothTemplate: () => null,
+  nativeBoothPlateStyle: () => null,
+}));
+
 import { LONDON_PANELS, isBoothPanel, londonBoothArtworkUrl } from "@/lib/next-london-signage";
 import {
   buildLondonPanelAi,
@@ -9,6 +22,7 @@ import {
 } from "@/lib/next-london-revise";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
 import { DEFAULT_LOGO_PLACEMENT } from "@/lib/next-london-logo-placement";
+
 
 /** Minimal 8×4 baseline JPEG header the PDF writer can embed verbatim. */
 function fakeJpeg(w: number, h: number): Uint8Array {
