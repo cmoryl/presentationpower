@@ -20,6 +20,10 @@ import {
   type BoothRectMm,
   type LondonBoothShell,
 } from "@/lib/next-london-booth-shells";
+import {
+  nativeBespokeFaces,
+  type NativeBespokeTemplate,
+} from "@/lib/next-london-bespoke-native";
 import { LONDON_VENUE_ITEMS, type LondonVenueItemSpec } from "@/lib/next-london-venue-items";
 
 export type LondonFloorId = "EXT" | "GF" | "2F" | "3F" | "4F" | "5F" | "6F";
@@ -1529,3 +1533,98 @@ export function londonBoothScreenRect(
 }
 
 LONDON_PANELS.push(...LONDON_BOOTH_PANELS);
+
+// ---------------------------------------------------------------------------
+// BESPOKE SCENIC FACES — fourth issue (app-built scenic artwork)
+//
+// The Bespoke GA pack publishes the size of every printed face on the scenic
+// units but supplies no artwork for them. Each face with a published size is
+// now a NATIVE template owned by the app: a live gradient plate plus editable
+// headline, subhead, body and logo slots, exported as live Illustrator vector.
+// One panel record per face, so the faces get the same schedule row, thumbnail,
+// print preview, live editor, revision and download flow as everything else.
+// Faces the GA leaves unpublished get no record — we never invent a print size.
+// ---------------------------------------------------------------------------
+
+export type LondonBespokePanelMeta = {
+  panelId: string;
+  face: NativeBespokeTemplate;
+};
+
+/** Bleed: heavy per-edge bleed on large wrapped faces, light on small ones. */
+function bespokeBleedEdge(wMm: number, hMm: number): number {
+  return Math.min(wMm, hMm) >= 1000 ? 25 : 10;
+}
+
+function bespokePanel(face: NativeBespokeTemplate, index: number): LondonPanel {
+  const bleedEdge = bespokeBleedEdge(face.wMm, face.hMm);
+  const seed: LondonPanel = {
+    id: `ldn-s${String(index + 1).padStart(2, "0")}`,
+    floor: face.floor,
+    room: face.room,
+    proof: "Native template (app-built) — Bespoke GA face size",
+    page: 1,
+    name: `${face.unitName} — ${face.panelLabel}`,
+    ground: "Brand plate (native template)",
+    style: LONDON_STYLES[face.plateStyle] ? face.plateStyle : "01-beam-violet-aqua",
+    trimW: face.wMm,
+    trimH: face.hMm,
+    bleedW: face.wMm + bleedEdge * 2,
+    bleedH: face.hMm + bleedEdge * 2,
+    bleedEdge,
+    rasterPx: "0x0",
+    rasterPpi: 0,
+    bandMm: 0,
+    rasterMb: 0,
+  };
+  const ppi = recommendedPpi(seed);
+  const size = rasterSizeFor(seed, ppi);
+  return {
+    ...seed,
+    rasterPpi: ppi,
+    rasterPx: `${size.w}x${size.h}`,
+    rasterMb: Math.round(Math.max(0.1, (size.w * size.h * 0.28) / (1024 * 1024)) * 10) / 10,
+    bandMm: Math.round((25.4 / ppi) * 3 * 100) / 100,
+  };
+}
+
+/** Panel records for every app-built scenic face, in GA order. */
+export const LONDON_BESPOKE_PANELS: LondonPanel[] = nativeBespokeFaces().map(bespokePanel);
+
+/** Scenic face metadata, keyed by panel id. */
+export const LONDON_BESPOKE_PANEL_META: Record<string, LondonBespokePanelMeta> =
+  Object.fromEntries(
+    LONDON_BESPOKE_PANELS.map((panel, i) => [
+      panel.id,
+      { panelId: panel.id, face: nativeBespokeFaces()[i]! },
+    ]),
+  );
+
+/** True for an app-built Bespoke scenic face panel. */
+export function isBespokePanel(panel: LondonPanel | { id: string }): boolean {
+  return panel.id.startsWith("ldn-s");
+}
+
+export function londonBespokePanelMeta(
+  panel: LondonPanel | { id: string },
+): LondonBespokePanelMeta | null {
+  return LONDON_BESPOKE_PANEL_META[panel.id] ?? null;
+}
+
+/** The app-built template behind a scenic face panel, or null. */
+export function londonBespokeNativeTemplate(panelId: string): NativeBespokeTemplate | null {
+  return LONDON_BESPOKE_PANEL_META[panelId]?.face ?? null;
+}
+
+/** The panel record for one face of a scenic unit, when we build that face. */
+export function londonBespokeFacePanel(
+  unitId: string,
+  panelLabel: string,
+): LondonPanel | null {
+  const entry = Object.values(LONDON_BESPOKE_PANEL_META).find(
+    (m) => m.face.unitId === unitId && m.face.panelLabel === panelLabel,
+  );
+  return entry ? (LONDON_PANELS.find((p) => p.id === entry.panelId) ?? null) : null;
+}
+
+LONDON_PANELS.push(...LONDON_BESPOKE_PANELS);
