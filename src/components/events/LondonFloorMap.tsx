@@ -62,6 +62,12 @@ export type LondonFloorMapProps = {
   areasEditable?: boolean;
   /** Remove one of the team's own areas straight from the plan. */
   onAreaRemove?: (id: string) => void;
+  /**
+   * Open the BoothHUB 3D walkthrough for a pinned asset. When given, every pin
+   * opens it on double-click and the selected pin carries a small 3D chip.
+   */
+  onView3d?: (panelId: string) => void;
+
 
   /** Attendee view: rooms and breakouts only, no signage pins. */
   roomsOnly?: boolean;
