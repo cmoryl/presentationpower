@@ -587,28 +587,39 @@ export function LondonFloorMap({
           : null}
       </div>
 
-      {/* Legend — same pin vocabulary as the printed directory plans. */}
+      {/* Legend — same pin vocabulary as the printed directory plans. The
+          attendee guide has no pins, so it gets a plain wayfinding note. */}
       <ul className="mt-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-1.5 rounded-xl border border-[#C9D5EA] bg-[#F5F8FD] px-3 py-2">
-        {kindsPresent.map((k) => (
-          <li key={k} className="flex items-center gap-1.5 text-[11px] text-[#03002C]/75">
-            <span className="relative block h-4 w-3">
-              <span
-                className="absolute left-0 top-0 block h-3 w-3 rounded-full border border-white"
-                style={{ background: KIND_INK(k) }}
-              />
-              <span
-                aria-hidden="true"
-                className="absolute left-1/2 top-[8px] block h-2 w-2 -translate-x-1/2 rotate-45 rounded-[1px]"
-                style={{ background: KIND_INK(k) }}
-              />
-            </span>
-            {LONDON_ASSET_KIND_LABEL[k]}
+        {roomsOnly ? (
+          <li className="text-[11px] text-[#03002C]/75">
+            Rooms and breakout spaces are named on the plan; the main entrance and lift cores are
+            marked. Sizes are for orientation, not measurement.
           </li>
-        ))}
-        <li className="flex items-center gap-1.5 text-[11px] text-[#03002C]/75">
-          <span className="block h-3 w-3 rounded-full border border-white bg-[#0F9D58]" />
-          Position confirmed
-        </li>
+        ) : (
+          <>
+            {kindsPresent.map((k) => (
+              <li key={k} className="flex items-center gap-1.5 text-[11px] text-[#03002C]/75">
+                <span className="relative block h-4 w-3">
+                  <span
+                    className="absolute left-0 top-0 block h-3 w-3 rounded-full border border-white"
+                    style={{ background: KIND_INK(k) }}
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="absolute left-1/2 top-[8px] block h-2 w-2 -translate-x-1/2 rotate-45 rounded-[1px]"
+                    style={{ background: KIND_INK(k) }}
+                  />
+                </span>
+                {LONDON_ASSET_KIND_LABEL[k]}
+              </li>
+            ))}
+            <li className="flex items-center gap-1.5 text-[11px] text-[#03002C]/75">
+              <span className="block h-3 w-3 rounded-full border border-white bg-[#0F9D58]" />
+              Position confirmed
+            </li>
+          </>
+        )}
+
         {zoomed ? (
           <li className="ml-auto font-mono text-[10px] uppercase tracking-[0.1em] text-[#03002C]/50">
             View {view.z.toFixed(1)}× — press fit to reframe
