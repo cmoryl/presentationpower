@@ -155,8 +155,13 @@ const ACCENT_SOFTEN = 0.5;
  * against GlobalLink or DataForce cyan): if a stop would land too close to
  * the accent, it is pulled back toward white until the separation holds, so
  * the accent-chevron mark always reads against its ground.
+ *
+ * The floor is per-accent: pale accents (lavender, yellow) sit close to white
+ * itself, so an absolute floor is unreachable — the cap keeps a fixed share
+ * of the best separation white can offer instead.
  */
 const ACCENT_MIN_SEPARATION = 150;
+const ACCENT_SEPARATION_WHITE_SHARE = 0.82;
 
 function rgbDistance(a: string, b: string): number {
   const [ar, ag, ab] = parseHex(a);
@@ -164,10 +169,16 @@ function rgbDistance(a: string, b: string): number {
   return Math.sqrt((ar - br) ** 2 + (ag - bg) ** 2 + (ab - bb) ** 2);
 }
 
+/** The separation floor a tinted stop must hold from this accent. */
+export function londonAccentSeparationFloor(accentHex: string): number {
+  return Math.min(ACCENT_MIN_SEPARATION, rgbDistance("#FFFFFF", accentHex) * ACCENT_SEPARATION_WHITE_SHARE);
+}
+
 /** Pull `stop` toward white until it stands clear of the raw accent. */
 function ensureAccentSeparation(stop: string, accentHex: string): string {
+  const floor = londonAccentSeparationFloor(accentHex);
   let out = stop;
-  for (let i = 0; i < 24 && rgbDistance(out, accentHex) < ACCENT_MIN_SEPARATION; i++) {
+  for (let i = 0; i < 48 && rgbDistance(out, accentHex) < floor; i++) {
     out = mix(out, "#FFFFFF", 0.18);
   }
   return out;
