@@ -139,6 +139,47 @@ export function BoothHub3DViewer({
             className="h-full w-full border-0"
           />
         </div>
+        <footer className="flex flex-wrap items-center gap-2 border-t border-black/10 bg-white px-4 py-3">
+          <p className="min-w-[220px] flex-1 text-[11.5px] leading-[1.45] text-[#03002C]/65">
+            Seeing “Booth unavailable”? The {BOOTHHUB_DIVISION_LABEL[division]} stand has not been
+            built in BoothHUB yet, or it is saved under a different plan name. Build it there once
+            and this window shows it for every pin on this division.
+          </p>
+          <form
+            className="flex items-center gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setLoaded(false);
+              setPlan(planDraft.trim());
+            }}
+          >
+            <label className="text-[11.5px] font-semibold text-[#03002C]" htmlFor="bh-plan">
+              Plan name
+            </label>
+            <input
+              id="bh-plan"
+              value={planDraft}
+              onChange={(e) => setPlanDraft(e.target.value)}
+              placeholder="default"
+              className="w-40 rounded-full border border-[#03002C]/20 bg-white px-3 py-1.5 text-[12.5px] text-[#03002C] outline-none focus:border-[#003FC7] focus:ring-2 focus:ring-[#003FC7]/25"
+            />
+            <button
+              type="submit"
+              className="rounded-full bg-[#003FC7] px-3.5 py-1.5 text-[12.5px] font-semibold text-white hover:bg-[#03002C]"
+            >
+              Show
+            </button>
+          </form>
+          <a
+            href={boothHubBuilderUrl(division)}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white px-3.5 py-1.5 text-[12.5px] font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
+          >
+            <PencilRuler className="h-4 w-4" /> Build this stand
+          </a>
+        </footer>
+
       </div>
     </div>
   );
