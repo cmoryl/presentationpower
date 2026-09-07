@@ -8,7 +8,7 @@
 // exported plans so what the crew reads on screen is what prints.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Compass, Crosshair, Minus, Plus, RotateCcw, Scan } from "lucide-react";
+import { Compass, Crosshair, Minus, Plus, RotateCcw, Scan, X } from "lucide-react";
 
 import {
   LONDON_ASSET_KIND_LABEL,
