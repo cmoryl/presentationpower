@@ -27,6 +27,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { LondonFloorMap, londonKindsPresent } from "@/components/events/LondonFloorMap";
 import { BoothHub3DViewer } from "@/components/events/BoothHub3DViewer";
+import { LondonRoomAccordion } from "@/components/events/LondonRoomAccordion";
 import { boothHubDivisionFor } from "@/lib/boothhub-3d";
 
 import { LondonMapDesignPanel } from "@/components/events/LondonMapDesignPanel";
