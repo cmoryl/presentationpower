@@ -41,7 +41,7 @@ export const listBoothTemplates = createServerFn({ method: "GET" })
     const query = supabase
       .from("booth_templates")
       .select(
-        "id, slug, vendor, venue, style, source_file, master_path, master_content_type, proof_path, trim_w, trim_h, bleed_mm, trim_preset_id, overlay, sort_order, is_active, revision, updated_at",
+        "id, slug, vendor, venue, style, source_file, master_path, master_content_type, proof_path, trim_w, trim_h, bleed_mm, trim_preset_id, shell_id, overlay, sort_order, is_active, revision, updated_at",
       )
       .eq("is_active", true)
       .order("sort_order", { ascending: true });
@@ -81,6 +81,7 @@ export type BoothTemplatePatch = {
   trim_h?: number;
   bleed_mm?: number;
   trim_preset_id?: string | null;
+  shell_id?: string;
   overlay?: Record<string, unknown>;
   master_path?: string | null;
   master_content_type?: string | null;

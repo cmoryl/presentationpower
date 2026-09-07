@@ -22,6 +22,7 @@ import {
   LONDON_BOOTH_PANELS,
   LONDON_BOOTH_PANEL_META,
 } from "@/lib/next-london-signage";
+import { boothShell } from "@/lib/next-london-booth-shells";
 import {
   DEFAULT_LOGO_PLACEMENT,
   setLondonLogoPlacement,
@@ -49,6 +50,8 @@ export type BoothTemplateRecord = {
   trim_h: number;
   bleed_mm: number;
   trim_preset_id: string | null;
+  /** Which supplied trade-booth shell the wall is built on. */
+  shell_id: string;
   overlay: BoothTemplateOverlay;
   sort_order: number;
   is_active: boolean;
@@ -128,6 +131,9 @@ export function applyBoothTemplates(rows: BoothTemplateRecord[]): number {
       panel.bleedW = row.trim_w + edge * 2;
       panel.bleedH = row.trim_h + edge * 2;
       panel.style = row.style;
+      // A booth can be moved between the two supplied shells (screen / no
+      // screen); every renderer reads the shell off the panel meta.
+      meta.shell = boothShell(row.shell_id);
       panel.proof = row.source_file ?? panel.proof;
 
       const overlay = normalizeBoothOverlay(row.overlay);
