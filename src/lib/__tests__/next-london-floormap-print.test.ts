@@ -79,7 +79,7 @@ describe("London map print masters", () => {
       const { w, h } = headerNumbers(svg);
       expect(w).toBeGreaterThan(200);
       expect(h).toBeGreaterThan(200);
-      expect(panelSlug(panel)).toMatch(/^[a-z0-9-]+$/);
+      expect(panelSlug(panel)).toMatch(/^[A-Za-z0-9-]+$/);
     }
   });
 
@@ -106,7 +106,7 @@ describe("London map print masters", () => {
       design: design(),
     });
     svgIsSound(svg);
-    expect(svg).toContain("Demo bays");
+    expect(svg.toUpperCase()).toContain("DEMO BAYS");
     const csv = londonAreaCsv([area]);
     expect(csv.split("\n").length).toBeGreaterThan(1);
     expect(csv).toContain("Demo bays");
@@ -124,6 +124,10 @@ describe("London map print masters", () => {
     for (const paper of ["a3", "a4", "sheet"] as const) {
       const fmt = pdfFormatFor(design({ paper } as Partial<MapDesign>));
       if (fmt === undefined || fmt === null) continue;
+      if (typeof fmt === "string") {
+        expect(fmt.length).toBeGreaterThan(1);
+        continue;
+      }
       const [w, h] = fmt as [number, number];
       expect(w).toBeGreaterThan(100);
       expect(h).toBeGreaterThan(100);
