@@ -189,6 +189,34 @@ export function LondonMapAreasPanel({
                     </label>
                   ))}
                 </div>
+
+                {/* Size sliders — the area on the plan resizes as you drag. */}
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {(
+                    [
+                      ["w", "Width", plan.w],
+                      ["h", "Height", plan.h],
+                    ] as ["w" | "h", string, number][]
+                  ).map(([key, title, max]) => (
+                    <label key={key} className="block">
+                      <span className={tag}>
+                        {title} · {a[key].toFixed(1)} m
+                      </span>
+                      <input
+                        type="range"
+                        min={MIN_AREA_M}
+                        max={max}
+                        step={0.1}
+                        value={a[key]}
+                        onChange={(e) =>
+                          onChange(clampArea({ ...a, [key]: Number(e.target.value) }, plan))
+                        }
+                        className="mt-1 w-full accent-[#003FC7]"
+                      />
+                    </label>
+                  ))}
+                </div>
+
               </li>
             );
           })}
