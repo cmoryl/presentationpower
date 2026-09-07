@@ -220,12 +220,20 @@ export function boothHub3dEmbedUrl(opts: BoothHub3dLinkOptions): string {
 /** The same build opened as a full BoothHUB page in a new tab. */
 export function boothHub3dPageUrl(opts: BoothHub3dLinkOptions): string {
   if (opts.shareToken) {
-    return `${BOOTHHUB_ORIGIN}/booth-review/${encodeURIComponent(opts.shareToken)}`;
+    const q = new URLSearchParams();
+    if (opts.characters) q.set("characters", "1");
+    if (opts.label) q.set("label", opts.label);
+    if (opts.room) q.set("room", opts.room);
+    if (opts.variant) q.set("variant", opts.variant);
+    placementParams(q, opts.placement);
+    const qs = q.toString();
+    return `${BOOTHHUB_ORIGIN}/booth-review/${encodeURIComponent(opts.shareToken)}${qs ? `?${qs}` : ""}`;
   }
   const q = baseParams(opts);
   placementParams(q, opts.placement);
   return `${BOOTHHUB_ORIGIN}/booths/${opts.division}/visit?${q.toString()}`;
 }
+
 
 
 /** Where a signed-in BoothHUB user designs this division's stand build. */
