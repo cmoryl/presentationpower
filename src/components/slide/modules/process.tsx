@@ -721,12 +721,12 @@ registerSlideModule({
                             />
                             <div
                               data-on-media
-                              className="absolute inset-0 flex flex-col items-center justify-center px-[12%] text-center"
+                              className="absolute inset-0 flex flex-col items-center justify-center px-[14%] text-center"
                               style={{ color: "#FFFFFF" }}
                             >
                               <div
                                 style={{
-                                  fontSize: numeralSize,
+                                  fontSize: fit.numeral,
                                   fontWeight: 700,
                                   lineHeight: 1,
                                   letterSpacing: "-0.05em",
@@ -735,18 +735,21 @@ registerSlideModule({
                                 {s(st.stepNumber, String(si + 1))}
                               </div>
                               <div
-                                className="mt-2"
+                                className="mt-2 w-full"
                                 style={{
-                                  fontSize: stageNameSize,
+                                  fontSize: fit.stageName,
                                   fontWeight: 700,
                                   lineHeight: 1.08,
                                   letterSpacing: "-0.02em",
                                   textTransform: "uppercase",
+                                  overflowWrap: "anywhere",
+                                  ...clampLines(fit.maxLines),
                                 }}
                               >
                                 {s(st.label)}
                               </div>
                             </div>
+
                           </div>
                         </div>
 
