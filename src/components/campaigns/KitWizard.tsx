@@ -652,7 +652,7 @@ export function KitWizard({
                 <option value="">Division aura (default)</option>
                 {groundPacks.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.name}
+                    {p.label}
                   </option>
                 ))}
               </select>
