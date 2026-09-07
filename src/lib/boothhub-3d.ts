@@ -138,12 +138,67 @@ export function parseBoothHubShareToken(input?: string | null): string | null {
   return /^[A-Za-z0-9._-]{8,}$/.test(token) ? token : null;
 }
 
-/** The share-link viewer URL — readable without a BoothHUB sign-in. */
-export function boothHubShareEmbedUrl(token: string, opts?: { characters?: boolean }): string {
+/**
+ * The share-link viewer URL — readable without a BoothHUB sign-in.
+ *
+ * Placement travels on the share link too: a shared build is still positioned
+ * by OUR plan, so an edit to a pin's floor, position, facing or trim size has to
+ * reach the viewer exactly as it does on the signed-in route.
+ */
+export function boothHubShareEmbedUrl(
+  token: string,
+  opts?: {
+    characters?: boolean;
+    label?: string | null;
+    room?: string | null;
+    variant?: string | null;
+    placement?: BoothHub3dPlacement | null;
+  },
+): string {
   const q = new URLSearchParams({ embed: "1", public: "1", presenter: "1", chromeless: "1" });
   if (opts?.characters) q.set("characters", "1");
+  if (opts?.label) q.set("label", opts.label);
+  if (opts?.room) q.set("room", opts.room);
+  if (opts?.variant) q.set("variant", opts.variant);
+  placementParams(q, opts?.placement);
   return `${BOOTHHUB_ORIGIN}/booth-review/${encodeURIComponent(token)}?${q.toString()}`;
 }
+
+/**
+ * The same placement as a message for BoothHUB's viewer window. Sent after the
+ * iframe loads and on every plan edit, so a viewer that listens re-lays the
+ * stand in place instead of waiting for the reload the changed URL triggers.
+ */
+export function boothHubPlacementMessage(opts: BoothHub3dLinkOptions): {
+  type: "boothhub:placement";
+  source: "transperfect-element";
+  division: BoothHubDivisionId;
+  label?: string | null;
+  room?: string | null;
+  variant?: string | null;
+  placement: BoothHub3dPlacement | null;
+} {
+  return {
+    type: "boothhub:placement",
+    source: "transperfect-element",
+    division: opts.division,
+    label: opts.label ?? null,
+    room: opts.room ?? null,
+    variant: opts.variant ?? null,
+    placement: opts.placement
+      ? {
+          ...opts.placement,
+          ...(Number.isFinite(opts.placement.x as number)
+            ? { x: round2(opts.placement.x as number) }
+            : {}),
+          ...(Number.isFinite(opts.placement.y as number)
+            ? { y: round2(opts.placement.y as number) }
+            : {}),
+        }
+      : null,
+  };
+}
+
 
 /** Where a signed-in BoothHUB user creates that share link for a division. */
 export function boothHubShareSetupUrl(division: BoothHubDivisionId): string {
@@ -152,7 +207,15 @@ export function boothHubShareSetupUrl(division: BoothHubDivisionId): string {
 
 /** The chromeless, sign-in-free 3D viewer URL for an iframe. */
 export function boothHub3dEmbedUrl(opts: BoothHub3dLinkOptions): string {
-  if (opts.shareToken) return boothHubShareEmbedUrl(opts.shareToken, opts);
+  if (opts.shareToken) {
+    return boothHubShareEmbedUrl(opts.shareToken, {
+      characters: opts.characters,
+      label: opts.label,
+      room: opts.room,
+      variant: opts.variant,
+      placement: opts.placement,
+    });
+  }
   const q = baseParams(opts);
   q.set("chromeless", "1");
   if (opts.label) q.set("label", opts.label);
@@ -165,12 +228,20 @@ export function boothHub3dEmbedUrl(opts: BoothHub3dLinkOptions): string {
 /** The same build opened as a full BoothHUB page in a new tab. */
 export function boothHub3dPageUrl(opts: BoothHub3dLinkOptions): string {
   if (opts.shareToken) {
-    return `${BOOTHHUB_ORIGIN}/booth-review/${encodeURIComponent(opts.shareToken)}`;
+    const q = new URLSearchParams();
+    if (opts.characters) q.set("characters", "1");
+    if (opts.label) q.set("label", opts.label);
+    if (opts.room) q.set("room", opts.room);
+    if (opts.variant) q.set("variant", opts.variant);
+    placementParams(q, opts.placement);
+    const qs = q.toString();
+    return `${BOOTHHUB_ORIGIN}/booth-review/${encodeURIComponent(opts.shareToken)}${qs ? `?${qs}` : ""}`;
   }
   const q = baseParams(opts);
   placementParams(q, opts.placement);
   return `${BOOTHHUB_ORIGIN}/booths/${opts.division}/visit?${q.toString()}`;
 }
+
 
 
 /** Where a signed-in BoothHUB user designs this division's stand build. */
