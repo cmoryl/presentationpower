@@ -718,6 +718,46 @@ function LondonMapsPage() {
           </div>
         </section>
       </div>
+
+      {/* Large window — the same live editor, given the whole screen, with the
+          design and area controls beside it. State is shared, so anything moved
+          here is already moved on the page behind. */}
+      {expanded ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${plan?.label ?? "Floor"} live plan editor`}
+          className="fixed inset-0 z-50 flex flex-col bg-[#03002C]/70 p-3 backdrop-blur-sm sm:p-5"
+        >
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#F7F9FC] shadow-2xl">
+            <header className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 bg-white px-4 py-3">
+              <div className="min-w-0">
+                <h2 className="truncate text-[15px] font-semibold text-[#03002C]">
+                  {plan?.label ?? "Floor plan"} — live editor
+                </h2>
+                <p className="mt-0.5 text-[11.5px] text-[#03002C]/60">
+                  Drag an area to move it, pull its corner to size it. Scroll to zoom, drag the plan
+                  to pan. Press Escape to close.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setExpanded(false)}
+                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white px-4 py-2 text-[13px] font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
+              >
+                <X className="h-4 w-4" /> Close
+              </button>
+            </header>
+            <div className="grid min-h-0 flex-1 gap-4 overflow-y-auto p-4 xl:grid-cols-[minmax(0,1fr)_23rem] xl:overflow-hidden">
+              <div className="min-w-0 xl:overflow-y-auto">{floorMap}</div>
+              <div className="min-w-0 space-y-3 xl:overflow-y-auto">
+                {areasPanel}
+                {designPanel}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </AppShell>
   );
 }
