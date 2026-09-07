@@ -1,6 +1,6 @@
 // Download card for a finished PowerPoint the agent built in-chat.
 // The export tool returns a private, time-limited link to the real .pptx.
-import { Download, FileDown } from "lucide-react";
+import { AlertTriangle, Download, FileDown } from "lucide-react";
 
 export const EXPORT_DECK_TOOL_NAME = "export_deck";
 
@@ -11,7 +11,22 @@ export type DeckDownload = {
   url: string;
   nativeSlides?: number;
   warnings?: string[];
+  /** Slides left out because no current capture of them exists. */
+  unsupported?: Array<{ position: number; variantId: string }>;
+  /** Opening this in the app records the missing slides. */
+  warmUpUrl?: string;
 };
+
+function parseUnsupported(value: unknown): DeckDownload["unsupported"] {
+  if (!Array.isArray(value)) return undefined;
+  const rows = value
+    .filter((v): v is Record<string, unknown> => Boolean(v) && typeof v === "object")
+    .map((v) => ({
+      position: typeof v["position"] === "number" ? v["position"] : 0,
+      variantId: typeof v["variant_id"] === "string" ? v["variant_id"] : "",
+    }));
+  return rows.length ? rows : undefined;
+}
 
 /** Parse the export tool result (JSON text, or an MCP content array). */
 export function deckDownloadFromToolOutput(output: unknown): DeckDownload | null {
@@ -40,6 +55,8 @@ export function deckDownloadFromToolOutput(output: unknown): DeckDownload | null
         warnings: Array.isArray(parsed["warnings"])
           ? (parsed["warnings"] as unknown[]).filter((w): w is string => typeof w === "string")
           : undefined,
+        unsupported: parseUnsupported(parsed["unsupported_slides"]),
+        warmUpUrl: typeof parsed["warm_up_url"] === "string" ? parsed["warm_up_url"] : undefined,
       };
     } catch {
       /* not the JSON payload */
@@ -47,6 +64,7 @@ export function deckDownloadFromToolOutput(output: unknown): DeckDownload | null
   }
   return null;
 }
+
 
 export function AgentDeckDownload({ download }: { download: DeckDownload }) {
   return (
@@ -61,9 +79,29 @@ export function AgentDeckDownload({ download }: { download: DeckDownload }) {
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-semibold text-foreground">{download.deck}</p>
           <p className="mt-0.5 text-[11px] text-foreground/60">
-            {download.slides > 0 ? `${download.slides} slides · ` : ""}PowerPoint, fully editable
+            {download.slides > 0
+              ? `${download.slides}${
+                  download.unsupported?.length
+                    ? ` of ${download.slides + download.unsupported.length}`
+                    : ""
+                } slides · `
+              : ""}
+            PowerPoint, fully editable
             {download.warnings?.length ? ` · ${download.warnings.length} note(s)` : ""}
           </p>
+          {download.unsupported?.length ? (
+            <p className="mt-1.5 flex items-start gap-1.5 rounded-lg bg-amber-500/10 px-2 py-1.5 text-[10.5px] leading-snug text-amber-700 dark:text-amber-400">
+              <AlertTriangle className="mt-px h-3 w-3 shrink-0" aria-hidden />
+              <span>
+                {download.unsupported.length} slide
+                {download.unsupported.length === 1 ? "" : "s"} left out (slide
+                {download.unsupported.length === 1 ? " " : "s "}
+                {download.unsupported.map((u) => u.position + 1).join(", ")}) — they have not been
+                opened in the app yet, so their exact look could not be recorded.
+                {download.warmUpUrl ? " Open the deck once in the app, then export again." : ""}
+              </span>
+            </p>
+          ) : null}
           <a
             href={download.url}
             download={download.fileName}
@@ -76,6 +114,7 @@ export function AgentDeckDownload({ download }: { download: DeckDownload }) {
             Private link — expires an hour after it was created.
           </p>
         </div>
+
       </div>
     </div>
   );

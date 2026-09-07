@@ -33,7 +33,15 @@ export default defineTool({
       mode: theme === "auto" ? null : theme,
       embedFonts: embed_fonts,
     });
-    if (!out.ok) return errorResult(out.error);
+    if (!out.ok) {
+      // A refusal must hand the caller the one action that fixes it, so the
+      // user is never told only "export failed".
+      const warmUp = `${publicOrigin()}/decks/${deck_id}/export?auto=pptx&fidelity=build`;
+      return errorResult(
+        `${out.error} Warm-up link for the user: ${warmUp} — opening it once in the app records every slide, after which this export succeeds.`,
+      );
+    }
+
 
     // Housekeeping: an export of a private deck must not linger as a durable
     // artifact. Anything older than 24h in this caller's own folder goes.
