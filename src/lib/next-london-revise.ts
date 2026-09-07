@@ -908,6 +908,32 @@ export function buildLondonPanelAi(
       })()
     : "";
 
+  // Subhead: outlined the same way, so the .ai master carries both lines as live
+  // vector objects and re-lays with the artboard when a booth is re-issued.
+  const subOps = brand.sub
+    ? (() => {
+        const run = outlineText(face, brand.sub, {
+          sizeMm: brand.subSizeMm,
+          trackingEm: brand.subTrackingEm,
+          anchor: "middle",
+          x: brand.subCentreMm,
+          y: brand.subBaselineMm,
+          vertical: brand.copyVertical,
+        });
+        const ops = outlineOps(run.d);
+        if (!ops) return "";
+        let spin = "";
+        if (brand.copyVertical) {
+          const px = brand.subCentreMm * MM_TO_PT;
+          const py = h - brand.subBaselineMm * MM_TO_PT;
+          spin = `0 -1 1 0 ${f3(px - py)} ${f3(py + px)} cm `;
+        }
+        return `q ${spin}${copyInk} ${ops} f Q\n`;
+      })()
+    : "";
+
+
+
   // QR: vector modules on a white plate, plus its caption — all live objects.
   const qrOps = brand.qr
     ? (() => {
