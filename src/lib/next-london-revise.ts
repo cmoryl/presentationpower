@@ -674,6 +674,31 @@ export function buildLondonPanelSvg(
       })()
     : "";
 
+  // Body: the wrapped paragraph, one outlined path per line, so a native booth
+  // wall carries live editable copy objects in Illustrator.
+  const bodyLayer =
+    brand.bodyLines.length > 0
+      ? `<g id="body" data-layer="body" data-layer-order="2" data-lines="${brand.bodyLines.length}">` +
+        brand.bodyLines
+          .map((line, i) => {
+            const y = brand.bodyBaselineMm + i * brand.bodyLeadingMm;
+            const run = outlineText(face, line, {
+              sizeMm: brand.bodySizeMm,
+              trackingEm: brand.bodyTrackingEm,
+              anchor: "middle",
+              x: brand.bodyCentreMm,
+              y,
+            });
+            return (
+              `<path d="${run.d}" data-text="${escapeXml(line)}" data-font="${face.name}"` +
+              ` data-size-mm="${brand.bodySizeMm.toFixed(2)}"` +
+              ` fill="${copyPaint.paint}"${copyPaint.meta}/>`
+            );
+          })
+          .join("") +
+        `</g>`
+      : "";
+
   // QR: real encoded modules as vector geometry on a white plate, so the code
   // stays crisp at any signage size and scans off a scenic ground.
   const qrLayer = brand.qr
@@ -762,6 +787,7 @@ export function buildLondonPanelSvg(
       : "",
     wall ? "" : copyLayer,
     wall ? "" : subLayer,
+    wall ? "" : bodyLayer,
     wall ? "" : qrLayer,
     // Booths that ship the vendor's own branded artwork start without a second,
     // generated lockup — the designer can switch it on per booth.
@@ -934,6 +960,21 @@ export function buildLondonPanelAi(
 
 
 
+  // Body: each wrapped line outlined and filled, matching the svg master.
+  const bodyOps = brand.bodyLines
+    .map((line, i) => {
+      const run = outlineText(face, line, {
+        sizeMm: brand.bodySizeMm,
+        trackingEm: brand.bodyTrackingEm,
+        anchor: "middle",
+        x: brand.bodyCentreMm,
+        y: brand.bodyBaselineMm + i * brand.bodyLeadingMm,
+      });
+      const ops = outlineOps(run.d);
+      return ops ? `q ${copyInk} ${ops} f Q\n` : "";
+    })
+    .join("");
+
   // QR: vector modules on a white plate, plus its caption — all live objects.
   const qrOps = brand.qr
     ? (() => {
@@ -1036,8 +1077,8 @@ export function buildLondonPanelAi(
   const content = wall
     ? `/OC /oc3 BDC\n${groundOps}EMC\n` + `/OC /oc1 BDC\n${wallOps}EMC\n`
     : `/OC /oc3 BDC\n${groundOps}${brewOps}EMC\n` +
-      (copyOps || subOps || qrOps
-        ? `/OC /oc2 BDC\n${copyOps}${subOps}${qrOps}EMC\n`
+      (copyOps || subOps || bodyOps || qrOps
+        ? `/OC /oc2 BDC\n${copyOps}${subOps}${bodyOps}${qrOps}EMC\n`
         : "") +
       (brand.lockupOn && logoOps ? `/OC /oc1 BDC\n${logoOps}EMC\n` : "");
 

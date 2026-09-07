@@ -61,6 +61,22 @@ export type LondonLogoPlacement = {
   subDx: number;
   /** Subhead vertical nudge, as a fraction of the trim height. */
   subDy: number;
+  /**
+   * Body paragraph, wrapped to the live area under the subhead. `null` means
+   * "whatever the panel's own template implies" (a native booth ships default
+   * body copy); `""` prints no body at all.
+   */
+  body: string | null;
+  /** Size multiplier on the planned body cap height. */
+  bodyScale: number;
+  /** Extra body letter-spacing, in em, on top of the signage tracking. */
+  bodyTracking: number;
+  /** Body horizontal nudge, as a fraction of the trim width. */
+  bodyDx: number;
+  /** Body vertical nudge, as a fraction of the trim height. */
+  bodyDy: number;
+  /** Body measure (wrap width) as a fraction of the live area width. */
+  bodyWidth: number;
   /** QR payload. `null`/empty means the panel carries no code. */
   qr: string | null;
   /** Size multiplier on the planned QR block. */
@@ -118,6 +134,12 @@ export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
   subTracking: 0,
   subDx: 0,
   subDy: 0,
+  body: null,
+  bodyScale: 1,
+  bodyTracking: 0,
+  bodyDx: 0,
+  bodyDy: 0,
+  bodyWidth: 0.72,
   qr: null,
   qrScale: 1,
   qrDx: 0,
@@ -153,6 +175,12 @@ export const LONDON_TEXT_SCALE = { min: 0.3, max: 3, step: 0.01 } as const;
 
 /** Longest headline the signage set accepts on one line. */
 export const LONDON_TEXT_MAX_CHARS = 64;
+
+/** Longest body paragraph a native booth wall accepts. */
+export const LONDON_BODY_MAX_CHARS = 400;
+
+/** Body measure bounds, as a fraction of the live area width. */
+export const LONDON_BODY_WIDTH = { min: 0.3, max: 1, step: 0.01 } as const;
 
 /**
  * Extra headline tracking bounds, in em, on top of the brand's -0.02 signage
@@ -212,6 +240,17 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
     ),
     subDx: clamp(p.subDx, -0.5, 0.5, 0),
     subDy: clamp(p.subDy, -0.5, 0.5, 0),
+    body: typeof p.body === "string" ? p.body.slice(0, LONDON_BODY_MAX_CHARS) : null,
+    bodyScale: clamp(p.bodyScale, LONDON_TEXT_SCALE.min, LONDON_TEXT_SCALE.max, 1),
+    bodyTracking: clamp(
+      p.bodyTracking,
+      LONDON_TEXT_TRACKING.min,
+      LONDON_TEXT_TRACKING.max,
+      0,
+    ),
+    bodyDx: clamp(p.bodyDx, -0.5, 0.5, 0),
+    bodyDy: clamp(p.bodyDy, -0.5, 0.5, 0),
+    bodyWidth: clamp(p.bodyWidth, LONDON_BODY_WIDTH.min, LONDON_BODY_WIDTH.max, 0.72),
     qr:
       typeof p.qr === "string" && p.qr.trim().length > 0
         ? p.qr.trim().slice(0, LONDON_QR_MAX_CHARS)
