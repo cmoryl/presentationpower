@@ -80,10 +80,11 @@ export function SocialModularityStrip({
                       section={section}
                       brandId={brandId}
                       mode={mode}
-                      displayShortEdge={format.width > format.height ? 150 : 230}
+                      displayShortEdge={format.width > format.height ? 176 : 240}
                       lookCode={lookCode ?? null}
                     />
                   </div>
+
                   <figcaption className="text-center text-[10px] uppercase tracking-widest text-black/45">
                     {label} · {format.width}×{format.height} · {mode}
                   </figcaption>
