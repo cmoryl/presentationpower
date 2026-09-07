@@ -167,7 +167,7 @@ export const BESPOKE_UNITS: BespokeUnit[] = [
   },
   {
     id: "plinth-500",
-    name: "Plinth 500 × 500",
+    name: "Plinth 500",
     floor: "GF",
     zoneId: "gf-exhibition",
     room: "Ground floor exhibition",
@@ -178,11 +178,11 @@ export const BESPOKE_UNITS: BespokeUnit[] = [
     heightMm: 1000,
     artwork: [{ label: "Plinth face", wMm: 500, hMm: 1000, qty: 4 }],
     kind: "exhibition",
-    anchor: { x: 0.18, y: 0.75 },
+    anchor: { x: 0.08, y: 0.78 },
   },
   {
     id: "plinth-600",
-    name: "Plinth 600 × 600",
+    name: "Plinth 600",
     floor: "GF",
     zoneId: "gf-exhibition",
     room: "Ground floor exhibition",
@@ -193,7 +193,7 @@ export const BESPOKE_UNITS: BespokeUnit[] = [
     heightMm: 1000,
     artwork: [{ label: "Plinth face", wMm: 600, hMm: 1000, qty: 4 }],
     kind: "exhibition",
-    anchor: { x: 0.34, y: 0.75 },
+    anchor: { x: 0.46, y: 0.78 },
   },
   {
     id: "churchill-stage-graphics",
