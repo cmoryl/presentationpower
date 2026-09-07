@@ -414,6 +414,20 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
         `<path d="M ${n(x)} ${n(y + 3)} a 3 3 0 0 1 3 -3 h ${n(bar)} v ${n(h)} h ${n(-bar)} a 3 3 0 0 1 -3 -3 Z" fill="${style.accent}" opacity="${
           quiet ? 0.6 : 0.95
         }" />`;
+      // A narrow tile — a lift core, a stair, a light well — cannot hold its own
+      // name at the left edge without the text running off the tile and, at the
+      // edge of the plan, off the sheet. When the name is wider than the tile,
+      // hang it from the right-hand edge instead so it grows back across the
+      // plan rather than out of it.
+      const nameFits = (text: string, size: number) => text.length * size * 0.6 <= w - bar - 16;
+      const nameAt = (text: string, size: number, baseline: number, opacity: number, weight = 600) => {
+        const fits = nameFits(text, size);
+        return `<text x="${n(fits ? x + bar + 9 : x + w - 6)}" y="${n(baseline)}"${
+          fits ? "" : ' text-anchor="end"'
+        } font-family="${FONT}" font-size="${n(size)}" font-weight="${weight}" letter-spacing="0.9" fill="${NAVY}" opacity="${opacity}">${esc(
+          text,
+        )}</text>`;
+      };
       // Attendee sheets centre a larger room name in the tile — there are no pins
       // to avoid, so the name can own the space and read from a phone.
       const label = roomsOnly
@@ -422,15 +436,12 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
               (w > 150 ? 12 : w > 96 ? 10.5 : 9) * roomScale,
             )}" font-weight="600" letter-spacing="0.8" fill="${NAVY}">${esc(z.label.toUpperCase())}</text>`
           : h > 12
-            ? `<text x="${n(x + bar + 8)}" y="${n(y + h / 2 + 3)}" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.7" fill="${NAVY}" opacity="0.55">${esc(
-                z.label.toUpperCase(),
-              )}</text>`
+            ? nameAt(z.label.toUpperCase(), 8.5, y + h / 2 + 3, 0.55)
             : ""
         : h > 20
-          ? `<text x="${n(x + bar + 9)}" y="${n(y + h - 7)}" font-family="${FONT}" font-size="${n(9.5 * roomScale)}" font-weight="600" letter-spacing="0.9" fill="${NAVY}" opacity="0.8">${esc(
-              z.label.toUpperCase(),
-            )}</text>`
+          ? nameAt(z.label.toUpperCase(), 9.5 * roomScale, y + h - 7, 0.8)
           : "";
+
 
       const dims =
         !roomsOnly && DESIGN.roomDims !== false && h > 30 && w > z.label.length * 6.2 + 108
