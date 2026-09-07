@@ -14,6 +14,8 @@ import {
   FileDown,
   Image as ImageIcon,
   Map as MapIcon,
+  Maximize2,
+  X,
   Package,
   Palette,
   RotateCcw,
@@ -262,6 +264,58 @@ function LondonMapsPage() {
   const btn =
     "inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-4 py-2 text-[13px] font-semibold text-[#03002C] transition-colors hover:bg-white";
 
+  const floorMap = (
+    <LondonFloorMap
+      floor={floor}
+      panels={panels}
+      overrides={overrides}
+      onMove={move}
+      onResetOne={resetOne}
+      kinds={kinds}
+      selectedId={selectedId}
+      onSelect={setSelectedId}
+      editable={!attendee}
+      // Sectioned areas belong to the team, so they stay draggable even in the
+      // attendee guide where the signage pins are locked.
+      areasEditable
+      roomsOnly={attendee}
+      design={design}
+      areas={floorAreas}
+      onAreaChange={changeArea}
+      selectedAreaId={selectedAreaId}
+      onSelectArea={setSelectedAreaId}
+    />
+  );
+
+  const designPanel = (
+    <LondonMapDesignPanel design={design} onChange={applyDesign} roomsOnly={attendee} />
+  );
+
+  const areasPanel = planWithMine ? (
+    <LondonMapAreasPanel
+      plan={planWithMine}
+      areas={floorAreas}
+      selectedId={selectedAreaId}
+      onSelect={setSelectedAreaId}
+      onAdd={addArea}
+      onChange={changeArea}
+      onDuplicate={(a) => {
+        const copy = {
+          ...clampArea({ ...a, x: a.x + 1, y: a.y + 1 }, plan),
+          id: newLondonArea(floor).id,
+          label: `${a.label} copy`,
+        };
+        persistAreas([...areas, copy]);
+        setSelectedAreaId(copy.id);
+      }}
+      onRemove={(id) => {
+        persistAreas(areas.filter((a) => a.id !== id));
+        if (selectedAreaId === id) setSelectedAreaId(null);
+      }}
+      design={design}
+    />
+  ) : null;
+
   return (
     <AppShell bare={!userId}>
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
@@ -464,23 +518,27 @@ function LondonMapsPage() {
           </p>
 
           <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-            <LondonFloorMap
-              floor={floor}
-              panels={panels}
-              overrides={overrides}
-              onMove={move}
-              onResetOne={resetOne}
-              kinds={kinds}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-              editable={!attendee}
-              roomsOnly={attendee}
-              design={design}
-              areas={floorAreas}
-              onAreaChange={attendee ? undefined : changeArea}
-              selectedAreaId={selectedAreaId}
-              onSelectArea={setSelectedAreaId}
-            />
+            {expanded ? (
+              <div className="flex min-h-[16rem] flex-col items-start justify-center gap-2 rounded-2xl border border-dashed border-[#03002C]/20 bg-[#F5F8FD] p-6">
+                <p className="text-[13px] font-semibold text-[#03002C]">
+                  This plan is open in the large window.
+                </p>
+                <button type="button" className={btn} onClick={() => setExpanded(true)}>
+                  <Maximize2 className="h-4 w-4" /> Back to the large window
+                </button>
+              </div>
+            ) : (
+              <div>
+                {floorMap}
+                <button
+                  type="button"
+                  className={`${btn} mt-2.5`}
+                  onClick={() => setExpanded(true)}
+                >
+                  <Maximize2 className="h-4 w-4" /> Open large editor
+                </button>
+              </div>
+            )}
 
             <div className="min-w-0">
               <div className="flex flex-wrap gap-2">
@@ -530,42 +588,9 @@ function LondonMapsPage() {
                 </button>
               </div>
 
-              {designOpen ? (
-                <div className="mt-3">
-                  <LondonMapDesignPanel
-                    design={design}
-                    onChange={applyDesign}
-                    roomsOnly={attendee}
-                  />
-                </div>
-              ) : null}
+              {designOpen ? <div className="mt-3">{designPanel}</div> : null}
 
-              {areasOpen && planWithMine ? (
-                <div className="mt-3">
-                  <LondonMapAreasPanel
-                    plan={planWithMine}
-                    areas={floorAreas}
-                    selectedId={selectedAreaId}
-                    onSelect={setSelectedAreaId}
-                    onAdd={addArea}
-                    onChange={changeArea}
-                    onDuplicate={(a) => {
-                      const copy = {
-                        ...clampArea({ ...a, x: a.x + 1, y: a.y + 1 }, plan),
-                        id: newLondonArea(floor).id,
-                        label: `${a.label} copy`,
-                      };
-                      persistAreas([...areas, copy]);
-                      setSelectedAreaId(copy.id);
-                    }}
-                    onRemove={(id) => {
-                      persistAreas(areas.filter((a) => a.id !== id));
-                      if (selectedAreaId === id) setSelectedAreaId(null);
-                    }}
-                    design={design}
-                  />
-                </div>
-              ) : null}
+              {areasOpen && areasPanel ? <div className="mt-3">{areasPanel}</div> : null}
 
               {attendee ? (
                 <>
