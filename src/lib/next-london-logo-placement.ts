@@ -47,6 +47,20 @@ export type LondonLogoPlacement = {
    * tall, narrow sheets set their copy running DOWN the panel.
    */
   textVertical: boolean | null;
+  /**
+   * Subhead copy, set under the headline in Geist Bold at a smaller cap height.
+   * `null`/`""` means the panel carries no subhead. Position is derived from the
+   * trim box, so re-issuing a booth at another stand size re-lays the line.
+   */
+  sub: string | null;
+  /** Size multiplier on the planned subhead cap height. */
+  subScale: number;
+  /** Extra subhead letter-spacing, in em, on top of the signage tracking. */
+  subTracking: number;
+  /** Subhead horizontal nudge, as a fraction of the trim width. */
+  subDx: number;
+  /** Subhead vertical nudge, as a fraction of the trim height. */
+  subDy: number;
   /** QR payload. `null`/empty means the panel carries no code. */
   qr: string | null;
   /** Size multiplier on the planned QR block. */
@@ -99,6 +113,11 @@ export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
   textDx: 0,
   textDy: 0,
   textVertical: null,
+  sub: null,
+  subScale: 1,
+  subTracking: 0,
+  subDx: 0,
+  subDy: 0,
   qr: null,
   qrScale: 1,
   qrDx: 0,
@@ -183,6 +202,16 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
     textDx: clamp(p.textDx, -0.5, 0.5, 0),
     textDy: clamp(p.textDy, -0.5, 0.5, 0),
     textVertical: typeof p.textVertical === "boolean" ? p.textVertical : null,
+    sub: typeof p.sub === "string" ? p.sub.slice(0, LONDON_TEXT_MAX_CHARS) : null,
+    subScale: clamp(p.subScale, LONDON_TEXT_SCALE.min, LONDON_TEXT_SCALE.max, 1),
+    subTracking: clamp(
+      p.subTracking,
+      LONDON_TEXT_TRACKING.min,
+      LONDON_TEXT_TRACKING.max,
+      0,
+    ),
+    subDx: clamp(p.subDx, -0.5, 0.5, 0),
+    subDy: clamp(p.subDy, -0.5, 0.5, 0),
     qr:
       typeof p.qr === "string" && p.qr.trim().length > 0
         ? p.qr.trim().slice(0, LONDON_QR_MAX_CHARS)
