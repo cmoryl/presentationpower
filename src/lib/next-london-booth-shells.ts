@@ -20,8 +20,12 @@
 
 import shellAAi from "@/assets/london-booths/tradebooth-a-shell.ai?url";
 import shellAProof from "@/assets/london-booths/tradebooth-a-shell.jpg";
+import shellARender from "@/assets/london-booths/renders/tradebooth-a-render.jpg";
 import shellBAi from "@/assets/london-booths/tradebooth-b-shell.ai?url";
 import shellBProof from "@/assets/london-booths/tradebooth-b-shell.jpg";
+import shellBRender from "@/assets/london-booths/renders/tradebooth-b-render.jpg";
+
+
 
 export type LondonBoothShellId = "tradebooth-a" | "tradebooth-b";
 
