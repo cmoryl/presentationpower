@@ -215,6 +215,45 @@ export function BoothTemplatePanel({
             ))}
           </div>
 
+          <label className={`${LABEL} mt-3 block`} htmlFor="booth-shell">
+            Stand wall
+          </label>
+          <select
+            id="booth-shell"
+            className={FIELD}
+            disabled={!canEdit || saving}
+            value={shell.id}
+            onChange={(e) =>
+              void patch({ id: template.id, shell_id: e.target.value }, "Stand wall saved.")
+            }
+          >
+            {LONDON_BOOTH_SHELLS.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-[12px] leading-[1.45] text-[#03002C]/70">
+            {screenRect
+              ? `Screen wall — a ${screenDiagonal}" monitor sits over ${Math.round(screenRect.w)} × ${Math.round(screenRect.h)} mm of the face, so the lockup is placed above it and the copy and QR below it.`
+              : "Full graphic wall — no screen aperture, the whole face is live artwork."}
+            {shell.aiUrl ? (
+              <>
+                {" "}
+                <a
+                  className="underline decoration-[#003FC7]/40 underline-offset-2 hover:text-[#003FC7]"
+                  href={shell.aiUrl}
+                  download
+                >
+                  Download the blank shell
+                </a>
+                .
+              </>
+            ) : null}
+          </p>
+
+
+
           <label className={`${LABEL} mt-3 block`} htmlFor="booth-vendor">
             Vendor name
           </label>
