@@ -99,6 +99,8 @@ export function LondonFloorMap({
   editable,
   areasEditable,
   onAreaRemove,
+  onView3d,
+
   roomsOnly = false,
   design = DEFAULT_MAP_DESIGN,
   areas,
