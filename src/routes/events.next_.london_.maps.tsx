@@ -728,6 +728,18 @@ function LondonMapsPage() {
                       </li>
                     )}
                   </ul>
+
+                  <h3 className="mt-5 text-sm font-semibold text-[#03002C]">
+                    Rooms and breakouts on this floor
+                  </h3>
+                  {planWithMine ? (
+                    <LondonRoomAccordion
+                      plan={planWithMine}
+                      panels={floorPanels}
+                      selectedId={selectedId}
+                      onSelectAsset={setSelectedId}
+                    />
+                  ) : null}
                 </>
               )}
 
