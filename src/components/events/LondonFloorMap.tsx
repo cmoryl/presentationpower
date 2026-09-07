@@ -59,6 +59,8 @@ export type LondonFloorMapProps = {
    * where the signage pins are locked. Defaults to `editable`.
    */
   areasEditable?: boolean;
+  /** Remove one of the team's own areas straight from the plan. */
+  onAreaRemove?: (id: string) => void;
 
   /** Attendee view: rooms and breakouts only, no signage pins. */
   roomsOnly?: boolean;
@@ -83,6 +85,7 @@ export function LondonFloorMap({
   onSelect,
   editable,
   areasEditable,
+  onAreaRemove,
   roomsOnly = false,
   design = DEFAULT_MAP_DESIGN,
   areas,
@@ -351,6 +354,32 @@ export function LondonFloorMap({
                     : undefined
                 }
                 title={own ? `${z.label} — ${areaKindLabel(z.kind)}` : undefined}
+                tabIndex={canEdit ? 0 : undefined}
+                onKeyDown={
+                  canEdit && mine
+                    ? (ev) => {
+                        // Delete removes the area; arrows nudge it a step at a time.
+                        if (ev.key === "Delete" || ev.key === "Backspace") {
+                          ev.preventDefault();
+                          onAreaRemove?.(z.id);
+                          return;
+                        }
+                        const step = ev.shiftKey ? 1 : 0.25;
+                        const d: Record<string, [number, number]> = {
+                          ArrowLeft: [-step, 0],
+                          ArrowRight: [step, 0],
+                          ArrowUp: [0, -step],
+                          ArrowDown: [0, step],
+                        };
+                        const move = d[ev.key];
+                        if (!move) return;
+                        ev.preventDefault();
+                        onAreaChange?.(
+                          clampArea({ ...mine, x: mine.x + move[0], y: mine.y + move[1] }, plan),
+                        );
+                      }
+                    : undefined
+                }
               >
                 {/* Category bar — the mall-directory colour key for this space. */}
                 <span
@@ -367,6 +396,21 @@ export function LondonFloorMap({
                 <span className="absolute bottom-0.5 right-1.5 font-mono text-[8.5px] tabular-nums text-[#03002C]/35">
                   {z.w.toFixed(1)} × {z.h.toFixed(1)} m
                 </span>
+                {canEdit && mine && onAreaRemove ? (
+                  <button
+                    type="button"
+                    onPointerDown={(ev) => ev.stopPropagation()}
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      onAreaRemove(z.id);
+                    }}
+                    title={`Delete ${z.label}`}
+                    aria-label={`Delete ${z.label}`}
+                    className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-[#E53D2E] text-white shadow-sm hover:bg-[#c9291b]"
+                  >
+                    <X className="h-2.5 w-2.5" strokeWidth={3} />
+                  </button>
+                ) : null}
                 {canEdit && mine ? (
                   <span
                     role="presentation"
