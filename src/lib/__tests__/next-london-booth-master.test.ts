@@ -1,6 +1,6 @@
 // Supplied-wall coverage: every bundled booth ships the vendor's own Illustrator
 // wall as its ground, embedded in the master, with our editable copy layer above.
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { LONDON_PANELS, isBoothPanel, londonBoothArtworkUrl } from "@/lib/next-london-signage";
 import {
