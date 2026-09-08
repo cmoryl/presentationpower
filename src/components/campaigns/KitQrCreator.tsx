@@ -12,7 +12,6 @@ import { Check, Copy, Download, QrCode } from "lucide-react";
 import { toast } from "sonner";
 import { buildPillarQr } from "@/lib/pillar-qr";
 import {
-  PILLAR_CAPTION_ALIGNS,
   PILLAR_CAPTION_FONTS,
   PILLAR_QR_MIN_CONTRAST,
   PILLAR_QR_STYLES,
@@ -31,6 +30,8 @@ export type KitQrCreatorProps = {
   fileStem?: string;
   className?: string;
 };
+
+const CAPTION_ALIGNS: PillarCaptionAlign[] = ["left", "center", "right"];
 
 const INKS = [
   { id: "#03002C", label: "Blue 800" },
@@ -406,7 +407,7 @@ export function KitQrCreator({
                 onChange={(e) => setCaptionAlign(e.target.value as PillarCaptionAlign)}
                 className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
               >
-                {PILLAR_CAPTION_ALIGNS.map((a) => (
+                {CAPTION_ALIGNS.map((a) => (
                   <option key={a} value={a}>
                     {a}
                   </option>
