@@ -6,17 +6,19 @@
 //   • The vendor proof is the full BLEED page (trim + 100 mm each edge), so it
 //     is scaled up by (trim + 2×bleed)/trim and offset by -bleed/trim, which
 //     lands the trim box of the artwork exactly on the trim face of the wall.
-//   • The supplied partner artwork already contains the exact monitor aperture.
-//     It must not be covered by a second synthetic screen in the visualisation.
+//   • The measured monitor aperture is the outside dimension of the installed
+//     display. The physical bezel and screen are rendered inside that box.
 //
 // A visualisation, never a survey photograph and never a dimensional reference:
 // the trim and bleed geometry on the panel card remains the authority.
 
 import { useState } from "react";
 
+import nextTvContent from "@/assets/london-booths/renders/next-tv-content.jpg";
 import {
   LONDON_BOOTH_SHELLS,
   boothShell,
+  boothScreenDiagonalIn,
   type LondonBoothShell,
 } from "@/lib/next-london-booth-shells";
 import type { LondonPanel } from "@/lib/next-london-signage";
@@ -28,6 +30,38 @@ export type BoothRenderPreviewProps = {
 
 const DISCLAIMER =
   "Visualisation only — the artwork shown in a room of this type, not a survey photograph. Build and print to the trim and bleed above.";
+
+function PhysicalDisplay({ shell }: { shell: LondonBoothShell }) {
+  const screen = shell.screen;
+  if (!screen) return null;
+
+  return (
+    <div
+      className="absolute z-10 bg-black p-[0.7%] shadow-2xl ring-1 ring-white/25"
+      style={{
+        left: `${screen.x * 100}%`,
+        top: `${screen.y * 100}%`,
+        width: `${screen.w * 100}%`,
+        height: `${screen.h * 100}%`,
+      }}
+      aria-label={`${boothScreenDiagonalIn(shell)}-inch wall-mounted display`}
+    >
+      <div className="relative h-full w-full overflow-hidden bg-black">
+        <img
+          src={nextTvContent}
+          alt="NEXT event presentation playing on the booth display"
+          className="h-full w-full object-cover"
+          width={1024}
+          height={576}
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-black/20" />
+        <div className="absolute bottom-[2%] left-1/2 h-[3px] w-[3px] -translate-x-1/2 rounded-full bg-white/50" />
+      </div>
+      <div className="absolute left-[8%] right-[8%] top-full h-[3%] bg-black/40 blur-[2px]" />
+    </div>
+  );
+}
 
 /** Bleed page geometry expressed against the trim box. */
 function bleedFrame(shell: LondonBoothShell) {
@@ -139,6 +173,8 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
             </div>
           ) : null}
 
+          <PhysicalDisplay shell={shell} />
+
           {guides ? (
             <div className="absolute inset-0" data-export-ignore="true">
               {/* Bleed edge, outside trim. */}
@@ -175,6 +211,12 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
       </div>
 
       <p className="mt-2 text-[12px] leading-relaxed text-[#03002C]/70">{shell.note}</p>
+      <p className="mt-1 font-mono text-[11px] text-[#03002C]/60">
+        Full wall at true {shell.trimW} × {shell.trimH} mm proportion
+        {shell.hasScreen
+          ? ` · ${boothScreenDiagonalIn(shell)} in 16:9 display at measured mounting position`
+          : " · no display fitted"}
+      </p>
       {guides ? (
         <p className="mt-1 font-mono text-[11px] text-[#03002C]/60">
           Yellow = trim {shell.trimW} × {shell.trimH} mm · pink dash = {shell.bleedMm} mm bleed ·
