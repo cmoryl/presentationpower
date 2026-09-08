@@ -30,6 +30,7 @@ import { useServerFn } from "@tanstack/react-start";
 
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import { useBoothTemplates } from "@/hooks/use-booth-templates";
 import { BoothTemplatePanel } from "@/components/events/BoothTemplatePanel";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
