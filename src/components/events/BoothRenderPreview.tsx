@@ -14,7 +14,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import nextTvContent from "@/assets/london-booths/renders/next-tv-content.jpg";
+// Screen content is real NEXT 2026 London event imagery from the Element
+// build — never an invented holding slide.
+import nextTvAsset from "@/assets/eventimg/next-flagship-london-1.jpg.asset.json";
 import {
   LONDON_BOOTH_SHELLS,
   boothShell,
@@ -48,7 +50,7 @@ function PhysicalDisplay({ shell }: { shell: LondonBoothShell }) {
     >
       <div className="relative h-full w-full overflow-hidden bg-black">
         <img
-          src={nextTvContent}
+          src={nextTvAsset.url}
           alt="NEXT event presentation playing on the booth display"
           className="h-full w-full object-cover"
           width={1024}
