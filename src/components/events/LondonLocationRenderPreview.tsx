@@ -17,14 +17,12 @@ import {
   type LondonScene,
 } from "@/lib/next-london-scenes";
 import { londonBoothArtworkUrl, type LondonPanel } from "@/lib/next-london-signage";
+import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
 
 export interface LondonLocationRenderPreviewProps {
   panel: LondonPanel;
 }
 
-function pct(n: number): string {
-  return `${(n * 100).toFixed(4)}%`;
-}
 
 function Stage({
   panel,
@@ -41,6 +39,7 @@ function Stage({
   return (
     <div
       ref={stageRef}
+      data-insitu-stage="london"
       className="relative w-full overflow-hidden rounded-xl bg-[#0d1117]"
       style={{ aspectRatio: `${scene.plate.w} / ${scene.plate.h}` }}
     >
@@ -54,19 +53,14 @@ function Stage({
         className="absolute inset-0 h-full w-full object-cover"
       />
       {art ? (
-        <img
-          src={art}
-          alt={`${panel.name} installed as a ${scene.label.toLowerCase()}`}
-          className="absolute"
-          style={{
-            left: pct(box.x),
-            top: pct(box.y),
-            width: pct(box.w),
-            height: pct(box.h),
-            objectFit: "fill",
-            boxShadow: "0 10px 26px rgba(3,0,44,0.28)",
-          }}
-        />
+        <SceneArtworkPlate box={box} sceneId={scene.id}>
+          <img
+            src={art}
+            alt={`${panel.name} installed as a ${scene.label.toLowerCase()}`}
+            className="absolute inset-0 h-full w-full"
+            style={{ objectFit: "fill" }}
+          />
+        </SceneArtworkPlate>
       ) : (
         <div className="absolute inset-0 grid place-items-center">
           <span className="rounded-full bg-black/55 px-3 py-1 font-mono text-[11px] text-white">
