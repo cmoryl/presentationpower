@@ -261,83 +261,18 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
       </div>
 
 
-      <div className="relative mt-3 overflow-hidden rounded-lg border border-black/10 bg-[#E0E8F5]">
-        <img
-          src={shell.renderUrl}
-          alt={`${panel.name} booth visualised on the ${shell.label} in a conference centre`}
-          className="block h-auto w-full"
-          width={1536}
-          height={1024}
-          loading="lazy"
-        />
-        {/* The printed trim face. Everything below is measured against it. */}
-        <div
-          className="pointer-events-none absolute"
-          style={{
-            left: `${face.x * 100}%`,
-            top: `${face.y * 100}%`,
-            width: `${face.w * 100}%`,
-            height: `${face.h * 100}%`,
-          }}
-        >
-          {art ? (
-            <div className="absolute inset-0 overflow-hidden">
-              {/* Bleed page, positioned so its trim box lands on the face. */}
-              <img
-                src={art}
-                alt=""
-                aria-hidden="true"
-                className="absolute block max-w-none"
-                style={{ ...page, maxWidth: "none", opacity: 0.96 }}
-                loading="lazy"
-              />
-              {/* Room light falling across the printed face. */}
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(115deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 42%, rgba(3,0,44,0.18) 100%)",
-                }}
-              />
-            </div>
-          ) : null}
-
-          <PhysicalDisplay shell={shell} />
-
-          {guides ? (
-            <div className="absolute inset-0" data-export-ignore="true">
-              {/* Bleed edge, outside trim. */}
-              <div
-                className="absolute border border-dashed border-[#EC388A]/80"
-                style={page}
-              />
-              {/* Trim edge. */}
-              <div className="absolute inset-0 border border-[#FFEB66]" />
-              {/* Safe area, 60 mm inside trim. */}
-              <div
-                className="absolute border border-dotted border-[#A6FA87]"
-                style={{
-                  left: `${(60 / panel.trimW) * 100}%`,
-                  top: `${(60 / panel.trimH) * 100}%`,
-                  right: `${(60 / panel.trimW) * 100}%`,
-                  bottom: `${(60 / panel.trimH) * 100}%`,
-                }}
-              />
-              {shell.screen ? (
-                <div
-                  className="absolute border border-[#EC388A]"
-                  style={{
-                    left: `${shell.screen.x * 100}%`,
-                    top: `${shell.screen.y * 100}%`,
-                    width: `${shell.screen.w * 100}%`,
-                    height: `${shell.screen.h * 100}%`,
-                  }}
-                />
-              ) : null}
-            </div>
-          ) : null}
+      <button
+        type="button"
+        onClick={() => setZoom(true)}
+        title="View this render larger"
+        aria-label={`View a larger render of ${panel.name} on the ${shell.label}`}
+        className="mt-3 block w-full cursor-zoom-in overflow-hidden rounded-lg border border-black/10 bg-[#E0E8F5] transition hover:border-[#003FC7]/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
+      >
+        <div ref={cardStage} className="relative">
+          {stage(false)}
         </div>
-      </div>
+      </button>
+
 
       <p className="mt-2 text-[12px] leading-relaxed text-[#03002C]/70">{shell.note}</p>
       <p className="mt-1 font-mono text-[11px] text-[#03002C]/60">
