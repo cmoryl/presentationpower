@@ -124,6 +124,7 @@ const navGroups: NavGroup[] = [
       { to: "/analytics", label: "Deck engagement" },
       { to: "/admin/ai", label: "AI usage & cost" },
       { to: "/admin/imagery-analytics", label: "Imagery analytics" },
+      { to: "/admin/qr-downloads", label: "QR downloads" },
       { to: "/admin/style-learning", label: "Style learning governance" },
     ],
   },

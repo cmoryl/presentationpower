@@ -467,6 +467,8 @@ function PlaybookDemoView() {
             defaultData={playbook.facts.registrationUrl || ""}
             defaultCaption="Scan to register"
             fileStem={`${playbook.id}-qr`}
+            kitId={`event-demo:${playbook.id}`}
+            kitLabel={playbook.name}
           />
         </div>
       </section>

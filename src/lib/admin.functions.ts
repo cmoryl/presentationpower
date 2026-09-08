@@ -1550,3 +1550,56 @@ export const proposeAbPalettes = createServerFn({ method: "POST" })
       }
     },
   );
+
+// ── Kit QR downloads ──────────────────────────────────────────────────────
+// "Which event kits are people actually pulling QR codes out of?"
+export const getKitQrDownloads = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input) => z.object({ days: z.number().min(1).max(365).default(90) }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as SupaCtx);
+    const s = (context as unknown as { supabase: SbClient }).supabase;
+    const from = new Date(Date.now() - data.days * 24 * 3600 * 1000).toISOString();
+    const { data: rows } = await s
+      .from("kit_qr_downloads")
+      .select("*")
+      .gte("created_at", from)
+      .order("created_at", { ascending: false })
+      .limit(5000);
+    const list = (rows ?? []) as Array<{
+      kit_id: string;
+      kit_label: string | null;
+      format: "svg" | "png";
+      created_at: string;
+    }>;
+    const byKit = new Map<
+      string,
+      { kitId: string; label: string; svg: number; png: number; total: number; last: string }
+    >();
+    for (const r of list) {
+      const cur = byKit.get(r.kit_id) ?? {
+        kitId: r.kit_id,
+        label: r.kit_label || r.kit_id,
+        svg: 0,
+        png: 0,
+        total: 0,
+        last: r.created_at,
+      };
+      if (r.kit_label) cur.label = r.kit_label;
+      if (r.format === "svg") cur.svg += 1;
+      else cur.png += 1;
+      cur.total += 1;
+      if (r.created_at > cur.last) cur.last = r.created_at;
+      byKit.set(r.kit_id, cur);
+    }
+    const kits = [...byKit.values()].sort((a, b) => b.total - a.total);
+    return {
+      kits,
+      totals: {
+        svg: kits.reduce((n, k) => n + k.svg, 0),
+        png: kits.reduce((n, k) => n + k.png, 0),
+        total: list.length,
+        kits: kits.length,
+      },
+    };
+  });

@@ -1096,6 +1096,8 @@ export function KitWizard({
               <KitQrCreator
                 defaultData={event.registrationUrl ?? ""}
                 defaultCaption="Scan to register"
+                kitId={`kit-wizard:${surface}`}
+                kitLabel={kitName || `${surface} kit`}
                 fileStem={`${(kitName || surface + "-kit").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-qr`}
               />
             </div>
