@@ -1090,6 +1090,15 @@ export function KitWizard({
               </p>
             </div>
 
+            {/* QR creator — event users build their own scannable codes here. */}
+            <div className="mb-5">
+              <KitQrCreator
+                defaultData={event.registrationUrl ?? ""}
+                defaultCaption="Scan to register"
+                fileStem={`${(kitName || surface + "-kit").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-qr`}
+              />
+            </div>
+
             {/* NEXT 2026 design mode — regenerate the kit into the event look. */}
             <div
               className="mb-5 rounded-2xl border p-4"

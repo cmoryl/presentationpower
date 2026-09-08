@@ -46,6 +46,7 @@ import { getDivisionLogos } from "@/lib/division-logos";
 import { DemoTranslateBar, useDemoTranslate } from "@/components/demo/DemoTranslate";
 import { nextLockupSuite, nextTrackIdForPlaybook } from "@/lib/next-event-logos";
 import { useSocialAssetEdits, socialEditKey } from "@/lib/social-asset-edit";
+import { KitQrCreator } from "@/components/campaigns/KitQrCreator";
 import {
   EVENT_LOOKS,
   EVENT_LOOKS_BY_ID,
