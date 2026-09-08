@@ -12,7 +12,7 @@
 // A visualisation, never a survey photograph and never a dimensional reference:
 // the trim and bleed geometry on the panel card remains the authority.
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import nextTvContent from "@/assets/london-booths/renders/next-tv-content.jpg";
 import {
@@ -75,16 +75,136 @@ function bleedFrame(panel: Pick<LondonPanel, "trimW" | "trimH" | "bleedEdge">) {
   };
 }
 
+/** Rasterise a stage node to a PNG download. Guides are excluded. */
+async function downloadStagePng(node: HTMLElement, filename: string) {
+  const { toPng } = await import("html-to-image");
+  const dataUrl = await toPng(node, {
+    pixelRatio: 2,
+    cacheBust: true,
+    backgroundColor: "#E0E8F5",
+    filter: (el) =>
+      !(el instanceof HTMLElement) || el.getAttribute("data-export-ignore") !== "true",
+  });
+  const a = document.createElement("a");
+  a.href = dataUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
 export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
   const panelShell = londonBoothShell(panel.id);
   const [shellId, setShellId] = useState<string>(
     panelShell?.id ?? LONDON_BOOTH_SHELLS[0]!.id,
   );
   const [guides, setGuides] = useState(false);
+  const [zoom, setZoom] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const cardStage = useRef<HTMLDivElement | null>(null);
+  const zoomStage = useRef<HTMLDivElement | null>(null);
   const shell: LondonBoothShell = boothShell(shellId);
   const art = londonBoothArtworkUrl(panel.id);
   const face = shell.renderFace;
   const page = bleedFrame(panel);
+
+  useEffect(() => {
+    if (!zoom) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setZoom(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zoom]);
+
+  const fileName = `${panel.id}-${shell.id}-render.png`;
+
+  const savePng = async (node: HTMLElement | null) => {
+    if (!node || saving) return;
+    setSaving(true);
+    try {
+      await downloadStagePng(node, fileName);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const stage = (large: boolean) => (
+    <>
+      <img
+        src={shell.renderUrl}
+        alt={`${panel.name} booth visualised on the ${shell.label} in a conference centre`}
+        className="block h-auto w-full"
+        width={1536}
+        height={1024}
+        loading={large ? "eager" : "lazy"}
+      />
+      {/* The printed trim face. Everything below is measured against it. */}
+      <div
+        className="pointer-events-none absolute"
+        style={{
+          left: `${face.x * 100}%`,
+          top: `${face.y * 100}%`,
+          width: `${face.w * 100}%`,
+          height: `${face.h * 100}%`,
+        }}
+      >
+        {art ? (
+          <div className="absolute inset-0 overflow-hidden">
+            {/* Bleed page, positioned so its trim box lands on the face. */}
+            <img
+              src={art}
+              alt=""
+              aria-hidden="true"
+              className="absolute block max-w-none"
+              style={{ ...page, maxWidth: "none", opacity: 0.96 }}
+              loading={large ? "eager" : "lazy"}
+            />
+            {/* Room light falling across the printed face. */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(115deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 42%, rgba(3,0,44,0.18) 100%)",
+              }}
+            />
+          </div>
+        ) : null}
+
+        <PhysicalDisplay shell={shell} />
+
+        {guides ? (
+          <div className="absolute inset-0" data-export-ignore="true">
+            {/* Bleed edge, outside trim. */}
+            <div className="absolute border border-dashed border-[#EC388A]/80" style={page} />
+            {/* Trim edge. */}
+            <div className="absolute inset-0 border border-[#FFEB66]" />
+            {/* Safe area, 60 mm inside trim. */}
+            <div
+              className="absolute border border-dotted border-[#A6FA87]"
+              style={{
+                left: `${(60 / panel.trimW) * 100}%`,
+                top: `${(60 / panel.trimH) * 100}%`,
+                right: `${(60 / panel.trimW) * 100}%`,
+                bottom: `${(60 / panel.trimH) * 100}%`,
+              }}
+            />
+            {shell.screen ? (
+              <div
+                className="absolute border border-[#EC388A]"
+                style={{
+                  left: `${shell.screen.x * 100}%`,
+                  top: `${shell.screen.y * 100}%`,
+                  width: `${shell.screen.w * 100}%`,
+                  height: `${shell.screen.h * 100}%`,
+                }}
+              />
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </>
+  );
 
   return (
     <section className="rounded-xl border border-black/10 bg-white p-4">
@@ -129,86 +249,30 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
           >
             Print guides
           </button>
+          <button
+            type="button"
+            onClick={() => void savePng(cardStage.current)}
+            disabled={saving}
+            className="rounded-full border border-black/15 px-3 py-1.5 text-[11px] font-semibold text-[#03002C]/70 transition-colors hover:text-[#03002C] disabled:opacity-50"
+          >
+            {saving ? "Saving…" : "Download PNG"}
+          </button>
         </div>
       </div>
 
-      <div className="relative mt-3 overflow-hidden rounded-lg border border-black/10 bg-[#E0E8F5]">
-        <img
-          src={shell.renderUrl}
-          alt={`${panel.name} booth visualised on the ${shell.label} in a conference centre`}
-          className="block h-auto w-full"
-          width={1536}
-          height={1024}
-          loading="lazy"
-        />
-        {/* The printed trim face. Everything below is measured against it. */}
-        <div
-          className="pointer-events-none absolute"
-          style={{
-            left: `${face.x * 100}%`,
-            top: `${face.y * 100}%`,
-            width: `${face.w * 100}%`,
-            height: `${face.h * 100}%`,
-          }}
-        >
-          {art ? (
-            <div className="absolute inset-0 overflow-hidden">
-              {/* Bleed page, positioned so its trim box lands on the face. */}
-              <img
-                src={art}
-                alt=""
-                aria-hidden="true"
-                className="absolute block max-w-none"
-                style={{ ...page, maxWidth: "none", opacity: 0.96 }}
-                loading="lazy"
-              />
-              {/* Room light falling across the printed face. */}
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(115deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 42%, rgba(3,0,44,0.18) 100%)",
-                }}
-              />
-            </div>
-          ) : null}
 
-          <PhysicalDisplay shell={shell} />
-
-          {guides ? (
-            <div className="absolute inset-0" data-export-ignore="true">
-              {/* Bleed edge, outside trim. */}
-              <div
-                className="absolute border border-dashed border-[#EC388A]/80"
-                style={page}
-              />
-              {/* Trim edge. */}
-              <div className="absolute inset-0 border border-[#FFEB66]" />
-              {/* Safe area, 60 mm inside trim. */}
-              <div
-                className="absolute border border-dotted border-[#A6FA87]"
-                style={{
-                  left: `${(60 / panel.trimW) * 100}%`,
-                  top: `${(60 / panel.trimH) * 100}%`,
-                  right: `${(60 / panel.trimW) * 100}%`,
-                  bottom: `${(60 / panel.trimH) * 100}%`,
-                }}
-              />
-              {shell.screen ? (
-                <div
-                  className="absolute border border-[#EC388A]"
-                  style={{
-                    left: `${shell.screen.x * 100}%`,
-                    top: `${shell.screen.y * 100}%`,
-                    width: `${shell.screen.w * 100}%`,
-                    height: `${shell.screen.h * 100}%`,
-                  }}
-                />
-              ) : null}
-            </div>
-          ) : null}
+      <button
+        type="button"
+        onClick={() => setZoom(true)}
+        title="View this render larger"
+        aria-label={`View a larger render of ${panel.name} on the ${shell.label}`}
+        className="mt-3 block w-full cursor-zoom-in overflow-hidden rounded-lg border border-black/10 bg-[#E0E8F5] transition hover:border-[#003FC7]/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
+      >
+        <div ref={cardStage} className="relative">
+          {stage(false)}
         </div>
-      </div>
+      </button>
+
 
       <p className="mt-2 text-[12px] leading-relaxed text-[#03002C]/70">{shell.note}</p>
       <p className="mt-1 font-mono text-[11px] text-[#03002C]/60">
@@ -224,6 +288,48 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
         </p>
       ) : null}
       <p className="mt-1 font-mono text-[11px] text-[#03002C]/50">{DISCLAIMER}</p>
+
+      {zoom ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${panel.name} — ${shell.label} render`}
+          className="fixed inset-0 z-[130] flex items-center justify-center bg-[#03002C]/85 p-6 backdrop-blur-sm"
+          onClick={() => setZoom(false)}
+        >
+          <div className="w-full max-w-6xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between gap-3 pb-2 text-white">
+              <p className="truncate text-sm font-medium">
+                {panel.name} — {shell.label}
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => void savePng(zoomStage.current)}
+                  disabled={saving}
+                  className="rounded-full bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] disabled:opacity-60"
+                >
+                  {saving ? "Saving…" : "Download PNG"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setZoom(false)}
+                  aria-label="Close render preview"
+                  className="rounded-full border border-white/30 px-3 py-1.5 text-xs text-white"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+            <div
+              ref={zoomStage}
+              className="relative overflow-hidden rounded-2xl border border-white/20 bg-[#E0E8F5] shadow-2xl"
+            >
+              {stage(true)}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
