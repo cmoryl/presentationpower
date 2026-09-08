@@ -249,8 +249,17 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
           >
             Print guides
           </button>
+          <button
+            type="button"
+            onClick={() => void savePng(cardStage.current)}
+            disabled={saving}
+            className="rounded-full border border-black/15 px-3 py-1.5 text-[11px] font-semibold text-[#03002C]/70 transition-colors hover:text-[#03002C] disabled:opacity-50"
+          >
+            {saving ? "Saving…" : "Download PNG"}
+          </button>
         </div>
       </div>
+
 
       <div className="relative mt-3 overflow-hidden rounded-lg border border-black/10 bg-[#E0E8F5]">
         <img
