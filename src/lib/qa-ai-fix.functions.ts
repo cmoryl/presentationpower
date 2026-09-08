@@ -34,6 +34,7 @@ function clampToCap(text: string, maxChars: number): string {
 }
 
 export const rewriteForCharCaps = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .validator((data: unknown) => Input.parse(data))
   .handler(async ({ data }) => {
     if (!hasAnthropicKey()) throw new Error(ANTHROPIC_SETUP_MESSAGE);
