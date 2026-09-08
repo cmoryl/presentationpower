@@ -39,6 +39,36 @@ export const Route = createFileRoute("/api/chat")({
         const apiKey = process.env.LOVABLE_API_KEY;
         if (!apiKey) return new Response("AI not configured", { status: 500 });
 
+        // Paid AI proxy: require a valid Supabase session bearer token.
+        const authHeader = request.headers.get("authorization") ?? "";
+        const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+        if (!token || token.split(".").length !== 3) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY;
+        if (!supabaseUrl || !supabaseKey) {
+          return new Response("Auth not configured", { status: 500 });
+        }
+        try {
+          const { createClient } = await import("@supabase/supabase-js");
+          const authClient = createClient(supabaseUrl, supabaseKey, {
+            auth: { persistSession: false, autoRefreshToken: false },
+            global: {
+              fetch: (input, init) => {
+                const headers = new Headers(init?.headers);
+                if (supabaseKey.startsWith("sb_")) headers.delete("Authorization");
+                headers.set("apikey", supabaseKey);
+                return fetch(input, { ...init, headers });
+              },
+            },
+          });
+          const { data, error } = await authClient.auth.getClaims(token);
+          if (error || !data?.claims?.sub) return new Response("Unauthorized", { status: 401 });
+        } catch {
+          return new Response("Unauthorized", { status: 401 });
+        }
+
         let parsed: z.infer<typeof Body>;
         try {
           parsed = Body.parse(await request.json());

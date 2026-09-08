@@ -5,6 +5,7 @@
 // while preserving meaning; results are validated and clamped server-side.
 
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import {
   callAnthropic,
@@ -33,6 +34,7 @@ function clampToCap(text: string, maxChars: number): string {
 }
 
 export const rewriteForCharCaps = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .validator((data: unknown) => Input.parse(data))
   .handler(async ({ data }) => {
     if (!hasAnthropicKey()) throw new Error(ANTHROPIC_SETUP_MESSAGE);

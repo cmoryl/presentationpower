@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 import { useRef, useState } from "react";
 import type { Deck } from "@/lib/deck-store";
 import { byId, MODULE_VARIANTS, NARRATIVE_ARCHETYPES, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
@@ -42,9 +43,15 @@ export function DeckChat({
     };
 
     try {
+      const { data: sess } = await supabase.auth.getSession();
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(sess.session?.access_token
+            ? { Authorization: `Bearer ${sess.session.access_token}` }
+            : {}),
+        },
         body: JSON.stringify({ messages: next, deckContext }),
         signal: ctrl.signal,
       });

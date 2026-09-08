@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 /**
@@ -10,8 +11,8 @@ import { z } from "zod";
  * non-translatable values with the shared glossary helpers, runs the configured
  * engine, and returns the translated JSON. Nothing is written to the database.
  *
- * It is intentionally unauthenticated (demos are public marketing surfaces) and
- * hard-capped so it cannot be used as a general-purpose translation endpoint.
+ * It requires an authenticated session (it spends paid translation credits) and
+ * is hard-capped so it cannot be used as a general-purpose translation endpoint.
  */
 
 const MAX_ITEMS = 40;
@@ -25,6 +26,7 @@ const Input = z.object({
 });
 
 export const translateDemoContent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .validator((raw: unknown) => Input.parse(raw))
   .handler(async ({ data }) => {
     const { extractStrings, protectStrings, unprotectStrings, applyGlossaryOverrides } =
