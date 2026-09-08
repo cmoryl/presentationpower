@@ -251,6 +251,7 @@ function LondonSignagePage() {
   // points (revise workflow, production studio) are only shown to signed-in
   // users.
   const userId = useSessionUser();
+  const isAdmin = useIsAdmin();
   // The kit shows the panel set IN FORCE: the newest published revision, or the
   // issued venue pack when there is none (or when the viewer is not signed in).
   const [panels, setPanels] = useState<LondonPanel[]>(LONDON_PANELS);
