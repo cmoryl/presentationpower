@@ -719,7 +719,7 @@ function LondonSignagePage() {
                   />
                 ))}
               </div>
-              {boothTemplates.templates.length > 0 ? (
+              {isAdmin && boothTemplates.templates.length > 0 ? (
                 <BoothTemplatePanel
                   templates={boothTemplates.templates}
                   panelIdBySlug={Object.fromEntries(
@@ -728,7 +728,7 @@ function LondonSignagePage() {
                       return meta ? [[meta.booth.id, panel.id] as const] : [];
                     }),
                   )}
-                  canEdit={!!userId}
+                  canEdit={isAdmin}
                   saving={boothTemplates.saving}
                   saveError={boothTemplates.saveError}
                   onSave={boothTemplates.save}
