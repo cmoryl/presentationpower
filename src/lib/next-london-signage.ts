@@ -10,9 +10,11 @@ import artworkAsset from "@/assets/next-london-signage-artwork.json.asset.json";
 import {
   LONDON_BOOTHS,
   LONDON_BOOTH_BLEED_MM,
+  boothHasTvOnStand,
   type LondonBoothArtboard,
   type LondonBoothSpec,
 } from "@/lib/next-london-booths";
+
 import { nativeBoothTemplate } from "@/lib/next-london-booth-native";
 import {
   boothShell,
@@ -1513,6 +1515,17 @@ export function londonBoothMasterUrl(panelId: string): string | null {
 export function londonBoothShell(panelId: string): LondonBoothShell | null {
   return LONDON_BOOTH_PANEL_META[panelId]?.shell ?? null;
 }
+
+/**
+ * True when the booth behind this panel has a monitor on stand. Booths without
+ * one never offer a TV render.
+ */
+export function londonBoothTvAvailable(panelId: string): boolean {
+  const meta = LONDON_BOOTH_PANEL_META[panelId];
+  if (!meta) return false;
+  return boothHasTvOnStand(meta.booth.id);
+}
+
 
 /**
  * The screen keep-clear zone for a panel, in mm on the BLEED page (so guides and

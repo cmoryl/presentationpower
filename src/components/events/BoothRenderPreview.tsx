@@ -24,7 +24,12 @@ import {
   type LondonBoothShell,
 } from "@/lib/next-london-booth-shells";
 import type { LondonPanel } from "@/lib/next-london-signage";
-import { londonBoothArtworkUrl, londonBoothShell } from "@/lib/next-london-signage";
+import {
+  londonBoothArtworkUrl,
+  londonBoothShell,
+  londonBoothTvAvailable,
+} from "@/lib/next-london-signage";
+
 
 export type BoothRenderPreviewProps = {
   panel: LondonPanel;
@@ -97,8 +102,12 @@ async function downloadStagePng(node: HTMLElement, filename: string) {
 
 export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
   const panelShell = londonBoothShell(panel.id);
+  const tvAvailable = londonBoothTvAvailable(panel.id);
+  const shellOptions = tvAvailable
+    ? LONDON_BOOTH_SHELLS
+    : LONDON_BOOTH_SHELLS.filter((s) => !s.hasScreen);
   const [shellId, setShellId] = useState<string>(
-    panelShell?.id ?? LONDON_BOOTH_SHELLS[0]!.id,
+    (tvAvailable ? (panelShell?.id ?? LONDON_BOOTH_SHELLS[0]!.id) : shellOptions[0]!.id),
   );
   const [guides, setGuides] = useState(false);
   const [zoom, setZoom] = useState(false);
@@ -109,6 +118,7 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
   const art = londonBoothArtworkUrl(panel.id);
   const face = shell.renderFace;
   const page = bleedFrame(panel);
+
 
   useEffect(() => {
     if (!zoom) return;
@@ -218,27 +228,34 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
           <p className="mt-1 text-[13px] font-semibold text-[#03002C]">{shell.label}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <div
-            className="inline-flex rounded-full border border-black/10 bg-[#F2F2F2] p-0.5"
-            role="group"
-            aria-label="Booth wall type"
-          >
-            {LONDON_BOOTH_SHELLS.map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                onClick={() => setShellId(option.id)}
-                aria-pressed={option.id === shell.id}
-                className={`rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors ${
-                  option.id === shell.id
-                    ? "bg-[#03002C] text-white"
-                    : "text-[#03002C]/70 hover:text-[#03002C]"
-                }`}
-              >
-                {option.hasScreen ? "With TV" : "No TV"}
-              </button>
-            ))}
-          </div>
+          {shellOptions.length > 1 ? (
+            <div
+              className="inline-flex rounded-full border border-black/10 bg-[#F2F2F2] p-0.5"
+              role="group"
+              aria-label="Booth wall type"
+            >
+              {shellOptions.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => setShellId(option.id)}
+                  aria-pressed={option.id === shell.id}
+                  className={`rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors ${
+                    option.id === shell.id
+                      ? "bg-[#03002C] text-white"
+                      : "text-[#03002C]/70 hover:text-[#03002C]"
+                  }`}
+                >
+                  {option.hasScreen ? "With TV" : "No TV"}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <span className="rounded-full border border-black/10 bg-[#F2F2F2] px-3 py-1.5 text-[11px] font-semibold text-[#03002C]/70">
+              No TV on stand
+            </span>
+          )}
+
           <button
             type="button"
             onClick={() => setGuides((v) => !v)}
