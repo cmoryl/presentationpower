@@ -19,6 +19,7 @@ import {
   type MartSceneSubject,
 } from "@/lib/next-mart-scenes";
 import { pillarGeometry, type PillarConfig } from "@/lib/next-pillar-masters";
+import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
 
 export interface MartLocationRenderPreviewProps {
   /** Sign id — used for scene matching and the download filename. */
@@ -31,9 +32,6 @@ export interface MartLocationRenderPreviewProps {
 /** Fixed working scale for the master before it is fitted to the face. */
 const PX_PER_MM = 0.4;
 
-function pct(n: number): string {
-  return `${(n * 100).toFixed(4)}%`;
-}
 
 function Stage({
   subject,
@@ -80,6 +78,7 @@ function Stage({
   return (
     <div
       ref={stageRef}
+      data-insitu-stage="mart"
       className="relative w-full overflow-hidden rounded-xl bg-[#0d1117]"
       style={{ aspectRatio: `${scene.plate.w} / ${scene.plate.h}` }}
     >
@@ -92,17 +91,7 @@ function Stage({
         decoding="async"
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div
-        ref={faceRef}
-        className="absolute overflow-hidden"
-        style={{
-          left: pct(box.x),
-          top: pct(box.y),
-          width: pct(box.w),
-          height: pct(box.h),
-          boxShadow: "0 10px 26px rgba(3,0,44,0.28)",
-        }}
-      >
+      <SceneArtworkPlate box={box} sceneId={scene.id} faceRef={faceRef}>
         {/* The master renders at a fixed scale, then is scaled to the measured
             face so the installed sign keeps its exact trim proportions. */}
         <div
@@ -115,7 +104,7 @@ function Stage({
         >
           <PillarSign config={config} pxPerMm={PX_PER_MM} />
         </div>
-      </div>
+      </SceneArtworkPlate>
       <span
         data-export-ignore="true"
         className="absolute bottom-2 left-2 rounded bg-black/55 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white"
