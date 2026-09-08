@@ -30,6 +30,7 @@ import { useServerFn } from "@tanstack/react-start";
 
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import { useBoothTemplates } from "@/hooks/use-booth-templates";
 import { BoothTemplatePanel } from "@/components/events/BoothTemplatePanel";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
@@ -251,6 +252,7 @@ function LondonSignagePage() {
   // points (revise workflow, production studio) are only shown to signed-in
   // users.
   const userId = useSessionUser();
+  const isAdmin = useIsAdmin();
   // The kit shows the panel set IN FORCE: the newest published revision, or the
   // issued venue pack when there is none (or when the viewer is not signed in).
   const [panels, setPanels] = useState<LondonPanel[]>(LONDON_PANELS);
@@ -718,7 +720,7 @@ function LondonSignagePage() {
                   />
                 ))}
               </div>
-              {boothTemplates.templates.length > 0 ? (
+              {isAdmin && boothTemplates.templates.length > 0 ? (
                 <BoothTemplatePanel
                   templates={boothTemplates.templates}
                   panelIdBySlug={Object.fromEntries(
@@ -727,7 +729,7 @@ function LondonSignagePage() {
                       return meta ? [[meta.booth.id, panel.id] as const] : [];
                     }),
                   )}
-                  canEdit={!!userId}
+                  canEdit={isAdmin}
                   saving={boothTemplates.saving}
                   saveError={boothTemplates.saveError}
                   onSave={boothTemplates.save}

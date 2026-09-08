@@ -148,11 +148,14 @@ export function BoothTemplatePanel({
   };
 
   return (
-    <section className="mt-8 rounded-2xl border border-black/10 bg-[#F2F2F2] p-5">
-      <div className="flex flex-wrap items-baseline gap-3">
+    <details className="group mt-8 rounded-2xl border border-black/10 bg-[#F2F2F2] p-5">
+      <summary className="flex cursor-pointer list-none flex-wrap items-baseline gap-3 [&::-webkit-details-marker]:hidden">
         <h4 className="text-base font-semibold tracking-tight text-[#03002C]">
           Booth templates
         </h4>
+        <span className="rounded border border-[#03002C] bg-[#03002C] px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-white">
+          Admin only
+        </span>
         <span className="font-mono text-[11px] text-[#03002C]/55">
           {templates.length} stored · revision r{template.revision}
         </span>
@@ -161,12 +164,13 @@ export function BoothTemplatePanel({
             App-built template
           </span>
         ) : null}
-        {!canEdit ? (
-          <span className="rounded border border-[#03002C]/20 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#03002C]/60">
-            Read only
-          </span>
-        ) : null}
-      </div>
+        <span
+          aria-hidden="true"
+          className="ml-auto text-[#03002C]/60 transition-transform group-open:rotate-90"
+        >
+          ▸
+        </span>
+      </summary>
       <p className="mt-2 max-w-3xl text-[13px] leading-[1.5] text-[#03002C]/75">
         Each booth master is held in the backend with its own trim size, bleed and overlay, so it
         can be re-issued at another stand size or replaced with a new artwork round without a
@@ -561,6 +565,6 @@ export function BoothTemplatePanel({
           {status ?? saveError}
         </p>
       ) : null}
-    </section>
+    </details>
   );
 }
