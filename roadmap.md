@@ -9,4 +9,3 @@
 - [x] Credential module: point marker, logo tone, accent strength, badge size, heading alignment
 - [x] Tests + typecheck + build green
 - [x] Export sweep for the 3 new slide types — swept locally (ticker strip, sparkline hero, gauge stack all pass); coverage ledger now carries prior cells across matrix additions (904/6270 verified)
-- [x] Audit all partner booth renders and lock full-bleed proofs to the supplied frame geometry

@@ -3,7 +3,7 @@
 // Geometry contract — this is the part that has to be exact:
 //   • `shell.renderFace` is the printed TRIM face of the wall, measured off a
 //     blank-face plate of that build, in fractions of the render plate.
-//   • The vendor proof is the full BLEED page (trim + 100 mm each edge), so it
+//   • The vendor proof is the full BLEED page (trim + the panel's live bleed), so it
 //     is scaled up by (trim + 2×bleed)/trim and offset by -bleed/trim, which
 //     lands the trim box of the artwork exactly on the trim face of the wall.
 //   • The measured monitor aperture is the outside dimension of the installed
