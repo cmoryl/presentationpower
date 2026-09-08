@@ -565,6 +565,6 @@ export function BoothTemplatePanel({
           {status ?? saveError}
         </p>
       ) : null}
-    </section>
+    </details>
   );
 }
