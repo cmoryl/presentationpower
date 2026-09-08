@@ -454,6 +454,22 @@ function PlaybookDemoView() {
         </div>
       </section>
 
+      {/* QR creator — same engine as our signage, shared with event users */}
+      <section>
+        <SectionHead
+          eyebrow="Make your own"
+          title="QR creator"
+          desc="Build a scannable code for this event on the spot — pick the look, size it for print, then download vector SVG or a PNG."
+        />
+        <div className="mt-6">
+          <KitQrCreator
+            defaultData={playbook.facts.registrationUrl || ""}
+            defaultCaption="Scan to register"
+            fileStem={`${playbook.id}-qr`}
+          />
+        </div>
+      </section>
+
       {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
       <section>
         <SectionHead
