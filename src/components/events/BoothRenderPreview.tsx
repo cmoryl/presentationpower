@@ -50,7 +50,7 @@ function PhysicalDisplay({ shell }: { shell: LondonBoothShell }) {
     >
       <div className="relative h-full w-full overflow-hidden bg-black">
         <img
-          src={nextTvContent}
+          src={nextTvAsset.url}
           alt="NEXT event presentation playing on the booth display"
           className="h-full w-full object-cover"
           width={1024}
