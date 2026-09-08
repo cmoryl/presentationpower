@@ -32,7 +32,8 @@ describe("London division signage", () => {
   });
 
   it("clamps unapproved colourways only for divisions", () => {
-    expect(londonDivisionColourway("lifesci", "color")).toBe("white");
+    expect(londonDivisionColourway("lifesci", "color")).toBe("color");
+    expect(londonDivisionColourway("lifesci", "dblue")).toBe("white");
     expect(londonDivisionColourway("lifesci", "white-accent")).toBe("white-accent");
     expect(londonDivisionColourway("transperfect", "color")).toBe("color");
   });
