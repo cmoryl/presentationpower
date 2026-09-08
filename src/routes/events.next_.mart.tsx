@@ -7,6 +7,7 @@ import { MartBundleExport } from "@/components/next/MartBundleExport";
 import { MartStopManager } from "@/components/next/MartStopManager";
 import { MartArtworkStudio } from "@/components/next/MartArtworkStudio";
 import { MartSignEditor } from "@/components/next/MartSignEditor";
+import { MartLocationRenderPreview } from "@/components/next/MartLocationRenderPreview";
 import {
   listMartFlatMasters,
   listMartFlatSigns,
@@ -111,6 +112,18 @@ function MartPage() {
                     <li>{p.placement}</li>
                     <li>{p.substrate}</li>
                   </ul>
+                  <details className="mt-3 group">
+                    <summary className="cursor-pointer list-none text-[11px] font-semibold text-[#003FC7]">
+                      Show it in the shop
+                    </summary>
+                    <div className="mt-2">
+                      <MartLocationRenderPreview
+                        id={p.id}
+                        name={p.name}
+                        config={resolvedMartPillarConfig(p)}
+                      />
+                    </div>
+                  </details>
                 </div>
               </article>
             ))}
@@ -322,6 +335,18 @@ function MartPage() {
                       </li>
                       <li>{art ? `Placed art: ${art.headline}` : "No placed artwork"}</li>
                     </ul>
+                    <details className="mt-3">
+                      <summary className="cursor-pointer list-none text-[11px] font-semibold text-[#003FC7]">
+                        Show it in the shop
+                      </summary>
+                      <div className="mt-2">
+                        <MartLocationRenderPreview
+                          id={sign.id}
+                          name={sign.name}
+                          config={config}
+                        />
+                      </div>
+                    </details>
                   </div>
                 </article>
               );
