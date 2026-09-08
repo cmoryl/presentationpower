@@ -707,8 +707,6 @@ export function floorMapSvg(floor: LondonFloorId, opts: FloorMapOptions = {}): s
         ? `${plan.label} attendee floor guide — ${venue}`
         : `${plan.label} install map — ${venue}`,
     )}">
-
-    )}">
 <rect width="${size.w}" height="${size.h}" fill="${PAPER}" />
 ${floorMapContent(floor, opts, size)}
 </svg>`;
