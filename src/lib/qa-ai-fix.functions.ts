@@ -5,6 +5,7 @@
 // while preserving meaning; results are validated and clamped server-side.
 
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import {
   callAnthropic,
