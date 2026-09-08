@@ -242,6 +242,24 @@ export function boothArtworkPending(booth: LondonBoothSpec): boolean {
   return !booth.aiUrl;
 }
 
+/**
+ * Booths that have NO monitor on stand at NEXT London. They render on the
+ * screenless wall only — no "With TV" option and no display overlay.
+ */
+export const LONDON_BOOTHS_WITHOUT_TV: readonly string[] = [
+  "global-digital-experience-tradebooth-a",
+  "legal-support-2-tradebooth-b",
+  "coa",
+  "medical-writing",
+  "commercial-life-sciences",
+];
+
+/** True when this booth has a monitor on stand, so a TV render is offered. */
+export function boothHasTvOnStand(boothId: string | null | undefined): boolean {
+  return !!boothId && !LONDON_BOOTHS_WITHOUT_TV.includes(boothId);
+}
+
+
 // ---------------------------------------------------------------------------
 // RE-SIZING FOR THE NEXT EVENT LOCATION
 //
