@@ -41,12 +41,21 @@ export function londonDivisionAccent(familyId: string): { label: string; hex: st
   return LONDON_DIVISION_ACCENTS[familyId] ?? null;
 }
 
-/** Colourways a division item may print. White is the default and the rule. */
-export const LONDON_DIVISION_COLOURWAYS: NextLogoColourway[] = ["white", "white-accent"];
+/**
+ * Colourways a division item may print. White stays the default and the rule
+ * for scenic work; the full-colour cut is available as a deliberate switch for
+ * light grounds, close-up boards and co-branded placements. The dark-blue cut
+ * is still not approved on division signage.
+ */
+export const LONDON_DIVISION_COLOURWAYS: NextLogoColourway[] = [
+  "white",
+  "white-accent",
+  "color",
+];
 
 /**
- * Clamp a designer's colourway choice for a division item: full-colour and
- * dark-blue marks are not approved on division signage.
+ * Clamp a designer's colourway choice for a division item: the dark-blue mark
+ * is not approved on division signage.
  */
 export function londonDivisionColourway(
   familyId: string,
