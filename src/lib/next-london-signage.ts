@@ -1515,6 +1515,17 @@ export function londonBoothShell(panelId: string): LondonBoothShell | null {
 }
 
 /**
+ * True when the booth behind this panel has a monitor on stand. Booths without
+ * one never offer a TV render.
+ */
+export function londonBoothTvAvailable(panelId: string): boolean {
+  const meta = LONDON_BOOTH_PANEL_META[panelId];
+  if (!meta) return false;
+  return boothHasTvOnStand(meta.booth.id);
+}
+
+
+/**
  * The screen keep-clear zone for a panel, in mm on the BLEED page (so guides and
  * layout maths can use it directly). Null for a screenless shell or a
  * non-booth panel. Scaled from the panel's live trim, so a booth re-issued at
