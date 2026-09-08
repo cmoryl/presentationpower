@@ -226,8 +226,8 @@ export function auditNode(root: HTMLElement): WcagReport {
       // halo (multi-layer text-shadow) that fades into the media below. Keeps
       // text legible without introducing chip/box backgrounds.
       const haloShadow = useLight
-        ? "0 0 18px rgba(3,0,44,0.85), 0 0 36px rgba(3,0,44,0.7), 0 2px 4px rgba(0,0,0,0.6)"
-        : "0 0 18px rgba(255,255,255,0.9), 0 0 36px rgba(255,255,255,0.75), 0 2px 4px rgba(255,255,255,0.6)";
+        ? "0 1px 2px rgba(3,0,44,0.9), 0 0 8px rgba(3,0,44,0.6)"
+        : "0 1px 2px rgba(255,255,255,0.9), 0 0 8px rgba(255,255,255,0.6)";
       el.style.setProperty("color", target, "important");
       el.style.setProperty("-webkit-text-fill-color", target, "important");
       setHalo(el, haloShadow);
@@ -372,8 +372,8 @@ export function applyAutoFix(root: HTMLElement): number {
     const postRatio = contrastRatio(target, postBg);
     if (postRatio < (large ? 3 : 4.5)) {
       const halo = useLight
-        ? "0 0 18px rgba(3,0,44,0.85), 0 0 36px rgba(3,0,44,0.7), 0 2px 4px rgba(0,0,0,0.6)"
-        : "0 0 18px rgba(255,255,255,0.9), 0 0 36px rgba(255,255,255,0.75), 0 2px 4px rgba(255,255,255,0.6)";
+        ? "0 1px 2px rgba(3,0,44,0.9), 0 0 8px rgba(3,0,44,0.6)"
+        : "0 1px 2px rgba(255,255,255,0.9), 0 0 8px rgba(255,255,255,0.6)";
       setHalo(el, halo);
       if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
     } else {
@@ -457,8 +457,8 @@ function applyAutoFixInternal(root: HTMLElement) {
     const postRatio = contrastRatio(target, postBg);
     if (postRatio < (large ? 3 : 4.5)) {
       const halo = useLight
-        ? "0 0 18px rgba(3,0,44,0.85), 0 0 36px rgba(3,0,44,0.7), 0 2px 4px rgba(0,0,0,0.6)"
-        : "0 0 18px rgba(255,255,255,0.9), 0 0 36px rgba(255,255,255,0.75), 0 2px 4px rgba(255,255,255,0.6)";
+        ? "0 1px 2px rgba(3,0,44,0.9), 0 0 8px rgba(3,0,44,0.6)"
+        : "0 1px 2px rgba(255,255,255,0.9), 0 0 8px rgba(255,255,255,0.6)";
       setHalo(el, halo);
       if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
     } else {
