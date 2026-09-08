@@ -288,6 +288,48 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
         </p>
       ) : null}
       <p className="mt-1 font-mono text-[11px] text-[#03002C]/50">{DISCLAIMER}</p>
+
+      {zoom ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${panel.name} — ${shell.label} render`}
+          className="fixed inset-0 z-[130] flex items-center justify-center bg-[#03002C]/85 p-6 backdrop-blur-sm"
+          onClick={() => setZoom(false)}
+        >
+          <div className="w-full max-w-6xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between gap-3 pb-2 text-white">
+              <p className="truncate text-sm font-medium">
+                {panel.name} — {shell.label}
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => void savePng(zoomStage.current)}
+                  disabled={saving}
+                  className="rounded-full bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] disabled:opacity-60"
+                >
+                  {saving ? "Saving…" : "Download PNG"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setZoom(false)}
+                  aria-label="Close render preview"
+                  className="rounded-full border border-white/30 px-3 py-1.5 text-xs text-white"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+            <div
+              ref={zoomStage}
+              className="relative overflow-hidden rounded-2xl border border-white/20 bg-[#E0E8F5] shadow-2xl"
+            >
+              {stage(true)}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
