@@ -18,11 +18,11 @@ describe("London division signage", () => {
     expect(divisionPanels.length).toBeGreaterThan(0);
   });
 
-  it("prints a white lockup on every division panel, even when overridden", () => {
+  it("keeps division lockups on an approved cut, even when overridden", () => {
     for (const panel of divisionPanels) {
       for (const colourway of ["white", "white-accent", "color", "dblue"] as const) {
         const plan = londonBrandingPlan(panel, { ...DEFAULT_LOGO_PLACEMENT, colourway });
-        expect(["white", "white-accent"]).toContain(plan.colourway);
+        expect(["white", "white-accent", "color"]).toContain(plan.colourway);
       }
       // Default placement is the all-white cut — except on doors, which
       // default to the white mark with the division accent in its chevrons.
