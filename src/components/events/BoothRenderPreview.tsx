@@ -14,7 +14,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import nextTvContent from "@/assets/london-booths/renders/next-tv-content.jpg";
+// Screen content is real NEXT 2026 London event imagery from the Element
+// build — never an invented holding slide.
+import nextTvAsset from "@/assets/eventimg/next-flagship-london-1.jpg.asset.json";
 import {
   LONDON_BOOTH_SHELLS,
   boothShell,
