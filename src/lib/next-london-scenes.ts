@@ -5,9 +5,11 @@
 // (pure magenta placement area) and the magenta then neutralised, so panel
 // artwork can be composited into the exact measured face.
 //
-// These plates are photoreal *visualisations* of the type of space each item
-// hangs in — they are not photographs of the Queen Elizabeth II Centre. Every
-// surface that shows them must label them as visualisations.
+// These plates are photoreal *visualisations* built to match the real
+// architecture of the Queen Elizabeth II Centre (grey ribbed slat ceilings,
+// dark grey carpet tiles, purple upholstered stacking chairs, Broad Sanctuary
+// glazing with Westminster Abbey outside) — they are still not photographs of
+// the venue. Every surface that shows them must label them as visualisations.
 
 import coffeeBar from "@/assets/london-scenes/coffee-bar.jpg";
 import deskFront from "@/assets/london-scenes/desk-front.jpg";
