@@ -12,7 +12,7 @@
 // A visualisation, never a survey photograph and never a dimensional reference:
 // the trim and bleed geometry on the panel card remains the authority.
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import nextTvContent from "@/assets/london-booths/renders/next-tv-content.jpg";
 import {
