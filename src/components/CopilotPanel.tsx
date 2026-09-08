@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Sparkles, X, ArrowUp, Loader2, Wand2, BookOpen } from "lucide-react";
@@ -45,9 +46,15 @@ export function CopilotPanel({
     // Guide mode: stream a coaching response from /api/chat (no deck edits).
     if (mode === "guide") {
       try {
+        const { data: sess } = await supabase.auth.getSession();
         const res = await fetch("/api/chat", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(sess.session?.access_token
+              ? { Authorization: `Bearer ${sess.session.access_token}` }
+              : {}),
+          },
           body: JSON.stringify({
             mode: "guide",
             messages: history.slice(-20),
