@@ -97,8 +97,12 @@ async function downloadStagePng(node: HTMLElement, filename: string) {
 
 export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
   const panelShell = londonBoothShell(panel.id);
+  const tvAvailable = londonBoothTvAvailable(panel.id);
+  const shellOptions = tvAvailable
+    ? LONDON_BOOTH_SHELLS
+    : LONDON_BOOTH_SHELLS.filter((s) => !s.hasScreen);
   const [shellId, setShellId] = useState<string>(
-    panelShell?.id ?? LONDON_BOOTH_SHELLS[0]!.id,
+    (tvAvailable ? (panelShell?.id ?? LONDON_BOOTH_SHELLS[0]!.id) : shellOptions[0]!.id),
   );
   const [guides, setGuides] = useState(false);
   const [zoom, setZoom] = useState(false);
@@ -109,6 +113,7 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
   const art = londonBoothArtworkUrl(panel.id);
   const face = shell.renderFace;
   const page = bleedFrame(panel);
+
 
   useEffect(() => {
     if (!zoom) return;
