@@ -46,6 +46,7 @@ import { getDivisionLogos } from "@/lib/division-logos";
 import { DemoTranslateBar, useDemoTranslate } from "@/components/demo/DemoTranslate";
 import { nextLockupSuite, nextTrackIdForPlaybook } from "@/lib/next-event-logos";
 import { useSocialAssetEdits, socialEditKey } from "@/lib/social-asset-edit";
+import { KitQrCreator } from "@/components/campaigns/KitQrCreator";
 import {
   EVENT_LOOKS,
   EVENT_LOOKS_BY_ID,
@@ -451,6 +452,22 @@ function PlaybookDemoView() {
               />
             );
           })}
+        </div>
+      </section>
+
+      {/* QR creator — same engine as our signage, shared with event users */}
+      <section>
+        <SectionHead
+          eyebrow="Make your own"
+          title="QR creator"
+          desc="Build a scannable code for this event on the spot — pick the look, size it for print, then download vector SVG or a PNG."
+        />
+        <div className="mt-6">
+          <KitQrCreator
+            defaultData={playbook.facts.registrationUrl || ""}
+            defaultCaption="Scan to register"
+            fileStem={`${playbook.id}-qr`}
+          />
         </div>
       </section>
 

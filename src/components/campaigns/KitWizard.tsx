@@ -60,6 +60,7 @@ import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker"
 
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
 import { GroundedCopyDrafter } from "@/components/campaigns/GroundedCopyDrafter";
+import { KitQrCreator } from "@/components/campaigns/KitQrCreator";
 
 import { Download } from "lucide-react";
 
@@ -1088,6 +1089,15 @@ export function KitWizard({
                   ? "This kit lives in your kits list — updates overwrite the saved copy."
                   : `Saved kits appear on ${surface === "event" ? "/events" : "/social"} under "Your saved kits" so you can reopen or duplicate them any time.`}
               </p>
+            </div>
+
+            {/* QR creator — event users build their own scannable codes here. */}
+            <div className="mb-5">
+              <KitQrCreator
+                defaultData={event.registrationUrl ?? ""}
+                defaultCaption="Scan to register"
+                fileStem={`${(kitName || surface + "-kit").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-qr`}
+              />
             </div>
 
             {/* NEXT 2026 design mode — regenerate the kit into the event look. */}
