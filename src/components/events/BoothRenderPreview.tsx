@@ -63,10 +63,10 @@ function PhysicalDisplay({ shell }: { shell: LondonBoothShell }) {
   );
 }
 
-/** Bleed page geometry expressed against the trim box. */
-function bleedFrame(shell: LondonBoothShell) {
-  const px = shell.bleedMm / shell.trimW;
-  const py = shell.bleedMm / shell.trimH;
+/** Bleed-page geometry expressed against this panel's live trim box. */
+function bleedFrame(panel: Pick<LondonPanel, "trimW" | "trimH" | "bleedEdge">) {
+  const px = panel.bleedEdge / panel.trimW;
+  const py = panel.bleedEdge / panel.trimH;
   return {
     left: `${-px * 100}%`,
     top: `${-py * 100}%`,
@@ -84,7 +84,7 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
   const shell: LondonBoothShell = boothShell(shellId);
   const art = londonBoothArtworkUrl(panel.id);
   const face = shell.renderFace;
-  const page = bleedFrame(shell);
+  const page = bleedFrame(panel);
 
   return (
     <section className="rounded-xl border border-black/10 bg-white p-4">
@@ -158,8 +158,8 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
                 src={art}
                 alt=""
                 aria-hidden="true"
-                className="absolute"
-                style={{ ...page, opacity: 0.96 }}
+                className="absolute block max-w-none"
+                style={{ ...page, maxWidth: "none", opacity: 0.96 }}
                 loading="lazy"
               />
               {/* Room light falling across the printed face. */}
@@ -188,10 +188,10 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
               <div
                 className="absolute border border-dotted border-[#A6FA87]"
                 style={{
-                  left: `${(60 / shell.trimW) * 100}%`,
-                  top: `${(60 / shell.trimH) * 100}%`,
-                  right: `${(60 / shell.trimW) * 100}%`,
-                  bottom: `${(60 / shell.trimH) * 100}%`,
+                  left: `${(60 / panel.trimW) * 100}%`,
+                  top: `${(60 / panel.trimH) * 100}%`,
+                  right: `${(60 / panel.trimW) * 100}%`,
+                  bottom: `${(60 / panel.trimH) * 100}%`,
                 }}
               />
               {shell.screen ? (
@@ -212,14 +212,14 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
 
       <p className="mt-2 text-[12px] leading-relaxed text-[#03002C]/70">{shell.note}</p>
       <p className="mt-1 font-mono text-[11px] text-[#03002C]/60">
-        Full wall at true {shell.trimW} × {shell.trimH} mm proportion
+        Full wall at true {panel.trimW} × {panel.trimH} mm proportion
         {shell.hasScreen
           ? ` · ${boothScreenDiagonalIn(shell)} in 16:9 display at measured mounting position`
           : " · no display fitted"}
       </p>
       {guides ? (
         <p className="mt-1 font-mono text-[11px] text-[#03002C]/60">
-          Yellow = trim {shell.trimW} × {shell.trimH} mm · pink dash = {shell.bleedMm} mm bleed ·
+          Yellow = trim {panel.trimW} × {panel.trimH} mm · pink dash = {panel.bleedEdge} mm bleed ·
           green = 60 mm safe area{shell.screen ? " · pink = monitor keep-clear" : ""}
         </p>
       ) : null}

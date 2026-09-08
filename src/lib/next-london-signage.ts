@@ -15,8 +15,8 @@ import {
 } from "@/lib/next-london-booths";
 import { nativeBoothTemplate } from "@/lib/next-london-booth-native";
 import {
+  boothShell,
   boothScreenRectMm,
-  boothShellForSlug,
   type BoothRectMm,
   type LondonBoothShell,
 } from "@/lib/next-london-booth-shells";
@@ -1466,7 +1466,7 @@ export const LONDON_BOOTH_PANEL_META: Record<string, LondonBoothPanelMeta> = Obj
       panelId: panel.id,
       booth: BOOTH_ROWS[i]!.booth,
       artboard: BOOTH_ROWS[i]!.artboard,
-      shell: boothShellForSlug(BOOTH_ROWS[i]!.booth.id),
+      shell: boothShell(BOOTH_ROWS[i]!.booth.shellId),
     },
   ]),
 );

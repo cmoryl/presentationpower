@@ -11,6 +11,7 @@ import { buildLondonPanelSvg } from "@/lib/next-london-revise";
 import { DEFAULT_LOGO_PLACEMENT } from "@/lib/next-london-logo-placement";
 import { auditSvg, gateOnQa } from "@/lib/london-signage-qa";
 import {
+  LONDON_BOOTH_PANEL_META,
   LONDON_BOOTH_PANELS,
   londonBoothArtworkUrl,
   londonBoothNativeTemplate,
@@ -24,6 +25,13 @@ describe("booth wall with an editable copy layer", () => {
     expect(panel.ground).toBe("Supplied booth artwork");
     // A supplied wall is never treated as an app-built plate.
     expect(londonBoothNativeTemplate(panel.id)).toBeNull();
+  });
+
+  it("assigns every supplied booth to its explicit physical shell", () => {
+    for (const boothPanel of LONDON_BOOTH_PANELS) {
+      const meta = LONDON_BOOTH_PANEL_META[boothPanel.id];
+      expect(meta?.shell.id).toBe(meta?.booth.shellId);
+    }
   });
 
   it("starts with no baked-on copy so the wall reads as delivered", () => {

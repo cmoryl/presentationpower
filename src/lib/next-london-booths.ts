@@ -43,6 +43,7 @@ import tiAi from "@/assets/london-booths/ti-tradebooth-a.ai?url";
 import tiP1 from "@/assets/london-booths/ti-tradebooth-a.jpg";
 import veevaAi from "@/assets/london-booths/veeva-tradebooth-a.ai?url";
 import veevaP1 from "@/assets/london-booths/veeva-tradebooth-a.jpg";
+import type { LondonBoothShellId } from "@/lib/next-london-booth-shells";
 
 export type LondonBoothArtboardKind = "main" | "return-l" | "return-r";
 
@@ -61,6 +62,8 @@ export type LondonBoothArtboard = {
 
 export type LondonBoothSpec = {
   id: string;
+  /** Physical wall supplied for this booth; never infer this from its name. */
+  shellId: LondonBoothShellId;
   vendor: string;
   /** Supplied Illustrator template filename, when we have one. */
   sourceFile: string | null;
@@ -95,6 +98,7 @@ function frontWall(previewUrl: string | null): LondonBoothArtboard[] {
 export const LONDON_BOOTHS: LondonBoothSpec[] = [
   {
     id: "ti-tradebooth-a",
+    shellId: "tradebooth-a",
     vendor: "Trial Interactive",
     sourceFile: "TITradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: tiAi,
@@ -103,6 +107,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   },
   {
     id: "gl-live-tradebooth-a",
+    shellId: "tradebooth-a",
     vendor: "GlobalLink Live · Conference & Events",
     sourceFile: "GLv2_LiveTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: glLiveAi,
@@ -111,6 +116,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   },
   {
     id: "global-digital-experience-tradebooth-a",
+    shellId: "tradebooth-a",
     vendor: "Global Digital Experience",
     sourceFile: "GlobalDigitalExperience_LiveTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: gdxAi,
@@ -119,6 +125,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   },
   {
     id: "learning-tradebooth-a",
+    shellId: "tradebooth-a",
     vendor: "Learning Solutions",
     sourceFile: "LearningTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: learningAi,
@@ -127,6 +134,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   },
   {
     id: "live-customer-tradebooth-a",
+    shellId: "tradebooth-a",
     vendor: "Live Customer Connect University",
     sourceFile: "LiveCustomerConnetUniTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: liveCustomerAi,
@@ -135,6 +143,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   },
   {
     id: "media-tradebooth-a",
+    shellId: "tradebooth-a",
     vendor: "Media Solutions",
     sourceFile: "MediaTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: mediaAi,
@@ -146,6 +155,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   // superseded.
   {
     id: "legal-support-2-tradebooth-b",
+    shellId: "tradebooth-b",
     vendor: "Legal Support · Booth B",
     sourceFile: "LegalSupport2TradeBoothB_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: legal2Ai,
@@ -154,6 +164,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   },
   {
     id: "sterling-2-tradebooth-a",
+    shellId: "tradebooth-a",
     vendor: "Sterling",
     sourceFile: "Sterling2TradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: sterling2Ai,
@@ -163,6 +174,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
 
   {
     id: "veeva-tradebooth-a",
+    shellId: "tradebooth-a",
     vendor: "Veeva",
     sourceFile: "VeevaTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: veevaAi,
@@ -171,6 +183,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   },
   {
     id: "contact-center",
+    shellId: "tradebooth-a",
     vendor: "Contact Center | LifeSciNEXT",
     sourceFile: "Contact CenterTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: contactCenterAi,
@@ -179,6 +192,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   },
   {
     id: "coa",
+    shellId: "tradebooth-a",
     vendor: "COA | LifeSciNEXT",
     sourceFile: "COA_LiveTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: coaAi,
@@ -187,6 +201,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   },
   {
     id: "medical-writing",
+    shellId: "tradebooth-a",
     vendor: "Medical Writing | LifeSciNEXT",
     sourceFile: "LSMEDWRTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: medWriteAi,
@@ -195,6 +210,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   },
   {
     id: "live-conference-events",
+    shellId: "tradebooth-a",
     vendor: "Live Conference/Events | LifeSciNEXT",
     sourceFile: "GL_Live_LifeSciNEXTTradeBoothA_Front_1830x2440mm_Plus100mmBleed.pdf",
     aiUrl: glLifeSciAi,
@@ -203,6 +219,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   },
   {
     id: "commercial-life-sciences",
+    shellId: "tradebooth-a",
     vendor: "Commercial for Life Sciences | LifeSciNEXT",
     sourceFile: "Commercial_LiveTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: commercialAi,
@@ -211,6 +228,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   },
   {
     id: "global-content-delivery-tradebooth-a",
+    shellId: "tradebooth-a",
     vendor: "Global Content Delivery",
     sourceFile: "GlobalContentDeliveryTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: gcdAi,
