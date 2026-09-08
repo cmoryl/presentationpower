@@ -779,9 +779,12 @@ body.export-mode [data-print-surface] {
    video stills, gradient scrims and accent-filled chips. Those surfaces are
    NOT flat editorial white, so white ink there gets its contrast treatment
    back: a tight, neutral shadow (never a colored glow) plus an optional
-   opt-in scrim. Flat-surface copy stays shadow-free. */
-[data-slide-mode="light"] .text-white,
-[data-slide-mode="light"] .text-white *,
+   opt-in scrim. Flat-surface copy stays shadow-free.
+
+   Scope note: the halo is keyed to the media markers ONLY. A bare
+   `.text-white`/`.text-white *` selector used to match every descendant of any
+   white-ink ancestor (including the app chrome wrapping a slide preview),
+   which stamped a blurred glow onto ordinary flat module copy. */
 [data-slide-mode="light"] [data-on-media],
 [data-slide-mode="light"] [data-on-media] *,
 [data-slide-mode="light"] [data-media-backing] > :not([data-media-tile]),
@@ -790,6 +793,7 @@ body.export-mode [data-print-surface] {
     0 1px 2px rgb(3 0 44 / 0.45),
     0 2px 10px rgb(3 0 44 / 0.3) !important;
 }
+
 
 /* Photography behind copy — BOTH modes: text layered over an image tile or a
    media-backed block must render white. Dark mode previously left muted blue
