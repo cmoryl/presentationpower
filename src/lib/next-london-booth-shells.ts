@@ -65,9 +65,27 @@ export type LondonBoothShell = {
   note: string;
 };
 
-
 /** Trim size and bleed shared by both supplied shells. */
 export const LONDON_BOOTH_SHELL_TRIM = { w: 1830, h: 2440, bleedMm: 100 } as const;
+
+/**
+ * Fit the exact 1830 × 2440 trim ratio inside a measured wall opening.
+ * The render plates are landscape images, so percentages alone do not preserve
+ * the physical wall ratio unless the image dimensions are included here.
+ */
+function trimFaceOnRender(
+  render: { w: number; h: number },
+  opening: { centerX: number; top: number; bottom: number },
+): LondonBoothShell["renderFace"] {
+  const heightPx = opening.bottom - opening.top;
+  const widthPx = heightPx * (LONDON_BOOTH_SHELL_TRIM.w / LONDON_BOOTH_SHELL_TRIM.h);
+  return {
+    x: (opening.centerX - widthPx / 2) / render.w,
+    y: opening.top / render.h,
+    w: widthPx / render.w,
+    h: heightPx / render.h,
+  };
+}
 
 // Measured off the supplied Trade Booth A artboard: the magenta aperture runs
 // x 303.76 → 1726.24 mm and y 504.50 → 1301.83 mm on the 2030 × 2640 mm bleed
@@ -92,16 +110,13 @@ export const LONDON_BOOTH_SHELLS: LondonBoothShell[] = [
       h: SCREEN_MM.h / LONDON_BOOTH_SHELL_TRIM.h,
     },
     renderUrl: shellARender,
-    // Exact inside edges of the wall face on the 1536 × 1024 render plate:
-    // x 428 → 1130 px and y 68 → 965 px. Do not force the source-file aspect
-    // ratio here: narrowing this measured opening shifts the otherwise exact,
-    // centred live-file monitor aperture relative to the photographed frame.
-    renderFace: {
-      x: 428 / 1536,
-      y: 68 / 1024,
-      w: (1130 - 428) / 1536,
-      h: (965 - 68) / 1024,
-    },
+    // The photographed opening is centred at x=779 and runs y=68 → 965.
+    // Fit the supplied 1830:2440 trim inside it rather than stretching artwork
+    // to the wider decorative frame. The TV remains centred on the true trim.
+    renderFace: trimFaceOnRender(
+      { w: 1536, h: 1024 },
+      { centerX: 779, top: 68, bottom: 965 },
+    ),
     note:
       "Screen wall: a 1422 × 797 mm 16:9 monitor aperture sits centred, 405 mm below the trim top. " +
       "Keep logos and copy out of it — the lockup rides above the screen, copy below it.",
@@ -118,9 +133,12 @@ export const LONDON_BOOTH_SHELLS: LondonBoothShell[] = [
     hasScreen: false,
     screen: null,
     renderUrl: shellBRender,
-    // Preserve the measured vertical bounds while enforcing the real trim
-    // ratio, centred within the generated frame.
-    renderFace: { x: 0.2871, y: 0.0684, w: 0.4253, h: 0.8506 },
+    // Apply the same physical trim fit to the screenless wall. Its measured
+    // opening is centred at x=767.6 and runs y=70 → 941 on the render plate.
+    renderFace: trimFaceOnRender(
+      { w: 1536, h: 1024 },
+      { centerX: 767.6, top: 70, bottom: 941 },
+    ),
     note: "No screen: the whole 1830 × 2440 mm face is live artwork.",
   },
 ];
