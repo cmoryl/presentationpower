@@ -110,6 +110,7 @@ import { Route as AdminTranslationRouteImport } from './routes/admin.translation
 import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
 import { Route as AdminTeamRouteImport } from './routes/admin.team'
 import { Route as AdminStyleLearningRouteImport } from './routes/admin.style-learning'
+import { Route as AdminQrDownloadsRouteImport } from './routes/admin.qr-downloads'
 import { Route as AdminPrintLibraryRouteImport } from './routes/admin.print-library'
 import { Route as AdminPrintColorRouteImport } from './routes/admin.print-color'
 import { Route as AdminPdfIngestRouteImport } from './routes/admin.pdf-ingest'
@@ -685,6 +686,11 @@ const AdminStyleLearningRoute = AdminStyleLearningRouteImport.update({
   path: '/style-learning',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminQrDownloadsRoute = AdminQrDownloadsRouteImport.update({
+  id: '/qr-downloads',
+  path: '/qr-downloads',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPrintLibraryRoute = AdminPrintLibraryRouteImport.update({
   id: '/print-library',
   path: '/print-library',
@@ -1079,6 +1085,7 @@ export interface FileRoutesByFullPath {
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-color': typeof AdminPrintColorRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
+  '/admin/qr-downloads': typeof AdminQrDownloadsRoute
   '/admin/style-learning': typeof AdminStyleLearningRoute
   '/admin/team': typeof AdminTeamRoute
   '/admin/templates': typeof AdminTemplatesRoute
@@ -1245,6 +1252,7 @@ export interface FileRoutesByTo {
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-color': typeof AdminPrintColorRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
+  '/admin/qr-downloads': typeof AdminQrDownloadsRoute
   '/admin/style-learning': typeof AdminStyleLearningRoute
   '/admin/team': typeof AdminTeamRoute
   '/admin/templates': typeof AdminTemplatesRoute
@@ -1416,6 +1424,7 @@ export interface FileRoutesById {
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-color': typeof AdminPrintColorRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
+  '/admin/qr-downloads': typeof AdminQrDownloadsRoute
   '/admin/style-learning': typeof AdminStyleLearningRoute
   '/admin/team': typeof AdminTeamRoute
   '/admin/templates': typeof AdminTemplatesRoute
@@ -1588,6 +1597,7 @@ export interface FileRouteTypes {
     | '/admin/pdf-ingest'
     | '/admin/print-color'
     | '/admin/print-library'
+    | '/admin/qr-downloads'
     | '/admin/style-learning'
     | '/admin/team'
     | '/admin/templates'
@@ -1754,6 +1764,7 @@ export interface FileRouteTypes {
     | '/admin/pdf-ingest'
     | '/admin/print-color'
     | '/admin/print-library'
+    | '/admin/qr-downloads'
     | '/admin/style-learning'
     | '/admin/team'
     | '/admin/templates'
@@ -1924,6 +1935,7 @@ export interface FileRouteTypes {
     | '/admin/pdf-ingest'
     | '/admin/print-color'
     | '/admin/print-library'
+    | '/admin/qr-downloads'
     | '/admin/style-learning'
     | '/admin/team'
     | '/admin/templates'
@@ -2858,6 +2870,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminStyleLearningRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/qr-downloads': {
+      id: '/admin/qr-downloads'
+      path: '/qr-downloads'
+      fullPath: '/admin/qr-downloads'
+      preLoaderRoute: typeof AdminQrDownloadsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/print-library': {
       id: '/admin/print-library'
       path: '/print-library'
@@ -3367,6 +3386,7 @@ interface AdminRouteChildren {
   AdminPdfIngestRoute: typeof AdminPdfIngestRoute
   AdminPrintColorRoute: typeof AdminPrintColorRoute
   AdminPrintLibraryRoute: typeof AdminPrintLibraryRoute
+  AdminQrDownloadsRoute: typeof AdminQrDownloadsRoute
   AdminStyleLearningRoute: typeof AdminStyleLearningRoute
   AdminTeamRoute: typeof AdminTeamRoute
   AdminTemplatesRoute: typeof AdminTemplatesRoute
@@ -3403,6 +3423,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPdfIngestRoute: AdminPdfIngestRoute,
   AdminPrintColorRoute: AdminPrintColorRoute,
   AdminPrintLibraryRoute: AdminPrintLibraryRoute,
+  AdminQrDownloadsRoute: AdminQrDownloadsRoute,
   AdminStyleLearningRoute: AdminStyleLearningRoute,
   AdminTeamRoute: AdminTeamRoute,
   AdminTemplatesRoute: AdminTemplatesRoute,

@@ -2311,6 +2311,33 @@ export type Database = {
         }
         Relationships: []
       }
+      kit_qr_downloads: {
+        Row: {
+          created_at: string
+          format: string
+          id: string
+          kit_id: string
+          kit_label: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          format: string
+          id?: string
+          kit_id: string
+          kit_label?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          format?: string
+          id?: string
+          kit_id?: string
+          kit_label?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       knowledge_entries: {
         Row: {
           body: string

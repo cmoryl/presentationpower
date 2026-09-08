@@ -11,6 +11,7 @@ import { useMemo, useRef, useState } from "react";
 import { Check, Copy, Download, QrCode } from "lucide-react";
 import { toast } from "sonner";
 import { buildPillarQr } from "@/lib/pillar-qr";
+import { logKitQrDownload } from "@/lib/kit-qr-downloads";
 import {
   PILLAR_CAPTION_FONTS,
   PILLAR_QR_MIN_CONTRAST,
@@ -28,6 +29,10 @@ export type KitQrCreatorProps = {
   defaultCaption?: string;
   /** Filename stem for downloads. */
   fileStem?: string;
+  /** Stable id of the kit this creator sits in — used for download tracking. */
+  kitId?: string;
+  /** Human name of the kit, shown on the downloads dashboard. */
+  kitLabel?: string;
   className?: string;
 };
 
@@ -125,8 +130,11 @@ export function KitQrCreator({
   defaultData = "",
   defaultCaption = "",
   fileStem = "event-kit-qr",
+  kitId,
+  kitLabel,
   className = "",
 }: KitQrCreatorProps) {
+  const trackId = kitId || fileStem;
   const [data, setData] = useState(defaultData);
   const [style, setStyle] = useState<PillarQrStyleId>("block");
   const [ink, setInk] = useState("#03002C");
@@ -200,6 +208,7 @@ export function KitQrCreator({
       const blob: Blob | null = await new Promise((res) => canvas.toBlob(res, "image/png"));
       if (!blob) throw new Error("no blob");
       downloadBlob(blob, `${fileStem}.png`);
+      void logKitQrDownload(trackId, kitLabel, "png");
     } catch {
       toast.error("Could not build the PNG — try the SVG download.");
     } finally {
@@ -225,7 +234,11 @@ export function KitQrCreator({
           <button
             type="button"
             disabled={!svg}
-            onClick={() => svg && downloadBlob(new Blob([svg], { type: "image/svg+xml" }), `${fileStem}.svg`)}
+            onClick={() => {
+              if (!svg) return;
+              downloadBlob(new Blob([svg], { type: "image/svg+xml" }), `${fileStem}.svg`);
+              void logKitQrDownload(trackId, kitLabel, "svg");
+            }}
             className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#03002C] disabled:opacity-50"
           >
             <Download size={12} /> SVG (vector)
