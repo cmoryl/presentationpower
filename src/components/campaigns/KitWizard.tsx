@@ -60,6 +60,7 @@ import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker"
 
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
 import { GroundedCopyDrafter } from "@/components/campaigns/GroundedCopyDrafter";
+import { KitQrCreator } from "@/components/campaigns/KitQrCreator";
 
 import { Download } from "lucide-react";
 
