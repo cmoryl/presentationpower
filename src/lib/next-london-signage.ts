@@ -10,9 +10,11 @@ import artworkAsset from "@/assets/next-london-signage-artwork.json.asset.json";
 import {
   LONDON_BOOTHS,
   LONDON_BOOTH_BLEED_MM,
+  boothHasTvOnStand,
   type LondonBoothArtboard,
   type LondonBoothSpec,
 } from "@/lib/next-london-booths";
+
 import { nativeBoothTemplate } from "@/lib/next-london-booth-native";
 import {
   boothShell,
