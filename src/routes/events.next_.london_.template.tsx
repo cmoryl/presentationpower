@@ -40,6 +40,7 @@ import { cmykLabel, cmykToHex, londonCmykBuild } from "@/lib/next-london-cmyk";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
 import { LondonPrintGuides, LondonPrintReadout } from "@/components/london/LondonPrintPreview";
 import { LONDON_DIVISION_COLOURWAYS, londonDivisionAccent } from "@/lib/next-london-division";
+import { LondonAccentTintPicker } from "@/components/events/LondonAccentTintPicker";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
   nextLogoColourways,
@@ -466,6 +467,13 @@ function LondonTemplatePage() {
                 <LondonPrintReadout panel={panel} plan={plan} />
               </div>
             ) : null}
+
+            <LondonAccentTintPicker
+              panel={panel}
+              familyId={plan.familyId}
+              accentTint={placement.accentTint}
+              className="mt-4"
+            />
 
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground">Logo colourway</span>

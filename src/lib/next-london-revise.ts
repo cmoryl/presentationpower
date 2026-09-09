@@ -45,8 +45,7 @@ import {
 } from "@/lib/next-london-branding";
 import {
   isLondonDoorItem,
-  LONDON_DOOR_ACCENT_WEIGHT,
-  londonDivisionStops,
+  londonTintedStops,
 } from "@/lib/next-london-division";
 import { loadLondonGroundImage, type LondonGroundImage } from "@/lib/next-london-artwork";
 
@@ -80,9 +79,10 @@ import {
   type LondonBoardSize,
   type LondonBoardSizeMap,
 } from "@/lib/next-london-board-size";
-import type {
-  LondonLogoPlacement,
-  LondonLogoPlacementMap,
+import {
+  londonLogoPlacement,
+  type LondonLogoPlacement,
+  type LondonLogoPlacementMap,
 } from "@/lib/next-london-logo-placement";
 import {
   isStepRepeatPanel,
@@ -470,18 +470,17 @@ function stopsFor(panel: LondonPanel): string[] {
  * The approved colour ramp for a panel, in ramp order. Exported so QA can
  * assert an exported `.ai` still carries these exact stops.
  */
-export function londonPanelStops(panel: LondonPanel): string[] {
+export function londonPanelStops(panel: LondonPanel, tintId?: string | null): string[] {
   const stops = LONDON_STYLES[panel.style]?.stops;
   const base = stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
   // Division items carry their NEXT 2026 accent as a slight tint at the light
   // end of the ramp; master-brand items are returned unchanged.
   // Doors take the stronger soft-focus accent weight; scenic panels keep the
   // restrained tint so the venue still reads as one pack.
-  return londonDivisionStops(
-    londonPanelFamily(panel),
-    base,
-    isLondonDoorItem(panel.room, panel.name) ? LONDON_DOOR_ACCENT_WEIGHT : undefined,
-  );
+  return londonTintedStops(londonPanelFamily(panel), base, {
+    tintId: tintId ?? londonLogoPlacement(panel.id).accentTint,
+    door: isLondonDoorItem(panel.room, panel.name),
+  });
 }
 
 /**

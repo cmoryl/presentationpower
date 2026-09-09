@@ -22,10 +22,10 @@ import { parseColor, readShadingStops } from "@/lib/pdf-gradient-shading";
 
 import {
   isLondonDoorItem,
-  LONDON_DOOR_ACCENT_WEIGHT,
-  londonDivisionStops,
+  londonTintedStops,
 } from "@/lib/next-london-division";
 import { londonBrandingPlan, londonPanelFamily } from "@/lib/next-london-branding";
+import { londonLogoPlacement } from "@/lib/next-london-logo-placement";
 
 const MM_TO_PT = 72 / 25.4;
 
@@ -38,11 +38,10 @@ function expectedRamp(panel: LondonPanel): string[] {
   const stops = LONDON_STYLES[panel.style]?.stops;
   const base = stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
   // Doors carry the heavier soft-focus accent weight; mirror the art layer.
-  return londonDivisionStops(
-    londonPanelFamily(panel),
-    base,
-    isLondonDoorItem(panel.room, panel.name) ? LONDON_DOOR_ACCENT_WEIGHT : undefined,
-  );
+  return londonTintedStops(londonPanelFamily(panel), base, {
+    tintId: londonLogoPlacement(panel.id).accentTint,
+    door: isLondonDoorItem(panel.room, panel.name),
+  });
 }
 
 function hex(c: [number, number, number]): string {

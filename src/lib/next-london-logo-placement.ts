@@ -9,6 +9,7 @@
 
 import { useSyncExternalStore } from "react";
 
+import { londonAccentTint } from "@/lib/next-london-division";
 import { NEXT_LOGO_COLOURWAYS, type NextLogoColourway } from "@/lib/next-logo-vectors";
 import {
   PILLAR_CAPTION_FONTS,
@@ -115,6 +116,12 @@ export type LondonLogoPlacement = {
   groundDx: number;
   /** Supplied-artwork pan, as a fraction of the trim height. */
   groundDy: number;
+  /**
+   * Division gradient option (see LONDON_ACCENT_TINTS). `null` keeps the house
+   * default for the panel type. Only affects division items — a master-brand
+   * panel has no accent to tint with.
+   */
+  accentTint: string | null;
 };
 
 export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
@@ -157,6 +164,7 @@ export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
   groundScale: 1,
   groundDx: 0,
   groundDy: 0,
+  accentTint: null,
 };
 
 export type LondonLogoPlacementMap = Record<string, LondonLogoPlacement>;
@@ -282,6 +290,7 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
     groundScale: clamp(p.groundScale, LONDON_GROUND_SCALE.min, LONDON_GROUND_SCALE.max, 1),
     groundDx: clamp(p.groundDx, -0.5, 0.5, 0),
     groundDy: clamp(p.groundDy, -0.5, 0.5, 0),
+    accentTint: londonAccentTint(typeof p.accentTint === "string" ? p.accentTint : null)?.id ?? null,
   };
 }
 
