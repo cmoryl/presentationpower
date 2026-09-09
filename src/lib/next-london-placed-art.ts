@@ -686,6 +686,23 @@ export function normalisePathData(d: string): { d: string; arcs: boolean } {
         i += 2;
         break;
       }
+      case "A": {
+        const rx = num(i);
+        const ry = num(i + 1);
+        const rot = num(i + 2);
+        const largeArc = num(i + 3) !== 0;
+        const sweep = num(i + 4) !== 0;
+        const ex = rel ? x + num(i + 5) : num(i + 5);
+        const ey = rel ? y + num(i + 6) : num(i + 6);
+        for (const c of arcToCubics(x, y, rx, ry, rot, largeArc, sweep, ex, ey)) {
+          out.push(`C ${c.join(" ")}`);
+        }
+        x = ex;
+        y = ey;
+        qx = qy = null;
+        i += 7;
+        break;
+      }
       default:
         i += 1;
     }
