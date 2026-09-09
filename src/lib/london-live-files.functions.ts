@@ -73,7 +73,10 @@ export const listLondonLiveFiles = createServerFn({ method: "GET" }).handler(asy
   );
   const signed = new Map<string, string>();
   if (paths.length > 0) {
-    const { data: urls } = await supabase.storage
+    // The store stays private: only the server may sign read links, and it does
+    // so for everyone who can see the kit, print vendors included.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: urls } = await supabaseAdmin.storage
       .from(BUCKET)
       .createSignedUrls(paths, READ_URL_TTL_SECONDS);
     for (const entry of urls ?? []) {
