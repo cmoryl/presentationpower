@@ -23,7 +23,7 @@ import gcdAi from "@/assets/london-booths/global-content-delivery-tradebooth-a.a
 import gcdP1 from "@/assets/london-booths/global-content-delivery-tradebooth-a.jpg";
 import gdxAi from "@/assets/london-booths/global-digital-experience-live-tradebooth-a.ai?url";
 import gdxP1 from "@/assets/london-booths/global-digital-experience-live-tradebooth-a.jpg";
-import glLifeSciAi from "@/assets/london-booths/gl-live-lifesci-tradebooth-a.pdf?url";
+import glLifeSciAi from "@/assets/london-booths/gl-live-lifesci-tradebooth-a.ai?url";
 import glLifeSciP1 from "@/assets/london-booths/gl-live-lifesci-tradebooth-a.jpg";
 import glLiveAi from "@/assets/london-booths/gl-live-tradebooth-a.ai?url";
 import glLiveP1 from "@/assets/london-booths/gl-live-tradebooth-a.jpg";
