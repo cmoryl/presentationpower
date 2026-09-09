@@ -25,7 +25,7 @@ function tokenize(d: string): (string | number)[] {
   let i = 0;
   while (i < source.length) {
     const ch = source[i]!;
-    if (/[MLHVCSZmlhvcsz]/.test(ch)) {
+    if (/[MLHVCSQTZmlhvcsqtz]/.test(ch)) {
       out.push(ch);
       i += 1;
       continue;
@@ -76,6 +76,18 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
   let cursor: Point = { x: 0, y: 0 };
   let start: Point = { x: 0, y: 0 };
   let lastControl: Point | null = null;
+  // Last QUADRATIC control point, kept apart from the cubic one so `T` reflects
+  // the right thing. TrueType glyph outlines (Geist Bold) are all quadratic, so
+  // without Q/T support every curved letter collapsed to straight facets.
+  let lastQControl: Point | null = null;
+  const quadTo = (c: Point, p: Point) => {
+    // Exact degree elevation: a quadratic is a cubic with controls at 2/3.
+    curveTo(
+      { x: cursor.x + (2 / 3) * (c.x - cursor.x), y: cursor.y + (2 / 3) * (c.y - cursor.y) },
+      { x: p.x + (2 / 3) * (c.x - p.x), y: p.y + (2 / 3) * (c.y - p.y) },
+      p,
+    );
+  };
   let command = "";
   let i = 0;
 
