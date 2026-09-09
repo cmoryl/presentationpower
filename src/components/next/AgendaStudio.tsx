@@ -508,7 +508,21 @@ export function AgendaStudio({
               }}
             >
               <div style={{ transform: `scale(${previewScale})`, transformOrigin: "top left" }}>
-                <AgendaSheet config={pageConfig} pxPerMm={NATIVE_PX_PER_MM} guides={guides} />
+                <AgendaSheet
+                  config={pageConfig}
+                  pxPerMm={NATIVE_PX_PER_MM}
+                  guides={guides}
+                  onPlaceQr={(x, y) => {
+                    // The sheet reports millimetres at native scale; the stage is
+                    // zoomed, so fold the zoom back out of the drag.
+                    const b = qrBlock;
+                    if (!b) return;
+                    placeQr(
+                      Math.round(b.x + (x - b.x) / previewScale),
+                      Math.round(b.y + (y - b.y) / previewScale),
+                    );
+                  }}
+                />
               </div>
             </div>
           </div>
