@@ -225,7 +225,12 @@ export function londonBrandingPlan(
     ? londonDoorColourway(familyId, nudgeEarly.colourway)
     : londonDivisionColourway(familyId, nudgeEarly.colourway);
 
-  const { art, orientation, colourway } = pickNextLogo(familyId, aspect, wantedColourway);
+  const { art, orientation, colourway } = pickNextLogo(
+    familyId,
+    aspect,
+    wantedColourway,
+    nudgeEarly.lockupShape,
+  );
 
   const marginX = (panel.bleedW - panel.trimW) / 2;
   const marginY = (panel.bleedH - panel.trimH) / 2;

@@ -11114,6 +11114,7 @@ export function pickNextLogo(
   familyId: string,
   aspect: number,
   colourway: NextLogoColourway = "white",
+  shape: "auto" | "side" | "stacked" = "auto",
 ): { art: NextLogoArt; orientation: "stacked" | "side"; colourway: NextLogoColourway } {
   const family = nextLogoFamily(familyId);
   const available = nextLogoColourways(familyId);
@@ -11123,7 +11124,7 @@ export function pickNextLogo(
     stacked: family.stacked,
     side: family.side,
   };
-  const wantSide = aspect >= 1.6;
+  const wantSide = shape === "auto" ? aspect >= 1.6 : shape === "side";
   const first = wantSide ? set.side : set.stacked;
   const fallback = wantSide ? set.stacked : set.side;
   const art = (first ?? fallback ?? family.stacked ?? family.side)!;

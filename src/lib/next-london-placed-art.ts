@@ -82,28 +82,51 @@ function clamp(v: unknown, min: number, max: number, fallback: number): number {
 }
 
 function sanitiseFill(value: unknown): string {
+  return parsePaint(value).hex;
+}
+
+/**
+ * Read a paint value. `alpha` carries the transparency the file itself declared
+ * (`rgba()` / `#rrggbbaa`), and `painted` is false for `none` / `transparent`,
+ * so a shape the designer made see-through is never turned into solid ink.
+ */
+export function parsePaint(value: unknown): { hex: string; alpha: number; painted: boolean } {
   const s = typeof value === "string" ? value.trim() : "";
-  if (/^#[0-9a-f]{3}$/i.test(s)) {
-    return `#${s[1]}${s[1]}${s[2]}${s[2]}${s[3]}${s[3]}`.toUpperCase();
+  const key = s.toLowerCase();
+  if (key === "none" || key === "transparent") return { hex: "#000000", alpha: 0, painted: false };
+  if (/^#[0-9a-f]{3,4}$/i.test(s)) {
+    const hex = `#${s[1]}${s[1]}${s[2]}${s[2]}${s[3]}${s[3]}`.toUpperCase();
+    const a = s.length === 5 ? parseInt(`${s[4]}${s[4]}`, 16) / 255 : 1;
+    return { hex, alpha: a, painted: true };
   }
-  if (/^#[0-9a-f]{6}$/i.test(s)) return s.toUpperCase();
+  if (/^#[0-9a-f]{6}$/i.test(s)) return { hex: s.toUpperCase(), alpha: 1, painted: true };
+  if (/^#[0-9a-f]{8}$/i.test(s)) {
+    return {
+      hex: s.slice(0, 7).toUpperCase(),
+      alpha: parseInt(s.slice(7), 16) / 255,
+      painted: true,
+    };
+  }
   const rgb = /^rgba?\(([^)]+)\)$/i.exec(s);
   if (rgb) {
-    const parts = rgb[1]!.split(",").map((p) => Number(p.trim()));
+    const parts = rgb[1]!.split(/[,\s/]+/).filter(Boolean).map((p) => Number(p.trim()));
     if (parts.length >= 3 && parts.slice(0, 3).every((n) => Number.isFinite(n))) {
-      return `#${parts
+      const hex = `#${parts
         .slice(0, 3)
         .map((n) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0"))
         .join("")}`.toUpperCase();
+      const a = parts.length >= 4 && Number.isFinite(parts[3]!) ? parts[3]! : 1;
+      return { hex, alpha: Math.max(0, Math.min(1, a)), painted: true };
     }
   }
-  return NAMED_INK[s.toLowerCase()] ?? "#03002C";
+  const named = NAMED_INK[key];
+  if (named) return { hex: named, alpha: 1, painted: true };
+  return { hex: "#03002C", alpha: 1, painted: true };
 }
 
 const NAMED_INK: Record<string, string> = {
   black: "#000000",
   white: "#FFFFFF",
-  none: "#000000",
   grey: "#808080",
   gray: "#808080",
   red: "#FF0000",
@@ -126,7 +149,7 @@ export function normalisePlacedArt(input: unknown): LondonPlacedArt | null {
           m: (Array.isArray(p.m) && p.m.length === 6 && p.m.every((n) => Number.isFinite(n))
             ? (p.m as PlacedArtMatrix)
             : [1, 0, 0, 1, 0, 0]) as PlacedArtMatrix,
-          ...(typeof p.alpha === "number" && p.alpha >= 0 && p.alpha < 1 ? { alpha: p.alpha } : {}),
+          ...(typeof p.alpha === "number" && p.alpha > 0 && p.alpha < 1 ? { alpha: p.alpha } : {}),
         }))
     : [];
   if (paths.length === 0) return null;
@@ -750,32 +773,59 @@ export function parseSvgArtwork(source: string, name: string): PlacedArtImport {
   const paths: PlacedArtPath[] = [];
   let strokeOnly = 0;
   let arcShapes = 0;
-  const walk = (el: Element, m: PlacedArtMatrix) => {
+  let invisible = 0;
+  /** An element's own opacity, ignoring ancestors (those are multiplied in). */
+  const own = (el: Element, name: string): number | null => {
+    const style = el.getAttribute("style");
+    const hit = style
+      ? new RegExp(`(?:^|;)\\s*${name}\\s*:\\s*([^;]+)`, "i").exec(style)
+      : null;
+    const raw = hit ? hit[1]!.trim() : el.getAttribute(name);
+    if (raw === null || raw === undefined || raw === "") return null;
+    const pct = /%$/.test(raw.trim());
+    const n = Number(raw.trim().replace(/%$/, ""));
+    if (!Number.isFinite(n)) return null;
+    return Math.max(0, Math.min(1, pct ? n / 100 : n));
+  };
+  // `group` is the accumulated opacity of every ancestor, so nested <g> fades
+  // in the uploaded file survive into the master exactly as drawn.
+  const walk = (el: Element, m: PlacedArtMatrix, group: number) => {
     const tag = el.tagName.toLowerCase();
     if (BANNED_TAGS.includes(tag)) return;
     const here = mul(m, parseTransform(el.getAttribute("transform")));
+    const alphaHere = group * (own(el, "opacity") ?? 1);
     const raw = shapeToPath(el);
     const normalised = raw && raw.trim() ? normalisePathData(raw.trim()) : null;
     if (normalised?.arcs) arcShapes += 1;
     const d = normalised && !normalised.arcs ? normalised.d : "";
     if (d && d.trim()) {
-      const fill = inherited(el, "fill");
-      const opacity = Number(inherited(el, "opacity") ?? inherited(el, "fill-opacity") ?? 1);
-      if (fill && fill.trim().toLowerCase() === "none") {
+      const paint = parsePaint(inherited(el, "fill") ?? "#000000");
+      const alpha = alphaHere * paint.alpha * (own(el, "fill-opacity") ?? 1);
+      if (!paint.painted) {
         strokeOnly += 1;
+      } else if (alpha <= 0.004) {
+        // The file says this shape is invisible; keep it out of the master
+        // rather than printing it as solid ink.
+        invisible += 1;
       } else {
         paths.push({
           d: d.trim(),
-          fill: sanitiseFill(fill ?? "#000000"),
+          fill: paint.hex,
           ...(inherited(el, "fill-rule")?.trim() === "evenodd" ? { fillRule: "evenodd" as const } : {}),
           m: here,
-          ...(Number.isFinite(opacity) && opacity > 0 && opacity < 1 ? { alpha: opacity } : {}),
+          ...(alpha < 1 ? { alpha: Number(alpha.toFixed(4)) } : {}),
         });
       }
     }
-    for (const child of Array.from(el.children)) walk(child, here);
+    for (const child of Array.from(el.children)) walk(child, here, alphaHere);
   };
-  for (const child of Array.from(root.children)) walk(child, base);
+  for (const child of Array.from(root.children)) walk(child, base, 1);
+
+  if (invisible > 0) {
+    warnings.push(
+      `${invisible} fully transparent shape${invisible === 1 ? " was" : "s were"} left out — the file had them at 0% opacity.`,
+    );
+  }
 
   if (strokeOnly > 0) {
     warnings.push(

@@ -208,3 +208,22 @@ describe("placed artwork in the masters", () => {
     );
   });
 });
+
+describe("uploaded artwork transparency", () => {
+  it("keeps declared transparency and drops invisible shapes", () => {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <g opacity="0.5"><rect x="0" y="0" width="10" height="10" fill="#FF0000" fill-opacity="0.6"/></g>
+      <rect x="20" y="0" width="10" height="10" fill="rgba(0,0,255,0.25)"/>
+      <rect x="40" y="0" width="10" height="10" fill="#00FF00" opacity="0"/>
+      <rect x="60" y="0" width="10" height="10" fill="none"/>
+      <rect x="80" y="0" width="10" height="10" fill="#112233"/>
+    </svg>`;
+    const { art, warnings } = parseSvgArtwork(svg, "t.svg");
+    expect(art.paths).toHaveLength(3);
+    expect(art.paths[0]!.alpha).toBeCloseTo(0.3, 3);
+    expect(art.paths[1]!.alpha).toBeCloseTo(0.25, 3);
+    expect(art.paths[1]!.fill).toBe("#0000FF");
+    expect(art.paths[2]!.alpha).toBeUndefined();
+    expect(warnings.join(" ")).toMatch(/transparent/i);
+  });
+});

@@ -556,6 +556,25 @@ export function londonGroundBox(
   };
 }
 
+/** Stable ExtGState suffix for one path transparency (0.35 → "350"). */
+function alphaKey(alpha: number): string {
+  return String(Math.round(Math.max(0, Math.min(1, alpha)) * 1000));
+}
+
+/** One live soft-mask state per distinct shape transparency in the artwork. */
+function placedArtAlphaGs(art: LondonPlacedArt): string {
+  const keys = new Set<string>();
+  for (const path of art.paths) {
+    if (path.alpha !== undefined) keys.add(alphaKey(path.alpha));
+  }
+  return [...keys]
+    .map((key) => {
+      const a = (Number(key) / 1000).toFixed(3);
+      return `/GsArt${key} << /Type /ExtGState /ca ${a} /CA ${a} >> `;
+    })
+    .join("");
+}
+
 /**
  * Placed-artwork layer as live SVG paths. The artwork keeps its own user space;
  * only a group transform sizes, positions and rotates it on the sheet, so the
@@ -1155,7 +1174,10 @@ export function buildLondonPanelAi(
             // F·M·F⁻¹ for the y-flip of height `placed.h`.
             const n = [m[0], -m[1], -m[2], m[3], m[2] * placed.h + m[4], placed.h - m[3] * placed.h - m[5]];
             const cm = `${n.map((v) => f3(v)).join(" ")} cm `;
-            return `q ${cm}${fillOp(placedArtFill(placed, path.fill))} ${ops} ${path.fillRule === "evenodd" ? "f*" : "f"} Q\n`;
+            // A shape the uploaded file drew semi-transparent keeps that
+            // transparency in the master, as a live PDF soft state.
+            const gs = path.alpha !== undefined ? `/GsArt${alphaKey(path.alpha)} gs ` : "";
+            return `q ${cm}${gs}${fillOp(placedArtFill(placed, path.fill))} ${ops} ${path.fillRule === "evenodd" ? "f*" : "f"} Q\n`;
           })
           .join("");
         return body ? `${head}${body}Q\n` : "";
@@ -1203,6 +1225,7 @@ export function buildLondonPanelAi(
       `${groundImage ? `/XObject << /ImGround ${groundImageNum} 0 R >> ` : ""}` +
       `/ExtGState << /GsWall << /Type /ExtGState /ca ${f3(wall ? wall.config.opacity : 1)} >> ` +
       `${placedOps ? `/GsArt << /Type /ExtGState /ca ${f3(placed!.opacity)} /CA ${f3(placed!.opacity)} >> ` : ""}` +
+      `${placedOps ? placedArtAlphaGs(placed!) : ""}` +
       `${brewGs}>> ` +
       `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R` +
       `${artOcgNum ? ` /oc4 ${artOcgNum} 0 R` : ""} >> >> /Contents 4 0 R >>`,
