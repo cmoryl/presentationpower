@@ -15,6 +15,8 @@ import doorVinylAi from "@/assets/london-supplied/main-entrance-door-vinyl.ai.as
 import doorVinylProof from "@/assets/london-supplied/main-entrance-door-vinyl.jpg.asset.json";
 import deskVinylAi from "@/assets/london-supplied/registration-desk-vinyl.ai.asset.json";
 import deskVinylProof from "@/assets/london-supplied/registration-desk-vinyl.jpg.asset.json";
+import regPillarAi from "@/assets/london-supplied/registration-pillar.ai.asset.json";
+import regPillarProof from "@/assets/london-supplied/registration-pillar.jpg.asset.json";
 
 export type LondonSuppliedMaster = {
   /** Panel this master replaces. */
@@ -59,6 +61,15 @@ const MASTERS: LondonSuppliedMaster[] = [
     fromRevision: 1,
     issued: "2026-09-09",
     note: "MAIN ENTRANCE DOOR VINYL — finished live file, 900 × 2100 mm trim. Print this file.",
+  },
+  {
+    panelId: "ldn-v49",
+    aiUrl: regPillarAi.url,
+    filename: regPillarAi.original_filename,
+    previewUrl: regPillarProof.url,
+    fromRevision: 1,
+    issued: "2026-09-09",
+    note: "REGISTRATION PILLAR — finished live file, 596.9 × 1981 mm trim. Print this file.",
   },
 ];
 
