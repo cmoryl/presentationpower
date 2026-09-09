@@ -47,7 +47,7 @@ import {
 } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import { londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
-import { useLondonBoardSizes } from "@/lib/next-london-board-size";
+import { applyLondonBoardSizes, useLondonBoardSizes } from "@/lib/next-london-board-size";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { handleLondonDirectoryDownload } from "@/lib/london-directory-pdf";
@@ -278,7 +278,19 @@ function LondonSignagePage() {
   const isAdmin = useIsAdmin();
   // The kit shows the panel set IN FORCE: the newest published revision, or the
   // issued venue pack when there is none (or when the viewer is not signed in).
-  const [panels, setPanels] = useState<LondonPanel[]>(LONDON_PANELS);
+  const [publishedPanels, setPanels] = useState<LondonPanel[]>(LONDON_PANELS);
+  // Unpublished edits made in this browser (live editor / template studio).
+  // Subscribing here means saving a logo move, a re-measured board or uploaded
+  // artwork repaints the hub cards and re-flows the layout immediately.
+  const localPlacements = useLondonLogoPlacements();
+  const localPlacedArt = useLondonPlacedArt();
+  const localBoardSizes = useLondonBoardSizes();
+  // A re-measured board changes the card's shape as well as its artwork, so the
+  // whole schedule reads from the resized panels.
+  const panels = useMemo(
+    () => applyLondonBoardSizes(publishedPanels, localBoardSizes),
+    [publishedPanels, localBoardSizes],
+  );
   // Booth masters live in the backend: applying them patches the booth specs
   // and panel records in place, so `applied` is what re-renders the cards.
   const boothTemplates = useBoothTemplates();
@@ -365,12 +377,6 @@ function LondonSignagePage() {
   const worstBand = Math.max(...panels.map((p) => p.bandMm));
 
   const target = openPanel ? rasterSizeFor(openPanel, ppi) : null;
-
-  // Unpublished edits made in this browser (live editor / template studio).
-  // Subscribing here means saving artwork repaints the hub cards immediately.
-  const localPlacements = useLondonLogoPlacements();
-  const localPlacedArt = useLondonPlacedArt();
-  const localBoardSizes = useLondonBoardSizes();
 
 
 
