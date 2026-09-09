@@ -718,6 +718,234 @@ export function AgendaStudio({
                 />
               </div>
             </div>
+
+            {config.qrData.trim() ? (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="agenda-qr-style">Module shape</Label>
+                    <select
+                      id="agenda-qr-style"
+                      className={selectClass}
+                      value={agendaQrStyle(config)}
+                      onChange={(e) => set("qrStyle", e.target.value as AgendaQrStyleId)}
+                    >
+                      {AGENDA_QR_STYLES.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.label}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-muted-foreground">
+                      {AGENDA_QR_STYLES.find((s) => s.id === agendaQrStyle(config))?.note}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="agenda-qr-ink">Code ink</Label>
+                    <select
+                      id="agenda-qr-ink"
+                      className={selectClass}
+                      value={config.qrForeground}
+                      onChange={(e) => set("qrForeground", e.target.value)}
+                    >
+                      <option value="">Blue 800 (default)</option>
+                      {AGENDA_TEXT_COLORS.map((c) => (
+                        <option key={c.id} value={c.hex}>
+                          {c.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="agenda-qr-plate">Plate colour</Label>
+                    <select
+                      id="agenda-qr-plate"
+                      className={selectClass}
+                      value={config.qrBackground}
+                      onChange={(e) => set("qrBackground", e.target.value)}
+                      disabled={config.qrTransparent}
+                    >
+                      <option value="">White (default)</option>
+                      {AGENDA_TEXT_COLORS.map((c) => (
+                        <option key={c.id} value={c.hex}>
+                          {c.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="agenda-qr-capsize">Caption size (mm)</Label>
+                    <Input
+                      id="agenda-qr-capsize"
+                      type="number"
+                      min={0}
+                      max={AGENDA_QR_CAPTION_SIZE.max}
+                      step={AGENDA_QR_CAPTION_SIZE.step}
+                      value={config.qrCaptionSize}
+                      onChange={(e) => set("qrCaptionSize", Number(e.target.value))}
+                    />
+                    <p className="text-xs text-muted-foreground">0 follows the footer size.</p>
+                  </div>
+                </div>
+
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={config.qrTransparent}
+                    onChange={(e) => set("qrTransparent", e.target.checked)}
+                  />
+                  Drop the plate — print the code straight on the gradient
+                </label>
+
+                {/* A code phone cameras cannot read is a reprint, so the editor
+                    states the contrast it will actually be scanned at. */}
+                {(() => {
+                  const c = agendaQrContrast(config);
+                  return (
+                    <p
+                      className={`text-xs ${c.ok ? "text-muted-foreground" : "text-destructive"}`}
+                    >
+                      Scan contrast {c.ratio.toFixed(1)}:1{" "}
+                      {c.ok
+                        ? "· comfortably scannable"
+                        : `· below ${AGENDA_QR_MIN_CONTRAST}:1, darken the ink or keep the plate`}
+                    </p>
+                  );
+                })()}
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="agenda-qr-align">Caption alignment</Label>
+                    <select
+                      id="agenda-qr-align"
+                      className={selectClass}
+                      value={agendaQrCaptionAlign(config)}
+                      onChange={(e) => set("qrCaptionAlign", e.target.value as AgendaCaptionAlign)}
+                    >
+                      <option value="left">Left</option>
+                      <option value="center">Centre</option>
+                      <option value="right">Right</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="agenda-qr-pad">Edge padding (mm)</Label>
+                    <Input
+                      id="agenda-qr-pad"
+                      type="number"
+                      min={AGENDA_QR_CAPTION_PAD.min}
+                      max={AGENDA_QR_CAPTION_PAD.max}
+                      step={AGENDA_QR_CAPTION_PAD.step}
+                      value={config.qrCaptionPad}
+                      onChange={(e) => set("qrCaptionPad", Number(e.target.value))}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2 rounded-md border border-border p-3">
+                  <p className="text-sm font-medium">Position on the page</p>
+                  <p className="text-xs text-muted-foreground">
+                    Drag the code on the sheet, use the nine spots, or type the exact millimetres
+                    from the trim corner. Everything stays inside the safe margin.
+                  </p>
+                  <div className="grid w-fit grid-cols-3 gap-1">
+                    {(
+                      [
+                        ["Top left", 0, 0],
+                        ["Top", 0.5, 0],
+                        ["Top right", 1, 0],
+                        ["Left", 0, 0.5],
+                        ["Centre", 0.5, 0.5],
+                        ["Right", 1, 0.5],
+                        ["Bottom left", 0, 1],
+                        ["Bottom", 0.5, 1],
+                        ["Bottom right", 1, 1],
+                      ] as [string, number, number][]
+                    ).map(([label, fx, fy]) => (
+                      <button
+                        key={label}
+                        type="button"
+                        title={label}
+                        aria-label={label}
+                        className="h-7 w-7 rounded border border-border text-[10px] hover:bg-muted"
+                        onClick={() => {
+                          const b = qrBlock;
+                          if (!b) return;
+                          setConfig((c) => ({
+                            ...c,
+                            qrOffsetX: Math.round(b.minX + (b.maxX - b.minX) * fx),
+                            qrOffsetY: Math.round(b.minY + (b.maxY - b.minY) * fy),
+                          }));
+                        }}
+                      >
+                        ·
+                      </button>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-qr-x">X from trim (mm)</Label>
+                      <Input
+                        id="agenda-qr-x"
+                        type="number"
+                        step={AGENDA_QR_NUDGE.fine}
+                        value={Math.round(qrBlock?.x ?? 0)}
+                        onChange={(e) =>
+                          setConfig((c) => ({
+                            ...c,
+                            qrOffsetX: Number(e.target.value),
+                            qrOffsetY: c.qrOffsetY ?? Math.round(qrBlock?.y ?? 0),
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-qr-y">Y from trim (mm)</Label>
+                      <Input
+                        id="agenda-qr-y"
+                        type="number"
+                        step={AGENDA_QR_NUDGE.fine}
+                        value={Math.round(qrBlock?.y ?? 0)}
+                        onChange={(e) =>
+                          setConfig((c) => ({
+                            ...c,
+                            qrOffsetY: Number(e.target.value),
+                            qrOffsetX: c.qrOffsetX ?? Math.round(qrBlock?.x ?? 0),
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {(
+                      [
+                        ["Left", -AGENDA_QR_NUDGE.coarse, 0],
+                        ["Right", AGENDA_QR_NUDGE.coarse, 0],
+                        ["Up", 0, -AGENDA_QR_NUDGE.coarse],
+                        ["Down", 0, AGENDA_QR_NUDGE.coarse],
+                      ] as [string, number, number][]
+                    ).map(([label, dx, dy]) => (
+                      <Button
+                        key={label}
+                        size="sm"
+                        variant="outline"
+                        onClick={() => nudgeQr(dx, dy)}
+                      >
+                        {label}
+                      </Button>
+                    ))}
+                    <Button size="sm" variant="ghost" onClick={() => placeQr(null, null)}>
+                      Back to default spot
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {qrBlock?.placed ? "Placed by hand" : "Following the default footer flow"}
+                  </p>
+                </div>
+              </>
+            ) : null}
           </div>
 
           <div className="space-y-2">
