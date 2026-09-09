@@ -37,7 +37,14 @@ function pct(n: number): string {
   return `${(n * 100).toFixed(4)}%`;
 }
 
-export function SceneArtworkPlate({ box, sceneId, children, faceRef }: SceneArtworkPlateProps) {
+export function SceneArtworkPlate({
+  box,
+  sceneId,
+  children,
+  faceRef,
+  face,
+  substrate,
+}: SceneArtworkPlateProps) {
   const light = sceneLighting(sceneId);
   const angle = shadeAngle(light.direction);
   const off = shadowOffset(light.direction);
