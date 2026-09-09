@@ -11,6 +11,10 @@
 
 import wallWestminsterAi from "@/assets/london-supplied/wall-4e-westminster.ai.asset.json";
 import wallWestminsterProof from "@/assets/london-supplied/wall-4e-westminster.jpg.asset.json";
+import doorVinylAi from "@/assets/london-supplied/main-entrance-door-vinyl.ai.asset.json";
+import doorVinylProof from "@/assets/london-supplied/main-entrance-door-vinyl.jpg.asset.json";
+import deskVinylAi from "@/assets/london-supplied/registration-desk-vinyl.ai.asset.json";
+import deskVinylProof from "@/assets/london-supplied/registration-desk-vinyl.jpg.asset.json";
 
 export type LondonSuppliedMaster = {
   /** Panel this master replaces. */
@@ -37,6 +41,24 @@ const MASTERS: LondonSuppliedMaster[] = [
     fromRevision: 1,
     issued: "2026-09-09",
     note: "WALL 4E OUTSIDE WESTMINSTER — finished live file, 2590 × 2110 mm trim, 100 mm bleed. Print this file.",
+  },
+  {
+    panelId: "ldn-v07",
+    aiUrl: deskVinylAi.url,
+    filename: deskVinylAi.original_filename,
+    previewUrl: deskVinylProof.url,
+    fromRevision: 1,
+    issued: "2026-09-09",
+    note: "REGISTRATION DESK VINYL — finished live file, 3390 × 1900 mm trim. Print this file.",
+  },
+  {
+    panelId: "ldn-v45",
+    aiUrl: doorVinylAi.url,
+    filename: doorVinylAi.original_filename,
+    previewUrl: doorVinylProof.url,
+    fromRevision: 1,
+    issued: "2026-09-09",
+    note: "MAIN ENTRANCE DOOR VINYL — finished live file, 900 × 2100 mm trim. Print this file.",
   },
 ];
 
