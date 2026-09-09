@@ -800,7 +800,7 @@ function LondonSignagePage() {
                   {boothPanels.length} panels
                 </span>
               </div>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+              <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                 {boothPanels.map((panel) => (
                   <PanelCard
                     key={panel.id}
@@ -844,24 +844,56 @@ function LondonSignagePage() {
                 </span>
               </div>
 
-              {floor.rooms.map((room) => (
-                <div key={room.room} className="mt-6">
-                  <h4 className="font-mono text-[12px] uppercase tracking-[0.12em] text-[#03002C]/70">
-                    {room.room}
-                  </h4>
-                  <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {room.panels.map((panel) => (
-                      <PanelCard
-                        key={panel.id}
-                        panel={panel}
-                        svg={previewSvg(panel)}
-                        draft={isDraft(panel)}
-                        onClick={setOpenPanel}
-                      />
-                    ))}
+              {floor.rooms.map((room) => {
+                // Booths are pulled out of their one-per-room groups below, so a
+                // room that only holds a booth does not print a lonely single row.
+                const roomPanels = room.panels.filter((p) => !isBoothPanel(p));
+                if (roomPanels.length === 0) return null;
+                return (
+                  <div key={room.room} className="mt-6">
+                    <h4 className="font-mono text-[12px] uppercase tracking-[0.12em] text-[#03002C]/70">
+                      {room.room}
+                    </h4>
+                    <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                      {roomPanels.map((panel) => (
+                        <PanelCard
+                          key={panel.id}
+                          panel={panel}
+                          svg={previewSvg(panel)}
+                          draft={isDraft(panel)}
+                          onClick={setOpenPanel}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
+
+              {(() => {
+                // Every booth on this floor, laid out as one matrix.
+                const floorBooths = floor.rooms.flatMap((room) =>
+                  room.panels.filter((p) => isBoothPanel(p)),
+                );
+                if (floorBooths.length === 0) return null;
+                return (
+                  <div className="mt-6">
+                    <h4 className="font-mono text-[12px] uppercase tracking-[0.12em] text-[#03002C]/70">
+                      Partner booths · {floorBooths.length}
+                    </h4>
+                    <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                      {floorBooths.map((panel) => (
+                        <PanelCard
+                          key={panel.id}
+                          panel={panel}
+                          svg={previewSvg(panel)}
+                          draft={isDraft(panel)}
+                          onClick={setOpenPanel}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           ))}
         </section>
