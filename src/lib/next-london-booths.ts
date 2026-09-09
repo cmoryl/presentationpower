@@ -212,7 +212,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
     id: "live-conference-events",
     shellId: "tradebooth-a",
     vendor: "Live Conference/Events | LifeSciNEXT",
-    sourceFile: "GL_Live_LifeSciNEXTTradeBoothA_Front_1830x2440mm_Plus100mmBleed.pdf",
+    sourceFile: "GL_Live_LifeSciNEXTTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: glLifeSciAi,
     style: "03-wash-diagonal",
     artboards: frontWall(glLifeSciP1),
