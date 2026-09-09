@@ -1173,6 +1173,20 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
     qrData: str(raw.qrData, ""),
     qrSize: num(raw.qrSize, base.qrSize),
     qrCaption: str(raw.qrCaption, base.qrCaption),
+    qrStyle: AGENDA_QR_STYLES.some((s) => s.id === raw.qrStyle)
+      ? (raw.qrStyle as PillarQrStyleId)
+      : "block",
+    qrForeground: str(raw.qrForeground, ""),
+    qrBackground: str(raw.qrBackground, ""),
+    qrTransparent: raw.qrTransparent === true,
+    qrCaptionAlign:
+      raw.qrCaptionAlign === "left" || raw.qrCaptionAlign === "right"
+        ? raw.qrCaptionAlign
+        : "center",
+    qrCaptionSize: Math.max(0, Math.min(AGENDA_QR_CAPTION_SIZE.max, num(raw.qrCaptionSize, 0))),
+    qrCaptionPad: Math.max(0, Math.min(AGENDA_QR_CAPTION_PAD.max, num(raw.qrCaptionPad, 0))),
+    qrOffsetX: Number.isFinite(Number(raw.qrOffsetX)) ? Number(raw.qrOffsetX) : null,
+    qrOffsetY: Number.isFinite(Number(raw.qrOffsetY)) ? Number(raw.qrOffsetY) : null,
     eventLabel: str(raw.eventLabel, ""),
     days:
       Array.isArray(raw.days) && raw.days.length
