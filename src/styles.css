@@ -773,25 +773,13 @@ body.export-mode [data-print-surface] {
   text-shadow: none !important;
 }
 
-/* ── Light-mode: keep white ink legible ────────────────────────────────────
-   The flat-surface reset above strips text shadows everywhere, which also
-   removed the legibility halo from white copy that sits on photography,
-   video stills, gradient scrims and accent-filled chips. Those surfaces are
-   NOT flat editorial white, so white ink there gets its contrast treatment
-   back: a tight, neutral shadow (never a colored glow) plus an optional
-   opt-in scrim. Flat-surface copy stays shadow-free.
-
-   Scope note: the halo is keyed to the media markers ONLY. A bare
-   `.text-white`/`.text-white *` selector used to match every descendant of any
-   white-ink ancestor (including the app chrome wrapping a slide preview),
-   which stamped a blurred glow onto ordinary flat module copy. */
-[data-slide-mode="light"] [data-on-media],
-[data-slide-mode="light"] [data-on-media] *,
-[data-slide-mode="light"] [data-media-backing] > :not([data-media-tile]),
-[data-slide-mode="light"] [data-media-backing] > :not([data-media-tile]) * {
-  text-shadow:
-    0 1px 2px rgb(3 0 44 / 0.45),
-    0 2px 10px rgb(3 0 44 / 0.3) !important;
+/* Media modules provide their own contrast scrims. Typography remains crisp
+   because blurred glyph shadows soften badly after preview scaling/export. */
+[data-slide-mode] [data-on-media],
+[data-slide-mode] [data-on-media] *,
+[data-slide-mode] [data-media-backing] > :not([data-media-tile]),
+[data-slide-mode] [data-media-backing] > :not([data-media-tile]) * {
+  text-shadow: none !important;
 }
 
 
@@ -811,16 +799,6 @@ body.export-mode [data-print-surface] {
 [data-slide-mode="light"] [data-on-media="funnel-graphic"] * {
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
-}
-
-/* Dark mode gets the same legibility halo over photography as light mode. */
-[data-slide-mode="dark"] [data-on-media],
-[data-slide-mode="dark"] [data-on-media] *,
-[data-slide-mode="dark"] [data-media-backing] > :not([data-media-tile]),
-[data-slide-mode="dark"] [data-media-backing] > :not([data-media-tile]) * {
-  text-shadow:
-    0 1px 2px rgb(3 0 44 / 0.5),
-    0 2px 12px rgb(3 0 44 / 0.35) !important;
 }
 
 /* White ink on a solid accent/ink fill needs no halo — the fill already
@@ -1081,22 +1059,17 @@ body.export-mode [data-print-surface] {
     transform: translate3d(0, 0, 0);
   }
 }
-/* Big figures: a tight de-blur snap so a number feels tallied, not slid in. */
+/* Big figures tally with opacity and motion while keeping glyph edges crisp. */
 @keyframes tp-in-count {
   from {
     opacity: 0;
-    /* Blur is the one non-compositable property in the set; kept small so a
-       120px numeral still snaps into focus without a per-frame repaint cost. */
-    filter: blur(3px);
     transform: translate3d(0, 14px, 0) scale(1.06);
   }
   55% {
     opacity: 1;
-    filter: blur(0);
   }
   to {
     opacity: 1;
-    filter: blur(0);
     transform: translate3d(0, 0, 0) scale(1);
   }
 }
@@ -1167,19 +1140,17 @@ body.export-mode [data-print-surface] {
 }
 
 /* Headline statistic emphasis: the biggest figure on a stats slide gets its own
-   beat — it swells past its resting size, de-blurs, then settles back to exactly
-   the authored type size. The keyframe LANDS on scale(1)/blur(0)/opacity(1), so
+   beat — it swells past its resting size, then settles back to exactly
+   the authored type size. The keyframe LANDS on scale(1)/opacity(1), so
    the settled figure is byte-identical to the static design the PPTX rasterizer
    captures; the inline animation is also stripped on animationend. */
 @keyframes tp-stat-hero {
   0% {
     opacity: 0;
-    filter: blur(6px);
     transform: translate3d(0, 10px, 0) scale(0.82);
   }
   45% {
     opacity: 1;
-    filter: blur(0);
     transform: translate3d(0, 0, 0) scale(1.12);
   }
   70% {
@@ -1187,7 +1158,6 @@ body.export-mode [data-print-surface] {
   }
   100% {
     opacity: 1;
-    filter: blur(0);
     transform: translate3d(0, 0, 0) scale(1);
   }
 }
@@ -1386,11 +1356,9 @@ body.export-mode [data-print-surface] {
 @keyframes tp-stat-blur {
   from {
     opacity: 0;
-    filter: blur(14px);
   }
   to {
     opacity: 1;
-    filter: blur(0);
   }
 }
 @keyframes tp-stat-drift {

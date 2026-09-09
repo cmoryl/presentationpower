@@ -1,24 +1,9 @@
 // Minimal WCAG 2.1 contrast utilities + DOM auditor.
 
-// Light-mode slide surfaces must stay shadow-free: the contrast auto-fix relies
-// on ink swaps instead of blurred text halos there.
-function haloAllowed(el: HTMLElement): boolean {
-  const host = el.closest?.("[data-slide-mode]") as HTMLElement | null;
-  return host?.dataset?.slideMode !== "light";
-}
-
-// Apply a legibility text-shadow only where halos are permitted.
-function setHalo(el: HTMLElement, value: string) {
-  if (!haloAllowed(el)) {
-    el.style.removeProperty("text-shadow");
-    return;
-  }
-  el.style.setProperty("text-shadow", value, "important");
-}
-
 /** True when the element lives on a light slide surface. */
 function onLightSlide(el: HTMLElement): boolean {
-  return !haloAllowed(el);
+  const host = el.closest?.("[data-slide-mode]") as HTMLElement | null;
+  return host?.dataset?.slideMode === "light";
 }
 
 /**
@@ -222,18 +207,11 @@ export function auditNode(root: HTMLElement): WcagReport {
       const rLight = contrastRatio(LIGHT_ON_DARK, bg);
       const useLight = rLight >= rDark;
       const target = useLight ? LIGHT_ON_DARK : DARK_ON_LIGHT;
-      // Instead of painting a solid pill behind the text, stack a soft blurred
-      // halo (multi-layer text-shadow) that fades into the media below. Keeps
-      // text legible without introducing chip/box backgrounds.
-      const haloShadow = useLight
-        ? "0 1px 2px rgba(3,0,44,0.9), 0 0 8px rgba(3,0,44,0.6)"
-        : "0 1px 2px rgba(255,255,255,0.9), 0 0 8px rgba(255,255,255,0.6)";
       el.style.setProperty("color", target, "important");
       el.style.setProperty("-webkit-text-fill-color", target, "important");
-      setHalo(el, haloShadow);
+      el.style.removeProperty("text-shadow");
       el.style.setProperty("opacity", "1", "important");
       el.dataset.wcagFixed = "1";
-      el.dataset.wcagShadow = "1";
       fg = target;
       ratio = Math.max(ratio, threshold);
     }
@@ -364,28 +342,8 @@ export function applyAutoFix(root: HTMLElement): number {
     el.style.setProperty("-webkit-background-clip", "border-box", "important");
     el.style.setProperty("opacity", "1", "important");
 
-    // Re-measure post-fix. If contrast is still failing, layer a soft blurred
-    // halo behind the glyphs (multi-layer text-shadow) instead of painting a
-    // solid chip/pill background. This preserves the free-form look over
-    // media/aurora backgrounds.
-    const postBg = effectiveBg(el);
-    const postRatio = contrastRatio(target, postBg);
-    if (postRatio < (large ? 3 : 4.5)) {
-      const halo = useLight
-        ? "0 1px 2px rgba(3,0,44,0.9), 0 0 8px rgba(3,0,44,0.6)"
-        : "0 1px 2px rgba(255,255,255,0.9), 0 0 8px rgba(255,255,255,0.6)";
-      setHalo(el, halo);
-      if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
-    } else {
-      const bestRatio = Math.max(rDark, rLight);
-      if (bestRatio < (large ? 3 : 4.5)) {
-        const shadow = useLight
-          ? "0 1px 2px rgba(0,0,0,0.85), 0 0 6px rgba(0,0,0,0.65)"
-          : "0 1px 2px rgba(255,255,255,0.85), 0 0 6px rgba(255,255,255,0.65)";
-        setHalo(el, shadow);
-        if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
-      }
-    }
+    el.style.removeProperty("text-shadow");
+    delete el.dataset.wcagShadow;
     el.dataset.wcagFixed = "1";
     fixed++;
   });
@@ -453,29 +411,16 @@ function applyAutoFixInternal(root: HTMLElement) {
     el.style.setProperty("background-clip", "border-box", "important");
     el.style.setProperty("-webkit-background-clip", "border-box", "important");
     el.style.setProperty("opacity", "1", "important");
-    const postBg = effectiveBg(el);
-    const postRatio = contrastRatio(target, postBg);
-    if (postRatio < (large ? 3 : 4.5)) {
-      const halo = useLight
-        ? "0 1px 2px rgba(3,0,44,0.9), 0 0 8px rgba(3,0,44,0.6)"
-        : "0 1px 2px rgba(255,255,255,0.9), 0 0 8px rgba(255,255,255,0.6)";
-      setHalo(el, halo);
-      if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
-    } else {
-      const bestRatio = Math.max(rDark, rLight);
-      if (bestRatio < (large ? 3 : 4.5)) {
-        const shadow = useLight
-          ? "0 1px 2px rgba(0,0,0,0.85), 0 0 6px rgba(0,0,0,0.65)"
-          : "0 1px 2px rgba(255,255,255,0.85), 0 0 6px rgba(255,255,255,0.65)";
-        setHalo(el, shadow);
-        if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
-      }
-    }
+    el.style.removeProperty("text-shadow");
+    delete el.dataset.wcagShadow;
     el.dataset.wcagFixed = "1";
   });
 }
 
 export function revertAutoFix(root: HTMLElement) {
+  const rootAny = root as HTMLElement & { __wcagObserver?: MutationObserver };
+  rootAny.__wcagObserver?.disconnect();
+  delete rootAny.__wcagObserver;
   const nodes = root.querySelectorAll<HTMLElement>("[data-wcag-fixed]");
   nodes.forEach((el) => {
     el.style.color = el.dataset.wcagOriginal ?? "";
