@@ -53,6 +53,30 @@ function Slider({
   );
 }
 
+const NUDGE_BTN =
+  "h-7 rounded border border-border text-[11px] text-muted-foreground transition hover:bg-muted";
+
+// Keep snapped artwork clear of the trim edge by this much of the sign.
+const EDGE_MARGIN = 0.06;
+
+type Align = -1 | 0 | 1;
+
+const ALIGN_CELLS: { key: string; label: string; mark: string; h: Align; v: Align }[] = [
+  { key: "tl", label: "Top left", mark: "↖", h: -1, v: -1 },
+  { key: "tc", label: "Top centre", mark: "↑", h: 0, v: -1 },
+  { key: "tr", label: "Top right", mark: "↗", h: 1, v: -1 },
+  { key: "ml", label: "Left", mark: "←", h: -1, v: 0 },
+  { key: "mc", label: "Centre", mark: "•", h: 0, v: 0 },
+  { key: "mr", label: "Right", mark: "→", h: 1, v: 0 },
+  { key: "bl", label: "Bottom left", mark: "↙", h: -1, v: 1 },
+  { key: "bc", label: "Bottom centre", mark: "↓", h: 0, v: 1 },
+  { key: "br", label: "Bottom right", mark: "↘", h: 1, v: 1 },
+];
+
+function clampNudge(v: number): number {
+  return Math.min(PLACED_ART_NUDGE.max, Math.max(PLACED_ART_NUDGE.min, Number(v.toFixed(4))));
+}
+
 export function LondonPlacedArtPanel({
   panel,
   art,
