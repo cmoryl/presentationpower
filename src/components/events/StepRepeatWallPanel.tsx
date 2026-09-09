@@ -249,9 +249,40 @@ export function StepRepeatWallPanel({ panel }: StepRepeatWallPanelProps) {
             </button>
           ))}
         </div>
+        {isMixed ? (
+          <>
+            <Chips
+              label="How the two marks sit together"
+              value={config.mix}
+              options={STEP_REPEAT_MIXES.map((mix) => ({
+                value: mix,
+                label: STEP_REPEAT_MIX_LABELS[mix],
+              }))}
+              onChange={(mix) => set({ mix })}
+            />
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
+              {STEP_REPEAT_MIX_NOTES[config.mix]}
+            </p>
+          </>
+        ) : null}
       </Group>
 
       <Group title="Mark">
+        <Chips
+          label="Lockup pool"
+          value={config.logoSet}
+          options={STEP_REPEAT_LOGO_SETS.map((key) => ({
+            value: key,
+            label: STEP_REPEAT_LOGO_SET_LABELS[key],
+          }))}
+          onChange={(logoSet) => set({ logoSet })}
+        />
+        {config.logoSet === "divisions" ? (
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            {plan.arts.length} division lockups rotate through the grid, so the same mark never sits
+            beside or above itself. The family below leads the set.
+          </p>
+        ) : null}
         <Field label="Lockup family">
           <select
             value={config.familyId}
