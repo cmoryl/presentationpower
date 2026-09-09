@@ -19,9 +19,23 @@ import {
   cityBadgeDivision,
   type CityBadgeDivision,
 } from "@/lib/next-city-badge";
+// The agenda board shares the house QR treatments with the pillar and signage
+// editors, so a code drawn here matches a code drawn anywhere else in the kit.
+import {
+  PILLAR_QR_MIN_CONTRAST,
+  PILLAR_QR_STYLES,
+  pillarContrastRatio,
+  type PillarCaptionAlign,
+  type PillarQrStyleId,
+} from "@/lib/next-pillar-masters";
 
 export const AGENDA_DIVISIONS: CityBadgeDivision[] = CITY_BADGE_DIVISIONS;
 export const agendaDivision = cityBadgeDivision;
+
+export const AGENDA_QR_STYLES = PILLAR_QR_STYLES;
+export const AGENDA_QR_MIN_CONTRAST = PILLAR_QR_MIN_CONTRAST;
+export const agendaContrastRatio = pillarContrastRatio;
+export type { PillarCaptionAlign as AgendaCaptionAlign, PillarQrStyleId as AgendaQrStyleId };
 
 export const AGENDA_SPEC = {
   bleedEdge: 5,
@@ -146,6 +160,12 @@ export const AGENDA_CUSTOM_SIZE = {
 };
 
 export const AGENDA_QR_SIZE = { min: 20, max: 160, step: 2 };
+/** Caption cap height in mm; 0 follows the footer size. */
+export const AGENDA_QR_CAPTION_SIZE = { min: 2, max: 24, step: 0.5 };
+/** Padding held between the code, its caption and the safe edges (mm). */
+export const AGENDA_QR_CAPTION_PAD = { min: 0, max: 40, step: 1 };
+/** Coarse / fine nudge steps for a placed code (mm). */
+export const AGENDA_QR_NUDGE = { fine: 1, coarse: 5 };
 
 export type AgendaFaceId = "dark" | "light";
 
@@ -278,6 +298,23 @@ export type AgendaConfig = {
   qrData: string;
   qrSize: number;
   qrCaption: string;
+  /** QR module shape. */
+  qrStyle: PillarQrStyleId;
+  /** QR ink hex. Empty = Blue 800. */
+  qrForeground: string;
+  /** QR plate hex. Empty = white. */
+  qrBackground: string;
+  /** Drop the plate so only the modules print over the gradient. */
+  qrTransparent: boolean;
+  /** Caption alignment under the code. */
+  qrCaptionAlign: PillarCaptionAlign;
+  /** Caption cap height in mm. 0 = follow the footer size. */
+  qrCaptionSize: number;
+  /** Padding between the code, its caption and the safe edges (mm). */
+  qrCaptionPad: number;
+  /** Placed QR position in mm from the trim top-left. null = default flow. */
+  qrOffsetX: number | null;
+  qrOffsetY: number | null;
   /** Event this live agenda file belongs to (free-text label). */
   eventLabel: string;
   /**
@@ -886,6 +923,15 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
     qrData: "",
     qrSize: 48,
     qrCaption: "FULL AGENDA",
+    qrStyle: "block",
+    qrForeground: "",
+    qrBackground: "",
+    qrTransparent: false,
+    qrCaptionAlign: "center",
+    qrCaptionSize: 0,
+    qrCaptionPad: 0,
+    qrOffsetX: null,
+    qrOffsetY: null,
     eventLabel: "",
   };
 }
@@ -944,6 +990,59 @@ export function agendaQrSize(config: AgendaConfig): number {
   const raw = Number(config.qrSize);
   const value = Number.isFinite(raw) && raw > 0 ? raw : 48;
   return Math.min(AGENDA_QR_SIZE.max, Math.max(AGENDA_QR_SIZE.min, value));
+}
+
+/** QR module shape, defaulting to the most reliable square modules. */
+export function agendaQrStyle(config: AgendaConfig): PillarQrStyleId {
+  return AGENDA_QR_STYLES.some((s) => s.id === config.qrStyle) ? config.qrStyle : "block";
+}
+
+/** QR ink: approved Blue 800 unless another ink was picked. */
+export function agendaQrForeground(config: AgendaConfig): string {
+  const v = (config.qrForeground ?? "").trim();
+  return /^#[0-9a-f]{6}$/i.test(v) ? v.toUpperCase() : "#03002C";
+}
+
+/** QR plate: white unless another colour was picked. */
+export function agendaQrBackground(config: AgendaConfig): string {
+  const v = (config.qrBackground ?? "").trim();
+  return /^#[0-9a-f]{6}$/i.test(v) ? v.toUpperCase() : "#FFFFFF";
+}
+
+/** True when the plate is dropped and the code prints on the gradient. */
+export function agendaQrTransparent(config: AgendaConfig): boolean {
+  return config.qrTransparent === true;
+}
+
+export function agendaQrCaptionAlign(config: AgendaConfig): PillarCaptionAlign {
+  return config.qrCaptionAlign === "left" || config.qrCaptionAlign === "right"
+    ? config.qrCaptionAlign
+    : "center";
+}
+
+/**
+ * Colour the modules actually sit on: the plate, or — with the plate dropped —
+ * the gradient stop that gives the worst contrast, which is what a phone
+ * camera has to survive.
+ */
+export function agendaQrPlateColor(config: AgendaConfig): string {
+  if (!agendaQrTransparent(config)) return agendaQrBackground(config);
+  const stops = agendaStops(config.styleId, config.face ?? "dark", config.divisionId);
+  let worst = stops[0] ?? "#003FC7";
+  let ratio = Number.POSITIVE_INFINITY;
+  for (const stop of stops) {
+    const r = agendaContrastRatio(agendaQrForeground(config), stop);
+    if (r >= ratio) continue;
+    ratio = r;
+    worst = stop;
+  }
+  return worst;
+}
+
+/** Contrast the printed code will be read at, and whether it clears the floor. */
+export function agendaQrContrast(config: AgendaConfig): { ratio: number; ok: boolean } {
+  const ratio = agendaContrastRatio(agendaQrForeground(config), agendaQrPlateColor(config));
+  return { ratio, ok: ratio >= AGENDA_QR_MIN_CONTRAST };
 }
 
 export const AGENDA_LOCKUP_SCALE = { min: 0.5, max: 1.6, step: 0.05 };
@@ -1074,6 +1173,20 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
     qrData: str(raw.qrData, ""),
     qrSize: num(raw.qrSize, base.qrSize),
     qrCaption: str(raw.qrCaption, base.qrCaption),
+    qrStyle: AGENDA_QR_STYLES.some((s) => s.id === raw.qrStyle)
+      ? (raw.qrStyle as PillarQrStyleId)
+      : "block",
+    qrForeground: str(raw.qrForeground, ""),
+    qrBackground: str(raw.qrBackground, ""),
+    qrTransparent: raw.qrTransparent === true,
+    qrCaptionAlign:
+      raw.qrCaptionAlign === "left" || raw.qrCaptionAlign === "right"
+        ? raw.qrCaptionAlign
+        : "center",
+    qrCaptionSize: Math.max(0, Math.min(AGENDA_QR_CAPTION_SIZE.max, num(raw.qrCaptionSize, 0))),
+    qrCaptionPad: Math.max(0, Math.min(AGENDA_QR_CAPTION_PAD.max, num(raw.qrCaptionPad, 0))),
+    qrOffsetX: Number.isFinite(Number(raw.qrOffsetX)) ? Number(raw.qrOffsetX) : null,
+    qrOffsetY: Number.isFinite(Number(raw.qrOffsetY)) ? Number(raw.qrOffsetY) : null,
     eventLabel: str(raw.eventLabel, ""),
     days:
       Array.isArray(raw.days) && raw.days.length
@@ -1136,17 +1249,65 @@ export function agendaBlocks(config: AgendaConfig) {
   const bottom = geo.trimH - geo.safeInset;
   const footY = bottom - L.footSize * 1.2;
   let listBottom = footY - L.footSize * 1.8;
-  let qr: { x: number; y: number; edge: number; capY: number } | null = null;
+  let qr: {
+    x: number;
+    y: number;
+    edge: number;
+    capY: number;
+    capSize: number;
+    capAlign: PillarCaptionAlign;
+    placed: boolean;
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+    defaultX: number;
+    defaultY: number;
+  } | null = null;
   if ((config.qrData ?? "").trim()) {
-    const capH = (config.qrCaption ?? "").trim() ? L.footSize * 2 : 0;
-    const qrTop = footY - L.footSize * 1.8 - capH - L.qrEdge;
+    const capSize =
+      Number(config.qrCaptionSize) > 0
+        ? Math.min(AGENDA_QR_CAPTION_SIZE.max, Number(config.qrCaptionSize))
+        : L.footSize;
+    const pad = Math.max(0, Math.min(AGENDA_QR_CAPTION_PAD.max, Number(config.qrCaptionPad) || 0));
+    const capH = (config.qrCaption ?? "").trim() ? capSize * 2 : 0;
+    const blockH = L.qrEdge + capH;
+    // The code can be dragged or typed anywhere on the sheet, but never outside
+    // the safe margin — a scannable code half off the trim is a reprint.
+    const minX = geo.safeInset + pad;
+    const maxX = Math.max(minX, geo.trimW - geo.safeInset - pad - L.qrEdge);
+    const minY = geo.safeInset + pad;
+    const maxY = Math.max(minY, geo.trimH - geo.safeInset - pad - blockH);
+    const defaultX = geo.trimW - geo.safeInset - L.qrEdge;
+    const defaultY = footY - L.footSize * 1.8 - capH - L.qrEdge;
+    const rawX = Number(config.qrOffsetX);
+    const rawY = Number(config.qrOffsetY);
+    const placed =
+      config.qrOffsetX !== null &&
+      config.qrOffsetY !== null &&
+      Number.isFinite(rawX) &&
+      Number.isFinite(rawY);
+    const clamp = (v: number, a: number, b: number) => Math.min(Math.max(v, a), b);
+    const qrX = clamp(placed ? rawX : defaultX, minX, maxX);
+    const qrTop = clamp(placed ? rawY : defaultY, minY, maxY);
     qr = {
-      x: geo.trimW - geo.safeInset - L.qrEdge,
+      x: qrX,
       y: qrTop,
       edge: L.qrEdge,
-      capY: qrTop + L.qrEdge + L.footSize * 0.7,
+      capY: qrTop + L.qrEdge + capSize * 0.7,
+      capSize,
+      capAlign: agendaQrCaptionAlign(config),
+      placed,
+      minX,
+      maxX,
+      minY,
+      maxY,
+      defaultX,
+      defaultY,
     };
-    listBottom = qrTop - L.footSize * 1.4;
+    // The programme only makes room for the code when the code sits in its way.
+    const clash = qrTop < listBottom && qrTop + blockH > rowsTop;
+    if (clash) listBottom = Math.max(rowsTop + 10, qrTop - L.footSize * 1.4);
   }
 
   const rowH = Math.max(5, (listBottom - rowsTop) / rowCount);
