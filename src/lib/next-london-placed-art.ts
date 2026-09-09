@@ -481,9 +481,9 @@ function lengthPx(value: string | null): number | null {
 
 /**
  * The PDF path writer speaks the command set Illustrator writes (M/L/H/V/C/S/Z).
- * Quadratic curves are converted to their exact cubic equivalent so imported
- * artwork keeps its geometry; elliptical arcs are refused rather than silently
- * printed as straight lines.
+ * Quadratic curves become their exact cubic equivalent and elliptical arcs are
+ * flattened to 90°-max cubic segments, so imported artwork keeps every shape it
+ * was drawn with instead of losing arc-based geometry.
  */
 /**
  * One elliptical arc as up to four cubic segments (max 90° each), the standard
