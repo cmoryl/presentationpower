@@ -183,9 +183,9 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         break;
       }
       case "T": {
-        const c = lastQControl
+        const c: Point = lastQControl
           ? { x: 2 * cursor.x - lastQControl.x, y: 2 * cursor.y - lastQControl.y }
-          : { ...cursor };
+          : { x: cursor.x, y: cursor.y };
         const p = { x: base.x + num(), y: base.y + num() };
         quadTo(c, p);
         cursor = p;
