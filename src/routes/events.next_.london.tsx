@@ -570,6 +570,9 @@ function LondonSignagePage() {
             <h1 className="mt-3 max-w-[22ch] text-3xl font-bold leading-[1.05] tracking-tight text-[#03002C] sm:text-5xl">
               NEXT 2026 London — scenic panel kit
             </h1>
+            <span
+              data-debug-local={`${Object.keys(localBoardSizes).length}|${Object.keys(localPlacements).length}`}
+            />
             <p className="mt-4 max-w-[54ch] text-sm leading-relaxed text-[#03002C]/75 sm:text-base">
               {LONDON_VENUE.venue}, {LONDON_VENUE.city} · {LONDON_VENUE.datesLabel}. Every panel the
               London location team specified, held against the issued print schedule and
