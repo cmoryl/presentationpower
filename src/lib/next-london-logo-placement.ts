@@ -120,6 +120,12 @@ export type LondonLogoPlacement = {
    * "stacked" forces the tall one.
    */
   lockupShape: "auto" | "side" | "stacked";
+  /**
+   * Turn the lockup lengthwise, in degrees clockwise: 0 (flat), 90 (reads top
+   * to bottom) or 270 (reads bottom to top). Used on flags and pillars where the
+   * long single-line mark should run the height of the sheet.
+   */
+  lockupRotate: 0 | 90 | 270;
   /** Zoom on supplied artwork (vendor booth grounds). 1 = fills the bleed box. */
   groundScale: number;
   /** Supplied-artwork pan, as a fraction of the trim width. */
@@ -182,6 +188,7 @@ export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
   qrRadius: 0.04,
   lockup: null,
   lockupShape: "auto",
+  lockupRotate: 0,
   groundScale: 1,
   groundDx: 0,
   groundDy: 0,
@@ -314,6 +321,7 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
     qrRadius: clamp(p.qrRadius, LONDON_QR_RADIUS.min, LONDON_QR_RADIUS.max, 0.04),
     lockup: typeof p.lockup === "boolean" ? p.lockup : null,
     lockupShape: p.lockupShape === "side" || p.lockupShape === "stacked" ? p.lockupShape : "auto",
+    lockupRotate: p.lockupRotate === 90 || p.lockupRotate === 270 ? p.lockupRotate : 0,
     groundScale: clamp(p.groundScale, LONDON_GROUND_SCALE.min, LONDON_GROUND_SCALE.max, 1),
     groundDx: clamp(p.groundDx, -0.5, 0.5, 0),
     groundDy: clamp(p.groundDy, -0.5, 0.5, 0),

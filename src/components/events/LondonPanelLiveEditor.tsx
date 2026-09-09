@@ -372,6 +372,8 @@ export function LondonPanelLiveEditor({
     top: `${(plan.logo.y / panel.bleedH) * 100}%`,
     width: `${(plan.logo.w / panel.bleedW) * 100}%`,
     height: `${(plan.logo.h / panel.bleedH) * 100}%`,
+    // A turned lockup spins about its own centre, exactly as the print master does.
+    transform: plan.logoRotate ? `rotate(${plan.logoRotate}deg)` : undefined,
   };
 
   const runMm = plan.copyRunMm;
@@ -911,6 +913,32 @@ export function LondonPanelLiveEditor({
                 onClick={() => setLondonLogoPlacement(panel.id, { lockupShape: key })}
                 className={`rounded-full border px-3 py-1 text-xs transition ${
                   placement.lockupShape === key
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-border text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {/* Turn the mark lengthwise: on a flag or a pillar the long
+              single-line lockup reads best running up or down the sheet. */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted-foreground">Logo turn</span>
+            {(
+              [
+                [0, "Flat"],
+                [90, "Turned down ↓"],
+                [270, "Turned up ↑"],
+              ] as const
+            ).map(([deg, label]) => (
+              <button
+                key={deg}
+                type="button"
+                aria-pressed={placement.lockupRotate === deg}
+                onClick={() => setLondonLogoPlacement(panel.id, { lockupRotate: deg })}
+                className={`rounded-full border px-3 py-1 text-xs transition ${
+                  placement.lockupRotate === deg
                     ? "border-primary bg-primary/10 text-foreground"
                     : "border-border text-muted-foreground hover:bg-muted"
                 }`}
