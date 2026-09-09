@@ -681,6 +681,21 @@ function LondonSignagePage() {
           </div>
         </details>
 
+        {/* Division agendas — the London kit's own agenda boards */}
+        <details className="group mt-6 rounded-2xl border border-black/10 bg-white/70 p-5">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#03002C]">
+              <CalendarDays className="h-4.5 w-4.5 text-[#003FC7]" /> Division agendas · editable
+              agenda boards, A4 to A1, every division
+            </h2>
+            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/55">
+              <span className="group-open:hidden">Show</span>
+              <span className="hidden group-open:inline">Hide</span>
+            </span>
+          </summary>
+          <LondonAgendaBoards />
+        </details>
+
 
         {/* Floor spine */}
         <section className="mt-12">
