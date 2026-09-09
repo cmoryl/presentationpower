@@ -7,6 +7,10 @@ import {
   agendaDivision,
   agendaGeometry,
   agendaInk,
+  agendaQrBackground,
+  agendaQrForeground,
+  agendaQrStyle,
+  agendaQrTransparent,
   agendaStops,
   agendaTitleInk,
   type AgendaConfig,
@@ -20,9 +24,18 @@ type Props = {
   guides?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  /** Supplied by the editor: drag the QR block to a new spot on the sheet. */
+  onPlaceQr?: (x: number, y: number) => void;
 };
 
-export function AgendaSheet({ config, pxPerMm = 0.8, guides = false, className, style }: Props) {
+export function AgendaSheet({
+  config,
+  pxPerMm = 0.8,
+  guides = false,
+  className,
+  style,
+  onPlaceQr,
+}: Props) {
   const mm = (v: number) => v * pxPerMm;
   const geo = agendaGeometry(config);
   const blocks = agendaBlocks(config);
@@ -35,6 +48,10 @@ export function AgendaSheet({ config, pxPerMm = 0.8, guides = false, className, 
   const isHalo = config.styleId.includes("halo");
   const ramp = isHalo ? [...stops].reverse() : stops;
   const qr = buildPillarQr(config.qrData ?? "");
+  const qrStyle = agendaQrStyle(config);
+  const qrInk = agendaQrForeground(config);
+  const qrClear = agendaQrTransparent(config);
+  const qrPlate = agendaQrBackground(config);
 
   const axis = config.styleId.includes("diagonal")
     ? "135deg"
