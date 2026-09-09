@@ -12,7 +12,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useLondonLivePanel } from "@/hooks/use-london-live-panel";
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
-import { buildLondonPanelSvg } from "@/lib/next-london-revise";
+import { buildLondonPanelSvg, type LondonArtOptions } from "@/lib/next-london-revise";
 import {
   fitArtworkInFace,
   scenesForPanel,
@@ -23,6 +23,8 @@ import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
 
 export interface LondonLocationRenderPreviewProps {
   panel: LondonPanel;
+  /** Published revision options this browser's edits layer on top of. */
+  baseOptions?: LondonArtOptions;
 }
 
 
@@ -93,10 +95,13 @@ function Stage({
   );
 }
 
-export function LondonLocationRenderPreview({ panel: input }: LondonLocationRenderPreviewProps) {
+export function LondonLocationRenderPreview({
+  panel: input,
+  baseOptions,
+}: LondonLocationRenderPreviewProps) {
   const faceReady = useLondonSignageFace();
   // The in-situ view shows the sign as edited here, not the last published file.
-  const live = useLondonLivePanel(input);
+  const live = useLondonLivePanel(input, baseOptions);
   const panel = live.panel;
   const scenes = useMemo(() => scenesForPanel(panel), [panel]);
   const [sceneId, setSceneId] = useState(scenes[0]!.id);

@@ -1022,12 +1022,12 @@ function LondonSignagePage() {
 
               {/* Every other item: the artwork in place at the venue. */}
               {isBoothPanel(openPanel) ? null : (
-                <LondonLocationRenderPreview panel={openPanel} />
+                <LondonLocationRenderPreview panel={openPanel} baseOptions={artOptions(openPanel)} />
               )}
 
 
               {/* Check every resolution tier on screen before downloading. */}
-              <LondonPpiPreview panel={openPanel} svg={artwork?.[openPanel.id]?.svg} />
+              <LondonPpiPreview panel={openPanel} svg={previewSvg(openPanel)} />
 
               {/* Live panel editing, same editor as the revise screen. Placement,
                   copy and board size write to the shared stores, so thumbnails
