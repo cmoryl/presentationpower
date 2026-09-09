@@ -115,40 +115,11 @@ function scallopPath(w: number, y: number, r: number, up: boolean): string {
  * line field stays visible without shouting over the lockup.
  */
 export function brewMotifPlan(panel: LondonPanel, light = false): BrewMotifPlan {
-  const w = panel.bleedW;
-  const h = panel.bleedH;
-  const short = Math.min(w, h);
-
-  const marks: BrewMark[] = [];
-
-  // Diagonal rule lattice. The dominant direction is tight and quiet; the
-  // counter direction is half as dense and fainter, so the field reads as a
-  // woven sleeve texture rather than a grid.
-  const pitch = Math.max(18, short * 0.075);
-  const hair = Math.max(0.8, short * 0.0032);
-  for (const d of latticePaths(w, h, pitch, 1)) {
-    marks.push({ kind: "path", d, width: hair, alpha: 0.14 });
-  }
-  for (const d of latticePaths(w, h, pitch * 2, -1)) {
-    marks.push({ kind: "path", d, width: hair, alpha: 0.07 });
-  }
-
-  // Scallop bands — awning / cup-sleeve arcs, whole periods, full width.
-  const scallopR = Math.max(14, short * 0.11);
-  for (const [ratio, alpha, up] of [
-    [0.28, 0.1, true],
-    [0.72, 0.16, false],
-    [0.9, 0.09, false],
-  ] as const) {
-    marks.push({
-      kind: "path",
-      d: scallopPath(w, h * ratio, scallopR, up),
-      width: Math.max(1.1, short * 0.0045),
-      alpha,
-    });
-  }
-
-  return { ink: light ? "#03002C" : "#FFFFFF", marks };
+  void panel;
+  // The brew grounds are now clean gradient only: no lattice, no scallops, no
+  // clip art. Kept as an empty plan so every caller (preview, .svg, .ai) keeps
+  // its shape while emitting nothing.
+  return { ink: light ? "#03002C" : "#FFFFFF", marks: [] };
 }
 
 /** SVG layer for the motif. Painted between ground and copy. */
@@ -156,6 +127,7 @@ export function brewMotifSvgLayer(
   plan: BrewMotifPlan,
   paintFor: (hex: string) => { paint: string; meta: string },
 ): string {
+  if (plan.marks.length === 0) return "";
   const { paint, meta } = paintFor(plan.ink);
   const body = plan.marks
     .map((m) => {
