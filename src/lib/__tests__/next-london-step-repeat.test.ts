@@ -56,6 +56,48 @@ describe("step & repeat wall", () => {
     expect(stepRepeatWarnings(wall, stepRepeatPlan(wall, DEFAULT_STEP_REPEAT))).toEqual([]);
   });
 
+  it("spreads a mixed recipe evenly instead of banding rows 2:1", () => {
+    const config = {
+      ...DEFAULT_STEP_REPEAT,
+      kind: "logo-qr" as const,
+      qrData: "https://example.com",
+      mix: "checker" as const,
+    };
+    const plan = stepRepeatPlan(wall, config);
+    const qr = plan.tiles.filter((t) => t.kind === "qr").length;
+    const logo = plan.tiles.filter((t) => t.kind === "logo").length;
+    // A checkerboard is close to half and half, never a 1-in-3 stripe.
+    expect(qr / (qr + logo)).toBeGreaterThan(0.4);
+    // Neighbours in a row always differ.
+    const row0 = plan.tiles.filter((t) => t.row === 0).map((t) => t.kind);
+    expect(row0.slice(0, 4)).toEqual(["logo", "qr", "logo", "qr"]);
+
+    const rows = stepRepeatPlan(wall, { ...config, mix: "rows" });
+    expect(new Set(rows.tiles.filter((t) => t.row === 1).map((t) => t.kind))).toEqual(
+      new Set(["qr"]),
+    );
+  });
+
+  it("rotates every division lockup through the grid on an all-divisions wall", () => {
+    const plan = stepRepeatPlan(wall, {
+      ...DEFAULT_STEP_REPEAT,
+      kind: "logo" as const,
+      logoSet: "divisions" as const,
+    });
+    expect(plan.arts.length).toBeGreaterThan(5);
+    const used = new Set(
+      plan.tiles.flatMap((t) => (t.kind === "logo" ? [t.artIndex] : [])),
+    );
+    expect(used.size).toBe(plan.arts.length);
+    // No mark repeats immediately beside itself.
+    const row = plan.tiles.filter((t) => t.row === 0);
+    for (let i = 1; i < row.length; i += 1) {
+      const a = row[i - 1]!;
+      const b = row[i]!;
+      if (a.kind === "logo" && b.kind === "logo") expect(a.artIndex).not.toBe(b.artIndex);
+    }
+  });
+
   it("reports every dimension in millimetres and inches", () => {
     expect(dimText(254)).toBe("254 mm (10.00 in)");
     expect(sizeText(3000, 2400)).toBe("3000 × 2400 mm (118.11 × 94.49 in)");
