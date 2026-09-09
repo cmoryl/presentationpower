@@ -45,7 +45,16 @@ export interface MartScene {
   face: MartSceneFace;
   /** Aspect (w/h) of the measured face — used to rank scene fit. */
   faceRatio: number;
+  /** The surface edge that physically fixes the print size. */
+  fixed: SceneFixedAxis;
+  /** Where on the free axis the print sits. */
+  anchorY: "top" | "center" | "bottom";
 }
+
+import {
+  mountArtworkOnFace,
+  type SceneFixedAxis,
+} from "@/lib/scene-face-fit";
 
 const PLATE = { w: 1536, h: 1024 };
 
@@ -56,6 +65,8 @@ function scene(
   kind: MartSceneKind,
   src: string,
   face: MartSceneFace,
+  fixed: SceneFixedAxis = "w",
+  anchorY: "top" | "center" | "bottom" = "center",
 ): MartScene {
   return {
     id,
@@ -66,6 +77,8 @@ function scene(
     plate: PLATE,
     face,
     faceRatio: (face.w * PLATE.w) / (face.h * PLATE.h),
+    fixed,
+    anchorY,
   };
 }
 
@@ -75,43 +88,43 @@ export const MART_SCENES: MartScene[] = [
     y: 0.0771,
     w: 0.179,
     h: 0.7783,
-  }),
+  }, "w", "top"),
   scene("wall-panel", "Shop back wall", "Behind the merch rails", "wall", wallPanel, {
     x: 0.1934,
     y: 0.0703,
     w: 0.6387,
     h: 0.5068,
-  }),
+  }, "w", "center"),
   scene("hanging-banner", "Overhead hanging banner", "Rigged to truss above the mart", "overhead", hangingBanner, {
     x: 0.0208,
     y: 0.2783,
     w: 0.9538,
     h: 0.2646,
-  }),
+  }, "w", "top"),
   scene("rail-panel", "Category rail panel", "Clipped above a merch rail", "rail", railPanel, {
     x: 0.2546,
     y: 0.1768,
     w: 0.4954,
     h: 0.3047,
-  }),
+  }, "w", "center"),
   scene("queue-panel", "Queue stanchion panel", "Till bank queue line", "stanchion", queuePanel, {
     x: 0.4935,
     y: 0.2646,
     w: 0.3743,
     h: 0.4033,
-  }),
+  }, "w", "center"),
   scene("till-front", "Till counter front", "Cash desk fascia", "counter", tillFront, {
     x: 0.0527,
     y: 0.333,
     w: 0.8919,
     h: 0.4727,
-  }),
+  }, "h", "center"),
   scene("floor-decal", "Floor approach decal", "Last 6 m of approach", "floor", floorDecal, {
     x: 0.2018,
     y: 0.3145,
     w: 0.5898,
     h: 0.5283,
-  }),
+  }, "w", "center"),
 ];
 
 export function martScene(id: string): MartScene | undefined {
@@ -167,29 +180,20 @@ export function defaultSceneForMartSign(subject: MartSceneSubject): MartScene {
 }
 
 /**
- * Artwork box inside a scene face: the sign's trim aspect fitted (contain)
- * into the measured face so nothing is stretched. Fractions of the plate.
+ * Artwork box for a sign on a scene: the print fills the surface edge that
+ * physically fixes its size, keeps the sign's true trim ratio, and stays on
+ * the plate. Fractions of the plate.
  */
 export function fitMartArtworkInFace(
   subject: MartSceneSubject,
   sceneOrId: MartScene | string,
 ): MartSceneFace {
   const sc = typeof sceneOrId === "string" ? martScene(sceneOrId) : sceneOrId;
-  const face = sc?.face ?? { x: 0, y: 0, w: 1, h: 1 };
-  const plate = sc?.plate ?? PLATE;
-  const facePxW = face.w * plate.w;
-  const facePxH = face.h * plate.h;
-  const target = subject.trimH > 0 ? subject.trimW / subject.trimH : 1;
-  let w = facePxW;
-  let h = w / target;
-  if (h > facePxH) {
-    h = facePxH;
-    w = h * target;
-  }
-  return {
-    x: face.x + (facePxW - w) / 2 / plate.w,
-    y: face.y + (facePxH - h) / 2 / plate.h,
-    w: w / plate.w,
-    h: h / plate.h,
-  };
+  return mountArtworkOnFace({
+    face: sc?.face ?? { x: 0, y: 0, w: 1, h: 1 },
+    plate: sc?.plate ?? PLATE,
+    ratio: subject.trimH > 0 ? subject.trimW / subject.trimH : 1,
+    fixed: sc?.fixed ?? "w",
+    anchorY: sc?.anchorY ?? "center",
+  });
 }
