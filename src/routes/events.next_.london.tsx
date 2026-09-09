@@ -47,7 +47,7 @@ import {
 } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import { londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
-import { applyLondonBoardSizes, useLondonBoardSizes } from "@/lib/next-london-board-size";
+import { applyLondonBoardSize, applyLondonBoardSizes, useLondonBoardSizes } from "@/lib/next-london-board-size";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { handleLondonDirectoryDownload } from "@/lib/london-directory-pdf";
@@ -306,7 +306,12 @@ function LondonSignagePage() {
   const [floorId, setFloorId] = useState<string>("all");
   const [artwork, setArtwork] = useState<LondonArtwork | null>(null);
   const [artworkError, setArtworkError] = useState<string | null>(null);
-  const [openPanel, setOpenPanel] = useState<LondonPanel | null>(null);
+  const [openPanelRaw, setOpenPanel] = useState<LondonPanel | null>(null);
+  // The open dialog follows a re-measured board too.
+  const openPanel = useMemo(
+    () => (openPanelRaw ? applyLondonBoardSize(openPanelRaw, localBoardSizes) : null),
+    [openPanelRaw, localBoardSizes],
+  );
   const [editing, setEditing] = useState(false);
   const [ppi, setPpi] = useState<number>(72);
   const [qa, setQa] = useState<LondonQaReport[] | null>(null);
