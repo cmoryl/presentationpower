@@ -2490,6 +2490,57 @@ export type Database = {
           },
         ]
       }
+      london_live_files: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          issued: string
+          master_content_type: string | null
+          master_filename: string
+          master_path: string
+          note: string | null
+          panel_id: string
+          proof_path: string | null
+          trim_h: number | null
+          trim_w: number | null
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          issued?: string
+          master_content_type?: string | null
+          master_filename: string
+          master_path: string
+          note?: string | null
+          panel_id: string
+          proof_path?: string | null
+          trim_h?: number | null
+          trim_w?: number | null
+          version: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          issued?: string
+          master_content_type?: string | null
+          master_filename?: string
+          master_path?: string
+          note?: string | null
+          panel_id?: string
+          proof_path?: string | null
+          trim_h?: number | null
+          trim_w?: number | null
+          version?: number
+        }
+        Relationships: []
+      }
       london_signage_revisions: {
         Row: {
           author_id: string | null

@@ -9,6 +9,7 @@
 import { useMemo } from "react";
 
 import { applyLondonBoardSize, useLondonBoardSizes } from "@/lib/next-london-board-size";
+import { useLondonLiveFiles } from "@/lib/next-london-live-files";
 import { useLondonLogoPlacements } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import type { LondonArtOptions } from "@/lib/next-london-revise";
@@ -32,6 +33,8 @@ export function useLondonLivePanel(
   const placements = useLondonLogoPlacements();
   const placedArtMap = useLondonPlacedArt();
   const boardSizes = useLondonBoardSizes();
+  // A newly published live file for this sign must repaint every surface too.
+  const liveFiles = useLondonLiveFiles();
 
   return useMemo(() => {
     const placement = placements[input.id];
@@ -55,9 +58,12 @@ export function useLondonLivePanel(
         JSON.stringify(placedArt ?? null),
         JSON.stringify(boardSize ?? null),
         JSON.stringify(base),
+        liveFiles[input.id]
+          ? `live:${liveFiles[input.id]!.version}:${liveFiles[input.id]!.proofUrl ?? ""}`
+          : "live:none",
       ].join("|"),
       draft: Boolean(placement || placedArt || boardSize),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [input, placements, placedArtMap, boardSizes, JSON.stringify(base)]);
+  }, [input, placements, placedArtMap, boardSizes, liveFiles, JSON.stringify(base)]);
 }

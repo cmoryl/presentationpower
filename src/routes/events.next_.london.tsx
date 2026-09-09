@@ -47,6 +47,9 @@ import {
 } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import { londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
+import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
+import { setLondonLiveFiles } from "@/lib/next-london-live-files";
+import { LondonLiveFilePanel } from "@/components/events/LondonLiveFilePanel";
 import { applyLondonBoardSize, applyLondonBoardSizes, useLondonBoardSizes } from "@/lib/next-london-board-size";
 import {
   createLondonVariation,
@@ -349,6 +352,24 @@ function LondonSignagePage() {
       live = false;
     };
   }, []);
+
+  // The finished live file in force for each sign is read from the backend, so
+  // replacing a file updates every preview card here without a code change.
+  const fetchLiveFiles = useServerFn(listLondonLiveFiles);
+  const [liveFileTick, setLiveFileTick] = useState(0);
+  useEffect(() => {
+    let live = true;
+    fetchLiveFiles()
+      .then((rows) => {
+        if (live) setLondonLiveFiles(rows);
+      })
+      .catch(() => {
+        /* no stored versions reachable — the bundled artwork still prints */
+      });
+    return () => {
+      live = false;
+    };
+  }, [fetchLiveFiles, liveFileTick]);
 
   const [revisionTick, setRevisionTick] = useState(0);
 
@@ -1046,6 +1067,16 @@ function LondonSignagePage() {
                   </div>
                 ))}
               </dl>
+
+              {/* The finished live file in force for this sign. Replacing it here
+                  re-paints every preview card in the kit at once. */}
+              {isBoothPanel(openPanel) ? null : (
+                <LondonLiveFilePanel
+                  panel={openPanel}
+                  canEdit={isAdmin}
+                  onChanged={() => setLiveFileTick((n) => n + 1)}
+                />
+              )}
 
               {/* Copies of this sign — a second pillar version, a different
                   treatment on the same board. Each copy is its own asset. */}
