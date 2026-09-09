@@ -92,6 +92,23 @@ describe("placed artwork import", () => {
     expect(warnings.join(" ")).toMatch(/stroked path/);
   });
 
+  it("interprets a plain-PostScript EPS written by non-Illustrator tools", () => {
+    const { art } = parseEpsArtwork(
+      [
+        "%!PS-Adobe-3.0 EPSF-3.0",
+        "%%BoundingBox: 0 0 200 100",
+        "0 0.247 0.780 setrgbcolor",
+        "newpath 0 0 moveto 200 0 rlineto 0 100 rlineto -200 0 rlineto closepath fill",
+      ].join("\n"),
+      "plain.eps",
+    );
+    expect(art.w).toBe(200);
+    expect(art.h).toBe(100);
+    expect(art.paths).toHaveLength(1);
+    expect(art.paths[0]!.fill).toBe("#003FC7");
+    expect(art.paths[0]!.d.startsWith("M 0.000 100.000")).toBe(true);
+  });
+
   it("routes uploads by extension and rejects other files", () => {
     expect(parseArtworkFile(SVG, "mark.svg").art.format).toBe("svg");
     expect(parseArtworkFile(EPS, "logo.eps").art.format).toBe("eps");

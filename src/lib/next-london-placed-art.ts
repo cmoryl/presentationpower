@@ -718,23 +718,44 @@ export function parseEpsArtwork(source: string, name: string): PlacedArtImport {
       continue;
     }
     switch (token) {
-      case "m": {
+      case "m":
+      case "moveto": {
         const [x, y] = pop(2);
         if (x === undefined || y === undefined) break;
         current.push(`M ${pt(x, y)}`);
         cursor = { x, y };
         break;
       }
+      case "rmoveto": {
+        const [dx, dy] = pop(2);
+        if (dx === undefined || dy === undefined || !cursor) break;
+        const x: number = cursor.x + dx;
+        const y: number = cursor.y + dy;
+        current.push(`M ${pt(x, y)}`);
+        cursor = { x, y };
+        break;
+      }
       case "l":
-      case "L": {
+      case "L":
+      case "lineto": {
         const [x, y] = pop(2);
         if (x === undefined || y === undefined) break;
         current.push(`L ${pt(x, y)}`);
         cursor = { x, y };
         break;
       }
+      case "rlineto": {
+        const [dx, dy] = pop(2);
+        if (dx === undefined || dy === undefined || !cursor) break;
+        const x: number = cursor.x + dx;
+        const y: number = cursor.y + dy;
+        current.push(`L ${pt(x, y)}`);
+        cursor = { x, y };
+        break;
+      }
       case "c":
-      case "C": {
+      case "C":
+      case "curveto": {
         const [ax, ay, bx, by, x, y] = pop(6);
         if (x === undefined || y === undefined) break;
         current.push(`C ${pt(ax!, ay!)} ${pt(bx!, by!)} ${pt(x, y)}`);
@@ -774,15 +795,34 @@ export function parseEpsArtwork(source: string, name: string): PlacedArtImport {
         break;
       }
       case "Xa":
-      case "XA": {
+      case "XA":
+      case "setrgbcolor": {
         const [r, g2, b] = pop(3);
         if (b !== undefined) fill = hex(r!, g2!, b);
         break;
       }
+      case "setgray": {
+        const [grey] = pop(1);
+        if (grey !== undefined) fill = hex(grey, grey, grey);
+        break;
+      }
+      case "setcmykcolor": {
+        const [c, mm, yy, kk] = pop(4);
+        if (kk !== undefined) {
+          fill = hex((1 - c!) * (1 - kk), (1 - mm!) * (1 - kk), (1 - yy!) * (1 - kk));
+        }
+        break;
+      }
+      // A plain-PostScript closepath only shuts the subpath; the paint
+      // operator that follows decides whether it is filled.
+      case "closepath":
+        if (current.length > 0) current.push("Z");
+        break;
       case "f":
       case "F":
       case "b":
       case "B":
+      case "fill":
         current.push("Z");
         flush(true, false);
         break;
@@ -790,16 +830,20 @@ export function parseEpsArtwork(source: string, name: string): PlacedArtImport {
       case "F*":
       case "b*":
       case "B*":
+      case "eofill":
         current.push("Z");
         flush(true, true);
         break;
       case "s":
       case "S":
+      case "stroke":
         flush(false, false);
         break;
       case "n":
       case "N":
         flush(false, false);
+        break;
+      case "newpath":
         break;
       default:
         stack.length = 0;
