@@ -53,7 +53,7 @@ describe("placed artwork import", () => {
     expect(warnings.join(" ")).toMatch(/stroke-only/);
   });
 
-  it("converts quadratic curves to cubics and refuses arcs", () => {
+  it("converts quadratic curves and elliptical arcs to cubics", () => {
     const q = normalisePathData("M 0 0 Q 10 0 10 10 T 20 20");
     expect(q.arcs).toBe(false);
     const n = q.d.match(/-?\d*\.?\d+/g)!.map(Number);
@@ -61,14 +61,31 @@ describe("placed artwork import", () => {
     expect(n.slice(0, 8)).toEqual([0, 0, 6.666667, 0, 10, 3.333333, 10, 10].map((v, i) =>
       expect.closeTo(v, 4) as unknown as number,
     ) as unknown as number[]);
-    expect(normalisePathData("M0 0 A5 5 0 0 1 10 10")).toEqual({ d: "", arcs: true });
-    const { art, warnings } = parseSvgArtwork(
+
+    // A quarter-turn arc keeps its endpoint and becomes real curve geometry.
+    const a = normalisePathData("M0 0 A5 5 0 0 1 10 10");
+    expect(a.arcs).toBe(false);
+    expect(a.d).toMatch(/C/);
+    expect(a.d).not.toMatch(/[Aa]/);
+    const an = a.d.match(/-?\d*\.?\d+(?:e[-+]?\d+)?/g)!.map(Number);
+    expect(an[an.length - 2]).toBeCloseTo(10, 3);
+    expect(an[an.length - 1]).toBeCloseTo(10, 3);
+
+    const { art } = parseSvgArtwork(
       `<svg viewBox="0 0 20 20"><path d="M0 0 A5 5 0 0 1 10 10 Z" fill="#000"/><path d="M0 0 Q10 0 10 10 Z" fill="#000"/></svg>`,
       "mixed.svg",
     );
+    expect(art.paths).toHaveLength(2);
+    for (const p of art.paths) expect(p.d).not.toMatch(/[QqAa]/);
+  });
+
+  it("keeps rounded rectangle corners", () => {
+    const { art } = parseSvgArtwork(
+      `<svg viewBox="0 0 40 20"><rect x="0" y="0" width="40" height="20" rx="6" fill="#000"/></svg>`,
+      "rounded.svg",
+    );
     expect(art.paths).toHaveLength(1);
-    expect(art.paths[0]!.d).not.toMatch(/[QqAa]/);
-    expect(warnings.join(" ")).toMatch(/elliptical arcs/);
+    expect((art.paths[0]!.d.match(/C/g) ?? []).length).toBe(4);
   });
 
   it("refuses live text and placed rasters", () => {

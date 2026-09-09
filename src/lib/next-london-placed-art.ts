@@ -380,7 +380,29 @@ function shapeToPath(el: Element): string | null {
       const w = num(el, "width");
       const h = num(el, "height");
       if (!(w > 0) || !(h > 0)) return null;
-      return `M ${x} ${y} H ${x + w} V ${y + h} H ${x} Z`;
+      // Rounded corners are part of the artwork: dropping rx/ry printed a
+      // sharp-cornered box where the designer drew a soft one.
+      const rxAttr = el.getAttribute("rx");
+      const ryAttr = el.getAttribute("ry");
+      let rx = rxAttr !== null ? num(el, "rx") : ryAttr !== null ? num(el, "ry") : 0;
+      let ry = ryAttr !== null ? num(el, "ry") : rx;
+      rx = Math.min(Math.max(rx, 0), w / 2);
+      ry = Math.min(Math.max(ry, 0), h / 2);
+      if (!(rx > 0) || !(ry > 0)) return `M ${x} ${y} H ${x + w} V ${y + h} H ${x} Z`;
+      const k = 0.5522847498;
+      const cx = rx * k;
+      const cy = ry * k;
+      return (
+        `M ${x + rx} ${y} ` +
+        `L ${x + w - rx} ${y} ` +
+        `C ${x + w - rx + cx} ${y} ${x + w} ${y + ry - cy} ${x + w} ${y + ry} ` +
+        `L ${x + w} ${y + h - ry} ` +
+        `C ${x + w} ${y + h - ry + cy} ${x + w - rx + cx} ${y + h} ${x + w - rx} ${y + h} ` +
+        `L ${x + rx} ${y + h} ` +
+        `C ${x + rx - cx} ${y + h} ${x} ${y + h - ry + cy} ${x} ${y + h - ry} ` +
+        `L ${x} ${y + ry} ` +
+        `C ${x} ${y + ry - cy} ${x + rx - cx} ${y} ${x + rx} ${y} Z`
+      );
     }
     case "circle": {
       const r = num(el, "r");
@@ -459,14 +481,98 @@ function lengthPx(value: string | null): number | null {
 
 /**
  * The PDF path writer speaks the command set Illustrator writes (M/L/H/V/C/S/Z).
- * Quadratic curves are converted to their exact cubic equivalent so imported
- * artwork keeps its geometry; elliptical arcs are refused rather than silently
- * printed as straight lines.
+ * Quadratic curves become their exact cubic equivalent and elliptical arcs are
+ * flattened to 90°-max cubic segments, so imported artwork keeps every shape it
+ * was drawn with instead of losing arc-based geometry.
  */
+/**
+ * One elliptical arc as up to four cubic segments (max 90° each), the standard
+ * SVG endpoint→centre parameterisation. Arcs used to be dropped, which quietly
+ * deleted whole shapes — rounded corners, dials, pie wedges — from the master.
+ */
+function arcToCubics(
+  x1: number,
+  y1: number,
+  rxIn: number,
+  ryIn: number,
+  rotDeg: number,
+  largeArc: boolean,
+  sweep: boolean,
+  x2: number,
+  y2: number,
+): number[][] {
+  if (x1 === x2 && y1 === y2) return [];
+  let rx = Math.abs(rxIn);
+  let ry = Math.abs(ryIn);
+  if (rx === 0 || ry === 0) return [[x1, y1, x2, y2, x2, y2]];
+  const phi = (rotDeg * Math.PI) / 180;
+  const cosP = Math.cos(phi);
+  const sinP = Math.sin(phi);
+  const dx = (x1 - x2) / 2;
+  const dy = (y1 - y2) / 2;
+  const x1p = cosP * dx + sinP * dy;
+  const y1p = -sinP * dx + cosP * dy;
+  const lambda = (x1p * x1p) / (rx * rx) + (y1p * y1p) / (ry * ry);
+  if (lambda > 1) {
+    const s = Math.sqrt(lambda);
+    rx *= s;
+    ry *= s;
+  }
+  const num = rx * rx * ry * ry - rx * rx * y1p * y1p - ry * ry * x1p * x1p;
+  const den = rx * rx * y1p * y1p + ry * ry * x1p * x1p;
+  const factor = Math.sqrt(Math.max(0, num / den)) * (largeArc === sweep ? -1 : 1);
+  const cxp = (factor * rx * y1p) / ry;
+  const cyp = (-factor * ry * x1p) / rx;
+  const cx = cosP * cxp - sinP * cyp + (x1 + x2) / 2;
+  const cy = sinP * cxp + cosP * cyp + (y1 + y2) / 2;
+  const angle = (ux: number, uy: number, vx: number, vy: number) => {
+    const dot = ux * vx + uy * vy;
+    const len = Math.sqrt(ux * ux + uy * uy) * Math.sqrt(vx * vx + vy * vy);
+    const a = Math.acos(Math.min(1, Math.max(-1, len === 0 ? 1 : dot / len)));
+    return ux * vy - uy * vx < 0 ? -a : a;
+  };
+  const ux = (x1p - cxp) / rx;
+  const uy = (y1p - cyp) / ry;
+  const vx = (-x1p - cxp) / rx;
+  const vy = (-y1p - cyp) / ry;
+  const theta1 = angle(1, 0, ux, uy);
+  let delta = angle(ux, uy, vx, vy);
+  if (!sweep && delta > 0) delta -= 2 * Math.PI;
+  if (sweep && delta < 0) delta += 2 * Math.PI;
+  const segments = Math.max(1, Math.ceil(Math.abs(delta) / (Math.PI / 2)));
+  const step = delta / segments;
+  const alpha = (4 / 3) * Math.tan(step / 4);
+  const point = (t: number) => {
+    const ct = Math.cos(t);
+    const st = Math.sin(t);
+    return {
+      x: cx + rx * cosP * ct - ry * sinP * st,
+      y: cy + rx * sinP * ct + ry * cosP * st,
+      dx: -rx * cosP * st - ry * sinP * ct,
+      dy: -rx * sinP * st + ry * cosP * ct,
+    };
+  };
+  const out: number[][] = [];
+  for (let s = 0; s < segments; s += 1) {
+    const t0 = theta1 + s * step;
+    const t1 = t0 + step;
+    const p0 = point(t0);
+    const p1 = point(t1);
+    out.push([
+      p0.x + alpha * p0.dx,
+      p0.y + alpha * p0.dy,
+      p1.x - alpha * p1.dx,
+      p1.y - alpha * p1.dy,
+      p1.x,
+      p1.y,
+    ]);
+  }
+  return out;
+}
+
 export function normalisePathData(d: string): { d: string; arcs: boolean } {
-  if (/[Aa]/.test(d)) return { d: "", arcs: true };
-  if (!/[QqTt]/.test(d)) return { d, arcs: false };
-  const tokens = d.match(/[MmLlHhVvCcSsQqTtZz]|-?\d*\.?\d+(?:e[-+]?\d+)?/gi) ?? [];
+  if (!/[QqTtAa]/.test(d)) return { d, arcs: false };
+  const tokens = d.match(/[MmLlHhVvCcSsQqTtAaZz]|-?\d*\.?\d+(?:e[-+]?\d+)?/gi) ?? [];
   const out: string[] = [];
   let cmd = "";
   let x = 0;
@@ -578,6 +684,23 @@ export function normalisePathData(d: string): { d: string; arcs: boolean } {
         const ey = rel ? y + num(i + 1) : num(i + 1);
         cubicFromQuad(cx, cy, ex, ey);
         i += 2;
+        break;
+      }
+      case "A": {
+        const rx = num(i);
+        const ry = num(i + 1);
+        const rot = num(i + 2);
+        const largeArc = num(i + 3) !== 0;
+        const sweep = num(i + 4) !== 0;
+        const ex = rel ? x + num(i + 5) : num(i + 5);
+        const ey = rel ? y + num(i + 6) : num(i + 6);
+        for (const c of arcToCubics(x, y, rx, ry, rot, largeArc, sweep, ex, ey)) {
+          out.push(`C ${c.join(" ")}`);
+        }
+        x = ex;
+        y = ey;
+        qx = qy = null;
+        i += 7;
         break;
       }
       default:
