@@ -14,6 +14,7 @@ import {
   PLACED_ART_ROTATE,
   PLACED_ART_SIZE,
   parseArtworkFile,
+  placedArtInks,
   setLondonPlacedArt,
   type LondonPlacedArt,
 } from "@/lib/next-london-placed-art";
@@ -119,6 +120,14 @@ export function LondonPlacedArtPanel({
       dx: clampNudge(art.dx + hx * step),
       dy: clampNudge(art.dy + hy * step),
     });
+  }
+
+  function recolour(from: string, to: string) {
+    if (!art) return;
+    const next = { ...(art.recolour ?? {}) };
+    if (to.trim().toUpperCase() === from) delete next[from];
+    else next[from] = to.trim().toUpperCase();
+    setLondonPlacedArt(panel.id, { recolour: Object.keys(next).length > 0 ? next : undefined });
   }
 
   function align(h: Align, v: Align): { dx: number; dy: number } {
@@ -326,6 +335,50 @@ export function LondonPlacedArtPanel({
                 </button>
                 <span />
               </div>
+            </div>
+          </div>
+          <div className="mt-3">
+            <p className="mb-1 text-[11px] text-muted-foreground">
+              Inks in this artwork — change any one, geometry stays untouched
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {placedArtInks(art).map((ink) => (
+                <label
+                  key={ink.from}
+                  className="flex items-center gap-2 rounded-full border border-border py-1 pl-1 pr-3 text-[11px] text-muted-foreground"
+                >
+                  <input
+                    type="color"
+                    value={ink.to}
+                    aria-label={`Ink ${ink.from}`}
+                    onChange={(e) => recolour(ink.from, e.target.value)}
+                    className="h-6 w-6 cursor-pointer rounded-full border border-border bg-transparent p-0"
+                  />
+                  <span className="font-mono">{ink.to}</span>
+                  {ink.to !== ink.from ? (
+                    <button
+                      type="button"
+                      onClick={() => recolour(ink.from, ink.from)}
+                      className="text-muted-foreground underline"
+                    >
+                      was {ink.from}
+                    </button>
+                  ) : (
+                    <span className="opacity-60">
+                      {ink.count} shape{ink.count === 1 ? "" : "s"}
+                    </span>
+                  )}
+                </label>
+              ))}
+              {art.recolour ? (
+                <button
+                  type="button"
+                  onClick={() => setLondonPlacedArt(panel.id, { recolour: undefined })}
+                  className="rounded-full border border-border px-3 py-1 text-[11px] text-muted-foreground transition hover:bg-muted"
+                >
+                  Back to the file's own colours
+                </button>
+              ) : null}
             </div>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
