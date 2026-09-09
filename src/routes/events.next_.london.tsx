@@ -143,7 +143,9 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
   const ratio = panel.bleedW / panel.bleedH;
   // Vendor booths show the supplied artwork proof directly: a data-URL SVG in an
   // <img> cannot load the linked artwork.
-  const boothArt = londonBoothArtworkUrl(panel.id);
+  // A hand-finished live file supplied by the design team wins over anything we
+  // would generate for the ground.
+  const boothArt = londonSuppliedMaster(panel)?.previewUrl ?? londonBoothArtworkUrl(panel.id);
   return (
     <div
       className="relative w-full overflow-hidden rounded-lg border border-black/10 bg-[#E0E8F5]"
