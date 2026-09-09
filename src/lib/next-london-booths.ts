@@ -23,7 +23,7 @@ import gcdAi from "@/assets/london-booths/global-content-delivery-tradebooth-a.a
 import gcdP1 from "@/assets/london-booths/global-content-delivery-tradebooth-a.jpg";
 import gdxAi from "@/assets/london-booths/global-digital-experience-live-tradebooth-a.ai?url";
 import gdxP1 from "@/assets/london-booths/global-digital-experience-live-tradebooth-a.jpg";
-import glLifeSciAi from "@/assets/london-booths/gl-live-lifesci-tradebooth-a.pdf?url";
+import glLifeSciAi from "@/assets/london-booths/gl-live-lifesci-tradebooth-a.ai?url";
 import glLifeSciP1 from "@/assets/london-booths/gl-live-lifesci-tradebooth-a.jpg";
 import glLiveAi from "@/assets/london-booths/gl-live-tradebooth-a.ai?url";
 import glLiveP1 from "@/assets/london-booths/gl-live-tradebooth-a.jpg";
@@ -212,7 +212,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
     id: "live-conference-events",
     shellId: "tradebooth-a",
     vendor: "Live Conference/Events | LifeSciNEXT",
-    sourceFile: "GL_Live_LifeSciNEXTTradeBoothA_Front_1830x2440mm_Plus100mmBleed.pdf",
+    sourceFile: "GL_Live_LifeSciNEXTTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: glLifeSciAi,
     style: "03-wash-diagonal",
     artboards: frontWall(glLifeSciP1),
