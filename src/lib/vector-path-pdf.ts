@@ -25,7 +25,7 @@ function tokenize(d: string): (string | number)[] {
   let i = 0;
   while (i < source.length) {
     const ch = source[i]!;
-    if (/[MLHVCSZmlhvcsz]/.test(ch)) {
+    if (/[MLHVCSQTZmlhvcsqtz]/.test(ch)) {
       out.push(ch);
       i += 1;
       continue;
@@ -76,6 +76,18 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
   let cursor: Point = { x: 0, y: 0 };
   let start: Point = { x: 0, y: 0 };
   let lastControl: Point | null = null;
+  // Last QUADRATIC control point, kept apart from the cubic one so `T` reflects
+  // the right thing. TrueType glyph outlines (Geist Bold) are all quadratic, so
+  // without Q/T support every curved letter collapsed to straight facets.
+  let lastQControl: Point | null = null;
+  const quadTo = (c: Point, p: Point) => {
+    // Exact degree elevation: a quadratic is a cubic with controls at 2/3.
+    curveTo(
+      { x: cursor.x + (2 / 3) * (c.x - cursor.x), y: cursor.y + (2 / 3) * (c.y - cursor.y) },
+      { x: p.x + (2 / 3) * (c.x - p.x), y: p.y + (2 / 3) * (c.y - p.y) },
+      p,
+    );
+  };
   let command = "";
   let i = 0;
 
@@ -94,6 +106,7 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         ops.push("h");
         cursor = { ...start };
         lastControl = null;
+        lastQControl = null;
         continue;
       }
     }
@@ -110,6 +123,7 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         cursor = p;
         start = p;
         lastControl = null;
+        lastQControl = null;
         command = rel ? "l" : "L";
         break;
       }
@@ -118,6 +132,7 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         lineTo(p);
         cursor = p;
         lastControl = null;
+        lastQControl = null;
         break;
       }
       case "H": {
@@ -125,6 +140,7 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         lineTo(p);
         cursor = p;
         lastControl = null;
+        lastQControl = null;
         break;
       }
       case "V": {
@@ -132,6 +148,7 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         lineTo(p);
         cursor = p;
         lastControl = null;
+        lastQControl = null;
         break;
       }
       case "C": {
@@ -141,6 +158,7 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         curveTo(c1, c2, p);
         cursor = p;
         lastControl = c2;
+        lastQControl = null;
         break;
       }
       case "S": {
@@ -152,6 +170,27 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         curveTo(c1, c2, p);
         cursor = p;
         lastControl = c2;
+        lastQControl = null;
+        break;
+      }
+      case "Q": {
+        const c = { x: base.x + num(), y: base.y + num() };
+        const p = { x: base.x + num(), y: base.y + num() };
+        quadTo(c, p);
+        cursor = p;
+        lastQControl = c;
+        lastControl = null;
+        break;
+      }
+      case "T": {
+        const c: Point = lastQControl
+          ? { x: 2 * cursor.x - lastQControl.x, y: 2 * cursor.y - lastQControl.y }
+          : { x: cursor.x, y: cursor.y };
+        const p = { x: base.x + num(), y: base.y + num() };
+        quadTo(c, p);
+        cursor = p;
+        lastQControl = c;
+        lastControl = null;
         break;
       }
       default:
