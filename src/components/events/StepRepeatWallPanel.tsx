@@ -215,6 +215,7 @@ export function StepRepeatWallPanel({ panel }: StepRepeatWallPanelProps) {
 
   const showsQr = config.kind === "qr" || config.kind === "logo-qr";
   const showsText = config.kind === "text" || config.kind === "logo-text";
+  const isMixed = config.kind === "logo-text" || config.kind === "logo-qr";
 
   return (
     <div className="rounded-lg border border-primary/40 bg-primary/5 p-3">
