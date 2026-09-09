@@ -329,6 +329,8 @@ function LondonTemplatePage() {
     top: `${(plan.logo.y / panel.bleedH) * 100}%`,
     width: `${(plan.logo.w / panel.bleedW) * 100}%`,
     height: `${(plan.logo.h / panel.bleedH) * 100}%`,
+    // A turned lockup spins about its own centre, exactly as the print master does.
+    transform: plan.logoRotate ? `rotate(${plan.logoRotate}deg)` : undefined,
   };
 
   // Headline hit box: the cap band around the copy baseline, centred on the

@@ -680,7 +680,12 @@ export function buildLondonPanelSvg(
     ` data-lockup="${brand.orientation}" data-family="${brand.familyId}"`,
     ` data-colourway="${brand.colourway}"`,
     ` data-source="${escapeXml(brand.art.source)}"`,
-    ` transform="translate(${brand.logo.x.toFixed(2)} ${brand.logo.y.toFixed(2)}) scale(${logoScale.toFixed(5)})">`,
+    ` data-rotate="${brand.logoRotate}"`,
+    ` transform="${
+      brand.logoRotate
+        ? `rotate(${brand.logoRotate} ${(brand.logo.x + brand.logo.w / 2).toFixed(2)} ${(brand.logo.y + brand.logo.h / 2).toFixed(2)}) `
+        : ""
+    }translate(${brand.logo.x.toFixed(2)} ${brand.logo.y.toFixed(2)}) scale(${logoScale.toFixed(5)})">`,
     brand.art.paths
       .map((p) => {
         const { paint: fill, meta } = paintFor(p.fill);
@@ -962,6 +967,24 @@ export function buildLondonPanelAi(
   // as live Geist Bold text — both editable when the .ai is opened.
   const brand = londonBrandingPlan(panel, options.placement);
   const logoScale = (brand.logo.w * MM_TO_PT) / brand.art.w;
+  // A turned lockup spins about the centre of its own box. The paths keep their
+  // absolute coordinates, so the spin is one matrix wrapped around the layer —
+  // the outlines stay live vector objects with no baked-in transform.
+  const logoSpin = (() => {
+    if (!brand.logoRotate) return { open: "", close: "" };
+    const rad = (-brand.logoRotate * Math.PI) / 180;
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+    const cx = (brand.logo.x + brand.logo.w / 2) * MM_TO_PT;
+    const cy = h - (brand.logo.y + brand.logo.h / 2) * MM_TO_PT;
+    const e = cx - (cos * cx - sin * cy);
+    const f = cy - (sin * cx + cos * cy);
+    const f5 = (n: number) => n.toFixed(5);
+    return {
+      open: `q ${f5(cos)} ${f5(sin)} ${f5(-sin)} ${f5(cos)} ${f5(e)} ${f5(f)} cm\n`,
+      close: "Q\n",
+    };
+  })();
   const logoOps = brand.art.paths
     .map((p) => {
       const ops = svgPathToPdfOps(p.d, {
@@ -1199,7 +1222,9 @@ export function buildLondonPanelAi(
       (copyOps || subOps || bodyOps || qrOps
         ? `/OC /oc2 BDC\n${copyOps}${subOps}${bodyOps}${qrOps}EMC\n`
         : "") +
-      (brand.lockupOn && logoOps ? `/OC /oc1 BDC\n${logoOps}EMC\n` : "") +
+      (brand.lockupOn && logoOps
+        ? `/OC /oc1 BDC\n${logoSpin.open}${logoOps}${logoSpin.close}EMC\n`
+        : "") +
       artOver;
 
   // The copy actually printed on this master, kept as searchable metadata now

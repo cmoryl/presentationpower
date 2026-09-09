@@ -121,6 +121,12 @@ export type LondonBrandingPlan = {
   art: NextLogoArt;
   /** Logo box, in mm, in the panel's bleed coordinate space. */
   logo: { x: number; y: number; w: number; h: number };
+  /**
+   * Clockwise rotation of the lockup, in degrees, about the centre of its box.
+   * 0 on almost every sheet; 90 or 270 turns the long single-line mark so it
+   * runs lengthwise up or down a tall panel.
+   */
+  logoRotate: number;
   /** Optional headline, set in Geist Bold. */
   copy: string | null;
   /** Cap height of the headline, in mm. */
@@ -256,10 +262,18 @@ export function londonBrandingPlan(
   const widthShare =
     orientation === "side" ? (aspect >= 4 ? 0.62 : 0.78) : aspect >= 1.6 ? 0.48 : 0.72;
   const nudge = nudgeEarly;
-  let logoW = liveW * widthShare * nudge.scale;
+  // Turned lockup: on a tall, narrow sheet (a flag, a pillar) the long
+  // single-line mark reads best running UP or DOWN the panel. The mark keeps its
+  // own proportions; the live area it is measured against is swapped, so the
+  // long edge of the lockup is budgeted against the long edge of the sheet.
+  const logoRotate = nudge.lockupRotate === 90 || nudge.lockupRotate === 270 ? nudge.lockupRotate : 0;
+  const turned = logoRotate !== 0;
+  const runW = turned ? liveH : liveW;
+  const runH = turned ? liveW : liveH;
+  let logoW = runW * widthShare * nudge.scale;
   let logoH = (art.h / art.w) * logoW;
-  let maxH = liveH * (orientation === "side" ? 0.44 : 0.58) * nudge.scale;
-  if (screenTop !== null) {
+  let maxH = runH * (orientation === "side" ? 0.44 : 0.58) * nudge.scale;
+  if (screenTop !== null && !turned) {
     // Band between the safe line and the screen, less a gap of a tenth of it.
     const band = Math.max(20, screenTop - ((panel.bleedH - panel.trimH) / 2 + safe));
     maxH = Math.min(maxH, band * 0.86);
@@ -286,17 +300,36 @@ export function londonBrandingPlan(
 
   // Stacked lockups sit on the upper third; horizontal lockups ride the lower
   // band so the middle of a wide panel stays open for copy. On a screen wall the
-  // lockup is centred in the band above the aperture instead.
-  const baseY =
-    screenTop !== null
+  // lockup is centred in the band above the aperture instead. A turned lockup
+  // runs the height of the sheet, so it is centred on the trim and the designer
+  // walks it to whichever edge they want.
+  const baseY = turned
+    ? marginY + panel.trimH / 2 - logoH / 2
+    : screenTop !== null
       ? Math.max(marginY + safe, marginY + safe + (screenTop - (marginY + safe) - logoH) / 2)
       : orientation === "side"
         ? marginY + panel.trimH - safe - logoH
         : marginY + safe + liveH * (copy ? 0.06 : 0.28);
 
   // Designer nudge, in trim fractions, clamped so the lockup stays on the sheet.
-  const logoX = clamp(centreX + nudge.dx * panel.trimW, 0, panel.bleedW - logoW);
-  const logoY = clamp(baseY + nudge.dy * panel.trimH, 0, panel.bleedH - logoH);
+  // Turned marks are clamped against their ROTATED footprint (the box swaps
+  // edges when it spins), otherwise a tall run would clamp itself off the sheet.
+  const boxW = turned ? logoH : logoW;
+  const boxH = turned ? logoW : logoH;
+  // The rotated footprint is centred on the box centre, so its left edge sits
+  // slackX to the RIGHT of the box origin — the clamp shifts by that offset.
+  const slackX = (logoW - boxW) / 2;
+  const slackY = (logoH - boxH) / 2;
+  const logoX = clamp(
+    centreX + nudge.dx * panel.trimW,
+    -slackX,
+    panel.bleedW - boxW - slackX,
+  );
+  const logoY = clamp(
+    baseY + nudge.dy * panel.trimH,
+    -slackY,
+    panel.bleedH - boxH - slackY,
+  );
 
   // Pillars and other tall, narrow sheets set their copy running DOWN the
   // panel by default — the same treatment as the master NEXT pillar set. The
@@ -465,6 +498,7 @@ export function londonBrandingPlan(
     colourway,
     art,
     logo: { x: logoX, y: logoY, w: logoW, h: logoH },
+    logoRotate,
     copy,
     copySizeMm,
     copyTrackingEm,
