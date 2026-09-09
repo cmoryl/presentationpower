@@ -43,7 +43,10 @@ import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor
 import {
   londonLogoPlacements,
   setLondonLogoPlacement,
+  useLondonLogoPlacements,
 } from "@/lib/next-london-logo-placement";
+import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
+import { useLondonBoardSizes } from "@/lib/next-london-board-size";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { handleLondonDirectoryDownload } from "@/lib/london-directory-pdf";
@@ -175,10 +178,13 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
 function PanelCard({
   panel,
   svg,
+  draft,
   onClick,
 }: {
   panel: LondonPanel;
   svg?: string;
+  /** This browser has unpublished edits for the sign. */
+  draft?: boolean;
   onClick?: (panel: LondonPanel) => void;
 }) {
   const booth = londonBoothPanelMeta(panel);
@@ -217,6 +223,11 @@ function PanelCard({
           {booth ? (
             <span className="ml-1.5 inline-flex align-middle rounded bg-[#A1FBF9]/55 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
               Booth
+            </span>
+          ) : null}
+          {draft ? (
+            <span className="ml-1.5 inline-flex align-middle rounded bg-[#FFEB66]/70 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+              Unpublished edit
             </span>
           ) : null}
         </p>
@@ -347,9 +358,36 @@ function LondonSignagePage() {
 
   const target = openPanel ? rasterSizeFor(openPanel, ppi) : null;
 
+  // Unpublished edits made in this browser (live editor / template studio).
+  // Subscribing here means saving artwork repaints the hub cards immediately.
+  const localPlacements = useLondonLogoPlacements();
+  const localPlacedArt = useLondonPlacedArt();
+  const localBoardSizes = useLondonBoardSizes();
+
+
+
   /** Builder options for a panel, taken from the revision in force. */
   const artOptions = (panel: LondonPanel) => londonOverrideOptions(panel.id, headOverrides);
   const fileBase = (panel: LondonPanel) => londonPanelFileBase(panel, headRev);
+
+  // Preview options layer THIS browser's unpublished edits over the revision in
+  // force, so a sign edited in the live editor or template studio reads the same
+  // on its hub card. Downloads and QA keep using `artOptions` — a print master
+  // must never depend on local storage.
+  const previewOptions = (panel: LondonPanel) => {
+    const base = artOptions(panel);
+    const placement = localPlacements[panel.id];
+    const boardSize = localBoardSizes[panel.id];
+    const placedArt = localPlacedArt[panel.id];
+    return {
+      ...base,
+      ...(placement ? { placement } : {}),
+      ...(boardSize ? { boardSize } : {}),
+      ...(placedArt ? { placedArt } : {}),
+    };
+  };
+  const isDraft = (panel: LondonPanel) =>
+    Boolean(localPlacements[panel.id] || localBoardSizes[panel.id] || localPlacedArt[panel.id]);
 
   // Previews outline their copy with the shipped signage face. Until it is in
   // memory the synchronous builder throws by design, so the tile simply stays
@@ -357,7 +395,7 @@ function LondonSignagePage() {
   const previewSvg = (panel: LondonPanel): string | undefined => {
     if (!faceReady) return undefined;
     try {
-      return londonPanelSvgFor(panel, artwork, artOptions(panel));
+      return londonPanelSvgFor(panel, artwork, previewOptions(panel));
     } catch {
       return undefined;
     }
@@ -768,6 +806,7 @@ function LondonSignagePage() {
                     key={panel.id}
                     panel={panel}
                     svg={previewSvg(panel)}
+                    draft={isDraft(panel)}
                     onClick={setOpenPanel}
                   />
                 ))}
@@ -816,6 +855,7 @@ function LondonSignagePage() {
                         key={panel.id}
                         panel={panel}
                         svg={previewSvg(panel)}
+                        draft={isDraft(panel)}
                         onClick={setOpenPanel}
                       />
                     ))}
