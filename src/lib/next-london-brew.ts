@@ -127,6 +127,7 @@ export function brewMotifSvgLayer(
   plan: BrewMotifPlan,
   paintFor: (hex: string) => { paint: string; meta: string },
 ): string {
+  if (plan.marks.length === 0) return "";
   const { paint, meta } = paintFor(plan.ink);
   const body = plan.marks
     .map((m) => {
