@@ -42,13 +42,60 @@ export type StepRepeatKind = (typeof STEP_REPEAT_KINDS)[number];
 export const STEP_REPEAT_KIND_LABELS: Record<StepRepeatKind, string> = {
   logo: "Lockup only",
   text: "Wordmark text only",
-  "logo-text": "Lockup + text rows",
-  "logo-qr": "Lockup + QR rows",
+  "logo-text": "Lockup + text",
+  "logo-qr": "Lockup + QR",
   qr: "QR only",
 };
 
+/**
+ * How a mixed recipe distributes its second element (text or QR) through the
+ * lockup field. Row banding used to be hardcoded at "two logo rows, one QR row",
+ * which reads as a stripe rather than a pattern.
+ */
+export const STEP_REPEAT_MIXES = ["checker", "rows", "columns", "accent"] as const;
+export type StepRepeatMix = (typeof STEP_REPEAT_MIXES)[number];
+export const STEP_REPEAT_MIX_LABELS: Record<StepRepeatMix, string> = {
+  checker: "Checkerboard",
+  rows: "Alternating rows",
+  columns: "Alternating columns",
+  accent: "Sparse accent",
+};
+export const STEP_REPEAT_MIX_NOTES: Record<StepRepeatMix, string> = {
+  checker: "Every other mark swaps — the most even mix in any crop.",
+  rows: "One lockup row, one second row, all the way down.",
+  columns: "Vertical banding — lockup column, second column.",
+  accent: "Mostly lockups with an occasional second mark.",
+};
+
+/** Lockup pool: one family, or the full division set rotated through the grid. */
+export const STEP_REPEAT_LOGO_SETS = ["single", "divisions"] as const;
+export type StepRepeatLogoSet = (typeof STEP_REPEAT_LOGO_SETS)[number];
+export const STEP_REPEAT_LOGO_SET_LABELS: Record<StepRepeatLogoSet, string> = {
+  single: "One lockup",
+  divisions: "All division lockups",
+};
+
+/** Division lockups used by the "all divisions" wall, in approved order. */
+export const STEP_REPEAT_DIVISION_FAMILIES = [
+  "transperfect",
+  "globallink",
+  "dataforce",
+  "digital",
+  "experience",
+  "finance",
+  "games",
+  "learn",
+  "legal",
+  "lifesci",
+  "media",
+] as const;
+
 export type StepRepeatConfig = {
   kind: StepRepeatKind;
+  /** How a mixed recipe spreads its second element through the field. */
+  mix: StepRepeatMix;
+  /** One lockup, or the whole division set rotated through the grid. */
+  logoSet: StepRepeatLogoSet;
   /** Lockup family (from the official EPS set). */
   familyId: string;
   colourway: NextLogoColourway;
@@ -123,6 +170,8 @@ export const STEP_REPEAT_LIMITS = {
 
 export const DEFAULT_STEP_REPEAT: StepRepeatConfig = {
   kind: "logo-text",
+  mix: "checker",
+  logoSet: "single",
   familyId: "transperfect",
   colourway: "white",
   orientation: "auto",
@@ -175,6 +224,12 @@ function clampConfig(patch: Partial<StepRepeatConfig>, base: StepRepeatConfig): 
   const wanted = patch.colourway ?? base.colourway;
   return {
     kind,
+    mix: STEP_REPEAT_MIXES.includes(patch.mix as StepRepeatMix)
+      ? (patch.mix as StepRepeatMix)
+      : (base.mix ?? DEFAULT_STEP_REPEAT.mix),
+    logoSet: STEP_REPEAT_LOGO_SETS.includes(patch.logoSet as StepRepeatLogoSet)
+      ? (patch.logoSet as StepRepeatLogoSet)
+      : (base.logoSet ?? DEFAULT_STEP_REPEAT.logoSet),
     familyId,
     colourway: available.includes(wanted) ? wanted : (available[0] ?? "white"),
     orientation:
@@ -315,7 +370,17 @@ export function useStepRepeatConfigs(): StepRepeatMap {
 // ── Geometry ─────────────────────────────────────────────────────────────────
 
 export type StepRepeatTile =
-  | { kind: "logo"; x: number; y: number; w: number; h: number; row: number; col: number }
+  | {
+      kind: "logo";
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+      row: number;
+      col: number;
+      /** Index into `plan.arts` — which lockup this tile carries. */
+      artIndex: number;
+    }
   | {
       kind: "text";
       x: number;
@@ -338,7 +403,12 @@ export type StepRepeatTile =
 
 export type StepRepeatPlan = {
   config: StepRepeatConfig;
+  /** First lockup in the pool — the wall's primary mark. */
   art: NextLogoArt;
+  /** Every lockup the wall rotates through (one entry for a single-mark wall). */
+  arts: NextLogoArt[];
+  /** Family id per entry of `arts`, for the spec readout. */
+  artFamilies: string[];
   orientation: "stacked" | "side";
   colourway: NextLogoColourway;
   /** QR module geometry, when the recipe carries a code. */
@@ -426,6 +496,26 @@ export function stepRepeatQrPath(
 
 
 /**
+ * Does the tile at (row, col) carry the recipe's SECOND element? Mixed recipes
+ * used to band rows 2:1, which printed as stripes; each mix below spreads the
+ * second mark evenly so any photo crop holds both.
+ */
+export function stepRepeatTileIsSecondary(mix: StepRepeatMix, row: number, col: number): boolean {
+  switch (mix) {
+    case "rows":
+      return row % 2 === 1;
+    case "columns":
+      return col % 2 === 1;
+    case "accent":
+      return row % 2 === 1 && (col + Math.floor(row / 2)) % 3 === 1;
+    case "checker":
+    default:
+      return (row + col) % 2 === 1;
+  }
+}
+
+
+/**
  * Lay the wall out. Tiles are generated with one row/column of overscan on every
  * side, so the pattern truly bleeds off all four edges instead of stopping at
  * the artboard.
@@ -438,10 +528,30 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
         ? 0
         : panel.trimW / Math.max(1, panel.trimH);
   const picked = pickNextLogo(config.familyId, wantSide, config.colourway);
-  const art = picked.art;
+
+  // Lockup pool. "All divisions" rotates every division mark through the field
+  // so one wall carries the whole house; a single-mark wall has one entry.
+  const families =
+    config.logoSet === "divisions"
+      ? Array.from(
+          new Set([
+            config.familyId,
+            ...STEP_REPEAT_DIVISION_FAMILIES.filter((id) => id !== config.familyId),
+          ]),
+        )
+      : [config.familyId];
+  const pool = families.map((id) => {
+    const p = pickNextLogo(id, wantSide, config.colourway);
+    return { familyId: id, art: p.art };
+  });
+  const arts = pool.map((entry) => entry.art);
+  const art = arts[0] ?? picked.art;
 
   const logoW = config.tileWidthMm;
-  const logoH = (art.h / Math.max(1, art.w)) * logoW;
+  // Every mark shares one width, so the tallest lockup in the pool sets the row
+  // box — otherwise a tall division mark would collide with the row above it.
+  const logoHeights = arts.map((a) => (a.h / Math.max(1, a.w)) * logoW);
+  const logoH = Math.max(...logoHeights);
 
   const usesText = config.kind === "text" || config.kind === "logo-text";
   const usesQr = (config.kind === "qr" || config.kind === "logo-qr") && !!config.qrData.trim();
@@ -471,25 +581,21 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
   const originX = panel.bleedW / 2 - ((cols - 1) * pitchX) / 2;
   const originY = panel.bleedH / 2 - ((rows - 1) * pitchY) / 2;
 
+  const secondary: StepRepeatKind | null =
+    config.kind === "logo-text" ? "text" : config.kind === "logo-qr" && code ? "qr" : null;
+
   const tiles: StepRepeatTile[] = [];
   for (let row = 0; row < rows; row += 1) {
     const stagger = (row % 2 === 1 ? config.drop : 0) * pitchX;
     const cy = originY + row * pitchY;
-    // Which content this row carries: mixed recipes alternate row by row so
-    // no two identical rows ever sit adjacent.
-    const rowKind: StepRepeatKind =
-      config.kind === "logo-text"
-        ? row % 2 === 1
-          ? "text"
-          : "logo"
-        : config.kind === "logo-qr"
-          ? row % 3 === 2 && code
-            ? "qr"
-            : "logo"
-          : config.kind;
     for (let col = 0; col < cols; col += 1) {
       const cx = originX + col * pitchX + stagger;
-      if (rowKind === "text") {
+      const tileKind: StepRepeatKind = secondary
+        ? stepRepeatTileIsSecondary(config.mix, row, col)
+          ? secondary
+          : "logo"
+        : config.kind;
+      if (tileKind === "text") {
         const w = textRunMm(config.text, textSize);
         tiles.push({
           kind: "text",
@@ -501,7 +607,7 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
           col,
           sizeMm: textSize,
         });
-      } else if (rowKind === "qr" && code) {
+      } else if (tileKind === "qr" && code) {
         tiles.push({
           kind: "qr",
           x: cx + tileW / 2 - qrSize / 2,
@@ -512,14 +618,19 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
           col,
         });
       } else {
+        // Rotate the pool diagonally, so the same mark never sits side by side
+        // or directly above itself.
+        const artIndex = arts.length > 1 ? (col + row * 3) % arts.length : 0;
+        const h = (arts[artIndex]!.h / Math.max(1, arts[artIndex]!.w)) * logoW;
         tiles.push({
           kind: "logo",
           x: cx + tileW / 2 - logoW / 2,
-          y: cy + tileH / 2 - logoH / 2,
+          y: cy + tileH / 2 - h / 2,
           w: logoW,
-          h: logoH,
+          h,
           row,
           col,
+          artIndex,
         });
       }
     }
@@ -529,6 +640,8 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
   return {
     config,
     art,
+    arts,
+    artFamilies: pool.map((entry) => entry.familyId),
     orientation: picked.orientation,
     colourway: picked.colourway,
     qr: code
