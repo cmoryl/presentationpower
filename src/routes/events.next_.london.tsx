@@ -48,6 +48,15 @@ import {
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import { londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
 import { applyLondonBoardSize, applyLondonBoardSizes, useLondonBoardSizes } from "@/lib/next-london-board-size";
+import {
+  createLondonVariation,
+  londonVariationsOf,
+  removeLondonVariation,
+  renameLondonVariation,
+  setLondonVariationStyle,
+  useLondonVariations,
+  withLondonVariations,
+} from "@/lib/next-london-variations";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { handleLondonDirectoryDownload } from "@/lib/london-directory-pdf";
@@ -182,12 +191,15 @@ function PanelCard({
   panel,
   svg,
   draft,
+  variation,
   onClick,
 }: {
   panel: LondonPanel;
   svg?: string;
   /** This browser has unpublished edits for the sign. */
   draft?: boolean;
+  /** The sign is a copy made from another sign in the kit. */
+  variation?: boolean;
   onClick?: (panel: LondonPanel) => void;
 }) {
   const booth = londonBoothPanelMeta(panel);
@@ -231,6 +243,11 @@ function PanelCard({
           {londonSuppliedMaster(panel) ? (
             <span className="ml-1.5 inline-flex align-middle rounded bg-[#A6FA87]/60 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
               Supplied master
+            </span>
+          ) : null}
+          {variation ? (
+            <span className="ml-1.5 inline-flex align-middle rounded bg-[#FF9B70]/55 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+              Copy
             </span>
           ) : null}
           {draft ? (
@@ -287,9 +304,12 @@ function LondonSignagePage() {
   const localBoardSizes = useLondonBoardSizes();
   // A re-measured board changes the card's shape as well as its artwork, so the
   // whole schedule reads from the resized panels.
+  // Copies made from an existing sign ("Version B" of a pillar, say) stand in the
+  // schedule right after the sign they came from, with their own edits.
+  const variations = useLondonVariations();
   const panels = useMemo(
-    () => applyLondonBoardSizes(publishedPanels, localBoardSizes),
-    [publishedPanels, localBoardSizes],
+    () => applyLondonBoardSizes(withLondonVariations(publishedPanels, variations), localBoardSizes),
+    [publishedPanels, variations, localBoardSizes],
   );
   // Booth masters live in the backend: applying them patches the booth specs
   // and panel records in place, so `applied` is what re-renders the cards.
@@ -403,8 +423,15 @@ function LondonSignagePage() {
       ...(placedArt ? { placedArt } : {}),
     };
   };
+  // A copy that has not been published counts as unpublished too, so its files are
+  // never stamped with a revision number that does not contain it.
   const isDraft = (panel: LondonPanel) =>
-    Boolean(localPlacements[panel.id] || localBoardSizes[panel.id] || localPlacedArt[panel.id]);
+    Boolean(
+      localPlacements[panel.id] ||
+        localBoardSizes[panel.id] ||
+        localPlacedArt[panel.id] ||
+        variations[panel.id],
+    );
 
   // A download must show what the card shows: when this browser holds unpublished
   // edits (uploaded vector artwork, moved logo, resized board) the file is built
@@ -834,6 +861,7 @@ function LondonSignagePage() {
                     panel={panel}
                     svg={previewSvg(panel)}
                     draft={isDraft(panel)}
+                    variation={Boolean(variations[panel.id])}
                     onClick={setOpenPanel}
                   />
                 ))}
@@ -888,6 +916,7 @@ function LondonSignagePage() {
                           panel={panel}
                           svg={previewSvg(panel)}
                           draft={isDraft(panel)}
+                          variation={Boolean(variations[panel.id])}
                           onClick={setOpenPanel}
                         />
                       ))}
@@ -914,6 +943,7 @@ function LondonSignagePage() {
                           panel={panel}
                           svg={previewSvg(panel)}
                           draft={isDraft(panel)}
+                          variation={Boolean(variations[panel.id])}
                           onClick={setOpenPanel}
                         />
                       ))}
@@ -1017,6 +1047,131 @@ function LondonSignagePage() {
                 ))}
               </dl>
 
+              {/* Copies of this sign — a second pillar version, a different
+                  treatment on the same board. Each copy is its own asset. */}
+              {isBoothPanel(openPanel) ? null : (
+                <div className="rounded-xl border border-black/10 p-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/60">
+                      Versions of this sign
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const made = createLondonVariation(openPanel);
+                        if (!made) {
+                          toast.error("That sign already has the maximum number of versions.");
+                          return;
+                        }
+                        toast.success(`${made.label} created`, {
+                          description:
+                            "A copy of this sign, starting from how it looks now. Edit it on its own without touching the original.",
+                        });
+                        setOpenPanel({ ...openPanel, id: made.id, name: made.name });
+                        setEditing(true);
+                      }}
+                      className="ml-auto inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                    >
+                      <Layers className="h-3.5 w-3.5" />
+                      Make another version
+                    </button>
+                  </div>
+
+                  {(() => {
+                    const mine = variations[openPanel.id];
+                    const sourceId = mine ? mine.sourceId : openPanel.id;
+                    const family = londonVariationsOf(sourceId);
+                    const source = panels.find((p) => p.id === sourceId);
+                    if (family.length === 0) {
+                      return (
+                        <p className="mt-3 text-[13px] leading-relaxed text-[#03002C]/70">
+                          Only the original exists so far. A new version copies this sign's board
+                          size, logo placement and any artwork you have added, then keeps its own
+                          edits from there.
+                        </p>
+                      );
+                    }
+                    return (
+                      <ul className="mt-3 space-y-2">
+                        {[
+                          ...(source
+                            ? [{ id: source.id, name: source.name, label: "Original" }]
+                            : []),
+                          ...family.map((v) => ({ id: v.id, name: v.name, label: v.label })),
+                        ].map((row) => {
+                          const isCopy = Boolean(variations[row.id]);
+                          const current = row.id === openPanel.id;
+                          return (
+                            <li
+                              key={row.id}
+                              className={`flex flex-wrap items-center gap-2 rounded-lg border p-2.5 ${
+                                current
+                                  ? "border-[#003FC7] bg-[#E0E8F5]"
+                                  : "border-black/10 bg-[#F2F2F2]"
+                              }`}
+                            >
+                              <span className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#03002C]/60">
+                                {row.label}
+                              </span>
+                              <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-[#03002C]">
+                                {row.name}
+                              </span>
+                              {current ? (
+                                <span className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#003FC7]">
+                                  Open
+                                </span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const next = panels.find((p) => p.id === row.id);
+                                    if (next) setOpenPanel(next);
+                                  }}
+                                  className="rounded-full border border-[#03002C]/25 px-3 py-1 text-[11px] font-semibold text-[#03002C] hover:bg-white"
+                                >
+                                  Open
+                                </button>
+                              )}
+                              {isCopy ? (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const name = window.prompt("Name this version", row.name);
+                                      if (name) renameLondonVariation(row.id, name);
+                                    }}
+                                    className="rounded-full border border-[#03002C]/25 px-3 py-1 text-[11px] font-semibold text-[#03002C] hover:bg-white"
+                                  >
+                                    Rename
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (
+                                        !window.confirm(
+                                          `Delete "${row.name}"? Its own edits go with it. The original is untouched.`,
+                                        )
+                                      )
+                                        return;
+                                      removeLondonVariation(row.id);
+                                      if (current && source) setOpenPanel(source);
+                                      toast.success("Version deleted");
+                                    }}
+                                    className="rounded-full border border-[#E53D2E]/40 px-3 py-1 text-[11px] font-semibold text-[#E53D2E] hover:bg-white"
+                                  >
+                                    Delete
+                                  </button>
+                                </>
+                              ) : null}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    );
+                  })()}
+                </div>
+              )}
+
               {/* Partner booths: the finished stand, visualised in the room. */}
               {isBoothPanel(openPanel) ? <BoothRenderPreview panel={openPanel} /> : null}
 
@@ -1050,9 +1205,15 @@ function LondonSignagePage() {
                       siblingIds={panels.filter((p) => p.id !== openPanel.id).map((p) => p.id)}
                       onStyleChange={(styleId) => {
                         const style = styleId as LondonPanel["style"];
-                        setPanels((prev) =>
-                          prev.map((p) => (p.id === openPanel.id ? { ...p, style } : p)),
-                        );
+                        // A copy keeps its treatment in the variations store, so it
+                        // survives a reload; originals patch the panel list.
+                        if (variations[openPanel.id]) {
+                          setLondonVariationStyle(openPanel.id, style);
+                        } else {
+                          setPanels((prev) =>
+                            prev.map((p) => (p.id === openPanel.id ? { ...p, style } : p)),
+                          );
+                        }
                         setOpenPanel((prev) => (prev ? { ...prev, style } : prev));
                       }}
                     />
