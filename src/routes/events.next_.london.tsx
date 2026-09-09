@@ -376,12 +376,10 @@ function LondonSignagePage() {
 
   /** Builder options for a panel, taken from the revision in force. */
   const artOptions = (panel: LondonPanel) => londonOverrideOptions(panel.id, headOverrides);
-  const fileBase = (panel: LondonPanel) => londonPanelFileBase(panel, headRev);
 
   // Preview options layer THIS browser's unpublished edits over the revision in
   // force, so a sign edited in the live editor or template studio reads the same
-  // on its hub card. Downloads and QA keep using `artOptions` — a print master
-  // must never depend on local storage.
+  // on its hub card.
   const previewOptions = (panel: LondonPanel) => {
     const base = artOptions(panel);
     const placement = localPlacements[panel.id];
@@ -396,6 +394,16 @@ function LondonSignagePage() {
   };
   const isDraft = (panel: LondonPanel) =>
     Boolean(localPlacements[panel.id] || localBoardSizes[panel.id] || localPlacedArt[panel.id]);
+
+  // A download must show what the card shows: when this browser holds unpublished
+  // edits (uploaded vector artwork, moved logo, resized board) the file is built
+  // from them and stamped `rdraft-`, never with a revision number that has not
+  // been published. With no local edits it is the revision in force, unchanged.
+  const exportOptions = (panel: LondonPanel) =>
+    isDraft(panel) ? previewOptions(panel) : artOptions(panel);
+  const fileBase = (panel: LondonPanel) =>
+    londonPanelFileBase(panel, isDraft(panel) ? "draft" : headRev);
+
 
   // Previews outline their copy with the shipped signage face. Until it is in
   // memory the synchronous builder throws by design, so the tile simply stays
@@ -438,8 +446,8 @@ function LondonSignagePage() {
         // booth downloads the real wall rather than the house ground.
         const art =
           fmt === "ai"
-            ? await resolveLondonArtworkAsync(panel, pack, artOptions(panel))
-            : resolveLondonArtwork(panel, pack, artOptions(panel));
+            ? await resolveLondonArtworkAsync(panel, pack, exportOptions(panel))
+            : resolveLondonArtwork(panel, pack, exportOptions(panel));
         gateOnQa(fmt === "svg" ? auditSvg(panel, art.svg) : auditAi(panel, art.ai));
         if (fmt === "svg") {
           download(new Blob([art.svg], { type: "image/svg+xml" }), `${fileBase(panel)}.svg`);
@@ -464,7 +472,7 @@ function LondonSignagePage() {
         const pack = await packOrNull();
         const size = rasterSizeFor(panel, ppi);
         const blob = await renderDitheredPng(
-          resolveLondonArtwork(panel, pack, artOptions(panel)).svg,
+          resolveLondonArtwork(panel, pack, exportOptions(panel)).svg,
           size.w,
           size.h,
         );
@@ -502,7 +510,7 @@ function LondonSignagePage() {
         const pack = await packOrNull();
         const reports: LondonQaReport[] = [];
         for (const panel of panels) {
-          const art = resolveLondonArtwork(panel, pack, artOptions(panel));
+          const art = resolveLondonArtwork(panel, pack, exportOptions(panel));
           reports.push(auditSvg(panel, art.svg), auditAi(panel, art.ai));
         }
         setQa(reports);
@@ -1047,13 +1055,22 @@ function LondonSignagePage() {
                     Vector
                   </span>
                   {londonSuppliedMaster(openPanel) ? (
-                    <a
-                      href={londonSuppliedMaster(openPanel)!.aiUrl}
-                      download={londonSuppliedMaster(openPanel)!.filename}
-                      className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
-                    >
-                      <FileDown className="h-3.5 w-3.5" /> AI · supplied master
-                    </a>
+                    <>
+                      <a
+                        href={londonSuppliedMaster(openPanel)!.aiUrl}
+                        download={londonSuppliedMaster(openPanel)!.filename}
+                        className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                      >
+                        <FileDown className="h-3.5 w-3.5" /> AI · supplied master
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => void downloadVector(openPanel, "ai")}
+                        className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/40 px-4 py-2 text-xs font-semibold text-[#003FC7] hover:bg-[#003FC7]/10"
+                      >
+                        <FileDown className="h-3.5 w-3.5" /> AI · with your edits
+                      </button>
+                    </>
                   ) : (
                     <button
                       type="button"
@@ -1075,15 +1092,25 @@ function LondonSignagePage() {
                   </em>
                 </div>
 
+                {isDraft(openPanel) ? (
+                  <p className="mt-3 rounded-lg border border-[#FFEB66]/70 bg-[#FFEB66]/25 p-3 text-[12.5px] leading-relaxed text-[#03002C]">
+                    This sign has edits that are not published yet — uploaded vector artwork, logo
+                    moves or a new board size. The downloads below include them and are named{" "}
+                    <code>rdraft-…</code> until the revision is published.
+                  </p>
+                ) : null}
+
                 {londonSuppliedMaster(openPanel) ? (
                   <p className="mt-3 rounded-lg border border-[#A6FA87]/60 bg-[#A6FA87]/15 p-3 text-[12.5px] leading-relaxed text-[#03002C]">
                     {londonSuppliedMaster(openPanel)!.note} Handed back{" "}
                     {londonSuppliedMaster(openPanel)!.issued} from r
-                    {String(londonSuppliedMaster(openPanel)!.fromRevision).padStart(3, "0")}, so the
-                    AI download serves that exact file — not a regenerated ground. The SVG and PNG
-                    buttons still render the app ground for reference.
+                    {String(londonSuppliedMaster(openPanel)!.fromRevision).padStart(3, "0")}. “AI ·
+                    supplied master” serves that exact file, untouched. “AI · with your edits”
+                    rebuilds it here so anything you added on top — uploaded vector artwork, logo,
+                    copy — is live in the file.
                   </p>
                 ) : null}
+
 
 
                 <div className="mt-4 flex flex-wrap items-center gap-2">
