@@ -9,6 +9,7 @@ import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { buildLondonPanelSvg } from "@/lib/next-london-revise";
+import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import { londonBoothArtworkUrl, type LondonPanel } from "@/lib/next-london-signage";
 
 export interface LondonPanelThumbProps {
@@ -26,6 +27,8 @@ function toDataUrl(svg: string): string {
 
 export function LondonPanelThumb({ panel, size = 72, className, onOpen }: LondonPanelThumbProps) {
   const faceReady = useLondonSignageFace();
+  // Uploaded artwork saved in this browser repaints the tile straight away.
+  const placedArtMap = useLondonPlacedArt();
   const holder = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -54,7 +57,8 @@ export function LondonPanelThumb({ panel, size = 72, className, onOpen }: London
   const h = landscape ? Math.max(18, Math.round((size * panel.bleedH) / panel.bleedW)) : size;
 
   // Keyed on everything that changes the artwork, so an edit repaints the tile.
-  const key = `${panel.style}|${panel.trimW}|${panel.trimH}|${panel.bleedEdge}|${panel.name}|${panel.ground}`;
+  const placedArtKey = JSON.stringify(placedArtMap[panel.id] ?? null);
+  const key = `${panel.style}|${panel.trimW}|${panel.trimH}|${panel.bleedEdge}|${panel.name}|${panel.ground}|${placedArtKey}`;
   // Vendor booth panels show the supplied artwork proof itself: an <img> with a
   // data-URL SVG cannot load external references, so the CDN proof is painted
   // directly rather than through the generated master.
