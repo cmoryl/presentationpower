@@ -56,6 +56,8 @@ import {
 } from "@/lib/next-london-signage";
 import { LONDON_DIVISION_COLOURWAYS, londonDivisionAccent } from "@/lib/next-london-division";
 import { LondonAccentTintPicker } from "@/components/events/LondonAccentTintPicker";
+import { LondonPlacedArtPanel } from "@/components/events/LondonPlacedArtPanel";
+import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
   nextLogoColourways,
@@ -188,8 +190,10 @@ export function LondonPanelLiveEditor({
   const wallConfigs = useStepRepeatConfigs();
   const isWall = isStepRepeatPanel(panel);
 
+  const placedArtMap = useLondonPlacedArt();
+  const placedArt = placedArtMap[panel.id] ?? null;
   const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
-  const art = useMemo(() => ({ colorSpace, vibrance: 1 }), [colorSpace]);
+  const art = useMemo(() => ({ colorSpace, vibrance: 1, placedArt }), [colorSpace, placedArt]);
   const faceReady = useLondonSignageFace();
   const svg = useMemo(
     () => (faceReady ? buildLondonPanelSvg(panel, art) : ""),
@@ -840,6 +844,7 @@ export function LondonPanelLiveEditor({
             accentTint={placement.accentTint}
             className="mt-3"
           />
+          <LondonPlacedArtPanel panel={panel} art={placedArt} className="mt-3" />
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <label className="flex items-center gap-2 text-xs text-muted-foreground">
               Logo scale

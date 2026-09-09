@@ -42,6 +42,7 @@ function toOverrides(value: unknown): LondonOverrides {
     placements: map("placements") as LondonOverrides["placements"],
     boardSizes: map("boardSizes") as LondonOverrides["boardSizes"],
     stepRepeat: map("stepRepeat") as LondonOverrides["stepRepeat"],
+    placedArt: map("placedArt") as LondonOverrides["placedArt"],
   };
 }
 

@@ -33,6 +33,11 @@ import {
   type LondonPanel,
 } from "@/lib/next-london-signage";
 import {
+  londonPlacedArt,
+  londonPlacedArtBox,
+  type LondonPlacedArt,
+} from "@/lib/next-london-placed-art";
+import {
   axialShadingDict,
   parseColor,
   radialShadingDict,
@@ -506,6 +511,12 @@ export type LondonArtOptions = {
    */
   groundImage?: LondonGroundImage | null;
   /**
+   * Designer-uploaded vector artwork placed on this panel (see
+   * next-london-placed-art.ts). `undefined` = the local upload store,
+   * `null` = build the panel with no placed artwork at all.
+   */
+  placedArt?: LondonPlacedArt | null;
+  /**
    * Lockup/headline/QR placement for this panel. Supply it from a revision's
    * snapshot so a print master never depends on the downloading browser's own
    * stored overrides. Omitted = the local placement store (today's behaviour).
@@ -541,6 +552,41 @@ export function londonGroundBox(
     x: (panel.bleedW - w) / 2 + placement.groundDx * panel.trimW,
     y: (panel.bleedH - h) / 2 + placement.groundDy * panel.trimH,
   };
+}
+
+/**
+ * Placed-artwork layer as live SVG paths. The artwork keeps its own user space;
+ * only a group transform sizes, positions and rotates it on the sheet, so the
+ * geometry in the master is bit-for-bit the geometry that was uploaded.
+ */
+function placedArtSvgLayer(
+  panel: LondonPanel,
+  art: LondonPlacedArt,
+  paintFor: (hex: string) => { paint: string; meta: string },
+): string {
+  const box = londonPlacedArtBox(panel, art);
+  const s = box.w / art.w;
+  const body = art.paths
+    .map((path) => {
+      const { paint, meta } = paintFor(path.fill);
+      const rule = path.fillRule === "evenodd" ? ` fill-rule="evenodd"` : "";
+      const alpha = path.alpha !== undefined ? ` fill-opacity="${path.alpha.toFixed(3)}"` : "";
+      const m = path.m;
+      const tx =
+        m[0] === 1 && m[1] === 0 && m[2] === 0 && m[3] === 1 && m[4] === 0 && m[5] === 0
+          ? ""
+          : ` transform="matrix(${m.map((n) => Number(n.toFixed(6))).join(" ")})"`;
+      return `<path d="${escapeXml(path.d)}" fill="${paint}"${rule}${alpha}${meta}${tx}/>`;
+    })
+    .join("");
+  return (
+    `<g id="placed-art" data-layer="placed-art" data-layer-order="0"` +
+    ` data-artwork="${escapeXml(art.name)}" data-artwork-format="${art.format}"` +
+    ` opacity="${art.opacity.toFixed(3)}"` +
+    ` transform="translate(${box.cx.toFixed(2)} ${box.cy.toFixed(2)}) rotate(${box.rotate.toFixed(2)})` +
+    ` scale(${s.toFixed(6)}) translate(${(-art.w / 2).toFixed(3)} ${(-art.h / 2).toFixed(3)})">` +
+    `${body}</g>`
+  );
 }
 
 /**
@@ -588,6 +634,10 @@ export function buildLondonPanelSvg(
   // Supplied vendor booth artwork, when the vendor has delivered their file:
   // it becomes the ground so previews and masters match the real booth.
   const boothArt = londonBoothArtworkUrl(panel.id);
+
+  // Designer-uploaded vector artwork: its own layer, live paths.
+  const placed = options.placedArt === undefined ? londonPlacedArt(panel.id) : options.placedArt;
+  const placedLayer = placed && placed.on ? placedArtSvgLayer(panel, placed, paintFor) : "";
 
   // Step-and-repeat walls are a repeating tile field, not a single lockup: the
   // wall layer replaces the hero lockup and the headline entirely.
@@ -784,6 +834,7 @@ export function buildLondonPanelSvg(
           faceName: face.name,
         })
       : "",
+    placed && placed.on && !placed.onTop ? placedLayer : "",
     wall ? "" : copyLayer,
     wall ? "" : subLayer,
     wall ? "" : bodyLayer,
@@ -791,6 +842,7 @@ export function buildLondonPanelSvg(
     // Booths that ship the vendor's own branded artwork start without a second,
     // generated lockup — the designer can switch it on per booth.
     wall || !brand.lockupOn ? "" : logoGroup,
+    placed && placed.on && placed.onTop ? placedLayer : "",
     `</svg>`,
   ].join("");
 }
@@ -875,6 +927,11 @@ export function buildLondonPanelAi(
   // opens on the vendor's own wall (placed, movable, its own layer) instead of
   // a rebuilt house gradient. JPEG bytes ride through as /DCTDecode.
   const groundImage = options.groundImage ?? null;
+
+  // Designer-uploaded vector artwork becomes its own Illustrator layer of live
+  // PDF path objects — never a placed raster.
+  const placedIn = options.placedArt === undefined ? londonPlacedArt(panel.id) : options.placedArt;
+  const placed = placedIn && placedIn.on && placedIn.paths.length > 0 ? placedIn : null;
 
   // Brand layer: EPS-derived lockup outlines as live PDF paths, headline copy
   // as live Geist Bold text — both editable when the .ai is opened.
@@ -1073,21 +1130,64 @@ export function buildLondonPanelAi(
         .join("")
     : "";
 
+  // PLACED ARTWORK: one q/Q block per path. The outer matrices size, rotate and
+  // position the artwork box; each path carries its own matrix from the source
+  // file, re-expressed for PDF's y-up space.
+  const placedOps = placed
+    ? (() => {
+        const box = londonPlacedArtBox(panel, placed);
+        const k = (box.w / placed.w) * MM_TO_PT;
+        const rad = (-placed.rotate * Math.PI) / 180;
+        const cos = Math.cos(rad);
+        const sin = Math.sin(rad);
+        const head =
+          `q /GsArt gs 1 0 0 1 ${f3(box.cx * MM_TO_PT)} ${f3(h - box.cy * MM_TO_PT)} cm ` +
+          `${f3(cos)} ${f3(sin)} ${f3(-sin)} ${f3(cos)} 0 0 cm ` +
+          `${f3(k)} 0 0 ${f3(k)} 0 0 cm ` +
+          `1 0 0 1 ${f3(-placed.w / 2)} ${f3(-placed.h / 2)} cm\n`;
+        const body = placed.paths
+          .map((path) => {
+            const ops = svgPathToPdfOps(path.d, { scale: 1, x: 0, y: 0, artHeight: placed.h });
+            if (!ops) return "";
+            const m = path.m;
+            // F·M·F⁻¹ for the y-flip of height `placed.h`.
+            const n = [m[0], -m[1], -m[2], m[3], m[2] * placed.h + m[4], placed.h - m[3] * placed.h - m[5]];
+            const cm = `${n.map((v) => f3(v)).join(" ")} cm `;
+            return `q ${cm}${fillOp(path.fill)} ${ops} ${path.fillRule === "evenodd" ? "f*" : "f"} Q\n`;
+          })
+          .join("");
+        return body ? `${head}${body}Q\n` : "";
+      })()
+    : "";
+
+  const artLayer = placedOps ? `/OC /oc4 BDC\n${placedOps}EMC\n` : "";
+  const artUnder = placed && !placed.onTop ? artLayer : "";
+  const artOver = placed && placed.onTop ? artLayer : "";
+
   const content = wall
-    ? `/OC /oc3 BDC\n${groundOps}EMC\n` + `/OC /oc1 BDC\n${wallOps}EMC\n`
+    ? `/OC /oc3 BDC\n${groundOps}EMC\n` + artUnder + `/OC /oc1 BDC\n${wallOps}EMC\n` + artOver
     : `/OC /oc3 BDC\n${groundOps}${brewOps}EMC\n` +
+      artUnder +
       (copyOps || subOps || bodyOps || qrOps
         ? `/OC /oc2 BDC\n${copyOps}${subOps}${bodyOps}${qrOps}EMC\n`
         : "") +
-      (brand.lockupOn && logoOps ? `/OC /oc1 BDC\n${logoOps}EMC\n` : "");
+      (brand.lockupOn && logoOps ? `/OC /oc1 BDC\n${logoOps}EMC\n` : "") +
+      artOver;
 
   // The copy actually printed on this master, kept as searchable metadata now
   // that the visible copy is outlined geometry.
   const copyMeta = wall ? wall.config.text : brand.copy;
 
+  // Object numbering: 8/9/10 are the fixed layers; a placed-artwork layer takes
+  // object 11 when present, which pushes the supplied-artwork image to 12.
+  const artOcgNum = placedOps ? 11 : 0;
+  const groundImageNum = placedOps ? 12 : 11;
+  const ocgRefs = `8 0 R 9 0 R 10 0 R${artOcgNum ? ` ${artOcgNum} 0 R` : ""}`;
+
   const objects: string[] = [
-    `<< /Type /Catalog /Pages 2 0 R /OCProperties << /OCGs [8 0 R 9 0 R 10 0 R] ` +
-      `/D << /Order [8 0 R 9 0 R 10 0 R] /ON [8 0 R 9 0 R 10 0 R] >> >> >>`,
+    `<< /Type /Catalog /Pages 2 0 R /OCProperties << /OCGs [${ocgRefs}] ` +
+      `/D << /Order [${artOcgNum && placed?.onTop ? `${artOcgNum} 0 R ` : ""}8 0 R 9 0 R 10 0 R` +
+      `${artOcgNum && !placed?.onTop ? ` ${artOcgNum} 0 R` : ""}] /ON [${ocgRefs}] >> >> >>`,
     `<< /Type /Pages /Kids [3 0 R] /Count 1 >>`,
     `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f3(w)} ${f3(h)}] /BleedBox [0 0 ${f3(w)} ${f3(h)}] ` +
       `/TrimBox [${f3(trimX)} ${f3(trimY)} ${f3(trimX + panel.trimW * MM_TO_PT)} ${f3(trimY + panel.trimH * MM_TO_PT)}] ` +
@@ -1098,9 +1198,12 @@ export function buildLondonPanelAi(
       `${brand.qr ? `/TPQr (${pdfText(brand.qr.data)}) ` : ""}` +
       `/TPText 7 0 R ` +
       `/Resources << /Shading << /Sh0 6 0 R >> ` +
-      `${groundImage ? "/XObject << /ImGround 11 0 R >> " : ""}` +
-      `/ExtGState << /GsWall << /Type /ExtGState /ca ${f3(wall ? wall.config.opacity : 1)} >> ${brewGs}>> ` +
-      `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R >> >> /Contents 4 0 R >>`,
+      `${groundImage ? `/XObject << /ImGround ${groundImageNum} 0 R >> ` : ""}` +
+      `/ExtGState << /GsWall << /Type /ExtGState /ca ${f3(wall ? wall.config.opacity : 1)} >> ` +
+      `${placedOps ? `/GsArt << /Type /ExtGState /ca ${f3(placed!.opacity)} /CA ${f3(placed!.opacity)} >> ` : ""}` +
+      `${brewGs}>> ` +
+      `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R` +
+      `${artOcgNum ? ` /oc4 ${artOcgNum} 0 R` : ""} >> >> /Contents 4 0 R >>`,
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
       `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)} · ${pdfText(`${brand.orientation === "side" ? "side-by-side" : "stacked"} ${brand.colourway} lockup`)}) >>`,
@@ -1115,6 +1218,11 @@ export function buildLondonPanelAi(
     `<< /Type /OCG /Name (Copy) >>`,
     `<< /Type /OCG /Name (Ground) >>`,
   ];
+
+  // Object 11: the placed-artwork layer group, when the designer has uploaded one.
+  if (placedOps) {
+    objects.push(`<< /Type /OCG /Name (${pdfText(`Placed art · ${placed!.name}`)}) >>`);
+  }
 
   // Object 11: the supplied artwork image. JPEG data is embedded verbatim, so
   // Illustrator opens the vendor's wall at full supplied resolution.
@@ -1308,12 +1416,15 @@ export type LondonOverrides = {
   placements: LondonLogoPlacementMap;
   boardSizes: LondonBoardSizeMap;
   stepRepeat: StepRepeatMap;
+  /** Designer-uploaded vector artwork placed on individual panels. */
+  placedArt: Record<string, LondonPlacedArt>;
 };
 
 export const EMPTY_LONDON_OVERRIDES: LondonOverrides = {
   placements: {},
   boardSizes: {},
   stepRepeat: {},
+  placedArt: {},
 };
 
 /** Per-panel builder options taken from a revision's snapshot. */
@@ -1329,6 +1440,9 @@ export function londonOverrideOptions(
   if (boardSize) out.boardSize = boardSize;
   const stepRepeat = overrides.stepRepeat?.[panelId];
   if (stepRepeat) out.stepRepeat = stepRepeat;
+  // Explicit null keeps a revision reproducible: a panel that carried no
+  // uploaded artwork must never pick one up from the current designer's browser.
+  out.placedArt = normalisePlacedArt(overrides.placedArt?.[panelId]);
   return out;
 }
 
