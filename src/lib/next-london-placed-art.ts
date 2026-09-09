@@ -485,9 +485,94 @@ function lengthPx(value: string | null): number | null {
  * artwork keeps its geometry; elliptical arcs are refused rather than silently
  * printed as straight lines.
  */
+/**
+ * One elliptical arc as up to four cubic segments (max 90° each), the standard
+ * SVG endpoint→centre parameterisation. Arcs used to be dropped, which quietly
+ * deleted whole shapes — rounded corners, dials, pie wedges — from the master.
+ */
+function arcToCubics(
+  x1: number,
+  y1: number,
+  rxIn: number,
+  ryIn: number,
+  rotDeg: number,
+  largeArc: boolean,
+  sweep: boolean,
+  x2: number,
+  y2: number,
+): number[][] {
+  if (x1 === x2 && y1 === y2) return [];
+  let rx = Math.abs(rxIn);
+  let ry = Math.abs(ryIn);
+  if (rx === 0 || ry === 0) return [[x1, y1, x2, y2, x2, y2]];
+  const phi = (rotDeg * Math.PI) / 180;
+  const cosP = Math.cos(phi);
+  const sinP = Math.sin(phi);
+  const dx = (x1 - x2) / 2;
+  const dy = (y1 - y2) / 2;
+  const x1p = cosP * dx + sinP * dy;
+  const y1p = -sinP * dx + cosP * dy;
+  const lambda = (x1p * x1p) / (rx * rx) + (y1p * y1p) / (ry * ry);
+  if (lambda > 1) {
+    const s = Math.sqrt(lambda);
+    rx *= s;
+    ry *= s;
+  }
+  const num = rx * rx * ry * ry - rx * rx * y1p * y1p - ry * ry * x1p * x1p;
+  const den = rx * rx * y1p * y1p + ry * ry * x1p * x1p;
+  const factor = Math.sqrt(Math.max(0, num / den)) * (largeArc === sweep ? -1 : 1);
+  const cxp = (factor * rx * y1p) / ry;
+  const cyp = (-factor * ry * x1p) / rx;
+  const cx = cosP * cxp - sinP * cyp + (x1 + x2) / 2;
+  const cy = sinP * cxp + cosP * cyp + (y1 + y2) / 2;
+  const angle = (ux: number, uy: number, vx: number, vy: number) => {
+    const dot = ux * vx + uy * vy;
+    const len = Math.sqrt(ux * ux + uy * uy) * Math.sqrt(vx * vx + vy * vy);
+    const a = Math.acos(Math.min(1, Math.max(-1, len === 0 ? 1 : dot / len)));
+    return ux * vy - uy * vx < 0 ? -a : a;
+  };
+  const ux = (x1p - cxp) / rx;
+  const uy = (y1p - cyp) / ry;
+  const vx = (-x1p - cxp) / rx;
+  const vy = (-y1p - cyp) / ry;
+  const theta1 = angle(1, 0, ux, uy);
+  let delta = angle(ux, uy, vx, vy);
+  if (!sweep && delta > 0) delta -= 2 * Math.PI;
+  if (sweep && delta < 0) delta += 2 * Math.PI;
+  const segments = Math.max(1, Math.ceil(Math.abs(delta) / (Math.PI / 2)));
+  const step = delta / segments;
+  const alpha = (4 / 3) * Math.tan(step / 4);
+  const point = (t: number) => {
+    const ct = Math.cos(t);
+    const st = Math.sin(t);
+    return {
+      x: cx + rx * cosP * ct - ry * sinP * st,
+      y: cy + rx * sinP * ct + ry * cosP * st,
+      dx: -rx * cosP * st - ry * sinP * ct,
+      dy: -rx * sinP * st + ry * cosP * ct,
+    };
+  };
+  const out: number[][] = [];
+  for (let s = 0; s < segments; s += 1) {
+    const t0 = theta1 + s * step;
+    const t1 = t0 + step;
+    const p0 = point(t0);
+    const p1 = point(t1);
+    out.push([
+      p0.x + alpha * p0.dx,
+      p0.y + alpha * p0.dy,
+      p1.x - alpha * p1.dx,
+      p1.y - alpha * p1.dy,
+      p1.x,
+      p1.y,
+    ]);
+  }
+  return out;
+}
+
 export function normalisePathData(d: string): { d: string; arcs: boolean } {
   if (!/[QqTtAa]/.test(d)) return { d, arcs: false };
-  const tokens = d.match(/[MmLlHhVvCcSsQqTtZz]|-?\d*\.?\d+(?:e[-+]?\d+)?/gi) ?? [];
+  const tokens = d.match(/[MmLlHhVvCcSsQqTtAaZz]|-?\d*\.?\d+(?:e[-+]?\d+)?/gi) ?? [];
   const out: string[] = [];
   let cmd = "";
   let x = 0;
