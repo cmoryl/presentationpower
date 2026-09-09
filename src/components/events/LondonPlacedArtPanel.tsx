@@ -107,8 +107,27 @@ export function LondonPlacedArtPanel({
     }
   }
 
+  const [fine, setFine] = useState(false);
+
   const mmWide = art ? panel.trimW * art.size : 0;
   const mmHigh = art ? (mmWide * art.h) / art.w : 0;
+
+  function nudge(hx: number, hy: number) {
+    if (!art) return;
+    const step = fine ? 0.002 : 0.01;
+    setLondonPlacedArt(panel.id, {
+      dx: clampNudge(art.dx + hx * step),
+      dy: clampNudge(art.dy + hy * step),
+    });
+  }
+
+  function align(h: Align, v: Align): { dx: number; dy: number } {
+    const wFrac = art ? art.size : 0;
+    const hFrac = panel.trimH > 0 ? mmHigh / panel.trimH : 0;
+    const limitX = Math.max(0, 0.5 - EDGE_MARGIN - wFrac / 2);
+    const limitY = Math.max(0, 0.5 - EDGE_MARGIN - hFrac / 2);
+    return { dx: clampNudge(h * limitX), dy: clampNudge(v * limitY) };
+  }
 
   return (
     <div className={`rounded-md border border-border p-3 ${className}`}>
