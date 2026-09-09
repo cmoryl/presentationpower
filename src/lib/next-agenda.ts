@@ -1249,17 +1249,65 @@ export function agendaBlocks(config: AgendaConfig) {
   const bottom = geo.trimH - geo.safeInset;
   const footY = bottom - L.footSize * 1.2;
   let listBottom = footY - L.footSize * 1.8;
-  let qr: { x: number; y: number; edge: number; capY: number } | null = null;
+  let qr: {
+    x: number;
+    y: number;
+    edge: number;
+    capY: number;
+    capSize: number;
+    capAlign: PillarCaptionAlign;
+    placed: boolean;
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+    defaultX: number;
+    defaultY: number;
+  } | null = null;
   if ((config.qrData ?? "").trim()) {
-    const capH = (config.qrCaption ?? "").trim() ? L.footSize * 2 : 0;
-    const qrTop = footY - L.footSize * 1.8 - capH - L.qrEdge;
+    const capSize =
+      Number(config.qrCaptionSize) > 0
+        ? Math.min(AGENDA_QR_CAPTION_SIZE.max, Number(config.qrCaptionSize))
+        : L.footSize;
+    const pad = Math.max(0, Math.min(AGENDA_QR_CAPTION_PAD.max, Number(config.qrCaptionPad) || 0));
+    const capH = (config.qrCaption ?? "").trim() ? capSize * 2 : 0;
+    const blockH = L.qrEdge + capH;
+    // The code can be dragged or typed anywhere on the sheet, but never outside
+    // the safe margin — a scannable code half off the trim is a reprint.
+    const minX = geo.safeInset + pad;
+    const maxX = Math.max(minX, geo.trimW - geo.safeInset - pad - L.qrEdge);
+    const minY = geo.safeInset + pad;
+    const maxY = Math.max(minY, geo.trimH - geo.safeInset - pad - blockH);
+    const defaultX = geo.trimW - geo.safeInset - L.qrEdge;
+    const defaultY = footY - L.footSize * 1.8 - capH - L.qrEdge;
+    const rawX = Number(config.qrOffsetX);
+    const rawY = Number(config.qrOffsetY);
+    const placed =
+      config.qrOffsetX !== null &&
+      config.qrOffsetY !== null &&
+      Number.isFinite(rawX) &&
+      Number.isFinite(rawY);
+    const clamp = (v: number, a: number, b: number) => Math.min(Math.max(v, a), b);
+    const qrX = clamp(placed ? rawX : defaultX, minX, maxX);
+    const qrTop = clamp(placed ? rawY : defaultY, minY, maxY);
     qr = {
-      x: geo.trimW - geo.safeInset - L.qrEdge,
+      x: qrX,
       y: qrTop,
       edge: L.qrEdge,
-      capY: qrTop + L.qrEdge + L.footSize * 0.7,
+      capY: qrTop + L.qrEdge + capSize * 0.7,
+      capSize,
+      capAlign: agendaQrCaptionAlign(config),
+      placed,
+      minX,
+      maxX,
+      minY,
+      maxY,
+      defaultX,
+      defaultY,
     };
-    listBottom = qrTop - L.footSize * 1.4;
+    // The programme only makes room for the code when the code sits in its way.
+    const clash = qrTop < listBottom && qrTop + blockH > rowsTop;
+    if (clash) listBottom = Math.max(rowsTop + 10, qrTop - L.footSize * 1.4);
   }
 
   const rowH = Math.max(5, (listBottom - rowsTop) / rowCount);
