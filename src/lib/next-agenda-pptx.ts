@@ -267,7 +267,13 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
     }
 
     if (b.qr) {
-      const data = qrDataUrl(cfg.qrData ?? "", `#${inkHex}`, `#${groundHex}`);
+      const data = qrDataUrl(
+        cfg.qrData ?? "",
+        agendaQrForeground(cfg),
+        agendaQrBackground(cfg),
+        agendaQrStyle(cfg),
+        agendaQrTransparent(cfg),
+      );
       if (data) {
         s.addImage({
           data,
@@ -280,14 +286,14 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       }
       if ((cfg.qrCaption ?? "").trim()) {
         s.addText(cfg.qrCaption, {
-          x: inX(b.qr.x - L.qrEdge * 0.5),
+          x: inX(b.qr.x),
           y: inX(b.qr.capY),
-          w: inX(b.qr.edge + L.qrEdge * 0.5),
-          h: inX(L.footSize * 2),
+          w: inX(b.qr.edge),
+          h: inX(b.qr.capSize * 2),
           fontFace: FONT,
-          fontSize: pt(L.footSize),
+          fontSize: pt(b.qr.capSize),
           color: inkHex,
-          align: "right",
+          align: b.qr.capAlign,
           valign: "top",
           margin: 0,
         });
