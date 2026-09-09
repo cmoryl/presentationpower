@@ -1301,7 +1301,7 @@ function stepRepeatPdfOps(
   const rad = (plan.config.rotationDeg * Math.PI) / 180;
   const cos = Math.cos(rad);
   const sin = Math.sin(rad);
-  const logoScale = (plan.config.tileWidthMm * MM_TO_PT) / Math.max(1, plan.art.w);
+  const markPt = plan.config.tileWidthMm * MM_TO_PT;
   const alpha = plan.config.opacity < 1 ? `/GsWall gs ` : "";
 
   const spin = (cxMm: number, cyMm: number): string => {
@@ -1318,13 +1318,15 @@ function stepRepeatPdfOps(
     .map((tile) => {
       const matrix = spin(tile.x + tile.w / 2, tile.y + tile.h / 2);
       if (tile.kind === "logo") {
-        const paths = plan.art.paths
+        const tileArt = plan.arts?.[tile.artIndex] ?? plan.art;
+        const logoScale = markPt / Math.max(1, tileArt.w);
+        const paths = tileArt.paths
           .map((p) => {
             const ops = svgPathToPdfOps(p.d, {
               scale: logoScale,
               x: tile.x * MM_TO_PT,
               y: h - (tile.y + tile.h) * MM_TO_PT,
-              artHeight: plan.art.h,
+              artHeight: tileArt.h,
             });
             if (!ops) return "";
             return `${fillOp(p.fill)} ${ops} ${p.fillRule === "evenodd" ? "f*" : "f"} `;

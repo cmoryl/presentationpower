@@ -32,6 +32,11 @@ import {
   STEP_REPEAT_KIND_LABELS,
   STEP_REPEAT_KINDS,
   STEP_REPEAT_LIMITS,
+  STEP_REPEAT_LOGO_SET_LABELS,
+  STEP_REPEAT_LOGO_SETS,
+  STEP_REPEAT_MIX_LABELS,
+  STEP_REPEAT_MIX_NOTES,
+  STEP_REPEAT_MIXES,
   STEP_REPEAT_QR_MODULE_LABELS,
   STEP_REPEAT_QR_MODULE_SHAPES,
   STEP_REPEAT_QR_PLATE_LABELS,
@@ -210,6 +215,7 @@ export function StepRepeatWallPanel({ panel }: StepRepeatWallPanelProps) {
 
   const showsQr = config.kind === "qr" || config.kind === "logo-qr";
   const showsText = config.kind === "text" || config.kind === "logo-text";
+  const isMixed = config.kind === "logo-text" || config.kind === "logo-qr";
 
   return (
     <div className="rounded-lg border border-primary/40 bg-primary/5 p-3">
@@ -244,9 +250,40 @@ export function StepRepeatWallPanel({ panel }: StepRepeatWallPanelProps) {
             </button>
           ))}
         </div>
+        {isMixed ? (
+          <>
+            <Chips
+              label="How the two marks sit together"
+              value={config.mix}
+              options={STEP_REPEAT_MIXES.map((mix) => ({
+                value: mix,
+                label: STEP_REPEAT_MIX_LABELS[mix],
+              }))}
+              onChange={(mix) => set({ mix })}
+            />
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
+              {STEP_REPEAT_MIX_NOTES[config.mix]}
+            </p>
+          </>
+        ) : null}
       </Group>
 
       <Group title="Mark">
+        <Chips
+          label="Lockup pool"
+          value={config.logoSet}
+          options={STEP_REPEAT_LOGO_SETS.map((key) => ({
+            value: key,
+            label: STEP_REPEAT_LOGO_SET_LABELS[key],
+          }))}
+          onChange={(logoSet) => set({ logoSet })}
+        />
+        {config.logoSet === "divisions" ? (
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            {plan.arts.length} division lockups rotate through the grid, so the same mark never sits
+            beside or above itself. The family below leads the set.
+          </p>
+        ) : null}
         <Field label="Lockup family">
           <select
             value={config.familyId}
@@ -418,6 +455,15 @@ export function StepRepeatWallPanel({ panel }: StepRepeatWallPanelProps) {
               "Lockup",
               `${plan.orientation === "side" ? "side by side" : "stacked"} · ${plan.colourway}`,
             ],
+            [
+              "Pool",
+              plan.arts.length > 1
+                ? `${plan.arts.length} division lockups`
+                : nextLogoFamily(config.familyId).label,
+            ],
+            ...(isMixed
+              ? ([["Mix", STEP_REPEAT_MIX_LABELS[config.mix]]] as [string, string][])
+              : []),
           ].map(([label, value]) => (
             <div
               key={label}
