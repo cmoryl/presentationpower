@@ -18,6 +18,8 @@ import deskVinylProof from "@/assets/london-supplied/registration-desk-vinyl.jpg
 import regPillarAi from "@/assets/london-supplied/registration-pillar.ai.asset.json";
 import regPillarProof from "@/assets/london-supplied/registration-pillar.jpg.asset.json";
 
+import { londonLiveFile } from "@/lib/next-london-live-files";
+
 export type LondonSuppliedMaster = {
   /** Panel this master replaces. */
   panelId: string;
@@ -82,6 +84,23 @@ export function londonSuppliedMaster(
   panel: { id: string } | string,
 ): LondonSuppliedMaster | null {
   const id = typeof panel === "string" ? panel : panel.id;
+  // A live file version published from the kit outranks whatever shipped with
+  // this build, so swapping the file updates every card at once.
+  const live = londonLiveFile(id);
+  if (live?.masterUrl) {
+    const bundled = BY_PANEL.get(id);
+    return {
+      panelId: id,
+      aiUrl: live.masterUrl,
+      filename: live.filename,
+      previewUrl: live.proofUrl ?? bundled?.previewUrl ?? "",
+      fromRevision: live.version,
+      issued: live.issued,
+      note:
+        live.note ??
+        `Finished live file, version ${live.version}, issued ${live.issued}. Print this file.`,
+    };
+  }
   return BY_PANEL.get(id) ?? null;
 }
 
@@ -92,5 +111,7 @@ export function londonSuppliedMaster(
  * still layer on top and stay editable.
  */
 export function londonSuppliedGroundUrl(panelId: string): string | null {
+  const live = londonLiveFile(panelId);
+  if (live?.proofUrl) return live.proofUrl;
   return BY_PANEL.get(panelId)?.previewUrl ?? null;
 }
