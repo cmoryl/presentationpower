@@ -145,7 +145,39 @@ export function normalisePlacedArt(input: unknown): LondonPlacedArt | null {
     rotate: clamp(a.rotate, PLACED_ART_ROTATE.min, PLACED_ART_ROTATE.max, 0),
     opacity: clamp(a.opacity, 0.05, 1, 1),
     onTop: a.onTop !== false,
+    ...(() => {
+      const map = normaliseRecolour(a.recolour);
+      return map ? { recolour: map } : {};
+    })(),
   };
+}
+
+/** Clean an ink-swap map: hex keys → hex values, capped. */
+export function normaliseRecolour(input: unknown): Record<string, string> | undefined {
+  if (!input || typeof input !== "object") return undefined;
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(input as Record<string, unknown>).slice(0, 64)) {
+    if (!/^#[0-9A-F]{6}$/i.test(key.trim())) continue;
+    const from = key.trim().toUpperCase();
+    const to = sanitiseFill(value);
+    if (to === from) continue;
+    out[from] = to;
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
+/** Every distinct ink in the uploaded artwork, most-used first. */
+export function placedArtInks(art: LondonPlacedArt): { from: string; to: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const p of art.paths) counts.set(p.fill, (counts.get(p.fill) ?? 0) + 1);
+  return Array.from(counts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([from, count]) => ({ from, to: art.recolour?.[from] ?? from, count }));
+}
+
+/** The ink a path actually prints in, after any swap. */
+export function placedArtFill(art: LondonPlacedArt, fill: string): string {
+  return art.recolour?.[fill] ?? fill;
 }
 
 function hydrate(): void {
