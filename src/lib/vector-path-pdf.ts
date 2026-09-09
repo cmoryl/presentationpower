@@ -106,6 +106,7 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         ops.push("h");
         cursor = { ...start };
         lastControl = null;
+        lastQControl = null;
         continue;
       }
     }
@@ -122,6 +123,7 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         cursor = p;
         start = p;
         lastControl = null;
+        lastQControl = null;
         command = rel ? "l" : "L";
         break;
       }
@@ -130,6 +132,7 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         lineTo(p);
         cursor = p;
         lastControl = null;
+        lastQControl = null;
         break;
       }
       case "H": {
@@ -137,6 +140,7 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         lineTo(p);
         cursor = p;
         lastControl = null;
+        lastQControl = null;
         break;
       }
       case "V": {
@@ -144,6 +148,7 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         lineTo(p);
         cursor = p;
         lastControl = null;
+        lastQControl = null;
         break;
       }
       case "C": {
@@ -153,6 +158,7 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         curveTo(c1, c2, p);
         cursor = p;
         lastControl = c2;
+        lastQControl = null;
         break;
       }
       case "S": {
@@ -164,6 +170,27 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
         curveTo(c1, c2, p);
         cursor = p;
         lastControl = c2;
+        lastQControl = null;
+        break;
+      }
+      case "Q": {
+        const c = { x: base.x + num(), y: base.y + num() };
+        const p = { x: base.x + num(), y: base.y + num() };
+        quadTo(c, p);
+        cursor = p;
+        lastQControl = c;
+        lastControl = null;
+        break;
+      }
+      case "T": {
+        const c = lastQControl
+          ? { x: 2 * cursor.x - lastQControl.x, y: 2 * cursor.y - lastQControl.y }
+          : { ...cursor };
+        const p = { x: base.x + num(), y: base.y + num() };
+        quadTo(c, p);
+        cursor = p;
+        lastQControl = c;
+        lastControl = null;
         break;
       }
       default:
