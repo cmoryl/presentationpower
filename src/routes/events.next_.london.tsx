@@ -617,10 +617,16 @@ function LondonSignagePage() {
         </header>
 
         {/* Print specification */}
-        <section className="mt-10">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-[#03002C]">
-            <Info className="h-4.5 w-4.5 text-[#003FC7]" /> Print specification — London run
-          </h2>
+        <details className="group mt-10 rounded-2xl border border-black/10 bg-white/70 p-5">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#03002C]">
+              <Info className="h-4.5 w-4.5 text-[#003FC7]" /> Print specification — London run
+            </h2>
+            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/55">
+              <span className="group-open:hidden">Show</span>
+              <span className="hidden group-open:inline">Hide</span>
+            </span>
+          </summary>
           <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {LONDON_PRINT_SPEC.map((rule) => (
               <article key={rule.id} className="rounded-xl border border-black/10 bg-white p-5">
@@ -633,13 +639,19 @@ function LondonSignagePage() {
             Colour space: {LONDON_VENUE.colourSpace}. Production partner: {LONDON_VENUE.producer}.
             Venue: {LONDON_VENUE.address}.
           </p>
-        </section>
+        </details>
 
         {/* Gradient grounds */}
-        <section className="mt-10">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-[#03002C]">
-            <ImageIcon className="h-4.5 w-4.5 text-[#003FC7]" /> Gradient grounds in this location
-          </h2>
+        <details className="group mt-6 rounded-2xl border border-black/10 bg-white/70 p-5">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#03002C]">
+              <ImageIcon className="h-4.5 w-4.5 text-[#003FC7]" /> Gradient grounds in this location
+            </h2>
+            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/55">
+              <span className="group-open:hidden">Show</span>
+              <span className="hidden group-open:inline">Hide</span>
+            </span>
+          </summary>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {Object.entries(LONDON_STYLES)
               .filter(([id]) => panels.some((p) => p.style === id))
@@ -667,7 +679,8 @@ function LondonSignagePage() {
                 </article>
               ))}
           </div>
-        </section>
+        </details>
+
 
         {/* Floor spine */}
         <section className="mt-12">
