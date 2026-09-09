@@ -53,6 +53,30 @@ function Slider({
   );
 }
 
+const NUDGE_BTN =
+  "h-7 rounded border border-border text-[11px] text-muted-foreground transition hover:bg-muted";
+
+// Keep snapped artwork clear of the trim edge by this much of the sign.
+const EDGE_MARGIN = 0.06;
+
+type Align = -1 | 0 | 1;
+
+const ALIGN_CELLS: { key: string; label: string; mark: string; h: Align; v: Align }[] = [
+  { key: "tl", label: "Top left", mark: "↖", h: -1, v: -1 },
+  { key: "tc", label: "Top centre", mark: "↑", h: 0, v: -1 },
+  { key: "tr", label: "Top right", mark: "↗", h: 1, v: -1 },
+  { key: "ml", label: "Left", mark: "←", h: -1, v: 0 },
+  { key: "mc", label: "Centre", mark: "•", h: 0, v: 0 },
+  { key: "mr", label: "Right", mark: "→", h: 1, v: 0 },
+  { key: "bl", label: "Bottom left", mark: "↙", h: -1, v: 1 },
+  { key: "bc", label: "Bottom centre", mark: "↓", h: 0, v: 1 },
+  { key: "br", label: "Bottom right", mark: "↘", h: 1, v: 1 },
+];
+
+function clampNudge(v: number): number {
+  return Math.min(PLACED_ART_NUDGE.max, Math.max(PLACED_ART_NUDGE.min, Number(v.toFixed(4))));
+}
+
 export function LondonPlacedArtPanel({
   panel,
   art,
@@ -83,8 +107,27 @@ export function LondonPlacedArtPanel({
     }
   }
 
+  const [fine, setFine] = useState(false);
+
   const mmWide = art ? panel.trimW * art.size : 0;
   const mmHigh = art ? (mmWide * art.h) / art.w : 0;
+
+  function nudge(hx: number, hy: number) {
+    if (!art) return;
+    const step = fine ? 0.002 : 0.01;
+    setLondonPlacedArt(panel.id, {
+      dx: clampNudge(art.dx + hx * step),
+      dy: clampNudge(art.dy + hy * step),
+    });
+  }
+
+  function align(h: Align, v: Align): { dx: number; dy: number } {
+    const wFrac = art ? art.size : 0;
+    const hFrac = panel.trimH > 0 ? mmHigh / panel.trimH : 0;
+    const limitX = Math.max(0, 0.5 - EDGE_MARGIN - wFrac / 2);
+    const limitY = Math.max(0, 0.5 - EDGE_MARGIN - hFrac / 2);
+    return { dx: clampNudge(h * limitX), dy: clampNudge(v * limitY) };
+  }
 
   return (
     <div className={`rounded-md border border-border p-3 ${className}`}>
@@ -217,13 +260,88 @@ export function LondonPlacedArtPanel({
               {art.on ? "Hide on this sign" : "Hidden — show again"}
             </button>
           </div>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap items-start gap-4">
+            <div>
+              <p className="mb-1 text-[11px] text-muted-foreground">Snap it to the trim</p>
+              <div className="grid w-[92px] grid-cols-3 gap-1">
+                {ALIGN_CELLS.map((cell) => (
+                  <button
+                    key={cell.key}
+                    type="button"
+                    title={cell.label}
+                    aria-label={cell.label}
+                    onClick={() => setLondonPlacedArt(panel.id, align(cell.h, cell.v))}
+                    className="h-7 rounded border border-border text-[10px] text-muted-foreground transition hover:bg-muted"
+                  >
+                    {cell.mark}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="mb-1 text-[11px] text-muted-foreground">
+                Nudge it {fine ? "0.2%" : "1%"} at a time — arrow keys work too
+              </p>
+              <div
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  const step = fine ? 0.002 : 0.01;
+                  const moves: Record<string, { dx?: number; dy?: number }> = {
+                    ArrowLeft: { dx: -step },
+                    ArrowRight: { dx: step },
+                    ArrowUp: { dy: -step },
+                    ArrowDown: { dy: step },
+                  };
+                  const move = moves[e.key];
+                  if (!move) return;
+                  e.preventDefault();
+                  nudge(move.dx ?? 0, move.dy ?? 0);
+                }}
+                className="grid w-[92px] grid-cols-3 gap-1 rounded outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <span />
+                <button type="button" aria-label="Move up" onClick={() => nudge(0, -1)} className={NUDGE_BTN}>
+                  ↑
+                </button>
+                <span />
+                <button type="button" aria-label="Move left" onClick={() => nudge(-1, 0)} className={NUDGE_BTN}>
+                  ←
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={fine}
+                  onClick={() => setFine((v) => !v)}
+                  className={`h-7 rounded border text-[10px] transition ${
+                    fine ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  fine
+                </button>
+                <button type="button" aria-label="Move right" onClick={() => nudge(1, 0)} className={NUDGE_BTN}>
+                  →
+                </button>
+                <span />
+                <button type="button" aria-label="Move down" onClick={() => nudge(0, 1)} className={NUDGE_BTN}>
+                  ↓
+                </button>
+                <span />
+              </div>
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition hover:bg-muted"
               onClick={() => setLondonPlacedArt(panel.id, { dx: 0, dy: 0, rotate: 0 })}
             >
               Centre it
+            </button>
+            <button
+              type="button"
+              className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition hover:bg-muted"
+              onClick={() => setLondonPlacedArt(panel.id, { rotate: 0 })}
+            >
+              Straighten
             </button>
             <button
               type="button"
