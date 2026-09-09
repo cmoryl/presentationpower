@@ -235,6 +235,19 @@ export function AgendaStudio({
 
   const division = agendaDivision(config.divisionId);
 
+  // Resolved QR geometry for the page on screen: the clamp range the placement
+  // controls work inside, and where the code currently sits.
+  const qrBlock = useMemo(() => agendaBlocks(pageConfig).qr, [pageConfig]);
+
+  const placeQr = (x: number | null, y: number | null) =>
+    setConfig((c) => ({ ...c, qrOffsetX: x, qrOffsetY: y }));
+
+  const nudgeQr = (dx: number, dy: number) => {
+    if (!qrBlock) return;
+    placeQr(Math.round(qrBlock.x + dx), Math.round(qrBlock.y + dy));
+  };
+
+
   const runExport = async () => {
     const node = plateRef.current?.querySelector<HTMLElement>('[data-kit-asset-frame="true"]');
     if (!node) return;
