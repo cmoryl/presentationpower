@@ -749,15 +749,15 @@ export function stepRepeatSvgLayer(
   const paintFor = options.paintFor ?? ((hex: string) => ({ paint: hex, meta: "" }));
   const rot = plan.config.rotationDeg;
   const ink = paintFor(plan.inkHex);
-  const logoScale = plan.config.tileWidthMm / Math.max(1, plan.art.w);
-
   const body = plan.tiles
     .map((tile) => {
       const spin = rot
         ? ` transform="rotate(${rot.toFixed(2)} ${(tile.x + tile.w / 2).toFixed(2)} ${(tile.y + tile.h / 2).toFixed(2)})"`
         : "";
       if (tile.kind === "logo") {
-        const paths = plan.art.paths
+        const tileArt = plan.arts[tile.artIndex] ?? plan.art;
+        const logoScale = plan.config.tileWidthMm / Math.max(1, tileArt.w);
+        const paths = tileArt.paths
           .map((p) => {
             const { paint, meta } = paintFor(p.fill);
             const rule = p.fillRule === "evenodd" ? ` fill-rule="evenodd"` : "";
@@ -765,7 +765,8 @@ export function stepRepeatSvgLayer(
           })
           .join("");
         return (
-          `<g data-tile="logo" data-row="${tile.row}" data-col="${tile.col}"${spin}>` +
+          `<g data-tile="logo" data-row="${tile.row}" data-col="${tile.col}"` +
+          ` data-family="${esc(plan.artFamilies[tile.artIndex] ?? plan.config.familyId)}"${spin}>` +
           `<g transform="translate(${tile.x.toFixed(2)} ${tile.y.toFixed(2)}) scale(${logoScale.toFixed(5)})">${paths}</g></g>`
         );
       }
