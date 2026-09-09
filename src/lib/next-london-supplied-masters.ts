@@ -62,6 +62,15 @@ const MASTERS: LondonSuppliedMaster[] = [
     issued: "2026-09-09",
     note: "MAIN ENTRANCE DOOR VINYL — finished live file, 900 × 2100 mm trim. Print this file.",
   },
+  {
+    panelId: "ldn-v49",
+    aiUrl: regPillarAi.url,
+    filename: regPillarAi.original_filename,
+    previewUrl: regPillarProof.url,
+    fromRevision: 1,
+    issued: "2026-09-09",
+    note: "REGISTRATION PILLAR — finished live file, 596.9 × 1981 mm trim. Print this file.",
+  },
 ];
 
 const BY_PANEL = new Map(MASTERS.map((m) => [m.panelId, m] as const));
