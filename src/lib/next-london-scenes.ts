@@ -22,6 +22,10 @@ import stageFascia from "@/assets/london-scenes/stage-fascia.jpg";
 import stepRepeat from "@/assets/london-scenes/step-repeat.jpg";
 import wideBanner from "@/assets/london-scenes/wide-banner.jpg";
 
+import {
+  mountArtworkOnFace,
+  type SceneFixedAxis,
+} from "@/lib/scene-face-fit";
 import type { LondonPanel } from "@/lib/next-london-signage";
 
 /** Fractional face rectangle on the plate (0..1 of plate width/height). */
@@ -55,6 +59,10 @@ export interface LondonScene {
   face: SceneFace;
   /** Aspect (w/h) of the measured face — used to rank scene fit. */
   faceRatio: number;
+  /** The surface edge that physically fixes the print size. */
+  fixed: SceneFixedAxis;
+  /** Where on the free axis the print sits. */
+  anchorY: "top" | "center" | "bottom";
 }
 
 function scene(
@@ -64,6 +72,8 @@ function scene(
   kind: SceneKind,
   src: string,
   face: SceneFace,
+  fixed: SceneFixedAxis = "w",
+  anchorY: "top" | "center" | "bottom" = "center",
 ): LondonScene {
   return {
     id,
@@ -74,6 +84,8 @@ function scene(
     plate: { w: 1536, h: 1024 },
     face,
     faceRatio: (face.w * 1536) / (face.h * 1024),
+    fixed,
+    anchorY,
   };
 }
 
@@ -83,61 +95,61 @@ export const LONDON_SCENES: LondonScene[] = [
     y: 0.1309,
     w: 0.1569,
     h: 0.707,
-  }),
+  }, "w", "top"),
   scene("portrait-banner", "Hanging portrait banner", "Atrium / stairwell", "portrait", portraitBanner, {
     x: 0.4173,
     y: 0.1113,
     w: 0.1602,
     h: 0.7412,
-  }),
+  }, "w", "top"),
   scene("wide-banner", "Foyer wall run", "Circulation wall", "wide", wideBanner, {
     x: 0.2617,
     y: 0.168,
     w: 0.6621,
     h: 0.5527,
-  }),
+  }, "w", "center"),
   scene("square-panel", "Breakout wall panel", "Breakout / lounge", "square", squarePanel, {
     x: 0.4889,
     y: 0.2539,
     w: 0.1764,
     h: 0.2607,
-  }),
+  }, "w", "center"),
   scene("door-vinyl", "Room door vinyl", "Session room entrance", "door", doorVinyl, {
     x: 0.3991,
     y: 0.0996,
     w: 0.1914,
     h: 0.8213,
-  }),
+  }, "w", "top"),
   scene("step-repeat", "Step-and-repeat wall", "Press / photo point", "wall", stepRepeat, {
     x: 0.1061,
     y: 0.1221,
     w: 0.7891,
     h: 0.7402,
-  }),
+  }, "w", "center"),
   scene("stage-fascia", "Stage fascia", "Main plenary stage", "fascia", stageFascia, {
     x: 0.1641,
     y: 0.4912,
     w: 0.6686,
     h: 0.0615,
-  }),
+  }, "h", "center"),
   scene("desk-front", "Registration desk front", "Registration", "desk", deskFront, {
     x: 0.112,
     y: 0.5156,
     w: 0.832,
     h: 0.1875,
-  }),
+  }, "h", "center"),
   scene("coffee-bar", "Coffee bar back wall", "Catering / coffee bar", "counter", coffeeBar, {
     x: 0.151,
     y: 0.2773,
     w: 0.6875,
     h: 0.2744,
-  }),
+  }, "w", "center"),
   scene("exterior-banner", "Exterior entrance banner", "Street entrance", "exterior", exteriorBanner, {
     x: 0.2715,
     y: 0.1768,
     w: 0.0579,
     h: 0.4551,
-  }),
+  }, "w", "top"),
 ];
 
 export function londonScene(id: string): LondonScene | undefined {
@@ -187,30 +199,21 @@ export function defaultSceneForPanel(panel: LondonPanel): LondonScene {
 }
 
 /**
- * Artwork box inside a scene face: the panel's trim aspect fitted (contain)
- * into the measured face, so nothing is stretched. Values are fractions of
- * the rendered plate.
+ * Artwork box for a panel on a scene: the print fills the surface edge that
+ * physically fixes its size (a column's width, a fascia's height), keeps the
+ * item's true trim ratio, and never runs off the plate. Fractions of the
+ * rendered plate.
  */
 export function fitArtworkInFace(
   panel: LondonPanel,
   sceneOrId: LondonScene | string,
 ): SceneFace {
   const sc = typeof sceneOrId === "string" ? londonScene(sceneOrId) : sceneOrId;
-  const face = sc?.face ?? { x: 0, y: 0, w: 1, h: 1 };
-  const plate = sc?.plate ?? { w: 1536, h: 1024 };
-  const facePxW = face.w * plate.w;
-  const facePxH = face.h * plate.h;
-  const target = panel.trimW / panel.trimH;
-  let w = facePxW;
-  let h = w / target;
-  if (h > facePxH) {
-    h = facePxH;
-    w = h * target;
-  }
-  return {
-    x: face.x + (facePxW - w) / 2 / plate.w,
-    y: face.y + (facePxH - h) / 2 / plate.h,
-    w: w / plate.w,
-    h: h / plate.h,
-  };
+  return mountArtworkOnFace({
+    face: sc?.face ?? { x: 0, y: 0, w: 1, h: 1 },
+    plate: sc?.plate ?? { w: 1536, h: 1024 },
+    ratio: panel.trimW / panel.trimH,
+    fixed: sc?.fixed ?? "w",
+    anchorY: sc?.anchorY ?? "center",
+  });
 }

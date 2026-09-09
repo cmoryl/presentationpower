@@ -22,13 +22,29 @@ export interface SceneArtworkPlateProps {
   children: ReactNode;
   /** Ref on the face element, for callers that measure it. */
   faceRef?: Ref<HTMLDivElement>;
+  /**
+   * The full measured placement area. When the print's true trim ratio does
+   * not use all of it, the leftover fixture is dressed with `substrate` so the
+   * print reads as mounted on a banner or panel rather than floating in a
+   * blank block.
+   */
+  face?: { x: number; y: number; w: number; h: number };
+  /** A stretched, defocused copy of the artwork used to dress the fixture. */
+  substrate?: ReactNode;
 }
 
 function pct(n: number): string {
   return `${(n * 100).toFixed(4)}%`;
 }
 
-export function SceneArtworkPlate({ box, sceneId, children, faceRef }: SceneArtworkPlateProps) {
+export function SceneArtworkPlate({
+  box,
+  sceneId,
+  children,
+  faceRef,
+  face,
+  substrate,
+}: SceneArtworkPlateProps) {
   const light = sceneLighting(sceneId);
   const angle = shadeAngle(light.direction);
   const off = shadowOffset(light.direction);
@@ -41,8 +57,46 @@ export function SceneArtworkPlate({ box, sceneId, children, faceRef }: SceneArtw
       ? `inset 0 0 0 1px rgba(255,255,255,0.22), inset 0 0 0 2px rgba(3,0,44,0.10), 0 ${(spread * 40).toFixed(1)}px ${(spread * 90).toFixed(1)}px rgba(3,0,44,${(light.contact * 0.5).toFixed(3)})`
       : `0 ${(spread * 26).toFixed(1)}px ${(spread * 70).toFixed(1)}px rgba(3,0,44,${(light.contact * 0.35).toFixed(3)})`;
 
+  // Dress the rest of the fixture when the print's true ratio leaves part of
+  // the measured placement area unused.
+  const dress =
+    face && substrate && (face.w > box.w * 1.04 || face.h > box.h * 1.04)
+      ? face
+      : null;
+
   return (
     <>
+      {dress ? (
+        <div
+          aria-hidden="true"
+          className="absolute overflow-hidden"
+          style={{
+            left: pct(dress.x),
+            top: pct(dress.y),
+            width: pct(dress.w),
+            height: pct(dress.h),
+          }}
+        >
+          <div
+            className="absolute inset-0"
+            style={{
+              filter: `blur(14px) brightness(${(light.exposure * 0.94).toFixed(3)}) saturate(1.02)`,
+              transform: "scale(1.14)",
+            }}
+          >
+            {substrate}
+          </div>
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(120% 120% at 50% 45%, rgba(255,255,255,0) 55%, rgba(3,0,44,0.22) 100%)",
+              mixBlendMode: "multiply",
+            }}
+          />
+        </div>
+      ) : null}
+
       {/* Contact shadow: sits behind the print, offset away from the light. */}
       <div
         aria-hidden="true"

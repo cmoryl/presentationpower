@@ -53,7 +53,20 @@ function Stage({
         className="absolute inset-0 h-full w-full object-cover"
       />
       {art ? (
-        <SceneArtworkPlate box={box} sceneId={scene.id}>
+        <SceneArtworkPlate
+          box={box}
+          sceneId={scene.id}
+          face={scene.face}
+          substrate={
+            <img
+              src={art}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full"
+              style={{ objectFit: "cover" }}
+            />
+          }
+        >
           <img
             src={art}
             alt={`${panel.name} installed as a ${scene.label.toLowerCase()}`}
