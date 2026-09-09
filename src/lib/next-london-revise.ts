@@ -36,6 +36,7 @@ import {
   londonPlacedArt,
   londonPlacedArtBox,
   normalisePlacedArt,
+  placedArtFill,
   type LondonPlacedArt,
 } from "@/lib/next-london-placed-art";
 import {
