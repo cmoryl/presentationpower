@@ -354,13 +354,32 @@ function LondonSignagePage() {
   const artOptions = (panel: LondonPanel) => londonOverrideOptions(panel.id, headOverrides);
   const fileBase = (panel: LondonPanel) => londonPanelFileBase(panel, headRev);
 
+  // Preview options layer THIS browser's unpublished edits over the revision in
+  // force, so a sign edited in the live editor or template studio reads the same
+  // on its hub card. Downloads and QA keep using `artOptions` — a print master
+  // must never depend on local storage.
+  const previewOptions = (panel: LondonPanel) => {
+    const base = artOptions(panel);
+    const placement = localPlacements[panel.id];
+    const boardSize = localBoardSizes[panel.id];
+    const placedArt = localPlacedArt[panel.id];
+    return {
+      ...base,
+      ...(placement ? { placement } : {}),
+      ...(boardSize ? { boardSize } : {}),
+      ...(placedArt ? { placedArt } : {}),
+    };
+  };
+  const isDraft = (panel: LondonPanel) =>
+    Boolean(localPlacements[panel.id] || localBoardSizes[panel.id] || localPlacedArt[panel.id]);
+
   // Previews outline their copy with the shipped signage face. Until it is in
   // memory the synchronous builder throws by design, so the tile simply stays
   // blank rather than taking the whole page down with it.
   const previewSvg = (panel: LondonPanel): string | undefined => {
     if (!faceReady) return undefined;
     try {
-      return londonPanelSvgFor(panel, artwork, artOptions(panel));
+      return londonPanelSvgFor(panel, artwork, previewOptions(panel));
     } catch {
       return undefined;
     }
