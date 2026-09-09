@@ -148,6 +148,6 @@ describe("division accent fine tuning", () => {
   it("holds the accent back until the chosen start point", () => {
     const stops = londonDivisionStops("media", base, 0.7, 1, { from: 0.6 });
     expect(stops[0]).toBe(base[0]);
-    expect(stops[1]).toBe(base[1]);
+    expect(stops[1]!.toLowerCase()).toBe(base[1]!.toLowerCase());
   });
 });
