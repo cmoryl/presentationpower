@@ -19,9 +19,23 @@ import {
   cityBadgeDivision,
   type CityBadgeDivision,
 } from "@/lib/next-city-badge";
+// The agenda board shares the house QR treatments with the pillar and signage
+// editors, so a code drawn here matches a code drawn anywhere else in the kit.
+import {
+  PILLAR_QR_MIN_CONTRAST,
+  PILLAR_QR_STYLES,
+  pillarContrastRatio,
+  type PillarCaptionAlign,
+  type PillarQrStyleId,
+} from "@/lib/next-pillar-masters";
 
 export const AGENDA_DIVISIONS: CityBadgeDivision[] = CITY_BADGE_DIVISIONS;
 export const agendaDivision = cityBadgeDivision;
+
+export const AGENDA_QR_STYLES = PILLAR_QR_STYLES;
+export const AGENDA_QR_MIN_CONTRAST = PILLAR_QR_MIN_CONTRAST;
+export const agendaContrastRatio = pillarContrastRatio;
+export type { PillarCaptionAlign as AgendaCaptionAlign, PillarQrStyleId as AgendaQrStyleId };
 
 export const AGENDA_SPEC = {
   bleedEdge: 5,
@@ -146,6 +160,12 @@ export const AGENDA_CUSTOM_SIZE = {
 };
 
 export const AGENDA_QR_SIZE = { min: 20, max: 160, step: 2 };
+/** Caption cap height in mm; 0 follows the footer size. */
+export const AGENDA_QR_CAPTION_SIZE = { min: 2, max: 24, step: 0.5 };
+/** Padding held between the code, its caption and the safe edges (mm). */
+export const AGENDA_QR_CAPTION_PAD = { min: 0, max: 40, step: 1 };
+/** Coarse / fine nudge steps for a placed code (mm). */
+export const AGENDA_QR_NUDGE = { fine: 1, coarse: 5 };
 
 export type AgendaFaceId = "dark" | "light";
 
@@ -278,6 +298,23 @@ export type AgendaConfig = {
   qrData: string;
   qrSize: number;
   qrCaption: string;
+  /** QR module shape. */
+  qrStyle: PillarQrStyleId;
+  /** QR ink hex. Empty = Blue 800. */
+  qrForeground: string;
+  /** QR plate hex. Empty = white. */
+  qrBackground: string;
+  /** Drop the plate so only the modules print over the gradient. */
+  qrTransparent: boolean;
+  /** Caption alignment under the code. */
+  qrCaptionAlign: PillarCaptionAlign;
+  /** Caption cap height in mm. 0 = follow the footer size. */
+  qrCaptionSize: number;
+  /** Padding between the code, its caption and the safe edges (mm). */
+  qrCaptionPad: number;
+  /** Placed QR position in mm from the trim top-left. null = default flow. */
+  qrOffsetX: number | null;
+  qrOffsetY: number | null;
   /** Event this live agenda file belongs to (free-text label). */
   eventLabel: string;
   /**
@@ -886,6 +923,15 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
     qrData: "",
     qrSize: 48,
     qrCaption: "FULL AGENDA",
+    qrStyle: "block",
+    qrForeground: "",
+    qrBackground: "",
+    qrTransparent: false,
+    qrCaptionAlign: "center",
+    qrCaptionSize: 0,
+    qrCaptionPad: 0,
+    qrOffsetX: null,
+    qrOffsetY: null,
     eventLabel: "",
   };
 }
@@ -944,6 +990,59 @@ export function agendaQrSize(config: AgendaConfig): number {
   const raw = Number(config.qrSize);
   const value = Number.isFinite(raw) && raw > 0 ? raw : 48;
   return Math.min(AGENDA_QR_SIZE.max, Math.max(AGENDA_QR_SIZE.min, value));
+}
+
+/** QR module shape, defaulting to the most reliable square modules. */
+export function agendaQrStyle(config: AgendaConfig): PillarQrStyleId {
+  return AGENDA_QR_STYLES.some((s) => s.id === config.qrStyle) ? config.qrStyle : "block";
+}
+
+/** QR ink: approved Blue 800 unless another ink was picked. */
+export function agendaQrForeground(config: AgendaConfig): string {
+  const v = (config.qrForeground ?? "").trim();
+  return /^#[0-9a-f]{6}$/i.test(v) ? v.toUpperCase() : "#03002C";
+}
+
+/** QR plate: white unless another colour was picked. */
+export function agendaQrBackground(config: AgendaConfig): string {
+  const v = (config.qrBackground ?? "").trim();
+  return /^#[0-9a-f]{6}$/i.test(v) ? v.toUpperCase() : "#FFFFFF";
+}
+
+/** True when the plate is dropped and the code prints on the gradient. */
+export function agendaQrTransparent(config: AgendaConfig): boolean {
+  return config.qrTransparent === true;
+}
+
+export function agendaQrCaptionAlign(config: AgendaConfig): PillarCaptionAlign {
+  return config.qrCaptionAlign === "left" || config.qrCaptionAlign === "right"
+    ? config.qrCaptionAlign
+    : "center";
+}
+
+/**
+ * Colour the modules actually sit on: the plate, or — with the plate dropped —
+ * the gradient stop that gives the worst contrast, which is what a phone
+ * camera has to survive.
+ */
+export function agendaQrPlateColor(config: AgendaConfig): string {
+  if (!agendaQrTransparent(config)) return agendaQrBackground(config);
+  const stops = agendaStops(config.styleId, config.face ?? "dark", config.divisionId);
+  let worst = stops[0] ?? "#003FC7";
+  let ratio = Number.POSITIVE_INFINITY;
+  for (const stop of stops) {
+    const r = agendaContrastRatio(agendaQrForeground(config), stop);
+    if (r >= ratio) continue;
+    ratio = r;
+    worst = stop;
+  }
+  return worst;
+}
+
+/** Contrast the printed code will be read at, and whether it clears the floor. */
+export function agendaQrContrast(config: AgendaConfig): { ratio: number; ok: boolean } {
+  const ratio = agendaContrastRatio(agendaQrForeground(config), agendaQrPlateColor(config));
+  return { ratio, ok: ratio >= AGENDA_QR_MIN_CONTRAST };
 }
 
 export const AGENDA_LOCKUP_SCALE = { min: 0.5, max: 1.6, step: 0.05 };
