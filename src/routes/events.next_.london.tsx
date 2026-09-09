@@ -178,10 +178,13 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
 function PanelCard({
   panel,
   svg,
+  draft,
   onClick,
 }: {
   panel: LondonPanel;
   svg?: string;
+  /** This browser has unpublished edits for the sign. */
+  draft?: boolean;
   onClick?: (panel: LondonPanel) => void;
 }) {
   const booth = londonBoothPanelMeta(panel);
