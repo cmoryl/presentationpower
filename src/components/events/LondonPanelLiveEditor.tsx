@@ -57,7 +57,11 @@ import {
 import { LONDON_DIVISION_COLOURWAYS, londonDivisionAccent } from "@/lib/next-london-division";
 import { LondonAccentTintPicker } from "@/components/events/LondonAccentTintPicker";
 import { LondonPlacedArtPanel } from "@/components/events/LondonPlacedArtPanel";
-import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
+import {
+  londonPlacedArtBox,
+  setLondonPlacedArt,
+  useLondonPlacedArt,
+} from "@/lib/next-london-placed-art";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
   nextLogoColourways,
@@ -216,7 +220,10 @@ export function LondonPanelLiveEditor({
   const boothMeta = londonBoothPanelMeta(panel);
 
   const startDrag = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>, target: "logo" | "text" | "qr" | "ground") => {
+    (
+      event: React.PointerEvent<HTMLDivElement>,
+      target: "logo" | "text" | "qr" | "ground" | "art",
+    ) => {
       event.preventDefault();
       event.stopPropagation();
       const stage = stageRef.current;
@@ -233,7 +240,9 @@ export function LondonPanelLiveEditor({
               ? placement.groundDx
               : target === "qr"
                 ? placement.qrDx
-                : placement.textDx,
+                : target === "art"
+                  ? (placedArt?.dx ?? 0)
+                  : placement.textDx,
         dy:
           target === "logo"
             ? placement.dy
@@ -241,13 +250,19 @@ export function LondonPanelLiveEditor({
               ? placement.groundDy
               : target === "qr"
                 ? placement.qrDy
-                : placement.textDy,
+                : target === "art"
+                  ? (placedArt?.dy ?? 0)
+                  : placement.textDy,
       };
       const move = (moveEvent: PointerEvent) => {
         const dx =
           start.dx + ((moveEvent.clientX - start.x) / rect.width) * (panel.bleedW / panel.trimW);
         const dy =
           start.dy + ((moveEvent.clientY - start.y) / rect.height) * (panel.bleedH / panel.trimH);
+        if (target === "art") {
+          setLondonPlacedArt(panel.id, { dx, dy });
+          return;
+        }
         setLondonLogoPlacement(
           panel.id,
           target === "logo"
@@ -278,6 +293,8 @@ export function LondonPanelLiveEditor({
       placement.groundDy,
       placement.qrDx,
       placement.qrDy,
+      placedArt?.dx,
+      placedArt?.dy,
     ],
   );
 
@@ -559,6 +576,43 @@ export function LondonPanelLiveEditor({
               style={textBox}
             />
           ) : null}
+          {/* Uploaded artwork: drag it straight on the panel, arrows nudge. */}
+          {placedArt && placedArt.on ? (
+            (() => {
+              const box = londonPlacedArtBox(panel, placedArt);
+              const step = 0.005;
+              const moveArt = (dx: number, dy: number) =>
+                setLondonPlacedArt(panel.id, {
+                  dx: placedArt.dx + dx,
+                  dy: placedArt.dy + dy,
+                });
+              return (
+                <div
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Move uploaded artwork"
+                  onPointerDown={(event) => startDrag(event, "art")}
+                  onKeyDown={(event) => {
+                    const s = event.shiftKey ? 0.02 : step;
+                    if (event.key === "ArrowLeft") moveArt(-s, 0);
+                    else if (event.key === "ArrowRight") moveArt(s, 0);
+                    else if (event.key === "ArrowUp") moveArt(0, -s);
+                    else if (event.key === "ArrowDown") moveArt(0, s);
+                    else return;
+                    event.preventDefault();
+                  }}
+                  className="absolute cursor-move rounded-sm border border-dashed border-fuchsia-300/80 bg-fuchsia-200/10 outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300"
+                  style={{
+                    left: `${(box.x / panel.bleedW) * 100}%`,
+                    top: `${(box.y / panel.bleedH) * 100}%`,
+                    width: `${(box.w / panel.bleedW) * 100}%`,
+                    height: `${(box.h / panel.bleedH) * 100}%`,
+                    transform: `rotate(${box.rotate}deg)`,
+                  }}
+                />
+              );
+            })()
+          ) : null}
           {plan.qr && !isWall ? (
             <div
               role="button"
@@ -837,6 +891,40 @@ export function LondonPanelLiveEditor({
                 {NEXT_LOGO_COLOURWAY_LABELS[key]}
               </button>
             ))}
+          </div>
+          {/* Lockup shape + visibility: NEXT Brew boards in particular want the
+              long single-line mark, or no mark at all. */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted-foreground">Logo shape</span>
+            {(
+              [
+                ["auto", "Auto"],
+                ["side", "Single line"],
+                ["stacked", "Stacked"],
+              ] as const
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={placement.lockupShape === key}
+                onClick={() => setLondonLogoPlacement(panel.id, { lockupShape: key })}
+                className={`rounded-full border px-3 py-1 text-xs transition ${
+                  placement.lockupShape === key
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-border text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+            <Button
+              variant={plan.lockupOn ? "outline" : "default"}
+              size="sm"
+              aria-pressed={!plan.lockupOn}
+              onClick={() => setLondonLogoPlacement(panel.id, { lockup: !plan.lockupOn })}
+            >
+              {plan.lockupOn ? "Hide logo" : "Logo hidden — show it"}
+            </Button>
           </div>
           <LondonAccentTintPicker
             panel={panel}
