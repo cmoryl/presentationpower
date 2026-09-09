@@ -11,6 +11,10 @@
 
 import wallWestminsterAi from "@/assets/london-supplied/wall-4e-westminster.ai.asset.json";
 import wallWestminsterProof from "@/assets/london-supplied/wall-4e-westminster.jpg.asset.json";
+import doorVinylAi from "@/assets/london-supplied/main-entrance-door-vinyl.ai.asset.json";
+import doorVinylProof from "@/assets/london-supplied/main-entrance-door-vinyl.jpg.asset.json";
+import deskVinylAi from "@/assets/london-supplied/registration-desk-vinyl.ai.asset.json";
+import deskVinylProof from "@/assets/london-supplied/registration-desk-vinyl.jpg.asset.json";
 
 export type LondonSuppliedMaster = {
   /** Panel this master replaces. */
