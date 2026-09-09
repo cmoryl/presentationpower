@@ -6,6 +6,7 @@
 // step. The editor is intentionally self-contained so it can be mounted in a
 // dialog from any panel listing.
 
+import { londonSuppliedGroundUrl } from "@/lib/next-london-supplied-masters";
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -215,7 +216,7 @@ export function LondonPanelLiveEditor({
   // Vendor booth kiosks: the vendor's supplied artwork is the ground and their
   // Illustrator template is the print deliverable.
   const booth = isBoothPanel(panel);
-  const boothArt = londonBoothArtworkUrl(panel.id);
+  const boothArt = londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id);
   const boothMaster = londonBoothMasterUrl(panel.id);
   const boothMeta = londonBoothPanelMeta(panel);
 

@@ -10,6 +10,10 @@
 import { toast } from "sonner";
 
 import { LONDON_MAX_PX } from "@/lib/london-panel-raster";
+// A panel whose ground is artwork someone supplied — a vendor booth wall or a
+// hand-finished venue master. For those the raster/vendor ground IS the
+// deliverable, so the vector-ground checks report it rather than failing.
+import { londonSuppliedGroundUrl } from "@/lib/next-london-supplied-masters";
 import {
   isBoothPanel,
   LONDON_STYLES,
@@ -34,6 +38,11 @@ const MM_TO_PT = 72 / 25.4;
  * Division items carry their NEXT 2026 accent tint at the light end, so the
  * approved ramp is the tinted one.
  */
+/** Vendor booth wall or hand-finished venue master: supplied artwork ground. */
+function suppliedGround(panel: LondonPanel): boolean {
+  return isBoothPanel(panel) || !!londonSuppliedGroundUrl(panel.id);
+}
+
 function expectedRamp(panel: LondonPanel): string[] {
   const stops = LONDON_STYLES[panel.style]?.stops;
   const base = stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
@@ -212,7 +221,7 @@ export function auditSvg(panel: LondonPanel, svg: string): LondonQaReport {
     ),
     // Vendor booth kiosks intentionally place the vendor's own supplied artwork
     // as the ground; their print deliverable is the vendor's Illustrator master.
-    isBoothPanel(panel)
+    suppliedGround(panel)
       ? check(
           "svg-live-gradient",
           "Ground is the supplied vendor artwork",
@@ -345,7 +354,7 @@ export function auditAi(panel: LondonPanel, ai: string | Uint8Array): LondonQaRe
     // Vendor booth kiosks embed the vendor's supplied wall as an image XObject
     // — for those panels that IS the expected deliverable, mirroring the
     // booth-aware svg-live-gradient check above.
-    isBoothPanel(panel)
+    suppliedGround(panel)
       ? check(
           "ai-vector-ground",
           "Ground is the supplied vendor artwork",

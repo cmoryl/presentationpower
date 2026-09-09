@@ -12,6 +12,7 @@
 // Family and copy are read from the item's own branding note, so the artwork
 // follows what the London location team asked for on each item.
 
+import { londonSuppliedGroundUrl } from "@/lib/next-london-supplied-masters";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
   pickNextLogo,
@@ -490,7 +491,8 @@ export function londonBrandingPlan(
     placement: nudge,
     // Booths that supplied branded artwork start clean; pending booths still get
     // the house lockup on their brand ground.
-    lockupOn: nudge.lockup ?? !(isBoothPanel(panel) && !!londonBoothArtworkUrl(panel.id)),
+    lockupOn: nudge.lockup ?? !((isBoothPanel(panel) && !!londonBoothArtworkUrl(panel.id)) ||
+      !!londonSuppliedGroundUrl(panel.id)),
   };
 }
 
