@@ -48,7 +48,7 @@ import {
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import { londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
 import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
-import { setLondonLiveFiles, useLondonLiveFiles } from "@/lib/next-london-live-files";
+import { setLondonLiveFiles } from "@/lib/next-london-live-files";
 import { LondonLiveFilePanel } from "@/components/events/LondonLiveFilePanel";
 import { applyLondonBoardSize, applyLondonBoardSizes, useLondonBoardSizes } from "@/lib/next-london-board-size";
 import {
@@ -357,7 +357,6 @@ function LondonSignagePage() {
   // replacing a file updates every preview card here without a code change.
   const fetchLiveFiles = useServerFn(listLondonLiveFiles);
   const [liveFileTick, setLiveFileTick] = useState(0);
-  const liveFiles = useLondonLiveFiles();
   useEffect(() => {
     let live = true;
     fetchLiveFiles()
