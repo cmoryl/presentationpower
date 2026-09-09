@@ -25,7 +25,7 @@ import {
   londonTintedStops,
 } from "@/lib/next-london-division";
 import { londonBrandingPlan, londonPanelFamily } from "@/lib/next-london-branding";
-import { londonLogoPlacement } from "@/lib/next-london-logo-placement";
+import { londonLogoPlacement, londonTintShape } from "@/lib/next-london-logo-placement";
 
 const MM_TO_PT = 72 / 25.4;
 
@@ -38,9 +38,11 @@ function expectedRamp(panel: LondonPanel): string[] {
   const stops = LONDON_STYLES[panel.style]?.stops;
   const base = stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
   // Doors carry the heavier soft-focus accent weight; mirror the art layer.
+  const placement = londonLogoPlacement(panel.id);
   return londonTintedStops(londonPanelFamily(panel), base, {
-    tintId: londonLogoPlacement(panel.id).accentTint,
+    tintId: placement.accentTint,
     door: isLondonDoorItem(panel.room, panel.name),
+    shape: londonTintShape(placement),
   });
 }
 

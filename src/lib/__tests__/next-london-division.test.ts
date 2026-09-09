@@ -8,6 +8,9 @@ import {
   londonDivisionAccent,
   londonDivisionColourway,
   londonDivisionStops,
+  londonAccentTint,
+  londonEffectiveTint,
+  LONDON_TINT_LIMITS,
 } from "@/lib/next-london-division";
 import { DEFAULT_LOGO_PLACEMENT } from "@/lib/next-london-logo-placement";
 
@@ -99,5 +102,52 @@ describe("London division signage", () => {
   it("leaves master-brand panels on the approved ramp", () => {
     const master = LONDON_PANELS.find((p) => londonPanelFamily(p) === "transperfect")!;
     expect(londonPanelStops(master)).toEqual(LONDON_STYLES[master.style]!.stops);
+  });
+});
+
+describe("division accent fine tuning", () => {
+  const base = LONDON_STYLES["08-chevron-sweep"]!.stops;
+  const dist = (a: string, b: string) => {
+    const p = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const [ar, ag, ab] = p(a);
+    const [br, bg, bb] = p(b);
+    return Math.hypot(ar - br, ag - bg, ab - bb);
+  };
+
+  it("offers stronger approved presets than the house tint", () => {
+    const house = londonAccentTint("house")!;
+    for (const id of ["rich", "statement"]) {
+      const tint = londonAccentTint(id)!;
+      expect(tint.weight).toBeGreaterThan(house.weight);
+      expect(tint.soften).toBeLessThan(house.soften);
+    }
+  });
+
+  it("gets visibly closer to the accent as strength rises, dark head untouched", () => {
+    const accent = londonDivisionAccent("lifesci")!.hex;
+    const light = (weight: number, soften: number, clearance: number) => {
+      const stops = londonDivisionStops("lifesci", base, weight, 1.1, { soften, clearance });
+      expect(stops[0]).toBe(base[0]);
+      return dist(stops[stops.length - 1]!, accent);
+    };
+    expect(light(0.8, 0.16, 0.35)).toBeLessThan(light(0.22, 0.5, 1));
+  });
+
+  it("merges clamped per-panel tuning over the chosen preset", () => {
+    const tuned = londonEffectiveTint({
+      tintId: "house",
+      shape: { weight: 99, curve: -5, soften: 0.1 },
+    });
+    expect(tuned.weight).toBe(LONDON_TINT_LIMITS.weight.max);
+    expect(tuned.curve).toBe(LONDON_TINT_LIMITS.curve.min);
+    expect(tuned.soften).toBe(0.1);
+    // No tuning returns the preset itself.
+    expect(londonEffectiveTint({ tintId: "house" }).id).toBe("house");
+  });
+
+  it("holds the accent back until the chosen start point", () => {
+    const stops = londonDivisionStops("media", base, 0.7, 1, { from: 0.6 });
+    expect(stops[0]).toBe(base[0]);
+    expect(stops[1]!.toLowerCase()).toBe(base[1]!.toLowerCase());
   });
 });

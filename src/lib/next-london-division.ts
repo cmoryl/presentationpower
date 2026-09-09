@@ -179,13 +179,21 @@ function rgbDistance(a: string, b: string): number {
 }
 
 /** The separation floor a tinted stop must hold from this accent. */
-export function londonAccentSeparationFloor(accentHex: string): number {
-  return Math.min(ACCENT_MIN_SEPARATION, rgbDistance("#FFFFFF", accentHex) * ACCENT_SEPARATION_WHITE_SHARE);
+export function londonAccentSeparationFloor(accentHex: string, clearance = 1): number {
+  const share = ACCENT_SEPARATION_WHITE_SHARE * clamp01(clearance, 1);
+  return Math.min(
+    ACCENT_MIN_SEPARATION * clamp01(clearance, 1),
+    rgbDistance("#FFFFFF", accentHex) * share,
+  );
+}
+
+function clamp01(value: number | undefined, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : fallback;
 }
 
 /** Pull `stop` toward white until it stands clear of the raw accent. */
-function ensureAccentSeparation(stop: string, accentHex: string): string {
-  const floor = londonAccentSeparationFloor(accentHex);
+function ensureAccentSeparation(stop: string, accentHex: string, clearance = 1): string {
+  const floor = londonAccentSeparationFloor(accentHex, clearance);
   let out = stop;
   for (let i = 0; i < 48 && rgbDistance(out, accentHex) < floor; i++) {
     out = mix(out, "#FFFFFF", 0.18);
@@ -193,26 +201,65 @@ function ensureAccentSeparation(stop: string, accentHex: string): string {
   return out;
 }
 
+/** Fine-tuning knobs a designer may vary per panel, on top of a preset. */
+export type LondonTintShape = {
+  /** Peak accent weight at the light end (0–1). */
+  weight?: number;
+  /** Ramp curve: higher keeps the accent later in the ramp. */
+  curve?: number;
+  /** Accent pre-mix toward white. Lower = purer division colour. */
+  soften?: number;
+  /** Share of the legibility separation floor to hold (1 = full guard). */
+  clearance?: number;
+  /** Ramp fraction before any accent enters (0 = from the second stop). */
+  from?: number;
+};
+
+/** Bounds the editor sliders and stored values are clamped to. */
+export const LONDON_TINT_LIMITS = {
+  weight: { min: 0, max: 1, step: 0.01 },
+  curve: { min: 0.6, max: 4, step: 0.05 },
+  soften: { min: 0, max: 0.9, step: 0.01 },
+  clearance: { min: 0.25, max: 1, step: 0.01 },
+  from: { min: 0, max: 0.8, step: 0.01 },
+} as const;
+
+function clampRange(
+  value: number | null | undefined,
+  range: { min: number; max: number },
+  fallback: number,
+): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
+  return Math.min(range.max, Math.max(range.min, value));
+}
+
 /**
  * Tint a panel ramp with its division accent. The first stop (the dark head
  * that carries the lockup) is untouched; weight ramps up to `weight` (default
  * `LONDON_DIVISION_ACCENT_WEIGHT`) at the last stop. Every tinted stop is
  * kept clear of the raw accent hue so the lockup's accent chevron never
- * merges into the ground behind it.
+ * merges into the ground behind it — `clearance` may soften that guard for a
+ * deliberately punchier division ramp, never remove it.
  */
 export function londonDivisionStops(
   familyId: string,
   stops: string[],
   weight: number = LONDON_DIVISION_ACCENT_WEIGHT,
   curve = 1.4,
+  shape: LondonTintShape = {},
 ): string[] {
   const accent = londonDivisionAccent(familyId);
   if (!accent || stops.length < 2) return stops;
-  const target = mix(accent.hex, "#FFFFFF", ACCENT_SOFTEN);
+  const soften = clampRange(shape.soften, LONDON_TINT_LIMITS.soften, ACCENT_SOFTEN);
+  const clearance = clampRange(shape.clearance, LONDON_TINT_LIMITS.clearance, 1);
+  const from = clampRange(shape.from, LONDON_TINT_LIMITS.from, 0);
+  const target = mix(accent.hex, "#FFFFFF", soften);
   const last = stops.length - 1;
   return stops.map((stop, i) => {
-    const t = (i / last) ** curve * weight;
-    return i === 0 ? stop : ensureAccentSeparation(mix(stop, target, t), accent.hex);
+    const p = i / last;
+    const reach = from >= 1 ? 0 : Math.max(0, (p - from) / (1 - from));
+    const t = reach ** curve * weight;
+    return i === 0 ? stop : ensureAccentSeparation(mix(stop, target, t), accent.hex, clearance);
   });
 }
 
@@ -236,6 +283,12 @@ export type LondonAccentTint = {
   weight: number;
   /** Ramp curve: higher keeps the accent later in the ramp. */
   curve: number;
+  /** Accent pre-mix toward white. Lower = purer division colour. */
+  soften: number;
+  /** Share of the legibility separation guard held. */
+  clearance: number;
+  /** Ramp fraction before any accent enters. */
+  from: number;
 };
 
 export const LONDON_ACCENT_TINTS: LondonAccentTint[] = [
@@ -245,6 +298,9 @@ export const LONDON_ACCENT_TINTS: LondonAccentTint[] = [
     note: "The pack default: a restrained accent through the light half of the ramp.",
     weight: LONDON_DIVISION_ACCENT_WEIGHT,
     curve: 1.4,
+    soften: ACCENT_SOFTEN,
+    clearance: 1,
+    from: 0,
   },
   {
     id: "whisper",
@@ -252,6 +308,9 @@ export const LONDON_ACCENT_TINTS: LondonAccentTint[] = [
     note: "Barely there — for scenic runs that must read as master brand first.",
     weight: 0.12,
     curve: 1.8,
+    soften: ACCENT_SOFTEN,
+    clearance: 1,
+    from: 0,
   },
   {
     id: "tip",
@@ -259,6 +318,9 @@ export const LONDON_ACCENT_TINTS: LondonAccentTint[] = [
     note: "Accent held back to the very lightest stop, so it reads as a single edge of division colour.",
     weight: 0.3,
     curve: 3,
+    soften: ACCENT_SOFTEN,
+    clearance: 1,
+    from: 0,
   },
   {
     id: "bloom",
@@ -266,6 +328,39 @@ export const LONDON_ACCENT_TINTS: LondonAccentTint[] = [
     note: "The door strength: an obvious accent bloom behind the mark, dark head still untouched.",
     weight: LONDON_DOOR_ACCENT_WEIGHT,
     curve: 1.15,
+    soften: ACCENT_SOFTEN,
+    clearance: 1,
+    from: 0,
+  },
+  {
+    id: "rich",
+    label: "Rich",
+    note: "Clear division colour through the light half: purer accent, guard eased, dark head untouched.",
+    weight: 0.58,
+    curve: 1.1,
+    soften: 0.3,
+    clearance: 0.62,
+    from: 0,
+  },
+  {
+    id: "statement",
+    label: "Statement",
+    note: "Strongest approved read: the light end lands close to the division accent itself.",
+    weight: 0.8,
+    curve: 0.95,
+    soften: 0.16,
+    clearance: 0.35,
+    from: 0,
+  },
+  {
+    id: "late",
+    label: "Late surge",
+    note: "Holds the pack ramp most of the way, then surges into strong accent at the very light end.",
+    weight: 0.72,
+    curve: 2.6,
+    soften: 0.22,
+    clearance: 0.45,
+    from: 0.25,
   },
 ];
 
@@ -278,24 +373,48 @@ export function londonAccentTint(id: string | null | undefined): LondonAccentTin
 /**
  * The gradient option in force for a panel: the designer's choice when they
  * made one, otherwise the house default (soft focus on doors, house tint
- * everywhere else) — so an untouched panel renders exactly as before.
+ * everywhere else) — so an untouched panel renders exactly as before. Any
+ * per-panel fine-tuning in `shape` is merged over the preset and clamped, so a
+ * division ramp can be dialled in without leaving the approved envelope.
  */
 export function londonEffectiveTint(opts: {
   tintId?: string | null;
   door?: boolean;
+  shape?: LondonTintShape | null;
 }): LondonAccentTint {
   const chosen = londonAccentTint(opts.tintId);
-  if (chosen) return chosen;
-  const fallback = opts.door ? "bloom" : "house";
-  return londonAccentTint(fallback)!;
+  const base = chosen ?? londonAccentTint(opts.door ? "bloom" : "house")!;
+  const shape = opts.shape;
+  if (!shape) return base;
+  const tuned: LondonAccentTint = {
+    ...base,
+    weight: clampRange(shape.weight, LONDON_TINT_LIMITS.weight, base.weight),
+    curve: clampRange(shape.curve, LONDON_TINT_LIMITS.curve, base.curve),
+    soften: clampRange(shape.soften, LONDON_TINT_LIMITS.soften, base.soften),
+    clearance: clampRange(shape.clearance, LONDON_TINT_LIMITS.clearance, base.clearance),
+    from: clampRange(shape.from, LONDON_TINT_LIMITS.from, base.from),
+  };
+  const varied =
+    tuned.weight !== base.weight ||
+    tuned.curve !== base.curve ||
+    tuned.soften !== base.soften ||
+    tuned.clearance !== base.clearance ||
+    tuned.from !== base.from;
+  return varied
+    ? { ...tuned, note: `${base.label}, fine-tuned for this panel.` }
+    : base;
 }
 
 /** Division-tinted ramp for a panel, honouring the chosen gradient option. */
 export function londonTintedStops(
   familyId: string,
   stops: string[],
-  opts: { tintId?: string | null; door?: boolean } = {},
+  opts: { tintId?: string | null; door?: boolean; shape?: LondonTintShape | null } = {},
 ): string[] {
   const tint = londonEffectiveTint(opts);
-  return londonDivisionStops(familyId, stops, tint.weight, tint.curve);
+  return londonDivisionStops(familyId, stops, tint.weight, tint.curve, {
+    soften: tint.soften,
+    clearance: tint.clearance,
+    from: tint.from,
+  });
 }

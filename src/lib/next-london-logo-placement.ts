@@ -9,7 +9,11 @@
 
 import { useSyncExternalStore } from "react";
 
-import { londonAccentTint } from "@/lib/next-london-division";
+import {
+  LONDON_TINT_LIMITS,
+  londonAccentTint,
+  type LondonTintShape,
+} from "@/lib/next-london-division";
 import { NEXT_LOGO_COLOURWAYS, type NextLogoColourway } from "@/lib/next-logo-vectors";
 import {
   PILLAR_CAPTION_FONTS,
@@ -128,6 +132,16 @@ export type LondonLogoPlacement = {
    * panel has no accent to tint with.
    */
   accentTint: string | null;
+  /**
+   * Per-panel fine tuning over the chosen gradient option. `null` on any field
+   * follows the preset. Values are clamped to LONDON_TINT_LIMITS, so the dark
+   * head of the ramp always survives.
+   */
+  accentWeight: number | null;
+  accentCurve: number | null;
+  accentSoften: number | null;
+  accentClearance: number | null;
+  accentFrom: number | null;
 };
 
 export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
@@ -172,6 +186,11 @@ export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
   groundDx: 0,
   groundDy: 0,
   accentTint: null,
+  accentWeight: null,
+  accentCurve: null,
+  accentSoften: null,
+  accentClearance: null,
+  accentFrom: null,
 };
 
 export type LondonLogoPlacementMap = Record<string, LondonLogoPlacement>;
@@ -299,7 +318,35 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
     groundDx: clamp(p.groundDx, -0.5, 0.5, 0),
     groundDy: clamp(p.groundDy, -0.5, 0.5, 0),
     accentTint: londonAccentTint(typeof p.accentTint === "string" ? p.accentTint : null)?.id ?? null,
+    accentWeight: tintValue(p.accentWeight, LONDON_TINT_LIMITS.weight),
+    accentCurve: tintValue(p.accentCurve, LONDON_TINT_LIMITS.curve),
+    accentSoften: tintValue(p.accentSoften, LONDON_TINT_LIMITS.soften),
+    accentClearance: tintValue(p.accentClearance, LONDON_TINT_LIMITS.clearance),
+    accentFrom: tintValue(p.accentFrom, LONDON_TINT_LIMITS.from),
   };
+}
+
+/** A stored tint knob: clamped into range, or null when it follows the preset. */
+function tintValue(
+  value: unknown,
+  range: { min: number; max: number },
+): number | null {
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  return Math.min(range.max, Math.max(range.min, value));
+}
+
+/**
+ * The per-panel gradient fine tuning stored for a panel, in the shape the
+ * division tint engine takes. Fields left on the preset stay undefined.
+ */
+export function londonTintShape(p: LondonLogoPlacement): LondonTintShape | null {
+  const shape: LondonTintShape = {};
+  if (p.accentWeight !== null) shape.weight = p.accentWeight;
+  if (p.accentCurve !== null) shape.curve = p.accentCurve;
+  if (p.accentSoften !== null) shape.soften = p.accentSoften;
+  if (p.accentClearance !== null) shape.clearance = p.accentClearance;
+  if (p.accentFrom !== null) shape.from = p.accentFrom;
+  return Object.keys(shape).length > 0 ? shape : null;
 }
 
 function hydrate(): void {
