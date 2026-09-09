@@ -57,8 +57,46 @@ export function SceneArtworkPlate({
       ? `inset 0 0 0 1px rgba(255,255,255,0.22), inset 0 0 0 2px rgba(3,0,44,0.10), 0 ${(spread * 40).toFixed(1)}px ${(spread * 90).toFixed(1)}px rgba(3,0,44,${(light.contact * 0.5).toFixed(3)})`
       : `0 ${(spread * 26).toFixed(1)}px ${(spread * 70).toFixed(1)}px rgba(3,0,44,${(light.contact * 0.35).toFixed(3)})`;
 
+  // Dress the rest of the fixture when the print's true ratio leaves part of
+  // the measured placement area unused.
+  const dress =
+    face && substrate && (face.w > box.w * 1.04 || face.h > box.h * 1.04)
+      ? face
+      : null;
+
   return (
     <>
+      {dress ? (
+        <div
+          aria-hidden="true"
+          className="absolute overflow-hidden"
+          style={{
+            left: pct(dress.x),
+            top: pct(dress.y),
+            width: pct(dress.w),
+            height: pct(dress.h),
+          }}
+        >
+          <div
+            className="absolute inset-0"
+            style={{
+              filter: `blur(14px) brightness(${(light.exposure * 0.94).toFixed(3)}) saturate(1.02)`,
+              transform: "scale(1.14)",
+            }}
+          >
+            {substrate}
+          </div>
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(120% 120% at 50% 45%, rgba(255,255,255,0) 55%, rgba(3,0,44,0.22) 100%)",
+              mixBlendMode: "multiply",
+            }}
+          />
+        </div>
+      ) : null}
+
       {/* Contact shadow: sits behind the print, offset away from the light. */}
       <div
         aria-hidden="true"
