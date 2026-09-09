@@ -266,8 +266,10 @@ function LondonSignagePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- templates mutate the panel records
     [panels, boothTemplates.applied],
   );
-  const nonBoothPanels = useMemo(() => panels.filter((p) => !isBoothPanel(p)), [panels]);
-  const floors = useMemo(() => londonPanelsByFloor(nonBoothPanels), [nonBoothPanels]);
+  // Booths belong to the floor they stand on, so they group with the rest of
+  // that floor's schedule instead of sitting above every floor view. The
+  // "booths" filter is the one place the whole partner set is listed together.
+  const floors = useMemo(() => londonPanelsByFloor(panels), [panels]);
   const [floorId, setFloorId] = useState<string>("all");
   const [artwork, setArtwork] = useState<LondonArtwork | null>(null);
   const [artworkError, setArtworkError] = useState<string | null>(null);
@@ -331,7 +333,12 @@ function LondonSignagePage() {
     }
   }, [editing, openPanel, headOverrides]);
 
-  const shown = floorId === "all" ? floors : floors.filter((f) => f.id === floorId);
+  const boothsOnly = floorId === "booths";
+  const shown = boothsOnly
+    ? []
+    : floorId === "all"
+      ? floors
+      : floors.filter((f) => f.id === floorId);
   const styleCount = new Set(panels.map((p) => p.style)).size;
   const roomCount = new Set(panels.map((p) => `${p.floor}·${p.room}`)).size;
   const worstBand = Math.max(...panels.map((p) => p.bandMm));
@@ -677,7 +684,7 @@ function LondonSignagePage() {
                   : "border-black/15 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
               }`}
             >
-              All floors · {nonBoothPanels.length}
+              All floors · {panels.length}
             </button>
             {floors.map((floor) => (
               <button
@@ -693,6 +700,19 @@ function LondonSignagePage() {
                 {floor.id} · {floor.rooms.reduce((n, r) => n + r.panels.length, 0)}
               </button>
             ))}
+            {boothPanels.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setFloorId("booths")}
+                className={`${chip} ${
+                  boothsOnly
+                    ? "border-[#03002C] bg-[#03002C] text-white"
+                    : "border-black/15 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+                }`}
+              >
+                Partner booths · {boothPanels.length}
+              </button>
+            ) : null}
           </div>
 
           {artworkError ? (
