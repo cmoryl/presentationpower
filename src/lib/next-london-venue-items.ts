@@ -729,7 +729,7 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
     template: "Master NEXT pillar sheet",
     dimsSource: "template",
     note: "Master NEXT directional pillar — MAIN STAGE.",
-  },,
+  },
   // Alternate exterior flag artwork — appended (not inserted) so every existing
   // item keeps its published id. Same trim/bleed as the issued flag, different
   // ground, so the team can approve one of two versions in the Exterior area.
