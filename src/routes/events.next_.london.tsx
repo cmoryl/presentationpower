@@ -806,6 +806,7 @@ function LondonSignagePage() {
                     key={panel.id}
                     panel={panel}
                     svg={previewSvg(panel)}
+                    draft={isDraft(panel)}
                     onClick={setOpenPanel}
                   />
                 ))}
