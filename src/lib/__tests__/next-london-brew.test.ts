@@ -12,34 +12,19 @@ describe("NEXTbrew theming", () => {
     expect(LONDON_STYLES["11-brew-diagonal"]!.stops[0]).toBe("#03002C");
   });
 
-  it("plans a seamless line field — no floating vector doodles", () => {
+  it("plans no background vector graphics on brew grounds", () => {
     for (const panel of brewPanels) {
-      const plan = brewMotifPlan(panel);
-      const kinds = new Set(plan.marks.map((m) => m.kind));
-      // The cup ring / bean clip art is gone: strokes only.
-      expect([...kinds]).toEqual(["path"]);
-      expect(plan.marks.length).toBeGreaterThan(6);
-      for (const m of plan.marks) expect(m.alpha).toBeGreaterThan(0);
-
-      // Lattice rules must touch the sheet edges so the pattern is continuous
-      // across the trim rather than floating inside the panel.
-      const lattice = plan.marks.filter((m) => m.kind === "path" && m.d.includes(" L "));
-      expect(lattice.length).toBeGreaterThan(4);
+      expect(brewMotifPlan(panel).marks).toEqual([]);
     }
   });
 
-  it("emits an editable motif layer in the SVG and live paths in the .ai", () => {
+  it("ships clean gradient masters with no motif layer", () => {
     const panel = brewPanels.find((p) => p.style === "11-brew-diagonal")!;
     const svg = buildLondonPanelSvg(panel);
-    expect(svg).toContain('data-layer="brew-motif"');
-    // Motif sits above the ground and below the hero lockup.
-    expect(svg.indexOf('id="brew-motif"')).toBeGreaterThan(svg.indexOf('id="ground"'));
-    expect(svg.lastIndexOf('id="hero-lockup"')).toBeGreaterThan(svg.indexOf('id="brew-motif"'));
+    expect(svg).not.toContain('data-layer="brew-motif"');
 
     const pdf = new TextDecoder("latin1").decode(buildLondonPanelAi(panel));
-    expect(pdf).toContain("/GsBrew");
-    expect(pdf).toMatch(/ RG/);
-    expect(pdf).toMatch(/ S Q/);
+    expect(pdf).not.toContain("/GsBrew");
   });
 
   it("leaves non-brew panels untouched", () => {
