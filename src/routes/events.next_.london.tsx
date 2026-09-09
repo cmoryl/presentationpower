@@ -1069,6 +1069,16 @@ function LondonSignagePage() {
                 ))}
               </dl>
 
+              {/* The finished live file in force for this sign. Replacing it here
+                  re-paints every preview card in the kit at once. */}
+              {isBoothPanel(openPanel) ? null : (
+                <LondonLiveFilePanel
+                  panel={openPanel}
+                  canEdit={isAdmin}
+                  onChanged={() => setLiveFileTick((n) => n + 1)}
+                />
+              )}
+
               {/* Copies of this sign — a second pillar version, a different
                   treatment on the same board. Each copy is its own asset. */}
               {isBoothPanel(openPanel) ? null : (
