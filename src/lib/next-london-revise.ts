@@ -570,7 +570,7 @@ function placedArtSvgLayer(
   const s = box.w / art.w;
   const body = art.paths
     .map((path) => {
-      const { paint, meta } = paintFor(path.fill);
+      const { paint, meta } = paintFor(placedArtFill(art, path.fill));
       const rule = path.fillRule === "evenodd" ? ` fill-rule="evenodd"` : "";
       const alpha = path.alpha !== undefined ? ` fill-opacity="${path.alpha.toFixed(3)}"` : "";
       const m = path.m;
@@ -1155,7 +1155,7 @@ export function buildLondonPanelAi(
             // F·M·F⁻¹ for the y-flip of height `placed.h`.
             const n = [m[0], -m[1], -m[2], m[3], m[2] * placed.h + m[4], placed.h - m[3] * placed.h - m[5]];
             const cm = `${n.map((v) => f3(v)).join(" ")} cm `;
-            return `q ${cm}${fillOp(path.fill)} ${ops} ${path.fillRule === "evenodd" ? "f*" : "f"} Q\n`;
+            return `q ${cm}${fillOp(placedArtFill(placed, path.fill))} ${ops} ${path.fillRule === "evenodd" ? "f*" : "f"} Q\n`;
           })
           .join("");
         return body ? `${head}${body}Q\n` : "";
