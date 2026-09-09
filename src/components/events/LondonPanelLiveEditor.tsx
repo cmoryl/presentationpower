@@ -218,6 +218,9 @@ export function LondonPanelLiveEditor({
   const booth = isBoothPanel(panel);
   const boothArt = londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id);
   const boothMaster = londonBoothMasterUrl(panel.id);
+  // An updated live file handed back by the design team: it paints the ground,
+  // and the editable layers ride on top exactly as they do on any other sign.
+  const liveGround = !booth && !!londonSuppliedGroundUrl(panel.id);
   const boothMeta = londonBoothPanelMeta(panel);
 
   const startDrag = useCallback(
@@ -465,7 +468,9 @@ export function LondonPanelLiveEditor({
                 ? boothArt
                   ? `${boothMeta?.artboard.label ?? "Booth"} · supplied vendor artwork`
                   : "Booth artwork pending — brand ground shown"
-                : "drag the lockup, headline or code"}
+                : liveGround
+                  ? "updated live file underneath — drag the lockup, headline or code"
+                  : "drag the lockup, headline or code"}
           </span>
           <span className="flex flex-wrap items-center gap-1.5">
             <span className="text-[11px] uppercase tracking-wide">Stage</span>
@@ -506,7 +511,7 @@ export function LondonPanelLiveEditor({
             {boothArt ? (
               <img
                 src={boothArt}
-                alt={`${panel.name} supplied booth artwork`}
+                alt={`${panel.name} supplied artwork`}
                 className="absolute"
                 style={groundStyle}
               />
@@ -679,7 +684,9 @@ export function LondonPanelLiveEditor({
         {boothArt ? (
           <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-              <span className="font-medium">Supplied artwork</span>
+              <span className="font-medium">
+                {liveGround ? "Updated live file" : "Supplied artwork"}
+              </span>
               {groundImage ? (
                 <span
                   className={
@@ -742,7 +749,9 @@ export function LondonPanelLiveEditor({
                 onCenter={(axis) => centerObject("ground", axis)}
               />
               <span className="text-[11px] text-muted-foreground">
-                drag the wall to reposition · arrows nudge
+                {liveGround
+                  ? "drag the file to reposition · arrows nudge · the file already carries a printed logo, so turn the lockup off if you do not want a second one"
+                  : "drag the wall to reposition · arrows nudge"}
               </span>
             </div>
           </div>
@@ -765,6 +774,12 @@ export function LondonPanelLiveEditor({
               ))}
             </select>
           </label>
+          {liveGround ? (
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              The updated live file covers the ground, so a gradient change only shows where the
+              file is moved or zoomed away from the edge.
+            </p>
+          ) : null}
         </div>
 
         {/* Copy — a wall repeats its own text, so the single headline is hidden */}
