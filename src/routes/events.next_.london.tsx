@@ -13,6 +13,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
   BookOpen,
+  CalendarDays,
   Download,
   FileDown,
   ImageIcon,
@@ -37,6 +38,7 @@ import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { BoothRenderPreview } from "@/components/events/BoothRenderPreview";
 import { LondonLocationRenderPreview } from "@/components/events/LondonLocationRenderPreview";
 
+import { LondonAgendaBoards } from "@/components/events/LondonAgendaBoards";
 import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor";
 import {
   londonLogoPlacements,
