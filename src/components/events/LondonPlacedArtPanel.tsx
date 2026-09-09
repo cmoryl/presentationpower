@@ -217,13 +217,88 @@ export function LondonPlacedArtPanel({
               {art.on ? "Hide on this sign" : "Hidden — show again"}
             </button>
           </div>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap items-start gap-4">
+            <div>
+              <p className="mb-1 text-[11px] text-muted-foreground">Snap it to the trim</p>
+              <div className="grid w-[92px] grid-cols-3 gap-1">
+                {ALIGN_CELLS.map((cell) => (
+                  <button
+                    key={cell.key}
+                    type="button"
+                    title={cell.label}
+                    aria-label={cell.label}
+                    onClick={() => setLondonPlacedArt(panel.id, align(cell.h, cell.v))}
+                    className="h-7 rounded border border-border text-[10px] text-muted-foreground transition hover:bg-muted"
+                  >
+                    {cell.mark}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="mb-1 text-[11px] text-muted-foreground">
+                Nudge it {fine ? "0.2%" : "1%"} at a time — arrow keys work too
+              </p>
+              <div
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  const step = fine ? 0.002 : 0.01;
+                  const moves: Record<string, { dx?: number; dy?: number }> = {
+                    ArrowLeft: { dx: -step },
+                    ArrowRight: { dx: step },
+                    ArrowUp: { dy: -step },
+                    ArrowDown: { dy: step },
+                  };
+                  const move = moves[e.key];
+                  if (!move) return;
+                  e.preventDefault();
+                  nudge(move.dx ?? 0, move.dy ?? 0);
+                }}
+                className="grid w-[92px] grid-cols-3 gap-1 rounded outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <span />
+                <button type="button" aria-label="Move up" onClick={() => nudge(0, -1)} className={NUDGE_BTN}>
+                  ↑
+                </button>
+                <span />
+                <button type="button" aria-label="Move left" onClick={() => nudge(-1, 0)} className={NUDGE_BTN}>
+                  ←
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={fine}
+                  onClick={() => setFine((v) => !v)}
+                  className={`h-7 rounded border text-[10px] transition ${
+                    fine ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  fine
+                </button>
+                <button type="button" aria-label="Move right" onClick={() => nudge(1, 0)} className={NUDGE_BTN}>
+                  →
+                </button>
+                <span />
+                <button type="button" aria-label="Move down" onClick={() => nudge(0, 1)} className={NUDGE_BTN}>
+                  ↓
+                </button>
+                <span />
+              </div>
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition hover:bg-muted"
               onClick={() => setLondonPlacedArt(panel.id, { dx: 0, dy: 0, rotate: 0 })}
             >
               Centre it
+            </button>
+            <button
+              type="button"
+              className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition hover:bg-muted"
+              onClick={() => setLondonPlacedArt(panel.id, { rotate: 0 })}
+            >
+              Straighten
             </button>
             <button
               type="button"
