@@ -46,6 +46,7 @@ import {
   useLondonLogoPlacements,
 } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
+import { londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
 import { useLondonBoardSizes } from "@/lib/next-london-board-size";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
@@ -143,7 +144,9 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
   const ratio = panel.bleedW / panel.bleedH;
   // Vendor booths show the supplied artwork proof directly: a data-URL SVG in an
   // <img> cannot load the linked artwork.
-  const boothArt = londonBoothArtworkUrl(panel.id);
+  // A hand-finished live file supplied by the design team wins over anything we
+  // would generate for the ground.
+  const boothArt = londonSuppliedMaster(panel)?.previewUrl ?? londonBoothArtworkUrl(panel.id);
   return (
     <div
       className="relative w-full overflow-hidden rounded-lg border border-black/10 bg-[#E0E8F5]"
@@ -223,6 +226,11 @@ function PanelCard({
           {booth ? (
             <span className="ml-1.5 inline-flex align-middle rounded bg-[#A1FBF9]/55 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
               Booth
+            </span>
+          ) : null}
+          {londonSuppliedMaster(panel) ? (
+            <span className="ml-1.5 inline-flex align-middle rounded bg-[#A6FA87]/60 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+              Supplied master
             </span>
           ) : null}
           {draft ? (
@@ -1038,13 +1046,23 @@ function LondonSignagePage() {
                   <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">
                     Vector
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => void downloadVector(openPanel, "ai")}
-                    className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
-                  >
-                    <FileDown className="h-3.5 w-3.5" /> AI
-                  </button>
+                  {londonSuppliedMaster(openPanel) ? (
+                    <a
+                      href={londonSuppliedMaster(openPanel)!.aiUrl}
+                      download={londonSuppliedMaster(openPanel)!.filename}
+                      className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                    >
+                      <FileDown className="h-3.5 w-3.5" /> AI · supplied master
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => void downloadVector(openPanel, "ai")}
+                      className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                    >
+                      <FileDown className="h-3.5 w-3.5" /> AI
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => void downloadVector(openPanel, "svg")}
@@ -1056,6 +1074,17 @@ function LondonSignagePage() {
                     live gradients — print these
                   </em>
                 </div>
+
+                {londonSuppliedMaster(openPanel) ? (
+                  <p className="mt-3 rounded-lg border border-[#A6FA87]/60 bg-[#A6FA87]/15 p-3 text-[12.5px] leading-relaxed text-[#03002C]">
+                    {londonSuppliedMaster(openPanel)!.note} Handed back{" "}
+                    {londonSuppliedMaster(openPanel)!.issued} from r
+                    {String(londonSuppliedMaster(openPanel)!.fromRevision).padStart(3, "0")}, so the
+                    AI download serves that exact file — not a regenerated ground. The SVG and PNG
+                    buttons still render the app ground for reference.
+                  </p>
+                ) : null}
+
 
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">
