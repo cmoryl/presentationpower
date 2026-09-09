@@ -22,6 +22,15 @@ export interface SceneArtworkPlateProps {
   children: ReactNode;
   /** Ref on the face element, for callers that measure it. */
   faceRef?: Ref<HTMLDivElement>;
+  /**
+   * The full measured placement area. When the print's true trim ratio does
+   * not use all of it, the leftover fixture is dressed with `substrate` so the
+   * print reads as mounted on a banner or panel rather than floating in a
+   * blank block.
+   */
+  face?: { x: number; y: number; w: number; h: number };
+  /** A stretched, defocused copy of the artwork used to dress the fixture. */
+  substrate?: ReactNode;
 }
 
 function pct(n: number): string {
