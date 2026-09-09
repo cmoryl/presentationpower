@@ -212,23 +212,82 @@ export function AgendaSheet({ config, pxPerMm = 0.8, guides = false, className, 
       />
 
       {qr && blocks.qr ? (
-        <div style={{ ...at(blocks.qr.x, blocks.qr.y) }}>
+        <div
+          style={{
+            ...at(blocks.qr.x, blocks.qr.y),
+            cursor: onPlaceQr ? "grab" : undefined,
+            touchAction: onPlaceQr ? "none" : undefined,
+          }}
+          data-export-ignore={undefined}
+          onPointerDown={
+            onPlaceQr
+              ? (event) => {
+                  event.preventDefault();
+                  const startX = event.clientX;
+                  const startY = event.clientY;
+                  const fromX = blocks.qr!.x;
+                  const fromY = blocks.qr!.y;
+                  const move = (e: PointerEvent) => {
+                    onPlaceQr(
+                      fromX + (e.clientX - startX) / pxPerMm,
+                      fromY + (e.clientY - startY) / pxPerMm,
+                    );
+                  };
+                  const up = () => {
+                    window.removeEventListener("pointermove", move);
+                    window.removeEventListener("pointerup", up);
+                  };
+                  window.addEventListener("pointermove", move);
+                  window.addEventListener("pointerup", up);
+                }
+              : undefined
+          }
+        >
           <svg
             width={mm(blocks.qr.edge)}
             height={mm(blocks.qr.edge)}
             viewBox={`0 0 ${qr.size} ${qr.size}`}
+            shapeRendering={qrStyle === "block" ? "crispEdges" : undefined}
             aria-hidden
           >
-            <rect x={0} y={0} width={qr.size} height={qr.size} fill="#FFFFFF" />
-            <path d={qr.path} fill="#03002C" />
+            {qrClear ? null : (
+              <rect x={0} y={0} width={qr.size} height={qr.size} fill={qrPlate} />
+            )}
+            {qrStyle === "block" ? (
+              <path d={qr.path} fill={qrInk} />
+            ) : (
+              qr.modules.map((on, i) =>
+                on ? (
+                  qrStyle === "dot" ? (
+                    <circle
+                      key={i}
+                      cx={(i % qr.size) + 0.5}
+                      cy={Math.floor(i / qr.size) + 0.5}
+                      r={0.5}
+                      fill={qrInk}
+                    />
+                  ) : (
+                    <rect
+                      key={i}
+                      x={(i % qr.size) + 0.06}
+                      y={Math.floor(i / qr.size) + 0.06}
+                      width={0.88}
+                      height={0.88}
+                      rx={0.26}
+                      fill={qrInk}
+                    />
+                  )
+                ) : null,
+              )
+            )}
           </svg>
           {config.qrCaption.trim() ? (
             <div
               style={{
                 width: mm(blocks.qr.edge),
-                textAlign: "center",
-                marginTop: mm(L.footSize * 0.7),
-                fontSize: mm(L.footSize),
+                textAlign: blocks.qr.capAlign,
+                marginTop: mm(blocks.qr.capSize * 0.7),
+                fontSize: mm(blocks.qr.capSize),
                 fontWeight: 700,
                 letterSpacing: "0.16em",
               }}
