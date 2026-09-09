@@ -225,6 +225,11 @@ function PanelCard({
               Booth
             </span>
           ) : null}
+          {draft ? (
+            <span className="ml-1.5 inline-flex align-middle rounded bg-[#FFEB66]/70 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+              Unpublished edit
+            </span>
+          ) : null}
         </p>
         {londonVenueItemMeta(panel) ? (
           <p className="mt-1 text-[12px] font-medium leading-snug text-[#03002C]/75">
