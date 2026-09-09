@@ -455,6 +455,15 @@ export function StepRepeatWallPanel({ panel }: StepRepeatWallPanelProps) {
               "Lockup",
               `${plan.orientation === "side" ? "side by side" : "stacked"} · ${plan.colourway}`,
             ],
+            [
+              "Pool",
+              plan.arts.length > 1
+                ? `${plan.arts.length} division lockups`
+                : nextLogoFamily(config.familyId).label,
+            ],
+            ...(isMixed
+              ? ([["Mix", STEP_REPEAT_MIX_LABELS[config.mix]]] as [string, string][])
+              : []),
           ].map(([label, value]) => (
             <div
               key={label}
