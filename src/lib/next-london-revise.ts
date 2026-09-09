@@ -1301,7 +1301,7 @@ function stepRepeatPdfOps(
   const rad = (plan.config.rotationDeg * Math.PI) / 180;
   const cos = Math.cos(rad);
   const sin = Math.sin(rad);
-  const logoScale = (plan.config.tileWidthMm * MM_TO_PT) / Math.max(1, plan.art.w);
+  const markPt = plan.config.tileWidthMm * MM_TO_PT;
   const alpha = plan.config.opacity < 1 ? `/GsWall gs ` : "";
 
   const spin = (cxMm: number, cyMm: number): string => {
