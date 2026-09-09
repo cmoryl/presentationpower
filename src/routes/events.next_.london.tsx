@@ -46,6 +46,7 @@ import {
   useLondonLogoPlacements,
 } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
+import { londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
 import { useLondonBoardSizes } from "@/lib/next-london-board-size";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
