@@ -729,5 +729,22 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
     template: "Master NEXT pillar sheet",
     dimsSource: "template",
     note: "Master NEXT directional pillar — MAIN STAGE.",
+  },,
+  // Alternate exterior flag artwork — appended (not inserted) so every existing
+  // item keeps its published id. Same trim/bleed as the issued flag, different
+  // ground, so the team can approve one of two versions in the Exterior area.
+  {
+    floor: "EXT",
+    room: "EXTERIOR",
+    name: "EXTERIOR FLAG (VERSION B) - 1500x4000mm",
+    ground: "Dawn column",
+    style: "09-dawn",
+    trimW: 1500,
+    trimH: 4000,
+    bleedEdge: 25,
+    template: "Exterior/Exterior Flags/QEII 1500 x 4000 FLAG 020316.pdf",
+    dimsSource: "list",
+    qty: 8,
+    note: "Alternate version of the exterior flag: same size and template, softer dawn ground. TransPerfect & TransPerfect NEXT alternating.",
   },
 ];
