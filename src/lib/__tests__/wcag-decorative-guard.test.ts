@@ -144,6 +144,18 @@ describe("wcag auto-fix never repaints decorative type", () => {
 
     expect(touched(find(root, "#ghost"))).toBe(false);
   });
+
+  it("corrects foreground ink without adding a blurred text halo", () => {
+    const root = mount(
+      `<span id="value" style="color: ${FAILING_INK}; font-size: 20px;">Readable value</span>`,
+    );
+
+    applyAutoFix(root);
+
+    const value = find(root, "#value");
+    expect(value.style.textShadow).toBe("");
+    expect(value.dataset.wcagShadow).toBeUndefined();
+  });
 });
 
 // Source-level guard: the runtime skip only works if the ghost counterform in

@@ -37,7 +37,6 @@ export function HiddenAuditFrame({
         revertTypeFix(el);
         auditAndFixTypography(el);
         applyAutoFix(el);
-        applyAutoFix(el);
         if (cancelled) return;
         onReport(audit(el));
       } catch {
