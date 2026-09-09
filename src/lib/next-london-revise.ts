@@ -88,6 +88,7 @@ import {
 } from "@/lib/next-london-board-size";
 import {
   londonLogoPlacement,
+  londonTintShape,
   type LondonLogoPlacement,
   type LondonLogoPlacementMap,
 } from "@/lib/next-london-logo-placement";
@@ -484,9 +485,11 @@ export function londonPanelStops(panel: LondonPanel, tintId?: string | null): st
   // end of the ramp; master-brand items are returned unchanged.
   // Doors take the stronger soft-focus accent weight; scenic panels keep the
   // restrained tint so the venue still reads as one pack.
+  const placement = londonLogoPlacement(panel.id);
   return londonTintedStops(londonPanelFamily(panel), base, {
-    tintId: tintId ?? londonLogoPlacement(panel.id).accentTint,
+    tintId: tintId ?? placement.accentTint,
     door: isLondonDoorItem(panel.room, panel.name),
+    shape: londonTintShape(placement),
   });
 }
 
