@@ -350,6 +350,14 @@ function LondonSignagePage() {
 
   const target = openPanel ? rasterSizeFor(openPanel, ppi) : null;
 
+  // Unpublished edits made in this browser (live editor / template studio).
+  // Subscribing here means saving artwork repaints the hub cards immediately.
+  const localPlacements = useLondonLogoPlacements();
+  const localPlacedArt = useLondonPlacedArt();
+  const localBoardSizes = useLondonBoardSizes();
+
+
+
   /** Builder options for a panel, taken from the revision in force. */
   const artOptions = (panel: LondonPanel) => londonOverrideOptions(panel.id, headOverrides);
   const fileBase = (panel: LondonPanel) => londonPanelFileBase(panel, headRev);
