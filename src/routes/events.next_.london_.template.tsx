@@ -41,6 +41,8 @@ import { londonBrandingPlan } from "@/lib/next-london-branding";
 import { LondonPrintGuides, LondonPrintReadout } from "@/components/london/LondonPrintPreview";
 import { LONDON_DIVISION_COLOURWAYS, londonDivisionAccent } from "@/lib/next-london-division";
 import { LondonAccentTintPicker } from "@/components/events/LondonAccentTintPicker";
+import { LondonPlacedArtPanel } from "@/components/events/LondonPlacedArtPanel";
+import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
   nextLogoColourways,
@@ -195,8 +197,10 @@ function LondonTemplatePage() {
   );
   const boardOverridden = !!boardSizes[panel.id];
   const placement = placements[panel.id] ?? DEFAULT_LOGO_PLACEMENT;
+  const placedArtMap = useLondonPlacedArt();
+  const placedArt = placedArtMap[panel.id] ?? null;
   const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
-  const art = useMemo(() => ({ colorSpace, vibrance }), [colorSpace, vibrance]);
+  const art = useMemo(() => ({ colorSpace, vibrance, placedArt }), [colorSpace, vibrance, placedArt]);
   // Preview paints the chosen space, so a CMYK master is soft-proofed on screen.
   const faceReady = useLondonSignageFace();
   const svg = useMemo(
@@ -474,6 +478,8 @@ function LondonTemplatePage() {
               accentTint={placement.accentTint}
               className="mt-4"
             />
+
+            <LondonPlacedArtPanel panel={panel} art={placedArt} className="mt-4" />
 
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground">Logo colourway</span>

@@ -34,6 +34,7 @@ import { useSessionUser } from "@/hooks/use-session-user";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { LondonPanelThumb } from "@/components/events/LondonPanelThumb";
 import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor";
+import { londonPlacedArtMap } from "@/lib/next-london-placed-art";
 import { londonBoardSizes } from "@/lib/next-london-board-size";
 import { londonLogoPlacements } from "@/lib/next-london-logo-placement";
 import { stepRepeatConfigs } from "@/lib/next-london-step-repeat";
@@ -564,6 +565,7 @@ function LondonRevisePage() {
             placements: londonLogoPlacements(),
             boardSizes: londonBoardSizes(),
             stepRepeat: stepRepeatConfigs(),
+            placedArt: londonPlacedArtMap(),
           } satisfies LondonOverrides as unknown as Record<string, unknown>,
           restoredFrom,
         },
