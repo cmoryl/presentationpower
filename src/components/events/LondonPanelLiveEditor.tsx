@@ -55,6 +55,7 @@ import {
   type LondonPanel,
 } from "@/lib/next-london-signage";
 import { LONDON_DIVISION_COLOURWAYS, londonDivisionAccent } from "@/lib/next-london-division";
+import { LondonAccentTintPicker } from "@/components/events/LondonAccentTintPicker";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
   nextLogoColourways,
@@ -833,6 +834,12 @@ export function LondonPanelLiveEditor({
               </button>
             ))}
           </div>
+          <LondonAccentTintPicker
+            panel={panel}
+            familyId={plan.familyId}
+            accentTint={placement.accentTint}
+            className="mt-3"
+          />
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <label className="flex items-center gap-2 text-xs text-muted-foreground">
               Logo scale

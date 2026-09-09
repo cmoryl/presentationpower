@@ -204,13 +204,98 @@ export function londonDivisionStops(
   familyId: string,
   stops: string[],
   weight: number = LONDON_DIVISION_ACCENT_WEIGHT,
+  curve = 1.4,
 ): string[] {
   const accent = londonDivisionAccent(familyId);
   if (!accent || stops.length < 2) return stops;
   const target = mix(accent.hex, "#FFFFFF", ACCENT_SOFTEN);
   const last = stops.length - 1;
   return stops.map((stop, i) => {
-    const t = (i / last) ** 1.4 * weight;
+    const t = (i / last) ** curve * weight;
     return i === 0 ? stop : ensureAccentSeparation(mix(stop, target, t), accent.hex);
   });
+}
+
+// ---------------------------------------------------------------------------
+// DIVISION GRADIENT OPTIONS
+//
+// One fixed tint weight was too blunt: a Life Sciences door and a GlobalLink
+// stage wing want the same accent read at different strengths. These presets
+// are the approved set of division gradient options — every one of them keeps
+// the dark head of the ramp untouched (that is what holds the white lockup at
+// full contrast) and only varies HOW MUCH accent reaches the light end and HOW
+// LATE in the ramp it arrives. Nothing here can turn a panel into a field of
+// division colour.
+// ---------------------------------------------------------------------------
+
+export type LondonAccentTint = {
+  id: string;
+  label: string;
+  note: string;
+  /** Peak accent weight at the light end. */
+  weight: number;
+  /** Ramp curve: higher keeps the accent later in the ramp. */
+  curve: number;
+};
+
+export const LONDON_ACCENT_TINTS: LondonAccentTint[] = [
+  {
+    id: "house",
+    label: "House tint",
+    note: "The pack default: a restrained accent through the light half of the ramp.",
+    weight: LONDON_DIVISION_ACCENT_WEIGHT,
+    curve: 1.4,
+  },
+  {
+    id: "whisper",
+    label: "Whisper",
+    note: "Barely there — for scenic runs that must read as master brand first.",
+    weight: 0.12,
+    curve: 1.8,
+  },
+  {
+    id: "tip",
+    label: "Accent tip",
+    note: "Accent held back to the very lightest stop, so it reads as a single edge of division colour.",
+    weight: 0.3,
+    curve: 3,
+  },
+  {
+    id: "bloom",
+    label: "Soft focus",
+    note: "The door strength: an obvious accent bloom behind the mark, dark head still untouched.",
+    weight: LONDON_DOOR_ACCENT_WEIGHT,
+    curve: 1.15,
+  },
+];
+
+/** A gradient option by id, or null when the id is not approved. */
+export function londonAccentTint(id: string | null | undefined): LondonAccentTint | null {
+  if (!id) return null;
+  return LONDON_ACCENT_TINTS.find((t) => t.id === id) ?? null;
+}
+
+/**
+ * The gradient option in force for a panel: the designer's choice when they
+ * made one, otherwise the house default (soft focus on doors, house tint
+ * everywhere else) — so an untouched panel renders exactly as before.
+ */
+export function londonEffectiveTint(opts: {
+  tintId?: string | null;
+  door?: boolean;
+}): LondonAccentTint {
+  const chosen = londonAccentTint(opts.tintId);
+  if (chosen) return chosen;
+  const fallback = opts.door ? "bloom" : "house";
+  return londonAccentTint(fallback)!;
+}
+
+/** Division-tinted ramp for a panel, honouring the chosen gradient option. */
+export function londonTintedStops(
+  familyId: string,
+  stops: string[],
+  opts: { tintId?: string | null; door?: boolean } = {},
+): string[] {
+  const tint = londonEffectiveTint(opts);
+  return londonDivisionStops(familyId, stops, tint.weight, tint.curve);
 }
