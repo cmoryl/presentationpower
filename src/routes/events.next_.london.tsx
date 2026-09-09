@@ -722,7 +722,7 @@ function LondonSignagePage() {
             </p>
           ) : null}
 
-          {boothPanels.length > 0 ? (
+          {boothsOnly && boothPanels.length > 0 ? (
             <div className="mt-10">
               <div className="flex flex-wrap items-baseline gap-3 border-b border-black/10 pb-2">
                 <h3 className="text-xl font-semibold tracking-tight text-[#03002C]">
