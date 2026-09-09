@@ -23,7 +23,7 @@ import {
   londonLogoPlacement,
   londonTintShape,
   setLondonLogoPlacement,
-  useLondonLogoPlacement,
+  useLondonLogoPlacements,
 } from "@/lib/next-london-logo-placement";
 
 type Knob = {
@@ -47,7 +47,8 @@ export function LondonAccentTintPicker({
   accentTint: string | null;
   className?: string;
 }) {
-  const placement = useLondonLogoPlacement(panel.id);
+  const placements = useLondonLogoPlacements();
+  const placement = placements[panel.id] ?? londonLogoPlacement(panel.id);
   const [open, setOpen] = useState(false);
   const accent = londonDivisionAccent(familyId);
   if (!accent) return null;
