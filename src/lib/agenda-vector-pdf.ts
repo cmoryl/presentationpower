@@ -560,13 +560,43 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       const left = px(blocks.qr.x);
       const bottom = py(blocks.qr.y) - edge;
       beginLayer(page, layer("06 QR code"));
-      page.drawRectangle({ x: left, y: bottom, width: edge, height: edge, color: rgb(1, 1, 1) });
-      const dark = hexRgb("#03002C");
+      // The press file uses exactly the ink, plate and module shape the editor
+      // previewed — a code that prints differently to the proof is a reprint.
+      const style = agendaQrStyle(cfg);
+      if (!agendaQrTransparent(cfg)) {
+        page.drawRectangle({
+          x: left,
+          y: bottom,
+          width: edge,
+          height: edge,
+          color: hexRgb(agendaQrBackground(cfg)),
+        });
+      }
+      const dark = hexRgb(agendaQrForeground(cfg));
       for (let r = 0; r < qr.size; r += 1) {
         for (let c = 0; c < qr.size; c += 1) {
           if (!qr.modules[r * qr.size + c]) continue;
           const x = left + c * unit;
           const y = bottom + edge - (r + 1) * unit;
+          if (style === "dot") {
+            page.drawCircle({
+              x: x + unit / 2,
+              y: y + unit / 2,
+              size: unit / 2,
+              color: dark,
+            });
+            continue;
+          }
+          if (style === "rounded") {
+            page.drawRectangle({
+              x: x + unit * 0.06,
+              y: y + unit * 0.06,
+              width: unit * 0.88,
+              height: unit * 0.88,
+              color: dark,
+            });
+            continue;
+          }
           polygon(
             page,
             [
@@ -580,12 +610,18 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
         }
       }
       if ((cfg.qrCaption ?? "").trim()) {
-        const size = mm(L.footSize);
+        const size = mm(blocks.qr.capSize);
         const label = cfg.qrCaption.toUpperCase();
         const spacing = size * 0.16;
         const width = trackedWidth(bold, label, size, spacing);
+        const capX =
+          blocks.qr.capAlign === "left"
+            ? left
+            : blocks.qr.capAlign === "right"
+              ? left + edge - width
+              : left + edge / 2 - width / 2;
         drawTracked(page, label, {
-          x: left + edge / 2 - width / 2,
+          x: capX,
           y: py(blocks.qr.capY) - size,
           size,
           font: bold,
