@@ -228,6 +228,11 @@ function PanelCard({
               Booth
             </span>
           ) : null}
+          {londonSuppliedMaster(panel) ? (
+            <span className="ml-1.5 inline-flex align-middle rounded bg-[#A6FA87]/60 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+              Supplied master
+            </span>
+          ) : null}
           {draft ? (
             <span className="ml-1.5 inline-flex align-middle rounded bg-[#FFEB66]/70 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
               Unpublished edit
