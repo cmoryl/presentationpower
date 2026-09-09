@@ -22,6 +22,7 @@
 // from its own snapshot, and restoring an old revision publishes it forward as
 // a new revision rather than rewriting the past.
 
+import { londonSuppliedGroundUrl } from "@/lib/next-london-supplied-masters";
 import {
   LONDON_PANELS,
   LONDON_STYLES,
@@ -657,7 +658,7 @@ export function buildLondonPanelSvg(
 
   // Supplied vendor booth artwork, when the vendor has delivered their file:
   // it becomes the ground so previews and masters match the real booth.
-  const boothArt = londonBoothArtworkUrl(panel.id);
+  const boothArt = londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id);
 
   // Designer-uploaded vector artwork: its own layer, live paths.
   const placed = options.placedArt === undefined ? londonPlacedArt(panel.id) : options.placedArt;

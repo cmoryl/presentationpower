@@ -84,3 +84,13 @@ export function londonSuppliedMaster(
   const id = typeof panel === "string" ? panel : panel.id;
   return BY_PANEL.get(id) ?? null;
 }
+
+/**
+ * Proof of the supplied live file, painted as the panel ground so previews,
+ * the live editor and the venue renders all show the finished artwork rather
+ * than a regenerated gradient. Logos, headlines, codes and uploaded artwork
+ * still layer on top and stay editable.
+ */
+export function londonSuppliedGroundUrl(panelId: string): string | null {
+  return BY_PANEL.get(panelId)?.previewUrl ?? null;
+}

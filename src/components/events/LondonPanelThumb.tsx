@@ -5,6 +5,7 @@
 // until the row scrolls into view — the full kit is 105 panels and each master
 // embeds the EPS lockup geometry.
 
+import { londonSuppliedGroundUrl } from "@/lib/next-london-supplied-masters";
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -62,10 +63,9 @@ export function LondonPanelThumb({ panel, size = 72, className, onOpen }: London
   // Vendor booth panels show the supplied artwork proof itself: an <img> with a
   // data-URL SVG cannot load external references, so the CDN proof is painted
   // directly rather than through the generated master.
-  const boothArt = londonBoothArtworkUrl(panel.id);
+  const boothArt = londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id);
 
   const src = useMemo(() => {
-    if (boothArt) return boothArt;
     if (!visible || !faceReady) return null;
     try {
       return toDataUrl(buildLondonPanelSvg(panel));
@@ -75,17 +75,36 @@ export function LondonPanelThumb({ panel, size = 72, className, onOpen }: London
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, faceReady, key, boothArt]);
 
-  const art = src ? (
-    <img
-      src={src}
-      alt={`Artwork preview for ${panel.name}`}
-      width={w}
-      height={h}
-      loading="lazy"
-      decoding="async"
-      className="h-full w-full object-contain"
-    />
-  ) : null;
+  // Supplied artwork is painted underneath: a data-URL SVG cannot load the CDN
+  // proof itself, so the live layers (lockup, headline, code, uploads) ride on
+  // top of the real finished file.
+  const art =
+    src || boothArt ? (
+      <span className="relative block h-full w-full">
+        {boothArt ? (
+          <img
+            src={boothArt}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-contain"
+          />
+        ) : null}
+        {src ? (
+          <img
+            src={src}
+            alt={`Artwork preview for ${panel.name}`}
+            width={w}
+            height={h}
+            loading="lazy"
+            decoding="async"
+            className="relative h-full w-full object-contain"
+          />
+        ) : null}
+      </span>
+    ) : null;
+
 
   const box = `overflow-hidden rounded-md border border-black/10 bg-[#03002C] ${className ?? ""}`;
 

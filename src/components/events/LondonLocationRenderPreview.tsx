@@ -6,6 +6,7 @@
 // on screen. The plates are photoreal visualisations of the kind of space
 // each item hangs in, not photographs of the QEII Centre.
 
+import { londonSuppliedGroundUrl } from "@/lib/next-london-supplied-masters";
 import { Download, ImageIcon, Maximize2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -106,7 +107,7 @@ export function LondonLocationRenderPreview({ panel }: LondonLocationRenderPrevi
 
   const scene = scenes.find((s) => s.id === sceneId) ?? scenes[0]!;
 
-  const boothArt = londonBoothArtworkUrl(panel.id);
+  const boothArt = londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id);
   const artKey = `${panel.id}|${panel.style}|${panel.trimW}|${panel.trimH}|${panel.name}|${panel.ground}`;
   const art = useMemo(() => {
     if (boothArt) return boothArt;
