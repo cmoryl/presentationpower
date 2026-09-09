@@ -52,6 +52,12 @@ export type LondonPlacedArt = {
   opacity: number;
   /** Above the generated lockup, or under it. */
   onTop: boolean;
+  /**
+   * Ink swaps: source fill (upper-case hex) → replacement hex. Recolouring is a
+   * paint change only; the uploaded geometry is untouched, so the master stays
+   * the file that was supplied.
+   */
+  recolour?: Record<string, string>;
 };
 
 export const PLACED_ART_SIZE = { min: 0.02, max: 1.2, step: 0.005 } as const;
