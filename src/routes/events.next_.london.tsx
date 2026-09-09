@@ -1046,13 +1046,23 @@ function LondonSignagePage() {
                   <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">
                     Vector
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => void downloadVector(openPanel, "ai")}
-                    className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
-                  >
-                    <FileDown className="h-3.5 w-3.5" /> AI
-                  </button>
+                  {londonSuppliedMaster(openPanel) ? (
+                    <a
+                      href={londonSuppliedMaster(openPanel)!.aiUrl}
+                      download={londonSuppliedMaster(openPanel)!.filename}
+                      className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                    >
+                      <FileDown className="h-3.5 w-3.5" /> AI · supplied master
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => void downloadVector(openPanel, "ai")}
+                      className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                    >
+                      <FileDown className="h-3.5 w-3.5" /> AI
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => void downloadVector(openPanel, "svg")}
@@ -1064,6 +1074,17 @@ function LondonSignagePage() {
                     live gradients — print these
                   </em>
                 </div>
+
+                {londonSuppliedMaster(openPanel) ? (
+                  <p className="mt-3 rounded-lg border border-[#A6FA87]/60 bg-[#A6FA87]/15 p-3 text-[12.5px] leading-relaxed text-[#03002C]">
+                    {londonSuppliedMaster(openPanel)!.note} Handed back{" "}
+                    {londonSuppliedMaster(openPanel)!.issued} from r
+                    {String(londonSuppliedMaster(openPanel)!.fromRevision).padStart(3, "0")}, so the
+                    AI download serves that exact file — not a regenerated ground. The SVG and PNG
+                    buttons still render the app ground for reference.
+                  </p>
+                ) : null}
+
 
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">
