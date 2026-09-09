@@ -380,7 +380,29 @@ function shapeToPath(el: Element): string | null {
       const w = num(el, "width");
       const h = num(el, "height");
       if (!(w > 0) || !(h > 0)) return null;
-      return `M ${x} ${y} H ${x + w} V ${y + h} H ${x} Z`;
+      // Rounded corners are part of the artwork: dropping rx/ry printed a
+      // sharp-cornered box where the designer drew a soft one.
+      const rxAttr = el.getAttribute("rx");
+      const ryAttr = el.getAttribute("ry");
+      let rx = rxAttr !== null ? num(el, "rx") : ryAttr !== null ? num(el, "ry") : 0;
+      let ry = ryAttr !== null ? num(el, "ry") : rx;
+      rx = Math.min(Math.max(rx, 0), w / 2);
+      ry = Math.min(Math.max(ry, 0), h / 2);
+      if (!(rx > 0) || !(ry > 0)) return `M ${x} ${y} H ${x + w} V ${y + h} H ${x} Z`;
+      const k = 0.5522847498;
+      const cx = rx * k;
+      const cy = ry * k;
+      return (
+        `M ${x + rx} ${y} ` +
+        `L ${x + w - rx} ${y} ` +
+        `C ${x + w - rx + cx} ${y} ${x + w} ${y + ry - cy} ${x + w} ${y + ry} ` +
+        `L ${x + w} ${y + h - ry} ` +
+        `C ${x + w} ${y + h - ry + cy} ${x + w - rx + cx} ${y + h} ${x + w - rx} ${y + h} ` +
+        `L ${x + rx} ${y + h} ` +
+        `C ${x + rx - cx} ${y + h} ${x} ${y + h - ry + cy} ${x} ${y + h - ry} ` +
+        `L ${x} ${y + ry} ` +
+        `C ${x} ${y + ry - cy} ${x + rx - cx} ${y} ${x + rx} ${y} Z`
+      );
     }
     case "circle": {
       const r = num(el, "r");
@@ -464,8 +486,7 @@ function lengthPx(value: string | null): number | null {
  * printed as straight lines.
  */
 export function normalisePathData(d: string): { d: string; arcs: boolean } {
-  if (/[Aa]/.test(d)) return { d: "", arcs: true };
-  if (!/[QqTt]/.test(d)) return { d, arcs: false };
+  if (!/[QqTtAa]/.test(d)) return { d, arcs: false };
   const tokens = d.match(/[MmLlHhVvCcSsQqTtZz]|-?\d*\.?\d+(?:e[-+]?\d+)?/gi) ?? [];
   const out: string[] = [];
   let cmd = "";
