@@ -6,6 +6,7 @@
 // visible, plus the physical numbers — pixel pitch in mm, worst flat-tone run,
 // file weight, and whether the 6000 px ceiling clipped the tier.
 
+import { useLondonLivePanel } from "@/hooks/use-london-live-panel";
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Download, Loader2, ZoomIn } from "lucide-react";
@@ -48,7 +49,7 @@ function download(blob: Blob, name: string) {
 }
 
 export function LondonPpiPreview({
-  panel,
+  panel: input,
   svg,
   className,
 }: {
@@ -58,10 +59,15 @@ export function LondonPpiPreview({
   className?: string;
 }) {
   const faceReady = useLondonSignageFace();
+  // Unpublished edits count here too: the tier preview must measure the sign as
+  // it now stands.
+  const live = useLondonLivePanel(input);
+  const panel = live.panel;
   // Copy is outlined, so nothing is built until the signage face is in memory.
   const artwork = useMemo(
-    () => svg ?? (faceReady ? buildLondonPanelSvg(panel) : ""),
-    [svg, panel, faceReady],
+    () => svg ?? (faceReady ? buildLondonPanelSvg(panel, live.options) : ""),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [svg, panel, faceReady, live.signature],
   );
   const tiers = useMemo(() => londonTiers(panel), [panel]);
   const [ppi, setPpi] = useState<number>(panel.rasterPpi);

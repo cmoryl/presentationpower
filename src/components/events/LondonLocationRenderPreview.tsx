@@ -10,6 +10,7 @@ import { londonSuppliedGroundUrl } from "@/lib/next-london-supplied-masters";
 import { Download, ImageIcon, Maximize2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { useLondonLivePanel } from "@/hooks/use-london-live-panel";
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { buildLondonPanelSvg } from "@/lib/next-london-revise";
 import {
@@ -92,8 +93,11 @@ function Stage({
   );
 }
 
-export function LondonLocationRenderPreview({ panel }: LondonLocationRenderPreviewProps) {
+export function LondonLocationRenderPreview({ panel: input }: LondonLocationRenderPreviewProps) {
   const faceReady = useLondonSignageFace();
+  // The in-situ view shows the sign as edited here, not the last published file.
+  const live = useLondonLivePanel(input);
+  const panel = live.panel;
   const scenes = useMemo(() => scenesForPanel(panel), [panel]);
   const [sceneId, setSceneId] = useState(scenes[0]!.id);
   const [open, setOpen] = useState(false);
@@ -108,12 +112,12 @@ export function LondonLocationRenderPreview({ panel }: LondonLocationRenderPrevi
   const scene = scenes.find((s) => s.id === sceneId) ?? scenes[0]!;
 
   const boothArt = londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id);
-  const artKey = `${panel.id}|${panel.style}|${panel.trimW}|${panel.trimH}|${panel.name}|${panel.ground}`;
+  const artKey = `${panel.trimW}|${panel.trimH}|${live.signature}`;
   const art = useMemo(() => {
     if (boothArt) return boothArt;
     if (!faceReady) return null;
     try {
-      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(buildLondonPanelSvg(panel))}`;
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(buildLondonPanelSvg(panel, live.options))}`;
     } catch {
       return null;
     }
