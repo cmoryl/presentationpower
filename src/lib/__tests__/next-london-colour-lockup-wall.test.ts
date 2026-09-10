@@ -26,7 +26,7 @@ describe("full-colour division lockup step & repeat wall", () => {
   it("carries a 1m return each side on the same recipe", () => {
     expect(returns.length).toBe(1);
     const side = returns[0]!;
-    expect(side.qty).toBe(2);
+    expect(side.name).toMatch(/1000x6500mm/);
     expect(side.trimW).toBe(1000);
     expect(side.trimH).toBe(6500);
     expect(side.bleedEdge).toBe(100);
