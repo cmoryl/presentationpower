@@ -132,7 +132,7 @@ export function LondonAutoPublish({ panels, removedIds = [] }: LondonAutoPublish
 
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- store hooks are the change signal
-  }, [userId, placements, boards, placedArt, stepRepeat, publishedOverrides, publish]);
+  }, [userId, placements, boards, placedArt, stepRepeat, publishedOverrides, removalKey, publish]);
 
   return null;
 }
