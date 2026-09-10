@@ -168,7 +168,7 @@ export function createLondonVariation(panel: LondonPanel): LondonVariation | nul
   if (size) setLondonBoardSize({ ...panel, id }, size);
   // A step-and-repeat wall's recipe is part of how it looks, so the copy keeps it.
   const repeat = stepRepeatConfigs()[panel.id];
-  if (repeat) setStepRepeatConfig({ ...panel, id }, repeat);
+  if (repeat) setStepRepeatConfig(id, repeat);
 
   emit();
   return variation;
