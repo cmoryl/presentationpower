@@ -5,7 +5,7 @@ import { floorMapSvg } from "@/lib/next-london-floormap-svg";
 import { LONDON_PANELS } from "@/lib/next-london-signage";
 import { londonFloorPlan } from "@/lib/next-london-floorplan";
 
-const plan = londonFloorPlan("GF");
+const plan = londonFloorPlan("GF")!;
 const draw = (arch: boolean, over = {}) =>
   floorMapSvg("GF", {
     panels: LONDON_PANELS,
