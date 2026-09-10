@@ -110,6 +110,8 @@ import {
   type LondonOverrides,
   isAddedPanel,
   londonAiBytes,
+  buildLondonPanelPrintPdfAsync,
+  LONDON_MARKS_MARGIN_MM,
   londonPanelSvgFor,
   resolveLondonArtwork,
   resolveLondonArtworkAsync,
@@ -549,11 +551,8 @@ function LondonSignagePage() {
       },
       async () => {
         await loadLondonSignageFace();
-        const pack = await packOrNull();
-        const opts = exportOptions(panel);
-        const ground = (await resolveLondonArtworkAsync(panel, pack, opts)) as unknown;
-        void ground;
-        const bytes = await buildLondonPanelPrintPdfAsync(panel, opts);
+        // The async builder resolves supplied vendor artwork itself.
+        const bytes = await buildLondonPanelPrintPdfAsync(panel, exportOptions(panel));
         gateOnQa(auditPrintPdf(panel, bytes, LONDON_MARKS_MARGIN_MM));
         download(new Blob([londonAiBytes(bytes)], { type: "application/pdf" }), `${fileBase(panel)}-print.pdf`);
       },
