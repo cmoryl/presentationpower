@@ -1249,7 +1249,7 @@ export function buildLondonPanelAi(
   // and the marks themselves are drawn in page space around it.
   const sheet = margin
     ? `q 1 0 0 1 ${f3(margin)} ${f3(margin)} cm\n${content}Q\n` +
-      londonPrintMarksOps(panel, margin, cmyk, vibrance)
+      londonPrintMarksOps(panel, margin, cmyk)
     : content;
 
   // The copy actually printed on this master, kept as searchable metadata now
@@ -1348,12 +1348,7 @@ export function buildLondonPanelAi(
  * Hairlines only — 100K in CMYK, pure black in RGB. No text, so the file stays
  * font-free exactly like the design master.
  */
-function londonPrintMarksOps(
-  panel: LondonPanel,
-  margin: number,
-  cmyk: boolean,
-  vibrance: number,
-): string {
+function londonPrintMarksOps(panel: LondonPanel, margin: number, cmyk: boolean): string {
   const w = panel.bleedW * MM_TO_PT;
   const h = panel.bleedH * MM_TO_PT;
   const pageW = w + margin * 2;
@@ -1368,7 +1363,7 @@ function londonPrintMarksOps(
   const len = LONDON_MARKS_LENGTH_MM * MM_TO_PT;
   const tick = len * 0.55;
   // 100K text/line rule: marks are always solid black, never a rich build.
-  const ink = cmyk ? `${cmykStrokeOp(londonCmykBuild("#000000", vibrance))}` : "0 G";
+  const ink = cmyk ? "0 0 0 1 K" : "0 G";
 
   const line = (x1: number, y1: number, x2: number, y2: number) =>
     `${f3(x1)} ${f3(y1)} m ${f3(x2)} ${f3(y2)} l S\n`;
