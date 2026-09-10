@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { LONDON_PANELS } from "@/lib/next-london-signage";
-import { buildLondonPanelSvg } from "@/lib/next-london-revise";
+import { buildLondonPanelAi, buildLondonPanelSvg } from "@/lib/next-london-revise";
+import { buildPillarQr } from "@/lib/pillar-qr";
 import {
   DEFAULT_STEP_REPEAT,
   dimText,
@@ -101,5 +102,47 @@ describe("step & repeat wall", () => {
   it("reports every dimension in millimetres and inches", () => {
     expect(dimText(254)).toBe("254 mm (10.00 in)");
     expect(sizeText(3000, 2400)).toBe("3000 × 2400 mm (118.11 × 94.49 in)");
+  });
+});
+
+describe("step & repeat QR export", () => {
+  const qrConfig = {
+    ...DEFAULT_STEP_REPEAT,
+    kind: "logo-qr" as const,
+    qrData: "https://presentationpower.lovable.app/events/next/london",
+  };
+
+  it("plans real QR tiles with the encoded matrix and its quiet zone", () => {
+    const plan = stepRepeatPlan(wall, qrConfig);
+    const code = buildPillarQr(qrConfig.qrData)!;
+    expect(plan.qr).not.toBeNull();
+    expect(plan.qr!.modules).toBe(code.size);
+    // Quiet zone: the outermost 4 module rings of the matrix are always light.
+    for (let i = 0; i < 4; i += 1) {
+      expect(code.modules[i * code.size + i]).toBe(false);
+    }
+    expect(plan.tiles.some((t) => t.kind === "qr")).toBe(true);
+  });
+
+  it("writes every QR tile into the svg master as vector modules", () => {
+    const plan = stepRepeatPlan(wall, qrConfig);
+    const svg = buildLondonPanelSvg(wall, { stepRepeat: qrConfig });
+    const qrTiles = plan.tiles.filter((t) => t.kind === "qr").length;
+    expect(qrTiles).toBeGreaterThan(0);
+    expect((svg.match(/data-tile="qr"/g) ?? []).length).toBe(qrTiles);
+    expect(svg).toContain(`data-qr-ink="${qrConfig.qrInkHex}"`);
+    // The field is clipped to the bleed box, so overscan never floats loose.
+    expect(svg).toMatch(/id="step-repeat"[^>]*clip-path="url\(#clip-/);
+  });
+
+  it("writes the same QR tiles into the .ai master", () => {
+    const plan = stepRepeatPlan(wall, qrConfig);
+    const bytes = buildLondonPanelAi(wall, { stepRepeat: qrConfig });
+    const text = new TextDecoder("latin1").decode(bytes);
+    expect(text).toContain("re W n");
+    // Every dark module of every QR tile is a filled path in the content stream.
+    const modules = plan.qr!.path.split("z").length - 1;
+    expect(modules).toBeGreaterThan(100);
+    expect(text.length).toBeGreaterThan(modules * plan.tiles.filter((t) => t.kind === "qr").length);
   });
 });
