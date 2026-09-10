@@ -13,14 +13,21 @@ import { useSyncExternalStore } from "react";
 
 import {
   londonBoardSizes,
+  resetLondonBoardSize,
   setLondonBoardSize,
   type LondonBoardSizeMap,
 } from "@/lib/next-london-board-size";
 import {
   londonLogoPlacements,
+  resetLondonLogoPlacement,
   setLondonLogoPlacement,
 } from "@/lib/next-london-logo-placement";
 import { londonPlacedArt, setLondonPlacedArt } from "@/lib/next-london-placed-art";
+import {
+  resetStepRepeatConfig,
+  setStepRepeatConfig,
+  stepRepeatConfigs,
+} from "@/lib/next-london-step-repeat";
 import type { LondonPanel } from "@/lib/next-london-signage";
 
 export type LondonVariation = {
@@ -128,10 +135,16 @@ export function isLondonVariation(panelId: string): boolean {
  * like the sign it came from and is edited independently from there.
  */
 export function createLondonVariation(panel: LondonPanel): LondonVariation | null {
-  const source = londonVariations()[panel.id]?.sourceId ?? panel.id;
+  const all = londonVariations();
+  const source = all[panel.id]?.sourceId ?? panel.id;
   const existing = londonVariationsOf(source);
   if (existing.length >= MAX_PER_SOURCE) return null;
-  const index = existing.length;
+  // Take the first free slot rather than counting the copies that exist. After
+  // deleting "Version B" of a pillar, the next copy must not be handed the id
+  // that "Version C" is already using.
+  let index = 0;
+  while (index < MAX_PER_SOURCE && `${source}-var-${index + 2}` in all) index += 1;
+  if (index >= MAX_PER_SOURCE) return null;
   const label = versionLabel(index);
   const id = `${source}-var-${index + 2}`;
   const baseName = panel.name.replace(/\s*\((?:VERSION|Version)[^)]*\)/g, "").trim();
@@ -153,12 +166,19 @@ export function createLondonVariation(panel: LondonPanel): LondonVariation | nul
   if (art) setLondonPlacedArt(id, art);
   const size = (londonBoardSizes() as LondonBoardSizeMap)[panel.id];
   if (size) setLondonBoardSize({ ...panel, id }, size);
+  // A step-and-repeat wall's recipe is part of how it looks, so the copy keeps it.
+  const repeat = stepRepeatConfigs()[panel.id];
+  if (repeat) setStepRepeatConfig(id, repeat);
 
   emit();
   return variation;
 }
 
-/** Remove a variation (its own edits are dropped with it). */
+/**
+ * Remove a variation. Every edit held against the copy's own id goes with it, so
+ * a later copy that reuses the slot starts clean instead of inheriting a deleted
+ * version's board size, logo move, artwork or step-and-repeat recipe.
+ */
 export function removeLondonVariation(id: string): void {
   const current = londonVariations();
   if (!(id in current)) return;
@@ -167,6 +187,9 @@ export function removeLondonVariation(id: string): void {
   store = next;
   persist();
   setLondonPlacedArt(id, null);
+  resetLondonLogoPlacement(id);
+  resetLondonBoardSize(id);
+  resetStepRepeatConfig(id);
   emit();
 }
 
@@ -200,11 +223,18 @@ export function withLondonVariations(
 ): LondonPanel[] {
   const all = Object.values(map);
   if (all.length === 0) return panels;
+  // Once a copy has been published it is part of the panel set in force, so it
+  // arrives here already in the list. Adding it again would put two cards with
+  // the same id in the schedule and two identical files in the vendor pack.
+  const present = new Set(panels.map((panel) => panel.id));
   const out: LondonPanel[] = [];
   for (const panel of panels) {
-    out.push(panel);
+    const own = map[panel.id];
+    // A published copy still takes its name and treatment from the local record,
+    // so renaming or restyling it shows immediately.
+    out.push(own ? { ...panel, name: own.name, style: own.style || panel.style } : panel);
     const copies = all
-      .filter((v) => v.sourceId === panel.id)
+      .filter((v) => v.sourceId === panel.id && !present.has(v.id))
       .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
     for (const copy of copies) {
       out.push({

@@ -12,6 +12,16 @@ import {
   setLondonVariationStyle,
   withLondonVariations,
 } from "@/lib/next-london-variations";
+import {
+  applyLondonBoardSizes,
+  londonBoardSizes,
+  resetLondonBoardSize,
+  setLondonBoardSize,
+} from "@/lib/next-london-board-size";
+import {
+  londonLogoPlacements,
+  setLondonLogoPlacement,
+} from "@/lib/next-london-logo-placement";
 import { LONDON_PANELS, type LondonPanel } from "@/lib/next-london-signage";
 
 const source = (): LondonPanel => LONDON_PANELS[0]!;
@@ -49,5 +59,46 @@ describe("London signage variations", () => {
     removeLondonVariation(b.id);
     expect(londonVariationsOf(source().id)).toHaveLength(0);
     expect(withLondonVariations([source()])).toHaveLength(1);
+  });
+
+  it("never hands a new copy an id another version already uses", () => {
+    const b = createLondonVariation(source())!;
+    const c = createLondonVariation(source())!;
+    removeLondonVariation(b.id);
+    const next = createLondonVariation(source())!;
+    expect(next.id).not.toBe(c.id);
+    const list = withLondonVariations([source()]);
+    expect(new Set(list.map((p) => p.id)).size).toBe(list.length);
+  });
+
+  it("a resized copy keeps its own board and leaves the original measured as it was", () => {
+    const b = createLondonVariation(source())!;
+    setLondonBoardSize({ ...source(), id: b.id }, { trimW: source().trimW - 120 });
+    const list = applyLondonBoardSizes(withLondonVariations([source()]), londonBoardSizes());
+    expect(list.find((p) => p.id === b.id)!.trimW).toBeCloseTo(source().trimW - 120, 2);
+    expect(list.find((p) => p.id === source().id)!.trimW).toBeCloseTo(source().trimW, 2);
+    resetLondonBoardSize(b.id);
+  });
+
+  it("a copy already in the published set is listed once, with its current name", () => {
+    const b = createLondonVariation(source())!;
+    renameLondonVariation(b.id, "REGISTRATION PILLAR — second run");
+    // What a publish then a reload looks like: the copy arrives inside the panel
+    // set in force, and the local record is still here.
+    const published: LondonPanel[] = [source(), { ...source(), id: b.id, name: b.name }];
+    const list = withLondonVariations(published);
+    expect(list).toHaveLength(2);
+    expect(list.filter((p) => p.id === b.id)).toHaveLength(1);
+    expect(list.find((p) => p.id === b.id)!.name).toBe("REGISTRATION PILLAR — second run");
+  });
+
+  it("a deleted copy's own edits do not carry into the next copy of that sign", () => {
+    const b = createLondonVariation(source())!;
+    setLondonBoardSize({ ...source(), id: b.id }, { trimW: source().trimW - 200 });
+    setLondonLogoPlacement(b.id, { scale: 1.4 });
+    removeLondonVariation(b.id);
+    const next = createLondonVariation(source())!;
+    expect(londonBoardSizes()[next.id]).toBeUndefined();
+    expect(londonLogoPlacements()[next.id]).toBeUndefined();
   });
 });
