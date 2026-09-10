@@ -1,13 +1,20 @@
 import { describe, expect, it } from "vitest";
 
 import { DEFAULT_MAP_DESIGN, isArchitecturalMap, mapPalette } from "@/lib/next-london-floormap-design";
-import { LONDON_FLOORS } from "@/lib/next-london-floorplan";
-import { londonFloorMapSvg } from "@/lib/next-london-floormap-svg";
+import { floorMapSvg } from "@/lib/next-london-floormap-svg";
+import { LONDON_PANELS } from "@/lib/next-london-signage";
+import { londonFloorPlan } from "@/lib/next-london-floorplan";
 
-const floor = LONDON_FLOORS[0]!;
-const draw = (arch: boolean) =>
-  londonFloorMapSvg(floor, [], {
-    design: { ...DEFAULT_MAP_DESIGN, sheetStyle: arch ? "architectural" : "directory" },
+const plan = londonFloorPlan("GF");
+const draw = (arch: boolean, over = {}) =>
+  floorMapSvg("GF", {
+    panels: LONDON_PANELS,
+    labels: true,
+    design: {
+      ...DEFAULT_MAP_DESIGN,
+      sheetStyle: arch ? "architectural" : "directory",
+      ...over,
+    },
   });
 
 describe("architectural map sheets", () => {
@@ -22,7 +29,7 @@ describe("architectural map sheets", () => {
     expect(arch).toContain("url(#ldn-hatch)");
     // No dropped shadows and no rounded room corners on a drafting sheet.
     expect(arch).not.toContain("url(#ldn-tile)");
-    expect(arch).toContain("m</text>");
+    expect(arch).toContain(`${plan.w.toFixed(1)} m</text>`);
   });
 
   it("leaves the directory sheet untouched", () => {
@@ -32,10 +39,8 @@ describe("architectural map sheets", () => {
   });
 
   it("can drop the dimension ribbon", () => {
-    const off = londonFloorMapSvg(floor, [], {
-      design: { ...DEFAULT_MAP_DESIGN, sheetStyle: "architectural", dimensionRibbon: false },
-    });
-    expect(off).not.toContain(`${floor.plan.w.toFixed(1)} m</text>`);
+    const off = draw(true, { dimensionRibbon: false });
+    expect(off).not.toContain(`${plan.w.toFixed(1)} m</text>`);
   });
 
   it("ships a cyanotype ground", () => {
