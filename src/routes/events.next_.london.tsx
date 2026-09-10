@@ -1233,8 +1233,11 @@ function LondonSignagePage() {
                       )
                     )
                       return;
+                    // A copy that has already been published is part of the panel
+                    // set in force, so it is taken out of the kit as well as
+                    // dropped locally — otherwise it would come straight back.
+                    removeLondonPanel(openPanel);
                     if (isCopy) removeLondonVariation(openPanel.id);
-                    else removeLondonPanel(openPanel);
                     setOpenPanel(null);
                     setEditing(false);
                     toast.success(isCopy ? "Version deleted" : `${openPanel.name} removed`, {
@@ -1367,6 +1370,7 @@ function LondonSignagePage() {
                                         )
                                       )
                                         return;
+                                      removeLondonPanel({ id: row.id, name: row.name });
                                       removeLondonVariation(row.id);
                                       if (current && source) setOpenPanel(source);
                                       toast.success("Version deleted");
