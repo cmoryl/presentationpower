@@ -56,6 +56,8 @@ import {
   londonTintedStops,
 } from "@/lib/next-london-division";
 import { loadLondonGroundImage, type LondonGroundImage } from "@/lib/next-london-artwork";
+import { NEXT_LOGO_FAMILIES } from "@/lib/next-logo-vectors";
+
 
 import {
   cmykAxialShadingDict,
@@ -1182,19 +1184,53 @@ export function buildLondonPanelAi(
   // lists the hero lockup FIRST, so it is the top layer when the .ai is opened.
   // A photo wall's top layer is the repeat field itself: every mark, text tile
   // and QR is a live PDF object, so the wall stays fully editable in Illustrator.
-  const wallOps = wall
-    ? stepRepeatPdfOps(wall, h, fillOp, copyInk, (text, sizeMm, x, y) =>
-        outlineOps(
-          outlineText(face, text, {
-            sizeMm,
-            trackingEm: LONDON_SIGNAGE_FONT.tracking,
-            anchor: "middle",
-            x,
-            y,
-          }).d,
-        ),
-      )
-    : "";
+  const wallOutline = (text: string, sizeMm: number, x: number, y: number): string =>
+    outlineOps(
+      outlineText(face, text, {
+        sizeMm,
+        trackingEm: LONDON_SIGNAGE_FONT.tracking,
+        anchor: "middle",
+        x,
+        y,
+      }).d,
+    );
+  const wallOps = wall ? stepRepeatPdfOps(wall, h, fillOp, copyInk, wallOutline) : "";
+
+  // A multi-mark wall is split into one Illustrator layer per lockup (plus a
+  // layer for text/QR tiles), so each division's marks can be shown, hidden,
+  // recoloured or moved on their own without touching the rest of the field.
+  const wallLayers: { name: string; ops: string }[] = wall
+    ? (() => {
+        const arts = wall.arts ?? [];
+        if (arts.length < 2) return [];
+        const out: { name: string; ops: string }[] = [];
+        arts.forEach((_art, index) => {
+          const ops = stepRepeatPdfOps(
+            wall,
+            h,
+            fillOp,
+            copyInk,
+            wallOutline,
+            (tile) => tile.kind === "logo" && tile.artIndex === index,
+          );
+          if (!ops) return;
+          const familyId = wall.artFamilies[index] ?? wall.config.familyId;
+          const label = NEXT_LOGO_FAMILIES[familyId]?.label ?? familyId;
+          out.push({ name: `Lockup · ${label}`, ops });
+        });
+        const rest = stepRepeatPdfOps(
+          wall,
+          h,
+          fillOp,
+          copyInk,
+          wallOutline,
+          (tile) => tile.kind !== "logo",
+        );
+        if (rest) out.push({ name: "Copy & QR tiles", ops: rest });
+        return out;
+      })()
+    : [];
+
 
   // Ground: the vendor's placed artwork when supplied (zoom/pan honoured),
   // otherwise the live gradient shading.
@@ -1274,11 +1310,28 @@ export function buildLondonPanelAi(
 
   // The repeat field carries overscan so it bleeds off every edge; clip it to
   // the bleed box so nothing lands loose on the canvas outside the artboard.
-  const wallClipped = wallOps
-    ? `q 0 0 ${f3(w)} ${f3(h)} re W n\n${wallOps}Q\n`
-    : "";
+  const clipWall = (ops: string): string =>
+    ops ? `q 0 0 ${f3(w)} ${f3(h)} re W n\n${ops}Q\n` : "";
+  const wallClipped = clipWall(wallOps);
+
+  // Object numbering: 8/9/10 are the fixed layers; a placed-artwork layer, the
+  // supplied-artwork image and any per-lockup wall layers follow in order.
+  let nextObj = 11;
+  const artOcgNum = placedOps ? nextObj++ : 0;
+  const groundImageNum = groundImage ? nextObj++ : 0;
+  const wallLayerNums = wallLayers.map(() => nextObj++);
+  const wallLayerName = (index: number): string => `ocw${index + 1}`;
+
+  // Split field: one marked-content block per lockup layer, in the same paint
+  // order as the flat field. Falls back to the single wall layer otherwise.
+  const wallContent = wallLayers.length
+    ? wallLayers
+        .map((layer, index) => `/OC /${wallLayerName(index)} BDC\n${clipWall(layer.ops)}EMC\n`)
+        .join("")
+    : `/OC /oc1 BDC\n${wallClipped}EMC\n`;
+
   const content = wall
-    ? `/OC /oc3 BDC\n${groundOps}EMC\n` + artUnder + `/OC /oc1 BDC\n${wallClipped}EMC\n` + artOver
+    ? `/OC /oc3 BDC\n${groundOps}EMC\n` + artUnder + wallContent + artOver
     : `/OC /oc3 BDC\n${groundOps}${brewOps}EMC\n` +
       artUnder +
       (copyOps || subOps || bodyOps || qrOps
@@ -1300,16 +1353,22 @@ export function buildLondonPanelAi(
   // that the visible copy is outlined geometry.
   const copyMeta = wall ? wall.config.text : brand.copy;
 
-  // Object numbering: 8/9/10 are the fixed layers; a placed-artwork layer takes
-  // object 11 when present, which pushes the supplied-artwork image to 12.
-  const artOcgNum = placedOps ? 11 : 0;
-  const groundImageNum = placedOps ? 12 : 11;
-  const ocgRefs = `8 0 R 9 0 R 10 0 R${artOcgNum ? ` ${artOcgNum} 0 R` : ""}`;
+  const wallLayerRefs = wallLayerNums.map((n) => `${n} 0 R`).join(" ");
+  const ocgRefs =
+    `8 0 R 9 0 R 10 0 R${artOcgNum ? ` ${artOcgNum} 0 R` : ""}` +
+    `${wallLayerRefs ? ` ${wallLayerRefs}` : ""}`;
+  // A split wall lists its per-lockup layers on top, in place of the single
+  // "Step & repeat" layer, so Illustrator's layer panel reads one per division.
+  const orderRefs =
+    `${artOcgNum && placed?.onTop ? `${artOcgNum} 0 R ` : ""}` +
+    `${wallLayerRefs ? `${wallLayerRefs} ` : ""}` +
+    `${wallLayerRefs ? "" : "8 0 R "}9 0 R 10 0 R` +
+    `${artOcgNum && !placed?.onTop ? ` ${artOcgNum} 0 R` : ""}`;
 
   const objects: string[] = [
     `<< /Type /Catalog /Pages 2 0 R /OCProperties << /OCGs [${ocgRefs}] ` +
-      `/D << /Order [${artOcgNum && placed?.onTop ? `${artOcgNum} 0 R ` : ""}8 0 R 9 0 R 10 0 R` +
-      `${artOcgNum && !placed?.onTop ? ` ${artOcgNum} 0 R` : ""}] /ON [${ocgRefs}] >> >> >>`,
+      `/D << /Order [${orderRefs}] /ON [${ocgRefs}] >> >> >>`,
+
     `<< /Type /Pages /Kids [3 0 R] /Count 1 >>`,
     `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f3(w + margin * 2)} ${f3(h + margin * 2)}] ` +
       `/BleedBox [${f3(margin)} ${f3(margin)} ${f3(margin + w)} ${f3(margin + h)}] ` +
@@ -1328,7 +1387,9 @@ export function buildLondonPanelAi(
       `${placedOps ? placedArtAlphaGs(placed!) : ""}` +
       `${brewGs}>> ` +
       `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R` +
-      `${artOcgNum ? ` /oc4 ${artOcgNum} 0 R` : ""} >> >> /Contents 4 0 R >>`,
+      `${artOcgNum ? ` /oc4 ${artOcgNum} 0 R` : ""}` +
+      `${wallLayerNums.map((n, i) => ` /${wallLayerName(i)} ${n} 0 R`).join("")} >> >> /Contents 4 0 R >>`,
+
     `<< /Length ${sheet.length} >>\nstream\n${sheet}endstream`,
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
       `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)} · ${pdfText(`${brand.orientation === "side" ? "side-by-side" : "stacked"} ${brand.colourway} lockup`)}) >>`,
@@ -1365,6 +1426,12 @@ export function buildLondonPanelAi(
     );
   }
 
+  // One layer group per lockup on a split step-and-repeat wall, so every
+  // division's marks arrive as their own named, live Illustrator layer.
+  for (const layer of wallLayers) {
+    objects.push(`<< /Type /OCG /Name (${pdfText(layer.name)}) >>`);
+  }
+
   let pdf = "%PDF-1.5\n%\u00e2\u00e3\u00cf\u00d3\n";
   const offsets: number[] = [];
   objects.forEach((body, i) => {
@@ -1375,8 +1442,9 @@ export function buildLondonPanelAi(
   pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
   for (const off of offsets) pdf += `${String(off).padStart(10, "0")} 00000 n \n`;
   pdf +=
-    `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R /Info ${objects.length} 0 R >>\n` +
+    `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R /Info 5 0 R >>\n` +
     `startxref\n${xrefAt}\n%%EOF\n`;
+
 
   const bytes = new Uint8Array(pdf.length);
   for (let i = 0; i < pdf.length; i += 1) bytes[i] = pdf.charCodeAt(i) & 0xff;
@@ -1549,7 +1617,11 @@ function stepRepeatPdfOps(
   fillOp: (hex: string) => string,
   copyInk: string,
   outlineOps: (text: string, sizeMm: number, x: number, y: number) => string,
+  /** Emit only the tiles this predicate keeps — used to split the field into
+   *  one Illustrator layer per lockup. */
+  only?: (tile: StepRepeatPlan["tiles"][number]) => boolean,
 ): string {
+
   const rad = (plan.config.rotationDeg * Math.PI) / 180;
   const cos = Math.cos(rad);
   const sin = Math.sin(rad);
@@ -1567,7 +1639,9 @@ function stepRepeatPdfOps(
   };
 
   return plan.tiles
+    .filter((tile) => (only ? only(tile) : true))
     .map((tile) => {
+
       const matrix = spin(tile.x + tile.w / 2, tile.y + tile.h / 2);
       if (tile.kind === "logo") {
         const tileArt = plan.arts?.[tile.artIndex] ?? plan.art;
