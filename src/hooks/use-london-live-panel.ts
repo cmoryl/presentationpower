@@ -12,6 +12,10 @@ import { applyLondonBoardSize, useLondonBoardSizes } from "@/lib/next-london-boa
 import { useLondonLiveFiles } from "@/lib/next-london-live-files";
 import { useLondonLogoPlacements } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
+import {
+  londonEditsArePublished,
+  useLondonPublishedOverrides,
+} from "@/lib/next-london-published-overrides";
 import type { LondonArtOptions } from "@/lib/next-london-revise";
 import type { LondonPanel } from "@/lib/next-london-signage";
 
@@ -35,6 +39,8 @@ export function useLondonLivePanel(
   const boardSizes = useLondonBoardSizes();
   // A newly published live file for this sign must repaint every surface too.
   const liveFiles = useLondonLiveFiles();
+  // Saves are auto-published, so "draft" means "not yet in the revision in force".
+  const publishedOverrides = useLondonPublishedOverrides();
 
   return useMemo(() => {
     const placement = placements[input.id];
@@ -62,8 +68,18 @@ export function useLondonLivePanel(
           ? `live:${liveFiles[input.id]!.version}:${liveFiles[input.id]!.proofUrl ?? ""}`
           : "live:none",
       ].join("|"),
-      draft: Boolean(placement || placedArt || boardSize),
+      draft:
+        Boolean(placement || placedArt || boardSize) &&
+        !londonEditsArePublished(input.id, { placement, placedArt, boardSize }, publishedOverrides),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [input, placements, placedArtMap, boardSizes, liveFiles, JSON.stringify(base)]);
+  }, [
+    input,
+    placements,
+    placedArtMap,
+    boardSizes,
+    liveFiles,
+    publishedOverrides,
+    JSON.stringify(base),
+  ]);
 }

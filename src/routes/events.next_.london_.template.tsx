@@ -35,6 +35,8 @@ import {
 } from "@/lib/next-london-revise";
 import { auditAi, auditSvg, gateOnQa } from "@/lib/london-signage-qa";
 import { getLondonHeadRevision } from "@/lib/next-london-revise.functions";
+import { LondonAutoPublish } from "@/components/events/LondonAutoPublish";
+import { setLondonPublishedOverrides } from "@/lib/next-london-published-overrides";
 import { NEXT_LONDON_AGENDA_URL } from "@/lib/next-event";
 import { cmykLabel, cmykToHex, londonCmykBuild } from "@/lib/next-london-cmyk";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
@@ -168,7 +170,9 @@ function LondonTemplatePage() {
     let live = true;
     fetchHead({})
       .then((res) => {
-        if (live) setHeadRev(res.revision?.rev ?? 0);
+        if (!live) return;
+        setHeadRev(res.revision?.rev ?? 0);
+        setLondonPublishedOverrides(res.revision?.overrides ?? null);
       })
       .catch(() => {
         /* No revision reachable — fall back to the issued pack numbering. */
@@ -919,6 +923,8 @@ function LondonTemplatePage() {
           </aside>
         </div>
       </div>
+      {/* Every save here goes live immediately for the whole kit. */}
+      <LondonAutoPublish panels={LONDON_PANELS} />
     </AppShell>
   );
 }
