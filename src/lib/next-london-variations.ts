@@ -21,6 +21,15 @@ import {
   setLondonLogoPlacement,
 } from "@/lib/next-london-logo-placement";
 import { londonPlacedArt, setLondonPlacedArt } from "@/lib/next-london-placed-art";
+import {
+  resetLondonBoardSize,
+} from "@/lib/next-london-board-size";
+import { resetLondonLogoPlacement } from "@/lib/next-london-logo-placement";
+import {
+  resetStepRepeatConfig,
+  setStepRepeatConfig,
+  stepRepeatConfigs,
+} from "@/lib/next-london-step-repeat";
 import type { LondonPanel } from "@/lib/next-london-signage";
 
 export type LondonVariation = {
