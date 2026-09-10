@@ -12,6 +12,16 @@ import {
   setLondonVariationStyle,
   withLondonVariations,
 } from "@/lib/next-london-variations";
+import {
+  applyLondonBoardSizes,
+  londonBoardSizes,
+  resetLondonBoardSize,
+  setLondonBoardSize,
+} from "@/lib/next-london-board-size";
+import {
+  londonLogoPlacements,
+  setLondonLogoPlacement,
+} from "@/lib/next-london-logo-placement";
 import { LONDON_PANELS, type LondonPanel } from "@/lib/next-london-signage";
 
 const source = (): LondonPanel => LONDON_PANELS[0]!;
