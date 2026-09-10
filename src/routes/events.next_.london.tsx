@@ -60,6 +60,13 @@ import {
   useLondonVariations,
   withLondonVariations,
 } from "@/lib/next-london-variations";
+import {
+  removeLondonPanel,
+  restoreAllLondonPanels,
+  restoreLondonPanel,
+  useLondonRemovals,
+  withoutLondonRemovals,
+} from "@/lib/next-london-removals";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { handleLondonDirectoryDownload } from "@/lib/london-directory-pdf";
