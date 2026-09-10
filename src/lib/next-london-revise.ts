@@ -1571,7 +1571,9 @@ function stepRepeatPdfOps(
   };
 
   return plan.tiles
+    .filter((tile) => (only ? only(tile) : true))
     .map((tile) => {
+
       const matrix = spin(tile.x + tile.w / 2, tile.y + tile.h / 2);
       if (tile.kind === "logo") {
         const tileArt = plan.arts?.[tile.artIndex] ?? plan.art;
