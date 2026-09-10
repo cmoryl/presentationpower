@@ -16,6 +16,7 @@ import {
   londonEditsArePublished,
   useLondonPublishedOverrides,
 } from "@/lib/next-london-published-overrides";
+import { useStepRepeatConfigs } from "@/lib/next-london-step-repeat";
 import type { LondonArtOptions } from "@/lib/next-london-revise";
 import type { LondonPanel } from "@/lib/next-london-signage";
 
