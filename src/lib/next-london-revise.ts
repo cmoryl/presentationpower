@@ -1308,11 +1308,28 @@ export function buildLondonPanelAi(
 
   // The repeat field carries overscan so it bleeds off every edge; clip it to
   // the bleed box so nothing lands loose on the canvas outside the artboard.
-  const wallClipped = wallOps
-    ? `q 0 0 ${f3(w)} ${f3(h)} re W n\n${wallOps}Q\n`
-    : "";
+  const clipWall = (ops: string): string =>
+    ops ? `q 0 0 ${f3(w)} ${f3(h)} re W n\n${ops}Q\n` : "";
+  const wallClipped = clipWall(wallOps);
+
+  // Object numbering: 8/9/10 are the fixed layers; a placed-artwork layer, the
+  // supplied-artwork image and any per-lockup wall layers follow in order.
+  let nextObj = 11;
+  const artOcgNum = placedOps ? nextObj++ : 0;
+  const groundImageNum = groundImage ? nextObj++ : 0;
+  const wallLayerNums = wallLayers.map(() => nextObj++);
+  const wallLayerName = (index: number): string => `ocw${index + 1}`;
+
+  // Split field: one marked-content block per lockup layer, in the same paint
+  // order as the flat field. Falls back to the single wall layer otherwise.
+  const wallContent = wallLayers.length
+    ? wallLayers
+        .map((layer, index) => `/OC /${wallLayerName(index)} BDC\n${clipWall(layer.ops)}EMC\n`)
+        .join("")
+    : `/OC /oc1 BDC\n${wallClipped}EMC\n`;
+
   const content = wall
-    ? `/OC /oc3 BDC\n${groundOps}EMC\n` + artUnder + `/OC /oc1 BDC\n${wallClipped}EMC\n` + artOver
+    ? `/OC /oc3 BDC\n${groundOps}EMC\n` + artUnder + wallContent + artOver
     : `/OC /oc3 BDC\n${groundOps}${brewOps}EMC\n` +
       artUnder +
       (copyOps || subOps || bodyOps || qrOps
@@ -1334,16 +1351,22 @@ export function buildLondonPanelAi(
   // that the visible copy is outlined geometry.
   const copyMeta = wall ? wall.config.text : brand.copy;
 
-  // Object numbering: 8/9/10 are the fixed layers; a placed-artwork layer takes
-  // object 11 when present, which pushes the supplied-artwork image to 12.
-  const artOcgNum = placedOps ? 11 : 0;
-  const groundImageNum = placedOps ? 12 : 11;
-  const ocgRefs = `8 0 R 9 0 R 10 0 R${artOcgNum ? ` ${artOcgNum} 0 R` : ""}`;
+  const wallLayerRefs = wallLayerNums.map((n) => `${n} 0 R`).join(" ");
+  const ocgRefs =
+    `8 0 R 9 0 R 10 0 R${artOcgNum ? ` ${artOcgNum} 0 R` : ""}` +
+    `${wallLayerRefs ? ` ${wallLayerRefs}` : ""}`;
+  // A split wall lists its per-lockup layers on top, in place of the single
+  // "Step & repeat" layer, so Illustrator's layer panel reads one per division.
+  const orderRefs =
+    `${artOcgNum && placed?.onTop ? `${artOcgNum} 0 R ` : ""}` +
+    `${wallLayerRefs ? `${wallLayerRefs} ` : ""}` +
+    `${wallLayerRefs ? "" : "8 0 R "}9 0 R 10 0 R` +
+    `${artOcgNum && !placed?.onTop ? ` ${artOcgNum} 0 R` : ""}`;
 
   const objects: string[] = [
     `<< /Type /Catalog /Pages 2 0 R /OCProperties << /OCGs [${ocgRefs}] ` +
-      `/D << /Order [${artOcgNum && placed?.onTop ? `${artOcgNum} 0 R ` : ""}8 0 R 9 0 R 10 0 R` +
-      `${artOcgNum && !placed?.onTop ? ` ${artOcgNum} 0 R` : ""}] /ON [${ocgRefs}] >> >> >>`,
+      `/D << /Order [${orderRefs}] /ON [${ocgRefs}] >> >> >>`,
+
     `<< /Type /Pages /Kids [3 0 R] /Count 1 >>`,
     `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f3(w + margin * 2)} ${f3(h + margin * 2)}] ` +
       `/BleedBox [${f3(margin)} ${f3(margin)} ${f3(margin + w)} ${f3(margin + h)}] ` +
