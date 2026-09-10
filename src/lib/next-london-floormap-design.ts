@@ -24,7 +24,25 @@ export type MapAreaKind =
   | "storage"
   | "support";
 
-export type MapThemeId = "directory" | "blueprint" | "night" | "mono" | "brand";
+export type MapThemeId =
+  | "directory"
+  | "blueprint"
+  | "cyanotype"
+  | "night"
+  | "mono"
+  | "brand";
+
+/**
+ * How the sheet is DRAWN, independent of its colours.
+ *
+ * `directory` is the mall-directory language this kit shipped with: soft tiles,
+ * dropped shadows, rounded corners, colour-coded category bars.
+ * `architectural` is a drafting sheet: square corners, poché wall weights,
+ * hatched circulation, no shadows, and a measured dimension ribbon down two
+ * edges — the look a venue or print vendor expects from a floor plan, and the
+ * one that survives being printed at A1 in one ink.
+ */
+export type MapSheetStyle = "directory" | "architectural";
 export type MapPinShape = "pin" | "dot" | "square";
 export type MapLabelMode = "numbered" | "named" | "none";
 export type MapLegendMode = "key" | "none";
@@ -56,6 +74,10 @@ export type MapPalette = {
 
 export type MapDesign = {
   theme: MapThemeId;
+  /** Drawing language — directory tiles or an architectural drafting sheet. */
+  sheetStyle: MapSheetStyle;
+  /** Architectural sheets only: measured dimension ribbon down two edges. */
+  dimensionRibbon: boolean;
   /** Accent override (division / brand colour). Empty = theme accent. */
   accent: string;
   /** Category colour on room tiles; off makes every room a neutral tile. */
@@ -105,6 +127,8 @@ export type MapDesign = {
 
 export const DEFAULT_MAP_DESIGN: MapDesign = {
   theme: "brand",
+  sheetStyle: "directory",
+  dimensionRibbon: true,
   accent: "",
   roomTint: true,
   grid: true,
@@ -177,6 +201,21 @@ const THEMES: Record<MapThemeId, MapPalette> = {
     grid: "#FFFFFF",
     dark: false,
   },
+  // True cyanotype: the classic negative blueprint — white linework burnt into a
+  // deep Prussian ground. One ink, so it reproduces cleanly at any size.
+  cyanotype: {
+    paper: "#0B2E63",
+    ink: "#F2F7FF",
+    accent: "#A9D4FF",
+    walkway: "#0E3872",
+    tile: "#13417F",
+    line: "#7FB2E8",
+    hair: "#4E7FBE",
+    quietFill: "#0C3169",
+    quietAccent: "#8FB9E6",
+    grid: "#9CC4EE",
+    dark: true,
+  },
   night: {
     paper: "#03002C",
     ink: "#EEF2FA",
@@ -221,10 +260,21 @@ const THEMES: Record<MapThemeId, MapPalette> = {
 export const MAP_THEME_LABEL: Record<MapThemeId, string> = {
   directory: "Directory",
   blueprint: "Blueprint",
+  cyanotype: "Cyanotype",
   night: "Night",
   mono: "Mono",
   brand: "Brand blue",
 };
+
+export const MAP_SHEET_STYLE_LABEL: Record<MapSheetStyle, string> = {
+  directory: "Directory tiles",
+  architectural: "Architectural",
+};
+
+/** True when the sheet should be drawn as a drafting plan rather than tiles. */
+export function isArchitecturalMap(design: MapDesign): boolean {
+  return design.sheetStyle === "architectural";
+}
 
 /** Resolve a design into the palette the drawing code uses. */
 export function mapPalette(design: MapDesign): MapPalette {

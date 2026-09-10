@@ -8,6 +8,7 @@ import { RotateCcw } from "lucide-react";
 import {
   DEFAULT_MAP_DESIGN,
   MAP_ACCENT_SWATCHES,
+  MAP_SHEET_STYLE_LABEL,
   MAP_THEME_LABEL,
   mapPalette,
   type MapDesign,
@@ -16,6 +17,7 @@ import {
   type MapOrientation,
   type MapPaper,
   type MapPinShape,
+  type MapSheetStyle,
   type MapThemeId,
 } from "@/lib/next-london-floormap-design";
 import { MAP_LOGO_LABEL, type MapLogoId } from "@/lib/next-london-floormap-logos";
@@ -192,6 +194,33 @@ export function LondonMapDesignPanel({ design, onChange, roomsOnly }: LondonMapD
         </Group>
 
         <Group title="Look and colour">
+          {/* Drawing language first: it decides whether this sheet reads as a
+              visitor directory or as a plan a venue and print vendor work from. */}
+          <div>
+            <span className={label}>Drawing style</span>
+            <div className="mt-1 flex flex-wrap gap-2">
+              {(Object.keys(MAP_SHEET_STYLE_LABEL) as MapSheetStyle[]).map((k) => (
+                <Toggle
+                  key={k}
+                  title={MAP_SHEET_STYLE_LABEL[k]}
+                  active={(design.sheetStyle ?? "directory") === k}
+                  onClick={() => set("sheetStyle", k)}
+                />
+              ))}
+            </div>
+            <p className="mt-1.5 text-[11.5px] leading-[1.45] text-[#03002C]/55">
+              {(design.sheetStyle ?? "directory") === "architectural"
+                ? "Drafting sheet: square rooms, wall weights, hatched circulation and a measured ribbon — best for print and venue sign-off."
+                : "Directory sheet: soft tiles and colour-coded categories — best for attendees finding a room."}
+            </p>
+          </div>
+          {(design.sheetStyle ?? "directory") === "architectural" ? (
+            <Toggle
+              title="Dimension ribbon"
+              active={design.dimensionRibbon !== false}
+              onClick={() => set("dimensionRibbon", design.dimensionRibbon === false)}
+            />
+          ) : null}
 
           <div className="flex flex-wrap gap-2">
             {(Object.keys(MAP_THEME_LABEL) as MapThemeId[]).map((t) => (
