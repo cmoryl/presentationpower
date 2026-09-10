@@ -1462,9 +1462,56 @@ function LondonSignagePage() {
           ) : null}
         </DialogContent>
       </Dialog>
+      {/* Signs taken out of the kit. Nothing is destroyed — put any of them
+          back and the card returns to its floor and area. */}
+      {Object.keys(removals).length > 0 ? (
+        <details className="mt-10 rounded-2xl border border-black/10 bg-white p-5">
+          <summary className="cursor-pointer font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/70">
+            Removed signs · {Object.keys(removals).length}
+          </summary>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <p className="min-w-0 flex-1 text-[12.5px] leading-relaxed text-[#03002C]/70">
+              These are out of the kit and out of the vendor pack. Put one back and it returns to
+              its floor and area exactly as it was, with its edits intact.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                restoreAllLondonPanels();
+                toast.success("All removed signs are back");
+              }}
+              className="rounded-full border border-[#03002C]/25 px-4 py-2 text-[11px] font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
+            >
+              Put them all back
+            </button>
+          </div>
+          <ul className="mt-3 space-y-2">
+            {Object.entries(removals).map(([id, name]) => (
+              <li
+                key={id}
+                className="flex flex-wrap items-center gap-2 rounded-lg border border-black/10 bg-[#F2F2F2] p-2.5"
+              >
+                <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-[#03002C]">
+                  {name}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    restoreLondonPanel(id);
+                    toast.success(`${name} is back in the kit`);
+                  }}
+                  className="rounded-full border border-[#003FC7]/40 px-3 py-1 text-[11px] font-semibold text-[#003FC7] hover:bg-white"
+                >
+                  Put it back
+                </button>
+              </li>
+            ))}
+          </ul>
+        </details>
+      ) : null}
       {/* Saving a sign publishes it forward, so these cards and the vendor
           downloads always carry the newest version. */}
-      <LondonAutoPublish panels={panels} />
+      <LondonAutoPublish panels={panels} removedIds={Object.keys(removals)} />
     </AppShell>
   );
 }
