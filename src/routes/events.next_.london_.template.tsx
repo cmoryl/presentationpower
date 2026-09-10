@@ -35,6 +35,8 @@ import {
 } from "@/lib/next-london-revise";
 import { auditAi, auditSvg, gateOnQa } from "@/lib/london-signage-qa";
 import { getLondonHeadRevision } from "@/lib/next-london-revise.functions";
+import { LondonAutoPublish } from "@/components/events/LondonAutoPublish";
+import { setLondonPublishedOverrides } from "@/lib/next-london-published-overrides";
 import { NEXT_LONDON_AGENDA_URL } from "@/lib/next-event";
 import { cmykLabel, cmykToHex, londonCmykBuild } from "@/lib/next-london-cmyk";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
