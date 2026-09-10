@@ -10,4 +10,4 @@
 - [x] Tests + typecheck + build green
 - [x] Export sweep for the 3 new slide types — swept locally (ticker strip, sparkline hero, gauge stack all pass); coverage ledger now carries prior cells across matrix additions (904/6270 verified)
 
-- [ ] Update Churchill partner booth specs from uploaded `Churchill_SI_Booths.pdf` (sizes, copy, per-booth details)
+- [x] Update Churchill partner booth specs from uploaded `Churchill_SI_Booths.pdf` — nine glass vinyls added (1300x1230 ×6, 7000x1230 ×3, 10mm bleed, CMYK vector)
