@@ -16,6 +16,7 @@ import {
   londonEditsArePublished,
   useLondonPublishedOverrides,
 } from "@/lib/next-london-published-overrides";
+import { useStepRepeatConfigs } from "@/lib/next-london-step-repeat";
 import type { LondonArtOptions } from "@/lib/next-london-revise";
 import type { LondonPanel } from "@/lib/next-london-signage";
 
@@ -41,16 +42,22 @@ export function useLondonLivePanel(
   const liveFiles = useLondonLiveFiles();
   // Saves are auto-published, so "draft" means "not yet in the revision in force".
   const publishedOverrides = useLondonPublishedOverrides();
+  // Wall recipes (marks, text, QR payload and colours) are edits like any other:
+  // a download must carry the recipe saved in this browser, not the last one
+  // that made it into a revision — otherwise an exported wall loses its QR rows.
+  const stepRepeats = useStepRepeatConfigs();
 
   return useMemo(() => {
     const placement = placements[input.id];
     const placedArt = placedArtMap[input.id];
     const boardSize = boardSizes[input.id];
+    const stepRepeat = stepRepeats[input.id];
     const options: LondonArtOptions = {
       ...base,
       ...(placement ? { placement } : {}),
       ...(placedArt ? { placedArt } : {}),
       ...(boardSize ? { boardSize } : {}),
+      ...(stepRepeat ? { stepRepeat } : {}),
     };
     return {
       panel: applyLondonBoardSize(input, boardSizes),
@@ -63,14 +70,19 @@ export function useLondonLivePanel(
         JSON.stringify(placement ?? null),
         JSON.stringify(placedArt ?? null),
         JSON.stringify(boardSize ?? null),
+        JSON.stringify(stepRepeat ?? null),
         JSON.stringify(base),
         liveFiles[input.id]
           ? `live:${liveFiles[input.id]!.version}:${liveFiles[input.id]!.proofUrl ?? ""}`
           : "live:none",
       ].join("|"),
       draft:
-        Boolean(placement || placedArt || boardSize) &&
-        !londonEditsArePublished(input.id, { placement, placedArt, boardSize }, publishedOverrides),
+        Boolean(placement || placedArt || boardSize || stepRepeat) &&
+        !londonEditsArePublished(
+          input.id,
+          { placement, placedArt, boardSize, stepRepeat },
+          publishedOverrides,
+        ),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -78,6 +90,7 @@ export function useLondonLivePanel(
     placements,
     placedArtMap,
     boardSizes,
+    stepRepeats,
     liveFiles,
     publishedOverrides,
     JSON.stringify(base),

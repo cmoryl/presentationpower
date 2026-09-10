@@ -734,6 +734,12 @@ export type StepRepeatSvgOptions = {
   outline?: (text: string, sizeMm: number, x: number, y: number) => { d: string };
   /** Name of the face the outlines came from, recorded as metadata. */
   faceName?: string;
+  /**
+   * Clip path id for the bleed box. The field is generated with a row and column
+   * of overscan so the pattern bleeds off every edge; without this clip those
+   * marks sit loose on the Illustrator canvas outside the artboard.
+   */
+  clipId?: string;
 };
 
 /**
@@ -799,8 +805,12 @@ export function stepRepeatSvgLayer(
             ` r="${((tile.w * Math.SQRT2) / 2).toFixed(2)}" fill="${plate.paint}"${plate.meta}/>`;
         } else {
           const rx = plan.qr.plateShape === "rounded" ? tile.w * 0.08 : 0;
+          // A rounded plate cuts into the code's quiet zone at the corners, so
+          // the plate is inflated by that bite — a scanner always sees four
+          // clear light modules around the matrix.
+          const pad = rx * 0.3;
           plateEl =
-            `<rect x="${tile.x.toFixed(2)}" y="${tile.y.toFixed(2)}" width="${tile.w.toFixed(2)}" height="${tile.h.toFixed(2)}"` +
+            `<rect x="${(tile.x - pad).toFixed(2)}" y="${(tile.y - pad).toFixed(2)}" width="${(tile.w + pad * 2).toFixed(2)}" height="${(tile.h + pad * 2).toFixed(2)}"` +
             (rx ? ` rx="${rx.toFixed(2)}"` : "") +
             ` fill="${plate.paint}"${plate.meta}/>`;
         }
@@ -824,6 +834,7 @@ export function stepRepeatSvgLayer(
     ` data-pitch-mm="${plan.pitchX.toFixed(2)}x${plan.pitchY.toFixed(2)}"` +
     ` data-drop="${plan.config.drop}" data-marks="${plan.tiles.length}"` +
     ` data-source="${esc(plan.art.source)}"` +
+    (options.clipId ? ` clip-path="url(#${options.clipId})"` : "") +
     (plan.config.opacity < 1 ? ` opacity="${plan.config.opacity}"` : "") +
     `>${body}</g>`
   );

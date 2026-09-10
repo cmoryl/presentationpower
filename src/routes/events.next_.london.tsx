@@ -47,6 +47,7 @@ import {
   useLondonLogoPlacements,
 } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
+import { useStepRepeatConfigs } from "@/lib/next-london-step-repeat";
 import { londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
 import { buildLondonKitZip } from "@/lib/next-london-kit-zip";
 import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
@@ -326,6 +327,9 @@ function LondonSignagePage() {
   // artwork repaints the hub cards and re-flows the layout immediately.
   const localPlacements = useLondonLogoPlacements();
   const localPlacedArt = useLondonPlacedArt();
+  // Wall recipes are edits like any other: a download must carry the QR payload,
+  // colours and mark mix saved in this browser, not a stale published recipe.
+  const localStepRepeat = useStepRepeatConfigs();
   const localBoardSizes = useLondonBoardSizes();
   // Subscribe the whole hub to live-file replacements. Without this, the
   // module-level live-file registry changed but card SVGs and supplied proof
@@ -473,11 +477,13 @@ function LondonSignagePage() {
     const placement = localPlacements[panel.id];
     const boardSize = localBoardSizes[panel.id];
     const placedArt = localPlacedArt[panel.id];
+    const stepRepeat = localStepRepeat[panel.id];
     return {
       ...base,
       ...(placement ? { placement } : {}),
       ...(boardSize ? { boardSize } : {}),
       ...(placedArt ? { placedArt } : {}),
+      ...(stepRepeat ? { stepRepeat } : {}),
     };
   };
   // A copy that has not been published counts as unpublished too, so its files are
@@ -487,7 +493,10 @@ function LondonSignagePage() {
   const isDraft = (panel: LondonPanel) =>
     Boolean(variations[panel.id]) ||
     (Boolean(
-      localPlacements[panel.id] || localBoardSizes[panel.id] || localPlacedArt[panel.id],
+      localPlacements[panel.id] ||
+        localBoardSizes[panel.id] ||
+        localPlacedArt[panel.id] ||
+        localStepRepeat[panel.id],
     ) &&
       !londonEditsArePublished(
         panel.id,
@@ -495,6 +504,7 @@ function LondonSignagePage() {
           placement: localPlacements[panel.id],
           boardSize: localBoardSizes[panel.id],
           placedArt: localPlacedArt[panel.id],
+          stepRepeat: localStepRepeat[panel.id],
         },
         headOverrides,
       ));
