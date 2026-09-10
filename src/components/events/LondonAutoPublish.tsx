@@ -16,6 +16,7 @@ import { useLondonLogoPlacements, londonLogoPlacements } from "@/lib/next-london
 import { useLondonPlacedArt, londonPlacedArtMap } from "@/lib/next-london-placed-art";
 import { useStepRepeatConfigs, stepRepeatConfigs } from "@/lib/next-london-step-repeat";
 import { useLondonRemovals } from "@/lib/next-london-removals";
+import { useLondonVariations } from "@/lib/next-london-variations";
 import {
   londonPublishedOverridesReady,
   setLondonPublishedOverrides,
@@ -70,11 +71,19 @@ export function LondonAutoPublish({ panels, removedIds = [] }: LondonAutoPublish
   // publishes forward like any other save.
   const removals = useLondonRemovals();
   const removalKey = Object.keys(removals).sort().join(",");
+  // Copying a sign adds an asset to the kit even when nothing has been edited on
+  // it yet, so a new, renamed or deleted version publishes forward on its own.
+  const variations = useLondonVariations();
+  const variationKey = Object.values(variations)
+    .map((v) => `${v.id}:${v.name}:${v.style}`)
+    .sort()
+    .join(",");
 
   const busy = useRef(false);
   const lastTried = useRef<string | null>(null);
   const warned = useRef(false);
   const publishedRemovals = useRef<string | null>(null);
+  const publishedVariations = useRef<string | null>(null);
   const latest = useRef({ panels, removedIds });
   latest.current = { panels, removedIds };
 
@@ -87,15 +96,19 @@ export function LondonAutoPublish({ panels, removedIds = [] }: LondonAutoPublish
     const snapshot = londonOverridesSnapshot();
     const next = signature(snapshot);
     if (publishedRemovals.current === null) publishedRemovals.current = removalKey;
+    if (publishedVariations.current === null) publishedVariations.current = variationKey;
     const removalsChanged = removalKey !== publishedRemovals.current;
-    if (!removalsChanged && next === signature(publishedOverrides)) return;
-    if (!removalsChanged && next === lastTried.current) return;
+    const variationsChanged = variationKey !== publishedVariations.current;
+    const setChanged = removalsChanged || variationsChanged;
+    if (!setChanged && next === signature(publishedOverrides)) return;
+    if (!setChanged && next === lastTried.current) return;
     if (latest.current.panels.length === 0) return;
 
     const timer = window.setTimeout(() => {
       busy.current = true;
       lastTried.current = next;
       publishedRemovals.current = removalKey;
+      publishedVariations.current = variationKey;
       void (async () => {
         try {
           const res = await publish({
@@ -132,7 +145,7 @@ export function LondonAutoPublish({ panels, removedIds = [] }: LondonAutoPublish
 
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- store hooks are the change signal
-  }, [userId, placements, boards, placedArt, stepRepeat, publishedOverrides, removalKey, publish]);
+  }, [userId, placements, boards, placedArt, stepRepeat, publishedOverrides, removalKey, variationKey, publish]);
 
   return null;
 }
