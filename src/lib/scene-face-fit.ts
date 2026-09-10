@@ -68,9 +68,15 @@ export function mountArtworkOnFace({
   plate,
   ratio,
   fixed,
+  mode = "edge",
   anchorY = "center",
   anchorX = "center",
 }: MountOptions): FaceRect {
+  // An applied vinyl IS the surface: hand back the measured face and let the
+  // renderer cover-crop inside it, so no blank fixture and no stretching.
+  if (mode === "cover" && canCoverFace({ face, plate, ratio })) {
+    return { ...face };
+  }
   const target = ratio > 0 && Number.isFinite(ratio) ? ratio : 1;
   const facePxW = Math.max(1, face.w * plate.w);
   const facePxH = Math.max(1, face.h * plate.h);
