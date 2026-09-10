@@ -23,6 +23,10 @@ import {
   agendaInk,
   agendaName,
   agendaPages,
+  agendaQrBackground,
+  agendaQrForeground,
+  agendaQrStyle,
+  agendaQrTransparent,
   agendaSlug,
   agendaTitleInk,
   type AgendaConfig,
@@ -53,8 +57,17 @@ async function blobToDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-/** Rasterize the real QR matrix at print density so it stays scannable. */
-function qrDataUrl(payload: string, ink: string, ground: string): string | null {
+/**
+ * Rasterize the real QR matrix at print density so it stays scannable, using
+ * the same module shape, ink and plate the editor previewed.
+ */
+function qrDataUrl(
+  payload: string,
+  ink: string,
+  ground: string,
+  style: "block" | "rounded" | "dot" = "block",
+  transparent = false,
+): string | null {
   const qr = buildPillarQr(payload);
   if (!qr) return null;
   const scale = 8;
@@ -63,12 +76,30 @@ function qrDataUrl(payload: string, ink: string, ground: string): string | null 
   canvas.height = qr.size * scale;
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
-  ctx.fillStyle = ground;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (!transparent) {
+    ctx.fillStyle = ground;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
   ctx.fillStyle = ink;
   for (let y = 0; y < qr.size; y += 1) {
     for (let x = 0; x < qr.size; x += 1) {
-      if (qr.modules[y * qr.size + x]) ctx.fillRect(x * scale, y * scale, scale, scale);
+      if (!qr.modules[y * qr.size + x]) continue;
+      const px = x * scale;
+      const py = y * scale;
+      if (style === "dot") {
+        ctx.beginPath();
+        ctx.arc(px + scale / 2, py + scale / 2, scale / 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (style === "rounded") {
+        ctx.beginPath();
+        const inset = scale * 0.06;
+        const size = scale * 0.88;
+        const r = scale * 0.26;
+        ctx.roundRect(px + inset, py + inset, size, size, r);
+        ctx.fill();
+      } else {
+        ctx.fillRect(px, py, scale, scale);
+      }
     }
   }
   return canvas.toDataURL("image/png");
@@ -240,7 +271,13 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
     }
 
     if (b.qr) {
-      const data = qrDataUrl(cfg.qrData ?? "", `#${inkHex}`, `#${groundHex}`);
+      const data = qrDataUrl(
+        cfg.qrData ?? "",
+        agendaQrForeground(cfg),
+        agendaQrBackground(cfg),
+        agendaQrStyle(cfg),
+        agendaQrTransparent(cfg),
+      );
       if (data) {
         s.addImage({
           data,
@@ -253,14 +290,14 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       }
       if ((cfg.qrCaption ?? "").trim()) {
         s.addText(cfg.qrCaption, {
-          x: inX(b.qr.x - L.qrEdge * 0.5),
+          x: inX(b.qr.x),
           y: inX(b.qr.capY),
-          w: inX(b.qr.edge + L.qrEdge * 0.5),
-          h: inX(L.footSize * 2),
+          w: inX(b.qr.edge),
+          h: inX(b.qr.capSize * 2),
           fontFace: FONT,
-          fontSize: pt(L.footSize),
+          fontSize: pt(b.qr.capSize),
           color: inkHex,
-          align: "right",
+          align: b.qr.capAlign,
           valign: "top",
           margin: 0,
         });
