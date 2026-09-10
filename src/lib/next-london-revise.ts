@@ -1424,6 +1424,12 @@ export function buildLondonPanelAi(
     );
   }
 
+  // One layer group per lockup on a split step-and-repeat wall, so every
+  // division's marks arrive as their own named, live Illustrator layer.
+  for (const layer of wallLayers) {
+    objects.push(`<< /Type /OCG /Name (${pdfText(layer.name)}) >>`);
+  }
+
   let pdf = "%PDF-1.5\n%\u00e2\u00e3\u00cf\u00d3\n";
   const offsets: number[] = [];
   objects.forEach((body, i) => {
@@ -1434,8 +1440,9 @@ export function buildLondonPanelAi(
   pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
   for (const off of offsets) pdf += `${String(off).padStart(10, "0")} 00000 n \n`;
   pdf +=
-    `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R /Info ${objects.length} 0 R >>\n` +
+    `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R /Info 5 0 R >>\n` +
     `startxref\n${xrefAt}\n%%EOF\n`;
+
 
   const bytes = new Uint8Array(pdf.length);
   for (let i = 0; i < pdf.length; i += 1) bytes[i] = pdf.charCodeAt(i) & 0xff;
