@@ -50,7 +50,7 @@ import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import { londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
 import { buildLondonKitZip } from "@/lib/next-london-kit-zip";
 import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
-import { setLondonLiveFiles } from "@/lib/next-london-live-files";
+import { setLondonLiveFiles, useLondonLiveFileSignature } from "@/lib/next-london-live-files";
 import { LondonLiveFilePanel } from "@/components/events/LondonLiveFilePanel";
 import { applyLondonBoardSize, applyLondonBoardSizes, useLondonBoardSizes } from "@/lib/next-london-board-size";
 import {
@@ -327,6 +327,10 @@ function LondonSignagePage() {
   const localPlacements = useLondonLogoPlacements();
   const localPlacedArt = useLondonPlacedArt();
   const localBoardSizes = useLondonBoardSizes();
+  // Subscribe the whole hub to live-file replacements. Without this, the
+  // module-level live-file registry changed but card SVGs and supplied proof
+  // URLs could remain from the previous render until some unrelated click.
+  const liveFileSignature = useLondonLiveFileSignature();
   // A re-measured board changes the card's shape as well as its artwork, so the
   // whole schedule reads from the resized panels.
   // Copies made from an existing sign ("Version B" of a pillar, say) stand in the
@@ -509,6 +513,9 @@ function LondonSignagePage() {
   // memory the synchronous builder throws by design, so the tile simply stays
   // blank rather than taking the whole page down with it.
   const previewSvg = (panel: LondonPanel): string | undefined => {
+    // Reading the signature here documents that a live-file replacement is a
+    // preview dependency; the hook above supplies the actual render signal.
+    void liveFileSignature;
     if (!faceReady) return undefined;
     try {
       return londonPanelSvgFor(panel, artwork, previewOptions(panel));
