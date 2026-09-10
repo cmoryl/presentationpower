@@ -539,7 +539,22 @@ export type LondonArtOptions = {
    * the builders throw rather than fall back to live, substitutable text.
    */
   face?: LondonSignageFace;
+  /**
+   * Wrap the sheet in printer's marks: the page grows by `LONDON_MARKS_MARGIN_MM`
+   * on every edge, the artwork stays at bleed size in the middle, and crop marks
+   * (offset clear of the trim), bleed ticks and registration targets are drawn in
+   * the margin. Trim/Bleed/MediaBox all move with it, so the file is ready to
+   * hand a printer as-is. Off for the `.ai` design master.
+   */
+  printMarks?: boolean;
 };
+
+/** Margin added on every edge to hold the printer's marks, in mm. */
+export const LONDON_MARKS_MARGIN_MM = 12;
+/** Gap between the trim line and the start of a crop mark, in mm. */
+export const LONDON_MARKS_OFFSET_MM = 3;
+/** Drawn length of one crop mark, in mm. */
+export const LONDON_MARKS_LENGTH_MM = 7;
 
 /**
  * Placement box for a supplied-artwork ground, in mm on the bleed sheet. The
