@@ -23,8 +23,10 @@ import stepRepeat from "@/assets/london-scenes/step-repeat.jpg";
 import wideBanner from "@/assets/london-scenes/wide-banner.jpg";
 
 import {
+  canCoverFace,
   mountArtworkOnFace,
   type SceneFixedAxis,
+  type SceneMountMode,
 } from "@/lib/scene-face-fit";
 import type { LondonPanel } from "@/lib/next-london-signage";
 
@@ -63,6 +65,8 @@ export interface LondonScene {
   fixed: SceneFixedAxis;
   /** Where on the free axis the print sits. */
   anchorY: "top" | "center" | "bottom";
+  /** How the print meets the surface (applied vinyls cover their face). */
+  mount: SceneMountMode;
 }
 
 function scene(
@@ -74,6 +78,7 @@ function scene(
   face: SceneFace,
   fixed: SceneFixedAxis = "w",
   anchorY: "top" | "center" | "bottom" = "center",
+  mount: SceneMountMode = "edge",
 ): LondonScene {
   return {
     id,
@@ -86,6 +91,7 @@ function scene(
     faceRatio: (face.w * 1536) / (face.h * 1024),
     fixed,
     anchorY,
+    mount,
   };
 }
 
@@ -119,7 +125,7 @@ export const LONDON_SCENES: LondonScene[] = [
     y: 0.0996,
     w: 0.1914,
     h: 0.8213,
-  }, "w", "top"),
+  }, "h", "center", "cover"),
   scene("step-repeat", "Step-and-repeat wall", "Press / photo point", "wall", stepRepeat, {
     x: 0.1061,
     y: 0.1221,
@@ -215,5 +221,23 @@ export function fitArtworkInFace(
     ratio: panel.trimW / panel.trimH,
     fixed: sc?.fixed ?? "w",
     anchorY: sc?.anchorY ?? "center",
+    mode: sc?.mount ?? "edge",
   });
+}
+
+/**
+ * How the artwork image should sit inside the measured box: an applied vinyl
+ * cover-crops to its surface, everything else fills a box already cut to the
+ * item's true trim ratio. Never "stretch".
+ */
+export function sceneArtworkObjectFit(
+  panel: LondonPanel,
+  sceneOrId: LondonScene | string,
+): "cover" | "contain" {
+  const sc = typeof sceneOrId === "string" ? londonScene(sceneOrId) : sceneOrId;
+  if (!sc) return "contain";
+  return sc.mount === "cover" &&
+    canCoverFace({ face: sc.face, plate: sc.plate, ratio: panel.trimW / panel.trimH })
+    ? "cover"
+    : "contain";
 }
