@@ -1,0 +1,14 @@
+import { LONDON_PANELS } from "../src/lib/next-london-signage";
+import { buildLondonPanelAi } from "../src/lib/next-london-revise";
+import { DEFAULT_STEP_REPEAT, isStepRepeatPanel, stepRepeatPlan } from "../src/lib/next-london-step-repeat";
+import { buildPillarQr } from "../src/lib/pillar-qr";
+import { loadLondonSignageFace } from "../src/lib/next-london-text-outline";
+await loadLondonSignageFace();
+const wall = LONDON_PANELS.filter(isStepRepeatPanel)[0]!;
+const cfg = { ...DEFAULT_STEP_REPEAT, kind: "logo-qr" as const, qrData: "https://presentationpower.lovable.app/events/next/london" };
+const plan = stepRepeatPlan(wall, cfg);
+const bytes = buildLondonPanelAi(wall, { stepRepeat: cfg });
+await Bun.write("/tmp/browser/qrwall/wall.pdf", bytes);
+const tile = plan.tiles.find((t) => t.kind === "qr" && t.x > 0 && t.y > 0)!;
+await Bun.write("/tmp/browser/qrwall/ai-meta.json", JSON.stringify({ bleedW: wall.bleedW, bleedH: wall.bleedH, tile, modules: plan.qr!.modules, matrix: buildPillarQr(cfg.qrData)!.modules }));
+console.log(bytes.length);
