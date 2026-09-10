@@ -474,6 +474,9 @@ export function styleAxis(styleId: string): Vec {
   return { x1: 0.5, y1: 0, x2: 0.5, y2: 1 };
 }
 
+/** Alias with the module-qualified name used outside the builders. */
+export const londonStyleAxis = styleAxis;
+
 function stopsFor(panel: LondonPanel): string[] {
   return londonPanelStops(panel);
 }
