@@ -54,6 +54,8 @@ let PAPER = "#FFFFFF";
 let WALKWAY = "#EDF1F7";
 let GRIDINK = "#FFFFFF";
 let TILE = "#FFFFFF";
+/** True while an architectural (drafting) sheet is being drawn. */
+let ARCH = false;
 const FONT = "Geist, 'Geist Variable', Inter, Helvetica, Arial, sans-serif";
 
 /** Screen pixels per plan metre. */
@@ -78,6 +80,7 @@ function applyDesign(design?: MapDesign): () => void {
     WALKWAY = pal.walkway;
     GRIDINK = pal.grid;
     TILE = pal.tile;
+    ARCH = d.sheetStyle === "architectural";
     PPM = Math.max(6, Math.min(48, d.ppm));
     PAD = Math.max(12, Math.min(120, d.margin));
   };
@@ -196,7 +199,17 @@ function footerStrip(w: number, y: number, right: string, note?: string): string
 
 
 function defs(): string {
-  return `<defs>
+  // The 45° hatch stands in for poché on a drafting sheet: circulation, cores
+  // and outdoor ground read as "not a room" in one ink, so the plan survives a
+  // single-colour print at any size.
+  // Only architectural sheets need the hatch, and an unused def would change
+  // every directory sheet's output, so it is emitted on demand.
+  const hatch = !ARCH
+    ? ""
+    : `<pattern id="ldn-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+  <path d="M 0 0 V 6" stroke="${NAVY}" stroke-width="0.7" stroke-opacity="0.34" />
+</pattern>`;
+  return `<defs>${hatch ? `\n${hatch}` : ""}
 <filter id="ldn-tile" x="-20%" y="-20%" width="140%" height="140%">
   <feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-color="${NAVY}" flood-opacity="0.1" />
 </filter>
@@ -204,6 +217,52 @@ function defs(): string {
   <feDropShadow dx="0" dy="1.2" stdDeviation="1.1" flood-color="${NAVY}" flood-opacity="0.26" />
 </filter>
 </defs>`;
+}
+
+/**
+ * Measured dimension ribbon along the bottom and left of the plan: extension
+ * lines, 45° arrow ticks every 5 m and the overall figure — the convention a
+ * venue or print vendor reads first on an architectural sheet.
+ */
+function dimensionRibbon(plan: LondonFloorPlan, ox: number, oy: number): string {
+  const pw = plan.w * PPM;
+  const ph = plan.h * PPM;
+  // Drawn just inside the plan edges rather than out in the margin, so the
+  // ribbon never collides with the legend band or run off a tight sheet.
+  const off = 13;
+  const by = oy + ph - off;
+  const lx = ox + off;
+  const tick = (x: number, y: number, vertical: boolean) =>
+    `<path d="M ${n(x - (vertical ? 3 : 3))} ${n(y - 3)} L ${n(x + 3)} ${n(y + 3)}" stroke="${NAVY}" stroke-width="0.9" opacity="0.75" />`;
+  const parts: string[] = [
+    `<path d="M ${n(ox)} ${n(by)} H ${n(ox + pw)}" stroke="${NAVY}" stroke-width="0.9" opacity="0.75" />`,
+    `<path d="M ${n(lx)} ${n(oy)} V ${n(oy + ph)}" stroke="${NAVY}" stroke-width="0.9" opacity="0.75" />`,
+  ];
+  for (let m = 0; m <= plan.w; m += 5) {
+    const x = ox + m * PPM;
+    parts.push(
+      `<path d="M ${n(x)} ${n(oy + ph)} V ${n(by - 3)}" stroke="${NAVY}" stroke-width="0.5" opacity="0.3" />`,
+      tick(x, by, false),
+    );
+  }
+  for (let m = 0; m <= plan.h; m += 5) {
+    const y = oy + m * PPM;
+    parts.push(
+      `<path d="M ${n(ox)} ${n(y)} H ${n(lx + 3)}" stroke="${NAVY}" stroke-width="0.5" opacity="0.3" />`,
+      tick(lx, y, true),
+    );
+  }
+  parts.push(
+    `<text x="${n(ox + pw / 2)}" y="${n(by - 5)}" text-anchor="middle" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.6" fill="${NAVY}" opacity="0.72">${plan.w.toFixed(
+      1,
+    )} m</text>`,
+    `<text x="${n(lx + 10)}" y="${n(oy + ph / 2)}" text-anchor="middle" transform="rotate(-90 ${n(lx + 10)} ${n(
+      oy + ph / 2,
+    )})" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.6" fill="${NAVY}" opacity="0.72">${plan.h.toFixed(
+      1,
+    )} m</text>`,
+  );
+  return `<g>${parts.join("")}</g>`;
 }
 
 /**
@@ -373,7 +432,13 @@ function roomKeyRow(plan: LondonFloorPlan, x: number, y: number, w: number): str
 function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = false): string {
   const pw = plan.w * PPM;
   const ph = plan.h * PPM;
-  const ground = `<rect x="${n(ox)}" y="${n(oy)}" width="${n(pw)}" height="${n(ph)}" rx="3" fill="${WALKWAY}" stroke="${LINE}" stroke-width="1" />`;
+  // Architectural sheets sit on square corners inside a heavy outer wall line —
+  // the drafting convention — while directory sheets keep their soft ground.
+  const rr = ARCH ? 0 : 3;
+  const ground = ARCH
+    ? `<rect x="${n(ox)}" y="${n(oy)}" width="${n(pw)}" height="${n(ph)}" fill="${WALKWAY}" stroke="${NAVY}" stroke-width="2.2" stroke-opacity="0.85" />` +
+      `<rect x="${n(ox + 3.5)}" y="${n(oy + 3.5)}" width="${n(pw - 7)}" height="${n(ph - 7)}" fill="none" stroke="${NAVY}" stroke-width="0.6" stroke-opacity="0.35" />`
+    : `<rect x="${n(ox)}" y="${n(oy)}" width="${n(pw)}" height="${n(ph)}" rx="3" fill="${WALKWAY}" stroke="${LINE}" stroke-width="1" />`;
 
   // Quiet metre grid: 1 m whisper, 5 m a touch firmer — reads as survey paper.
   const grid: string[] = [];
@@ -381,13 +446,17 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
   for (let i = 1; gridOn && i < plan.w; i += 1) {
     const x = ox + i * PPM;
     grid.push(
-      `<path d="M ${n(x)} ${n(oy)} V ${n(oy + ph)}" stroke="${GRIDINK}" stroke-opacity="${i % 5 === 0 ? 0.85 : 0.4}" stroke-width="1" />`,
+      `<path d="M ${n(x)} ${n(oy)} V ${n(oy + ph)}" stroke="${ARCH ? NAVY : GRIDINK}" stroke-opacity="${
+        ARCH ? (i % 5 === 0 ? 0.24 : 0.1) : i % 5 === 0 ? 0.85 : 0.4
+      }" stroke-width="${ARCH && i % 5 === 0 ? 0.8 : 1}" />`,
     );
   }
   for (let i = 1; gridOn && i < plan.h; i += 1) {
     const y = oy + i * PPM;
     grid.push(
-      `<path d="M ${n(ox)} ${n(y)} H ${n(ox + pw)}" stroke="${GRIDINK}" stroke-opacity="${i % 5 === 0 ? 0.85 : 0.4}" stroke-width="1" />`,
+      `<path d="M ${n(ox)} ${n(y)} H ${n(ox + pw)}" stroke="${ARCH ? NAVY : GRIDINK}" stroke-opacity="${
+        ARCH ? (i % 5 === 0 ? 0.24 : 0.1) : i % 5 === 0 ? 0.85 : 0.4
+      }" stroke-width="${ARCH && i % 5 === 0 ? 0.8 : 1}" />`,
     );
   }
 
@@ -405,15 +474,31 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
       const own = isCustomAreaId(z.id);
       // A sectioned area is a translucent wash, not an opaque tile: whatever the
       // venue drew underneath — and any pin inside it — must still read.
-      const tile =
-        (own
-          ? `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="${style.accent}" fill-opacity="0.12" />`
-          : `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="${style.fill}" stroke="${LINE}" stroke-width="1"${
-              quiet ? "" : ' filter="url(#ldn-tile)"'
-            } />`) +
-        `<path d="M ${n(x)} ${n(y + 3)} a 3 3 0 0 1 3 -3 h ${n(bar)} v ${n(h)} h ${n(-bar)} a 3 3 0 0 1 -3 -3 Z" fill="${style.accent}" opacity="${
-          quiet ? 0.6 : 0.95
-        }" />`;
+      const tile = ARCH
+        ? // Drafting sheet: a room is a square, wall-weighted outline; quiet ground
+          // (circulation, cores, outside) is hatched instead of tinted, and there
+          // are no shadows or rounded corners anywhere.
+          (own
+            ? `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" fill="${style.accent}" fill-opacity="0.1" />`
+            : `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" fill="${
+                quiet ? PAPER : style.fill
+              }" fill-opacity="${quiet ? 0.35 : 1}" stroke="${NAVY}" stroke-width="${
+                quiet ? 0.7 : 1.6
+              }" stroke-opacity="${quiet ? 0.45 : 0.9}" />` +
+              (quiet
+                ? `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" fill="url(#ldn-hatch)" />`
+                : "")) +
+          `<rect x="${n(x)}" y="${n(y)}" width="${n(bar)}" height="${n(h)}" fill="${style.accent}" opacity="${
+            quiet ? 0.5 : 0.9
+          }" />`
+        : (own
+            ? `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="${style.accent}" fill-opacity="0.12" />`
+            : `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="${style.fill}" stroke="${LINE}" stroke-width="1"${
+                quiet ? "" : ' filter="url(#ldn-tile)"'
+              } />`) +
+          `<path d="M ${n(x)} ${n(y + 3)} a 3 3 0 0 1 3 -3 h ${n(bar)} v ${n(h)} h ${n(-bar)} a 3 3 0 0 1 -3 -3 Z" fill="${style.accent}" opacity="${
+            quiet ? 0.6 : 0.95
+          }" />`;
       // A narrow tile — a lift core, a stair, a light well — cannot hold its own
       // name at the left edge without the text running off the tile and, at the
       // edge of the plan, off the sheet. When the name is wider than the tile,
@@ -476,7 +561,7 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
       // An area the team sectioned off themselves is drawn as a dashed overlay so
       // it never reads as a wall the venue built.
       const custom = own
-        ? `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="none" stroke="${style.accent}" stroke-width="1.4" stroke-dasharray="5 3" opacity="0.9" />`
+        ? `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="${rr}" fill="none" stroke="${style.accent}" stroke-width="1.4" stroke-dasharray="5 3" opacity="0.9" />`
         : "";
 
       // Names come back separately so they can be drawn after every tile: a name
@@ -503,7 +588,9 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
     })
     .join("");
 
-  return `${ground}<g>${grid.join("")}</g>${zones.body}${zones.text}${entries}`;
+  const ribbon =
+    ARCH && DESIGN.dimensionRibbon !== false ? dimensionRibbon(plan, ox, oy) : "";
+  return `${ground}<g>${grid.join("")}</g>${zones.body}${ribbon}${zones.text}${entries}`;
 }
 
 /** Measured scale bar: four 2.5 m ticks with end figures, cartographic style. */

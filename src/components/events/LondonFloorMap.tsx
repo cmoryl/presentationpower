@@ -25,6 +25,7 @@ import {
 } from "@/lib/next-london-floorplan";
 import {
   DEFAULT_MAP_DESIGN,
+  isArchitecturalMap,
   kindInkFor,
   mapPalette,
   zoneStyleFor,
@@ -261,19 +262,26 @@ export function LondonFloorMap({
     zoomAt(view.z * (dir === 1 ? 1.4 : 1 / 1.4), (r?.width ?? 0) / 2, (r?.height ?? 0) / 2);
   };
 
+  const arch = isArchitecturalMap(design);
+
   return (
     <div className="min-w-0">
       <div
         ref={frameRef}
-        className="relative w-full touch-none overflow-hidden rounded-2xl border border-[#03002C]/12 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]"
+        className={`relative w-full touch-none overflow-hidden border ${
+          arch
+            ? "rounded-none border-[#03002C]/55"
+            : "rounded-2xl border-[#03002C]/12 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]"
+        }`}
         style={{
           aspectRatio: `${plan.w} / ${plan.h}`,
           backgroundColor: palette.walkway,
           // The paper hatch only reads on a light ground; on a dark theme it
           // turns to noise, so the dark palettes get a flat walkway.
-          backgroundImage: palette.dark
-            ? undefined
-            : "repeating-linear-gradient(135deg, rgba(255,255,255,0.55) 0 1px, transparent 1px 9px)",
+          backgroundImage:
+            palette.dark || arch
+              ? undefined
+              : "repeating-linear-gradient(135deg, rgba(255,255,255,0.55) 0 1px, transparent 1px 9px)",
         }}
         role="group"
         aria-label={`${plan.label} top-down install map`}
@@ -305,8 +313,10 @@ export function LondonFloorMap({
                 y1={0}
                 x2={i}
                 y2={plan.h}
-                stroke={palette.grid}
-                strokeOpacity={design.grid === false ? 0 : i % 5 === 0 ? 0.55 : 0.22}
+                stroke={arch ? palette.ink : palette.grid}
+                strokeOpacity={
+                  design.grid === false ? 0 : arch ? (i % 5 === 0 ? 0.26 : 0.1) : i % 5 === 0 ? 0.55 : 0.22
+                }
                 strokeWidth={i % 5 === 0 ? 0.06 : 0.03}
               />
             ))}
@@ -317,8 +327,10 @@ export function LondonFloorMap({
                 y1={i}
                 x2={plan.w}
                 y2={i}
-                stroke={palette.grid}
-                strokeOpacity={design.grid === false ? 0 : i % 5 === 0 ? 0.55 : 0.22}
+                stroke={arch ? palette.ink : palette.grid}
+                strokeOpacity={
+                  design.grid === false ? 0 : arch ? (i % 5 === 0 ? 0.26 : 0.1) : i % 5 === 0 ? 0.55 : 0.22
+                }
                 strokeWidth={i % 5 === 0 ? 0.06 : 0.03}
               />
             ))}
@@ -335,15 +347,19 @@ export function LondonFloorMap({
               <div
                 key={z.id}
                 data-plan-surface={own ? undefined : "1"}
-                className={`absolute rounded-[3px] border ${
-                  own ? "border-dashed" : "overflow-hidden border-[#D3DCEA]"
+                className={`absolute border ${arch ? "rounded-none" : "rounded-[3px]"} ${
+                  own
+                    ? "border-dashed"
+                    : arch
+                      ? "overflow-hidden border-[#03002C]/70"
+                      : "overflow-hidden border-[#D3DCEA]"
                 } ${
-                  quiet
+                  quiet || arch
                     ? ""
                     : "shadow-[0_1px_2px_rgba(3,0,44,0.10),0_6px_14px_-6px_rgba(3,0,44,0.25)]"
-                } ${chosen ? "z-[6] ring-2 ring-[#003FC7]/60" : own ? "z-[5]" : ""} ${
-                  canEdit ? "cursor-grab" : ""
-                }`}
+                } ${arch && !own ? (quiet ? "border-[0.5px]" : "border-[1.5px]") : ""} ${
+                  chosen ? "z-[6] ring-2 ring-[#003FC7]/60" : own ? "z-[5]" : ""
+                } ${canEdit ? "cursor-grab" : ""}`}
                 style={{
                   left: `${(z.x / plan.w) * 100}%`,
                   top: `${(z.y / plan.h) * 100}%`,
@@ -354,6 +370,11 @@ export function LondonFloorMap({
                   background: own
                     ? `color-mix(in srgb, ${style.accent} 14%, transparent)`
                     : style.fill,
+                  // Poché: quiet ground is hatched on a drafting sheet, not tinted.
+                  backgroundImage:
+                    arch && quiet && !own
+                      ? `repeating-linear-gradient(45deg, color-mix(in srgb, ${palette.ink} 30%, transparent) 0 0.8px, transparent 0.8px 5px)`
+                      : undefined,
                   borderColor: own ? style.accent : undefined,
                 }}
                 onPointerDown={
