@@ -21,6 +21,20 @@ export interface FaceRect {
 /** Which edge of the surface physically fixes the print size. */
 export type SceneFixedAxis = "w" | "h";
 
+/**
+ * How the print meets the surface.
+ * - `edge`  — a hung/mounted item: fills one physical edge, ratio kept.
+ * - `cover` — an applied vinyl (door leaf, floor, wrap): the surface itself is
+ *   the print, so the artwork covers the whole face and the small overhang is
+ *   trimmed on install. Only used when the item is close to the surface ratio;
+ *   a wildly different ratio falls back to `edge` so nothing gets cropped in
+ *   half.
+ */
+export type SceneMountMode = "edge" | "cover";
+
+/** How far an item's ratio may differ from the face before `cover` is unsafe. */
+export const COVER_RATIO_TOLERANCE = 0.36;
+
 export interface MountOptions {
   /** Measured placement rectangle, fractions of the plate. */
   face: FaceRect;
@@ -28,9 +42,21 @@ export interface MountOptions {
   /** Artwork trim aspect (w / h). */
   ratio: number;
   fixed: SceneFixedAxis;
+  mode?: SceneMountMode;
   /** Where the print hangs on the free axis. */
   anchorY?: "top" | "center" | "bottom";
   anchorX?: "left" | "center" | "right";
+}
+
+/** True when a `cover` scene can take this item without a heavy crop. */
+export function canCoverFace(opts: {
+  face: FaceRect;
+  plate: { w: number; h: number };
+  ratio: number;
+}): boolean {
+  const faceRatio = (opts.face.w * opts.plate.w) / (opts.face.h * opts.plate.h);
+  if (!(opts.ratio > 0) || !Number.isFinite(opts.ratio) || !(faceRatio > 0)) return false;
+  return Math.abs(Math.log(opts.ratio / faceRatio)) <= COVER_RATIO_TOLERANCE;
 }
 
 /**
