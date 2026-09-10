@@ -166,12 +166,19 @@ export function createLondonVariation(panel: LondonPanel): LondonVariation | nul
   if (art) setLondonPlacedArt(id, art);
   const size = (londonBoardSizes() as LondonBoardSizeMap)[panel.id];
   if (size) setLondonBoardSize({ ...panel, id }, size);
+  // A step-and-repeat wall's recipe is part of how it looks, so the copy keeps it.
+  const repeat = stepRepeatConfigs()[panel.id];
+  if (repeat) setStepRepeatConfig({ ...panel, id }, repeat);
 
   emit();
   return variation;
 }
 
-/** Remove a variation (its own edits are dropped with it). */
+/**
+ * Remove a variation. Every edit held against the copy's own id goes with it, so
+ * a later copy that reuses the slot starts clean instead of inheriting a deleted
+ * version's board size, logo move, artwork or step-and-repeat recipe.
+ */
 export function removeLondonVariation(id: string): void {
   const current = londonVariations();
   if (!(id in current)) return;
@@ -180,6 +187,9 @@ export function removeLondonVariation(id: string): void {
   store = next;
   persist();
   setLondonPlacedArt(id, null);
+  resetLondonLogoPlacement(id);
+  resetLondonBoardSize(id);
+  resetStepRepeatConfig(id);
   emit();
 }
 
