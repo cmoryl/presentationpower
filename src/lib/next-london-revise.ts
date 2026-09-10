@@ -934,6 +934,9 @@ export function buildLondonPanelAi(
   const h = panel.bleedH * MM_TO_PT;
   const trimX = ((panel.bleedW - panel.trimW) / 2) * MM_TO_PT;
   const trimY = ((panel.bleedH - panel.trimH) / 2) * MM_TO_PT;
+  // Printer's-marks margin. Zero for the design master, so nothing about the
+  // existing `.ai` geometry changes.
+  const margin = options.printMarks ? LONDON_MARKS_MARGIN_MM * MM_TO_PT : 0;
   const axis = styleAxis(panel.style);
   const isHalo = panel.style.includes("halo");
   /** Fill operator for one brand colour, in the chosen output space. */
