@@ -805,8 +805,12 @@ export function stepRepeatSvgLayer(
             ` r="${((tile.w * Math.SQRT2) / 2).toFixed(2)}" fill="${plate.paint}"${plate.meta}/>`;
         } else {
           const rx = plan.qr.plateShape === "rounded" ? tile.w * 0.08 : 0;
+          // A rounded plate cuts into the code's quiet zone at the corners, so
+          // the plate is inflated by that bite — a scanner always sees four
+          // clear light modules around the matrix.
+          const pad = rx * 0.3;
           plateEl =
-            `<rect x="${tile.x.toFixed(2)}" y="${tile.y.toFixed(2)}" width="${tile.w.toFixed(2)}" height="${tile.h.toFixed(2)}"` +
+            `<rect x="${(tile.x - pad).toFixed(2)}" y="${(tile.y - pad).toFixed(2)}" width="${(tile.w + pad * 2).toFixed(2)}" height="${(tile.h + pad * 2).toFixed(2)}"` +
             (rx ? ` rx="${rx.toFixed(2)}"` : "") +
             ` fill="${plate.paint}"${plate.meta}/>`;
         }

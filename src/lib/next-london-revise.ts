@@ -1506,8 +1506,12 @@ function qrPlateOps(
   if (plan.qr!.plateShape === "rounded") {
     const r = size * 0.08;
     const k = r * 0.5523;
-    const x2 = x + size;
-    const y2 = y + size;
+    // Inflated by the corner bite of the radius, so the quiet zone stays light.
+    const pad = r * 0.3;
+    x -= pad;
+    y -= pad;
+    const x2 = x + size + pad * 2;
+    const y2 = y + size + pad * 2;
     return (
       `${paint} ${f3(x + r)} ${f3(y)} m ${f3(x2 - r)} ${f3(y)} l ` +
       `${f3(x2 - r + k)} ${f3(y)} ${f3(x2)} ${f3(y + r - k)} ${f3(x2)} ${f3(y + r)} c ` +
