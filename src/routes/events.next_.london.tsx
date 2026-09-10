@@ -912,39 +912,14 @@ function LondonSignagePage() {
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
             <h2 className="flex items-center gap-2 text-lg font-semibold text-[#03002C]">
               <ImageIcon className="h-4.5 w-4.5 text-[#003FC7]" /> Gradient grounds in this location
+              · house and division
             </h2>
             <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/55">
               <span className="group-open:hidden">Show</span>
               <span className="hidden group-open:inline">Hide</span>
             </span>
           </summary>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {Object.entries(LONDON_STYLES)
-              .filter(([id]) => panels.some((p) => p.style === id))
-              .map(([id, style]) => (
-                <article
-                  key={id}
-                  className="overflow-hidden rounded-xl border border-black/10 bg-white"
-                >
-                  <div
-                    className="h-20 w-full"
-                    style={{ background: `linear-gradient(120deg, ${style.stops.join(", ")})` }}
-                  />
-                  <div className="p-4">
-                    <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">
-                      {id}
-                    </p>
-                    <h3 className="mt-1 text-sm font-semibold text-[#03002C]">{style.label}</h3>
-                    <p className="mt-1.5 text-[12.5px] leading-relaxed text-[#03002C]/65">
-                      {style.note}
-                    </p>
-                    <p className="mt-2 font-mono text-[11px] text-[#03002C]/55">
-                      {panels.filter((p) => p.style === id).length} panels
-                    </p>
-                  </div>
-                </article>
-              ))}
-          </div>
+          <LondonGradientGrounds panels={panels} />
         </details>
 
         {/* Division agendas — the London kit's own agenda boards */}
