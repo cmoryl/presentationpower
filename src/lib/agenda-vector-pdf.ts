@@ -573,7 +573,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
           y: bottom,
           width: edge,
           height: edge,
-          color: hexRgb(agendaQrBackground(cfg)),
+          color: rgb(...hexRgb(agendaQrBackground(cfg))),
         });
       }
       const dark = hexRgb(agendaQrForeground(cfg));
@@ -587,7 +587,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
               x: x + unit / 2,
               y: y + unit / 2,
               size: unit / 2,
-              color: dark,
+              color: rgb(...dark),
             });
             continue;
           }
@@ -597,7 +597,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
               y: y + unit * 0.06,
               width: unit * 0.88,
               height: unit * 0.88,
-              color: dark,
+              color: rgb(...dark),
             });
             continue;
           }
