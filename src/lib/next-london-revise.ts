@@ -1340,6 +1340,116 @@ export function buildLondonPanelAi(
 }
 
 /**
+ * Printer's marks drawn in the margin around the sheet, in page space (y up):
+ *   * crop marks at each trim corner, offset clear of the trim so a mark never
+ *     prints inside the visible panel,
+ *   * bleed ticks showing where the bleed edge runs,
+ *   * centre registration targets on all four edges.
+ * Hairlines only — 100K in CMYK, pure black in RGB. No text, so the file stays
+ * font-free exactly like the design master.
+ */
+function londonPrintMarksOps(
+  panel: LondonPanel,
+  margin: number,
+  cmyk: boolean,
+  vibrance: number,
+): string {
+  const w = panel.bleedW * MM_TO_PT;
+  const h = panel.bleedH * MM_TO_PT;
+  const pageW = w + margin * 2;
+  const pageH = h + margin * 2;
+  // Trim rectangle on the page.
+  const tx0 = margin + ((panel.bleedW - panel.trimW) / 2) * MM_TO_PT;
+  const ty0 = margin + ((panel.bleedH - panel.trimH) / 2) * MM_TO_PT;
+  const tx1 = tx0 + panel.trimW * MM_TO_PT;
+  const ty1 = ty0 + panel.trimH * MM_TO_PT;
+
+  const off = LONDON_MARKS_OFFSET_MM * MM_TO_PT;
+  const len = LONDON_MARKS_LENGTH_MM * MM_TO_PT;
+  const tick = len * 0.55;
+  // 100K text/line rule: marks are always solid black, never a rich build.
+  const ink = cmyk ? `${cmykStrokeOp(londonCmykBuild("#000000", vibrance))}` : "0 G";
+
+  const line = (x1: number, y1: number, x2: number, y2: number) =>
+    `${f3(x1)} ${f3(y1)} m ${f3(x2)} ${f3(y2)} l S\n`;
+
+  let ops = `q ${ink} 0.25 w 1 J 0 j\n`;
+
+  // Crop marks: two per corner, starting `off` clear of the trim line.
+  for (const [x, sx] of [
+    [tx0, -1],
+    [tx1, 1],
+  ] as const) {
+    for (const [y, sy] of [
+      [ty0, -1],
+      [ty1, 1],
+    ] as const) {
+      ops += line(x + sx * off, y, x + sx * (off + len), y);
+      ops += line(x, y + sy * off, x, y + sy * (off + len));
+    }
+  }
+
+  // Bleed ticks, drawn in the margin outside each bleed corner.
+  for (const [x, sx] of [
+    [margin, -1],
+    [margin + w, 1],
+  ] as const) {
+    for (const [y, sy] of [
+      [margin, -1],
+      [margin + h, 1],
+    ] as const) {
+      ops += line(x, y + sy * off * 0.5, x, y + sy * (off * 0.5 + tick));
+      ops += line(x + sx * off * 0.5, y, x + sx * (off * 0.5 + tick), y);
+    }
+  }
+
+  // Centre registration targets: a crosshair in each margin edge.
+  const r = Math.min(margin * 0.28, 4 * MM_TO_PT);
+  const target = (cx: number, cy: number) =>
+    line(cx - r * 1.6, cy, cx + r * 1.6, cy) +
+    line(cx, cy - r * 1.6, cx, cy + r * 1.6) +
+    // Circle from four Bézier arcs.
+    (() => {
+      const k = r * 0.5523;
+      return (
+        `${f3(cx + r)} ${f3(cy)} m ` +
+        `${f3(cx + r)} ${f3(cy + k)} ${f3(cx + k)} ${f3(cy + r)} ${f3(cx)} ${f3(cy + r)} c ` +
+        `${f3(cx - k)} ${f3(cy + r)} ${f3(cx - r)} ${f3(cy + k)} ${f3(cx - r)} ${f3(cy)} c ` +
+        `${f3(cx - r)} ${f3(cy - k)} ${f3(cx - k)} ${f3(cy - r)} ${f3(cx)} ${f3(cy - r)} c ` +
+        `${f3(cx + k)} ${f3(cy - r)} ${f3(cx + r)} ${f3(cy - k)} ${f3(cx + r)} ${f3(cy)} c S\n`
+      );
+    })();
+
+  ops += target(pageW / 2, margin / 2);
+  ops += target(pageW / 2, pageH - margin / 2);
+  ops += target(margin / 2, pageH / 2);
+  ops += target(pageW - margin / 2, pageH / 2);
+
+  return `${ops}Q\n`;
+}
+
+/**
+ * Print-ready PDF for one sign: the same vector master, wrapped in a marks
+ * margin with crop marks, bleed ticks and registration targets, and with
+ * Media/Bleed/TrimBox set so a printer can impose and cut without asking a
+ * question. Hand this file to the print vendor as-is.
+ */
+export function buildLondonPanelPrintPdf(
+  panel: LondonPanel,
+  options: LondonArtOptions = {},
+): Uint8Array {
+  return buildLondonPanelAi(panel, { ...options, printMarks: true });
+}
+
+/** Print-ready PDF, resolving supplied vendor artwork first. */
+export async function buildLondonPanelPrintPdfAsync(
+  panel: LondonPanel,
+  options: LondonArtOptions = {},
+): Promise<Uint8Array> {
+  return buildLondonPanelAiAsync(panel, { ...options, printMarks: true });
+}
+
+/**
  * Step-and-repeat wall as live PDF content: repeated lockup outlines, live text
  * objects and vector QR modules, each rotated about its own centre.
  */
