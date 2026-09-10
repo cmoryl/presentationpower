@@ -95,6 +95,7 @@ import {
 } from "@/lib/next-london-logo-placement";
 import {
   isStepRepeatPanel,
+  clampStepRepeatConfig,
   stepRepeatConfig,
   stepRepeatPlan,
   stepRepeatSvgLayer,
@@ -710,7 +711,12 @@ export function buildLondonPanelSvg(
   // wall layer replaces the hero lockup and the headline entirely.
   const wall =
     !boothArt && isStepRepeatPanel(panel)
-      ? stepRepeatPlan(panel, options.stepRepeat ?? stepRepeatConfig(panel.id))
+      ? stepRepeatPlan(
+          panel,
+          options.stepRepeat
+            ? clampStepRepeatConfig(options.stepRepeat)
+            : stepRepeatConfig(panel.id),
+        )
       : null;
 
   const brand = londonBrandingPlan(panel, options.placement);
@@ -996,7 +1002,12 @@ export function buildLondonPanelAi(
       })();
 
   const wall = isStepRepeatPanel(panel)
-    ? stepRepeatPlan(panel, options.stepRepeat ?? stepRepeatConfig(panel.id))
+    ? stepRepeatPlan(
+          panel,
+          options.stepRepeat
+            ? clampStepRepeatConfig(options.stepRepeat)
+            : stepRepeatConfig(panel.id),
+        )
     : null;
 
   // Supplied vendor artwork: embedded as a real image XObject so the `.ai`

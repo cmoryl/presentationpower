@@ -12,6 +12,10 @@
 import { useSyncExternalStore } from "react";
 
 import { rasterSizeFor, recommendedPpi, type LondonPanel } from "@/lib/next-london-signage";
+import {
+  clearLondonOverrideCleared,
+  markLondonOverrideCleared,
+} from "@/lib/next-london-override-clears";
 
 export type LondonBoardSize = {
   /** Finished signboard width, in mm. */
@@ -114,6 +118,7 @@ export function setLondonBoardSize(
   const stock = londonStockSize(panel);
   const next = clampSize({ ...(londonBoardSizes()[panel.id] ?? stock), ...patch }, stock);
   sizes = { ...londonBoardSizes(), [panel.id]: next };
+  clearLondonOverrideCleared("boardSize", panel.id);
   persist();
   emit();
   return next;
@@ -121,6 +126,7 @@ export function setLondonBoardSize(
 
 /** Drop the measured size so the panel returns to the shipped spec. */
 export function resetLondonBoardSize(panelId: string): void {
+  markLondonOverrideCleared("boardSize", panelId);
   const current = londonBoardSizes();
   if (!(panelId in current)) return;
   const next = { ...current };

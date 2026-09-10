@@ -16,6 +16,7 @@ import { useLondonLogoPlacements, londonLogoPlacements } from "@/lib/next-london
 import { useLondonPlacedArt, londonPlacedArtMap } from "@/lib/next-london-placed-art";
 import { useStepRepeatConfigs, stepRepeatConfigs } from "@/lib/next-london-step-repeat";
 import { useLondonRemovals } from "@/lib/next-london-removals";
+import { mergeLondonOverrideMap } from "@/lib/next-london-override-clears";
 import { useLondonVariations } from "@/lib/next-london-variations";
 import {
   londonPublishedOverridesReady,
@@ -30,13 +31,23 @@ import type { LondonPanel } from "@/lib/next-london-signage";
 /** How long the editor stays quiet before a save is published. */
 const SETTLE_MS = 1500;
 
-/** The design overrides saved in this browser, exactly as a revision stores them. */
-export function londonOverridesSnapshot(): LondonOverrides {
+/**
+ * The overrides to publish: what is already published, with this browser's edits
+ * layered over it.
+ *
+ * Publishing the local stores alone was destructive — opening the kit in a
+ * browser that holds no local edits wiped every published lockup placement,
+ * board size, wall recipe (QR walls included) and placed artwork on the next
+ * save. Only an explicit "Reset" drops a published value now.
+ */
+export function londonOverridesSnapshot(
+  published?: LondonOverrides | null,
+): LondonOverrides {
   return {
-    placements: londonLogoPlacements(),
-    boardSizes: londonBoardSizes(),
-    stepRepeat: stepRepeatConfigs(),
-    placedArt: londonPlacedArtMap(),
+    placements: mergeLondonOverrideMap("placement", published?.placements, londonLogoPlacements()),
+    boardSizes: mergeLondonOverrideMap("boardSize", published?.boardSizes, londonBoardSizes()),
+    stepRepeat: mergeLondonOverrideMap("stepRepeat", published?.stepRepeat, stepRepeatConfigs()),
+    placedArt: mergeLondonOverrideMap("placedArt", published?.placedArt, londonPlacedArtMap()),
   };
 }
 
@@ -93,7 +104,7 @@ export function LondonAutoPublish({ panels, removedIds = [] }: LondonAutoPublish
     if (!userId) return;
     if (!londonPublishedOverridesReady()) return;
     if (busy.current) return;
-    const snapshot = londonOverridesSnapshot();
+    const snapshot = londonOverridesSnapshot(publishedOverrides);
     const next = signature(snapshot);
     if (publishedRemovals.current === null) publishedRemovals.current = removalKey;
     if (publishedVariations.current === null) publishedVariations.current = variationKey;

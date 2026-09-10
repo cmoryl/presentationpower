@@ -36,6 +36,7 @@ import {
 import { auditAi, auditSvg, gateOnQa } from "@/lib/london-signage-qa";
 import { getLondonHeadRevision } from "@/lib/next-london-revise.functions";
 import { LondonAutoPublish } from "@/components/events/LondonAutoPublish";
+import { adoptLondonPublishedOverrides } from "@/lib/next-london-adopt-published";
 import { setLondonPublishedOverrides } from "@/lib/next-london-published-overrides";
 import { NEXT_LONDON_AGENDA_URL } from "@/lib/next-event";
 import { cmykLabel, cmykToHex, londonCmykBuild } from "@/lib/next-london-cmyk";
@@ -172,7 +173,7 @@ function LondonTemplatePage() {
       .then((res) => {
         if (!live) return;
         setHeadRev(res.revision?.rev ?? 0);
-        setLondonPublishedOverrides(res.revision?.overrides ?? null);
+        setLondonPublishedOverrides(adoptLondonPublishedOverrides(res.revision?.overrides ?? null));
       })
       .catch(() => {
         /* No revision reachable — fall back to the issued pack numbering. */
