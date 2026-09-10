@@ -15,6 +15,7 @@ import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { buildLondonPanelSvg, type LondonArtOptions } from "@/lib/next-london-revise";
 import {
   fitArtworkInFace,
+  sceneArtworkObjectFit,
   scenesForPanel,
   type LondonScene,
 } from "@/lib/next-london-scenes";
@@ -40,6 +41,9 @@ function Stage({
   stageRef?: React.Ref<HTMLDivElement>;
 }) {
   const box = useMemo(() => fitArtworkInFace(panel, scene), [panel, scene]);
+  // Applied vinyls cover their surface; hung items fill a box already cut to
+  // the item's true trim ratio. Nothing is ever stretched.
+  const fit = useMemo(() => sceneArtworkObjectFit(panel, scene), [panel, scene]);
   return (
     <div
       ref={stageRef}
@@ -60,7 +64,7 @@ function Stage({
         <SceneArtworkPlate
           box={box}
           sceneId={scene.id}
-          face={scene.face}
+          face={fit === "cover" ? undefined : scene.face}
           substrate={
             <img
               src={art}
@@ -75,7 +79,7 @@ function Stage({
             src={art}
             alt={`${panel.name} installed as a ${scene.label.toLowerCase()}`}
             className="absolute inset-0 h-full w-full"
-            style={{ objectFit: "fill" }}
+            style={{ objectFit: fit }}
           />
         </SceneArtworkPlate>
       ) : (
