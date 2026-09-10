@@ -1851,7 +1851,7 @@ export function resolveLondonArtwork(
     issued.bleedW === panel.bleedW &&
     issued.bleedH === panel.bleedH &&
     issued.bleedEdge === panel.bleedEdge;
-  if (matchesIssue && !hasLondonArtOverrides(options)) {
+  if (matchesIssue && !hasLondonArtOverrides(options) && issuedSvgMeetsSpec(panel, entry!.svg)) {
     // Always rebuild the AI side with Illustrator-safe vector fills. Some of
     // the issued PDF-compatible masters contain shading dictionaries that
     // Illustrator reinterprets with a warning even though PDF renderers accept
