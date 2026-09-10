@@ -56,6 +56,8 @@ import {
   londonTintedStops,
 } from "@/lib/next-london-division";
 import { loadLondonGroundImage, type LondonGroundImage } from "@/lib/next-london-artwork";
+import { NEXT_LOGO_FAMILIES } from "@/lib/next-logo-vectors";
+
 
 import {
   cmykAxialShadingDict,
