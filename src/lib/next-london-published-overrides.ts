@@ -60,10 +60,12 @@ export function londonEditsArePublished(
   },
   overrides: LondonOverrides = published,
 ): boolean {
+  // Only the aspects the caller actually tracks are compared, so a page that
+  // does not edit (say) step-and-repeat never reports a false draft.
   return (
-    same(local.placement, overrides.placements?.[panelId]) &&
-    same(local.boardSize, overrides.boardSizes?.[panelId]) &&
-    same(local.placedArt, overrides.placedArt?.[panelId]) &&
-    same(local.stepRepeat, overrides.stepRepeat?.[panelId])
+    (!("placement" in local) || same(local.placement, overrides.placements?.[panelId])) &&
+    (!("boardSize" in local) || same(local.boardSize, overrides.boardSizes?.[panelId])) &&
+    (!("placedArt" in local) || same(local.placedArt, overrides.placedArt?.[panelId])) &&
+    (!("stepRepeat" in local) || same(local.stepRepeat, overrides.stepRepeat?.[panelId]))
   );
 }
