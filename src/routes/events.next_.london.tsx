@@ -48,6 +48,7 @@ import {
 } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import { londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
+import { buildLondonKitZip } from "@/lib/next-london-kit-zip";
 import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles } from "@/lib/next-london-live-files";
 import { LondonLiveFilePanel } from "@/components/events/LondonLiveFilePanel";
@@ -97,6 +98,7 @@ import {
   LONDON_STYLES,
   LONDON_VENUE,
   loadLondonArtwork,
+  LONDON_FLOORS,
   londonPanelsByFloor,
   londonRasterWeightMb,
   londonScheduleCsv,
@@ -595,6 +597,70 @@ function LondonSignagePage() {
       },
     );
 
+  // The whole kit in one file: every sign's live vector master and print-ready
+  // PDF, filed Floor / Room, plus the supplied master where the design team
+  // hand-finished one. A sign that fails QA is listed in SKIPPED.txt instead of
+  // silently landing in the pack.
+  const [zipProgress, setZipProgress] = useState<string | null>(null);
+  const isDraftKit = panels.some((p) => isDraft(p));
+  const downloadWholeKit = () =>
+    runWithExportFeedback(
+      {
+        pending: `Packing all ${panels.length} signs…`,
+        success: "Master kit ZIP downloaded",
+        failure: "Kit pack failed",
+        successDescription: "Live AI masters and print-ready PDFs, filed by floor and room.",
+      },
+      async () => {
+        await loadLondonSignageFace();
+        const pack = await packOrNull();
+        const floorLabels = new Map(LONDON_FLOORS.map((f) => [f.id, f.label] as const));
+        try {
+          const result = await buildLondonKitZip(
+            panels,
+            {
+              fileBase,
+              floorLabel: (panel) => floorLabels.get(panel.floor) ?? panel.floor,
+              ai: async (panel) => {
+                const art = await resolveLondonArtworkAsync(panel, pack, exportOptions(panel));
+                gateOnQa(auditAi(panel, art.ai));
+                return londonAiBytes(art.ai);
+              },
+              printPdf: async (panel) => {
+                const bytes = await buildLondonPanelPrintPdfAsync(panel, exportOptions(panel));
+                gateOnQa(auditPrintPdf(panel, bytes, LONDON_MARKS_MARGIN_MM));
+                return londonAiBytes(bytes);
+              },
+              supplied: async (panel) => {
+                const master = londonSuppliedMaster(panel);
+                if (!master) return null;
+                const res = await fetch(master.aiUrl);
+                if (!res.ok) return null;
+                return {
+                  filename: master.filename,
+                  bytes: new Uint8Array(await res.arrayBuffer()),
+                };
+              },
+            },
+            {
+              revLabel: isDraftKit ? "rdraft" : `r${String(headRev).padStart(3, "0")}`,
+              scheduleCsv: londonScheduleCsv(panels),
+              onProgress: (done, total, panel) =>
+                setZipProgress(`${done} of ${total} — ${panel.name}`),
+            },
+          );
+          download(result.blob, result.filename);
+          if (result.skipped.length) {
+            toast.warning(`${result.skipped.length} sign(s) left out of the pack`, {
+              description: "Open SKIPPED.txt in the ZIP for the reason on each one.",
+            });
+          }
+        } finally {
+          setZipProgress(null);
+        }
+      },
+    );
+
   const downloadSchedule = () =>
     runWithExportFeedback(
       {
@@ -701,6 +767,15 @@ function LondonSignagePage() {
                 className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
                 <Table2 className="h-4 w-4" /> Print schedule (CSV)
+              </button>
+              <button
+                type="button"
+                onClick={downloadWholeKit}
+                disabled={Boolean(zipProgress)}
+                className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+              >
+                <Download className="h-4 w-4" />
+                {zipProgress ? `Packing — ${zipProgress}` : "Download whole kit (ZIP)"}
               </button>
               <button
                 type="button"
