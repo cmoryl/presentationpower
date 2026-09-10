@@ -97,6 +97,7 @@ import {
   LONDON_STYLES,
   LONDON_VENUE,
   loadLondonArtwork,
+  LONDON_FLOORS,
   londonPanelsByFloor,
   londonRasterWeightMb,
   londonScheduleCsv,
