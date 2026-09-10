@@ -135,10 +135,16 @@ export function isLondonVariation(panelId: string): boolean {
  * like the sign it came from and is edited independently from there.
  */
 export function createLondonVariation(panel: LondonPanel): LondonVariation | null {
-  const source = londonVariations()[panel.id]?.sourceId ?? panel.id;
+  const all = londonVariations();
+  const source = all[panel.id]?.sourceId ?? panel.id;
   const existing = londonVariationsOf(source);
   if (existing.length >= MAX_PER_SOURCE) return null;
-  const index = existing.length;
+  // Take the first free slot rather than counting the copies that exist. After
+  // deleting "Version B" of a pillar, the next copy must not be handed the id
+  // that "Version C" is already using.
+  let index = 0;
+  while (index < MAX_PER_SOURCE && `${source}-var-${index + 2}` in all) index += 1;
+  if (index >= MAX_PER_SOURCE) return null;
   const label = versionLabel(index);
   const id = `${source}-var-${index + 2}`;
   const baseName = panel.name.replace(/\s*\((?:VERSION|Version)[^)]*\)/g, "").trim();
