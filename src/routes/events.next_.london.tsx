@@ -1122,6 +1122,48 @@ function LondonSignagePage() {
                 ))}
               </dl>
 
+              {/* Remove this sign from the kit. Copies are deleted outright;
+                  originals are taken out and can be put back at any time. */}
+              <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[#E53D2E]/30 bg-[#E53D2E]/[0.04] p-4">
+                <div className="min-w-0 flex-1">
+                  <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/60">
+                    Remove this sign
+                  </p>
+                  <p className="mt-1 text-[12.5px] leading-relaxed text-[#03002C]/70">
+                    Takes it out of this area and out of the vendor pack on the next save. You can
+                    put it back from the list at the bottom of this page.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const isCopy = Boolean(variations[openPanel.id]);
+                    if (
+                      !window.confirm(
+                        isCopy
+                          ? `Delete "${openPanel.name}"? Its own edits go with it.`
+                          : `Remove "${openPanel.name}" from the kit? You can put it back later.`,
+                      )
+                    )
+                      return;
+                    if (isCopy) removeLondonVariation(openPanel.id);
+                    else removeLondonPanel(openPanel);
+                    setOpenPanel(null);
+                    setEditing(false);
+                    toast.success(isCopy ? "Version deleted" : `${openPanel.name} removed`, {
+                      description: isCopy
+                        ? "The original is untouched."
+                        : "It is out of this area — restore it from the removed list any time.",
+                    });
+                  }}
+                  className="inline-flex items-center gap-2 rounded-full border border-[#E53D2E]/50 px-4 py-2 text-xs font-semibold text-[#E53D2E] hover:bg-white"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Remove sign
+                </button>
+              </div>
+
+
               {/* The finished live file in force for this sign. Replacing it here
                   re-paints every preview card in the kit at once. */}
               {isBoothPanel(openPanel) ? null : (
