@@ -484,6 +484,107 @@ export function auditAiGradient(panel: LondonPanel, text: string): QaCheck[] {
 }
 
 // ---------------------------------------------------------------------------
+// Print-ready PDF (marks margin)
+// ---------------------------------------------------------------------------
+
+/**
+ * A print-ready PDF is the vector master wrapped in a marks margin: the page
+ * grows on every edge, the artwork stays at bleed size in the middle, and crop
+ * marks / bleed ticks / registration targets live in the margin. This audit
+ * checks that geometry — the master's own checks assume no margin, so a marked
+ * file is audited here instead.
+ */
+export function auditPrintPdf(
+  panel: LondonPanel,
+  pdf: string | Uint8Array,
+  marginMm: number,
+): LondonQaReport {
+  const text =
+    typeof pdf === "string" ? pdf : Array.from(pdf, (b) => String.fromCharCode(b)).join("");
+  const margin = marginMm * MM_TO_PT;
+  const media = box(text, "MediaBox");
+  const bleed = box(text, "BleedBox");
+  const trim = box(text, "TrimBox");
+  const expectW = panel.bleedW * MM_TO_PT + margin * 2;
+  const expectH = panel.bleedH * MM_TO_PT + margin * 2;
+  const trimInsetX = margin + ((panel.bleedW - panel.trimW) / 2) * MM_TO_PT;
+  const trimInsetY = margin + ((panel.bleedH - panel.trimH) / 2) * MM_TO_PT;
+
+  const checks: QaCheck[] = [
+    ...auditPanelSpec(panel),
+    check(
+      "pdf-valid",
+      "Valid PDF file",
+      text.startsWith("%PDF-") && text.trimEnd().endsWith("%%EOF"),
+      "%PDF header + %%EOF trailer",
+      text.slice(0, 8).trim() || "unknown",
+    ),
+    check(
+      "pdf-mediabox",
+      "Page is bleed plus the marks margin",
+      !!media && near(media[2]! - media[0]!, expectW, 0.6) && near(media[3]! - media[1]!, expectH, 0.6),
+      `${expectW.toFixed(1)} × ${expectH.toFixed(1)} pt`,
+      media
+        ? `${(media[2]! - media[0]!).toFixed(1)} × ${(media[3]! - media[1]!).toFixed(1)} pt`
+        : "absent",
+    ),
+    check(
+      "pdf-bleedbox",
+      "BleedBox sits at the artwork edge",
+      !!bleed &&
+        near(bleed[0]!, margin, 0.6) &&
+        near(bleed[1]!, margin, 0.6) &&
+        near(bleed[2]! - bleed[0]!, panel.bleedW * MM_TO_PT, 0.6) &&
+        near(bleed[3]! - bleed[1]!, panel.bleedH * MM_TO_PT, 0.6),
+      `${margin.toFixed(1)} pt inset, ${(panel.bleedW * MM_TO_PT).toFixed(1)} × ${(panel.bleedH * MM_TO_PT).toFixed(1)} pt`,
+      bleed
+        ? `${bleed[0]!.toFixed(1)} pt inset, ${(bleed[2]! - bleed[0]!).toFixed(1)} × ${(bleed[3]! - bleed[1]!).toFixed(1)} pt`
+        : "absent",
+    ),
+    check(
+      "pdf-trimbox",
+      "TrimBox is the cut line",
+      !!trim &&
+        near(trim[0]!, trimInsetX, 0.6) &&
+        near(trim[1]!, trimInsetY, 0.6) &&
+        near(trim[2]! - trim[0]!, panel.trimW * MM_TO_PT, 0.6) &&
+        near(trim[3]! - trim[1]!, panel.trimH * MM_TO_PT, 0.6),
+      `${trimInsetX.toFixed(1)} / ${trimInsetY.toFixed(1)} pt inset, ${(panel.trimW * MM_TO_PT).toFixed(1)} × ${(panel.trimH * MM_TO_PT).toFixed(1)} pt`,
+      trim
+        ? `${trim[0]!.toFixed(1)} / ${trim[1]!.toFixed(1)} pt inset, ${(trim[2]! - trim[0]!).toFixed(1)} × ${(trim[3]! - trim[1]!).toFixed(1)} pt`
+        : "absent",
+    ),
+    check(
+      "pdf-marks",
+      "Crop, bleed and registration marks present",
+      /\/TPPrintMarks\s*true/.test(text) && / S\n/.test(text),
+      "marks layer drawn in the margin",
+      /\/TPPrintMarks\s*true/.test(text) ? "marks drawn" : "no marks",
+    ),
+    (() => {
+      const liveFont = /\/Subtype\s*\/(TrueType|Type1)/.test(text) || / Tj/.test(text);
+      return check(
+        "pdf-no-live-text",
+        "Copy is outlined vector paths",
+        !liveFont,
+        "no font resource, no text-showing operator",
+        liveFont ? "live text found" : "outlined paths",
+      );
+    })(),
+    ...auditAiGradient(panel, text),
+  ];
+
+  return {
+    panelId: panel.id,
+    panelName: panel.name,
+    file: `${panelSlug(panel)}-print.pdf`,
+    kind: "ai",
+    status: worst(checks),
+    checks,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Raster: PNG
 // ---------------------------------------------------------------------------
 

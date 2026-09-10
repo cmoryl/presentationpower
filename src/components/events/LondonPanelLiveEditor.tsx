@@ -32,7 +32,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { auditAi, auditSvg, gateOnQa } from "@/lib/london-signage-qa";
+import { auditAi, auditPrintPdf, auditSvg, gateOnQa } from "@/lib/london-signage-qa";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { NEXT_LONDON_AGENDA_URL } from "@/lib/next-event";
 import { LondonPrintGuides, LondonPrintReadout } from "@/components/london/LondonPrintPreview";
@@ -41,6 +41,8 @@ import { isStepRepeatPanel, mmToIn, useStepRepeatConfigs } from "@/lib/next-lond
 import { londonBrandingPlan } from "@/lib/next-london-branding";
 import {
   buildLondonPanelAiAsync,
+  buildLondonPanelPrintPdfAsync,
+  LONDON_MARKS_MARGIN_MM,
   londonGroundBox,
   buildLondonPanelSvg,
   londonAiBytes,
@@ -310,7 +312,7 @@ export function LondonPanelLiveEditor({
       textDy: placement.textDy + dy,
     });
 
-  const downloadPanel = async (kind: "svg" | "ai") => {
+  const downloadPanel = async (kind: "svg" | "ai" | "pdf") => {
     await loadLondonSignageFace();
     const base = londonPanelFileBase(panel, revisionLabel, colorSpace);
     // Same spec gate as the kit page: a file that disagrees with the panel
@@ -320,6 +322,11 @@ export function LondonPanelLiveEditor({
       const svg = buildLondonPanelSvg(panel, art);
       gateOnQa(auditSvg(panel, svg));
       blob = new Blob([svg], { type: "image/svg+xml" });
+    } else if (kind === "pdf") {
+      // Print-ready: bleed sheet inside a marks margin, crop marks and boxes set.
+      const pdf = await buildLondonPanelPrintPdfAsync(panel, art);
+      gateOnQa(auditPrintPdf(panel, pdf, LONDON_MARKS_MARGIN_MM));
+      blob = new Blob([londonAiBytes(pdf)], { type: "application/pdf" });
     } else {
       const ai = await buildLondonPanelAiAsync(panel, art);
       gateOnQa(auditAi(panel, ai));
@@ -328,14 +335,14 @@ export function LondonPanelLiveEditor({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${base}.${kind}`;
+    link.download = kind === "pdf" ? `${base}-print.pdf` : `${base}.${kind}`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
     toast.message(`${base}.${kind} · ${colorSpace.toUpperCase()}`);
   };
 
   /** Download with the kit page's pending/success/failure feedback. */
-  const savePanel = (kind: "svg" | "ai") =>
+  const savePanel = (kind: "svg" | "ai" | "pdf") =>
     runWithExportFeedback(
       {
         pending: `Preparing ${panel.name}.${kind}…`,
@@ -1328,6 +1335,15 @@ export function LondonPanelLiveEditor({
             onClick={() => void savePanel("ai")}
           >
             <Download className="h-3.5 w-3.5" /> AI
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            title="Print-ready PDF: bleed, trim and crop marks"
+            onClick={() => void savePanel("pdf")}
+          >
+            <Download className="h-3.5 w-3.5" /> Print PDF
           </Button>
           {boothMaster ? (
             <Button variant="default" size="sm" className="gap-2" asChild>
