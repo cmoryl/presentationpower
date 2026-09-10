@@ -116,6 +116,11 @@ import {
 
 import { getLondonHeadRevision } from "@/lib/next-london-revise.functions";
 import { onLondonRevisionPublished } from "@/lib/next-london-revision-live";
+import { LondonAutoPublish } from "@/components/events/LondonAutoPublish";
+import {
+  londonEditsArePublished,
+  setLondonPublishedOverrides,
+} from "@/lib/next-london-published-overrides";
 
 /** Millimetres as inches — every signage spec reads in both units. */
 const inch = (mm: number) => (mm / 25.4).toFixed(mm < 100 ? 2 : 1);
