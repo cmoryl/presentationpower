@@ -1182,19 +1182,53 @@ export function buildLondonPanelAi(
   // lists the hero lockup FIRST, so it is the top layer when the .ai is opened.
   // A photo wall's top layer is the repeat field itself: every mark, text tile
   // and QR is a live PDF object, so the wall stays fully editable in Illustrator.
-  const wallOps = wall
-    ? stepRepeatPdfOps(wall, h, fillOp, copyInk, (text, sizeMm, x, y) =>
-        outlineOps(
-          outlineText(face, text, {
-            sizeMm,
-            trackingEm: LONDON_SIGNAGE_FONT.tracking,
-            anchor: "middle",
-            x,
-            y,
-          }).d,
-        ),
-      )
-    : "";
+  const wallOutline = (text: string, sizeMm: number, x: number, y: number): string =>
+    outlineOps(
+      outlineText(face, text, {
+        sizeMm,
+        trackingEm: LONDON_SIGNAGE_FONT.tracking,
+        anchor: "middle",
+        x,
+        y,
+      }).d,
+    );
+  const wallOps = wall ? stepRepeatPdfOps(wall, h, fillOp, copyInk, wallOutline) : "";
+
+  // A multi-mark wall is split into one Illustrator layer per lockup (plus a
+  // layer for text/QR tiles), so each division's marks can be shown, hidden,
+  // recoloured or moved on their own without touching the rest of the field.
+  const wallLayers: { name: string; ops: string }[] = wall
+    ? (() => {
+        const arts = wall.arts ?? [];
+        if (arts.length < 2) return [];
+        const out: { name: string; ops: string }[] = [];
+        arts.forEach((_art, index) => {
+          const ops = stepRepeatPdfOps(
+            wall,
+            h,
+            fillOp,
+            copyInk,
+            wallOutline,
+            (tile) => tile.kind === "logo" && tile.artIndex === index,
+          );
+          if (!ops) return;
+          const familyId = wall.artFamilies[index] ?? wall.config.familyId;
+          const label = NEXT_LOGO_FAMILIES[familyId]?.label ?? familyId;
+          out.push({ name: `Lockup · ${label}`, ops });
+        });
+        const rest = stepRepeatPdfOps(
+          wall,
+          h,
+          fillOp,
+          copyInk,
+          wallOutline,
+          (tile) => tile.kind !== "logo",
+        );
+        if (rest) out.push({ name: "Copy & QR tiles", ops: rest });
+        return out;
+      })()
+    : [];
+
 
   // Ground: the vendor's placed artwork when supplied (zoom/pan honoured),
   // otherwise the live gradient shading.
