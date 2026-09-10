@@ -70,14 +70,19 @@ export function useLondonLivePanel(
         JSON.stringify(placement ?? null),
         JSON.stringify(placedArt ?? null),
         JSON.stringify(boardSize ?? null),
+        JSON.stringify(stepRepeat ?? null),
         JSON.stringify(base),
         liveFiles[input.id]
           ? `live:${liveFiles[input.id]!.version}:${liveFiles[input.id]!.proofUrl ?? ""}`
           : "live:none",
       ].join("|"),
       draft:
-        Boolean(placement || placedArt || boardSize) &&
-        !londonEditsArePublished(input.id, { placement, placedArt, boardSize }, publishedOverrides),
+        Boolean(placement || placedArt || boardSize || stepRepeat) &&
+        !londonEditsArePublished(
+          input.id,
+          { placement, placedArt, boardSize, stepRepeat },
+          publishedOverrides,
+        ),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -85,6 +90,7 @@ export function useLondonLivePanel(
     placements,
     placedArtMap,
     boardSizes,
+    stepRepeats,
     liveFiles,
     publishedOverrides,
     JSON.stringify(base),
