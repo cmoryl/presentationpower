@@ -125,7 +125,7 @@ export const LONDON_SCENES: LondonScene[] = [
     y: 0.0996,
     w: 0.1914,
     h: 0.8213,
-  }, "h", "center", "cover"),
+  }, "w", "center", "cover"),
   scene("step-repeat", "Step-and-repeat wall", "Press / photo point", "wall", stepRepeat, {
     x: 0.1061,
     y: 0.1221,
@@ -190,7 +190,12 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
   const hints = hintedKinds(panel);
   return [...LONDON_SCENES]
     .map((s) => {
-      const hint = hints.indexOf(s.kind);
+      // A door/vinyl keyword only wins if the item can actually skin that
+      // surface; a square artwork on a tall leaf is not a door vinyl scene.
+      const coverable =
+        s.mount !== "cover" ||
+        canCoverFace({ face: s.face, plate: s.plate, ratio });
+      const hint = coverable ? hints.indexOf(s.kind) : -1;
       const orientation =
         (ratio >= 1) === (s.faceRatio >= 1) ? 0 : 1.5;
       const fit = Math.abs(Math.log(s.faceRatio / ratio));
