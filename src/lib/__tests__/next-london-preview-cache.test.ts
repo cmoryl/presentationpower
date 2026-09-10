@@ -13,7 +13,12 @@ import {
 import { LONDON_PANELS } from "@/lib/next-london-signage";
 
 const panel = LONDON_PANELS.find((item) => item.id === "ldn-v07") ?? LONDON_PANELS[0];
-const issuedSvg = '<svg data-source="issued-cache" />';
+// A stand-in for an issued master that still meets the print spec: trim and
+// bleed geometry recorded, and headline copy present as outlined paths. Issued
+// files missing either are rebuilt on purpose, so this fixture carries both.
+const issuedSvg = panel
+  ? `<svg data-source="issued-cache" data-trim="${panel.trimW}x${panel.trimH}mm" data-bleed="${panel.bleedEdge}mm" data-text="copy" />`
+  : "<svg />";
 const pack = panel ? { [panel.id]: { svg: issuedSvg, ai: "issued-ai" } } : {};
 
 beforeAll(async () => {

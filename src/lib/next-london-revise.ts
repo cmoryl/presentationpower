@@ -1787,13 +1787,36 @@ export function matchesIssuedArtwork(
   );
 }
 
+/**
+ * True when a packaged issued SVG still satisfies the current print spec.
+ *
+ * The first issue of the venue pack predates two rules the QA gate now enforces:
+ * trim/bleed geometry recorded on the artboard, and headline copy present as
+ * outlined vector paths. Reusing those masters ships files that fail spec QA, so
+ * anything that falls short is rebuilt from the spec instead.
+ */
+export function issuedSvgMeetsSpec(panel: LondonPanel, svg: string): boolean {
+  if (!svg.includes(`data-trim="${panel.trimW}x${panel.trimH}mm"`)) return false;
+  if (!/data-bleed="[\d.]+mm"/.test(svg)) return false;
+  if (/<text[\s>]/i.test(svg)) return false;
+  let wantsCopy = false;
+  try {
+    wantsCopy = Boolean(londonBrandingPlan(panel).copy);
+  } catch {
+    wantsCopy = false;
+  }
+  return !wantsCopy || svg.includes('data-text="');
+}
+
 /** SVG only — cheap enough for thumbnails, never stale. */
 export function londonPanelSvgFor(
   panel: LondonPanel,
   pack: Record<string, { svg: string; ai: string }> | null | undefined,
   options: LondonArtOptions = {},
 ): string {
-  return matchesIssuedArtwork(panel, pack) && !hasLondonArtOverrides(options)
+  return matchesIssuedArtwork(panel, pack) &&
+    !hasLondonArtOverrides(options) &&
+    issuedSvgMeetsSpec(panel, pack![panel.id]!.svg)
     ? pack![panel.id]!.svg
     : buildLondonPanelSvg(panel, options);
 }
@@ -1828,7 +1851,7 @@ export function resolveLondonArtwork(
     issued.bleedW === panel.bleedW &&
     issued.bleedH === panel.bleedH &&
     issued.bleedEdge === panel.bleedEdge;
-  if (matchesIssue && !hasLondonArtOverrides(options)) {
+  if (matchesIssue && !hasLondonArtOverrides(options) && issuedSvgMeetsSpec(panel, entry!.svg)) {
     // Always rebuild the AI side with Illustrator-safe vector fills. Some of
     // the issued PDF-compatible masters contain shading dictionaries that
     // Illustrator reinterprets with a warning even though PDF renderers accept
