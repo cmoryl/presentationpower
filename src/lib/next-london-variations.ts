@@ -13,18 +13,16 @@ import { useSyncExternalStore } from "react";
 
 import {
   londonBoardSizes,
+  resetLondonBoardSize,
   setLondonBoardSize,
   type LondonBoardSizeMap,
 } from "@/lib/next-london-board-size";
 import {
   londonLogoPlacements,
+  resetLondonLogoPlacement,
   setLondonLogoPlacement,
 } from "@/lib/next-london-logo-placement";
 import { londonPlacedArt, setLondonPlacedArt } from "@/lib/next-london-placed-art";
-import {
-  resetLondonBoardSize,
-} from "@/lib/next-london-board-size";
-import { resetLondonLogoPlacement } from "@/lib/next-london-logo-placement";
 import {
   resetStepRepeatConfig,
   setStepRepeatConfig,
