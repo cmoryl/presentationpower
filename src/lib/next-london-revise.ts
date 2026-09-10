@@ -1267,8 +1267,10 @@ export function buildLondonPanelAi(
       `/D << /Order [${artOcgNum && placed?.onTop ? `${artOcgNum} 0 R ` : ""}8 0 R 9 0 R 10 0 R` +
       `${artOcgNum && !placed?.onTop ? ` ${artOcgNum} 0 R` : ""}] /ON [${ocgRefs}] >> >> >>`,
     `<< /Type /Pages /Kids [3 0 R] /Count 1 >>`,
-    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f3(w)} ${f3(h)}] /BleedBox [0 0 ${f3(w)} ${f3(h)}] ` +
-      `/TrimBox [${f3(trimX)} ${f3(trimY)} ${f3(trimX + panel.trimW * MM_TO_PT)} ${f3(trimY + panel.trimH * MM_TO_PT)}] ` +
+    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f3(w + margin * 2)} ${f3(h + margin * 2)}] ` +
+      `/BleedBox [${f3(margin)} ${f3(margin)} ${f3(margin + w)} ${f3(margin + h)}] ` +
+      `/TrimBox [${f3(margin + trimX)} ${f3(margin + trimY)} ${f3(margin + trimX + panel.trimW * MM_TO_PT)} ${f3(margin + trimY + panel.trimH * MM_TO_PT)}] ` +
+      `${margin ? `/TPPrintMarks true ` : ""}` +
       `/TPGradientKind /LiveShading /TPLockup (${pdfText(brand.art.source)}) ` +
       `/TPColorSpace (${cmyk ? `DeviceCMYK vibrant${vibrance}` : "DeviceRGB"}) ` +
       `/TPLockupColourway (${pdfText(brand.colourway)}) ` +
