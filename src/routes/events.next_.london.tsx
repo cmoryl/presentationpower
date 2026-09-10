@@ -1375,6 +1375,9 @@ function LondonSignagePage() {
           ) : null}
         </DialogContent>
       </Dialog>
+      {/* Saving a sign publishes it forward, so these cards and the vendor
+          downloads always carry the newest version. */}
+      <LondonAutoPublish panels={panels} />
     </AppShell>
   );
 }
