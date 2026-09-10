@@ -40,6 +40,7 @@ import { BoothRenderPreview } from "@/components/events/BoothRenderPreview";
 import { LondonLocationRenderPreview } from "@/components/events/LondonLocationRenderPreview";
 
 import { LondonAgendaBoards } from "@/components/events/LondonAgendaBoards";
+import { LondonGradientGrounds } from "@/components/events/LondonGradientGrounds";
 import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor";
 import {
   londonLogoPlacements,
