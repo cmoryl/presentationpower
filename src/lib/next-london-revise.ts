@@ -1385,7 +1385,9 @@ export function buildLondonPanelAi(
       `${placedOps ? placedArtAlphaGs(placed!) : ""}` +
       `${brewGs}>> ` +
       `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R` +
-      `${artOcgNum ? ` /oc4 ${artOcgNum} 0 R` : ""} >> >> /Contents 4 0 R >>`,
+      `${artOcgNum ? ` /oc4 ${artOcgNum} 0 R` : ""}` +
+      `${wallLayerNums.map((n, i) => ` /${wallLayerName(i)} ${n} 0 R`).join("")} >> >> /Contents 4 0 R >>`,
+
     `<< /Length ${sheet.length} >>\nstream\n${sheet}endstream`,
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
       `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)} · ${pdfText(`${brand.orientation === "side" ? "side-by-side" : "stacked"} ${brand.colourway} lockup`)}) >>`,
