@@ -168,7 +168,9 @@ function LondonTemplatePage() {
     let live = true;
     fetchHead({})
       .then((res) => {
-        if (live) setHeadRev(res.revision?.rev ?? 0);
+        if (!live) return;
+        setHeadRev(res.revision?.rev ?? 0);
+        setLondonPublishedOverrides(res.revision?.overrides ?? null);
       })
       .catch(() => {
         /* No revision reachable — fall back to the issued pack numbering. */
