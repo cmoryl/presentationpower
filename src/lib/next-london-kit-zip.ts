@@ -18,6 +18,8 @@ export type LondonKitZipBuilders = {
   ) => Promise<{ filename: string; bytes: Uint8Array } | null>;
   /** File stem for a panel, already stamped with the revision or `rdraft-`. */
   fileBase: (panel: LondonPanel) => string;
+  /** Human floor name for the folder, e.g. "Level 2 — Britten". */
+  floorLabel: (panel: LondonPanel) => string;
 };
 
 export type LondonKitZipOptions = {
@@ -70,7 +72,7 @@ export async function buildLondonKitZip(
 
   for (let i = 0; i < panels.length; i += 1) {
     const panel = panels[i]!;
-    const dir = `${zipSafeSegment(panel.floorLabel ?? panel.floor)}/${zipSafeSegment(panel.room)}`;
+    const dir = `${zipSafeSegment(builders.floorLabel(panel))}/${zipSafeSegment(panel.room)}`;
     const base = builders.fileBase(panel);
     const written: string[] = [];
     try {
@@ -87,10 +89,10 @@ export async function buildLondonKitZip(
       }
       files += written.length;
       rows.push([
-        panel.floorLabel ?? panel.floor,
+        builders.floorLabel(panel),
         panel.room,
         panel.name,
-        `${panel.trimWmm}x${panel.trimHmm}mm`,
+        `${panel.trimW}x${panel.trimH}mm`,
         written.join(" | "),
         "included",
       ]);
@@ -98,10 +100,10 @@ export async function buildLondonKitZip(
       const reason = err instanceof Error ? err.message : "Build failed";
       skipped.push({ panel: panel.name, reason });
       rows.push([
-        panel.floorLabel ?? panel.floor,
+        builders.floorLabel(panel),
         panel.room,
         panel.name,
-        `${panel.trimWmm}x${panel.trimHmm}mm`,
+        `${panel.trimW}x${panel.trimH}mm`,
         written.join(" | "),
         `SKIPPED — ${reason}`,
       ]);
