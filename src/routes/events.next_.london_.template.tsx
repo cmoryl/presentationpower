@@ -923,6 +923,8 @@ function LondonTemplatePage() {
           </aside>
         </div>
       </div>
+      {/* Every save here goes live immediately for the whole kit. */}
+      <LondonAutoPublish panels={LONDON_PANELS} />
     </AppShell>
   );
 }
