@@ -172,11 +172,14 @@ function download(blob: Blob, name: string) {
 function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
   const style = LONDON_STYLES[panel.style];
   const ratio = panel.bleedW / panel.bleedH;
-  // Vendor booths show the supplied artwork proof directly: a data-URL SVG in an
-  // <img> cannot load the linked artwork.
-  // A hand-finished live file supplied by the design team wins over anything we
-  // would generate for the ground.
+  // Vendor booths and hand-finished live files show the supplied proof as the
+  // ground: a data-URL SVG in an <img> cannot load the linked artwork. The
+  // generated layers (lockup, headline, code, uploaded vector art) are painted
+  // straight on top, so an edit to a supplied sign shows on the card too.
   const boothArt = londonSuppliedMaster(panel)?.previewUrl ?? londonBoothArtworkUrl(panel.id);
+  const svgUrl = svg
+    ? `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`
+    : null;
   return (
     <div
       className="relative w-full overflow-hidden rounded-lg border border-black/10 bg-[#E0E8F5]"
@@ -185,18 +188,19 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
       {boothArt ? (
         <img
           src={boothArt}
-          alt={`${panel.room} — ${panel.name}, supplied vendor booth artwork`}
+          alt={`${panel.room} — ${panel.name}, supplied artwork`}
           className="absolute inset-0 h-full w-full object-cover"
           loading="lazy"
         />
-      ) : svg ? (
+      ) : null}
+      {svgUrl ? (
         <img
-          src={`data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`}
+          src={svgUrl}
           alt={`${panel.room} panel ${panel.name} — ${style?.label ?? panel.style} gradient ground`}
           className="absolute inset-0 h-full w-full object-cover"
           loading="lazy"
         />
-      ) : (
+      ) : boothArt ? null : (
         <div
           className="absolute inset-0 animate-pulse"
           style={{
