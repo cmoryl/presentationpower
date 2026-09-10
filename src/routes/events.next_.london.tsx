@@ -325,9 +325,16 @@ function LondonSignagePage() {
   // Copies made from an existing sign ("Version B" of a pillar, say) stand in the
   // schedule right after the sign they came from, with their own edits.
   const variations = useLondonVariations();
+  // Signs taken out of the kit here disappear from the schedule and from the
+  // vendor pack on the next publish, and can be put back at any time.
+  const removals = useLondonRemovals();
   const panels = useMemo(
-    () => applyLondonBoardSizes(withLondonVariations(publishedPanels, variations), localBoardSizes),
-    [publishedPanels, variations, localBoardSizes],
+    () =>
+      withoutLondonRemovals(
+        applyLondonBoardSizes(withLondonVariations(publishedPanels, variations), localBoardSizes),
+        removals,
+      ),
+    [publishedPanels, variations, localBoardSizes, removals],
   );
   // Booth masters live in the backend: applying them patches the booth specs
   // and panel records in place, so `applied` is what re-renders the cards.
