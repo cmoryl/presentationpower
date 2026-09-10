@@ -734,6 +734,12 @@ export type StepRepeatSvgOptions = {
   outline?: (text: string, sizeMm: number, x: number, y: number) => { d: string };
   /** Name of the face the outlines came from, recorded as metadata. */
   faceName?: string;
+  /**
+   * Clip path id for the bleed box. The field is generated with a row and column
+   * of overscan so the pattern bleeds off every edge; without this clip those
+   * marks sit loose on the Illustrator canvas outside the artboard.
+   */
+  clipId?: string;
 };
 
 /**
@@ -824,6 +830,7 @@ export function stepRepeatSvgLayer(
     ` data-pitch-mm="${plan.pitchX.toFixed(2)}x${plan.pitchY.toFixed(2)}"` +
     ` data-drop="${plan.config.drop}" data-marks="${plan.tiles.length}"` +
     ` data-source="${esc(plan.art.source)}"` +
+    (options.clipId ? ` clip-path="url(#${options.clipId})"` : "") +
     (plan.config.opacity < 1 ? ` opacity="${plan.config.opacity}"` : "") +
     `>${body}</g>`
   );

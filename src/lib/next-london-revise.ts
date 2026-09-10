@@ -885,6 +885,7 @@ export function buildLondonPanelSvg(
 
     wall
       ? stepRepeatSvgLayer(panel, wall, {
+          clipId: `clip-${id}`,
           paintFor,
           fontStack: LONDON_SIGNAGE_FONT.cssStack,
           fontWeight: LONDON_SIGNAGE_FONT.weight,
@@ -1254,8 +1255,13 @@ export function buildLondonPanelAi(
   const artUnder = placed && !placed.onTop ? artLayer : "";
   const artOver = placed && placed.onTop ? artLayer : "";
 
+  // The repeat field carries overscan so it bleeds off every edge; clip it to
+  // the bleed box so nothing lands loose on the canvas outside the artboard.
+  const wallClipped = wallOps
+    ? `q 0 0 ${f3(w)} ${f3(h)} re W n\n${wallOps}Q\n`
+    : "";
   const content = wall
-    ? `/OC /oc3 BDC\n${groundOps}EMC\n` + artUnder + `/OC /oc1 BDC\n${wallOps}EMC\n` + artOver
+    ? `/OC /oc3 BDC\n${groundOps}EMC\n` + artUnder + `/OC /oc1 BDC\n${wallClipped}EMC\n` + artOver
     : `/OC /oc3 BDC\n${groundOps}${brewOps}EMC\n` +
       artUnder +
       (copyOps || subOps || bodyOps || qrOps
@@ -1469,6 +1475,53 @@ export async function buildLondonPanelPrintPdfAsync(
  * Step-and-repeat wall as live PDF content: repeated lockup outlines, live text
  * objects and vector QR modules, each rotated about its own centre.
  */
+/**
+ * QR plate in the shape the recipe asks for, so the `.ai` matches the on-screen
+ * proof exactly: square, rounded (8% corner), or a circle taking the code's
+ * diagonal so the quiet zone is never clipped.
+ */
+function qrPlateOps(
+  plan: StepRepeatPlan,
+  fillOp: (hex: string) => string,
+  x: number,
+  y: number,
+  size: number,
+): string {
+  const hex = plan.qr?.plateHex;
+  if (!hex) return "";
+  const paint = fillOp(hex);
+  if (plan.qr!.plateShape === "circle") {
+    const cx = x + size / 2;
+    const cy = y + size / 2;
+    const r = (size * Math.SQRT2) / 2;
+    const k = r * 0.5523;
+    return (
+      `${paint} ${f3(cx + r)} ${f3(cy)} m ` +
+      `${f3(cx + r)} ${f3(cy + k)} ${f3(cx + k)} ${f3(cy + r)} ${f3(cx)} ${f3(cy + r)} c ` +
+      `${f3(cx - k)} ${f3(cy + r)} ${f3(cx - r)} ${f3(cy + k)} ${f3(cx - r)} ${f3(cy)} c ` +
+      `${f3(cx - r)} ${f3(cy - k)} ${f3(cx - k)} ${f3(cy - r)} ${f3(cx)} ${f3(cy - r)} c ` +
+      `${f3(cx + k)} ${f3(cy - r)} ${f3(cx + r)} ${f3(cy - k)} ${f3(cx + r)} ${f3(cy)} c f `
+    );
+  }
+  if (plan.qr!.plateShape === "rounded") {
+    const r = size * 0.08;
+    const k = r * 0.5523;
+    const x2 = x + size;
+    const y2 = y + size;
+    return (
+      `${paint} ${f3(x + r)} ${f3(y)} m ${f3(x2 - r)} ${f3(y)} l ` +
+      `${f3(x2 - r + k)} ${f3(y)} ${f3(x2)} ${f3(y + r - k)} ${f3(x2)} ${f3(y + r)} c ` +
+      `${f3(x2)} ${f3(y2 - r)} l ` +
+      `${f3(x2)} ${f3(y2 - r + k)} ${f3(x2 - r + k)} ${f3(y2)} ${f3(x2 - r)} ${f3(y2)} c ` +
+      `${f3(x + r)} ${f3(y2)} l ` +
+      `${f3(x + r - k)} ${f3(y2)} ${f3(x)} ${f3(y2 - r + k)} ${f3(x)} ${f3(y2 - r)} c ` +
+      `${f3(x)} ${f3(y + r)} l ` +
+      `${f3(x)} ${f3(y + r - k)} ${f3(x + r - k)} ${f3(y)} ${f3(x + r)} ${f3(y)} c f `
+    );
+  }
+  return `${paint} ${f3(x)} ${f3(y)} ${f3(size)} ${f3(size)} re f `;
+}
+
 function stepRepeatPdfOps(
   plan: StepRepeatPlan,
   h: number,
@@ -1526,9 +1579,7 @@ function stepRepeatPdfOps(
       const size = tile.w * MM_TO_PT;
       const x = tile.x * MM_TO_PT;
       const yBottom = h - (tile.y + tile.h) * MM_TO_PT;
-      const plate = plan.qr.plateHex
-        ? `${fillOp(plan.qr.plateHex)} ${f3(x)} ${f3(yBottom)} ${f3(size)} ${f3(size)} re f `
-        : "";
+      const plate = plan.qr.plateHex ? qrPlateOps(plan, fillOp, x, yBottom, size) : "";
       const modules = svgPathToPdfOps(plan.qr.path, {
         scale: size / plan.qr.modules,
         x,
