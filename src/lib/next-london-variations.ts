@@ -223,11 +223,18 @@ export function withLondonVariations(
 ): LondonPanel[] {
   const all = Object.values(map);
   if (all.length === 0) return panels;
+  // Once a copy has been published it is part of the panel set in force, so it
+  // arrives here already in the list. Adding it again would put two cards with
+  // the same id in the schedule and two identical files in the vendor pack.
+  const present = new Set(panels.map((panel) => panel.id));
   const out: LondonPanel[] = [];
   for (const panel of panels) {
-    out.push(panel);
+    const own = map[panel.id];
+    // A published copy still takes its name and treatment from the local record,
+    // so renaming or restyling it shows immediately.
+    out.push(own ? { ...panel, name: own.name, style: own.style || panel.style } : panel);
     const copies = all
-      .filter((v) => v.sourceId === panel.id)
+      .filter((v) => v.sourceId === panel.id && !present.has(v.id))
       .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
     for (const copy of copies) {
       out.push({
