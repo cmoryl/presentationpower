@@ -10,6 +10,7 @@ import { useSyncExternalStore } from "react";
 import { EMPTY_LONDON_OVERRIDES, type LondonOverrides } from "@/lib/next-london-revise";
 
 let published: LondonOverrides = EMPTY_LONDON_OVERRIDES;
+let ready = false;
 const listeners = new Set<() => void>();
 
 function emit(): void {
@@ -19,7 +20,13 @@ function emit(): void {
 /** Record the design overrides carried by the revision in force. */
 export function setLondonPublishedOverrides(next: LondonOverrides | null | undefined): void {
   published = next ?? EMPTY_LONDON_OVERRIDES;
+  ready = true;
   emit();
+}
+
+/** True once the revision in force has been read — nothing auto-publishes before. */
+export function londonPublishedOverridesReady(): boolean {
+  return ready;
 }
 
 export function londonPublishedOverrides(): LondonOverrides {
