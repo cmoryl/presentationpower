@@ -17,6 +17,10 @@
 // TRIM box, so re-issuing a panel at another signboard size re-lays the art.
 
 import { useSyncExternalStore } from "react";
+import {
+  clearLondonOverrideCleared,
+  markLondonOverrideCleared,
+} from "@/lib/next-london-override-clears";
 
 export type PlacedArtMatrix = [number, number, number, number, number, number];
 
@@ -265,7 +269,9 @@ export function setLondonPlacedArt(
   const next = { ...store };
   if (patch === null) {
     delete next[panelId];
+    markLondonOverrideCleared("placedArt", panelId);
   } else {
+    clearLondonOverrideCleared("placedArt", panelId);
     const merged = normalisePlacedArt({ ...(store[panelId] ?? {}), ...patch });
     if (!merged) return;
     next[panelId] = merged;

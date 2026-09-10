@@ -132,6 +132,7 @@ import {
 import { getLondonHeadRevision } from "@/lib/next-london-revise.functions";
 import { onLondonRevisionPublished } from "@/lib/next-london-revision-live";
 import { LondonAutoPublish } from "@/components/events/LondonAutoPublish";
+import { adoptLondonPublishedOverrides } from "@/lib/next-london-adopt-published";
 import {
   londonEditsArePublished,
   setLondonPublishedOverrides,
@@ -427,7 +428,10 @@ function LondonSignagePage() {
         setHeadOverrides(res.revision?.overrides ?? EMPTY_LONDON_OVERRIDES);
         // Tell the auto-publisher what is already live, so a saved edit that has
         // been published stops counting as a draft.
-        setLondonPublishedOverrides(res.revision?.overrides ?? EMPTY_LONDON_OVERRIDES);
+        setLondonPublishedOverrides(
+          adoptLondonPublishedOverrides(res.revision?.overrides ?? null) ??
+            EMPTY_LONDON_OVERRIDES,
+        );
         const inForce = effectiveLondonPanels(res.revision ? [res.revision] : []);
         if (inForce.length) setPanels(inForce);
       })

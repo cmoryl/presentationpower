@@ -200,7 +200,19 @@ export function LondonPanelLiveEditor({
   const placedArtMap = useLondonPlacedArt();
   const placedArt = placedArtMap[panel.id] ?? null;
   const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
-  const art = useMemo(() => ({ colorSpace, vibrance: 1, placedArt }), [colorSpace, placedArt]);
+  // Every live edit this editor holds travels with the export: the wall recipe
+  // (QR tiles included), the lockup placement and the board size. Leaving any of
+  // them out made a direct download fall back to whatever was last published.
+  const art = useMemo(
+    () => ({
+      colorSpace,
+      vibrance: 1,
+      placedArt,
+      placement,
+      ...(wallConfigs[panel.id] ? { stepRepeat: wallConfigs[panel.id] } : {}),
+    }),
+    [colorSpace, placedArt, placement, wallConfigs, panel.id],
+  );
   const faceReady = useLondonSignageFace();
   const svg = useMemo(
     () => (faceReady ? buildLondonPanelSvg(panel, art) : ""),

@@ -20,6 +20,10 @@ import {
   type PillarCaptionAlign,
   type PillarCaptionFontId,
 } from "@/lib/next-pillar-masters";
+import {
+  clearLondonOverrideCleared,
+  markLondonOverrideCleared,
+} from "@/lib/next-london-override-clears";
 
 export type LondonLogoPlacement = {
   /** Horizontal nudge, as a fraction of the trim width. */
@@ -410,6 +414,7 @@ export function setLondonLogoPlacement(
 ): LondonLogoPlacement {
   const next = clampPlacement({ ...londonLogoPlacement(panelId), ...patch });
   placements = { ...londonLogoPlacements(), [panelId]: next };
+  clearLondonOverrideCleared("placement", panelId);
   persist();
   emit();
   return next;
@@ -417,6 +422,7 @@ export function setLondonLogoPlacement(
 
 /** Drop the override so the panel returns to the planned placement. */
 export function resetLondonLogoPlacement(panelId: string): void {
+  markLondonOverrideCleared("placement", panelId);
   const current = londonLogoPlacements();
   if (!(panelId in current)) return;
   const next = { ...current };
@@ -428,6 +434,7 @@ export function resetLondonLogoPlacement(panelId: string): void {
 
 /** Drop every override across the pack. */
 export function resetAllLondonLogoPlacements(): void {
+  for (const id of Object.keys(londonLogoPlacements())) markLondonOverrideCleared("placement", id);
   placements = {};
   persist();
   emit();

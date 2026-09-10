@@ -34,6 +34,10 @@ import {
 } from "@/lib/next-logo-vectors";
 import { londonVenueItemMeta, type LondonPanel } from "@/lib/next-london-signage";
 import { londonSafeMm } from "@/lib/next-london-print-geometry";
+import {
+  clearLondonOverrideCleared,
+  markLondonOverrideCleared,
+} from "@/lib/next-london-override-clears";
 
 /** What each repeated tile carries. */
 export const STEP_REPEAT_KINDS = ["logo", "text", "logo-text", "logo-qr", "qr"] as const;
@@ -320,18 +324,29 @@ export function stepRepeatConfig(
   return stored ? clampConfig(stored, DEFAULT_STEP_REPEAT) : DEFAULT_STEP_REPEAT;
 }
 
+/**
+ * A stored/snapshotted recipe made whole again: missing or out-of-range fields
+ * fall back to the shipped default. A revision saved before a field existed must
+ * never silently drop artwork (a QR wall exporting logo-only, for instance).
+ */
+export function clampStepRepeatConfig(config: Partial<StepRepeatConfig>): StepRepeatConfig {
+  return clampConfig(config, DEFAULT_STEP_REPEAT);
+}
+
 export function setStepRepeatConfig(
   panelId: string,
   patch: Partial<StepRepeatConfig>,
 ): StepRepeatConfig {
   const next = clampConfig(patch, stepRepeatConfig(panelId));
   configs = { ...stepRepeatConfigs(), [panelId]: next };
+  clearLondonOverrideCleared("stepRepeat", panelId);
   persist();
   emit();
   return next;
 }
 
 export function resetStepRepeatConfig(panelId: string): void {
+  markLondonOverrideCleared("stepRepeat", panelId);
   const current = stepRepeatConfigs();
   if (!(panelId in current)) return;
   const next = { ...current };
@@ -680,6 +695,44 @@ export function stepRepeatSummary(panel: LondonPanel, plan: StepRepeatPlan): str
   ].join(" · ");
 }
 
+/** Relative luminance of a hex colour, 0 (black) – 1 (white). */
+function hexLuminance(hex: string): number {
+  const v = hex.replace("#", "");
+  const c = [0, 2, 4].map((i) => parseInt(v.slice(i, i + 2), 16) / 255);
+  return 0.2126 * (c[0] ?? 0) + 0.7152 * (c[1] ?? 0) + 0.0722 * (c[2] ?? 0);
+}
+
+/**
+ * Reasons the QR tiles on this wall would not scan off the printed panel.
+ *
+ * Anything listed here means a dead code at the event, so it blocks the
+ * download rather than shipping quietly: a wall printed with unscannable codes
+ * is a wasted print run.
+ */
+export function stepRepeatQrScanBlockers(plan: StepRepeatPlan): string[] {
+  const config = plan.config;
+  const wantsQr = config.kind === "qr" || config.kind === "logo-qr";
+  if (!wantsQr) return [];
+  const out: string[] = [];
+  if (!plan.qr) {
+    out.push("This wall asks for QR tiles but no link is set, so no code would print.");
+    return out;
+  }
+  const plate = plan.qr.plateHex;
+  if (!plate) {
+    // The wall ground is a live gradient, so a code sitting straight on it has
+    // no quiet zone and no guaranteed light/dark split.
+    out.push(
+      "The code has no plate behind it — on a gradient wall a reader has no quiet zone and cannot lock on. Add a white plate.",
+    );
+  } else if (Math.abs(hexLuminance(plan.qr.inkHex) - hexLuminance(plate)) < 0.4) {
+    out.push(
+      "Code colour and plate colour are too close in value — a phone camera cannot separate the modules.",
+    );
+  }
+  return out;
+}
+
 /** Trade-practice warnings for a wall recipe. */
 export function stepRepeatWarnings(panel: LondonPanel, plan: StepRepeatPlan): string[] {
   const out: string[] = [];
@@ -690,6 +743,7 @@ export function stepRepeatWarnings(panel: LondonPanel, plan: StepRepeatPlan): st
     out.push(`Mark is ${inW.toFixed(1)} in wide — over 16 in a portrait crop can cut it in half.`);
   if (plan.config.gapX < 0.25 || plan.config.gapY < 0.25)
     out.push("Gaps under 25% of the mark fuse the wall into a texture on camera.");
+  for (const blocker of stepRepeatQrScanBlockers(plan)) out.push(`WILL NOT SCAN: ${blocker}`);
   if (plan.config.drop < 0.2)
     out.push("Rows are nearly aligned — a subject can block a whole column. Use a 40–50% drop.");
   if (plan.pitchX > panel.trimW / 2.5)

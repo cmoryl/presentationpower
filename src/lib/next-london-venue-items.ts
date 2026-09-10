@@ -143,7 +143,7 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
     bleedEdge: 100,
     template: "GF/Churchill SI Booths.pdf",
     dimsSource: "template-1:10",
-    note: "Covers the Innovation Lounge walls — TransPerfectNEXT widget logo, GlobalLink, TransPerfect.",
+    note: "Covers the Innovation Lounge walls — TransPerfectNEXT widget logo, GlobalLink, TransPerfect. Superseded for the glass by CHURCHILL GLASS VINYL 1–9, which carry the venue's measured panel sizes.",
   },
   {
     floor: "GF",
@@ -747,4 +747,34 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
     qty: 8,
     note: "Alternate version of the exterior flag: same size and template, softer dawn ground. TransPerfect & TransPerfect NEXT alternating.",
   },
+
+  // ── Churchill glass vinyls 1–9 ──────────────────────────────────────────
+  // Transcribed from the venue's "Churchill — SI Booths dimensions (glass)"
+  // pack: nine numbered glass panels around the Churchill room, six portrait
+  // 1300×1230mm and three long 7000×1230mm runs. Every one is CMYK, supplied
+  // as a scalable vector master, with 10mm bleed on every side. Appended (not
+  // inserted) so every already published item keeps its id.
+  ...([
+    [1, 1300],
+    [2, 7000],
+    [3, 1300],
+    [4, 1300],
+    [5, 7000],
+    [6, 1300],
+    [7, 1300],
+    [8, 7000],
+    [9, 1300],
+  ] as const).map(([n, w]) => ({
+    floor: "GF" as const,
+    room: "CHURCHILL",
+    name: `CHURCHILL GLASS VINYL ${n} - ${w}x1230mm`,
+    ground: w === 7000 ? "Wide diagonal wash" : "Beam booth wall",
+    style: w === 7000 ? "03-wash-diagonal" : "01-beam-violet-aqua",
+    trimW: w,
+    trimH: 1230,
+    bleedEdge: 10,
+    template: "GF/Churchill SI Booths.pdf",
+    dimsSource: "list" as const,
+    note: `Churchill glass panel ${n} (${w}mm wide × 1230mm high plus bleed). CMYK, vector master, 10mm bleed all round. Semi-transparent finish TBC with the venue.`,
+  })),
 ];

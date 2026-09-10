@@ -44,6 +44,7 @@ import {
   STEP_REPEAT_QR_SWATCHES,
   stepRepeatConfig,
   stepRepeatPlan,
+  stepRepeatQrScanBlockers,
   stepRepeatWarnings,
   useStepRepeatConfigs,
   type StepRepeatKind,
@@ -208,6 +209,7 @@ export function StepRepeatWallPanel({ panel }: StepRepeatWallPanelProps) {
   const config = useMemo(() => stepRepeatConfig(panel.id, map), [panel.id, map]);
   const plan = useMemo(() => stepRepeatPlan(panel, config), [panel, config]);
   const warnings = useMemo(() => stepRepeatWarnings(panel, plan), [panel, plan]);
+  const scanBlockers = useMemo(() => stepRepeatQrScanBlockers(plan), [plan]);
   const colourways = nextLogoColourways(config.familyId);
   const overridden = !!map[panel.id];
   const set = (patch: Parameters<typeof setStepRepeatConfig>[1]) =>
@@ -475,6 +477,35 @@ export function StepRepeatWallPanel({ panel }: StepRepeatWallPanelProps) {
           ))}
         </dl>
       </Group>
+
+      {scanBlockers.length > 0 ? (
+        <div className="mt-3 rounded-md bg-destructive/10 px-2 py-1.5 text-[11px] leading-relaxed text-destructive">
+          <p className="flex items-start gap-2 font-semibold">
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <span>The codes on this wall will not scan, so the download is blocked.</span>
+          </p>
+          <ul className="mt-1 list-disc space-y-0.5 pl-7">
+            {scanBlockers.map((blocker) => (
+              <li key={blocker}>{blocker}</li>
+            ))}
+          </ul>
+          <Button
+            size="sm"
+            variant="outline"
+            className="mt-2 h-7 text-[11px]"
+            onClick={() =>
+              set({
+                qrInkHex: "#03002C",
+                qrPlateHex: "#FFFFFF",
+                qrPlateShape: "rounded",
+                qrModuleShape: "square",
+              })
+            }
+          >
+            Make the codes scannable
+          </Button>
+        </div>
+      ) : null}
 
       <div
         className={`mt-3 flex items-start gap-2 rounded-md px-2 py-1.5 text-[11px] leading-relaxed ${

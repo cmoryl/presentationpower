@@ -23,6 +23,12 @@ import {
   type LondonPanel,
 } from "@/lib/next-london-signage";
 import { parseColor, readShadingStops } from "@/lib/pdf-gradient-shading";
+import {
+  isStepRepeatPanel,
+  stepRepeatConfig,
+  stepRepeatPlan,
+  stepRepeatQrScanBlockers,
+} from "@/lib/next-london-step-repeat";
 
 import {
   isLondonDoorItem,
@@ -149,6 +155,28 @@ export function auditPanelSpec(panel: LondonPanel): QaCheck[] {
       `${tier} ppi`,
       `${panel.rasterPpi} ppi`,
       { warnOnly: true, note: "Overrides are allowed but should be deliberate." },
+    ),
+    ...qrScanChecks(panel),
+  ];
+}
+
+/**
+ * A step-and-repeat wall carrying QR tiles: the codes must be readable off the
+ * print. An unscannable recipe (no plate, or ink and plate too close in value)
+ * fails here so the file never reaches a printer.
+ */
+function qrScanChecks(panel: LondonPanel): QaCheck[] {
+  if (!isStepRepeatPanel(panel)) return [];
+  const config = stepRepeatConfig(panel.id);
+  if (config.kind !== "qr" && config.kind !== "logo-qr") return [];
+  const blockers = stepRepeatQrScanBlockers(stepRepeatPlan(panel, config));
+  return [
+    check(
+      "qr-scannable",
+      "Wall QR tiles can be scanned",
+      blockers.length === 0,
+      "dark modules on a light plate",
+      blockers.length === 0 ? "scannable" : blockers.join(" "),
     ),
   ];
 }
