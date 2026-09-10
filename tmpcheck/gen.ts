@@ -1,6 +1,7 @@
 import { LONDON_PANELS } from "../src/lib/next-london-signage";
 import { buildLondonPanelSvg } from "../src/lib/next-london-revise";
 import { DEFAULT_STEP_REPEAT, isStepRepeatPanel, stepRepeatPlan } from "../src/lib/next-london-step-repeat";
+import { buildPillarQr } from "../src/lib/pillar-qr";
 import { loadLondonSignageFace } from "../src/lib/next-london-text-outline";
 await loadLondonSignageFace();
 const wall = LONDON_PANELS.filter(isStepRepeatPanel)[0]!;
@@ -11,6 +12,6 @@ const tile = plan.tiles.find((t) => t.kind === "qr" && t.x > 0 && t.y > 0)!;
 await Bun.write("/tmp/browser/qrwall/wall.svg", svg);
 await Bun.write("/tmp/browser/qrwall/meta.json", JSON.stringify({
   bleedW: wall.bleedW, bleedH: wall.bleedH, tile, modules: plan.qr!.modules,
-  matrix: plan.qr!.modulesGrid ?? null,
+  matrix: buildPillarQr(cfg.qrData)!.modules,
 }));
 console.log(JSON.stringify({ tiles: plan.tiles.length, qr: plan.tiles.filter(t=>t.kind==="qr").length, tile }));
