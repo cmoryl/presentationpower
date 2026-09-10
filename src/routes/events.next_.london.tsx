@@ -454,13 +454,22 @@ function LondonSignagePage() {
   };
   // A copy that has not been published counts as unpublished too, so its files are
   // never stamped with a revision number that does not contain it.
+  // Saved edits are auto-published, so a sign is only a draft while its local
+  // state is not yet contained in the revision in force.
   const isDraft = (panel: LondonPanel) =>
-    Boolean(
-      localPlacements[panel.id] ||
-        localBoardSizes[panel.id] ||
-        localPlacedArt[panel.id] ||
-        variations[panel.id],
-    );
+    Boolean(variations[panel.id]) ||
+    (Boolean(
+      localPlacements[panel.id] || localBoardSizes[panel.id] || localPlacedArt[panel.id],
+    ) &&
+      !londonEditsArePublished(
+        panel.id,
+        {
+          placement: localPlacements[panel.id],
+          boardSize: localBoardSizes[panel.id],
+          placedArt: localPlacedArt[panel.id],
+        },
+        headOverrides,
+      ));
 
   // A download must show what the card shows: when this browser holds unpublished
   // edits (uploaded vector artwork, moved logo, resized board) the file is built
