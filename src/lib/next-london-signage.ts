@@ -134,7 +134,14 @@ export const LONDON_STYLES: Record<string, { label: string; note: string; stops:
     note: "Deep vertical wash sized for step-and-repeat walls, so the tiled lockup rows stay legible in on-camera flash.",
     stops: ["#03002C", "#135CFB", "#7C4EF4"],
   },
+
+  "13-repeat-white": {
+    label: "Repeat · white",
+    note: "Near-white press-wall ground for the full-colour division lockup wall. Keeps every division colourway at its approved value with no gradient tint under flash.",
+    stops: ["#FFFFFF", "#FBFCFE", "#F2F5FA"],
+  },
 };
+
 
 /**
  * Print specification, as issued with the pack. These are hard rules for the

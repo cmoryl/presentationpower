@@ -850,4 +850,17 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
     qty: 2,
     note: "Cloakroom desk end return: 250mm deep × 950mm high. 10mm bleed all round.",
   },
+  {
+    floor: "GF",
+    room: "STEP & REPEAT",
+    name: "STEP & REPEAT WALL COLOUR LOCKUPS - 3000x2400mm",
+    ground: "Repeat white wall",
+    style: "13-repeat-white",
+    trimW: 3000,
+    trimH: 2400,
+    bleedEdge: 50,
+    template: "No venue template supplied",
+    dimsSource: "list",
+    note: "Press and photo wall carrying every division NEXT lockup stacked in full colour on a near-white ground — step & repeat, half-drop rows, fully live vector marks in the .ai master.",
+  },
 ];

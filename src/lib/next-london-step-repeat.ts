@@ -32,7 +32,12 @@ import {
   type NextLogoArt,
   type NextLogoColourway,
 } from "@/lib/next-logo-vectors";
-import { londonVenueItemMeta, type LondonPanel } from "@/lib/next-london-signage";
+import {
+  LONDON_PANELS,
+  londonVenueItemMeta,
+  type LondonPanel,
+} from "@/lib/next-london-signage";
+
 import { londonSafeMm } from "@/lib/next-london-print-geometry";
 import {
   clearLondonOverrideCleared,
@@ -315,14 +320,47 @@ export function stepRepeatConfigs(): StepRepeatMap {
   return configs;
 }
 
+/**
+ * Shipped recipes for walls whose approved look is not the house default.
+ * Matched on the sign name so a copy ("… VERSION B") inherits the same look.
+ */
+const PANEL_NAME_DEFAULTS: { test: RegExp; config: Partial<StepRepeatConfig> }[] = [
+  {
+    // Full-colour division lockup wall: every division NEXT mark, stacked,
+    // rotated through a half-drop grid on the near-white ground.
+    test: /COLOUR LOCKUPS/i,
+    config: {
+      kind: "logo",
+      logoSet: "divisions",
+      familyId: "transperfect",
+      colourway: "color",
+      orientation: "stacked",
+      tileWidthMm: 230,
+      gapX: 0.6,
+      gapY: 0.65,
+      drop: 0.5,
+      opacity: 1,
+    },
+  },
+];
+
+/** The recipe a wall ships with, before any saved edit. */
+export function stepRepeatPanelDefault(panelId: string): StepRepeatConfig {
+  const panel = LONDON_PANELS.find((p) => p.id === panelId);
+  const hit = panel ? PANEL_NAME_DEFAULTS.find((d) => d.test.test(panel.name)) : undefined;
+  return hit ? clampConfig(hit.config, DEFAULT_STEP_REPEAT) : DEFAULT_STEP_REPEAT;
+}
+
 /** Resolved wall recipe for a panel: stored override merged over the default. */
 export function stepRepeatConfig(
   panelId: string,
   map: StepRepeatMap = stepRepeatConfigs(),
 ): StepRepeatConfig {
+  const base = stepRepeatPanelDefault(panelId);
   const stored = map[panelId];
-  return stored ? clampConfig(stored, DEFAULT_STEP_REPEAT) : DEFAULT_STEP_REPEAT;
+  return stored ? clampConfig(stored, base) : base;
 }
+
 
 /**
  * A stored/snapshotted recipe made whole again: missing or out-of-range fields

@@ -270,12 +270,19 @@ export function auditSvg(panel: LondonPanel, svg: string): LondonQaReport {
       const liveText = /<text[\s>]/i.test(svg);
       const outlined = /data-text="/.test(svg);
       const wantsCopy = (() => {
+        // A step-and-repeat wall carries no headline: the tile field IS the
+        // artwork, and a logo-only recipe deliberately has no copy at all.
+        if (isStepRepeatPanel(panel)) {
+          const kind = stepRepeatConfig(panel.id).kind;
+          if (kind === "logo" || kind === "qr") return false;
+        }
         try {
           return Boolean(londonBrandingPlan(panel).copy);
         } catch {
           return false;
         }
       })();
+
       return check(
         "svg-no-live-text",
         "Copy is outlined vector paths",
