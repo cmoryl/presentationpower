@@ -15,6 +15,7 @@ import { useLondonBoardSizes, londonBoardSizes } from "@/lib/next-london-board-s
 import { useLondonLogoPlacements, londonLogoPlacements } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt, londonPlacedArtMap } from "@/lib/next-london-placed-art";
 import { useStepRepeatConfigs, stepRepeatConfigs } from "@/lib/next-london-step-repeat";
+import { useLondonRemovals } from "@/lib/next-london-removals";
 import {
   londonPublishedOverridesReady,
   setLondonPublishedOverrides,
