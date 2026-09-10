@@ -458,8 +458,11 @@ const MM_TO_PT = 72 / 25.4;
 
 type Vec = { x1: number; y1: number; x2: number; y2: number };
 
-/** Gradient axis per treatment, in unit space. */
-function styleAxis(styleId: string): Vec {
+/**
+ * Gradient axis per treatment, in unit space. Exported as `londonStyleAxis` so
+ * the gradient reference can report the very axis the masters are built with.
+ */
+export function styleAxis(styleId: string): Vec {
   if (styleId.includes("diagonal")) return { x1: 0, y1: 0, x2: 1, y2: 1 };
   if (styleId.includes("horizon")) return { x1: 0, y1: 0, x2: 0, y2: 1 };
   if (styleId.includes("bloom")) return { x1: 0, y1: 0, x2: 0.85, y2: 0.85 };
@@ -470,6 +473,9 @@ function styleAxis(styleId: string): Vec {
   if (styleId.includes("chevron")) return { x1: 0, y1: 1, x2: 1, y2: 0.18 };
   return { x1: 0.5, y1: 0, x2: 0.5, y2: 1 };
 }
+
+/** Alias with the module-qualified name used outside the builders. */
+export const londonStyleAxis = styleAxis;
 
 function stopsFor(panel: LondonPanel): string[] {
   return londonPanelStops(panel);
