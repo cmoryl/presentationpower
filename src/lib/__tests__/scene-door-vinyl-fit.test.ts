@@ -6,13 +6,12 @@ import {
   sceneArtworkObjectFit,
   scenesForPanel,
 } from "@/lib/next-london-scenes";
-import { LONDON_VENUE_ITEMS } from "@/lib/next-london-venue-items";
-import type { LondonPanel } from "@/lib/next-london-signage";
+import { LONDON_PANELS, type LondonPanel } from "@/lib/next-london-signage";
 
 function panel(name: string): LondonPanel {
-  const found = LONDON_VENUE_ITEMS.find((p) => p.name === name);
+  const found = LONDON_PANELS.find((p) => p.name === name);
   if (!found) throw new Error(`missing ${name}`);
-  return found as LondonPanel;
+  return found;
 }
 
 describe("door vinyl scene mounting", () => {
