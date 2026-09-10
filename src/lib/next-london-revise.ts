@@ -1628,7 +1628,11 @@ export async function buildLondonPanelAiAsync(
   panel: LondonPanel,
   options: LondonArtOptions = {},
 ): Promise<Uint8Array> {
-  const art = londonBoothArtworkUrl(panel.id);
+  // Same resolution order as the preview (buildLondonPanelSvg): vendor booth
+  // artwork first, then a hand-finished or uploaded live-file proof. Without the
+  // second fallback a downloaded master would print the house gradient instead
+  // of the approved artwork everyone can see on the card.
+  const art = londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id);
   const groundImage = options.groundImage ?? (art ? await loadLondonGroundImage(art) : null);
   return buildLondonPanelAi(panel, { ...options, groundImage });
 }
