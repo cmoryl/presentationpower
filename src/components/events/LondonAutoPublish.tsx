@@ -66,12 +66,18 @@ export function LondonAutoPublish({ panels, removedIds = [] }: LondonAutoPublish
   const placedArt = useLondonPlacedArt();
   const stepRepeat = useStepRepeatConfigs();
   const publishedOverrides = useLondonPublishedOverrides();
+  // Removing or restoring a sign is a change to the kit in its own right, so it
+  // publishes forward like any other save.
+  const removals = useLondonRemovals();
+  const removalKey = Object.keys(removals).sort().join(",");
 
   const busy = useRef(false);
   const lastTried = useRef<string | null>(null);
   const warned = useRef(false);
+  const publishedRemovals = useRef<string | null>(null);
   const latest = useRef({ panels, removedIds });
   latest.current = { panels, removedIds };
+
 
   useEffect(() => {
     // Signed-out visitors are vendors reading the kit — they never publish.
