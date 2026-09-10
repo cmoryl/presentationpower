@@ -209,8 +209,7 @@ function defs(): string {
     : `<pattern id="ldn-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
   <path d="M 0 0 V 6" stroke="${NAVY}" stroke-width="0.7" stroke-opacity="0.34" />
 </pattern>`;
-  return `<defs>
-${hatch}
+  return `<defs>${hatch ? `\n${hatch}` : ""}
 <filter id="ldn-tile" x="-20%" y="-20%" width="140%" height="140%">
   <feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-color="${NAVY}" flood-opacity="0.1" />
 </filter>
