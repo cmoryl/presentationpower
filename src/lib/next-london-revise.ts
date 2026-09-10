@@ -1549,7 +1549,11 @@ function stepRepeatPdfOps(
   fillOp: (hex: string) => string,
   copyInk: string,
   outlineOps: (text: string, sizeMm: number, x: number, y: number) => string,
+  /** Emit only the tiles this predicate keeps — used to split the field into
+   *  one Illustrator layer per lockup. */
+  only?: (tile: StepRepeatPlan["tiles"][number]) => boolean,
 ): string {
+
   const rad = (plan.config.rotationDeg * Math.PI) / 180;
   const cos = Math.cos(rad);
   const sin = Math.sin(rad);
