@@ -1336,6 +1336,15 @@ export function LondonPanelLiveEditor({
           >
             <Download className="h-3.5 w-3.5" /> AI
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            title="Print-ready PDF: bleed, trim and crop marks"
+            onClick={() => void savePanel("pdf")}
+          >
+            <Download className="h-3.5 w-3.5" /> Print PDF
+          </Button>
           {boothMaster ? (
             <Button variant="default" size="sm" className="gap-2" asChild>
               <a href={boothMaster} download={boothMeta?.booth.sourceFile ?? undefined}>
