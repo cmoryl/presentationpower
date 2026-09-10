@@ -76,6 +76,7 @@ import {
   auditSvg,
   auditPng,
   gateOnQa,
+  auditPrintPdf,
   qaReportCsv,
   qaSummary,
   rollup,
@@ -532,6 +533,29 @@ function LondonSignagePage() {
         // .ai is PDF-compatible binary — never let Blob UTF-8 the bytes.
         const bytes = londonAiBytes(art.ai);
         download(new Blob([bytes], { type: "application/illustrator" }), `${fileBase(panel)}.ai`);
+      },
+    );
+
+  // Print-ready PDF: the same vector master, wrapped in a marks margin with
+  // crop marks, bleed ticks and registration targets, boxes set for the printer.
+  const downloadPrintPdf = (panel: LondonPanel) =>
+    runWithExportFeedback(
+      {
+        pending: `Preparing ${fileBase(panel)}-print.pdf…`,
+        success: `${fileBase(panel)}-print.pdf downloaded`,
+        failure: "Print PDF failed",
+        successDescription:
+          "Bleed, trim and crop marks in place — hand this file straight to the printer.",
+      },
+      async () => {
+        await loadLondonSignageFace();
+        const pack = await packOrNull();
+        const opts = exportOptions(panel);
+        const ground = (await resolveLondonArtworkAsync(panel, pack, opts)) as unknown;
+        void ground;
+        const bytes = await buildLondonPanelPrintPdfAsync(panel, opts);
+        gateOnQa(auditPrintPdf(panel, bytes, LONDON_MARKS_MARGIN_MM));
+        download(new Blob([londonAiBytes(bytes)], { type: "application/pdf" }), `${fileBase(panel)}-print.pdf`);
       },
     );
 
@@ -1300,6 +1324,13 @@ function LondonSignagePage() {
                       <FileDown className="h-3.5 w-3.5" /> AI
                     </button>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => void downloadPrintPdf(openPanel)}
+                    className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/40 px-4 py-2 text-xs font-semibold text-[#003FC7] hover:bg-[#003FC7]/10"
+                  >
+                    <FileDown className="h-3.5 w-3.5" /> Print PDF · marks
+                  </button>
                   <button
                     type="button"
                     onClick={() => void downloadVector(openPanel, "svg")}
