@@ -48,6 +48,7 @@ import {
 } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import { londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
+import { buildLondonKitZip } from "@/lib/next-london-kit-zip";
 import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles } from "@/lib/next-london-live-files";
 import { LondonLiveFilePanel } from "@/components/events/LondonLiveFilePanel";
@@ -601,6 +602,7 @@ function LondonSignagePage() {
   // hand-finished one. A sign that fails QA is listed in SKIPPED.txt instead of
   // silently landing in the pack.
   const [zipProgress, setZipProgress] = useState<string | null>(null);
+  const isDraftKit = panels.some((p) => isDraft(p));
   const downloadWholeKit = () =>
     runWithExportFeedback(
       {
@@ -765,6 +767,15 @@ function LondonSignagePage() {
                 className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
                 <Table2 className="h-4 w-4" /> Print schedule (CSV)
+              </button>
+              <button
+                type="button"
+                onClick={downloadWholeKit}
+                disabled={Boolean(zipProgress)}
+                className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+              >
+                <Download className="h-4 w-4" />
+                {zipProgress ? `Packing — ${zipProgress}` : "Download whole kit (ZIP)"}
               </button>
               <button
                 type="button"
