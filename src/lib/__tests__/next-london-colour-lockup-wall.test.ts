@@ -8,16 +8,32 @@ import {
   stepRepeatPlan,
 } from "@/lib/next-london-step-repeat";
 
-const wall = LONDON_PANELS.find((p) => /COLOUR LOCKUPS/i.test(p.name))!;
+const wall = LONDON_PANELS.find(
+  (p) => /COLOUR LOCKUPS/i.test(p.name) && !/RETURN/i.test(p.name),
+)!;
+const returns = LONDON_PANELS.filter((p) => /COLOUR LOCKUPS RETURN/i.test(p.name));
 
 describe("full-colour division lockup step & repeat wall", () => {
   it("exists in the kit as a photo wall on a near-white ground", () => {
     expect(wall).toBeDefined();
     expect(isStepRepeatPanel(wall)).toBe(true);
-    expect(wall.trimW).toBe(3000);
-    expect(wall.trimH).toBe(2400);
+    expect(wall.trimW).toBe(4500);
+    expect(wall.trimH).toBe(6500);
+    expect(wall.bleedEdge).toBe(100);
     expect(LONDON_STYLES["13-repeat-white"]).toBeDefined();
   });
+
+  it("carries a 1m return each side on the same recipe", () => {
+    expect(returns.length).toBe(1);
+    const side = returns[0]!;
+    expect(side.qty).toBe(2);
+    expect(side.trimW).toBe(1000);
+    expect(side.trimH).toBe(6500);
+    expect(side.bleedEdge).toBe(100);
+    expect(isStepRepeatPanel(side)).toBe(true);
+    expect(stepRepeatPanelDefault(side.id)).toEqual(stepRepeatPanelDefault(wall.id));
+  });
+
 
   it("ships with the full-colour stacked division recipe", () => {
     const config = stepRepeatPanelDefault(wall.id);
