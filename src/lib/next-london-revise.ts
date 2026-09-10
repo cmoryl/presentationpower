@@ -549,6 +549,27 @@ export type LondonArtOptions = {
   printMarks?: boolean;
 };
 
+/**
+ * True when returning a packaged SVG would discard current artwork state.
+ *
+ * Issued SVGs are safe only for a completely untouched RGB preview. Geometry
+ * matching alone is not enough: moving a lockup, changing copy/QR, placing
+ * artwork, changing a wall recipe, or selecting another output treatment all
+ * require a rebuild even when the board dimensions did not change.
+ */
+export function hasLondonArtOverrides(options: LondonArtOptions): boolean {
+  return (
+    options.placement !== undefined ||
+    options.boardSize !== undefined ||
+    options.stepRepeat !== undefined ||
+    options.placedArt != null ||
+    options.groundImage != null ||
+    options.colorSpace !== undefined ||
+    options.vibrance !== undefined ||
+    options.printMarks === true
+  );
+}
+
 /** Margin added on every edge to hold the printer's marks, in mm. */
 export const LONDON_MARKS_MARGIN_MM = 12;
 /** Gap between the trim line and the start of a crop mark, in mm. */
@@ -1717,7 +1738,7 @@ export function londonPanelSvgFor(
   pack: Record<string, { svg: string; ai: string }> | null | undefined,
   options: LondonArtOptions = {},
 ): string {
-  return matchesIssuedArtwork(panel, pack)
+  return matchesIssuedArtwork(panel, pack) && !hasLondonArtOverrides(options)
     ? pack![panel.id]!.svg
     : buildLondonPanelSvg(panel, options);
 }
@@ -1752,7 +1773,7 @@ export function resolveLondonArtwork(
     issued.bleedW === panel.bleedW &&
     issued.bleedH === panel.bleedH &&
     issued.bleedEdge === panel.bleedEdge;
-  if (matchesIssue) {
+  if (matchesIssue && !hasLondonArtOverrides(options)) {
     // Always rebuild the AI side with Illustrator-safe vector fills. Some of
     // the issued PDF-compatible masters contain shading dictionaries that
     // Illustrator reinterprets with a warning even though PDF renderers accept
