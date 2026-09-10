@@ -1245,6 +1245,13 @@ export function buildLondonPanelAi(
         : "") +
       artOver;
 
+  // Print-ready sheet: the artwork sits at bleed size inside the marks margin,
+  // and the marks themselves are drawn in page space around it.
+  const sheet = margin
+    ? `q 1 0 0 1 ${f3(margin)} ${f3(margin)} cm\n${content}Q\n` +
+      londonPrintMarksOps(panel, margin, cmyk, vibrance)
+    : content;
+
   // The copy actually printed on this master, kept as searchable metadata now
   // that the visible copy is outlined geometry.
   const copyMeta = wall ? wall.config.text : brand.copy;
