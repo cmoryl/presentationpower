@@ -86,13 +86,16 @@ export function LondonAutoPublish({ panels, removedIds = [] }: LondonAutoPublish
     if (busy.current) return;
     const snapshot = londonOverridesSnapshot();
     const next = signature(snapshot);
-    if (next === signature(publishedOverrides)) return;
-    if (next === lastTried.current) return;
+    if (publishedRemovals.current === null) publishedRemovals.current = removalKey;
+    const removalsChanged = removalKey !== publishedRemovals.current;
+    if (!removalsChanged && next === signature(publishedOverrides)) return;
+    if (!removalsChanged && next === lastTried.current) return;
     if (latest.current.panels.length === 0) return;
 
     const timer = window.setTimeout(() => {
       busy.current = true;
       lastTried.current = next;
+      publishedRemovals.current = removalKey;
       void (async () => {
         try {
           const res = await publish({
