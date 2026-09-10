@@ -392,6 +392,9 @@ function LondonSignagePage() {
         setHeadError(false);
         setHeadRev(res.revision?.rev ?? 0);
         setHeadOverrides(res.revision?.overrides ?? EMPTY_LONDON_OVERRIDES);
+        // Tell the auto-publisher what is already live, so a saved edit that has
+        // been published stops counting as a draft.
+        setLondonPublishedOverrides(res.revision?.overrides ?? EMPTY_LONDON_OVERRIDES);
         const inForce = effectiveLondonPanels(res.revision ? [res.revision] : []);
         if (inForce.length) setPanels(inForce);
       })
