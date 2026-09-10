@@ -1285,7 +1285,7 @@ export function buildLondonPanelAi(
       `${brewGs}>> ` +
       `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R` +
       `${artOcgNum ? ` /oc4 ${artOcgNum} 0 R` : ""} >> >> /Contents 4 0 R >>`,
-    `<< /Length ${content.length} >>\nstream\n${content}endstream`,
+    `<< /Length ${sheet.length} >>\nstream\n${sheet}endstream`,
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
       `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)} · ${pdfText(`${brand.orientation === "side" ? "side-by-side" : "stacked"} ${brand.colourway} lockup`)}) >>`,
     shadingDict,
