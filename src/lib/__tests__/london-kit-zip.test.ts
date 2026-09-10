@@ -17,7 +17,7 @@ describe("london kit zip", () => {
       printPdf: async () => new Uint8Array([4,5]),
     }, { revLabel: "r001", scheduleCsv: "a,b" });
     expect(res.skipped).toHaveLength(1);
-    const zip = await JSZip.loadAsync(res.blob);
+    const zip = await JSZip.loadAsync(await res.blob.arrayBuffer());
     const names = Object.keys(zip.files);
     expect(names.some((x) => x.includes("/live-ai/r001-"))).toBe(true);
     expect(names.some((x) => x.includes("/print-pdf/"))).toBe(true);
