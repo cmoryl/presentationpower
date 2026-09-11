@@ -108,6 +108,14 @@ export type StepRepeatConfig = {
   /** Lockup family (from the official EPS set). */
   familyId: string;
   colourway: NextLogoColourway;
+  /**
+   * Optional SECOND lockup colourway. When set (and different to `colourway`),
+   * the field alternates between the two colour versions of the same marks —
+   * a richer wall without changing the lockup itself. `none` = one colourway.
+   */
+  colourwayB: NextLogoColourway | "none";
+  /** How the two colourways spread through the field. */
+  colourMix: StepRepeatColourMix;
   /** Lockup orientation; `auto` follows the mark's own aspect. */
   orientation: "auto" | "stacked" | "side";
   /** Mark width, in mm — the size the trade spec is written in. */
