@@ -90,7 +90,12 @@ export async function buildLondonKitZip(
       if (supplied) {
         folder.file(`${dir}/supplied-master/${supplied.filename}`, supplied.bytes);
         written.push(`${dir}/supplied-master/${supplied.filename}`);
+        if (supplied.print) {
+          folder.file(`${dir}/supplied-master/${supplied.print.filename}`, supplied.print.bytes);
+          written.push(`${dir}/supplied-master/${supplied.print.filename}`);
+        }
       }
+
       files += written.length;
       rows.push([
         builders.floorLabel(panel),
