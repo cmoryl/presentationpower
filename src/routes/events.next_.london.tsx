@@ -1443,6 +1443,17 @@ function LondonSignagePage() {
                       >
                         <FileDown className="h-3.5 w-3.5" /> AI · supplied master
                       </a>
+                      {londonSuppliedMaster(openPanel)!.printUrl ? (
+                        <a
+                          href={londonSuppliedMaster(openPanel)!.printUrl!}
+                          download={
+                            londonSuppliedMaster(openPanel)!.printFilename ?? "print-ready.pdf"
+                          }
+                          className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                        >
+                          <FileDown className="h-3.5 w-3.5" /> PDF · supplied print file
+                        </a>
+                      ) : null}
                       <button
                         type="button"
                         onClick={() => void downloadVector(openPanel, "ai")}
@@ -1450,6 +1461,7 @@ function LondonSignagePage() {
                       >
                         <FileDown className="h-3.5 w-3.5" /> AI · with your edits
                       </button>
+
                     </>
                   ) : (
                     <button
