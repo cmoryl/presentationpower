@@ -877,5 +877,33 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
     qty: 2,
     note: "Side return for the colour lockup press wall: 1000mm wide × 6500mm high, 100mm bleed all round. Same step & repeat field as the front face so the pattern runs continuously round the corner.",
   },
+  {
+    floor: "GF",
+    room: "STEP & REPEAT",
+    name: "STEP & REPEAT WALL COLOUR LOCKUPS (VERSION B) - 4500x6500mm",
+    ground: "Repeat white wall",
+    style: "13-repeat-white",
+    trimW: 4500,
+    trimH: 6500,
+    bleedEdge: 100,
+    template: "No venue template supplied",
+    dimsSource: "list",
+    note: "Second press and photo wall, same specification as the colour lockup front face: 4500mm wide × 6500mm high, 100mm bleed all round. Independent copy so the field, marks and copy can be edited without touching version A. Wraps onto a 1000mm return each side (separate items).",
+  },
+  {
+    floor: "GF",
+    room: "STEP & REPEAT",
+    name: "STEP & REPEAT WALL COLOUR LOCKUPS RETURN (VERSION B) - 1000x6500mm",
+    ground: "Repeat white wall",
+    style: "13-repeat-white",
+    trimW: 1000,
+    trimH: 6500,
+    bleedEdge: 100,
+    template: "No venue template supplied",
+    dimsSource: "list",
+    qty: 2,
+    note: "Side return for version B of the colour lockup press wall: 1000mm wide × 6500mm high, 100mm bleed all round. Same step & repeat field as its front face so the pattern runs continuously round the corner.",
+  },
 ];
+
 
