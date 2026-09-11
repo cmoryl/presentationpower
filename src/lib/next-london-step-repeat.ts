@@ -247,20 +247,7 @@ function clampConfig(patch: Partial<StepRepeatConfig>, base: StepRepeatConfig): 
     ? (patch.kind as StepRepeatKind)
     : base.kind;
   const familyId = typeof patch.familyId === "string" ? patch.familyId : base.familyId;
-  const logoSet = STEP_REPEAT_LOGO_SETS.includes(patch.logoSet as StepRepeatLogoSet)
-    ? (patch.logoSet as StepRepeatLogoSet)
-    : (base.logoSet ?? DEFAULT_STEP_REPEAT.logoSet);
-  // A divisions wall draws every division mark, so a colourway is legal when any
-  // mark in the drawn set supports it — the anchor family alone is too narrow
-  // (e.g. dark blue exists for the division lockups but not for TransPerfect).
-  const available =
-    logoSet === "divisions"
-      ? (Array.from(
-          new Set(
-            [familyId, ...STEP_REPEAT_DIVISION_FAMILIES].flatMap((id) => nextLogoColourways(id)),
-          ),
-        ) as NextLogoColourway[])
-      : nextLogoColourways(familyId);
+  const available = nextLogoColourways(familyId);
   const wanted = patch.colourway ?? base.colourway;
 
   return {
@@ -268,7 +255,9 @@ function clampConfig(patch: Partial<StepRepeatConfig>, base: StepRepeatConfig): 
     mix: STEP_REPEAT_MIXES.includes(patch.mix as StepRepeatMix)
       ? (patch.mix as StepRepeatMix)
       : (base.mix ?? DEFAULT_STEP_REPEAT.mix),
-    logoSet,
+    logoSet: STEP_REPEAT_LOGO_SETS.includes(patch.logoSet as StepRepeatLogoSet)
+      ? (patch.logoSet as StepRepeatLogoSet)
+      : (base.logoSet ?? DEFAULT_STEP_REPEAT.logoSet),
 
     familyId,
     colourway: available.includes(wanted) ? wanted : (available[0] ?? "white"),
