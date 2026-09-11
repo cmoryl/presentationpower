@@ -146,3 +146,35 @@ describe("step & repeat QR export", () => {
     expect(text.length).toBeGreaterThan(modules * plan.tiles.filter((t) => t.kind === "qr").length);
   });
 });
+
+describe("two-colour lockup walls", () => {
+  it("alternates two colourways through the field and tags each mark", () => {
+    const plan = stepRepeatPlan(wall, {
+      ...DEFAULT_STEP_REPEAT,
+      kind: "logo",
+      logoSet: "single",
+      familyId: "transperfect",
+      colourway: "white",
+      colourwayB: "color",
+      colourMix: "checker",
+    });
+    expect(new Set(plan.artColourways).size).toBe(2);
+    const logos = plan.tiles.filter((t) => t.kind === "logo") as Extract<
+      (typeof plan.tiles)[number],
+      { kind: "logo" }
+    >[];
+    const used = new Set(logos.map((t) => plan.artColourways[t.artIndex]));
+    expect(used.size).toBe(2);
+    const svg = buildLondonPanelSvg(wall);
+    expect(svg.includes('data-colourway=')).toBe(true);
+  });
+
+  it("ignores a second colourway that matches the first", () => {
+    const plan = stepRepeatPlan(wall, {
+      ...DEFAULT_STEP_REPEAT,
+      colourway: "white",
+      colourwayB: "white",
+    });
+    expect(new Set(plan.artColourways).size).toBe(1);
+  });
+});

@@ -1216,7 +1216,15 @@ export function buildLondonPanelAi(
           if (!ops) return;
           const familyId = wall.artFamilies[index] ?? wall.config.familyId;
           const label = NEXT_LOGO_FAMILIES[familyId]?.label ?? familyId;
-          out.push({ name: `Lockup · ${label}`, ops });
+          // A two-colour wall carries the same family twice, so the colourway
+          // is part of the layer name — otherwise the panel shows duplicates.
+          const colourways = wall.artColourways ?? [];
+          const twoColour = new Set(colourways).size > 1;
+          const colour = colourways[index];
+          out.push({
+            name: twoColour && colour ? `Lockup · ${label} · ${colour}` : `Lockup · ${label}`,
+            ops,
+          });
         });
         const rest = stepRepeatPdfOps(
           wall,

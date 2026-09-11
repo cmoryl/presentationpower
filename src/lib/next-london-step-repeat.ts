@@ -108,6 +108,14 @@ export type StepRepeatConfig = {
   /** Lockup family (from the official EPS set). */
   familyId: string;
   colourway: NextLogoColourway;
+  /**
+   * Optional SECOND lockup colourway. When set (and different to `colourway`),
+   * the field alternates between the two colour versions of the same marks —
+   * a richer wall without changing the lockup itself. `none` = one colourway.
+   */
+  colourwayB: NextLogoColourway | "none";
+  /** How the two colourways spread through the field. */
+  colourMix: StepRepeatColourMix;
   /** Lockup orientation; `auto` follows the mark's own aspect. */
   orientation: "auto" | "stacked" | "side";
   /** Mark width, in mm — the size the trade spec is written in. */
@@ -134,6 +142,14 @@ export type StepRepeatConfig = {
   qrModuleShape: StepRepeatQrModuleShape;
   /** Plate silhouette behind the code. */
   qrPlateShape: StepRepeatQrPlateShape;
+};
+
+export const STEP_REPEAT_COLOUR_MIXES = ["checker", "rows", "columns"] as const;
+export type StepRepeatColourMix = (typeof STEP_REPEAT_COLOUR_MIXES)[number];
+export const STEP_REPEAT_COLOUR_MIX_LABELS: Record<StepRepeatColourMix, string> = {
+  checker: "Checkerboard",
+  rows: "Alternating rows",
+  columns: "Alternating columns",
 };
 
 export const STEP_REPEAT_QR_MODULE_SHAPES = ["square", "rounded", "dot"] as const;
@@ -183,6 +199,8 @@ export const DEFAULT_STEP_REPEAT: StepRepeatConfig = {
   logoSet: "single",
   familyId: "transperfect",
   colourway: "white",
+  colourwayB: "none",
+  colourMix: "checker",
   orientation: "auto",
   // 260 mm ≈ 10.2 in — the middle of the standard press-wall mark range.
   tileWidthMm: 260,
@@ -241,6 +259,16 @@ function clampConfig(patch: Partial<StepRepeatConfig>, base: StepRepeatConfig): 
       : (base.logoSet ?? DEFAULT_STEP_REPEAT.logoSet),
     familyId,
     colourway: available.includes(wanted) ? wanted : (available[0] ?? "white"),
+    colourwayB: (() => {
+      const wantedB = patch.colourwayB ?? base.colourwayB ?? "none";
+      if (wantedB === "none") return "none";
+      return available.includes(wantedB as NextLogoColourway)
+        ? (wantedB as NextLogoColourway)
+        : "none";
+    })(),
+    colourMix: STEP_REPEAT_COLOUR_MIXES.includes(patch.colourMix as StepRepeatColourMix)
+      ? (patch.colourMix as StepRepeatColourMix)
+      : (base.colourMix ?? DEFAULT_STEP_REPEAT.colourMix),
     orientation:
       patch.orientation === "stacked" ||
       patch.orientation === "side" ||
@@ -462,6 +490,8 @@ export type StepRepeatPlan = {
   arts: NextLogoArt[];
   /** Family id per entry of `arts`, for the spec readout. */
   artFamilies: string[];
+  /** Colourway per entry of `arts` — a two-colour wall lists each twice. */
+  artColourways: NextLogoColourway[];
   orientation: "stacked" | "side";
   colourway: NextLogoColourway;
   /** QR module geometry, when the recipe carries a code. */
@@ -593,10 +623,21 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
           ]),
         )
       : [config.familyId];
-  const pool = families.map((id) => {
-    const p = pickNextLogo(id, wantSide, config.colourway);
-    return { familyId: id, art: p.art };
-  });
+  const poolFor = (colourway: NextLogoColourway) =>
+    families.map((id) => {
+      const p = pickNextLogo(id, wantSide, colourway);
+      return { familyId: id, colourway: p.colourway, art: p.art };
+    });
+  const poolA = poolFor(config.colourway);
+  // Two-colour wall: the same marks in a second approved colourway, alternated
+  // through the field. The second pool is appended, so every renderer that
+  // indexes `arts` picks up the colour swap with no other change.
+  const secondColour =
+    config.colourwayB && config.colourwayB !== "none" && config.colourwayB !== config.colourway
+      ? config.colourwayB
+      : null;
+  const poolB = secondColour ? poolFor(secondColour) : [];
+  const pool = [...poolA, ...poolB];
   const arts = pool.map((entry) => entry.art);
   const art = arts[0] ?? picked.art;
 
@@ -673,7 +714,11 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
       } else {
         // Rotate the pool diagonally, so the same mark never sits side by side
         // or directly above itself.
-        const artIndex = arts.length > 1 ? (col + row * 3) % arts.length : 0;
+        const baseCount = poolA.length;
+        const baseIndex = baseCount > 1 ? (col + row * 3) % baseCount : 0;
+        const useSecondColour =
+          poolB.length > 0 && stepRepeatTileIsSecondary(config.colourMix as StepRepeatMix, row, col);
+        const artIndex = useSecondColour ? baseCount + baseIndex : baseIndex;
         const h = (arts[artIndex]!.h / Math.max(1, arts[artIndex]!.w)) * logoW;
         tiles.push({
           kind: "logo",
@@ -695,6 +740,7 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
     art,
     arts,
     artFamilies: pool.map((entry) => entry.familyId),
+    artColourways: pool.map((entry) => entry.colourway),
     orientation: picked.orientation,
     colourway: picked.colourway,
     qr: code
@@ -864,7 +910,8 @@ export function stepRepeatSvgLayer(
           .join("");
         return (
           `<g data-tile="logo" data-row="${tile.row}" data-col="${tile.col}"` +
-          ` data-family="${esc(plan.artFamilies[tile.artIndex] ?? plan.config.familyId)}"${spin}>` +
+          ` data-family="${esc(plan.artFamilies[tile.artIndex] ?? plan.config.familyId)}"` +
+          ` data-colourway="${plan.artColourways[tile.artIndex] ?? plan.colourway}"${spin}>` +
           `<g transform="translate(${tile.x.toFixed(2)} ${tile.y.toFixed(2)}) scale(${logoScale.toFixed(5)})">${paths}</g></g>`
         );
       }
