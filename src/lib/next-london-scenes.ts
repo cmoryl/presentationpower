@@ -15,6 +15,14 @@ import coffeeBar from "@/assets/london-scenes/coffee-bar.jpg";
 import deskFront from "@/assets/london-scenes/desk-front.jpg";
 import doorVinyl from "@/assets/london-scenes/door-vinyl.jpg";
 import exteriorBanner from "@/assets/london-scenes/exterior-banner.jpg";
+import floor2fBreakout from "@/assets/london-scenes/floor-2f-breakout.jpg";
+import floor3fFoyer from "@/assets/london-scenes/floor-3f-foyer.jpg";
+import floor4fSuite from "@/assets/london-scenes/floor-4f-suite.jpg";
+import floor5fStairGlass from "@/assets/london-scenes/floor-5f-stair-glass.jpg";
+import floor6fSet from "@/assets/london-scenes/floor-6f-set.jpg";
+import floorExtForecourt from "@/assets/london-scenes/floor-ext-forecourt.jpg";
+import floorGfAuditorium from "@/assets/london-scenes/floor-gf-auditorium.jpg";
+
 import foyerColumn from "@/assets/london-scenes/foyer-column.jpg";
 import portraitBanner from "@/assets/london-scenes/portrait-banner.jpg";
 import squarePanel from "@/assets/london-scenes/square-panel.jpg";
@@ -28,7 +36,7 @@ import {
   type SceneFixedAxis,
   type SceneMountMode,
 } from "@/lib/scene-face-fit";
-import type { LondonPanel } from "@/lib/next-london-signage";
+import type { LondonFloorId, LondonPanel } from "@/lib/next-london-signage";
 
 /** Fractional face rectangle on the plate (0..1 of plate width/height). */
 export interface SceneFace {
