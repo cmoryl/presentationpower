@@ -97,9 +97,12 @@ export function londonSuppliedMaster(
       panelId: id,
       aiUrl: live.masterUrl,
       filename: live.filename,
+      printUrl: live.printUrl ?? null,
+      printFilename: live.printFilename ?? null,
       previewUrl: live.proofUrl ?? bundled?.previewUrl ?? "",
       fromRevision: live.version,
       issued: live.issued,
+
       note:
         live.note ??
         `Finished live file, version ${live.version}, issued ${live.issued}. Print this file.`,
