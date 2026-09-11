@@ -151,6 +151,29 @@ function SocialView() {
         {/* Your saved kits (signed-in, non-empty only) */}
         <SavedKitsSection surface="social" />
 
+        {/* Live campaign: Legal creative refresh — four look & feel directions */}
+        <Link
+          to="/social/legal-refresh"
+          className="group flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-black/10 bg-gradient-to-br from-[#003FC71A] via-white/70 to-[#C2A3FF22] p-6 transition hover:border-[#003FC7]/50"
+        >
+          <div className="min-w-0">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+              New campaign · TransPerfect Legal
+            </div>
+            <div className="mt-1 text-2xl font-semibold tracking-tight text-[#03002C]">
+              We&apos;re here for the thorny work.
+            </div>
+            <p className="mt-1 max-w-2xl text-sm text-black/65">
+              Four look-and-feel directions for the LinkedIn test — four headline variations, all
+              drawn, no stock photography and no legal clichés.
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-sm font-medium text-white group-hover:bg-[#003FC7]">
+            See the four directions <ArrowRight size={14} />
+          </span>
+        </Link>
+
+
         {/* Angle filter */}
         <section id="playbooks" className="space-y-5">
           <SectionHead
