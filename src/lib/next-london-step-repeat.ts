@@ -623,10 +623,21 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
           ]),
         )
       : [config.familyId];
-  const pool = families.map((id) => {
-    const p = pickNextLogo(id, wantSide, config.colourway);
-    return { familyId: id, art: p.art };
-  });
+  const poolFor = (colourway: NextLogoColourway) =>
+    families.map((id) => {
+      const p = pickNextLogo(id, wantSide, colourway);
+      return { familyId: id, colourway: p.colourway, art: p.art };
+    });
+  const poolA = poolFor(config.colourway);
+  // Two-colour wall: the same marks in a second approved colourway, alternated
+  // through the field. The second pool is appended, so every renderer that
+  // indexes `arts` picks up the colour swap with no other change.
+  const secondColour =
+    config.colourwayB && config.colourwayB !== "none" && config.colourwayB !== config.colourway
+      ? config.colourwayB
+      : null;
+  const poolB = secondColour ? poolFor(secondColour) : [];
+  const pool = [...poolA, ...poolB];
   const arts = pool.map((entry) => entry.art);
   const art = arts[0] ?? picked.art;
 
