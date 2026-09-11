@@ -12,9 +12,11 @@ import {
   LONDON_ASSET_KIND_LABEL,
   londonAssetKind,
   londonZoneFor,
+  londonZoneSummary,
   type LondonFloorPlan,
   type LondonZone,
 } from "@/lib/next-london-floorplan";
+
 import { bespokeSizeLabel, bespokeUnitsOnFloor } from "@/lib/next-london-bespoke";
 import type { LondonPanel } from "@/lib/next-london-signage";
 import { areaKindLabel } from "@/lib/next-london-floormap-icons";
