@@ -714,7 +714,11 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
       } else {
         // Rotate the pool diagonally, so the same mark never sits side by side
         // or directly above itself.
-        const artIndex = arts.length > 1 ? (col + row * 3) % arts.length : 0;
+        const baseCount = poolA.length;
+        const baseIndex = baseCount > 1 ? (col + row * 3) % baseCount : 0;
+        const useSecondColour =
+          poolB.length > 0 && stepRepeatTileIsSecondary(config.colourMix, row, col);
+        const artIndex = useSecondColour ? baseCount + baseIndex : baseIndex;
         const h = (arts[artIndex]!.h / Math.max(1, arts[artIndex]!.w)) * logoW;
         tiles.push({
           kind: "logo",
@@ -736,6 +740,7 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
     art,
     arts,
     artFamilies: pool.map((entry) => entry.familyId),
+    artColourways: pool.map((entry) => entry.colourway),
     orientation: picked.orientation,
     colourway: picked.colourway,
     qr: code
