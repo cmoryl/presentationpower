@@ -223,6 +223,17 @@ export function londonScene(id: string): LondonScene | undefined {
   return LONDON_SCENES.find((s) => s.id === id);
 }
 
+/** The floor-specific plates for a floor (empty when a floor has none). */
+export function scenesForFloor(floor: LondonFloorId): LondonScene[] {
+  return LONDON_SCENES.filter((s) => s.floors?.includes(floor));
+}
+
+/** True when this plate is one of the floor spaces, not a generic surface. */
+export function isFloorScene(scene: LondonScene): boolean {
+  return !!scene.floors?.length;
+}
+
+
 /** Keyword hints from the panel name/ground, strongest signal first. */
 function hintedKinds(panel: LondonPanel): SceneKind[] {
   const t = `${panel.name} ${panel.ground} ${panel.style}`.toLowerCase();
