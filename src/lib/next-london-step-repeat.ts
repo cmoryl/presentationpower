@@ -259,6 +259,16 @@ function clampConfig(patch: Partial<StepRepeatConfig>, base: StepRepeatConfig): 
       : (base.logoSet ?? DEFAULT_STEP_REPEAT.logoSet),
     familyId,
     colourway: available.includes(wanted) ? wanted : (available[0] ?? "white"),
+    colourwayB: (() => {
+      const wantedB = patch.colourwayB ?? base.colourwayB ?? "none";
+      if (wantedB === "none") return "none";
+      return available.includes(wantedB as NextLogoColourway)
+        ? (wantedB as NextLogoColourway)
+        : "none";
+    })(),
+    colourMix: STEP_REPEAT_COLOUR_MIXES.includes(patch.colourMix as StepRepeatColourMix)
+      ? (patch.colourMix as StepRepeatColourMix)
+      : (base.colourMix ?? DEFAULT_STEP_REPEAT.colourMix),
     orientation:
       patch.orientation === "stacked" ||
       patch.orientation === "side" ||
