@@ -45,6 +45,7 @@ import { Route as TestPrintDndRouteImport } from './routes/test.print-dnd'
 import { Route as SocialPresetsRouteImport } from './routes/social.presets'
 import { Route as SocialNewRouteImport } from './routes/social.new'
 import { Route as SocialModulesRouteImport } from './routes/social.modules'
+import { Route as SocialLegalRefreshRouteImport } from './routes/social.legal-refresh'
 import { Route as SocialBannersRouteImport } from './routes/social.banners'
 import { Route as SocialAgentThreadIdRouteImport } from './routes/social-agent.$threadId'
 import { Route as ShowcasePresetIdRouteImport } from './routes/showcase.$presetId'
@@ -357,6 +358,11 @@ const SocialNewRoute = SocialNewRouteImport.update({
 const SocialModulesRoute = SocialModulesRouteImport.update({
   id: '/modules',
   path: '/modules',
+  getParentRoute: () => SocialRoute,
+} as any)
+const SocialLegalRefreshRoute = SocialLegalRefreshRouteImport.update({
+  id: '/legal-refresh',
+  path: '/legal-refresh',
   getParentRoute: () => SocialRoute,
 } as any)
 const SocialBannersRoute = SocialBannersRouteImport.update({
@@ -1151,6 +1157,7 @@ export interface FileRoutesByFullPath {
   '/showcase/$presetId': typeof ShowcasePresetIdRoute
   '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
+  '/social/legal-refresh': typeof SocialLegalRefreshRoute
   '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
   '/social/presets': typeof SocialPresetsRoute
@@ -1318,6 +1325,7 @@ export interface FileRoutesByTo {
   '/showcase/$presetId': typeof ShowcasePresetIdRoute
   '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
+  '/social/legal-refresh': typeof SocialLegalRefreshRoute
   '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
   '/social/presets': typeof SocialPresetsRoute
@@ -1490,6 +1498,7 @@ export interface FileRoutesById {
   '/showcase/$presetId': typeof ShowcasePresetIdRoute
   '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
+  '/social/legal-refresh': typeof SocialLegalRefreshRoute
   '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
   '/social/presets': typeof SocialPresetsRoute
@@ -1663,6 +1672,7 @@ export interface FileRouteTypes {
     | '/showcase/$presetId'
     | '/social-agent/$threadId'
     | '/social/banners'
+    | '/social/legal-refresh'
     | '/social/modules'
     | '/social/new'
     | '/social/presets'
@@ -1830,6 +1840,7 @@ export interface FileRouteTypes {
     | '/showcase/$presetId'
     | '/social-agent/$threadId'
     | '/social/banners'
+    | '/social/legal-refresh'
     | '/social/modules'
     | '/social/new'
     | '/social/presets'
@@ -2001,6 +2012,7 @@ export interface FileRouteTypes {
     | '/showcase/$presetId'
     | '/social-agent/$threadId'
     | '/social/banners'
+    | '/social/legal-refresh'
     | '/social/modules'
     | '/social/new'
     | '/social/presets'
@@ -2413,6 +2425,13 @@ declare module '@tanstack/react-router' {
       path: '/modules'
       fullPath: '/social/modules'
       preLoaderRoute: typeof SocialModulesRouteImport
+      parentRoute: typeof SocialRoute
+    }
+    '/social/legal-refresh': {
+      id: '/social/legal-refresh'
+      path: '/legal-refresh'
+      fullPath: '/social/legal-refresh'
+      preLoaderRoute: typeof SocialLegalRefreshRouteImport
       parentRoute: typeof SocialRoute
     }
     '/social/banners': {
@@ -3519,6 +3538,7 @@ const KnowledgeRouteWithChildren = KnowledgeRoute._addFileChildren(
 
 interface SocialRouteChildren {
   SocialBannersRoute: typeof SocialBannersRoute
+  SocialLegalRefreshRoute: typeof SocialLegalRefreshRoute
   SocialModulesRoute: typeof SocialModulesRoute
   SocialNewRoute: typeof SocialNewRoute
   SocialPresetsRoute: typeof SocialPresetsRoute
@@ -3528,6 +3548,7 @@ interface SocialRouteChildren {
 
 const SocialRouteChildren: SocialRouteChildren = {
   SocialBannersRoute: SocialBannersRoute,
+  SocialLegalRefreshRoute: SocialLegalRefreshRoute,
   SocialModulesRoute: SocialModulesRoute,
   SocialNewRoute: SocialNewRoute,
   SocialPresetsRoute: SocialPresetsRoute,

@@ -260,6 +260,72 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       { label: "MQL from brief", target: "180" },
     ],
   },
+  // Sept 2026 Legal creative refresh. Four look-and-feel directions live at
+  // /social/legal-refresh; this playbook carries the campaign into the kit.
+  {
+    id: "legal-thorny-work",
+    angle: "brand-anthem",
+    name: "Legal · the thorny work",
+    tagline: "Design-led LinkedIn test: flexible legal solutions for complex matters.",
+    intent:
+      "Awareness for the Legal proposition in plain language — most legal tech sells one shape of contract; complex matters are not one shape. Four headline variations across four distinct art directions, no stock photography and no legal clichés.",
+    subBrand: "bm-tp-legal",
+    divisionLabel: "TransPerfect Legal",
+    kitProfileId: "social-essentials",
+    seedVariantId: "MV-INS-SO-WHAT",
+    accent: "#003FC7",
+    chip: "Legal",
+    copy: {
+      title: "We're here for the thorny work.",
+      summary:
+        "Flexible legal solutions for complex matters — built around the matter rather than a one-size-fits-all platform, with people you can actually reach.",
+      cta: "Speak to a specialist",
+    },
+    phases: [
+      {
+        when: "Week 1",
+        label: "Thorny work",
+        detail: "Direction 01 single-image ad.",
+        formats: ["callout-1200x628", "square-1080"],
+      },
+      {
+        when: "Week 2",
+        label: "When it gets knotty",
+        detail: "Direction 03 single-image ad.",
+        formats: ["callout-1200x628"],
+      },
+      {
+        when: "Week 3",
+        label: "The tricky ones",
+        detail: "Direction 02 redacted treatment.",
+        formats: ["callout-1200x628", "portrait-1080x1350"],
+      },
+      {
+        when: "Week 4",
+        label: "The messy jobs",
+        detail: "Direction 04 typographic close.",
+        formats: ["callout-1200x628"],
+      },
+    ],
+    deliverables: [
+      {
+        surface: "digital",
+        label: "4× LinkedIn single-image ads",
+        detail: "1200×628 · one per headline variation.",
+      },
+      { surface: "digital", label: "Square trims", detail: "1080×1080 for feed and stories." },
+      {
+        surface: "digital",
+        label: "Look & feel board",
+        detail: "Four directions with palette, type and device notes.",
+      },
+    ],
+    kpis: [
+      { label: "Qualified reach", target: "250k" },
+      { label: "Engagement rate", target: "3.5%" },
+      { label: "Specialist enquiries", target: "60" },
+    ],
+  },
   {
     id: "gaming-scale-drop",
     angle: "milestone",
