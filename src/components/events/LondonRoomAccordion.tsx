@@ -79,6 +79,40 @@ export function LondonRoomAccordion({ plan, panels, onSelectAsset, selectedId }:
                   </p>
                 ) : null}
 
+                {(() => {
+                  const sum = londonZoneSummary(plan, z, panels);
+                  if (!sum.count) return null;
+                  return (
+                    <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      {[
+                        { k: "Items here", v: String(sum.count) },
+                        { k: "Printed face", v: `${sum.printAreaM2.toFixed(1)} m²` },
+                        { k: "Widest trim", v: `${sum.widestMm} mm` },
+                        { k: "Tallest trim", v: `${sum.tallestMm} mm` },
+                      ].map((s) => (
+                        <div key={s.k} className="rounded-lg border border-black/10 bg-white px-2 py-1.5">
+                          <dd className="text-[13px] font-semibold text-[#03002C]">{s.v}</dd>
+                          <dt className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[#03002C]/55">
+                            {s.k}
+                          </dt>
+                        </div>
+                      ))}
+                      {sum.largest ? (
+                        <div className="col-span-2 rounded-lg border border-black/10 bg-white px-2 py-1.5 sm:col-span-4">
+                          <dd className="text-[12px] font-medium text-[#03002C]">
+                            {sum.largest.name} — {sum.largest.trimW} × {sum.largest.trimH} mm
+                          </dd>
+                          <dt className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[#03002C]/55">
+                            Largest single piece
+                          </dt>
+                        </div>
+                      ) : null}
+                    </dl>
+                  );
+                })()}
+
+
+
                 <div>
                   <p className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-[#03002C]/55">
                     Signage and marketing here
