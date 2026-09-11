@@ -188,8 +188,8 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineCase: "sentence",
     photo: {
       note: "A dense winter thicket of briars thinning out into clean white fog — the mess clearing, shot for real.",
-      focus: "80% 55%",
-      scrim: 0.76,
+      focus: "84% 22%",
+      scrim: 0.8,
       ink: "#03002C",
     },
   },
