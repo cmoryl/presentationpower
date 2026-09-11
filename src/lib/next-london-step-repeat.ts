@@ -268,9 +268,8 @@ function clampConfig(patch: Partial<StepRepeatConfig>, base: StepRepeatConfig): 
     mix: STEP_REPEAT_MIXES.includes(patch.mix as StepRepeatMix)
       ? (patch.mix as StepRepeatMix)
       : (base.mix ?? DEFAULT_STEP_REPEAT.mix),
-    logoSet: STEP_REPEAT_LOGO_SETS.includes(patch.logoSet as StepRepeatLogoSet)
-      ? (patch.logoSet as StepRepeatLogoSet)
-      : (base.logoSet ?? DEFAULT_STEP_REPEAT.logoSet),
+    logoSet,
+
     familyId,
     colourway: available.includes(wanted) ? wanted : (available[0] ?? "white"),
     colourwayB: (() => {
