@@ -2,6 +2,8 @@ import { LONDON_PANELS } from "../src/lib/next-london-signage";
 import { stepRepeatPanelDefault, clampStepRepeatConfig } from "../src/lib/next-london-step-repeat";
 import { buildLondonPanelAiAsync, buildLondonPanelPrintPdfAsync } from "../src/lib/next-london-revise";
 import { writeFileSync } from "node:fs";
+import { loadLondonSignageFace } from "../src/lib/next-london-text-outline";
+await loadLondonSignageFace();
 
 const targets = LONDON_PANELS.filter((p) => /COLOUR LOCKUPS/i.test(p.name));
 console.log("panels:", targets.map((p) => `${p.id} ${p.name}`).join("\n"));
