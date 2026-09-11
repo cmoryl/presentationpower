@@ -144,6 +144,14 @@ export type StepRepeatConfig = {
   qrPlateShape: StepRepeatQrPlateShape;
 };
 
+export const STEP_REPEAT_COLOUR_MIXES = ["checker", "rows", "columns"] as const;
+export type StepRepeatColourMix = (typeof STEP_REPEAT_COLOUR_MIXES)[number];
+export const STEP_REPEAT_COLOUR_MIX_LABELS: Record<StepRepeatColourMix, string> = {
+  checker: "Checkerboard",
+  rows: "Alternating rows",
+  columns: "Alternating columns",
+};
+
 export const STEP_REPEAT_QR_MODULE_SHAPES = ["square", "rounded", "dot"] as const;
 export type StepRepeatQrModuleShape = (typeof STEP_REPEAT_QR_MODULE_SHAPES)[number];
 export const STEP_REPEAT_QR_MODULE_LABELS: Record<StepRepeatQrModuleShape, string> = {
@@ -191,6 +199,8 @@ export const DEFAULT_STEP_REPEAT: StepRepeatConfig = {
   logoSet: "single",
   familyId: "transperfect",
   colourway: "white",
+  colourwayB: "none",
+  colourMix: "checker",
   orientation: "auto",
   // 260 mm ≈ 10.2 in — the middle of the standard press-wall mark range.
   tileWidthMm: 260,
