@@ -67,6 +67,8 @@ export interface LondonScene {
   anchorY: "top" | "center" | "bottom";
   /** How the print meets the surface (applied vinyls cover their face). */
   mount: SceneMountMode;
+  /** Floors this plate actually represents, when it is a floor-specific space. */
+  floors?: LondonFloorId[];
 }
 
 function scene(
@@ -79,6 +81,7 @@ function scene(
   fixed: SceneFixedAxis = "w",
   anchorY: "top" | "center" | "bottom" = "center",
   mount: SceneMountMode = "edge",
+  floors?: LondonFloorId[],
 ): LondonScene {
   return {
     id,
@@ -92,8 +95,10 @@ function scene(
     fixed,
     anchorY,
     mount,
+    ...(floors ? { floors } : {}),
   };
 }
+
 
 export const LONDON_SCENES: LondonScene[] = [
   scene("foyer-column", "Foyer light column", "Ground floor foyer", "column", foyerColumn, {
