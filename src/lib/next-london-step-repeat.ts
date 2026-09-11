@@ -717,7 +717,7 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
         const baseCount = poolA.length;
         const baseIndex = baseCount > 1 ? (col + row * 3) % baseCount : 0;
         const useSecondColour =
-          poolB.length > 0 && stepRepeatTileIsSecondary(config.colourMix, row, col);
+          poolB.length > 0 && stepRepeatTileIsSecondary(config.colourMix as StepRepeatMix, row, col);
         const artIndex = useSecondColour ? baseCount + baseIndex : baseIndex;
         const h = (arts[artIndex]!.h / Math.max(1, arts[artIndex]!.w)) * logoW;
         tiles.push({
@@ -910,7 +910,8 @@ export function stepRepeatSvgLayer(
           .join("");
         return (
           `<g data-tile="logo" data-row="${tile.row}" data-col="${tile.col}"` +
-          ` data-family="${esc(plan.artFamilies[tile.artIndex] ?? plan.config.familyId)}"${spin}>` +
+          ` data-family="${esc(plan.artFamilies[tile.artIndex] ?? plan.config.familyId)}"` +
+          ` data-colourway="${plan.artColourways[tile.artIndex] ?? plan.colourway}"${spin}>` +
           `<g transform="translate(${tile.x.toFixed(2)} ${tile.y.toFixed(2)}) scale(${logoScale.toFixed(5)})">${paths}</g></g>`
         );
       }
