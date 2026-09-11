@@ -47,6 +47,9 @@ export type LondonLiveFileRecord = {
   trimH: number | null;
   /** Short-lived link to the supplied Illustrator file. */
   masterUrl: string | null;
+  /** Short-lived link to the supplied print-ready PDF, when one was handed back. */
+  printUrl: string | null;
+  printFilename: string | null;
   /** Short-lived link to the flat proof, painted as the sign ground. */
   proofUrl: string | null;
 };
@@ -57,7 +60,7 @@ export const listLondonLiveFiles = createServerFn({ method: "GET" }).handler(asy
   const { data: rows, error } = await supabase
     .from("london_live_files")
     .select(
-      "id, panel_id, version, master_path, master_filename, proof_path, trim_w, trim_h, note, issued",
+      "id, panel_id, version, master_path, master_filename, print_path, print_filename, proof_path, trim_w, trim_h, note, issued",
     )
     .eq("is_active", true)
     .order("version", { ascending: false });
@@ -69,7 +72,7 @@ export const listLondonLiveFiles = createServerFn({ method: "GET" }).handler(asy
   const picked = [...newest.values()];
 
   const paths = picked.flatMap((row) =>
-    [row.master_path, row.proof_path].filter((p): p is string => !!p),
+    [row.master_path, row.print_path, row.proof_path].filter((p): p is string => !!p),
   );
   const signed = new Map<string, string>();
   if (paths.length > 0) {
@@ -94,9 +97,12 @@ export const listLondonLiveFiles = createServerFn({ method: "GET" }).handler(asy
     trimW: row.trim_w === null ? null : Number(row.trim_w),
     trimH: row.trim_h === null ? null : Number(row.trim_h),
     masterUrl: signed.get(row.master_path) ?? null,
+    printUrl: row.print_path ? (signed.get(row.print_path) ?? null) : null,
+    printFilename: row.print_filename ?? null,
     proofUrl: row.proof_path ? (signed.get(row.proof_path) ?? null) : null,
   }));
 });
+
 
 export type LondonLiveFileInput = {
   panelId: string;
