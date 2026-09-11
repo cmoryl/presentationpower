@@ -169,7 +169,55 @@ export const LONDON_SCENES: LondonScene[] = [
     w: 0.0579,
     h: 0.4551,
   }, "w", "top"),
+
+  // ── Floor-specific plates ────────────────────────────────────────────────
+  // One space per mapped floor of the venue, matched to the room roster and
+  // the install faces on that level, so an item can be previewed in the space
+  // it is actually scheduled for. Still visualisations, not venue photos.
+  scene("floor-ext-forecourt", "Broad Sanctuary forecourt flag", "Exterior · forecourt approach", "exterior", floorExtForecourt, {
+    x: 0.28,
+    y: 0.06,
+    w: 0.105,
+    h: 0.645,
+  }, "w", "top", "edge", ["EXT"]),
+  scene("floor-gf-auditorium", "Churchill stage wall", "Ground floor · Churchill", "wall", floorGfAuditorium, {
+    x: 0.1914,
+    y: 0.1934,
+    w: 0.6133,
+    h: 0.3379,
+  }, "w", "center", "edge", ["GF"]),
+  scene("floor-2f-breakout", "Second floor breakout wall", "Second floor · actor rooms & beam", "wall", floor2fBreakout, {
+    x: 0.387,
+    y: 0.283,
+    w: 0.348,
+    h: 0.256,
+  }, "w", "center", "edge", ["2F"]),
+  scene("floor-3f-foyer", "Third floor foyer pillar", "Third floor · Fleming & exhibition foyer", "column", floor3fFoyer, {
+    x: 0.401,
+    y: 0.0195,
+    w: 0.1992,
+    h: 0.8379,
+  }, "w", "top", "edge", ["3F"]),
+  scene("floor-4f-suite", "Fourth floor suite wall", "Fourth floor · meeting suites", "portrait", floor4fSuite, {
+    x: 0.4323,
+    y: 0.2773,
+    w: 0.1094,
+    h: 0.2793,
+  }, "w", "center", "edge", ["4F"]),
+  scene("floor-5f-stair-glass", "Fifth floor stair glazing", "Fifth floor · Windsor, Cambridge & stair glass", "wall", floor5fStairGlass, {
+    x: 0.4102,
+    y: 0.2695,
+    w: 0.3815,
+    h: 0.2871,
+  }, "w", "center", "edge", ["5F"]),
+  scene("floor-6f-set", "Mountbatten set wrap", "Sixth floor · Mountbatten", "wall", floor6fSet, {
+    x: 0.1615,
+    y: 0.1953,
+    w: 0.6771,
+    h: 0.4004,
+  }, "w", "center", "edge", ["6F"]),
 ];
+
 
 export function londonScene(id: string): LondonScene | undefined {
   return LONDON_SCENES.find((s) => s.id === id);
