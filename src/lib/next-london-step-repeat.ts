@@ -490,6 +490,8 @@ export type StepRepeatPlan = {
   arts: NextLogoArt[];
   /** Family id per entry of `arts`, for the spec readout. */
   artFamilies: string[];
+  /** Colourway per entry of `arts` — a two-colour wall lists each twice. */
+  artColourways: NextLogoColourway[];
   orientation: "stacked" | "side";
   colourway: NextLogoColourway;
   /** QR module geometry, when the recipe carries a code. */
