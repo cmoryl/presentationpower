@@ -37,6 +37,8 @@ import {
   STEP_REPEAT_MIX_LABELS,
   STEP_REPEAT_MIX_NOTES,
   STEP_REPEAT_MIXES,
+  STEP_REPEAT_COLOUR_MIX_LABELS,
+  STEP_REPEAT_COLOUR_MIXES,
   STEP_REPEAT_QR_MODULE_LABELS,
   STEP_REPEAT_QR_MODULE_SHAPES,
   STEP_REPEAT_QR_PLATE_LABELS,
@@ -321,6 +323,34 @@ export function StepRepeatWallPanel({ panel }: StepRepeatWallPanelProps) {
           }))}
           onChange={(colourway) => set({ colourway })}
         />
+        <Chips
+          label="Second colourway"
+          value={config.colourwayB}
+          options={[
+            { value: "none" as const, label: "One colour only" },
+            ...colourways
+              .filter((key) => key !== config.colourway)
+              .map((key) => ({ value: key, label: NEXT_LOGO_COLOURWAY_LABELS[key] })),
+          ]}
+          onChange={(colourwayB) => set({ colourwayB })}
+        />
+        {config.colourwayB !== "none" ? (
+          <>
+            <Chips
+              label="How the two colours spread"
+              value={config.colourMix}
+              options={STEP_REPEAT_COLOUR_MIXES.map((key) => ({
+                value: key,
+                label: STEP_REPEAT_COLOUR_MIX_LABELS[key],
+              }))}
+              onChange={(colourMix) => set({ colourMix })}
+            />
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
+              The same marks print in two approved colour versions, alternating through the field —
+              each colour becomes its own editable layer in the Illustrator master.
+            </p>
+          </>
+        ) : null}
       </Group>
 
       <Group title="Pattern geometry">
