@@ -14,15 +14,16 @@ import {
   type LegalRefreshDirection,
   type LegalRefreshRenderMode,
 } from "@/lib/social-legal-refresh";
-import photoThorn from "@/assets/legal-refresh/thorn-line.jpg";
-import photoRedacted from "@/assets/legal-refresh/redacted.jpg";
-import photoKnot from "@/assets/legal-refresh/the-knot.jpg";
-import photoThicket from "@/assets/legal-refresh/thicket-type.jpg";
+import photoThorn from "@/assets/legal-refresh/human-thorn-line.jpg";
+import photoRedacted from "@/assets/legal-refresh/human-redacted.jpg";
+import photoKnot from "@/assets/legal-refresh/human-the-knot.jpg";
+import photoThicket from "@/assets/legal-refresh/human-thicket-type.jpg";
 
 /**
- * Commissioned campaign photography, generated for this campaign rather than
- * licensed from a stock library: real objects, no people, no devices, no legal
- * symbols and no blue overlay, so the brief's forbidden list still holds.
+ * Commissioned campaign photography: real people in real, slightly absurd
+ * working situations. Wry rather than beaming, no devices in hand, no gavels or
+ * scales, no blue overlay — so the brief's forbidden list still holds while the
+ * campaign gets its human warmth and its joke.
  */
 const PHOTOS: Record<string, string> = {
   "thorn-line": photoThorn,
