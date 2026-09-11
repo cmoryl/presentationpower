@@ -22,8 +22,11 @@ export type LondonLiveFileVersion = {
   trimW: number | null;
   trimH: number | null;
   masterUrl: string | null;
+  printUrl?: string | null;
+  printFilename?: string | null;
   proofUrl: string | null;
 };
+
 
 export type LondonLiveFileMap = Record<string, LondonLiveFileVersion>;
 
