@@ -9,13 +9,39 @@
 
 import { useId } from "react";
 import { getDivisionLogos } from "@/lib/division-logos";
-import { LEGAL_REFRESH_CONCEPT, type LegalRefreshDirection } from "@/lib/social-legal-refresh";
+import {
+  LEGAL_REFRESH_CONCEPT,
+  type LegalRefreshDirection,
+  type LegalRefreshRenderMode,
+} from "@/lib/social-legal-refresh";
+import photoThorn from "@/assets/legal-refresh/thorn-line.jpg";
+import photoRedacted from "@/assets/legal-refresh/redacted.jpg";
+import photoKnot from "@/assets/legal-refresh/the-knot.jpg";
+import photoThicket from "@/assets/legal-refresh/thicket-type.jpg";
+
+/**
+ * Commissioned campaign photography, generated for this campaign rather than
+ * licensed from a stock library: real objects, no people, no devices, no legal
+ * symbols and no blue overlay, so the brief's forbidden list still holds.
+ */
+const PHOTOS: Record<string, string> = {
+  "thorn-line": photoThorn,
+  redacted: photoRedacted,
+  "the-knot": photoKnot,
+  "thicket-type": photoThicket,
+};
+
+export function legalRefreshPhoto(directionId: string): string | undefined {
+  return PHOTOS[directionId];
+}
 
 type Props = {
   direction: LegalRefreshDirection;
   /** Frame aspect. */
   w: number;
   h: number;
+  /** Photographic art direction, or the drawn motif. Defaults to photographic. */
+  mode?: LegalRefreshRenderMode;
   className?: string;
 };
 
@@ -23,14 +49,27 @@ const SERIF = '"Instrument Serif", "Iowan Old Style", Georgia, serif';
 const SANS = 'Geist, "Geist Variable", system-ui, sans-serif';
 const MONO = '"Geist Mono", ui-monospace, monospace';
 
-export function LegalRefreshAd({ direction: d, w, h, className }: Props) {
+export function LegalRefreshAd({ direction: d, w, h, mode = "photo", className }: Props) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const logos = getDivisionLogos("bm-tp-legal");
-  const lockup = d.lockup === "white" ? (logos?.white ?? logos?.color) : (logos?.color ?? "");
+  const photo = mode === "photo" ? legalRefreshPhoto(d.id) : undefined;
+  // On the photographic route the lockup and copy have to survive the frame, so
+  // the ink flips to whatever the shot can carry.
+  const ink = photo ? d.photo.ink : d.palette.ink;
+  const onDark = ink.toUpperCase() === "#FFFFFF";
+  const lockup =
+    photo || d.lockup === "white"
+      ? onDark
+        ? (logos?.white ?? logos?.color)
+        : (logos?.color ?? logos?.white)
+      : (logos?.color ?? "");
   const square = h >= w;
   // One type scale drives the whole frame so both aspects stay in proportion.
   const unit = Math.min(w, h);
   const px = (n: number) => `${(n / unit) * 100}cqmin`;
+  const scrimStops = square
+    ? `${d.palette.ground} 0%, ${d.palette.ground} 34%, transparent 78%`
+    : `${d.palette.ground} 0%, ${d.palette.ground} 30%, transparent 72%`;
 
   return (
     <div
@@ -42,11 +81,45 @@ export function LegalRefreshAd({ direction: d, w, h, className }: Props) {
         width: "100%",
         overflow: "hidden",
         background: d.palette.ground,
-        color: d.palette.ink,
+        color: ink,
         fontFamily: SANS,
       }}
     >
-      <Motif direction={d} square={square} uid={uid} />
+      {photo ? (
+        <>
+          <img
+            src={photo}
+            alt=""
+            aria-hidden
+            loading="lazy"
+            width={1920}
+            height={1008}
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: d.photo.focus,
+              zIndex: 0,
+            }}
+          />
+          {/* Ground-toned scrim — the brand ground, never a blue wash. */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 1,
+              opacity: d.photo.scrim,
+              background: `linear-gradient(${square ? "to top" : "to right"}, ${scrimStops})`,
+            }}
+          />
+        </>
+      ) : (
+        <Motif direction={d} square={square} uid={uid} />
+      )}
+
 
       {/* Copy stack */}
       <div
@@ -82,7 +155,7 @@ export function LegalRefreshAd({ direction: d, w, h, className }: Props) {
               lineHeight: 1.02,
               letterSpacing: d.headlineFont === "serif" ? "-0.01em" : "-0.03em",
               textTransform: d.headlineCase === "caps" ? "uppercase" : "none",
-              color: d.palette.ink,
+              color: ink,
             }}
           >
             {d.headline}

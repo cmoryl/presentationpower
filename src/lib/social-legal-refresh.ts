@@ -78,6 +78,22 @@ export type LegalRefreshDirection = {
   /** Headline treatment. */
   headlineFont: "serif" | "sans";
   headlineCase: "sentence" | "caps";
+  /**
+   * AI-generated photographic art direction for the same idea. Commissioned as
+   * real objects shot for this campaign — never a licensed stock library frame,
+   * never a blue overlay, no people, no devices, no legal symbols, so the
+   * brief's forbidden list still holds in the photographic route.
+   */
+  photo: {
+    /** What the frame shows, in plain words. */
+    note: string;
+    /** CSS object-position for the crop, so copy always lands on clear space. */
+    focus: string;
+    /** Ground-coloured scrim opacity behind the copy column (0–1). */
+    scrim: number;
+    /** Ink colour to use when the photograph is behind the copy. */
+    ink: string;
+  };
 };
 
 /**
@@ -101,6 +117,12 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     lockup: "color",
     headlineFont: "serif",
     headlineCase: "sentence",
+    photo: {
+      note: "Macro of a real bramble, backlit by low window light against warm paper tone. Thorns hard-lit, ground soft.",
+      focus: "78% 50%",
+      scrim: 0.72,
+      ink: "#03002C",
+    },
   },
   {
     id: "redacted",
@@ -118,6 +140,12 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     lockup: "white",
     headlineFont: "sans",
     headlineCase: "caps",
+    photo: {
+      note: "A stack of paperwork seen edge-on in near darkness, one raking sliver of light on the page edges.",
+      focus: "72% 50%",
+      scrim: 0.62,
+      ink: "#FFFFFF",
+    },
   },
   {
     id: "the-knot",
@@ -135,6 +163,12 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     lockup: "color",
     headlineFont: "sans",
     headlineCase: "sentence",
+    photo: {
+      note: "One hemp rope, tangled into a knot then running dead straight out of frame. Studio light, pale grey sweep.",
+      focus: "72% 45%",
+      scrim: 0.7,
+      ink: "#03002C",
+    },
   },
   {
     id: "thicket-type",
@@ -152,8 +186,22 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     lockup: "color",
     headlineFont: "sans",
     headlineCase: "sentence",
+    photo: {
+      note: "A dense winter thicket of briars thinning out into clean white fog — the mess clearing, shot for real.",
+      focus: "84% 22%",
+      scrim: 0.8,
+      ink: "#03002C",
+    },
   },
 ];
+
+/** The two art routes each direction can be proofed in. */
+export const LEGAL_REFRESH_RENDER_MODES = [
+  { id: "photo", label: "Photographic" },
+  { id: "drawn", label: "Drawn" },
+] as const;
+
+export type LegalRefreshRenderMode = (typeof LEGAL_REFRESH_RENDER_MODES)[number]["id"];
 
 export function legalRefreshDirection(id: string): LegalRefreshDirection | undefined {
   return LEGAL_REFRESH_DIRECTIONS.find((d) => d.id === id);
