@@ -13,7 +13,9 @@ import {
   LEGAL_REFRESH_CONCEPT,
   LEGAL_REFRESH_DIRECTIONS,
   LEGAL_REFRESH_FORBIDDEN,
+  LEGAL_REFRESH_RENDER_MODES,
   LEGAL_REFRESH_SIZES,
+  type LegalRefreshRenderMode,
 } from "@/lib/social-legal-refresh";
 
 export const Route = createFileRoute("/social/legal-refresh")({
@@ -45,6 +47,7 @@ export const Route = createFileRoute("/social/legal-refresh")({
 function LegalRefreshView() {
   const [sizeId, setSizeId] = useState<string>(LEGAL_REFRESH_SIZES[0].id);
   const size = LEGAL_REFRESH_SIZES.find((s) => s.id === sizeId) ?? LEGAL_REFRESH_SIZES[0];
+  const [mode, setMode] = useState<LegalRefreshRenderMode>("photo");
 
   return (
     <div className="mx-auto max-w-7xl space-y-12 px-4 py-10 sm:px-6 lg:px-8">
@@ -92,10 +95,29 @@ function LegalRefreshView() {
             </h2>
             <p className="max-w-2xl text-sm text-black/60">
               Each direction carries one of the four approved headlines, so the playback shows the
-              copy and the design together. Everything is drawn — type, line and flat colour only.
+              copy and the design together. Switch between the commissioned photography and the
+              drawn version of the same idea.
             </p>
           </div>
-          <div className="flex gap-1.5">
+          <div className="flex flex-wrap justify-end gap-1.5">
+            {LEGAL_REFRESH_RENDER_MODES.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => setMode(m.id)}
+                aria-pressed={m.id === mode}
+                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                  m.id === mode
+                    ? "border-[#03002C] bg-[#03002C] text-white"
+                    : "border-black/15 bg-white text-[#03002C] hover:border-[#003FC7]/50"
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
+            <span aria-hidden className="mx-1 self-center text-black/20">
+              |
+            </span>
             {LEGAL_REFRESH_SIZES.map((s) => (
               <button
                 key={s.id}
@@ -137,7 +159,7 @@ function LegalRefreshView() {
 
               <div className="bg-[#F6F7FA] p-5">
                 <div className="mx-auto max-w-[560px] overflow-hidden rounded-xl shadow-[0_16px_40px_-22px_rgba(3,0,44,0.45)]">
-                  <LegalRefreshAd direction={d} w={size.w} h={size.h} />
+                  <LegalRefreshAd direction={d} w={size.w} h={size.h} mode={mode} />
                 </div>
               </div>
 
