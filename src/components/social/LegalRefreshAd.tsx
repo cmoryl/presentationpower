@@ -116,6 +116,17 @@ export function LegalRefreshAd({ direction: d, w, h, mode = "photo", className }
               background: `linear-gradient(${square ? "to top" : "to right"}, ${scrimStops})`,
             }}
           />
+          {/* Lift the lockup corner off busy detail so the mark stays legible. */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 1,
+              background: `radial-gradient(120% 90% at 100% 100%, ${d.palette.ground} 0%, transparent 46%)`,
+              opacity: 0.62,
+            }}
+          />
         </>
       ) : (
         <Motif direction={d} square={square} uid={uid} />
