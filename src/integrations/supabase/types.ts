@@ -2502,6 +2502,8 @@ export type Database = {
           master_path: string
           note: string | null
           panel_id: string
+          print_filename: string | null
+          print_path: string | null
           proof_path: string | null
           trim_h: number | null
           trim_w: number | null
@@ -2518,6 +2520,8 @@ export type Database = {
           master_path: string
           note?: string | null
           panel_id: string
+          print_filename?: string | null
+          print_path?: string | null
           proof_path?: string | null
           trim_h?: number | null
           trim_w?: number | null
@@ -2534,6 +2538,8 @@ export type Database = {
           master_path?: string
           note?: string | null
           panel_id?: string
+          print_filename?: string | null
+          print_path?: string | null
           proof_path?: string | null
           trim_h?: number | null
           trim_w?: number | null

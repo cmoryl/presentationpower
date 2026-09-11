@@ -27,6 +27,9 @@ export type LondonSuppliedMaster = {
   aiUrl: string;
   /** Download filename. */
   filename: string;
+  /** Print-ready PDF supplied alongside the Illustrator file, when there is one. */
+  printUrl?: string | null;
+  printFilename?: string | null;
   /** Flat proof of the supplied artboard, painted as the panel ground. */
   previewUrl: string;
   /** Revision the supplied file was finished from. */
@@ -35,6 +38,7 @@ export type LondonSuppliedMaster = {
   issued: string;
   note: string;
 };
+
 
 const MASTERS: LondonSuppliedMaster[] = [
   {
@@ -93,9 +97,12 @@ export function londonSuppliedMaster(
       panelId: id,
       aiUrl: live.masterUrl,
       filename: live.filename,
+      printUrl: live.printUrl ?? null,
+      printFilename: live.printFilename ?? null,
       previewUrl: live.proofUrl ?? bundled?.previewUrl ?? "",
       fromRevision: live.version,
       issued: live.issued,
+
       note:
         live.note ??
         `Finished live file, version ${live.version}, issued ${live.issued}. Print this file.`,

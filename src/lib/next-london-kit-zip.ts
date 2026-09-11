@@ -13,9 +13,13 @@ export type LondonKitZipBuilders = {
   /** Print-ready PDF bytes (bleed, trim, crop marks) for one panel. */
   printPdf: (panel: LondonPanel) => Promise<Uint8Array>;
   /** Supplied vendor master, served verbatim when the design team hand-finished one. */
-  supplied?: (
-    panel: LondonPanel,
-  ) => Promise<{ filename: string; bytes: Uint8Array } | null>;
+  supplied?: (panel: LondonPanel) => Promise<{
+    filename: string;
+    bytes: Uint8Array;
+    /** Print-ready PDF handed back with the master, served verbatim too. */
+    print?: { filename: string; bytes: Uint8Array };
+  } | null>;
+
   /** File stem for a panel, already stamped with the revision or `rdraft-`. */
   fileBase: (panel: LondonPanel) => string;
   /** Human floor name for the folder, e.g. "Level 2 — Britten". */
@@ -86,7 +90,12 @@ export async function buildLondonKitZip(
       if (supplied) {
         folder.file(`${dir}/supplied-master/${supplied.filename}`, supplied.bytes);
         written.push(`${dir}/supplied-master/${supplied.filename}`);
+        if (supplied.print) {
+          folder.file(`${dir}/supplied-master/${supplied.print.filename}`, supplied.print.bytes);
+          written.push(`${dir}/supplied-master/${supplied.print.filename}`);
+        }
       }
+
       files += written.length;
       rows.push([
         builders.floorLabel(panel),
