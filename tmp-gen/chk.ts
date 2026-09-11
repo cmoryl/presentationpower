@@ -5,5 +5,5 @@ const cfg = clampStepRepeatConfig({ ...stepRepeatPanelDefault(p.id), colourway: 
 console.log(cfg.colourway, cfg.colourwayB, cfg.colourMix);
 const plan = stepRepeatPlan(p, cfg);
 console.log([...new Set(plan.artColourways)], plan.tiles?.length ?? "n/a", Object.keys(plan));
-import { nextLogoColourways } from "../src/lib/next-logo";
+import { nextLogoColourways } from "../src/lib/next-logo-vectors";
 console.log("family", cfg.familyId, nextLogoColourways(cfg.familyId));
