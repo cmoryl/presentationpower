@@ -260,7 +260,15 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
       const orientation =
         (ratio >= 1) === (s.faceRatio >= 1) ? 0 : 1.5;
       const fit = Math.abs(Math.log(s.faceRatio / ratio));
-      return { s, score: (hint >= 0 ? hint * 0.15 : 3) + orientation + fit };
+      // A plate of the floor the item is actually scheduled on wins ties, so
+      // the first view a user sees is the space the item installs in.
+      const onFloor = s.floors?.includes(panel.floor) ? -0.75 : 0;
+      const wrongFloor = s.floors && !s.floors.includes(panel.floor) ? 1.5 : 0;
+      return {
+        s,
+        score: (hint >= 0 ? hint * 0.15 : 3) + orientation + fit + onFloor + wrongFloor,
+      };
+
     })
     .sort((a, b) => a.score - b.score)
     .map((r) => r.s);
