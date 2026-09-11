@@ -191,7 +191,16 @@ const PLANS: LondonFloorPlan[] = [
         y: 30,
         w: 30,
         h: 8,
-        rooms: ["FOYER", "SANCTUARY", "PILLARS", "STEP & REPEAT", "MAIN DOORS", "MAIN ENTRANCE"],
+        rooms: [
+          "FOYER",
+          "SANCTUARY",
+          "SANCTUARY FOYER",
+          "PILLARS",
+          "STEP & REPEAT",
+          "MAIN DOORS",
+          "MAIN ENTRANCE",
+        ],
+
         note: "Video wall on the long side; floor vinyl sits 1.6 m clear of it. The dedicated stair to Pickwick and the Churchill Gallery leaves from this foyer.",
       },
       {
@@ -202,7 +211,8 @@ const PLANS: LondonFloorPlan[] = [
         y: 4,
         w: 14,
         h: 12,
-        rooms: ["EXHIBITION BOOTHS"],
+        rooms: ["EXHIBITION BOOTHS", "GROUND FLOOR EXHIBITION", "EXHIBITION"],
+
         note: "Vendor kiosks in two rows, front walls facing the aisle.",
       },
       {
