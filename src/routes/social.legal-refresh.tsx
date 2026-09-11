@@ -167,8 +167,10 @@ function LegalRefreshView() {
                 <p className="text-black/70">{d.rationale}</p>
                 <dl className="grid gap-2 text-xs text-black/65 sm:grid-cols-2">
                   <div>
-                    <dt className="font-semibold uppercase tracking-widest text-black/40">Device</dt>
-                    <dd className="mt-0.5">{d.motifNote}</dd>
+                    <dt className="font-semibold uppercase tracking-widest text-black/40">
+                      {mode === "photo" ? "Image" : "Device"}
+                    </dt>
+                    <dd className="mt-0.5">{mode === "photo" ? d.photo.note : d.motifNote}</dd>
                   </div>
                   <div>
                     <dt className="font-semibold uppercase tracking-widest text-black/40">Type</dt>
