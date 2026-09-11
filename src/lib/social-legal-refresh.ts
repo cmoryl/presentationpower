@@ -118,7 +118,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineFont: "serif",
     headlineCase: "sentence",
     photo: {
-      note: "Golden hour in an ordinary back garden: a woman in a t-shirt and gardening gloves mows straight through a shoulder-high bramble hedge, clean corridor behind her. Left half is empty warm lawn and haze for copy.",
+      note: "Golden hour in an ordinary back garden: a woman in gardening gloves calmly trims back a huge overgrown bramble hedge with hand shears. Normal chore, absurd tangle. Left half is empty sunlit lawn and haze for copy.",
       focus: "70% 55%",
       scrim: 0.42,
       ink: "#03002C",
@@ -141,7 +141,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineFont: "sans",
     headlineCase: "caps",
     photo: {
-      note: "Family living room at night buried waist-deep in post like snowfall; a man in pyjamas shovels a path off the sofa while the cat watches. Left edge falls to near black for copy.",
+      note: "Family living room at night: a man in pyjamas sits opening and sorting letters into neat piles while the room lies knee-deep in unopened post, cat on top. Left edge falls to near black for copy.",
       focus: "74% 55%",
       scrim: 0.3,
       ink: "#FFFFFF",
@@ -164,7 +164,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineFont: "sans",
     headlineCase: "sentence",
     photo: {
-      note: "Domestic garage: five neighbours in hoodies and jeans haul at a giant knot of garden hose while one calm woman holds the freed line straight with a finger. Empty pale wall above as copy space.",
+      note: "Domestic garage: two neighbours in hoodies crouch patiently untangling a garden hose the size of an armchair, one neat coil already done beside them. Empty pale block wall above as copy space.",
       focus: "50% 72%",
       scrim: 0.3,
       ink: "#03002C",
@@ -187,7 +187,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineFont: "sans",
     headlineCase: "sentence",
     photo: {
-      note: "Foggy residential street: a man in a dressing gown and wellies rides a ride-on mower through kerbside moving boxes and bin bags. Left half is luminous empty fog for copy.",
+      note: "Foggy residential street on moving day: a man in a coat carries one box to the kerb past an endless line of stacked boxes and bin bags. Left half is luminous empty fog for copy.",
       focus: "72% 55%",
       scrim: 0.24,
       ink: "#03002C",
