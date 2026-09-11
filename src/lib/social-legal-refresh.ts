@@ -118,8 +118,8 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineFont: "serif",
     headlineCase: "sentence",
     photo: {
-      note: "Golden hour: counsel in charcoal tailoring pushing an old mower straight through a shoulder-high bramble hedge, a clean corridor opening behind her. Left half is empty warm haze for copy.",
-      focus: "66% 50%",
+      note: "Golden hour in an ordinary back garden: a woman in a t-shirt and gardening gloves mows straight through a shoulder-high bramble hedge, clean corridor behind her. Left half is empty warm lawn and haze for copy.",
+      focus: "70% 55%",
       scrim: 0.42,
       ink: "#03002C",
     },
@@ -141,8 +141,8 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineFont: "sans",
     headlineCase: "caps",
     photo: {
-      note: "Boardroom buried in paper like snowfall, three colleagues sunk to their chests, one man on the table clearing a path with a snow shovel. Left edge falls to near black for copy.",
-      focus: "72% 50%",
+      note: "Family living room at night buried waist-deep in post like snowfall; a man in pyjamas shovels a path off the sofa while the cat watches. Left edge falls to near black for copy.",
+      focus: "74% 55%",
       scrim: 0.3,
       ink: "#FFFFFF",
     },
@@ -164,8 +164,8 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineFont: "sans",
     headlineCase: "sentence",
     photo: {
-      note: "Office tug-of-war: five people straining at a car-sized rope knot while one calm woman holds the freed line dead straight with a single finger. Vast pale wall above as copy space.",
-      focus: "50% 70%",
+      note: "Domestic garage: five neighbours in hoodies and jeans haul at a giant knot of garden hose while one calm woman holds the freed line straight with a finger. Empty pale wall above as copy space.",
+      focus: "50% 72%",
       scrim: 0.3,
       ink: "#03002C",
     },
@@ -187,8 +187,8 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineFont: "sans",
     headlineCase: "sentence",
     photo: {
-      note: "Silver fog: a suited man rides a small mower straight through a hedge maze built of archive boxes, files tumbling behind him. Left half is luminous empty fog for copy.",
-      focus: "70% 50%",
+      note: "Foggy residential street: a man in a dressing gown and wellies rides a ride-on mower through kerbside moving boxes and bin bags. Left half is luminous empty fog for copy.",
+      focus: "72% 55%",
       scrim: 0.24,
       ink: "#03002C",
     },
