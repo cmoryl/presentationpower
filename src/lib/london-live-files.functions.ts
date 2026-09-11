@@ -157,7 +157,10 @@ export const publishLondonLiveFile = createServerFn({ method: "POST" })
         master_path: data.masterPath,
         master_filename: data.masterFilename,
         master_content_type: data.masterContentType ?? null,
+        print_path: data.printPath ?? null,
+        print_filename: data.printFilename ?? null,
         proof_path: data.proofPath ?? null,
+
         trim_w: data.trimW ?? null,
         trim_h: data.trimH ?? null,
         note: data.note ?? null,
