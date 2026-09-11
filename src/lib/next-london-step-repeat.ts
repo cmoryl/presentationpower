@@ -249,6 +249,7 @@ function clampConfig(patch: Partial<StepRepeatConfig>, base: StepRepeatConfig): 
   const familyId = typeof patch.familyId === "string" ? patch.familyId : base.familyId;
   const available = nextLogoColourways(familyId);
   const wanted = patch.colourway ?? base.colourway;
+
   return {
     kind,
     mix: STEP_REPEAT_MIXES.includes(patch.mix as StepRepeatMix)
@@ -257,6 +258,7 @@ function clampConfig(patch: Partial<StepRepeatConfig>, base: StepRepeatConfig): 
     logoSet: STEP_REPEAT_LOGO_SETS.includes(patch.logoSet as StepRepeatLogoSet)
       ? (patch.logoSet as StepRepeatLogoSet)
       : (base.logoSet ?? DEFAULT_STEP_REPEAT.logoSet),
+
     familyId,
     colourway: available.includes(wanted) ? wanted : (available[0] ?? "white"),
     colourwayB: (() => {
