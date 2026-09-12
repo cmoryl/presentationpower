@@ -365,6 +365,85 @@ export function SceneArtworkPlate({
           }}
         />
 
+        {/* Substrate texture: fabric weave, film orange peel, board seams or
+            anti-slip floor grain. It is what a print is actually made of. */}
+        {texture ? (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              backgroundImage: texture,
+              opacity: finish.texture * (1 - rake * 0.3),
+              mixBlendMode: "overlay",
+            }}
+          />
+        ) : null}
+
+        {/* Drape: a hung textile is never a plane. Soft vertical relief, and a
+            sag that shades the print away from its top pocket. */}
+        {finish.drape > 0.02 ? (
+          <>
+            <div
+              aria-hidden="true"
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `repeating-linear-gradient(90deg, rgba(3,0,44,${(finish.drape * 0.16).toFixed(3)}) 0%, rgba(3,0,44,0) 6%, rgba(255,255,255,${(finish.drape * 0.12).toFixed(3)}) 11%, rgba(3,0,44,0) 17%)`,
+                mixBlendMode: "soft-light",
+              }}
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(180deg, rgba(3,0,44,${(finish.drape * 0.2).toFixed(3)}) 0%, rgba(3,0,44,0) 22%)`,
+                mixBlendMode: "multiply",
+              }}
+            />
+          </>
+        ) : null}
+
+        {/* Occlusion at the fixed edge: light cannot reach the join, so the
+            print is darkest exactly where it is held. */}
+        {occlusionEdge && finish.occlusion > 0.05 ? (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(${occlusionEdge}, rgba(3,0,44,${(finish.occlusion * 0.5).toFixed(3)}) 0%, rgba(3,0,44,0) ${(10 + finish.occlusion * 24).toFixed(0)}%)`,
+              mixBlendMode: "multiply",
+            }}
+          />
+        ) : null}
+
+        {/* Transmission: film on glazing is lit from behind as well as in front,
+            so it glows on its light side instead of sitting opaque. */}
+        {finish.transmit > 0.02 ? (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(${angle}deg, rgba(236,244,255,${(finish.transmit * 0.6).toFixed(3)}) 0%, rgba(236,244,255,${(finish.transmit * 0.18).toFixed(3)}) 62%, rgba(236,244,255,0) 100%)`,
+              mixBlendMode: "screen",
+            }}
+          />
+        ) : null}
+
+        {/* Wear: floors are walked on, counters and desk fronts are rubbed at
+            hand height. Strongest at the edges that actually take the traffic. */}
+        {finish.wear > 0.04 ? (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background:
+                finish.contact === "ground"
+                  ? `radial-gradient(90% 70% at 50% 78%, rgba(255,255,255,${(finish.wear * 0.5).toFixed(3)}) 0%, rgba(255,255,255,0) 62%)`
+                  : `linear-gradient(0deg, rgba(226,232,244,${(finish.wear * 0.45).toFixed(3)}) 0%, rgba(226,232,244,0) 18%)`,
+              mixBlendMode: "screen",
+            }}
+          />
+        ) : null}
+
         {/* Specular sheen for laminated stock, raked with the light. */}
         {light.sheen > 0.02 ? (
           <div
