@@ -33,6 +33,7 @@ import {
   type LondonPanel,
 } from "@/lib/next-london-signage";
 import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
+import { SceneEventScreens, sceneScreensCaption } from "@/components/next/SceneEventScreens";
 import { SceneDoorLeaves } from "@/components/next/SceneDoorLeaves";
 import { doorLeafLabel, londonDoorSpec } from "@/lib/next-london-doors";
 
