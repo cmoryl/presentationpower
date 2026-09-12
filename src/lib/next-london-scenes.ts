@@ -349,12 +349,6 @@ const QEII_PHOTO_QUADS: Record<string, SceneQuad> = {
     { x: 0.815, y: 0.855 },
     { x: 0.235, y: 0.862 },
   ],
-  "photo-churchill-stage": [
-    { x: 0.258, y: 0.418 },
-    { x: 0.712, y: 0.418 },
-    { x: 0.712, y: 0.523 },
-    { x: 0.258, y: 0.523 },
-  ],
   "photo-lounge-panel": [
     { x: 0.118, y: 0.365 },
     { x: 0.255, y: 0.378 },
