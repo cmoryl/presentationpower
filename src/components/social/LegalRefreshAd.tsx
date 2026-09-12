@@ -17,6 +17,9 @@ import { useId } from "react";
 import { getDivisionLogos } from "@/lib/division-logos";
 import {
   LEGAL_REFRESH_CONCEPT,
+  legalRefreshFinish,
+  legalRefreshModeUsesPhoto,
+  type LegalRefreshFinish,
   type LegalRefreshDirection,
   type LegalRefreshRenderMode,
 } from "@/lib/social-legal-refresh";
@@ -69,7 +72,11 @@ type Px = (n: number) => string;
 export function LegalRefreshAd({ direction: d, w, h, mode = "photo", className }: Props) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const logos = getDivisionLogos("bm-tp-legal");
-  const photo = mode === "photo" ? legalRefreshPhoto(d.id) : undefined;
+  const photo = legalRefreshModeUsesPhoto(mode) ? legalRefreshPhoto(d.id) : undefined;
+  const finish = legalRefreshFinish(mode);
+  // Grades that darken or tint the frame carry white copy over art regardless of
+  // what the untreated photograph could hold.
+  const darkFinish = mode === "nightshift" || mode === "duotone" || mode === "riso";
   const square = h >= w;
   const unit = Math.min(w, h);
   const px: Px = (n) => `${(n / unit) * 100}cqmin`;
@@ -77,14 +84,12 @@ export function LegalRefreshAd({ direction: d, w, h, mode = "photo", className }
   // Layouts that never lay type over art keep the palette ink; the rest flip to
   // whatever the photograph can carry.
   const onPanel = d.layout === "split-vertical" || d.layout === "bottom-band" || d.layout === "corner-plate";
-  const ink = photo && !onPanel ? d.photo.ink : d.palette.ink;
+  const ink = photo && !onPanel ? (darkFinish ? "#FFFFFF" : d.photo.ink) : d.palette.ink;
   const onDark = ink.toUpperCase() === "#FFFFFF";
   const lockup = onDark ? (logos?.white ?? logos?.color ?? "") : (logos?.color ?? logos?.white ?? "");
   const mono = d.motif === "redaction" || d.motif === "trail" || d.motif === "fineprint";
 
-  const art = (
-    <Art d={d} photo={photo} square={square} uid={uid} />
-  );
+  const art = <Art d={d} photo={photo} square={square} uid={uid} finish={finish} />;
   const shared = { d, px, ink, mono, lockup, square } as const;
 
   return (
@@ -617,35 +622,78 @@ function Art({
   photo,
   square,
   uid,
+  finish,
 }: {
   d: LegalRefreshDirection;
   photo?: string;
   square: boolean;
   uid: string;
+  finish: LegalRefreshFinish;
 }) {
   if (photo) {
+    const tone = (c: LegalRefreshFinish["tints"][number]["color"]) =>
+      c === "ink"
+        ? d.palette.ink
+        : c === "accent"
+          ? d.palette.accent
+          : c === "second"
+            ? d.palette.second
+            : d.palette.ground;
     return (
-      <img
-        src={photo}
-        alt=""
-        aria-hidden
-        loading="lazy"
-        width={1920}
-        height={1008}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          objectPosition: d.photo.focus,
-          zIndex: 0,
-        }}
-      />
+      <>
+        <img
+          src={photo}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          width={1920}
+          height={1008}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: d.photo.focus,
+            filter: finish.filter,
+            zIndex: 0,
+          }}
+        />
+        {finish.tints.map((t, i) => (
+          <div
+            key={i}
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 0,
+              background: tone(t.color),
+              mixBlendMode: t.blend as React.CSSProperties["mixBlendMode"],
+              opacity: t.opacity,
+            }}
+          />
+        ))}
+        {finish.grain > 0 && (
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 0,
+              opacity: finish.grain,
+              backgroundImage:
+                "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>\")",
+              backgroundSize: "180px 180px",
+              mixBlendMode: "overlay",
+            }}
+          />
+        )}
+      </>
     );
   }
   return <Motif direction={d} square={square} uid={uid} />;
 }
+
 
 /** The drawn graphic device for each direction. */
 function Motif({

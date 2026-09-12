@@ -344,13 +344,77 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
 ];
 
 
-/** The two art routes each direction can be proofed in. */
+/**
+ * The art routes each direction can be proofed in. All but `drawn` use the
+ * campaign photography; they differ in the photographic finish (grade, tone,
+ * print treatment) so one direction can be shown in several looks without a
+ * reshoot. `drawn` swaps the photograph for the direction's drawn device.
+ */
 export const LEGAL_REFRESH_RENDER_MODES = [
-  { id: "photo", label: "Photographic" },
-  { id: "drawn", label: "Drawn" },
+  { id: "photo", label: "Photographic", note: "Natural campaign grade, straight off the shoot." },
+  { id: "duotone", label: "Brand duotone", note: "Two-tone brand grade: ink shadows, accent light." },
+  { id: "mono", label: "Editorial mono", note: "Black and white with a hard editorial contrast curve." },
+  { id: "film", label: "Sunlit film", note: "Warm film grade, lifted blacks, softer highlights." },
+  { id: "riso", label: "Riso print", note: "Posterised two-colour print with visible grain." },
+  { id: "nightshift", label: "Night shift", note: "Cool, deep grade for dark-frame placements." },
+  { id: "drawn", label: "Drawn", note: "The drawn device instead of a photograph." },
 ] as const;
 
 export type LegalRefreshRenderMode = (typeof LEGAL_REFRESH_RENDER_MODES)[number]["id"];
+
+/** Every mode except `drawn` renders the photograph. */
+export function legalRefreshModeUsesPhoto(mode: LegalRefreshRenderMode): boolean {
+  return mode !== "drawn";
+}
+
+/** Finish recipe for a photographic mode: CSS filter plus optional tint layers. */
+export type LegalRefreshFinish = {
+  filter: string;
+  /** Colour layers painted over the photograph, in order. */
+  tints: { color: "ink" | "accent" | "second" | "ground"; blend: string; opacity: number }[];
+  /** Print grain strength, 0 = none. */
+  grain: number;
+};
+
+export function legalRefreshFinish(mode: LegalRefreshRenderMode): LegalRefreshFinish {
+  switch (mode) {
+    case "duotone":
+      return {
+        filter: "grayscale(1) contrast(1.14) brightness(1.02)",
+        tints: [
+          { color: "ink", blend: "multiply", opacity: 0.82 },
+          { color: "accent", blend: "screen", opacity: 0.42 },
+        ],
+        grain: 0,
+      };
+    case "mono":
+      return { filter: "grayscale(1) contrast(1.32) brightness(0.98)", tints: [], grain: 0.05 };
+    case "film":
+      return {
+        filter: "saturate(0.92) contrast(0.94) brightness(1.06) sepia(0.16)",
+        tints: [{ color: "second", blend: "soft-light", opacity: 0.24 }],
+        grain: 0.07,
+      };
+    case "riso":
+      return {
+        filter: "grayscale(1) contrast(1.6) brightness(1.08)",
+        tints: [
+          { color: "accent", blend: "multiply", opacity: 0.6 },
+          { color: "second", blend: "screen", opacity: 0.3 },
+        ],
+        grain: 0.16,
+      };
+    case "nightshift":
+      return {
+        filter: "saturate(0.7) contrast(1.18) brightness(0.78)",
+        tints: [{ color: "ink", blend: "multiply", opacity: 0.5 }],
+        grain: 0.04,
+      };
+    default:
+      return { filter: "none", tints: [], grain: 0 };
+  }
+}
+
 
 export function legalRefreshDirection(id: string): LegalRefreshDirection | undefined {
   return LEGAL_REFRESH_DIRECTIONS.find((d) => d.id === id);
