@@ -826,6 +826,9 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
       // Between two plates of the same surface, the one with delegates on site
       // reads as the install in use, so it leads.
       const liveBonus = s.live && (kindOk ? hint >= 0 || hints.length === 0 : false) ? -0.35 : 0;
+      // A genuine venue photograph beats a visualisation of the same surface,
+      // so the first view a user sees is the real space wherever we have it.
+      const photoBonus = s.photo && (kindOk ? hint >= 0 || hints.length === 0 : false) ? -0.5 : 0;
       return {
         s,
         score:
@@ -835,6 +838,7 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
           onFloor +
           wrongFloor +
           liveBonus +
+          photoBonus +
           specialised,
       };
 
