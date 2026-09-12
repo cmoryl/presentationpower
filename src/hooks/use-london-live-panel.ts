@@ -10,6 +10,7 @@ import { useMemo } from "react";
 
 import { applyLondonBoardSize, useLondonBoardSizes } from "@/lib/next-london-board-size";
 import { useLondonLiveFiles } from "@/lib/next-london-live-files";
+import { useLondonLiveLayerMap } from "@/lib/next-london-live-layers";
 import { useLondonLogoPlacements } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import {
@@ -46,6 +47,9 @@ export function useLondonLivePanel(
   // a download must carry the recipe saved in this browser, not the last one
   // that made it into a revision — otherwise an exported wall loses its QR rows.
   const stepRepeats = useStepRepeatConfigs();
+  // Which layers the finished file owns decides which layers we regenerate, so
+  // a change there has to repaint every card and preview too.
+  const liveLayers = useLondonLiveLayerMap();
 
   return useMemo(() => {
     const placement = placements[input.id];
@@ -75,6 +79,7 @@ export function useLondonLivePanel(
         liveFiles[input.id]
           ? `live:${liveFiles[input.id]!.version}:${liveFiles[input.id]!.proofUrl ?? ""}`
           : "live:none",
+        JSON.stringify(liveLayers[input.id] ?? null),
       ].join("|"),
       draft:
         Boolean(placement || placedArt || boardSize || stepRepeat) &&
@@ -92,6 +97,7 @@ export function useLondonLivePanel(
     boardSizes,
     stepRepeats,
     liveFiles,
+    liveLayers,
     publishedOverrides,
     JSON.stringify(base),
   ]);
