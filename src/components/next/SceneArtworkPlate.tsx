@@ -37,6 +37,8 @@ import {
   quadForeshortening,
   type SceneQuad,
 } from "@/lib/scene-perspective";
+import { sceneSurface, surfaceCastScale } from "@/lib/scene-surface";
+import type { SceneKind } from "@/lib/next-london-scenes";
 
 export interface SceneArtworkPlateProps {
   /** Measured artwork box as fractions of the rendered plate. */
