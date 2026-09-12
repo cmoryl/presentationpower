@@ -266,10 +266,10 @@ export const LONDON_SCENES: LondonScene[] = [
     h: 0.245,
   }, "h", "center", "edge"), live: true },
   { ...scene("live-coffee-bar", "Coffee bar wall · break in progress", "Catering / coffee bar · event live", "counter", liveCoffeeBar, {
-    x: 0.16,
-    y: 0.12,
-    w: 0.705,
-    h: 0.425,
+    x: 0.185,
+    y: 0.1,
+    w: 0.7,
+    h: 0.44,
   }, "w", "center", "edge"), live: true },
   { ...scene("live-foyer-column", "Pillar · exhibition foyer in use", "Exhibition foyer pillar · event live", "column", liveFoyerColumn, {
     x: 0.405,
@@ -373,16 +373,16 @@ export const LONDON_SCENES: LondonScene[] = [
   // rectangles were measured off the photographs themselves, so artwork lands
   // on the actual printed pillar side and the actual scenic stage wall.
   { ...scene("ref-foyer-pillar", "NEXT pillar in an exhibition foyer", "Exhibition foyer · four-sided pillar", "column", refFoyerPillar, {
-    x: 0.806,
-    y: 0.252,
-    w: 0.0946,
-    h: 0.649,
+    x: 0.795,
+    y: 0.157,
+    w: 0.082,
+    h: 0.73,
   }, "w", "center", "cover"), photo: true },
   { ...scene("ref-plenary-stage", "NEXT scenic stage wall", "Plenary stage · scenic back wall", "wall", refPlenaryStage, {
-    x: 0.05,
-    y: 0.0755,
-    w: 0.85,
-    h: 0.483,
+    x: 0.045,
+    y: 0.045,
+    w: 0.86,
+    h: 0.545,
   }, "w", "center", "edge"), photo: true },
   // Meeting-room door pair, photographed square on: applied vinyl covers the
   // two door leaves, so the print is measured to the leaves themselves.
@@ -394,10 +394,10 @@ export const LONDON_SCENES: LondonScene[] = [
   }, "w", "center", "cover"), photo: true },
   // Long foyer wall run beside the plenary entrance.
   { ...scene("ref-foyer-wall-run", "Foyer wall run", "Exhibition foyer · long wall run", "wide", refFoyerWallRun, {
-    x: 0.05,
-    y: 0.11,
-    w: 0.73,
-    h: 0.83,
+    x: 0.025,
+    y: 0.09,
+    w: 0.79,
+    h: 0.845,
   }, "w", "center", "edge"), photo: true },
   // Freestanding press / merch wall with a dressed table in front of it.
   { ...scene("ref-press-wall", "Press & merch wall", "Foyer · freestanding press wall", "wall", refPressWall, {
