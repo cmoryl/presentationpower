@@ -341,9 +341,14 @@ export function LondonLocationRenderPreview({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[13px] font-semibold text-[#03002C]">
-                {panel.name} · {scene.label}
-              </p>
+              <div>
+                <p className="text-[13px] font-semibold text-[#03002C]">
+                  {panel.name} · {scene.label}
+                </p>
+                <p className="mt-0.5 font-mono text-[10.5px] uppercase tracking-[0.1em] text-[#03002C]/55">
+                  {sceneCaption(scene, panel)}
+                </p>
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
