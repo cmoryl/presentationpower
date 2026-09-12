@@ -36,3 +36,23 @@ describe("NEXT venue template families", () => {
     }
   });
 });
+
+describe("venue template audit", () => {
+  it("reports coverage, size ranges and the gaps still to template", () => {
+    const audit = venueTemplateAudit(LONDON_PANELS);
+    expect(audit.total).toBe(LONDON_PANELS.length);
+    expect(audit.covered + audit.unmatched.length).toBe(audit.total);
+    expect(audit.reuse).toBeGreaterThan(0.2);
+    expect(audit.coverage).toHaveLength(NEXT_VENUE_TEMPLATES.length);
+    for (const row of audit.coverage) {
+      if (!row.panels.length) continue;
+      expect(row.sizeRange).not.toBeNull();
+      expect(row.sizeRange!.maxW).toBeGreaterThanOrEqual(row.sizeRange!.minW);
+      expect(row.bleeds.length).toBeGreaterThan(0);
+      for (const panel of row.panels) {
+        expect(venueTemplateFor(panel.id)?.id).toBe(row.family.id);
+      }
+    }
+    for (const panel of audit.unmatched) expect(venueTemplateFor(panel.id)).toBeNull();
+  });
+});
