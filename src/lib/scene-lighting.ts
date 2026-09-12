@@ -421,12 +421,241 @@ const SCENE_FINISH: Record<string, SceneFinish> = {
   "floor-ext-forecourt": { grain: 0.05, softness: 0.35, bounce: 0.04 },
 };
 
-export function sceneLighting(sceneId: string): SceneLighting {
+/**
+ * ── The photographer's read of a plate ──────────────────────────────────────
+ *
+ * Matching a print to a photograph is not just "make it a bit darker". A real
+ * shot has a time of day, a colour temperature, one dominant light of a given
+ * hardness arriving from a measurable azimuth and elevation, a shadow whose
+ * direction and length follow from that light, and a camera that rolls off
+ * highlights, lifts blacks and vignettes the frame.
+ *
+ * Recording those properly, per plate, is what makes every event render read as
+ * the same photographer on the same job — and it travels to the next venue,
+ * because the same daylight/tungsten/stage reads recur in every conference
+ * centre.
+ */
+export type TimeOfDay =
+  | "morning"
+  | "midday"
+  | "afternoon"
+  | "golden"
+  | "evening"
+  | "night"
+  | "tungsten"
+  | "daylight-interior"
+  | "mixed-interior"
+  | "stage";
+
+export interface LightQuality {
+  /** When, and under what, the plate was shot. */
+  timeOfDay: TimeOfDay;
+  /** Colour temperature of the dominant light, in kelvin. */
+  kelvin: number;
+  /** 0 = broad soft source (overcast, diffuser), 1 = bare hard source. */
+  hardness: number;
+  /** Compass bearing the light arrives from, in degrees: 0 = behind camera. */
+  azimuth: number;
+  /** Height of the light above the horizon, in degrees. */
+  elevation: number;
+  /** Shadow length as a multiple of the object's height (from elevation). */
+  shadowLength: number;
+  /** Open shade filling the shadow side, 0..1. */
+  ambientLift: number;
+  /** Highlight rolloff — how gently the top end compresses, 0..1. */
+  rolloff: number;
+  /** Lifted, filmic blacks, 0..1. */
+  blackLift: number;
+  /** Corner falloff of the taking lens, 0..1. */
+  vignette: number;
+}
+
+/** House reads for each lighting condition, so plates stay consistent. */
+const TIME_OF_DAY: Record<TimeOfDay, Omit<LightQuality, "timeOfDay">> = {
+  morning: { kelvin: 5200, hardness: 0.55, azimuth: 105, elevation: 26, shadowLength: 2.05, ambientLift: 0.1, rolloff: 0.12, blackLift: 0.05, vignette: 0.1 },
+  midday: { kelvin: 5600, hardness: 0.78, azimuth: 178, elevation: 64, shadowLength: 0.49, ambientLift: 0.07, rolloff: 0.16, blackLift: 0.04, vignette: 0.12 },
+  afternoon: { kelvin: 4900, hardness: 0.52, azimuth: 252, elevation: 34, shadowLength: 1.48, ambientLift: 0.11, rolloff: 0.13, blackLift: 0.05, vignette: 0.11 },
+  golden: { kelvin: 3400, hardness: 0.62, azimuth: 272, elevation: 13, shadowLength: 4.33, ambientLift: 0.09, rolloff: 0.2, blackLift: 0.07, vignette: 0.16 },
+  evening: { kelvin: 3000, hardness: 0.34, azimuth: 296, elevation: 11, shadowLength: 5.14, ambientLift: 0.14, rolloff: 0.22, blackLift: 0.09, vignette: 0.18 },
+  night: { kelvin: 4300, hardness: 0.3, azimuth: 190, elevation: 55, shadowLength: 0.7, ambientLift: 0.16, rolloff: 0.24, blackLift: 0.11, vignette: 0.22 },
+  tungsten: { kelvin: 3050, hardness: 0.3, azimuth: 195, elevation: 72, shadowLength: 0.32, ambientLift: 0.16, rolloff: 0.18, blackLift: 0.07, vignette: 0.14 },
+  "daylight-interior": { kelvin: 5300, hardness: 0.3, azimuth: 118, elevation: 42, shadowLength: 1.11, ambientLift: 0.2, rolloff: 0.14, blackLift: 0.05, vignette: 0.12 },
+  "mixed-interior": { kelvin: 4350, hardness: 0.24, azimuth: 176, elevation: 60, shadowLength: 0.58, ambientLift: 0.22, rolloff: 0.15, blackLift: 0.06, vignette: 0.13 },
+  stage: { kelvin: 6200, hardness: 0.46, azimuth: 182, elevation: 46, shadowLength: 0.97, ambientLift: 0.1, rolloff: 0.26, blackLift: 0.12, vignette: 0.24 },
+};
+
+/**
+ * Time of day / light source per plate, plus any read that departs from the
+ * house condition. Unlisted plates take a condition from their surface and
+ * light direction, so a new venue's scenes are coherent from the first render.
+ */
+const SCENE_QUALITY: Record<string, { timeOfDay: TimeOfDay } & Partial<LightQuality>> = {
+  // Genuine QEII photographs.
+  "photo-foyer-wall-run": { timeOfDay: "daylight-interior", azimuth: 108, elevation: 38 },
+  "photo-plenary-fascia": { timeOfDay: "stage", kelvin: 6600, hardness: 0.5 },
+  "photo-churchill-stage": { timeOfDay: "stage", kelvin: 6000 },
+  "photo-exhibition-foyer": { timeOfDay: "mixed-interior", azimuth: 150 },
+  "photo-thirdfloor-wall": { timeOfDay: "daylight-interior", azimuth: 128, elevation: 46 },
+  "photo-exhibition-stand": { timeOfDay: "daylight-interior", azimuth: 140, elevation: 44 },
+  "photo-lounge-panel": { timeOfDay: "mixed-interior", azimuth: 120 },
+  "photo-sanctuary-counter": { timeOfDay: "tungsten", kelvin: 3200 },
+  "photo-cafe-tabletop": { timeOfDay: "daylight-interior", azimuth: 150, elevation: 52 },
+  "photo-facade-evening": { timeOfDay: "night", kelvin: 4000, vignette: 0.24 },
+
+  // Supplied event photographs.
+  "ref-foyer-pillar": { timeOfDay: "mixed-interior", azimuth: 122 },
+  "ref-plenary-stage": { timeOfDay: "stage" },
+  "ref-room-doors": { timeOfDay: "mixed-interior", azimuth: 112 },
+  "ref-foyer-wall-run": { timeOfDay: "daylight-interior", azimuth: 110, elevation: 36 },
+  "ref-press-wall": { timeOfDay: "tungsten", kelvin: 3400 },
+  "ref-scenic-wall-blank": { timeOfDay: "mixed-interior" },
+  "ref-exterior-canopy": { timeOfDay: "afternoon" },
+
+  // In-event visualisations.
+  "live-stage-fascia": { timeOfDay: "stage" },
+  "live-stair-glass": { timeOfDay: "daylight-interior", azimuth: 104, elevation: 40 },
+  "live-floor-graphic": { timeOfDay: "mixed-interior", elevation: 74, shadowLength: 0.29 },
+  "live-tabletop": { timeOfDay: "daylight-interior", elevation: 66, shadowLength: 0.45 },
+  "live-coffee-bar": { timeOfDay: "tungsten" },
+  "live-registration-desk": { timeOfDay: "mixed-interior" },
+  "live-lift-lobby": { timeOfDay: "tungsten", kelvin: 3300 },
+  "live-exterior-entrance": { timeOfDay: "afternoon" },
+  "live-portrait-banner": { timeOfDay: "daylight-interior", azimuth: 106 },
+  "live-foyer-column": { timeOfDay: "daylight-interior", azimuth: 112 },
+  "live-foyer-wall-run": { timeOfDay: "daylight-interior", azimuth: 110 },
+  "live-scenic-wall": { timeOfDay: "mixed-interior" },
+  "live-breakout-panel": { timeOfDay: "daylight-interior", azimuth: 116 },
+  "live-room-doors": { timeOfDay: "mixed-interior", azimuth: 114 },
+
+  // House surface plates and NEXT MART.
+  "stage-fascia": { timeOfDay: "stage" },
+  "coffee-bar": { timeOfDay: "tungsten" },
+  "desk-front": { timeOfDay: "mixed-interior" },
+  "exterior-banner": { timeOfDay: "midday" },
+  "floor-ext-forecourt": { timeOfDay: "midday", elevation: 68, shadowLength: 0.4 },
+  "floor-decal": { timeOfDay: "mixed-interior", elevation: 74, shadowLength: 0.29 },
+  "surface-floor-graphic": { timeOfDay: "mixed-interior", elevation: 74, shadowLength: 0.29 },
+  "surface-tabletop": { timeOfDay: "daylight-interior", elevation: 66, shadowLength: 0.45 },
+  "surface-stair-glass": { timeOfDay: "daylight-interior", azimuth: 104 },
+  "entrance-pillar": { timeOfDay: "tungsten", kelvin: 3200 },
+  "till-front": { timeOfDay: "tungsten" },
+  "wall-panel": { timeOfDay: "tungsten", kelvin: 3300 },
+  "rail-panel": { timeOfDay: "tungsten", kelvin: 3300 },
+  "queue-panel": { timeOfDay: "tungsten", kelvin: 3300 },
+  "hanging-banner": { timeOfDay: "tungsten", kelvin: 3400 },
+};
+
+/** Azimuth implied by a plate's dominant light direction, when unrecorded. */
+function azimuthFor(direction: LightDirection): number {
+  switch (direction) {
+    case "left":
+      return 112;
+    case "right":
+      return 248;
+    default:
+      return 178;
+  }
+}
+
+/**
+ * Approximate blackbody colour at `kelvin` as a hex string. Deriving every
+ * ambient cast from a temperature — rather than a hand-picked hex per scene —
+ * is what keeps a tungsten foyer and a tungsten coffee bar the same warm.
+ */
+export function kelvinTint(kelvin: number): string {
+  const k = Math.min(9000, Math.max(1800, kelvin)) / 100;
+  const clamp = (n: number) => Math.round(Math.min(255, Math.max(0, n)));
+  const r = k <= 66 ? 255 : 329.6987 * Math.pow(k - 60, -0.1332047592);
+  const g =
+    k <= 66
+      ? 99.4708025861 * Math.log(k) - 161.1195681661
+      : 288.1221695283 * Math.pow(k - 60, -0.0755148492);
+  const b = k >= 66 ? 255 : k <= 19 ? 0 : 138.5177312231 * Math.log(k - 10) - 305.0447927307;
+  // Pulled toward white: this is an ambient cast laid over a print, not the
+  // colour of the light itself, and brand colours must survive it.
+  const mix = (c: number) => clamp(c + (255 - c) * 0.55);
+  return `#${[mix(r), mix(g), mix(b)]
+    .map((c) => clamp(c).toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+/** The full photographic read of a plate. */
+export function sceneLightQuality(sceneId: string): LightQuality {
+  const base = sceneLighting(sceneId);
+  const spec = SCENE_QUALITY[sceneId];
+  const tod: TimeOfDay = spec?.timeOfDay ?? "mixed-interior";
+  const house = TIME_OF_DAY[tod];
+  const q: LightQuality = {
+    timeOfDay: tod,
+    ...house,
+    ...(spec ? { ...spec, timeOfDay: tod } : {}),
+  };
+  if (!spec || spec.azimuth === undefined) q.azimuth = azimuthFor(base.direction);
+  if (!spec || spec.elevation === undefined) {
+    if (base.direction === "top") q.elevation = Math.max(q.elevation, 58);
+  }
+  if (!spec || spec.shadowLength === undefined) {
+    // A shadow's length follows from how high the light sits — never guessed.
+    q.shadowLength = 1 / Math.tan((Math.max(6, q.elevation) * Math.PI) / 180);
+  }
+  return q;
+}
+
+/**
+ * Cast shadow for a print on a surface, in fractions of the print's own box.
+ * Direction comes from the light's azimuth, length from its elevation and
+ * softness from its hardness — so a hard midday shadow is short and crisp and
+ * an evening one is long and open, without either being hand-tuned.
+ */
+export function castShadow(
+  q: LightQuality,
+  strength: number,
+): { x: number; y: number; blur: number; opacity: number } {
+  const rad = ((q.azimuth - 180) * Math.PI) / 180;
+  const len = Math.min(0.09, 0.012 + Math.min(3.2, q.shadowLength) * 0.016);
   return {
+    // Light from the left throws the shadow right, and always downward on a
+    // vertical surface because the source is above the horizon.
+    x: -Math.sin(rad) * len,
+    y: Math.max(0.006, Math.cos(((90 - q.elevation) * Math.PI) / 180) * 0.03 + len * 0.35),
+    blur: 0.5 + (1 - q.hardness) * 2.4,
+    opacity: Math.min(0.85, strength * (0.55 + q.hardness * 0.7)),
+  };
+}
+
+/** Plain-language read of a plate's light, for preview captions. */
+export function lightQualityLabel(q: LightQuality): string {
+  const when: Record<TimeOfDay, string> = {
+    morning: "Morning daylight",
+    midday: "Midday sun",
+    afternoon: "Afternoon daylight",
+    golden: "Golden hour",
+    evening: "Evening light",
+    night: "After dark",
+    tungsten: "Warm house lighting",
+    "daylight-interior": "Daylight through the glazing",
+    "mixed-interior": "House and daylight mix",
+    stage: "Stage wash",
+  };
+  const feel = q.hardness >= 0.6 ? "hard shadows" : q.hardness >= 0.4 ? "medium shadows" : "soft shadows";
+  return `${when[q.timeOfDay]} · ${Math.round(q.kelvin)}K · ${feel}`;
+}
+
+export function sceneLighting(sceneId: string): SceneLighting {
+  const merged: SceneLighting = {
     ...DEFAULT_LIGHTING,
     ...(SCENE_LIGHTING[sceneId] ?? {}),
     ...(SCENE_FINISH[sceneId] ?? {}),
   };
+  // Plates with no hand-picked cast take the colour of their own light, so a
+  // new venue's scenes are already consistent with the existing ones.
+  if (SCENE_LIGHTING[sceneId]?.tint === undefined) {
+    const spec = SCENE_QUALITY[sceneId];
+    if (spec) {
+      merged.tint = kelvinTint(spec.kelvin ?? TIME_OF_DAY[spec.timeOfDay].kelvin);
+    }
+  }
+  return merged;
 }
 
 /** CSS gradient angle, in degrees, for light arriving from `direction`. */
