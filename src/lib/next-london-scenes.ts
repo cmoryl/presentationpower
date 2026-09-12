@@ -278,7 +278,44 @@ export const LONDON_SCENES: LondonScene[] = [
     w: 0.85,
     h: 0.483,
   }, "w", "center", "edge"), photo: true },
+  // Meeting-room door pair, photographed square on: applied vinyl covers the
+  // two door leaves, so the print is measured to the leaves themselves.
+  { ...scene("ref-room-doors", "Breakout room door pair", "Breakout room entrance · double doors", "door", refRoomDoors, {
+    x: 0.3,
+    y: 0.215,
+    w: 0.325,
+    h: 0.615,
+  }, "w", "center", "cover"), photo: true },
+  // Long foyer wall run beside the plenary entrance.
+  { ...scene("ref-foyer-wall-run", "Foyer wall run", "Exhibition foyer · long wall run", "wide", refFoyerWallRun, {
+    x: 0.05,
+    y: 0.11,
+    w: 0.73,
+    h: 0.83,
+  }, "w", "center", "edge"), photo: true },
+  // Freestanding press / merch wall with a dressed table in front of it.
+  { ...scene("ref-press-wall", "Press & merch wall", "Foyer · freestanding press wall", "wall", refPressWall, {
+    x: 0.19,
+    y: 0.05,
+    w: 0.67,
+    h: 0.73,
+  }, "w", "center", "edge"), photo: true },
+  // QEII Centre entrance canopy: the banner face above the lit lettering.
+  { ...scene("ref-exterior-canopy", "Entrance canopy banner", "Exterior · QEII Centre canopy", "exterior", refExteriorCanopy, {
+    x: 0.1,
+    y: 0.465,
+    w: 0.805,
+    h: 0.14,
+  }, "w", "center", "cover"), photo: true },
+  // Bare 6800 x 4030 mm scenic wall build, photographed before artwork.
+  { ...scene("ref-scenic-wall-blank", "Scenic wall build (6800 x 4030 mm)", "Scenic build · bare panel wall", "wall", refScenicWallBlank, {
+    x: 0.035,
+    y: 0.07,
+    w: 0.91,
+    h: 0.855,
+  }, "w", "center", "edge"), photo: true },
 ];
+
 
 
 export function londonScene(id: string): LondonScene | undefined {
