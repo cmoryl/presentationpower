@@ -15,6 +15,7 @@ import {
   LEGAL_REFRESH_FORBIDDEN,
   LEGAL_REFRESH_RENDER_MODES,
   LEGAL_REFRESH_SIZES,
+  legalRefreshModeUsesPhoto,
   type LegalRefreshRenderMode,
 } from "@/lib/social-legal-refresh";
 
@@ -108,6 +109,7 @@ function LegalRefreshView() {
                 type="button"
                 onClick={() => setMode(m.id)}
                 aria-pressed={m.id === mode}
+                title={m.note}
                 className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                   m.id === mode
                     ? "border-[#03002C] bg-[#03002C] text-white"
@@ -170,9 +172,16 @@ function LegalRefreshView() {
                 <dl className="grid gap-2 text-xs text-black/65 sm:grid-cols-2">
                   <div>
                     <dt className="font-semibold uppercase tracking-widest text-black/40">
-                      {mode === "photo" ? "Image" : "Device"}
+                      {legalRefreshModeUsesPhoto(mode) ? "Image" : "Device"}
                     </dt>
-                    <dd className="mt-0.5">{mode === "photo" ? d.photo.note : d.motifNote}</dd>
+                    <dd className="mt-0.5">
+                      {legalRefreshModeUsesPhoto(mode) ? d.photo.note : d.motifNote}
+                      {legalRefreshModeUsesPhoto(mode) && mode !== "photo" ? (
+                        <span className="block text-black/45">
+                          Finish: {LEGAL_REFRESH_RENDER_MODES.find((m) => m.id === mode)?.note}
+                        </span>
+                      ) : null}
+                    </dd>
                   </div>
                   <div>
                     <dt className="font-semibold uppercase tracking-widest text-black/40">Type</dt>
