@@ -191,7 +191,16 @@ const PLANS: LondonFloorPlan[] = [
         y: 30,
         w: 30,
         h: 8,
-        rooms: ["FOYER", "SANCTUARY", "PILLARS", "STEP & REPEAT", "MAIN DOORS", "MAIN ENTRANCE"],
+        rooms: [
+          "FOYER",
+          "SANCTUARY",
+          "SANCTUARY FOYER",
+          "PILLARS",
+          "STEP & REPEAT",
+          "MAIN DOORS",
+          "MAIN ENTRANCE",
+        ],
+
         note: "Video wall on the long side; floor vinyl sits 1.6 m clear of it. The dedicated stair to Pickwick and the Churchill Gallery leaves from this foyer.",
       },
       {
@@ -202,7 +211,8 @@ const PLANS: LondonFloorPlan[] = [
         y: 4,
         w: 14,
         h: 12,
-        rooms: ["EXHIBITION BOOTHS"],
+        rooms: ["EXHIBITION BOOTHS", "GROUND FLOOR EXHIBITION", "EXHIBITION"],
+
         note: "Vendor kiosks in two rows, front walls facing the aisle.",
       },
       {
@@ -1115,4 +1125,51 @@ export function londonMapCsv(
   return rows
     .map((r) => r.map((c) => (/[",\n]/.test(c) ? `"${c.replace(/"/g, '""')}"` : c)).join(","))
     .join("\n");
+}
+
+// ── Zone install summary ───────────────────────────────────────────────────
+// The maps page used to name a zone and list its items. The install team also
+// needs the measured picture of a space: how many items, what kinds, how much
+// printed surface, and the largest single piece that has to get through the
+// door. All of it is read from the schedule's real trim sizes, never estimated.
+
+export type LondonZoneSummary = {
+  /** Items scheduled in this zone. */
+  count: number;
+  /** Asset kinds present, in schedule order. */
+  kinds: LondonAssetKind[];
+  /** Total printed face area in square metres, from the trim sizes. */
+  printAreaM2: number;
+  /** The largest single item by printed area. */
+  largest: { name: string; trimW: number; trimH: number } | null;
+  /** Widest and tallest trim on the zone, in millimetres. */
+  widestMm: number;
+  tallestMm: number;
+};
+
+export function londonZoneSummary(
+  plan: LondonFloorPlan,
+  zone: LondonZone,
+  panels: LondonPanel[] = LONDON_PANELS,
+): LondonZoneSummary {
+  const mine = panels.filter((p) => p.floor === plan.floor && londonZoneFor(plan, p).id === zone.id);
+  const kinds: LondonAssetKind[] = [];
+  let printAreaM2 = 0;
+  let widestMm = 0;
+  let tallestMm = 0;
+  let largest: LondonZoneSummary["largest"] = null;
+  let largestArea = 0;
+  for (const p of mine) {
+    const kind = londonAssetKind(p);
+    if (!kinds.includes(kind)) kinds.push(kind);
+    const area = (p.trimW / 1000) * (p.trimH / 1000);
+    printAreaM2 += area;
+    widestMm = Math.max(widestMm, p.trimW);
+    tallestMm = Math.max(tallestMm, p.trimH);
+    if (area > largestArea) {
+      largestArea = area;
+      largest = { name: p.name, trimW: p.trimW, trimH: p.trimH };
+    }
+  }
+  return { count: mine.length, kinds, printAreaM2, largest, widestMm, tallestMm };
 }

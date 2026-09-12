@@ -204,22 +204,38 @@ export function LondonLocationRenderPreview({
       </div>
 
       <div className="mt-3 flex flex-wrap gap-1.5" role="group" aria-label="Choose a location">
-        {scenes.map((s) => (
-          <button
-            key={s.id}
-            type="button"
-            onClick={() => setSceneId(s.id)}
-            aria-pressed={s.id === scene.id}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold transition ${
-              s.id === scene.id
-                ? "bg-[#03002C] text-white"
-                : "border border-black/15 text-[#03002C] hover:bg-[#F2F2F2]"
-            }`}
-          >
-            <ImageIcon className="h-3 w-3" /> {s.label}
-          </button>
-        ))}
+        {scenes.map((s) => {
+          const here = s.floors?.includes(panel.floor);
+          return (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setSceneId(s.id)}
+              aria-pressed={s.id === scene.id}
+              title={s.where}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold transition ${
+                s.id === scene.id
+                  ? "bg-[#03002C] text-white"
+                  : here
+                    ? "border border-[#003FC7]/40 bg-[#E0E8F5] text-[#03002C] hover:bg-[#D5E1F3]"
+                    : "border border-black/15 text-[#03002C] hover:bg-[#F2F2F2]"
+              }`}
+            >
+              <ImageIcon className="h-3 w-3" /> {s.label}
+              {here ? (
+                <span
+                  className={`rounded-full px-1.5 py-px font-mono text-[9.5px] uppercase tracking-[0.08em] ${
+                    s.id === scene.id ? "bg-white/20 text-white" : "bg-[#003FC7]/15 text-[#003FC7]"
+                  }`}
+                >
+                  This floor
+                </span>
+              ) : null}
+            </button>
+          );
+        })}
       </div>
+
 
       {open ? (
         <div

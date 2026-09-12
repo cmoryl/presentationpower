@@ -15,6 +15,14 @@ import coffeeBar from "@/assets/london-scenes/coffee-bar.jpg";
 import deskFront from "@/assets/london-scenes/desk-front.jpg";
 import doorVinyl from "@/assets/london-scenes/door-vinyl.jpg";
 import exteriorBanner from "@/assets/london-scenes/exterior-banner.jpg";
+import floor2fBreakout from "@/assets/london-scenes/floor-2f-breakout.jpg";
+import floor3fFoyer from "@/assets/london-scenes/floor-3f-foyer.jpg";
+import floor4fSuite from "@/assets/london-scenes/floor-4f-suite.jpg";
+import floor5fStairGlass from "@/assets/london-scenes/floor-5f-stair-glass.jpg";
+import floor6fSet from "@/assets/london-scenes/floor-6f-set.jpg";
+import floorExtForecourt from "@/assets/london-scenes/floor-ext-forecourt.jpg";
+import floorGfAuditorium from "@/assets/london-scenes/floor-gf-auditorium.jpg";
+
 import foyerColumn from "@/assets/london-scenes/foyer-column.jpg";
 import portraitBanner from "@/assets/london-scenes/portrait-banner.jpg";
 import squarePanel from "@/assets/london-scenes/square-panel.jpg";
@@ -28,7 +36,7 @@ import {
   type SceneFixedAxis,
   type SceneMountMode,
 } from "@/lib/scene-face-fit";
-import type { LondonPanel } from "@/lib/next-london-signage";
+import type { LondonFloorId, LondonPanel } from "@/lib/next-london-signage";
 
 /** Fractional face rectangle on the plate (0..1 of plate width/height). */
 export interface SceneFace {
@@ -67,6 +75,8 @@ export interface LondonScene {
   anchorY: "top" | "center" | "bottom";
   /** How the print meets the surface (applied vinyls cover their face). */
   mount: SceneMountMode;
+  /** Floors this plate actually represents, when it is a floor-specific space. */
+  floors?: LondonFloorId[];
 }
 
 function scene(
@@ -79,6 +89,7 @@ function scene(
   fixed: SceneFixedAxis = "w",
   anchorY: "top" | "center" | "bottom" = "center",
   mount: SceneMountMode = "edge",
+  floors?: LondonFloorId[],
 ): LondonScene {
   return {
     id,
@@ -92,8 +103,10 @@ function scene(
     fixed,
     anchorY,
     mount,
+    ...(floors ? { floors } : {}),
   };
 }
+
 
 export const LONDON_SCENES: LondonScene[] = [
   scene("foyer-column", "Foyer light column", "Ground floor foyer", "column", foyerColumn, {
@@ -156,11 +169,70 @@ export const LONDON_SCENES: LondonScene[] = [
     w: 0.0579,
     h: 0.4551,
   }, "w", "top"),
+
+  // ── Floor-specific plates ────────────────────────────────────────────────
+  // One space per mapped floor of the venue, matched to the room roster and
+  // the install faces on that level, so an item can be previewed in the space
+  // it is actually scheduled for. Still visualisations, not venue photos.
+  scene("floor-ext-forecourt", "Broad Sanctuary forecourt flag", "Exterior · forecourt approach", "exterior", floorExtForecourt, {
+    x: 0.28,
+    y: 0.06,
+    w: 0.105,
+    h: 0.645,
+  }, "w", "top", "edge", ["EXT"]),
+  scene("floor-gf-auditorium", "Churchill stage wall", "Ground floor · Churchill", "wall", floorGfAuditorium, {
+    x: 0.1914,
+    y: 0.1934,
+    w: 0.6133,
+    h: 0.3379,
+  }, "w", "center", "edge", ["GF"]),
+  scene("floor-2f-breakout", "Second floor breakout wall", "Second floor · actor rooms & beam", "wall", floor2fBreakout, {
+    x: 0.387,
+    y: 0.283,
+    w: 0.348,
+    h: 0.256,
+  }, "w", "center", "edge", ["2F"]),
+  scene("floor-3f-foyer", "Third floor foyer pillar", "Third floor · Fleming & exhibition foyer", "column", floor3fFoyer, {
+    x: 0.401,
+    y: 0.0195,
+    w: 0.1992,
+    h: 0.8379,
+  }, "w", "top", "edge", ["3F"]),
+  scene("floor-4f-suite", "Fourth floor suite wall", "Fourth floor · meeting suites", "portrait", floor4fSuite, {
+    x: 0.4323,
+    y: 0.2773,
+    w: 0.1094,
+    h: 0.2793,
+  }, "w", "center", "edge", ["4F"]),
+  scene("floor-5f-stair-glass", "Fifth floor stair glazing", "Fifth floor · Windsor, Cambridge & stair glass", "wall", floor5fStairGlass, {
+    x: 0.4102,
+    y: 0.2695,
+    w: 0.3815,
+    h: 0.2871,
+  }, "w", "center", "edge", ["5F"]),
+  scene("floor-6f-set", "Mountbatten set wrap", "Sixth floor · Mountbatten", "wall", floor6fSet, {
+    x: 0.1615,
+    y: 0.1953,
+    w: 0.6771,
+    h: 0.4004,
+  }, "w", "center", "edge", ["6F"]),
 ];
+
 
 export function londonScene(id: string): LondonScene | undefined {
   return LONDON_SCENES.find((s) => s.id === id);
 }
+
+/** The floor-specific plates for a floor (empty when a floor has none). */
+export function scenesForFloor(floor: LondonFloorId): LondonScene[] {
+  return LONDON_SCENES.filter((s) => s.floors?.includes(floor));
+}
+
+/** True when this plate is one of the floor spaces, not a generic surface. */
+export function isFloorScene(scene: LondonScene): boolean {
+  return !!scene.floors?.length;
+}
+
 
 /** Keyword hints from the panel name/ground, strongest signal first. */
 function hintedKinds(panel: LondonPanel): SceneKind[] {
@@ -199,7 +271,15 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
       const orientation =
         (ratio >= 1) === (s.faceRatio >= 1) ? 0 : 1.5;
       const fit = Math.abs(Math.log(s.faceRatio / ratio));
-      return { s, score: (hint >= 0 ? hint * 0.15 : 3) + orientation + fit };
+      // A plate of the floor the item is actually scheduled on wins ties, so
+      // the first view a user sees is the space the item installs in.
+      const onFloor = s.floors?.includes(panel.floor) ? -0.75 : 0;
+      const wrongFloor = s.floors && !s.floors.includes(panel.floor) ? 1.5 : 0;
+      return {
+        s,
+        score: (hint >= 0 ? hint * 0.15 : 3) + orientation + fit + onFloor + wrongFloor,
+      };
+
     })
     .sort((a, b) => a.score - b.score)
     .map((r) => r.s);
