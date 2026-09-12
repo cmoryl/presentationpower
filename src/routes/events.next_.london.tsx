@@ -264,6 +264,8 @@ function SceneThumb({
           )}
         </SceneArtworkPlate>
       ) : null}
+      {/* Any working display in this plate runs NEXT 2026 London content. */}
+      <SceneEventScreens sceneId={scene.id} />
       <span className="absolute bottom-1 left-1 max-w-[calc(100%-0.5rem)] truncate rounded bg-black/55 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
         {sceneSurfaceLabel(scene)}
       </span>
