@@ -41,6 +41,8 @@ import { venueTemplateFor } from "@/lib/next-venue-templates";
 import { LondonLocationRenderPreview } from "@/components/events/LondonLocationRenderPreview";
 
 import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
+import { SceneDoorLeaves } from "@/components/next/SceneDoorLeaves";
+import { londonDoorSpec } from "@/lib/next-london-doors";
 import {
   defaultSceneForPanel,
   fitArtworkInFace,
@@ -209,7 +211,14 @@ function SceneThumb({
   art: string | null;
 }) {
   const scene = useMemo(() => defaultSceneForPanel(panel), [panel]);
-  const box = useMemo(() => fitArtworkInFace(panel, scene), [panel, scene]);
+  const door = useMemo(() => londonDoorSpec(panel), [panel]);
+  // A double door is rendered leaf by leaf on its measured opening, so a leaf
+  // sheet is not cover-cropped across a pair.
+  const leaves = door && scene.kind === "door" ? door : null;
+  const box = useMemo(
+    () => (leaves ? scene.face : fitArtworkInFace(panel, scene)),
+    [leaves, panel, scene],
+  );
   const fit = useMemo(() => sceneArtworkObjectFit(panel, scene), [panel, scene]);
   return (
     <div
@@ -228,7 +237,7 @@ function SceneThumb({
           box={box}
           sceneId={scene.id}
           quad={scene.quad}
-          face={fit === "cover" ? undefined : scene.face}
+          face={leaves || fit === "cover" ? undefined : scene.face}
           substrate={
             <img
               src={art}
@@ -239,12 +248,20 @@ function SceneThumb({
             />
           }
         >
-          <img
-            src={art}
-            alt={`${panel.name} installed as a ${scene.label.toLowerCase()}`}
-            className="absolute inset-0 h-full w-full"
-            style={{ objectFit: fit }}
-          />
+          {leaves ? (
+            <SceneDoorLeaves
+              spec={leaves}
+              art={art}
+              alt={`${panel.name} installed on ${leaves.leaves > 1 ? "double doors" : "the door"}`}
+            />
+          ) : (
+            <img
+              src={art}
+              alt={`${panel.name} installed as a ${scene.label.toLowerCase()}`}
+              className="absolute inset-0 h-full w-full"
+              style={{ objectFit: fit }}
+            />
+          )}
         </SceneArtworkPlate>
       ) : null}
       <span className="absolute bottom-1 left-1 max-w-[calc(100%-0.5rem)] truncate rounded bg-black/55 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
