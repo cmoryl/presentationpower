@@ -19,7 +19,12 @@ import {
   scenesForPanel,
   type LondonScene,
 } from "@/lib/next-london-scenes";
-import { londonBoothArtworkUrl, type LondonPanel } from "@/lib/next-london-signage";
+import {
+  londonBoothArtworkUrl,
+  LONDON_FLOORS,
+  type LondonFloorId,
+  type LondonPanel,
+} from "@/lib/next-london-signage";
 import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
 
 export interface LondonLocationRenderPreviewProps {
@@ -113,16 +118,36 @@ export function LondonLocationRenderPreview({
   const panel = live.panel;
   const scenes = useMemo(() => scenesForPanel(panel), [panel]);
   const [sceneId, setSceneId] = useState(scenes[0]!.id);
+  const [floorFilter, setFloorFilter] = useState<LondonFloorId | "all">("all");
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const cardStage = useRef<HTMLDivElement | null>(null);
   const modalStage = useRef<HTMLDivElement | null>(null);
 
+  // Only floors that actually have a plate for this item are offered.
+  const floorOptions = useMemo(
+    () => LONDON_FLOORS.filter((f) => scenes.some((s) => s.floors?.includes(f.id))),
+    [scenes],
+  );
+  const visible = useMemo(
+    () =>
+      floorFilter === "all"
+        ? scenes
+        : scenes.filter((s) => s.floors?.includes(floorFilter)),
+    [scenes, floorFilter],
+  );
+
   useEffect(() => {
+    setFloorFilter("all");
     setSceneId(scenes[0]!.id);
   }, [scenes]);
 
-  const scene = scenes.find((s) => s.id === sceneId) ?? scenes[0]!;
+  // A floor choice that hides the current plate moves to the first one it keeps.
+  useEffect(() => {
+    if (visible.length && !visible.some((s) => s.id === sceneId)) setSceneId(visible[0]!.id);
+  }, [visible, sceneId]);
+
+  const scene = visible.find((s) => s.id === sceneId) ?? visible[0] ?? scenes[0]!;
 
   const boothArt = londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id);
   const artKey = `${panel.trimW}|${panel.trimH}|${live.signature}`;
@@ -207,8 +232,45 @@ export function LondonLocationRenderPreview({
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-1.5" role="group" aria-label="Choose a location">
-        {scenes.map((s) => {
+      {floorOptions.length ? (
+        <div
+          className="mt-3 flex flex-wrap items-center gap-1.5"
+          role="group"
+          aria-label="Show locations for one floor"
+        >
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#03002C]/55">
+            Floor
+          </span>
+          {([{ id: "all" as const, label: `All floors · ${scenes.length}` }] as {
+            id: LondonFloorId | "all";
+            label: string;
+          }[])
+            .concat(
+              floorOptions.map((f) => ({
+                id: f.id,
+                label: `${f.label} · ${scenes.filter((s) => s.floors?.includes(f.id)).length}`,
+              })),
+            )
+            .map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setFloorFilter(f.id)}
+                aria-pressed={floorFilter === f.id}
+                className={`rounded-full px-2.5 py-1 text-[10.5px] font-semibold transition ${
+                  floorFilter === f.id
+                    ? "bg-[#003FC7] text-white"
+                    : "border border-black/15 text-[#03002C] hover:bg-[#F2F2F2]"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+        </div>
+      ) : null}
+
+      <div className="mt-2 flex flex-wrap gap-1.5" role="group" aria-label="Choose a location">
+        {visible.map((s) => {
           const here = s.floors?.includes(panel.floor);
           return (
             <button
