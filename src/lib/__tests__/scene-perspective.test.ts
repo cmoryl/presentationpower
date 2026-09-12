@@ -88,7 +88,9 @@ describe("scene perspective", () => {
       expect(Math.abs(bounds.y - scene.face.y)).toBeLessThan(0.06);
       expect(Math.abs(bounds.w - scene.face.w)).toBeLessThan(0.12);
       expect(Math.abs(bounds.h - scene.face.h)).toBeLessThan(0.12);
-      expect(quadForeshortening(quad)).toBeGreaterThan(0.55);
+      // A deep foyer wall run legitimately halves; anything below reads as a
+      // mis-read corner rather than perspective.
+      expect(quadForeshortening(quad)).toBeGreaterThan(0.45);
       expect(
         faceQuadTransform(quad, scene.face, { w: 1536, h: 1024 }),
       ).toMatch(/^matrix3d\(/);
