@@ -385,11 +385,13 @@ export const LONDON_SCENES: LondonScene[] = [
   // ── Surface-specific plates ──────────────────────────────────────────────
   // Kinds that have no wall to sit on: a floor graphic laid on carpet, a lift
   // door pair, applied stair balustrade glass, and a cafe table top.
+  // Face rectangle = the bounding box of the measured floor quad, so the fit
+  // and the warp describe the same physical surface.
   scene("surface-floor-graphic", "Floor graphic on carpet", "Foyer circulation floor", "floor", surfaceFloorGraphic, {
-    x: 0.13,
-    y: 0.36,
-    w: 0.75,
-    h: 0.48,
+    x: 0.061,
+    y: 0.383,
+    w: 0.822,
+    h: 0.416,
   }, "w", "center", "edge"),
   scene("surface-lift-doors", "Lift door wrap", "Lift lobby", "lift", surfaceLiftDoors, {
     x: 0.155,
