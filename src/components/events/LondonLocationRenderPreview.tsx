@@ -232,8 +232,45 @@ export function LondonLocationRenderPreview({
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-1.5" role="group" aria-label="Choose a location">
-        {scenes.map((s) => {
+      {floorOptions.length ? (
+        <div
+          className="mt-3 flex flex-wrap items-center gap-1.5"
+          role="group"
+          aria-label="Show locations for one floor"
+        >
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#03002C]/55">
+            Floor
+          </span>
+          {([{ id: "all" as const, label: `All floors · ${scenes.length}` }] as {
+            id: LondonFloorId | "all";
+            label: string;
+          }[])
+            .concat(
+              floorOptions.map((f) => ({
+                id: f.id,
+                label: `${f.label} · ${scenes.filter((s) => s.floors?.includes(f.id)).length}`,
+              })),
+            )
+            .map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setFloorFilter(f.id)}
+                aria-pressed={floorFilter === f.id}
+                className={`rounded-full px-2.5 py-1 text-[10.5px] font-semibold transition ${
+                  floorFilter === f.id
+                    ? "bg-[#003FC7] text-white"
+                    : "border border-black/15 text-[#03002C] hover:bg-[#F2F2F2]"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+        </div>
+      ) : null}
+
+      <div className="mt-2 flex flex-wrap gap-1.5" role="group" aria-label="Choose a location">
+        {visible.map((s) => {
           const here = s.floors?.includes(panel.floor);
           return (
             <button
