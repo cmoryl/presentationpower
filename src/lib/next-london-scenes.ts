@@ -379,10 +379,10 @@ export const LONDON_SCENES: LondonScene[] = [
     h: 0.73,
   }, "w", "center", "cover"), photo: true },
   { ...scene("ref-plenary-stage", "NEXT scenic stage wall", "Plenary stage · scenic back wall", "wall", refPlenaryStage, {
-    x: 0.05,
-    y: 0.0755,
-    w: 0.85,
-    h: 0.483,
+    x: 0.045,
+    y: 0.045,
+    w: 0.86,
+    h: 0.545,
   }, "w", "center", "edge"), photo: true },
   // Meeting-room door pair, photographed square on: applied vinyl covers the
   // two door leaves, so the print is measured to the leaves themselves.
