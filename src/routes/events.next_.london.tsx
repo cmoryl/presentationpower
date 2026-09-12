@@ -66,6 +66,7 @@ import { buildLondonKitZip } from "@/lib/next-london-kit-zip";
 import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles, useLondonLiveFileSignature } from "@/lib/next-london-live-files";
 import { LondonLiveFilePanel } from "@/components/events/LondonLiveFilePanel";
+import { LondonLiveFileBulkUpload } from "@/components/events/LondonLiveFileBulkUpload";
 import { applyLondonBoardSize, applyLondonBoardSizes, useLondonBoardSizes } from "@/lib/next-london-board-size";
 import {
   createLondonVariation,
