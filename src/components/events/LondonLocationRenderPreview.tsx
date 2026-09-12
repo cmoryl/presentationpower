@@ -16,6 +16,10 @@ import { buildLondonPanelSvg, type LondonArtOptions } from "@/lib/next-london-re
 import {
   fitArtworkInFace,
   sceneArtworkObjectFit,
+  sceneCaption,
+  sceneDimensionsLabel,
+  sceneProvenanceLabel,
+  sceneSurfaceLabel,
   scenesForPanel,
   type LondonScene,
 } from "@/lib/next-london-scenes";
@@ -96,13 +100,9 @@ function Stage({
       )}
       <span
         data-export-ignore="true"
-        className="absolute bottom-2 left-2 rounded bg-black/55 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white"
+        className="absolute bottom-2 left-2 max-w-[calc(100%-1rem)] rounded bg-black/55 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white"
       >
-        {scene.photo
-          ? "Event photograph · artwork composited"
-          : scene.live
-            ? "Visualisation · event in progress, not a venue photo"
-            : "Visualisation · not a venue photo"}
+        {sceneCaption(scene, panel)}
       </span>
     </div>
   );
@@ -201,6 +201,13 @@ export function LondonLocationRenderPreview({
           <p className="mt-1 text-[13px] font-medium text-[#03002C]">
             {scene.label} · {scene.where}
           </p>
+          <p className="mt-0.5 font-mono text-[10.5px] uppercase tracking-[0.1em] text-[#03002C]/55">
+            {sceneProvenanceLabel(scene)}
+          </p>
+          <p className="mt-0.5 text-[11.5px] text-[#03002C]/70">
+            {sceneDimensionsLabel(scene, panel)}
+            {scene.surface?.note ? ` · ${scene.surface.note}` : ""}
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
@@ -278,7 +285,7 @@ export function LondonLocationRenderPreview({
               type="button"
               onClick={() => setSceneId(s.id)}
               aria-pressed={s.id === scene.id}
-              title={s.where}
+              title={`${s.where} · ${sceneCaption(s, panel)}`}
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold transition ${
                 s.id === scene.id
                   ? "bg-[#03002C] text-white"
@@ -288,6 +295,24 @@ export function LondonLocationRenderPreview({
               }`}
             >
               <ImageIcon className="h-3 w-3" /> {s.label}
+              {s.photo ? (
+                <span
+                  className={`rounded-full px-1.5 py-px font-mono text-[9.5px] uppercase tracking-[0.08em] ${
+                    s.id === scene.id ? "bg-white/20 text-white" : "bg-[#03002C]/10 text-[#03002C]"
+                  }`}
+                >
+                  Photo
+                </span>
+              ) : null}
+              {sceneSurfaceLabel(s) ? (
+                <span
+                  className={`font-mono text-[9.5px] tracking-[0.04em] ${
+                    s.id === scene.id ? "text-white/75" : "text-[#03002C]/60"
+                  }`}
+                >
+                  {sceneSurfaceLabel(s)}
+                </span>
+              ) : null}
               {here ? (
                 <span
                   className={`rounded-full px-1.5 py-px font-mono text-[9.5px] uppercase tracking-[0.08em] ${
@@ -316,9 +341,14 @@ export function LondonLocationRenderPreview({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[13px] font-semibold text-[#03002C]">
-                {panel.name} · {scene.label}
-              </p>
+              <div>
+                <p className="text-[13px] font-semibold text-[#03002C]">
+                  {panel.name} · {scene.label}
+                </p>
+                <p className="mt-0.5 font-mono text-[10.5px] uppercase tracking-[0.1em] text-[#03002C]/55">
+                  {sceneCaption(scene, panel)}
+                </p>
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"

@@ -110,6 +110,67 @@ export interface LondonScene {
   live?: boolean;
   /** Floors this plate actually represents, when it is a floor-specific space. */
   floors?: LondonFloorId[];
+  /**
+   * Measured real-world size of the printed face in this plate, in mm, only
+   * where the build was actually measured (supplied drawing or survey). Never
+   * estimated from the photograph.
+   */
+  surface?: { wMm: number; hMm: number; note?: string };
+}
+
+/** How a plate came to exist — the one line every surface must show. */
+export type SceneProvenance = "photograph" | "live-visualisation" | "visualisation";
+
+export function sceneProvenance(scene: LondonScene): SceneProvenance {
+  if (scene.photo) return "photograph";
+  return scene.live ? "live-visualisation" : "visualisation";
+}
+
+/** Short, consistent provenance wording for badges and captions. */
+export function sceneProvenanceLabel(scene: LondonScene): string {
+  switch (sceneProvenance(scene)) {
+    case "photograph":
+      return "Event photograph · artwork composited";
+    case "live-visualisation":
+      return "Visualisation · event in progress, not a venue photo";
+    default:
+      return "Visualisation · not a venue photo";
+  }
+}
+
+function mm(v: number): string {
+  return `${Math.round(v)}`;
+}
+
+/** "6800 × 4030 mm" for a measured face, or undefined when it is unmeasured. */
+export function sceneSurfaceLabel(scene: LondonScene): string | undefined {
+  if (!scene.surface) return undefined;
+  return `${mm(scene.surface.wMm)} × ${mm(scene.surface.hMm)} mm`;
+}
+
+/**
+ * The dimensions line for a scene: the measured surface where we have it, and
+ * always the item's own printed trim, so the caption never implies a size we
+ * did not measure.
+ */
+export function sceneDimensionsLabel(
+  scene: LondonScene,
+  panel?: Pick<LondonPanel, "trimW" | "trimH">,
+): string {
+  const parts: string[] = [];
+  const surface = sceneSurfaceLabel(scene);
+  if (surface) parts.push(`Surface ${surface}`);
+  if (panel) parts.push(`Print ${mm(panel.trimW)} × ${mm(panel.trimH)} mm trim`);
+  return parts.join(" · ");
+}
+
+/** The full one-line caption used under and over every in-situ plate. */
+export function sceneCaption(
+  scene: LondonScene,
+  panel?: Pick<LondonPanel, "trimW" | "trimH">,
+): string {
+  const dims = sceneDimensionsLabel(scene, panel);
+  return dims ? `${sceneProvenanceLabel(scene)} · ${dims}` : sceneProvenanceLabel(scene);
 }
 
 function scene(
@@ -377,7 +438,9 @@ export const LONDON_SCENES: LondonScene[] = [
     y: 0.157,
     w: 0.082,
     h: 0.73,
-  }, "w", "center", "cover"), photo: true },
+  }, "w", "center", "cover"), photo: true,
+    // Measured off the supplied pillar drawing: 550 mm faces, 2500 mm high.
+    surface: { wMm: 550, hMm: 2500, note: "Four-sided pillar face, supplied drawing" } },
   { ...scene("ref-plenary-stage", "NEXT scenic stage wall", "Plenary stage · scenic back wall", "wall", refPlenaryStage, {
     x: 0.045,
     y: 0.045,
@@ -414,12 +477,13 @@ export const LONDON_SCENES: LondonScene[] = [
     h: 0.14,
   }, "w", "center", "cover"), photo: true },
   // Bare 6800 x 4030 mm scenic wall build, photographed before artwork.
-  { ...scene("ref-scenic-wall-blank", "Scenic wall build (6800 x 4030 mm)", "Scenic build · bare panel wall", "wall", refScenicWallBlank, {
+  { ...scene("ref-scenic-wall-blank", "Scenic wall build", "Scenic build · bare panel wall", "wall", refScenicWallBlank, {
     x: 0.035,
     y: 0.07,
     w: 0.91,
     h: 0.855,
-  }, "w", "center", "edge"), photo: true },
+  }, "w", "center", "edge"), photo: true,
+    surface: { wMm: 6800, hMm: 4030, note: "Measured scenic build, supplied reference" } },
 ];
 
 
