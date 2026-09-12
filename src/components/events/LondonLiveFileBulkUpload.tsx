@@ -22,6 +22,10 @@ import {
   publishLondonLiveFile,
 } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles, useLondonLiveFiles } from "@/lib/next-london-live-files";
+import {
+  parseLondonLiveFileLayers,
+  setLondonLiveLayers,
+} from "@/lib/next-london-live-layers";
 import type { LondonPanel } from "@/lib/next-london-signage";
 
 const BUCKET = "london-live-files";
@@ -158,6 +162,18 @@ export function LondonLiveFileBulkUpload({
               note: note.trim() || null,
             },
           });
+          // Layers inside the finished file, so the kit does not redraw them.
+          if (row.master && /\.(ai|pdf|eps|svg)$/i.test(row.master.name)) {
+            try {
+              setLondonLiveLayers(
+                panel.id,
+                `${row.master.name}@${version}`,
+                parseLondonLiveFileLayers(await row.master.arrayBuffer(), row.master.name),
+              );
+            } catch {
+              /* an unreadable file is still a finished file */
+            }
+          }
           saved.push(panel.name);
         } catch {
           failed.push(panel.name);
