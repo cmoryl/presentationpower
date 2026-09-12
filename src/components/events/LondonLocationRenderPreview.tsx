@@ -118,16 +118,36 @@ export function LondonLocationRenderPreview({
   const panel = live.panel;
   const scenes = useMemo(() => scenesForPanel(panel), [panel]);
   const [sceneId, setSceneId] = useState(scenes[0]!.id);
+  const [floorFilter, setFloorFilter] = useState<LondonFloorId | "all">("all");
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const cardStage = useRef<HTMLDivElement | null>(null);
   const modalStage = useRef<HTMLDivElement | null>(null);
 
+  // Only floors that actually have a plate for this item are offered.
+  const floorOptions = useMemo(
+    () => LONDON_FLOORS.filter((f) => scenes.some((s) => s.floors?.includes(f.id))),
+    [scenes],
+  );
+  const visible = useMemo(
+    () =>
+      floorFilter === "all"
+        ? scenes
+        : scenes.filter((s) => s.floors?.includes(floorFilter)),
+    [scenes, floorFilter],
+  );
+
   useEffect(() => {
+    setFloorFilter("all");
     setSceneId(scenes[0]!.id);
   }, [scenes]);
 
-  const scene = scenes.find((s) => s.id === sceneId) ?? scenes[0]!;
+  // A floor choice that hides the current plate moves to the first one it keeps.
+  useEffect(() => {
+    if (visible.length && !visible.some((s) => s.id === sceneId)) setSceneId(visible[0]!.id);
+  }, [visible, sceneId]);
+
+  const scene = visible.find((s) => s.id === sceneId) ?? visible[0] ?? scenes[0]!;
 
   const boothArt = londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id);
   const artKey = `${panel.trimW}|${panel.trimH}|${live.signature}`;
