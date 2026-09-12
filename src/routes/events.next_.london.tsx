@@ -66,6 +66,7 @@ import { buildLondonKitZip } from "@/lib/next-london-kit-zip";
 import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles, useLondonLiveFileSignature } from "@/lib/next-london-live-files";
 import { LondonLiveFilePanel } from "@/components/events/LondonLiveFilePanel";
+import { LondonLiveFileBulkUpload } from "@/components/events/LondonLiveFileBulkUpload";
 import { applyLondonBoardSize, applyLondonBoardSizes, useLondonBoardSizes } from "@/lib/next-london-board-size";
 import {
   createLondonVariation,
@@ -1199,6 +1200,18 @@ function LondonSignagePage() {
                   onSave={boothTemplates.save}
                 />
               ) : null}
+            </div>
+          ) : null}
+
+          {/* Replace the artwork on many signs in one go: matched by filename,
+              stored as the version in force, so every card here repaints. */}
+          {isAdmin ? (
+            <div className="mt-8">
+              <LondonLiveFileBulkUpload
+                panels={panels}
+                canEdit={isAdmin}
+                onChanged={() => setLiveFileTick((n) => n + 1)}
+              />
             </div>
           ) : null}
 
