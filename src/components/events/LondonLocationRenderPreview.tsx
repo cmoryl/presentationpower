@@ -201,6 +201,13 @@ export function LondonLocationRenderPreview({
           <p className="mt-1 text-[13px] font-medium text-[#03002C]">
             {scene.label} · {scene.where}
           </p>
+          <p className="mt-0.5 font-mono text-[10.5px] uppercase tracking-[0.1em] text-[#03002C]/55">
+            {sceneProvenanceLabel(scene)}
+          </p>
+          <p className="mt-0.5 text-[11.5px] text-[#03002C]/70">
+            {sceneDimensionsLabel(scene, panel)}
+            {scene.surface?.note ? ` · ${scene.surface.note}` : ""}
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
