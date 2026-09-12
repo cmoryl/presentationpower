@@ -474,7 +474,7 @@ function DiagonalBand(p: Shared & { art: React.ReactNode; photo: boolean }) {
           left: "-12%",
           right: "-12%",
           top: square ? "34%" : "30%",
-          height: square ? "30%" : "34%",
+          height: square ? "34%" : "40%",
           background: d.palette.accent,
           transform: `rotate(${square ? -8 : -6}deg)`,
           zIndex: 2,
