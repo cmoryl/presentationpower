@@ -12,6 +12,10 @@
 // the venue. Every surface that shows them must label them as visualisations.
 
 import coffeeBar from "@/assets/london-scenes/coffee-bar.jpg";
+import surfaceFloorGraphic from "@/assets/london-scenes/surface-floor-graphic.jpg";
+import surfaceLiftDoors from "@/assets/london-scenes/surface-lift-doors.jpg";
+import surfaceStairGlass from "@/assets/london-scenes/surface-stair-glass.jpg";
+import surfaceTabletop from "@/assets/london-scenes/surface-tabletop.jpg";
 import deskFront from "@/assets/london-scenes/desk-front.jpg";
 import doorVinyl from "@/assets/london-scenes/door-vinyl.jpg";
 import exteriorBanner from "@/assets/london-scenes/exterior-banner.jpg";
@@ -56,7 +60,11 @@ export type SceneKind =
   | "fascia"
   | "desk"
   | "counter"
-  | "exterior";
+  | "exterior"
+  | "floor"
+  | "lift"
+  | "glass"
+  | "table";
 
 export interface LondonScene {
   id: string;
