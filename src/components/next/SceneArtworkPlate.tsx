@@ -37,6 +37,8 @@ import {
   quadForeshortening,
   type SceneQuad,
 } from "@/lib/scene-perspective";
+import { sceneSurface, surfaceCastScale } from "@/lib/scene-surface";
+import type { SceneKind } from "@/lib/next-london-scenes";
 
 export interface SceneArtworkPlateProps {
   /** Measured artwork box as fractions of the rendered plate. */
@@ -61,6 +63,15 @@ export interface SceneArtworkPlateProps {
    * top-left. Supplied for every surface seen at an angle.
    */
   quad?: SceneQuad;
+  /**
+   * What the print is installed on. This decides the substrate behaviour: a
+   * flush vinyl casts nothing, a board on a standoff throws a real shadow, a
+   * hung banner drapes, a floor graphic is walked on. Omitted falls back to a
+   * board on a wall.
+   */
+  kind?: SceneKind;
+  /** How the artwork is mounted on that surface, from the scene definition. */
+  mount?: "edge" | "cover";
 }
 
 interface Rect {
@@ -113,11 +124,17 @@ export function SceneArtworkPlate({
   face,
   substrate,
   quad,
+  kind,
+  mount,
 }: SceneArtworkPlateProps) {
   const light = sceneLighting(sceneId);
   const quality = sceneLightQuality(sceneId);
   const angle = shadeAngle(light.direction);
   const portrait = box.h >= box.w;
+  // What the print is mounted on. This, not a fixed drop shadow, decides how it
+  // meets its surface.
+  const finish = sceneSurface(kind, mount);
+  const castScale = surfaceCastScale(finish);
 
   // Perspective: the print is warped from the measured face rectangle onto the
   // measured face quad. Frontal surfaces skip the warp entirely so their print
@@ -148,14 +165,48 @@ export function SceneArtworkPlate({
   // fascia both cast a plausible shadow rather than one measured in plate px.
   const spread = Math.max(0.006, Math.min(boxL.w, boxL.h) * 0.09) * (1 + rake * 0.5);
   const contact = Math.min(0.85, light.contact * (1 + rake * 0.55));
-  const dropShadow =
-    light.edge === "reveal"
-      ? `inset 0 0 0 1px rgba(255,255,255,0.22), inset 0 0 0 2px rgba(3,0,44,0.10), 0 ${(spread * 40).toFixed(1)}px ${(spread * 90).toFixed(1)}px rgba(3,0,44,${(contact * 0.5).toFixed(3)})`
-      : `0 ${(spread * 26).toFixed(1)}px ${(spread * 70).toFixed(1)}px rgba(3,0,44,${(contact * 0.35).toFixed(3)})`;
+  // The reveal and the drop only belong to a board standing off its surface. An
+  // applied film, a hung textile and anything horizontal show neither: a flush
+  // vinyl with a drop shadow under it is exactly what makes a render look pasted
+  // on. Those substrates get an occlusion line along the edge they meet instead.
+  const standoff = finish.contact === "standoff";
+  const dropShadow = standoff
+    ? `inset 0 0 0 1px rgba(255,255,255,${(0.14 + finish.gloss * 0.3).toFixed(3)}), inset 0 0 0 2px rgba(3,0,44,0.10), 0 ${(spread * 40 * castScale).toFixed(1)}px ${(spread * 90 * castScale).toFixed(1)}px rgba(3,0,44,${(contact * 0.5).toFixed(3)})`
+    : finish.contact === "hung"
+      ? `0 ${(spread * 30 * castScale).toFixed(1)}px ${(spread * 78 * castScale).toFixed(1)}px rgba(3,0,44,${(contact * 0.32).toFixed(3)})`
+      : `inset 0 0 0 1px rgba(3,0,44,${(finish.occlusion * 0.45).toFixed(3)})`;
   const softness = Math.max(0, light.softness * (1 + rake * 0.8) * 0.6);
   // Cast shadow read from the plate's own light: direction from its azimuth,
-  // length from its elevation, softness from how hard the source is.
-  const cast = castShadow(quality, contact);
+  // length from its elevation, softness from how hard the source is — then
+  // scaled by how far this substrate actually stands off its surface.
+  const rawCast = castShadow(quality, contact);
+  const cast = {
+    ...rawCast,
+    x: rawCast.x * castScale,
+    y: rawCast.y * castScale,
+    opacity: rawCast.opacity * Math.min(1, castScale),
+  };
+  const showCast = castScale > 0.12;
+  // Occlusion along the fixed edge: light cannot reach the join, so a hung or
+  // applied print is always slightly darker where it is fixed.
+  const occlusionEdge =
+    finish.fixedEdge === "top"
+      ? "to bottom"
+      : finish.fixedEdge === "bottom"
+        ? "to top"
+        : finish.fixedEdge === "left"
+          ? "to right"
+          : null;
+  const texture: string | null =
+    finish.texture <= 0.02
+      ? null
+      : finish.textureKind === "weave"
+        ? "repeating-linear-gradient(0deg, rgba(3,0,44,0.5) 0px, rgba(3,0,44,0) 1px, rgba(3,0,44,0) 2px), repeating-linear-gradient(90deg, rgba(3,0,44,0.4) 0px, rgba(3,0,44,0) 1px, rgba(3,0,44,0) 2px)"
+        : finish.textureKind === "board"
+          ? "repeating-linear-gradient(90deg, rgba(255,255,255,0.16) 0px, rgba(255,255,255,0) 3px, rgba(3,0,44,0.12) 6px, rgba(3,0,44,0) 9px)"
+          : finish.textureKind === "floor"
+            ? "repeating-linear-gradient(58deg, rgba(255,255,255,0.13) 0px, rgba(255,255,255,0) 2px, rgba(3,0,44,0.1) 5px, rgba(3,0,44,0) 11px)"
+            : "repeating-linear-gradient(12deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0) 6px, rgba(3,0,44,0.07) 13px, rgba(3,0,44,0) 22px)";
 
   // Spatial read of the surface: where the camera stood, which end of the print
   // is deeper into the room, and how much haze, shade and defocus that far end
@@ -208,35 +259,41 @@ export function SceneArtworkPlate({
       ) : null}
 
       {/* Cast shadow: thrown away from the light, at the length its elevation
-          allows, and softened to match the source. */}
-      <div
-        aria-hidden="true"
-        className="absolute"
-        style={{
-          left: pct(boxL.x + cast.x),
-          top: pct(boxL.y + cast.y),
-          width: pct(boxL.w),
-          height: pct(boxL.h),
-          background: "rgba(6,4,26,1)",
-          opacity: cast.opacity,
-          filter: `blur(${(spread * 100 * cast.blur * 0.55).toFixed(2)}px)`,
-        }}
-      />
+          allows, softened to match the source, and only as far as this
+          substrate's standoff actually lifts the print off its surface. */}
+      {showCast ? (
+        <div
+          aria-hidden="true"
+          className="absolute"
+          style={{
+            left: pct(boxL.x + cast.x),
+            top: pct(boxL.y + cast.y),
+            width: pct(boxL.w),
+            height: pct(boxL.h),
+            background: "rgba(6,4,26,1)",
+            opacity: cast.opacity,
+            filter: `blur(${(spread * 100 * cast.blur * 0.55).toFixed(2)}px)`,
+          }}
+        />
+      ) : null}
       {/* Contact shadow: the tight, dark line right where the print meets the
-          surface, present under every light no matter how soft. */}
-      <div
-        aria-hidden="true"
-        className="absolute"
-        style={{
-          left: pct(boxL.x),
-          top: pct(boxL.y + Math.max(0.002, cast.y * 0.28)),
-          width: pct(boxL.w),
-          height: pct(boxL.h),
-          background: "rgba(6,4,26,1)",
-          opacity: Math.min(0.7, contact * 0.55),
-          filter: `blur(${(spread * 26).toFixed(2)}px)`,
-        }}
-      />
+          surface, present under every light no matter how soft. A flush film
+          keeps only a hairline of it; nothing horizontal gets one at all. */}
+      {finish.contact !== "ground" ? (
+        <div
+          aria-hidden="true"
+          className="absolute"
+          style={{
+            left: pct(boxL.x),
+            top: pct(boxL.y + Math.max(0.0015, cast.y * 0.28)),
+            width: pct(boxL.w),
+            height: pct(boxL.h),
+            background: "rgba(6,4,26,1)",
+            opacity: Math.min(0.7, contact * 0.55 * Math.max(0.22, castScale)),
+            filter: `blur(${(spread * 26 * Math.max(0.4, castScale)).toFixed(2)}px)`,
+          }}
+        />
+      ) : null}
 
       <div
         ref={faceRef}
@@ -308,15 +365,101 @@ export function SceneArtworkPlate({
           }}
         />
 
-        {/* Specular sheen for laminated stock, raked with the light. */}
-        {light.sheen > 0.02 ? (
+        {/* Substrate texture: fabric weave, film orange peel, board seams or
+            anti-slip floor grain. It is what a print is actually made of. */}
+        {texture ? (
           <div
             aria-hidden="true"
             className="absolute inset-0"
             style={{
-              background: portrait
-                ? `linear-gradient(${angle + 12}deg, rgba(255,255,255,${light.sheen.toFixed(3)}) 0%, rgba(255,255,255,0) 26%, rgba(255,255,255,0) 74%, rgba(255,255,255,${(light.sheen * 0.5).toFixed(3)}) 100%)`
-                : `linear-gradient(${angle + 78}deg, rgba(255,255,255,${light.sheen.toFixed(3)}) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 78%, rgba(255,255,255,${(light.sheen * 0.4).toFixed(3)}) 100%)`,
+              backgroundImage: texture,
+              opacity: finish.texture * (1 - rake * 0.3),
+              mixBlendMode: "overlay",
+            }}
+          />
+        ) : null}
+
+        {/* Drape: a hung textile is never a plane. Soft vertical relief, and a
+            sag that shades the print away from its top pocket. */}
+        {finish.drape > 0.02 ? (
+          <>
+            <div
+              aria-hidden="true"
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `repeating-linear-gradient(90deg, rgba(3,0,44,${(finish.drape * 0.16).toFixed(3)}) 0%, rgba(3,0,44,0) 6%, rgba(255,255,255,${(finish.drape * 0.12).toFixed(3)}) 11%, rgba(3,0,44,0) 17%)`,
+                mixBlendMode: "soft-light",
+              }}
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(180deg, rgba(3,0,44,${(finish.drape * 0.2).toFixed(3)}) 0%, rgba(3,0,44,0) 22%)`,
+                mixBlendMode: "multiply",
+              }}
+            />
+          </>
+        ) : null}
+
+        {/* Occlusion at the fixed edge: light cannot reach the join, so the
+            print is darkest exactly where it is held. */}
+        {occlusionEdge && finish.occlusion > 0.05 ? (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(${occlusionEdge}, rgba(3,0,44,${(finish.occlusion * 0.5).toFixed(3)}) 0%, rgba(3,0,44,0) ${(10 + finish.occlusion * 24).toFixed(0)}%)`,
+              mixBlendMode: "multiply",
+            }}
+          />
+        ) : null}
+
+        {/* Transmission: film on glazing is lit from behind as well as in front,
+            so it glows on its light side instead of sitting opaque. */}
+        {finish.transmit > 0.02 ? (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(${angle}deg, rgba(236,244,255,${(finish.transmit * 0.6).toFixed(3)}) 0%, rgba(236,244,255,${(finish.transmit * 0.18).toFixed(3)}) 62%, rgba(236,244,255,0) 100%)`,
+              mixBlendMode: "screen",
+            }}
+          />
+        ) : null}
+
+        {/* Wear: floors are walked on, counters and desk fronts are rubbed at
+            hand height. Strongest at the edges that actually take the traffic. */}
+        {finish.wear > 0.04 ? (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background:
+                finish.contact === "ground"
+                  ? `radial-gradient(90% 70% at 50% 78%, rgba(255,255,255,${(finish.wear * 0.5).toFixed(3)}) 0%, rgba(255,255,255,0) 62%)`
+                  : `linear-gradient(0deg, rgba(226,232,244,${(finish.wear * 0.45).toFixed(3)}) 0%, rgba(226,232,244,0) 18%)`,
+              mixBlendMode: "screen",
+            }}
+          />
+        ) : null}
+
+        {/* Specular sheen for laminated stock, raked with the light. */}
+        {light.sheen + finish.gloss > 0.06 ? (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              // Gloss decides how strong the highlight is; anisotropy decides
+              // whether it is a broad wash (matt board) or a stretched streak
+              // (squeegeed film, laminated floor, glass).
+              background: (() => {
+                const s = Math.min(0.5, light.sheen + finish.gloss * 0.22);
+                const rakeAngle = angle + (portrait ? 12 : 78) + finish.anisotropy * 14;
+                const near = (26 - finish.anisotropy * 14).toFixed(0);
+                const far = (74 + finish.anisotropy * 12).toFixed(0);
+                return `linear-gradient(${rakeAngle}deg, rgba(255,255,255,${s.toFixed(3)}) 0%, rgba(255,255,255,0) ${near}%, rgba(255,255,255,0) ${far}%, rgba(255,255,255,${(s * 0.45).toFixed(3)}) 100%)`;
+              })(),
               mixBlendMode: "screen",
             }}
           />
