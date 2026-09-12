@@ -33,6 +33,7 @@ import {
   type LondonPanel,
 } from "@/lib/next-london-signage";
 import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
+import { sceneSurface, surfaceFinishLabel } from "@/lib/scene-surface";
 import { SceneEventScreens, sceneScreensCaption } from "@/components/next/SceneEventScreens";
 import { SceneDoorLeaves } from "@/components/next/SceneDoorLeaves";
 import { doorLeafLabel, londonDoorSpec } from "@/lib/next-london-doors";
@@ -140,6 +141,8 @@ function Stage({
         {lightQualityLabel(sceneLightQuality(scene.id))}
         {" · "}
         {spaceLabel(sceneSpace(sceneQuad(scene)))}
+        {" · "}
+        {surfaceFinishLabel(sceneSurface(scene.kind, scene.mount))}
       </span>
       {leaves ? (
         <span
