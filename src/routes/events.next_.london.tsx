@@ -465,6 +465,9 @@ function LondonSignagePage() {
   // "booths" filter is the one place the whole partner set is listed together.
   const floors = useMemo(() => londonPanelsByFloor(panels), [panels]);
   const [floorId, setFloorId] = useState<string>("all");
+  // Cards default to the installed view: each item mounted on the measured face
+  // of its best-matched in-event plate, so the kit reads as the room looks.
+  const [cardView, setCardView] = useState<"scene" | "flat">("scene");
   const [artwork, setArtwork] = useState<LondonArtwork | null>(null);
   const [artworkError, setArtworkError] = useState<string | null>(null);
   const [openPanelRaw, setOpenPanel] = useState<LondonPanel | null>(null);
@@ -1098,6 +1101,23 @@ function LondonSignagePage() {
                 Partner booths · {boothPanels.length}
               </button>
             ) : null}
+            <span className="ml-auto inline-flex overflow-hidden rounded-full border border-black/15">
+              {(["scene", "flat"] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setCardView(v)}
+                  aria-pressed={cardView === v}
+                  className={`px-3 py-1 font-mono text-[11px] uppercase tracking-[0.12em] ${
+                    cardView === v
+                      ? "bg-[#03002C] text-white"
+                      : "bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+                  }`}
+                >
+                  {v === "scene" ? "In scene" : "Flat art"}
+                </button>
+              ))}
+            </span>
           </div>
 
           {artworkError ? (
@@ -1125,6 +1145,8 @@ function LondonSignagePage() {
                     svg={previewSvg(panel)}
                     draft={isDraft(panel)}
                     variation={Boolean(variations[panel.id])}
+                    version={liveFileSignature}
+                    view={cardView}
                     onClick={setOpenPanel}
                   />
                 ))}
@@ -1180,6 +1202,8 @@ function LondonSignagePage() {
                           svg={previewSvg(panel)}
                           draft={isDraft(panel)}
                           variation={Boolean(variations[panel.id])}
+                          version={liveFileSignature}
+                          view={cardView}
                           onClick={setOpenPanel}
                         />
                       ))}
@@ -1207,6 +1231,8 @@ function LondonSignagePage() {
                           svg={previewSvg(panel)}
                           draft={isDraft(panel)}
                           variation={Boolean(variations[panel.id])}
+                          version={liveFileSignature}
+                          view={cardView}
                           onClick={setOpenPanel}
                         />
                       ))}
