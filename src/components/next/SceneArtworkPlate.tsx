@@ -63,6 +63,15 @@ export interface SceneArtworkPlateProps {
    * top-left. Supplied for every surface seen at an angle.
    */
   quad?: SceneQuad;
+  /**
+   * What the print is installed on. This decides the substrate behaviour: a
+   * flush vinyl casts nothing, a board on a standoff throws a real shadow, a
+   * hung banner drapes, a floor graphic is walked on. Omitted falls back to a
+   * board on a wall.
+   */
+  kind?: SceneKind;
+  /** How the artwork is mounted on that surface, from the scene definition. */
+  mount?: "edge" | "cover";
 }
 
 interface Rect {
