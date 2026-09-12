@@ -477,12 +477,13 @@ export const LONDON_SCENES: LondonScene[] = [
     h: 0.14,
   }, "w", "center", "cover"), photo: true },
   // Bare 6800 x 4030 mm scenic wall build, photographed before artwork.
-  { ...scene("ref-scenic-wall-blank", "Scenic wall build (6800 x 4030 mm)", "Scenic build · bare panel wall", "wall", refScenicWallBlank, {
+  { ...scene("ref-scenic-wall-blank", "Scenic wall build", "Scenic build · bare panel wall", "wall", refScenicWallBlank, {
     x: 0.035,
     y: 0.07,
     w: 0.91,
     h: 0.855,
-  }, "w", "center", "edge"), photo: true },
+  }, "w", "center", "edge"), photo: true,
+    surface: { wMm: 6800, hMm: 4030, note: "Measured scenic build, supplied reference" } },
 ];
 
 
