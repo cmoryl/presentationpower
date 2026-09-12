@@ -34,6 +34,7 @@ import {
 } from "@/lib/next-london-signage";
 import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
 import { sceneSurface, surfaceFinishLabel } from "@/lib/scene-surface";
+import { sceneSpecFit, specFitLabel } from "@/lib/scene-scale";
 import { SceneEventScreens, sceneScreensCaption } from "@/components/next/SceneEventScreens";
 import { SceneDoorLeaves } from "@/components/next/SceneDoorLeaves";
 import { doorLeafLabel, londonDoorSpec } from "@/lib/next-london-doors";
@@ -130,8 +131,19 @@ function Stage({
         className="absolute bottom-2 left-2 max-w-[calc(100%-1rem)] rounded bg-black/55 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white"
       >
         {sceneCaption(scene, panel)}
+        {` · ${specFitLabel(sceneSpecFit(panel, scene))}`}
         {sceneScreensCaption(scene.id) ? ` · ${sceneScreensCaption(scene.id)}` : ""}
       </span>
+      {/* When the render cannot be trusted as a size check, say so on the view
+          itself rather than letting a designer read it as a spec proof. */}
+      {sceneSpecFit(panel, scene).warnings.length > 0 ? (
+        <span
+          data-export-ignore="true"
+          className="absolute left-2 top-2 max-w-[calc(100%-1rem)] rounded bg-[#03002C]/80 px-2 py-1 font-mono text-[10px] text-white"
+        >
+          {sceneSpecFit(panel, scene).warnings[0]}
+        </span>
+      ) : null}
       {/* The photographer's read of this plate, so the light a design is judged
           under is never a mystery. */}
       <span
