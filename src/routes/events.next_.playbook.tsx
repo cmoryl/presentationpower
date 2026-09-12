@@ -314,6 +314,14 @@ function PlaybookPage() {
           slightly softer than the near end, because that is what distance does — a print treated
           evenly across a raked surface always reads as pasted on.
         </p>
+        <p className="mt-2 text-[13px] text-black/60">
+          Size comes before looks. Where the install surface has been measured — a supplied artboard,
+          a venue drawing, a measured door opening — the print is placed at its true fraction of that
+          surface, so a 1000&nbsp;mm panel on a 6800&nbsp;mm scenic wall covers 15% of the wall in the
+          view exactly as it will on site. Where the surface has not been measured the view says
+          &ldquo;indicative scale&rdquo; instead of pretending, and any item that cannot physically fit
+          the surface it is shown on is called out on the view itself.
+        </p>
         <ul className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
           {LONDON_SCENES.map((scene) => {
             const q = sceneLightQuality(scene.id);
