@@ -312,6 +312,8 @@ function PanelCard({
   svg,
   draft,
   variation,
+  version,
+  view,
   onClick,
 }: {
   panel: LondonPanel;
@@ -320,6 +322,10 @@ function PanelCard({
   draft?: boolean;
   /** The sign is a copy made from another sign in the kit. */
   variation?: boolean;
+  /** Live-file signature, so a replaced file is not served from cache. */
+  version?: string;
+  /** Flat print artwork, or the item mounted in its in-event plate. */
+  view?: "flat" | "scene";
   onClick?: (panel: LondonPanel) => void;
 }) {
   const booth = londonBoothPanelMeta(panel);
@@ -330,8 +336,9 @@ function PanelCard({
       className="group flex h-full flex-col rounded-xl border border-black/10 bg-white p-3 text-left transition-shadow hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
     >
       <div className="shrink-0">
-        <PanelThumb panel={panel} svg={svg} />
+        <PanelThumb panel={panel} svg={svg} version={version} view={view} />
       </div>
+
       <div className="mt-3 flex min-w-0 flex-1 flex-col">
         <p
           className="text-[13px] font-semibold leading-snug text-[#03002C]"
