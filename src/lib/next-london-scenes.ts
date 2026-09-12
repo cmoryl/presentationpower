@@ -110,6 +110,67 @@ export interface LondonScene {
   live?: boolean;
   /** Floors this plate actually represents, when it is a floor-specific space. */
   floors?: LondonFloorId[];
+  /**
+   * Measured real-world size of the printed face in this plate, in mm, only
+   * where the build was actually measured (supplied drawing or survey). Never
+   * estimated from the photograph.
+   */
+  surface?: { wMm: number; hMm: number; note?: string };
+}
+
+/** How a plate came to exist — the one line every surface must show. */
+export type SceneProvenance = "photograph" | "live-visualisation" | "visualisation";
+
+export function sceneProvenance(scene: LondonScene): SceneProvenance {
+  if (scene.photo) return "photograph";
+  return scene.live ? "live-visualisation" : "visualisation";
+}
+
+/** Short, consistent provenance wording for badges and captions. */
+export function sceneProvenanceLabel(scene: LondonScene): string {
+  switch (sceneProvenance(scene)) {
+    case "photograph":
+      return "Event photograph · artwork composited";
+    case "live-visualisation":
+      return "Visualisation · event in progress, not a venue photo";
+    default:
+      return "Visualisation · not a venue photo";
+  }
+}
+
+function mm(v: number): string {
+  return `${Math.round(v)}`;
+}
+
+/** "6800 × 4030 mm" for a measured face, or undefined when it is unmeasured. */
+export function sceneSurfaceLabel(scene: LondonScene): string | undefined {
+  if (!scene.surface) return undefined;
+  return `${mm(scene.surface.wMm)} × ${mm(scene.surface.hMm)} mm`;
+}
+
+/**
+ * The dimensions line for a scene: the measured surface where we have it, and
+ * always the item's own printed trim, so the caption never implies a size we
+ * did not measure.
+ */
+export function sceneDimensionsLabel(
+  scene: LondonScene,
+  panel?: Pick<LondonPanel, "trimW" | "trimH">,
+): string {
+  const parts: string[] = [];
+  const surface = sceneSurfaceLabel(scene);
+  if (surface) parts.push(`Surface ${surface}`);
+  if (panel) parts.push(`Print ${mm(panel.trimW)} × ${mm(panel.trimH)} mm trim`);
+  return parts.join(" · ");
+}
+
+/** The full one-line caption used under and over every in-situ plate. */
+export function sceneCaption(
+  scene: LondonScene,
+  panel?: Pick<LondonPanel, "trimW" | "trimH">,
+): string {
+  const dims = sceneDimensionsLabel(scene, panel);
+  return dims ? `${sceneProvenanceLabel(scene)} · ${dims}` : sceneProvenanceLabel(scene);
 }
 
 function scene(
