@@ -27,6 +27,11 @@ import {
   shadeAngle,
 } from "@/lib/scene-lighting";
 import {
+  depthGradientAngle,
+  depthMaskDirection,
+  sceneSpace,
+} from "@/lib/scene-space";
+import {
   faceQuadTransform,
   isQuadSkewed,
   quadForeshortening,
@@ -151,6 +156,16 @@ export function SceneArtworkPlate({
   // Cast shadow read from the plate's own light: direction from its azimuth,
   // length from its elevation, softness from how hard the source is.
   const cast = castShadow(quality, contact);
+
+  // Spatial read of the surface: where the camera stood, which end of the print
+  // is deeper into the room, and how much haze, shade and defocus that far end
+  // has to take. A flat value across the print would still read as pasted on;
+  // these run as a gradient down the depth axis.
+  const space = quad ? sceneSpace(quad) : null;
+  const depthAngle = space ? depthGradientAngle(space.depthAxis) : 180;
+  const farSide = space ? depthMaskDirection(space.depthAxis) : "to bottom";
+  const showDepth = !!space && space.depthAxis !== "none";
+  const defocus = space && showDepth ? space.defocus : 0;
 
   // Dress the rest of the fixture when the print's true ratio leaves part of
   // the measured placement area unused.
@@ -317,6 +332,45 @@ export function SceneArtworkPlate({
               mixBlendMode: "screen",
             }}
           />
+        ) : null}
+
+        {/* Far-end defocus: at a real aperture the deep end of a raked surface
+            falls slightly out of focus. Masked so only that end softens. */}
+        {defocus > 0.4 ? (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              filter: `blur(${defocus.toFixed(2)}px) brightness(${light.exposure})`,
+              maskImage: `linear-gradient(${farSide}, rgba(0,0,0,0) 34%, rgba(0,0,0,1) 100%)`,
+              WebkitMaskImage: `linear-gradient(${farSide}, rgba(0,0,0,0) 34%, rgba(0,0,0,1) 100%)`,
+            }}
+          >
+            {children}
+          </div>
+        ) : null}
+
+        {/* Aerial perspective: the far end is further through the room's air, so
+            it hazes and shades a little. This is the depth cue the eye reads
+            first. */}
+        {showDepth && space ? (
+          <>
+            <div
+              aria-hidden="true"
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(${depthAngle}deg, rgba(3,0,44,${space.farShade.toFixed(3)}) 0%, rgba(3,0,44,0) 62%)`,
+                mixBlendMode: "multiply",
+              }}
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(${depthAngle}deg, rgba(226,234,246,${space.haze.toFixed(3)}) 0%, rgba(226,234,246,0) 58%)`,
+              }}
+            />
+          </>
         ) : null}
 
         {/* Camera grade: highlights roll off, blacks lift, the lens vignettes.
