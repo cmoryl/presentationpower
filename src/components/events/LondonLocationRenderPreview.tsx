@@ -87,6 +87,8 @@ function Stage({
           box={box}
           sceneId={scene.id}
           quad={scene.quad}
+          kind={scene.kind}
+          mount={scene.mount}
           face={leaves || fit === "cover" ? undefined : scene.face}
           substrate={
             <img
