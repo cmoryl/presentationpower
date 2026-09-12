@@ -24,6 +24,8 @@ import floor3fFoyer from "@/assets/london-scenes/floor-3f-foyer.jpg";
 import floor4fSuite from "@/assets/london-scenes/floor-4f-suite.jpg";
 import floor5fStairGlass from "@/assets/london-scenes/floor-5f-stair-glass.jpg";
 import floor6fSet from "@/assets/london-scenes/floor-6f-set.jpg";
+import refFoyerPillar from "@/assets/london-scenes/ref-foyer-pillar.jpg";
+import refPlenaryStage from "@/assets/london-scenes/ref-plenary-stage.jpg";
 import floorExtForecourt from "@/assets/london-scenes/floor-ext-forecourt.jpg";
 import floorGfAuditorium from "@/assets/london-scenes/floor-gf-auditorium.jpg";
 
@@ -83,6 +85,8 @@ export interface LondonScene {
   anchorY: "top" | "center" | "bottom";
   /** How the print meets the surface (applied vinyls cover their face). */
   mount: SceneMountMode;
+  /** True when the plate is a real event photograph, not a visualisation. */
+  photo?: boolean;
   /** Floors this plate actually represents, when it is a floor-specific space. */
   floors?: LondonFloorId[];
 }
@@ -252,6 +256,23 @@ export const LONDON_SCENES: LondonScene[] = [
     w: 0.6771,
     h: 0.4004,
   }, "w", "center", "edge", ["6F"]),
+
+  // ── Reference event photographs ──────────────────────────────────────────
+  // Real NEXT event photography supplied with the template pack. The face
+  // rectangles were measured off the photographs themselves, so artwork lands
+  // on the actual printed pillar side and the actual scenic stage wall.
+  { ...scene("ref-foyer-pillar", "NEXT pillar in an exhibition foyer", "Exhibition foyer · four-sided pillar", "column", refFoyerPillar, {
+    x: 0.806,
+    y: 0.252,
+    w: 0.0946,
+    h: 0.649,
+  }, "w", "center", "cover"), photo: true },
+  { ...scene("ref-plenary-stage", "NEXT scenic stage wall", "Plenary stage · scenic back wall", "wall", refPlenaryStage, {
+    x: 0.05,
+    y: 0.0755,
+    w: 0.85,
+    h: 0.483,
+  }, "w", "center", "edge"), photo: true },
 ];
 
 
