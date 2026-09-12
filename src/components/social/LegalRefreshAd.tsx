@@ -152,11 +152,12 @@ type Px = (n: number) => string;
 export function LegalRefreshAd({ direction: d, w, h, mode = "photo", className }: Props) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const logos = getDivisionLogos("bm-tp-legal");
-  const photo = legalRefreshModeUsesPhoto(mode) ? legalRefreshPhoto(d.id) : undefined;
+  const photo = legalRefreshModeUsesPhoto(mode) ? legalRefreshPhoto(d.id, mode) : undefined;
   const finish = legalRefreshFinish(mode);
-  // Grades that darken or tint the frame carry white copy over art regardless of
-  // what the untreated photograph could hold.
-  const darkFinish = mode === "nightshift" || mode === "duotone" || mode === "riso";
+  // Concepts whose artwork runs dark carry white copy over art regardless of
+  // what the daylight photograph could hold.
+  const darkFinish = legalRefreshModeIsDark(mode);
+
   const square = h >= w;
   const unit = Math.min(w, h);
   const px: Px = (n) => `${(n / unit) * 100}cqmin`;
