@@ -12,6 +12,10 @@
 // the venue. Every surface that shows them must label them as visualisations.
 
 import coffeeBar from "@/assets/london-scenes/coffee-bar.jpg";
+import surfaceFloorGraphic from "@/assets/london-scenes/surface-floor-graphic.jpg";
+import surfaceLiftDoors from "@/assets/london-scenes/surface-lift-doors.jpg";
+import surfaceStairGlass from "@/assets/london-scenes/surface-stair-glass.jpg";
+import surfaceTabletop from "@/assets/london-scenes/surface-tabletop.jpg";
 import deskFront from "@/assets/london-scenes/desk-front.jpg";
 import doorVinyl from "@/assets/london-scenes/door-vinyl.jpg";
 import exteriorBanner from "@/assets/london-scenes/exterior-banner.jpg";
@@ -56,7 +60,11 @@ export type SceneKind =
   | "fascia"
   | "desk"
   | "counter"
-  | "exterior";
+  | "exterior"
+  | "floor"
+  | "lift"
+  | "glass"
+  | "table";
 
 export interface LondonScene {
   id: string;
@@ -170,6 +178,34 @@ export const LONDON_SCENES: LondonScene[] = [
     h: 0.4551,
   }, "w", "top"),
 
+  // ── Surface-specific plates ──────────────────────────────────────────────
+  // Kinds that have no wall to sit on: a floor graphic laid on carpet, a lift
+  // door pair, applied stair balustrade glass, and a cafe table top.
+  scene("surface-floor-graphic", "Floor graphic on carpet", "Foyer circulation floor", "floor", surfaceFloorGraphic, {
+    x: 0.13,
+    y: 0.36,
+    w: 0.75,
+    h: 0.48,
+  }, "w", "center", "edge"),
+  scene("surface-lift-doors", "Lift door wrap", "Lift lobby", "lift", surfaceLiftDoors, {
+    x: 0.155,
+    y: 0.175,
+    w: 0.23,
+    h: 0.615,
+  }, "w", "center", "cover"),
+  scene("surface-stair-glass", "Stair balustrade glass", "Stair glazing", "glass", surfaceStairGlass, {
+    x: 0.13,
+    y: 0.22,
+    w: 0.72,
+    h: 0.55,
+  }, "w", "center", "edge"),
+  scene("surface-tabletop", "Cafe table top", "Catering / lounge tables", "table", surfaceTabletop, {
+    x: 0.22,
+    y: 0.09,
+    w: 0.56,
+    h: 0.6,
+  }, "w", "center", "edge"),
+
   // ── Floor-specific plates ────────────────────────────────────────────────
   // One space per mapped floor of the venue, matched to the room roster and
   // the install faces on that level, so an item can be previewed in the space
@@ -234,14 +270,23 @@ export function isFloorScene(scene: LondonScene): boolean {
 }
 
 
+/** Surfaces that only make sense for their own kind of install. */
+const SPECIALISED_KINDS: SceneKind[] = ["floor", "lift", "glass", "table"];
+
 /** Keyword hints from the panel name/ground, strongest signal first. */
 function hintedKinds(panel: LondonPanel): SceneKind[] {
-  const t = `${panel.name} ${panel.ground} ${panel.style}`.toLowerCase();
+  // Only the item name and ground read as surface words. The style id is a
+  // gradient/pattern code ("12-repeat-wash") and must not hint a surface.
+  const t = `${panel.name} ${panel.ground}`.toLowerCase();
   const out: SceneKind[] = [];
   const push = (k: SceneKind) => {
     if (!out.includes(k)) out.push(k);
   };
-  if (/step|repeat|press|photo/.test(t)) push("wall");
+  if (/floor (graphic|vinyl|sticker|decal|tile)|floor-?graphic/.test(t)) push("floor");
+  if (/lift|elevator/.test(t)) push("lift");
+  if (/glass|glazing|balustrade|stair/.test(t)) push("glass");
+  if (/table ?top|tabletop|bistro|poseur|cafe table/.test(t)) push("table");
+  if (/step\s*(&|and|-)?\s*repeat|press wall|photo (wall|point|call)/.test(t)) push("wall");
   if (/door|vinyl/.test(t)) push("door");
   if (/stage|fascia|plenar|podium|lectern/.test(t)) push("fascia");
   if (/desk|registration|check-?in|counter/.test(t)) push("desk");
@@ -273,11 +318,25 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
       const fit = Math.abs(Math.log(s.faceRatio / ratio));
       // A plate of the floor the item is actually scheduled on wins ties, so
       // the first view a user sees is the space the item installs in.
-      const onFloor = s.floors?.includes(panel.floor) ? -0.75 : 0;
+      // The floor bonus only applies when the plate is not the wrong kind of
+      // surface: a floor graphic must not win a stage wall just because both
+      // sit on the ground floor.
+      const kindOk = hints.length === 0 || hint >= 0;
+      const onFloor = kindOk && s.floors?.includes(panel.floor) ? -0.75 : 0;
       const wrongFloor = s.floors && !s.floors.includes(panel.floor) ? 1.5 : 0;
+      // Purpose-built surfaces (floor, lift, glass, table) are only offered
+      // first when the item is actually that kind of install.
+      const specialised =
+        hint < 0 && SPECIALISED_KINDS.includes(s.kind) ? 3 : 0;
       return {
         s,
-        score: (hint >= 0 ? hint * 0.15 : 3) + orientation + fit + onFloor + wrongFloor,
+        score:
+          (hint >= 0 ? hint * 0.15 : 3) +
+          orientation +
+          fit +
+          onFloor +
+          wrongFloor +
+          specialised,
       };
 
     })

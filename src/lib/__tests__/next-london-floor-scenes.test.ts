@@ -49,3 +49,44 @@ describe("map areas", () => {
     expect(loose.map((p) => `${p.id} ${p.room}`)).toEqual([]);
   });
 });
+
+describe("purpose-built surface scenes", () => {
+  const pick = (id: string) => {
+    const panel = LONDON_PANELS.find((p) => p.id === id);
+    expect(panel, id).toBeTruthy();
+    return scenesForPanel(panel!)[0]!;
+  };
+
+  it("previews floor graphics on the floor, not a wall", () => {
+    expect(pick("ldn-v03").kind).toBe("floor");
+    expect(pick("ldn-s04").kind).toBe("floor");
+  });
+
+  it("previews lift wraps on lift doors", () => {
+    expect(pick("ldn-v04").id).toBe("surface-lift-doors");
+    expect(pick("ldn-v05").id).toBe("surface-lift-doors");
+  });
+
+  it("previews stair glazing on balustrade glass", () => {
+    for (const id of ["ldn-v34", "ldn-v35", "ldn-v36"]) {
+      expect(pick(id).id, id).toBe("surface-stair-glass");
+    }
+  });
+
+  it("previews table tops on a table", () => {
+    for (const id of ["ldn-v09", "ldn-v10", "ldn-v11", "ldn-v12"]) {
+      expect(pick(id).id, id).toBe("surface-tabletop");
+    }
+  });
+
+  it("keeps step-and-repeat walls on wall surfaces", () => {
+    for (const id of ["ldn-v42", "ldn-v43", "ldn-v44", "ldn-v70", "ldn-v72"]) {
+      expect(["wall", "exterior"], id).toContain(pick(id).kind);
+    }
+  });
+
+  it("never offers a specialised surface first to an ordinary wall panel", () => {
+    const wall = LONDON_PANELS.find((p) => p.id === "ldn-v42")!;
+    expect(scenesForPanel(wall)[0]!.kind).not.toBe("table");
+  });
+});
