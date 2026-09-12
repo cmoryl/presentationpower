@@ -259,35 +259,41 @@ export function SceneArtworkPlate({
       ) : null}
 
       {/* Cast shadow: thrown away from the light, at the length its elevation
-          allows, and softened to match the source. */}
-      <div
-        aria-hidden="true"
-        className="absolute"
-        style={{
-          left: pct(boxL.x + cast.x),
-          top: pct(boxL.y + cast.y),
-          width: pct(boxL.w),
-          height: pct(boxL.h),
-          background: "rgba(6,4,26,1)",
-          opacity: cast.opacity,
-          filter: `blur(${(spread * 100 * cast.blur * 0.55).toFixed(2)}px)`,
-        }}
-      />
+          allows, softened to match the source, and only as far as this
+          substrate's standoff actually lifts the print off its surface. */}
+      {showCast ? (
+        <div
+          aria-hidden="true"
+          className="absolute"
+          style={{
+            left: pct(boxL.x + cast.x),
+            top: pct(boxL.y + cast.y),
+            width: pct(boxL.w),
+            height: pct(boxL.h),
+            background: "rgba(6,4,26,1)",
+            opacity: cast.opacity,
+            filter: `blur(${(spread * 100 * cast.blur * 0.55).toFixed(2)}px)`,
+          }}
+        />
+      ) : null}
       {/* Contact shadow: the tight, dark line right where the print meets the
-          surface, present under every light no matter how soft. */}
-      <div
-        aria-hidden="true"
-        className="absolute"
-        style={{
-          left: pct(boxL.x),
-          top: pct(boxL.y + Math.max(0.002, cast.y * 0.28)),
-          width: pct(boxL.w),
-          height: pct(boxL.h),
-          background: "rgba(6,4,26,1)",
-          opacity: Math.min(0.7, contact * 0.55),
-          filter: `blur(${(spread * 26).toFixed(2)}px)`,
-        }}
-      />
+          surface, present under every light no matter how soft. A flush film
+          keeps only a hairline of it; nothing horizontal gets one at all. */}
+      {finish.contact !== "ground" ? (
+        <div
+          aria-hidden="true"
+          className="absolute"
+          style={{
+            left: pct(boxL.x),
+            top: pct(boxL.y + Math.max(0.0015, cast.y * 0.28)),
+            width: pct(boxL.w),
+            height: pct(boxL.h),
+            background: "rgba(6,4,26,1)",
+            opacity: Math.min(0.7, contact * 0.55 * Math.max(0.22, castScale)),
+            filter: `blur(${(spread * 26 * Math.max(0.4, castScale)).toFixed(2)}px)`,
+          }}
+        />
+      ) : null}
 
       <div
         ref={faceRef}
