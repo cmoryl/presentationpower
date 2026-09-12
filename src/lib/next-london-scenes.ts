@@ -146,7 +146,7 @@ export const LONDON_SCENES: LondonScene[] = [
     y: 0.0996,
     w: 0.1914,
     h: 0.8213,
-  }, "w", "center", "edge"),
+  }, "w", "center", "cover"),
   scene("step-repeat", "Step-and-repeat wall", "Press / photo point", "wall", stepRepeat, {
     x: 0.1061,
     y: 0.1221,
@@ -192,19 +192,19 @@ export const LONDON_SCENES: LondonScene[] = [
     y: 0.175,
     w: 0.23,
     h: 0.615,
-  }, "w", "center", "edge"),
+  }, "w", "center", "cover"),
   scene("surface-stair-glass", "Stair balustrade glass", "Stair glazing", "glass", surfaceStairGlass, {
     x: 0.13,
     y: 0.22,
     w: 0.72,
     h: 0.55,
-  }, "w", "center", "cover"),
+  }, "w", "center", "edge"),
   scene("surface-tabletop", "Cafe table top", "Catering / lounge tables", "table", surfaceTabletop, {
     x: 0.22,
     y: 0.09,
     w: 0.56,
     h: 0.6,
-  }, "w", "center", "cover"),
+  }, "w", "center", "edge"),
 
   // ── Floor-specific plates ────────────────────────────────────────────────
   // One space per mapped floor of the venue, matched to the room roster and
