@@ -172,17 +172,19 @@ function LegalRefreshView() {
                 <dl className="grid gap-2 text-xs text-black/65 sm:grid-cols-2">
                   <div>
                     <dt className="font-semibold uppercase tracking-widest text-black/40">
-                      {legalRefreshModeUsesPhoto(mode) ? "Image" : "Device"}
+                      {legalRefreshModeUsesPhoto(mode) ? "Artwork" : "Device"}
                     </dt>
                     <dd className="mt-0.5">
                       {legalRefreshModeUsesPhoto(mode) ? d.photo.note : d.motifNote}
-                      {legalRefreshModeUsesPhoto(mode) && mode !== "photo" ? (
+                      {legalRefreshModeUsesPhoto(mode) ? (
                         <span className="block text-black/45">
-                          Finish: {LEGAL_REFRESH_RENDER_MODES.find((m) => m.id === mode)?.note}
+                          {LEGAL_REFRESH_RENDER_MODES.find((m) => m.id === mode)?.label}:{" "}
+                          {LEGAL_REFRESH_RENDER_MODES.find((m) => m.id === mode)?.note}
                         </span>
                       ) : null}
                     </dd>
                   </div>
+
                   <div>
                     <dt className="font-semibold uppercase tracking-widest text-black/40">Type</dt>
                     <dd className="mt-0.5">{d.type}</dd>
