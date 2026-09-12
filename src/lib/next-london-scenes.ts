@@ -275,7 +275,9 @@ const SPECIALISED_KINDS: SceneKind[] = ["floor", "lift", "glass", "table"];
 
 /** Keyword hints from the panel name/ground, strongest signal first. */
 function hintedKinds(panel: LondonPanel): SceneKind[] {
-  const t = `${panel.name} ${panel.ground} ${panel.style}`.toLowerCase();
+  // Only the item name and ground read as surface words. The style id is a
+  // gradient/pattern code ("12-repeat-wash") and must not hint a surface.
+  const t = `${panel.name} ${panel.ground}`.toLowerCase();
   const out: SceneKind[] = [];
   const push = (k: SceneKind) => {
     if (!out.includes(k)) out.push(k);
@@ -284,7 +286,7 @@ function hintedKinds(panel: LondonPanel): SceneKind[] {
   if (/lift|elevator/.test(t)) push("lift");
   if (/glass|glazing|balustrade|stair/.test(t)) push("glass");
   if (/table ?top|tabletop|bistro|poseur|cafe table/.test(t)) push("table");
-  if (/step|repeat|press|photo/.test(t)) push("wall");
+  if (/step[- ]?(and[- ])?repeat|press wall|photo (wall|point|call)/.test(t)) push("wall");
   if (/door|vinyl/.test(t)) push("door");
   if (/stage|fascia|plenar|podium|lectern/.test(t)) push("fascia");
   if (/desk|registration|check-?in|counter/.test(t)) push("desk");
@@ -303,7 +305,6 @@ function hintedKinds(panel: LondonPanel): SceneKind[] {
 export function scenesForPanel(panel: LondonPanel): LondonScene[] {
   const ratio = panel.trimW / panel.trimH;
   const hints = hintedKinds(panel);
-  if (process.env["SCENE_DEBUG"]) console.log("DEBUG hints", panel.id, hints);
   return [...LONDON_SCENES]
     .map((s) => {
       // A door/vinyl keyword only wins if the item can actually skin that
