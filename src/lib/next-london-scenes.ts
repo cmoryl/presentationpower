@@ -303,6 +303,7 @@ function hintedKinds(panel: LondonPanel): SceneKind[] {
 export function scenesForPanel(panel: LondonPanel): LondonScene[] {
   const ratio = panel.trimW / panel.trimH;
   const hints = hintedKinds(panel);
+  if (process.env["SCENE_DEBUG"]) console.log("DEBUG hints", panel.id, hints);
   return [...LONDON_SCENES]
     .map((s) => {
       // A door/vinyl keyword only wins if the item can actually skin that
