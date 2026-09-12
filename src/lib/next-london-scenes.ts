@@ -26,6 +26,11 @@ import floor5fStairGlass from "@/assets/london-scenes/floor-5f-stair-glass.jpg";
 import floor6fSet from "@/assets/london-scenes/floor-6f-set.jpg";
 import refFoyerPillar from "@/assets/london-scenes/ref-foyer-pillar.jpg";
 import refPlenaryStage from "@/assets/london-scenes/ref-plenary-stage.jpg";
+import refRoomDoors from "@/assets/london-scenes/ref-room-doors.jpg";
+import refFoyerWallRun from "@/assets/london-scenes/ref-foyer-wall-run.jpg";
+import refPressWall from "@/assets/london-scenes/ref-press-wall.jpg";
+import refExteriorCanopy from "@/assets/london-scenes/ref-exterior-canopy.jpg";
+import refScenicWallBlank from "@/assets/london-scenes/ref-scenic-wall-blank.jpg";
 import floorExtForecourt from "@/assets/london-scenes/floor-ext-forecourt.jpg";
 import floorGfAuditorium from "@/assets/london-scenes/floor-gf-auditorium.jpg";
 
