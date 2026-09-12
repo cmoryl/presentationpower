@@ -405,11 +405,12 @@ export const LONDON_SCENES: LondonScene[] = [
     w: 0.72,
     h: 0.55,
   }, "w", "center", "edge"),
+  // Face rectangle = bounding box of the measured (foreshortened) table top.
   scene("surface-tabletop", "Cafe table top", "Catering / lounge tables", "table", surfaceTabletop, {
-    x: 0.22,
-    y: 0.09,
-    w: 0.56,
-    h: 0.6,
+    x: 0.253,
+    y: 0.199,
+    w: 0.504,
+    h: 0.299,
   }, "w", "center", "edge"),
 
   // ── Live in-event plates ─────────────────────────────────────────────────
