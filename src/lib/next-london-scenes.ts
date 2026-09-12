@@ -685,7 +685,74 @@ export const LONDON_SCENES: LondonScene[] = [
     h: 0.855,
   }, "w", "center", "edge"), photo: true,
     surface: { wMm: 6800, hMm: 4030, note: "Measured scenic build, supplied reference" } },
+
+  // ── Genuine QEII Centre photographs ──────────────────────────────────────
+  // Queen Elizabeth II Centre event photography (venue press/marketing library,
+  // qeiicentre.london). These are the real spaces our items install in, so the
+  // faces below were measured off the photographs themselves and every one of
+  // these plates is labelled as a photograph, not a visualisation.
+  { ...scene("photo-foyer-wall-run", "Foyer wall run · QEII foyer in use", "Exhibition foyer wall run · QEII Centre photograph", "wide", photoFoyerWallRun, {
+    x: 0.048,
+    y: 0.212,
+    w: 0.422,
+    h: 0.523,
+  }, "w", "center", "edge"), photo: true, live: true },
+  { ...scene("photo-plenary-fascia", "Plenary scenic wall · QEII in use", "Plenary stage scenic wall · QEII Centre photograph", "wall", photoPlenaryFascia, {
+    x: 0.015,
+    y: 0.02,
+    w: 0.975,
+    h: 0.545,
+  }, "w", "center", "edge", ["GF"]), photo: true, live: true },
+  { ...scene("photo-churchill-stage", "Churchill stage set · session live", "Churchill auditorium stage · QEII Centre photograph", "fascia", photoChurchillStage, {
+    x: 0.258,
+    y: 0.418,
+    w: 0.454,
+    h: 0.105,
+  }, "w", "center", "edge", ["GF"]), photo: true, live: true },
+  { ...scene("photo-exhibition-foyer", "Exhibition stand wall · QEII expo", "Exhibition foyer stand wall · QEII Centre photograph", "wall", photoExhibitionFoyer, {
+    x: 0.012,
+    y: 0.252,
+    w: 0.323,
+    h: 0.408,
+  }, "w", "center", "edge"), photo: true, live: true },
+  { ...scene("photo-thirdfloor-wall", "Third floor wall run · QEII expo", "Third floor exhibition wall run · QEII Centre photograph", "wide", photoThirdfloorWall, {
+    x: 0.117,
+    y: 0.212,
+    w: 0.846,
+    h: 0.516,
+  }, "w", "center", "edge", ["3F"]), photo: true },
+  { ...scene("photo-exhibition-stand", "Stand back wall · QEII expo zone", "Expo zone stand back wall · QEII Centre photograph", "portrait", photoExhibitionStand, {
+    x: 0.118,
+    y: 0.3,
+    w: 0.257,
+    h: 0.365,
+  }, "w", "center", "edge"), photo: true },
+  { ...scene("photo-lounge-panel", "Lounge banner · Sanctuary in use", "Sanctuary lounge banner · QEII Centre photograph", "portrait", photoLoungePanel, {
+    x: 0.118,
+    y: 0.365,
+    w: 0.137,
+    h: 0.465,
+  }, "w", "center", "edge"), photo: true, live: true },
+  { ...scene("photo-sanctuary-counter", "Sanctuary counter front", "Sanctuary cafe counter · QEII Centre photograph", "counter", photoSanctuaryCounter, {
+    x: 0.02,
+    y: 0.37,
+    w: 0.58,
+    h: 0.47,
+  }, "h", "center", "edge"), photo: true },
+  { ...scene("photo-cafe-tabletop", "Cafe table top · QEII break area", "Catering table top · QEII Centre photograph", "table", photoCafeTabletop, {
+    x: 0.24,
+    y: 0.665,
+    w: 0.36,
+    h: 0.135,
+  }, "w", "center", "edge"), photo: true },
+  { ...scene("photo-facade-evening", "Entrance fascia · QEII facade lit", "Exterior · QEII Centre entrance fascia photograph", "exterior", photoFacadeEvening, {
+    x: 0.235,
+    y: 0.79,
+    w: 0.58,
+    h: 0.072,
+  }, "w", "center", "cover", ["EXT"]), photo: true },
 ];
+
 
 
 
