@@ -242,3 +242,81 @@ export function venueTemplateFor(panel: { id: string } | string): VenueTemplateF
 export function venueTemplate(id: string): VenueTemplateFamily | null {
   return NEXT_VENUE_TEMPLATES.find((family) => family.id === id) ?? null;
 }
+
+/** The least a coverage read needs to know about a sign. */
+export type VenueTemplatePanelLike = {
+  id: string;
+  name: string;
+  room: string;
+  trimW: number;
+  trimH: number;
+  bleedEdge: number;
+};
+
+export type VenueTemplateCoverage<P extends VenueTemplatePanelLike = VenueTemplatePanelLike> = {
+  family: VenueTemplateFamily;
+  /** Signs in the supplied set that this family already covers. */
+  panels: P[];
+  /** Smallest and largest trim seen on the family, in mm. */
+  sizeRange: { minW: number; maxW: number; minH: number; maxH: number } | null;
+  /** Bleed values the family has been produced at, in mm. */
+  bleeds: number[];
+};
+
+export type VenueTemplateAudit<P extends VenueTemplatePanelLike = VenueTemplatePanelLike> = {
+  coverage: VenueTemplateCoverage<P>[];
+  /** Signs with no family yet — the next things worth templating. */
+  unmatched: P[];
+  covered: number;
+  total: number;
+  /** Share of the set that a new venue can start from a template, 0–1. */
+  reuse: number;
+};
+
+/**
+ * How much of a settled signage set is already reusable at the next venue.
+ * Coverage is what saves time: a family carries the face shape, copy slots,
+ * ground and print notes, so a new venue supplies only trim and copy.
+ */
+export function venueTemplateAudit<P extends VenueTemplatePanelLike>(
+  panels: P[],
+): VenueTemplateAudit<P> {
+  const buckets = new Map<string, P[]>();
+  const unmatched: P[] = [];
+  for (const panel of panels) {
+    const family = venueTemplateFor(panel.id);
+    if (!family) {
+      unmatched.push(panel);
+      continue;
+    }
+    const list = buckets.get(family.id);
+    if (list) list.push(panel);
+    else buckets.set(family.id, [panel]);
+  }
+  const coverage = NEXT_VENUE_TEMPLATES.map((family) => {
+    const list = buckets.get(family.id) ?? [];
+    const sizeRange = list.length
+      ? {
+          minW: Math.min(...list.map((p) => p.trimW)),
+          maxW: Math.max(...list.map((p) => p.trimW)),
+          minH: Math.min(...list.map((p) => p.trimH)),
+          maxH: Math.max(...list.map((p) => p.trimH)),
+        }
+      : null;
+    return {
+      family,
+      panels: list,
+      sizeRange,
+      bleeds: [...new Set(list.map((p) => p.bleedEdge))].sort((a, b) => a - b),
+    };
+  });
+  const covered = panels.length - unmatched.length;
+  return {
+    coverage,
+    unmatched,
+    covered,
+    total: panels.length,
+    reuse: panels.length ? covered / panels.length : 0,
+  };
+}
+

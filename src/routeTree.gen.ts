@@ -152,6 +152,7 @@ import { Route as KnowledgeBrandGuidesNext2026RouteImport } from './routes/knowl
 import { Route as KnowledgeBrandGuidesElementRouteImport } from './routes/knowledge.brand-guides.element'
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
 import { Route as EventsNextVenueRouteImport } from './routes/events.next_.venue'
+import { Route as EventsNextPlaybookRouteImport } from './routes/events.next_.playbook'
 import { Route as EventsNextPillarsRouteImport } from './routes/events.next_.pillars'
 import { Route as EventsNextMartRouteImport } from './routes/events.next_.mart'
 import { Route as EventsNextLondonRouteImport } from './routes/events.next_.london'
@@ -904,6 +905,11 @@ const EventsNextVenueRoute = EventsNextVenueRouteImport.update({
   path: '/next/venue',
   getParentRoute: () => EventsRoute,
 } as any)
+const EventsNextPlaybookRoute = EventsNextPlaybookRouteImport.update({
+  id: '/next_/playbook',
+  path: '/next/playbook',
+  getParentRoute: () => EventsRoute,
+} as any)
 const EventsNextPillarsRoute = EventsNextPillarsRouteImport.update({
   id: '/next_/pillars',
   path: '/next/pillars',
@@ -1196,6 +1202,7 @@ export interface FileRoutesByFullPath {
   '/events/next/london': typeof EventsNextLondonRoute
   '/events/next/mart': typeof EventsNextMartRoute
   '/events/next/pillars': typeof EventsNextPillarsRoute
+  '/events/next/playbook': typeof EventsNextPlaybookRoute
   '/events/next/venue': typeof EventsNextVenueRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/element': typeof KnowledgeBrandGuidesElementRoute
@@ -1364,6 +1371,7 @@ export interface FileRoutesByTo {
   '/events/next/london': typeof EventsNextLondonRoute
   '/events/next/mart': typeof EventsNextMartRoute
   '/events/next/pillars': typeof EventsNextPillarsRoute
+  '/events/next/playbook': typeof EventsNextPlaybookRoute
   '/events/next/venue': typeof EventsNextVenueRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/element': typeof KnowledgeBrandGuidesElementRoute
@@ -1537,6 +1545,7 @@ export interface FileRoutesById {
   '/events/next_/london': typeof EventsNextLondonRoute
   '/events/next_/mart': typeof EventsNextMartRoute
   '/events/next_/pillars': typeof EventsNextPillarsRoute
+  '/events/next_/playbook': typeof EventsNextPlaybookRoute
   '/events/next_/venue': typeof EventsNextVenueRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/element': typeof KnowledgeBrandGuidesElementRoute
@@ -1711,6 +1720,7 @@ export interface FileRouteTypes {
     | '/events/next/london'
     | '/events/next/mart'
     | '/events/next/pillars'
+    | '/events/next/playbook'
     | '/events/next/venue'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/element'
@@ -1879,6 +1889,7 @@ export interface FileRouteTypes {
     | '/events/next/london'
     | '/events/next/mart'
     | '/events/next/pillars'
+    | '/events/next/playbook'
     | '/events/next/venue'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/element'
@@ -2051,6 +2062,7 @@ export interface FileRouteTypes {
     | '/events/next_/london'
     | '/events/next_/mart'
     | '/events/next_/pillars'
+    | '/events/next_/playbook'
     | '/events/next_/venue'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/element'
@@ -3176,6 +3188,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsNextVenueRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/events/next_/playbook': {
+      id: '/events/next_/playbook'
+      path: '/next/playbook'
+      fullPath: '/events/next/playbook'
+      preLoaderRoute: typeof EventsNextPlaybookRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/pillars': {
       id: '/events/next_/pillars'
       path: '/next/pillars'
@@ -3471,6 +3490,7 @@ interface EventsRouteChildren {
   EventsNextLondonRoute: typeof EventsNextLondonRoute
   EventsNextMartRoute: typeof EventsNextMartRoute
   EventsNextPillarsRoute: typeof EventsNextPillarsRoute
+  EventsNextPlaybookRoute: typeof EventsNextPlaybookRoute
   EventsNextVenueRoute: typeof EventsNextVenueRoute
   EventsNextLondonMapsRoute: typeof EventsNextLondonMapsRoute
   EventsNextLondonReviseRoute: typeof EventsNextLondonReviseRoute
@@ -3493,6 +3513,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextLondonRoute: EventsNextLondonRoute,
   EventsNextMartRoute: EventsNextMartRoute,
   EventsNextPillarsRoute: EventsNextPillarsRoute,
+  EventsNextPlaybookRoute: EventsNextPlaybookRoute,
   EventsNextVenueRoute: EventsNextVenueRoute,
   EventsNextLondonMapsRoute: EventsNextLondonMapsRoute,
   EventsNextLondonReviseRoute: EventsNextLondonReviseRoute,
