@@ -172,7 +172,89 @@ function download(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
-function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
+/** The artwork a card shows: supplied/hand-finished proof, else the live SVG. */
+function useCardArt(panel: LondonPanel, svg?: string, version?: string) {
+  const boothArt = londonSuppliedMaster(panel)?.previewUrl ?? londonBoothArtworkUrl(panel.id);
+  return useMemo(() => {
+    // A replaced live file keeps the same URL, so the signature is appended as
+    // a cache buster — otherwise the card keeps showing the previous render.
+    if (boothArt) {
+      if (!version || boothArt.startsWith("data:") || boothArt.startsWith("blob:")) return boothArt;
+      return `${boothArt}${boothArt.includes("?") ? "&" : "?"}v=${encodeURIComponent(version.slice(0, 24))}`;
+    }
+    if (!svg) return null;
+    return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+  }, [boothArt, svg, version]);
+}
+
+/**
+ * The card render as it looks installed: the item's own artwork mounted on the
+ * measured face of its best-ranked in-event plate, with the same light matching
+ * as the full in-situ preview so a card and its enlarged view agree.
+ */
+function SceneThumb({
+  panel,
+  art,
+}: {
+  panel: LondonPanel;
+  art: string | null;
+}) {
+  const scene = useMemo(() => defaultSceneForPanel(panel), [panel]);
+  const box = useMemo(() => fitArtworkInFace(panel, scene), [panel, scene]);
+  const fit = useMemo(() => sceneArtworkObjectFit(panel, scene), [panel, scene]);
+  return (
+    <div
+      className="relative w-full overflow-hidden rounded-lg border border-black/10 bg-[#0d1117]"
+      style={{ aspectRatio: `${scene.plate.w} / ${scene.plate.h}` }}
+    >
+      <img
+        src={scene.src}
+        alt={`${panel.name} shown ${scene.label.toLowerCase()}`}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      {art ? (
+        <SceneArtworkPlate
+          box={box}
+          sceneId={scene.id}
+          face={fit === "cover" ? undefined : scene.face}
+          substrate={
+            <img
+              src={art}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full"
+              style={{ objectFit: "cover" }}
+            />
+          }
+        >
+          <img
+            src={art}
+            alt={`${panel.name} installed as a ${scene.label.toLowerCase()}`}
+            className="absolute inset-0 h-full w-full"
+            style={{ objectFit: fit }}
+          />
+        </SceneArtworkPlate>
+      ) : null}
+      <span className="absolute bottom-1 left-1 max-w-[calc(100%-0.5rem)] truncate rounded bg-black/55 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
+        {sceneSurfaceLabel(scene)}
+      </span>
+    </div>
+  );
+}
+
+function PanelThumb({
+  panel,
+  svg,
+  version,
+  view = "flat",
+}: {
+  panel: LondonPanel;
+  svg?: string;
+  version?: string;
+  view?: "flat" | "scene";
+}) {
   const style = LONDON_STYLES[panel.style];
   const ratio = panel.bleedW / panel.bleedH;
   // Vendor booths and hand-finished live files show the supplied proof as the
@@ -180,9 +262,11 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
   // generated layers (lockup, headline, code, uploaded vector art) are painted
   // straight on top, so an edit to a supplied sign shows on the card too.
   const boothArt = londonSuppliedMaster(panel)?.previewUrl ?? londonBoothArtworkUrl(panel.id);
+  const art = useCardArt(panel, svg, version);
   const svgUrl = svg
     ? `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`
     : null;
+  if (view === "scene") return <SceneThumb panel={panel} art={art} />;
   return (
     <div
       className="relative w-full overflow-hidden rounded-lg border border-black/10 bg-[#E0E8F5]"
@@ -190,7 +274,7 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
     >
       {boothArt ? (
         <img
-          src={boothArt}
+          src={art ?? boothArt}
           alt={`${panel.room} — ${panel.name}, supplied artwork`}
           className="absolute inset-0 h-full w-full object-cover"
           loading="lazy"
@@ -214,6 +298,7 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
     </div>
   );
 }
+
 
 function PanelCard({
   panel,
