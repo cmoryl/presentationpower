@@ -338,10 +338,10 @@ const QEII_PHOTO_QUADS: Record<string, SceneQuad> = {
     { x: 0.24, y: 0.8 },
   ],
   "photo-sanctuary-counter": [
-    { x: 0.02, y: 0.44 },
-    { x: 0.6, y: 0.37 },
-    { x: 0.6, y: 0.5 },
-    { x: 0.02, y: 0.84 },
+    { x: 0.02, y: 0.46 },
+    { x: 0.32, y: 0.4 },
+    { x: 0.32, y: 0.66 },
+    { x: 0.02, y: 0.83 },
   ],
   "photo-facade-evening": [
     { x: 0.235, y: 0.795 },
@@ -729,9 +729,9 @@ export const LONDON_SCENES: LondonScene[] = [
   }, "w", "center", "edge"), photo: true, live: true },
   { ...scene("photo-sanctuary-counter", "Sanctuary counter front", "Sanctuary cafe counter · QEII Centre photograph", "counter", photoSanctuaryCounter, {
     x: 0.02,
-    y: 0.37,
-    w: 0.58,
-    h: 0.47,
+    y: 0.4,
+    w: 0.3,
+    h: 0.43,
   }, "h", "center", "edge"), photo: true },
   { ...scene("photo-cafe-tabletop", "Cafe table top · QEII break area", "Catering table top · QEII Centre photograph", "table", photoCafeTabletop, {
     x: 0.24,
