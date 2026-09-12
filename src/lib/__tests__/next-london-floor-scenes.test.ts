@@ -63,19 +63,19 @@ describe("purpose-built surface scenes", () => {
   });
 
   it("previews lift wraps on lift doors", () => {
-    expect(pick("ldn-v04").id).toBe("surface-lift-doors");
-    expect(pick("ldn-v05").id).toBe("surface-lift-doors");
+    expect(pick("ldn-v04").kind).toBe("lift");
+    expect(pick("ldn-v05").kind).toBe("lift");
   });
 
   it("previews stair glazing on balustrade glass", () => {
     for (const id of ["ldn-v34", "ldn-v35", "ldn-v36"]) {
-      expect(pick(id).id, id).toBe("surface-stair-glass");
+      expect(pick(id).kind, id).toBe("glass");
     }
   });
 
   it("previews table tops on a table", () => {
     for (const id of ["ldn-v09", "ldn-v10", "ldn-v11", "ldn-v12"]) {
-      expect(pick(id).id, id).toBe("surface-tabletop");
+      expect(pick(id).kind, id).toBe("table");
     }
   });
 
