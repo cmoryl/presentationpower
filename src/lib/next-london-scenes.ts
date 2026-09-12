@@ -270,6 +270,9 @@ export function isFloorScene(scene: LondonScene): boolean {
 }
 
 
+/** Surfaces that only make sense for their own kind of install. */
+const SPECIALISED_KINDS: SceneKind[] = ["floor", "lift", "glass", "table"];
+
 /** Keyword hints from the panel name/ground, strongest signal first. */
 function hintedKinds(panel: LondonPanel): SceneKind[] {
   const t = `${panel.name} ${panel.ground} ${panel.style}`.toLowerCase();
@@ -313,11 +316,25 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
       const fit = Math.abs(Math.log(s.faceRatio / ratio));
       // A plate of the floor the item is actually scheduled on wins ties, so
       // the first view a user sees is the space the item installs in.
-      const onFloor = s.floors?.includes(panel.floor) ? -0.75 : 0;
+      // The floor bonus only applies when the plate is not the wrong kind of
+      // surface: a floor graphic must not win a stage wall just because both
+      // sit on the ground floor.
+      const kindOk = hints.length === 0 || hint >= 0;
+      const onFloor = kindOk && s.floors?.includes(panel.floor) ? -0.75 : 0;
       const wrongFloor = s.floors && !s.floors.includes(panel.floor) ? 1.5 : 0;
+      // Purpose-built surfaces (floor, lift, glass, table) are only offered
+      // first when the item is actually that kind of install.
+      const specialised =
+        !kindOk && SPECIALISED_KINDS.includes(s.kind) ? 3 : 0;
       return {
         s,
-        score: (hint >= 0 ? hint * 0.15 : 3) + orientation + fit + onFloor + wrongFloor,
+        score:
+          (hint >= 0 ? hint * 0.15 : 3) +
+          orientation +
+          fit +
+          onFloor +
+          wrongFloor +
+          specialised,
       };
 
     })
