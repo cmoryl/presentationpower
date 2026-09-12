@@ -1135,7 +1135,7 @@ function LondonSignagePage() {
               </button>
             ) : null}
             <span className="ml-auto inline-flex overflow-hidden rounded-full border border-black/15">
-              {(["scene", "flat"] as const).map((v) => (
+              {(["flat", "scene"] as const).map((v) => (
                 <button
                   key={v}
                   type="button"
