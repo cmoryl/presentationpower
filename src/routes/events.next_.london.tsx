@@ -388,6 +388,12 @@ function PanelCard({
             {londonVenueItemMeta(panel)!.note}
           </p>
         ) : null}
+        {venueTemplateFor(panel) ? (
+          <p className="mt-1 text-[11px] leading-snug text-[#03002C]/55">
+            Reusable family: {venueTemplateFor(panel)!.name}
+          </p>
+        ) : null}
+
         {booth ? (
           <p className="mt-1 text-[12px] font-medium leading-snug text-[#03002C]/75">
             {booth.artboard.label} · {booth.artboard.trimW} × {booth.artboard.trimH} mm
