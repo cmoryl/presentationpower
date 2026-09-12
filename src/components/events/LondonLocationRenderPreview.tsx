@@ -19,7 +19,12 @@ import {
   scenesForPanel,
   type LondonScene,
 } from "@/lib/next-london-scenes";
-import { londonBoothArtworkUrl, type LondonPanel } from "@/lib/next-london-signage";
+import {
+  londonBoothArtworkUrl,
+  LONDON_FLOORS,
+  type LondonFloorId,
+  type LondonPanel,
+} from "@/lib/next-london-signage";
 import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
 
 export interface LondonLocationRenderPreviewProps {
