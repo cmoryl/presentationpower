@@ -445,14 +445,21 @@ export function SceneArtworkPlate({
         ) : null}
 
         {/* Specular sheen for laminated stock, raked with the light. */}
-        {light.sheen > 0.02 ? (
+        {light.sheen + finish.gloss > 0.06 ? (
           <div
             aria-hidden="true"
             className="absolute inset-0"
             style={{
-              background: portrait
-                ? `linear-gradient(${angle + 12}deg, rgba(255,255,255,${light.sheen.toFixed(3)}) 0%, rgba(255,255,255,0) 26%, rgba(255,255,255,0) 74%, rgba(255,255,255,${(light.sheen * 0.5).toFixed(3)}) 100%)`
-                : `linear-gradient(${angle + 78}deg, rgba(255,255,255,${light.sheen.toFixed(3)}) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 78%, rgba(255,255,255,${(light.sheen * 0.4).toFixed(3)}) 100%)`,
+              // Gloss decides how strong the highlight is; anisotropy decides
+              // whether it is a broad wash (matt board) or a stretched streak
+              // (squeegeed film, laminated floor, glass).
+              background: (() => {
+                const s = Math.min(0.5, light.sheen + finish.gloss * 0.22);
+                const rakeAngle = angle + (portrait ? 12 : 78) + finish.anisotropy * 14;
+                const near = (26 - finish.anisotropy * 14).toFixed(0);
+                const far = (74 + finish.anisotropy * 12).toFixed(0);
+                return `linear-gradient(${rakeAngle}deg, rgba(255,255,255,${s.toFixed(3)}) 0%, rgba(255,255,255,0) ${near}%, rgba(255,255,255,0) ${far}%, rgba(255,255,255,${(s * 0.45).toFixed(3)}) 100%)`;
+              })(),
               mixBlendMode: "screen",
             }}
           />
