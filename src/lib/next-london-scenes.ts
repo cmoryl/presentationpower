@@ -12,6 +12,14 @@
 // the venue. Every surface that shows them must label them as visualisations.
 
 import coffeeBar from "@/assets/london-scenes/coffee-bar.jpg";
+import liveFloorGraphic from "@/assets/london-scenes/live-floor-graphic.jpg";
+import liveLiftLobby from "@/assets/london-scenes/live-lift-lobby.jpg";
+import liveStairGlass from "@/assets/london-scenes/live-stair-glass.jpg";
+import liveTabletop from "@/assets/london-scenes/live-tabletop.jpg";
+import liveRegistrationDesk from "@/assets/london-scenes/live-registration-desk.jpg";
+import liveCoffeeBar from "@/assets/london-scenes/live-coffee-bar.jpg";
+import liveFoyerColumn from "@/assets/london-scenes/live-foyer-column.jpg";
+import liveStageFascia from "@/assets/london-scenes/live-stage-fascia.jpg";
 import surfaceFloorGraphic from "@/assets/london-scenes/surface-floor-graphic.jpg";
 import surfaceLiftDoors from "@/assets/london-scenes/surface-lift-doors.jpg";
 import surfaceStairGlass from "@/assets/london-scenes/surface-stair-glass.jpg";
@@ -92,6 +100,8 @@ export interface LondonScene {
   mount: SceneMountMode;
   /** True when the plate is a real event photograph, not a visualisation. */
   photo?: boolean;
+  /** True when the plate shows the surface with delegates on site. */
+  live?: boolean;
   /** Floors this plate actually represents, when it is a floor-specific space. */
   floors?: LondonFloorId[];
 }
@@ -214,6 +224,60 @@ export const LONDON_SCENES: LondonScene[] = [
     w: 0.56,
     h: 0.6,
   }, "w", "center", "edge"),
+
+  // ── Live in-event plates ─────────────────────────────────────────────────
+  // The same surfaces, photographed as they read during the show: delegates
+  // walking, queueing and networking around the install, with the printed face
+  // itself kept clear so nothing crosses the artwork.
+  { ...scene("live-floor-graphic", "Floor graphic · foyer in use", "Foyer circulation floor · event live", "floor", liveFloorGraphic, {
+    x: 0.17,
+    y: 0.5,
+    w: 0.7,
+    h: 0.33,
+  }, "w", "center", "edge"), live: true },
+  { ...scene("live-lift-lobby", "Lift wrap · lift lobby in use", "Lift lobby · event live", "lift", liveLiftLobby, {
+    x: 0.105,
+    y: 0.085,
+    w: 0.27,
+    h: 0.84,
+  }, "w", "center", "cover"), live: true },
+  { ...scene("live-stair-glass", "Stair glazing · stairs in use", "Stair glazing · event live", "glass", liveStairGlass, {
+    x: 0.18,
+    y: 0.35,
+    w: 0.48,
+    h: 0.3,
+  }, "w", "center", "edge"), live: true },
+  { ...scene("live-tabletop", "Table top · break in progress", "Catering tables · event live", "table", liveTabletop, {
+    x: 0.19,
+    y: 0.545,
+    w: 0.59,
+    h: 0.28,
+  }, "w", "center", "edge"), live: true },
+  { ...scene("live-registration-desk", "Registration desk in use", "Registration · event live", "desk", liveRegistrationDesk, {
+    x: 0.135,
+    y: 0.51,
+    w: 0.74,
+    h: 0.245,
+  }, "h", "center", "edge"), live: true },
+  { ...scene("live-coffee-bar", "Coffee bar wall · break in progress", "Catering / coffee bar · event live", "counter", liveCoffeeBar, {
+    x: 0.16,
+    y: 0.12,
+    w: 0.705,
+    h: 0.425,
+  }, "w", "center", "edge"), live: true },
+  { ...scene("live-foyer-column", "Pillar · exhibition foyer in use", "Exhibition foyer pillar · event live", "column", liveFoyerColumn, {
+    x: 0.405,
+    y: 0.035,
+    w: 0.17,
+    h: 0.92,
+  }, "w", "top", "cover"), live: true },
+  { ...scene("live-stage-fascia", "Stage fascia · session in progress", "Plenary stage front · event live", "fascia", liveStageFascia, {
+    x: 0.075,
+    y: 0.565,
+    w: 0.905,
+    h: 0.135,
+  }, "h", "center", "edge"), live: true },
+
 
   // ── Floor-specific plates ────────────────────────────────────────────────
   // One space per mapped floor of the venue, matched to the room roster and
@@ -391,6 +455,9 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
       // first when the item is actually that kind of install.
       const specialised =
         hint < 0 && SPECIALISED_KINDS.includes(s.kind) ? 3 : 0;
+      // Between two plates of the same surface, the one with delegates on site
+      // reads as the install in use, so it leads.
+      const liveBonus = s.live && (kindOk ? hint >= 0 || hints.length === 0 : false) ? -0.35 : 0;
       return {
         s,
         score:
@@ -399,8 +466,10 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
           fit +
           onFloor +
           wrongFloor +
+          liveBonus +
           specialised,
       };
+
 
     })
     .sort((a, b) => a.score - b.score)
