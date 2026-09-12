@@ -180,6 +180,115 @@ export function sceneCaption(
   return dims ? `${sceneProvenanceLabel(scene)} · ${dims}` : sceneProvenanceLabel(scene);
 }
 
+/**
+ * Measured face corners per plate, clockwise from top-left, in plate fractions.
+ * Read off the plates themselves against a tenth grid: the printed face of a
+ * receding wall, a floor laid in perspective, a raked fascia or a table top is
+ * NOT a rectangle on the photograph, and mounting artwork as one is what makes
+ * a render look placed. Only surfaces that actually rake are listed; a frontal
+ * wall is left out on purpose so its print stays pixel-exact.
+ */
+const SCENE_QUADS: Record<string, SceneQuad> = {
+  // Floor graphics: laid flat, so the far edge is short and the near edge wide.
+  "surface-floor-graphic": [
+    { x: 0.196, y: 0.383 },
+    { x: 0.788, y: 0.401 },
+    { x: 0.883, y: 0.799 },
+    { x: 0.061, y: 0.722 },
+  ],
+  "live-floor-graphic": [
+    { x: 0.246, y: 0.506 },
+    { x: 0.664, y: 0.506 },
+    { x: 0.856, y: 0.799 },
+    { x: 0.134, y: 0.799 },
+  ],
+  // Table tops: seen from standing height, near edge wider.
+  "surface-tabletop": [
+    { x: 0.301, y: 0.199 },
+    { x: 0.709, y: 0.199 },
+    { x: 0.757, y: 0.498 },
+    { x: 0.253, y: 0.498 },
+  ],
+  "live-tabletop": [
+    { x: 0.247, y: 0.601 },
+    { x: 0.723, y: 0.601 },
+    { x: 0.775, y: 0.723 },
+    { x: 0.196, y: 0.723 },
+  ],
+  // Desk and counter fronts: slight rake off the lens axis.
+  "desk-front": [
+    { x: 0.114, y: 0.534 },
+    { x: 0.944, y: 0.545 },
+    { x: 0.944, y: 0.687 },
+    { x: 0.112, y: 0.706 },
+  ],
+  "live-registration-desk": [
+    { x: 0.142, y: 0.522 },
+    { x: 0.873, y: 0.508 },
+    { x: 0.878, y: 0.753 },
+    { x: 0.135, y: 0.772 },
+  ],
+  "live-coffee-bar": [
+    { x: 0.19, y: 0.117 },
+    { x: 0.884, y: 0.096 },
+    { x: 0.884, y: 0.546 },
+    { x: 0.19, y: 0.531 },
+  ],
+  // Stage fascias: long, low, and seen from the floor of the room.
+  "live-stage-fascia": [
+    { x: 0.078, y: 0.588 },
+    { x: 0.977, y: 0.57 },
+    { x: 0.977, y: 0.666 },
+    { x: 0.078, y: 0.712 },
+  ],
+  // A foyer wall run receding away from the camera — the strongest rake in the
+  // library, and the plate that most obviously failed as a flat rectangle.
+  "ref-foyer-wall-run": [
+    { x: 0.021, y: 0.077 },
+    { x: 0.813, y: 0.316 },
+    { x: 0.813, y: 0.779 },
+    { x: 0.021, y: 0.962 },
+  ],
+  "live-foyer-wall-run": [
+    { x: 0.338, y: 0.108 },
+    { x: 0.967, y: 0.091 },
+    { x: 0.967, y: 0.632 },
+    { x: 0.338, y: 0.651 },
+  ],
+  // Scenic builds and press walls: near-frontal, a degree or two of turn.
+  "live-scenic-wall": [
+    { x: 0.185, y: 0.03 },
+    { x: 0.953, y: 0.046 },
+    { x: 0.949, y: 0.903 },
+    { x: 0.19, y: 0.884 },
+  ],
+  "ref-press-wall": [
+    { x: 0.194, y: 0.046 },
+    { x: 0.856, y: 0.056 },
+    { x: 0.856, y: 0.721 },
+    { x: 0.194, y: 0.735 },
+  ],
+  // Entrance canopy band, seen from below on the forecourt.
+  "ref-exterior-canopy": [
+    { x: 0.104, y: 0.478 },
+    { x: 0.906, y: 0.461 },
+    { x: 0.906, y: 0.573 },
+    { x: 0.104, y: 0.601 },
+  ],
+  // Photographed pillar: the visible face turns very slightly toward the lens.
+  "ref-foyer-pillar": [
+    { x: 0.797, y: 0.153 },
+    { x: 0.878, y: 0.164 },
+    { x: 0.878, y: 0.884 },
+    { x: 0.797, y: 0.876 },
+  ],
+};
+
+/** Measured face quad for a scene, or the plain face rectangle. */
+export function sceneQuad(scene: LondonScene): SceneQuad {
+  return scene.quad ?? quadFromRect(scene.face);
+}
+
 function scene(
   id: string,
   label: string,
