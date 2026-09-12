@@ -563,19 +563,27 @@ function azimuthFor(direction: LightDirection): number {
  * is what keeps a tungsten foyer and a tungsten coffee bar the same warm.
  */
 export function kelvinTint(kelvin: number): string {
-  const k = Math.min(9000, Math.max(1800, kelvin)) / 100;
   const clamp = (n: number) => Math.round(Math.min(255, Math.max(0, n)));
-  const r = k <= 66 ? 255 : 329.6987 * Math.pow(k - 60, -0.1332047592);
-  const g =
-    k <= 66
-      ? 99.4708025861 * Math.log(k) - 161.1195681661
-      : 288.1221695283 * Math.pow(k - 60, -0.0755148492);
-  const b = k >= 66 ? 255 : k <= 19 ? 0 : 138.5177312231 * Math.log(k - 10) - 305.0447927307;
+  const black = (kelvin: number) => {
+    const k = Math.min(9000, Math.max(1800, kelvin)) / 100;
+    const r = k <= 66 ? 255 : 329.6987 * Math.pow(k - 60, -0.1332047592);
+    const g =
+      k <= 66
+        ? 99.4708025861 * Math.log(k) - 161.1195681661
+        : 288.1221695283 * Math.pow(k - 60, -0.0755148492);
+    const b = k >= 66 ? 255 : k <= 19 ? 0 : 138.5177312231 * Math.log(k - 10) - 305.0447927307;
+    return [Math.max(1, r), Math.max(1, g), Math.max(1, b)] as const;
+  };
+  // Normalised against 6500K daylight, so neutral daylight casts neutral and
+  // only genuinely warm or cool light shifts the print.
+  const ref = black(6500);
+  const c = black(kelvin);
+  const rel = [0, 1, 2].map((i) => (c[i]! / ref[i]!) * 255);
   // Pulled toward white: this is an ambient cast laid over a print, not the
   // colour of the light itself, and brand colours must survive it.
-  const mix = (c: number) => clamp(c + (255 - c) * 0.55);
-  return `#${[mix(r), mix(g), mix(b)]
-    .map((c) => clamp(c).toString(16).padStart(2, "0"))
+  const mix = (v: number) => clamp(v + (255 - v) * 0.55);
+  return `#${rel
+    .map((v) => mix(v).toString(16).padStart(2, "0"))
     .join("")}`;
 }
 
