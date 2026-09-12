@@ -537,10 +537,11 @@ export function londonBrandingPlan(
     clearMm: logoH * 0.25,
     qr,
     placement: nudge,
-    // Booths that supplied branded artwork start clean; every other sign — a
-    // generated ground or an updated live file — starts with the house lockup
+    // A sign whose finished file already carries the mark starts clean — no
+    // second lockup over the top. Every other sign starts with the house lockup
     // placed and editable, so it can be moved, recoloured, turned or hidden.
-    lockupOn: nudge.lockup ?? !(isBoothPanel(panel) && !!londonBoothArtworkUrl(panel.id)),
+    lockupOn: nudge.lockup ?? !fileOwnsLockup,
+
   };
 }
 
