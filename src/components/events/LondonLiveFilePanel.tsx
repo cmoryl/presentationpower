@@ -140,7 +140,7 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
             Finished Illustrator file
             <input
               type="file"
-              accept=".ai,.pdf,application/pdf,application/postscript"
+              accept=".ai,.pdf,.eps,.svg,application/pdf,application/postscript,image/svg+xml"
               onChange={(e) => setMaster(e.target.files?.[0] ?? null)}
               className="mt-1 block w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-[12px] font-normal"
             />
