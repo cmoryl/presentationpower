@@ -192,10 +192,10 @@ export function sceneCaption(
 const SCENE_QUADS: Record<string, SceneQuad> = {
   // Floor graphics: laid flat, so the far edge is short and the near edge wide.
   "surface-floor-graphic": [
-    { x: 0.196, y: 0.383 },
-    { x: 0.788, y: 0.401 },
-    { x: 0.883, y: 0.799 },
-    { x: 0.061, y: 0.722 },
+    { x: 0.505, y: 0.345 },
+    { x: 0.925, y: 0.425 },
+    { x: 0.645, y: 0.855 },
+    { x: 0.048, y: 0.545 },
   ],
   "live-floor-graphic": [
     { x: 0.246, y: 0.506 },
@@ -211,10 +211,10 @@ const SCENE_QUADS: Record<string, SceneQuad> = {
     { x: 0.253, y: 0.498 },
   ],
   "live-tabletop": [
-    { x: 0.247, y: 0.601 },
-    { x: 0.723, y: 0.601 },
-    { x: 0.775, y: 0.723 },
-    { x: 0.196, y: 0.723 },
+    { x: 0.278, y: 0.572 },
+    { x: 0.688, y: 0.572 },
+    { x: 0.732, y: 0.762 },
+    { x: 0.234, y: 0.762 },
   ],
   // Desk and counter fronts: slight rake off the lens axis.
   "desk-front": [
@@ -388,10 +388,10 @@ export const LONDON_SCENES: LondonScene[] = [
   // Face rectangle = the bounding box of the measured floor quad, so the fit
   // and the warp describe the same physical surface.
   scene("surface-floor-graphic", "Floor graphic on carpet", "Foyer circulation floor", "floor", surfaceFloorGraphic, {
-    x: 0.061,
-    y: 0.383,
-    w: 0.822,
-    h: 0.416,
+    x: 0.048,
+    y: 0.345,
+    w: 0.877,
+    h: 0.51,
   }, "w", "center", "edge"),
   scene("surface-lift-doors", "Lift door wrap", "Lift lobby", "lift", surfaceLiftDoors, {
     x: 0.155,
@@ -436,10 +436,10 @@ export const LONDON_SCENES: LondonScene[] = [
     h: 0.3,
   }, "w", "center", "edge"), live: true },
   { ...scene("live-tabletop", "Table top · break in progress", "Catering tables · event live", "table", liveTabletop, {
-    x: 0.196,
-    y: 0.601,
-    w: 0.579,
-    h: 0.122,
+    x: 0.234,
+    y: 0.572,
+    w: 0.498,
+    h: 0.19,
   }, "w", "center", "edge"), live: true },
   { ...scene("live-registration-desk", "Registration desk in use", "Registration · event live", "desk", liveRegistrationDesk, {
     x: 0.135,
