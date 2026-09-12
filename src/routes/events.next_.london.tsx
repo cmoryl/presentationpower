@@ -37,7 +37,9 @@ import { useBoothTemplates } from "@/hooks/use-booth-templates";
 import { BoothTemplatePanel } from "@/components/events/BoothTemplatePanel";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { BoothRenderPreview } from "@/components/events/BoothRenderPreview";
+import { venueTemplateFor } from "@/lib/next-venue-templates";
 import { LondonLocationRenderPreview } from "@/components/events/LondonLocationRenderPreview";
+
 import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
 import {
   defaultSceneForPanel,
