@@ -122,6 +122,15 @@ function Stage({
       >
         {sceneCaption(scene, panel)}
       </span>
+      {leaves ? (
+        <span
+          data-export-ignore="true"
+          className="absolute right-2 top-2 max-w-[calc(100%-1rem)] rounded bg-black/55 px-2 py-1 font-mono text-[10px] text-white"
+        >
+          {doorLeafLabel(leaves)}
+        </span>
+      ) : null}
+
     </div>
   );
 }
