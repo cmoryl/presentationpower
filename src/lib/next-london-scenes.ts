@@ -61,6 +61,7 @@ import {
   type SceneFixedAxis,
   type SceneMountMode,
 } from "@/lib/scene-face-fit";
+import { quadFromRect, type SceneQuad } from "@/lib/scene-perspective";
 import type { LondonFloorId, LondonPanel } from "@/lib/next-london-signage";
 
 /** Fractional face rectangle on the plate (0..1 of plate width/height). */
@@ -313,6 +314,7 @@ function scene(
     fixed,
     anchorY,
     mount,
+    ...(SCENE_QUADS[id] ? { quad: SCENE_QUADS[id] } : {}),
     ...(floors ? { floors } : {}),
   };
 }
