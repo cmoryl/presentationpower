@@ -438,7 +438,9 @@ export const LONDON_SCENES: LondonScene[] = [
     y: 0.157,
     w: 0.082,
     h: 0.73,
-  }, "w", "center", "cover"), photo: true },
+  }, "w", "center", "cover"), photo: true,
+    // Measured off the supplied pillar drawing: 550 mm faces, 2500 mm high.
+    surface: { wMm: 550, hMm: 2500, note: "Four-sided pillar face, supplied drawing" } },
   { ...scene("ref-plenary-stage", "NEXT scenic stage wall", "Plenary stage · scenic back wall", "wall", refPlenaryStage, {
     x: 0.045,
     y: 0.045,
