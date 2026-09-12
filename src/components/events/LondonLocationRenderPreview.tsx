@@ -30,6 +30,8 @@ import {
   type LondonPanel,
 } from "@/lib/next-london-signage";
 import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
+import { SceneDoorLeaves } from "@/components/next/SceneDoorLeaves";
+import { doorLeafLabel, londonDoorSpec } from "@/lib/next-london-doors";
 
 export interface LondonLocationRenderPreviewProps {
   panel: LondonPanel;
@@ -49,7 +51,14 @@ function Stage({
   art: string | null;
   stageRef?: React.Ref<HTMLDivElement>;
 }) {
-  const box = useMemo(() => fitArtworkInFace(panel, scene), [panel, scene]);
+  const door = useMemo(() => londonDoorSpec(panel), [panel]);
+  // Double doors: mount on the measured opening and let each leaf carry its
+  // own sheet, with the shut line where it really falls.
+  const leaves = door && scene.kind === "door" ? door : null;
+  const box = useMemo(
+    () => (leaves ? scene.face : fitArtworkInFace(panel, scene)),
+    [leaves, panel, scene],
+  );
   // Applied vinyls cover their surface; hung items fill a box already cut to
   // the item's true trim ratio. Nothing is ever stretched.
   const fit = useMemo(() => sceneArtworkObjectFit(panel, scene), [panel, scene]);
@@ -74,7 +83,7 @@ function Stage({
           box={box}
           sceneId={scene.id}
           quad={scene.quad}
-          face={fit === "cover" ? undefined : scene.face}
+          face={leaves || fit === "cover" ? undefined : scene.face}
           substrate={
             <img
               src={art}
@@ -85,12 +94,20 @@ function Stage({
             />
           }
         >
-          <img
-            src={art}
-            alt={`${panel.name} installed as a ${scene.label.toLowerCase()}`}
-            className="absolute inset-0 h-full w-full"
-            style={{ objectFit: fit }}
-          />
+          {leaves ? (
+            <SceneDoorLeaves
+              spec={leaves}
+              art={art}
+              alt={`${panel.name} installed on ${leaves.leaves > 1 ? "double doors" : "the door"}`}
+            />
+          ) : (
+            <img
+              src={art}
+              alt={`${panel.name} installed as a ${scene.label.toLowerCase()}`}
+              className="absolute inset-0 h-full w-full"
+              style={{ objectFit: fit }}
+            />
+          )}
         </SceneArtworkPlate>
       ) : (
         <div className="absolute inset-0 grid place-items-center">
