@@ -99,17 +99,18 @@ export function parseLondonLiveFileLayers(
     if (!names.some((n) => n.toLowerCase() === name.toLowerCase())) names.push(name);
   };
 
-  // Optional-content groups — one per Illustrator layer in a PDF-compatible file.
-  const ocg = /\/Type\s*\/OCG[\s\S]{0,400}?|\/OCGs?[\s\S]{0,400}?/g;
-  for (const chunk of text.match(ocg) ?? []) {
-    const literal = chunk.match(/\/Name\s*\(((?:\\.|[^)])*)\)/);
-    if (literal?.[1]) push(literal[1]);
-    const hex = chunk.match(/\/Name\s*<([0-9A-Fa-f\s]+)>/);
-    if (hex?.[1]) push(fromHexString(hex[1]));
-  }
-  // A named group written without a nearby /Type /OCG still reads here.
-  for (const m of text.matchAll(/\/Name\s*\(((?:\\.|[^)])*)\)\s*(?:\/Type\s*\/OCG)/g)) {
-    if (m[1]) push(m[1]);
+  // Optional-content groups — one per Illustrator layer in a PDF-compatible
+  // file. The name can sit either side of the /OCG marker, so a window around
+  // each marker is scanned.
+  for (const match of text.matchAll(/\/OCG\b/g)) {
+    const from = Math.max(0, (match.index ?? 0) - 400);
+    const chunk = text.slice(from, (match.index ?? 0) + 400);
+    for (const name of chunk.matchAll(/\/Name\s*\(((?:\\.|[^)])*)\)/g)) {
+      if (name[1]) push(name[1]);
+    }
+    for (const name of chunk.matchAll(/\/Name\s*<([0-9A-Fa-f\s]+)>/g)) {
+      if (name[1]) push(fromHexString(name[1]));
+    }
   }
   // Legacy Illustrator layer records.
   for (const m of text.matchAll(/%AI\d?_?BeginLayer[^\n]*\n[^\n]*?\(((?:\\.|[^)])*)\)/g)) {
