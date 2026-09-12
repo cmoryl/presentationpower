@@ -93,7 +93,9 @@ function Stage({
         data-export-ignore="true"
         className="absolute bottom-2 left-2 rounded bg-black/55 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white"
       >
-        Visualisation · not a venue photo
+        {scene.photo
+          ? "Event photograph · artwork composited"
+          : "Visualisation · not a venue photo"}
       </span>
     </div>
   );
