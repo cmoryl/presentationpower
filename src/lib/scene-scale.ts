@@ -18,7 +18,7 @@
 // view as a scale check. Published venue metrics are used only as a sanity
 // bound (a print cannot be taller than the room it is in), never as a measured
 // surface size.
-import type { LondonPanel } from "@/lib/next-london-data";
+import type { LondonPanel } from "@/lib/next-london-signage";
 import { LONDON_DOOR_SPECS, doorOpeningSize, londonDoorSpec } from "@/lib/next-london-doors";
 import type { LondonScene } from "@/lib/next-london-scenes";
 import type { FaceRect } from "@/lib/scene-face-fit";
