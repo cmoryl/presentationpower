@@ -96,13 +96,9 @@ function Stage({
       )}
       <span
         data-export-ignore="true"
-        className="absolute bottom-2 left-2 rounded bg-black/55 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white"
+        className="absolute bottom-2 left-2 max-w-[calc(100%-1rem)] rounded bg-black/55 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white"
       >
-        {scene.photo
-          ? "Event photograph · artwork composited"
-          : scene.live
-            ? "Visualisation · event in progress, not a venue photo"
-            : "Visualisation · not a venue photo"}
+        {sceneCaption(scene, panel)}
       </span>
     </div>
   );
