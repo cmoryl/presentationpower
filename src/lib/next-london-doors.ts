@@ -125,7 +125,7 @@ export const LONDON_DOOR_SPECS: LondonDoorSpec[] = [
     note: "Single leaf: the supplied file holds one page only.",
   },
   {
-    match: "CHURCHILL DOOR VINYL",
+    match: "CHURCHILL DOUBLE DOOR",
     leaves: 2,
     leafW: [890, 890],
     leafH: 2200,
