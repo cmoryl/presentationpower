@@ -91,13 +91,15 @@ function LegalRefreshView() {
               Look &amp; feel
             </div>
             <h2 className="text-2xl font-semibold tracking-tight text-[#03002C]">
-              Four directions, four headlines
+              Eight directions, eight compositions
             </h2>
             <p className="max-w-2xl text-sm text-black/60">
-              Each direction carries one of the four approved headlines, so the playback shows the
-              copy and the design together. Switch between the commissioned photography and the
-              drawn version of the same idea.
+              Every direction has its own frame — where the copy sits, how the art is cropped and
+              how the footer reads all change, so this is eight designs rather than eight colourways
+              of one. Each carries one of the approved headlines. Switch between the commissioned
+              photography and the drawn version of the same idea.
             </p>
+
           </div>
           <div className="flex flex-wrap justify-end gap-1.5">
             {LEGAL_REFRESH_RENDER_MODES.map((m) => (
@@ -176,7 +178,14 @@ function LegalRefreshView() {
                     <dt className="font-semibold uppercase tracking-widest text-black/40">Type</dt>
                     <dd className="mt-0.5">{d.type}</dd>
                   </div>
+                  <div className="sm:col-span-2">
+                    <dt className="font-semibold uppercase tracking-widest text-black/40">
+                      Composition
+                    </dt>
+                    <dd className="mt-0.5">{d.layoutNote}</dd>
+                  </div>
                 </dl>
+
                 <div className="flex flex-wrap items-center gap-3 pt-1">
                   {(
                     [
