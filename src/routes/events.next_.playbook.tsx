@@ -103,6 +103,13 @@ function PlaybookPage() {
         >
           <ArrowLeft size={13} /> NEXT 2026 hub
         </Link>
+        <Link
+          to="/events/next/city"
+          className="ml-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#003FC7] hover:underline"
+        >
+          <MapPin size={13} /> Start the next city
+        </Link>
+
 
         <div className="mt-3">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E0E8F5] px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
