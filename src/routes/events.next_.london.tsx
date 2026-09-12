@@ -309,10 +309,16 @@ function PanelThumb({
         <img
           src={art ?? boothArt}
           alt={`${panel.room} — ${panel.name}, supplied artwork`}
-          className="absolute inset-0 h-full w-full object-cover"
+          // The generated master places supplied artwork across the whole bleed
+          // box (preserveAspectRatio="none"), so the card paints it the same way
+          // — otherwise a cropped proof sits out of register with the layers
+          // drawn on top of it.
+          className="absolute inset-0 h-full w-full"
+          style={{ objectFit: "fill" }}
           loading="lazy"
         />
       ) : null}
+
       {svgUrl ? (
         <img
           src={svgUrl}

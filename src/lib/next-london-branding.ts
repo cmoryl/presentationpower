@@ -13,6 +13,7 @@
 // follows what the London location team asked for on each item.
 
 import { londonSuppliedGroundUrl } from "@/lib/next-london-supplied-masters";
+import { londonFileOwnsLayer } from "@/lib/next-london-live-layers";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
   pickNextLogo,
@@ -293,9 +294,23 @@ export function londonBrandingPlan(
   // copy for every slot, and both stay fully editable on top.
   const native =
     londonBoothNativeTemplate(panel.id) ?? londonBespokeNativeTemplate(panel.id);
+  // A hand-finished live file is already typeset. Whatever layer it carries is
+  // NOT drawn a second time on top — that is what doubled the lockup and the
+  // headline on the preview cards. The designer can hand any layer back to the
+  // editor (see next-london-live-layers.ts) and it returns as an editable layer.
+  const finishedFile = !!(londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id));
+  const fileOwnsLockup = finishedFile && londonFileOwnsLayer(panel.id, "lockup");
+  const fileOwnsCopy = finishedFile && londonFileOwnsLayer(panel.id, "copy");
   const authored =
-    nudge.text === null ? (native ? native.headline || null : pickCopy(panel)) : nudge.text.trim() || null;
+    nudge.text === null
+      ? fileOwnsCopy
+        ? null
+        : native
+          ? native.headline || null
+          : pickCopy(panel)
+      : nudge.text.trim() || null;
   const copy = authored;
+
   const centreX = marginX + panel.trimW / 2 - logoW / 2;
 
   // Stacked lockups sit on the upper third; horizontal lockups ride the lower
@@ -523,10 +538,11 @@ export function londonBrandingPlan(
     clearMm: logoH * 0.25,
     qr,
     placement: nudge,
-    // Booths that supplied branded artwork start clean; every other sign — a
-    // generated ground or an updated live file — starts with the house lockup
+    // A sign whose finished file already carries the mark starts clean — no
+    // second lockup over the top. Every other sign starts with the house lockup
     // placed and editable, so it can be moved, recoloured, turned or hidden.
-    lockupOn: nudge.lockup ?? !(isBoothPanel(panel) && !!londonBoothArtworkUrl(panel.id)),
+    lockupOn: nudge.lockup ?? !fileOwnsLockup,
+
   };
 }
 

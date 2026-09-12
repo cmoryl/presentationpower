@@ -89,7 +89,8 @@ export function LondonPanelThumb({ panel: input, size = 72, className, onOpen }:
             aria-hidden="true"
             loading="lazy"
             decoding="async"
-            className="absolute inset-0 h-full w-full object-contain"
+            className="absolute inset-0 h-full w-full"
+            style={{ objectFit: "fill" }}
           />
         ) : null}
         {src ? (

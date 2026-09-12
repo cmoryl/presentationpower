@@ -19,6 +19,11 @@ import {
   retireLondonLiveFile,
 } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles, useLondonLiveFiles } from "@/lib/next-london-live-files";
+import { LondonLiveLayersPanel } from "@/components/events/LondonLiveLayersPanel";
+import {
+  parseLondonLiveFileLayers,
+  setLondonLiveLayers,
+} from "@/lib/next-london-live-layers";
 import type { LondonPanel } from "@/lib/next-london-signage";
 
 const BUCKET = "london-live-files";
@@ -83,6 +88,17 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
           note: note.trim() || null,
         },
       });
+      // Read the layers out of the finished file, so the kit knows what the file
+      // already carries and never paints its own logo or wording over the top.
+      try {
+        setLondonLiveLayers(
+          panel.id,
+          `${master.name}@${version}`,
+          parseLondonLiveFileLayers(await master.arrayBuffer(), master.name),
+        );
+      } catch {
+        /* an unreadable file is still a finished file */
+      }
       setMaster(null);
       setProof(null);
       setNote("");
@@ -198,6 +214,13 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
           </div>
         </div>
       ) : null}
+
+      <LondonLiveLayersPanel
+        panel={panel}
+        fileUrl={inForce?.masterUrl ?? null}
+        fileKey={inForce ? `${inForce.filename}@${inForce.version}` : null}
+        className="mt-4"
+      />
     </div>
   );
 }

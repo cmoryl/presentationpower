@@ -39,6 +39,7 @@ import { LondonPrintGuides, LondonPrintReadout } from "@/components/london/Londo
 import { StepRepeatWallPanel } from "@/components/events/StepRepeatWallPanel";
 import { isStepRepeatPanel, mmToIn, useStepRepeatConfigs } from "@/lib/next-london-step-repeat";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
+import { useLondonLiveLayerMap } from "@/lib/next-london-live-layers";
 import {
   buildLondonPanelAiAsync,
   buildLondonPanelPrintPdfAsync,
@@ -199,7 +200,11 @@ export function LondonPanelLiveEditor({
 
   const placedArtMap = useLondonPlacedArt();
   const placedArt = placedArtMap[panel.id] ?? null;
-  const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
+  // Handing a layer back to the editor (or back to the finished file) changes
+  // which layers are generated, so the plan is recomputed with it.
+  const liveLayers = useLondonLiveLayerMap();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement, liveLayers]);
   // Every live edit this editor holds travels with the export: the wall recipe
   // (QR tiles included), the lockup placement and the board size. Leaving any of
   // them out made a direct download fall back to whatever was last published.
