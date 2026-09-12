@@ -871,7 +871,9 @@ export function fitArtworkInFace(
   // Where the surface has actually been measured, the print goes on at its true
   // fraction of that surface, so the render agrees with the spec sheet. An
   // unmeasured surface keeps the honest fill-the-fixed-edge behaviour.
-  if (sc) {
+  // An applied vinyl IS the surface — its print equals the face by definition,
+  // so true-scale placement does not apply and must not shrink it.
+  if (sc && sc.mount !== "cover") {
     const surface = measuredSurface(sc, panel);
     if (surface) {
       const scaled = scaleTrueBox({
