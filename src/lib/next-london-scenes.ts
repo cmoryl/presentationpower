@@ -286,7 +286,7 @@ function hintedKinds(panel: LondonPanel): SceneKind[] {
   if (/lift|elevator/.test(t)) push("lift");
   if (/glass|glazing|balustrade|stair/.test(t)) push("glass");
   if (/table ?top|tabletop|bistro|poseur|cafe table/.test(t)) push("table");
-  if (/step[- ]?(and[- ])?repeat|press wall|photo (wall|point|call)/.test(t)) push("wall");
+  if (/step\s*(&|and|-)?\s*repeat|press wall|photo (wall|point|call)/.test(t)) push("wall");
   if (/door|vinyl/.test(t)) push("door");
   if (/stage|fascia|plenar|podium|lectern/.test(t)) push("fascia");
   if (/desk|registration|check-?in|counter/.test(t)) push("desk");
