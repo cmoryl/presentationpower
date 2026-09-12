@@ -285,7 +285,7 @@ export function LondonLocationRenderPreview({
               type="button"
               onClick={() => setSceneId(s.id)}
               aria-pressed={s.id === scene.id}
-              title={s.where}
+              title={`${s.where} · ${sceneCaption(s, panel)}`}
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold transition ${
                 s.id === scene.id
                   ? "bg-[#03002C] text-white"
