@@ -295,6 +295,24 @@ export function LondonLocationRenderPreview({
               }`}
             >
               <ImageIcon className="h-3 w-3" /> {s.label}
+              {s.photo ? (
+                <span
+                  className={`rounded-full px-1.5 py-px font-mono text-[9.5px] uppercase tracking-[0.08em] ${
+                    s.id === scene.id ? "bg-white/20 text-white" : "bg-[#03002C]/10 text-[#03002C]"
+                  }`}
+                >
+                  Photo
+                </span>
+              ) : null}
+              {sceneSurfaceLabel(s) ? (
+                <span
+                  className={`font-mono text-[9.5px] tracking-[0.04em] ${
+                    s.id === scene.id ? "text-white/75" : "text-[#03002C]/60"
+                  }`}
+                >
+                  {sceneSurfaceLabel(s)}
+                </span>
+              ) : null}
               {here ? (
                 <span
                   className={`rounded-full px-1.5 py-px font-mono text-[9.5px] uppercase tracking-[0.08em] ${
