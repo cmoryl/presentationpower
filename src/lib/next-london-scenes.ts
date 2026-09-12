@@ -325,7 +325,7 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
       // Purpose-built surfaces (floor, lift, glass, table) are only offered
       // first when the item is actually that kind of install.
       const specialised =
-        !kindOk && SPECIALISED_KINDS.includes(s.kind) ? 3 : 0;
+        hint < 0 && SPECIALISED_KINDS.includes(s.kind) ? 3 : 0;
       return {
         s,
         score:
