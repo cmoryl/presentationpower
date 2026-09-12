@@ -18,6 +18,7 @@ import { getDivisionLogos } from "@/lib/division-logos";
 import {
   LEGAL_REFRESH_CONCEPT,
   legalRefreshFinish,
+  legalRefreshModeIsDark,
   legalRefreshModeUsesPhoto,
   type LegalRefreshFinish,
   type LegalRefreshDirection,
@@ -31,27 +32,106 @@ import photoTrail from "@/assets/legal-refresh/v2-paper-trail.jpg";
 import photoCut from "@/assets/legal-refresh/v2-cut-through.jpg";
 import photoFine from "@/assets/legal-refresh/v2-fine-print.jpg";
 import photoMaze from "@/assets/legal-refresh/v2-the-maze.jpg";
+import cineThorn from "@/assets/legal-refresh/cine-thorn-line.jpg";
+import cineRedacted from "@/assets/legal-refresh/cine-redacted.jpg";
+import cineKnot from "@/assets/legal-refresh/cine-the-knot.jpg";
+import cineThicket from "@/assets/legal-refresh/cine-thicket-type.jpg";
+import cineTrail from "@/assets/legal-refresh/cine-paper-trail.jpg";
+import cineCut from "@/assets/legal-refresh/cine-cut-through.jpg";
+import cineFine from "@/assets/legal-refresh/cine-fine-print.jpg";
+import cineMaze from "@/assets/legal-refresh/cine-the-maze.jpg";
+import inkThorn from "@/assets/legal-refresh/ink-thorn-line.jpg";
+import inkRedacted from "@/assets/legal-refresh/ink-redacted.jpg";
+import inkKnot from "@/assets/legal-refresh/ink-the-knot.jpg";
+import inkThicket from "@/assets/legal-refresh/ink-thicket-type.jpg";
+import inkTrail from "@/assets/legal-refresh/ink-paper-trail.jpg";
+import inkCut from "@/assets/legal-refresh/ink-cut-through.jpg";
+import inkFine from "@/assets/legal-refresh/ink-fine-print.jpg";
+import inkMaze from "@/assets/legal-refresh/ink-the-maze.jpg";
+import risoThorn from "@/assets/legal-refresh/riso-thorn-line.jpg";
+import risoRedacted from "@/assets/legal-refresh/riso-redacted.jpg";
+import risoKnot from "@/assets/legal-refresh/riso-the-knot.jpg";
+import risoThicket from "@/assets/legal-refresh/riso-thicket-type.jpg";
+import risoTrail from "@/assets/legal-refresh/riso-paper-trail.jpg";
+import risoCut from "@/assets/legal-refresh/riso-cut-through.jpg";
+import risoFine from "@/assets/legal-refresh/riso-fine-print.jpg";
+import risoMaze from "@/assets/legal-refresh/riso-the-maze.jpg";
+import collageThorn from "@/assets/legal-refresh/collage-thorn-line.jpg";
+import collageRedacted from "@/assets/legal-refresh/collage-redacted.jpg";
+import collageKnot from "@/assets/legal-refresh/collage-the-knot.jpg";
+import collageThicket from "@/assets/legal-refresh/collage-thicket-type.jpg";
+import collageTrail from "@/assets/legal-refresh/collage-paper-trail.jpg";
+import collageCut from "@/assets/legal-refresh/collage-cut-through.jpg";
+import collageFine from "@/assets/legal-refresh/collage-fine-print.jpg";
+import collageMaze from "@/assets/legal-refresh/collage-the-maze.jpg";
 
 /**
- * Commissioned campaign photography: real people in real, slightly absurd
- * everyday situations. Wry rather than beaming, no devices in hand, no gavels or
- * scales, no blue overlay — so the brief's forbidden list still holds while the
- * campaign gets its human warmth and its joke.
+ * One commissioned artwork set per concept. Each set covers all eight
+ * directions in its own medium — a cinematic film still, an ink-and-wash
+ * drawing, a two-ink riso print, a cut-paper collage — so switching concept
+ * changes the artwork itself, not a filter over one photograph.
  */
-const PHOTOS: Record<string, string> = {
-  "thorn-line": photoThorn,
-  redacted: photoRedacted,
-  "the-knot": photoKnot,
-  "thicket-type": photoThicket,
-  "paper-trail": photoTrail,
-  "cut-through": photoCut,
-  "fine-print": photoFine,
-  "the-maze": photoMaze,
+const ART: Record<Exclude<LegalRefreshRenderMode, "drawn">, Record<string, string>> = {
+  photo: {
+    "thorn-line": photoThorn,
+    redacted: photoRedacted,
+    "the-knot": photoKnot,
+    "thicket-type": photoThicket,
+    "paper-trail": photoTrail,
+    "cut-through": photoCut,
+    "fine-print": photoFine,
+    "the-maze": photoMaze,
+  },
+  cinematic: {
+    "thorn-line": cineThorn,
+    redacted: cineRedacted,
+    "the-knot": cineKnot,
+    "thicket-type": cineThicket,
+    "paper-trail": cineTrail,
+    "cut-through": cineCut,
+    "fine-print": cineFine,
+    "the-maze": cineMaze,
+  },
+  ink: {
+    "thorn-line": inkThorn,
+    redacted: inkRedacted,
+    "the-knot": inkKnot,
+    "thicket-type": inkThicket,
+    "paper-trail": inkTrail,
+    "cut-through": inkCut,
+    "fine-print": inkFine,
+    "the-maze": inkMaze,
+  },
+  riso: {
+    "thorn-line": risoThorn,
+    redacted: risoRedacted,
+    "the-knot": risoKnot,
+    "thicket-type": risoThicket,
+    "paper-trail": risoTrail,
+    "cut-through": risoCut,
+    "fine-print": risoFine,
+    "the-maze": risoMaze,
+  },
+  collage: {
+    "thorn-line": collageThorn,
+    redacted: collageRedacted,
+    "the-knot": collageKnot,
+    "thicket-type": collageThicket,
+    "paper-trail": collageTrail,
+    "cut-through": collageCut,
+    "fine-print": collageFine,
+    "the-maze": collageMaze,
+  },
 };
 
-export function legalRefreshPhoto(directionId: string): string | undefined {
-  return PHOTOS[directionId];
+export function legalRefreshPhoto(
+  directionId: string,
+  mode: LegalRefreshRenderMode = "photo",
+): string | undefined {
+  if (mode === "drawn") return undefined;
+  return ART[mode]?.[directionId];
 }
+
 
 type Props = {
   direction: LegalRefreshDirection;
