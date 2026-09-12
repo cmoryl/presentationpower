@@ -20,6 +20,12 @@ import liveRegistrationDesk from "@/assets/london-scenes/live-registration-desk.
 import liveCoffeeBar from "@/assets/london-scenes/live-coffee-bar.jpg";
 import liveFoyerColumn from "@/assets/london-scenes/live-foyer-column.jpg";
 import liveStageFascia from "@/assets/london-scenes/live-stage-fascia.jpg";
+import liveRoomDoors from "@/assets/london-scenes/live-room-doors.jpg";
+import liveScenicWall from "@/assets/london-scenes/live-scenic-wall.jpg";
+import liveFoyerWallRun from "@/assets/london-scenes/live-foyer-wall-run.jpg";
+import liveBreakoutPanel from "@/assets/london-scenes/live-breakout-panel.jpg";
+import livePortraitBanner from "@/assets/london-scenes/live-portrait-banner.jpg";
+import liveExteriorEntrance from "@/assets/london-scenes/live-exterior-entrance.jpg";
 import surfaceFloorGraphic from "@/assets/london-scenes/surface-floor-graphic.jpg";
 import surfaceLiftDoors from "@/assets/london-scenes/surface-lift-doors.jpg";
 import surfaceStairGlass from "@/assets/london-scenes/surface-stair-glass.jpg";
