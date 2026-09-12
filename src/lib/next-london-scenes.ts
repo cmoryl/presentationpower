@@ -295,6 +295,76 @@ const SCENE_QUADS: Record<string, SceneQuad> = {
   ],
 };
 
+/**
+ * Measured faces on the genuine QEII Centre photographs (venue event
+ * photography). Read off each plate against a twentieth grid, so artwork lands
+ * on the real printed face and rakes with the real surface.
+ */
+const QEII_PHOTO_QUADS: Record<string, SceneQuad> = {
+  "photo-foyer-wall-run": [
+    { x: 0.048, y: 0.212 },
+    { x: 0.47, y: 0.238 },
+    { x: 0.47, y: 0.7 },
+    { x: 0.048, y: 0.735 },
+  ],
+  "photo-plenary-fascia": [
+    { x: 0.015, y: 0.035 },
+    { x: 0.99, y: 0.02 },
+    { x: 0.99, y: 0.555 },
+    { x: 0.015, y: 0.565 },
+  ],
+  "photo-exhibition-foyer": [
+    { x: 0.012, y: 0.252 },
+    { x: 0.335, y: 0.293 },
+    { x: 0.335, y: 0.62 },
+    { x: 0.012, y: 0.66 },
+  ],
+  "photo-thirdfloor-wall": [
+    { x: 0.117, y: 0.212 },
+    { x: 0.963, y: 0.222 },
+    { x: 0.963, y: 0.723 },
+    { x: 0.117, y: 0.728 },
+  ],
+  "photo-exhibition-stand": [
+    { x: 0.118, y: 0.3 },
+    { x: 0.375, y: 0.335 },
+    { x: 0.375, y: 0.655 },
+    { x: 0.118, y: 0.665 },
+  ],
+  "photo-cafe-tabletop": [
+    { x: 0.265, y: 0.665 },
+    { x: 0.575, y: 0.665 },
+    { x: 0.6, y: 0.8 },
+    { x: 0.24, y: 0.8 },
+  ],
+  "photo-sanctuary-counter": [
+    { x: 0.02, y: 0.44 },
+    { x: 0.6, y: 0.37 },
+    { x: 0.6, y: 0.5 },
+    { x: 0.02, y: 0.84 },
+  ],
+  "photo-facade-evening": [
+    { x: 0.235, y: 0.795 },
+    { x: 0.815, y: 0.79 },
+    { x: 0.815, y: 0.855 },
+    { x: 0.235, y: 0.862 },
+  ],
+  "photo-churchill-stage": [
+    { x: 0.258, y: 0.418 },
+    { x: 0.712, y: 0.418 },
+    { x: 0.712, y: 0.523 },
+    { x: 0.258, y: 0.523 },
+  ],
+  "photo-lounge-panel": [
+    { x: 0.118, y: 0.365 },
+    { x: 0.255, y: 0.378 },
+    { x: 0.255, y: 0.815 },
+    { x: 0.118, y: 0.83 },
+  ],
+};
+
+Object.assign(SCENE_QUADS, QEII_PHOTO_QUADS);
+
 /** Measured face quad for a scene, or the plain face rectangle. */
 export function sceneQuad(scene: LondonScene): SceneQuad {
   return scene.quad ?? quadFromRect(scene.face);
