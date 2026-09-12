@@ -299,13 +299,20 @@ function PlaybookPage() {
         </ul>
 
         <h2 className="mt-10 text-lg font-semibold tracking-tight text-[#03002C]">
-          How every view is lit
+          How every view is lit and placed in space
         </h2>
         <p className="mt-1 text-[13px] text-black/60">
           Each view carries a photographer's read of its space: time of day, colour temperature of the
           dominant light, and how hard it is. Shadow direction follows the light's bearing and shadow
           length follows its height, so the same warm foyer or stage wash looks the same at every
           venue in the NEXT ecosystem.
+        </p>
+        <p className="mt-2 text-[13px] text-black/60">
+          Each view also records where the camera stood. The surface's own converging edges give the
+          horizon, so the lens height and tilt are read from the picture rather than guessed. The end
+          of a print that runs deeper into the room is drawn slightly hazier, slightly darker and
+          slightly softer than the near end, because that is what distance does — a print treated
+          evenly across a raked surface always reads as pasted on.
         </p>
         <ul className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
           {LONDON_SCENES.map((scene) => {
