@@ -41,6 +41,7 @@ import { venueTemplateFor } from "@/lib/next-venue-templates";
 import { LondonLocationRenderPreview } from "@/components/events/LondonLocationRenderPreview";
 
 import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
+import { SceneEventScreens } from "@/components/next/SceneEventScreens";
 import { SceneDoorLeaves } from "@/components/next/SceneDoorLeaves";
 import { londonDoorSpec } from "@/lib/next-london-doors";
 import {
