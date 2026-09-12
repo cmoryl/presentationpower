@@ -863,6 +863,22 @@ export function fitArtworkInFace(
   sceneOrId: LondonScene | string,
 ): SceneFace {
   const sc = typeof sceneOrId === "string" ? londonScene(sceneOrId) : sceneOrId;
+  // Where the surface has actually been measured, the print goes on at its true
+  // fraction of that surface, so the render agrees with the spec sheet. An
+  // unmeasured surface keeps the honest fill-the-fixed-edge behaviour.
+  if (sc) {
+    const surface = measuredSurface(sc, panel);
+    if (surface) {
+      const scaled = scaleTrueBox({
+        face: sc.face,
+        plate: sc.plate,
+        panel,
+        surface,
+        anchorY: sc.anchorY,
+      });
+      if (scaled) return scaled;
+    }
+  }
   return mountArtworkOnFace({
     face: sc?.face ?? { x: 0, y: 0, w: 1, h: 1 },
     plate: sc?.plate ?? { w: 1536, h: 1024 },
