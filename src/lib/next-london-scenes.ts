@@ -178,6 +178,34 @@ export const LONDON_SCENES: LondonScene[] = [
     h: 0.4551,
   }, "w", "top"),
 
+  // ── Surface-specific plates ──────────────────────────────────────────────
+  // Kinds that have no wall to sit on: a floor graphic laid on carpet, a lift
+  // door pair, applied stair balustrade glass, and a cafe table top.
+  scene("surface-floor-graphic", "Floor graphic on carpet", "Foyer circulation floor", "floor", surfaceFloorGraphic, {
+    x: 0.13,
+    y: 0.36,
+    w: 0.75,
+    h: 0.48,
+  }, "w", "center", "cover"),
+  scene("surface-lift-doors", "Lift door wrap", "Lift lobby", "lift", surfaceLiftDoors, {
+    x: 0.155,
+    y: 0.175,
+    w: 0.23,
+    h: 0.615,
+  }, "w", "center", "cover"),
+  scene("surface-stair-glass", "Stair balustrade glass", "Stair glazing", "glass", surfaceStairGlass, {
+    x: 0.13,
+    y: 0.22,
+    w: 0.72,
+    h: 0.55,
+  }, "w", "center", "cover"),
+  scene("surface-tabletop", "Cafe table top", "Catering / lounge tables", "table", surfaceTabletop, {
+    x: 0.22,
+    y: 0.09,
+    w: 0.56,
+    h: 0.6,
+  }, "w", "center", "cover"),
+
   // ── Floor-specific plates ────────────────────────────────────────────────
   // One space per mapped floor of the venue, matched to the room roster and
   // the install faces on that level, so an item can be previewed in the space
@@ -249,6 +277,10 @@ function hintedKinds(panel: LondonPanel): SceneKind[] {
   const push = (k: SceneKind) => {
     if (!out.includes(k)) out.push(k);
   };
+  if (/floor (graphic|vinyl|sticker|decal|tile)|floor-?graphic/.test(t)) push("floor");
+  if (/lift|elevator/.test(t)) push("lift");
+  if (/glass|glazing|balustrade|stair/.test(t)) push("glass");
+  if (/table ?top|tabletop|bistro|poseur|cafe table/.test(t)) push("table");
   if (/step|repeat|press|photo/.test(t)) push("wall");
   if (/door|vinyl/.test(t)) push("door");
   if (/stage|fascia|plenar|podium|lectern/.test(t)) push("fascia");
