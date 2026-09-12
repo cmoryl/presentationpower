@@ -18,7 +18,12 @@ import {
   LONDON_VENUE,
   type LondonPanel,
 } from "@/lib/next-london-signage";
-import { LONDON_SCENES, sceneProvenance, sceneSurfaceLabel } from "@/lib/next-london-scenes";
+import {
+  LONDON_SCENES,
+  sceneProvenance,
+  sceneQuad,
+  sceneSurfaceLabel,
+} from "@/lib/next-london-scenes";
 import { lightQualityLabel, sceneLightQuality } from "@/lib/scene-lighting";
 import { sceneSpace, spaceLabel } from "@/lib/scene-space";
 import {

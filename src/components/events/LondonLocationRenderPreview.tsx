@@ -21,6 +21,7 @@ import {
   sceneCaption,
   sceneDimensionsLabel,
   sceneProvenanceLabel,
+  sceneQuad,
   sceneSurfaceLabel,
   scenesForPanel,
   type LondonScene,
