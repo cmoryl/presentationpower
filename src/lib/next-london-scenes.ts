@@ -12,6 +12,14 @@
 // the venue. Every surface that shows them must label them as visualisations.
 
 import coffeeBar from "@/assets/london-scenes/coffee-bar.jpg";
+import liveFloorGraphic from "@/assets/london-scenes/live-floor-graphic.jpg";
+import liveLiftLobby from "@/assets/london-scenes/live-lift-lobby.jpg";
+import liveStairGlass from "@/assets/london-scenes/live-stair-glass.jpg";
+import liveTabletop from "@/assets/london-scenes/live-tabletop.jpg";
+import liveRegistrationDesk from "@/assets/london-scenes/live-registration-desk.jpg";
+import liveCoffeeBar from "@/assets/london-scenes/live-coffee-bar.jpg";
+import liveFoyerColumn from "@/assets/london-scenes/live-foyer-column.jpg";
+import liveStageFascia from "@/assets/london-scenes/live-stage-fascia.jpg";
 import surfaceFloorGraphic from "@/assets/london-scenes/surface-floor-graphic.jpg";
 import surfaceLiftDoors from "@/assets/london-scenes/surface-lift-doors.jpg";
 import surfaceStairGlass from "@/assets/london-scenes/surface-stair-glass.jpg";
