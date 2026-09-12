@@ -418,10 +418,10 @@ export const LONDON_SCENES: LondonScene[] = [
   // walking, queueing and networking around the install, with the printed face
   // itself kept clear so nothing crosses the artwork.
   { ...scene("live-floor-graphic", "Floor graphic · foyer in use", "Foyer circulation floor · event live", "floor", liveFloorGraphic, {
-    x: 0.17,
-    y: 0.5,
-    w: 0.7,
-    h: 0.33,
+    x: 0.134,
+    y: 0.506,
+    w: 0.722,
+    h: 0.293,
   }, "w", "center", "edge"), live: true },
   { ...scene("live-lift-lobby", "Lift wrap · lift lobby in use", "Lift lobby · event live", "lift", liveLiftLobby, {
     x: 0.105,
@@ -436,10 +436,10 @@ export const LONDON_SCENES: LondonScene[] = [
     h: 0.3,
   }, "w", "center", "edge"), live: true },
   { ...scene("live-tabletop", "Table top · break in progress", "Catering tables · event live", "table", liveTabletop, {
-    x: 0.19,
-    y: 0.545,
-    w: 0.59,
-    h: 0.28,
+    x: 0.196,
+    y: 0.601,
+    w: 0.579,
+    h: 0.122,
   }, "w", "center", "edge"), live: true },
   { ...scene("live-registration-desk", "Registration desk in use", "Registration · event live", "desk", liveRegistrationDesk, {
     x: 0.135,
