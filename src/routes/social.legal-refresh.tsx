@@ -97,9 +97,11 @@ function LegalRefreshView() {
             <p className="max-w-2xl text-sm text-black/60">
               Every direction has its own frame — where the copy sits, how the art is cropped and
               how the footer reads all change, so this is eight designs rather than eight colourways
-              of one. Each carries one of the approved headlines. Switch between the commissioned
-              photography and the drawn version of the same idea.
+              of one. Each carries one of the approved headlines. Switch art concept to see the same
+              eight ideas as photography, cinematic film stills, hand-drawn ink and wash, two-ink
+              riso print, cut-paper collage, or the drawn device alone.
             </p>
+
 
           </div>
           <div className="flex flex-wrap justify-end gap-1.5">
@@ -172,17 +174,19 @@ function LegalRefreshView() {
                 <dl className="grid gap-2 text-xs text-black/65 sm:grid-cols-2">
                   <div>
                     <dt className="font-semibold uppercase tracking-widest text-black/40">
-                      {legalRefreshModeUsesPhoto(mode) ? "Image" : "Device"}
+                      {legalRefreshModeUsesPhoto(mode) ? "Artwork" : "Device"}
                     </dt>
                     <dd className="mt-0.5">
                       {legalRefreshModeUsesPhoto(mode) ? d.photo.note : d.motifNote}
-                      {legalRefreshModeUsesPhoto(mode) && mode !== "photo" ? (
+                      {legalRefreshModeUsesPhoto(mode) ? (
                         <span className="block text-black/45">
-                          Finish: {LEGAL_REFRESH_RENDER_MODES.find((m) => m.id === mode)?.note}
+                          {LEGAL_REFRESH_RENDER_MODES.find((m) => m.id === mode)?.label}:{" "}
+                          {LEGAL_REFRESH_RENDER_MODES.find((m) => m.id === mode)?.note}
                         </span>
                       ) : null}
                     </dd>
                   </div>
+
                   <div>
                     <dt className="font-semibold uppercase tracking-widest text-black/40">Type</dt>
                     <dd className="mt-0.5">{d.type}</dd>
