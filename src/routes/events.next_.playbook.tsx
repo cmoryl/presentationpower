@@ -20,6 +20,7 @@ import {
 } from "@/lib/next-london-signage";
 import { LONDON_SCENES, sceneProvenance, sceneSurfaceLabel } from "@/lib/next-london-scenes";
 import { lightQualityLabel, sceneLightQuality } from "@/lib/scene-lighting";
+import { sceneSpace, spaceLabel } from "@/lib/scene-space";
 import {
   NEXT_VENUE_TEMPLATES,
   venueTemplateAudit,
@@ -316,6 +317,9 @@ function PlaybookPage() {
                 <span className="mt-0.5 block font-mono text-[10px] text-black/40">
                   light {Math.round(q.azimuth)}° bearing · {Math.round(q.elevation)}° high · shadow{" "}
                   {q.shadowLength.toFixed(2)}× height
+                </span>
+                <span className="mt-0.5 block text-[11px] text-black/45">
+                  {spaceLabel(sceneSpace(sceneQuad(scene)))}
                 </span>
               </li>
             );

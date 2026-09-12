@@ -14,6 +14,7 @@ import { useLondonLivePanel } from "@/hooks/use-london-live-panel";
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { buildLondonPanelSvg, type LondonArtOptions } from "@/lib/next-london-revise";
 import { lightQualityLabel, sceneLightQuality } from "@/lib/scene-lighting";
+import { sceneSpace, spaceLabel } from "@/lib/scene-space";
 import {
   fitArtworkInFace,
   sceneArtworkObjectFit,
@@ -130,6 +131,8 @@ function Stage({
         className="absolute bottom-2 right-2 max-w-[calc(100%-1rem)] rounded bg-black/45 px-2 py-1 font-mono text-[10px] text-white/90"
       >
         {lightQualityLabel(sceneLightQuality(scene.id))}
+        {" · "}
+        {spaceLabel(sceneSpace(sceneQuad(scene)))}
       </span>
       {leaves ? (
         <span
