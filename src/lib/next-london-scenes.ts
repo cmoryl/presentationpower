@@ -146,7 +146,7 @@ export const LONDON_SCENES: LondonScene[] = [
     y: 0.0996,
     w: 0.1914,
     h: 0.8213,
-  }, "w", "center", "cover"),
+  }, "w", "center", "edge"),
   scene("step-repeat", "Step-and-repeat wall", "Press / photo point", "wall", stepRepeat, {
     x: 0.1061,
     y: 0.1221,
@@ -186,13 +186,13 @@ export const LONDON_SCENES: LondonScene[] = [
     y: 0.36,
     w: 0.75,
     h: 0.48,
-  }, "w", "center", "cover"),
+  }, "w", "center", "edge"),
   scene("surface-lift-doors", "Lift door wrap", "Lift lobby", "lift", surfaceLiftDoors, {
     x: 0.155,
     y: 0.175,
     w: 0.23,
     h: 0.615,
-  }, "w", "center", "cover"),
+  }, "w", "center", "edge"),
   scene("surface-stair-glass", "Stair balustrade glass", "Stair glazing", "glass", surfaceStairGlass, {
     x: 0.13,
     y: 0.22,
