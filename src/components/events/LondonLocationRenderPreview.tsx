@@ -13,6 +13,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLondonLivePanel } from "@/hooks/use-london-live-panel";
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { buildLondonPanelSvg, type LondonArtOptions } from "@/lib/next-london-revise";
+import { lightQualityLabel, sceneLightQuality } from "@/lib/scene-lighting";
 import {
   fitArtworkInFace,
   sceneArtworkObjectFit,
