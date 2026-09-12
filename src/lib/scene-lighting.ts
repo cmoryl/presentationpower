@@ -28,6 +28,17 @@ export interface SceneLighting {
   sheen: number;
   /** Substrate: flat prints sit flush, panels get a thin edge reveal. */
   edge: "flush" | "reveal";
+  /**
+   * Photographic finish. A print composited at full digital cleanliness reads
+   * as a screenshot dropped into a photo, so it takes the plate's own camera
+   * character: sensor grain, a hair of lens softness (more on surfaces further
+   * from the lens), and bounce light coming back off the floor.
+   */
+  grain: number;
+  /** Lens/print softness in px at a 1536px-wide plate. */
+  softness: number;
+  /** Light bounced up into the print from the floor, 0..1. */
+  bounce: number;
 }
 
 const DEFAULT_LIGHTING: SceneLighting = {
@@ -39,6 +50,9 @@ const DEFAULT_LIGHTING: SceneLighting = {
   contact: 0.3,
   sheen: 0.06,
   edge: "reveal",
+  grain: 0.055,
+  softness: 0.35,
+  bounce: 0.06,
 };
 
 /**
