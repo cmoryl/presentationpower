@@ -61,6 +61,7 @@ import {
   type SceneFixedAxis,
   type SceneMountMode,
 } from "@/lib/scene-face-fit";
+import { quadFromRect, type SceneQuad } from "@/lib/scene-perspective";
 import type { LondonFloorId, LondonPanel } from "@/lib/next-london-signage";
 
 /** Fractional face rectangle on the plate (0..1 of plate width/height). */
@@ -108,6 +109,13 @@ export interface LondonScene {
   photo?: boolean;
   /** True when the plate shows the surface with delegates on site. */
   live?: boolean;
+  /**
+   * Measured corners of the printed face as they appear in the plate, clockwise
+   * from top-left, in plate fractions. Present for every surface seen at an
+   * angle, so the print is warped onto the real surface instead of pasted on
+   * square. Frontal surfaces have none and stay unresampled.
+   */
+  quad?: SceneQuad;
   /** Floors this plate actually represents, when it is a floor-specific space. */
   floors?: LondonFloorId[];
   /**
@@ -173,6 +181,115 @@ export function sceneCaption(
   return dims ? `${sceneProvenanceLabel(scene)} · ${dims}` : sceneProvenanceLabel(scene);
 }
 
+/**
+ * Measured face corners per plate, clockwise from top-left, in plate fractions.
+ * Read off the plates themselves against a tenth grid: the printed face of a
+ * receding wall, a floor laid in perspective, a raked fascia or a table top is
+ * NOT a rectangle on the photograph, and mounting artwork as one is what makes
+ * a render look placed. Only surfaces that actually rake are listed; a frontal
+ * wall is left out on purpose so its print stays pixel-exact.
+ */
+const SCENE_QUADS: Record<string, SceneQuad> = {
+  // Floor graphics: laid flat, so the far edge is short and the near edge wide.
+  "surface-floor-graphic": [
+    { x: 0.505, y: 0.345 },
+    { x: 0.925, y: 0.425 },
+    { x: 0.645, y: 0.855 },
+    { x: 0.048, y: 0.545 },
+  ],
+  "live-floor-graphic": [
+    { x: 0.246, y: 0.506 },
+    { x: 0.664, y: 0.506 },
+    { x: 0.856, y: 0.799 },
+    { x: 0.134, y: 0.799 },
+  ],
+  // Table tops: seen from standing height, near edge wider.
+  "surface-tabletop": [
+    { x: 0.301, y: 0.199 },
+    { x: 0.709, y: 0.199 },
+    { x: 0.757, y: 0.498 },
+    { x: 0.253, y: 0.498 },
+  ],
+  "live-tabletop": [
+    { x: 0.278, y: 0.572 },
+    { x: 0.688, y: 0.572 },
+    { x: 0.732, y: 0.762 },
+    { x: 0.234, y: 0.762 },
+  ],
+  // Desk and counter fronts: slight rake off the lens axis.
+  "desk-front": [
+    { x: 0.114, y: 0.534 },
+    { x: 0.944, y: 0.545 },
+    { x: 0.944, y: 0.687 },
+    { x: 0.112, y: 0.706 },
+  ],
+  "live-registration-desk": [
+    { x: 0.142, y: 0.522 },
+    { x: 0.873, y: 0.508 },
+    { x: 0.878, y: 0.753 },
+    { x: 0.135, y: 0.772 },
+  ],
+  "live-coffee-bar": [
+    { x: 0.19, y: 0.117 },
+    { x: 0.884, y: 0.096 },
+    { x: 0.884, y: 0.546 },
+    { x: 0.19, y: 0.531 },
+  ],
+  // Stage fascias: long, low, and seen from the floor of the room.
+  "live-stage-fascia": [
+    { x: 0.078, y: 0.588 },
+    { x: 0.977, y: 0.57 },
+    { x: 0.977, y: 0.666 },
+    { x: 0.078, y: 0.712 },
+  ],
+  // A foyer wall run receding away from the camera — the strongest rake in the
+  // library, and the plate that most obviously failed as a flat rectangle.
+  "ref-foyer-wall-run": [
+    { x: 0.021, y: 0.077 },
+    { x: 0.813, y: 0.316 },
+    { x: 0.813, y: 0.779 },
+    { x: 0.021, y: 0.962 },
+  ],
+  "live-foyer-wall-run": [
+    { x: 0.338, y: 0.108 },
+    { x: 0.967, y: 0.091 },
+    { x: 0.967, y: 0.632 },
+    { x: 0.338, y: 0.651 },
+  ],
+  // Scenic builds and press walls: near-frontal, a degree or two of turn.
+  "live-scenic-wall": [
+    { x: 0.185, y: 0.03 },
+    { x: 0.953, y: 0.046 },
+    { x: 0.949, y: 0.903 },
+    { x: 0.19, y: 0.884 },
+  ],
+  "ref-press-wall": [
+    { x: 0.194, y: 0.046 },
+    { x: 0.856, y: 0.056 },
+    { x: 0.856, y: 0.721 },
+    { x: 0.194, y: 0.735 },
+  ],
+  // Entrance canopy band, seen from below on the forecourt.
+  "ref-exterior-canopy": [
+    { x: 0.104, y: 0.478 },
+    { x: 0.906, y: 0.461 },
+    { x: 0.906, y: 0.573 },
+    { x: 0.104, y: 0.601 },
+  ],
+  // Photographed pillar: the visible face turns very slightly toward the lens.
+  "ref-foyer-pillar": [
+    { x: 0.797, y: 0.153 },
+    { x: 0.878, y: 0.164 },
+    { x: 0.878, y: 0.884 },
+    { x: 0.797, y: 0.876 },
+  ],
+};
+
+/** Measured face quad for a scene, or the plain face rectangle. */
+export function sceneQuad(scene: LondonScene): SceneQuad {
+  return scene.quad ?? quadFromRect(scene.face);
+}
+
 function scene(
   id: string,
   label: string,
@@ -197,6 +314,7 @@ function scene(
     fixed,
     anchorY,
     mount,
+    ...(SCENE_QUADS[id] ? { quad: SCENE_QUADS[id] } : {}),
     ...(floors ? { floors } : {}),
   };
 }
@@ -267,11 +385,13 @@ export const LONDON_SCENES: LondonScene[] = [
   // ── Surface-specific plates ──────────────────────────────────────────────
   // Kinds that have no wall to sit on: a floor graphic laid on carpet, a lift
   // door pair, applied stair balustrade glass, and a cafe table top.
+  // Face rectangle = the bounding box of the measured floor quad, so the fit
+  // and the warp describe the same physical surface.
   scene("surface-floor-graphic", "Floor graphic on carpet", "Foyer circulation floor", "floor", surfaceFloorGraphic, {
-    x: 0.13,
-    y: 0.36,
-    w: 0.75,
-    h: 0.48,
+    x: 0.048,
+    y: 0.345,
+    w: 0.877,
+    h: 0.51,
   }, "w", "center", "edge"),
   scene("surface-lift-doors", "Lift door wrap", "Lift lobby", "lift", surfaceLiftDoors, {
     x: 0.155,
@@ -285,11 +405,12 @@ export const LONDON_SCENES: LondonScene[] = [
     w: 0.72,
     h: 0.55,
   }, "w", "center", "edge"),
+  // Face rectangle = bounding box of the measured (foreshortened) table top.
   scene("surface-tabletop", "Cafe table top", "Catering / lounge tables", "table", surfaceTabletop, {
-    x: 0.22,
-    y: 0.09,
-    w: 0.56,
-    h: 0.6,
+    x: 0.253,
+    y: 0.199,
+    w: 0.504,
+    h: 0.299,
   }, "w", "center", "edge"),
 
   // ── Live in-event plates ─────────────────────────────────────────────────
@@ -297,10 +418,10 @@ export const LONDON_SCENES: LondonScene[] = [
   // walking, queueing and networking around the install, with the printed face
   // itself kept clear so nothing crosses the artwork.
   { ...scene("live-floor-graphic", "Floor graphic · foyer in use", "Foyer circulation floor · event live", "floor", liveFloorGraphic, {
-    x: 0.17,
-    y: 0.5,
-    w: 0.7,
-    h: 0.33,
+    x: 0.134,
+    y: 0.506,
+    w: 0.722,
+    h: 0.293,
   }, "w", "center", "edge"), live: true },
   { ...scene("live-lift-lobby", "Lift wrap · lift lobby in use", "Lift lobby · event live", "lift", liveLiftLobby, {
     x: 0.105,
@@ -315,10 +436,10 @@ export const LONDON_SCENES: LondonScene[] = [
     h: 0.3,
   }, "w", "center", "edge"), live: true },
   { ...scene("live-tabletop", "Table top · break in progress", "Catering tables · event live", "table", liveTabletop, {
-    x: 0.19,
-    y: 0.545,
-    w: 0.59,
-    h: 0.28,
+    x: 0.234,
+    y: 0.572,
+    w: 0.498,
+    h: 0.19,
   }, "w", "center", "edge"), live: true },
   { ...scene("live-registration-desk", "Registration desk in use", "Registration · event live", "desk", liveRegistrationDesk, {
     x: 0.135,

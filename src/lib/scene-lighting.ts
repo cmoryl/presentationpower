@@ -28,6 +28,17 @@ export interface SceneLighting {
   sheen: number;
   /** Substrate: flat prints sit flush, panels get a thin edge reveal. */
   edge: "flush" | "reveal";
+  /**
+   * Photographic finish. A print composited at full digital cleanliness reads
+   * as a screenshot dropped into a photo, so it takes the plate's own camera
+   * character: sensor grain, a hair of lens softness (more on surfaces further
+   * from the lens), and bounce light coming back off the floor.
+   */
+  grain: number;
+  /** Lens/print softness in px at a 1536px-wide plate. */
+  softness: number;
+  /** Light bounced up into the print from the floor, 0..1. */
+  bounce: number;
 }
 
 const DEFAULT_LIGHTING: SceneLighting = {
@@ -39,6 +50,9 @@ const DEFAULT_LIGHTING: SceneLighting = {
   contact: 0.3,
   sheen: 0.06,
   edge: "reveal",
+  grain: 0.055,
+  softness: 0.35,
+  bounce: 0.06,
 };
 
 /**
@@ -364,8 +378,55 @@ const SCENE_LIGHTING: Record<string, Partial<SceneLighting>> = {
 };
 
 
+type SceneFinish = Partial<Pick<SceneLighting, "grain" | "softness" | "bounce">>;
+
+/**
+ * Camera character per plate. Raked surfaces (floors, table tops, glass) take
+ * more softness and more bounce; a photographed plate carries visible sensor
+ * grain, so the print must carry the same or it floats above the picture.
+ */
+const SCENE_FINISH: Record<string, SceneFinish> = {
+  // Floors and tables: shot from above, closest to the lens, strong bounce.
+  "surface-floor-graphic": { grain: 0.07, softness: 0.7, bounce: 0.16 },
+  "live-floor-graphic": { grain: 0.08, softness: 0.8, bounce: 0.18 },
+  "floor-decal": { grain: 0.07, softness: 0.7, bounce: 0.16 },
+  "surface-tabletop": { grain: 0.06, softness: 0.6, bounce: 0.14 },
+  "live-tabletop": { grain: 0.07, softness: 0.7, bounce: 0.15 },
+  // Applied glass: crisp, but picks up the room behind it.
+  "surface-stair-glass": { grain: 0.05, softness: 0.3, bounce: 0.1 },
+  "live-stair-glass": { grain: 0.055, softness: 0.35, bounce: 0.12 },
+  // Deep wall runs and scenic builds fall away from the lens.
+  "ref-foyer-wall-run": { grain: 0.075, softness: 0.9, bounce: 0.08 },
+  "live-foyer-wall-run": { grain: 0.07, softness: 0.6, bounce: 0.08 },
+  "live-scenic-wall": { grain: 0.07, softness: 0.5, bounce: 0.07 },
+  "ref-scenic-wall-blank": { grain: 0.06, softness: 0.45, bounce: 0.07 },
+  "ref-press-wall": { grain: 0.065, softness: 0.45, bounce: 0.08 },
+  // Desks and counters catch floor bounce along the bottom edge.
+  "desk-front": { grain: 0.06, softness: 0.4, bounce: 0.14 },
+  "live-registration-desk": { grain: 0.065, softness: 0.45, bounce: 0.15 },
+  "coffee-bar": { grain: 0.06, softness: 0.4, bounce: 0.1 },
+  "live-coffee-bar": { grain: 0.065, softness: 0.45, bounce: 0.11 },
+  // Stage fascias sit in mixed wash light, far from the lens.
+  "stage-fascia": { grain: 0.08, softness: 0.8, bounce: 0.12 },
+  "live-stage-fascia": { grain: 0.085, softness: 0.9, bounce: 0.14 },
+  // Photographed pillars and doors: match the photograph's own grain.
+  "ref-foyer-pillar": { grain: 0.08, softness: 0.5, bounce: 0.09 },
+  "ref-plenary-stage": { grain: 0.08, softness: 0.7, bounce: 0.08 },
+  "ref-room-doors": { grain: 0.07, softness: 0.4, bounce: 0.1 },
+  "live-room-doors": { grain: 0.065, softness: 0.4, bounce: 0.1 },
+  // Exterior: bright, clean, hard daylight, almost no bounce.
+  "ref-exterior-canopy": { grain: 0.05, softness: 0.35, bounce: 0.04 },
+  "exterior-banner": { grain: 0.045, softness: 0.3, bounce: 0.04 },
+  "live-exterior-entrance": { grain: 0.05, softness: 0.35, bounce: 0.05 },
+  "floor-ext-forecourt": { grain: 0.05, softness: 0.35, bounce: 0.04 },
+};
+
 export function sceneLighting(sceneId: string): SceneLighting {
-  return { ...DEFAULT_LIGHTING, ...(SCENE_LIGHTING[sceneId] ?? {}) };
+  return {
+    ...DEFAULT_LIGHTING,
+    ...(SCENE_LIGHTING[sceneId] ?? {}),
+    ...(SCENE_FINISH[sceneId] ?? {}),
+  };
 }
 
 /** CSS gradient angle, in degrees, for light arriving from `direction`. */

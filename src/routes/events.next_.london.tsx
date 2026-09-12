@@ -227,6 +227,7 @@ function SceneThumb({
         <SceneArtworkPlate
           box={box}
           sceneId={scene.id}
+          quad={scene.quad}
           face={fit === "cover" ? undefined : scene.face}
           substrate={
             <img
