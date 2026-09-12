@@ -266,10 +266,10 @@ export const LONDON_SCENES: LondonScene[] = [
     h: 0.245,
   }, "h", "center", "edge"), live: true },
   { ...scene("live-coffee-bar", "Coffee bar wall · break in progress", "Catering / coffee bar · event live", "counter", liveCoffeeBar, {
-    x: 0.16,
-    y: 0.12,
-    w: 0.705,
-    h: 0.425,
+    x: 0.185,
+    y: 0.1,
+    w: 0.7,
+    h: 0.44,
   }, "w", "center", "edge"), live: true },
   { ...scene("live-foyer-column", "Pillar · exhibition foyer in use", "Exhibition foyer pillar · event live", "column", liveFoyerColumn, {
     x: 0.405,
