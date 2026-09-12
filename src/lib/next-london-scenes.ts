@@ -20,6 +20,12 @@ import liveRegistrationDesk from "@/assets/london-scenes/live-registration-desk.
 import liveCoffeeBar from "@/assets/london-scenes/live-coffee-bar.jpg";
 import liveFoyerColumn from "@/assets/london-scenes/live-foyer-column.jpg";
 import liveStageFascia from "@/assets/london-scenes/live-stage-fascia.jpg";
+import liveRoomDoors from "@/assets/london-scenes/live-room-doors.jpg";
+import liveScenicWall from "@/assets/london-scenes/live-scenic-wall.jpg";
+import liveFoyerWallRun from "@/assets/london-scenes/live-foyer-wall-run.jpg";
+import liveBreakoutPanel from "@/assets/london-scenes/live-breakout-panel.jpg";
+import livePortraitBanner from "@/assets/london-scenes/live-portrait-banner.jpg";
+import liveExteriorEntrance from "@/assets/london-scenes/live-exterior-entrance.jpg";
 import surfaceFloorGraphic from "@/assets/london-scenes/surface-floor-graphic.jpg";
 import surfaceLiftDoors from "@/assets/london-scenes/surface-lift-doors.jpg";
 import surfaceStairGlass from "@/assets/london-scenes/surface-stair-glass.jpg";
@@ -277,6 +283,42 @@ export const LONDON_SCENES: LondonScene[] = [
     w: 0.905,
     h: 0.135,
   }, "h", "center", "edge"), live: true },
+  { ...scene("live-room-doors", "Room doors · delegates arriving", "Breakout room doors · event live", "door", liveRoomDoors, {
+    x: 0.312,
+    y: 0.03,
+    w: 0.475,
+    h: 0.83,
+  }, "w", "center", "cover"), live: true },
+  { ...scene("live-scenic-wall", "Scenic wall · foyer in use", "Scenic panel wall · event live", "wall", liveScenicWall, {
+    x: 0.177,
+    y: 0.039,
+    w: 0.728,
+    h: 0.845,
+  }, "w", "center", "edge"), live: true },
+  { ...scene("live-foyer-wall-run", "Foyer wall run · circulation in use", "Foyer wall run · event live", "wide", liveFoyerWallRun, {
+    x: 0.335,
+    y: 0.1,
+    w: 0.635,
+    h: 0.55,
+  }, "w", "center", "edge"), live: true },
+  { ...scene("live-breakout-panel", "Breakout panel · lounge in use", "Breakout lounge panel · event live", "square", liveBreakoutPanel, {
+    x: 0.501,
+    y: 0.119,
+    w: 0.234,
+    h: 0.369,
+  }, "w", "center", "edge"), live: true },
+  { ...scene("live-portrait-banner", "Hanging banner · atrium in use", "Atrium hanging banner · event live", "portrait", livePortraitBanner, {
+    x: 0.404,
+    y: 0.029,
+    w: 0.169,
+    h: 0.615,
+  }, "w", "top", "edge"), live: true },
+  { ...scene("live-exterior-entrance", "Entrance banner · doors open", "Exterior entrance banner · event live", "exterior", liveExteriorEntrance, {
+    x: 0.137,
+    y: 0.176,
+    w: 0.765,
+    h: 0.283,
+  }, "w", "center", "cover"), live: true },
 
 
   // ── Floor-specific plates ────────────────────────────────────────────────
