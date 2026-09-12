@@ -33,6 +33,7 @@ import {
   type LondonPanel,
 } from "@/lib/next-london-signage";
 import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
+import { SceneEventScreens, sceneScreensCaption } from "@/components/next/SceneEventScreens";
 import { SceneDoorLeaves } from "@/components/next/SceneDoorLeaves";
 import { doorLeafLabel, londonDoorSpec } from "@/lib/next-london-doors";
 
@@ -119,11 +120,14 @@ function Stage({
           </span>
         </div>
       )}
+      {/* Any working display in this plate runs NEXT 2026 London content. */}
+      <SceneEventScreens sceneId={scene.id} />
       <span
         data-export-ignore="true"
         className="absolute bottom-2 left-2 max-w-[calc(100%-1rem)] rounded bg-black/55 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white"
       >
         {sceneCaption(scene, panel)}
+        {sceneScreensCaption(scene.id) ? ` · ${sceneScreensCaption(scene.id)}` : ""}
       </span>
       {/* The photographer's read of this plate, so the light a design is judged
           under is never a mystery. */}

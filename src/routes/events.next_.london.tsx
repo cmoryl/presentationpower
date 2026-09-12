@@ -41,6 +41,7 @@ import { venueTemplateFor } from "@/lib/next-venue-templates";
 import { LondonLocationRenderPreview } from "@/components/events/LondonLocationRenderPreview";
 
 import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
+import { SceneEventScreens } from "@/components/next/SceneEventScreens";
 import { SceneDoorLeaves } from "@/components/next/SceneDoorLeaves";
 import { londonDoorSpec } from "@/lib/next-london-doors";
 import {
@@ -264,6 +265,8 @@ function SceneThumb({
           )}
         </SceneArtworkPlate>
       ) : null}
+      {/* Any working display in this plate runs NEXT 2026 London content. */}
+      <SceneEventScreens sceneId={scene.id} />
       <span className="absolute bottom-1 left-1 max-w-[calc(100%-0.5rem)] truncate rounded bg-black/55 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
         {sceneSurfaceLabel(scene)}
       </span>
