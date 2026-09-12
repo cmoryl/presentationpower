@@ -38,6 +38,13 @@ import { BoothTemplatePanel } from "@/components/events/BoothTemplatePanel";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { BoothRenderPreview } from "@/components/events/BoothRenderPreview";
 import { LondonLocationRenderPreview } from "@/components/events/LondonLocationRenderPreview";
+import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
+import {
+  defaultSceneForPanel,
+  fitArtworkInFace,
+  sceneArtworkObjectFit,
+  sceneSurfaceLabel,
+} from "@/lib/next-london-scenes";
 
 import { LondonAgendaBoards } from "@/components/events/LondonAgendaBoards";
 import { LondonGradientGrounds } from "@/components/events/LondonGradientGrounds";
