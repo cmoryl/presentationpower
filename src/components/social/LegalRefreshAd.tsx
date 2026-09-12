@@ -503,7 +503,7 @@ function DiagonalBand(p: Shared & { art: React.ReactNode; photo: boolean }) {
           zIndex: 3,
         }}
       >
-        <Headline {...p} ink="#FFFFFF" size={square ? 86 : 70} />
+        <Headline {...p} ink="#FFFFFF" size={square ? 74 : 58} />
       </div>
       <div
         style={{
