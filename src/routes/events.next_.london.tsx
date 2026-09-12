@@ -1202,6 +1202,18 @@ function LondonSignagePage() {
             </div>
           ) : null}
 
+          {/* Replace the artwork on many signs in one go: matched by filename,
+              stored as the version in force, so every card here repaints. */}
+          {isAdmin ? (
+            <div className="mt-8">
+              <LondonLiveFileBulkUpload
+                panels={panels}
+                canEdit={isAdmin}
+                onChanged={() => setLiveFileTick((n) => n + 1)}
+              />
+            </div>
+          ) : null}
+
           {shown.map((floor) => (
             <div key={floor.id} className="mt-8">
               <div className="flex flex-wrap items-baseline gap-3 border-b border-black/10 pb-2">
