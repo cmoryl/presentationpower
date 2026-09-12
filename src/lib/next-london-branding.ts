@@ -293,9 +293,23 @@ export function londonBrandingPlan(
   // copy for every slot, and both stay fully editable on top.
   const native =
     londonBoothNativeTemplate(panel.id) ?? londonBespokeNativeTemplate(panel.id);
+  // A hand-finished live file is already typeset. Whatever layer it carries is
+  // NOT drawn a second time on top — that is what doubled the lockup and the
+  // headline on the preview cards. The designer can hand any layer back to the
+  // editor (see next-london-live-layers.ts) and it returns as an editable layer.
+  const finishedFile = !!(londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id));
+  const fileOwnsLockup = finishedFile && londonFileOwnsLayer(panel.id, "lockup");
+  const fileOwnsCopy = finishedFile && londonFileOwnsLayer(panel.id, "copy");
   const authored =
-    nudge.text === null ? (native ? native.headline || null : pickCopy(panel)) : nudge.text.trim() || null;
+    nudge.text === null
+      ? fileOwnsCopy
+        ? null
+        : native
+          ? native.headline || null
+          : pickCopy(panel)
+      : nudge.text.trim() || null;
   const copy = authored;
+
   const centreX = marginX + panel.trimW / 2 - logoW / 2;
 
   // Stacked lockups sit on the upper third; horizontal lockups ride the lower
