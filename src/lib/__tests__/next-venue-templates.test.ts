@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   NEXT_VENUE_TEMPLATES,
   venueTemplate,
+  venueTemplateAudit,
   venueTemplateFor,
 } from "@/lib/next-venue-templates";
 import { LONDON_PANELS } from "@/lib/next-london-signage";
