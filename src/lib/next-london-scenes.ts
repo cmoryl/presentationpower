@@ -47,6 +47,16 @@ import refExteriorCanopy from "@/assets/london-scenes/ref-exterior-canopy.jpg";
 import refScenicWallBlank from "@/assets/london-scenes/ref-scenic-wall-blank.jpg";
 import floorExtForecourt from "@/assets/london-scenes/floor-ext-forecourt.jpg";
 import floorGfAuditorium from "@/assets/london-scenes/floor-gf-auditorium.jpg";
+import photoExhibitionFoyer from "@/assets/london-scenes/photo-exhibition-foyer.jpg";
+import photoFoyerWallRun from "@/assets/london-scenes/photo-foyer-wall-run.jpg";
+import photoPlenaryFascia from "@/assets/london-scenes/photo-plenary-fascia.jpg";
+import photoThirdfloorWall from "@/assets/london-scenes/photo-thirdfloor-wall.jpg";
+import photoExhibitionStand from "@/assets/london-scenes/photo-exhibition-stand.jpg";
+import photoCafeTabletop from "@/assets/london-scenes/photo-cafe-tabletop.jpg";
+import photoSanctuaryCounter from "@/assets/london-scenes/photo-sanctuary-counter.jpg";
+import photoFacadeEvening from "@/assets/london-scenes/photo-facade-evening.jpg";
+import photoChurchillStage from "@/assets/london-scenes/photo-churchill-stage.jpg";
+import photoLoungePanel from "@/assets/london-scenes/photo-lounge-panel.jpg";
 
 import foyerColumn from "@/assets/london-scenes/foyer-column.jpg";
 import portraitBanner from "@/assets/london-scenes/portrait-banner.jpg";
