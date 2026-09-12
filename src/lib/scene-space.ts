@@ -155,19 +155,22 @@ export function sceneSpace(quad: SceneQuad): SceneSpace {
   };
 }
 
-/** CSS gradient angle that runs from the near end toward the far end. */
+/**
+ * CSS gradient angle whose 0% stop sits on the FAR end of the surface, so the
+ * haze and shade stops can be written far→near.
+ */
 export function depthGradientAngle(axis: DepthAxis): number {
   switch (axis) {
     case "left":
-      return 270; // far end on the left
+      return 90; // starts left (far), runs right
     case "right":
-      return 90;
+      return 270;
     case "up":
-      return 0;
+      return 180; // starts top (far), runs down
     case "down":
-      return 180;
+      return 0;
     default:
-      return 180;
+      return 0;
   }
 }
 
