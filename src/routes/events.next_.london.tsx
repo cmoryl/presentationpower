@@ -496,9 +496,11 @@ function LondonSignagePage() {
   // "booths" filter is the one place the whole partner set is listed together.
   const floors = useMemo(() => londonPanelsByFloor(panels), [panels]);
   const [floorId, setFloorId] = useState<string>("all");
-  // Cards default to the installed view: each item mounted on the measured face
-  // of its best-matched in-event plate, so the kit reads as the room looks.
-  const [cardView, setCardView] = useState<"scene" | "flat">("scene");
+  // Cards default to the flat artwork itself: the in-scene visualisations were
+  // not reading true enough to stand as the primary card image, so they stay
+  // available behind the toggle rather than fronting the kit.
+  const [cardView, setCardView] = useState<"scene" | "flat">("flat");
+
   const [artwork, setArtwork] = useState<LondonArtwork | null>(null);
   const [artworkError, setArtworkError] = useState<string | null>(null);
   const [openPanelRaw, setOpenPanel] = useState<LondonPanel | null>(null);
