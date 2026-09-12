@@ -194,7 +194,7 @@ export function londonDoorSpec(
 }
 
 /** True when the item is applied across more than one leaf. */
-export function isDoublDoor(spec: LondonDoorSpec | null): boolean {
+export function isDoubleDoor(spec: LondonDoorSpec | null): boolean {
   return !!spec && spec.leaves > 1;
 }
 
