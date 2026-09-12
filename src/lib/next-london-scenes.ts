@@ -455,6 +455,9 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
       // first when the item is actually that kind of install.
       const specialised =
         hint < 0 && SPECIALISED_KINDS.includes(s.kind) ? 3 : 0;
+      // Between two plates of the same surface, the one with delegates on site
+      // reads as the install in use, so it leads.
+      const liveBonus = s.live && (kindOk ? hint >= 0 || hints.length === 0 : false) ? -0.35 : 0;
       return {
         s,
         score:
@@ -463,8 +466,10 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
           fit +
           onFloor +
           wrongFloor +
+          liveBonus +
           specialised,
       };
+
 
     })
     .sort((a, b) => a.score - b.score)
