@@ -118,7 +118,11 @@ const PLACEMENT: Record<
   "vt-desk-front": { area: "Staffed desks", qty: (b) => b.desks },
   "vt-desk-return": { area: "Staffed desks", qty: (b) => b.desks },
   "vt-glass-vinyl": { area: "Glazed room fronts and partitions", qty: (b) => b.breakoutRooms },
-  "vt-door-branding": { area: "Session room doors", qty: (b) => b.breakoutRooms },
+  "vt-door-branding": {
+    area: "Session room and division doors",
+    // One sub-event or division per door, so whichever count is larger drives it.
+    qty: (b) => Math.max(b.breakoutRooms, b.divisions),
+  },
   "vt-beam-vinyl": { area: "Beams and bulkheads", qty: (b) => b.floors },
   "vt-wall-panel": { area: "Plenary and foyer scenic runs", qty: (b) => b.floors * 3 },
   "vt-table-top": { area: "NEXT Brew and lounge tables", qty: (b) => b.floors * 4 },
