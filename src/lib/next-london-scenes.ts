@@ -394,10 +394,10 @@ export const LONDON_SCENES: LondonScene[] = [
   }, "w", "center", "cover"), photo: true },
   // Long foyer wall run beside the plenary entrance.
   { ...scene("ref-foyer-wall-run", "Foyer wall run", "Exhibition foyer · long wall run", "wide", refFoyerWallRun, {
-    x: 0.05,
-    y: 0.11,
-    w: 0.73,
-    h: 0.83,
+    x: 0.025,
+    y: 0.09,
+    w: 0.79,
+    h: 0.845,
   }, "w", "center", "edge"), photo: true },
   // Freestanding press / merch wall with a dressed table in front of it.
   { ...scene("ref-press-wall", "Press & merch wall", "Foyer · freestanding press wall", "wall", refPressWall, {
