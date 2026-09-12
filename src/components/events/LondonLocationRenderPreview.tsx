@@ -16,6 +16,10 @@ import { buildLondonPanelSvg, type LondonArtOptions } from "@/lib/next-london-re
 import {
   fitArtworkInFace,
   sceneArtworkObjectFit,
+  sceneCaption,
+  sceneDimensionsLabel,
+  sceneProvenanceLabel,
+  sceneSurfaceLabel,
   scenesForPanel,
   type LondonScene,
 } from "@/lib/next-london-scenes";
