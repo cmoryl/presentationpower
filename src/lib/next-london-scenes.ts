@@ -65,6 +65,7 @@ import stageFascia from "@/assets/london-scenes/stage-fascia.jpg";
 import stepRepeat from "@/assets/london-scenes/step-repeat.jpg";
 import wideBanner from "@/assets/london-scenes/wide-banner.jpg";
 
+import { measuredSurface, scaleTrueBox, hasMeasuredSurface } from "@/lib/scene-scale";
 import {
   canCoverFace,
   mountArtworkOnFace,
@@ -829,6 +830,9 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
       // A genuine venue photograph beats a visualisation of the same surface,
       // so the first view a user sees is the real space wherever we have it.
       const photoBonus = s.photo && (kindOk ? hint >= 0 || hints.length === 0 : false) ? -0.5 : 0;
+      // A surface we hold a real measurement for can be rendered at true scale,
+      // so it leads over an equally suitable view we can only place the item on.
+      const measuredBonus = kindOk && hasMeasuredSurface(s) ? -0.4 : 0;
       return {
         s,
         score:
@@ -839,6 +843,7 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
           wrongFloor +
           liveBonus +
           photoBonus +
+          measuredBonus +
           specialised,
       };
 
@@ -863,6 +868,25 @@ export function fitArtworkInFace(
   sceneOrId: LondonScene | string,
 ): SceneFace {
   const sc = typeof sceneOrId === "string" ? londonScene(sceneOrId) : sceneOrId;
+  // Where the surface has actually been measured, the print goes on at its true
+  // fraction of that surface, so the render agrees with the spec sheet. An
+  // unmeasured surface keeps the honest fill-the-fixed-edge behaviour.
+  // An applied vinyl IS the surface — its print equals the face by definition,
+  // so true-scale placement does not apply and must not shrink it.
+  if (sc && sc.mount !== "cover") {
+    const surface = measuredSurface(sc, panel);
+    if (surface) {
+      const scaled = scaleTrueBox({
+        face: sc.face,
+        plate: sc.plate,
+        panel,
+        surface,
+        fixed: sc.fixed,
+        anchorY: sc.anchorY,
+      });
+      if (scaled) return scaled;
+    }
+  }
   return mountArtworkOnFace({
     face: sc?.face ?? { x: 0, y: 0, w: 1, h: 1 },
     plate: sc?.plate ?? { w: 1536, h: 1024 },
