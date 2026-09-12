@@ -108,6 +108,13 @@ export interface LondonScene {
   photo?: boolean;
   /** True when the plate shows the surface with delegates on site. */
   live?: boolean;
+  /**
+   * Measured corners of the printed face as they appear in the plate, clockwise
+   * from top-left, in plate fractions. Present for every surface seen at an
+   * angle, so the print is warped onto the real surface instead of pasted on
+   * square. Frontal surfaces have none and stay unresampled.
+   */
+  quad?: SceneQuad;
   /** Floors this plate actually represents, when it is a floor-specific space. */
   floors?: LondonFloorId[];
   /**
