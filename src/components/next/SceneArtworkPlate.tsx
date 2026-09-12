@@ -20,7 +20,12 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode, type Ref } from "react";
 
-import { sceneLighting, shadeAngle, shadowOffset } from "@/lib/scene-lighting";
+import {
+  castShadow,
+  sceneLighting,
+  sceneLightQuality,
+  shadeAngle,
+} from "@/lib/scene-lighting";
 import {
   faceQuadTransform,
   isQuadSkewed,
@@ -105,8 +110,8 @@ export function SceneArtworkPlate({
   quad,
 }: SceneArtworkPlateProps) {
   const light = sceneLighting(sceneId);
+  const quality = sceneLightQuality(sceneId);
   const angle = shadeAngle(light.direction);
-  const off = shadowOffset(light.direction);
   const portrait = box.h >= box.w;
 
   // Perspective: the print is warped from the measured face rectangle onto the
@@ -143,6 +148,9 @@ export function SceneArtworkPlate({
       ? `inset 0 0 0 1px rgba(255,255,255,0.22), inset 0 0 0 2px rgba(3,0,44,0.10), 0 ${(spread * 40).toFixed(1)}px ${(spread * 90).toFixed(1)}px rgba(3,0,44,${(contact * 0.5).toFixed(3)})`
       : `0 ${(spread * 26).toFixed(1)}px ${(spread * 70).toFixed(1)}px rgba(3,0,44,${(contact * 0.35).toFixed(3)})`;
   const softness = Math.max(0, light.softness * (1 + rake * 0.8) * 0.6);
+  // Cast shadow read from the plate's own light: direction from its azimuth,
+  // length from its elevation, softness from how hard the source is.
+  const cast = castShadow(quality, contact);
 
   // Dress the rest of the fixture when the print's true ratio leaves part of
   // the measured placement area unused.
@@ -184,18 +192,34 @@ export function SceneArtworkPlate({
         </div>
       ) : null}
 
-      {/* Contact shadow: sits behind the print, offset away from the light. */}
+      {/* Cast shadow: thrown away from the light, at the length its elevation
+          allows, and softened to match the source. */}
       <div
         aria-hidden="true"
         className="absolute"
         style={{
-          left: pct(boxL.x + off.x),
-          top: pct(boxL.y + off.y),
+          left: pct(boxL.x + cast.x),
+          top: pct(boxL.y + cast.y),
           width: pct(boxL.w),
           height: pct(boxL.h),
           background: "rgba(6,4,26,1)",
-          opacity: contact,
-          filter: `blur(${(spread * 100).toFixed(2)}px)`,
+          opacity: cast.opacity,
+          filter: `blur(${(spread * 100 * cast.blur * 0.55).toFixed(2)}px)`,
+        }}
+      />
+      {/* Contact shadow: the tight, dark line right where the print meets the
+          surface, present under every light no matter how soft. */}
+      <div
+        aria-hidden="true"
+        className="absolute"
+        style={{
+          left: pct(boxL.x),
+          top: pct(boxL.y + Math.max(0.002, cast.y * 0.28)),
+          width: pct(boxL.w),
+          height: pct(boxL.h),
+          background: "rgba(6,4,26,1)",
+          opacity: Math.min(0.7, contact * 0.55),
+          filter: `blur(${(spread * 26).toFixed(2)}px)`,
         }}
       />
 
@@ -279,6 +303,39 @@ export function SceneArtworkPlate({
                 ? `linear-gradient(${angle + 12}deg, rgba(255,255,255,${light.sheen.toFixed(3)}) 0%, rgba(255,255,255,0) 26%, rgba(255,255,255,0) 74%, rgba(255,255,255,${(light.sheen * 0.5).toFixed(3)}) 100%)`
                 : `linear-gradient(${angle + 78}deg, rgba(255,255,255,${light.sheen.toFixed(3)}) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 78%, rgba(255,255,255,${(light.sheen * 0.4).toFixed(3)}) 100%)`,
               mixBlendMode: "screen",
+            }}
+          />
+        ) : null}
+
+        {/* Open shade filling the shadow side, so the dark half is never dead. */}
+        {quality.ambientLift > 0.02 ? (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(${angle + 180}deg, rgba(214,228,246,${(quality.ambientLift * 0.5).toFixed(3)}) 0%, rgba(214,228,246,0) 62%)`,
+              mixBlendMode: "screen",
+            }}
+          />
+        ) : null}
+
+        {/* Camera grade: highlights roll off, blacks lift, the lens vignettes.
+            This is what stops a print looking digitally cleaner than the shot
+            it sits in. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(130% 130% at 50% 42%, rgba(255,255,255,${(quality.rolloff * 0.22).toFixed(3)}) 0%, rgba(255,255,255,0) 46%, rgba(3,0,44,${(quality.vignette * 0.34).toFixed(3)}) 100%)`,
+          }}
+        />
+        {quality.blackLift > 0.02 ? (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background: `rgba(126,138,168,${(quality.blackLift * 0.3).toFixed(3)})`,
+              mixBlendMode: "lighten",
             }}
           />
         ) : null}

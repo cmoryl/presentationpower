@@ -13,6 +13,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLondonLivePanel } from "@/hooks/use-london-live-panel";
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { buildLondonPanelSvg, type LondonArtOptions } from "@/lib/next-london-revise";
+import { lightQualityLabel, sceneLightQuality } from "@/lib/scene-lighting";
 import {
   fitArtworkInFace,
   sceneArtworkObjectFit,
@@ -121,6 +122,14 @@ function Stage({
         className="absolute bottom-2 left-2 max-w-[calc(100%-1rem)] rounded bg-black/55 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white"
       >
         {sceneCaption(scene, panel)}
+      </span>
+      {/* The photographer's read of this plate, so the light a design is judged
+          under is never a mystery. */}
+      <span
+        data-export-ignore="true"
+        className="absolute bottom-2 right-2 max-w-[calc(100%-1rem)] rounded bg-black/45 px-2 py-1 font-mono text-[10px] text-white/90"
+      >
+        {lightQualityLabel(sceneLightQuality(scene.id))}
       </span>
       {leaves ? (
         <span

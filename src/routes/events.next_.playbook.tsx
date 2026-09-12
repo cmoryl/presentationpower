@@ -19,6 +19,7 @@ import {
   type LondonPanel,
 } from "@/lib/next-london-signage";
 import { LONDON_SCENES, sceneProvenance, sceneSurfaceLabel } from "@/lib/next-london-scenes";
+import { lightQualityLabel, sceneLightQuality } from "@/lib/scene-lighting";
 import {
   NEXT_VENUE_TEMPLATES,
   venueTemplateAudit,
@@ -289,6 +290,36 @@ function PlaybookPage() {
               </span>
             </li>
           ))}
+        </ul>
+
+        <h2 className="mt-10 text-lg font-semibold tracking-tight text-[#03002C]">
+          How every view is lit
+        </h2>
+        <p className="mt-1 text-[13px] text-black/60">
+          Each view carries a photographer's read of its space: time of day, colour temperature of the
+          dominant light, and how hard it is. Shadow direction follows the light's bearing and shadow
+          length follows its height, so the same warm foyer or stage wash looks the same at every
+          venue in the NEXT ecosystem.
+        </p>
+        <ul className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+          {LONDON_SCENES.map((scene) => {
+            const q = sceneLightQuality(scene.id);
+            return (
+              <li
+                key={`light-${scene.id}`}
+                className="rounded-lg border border-black/10 bg-white px-3 py-2 text-[12px] text-black/70"
+              >
+                <span className="font-medium text-[#03002C]">
+                  {sceneSurfaceLabel(scene) ?? scene.label}
+                </span>
+                <span className="mt-0.5 block text-black/55">{lightQualityLabel(q)}</span>
+                <span className="mt-0.5 block font-mono text-[10px] text-black/40">
+                  light {Math.round(q.azimuth)}° bearing · {Math.round(q.elevation)}° high · shadow{" "}
+                  {q.shadowLength.toFixed(2)}× height
+                </span>
+              </li>
+            );
+          })}
         </ul>
 
         <div className="mt-10 flex flex-wrap gap-3">
