@@ -373,10 +373,10 @@ export const LONDON_SCENES: LondonScene[] = [
   // rectangles were measured off the photographs themselves, so artwork lands
   // on the actual printed pillar side and the actual scenic stage wall.
   { ...scene("ref-foyer-pillar", "NEXT pillar in an exhibition foyer", "Exhibition foyer · four-sided pillar", "column", refFoyerPillar, {
-    x: 0.806,
-    y: 0.252,
-    w: 0.0946,
-    h: 0.649,
+    x: 0.795,
+    y: 0.157,
+    w: 0.082,
+    h: 0.73,
   }, "w", "center", "cover"), photo: true },
   { ...scene("ref-plenary-stage", "NEXT scenic stage wall", "Plenary stage · scenic back wall", "wall", refPlenaryStage, {
     x: 0.05,
