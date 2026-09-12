@@ -215,6 +215,8 @@ export function scaleTrueBox(opts: {
   surface: MeasuredSurface;
   anchorY?: "top" | "center" | "bottom";
   anchorX?: "left" | "center" | "right";
+  /** Which surface edge physically fixes the print size, from the scene. */
+  fixed?: "w" | "h";
 }): FaceRect | null {
   const { face, plate, panel, surface } = opts;
   const coverW = panel.trimW / surface.wMm;
@@ -226,8 +228,22 @@ export function scaleTrueBox(opts: {
   const hPx = face.h * plate.h * coverH;
   if (wPx < plate.w * 0.05 || hPx < plate.h * 0.05) return null;
 
-  const w = face.w * coverW;
-  const h = face.h * coverH;
+  // The measured face is the surface as it appears in the plate, and its pixel
+  // aspect rarely equals the surface's true aspect. Scaling both axes by their
+  // mm fractions would therefore inherit that distortion and skew the print. So
+  // the print takes its true fraction of the surface's fixed edge, and its other
+  // edge follows the exact trim ratio — right size, and never stretched.
+  const trim = panel.trimW / panel.trimH;
+  let w: number;
+  let h: number;
+  if ((opts.fixed ?? "w") === "w") {
+    w = face.w * coverW;
+    h = (w * plate.w) / trim / plate.h;
+  } else {
+    h = face.h * coverH;
+    w = (h * plate.h * trim) / plate.w;
+  }
+  if (w > face.w * 1.02 || h > face.h * 1.02) return null;
   const anchorY = opts.anchorY ?? "center";
   const anchorX = opts.anchorX ?? "center";
   const x =

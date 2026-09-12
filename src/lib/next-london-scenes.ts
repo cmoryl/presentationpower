@@ -879,6 +879,7 @@ export function fitArtworkInFace(
         plate: sc.plate,
         panel,
         surface,
+        fixed: sc.fixed,
         anchorY: sc.anchorY,
       });
       if (scaled) return scaled;
