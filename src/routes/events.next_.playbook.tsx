@@ -8,7 +8,7 @@
 
 import { useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Layers, Ruler, Image as ImageIcon, ListChecks } from "lucide-react";
+import { ArrowLeft, Layers, MapPin, Ruler, Image as ImageIcon, ListChecks } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import {
