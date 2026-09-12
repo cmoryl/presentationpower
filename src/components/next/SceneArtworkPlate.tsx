@@ -165,14 +165,48 @@ export function SceneArtworkPlate({
   // fascia both cast a plausible shadow rather than one measured in plate px.
   const spread = Math.max(0.006, Math.min(boxL.w, boxL.h) * 0.09) * (1 + rake * 0.5);
   const contact = Math.min(0.85, light.contact * (1 + rake * 0.55));
-  const dropShadow =
-    light.edge === "reveal"
-      ? `inset 0 0 0 1px rgba(255,255,255,0.22), inset 0 0 0 2px rgba(3,0,44,0.10), 0 ${(spread * 40).toFixed(1)}px ${(spread * 90).toFixed(1)}px rgba(3,0,44,${(contact * 0.5).toFixed(3)})`
-      : `0 ${(spread * 26).toFixed(1)}px ${(spread * 70).toFixed(1)}px rgba(3,0,44,${(contact * 0.35).toFixed(3)})`;
+  // The reveal and the drop only belong to a board standing off its surface. An
+  // applied film, a hung textile and anything horizontal show neither: a flush
+  // vinyl with a drop shadow under it is exactly what makes a render look pasted
+  // on. Those substrates get an occlusion line along the edge they meet instead.
+  const standoff = finish.contact === "standoff";
+  const dropShadow = standoff
+    ? `inset 0 0 0 1px rgba(255,255,255,${(0.14 + finish.gloss * 0.3).toFixed(3)}), inset 0 0 0 2px rgba(3,0,44,0.10), 0 ${(spread * 40 * castScale).toFixed(1)}px ${(spread * 90 * castScale).toFixed(1)}px rgba(3,0,44,${(contact * 0.5).toFixed(3)})`
+    : finish.contact === "hung"
+      ? `0 ${(spread * 30 * castScale).toFixed(1)}px ${(spread * 78 * castScale).toFixed(1)}px rgba(3,0,44,${(contact * 0.32).toFixed(3)})`
+      : `inset 0 0 0 1px rgba(3,0,44,${(finish.occlusion * 0.45).toFixed(3)})`;
   const softness = Math.max(0, light.softness * (1 + rake * 0.8) * 0.6);
   // Cast shadow read from the plate's own light: direction from its azimuth,
-  // length from its elevation, softness from how hard the source is.
-  const cast = castShadow(quality, contact);
+  // length from its elevation, softness from how hard the source is — then
+  // scaled by how far this substrate actually stands off its surface.
+  const rawCast = castShadow(quality, contact);
+  const cast = {
+    ...rawCast,
+    x: rawCast.x * castScale,
+    y: rawCast.y * castScale,
+    opacity: rawCast.opacity * Math.min(1, castScale),
+  };
+  const showCast = castScale > 0.12;
+  // Occlusion along the fixed edge: light cannot reach the join, so a hung or
+  // applied print is always slightly darker where it is fixed.
+  const occlusionEdge =
+    finish.fixedEdge === "top"
+      ? "to bottom"
+      : finish.fixedEdge === "bottom"
+        ? "to top"
+        : finish.fixedEdge === "left"
+          ? "to right"
+          : null;
+  const texture: string | null =
+    finish.texture <= 0.02
+      ? null
+      : finish.textureKind === "weave"
+        ? "repeating-linear-gradient(0deg, rgba(3,0,44,0.5) 0px, rgba(3,0,44,0) 1px, rgba(3,0,44,0) 2px), repeating-linear-gradient(90deg, rgba(3,0,44,0.4) 0px, rgba(3,0,44,0) 1px, rgba(3,0,44,0) 2px)"
+        : finish.textureKind === "board"
+          ? "repeating-linear-gradient(90deg, rgba(255,255,255,0.16) 0px, rgba(255,255,255,0) 3px, rgba(3,0,44,0.12) 6px, rgba(3,0,44,0) 9px)"
+          : finish.textureKind === "floor"
+            ? "repeating-linear-gradient(58deg, rgba(255,255,255,0.13) 0px, rgba(255,255,255,0) 2px, rgba(3,0,44,0.1) 5px, rgba(3,0,44,0) 11px)"
+            : "repeating-linear-gradient(12deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0) 6px, rgba(3,0,44,0.07) 13px, rgba(3,0,44,0) 22px)";
 
   // Spatial read of the surface: where the camera stood, which end of the print
   // is deeper into the room, and how much haze, shade and defocus that far end
