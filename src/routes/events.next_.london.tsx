@@ -38,6 +38,13 @@ import { BoothTemplatePanel } from "@/components/events/BoothTemplatePanel";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { BoothRenderPreview } from "@/components/events/BoothRenderPreview";
 import { LondonLocationRenderPreview } from "@/components/events/LondonLocationRenderPreview";
+import { SceneArtworkPlate } from "@/components/next/SceneArtworkPlate";
+import {
+  defaultSceneForPanel,
+  fitArtworkInFace,
+  sceneArtworkObjectFit,
+  sceneSurfaceLabel,
+} from "@/lib/next-london-scenes";
 
 import { LondonAgendaBoards } from "@/components/events/LondonAgendaBoards";
 import { LondonGradientGrounds } from "@/components/events/LondonGradientGrounds";
@@ -172,7 +179,89 @@ function download(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
-function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
+/** The artwork a card shows: supplied/hand-finished proof, else the live SVG. */
+function useCardArt(panel: LondonPanel, svg?: string, version?: string) {
+  const boothArt = londonSuppliedMaster(panel)?.previewUrl ?? londonBoothArtworkUrl(panel.id);
+  return useMemo(() => {
+    // A replaced live file keeps the same URL, so the signature is appended as
+    // a cache buster — otherwise the card keeps showing the previous render.
+    if (boothArt) {
+      if (!version || boothArt.startsWith("data:") || boothArt.startsWith("blob:")) return boothArt;
+      return `${boothArt}${boothArt.includes("?") ? "&" : "?"}v=${encodeURIComponent(version.slice(0, 24))}`;
+    }
+    if (!svg) return null;
+    return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+  }, [boothArt, svg, version]);
+}
+
+/**
+ * The card render as it looks installed: the item's own artwork mounted on the
+ * measured face of its best-ranked in-event plate, with the same light matching
+ * as the full in-situ preview so a card and its enlarged view agree.
+ */
+function SceneThumb({
+  panel,
+  art,
+}: {
+  panel: LondonPanel;
+  art: string | null;
+}) {
+  const scene = useMemo(() => defaultSceneForPanel(panel), [panel]);
+  const box = useMemo(() => fitArtworkInFace(panel, scene), [panel, scene]);
+  const fit = useMemo(() => sceneArtworkObjectFit(panel, scene), [panel, scene]);
+  return (
+    <div
+      className="relative w-full overflow-hidden rounded-lg border border-black/10 bg-[#0d1117]"
+      style={{ aspectRatio: `${scene.plate.w} / ${scene.plate.h}` }}
+    >
+      <img
+        src={scene.src}
+        alt={`${panel.name} shown ${scene.label.toLowerCase()}`}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      {art ? (
+        <SceneArtworkPlate
+          box={box}
+          sceneId={scene.id}
+          face={fit === "cover" ? undefined : scene.face}
+          substrate={
+            <img
+              src={art}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full"
+              style={{ objectFit: "cover" }}
+            />
+          }
+        >
+          <img
+            src={art}
+            alt={`${panel.name} installed as a ${scene.label.toLowerCase()}`}
+            className="absolute inset-0 h-full w-full"
+            style={{ objectFit: fit }}
+          />
+        </SceneArtworkPlate>
+      ) : null}
+      <span className="absolute bottom-1 left-1 max-w-[calc(100%-0.5rem)] truncate rounded bg-black/55 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-white">
+        {sceneSurfaceLabel(scene)}
+      </span>
+    </div>
+  );
+}
+
+function PanelThumb({
+  panel,
+  svg,
+  version,
+  view = "flat",
+}: {
+  panel: LondonPanel;
+  svg?: string;
+  version?: string;
+  view?: "flat" | "scene";
+}) {
   const style = LONDON_STYLES[panel.style];
   const ratio = panel.bleedW / panel.bleedH;
   // Vendor booths and hand-finished live files show the supplied proof as the
@@ -180,9 +269,11 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
   // generated layers (lockup, headline, code, uploaded vector art) are painted
   // straight on top, so an edit to a supplied sign shows on the card too.
   const boothArt = londonSuppliedMaster(panel)?.previewUrl ?? londonBoothArtworkUrl(panel.id);
+  const art = useCardArt(panel, svg, version);
   const svgUrl = svg
     ? `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`
     : null;
+  if (view === "scene") return <SceneThumb panel={panel} art={art} />;
   return (
     <div
       className="relative w-full overflow-hidden rounded-lg border border-black/10 bg-[#E0E8F5]"
@@ -190,7 +281,7 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
     >
       {boothArt ? (
         <img
-          src={boothArt}
+          src={art ?? boothArt}
           alt={`${panel.room} — ${panel.name}, supplied artwork`}
           className="absolute inset-0 h-full w-full object-cover"
           loading="lazy"
@@ -215,11 +306,14 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
   );
 }
 
+
 function PanelCard({
   panel,
   svg,
   draft,
   variation,
+  version,
+  view,
   onClick,
 }: {
   panel: LondonPanel;
@@ -228,6 +322,10 @@ function PanelCard({
   draft?: boolean;
   /** The sign is a copy made from another sign in the kit. */
   variation?: boolean;
+  /** Live-file signature, so a replaced file is not served from cache. */
+  version?: string;
+  /** Flat print artwork, or the item mounted in its in-event plate. */
+  view?: "flat" | "scene";
   onClick?: (panel: LondonPanel) => void;
 }) {
   const booth = londonBoothPanelMeta(panel);
@@ -238,8 +336,9 @@ function PanelCard({
       className="group flex h-full flex-col rounded-xl border border-black/10 bg-white p-3 text-left transition-shadow hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
     >
       <div className="shrink-0">
-        <PanelThumb panel={panel} svg={svg} />
+        <PanelThumb panel={panel} svg={svg} version={version} view={view} />
       </div>
+
       <div className="mt-3 flex min-w-0 flex-1 flex-col">
         <p
           className="text-[13px] font-semibold leading-snug text-[#03002C]"
@@ -366,6 +465,9 @@ function LondonSignagePage() {
   // "booths" filter is the one place the whole partner set is listed together.
   const floors = useMemo(() => londonPanelsByFloor(panels), [panels]);
   const [floorId, setFloorId] = useState<string>("all");
+  // Cards default to the installed view: each item mounted on the measured face
+  // of its best-matched in-event plate, so the kit reads as the room looks.
+  const [cardView, setCardView] = useState<"scene" | "flat">("scene");
   const [artwork, setArtwork] = useState<LondonArtwork | null>(null);
   const [artworkError, setArtworkError] = useState<string | null>(null);
   const [openPanelRaw, setOpenPanel] = useState<LondonPanel | null>(null);
@@ -999,6 +1101,23 @@ function LondonSignagePage() {
                 Partner booths · {boothPanels.length}
               </button>
             ) : null}
+            <span className="ml-auto inline-flex overflow-hidden rounded-full border border-black/15">
+              {(["scene", "flat"] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setCardView(v)}
+                  aria-pressed={cardView === v}
+                  className={`px-3 py-1 font-mono text-[11px] uppercase tracking-[0.12em] ${
+                    cardView === v
+                      ? "bg-[#03002C] text-white"
+                      : "bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+                  }`}
+                >
+                  {v === "scene" ? "In scene" : "Flat art"}
+                </button>
+              ))}
+            </span>
           </div>
 
           {artworkError ? (
@@ -1026,6 +1145,8 @@ function LondonSignagePage() {
                     svg={previewSvg(panel)}
                     draft={isDraft(panel)}
                     variation={Boolean(variations[panel.id])}
+                    version={liveFileSignature}
+                    view={cardView}
                     onClick={setOpenPanel}
                   />
                 ))}
@@ -1081,6 +1202,8 @@ function LondonSignagePage() {
                           svg={previewSvg(panel)}
                           draft={isDraft(panel)}
                           variation={Boolean(variations[panel.id])}
+                          version={liveFileSignature}
+                          view={cardView}
                           onClick={setOpenPanel}
                         />
                       ))}
@@ -1108,6 +1231,8 @@ function LondonSignagePage() {
                           svg={previewSvg(panel)}
                           draft={isDraft(panel)}
                           variation={Boolean(variations[panel.id])}
+                          version={liveFileSignature}
+                          view={cardView}
                           onClick={setOpenPanel}
                         />
                       ))}
