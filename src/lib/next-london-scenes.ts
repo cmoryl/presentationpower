@@ -65,6 +65,7 @@ import stageFascia from "@/assets/london-scenes/stage-fascia.jpg";
 import stepRepeat from "@/assets/london-scenes/step-repeat.jpg";
 import wideBanner from "@/assets/london-scenes/wide-banner.jpg";
 
+import { measuredSurface, scaleTrueBox, hasMeasuredSurface } from "@/lib/scene-scale";
 import {
   canCoverFace,
   mountArtworkOnFace,
@@ -829,6 +830,9 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
       // A genuine venue photograph beats a visualisation of the same surface,
       // so the first view a user sees is the real space wherever we have it.
       const photoBonus = s.photo && (kindOk ? hint >= 0 || hints.length === 0 : false) ? -0.5 : 0;
+      // A surface we hold a real measurement for can be rendered at true scale,
+      // so it leads over an equally suitable view we can only place the item on.
+      const measuredBonus = kindOk && hasMeasuredSurface(s) ? -0.4 : 0;
       return {
         s,
         score:
@@ -839,6 +843,7 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
           wrongFloor +
           liveBonus +
           photoBonus +
+          measuredBonus +
           specialised,
       };
 
