@@ -90,7 +90,7 @@ export const Route = createFileRoute("/api/kit-agent-chat")({
           originalMessages: messages,
           onError: (error) => {
             const raw = error instanceof Error ? error.message : String(error);
-            if (/not enough credits|payment_required|402/i.test(raw))
+            if (/not enough credits|payment[ _-]?required|402/i.test(raw))
               return "AI credits are exhausted for this workspace, so the kit could not be generated. Top up the workspace AI credits and send the brief again.";
             if (/rate.?limit|429/i.test(raw))
               return "The AI service is rate limited right now. Wait a moment and resend the brief.";
