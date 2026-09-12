@@ -97,9 +97,11 @@ function LegalRefreshView() {
             <p className="max-w-2xl text-sm text-black/60">
               Every direction has its own frame — where the copy sits, how the art is cropped and
               how the footer reads all change, so this is eight designs rather than eight colourways
-              of one. Each carries one of the approved headlines. Switch between the commissioned
-              photography and the drawn version of the same idea.
+              of one. Each carries one of the approved headlines. Switch art concept to see the same
+              eight ideas as photography, cinematic film stills, hand-drawn ink and wash, two-ink
+              riso print, cut-paper collage, or the drawn device alone.
             </p>
+
 
           </div>
           <div className="flex flex-wrap justify-end gap-1.5">
