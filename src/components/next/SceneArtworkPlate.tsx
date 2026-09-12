@@ -124,11 +124,17 @@ export function SceneArtworkPlate({
   face,
   substrate,
   quad,
+  kind,
+  mount,
 }: SceneArtworkPlateProps) {
   const light = sceneLighting(sceneId);
   const quality = sceneLightQuality(sceneId);
   const angle = shadeAngle(light.direction);
   const portrait = box.h >= box.w;
+  // What the print is mounted on. This, not a fixed drop shadow, decides how it
+  // meets its surface.
+  const finish = sceneSurface(kind, mount);
+  const castScale = surfaceCastScale(finish);
 
   // Perspective: the print is warped from the measured face rectangle onto the
   // measured face quad. Frontal surfaces skip the warp entirely so their print
