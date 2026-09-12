@@ -83,11 +83,12 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
   {
     floor: "GF",
     room: "LIFTS",
-    name: "LIFT DOOR - 1120x2090mm",
+    name: "LIFT DOOR - 1100x2085mm",
     ground: "Dawn column",
     style: "09-dawn",
-    trimW: 1120,
-    trimH: 2090,
+    // Corrected to the supplied lift car-front artboard.
+    trimW: 1100,
+    trimH: 2085,
     bleedEdge: 10,
     template: "GF/Lift Door Template/Lifts_Template.ai",
     dimsSource: "template",
@@ -230,15 +231,16 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
   {
     floor: "2F",
     room: "OLIVIER & BURTON",
-    name: "DOOR BRANDING OLIVIER & BURTON - 840x2000mm",
+    name: "DOOR BRANDING OLIVIER & BURTON - 930x2001mm",
     ground: "Bloom door",
     style: "05-bloom-corner",
-    trimW: 840,
-    trimH: 2000,
+    // Corrected to the supplied Burton pair artboard (2 pages, one per leaf).
+    trimW: 930,
+    trimH: 2001,
     bleedEdge: 10,
-    template: "Venue template requested — sized from 2F/Albert_and_Victoria.ai",
+    template: "2F/Burton/Burton_door.ai",
     dimsSource: "template",
-    note: "MediaNEXT branding. Template still being requested from the venue.",
+    note: "MediaNEXT branding. Double doors: one 930 x 2001 mm sheet per leaf.",
   },
   {
     floor: "2F",
@@ -269,15 +271,16 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
   {
     floor: "2F",
     room: "GIELGUD",
-    name: "DOOR BRANDING GIELGUD - 850x2020mm",
+    name: "DOOR BRANDING GIELGUD - 840x2000mm",
     ground: "Bloom door",
     style: "05-bloom-corner",
-    trimW: 850,
-    trimH: 2020,
+    // Corrected to the supplied Gielgud artboard (2 pages, one per leaf).
+    trimW: 840,
+    trimH: 2000,
     bleedEdge: 10,
-    template: "2F/Gielgud_entrance.ai",
+    template: "2F/Gielgud/GIELGUD.ai",
     dimsSource: "template",
-    note: "DigitalNEXT.",
+    note: "DigitalNEXT. Double doors: one 840 x 2000 mm sheet per leaf.",
   },
 
   // ── Third floor ─────────────────────────────────────────────────────────
@@ -648,16 +651,18 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
   {
     floor: "GF",
     room: "CHURCHILL",
-    name: "CHURCHILL DOOR VINYL - 900x2100mm",
+    name: "CHURCHILL DOUBLE DOOR VINYL - 1780x2200mm",
     ground: "Beam door",
     style: "01-beam-violet-aqua",
-    trimW: 900,
-    trimH: 2100,
+    // Corrected to the supplied Churchill pair artboard: one sheet spans both
+    // leaves, so the shut line falls inside the artwork.
+    trimW: 1780,
+    trimH: 2200,
     bleedEdge: 10,
-    template: "No venue template supplied",
-    dimsSource: "list",
+    template: "GF/Curchill Double Doors/Churchill_Double_doors.ai",
+    dimsSource: "template",
     qty: 2,
-    note: "Innovation Lounge doors — TransPerfect NEXT, room name set as live copy.",
+    note: "Innovation Lounge double doors — TransPerfect NEXT, room name set as live copy. One sheet across the pair (2 pairs supplied).",
   },
   {
     floor: "6F",
