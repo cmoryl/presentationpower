@@ -95,7 +95,9 @@ function Stage({
       >
         {scene.photo
           ? "Event photograph · artwork composited"
-          : "Visualisation · not a venue photo"}
+          : scene.live
+            ? "Visualisation · event in progress, not a venue photo"
+            : "Visualisation · not a venue photo"}
       </span>
     </div>
   );
