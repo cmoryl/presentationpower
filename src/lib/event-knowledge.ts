@@ -446,3 +446,91 @@ export function groupEventKnowledge(hits: readonly EventKnowledgeHit[]): EventKn
   }
   return brief;
 }
+
+// ---------------------------------------------------------------------------
+// Decision log — parse `docs/EVENT-DECISIONS.md` into searchable records
+// ---------------------------------------------------------------------------
+
+export type ParsedDecision = {
+  date: string;
+  title: string;
+  area: string;
+  optionsTested: string;
+  chosen: string;
+  why: string;
+  wouldChangeIf: string;
+  appliesTo: string;
+};
+
+/**
+ * Reads the decision log's `### YYYY-MM — Title` entries. Same shape as the
+ * lesson parser: the fenced format block at the top is skipped, superseded
+ * entries are kept so search still surfaces them with their marker.
+ */
+export function parseEventDecisions(markdown: string): ParsedDecision[] {
+  const body = markdown.replace(/```[\s\S]*?```/g, "");
+  const out: ParsedDecision[] = [];
+  const re = /^###\s+([\d]{4}(?:-[\d]{2}){0,2})\s+—\s+(.+)$/gm;
+  const heads: Array<{ date: string; title: string; at: number; end: number }> = [];
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(body))) {
+    heads.push({ date: m[1], title: m[2].trim(), at: m.index, end: re.lastIndex });
+  }
+  for (let i = 0; i < heads.length; i += 1) {
+    const head = heads[i];
+    const block = body.slice(head.end, heads[i + 1]?.at ?? body.length);
+    out.push({
+      date: head.date,
+      title: head.title,
+      area: FIELD(block, "Area"),
+      optionsTested: FIELD(block, "Options tested"),
+      chosen: FIELD(block, "Chosen"),
+      why: FIELD(block, "Why"),
+      wouldChangeIf: FIELD(block, "Would change if"),
+      appliesTo: FIELD(block, "Applies to"),
+    });
+  }
+  return out;
+}
+
+/**
+ * A decision is only useful with the options it beat: without them a future
+ * build re-tests the same rejected approach, or reverses the choice believing
+ * it was never considered. So the losing options ride in the body, and the
+ * reopening condition rides with them.
+ */
+export function decisionRecords(
+  venue: HarvestVenue,
+  decisions: readonly ParsedDecision[],
+): EventKnowledgeRecord[] {
+  return decisions.map((decision) => ({
+    eventId: venue.eventId,
+    city: venue.city,
+    venue: venue.venue,
+    templateFamilyId: null,
+    panelId: null,
+    kind: "decision" as const,
+    title: decision.title,
+    body: [
+      decision.area ? `Area: ${decision.area}` : "",
+      decision.optionsTested ? `Options tested: ${decision.optionsTested}` : "",
+      decision.chosen ? `Chosen: ${decision.chosen}` : "",
+      decision.why ? `Why: ${decision.why}` : "",
+      decision.wouldChangeIf ? `Would change if: ${decision.wouldChangeIf}` : "",
+      decision.appliesTo ? `Applies to: ${decision.appliesTo}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    facts: {
+      date: decision.date,
+      appliesTo: decision.appliesTo || "unstated",
+      reopensIf: decision.wouldChangeIf || "unstated",
+    },
+    source: "decision-log" as const,
+    fingerprint: eventKnowledgeFingerprint({
+      eventId: venue.eventId,
+      kind: "decision",
+      title: decision.title,
+    }),
+  }));
+}
