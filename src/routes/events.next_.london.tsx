@@ -61,7 +61,10 @@ import {
 } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import { useStepRepeatConfigs } from "@/lib/next-london-step-repeat";
-import { londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
+import {
+  londonPanelArtworkUrl,
+  londonSuppliedMaster,
+} from "@/lib/next-london-supplied-masters";
 import { buildLondonKitZip } from "@/lib/next-london-kit-zip";
 import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles, useLondonLiveFileSignature } from "@/lib/next-london-live-files";
@@ -191,7 +194,7 @@ function download(blob: Blob, name: string) {
 
 /** The artwork a card shows: supplied/hand-finished proof, else the live SVG. */
 function useCardArt(panel: LondonPanel, svg?: string, version?: string) {
-  const boothArt = londonSuppliedMaster(panel)?.previewUrl ?? londonBoothArtworkUrl(panel.id);
+  const boothArt = londonPanelArtworkUrl(panel.id);
   return useMemo(() => {
     // A replaced live file keeps the same URL, so the signature is appended as
     // a cache buster — otherwise the card keeps showing the previous render.
@@ -292,7 +295,7 @@ function PanelThumb({
   // ground: a data-URL SVG in an <img> cannot load the linked artwork. The
   // generated layers (lockup, headline, code, uploaded vector art) are painted
   // straight on top, so an edit to a supplied sign shows on the card too.
-  const boothArt = londonSuppliedMaster(panel)?.previewUrl ?? londonBoothArtworkUrl(panel.id);
+  const boothArt = londonPanelArtworkUrl(panel.id);
   const art = useCardArt(panel, svg, version);
   const svgUrl = svg
     ? `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`
