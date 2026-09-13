@@ -431,16 +431,25 @@ export function outcomeRecord(args: {
 export type EventKnowledgeBrief = {
   specs: EventKnowledgeHit[];
   placement: EventKnowledgeHit[];
+  /** Settled choices come before lessons: they say what to do, not what broke. */
+  decisions: EventKnowledgeHit[];
   lessons: EventKnowledgeHit[];
   other: EventKnowledgeHit[];
 };
 
 export function groupEventKnowledge(hits: readonly EventKnowledgeHit[]): EventKnowledgeBrief {
-  const brief: EventKnowledgeBrief = { specs: [], placement: [], lessons: [], other: [] };
+  const brief: EventKnowledgeBrief = {
+    specs: [],
+    placement: [],
+    decisions: [],
+    lessons: [],
+    other: [],
+  };
   for (const hit of hits) {
     if (hit.similarity < MIN_EVENT_KNOWLEDGE_SIMILARITY) continue;
     if (hit.kind === "spec") brief.specs.push(hit);
     else if (hit.kind === "placement") brief.placement.push(hit);
+    else if (hit.kind === "decision") brief.decisions.push(hit);
     else if (hit.kind === "lesson") brief.lessons.push(hit);
     else brief.other.push(hit);
   }
