@@ -194,13 +194,7 @@ function ScreenFrame({ screen }: { screen: LondonSceneScreen }) {
   );
 }
 
-function ScreenPlate({
-  screen,
-  sceneId,
-}: {
-  screen: LondonSceneScreen;
-  sceneId: string;
-}) {
+function ScreenPlate({ screen, sceneId }: { screen: LondonSceneScreen; sceneId: string }) {
   const light = sceneLighting(sceneId);
   const quality = sceneLightQuality(sceneId);
   const bounds = quadBounds(screen.quad);

@@ -2,12 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { LONDON_PANELS } from "@/lib/next-london-signage";
 import { LONDON_SCENES, fitArtworkInFace, londonScene } from "@/lib/next-london-scenes";
-import {
-  measuredSurface,
-  sceneSpecFit,
-  scaleTrueBox,
-  specFitLabel,
-} from "@/lib/scene-scale";
+import { measuredSurface, sceneSpecFit, scaleTrueBox, specFitLabel } from "@/lib/scene-scale";
 
 const panel = (match: string) => {
   const p = LONDON_PANELS.find((x) => x.name.includes(match));
@@ -59,10 +54,7 @@ describe("scene scale accuracy", () => {
   it("flags a print that cannot fit the surface it is shown on", () => {
     const scene = londonScene("ref-foyer-pillar")!;
     const surface = measuredSurface(scene)!;
-    const fit = sceneSpecFit(
-      { ...panel(""), trimW: surface.wMm * 2, trimH: surface.hMm },
-      scene,
-    );
+    const fit = sceneSpecFit({ ...panel(""), trimW: surface.wMm * 2, trimH: surface.hMm }, scene);
     expect(fit.mode).toBe("oversize");
     expect(fit.warnings[0]).toContain("does not fit");
   });

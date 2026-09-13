@@ -889,11 +889,13 @@ export function londonFloorPlan(floor: LondonFloorId): LondonFloorPlan | null {
 export function londonMappedFloors(
   panels: LondonPanel[] = LONDON_PANELS,
 ): { id: LondonFloorId; label: string; count: number }[] {
-  return LONDON_FLOORS.filter((f) => londonFloorPlan(f.id)).map((f) => ({
-    id: f.id,
-    label: f.label,
-    count: panels.filter((p) => p.floor === f.id).length,
-  })).filter((f) => f.count > 0);
+  return LONDON_FLOORS.filter((f) => londonFloorPlan(f.id))
+    .map((f) => ({
+      id: f.id,
+      label: f.label,
+      count: panels.filter((p) => p.floor === f.id).length,
+    }))
+    .filter((f) => f.count > 0);
 }
 
 // ── Asset classification ───────────────────────────────────────────────────
@@ -936,7 +938,11 @@ export const LONDON_ASSET_KIND_LABEL: Record<LondonAssetKind, string> = {
 // ── Placement ──────────────────────────────────────────────────────────────
 
 function normRoom(room: string): string {
-  return room.toUpperCase().replace(/[^A-Z& ]/g, "").replace(/\s+/g, " ").trim();
+  return room
+    .toUpperCase()
+    .replace(/[^A-Z& ]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 /** The zone a panel belongs to: room match first, then the floor's foyer. */
@@ -1002,7 +1008,7 @@ function rulePlacement(
     return { x: zone.x + zone.w, y: span(total, index, top, bottom), face: "west" };
   }
   if (kind === "floor") {
-    return { x: (zone.x + zone.w / 2), y: bottom, face: "up" };
+    return { x: zone.x + zone.w / 2, y: bottom, face: "up" };
   }
   if (kind === "wall" || kind === "banner" || kind === "set") {
     return {
@@ -1013,7 +1019,10 @@ function rulePlacement(
   }
 
   // Free-standing: interior grid, filled in rows across the zone.
-  const cols = Math.max(1, Math.min(6, Math.ceil(Math.sqrt(total * (zone.w / Math.max(1, zone.h))))));
+  const cols = Math.max(
+    1,
+    Math.min(6, Math.ceil(Math.sqrt(total * (zone.w / Math.max(1, zone.h))))),
+  );
   const rows = Math.max(1, Math.ceil(total / cols));
   const col = index % cols;
   const row = Math.floor(index / cols);
@@ -1086,7 +1095,9 @@ export function londonMarkerFor(
   panels: LondonPanel[] = LONDON_PANELS,
   overrides: LondonMarkerOverrides = {},
 ): LondonMarker | null {
-  return londonFloorMarkers(panel.floor, panels, overrides).find((m) => m.panelId === panel.id) ?? null;
+  return (
+    londonFloorMarkers(panel.floor, panels, overrides).find((m) => m.panelId === panel.id) ?? null
+  );
 }
 
 export const LONDON_FACE_LABEL: Record<LondonFace, string> = {
@@ -1152,7 +1163,9 @@ export function londonZoneSummary(
   zone: LondonZone,
   panels: LondonPanel[] = LONDON_PANELS,
 ): LondonZoneSummary {
-  const mine = panels.filter((p) => p.floor === plan.floor && londonZoneFor(plan, p).id === zone.id);
+  const mine = panels.filter(
+    (p) => p.floor === plan.floor && londonZoneFor(plan, p).id === zone.id,
+  );
   const kinds: LondonAssetKind[] = [];
   let printAreaM2 = 0;
   let widestMm = 0;

@@ -171,7 +171,12 @@ export function LondonMapAreasPanel({
                       ["y", "Y m", 0, plan.h],
                       ["w", "W m", MIN_AREA_M, plan.w],
                       ["h", "H m", MIN_AREA_M, plan.h],
-                    ] as [keyof LondonCustomArea & ("x" | "y" | "w" | "h"), string, number, number][]
+                    ] as [
+                      keyof LondonCustomArea & ("x" | "y" | "w" | "h"),
+                      string,
+                      number,
+                      number,
+                    ][]
                   ).map(([key, title, min, max]) => (
                     <label key={key} className="block">
                       <span className={tag}>{title}</span>
@@ -216,7 +221,6 @@ export function LondonMapAreasPanel({
                     </label>
                   ))}
                 </div>
-
               </li>
             );
           })}

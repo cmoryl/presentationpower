@@ -51,13 +51,9 @@ import {
   londonBrandingPlan,
   londonPanelFamily,
 } from "@/lib/next-london-branding";
-import {
-  isLondonDoorItem,
-  londonTintedStops,
-} from "@/lib/next-london-division";
+import { isLondonDoorItem, londonTintedStops } from "@/lib/next-london-division";
 import { loadLondonGroundImage, type LondonGroundImage } from "@/lib/next-london-artwork";
 import { NEXT_LOGO_FAMILIES } from "@/lib/next-logo-vectors";
-
 
 import {
   cmykAxialShadingDict,
@@ -663,10 +659,7 @@ function placedArtSvgLayer(
  * Rebuild a panel's SVG from its own specification: full-bleed artboard in mm,
  * live linear gradient, trim box marked as metadata only (never a drawn line).
  */
-export function buildLondonPanelSvg(
-  panelIn: LondonPanel,
-  options: LondonArtOptions = {},
-): string {
+export function buildLondonPanelSvg(panelIn: LondonPanel, options: LondonArtOptions = {}): string {
   const panel = options.boardSize
     ? applyLondonBoardSize(panelIn, { [panelIn.id]: options.boardSize })
     : panelIn;
@@ -842,7 +835,12 @@ export function buildLondonPanelSvg(
               const run = outlineText(face, q.caption, {
                 sizeMm: q.captionSizeMm,
                 trackingEm: q.captionTracking,
-                anchor: q.captionAnchor === "end" ? "end" : q.captionAnchor === "start" ? "start" : "middle",
+                anchor:
+                  q.captionAnchor === "end"
+                    ? "end"
+                    : q.captionAnchor === "start"
+                      ? "start"
+                      : "middle",
                 x: q.captionX,
                 y: q.y + q.size + pad + q.captionPadMm + q.captionSizeMm,
               });
@@ -868,7 +866,6 @@ export function buildLondonPanelSvg(
         );
       })()
     : "";
-
 
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${panel.bleedW}mm" height="${panel.bleedH}mm"`,
@@ -1005,11 +1002,9 @@ export function buildLondonPanelAi(
 
   const wall = isStepRepeatPanel(panel)
     ? stepRepeatPlan(
-          panel,
-          options.stepRepeat
-            ? clampStepRepeatConfig(options.stepRepeat)
-            : stepRepeatConfig(panel.id),
-        )
+        panel,
+        options.stepRepeat ? clampStepRepeatConfig(options.stepRepeat) : stepRepeatConfig(panel.id),
+      )
     : null;
 
   // Supplied vendor artwork: embedded as a real image XObject so the `.ai`
@@ -1120,8 +1115,6 @@ export function buildLondonPanelAi(
         return `q ${spin}${copyInk} ${ops} f Q\n`;
       })()
     : "";
-
-
 
   // Body: each wrapped line outlined and filled, matching the svg master.
   const bodyOps = brand.bodyLines
@@ -1239,7 +1232,6 @@ export function buildLondonPanelAi(
       })()
     : [];
 
-
   // Ground: the vendor's placed artwork when supplied (zoom/pan honoured),
   // otherwise the live gradient shading.
   const groundOps = groundImage
@@ -1300,7 +1292,14 @@ export function buildLondonPanelAi(
             if (!ops) return "";
             const m = path.m;
             // F·M·F⁻¹ for the y-flip of height `placed.h`.
-            const n = [m[0], -m[1], -m[2], m[3], m[2] * placed.h + m[4], placed.h - m[3] * placed.h - m[5]];
+            const n = [
+              m[0],
+              -m[1],
+              -m[2],
+              m[3],
+              m[2] * placed.h + m[4],
+              placed.h - m[3] * placed.h - m[5],
+            ];
             const cm = `${n.map((v) => f3(v)).join(" ")} cm `;
             // A shape the uploaded file drew semi-transparent keeps that
             // transparency in the master, as a live PDF soft state.
@@ -1452,7 +1451,6 @@ export function buildLondonPanelAi(
   pdf +=
     `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R /Info 5 0 R >>\n` +
     `startxref\n${xrefAt}\n%%EOF\n`;
-
 
   const bytes = new Uint8Array(pdf.length);
   for (let i = 0; i < pdf.length; i += 1) bytes[i] = pdf.charCodeAt(i) & 0xff;
@@ -1629,7 +1627,6 @@ function stepRepeatPdfOps(
    *  one Illustrator layer per lockup. */
   only?: (tile: StepRepeatPlan["tiles"][number]) => boolean,
 ): string {
-
   const rad = (plan.config.rotationDeg * Math.PI) / 180;
   const cos = Math.cos(rad);
   const sin = Math.sin(rad);
@@ -1649,7 +1646,6 @@ function stepRepeatPdfOps(
   return plan.tiles
     .filter((tile) => (only ? only(tile) : true))
     .map((tile) => {
-
       const matrix = spin(tile.x + tile.w / 2, tile.y + tile.h / 2);
       if (tile.kind === "logo") {
         const tileArt = plan.arts?.[tile.artIndex] ?? plan.art;
@@ -1690,7 +1686,6 @@ function stepRepeatPdfOps(
         artHeight: plan.qr.modules,
       });
       return `q ${alpha}${matrix}${plate}${modules ? `${fillOp(plan.qr.inkHex)} ${modules} f ` : ""}Q\n`;
-
     })
     .join("");
 }
@@ -1855,10 +1850,7 @@ export function effectiveLondonPanels(revisions: LondonRevision[]): LondonPanel[
   const known = new Set(latest.panels.map((p) => p.id));
   // ...unless the revision explicitly removed them.
   const removed = new Set(latest.removedIds ?? []);
-  return [
-    ...latest.panels,
-    ...LONDON_PANELS.filter((p) => !known.has(p.id) && !removed.has(p.id)),
-  ];
+  return [...latest.panels, ...LONDON_PANELS.filter((p) => !known.has(p.id) && !removed.has(p.id))];
 }
 
 /** Panels present in `to` but not in `from` — used when restoring a revision. */

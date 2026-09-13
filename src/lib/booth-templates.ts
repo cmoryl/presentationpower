@@ -18,10 +18,7 @@ import {
   LONDON_BOOTH_BLEED_MM,
   type LondonBoothSpec,
 } from "@/lib/next-london-booths";
-import {
-  LONDON_BOOTH_PANELS,
-  LONDON_BOOTH_PANEL_META,
-} from "@/lib/next-london-signage";
+import { LONDON_BOOTH_PANELS, LONDON_BOOTH_PANEL_META } from "@/lib/next-london-signage";
 import { boothShell } from "@/lib/next-london-booth-shells";
 import {
   DEFAULT_LOGO_PLACEMENT,
@@ -74,9 +71,7 @@ export function normalizeBoothOverlay(raw: unknown): BoothTemplateOverlay {
 }
 
 /** The overlay to save for a booth: the live placement, minus untouched keys. */
-export function boothOverlayFromPlacement(
-  placement: LondonLogoPlacement,
-): BoothTemplateOverlay {
+export function boothOverlayFromPlacement(placement: LondonLogoPlacement): BoothTemplateOverlay {
   const out: Record<string, unknown> = {};
   for (const [key, fallback] of Object.entries(DEFAULT_LOGO_PLACEMENT)) {
     const value = (placement as Record<string, unknown>)[key];

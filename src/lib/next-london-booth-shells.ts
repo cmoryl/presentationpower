@@ -25,8 +25,6 @@ import shellBAi from "@/assets/london-booths/tradebooth-b-shell.ai?url";
 import shellBProof from "@/assets/london-booths/tradebooth-b-shell.jpg";
 import shellBRender from "@/assets/london-booths/renders/tradebooth-b-render.jpg";
 
-
-
 export type LondonBoothShellId = "tradebooth-a" | "tradebooth-b";
 
 /** A rectangle on the wall, in mm from the TRIM origin (top-left of trim). */
@@ -113,10 +111,7 @@ export const LONDON_BOOTH_SHELLS: LondonBoothShell[] = [
     // The photographed opening is centred at x=779 and runs y=68 → 965.
     // Fit the supplied 1830:2440 trim inside it rather than stretching artwork
     // to the wider decorative frame. The TV remains centred on the true trim.
-    renderFace: trimFaceOnRender(
-      { w: 1536, h: 1024 },
-      { centerX: 779, top: 68, bottom: 965 },
-    ),
+    renderFace: trimFaceOnRender({ w: 1536, h: 1024 }, { centerX: 779, top: 68, bottom: 965 }),
     note:
       "Screen wall: a 1422 × 797 mm 16:9 monitor aperture sits centred, 405 mm below the trim top. " +
       "Keep logos and copy out of it — the lockup rides above the screen, copy below it.",
@@ -135,10 +130,7 @@ export const LONDON_BOOTH_SHELLS: LondonBoothShell[] = [
     renderUrl: shellBRender,
     // Apply the same physical trim fit to the screenless wall. Its measured
     // opening is centred at x=767.6 and runs y=70 → 941 on the render plate.
-    renderFace: trimFaceOnRender(
-      { w: 1536, h: 1024 },
-      { centerX: 767.6, top: 70, bottom: 941 },
-    ),
+    renderFace: trimFaceOnRender({ w: 1536, h: 1024 }, { centerX: 767.6, top: 70, bottom: 941 }),
     note: "No screen: the whole 1830 × 2440 mm face is live artwork.",
   },
 ];

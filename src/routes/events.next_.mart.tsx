@@ -340,11 +340,7 @@ function MartPage() {
                         Show it in the shop
                       </summary>
                       <div className="mt-2">
-                        <MartLocationRenderPreview
-                          id={sign.id}
-                          name={sign.name}
-                          config={config}
-                        />
+                        <MartLocationRenderPreview id={sign.id} name={sign.name} config={config} />
                       </div>
                     </details>
                   </div>

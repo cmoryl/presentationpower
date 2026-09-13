@@ -266,33 +266,18 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
       : "white",
     text: typeof p.text === "string" ? p.text.slice(0, LONDON_TEXT_MAX_CHARS) : null,
     textScale: clamp(p.textScale, LONDON_TEXT_SCALE.min, LONDON_TEXT_SCALE.max, 1),
-    textTracking: clamp(
-      p.textTracking,
-      LONDON_TEXT_TRACKING.min,
-      LONDON_TEXT_TRACKING.max,
-      0,
-    ),
+    textTracking: clamp(p.textTracking, LONDON_TEXT_TRACKING.min, LONDON_TEXT_TRACKING.max, 0),
     textDx: clamp(p.textDx, -0.5, 0.5, 0),
     textDy: clamp(p.textDy, -0.5, 0.5, 0),
     textVertical: typeof p.textVertical === "boolean" ? p.textVertical : null,
     sub: typeof p.sub === "string" ? p.sub.slice(0, LONDON_TEXT_MAX_CHARS) : null,
     subScale: clamp(p.subScale, LONDON_TEXT_SCALE.min, LONDON_TEXT_SCALE.max, 1),
-    subTracking: clamp(
-      p.subTracking,
-      LONDON_TEXT_TRACKING.min,
-      LONDON_TEXT_TRACKING.max,
-      0,
-    ),
+    subTracking: clamp(p.subTracking, LONDON_TEXT_TRACKING.min, LONDON_TEXT_TRACKING.max, 0),
     subDx: clamp(p.subDx, -0.5, 0.5, 0),
     subDy: clamp(p.subDy, -0.5, 0.5, 0),
     body: typeof p.body === "string" ? p.body.slice(0, LONDON_BODY_MAX_CHARS) : null,
     bodyScale: clamp(p.bodyScale, LONDON_TEXT_SCALE.min, LONDON_TEXT_SCALE.max, 1),
-    bodyTracking: clamp(
-      p.bodyTracking,
-      LONDON_TEXT_TRACKING.min,
-      LONDON_TEXT_TRACKING.max,
-      0,
-    ),
+    bodyTracking: clamp(p.bodyTracking, LONDON_TEXT_TRACKING.min, LONDON_TEXT_TRACKING.max, 0),
     bodyDx: clamp(p.bodyDx, -0.5, 0.5, 0),
     bodyDy: clamp(p.bodyDy, -0.5, 0.5, 0),
     bodyWidth: clamp(p.bodyWidth, LONDON_BODY_WIDTH.min, LONDON_BODY_WIDTH.max, 0.72),
@@ -329,7 +314,8 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
     groundScale: clamp(p.groundScale, LONDON_GROUND_SCALE.min, LONDON_GROUND_SCALE.max, 1),
     groundDx: clamp(p.groundDx, -0.5, 0.5, 0),
     groundDy: clamp(p.groundDy, -0.5, 0.5, 0),
-    accentTint: londonAccentTint(typeof p.accentTint === "string" ? p.accentTint : null)?.id ?? null,
+    accentTint:
+      londonAccentTint(typeof p.accentTint === "string" ? p.accentTint : null)?.id ?? null,
     accentWeight: tintValue(p.accentWeight, LONDON_TINT_LIMITS.weight),
     accentCurve: tintValue(p.accentCurve, LONDON_TINT_LIMITS.curve),
     accentSoften: tintValue(p.accentSoften, LONDON_TINT_LIMITS.soften),
@@ -339,10 +325,7 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
 }
 
 /** A stored tint knob: clamped into range, or null when it follows the preset. */
-function tintValue(
-  value: unknown,
-  range: { min: number; max: number },
-): number | null {
+function tintValue(value: unknown, range: { min: number; max: number }): number | null {
   if (typeof value !== "number" || !Number.isFinite(value)) return null;
   return Math.min(range.max, Math.max(range.min, value));
 }

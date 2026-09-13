@@ -1,9 +1,11 @@
 # Harden TransPerfect Element as a local design-system library
 
 ## Goal
+
 Make the existing converted application publishable as a local React/Tailwind design-system library without breaking its 161 product routes, editors, exports, or backend integrations.
 
 ## What the audit confirmed
+
 - This is a local, app-shaped TanStack project, not a wrapper around an upstream npm design-system package.
 - Geist is already bundled through `@fontsource-variable/geist`; there is no Google Fonts import for Geist to remove.
 - Current dependency ranges support application maintenance and should not be converted wholesale to exact npm-wrapper pins.
@@ -11,6 +13,7 @@ Make the existing converted application publishable as a local React/Tailwind de
 - The current UI/slide surface is highly coupled across `components`, `lib`, `hooks`, `assets`, and backend integrations, so exporting the whole app as a component barrel would ship broken consumer imports.
 
 ## Implementation
+
 1. **Add library classification**
    - Create `lovable.toml` with `tech_stack = "custom_design_system_tanstack"`.
    - Create `.lovable/meta.yaml` as React + Tailwind + local source + `custom_design_system` starter.
@@ -36,6 +39,7 @@ Make the existing converted application publishable as a local React/Tailwind de
    - Browser-check representative dashboard, module-library, and deck-editor routes to ensure the extraction introduced no visual or runtime regression.
 
 ## Technical note on rejected reviewer assumptions
+
 - Do not add a missing "upstream design-system dependency": this library is locally authored.
 - Do not add `upstream_package`, `stack_packages`, or npm-source paths to metadata.
 - Do not convert all package ranges to exact pins; that requirement applies to npm wrappers and would create unnecessary dependency churn here.

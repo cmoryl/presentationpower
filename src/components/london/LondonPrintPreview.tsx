@@ -229,10 +229,9 @@ export function LondonPrintReadout({ panel, plan }: LondonPrintReadoutProps) {
       </div>
 
       <p className="mt-2 text-[11px] text-muted-foreground">
-        Red = bleed (the file), white dashed = trim (the cut), green dashed = safe, magenta =
-        the screen aperture on a booth wall with a monitor. Artwork is
-        full-bleed to the red edge; shaped panels still take their cutting paths from the venue
-        proofs.
+        Red = bleed (the file), white dashed = trim (the cut), green dashed = safe, magenta = the
+        screen aperture on a booth wall with a monitor. Artwork is full-bleed to the red edge;
+        shaped panels still take their cutting paths from the venue proofs.
       </p>
     </div>
   );

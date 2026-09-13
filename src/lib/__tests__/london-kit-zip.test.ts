@@ -10,12 +10,20 @@ describe("london kit zip", () => {
   it("files masters by floor and room and records skips", async () => {
     const panels = LONDON_PANELS.slice(0, 3);
     let n = 0;
-    const res = await buildLondonKitZip(panels, {
-      fileBase: (p) => `r001-${p.id}`,
-      floorLabel: () => "Level 2 — Britten",
-      ai: async () => { n += 1; if (n === 2) throw new Error("QA fail"); return new Uint8Array([1,2,3]); },
-      printPdf: async () => new Uint8Array([4,5]),
-    }, { revLabel: "r001", scheduleCsv: "a,b" });
+    const res = await buildLondonKitZip(
+      panels,
+      {
+        fileBase: (p) => `r001-${p.id}`,
+        floorLabel: () => "Level 2 — Britten",
+        ai: async () => {
+          n += 1;
+          if (n === 2) throw new Error("QA fail");
+          return new Uint8Array([1, 2, 3]);
+        },
+        printPdf: async () => new Uint8Array([4, 5]),
+      },
+      { revLabel: "r001", scheduleCsv: "a,b" },
+    );
     expect(res.skipped).toHaveLength(1);
     const zip = await JSZip.loadAsync(await res.blob.arrayBuffer());
     const names = Object.keys(zip.files);

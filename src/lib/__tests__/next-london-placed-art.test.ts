@@ -58,9 +58,11 @@ describe("placed artwork import", () => {
     expect(q.arcs).toBe(false);
     const n = q.d.match(/-?\d*\.?\d+/g)!.map(Number);
     expect(q.d.replace(/[-\d.\s]+/g, " ").trim()).toBe("M C C");
-    expect(n.slice(0, 8)).toEqual([0, 0, 6.666667, 0, 10, 3.333333, 10, 10].map((v, i) =>
-      expect.closeTo(v, 4) as unknown as number,
-    ) as unknown as number[]);
+    expect(n.slice(0, 8)).toEqual(
+      [0, 0, 6.666667, 0, 10, 3.333333, 10, 10].map(
+        (v, i) => expect.closeTo(v, 4) as unknown as number,
+      ) as unknown as number[],
+    );
 
     // A quarter-turn arc keeps its endpoint and becomes real curve geometry.
     const a = normalisePathData("M0 0 A5 5 0 0 1 10 10");
@@ -93,7 +95,10 @@ describe("placed artwork import", () => {
       parseSvgArtwork(`<svg viewBox="0 0 10 10"><text x="0" y="5">NEXT</text></svg>`, "a.svg"),
     ).toThrow(/live text/i);
     expect(() =>
-      parseSvgArtwork(`<svg viewBox="0 0 10 10"><image href="x.jpg" width="10" height="10"/></svg>`, "a.svg"),
+      parseSvgArtwork(
+        `<svg viewBox="0 0 10 10"><image href="x.jpg" width="10" height="10"/></svg>`,
+        "a.svg",
+      ),
     ).toThrow(/vector only/i);
   });
 
@@ -169,7 +174,7 @@ describe("placed artwork in the masters", () => {
     const svg = buildLondonPanelSvg(panel, { placedArt: art });
     expect(svg).toContain('data-layer="placed-art"');
     expect(svg).toContain('data-artwork="mark.svg"');
-    expect(svg).toContain('matrix(2 0 0 2 10 5)');
+    expect(svg).toContain("matrix(2 0 0 2 10 5)");
     // Vector only: no placed raster and no live text sneaks in with it.
     expect(svg).not.toContain("<image");
     expect(svg).not.toContain("<text");

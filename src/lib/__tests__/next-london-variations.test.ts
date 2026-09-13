@@ -18,10 +18,7 @@ import {
   resetLondonBoardSize,
   setLondonBoardSize,
 } from "@/lib/next-london-board-size";
-import {
-  londonLogoPlacements,
-  setLondonLogoPlacement,
-} from "@/lib/next-london-logo-placement";
+import { londonLogoPlacements, setLondonLogoPlacement } from "@/lib/next-london-logo-placement";
 import { LONDON_PANELS, type LondonPanel } from "@/lib/next-london-signage";
 
 const source = (): LondonPanel => LONDON_PANELS[0]!;

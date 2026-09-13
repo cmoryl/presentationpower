@@ -65,7 +65,6 @@ export function deckDownloadFromToolOutput(output: unknown): DeckDownload | null
   return null;
 }
 
-
 export function AgentDeckDownload({ download }: { download: DeckDownload }) {
   return (
     <div className="rounded-xl border border-[#003FC7]/25 bg-[#003FC7]/[0.04] p-3">
@@ -114,7 +113,6 @@ export function AgentDeckDownload({ download }: { download: DeckDownload }) {
             Private link — expires an hour after it was created.
           </p>
         </div>
-
       </div>
     </div>
   );

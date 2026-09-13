@@ -12,8 +12,7 @@ import { socialSafeRect } from "@/lib/social-module-fit";
 import type { PrintSection } from "@/lib/print-assets.types";
 
 const portrait = SOCIAL_FORMATS.find((f) => aspectClass(f) === "portrait") ?? SOCIAL_FORMATS[0];
-const banner =
-  SOCIAL_FORMATS.find((f) => aspectClass(f) === "landscape-wide") ?? SOCIAL_FORMATS[0];
+const banner = SOCIAL_FORMATS.find((f) => aspectClass(f) === "landscape-wide") ?? SOCIAL_FORMATS[0];
 
 describe("social full-bleed plans", () => {
   it("covers the photographic hero and the monitor showcase", () => {
@@ -52,7 +51,12 @@ describe("social full-bleed plans", () => {
 
   it("collapses the hero's own band and reverses its type", () => {
     const plan = SOCIAL_FULL_BLEED_PLANS.find((p) => p.kind === "photo")!;
-    const section = { id: "h", kind: "hero", variantId: "hero-photo-fade", heightPct: 62 } as unknown as PrintSection;
+    const section = {
+      id: "h",
+      kind: "hero",
+      variantId: "hero-photo-fade",
+      heightPct: 62,
+    } as unknown as PrintSection;
     const out = fullBleedSection(section, plan) as unknown as { heightPct: number };
     expect(out.heightPct).toBeLessThan(5);
     expect(fullBleedMode(plan, "light")).toBe("dark");
@@ -60,7 +64,11 @@ describe("social full-bleed plans", () => {
 
   it("leaves the device section and face untouched", () => {
     const plan = SOCIAL_FULL_BLEED_PLANS.find((p) => p.kind === "device")!;
-    const section = { id: "d", kind: "device", variantId: "device-monitor-showcase" } as unknown as PrintSection;
+    const section = {
+      id: "d",
+      kind: "device",
+      variantId: "device-monitor-showcase",
+    } as unknown as PrintSection;
     expect(fullBleedSection(section, plan)).toBe(section);
     expect(fullBleedMode(plan, "light")).toBe("light");
   });

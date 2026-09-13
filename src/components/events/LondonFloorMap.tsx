@@ -69,7 +69,6 @@ export type LondonFloorMapProps = {
    */
   onView3d?: (panelId: string) => void;
 
-
   /** Attendee view: rooms and breakouts only, no signage pins. */
   roomsOnly?: boolean;
   /** Live design — the editor previews exactly what will export. */
@@ -315,7 +314,15 @@ export function LondonFloorMap({
                 y2={plan.h}
                 stroke={arch ? palette.ink : palette.grid}
                 strokeOpacity={
-                  design.grid === false ? 0 : arch ? (i % 5 === 0 ? 0.26 : 0.1) : i % 5 === 0 ? 0.55 : 0.22
+                  design.grid === false
+                    ? 0
+                    : arch
+                      ? i % 5 === 0
+                        ? 0.26
+                        : 0.1
+                      : i % 5 === 0
+                        ? 0.55
+                        : 0.22
                 }
                 strokeWidth={i % 5 === 0 ? 0.06 : 0.03}
               />
@@ -329,7 +336,15 @@ export function LondonFloorMap({
                 y2={i}
                 stroke={arch ? palette.ink : palette.grid}
                 strokeOpacity={
-                  design.grid === false ? 0 : arch ? (i % 5 === 0 ? 0.26 : 0.1) : i % 5 === 0 ? 0.55 : 0.22
+                  design.grid === false
+                    ? 0
+                    : arch
+                      ? i % 5 === 0
+                        ? 0.26
+                        : 0.1
+                      : i % 5 === 0
+                        ? 0.55
+                        : 0.22
                 }
                 strokeWidth={i % 5 === 0 ? 0.06 : 0.03}
               />
@@ -481,91 +496,89 @@ export function LondonFloorMap({
             const ink = active ? "#C4306E" : m.corrected ? "#0F9D58" : KIND_INK(m.kind);
             return (
               <div key={m.panelId} className="contents">
-              <button
-                type="button"
-                onDoubleClick={(ev) => {
-                  if (!onView3d) return;
-                  ev.stopPropagation();
-                  ev.preventDefault();
-                  onView3d(m.panelId);
-                }}
-                onPointerDown={(ev) => {
-
-                  ev.stopPropagation();
-                  onSelect(m.panelId);
-                  if (!editable) return;
-                  ev.preventDefault();
-                  setDragId(m.panelId);
-                }}
-                onKeyDown={(ev) => {
-                  if (!editable) return;
-                  const step = ev.shiftKey ? 1 : 0.25;
-                  if (ev.key === "ArrowLeft") nudge(m, -step, 0);
-                  else if (ev.key === "ArrowRight") nudge(m, step, 0);
-                  else if (ev.key === "ArrowUp") nudge(m, 0, -step);
-                  else if (ev.key === "ArrowDown") nudge(m, 0, step);
-                  else return;
-                  ev.preventDefault();
-                }}
-                title={`${m.name} — ${LONDON_ASSET_KIND_LABEL[m.kind]} · ${LONDON_FACE_LABEL[m.face]} · x ${m.x.toFixed(1)} m / y ${m.y.toFixed(1)} m`}
-                aria-label={`${m.name}, ${LONDON_ASSET_KIND_LABEL[m.kind]}, ${LONDON_FACE_LABEL[m.face]}${
-                  m.corrected ? ", position confirmed" : ""
-                }`}
-                className={`absolute outline-offset-2 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#003FC7] ${
-                  active ? "z-20" : "z-10 hover:scale-110"
-                } ${editable ? "cursor-grab" : "cursor-pointer"}`}
-                style={{
-                  left: `${(m.x / plan.w) * 100}%`,
-                  top: `${(m.y / plan.h) * 100}%`,
-                  // Pins keep their on-screen size as the plan scales up, and hang
-                  // from their tip like a directory drop pin.
-                  // Pins near the top edge flip so the head stays inside the plan.
-                  transform: `translate(-50%, ${m.y < 1.4 ? "0%" : "-100%"}) rotate(${m.y < 1.4 ? 180 : 0}deg) scale(${(active ? 1.18 : 1) / view.z})`,
-                }}
-              >
-                <span
-                  className="relative block drop-shadow-[0_2px_2px_rgba(3,0,44,0.35)]"
-                  style={{ width: 16, height: 22 }}
-                >
-                  <span
-                    className="absolute left-0 top-0 block h-4 w-4 rounded-full border-[1.5px] border-white"
-                    style={{ background: ink }}
-                  />
-                  <span
-                    aria-hidden="true"
-                    className="absolute left-1/2 top-[11px] block h-2.5 w-2.5 -translate-x-1/2 rotate-45 rounded-[1px] border-b-[1.5px] border-r-[1.5px] border-white"
-                    style={{ background: ink }}
-                  />
-                  <span
-                    aria-hidden="true"
-                    className={`absolute left-1/2 top-[8px] block -translate-x-1/2 -translate-y-1/2 bg-white ${glyphClass(m.kind)}`}
-                  />
-                </span>
-              </button>
-              {active && onView3d ? (
                 <button
                   type="button"
-                  onPointerDown={(ev) => ev.stopPropagation()}
-                  onClick={(ev) => {
+                  onDoubleClick={(ev) => {
+                    if (!onView3d) return;
                     ev.stopPropagation();
+                    ev.preventDefault();
                     onView3d(m.panelId);
                   }}
-                  title={`View ${m.name} in 3D`}
-                  aria-label={`View ${m.name} in 3D`}
-                  className="absolute z-30 inline-flex items-center gap-1 rounded-full bg-[#003FC7] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-white shadow-sm outline-offset-2 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#03002C]"
+                  onPointerDown={(ev) => {
+                    ev.stopPropagation();
+                    onSelect(m.panelId);
+                    if (!editable) return;
+                    ev.preventDefault();
+                    setDragId(m.panelId);
+                  }}
+                  onKeyDown={(ev) => {
+                    if (!editable) return;
+                    const step = ev.shiftKey ? 1 : 0.25;
+                    if (ev.key === "ArrowLeft") nudge(m, -step, 0);
+                    else if (ev.key === "ArrowRight") nudge(m, step, 0);
+                    else if (ev.key === "ArrowUp") nudge(m, 0, -step);
+                    else if (ev.key === "ArrowDown") nudge(m, 0, step);
+                    else return;
+                    ev.preventDefault();
+                  }}
+                  title={`${m.name} — ${LONDON_ASSET_KIND_LABEL[m.kind]} · ${LONDON_FACE_LABEL[m.face]} · x ${m.x.toFixed(1)} m / y ${m.y.toFixed(1)} m`}
+                  aria-label={`${m.name}, ${LONDON_ASSET_KIND_LABEL[m.kind]}, ${LONDON_FACE_LABEL[m.face]}${
+                    m.corrected ? ", position confirmed" : ""
+                  }`}
+                  className={`absolute outline-offset-2 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#003FC7] ${
+                    active ? "z-20" : "z-10 hover:scale-110"
+                  } ${editable ? "cursor-grab" : "cursor-pointer"}`}
                   style={{
                     left: `${(m.x / plan.w) * 100}%`,
                     top: `${(m.y / plan.h) * 100}%`,
-                    transform: `translate(-50%, ${m.y < 1.4 ? "170%" : "40%"}) scale(${1 / view.z})`,
+                    // Pins keep their on-screen size as the plan scales up, and hang
+                    // from their tip like a directory drop pin.
+                    // Pins near the top edge flip so the head stays inside the plan.
+                    transform: `translate(-50%, ${m.y < 1.4 ? "0%" : "-100%"}) rotate(${m.y < 1.4 ? 180 : 0}deg) scale(${(active ? 1.18 : 1) / view.z})`,
                   }}
                 >
-                  3D
+                  <span
+                    className="relative block drop-shadow-[0_2px_2px_rgba(3,0,44,0.35)]"
+                    style={{ width: 16, height: 22 }}
+                  >
+                    <span
+                      className="absolute left-0 top-0 block h-4 w-4 rounded-full border-[1.5px] border-white"
+                      style={{ background: ink }}
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-1/2 top-[11px] block h-2.5 w-2.5 -translate-x-1/2 rotate-45 rounded-[1px] border-b-[1.5px] border-r-[1.5px] border-white"
+                      style={{ background: ink }}
+                    />
+                    <span
+                      aria-hidden="true"
+                      className={`absolute left-1/2 top-[8px] block -translate-x-1/2 -translate-y-1/2 bg-white ${glyphClass(m.kind)}`}
+                    />
+                  </span>
                 </button>
-              ) : null}
+                {active && onView3d ? (
+                  <button
+                    type="button"
+                    onPointerDown={(ev) => ev.stopPropagation()}
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      onView3d(m.panelId);
+                    }}
+                    title={`View ${m.name} in 3D`}
+                    aria-label={`View ${m.name} in 3D`}
+                    className="absolute z-30 inline-flex items-center gap-1 rounded-full bg-[#003FC7] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-white shadow-sm outline-offset-2 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#03002C]"
+                    style={{
+                      left: `${(m.x / plan.w) * 100}%`,
+                      top: `${(m.y / plan.h) * 100}%`,
+                      transform: `translate(-50%, ${m.y < 1.4 ? "170%" : "40%"}) scale(${1 / view.z})`,
+                    }}
+                  >
+                    3D
+                  </button>
+                ) : null}
               </div>
             );
           })}
-
         </div>
 
         {/* North arrow + scale bar: fixed to the frame, unaffected by zoom. */}

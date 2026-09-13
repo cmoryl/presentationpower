@@ -67,7 +67,11 @@ import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles, useLondonLiveFileSignature } from "@/lib/next-london-live-files";
 import { LondonLiveFilePanel } from "@/components/events/LondonLiveFilePanel";
 import { LondonLiveFileBulkUpload } from "@/components/events/LondonLiveFileBulkUpload";
-import { applyLondonBoardSize, applyLondonBoardSizes, useLondonBoardSizes } from "@/lib/next-london-board-size";
+import {
+  applyLondonBoardSize,
+  applyLondonBoardSizes,
+  useLondonBoardSizes,
+} from "@/lib/next-london-board-size";
 import {
   createLondonVariation,
   londonVariationsOf,
@@ -205,13 +209,7 @@ function useCardArt(panel: LondonPanel, svg?: string, version?: string) {
  * measured face of its best-ranked in-event plate, with the same light matching
  * as the full in-situ preview so a card and its enlarged view agree.
  */
-function SceneThumb({
-  panel,
-  art,
-}: {
-  panel: LondonPanel;
-  art: string | null;
-}) {
+function SceneThumb({ panel, art }: { panel: LondonPanel; art: string | null }) {
   const scene = useMemo(() => defaultSceneForPanel(panel), [panel]);
   const door = useMemo(() => londonDoorSpec(panel), [panel]);
   // A double door is rendered leaf by leaf on its measured opening, so a leaf
@@ -337,7 +335,6 @@ function PanelThumb({
     </div>
   );
 }
-
 
 function PanelCard({
   panel,
@@ -571,8 +568,7 @@ function LondonSignagePage() {
         // Tell the auto-publisher what is already live, so a saved edit that has
         // been published stops counting as a draft.
         setLondonPublishedOverrides(
-          adoptLondonPublishedOverrides(res.revision?.overrides ?? null) ??
-            EMPTY_LONDON_OVERRIDES,
+          adoptLondonPublishedOverrides(res.revision?.overrides ?? null) ?? EMPTY_LONDON_OVERRIDES,
         );
         const inForce = effectiveLondonPanels(res.revision ? [res.revision] : []);
         if (inForce.length) setPanels(inForce);
@@ -611,8 +607,6 @@ function LondonSignagePage() {
 
   const target = openPanel ? rasterSizeFor(openPanel, ppi) : null;
 
-
-
   /** Builder options for a panel, taken from the revision in force. */
   const artOptions = (panel: LondonPanel) => londonOverrideOptions(panel.id, headOverrides);
 
@@ -641,9 +635,9 @@ function LondonSignagePage() {
     Boolean(variations[panel.id]) ||
     (Boolean(
       localPlacements[panel.id] ||
-        localBoardSizes[panel.id] ||
-        localPlacedArt[panel.id] ||
-        localStepRepeat[panel.id],
+      localBoardSizes[panel.id] ||
+      localPlacedArt[panel.id] ||
+      localStepRepeat[panel.id],
     ) &&
       !londonEditsArePublished(
         panel.id,
@@ -665,7 +659,6 @@ function LondonSignagePage() {
   const fileBase = (panel: LondonPanel) =>
     londonPanelFileBase(panel, isDraft(panel) ? "draft" : headRev);
 
-
   // Previews outline their copy with the shipped signage face. Until it is in
   // memory the synchronous builder throws by design, so the tile simply stays
   // blank rather than taking the whole page down with it.
@@ -680,7 +673,6 @@ function LondonSignagePage() {
       return undefined;
     }
   };
-
 
   const packOrNull = async () => {
     if (artwork) return artwork;
@@ -739,7 +731,10 @@ function LondonSignagePage() {
         // The async builder resolves supplied vendor artwork itself.
         const bytes = await buildLondonPanelPrintPdfAsync(panel, exportOptions(panel));
         gateOnQa(auditPrintPdf(panel, bytes, LONDON_MARKS_MARGIN_MM));
-        download(new Blob([londonAiBytes(bytes)], { type: "application/pdf" }), `${fileBase(panel)}-print.pdf`);
+        download(
+          new Blob([londonAiBytes(bytes)], { type: "application/pdf" }),
+          `${fileBase(panel)}-print.pdf`,
+        );
       },
     );
 
@@ -820,7 +815,6 @@ function LondonSignagePage() {
                   print,
                 };
               },
-
             },
             {
               revLabel: isDraftKit ? "rdraft" : `r${String(headRev).padStart(3, "0")}`,
@@ -1095,7 +1089,6 @@ function LondonSignagePage() {
           </summary>
           <LondonAgendaBoards />
         </details>
-
 
         {/* Floor spine */}
         <section className="mt-12">
@@ -1432,7 +1425,6 @@ function LondonSignagePage() {
                 </button>
               </div>
 
-
               {/* The finished live file in force for this sign. Replacing it here
                   re-paints every preview card in the kit at once. */}
               {isBoothPanel(openPanel) ? null : (
@@ -1574,9 +1566,11 @@ function LondonSignagePage() {
 
               {/* Every other item: the artwork in place at the venue. */}
               {isBoothPanel(openPanel) ? null : (
-                <LondonLocationRenderPreview panel={openPanel} baseOptions={artOptions(openPanel)} />
+                <LondonLocationRenderPreview
+                  panel={openPanel}
+                  baseOptions={artOptions(openPanel)}
+                />
               )}
-
 
               {/* Check every resolution tier on screen before downloading. */}
               <LondonPpiPreview panel={openPanel} svg={previewSvg(openPanel)} />
@@ -1650,7 +1644,6 @@ function LondonSignagePage() {
                       >
                         <FileDown className="h-3.5 w-3.5" /> AI · with your edits
                       </button>
-
                     </>
                   ) : (
                     <button
@@ -1698,8 +1691,6 @@ function LondonSignagePage() {
                     copy — is live in the file.
                   </p>
                 ) : null}
-
-
 
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">

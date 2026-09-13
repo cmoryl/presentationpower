@@ -26,7 +26,12 @@ function toDataUrl(svg: string): string {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
-export function LondonPanelThumb({ panel: input, size = 72, className, onOpen }: LondonPanelThumbProps) {
+export function LondonPanelThumb({
+  panel: input,
+  size = 72,
+  className,
+  onOpen,
+}: LondonPanelThumbProps) {
   const faceReady = useLondonSignageFace();
   // Edits saved in this browser (logo move/turn, accent tuning, re-measured
   // board, uploaded artwork) repaint the tile straight away.
@@ -106,7 +111,6 @@ export function LondonPanelThumb({ panel: input, size = 72, className, onOpen }:
         ) : null}
       </span>
     ) : null;
-
 
   const box = `overflow-hidden rounded-md border border-black/10 bg-[#03002C] ${className ?? ""}`;
 

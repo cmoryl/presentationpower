@@ -17,11 +17,7 @@ describe("orbit stat placement", () => {
   it("falls back to the staggered defaults", () => {
     const items = [{ value: "97%" }, { value: "90%" }, { value: "70%" }];
     const layout = resolveOrbitLayout(items);
-    expect(layout).toEqual([
-      defaultOrbitPos(0, 3),
-      defaultOrbitPos(1, 3),
-      defaultOrbitPos(2, 3),
-    ]);
+    expect(layout).toEqual([defaultOrbitPos(0, 3), defaultOrbitPos(1, 3), defaultOrbitPos(2, 3)]);
     expect(new Set(layout.map((p) => `${p.x}:${p.y}`)).size).toBe(3);
   });
 
@@ -125,7 +121,9 @@ describe("orbit collision detection", () => {
     const fitted = resolveFittedOrbitLayout(items);
     for (let i = 0; i < fitted.length; i += 1) {
       for (let j = i + 1; j < fitted.length; j += 1) {
-        expect(orbitsCollide(fitted[i]!, fitted[j]!, st, orbitBaseSize(3)), `${i}/${j}`).toBe(false);
+        expect(orbitsCollide(fitted[i]!, fitted[j]!, st, orbitBaseSize(3)), `${i}/${j}`).toBe(
+          false,
+        );
       }
     }
   });

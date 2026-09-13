@@ -145,7 +145,6 @@ export function SocialModulePicker({
                 }}
                 className="group flex min-w-0 flex-col gap-2 rounded-2xl border border-black/10 bg-white p-3 text-left transition hover:border-[#003FC7]/50 hover:shadow-[0_18px_40px_-24px_rgba(3,0,44,0.35)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
               >
-
                 <div className="flex h-[220px] items-center justify-center overflow-hidden rounded-xl bg-[#F2F2F2]">
                   <SocialModuleFrame
                     format={format}

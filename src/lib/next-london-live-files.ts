@@ -27,7 +27,6 @@ export type LondonLiveFileVersion = {
   proofUrl: string | null;
 };
 
-
 export type LondonLiveFileMap = Record<string, LondonLiveFileVersion>;
 
 const EMPTY: LondonLiveFileMap = {};

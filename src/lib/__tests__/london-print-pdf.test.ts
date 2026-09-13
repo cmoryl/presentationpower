@@ -1,20 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import { auditPrintPdf } from "@/lib/london-signage-qa";
-import {
-  buildLondonPanelPrintPdf,
-  LONDON_MARKS_MARGIN_MM,
-} from "@/lib/next-london-revise";
+import { buildLondonPanelPrintPdf, LONDON_MARKS_MARGIN_MM } from "@/lib/next-london-revise";
 import { LONDON_PANELS } from "@/lib/next-london-signage";
 
 const MM_TO_PT = 72 / 25.4;
 const text = (bytes: Uint8Array) => Array.from(bytes, (b) => String.fromCharCode(b)).join("");
 const box = (pdf: string, name: string) =>
-  new RegExp(`/${name}\\s*\\[([^\\]]+)\\]`)
-    .exec(pdf)?.[1]!
-    .trim()
-    .split(/\s+/)
-    .map(Number) ?? null;
+  new RegExp(`/${name}\\s*\\[([^\\]]+)\\]`).exec(pdf)?.[1]!.trim().split(/\s+/).map(Number) ?? null;
 
 const panel = LONDON_PANELS.find((p) => !p.name.toLowerCase().includes("booth"))!;
 

@@ -134,9 +134,6 @@ export function fullBleedSection(section: PrintSection, plan: SocialFullBleedPla
 }
 
 /** Ink the composition's copy must use (photo kind always reverses out). */
-export function fullBleedMode(
-  plan: SocialFullBleedPlan,
-  mode: "light" | "dark",
-): "light" | "dark" {
+export function fullBleedMode(plan: SocialFullBleedPlan, mode: "light" | "dark"): "light" | "dark" {
   return plan.kind === "photo" ? "dark" : mode;
 }

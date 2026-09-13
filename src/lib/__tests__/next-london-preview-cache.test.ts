@@ -1,10 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
-import {
-  DEFAULT_LOGO_PLACEMENT,
-  type LondonLogoPlacement,
-} from "@/lib/next-london-logo-placement";
+import { DEFAULT_LOGO_PLACEMENT, type LondonLogoPlacement } from "@/lib/next-london-logo-placement";
 import {
   hasLondonArtOverrides,
   londonPanelSvgFor,
@@ -47,7 +44,7 @@ describe("London card preview cache", () => {
     const svg = londonPanelSvgFor(panel, pack, { placement });
     expect(svg).not.toBe(issuedSvg);
     expect(svg).toContain(`data-panel="${panel.id}"`);
-    expect(svg).toContain("data-qr=\"https://example.com/updated\"");
+    expect(svg).toContain('data-qr="https://example.com/updated"');
   });
 
   it("keeps preview and downloadable SVG on the same rebuilt artwork", () => {

@@ -28,9 +28,13 @@ describe("published override merge", () => {
 
   it("lets a local edit win over the published value", () => {
     const local = { ...QR_RECIPE, tileWidthMm: 320 };
-    const merged = mergeLondonOverrideMap("stepRepeat", { "ldn-v42": QR_RECIPE }, {
-      "ldn-v42": local,
-    });
+    const merged = mergeLondonOverrideMap(
+      "stepRepeat",
+      { "ldn-v42": QR_RECIPE },
+      {
+        "ldn-v42": local,
+      },
+    );
     expect(merged["ldn-v42"]!.tileWidthMm).toBe(320);
   });
 

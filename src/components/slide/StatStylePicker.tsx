@@ -33,7 +33,6 @@ const selectClass =
   "w-full rounded-lg border border-black/10 bg-white px-2 py-1.5 text-[11px] font-medium text-[#03002C] outline-none transition focus:border-[#003FC7]";
 const capClass = "text-[9px] font-semibold uppercase tracking-[0.16em] text-black/40";
 
-
 /**
  * Slide-level stat design control: figure shape (including the data-viz and
  * oversized-icon treatments), the material behind it, its reveal beat, its
@@ -71,8 +70,6 @@ export function StatStylePicker({
   const motion = value?.motion ?? moduleLayout.motion ?? "none";
   const emphasis = value?.emphasis ?? moduleLayout.emphasis ?? "normal";
   const series = value?.series ?? moduleLayout.series ?? [];
-
-
 
   const grouped = useMemo(() => {
     const out = new Map<string, typeof STAT_SHAPE_PRESETS>();
@@ -270,7 +267,6 @@ export function StatStylePicker({
           </span>
         </label>
       )}
-
 
       {value && Object.keys(value).length > 0 && (
         <button

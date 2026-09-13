@@ -35,8 +35,14 @@ export function resolveLogoWall(value: unknown): LogoWall {
   const scale = num(v.scale);
   const gap = num(v.gap);
   return {
-    columns: columns === null ? DEFAULT_LOGO_WALL.columns : Math.round(clamp(columns, MIN_WALL_COLUMNS, MAX_WALL_COLUMNS)),
-    scale: scale === null ? DEFAULT_LOGO_WALL.scale : clamp(Math.round(scale * 100) / 100, MIN_WALL_SCALE, MAX_WALL_SCALE),
+    columns:
+      columns === null
+        ? DEFAULT_LOGO_WALL.columns
+        : Math.round(clamp(columns, MIN_WALL_COLUMNS, MAX_WALL_COLUMNS)),
+    scale:
+      scale === null
+        ? DEFAULT_LOGO_WALL.scale
+        : clamp(Math.round(scale * 100) / 100, MIN_WALL_SCALE, MAX_WALL_SCALE),
     gap: gap === null ? DEFAULT_LOGO_WALL.gap : Math.round(clamp(gap, MIN_WALL_GAP, MAX_WALL_GAP)),
   };
 }

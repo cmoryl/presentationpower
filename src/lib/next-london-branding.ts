@@ -93,7 +93,6 @@ export function londonPanelFamily(panel: LondonPanel): string {
   return "transperfect";
 }
 
-
 /** Headline copy the note calls out, normalised to the signage set. */
 /** Everything that can carry a branding instruction for an item. */
 function brandingHaystack(panel: LondonPanel): string {
@@ -267,7 +266,8 @@ export function londonBrandingPlan(
   // single-line mark reads best running UP or DOWN the panel. The mark keeps its
   // own proportions; the live area it is measured against is swapped, so the
   // long edge of the lockup is budgeted against the long edge of the sheet.
-  const logoRotate = nudge.lockupRotate === 90 || nudge.lockupRotate === 270 ? nudge.lockupRotate : 0;
+  const logoRotate =
+    nudge.lockupRotate === 90 || nudge.lockupRotate === 270 ? nudge.lockupRotate : 0;
   const turned = logoRotate !== 0;
   const runW = turned ? liveH : liveW;
   const runH = turned ? liveW : liveH;
@@ -292,8 +292,7 @@ export function londonBrandingPlan(
   // Native templates are app-built faces: a vendor booth with no supplied wall,
   // or a Bespoke scenic face whose artwork we own outright. Both ship default
   // copy for every slot, and both stay fully editable on top.
-  const native =
-    londonBoothNativeTemplate(panel.id) ?? londonBespokeNativeTemplate(panel.id);
+  const native = londonBoothNativeTemplate(panel.id) ?? londonBespokeNativeTemplate(panel.id);
   // A hand-finished live file is already typeset. Whatever layer it carries is
   // NOT drawn a second time on top — that is what doubled the lockup and the
   // headline on the preview cards. The designer can hand any layer back to the
@@ -335,16 +334,8 @@ export function londonBrandingPlan(
   // slackX to the RIGHT of the box origin — the clamp shifts by that offset.
   const slackX = (logoW - boxW) / 2;
   const slackY = (logoH - boxH) / 2;
-  const logoX = clamp(
-    centreX + nudge.dx * panel.trimW,
-    -slackX,
-    panel.bleedW - boxW - slackX,
-  );
-  const logoY = clamp(
-    baseY + nudge.dy * panel.trimH,
-    -slackY,
-    panel.bleedH - boxH - slackY,
-  );
+  const logoX = clamp(centreX + nudge.dx * panel.trimW, -slackX, panel.bleedW - boxW - slackX);
+  const logoY = clamp(baseY + nudge.dy * panel.trimH, -slackY, panel.bleedH - boxH - slackY);
 
   // Pillars and other tall, narrow sheets set their copy running DOWN the
   // panel by default — the same treatment as the master NEXT pillar set. The
@@ -375,9 +366,7 @@ export function londonBrandingPlan(
         : logoY + logoH + Math.max(logoH * 0.5, copySizeMm * 1.2);
     // On a screen wall the copy stack starts clear of the aperture.
     const baseBaseline =
-      screenBottom !== null
-        ? Math.max(stackTop, screenBottom + copySizeMm * 1.35)
-        : stackTop;
+      screenBottom !== null ? Math.max(stackTop, screenBottom + copySizeMm * 1.35) : stackTop;
     // Headline nudge, clamped so the cap band stays inside the sheet.
     copyBaselineMm = clamp(
       baseBaseline + nudge.textDy * panel.trimH,
@@ -457,21 +446,14 @@ export function londonBrandingPlan(
   // there is no headline). Its cap height and baseline are derived from the live
   // area and the headline, never stored in absolute mm, so re-issuing a booth at
   // another stand size re-lays the copy instead of stranding it.
-  const sub =
-    nudge.sub === null
-      ? (native?.sub || null)
-      : nudge.sub.trim()
-        ? nudge.sub.trim()
-        : null;
+  const sub = nudge.sub === null ? native?.sub || null : nudge.sub.trim() ? nudge.sub.trim() : null;
   const subSizeMm = copySizeMm * 0.42 * nudge.subScale;
   const subTrackingEm = LONDON_SIGNAGE_FONT.tracking + 0.02 + nudge.subTracking;
   const subRunMm = sub ? londonCopyRunMm(sub, subSizeMm, subTrackingEm) : 0;
   const subAnchorBaseline = copy
     ? copyBaselineMm + (vertical ? 0 : copySizeMm * 0.55 + subSizeMm)
     : logoY + logoH + Math.max(logoH * 0.4, subSizeMm * 1.6);
-  const subAnchorCentre = vertical
-    ? copyCentreMm + copySizeMm * 0.95
-    : marginX + panel.trimW / 2;
+  const subAnchorCentre = vertical ? copyCentreMm + copySizeMm * 0.95 : marginX + panel.trimW / 2;
   const subBaselineMm = vertical
     ? clamp(subAnchorBaseline + nudge.subDy * panel.trimH, 0, panel.bleedH)
     : clamp(
@@ -485,16 +467,18 @@ export function londonBrandingPlan(
   // metric as the headline so the wrap holds at every stand size. Like the other
   // slots its geometry is derived, never stored in absolute mm.
   const bodyText =
-    nudge.body === null ? (native?.body || null) : nudge.body.trim() ? nudge.body.trim() : null;
+    nudge.body === null ? native?.body || null : nudge.body.trim() ? nudge.body.trim() : null;
   const bodySizeMm = subSizeMm * 0.52 * nudge.bodyScale;
   const bodyTrackingEm = LONDON_SIGNAGE_FONT.tracking + 0.01 + nudge.bodyTracking;
   const bodyMeasureMm = liveW * nudge.bodyWidth;
-  const bodyLines = bodyText
-    ? wrapCopy(bodyText, bodySizeMm, bodyTrackingEm, bodyMeasureMm)
-    : [];
+  const bodyLines = bodyText ? wrapCopy(bodyText, bodySizeMm, bodyTrackingEm, bodyMeasureMm) : [];
   const bodyLeadingMm = bodySizeMm * 1.45;
   const bodyAnchorBaseline =
-    (sub ? subBaselineMm + subSizeMm * 0.8 : copy ? copyBaselineMm + copySizeMm * 0.9 : logoY + logoH) +
+    (sub
+      ? subBaselineMm + subSizeMm * 0.8
+      : copy
+        ? copyBaselineMm + copySizeMm * 0.9
+        : logoY + logoH) +
     bodySizeMm * 1.6;
   const bodyBaselineMm = clamp(
     bodyAnchorBaseline + nudge.bodyDy * panel.trimH,
@@ -542,7 +526,6 @@ export function londonBrandingPlan(
     // second lockup over the top. Every other sign starts with the house lockup
     // placed and editable, so it can be moved, recoloured, turned or hidden.
     lockupOn: nudge.lockup ?? !fileOwnsLockup,
-
   };
 }
 

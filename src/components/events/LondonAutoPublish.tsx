@@ -40,9 +40,7 @@ const SETTLE_MS = 1500;
  * board size, wall recipe (QR walls included) and placed artwork on the next
  * save. Only an explicit "Reset" drops a published value now.
  */
-export function londonOverridesSnapshot(
-  published?: LondonOverrides | null,
-): LondonOverrides {
+export function londonOverridesSnapshot(published?: LondonOverrides | null): LondonOverrides {
   return {
     placements: mergeLondonOverrideMap("placement", published?.placements, londonLogoPlacements()),
     boardSizes: mergeLondonOverrideMap("boardSize", published?.boardSizes, londonBoardSizes()),
@@ -97,7 +95,6 @@ export function LondonAutoPublish({ panels, removedIds = [] }: LondonAutoPublish
   const publishedVariations = useRef<string | null>(null);
   const latest = useRef({ panels, removedIds });
   latest.current = { panels, removedIds };
-
 
   useEffect(() => {
     // Signed-out visitors are vendors reading the kit — they never publish.
@@ -156,7 +153,17 @@ export function LondonAutoPublish({ panels, removedIds = [] }: LondonAutoPublish
 
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- store hooks are the change signal
-  }, [userId, placements, boards, placedArt, stepRepeat, publishedOverrides, removalKey, variationKey, publish]);
+  }, [
+    userId,
+    placements,
+    boards,
+    placedArt,
+    stepRepeat,
+    publishedOverrides,
+    removalKey,
+    variationKey,
+    publish,
+  ]);
 
   return null;
 }

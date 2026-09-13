@@ -33,11 +33,11 @@ Flags:
 
 Breakpoint viewports:
 
-| Preset  | Viewport      | Grid tier the library renders |
-| ------- | ------------- | ----------------------------- |
-| mobile  | 390×1800      | single column                 |
-| tablet  | 834×1800      | 2-up                          |
-| desktop | 1440×1800     | 3-up                          |
+| Preset  | Viewport  | Grid tier the library renders |
+| ------- | --------- | ----------------------------- |
+| mobile  | 390×1800  | single column                 |
+| tablet  | 834×1800  | 2-up                          |
+| desktop | 1440×1800 | 3-up                          |
 
 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` overrides the browser binary when the
 matching Playwright download is unavailable.
@@ -103,7 +103,7 @@ once per template style × light/dark and, for **every social format**
 4. fails when a plate rounds past the 6%-of-short-edge cap, reaches half the
    plate's short side (pill/ellipse), or has unequal corners.
 
-That last check is the regression this guards: `plateRadiusPct` is a *percent*
+That last check is the regression this guards: `plateRadiusPct` is a _percent_
 of the short edge, and multiplying by the raw pixel edge produced radii in the
 thousands of px that browsers clamp to 50% — the plate rendered as an ellipse.
 

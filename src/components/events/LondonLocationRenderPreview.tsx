@@ -45,7 +45,6 @@ export interface LondonLocationRenderPreviewProps {
   baseOptions?: LondonArtOptions;
 }
 
-
 function Stage({
   panel,
   scene,
@@ -164,7 +163,6 @@ function Stage({
           {doorLeafLabel(leaves)}
         </span>
       ) : null}
-
     </div>
   );
 }
@@ -191,10 +189,7 @@ export function LondonLocationRenderPreview({
     [scenes],
   );
   const visible = useMemo(
-    () =>
-      floorFilter === "all"
-        ? scenes
-        : scenes.filter((s) => s.floors?.includes(floorFilter)),
+    () => (floorFilter === "all" ? scenes : scenes.filter((s) => s.floors?.includes(floorFilter))),
     [scenes, floorFilter],
   );
 
@@ -240,8 +235,7 @@ export function LondonLocationRenderPreview({
       const url = await toPng(from, {
         pixelRatio: 2,
         cacheBust: true,
-        filter: (node) =>
-          !(node instanceof HTMLElement && node.dataset["exportIgnore"] === "true"),
+        filter: (node) => !(node instanceof HTMLElement && node.dataset["exportIgnore"] === "true"),
       });
       const a = document.createElement("a");
       a.href = url;
@@ -309,10 +303,12 @@ export function LondonLocationRenderPreview({
           <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#03002C]/55">
             Floor
           </span>
-          {([{ id: "all" as const, label: `All floors · ${scenes.length}` }] as {
-            id: LondonFloorId | "all";
-            label: string;
-          }[])
+          {(
+            [{ id: "all" as const, label: `All floors · ${scenes.length}` }] as {
+              id: LondonFloorId | "all";
+              label: string;
+            }[]
+          )
             .concat(
               floorOptions.map((f) => ({
                 id: f.id,
@@ -387,7 +383,6 @@ export function LondonLocationRenderPreview({
           );
         })}
       </div>
-
 
       {open ? (
         <div

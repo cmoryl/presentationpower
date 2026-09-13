@@ -1,12 +1,7 @@
 {
   "generatedFrom": "http://localhost:8080",
-  "modes": [
-    "light",
-    "dark"
-  ],
-  "brands": [
-    "bm-enterprise"
-  ],
+  "modes": ["light", "dark"],
+  "brands": ["bm-enterprise"],
   "coverage": {
     "styles": 7,
     "formats": 29,

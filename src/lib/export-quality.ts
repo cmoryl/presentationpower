@@ -222,7 +222,6 @@ export function visualThresholdFor(id: ExportFidelityId): number {
   return 0.82;
 }
 
-
 export function readExportFidelity(): ExportFidelityId {
   if (typeof window === "undefined") return DEFAULT_EXPORT_FIDELITY;
   try {

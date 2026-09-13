@@ -92,7 +92,10 @@ export function LondonRoomAccordion({ plan, panels, onSelectAsset, selectedId }:
                         { k: "Widest trim", v: `${sum.widestMm} mm` },
                         { k: "Tallest trim", v: `${sum.tallestMm} mm` },
                       ].map((s) => (
-                        <div key={s.k} className="rounded-lg border border-black/10 bg-white px-2 py-1.5">
+                        <div
+                          key={s.k}
+                          className="rounded-lg border border-black/10 bg-white px-2 py-1.5"
+                        >
                           <dd className="text-[13px] font-semibold text-[#03002C]">{s.v}</dd>
                           <dt className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[#03002C]/55">
                             {s.k}
@@ -112,8 +115,6 @@ export function LondonRoomAccordion({ plan, panels, onSelectAsset, selectedId }:
                     </dl>
                   );
                 })()}
-
-
 
                 <div>
                   <p className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-[#03002C]/55">

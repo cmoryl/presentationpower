@@ -28,7 +28,9 @@ function exportSource(): string {
 
 describe("quote family exports natively", () => {
   it("covers every quote variant in the taxonomy", () => {
-    const taxonomyQuotes = MODULE_VARIANTS.filter((v) => v.id.startsWith("MV-QUOTE-")).map((v) => v.id);
+    const taxonomyQuotes = MODULE_VARIANTS.filter((v) => v.id.startsWith("MV-QUOTE-")).map(
+      (v) => v.id,
+    );
     expect([...taxonomyQuotes].sort()).toEqual([...QUOTE_FAMILY].sort());
   });
 

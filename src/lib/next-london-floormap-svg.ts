@@ -197,7 +197,6 @@ function footerStrip(w: number, y: number, right: string, note?: string): string
 <text x="${PAD}" y="${n(y + 31)}" font-family="${FONT}" font-size="8" letter-spacing="0.2" fill="${NAVY}" opacity="0.38">${esc(note ?? "Schematic install plan — confirm exact positions on site with the venue production partner.")}</text></g>`;
 }
 
-
 function defs(): string {
   // The 45° hatch stands in for poché on a drafting sheet: circulation, cores
   // and outdoor ground read as "not a room" in one ink, so the plan survives a
@@ -506,7 +505,13 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
       // than out of it — unless the tile is against the left edge, where that
       // would push the text off the other side, so there it stays left-anchored.
       const planL = ox + 4;
-      const nameAt = (text: string, size: number, baseline: number, opacity: number, weight = 600) => {
+      const nameAt = (
+        text: string,
+        size: number,
+        baseline: number,
+        opacity: number,
+        weight = 600,
+      ) => {
         const tw = text.length * size * 0.6;
         let end = tw > w - bar - 16;
         let ax = end ? x + w - 6 : x + bar + 9;
@@ -534,7 +539,6 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
         : h > 20
           ? nameAt(z.label.toUpperCase(), 9.5 * roomScale, y + h - 7, 0.8)
           : "";
-
 
       const dims =
         !roomsOnly && DESIGN.roomDims !== false && h > 30 && w > z.label.length * 6.2 + 108
@@ -574,7 +578,6 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
       text: "",
     });
 
-
   const entries = plan.entries
     .map((e) => {
       const x = ox + e.x * PPM;
@@ -588,8 +591,7 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
     })
     .join("");
 
-  const ribbon =
-    ARCH && DESIGN.dimensionRibbon !== false ? dimensionRibbon(plan, ox, oy) : "";
+  const ribbon = ARCH && DESIGN.dimensionRibbon !== false ? dimensionRibbon(plan, ox, oy) : "";
   return `${ground}<g>${grid.join("")}</g>${zones.body}${ribbon}${zones.text}${entries}`;
 }
 
@@ -689,9 +691,7 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
   const roomCount = plan.zones.filter((z) => z.kind !== "circulation" && z.kind !== "core").length;
   const eyebrowText =
     DESIGN.eyebrow.trim() ||
-    (roomsOnly
-      ? `${eventName()} · you are here`
-      : `${eventName()} · venue directory`);
+    (roomsOnly ? `${eventName()} · you are here` : `${eventName()} · venue directory`);
   const titleText = DESIGN.title.trim() || plan.label;
   const subtitleText =
     DESIGN.subtitle.trim() ||

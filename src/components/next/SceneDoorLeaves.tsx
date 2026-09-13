@@ -6,11 +6,7 @@
 // Either way the leaves keep their measured widths, so an unequal pair (a wide
 // leading leaf with a narrow secondary leaf) reads correctly.
 
-import {
-  doorLeafColumns,
-  doorShutLines,
-  type LondonDoorSpec,
-} from "@/lib/next-london-doors";
+import { doorLeafColumns, doorShutLines, type LondonDoorSpec } from "@/lib/next-london-doors";
 
 export interface SceneDoorLeavesProps {
   spec: LondonDoorSpec;

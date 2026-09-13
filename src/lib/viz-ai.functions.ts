@@ -15,10 +15,13 @@ async function assertAdmin(context: {
   supabase: { rpc: (fn: never, args: never) => Promise<{ data: unknown; error: unknown }> };
   userId: string;
 }) {
-  const { data, error } = await context.supabase.rpc("has_role" as never, {
-    _user_id: context.userId,
-    _role: "admin",
-  } as never);
+  const { data, error } = await context.supabase.rpc(
+    "has_role" as never,
+    {
+      _user_id: context.userId,
+      _role: "admin",
+    } as never,
+  );
   if (error || data !== true) throw new Error("Forbidden");
 }
 

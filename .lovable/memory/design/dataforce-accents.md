@@ -3,6 +3,7 @@ name: DataForce product accents
 description: DataForce (bm-product) uses Green #7BCD3A + Blue #139DD8 accents; also offered as text/tone swatches
 type: design
 ---
+
 DataForce is a product brand (not a TransPerfect division), so it is exempt from the
 "no division accent colors" rule.
 

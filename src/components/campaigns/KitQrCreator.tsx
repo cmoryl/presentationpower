@@ -68,7 +68,8 @@ function qrSvg(opts: {
 }): string | null {
   const code = buildPillarQr(opts.data);
   if (!code) return null;
-  const font = PILLAR_CAPTION_FONTS.find((f) => f.id === opts.captionFont) ?? PILLAR_CAPTION_FONTS[0]!;
+  const font =
+    PILLAR_CAPTION_FONTS.find((f) => f.id === opts.captionFont) ?? PILLAR_CAPTION_FONTS[0]!;
   const caption = opts.caption.trim();
   const capBlock = caption ? opts.captionPadMm + opts.captionSizeMm * 1.25 : 0;
   const w = opts.sizeMm;

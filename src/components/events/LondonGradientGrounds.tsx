@@ -212,8 +212,9 @@ function GroundDetail({ info, onClose }: { info: LondonGroundInfo; onClose: () =
 
         <h4 className="mt-5 text-sm font-semibold text-[#03002C]">Gradient definition</h4>
         <pre className="mt-1 overflow-x-auto rounded-xl bg-[#03002C]/[0.04] p-3 font-mono text-[11.5px] text-[#03002C]">
-{info.css}
-{"\n"}SVG axis (objectBoundingBox): x1={info.axis.x1} y1={info.axis.y1} x2={info.axis.x2} y2=
+          {info.css}
+          {"\n"}SVG axis (objectBoundingBox): x1={info.axis.x1} y1={info.axis.y1} x2={info.axis.x2}{" "}
+          y2=
           {info.axis.y2}
         </pre>
         <div className="mt-3 flex flex-wrap gap-2">

@@ -42,7 +42,6 @@ export default defineTool({
       );
     }
 
-
     // Housekeeping: an export of a private deck must not linger as a durable
     // artifact. Anything older than 24h in this caller's own folder goes.
     try {

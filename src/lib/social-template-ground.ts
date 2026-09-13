@@ -80,18 +80,9 @@ export function socialGroundScene(
  * The look's ground layers for one scene, in CSS `background` shorthand order
  * (front layer first) — exactly what the slide stage paints.
  */
-export function socialGroundLayers(
-  look: SocialGroundLook,
-  scene: SkinScene,
-  take = 0,
-): string[] {
+export function socialGroundLayers(look: SocialGroundLook, scene: SkinScene, take = 0): string[] {
   const seed = `scene:${scene} take:${take}`;
-  return resolveGroundLayers(
-    authoredGround(look.pack),
-    look.code,
-    seed,
-    look.pack.tokens.surface,
-  );
+  return resolveGroundLayers(authoredGround(look.pack), look.code, seed, look.pack.tokens.surface);
 }
 
 export interface SocialGroundPlate {

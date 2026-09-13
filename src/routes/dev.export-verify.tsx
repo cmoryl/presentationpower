@@ -1150,9 +1150,7 @@ function ExportVerifyHarness() {
           mode,
           pack: null,
           pageNumber: 1,
-        } as Parameters<
-          Awaited<typeof import("@/lib/slide-exact-raster")>["withExactStage"]
-        >[0],
+        } as Parameters<Awaited<typeof import("@/lib/slide-exact-raster")>["withExactStage"]>[0],
         (stage) => {
           const base = stage.getBoundingClientRect();
           const out: Array<Record<string, number | string>> = [];
@@ -1177,7 +1175,6 @@ function ExportVerifyHarness() {
       );
     };
     window.__tpExportVerify = {
-
       variants: MODULE_VARIANTS.map((v) => v.id),
       chartVariants: chartParityVariantIds(),
       packs: [null, ...STYLE_PACKS.map((p) => p.id)],

@@ -106,10 +106,7 @@ function median(values: number[]): number {
 }
 
 /** What each family is for at a venue, and how many the brief implies. */
-const PLACEMENT: Record<
-  string,
-  { area: string; qty: (b: CityBrief) => number }
-> = {
+const PLACEMENT: Record<string, { area: string; qty: (b: CityBrief) => number }> = {
   "vt-exterior-flag": { area: "Street approach", qty: (b) => Math.max(2, b.entrances * 4) },
   "vt-canopy-banner": { area: "Entrance canopy", qty: (b) => b.entrances },
   "vt-floor-vinyl": { area: "Entrance floor", qty: (b) => b.entrances },

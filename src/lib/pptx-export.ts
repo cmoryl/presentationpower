@@ -631,7 +631,6 @@ function installForegroundGuard(s: PptxGenJS.Slide, opts: { ink: string; light: 
         delete o.transparency;
       }
 
-
       // Multi-run paragraphs carry their colour per run.
       if (Array.isArray(text)) {
         for (const part of text as Array<{ options?: Record<string, unknown> }>) {
@@ -3000,11 +2999,7 @@ function renderTimeline(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
     : arr(c.stages).map((st) => ({
         label: st.label ?? st.title,
         body: arr(st.items)
-          .map((t) =>
-            [str(t.label ?? t.title), str(t.body)]
-              .filter(Boolean)
-              .join(" — "),
-          )
+          .map((t) => [str(t.label ?? t.title), str(t.body)].filter(Boolean).join(" — "))
           .filter(Boolean)
           .join("\n"),
       }));
@@ -7382,12 +7377,11 @@ function renderPullQuoteStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
         color: mutedC(p),
         fontFace: "Geist",
         charSpacing: 2,
-          valign: "top",
+        valign: "top",
       } as unknown as PptxGenJS.TextPropsOptions);
     }
   });
 }
-
 
 // 17. MV-DEFINITION
 function renderDefinition(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
@@ -12137,16 +12131,9 @@ function renderGrowthOrbits(
       const markH = tileH * Math.min(0.94, 0.68 * wall.scale);
       s.addImage({
         data: logoData,
-        ...containFrame(
-          logoData,
-          x + (tileW - markW) / 2,
-          ty + (tileH - markH) / 2,
-          markW,
-          markH,
-        ),
+        ...containFrame(logoData, x + (tileW - markW) / 2, ty + (tileH - markH) / 2, markW, markH),
       });
     } else {
-
       s.addText(str(it.name || it.client), {
         x,
         y: ty,
@@ -12365,7 +12352,16 @@ function renderCapCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
       fill: { color: st.cardLook === "outline" ? "FFFFFF" : p.surface },
       line: { color: st.cardLook === "outline" ? p.surface : p.surface },
       ...(st.cardLook === "elevated"
-        ? { shadow: { type: "outer", blur: 12, offset: 3, angle: 90, color: "000000", opacity: 0.12 } }
+        ? {
+            shadow: {
+              type: "outer",
+              blur: 12,
+              offset: 3,
+              angle: 90,
+              color: "000000",
+              opacity: 0.12,
+            },
+          }
         : {}),
     });
     // Image plate (the photograph sits here; kept as a tinted plate so the
@@ -12398,7 +12394,19 @@ function renderCapCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
     const pad = 0.26;
     s.addText(
       [
-        { text: `${card.lead}\n`, options: { bold: true, fontSize: 13, color: st.leadColor === "ink" ? p.primary : st.leadColor === "accent" ? p.accent : tone(card.tone) } },
+        {
+          text: `${card.lead}\n`,
+          options: {
+            bold: true,
+            fontSize: 13,
+            color:
+              st.leadColor === "ink"
+                ? p.primary
+                : st.leadColor === "accent"
+                  ? p.accent
+                  : tone(card.tone),
+          },
+        },
         { text: card.leadNote, options: { fontSize: 11, color: p.ink } },
       ],
       {
@@ -12586,7 +12594,6 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   const highlights = strList(c.cardHighlights).slice(0, 3);
   const points = strList(c.cardPoints).slice(0, 6);
 
-
   if (str(c.cardTitle)) {
     s.addText(str(c.cardTitle), {
       x: CX,
@@ -12764,9 +12771,7 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       h: rowH,
       rectRadius: EXPORT_RADIUS_IN.media,
       fill:
-        st.cardLook === "outline"
-          ? { color: p.surface, transparency: 100 }
-          : { color: p.surface },
+        st.cardLook === "outline" ? { color: p.surface, transparency: 100 } : { color: p.surface },
       line: { color: LIGHT_GRAY },
     });
     if (st.accentBar > 0) {
@@ -12819,7 +12824,6 @@ function renderCertOrbits(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     );
   });
 }
-
 
 // ── MV-RISK-MITIGATION ── risk → mitigation paired rows
 function renderRiskMitigation(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {

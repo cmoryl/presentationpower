@@ -240,9 +240,9 @@ export async function exportMartBundle(opts?: {
 
   // ─────────────────────────────────────────────── pillar sets (vector build)
   for (const sign of pillars) {
-  // Copy is outlined into vector paths, so the signage face must be in memory
-  // before any master is built.
-  await loadLondonSignageFace();
+    // Copy is outlined into vector paths, so the signage face must be in memory
+    // before any master is built.
+    await loadLondonSignageFace();
     tick(`Building ${sign.name}`);
     const config = martStopPillarConfig(stop, sign);
     const geo = pillarGeometry(config);

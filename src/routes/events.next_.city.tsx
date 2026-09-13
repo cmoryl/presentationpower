@@ -219,13 +219,27 @@ function NextCityPage() {
                 </caption>
                 <thead className="bg-[#F2F2F2] text-[11px] uppercase tracking-wide text-black/55">
                   <tr>
-                    <th scope="col" className="px-3 py-2 font-medium">Ref</th>
-                    <th scope="col" className="px-3 py-2 font-medium">Family</th>
-                    <th scope="col" className="px-3 py-2 font-medium">Where</th>
-                    <th scope="col" className="px-3 py-2 font-medium">Qty</th>
-                    <th scope="col" className="px-3 py-2 font-medium">Carried size</th>
-                    <th scope="col" className="px-3 py-2 font-medium">Ground</th>
-                    <th scope="col" className="px-3 py-2 font-medium">Copy it carries</th>
+                    <th scope="col" className="px-3 py-2 font-medium">
+                      Ref
+                    </th>
+                    <th scope="col" className="px-3 py-2 font-medium">
+                      Family
+                    </th>
+                    <th scope="col" className="px-3 py-2 font-medium">
+                      Where
+                    </th>
+                    <th scope="col" className="px-3 py-2 font-medium">
+                      Qty
+                    </th>
+                    <th scope="col" className="px-3 py-2 font-medium">
+                      Carried size
+                    </th>
+                    <th scope="col" className="px-3 py-2 font-medium">
+                      Ground
+                    </th>
+                    <th scope="col" className="px-3 py-2 font-medium">
+                      Copy it carries
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -237,7 +251,9 @@ function NextCityPage() {
                         <div className="mt-0.5 text-[11px] text-black/55">
                           {item.family.substrate}
                         </div>
-                        <div className="mt-1 text-[11px] text-black/45">{item.family.printNote}</div>
+                        <div className="mt-1 text-[11px] text-black/45">
+                          {item.family.printNote}
+                        </div>
                       </td>
                       <td className="px-3 py-2 text-black/70">{item.area}</td>
                       <td className="px-3 py-2 text-black/70">{item.qty}</td>
@@ -285,9 +301,8 @@ function NextCityPage() {
                 </li>
                 {starter.gaps.length > 0 ? (
                   <li>
-                    No London build to carry from:{" "}
-                    {starter.gaps.map((g) => g.name).join(", ")} — these need a first build at this
-                    venue.
+                    No London build to carry from: {starter.gaps.map((g) => g.name).join(", ")} —
+                    these need a first build at this venue.
                   </li>
                 ) : null}
               </ul>

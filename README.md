@@ -2,7 +2,7 @@
 
 **AI‑native sales deck platform for TransPerfect — governed by real brand guidelines, editable in natural language, and round‑trippable to PowerPoint.**
 
-Judges: this isn't a slide *template gallery* with an AI wrapper. It's a full deck runtime: a conversational Copilot that mutates slides in place via Claude tool‑use, a faithful `.pptx` import/export pipeline with native chart round‑trip, and eight sub‑brand modes governed by a real BrandHub knowledge base with an automated brand‑compliance reviewer.
+Judges: this isn't a slide _template gallery_ with an AI wrapper. It's a full deck runtime: a conversational Copilot that mutates slides in place via Claude tool‑use, a faithful `.pptx` import/export pipeline with native chart round‑trip, and eight sub‑brand modes governed by a real BrandHub knowledge base with an automated brand‑compliance reviewer.
 
 ---
 
@@ -10,16 +10,16 @@ Judges: this isn't a slide *template gallery* with an AI wrapper. It's a full de
 
 - **App:** https://presentationpower.lovable.app
 - **Seeded share link (no login):** https://presentationpower.lovable.app/share/demo-audit-share-token
-- **Seeded demo deck:** *Acme Global · Localization Partnership* — 8 slides, all systems wired.
+- **Seeded demo deck:** _Acme Global · Localization Partnership_ — 8 slides, all systems wired.
 
 ---
 
 ## ⏱ 3–5 Minute Demo Script
 
 1. **Command Center** → open `/` signed in. KPIs, recent decks, sparklines.
-2. **Generate a brief** → `/brief/new`. Pick a division (e.g. *GlobalLink*), a prospect, one meeting objective. Hit **Generate deck**. Narrative Strategist plans the section order; RAG synthesis pulls division facts from the knowledge base.
+2. **Generate a brief** → `/brief/new`. Pick a division (e.g. _GlobalLink_), a prospect, one meeting objective. Hit **Generate deck**. Narrative Strategist plans the section order; RAG synthesis pulls division facts from the knowledge base.
 3. **Deck editor** → land on the new deck. Show the **Live Edit** toggle above the preview — click any outlined text on the slide, type, `Enter` to commit.
-4. **Copilot** → open the drawer. Say *"add a 3‑column stat slide showing customer wins"*. Watch Claude call `insert_slide` with a chosen variant + content and it appears on the strip.
+4. **Copilot** → open the drawer. Say _"add a 3‑column stat slide showing customer wins"_. Watch Claude call `insert_slide` with a chosen variant + content and it appears on the strip.
 5. **Brand Reviewer** → run it on the deck. Get a scored report (palette, logo placement, footer safe‑zone, division fit) grounded in that division's BrandHub guide.
 6. **Present** → hit Present. Speaker view, keyboard nav, timer.
 7. **Export PPTX** → real `.pptx`. Charts export as **native editable PowerPoint charts** (not screenshots). Backdrops, logos, footers all preserved.
@@ -37,6 +37,7 @@ The drawer wires Anthropic Claude Sonnet to real deck mutations: `insert_slide`,
 
 **Multi‑division brand governance.**
 Eight modes (Corporate, GlobalLink, Life Sciences, Trial Interactive, Legal Tech, Media Tech, Agencies, Portfolio Tech), each with:
+
 - A `BrandGuide` record + 355 mapped BrandHub insights in a vector‑search‑enabled `knowledge_entries` table.
 - Division‑scoped RAG retrieval (hybrid dense + tag filter via `match_brand_chunks`).
 - **Brand Reviewer agent** that scores decks against the guide with cited chunks — not vibes.
@@ -82,15 +83,15 @@ Admin surfaces (`/admin/*`) are gated on the `admin` role in `user_roles`. Accou
 
 ## 🗂 Where to Look
 
-| What | Where |
-|---|---|
-| Deck editor + Live Edit | `src/routes/decks.$deckId.index.tsx`, `src/components/slide/LiveEditOverlay.tsx` |
-| Copilot (Claude tool‑use) | `src/lib/ai-copilot.functions.ts`, `src/components/CopilotPanel.tsx` |
-| Brand Reviewer | `src/lib/ai-review.functions.ts`, `src/components/BrandReviewPanel.tsx` |
-| PPTX import | `src/lib/pptx-import.functions.ts` (XXE‑hardened, zip‑bomb capped) |
-| PPTX export (59 variants + native charts) | `src/lib/pptx-export.ts` |
-| Brand modes + guides | `src/lib/brand-modes.ts`, `src/lib/brand-guides.ts` |
-| RAG | `src/lib/ai-rag.functions.ts`, `match_brand_chunks` RPC |
-| Share viewer | `src/routes/share.$token.tsx`, `get_shared_deck` RPC |
+| What                                      | Where                                                                            |
+| ----------------------------------------- | -------------------------------------------------------------------------------- |
+| Deck editor + Live Edit                   | `src/routes/decks.$deckId.index.tsx`, `src/components/slide/LiveEditOverlay.tsx` |
+| Copilot (Claude tool‑use)                 | `src/lib/ai-copilot.functions.ts`, `src/components/CopilotPanel.tsx`             |
+| Brand Reviewer                            | `src/lib/ai-review.functions.ts`, `src/components/BrandReviewPanel.tsx`          |
+| PPTX import                               | `src/lib/pptx-import.functions.ts` (XXE‑hardened, zip‑bomb capped)               |
+| PPTX export (59 variants + native charts) | `src/lib/pptx-export.ts`                                                         |
+| Brand modes + guides                      | `src/lib/brand-modes.ts`, `src/lib/brand-guides.ts`                              |
+| RAG                                       | `src/lib/ai-rag.functions.ts`, `match_brand_chunks` RPC                          |
+| Share viewer                              | `src/routes/share.$token.tsx`, `get_shared_deck` RPC                             |
 
 Built for a hackathon. Shipped like a product.

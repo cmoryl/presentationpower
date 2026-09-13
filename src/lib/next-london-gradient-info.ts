@@ -112,9 +112,7 @@ function readout(stops: string[]): LondonColorReadout[] {
 }
 
 function cssFor(angle: number, colors: LondonColorReadout[]): string {
-  return `linear-gradient(${angle}deg, ${colors
-    .map((c) => `${c.hex} ${c.position}%`)
-    .join(", ")})`;
+  return `linear-gradient(${angle}deg, ${colors.map((c) => `${c.hex} ${c.position}%`).join(", ")})`;
 }
 
 function baseStops(styleId: string): string[] {
@@ -166,9 +164,7 @@ export function londonHouseGrounds(panels: LondonPanel[]): LondonGroundInfo[] {
   return Object.keys(LONDON_STYLES)
     .map((styleId) => ({
       styleId,
-      members: panels.filter(
-        (p) => p.style === styleId && londonPanelFamily(p) === "transperfect",
-      ),
+      members: panels.filter((p) => p.style === styleId && londonPanelFamily(p) === "transperfect"),
     }))
     .filter((s) => s.members.length > 0)
     .map((s) => londonGroundInfo(s.styleId, null, s.members));

@@ -318,7 +318,6 @@ function VariantRendererInner(props: Props) {
                           })}
                         </StatArrangementProvider>
                       </StatLayoutProvider>
-
                     </div>
                   </SlideFrameCtx.Provider>
                 </SlideSceneSeedContext.Provider>

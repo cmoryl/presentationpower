@@ -233,13 +233,20 @@ registerSlideModule({
       ? (s(c.deviceTone) as "graphite" | "silver" | "ink")
       : "silver";
     const tileBg =
-      st.tileLook === "tile" ? (isDark ? "rgba(255,255,255,0.07)" : "rgba(3,0,44,0.04)") : undefined;
+      st.tileLook === "tile"
+        ? isDark
+          ? "rgba(255,255,255,0.07)"
+          : "rgba(3,0,44,0.04)"
+        : undefined;
     const tileBorder = st.tileLook === "outline" ? `1px solid ${accent}` : undefined;
     const iconBox = Math.round(96 * st.iconScale);
     const centered = st.labelAlign === "center";
 
     const deviceCol = (
-      <div className="flex min-w-0 items-center" style={{ order: st.deviceSide === "left" ? 1 : 2 }}>
+      <div
+        className="flex min-w-0 items-center"
+        style={{ order: st.deviceSide === "left" ? 1 : 2 }}
+      >
         <DeviceFrame kind={kind} tone={tone} accent="var(--slide-accent-text)">
           <MediaTile
             brand={brand}

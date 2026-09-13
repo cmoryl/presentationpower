@@ -30,7 +30,6 @@ type Cert = { label?: unknown; points?: unknown; [k: string]: unknown };
 
 const str = (v: unknown) => (typeof v === "string" ? v : "");
 const strList = (v: unknown): string[] =>
-
   Array.isArray(v) ? v.map((x) => (typeof x === "string" ? x : String(x ?? ""))) : [];
 
 const certList = (v: unknown): Cert[] =>
@@ -42,7 +41,8 @@ const FIELD =
   "w-full rounded-lg border border-black/10 px-2.5 py-1.5 text-[12px] text-[#03002C] outline-none focus:border-[#003FC7]";
 const CHIP =
   "rounded-full border px-2.5 py-1 text-[11px] font-medium transition border-black/10 text-black/60 hover:border-[#003FC7] hover:text-[#003FC7]";
-const CHIP_ON = "rounded-full border px-2.5 py-1 text-[11px] font-medium border-[#003FC7] bg-[#003FC7]/8 text-[#003FC7]";
+const CHIP_ON =
+  "rounded-full border px-2.5 py-1 text-[11px] font-medium border-[#003FC7] bg-[#003FC7]/8 text-[#003FC7]";
 const TINY =
   "rounded-md border border-black/10 px-1.5 text-[11px] leading-5 text-black/55 transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-30";
 
@@ -405,7 +405,11 @@ export function CertStylePanel({
         <span className={LABEL}>Decoration</span>
         <div className="mt-1.5 flex flex-wrap gap-1.5">
           <Toggle label="Tinted band" on={style.band} onChange={(band) => set({ band })} />
-          <Toggle label="Corner arcs" on={style.showArcs} onChange={(showArcs) => set({ showArcs })} />
+          <Toggle
+            label="Corner arcs"
+            on={style.showArcs}
+            onChange={(showArcs) => set({ showArcs })}
+          />
           <Toggle
             label="Card numbers"
             on={style.showIndex}
@@ -575,7 +579,6 @@ export function CertStylePanel({
                     />
                   </label>
                 </div>
-
               </div>
             );
           })}

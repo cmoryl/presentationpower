@@ -16,16 +16,9 @@ import {
   boothShell,
   LONDON_BOOTH_SHELLS,
 } from "@/lib/next-london-booth-shells";
-import {
-  boothOverlayFromPlacement,
-  type BoothTemplateRecord,
-} from "@/lib/booth-templates";
-import {
-  LONDON_BOOTH_TRIM_PRESETS,
-  resizeBoothArtboard,
-} from "@/lib/next-london-booths";
+import { boothOverlayFromPlacement, type BoothTemplateRecord } from "@/lib/booth-templates";
+import { LONDON_BOOTH_TRIM_PRESETS, resizeBoothArtboard } from "@/lib/next-london-booths";
 import { londonBoothNativeTemplate } from "@/lib/next-london-signage";
-
 
 import {
   LONDON_BODY_MAX_CHARS,
@@ -150,9 +143,7 @@ export function BoothTemplatePanel({
   return (
     <details className="group mt-8 rounded-2xl border border-black/10 bg-[#F2F2F2] p-5">
       <summary className="flex cursor-pointer list-none flex-wrap items-baseline gap-3 [&::-webkit-details-marker]:hidden">
-        <h4 className="text-base font-semibold tracking-tight text-[#03002C]">
-          Booth templates
-        </h4>
+        <h4 className="text-base font-semibold tracking-tight text-[#03002C]">Booth templates</h4>
         <span className="rounded border border-[#03002C] bg-[#03002C] px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-white">
           Admin only
         </span>
@@ -269,8 +260,6 @@ export function BoothTemplatePanel({
             ) : null}
           </p>
 
-
-
           <label className={`${LABEL} mt-3 block`} htmlFor="booth-vendor">
             Vendor name
           </label>
@@ -360,9 +349,7 @@ export function BoothTemplatePanel({
                       {Math.round(resize.scale * 100)}%
                     </span>
                   </div>
-                  <p className="mt-1 text-[12px] leading-[1.45] text-[#03002C]/70">
-                    {resize.note}
-                  </p>
+                  <p className="mt-1 text-[12px] leading-[1.45] text-[#03002C]/70">{resize.note}</p>
                   {canEdit ? (
                     <button
                       type="button"
@@ -396,8 +383,8 @@ export function BoothTemplatePanel({
           <span className={LABEL}>Copy and logo layer</span>
           <p className="mt-1 max-w-3xl text-[12px] leading-[1.5] text-[#03002C]/70">
             Headline, subhead, body and lockup are held per booth and set from the trim box, so
-            re-issuing at another stand size re-lays them. Both lines export as outlined
-            Illustrator paths.
+            re-issuing at another stand size re-lays them. Both lines export as outlined Illustrator
+            paths.
           </p>
           <div className="mt-3 grid gap-3 md:grid-cols-2">
             <div>

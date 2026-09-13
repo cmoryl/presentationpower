@@ -122,12 +122,7 @@ export function removeBullet(cards: CapCard[], index: number, bi: number): CapCa
   return patchCard(cards, index, { bullets: card.bullets.filter((_, i) => i !== bi) });
 }
 
-export function moveBullet(
-  cards: CapCard[],
-  index: number,
-  bi: number,
-  delta: number,
-): CapCard[] {
+export function moveBullet(cards: CapCard[], index: number, bi: number, delta: number): CapCard[] {
   const card = cards[index];
   if (!card) return cards;
   const to = bi + delta;
@@ -138,12 +133,7 @@ export function moveBullet(
   return patchCard(cards, index, { bullets });
 }
 
-export function patchBullet(
-  cards: CapCard[],
-  index: number,
-  bi: number,
-  value: string,
-): CapCard[] {
+export function patchBullet(cards: CapCard[], index: number, bi: number, value: string): CapCard[] {
   const card = cards[index];
   if (!card) return cards;
   return patchCard(cards, index, {
@@ -207,9 +197,7 @@ export function resolveCapCardStyle(raw: unknown): CapCardStyle {
         d.cardRadius,
       ),
     ),
-    gap: Math.round(
-      clamp(Number(o.gap), CAP_CARD_LIMITS.gap.min, CAP_CARD_LIMITS.gap.max, d.gap),
-    ),
+    gap: Math.round(clamp(Number(o.gap), CAP_CARD_LIMITS.gap.min, CAP_CARD_LIMITS.gap.max, d.gap)),
     bandCase: pick(o.bandCase, ["upper", "as-typed"] as const, d.bandCase),
     cardLook: pick(o.cardLook, ["elevated", "flat", "outline"] as const, d.cardLook),
     bulletMark: pick(o.bulletMark, ["dot", "dash", "number"] as const, d.bulletMark),

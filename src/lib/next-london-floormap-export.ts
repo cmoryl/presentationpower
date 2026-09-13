@@ -120,7 +120,10 @@ export async function downloadFloorMapPng(floor: LondonFloorId, opts: MapExportO
 
 /** Attendee floor guide: one page per floor, rooms and breakouts only. */
 export async function downloadAttendeeMapPdf(opts: MapExportOptions) {
-  await buildFloorPdf({ ...opts, roomsOnly: true, labels: false }, `${stemOf(opts)}-floor-guide.pdf`);
+  await buildFloorPdf(
+    { ...opts, roomsOnly: true, labels: false },
+    `${stemOf(opts)}-floor-guide.pdf`,
+  );
 }
 
 export function downloadAssetMapSvg(panel: LondonPanel, opts: MapExportOptions) {

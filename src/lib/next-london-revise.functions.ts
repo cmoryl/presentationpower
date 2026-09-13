@@ -10,7 +10,11 @@ import { z } from "zod";
 
 import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { EMPTY_LONDON_OVERRIDES, type LondonOverrides, type LondonRevision } from "@/lib/next-london-revise";
+import {
+  EMPTY_LONDON_OVERRIDES,
+  type LondonOverrides,
+  type LondonRevision,
+} from "@/lib/next-london-revise";
 
 const TABLE = "london_signage_revisions";
 
@@ -100,7 +104,6 @@ export const getLondonHeadRevision = createServerFn({ method: "GET" }).handler(a
   const row = (data ?? null) as Row | null;
   return { revision: row ? toRevision(row) : null };
 });
-
 
 const PanelSchema = z.object({
   id: z.string(),

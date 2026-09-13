@@ -86,9 +86,7 @@ describe("step & repeat wall", () => {
       logoSet: "divisions" as const,
     });
     expect(plan.arts.length).toBeGreaterThan(5);
-    const used = new Set(
-      plan.tiles.flatMap((t) => (t.kind === "logo" ? [t.artIndex] : [])),
-    );
+    const used = new Set(plan.tiles.flatMap((t) => (t.kind === "logo" ? [t.artIndex] : [])));
     expect(used.size).toBe(plan.arts.length);
     // No mark repeats immediately beside itself.
     const row = plan.tiles.filter((t) => t.row === 0);
@@ -166,7 +164,7 @@ describe("two-colour lockup walls", () => {
     const used = new Set(logos.map((t) => plan.artColourways[t.artIndex]));
     expect(used.size).toBe(2);
     const svg = buildLondonPanelSvg(wall);
-    expect(svg.includes('data-colourway=')).toBe(true);
+    expect(svg.includes("data-colourway=")).toBe(true);
   });
 
   it("ignores a second colourway that matches the first", () => {

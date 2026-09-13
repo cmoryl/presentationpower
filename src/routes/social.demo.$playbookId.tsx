@@ -457,7 +457,6 @@ function SocialDemoView() {
         </div>
       </section>
 
-
       {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
       <section>
         <SectionHead

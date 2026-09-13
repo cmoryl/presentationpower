@@ -11,7 +11,6 @@ import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { resolveCertStyle } from "@/lib/cert-style";
 
-
 const MAX_CERTS = 3;
 const MAX_POINTS = 6;
 const MAX_HIGHLIGHTS = 3;
@@ -41,11 +40,7 @@ registerSlideModule({
         : "rgba(3,0,44,0.03)"
       : "transparent";
     const cardBg =
-      st.cardLook === "outline"
-        ? "transparent"
-        : isDark
-          ? "rgba(255,255,255,0.07)"
-          : "#FFFFFF";
+      st.cardLook === "outline" ? "transparent" : isDark ? "rgba(255,255,255,0.07)" : "#FFFFFF";
     const cardBorder = isDark ? "rgba(255,255,255,0.16)" : "rgba(10,15,28,0.1)";
     const cardShadow =
       st.cardLook === "elevated"
@@ -54,7 +49,11 @@ registerSlideModule({
           : "0 18px 40px -24px rgba(3,0,44,0.25)"
         : "none";
     const tileBg =
-      st.statTile === "tile" ? (isDark ? "rgba(255,255,255,0.06)" : "rgba(3,0,44,0.045)") : "transparent";
+      st.statTile === "tile"
+        ? isDark
+          ? "rgba(255,255,255,0.06)"
+          : "rgba(3,0,44,0.045)"
+        : "transparent";
     const ghostIdx = isDark ? "rgba(255,255,255,0.1)" : "rgba(3,0,44,0.08)";
     const muted = isDark ? "rgba(255,255,255,0.6)" : "rgba(3,0,44,0.62)";
     const cardsFirst = st.cardsSide === "left";
@@ -85,7 +84,6 @@ registerSlideModule({
             className="flex min-w-0 flex-col"
             style={{ order: cardsFirst ? 2 : 1 }}
           >
-
             {s(c.cardTitle) && (
               <div
                 style={{
@@ -117,8 +115,7 @@ registerSlideModule({
                       className="flex min-w-0 flex-1 flex-col justify-between"
                       style={{
                         background: tileBg,
-                        borderLeft:
-                          st.statTile === "plain" ? undefined : `5px solid ${accent}`,
+                        borderLeft: st.statTile === "plain" ? undefined : `5px solid ${accent}`,
                         borderRadius: 4,
                         padding:
                           st.statTile === "plain"
@@ -131,7 +128,6 @@ registerSlideModule({
                         alignItems: st.statAlign === "center" ? "center" : undefined,
                       }}
                     >
-
                       {figure && (
                         <span
                           style={{
@@ -165,10 +161,7 @@ registerSlideModule({
 
             {/* Spec-sheet bullet block — ruled rows with accent markers */}
             {points.length > 0 && (
-              <div
-                className="mt-9 flex flex-col"
-                style={{ borderTop: `2px solid ${ink.strong}` }}
-              >
+              <div className="mt-9 flex flex-col" style={{ borderTop: `2px solid ${ink.strong}` }}>
                 <div
                   className="flex items-center justify-between"
                   style={{ padding: "12px 2px 0" }}
@@ -262,7 +255,6 @@ registerSlideModule({
                             }}
                           />
                         ))}
-
 
                       <span
                         style={{
@@ -403,10 +395,8 @@ registerSlideModule({
                                 : undefined,
                           }}
                         />
-
                       </div>
                     )}
-
 
                     <div className="min-w-0 flex-1">
                       {s(cert.label) && (

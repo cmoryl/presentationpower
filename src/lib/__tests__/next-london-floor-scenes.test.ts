@@ -43,8 +43,14 @@ describe("map areas", () => {
       const zone = londonZoneFor(plan, p);
       // Booth rooms read "<VENDOR> BOOTH" and land in the exhibition area.
       if (/booth/i.test(p.room)) return zone.kind !== "exhibition";
-      const room = p.room.toUpperCase().replace(/[^A-Z& ]/g, " ").replace(/\s+/g, " ").trim();
-      return !zone.rooms.some((r) => room.includes(r.toUpperCase()) || r.toUpperCase().includes(room));
+      const room = p.room
+        .toUpperCase()
+        .replace(/[^A-Z& ]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      return !zone.rooms.some(
+        (r) => room.includes(r.toUpperCase()) || r.toUpperCase().includes(room),
+      );
     });
     expect(loose.map((p) => `${p.id} ${p.room}`)).toEqual([]);
   });

@@ -120,10 +120,7 @@ export async function buildLondonKitZip(
     options.onProgress?.(i + 1, panels.length, panel);
   }
 
-  const manifest = [
-    ["Floor", "Room", "Sign", "Trim", "Files", "Status"],
-    ...rows,
-  ]
+  const manifest = [["Floor", "Room", "Sign", "Trim", "Files", "Status"], ...rows]
     .map((r) => r.map(csvCell).join(","))
     .join("\n");
   folder.file("manifest.csv", manifest);

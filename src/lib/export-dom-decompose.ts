@@ -999,8 +999,6 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         if (coversStage || bigCircle) continue;
       }
 
-
-
       // Brand-tint ceiling for translucent CARD paint. On screen a tinted card
       // sits behind a blurred glass surface and reads almost white; PowerPoint
       // composites the same alpha flat over the artwork plate, which turned

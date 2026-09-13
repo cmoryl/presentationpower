@@ -759,17 +759,19 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
   // 1300×1230mm and three long 7000×1230mm runs. Every one is CMYK, supplied
   // as a scalable vector master, with 10mm bleed on every side. Appended (not
   // inserted) so every already published item keeps its id.
-  ...([
-    [1, 1300],
-    [2, 7000],
-    [3, 1300],
-    [4, 1300],
-    [5, 7000],
-    [6, 1300],
-    [7, 1300],
-    [8, 7000],
-    [9, 1300],
-  ] as const).map(([n, w]) => ({
+  ...(
+    [
+      [1, 1300],
+      [2, 7000],
+      [3, 1300],
+      [4, 1300],
+      [5, 7000],
+      [6, 1300],
+      [7, 1300],
+      [8, 7000],
+      [9, 1300],
+    ] as const
+  ).map(([n, w]) => ({
     floor: "GF" as const,
     room: "CHURCHILL",
     name: `CHURCHILL GLASS VINYL ${n} - ${w}x1230mm`,
@@ -910,5 +912,3 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
     note: "Side return for version B of the colour lockup press wall: 1000mm wide × 6500mm high, 100mm bleed all round. Same step & repeat field as its front face so the pattern runs continuously round the corner.",
   },
 ];
-
-

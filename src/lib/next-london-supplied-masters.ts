@@ -39,7 +39,6 @@ export type LondonSuppliedMaster = {
   note: string;
 };
 
-
 const MASTERS: LondonSuppliedMaster[] = [
   {
     panelId: "ldn-v32",
@@ -84,9 +83,7 @@ const BY_PANEL = new Map(MASTERS.map((m) => [m.panelId, m] as const));
 export const LONDON_SUPPLIED_MASTERS = MASTERS;
 
 /** The supplied live file for a panel, when the team has handed one back. */
-export function londonSuppliedMaster(
-  panel: { id: string } | string,
-): LondonSuppliedMaster | null {
+export function londonSuppliedMaster(panel: { id: string } | string): LondonSuppliedMaster | null {
   const id = typeof panel === "string" ? panel : panel.id;
   // A live file version published from the kit outranks whatever shipped with
   // this build, so swapping the file updates every card at once.

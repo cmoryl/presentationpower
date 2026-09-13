@@ -156,7 +156,12 @@ export function LondonPlacedArtPanel({
               e.target.value = "";
             }}
           />
-          <Button variant="outline" size="sm" className="gap-2" onClick={() => input.current?.click()}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => input.current?.click()}
+          >
             <Upload className="h-3.5 w-3.5" /> {art ? "Replace" : "Upload"}
           </Button>
           {art ? (
@@ -187,8 +192,8 @@ export function LondonPlacedArtPanel({
         <>
           <p className="mt-2 text-[11px] text-muted-foreground">
             <span className="font-mono">{art.name}</span> · {art.format.toUpperCase()} ·{" "}
-            {art.paths.length} path{art.paths.length === 1 ? "" : "s"} · prints{" "}
-            {Math.round(mmWide)}×{Math.round(mmHigh)}mm on the trim
+            {art.paths.length} path{art.paths.length === 1 ? "" : "s"} · prints {Math.round(mmWide)}
+            ×{Math.round(mmHigh)}mm on the trim
           </p>
           <div className="mt-3 flex flex-wrap gap-3">
             <Slider
@@ -309,11 +314,21 @@ export function LondonPlacedArtPanel({
                 className="grid w-[92px] grid-cols-3 gap-1 rounded outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <span />
-                <button type="button" aria-label="Move up" onClick={() => nudge(0, -1)} className={NUDGE_BTN}>
+                <button
+                  type="button"
+                  aria-label="Move up"
+                  onClick={() => nudge(0, -1)}
+                  className={NUDGE_BTN}
+                >
                   ↑
                 </button>
                 <span />
-                <button type="button" aria-label="Move left" onClick={() => nudge(-1, 0)} className={NUDGE_BTN}>
+                <button
+                  type="button"
+                  aria-label="Move left"
+                  onClick={() => nudge(-1, 0)}
+                  className={NUDGE_BTN}
+                >
                   ←
                 </button>
                 <button
@@ -321,16 +336,28 @@ export function LondonPlacedArtPanel({
                   aria-pressed={fine}
                   onClick={() => setFine((v) => !v)}
                   className={`h-7 rounded border text-[10px] transition ${
-                    fine ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground hover:bg-muted"
+                    fine
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border text-muted-foreground hover:bg-muted"
                   }`}
                 >
                   fine
                 </button>
-                <button type="button" aria-label="Move right" onClick={() => nudge(1, 0)} className={NUDGE_BTN}>
+                <button
+                  type="button"
+                  aria-label="Move right"
+                  onClick={() => nudge(1, 0)}
+                  className={NUDGE_BTN}
+                >
                   →
                 </button>
                 <span />
-                <button type="button" aria-label="Move down" onClick={() => nudge(0, 1)} className={NUDGE_BTN}>
+                <button
+                  type="button"
+                  aria-label="Move down"
+                  onClick={() => nudge(0, 1)}
+                  className={NUDGE_BTN}
+                >
                   ↓
                 </button>
                 <span />

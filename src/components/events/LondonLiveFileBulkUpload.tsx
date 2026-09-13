@@ -17,15 +17,9 @@ import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 
 import { supabase } from "@/integrations/supabase/client";
-import {
-  listLondonLiveFiles,
-  publishLondonLiveFile,
-} from "@/lib/london-live-files.functions";
+import { listLondonLiveFiles, publishLondonLiveFile } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles, useLondonLiveFiles } from "@/lib/next-london-live-files";
-import {
-  parseLondonLiveFileLayers,
-  setLondonLiveLayers,
-} from "@/lib/next-london-live-layers";
+import { parseLondonLiveFileLayers, setLondonLiveLayers } from "@/lib/next-london-live-layers";
 import type { LondonPanel } from "@/lib/next-london-signage";
 
 const BUCKET = "london-live-files";
@@ -63,7 +57,10 @@ export type BulkMatch = {
 };
 
 /** Match dropped files to signs by name, pairing print file with its picture. */
-export function matchLondonUploads(files: readonly File[], panels: readonly LondonPanel[]): BulkMatch[] {
+export function matchLondonUploads(
+  files: readonly File[],
+  panels: readonly LondonPanel[],
+): BulkMatch[] {
   const byId = new Map(panels.map((p) => [p.id, p] as const));
   const byName = new Map<string, LondonPanel>();
   for (const panel of panels) {
@@ -81,9 +78,7 @@ export function matchLondonUploads(files: readonly File[], panels: readonly Lond
     if (!row) {
       const direct = byId.get(key) ?? byName.get(key) ?? null;
       const loose =
-        direct ??
-        panels.find((p) => key.includes(p.id) || key.includes(slug(p.name))) ??
-        null;
+        direct ?? panels.find((p) => key.includes(p.id) || key.includes(slug(p.name))) ?? null;
       row = { key, master: null, proof: null, panelId: loose?.id ?? "", auto: !!loose };
       groups.set(key, row);
     }
@@ -112,10 +107,7 @@ export function LondonLiveFileBulkUpload({
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<string[]>([]);
 
-  const ready = useMemo(
-    () => rows.filter((r) => r.panelId && (r.master || r.proof)),
-    [rows],
-  );
+  const ready = useMemo(() => rows.filter((r) => r.panelId && (r.master || r.proof)), [rows]);
   const unmatched = rows.length - ready.length;
 
   const pick = (files: FileList | null) => {
@@ -186,11 +178,16 @@ export function LondonLiveFileBulkUpload({
       }
       onChanged?.();
       setDone(saved);
-      setRows((prev) => prev.filter((r) => !saved.includes(panels.find((p) => p.id === r.panelId)?.name ?? "")));
+      setRows((prev) =>
+        prev.filter((r) => !saved.includes(panels.find((p) => p.id === r.panelId)?.name ?? "")),
+      );
       if (saved.length > 0) {
-        toast.success(`${saved.length} sign${saved.length === 1 ? "" : "s"} switched to your files`, {
-          description: "Every card, preview and render for them shows your artwork now.",
-        });
+        toast.success(
+          `${saved.length} sign${saved.length === 1 ? "" : "s"} switched to your files`,
+          {
+            description: "Every card, preview and render for them shows your artwork now.",
+          },
+        );
       }
       if (failed.length > 0) {
         toast.error(`${failed.length} could not be stored: ${failed.join(", ")}`);
@@ -209,8 +206,8 @@ export function LondonLiveFileBulkUpload({
       </p>
       <p className="mt-2 max-w-3xl text-[13px] leading-relaxed text-[#03002C]/70">
         Choose as many finished files as you like. Print files (.ai, .pdf, .eps, .svg) and pictures
-        (.jpg, .png, .webp) are paired by name and matched to a sign. Anything that cannot be matched
-        is left for you to point at the right sign.
+        (.jpg, .png, .webp) are paired by name and matched to a sign. Anything that cannot be
+        matched is left for you to point at the right sign.
       </p>
 
       <label className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-full border border-black/15 px-4 py-2 text-xs font-semibold text-[#03002C] hover:bg-[#F2F2F2]">
@@ -253,7 +250,9 @@ export function LondonLiveFileBulkUpload({
                         onChange={(e) =>
                           setRows((prev) =>
                             prev.map((r) =>
-                              r.key === row.key ? { ...r, panelId: e.target.value, auto: false } : r,
+                              r.key === row.key
+                                ? { ...r, panelId: e.target.value, auto: false }
+                                : r,
                             ),
                           )
                         }

@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_MAP_DESIGN, isArchitecturalMap, mapPalette } from "@/lib/next-london-floormap-design";
+import {
+  DEFAULT_MAP_DESIGN,
+  isArchitecturalMap,
+  mapPalette,
+} from "@/lib/next-london-floormap-design";
 import { floorMapSvg } from "@/lib/next-london-floormap-svg";
 import { LONDON_PANELS } from "@/lib/next-london-signage";
 import { londonFloorPlan } from "@/lib/next-london-floorplan";

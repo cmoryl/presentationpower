@@ -502,7 +502,6 @@ function Hero({
               </span>
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
             </Link>
-
           </div>
         </div>
       </div>

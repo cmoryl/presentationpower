@@ -64,7 +64,6 @@ describe("map design", () => {
     expect(ours).not.toContain("Queen Elizabeth II Centre");
   });
 
-
   it("honours scale and margin in the sheet size", () => {
     const base = floorMapSheetSize("GF", { panels: LONDON_PANELS, labels: true });
     const big = floorMapSheetSize("GF", {

@@ -16,7 +16,6 @@ import {
   bespokeArtworkCsv,
   bespokeUnitAsArea,
   bespokeUnitsOnFloor,
-
   type BespokeUnit,
 } from "@/lib/next-london-bespoke";
 import { BESPOKE_RENDER_DISCLAIMER, bespokeRender } from "@/lib/next-london-bespoke-renders";
@@ -88,10 +87,7 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
           {units.map((u) => {
             const render = bespokeRender(u.id);
             return (
-              <li
-                key={u.id}
-                className="overflow-hidden rounded-xl border border-black/10 bg-white"
-              >
+              <li key={u.id} className="overflow-hidden rounded-xl border border-black/10 bg-white">
                 {render ? (
                   <button
                     type="button"
@@ -167,9 +163,7 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
                             {p.label}
                           </span>{" "}
                           — {bespokeSizeLabel(p.wMm, p.hMm)}
-                          {p.note ? (
-                            <span className="text-[#03002C]/55"> · {p.note}</span>
-                          ) : null}
+                          {p.note ? <span className="text-[#03002C]/55"> · {p.note}</span> : null}
                           {facePanel ? (
                             <span className="ml-1.5 inline-flex items-center rounded-full bg-[#003FC7]/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#003FC7]">
                               Editable template · {facePanel.id}
@@ -236,7 +230,6 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
           onClose={() => setView3d(null)}
         />
       ) : null}
-
     </section>
   );
 }

@@ -258,7 +258,6 @@ export function AgendaStudio({
     placeQr(Math.round(qrBlock.x + dx), Math.round(qrBlock.y + dy));
   };
 
-
   const runExport = async () => {
     const node = plateRef.current?.querySelector<HTMLElement>('[data-kit-asset-frame="true"]');
     if (!node) return;
@@ -843,9 +842,7 @@ export function AgendaStudio({
                 {(() => {
                   const c = agendaQrContrast(config);
                   return (
-                    <p
-                      className={`text-xs ${c.ok ? "text-muted-foreground" : "text-destructive"}`}
-                    >
+                    <p className={`text-xs ${c.ok ? "text-muted-foreground" : "text-destructive"}`}>
                       Scan contrast {c.ratio.toFixed(1)}:1{" "}
                       {c.ok
                         ? "· comfortably scannable"

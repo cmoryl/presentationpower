@@ -6,9 +6,7 @@
     "framework": "react",
     "css_framework": "tailwind",
     "starter_template": "custom_design_system",
-    "theme_files": [
-      "src/design-system/element/styles/theme.css"
-    ],
+    "theme_files": ["src/design-system/element/styles/theme.css"],
     "source_type": "local",
     "source_manifest": {
       "#enrichment": "eea946e88d86fbc230cd9601097257a3e91940a7f8c00c5dc7a3ecdccef89ec0",
@@ -5865,12 +5863,7 @@
         {
           "name": "variant",
           "type": "enum",
-          "values": [
-            "default",
-            "secondary",
-            "destructive",
-            "outline"
-          ],
+          "values": ["default", "secondary", "destructive", "outline"],
           "default": "default"
         }
       ],
@@ -5894,25 +5887,13 @@
         {
           "name": "variant",
           "type": "enum",
-          "values": [
-            "default",
-            "destructive",
-            "outline",
-            "secondary",
-            "ghost",
-            "link"
-          ],
+          "values": ["default", "destructive", "outline", "secondary", "ghost", "link"],
           "default": "default"
         },
         {
           "name": "size",
           "type": "enum",
-          "values": [
-            "default",
-            "sm",
-            "lg",
-            "icon"
-          ],
+          "values": ["default", "sm", "lg", "icon"],
           "default": "default"
         },
         {
@@ -5964,9 +5945,7 @@
           "code": "<CardContent>Deck summary</CardContent>"
         }
       ],
-      "antipatterns": [
-        "Adding your own outer padding that fights the card rhythm."
-      ]
+      "antipatterns": ["Adding your own outer padding that fights the card rhythm."]
     },
     {
       "name": "CardDescription",
@@ -5979,9 +5958,7 @@
           "code": "<CardDescription>Updated 2 days ago</CardDescription>"
         }
       ],
-      "antipatterns": [
-        "Using it for body content \u2014 use CardContent."
-      ]
+      "antipatterns": ["Using it for body content \u2014 use CardContent."]
     },
     {
       "name": "CardFooter",
@@ -5994,9 +5971,7 @@
           "code": "<CardFooter><Button size=\"sm\">Open</Button></CardFooter>"
         }
       ],
-      "antipatterns": [
-        "Placing actions loose after the Card element."
-      ]
+      "antipatterns": ["Placing actions loose after the Card element."]
     },
     {
       "name": "CardHeader",
@@ -6009,9 +5984,7 @@
           "code": "<CardHeader><CardTitle>Agenda</CardTitle></CardHeader>"
         }
       ],
-      "antipatterns": [
-        "Using it outside a Card."
-      ]
+      "antipatterns": ["Using it outside a Card."]
     },
     {
       "name": "CardTitle",
@@ -6024,9 +5997,7 @@
           "code": "<CardTitle>Q3 review</CardTitle>"
         }
       ],
-      "antipatterns": [
-        "Applying custom font sizes with raw px values."
-      ]
+      "antipatterns": ["Applying custom font sizes with raw px values."]
     },
     {
       "name": "Input",
@@ -6055,10 +6026,7 @@
           "code": "<label htmlFor=\"notes\">Speaker notes</label>\n<Textarea id=\"notes\" rows={4} />"
         }
       ],
-      "antipatterns": [
-        "Using a contentEditable div instead.",
-        "Removing the focus ring."
-      ]
+      "antipatterns": ["Using a contentEditable div instead.", "Removing the focus ring."]
     }
   ],
   "assets": [

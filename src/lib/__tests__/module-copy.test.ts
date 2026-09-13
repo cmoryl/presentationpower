@@ -13,7 +13,10 @@ describe("module library copy", () => {
 
   it("authored ids all exist in the taxonomy", () => {
     for (const id of AUTHORED_COPY_IDS) {
-      expect(MODULE_VARIANTS.some((v) => v.id === id), id).toBe(true);
+      expect(
+        MODULE_VARIANTS.some((v) => v.id === id),
+        id,
+      ).toBe(true);
     }
   });
 

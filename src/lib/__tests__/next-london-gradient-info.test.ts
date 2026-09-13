@@ -10,9 +10,7 @@ import {
 } from "@/lib/next-london-gradient-info";
 import { LONDON_PANELS, LONDON_STYLES } from "@/lib/next-london-signage";
 
-const divisions = londonDivisionGrounds(LONDON_PANELS, (p) =>
-  isLondonDoorItem(p.room, p.name),
-);
+const divisions = londonDivisionGrounds(LONDON_PANELS, (p) => isLondonDoorItem(p.room, p.name));
 
 describe("London gradient grounds reference", () => {
   it("lists the house treatments actually in use", () => {

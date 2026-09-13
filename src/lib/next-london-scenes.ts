@@ -394,362 +394,977 @@ function scene(
   };
 }
 
-
 export const LONDON_SCENES: LondonScene[] = [
-  scene("foyer-column", "Foyer light column", "Ground floor foyer", "column", foyerColumn, {
-    x: 0.4219,
-    y: 0.1309,
-    w: 0.1569,
-    h: 0.707,
-  }, "w", "top"),
-  scene("portrait-banner", "Hanging portrait banner", "Atrium / stairwell", "portrait", portraitBanner, {
-    x: 0.4173,
-    y: 0.1113,
-    w: 0.1602,
-    h: 0.7412,
-  }, "w", "top"),
-  scene("wide-banner", "Foyer wall run", "Circulation wall", "wide", wideBanner, {
-    x: 0.2617,
-    y: 0.168,
-    w: 0.6621,
-    h: 0.5527,
-  }, "w", "center"),
-  scene("square-panel", "Breakout wall panel", "Breakout / lounge", "square", squarePanel, {
-    x: 0.4889,
-    y: 0.2539,
-    w: 0.1764,
-    h: 0.2607,
-  }, "w", "center"),
-  scene("door-vinyl", "Room door vinyl", "Session room entrance", "door", doorVinyl, {
-    x: 0.3991,
-    y: 0.0996,
-    w: 0.1914,
-    h: 0.8213,
-  }, "w", "center", "cover"),
-  scene("step-repeat", "Step-and-repeat wall", "Press / photo point", "wall", stepRepeat, {
-    x: 0.1061,
-    y: 0.1221,
-    w: 0.7891,
-    h: 0.7402,
-  }, "w", "center"),
-  scene("stage-fascia", "Stage fascia", "Main plenary stage", "fascia", stageFascia, {
-    x: 0.1641,
-    y: 0.4912,
-    w: 0.6686,
-    h: 0.0615,
-  }, "h", "center"),
-  scene("desk-front", "Registration desk front", "Registration", "desk", deskFront, {
-    x: 0.112,
-    y: 0.5156,
-    w: 0.832,
-    h: 0.1875,
-  }, "h", "center"),
-  scene("coffee-bar", "Coffee bar back wall", "Catering / coffee bar", "counter", coffeeBar, {
-    x: 0.151,
-    y: 0.2773,
-    w: 0.6875,
-    h: 0.2744,
-  }, "w", "center"),
-  scene("exterior-banner", "Exterior entrance banner", "Street entrance", "exterior", exteriorBanner, {
-    x: 0.2715,
-    y: 0.1768,
-    w: 0.0579,
-    h: 0.4551,
-  }, "w", "top"),
+  scene(
+    "foyer-column",
+    "Foyer light column",
+    "Ground floor foyer",
+    "column",
+    foyerColumn,
+    {
+      x: 0.4219,
+      y: 0.1309,
+      w: 0.1569,
+      h: 0.707,
+    },
+    "w",
+    "top",
+  ),
+  scene(
+    "portrait-banner",
+    "Hanging portrait banner",
+    "Atrium / stairwell",
+    "portrait",
+    portraitBanner,
+    {
+      x: 0.4173,
+      y: 0.1113,
+      w: 0.1602,
+      h: 0.7412,
+    },
+    "w",
+    "top",
+  ),
+  scene(
+    "wide-banner",
+    "Foyer wall run",
+    "Circulation wall",
+    "wide",
+    wideBanner,
+    {
+      x: 0.2617,
+      y: 0.168,
+      w: 0.6621,
+      h: 0.5527,
+    },
+    "w",
+    "center",
+  ),
+  scene(
+    "square-panel",
+    "Breakout wall panel",
+    "Breakout / lounge",
+    "square",
+    squarePanel,
+    {
+      x: 0.4889,
+      y: 0.2539,
+      w: 0.1764,
+      h: 0.2607,
+    },
+    "w",
+    "center",
+  ),
+  scene(
+    "door-vinyl",
+    "Room door vinyl",
+    "Session room entrance",
+    "door",
+    doorVinyl,
+    {
+      x: 0.3991,
+      y: 0.0996,
+      w: 0.1914,
+      h: 0.8213,
+    },
+    "w",
+    "center",
+    "cover",
+  ),
+  scene(
+    "step-repeat",
+    "Step-and-repeat wall",
+    "Press / photo point",
+    "wall",
+    stepRepeat,
+    {
+      x: 0.1061,
+      y: 0.1221,
+      w: 0.7891,
+      h: 0.7402,
+    },
+    "w",
+    "center",
+  ),
+  scene(
+    "stage-fascia",
+    "Stage fascia",
+    "Main plenary stage",
+    "fascia",
+    stageFascia,
+    {
+      x: 0.1641,
+      y: 0.4912,
+      w: 0.6686,
+      h: 0.0615,
+    },
+    "h",
+    "center",
+  ),
+  scene(
+    "desk-front",
+    "Registration desk front",
+    "Registration",
+    "desk",
+    deskFront,
+    {
+      x: 0.112,
+      y: 0.5156,
+      w: 0.832,
+      h: 0.1875,
+    },
+    "h",
+    "center",
+  ),
+  scene(
+    "coffee-bar",
+    "Coffee bar back wall",
+    "Catering / coffee bar",
+    "counter",
+    coffeeBar,
+    {
+      x: 0.151,
+      y: 0.2773,
+      w: 0.6875,
+      h: 0.2744,
+    },
+    "w",
+    "center",
+  ),
+  scene(
+    "exterior-banner",
+    "Exterior entrance banner",
+    "Street entrance",
+    "exterior",
+    exteriorBanner,
+    {
+      x: 0.2715,
+      y: 0.1768,
+      w: 0.0579,
+      h: 0.4551,
+    },
+    "w",
+    "top",
+  ),
 
   // ── Surface-specific plates ──────────────────────────────────────────────
   // Kinds that have no wall to sit on: a floor graphic laid on carpet, a lift
   // door pair, applied stair balustrade glass, and a cafe table top.
   // Face rectangle = the bounding box of the measured floor quad, so the fit
   // and the warp describe the same physical surface.
-  scene("surface-floor-graphic", "Floor graphic on carpet", "Foyer circulation floor", "floor", surfaceFloorGraphic, {
-    x: 0.048,
-    y: 0.345,
-    w: 0.877,
-    h: 0.51,
-  }, "w", "center", "edge"),
-  scene("surface-lift-doors", "Lift door wrap", "Lift lobby", "lift", surfaceLiftDoors, {
-    x: 0.155,
-    y: 0.175,
-    w: 0.23,
-    h: 0.615,
-  }, "w", "center", "cover"),
-  scene("surface-stair-glass", "Stair balustrade glass", "Stair glazing", "glass", surfaceStairGlass, {
-    x: 0.13,
-    y: 0.22,
-    w: 0.72,
-    h: 0.55,
-  }, "w", "center", "edge"),
+  scene(
+    "surface-floor-graphic",
+    "Floor graphic on carpet",
+    "Foyer circulation floor",
+    "floor",
+    surfaceFloorGraphic,
+    {
+      x: 0.048,
+      y: 0.345,
+      w: 0.877,
+      h: 0.51,
+    },
+    "w",
+    "center",
+    "edge",
+  ),
+  scene(
+    "surface-lift-doors",
+    "Lift door wrap",
+    "Lift lobby",
+    "lift",
+    surfaceLiftDoors,
+    {
+      x: 0.155,
+      y: 0.175,
+      w: 0.23,
+      h: 0.615,
+    },
+    "w",
+    "center",
+    "cover",
+  ),
+  scene(
+    "surface-stair-glass",
+    "Stair balustrade glass",
+    "Stair glazing",
+    "glass",
+    surfaceStairGlass,
+    {
+      x: 0.13,
+      y: 0.22,
+      w: 0.72,
+      h: 0.55,
+    },
+    "w",
+    "center",
+    "edge",
+  ),
   // Face rectangle = bounding box of the measured (foreshortened) table top.
-  scene("surface-tabletop", "Cafe table top", "Catering / lounge tables", "table", surfaceTabletop, {
-    x: 0.253,
-    y: 0.199,
-    w: 0.504,
-    h: 0.299,
-  }, "w", "center", "edge"),
+  scene(
+    "surface-tabletop",
+    "Cafe table top",
+    "Catering / lounge tables",
+    "table",
+    surfaceTabletop,
+    {
+      x: 0.253,
+      y: 0.199,
+      w: 0.504,
+      h: 0.299,
+    },
+    "w",
+    "center",
+    "edge",
+  ),
 
   // ── Live in-event plates ─────────────────────────────────────────────────
   // The same surfaces, photographed as they read during the show: delegates
   // walking, queueing and networking around the install, with the printed face
   // itself kept clear so nothing crosses the artwork.
-  { ...scene("live-floor-graphic", "Floor graphic · foyer in use", "Foyer circulation floor · event live", "floor", liveFloorGraphic, {
-    x: 0.134,
-    y: 0.506,
-    w: 0.722,
-    h: 0.293,
-  }, "w", "center", "edge"), live: true },
-  { ...scene("live-lift-lobby", "Lift wrap · lift lobby in use", "Lift lobby · event live", "lift", liveLiftLobby, {
-    x: 0.105,
-    y: 0.085,
-    w: 0.27,
-    h: 0.84,
-  }, "w", "center", "cover"), live: true },
-  { ...scene("live-stair-glass", "Stair glazing · stairs in use", "Stair glazing · event live", "glass", liveStairGlass, {
-    x: 0.18,
-    y: 0.35,
-    w: 0.48,
-    h: 0.3,
-  }, "w", "center", "edge"), live: true },
-  { ...scene("live-tabletop", "Table top · break in progress", "Catering tables · event live", "table", liveTabletop, {
-    x: 0.234,
-    y: 0.572,
-    w: 0.498,
-    h: 0.19,
-  }, "w", "center", "edge"), live: true },
-  { ...scene("live-registration-desk", "Registration desk in use", "Registration · event live", "desk", liveRegistrationDesk, {
-    x: 0.135,
-    y: 0.51,
-    w: 0.74,
-    h: 0.245,
-  }, "h", "center", "edge"), live: true },
-  { ...scene("live-coffee-bar", "Coffee bar wall · break in progress", "Catering / coffee bar · event live", "counter", liveCoffeeBar, {
-    x: 0.185,
-    y: 0.1,
-    w: 0.7,
-    h: 0.44,
-  }, "w", "center", "edge"), live: true },
-  { ...scene("live-foyer-column", "Pillar · exhibition foyer in use", "Exhibition foyer pillar · event live", "column", liveFoyerColumn, {
-    x: 0.405,
-    y: 0.035,
-    w: 0.17,
-    h: 0.92,
-  }, "w", "top", "cover"), live: true },
-  { ...scene("live-stage-fascia", "Stage fascia · session in progress", "Plenary stage front · event live", "fascia", liveStageFascia, {
-    x: 0.075,
-    y: 0.565,
-    w: 0.905,
-    h: 0.135,
-  }, "h", "center", "edge"), live: true },
-  { ...scene("live-room-doors", "Room doors · delegates arriving", "Breakout room doors · event live", "door", liveRoomDoors, {
-    x: 0.312,
-    y: 0.03,
-    w: 0.475,
-    h: 0.83,
-  }, "w", "center", "cover"), live: true },
-  { ...scene("live-scenic-wall", "Scenic wall · foyer in use", "Scenic panel wall · event live", "wall", liveScenicWall, {
-    x: 0.177,
-    y: 0.039,
-    w: 0.728,
-    h: 0.845,
-  }, "w", "center", "edge"), live: true },
-  { ...scene("live-foyer-wall-run", "Foyer wall run · circulation in use", "Foyer wall run · event live", "wide", liveFoyerWallRun, {
-    x: 0.335,
-    y: 0.1,
-    w: 0.635,
-    h: 0.55,
-  }, "w", "center", "edge"), live: true },
-  { ...scene("live-breakout-panel", "Breakout panel · lounge in use", "Breakout lounge panel · event live", "square", liveBreakoutPanel, {
-    x: 0.501,
-    y: 0.119,
-    w: 0.234,
-    h: 0.369,
-  }, "w", "center", "edge"), live: true },
-  { ...scene("live-portrait-banner", "Hanging banner · atrium in use", "Atrium hanging banner · event live", "portrait", livePortraitBanner, {
-    x: 0.404,
-    y: 0.029,
-    w: 0.169,
-    h: 0.615,
-  }, "w", "top", "edge"), live: true },
-  { ...scene("live-exterior-entrance", "Entrance banner · doors open", "Exterior entrance banner · event live", "exterior", liveExteriorEntrance, {
-    x: 0.137,
-    y: 0.176,
-    w: 0.765,
-    h: 0.283,
-  }, "w", "center", "cover"), live: true },
-
+  {
+    ...scene(
+      "live-floor-graphic",
+      "Floor graphic · foyer in use",
+      "Foyer circulation floor · event live",
+      "floor",
+      liveFloorGraphic,
+      {
+        x: 0.134,
+        y: 0.506,
+        w: 0.722,
+        h: 0.293,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    live: true,
+  },
+  {
+    ...scene(
+      "live-lift-lobby",
+      "Lift wrap · lift lobby in use",
+      "Lift lobby · event live",
+      "lift",
+      liveLiftLobby,
+      {
+        x: 0.105,
+        y: 0.085,
+        w: 0.27,
+        h: 0.84,
+      },
+      "w",
+      "center",
+      "cover",
+    ),
+    live: true,
+  },
+  {
+    ...scene(
+      "live-stair-glass",
+      "Stair glazing · stairs in use",
+      "Stair glazing · event live",
+      "glass",
+      liveStairGlass,
+      {
+        x: 0.18,
+        y: 0.35,
+        w: 0.48,
+        h: 0.3,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    live: true,
+  },
+  {
+    ...scene(
+      "live-tabletop",
+      "Table top · break in progress",
+      "Catering tables · event live",
+      "table",
+      liveTabletop,
+      {
+        x: 0.234,
+        y: 0.572,
+        w: 0.498,
+        h: 0.19,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    live: true,
+  },
+  {
+    ...scene(
+      "live-registration-desk",
+      "Registration desk in use",
+      "Registration · event live",
+      "desk",
+      liveRegistrationDesk,
+      {
+        x: 0.135,
+        y: 0.51,
+        w: 0.74,
+        h: 0.245,
+      },
+      "h",
+      "center",
+      "edge",
+    ),
+    live: true,
+  },
+  {
+    ...scene(
+      "live-coffee-bar",
+      "Coffee bar wall · break in progress",
+      "Catering / coffee bar · event live",
+      "counter",
+      liveCoffeeBar,
+      {
+        x: 0.185,
+        y: 0.1,
+        w: 0.7,
+        h: 0.44,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    live: true,
+  },
+  {
+    ...scene(
+      "live-foyer-column",
+      "Pillar · exhibition foyer in use",
+      "Exhibition foyer pillar · event live",
+      "column",
+      liveFoyerColumn,
+      {
+        x: 0.405,
+        y: 0.035,
+        w: 0.17,
+        h: 0.92,
+      },
+      "w",
+      "top",
+      "cover",
+    ),
+    live: true,
+  },
+  {
+    ...scene(
+      "live-stage-fascia",
+      "Stage fascia · session in progress",
+      "Plenary stage front · event live",
+      "fascia",
+      liveStageFascia,
+      {
+        x: 0.075,
+        y: 0.565,
+        w: 0.905,
+        h: 0.135,
+      },
+      "h",
+      "center",
+      "edge",
+    ),
+    live: true,
+  },
+  {
+    ...scene(
+      "live-room-doors",
+      "Room doors · delegates arriving",
+      "Breakout room doors · event live",
+      "door",
+      liveRoomDoors,
+      {
+        x: 0.312,
+        y: 0.03,
+        w: 0.475,
+        h: 0.83,
+      },
+      "w",
+      "center",
+      "cover",
+    ),
+    live: true,
+  },
+  {
+    ...scene(
+      "live-scenic-wall",
+      "Scenic wall · foyer in use",
+      "Scenic panel wall · event live",
+      "wall",
+      liveScenicWall,
+      {
+        x: 0.177,
+        y: 0.039,
+        w: 0.728,
+        h: 0.845,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    live: true,
+  },
+  {
+    ...scene(
+      "live-foyer-wall-run",
+      "Foyer wall run · circulation in use",
+      "Foyer wall run · event live",
+      "wide",
+      liveFoyerWallRun,
+      {
+        x: 0.335,
+        y: 0.1,
+        w: 0.635,
+        h: 0.55,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    live: true,
+  },
+  {
+    ...scene(
+      "live-breakout-panel",
+      "Breakout panel · lounge in use",
+      "Breakout lounge panel · event live",
+      "square",
+      liveBreakoutPanel,
+      {
+        x: 0.501,
+        y: 0.119,
+        w: 0.234,
+        h: 0.369,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    live: true,
+  },
+  {
+    ...scene(
+      "live-portrait-banner",
+      "Hanging banner · atrium in use",
+      "Atrium hanging banner · event live",
+      "portrait",
+      livePortraitBanner,
+      {
+        x: 0.404,
+        y: 0.029,
+        w: 0.169,
+        h: 0.615,
+      },
+      "w",
+      "top",
+      "edge",
+    ),
+    live: true,
+  },
+  {
+    ...scene(
+      "live-exterior-entrance",
+      "Entrance banner · doors open",
+      "Exterior entrance banner · event live",
+      "exterior",
+      liveExteriorEntrance,
+      {
+        x: 0.137,
+        y: 0.176,
+        w: 0.765,
+        h: 0.283,
+      },
+      "w",
+      "center",
+      "cover",
+    ),
+    live: true,
+  },
 
   // ── Floor-specific plates ────────────────────────────────────────────────
   // One space per mapped floor of the venue, matched to the room roster and
   // the install faces on that level, so an item can be previewed in the space
   // it is actually scheduled for. Still visualisations, not venue photos.
-  scene("floor-ext-forecourt", "Broad Sanctuary forecourt flag", "Exterior · forecourt approach", "exterior", floorExtForecourt, {
-    x: 0.28,
-    y: 0.06,
-    w: 0.105,
-    h: 0.645,
-  }, "w", "top", "edge", ["EXT"]),
-  scene("floor-gf-auditorium", "Churchill stage wall", "Ground floor · Churchill", "wall", floorGfAuditorium, {
-    x: 0.1914,
-    y: 0.1934,
-    w: 0.6133,
-    h: 0.3379,
-  }, "w", "center", "edge", ["GF"]),
-  scene("floor-2f-breakout", "Second floor breakout wall", "Second floor · actor rooms & beam", "wall", floor2fBreakout, {
-    x: 0.387,
-    y: 0.283,
-    w: 0.348,
-    h: 0.256,
-  }, "w", "center", "edge", ["2F"]),
-  scene("floor-3f-foyer", "Third floor foyer pillar", "Third floor · Fleming & exhibition foyer", "column", floor3fFoyer, {
-    x: 0.401,
-    y: 0.0195,
-    w: 0.1992,
-    h: 0.8379,
-  }, "w", "top", "edge", ["3F"]),
-  scene("floor-4f-suite", "Fourth floor suite wall", "Fourth floor · meeting suites", "portrait", floor4fSuite, {
-    x: 0.4323,
-    y: 0.2773,
-    w: 0.1094,
-    h: 0.2793,
-  }, "w", "center", "edge", ["4F"]),
-  scene("floor-5f-stair-glass", "Fifth floor stair glazing", "Fifth floor · Windsor, Cambridge & stair glass", "wall", floor5fStairGlass, {
-    x: 0.4102,
-    y: 0.2695,
-    w: 0.3815,
-    h: 0.2871,
-  }, "w", "center", "edge", ["5F"]),
-  scene("floor-6f-set", "Mountbatten set wrap", "Sixth floor · Mountbatten", "wall", floor6fSet, {
-    x: 0.1615,
-    y: 0.1953,
-    w: 0.6771,
-    h: 0.4004,
-  }, "w", "center", "edge", ["6F"]),
+  scene(
+    "floor-ext-forecourt",
+    "Broad Sanctuary forecourt flag",
+    "Exterior · forecourt approach",
+    "exterior",
+    floorExtForecourt,
+    {
+      x: 0.28,
+      y: 0.06,
+      w: 0.105,
+      h: 0.645,
+    },
+    "w",
+    "top",
+    "edge",
+    ["EXT"],
+  ),
+  scene(
+    "floor-gf-auditorium",
+    "Churchill stage wall",
+    "Ground floor · Churchill",
+    "wall",
+    floorGfAuditorium,
+    {
+      x: 0.1914,
+      y: 0.1934,
+      w: 0.6133,
+      h: 0.3379,
+    },
+    "w",
+    "center",
+    "edge",
+    ["GF"],
+  ),
+  scene(
+    "floor-2f-breakout",
+    "Second floor breakout wall",
+    "Second floor · actor rooms & beam",
+    "wall",
+    floor2fBreakout,
+    {
+      x: 0.387,
+      y: 0.283,
+      w: 0.348,
+      h: 0.256,
+    },
+    "w",
+    "center",
+    "edge",
+    ["2F"],
+  ),
+  scene(
+    "floor-3f-foyer",
+    "Third floor foyer pillar",
+    "Third floor · Fleming & exhibition foyer",
+    "column",
+    floor3fFoyer,
+    {
+      x: 0.401,
+      y: 0.0195,
+      w: 0.1992,
+      h: 0.8379,
+    },
+    "w",
+    "top",
+    "edge",
+    ["3F"],
+  ),
+  scene(
+    "floor-4f-suite",
+    "Fourth floor suite wall",
+    "Fourth floor · meeting suites",
+    "portrait",
+    floor4fSuite,
+    {
+      x: 0.4323,
+      y: 0.2773,
+      w: 0.1094,
+      h: 0.2793,
+    },
+    "w",
+    "center",
+    "edge",
+    ["4F"],
+  ),
+  scene(
+    "floor-5f-stair-glass",
+    "Fifth floor stair glazing",
+    "Fifth floor · Windsor, Cambridge & stair glass",
+    "wall",
+    floor5fStairGlass,
+    {
+      x: 0.4102,
+      y: 0.2695,
+      w: 0.3815,
+      h: 0.2871,
+    },
+    "w",
+    "center",
+    "edge",
+    ["5F"],
+  ),
+  scene(
+    "floor-6f-set",
+    "Mountbatten set wrap",
+    "Sixth floor · Mountbatten",
+    "wall",
+    floor6fSet,
+    {
+      x: 0.1615,
+      y: 0.1953,
+      w: 0.6771,
+      h: 0.4004,
+    },
+    "w",
+    "center",
+    "edge",
+    ["6F"],
+  ),
 
   // ── Reference event photographs ──────────────────────────────────────────
   // Real NEXT event photography supplied with the template pack. The face
   // rectangles were measured off the photographs themselves, so artwork lands
   // on the actual printed pillar side and the actual scenic stage wall.
-  { ...scene("ref-foyer-pillar", "NEXT pillar in an exhibition foyer", "Exhibition foyer · four-sided pillar", "column", refFoyerPillar, {
-    x: 0.795,
-    y: 0.157,
-    w: 0.082,
-    h: 0.73,
-  }, "w", "center", "cover"), photo: true,
+  {
+    ...scene(
+      "ref-foyer-pillar",
+      "NEXT pillar in an exhibition foyer",
+      "Exhibition foyer · four-sided pillar",
+      "column",
+      refFoyerPillar,
+      {
+        x: 0.795,
+        y: 0.157,
+        w: 0.082,
+        h: 0.73,
+      },
+      "w",
+      "center",
+      "cover",
+    ),
+    photo: true,
     // Measured off the supplied pillar drawing: 550 mm faces, 2500 mm high.
-    surface: { wMm: 550, hMm: 2500, note: "Four-sided pillar face, supplied drawing" } },
-  { ...scene("ref-plenary-stage", "NEXT scenic stage wall", "Plenary stage · scenic back wall", "wall", refPlenaryStage, {
-    x: 0.045,
-    y: 0.045,
-    w: 0.86,
-    h: 0.545,
-  }, "w", "center", "edge"), photo: true },
+    surface: { wMm: 550, hMm: 2500, note: "Four-sided pillar face, supplied drawing" },
+  },
+  {
+    ...scene(
+      "ref-plenary-stage",
+      "NEXT scenic stage wall",
+      "Plenary stage · scenic back wall",
+      "wall",
+      refPlenaryStage,
+      {
+        x: 0.045,
+        y: 0.045,
+        w: 0.86,
+        h: 0.545,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    photo: true,
+  },
   // Meeting-room door pair, photographed square on: applied vinyl covers the
   // two door leaves, so the print is measured to the leaves themselves.
-  { ...scene("ref-room-doors", "Breakout room door pair", "Breakout room entrance · double doors", "door", refRoomDoors, {
-    x: 0.3,
-    y: 0.215,
-    w: 0.325,
-    h: 0.615,
-  }, "w", "center", "cover"), photo: true },
+  {
+    ...scene(
+      "ref-room-doors",
+      "Breakout room door pair",
+      "Breakout room entrance · double doors",
+      "door",
+      refRoomDoors,
+      {
+        x: 0.3,
+        y: 0.215,
+        w: 0.325,
+        h: 0.615,
+      },
+      "w",
+      "center",
+      "cover",
+    ),
+    photo: true,
+  },
   // Long foyer wall run beside the plenary entrance.
-  { ...scene("ref-foyer-wall-run", "Foyer wall run", "Exhibition foyer · long wall run", "wide", refFoyerWallRun, {
-    x: 0.025,
-    y: 0.09,
-    w: 0.79,
-    h: 0.845,
-  }, "w", "center", "edge"), photo: true },
+  {
+    ...scene(
+      "ref-foyer-wall-run",
+      "Foyer wall run",
+      "Exhibition foyer · long wall run",
+      "wide",
+      refFoyerWallRun,
+      {
+        x: 0.025,
+        y: 0.09,
+        w: 0.79,
+        h: 0.845,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    photo: true,
+  },
   // Freestanding press / merch wall with a dressed table in front of it.
-  { ...scene("ref-press-wall", "Press & merch wall", "Foyer · freestanding press wall", "wall", refPressWall, {
-    x: 0.19,
-    y: 0.05,
-    w: 0.67,
-    h: 0.73,
-  }, "w", "center", "edge"), photo: true },
+  {
+    ...scene(
+      "ref-press-wall",
+      "Press & merch wall",
+      "Foyer · freestanding press wall",
+      "wall",
+      refPressWall,
+      {
+        x: 0.19,
+        y: 0.05,
+        w: 0.67,
+        h: 0.73,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    photo: true,
+  },
   // QEII Centre entrance canopy: the banner face above the lit lettering.
-  { ...scene("ref-exterior-canopy", "Entrance canopy banner", "Exterior · QEII Centre canopy", "exterior", refExteriorCanopy, {
-    x: 0.1,
-    y: 0.465,
-    w: 0.805,
-    h: 0.14,
-  }, "w", "center", "cover"), photo: true },
+  {
+    ...scene(
+      "ref-exterior-canopy",
+      "Entrance canopy banner",
+      "Exterior · QEII Centre canopy",
+      "exterior",
+      refExteriorCanopy,
+      {
+        x: 0.1,
+        y: 0.465,
+        w: 0.805,
+        h: 0.14,
+      },
+      "w",
+      "center",
+      "cover",
+    ),
+    photo: true,
+  },
   // Bare 6800 x 4030 mm scenic wall build, photographed before artwork.
-  { ...scene("ref-scenic-wall-blank", "Scenic wall build", "Scenic build · bare panel wall", "wall", refScenicWallBlank, {
-    x: 0.035,
-    y: 0.07,
-    w: 0.91,
-    h: 0.855,
-  }, "w", "center", "edge"), photo: true,
-    surface: { wMm: 6800, hMm: 4030, note: "Measured scenic build, supplied reference" } },
+  {
+    ...scene(
+      "ref-scenic-wall-blank",
+      "Scenic wall build",
+      "Scenic build · bare panel wall",
+      "wall",
+      refScenicWallBlank,
+      {
+        x: 0.035,
+        y: 0.07,
+        w: 0.91,
+        h: 0.855,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    photo: true,
+    surface: { wMm: 6800, hMm: 4030, note: "Measured scenic build, supplied reference" },
+  },
 
   // ── Genuine QEII Centre photographs ──────────────────────────────────────
   // Queen Elizabeth II Centre event photography (venue press/marketing library,
   // qeiicentre.london). These are the real spaces our items install in, so the
   // faces below were measured off the photographs themselves and every one of
   // these plates is labelled as a photograph, not a visualisation.
-  { ...scene("photo-foyer-wall-run", "Foyer wall run · QEII foyer in use", "Exhibition foyer wall run · QEII Centre photograph", "wide", photoFoyerWallRun, {
-    x: 0.048,
-    y: 0.212,
-    w: 0.422,
-    h: 0.523,
-  }, "w", "center", "edge"), photo: true, live: true },
-  { ...scene("photo-plenary-fascia", "Plenary scenic wall · QEII in use", "Plenary stage scenic wall · QEII Centre photograph", "wall", photoPlenaryFascia, {
-    x: 0.015,
-    y: 0.02,
-    w: 0.975,
-    h: 0.545,
-  }, "w", "center", "edge", ["GF"]), photo: true, live: true },
-  { ...scene("photo-churchill-stage", "Churchill stage set · session live", "Churchill auditorium stage · QEII Centre photograph", "fascia", photoChurchillStage, {
-    x: 0.258,
-    y: 0.418,
-    w: 0.454,
-    h: 0.105,
-  }, "w", "center", "edge", ["GF"]), photo: true, live: true },
-  { ...scene("photo-exhibition-foyer", "Exhibition stand wall · QEII expo", "Exhibition foyer stand wall · QEII Centre photograph", "wall", photoExhibitionFoyer, {
-    x: 0.012,
-    y: 0.252,
-    w: 0.323,
-    h: 0.408,
-  }, "w", "center", "edge"), photo: true, live: true },
-  { ...scene("photo-thirdfloor-wall", "Third floor wall run · QEII expo", "Third floor exhibition wall run · QEII Centre photograph", "wide", photoThirdfloorWall, {
-    x: 0.117,
-    y: 0.212,
-    w: 0.846,
-    h: 0.516,
-  }, "w", "center", "edge", ["3F"]), photo: true },
-  { ...scene("photo-exhibition-stand", "Stand back wall · QEII expo zone", "Expo zone stand back wall · QEII Centre photograph", "portrait", photoExhibitionStand, {
-    x: 0.118,
-    y: 0.3,
-    w: 0.257,
-    h: 0.365,
-  }, "w", "center", "edge"), photo: true },
-  { ...scene("photo-lounge-panel", "Lounge banner · Sanctuary in use", "Sanctuary lounge banner · QEII Centre photograph", "portrait", photoLoungePanel, {
-    x: 0.118,
-    y: 0.365,
-    w: 0.137,
-    h: 0.465,
-  }, "w", "center", "edge"), photo: true, live: true },
-  { ...scene("photo-sanctuary-counter", "Sanctuary counter front", "Sanctuary cafe counter · QEII Centre photograph", "counter", photoSanctuaryCounter, {
-    x: 0.02,
-    y: 0.4,
-    w: 0.3,
-    h: 0.43,
-  }, "h", "center", "edge"), photo: true },
-  { ...scene("photo-cafe-tabletop", "Cafe table top · QEII break area", "Catering table top · QEII Centre photograph", "table", photoCafeTabletop, {
-    x: 0.24,
-    y: 0.665,
-    w: 0.36,
-    h: 0.135,
-  }, "w", "center", "edge"), photo: true },
-  { ...scene("photo-facade-evening", "Entrance fascia · QEII facade lit", "Exterior · QEII Centre entrance fascia photograph", "exterior", photoFacadeEvening, {
-    x: 0.235,
-    y: 0.79,
-    w: 0.58,
-    h: 0.072,
-  }, "w", "center", "cover", ["EXT"]), photo: true },
+  {
+    ...scene(
+      "photo-foyer-wall-run",
+      "Foyer wall run · QEII foyer in use",
+      "Exhibition foyer wall run · QEII Centre photograph",
+      "wide",
+      photoFoyerWallRun,
+      {
+        x: 0.048,
+        y: 0.212,
+        w: 0.422,
+        h: 0.523,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    photo: true,
+    live: true,
+  },
+  {
+    ...scene(
+      "photo-plenary-fascia",
+      "Plenary scenic wall · QEII in use",
+      "Plenary stage scenic wall · QEII Centre photograph",
+      "wall",
+      photoPlenaryFascia,
+      {
+        x: 0.015,
+        y: 0.02,
+        w: 0.975,
+        h: 0.545,
+      },
+      "w",
+      "center",
+      "edge",
+      ["GF"],
+    ),
+    photo: true,
+    live: true,
+  },
+  {
+    ...scene(
+      "photo-churchill-stage",
+      "Churchill stage set · session live",
+      "Churchill auditorium stage · QEII Centre photograph",
+      "fascia",
+      photoChurchillStage,
+      {
+        x: 0.258,
+        y: 0.418,
+        w: 0.454,
+        h: 0.105,
+      },
+      "w",
+      "center",
+      "edge",
+      ["GF"],
+    ),
+    photo: true,
+    live: true,
+  },
+  {
+    ...scene(
+      "photo-exhibition-foyer",
+      "Exhibition stand wall · QEII expo",
+      "Exhibition foyer stand wall · QEII Centre photograph",
+      "wall",
+      photoExhibitionFoyer,
+      {
+        x: 0.012,
+        y: 0.252,
+        w: 0.323,
+        h: 0.408,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    photo: true,
+    live: true,
+  },
+  {
+    ...scene(
+      "photo-thirdfloor-wall",
+      "Third floor wall run · QEII expo",
+      "Third floor exhibition wall run · QEII Centre photograph",
+      "wide",
+      photoThirdfloorWall,
+      {
+        x: 0.117,
+        y: 0.212,
+        w: 0.846,
+        h: 0.516,
+      },
+      "w",
+      "center",
+      "edge",
+      ["3F"],
+    ),
+    photo: true,
+  },
+  {
+    ...scene(
+      "photo-exhibition-stand",
+      "Stand back wall · QEII expo zone",
+      "Expo zone stand back wall · QEII Centre photograph",
+      "portrait",
+      photoExhibitionStand,
+      {
+        x: 0.118,
+        y: 0.3,
+        w: 0.257,
+        h: 0.365,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    photo: true,
+  },
+  {
+    ...scene(
+      "photo-lounge-panel",
+      "Lounge banner · Sanctuary in use",
+      "Sanctuary lounge banner · QEII Centre photograph",
+      "portrait",
+      photoLoungePanel,
+      {
+        x: 0.118,
+        y: 0.365,
+        w: 0.137,
+        h: 0.465,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    photo: true,
+    live: true,
+  },
+  {
+    ...scene(
+      "photo-sanctuary-counter",
+      "Sanctuary counter front",
+      "Sanctuary cafe counter · QEII Centre photograph",
+      "counter",
+      photoSanctuaryCounter,
+      {
+        x: 0.02,
+        y: 0.4,
+        w: 0.3,
+        h: 0.43,
+      },
+      "h",
+      "center",
+      "edge",
+    ),
+    photo: true,
+  },
+  {
+    ...scene(
+      "photo-cafe-tabletop",
+      "Cafe table top · QEII break area",
+      "Catering table top · QEII Centre photograph",
+      "table",
+      photoCafeTabletop,
+      {
+        x: 0.24,
+        y: 0.665,
+        w: 0.36,
+        h: 0.135,
+      },
+      "w",
+      "center",
+      "edge",
+    ),
+    photo: true,
+  },
+  {
+    ...scene(
+      "photo-facade-evening",
+      "Entrance fascia · QEII facade lit",
+      "Exterior · QEII Centre entrance fascia photograph",
+      "exterior",
+      photoFacadeEvening,
+      {
+        x: 0.235,
+        y: 0.79,
+        w: 0.58,
+        h: 0.072,
+      },
+      "w",
+      "center",
+      "cover",
+      ["EXT"],
+    ),
+    photo: true,
+  },
 ];
-
-
-
 
 export function londonScene(id: string): LondonScene | undefined {
   return LONDON_SCENES.find((s) => s.id === id);
@@ -764,7 +1379,6 @@ export function scenesForFloor(floor: LondonFloorId): LondonScene[] {
 export function isFloorScene(scene: LondonScene): boolean {
   return !!scene.floors?.length;
 }
-
 
 /** Surfaces that only make sense for their own kind of install. */
 const SPECIALISED_KINDS: SceneKind[] = ["floor", "lift", "glass", "table"];
@@ -806,11 +1420,9 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
       // A door/vinyl keyword only wins if the item can actually skin that
       // surface; a square artwork on a tall leaf is not a door vinyl scene.
       const coverable =
-        s.mount !== "cover" ||
-        canCoverFace({ face: s.face, plate: s.plate, ratio });
+        s.mount !== "cover" || canCoverFace({ face: s.face, plate: s.plate, ratio });
       const hint = coverable ? hints.indexOf(s.kind) : -1;
-      const orientation =
-        (ratio >= 1) === (s.faceRatio >= 1) ? 0 : 1.5;
+      const orientation = ratio >= 1 === s.faceRatio >= 1 ? 0 : 1.5;
       const fit = Math.abs(Math.log(s.faceRatio / ratio));
       // A plate of the floor the item is actually scheduled on wins ties, so
       // the first view a user sees is the space the item installs in.
@@ -822,8 +1434,7 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
       const wrongFloor = s.floors && !s.floors.includes(panel.floor) ? 1.5 : 0;
       // Purpose-built surfaces (floor, lift, glass, table) are only offered
       // first when the item is actually that kind of install.
-      const specialised =
-        hint < 0 && SPECIALISED_KINDS.includes(s.kind) ? 3 : 0;
+      const specialised = hint < 0 && SPECIALISED_KINDS.includes(s.kind) ? 3 : 0;
       // Between two plates of the same surface, the one with delegates on site
       // reads as the install in use, so it leads.
       const liveBonus = s.live && (kindOk ? hint >= 0 || hints.length === 0 : false) ? -0.35 : 0;
@@ -846,8 +1457,6 @@ export function scenesForPanel(panel: LondonPanel): LondonScene[] {
           measuredBonus +
           specialised,
       };
-
-
     })
     .sort((a, b) => a.score - b.score)
     .map((r) => r.s);
@@ -863,10 +1472,7 @@ export function defaultSceneForPanel(panel: LondonPanel): LondonScene {
  * item's true trim ratio, and never runs off the plate. Fractions of the
  * rendered plate.
  */
-export function fitArtworkInFace(
-  panel: LondonPanel,
-  sceneOrId: LondonScene | string,
-): SceneFace {
+export function fitArtworkInFace(panel: LondonPanel, sceneOrId: LondonScene | string): SceneFace {
   const sc = typeof sceneOrId === "string" ? londonScene(sceneOrId) : sceneOrId;
   // Where the surface has actually been measured, the print goes on at its true
   // fraction of that surface, so the render agrees with the spec sheet. An

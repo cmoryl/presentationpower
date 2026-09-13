@@ -13,10 +13,7 @@ import { useMemo } from "react";
 import { z } from "zod";
 
 import { SocialModuleFrame } from "@/components/campaigns/SocialModuleFrame";
-import {
-  SOCIAL_MODULE_LAYOUTS,
-  buildSocialModuleSection,
-} from "@/lib/social-module-layouts";
+import { SOCIAL_MODULE_LAYOUTS, buildSocialModuleSection } from "@/lib/social-module-layouts";
 import { SOCIAL_FORMATS, getFormat } from "@/lib/social-formats";
 import { reliefAt } from "@/lib/social-module-fit";
 
@@ -62,7 +59,8 @@ function SocialSweepHarness() {
   const { format: formatId, mode = "dark", only } = Route.useSearch();
   const format = getFormat(formatId ?? "") ?? SOCIAL_FORMATS[0];
   const layouts = useMemo(
-    () => (only ? SOCIAL_MODULE_LAYOUTS.filter((l) => l.variantId === only) : SOCIAL_MODULE_LAYOUTS),
+    () =>
+      only ? SOCIAL_MODULE_LAYOUTS.filter((l) => l.variantId === only) : SOCIAL_MODULE_LAYOUTS,
     [only],
   );
 

@@ -3934,7 +3934,11 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       return {
         title: "The direction of travel",
         kicker: "Trend",
-        stat: { value: "71", unit: "%", label: "Of content now routed through the managed pipeline" },
+        stat: {
+          value: "71",
+          unit: "%",
+          label: "Of content now routed through the managed pipeline",
+        },
         items: [
           { value: "+22", unit: "%", label: "Volume growth" },
           { value: "-31", unit: "%", label: "Cost per word" },

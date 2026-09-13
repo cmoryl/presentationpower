@@ -1,12 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { LONDON_SCENES } from "@/lib/next-london-scenes";
-import {
-  castShadow,
-  kelvinTint,
-  lightQualityLabel,
-  sceneLightQuality,
-} from "@/lib/scene-lighting";
+import { castShadow, kelvinTint, lightQualityLabel, sceneLightQuality } from "@/lib/scene-lighting";
 
 describe("scene light quality", () => {
   it("gives every London scene a plausible photographic read", () => {

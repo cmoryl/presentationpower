@@ -58,9 +58,9 @@ export function LondonAgendaBoards() {
   return (
     <div className="mt-4">
       <p className="text-[13px] leading-relaxed text-[#03002C]/70">
-        Editable agenda boards, A4 to A1, for every division area at the QEII Centre. Programme rows,
-        approved grounds, dark and light faces, scannable QR codes and layered vector export for
-        print.
+        Editable agenda boards, A4 to A1, for every division area at the QEII Centre. Programme
+        rows, approved grounds, dark and light faces, scannable QR codes and layered vector export
+        for print.
       </p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {AGENDA_DIVISIONS.map((div) => (

@@ -122,7 +122,6 @@ describe("MV-PROC-STAGE-ORBITS export verification", () => {
     expect(exp.capacityProblems.join(" ")).toMatch(/maximum is 6/);
   });
 
-
   it("exports a six-phase chain with task descriptions as native text", async () => {
     const wide = {
       title: "Six stage program",

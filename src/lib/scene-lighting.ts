@@ -377,7 +377,6 @@ const SCENE_LIGHTING: Record<string, Partial<SceneLighting>> = {
   },
 };
 
-
 type SceneFinish = Partial<Pick<SceneLighting, "grain" | "softness" | "bounce">>;
 
 /**
@@ -472,16 +471,116 @@ export interface LightQuality {
 
 /** House reads for each lighting condition, so plates stay consistent. */
 const TIME_OF_DAY: Record<TimeOfDay, Omit<LightQuality, "timeOfDay">> = {
-  morning: { kelvin: 5200, hardness: 0.55, azimuth: 105, elevation: 26, shadowLength: 2.05, ambientLift: 0.1, rolloff: 0.12, blackLift: 0.05, vignette: 0.1 },
-  midday: { kelvin: 5600, hardness: 0.78, azimuth: 178, elevation: 64, shadowLength: 0.49, ambientLift: 0.07, rolloff: 0.16, blackLift: 0.04, vignette: 0.12 },
-  afternoon: { kelvin: 4900, hardness: 0.52, azimuth: 252, elevation: 34, shadowLength: 1.48, ambientLift: 0.11, rolloff: 0.13, blackLift: 0.05, vignette: 0.11 },
-  golden: { kelvin: 3400, hardness: 0.62, azimuth: 272, elevation: 13, shadowLength: 4.33, ambientLift: 0.09, rolloff: 0.2, blackLift: 0.07, vignette: 0.16 },
-  evening: { kelvin: 3000, hardness: 0.34, azimuth: 296, elevation: 11, shadowLength: 5.14, ambientLift: 0.14, rolloff: 0.22, blackLift: 0.09, vignette: 0.18 },
-  night: { kelvin: 4300, hardness: 0.3, azimuth: 190, elevation: 55, shadowLength: 0.7, ambientLift: 0.16, rolloff: 0.24, blackLift: 0.11, vignette: 0.22 },
-  tungsten: { kelvin: 3050, hardness: 0.3, azimuth: 195, elevation: 72, shadowLength: 0.32, ambientLift: 0.16, rolloff: 0.18, blackLift: 0.07, vignette: 0.14 },
-  "daylight-interior": { kelvin: 5300, hardness: 0.3, azimuth: 118, elevation: 42, shadowLength: 1.11, ambientLift: 0.2, rolloff: 0.14, blackLift: 0.05, vignette: 0.12 },
-  "mixed-interior": { kelvin: 4350, hardness: 0.24, azimuth: 176, elevation: 60, shadowLength: 0.58, ambientLift: 0.22, rolloff: 0.15, blackLift: 0.06, vignette: 0.13 },
-  stage: { kelvin: 6200, hardness: 0.46, azimuth: 182, elevation: 46, shadowLength: 0.97, ambientLift: 0.1, rolloff: 0.26, blackLift: 0.12, vignette: 0.24 },
+  morning: {
+    kelvin: 5200,
+    hardness: 0.55,
+    azimuth: 105,
+    elevation: 26,
+    shadowLength: 2.05,
+    ambientLift: 0.1,
+    rolloff: 0.12,
+    blackLift: 0.05,
+    vignette: 0.1,
+  },
+  midday: {
+    kelvin: 5600,
+    hardness: 0.78,
+    azimuth: 178,
+    elevation: 64,
+    shadowLength: 0.49,
+    ambientLift: 0.07,
+    rolloff: 0.16,
+    blackLift: 0.04,
+    vignette: 0.12,
+  },
+  afternoon: {
+    kelvin: 4900,
+    hardness: 0.52,
+    azimuth: 252,
+    elevation: 34,
+    shadowLength: 1.48,
+    ambientLift: 0.11,
+    rolloff: 0.13,
+    blackLift: 0.05,
+    vignette: 0.11,
+  },
+  golden: {
+    kelvin: 3400,
+    hardness: 0.62,
+    azimuth: 272,
+    elevation: 13,
+    shadowLength: 4.33,
+    ambientLift: 0.09,
+    rolloff: 0.2,
+    blackLift: 0.07,
+    vignette: 0.16,
+  },
+  evening: {
+    kelvin: 3000,
+    hardness: 0.34,
+    azimuth: 296,
+    elevation: 11,
+    shadowLength: 5.14,
+    ambientLift: 0.14,
+    rolloff: 0.22,
+    blackLift: 0.09,
+    vignette: 0.18,
+  },
+  night: {
+    kelvin: 4300,
+    hardness: 0.3,
+    azimuth: 190,
+    elevation: 55,
+    shadowLength: 0.7,
+    ambientLift: 0.16,
+    rolloff: 0.24,
+    blackLift: 0.11,
+    vignette: 0.22,
+  },
+  tungsten: {
+    kelvin: 3050,
+    hardness: 0.3,
+    azimuth: 195,
+    elevation: 72,
+    shadowLength: 0.32,
+    ambientLift: 0.16,
+    rolloff: 0.18,
+    blackLift: 0.07,
+    vignette: 0.14,
+  },
+  "daylight-interior": {
+    kelvin: 5300,
+    hardness: 0.3,
+    azimuth: 118,
+    elevation: 42,
+    shadowLength: 1.11,
+    ambientLift: 0.2,
+    rolloff: 0.14,
+    blackLift: 0.05,
+    vignette: 0.12,
+  },
+  "mixed-interior": {
+    kelvin: 4350,
+    hardness: 0.24,
+    azimuth: 176,
+    elevation: 60,
+    shadowLength: 0.58,
+    ambientLift: 0.22,
+    rolloff: 0.15,
+    blackLift: 0.06,
+    vignette: 0.13,
+  },
+  stage: {
+    kelvin: 6200,
+    hardness: 0.46,
+    azimuth: 182,
+    elevation: 46,
+    shadowLength: 0.97,
+    ambientLift: 0.1,
+    rolloff: 0.26,
+    blackLift: 0.12,
+    vignette: 0.24,
+  },
 };
 
 /**
@@ -582,9 +681,7 @@ export function kelvinTint(kelvin: number): string {
   // Pulled toward white: this is an ambient cast laid over a print, not the
   // colour of the light itself, and brand colours must survive it.
   const mix = (v: number) => clamp(v + (255 - v) * 0.55);
-  return `#${rel
-    .map((v) => mix(v).toString(16).padStart(2, "0"))
-    .join("")}`;
+  return `#${rel.map((v) => mix(v).toString(16).padStart(2, "0")).join("")}`;
 }
 
 /** The full photographic read of a plate. */
@@ -645,7 +742,8 @@ export function lightQualityLabel(q: LightQuality): string {
     "mixed-interior": "House and daylight mix",
     stage: "Stage wash",
   };
-  const feel = q.hardness >= 0.6 ? "hard shadows" : q.hardness >= 0.4 ? "medium shadows" : "soft shadows";
+  const feel =
+    q.hardness >= 0.6 ? "hard shadows" : q.hardness >= 0.4 ? "medium shadows" : "soft shadows";
   return `${when[q.timeOfDay]} · ${Math.round(q.kelvin)}K · ${feel}`;
 }
 

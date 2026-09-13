@@ -33,9 +33,7 @@ describe("next city starter", () => {
     }
     // Every carried size traces to a real London trim on that family.
     const flag = starter.items.find((i) => i.family.id === "vt-exterior-flag")!;
-    const londonFlags = LONDON_PANELS.filter((p) =>
-      flag.family.londonPanels.includes(p.id),
-    );
+    const londonFlags = LONDON_PANELS.filter((p) => flag.family.londonPanels.includes(p.id));
     expect(londonFlags.length).toBeGreaterThan(0);
     expect(flag.trimW).toBeGreaterThanOrEqual(Math.min(...londonFlags.map((p) => p.trimW)));
     expect(flag.trimW).toBeLessThanOrEqual(Math.max(...londonFlags.map((p) => p.trimW)));

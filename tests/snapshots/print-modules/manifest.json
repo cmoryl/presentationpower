@@ -15,10 +15,7 @@
     "pm-table-table-spec-rows",
     "pm-contact-contact-expert-card"
   ],
-  "modes": [
-    "light",
-    "dark"
-  ],
+  "modes": ["light", "dark"],
   "pages": [
     {
       "id": "pm-narrative-narrative-tri-card",

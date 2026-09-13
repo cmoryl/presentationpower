@@ -319,4 +319,3 @@ export function venueTemplateAudit<P extends VenueTemplatePanelLike>(
     reuse: panels.length ? covered / panels.length : 0,
   };
 }
-

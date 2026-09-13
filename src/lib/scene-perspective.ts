@@ -182,12 +182,7 @@ export function applyHomography(m: Homography, p: ScenePoint): ScenePoint {
 
 /** CSS `matrix3d(...)` (column-major) for a homography. */
 export function homographyToMatrix3d(m: Homography): string {
-  const v = [
-    m.a, m.d, 0, m.g,
-    m.b, m.e, 0, m.h,
-    0, 0, 1, 0,
-    m.c, m.f, 0, 1,
-  ];
+  const v = [m.a, m.d, 0, m.g, m.b, m.e, 0, m.h, 0, 0, 1, 0, m.c, m.f, 0, 1];
   return `matrix3d(${v.map((n) => Number(n.toFixed(6))).join(",")})`;
 }
 

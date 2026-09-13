@@ -18,12 +18,12 @@
 // Bespoke scenic units as draggable areas placed by matching room type, and all
 // 54 signage panels reissued at a scale you set, with the print risks flagged.
 
+import { BESPOKE_UNITS, bespokeFootprintLabel, type BespokeUnit } from "@/lib/next-london-bespoke";
 import {
-  BESPOKE_UNITS,
-  bespokeFootprintLabel,
-  type BespokeUnit,
-} from "@/lib/next-london-bespoke";
-import { LONDON_FLOOR_PLANS, type LondonFloorPlan, type LondonZone } from "@/lib/next-london-floorplan";
+  LONDON_FLOOR_PLANS,
+  type LondonFloorPlan,
+  type LondonZone,
+} from "@/lib/next-london-floorplan";
 import type { LondonCustomArea } from "@/lib/next-london-floormap-areas";
 import { LONDON_PANELS, type LondonFloorId, type LondonPanel } from "@/lib/next-london-signage";
 
@@ -268,7 +268,9 @@ const MIN_UNIT_M = 1.6;
  * Ids stay `area-` prefixed, so the sheets, keys and exports treat them exactly
  * like any other sectioned area.
  */
-export function nextVenueScenicAreas(units: readonly BespokeUnit[] = BESPOKE_UNITS): LondonCustomArea[] {
+export function nextVenueScenicAreas(
+  units: readonly BespokeUnit[] = BESPOKE_UNITS,
+): LondonCustomArea[] {
   const out: LondonCustomArea[] = [];
   /** Next free x per zone, so packing is deterministic. */
   const cursor = new Map<string, { x: number; y: number; rowH: number }>();
@@ -280,7 +282,10 @@ export function nextVenueScenicAreas(units: readonly BespokeUnit[] = BESPOKE_UNI
       Math.max(MIN_UNIT_M, unit.widthMm ? unit.widthMm / 1000 : MIN_UNIT_M * 1.5),
       zone.w,
     );
-    const h = Math.min(Math.max(MIN_UNIT_M, unit.depthMm ? unit.depthMm / 1000 : MIN_UNIT_M), zone.h);
+    const h = Math.min(
+      Math.max(MIN_UNIT_M, unit.depthMm ? unit.depthMm / 1000 : MIN_UNIT_M),
+      zone.h,
+    );
     const c = cursor.get(zone.id) ?? { x: 0, y: 0, rowH: 0 };
     if (c.x + w > zone.w) {
       c.x = 0;
@@ -343,7 +348,8 @@ export function reissuePanel(panel: LondonPanel, scale: number): ReissuedPanel {
   const trimW = Math.round(panel.trimW * s);
   const trimH = Math.round(panel.trimH * s);
   const flags: string[] = [];
-  if (ppi < 36) flags.push(`${ppi} ppi at this size — below the 36 ppi floor, artwork must be re-rendered`);
+  if (ppi < 36)
+    flags.push(`${ppi} ppi at this size — below the 36 ppi floor, artwork must be re-rendered`);
   else if (ppi < panel.rasterPpi) flags.push(`${ppi} ppi at this size (was ${panel.rasterPpi})`);
   if (Math.max(trimW, trimH) > MAX_SINGLE_PIECE_MM)
     flags.push(`${Math.max(trimW, trimH)} mm long — tiled panels, seam positions to confirm`);

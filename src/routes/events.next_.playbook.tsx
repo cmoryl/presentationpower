@@ -110,7 +110,6 @@ function PlaybookPage() {
           <MapPin size={13} /> Start the next city
         </Link>
 
-
         <div className="mt-3">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E0E8F5] px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
             <Layers size={12} /> Venue playbook
@@ -204,7 +203,11 @@ function PlaybookPage() {
 
               {panels.length ? (
                 <p className="mt-3 text-[11px] text-black/45">
-                  Settled on: {panels.slice(0, 3).map((p) => p.name).join(", ")}
+                  Settled on:{" "}
+                  {panels
+                    .slice(0, 3)
+                    .map((p) => p.name)
+                    .join(", ")}
                   {panels.length > 3 ? ` +${panels.length - 3} more` : ""}
                 </p>
               ) : null}
@@ -256,8 +259,8 @@ function PlaybookPage() {
         {audit.unmatched.length ? (
           <>
             <p className="mt-1 text-[13px] text-black/60">
-              {audit.unmatched.length} signs have no reusable family yet. Each one added here is time
-              saved at the next venue.
+              {audit.unmatched.length} signs have no reusable family yet. Each one added here is
+              time saved at the next venue.
             </p>
             <ul className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
               {audit.unmatched.map((panel) => (
@@ -309,25 +312,25 @@ function PlaybookPage() {
           How every view is lit and placed in space
         </h2>
         <p className="mt-1 text-[13px] text-black/60">
-          Each view carries a photographer's read of its space: time of day, colour temperature of the
-          dominant light, and how hard it is. Shadow direction follows the light's bearing and shadow
-          length follows its height, so the same warm foyer or stage wash looks the same at every
-          venue in the NEXT ecosystem.
+          Each view carries a photographer's read of its space: time of day, colour temperature of
+          the dominant light, and how hard it is. Shadow direction follows the light's bearing and
+          shadow length follows its height, so the same warm foyer or stage wash looks the same at
+          every venue in the NEXT ecosystem.
         </p>
         <p className="mt-2 text-[13px] text-black/60">
           Each view also records where the camera stood. The surface's own converging edges give the
-          horizon, so the lens height and tilt are read from the picture rather than guessed. The end
-          of a print that runs deeper into the room is drawn slightly hazier, slightly darker and
-          slightly softer than the near end, because that is what distance does — a print treated
-          evenly across a raked surface always reads as pasted on.
+          horizon, so the lens height and tilt are read from the picture rather than guessed. The
+          end of a print that runs deeper into the room is drawn slightly hazier, slightly darker
+          and slightly softer than the near end, because that is what distance does — a print
+          treated evenly across a raked surface always reads as pasted on.
         </p>
         <p className="mt-2 text-[13px] text-black/60">
-          Size comes before looks. Where the install surface has been measured — a supplied artboard,
-          a venue drawing, a measured door opening — the print is placed at its true fraction of that
-          surface, so a 1000&nbsp;mm panel on a 6800&nbsp;mm scenic wall covers 15% of the wall in the
-          view exactly as it will on site. Where the surface has not been measured the view says
-          &ldquo;indicative scale&rdquo; instead of pretending, and any item that cannot physically fit
-          the surface it is shown on is called out on the view itself.
+          Size comes before looks. Where the install surface has been measured — a supplied
+          artboard, a venue drawing, a measured door opening — the print is placed at its true
+          fraction of that surface, so a 1000&nbsp;mm panel on a 6800&nbsp;mm scenic wall covers 15%
+          of the wall in the view exactly as it will on site. Where the surface has not been
+          measured the view says &ldquo;indicative scale&rdquo; instead of pretending, and any item
+          that cannot physically fit the surface it is shown on is called out on the view itself.
         </p>
         <ul className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
           {LONDON_SCENES.map((scene) => {

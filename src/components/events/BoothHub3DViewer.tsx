@@ -24,8 +24,6 @@ import {
 /** Where a division's pasted share link is remembered between sessions. */
 const shareKey = (division: string) => `boothhub:share:${division}`;
 
-
-
 export interface BoothHub3DViewerProps {
   /** Asset name shown in the header. */
   title: string;
@@ -168,7 +166,6 @@ export function BoothHub3DViewer({
     return () => window.clearTimeout(t);
   }, [embedUrl]);
 
-
   return (
     <div
       role="dialog"
@@ -223,8 +220,9 @@ export function BoothHub3DViewer({
           {graphics === "unavailable" ? (
             <div className="absolute inset-x-0 top-0 z-10 flex flex-wrap items-center justify-between gap-3 bg-[#FFEB66] px-4 py-2.5 text-[12.5px] text-[#03002C]">
               <span className="min-w-[200px] flex-1">
-                This browser window can’t start a 3D picture here — it’s a graphics limit of a window
-                inside a window, not your stand. Open it in a tab of its own and it draws normally.
+                This browser window can’t start a 3D picture here — it’s a graphics limit of a
+                window inside a window, not your stand. Open it in a tab of its own and it draws
+                normally.
               </span>
               <a
                 href={pageUrl}
@@ -261,7 +259,8 @@ export function BoothHub3DViewer({
               <>
                 Seeing “Booth unavailable”? Without a BoothHUB sign-in this window can only show a
                 stand that has been shared. Paste the {BOOTHHUB_DIVISION_LABEL[division]} share link
-                from BoothHUB below — it is remembered, so everyone here sees the build from then on.
+                from BoothHUB below — it is remembered, so everyone here sees the build from then
+                on.
               </>
             )}
           </p>
@@ -324,7 +323,6 @@ export function BoothHub3DViewer({
             <PencilRuler className="h-4 w-4" /> Build this stand
           </a>
         </footer>
-
       </div>
     </div>
   );

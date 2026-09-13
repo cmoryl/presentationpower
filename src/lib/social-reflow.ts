@@ -22,7 +22,12 @@ import {
   type PrintModuleDensity,
   type PrintSectionModule,
 } from "@/lib/print-library/section-modules";
-import { applyTallPlan, isTallAspect, tallPlanFor, type SocialTallPlan } from "@/lib/social-tall-layouts";
+import {
+  applyTallPlan,
+  isTallAspect,
+  tallPlanFor,
+  type SocialTallPlan,
+} from "@/lib/social-tall-layouts";
 
 export type SocialReflowPlan = SocialTallPlan & {
   /** Which shape asked for the relayout. */

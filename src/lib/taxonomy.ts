@@ -1804,8 +1804,7 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     id: "MV-SHOW-DEVICE-QUAD",
     familyId: "MF-04",
     name: "Device screen + benefit quad",
-    description:
-      "Device mockup on one side, two to six icon benefits in a quad grid on the other",
+    description: "Device mockup on one side, two to six icon benefits in a quad grid on the other",
     permittedLayoutIds: ["LF-03"],
     capacity: {
       fields: {
@@ -1839,7 +1838,6 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
         "certs[].logoUrl": { kind: "logo" },
         "certs[].logoUrlDark": { kind: "logo" },
         "certs[].logoPath": { kind: "logo" },
-
       },
       titleChars: 44,
       bodyChars: 34,
@@ -1854,7 +1852,6 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
       "certs[].logoUrl",
       "certs[].logoUrlDark",
       "certs[].logoPath",
-
     ],
     lockedFields: ["footer", "logo"],
   },

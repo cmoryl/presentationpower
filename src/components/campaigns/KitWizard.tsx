@@ -66,14 +66,35 @@ import { Download } from "lucide-react";
 
 /** Format picker groups — platform families with a small brand-accent marker
  *  each (aqua/lavender stay under the 10% accent rule; blue leads). */
-const FORMAT_GROUPS: { id: string; label: string; accent: string; platforms: FormatPlatform[] }[] = [
-  { id: "meta", label: "Instagram & Facebook", accent: "#EC388A", platforms: ["instagram", "facebook"] },
-  { id: "linkedin", label: "LinkedIn", accent: "#003FC7", platforms: ["linkedin"] },
-  { id: "short", label: "Short-form video", accent: "#03002C", platforms: ["tiktok", "snapchat", "whatsapp"] },
-  { id: "google", label: "YouTube", accent: "#E53D2E", platforms: ["youtube"] },
-  { id: "social", label: "More social", accent: "#C2A3FF", platforms: ["x", "threads", "bluesky", "pinterest"] },
-  { id: "other", label: "Email & other", accent: "#A1FBF9", platforms: ["email", "generic", "signage"] },
-];
+const FORMAT_GROUPS: { id: string; label: string; accent: string; platforms: FormatPlatform[] }[] =
+  [
+    {
+      id: "meta",
+      label: "Instagram & Facebook",
+      accent: "#EC388A",
+      platforms: ["instagram", "facebook"],
+    },
+    { id: "linkedin", label: "LinkedIn", accent: "#003FC7", platforms: ["linkedin"] },
+    {
+      id: "short",
+      label: "Short-form video",
+      accent: "#03002C",
+      platforms: ["tiktok", "snapchat", "whatsapp"],
+    },
+    { id: "google", label: "YouTube", accent: "#E53D2E", platforms: ["youtube"] },
+    {
+      id: "social",
+      label: "More social",
+      accent: "#C2A3FF",
+      platforms: ["x", "threads", "bluesky", "pinterest"],
+    },
+    {
+      id: "other",
+      label: "Email & other",
+      accent: "#A1FBF9",
+      platforms: ["email", "generic", "signage"],
+    },
+  ];
 
 /** Mini aspect-ratio glyph for a format chip — a bordered box whose w/h
  *  inside a 14px square conveys 1:1 vs 4:5 vs 9:16 vs wide at a glance. */
@@ -284,9 +305,13 @@ export function KitWizard({
         }
         {
           const storedVisual = (
-            row.eventFacts as
-              | { visual?: { moduleLayoutId?: string | null; imageScrimPct?: number; imageUrl?: string } }
-              | null
+            row.eventFacts as {
+              visual?: {
+                moduleLayoutId?: string | null;
+                imageScrimPct?: number;
+                imageUrl?: string;
+              };
+            } | null
           )?.visual;
           if (storedVisual) {
             if (storedVisual.moduleLayoutId) setModuleLayoutId(storedVisual.moduleLayoutId);
@@ -335,7 +360,9 @@ export function KitWizard({
     }
     const persistableImageUrl = imageUrl && !imageUrl.startsWith("data:") ? imageUrl : undefined;
     if (imageUrl && imageUrl.startsWith("data:")) {
-      toast("Uploaded background isn't saved with the kit — pick it from the Division library to keep it");
+      toast(
+        "Uploaded background isn't saved with the kit — pick it from the Division library to keep it",
+      );
     }
     setSaving(true);
     try {
@@ -658,11 +685,10 @@ export function KitWizard({
                 ))}
               </select>
               <p className="mt-2 text-[11px] leading-relaxed text-black/55">
-                Uses the template's own background art for each module's scene —
-                covers, stats, quotes and logo walls each get their matching plate.
+                Uses the template's own background art for each module's scene — covers, stats,
+                quotes and logo walls each get their matching plate.
               </p>
             </div>
-
           </StepCard>
         )}
 
@@ -825,7 +851,10 @@ export function KitWizard({
         )}
 
         {currentStepKey === "profile" && (
-          <StepCard eyebrow={`Step ${step + 1} of ${WIZARD_STEPS.length}`} title="Which formats should ship?">
+          <StepCard
+            eyebrow={`Step ${step + 1} of ${WIZARD_STEPS.length}`}
+            title="Which formats should ship?"
+          >
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {KIT_PROFILES.map((profile) => {
                 const selected = profile.id === profileId;
@@ -860,8 +889,8 @@ export function KitWizard({
               </div>
               <div className="space-y-3">
                 {FORMAT_GROUPS.map((group) => {
-                  const formats = Object.values(SOCIAL_FORMATS_BY_ID).filter(
-                    (f) => group.platforms.includes(f.platform),
+                  const formats = Object.values(SOCIAL_FORMATS_BY_ID).filter((f) =>
+                    group.platforms.includes(f.platform),
                   );
                   if (formats.length === 0) return null;
                   const onCount = formats.filter((f) => formatIds.includes(f.id)).length;
@@ -1098,7 +1127,10 @@ export function KitWizard({
                 defaultCaption="Scan to register"
                 kitId={`kit-wizard:${surface}`}
                 kitLabel={kitName || `${surface} kit`}
-                fileStem={`${(kitName || surface + "-kit").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-qr`}
+                fileStem={`${(kitName || surface + "-kit")
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]+/g, "-")
+                  .replace(/^-|-$/g, "")}-qr`}
               />
             </div>
 

@@ -15,9 +15,15 @@ one-way snapshot.
 ```json
 {
   "exported_at": "ISO timestamp",
-  "oracle_intelligence": [ /* 1 row: org-level synthesis */ ],
-  "oracle_knowledge_base": [ /* 30 rows: title, content, content_type, tags, ... */ ],
-  "brand_intelligence": [ /* 40 rows: per-entity summaries, knowledge_entries, etc. */ ]
+  "oracle_intelligence": [
+    /* 1 row: org-level synthesis */
+  ],
+  "oracle_knowledge_base": [
+    /* 30 rows: title, content, content_type, tags, ... */
+  ],
+  "brand_intelligence": [
+    /* 40 rows: per-entity summaries, knowledge_entries, etc. */
+  ]
 }
 ```
 

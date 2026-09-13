@@ -68,7 +68,10 @@ export function styleDescriptor(
   mask?: Uint8Array | null,
   trackHue?: number | null,
 ): StyleDescriptor;
-export function compareStyle(reference: StyleDescriptor, exported: StyleDescriptor): StyleComparison;
+export function compareStyle(
+  reference: StyleDescriptor,
+  exported: StyleDescriptor,
+): StyleComparison;
 export function chroma(r: number, g: number, b: number): number;
 export function chartMask(
   width: number,

@@ -842,7 +842,6 @@ function DeckEditor() {
                         onArrangementChange={(next) =>
                           updateField(deck.id, active.id, "statArrangement", next)
                         }
-
                       />
                     </EditorMenu>
 
@@ -1552,9 +1551,7 @@ function DeckEditor() {
                 <div className="mt-6 space-y-6">
                   <OrbitContentPanel
                     content={active.content as Record<string, unknown>}
-                    onChangeField={(field, value) =>
-                      updateField(deck.id, active.id, field, value)
-                    }
+                    onChangeField={(field, value) => updateField(deck.id, active.id, field, value)}
                   />
                   <LogoWallPanel
                     items={(active.content as Record<string, unknown>).items}
@@ -1571,7 +1568,6 @@ function DeckEditor() {
                     onChange={(next) => updateField(deck.id, active.id, "orbitStyle", next)}
                   />
                 </div>
-
               )}
 
               {/* Credential proof split — layout, styling and content editor */}
@@ -1579,13 +1575,10 @@ function DeckEditor() {
                 <div className="mt-6">
                   <CertStylePanel
                     content={active.content as Record<string, unknown>}
-                    onChangeField={(field, value) =>
-                      updateField(deck.id, active.id, field, value)
-                    }
+                    onChangeField={(field, value) => updateField(deck.id, active.id, field, value)}
                   />
                 </div>
               )}
-
 
               {/* Capability cards — structure, per-card imagery and card design */}
               {active && mv && mv.id === "MV-SOL-CAP-CARDS" && (
@@ -1596,9 +1589,7 @@ function DeckEditor() {
                     style={(active.content as Record<string, unknown>).capCardStyle}
                     divisionId={deck.brandModeId}
                     onChangeCards={(cards) => updateField(deck.id, active.id, "cards", cards)}
-                    onChangeStyle={(next) =>
-                      updateField(deck.id, active.id, "capCardStyle", next)
-                    }
+                    onChangeStyle={(next) => updateField(deck.id, active.id, "capCardStyle", next)}
                   />
                 </div>
               )}
@@ -1613,13 +1604,9 @@ function DeckEditor() {
                     deviceKind={(active.content as Record<string, unknown>).deviceKind}
                     deviceTone={(active.content as Record<string, unknown>).deviceTone}
                     brandModeId={deck.brandModeId}
-                    onChangeBenefits={(rows) =>
-                      updateField(deck.id, active.id, "benefits", rows)
-                    }
+                    onChangeBenefits={(rows) => updateField(deck.id, active.id, "benefits", rows)}
                     onChangeStyle={(next) => updateField(deck.id, active.id, "quadStyle", next)}
-                    onChangeField={(field, value) =>
-                      updateField(deck.id, active.id, field, value)
-                    }
+                    onChangeField={(field, value) => updateField(deck.id, active.id, field, value)}
                   />
                 </div>
               )}

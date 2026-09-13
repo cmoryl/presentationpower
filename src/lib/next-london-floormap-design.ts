@@ -24,13 +24,7 @@ export type MapAreaKind =
   | "storage"
   | "support";
 
-export type MapThemeId =
-  | "directory"
-  | "blueprint"
-  | "cyanotype"
-  | "night"
-  | "mono"
-  | "brand";
+export type MapThemeId = "directory" | "blueprint" | "cyanotype" | "night" | "mono" | "brand";
 
 /**
  * How the sheet is DRAWN, independent of its colours.
@@ -172,7 +166,6 @@ export const MAP_ACCENT_SWATCHES: { name: string; hex: string }[] = [
   { name: "Peach", hex: "#FF9B70" },
   { name: "Pink", hex: "#EC388A" },
 ];
-
 
 const THEMES: Record<MapThemeId, MapPalette> = {
   directory: {
