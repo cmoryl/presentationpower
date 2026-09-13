@@ -173,8 +173,41 @@ export const publishLondonLiveFile = createServerFn({ method: "POST" })
       await supabase.from("london_live_files").update({ is_active: false }).eq("id", latest.id);
     }
 
+    // Learn from it: what actually shipped is the only reliable precedent for
+    // the next venue. Captured without an embedding so publishing is never
+    // slowed or blocked by the AI gateway — the backlog embeds it after.
+    try {
+      const [{ outcomeRecord }, { LONDON_HARVEST_VENUE, recordRow }, { venueTemplateFor }, { LONDON_PANELS }] =
+        await Promise.all([
+          import("@/lib/event-knowledge"),
+          import("@/lib/event-knowledge.server"),
+          import("@/lib/next-venue-templates"),
+          import("@/lib/next-london-signage"),
+        ]);
+      const panel = LONDON_PANELS.find((p) => p.id === data.panelId);
+      const record = outcomeRecord({
+        venue: LONDON_HARVEST_VENUE,
+        panelId: data.panelId,
+        panelName: panel?.name ?? data.panelId,
+        templateFamilyId: venueTemplateFor(data.panelId)?.id ?? null,
+        version: saved.version,
+        filename: data.masterFilename,
+        trimW: data.trimW ?? panel?.trimW ?? null,
+        trimH: data.trimH ?? panel?.trimH ?? null,
+        note: data.note ?? null,
+      });
+      await supabase
+        .from("event_venue_knowledge")
+        .upsert({ ...recordRow(record, userId), embedding: null, model: null } as never, {
+          onConflict: "fingerprint",
+        });
+    } catch {
+      // Capture is additive. A failure here must never fail a publish.
+    }
+
     return { id: saved.id, version: saved.version };
   });
+
 
 /** Roll a sign back to the bundled artwork by retiring every stored version. */
 export const retireLondonLiveFile = createServerFn({ method: "POST" })

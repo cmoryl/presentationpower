@@ -113,3 +113,16 @@ unavailable; quadratic→cubic conversion is exact.
 **Rule now:** label DOM-rasterised output as a proof. Guides carry
 `data-export-ignore="true"` or they print.
 **Enforced by:** export-ignore tests.
+
+### 2026-10 — Written-down knowledge only helps if it can be asked
+**Context:** carrying the London build forward to the next NEXT venue.
+**What happened:** the specs, template families, grounds and lessons all existed, but
+answering "how big were the room door vinyls" still meant reading 154 rows by hand, so
+people re-derived sizes instead of reusing them — and near-misses stayed in chat history.
+**Rule now:** everything a venue teaches is harvested into the event knowledge store and
+embedded, so it is searchable in plain language at `/events/next/knowledge`. Publishing a
+live file records what actually shipped. Precedent answers always carry "confirm on
+survey" — a past venue's size is a sanity check, never the new venue's truth. Records that
+fail to index are shown as pending, never silently dropped.
+**Enforced by:** `src/lib/__tests__/event-knowledge.test.ts`; fingerprints keep one row per
+fact so revisions update instead of twinning.
