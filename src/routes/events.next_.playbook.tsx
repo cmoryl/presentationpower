@@ -14,11 +14,15 @@ import {
   Layers,
   MapPin,
   Ruler,
+  Scale,
   Image as ImageIcon,
   ListChecks,
 } from "lucide-react";
 
+import decisionsMarkdown from "../../docs/EVENT-DECISIONS.md?raw";
+
 import { AppShell } from "@/components/AppShell";
+import { parseEventDecisions } from "@/lib/event-knowledge";
 import {
   LONDON_PANELS,
   LONDON_PRINT_SPEC,
