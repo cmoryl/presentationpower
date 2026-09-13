@@ -1,0 +1,1 @@
+revoke execute on function public.display_names(uuid[]) from anon;

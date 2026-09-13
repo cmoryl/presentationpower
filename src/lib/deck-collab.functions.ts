@@ -47,10 +47,7 @@ export const listDeckComments = createServerFn({ method: "POST" })
     const authorIds = Array.from(new Set((rows ?? []).map((r) => r.author_id)));
     let profiles: Record<string, string> = {};
     if (authorIds.length) {
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, display_name")
-        .in("id", authorIds);
+      const { data: profs } = await supabase.rpc("display_names", { _ids: authorIds });
       profiles = Object.fromEntries((profs ?? []).map((p) => [p.id, p.display_name ?? "Member"]));
     }
     return { comments: rows ?? [], authors: profiles };

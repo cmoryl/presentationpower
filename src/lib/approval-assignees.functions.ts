@@ -66,10 +66,7 @@ export const listAssignableReviewers = createServerFn({ method: "GET" })
     const ids = Array.from(byUser.keys());
     let names: Record<string, string> = {};
     if (ids.length) {
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, display_name")
-        .in("id", ids);
+      const { data: profs } = await supabase.rpc("display_names", { _ids: ids });
       names = Object.fromEntries((profs ?? []).map((p) => [p.id, p.display_name ?? "Member"]));
     }
 
@@ -109,10 +106,7 @@ export const listApprovalAssignees = createServerFn({ method: "POST" })
     const ids = Array.from(new Set((rows ?? []).flatMap((r) => [r.assignee_id, r.assigned_by])));
     let people: Record<string, string> = {};
     if (ids.length) {
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, display_name")
-        .in("id", ids);
+      const { data: profs } = await supabase.rpc("display_names", { _ids: ids });
       people = Object.fromEntries((profs ?? []).map((p) => [p.id, p.display_name ?? "Member"]));
     }
     return { assignees: rows ?? [], people, userId };
