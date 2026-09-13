@@ -55,3 +55,30 @@ describe("published live file resolves everywhere", () => {
     expect(plan.lockupOn).toBe(false);
   });
 });
+
+describe("downloaded Illustrator master", () => {
+  it("embeds the published artwork, not the house gradient", async () => {
+    const { buildLondonPanelAiAsync } = await import("@/lib/next-london-revise");
+    // 1x1 white JPEG as a stand-in for the signed proof link.
+    const proof =
+      "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABBQI//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAxEBPwF//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAhEBPwF//9k=";
+    setLondonLiveFiles([
+      {
+        id: "row-3",
+        panelId: panel.id,
+        version: 4,
+        filename: "QEII Flag 1.ai",
+        note: null,
+        issued: "2026-09-11",
+        trimW: 1500,
+        trimH: 4000,
+        masterUrl: "https://example.test/m.ai",
+        proofUrl: proof,
+      },
+    ]);
+    const bytes = await buildLondonPanelAiAsync(panel);
+    const text = new TextDecoder("latin1").decode(bytes);
+    expect(text).toContain("/Subtype /Image");
+    setLondonLiveFiles([]);
+  });
+});
