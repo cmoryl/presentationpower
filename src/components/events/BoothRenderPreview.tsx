@@ -24,12 +24,8 @@ import {
   type LondonBoothShell,
 } from "@/lib/next-london-booth-shells";
 import type { LondonPanel } from "@/lib/next-london-signage";
-import {
-  londonBoothArtworkUrl,
-
-  londonBoothShell,
-  londonBoothTvAvailable,
-} from "@/lib/next-london-signage";
+import { londonBoothShell, londonBoothTvAvailable } from "@/lib/next-london-signage";
+import { londonPanelArtworkSrc } from "@/lib/next-london-supplied-masters";
 
 export type BoothRenderPreviewProps = {
   panel: LondonPanel;
