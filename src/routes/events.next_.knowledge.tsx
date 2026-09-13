@@ -390,7 +390,8 @@ function KnowledgePage() {
             <div className="mt-6 rounded-xl border border-black/10 bg-white p-5 text-[13.5px] text-black/65">
               Nothing in the store is close enough to answer that yet. If the answer exists in this
               build, run “Learn from this event” to re-harvest — and if it was a judgement call, add
-              it to the lessons log so it is here next time.
+              it to the lessons log — or, if it was a choice between options, the decisions log — so
+              it is here next time.
             </div>
           )
         ) : null}
