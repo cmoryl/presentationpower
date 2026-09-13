@@ -4087,6 +4087,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      display_names: {
+        Args: { _ids: string[] }
+        Returns: {
+          display_name: string
+          id: string
+        }[]
+      }
       get_london_head_revision: { Args: never; Returns: Json }
       get_shared_deck: { Args: { _token: string }; Returns: Json }
       get_shared_deck_locales: {
