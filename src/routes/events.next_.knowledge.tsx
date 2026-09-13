@@ -377,6 +377,9 @@ function KnowledgePage() {
                 {brief?.specs.length
                   ? ` · ${brief.specs.length} measured ${brief.specs.length === 1 ? "spec" : "specs"}`
                   : ""}
+                {brief?.decisions.length
+                  ? ` · ${brief.decisions.length} settled ${brief.decisions.length === 1 ? "decision" : "decisions"}`
+                  : ""}
                 {brief?.lessons.length ? ` · ${brief.lessons.length} lessons` : ""}
               </p>
               {ordered.map((hit) => (
