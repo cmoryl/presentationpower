@@ -129,6 +129,7 @@ function HitCard({ hit }: { hit: EventKnowledgeHit }) {
 function KnowledgePage() {
   const [question, setQuestion] = useState("");
   const [kind, setKind] = useState<EventKnowledgeKind | "">("");
+  const [syncProgress, setSyncProgress] = useState<{ done: number; total: number } | null>(null);
   const queryClient = useQueryClient();
 
   const coverageFn = useServerFn(eventKnowledgeCoverage);
@@ -146,9 +147,34 @@ function KnowledgePage() {
       searchFn({ data: { question: input.question, kind: input.kind || null } }),
   });
 
+  // Harvesting a whole venue outlives one request, so it runs in resumable
+  // slices and each slice is written before the next starts.
   const sync = useMutation({
-    mutationFn: () => syncFn(),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["event-knowledge", "coverage"] }),
+    mutationFn: async () => {
+      let offset = 0;
+      let total = 0;
+      let written = 0;
+      let embedded = 0;
+      let pendingRows = 0;
+      const failures: string[] = [];
+      for (let pass = 0; pass < 200; pass += 1) {
+        const step = await syncFn({ data: { offset } });
+        total = step.total;
+        written += step.written;
+        embedded += step.embedded;
+        pendingRows += step.pending;
+        failures.push(...step.failures);
+        offset = step.offset;
+        setSyncProgress({ done: offset, total });
+        queryClient.invalidateQueries({ queryKey: ["event-knowledge", "coverage"] });
+        if (step.done) break;
+      }
+      return { total, written, embedded, pending: pendingRows, failures };
+    },
+    onSettled: () => {
+      setSyncProgress(null);
+      queryClient.invalidateQueries({ queryKey: ["event-knowledge", "coverage"] });
+    },
   });
 
   const backlog = useMutation({
@@ -230,6 +256,11 @@ function KnowledgePage() {
             )}
             Learn from this event
           </Button>
+          {syncProgress ? (
+            <span className="text-[12px] tabular-nums text-black/60">
+              {syncProgress.done} of {syncProgress.total} learned
+            </span>
+          ) : null}
           {pending > 0 ? (
             <Button
               variant="ghost"
