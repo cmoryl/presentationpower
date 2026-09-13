@@ -285,7 +285,14 @@ export function planStatArrangement(
         }),
       );
     }
-    return { id: effective, cols, rows: rest > 0 ? 1 + Math.ceil(rest / cols) : 1, gapX: 52, gapY: 40, cells };
+    return {
+      id: effective,
+      cols,
+      rows: rest > 0 ? 1 + Math.ceil(rest / cols) : 1,
+      gapX: 52,
+      gapY: 40,
+      cells,
+    };
   }
 
   const cols = Math.min(n, maxCols);

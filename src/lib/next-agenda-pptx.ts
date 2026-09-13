@@ -139,7 +139,10 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
   let ground: string | null = null;
   try {
     ground = await blobToDataUrl(
-      await flattenedGroundPng(config, { w: (geo.trimW / 25.4) * 150, h: (geo.trimH / 25.4) * 150 }),
+      await flattenedGroundPng(config, {
+        w: (geo.trimW / 25.4) * 150,
+        h: (geo.trimH / 25.4) * 150,
+      }),
     );
   } catch {
     notes.push("Gradient ground unavailable in this browser — slides use a flat brand fill.");
@@ -345,5 +348,10 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
   notes.push(
     `${pages.length} slide${pages.length === 1 ? "" : "s"} at ${geo.trimW} × ${geo.trimH} mm — every programme row is an editable PowerPoint table cell.`,
   );
-  return { blob, filename: `next-agenda-${agendaSlug(config)}.pptx`, slideCount: pages.length, notes };
+  return {
+    blob,
+    filename: `next-agenda-${agendaSlug(config)}.pptx`,
+    slideCount: pages.length,
+    notes,
+  };
 }

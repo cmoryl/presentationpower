@@ -22,10 +22,7 @@ import {
   type BoothRectMm,
   type LondonBoothShell,
 } from "@/lib/next-london-booth-shells";
-import {
-  nativeBespokeFaces,
-  type NativeBespokeTemplate,
-} from "@/lib/next-london-bespoke-native";
+import { nativeBespokeFaces, type NativeBespokeTemplate } from "@/lib/next-london-bespoke-native";
 import { LONDON_VENUE_ITEMS, type LondonVenueItemSpec } from "@/lib/next-london-venue-items";
 
 export type LondonFloorId = "EXT" | "GF" | "2F" | "3F" | "4F" | "5F" | "6F";
@@ -141,7 +138,6 @@ export const LONDON_STYLES: Record<string, { label: string; note: string; stops:
     stops: ["#FFFFFF", "#FBFCFE", "#F2F5FA"],
   },
 };
-
 
 /**
  * Print specification, as issued with the pack. These are hard rules for the
@@ -1512,7 +1508,6 @@ export function londonBoothNativeTemplate(panelId: string) {
   return nativeBoothTemplate(meta.booth.id);
 }
 
-
 /** The vendor's Illustrator master — the print deliverable for a booth panel. */
 export function londonBoothMasterUrl(panelId: string): string | null {
   return LONDON_BOOTH_PANEL_META[panelId]?.booth.aiUrl ?? null;
@@ -1532,7 +1527,6 @@ export function londonBoothTvAvailable(panelId: string): boolean {
   if (!meta) return false;
   return boothHasTvOnStand(meta.booth.id);
 }
-
 
 /**
  * The screen keep-clear zone for a panel, in mm on the BLEED page (so guides and
@@ -1612,13 +1606,12 @@ function bespokePanel(face: NativeBespokeTemplate, index: number): LondonPanel {
 export const LONDON_BESPOKE_PANELS: LondonPanel[] = nativeBespokeFaces().map(bespokePanel);
 
 /** Scenic face metadata, keyed by panel id. */
-export const LONDON_BESPOKE_PANEL_META: Record<string, LondonBespokePanelMeta> =
-  Object.fromEntries(
-    LONDON_BESPOKE_PANELS.map((panel, i) => [
-      panel.id,
-      { panelId: panel.id, face: nativeBespokeFaces()[i]! },
-    ]),
-  );
+export const LONDON_BESPOKE_PANEL_META: Record<string, LondonBespokePanelMeta> = Object.fromEntries(
+  LONDON_BESPOKE_PANELS.map((panel, i) => [
+    panel.id,
+    { panelId: panel.id, face: nativeBespokeFaces()[i]! },
+  ]),
+);
 
 /** True for an app-built Bespoke scenic face panel. */
 export function isBespokePanel(panel: LondonPanel | { id: string }): boolean {
@@ -1637,10 +1630,7 @@ export function londonBespokeNativeTemplate(panelId: string): NativeBespokeTempl
 }
 
 /** The panel record for one face of a scenic unit, when we build that face. */
-export function londonBespokeFacePanel(
-  unitId: string,
-  panelLabel: string,
-): LondonPanel | null {
+export function londonBespokeFacePanel(unitId: string, panelLabel: string): LondonPanel | null {
   const entry = Object.values(LONDON_BESPOKE_PANEL_META).find(
     (m) => m.face.unitId === unitId && m.face.panelLabel === panelLabel,
   );

@@ -9,7 +9,6 @@ import type { IconSizeToken } from "@/lib/iconography";
 import { useStatLayout } from "./StatLayoutContext";
 import { fillLeading, fillPx, typeBounds } from "@/lib/open-space-fill";
 
-
 /**
  * Editorial slide primitives — a small, disciplined typographic system used
  * across the 94 module variants so cover, divider, and content families feel
@@ -669,7 +668,9 @@ export function StatFigure({
   // Part-of-whole figures (dot grid, waffle, radial stack) claim a proportion of
   // a total, so they may only be drawn when the value really is a percentage.
   const isPercentValue =
-    String(unit ?? "").includes("%") || /%/.test(String(value ?? "")) || moduleLayout.progress !== undefined;
+    String(unit ?? "").includes("%") ||
+    /%/.test(String(value ?? "")) ||
+    moduleLayout.progress !== undefined;
 
   const centeredShape = resolvedAlign === "center";
   const ruleWeight = Math.max(3, Math.round(spec.valuePx * 0.035));
@@ -684,7 +685,6 @@ export function StatFigure({
     trend ??
     moduleLayout.trend ??
     (/^-|↓|down|less|reduc/i.test(String(value ?? "")) ? "down" : "up");
-
 
   const vc = valueColor ?? ink.text;
   const uc = unitColor ?? ink.muted;
@@ -767,9 +767,7 @@ export function StatFigure({
               padding: `${Math.round(spec.valuePx * 0.14)}px ${Math.round(spec.valuePx * 0.16)}px`,
             }
           : null),
-        ...(resolvedShape === "spine"
-          ? { paddingLeft: Math.round(spec.valuePx * 0.16) }
-          : null),
+        ...(resolvedShape === "spine" ? { paddingLeft: Math.round(spec.valuePx * 0.16) } : null),
         ...(resolvedShape === "bracket"
           ? {
               paddingLeft: Math.round(spec.valuePx * 0.16),
@@ -778,7 +776,6 @@ export function StatFigure({
           : null),
       }}
     >
-
       {(resolvedShape === "ghost" || resolvedShape === "auto") &&
         !valueIsPhrase &&
         (() => {
@@ -1393,7 +1390,6 @@ export function StatFigure({
 
       {resolvedShape === "donut" && isPercentValue && (
         <svg
-
           aria-hidden
           data-decorative
           viewBox="0 0 200 200"
@@ -1471,7 +1467,6 @@ export function StatFigure({
         </span>
       )}
 
-
       {resolvedShape === "delta" && (
         <span
           aria-hidden
@@ -1496,7 +1491,6 @@ export function StatFigure({
           {resolvedTrend === "down" ? "Down" : "Up"}
         </span>
       )}
-
 
       <div
         className={isIconRow ? "relative flex items-center" : "relative"}

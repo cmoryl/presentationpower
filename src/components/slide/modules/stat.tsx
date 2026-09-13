@@ -245,7 +245,6 @@ registerSlideModule({
                       borderLeft: cellPlan.leadingRule ? `1px solid ${ink.hairline}` : "none",
                     }}
                   >
-
                     <div
                       className="tabular-nums"
                       style={{
@@ -376,7 +375,10 @@ registerSlideModule({
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-            <div className="mt-12 grid min-h-0 flex-1 items-center gap-16" style={{ gridTemplateColumns: "1.15fr 1fr" }}>
+            <div
+              className="mt-12 grid min-h-0 flex-1 items-center gap-16"
+              style={{ gridTemplateColumns: "1.15fr 1fr" }}
+            >
               <div className="min-w-0">
                 <StatFigure
                   brand={brand}
@@ -450,8 +452,6 @@ registerSlideModule({
           </SlideFrame>
         );
       }
-
-
 
       case "MV-STAT-ORBIT": {
         const stat = obj(c.stat);

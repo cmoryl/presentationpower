@@ -5,7 +5,7 @@
 The system you describe as the target is **already partly in place**: the approved
 catalog is 28 visual languages `S01`–`S28` in `src/lib/design-skins.ts`, exposed as
 `skin-s01` … `skin-s28` style packs and surfaced by the picker on `/library`. What is
-inconsistent today is the *visual/metadata layer* (background art per skin, gradient and
+inconsistent today is the _visual/metadata layer_ (background art per skin, gradient and
 opacity tokens, mode handling, preview treatment), not the plumbing.
 
 Confirmed facts:
@@ -32,17 +32,17 @@ Confirmed facts:
 
 ## Downstream dependencies that must keep working
 
-| Consumer | What it reads |
-| --- | --- |
-| Deck data | `DeckContext.stylePackId` (`src/lib/deck-store.ts:301`), persisted in `decks.context` JSON |
-| Deck editor / share / export routes | `stylePackId` → `DeckPackScope` → `stylePackById()` |
-| Agent | `AgentQuickStart`, `AgentDeckPreview`, `src/lib/agent/design-knowledge.ts` (skin codes and pack ids in prompts/tools) |
-| MCP | `create-deck.ts` validates `style_pack_id` and documents `'skin-s01'…'skin-s28'`; `get-deck.ts` returns it |
-| SQL | migration `20260816163724` reads `_deck.context->>'stylePackId'` |
-| Learning / governance | `style_reco_events.style_code`, `style_learning_prefs.style_codes` store bare `S##` codes |
-| Admin templates | `template_looks.base_skin_code` default `'S01'`; `template-registry` custom packs and background overrides merge into `allSelectablePacks()` |
-| PPTX / PDF | `single-slide-pptx.ts`, `pptx-export.ts` via pack tokens/ground, plus `pack-background-raster.ts` |
-| Tests | `pack-compose`, `pack-readability`, `industry-skins`, `mcp-tools` |
+| Consumer                            | What it reads                                                                                                                                |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Deck data                           | `DeckContext.stylePackId` (`src/lib/deck-store.ts:301`), persisted in `decks.context` JSON                                                   |
+| Deck editor / share / export routes | `stylePackId` → `DeckPackScope` → `stylePackById()`                                                                                          |
+| Agent                               | `AgentQuickStart`, `AgentDeckPreview`, `src/lib/agent/design-knowledge.ts` (skin codes and pack ids in prompts/tools)                        |
+| MCP                                 | `create-deck.ts` validates `style_pack_id` and documents `'skin-s01'…'skin-s28'`; `get-deck.ts` returns it                                   |
+| SQL                                 | migration `20260816163724` reads `_deck.context->>'stylePackId'`                                                                             |
+| Learning / governance               | `style_reco_events.style_code`, `style_learning_prefs.style_codes` store bare `S##` codes                                                    |
+| Admin templates                     | `template_looks.base_skin_code` default `'S01'`; `template-registry` custom packs and background overrides merge into `allSelectablePacks()` |
+| PPTX / PDF                          | `single-slide-pptx.ts`, `pptx-export.ts` via pack tokens/ground, plus `pack-background-raster.ts`                                            |
+| Tests                               | `pack-compose`, `pack-readability`, `industry-skins`, `mcp-tools`                                                                            |
 
 ## Must be preserved (breaking these breaks saved decks)
 
@@ -53,7 +53,7 @@ Confirmed facts:
    re-mapping a code to different art silently changes existing decks, so any
    re-ordering needs a deliberate decision.
 3. `null` = brand system, and `R01`–`R30` + legacy `STYLE_PACKS` ids remaining
-   *resolvable* through `stylePackById()` even though hidden from approved results.
+   _resolvable_ through `stylePackById()` even though hidden from approved results.
 4. The `StylePack` interface (`tokens`, `card`, `type`, `ground`, `swatch`, `layout`,
    `geometry`, `topBar`, `grain`) — every renderer and the export path read it.
 5. `DesignSkin` field names, since `approved-visual-styles.ts`, `style-intent.ts`,
@@ -62,6 +62,7 @@ Confirmed facts:
 ## Proposed change set (files, in order)
 
 **Data / visual language**
+
 1. `src/lib/design-skins.ts` — normalise the 28 entries: name, reference, description,
    `bestFit` industry tags, `palette` (5 stops), `density`, `spec`. Add optional
    `industries?: string[]` (explicit tags instead of splitting `bestFit`) and an optional
@@ -75,18 +76,13 @@ Confirmed facts:
    "High contrast" stops being a label-only claim (falls back to today's behaviour when
    a skin has no `hc` block).
 
-**Selector / metadata layer**
-4. `src/lib/approved-visual-styles.ts` — read `industries` when present, keep
-   `chipsFrom(bestFit)` as fallback; expose gradient/opacity summary for the card.
-5. `src/lib/style-intent.ts` — retag `StyleTraits` for any skin whose character changes.
+**Selector / metadata layer** 4. `src/lib/approved-visual-styles.ts` — read `industries` when present, keep
+`chipsFrom(bestFit)` as fallback; expose gradient/opacity summary for the card. 5. `src/lib/style-intent.ts` — retag `StyleTraits` for any skin whose character changes.
 
-**UI (behaviour unchanged, visuals normalised)**
-6. `src/components/skins/ApprovedStyleThumb.tsx` — single background preview treatment
-   (abstract 16:9, shared ground plane, mode toggle incl. HC).
-7. `src/components/skins/StyleLookPicker.tsx` — keep the value contract and industry-first
-   flow; align card chrome, chips and mode badges to the normalised metadata.
-8. `src/components/skins/SkinLookbook.tsx` / `SkinPreviewTile.tsx` — same treatment for
-   the deeper look view.
+**UI (behaviour unchanged, visuals normalised)** 6. `src/components/skins/ApprovedStyleThumb.tsx` — single background preview treatment
+(abstract 16:9, shared ground plane, mode toggle incl. HC). 7. `src/components/skins/StyleLookPicker.tsx` — keep the value contract and industry-first
+flow; align card chrome, chips and mode badges to the normalised metadata. 8. `src/components/skins/SkinLookbook.tsx` / `SkinPreviewTile.tsx` — same treatment for
+the deeper look view.
 
 **Explicitly not changed:** `deck-store.ts`, MCP tools, export libraries, `PackShell`,
 `DeckPackScope`, `template-registry`, and every route that only passes `stylePackId`

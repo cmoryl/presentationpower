@@ -190,8 +190,7 @@ export function LondonPanelLiveEditor({
   // tuning, so the live print area can be widened — and at the two larger
   // sizes the controls drop underneath so the artwork gets the full dialog.
   const [stageSize, setStageSize] = useState<"fit" | "large" | "full">("large");
-  const stageMaxWidth =
-    stageSize === "fit" ? "420px" : stageSize === "large" ? "860px" : "100%";
+  const stageMaxWidth = stageSize === "fit" ? "420px" : stageSize === "large" ? "860px" : "100%";
 
   // Photo walls are a repeating pattern, so their artwork is driven by the wall
   // recipe rather than by a single lockup / headline placement.
@@ -609,42 +608,42 @@ export function LondonPanelLiveEditor({
             />
           ) : null}
           {/* Uploaded artwork: drag it straight on the panel, arrows nudge. */}
-          {placedArt && placedArt.on ? (
-            (() => {
-              const box = londonPlacedArtBox(panel, placedArt);
-              const step = 0.005;
-              const moveArt = (dx: number, dy: number) =>
-                setLondonPlacedArt(panel.id, {
-                  dx: placedArt.dx + dx,
-                  dy: placedArt.dy + dy,
-                });
-              return (
-                <div
-                  role="button"
-                  tabIndex={0}
-                  aria-label="Move uploaded artwork"
-                  onPointerDown={(event) => startDrag(event, "art")}
-                  onKeyDown={(event) => {
-                    const s = event.shiftKey ? 0.02 : step;
-                    if (event.key === "ArrowLeft") moveArt(-s, 0);
-                    else if (event.key === "ArrowRight") moveArt(s, 0);
-                    else if (event.key === "ArrowUp") moveArt(0, -s);
-                    else if (event.key === "ArrowDown") moveArt(0, s);
-                    else return;
-                    event.preventDefault();
-                  }}
-                  className="absolute cursor-move rounded-sm border border-dashed border-fuchsia-300/80 bg-fuchsia-200/10 outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300"
-                  style={{
-                    left: `${(box.x / panel.bleedW) * 100}%`,
-                    top: `${(box.y / panel.bleedH) * 100}%`,
-                    width: `${(box.w / panel.bleedW) * 100}%`,
-                    height: `${(box.h / panel.bleedH) * 100}%`,
-                    transform: `rotate(${box.rotate}deg)`,
-                  }}
-                />
-              );
-            })()
-          ) : null}
+          {placedArt && placedArt.on
+            ? (() => {
+                const box = londonPlacedArtBox(panel, placedArt);
+                const step = 0.005;
+                const moveArt = (dx: number, dy: number) =>
+                  setLondonPlacedArt(panel.id, {
+                    dx: placedArt.dx + dx,
+                    dy: placedArt.dy + dy,
+                  });
+                return (
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Move uploaded artwork"
+                    onPointerDown={(event) => startDrag(event, "art")}
+                    onKeyDown={(event) => {
+                      const s = event.shiftKey ? 0.02 : step;
+                      if (event.key === "ArrowLeft") moveArt(-s, 0);
+                      else if (event.key === "ArrowRight") moveArt(s, 0);
+                      else if (event.key === "ArrowUp") moveArt(0, -s);
+                      else if (event.key === "ArrowDown") moveArt(0, s);
+                      else return;
+                      event.preventDefault();
+                    }}
+                    className="absolute cursor-move rounded-sm border border-dashed border-fuchsia-300/80 bg-fuchsia-200/10 outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300"
+                    style={{
+                      left: `${(box.x / panel.bleedW) * 100}%`,
+                      top: `${(box.y / panel.bleedH) * 100}%`,
+                      width: `${(box.w / panel.bleedW) * 100}%`,
+                      height: `${(box.h / panel.bleedH) * 100}%`,
+                      transform: `rotate(${box.rotate}deg)`,
+                    }}
+                  />
+                );
+              })()
+            : null}
           {plan.qr && !isWall ? (
             <div
               role="button"

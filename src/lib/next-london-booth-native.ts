@@ -192,7 +192,6 @@ export const NATIVE_BOOTH_TEMPLATES: NativeBoothTemplate[] = [
   },
 ];
 
-
 const BY_SLUG = new Map(NATIVE_BOOTH_TEMPLATES.map((t) => [t.slug, t]));
 
 /** True when this booth is built by the app rather than supplied by a vendor. */

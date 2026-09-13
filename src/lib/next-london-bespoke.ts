@@ -96,18 +96,24 @@ export const BESPOKE_UNITS: BespokeUnit[] = [
     room: "Ground floor exhibition",
     rev: "A",
     revDate: "13/08/26",
-    components: ["Double sided 43\" screen surround", "Demo display tables, 2 of"],
+    components: ['Double sided 43" screen surround', "Demo display tables, 2 of"],
     widthMm: null,
     depthMm: null,
     heightMm: null,
     artwork: [
-      { label: "Screen surround face", wMm: null, hMm: null, qty: 2, note: "Double sided — both faces print." },
+      {
+        label: "Screen surround face",
+        wMm: null,
+        hMm: null,
+        qty: 2,
+        note: "Double sided — both faces print.",
+      },
       { label: "Demo table front", wMm: null, hMm: null, qty: 2 },
     ],
     screensIn: [43, 43],
     kind: "demo",
     anchor: { x: 0.5, y: 0.35 },
-    notes: "2 of 43\" screens, one per face of the surround.",
+    notes: '2 of 43" screens, one per face of the surround.',
   },
   {
     id: "merch-market",
@@ -117,7 +123,12 @@ export const BESPOKE_UNITS: BespokeUnit[] = [
     room: "Sanctuary foyer",
     rev: "A",
     revDate: "13/08/26",
-    components: ["Shelving unit, 2 of", "Merch cylinder, 1 of", "Merch bar, 1 of", "12' circular floor"],
+    components: [
+      "Shelving unit, 2 of",
+      "Merch cylinder, 1 of",
+      "Merch bar, 1 of",
+      "12' circular floor",
+    ],
     widthMm: 4621,
     depthMm: 1844,
     heightMm: 2251,
@@ -125,7 +136,13 @@ export const BESPOKE_UNITS: BespokeUnit[] = [
       { label: "Merch bar front", wMm: 3780, hMm: 1153, qty: 1 },
       { label: "Merch cylinder wrap", wMm: 1200, hMm: 1171, qty: 1 },
       { label: "Shelving unit header", wMm: 1200, hMm: 323, qty: 2 },
-      { label: "12' circular floor graphic", wMm: 3658, hMm: 3658, qty: 1, note: "12' Ø — supply as a circle on a square page." },
+      {
+        label: "12' circular floor graphic",
+        wMm: 3658,
+        hMm: 3658,
+        qty: 1,
+        note: "12' Ø — supply as a circle on a square page.",
+      },
     ],
     kind: "exhibition",
     anchor: { x: 0.22, y: 0.5 },
@@ -159,7 +176,13 @@ export const BESPOKE_UNITS: BespokeUnit[] = [
     heightMm: 2038,
     artwork: [
       { label: "Counter front", wMm: 2356, hMm: 888, qty: 1 },
-      { label: "Totem panel", wMm: 1532, hMm: 2038, qty: 1, note: "Pink hatch on the GA marks the artwork panel." },
+      {
+        label: "Totem panel",
+        wMm: 1532,
+        hMm: 2038,
+        qty: 1,
+        note: "Pink hatch on the GA marks the artwork panel.",
+      },
       { label: "Counter return", wMm: 594, hMm: 888, qty: 2 },
     ],
     kind: "support",
@@ -201,12 +224,24 @@ export const BESPOKE_UNITS: BespokeUnit[] = [
     floor: "GF",
     zoneId: "gf-churchill",
     room: "Churchill",
-    components: ["Stage left back arrow", "Stage left front arrow", "Stage right back arrow", "Stage right front arrow", "LED wall footer"],
+    components: [
+      "Stage left back arrow",
+      "Stage left front arrow",
+      "Stage right back arrow",
+      "Stage right front arrow",
+      "LED wall footer",
+    ],
     widthMm: null,
     depthMm: null,
     heightMm: null,
     artwork: [
-      { label: "Stage arrow", wMm: null, hMm: null, qty: 4, note: "Left and right, back and front." },
+      {
+        label: "Stage arrow",
+        wMm: null,
+        hMm: null,
+        qty: 4,
+        note: "Left and right, back and front.",
+      },
       { label: "LED wall footer", wMm: null, hMm: null, qty: 1, note: "Content plate, not print." },
     ],
     kind: "stage",
@@ -218,11 +253,19 @@ export const BESPOKE_UNITS: BespokeUnit[] = [
     floor: "2F",
     zoneId: "f2-gielgud",
     room: "Gielgud",
-    components: ["8' × 8' screen surround", "86\" screen"],
+    components: ["8' × 8' screen surround", '86" screen'],
     widthMm: 2438,
     depthMm: null,
     heightMm: 2438,
-    artwork: [{ label: "Surround face", wMm: 2438, hMm: 2438, qty: 1, note: "Aperture cut for the 86\" screen." }],
+    artwork: [
+      {
+        label: "Surround face",
+        wMm: 2438,
+        hMm: 2438,
+        qty: 1,
+        note: 'Aperture cut for the 86" screen.',
+      },
+    ],
     screensIn: [86],
     kind: "demo",
     anchor: { x: 0.5, y: 0.3 },
@@ -234,22 +277,30 @@ export const BESPOKE_UNITS: BespokeUnit[] = [
     zoneId: "f2-olivier",
     room: "Olivier",
     revDate: "13/08/26",
-    components: ["24' × 8' screen surround", "86\" screens, 2 of"],
+    components: ["24' × 8' screen surround", '86" screens, 2 of'],
     widthMm: 7315,
     depthMm: null,
     heightMm: 2438,
-    artwork: [{ label: "Surround face", wMm: 7315, hMm: 2438, qty: 1, note: "Two apertures cut for 86\" screens — supply as tiled panels." }],
+    artwork: [
+      {
+        label: "Surround face",
+        wMm: 7315,
+        hMm: 2438,
+        qty: 1,
+        note: 'Two apertures cut for 86" screens — supply as tiled panels.',
+      },
+    ],
     screensIn: [86, 86],
     kind: "demo",
     anchor: { x: 0.5, y: 0.35 },
   },
   {
     id: "fleming-monitor-hide",
-    name: "Fleming 65\" comfort monitor hide",
+    name: 'Fleming 65" comfort monitor hide',
     floor: "3F",
     zoneId: "f3-fleming",
     room: "Fleming (Day 1)",
-    components: ["65\" comfort monitor hide"],
+    components: ['65" comfort monitor hide'],
     widthMm: 1519,
     depthMm: 108,
     heightMm: 900,
@@ -296,7 +347,9 @@ export function bespokeFootprintLabel(unit: BespokeUnit): string {
     unit.depthMm == null
       ? `${unit.widthMm} mm wide`
       : `${unit.widthMm} × ${unit.depthMm} mm footprint`;
-  return unit.heightMm == null ? `${plan}, height to be confirmed` : `${plan}, ${unit.heightMm} mm high`;
+  return unit.heightMm == null
+    ? `${plan}, height to be confirmed`
+    : `${plan}, ${unit.heightMm} mm high`;
 }
 
 /** Units scheduled on one floor, in drawing order. */

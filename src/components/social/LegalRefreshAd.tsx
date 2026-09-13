@@ -132,7 +132,6 @@ export function legalRefreshPhoto(
   return ART[mode]?.[directionId];
 }
 
-
 type Props = {
   direction: LegalRefreshDirection;
   /** Frame aspect. */
@@ -164,10 +163,13 @@ export function LegalRefreshAd({ direction: d, w, h, mode = "photo", className }
 
   // Layouts that never lay type over art keep the palette ink; the rest flip to
   // whatever the photograph can carry.
-  const onPanel = d.layout === "split-vertical" || d.layout === "bottom-band" || d.layout === "corner-plate";
+  const onPanel =
+    d.layout === "split-vertical" || d.layout === "bottom-band" || d.layout === "corner-plate";
   const ink = photo && !onPanel ? (darkFinish ? "#FFFFFF" : d.photo.ink) : d.palette.ink;
   const onDark = ink.toUpperCase() === "#FFFFFF";
-  const lockup = onDark ? (logos?.white ?? logos?.color ?? "") : (logos?.color ?? logos?.white ?? "");
+  const lockup = onDark
+    ? (logos?.white ?? logos?.color ?? "")
+    : (logos?.color ?? logos?.white ?? "");
   const mono = d.motif === "redaction" || d.motif === "trail" || d.motif === "fineprint";
 
   const art = <Art d={d} photo={photo} square={square} uid={uid} finish={finish} />;
@@ -226,7 +228,13 @@ function Eyebrow({ d, px, mono, size = 18 }: Shared & { size?: number }) {
   );
 }
 
-function Headline({ d, px, ink, size, align = "left" }: Shared & { size: number; align?: "left" | "center" }) {
+function Headline({
+  d,
+  px,
+  ink,
+  size,
+  align = "left",
+}: Shared & { size: number; align?: "left" | "center" }) {
   return (
     <h3
       style={{
@@ -246,7 +254,12 @@ function Headline({ d, px, ink, size, align = "left" }: Shared & { size: number;
   );
 }
 
-function Support({ d, px, size, align = "left" }: Shared & { size: number; align?: "left" | "center" }) {
+function Support({
+  d,
+  px,
+  size,
+  align = "left",
+}: Shared & { size: number; align?: "left" | "center" }) {
   return (
     <p
       style={{
@@ -291,13 +304,26 @@ function Lockup({ px, lockup, d, size = 40 }: Shared & { size?: number }) {
     <img
       src={lockup}
       alt="TransPerfect Legal"
-      style={{ height: px(size), width: "auto", opacity: 0.95, filter: d.layout === "corner-plate" ? "none" : undefined }}
+      style={{
+        height: px(size),
+        width: "auto",
+        opacity: 0.95,
+        filter: d.layout === "corner-plate" ? "none" : undefined,
+      }}
     />
   );
 }
 
 /** Ground-toned scrim, shaped for where the copy sits. Never a blue wash. */
-function Scrim({ d, direction, strength }: { d: LegalRefreshDirection; direction: string; strength: number }) {
+function Scrim({
+  d,
+  direction,
+  strength,
+}: {
+  d: LegalRefreshDirection;
+  direction: string;
+  strength: number;
+}) {
   return (
     <div
       aria-hidden
@@ -333,11 +359,20 @@ function EditorialLeft(p: Shared & { art: React.ReactNode; photo: boolean }) {
         }}
       >
         <Eyebrow {...p} size={square ? 20 : 17} />
-        <div style={{ maxWidth: square ? "92%" : "60%", display: "grid", gap: px(square ? 26 : 22) }}>
+        <div
+          style={{ maxWidth: square ? "92%" : "60%", display: "grid", gap: px(square ? 26 : 22) }}
+        >
           <Headline {...p} size={square ? 96 : 80} />
           <Support {...p} size={square ? 32 : 27} />
         </div>
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: px(24) }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            gap: px(24),
+          }}
+        >
           <Cta {...p} size={square ? 26 : 22} />
           <Lockup {...p} size={square ? 46 : 40} />
         </div>
@@ -399,7 +434,9 @@ function BottomBand(p: Shared & { art: React.ReactNode }) {
   const bandH = square ? "42%" : "36%";
   return (
     <>
-      <div style={{ position: "absolute", inset: 0, bottom: bandH, overflow: "hidden", zIndex: 1 }}>{art}</div>
+      <div style={{ position: "absolute", inset: 0, bottom: bandH, overflow: "hidden", zIndex: 1 }}>
+        {art}
+      </div>
       <div
         style={{
           position: "absolute",
@@ -525,7 +562,14 @@ function SplitVertical(p: Shared & { art: React.ReactNode }) {
           <Headline {...p} size={square ? 74 : 58} />
           <Support {...p} size={square ? 27 : 22} />
         </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: px(20) }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: px(20),
+          }}
+        >
           <Cta {...p} size={square ? 24 : 20} />
           <Lockup {...p} size={square ? 38 : 32} />
         </div>
@@ -608,7 +652,14 @@ function DiagonalBand(p: Shared & { art: React.ReactNode; photo: boolean }) {
           <div style={{ maxWidth: square ? "82%" : "54%" }}>
             <Support {...p} size={square ? 29 : 24} />
           </div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: px(24) }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: px(24),
+            }}
+          >
             <Cta {...p} size={square ? 25 : 21} />
             <Lockup {...p} size={square ? 42 : 36} />
           </div>
@@ -635,7 +686,14 @@ function Footnote(p: Shared & { art: React.ReactNode; photo: boolean }) {
           gridTemplateRows: "auto 1fr auto",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: px(24) }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: px(24),
+          }}
+        >
           <Eyebrow {...p} size={square ? 18 : 15} />
           <Lockup {...p} size={square ? 38 : 32} />
         </div>
@@ -687,7 +745,14 @@ function CornerPlate(p: Shared & { art: React.ReactNode }) {
         <Eyebrow {...p} size={square ? 17 : 15} />
         <Headline {...p} size={square ? 62 : 50} />
         <Support {...p} size={square ? 25 : 21} />
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: px(18) }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: px(18),
+          }}
+        >
           <Cta {...p} size={square ? 23 : 20} />
           <Lockup {...p} size={square ? 36 : 30} />
         </div>
@@ -774,7 +839,6 @@ function Art({
   }
   return <Motif direction={d} square={square} uid={uid} />;
 }
-
 
 /** The drawn graphic device for each direction. */
 function Motif({
@@ -981,10 +1045,16 @@ function Motif({
     <>
       <g stroke={d.palette.ink} strokeWidth="6" fill="none" opacity={0.22}>
         {Array.from({ length: 7 }, (_, r) => (
-          <path key={`h${r}`} d={`M${120 + (r % 2) * 90} ${80 + r * 78} H ${900 - (r % 3) * 120}`} />
+          <path
+            key={`h${r}`}
+            d={`M${120 + (r % 2) * 90} ${80 + r * 78} H ${900 - (r % 3) * 120}`}
+          />
         ))}
         {Array.from({ length: 8 }, (_, c) => (
-          <path key={`v${c}`} d={`M${140 + c * 108} ${100 + (c % 3) * 70} V ${480 - (c % 2) * 110}`} />
+          <path
+            key={`v${c}`}
+            d={`M${140 + c * 108} ${100 + (c % 3) * 70} V ${480 - (c % 2) * 110}`}
+          />
         ))}
       </g>
       <path

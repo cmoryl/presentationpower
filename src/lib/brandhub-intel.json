@@ -77,13 +77,7 @@
       }
     ],
     "competitiveLandscape": {
-      "competitors": [
-        "IQVIA",
-        "RWS",
-        "ICON",
-        "Parexel",
-        "Lionbridge"
-      ],
+      "competitors": ["IQVIA", "RWS", "ICON", "Parexel", "Lionbridge"],
       "last_synced": "2026-02-14T00:08:38.594Z",
       "reports_count": 1,
       "website_audit": {
@@ -99,23 +93,13 @@
         "competitors": [
           {
             "name": "Lionbridge Life Sciences",
-            "strengths": [
-              "Strong global presence",
-              "Extensive language services"
-            ],
-            "weaknesses": [
-              "Less focus on specialized life sciences technology"
-            ]
+            "strengths": ["Strong global presence", "Extensive language services"],
+            "weaknesses": ["Less focus on specialized life sciences technology"]
           },
           {
             "name": "RWS Life Sciences",
-            "strengths": [
-              "Deep regulatory expertise",
-              "Integrated technology platforms"
-            ],
-            "weaknesses": [
-              "Website can be less visually engaging"
-            ]
+            "strengths": ["Deep regulatory expertise", "Integrated technology platforms"],
+            "weaknesses": ["Website can be less visually engaging"]
           }
         ]
       },
@@ -125,11 +109,7 @@
       "differentiation_opportunities": []
     },
     "culturalInsights": {
-      "primary_markets": [
-        "North America",
-        "Europe",
-        "Asia-Pacific"
-      ],
+      "primary_markets": ["North America", "Europe", "Asia-Pacific"],
       "imagery_guidelines": [],
       "color_cultural_notes": [],
       "global_readiness_score": 80,
@@ -383,11 +363,7 @@
       "differentiation_opportunities": []
     },
     "culturalInsights": {
-      "primary_markets": [
-        "North America",
-        "Europe",
-        "Asia-Pacific"
-      ],
+      "primary_markets": ["North America", "Europe", "Asia-Pacific"],
       "imagery_guidelines": [],
       "color_cultural_notes": [],
       "global_readiness_score": 85,
@@ -649,25 +625,13 @@
         "competitors": [
           {
             "name": "United Language Group (Legal)",
-            "strengths": [
-              "Strong focus on language services",
-              "Clear pricing models"
-            ],
-            "weaknesses": [
-              "Less emphasis on broader legal tech",
-              "Smaller global footprint"
-            ]
+            "strengths": ["Strong focus on language services", "Clear pricing models"],
+            "weaknesses": ["Less emphasis on broader legal tech", "Smaller global footprint"]
           },
           {
             "name": "KLDiscovery",
-            "strengths": [
-              "Advanced e-discovery platforms",
-              "Strong technical support"
-            ],
-            "weaknesses": [
-              "Less diverse service portfolio",
-              "Website can feel overly technical"
-            ]
+            "strengths": ["Advanced e-discovery platforms", "Strong technical support"],
+            "weaknesses": ["Less diverse service portfolio", "Website can feel overly technical"]
           }
         ]
       },
@@ -677,11 +641,7 @@
       "differentiation_opportunities": []
     },
     "culturalInsights": {
-      "primary_markets": [
-        "North America",
-        "Europe",
-        "Asia-Pacific"
-      ],
+      "primary_markets": ["North America", "Europe", "Asia-Pacific"],
       "imagery_guidelines": [],
       "color_cultural_notes": [],
       "global_readiness_score": 85,
@@ -858,16 +818,9 @@
       "Brand recognition"
     ],
     "voiceProfile": {
-      "tone": [
-        "Professional",
-        "Authoritative",
-        "Reliable"
-      ],
+      "tone": ["Professional", "Authoritative", "Reliable"],
       "style": "Technical, Creative",
-      "personality": [
-        "The Expert Partner",
-        "The Global Facilitator"
-      ],
+      "personality": ["The Expert Partner", "The Global Facilitator"],
       "communication_style": "Direct, results-oriented, and consultative with a focus on transparency and accountability."
     },
     "growthRecommendations": [
@@ -944,11 +897,7 @@
       "differentiation_opportunities": []
     },
     "culturalInsights": {
-      "primary_markets": [
-        "North America",
-        "Europe",
-        "Asia"
-      ],
+      "primary_markets": ["North America", "Europe", "Asia"],
       "imagery_guidelines": [],
       "color_cultural_notes": [],
       "global_readiness_score": 80,
@@ -1105,16 +1054,9 @@
       "Brand recognition"
     ],
     "voiceProfile": {
-      "tone": [
-        "Authoritative",
-        "Reliable",
-        "Sophisticated"
-      ],
+      "tone": ["Authoritative", "Reliable", "Sophisticated"],
       "style": "Global, Professional",
-      "personality": [
-        "The Expert Architect",
-        "The Global Citizen"
-      ],
+      "personality": ["The Expert Architect", "The Global Citizen"],
       "communication_style": "Direct and results-oriented, emphasizing technical precision and ethical transparency ('bad news travels faster')."
     },
     "growthRecommendations": [
@@ -1187,21 +1129,12 @@
         "competitors": [
           {
             "name": "Deluxe Entertainment Services Group",
-            "strengths": [
-              "Established industry presence",
-              "Broad service portfolio"
-            ],
-            "weaknesses": [
-              "Potentially less agile",
-              "Complex website navigation"
-            ]
+            "strengths": ["Established industry presence", "Broad service portfolio"],
+            "weaknesses": ["Potentially less agile", "Complex website navigation"]
           },
           {
             "name": "SDI Media (now Iyuno-SDI Group)",
-            "strengths": [
-              "Global reach",
-              "Strong localization focus"
-            ],
+            "strengths": ["Global reach", "Strong localization focus"],
             "weaknesses": [
               "Less emphasis on creative production",
               "Website can be corporate-focused"
@@ -1211,11 +1144,7 @@
       }
     },
     "culturalInsights": {
-      "primary_markets": [
-        "Global",
-        "North America",
-        "Europe"
-      ],
+      "primary_markets": ["Global", "North America", "Europe"],
       "imagery_guidelines": [],
       "color_cultural_notes": [],
       "global_readiness_score": 80,
@@ -1371,16 +1300,9 @@
       "Brand recognition"
     ],
     "voiceProfile": {
-      "tone": [
-        "Authoritative",
-        "Reliable",
-        "Forward-thinking"
-      ],
+      "tone": ["Authoritative", "Reliable", "Forward-thinking"],
       "style": "Clear",
-      "personality": [
-        "The Expert Partner",
-        "The Efficient Architect"
-      ],
+      "personality": ["The Expert Partner", "The Efficient Architect"],
       "communication_style": "Direct and results-oriented, emphasizing security, speed, and global performance over creative flair."
     },
     "growthRecommendations": [
@@ -1436,11 +1358,7 @@
       }
     ],
     "competitiveLandscape": {
-      "competitors": [
-        "Lionbridge",
-        "SDL (RWS)",
-        "MemoQ"
-      ],
+      "competitors": ["Lionbridge", "SDL (RWS)", "MemoQ"],
       "competitive_gaps": []
     },
     "culturalInsights": {},
@@ -1488,12 +1406,7 @@
       "Brand recognition"
     ],
     "voiceProfile": {
-      "tone": [
-        "Authoritative",
-        "Ethical",
-        "Decisive",
-        "Transparent"
-      ],
+      "tone": ["Authoritative", "Ethical", "Decisive", "Transparent"],
       "style": "Clear",
       "personality": [
         "The Meticulous Architect",
@@ -1594,16 +1507,9 @@
       "Global creative production at scale with local relevance safeguards."
     ],
     "voiceProfile": {
-      "tone": [
-        "Confident",
-        "Commercial",
-        "Craft-forward"
-      ],
+      "tone": ["Confident", "Commercial", "Craft-forward"],
       "style": "Modern, campaign-ready",
-      "personality": [
-        "Growth Partner",
-        "Creative Operator"
-      ],
+      "personality": ["Growth Partner", "Creative Operator"],
       "communication_style": "Outcome-led and metric-anchored — leads with business impact and pairs it with visible creative craft."
     },
     "growthRecommendations": [
@@ -1640,11 +1546,7 @@
       ]
     },
     "culturalInsights": {
-      "primary_markets": [
-        "North America",
-        "EMEA",
-        "APAC ecommerce hubs"
-      ],
+      "primary_markets": ["North America", "EMEA", "APAC ecommerce hubs"],
       "cultural_considerations": [
         "Local imagery must reflect market-specific demographics.",
         "Retail calendars vary by market — campaign cadence should reflect that.",
@@ -1685,16 +1587,9 @@
       "Reusable across joint programs, managed services, strategic partnerships and named-account work."
     ],
     "voiceProfile": {
-      "tone": [
-        "Balanced",
-        "Deferential to client voice",
-        "Trustworthy"
-      ],
+      "tone": ["Balanced", "Deferential to client voice", "Trustworthy"],
       "style": "Restrained, partnership-forward",
-      "personality": [
-        "Trusted Partner",
-        "Shared Operator"
-      ],
+      "personality": ["Trusted Partner", "Shared Operator"],
       "communication_style": "Foregrounds the client narrative and outcomes; TransPerfect appears as the enabling partner rather than the protagonist."
     },
     "growthRecommendations": [
@@ -1719,9 +1614,7 @@
       ]
     },
     "culturalInsights": {
-      "primary_markets": [
-        "Wherever the client operates"
-      ],
+      "primary_markets": ["Wherever the client operates"],
       "cultural_considerations": [
         "Client brand rules override TransPerfect rules on shared surfaces.",
         "Region-specific client norms (e.g. logo placement conventions in APAC) take precedence."
@@ -1763,16 +1656,9 @@
       "Brand recognition"
     ],
     "voiceProfile": {
-      "tone": [
-        "Authoritative",
-        "Urgent",
-        "Reliable"
-      ],
+      "tone": ["Authoritative", "Urgent", "Reliable"],
       "style": "Clear",
-      "personality": [
-        "The Expert Guide",
-        "The Disciplined Guardian"
-      ],
+      "personality": ["The Expert Guide", "The Disciplined Guardian"],
       "communication_style": "Direct and results-oriented, emphasizing efficiency, risk mitigation, and operational excellence through a consultative lens."
     },
     "growthRecommendations": [
@@ -1820,10 +1706,7 @@
       }
     ],
     "competitiveLandscape": {
-      "competitors": [
-        "Veeva Systems",
-        "Medidata Solutions"
-      ],
+      "competitors": ["Veeva Systems", "Medidata Solutions"],
       "competitive_gaps": [],
       "reports_count": 1,
       "last_synced": "2026-02-14T13:25:27.711Z"

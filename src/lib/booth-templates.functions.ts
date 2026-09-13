@@ -45,9 +45,7 @@ export const listBoothTemplates = createServerFn({ method: "GET" })
       )
       .eq("is_active", true)
       .order("sort_order", { ascending: true });
-    const { data: rows, error } = data.venue
-      ? await query.eq("venue", data.venue)
-      : await query;
+    const { data: rows, error } = data.venue ? await query.eq("venue", data.venue) : await query;
     if (error) throw new Error(error.message);
 
     const paths = (rows ?? []).flatMap((row) =>

@@ -636,8 +636,6 @@ function liveLineSegments(el: HTMLElement): string[] {
   return lines.filter((line) => line.length > 0);
 }
 
-
-
 /**
 
  * Wait for all <img> descendants to finish loading (or error). Runs after
@@ -783,7 +781,6 @@ export async function captureSlideAsDataUrl(
 
   // Give the browser one paint cycle so the neutralized styles settle.
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-
 
   try {
     report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });

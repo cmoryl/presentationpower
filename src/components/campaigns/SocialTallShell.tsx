@@ -112,7 +112,13 @@ export function SocialTallShell({
                 {marker}
               </span>
             ) : null}
-            <div style={{ display: "flex", gap: Math.round(safe.width * 0.02), alignItems: "flex-end" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: Math.round(safe.width * 0.02),
+                alignItems: "flex-end",
+              }}
+            >
               {[0.34, 0.2, 0.12, 0.07].map((h, i) => (
                 <span
                   key={h}
@@ -162,7 +168,6 @@ export function SocialTallShell({
         </div>
       </div>
 
-
       {/* Raised panel — the module lives centred inside this. */}
       <div
         style={{
@@ -170,9 +175,7 @@ export function SocialTallShell({
           borderRadius: geometry.radius,
           background: panelSurface,
           border: `1px solid ${panelEdge}`,
-          boxShadow: dark
-            ? "0 24px 60px rgba(0,0,0,0.34)"
-            : "0 24px 60px rgba(3,0,44,0.12)",
+          boxShadow: dark ? "0 24px 60px rgba(0,0,0,0.34)" : "0 24px 60px rgba(3,0,44,0.12)",
           padding: geometry.panelPad,
           position: "relative",
           overflow: "hidden",
@@ -207,13 +210,16 @@ export function SocialTallShell({
           overflow: "hidden",
         }}
       >
-        <div style={{ display: "flex", alignItems: "flex-start", gap: Math.round(safe.width * 0.02) }}>
+        <div
+          style={{ display: "flex", alignItems: "flex-start", gap: Math.round(safe.width * 0.02) }}
+        >
           {Array.from({ length: tickCount }).map((_, i) => (
             <span
               key={i}
               style={{
                 flex: 1,
-                height: i % 3 === 0 ? Math.round(safe.height * 0.022) : Math.round(safe.height * 0.012),
+                height:
+                  i % 3 === 0 ? Math.round(safe.height * 0.022) : Math.round(safe.height * 0.012),
                 borderLeft: `1px solid ${i % 3 === 0 ? accent : hairline}`,
                 opacity: i % 3 === 0 ? 0.85 : 1,
               }}
@@ -224,7 +230,12 @@ export function SocialTallShell({
           ? Array.from(
               // Rows scale with the rail so the bottom of the frame is ruled all
               // the way down rather than trailing off into empty space.
-              { length: Math.max(3, Math.min(8, Math.round(geometry.railHeight / (safe.height * 0.055)))) },
+              {
+                length: Math.max(
+                  3,
+                  Math.min(8, Math.round(geometry.railHeight / (safe.height * 0.055))),
+                ),
+              },
               (_, i) => 0.92 - i * 0.11,
             ).map((w, i) => (
               <div
@@ -246,7 +257,9 @@ export function SocialTallShell({
                     background: i === 0 ? accent : hairline,
                   }}
                 />
-                <span style={{ width: `${Math.max(0.2, w) * 100}%`, height: 1, background: hairline }} />
+                <span
+                  style={{ width: `${Math.max(0.2, w) * 100}%`, height: 1, background: hairline }}
+                />
               </div>
             ))
           : null}

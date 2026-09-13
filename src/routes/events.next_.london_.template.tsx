@@ -205,7 +205,10 @@ function LondonTemplatePage() {
   const placedArtMap = useLondonPlacedArt();
   const placedArt = placedArtMap[panel.id] ?? null;
   const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
-  const art = useMemo(() => ({ colorSpace, vibrance, placedArt }), [colorSpace, vibrance, placedArt]);
+  const art = useMemo(
+    () => ({ colorSpace, vibrance, placedArt }),
+    [colorSpace, vibrance, placedArt],
+  );
   // Preview paints the chosen space, so a CMYK master is soft-proofed on screen.
   const faceReady = useLondonSignageFace();
   const svg = useMemo(

@@ -13,7 +13,6 @@ import {
 import { londonBrandingPlan } from "@/lib/next-london-branding";
 import { DEFAULT_LOGO_PLACEMENT } from "@/lib/next-london-logo-placement";
 
-
 /** Minimal 8×4 baseline JPEG header the PDF writer can embed verbatim. */
 function fakeJpeg(w: number, h: number): Uint8Array {
   const bytes = [

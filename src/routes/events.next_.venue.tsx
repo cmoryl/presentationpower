@@ -8,7 +8,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, FileDown, Image as ImageIcon, MapIcon, Palette, SquareDashed, Table2 } from "lucide-react";
+import {
+  ArrowLeft,
+  FileDown,
+  Image as ImageIcon,
+  MapIcon,
+  Palette,
+  SquareDashed,
+  Table2,
+} from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { LondonFloorMap } from "@/components/events/LondonFloorMap";
@@ -301,21 +309,36 @@ function NextVenuePage() {
           <button
             type="button"
             className={btn}
-            onClick={() => runWithExportFeedback(labels("floor plan SVG", `next-venue-rooms-${floor.toLowerCase()}.svg`), async () => downloadFloorMapSvg(floor, exportOpts))}
+            onClick={() =>
+              runWithExportFeedback(
+                labels("floor plan SVG", `next-venue-rooms-${floor.toLowerCase()}.svg`),
+                async () => downloadFloorMapSvg(floor, exportOpts),
+              )
+            }
           >
             <MapIcon className="h-4 w-4" /> Floor SVG
           </button>
           <button
             type="button"
             className={btn}
-            onClick={() => runWithExportFeedback(labels("floor plan PNG", `next-venue-rooms-${floor.toLowerCase()}.png`), async () => downloadFloorMapPng(floor, exportOpts))}
+            onClick={() =>
+              runWithExportFeedback(
+                labels("floor plan PNG", `next-venue-rooms-${floor.toLowerCase()}.png`),
+                async () => downloadFloorMapPng(floor, exportOpts),
+              )
+            }
           >
             <ImageIcon className="h-4 w-4" /> Floor PNG
           </button>
           <button
             type="button"
             className={btn}
-            onClick={() => runWithExportFeedback(labels("plan set PDF", "next-venue-floor-guide.pdf"), async () => downloadAttendeeMapPdf(exportOpts))}
+            onClick={() =>
+              runWithExportFeedback(
+                labels("plan set PDF", "next-venue-floor-guide.pdf"),
+                async () => downloadAttendeeMapPdf(exportOpts),
+              )
+            }
           >
             <FileDown className="h-4 w-4" /> Plan set PDF
           </button>
@@ -361,12 +384,14 @@ function NextVenuePage() {
               type="button"
               className={btn}
               onClick={() =>
-                runWithExportFeedback(labels("signage schedule", `next-venue-signage-${scalePct}pct.csv`), async () =>
-                  saveText(
-                    nextVenueSignageCsv(schedule),
-                    `next-venue-signage-${scalePct}pct.csv`,
-                    "text/csv",
-                  ),
+                runWithExportFeedback(
+                  labels("signage schedule", `next-venue-signage-${scalePct}pct.csv`),
+                  async () =>
+                    saveText(
+                      nextVenueSignageCsv(schedule),
+                      `next-venue-signage-${scalePct}pct.csv`,
+                      "text/csv",
+                    ),
                 )
               }
             >

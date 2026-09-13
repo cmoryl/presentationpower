@@ -91,9 +91,7 @@ describe("scene perspective", () => {
       // A deep foyer wall run legitimately halves; anything below reads as a
       // mis-read corner rather than perspective.
       expect(quadForeshortening(quad)).toBeGreaterThan(0.45);
-      expect(
-        faceQuadTransform(quad, scene.face, { w: 1536, h: 1024 }),
-      ).toMatch(/^matrix3d\(/);
+      expect(faceQuadTransform(quad, scene.face, { w: 1536, h: 1024 })).toMatch(/^matrix3d\(/);
     }
   });
 });

@@ -88,8 +88,8 @@ export function OrbitLayoutPanel({ orbits, onChange }: Props) {
         </p>
         {collided && (
           <p className="mt-2 rounded-lg bg-amber-50 px-2 py-1 text-xs text-amber-800">
-            Two figures were overlapping, so they have been eased apart to keep every
-            number readable.
+            Two figures were overlapping, so they have been eased apart to keep every number
+            readable.
           </p>
         )}
       </header>
@@ -101,9 +101,7 @@ export function OrbitLayoutPanel({ orbits, onChange }: Props) {
       >
         {items.map((it, i) => {
           const p = positions[i]!;
-          const label = String(
-            (it as Record<string, unknown>)?.value ?? `#${i + 1}`,
-          );
+          const label = String((it as Record<string, unknown>)?.value ?? `#${i + 1}`);
           const on = active === i;
           return (
             <button
@@ -183,7 +181,11 @@ export function OrbitLayoutPanel({ orbits, onChange }: Props) {
                   moved to clear an overlap
                 </span>
               )}
-              <button type="button" className={btnCls} onClick={() => onChange(resetOrbitPos(items, i))}>
+              <button
+                type="button"
+                className={btnCls}
+                onClick={() => onChange(resetOrbitPos(items, i))}
+              >
                 Reset
               </button>
             </div>

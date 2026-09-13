@@ -26,8 +26,7 @@ export const MIN_ORBIT_SIZE = 0.5;
 export const MAX_ORBIT_SIZE = 1.8;
 
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
-const num = (v: unknown): number | null =>
-  typeof v === "number" && Number.isFinite(v) ? v : null;
+const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
 
 /** Base ring diameter (stage px) for a given number of figures. */
 export function orbitBaseSize(count: number): number {
@@ -41,11 +40,7 @@ export function defaultOrbitPos(index: number, count: number): OrbitPos {
 }
 
 /** Resolve the stored position of one figure, falling back to the default. */
-export function resolveOrbitPos(
-  item: unknown,
-  index: number,
-  count: number,
-): OrbitPos {
+export function resolveOrbitPos(item: unknown, index: number, count: number): OrbitPos {
   const base = defaultOrbitPos(index, count);
   const o = (item ?? {}) as Record<string, unknown>;
   return {
@@ -175,7 +170,7 @@ export function orbitsCollide(
  */
 export function fitOrbitLayout(
   positions: OrbitPos[],
-  opts: { stage: OrbitStage; base: number; gap?: number; iterations?: number } ,
+  opts: { stage: OrbitStage; base: number; gap?: number; iterations?: number },
 ): FittedOrbit[] {
   const { stage, base } = opts;
   const gap = opts.gap ?? base * 0.06;
@@ -266,8 +261,7 @@ export function fitOrbitLayout(
     x: Math.round(clamp((p.x / stage.w) * 100, 0, 100) * 10) / 10,
     y: Math.round(clamp((p.y / stage.h) * 100, 0, 100) * 10) / 10,
     size: positions[i]!.size,
-    nudged:
-      Math.abs(p.x - start[i]!.x) > 0.5 || Math.abs(p.y - start[i]!.y) > 0.5,
+    nudged: Math.abs(p.x - start[i]!.x) > 0.5 || Math.abs(p.y - start[i]!.y) > 0.5,
   }));
 }
 

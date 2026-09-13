@@ -32,11 +32,7 @@ import {
   type NextLogoArt,
   type NextLogoColourway,
 } from "@/lib/next-logo-vectors";
-import {
-  LONDON_PANELS,
-  londonVenueItemMeta,
-  type LondonPanel,
-} from "@/lib/next-london-signage";
+import { LONDON_PANELS, londonVenueItemMeta, type LondonPanel } from "@/lib/next-london-signage";
 
 import { londonSafeMm } from "@/lib/next-london-print-geometry";
 import {
@@ -217,7 +213,6 @@ export const DEFAULT_STEP_REPEAT: StepRepeatConfig = {
   qrPlateShape: "rounded",
 };
 
-
 /** Is this panel a step-and-repeat / photo wall? */
 export function isStepRepeatPanel(panel: LondonPanel): boolean {
   const note = londonVenueItemMeta(panel)?.note ?? "";
@@ -310,7 +305,6 @@ function clampConfig(patch: Partial<StepRepeatConfig>, base: StepRepeatConfig): 
     qrPlateShape: STEP_REPEAT_QR_PLATE_SHAPES.includes(patch.qrPlateShape as StepRepeatQrPlateShape)
       ? (patch.qrPlateShape as StepRepeatQrPlateShape)
       : (base.qrPlateShape ?? DEFAULT_STEP_REPEAT.qrPlateShape),
-
   };
 }
 
@@ -390,7 +384,6 @@ export function stepRepeatConfig(
   const stored = map[panelId];
   return stored ? clampConfig(stored, base) : base;
 }
-
 
 /**
  * A stored/snapshotted recipe made whole again: missing or out-of-range fields
@@ -579,7 +572,6 @@ export function stepRepeatQrPath(
   return parts.join("");
 }
 
-
 /**
  * Does the tile at (row, col) carry the recipe's SECOND element? Mixed recipes
  * used to band rows 2:1, which printed as stripes; each mix below spreads the
@@ -598,7 +590,6 @@ export function stepRepeatTileIsSecondary(mix: StepRepeatMix, row: number, col: 
       return (row + col) % 2 === 1;
   }
 }
-
 
 /**
  * Lay the wall out. Tiles are generated with one row/column of overscan on every
@@ -719,7 +710,8 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
         const baseCount = poolA.length;
         const baseIndex = baseCount > 1 ? (col + row * 3) % baseCount : 0;
         const useSecondColour =
-          poolB.length > 0 && stepRepeatTileIsSecondary(config.colourMix as StepRepeatMix, row, col);
+          poolB.length > 0 &&
+          stepRepeatTileIsSecondary(config.colourMix as StepRepeatMix, row, col);
         const artIndex = useSecondColour ? baseCount + baseIndex : baseIndex;
         const h = (arts[artIndex]!.h / Math.max(1, arts[artIndex]!.w)) * logoW;
         tiles.push({
@@ -750,9 +742,10 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
           modules: code.size,
           path: stepRepeatQrPath(code, config.qrModuleShape),
           inkHex: config.qrInkHex,
-          plateHex: config.qrPlateShape === "none" || config.qrPlateHex === "none"
-            ? null
-            : config.qrPlateHex,
+          plateHex:
+            config.qrPlateShape === "none" || config.qrPlateHex === "none"
+              ? null
+              : config.qrPlateHex,
           plateShape: config.qrPlateShape,
         }
       : null,
@@ -964,7 +957,6 @@ export function stepRepeatSvgLayer(
         `<g transform="translate(${tile.x.toFixed(2)} ${tile.y.toFixed(2)}) scale(${scale.toFixed(5)})">` +
         `<path d="${plan.qr.path}" fill="${dark.paint}"${dark.meta}/></g></g>`
       );
-
     })
     .join("");
 

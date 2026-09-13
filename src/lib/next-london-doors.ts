@@ -186,9 +186,7 @@ export const LONDON_DOOR_SPECS: LondonDoorSpec[] = [
 ];
 
 /** Door leaf geometry for an item, when it is a door at all. */
-export function londonDoorSpec(
-  panel: { name: string } | string,
-): LondonDoorSpec | null {
+export function londonDoorSpec(panel: { name: string } | string): LondonDoorSpec | null {
   const name = (typeof panel === "string" ? panel : panel.name).toUpperCase();
   return LONDON_DOOR_SPECS.find((s) => name.includes(s.match)) ?? null;
 }
@@ -242,9 +240,6 @@ export function doorLeafLabel(spec: LondonDoorSpec): string {
   if (spec.leaves === 1) return `Single leaf · ${spec.leafW[0]} × ${spec.leafH} mm`;
   const leaves = spec.leafW.join(" + ");
   const opening = doorOpeningSize(spec);
-  const scope =
-    spec.scope === "leaf"
-      ? "artwork per leaf"
-      : "one sheet across the pair";
+  const scope = spec.scope === "leaf" ? "artwork per leaf" : "one sheet across the pair";
   return `Double doors · leaves ${leaves} × ${spec.leafH} mm · opening ${opening.w} mm · ${scope}`;
 }

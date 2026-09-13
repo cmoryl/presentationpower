@@ -101,8 +101,6 @@ function LegalRefreshView() {
               eight ideas as photography, cinematic film stills, hand-drawn ink and wash, two-ink
               riso print, cut-paper collage, or the drawn device alone.
             </p>
-
-
           </div>
           <div className="flex flex-wrap justify-end gap-1.5">
             {LEGAL_REFRESH_RENDER_MODES.map((m) => (

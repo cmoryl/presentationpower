@@ -20,17 +20,8 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode, type Ref } from "react";
 
-import {
-  castShadow,
-  sceneLighting,
-  sceneLightQuality,
-  shadeAngle,
-} from "@/lib/scene-lighting";
-import {
-  depthGradientAngle,
-  depthMaskDirection,
-  sceneSpace,
-} from "@/lib/scene-space";
+import { castShadow, sceneLighting, sceneLightQuality, shadeAngle } from "@/lib/scene-lighting";
+import { depthGradientAngle, depthMaskDirection, sceneSpace } from "@/lib/scene-space";
 import {
   faceQuadTransform,
   isQuadSkewed,
@@ -221,9 +212,7 @@ export function SceneArtworkPlate({
   // Dress the rest of the fixture when the print's true ratio leaves part of
   // the measured placement area unused.
   const dress =
-    face && substrate && (face.w > box.w * 1.04 || face.h > box.h * 1.04)
-      ? local(face)
-      : null;
+    face && substrate && (face.w > box.w * 1.04 || face.h > box.h * 1.04) ? local(face) : null;
 
   const content = (
     <>

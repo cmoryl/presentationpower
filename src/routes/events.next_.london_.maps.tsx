@@ -140,7 +140,6 @@ function LondonMapsPage() {
    */
   const [viewer3dId, setViewer3dId] = useState<string | null>(null);
 
-
   // Corrections live per browser: the location team marks up positions on site
   // and the same browser keeps producing corrected maps.
   useEffect(() => {
@@ -203,9 +202,7 @@ function LondonMapsPage() {
   // The asset in the 3D window, and its live placement: both re-derive from the
   // panels and the on-screen corrections, so an edit flows straight into BoothHUB.
   const viewer3dPanel = viewer3dId ? (panels.find((p) => p.id === viewer3dId) ?? null) : null;
-  const viewer3dMarker = viewer3dPanel
-    ? londonMarkerFor(viewer3dPanel, panels, overrides)
-    : null;
+  const viewer3dMarker = viewer3dPanel ? londonMarkerFor(viewer3dPanel, panels, overrides) : null;
   const selectedMarker = selected ? londonMarkerFor(selected, panels, overrides) : null;
   // The Bespoke scenic units are drawn like any other sectioned area, so they
   // print on every sheet and card. A user edit to one is stored under the same
@@ -326,7 +323,6 @@ function LondonMapsPage() {
       onView3d={(id) => {
         setViewer3dId(id);
       }}
-
     />
   );
 
@@ -573,11 +569,7 @@ function LondonMapsPage() {
             ) : (
               <div>
                 {floorMap}
-                <button
-                  type="button"
-                  className={`${btn} mt-2.5`}
-                  onClick={() => setExpanded(true)}
-                >
+                <button type="button" className={`${btn} mt-2.5`} onClick={() => setExpanded(true)}>
                   <Maximize2 className="h-4 w-4" /> Open large editor
                 </button>
               </div>
@@ -647,10 +639,7 @@ function LondonMapsPage() {
               {areasOpen && areasPanel ? <div className="mt-3">{areasPanel}</div> : null}
 
               <div className="mt-4">
-                <LondonBespokePanel
-                  floor={floor}
-                  floorLabel={plan?.label ?? floor}
-                />
+                <LondonBespokePanel floor={floor} floorLabel={plan?.label ?? floor} />
               </div>
 
               {attendee ? (
@@ -720,7 +709,6 @@ function LondonMapsPage() {
                             </button>
                           </li>
                         );
-
                       })
                     ) : (
                       <li className="px-3 py-4 text-[12.5px] text-[#03002C]/60">
@@ -792,7 +780,6 @@ function LondonMapsPage() {
                       <ImageIcon className="h-4 w-4" /> Location card (PNG)
                     </button>
                   </div>
-
                 </div>
               ) : (
                 <p className="mt-4 rounded-xl border border-black/10 bg-white p-4 text-[12.5px] leading-relaxed text-[#03002C]/70">
@@ -861,7 +848,6 @@ function LondonMapsPage() {
           onClose={() => setViewer3dId(null)}
         />
       ) : null}
-
     </AppShell>
   );
 }

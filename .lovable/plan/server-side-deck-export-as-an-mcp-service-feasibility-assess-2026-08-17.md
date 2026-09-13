@@ -8,12 +8,12 @@ So the real question is narrower than "how do we host Chromium": it is **whether
 
 ## 1. Where the render runs in production
 
-| Option | Fit | Cost |
-| --- | --- | --- |
-| **No render host (current headless path)** | Already working. Native OOXML only; no plates, no DOM rasterization. | Zero. Fidelity gap is the price. |
-| **Cloudflare Browser Rendering** | Best fit if we want real plates. Same account/edge as the Worker, no infra to own. Needs a binding, and the render step must fetch an authenticated app URL, so it needs a short-lived render token. | Medium. Session limits and per-render cost; a 20-slide deck with fonts and media is minutes of browser time, not seconds. |
-| **External container (Fly/Render/Cloud Run + Playwright)** | Works, most control, matches the sandbox harness exactly. | Highest: a second deployable, its own secrets, its own auth boundary to the app. Outside what Lovable Cloud manages. |
-| **Long-lived queue worker** | Not a render host by itself — still needs one of the two above. Useful only as the job runner. | N/A |
+| Option                                                     | Fit                                                                                                                                                                                                  | Cost                                                                                                                      |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **No render host (current headless path)**                 | Already working. Native OOXML only; no plates, no DOM rasterization.                                                                                                                                 | Zero. Fidelity gap is the price.                                                                                          |
+| **Cloudflare Browser Rendering**                           | Best fit if we want real plates. Same account/edge as the Worker, no infra to own. Needs a binding, and the render step must fetch an authenticated app URL, so it needs a short-lived render token. | Medium. Session limits and per-render cost; a 20-slide deck with fonts and media is minutes of browser time, not seconds. |
+| **External container (Fly/Render/Cloud Run + Playwright)** | Works, most control, matches the sandbox harness exactly.                                                                                                                                            | Highest: a second deployable, its own secrets, its own auth boundary to the app. Outside what Lovable Cloud manages.      |
+| **Long-lived queue worker**                                | Not a render host by itself — still needs one of the two above. Useful only as the job runner.                                                                                                       | N/A                                                                                                                       |
 
 If we do this: Cloudflare Browser Rendering. Do not stand up a container for it.
 
@@ -61,7 +61,7 @@ Both orderings are enforced in shared code that any path — browser or headless
 - `src/lib/pptx-presentation-order.ts` fixes child order inside `<p:presentation>`, with `p:embeddedFontLst` last and `p:notesMasterIdLst` after `p:sldIdLst`.
 - `src/lib/pptx-font-embed.ts` injects the font list and explicitly does not hoist `notesMasterIdLst`.
 
-A service path inherits both, because it calls the same exporter. The only new risk is font *fetching*: the headless path resolves `/fonts/` via `resolveAssetUrl`, so the render host must be given a reachable origin or embedding silently degrades. Guard it with an assertion that fails the job rather than shipping an unembedded file.
+A service path inherits both, because it calls the same exporter. The only new risk is font _fetching_: the headless path resolves `/fonts/` via `resolveAssetUrl`, so the render host must be given a reachable origin or embedding silently degrades. Guard it with an assertion that fails the job rather than shipping an unembedded file.
 
 ## Cheap fallback (ship this first)
 

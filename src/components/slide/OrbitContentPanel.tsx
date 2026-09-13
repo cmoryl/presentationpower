@@ -43,9 +43,7 @@ function StatRows({
   const reorder = useReorder(
     items,
     onChange,
-    keepPlacement
-      ? (list, from, to) => reorderOrbits(list as Row[], from, to) as Row[]
-      : undefined,
+    keepPlacement ? (list, from, to) => reorderOrbits(list as Row[], from, to) as Row[] : undefined,
   );
 
   if (items.length === 0) {
@@ -74,10 +72,7 @@ function StatRows({
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-1.5">
-                  <ReorderHandle
-                    draggable
-                    {...reorder.handleProps(i, `Figure ${i + 1}`)}
-                  />
+                  <ReorderHandle draggable {...reorder.handleProps(i, `Figure ${i + 1}`)} />
                   <span className="text-[11px] font-semibold text-black/55">Figure {i + 1}</span>
                 </span>
                 <span className="flex items-center gap-2">

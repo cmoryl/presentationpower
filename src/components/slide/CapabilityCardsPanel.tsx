@@ -102,7 +102,11 @@ function Slider({
   return (
     <label className="block">
       <span className={labelCls}>
-        {label} <span className="text-black/40">· {value}{suffix ?? ""}</span>
+        {label}{" "}
+        <span className="text-black/40">
+          · {value}
+          {suffix ?? ""}
+        </span>
       </span>
       <input
         className="mt-2 w-full"

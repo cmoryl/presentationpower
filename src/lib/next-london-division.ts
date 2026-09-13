@@ -47,11 +47,7 @@ export function londonDivisionAccent(familyId: string): { label: string; hex: st
  * light grounds, close-up boards and co-branded placements. The dark-blue cut
  * is still not approved on division signage.
  */
-export const LONDON_DIVISION_COLOURWAYS: NextLogoColourway[] = [
-  "white",
-  "white-accent",
-  "color",
-];
+export const LONDON_DIVISION_COLOURWAYS: NextLogoColourway[] = ["white", "white-accent", "color"];
 
 /**
  * Clamp a designer's colourway choice for a division item: the dark-blue mark
@@ -108,7 +104,6 @@ export function londonDoorColourway(
   if (!londonDivisionAccent(familyId)) return londonDivisionColourway(familyId, wanted);
   return wanted === "white" ? "white-accent" : londonDivisionColourway(familyId, wanted);
 }
-
 
 function hex(n: number): string {
   return Math.max(0, Math.min(255, Math.round(n)))
@@ -188,7 +183,9 @@ export function londonAccentSeparationFloor(accentHex: string, clearance = 1): n
 }
 
 function clamp01(value: number | undefined, fallback: number): number {
-  return typeof value === "number" && Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : fallback;
+  return typeof value === "number" && Number.isFinite(value)
+    ? Math.min(1, Math.max(0, value))
+    : fallback;
 }
 
 /** Pull `stop` toward white until it stands clear of the raw accent. */
@@ -400,9 +397,7 @@ export function londonEffectiveTint(opts: {
     tuned.soften !== base.soften ||
     tuned.clearance !== base.clearance ||
     tuned.from !== base.from;
-  return varied
-    ? { ...tuned, note: `${base.label}, fine-tuned for this panel.` }
-    : base;
+  return varied ? { ...tuned, note: `${base.label}, fine-tuned for this panel.` } : base;
 }
 
 /** Division-tinted ramp for a panel, honouring the chosen gradient option. */

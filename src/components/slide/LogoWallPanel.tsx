@@ -114,7 +114,10 @@ export function LogoWallPanel({
               className="flex items-center justify-between gap-2 rounded-lg border border-black/10 px-2 py-1.5 data-[drop-target]:border-[#003FC7] data-[dragging]:opacity-60"
             >
               <span className="flex min-w-0 items-center gap-1.5">
-                <ReorderHandle draggable {...reorder.handleProps(i, str(row.name) || `Logo ${i + 1}`)} />
+                <ReorderHandle
+                  draggable
+                  {...reorder.handleProps(i, str(row.name) || `Logo ${i + 1}`)}
+                />
                 <span className="truncate text-[12px] text-[#03002C]">
                   {str(row.name) || `Logo ${i + 1}`}
                 </span>

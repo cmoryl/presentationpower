@@ -193,13 +193,21 @@ export function tallShellFit(
     contentHeight: content,
     headHeight: base.headHeight + Math.round(spare * 0.66),
     railHeight: base.railHeight + (spare - Math.round(spare * 0.66)),
-    composedHeight: base.headHeight + Math.round(spare * 0.66) + gap * 2 + panelHeight +
-      base.railHeight + (spare - Math.round(spare * 0.66)),
+    composedHeight:
+      base.headHeight +
+      Math.round(spare * 0.66) +
+      gap * 2 +
+      panelHeight +
+      base.railHeight +
+      (spare - Math.round(spare * 0.66)),
   };
 }
 
 /** Shell geometry for a safe rect, in frame px. */
-export function tallShellGeometry(safe: { width: number; height: number }): SocialTallShellGeometry {
+export function tallShellGeometry(safe: {
+  width: number;
+  height: number;
+}): SocialTallShellGeometry {
   const headHeight = Math.round(safe.height * 0.07);
   const railHeight = Math.round(safe.height * 0.11);
   const gap = Math.round(safe.height * 0.025);

@@ -112,7 +112,6 @@ export const SOCIAL_RELIEF_LADDER: SocialFitRelief[] = [
   },
 ];
 
-
 export const SOCIAL_RELIEF_MAX = SOCIAL_RELIEF_LADDER.length - 1;
 
 export function reliefAt(level: number): SocialFitRelief {
@@ -184,7 +183,6 @@ export type SocialFitInput = {
    */
   widthBudget?: number;
 };
-
 
 export type SocialFitResult = {
   /** Virtual page width the module renders at. */
@@ -323,7 +321,6 @@ export function reliefFloorFor(format: SocialFormat, density?: "compact" | "stan
   return 0;
 }
 
-
 /**
  * Next growth rung to try, or null when the module already reads full enough
  * (or enlarging further would risk the safe rect).
@@ -394,7 +391,6 @@ export function withComposedFill(
   const fillPct = Math.min(1, composedHeight / safe.height);
   return { ...fit, fillPct, sparse: fillPct < 0.55 };
 }
-
 
 /**
  * Next rung to try. Returns null when the module already fits, or when the

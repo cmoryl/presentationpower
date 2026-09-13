@@ -30,10 +30,7 @@ import {
   stepRepeatQrScanBlockers,
 } from "@/lib/next-london-step-repeat";
 
-import {
-  isLondonDoorItem,
-  londonTintedStops,
-} from "@/lib/next-london-division";
+import { isLondonDoorItem, londonTintedStops } from "@/lib/next-london-division";
 import { londonBrandingPlan, londonPanelFamily } from "@/lib/next-london-branding";
 import { londonLogoPlacement, londonTintShape } from "@/lib/next-london-logo-placement";
 
@@ -557,7 +554,9 @@ export function auditPrintPdf(
     check(
       "pdf-mediabox",
       "Page is bleed plus the marks margin",
-      !!media && near(media[2]! - media[0]!, expectW, 0.6) && near(media[3]! - media[1]!, expectH, 0.6),
+      !!media &&
+        near(media[2]! - media[0]!, expectW, 0.6) &&
+        near(media[3]! - media[1]!, expectH, 0.6),
       `${expectW.toFixed(1)} × ${expectH.toFixed(1)} pt`,
       media
         ? `${(media[2]! - media[0]!).toFixed(1)} × ${(media[3]! - media[1]!).toFixed(1)} pt`

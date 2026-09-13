@@ -58,7 +58,6 @@
      --spacing-<key> namespace also feeds width/max-width utilities, so named
      keys there would hijack max-w-xl, max-w-2xl, etc. */
 
-
   /* Elevation - navy-tinted shadows, never neutral black. */
   --shadow-xs: 0 1px 2px -1px color-mix(in oklab, #03002c 14%, transparent);
   --shadow-sm: 0 2px 6px -2px color-mix(in oklab, #03002c 16%, transparent);
@@ -70,7 +69,6 @@
     0 2px 8px -2px color-mix(in oklab, #03002c 12%, transparent);
   --shadow-xl: 0 30px 60px -25px color-mix(in oklab, #03002c 38%, transparent);
 }
-
 
 :root {
   /* Element spacing rhythm (plain custom properties, see note above). */

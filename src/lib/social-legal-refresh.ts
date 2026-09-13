@@ -123,7 +123,6 @@ export type LegalRefreshDirection = {
   };
 };
 
-
 /**
  * Four look-and-feel directions. Deliberately different registers so the
  * playback is a real choice, not four tints of one idea.
@@ -343,7 +342,6 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
   },
 ];
 
-
 /**
  * The art concepts each direction can be proofed in. These are NOT grades of one
  * photograph — every concept is its own commissioned artwork set for all eight
@@ -415,8 +413,6 @@ export function legalRefreshFinish(mode: LegalRefreshRenderMode): LegalRefreshFi
 export function legalRefreshModeIsDark(mode: LegalRefreshRenderMode): boolean {
   return mode === "cinematic";
 }
-
-
 
 export function legalRefreshDirection(id: string): LegalRefreshDirection | undefined {
   return LEGAL_REFRESH_DIRECTIONS.find((d) => d.id === id);

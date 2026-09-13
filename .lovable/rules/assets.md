@@ -108,4 +108,3 @@ The full machine-readable catalog lives in this library's `design-system.json` (
 - `@/design-system/{slug}/assets/backdrops/divisions/bm-subcompany/photo-03.jpg` (jpg)
 - `@/design-system/{slug}/assets/backdrops/divisions/bm-subcompany/photo-04.jpg` (jpg)
 - …and 368 more — full list in `design-system.json`
-

@@ -316,7 +316,6 @@ registerSlideModule({
                       rasterizer re-wrapped the label past its captured height
                       and the note printed through the second line. */}
                   <div className="min-w-0 flex-1">
-
                     <div
                       style={{
                         fontSize: fillPx(26, "body"),

@@ -49,7 +49,8 @@ export function isDefaultStatFormat(fmt: StatFormat): boolean {
  * decoration the author typed around it.
  */
 export function splitStatValue(value: unknown): { lead: string; digits: string; trail: string } {
-  const raw = typeof value === "string" ? value.trim() : typeof value === "number" ? `${value}` : "";
+  const raw =
+    typeof value === "string" ? value.trim() : typeof value === "number" ? `${value}` : "";
   const m = raw.match(/^([^0-9-]*-?)?\s*([0-9][0-9,]*(?:\.[0-9]+)?)(.*)$/);
   if (!m) return { lead: "", digits: "", trail: raw };
   return { lead: (m[1] ?? "").trim(), digits: m[2] ?? "", trail: (m[3] ?? "").trim() };
@@ -69,10 +70,11 @@ export function formatStatValue(value: unknown, raw?: unknown): string {
     const n = Number(digits.replace(/,/g, ""));
     if (Number.isFinite(n)) {
       core = n.toFixed(fmt.decimals);
-      if (digits.includes(",")) core = Number(core).toLocaleString("en-US", {
-        minimumFractionDigits: fmt.decimals,
-        maximumFractionDigits: fmt.decimals,
-      });
+      if (digits.includes(","))
+        core = Number(core).toLocaleString("en-US", {
+          minimumFractionDigits: fmt.decimals,
+          maximumFractionDigits: fmt.decimals,
+        });
     }
   }
 

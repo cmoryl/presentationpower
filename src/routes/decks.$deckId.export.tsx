@@ -76,7 +76,6 @@ export const Route = createFileRoute("/decks/$deckId/export")({
       search["fidelity"] === "build" ||
       search["fidelity"] === "exact"
         ? search["fidelity"]
-
         : undefined,
   }),
   component: ExportGate,
@@ -345,7 +344,6 @@ function ExportView() {
           refs,
           visualThresholdFor(readExportFidelity()),
         );
-
       } catch (e) {
         console.warn("[deck-export-visual-validate] visual check unavailable:", e);
       }

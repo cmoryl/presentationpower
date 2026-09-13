@@ -267,9 +267,7 @@ export function AgendaSheet({
             shapeRendering={qrStyle === "block" ? "crispEdges" : undefined}
             aria-hidden
           >
-            {qrClear ? null : (
-              <rect x={0} y={0} width={qr.size} height={qr.size} fill={qrPlate} />
-            )}
+            {qrClear ? null : <rect x={0} y={0} width={qr.size} height={qr.size} fill={qrPlate} />}
             {qrStyle === "block" ? (
               <path d={qr.path} fill={qrInk} />
             ) : (

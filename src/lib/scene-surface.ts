@@ -260,10 +260,7 @@ const SURFACE_FINISH: Record<SceneKind, SurfaceFinish> = {
  * cover its surface is an applied film even on a wall, because that is how a
  * full-bleed wall graphic is actually installed.
  */
-export function sceneSurface(
-  kind: SceneKind | undefined,
-  mount?: "edge" | "cover",
-): SurfaceFinish {
+export function sceneSurface(kind: SceneKind | undefined, mount?: "edge" | "cover"): SurfaceFinish {
   const base = kind ? SURFACE_FINISH[kind] : SURFACE_FINISH.wall;
   if (!base) return SURFACE_FINISH.wall;
   if (mount === "cover" && base.contact === "standoff") {

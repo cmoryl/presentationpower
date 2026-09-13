@@ -63,11 +63,7 @@ export function removePhase(phases: readonly StagePhase[], index: number): Stage
   return renumberPhases(phases.filter((_, i) => i !== index));
 }
 
-export function movePhase(
-  phases: readonly StagePhase[],
-  index: number,
-  dir: -1 | 1,
-): StagePhase[] {
+export function movePhase(phases: readonly StagePhase[], index: number, dir: -1 | 1): StagePhase[] {
   const j = index + dir;
   if (index < 0 || j < 0 || index >= phases.length || j >= phases.length) return [...phases];
   const next = [...phases];
@@ -134,9 +130,7 @@ export function patchTask(
 
 /** Clamp authored content to what the module can actually hold on stage. */
 export function clampPhases(phases: readonly StagePhase[]): StagePhase[] {
-  return phases
-    .slice(0, MAX_PHASES)
-    .map((p) => ({ ...p, items: tasksOf(p).slice(0, MAX_TASKS) }));
+  return phases.slice(0, MAX_PHASES).map((p) => ({ ...p, items: tasksOf(p).slice(0, MAX_TASKS) }));
 }
 
 /**
@@ -163,8 +157,24 @@ export function stageMetrics(count: number, taskMax = 3) {
     tier === "wide"
       ? { medallion: 380, iconBox: 78, taskSize: 27, numeral: 96, stageName: 40, gap: 28, chev: 58 }
       : tier === "mid"
-        ? { medallion: 310, iconBox: 64, taskSize: 22, numeral: 74, stageName: 32, gap: 18, chev: 44 }
-        : { medallion: 214, iconBox: 46, taskSize: 18, numeral: 52, stageName: 22, gap: 16, chev: 26 };
+        ? {
+            medallion: 310,
+            iconBox: 64,
+            taskSize: 22,
+            numeral: 74,
+            stageName: 32,
+            gap: 18,
+            chev: 44,
+          }
+        : {
+            medallion: 214,
+            iconBox: 46,
+            taskSize: 18,
+            numeral: 52,
+            stageName: 22,
+            gap: 16,
+            chev: 26,
+          };
   if (!dense) return { tier, slim, ...base };
   // More than four tasks in a chain: shave the medallion and rows to keep the
   // whole stack inside the stage height.
@@ -179,7 +189,6 @@ export function stageMetrics(count: number, taskMax = 3) {
     stageName: Math.max(18, Math.round(base.stageName * 0.86)),
   };
 }
-
 
 /**
  * Fit the stage name (and its numeral) inside the photo medallion.

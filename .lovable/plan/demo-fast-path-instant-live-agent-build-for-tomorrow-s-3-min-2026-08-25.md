@@ -7,6 +7,7 @@ Typing the trigger prompt **"Create a 6-slide GlobalLink Q3 business review with
 ## What gets built
 
 ### 1. Pre-authored deck snapshot — `src/lib/agent/demo-fast-build.ts` (new)
+
 - `GLOBALLINK_Q3_QBR_DECK`: a curated 6-slide `DeckSnapshot` in the same style as the existing `JUDGING_DEMO_DECK`:
   - Slide 1 (dark): cover — GlobalLink Q3 Business Review.
   - Slide 2 (light): agenda / quarter highlights.
@@ -21,6 +22,7 @@ Typing the trigger prompt **"Create a 6-slide GlobalLink Q3 business review with
 - `DEMO_BUILD_STEPS`: timed script of status lines ("Reading your brief…", "Drafting outline — 6 slides…", "Building slide 3 · KPI stats…", "Applying Enterprise brand…", "Running QA gates…", "Done") totalling ~12–18s.
 
 ### 2. Agent fast-path intercept — `src/components/agent/AgentChat.tsx` + `src/routes/agent.$threadId.tsx`
+
 - In `submit()`, before calling `sendMessage`, check `isDemoFastBuildPrompt(value)`.
 - If matched: skip the server round-trip and run a local simulated build:
   - Append the user message and a streaming assistant message to the chat, updating its text step-by-step on a timer so it reads like the normal live generation (same timeline/status UI the real stream uses).
@@ -29,18 +31,22 @@ Typing the trigger prompt **"Create a 6-slide GlobalLink Q3 business review with
 - Add the trigger phrase as a quick-start chip ("GlobalLink Q3 QBR — demo") in the agent hero/starter briefs so it's one click, no typing risk on stage.
 
 ### 3. QA-clean guarantee for the export moment
+
 - The deck opens with the QA panel already green: snapshot is authored clean and passes through the existing creation-time normalization.
 - Verified before handoff with a Playwright run: trigger → build completes → editor QA panel shows 0 blockers / 0 warnings → PPTX export succeeds.
 
 ### 4. PowerPoint handoff
+
 - After verification, export the finished deck to PPTX and hand you the file path (`/mnt/documents/GlobalLink-Q3-QBR-demo.pptx`) so you can keep it open in PowerPoint before the demo and switch over instantly. The in-app Export also stays one click away as a backup.
 
 ## Technical notes
+
 - No changes to the normal AI generation path, server route `/api/agent-chat`, or other agents (print/social/events) — the intercept is scoped to the presentation agent's submit handler.
 - Synthetic messages use the same `UIMessage` shape as real ones so `findDeckIdInMessages`, preview refresh, and thread persistence all work unmodified.
 - Deck creation goes through the existing `createDeckFromSnapshot`, which already applies geometry healing + creation-time QA normalization without polluting undo history.
 
 ## Verification
+
 1. Typecheck + build.
 2. Playwright: open agent → click the chip / type the trigger → confirm staged build completes in under ~20s, preview shows the deck, navigate to editor, QA panel reads 0 blockers / 0 warnings.
 3. Export the deck to PPTX from the editor and confirm the file opens (LibreOffice render spot-check of the 6 slides).

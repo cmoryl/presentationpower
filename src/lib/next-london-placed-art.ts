@@ -113,11 +113,18 @@ export function parsePaint(value: unknown): { hex: string; alpha: number; painte
   }
   const rgb = /^rgba?\(([^)]+)\)$/i.exec(s);
   if (rgb) {
-    const parts = rgb[1]!.split(/[,\s/]+/).filter(Boolean).map((p) => Number(p.trim()));
+    const parts = rgb[1]!
+      .split(/[,\s/]+/)
+      .filter(Boolean)
+      .map((p) => Number(p.trim()));
     if (parts.length >= 3 && parts.slice(0, 3).every((n) => Number.isFinite(n))) {
       const hex = `#${parts
         .slice(0, 3)
-        .map((n) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0"))
+        .map((n) =>
+          Math.max(0, Math.min(255, Math.round(n)))
+            .toString(16)
+            .padStart(2, "0"),
+        )
         .join("")}`.toUpperCase();
       const a = parts.length >= 4 && Number.isFinite(parts[3]!) ? parts[3]! : 1;
       return { hex, alpha: Math.max(0, Math.min(1, a)), painted: true };
@@ -261,10 +268,7 @@ export function londonPlacedArtMap(): LondonPlacedArtMap {
 }
 
 /** Set (or patch) the artwork on a panel. Broadcasts to every open editor. */
-export function setLondonPlacedArt(
-  panelId: string,
-  patch: Partial<LondonPlacedArt> | null,
-): void {
+export function setLondonPlacedArt(panelId: string, patch: Partial<LondonPlacedArt> | null): void {
   hydrate();
   const next = { ...store };
   if (patch === null) {
@@ -771,10 +775,13 @@ export function parseSvgArtwork(source: string, name: string): PlacedArtImport {
     .trim()
     .split(/[\s,]+/)
     .map(Number);
-  const hasBox = viewBox.length === 4 && viewBox.every((n) => Number.isFinite(n)) && viewBox[2]! > 0;
+  const hasBox =
+    viewBox.length === 4 && viewBox.every((n) => Number.isFinite(n)) && viewBox[2]! > 0;
   const w = hasBox ? viewBox[2]! : (lengthPx(root.getAttribute("width")) ?? 100);
   const h = hasBox ? viewBox[3]! : (lengthPx(root.getAttribute("height")) ?? 100);
-  const base: PlacedArtMatrix = hasBox ? [1, 0, 0, 1, -viewBox[0]!, -viewBox[1]!] : [1, 0, 0, 1, 0, 0];
+  const base: PlacedArtMatrix = hasBox
+    ? [1, 0, 0, 1, -viewBox[0]!, -viewBox[1]!]
+    : [1, 0, 0, 1, 0, 0];
 
   const paths: PlacedArtPath[] = [];
   let strokeOnly = 0;
@@ -783,9 +790,7 @@ export function parseSvgArtwork(source: string, name: string): PlacedArtImport {
   /** An element's own opacity, ignoring ancestors (those are multiplied in). */
   const own = (el: Element, name: string): number | null => {
     const style = el.getAttribute("style");
-    const hit = style
-      ? new RegExp(`(?:^|;)\\s*${name}\\s*:\\s*([^;]+)`, "i").exec(style)
-      : null;
+    const hit = style ? new RegExp(`(?:^|;)\\s*${name}\\s*:\\s*([^;]+)`, "i").exec(style) : null;
     const raw = hit ? hit[1]!.trim() : el.getAttribute(name);
     if (raw === null || raw === undefined || raw === "") return null;
     const pct = /%$/.test(raw.trim());
@@ -817,7 +822,9 @@ export function parseSvgArtwork(source: string, name: string): PlacedArtImport {
         paths.push({
           d: d.trim(),
           fill: paint.hex,
-          ...(inherited(el, "fill-rule")?.trim() === "evenodd" ? { fillRule: "evenodd" as const } : {}),
+          ...(inherited(el, "fill-rule")?.trim() === "evenodd"
+            ? { fillRule: "evenodd" as const }
+            : {}),
           m: here,
           ...(alpha < 1 ? { alpha: Number(alpha.toFixed(4)) } : {}),
         });
@@ -907,7 +914,11 @@ export function parseEpsArtwork(source: string, name: string): PlacedArtImport {
   const pt = (x: number, y: number) => `${(x - x0).toFixed(3)} ${(y1 - y).toFixed(3)}`;
   const hex = (r: number, g: number, b: number) =>
     `#${[r, g, b]
-      .map((c) => Math.max(0, Math.min(255, Math.round(c * 255))).toString(16).padStart(2, "0"))
+      .map((c) =>
+        Math.max(0, Math.min(255, Math.round(c * 255)))
+          .toString(16)
+          .padStart(2, "0"),
+      )
       .join("")}`.toUpperCase();
 
   const flush = (paint: boolean, evenodd: boolean) => {
@@ -1003,11 +1014,7 @@ export function parseEpsArtwork(source: string, name: string): PlacedArtImport {
       case "k": {
         const [c, mm, yy, kk] = pop(4);
         if (kk !== undefined) {
-          fill = hex(
-            (1 - c!) * (1 - kk),
-            (1 - mm!) * (1 - kk),
-            (1 - yy!) * (1 - kk),
-          );
+          fill = hex((1 - c!) * (1 - kk), (1 - mm!) * (1 - kk), (1 - yy!) * (1 - kk));
         }
         break;
       }

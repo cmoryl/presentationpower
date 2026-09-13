@@ -103,7 +103,6 @@ export const listLondonLiveFiles = createServerFn({ method: "GET" }).handler(asy
   }));
 });
 
-
 export type LondonLiveFileInput = {
   panelId: string;
   masterPath: string;
@@ -116,7 +115,6 @@ export type LondonLiveFileInput = {
   trimH?: number | null;
   note?: string | null;
 };
-
 
 /** Register a newer live file for a sign; the previous version is retired. */
 export const publishLondonLiveFile = createServerFn({ method: "POST" })

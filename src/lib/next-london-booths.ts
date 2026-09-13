@@ -259,7 +259,6 @@ export function boothHasTvOnStand(boothId: string | null | undefined): boolean {
   return !!boothId && !LONDON_BOOTHS_WITHOUT_TV.includes(boothId);
 }
 
-
 // ---------------------------------------------------------------------------
 // RE-SIZING FOR THE NEXT EVENT LOCATION
 //

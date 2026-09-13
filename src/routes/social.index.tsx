@@ -173,7 +173,6 @@ function SocialView() {
           </span>
         </Link>
 
-
         {/* Angle filter */}
         <section id="playbooks" className="space-y-5">
           <SectionHead

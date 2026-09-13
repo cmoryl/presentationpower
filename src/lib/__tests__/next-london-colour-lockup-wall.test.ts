@@ -8,9 +8,7 @@ import {
   stepRepeatPlan,
 } from "@/lib/next-london-step-repeat";
 
-const wall = LONDON_PANELS.find(
-  (p) => /COLOUR LOCKUPS/i.test(p.name) && !/RETURN/i.test(p.name),
-)!;
+const wall = LONDON_PANELS.find((p) => /COLOUR LOCKUPS/i.test(p.name) && !/RETURN/i.test(p.name))!;
 const returns = LONDON_PANELS.filter((p) => /COLOUR LOCKUPS RETURN/i.test(p.name));
 
 describe("full-colour division lockup step & repeat wall", () => {
@@ -33,7 +31,6 @@ describe("full-colour division lockup step & repeat wall", () => {
     expect(isStepRepeatPanel(side)).toBe(true);
     expect(stepRepeatPanelDefault(side.id)).toEqual(stepRepeatPanelDefault(wall.id));
   });
-
 
   it("ships with the full-colour stacked division recipe", () => {
     const config = stepRepeatPanelDefault(wall.id);

@@ -1,6 +1,7 @@
 # Plan: Judging-ready live demo prep
 
 ## Goal
+
 Prepare tomorrow’s live presentation around the judging sheet so the demo explicitly earns points in all three categories:
 
 1. **Sell more** — new business, existing-client expansion, proof.
@@ -10,6 +11,7 @@ Prepare tomorrow’s live presentation around the judging sheet so the demo expl
 ## Deliverables
 
 ### 1. Three-minute demo script
+
 Create a concise talk track that maps each live step to the rubric:
 
 ```text
@@ -23,6 +25,7 @@ Create a concise talk track that maps each live step to the rubric:
 The script will include exact phrases for business value, proof, time saved, cost control, ease of use, and scale. Any unsupported metrics will be written as clear placeholders rather than invented numbers.
 
 ### 2. Judging-ready demo deck
+
 Create a short internal demo deck structure that mirrors the score sheet:
 
 - Cover: TransPerfect Element, “built to own the room.”
@@ -35,6 +38,7 @@ Create a short internal demo deck structure that mirrors the score sheet:
 Use the approved TransPerfect Enterprise brand system by default, with a deliberate mix of light and dark slides. Keep copy realistic and avoid fake figures.
 
 ### 3. In-app live-demo checklist
+
 Add a lightweight judge-score checklist surface inside the app so you can follow it during the live demo without exposing admin/backend clutter.
 
 It will show:

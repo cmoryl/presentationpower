@@ -32,7 +32,6 @@ export interface MartLocationRenderPreviewProps {
 /** Fixed working scale for the master before it is fitted to the face. */
 const PX_PER_MM = 0.4;
 
-
 function Stage({
   subject,
   scene,
@@ -151,8 +150,7 @@ export function MartLocationRenderPreview({ id, name, config }: MartLocationRend
       const url = await toPng(from, {
         pixelRatio: 2,
         cacheBust: true,
-        filter: (node) =>
-          !(node instanceof HTMLElement && node.dataset["exportIgnore"] === "true"),
+        filter: (node) => !(node instanceof HTMLElement && node.dataset["exportIgnore"] === "true"),
       });
       const a = document.createElement("a");
       a.href = url;

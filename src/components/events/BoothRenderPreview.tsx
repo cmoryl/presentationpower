@@ -30,7 +30,6 @@ import {
   londonBoothTvAvailable,
 } from "@/lib/next-london-signage";
 
-
 export type BoothRenderPreviewProps = {
   panel: LondonPanel;
 };
@@ -107,7 +106,7 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
     ? LONDON_BOOTH_SHELLS
     : LONDON_BOOTH_SHELLS.filter((s) => !s.hasScreen);
   const [shellId, setShellId] = useState<string>(
-    (tvAvailable ? (panelShell?.id ?? LONDON_BOOTH_SHELLS[0]!.id) : shellOptions[0]!.id),
+    tvAvailable ? (panelShell?.id ?? LONDON_BOOTH_SHELLS[0]!.id) : shellOptions[0]!.id,
   );
   const [guides, setGuides] = useState(false);
   const [zoom, setZoom] = useState(false);
@@ -118,7 +117,6 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
   const art = londonBoothArtworkUrl(panel.id);
   const face = shell.renderFace;
   const page = bleedFrame(panel);
-
 
   useEffect(() => {
     if (!zoom) return;
@@ -279,7 +277,6 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
         </div>
       </div>
 
-
       <button
         type="button"
         onClick={() => setZoom(true)}
@@ -291,7 +288,6 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
           {stage(false)}
         </div>
       </button>
-
 
       <p className="mt-2 text-[12px] leading-relaxed text-[#03002C]/70">{shell.note}</p>
       <p className="mt-1 font-mono text-[11px] text-[#03002C]/60">

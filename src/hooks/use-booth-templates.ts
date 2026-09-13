@@ -8,10 +8,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
-import {
-  applyBoothTemplates,
-  type BoothTemplateRecord,
-} from "@/lib/booth-templates";
+import { applyBoothTemplates, type BoothTemplateRecord } from "@/lib/booth-templates";
 import {
   listBoothTemplates,
   saveBoothTemplate,

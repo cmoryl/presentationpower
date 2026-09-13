@@ -18,8 +18,8 @@ Current platform trends are moving away from “one flat icon, one file” towar
 
 The recommendations that follow are direct consequences of that history:
 
-*   Model **icon concept**, **visual variant**, **asset package**, **font mapping**, **creator/provenance**, **license**, and **accessibility/cultural notes** as distinct entities. <sup>5</sup>
-*   Store **canonical vector geometry** and derive font or bitmap outputs from it, rather than editing icons primarily in font space. <sup>6</sup>
+- Model **icon concept**, **visual variant**, **asset package**, **font mapping**, **creator/provenance**, **license**, and **accessibility/cultural notes** as distinct entities. <sup>5</sup>
+- Store **canonical vector geometry** and derive font or bitmap outputs from it, rather than editing icons primarily in font space. <sup>6</sup>
 
 1
 
@@ -27,7 +27,7 @@ The recommendations that follow are direct consequences of that history:
 
 - Include **design axes**, **mirroring behavior**, **locale labels**, **contrast/accessibility rules**, and **legal metadata** as first-class fields. <sup>7</sup>
 - Support both **historical/iconographic classification** and **runtime UI semantics** so the same backend can serve museum-like classification, design-system authoring, and deployment pipelines.
-<sup>8</sup>
+  <sup>8</sup>
 
 ## Deep history of icons and iconography
 
@@ -47,7 +47,7 @@ Hindu and Buddhist traditions make the role of conventional attributes even clea
 
 Medieval heraldry moved iconography into civic, dynastic, and quasi-database territory. The College of Arms notes that heralds existed in medieval service to monarchs and nobility; the Met notes that heraldry continued to flourish even after knights lost much of their military centrality. Heraldic systems established one of the earliest large-scale visual identity regimes: bounded compositions, standardized tinctures and charges, inherited or granted rights, and strong provenance rules. Medieval bestiaries also circulated symbolic associations at scale, turning animals into reusable moral-emblematic signifiers across manuscripts and architecture. <sup>14</sup>
 
-Print culture intensified symbol standardization. Dürer’s *Apocalypse* of 1498 is notable because the British Museum identifies it as the first book in Western art both published and illustrated by a major artist, and the Met credits Dürer with revolutionizing printmaking as an independent art form. Etching, according to the Met, spread rapidly because it was easier to exploit than engraving or woodcut. Renaissance emblem culture then fused image, motto, and moral meaning; the British Museum describes Andrea Alciati’s *Emblematum libellus*, first printed in 1536, as the source of powerful emblematic imagery, while Holbein’s 1516 title-page border for Johann Froben shows how printer’s marks already functioned as reproducible identity devices at the boundary of icon, brand, and ornament. <sup>15</sup>
+Print culture intensified symbol standardization. Dürer’s _Apocalypse_ of 1498 is notable because the British Museum identifies it as the first book in Western art both published and illustrated by a major artist, and the Met credits Dürer with revolutionizing printmaking as an independent art form. Etching, according to the Met, spread rapidly because it was easier to exploit than engraving or woodcut. Renaissance emblem culture then fused image, motto, and moral meaning; the British Museum describes Andrea Alciati’s _Emblematum libellus_, first printed in 1536, as the source of powerful emblematic imagery, while Holbein’s 1516 title-page border for Johann Froben shows how printer’s marks already functioned as reproducible identity devices at the boundary of icon, brand, and ornament. <sup>15</sup>
 
 Condensed timeline of icon history
 
@@ -872,9 +872,7 @@ The field model deliberately separates **literal depiction**, **interface functi
     "functions": ["send message", "share"],
     "concept_ids": ["communication", "message-transfer"],
     "directionality": "mirror",
-    "cultural_notes": [
-      "Paper-plane metaphor may need localization review."
-    ]
+    "cultural_notes": ["Paper-plane metaphor may need localization review."]
   }
 }
 ```
@@ -1168,8 +1166,8 @@ https://www.copyright.gov/circs/circ33.pdf
 
 19
 
-
 ### Extracted images (34):
+
 - `parsed-documents://20260527-130252-548730/History_of_Icons_and_Iconography_for_Font-Creation_Backends.pdf/images/page_1.jpg`
 - `parsed-documents://20260527-130252-548730/History_of_Icons_and_Iconography_for_Font-Creation_Backends.pdf/images/page_10.jpg`
 - `parsed-documents://20260527-130252-548730/History_of_Icons_and_Iconography_for_Font-Creation_Backends.pdf/images/page_10_image_1_v2.jpg`

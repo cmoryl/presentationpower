@@ -20,10 +20,7 @@ import {
 } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles, useLondonLiveFiles } from "@/lib/next-london-live-files";
 import { LondonLiveLayersPanel } from "@/components/events/LondonLiveLayersPanel";
-import {
-  parseLondonLiveFileLayers,
-  setLondonLiveLayers,
-} from "@/lib/next-london-live-layers";
+import { parseLondonLiveFileLayers, setLondonLiveLayers } from "@/lib/next-london-live-layers";
 import type { LondonPanel } from "@/lib/next-london-signage";
 
 const BUCKET = "london-live-files";

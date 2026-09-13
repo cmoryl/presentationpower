@@ -78,7 +78,10 @@ describe("scene space", () => {
       const quad = sceneQuad(scene);
       expect(isConvex(quad), `${scene.id} is not convex`).toBe(true);
       const space = sceneSpace(quad);
-      expect(spaceWarnings(space, quad), `${scene.id}: ${spaceWarnings(space, quad).join("; ")}`).toEqual([]);
+      expect(
+        spaceWarnings(space, quad),
+        `${scene.id}: ${spaceWarnings(space, quad).join("; ")}`,
+      ).toEqual([]);
       expect(space.depthRatio).toBeLessThanOrEqual(3.4);
     }
   });

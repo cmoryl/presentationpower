@@ -4,10 +4,7 @@
 
 import { useEffect, useState } from "react";
 
-import {
-  loadLondonSignageFace,
-  londonSignageFaceReady,
-} from "@/lib/next-london-text-outline";
+import { loadLondonSignageFace, londonSignageFaceReady } from "@/lib/next-london-text-outline";
 
 export function useLondonSignageFace(): boolean {
   const [ready, setReady] = useState(() => londonSignageFaceReady());

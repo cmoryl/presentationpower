@@ -50,8 +50,6 @@ import { SocialFullBleedShell } from "@/components/campaigns/SocialFullBleedShel
 import { socialGroundPlate } from "@/lib/social-template-ground";
 import { SOCIAL_MODULE_LAYOUTS } from "@/lib/social-module-layouts";
 
-
-
 const SETTLE_BUDGET = 64;
 const MEASURE_BUDGET = 4;
 
@@ -100,7 +98,6 @@ export function SocialModuleFrame({
   lookCode = null,
   groundTake = 0,
 }: SocialModuleFrameProps) {
-
   const accent = accentFor(brandId);
   const brand = BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0];
   const short = Math.min(format.width, format.height);
@@ -143,11 +140,7 @@ export function SocialModuleFrame({
   // tall shapes: the picture (or the brand ground) leaves the type area and
   // covers the frame, and the module itself is budgeted against a content box.
   const bleedPlan = useMemo(
-    () =>
-      fullBleedPlanFor(
-        (tall.section as { variantId?: string }).variantId,
-        aspectClass(format),
-      ),
+    () => fullBleedPlanFor((tall.section as { variantId?: string }).variantId, aspectClass(format)),
     [tall, format],
   );
   const bleedSection = useMemo(
@@ -158,7 +151,10 @@ export function SocialModuleFrame({
     () => (bleedPlan ? fullBleedGeometry(format, bleedPlan, safe) : null),
     [bleedPlan, format, safe],
   );
-  const rendered = useMemo(() => applyReliefToSection(bleedSection, relief), [bleedSection, relief]);
+  const rendered = useMemo(
+    () => applyReliefToSection(bleedSection, relief),
+    [bleedSection, relief],
+  );
   const growth = SOCIAL_GROWTH_STEPS[Math.min(growthIndex, growthCeiling.current)];
   const air = SOCIAL_AIR_STEPS[Math.min(airIndex, airCeiling.current)];
   const measureKey = `${format}|${rendered.id}|${rendered.variantId}|${relief.level}|${growth}|${air}`;
@@ -204,9 +200,6 @@ export function SocialModuleFrame({
     [rawFit, shellFitted, bleed, format],
   );
 
-
-
-
   // Reset every ladder whenever the inputs change so we always start from the
   // most generous rung — all three are monotonic, so this terminates.
   useEffect(() => {
@@ -239,7 +232,9 @@ export function SocialModuleFrame({
         // Value-equal bail-out: the studio hands us a fresh section object on
         // every render, so this effect re-runs constantly — returning the same
         // state object is what stops that from becoming a render loop.
-        setMeasured((prev) => (prev.h === h && prev.key === measureKey ? prev : { h, key: measureKey }));
+        setMeasured((prev) =>
+          prev.h === h && prev.key === measureKey ? prev : { h, key: measureKey },
+        );
       }
     };
     measure();
@@ -254,7 +249,6 @@ export function SocialModuleFrame({
     };
   }, [rendered, fit.pageWidth, air, measureKey]);
 
-
   // Auto-escalate relief until the module clears the safe rect; when it clears
   // with room to spare, enlarge, then pad it out so the frame reads full.
   useEffect(() => {
@@ -266,41 +260,41 @@ export function SocialModuleFrame({
     return () => cancelAnimationFrame(frame);
 
     function step() {
-    // Cycle guard: a rung combination is only ever decided once. Re-measuring
-    // the same combination cannot teach the ladder anything new, and stopping
-    // here is what keeps a pinned ceiling from ping-ponging forever.
-    if (settled.current.has(measureKey)) return;
-    settled.current.add(measureKey);
-    if (settled.current.size > SETTLE_BUDGET) return;
+      // Cycle guard: a rung combination is only ever decided once. Re-measuring
+      // the same combination cannot teach the ladder anything new, and stopping
+      // here is what keeps a pinned ceiling from ping-ponging forever.
+      if (settled.current.has(measureKey)) return;
+      settled.current.add(measureKey);
+      if (settled.current.size > SETTLE_BUDGET) return;
 
-    if (!rawFit.ok) {
-      // Air is the newest and cheapest thing to give back.
-      if (airIndex > 0) {
-        airCeiling.current = Math.min(airCeiling.current, airIndex - 1);
-        setAirIndex(airIndex - 1);
+      if (!rawFit.ok) {
+        // Air is the newest and cheapest thing to give back.
+        if (airIndex > 0) {
+          airCeiling.current = Math.min(airCeiling.current, airIndex - 1);
+          setAirIndex(airIndex - 1);
+          return;
+        }
+        // Enlarging caused (or failed to fix) the overflow: pin the ceiling below
+        // the current rung before touching relief.
+        if (growthIndex > 0) {
+          growthCeiling.current = Math.min(growthCeiling.current, growthIndex - 1);
+          setGrowthIndex(growthIndex - 1);
+          return;
+        }
+        if (pinned) return;
+        const next = nextRelief(rawFit, relief);
+        if (next) setAutoLevel(next.level);
         return;
       }
-      // Enlarging caused (or failed to fix) the overflow: pin the ceiling below
-      // the current rung before touching relief.
-      if (growthIndex > 0) {
-        growthCeiling.current = Math.min(growthCeiling.current, growthIndex - 1);
-        setGrowthIndex(growthIndex - 1);
+      const grow = nextGrowthStep(rawFit, growthIndex);
+      if (grow !== null && grow <= growthCeiling.current) {
+        setGrowthIndex(grow);
         return;
       }
-      if (pinned) return;
-      const next = nextRelief(rawFit, relief);
-      if (next) setAutoLevel(next.level);
-      return;
-    }
-    const grow = nextGrowthStep(rawFit, growthIndex);
-    if (grow !== null && grow <= growthCeiling.current) {
-      setGrowthIndex(grow);
-      return;
-    }
-    const growthExhausted =
-      growthIndex >= Math.min(SOCIAL_GROWTH_MAX, growthCeiling.current) || grow === null;
-    const nextAir = nextAirStep(rawFit, airIndex, growthExhausted);
-    if (nextAir !== null && nextAir <= airCeiling.current) setAirIndex(nextAir);
+      const growthExhausted =
+        growthIndex >= Math.min(SOCIAL_GROWTH_MAX, growthCeiling.current) || grow === null;
+      const nextAir = nextAirStep(rawFit, airIndex, growthExhausted);
+      if (nextAir !== null && nextAir <= airCeiling.current) setAirIndex(nextAir);
     }
   }, [pinned, naturalHeight, fresh, rawFit, relief, growthIndex, airIndex, measureKey]);
 
@@ -323,7 +317,6 @@ export function SocialModuleFrame({
     : bleed
       ? Math.round(816 * (bleed.height / bleed.width))
       : Math.round(816 * (safe.height / safe.width));
-
 
   const frameBandPct = useMemo(() => {
     switch (aspectClass(format)) {
@@ -360,8 +353,6 @@ export function SocialModuleFrame({
       ? "#FFFFFF"
       : "#03002C";
   const paper = plate ? plate.surface : mode === "dark" ? "#03002C" : "#FFFFFF";
-
-
 
   // Center the module inside the safe rect so short modules never leave a
   // lopsided band at one edge.
@@ -418,7 +409,6 @@ export function SocialModuleFrame({
         data-social-bleed={bleedPlan ? bleedPlan.kind : undefined}
         data-social-ground={plate ? `${plate.code}:${plate.scene}` : undefined}
       >
-
         <div
           style={{
             width: format.width,
@@ -448,7 +438,6 @@ export function SocialModuleFrame({
             }}
           />
 
-
           {/* Live module: full-bleed composition for the photographic / hardware
             modules, the tall shell for restacked thin strips, otherwise scaled
             into the safe rect. */}
@@ -462,7 +451,9 @@ export function SocialModuleFrame({
               focalX={(rendered as { focalX?: number }).focalX}
               focalY={(rendered as { focalY?: number }).focalY}
             >
-              <div style={{ height: Math.min(fit.renderedHeight, bleed.height), overflow: "hidden" }}>
+              <div
+                style={{ height: Math.min(fit.renderedHeight, bleed.height), overflow: "hidden" }}
+              >
                 {moduleBlock}
               </div>
             </SocialFullBleedShell>
@@ -497,7 +488,6 @@ export function SocialModuleFrame({
               {moduleBlock}
             </div>
           )}
-
 
           {!hideLockup && brand ? (
             <div style={{ position: "absolute", left: safe.left, bottom: lockupPad }}>

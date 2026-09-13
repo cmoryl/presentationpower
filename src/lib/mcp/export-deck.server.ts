@@ -133,10 +133,7 @@ export async function exportDeckHeadless(
   const ctx = captureContextOf(deck);
   const wantMode = opts.mode ?? null;
 
-  const sceneCaptures: Record<
-    string,
-    { plate: string; runs?: never[]; shapes?: never[] }
-  > = {};
+  const sceneCaptures: Record<string, { plate: string; runs?: never[]; shapes?: never[] }> = {};
   const unsupportedSlides: Array<{ position: number; variantId: string; reason: string }> = [];
 
   deck.slides.forEach((sl, i) => {

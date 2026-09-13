@@ -59,7 +59,11 @@ describe("stage phase ops", () => {
     expect(phases[1]!.label).toBe("Delivery");
     expect(phases[0]!.label).toBe("Pre-flight");
     const tasked = patchTask(phases, 0, 0, { body: "Detail", icon: "Search" });
-    expect(tasked[0]!.items![0]).toMatchObject({ label: "Timeline", body: "Detail", icon: "Search" });
+    expect(tasked[0]!.items![0]).toMatchObject({
+      label: "Timeline",
+      body: "Detail",
+      icon: "Search",
+    });
   });
 
   it("adds, moves and removes tasks within a phase cap", () => {

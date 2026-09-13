@@ -47,7 +47,6 @@ jobs:
       - name: Placement + corner-radius baselines must be present and current
         run: bunx vitest run src/lib/__tests__/export-placement.test.ts src/lib/__tests__/export-corner-radius-regression.test.ts src/lib/__tests__/export-radius-token-suite.test.ts src/lib/__tests__/export-radius-scale-parity.test.ts src/lib/__tests__/export-surface-parity.test.ts
 
-
   sweep:
     # Sampled on PR/push (~448 exports); full only nightly or on explicit dispatch.
     name: Export sweep (${{ (github.event_name == 'schedule' || inputs.coverage == 'full') && 'FULL 10904 exports' || 'SAMPLED ~448 exports' }})
@@ -147,5 +146,3 @@ jobs:
       - name: Dev server log
         if: failure()
         run: tail -100 /tmp/dev-pixel.log
-
-

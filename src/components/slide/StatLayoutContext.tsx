@@ -40,7 +40,9 @@ export function StatArrangementProvider({
   children: ReactNode;
 }) {
   return (
-    <StatArrangementContext.Provider value={arrangement}>{children}</StatArrangementContext.Provider>
+    <StatArrangementContext.Provider value={arrangement}>
+      {children}
+    </StatArrangementContext.Provider>
   );
 }
 

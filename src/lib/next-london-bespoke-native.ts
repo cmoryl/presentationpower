@@ -210,7 +210,7 @@ export const NATIVE_BESPOKE_TEMPLATES: NativeBespokeTemplate[] = [
     headline: "GLOBALLINK",
     sub: "SEE IT WORKING",
     body: "Live demonstrations run through the day — pull up a stool and ask the hard questions.",
-    note: "Aperture is cut for the 86\" screen: keep copy clear of the centre.",
+    note: 'Aperture is cut for the 86" screen: keep copy clear of the centre.',
   },
   {
     unitId: "olivier-screen-surround",
@@ -225,13 +225,13 @@ export const NATIVE_BESPOKE_TEMPLATES: NativeBespokeTemplate[] = [
     headline: "BEYOND INTELLIGENCE",
     sub: "LANGUAGE, TECHNOLOGY, SCALE",
     body: "Two screens, one story: how governed content reaches every market on the same day.",
-    note: "Two 86\" apertures — supplied as tiled panels, copy sits outside both.",
+    note: 'Two 86" apertures — supplied as tiled panels, copy sits outside both.',
   },
 
   // ── Comfort monitor hide, Fleming (3F) ──────────────────────────────────
   {
     unitId: "fleming-monitor-hide",
-    unitName: "Fleming 65\" comfort monitor hide",
+    unitName: 'Fleming 65" comfort monitor hide',
     panelLabel: "Hide front",
     floor: "3F",
     room: "Fleming (Day 1)",
@@ -248,9 +248,7 @@ export const NATIVE_BESPOKE_TEMPLATES: NativeBespokeTemplate[] = [
 
 const KEY = (unitId: string, panelLabel: string) => `${unitId}::${panelLabel}`;
 
-const BY_KEY = new Map(
-  NATIVE_BESPOKE_TEMPLATES.map((t) => [KEY(t.unitId, t.panelLabel), t]),
-);
+const BY_KEY = new Map(NATIVE_BESPOKE_TEMPLATES.map((t) => [KEY(t.unitId, t.panelLabel), t]));
 
 /** The template for one face of a unit, or null when the GA size is unpublished. */
 export function nativeBespokeTemplate(

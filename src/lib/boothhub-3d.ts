@@ -77,8 +77,6 @@ export type BoothHub3dLinkOptions = {
   shareToken?: string | null;
 };
 
-
-
 /**
  * The live state of one asset on a floor sheet: floor, position in plan metres,
  * which way it faces and its printed size. Passed to BoothHUB so the 3D build
@@ -199,7 +197,6 @@ export function boothHubPlacementMessage(opts: BoothHub3dLinkOptions): {
   };
 }
 
-
 /** Where a signed-in BoothHUB user creates that share link for a division. */
 export function boothHubShareSetupUrl(division: BoothHubDivisionId): string {
   return `${BOOTHHUB_ORIGIN}/booths/${division}`;
@@ -224,7 +221,6 @@ export function boothHub3dEmbedUrl(opts: BoothHub3dLinkOptions): string {
   return `${BOOTHHUB_ORIGIN}/booths/${opts.division}/visit?${q.toString()}`;
 }
 
-
 /** The same build opened as a full BoothHUB page in a new tab. */
 export function boothHub3dPageUrl(opts: BoothHub3dLinkOptions): string {
   if (opts.shareToken) {
@@ -242,14 +238,10 @@ export function boothHub3dPageUrl(opts: BoothHub3dLinkOptions): string {
   return `${BOOTHHUB_ORIGIN}/booths/${opts.division}/visit?${q.toString()}`;
 }
 
-
-
 /** Where a signed-in BoothHUB user designs this division's stand build. */
 export function boothHubBuilderUrl(division: BoothHubDivisionId): string {
   return `${BOOTHHUB_ORIGIN}/booths/${division}/builder`;
 }
-
-
 
 export const BOOTHHUB_DIVISION_LABEL: Record<BoothHubDivisionId, string> = {
   corporate: "TransPerfect corporate",

@@ -121,9 +121,7 @@ export function parseLondonLiveFileLayers(
   }
   // SVG groups: our own masters tag `data-layer`, hand files use id/label.
   if (/<svg[\s>]/i.test(text) || filename.toLowerCase().endsWith(".svg")) {
-    for (const m of text.matchAll(
-      /<g\b[^>]*?(?:data-layer|inkscape:label|id)\s*=\s*"([^"]+)"/g,
-    )) {
+    for (const m of text.matchAll(/<g\b[^>]*?(?:data-layer|inkscape:label|id)\s*=\s*"([^"]+)"/g)) {
       if (m[1]) push(m[1]);
     }
   }

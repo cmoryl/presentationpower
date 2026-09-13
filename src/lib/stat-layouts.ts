@@ -139,8 +139,16 @@ export const STAT_MOTION_PRESETS: Array<{
   { id: "rise", label: "Rise in", description: "Figure lifts and fades in on a staggered beat." },
   { id: "count", label: "Count up", description: "Numeral counts up to its value on reveal." },
   { id: "sweep", label: "Gauge sweep", description: "Meters and rings sweep to their value." },
-  { id: "blur", label: "Focus pull", description: "Figure sharpens from a soft blur into crisp type." },
-  { id: "drift", label: "Drift in", description: "Figure slides in from the leading edge and settles." },
+  {
+    id: "blur",
+    label: "Focus pull",
+    description: "Figure sharpens from a soft blur into crisp type.",
+  },
+  {
+    id: "drift",
+    label: "Drift in",
+    description: "Figure slides in from the leading edge and settles.",
+  },
 ];
 
 export const STAT_EMPHASIS_PRESETS: Array<{
@@ -157,7 +165,6 @@ export const STAT_EMPHASIS_PRESETS: Array<{
   },
   { id: "quiet", label: "Supporting", description: "Reduced weight so a hero figure leads." },
 ];
-
 
 export const STAT_SHAPE_PRESETS: StatShapePreset[] = [
   {
@@ -390,9 +397,7 @@ export function isStatShape(value: unknown): value is StatShape {
 }
 
 export function isStatSurface(value: unknown): value is StatSurface {
-  return (
-    typeof value === "string" && STAT_SURFACE_PRESETS.some((p) => (p.id as string) === value)
-  );
+  return typeof value === "string" && STAT_SURFACE_PRESETS.some((p) => (p.id as string) === value);
 }
 
 export function isStatMotion(value: unknown): value is StatMotion {
@@ -425,7 +430,6 @@ export type StatLayout = {
   /** Direction for the delta pill. Inferred from the value when omitted. */
   trend?: "up" | "down";
 };
-
 
 export const DEFAULT_STAT_LAYOUT: StatLayout = { shape: "auto", align: "start" };
 
@@ -500,7 +504,6 @@ export const MODULE_STAT_LAYOUTS: Record<string, StatLayout> = {
   "MV-CTX-TREND": { shape: "sparkline", align: "start", progress: 0.66, motion: "rise" },
   "MV-CASE-METRICS": { shape: "delta", align: "start", motion: "count" },
   "MV-INS-OPPORTUNITY-SIZE": { shape: "ghost", align: "start" },
-
 };
 
 /** Family-level fallbacks applied when a module has no explicit entry. */
@@ -555,7 +558,6 @@ export function parseStatLayout(input: unknown): Partial<StatLayout> | null {
   if (trend === "up" || trend === "down") out.trend = trend;
   return Object.keys(out).length ? out : null;
 }
-
 
 /**
  * Resolution order (last wins): module default → slide content override →

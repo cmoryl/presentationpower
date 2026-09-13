@@ -51,10 +51,7 @@ export interface MartScene {
   anchorY: "top" | "center" | "bottom";
 }
 
-import {
-  mountArtworkOnFace,
-  type SceneFixedAxis,
-} from "@/lib/scene-face-fit";
+import { mountArtworkOnFace, type SceneFixedAxis } from "@/lib/scene-face-fit";
 
 const PLATE = { w: 1536, h: 1024 };
 
@@ -83,48 +80,111 @@ function scene(
 }
 
 export const MART_SCENES: MartScene[] = [
-  scene("entrance-pillar", "Entrance tower pillar", "Mart threshold, shop left", "pillar", entrancePillar, {
-    x: 0.14,
-    y: 0.0771,
-    w: 0.179,
-    h: 0.7783,
-  }, "w", "top"),
-  scene("wall-panel", "Shop back wall", "Behind the merch rails", "wall", wallPanel, {
-    x: 0.1934,
-    y: 0.0703,
-    w: 0.6387,
-    h: 0.5068,
-  }, "w", "center"),
-  scene("hanging-banner", "Overhead hanging banner", "Rigged to truss above the mart", "overhead", hangingBanner, {
-    x: 0.0208,
-    y: 0.2783,
-    w: 0.9538,
-    h: 0.2646,
-  }, "w", "top"),
-  scene("rail-panel", "Category rail panel", "Clipped above a merch rail", "rail", railPanel, {
-    x: 0.2546,
-    y: 0.1768,
-    w: 0.4954,
-    h: 0.3047,
-  }, "w", "center"),
-  scene("queue-panel", "Queue stanchion panel", "Till bank queue line", "stanchion", queuePanel, {
-    x: 0.4935,
-    y: 0.2646,
-    w: 0.3743,
-    h: 0.4033,
-  }, "w", "center"),
-  scene("till-front", "Till counter front", "Cash desk fascia", "counter", tillFront, {
-    x: 0.0527,
-    y: 0.333,
-    w: 0.8919,
-    h: 0.4727,
-  }, "h", "center"),
-  scene("floor-decal", "Floor approach decal", "Last 6 m of approach", "floor", floorDecal, {
-    x: 0.2018,
-    y: 0.3145,
-    w: 0.5898,
-    h: 0.5283,
-  }, "w", "center"),
+  scene(
+    "entrance-pillar",
+    "Entrance tower pillar",
+    "Mart threshold, shop left",
+    "pillar",
+    entrancePillar,
+    {
+      x: 0.14,
+      y: 0.0771,
+      w: 0.179,
+      h: 0.7783,
+    },
+    "w",
+    "top",
+  ),
+  scene(
+    "wall-panel",
+    "Shop back wall",
+    "Behind the merch rails",
+    "wall",
+    wallPanel,
+    {
+      x: 0.1934,
+      y: 0.0703,
+      w: 0.6387,
+      h: 0.5068,
+    },
+    "w",
+    "center",
+  ),
+  scene(
+    "hanging-banner",
+    "Overhead hanging banner",
+    "Rigged to truss above the mart",
+    "overhead",
+    hangingBanner,
+    {
+      x: 0.0208,
+      y: 0.2783,
+      w: 0.9538,
+      h: 0.2646,
+    },
+    "w",
+    "top",
+  ),
+  scene(
+    "rail-panel",
+    "Category rail panel",
+    "Clipped above a merch rail",
+    "rail",
+    railPanel,
+    {
+      x: 0.2546,
+      y: 0.1768,
+      w: 0.4954,
+      h: 0.3047,
+    },
+    "w",
+    "center",
+  ),
+  scene(
+    "queue-panel",
+    "Queue stanchion panel",
+    "Till bank queue line",
+    "stanchion",
+    queuePanel,
+    {
+      x: 0.4935,
+      y: 0.2646,
+      w: 0.3743,
+      h: 0.4033,
+    },
+    "w",
+    "center",
+  ),
+  scene(
+    "till-front",
+    "Till counter front",
+    "Cash desk fascia",
+    "counter",
+    tillFront,
+    {
+      x: 0.0527,
+      y: 0.333,
+      w: 0.8919,
+      h: 0.4727,
+    },
+    "h",
+    "center",
+  ),
+  scene(
+    "floor-decal",
+    "Floor approach decal",
+    "Last 6 m of approach",
+    "floor",
+    floorDecal,
+    {
+      x: 0.2018,
+      y: 0.3145,
+      w: 0.5898,
+      h: 0.5283,
+    },
+    "w",
+    "center",
+  ),
 ];
 
 export function martScene(id: string): MartScene | undefined {
@@ -167,7 +227,7 @@ export function scenesForMartSign(subject: MartSceneSubject): MartScene[] {
   return [...MART_SCENES]
     .map((s) => {
       const hint = hints.indexOf(s.kind);
-      const orientation = (ratio >= 1) === (s.faceRatio >= 1) ? 0 : 1.5;
+      const orientation = ratio >= 1 === s.faceRatio >= 1 ? 0 : 1.5;
       const fit = Math.abs(Math.log(s.faceRatio / ratio));
       return { s, score: (hint >= 0 ? hint * 0.15 : 3) + orientation + fit };
     })

@@ -27,7 +27,13 @@ import {
   SUMMARY_BAND,
 } from "@/lib/surface-tokens";
 import { cellAccent, cellWash, iconWellStyle, cellIconScale } from "./cell-controls";
-import { MAX_TASKS, clampPhases, readPhases, stageLabelFit, stageMetrics } from "@/lib/stage-phases";
+import {
+  MAX_TASKS,
+  clampPhases,
+  readPhases,
+  stageLabelFit,
+  stageMetrics,
+} from "@/lib/stage-phases";
 
 registerSlideModule({
   id: "family:process",
@@ -624,7 +630,6 @@ registerSlideModule({
         const numeralSize = m.numeral;
         const stageNameSize = m.stageName;
 
-
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <div className="flex h-full flex-col justify-center">
@@ -646,7 +651,6 @@ registerSlideModule({
                     stageName: stageNameSize,
                   });
                   return (
-
                     <React.Fragment key={si}>
                       {si > 0 && (
                         <div
@@ -708,7 +712,6 @@ registerSlideModule({
                             className="absolute overflow-hidden rounded-full"
                             style={{ inset: slim ? "8%" : "11%" }}
                           >
-
                             <MediaTile
                               brand={brand}
                               seed={s(st.mediaSeed, s(st.label, `stage-${si + 1}`))}
@@ -757,7 +760,6 @@ registerSlideModule({
                                 {s(st.label)}
                               </div>
                             </div>
-
                           </div>
                         </div>
 
@@ -765,7 +767,9 @@ registerSlideModule({
                         <div
                           data-intro-item=""
                           data-intro-step={si * 2 + 2}
-                          className={slim ? "mt-5 flex w-full flex-col" : "mt-8 flex w-full flex-col"}
+                          className={
+                            slim ? "mt-5 flex w-full flex-col" : "mt-8 flex w-full flex-col"
+                          }
                           style={{ gap: 0 }}
                         >
                           {tasks.map((t, ti) => {

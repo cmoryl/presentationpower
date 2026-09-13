@@ -61,10 +61,7 @@ export function LondonLiveLayersPanel({
     try {
       const response = await fetch(fileUrl);
       if (!response.ok) throw new Error("The finished file could not be read.");
-      const layers = parseLondonLiveFileLayers(
-        await response.arrayBuffer(),
-        fileKey ?? panel.id,
-      );
+      const layers = parseLondonLiveFileLayers(await response.arrayBuffer(), fileKey ?? panel.id);
       setLondonLiveLayers(panel.id, fileKey ?? "file", layers);
       toast.success(
         layers.length

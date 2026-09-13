@@ -106,7 +106,6 @@ export function OrbitRing({
   );
 }
 
-
 registerSlideModule({
   id: "family:growth-orbits",
   variantIds: ["MV-PROOF-GROWTH-ORBITS"],
@@ -118,7 +117,6 @@ registerSlideModule({
     const wall = resolveLogoWall(c.logoWall);
     // Ring colour, weight and dot treatment are authored per face.
     const ringFace = resolveOrbitFace(c.orbitStyle, mode === "dark" ? "dark" : "light");
-
 
     const tileBg = bareSurfaces ? "transparent" : isDark ? "#FFFFFF" : "rgba(10,15,28,0.02)";
     const tileRing = bareSurfaces
@@ -137,7 +135,6 @@ registerSlideModule({
       base: ringSize,
       stage: orbitStageSize(orbits.length),
     });
-
 
     return (
       <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -303,67 +300,69 @@ registerSlideModule({
                 )}
               </div>
             )}
-            <div className="relative mt-8 w-full flex-1" style={{ minHeight: orbitStageSize(orbits.length).h }}>
+            <div
+              className="relative mt-8 w-full flex-1"
+              style={{ minHeight: orbitStageSize(orbits.length).h }}
+            >
               {orbits.map((o: Item, i) => {
                 const pos = positions[i]!;
                 const size = Math.round(ringSize * pos.size);
                 return (
-                <div
-                  key={i}
-                  data-intro-item=""
-                  data-intro-step={4 + i}
-                  className="absolute"
-                  style={{
-                    width: size,
-                    height: size,
-                    left: `${pos.x}%`,
-                    top: `${pos.y}%`,
-                    transform: "translate(-50%, -50%)",
-                  }}
-                >
-                  <OrbitRing accent={accent} size={size} face={ringFace} />
-                  <div className="absolute inset-[9%] flex flex-col items-center justify-center text-center">
-
-                    {s(o.label) && (
+                  <div
+                    key={i}
+                    data-intro-item=""
+                    data-intro-step={4 + i}
+                    className="absolute"
+                    style={{
+                      width: size,
+                      height: size,
+                      left: `${pos.x}%`,
+                      top: `${pos.y}%`,
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    <OrbitRing accent={accent} size={size} face={ringFace} />
+                    <div className="absolute inset-[9%] flex flex-col items-center justify-center text-center">
+                      {s(o.label) && (
+                        <div
+                          style={{
+                            fontSize: fillPx(22, "body"),
+                            fontWeight: 800,
+                            letterSpacing: "0.06em",
+                            textTransform: "uppercase",
+                            lineHeight: 1.15,
+                            color: accent,
+                          }}
+                        >
+                          {s(o.label)}
+                        </div>
+                      )}
                       <div
                         style={{
-                          fontSize: fillPx(22, "body"),
+                          fontSize: Math.round(size * 0.33),
                           fontWeight: 800,
-                          letterSpacing: "0.06em",
-                          textTransform: "uppercase",
-                          lineHeight: 1.15,
-                          color: accent,
+                          lineHeight: 1,
+                          letterSpacing: "-0.05em",
+                          color: ink.strong,
                         }}
                       >
-                        {s(o.label)}
+                        {formatStatValue(o.value, o)}
                       </div>
-                    )}
-                    <div
-                      style={{
-                        fontSize: Math.round(size * 0.33),
-                        fontWeight: 800,
-                        lineHeight: 1,
-                        letterSpacing: "-0.05em",
-                        color: ink.strong,
-                      }}
-                    >
-                      {formatStatValue(o.value, o)}
+                      {s(o.body) && (
+                        <div
+                          className="mt-1"
+                          style={{
+                            fontSize: fillPx(19, "body"),
+                            lineHeight: 1.26,
+                            color: ink.body,
+                            maxWidth: "84%",
+                          }}
+                        >
+                          {s(o.body)}
+                        </div>
+                      )}
                     </div>
-                    {s(o.body) && (
-                      <div
-                        className="mt-1"
-                        style={{
-                          fontSize: fillPx(19, "body"),
-                          lineHeight: 1.26,
-                          color: ink.body,
-                          maxWidth: "84%",
-                        }}
-                      >
-                        {s(o.body)}
-                      </div>
-                    )}
                   </div>
-                </div>
                 );
               })}
             </div>
