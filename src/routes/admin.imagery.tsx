@@ -141,7 +141,7 @@ function AdminImageryPage() {
     },
   });
 
-  const rows = q.data ?? [];
+  const rows = useMemo(() => q.data ?? [], [q.data]);
   const collections = useMemo(() => {
     const set = new Set<string>();
     rows.forEach((r) => {

@@ -51,7 +51,7 @@ function AuditView() {
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]["id"]>("all");
   const [search, setSearch] = useState("");
 
-  const rows = (q.data ?? []) as Row[];
+  const rows = useMemo(() => (q.data ?? []) as Row[], [q.data]);
   const filtered = useMemo(() => {
     const cat = CATEGORIES.find((c) => c.id === category)!;
     const s = search.trim().toLowerCase();

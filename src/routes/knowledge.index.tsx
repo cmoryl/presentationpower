@@ -50,7 +50,7 @@ function KnowledgeView() {
       }),
   });
 
-  const rows: KnowledgeEntry[] = entries.data ?? [];
+  const rows: KnowledgeEntry[] = useMemo(() => entries.data ?? [], [entries.data]);
   const owned = rows.filter((r) => r.owner_division_id === divisionId);
   const shared = rows.filter(
     (r) => r.owner_division_id !== divisionId && r.visibility === "shared",

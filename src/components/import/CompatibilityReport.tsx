@@ -133,7 +133,7 @@ export function CompatibilityReport({
   const [categoryFilter, setCategoryFilter] = useState<IssueCategory | "all">("all");
   const [fixFilter, setFixFilter] = useState<FixKind | "all">("all");
 
-  const issues = screening.compat.issues ?? [];
+  const issues = useMemo(() => screening.compat.issues ?? [], [screening.compat.issues]);
   const scores = screening.compat.scores;
   const objects = screening.compat.objects;
   const totals = screening.compat.totals;

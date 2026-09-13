@@ -68,7 +68,7 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
     staleTime: 60_000,
     retry: false,
   });
-  const customRows = custom.data ?? [];
+  const customRows = useMemo(() => custom.data ?? [], [custom.data]);
 
   const customMatches = useMemo(() => {
     const needle = q.trim().toLowerCase();

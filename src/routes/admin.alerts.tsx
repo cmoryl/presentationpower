@@ -54,7 +54,7 @@ function AlertsView() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
 
-  const recipients = q.data?.recipients ?? [];
+  const recipients = useMemo(() => q.data?.recipients ?? [], [q.data]);
   const filtered = useMemo(() => {
     const needle = search.trim().toLowerCase();
     if (!needle) return recipients;

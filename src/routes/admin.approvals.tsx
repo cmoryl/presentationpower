@@ -62,7 +62,7 @@ function ApprovalsView() {
 
   const forbidden = (pending.error as Error | null)?.message?.includes("Forbidden");
 
-  const pendingRows = (pending.data ?? []) as PendingRow[];
+  const pendingRows = useMemo(() => (pending.data ?? []) as PendingRow[], [pending.data]);
   const inPending = pendingRows.filter(
     (r) => r.approval_status === "pending" || r.approval_status === "draft",
   );
