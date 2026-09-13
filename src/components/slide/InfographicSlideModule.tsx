@@ -40,7 +40,10 @@ function s(v: unknown, fb = ""): string {
 }
 
 export function InfographicSlideModule({ slide, variant, brand, pageNumber, mode }: Props) {
-  const content = useMemo(() => (slide.content ?? {}) as Record<string, unknown>, [slide.content]);
+  const content = React.useMemo(
+    () => (slide.content ?? {}) as Record<string, unknown>,
+    [slide.content],
+  );
   // A chart has to be legible on the surface it actually lands on: dark mode
   // and every alternate look change the ground under it.
   const pack = useStylePack();
