@@ -52,9 +52,19 @@ describe("event knowledge store", () => {
 
   it("distinguishes different subjects", () => {
     expect(
-      eventKnowledgeFingerprint({ eventId: "next-2026", kind: "spec", subject: "p-01" }),
+      eventKnowledgeFingerprint({
+        eventId: "next-2026",
+        kind: "spec",
+        panelId: "p-01",
+        title: "Room door vinyl",
+      }),
     ).not.toBe(
-      eventKnowledgeFingerprint({ eventId: "next-2026", kind: "spec", subject: "p-02" }),
+      eventKnowledgeFingerprint({
+        eventId: "next-2026",
+        kind: "spec",
+        panelId: "p-02",
+        title: "Room door vinyl",
+      }),
     );
   });
 
