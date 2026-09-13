@@ -114,7 +114,7 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
   const cardStage = useRef<HTMLDivElement | null>(null);
   const zoomStage = useRef<HTMLDivElement | null>(null);
   const shell: LondonBoothShell = boothShell(shellId);
-  const art = londonBoothArtworkUrl(panel.id);
+  const art = londonPanelArtworkSrc(panel.id);
   const face = shell.renderFace;
   const page = bleedFrame(panel);
 

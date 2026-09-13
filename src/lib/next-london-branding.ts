@@ -12,7 +12,7 @@
 // Family and copy are read from the item's own branding note, so the artwork
 // follows what the London location team asked for on each item.
 
-import { londonSuppliedGroundUrl } from "@/lib/next-london-supplied-masters";
+import { londonPanelArtworkUrl } from "@/lib/next-london-supplied-masters";
 import { londonFileOwnsLayer } from "@/lib/next-london-live-layers";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
@@ -297,7 +297,7 @@ export function londonBrandingPlan(
   // NOT drawn a second time on top — that is what doubled the lockup and the
   // headline on the preview cards. The designer can hand any layer back to the
   // editor (see next-london-live-layers.ts) and it returns as an editable layer.
-  const finishedFile = !!(londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id));
+  const finishedFile = !!londonPanelArtworkUrl(panel.id);
   const fileOwnsLockup = finishedFile && londonFileOwnsLayer(panel.id, "lockup");
   const fileOwnsCopy = finishedFile && londonFileOwnsLayer(panel.id, "copy");
   const authored =
