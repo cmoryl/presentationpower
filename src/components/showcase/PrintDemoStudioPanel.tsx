@@ -77,7 +77,10 @@ export function PrintDemoStudioPanel({
 }: Props) {
   const bag = (content ?? {}) as Record<string, unknown>;
   const hero = bag["heroMedia"] as PrintHeroMedia | undefined;
-  const modules = Array.isArray(bag["modules"]) ? (bag["modules"] as PrintSection[]) : [];
+  const modules = useMemo(
+    () => (Array.isArray(bag["modules"]) ? (bag["modules"] as PrintSection[]) : []),
+    [bag],
+  );
   const capacityKind = CAPACITY_KINDS.has(kind) ? (kind as PrintTemplateKind) : null;
 
   const copy = {

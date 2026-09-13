@@ -184,9 +184,14 @@ function RoleDashboard() {
     queryFn: () => kitsFn({ data: {} }),
   });
 
-  const deckRows = Array.isArray(decks.data) ? decks.data : [];
-  const printRows = Array.isArray(printAssets.data) ? printAssets.data : [];
-  const kitRows = Array.isArray(kits.data) ? kits.data : [];
+  // Stable array identities: these feed the summary memos below, which would
+  // otherwise recompute on every render.
+  const deckRows = useMemo(() => (Array.isArray(decks.data) ? decks.data : []), [decks.data]);
+  const printRows = useMemo(
+    () => (Array.isArray(printAssets.data) ? printAssets.data : []),
+    [printAssets.data],
+  );
+  const kitRows = useMemo(() => (Array.isArray(kits.data) ? kits.data : []), [kits.data]);
 
   const loading = decks.isLoading || printAssets.isLoading || kits.isLoading;
 

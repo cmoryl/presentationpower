@@ -670,7 +670,21 @@ function Lightbox({
     } finally {
       setPptxBusy(false);
     }
-  }, [pptxBusy, variant, brand, mode, pack, preset, slideForExport, exportQuality]);
+    // exportFidelity / exportDebugTree belong here too: without them the
+    // callback closes over the settings held when it was created, so a toggled
+    // fidelity or object-tree switch would export at the previous setting.
+  }, [
+    pptxBusy,
+    variant,
+    brand,
+    mode,
+    pack,
+    preset,
+    slideForExport,
+    exportQuality,
+    exportFidelity,
+    exportDebugTree,
+  ]);
 
   return (
     <div

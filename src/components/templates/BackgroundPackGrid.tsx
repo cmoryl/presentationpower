@@ -114,7 +114,9 @@ export function BackgroundPackGrid({
   const rows = useMemo(
     () =>
       ALL.map((scene) => {
-        const saved = savedFor(scene);
+        // Read `mine` directly (not through savedFor) so this memo's inputs are
+        // statically checkable and the rows can't hold a stale saved override.
+        const saved = mine.find((o) => o.scene === scene);
         const eff = saved ?? defaultOverride(code, scene);
         return {
           scene,

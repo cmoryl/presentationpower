@@ -1048,7 +1048,7 @@ export function MediaTile({
       v.removeEventListener("timeupdate", onTime);
       registeredVideos.delete(v);
     };
-  }, [previewKey, resolvedVideoUrl, userStarted, shouldPlay]);
+  }, [previewKey, resolvedVideoUrl, userStarted, shouldPlay, forceAutoplay]);
 
   // Persist userStarted so reopening the same preview key resumes.
   useEffect(() => {
@@ -1076,7 +1076,7 @@ export function MediaTile({
         }
       });
     }
-  }, [shouldPlay, wantMuted, resolvedVideoUrl]);
+  }, [shouldPlay, wantMuted, resolvedVideoUrl, forceAutoplay]);
 
   const divSet = getDivisionImagery(brand.id);
   // A tile positioned absolutely is a *backing* layer: sibling copy is drawn on
