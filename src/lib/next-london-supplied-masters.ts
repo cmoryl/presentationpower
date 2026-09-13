@@ -19,6 +19,8 @@ import regPillarAi from "@/assets/london-supplied/registration-pillar.ai.asset.j
 import regPillarProof from "@/assets/london-supplied/registration-pillar.jpg.asset.json";
 
 import { londonLiveFile } from "@/lib/next-london-live-files";
+import { londonBoothArtworkUrl } from "@/lib/next-london-signage";
+
 
 export type LondonSuppliedMaster = {
   /** Panel this master replaces. */
