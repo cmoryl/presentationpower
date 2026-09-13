@@ -97,6 +97,7 @@ function mm(n: number) {
 
 function PlaybookPage() {
   const audit = useMemo(() => venueTemplateAudit<LondonPanel>(LONDON_PANELS), []);
+  const decisions = useMemo(() => parseEventDecisions(decisionsMarkdown), []);
   const grounds = useMemo(
     () => [...new Set(LONDON_PANELS.map((p) => p.style))].filter((id) => LONDON_STYLES[id]),
     [],
