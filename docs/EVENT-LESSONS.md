@@ -4,6 +4,10 @@ A running record of judgement calls, near-misses and "we tried this and it was w
 from real event builds. Tests lock in fixed bugs; this file carries the reasoning that
 tests cannot express. Read it before starting a new city, venue or signage family.
 
+Its companion is `docs/EVENT-DECISIONS.md`: this file records what went wrong, that one
+records the choices we tested and settled on. Both are harvested into the searchable
+event knowledge store, so a new city can ask them in plain language.
+
 **How to use it**
 - Add an entry the moment something is learned — during the work, not after.
 - One entry per lesson. Keep it short and decision-shaped: what happened, what we do now.
@@ -126,3 +130,14 @@ survey" — a past venue's size is a sanity check, never the new venue's truth. 
 fail to index are shown as pending, never silently dropped.
 **Enforced by:** `src/lib/__tests__/event-knowledge.test.ts`; fingerprints keep one row per
 fact so revisions update instead of twinning.
+
+### 2026-09 — A settled choice is not knowledge until the losing options are written down
+**Context:** hub card renders, Brew grounds, door mounting, colour space — all chosen after
+testing alternatives.
+**What happened:** the chosen option survived only as the current state of the code. Nothing
+recorded what it beat or why, so a later change could reverse it in good faith and a new city
+could re-test a rejected approach from scratch.
+**Rule now:** a choice between real alternatives gets an entry in `docs/EVENT-DECISIONS.md`
+at the moment it is made, naming the options it beat and the condition that would reopen it.
+Decisions are harvested into the knowledge store alongside lessons and specs.
+**Enforced by:** `src/lib/__tests__/event-knowledge.test.ts` (decision log suite).

@@ -3,11 +3,13 @@ import { describe, expect, it } from "vitest";
 import {
   EVENT_KNOWLEDGE_DIMS,
   EVENT_KNOWLEDGE_EMBEDDING_MODEL,
+  decisionRecords,
   eventKnowledgeFingerprint,
   eventKnowledgeText,
   groupEventKnowledge,
   harvestPanelSpecs,
   outcomeRecord,
+  parseEventDecisions,
   parseEventLessons,
   type EventKnowledgeHit,
   type HarvestPanel,
@@ -126,5 +128,52 @@ describe("event knowledge store", () => {
     };
     const brief = groupEventKnowledge([base, { ...base, id: "2", similarity: 0.05 }]);
     expect(brief.specs).toHaveLength(1);
+  });
+});
+
+describe("decision log", () => {
+  const md = [
+    "```",
+    "### YYYY-MM — Title",
+    "**Area:** template.",
+    "```",
+    "",
+    "### 2026-09 — Brew grounds are gradient only",
+    "**Area:** NEXT Brew signage.",
+    "**Options tested:** chevron motif; gradient plus texture; gradient only.",
+    "**Chosen:** gradient only.",
+    "**Why:** the motif fought the lockup at coffee-bar distance.",
+    "**Would change if:** a Brew motif is approved inside the lockup.",
+    "**Applies to:** every venue.",
+    "",
+    "### 2026-09 — Old call SUPERSEDED by 2026-10",
+    "**Area:** hub cards.",
+    "**Chosen:** in-scene renders as the default card.",
+  ].join("\n");
+
+  it("parses entries, skips the fenced format block and keeps superseded ones", () => {
+    const parsed = parseEventDecisions(md);
+    expect(parsed).toHaveLength(2);
+    expect(parsed[0].chosen).toBe("gradient only.");
+    expect(parsed[0].optionsTested).toContain("chevron motif");
+    expect(parsed[1].title).toContain("SUPERSEDED");
+  });
+
+  it("carries the rejected options and the reopening condition into the record", () => {
+    const [record] = decisionRecords(venue, parseEventDecisions(md));
+    expect(record.kind).toBe("decision");
+    expect(record.source).toBe("decision-log");
+    expect(record.body).toContain("Options tested: chevron motif");
+    expect(record.body).toContain("Would change if:");
+    expect(record.facts.reopensIf).toContain("Brew motif");
+    expect(eventKnowledgeText(record)).toContain("gradient only");
+  });
+
+  it("groups decisions ahead of lessons so guidance reads before failures", () => {
+    const [record] = decisionRecords(venue, parseEventDecisions(md));
+    const brief = groupEventKnowledge([{ ...record, id: "1", similarity: 0.8 }]);
+    expect(brief.decisions).toHaveLength(1);
+    expect(brief.lessons).toHaveLength(0);
+    expect(brief.other).toHaveLength(0);
   });
 });

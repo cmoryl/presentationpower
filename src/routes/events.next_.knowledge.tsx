@@ -62,6 +62,7 @@ const KIND_LABELS: Record<EventKnowledgeKind, string> = {
   ground: "Approved ground",
   substrate: "Substrate & print",
   lesson: "Build lesson",
+  decision: "Settled decision",
   outcome: "Shipped live file",
 };
 
@@ -71,6 +72,7 @@ const KIND_TONES: Record<EventKnowledgeKind, string> = {
   ground: "bg-[#F2F2F2] text-[#03002C]",
   substrate: "bg-[#F2F2F2] text-[#03002C]",
   lesson: "bg-[#FFEB66]/45 text-[#03002C]",
+  decision: "bg-[#C2A3FF]/40 text-[#03002C]",
   outcome: "bg-[#A6FA87]/40 text-[#03002C]",
 };
 
@@ -79,6 +81,7 @@ const EXAMPLES = [
   "Which grounds are approved for a press wall?",
   "What did we learn about exporting QR codes for print?",
   "Step and repeat wall sizes and returns",
+  "Why do hub cards show flat artwork instead of the in-scene render?",
   "Which sign families have no template yet?",
 ];
 
@@ -194,7 +197,13 @@ function KnowledgePage() {
   const pending = totals.records - totals.embedded;
   const brief = search.data?.brief;
   const ordered = brief
-    ? [...brief.specs, ...brief.placement, ...brief.lessons, ...brief.other]
+    ? [
+        ...brief.decisions,
+        ...brief.specs,
+        ...brief.placement,
+        ...brief.lessons,
+        ...brief.other,
+      ]
     : [];
 
   function ask(next: string) {
@@ -368,6 +377,9 @@ function KnowledgePage() {
                 {brief?.specs.length
                   ? ` · ${brief.specs.length} measured ${brief.specs.length === 1 ? "spec" : "specs"}`
                   : ""}
+                {brief?.decisions.length
+                  ? ` · ${brief.decisions.length} settled ${brief.decisions.length === 1 ? "decision" : "decisions"}`
+                  : ""}
                 {brief?.lessons.length ? ` · ${brief.lessons.length} lessons` : ""}
               </p>
               {ordered.map((hit) => (
@@ -378,7 +390,8 @@ function KnowledgePage() {
             <div className="mt-6 rounded-xl border border-black/10 bg-white p-5 text-[13.5px] text-black/65">
               Nothing in the store is close enough to answer that yet. If the answer exists in this
               build, run “Learn from this event” to re-harvest — and if it was a judgement call, add
-              it to the lessons log so it is here next time.
+              it to the lessons log — or, if it was a choice between options, the decisions log — so
+              it is here next time.
             </div>
           )
         ) : null}

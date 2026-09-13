@@ -14,11 +14,15 @@ import {
   Layers,
   MapPin,
   Ruler,
+  Scale,
   Image as ImageIcon,
   ListChecks,
 } from "lucide-react";
 
+import decisionsMarkdown from "../../docs/EVENT-DECISIONS.md?raw";
+
 import { AppShell } from "@/components/AppShell";
+import { parseEventDecisions } from "@/lib/event-knowledge";
 import {
   LONDON_PANELS,
   LONDON_PRINT_SPEC,
@@ -93,6 +97,7 @@ function mm(n: number) {
 
 function PlaybookPage() {
   const audit = useMemo(() => venueTemplateAudit<LondonPanel>(LONDON_PANELS), []);
+  const decisions = useMemo(() => parseEventDecisions(decisionsMarkdown), []);
   const grounds = useMemo(
     () => [...new Set(LONDON_PANELS.map((p) => p.style))].filter((id) => LONDON_STYLES[id]),
     [],
@@ -296,6 +301,60 @@ function PlaybookPage() {
             Every sign in the London set now belongs to a reusable family.
           </p>
         )}
+
+        <h2 className="mt-10 flex items-center gap-2 text-lg font-semibold tracking-tight text-[#03002C]">
+          <Scale size={16} className="text-[#003FC7]" /> Settled decisions
+        </h2>
+        <p className="mt-1 text-[13px] text-black/60">
+          Choices made between real, tested options. Each one names what it beat and what would
+          reopen it, so a new city inherits the reasoning instead of re-testing the losing option.
+        </p>
+        <ul className="mt-4 space-y-3">
+          {decisions.map((decision) => (
+            <li
+              key={decision.title}
+              className="rounded-lg border border-black/10 bg-white px-4 py-3"
+            >
+              <div className="flex flex-wrap items-baseline gap-x-2">
+                <h3 className="text-[14px] font-semibold text-[#03002C]">{decision.title}</h3>
+                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-black/40">
+                  {decision.date}
+                </span>
+                {decision.appliesTo ? (
+                  <span className="ml-auto rounded-full bg-[#EEF1F7] px-2 py-0.5 text-[10px] text-[#03002C]">
+                    {decision.appliesTo.replace(/\.$/, "")}
+                  </span>
+                ) : null}
+              </div>
+              <dl className="mt-1.5 space-y-1 text-[12.5px] leading-relaxed text-black/70">
+                {decision.chosen ? (
+                  <div>
+                    <dt className="inline font-medium text-[#03002C]">Chosen: </dt>
+                    <dd className="inline">{decision.chosen}</dd>
+                  </div>
+                ) : null}
+                {decision.optionsTested ? (
+                  <div>
+                    <dt className="inline font-medium text-[#03002C]">It beat: </dt>
+                    <dd className="inline">{decision.optionsTested}</dd>
+                  </div>
+                ) : null}
+                {decision.why ? (
+                  <div>
+                    <dt className="inline font-medium text-[#03002C]">Why: </dt>
+                    <dd className="inline">{decision.why}</dd>
+                  </div>
+                ) : null}
+                {decision.wouldChangeIf ? (
+                  <div>
+                    <dt className="inline font-medium text-[#03002C]">Reopens if: </dt>
+                    <dd className="inline">{decision.wouldChangeIf}</dd>
+                  </div>
+                ) : null}
+              </dl>
+            </li>
+          ))}
+        </ul>
 
         <h2 className="mt-10 text-lg font-semibold tracking-tight text-[#03002C]">
           In-event views the ecosystem can reuse
