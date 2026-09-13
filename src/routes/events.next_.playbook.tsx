@@ -8,7 +8,15 @@
 
 import { useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Layers, MapPin, Ruler, Image as ImageIcon, ListChecks } from "lucide-react";
+import {
+  ArrowLeft,
+  Brain,
+  Layers,
+  MapPin,
+  Ruler,
+  Image as ImageIcon,
+  ListChecks,
+} from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import {
@@ -108,6 +116,12 @@ function PlaybookPage() {
           className="ml-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#003FC7] hover:underline"
         >
           <MapPin size={13} /> Start the next city
+        </Link>
+        <Link
+          to="/events/next/knowledge"
+          className="ml-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#003FC7] hover:underline"
+        >
+          <Brain size={13} /> Ask the knowledge store
         </Link>
 
         <div className="mt-3">
