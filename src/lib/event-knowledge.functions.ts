@@ -31,10 +31,18 @@ async function assertBrandTeam(
   }
 }
 
-/** Re-harvest every derivable record and upsert it by fingerprint. */
+/** How many records one sync call handles. Kept small deliberately: embedding
+ * the whole venue in one request outlives the platform's request timeout, so the
+ * work is resumable in slices and each slice is written before returning. */
+const SYNC_SLICE = 40;
+
+/** Re-harvest a slice of derivable records and upsert it by fingerprint. */
 export const syncEventKnowledge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((input?: { offset?: number } | null) => ({
+    offset: Math.max(0, Math.floor(input?.offset ?? 0)),
+  }))
+  .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertBrandTeam(supabase as never, userId);
 
@@ -42,7 +50,12 @@ export const syncEventKnowledge = createServerFn({ method: "POST" })
       await import("@/lib/event-knowledge.server");
     const { EVENT_KNOWLEDGE_EMBEDDING_MODEL } = await import("@/lib/event-knowledge");
 
-    const records = harvestLondonKnowledge();
+    const all = harvestLondonKnowledge();
+    const records = all.slice(data.offset, data.offset + SYNC_SLICE);
+    if (!records.length) {
+      return { total: all.length, offset: all.length, written: 0, embedded: 0, pending: 0, done: true, failures: [] as string[] };
+    }
+
     const { vectors, failures } = await embedEventKnowledge(records.map(eventKnowledgeText));
 
     const rows = records.map((record, i) => ({
@@ -51,23 +64,24 @@ export const syncEventKnowledge = createServerFn({ method: "POST" })
       model: vectors[i] ? EVENT_KNOWLEDGE_EMBEDDING_MODEL : null,
     }));
 
-    let written = 0;
-    for (let start = 0; start < rows.length; start += 200) {
-      const { error } = await supabase
-        .from("event_venue_knowledge")
-        .upsert(rows.slice(start, start + 200) as never, { onConflict: "fingerprint" });
-      if (error) throw new Error(error.message);
-      written += Math.min(200, rows.length - start);
-    }
+    const { error } = await supabase
+      .from("event_venue_knowledge")
+      .upsert(rows as never, { onConflict: "fingerprint" });
+    if (error) throw new Error(error.message);
 
+    const offset = data.offset + records.length;
     return {
-      written,
+      total: all.length,
+      offset,
+      written: records.length,
       embedded: vectors.filter(Boolean).length,
       // Surfaced, never swallowed: an un-embedded record cannot be found.
       pending: vectors.filter((v) => !v).length,
+      done: offset >= all.length,
       failures: failures.map((f) => f.message),
     };
   });
+
 
 export type EventKnowledgeSearchInput = {
   question: string;
