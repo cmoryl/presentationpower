@@ -2044,6 +2044,66 @@ export type Database = {
         }
         Relationships: []
       }
+      event_venue_knowledge: {
+        Row: {
+          body: string
+          city: string
+          created_at: string
+          created_by: string | null
+          embedding: string | null
+          event_id: string
+          facts: Json
+          fingerprint: string
+          id: string
+          kind: string
+          model: string | null
+          panel_id: string | null
+          source: string
+          template_family_id: string | null
+          title: string
+          updated_at: string
+          venue: string
+        }
+        Insert: {
+          body: string
+          city: string
+          created_at?: string
+          created_by?: string | null
+          embedding?: string | null
+          event_id?: string
+          facts?: Json
+          fingerprint: string
+          id?: string
+          kind: string
+          model?: string | null
+          panel_id?: string | null
+          source?: string
+          template_family_id?: string | null
+          title: string
+          updated_at?: string
+          venue?: string
+        }
+        Update: {
+          body?: string
+          city?: string
+          created_at?: string
+          created_by?: string | null
+          embedding?: string | null
+          event_id?: string
+          facts?: Json
+          fingerprint?: string
+          id?: string
+          kind?: string
+          model?: string | null
+          panel_id?: string | null
+          source?: string
+          template_family_id?: string | null
+          title?: string
+          updated_at?: string
+          venue?: string
+        }
+        Relationships: []
+      }
       globallink_config: {
         Row: {
           batch_size: number
@@ -4134,6 +4194,28 @@ export type Database = {
           source_type: string
           tags: string[]
           weighted_similarity: number
+        }[]
+      }
+      match_event_knowledge: {
+        Args: {
+          filter_city?: string
+          filter_kind?: string
+          match_count?: number
+          query_embedding: string
+        }
+        Returns: {
+          body: string
+          city: string
+          event_id: string
+          facts: Json
+          id: string
+          kind: string
+          panel_id: string
+          similarity: number
+          source: string
+          template_family_id: string
+          title: string
+          venue: string
         }[]
       }
       record_share_view: {
