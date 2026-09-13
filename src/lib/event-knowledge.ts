@@ -33,6 +33,9 @@ export type EventKnowledgeKind =
   /** Something that actually shipped — a published live file. */
   | "outcome";
 
+/** JSON-safe facts: these cross the wire and land in a jsonb column. */
+export type EventKnowledgeFacts = Record<string, string | number | boolean | null>;
+
 export type EventKnowledgeRecord = {
   eventId: string;
   city: string;
@@ -42,7 +45,7 @@ export type EventKnowledgeRecord = {
   kind: EventKnowledgeKind;
   title: string;
   body: string;
-  facts: Record<string, unknown>;
+  facts: EventKnowledgeFacts;
   source: "harvest" | "publish" | "lesson-log" | "manual";
   /** Stable identity so re-harvesting updates rather than duplicates. */
   fingerprint: string;
