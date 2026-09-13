@@ -5,15 +5,18 @@
 // them into vectors through the Lovable AI Gateway so a new venue can search
 // precedent semantically instead of reading 154 rows.
 
+import decisionsMarkdown from "../../docs/EVENT-DECISIONS.md?raw";
 import lessonsMarkdown from "../../docs/EVENT-LESSONS.md?raw";
 
 import {
   EVENT_KNOWLEDGE_EMBEDDING_MODEL,
+  decisionRecords,
   eventKnowledgeText,
   harvestFamilyKnowledge,
   harvestGrounds,
   harvestPanelSpecs,
   lessonRecords,
+  parseEventDecisions,
   parseEventLessons,
   type EventKnowledgeRecord,
   type HarvestFamily,
@@ -82,7 +85,13 @@ export function harvestLondonKnowledge(): EventKnowledgeRecord[] {
     ),
     ...harvestGrounds(LONDON_HARVEST_VENUE, LONDON_STYLES, panels),
     ...lessonRecords(LONDON_HARVEST_VENUE, parseEventLessons(lessonsMarkdown)),
+    ...decisionRecords(LONDON_HARVEST_VENUE, parseEventDecisions(decisionsMarkdown)),
   ];
+}
+
+/** Raw decision-log entries, so the playbook can list them without a round trip. */
+export function eventDecisions() {
+  return parseEventDecisions(decisionsMarkdown);
 }
 
 /** Raw lesson-log entries, so the playbook can list them without a round trip. */

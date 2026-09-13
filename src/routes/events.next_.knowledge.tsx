@@ -62,6 +62,7 @@ const KIND_LABELS: Record<EventKnowledgeKind, string> = {
   ground: "Approved ground",
   substrate: "Substrate & print",
   lesson: "Build lesson",
+  decision: "Settled decision",
   outcome: "Shipped live file",
 };
 
@@ -71,6 +72,7 @@ const KIND_TONES: Record<EventKnowledgeKind, string> = {
   ground: "bg-[#F2F2F2] text-[#03002C]",
   substrate: "bg-[#F2F2F2] text-[#03002C]",
   lesson: "bg-[#FFEB66]/45 text-[#03002C]",
+  decision: "bg-[#C2A3FF]/40 text-[#03002C]",
   outcome: "bg-[#A6FA87]/40 text-[#03002C]",
 };
 
@@ -79,6 +81,7 @@ const EXAMPLES = [
   "Which grounds are approved for a press wall?",
   "What did we learn about exporting QR codes for print?",
   "Step and repeat wall sizes and returns",
+  "Why do hub cards show flat artwork instead of the in-scene render?",
   "Which sign families have no template yet?",
 ];
 
