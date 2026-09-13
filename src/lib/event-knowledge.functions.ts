@@ -12,6 +12,7 @@ import {
   eventKnowledgeText,
   groupEventKnowledge,
   outcomeRecord,
+  type EventKnowledgeFacts,
   type EventKnowledgeHit,
   type EventKnowledgeRecord,
 } from "@/lib/event-knowledge";
@@ -101,8 +102,8 @@ export const searchEventKnowledge = createServerFn({ method: "POST" })
     const { data: rows, error } = await supabase.rpc("match_event_knowledge", {
       query_embedding: embeddingLiteral(vector) as never,
       match_count: data.limit,
-      filter_city: data.city,
-      filter_kind: data.kind,
+      filter_city: data.city ?? undefined,
+      filter_kind: data.kind ?? undefined,
     });
     if (error) throw new Error(error.message);
 
@@ -117,7 +118,7 @@ export const searchEventKnowledge = createServerFn({ method: "POST" })
         kind: EventKnowledgeRecord["kind"];
         title: string;
         body: string;
-        facts: Record<string, unknown>;
+        facts: EventKnowledgeFacts;
         source: EventKnowledgeRecord["source"];
         similarity: number;
       };
@@ -215,7 +216,7 @@ export const embedEventKnowledgeBacklog = createServerFn({ method: "POST" })
       kind: row.kind as EventKnowledgeRecord["kind"],
       title: row.title,
       body: row.body,
-      facts: (row.facts ?? {}) as Record<string, unknown>,
+      facts: (row.facts ?? {}) as EventKnowledgeFacts,
       source: row.source as EventKnowledgeRecord["source"],
       fingerprint: row.fingerprint,
     }));
