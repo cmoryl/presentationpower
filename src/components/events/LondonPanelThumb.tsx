@@ -5,13 +5,13 @@
 // until the row scrolls into view — the full kit is 105 panels and each master
 // embeds the EPS lockup geometry.
 
-import { londonSuppliedGroundUrl } from "@/lib/next-london-supplied-masters";
+import { londonPanelArtworkSrc } from "@/lib/next-london-supplied-masters";
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { buildLondonPanelSvg } from "@/lib/next-london-revise";
 import { useLondonLivePanel } from "@/hooks/use-london-live-panel";
-import { londonBoothArtworkUrl, type LondonPanel } from "@/lib/next-london-signage";
+import type { LondonPanel } from "@/lib/next-london-signage";
 
 export interface LondonPanelThumbProps {
   panel: LondonPanel;
@@ -69,7 +69,7 @@ export function LondonPanelThumb({
   // Vendor booth panels show the supplied artwork proof itself: an <img> with a
   // data-URL SVG cannot load external references, so the CDN proof is painted
   // directly rather than through the generated master.
-  const boothArt = londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id);
+  const boothArt = londonPanelArtworkSrc(panel.id);
 
   const src = useMemo(() => {
     if (!visible || !faceReady) return null;

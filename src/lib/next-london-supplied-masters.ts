@@ -19,6 +19,7 @@ import regPillarAi from "@/assets/london-supplied/registration-pillar.ai.asset.j
 import regPillarProof from "@/assets/london-supplied/registration-pillar.jpg.asset.json";
 
 import { londonLiveFile } from "@/lib/next-london-live-files";
+import { londonBoothArtworkUrl } from "@/lib/next-london-signage";
 
 export type LondonSuppliedMaster = {
   /** Panel this master replaces. */
@@ -118,4 +119,39 @@ export function londonSuppliedGroundUrl(panelId: string): string | null {
   const live = londonLiveFile(panelId);
   if (live?.proofUrl) return live.proofUrl;
   return BY_PANEL.get(panelId)?.previewUrl ?? null;
+}
+
+/**
+ * THE artwork a sign shows, in one place.
+ *
+ * Order matters and used to be wrong in half the surfaces: a bundled vendor
+ * booth wall was resolved BEFORE a newer published live file, so replacing a
+ * booth master left thumbnails, the live editor, the venue renders and the
+ * downloaded `.ai` painting the artwork that shipped with the build. Anything
+ * that paints or embeds a sign's artwork must call this — never the bundled
+ * lookups directly.
+ */
+export function londonPanelArtworkUrl(panelId: string): string | null {
+  const live = londonLiveFile(panelId);
+  if (live?.proofUrl) return live.proofUrl;
+  return BY_PANEL.get(panelId)?.previewUrl ?? londonBoothArtworkUrl(panelId) ?? null;
+}
+
+/** Version stamp of the artwork in force — changes when a live file is replaced. */
+export function londonPanelArtworkVersion(panelId: string): string {
+  const live = londonLiveFile(panelId);
+  if (live) return `v${live.version}`;
+  const bundled = BY_PANEL.get(panelId);
+  return bundled ? `r${bundled.fromRevision}` : "bundled";
+}
+
+/**
+ * Same artwork, with the version appended as a cache buster. A replaced file
+ * can keep the same URL, and without this a browser keeps the old bitmap.
+ */
+export function londonPanelArtworkSrc(panelId: string): string | null {
+  const url = londonPanelArtworkUrl(panelId);
+  if (!url || url.startsWith("data:") || url.startsWith("blob:")) return url;
+  const version = londonPanelArtworkVersion(panelId);
+  return `${url}${url.includes("?") ? "&" : "?"}v=${encodeURIComponent(version)}`;
 }

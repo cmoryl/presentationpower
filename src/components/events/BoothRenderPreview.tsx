@@ -24,11 +24,8 @@ import {
   type LondonBoothShell,
 } from "@/lib/next-london-booth-shells";
 import type { LondonPanel } from "@/lib/next-london-signage";
-import {
-  londonBoothArtworkUrl,
-  londonBoothShell,
-  londonBoothTvAvailable,
-} from "@/lib/next-london-signage";
+import { londonBoothShell, londonBoothTvAvailable } from "@/lib/next-london-signage";
+import { londonPanelArtworkSrc } from "@/lib/next-london-supplied-masters";
 
 export type BoothRenderPreviewProps = {
   panel: LondonPanel;
@@ -114,7 +111,7 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
   const cardStage = useRef<HTMLDivElement | null>(null);
   const zoomStage = useRef<HTMLDivElement | null>(null);
   const shell: LondonBoothShell = boothShell(shellId);
-  const art = londonBoothArtworkUrl(panel.id);
+  const art = londonPanelArtworkSrc(panel.id);
   const face = shell.renderFace;
   const page = bleedFrame(panel);
 

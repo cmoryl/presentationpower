@@ -22,7 +22,7 @@
 // from its own snapshot, and restoring an old revision publishes it forward as
 // a new revision rather than rewriting the past.
 
-import { londonSuppliedGroundUrl } from "@/lib/next-london-supplied-masters";
+import { londonPanelArtworkUrl } from "@/lib/next-london-supplied-masters";
 import {
   LONDON_PANELS,
   LONDON_STYLES,
@@ -696,7 +696,7 @@ export function buildLondonPanelSvg(panelIn: LondonPanel, options: LondonArtOpti
 
   // Supplied vendor booth artwork, when the vendor has delivered their file:
   // it becomes the ground so previews and masters match the real booth.
-  const boothArt = londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id);
+  const boothArt = londonPanelArtworkUrl(panel.id);
 
   // Designer-uploaded vector artwork: its own layer, live paths.
   const placed = options.placedArt === undefined ? londonPlacedArt(panel.id) : options.placedArt;
@@ -1709,7 +1709,7 @@ export async function buildLondonPanelAiAsync(
   // artwork first, then a hand-finished or uploaded live-file proof. Without the
   // second fallback a downloaded master would print the house gradient instead
   // of the approved artwork everyone can see on the card.
-  const art = londonBoothArtworkUrl(panel.id) ?? londonSuppliedGroundUrl(panel.id);
+  const art = londonPanelArtworkUrl(panel.id);
   const groundImage = options.groundImage ?? (art ? await loadLondonGroundImage(art) : null);
   return buildLondonPanelAi(panel, { ...options, groundImage });
 }
