@@ -431,7 +431,7 @@ registerSlideModule({
               }}
             >
               {items.map((it, i) => {
-                const pct = Number(String(s(it.value)).replace(/[^0-9.\-]/g, ""));
+                const pct = Number(String(s(it.value)).replace(/[^0-9.-]/g, ""));
                 return (
                   <div key={i} className="slide-fill-center min-w-0">
                     <StatFigure
