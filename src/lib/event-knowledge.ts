@@ -30,6 +30,8 @@ export type EventKnowledgeKind =
   | "substrate"
   /** A judgement call, mistake or rejected approach. */
   | "lesson"
+  /** A settled choice between tested options, with the alternatives it beat. */
+  | "decision"
   /** Something that actually shipped — a published live file. */
   | "outcome";
 
