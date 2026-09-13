@@ -197,7 +197,13 @@ function KnowledgePage() {
   const pending = totals.records - totals.embedded;
   const brief = search.data?.brief;
   const ordered = brief
-    ? [...brief.specs, ...brief.placement, ...brief.lessons, ...brief.other]
+    ? [
+        ...brief.decisions,
+        ...brief.specs,
+        ...brief.placement,
+        ...brief.lessons,
+        ...brief.other,
+      ]
     : [];
 
   function ask(next: string) {
