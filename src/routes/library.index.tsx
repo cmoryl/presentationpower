@@ -487,8 +487,16 @@ function Library() {
   const scopeBrand =
     scopeBrandId === "all" ? undefined : brandModes.find((b) => b.id === scopeBrandId);
   const tpMaster = brandModes.find((b) => b.id === "bm-enterprise") ?? brandModes[0];
-  const restricted = new Set(scopeBrand?.contentScope?.restrictedFamilyIds ?? []);
-  const preferred = new Set(scopeBrand?.contentScope?.preferredVariantIds ?? []);
+  // Memoised: these Sets feed matchEntry's dependency list, so rebuilding them
+  // on every render made the whole filtered library recompute every render.
+  const restricted = useMemo(
+    () => new Set(scopeBrand?.contentScope?.restrictedFamilyIds ?? []),
+    [scopeBrand],
+  );
+  const preferred = useMemo(
+    () => new Set(scopeBrand?.contentScope?.preferredVariantIds ?? []),
+    [scopeBrand],
+  );
 
   // Keep the modal's brand preview in sync with the active scope filter so
   // opening a card while scope=TP Media (etc.) shows that brand's imagery in
@@ -501,7 +509,7 @@ function Library() {
     // that template with the scope, unless the visitor is already holding it.
     const ownLook = packIdForBrandMode(scopeBrand.id);
     if (ownLook && lookBrandModeId(packId) !== scopeBrand.id) setPackId(ownLook);
-  }, [scopeBrand?.id, brandModes]);
+  }, [scopeBrand?.id, brandModes, packId]);
 
   const toggle = (set: Set<string>, id: string) => {
     const next = new Set(set);
@@ -624,6 +632,7 @@ function Library() {
     pins,
     sort,
     usageByVariant,
+    matchEntry,
   ]);
 
   const hasFilters =
@@ -1703,7 +1712,7 @@ const VariantCard = memo(function VariantCard({
     if (!logoHubPool || logoHubPool.length === 0) return rawContent;
     if (!/^MV-(PROOF-LOGOS|CASE-LOGO-GRID|LOGO-WALL)/.test(variant.id)) return rawContent;
     return overlayLogoHubFillers(rawContent, variant.id, logoHubPool);
-  }, [rawContent, videoExample, logoHubPool, variant.id, preset, brief.prospect]);
+  }, [rawContent, videoExample, logoHubPool, variant.id, preset, brief.prospect, brand.id]);
   const previewSlide = {
     id: videoExample
       ? `${variant.id}:video:${videoExample.key}`

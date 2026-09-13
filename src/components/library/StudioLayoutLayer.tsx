@@ -20,7 +20,7 @@
 //     underlying variant layout keeps its flow and simply shifts — an
 //     automatic reflow that can never detach content from the slide.
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SampleLayout, StudioFreeLayer } from "@/hooks/use-variant-samples";
 
 const SLIDE_W = 1920;
@@ -105,8 +105,8 @@ export function StudioLayoutLayer({
   const [editingId, setEditingId] = useState<string | null>(null);
   const dragRef = useRef<{ state: DragState; px: number; py: number } | null>(null);
 
-  const layers = layout.layers ?? [];
-  const offsets = layout.offsets ?? {};
+  const layers = useMemo(() => layout.layers ?? [], [layout.layers]);
+  const offsets = useMemo(() => layout.offsets ?? {}, [layout.offsets]);
 
   // ── Stage scale (slide px → screen px) ──────────────────────────────────
   useEffect(() => {

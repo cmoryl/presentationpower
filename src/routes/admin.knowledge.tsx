@@ -608,7 +608,7 @@ function SourcesTab({ slug }: { slug: string }) {
     enabled: !!openId,
   });
 
-  const rows = rowsQ.data ?? [];
+  const rows = useMemo(() => rowsQ.data ?? [], [rowsQ.data]);
   const totals = useMemo(() => {
     return {
       ok: rows.filter((r) => r.status === "ok").length,

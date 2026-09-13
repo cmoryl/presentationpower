@@ -65,7 +65,7 @@ function MyModules() {
     queryKey: ["saved-modules"],
     queryFn: () => listFn(),
   });
-  const rows = (data ?? []) as SavedRow[];
+  const rows = useMemo(() => (data ?? []) as SavedRow[], [data]);
 
   const [q, setQ] = useState("");
   const [kindFilter, setKindFilter] = useState<"all" | "populated" | "template">("all");

@@ -105,7 +105,7 @@ export function ReviewerAssignments({
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const rows = assigned.data?.assignees ?? [];
+  const rows = useMemo(() => assigned.data?.assignees ?? [], [assigned.data]);
   const people = assigned.data?.people ?? {};
   const me = assigned.data?.userId ?? "";
 

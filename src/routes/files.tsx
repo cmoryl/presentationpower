@@ -153,7 +153,7 @@ function MyFilesPage() {
     enabled: signedIn === true,
   });
 
-  const rows = (data ?? []) as MyFile[];
+  const rows = useMemo(() => (data ?? []) as MyFile[], [data]);
 
   const [q, setQ] = useState("");
   const [kind, setKind] = useState<"all" | MyFileKind>("all");

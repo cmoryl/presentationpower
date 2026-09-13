@@ -75,9 +75,12 @@ export function PrintDemoStudioPanel({
   onResetLayout,
   accent = "#003FC7",
 }: Props) {
-  const bag = (content ?? {}) as Record<string, unknown>;
+  const bag = useMemo(() => (content ?? {}) as Record<string, unknown>, [content]);
   const hero = bag["heroMedia"] as PrintHeroMedia | undefined;
-  const modules = Array.isArray(bag["modules"]) ? (bag["modules"] as PrintSection[]) : [];
+  const modules = useMemo(
+    () => (Array.isArray(bag["modules"]) ? (bag["modules"] as PrintSection[]) : []),
+    [bag],
+  );
   const capacityKind = CAPACITY_KINDS.has(kind) ? (kind as PrintTemplateKind) : null;
 
   const copy = {

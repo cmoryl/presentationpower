@@ -110,7 +110,7 @@ function ApprovalQueuePage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const rows = (queue.data?.requests ?? []) as ApprovalRequestRow[];
+  const rows = useMemo(() => (queue.data?.requests ?? []) as ApprovalRequestRow[], [queue.data]);
   const people = queue.data?.people ?? {};
   const commentCounts = queue.data?.commentCounts ?? {};
   const isReviewer = queue.data?.isReviewer ?? false;
