@@ -171,10 +171,7 @@ export const listApprovalRequests = createServerFn({ method: "POST" })
     );
     let people: Record<string, string> = {};
     if (ids.length) {
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, display_name")
-        .in("id", ids);
+      const { data: profs } = await supabase.rpc("display_names", { _ids: ids });
       people = Object.fromEntries((profs ?? []).map((p) => [p.id, p.display_name ?? "Member"]));
     }
 
@@ -385,10 +382,7 @@ export const listApprovalComments = createServerFn({ method: "POST" })
     const ids = Array.from(new Set((rows ?? []).map((r) => r.author_id)));
     let people: Record<string, string> = {};
     if (ids.length) {
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, display_name")
-        .in("id", ids);
+      const { data: profs } = await supabase.rpc("display_names", { _ids: ids });
       people = Object.fromEntries((profs ?? []).map((p) => [p.id, p.display_name ?? "Member"]));
     }
     return { comments: rows ?? [], people };
@@ -492,10 +486,7 @@ export const listApprovalTimeline = createServerFn({ method: "POST" })
     );
     let people: Record<string, string> = {};
     if (ids.length) {
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, display_name")
-        .in("id", ids);
+      const { data: profs } = await supabase.rpc("display_names", { _ids: ids });
       people = Object.fromEntries((profs ?? []).map((p) => [p.id, p.display_name ?? "Member"]));
     }
     return { request: req, events: rows ?? [], people };
