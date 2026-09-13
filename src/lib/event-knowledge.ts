@@ -48,7 +48,7 @@ export type EventKnowledgeRecord = {
   title: string;
   body: string;
   facts: EventKnowledgeFacts;
-  source: "harvest" | "publish" | "lesson-log" | "manual";
+  source: "harvest" | "publish" | "lesson-log" | "decision-log" | "manual";
   /** Stable identity so re-harvesting updates rather than duplicates. */
   fingerprint: string;
 };
