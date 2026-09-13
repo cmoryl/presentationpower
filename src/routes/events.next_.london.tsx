@@ -61,10 +61,7 @@ import {
 } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import { useStepRepeatConfigs } from "@/lib/next-london-step-repeat";
-import {
-  londonPanelArtworkUrl,
-  londonSuppliedMaster,
-} from "@/lib/next-london-supplied-masters";
+import { londonPanelArtworkUrl, londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
 import { buildLondonKitZip } from "@/lib/next-london-kit-zip";
 import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles, useLondonLiveFileSignature } from "@/lib/next-london-live-files";

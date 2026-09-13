@@ -6,10 +6,7 @@
 // step. The editor is intentionally self-contained so it can be mounted in a
 // dialog from any panel listing.
 
-import {
-  londonPanelArtworkSrc,
-  londonSuppliedGroundUrl,
-} from "@/lib/next-london-supplied-masters";
+import { londonPanelArtworkSrc, londonSuppliedGroundUrl } from "@/lib/next-london-supplied-masters";
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
