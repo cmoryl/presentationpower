@@ -17,7 +17,8 @@ import JSZip from "jszip";
 
 import { buildLondonPanelAi } from "./next-london-revise";
 import type { LondonPanel } from "./next-london-signage";
-import { buildPillarVectorPdf } from "./pillar-vector-pdf";
+import { pillarCmykSignOffCsv, pillarTemplateCmykCsv } from "./next-pillar-cmyk";
+import { buildPillarVectorPdf, type PillarColorSpace } from "./pillar-vector-pdf";
 import {
   PILLAR_SPEC,
   pillarDivision,
@@ -68,6 +69,7 @@ function itemConfig(base: PillarConfig, item: PillarBatchItem): PillarConfig {
 function manifest(
   base: PillarConfig,
   rows: { config: PillarConfig; item: PillarBatchItem; vector: boolean }[],
+  colorSpace: PillarColorSpace = "rgb",
 ): string {
   const total = rows.reduce((n, r) => n + r.item.quantity, 0);
   const lines = [
@@ -98,7 +100,12 @@ function manifest(
     );
   }
   lines.push(
-    `Colour:          convert to ${PILLAR_SPEC.colorMode} at output; body text 100K`,
+    colorSpace === "cmyk"
+      ? `Colour:          built in DeviceCMYK — see printer-colour-sign-off.csv for which`
+      : `Colour:          convert to ${PILLAR_SPEC.colorMode} at output; body text 100K`,
+    colorSpace === "cmyk"
+      ? `                 builds are signed off and which still need printer approval`
+      : `Body text:       100K`,
     `Export preset:   ${PILLAR_SPEC.exportPreset}`,
     "Standard:        PDF/X-4, MediaBox / BleedBox / TrimBox set numerically",
     "",
@@ -111,11 +118,14 @@ function manifest(
 export async function exportPillarBatch(opts: {
   config: PillarConfig;
   items: PillarBatchItem[];
+  /** Output colour space. RGB is the house default; CMYK is opt-in. */
+  colorSpace?: PillarColorSpace;
   onProgress?: (p: PillarBatchProgress) => void;
 }): Promise<PillarBatchResult> {
   // Copy is outlined into vector paths, so the signage face must be in memory
   // before any master is built.
   await loadLondonSignageFace();
+  const colorSpace: PillarColorSpace = opts.colorSpace ?? "rgb";
   const items = opts.items.filter((i) => i.quantity > 0);
   if (items.length === 0) throw new Error("Pick at least one pillar size with a quantity");
 
@@ -136,18 +146,19 @@ export async function exportPillarBatch(opts: {
 
     let bytes: Uint8Array | null = null;
     try {
-      bytes = (await buildPillarVectorPdf(config)).bytes;
+      bytes = (await buildPillarVectorPdf(config, { colorSpace })).bytes;
     } catch {
       bytes = null;
     }
     const folder = `${slug}`;
+    const stem = colorSpace === "cmyk" ? `${slug}-cmyk` : slug;
     if (bytes) {
       const buf = bytes.buffer.slice(
         bytes.byteOffset,
         bytes.byteOffset + bytes.byteLength,
       ) as ArrayBuffer;
-      zip.file(`${folder}/pdf/${slug}.pdf`, buf);
-      zip.file(`${folder}/ai/${slug}.ai`, buf);
+      zip.file(`${folder}/pdf/${stem}.pdf`, buf);
+      zip.file(`${folder}/ai/${stem}.ai`, buf);
     } else {
       zip.file(
         `${folder}/pdf/BUILD-FAILED.txt`,
@@ -157,8 +168,8 @@ export async function exportPillarBatch(opts: {
     }
     try {
       zip.file(
-        `${folder}/ai/${slug}-ground.ai`,
-        buildLondonPanelAi(pillarPanelSpec(config) as LondonPanel),
+        `${folder}/ai/${stem}-ground.ai`,
+        buildLondonPanelAi(pillarPanelSpec(config) as LondonPanel, { colorSpace }),
       );
     } catch {
       // Ground art is a convenience layer; skip it rather than failing the batch.
@@ -179,7 +190,12 @@ export async function exportPillarBatch(opts: {
   }
 
   opts.onProgress?.({ index: items.length, total: items.length, label: "Packaging the batch zip" });
-  zip.file("PRODUCTION-MANIFEST.txt", manifest(opts.config, rows));
+  zip.file("PRODUCTION-MANIFEST.txt", manifest(opts.config, rows, colorSpace));
+  // Colour is the same on every size in the batch, so the printer signs once.
+  if (colorSpace === "cmyk") {
+    zip.file("printer-colour-sign-off.csv", pillarCmykSignOffCsv(opts.config));
+    zip.file("printer-colour-sign-off-all-templates.csv", pillarTemplateCmykCsv(opts.config));
+  }
   const blob = await zip.generateAsync({ type: "blob" });
 
   const eventSlug = (opts.config.eventLabel ?? "")
@@ -190,7 +206,7 @@ export async function exportPillarBatch(opts: {
 
   return {
     blob,
-    filename: `next-pillar-batch${eventSlug ? `-${eventSlug}` : ""}-${pillarName(opts.config)
+    filename: `next-pillar-batch${colorSpace === "cmyk" ? "-cmyk" : ""}${eventSlug ? `-${eventSlug}` : ""}-${pillarName(opts.config)
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "")}.zip`,

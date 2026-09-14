@@ -12,8 +12,14 @@ import { PDFDocument, PDFDict, PDFName, type PDFPage, type PDFRef } from "pdf-li
 
 export type MeshRgb = [number, number, number];
 
-/** Returns the 0–1 RGB colour at a point inside the sheet, in PDF points. */
-export type MeshSampler = (xPt: number, yPt: number) => MeshRgb;
+/** Four 0–1 ink values: cyan, magenta, yellow, black. */
+export type MeshCmyk = [number, number, number, number];
+
+/**
+ * Returns the colour at a point inside the sheet, in PDF points: three
+ * components for a DeviceRGB mesh, four for a DeviceCMYK one.
+ */
+export type MeshSampler = (xPt: number, yPt: number) => MeshRgb | MeshCmyk;
 
 /**
  * Serialise a free-form Gouraud triangle mesh covering [0,w]×[0,h].
@@ -26,31 +32,31 @@ export function buildGouraudMesh(
   sampler: MeshSampler,
   cells = 44,
 ): Uint8Array {
-  const verts: MeshRgb[][] = [];
+  const verts: (MeshRgb | MeshCmyk)[][] = [];
   for (let row = 0; row <= cells; row += 1) {
-    const line: MeshRgb[] = [];
+    const line: (MeshRgb | MeshCmyk)[] = [];
     for (let col = 0; col <= cells; col += 1) {
       line.push(sampler((col / cells) * widthPt, (row / cells) * heightPt));
     }
     verts.push(line);
   }
 
-  const record = 9;
+  // One byte per colour component, so a CMYK mesh record is a byte longer.
+  const comps = verts[0]![0]!.length;
+  const record = 5 + comps;
   const triangles = cells * cells * 2;
   const data = new Uint8Array(triangles * 3 * record);
   let o = 0;
   const push = (col: number, row: number, flag: number) => {
     const x = Math.round((col / cells) * 65535);
     const y = Math.round((row / cells) * 65535);
-    const [r, g, b] = verts[row]![col]!;
+    const colour = verts[row]![col]!;
     data[o++] = flag;
     data[o++] = (x >> 8) & 255;
     data[o++] = x & 255;
     data[o++] = (y >> 8) & 255;
     data[o++] = y & 255;
-    data[o++] = Math.round(r * 255);
-    data[o++] = Math.round(g * 255);
-    data[o++] = Math.round(b * 255);
+    for (const v of colour) data[o++] = Math.round(Math.max(0, Math.min(1, v)) * 255);
   };
   for (let row = 0; row < cells; row += 1) {
     for (let col = 0; col < cells; col += 1) {
@@ -68,13 +74,21 @@ export function buildGouraudMesh(
 }
 
 /** Dictionary entries shared by both the pdf-lib and raw-string writers. */
-export function meshShadingEntries(widthPt: number, heightPt: number): string {
+export function meshShadingEntries(
+  widthPt: number,
+  heightPt: number,
+  space: MeshSpace = "rgb",
+): string {
+  const comps = space === "cmyk" ? 4 : 3;
   return (
-    `/Type /Shading /ShadingType 4 /ColorSpace /DeviceRGB ` +
+    `/Type /Shading /ShadingType 4 /ColorSpace /${space === "cmyk" ? "DeviceCMYK" : "DeviceRGB"} ` +
     `/BitsPerCoordinate 16 /BitsPerComponent 8 /BitsPerFlag 8 ` +
-    `/Decode [0 ${round3(widthPt)} 0 ${round3(heightPt)} 0 1 0 1 0 1]`
+    `/Decode [0 ${round3(widthPt)} 0 ${round3(heightPt)}${" 0 1".repeat(comps)}]`
   );
 }
+
+/** Paint space of the mesh. CMYK meshes carry four components per vertex. */
+export type MeshSpace = "rgb" | "cmyk";
 
 function round3(n: number): number {
   return Math.round(n * 1000) / 1000;
@@ -90,16 +104,20 @@ export function registerMeshShading(
   widthPt: number,
   heightPt: number,
   sampler: MeshSampler,
+  space: MeshSpace = "rgb",
 ): { name: PDFName; ref: PDFRef } {
   const data = buildGouraudMesh(widthPt, heightPt, sampler);
+  const comps = space === "cmyk" ? 4 : 3;
+  const decode = [0, widthPt, 0, heightPt];
+  for (let i = 0; i < comps; i += 1) decode.push(0, 1);
   const stream = doc.context.flateStream(data, {
     Type: PDFName.of("Shading"),
     ShadingType: 4,
-    ColorSpace: PDFName.of("DeviceRGB"),
+    ColorSpace: PDFName.of(space === "cmyk" ? "DeviceCMYK" : "DeviceRGB"),
     BitsPerCoordinate: 16,
     BitsPerComponent: 8,
     BitsPerFlag: 8,
-    Decode: [0, widthPt, 0, heightPt, 0, 1, 0, 1, 0, 1],
+    Decode: decode,
   });
   const ref = doc.context.register(stream);
 

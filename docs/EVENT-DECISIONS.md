@@ -209,3 +209,11 @@ flagged gradients, which would let them carry the dark face.
 **Why:** Brand colour is never silently converted, but printers do ask for CMYK. Labelling makes the risk explicit instead of hiding it, and the ledger doubles as the approval sheet.
 **Would change if:** the print house signs off the remaining 54 builds — then those move into `APPROVED` in `next-london-cmyk.ts` and the sign-off warning disappears on its own.
 **Applies to:** any venue reusing the London sign families; supplied vendor/venue masters are still handed on untouched in their own colour space.
+
+### 2026-09 — NEXT pillar CMYK is built per pillar with its own sign-off sheet
+**Area:** Print colour management (NEXT pillar signs, both templates, all cities)
+**Options tested:** (a) route pillars through the London signage CMYK pack; (b) approve the NEXT ascent violet→aqua ramp centrally and treat pillars as approved; (c) build pillars in DeviceCMYK on demand from the studio, with a per-pillar ledger and its own printer sign-off CSV.
+**Chosen:** (c). `buildPillarVectorPdf(config, { colorSpace: "cmyk" })` paints ground mesh, chevron device, lockup, outlined type and QR in DeviceCMYK (`pdf-mesh-shading` now emits 4-component Gouraud meshes); `next-pillar-cmyk.ts` reports every colour with its role — ground, chevron device, division lockup, headline + sub-line, QR modules, QR plate — and writes `printer-colour-sign-off.csv` plus an all-templates roll-up. RGB stays the default in the studio and both export paths.
+**Why:** Pillar colour is not London panel colour — the ascent template's ramp and chevron ink come off the supplied Canva master and have never been on press, so they must show as conversions. A per-pillar sheet keeps the chevron device approvable on its own line instead of buried in a 57-row signage ledger. (a) mislabels pillar stops; (b) approves colour no printer has proofed.
+**Would change if:** the print house signs off the ascent ramp and chevron ink — those hexes move into `APPROVED` in `next-london-cmyk.ts` and the pillar ledger reports fully approved with no code change.
+**Applies to:** classic column and NEXT ascent pillars, single and batch exports, every city reusing the pillar families.

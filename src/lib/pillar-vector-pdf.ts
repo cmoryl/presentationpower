@@ -36,9 +36,11 @@ import {
   moveTo,
   popGraphicsState,
   pushGraphicsState,
+  cmyk,
   rgb,
-  setFillingRgbColor,
+  setFillingColor,
   translate,
+  type Color,
   type PDFFont,
   type PDFPage,
 } from "pdf-lib";
@@ -65,6 +67,8 @@ import {
   type PillarConfig,
 } from "./next-pillar-masters";
 import { PILLAR_LOGO_DROP } from "./next-pillar-masters";
+import { londonCmykBuild } from "./next-london-cmyk";
+import { pillarCmykLedger, pillarCmykSignOffCsv, pillarCmykSummary } from "./next-pillar-cmyk";
 import { registerMeshShading, type MeshSampler } from "./pdf-mesh-shading";
 import {
   pillarChevronBands,
@@ -90,6 +94,15 @@ export type PillarLayerName =
   | "08 Placed artwork"
   | "09 Chevron device";
 
+/** Output colour space. RGB stays the house default; CMYK is opt-in. */
+export type PillarColorSpace = "rgb" | "cmyk";
+
+export type PillarVectorOptions = {
+  colorSpace?: PillarColorSpace;
+  /** Dot-gain pre-compensation for converted colours. 1 is the tuned default. */
+  vibrance?: number;
+};
+
 export type PillarVectorResult = {
   bytes: Uint8Array<ArrayBuffer>;
   layers: PillarLayerName[];
@@ -98,6 +111,20 @@ export type PillarVectorResult = {
   page: { widthPt: number; heightPt: number };
   /** PDF/X-4 conformance result: embedded output intent + colour tagging. */
   pdfx: PdfX4Applied;
+  /** Colour space the artwork is painted in. */
+  colorSpace: PillarColorSpace;
+  /**
+   * Colour honesty, on a CMYK build: how many of the sign's colours carry a
+   * signed-off brand build, the printer's sign-off sheet, and a one-line
+   * summary. Null on an RGB build, where nothing has been converted.
+   */
+  cmyk: {
+    approved: number;
+    converted: number;
+    fullyApproved: boolean;
+    signOffCsv: string;
+    summary: string;
+  } | null;
 };
 
 // ── colour ───────────────────────────────────────────────────────────────────
@@ -140,10 +167,10 @@ function endLayer(page: PDFPage): void {
   page.pushOperators(popGraphicsState(), PDFOperator.of(Ops.EndMarkedContent));
 }
 
-function polygon(page: PDFPage, points: [number, number][], color: [number, number, number]): void {
+function polygon(page: PDFPage, points: [number, number][], color: Color): void {
   if (points.length < 3) return;
   page.pushOperators(
-    setFillingRgbColor(round(color[0]), round(color[1]), round(color[2])),
+    setFillingColor(color),
     moveTo(points[0]![0], points[0]![1]),
     ...points.slice(1).map(([x, y]) => lineTo(x, y)),
     closePath(),
@@ -153,6 +180,19 @@ function polygon(page: PDFPage, points: [number, number][], color: [number, numb
 
 function round(n: number): number {
   return Math.round(n * 1000) / 1000;
+}
+
+/**
+ * One brand colour as paint. On an RGB build this is the colour itself; on a
+ * CMYK build it is the signed-off press build where one exists, otherwise the
+ * measured conversion — which the sign-off ledger reports as unapproved.
+ */
+function painter(space: PillarColorSpace, vibrance: number): (hex: string) => Color {
+  if (space === "rgb") return (hex) => rgb(...hexRgb(hex));
+  return (hex) => {
+    const b = londonCmykBuild(hex, vibrance);
+    return cmyk(round(b.c), round(b.m), round(b.y), round(b.k));
+  };
 }
 
 // ── mesh gradient ground ─────────────────────────────────────────────────────
@@ -192,6 +232,19 @@ function groundSampler(w: number, h: number, stops: string[], styleId: string): 
   return (x, y) => mixRgb(stops, (x * ux + y * uy - origin) / len);
 }
 
+/** The same colour field, resolved to ink so the ground separates as CMYK. */
+function cmykSampler(rgbSampler: MeshSampler, vibrance: number): MeshSampler {
+  return (x, y) => {
+    const [r, g, b] = rgbSampler(x, y) as [number, number, number];
+    const hx = (n: number) =>
+      Math.round(Math.max(0, Math.min(1, n)) * 255)
+        .toString(16)
+        .padStart(2, "0");
+    const build = londonCmykBuild(`#${hx(r)}${hx(g)}${hx(b)}`, vibrance);
+    return [build.c, build.m, build.y, build.k];
+  };
+}
+
 function drawGround(
   doc: PDFDocument,
   page: PDFPage,
@@ -199,8 +252,18 @@ function drawGround(
   h: number,
   stops: string[],
   styleId: string,
+  space: PillarColorSpace,
+  vibrance: number,
 ): void {
-  const { name } = registerMeshShading(doc, page, w, h, groundSampler(w, h, stops, styleId));
+  const sampler = groundSampler(w, h, stops, styleId);
+  const { name } = registerMeshShading(
+    doc,
+    page,
+    w,
+    h,
+    space === "cmyk" ? cmykSampler(sampler, vibrance) : sampler,
+    space === "cmyk" ? "cmyk" : "rgb",
+  );
   // pdf-lib has no `sh` helper; emit the shading-fill operator directly.
   page.pushOperators(PDFOperator.of("sh" as never, [name]));
 }
@@ -297,7 +360,13 @@ async function ttf(doc: PDFDocument, path: string): Promise<PDFFont | null> {
   }
 }
 
-export async function buildPillarVectorPdf(config: PillarConfig): Promise<PillarVectorResult> {
+export async function buildPillarVectorPdf(
+  config: PillarConfig,
+  options: PillarVectorOptions = {},
+): Promise<PillarVectorResult> {
+  const colorSpace: PillarColorSpace = options.colorSpace ?? "rgb";
+  const vibrance = options.vibrance ?? 1;
+  const paint = painter(colorSpace, vibrance);
   const geo = pillarGeometry(config);
   const face = config.face ?? "dark";
   const ink = pillarInk(face);
@@ -408,14 +477,23 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     endPath(),
   );
   // A template with its own measured ground runs top-to-bottom like the master.
-  drawGround(doc, page, bleedW, bleedH, stops, template.stops ? "01-beam-violet-aqua" : config.styleId);
+  drawGround(
+    doc,
+    page,
+    bleedW,
+    bleedH,
+    stops,
+    template.stops ? "01-beam-violet-aqua" : config.styleId,
+    colorSpace,
+    vibrance,
+  );
   page.pushOperators(popGraphicsState());
   endLayer(page);
 
   // ── 09 Chevron device ──────────────────────────────────────────────────────
   if (template.chevrons) {
     const chev = pillarChevronInk(face);
-    const chevColor = hexRgb(chev.color);
+    const chevColor = paint(chev.color);
     beginLayer(page, layer("09 Chevron device"));
     page.pushOperators(
       pushGraphicsState(),
@@ -461,13 +539,22 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
       const left = ox + mm(geo.bleedEdge + placed.x) + (boxW - (vw || 1) * scale) / 2;
       const top = oy + bleedH - mm(geo.bleedEdge + placed.y) - (boxH - (vh || 1) * scale) / 2;
       beginLayer(page, layer("08 Placed artwork"));
+      // Supplied MART art carries its own colours; on a CMYK build they go
+      // through the same conversion as ours, so nothing is silently left in RGB.
+      const artPaint = (c: [number, number, number]) => {
+        const hx = (n: number) =>
+          Math.round(Math.max(0, Math.min(1, n)) * 255)
+            .toString(16)
+            .padStart(2, "0");
+        return paint(`#${hx(c[0])}${hx(c[1])}${hx(c[2])}`);
+      };
       for (const shape of art.shapes) {
         page.drawSvgPath(shape.d, {
           x: left - vx * scale,
           y: top + vy * scale,
           scale,
-          color: shape.fill ? rgb(...shape.fill) : undefined,
-          borderColor: shape.stroke ? rgb(...shape.stroke) : undefined,
+          color: shape.fill ? artPaint(shape.fill) : undefined,
+          borderColor: shape.stroke ? artPaint(shape.stroke) : undefined,
           borderWidth: shape.stroke ? Math.max(0.15, shape.strokeWidth * scale) : undefined,
         });
       }
@@ -499,7 +586,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
           x: lockupX - vx * scale,
           y: lockupTop + vy * scale,
           scale,
-          color: rgb(...hexRgb(ink)),
+          color: paint(ink),
         });
       }
       void vh;
@@ -541,7 +628,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
         y: baseline,
         size: headlineSize,
         font: bold,
-        color: rgb(...hexRgb(headlineInk)),
+        color: paint(headlineInk),
       });
       baseline -= headlineSize;
     }
@@ -560,7 +647,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
         y: startY,
         size,
         font: bold,
-        color: rgb(...hexRgb(headlineInk)),
+        color: paint(headlineInk),
         rotate: degrees(90),
       });
       headlineBottom = startY - subSize * 0.7;
@@ -574,7 +661,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
         y: baseline,
         size,
         font: bold,
-        color: rgb(...hexRgb(headlineInk)),
+        color: paint(headlineInk),
       });
       headlineBottom = baseline;
     }
@@ -589,7 +676,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
       y: headlineBottom - subSize * 1.5,
       size: subSize,
       font: regular,
-      color: rgb(...hexRgb(headlineInk)),
+      color: paint(headlineInk),
       opacity: 0.92,
     });
     endLayer(page);
@@ -610,7 +697,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
           y,
           size,
           font: regular,
-          color: rgb(...hexRgb(headlineInk)),
+          color: paint(headlineInk),
         });
         y -= size * 1.7;
       });
@@ -638,7 +725,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
       });
     beginLayer(page, layer("05 Arrow"));
     for (const poly of pillarArrowStyle(config.arrowStyle).polys) {
-      polygon(page, draw(poly), hexRgb(headlineInk));
+      polygon(page, draw(poly), paint(headlineInk));
     }
     endLayer(page);
   }
@@ -666,11 +753,11 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
         y: qrY,
         width: edge,
         height: edge,
-        color: rgb(...hexRgb(pillarQrBackground(config))),
+        color: paint(pillarQrBackground(config)),
       });
     }
     const qrStyle = pillarQrStyle(config);
-    const dark: [number, number, number] = hexRgb(pillarQrForeground(config));
+    const dark: Color = paint(pillarQrForeground(config));
     // Rounded modules are approximated as 4-arc polygons; dots are ellipses.
     const rounded = (x: number, y: number, s: number, r: number) => {
       const pts: [number, number][] = [];
@@ -699,7 +786,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
             y: y + unit / 2,
             xScale: unit * 0.5,
             yScale: unit * 0.5,
-            color: rgb(...dark),
+            color: dark,
           });
         } else if (qrStyle === "rounded") {
           polygon(page, rounded(x + unit * 0.06, y + unit * 0.06, unit * 0.88, unit * 0.24), dark);
@@ -739,7 +826,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
           y: captionY,
           size: captionSize,
           font,
-          color: rgb(...hexRgb(headlineInk)),
+          color: paint(headlineInk),
         });
         cursor += font.widthOfTextAtSize(ch, captionSize) + track;
       }
@@ -751,7 +838,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
 
   // ── 07 Guides + marks ──────────────────────────────────────────────────────
   beginLayer(page, layer("07 Guides + marks"));
-  const guideInk = rgb(...hexRgb(face === "light" ? "#03002C" : "#FFFFFF"));
+  const guideInk = paint(face === "light" ? "#03002C" : "#FFFFFF");
   page.drawRectangle({
     x: trimX,
     y: trimY,
@@ -774,6 +861,8 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     opacity: 0,
     borderOpacity: 0.35,
   });
+  // Registration marks print as a single black on both colour paths.
+  const markInk: Color = colorSpace === "cmyk" ? cmyk(0, 0, 0, 1) : rgb(0, 0, 0);
   const markLen = 0.3 * 72;
   const gap = 0.08 * 72;
   const corners: [number, number][] = [
@@ -788,13 +877,13 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     page.drawLine({
       start: { x: left ? cx - gap - markLen : cx + gap, y: cy },
       end: { x: left ? cx - gap : cx + gap + markLen, y: cy },
-      color: rgb(0, 0, 0),
+      color: markInk,
       thickness: 0.5,
     });
     page.drawLine({
       start: { x: cx, y: bottom ? cy - gap - markLen : cy + gap },
       end: { x: cx, y: bottom ? cy - gap : cy + gap + markLen },
-      color: rgb(0, 0, 0),
+      color: markInk,
       thickness: 0.5,
     });
   }
@@ -808,11 +897,22 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
   });
 
   const bytes = await doc.save({ useObjectStreams: false });
+  const ledger = colorSpace === "cmyk" ? pillarCmykLedger(config, vibrance) : null;
   return {
     bytes: bytes as Uint8Array<ArrayBuffer>,
     layers: names,
     lockupVector,
     page: { widthPt: pageW, heightPt: pageH },
     pdfx: x4,
+    colorSpace,
+    cmyk: ledger
+      ? {
+          approved: ledger.approved,
+          converted: ledger.converted,
+          fullyApproved: ledger.fullyApproved,
+          signOffCsv: pillarCmykSignOffCsv(config, vibrance),
+          summary: pillarCmykSummary(config, vibrance),
+        }
+      : null,
   };
 }
