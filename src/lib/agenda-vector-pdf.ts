@@ -517,7 +517,8 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
     if (blocks.location) {
       const loc = blocks.location;
       const size = mm(loc.size);
-      const right = px(blocks.x + blocks.contentW);
+      // loc.right already steps back for a code parked in the header.
+      const right = px(loc.right);
       const label = (cfg.locationLine ?? "").trim();
       if (label) {
         const w = bold.widthOfTextAtSize(label, size);
