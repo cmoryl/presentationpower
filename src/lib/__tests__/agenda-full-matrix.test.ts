@@ -126,7 +126,7 @@ describe("agenda option matrix", () => {
                     qrAnchor,
                   ].join("|");
 
-                  auditSheet(id, config, problems);
+                  auditSheet(id, config, problems, { printedPage: false });
 
                   const fit = agendaFit(config);
                   status[fit.status] = (status[fit.status] ?? 0) + 1;
