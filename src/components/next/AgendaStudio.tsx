@@ -46,6 +46,7 @@ import {
   agendaQrContrast,
   agendaQrStyle,
   type AgendaCaptionAlign,
+  type AgendaQrAnchor,
   type AgendaQrStyleId,
   AGENDA_SIZES,
   AGENDA_SPEC,
