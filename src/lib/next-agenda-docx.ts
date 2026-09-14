@@ -212,10 +212,10 @@ function cell(
     opts.fill ? `<w:shd w:val="clear" w:color="auto" w:fill="${hex(opts.fill)}"/>` : "",
     `<w:tcMar><w:top w:w="${Math.round(padTwips)}" w:type="dxa"/><w:bottom w:w="${Math.round(
       padTwips,
-    )}" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:right w:w="${Math.round(
-      padTwips,
-    )}" w:type="dxa"/></w:tcMar>`,
-    '<w:vAlign w:val="center"/>',
+    )}" w:type="dxa"/><w:left w:w="${Math.round(
+      opts.fill ? padTwips : 0,
+    )}" w:type="dxa"/><w:right w:w="${Math.round(padTwips)}" w:type="dxa"/></w:tcMar>`,
+    `<w:vAlign w:val="${opts.vAlign ?? "center"}"/>`,
     "</w:tcPr>",
     content || "<w:p/>",
     "</w:tc>",
