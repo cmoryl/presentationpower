@@ -48,19 +48,6 @@ function pt(mm: number): number {
   return Math.max(6, Math.round(mm * MM_TO_PT * 10) / 10);
 }
 
-/**
- * The board renders a muted session as the ink at 70% opacity. PowerPoint runs
- * carry no text transparency, so mix the ink into the ground instead of using a
- * fixed grey — a hardcoded grey went unreadable on the light end of the ramp.
- */
-function mix(inkHex6: string, groundHex6: string, amount: number): string {
-  const ch = (h: string, i: number) => parseInt(h.slice(i * 2, i * 2 + 2), 16);
-  const out = [0, 1, 2]
-    .map((i) => Math.round(ch(inkHex6, i) * amount + ch(groundHex6, i) * (1 - amount)))
-    .map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0"))
-    .join("");
-  return out.toUpperCase();
-}
 
 async function blobToDataUrl(blob: Blob): Promise<string> {
   return await new Promise((resolve, reject) => {
@@ -138,7 +125,10 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
   const face = config.face ?? "dark";
   const inkHex = hex(agendaInk(face), face === "light" ? "03002C" : "FFFFFF");
   const groundHex = face === "light" ? "EEF1F7" : "03002C";
-  const mutedHex = mix(inkHex, groundHex, 0.7);
+  // A muted session reads as lighter weight, not a lighter ink: the gradient
+  // grounds run light at one end, so a dimmed grey (the previous 8A93A6) fell
+  // below contrast there. Same rule the Word export follows.
+  const mutedHex = inkHex;
   const notes: string[] = [];
 
   const pptx = new PptxGenJS();
