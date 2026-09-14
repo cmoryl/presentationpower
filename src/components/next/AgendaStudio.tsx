@@ -702,7 +702,35 @@ export function AgendaStudio({
               <p className="text-xs text-muted-foreground">
                 {Math.round(config.lockupScale * 100)}%
               </p>
-            </div>
+          </div>
+
+          {/* A printed board has no zoom, so the editor states the contrast every
+              band of copy will be read at, and says when the guard stepped in. */}
+          {(() => {
+            const guard = agendaCopyInk(config);
+            const readouts = agendaCopyReadouts(config);
+            const failing = readouts.filter((r) => !r.ok);
+            return (
+              <div className="space-y-2 rounded-md border border-border/60 p-3">
+                <p className="text-sm font-medium">Copy legibility</p>
+                <p
+                  className={`text-xs ${failing.length ? "text-destructive" : "text-muted-foreground"}`}
+                >
+                  {failing.length === 0
+                    ? `All ${readouts.length} bands clear their contrast floor · copy ink ${guard.hex}${guard.auto ? " (guard applied: the face ink stopped reading on this ground)" : ""}`
+                    : `${failing.length} of ${readouts.length} bands sit below their floor on this ground — pick a different ground or move the copy: ${failing.map((r) => r.label).join(", ")}`}
+                </p>
+                <ul className="grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
+                  {readouts.map((r) => (
+                    <li key={r.role} className={r.ok ? "" : "text-destructive"}>
+                      {r.label} · {r.ratio.toFixed(1)}:1 (needs {r.floor}:1)
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })()}
+
           </div>
 
           <label className="flex items-center gap-2 text-sm">
