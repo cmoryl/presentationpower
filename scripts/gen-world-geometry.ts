@@ -25,22 +25,47 @@ async function load(name: string) {
   return res.json();
 }
 
-function ringToPath(ring: [number, number][]): string {
-  let d = "";
-  ring.forEach(([lon, lat], i) => {
+/**
+ * Splits a projected point run wherever it jumps the antimeridian, so a ring
+ * spanning ±180 (Russia, Antarctica, Fiji) never draws a straight line right
+ * across the map.
+ */
+function splitWrap(pts: [number, number][]): [number, number][][] {
+  const out: [number, number][][] = [];
+  let run: [number, number][] = [];
+  for (const p of pts) {
+    const prev = run[run.length - 1];
+    if (prev && Math.abs(p[0] - prev[0]) > W / 2) {
+      if (run.length > 1) out.push(run);
+      run = [];
+    }
+    run.push(p);
+  }
+  if (run.length > 1) out.push(run);
+  return out;
+}
+
+function projectRun(coords: [number, number][]): [number, number][] {
+  return coords.map(([lon, lat]) => {
     const [x, y] = project(lon, lat);
-    d += `${i === 0 ? "M" : "L"}${round(x)} ${round(y)}`;
-    if (i < ring.length - 1) d += " ";
+    return [round(x), round(y)] as [number, number];
   });
-  return d + "Z";
+}
+
+function runToPath(run: [number, number][], close: boolean): string {
+  const d = run.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x} ${y}`).join(" ");
+  return close ? `${d}Z` : d;
+}
+
+function ringToPath(ring: [number, number][]): string {
+  return splitWrap(projectRun(ring))
+    .map((run) => runToPath(run, true))
+    .join(" ");
 }
 
 function lineToPath(line: [number, number][]): string {
-  return line
-    .map(([lon, lat], i) => {
-      const [x, y] = project(lon, lat);
-      return `${i === 0 ? "M" : "L"}${round(x)} ${round(y)}`;
-    })
+  return splitWrap(projectRun(line))
+    .map((run) => runToPath(run, false))
     .join(" ");
 }
 
@@ -70,12 +95,9 @@ const coastMesh = mesh(landTopo, landTopo.objects.land) as {
 const coastPaths = coastMesh.coordinates.map(lineToPath);
 
 // Projected rings, flattened as x,y pairs, for point-in-polygon rasterisation.
-const flatRings = rings.map((ring) =>
-  ring.flatMap(([lon, lat]) => {
-    const [x, y] = project(lon, lat);
-    return [round(x), round(y)];
-  }),
-);
+const flatRings = rings
+  .flatMap((ring) => splitWrap(projectRun(ring)))
+  .map((run) => run.flat());
 
 const out = `/**
  * GENERATED FILE — do not edit by hand.
