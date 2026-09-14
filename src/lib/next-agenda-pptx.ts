@@ -19,6 +19,7 @@ import PptxGenJS from "pptxgenjs";
 
 import {
   AGENDA_BAND,
+  agendaBandPalette,
   agendaBlocks,
   agendaGeometry,
   agendaInk,
@@ -245,9 +246,22 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
     // parallel session on an aqua card beside it. PowerPoint gets the same
     // geometry as shapes so the deck reads exactly like the printed sheet.
     if (cardMode && rows.length) {
+      const BAND = agendaBandPalette(cfg);
+      /** Blue 500 time rail down the left edge of a band. */
+      const rail = (box: { x: number; y: number; h: number }, name: string) =>
+        s.addShape("rect", {
+          x: inX(box.x),
+          y: inX(box.y),
+          w: inX(BAND.railW * L.k),
+          h: inX(box.h),
+          fill: { color: hex(BAND.rail) },
+          line: { type: "none" },
+          objectName: name,
+        });
       const bandText = (
         box: { x: number; y: number; w: number; h: number },
         session: { time?: string; title?: string; detail?: string },
+        copyInk: string = BAND.ink,
       ) => {
         s.addText(session.time ?? "", {
           x: inX(box.x + L.bandPadX),
@@ -258,7 +272,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
           fontSize: pt(L.timeSize),
           lineSpacing: pt(L.timeSize * 1.4),
           bold: true,
-          color: hex(AGENDA_BAND.ink),
+          color: copyInk,
           valign: "top",
           margin: 0,
         });
@@ -271,7 +285,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
               options: {
                 fontSize: pt(L.titleRowSize),
                 bold: true,
-                color: hex(AGENDA_BAND.ink),
+                color: copyInk,
                 breakLine: true,
                 lineSpacing: pt(L.titleRowSize * 1.5),
               },
@@ -282,7 +296,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
                     text: session.detail!,
                     options: {
                       fontSize: pt(L.detailSize),
-                      color: hex(AGENDA_BAND.ink),
+                      color: copyInk,
                       lineSpacing: pt(L.detailSize * 1.5),
                     },
                   },
@@ -312,10 +326,11 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
           y: inX(band.y),
           w: inX(band.w),
           h: inX(band.h),
-          fill: { color: hex(i % 2 === 0 ? AGENDA_BAND.fillA : AGENDA_BAND.fillB) },
+          fill: { color: hex(i % 2 === 0 ? BAND.fillA : BAND.fillB) },
           line: { type: "none" },
           objectName: `Session band ${i + 1}`,
         });
+        rail(band, `Session rail ${i + 1}`);
         bandText(band, r.session);
         const par = r.parallel;
         if (par && r.session.parallel) {
@@ -324,15 +339,20 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
             y: inX(par.y),
             w: inX(par.w),
             h: inX(par.h),
-            fill: { color: hex(AGENDA_BAND.parallel) },
+            fill: { color: hex(BAND.parallel) },
             line: { type: "none" },
             objectName: `Parallel session ${i + 1}`,
           });
-          bandText(par, {
-            time: r.session.time,
-            title: r.session.parallel.title,
-            detail: r.session.parallel.detail,
-          });
+          rail(par, `Parallel rail ${i + 1}`);
+          bandText(
+            par,
+            {
+              time: r.session.time,
+              title: r.session.parallel.title,
+              detail: r.session.parallel.detail,
+            },
+            BAND.parallelInk,
+          );
         }
       });
     } else if (rows.length) {

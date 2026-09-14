@@ -15,6 +15,7 @@ import {
   agendaStops,
   agendaTitleInk,
   AGENDA_BAND,
+  agendaBandPalette,
   type AgendaConfig,
 } from "@/lib/next-agenda";
 import { agendaCopyInk } from "@/lib/next-agenda-contrast";
@@ -60,6 +61,7 @@ export function AgendaSheet({
   const geo = agendaGeometry(config);
   const blocks = agendaBlocks(config);
   const L = blocks.layout;
+  const BAND = agendaBandPalette(config);
   const face = config.face ?? "dark";
   // Legibility guard: keeps the approved face ink unless it stops reading on
   // this ground, so a board is never printed in copy no one can see.
@@ -228,8 +230,9 @@ export function AgendaSheet({
                 ...at(row.band.x, row.band.y),
                 width: mm(row.band.w),
                 height: mm(row.band.h),
-                background: i % 2 === 0 ? AGENDA_BAND.fillA : AGENDA_BAND.fillB,
-                color: AGENDA_BAND.ink,
+                background: i % 2 === 0 ? BAND.fillA : BAND.fillB,
+                color: BAND.ink,
+                borderLeft: `${mm(BAND.railW * L.k)}px solid ${BAND.rail}`,
                 display: "flex",
                 alignItems: "flex-start",
                 padding: `${mm(L.bandPadY)}px ${mm(L.bandPadX)}px`,
@@ -293,8 +296,9 @@ export function AgendaSheet({
                   ...at(row.parallel.x, row.parallel.y),
                   width: mm(row.parallel.w),
                   height: mm(row.parallel.h),
-                  background: AGENDA_BAND.parallel,
-                  color: AGENDA_BAND.ink,
+                  background: BAND.parallel,
+                  color: BAND.parallelInk,
+                  borderLeft: `${mm(BAND.railW * L.k)}px solid ${BAND.rail}`,
                   padding: `${mm(L.bandPadY)}px ${mm(L.bandPadX)}px`,
                   boxSizing: "border-box",
                   position: "absolute",
@@ -329,7 +333,7 @@ export function AgendaSheet({
                     bottom: mm(L.bandPadY),
                   }}
                 >
-                  <AgendaPin size={mm(L.locSize * 1.5)} />
+                  <AgendaPin size={mm(L.locSize * 1.5)} fill={BAND.pin} />
                 </div>
               </div>
             ) : null}
