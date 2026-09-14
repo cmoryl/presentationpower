@@ -117,6 +117,7 @@ import {
 import type { StylePack } from "@/lib/style-packs";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
+import { MapStylePanel } from "@/components/slide/MapStylePanel";
 import { StagePhasesPanel } from "@/components/slide/StagePhasesPanel";
 import { OrbitLayoutPanel } from "@/components/slide/OrbitLayoutPanel";
 import { LogoWallPanel } from "@/components/slide/LogoWallPanel";
@@ -1620,6 +1621,16 @@ function DeckEditor() {
                     items={(active.content as Record<string, unknown>).items}
                     onChange={(items) => updateField(deck.id, active.id, "items", items)}
                   />
+                  <MapStylePanel
+                    key={`mapstyle-${active.id}`}
+                    brandId={brand.id}
+                    accent={brand.tokens.accent}
+                    primary={brand.tokens.primary}
+                    items={(active.content as Record<string, unknown>).items}
+                    mapStyle={(active.content as Record<string, unknown>).mapStyle}
+                    onChange={(next) => updateField(deck.id, active.id, "mapStyle", next)}
+                  />
+
                   {mv.id === "MV-LOC-WORLD-STATS" && (
                     <WorldStatsMetricsPanel
                       brandId={brand.id}

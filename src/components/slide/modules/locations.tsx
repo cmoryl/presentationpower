@@ -24,6 +24,7 @@ import {
   type LocationPin as LocPin,
   type LocationMetric as LocMetric,
   type RegionKey as LocRegionKey,
+  coerceMapStyle as locCoerceMapStyle,
 } from "@/lib/location-maps";
 
 const LOCATION_REGION_KEYS = ["AMER", "EMEA", "APAC", "LATAM", "MEA"] as const;
@@ -185,6 +186,8 @@ function renderLocationsVariant(
   // Never cast arbitrary content into the map viewport lookup: an unknown key
   // used to throw while rendering and blank every module card on the page.
   const region = coerceRegion(c.region);
+  // Map look — every style draws the same exact geometry (see MAP_STYLES).
+  const mapStyle = locCoerceMapStyle(c.mapStyle);
   const accent = brand.tokens.accent;
   const primary = brand.tokens.primary;
   const isDark = mode === "dark";
@@ -563,6 +566,7 @@ function renderLocationsVariant(
             <Corner pos="br" />
             <div className="absolute inset-0 px-1 py-1">
               <LocWorldMap
+                mapStyle={mapStyle}
                 pins={pins}
                 region="world"
                 mode={mode}
@@ -701,6 +705,7 @@ function renderLocationsVariant(
               className="relative mt-8 flex-1 overflow-hidden"
             >
               <LocWorldMap
+                mapStyle={mapStyle}
                 pins={filteredPins}
                 region="world"
                 mode={mode}
@@ -1002,6 +1007,7 @@ function renderLocationsVariant(
             <div className="mt-10 grid flex-1 gap-12" style={{ gridTemplateColumns: "1.55fr 1fr" }}>
               <div className="relative overflow-hidden">
                 <LocWorldMap
+                  mapStyle={mapStyle}
                   pins={pins}
                   region={region}
                   mode={mode}
@@ -1031,6 +1037,7 @@ function renderLocationsVariant(
           ) : (
             <div className="relative mt-10 flex-1 overflow-hidden">
               <LocWorldMap
+                mapStyle={mapStyle}
                 pins={pins}
                 region={region}
                 mode={mode}
@@ -1068,6 +1075,7 @@ function renderLocationsVariant(
         <Header />
         <div className="relative mt-10 flex-1 overflow-hidden">
           <LocWorldMap
+            mapStyle={mapStyle}
             pins={pins}
             region="world"
             mode={mode}
