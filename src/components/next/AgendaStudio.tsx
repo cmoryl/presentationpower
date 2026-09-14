@@ -80,6 +80,7 @@ import {
   agendaTitleInkOptions,
 } from "@/lib/next-agenda-contrast";
 import { NEXT_CITY_SERIES, NEXT_EVENT } from "@/lib/next-event";
+import { QR_SCAN_VERIFIED_STYLES, type QrModuleStyle } from "@/lib/qr-print";
 
 const NATIVE_PX_PER_MM = 1.2;
 
