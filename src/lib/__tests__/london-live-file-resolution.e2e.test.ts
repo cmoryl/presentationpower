@@ -108,7 +108,9 @@ describe("downloaded Illustrator master", () => {
 
   it("returns the uploaded editable CMYK companion instead of the RGB proof", async () => {
     const { buildLondonPanelAiAsync } = await import("@/lib/next-london-revise");
-    const cmyk = new TextEncoder().encode("%PDF-1.5 editable DeviceCMYK master %%EOF");
+    const cmyk = new TextEncoder().encode(
+      "%PDF-1.5 /DeviceCMYK /ShadingType 2 /PatternType 2 /PGround scn %%EOF",
+    );
     setLondonLiveFiles([
       {
         id: "row-5",
@@ -133,5 +135,15 @@ describe("downloaded Illustrator master", () => {
       globalThis.fetch = originalFetch;
       setLondonLiveFiles([]);
     }
+  });
+
+  it("rejects a flattened or RGB file uploaded as the CMYK companion", async () => {
+    const { assertEditableCmykMaster } = await import("@/lib/next-london-revise");
+    const fake = new TextEncoder().encode(
+      "%PDF-1.5 /DeviceCMYK /DeviceRGB /Subtype /Image /ShadingType 2 /PatternType 2 %%EOF",
+    );
+    expect(() => assertEditableCmykMaster(fake, "QEII Flag 1")).toThrow(
+      /DeviceRGB artwork.*flattened image/,
+    );
   });
 });

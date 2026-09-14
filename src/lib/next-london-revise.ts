@@ -1742,7 +1742,9 @@ export async function buildLondonPanelAiAsync(
       if (!response.ok) {
         throw new Error(`The editable CMYK print master for ${panel.name} could not be opened.`);
       }
-      return new Uint8Array(await response.arrayBuffer());
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      assertEditableCmykMaster(bytes, panel.name);
+      return bytes;
     }
   }
   // Same resolution order as the preview (buildLondonPanelSvg): vendor booth
@@ -1752,6 +1754,29 @@ export async function buildLondonPanelAiAsync(
   const art = londonPanelArtworkUrl(panel.id);
   const groundImage = options.groundImage ?? (art ? await loadLondonGroundImage(art) : null);
   return buildLondonPanelAi(panel, { ...options, groundImage });
+}
+
+/**
+ * A CMYK live master is accepted only when the bytes prove the claim. This gate
+ * prevents a renamed RGB PDF or a JPEG-in-PDF proof from being handed out as an
+ * editable Illustrator master. It intentionally follows the London print
+ * contract: analytic CMYK shading on a selectable pattern-filled path, no mesh,
+ * no RGB colour space, and no embedded image XObject.
+ */
+export function assertEditableCmykMaster(bytes: Uint8Array, panelName = "This sign"): void {
+  const text = new TextDecoder("latin1").decode(bytes);
+  const failures: string[] = [];
+  if (!text.startsWith("%PDF-")) failures.push("it is not a PDF-compatible Illustrator file");
+  if (!/\/DeviceCMYK\b/.test(text)) failures.push("it does not contain DeviceCMYK artwork");
+  if (/\/DeviceRGB\b/.test(text)) failures.push("it still contains DeviceRGB artwork");
+  if (/\/Subtype\s*\/Image\b/.test(text)) failures.push("it contains a flattened image");
+  if (!/\/ShadingType\s*[23]\b/.test(text) || !/\/PatternType\s*2\b/.test(text)) {
+    failures.push("its gradient is not an editable analytic gradient fill");
+  }
+  if (/\/ShadingType\s*[4-7]\b/.test(text)) failures.push("it contains a gradient mesh");
+  if (failures.length > 0) {
+    throw new Error(`${panelName} cannot export as an editable CMYK master: ${failures.join("; ")}.`);
+  }
 }
 
 function f3(n: number): string {
