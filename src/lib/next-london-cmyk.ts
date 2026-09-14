@@ -17,6 +17,12 @@
 //      build, matching the print contract for body copy.
 // -----------------------------------------------------------------------------
 
+import {
+  predictPrintedSrgb,
+  printedDelta,
+  solveCmyk,
+  solveCmykRamp,
+} from "@/lib/cmyk-gamut-solver";
 import { parseColor } from "@/lib/pdf-gradient-shading";
 
 export type Cmyk = { c: number; m: number; y: number; k: number };
@@ -86,10 +92,34 @@ function limitTac(v: Cmyk): Cmyk {
 }
 
 /**
- * Chroma-preserving RGB → CMYK. `vibrance` scales the pre-compensation; 1 is
- * the tuned default used by the signage exports, 0 gives a plain conversion.
+ * Chroma-preserving RGB → CMYK.
+ *
+ * This now runs the press-model solver in `cmyk-gamut-solver.ts`: instead of
+ * applying a formula and hoping, it predicts what each candidate ink build will
+ * print as on a coated sheet and searches for the one that lands closest to the
+ * brand colour in OKLab, weighting saturation and hue above lightness. That is
+ * what recovers the vividness of the aqua/violet ramps the formula flattened.
+ *
+ * `vibrance` is how hard it may trade lightness for saturation; 1 is the tuned
+ * house setting. `vibrance = 0` falls back to the plain textbook conversion for
+ * anyone who needs the old, unoptimised numbers.
  */
+const SOLVED = new Map<string, Cmyk>();
+
 export function vibrantCmyk(input: string, vibrance = 1): Cmyk {
+  if (vibrance > 0) {
+    const key = `${normalizeHex(input)}|${vibrance}`;
+    const hit = SOLVED.get(key);
+    if (hit) return hit;
+    const solved = limitTac(solveCmyk(input, { vibrance, tacLimit: CMYK_TAC_LIMIT }));
+    SOLVED.set(key, solved);
+    return solved;
+  }
+  return plainCmyk(input, 0);
+}
+
+/** The original formula-based conversion, kept for `vibrance = 0`. */
+function plainCmyk(input: string, vibrance = 1): Cmyk {
   let [r, g, b] = parseColor(input);
 
   const max = Math.max(r, g, b);
@@ -152,14 +182,44 @@ export function londonCmykBuild(input: string, vibrance = 1): CmykBuild {
   return { ...converted, approved: false, tac: tacOf(converted) * 100 };
 }
 
-/** Screen proxy for a CMYK build, so previews show what the press will hold. */
+/**
+ * Screen proxy for a CMYK build, so previews show what the press will hold.
+ * This is the forward press model — dot gain and ink overprint included — not a
+ * naive inversion, so a soft proof on screen matches the sheet far more closely.
+ */
 export function cmykToHex(v: Cmyk): string {
-  const ch = (x: number, k: number) => clamp01((1 - clamp01(x)) * (1 - clamp01(k)));
+  const [r, g, b] = predictPrintedSrgb(v);
   const hx = (n: number) =>
-    Math.round(n * 255)
+    Math.round(clamp01(n) * 255)
       .toString(16)
       .padStart(2, "0");
-  return `#${hx(ch(v.c, v.k))}${hx(ch(v.m, v.k))}${hx(ch(v.y, v.k))}`;
+  return `#${hx(r)}${hx(g)}${hx(b)}`;
+}
+
+/**
+ * How far a build lands from its brand colour once printed, as fractions.
+ * Used by the gamut report so the honest loss is measured, never assumed.
+ */
+export function cmykPrintedShift(hex: string, vibrance = 1) {
+  return printedDelta(hex, londonCmykBuild(hex, vibrance));
+}
+
+/**
+ * Resolve a whole gradient at once.
+ *
+ * Approved brand builds are always used verbatim. Everything else is solved as
+ * a ramp rather than stop by stop, so the printed blend keeps the direction of
+ * the original and does not seam between neighbouring stops.
+ */
+export function londonCmykRamp(colors: string[], vibrance = 1): CmykBuild[] {
+  const hexes = colors.map(normalizeHex);
+  const solved = vibrance > 0 ? solveCmykRamp(hexes, { vibrance, tacLimit: CMYK_TAC_LIMIT }) : [];
+  return hexes.map((hex, i) => {
+    const approved = APPROVED[hex];
+    if (approved) return { ...approved, approved: true, tac: tacOf(approved) * 100 };
+    const build = limitTac(solved[i] ?? vibrantCmyk(hex, vibrance));
+    return { ...build, approved: false, tac: tacOf(build) * 100 };
+  });
 }
 
 /** `device-cmyk()` notation for the SVG masters, with an sRGB fallback. */
@@ -197,7 +257,9 @@ function ink(v: Cmyk): string {
 export function cmykStopsFromColors(colors: string[], vibrance = 1): CmykStop[] {
   if (colors.length === 0) return [{ offset: 0, cmyk: { c: 0, m: 0, y: 0, k: 1 } }];
   const last = Math.max(colors.length - 1, 1);
-  return colors.map((hex, i) => ({ offset: i / last, cmyk: londonCmykBuild(hex, vibrance) }));
+  // Solved as one ramp so the printed gradient holds together across stops.
+  const builds = londonCmykRamp(colors, vibrance);
+  return builds.map((cmyk, i) => ({ offset: i / last, cmyk }));
 }
 
 function stitching(stops: CmykStop[]): string {
