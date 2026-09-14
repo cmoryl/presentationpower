@@ -25,6 +25,8 @@ import {
   agendaInk,
   agendaName,
   agendaPages,
+  agendaCardType,
+  agendaLongestWord,
   agendaParallels,
   agendaQrBackground,
   agendaQrForeground,
@@ -263,32 +265,45 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
         box: { x: number; y: number; w: number; h: number },
         session: { time?: string; title?: string; speaker?: string; detail?: string },
         copyInk: string = BAND.ink,
+        /** Fitted type for a narrow parallel card; omitted on the main band. */
+        card?: ReturnType<typeof agendaCardType>,
       ) => {
+        // The main band runs the time in its own left column. A parallel card is
+        // far too narrow for that column, so the time sits above the copy at the
+        // fitted card size.
+        const padX = card ? card.padX : L.bandPadX;
+        const timeSize = card ? card.timeSize : L.timeSize;
+        const titleSize = card ? card.titleSize : L.titleRowSize;
+        const detailSize = card ? card.detailSize : L.detailSize;
+        const timeShown = (session.time ?? "").trim().length > 0;
         s.addText(session.time ?? "", {
-          x: inX(box.x + L.bandPadX),
+          x: inX(box.x + padX),
           y: inX(box.y + L.bandPadY),
-          w: inX(L.timeColW),
-          h: inX(L.timeSize * 2),
+          w: inX(card ? card.textW : L.timeColW),
+          h: inX(timeSize * 2),
           fontFace: FONT,
-          fontSize: pt(L.timeSize),
-          lineSpacing: pt(L.timeSize * 1.4),
+          fontSize: pt(timeSize),
+          lineSpacing: pt(timeSize * 1.4),
           bold: true,
           color: copyInk,
           valign: "top",
           margin: 0,
         });
-        const copyX = box.x + L.bandPadX + L.timeColW;
-        const copyW = box.w - L.bandPadX * 2 - L.timeColW;
+        const copyX = card ? box.x + padX : box.x + L.bandPadX + L.timeColW;
+        const copyW = card ? card.textW : box.w - L.bandPadX * 2 - L.timeColW;
+        const copyY = card
+          ? box.y + L.bandPadY + (timeShown ? timeSize * 1.5 : 0)
+          : box.y + L.bandPadY;
         s.addText(
           [
             {
               text: session.title ?? "",
               options: {
-                fontSize: pt(L.titleRowSize),
+                fontSize: pt(titleSize),
                 bold: true,
                 color: copyInk,
                 breakLine: true,
-                lineSpacing: pt(L.titleRowSize * 1.5),
+                lineSpacing: pt(titleSize * 1.5),
               },
             },
             // Speaker sits on its own line under the title, so the notes stay a
@@ -298,11 +313,11 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
                   {
                     text: session.speaker!,
                     options: {
-                      fontSize: pt(L.detailSize),
+                      fontSize: pt(detailSize),
                       bold: true,
                       color: copyInk,
                       breakLine: true,
-                      lineSpacing: pt(L.detailSize * 1.5),
+                      lineSpacing: pt(detailSize * 1.5),
                     },
                   },
                 ]
@@ -312,9 +327,9 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
                   {
                     text: session.detail!,
                     options: {
-                      fontSize: pt(L.detailSize),
+                      fontSize: pt(detailSize),
                       color: copyInk,
-                      lineSpacing: pt(L.detailSize * 1.5),
+                      lineSpacing: pt(detailSize * 1.5),
                     },
                   },
                 ]
@@ -322,9 +337,9 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
           ],
           {
             x: inX(copyX),
-            y: inX(box.y + L.bandPadY),
+            y: inX(copyY),
             w: inX(Math.max(6, copyW)),
-            h: inX(box.h - L.bandPadY * 2),
+            h: inX(Math.max(6, box.y + box.h - L.bandPadY - copyY)),
             fontFace: FONT,
             valign: "top",
             margin: 0,
@@ -376,6 +391,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
               detail: copy.detail,
             },
             BAND.parallelInk,
+            agendaCardType(L, par.w, r.parallels.length, agendaLongestWord(copy.title)),
           );
         });
       });

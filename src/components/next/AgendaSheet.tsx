@@ -8,6 +8,8 @@ import {
   agendaGeometry,
   agendaInk,
   agendaLockupUrl,
+  agendaCardType,
+  agendaLongestWord,
   agendaParallels,
   agendaQrBackground,
   agendaQrForeground,
@@ -292,8 +294,12 @@ export function AgendaSheet({
               </div>
             </div>
             {row.parallels.map((rect, n) => {
-              const par = agendaParallels(row.session)[n];
+              const pars = agendaParallels(row.session);
+              const par = pars[n];
               if (!par) return null;
+              // Narrow cards get fitted type and tighter padding, so copy never
+              // wraps to one character a line.
+              const ct = agendaCardType(L, rect.w, pars.length, agendaLongestWord(par.title));
               return (
                 <div
                   key={n}
@@ -304,29 +310,29 @@ export function AgendaSheet({
                     background: BAND.parallel,
                     color: BAND.parallelInk,
                     borderLeft: `${mm(BAND.railW * L.k)}px solid ${BAND.rail}`,
-                    padding: `${mm(L.bandPadY)}px ${mm(L.bandPadX)}px`,
+                    padding: `${mm(L.bandPadY)}px ${mm(ct.padX)}px`,
                     boxSizing: "border-box",
                     position: "absolute",
                   }}
                 >
-                  {(par.time ?? "").trim() ? (
+                  {((par.time ?? "").trim() || row.session.time.trim()) ? (
                     <div
                       style={{
-                        fontSize: mm(L.timeSize),
+                        fontSize: mm(ct.timeSize),
                         fontWeight: 700,
                         lineHeight: 1.4,
-                        marginBottom: mm(L.timeSize * 0.25),
+                        marginBottom: mm(ct.timeSize * 0.25),
                       }}
                     >
-                      {par.time}
+                      {(par.time ?? "").trim() || row.session.time}
                     </div>
                   ) : null}
                   <div
                     style={{
-                      fontSize: mm(L.titleRowSize),
+                      fontSize: mm(ct.titleSize),
                       fontWeight: 700,
                       lineHeight: 1.35,
-                      paddingRight: mm(L.locSize * 1.4),
+                      paddingRight: mm(ct.pinW),
                     }}
                   >
                     {par.title}
@@ -334,11 +340,11 @@ export function AgendaSheet({
                   {(par.speaker ?? "").trim() ? (
                     <div
                       style={{
-                        fontSize: mm(L.detailSize),
+                        fontSize: mm(ct.detailSize),
                         fontWeight: 600,
                         lineHeight: 1.45,
-                        marginTop: mm(L.detailSize * 0.5),
-                        paddingRight: mm(L.locSize * 1.4),
+                        marginTop: mm(ct.detailSize * 0.5),
+                        paddingRight: mm(ct.pinW),
                       }}
                     >
                       {par.speaker}
@@ -347,24 +353,26 @@ export function AgendaSheet({
                   {par.detail.trim() ? (
                     <div
                       style={{
-                        fontSize: mm(L.detailSize),
+                        fontSize: mm(ct.detailSize),
                         lineHeight: 1.45,
-                        marginTop: mm(L.detailSize * 0.6),
-                        paddingRight: mm(L.locSize * 1.4),
+                        marginTop: mm(ct.detailSize * 0.6),
+                        paddingRight: mm(ct.pinW),
                       }}
                     >
                       {par.detail}
                     </div>
                   ) : null}
-                  <div
-                    style={{
-                      position: "absolute",
-                      right: mm(L.bandPadX),
-                      bottom: mm(L.bandPadY),
-                    }}
-                  >
-                    <AgendaPin size={mm(L.locSize * 1.5)} fill={BAND.pin} />
-                  </div>
+                  {ct.pinW > 0 ? (
+                    <div
+                      style={{
+                        position: "absolute",
+                        right: mm(ct.padX),
+                        bottom: mm(L.bandPadY),
+                      }}
+                    >
+                      <AgendaPin size={mm(L.locSize * 1.5)} fill={BAND.pin} />
+                    </div>
+                  ) : null}
                 </div>
               );
             })}
