@@ -1914,6 +1914,25 @@ export function agendaBlocks(config: AgendaConfig) {
       const gutter = Math.max(6 * L.k, pad);
       if (qrX > x + L.contentW * 0.4) headW = Math.max(L.contentW * 0.35, qrX - x - gutter);
       if (qrBottom + gutter > rowsTop) rowsTop = Math.min(listBottom - 20, qrBottom + gutter);
+      // The room / floor line and the date are right-aligned to the content
+      // edge, so a code parked in the header used to print straight over them.
+      // Pull their right edge back to the code's left side whenever the two
+      // share any vertical band.
+      if (location) {
+        const locTop = location.y - L.locSize;
+        const locBottom = location.metaY + L.metaSize * 0.6;
+        const overlaps = qrTop < locBottom && qrBottom > locTop;
+        if (overlaps && qrX > x) {
+          const capW = (config.qrCaption ?? "").trim()
+            ? Math.max(L.qrEdge, (config.qrCaption ?? "").trim().length * capSize * 0.62)
+            : L.qrEdge;
+          // The caption can sit wider than the code itself; clear the wider of
+          // the two so nothing tucks under the label either.
+          const blockLeft = Math.min(qrX, qrX + (L.qrEdge - capW) * 0.5);
+          const minRight = x + L.locSize * 4;
+          location.right = Math.max(minRight, blockLeft - gutter);
+        }
+      }
     } else {
       // The programme only makes room for the code when the code sits in its way.
       const clash = qrTop < listBottom && qrBottom > rowsTop;
