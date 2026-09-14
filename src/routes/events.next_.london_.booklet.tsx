@@ -136,12 +136,21 @@ function BookletPage() {
 
   const plan = useMemo(() => bookletPagePlan(config, agendaPageCount), [config, agendaPageCount]);
 
+  /** The printed trim of the booklet, taken from the agenda page it prints. */
+  const bookletGeo = useMemo(() => agendaGeometry(agenda), [agenda]);
+
   /** Render the map and chart pages once per export. */
   const renderExtras = async (): Promise<{ pages: BookletImagePage[]; warnings: string[] }> => {
     const pages: BookletImagePage[] = [];
     const warnings: string[] = [];
     if (config.includeMap && config.mapFloors.length) {
-      pages.push(...(await bookletMapPages(config.mapFloors, {}, { wMm: bookletGeo.trimW, hMm: bookletGeo.trimH })));
+      pages.push(
+        ...(await bookletMapPages(
+          config.mapFloors,
+          {},
+          { wMm: bookletGeo.trimW, hMm: bookletGeo.trimH },
+        )),
+      );
     }
     if (config.charts.length) {
       const charts = await bookletChartPages(config.charts, "light");
