@@ -261,7 +261,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
         });
       const bandText = (
         box: { x: number; y: number; w: number; h: number },
-        session: { time?: string; title?: string; detail?: string },
+        session: { time?: string; title?: string; speaker?: string; detail?: string },
         copyInk: string = BAND.ink,
       ) => {
         s.addText(session.time ?? "", {
@@ -291,6 +291,22 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
                 lineSpacing: pt(L.titleRowSize * 1.5),
               },
             },
+            // Speaker sits on its own line under the title, so the notes stay a
+            // separate editable paragraph in PowerPoint.
+            ...((session.speaker ?? "").trim()
+              ? [
+                  {
+                    text: session.speaker!,
+                    options: {
+                      fontSize: pt(L.detailSize),
+                      bold: true,
+                      color: copyInk,
+                      breakLine: true,
+                      lineSpacing: pt(L.detailSize * 1.5),
+                    },
+                  },
+                ]
+              : []),
             ...((session.detail ?? "").trim()
               ? [
                   {
@@ -351,7 +367,14 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
           rail(par, `Parallel rail ${label}`);
           bandText(
             par,
-            { time: r.session.time, title: copy.title, detail: copy.detail },
+            {
+              // A track with its own start time prints that; otherwise it
+              // inherits the slot's time, as the board does.
+              time: (copy.time ?? "").trim() || r.session.time,
+              title: copy.title,
+              speaker: copy.speaker,
+              detail: copy.detail,
+            },
             BAND.parallelInk,
           );
         });

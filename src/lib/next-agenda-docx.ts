@@ -433,6 +433,8 @@ export async function buildAgendaDocx(
           Math.max(
             tallest,
             cardLineCount(p.title, PL.titleRowSize, cardParColW) * lineMm(PL.titleRowSize) +
+              cardLineCount(p.speaker ?? "", PL.detailSize, cardParColW) *
+                lineMm(PL.detailSize) +
               cardLineCount(p.detail, PL.detailSize, cardParColW) * lineMm(PL.detailSize),
           ),
         0,
@@ -457,7 +459,7 @@ export async function buildAgendaDocx(
         const bandInk = hex(BAND.ink);
         const parInk = hex(BAND.parallelInk);
         const fill = i % 2 === 0 ? BAND.fillA : BAND.fillB;
-        const copy = (title: string, detail: string, copyInk = bandInk) =>
+        const copy = (title: string, detail: string, copyInk = bandInk, speaker = "") =>
           [
             para(
               run(title, {
@@ -467,6 +469,15 @@ export async function buildAgendaDocx(
               }),
               { afterTwips: 0, lineTwips: mmT(PL.titleRowSize * 1.4) },
             ),
+            // Speaker line: its own Word paragraph so it stays editable apart
+            // from the notes underneath it.
+            speaker.trim()
+              ? para(run(speaker, { size: halfPt(PL.detailSize), color: copyInk, bold: true }), {
+                  beforeTwips: mmT(PL.detailSize * 0.3),
+                  afterTwips: 0,
+                  lineTwips: mmT(PL.detailSize * 1.4),
+                })
+              : "",
             detail.trim()
               ? para(run(detail, { size: halfPt(PL.detailSize), color: copyInk }), {
                   beforeTwips: mmT(PL.detailSize * 0.35),
@@ -499,12 +510,24 @@ export async function buildAgendaDocx(
           ),
           pars
             .map((p) =>
-              cell(cardParColW, copy(p.title, p.detail, parInk), rowPad, {
-                fill: BAND.parallel,
-                vAlign: "top",
-                rail: BAND.rail,
-                railW: BAND.railW * PL.k,
-              }),
+              cell(
+                cardParColW,
+                // A track with its own start time prints it above the title; the
+                // row's time cell only carries the main band's slot time.
+                ((p.time ?? "").trim()
+                  ? para(
+                      run(p.time!, { size: halfPt(PL.timeSize), color: parInk, bold: true }),
+                      { afterTwips: 0, lineTwips: mmT(PL.timeSize * 1.4) },
+                    )
+                  : "") + copy(p.title, p.detail, parInk, p.speaker ?? ""),
+                rowPad,
+                {
+                  fill: BAND.parallel,
+                  vAlign: "top",
+                  rail: BAND.rail,
+                  railW: BAND.railW * PL.k,
+                },
+              ),
             )
             .join(""),
           "</w:tr>",

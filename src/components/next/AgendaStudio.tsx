@@ -91,6 +91,7 @@ import {
   withAgendaDivision,
   type AgendaConfig,
   type AgendaSession,
+  type AgendaParallel,
 } from "@/lib/next-agenda";
 import {
   AGENDA_GUARD_GAPS,
@@ -1418,7 +1419,7 @@ export function AgendaStudio({
                     // Up to four tracks can run alongside one slot; each gets its
                     // own aqua card on the board and in every export.
                     const pars = agendaParallels(session);
-                    const write = (next: { title: string; detail: string }[]) =>
+                    const write = (next: AgendaParallel[]) =>
                       setSession(i, {
                         parallels: next,
                         parallel: next[0] ?? null,
@@ -1436,48 +1437,66 @@ export function AgendaStudio({
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => write([...pars, { title: "", detail: "" }])}
+                              onClick={() =>
+                                write([
+                                  ...pars,
+                                  { time: "", title: "", speaker: "", detail: "" },
+                                ])
+                              }
                             >
                               <Plus className="mr-1 h-3.5 w-3.5" /> Add parallel track
                             </Button>
                           ) : null}
                         </div>
-                        {pars.map((par, pi) => (
-                          <div key={pi} className="grid gap-2 md:grid-cols-[1fr_1fr_auto]">
-                            <Input
-                              aria-label={`Row ${i + 1} parallel ${pi + 1} title`}
-                              value={par.title}
-                              placeholder={`Parallel session ${pi + 1} title`}
-                              onChange={(e) =>
-                                write(
-                                  pars.map((p, j) =>
-                                    j === pi ? { ...p, title: e.target.value } : p,
-                                  ),
-                                )
-                              }
-                            />
-                            <Input
-                              aria-label={`Row ${i + 1} parallel ${pi + 1} detail`}
-                              value={par.detail}
-                              placeholder="Speaker or room"
-                              onChange={(e) =>
-                                write(
-                                  pars.map((p, j) =>
-                                    j === pi ? { ...p, detail: e.target.value } : p,
-                                  ),
-                                )
-                              }
-                            />
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              aria-label={`Remove row ${i + 1} parallel ${pi + 1}`}
-                              onClick={() => write(pars.filter((_, j) => j !== pi))}
+                        {pars.map((par, pi) => {
+                          const edit = (patch: Partial<AgendaParallel>) =>
+                            write(pars.map((p, j) => (j === pi ? { ...p, ...patch } : p)));
+                          return (
+                            <div
+                              key={pi}
+                              className="rounded-lg border border-black/10 p-2 dark:border-white/15"
                             >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
+                              <div className="mb-2 flex items-center justify-between text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                                <span>Track {pi + 1}</span>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  aria-label={`Remove row ${i + 1} parallel ${pi + 1}`}
+                                  onClick={() => write(pars.filter((_, j) => j !== pi))}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              <div className="grid gap-2 md:grid-cols-[120px_1fr_1fr]">
+                                <Input
+                                  aria-label={`Row ${i + 1} parallel ${pi + 1} time`}
+                                  value={par.time ?? ""}
+                                  placeholder="Time"
+                                  onChange={(e) => edit({ time: e.target.value })}
+                                />
+                                <Input
+                                  aria-label={`Row ${i + 1} parallel ${pi + 1} title`}
+                                  value={par.title}
+                                  placeholder={`Parallel session ${pi + 1} title`}
+                                  onChange={(e) => edit({ title: e.target.value })}
+                                />
+                                <Input
+                                  aria-label={`Row ${i + 1} parallel ${pi + 1} speaker`}
+                                  value={par.speaker ?? ""}
+                                  placeholder="Speaker"
+                                  onChange={(e) => edit({ speaker: e.target.value })}
+                                />
+                              </div>
+                              <Input
+                                className="mt-2"
+                                aria-label={`Row ${i + 1} parallel ${pi + 1} notes`}
+                                value={par.detail}
+                                placeholder="Notes or room"
+                                onChange={(e) => edit({ detail: e.target.value })}
+                              />
+                            </div>
+                          );
+                        })}
                       </div>
                     );
                   })()

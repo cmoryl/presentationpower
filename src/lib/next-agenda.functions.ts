@@ -8,13 +8,27 @@ import { canEditNextDivision } from "./next-permissions.functions";
 // can be re-opened and re-exported for print at any time. RLS scopes every row
 // to its owner.
 
-const sessionSchema = z.object({
-  time: z.string().default(""),
-  title: z.string().default(""),
-  detail: z.string().default(""),
-  track: z.string().default(""),
-  muted: z.boolean().default(false),
-});
+const parallelSchema = z
+  .object({
+    time: z.string().default(""),
+    title: z.string().default(""),
+    speaker: z.string().default(""),
+    detail: z.string().default(""),
+  })
+  .passthrough();
+
+const sessionSchema = z
+  .object({
+    time: z.string().default(""),
+    title: z.string().default(""),
+    detail: z.string().default(""),
+    track: z.string().default(""),
+    muted: z.boolean().default(false),
+    pin: z.string().optional(),
+    parallel: parallelSchema.nullable().optional(),
+    parallels: z.array(parallelSchema).max(4).optional(),
+  })
+  .passthrough();
 
 const configSchema = z
   .object({
