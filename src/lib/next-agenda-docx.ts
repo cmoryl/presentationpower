@@ -522,11 +522,12 @@ export async function buildAgendaDocx(
                   : "") + copy(p.title, p.detail, parInk, p.speaker ?? ""),
                 rowPad,
                 {
-                fill: BAND.parallel,
-                vAlign: "top",
-                rail: BAND.rail,
-                railW: BAND.railW * PL.k,
-              }),
+                  fill: BAND.parallel,
+                  vAlign: "top",
+                  rail: BAND.rail,
+                  railW: BAND.railW * PL.k,
+                },
+              ),
             )
             .join(""),
           "</w:tr>",
