@@ -304,8 +304,8 @@ export function londonBrandingPlan(
   // supplied file already carries its own lockup and wording, so the kit must
   // not typeset a second one over it. Anything smaller than the sheet is a
   // placed element (a partner mark, a glyph) and the house layers stay on.
-  const art = placedArt === undefined ? londonPlacedArt(panel.id) : placedArt;
-  const artIsFinishedFace = !!art && art.on !== false && art.size >= 0.9;
+  const placed = placedArt === undefined ? londonPlacedArt(panel.id) : placedArt;
+  const artIsFinishedFace = !!placed && placed.on !== false && placed.size >= 0.9;
   const fileOwnsLockup =
     (finishedFile && londonFileOwnsLayer(panel.id, "lockup")) || artIsFinishedFace;
   const fileOwnsCopy = (finishedFile && londonFileOwnsLayer(panel.id, "copy")) || artIsFinishedFace;
