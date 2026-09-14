@@ -23,8 +23,8 @@ describe("London CMYK sign-off ledger", () => {
 
   it("labels every colour build as approved or machine-converted", () => {
     const led = londonCmykSignOff(1);
-    expect(led.stops).toBeGreaterThan(0);
-    expect(led.approved + led.converted).toBe(led.stops);
+    expect(led.stops.length).toBeGreaterThan(0);
+    expect(led.approved + led.converted).toBe(led.stops.length);
     // The kit is not fully approved yet; the ledger must say so rather than imply it is.
     expect(led.fullyApproved).toBe(led.converted === 0);
   });
@@ -45,7 +45,7 @@ describe("London CMYK sign-off ledger", () => {
     const csv = londonCmykSignOffCsv(1);
     const lines = csv.trim().split("\n");
     expect(lines[0]).toContain("printer_approval");
-    expect(lines.length).toBe(londonCmykSignOff(1).stops + 1);
+    expect(lines.length).toBe(londonCmykSignOff(1).stops.length + 1);
     expect(csv).toMatch(/approved build|conversion/);
   });
 });
@@ -55,7 +55,7 @@ describe("London print QA colour space checks", () => {
     await loadLondonSignageFace();
     const ai = await buildLondonPanelAiAsync(panel, { colorSpace: "cmyk", vibrance: 1 });
     const checks = auditAiGradient(panel, text(ai), { colorSpace: "cmyk", vibrance: 1 });
-    const space = checks.find((c) => c.id === "ai-colorspace");
+    const space = checks.find((c) => c.id === "ai-gradient-colorspace");
     const stops = checks.find((c) => c.id === "ai-gradient-stops");
     expect(space?.status).toBe("pass");
     expect(stops?.status).toBe("pass");
