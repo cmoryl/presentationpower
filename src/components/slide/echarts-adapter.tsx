@@ -161,29 +161,14 @@ const adapter: InfographicAdapter = {
     return SUPPORTED.includes(kind);
   },
   render(spec, ctx) {
+    const label = spec.accessibility.shortAlt || spec.title || "Chart";
+    const mode = spec.theme.mode === "dark" ? "dark" : "light";
+    const height = ctx.height || 480;
+    const skeleton = <ChartSkeleton label={label} mode={mode} height={height} />;
     return (
-      <ClientOnly
-        fallback={
-          <div
-            aria-hidden
-            style={{
-              width: "100%",
-              height: ctx.height || 480,
-              background:
-                spec.theme.mode === "dark" ? "rgba(255,255,255,0.02)" : "rgba(10,15,28,0.03)",
-              borderRadius: 16,
-            }}
-          />
-        }
-      >
-        <ChartBoundary
-          label={spec.accessibility.shortAlt || spec.title || "Chart"}
-          mode={spec.theme.mode === "dark" ? "dark" : "light"}
-          height={ctx.height || 480}
-        >
-          <React.Suspense
-            fallback={<div aria-hidden style={{ width: "100%", height: ctx.height || 480 }} />}
-          >
+      <ClientOnly fallback={skeleton}>
+        <ChartBoundary label={label} mode={mode} height={height}>
+          <React.Suspense fallback={skeleton}>
             <EChartsInfographic spec={spec} ctx={ctx} />
           </React.Suspense>
         </ChartBoundary>
