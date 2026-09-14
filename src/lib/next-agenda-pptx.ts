@@ -48,6 +48,7 @@ function pt(mm: number): number {
   return Math.max(6, Math.round(mm * MM_TO_PT * 10) / 10);
 }
 
+
 async function blobToDataUrl(blob: Blob): Promise<string> {
   return await new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -124,6 +125,10 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
   const face = config.face ?? "dark";
   const inkHex = hex(agendaInk(face), face === "light" ? "03002C" : "FFFFFF");
   const groundHex = face === "light" ? "EEF1F7" : "03002C";
+  // A muted session reads as lighter weight, not a lighter ink: the gradient
+  // grounds run light at one end, so a dimmed grey (the previous 8A93A6) fell
+  // below contrast there. Same rule the Word export follows.
+  const mutedHex = inkHex;
   const notes: string[] = [];
 
   const pptx = new PptxGenJS();
@@ -168,14 +173,22 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       s.background = { color: groundHex };
     }
 
+    // Header bands come from the printed board: each block owns the space up to
+    // the next one, and the line pitch is set to that band so PowerPoint's own
+    // (larger) line box cannot push the headline down onto the date line.
+    const eyebrowBand = Math.max(L.eyebrowSize * 1.6, b.titleY - b.eyebrowY);
+    const titleBand = Math.max(L.titleSize * 1.15, b.metaY - b.titleY);
+    const metaBand = Math.max(L.metaSize * 1.6, b.rowsTop - b.metaY);
+
     if ((cfg.eyebrow ?? "").trim()) {
       s.addText(cfg.eyebrow.toUpperCase(), {
         x: inX(b.x),
         y: inX(b.eyebrowY),
         w: inX(b.contentW),
-        h: inX(L.eyebrowSize * 1.8),
+        h: inX(eyebrowBand),
         fontFace: FONT,
         fontSize: pt(L.eyebrowSize),
+        lineSpacing: pt(eyebrowBand),
         bold: true,
         charSpacing: 3,
         color: inkHex,
@@ -187,9 +200,10 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       x: inX(b.x),
       y: inX(b.titleY),
       w: inX(b.contentW),
-      h: inX(L.titleSize * 1.2),
+      h: inX(titleBand),
       fontFace: FONT,
       fontSize: pt(L.titleSize),
+      lineSpacing: pt(titleBand),
       bold: true,
       color: hex(agendaTitleInk(cfg), inkHex),
       valign: "top",
@@ -200,9 +214,10 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
         x: inX(b.x),
         y: inX(b.metaY),
         w: inX(b.contentW),
-        h: inX(L.metaSize * 2),
+        h: inX(metaBand),
         fontFace: FONT,
         fontSize: pt(L.metaSize),
+        lineSpacing: pt(L.metaSize * 1.6),
         color: inkHex,
         valign: "top",
         margin: 0,
@@ -219,33 +234,49 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       const rowH = inX(b.rowH);
       s.addTable(
         rows.map(({ session }) => {
-          const rowInk = session.muted ? "8A93A6" : inkHex;
+          const rowInk = session.muted ? mutedHex : inkHex;
           return [
             {
               text: session.time ?? "",
-              options: { fontSize: pt(L.timeSize), bold: true, color: rowInk, valign: "middle" },
+              options: {
+                fontSize: pt(L.timeSize),
+                lineSpacing: pt(L.timeSize * 1.3),
+                bold: true,
+                color: rowInk,
+                valign: "middle",
+              },
             },
             {
               text: [
                 {
                   text: session.title ?? "",
-                  options: { fontSize: pt(L.titleRowSize), bold: !session.muted, color: rowInk },
+                  options: {
+                    fontSize: pt(L.titleRowSize),
+                    bold: !session.muted,
+                    color: rowInk,
+                    breakLine: true,
+                  },
                 },
                 ...((session.detail ?? "").trim()
                   ? [
                       {
-                        text: `\n${session.detail}`,
-                        options: { fontSize: pt(L.detailSize), color: rowInk },
+                        text: session.detail!,
+                        options: {
+                          fontSize: pt(L.detailSize),
+                          color: rowInk,
+                          lineSpacing: pt(L.detailSize * 1.4),
+                        },
                       },
                     ]
                   : []),
               ],
-              options: { valign: "middle" },
+              options: { valign: "middle", lineSpacing: pt(L.titleRowSize * 1.25) },
             },
             {
               text: (session.track ?? "").toUpperCase(),
               options: {
                 fontSize: pt(L.trackSize),
+                lineSpacing: pt(L.trackSize * 1.4),
                 color: rowInk,
                 align: "right",
                 charSpacing: 2,
@@ -267,7 +298,9 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
             { type: "solid", color: "7F8798", pt: 0.5 },
             { type: "none" },
           ],
-          margin: 2,
+          // Zero cell padding: the column widths already come from the printed
+          // board, so any inset shifts every row off the measured grid.
+          margin: 0,
           objectName: "NEXT agenda programme",
         },
       );
@@ -299,6 +332,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
           h: inX(b.qr.capSize * 2),
           fontFace: FONT,
           fontSize: pt(b.qr.capSize),
+          lineSpacing: pt(b.qr.capSize * 1.4),
           color: inkHex,
           align: b.qr.capAlign,
           valign: "top",
@@ -316,6 +350,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
         h: inX(L.footSize * 2),
         fontFace: FONT,
         fontSize: pt(L.footSize),
+        lineSpacing: pt(L.footSize * 1.4),
         color: inkHex,
         valign: "top",
         margin: 0,
@@ -329,6 +364,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
         h: inX(L.footSize * 2),
         fontFace: FONT,
         fontSize: pt(L.footSize),
+        lineSpacing: pt(L.footSize * 1.4),
         bold: true,
         charSpacing: 2,
         color: inkHex,
@@ -340,11 +376,16 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
   }
 
   const raw = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
+  // Carry Geist inside the package and normalize the theme font scheme, so the
+  // board's type does not re-flow into a substitute face on the machine that
+  // opens it — the same pass every other deck export runs.
+  const { embedFontsInPptx } = await import("./pptx-font-embed");
+  const withFonts = await embedFontsInPptx(raw);
   // pptxgenjs emits presentation.xml with notesMasterIdLst after sldIdLst, which
   // the ECMA-376 sequence forbids and Office refuses to open. Reuse the same
   // terminal hygiene pass every other deck export in the app runs through.
   const { applyTerminalPptxHygiene } = await import("./pptx-terminal-hygiene");
-  const blob = await applyTerminalPptxHygiene(raw);
+  const blob = await applyTerminalPptxHygiene(withFonts);
   notes.push(
     `${pages.length} slide${pages.length === 1 ? "" : "s"} at ${geo.trimW} × ${geo.trimH} mm — every programme row is an editable PowerPoint table cell.`,
   );
