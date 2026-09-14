@@ -47,6 +47,7 @@ import { qrStructuralModule } from "./qr-print";
 import {
   agendaBlocks,
   agendaDivision,
+  agendaLockupUrl,
   agendaGeometry,
   agendaInk,
   agendaName,
@@ -315,13 +316,8 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
 
   // Approved division lockup is fetched once and reused on every page.
   const division = agendaDivision(config.divisionId);
-  const art = config.showLockup
-    ? await loadLockup(
-        face === "light"
-          ? division.colorUrl || division.whiteUrl
-          : division.whiteUrl || division.colorUrl,
-      )
-    : null;
+  const lockupSrc = agendaLockupUrl(config);
+  const art = config.showLockup ? await loadLockup(lockupSrc) : null;
   let lockupVector = false;
 
   // Every programme day / page of the live file becomes one press page.
