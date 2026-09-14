@@ -39,7 +39,7 @@ import {
 
 import { applyPdfX4, type PdfX4Applied } from "./pdf-x4-vector";
 import { resolveAssetUrl } from "./asset-base-url";
-import { registerMeshShading, type MeshSampler } from "./pdf-mesh-shading";
+import { registerGradientPattern, type ShadingStop } from "./pdf-analytic-shading";
 import { extractSvgPaths } from "./pillar-vector-pdf";
 import { buildPillarQr } from "./pillar-qr";
 import { logoInkBox, logoInkPlacement } from "./next-logo-ink";
@@ -144,25 +144,45 @@ function styleAxis(styleId: string) {
   return { x1: 0.5, y1: 0, x2: 0.5, y2: 1 };
 }
 
-function groundSampler(w: number, h: number, stops: string[], styleId: string): MeshSampler {
+/**
+ * The ground as an EDITABLE gradient: an analytic axial or radial shading used
+ * as a pattern fill on the sheet rectangle. A Gouraud mesh prints the same but
+ * opens in Illustrator as a gradient mesh, which cannot be retuned by dragging
+ * a stop or typing a brand hex — so the board carries a real gradient instead.
+ */
+function groundGradient(
+  w: number,
+  h: number,
+  stops: string[],
+  styleId: string,
+  ox: number,
+  oy: number,
+) {
+  const last = Math.max(stops.length - 1, 1);
+  const toStops = (list: string[]): ShadingStop[] =>
+    list.map((hex, i) => ({ offset: i / last, color: hexRgb(hex) }));
   if (styleId.includes("halo")) {
-    const ramp = [...stops].reverse();
-    const cx = w / 2;
-    const cy = h - 0.42 * h;
-    const rx = 1.2 * w;
-    const ry = 0.9 * h;
-    return (x, y) => mixRgb(ramp, Math.min(Math.hypot((x - cx) / rx, (y - cy) / ry), 1));
+    return {
+      // Pattern space is measured from the page origin, not the current
+      // transform, so the slug offset is added to the gradient geometry.
+      spec: {
+        kind: "radial" as const,
+        centre: { x: ox + w / 2, y: oy + h - 0.42 * h },
+        rx: 1.2 * w,
+        ry: 0.9 * h,
+      },
+      stops: toStops([...stops].reverse()),
+    };
   }
   const axis = styleAxis(styleId);
-  const x1 = axis.x1 * w;
-  const y1 = h - axis.y1 * h;
-  const dx = axis.x2 * w - x1;
-  const dy = h - axis.y2 * h - y1;
-  const len = Math.max(Math.hypot(dx, dy), 1);
-  const ux = dx / len;
-  const uy = dy / len;
-  const origin = x1 * ux + y1 * uy;
-  return (x, y) => mixRgb(stops, (x * ux + y * uy - origin) / len);
+  return {
+    spec: {
+      kind: "axial" as const,
+      from: { x: ox + axis.x1 * w, y: oy + h - axis.y1 * h },
+      to: { x: ox + axis.x2 * w, y: oy + h - axis.y2 * h },
+    },
+    stops: toStops(stops),
+  };
 }
 
 type LockupArt =
@@ -388,14 +408,33 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       clip(),
       endPath(),
     );
-    const { name: shading } = registerMeshShading(
-      doc,
-      page,
+    const ground = groundGradient(
       bleedW,
       bleedH,
-      groundSampler(bleedW, bleedH, stops, config.styleId),
+      stops,
+      config.styleId,
+      round(ox),
+      round(oy),
     );
-    page.pushOperators(PDFOperator.of("sh" as never, [shading]));
+    const { name: groundPattern } = registerGradientPattern(
+      doc,
+      page,
+      ground.spec,
+      ground.stops,
+      "rgb",
+      "PGround",
+    );
+    page.pushOperators(
+      PDFOperator.of("cs" as never, [PDFName.of("Pattern")]),
+      PDFOperator.of("scn" as never, [groundPattern]),
+      PDFNumber ? PDFOperator.of("re" as never, [
+        PDFNumber.of(0),
+        PDFNumber.of(0),
+        PDFNumber.of(bleedW),
+        PDFNumber.of(bleedH),
+      ]) : PDFOperator.of("re" as never, []),
+      PDFOperator.of("f" as never),
+    );
     page.pushOperators(popGraphicsState());
     endLayer(page);
 
