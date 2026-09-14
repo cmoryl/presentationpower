@@ -457,7 +457,7 @@ export async function buildAgendaDocx(
         const bandInk = hex(BAND.ink);
         const parInk = hex(BAND.parallelInk);
         const fill = i % 2 === 0 ? BAND.fillA : BAND.fillB;
-        const copy = (title: string, detail: string, copyInk = bandInk) =>
+        const copy = (title: string, detail: string, copyInk = bandInk, speaker = "") =>
           [
             para(
               run(title, {
@@ -467,6 +467,15 @@ export async function buildAgendaDocx(
               }),
               { afterTwips: 0, lineTwips: mmT(PL.titleRowSize * 1.4) },
             ),
+            // Speaker line: its own Word paragraph so it stays editable apart
+            // from the notes underneath it.
+            speaker.trim()
+              ? para(run(speaker, { size: halfPt(PL.detailSize), color: copyInk, bold: true }), {
+                  beforeTwips: mmT(PL.detailSize * 0.3),
+                  afterTwips: 0,
+                  lineTwips: mmT(PL.detailSize * 1.4),
+                })
+              : "",
             detail.trim()
               ? para(run(detail, { size: halfPt(PL.detailSize), color: copyInk }), {
                   beforeTwips: mmT(PL.detailSize * 0.35),
