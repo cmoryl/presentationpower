@@ -588,7 +588,17 @@ export function AgendaStudio({
                 id="agenda-size"
                 className={selectClass}
                 value={config.sizeId}
-                onChange={(e) => set("sizeId", e.target.value as AgendaConfig["sizeId"])}
+                onChange={(e) =>
+                  // A code dragged on one board size means nothing on another, so
+                  // a format switch returns it to its anchored home.
+                  setConfig((c) => ({
+                    ...c,
+                    sizeId: e.target.value as AgendaConfig["sizeId"],
+                    qrOffsetX: null,
+                    qrOffsetY: null,
+                  }))
+                }
+
               >
                 <optgroup label="Print">
                   {AGENDA_SIZES.filter((s) => s.medium !== "screen").map((s) => (
