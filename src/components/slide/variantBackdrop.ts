@@ -3,6 +3,7 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import type { SlideBackdrop } from "./SlideChrome";
 import { getDivisionImagery, hasOwnBackdropPool } from "@/assets/backdrops/divisions";
 import { isTransPerfectBrandScope } from "@/lib/brand-profiles";
+import { LIGHT_IMAGERY, LIGHT_TINT } from "@/assets/backdrops/light";
 
 import portrait1 from "@/assets/portraits/portrait-1.webp";
 import portrait2 from "@/assets/portraits/portrait-2.webp";
@@ -79,6 +80,37 @@ function _computeBackdrop(
   // product/cobrand modes can still carry their own authored surface.
   const brand = BRAND_MODES.find((b) => b.id === effectiveBrandId);
   const surface = brand?.tokens.surface ?? "#FFFFFF";
+
+  // ── Approved light ground ────────────────────────────────────────────────
+  // Light mode on the approved TransPerfect surface renders the authored
+  // high-key stills: soft-focus near-whites, so a light module card reads as a
+  // real approved background rather than a blank white box. Deterministic per
+  // variant id, so the same module shows the same ground everywhere (library
+  // card, lightbox, editor, present, print).
+  if (mode === "light" && effectiveBrandId === "bm-enterprise") {
+    const family = /^MV-OP-DIVIDER|CARDS-|PILLARS-|PRINCIPLES|VALUE-PROPS/.test(id)
+      ? "abstracts"
+      : "photos";
+    const pool = LIGHT_IMAGERY[family];
+    // Logo strips stay clean: a lockup wall needs an even field behind it.
+    if (/LOGO-STRIP|LOGOS/.test(id)) return null;
+    // A vignette on full-frame looks, otherwise the light falls in from the side
+    // the copy does not occupy.
+    const scrim: NonNullable<SlideBackdrop["scrim"]> = /^MV-OP-DIVIDER|CLOSING|THANKS/.test(id)
+      ? "vignette"
+      : /^MV-CS-|TESTIMONIAL|QUOTE/.test(id)
+        ? "right"
+        : "left";
+    return {
+      url: pool[seed % pool.length]!,
+      scrim,
+      // Softer than the old flat wash so the ground actually reads, still light
+      // enough for Blue 800 copy to clear AA on every still.
+      scrimStrength: 0.86,
+      tint: LIGHT_TINT,
+      darkChrome: false,
+    };
+  }
 
   // ── Brand-swap integrity guard ──────────────────────────────────────────
   // Raster stills carry a baked palette. For TransPerfect division scope the

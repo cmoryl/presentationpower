@@ -655,7 +655,13 @@ export function SlideFrame({
   // Light mode: force the backdrop tint to pure white and push the scrim
   // near-opaque so imagery reads as a subtle wash on a white page.
   const tint = lightBackdrop ? "#FFFFFF" : (backdrop?.tint ?? defaultTint);
-  const scrimStrength = lightBackdrop ? 0.97 : (backdrop?.scrimStrength ?? 0.55);
+  // Light mode used to flatten every ground to a near-solid white, which hid the
+  // approved high-key stills entirely. The backdrop's own strength is honoured
+  // inside a safe light band instead, so the soft-focus ground reads while copy
+  // still clears AA on white.
+  const scrimStrength = lightBackdrop
+    ? Math.min(0.97, Math.max(0.8, backdrop?.scrimStrength ?? 0.97))
+    : (backdrop?.scrimStrength ?? 0.55);
 
   const scrimGradient = (() => {
     if (!backdrop) return "none";
