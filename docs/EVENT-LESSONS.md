@@ -152,3 +152,23 @@ each band where it actually prints. Six dark grounds have no approved ink that
 reads across the whole board and are now named in `AGENDA_GUARD_GAPS`.
 
 **Enforced by:** `src/lib/__tests__/agenda-contrast.test.ts`
+
+### 2026-09 — The agenda page-fit model only added up on tall formats
+
+**Context:** an end-to-end sweep of every combination the agenda studio can build
+(12 division areas x 11 grounds x 2 faces x 10 formats x 3 band treatments x 2 row
+looks x 2 QR anchors = 31,680 boards), each one also checked page by page.
+**What happened:** on the short, wide screen formats (16:9 and 21:9) the programme
+bands printed over the footer band. The band heights were scaled proportionally and
+then each band was raised to a legible floor — floored bands kept their new height
+while nothing else gave any back, so the column added up to more than the band it
+had to fit in. Pagination did not save it, because the page carried the same sum.
+Separately, a typed line break in a session note crashed the press PDF build on the
+ruled list: the single-line fitter measured the newline as an unencodable glyph.
+**Rule now:** band heights are water-filled — bands that hit the legible floor are
+pinned at it and taken out of the budget, and the rest re-share what is left, so the
+column can never exceed the band. When even the floor no longer fits, every band sits
+on the floor and the fit report / page capacity says "over" out loud. The single-line
+fitter collapses line breaks and tabs before measuring.
+**Enforced by:** `src/lib/__tests__/agenda-full-matrix.test.ts` — the full combination
+sweep plus a real press PDF, Word and PowerPoint build for every option value.
