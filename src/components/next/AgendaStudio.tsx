@@ -799,6 +799,32 @@ export function AgendaStudio({
 
             {config.qrData.trim() ? (
               <>
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-qr-anchor">Position</Label>
+                  <select
+                    id="agenda-qr-anchor"
+                    className={selectClass}
+                    value={agendaQrAnchor(config)}
+                    onChange={(e) =>
+                      setConfig((c) => ({
+                        ...c,
+                        qrAnchor: e.target.value as AgendaQrAnchor,
+                        // A saved drag would win over the new position, so clear it.
+                        qrOffsetX: null,
+                        qrOffsetY: null,
+                      }))
+                    }
+                  >
+                    {AGENDA_QR_ANCHORS.map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-muted-foreground">
+                    {AGENDA_QR_ANCHORS.find((a) => a.id === agendaQrAnchor(config))?.note}
+                  </p>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label htmlFor="agenda-qr-style">Module shape</Label>
