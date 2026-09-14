@@ -413,6 +413,18 @@ function PanelCard({
             </span>
           ) : null}
         </p>
+        {/* Which finished file this card is painting, so a replacement can be
+            confirmed at a glance rather than taken on trust. */}
+        {londonSuppliedMaster(panel) ? (
+          <p
+            className="mt-1 truncate font-mono text-[11px] text-[#03002C]/60"
+            title={londonSuppliedMaster(panel)!.filename}
+          >
+            {londonSuppliedMaster(panel)!.filename} · issued{" "}
+            {londonSuppliedMaster(panel)!.issued}
+          </p>
+        ) : null}
+
         {londonVenueItemMeta(panel) ? (
           <p className="mt-1 text-[12px] font-medium leading-snug text-[#03002C]/75">
             {londonVenueItemMeta(panel)!.note}
