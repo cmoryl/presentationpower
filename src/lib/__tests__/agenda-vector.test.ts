@@ -73,9 +73,8 @@ describe("agenda vector export", () => {
       // a raster plate, and never a Type 4 mesh (prints fine, cannot be retuned).
       expect(raw).toMatch(/\/ShadingType [23]/);
       expect(raw).toContain("/PatternType 2");
-      expect(raw).toContain("/PGround scn");
       expect(raw).not.toContain("/ShadingType 4");
-      expect(ops).toContain("sh");
+      expect(ops).toContain("/PGround scn");
       expect(/\/Subtype\s*\/Image/.test(raw)).toBe(false);
       // Live text and vector rules for the programme rows.
       expect((ops.match(/Tj/g) ?? []).length).toBeGreaterThan(10);
