@@ -113,6 +113,9 @@ export async function bookletMapPages(
   return pages;
 }
 
+/** Exposed for browser-driven verification of the fallback sample series. */
+export const __test_simpleSpec = simpleSampleSpec;
+
 /** One booklet page per chart module, at the booklet's own printed proportions. */
 export async function bookletChartPages(
   charts: readonly BookletChartPage[],
