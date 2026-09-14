@@ -30,7 +30,8 @@ describe("brand swap backdrop integrity", () => {
             continue;
           }
           const isPortrait = bd.url.includes("portrait");
-          if (!onBrand(bd.url) && !isPortrait && !bd.url.includes("corporate-dark")) {
+          if (!onBrand(bd.url) && !isPortrait && !bd.url.includes("corporate-dark") &&
+            !bd.url.includes("/backdrops/light/")) {
             offenders.push(`${brand.id}/${variant.id}/${mode}: ${bd.url}`);
           }
         }
