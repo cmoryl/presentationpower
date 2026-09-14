@@ -255,7 +255,11 @@ function trackedWidth(font: PDFFont, text: string, size: number, spacing: number
 }
 
 /** Trim a line to the available width so nothing overruns the safe area. */
-function fit(font: PDFFont, text: string, size: number, maxWidth: number): string {
+function fit(font: PDFFont, rawText: string, size: number, maxWidth: number): string {
+  // A single printed line: a typed line break in a session note is collapsed to
+  // a space. Left in, it either measures as an unencodable glyph (crashing the
+  // press build) or prints as a stray box in the ruled list.
+  const text = (rawText ?? "").replace(/[\r\n\t]+/g, " ").replace(/ {2,}/g, " ");
   if (!text) return "";
   if (font.widthOfTextAtSize(text, size) <= maxWidth) return text;
   let out = text;

@@ -1813,13 +1813,44 @@ export function agendaBlocks(config: AgendaConfig) {
     const wanted = config.sessions.map(height);
     const gaps = L.bandGap * Math.max(0, wanted.length - 1);
     const available = Math.max(20, listBottom - rowsTop - gaps);
-    const total = wanted.reduce((a, b) => a + b, 0) || 1;
     // Scale to the sheet: shrink proportionally when the day overruns, and share
     // the spare height out when it underruns, keeping the copy-driven ratios.
-    const scale = available / total;
+    //
+    // Short, wide formats (16:9, 21:9) have a shallow programme band, so a plain
+    // proportional scale plus a per-band legible floor used to add up to more
+    // than the band: the floored bands kept their height while nothing else gave
+    // any back, and the last sessions printed over the footer. The heights are
+    // solved by water-filling instead — bands that hit the floor are pinned at
+    // it and taken out of the budget, and the rest re-share what is left. When
+    // even the floor no longer fits, every band sits on the floor and the fit
+    // report / page capacity reports the overflow honestly.
+    const floorH = L.titleRowSize * 2.4;
+    const heights = new Array<number>(wanted.length).fill(floorH);
+    let free = wanted.map((_, i) => i);
+    let budget = available;
+    for (let pass = 0; pass < wanted.length + 1 && free.length > 0; pass += 1) {
+      const freeTotal = free.reduce((a, i) => a + wanted[i]!, 0) || 1;
+      const scale = budget / freeTotal;
+      const pinned = free.filter((i) => wanted[i]! * scale < floorH);
+      if (pinned.length === 0) {
+        for (const i of free) heights[i] = wanted[i]! * scale;
+        free = [];
+        break;
+      }
+      for (const i of pinned) {
+        heights[i] = floorH;
+        budget -= floorH;
+      }
+      free = free.filter((i) => !pinned.includes(i));
+      if (budget <= 0) {
+        for (const i of free) heights[i] = floorH;
+        free = [];
+      }
+    }
+    for (const i of free) heights[i] = floorH;
     let cursor = rowsTop;
     rows = config.sessions.map((session, i) => {
-      const h = Math.max(L.titleRowSize * 2.4, wanted[i]! * scale);
+      const h = heights[i]!;
       const y = cursor;
       cursor += h + L.bandGap;
       const band = { x, y, w: session.parallel ? L.splitLeftW : L.contentW, h };
