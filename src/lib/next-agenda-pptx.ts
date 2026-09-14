@@ -28,6 +28,7 @@ import {
   agendaQrForeground,
   agendaQrStyle,
   agendaQrTransparent,
+  agendaRowStyle,
   agendaSlug,
   agendaTitleInk,
   type AgendaConfig,
@@ -187,7 +188,40 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       valign: "top",
       margin: 0,
     });
-    if ((cfg.meta ?? "").trim()) {
+    // Card mode puts the room line and the date right-aligned beside the lockup.
+    if (b.location && (cfg.locationLine ?? "").trim()) {
+      const loc = b.location;
+      s.addText((cfg.locationLine ?? "").trim().toUpperCase(), {
+        x: inX(b.x),
+        y: inX(loc.y),
+        w: inX(loc.right - b.x),
+        h: inX(loc.size * 1.8),
+        fontFace: FONT,
+        fontSize: pt(loc.size),
+        lineSpacing: pt(loc.size * 1.5),
+        bold: true,
+        charSpacing: 2,
+        color: inkHex,
+        align: "right",
+        valign: "top",
+        margin: 0,
+      });
+      if ((cfg.meta ?? "").trim()) {
+        s.addText(cfg.meta, {
+          x: inX(b.x),
+          y: inX(loc.metaY),
+          w: inX(loc.right - b.x),
+          h: inX(loc.metaSize * 2),
+          fontFace: FONT,
+          fontSize: pt(loc.metaSize),
+          lineSpacing: pt(loc.metaSize * 1.6),
+          color: inkHex,
+          align: "right",
+          valign: "top",
+          margin: 0,
+        });
+      }
+    } else if ((cfg.meta ?? "").trim()) {
       s.addText(cfg.meta, {
         x: inX(b.x),
         y: inX(b.metaY),
@@ -413,11 +447,63 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       }
     }
 
+    // The printed card board finishes on a full-bleed Blue 500 band carrying the
+    // event URL and dates in white.
+    if (b.footerBand) {
+      const fb = b.footerBand;
+      s.addShape("rect", {
+        x: inX(fb.x),
+        y: inX(fb.y),
+        w: inX(fb.w),
+        h: inX(fb.h),
+        fill: { color: hex(AGENDA_BAND.footerBand) },
+        line: { type: "none" },
+        objectName: "NEXT agenda footer band",
+      });
+      const footInk = hex(AGENDA_BAND.footerInk, "FFFFFF");
+      const bandY = fb.y + (fb.h - L.footSize * 1.6) * 0.5;
+      if ((cfg.footerLeft ?? "").trim()) {
+        s.addText((cfg.footerLeft ?? "").trim().toUpperCase(), {
+          x: inX(b.x),
+          y: inX(bandY),
+          w: inX(b.contentW * 0.62),
+          h: inX(L.footSize * 2),
+          fontFace: FONT,
+          fontSize: pt(L.footSize),
+          lineSpacing: pt(L.footSize * 1.6),
+          bold: true,
+          charSpacing: 2,
+          color: footInk,
+          valign: "top",
+          margin: 0,
+        });
+      }
+      if ((cfg.footerRight ?? "").trim()) {
+        s.addText((cfg.footerRight ?? "").trim().toUpperCase(), {
+          x: inX(b.x + b.contentW * 0.62),
+          y: inX(bandY),
+          w: inX(b.contentW * 0.38),
+          h: inX(L.footSize * 2),
+          fontFace: FONT,
+          fontSize: pt(L.footSize),
+          lineSpacing: pt(L.footSize * 1.6),
+          bold: true,
+          charSpacing: 2,
+          color: footInk,
+          align: "right",
+          valign: "top",
+          margin: 0,
+        });
+      }
+    }
+
     const foot = [(cfg.footnote ?? "").trim()].filter(Boolean).join(" ");
+    // On a card board the footnote sits above the brand band, not inside it.
+    const footNoteY = b.footerBand ? b.footerBand.y - L.footSize * 2.6 : b.footY;
     if (foot) {
       s.addText(foot, {
         x: inX(b.x),
-        y: inX(b.footY),
+        y: inX(footNoteY),
         w: inX(b.contentW * 0.7),
         h: inX(L.footSize * 2),
         fontFace: FONT,
@@ -431,7 +517,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
     if ((cfg.pageLabel ?? "").trim()) {
       s.addText(cfg.pageLabel!.toUpperCase(), {
         x: inX(b.x + b.contentW * 0.7),
-        y: inX(b.footY),
+        y: inX(footNoteY),
         w: inX(b.contentW * 0.3),
         h: inX(L.footSize * 2),
         fontFace: FONT,
