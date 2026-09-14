@@ -13,7 +13,7 @@
  * A second, smaller sweep builds real export bytes across every axis value so
  * the vector PDF, Word and PowerPoint writers are proven on each option too.
  */
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 import {
   AGENDA_BAND_TREATMENTS,
