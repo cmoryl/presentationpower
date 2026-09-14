@@ -1070,6 +1070,14 @@ export function agendaQrContrast(config: AgendaConfig): { ratio: number; ok: boo
   return { ratio, ok: ratio >= AGENDA_QR_MIN_CONTRAST };
 }
 
+/** Printed module size and quiet zone of the code as it will be output. */
+export function agendaQrPrintQuality(config: AgendaConfig) {
+  const payload = (config.qrData ?? "").trim();
+  const blocks = agendaBlocks(config);
+  if (!payload || !blocks.qr) return null;
+  return qrPrintQuality(payload, blocks.qr.edge, agendaQrStyle(config) as QrModuleStyle);
+}
+
 /**
  * Everything that would stop a phone reading the printed code: no link, ink and
  * plate too close in value, or modules printed too small to resolve. Returned as
