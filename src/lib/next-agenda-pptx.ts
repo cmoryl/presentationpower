@@ -18,6 +18,7 @@
 import PptxGenJS from "pptxgenjs";
 
 import {
+  AGENDA_BAND,
   agendaBlocks,
   agendaGeometry,
   agendaInk,
@@ -204,7 +205,100 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
     // Programme rows as ONE native table: presenters re-time sessions in
     // PowerPoint constantly, and a table keeps the columns aligned when they do.
     const rows = b.rows;
-    if (rows.length) {
+    const cardMode = agendaRowStyle(cfg) === "card";
+
+    // Card mode: the printed board draws each session as a pale band, with any
+    // parallel session on an aqua card beside it. PowerPoint gets the same
+    // geometry as shapes so the deck reads exactly like the printed sheet.
+    if (cardMode && rows.length) {
+      const bandText = (
+        box: { x: number; y: number; w: number; h: number },
+        session: { time?: string; title?: string; detail?: string },
+      ) => {
+        s.addText(session.time ?? "", {
+          x: inX(box.x + L.bandPadX),
+          y: inX(box.y + L.bandPadY),
+          w: inX(L.timeColW),
+          h: inX(L.timeSize * 2),
+          fontFace: FONT,
+          fontSize: pt(L.timeSize),
+          lineSpacing: pt(L.timeSize * 1.4),
+          bold: true,
+          color: hex(AGENDA_BAND.ink),
+          valign: "top",
+          margin: 0,
+        });
+        const copyX = box.x + L.bandPadX + L.timeColW;
+        const copyW = box.w - L.bandPadX * 2 - L.timeColW;
+        s.addText(
+          [
+            {
+              text: session.title ?? "",
+              options: {
+                fontSize: pt(L.titleRowSize),
+                bold: true,
+                color: hex(AGENDA_BAND.ink),
+                breakLine: true,
+                lineSpacing: pt(L.titleRowSize * 1.5),
+              },
+            },
+            ...((session.detail ?? "").trim()
+              ? [
+                  {
+                    text: session.detail!,
+                    options: {
+                      fontSize: pt(L.detailSize),
+                      color: hex(AGENDA_BAND.ink),
+                      lineSpacing: pt(L.detailSize * 1.5),
+                    },
+                  },
+                ]
+              : []),
+          ],
+          {
+            x: inX(copyX),
+            y: inX(box.y + L.bandPadY),
+            w: inX(Math.max(6, copyW)),
+            h: inX(box.h - L.bandPadY * 2),
+            fontFace: FONT,
+            valign: "top",
+            margin: 0,
+          },
+        );
+      };
+
+      rows.forEach((r, i) => {
+        const band = r.band;
+        if (!band) return;
+        s.addShape("rect", {
+          x: inX(band.x),
+          y: inX(band.y),
+          w: inX(band.w),
+          h: inX(band.h),
+          fill: { color: hex(i % 2 === 0 ? AGENDA_BAND.fillA : AGENDA_BAND.fillB) },
+          line: { type: "none" },
+          objectName: `Session band ${i + 1}`,
+        });
+        bandText(band, r.session);
+        const par = r.parallel;
+        if (par && r.session.parallel) {
+          s.addShape("rect", {
+            x: inX(par.x),
+            y: inX(par.y),
+            w: inX(par.w),
+            h: inX(par.h),
+            fill: { color: hex(AGENDA_BAND.parallel) },
+            line: { type: "none" },
+            objectName: `Parallel session ${i + 1}`,
+          });
+          bandText(par, {
+            time: r.session.time,
+            title: r.session.parallel.title,
+            detail: r.session.parallel.detail,
+          });
+        }
+      });
+    } else if (rows.length) {
       const timeW = inX(L.timeColW);
       const trackW = inX(L.trackColW);
       const bodyW = inX(b.contentW) - timeW - trackW;

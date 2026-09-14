@@ -58,6 +58,7 @@ import {
   agendaPages,
   agendaStops,
   agendaTitleInk,
+  AGENDA_BAND,
   type AgendaConfig,
 } from "./next-agenda";
 import { agendaCopyInk } from "./next-agenda-contrast";
@@ -250,6 +251,30 @@ function fit(font: PDFFont, text: string, size: number, maxWidth: number): strin
   return `${out}…`;
 }
 
+/** Wrap copy on word boundaries so a banded row prints every word it carries. */
+function wrapLines(font: PDFFont, text: string, size: number, maxWidth: number): string[] {
+  const out: string[] = [];
+  for (const para of text.split("\n")) {
+    const words = para.trim().split(/\s+/).filter(Boolean);
+    if (!words.length) continue;
+    let line = "";
+    for (const word of words) {
+      const next = line ? `${line} ${word}` : word;
+      if (font.widthOfTextAtSize(next, size) <= maxWidth || !line) line = next;
+      else {
+        out.push(line);
+        line = word;
+      }
+    }
+    if (line) out.push(line);
+  }
+  return out;
+}
+
+/** House location pin, drawn on its own so the press file carries real vector. */
+const AGENDA_PIN_PATH =
+  "M9 0C4.03 0 0 4.03 0 9c0 6.36 7.4 14.68 7.72 15.03a1.72 1.72 0 0 0 2.56 0C10.6 23.68 18 15.36 18 9c0-4.97-4.03-9-9-9Zm0 13.1A4.1 4.1 0 1 1 9 4.9a4.1 4.1 0 0 1 0 8.2Z";
+
 export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<AgendaVectorResult> {
   const pages = agendaPages(config);
   const geo = agendaGeometry(config);
@@ -437,7 +462,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
         color: rgb(...hexRgb(titleInk)),
       });
     }
-    if ((cfg.meta ?? "").trim()) {
+    if ((cfg.meta ?? "").trim() && !blocks.location) {
       const size = mm(L.metaSize);
       page.drawText(fit(regular, cfg.meta, size, mm(blocks.headW)), {
         x: px(blocks.x),
@@ -448,10 +473,150 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
         opacity: 0.86,
       });
     }
+    // Programme look: room line with its pin, and the date beneath it, both set
+    // to the right of the lockup exactly where the preview places them.
+    if (blocks.location) {
+      const loc = blocks.location;
+      const size = mm(loc.size);
+      const right = px(blocks.x + blocks.contentW);
+      const label = (cfg.locationLine ?? "").trim();
+      if (label) {
+        const w = bold.widthOfTextAtSize(label, size);
+        page.drawText(label, {
+          x: right - w,
+          y: py(loc.pin!.y) - size,
+          size,
+          font: bold,
+          color: rgb(...hexRgb(ink)),
+        });
+        const pinH = size * 1.15;
+        page.drawSvgPath(AGENDA_PIN_PATH, {
+          x: right - w - pinH * 0.72 - size * 0.3,
+          y: py(loc.pin!.y) - size * 0.05,
+          scale: pinH / 25,
+          color: rgb(...hexRgb(AGENDA_BAND.pin)),
+        });
+      }
+      if ((cfg.meta ?? "").trim()) {
+        const ms = mm(loc.metaSize);
+        const w = regular.widthOfTextAtSize(cfg.meta, ms);
+        page.drawText(cfg.meta, {
+          x: right - w,
+          y: py(loc.metaY) - ms,
+          size: ms,
+          font: regular,
+          color: rgb(...hexRgb(ink)),
+        });
+      }
+    }
     endLayer(page);
 
     // ── 04 Sessions ──────────────────────────────────────────────────────────
     beginLayer(page, layer("04 Sessions"));
+    if (L.card) {
+      // Programme bands: a pale plate per session, an aqua plate for a parallel
+      // track, and the same copy geometry the preview measured.
+      const bandInk = rgb(...hexRgb(AGENDA_BAND.ink));
+      const padX = mm(L.bandPadX);
+      const padY = mm(L.bandPadY);
+      const timeW = mm(L.timeColW);
+      blocks.rows.forEach((row, i) => {
+        const band = row.band;
+        if (!band) return;
+        page.drawRectangle({
+          x: px(band.x),
+          y: py(band.y) - mm(band.h),
+          width: mm(band.w),
+          height: mm(band.h),
+          color: rgb(...hexRgb(i % 2 === 0 ? AGENDA_BAND.fillA : AGENDA_BAND.fillB)),
+        });
+        const bodyX = px(band.x) + padX + timeW;
+        const bodyW = mm(band.w) - padX * 2 - timeW;
+        let y = py(band.y) - padY;
+        if (row.session.time.trim()) {
+          const size = mm(L.timeSize);
+          page.drawText(fit(regular, row.session.time, size, timeW), {
+            x: px(band.x) + padX,
+            y: y - size,
+            size,
+            font: regular,
+            color: bandInk,
+          });
+        }
+        if (row.session.track.trim()) {
+          const size = mm(L.trackSize);
+          page.drawText(row.session.track.toUpperCase(), {
+            x: bodyX,
+            y: y - size,
+            size,
+            font: bold,
+            color: bandInk,
+          });
+          y -= size * 1.5;
+        }
+        if (row.session.title.trim()) {
+          const size = mm(L.titleRowSize);
+          const font = row.session.muted ? regular : bold;
+          for (const line of wrapLines(font, row.session.title, size, bodyW)) {
+            page.drawText(line, { x: bodyX, y: y - size, size, font, color: bandInk });
+            y -= size * 1.5;
+          }
+        }
+        if (row.session.detail.trim()) {
+          const size = mm(L.detailSize);
+          y -= size * 0.5;
+          for (const line of wrapLines(regular, row.session.detail, size, bodyW)) {
+            page.drawText(line, { x: bodyX, y: y - size, size, font: regular, color: bandInk });
+            y -= size * 1.55;
+          }
+        }
+        const par = row.parallel;
+        if (par && row.session.parallel) {
+          page.drawRectangle({
+            x: px(par.x),
+            y: py(par.y) - mm(par.h),
+            width: mm(par.w),
+            height: mm(par.h),
+            color: rgb(...hexRgb(AGENDA_BAND.parallel)),
+          });
+          const pw = mm(par.w) - padX * 2 - mm(L.locSize * 1.4);
+          let py2 = py(par.y) - padY;
+          const size = mm(L.titleRowSize);
+          for (const line of wrapLines(bold, row.session.parallel.title, size, pw)) {
+            page.drawText(line, {
+              x: px(par.x) + padX,
+              y: py2 - size,
+              size,
+              font: bold,
+              color: bandInk,
+            });
+            py2 -= size * 1.5;
+          }
+          if (row.session.parallel.detail.trim()) {
+            const ds = mm(L.detailSize);
+            py2 -= ds * 0.5;
+            for (const line of wrapLines(regular, row.session.parallel.detail, ds, pw)) {
+              page.drawText(line, {
+                x: px(par.x) + padX,
+                y: py2 - ds,
+                size: ds,
+                font: regular,
+                color: bandInk,
+              });
+              py2 -= ds * 1.55;
+            }
+          }
+          const pinH = mm(L.locSize * 1.5);
+          page.drawSvgPath(AGENDA_PIN_PATH, {
+            x: px(par.x + par.w) - padX - pinH * 0.72,
+            y: py(par.y + par.h) + padY + pinH,
+            scale: pinH / 25,
+            color: rgb(...hexRgb(AGENDA_BAND.pin)),
+          });
+        }
+      });
+      endLayer(page);
+    } else {
     const ruleColor = rgb(...hexRgb(ink));
     const timeW = mm(L.timeColW);
     const trackW = mm(L.trackColW);
@@ -529,13 +694,73 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       opacity: face === "light" ? 0.22 : 0.28,
     });
     endLayer(page);
+    }
 
     // ── 05 Footer ────────────────────────────────────────────────────────────
     const stamp = (cfg.pageLabel ?? "").trim();
-    if ((cfg.footnote ?? "").trim() || stamp) {
+    const footnote = (cfg.footnote ?? "").trim();
+    if (blocks.footerBand) {
       beginLayer(page, layer("05 Footer"));
       const size = mm(L.footSize);
-      if ((cfg.footnote ?? "").trim()) {
+      const band = blocks.footerBand;
+      // The band bleeds off the foot so no white edge survives trimming.
+      page.drawRectangle({
+        x: ox,
+        y: oy,
+        width: bleedW,
+        height: py(band.y) - oy,
+        color: rgb(...hexRgb(AGENDA_BAND.footerBand)),
+      });
+      const bandInk = rgb(...hexRgb(AGENDA_BAND.footerInk));
+      if (footnote) {
+        const fs = mm(L.footSize * 1.15);
+        const hasPin = blocks.rows.some((r) => r.parallel);
+        const pinH = fs * 1.9;
+        const x = px(blocks.x) + (hasPin ? pinH * 0.72 + fs * 0.4 : 0);
+        const y = py(band.y - L.footSize * 3.1) - fs;
+        if (hasPin) {
+          page.drawSvgPath(AGENDA_PIN_PATH, {
+            x: px(blocks.x),
+            y: y + fs * 1.5,
+            scale: pinH / 25,
+            color: rgb(...hexRgb(AGENDA_BAND.pin)),
+          });
+        }
+        page.drawText(fit(bold, footnote, fs, mm(blocks.contentW) - (x - px(blocks.x))), {
+          x,
+          y,
+          size: fs,
+          font: bold,
+          color: rgb(...hexRgb(ink)),
+        });
+      }
+      const left = (cfg.footerLeft ?? "").trim();
+      if (left) {
+        page.drawText(fit(regular, left.toUpperCase(), size, mm(blocks.contentW * 0.6)), {
+          x: px(blocks.x),
+          y: py(blocks.footY) - size,
+          size,
+          font: regular,
+          color: bandInk,
+        });
+      }
+      const right = (cfg.footerRight ?? "").trim() || stamp;
+      if (right) {
+        const label = right.toUpperCase();
+        const w = regular.widthOfTextAtSize(label, size);
+        page.drawText(label, {
+          x: px(blocks.x + blocks.contentW) - w,
+          y: py(blocks.footY) - size,
+          size,
+          font: regular,
+          color: bandInk,
+        });
+      }
+      endLayer(page);
+    } else if (footnote || stamp) {
+      beginLayer(page, layer("05 Footer"));
+      const size = mm(L.footSize);
+      if (footnote) {
         page.drawText(fit(regular, cfg.footnote, size, mm(blocks.contentW * 0.72)), {
           x: px(blocks.x),
           y: py(blocks.footY) - size,

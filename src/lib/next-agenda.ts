@@ -277,7 +277,55 @@ export const AGENDA_TEXT_COLORS: { id: string; label: string; hex: string }[] = 
   { id: "yellow", label: "Yellow", hex: "#FFEB66" },
 ];
 
+// ── row treatment ────────────────────────────────────────────────────────────
+//
+// Two approved programme looks. "rule" is the issued ruled list. "card" is the
+// NEXT programme board: every session sits on its own pale band with the time in
+// a left column, alternating white and lavender, and a parallel session printed
+// beside it on an aqua card marked with a location pin.
+
+export type AgendaRowStyleId = "rule" | "card";
+
+export const AGENDA_ROW_STYLES: { id: AgendaRowStyleId; name: string; note: string }[] = [
+  {
+    id: "rule",
+    name: "Ruled list",
+    note: "Copy on the gradient with a hairline between sessions. The issued board look.",
+  },
+  {
+    id: "card",
+    name: "Programme bands",
+    note: "Each session on its own pale band, alternating white and lavender, with parallel sessions on an aqua card.",
+  },
+];
+
+/**
+ * Band palette for the programme look. Approved TransPerfect values only —
+ * white and Lavender for the alternating bands, Aqua for a parallel session,
+ * Peach for the location pin, Blue 500 for the footer band. Copy on a band is
+ * always Blue 800, which is the only ink that reads on all four.
+ */
+export const AGENDA_BAND = {
+  fillA: "#FFFFFF",
+  fillB: "#EFE0FA",
+  parallel: "#A1FBF9",
+  ink: "#03002C",
+  pin: "#FF9B70",
+  footerBand: "#003FC7",
+  footerInk: "#FFFFFF",
+} as const;
+
+export function agendaRowStyle(config: { rowStyle?: string }): AgendaRowStyleId {
+  return config.rowStyle === "card" ? "card" : "rule";
+}
+
 // ── content ──────────────────────────────────────────────────────────────────
+
+/** A session running in parallel with the row it sits on, in another room. */
+export type AgendaParallel = {
+  title: string;
+  detail: string;
+};
 
 export type AgendaSession = {
   time: string;
@@ -287,6 +335,10 @@ export type AgendaSession = {
   track: string;
   /** Break / transition rows print in a quieter weight. */
   muted: boolean;
+  /** Second session sharing the same band, printed on an aqua card. */
+  parallel?: AgendaParallel | null;
+  /** Mark the row with the location pin (session runs off the main floor). */
+  pin?: boolean;
 };
 
 /** One programme day. Multi-day agendas hold an ordered list of these. */
@@ -314,9 +366,17 @@ export type AgendaConfig = {
   meta: string;
   /** Headline ink. Empty = the face default. */
   titleColor: string;
+  /** Programme look: ruled list or pale programme bands. */
+  rowStyle: AgendaRowStyleId;
+  /** Room / floor line printed with a pin beside the lockup. Empty = none. */
+  locationLine: string;
   sessions: AgendaSession[];
   /** Footer line printed at the foot of the board. */
   footnote: string;
+  /** Left-hand footer line on the band, e.g. the event URL. Empty = none. */
+  footerLeft: string;
+  /** Right-hand footer line, e.g. the event dates. Empty = none. */
+  footerRight: string;
   /** Printed QR payload. Empty = no QR. */
   qrData: string;
   qrSize: number;
@@ -353,15 +413,124 @@ export type AgendaConfig = {
   pageLabel?: string;
 };
 
+/** Row helper: keeps the issued programmes readable. */
+const row = (
+  time: string,
+  title: string,
+  detail = "",
+  extra: Partial<AgendaSession> = {},
+): AgendaSession => ({ time, title, detail, track: "", muted: false, ...extra });
+
+/** GlobalLinkNEXT London, day one — Fleming, 3rd floor. */
+const GLOBALLINK_DAY_ONE: AgendaSession[] = [
+  row("11:30 AM-1:30 PM", "Registration, Networking & Lunch", "", { muted: true }),
+  row("1:30-1:45 PM", "Welcome to GlobalLinkNEXT"),
+  row(
+    "1:45 PM-2:30 PM",
+    "Building What's NEXT: Inside TransPerfect's GlobalLink Technology",
+    "Join TransPerfect's Technology Leaders for an inside look at the innovations shaping the company's future.",
+  ),
+  row(
+    "2:30-3:00 PM",
+    "One Platform, One Voice: How Hilti Built a Global Localization Backbone",
+    "Karel Rozkosny, Global Lead Marketing Technology, Hilti Group",
+  ),
+  row(
+    "3:00-3:30 PM",
+    "Mind the Gap! Why AI Translation Needs Governance",
+    "Hilary Wright & Ty Trainer, AI Practice Group, TransPerfect",
+  ),
+  row("3:30-3:45 PM", "Coffee Break", "", { muted: true }),
+  row(
+    "3:45-4:10 PM",
+    "Brewing AI-Powered Innovation",
+    "Francesco Mandia, Global Head of Digital Innovation & Performance Marketing, illycaffé S.p.A.",
+    {
+      parallel: {
+        title: "Adapting to a New Era of Travel Discovery",
+        detail: "Ashley Jones, Client Partner, Tripadvisor",
+      },
+    },
+  ),
+  row(
+    "4:15-4:40 PM",
+    "Managing an AI-Forward Content Supply Chain",
+    "Lindis Barry, Sr. Globalization Lead, Amazon Web Services",
+    {
+      parallel: {
+        title: "Built to Evolve: Redesigning Fairmont.com to Unlock the Future of Digital Hospitality",
+        detail:
+          "Brittany Borrego, Lead Digital Experience & Performance Manager, Accor Hotels - Fairmont & Raffles",
+      },
+    },
+  ),
+  row("4:45-5:10 PM", "TBA"),
+  row("5:10-5:50 PM", "Panel Discussion", "Moderated by Aaron Campbell, Senior Director, TransPerfect"),
+  row("5:50-6:00 PM", "Closing Remarks Day One"),
+  row("6:00-8:00 PM", "Post-Event Networking Cocktail Reception", "", { muted: true }),
+];
+
+/** GlobalLinkNEXT London, day two. */
+const GLOBALLINK_DAY_TWO: AgendaSession[] = [
+  row("9:00-9:45 AM", "Doors Open, Coffee & Networking", "", { muted: true }),
+  row(
+    "9:45-10:30 AM",
+    "Beyond Intelligence",
+    "Matt Hauser, Chief Experience Officer, TransPerfect\n\nArtificial intelligence has rapidly shifted from a novelty into an everyday baseline, but true competitive advantage lies in what you build on top of that technology. Discover how TransPerfect's continuous evolution can help turn new capabilities into strategic outcomes for what's NEXT.",
+  ),
+  row(
+    "10:30-11:45 AM",
+    "Unreasonable Brands: How to Build a Brand Centered on Unreasonable Hospitality",
+    "Will Guidara, New York Times bestselling author of Unreasonable Hospitality and former co-owner of Eleven Madison Park, will show how making people feel valued turned a restaurant into the best in the world, and how that same thinking builds brands people stay loyal to.",
+    { track: "KEYNOTE" },
+  ),
+  row("11:45-12:45 PM", "Lunch", "", { muted: true }),
+  row(
+    "12:45-1:10 PM",
+    "Becoming AI-Forward— Scaling Localization & Content with Agentic AI",
+    "Jonathan, Head of Customer & Product Excellence, Amazon Web Services",
+  ),
+  row(
+    "1:15-1:40 PM",
+    "Aura: Building the Marketing Operating System",
+    "Mario Lenoci & Verena Bucher, TransPerfect",
+  ),
+  row("1:45-2:10 PM", "Turning Information into Advantage", "Mark Lawyer, Vice President, TransPerfect"),
+  row(
+    "2:15-2:40 PM",
+    "Scaling Creative Without Losing Control: A Guide to AI in Content Production",
+    "Danielle Penny, Content Manager, easyJet Holidays",
+  ),
+  row(
+    "2:45-3:10 PM",
+    "Beyond Loyalty: How Global Hotel Alliance Builds One Experience Across 50+ Brands",
+    "Nicholas le Roux, EVP Marketing, Global Hotel Alliance",
+  ),
+  row("3:10-3:15 PM", "Closing Remarks"),
+];
+
+
 /**
  * Division-specific default programmes. Every NEXT area opens on its own
  * agenda copy, so an operator starts from a real programme for that track
  * rather than a blank grid.
  */
-const DIVISION_PROGRAMMES: Record<
-  string,
-  { title: string; meta: string; sessions: AgendaSession[] }
-> = {
+type DivisionProgramme = {
+  title: string;
+  meta: string;
+  sessions: AgendaSession[];
+  /** Multi-day programme. Day one is mirrored onto the fields above. */
+  days?: AgendaDay[];
+  /** Look, header pin line and footer lines this division opens on. */
+  rowStyle?: AgendaRowStyleId;
+  eyebrow?: string;
+  locationLine?: string;
+  footnote?: string;
+  footerLeft?: string;
+  footerRight?: string;
+};
+
+const DIVISION_PROGRAMMES: Record<string, DivisionProgramme> = {
   "city-series": {
     title: "DAY ONE",
     meta: "City Series · 2026 season",
@@ -418,54 +587,20 @@ const DIVISION_PROGRAMMES: Record<
       },
     ],
   },
+  // GlobalLinkNEXT London — the issued two-day programme, as approved.
   globallink: {
-    title: "DAY ONE",
-    meta: "GlobalLink NEXT · agenda",
-    sessions: [
-      {
-        time: "08:30",
-        title: "Registration & platform lab open",
-        detail: "Concourse, Level 2",
-        track: "",
-        muted: true,
-      },
-      {
-        time: "09:30",
-        title: "Keynote — one platform, every channel",
-        detail: "GlobalLink product leadership",
-        track: "MAIN STAGE",
-        muted: false,
-      },
-      {
-        time: "10:30",
-        title: "Connector clinic: CMS, PIM & commerce",
-        detail: "Live integrations, bring a stack",
-        track: "LAB",
-        muted: false,
-      },
-      { time: "11:30", title: "Break", detail: "", track: "", muted: true },
-      {
-        time: "12:00",
-        title: "Automation blueprints for global teams",
-        detail: "Workflow patterns that scale",
-        track: "WORKSHOP",
-        muted: false,
-      },
-      { time: "13:00", title: "Lunch & partner expo", detail: "Atrium", track: "", muted: true },
-      {
-        time: "14:00",
-        title: "Roadmap deep dive",
-        detail: "What ships next, and why",
-        track: "STUDIO",
-        muted: false,
-      },
-      {
-        time: "16:00",
-        title: "Ask the engineers",
-        detail: "Open floor Q&A",
-        track: "MAIN STAGE",
-        muted: false,
-      },
+    title: "",
+    meta: "THURSDAY, SEPTEMBER 24, 2026",
+    rowStyle: "card",
+    eyebrow: "",
+    locationLine: "FLEMING 3RD FLOOR",
+    footnote: "These sessions will take place in Abbey (4th Floor)",
+    footerLeft: "WWW.TRANSPERFECTNEXT.COM/EMEA/GLOBALLINK",
+    footerRight: "24 & 25 SEPTEMBER, 2026",
+    sessions: GLOBALLINK_DAY_ONE,
+    days: [
+      { label: "", meta: "THURSDAY, SEPTEMBER 24, 2026", sessions: GLOBALLINK_DAY_ONE },
+      { label: "", meta: "FRIDAY, SEPTEMBER 25, 2026", sessions: GLOBALLINK_DAY_TWO },
     ],
   },
   finance: {
@@ -927,6 +1062,42 @@ export function agendaProgramme(divisionId: string | undefined) {
   return DIVISION_PROGRAMMES[div.id] ?? GENERIC_PROGRAMME;
 }
 
+/**
+ * True when a board still carries its division's approved programme copy.
+ *
+ * Compared on printed content only: a normalized config carries optional keys
+ * (`parallel`, `pin`) that the programme records omit, so a raw JSON comparison
+ * reports every untouched board as edited.
+ */
+export function agendaProgrammeIsStock(config: {
+  divisionId?: string;
+  sessions: AgendaSession[];
+  days?: AgendaDay[];
+}): boolean {
+  const programme = agendaProgramme(config.divisionId);
+  const sig = (s: Partial<AgendaSession>) =>
+    [
+      s.time ?? "",
+      s.title ?? "",
+      s.detail ?? "",
+      s.track ?? "",
+      s.muted ? "1" : "0",
+      s.parallel?.title ?? "",
+      s.parallel?.detail ?? "",
+    ].join("\u0001");
+  const same = (a: Partial<AgendaSession>[], b: Partial<AgendaSession>[]) =>
+    a.length === b.length && a.every((s, i) => sig(s) === sig(b[i]!));
+  if (config.days?.length) {
+    const stockDays = programme.days ?? [];
+    return (
+      config.days.length === stockDays.length &&
+      config.days.every((d, i) => same(d.sessions, stockDays[i]?.sessions ?? []))
+    );
+  }
+  if (programme.days?.length) return false;
+  return same(config.sessions, programme.sessions);
+}
+
 export function agendaDefault(divisionId = "city-series"): AgendaConfig {
   const div = agendaDivision(divisionId);
   const programme = agendaProgramme(div.id);
@@ -939,12 +1110,16 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
     trimH: 594,
     showLockup: true,
     lockupScale: 1,
-    eyebrow: "AGENDA",
+    eyebrow: programme.eyebrow ?? "AGENDA",
     title: programme.title,
     meta: programme.meta,
     titleColor: "",
+    rowStyle: programme.rowStyle ?? "rule",
+    locationLine: programme.locationLine ?? "",
     sessions: programme.sessions.map((s) => ({ ...s })),
-    footnote: "Programme subject to change · full agenda and speaker bios online",
+    footnote: programme.footnote ?? "Programme subject to change · full agenda and speaker bios online",
+    footerLeft: programme.footerLeft ?? "",
+    footerRight: programme.footerRight ?? "",
     qrData: "",
     qrSize: 48,
     qrCaption: "FULL AGENDA",
@@ -959,6 +1134,7 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
     qrOffsetX: null,
     qrOffsetY: null,
     eventLabel: "",
+    days: programme.days?.map((d) => ({ ...d, sessions: d.sessions.map((s) => ({ ...s })) })),
   };
 }
 
@@ -966,13 +1142,32 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
 export function withAgendaDivision(config: AgendaConfig, divisionId: string): AgendaConfig {
   const div = agendaDivision(divisionId);
   const fresh = agendaDefault(div.id);
-  const untouched =
-    JSON.stringify(config.sessions) === JSON.stringify(agendaProgramme(config.divisionId).sessions);
+  const untouched = agendaProgrammeIsStock(config);
   const metaUntouched = config.meta === agendaProgramme(config.divisionId).meta;
+  // An unedited board adopts the incoming division's whole approved programme —
+  // its days, row look and title/footer lines — not just the session rows, so a
+  // division whose signed-off board is the banded programme arrives looking like
+  // its board rather than the previous division's ruled list.
+  if (untouched) {
+    return {
+      ...config,
+      divisionId: div.id,
+      sessions: fresh.sessions,
+      days: fresh.days,
+      rowStyle: fresh.rowStyle,
+      eyebrow: fresh.eyebrow,
+      title: fresh.title,
+      locationLine: fresh.locationLine,
+      footnote: fresh.footnote,
+      footerLeft: fresh.footerLeft,
+      footerRight: fresh.footerRight,
+      meta: metaUntouched ? fresh.meta : config.meta,
+    };
+  }
   return {
     ...config,
     divisionId: div.id,
-    sessions: untouched ? fresh.sessions : config.sessions,
+    sessions: config.sessions,
     meta: metaUntouched ? fresh.meta : config.meta,
   };
 }
@@ -1145,37 +1340,60 @@ export function agendaLayout(config: AgendaConfig) {
   const lockupW = Math.min(contentW * 0.44, geo.trimH * 0.2 * ratio) * agendaLockupScale(config);
   const lockupH = lockupW / ratio;
 
+  const card = agendaRowStyle(config) === "card";
+
   const eyebrowSize = 5.4 * k;
   const titleSize = 22 * k;
-  const metaSize = 6.4 * k;
+  const metaSize = card ? 4.6 * k : 6.4 * k;
   const footSize = 4.4 * k;
   const qrEdge = Math.min(agendaQrSize(config), contentW * 0.35);
-  const headBlock =
-    (config.showLockup ? lockupH + 9 * k : 0) +
-    eyebrowSize * 2.4 +
-    titleSize * 1.16 +
-    metaSize * 2.1;
+  // Programme look: the room / floor line sits beside the lockup with a pin, the
+  // date line under it, and the footer prints on a Blue 500 band across the foot.
+  const locSize = 8.2 * k;
+  const bandGap = 2.6 * k;
+  const bandPadX = 4.6 * k;
+  const bandPadY = 3.4 * k;
+  const footerBandH = card ? footSize * 3.6 : 0;
+  const headBlock = card
+    ? Math.max(
+        config.showLockup ? lockupH : 0,
+        (config.locationLine ?? "").trim() ? locSize * 1.5 + metaSize * 1.8 : 0,
+      ) +
+      ((config.eyebrow ?? "").trim() ? eyebrowSize * 2.4 : 0) +
+      ((config.title ?? "").trim() ? titleSize * 1.16 : 0) +
+      8 * k
+    : (config.showLockup ? lockupH + 9 * k : 0) +
+      eyebrowSize * 2.4 +
+      titleSize * 1.16 +
+      metaSize * 2.1;
   // The foot only reserves height for the code when the code rests there.
   const qrInFoot = config.qrData.trim() !== "" && agendaQrAnchor(config) === "foot-right";
-  const footBlock = (qrInFoot ? qrEdge + footSize * 2.6 : 0) + footSize * 2.4;
+  const footBlock =
+    (qrInFoot ? qrEdge + footSize * 2.6 : 0) + (card ? footerBandH + 5 * k : footSize * 2.4);
   const listTop = geo.safeInset + headBlock;
-  const listBottom = geo.trimH - geo.safeInset - footBlock;
+  const listBottom = geo.trimH - (card ? 0 : geo.safeInset) - footBlock;
   const listH = Math.max(20, listBottom - listTop);
   const rowH = listH / rows;
-  const timeSize = Math.min(rowH * 0.3, 7.6 * k);
-  const titleRowSize = Math.min(rowH * 0.34, 8.4 * k);
-  const detailSize = Math.min(rowH * 0.24, 5.6 * k);
-  const trackSize = Math.max(2.6, Math.min(rowH * 0.18, 4.2 * k));
+  const timeSize = card ? 4.6 * k : Math.min(rowH * 0.3, 7.6 * k);
+  const titleRowSize = card ? 5.0 * k : Math.min(rowH * 0.34, 8.4 * k);
+  const detailSize = card ? 4.3 * k : Math.min(rowH * 0.24, 5.6 * k);
+  const trackSize = card ? 4.3 * k : Math.max(2.6, Math.min(rowH * 0.18, 4.2 * k));
   return {
     geo,
     k,
+    card,
     contentW,
     lockupW,
     lockupH,
     eyebrowSize,
     titleSize,
     metaSize,
+    locSize,
     footSize,
+    footerBandH,
+    bandGap,
+    bandPadX,
+    bandPadY,
     qrEdge,
     listTop,
     listBottom,
@@ -1186,10 +1404,26 @@ export function agendaLayout(config: AgendaConfig) {
     detailSize,
     trackSize,
     /** Time column width, measured from the left safe edge. */
-    timeColW: contentW * 0.17,
+    timeColW: contentW * (card ? 0.21 : 0.17),
     /** Track chip column width on the right. */
     trackColW: contentW * 0.2,
+    /** Width of the left card when a band carries a parallel session. */
+    splitLeftW: contentW * 0.455,
   };
+}
+
+/**
+ * Lines a run of copy takes at a printed size inside a column. Cap-height mm to
+ * average glyph advance is ~0.55, which matched the issued boards when the row
+ * bands were measured against the approved Canva programme.
+ */
+export function agendaTextLines(text: string, sizeMm: number, colW: number): number {
+  const clean = (text ?? "").trim();
+  if (!clean) return 0;
+  const perLine = Math.max(8, Math.floor(colW / (sizeMm * 0.55)));
+  return clean
+    .split("\n")
+    .reduce((sum, para) => sum + Math.max(1, Math.ceil(para.trim().length / perLine)), 0);
 }
 
 // ── naming + persistence ─────────────────────────────────────────────────────
@@ -1213,14 +1447,24 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
   const base = agendaDefault(typeof raw.divisionId === "string" ? raw.divisionId : undefined);
   const str = (v: unknown, fb: string) => (typeof v === "string" ? v : fb);
   const num = (v: unknown, fb: number) => (Number.isFinite(Number(v)) ? Number(v) : fb);
+  const session = (input: unknown): AgendaSession => {
+    const s = (input ?? {}) as Partial<AgendaSession>;
+    const par = (s.parallel ?? null) as AgendaParallel | null;
+    return {
+      time: str(s.time, ""),
+      title: str(s.title, ""),
+      detail: str(s.detail, ""),
+      track: str(s.track, ""),
+      muted: Boolean(s.muted),
+      parallel:
+        par && (str(par.title, "").trim() || str(par.detail, "").trim())
+          ? { title: str(par.title, ""), detail: str(par.detail, "") }
+          : null,
+      pin: Boolean(s.pin),
+    };
+  };
   const sessions = Array.isArray(raw.sessions)
-    ? raw.sessions.slice(0, 60).map((s) => ({
-        time: str((s as AgendaSession)?.time, ""),
-        title: str((s as AgendaSession)?.title, ""),
-        detail: str((s as AgendaSession)?.detail, ""),
-        track: str((s as AgendaSession)?.track, ""),
-        muted: Boolean((s as AgendaSession)?.muted),
-      }))
+    ? raw.sessions.slice(0, 60).map(session)
     : base.sessions;
   return {
     ...base,
@@ -1238,8 +1482,12 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
     title: str(raw.title, base.title),
     meta: str(raw.meta, base.meta),
     titleColor: str(raw.titleColor, ""),
+    rowStyle: raw.rowStyle === "card" ? "card" : raw.rowStyle === "rule" ? "rule" : base.rowStyle,
+    locationLine: str(raw.locationLine, base.locationLine),
     sessions: sessions.length ? sessions : base.sessions,
     footnote: str(raw.footnote, base.footnote),
+    footerLeft: str(raw.footerLeft, base.footerLeft),
+    footerRight: str(raw.footerRight, base.footerRight),
     qrData: str(raw.qrData, ""),
     qrSize: num(raw.qrSize, base.qrSize),
     qrCaption: str(raw.qrCaption, base.qrCaption),
@@ -1263,15 +1511,7 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
       Array.isArray(raw.days) && raw.days.length
         ? raw.days.slice(0, 14).map((d, i) => {
             const day = (d ?? {}) as Partial<AgendaDay>;
-            const rows = Array.isArray(day.sessions)
-              ? day.sessions.slice(0, 60).map((s) => ({
-                  time: str((s as AgendaSession)?.time, ""),
-                  title: str((s as AgendaSession)?.title, ""),
-                  detail: str((s as AgendaSession)?.detail, ""),
-                  track: str((s as AgendaSession)?.track, ""),
-                  muted: Boolean((s as AgendaSession)?.muted),
-                }))
-              : [];
+            const rows = Array.isArray(day.sessions) ? day.sessions.slice(0, 60).map(session) : [];
             return {
               label: str(day.label, `DAY ${i + 1}`),
               meta: str(day.meta, ""),
@@ -1308,20 +1548,57 @@ export function agendaBlocks(config: AgendaConfig) {
 
   let y = geo.safeInset;
   const lockup = config.showLockup ? { x, y, w: L.lockupW, h: L.lockupH } : null;
-  if (lockup) y += L.lockupH + 9 * L.k;
+  const locationText = (config.locationLine ?? "").trim();
+
+  // Programme look: the room / floor line and the date sit right-aligned beside
+  // the lockup, so the header reads lockup left, place and date right.
+  let location: {
+    y: number;
+    metaY: number;
+    right: number;
+    size: number;
+    metaSize: number;
+    pin: { x: number; y: number; h: number } | null;
+  } | null = null;
+  if (L.card) {
+    const headTop = y;
+    if (locationText) {
+      const locH = L.locSize * 1.5 + L.metaSize * 1.8;
+      const top = lockup ? headTop + Math.max(0, (L.lockupH - locH) * 0.62) : headTop;
+      const pinH = L.locSize * 1.5;
+      location = {
+        y: top,
+        metaY: top + L.locSize * 1.7,
+        right: x + L.contentW,
+        size: L.locSize,
+        metaSize: L.metaSize,
+        pin: { x, y: top, h: pinH },
+      };
+    }
+    y = headTop + Math.max(lockup ? L.lockupH : 0, locationText ? L.locSize * 1.5 + L.metaSize * 1.8 : 0);
+    y += 8 * L.k;
+  } else if (lockup) {
+    y += L.lockupH + 9 * L.k;
+  }
   const eyebrowY = y;
-  y += L.eyebrowSize * 2.1;
+  if (!L.card || (config.eyebrow ?? "").trim()) y += L.eyebrowSize * 2.1;
   const titleY = y;
-  y += L.titleSize * 1.14;
-  const metaY = y;
-  y += L.metaSize * 2.2;
+  if (!L.card || (config.title ?? "").trim()) y += L.titleSize * 1.14;
+  const metaY = L.card && location ? location.metaY : y;
+  if (!L.card) y += L.metaSize * 2.2;
   let rowsTop = y;
 
   /** Width the eyebrow, headline and date line may occupy. */
   let headW = L.contentW;
   const bottom = geo.trimH - geo.safeInset;
-  const footY = bottom - L.footSize * 1.2;
-  let listBottom = footY - L.footSize * 1.8;
+  /** Blue 500 footer band across the foot of a programme board. */
+  const footerBand = L.card
+    ? { x: 0, y: geo.trimH - L.footerBandH, w: geo.trimW, h: L.footerBandH }
+    : null;
+  const footY = footerBand
+    ? footerBand.y + (L.footerBandH - L.footSize) * 0.5
+    : bottom - L.footSize * 1.2;
+  let listBottom = footerBand ? footerBand.y - L.footSize * 3.4 : footY - L.footSize * 1.8;
   let qr: {
     x: number;
     y: number;
@@ -1396,11 +1673,72 @@ export function agendaBlocks(config: AgendaConfig) {
   }
 
   const rowH = Math.max(5, (listBottom - rowsTop) / rowCount);
-  const rows = config.sessions.map((session, i) => ({
-    session,
-    y: rowsTop + i * rowH,
-    h: rowH,
-  }));
+
+  type AgendaRow = {
+    session: AgendaSession;
+    y: number;
+    h: number;
+    /** Band rectangle for the programme look; null on the ruled list. */
+    band: { x: number; y: number; w: number; h: number } | null;
+    /** Aqua card beside the band when the session runs a parallel track. */
+    parallel: { x: number; y: number; w: number; h: number } | null;
+  };
+
+  let rows: AgendaRow[];
+  if (L.card) {
+    // Bands take the height their copy really needs, so a two-line title with a
+    // three-line speaker note is never crushed into the same band as "Lunch".
+    const bodyW = L.contentW - L.timeColW - L.bandPadX * 2;
+    const splitBodyW = L.splitLeftW - L.timeColW - L.bandPadX * 2;
+    const height = (session: AgendaSession) => {
+      const hasSplit = !!session.parallel;
+      const w = hasSplit ? splitBodyW : bodyW;
+      const left =
+        agendaTextLines(session.title, L.titleRowSize, w) * L.titleRowSize * 1.5 +
+        agendaTextLines(session.detail, L.detailSize, w) * L.detailSize * 1.55 +
+        (session.detail.trim() ? L.detailSize * 0.8 : 0);
+      const rightW = L.contentW - L.splitLeftW - L.bandGap - L.bandPadX * 2 - L.locSize;
+      const right = hasSplit
+        ? agendaTextLines(session.parallel!.title, L.titleRowSize, rightW) * L.titleRowSize * 1.5 +
+          agendaTextLines(session.parallel!.detail, L.detailSize, rightW) * L.detailSize * 1.55 +
+          L.detailSize * 0.8
+        : 0;
+      return L.bandPadY * 2 + Math.max(L.titleRowSize * 1.6, left, right);
+    };
+    const wanted = config.sessions.map(height);
+    const gaps = L.bandGap * Math.max(0, wanted.length - 1);
+    const available = Math.max(20, listBottom - rowsTop - gaps);
+    const total = wanted.reduce((a, b) => a + b, 0) || 1;
+    // Scale to the sheet: shrink proportionally when the day overruns, and share
+    // the spare height out when it underruns, keeping the copy-driven ratios.
+    const scale = available / total;
+    let cursor = rowsTop;
+    rows = config.sessions.map((session, i) => {
+      const h = Math.max(L.titleRowSize * 2.4, wanted[i]! * scale);
+      const y = cursor;
+      cursor += h + L.bandGap;
+      const band = { x, y, w: session.parallel ? L.splitLeftW : L.contentW, h };
+      const parallel = session.parallel
+        ? {
+            x: x + L.splitLeftW + L.bandGap,
+            y,
+            w: L.contentW - L.splitLeftW - L.bandGap,
+            h,
+          }
+        : null;
+      return { session, y, h: h + L.bandGap, band, parallel };
+    });
+  } else {
+    rows = config.sessions.map((session, i) => ({
+      session,
+      y: rowsTop + i * rowH,
+      h: rowH,
+      band: null,
+      parallel: null,
+    }));
+  }
+
+  const rowsBottom = rows.length ? rows[rows.length - 1]!.y + rows[rows.length - 1]!.h : rowsTop;
 
   return {
     layout: L,
@@ -1409,13 +1747,16 @@ export function agendaBlocks(config: AgendaConfig) {
     contentW: L.contentW,
     headW,
     lockup,
+    location,
     eyebrowY,
     titleY,
     metaY,
     rowsTop,
     rowH,
     rows,
+    rowsBottom,
     listBottom,
+    footerBand,
     footY,
     qr,
   };
@@ -1518,7 +1859,11 @@ export function agendaPages(config: AgendaConfig): AgendaPage[] {
         ...config,
         days: undefined,
         rowsPerPage: 0,
-        title: continued ? `${dayLabel} (CONT.)` : dayLabel,
+        // A day with no printed label (the GlobalLink programme boards carry the
+        // date line only) must stay unlabelled, so the fallback is stamp-only.
+        title: continued
+          ? `${(chunk.day.label ?? "").trim() || dayLabel} (CONT.)`
+          : (chunk.day.label ?? ""),
         meta: chunk.day.meta ?? "",
         sessions: chunk.rows,
         pageLabel: stamp,

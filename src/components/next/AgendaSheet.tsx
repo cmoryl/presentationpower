@@ -14,12 +14,28 @@ import {
   agendaQrTransparent,
   agendaStops,
   agendaTitleInk,
+  AGENDA_BAND,
   type AgendaConfig,
 } from "@/lib/next-agenda";
 import { agendaCopyInk } from "@/lib/next-agenda-contrast";
 import { buildPillarQr } from "@/lib/pillar-qr";
 import { logoInkPlacement } from "@/lib/next-logo-ink";
 import { qrStructuralModule } from "@/lib/qr-print";
+
+/**
+ * House location pin. Printed in Peach on the aqua parallel card and beside the
+ * room line, the same mark the approved programme board carries.
+ */
+function AgendaPin({ size, fill = AGENDA_BAND.pin }: { size: number; fill?: string }) {
+  return (
+    <svg width={size * 0.72} height={size} viewBox="0 0 18 25" aria-hidden style={{ flex: "0 0 auto" }}>
+      <path
+        d="M9 0C4.03 0 0 4.03 0 9c0 6.36 7.4 14.68 7.72 15.03a1.72 1.72 0 0 0 2.56 0C10.6 23.68 18 15.36 18 9c0-4.97-4.03-9-9-9Zm0 13.1A4.1 4.1 0 1 1 9 4.9a4.1 4.1 0 0 1 0 8.2Z"
+        fill={fill}
+      />
+    </svg>
+  );
+}
 
 type Props = {
   config: AgendaConfig;
@@ -147,7 +163,9 @@ export function AgendaSheet({
         {config.title}
       </div>
 
-      {config.meta.trim() ? (
+      {/* The programme look prints the date beside the room line, not under the
+          lockup, so the header carries it once. */}
+      {config.meta.trim() && !blocks.location ? (
         <div
           style={{
             ...at(blocks.x, blocks.metaY),
@@ -161,82 +179,241 @@ export function AgendaSheet({
         </div>
       ) : null}
 
-      {blocks.rows.map((row, i) => (
-        <div
-          key={i}
-          style={{
-            ...at(blocks.x, row.y),
-            width: mm(blocks.contentW),
-            height: mm(row.h),
-            borderTop: `${Math.max(0.6, mm(0.35))}px solid ${rule}`,
-            display: "flex",
-            alignItems: "flex-start",
-            paddingTop: mm(row.h * 0.16),
-            opacity: row.session.muted ? 0.7 : 1,
-          }}
-        >
+      {blocks.location ? (
+        <>
           <div
             style={{
-              width: mm(L.timeColW),
-              flex: "0 0 auto",
-              fontSize: mm(L.timeSize),
-              fontWeight: 700,
-              letterSpacing: "-0.01em",
-              color: row.session.muted ? ink : titleInk,
+              ...at(blocks.location.pin!.x, blocks.location.pin!.y),
+              width: mm(blocks.contentW),
+              textAlign: "right",
+              fontSize: mm(blocks.location.size),
+              lineHeight: 1.1,
+              fontWeight: 500,
+              letterSpacing: "0.01em",
             }}
           >
-            {row.session.time}
-          </div>
-          <div style={{ flex: "1 1 auto", minWidth: 0, paddingRight: mm(4) }}>
-            <div
+            <span
               style={{
-                fontSize: mm(L.titleRowSize),
-                fontWeight: row.session.muted ? 500 : 700,
-                lineHeight: 1.12,
-                letterSpacing: "-0.01em",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: mm(2.4),
               }}
             >
-              {row.session.title}
+              <AgendaPin size={mm(blocks.location.size * 1.15)} />
+              {config.locationLine}
+            </span>
+          </div>
+          {config.meta.trim() ? (
+            <div
+              style={{
+                ...at(blocks.x, blocks.location.metaY),
+                width: mm(blocks.contentW),
+                textAlign: "right",
+                fontSize: mm(blocks.location.metaSize),
+                fontWeight: 500,
+                letterSpacing: "0.02em",
+              }}
+            >
+              {config.meta}
             </div>
-            {row.session.detail.trim() ? (
+          ) : null}
+        </>
+      ) : null}
+
+      {blocks.rows.map((row, i) =>
+        row.band ? (
+          <div key={i}>
+            <div
+              style={{
+                ...at(row.band.x, row.band.y),
+                width: mm(row.band.w),
+                height: mm(row.band.h),
+                background: i % 2 === 0 ? AGENDA_BAND.fillA : AGENDA_BAND.fillB,
+                color: AGENDA_BAND.ink,
+                display: "flex",
+                alignItems: "flex-start",
+                padding: `${mm(L.bandPadY)}px ${mm(L.bandPadX)}px`,
+                boxSizing: "border-box",
+              }}
+            >
               <div
                 style={{
-                  fontSize: mm(L.detailSize),
-                  opacity: 0.78,
-                  marginTop: mm(L.detailSize * 0.35),
+                  width: mm(L.timeColW),
+                  flex: "0 0 auto",
+                  fontSize: mm(L.timeSize),
+                  fontWeight: 400,
+                  lineHeight: 1.4,
                 }}
               >
-                {row.session.detail}
+                {row.session.time}
+              </div>
+              <div style={{ flex: "1 1 auto", minWidth: 0 }}>
+                {row.session.track.trim() ? (
+                  <div
+                    style={{
+                      fontSize: mm(L.trackSize),
+                      fontWeight: 700,
+                      lineHeight: 1.4,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {row.session.track}
+                  </div>
+                ) : null}
+                <div
+                  style={{
+                    fontSize: mm(L.titleRowSize),
+                    fontWeight: row.session.muted ? 400 : 700,
+                    lineHeight: 1.35,
+                  }}
+                >
+                  {row.session.title}
+                </div>
+                {row.session.detail.trim()
+                  ? row.session.detail.split("\n").map((para, p) =>
+                      para.trim() ? (
+                        <div
+                          key={p}
+                          style={{
+                            fontSize: mm(L.detailSize),
+                            lineHeight: 1.45,
+                            marginTop: mm(L.detailSize * 0.6),
+                          }}
+                        >
+                          {para}
+                        </div>
+                      ) : null,
+                    )
+                  : null}
+              </div>
+            </div>
+            {row.parallel ? (
+              <div
+                style={{
+                  ...at(row.parallel.x, row.parallel.y),
+                  width: mm(row.parallel.w),
+                  height: mm(row.parallel.h),
+                  background: AGENDA_BAND.parallel,
+                  color: AGENDA_BAND.ink,
+                  padding: `${mm(L.bandPadY)}px ${mm(L.bandPadX)}px`,
+                  boxSizing: "border-box",
+                  position: "absolute",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: mm(L.titleRowSize),
+                    fontWeight: 700,
+                    lineHeight: 1.35,
+                    paddingRight: mm(L.locSize * 1.4),
+                  }}
+                >
+                  {row.session.parallel?.title}
+                </div>
+                {row.session.parallel?.detail.trim() ? (
+                  <div
+                    style={{
+                      fontSize: mm(L.detailSize),
+                      lineHeight: 1.45,
+                      marginTop: mm(L.detailSize * 0.6),
+                      paddingRight: mm(L.locSize * 1.4),
+                    }}
+                  >
+                    {row.session.parallel.detail}
+                  </div>
+                ) : null}
+                <div
+                  style={{
+                    position: "absolute",
+                    right: mm(L.bandPadX),
+                    bottom: mm(L.bandPadY),
+                  }}
+                >
+                  <AgendaPin size={mm(L.locSize * 1.5)} />
+                </div>
               </div>
             ) : null}
           </div>
-          {row.session.track.trim() ? (
+        ) : (
+          <div
+            key={i}
+            style={{
+              ...at(blocks.x, row.y),
+              width: mm(blocks.contentW),
+              height: mm(row.h),
+              borderTop: `${Math.max(0.6, mm(0.35))}px solid ${rule}`,
+              display: "flex",
+              alignItems: "flex-start",
+              paddingTop: mm(row.h * 0.16),
+              opacity: row.session.muted ? 0.7 : 1,
+            }}
+          >
             <div
               style={{
-                width: mm(L.trackColW),
+                width: mm(L.timeColW),
                 flex: "0 0 auto",
-                textAlign: "right",
-                fontSize: mm(L.trackSize),
+                fontSize: mm(L.timeSize),
                 fontWeight: 700,
-                letterSpacing: "0.16em",
-                opacity: 0.8,
-                textTransform: "uppercase",
+                letterSpacing: "-0.01em",
+                color: row.session.muted ? ink : titleInk,
               }}
             >
-              {row.session.track}
+              {row.session.time}
             </div>
-          ) : null}
-        </div>
-      ))}
+            <div style={{ flex: "1 1 auto", minWidth: 0, paddingRight: mm(4) }}>
+              <div
+                style={{
+                  fontSize: mm(L.titleRowSize),
+                  fontWeight: row.session.muted ? 500 : 700,
+                  lineHeight: 1.12,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {row.session.title}
+              </div>
+              {row.session.detail.trim() ? (
+                <div
+                  style={{
+                    fontSize: mm(L.detailSize),
+                    opacity: 0.78,
+                    marginTop: mm(L.detailSize * 0.35),
+                  }}
+                >
+                  {row.session.detail}
+                </div>
+              ) : null}
+            </div>
+            {row.session.track.trim() ? (
+              <div
+                style={{
+                  width: mm(L.trackColW),
+                  flex: "0 0 auto",
+                  textAlign: "right",
+                  fontSize: mm(L.trackSize),
+                  fontWeight: 700,
+                  letterSpacing: "0.16em",
+                  opacity: 0.8,
+                  textTransform: "uppercase",
+                }}
+              >
+                {row.session.track}
+              </div>
+            ) : null}
+          </div>
+        ),
+      )}
 
-      {/* closing rule under the last session */}
-      <div
-        style={{
-          ...at(blocks.x, blocks.rowsTop + blocks.rowH * blocks.rows.length),
-          width: mm(blocks.contentW),
-          borderTop: `${Math.max(0.6, mm(0.35))}px solid ${rule}`,
-        }}
-      />
+      {/* closing rule under the last session — ruled list only */}
+      {L.card ? null : (
+        <div
+          style={{
+            ...at(blocks.x, blocks.rowsTop + blocks.rowH * blocks.rows.length),
+            width: mm(blocks.contentW),
+            borderTop: `${Math.max(0.6, mm(0.35))}px solid ${rule}`,
+          }}
+        />
+      )}
+      
 
       {qr && blocks.qr ? (
         <div
@@ -334,18 +511,86 @@ export function AgendaSheet({
         </div>
       ) : null}
 
-      {config.footnote.trim() ? (
+      {blocks.footerBand ? (
         <div
           style={{
-            ...at(blocks.x, blocks.footY),
-            width: mm(blocks.contentW * 0.72),
-            fontSize: mm(L.footSize),
-            opacity: 0.74,
-            lineHeight: 1.25,
+            position: "absolute",
+            left: 0,
+            top: ty + mm(blocks.footerBand.y),
+            width: mm(geo.bleedW),
+            height: mm(blocks.footerBand.h) + ty,
+            background: AGENDA_BAND.footerBand,
           }}
-        >
-          {config.footnote}
-        </div>
+        />
+      ) : null}
+
+      {/* Footnote: on the programme look it sits above the band with a pin. */}
+      {config.footnote.trim() ? (
+        blocks.footerBand ? (
+          <div
+            style={{
+              ...at(blocks.x, blocks.footerBand.y - L.footSize * 3.1),
+              width: mm(blocks.contentW),
+              fontSize: mm(L.footSize * 1.15),
+              fontWeight: 700,
+              lineHeight: 1.3,
+              display: "flex",
+              alignItems: "center",
+              gap: mm(2.6),
+            }}
+          >
+            {blocks.rows.some((r) => r.parallel) ? (
+              <AgendaPin size={mm(L.footSize * 2.6)} />
+            ) : null}
+            <span>{config.footnote}</span>
+          </div>
+        ) : (
+          <div
+            style={{
+              ...at(blocks.x, blocks.footY),
+              width: mm(blocks.contentW * 0.72),
+              fontSize: mm(L.footSize),
+              opacity: 0.74,
+              lineHeight: 1.25,
+            }}
+          >
+            {config.footnote}
+          </div>
+        )
+      ) : null}
+
+      {blocks.footerBand ? (
+        <>
+          <div
+            style={{
+              ...at(blocks.x, blocks.footY),
+              width: mm(blocks.contentW),
+              fontSize: mm(L.footSize),
+              fontWeight: 500,
+              letterSpacing: "0.04em",
+              color: AGENDA_BAND.footerInk,
+              textTransform: "uppercase",
+            }}
+          >
+            {config.footerLeft}
+          </div>
+          {config.footerRight.trim() ? (
+            <div
+              style={{
+                ...at(blocks.x, blocks.footY),
+                width: mm(blocks.contentW),
+                textAlign: "right",
+                fontSize: mm(L.footSize),
+                fontWeight: 500,
+                letterSpacing: "0.04em",
+                color: AGENDA_BAND.footerInk,
+                textTransform: "uppercase",
+              }}
+            >
+              {config.footerRight}
+            </div>
+          ) : null}
+        </>
       ) : null}
 
       {(config.pageLabel ?? "").trim() ? (

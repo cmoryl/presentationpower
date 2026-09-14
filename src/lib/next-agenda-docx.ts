@@ -16,6 +16,7 @@
 import JSZip from "jszip";
 
 import {
+  AGENDA_BAND,
   agendaBlocks,
   agendaDivision,
   agendaLockupUrl,
@@ -29,6 +30,7 @@ import {
   agendaQrPlateColor,
   agendaQrStyle,
   agendaQrTransparent,
+  agendaRowStyle,
   agendaStops,
   agendaTitleInk,
   type AgendaConfig,
@@ -199,16 +201,23 @@ function spacer(heightTwips: number, runs = ""): string {
   ].join("");
 }
 
-function cell(widthTwips: number, content: string, padTwips = 0): string {
+function cell(
+  widthTwips: number,
+  content: string,
+  padTwips = 0,
+  opts: { fill?: string; span?: number; vAlign?: "top" | "center" } = {},
+): string {
   return [
     "<w:tc><w:tcPr>",
     `<w:tcW w:w="${Math.round(widthTwips)}" w:type="dxa"/>`,
+    opts.span && opts.span > 1 ? `<w:gridSpan w:val="${opts.span}"/>` : "",
+    opts.fill ? `<w:shd w:val="clear" w:color="auto" w:fill="${hex(opts.fill)}"/>` : "",
     `<w:tcMar><w:top w:w="${Math.round(padTwips)}" w:type="dxa"/><w:bottom w:w="${Math.round(
       padTwips,
-    )}" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:right w:w="${Math.round(
-      padTwips,
-    )}" w:type="dxa"/></w:tcMar>`,
-    '<w:vAlign w:val="center"/>',
+    )}" w:type="dxa"/><w:left w:w="${Math.round(
+      opts.fill ? padTwips : 0,
+    )}" w:type="dxa"/><w:right w:w="${Math.round(padTwips)}" w:type="dxa"/></w:tcMar>`,
+    `<w:vAlign w:val="${opts.vAlign ?? "center"}"/>`,
     "</w:tcPr>",
     content || "<w:p/>",
     "</w:tc>",
@@ -372,6 +381,74 @@ export async function buildAgendaDocx(
     }
     const rowBand = mmT(rowH);
 
+    // ── card mode: the Canva-style programme bands ───────────────────────────
+    const cardMode = agendaRowStyle(cfg) === "card";
+    const cardTimeW = contentTwips * 0.21;
+    const cardParallelW = contentTwips * 0.34;
+    const cardBodyW = contentTwips - cardTimeW - cardParallelW;
+
+    const cardRows = (cfg.sessions ?? [])
+      .map((session, i) => {
+        const muted = session.muted;
+        const bandInk = hex(AGENDA_BAND.ink);
+        const fill = i % 2 === 0 ? AGENDA_BAND.fillA : AGENDA_BAND.fillB;
+        const copy = (title: string, detail: string) =>
+          [
+            para(
+              run(title, {
+                size: halfPt(PL.titleRowSize),
+                color: bandInk,
+                bold: !muted,
+              }),
+              { afterTwips: 0, lineTwips: mmT(PL.titleRowSize * 1.4) },
+            ),
+            detail.trim()
+              ? para(run(detail, { size: halfPt(PL.detailSize), color: bandInk }), {
+                  beforeTwips: mmT(PL.detailSize * 0.35),
+                  afterTwips: 0,
+                  lineTwips: mmT(PL.detailSize * 1.4),
+                })
+              : "",
+          ].join("");
+        const parallel = session.parallel;
+        return [
+          `<w:tr><w:trPr><w:trHeight w:val="${rowBand}" w:hRule="atLeast"/><w:cantSplit/></w:trPr>`,
+          cell(
+            cardTimeW,
+            para(run(session.time ?? "", { size: halfPt(PL.timeSize), color: bandInk, bold: true }), {
+              afterTwips: 0,
+              lineTwips: mmT(PL.timeSize * 1.4),
+            }),
+            rowPad,
+            { fill, vAlign: "top" },
+          ),
+          parallel
+            ? cell(cardBodyW, copy(session.title ?? "", session.detail ?? ""), rowPad, {
+                fill,
+                vAlign: "top",
+              })
+            : cell(cardBodyW + cardParallelW, copy(session.title ?? "", session.detail ?? ""), rowPad, {
+                fill,
+                span: 2,
+                vAlign: "top",
+              }),
+          parallel
+            ? cell(
+                cardParallelW,
+                copy(parallel.title ?? "", parallel.detail ?? ""),
+                rowPad,
+                { fill: AGENDA_BAND.parallel, vAlign: "top" },
+              )
+            : "",
+          "</w:tr>",
+          // A hairline spacer row keeps the printed gutter between bands.
+          `<w:tr><w:trPr><w:trHeight w:val="${mmT(1.2)}" w:hRule="exact"/></w:trPr>`,
+          cell(contentTwips, "", 0, { span: 3 }),
+          "</w:tr>",
+        ].join("");
+      })
+      .join("");
+
     const rows = (cfg.sessions ?? [])
       .map((session) => {
         const muted = session.muted;
@@ -429,16 +506,22 @@ export async function buildAgendaDocx(
       "<w:tbl><w:tblPr>",
       `<w:tblW w:w="${Math.round(contentTwips)}" w:type="dxa"/>`,
       '<w:tblInd w:w="0" w:type="dxa"/>',
-      '<w:tblBorders><w:insideH w:val="single" w:sz="2" w:color="7F8798"/></w:tblBorders>',
+      cardMode
+        ? ""
+        : '<w:tblBorders><w:insideH w:val="single" w:sz="2" w:color="7F8798"/></w:tblBorders>',
       // Zero default cell padding: the row padding is measured per row above.
       '<w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tblCellMar>',
       '<w:tblLayout w:type="fixed"/>',
       '<w:tblLook w:val="0000" w:firstRow="0" w:lastRow="0" w:firstColumn="0" w:lastColumn="0" w:noHBand="1" w:noVBand="1"/>',
       "</w:tblPr>",
       "<w:tblGrid>",
-      `<w:gridCol w:w="${Math.round(timeW)}"/><w:gridCol w:w="${Math.round(bodyW)}"/><w:gridCol w:w="${Math.round(trackW)}"/>`,
+      cardMode
+        ? `<w:gridCol w:w="${Math.round(cardTimeW)}"/><w:gridCol w:w="${Math.round(
+            cardBodyW,
+          )}"/><w:gridCol w:w="${Math.round(cardParallelW)}"/>`
+        : `<w:gridCol w:w="${Math.round(timeW)}"/><w:gridCol w:w="${Math.round(bodyW)}"/><w:gridCol w:w="${Math.round(trackW)}"/>`,
       "</w:tblGrid>",
-      rows,
+      cardMode ? cardRows : rows,
       "</w:tbl>",
     ].join("");
 
@@ -465,9 +548,24 @@ export async function buildAgendaDocx(
         }),
         { afterTwips: 0, lineTwips: mmT(titleBand) },
       ),
+      // Card mode carries the room line and the date on the right of the header,
+      // matching the printed board instead of stacking them on the left.
+      cardMode && (cfg.locationLine ?? "").trim()
+        ? para(
+            run((cfg.locationLine ?? "").trim(), {
+              size: halfPt(PL.metaSize),
+              color: inkHex,
+              caps: true,
+              bold: true,
+              spacing: 30,
+            }),
+            { afterTwips: 0, align: "right", lineTwips: mmT(PL.metaSize * 1.6) },
+          )
+        : "",
       hasMeta
         ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), {
             afterTwips: 0,
+            align: cardMode && (cfg.locationLine ?? "").trim() ? "right" : "left",
             lineTwips: mmT(metaBand),
           })
         : spacer(mmT(metaBand)),
@@ -504,6 +602,57 @@ export async function buildAgendaDocx(
         : "",
     ].join("");
 
+    // The printed card board finishes on a solid brand band carrying the event
+    // URL and dates in white — reproduced here as a shaded full-width table.
+    const footerBand =
+      cardMode && ((cfg.footerLeft ?? "").trim() || (cfg.footerRight ?? "").trim())
+        ? [
+            "<w:tbl><w:tblPr>",
+            `<w:tblW w:w="${Math.round(contentTwips)}" w:type="dxa"/>`,
+            '<w:tblInd w:w="0" w:type="dxa"/>',
+            '<w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tblCellMar>',
+            '<w:tblLayout w:type="fixed"/>',
+            "</w:tblPr>",
+            `<w:tblGrid><w:gridCol w:w="${Math.round(contentTwips * 0.62)}"/><w:gridCol w:w="${Math.round(
+              contentTwips * 0.38,
+            )}"/></w:tblGrid>`,
+            `<w:tr><w:trPr><w:trHeight w:val="${mmT(
+              Math.max(6, PL.footSize * 3),
+            )}" w:hRule="atLeast"/><w:cantSplit/></w:trPr>`,
+            cell(
+              contentTwips * 0.62,
+              para(
+                run((cfg.footerLeft ?? "").trim(), {
+                  size: halfPt(PL.footSize),
+                  color: hex(AGENDA_BAND.footerInk, "FFFFFF"),
+                  caps: true,
+                  bold: true,
+                  spacing: 30,
+                }),
+                { afterTwips: 0, lineTwips: mmT(PL.footSize * 1.6) },
+              ),
+              mmT(PL.footSize * 0.8),
+              { fill: AGENDA_BAND.footerBand },
+            ),
+            cell(
+              contentTwips * 0.38,
+              para(
+                run((cfg.footerRight ?? "").trim(), {
+                  size: halfPt(PL.footSize),
+                  color: hex(AGENDA_BAND.footerInk, "FFFFFF"),
+                  caps: true,
+                  bold: true,
+                  spacing: 30,
+                }),
+                { afterTwips: 0, align: "right", lineTwips: mmT(PL.footSize * 1.6) },
+              ),
+              mmT(PL.footSize * 0.8),
+              { fill: AGENDA_BAND.footerBand },
+            ),
+            "</w:tr></w:tbl>",
+          ].join("")
+        : "";
+
     return [
       // The ground rides in the first spacer so the picture costs no extra
       // vertical space — that stray line was pushing every block down a step.
@@ -515,6 +664,7 @@ export async function buildAgendaDocx(
       table,
       footGap > 0.2 ? spacer(mmT(footGap)) : "",
       footer,
+      footerBand,
     ].join("");
   };
 
