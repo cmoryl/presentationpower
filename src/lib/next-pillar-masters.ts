@@ -668,7 +668,8 @@ export function pillarName(config: PillarConfig): string {
 
 export function pillarSlug(config: PillarConfig): string {
   const g = pillarGeometry(config);
-  return `${config.divisionId}-${config.kind}-${config.face ?? "dark"}-${Math.round(g.trimW)}x${Math.round(g.trimH)}-${config.styleId}`
+  const tpl = config.templateId && config.templateId !== "classic" ? `-${config.templateId}` : "";
+  return `${config.divisionId}-${config.kind}${tpl}-${config.face ?? "dark"}-${Math.round(g.trimW)}x${Math.round(g.trimH)}-${config.styleId}`
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
