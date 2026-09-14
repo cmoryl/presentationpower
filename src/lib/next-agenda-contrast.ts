@@ -33,6 +33,26 @@ export const AGENDA_DISPLAY_MIN_CONTRAST = 3;
 /** Printed cap height at or above which copy counts as display size. */
 export const AGENDA_DISPLAY_MM = 7;
 
+/**
+ * Grounds where no approved ink clears the body floor across the copy region:
+ * the pale end of the ramp runs under the copy. Named rather than quietly
+ * passed — these need a scrim or a re-cut ramp before they carry an agenda in
+ * the dark face, and the editor says so.
+ */
+export const AGENDA_GUARD_GAPS: string[] = [
+  "03-wash-diagonal/dark",
+  "05-bloom-corner/dark",
+  "07-prism-sweep/dark",
+  "08-chevron-sweep/dark",
+  "11-brew-diagonal/dark",
+  "12-repeat-wash/dark",
+];
+
+/** Key used against AGENDA_GUARD_GAPS. */
+export function agendaGroundKey(config: AgendaConfig): string {
+  return `${config.styleId}/${config.face === "light" ? "light" : "dark"}`;
+}
+
 export type AgendaCopyRole =
   | "eyebrow"
   | "title"

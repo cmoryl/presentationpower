@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { AGENDA_STYLE_IDS, agendaBlocks, agendaDefault, type AgendaConfig } from "@/lib/next-agenda";
 import {
   AGENDA_COPY_MIN_CONTRAST,
+  AGENDA_GUARD_GAPS,
   agendaCopyInk,
   agendaCopyReadouts,
   agendaGroundSampler,
@@ -31,15 +32,13 @@ describe("agenda copy legibility", () => {
             titleColor: "",
           };
           const guard = agendaCopyInk(config);
-          if (!guard.ok) unreadable.push(`${styleId}/${face}/${division || "default"}`);
+          if (!guard.ok) unreadable.push(`${styleId}/${face}`);
         }
       }
     }
     // Grounds with no readable ink must be a known, named list — never a silent
     // pass and never a surprise at print.
-    expect(unreadable.every((k) => /08-chevron-sweep|11-brew-diagonal|12-repeat-wash/.test(k))).toBe(
-      true,
-    );
+    expect([...new Set(unreadable)].sort()).toEqual([...AGENDA_GUARD_GAPS].sort());
   });
 
   it("keeps the approved face ink whenever it still reads", () => {
