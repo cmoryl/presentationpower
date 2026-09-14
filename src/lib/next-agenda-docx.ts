@@ -546,9 +546,24 @@ export async function buildAgendaDocx(
         }),
         { afterTwips: 0, lineTwips: mmT(titleBand) },
       ),
+      // Card mode carries the room line and the date on the right of the header,
+      // matching the printed board instead of stacking them on the left.
+      cardMode && (cfg.locationLine ?? "").trim()
+        ? para(
+            run((cfg.locationLine ?? "").trim(), {
+              size: halfPt(PL.metaSize),
+              color: inkHex,
+              caps: true,
+              bold: true,
+              spacing: 30,
+            }),
+            { afterTwips: 0, align: "right", lineTwips: mmT(PL.metaSize * 1.6) },
+          )
+        : "",
       hasMeta
         ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), {
             afterTwips: 0,
+            align: cardMode && (cfg.locationLine ?? "").trim() ? "right" : "left",
             lineTwips: mmT(metaBand),
           })
         : spacer(mmT(metaBand)),
