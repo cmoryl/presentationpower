@@ -95,9 +95,7 @@ const coastMesh = mesh(landTopo, landTopo.objects.land) as {
 const coastPaths = coastMesh.coordinates.map(lineToPath);
 
 // Projected rings, flattened as x,y pairs, for point-in-polygon rasterisation.
-const flatRings = rings
-  .flatMap((ring) => splitWrap(projectRun(ring)))
-  .map((run) => run.flat());
+const flatRings = rings.flatMap((ring) => splitWrap(projectRun(ring))).map((run) => run.flat());
 
 const out = `/**
  * GENERATED FILE — do not edit by hand.
