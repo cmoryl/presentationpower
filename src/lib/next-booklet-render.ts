@@ -10,11 +10,46 @@
 
 import { renderSpecToSvg } from "@/lib/infographics/svg";
 import { sampleSpecFor } from "@/lib/infographics/audit-sweep";
+import { ensureA11y } from "@/lib/infographics/a11y";
+import { vizTheme } from "@/lib/infographics/viz-theme";
+import { BRAND_MODES } from "@/lib/taxonomy";
+import type { InfographicKind, InfographicSpec } from "@/lib/infographics/spec";
 import { floorMapSheetSize, floorMapSvg, type FloorMapOptions } from "@/lib/next-london-floormap-svg";
 import { LONDON_FLOORS, type LondonFloorId } from "@/lib/next-london-signage";
 import type { BookletChartPage, BookletImagePage } from "@/lib/next-booklet";
 
 const PRINT_PPI = 300;
+
+/** Simple single-series looks carry no library dataset of their own, so the
+ *  booklet supplies a plainly-labelled sample series the operator overwrites. */
+const SIMPLE_SAMPLE = {
+  rows: [
+    { label: "Day one · morning", value: 420 },
+    { label: "Day one · afternoon", value: 386 },
+    { label: "Day two · morning", value: 351 },
+    { label: "Day two · afternoon", value: 298 },
+  ],
+  columns: { label: "Session block", value: "Delegates" },
+  source: "Sample dataset · replace with the approved figures",
+};
+
+function simpleSampleSpec(
+  kind: InfographicKind,
+  mode: "light" | "dark",
+  title?: string,
+): InfographicSpec {
+  const brand = BRAND_MODES.find((b) => b.id === "bm-enterprise") ?? BRAND_MODES[0]!;
+  return ensureA11y({
+    id: `booklet-${kind}-${mode}`,
+    kind,
+    title: title ?? "Chart page",
+    data: { rows: SIMPLE_SAMPLE.rows, source: SIMPLE_SAMPLE.source, columns: SIMPLE_SAMPLE.columns },
+    encoding: { x: "label", y: "value", label: "label", value: "value" },
+    theme: vizTheme({ brand, mode }),
+    accessibility: { shortAlt: "", longDesc: "" },
+    export: { preferredFormat: "svg", rasterFallback: true },
+  });
+}
 
 /** mm at 300 ppi, capped so a big sheet cannot blow the browser's canvas limit. */
 function printPx(mm: number): number {
@@ -87,11 +122,9 @@ export async function bookletChartPages(
   const pages: BookletImagePage[] = [];
   const warnings: string[] = [];
   for (const chart of charts) {
-    const spec = sampleSpecFor(chart.kind, mode, chart.title || undefined);
-    if (!spec) {
-      warnings.push(`No chart data available for “${chart.kind}” — page skipped.`);
-      continue;
-    }
+    const spec =
+      sampleSpecFor(chart.kind, mode, chart.title || undefined) ??
+      simpleSampleSpec(chart.kind, mode, chart.title || undefined);
     const withCopy = { ...spec, subtitle: chart.subtitle || spec.subtitle };
     const wPx = printPx(sheet.wMm);
     const hPx = printPx(sheet.hMm);
