@@ -7,6 +7,7 @@ import {
   agendaDivision,
   agendaGeometry,
   agendaInk,
+  agendaLockupUrl,
   agendaQrBackground,
   agendaQrForeground,
   agendaQrStyle,
@@ -49,6 +50,7 @@ export function AgendaSheet({
   const ink = agendaCopyInk(config).hex;
   const titleInk = (config.titleColor || "").trim() ? agendaTitleInk(config) : ink;
   const division = agendaDivision(config.divisionId);
+  const lockupUrl = agendaLockupUrl(config);
   const stops = agendaStops(config.styleId, face, config.divisionId);
   const isHalo = config.styleId.includes("halo");
   const ramp = isHalo ? [...stops].reverse() : stops;
