@@ -54,7 +54,7 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
     onChanged?.();
   };
 
-  const upload = async (file: File, kind: "master" | "proof", version: number) => {
+  const upload = async (file: File, kind: "master" | "print" | "proof", version: number) => {
     const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase() || ".ai";
     const path = `${panel.id}/v${version}-${kind}${ext}`;
     const { error } = await supabase.storage
