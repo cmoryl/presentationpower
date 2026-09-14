@@ -1436,7 +1436,12 @@ export function AgendaStudio({
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => write([...pars, { title: "", detail: "" }])}
+                              onClick={() =>
+                                write([
+                                  ...pars,
+                                  { time: "", title: "", speaker: "", detail: "" },
+                                ])
+                              }
                             >
                               <Plus className="mr-1 h-3.5 w-3.5" /> Add parallel track
                             </Button>
