@@ -497,7 +497,12 @@ export async function buildAgendaDocx(
     body,
     "<w:sectPr>",
     `<w:pgSz w:w="${pageW}" w:h="${pageH}" w:orient="${geo.trimW > geo.trimH ? "landscape" : "portrait"}"/>`,
-    `<w:pgMar w:top="${margin}" w:right="${margin}" w:bottom="${margin}" w:left="${margin}" w:header="0" w:footer="0" w:gutter="0"/>`,
+    // The top and side margins are the printed safe inset so measured y values
+    // land true. The bottom margin is trimmed to the bleed so Word's slightly
+    // taller line boxes cannot tip the footer onto a second page.
+    `<w:pgMar w:top="${margin}" w:right="${margin}" w:bottom="${Math.round(
+      Math.min(margin, 6 * TWIPS_PER_MM),
+    )}" w:left="${margin}" w:header="0" w:footer="0" w:gutter="0"/>`,
     "</w:sectPr>",
     "</w:body></w:document>",
   ].join("");
