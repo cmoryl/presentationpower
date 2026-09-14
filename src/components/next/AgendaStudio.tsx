@@ -65,6 +65,7 @@ import {
   agendaGeometry,
   agendaName,
   agendaProgramme,
+  agendaProgrammeIsStock,
   agendaSlug,
   agendaStyleLabel,
   normalizeAgendaConfig,
@@ -341,11 +342,8 @@ export function AgendaStudio({
   };
 
   const programmeIsStock = useMemo(
-    () =>
-      !config.days &&
-      JSON.stringify(config.sessions) ===
-        JSON.stringify(agendaProgramme(config.divisionId).sessions),
-    [config.days, config.sessions, config.divisionId],
+    () => agendaProgrammeIsStock(config),
+    [config],
   );
 
   return (

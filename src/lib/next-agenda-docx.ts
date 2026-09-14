@@ -199,10 +199,17 @@ function spacer(heightTwips: number, runs = ""): string {
   ].join("");
 }
 
-function cell(widthTwips: number, content: string, padTwips = 0): string {
+function cell(
+  widthTwips: number,
+  content: string,
+  padTwips = 0,
+  opts: { fill?: string; span?: number; vAlign?: "top" | "center" } = {},
+): string {
   return [
     "<w:tc><w:tcPr>",
     `<w:tcW w:w="${Math.round(widthTwips)}" w:type="dxa"/>`,
+    opts.span && opts.span > 1 ? `<w:gridSpan w:val="${opts.span}"/>` : "",
+    opts.fill ? `<w:shd w:val="clear" w:color="auto" w:fill="${hex(opts.fill)}"/>` : "",
     `<w:tcMar><w:top w:w="${Math.round(padTwips)}" w:type="dxa"/><w:bottom w:w="${Math.round(
       padTwips,
     )}" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:right w:w="${Math.round(
