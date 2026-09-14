@@ -181,6 +181,7 @@ import { Route as EventsNextMartStopIdRouteImport } from './routes/events.next_.
 import { Route as EventsNextLondonTemplateRouteImport } from './routes/events.next_.london_.template'
 import { Route as EventsNextLondonReviseRouteImport } from './routes/events.next_.london_.revise'
 import { Route as EventsNextLondonMapsRouteImport } from './routes/events.next_.london_.maps'
+import { Route as EventsNextLondonBookletRouteImport } from './routes/events.next_.london_.booklet'
 import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
 
 const TemplatesRoute = TemplatesRouteImport.update({
@@ -1055,6 +1056,11 @@ const EventsNextLondonMapsRoute = EventsNextLondonMapsRouteImport.update({
   path: '/next/london/maps',
   getParentRoute: () => EventsRoute,
 } as any)
+const EventsNextLondonBookletRoute = EventsNextLondonBookletRouteImport.update({
+  id: '/next_/london_/booklet',
+  path: '/next/london/booklet',
+  getParentRoute: () => EventsRoute,
+} as any)
 const AdminModulesPrintModuleIdRoute =
   AdminModulesPrintModuleIdRouteImport.update({
     id: '/modules_/print/$moduleId',
@@ -1232,6 +1238,7 @@ export interface FileRoutesByFullPath {
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
+  '/events/next/london/booklet': typeof EventsNextLondonBookletRoute
   '/events/next/london/maps': typeof EventsNextLondonMapsRoute
   '/events/next/london/revise': typeof EventsNextLondonReviseRoute
   '/events/next/london/template': typeof EventsNextLondonTemplateRoute
@@ -1403,6 +1410,7 @@ export interface FileRoutesByTo {
   '/decks/$deckId': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
+  '/events/next/london/booklet': typeof EventsNextLondonBookletRoute
   '/events/next/london/maps': typeof EventsNextLondonMapsRoute
   '/events/next/london/revise': typeof EventsNextLondonReviseRoute
   '/events/next/london/template': typeof EventsNextLondonTemplateRoute
@@ -1579,6 +1587,7 @@ export interface FileRoutesById {
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules_/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
+  '/events/next_/london_/booklet': typeof EventsNextLondonBookletRoute
   '/events/next_/london_/maps': typeof EventsNextLondonMapsRoute
   '/events/next_/london_/revise': typeof EventsNextLondonReviseRoute
   '/events/next_/london_/template': typeof EventsNextLondonTemplateRoute
@@ -1756,6 +1765,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
     | '/admin/modules/print/$moduleId'
+    | '/events/next/london/booklet'
     | '/events/next/london/maps'
     | '/events/next/london/revise'
     | '/events/next/london/template'
@@ -1927,6 +1937,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId'
     | '/knowledge/brand-guides'
     | '/admin/modules/print/$moduleId'
+    | '/events/next/london/booklet'
     | '/events/next/london/maps'
     | '/events/next/london/revise'
     | '/events/next/london/template'
@@ -2102,6 +2113,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
     | '/admin/modules_/print/$moduleId'
+    | '/events/next_/london_/booklet'
     | '/events/next_/london_/maps'
     | '/events/next_/london_/revise'
     | '/events/next_/london_/template'
@@ -3415,6 +3427,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsNextLondonMapsRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/events/next_/london_/booklet': {
+      id: '/events/next_/london_/booklet'
+      path: '/next/london/booklet'
+      fullPath: '/events/next/london/booklet'
+      preLoaderRoute: typeof EventsNextLondonBookletRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/admin/modules_/print/$moduleId': {
       id: '/admin/modules_/print/$moduleId'
       path: '/modules/print/$moduleId'
@@ -3532,6 +3551,7 @@ interface EventsRouteChildren {
   EventsNextPillarsRoute: typeof EventsNextPillarsRoute
   EventsNextPlaybookRoute: typeof EventsNextPlaybookRoute
   EventsNextVenueRoute: typeof EventsNextVenueRoute
+  EventsNextLondonBookletRoute: typeof EventsNextLondonBookletRoute
   EventsNextLondonMapsRoute: typeof EventsNextLondonMapsRoute
   EventsNextLondonReviseRoute: typeof EventsNextLondonReviseRoute
   EventsNextLondonTemplateRoute: typeof EventsNextLondonTemplateRoute
@@ -3557,6 +3577,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextPillarsRoute: EventsNextPillarsRoute,
   EventsNextPlaybookRoute: EventsNextPlaybookRoute,
   EventsNextVenueRoute: EventsNextVenueRoute,
+  EventsNextLondonBookletRoute: EventsNextLondonBookletRoute,
   EventsNextLondonMapsRoute: EventsNextLondonMapsRoute,
   EventsNextLondonReviseRoute: EventsNextLondonReviseRoute,
   EventsNextLondonTemplateRoute: EventsNextLondonTemplateRoute,
