@@ -17,6 +17,7 @@ import {
 } from "@/lib/next-agenda";
 import { agendaCopyInk } from "@/lib/next-agenda-contrast";
 import { buildPillarQr } from "@/lib/pillar-qr";
+import { logoInkPlacement } from "@/lib/next-logo-ink";
 import { qrStructuralModule } from "@/lib/qr-print";
 
 type Props = {
@@ -94,23 +95,25 @@ export function AgendaSheet({
         ...style,
       }}
     >
-      {blocks.lockup && (division.whiteUrl || division.colorUrl) ? (
-        <img
-          src={
-            face === "light"
-              ? division.colorUrl || division.whiteUrl
-              : division.whiteUrl || division.colorUrl
-          }
-          alt={`${division.name} lockup`}
-          style={{
-            ...at(blocks.lockup.x, blocks.lockup.y),
-            width: mm(blocks.lockup.w),
-            height: mm(blocks.lockup.h),
-            objectFit: "contain",
-            objectPosition: "left top",
-          }}
-        />
-      ) : null}
+      {blocks.lockup && lockupUrl
+        ? (() => {
+            // Place the measured ink box so the mark sits flush on the copy edge;
+            // the file's own clear space falls outside that box.
+            const box = logoInkPlacement(lockupUrl, blocks.lockup);
+            return (
+              <img
+                src={lockupUrl}
+                alt={`${division.name} lockup`}
+                style={{
+                  ...at(box.x, box.y),
+                  width: mm(box.w),
+                  height: mm(box.h),
+                  objectFit: "fill",
+                }}
+              />
+            );
+          })()
+        : null}
 
       {config.eyebrow.trim() ? (
         <div
