@@ -195,7 +195,7 @@ function BookletPage() {
   const addChart = () => {
     const chart: BookletChartPage = {
       id: `c${Date.now().toString(36)}`,
-      kind: "column",
+      kind: "waterfall",
       title: "Programme at a glance",
       subtitle: "",
     };
