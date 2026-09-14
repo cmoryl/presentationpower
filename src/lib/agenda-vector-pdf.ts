@@ -57,6 +57,7 @@ import {
   agendaTitleInk,
   type AgendaConfig,
 } from "./next-agenda";
+import { agendaCopyInk } from "./next-agenda-contrast";
 
 const MM_TO_PT = 72 / 25.4;
 const SLUG_PT = 0.4 * 72;
@@ -250,7 +251,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
   const pages = agendaPages(config);
   const geo = agendaGeometry(config);
   const face = config.face ?? "dark";
-  const ink = agendaInk(face);
+  const ink = agendaCopyInk(config).hex;
   const stops = agendaStops(config.styleId, face, config.divisionId);
 
   const bleedW = geo.bleedW * MM_TO_PT;

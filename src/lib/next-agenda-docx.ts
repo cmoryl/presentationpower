@@ -27,6 +27,7 @@ import {
   agendaTitleInk,
   type AgendaConfig,
 } from "./next-agenda";
+import { agendaCopyInk } from "./next-agenda-contrast";
 
 /** Word measures pages in twentieths of a point. */
 const TWIPS_PER_MM = 1440 / 25.4;
@@ -229,7 +230,7 @@ export async function buildAgendaDocx(
   const geo = agendaGeometry(config);
   const L = agendaLayout(pages[0]!.config);
   const blocks = agendaBlocks(config);
-  const ink = agendaInk(config.face ?? "dark");
+  const ink = agendaCopyInk(config).hex;
   const inkHex = hex(ink, config.face === "light" ? "03002C" : "FFFFFF");
   const titleHex = hex(agendaTitleInk(config));
   const division = agendaDivision(config.divisionId);

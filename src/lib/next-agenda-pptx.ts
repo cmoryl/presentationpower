@@ -31,6 +31,7 @@ import {
   agendaTitleInk,
   type AgendaConfig,
 } from "./next-agenda";
+import { agendaCopyInk } from "./next-agenda-contrast";
 import { flattenedGroundPng } from "./next-agenda-docx";
 import { buildPillarQr } from "./pillar-qr";
 
@@ -123,7 +124,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
   const pages = agendaPages(config);
   const geo = agendaGeometry(config);
   const face = config.face ?? "dark";
-  const inkHex = hex(agendaInk(face), face === "light" ? "03002C" : "FFFFFF");
+  const inkHex = hex(agendaCopyInk(config).hex, face === "light" ? "03002C" : "FFFFFF");
   const groundHex = face === "light" ? "EEF1F7" : "03002C";
   // A muted session reads as lighter weight, not a lighter ink: the gradient
   // grounds run light at one end, so a dimmed grey (the previous 8A93A6) fell
