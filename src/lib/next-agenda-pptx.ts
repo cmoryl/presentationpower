@@ -297,6 +297,9 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
             fontFace: FONT,
             valign: "top",
             margin: 0,
+            // A stand-in face sets wider lines than Geist, so long speaker notes
+            // shrink inside the band instead of being cut off at its edge.
+            fit: "shrink",
           },
         );
       };
