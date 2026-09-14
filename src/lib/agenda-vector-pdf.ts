@@ -52,6 +52,7 @@ import {
   agendaGeometry,
   agendaInk,
   agendaName,
+  agendaParallels,
   agendaQrBackground,
   agendaQrForeground,
   agendaQrStyle,
@@ -619,8 +620,11 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             y -= size * 1.55;
           }
         }
-        const par = row.parallel;
-        if (par && row.session.parallel) {
+        // One aqua card per parallel track on this slot.
+        const parCopy = agendaParallels(row.session);
+        row.parallels.forEach((par, pi) => {
+          const copy = parCopy[pi];
+          if (!copy) return;
           page.drawRectangle({
             x: px(par.x),
             y: py(par.y) - mm(par.h),
@@ -638,7 +642,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
           const pw = mm(par.w) - padX * 2 - mm(L.locSize * 1.4);
           let py2 = py(par.y) - padY;
           const size = mm(L.titleRowSize);
-          for (const line of wrapLines(bold, row.session.parallel.title, size, pw)) {
+          for (const line of wrapLines(bold, copy.title, size, pw)) {
             page.drawText(line, {
               x: px(par.x) + padX,
               y: py2 - size,
@@ -648,10 +652,10 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             });
             py2 -= size * 1.5;
           }
-          if (row.session.parallel.detail.trim()) {
+          if (copy.detail.trim()) {
             const ds = mm(L.detailSize);
             py2 -= ds * 0.5;
-            for (const line of wrapLines(regular, row.session.parallel.detail, ds, pw)) {
+            for (const line of wrapLines(regular, copy.detail, ds, pw)) {
               page.drawText(line, {
                 x: px(par.x) + padX,
                 y: py2 - ds,
@@ -669,7 +673,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             scale: pinH / 25,
             color: rgb(...hexRgb(BAND.pin)),
           });
-        }
+        });
       });
       endLayer(page);
     } else {

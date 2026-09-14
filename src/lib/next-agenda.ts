@@ -432,11 +432,46 @@ export type AgendaSession = {
   track: string;
   /** Break / transition rows print in a quieter weight. */
   muted: boolean;
-  /** Second session sharing the same band, printed on an aqua card. */
+  /**
+   * Second session sharing the same band, printed on an aqua card. Kept for the
+   * saved files and callers that only ever carried one parallel track; it always
+   * mirrors the first entry of `parallels`.
+   */
   parallel?: AgendaParallel | null;
+  /**
+   * Every session running alongside this slot, each printed on its own aqua card
+   * to the right of the band. Up to `AGENDA_MAX_PARALLEL`.
+   */
+  parallels?: AgendaParallel[];
   /** Mark the row with the location pin (session runs off the main floor). */
   pin?: boolean;
 };
+
+/**
+ * Most parallel tracks one slot can print. Four cards is the point where the
+ * narrowest approved board (A4) can still hold a legible session title beside
+ * the main band, so the cap is a print limit, not an arbitrary one.
+ */
+export const AGENDA_MAX_PARALLEL = 4;
+
+/**
+ * Every parallel track on a session, in print order. Reads the multi-track
+ * `parallels` list when present and falls back to the single legacy `parallel`
+ * field, so a board saved before multi-track support still renders unchanged.
+ */
+export function agendaParallels(
+  session: Pick<AgendaSession, "parallel" | "parallels"> | null | undefined,
+): AgendaParallel[] {
+  const list = Array.isArray(session?.parallels)
+    ? session!.parallels!
+    : session?.parallel
+      ? [session.parallel]
+      : [];
+  return list
+    .filter((p) => p && ((p.title ?? "").trim() || (p.detail ?? "").trim()))
+    .slice(0, AGENDA_MAX_PARALLEL)
+    .map((p) => ({ title: p.title ?? "", detail: p.detail ?? "" }));
+}
 
 /** One programme day. Multi-day agendas hold an ordered list of these. */
 export type AgendaDay = {
@@ -1182,8 +1217,7 @@ export function agendaProgrammeIsStock(config: {
       s.detail ?? "",
       s.track ?? "",
       s.muted ? "1" : "0",
-      s.parallel?.title ?? "",
-      s.parallel?.detail ?? "",
+      ...agendaParallels(s).flatMap((p) => [p.title, p.detail]),
     ].join("\u0001");
   const same = (a: Partial<AgendaSession>[], b: Partial<AgendaSession>[]) =>
     a.length === b.length && a.every((s, i) => sig(s) === sig(b[i]!));
@@ -1515,6 +1549,25 @@ export function agendaLayout(config: AgendaConfig) {
 }
 
 /**
+ * Column widths for a band that carries `count` parallel cards: the main band on
+ * the left and an equal aqua card per parallel track, separated by the printed
+ * band gutter. With one card the split reproduces the approved 45.5 / 54.5 board
+ * exactly, so existing single-track boards are untouched.
+ */
+export function agendaSplitWidths(
+  contentW: number,
+  bandGap: number,
+  count: number,
+): { leftW: number; cardW: number } {
+  if (count <= 0) return { leftW: contentW, cardW: 0 };
+  // The main band keeps the approved 45.5% of the content width whatever the
+  // track count; the cards share what is left after the printed gutters.
+  const leftW = contentW * 0.455;
+  const cardW = Math.max(2, (contentW - leftW - bandGap * count) / count);
+  return { leftW, cardW };
+}
+
+/**
  * Lines a run of copy takes at a printed size inside a column. Cap-height mm to
  * average glyph advance is ~0.55, which matched the issued boards when the row
  * bands were measured against the approved Canva programme.
@@ -1551,17 +1604,25 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
   const num = (v: unknown, fb: number) => (Number.isFinite(Number(v)) ? Number(v) : fb);
   const session = (input: unknown): AgendaSession => {
     const s = (input ?? {}) as Partial<AgendaSession>;
-    const par = (s.parallel ?? null) as AgendaParallel | null;
+    const list = Array.isArray(s.parallels)
+      ? (s.parallels as AgendaParallel[])
+      : s.parallel
+        ? [s.parallel as AgendaParallel]
+        : [];
+    const parallels = list
+      .map((p) => ({ title: str(p?.title, ""), detail: str(p?.detail, "") }))
+      .filter((p) => p.title.trim() || p.detail.trim())
+      .slice(0, AGENDA_MAX_PARALLEL);
     return {
       time: str(s.time, ""),
       title: str(s.title, ""),
       detail: str(s.detail, ""),
       track: str(s.track, ""),
       muted: Boolean(s.muted),
-      parallel:
-        par && (str(par.title, "").trim() || str(par.detail, "").trim())
-          ? { title: str(par.title, ""), detail: str(par.detail, "") }
-          : null,
+      parallels,
+      // Kept in step with the list so a saved file stays readable by anything
+      // that only knows the single-track shape.
+      parallel: parallels[0] ?? null,
       pin: Boolean(s.pin),
     };
   };
@@ -1785,8 +1846,10 @@ export function agendaBlocks(config: AgendaConfig) {
     h: number;
     /** Band rectangle for the programme look; null on the ruled list. */
     band: { x: number; y: number; w: number; h: number } | null;
-    /** Aqua card beside the band when the session runs a parallel track. */
+    /** First aqua card, kept for callers that only read one parallel track. */
     parallel: { x: number; y: number; w: number; h: number } | null;
+    /** One aqua card per parallel track, left to right. */
+    parallels: { x: number; y: number; w: number; h: number }[];
   };
 
   let rows: AgendaRow[];
@@ -1794,20 +1857,27 @@ export function agendaBlocks(config: AgendaConfig) {
     // Bands take the height their copy really needs, so a two-line title with a
     // three-line speaker note is never crushed into the same band as "Lunch".
     const bodyW = L.contentW - L.timeColW - L.bandPadX * 2;
-    const splitBodyW = L.splitLeftW - L.timeColW - L.bandPadX * 2;
     const height = (session: AgendaSession) => {
-      const hasSplit = !!session.parallel;
-      const w = hasSplit ? splitBodyW : bodyW;
+      const pars = agendaParallels(session);
+      const split = agendaSplitWidths(L.contentW, L.bandGap, pars.length);
+      const w = pars.length ? split.leftW - L.timeColW - L.bandPadX * 2 : bodyW;
       const left =
         agendaTextLines(session.title, L.titleRowSize, w) * L.titleRowSize * 1.5 +
         agendaTextLines(session.detail, L.detailSize, w) * L.detailSize * 1.55 +
         (session.detail.trim() ? L.detailSize * 0.8 : 0);
-      const rightW = L.contentW - L.splitLeftW - L.bandGap - L.bandPadX * 2 - L.locSize;
-      const right = hasSplit
-        ? agendaTextLines(session.parallel!.title, L.titleRowSize, rightW) * L.titleRowSize * 1.5 +
-          agendaTextLines(session.parallel!.detail, L.detailSize, rightW) * L.detailSize * 1.55 +
-          L.detailSize * 0.8
-        : 0;
+      // Every parallel card is measured on its own column width; the band takes
+      // the tallest of them so no track is clipped.
+      const cardW = split.cardW - L.bandPadX * 2 - L.locSize;
+      const right = pars.reduce(
+        (tallest, p) =>
+          Math.max(
+            tallest,
+            agendaTextLines(p.title, L.titleRowSize, cardW) * L.titleRowSize * 1.5 +
+              agendaTextLines(p.detail, L.detailSize, cardW) * L.detailSize * 1.55 +
+              L.detailSize * 0.8,
+          ),
+        0,
+      );
       return L.bandPadY * 2 + Math.max(L.titleRowSize * 1.6, left, right);
     };
     const wanted = config.sessions.map(height);
@@ -1853,16 +1923,23 @@ export function agendaBlocks(config: AgendaConfig) {
       const h = heights[i]!;
       const y = cursor;
       cursor += h + L.bandGap;
-      const band = { x, y, w: session.parallel ? L.splitLeftW : L.contentW, h };
-      const parallel = session.parallel
-        ? {
-            x: x + L.splitLeftW + L.bandGap,
-            y,
-            w: L.contentW - L.splitLeftW - L.bandGap,
-            h,
-          }
-        : null;
-      return { session, y, h: h + L.bandGap, band, parallel };
+      const pars = agendaParallels(session);
+      const split = agendaSplitWidths(L.contentW, L.bandGap, pars.length);
+      const band = { x, y, w: pars.length ? split.leftW : L.contentW, h };
+      const parallels = pars.map((_, n) => ({
+        x: x + split.leftW + L.bandGap * (n + 1) + split.cardW * n,
+        y,
+        w: split.cardW,
+        h,
+      }));
+      return {
+        session,
+        y,
+        h: h + L.bandGap,
+        band,
+        parallel: parallels[0] ?? null,
+        parallels,
+      };
     });
   } else {
     rows = config.sessions.map((session, i) => ({
@@ -1871,6 +1948,7 @@ export function agendaBlocks(config: AgendaConfig) {
       h: rowH,
       band: null,
       parallel: null,
+      parallels: [],
     }));
   }
 

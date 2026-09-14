@@ -20,6 +20,7 @@ import {
   AGENDA_BAND,
   agendaBandPalette,
   agendaBlocks,
+  agendaSplitWidths,
   agendaDivision,
   agendaLockupUrl,
   agendaGeometry,
@@ -27,6 +28,8 @@ import {
   agendaLayout,
   agendaName,
   agendaPages,
+  agendaParallels,
+  AGENDA_MAX_PARALLEL,
   agendaQrBackground,
   agendaQrForeground,
   agendaQrPlateColor,
@@ -399,8 +402,19 @@ export async function buildAgendaDocx(
     // ── card mode: the Canva-style programme bands ───────────────────────────
     const cardMode = agendaRowStyle(cfg) === "card";
     const cardTimeW = contentTwips * 0.21;
-    const cardParallelW = contentTwips * 0.34;
-    const cardBodyW = contentTwips - cardTimeW - cardParallelW;
+    // Word tables are a fixed grid, so the parallel region is divided into as
+    // many equal columns as the busiest slot needs; quieter slots merge the
+    // spare columns back into the session body.
+    const cardMaxPar = Math.min(
+      AGENDA_MAX_PARALLEL,
+      (cfg.sessions ?? []).reduce((m, s) => Math.max(m, agendaParallels(s).length), 0),
+    );
+    const cardSplit = agendaSplitWidths(contentTwips, 0, cardMaxPar);
+    const cardParColW = cardSplit.cardW;
+    const cardParallelW = cardParColW * Math.max(1, cardMaxPar);
+    const cardBodyW = cardMaxPar
+      ? cardSplit.leftW - cardTimeW
+      : contentTwips - cardTimeW - cardParallelW;
 
     // Card bands carry copy of very different lengths, so each band asks for the
     // height its own copy really needs in Word line boxes; the whole set is then
@@ -409,16 +423,20 @@ export async function buildAgendaDocx(
     const cardLineCount = (text: string, sizeMm: number, colTwips: number) =>
       agendaTextLines(text, sizeMm, colTwips / TWIPS_PER_MM - 6);
     const cardWanted = (cfg.sessions ?? []).map((s) => {
-      const bodyCol = s.parallel ? cardBodyW : cardBodyW + cardParallelW;
+      const pars = agendaParallels(s);
+      const bodyCol = cardBodyW + (cardMaxPar - pars.length) * cardParColW;
       const left =
         cardLineCount(s.title ?? "", PL.titleRowSize, bodyCol) * lineMm(PL.titleRowSize) +
         cardLineCount(s.detail ?? "", PL.detailSize, bodyCol) * lineMm(PL.detailSize);
-      const right = s.parallel
-        ? cardLineCount(s.parallel.title ?? "", PL.titleRowSize, cardParallelW) *
-            lineMm(PL.titleRowSize) +
-          cardLineCount(s.parallel.detail ?? "", PL.detailSize, cardParallelW) *
-            lineMm(PL.detailSize)
-        : 0;
+      const right = pars.reduce(
+        (tallest, p) =>
+          Math.max(
+            tallest,
+            cardLineCount(p.title, PL.titleRowSize, cardParColW) * lineMm(PL.titleRowSize) +
+              cardLineCount(p.detail, PL.detailSize, cardParColW) * lineMm(PL.detailSize),
+          ),
+        0,
+      );
       return Math.max(lineMm(PL.titleRowSize) * 1.2, left, right) + 3.4;
     });
     const cardGapMm = 1.2 * Math.max(0, cardWanted.length - 1);
@@ -457,7 +475,8 @@ export async function buildAgendaDocx(
                 })
               : "",
           ].join("");
-        const parallel = session.parallel;
+        const pars = agendaParallels(session);
+        const spare = cardMaxPar - pars.length;
         return [
           `<w:tr><w:trPr><w:trHeight w:val="${
             cardBands[i] ?? rowBand
@@ -471,33 +490,27 @@ export async function buildAgendaDocx(
             rowPad,
             { fill, vAlign: "top", rail: BAND.rail, railW: BAND.railW * PL.k },
           ),
-          parallel
-            ? cell(cardBodyW, copy(session.title ?? "", session.detail ?? ""), rowPad, {
-                fill,
+          // The body takes back any parallel column this slot does not use.
+          cell(
+            cardBodyW + spare * cardParColW,
+            copy(session.title ?? "", session.detail ?? ""),
+            rowPad,
+            spare > 0 ? { fill, span: spare + 1, vAlign: "top" } : { fill, vAlign: "top" },
+          ),
+          pars
+            .map((p) =>
+              cell(cardParColW, copy(p.title, p.detail, parInk), rowPad, {
+                fill: BAND.parallel,
                 vAlign: "top",
-              })
-            : cell(cardBodyW + cardParallelW, copy(session.title ?? "", session.detail ?? ""), rowPad, {
-                fill,
-                span: 2,
-                vAlign: "top",
+                rail: BAND.rail,
+                railW: BAND.railW * PL.k,
               }),
-          parallel
-            ? cell(
-                cardParallelW,
-                copy(parallel.title ?? "", parallel.detail ?? "", parInk),
-                rowPad,
-                {
-                  fill: BAND.parallel,
-                  vAlign: "top",
-                  rail: BAND.rail,
-                  railW: BAND.railW * PL.k,
-                },
-              )
-            : "",
+            )
+            .join(""),
           "</w:tr>",
           // A hairline spacer row keeps the printed gutter between bands.
           `<w:tr><w:trPr><w:trHeight w:val="${mmT(1.2)}" w:hRule="exact"/></w:trPr>`,
-          cell(contentTwips, "", 0, { span: 3 }),
+          cell(contentTwips, "", 0, { span: cardMaxPar + 2 }),
           "</w:tr>",
         ].join("");
       })
@@ -570,9 +583,11 @@ export async function buildAgendaDocx(
       "</w:tblPr>",
       "<w:tblGrid>",
       cardMode
-        ? `<w:gridCol w:w="${Math.round(cardTimeW)}"/><w:gridCol w:w="${Math.round(
-            cardBodyW,
-          )}"/><w:gridCol w:w="${Math.round(cardParallelW)}"/>`
+        ? `<w:gridCol w:w="${Math.round(cardTimeW)}"/><w:gridCol w:w="${Math.round(cardBodyW)}"/>` +
+          Array.from(
+            { length: cardMaxPar },
+            () => `<w:gridCol w:w="${Math.round(cardParColW)}"/>`,
+          ).join("")
         : `<w:gridCol w:w="${Math.round(timeW)}"/><w:gridCol w:w="${Math.round(bodyW)}"/><w:gridCol w:w="${Math.round(trackW)}"/>`,
       "</w:tblGrid>",
       cardMode ? cardRows : rows,

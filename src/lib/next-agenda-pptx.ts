@@ -25,6 +25,7 @@ import {
   agendaInk,
   agendaName,
   agendaPages,
+  agendaParallels,
   agendaQrBackground,
   agendaQrForeground,
   agendaQrStyle,
@@ -332,8 +333,12 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
         });
         rail(band, `Session rail ${i + 1}`);
         bandText(band, r.session);
-        const par = r.parallel;
-        if (par && r.session.parallel) {
+        // One editable aqua card per parallel track, each its own named shape.
+        const parCopy = agendaParallels(r.session);
+        r.parallels.forEach((par, pi) => {
+          const copy = parCopy[pi];
+          if (!copy) return;
+          const label = parCopy.length > 1 ? `${i + 1}.${pi + 1}` : `${i + 1}`;
           s.addShape("rect", {
             x: inX(par.x),
             y: inX(par.y),
@@ -341,19 +346,15 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
             h: inX(par.h),
             fill: { color: hex(BAND.parallel) },
             line: { type: "none" },
-            objectName: `Parallel session ${i + 1}`,
+            objectName: `Parallel session ${label}`,
           });
-          rail(par, `Parallel rail ${i + 1}`);
+          rail(par, `Parallel rail ${label}`);
           bandText(
             par,
-            {
-              time: r.session.time,
-              title: r.session.parallel.title,
-              detail: r.session.parallel.detail,
-            },
+            { time: r.session.time, title: copy.title, detail: copy.detail },
             BAND.parallelInk,
           );
-        }
+        });
       });
     } else if (rows.length) {
       const timeW = inX(L.timeColW);
