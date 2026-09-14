@@ -714,7 +714,7 @@ export function buildLondonPanelSvg(panelIn: LondonPanel, options: LondonArtOpti
         )
       : null;
 
-  const brand = londonBrandingPlan(panel, options.placement);
+  const brand = londonBrandingPlan(panel, options.placement, options.placedArt);
   const logoScale = brand.logo.w / brand.art.w;
   // HERO LOCKUP is layer 1: it is written last in paint order, so it sits on
   // top of the ground and the copy, and Illustrator lists it first in Layers.
@@ -1019,7 +1019,7 @@ export function buildLondonPanelAi(
 
   // Brand layer: EPS-derived lockup outlines as live PDF paths, headline copy
   // as live Geist Bold text — both editable when the .ai is opened.
-  const brand = londonBrandingPlan(panel, options.placement);
+  const brand = londonBrandingPlan(panel, options.placement, options.placedArt);
   const logoScale = (brand.logo.w * MM_TO_PT) / brand.art.w;
   // A turned lockup spins about the centre of its own box. The paths keep their
   // absolute coordinates, so the spin is one matrix wrapped around the layer —

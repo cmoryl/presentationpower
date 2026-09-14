@@ -14,6 +14,7 @@
 
 import { londonPanelArtworkUrl } from "@/lib/next-london-supplied-masters";
 import { londonFileOwnsLayer } from "@/lib/next-london-live-layers";
+import { londonPlacedArt, type LondonPlacedArt } from "@/lib/next-london-placed-art";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
   pickNextLogo,
@@ -222,6 +223,7 @@ export type LondonBrandingPlan = {
 export function londonBrandingPlan(
   panel: LondonPanel,
   placement?: LondonLogoPlacement,
+  placedArt?: LondonPlacedArt | null,
 ): LondonBrandingPlan {
   const familyId = londonPanelFamily(panel);
   const aspect = panel.trimW / Math.max(1, panel.trimH);
@@ -298,8 +300,15 @@ export function londonBrandingPlan(
   // headline on the preview cards. The designer can hand any layer back to the
   // editor (see next-london-live-layers.ts) and it returns as an editable layer.
   const finishedFile = !!londonPanelArtworkUrl(panel.id);
-  const fileOwnsLockup = finishedFile && londonFileOwnsLayer(panel.id, "lockup");
-  const fileOwnsCopy = finishedFile && londonFileOwnsLayer(panel.id, "copy");
+  // Uploaded vector artwork that covers the sheet is a finished face too: the
+  // supplied file already carries its own lockup and wording, so the kit must
+  // not typeset a second one over it. Anything smaller than the sheet is a
+  // placed element (a partner mark, a glyph) and the house layers stay on.
+  const placed = placedArt === undefined ? londonPlacedArt(panel.id) : placedArt;
+  const artIsFinishedFace = !!placed && placed.on !== false && placed.size >= 0.9;
+  const fileOwnsLockup =
+    (finishedFile && londonFileOwnsLayer(panel.id, "lockup")) || artIsFinishedFace;
+  const fileOwnsCopy = (finishedFile && londonFileOwnsLayer(panel.id, "copy")) || artIsFinishedFace;
   const authored =
     nudge.text === null
       ? fileOwnsCopy
