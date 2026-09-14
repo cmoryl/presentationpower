@@ -842,6 +842,9 @@ export function AgendaStudio({
                       {AGENDA_QR_STYLES.map((s) => (
                         <option key={s.id} value={s.id}>
                           {s.label}
+                          {QR_SCAN_VERIFIED_STYLES.includes(s.id as QrModuleStyle)
+                            ? ""
+                            : " — not scan-verified"}
                         </option>
                       ))}
                     </select>
