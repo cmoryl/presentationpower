@@ -144,6 +144,31 @@ function agendaFaceGround(config: AgendaConfig): string {
   return (config.face ?? "dark") === "light" ? "#EEF1F7" : "#03002C";
 }
 
+/**
+ * Ground colour at a vertical fraction of the sheet. Word table shading cannot be
+ * translucent, so a band's fill is composited over this instead — the printed
+ * Word page then matches the board's see-through bands rather than sitting flat.
+ */
+function groundColorAt(config: AgendaConfig, fraction: number): string {
+  const stops = agendaStops(config.styleId, config.face, config.divisionId);
+  const list = stops.length ? stops : [agendaFaceGround(config)];
+  if (list.length === 1) return list[0]!;
+  const t = Math.min(1, Math.max(0, fraction)) * (list.length - 1);
+  const i = Math.min(list.length - 2, Math.floor(t));
+  const rgb = (value: string) => {
+    const h = value.replace("#", "");
+    const n = parseInt(h.length === 3 ? h.replace(/./g, (c) => c + c) : h, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255] as const;
+  };
+  const a = rgb(list[i]!);
+  const b = rgb(list[i + 1]!);
+  const f = t - i;
+  return `#${a
+    .map((c, n) => Math.round(c + (b[n]! - c) * f).toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase()}`;
+}
+
 function run(
   text: string,
   opts: { size: number; color: string; bold?: boolean; caps?: boolean; spacing?: number },
