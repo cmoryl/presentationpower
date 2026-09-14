@@ -43,8 +43,10 @@ describe("agenda PowerPoint export layout", () => {
     expect(slide).toMatch(/lIns="0"/);
     // Every session lands on the slide.
     for (const { session } of b.rows) {
-      if ((session.title ?? "").trim()) {
-        expect(slide).toContain((session.title ?? "").slice(0, 12));
+      const title = (session.title ?? "").trim();
+      if (title) {
+        // XML-escaped, so an ampersand in a session name is not a false failure.
+        expect(slide).toContain(title.slice(0, 12).replace(/&/g, "&amp;"));
       }
     }
   });
