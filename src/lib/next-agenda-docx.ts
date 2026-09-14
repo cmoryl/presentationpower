@@ -1009,7 +1009,10 @@ export async function buildAgendaDocx(
     const fitH = Math.min(hMm, maxH);
     const fitW = wMm * (fitH / Math.max(1, hMm));
     return [
-      bkPara(bkRun(art.title ?? "", L.titleSize * 0.62, titleHex, true, true), 4),
+      // Booklet artwork pages print on plain white paper, so the running head
+      // uses the paper ink — never the board's on-ground title colour, which
+      // can be white or aqua and would vanish here.
+      bkPara(bkRun(art.title ?? "", L.titleSize * 0.62, "03002C", true, true), 4),
       bkPara(inlinePicture(`rIdArt${i + 1}`, 40 + i, art.id || `page-${i + 1}`, fitW, fitH), 3),
       (art.caption ?? "").trim() ? bkPara(bkRun(art.caption, L.footSize, inkHex, false), 0) : "",
     ].join("");
