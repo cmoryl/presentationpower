@@ -414,7 +414,7 @@ function EditorialLeft(p: Shared & { art: React.ReactNode; photo: boolean }) {
         direction={square ? "to top" : "to right"}
         strength={photo ? d.photo.scrim : 1}
         hold={square ? 30 : 34}
-        fade={square ? 76 : 72}
+        fade={photo ? (square ? 76 : 72) : square ? 52 : 50}
       />
       <div
         style={{
