@@ -8,6 +8,7 @@ import {
   agendaGeometry,
   agendaInk,
   agendaLockupUrl,
+  agendaParallels,
   agendaQrBackground,
   agendaQrForeground,
   agendaQrStyle,
@@ -290,53 +291,58 @@ export function AgendaSheet({
                   : null}
               </div>
             </div>
-            {row.parallel ? (
-              <div
-                style={{
-                  ...at(row.parallel.x, row.parallel.y),
-                  width: mm(row.parallel.w),
-                  height: mm(row.parallel.h),
-                  background: BAND.parallel,
-                  color: BAND.parallelInk,
-                  borderLeft: `${mm(BAND.railW * L.k)}px solid ${BAND.rail}`,
-                  padding: `${mm(L.bandPadY)}px ${mm(L.bandPadX)}px`,
-                  boxSizing: "border-box",
-                  position: "absolute",
-                }}
-              >
+            {row.parallels.map((rect, n) => {
+              const par = agendaParallels(row.session)[n];
+              if (!par) return null;
+              return (
                 <div
+                  key={n}
                   style={{
-                    fontSize: mm(L.titleRowSize),
-                    fontWeight: 700,
-                    lineHeight: 1.35,
-                    paddingRight: mm(L.locSize * 1.4),
+                    ...at(rect.x, rect.y),
+                    width: mm(rect.w),
+                    height: mm(rect.h),
+                    background: BAND.parallel,
+                    color: BAND.parallelInk,
+                    borderLeft: `${mm(BAND.railW * L.k)}px solid ${BAND.rail}`,
+                    padding: `${mm(L.bandPadY)}px ${mm(L.bandPadX)}px`,
+                    boxSizing: "border-box",
+                    position: "absolute",
                   }}
                 >
-                  {row.session.parallel?.title}
-                </div>
-                {row.session.parallel?.detail.trim() ? (
                   <div
                     style={{
-                      fontSize: mm(L.detailSize),
-                      lineHeight: 1.45,
-                      marginTop: mm(L.detailSize * 0.6),
+                      fontSize: mm(L.titleRowSize),
+                      fontWeight: 700,
+                      lineHeight: 1.35,
                       paddingRight: mm(L.locSize * 1.4),
                     }}
                   >
-                    {row.session.parallel.detail}
+                    {par.title}
                   </div>
-                ) : null}
-                <div
-                  style={{
-                    position: "absolute",
-                    right: mm(L.bandPadX),
-                    bottom: mm(L.bandPadY),
-                  }}
-                >
-                  <AgendaPin size={mm(L.locSize * 1.5)} fill={BAND.pin} />
+                  {par.detail.trim() ? (
+                    <div
+                      style={{
+                        fontSize: mm(L.detailSize),
+                        lineHeight: 1.45,
+                        marginTop: mm(L.detailSize * 0.6),
+                        paddingRight: mm(L.locSize * 1.4),
+                      }}
+                    >
+                      {par.detail}
+                    </div>
+                  ) : null}
+                  <div
+                    style={{
+                      position: "absolute",
+                      right: mm(L.bandPadX),
+                      bottom: mm(L.bandPadY),
+                    }}
+                  >
+                    <AgendaPin size={mm(L.locSize * 1.5)} fill={BAND.pin} />
+                  </div>
                 </div>
-              </div>
-            ) : null}
+              );
+            })}
           </div>
         ) : (
           <div

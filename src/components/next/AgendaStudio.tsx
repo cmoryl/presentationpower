@@ -79,6 +79,8 @@ import {
   AGENDA_BAND_TREATMENTS,
   agendaBandTreatment,
   agendaProgramme,
+  agendaParallels,
+  AGENDA_MAX_PARALLEL,
   agendaProgrammeIsStock,
   agendaRowStyle,
   type AgendaRowStyleId,
@@ -1411,48 +1413,75 @@ export function AgendaStudio({
                 </Button>
               </div>
 
-              {agendaRowStyle(config) === "card" ? (
-                <div className="space-y-2 md:col-span-5">
-                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <input
-                      type="checkbox"
-                      checked={!!session.parallel}
-                      onChange={(e) =>
-                        setSession(i, {
-                          parallel: e.target.checked ? { title: "", detail: "" } : null,
-                          pin: e.target.checked ? true : session.pin,
-                        })
-                      }
-                      aria-label={`Row ${i + 1} runs a parallel session`}
-                    />
-                    Parallel session alongside this slot
-                  </label>
-                  {session.parallel ? (
-                    <div className="grid gap-2 md:grid-cols-2">
-                      <Input
-                        aria-label={`Row ${i + 1} parallel title`}
-                        value={session.parallel.title ?? ""}
-                        placeholder="Parallel session title"
-                        onChange={(e) =>
-                          setSession(i, {
-                            parallel: { ...session.parallel!, title: e.target.value },
-                          })
-                        }
-                      />
-                      <Input
-                        aria-label={`Row ${i + 1} parallel detail`}
-                        value={session.parallel.detail ?? ""}
-                        placeholder="Speaker or room"
-                        onChange={(e) =>
-                          setSession(i, {
-                            parallel: { ...session.parallel!, detail: e.target.value },
-                          })
-                        }
-                      />
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
+              {agendaRowStyle(config) === "card"
+                ? (() => {
+                    // Up to four tracks can run alongside one slot; each gets its
+                    // own aqua card on the board and in every export.
+                    const pars = agendaParallels(session);
+                    const write = (next: { title: string; detail: string }[]) =>
+                      setSession(i, {
+                        parallels: next,
+                        parallel: next[0] ?? null,
+                        pin: next.length ? true : session.pin,
+                      });
+                    return (
+                      <div className="space-y-2 md:col-span-5">
+                        <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                          <span>
+                            {pars.length
+                              ? `${pars.length} parallel track${pars.length === 1 ? "" : "s"} alongside this slot`
+                              : "No parallel tracks alongside this slot"}
+                          </span>
+                          {pars.length < AGENDA_MAX_PARALLEL ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => write([...pars, { title: "", detail: "" }])}
+                            >
+                              <Plus className="mr-1 h-3.5 w-3.5" /> Add parallel track
+                            </Button>
+                          ) : null}
+                        </div>
+                        {pars.map((par, pi) => (
+                          <div key={pi} className="grid gap-2 md:grid-cols-[1fr_1fr_auto]">
+                            <Input
+                              aria-label={`Row ${i + 1} parallel ${pi + 1} title`}
+                              value={par.title}
+                              placeholder={`Parallel session ${pi + 1} title`}
+                              onChange={(e) =>
+                                write(
+                                  pars.map((p, j) =>
+                                    j === pi ? { ...p, title: e.target.value } : p,
+                                  ),
+                                )
+                              }
+                            />
+                            <Input
+                              aria-label={`Row ${i + 1} parallel ${pi + 1} detail`}
+                              value={par.detail}
+                              placeholder="Speaker or room"
+                              onChange={(e) =>
+                                write(
+                                  pars.map((p, j) =>
+                                    j === pi ? { ...p, detail: e.target.value } : p,
+                                  ),
+                                )
+                              }
+                            />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={`Remove row ${i + 1} parallel ${pi + 1}`}
+                              onClick={() => write(pars.filter((_, j) => j !== pi))}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()
+                : null}
             </div>
           ))}
         </div>

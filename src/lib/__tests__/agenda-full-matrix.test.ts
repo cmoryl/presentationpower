@@ -84,8 +84,18 @@ function auditSheet(
     if (row.h <= 0 || !Number.isFinite(row.h)) problems.push(`row with no height — ${id}`);
     if (row.band && row.band.x + row.band.w > geo.trimW - geo.safeInset + 0.01)
       problems.push(`band past safe right — ${id}`);
-    if (row.parallel && row.parallel.x + row.parallel.w > geo.trimW - geo.safeInset + 0.01)
-      problems.push(`parallel card past safe right — ${id}`);
+    for (const par of row.parallels) {
+      if (par.w <= 2) problems.push(`parallel card too narrow — ${id}`);
+      if (par.x + par.w > geo.trimW - geo.safeInset + 0.01)
+        problems.push(`parallel card past safe right — ${id}`);
+      if (row.band && par.x < row.band.x + row.band.w - 0.01)
+        problems.push(`parallel card overlaps the session band — ${id}`);
+    }
+    for (let n = 1; n < row.parallels.length; n += 1) {
+      const prev = row.parallels[n - 1]!;
+      if (row.parallels[n]!.x < prev.x + prev.w - 0.01)
+        problems.push(`parallel cards overlap each other — ${id}`);
+    }
   }
 }
 
