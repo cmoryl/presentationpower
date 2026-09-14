@@ -1,5 +1,5 @@
 // NEXT division agenda vector export regression. Guards the Illustrator-facing
-// contract: seven named layers, a mesh-shaded ground, numeric trim/bleed boxes,
+// contract: seven named layers, an EDITABLE gradient ground, numeric trim/bleed boxes,
 // live text and vector QR modules.
 
 import { inflateSync } from "node:zlib";
@@ -68,8 +68,13 @@ describe("agenda vector export", () => {
       for (const name of result.layers) expect(raw).toContain(name);
       expect(raw).toContain("/TrimBox");
       expect(raw).toContain("/BleedBox");
-      // Ground is one Type 4 Gouraud mesh, never a raster plate.
-      expect(raw).toContain("/ShadingType 4");
+      // Ground is one live analytic gradient painted as a pattern fill on a
+      // path — the construct Illustrator reopens as an editable gradient. Never
+      // a raster plate, and never a Type 4 mesh (prints fine, cannot be retuned).
+      expect(raw).toMatch(/\/ShadingType [23]/);
+      expect(raw).toContain("/PatternType 2");
+      expect(raw).toContain("/PGround scn");
+      expect(raw).not.toContain("/ShadingType 4");
       expect(ops).toContain("sh");
       expect(/\/Subtype\s*\/Image/.test(raw)).toBe(false);
       // Live text and vector rules for the programme rows.
