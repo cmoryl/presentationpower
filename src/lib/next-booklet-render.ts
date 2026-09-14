@@ -10,53 +10,24 @@
 
 import { renderSpecToSvg } from "@/lib/infographics/svg";
 import { sampleSpecFor } from "@/lib/infographics/audit-sweep";
-import { ensureA11y } from "@/lib/infographics/a11y";
-import { vizTheme } from "@/lib/infographics/viz-theme";
-import { BRAND_MODES } from "@/lib/taxonomy";
-import type { InfographicKind, InfographicSpec } from "@/lib/infographics/spec";
 import { floorMapSheetSize, floorMapSvg, type FloorMapOptions } from "@/lib/next-london-floormap-svg";
 import { LONDON_FLOORS, type LondonFloorId } from "@/lib/next-london-signage";
 import type { BookletChartPage, BookletImagePage } from "@/lib/next-booklet";
 
 const PRINT_PPI = 300;
 
-/** Simple single-series looks carry no library dataset of their own, so the
- *  booklet supplies a plainly-labelled sample series the operator overwrites. */
-const SIMPLE_SAMPLE = {
-  rows: [
-    { label: "Day one · morning", value: 420 },
-    { label: "Day one · afternoon", value: 386 },
-    { label: "Day two · morning", value: 351 },
-    { label: "Day two · afternoon", value: 298 },
-  ],
-  columns: { label: "Session block", value: "Delegates" },
-  source: "Sample dataset · replace with the approved figures",
-};
-
-function simpleSampleSpec(
-  kind: InfographicKind,
-  mode: "light" | "dark",
-  title?: string,
-): InfographicSpec {
-  const brand = BRAND_MODES.find((b) => b.id === "bm-enterprise") ?? BRAND_MODES[0]!;
-  return ensureA11y({
-    id: `booklet-${kind}-${mode}`,
-    kind,
-    title: title ?? "Chart page",
-    data: { rows: SIMPLE_SAMPLE.rows, source: SIMPLE_SAMPLE.source, columns: SIMPLE_SAMPLE.columns },
-    encoding: { x: "label", y: "value", label: "label", value: "value" },
-    theme: vizTheme({ brand, mode }),
-    accessibility: { shortAlt: "", longDesc: "" },
-    export: { preferredFormat: "svg", rasterFallback: true },
-  });
-}
-
 /** mm at 300 ppi, capped so a big sheet cannot blow the browser's canvas limit. */
 function printPx(mm: number): number {
   return Math.max(64, Math.min(8000, Math.round((mm / 25.4) * PRINT_PPI)));
 }
 
-export async function svgToPngBytes(svg: string, wPx: number, hPx: number): Promise<Uint8Array> {
+export async function svgToPngBytes(
+  svg: string,
+  wPx: number,
+  hPx: number,
+  /** Turn the artwork a quarter turn so a landscape sheet fills a portrait page. */
+  rotate = false,
+): Promise<Uint8Array> {
   if (typeof window === "undefined") throw new Error("Booklet pages render in the browser only");
   const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -68,13 +39,21 @@ export async function svgToPngBytes(svg: string, wPx: number, hPx: number): Prom
       el.src = url;
     });
     const canvas = document.createElement("canvas");
-    canvas.width = Math.round(wPx);
-    canvas.height = Math.round(hPx);
+    canvas.width = Math.round(rotate ? hPx : wPx);
+    canvas.height = Math.round(rotate ? wPx : hPx);
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("Could not render the booklet page artwork");
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    if (rotate) {
+      ctx.save();
+      ctx.translate(canvas.width, 0);
+      ctx.rotate(Math.PI / 2);
+      ctx.drawImage(img, 0, 0, Math.round(wPx), Math.round(hPx));
+      ctx.restore();
+    } else {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    }
     const out = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob(
         (b) => (b ? resolve(b) : reject(new Error("Could not render the booklet page artwork"))),
@@ -91,6 +70,8 @@ export async function svgToPngBytes(svg: string, wPx: number, hPx: number): Prom
 export async function bookletMapPages(
   floors: readonly LondonFloorId[],
   opts: FloorMapOptions = {},
+  /** Booklet page proportion — a wide plan is turned a quarter turn on a tall page. */
+  page: { wMm: number; hMm: number } = { wMm: 210, hMm: 297 },
 ): Promise<BookletImagePage[]> {
   const pages: BookletImagePage[] = [];
   for (const floor of floors) {
@@ -99,22 +80,20 @@ export async function bookletMapPages(
     const svg = floorMapSvg(floor, options);
     const wPx = printPx(size.w);
     const hPx = Math.round(wPx * (size.h / Math.max(1, size.w)));
+    const turn = size.w / Math.max(1, size.h) > 1.25 && page.hMm > page.wMm;
     const label = LONDON_FLOORS.find((f) => f.id === floor)?.label ?? floor;
     pages.push({
       id: `map-${floor}`,
       title: `Venue map · ${label}`,
       caption:
         "QEII Centre floor plan — rendered artwork placed at 300 ppi, not vector print artwork.",
-      png: await svgToPngBytes(svg, wPx, hPx),
-      wPx,
-      hPx,
+      png: await svgToPngBytes(svg, wPx, hPx, turn),
+      wPx: turn ? hPx : wPx,
+      hPx: turn ? wPx : hPx,
     });
   }
   return pages;
 }
-
-/** Exposed for browser-driven verification of the fallback sample series. */
-export const __test_simpleSpec = simpleSampleSpec;
 
 /** One booklet page per chart module, at the booklet's own printed proportions. */
 export async function bookletChartPages(
@@ -125,9 +104,13 @@ export async function bookletChartPages(
   const pages: BookletImagePage[] = [];
   const warnings: string[] = [];
   for (const chart of charts) {
-    const spec =
-      sampleSpecFor(chart.kind, mode, chart.title || undefined) ??
-      simpleSampleSpec(chart.kind, mode, chart.title || undefined);
+    const spec = sampleSpecFor(chart.kind, mode, chart.title || undefined);
+    if (!spec) {
+      warnings.push(
+        `“${chart.title || chart.kind}” cannot be exported as a booklet page — that chart look has no print renderer, so the page was left out.`,
+      );
+      continue;
+    }
     const withCopy = { ...spec, subtitle: chart.subtitle || spec.subtitle };
     const wPx = printPx(sheet.wMm);
     const hPx = printPx(sheet.hMm);

@@ -30,6 +30,7 @@ import {
 } from "@/lib/next-booklet";
 import { buildBookletPdf } from "@/lib/next-booklet-pdf";
 import { bookletChartPages, bookletMapPages } from "@/lib/next-booklet-render";
+import { SUPPORTED_VIZ_KINDS } from "@/lib/infographics/variant-kinds";
 import { LONDON_FLOORS, LONDON_VENUE, type LondonFloorId } from "@/lib/next-london-signage";
 import { londonMappedFloors } from "@/lib/next-london-floorplan";
 import type { InfographicKind } from "@/lib/infographics/spec";
@@ -57,18 +58,32 @@ export const Route = createFileRoute("/events/next_/london_/booklet")({
 });
 
 /** Chart looks offered on a booklet page — the ones that read at handout size. */
-const CHART_KINDS: { id: InfographicKind; label: string }[] = [
-  { id: "kpi", label: "Headline figures" },
-  { id: "column", label: "Columns" },
-  { id: "bar", label: "Bars" },
-  { id: "line", label: "Line" },
-  { id: "area", label: "Area" },
-  { id: "donut", label: "Donut" },
-  { id: "waterfall", label: "Waterfall" },
-  { id: "funnel", label: "Funnel" },
-  { id: "radar", label: "Radar" },
-  { id: "heatmap", label: "Heat map" },
-];
+const CHART_LABELS: Partial<Record<InfographicKind, string>> = {
+  waterfall: "Waterfall",
+  radar: "Radar",
+  heatmap: "Heat map",
+  "calendar-heatmap": "Delivery calendar",
+  treemap: "Treemap",
+  sankey: "Flow (Sankey)",
+  chord: "Chord",
+  beeswarm: "Beeswarm",
+  bump: "Rankings (bump)",
+  "market-map": "Market map",
+  "stacked-area": "Stacked area",
+  dumbbell: "Before / after",
+  "radial-bar": "Radial bars",
+  sunburst: "Sunburst",
+  gantt: "Timeline (Gantt)",
+  slope: "Slope",
+  "gauge-grid": "Gauge grid",
+  boxplot: "Spread (boxplot)",
+};
+
+/** Only looks with a print renderer can become a booklet page. */
+const CHART_KINDS: { id: InfographicKind; label: string }[] = SUPPORTED_VIZ_KINDS.map((id) => ({
+  id,
+  label: CHART_LABELS[id] ?? id,
+}));
 
 function download(blob: Blob, name: string): void {
   const url = URL.createObjectURL(blob);
