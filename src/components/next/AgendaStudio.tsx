@@ -68,8 +68,10 @@ import {
   type AgendaSession,
 } from "@/lib/next-agenda";
 import {
+  AGENDA_GUARD_GAPS,
   agendaCopyInk,
   agendaCopyReadouts,
+  agendaGroundKey,
   agendaTitleInkOptions,
 } from "@/lib/next-agenda-contrast";
 import { NEXT_CITY_SERIES, NEXT_EVENT } from "@/lib/next-event";
@@ -724,6 +726,11 @@ export function AgendaStudio({
                   {failing.length === 0
                     ? `All ${readouts.length} bands clear their contrast floor · copy ink ${guard.hex}${guard.auto ? " (guard applied: the face ink stopped reading on this ground)" : ""}`
                     : `${failing.length} of ${readouts.length} bands sit below their floor on this ground — pick a different ground or move the copy: ${failing.map((r) => r.label).join(", ")}`}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {AGENDA_GUARD_GAPS.includes(agendaGroundKey(config))
+                    ? "This ground has no approved ink that reads across the whole board in the dark face — use the light face or a different gradient."
+                    : "Floors follow WCAG: 3:1 for display copy, 4.5:1 for body copy."}
                 </p>
                 <ul className="grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
                   {readouts.map((r) => (
