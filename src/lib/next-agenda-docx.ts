@@ -199,6 +199,8 @@ function para(
     beforeTwips?: number;
     lineTwips?: number;
     align?: "left" | "right";
+    /** Right indent in twips: keeps a right-aligned line clear of the QR code. */
+    rightTwips?: number;
   } = {},
 ): string {
   const line = opts.lineTwips ? Math.max(120, Math.round(opts.lineTwips)) : 0;
@@ -209,7 +211,7 @@ function para(
     `<w:spacing w:before="${Math.round(opts.beforeTwips ?? 0)}" w:after="${Math.round(
       opts.afterTwips ?? 0,
     )}"${line ? ` w:line="${line}" w:lineRule="atLeast"` : ' w:line="240" w:lineRule="auto"'}/>`,
-    '<w:ind w:left="0" w:right="0" w:firstLine="0"/>',
+    `<w:ind w:left="0" w:right="${Math.max(0, Math.round(opts.rightTwips ?? 0))}" w:firstLine="0"/>`,
     opts.align === "right" ? '<w:jc w:val="right"/>' : '<w:jc w:val="left"/>',
     "</w:pPr>",
     runs,
@@ -412,7 +414,10 @@ export async function buildAgendaDocx(
     ].reduce((a, b) => a + b, 0);
     // Reserve the room Word really gives those lines, so the QR line and page
     // stamp stay on the sheet instead of starting a blank second page.
-    const footMm = footLines * lineMm(PL.footSize) + 12 + rowCount * 2;
+    // The footer band is a real table in the Word flow, so its own height counts
+    // against the sheet as well as the footnote / page-stamp lines above it.
+    const footMm =
+      footLines * lineMm(PL.footSize) * 1.5 + (PL.footerBandH ?? 0) * 2.6 + 16 + rowCount * 1.4;
 
     // Space left on the sheet for the programme band plus the gap above the
     // footer. Everything must land inside it, or Word starts a second page.
@@ -492,12 +497,37 @@ export async function buildAgendaDocx(
       return Math.max(lineMm(PL.titleRowSize) * 1.2, left, right) + 3.4;
     });
     const cardGapMm = 1.2 * Math.max(0, cardWanted.length - 1);
-    const cardBudget = Math.max(20, budget - cardGapMm);
+    // Word's own line boxes run a shade taller than the model on a dense day, so
+    // every band keeps a hair of slack: without it the footnote and footer band
+    // tipped onto a blank second page.
+    const cardBudget = Math.max(
+      20,
+      (budget - cardGapMm) * 0.97 - cardWanted.length * 1.1,
+    );
     const cardTotal = cardWanted.reduce((a, b) => a + b, 0) || 1;
     const cardScale = cardTotal > cardBudget ? cardBudget / cardTotal : 1;
     if (cardScale < 1) {
       compensations.push(
         `Programme bands scaled to ${(cardScale * 100).toFixed(0)}% so the day stays on one Word page`,
+      );
+    }
+    // A Word row height is only a minimum: shrinking the band cannot shrink the
+    // copy inside it. So when the day does not fit, the card type shrinks with
+    // the bands — otherwise the footnote and brand band tip onto a blank page.
+    const copyScale = cardScale < 1 ? Math.max(0.72, Math.sqrt(cardScale)) : 1;
+    const cardBodyType = {
+      titleSize: PL.titleRowSize * copyScale,
+      detailSize: PL.detailSize * copyScale,
+    };
+    const cardTimeSize = PL.timeSize * copyScale;
+    const cardParType = {
+      timeSize: cardType.timeSize * copyScale,
+      titleSize: cardType.titleSize * copyScale,
+      detailSize: cardType.detailSize * copyScale,
+    };
+    if (copyScale < 1) {
+      compensations.push(
+        `Card type set at ${(copyScale * 100).toFixed(0)}% so the day stays on one Word page`,
       );
     }
     const cardBands = cardWanted.map((h) => mmT(h * cardScale));
@@ -523,10 +553,7 @@ export async function buildAgendaDocx(
           copyInk = bandInk,
           speaker = "",
           /** Fitted card sizes; the main band keeps its own type. */
-          T: { titleSize: number; detailSize: number } = {
-            titleSize: PL.titleRowSize,
-            detailSize: PL.detailSize,
-          },
+          T: { titleSize: number; detailSize: number } = cardBodyType,
         ) =>
           [
             para(
@@ -562,9 +589,9 @@ export async function buildAgendaDocx(
           }" w:hRule="atLeast"/><w:cantSplit/></w:trPr>`,
           cell(
             cardTimeW,
-            para(run(session.time ?? "", { size: halfPt(PL.timeSize), color: bandInk, bold: true }), {
+            para(run(session.time ?? "", { size: halfPt(cardTimeSize), color: bandInk, bold: true }), {
               afterTwips: 0,
-              lineTwips: mmT(PL.timeSize * 1.4),
+              lineTwips: mmT(cardTimeSize * 1.4),
             }),
             rowPad,
             { fill, vAlign: "top", rail: BAND.rail, railW: BAND.railW * PL.k },
@@ -586,12 +613,12 @@ export async function buildAgendaDocx(
                 // the slot's time, exactly as the board and the press file do.
                 para(
                   run((p.time ?? "").trim() || (session.time ?? ""), {
-                    size: halfPt(cardType.timeSize),
+                    size: halfPt(cardParType.timeSize),
                     color: parInk,
                     bold: true,
                   }),
-                  { afterTwips: 0, lineTwips: mmT(cardType.timeSize * 1.4) },
-                ) + copy(p.title, p.detail, parInk, p.speaker ?? "", cardType),
+                  { afterTwips: 0, lineTwips: mmT(cardParType.timeSize * 1.4) },
+                ) + copy(p.title, p.detail, parInk, p.speaker ?? "", cardParType),
                 rowPad,
                 {
                   fill: parFill,
@@ -689,10 +716,16 @@ export async function buildAgendaDocx(
       "</w:tbl>",
     ].join("");
 
-    // Card mode has no eyebrow or headline copy on the sheet — the lockup carries
-    // the name and the room line and date sit right of it. Walk that header from
-    // the measured positions instead of the ruled-board bands, or the empty
-    // eyebrow and headline bands open a hole above the programme.
+    // Card mode keeps the lockup with the room line and the date right of it, and
+    // the eyebrow plus the headline underneath, exactly as the printed board and
+    // the PowerPoint deck read. Walk that header from the measured positions so
+    // no empty band opens a hole above the programme.
+    // A code parked in the header narrows the room / date line: use the same
+    // right edge the board measured, or Word prints the room under the QR.
+    const cardLocRight = Math.max(
+      0,
+      mmT(geo.safeInset + PL.contentW - (B.location?.right ?? geo.safeInset + PL.contentW)),
+    );
     const cardHeader =
       cardMode && B.location
         ? [
@@ -705,15 +738,57 @@ export async function buildAgendaDocx(
                     bold: true,
                     spacing: 30,
                   }),
-                  { afterTwips: 0, align: "right", lineTwips: mmT(lineMm(PL.locSize) * 0.62) },
+                  {
+                    afterTwips: 0,
+                    align: "right",
+                    rightTwips: cardLocRight,
+                    lineTwips: mmT(lineMm(PL.locSize) * 0.62),
+                  },
                 )
               : "",
             hasMeta
               ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), {
                   afterTwips: 0,
                   align: "right",
+                  rightTwips: cardLocRight,
                   lineTwips: mmT(lineMm(PL.metaSize) * 0.62),
                 })
+              : "",
+            // Close the measured gap between the room / date block and the
+            // eyebrow so the headline lands where the board prints it.
+            spacer(
+              mmT(
+                Math.max(
+                  1,
+                  B.eyebrowY -
+                    (B.location?.y ?? B.eyebrowY) -
+                    ((cfg.locationLine ?? "").trim() ? lineMm(PL.locSize) * 0.62 : 0) -
+                    (hasMeta ? lineMm(PL.metaSize) * 0.62 : 0),
+                ),
+              ),
+            ),
+            hasEyebrow
+              ? para(
+                  run(cfg.eyebrow, {
+                    size: halfPt(PL.eyebrowSize),
+                    color: inkHex,
+                    caps: true,
+                    bold: true,
+                    spacing: 40,
+                  }),
+                  { afterTwips: 0, lineTwips: mmT(Math.max(1, B.titleY - B.eyebrowY)) },
+                )
+              : "",
+            (cfg.title ?? "").trim()
+              ? para(
+                  run(cfg.title ?? "", {
+                    size: halfPt(PL.titleSize),
+                    color: pageTitleHex,
+                    bold: true,
+                    spacing: -20,
+                  }),
+                  { afterTwips: 0, lineTwips: mmT(Math.max(1, B.rowsTop - B.titleY)) },
+                )
               : "",
           ].join("")
         : null;
@@ -858,7 +933,6 @@ export async function buildAgendaDocx(
         backgroundDrawing(groundRel) + qrDrawing("rIdQr"),
       ),
       cardHeader ?? header,
-      cardHeader ? spacer(mmT(Math.max(2, B.rowsTop - B.metaY - lineMm(PL.metaSize)))) : "",
       table,
       // Card mode: whatever the bands did not use drops the footer band to the
       // foot of the sheet, where the printed board carries it.
