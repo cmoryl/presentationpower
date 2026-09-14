@@ -676,6 +676,9 @@ function LondonSignagePage() {
     ...(isDraft(panel) ? previewOptions(panel) : artOptions(panel)),
     colorSpace: exportSpace,
   });
+  // The QA gate has to be told which colour space the operator asked for, or a
+  // legitimate CMYK print master fails the DeviceRGB rule written for RGB files.
+  const qaColorOpts = { colorSpace: exportSpace };
   const fileBase = (panel: LondonPanel) =>
     londonPanelFileBase(panel, isDraft(panel) ? "draft" : headRev, exportSpace);
 
@@ -724,7 +727,11 @@ function LondonSignagePage() {
           fmt === "ai"
             ? await resolveLondonArtworkAsync(panel, pack, exportOptions(panel))
             : resolveLondonArtwork(panel, pack, exportOptions(panel));
-        gateOnQa(fmt === "svg" ? auditSvg(panel, art.svg) : auditAi(panel, art.ai));
+        gateOnQa(
+          fmt === "svg"
+            ? auditSvg(panel, art.svg, qaColorOpts)
+            : auditAi(panel, art.ai, qaColorOpts),
+        );
         if (fmt === "svg") {
           download(new Blob([art.svg], { type: "image/svg+xml" }), `${fileBase(panel)}.svg`);
           return;
@@ -750,7 +757,7 @@ function LondonSignagePage() {
         await loadLondonSignageFace();
         // The async builder resolves supplied vendor artwork itself.
         const bytes = await buildLondonPanelPrintPdfAsync(panel, exportOptions(panel));
-        gateOnQa(auditPrintPdf(panel, bytes, LONDON_MARKS_MARGIN_MM));
+        gateOnQa(auditPrintPdf(panel, bytes, LONDON_MARKS_MARGIN_MM, qaColorOpts));
         download(
           new Blob([londonAiBytes(bytes)], { type: "application/pdf" }),
           `${fileBase(panel)}-print.pdf`,
@@ -806,12 +813,12 @@ function LondonSignagePage() {
               floorLabel: (panel) => floorLabels.get(panel.floor) ?? panel.floor,
               ai: async (panel) => {
                 const art = await resolveLondonArtworkAsync(panel, pack, exportOptions(panel));
-                gateOnQa(auditAi(panel, art.ai));
+                gateOnQa(auditAi(panel, art.ai, qaColorOpts));
                 return londonAiBytes(art.ai);
               },
               printPdf: async (panel) => {
                 const bytes = await buildLondonPanelPrintPdfAsync(panel, exportOptions(panel));
-                gateOnQa(auditPrintPdf(panel, bytes, LONDON_MARKS_MARGIN_MM));
+                gateOnQa(auditPrintPdf(panel, bytes, LONDON_MARKS_MARGIN_MM, qaColorOpts));
                 return londonAiBytes(bytes);
               },
               supplied: async (panel) => {
@@ -885,7 +892,7 @@ function LondonSignagePage() {
         const reports: LondonQaReport[] = [];
         for (const panel of panels) {
           const art = resolveLondonArtwork(panel, pack, exportOptions(panel));
-          reports.push(auditSvg(panel, art.svg), auditAi(panel, art.ai));
+          reports.push(auditSvg(panel, art.svg, qaColorOpts), auditAi(panel, art.ai, qaColorOpts));
         }
         setQa(reports);
         download(
