@@ -18,6 +18,7 @@ import JSZip from "jszip";
 import {
   agendaBlocks,
   agendaDivision,
+  agendaLockupUrl,
   agendaGeometry,
   agendaInk,
   agendaLayout,
@@ -33,6 +34,7 @@ import {
   type AgendaConfig,
 } from "./next-agenda";
 import { agendaCopyInk } from "./next-agenda-contrast";
+import { logoInkPlacement } from "./next-logo-ink";
 import { qrModulePxForPrint, qrPng } from "./qr-print";
 
 /** Word measures pages in twentieths of a point. */
