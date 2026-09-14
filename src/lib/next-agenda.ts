@@ -1948,8 +1948,34 @@ export function agendaBlocks(config: AgendaConfig) {
       Number.isFinite(rawX) &&
       Number.isFinite(rawY);
     const clamp = (v: number, a: number, b: number) => Math.min(Math.max(v, a), b);
-    const qrX = clamp(placed ? rawX : defaultX, minX, maxX);
-    const qrTop = clamp(placed ? rawY : defaultY, minY, maxY);
+    let qrX = clamp(placed ? rawX : defaultX, minX, maxX);
+    let qrTop = clamp(placed ? rawY : defaultY, minY, maxY);
+    // The caption can print wider than the code, so the block that must stay
+    // clear of the lockup is the wider of the two.
+    const capWidth = (config.qrCaption ?? "").trim()
+      ? Math.max(L.qrEdge, (config.qrCaption ?? "").trim().length * capSize * 0.62)
+      : L.qrEdge;
+    // The lockup owns the top-left of the header. A code parked or dragged there
+    // printed straight through the wordmark — and a code placed on a bigger board
+    // lands there after a format switch. Step it clear: to the right of the
+    // lockup when the margin allows, otherwise below it.
+    if (lockup) {
+      const gutter = Math.max(6 * L.k, pad);
+      const blockLeft = Math.min(qrX, qrX + (L.qrEdge - capWidth) * 0.5);
+      const blockRight = Math.max(qrX + L.qrEdge, blockLeft + capWidth);
+      const blockBottom = qrTop + blockH;
+      const hits =
+        blockRight > lockup.x - gutter &&
+        blockLeft < lockup.x + lockup.w + gutter &&
+        blockBottom > lockup.y - gutter &&
+        qrTop < lockup.y + lockup.h + gutter;
+      if (hits) {
+        const toRight = lockup.x + lockup.w + gutter + (qrX - blockLeft);
+        if (toRight <= maxX) qrX = clamp(toRight, minX, maxX);
+        else qrTop = clamp(lockup.y + lockup.h + gutter, minY, maxY);
+      }
+    }
+
     qr = {
       x: qrX,
       y: qrTop,

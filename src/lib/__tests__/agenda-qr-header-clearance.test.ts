@@ -28,3 +28,16 @@ describe("agenda header QR clearance", () => {
     expect(footQr.location!.right).toBeCloseTo(noQr.location!.right, 5);
   });
 });
+
+describe("agenda QR lockup clearance", () => {
+  it("keeps a stale dragged code off the lockup", () => {
+    const b = agendaBlocks(
+      cfg({ sizeId: "a4-handout", qrAnchor: "top-right", qrOffsetX: 20, qrOffsetY: 12 }),
+    );
+    expect(b.qr).not.toBeNull();
+    expect(b.lockup).not.toBeNull();
+    const lock = b.lockup!;
+    const qr = b.qr!;
+    expect(qr.x >= lock.x + lock.w || qr.y >= lock.y + lock.h).toBe(true);
+  });
+});
