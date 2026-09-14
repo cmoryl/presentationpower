@@ -597,7 +597,7 @@ function CenterStack(p: Shared & { art: React.ReactNode; photo: boolean }) {
             photograph otherwise fights every detail underneath it. */}
         <div
           style={{
-            width: square ? "84%" : "62%",
+            width: square ? "78%" : "54%",
             background: photo ? withAlpha(d.palette.ground, 0.94) : d.palette.ground,
             backdropFilter: photo ? "blur(2px)" : undefined,
             padding: `${px(square ? 56 : 44)} ${px(square ? 50 : 44)}`,
@@ -781,7 +781,7 @@ function Footnote(p: Shared & { art: React.ReactNode; photo: boolean }) {
       {photo && (
         <>
           <Curtain d={d} direction="to top" strength={d.photo.scrim} hold={26} fade={70} />
-          <EdgeHold d={d} direction="to bottom" strength={0.55} />
+          <EdgeHold d={d} direction="to bottom" strength={0.72} />
         </>
       )}
       <div

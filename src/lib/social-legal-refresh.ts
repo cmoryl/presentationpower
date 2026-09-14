@@ -282,8 +282,8 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineCase: "sentence",
     photo: {
       note: "Foggy residential street on moving day: a man in a coat carries one box to the kerb past an endless line of stacked boxes and bin bags. Left half is luminous empty fog for copy.",
-      focus: "62% 55%",
-      focusSquare: "58% 55%",
+      focus: "78% 55%",
+      focusSquare: "70% 55%",
       scrim: 0.3,
       ink: "#03002C",
     },
