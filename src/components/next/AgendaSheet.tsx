@@ -189,7 +189,9 @@ export function AgendaSheet({
           <div
             style={{
               ...at(blocks.location.pin!.x, blocks.location.pin!.y),
-              width: mm(blocks.contentW),
+              // Right edge comes from the block maths, which pulls it clear of a
+              // code parked in the header — never the full content width.
+              width: mm(blocks.location.right - blocks.x),
               textAlign: "right",
               fontSize: mm(blocks.location.size),
               lineHeight: 1.1,
