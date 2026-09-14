@@ -504,7 +504,9 @@ export async function buildAgendaDocx(
       "<w:tbl><w:tblPr>",
       `<w:tblW w:w="${Math.round(contentTwips)}" w:type="dxa"/>`,
       '<w:tblInd w:w="0" w:type="dxa"/>',
-      '<w:tblBorders><w:insideH w:val="single" w:sz="2" w:color="7F8798"/></w:tblBorders>',
+      cardMode
+        ? ""
+        : '<w:tblBorders><w:insideH w:val="single" w:sz="2" w:color="7F8798"/></w:tblBorders>',
       // Zero default cell padding: the row padding is measured per row above.
       '<w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tblCellMar>',
       '<w:tblLayout w:type="fixed"/>',
