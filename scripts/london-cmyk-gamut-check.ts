@@ -76,7 +76,9 @@ for (const line of measured) {
   const [i, lumA, lumB, satA, satB] = line.split(",");
   const s = stops[Number(i)]!;
   const la = Number(lumA), lb = Number(lumB), sa = Number(satA), sb = Number(satB);
-  const lumLoss = la > 0 ? ((la - lb) / la) * 100 : 0;
+  // On near-black grounds a percentage of almost nothing is meaningless, so a
+  // very dark colour reports no percentage and is judged on the absolute delta.
+  const lumLoss = la >= 20 ? ((la - lb) / la) * 100 : 0;
   const satLoss = sa > 0.02 ? ((sa - sb) / sa) * 100 : 0;
   losses.push({ hex: s.hex, sat: satLoss, lum: lumLoss });
   rowsOut.push(
@@ -86,7 +88,7 @@ for (const line of measured) {
       s.build.approved ? "approved brand build" : "machine conversion — needs sign-off",
       la.toFixed(1),
       lb.toFixed(1),
-      lumLoss.toFixed(1),
+      la >= 20 ? lumLoss.toFixed(1) : "n/a (near-black)",
       sa.toFixed(3),
       sb.toFixed(3),
       satLoss.toFixed(1),
