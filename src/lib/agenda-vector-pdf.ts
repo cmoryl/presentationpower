@@ -42,6 +42,7 @@ import { resolveAssetUrl } from "./asset-base-url";
 import { registerMeshShading, type MeshSampler } from "./pdf-mesh-shading";
 import { extractSvgPaths } from "./pillar-vector-pdf";
 import { buildPillarQr } from "./pillar-qr";
+import { qrStructuralModule } from "./qr-print";
 import {
   agendaBlocks,
   agendaDivision,
@@ -583,7 +584,9 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
           if (!qr.modules[r * qr.size + c]) continue;
           const x = left + c * unit;
           const y = bottom + edge - (r + 1) * unit;
-          if (style === "dot") {
+          // Scanner anchors stay solid whatever the module style — see qr-print.
+          const shaped = style !== "block" && !qrStructuralModule(c, r, qr.size);
+          if (shaped && style === "dot") {
             page.drawCircle({
               x: x + unit / 2,
               y: y + unit / 2,
@@ -592,7 +595,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             });
             continue;
           }
-          if (style === "rounded") {
+          if (shaped && style === "rounded") {
             page.drawRectangle({
               x: x + unit * 0.06,
               y: y + unit * 0.06,

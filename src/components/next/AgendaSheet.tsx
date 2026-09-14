@@ -17,6 +17,7 @@ import {
 } from "@/lib/next-agenda";
 import { agendaCopyInk } from "@/lib/next-agenda-contrast";
 import { buildPillarQr } from "@/lib/pillar-qr";
+import { qrStructuralModule } from "@/lib/qr-print";
 
 type Props = {
   config: AgendaConfig;
