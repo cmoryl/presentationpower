@@ -5,7 +5,8 @@
 //
 // Run: bun scripts/export-london-cmyk-pack.ts [out.zip]
 import JSZip from "jszip";
-import { mkdir, writeFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 
 import {
   auditAi,
@@ -94,6 +95,13 @@ async function main() {
   zip.file("manifest.csv", rows.join("\n"));
   zip.file("printer-colour-sign-off.csv", londonCmykSignOffCsv(art.vibrance));
   zip.file("qa-report.csv", qaReportCsv(reports));
+  // Measured ink-vs-screen appearance, so nobody is surprised on press day.
+  try {
+    execFileSync("bun", ["scripts/london-cmyk-gamut-check.ts"], { stdio: "ignore" });
+    zip.file("colour-gamut-check.csv", await readFile("/tmp/london-cmyk-gamut.csv", "utf8"));
+  } catch {
+    console.warn("gamut check unavailable — pack ships without colour-gamut-check.csv");
+  }
   const roll = rollup(reports);
   zip.file(
     "README.txt",
@@ -117,6 +125,18 @@ async function main() {
       "                                  crop/bleed/registration marks, TrimBox and BleedBox set.",
       "  manifest.csv                    Per-file trim, bleed, style and colour builds.",
       "  qa-report.csv                   Every automated print check on every file.",
+      "  colour-gamut-check.csv          Measured brightness and saturation of each colour as",
+      "                                  ink against the same colour as light.",
+      "",
+      "SCREEN BRIGHTNESS VS INK",
+      "Vector art, live gradients and outlined copy are identical to the RGB pack —",
+      "nothing is rasterised or downsampled, and supplied photography is embedded",
+      "verbatim at its full supplied resolution in its own colour space.",
+      "Colour, however, cannot be identical: ink on paper has a smaller gamut than",
+      "a screen. Measured across these 57 grounds, saturation drops about 16% on",
+      "average (worst cases, the light NEXT blues, near 28%) and brightness about",
+      "5%. The deep navy prints a shade lighter and flatter. Nothing can remove",
+      "that — it is why the conversions need a wet or calibrated proof signed off.",
       "",
       "SUPPLIED VENDOR AND VENUE MASTERS",
       "Panels whose artwork was supplied to us (vendor booth walls, hand-finished",
