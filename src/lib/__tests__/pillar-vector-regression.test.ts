@@ -50,6 +50,7 @@ type Fingerprint = {
   boxes: { media: boolean; trim: boolean; bleed: boolean };
   meshShading: number;
   legacyShading: number;
+  gradientPattern: number;
   rasterImages: number;
   fontsEmbedded: number;
   subsetFont: boolean;
@@ -74,6 +75,7 @@ function fingerprint(result: PillarVectorResult): Fingerprint {
     },
     meshShading: count(both, /\/ShadingType 4/g),
     legacyShading: count(both, /\/ShadingType [23]/g),
+    gradientPattern: count(both, /\/PatternType 2/g),
     rasterImages: count(both, /\/Subtype ?\/Image/g),
     fontsEmbedded: count(raw, /\/FontFile[23]?/g),
     subsetFont: /\/BaseFont ?\/[A-Z]{6}\+/.test(raw),
@@ -140,8 +142,13 @@ describe("pillar vector export regression", () => {
 
       // Illustrator-specific invariants — these are the failures printers see.
       expect(fp.pdfVersion.startsWith("%PDF-1.7"), "PDF 1.7 header").toBe(true);
-      expect(fp.legacyShading, "only Type 4 mesh shadings survive Illustrator").toBe(0);
-      expect(fp.meshShading, "ground must be a live mesh gradient").toBeGreaterThan(0);
+      // The ground must be an EDITABLE gradient: an analytic axial/radial shading
+      // (Type 2/3) used as a pattern fill on a path — what Illustrator writes for
+      // a gradient-filled object. A Type 4 mesh prints fine but opens as a
+      // gradient mesh a designer cannot retune, so it must not come back.
+      expect(fp.meshShading, "no gradient meshes — they are not editable").toBe(0);
+      expect(fp.legacyShading, "ground is an analytic axial/radial shading").toBeGreaterThan(0);
+      expect(fp.gradientPattern, "shading is a pattern fill on a path").toBeGreaterThan(0);
       expect(fp.subsetFont, "subset cmaps render as .notdef boxes").toBe(false);
       expect(fp.layers.length, "nine named layers (OCGs)").toBe(9);
       expect(fp.boxes).toEqual({ media: true, trim: true, bleed: true });

@@ -22,6 +22,7 @@ import { applyPdfX4, type PdfX4Applied } from "./pdf-x4-vector";
 import {
   PDFDocument,
   PDFName,
+  PDFNumber,
   PDFOperator,
   PDFOperatorNames as Ops,
   PDFRef,
@@ -67,9 +68,9 @@ import {
   type PillarConfig,
 } from "./next-pillar-masters";
 import { PILLAR_LOGO_DROP } from "./next-pillar-masters";
-import { londonCmykBuild } from "./next-london-cmyk";
+import { londonCmykBuild, londonCmykRamp } from "./next-london-cmyk";
 import { pillarCmykLedger, pillarCmykSignOffCsv, pillarCmykSummary } from "./next-pillar-cmyk";
-import { registerMeshShading, type MeshSampler } from "./pdf-mesh-shading";
+import { registerGradientPattern, type ShadingStop } from "./pdf-analytic-shading";
 import {
   pillarChevronBands,
   pillarChevronInk,
@@ -142,16 +143,6 @@ function hexRgb(hex: string): [number, number, number] {
   return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
 }
 
-function mixRgb(stops: string[], t: number): [number, number, number] {
-  const clamped = Math.max(0, Math.min(1, t));
-  const scaled = clamped * (stops.length - 1);
-  const i = Math.min(Math.floor(scaled), stops.length - 2);
-  const k = scaled - i;
-  const a = hexRgb(stops[i]!);
-  const b = hexRgb(stops[i + 1]!);
-  return a.map((c, idx) => c + (b[idx]! - c) * k) as [number, number, number];
-}
-
 // ── optional content layers ──────────────────────────────────────────────────
 
 type Layer = { name: PillarLayerName; ref: PDFRef; tag: string };
@@ -206,43 +197,16 @@ function styleAxis(styleId: string): Axis {
   return { x1: 0.5, y1: 0, x2: 0.5, y2: 1 };
 }
 
-/** Colour field for the ground, mirroring the live PillarSign gradient. */
-function groundSampler(w: number, h: number, stops: string[], styleId: string): MeshSampler {
-  if (styleId.includes("halo")) {
-    // Live preview reverses the ramp for halo grounds: light core, saturated rim.
-    const ramp = [...stops].reverse();
-    const cx = w / 2;
-    const cy = h - 0.42 * h;
-    const rx = 0.78 * w * 0.62 * 1.6;
-    const ry = 0.78 * h;
-    return (x, y) => {
-      const d = Math.hypot((x - cx) / rx, (y - cy) / ry);
-      return mixRgb(ramp, Math.min(d, 1));
-    };
+/** The ground's stops in the paint space, as a live gradient ramp. */
+function groundStops(stops: string[], space: PillarColorSpace, vibrance: number): ShadingStop[] {
+  const last = Math.max(stops.length - 1, 1);
+  if (space === "cmyk") {
+    return londonCmykRamp(stops, vibrance).map((b, i) => ({
+      offset: i / last,
+      color: [b.c, b.m, b.y, b.k],
+    }));
   }
-  const axis = styleAxis(styleId);
-  const x1 = axis.x1 * w;
-  const y1 = h - axis.y1 * h;
-  const dx = axis.x2 * w - x1;
-  const dy = h - axis.y2 * h - y1;
-  const len = Math.max(Math.hypot(dx, dy), 1);
-  const ux = dx / len;
-  const uy = dy / len;
-  const origin = x1 * ux + y1 * uy;
-  return (x, y) => mixRgb(stops, (x * ux + y * uy - origin) / len);
-}
-
-/** The same colour field, resolved to ink so the ground separates as CMYK. */
-function cmykSampler(rgbSampler: MeshSampler, vibrance: number): MeshSampler {
-  return (x, y) => {
-    const [r, g, b] = rgbSampler(x, y) as [number, number, number];
-    const hx = (n: number) =>
-      Math.round(Math.max(0, Math.min(1, n)) * 255)
-        .toString(16)
-        .padStart(2, "0");
-    const build = londonCmykBuild(`#${hx(r)}${hx(g)}${hx(b)}`, vibrance);
-    return [build.c, build.m, build.y, build.k];
-  };
+  return stops.map((hex, i) => ({ offset: i / last, color: hexRgb(hex) }));
 }
 
 function drawGround(
@@ -254,18 +218,53 @@ function drawGround(
   styleId: string,
   space: PillarColorSpace,
   vibrance: number,
+  // Pattern space is measured from the page origin, not the current transform,
+  // so the sheet's slug offset has to be added to the gradient geometry.
+  ox = 0,
+  oy = 0,
 ): void {
-  const sampler = groundSampler(w, h, stops, styleId);
-  const { name } = registerMeshShading(
+  // Analytic gradient painted as the FILL of the sheet rectangle. A Gouraud mesh
+  // also prints correctly, but Illustrator opens it as a gradient MESH — a grid
+  // of colour points, not a gradient a designer can retune. A shading pattern on
+  // a real path is what Illustrator itself writes, so the ramp stays editable.
+  const ramp = styleId.includes("halo") ? [...stops].reverse() : stops;
+  const shadingStops = groundStops(ramp, space, vibrance);
+  const spec = styleId.includes("halo")
+    ? ({
+        kind: "radial" as const,
+        centre: { x: ox + w / 2, y: oy + h - 0.42 * h },
+        rx: 0.78 * w * 0.62 * 1.6,
+        ry: 0.78 * h,
+      })
+    : (() => {
+        const axis = styleAxis(styleId);
+        return {
+          kind: "axial" as const,
+          from: { x: ox + axis.x1 * w, y: oy + h - axis.y1 * h },
+          to: { x: ox + axis.x2 * w, y: oy + h - axis.y2 * h },
+        };
+      })();
+  const { name } = registerGradientPattern(
     doc,
     page,
-    w,
-    h,
-    space === "cmyk" ? cmykSampler(sampler, vibrance) : sampler,
+    spec,
+    shadingStops,
     space === "cmyk" ? "cmyk" : "rgb",
+    "PGround",
   );
-  // pdf-lib has no `sh` helper; emit the shading-fill operator directly.
-  page.pushOperators(PDFOperator.of("sh" as never, [name]));
+  page.pushOperators(
+    pushGraphicsState(),
+    PDFOperator.of("cs" as never, [PDFName.of("Pattern")]),
+    PDFOperator.of("scn" as never, [name]),
+    PDFOperator.of(Ops.AppendRectangle, [
+      PDFNumber.of(0),
+      PDFNumber.of(0),
+      PDFNumber.of(w),
+      PDFNumber.of(h),
+    ]),
+    PDFOperator.of("f" as never),
+    popGraphicsState(),
+  );
 }
 
 // ── lockup as vector paths ───────────────────────────────────────────────────
@@ -486,6 +485,8 @@ export async function buildPillarVectorPdf(
     template.stops ? "01-beam-violet-aqua" : config.styleId,
     colorSpace,
     vibrance,
+    round(ox),
+    round(oy),
   );
   page.pushOperators(popGraphicsState());
   endLayer(page);

@@ -10,6 +10,7 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
   "clips": 1,
   "fillOps": 1,
   "fontsEmbedded": 0,
+  "gradientPattern": 2,
   "layers": [
     "01 Ground",
     "02 Lockup",
@@ -21,8 +22,8 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
     "08 Placed artwork",
     "09 Chevron device",
   ],
-  "legacyShading": 0,
-  "meshShading": 2,
+  "legacyShading": 2,
+  "meshShading": 0,
   "page": "1891x5815pt",
   "pdfVersion": "%PDF-1.7",
   "pdfx": {
@@ -43,8 +44,9 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
     "trim": true,
   },
   "clips": 1,
-  "fillOps": 560,
+  "fillOps": 570,
   "fontsEmbedded": 0,
+  "gradientPattern": 2,
   "layers": [
     "01 Ground",
     "02 Lockup",
@@ -56,8 +58,8 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
     "08 Placed artwork",
     "09 Chevron device",
   ],
-  "legacyShading": 0,
-  "meshShading": 2,
+  "legacyShading": 2,
+  "meshShading": 0,
   "page": "1891x5815pt",
   "pdfVersion": "%PDF-1.7",
   "pdfx": {
@@ -80,6 +82,7 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
   "clips": 1,
   "fillOps": 10,
   "fontsEmbedded": 0,
+  "gradientPattern": 2,
   "layers": [
     "01 Ground",
     "02 Lockup",
@@ -91,8 +94,8 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
     "08 Placed artwork",
     "09 Chevron device",
   ],
-  "legacyShading": 0,
-  "meshShading": 2,
+  "legacyShading": 2,
+  "meshShading": 0,
   "page": "1891x5815pt",
   "pdfVersion": "%PDF-1.7",
   "pdfx": {
@@ -113,8 +116,9 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
     "trim": true,
   },
   "clips": 1,
-  "fillOps": 0,
+  "fillOps": 1,
   "fontsEmbedded": 0,
+  "gradientPattern": 2,
   "layers": [
     "01 Ground",
     "02 Lockup",
@@ -126,8 +130,8 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
     "08 Placed artwork",
     "09 Chevron device",
   ],
-  "legacyShading": 0,
-  "meshShading": 2,
+  "legacyShading": 2,
+  "meshShading": 0,
   "page": "1891x5815pt",
   "pdfVersion": "%PDF-1.7",
   "pdfx": {
@@ -148,8 +152,9 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
     "trim": true,
   },
   "clips": 1,
-  "fillOps": 0,
+  "fillOps": 1,
   "fontsEmbedded": 0,
+  "gradientPattern": 2,
   "layers": [
     "01 Ground",
     "02 Lockup",
@@ -161,8 +166,8 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
     "08 Placed artwork",
     "09 Chevron device",
   ],
-  "legacyShading": 0,
-  "meshShading": 2,
+  "legacyShading": 2,
+  "meshShading": 0,
   "page": "1891x5815pt",
   "pdfVersion": "%PDF-1.7",
   "pdfx": {

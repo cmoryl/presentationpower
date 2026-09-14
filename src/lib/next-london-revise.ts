@@ -46,6 +46,7 @@ import {
   radialShadingDict,
   stopsFromColors,
 } from "@/lib/pdf-gradient-shading";
+import { patternDictBody, patternFillOps } from "@/lib/pdf-analytic-shading";
 import {
   LONDON_SIGNAGE_FONT,
   londonBrandingPlan,
@@ -1234,7 +1235,8 @@ export function buildLondonPanelAi(
 
   // Ground: the vendor's placed artwork when supplied (zoom/pan honoured),
   // otherwise the live gradient shading.
-  const groundOps = groundImage
+  // The vendor's placed artwork, when supplied, is the ground instead.
+  const groundImageOps = groundImage
     ? (() => {
         const box = londonGroundBox(panel, brand.placement);
         const bw = box.w * MM_TO_PT;
@@ -1246,7 +1248,7 @@ export function buildLondonPanelAi(
           `${f3(bw)} 0 0 ${f3(bh)} ${f3(bx)} ${f3(by)} cm /ImGround Do Q\n`
         );
       })()
-    : `q 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\n`;
+    : "";
 
   // NEXTbrew café motif: live stroked/filled paths sitting in the ground layer,
   // each with its own ExtGState alpha so nothing is flattened.
@@ -1327,6 +1329,14 @@ export function buildLondonPanelAi(
   const artOcgNum = placedOps ? nextObj++ : 0;
   const groundImageNum = groundImage ? nextObj++ : 0;
   const wallLayerNums = wallLayers.map(() => nextObj++);
+  // The ground gradient is painted as the FILL of a real rectangle through a
+  // shading pattern, not with the `sh` operator. That is the difference between
+  // Illustrator opening a gradient a designer can retune and opening art they
+  // cannot: same colours, same stops, but now a selectable path with a live fill.
+  const groundPatternNum = groundImage ? 0 : nextObj++;
+  const groundOps = groundImage
+    ? groundImageOps
+    : patternFillOps("PGround", { x: 0, y: 0, w, h });
   const wallLayerName = (index: number): string => `ocw${index + 1}`;
 
   // Split field: one marked-content block per lockup layer, in the same paint
@@ -1381,13 +1391,16 @@ export function buildLondonPanelAi(
       `/BleedBox [${f3(margin)} ${f3(margin)} ${f3(margin + w)} ${f3(margin + h)}] ` +
       `/TrimBox [${f3(margin + trimX)} ${f3(margin + trimY)} ${f3(margin + trimX + panel.trimW * MM_TO_PT)} ${f3(margin + trimY + panel.trimH * MM_TO_PT)}] ` +
       `${margin ? `/TPPrintMarks true ` : ""}` +
-      `/TPGradientKind /LiveShading /TPLockup (${pdfText(brand.art.source)}) ` +
+      `/TPGradientKind /LiveShading ` +
+      `${groundPatternNum ? `/TPGradientFill /EditableShadingPattern ` : ""}` +
+      `/TPLockup (${pdfText(brand.art.source)}) ` +
       `/TPColorSpace (${cmyk ? `DeviceCMYK vibrant${vibrance}` : "DeviceRGB"}) ` +
       `/TPLockupColourway (${pdfText(brand.colourway)}) ` +
       `${copyMeta ? `/TPCopy (${pdfText(copyMeta)}) ` : ""}` +
       `${brand.qr ? `/TPQr (${pdfText(brand.qr.data)}) ` : ""}` +
       `/TPText 7 0 R ` +
       `/Resources << /Shading << /Sh0 6 0 R >> ` +
+      `${groundPatternNum ? `/Pattern << /PGround ${groundPatternNum} 0 R >> ` : ""}` +
       `${groundImage ? `/XObject << /ImGround ${groundImageNum} 0 R >> ` : ""}` +
       `/ExtGState << /GsWall << /Type /ExtGState /ca ${f3(wall ? wall.config.opacity : 1)} >> ` +
       `${placedOps ? `/GsArt << /Type /ExtGState /ca ${f3(placed!.opacity)} /CA ${f3(placed!.opacity)} >> ` : ""}` +
@@ -1438,6 +1451,12 @@ export function buildLondonPanelAi(
   for (const layer of wallLayers) {
     objects.push(`<< /Type /OCG /Name (${pdfText(layer.name)}) >>`);
   }
+
+  // The ground's gradient pattern. It points at the same shading object (6 0 R)
+  // the file already carried, so the colour builds are byte-identical — what
+  // changes is that Illustrator now hands the designer an editable gradient.
+  if (groundPatternNum) objects.push(patternDictBody(6));
+
 
   let pdf = "%PDF-1.5\n%\u00e2\u00e3\u00cf\u00d3\n";
   const offsets: number[] = [];

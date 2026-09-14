@@ -71,7 +71,10 @@ describe("london booth masters", () => {
 
   it("falls back to the house ground when no artwork resolves", () => {
     const ai = new TextDecoder().decode(londonAiBytes(buildLondonPanelAi(boothPanels[0]!)));
-    expect(ai).toContain("/Sh0 sh");
+    // House ground = the live gradient, filled through its shading pattern so
+    // Illustrator hands the designer an editable gradient.
+    expect(ai).toContain("/PGround scn");
+    expect(ai).toContain("/PatternType 2");
     expect(ai).not.toContain("/ImGround");
   });
 
