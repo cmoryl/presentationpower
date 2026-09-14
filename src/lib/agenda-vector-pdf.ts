@@ -100,15 +100,6 @@ function hexRgb(hex: string): [number, number, number] {
   return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
 }
 
-function mixRgb(stops: string[], t: number): [number, number, number] {
-  const clamped = Math.max(0, Math.min(1, t));
-  const scaled = clamped * (stops.length - 1);
-  const i = Math.min(Math.floor(scaled), stops.length - 2);
-  const k = scaled - i;
-  const a = hexRgb(stops[i]!);
-  const b = hexRgb(stops[i + 1]!);
-  return a.map((c, idx) => c + (b[idx]! - c) * k) as [number, number, number];
-}
 
 function round(n: number): number {
   return Math.round(n * 1000) / 1000;
