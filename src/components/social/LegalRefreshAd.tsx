@@ -407,15 +407,15 @@ function EditorialLeft(p: Shared & { art: React.ReactNode; photo: boolean }) {
   return (
     <>
       {art}
-      {photo && (
-        <Curtain
-          d={d}
-          direction={square ? "to top" : "to right"}
-          strength={d.photo.scrim}
-          hold={square ? 30 : 34}
-          fade={square ? 76 : 72}
-        />
-      )}
+      {/* The curtain runs for the drawn device too, so the bramble line never
+          crosses the headline the way it used to. */}
+      <Curtain
+        d={d}
+        direction={square ? "to top" : "to right"}
+        strength={photo ? d.photo.scrim : 1}
+        hold={square ? 30 : 34}
+        fade={square ? 76 : 72}
+      />
       <div
         style={{
           position: "absolute",
@@ -464,13 +464,9 @@ function PosterCaps(p: Shared & { art: React.ReactNode; photo: boolean }) {
   return (
     <>
       {art}
-      {photo && (
-        <>
-          <Curtain d={d} direction="to bottom" strength={d.photo.scrim} hold={20} fade={64} />
-          {/* The footer row gets its own hold so the lockup reads. */}
-          <Curtain d={d} direction="to top" strength={d.photo.scrim} hold={12} fade={34} />
-        </>
-      )}
+      <Curtain d={d} direction="to bottom" strength={photo ? d.photo.scrim : 1} hold={20} fade={64} />
+      {/* The footer row gets its own hold so the lockup reads. */}
+      <Curtain d={d} direction="to top" strength={photo ? d.photo.scrim : 1} hold={12} fade={34} />
       <div
         style={{
           position: "absolute",
@@ -690,12 +686,8 @@ function DiagonalBand(p: Shared & { art: React.ReactNode; photo: boolean }) {
   return (
     <>
       {art}
-      {photo && (
-        <>
-          <Curtain d={d} direction="to top" strength={d.photo.scrim} hold={14} fade={44} />
-          <EdgeHold d={d} direction="to bottom" strength={0.5} />
-        </>
-      )}
+      <Curtain d={d} direction="to top" strength={photo ? d.photo.scrim : 1} hold={14} fade={44} />
+      <EdgeHold d={d} direction="to bottom" strength={photo ? 0.5 : 1} />
       {/* The band */}
       <div
         aria-hidden
@@ -778,12 +770,8 @@ function Footnote(p: Shared & { art: React.ReactNode; photo: boolean }) {
   return (
     <>
       {art}
-      {photo && (
-        <>
-          <Curtain d={d} direction="to top" strength={d.photo.scrim} hold={26} fade={70} />
-          <EdgeHold d={d} direction="to bottom" strength={0.72} />
-        </>
-      )}
+      <Curtain d={d} direction="to top" strength={photo ? d.photo.scrim : 1} hold={26} fade={70} />
+      <EdgeHold d={d} direction="to bottom" strength={photo ? 0.72 : 1} />
       <div
         style={{
           position: "absolute",
