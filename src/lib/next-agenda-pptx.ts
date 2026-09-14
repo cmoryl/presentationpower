@@ -190,7 +190,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
     // Hang the title from the foot of its space, but never above the eyebrow's
     // own line — it printed straight through the eyebrow when it did.
     const titleTop = Math.max(
-      b.eyebrowY + eyebrowBand,
+      b.eyebrowY + eyebrowBand + L.eyebrowSize * 0.6,
       b.rowsTop - Math.max(titleBand, titleRoom),
     );
 
