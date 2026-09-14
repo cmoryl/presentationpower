@@ -22,7 +22,7 @@
 // from its own snapshot, and restoring an old revision publishes it forward as
 // a new revision rather than rewriting the past.
 
-import { londonPanelArtworkUrl } from "@/lib/next-london-supplied-masters";
+import { londonPanelArtworkUrl, londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
 import {
   LONDON_PANELS,
   LONDON_STYLES,
@@ -1724,6 +1724,27 @@ export async function buildLondonPanelAiAsync(
   panel: LondonPanel,
   options: LondonArtOptions = {},
 ): Promise<Uint8Array> {
+  // A live-file proof is only a screen preview. It must never be embedded into
+  // a CMYK master: doing so produces exactly the false export we are preventing
+  // here — RGB pixels inside a file labelled CMYK, with the artwork flattened.
+  // A hand-finished sign can only ship in CMYK from its hand-finished editable
+  // CMYK companion master. When one exists, return it byte-for-byte; otherwise
+  // stop visibly rather than substituting the JPEG proof.
+  if (options.colorSpace === "cmyk") {
+    const supplied = londonSuppliedMaster(panel);
+    if (supplied) {
+      if (!supplied.printUrl) {
+        throw new Error(
+          `${panel.name} has a finished live file but no editable CMYK print master. Upload its CMYK .ai or PDF beside the live file before exporting.`,
+        );
+      }
+      const response = await fetch(supplied.printUrl);
+      if (!response.ok) {
+        throw new Error(`The editable CMYK print master for ${panel.name} could not be opened.`);
+      }
+      return new Uint8Array(await response.arrayBuffer());
+    }
+  }
   // Same resolution order as the preview (buildLondonPanelSvg): vendor booth
   // artwork first, then a hand-finished or uploaded live-file proof. Without the
   // second fallback a downloaded master would print the house gradient instead

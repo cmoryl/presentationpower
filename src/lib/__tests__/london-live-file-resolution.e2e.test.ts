@@ -81,4 +81,57 @@ describe("downloaded Illustrator master", () => {
     expect(text).toContain("/Subtype /Image");
     setLondonLiveFiles([]);
   });
+
+  it("never embeds the RGB proof into a CMYK live-file export", async () => {
+    const { buildLondonPanelAiAsync } = await import("@/lib/next-london-revise");
+    setLondonLiveFiles([
+      {
+        id: "row-4",
+        panelId: panel.id,
+        version: 5,
+        filename: "QEII Flag 1.ai",
+        note: null,
+        issued: "2026-09-11",
+        trimW: 1500,
+        trimH: 4000,
+        masterUrl: "https://example.test/m.ai",
+        proofUrl: "https://example.test/p.jpg",
+        printUrl: null,
+        printFilename: null,
+      },
+    ]);
+    await expect(buildLondonPanelAiAsync(panel, { colorSpace: "cmyk" })).rejects.toThrow(
+      "no editable CMYK print master",
+    );
+    setLondonLiveFiles([]);
+  });
+
+  it("returns the uploaded editable CMYK companion instead of the RGB proof", async () => {
+    const { buildLondonPanelAiAsync } = await import("@/lib/next-london-revise");
+    const cmyk = new TextEncoder().encode("%PDF-1.5 editable DeviceCMYK master %%EOF");
+    setLondonLiveFiles([
+      {
+        id: "row-5",
+        panelId: panel.id,
+        version: 6,
+        filename: "QEII Flag 1.ai",
+        note: null,
+        issued: "2026-09-11",
+        trimW: 1500,
+        trimH: 4000,
+        masterUrl: "https://example.test/m.ai",
+        proofUrl: "https://example.test/p.jpg",
+        printUrl: "https://example.test/m-cmyk.ai",
+        printFilename: "QEII Flag 1-cmyk.ai",
+      },
+    ]);
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async () => new Response(cmyk);
+    try {
+      expect(await buildLondonPanelAiAsync(panel, { colorSpace: "cmyk" })).toEqual(cmyk);
+    } finally {
+      globalThis.fetch = originalFetch;
+      setLondonLiveFiles([]);
+    }
+  });
 });
