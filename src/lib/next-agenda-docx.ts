@@ -379,6 +379,74 @@ export async function buildAgendaDocx(
     }
     const rowBand = mmT(rowH);
 
+    // ── card mode: the Canva-style programme bands ───────────────────────────
+    const cardMode = agendaRowStyle(cfg) === "card";
+    const cardTimeW = contentTwips * 0.21;
+    const cardParallelW = contentTwips * 0.34;
+    const cardBodyW = contentTwips - cardTimeW - cardParallelW;
+
+    const cardRows = (cfg.sessions ?? [])
+      .map((session, i) => {
+        const muted = session.muted;
+        const bandInk = hex(AGENDA_BAND.ink);
+        const fill = i % 2 === 0 ? AGENDA_BAND.fillA : AGENDA_BAND.fillB;
+        const copy = (title: string, detail: string) =>
+          [
+            para(
+              run(title, {
+                size: halfPt(PL.titleRowSize),
+                color: bandInk,
+                bold: !muted,
+              }),
+              { afterTwips: 0, lineTwips: mmT(PL.titleRowSize * 1.4) },
+            ),
+            detail.trim()
+              ? para(run(detail, { size: halfPt(PL.detailSize), color: bandInk }), {
+                  beforeTwips: mmT(PL.detailSize * 0.35),
+                  afterTwips: 0,
+                  lineTwips: mmT(PL.detailSize * 1.4),
+                })
+              : "",
+          ].join("");
+        const parallel = session.parallel;
+        return [
+          `<w:tr><w:trPr><w:trHeight w:val="${rowBand}" w:hRule="atLeast"/><w:cantSplit/></w:trPr>`,
+          cell(
+            cardTimeW,
+            para(run(session.time ?? "", { size: halfPt(PL.timeSize), color: bandInk, bold: true }), {
+              afterTwips: 0,
+              lineTwips: mmT(PL.timeSize * 1.4),
+            }),
+            rowPad,
+            { fill, vAlign: "top" },
+          ),
+          parallel
+            ? cell(cardBodyW, copy(session.title ?? "", session.detail ?? ""), rowPad, {
+                fill,
+                vAlign: "top",
+              })
+            : cell(cardBodyW + cardParallelW, copy(session.title ?? "", session.detail ?? ""), rowPad, {
+                fill,
+                span: 2,
+                vAlign: "top",
+              }),
+          parallel
+            ? cell(
+                cardParallelW,
+                copy(parallel.title ?? "", parallel.detail ?? ""),
+                rowPad,
+                { fill: AGENDA_BAND.parallel, vAlign: "top" },
+              )
+            : "",
+          "</w:tr>",
+          // A hairline spacer row keeps the printed gutter between bands.
+          `<w:tr><w:trPr><w:trHeight w:val="${mmT(1.2)}" w:hRule="exact"/></w:trPr>`,
+          cell(contentTwips, "", 0, { span: 3 }),
+          "</w:tr>",
+        ].join("");
+      })
+      .join("");
+
     const rows = (cfg.sessions ?? [])
       .map((session) => {
         const muted = session.muted;
