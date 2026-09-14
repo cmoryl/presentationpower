@@ -7,7 +7,74 @@ import type { InfographicAdapter, InfographicKind } from "@/lib/infographics/spe
 import { registerInfographicAdapter } from "@/lib/infographics/registry";
 
 // Lazy: never appears in the SSR module graph.
-const EChartsInfographic = React.lazy(() => import("./EChartsInfographic"));
+const loadCharts = () => import("./EChartsInfographic");
+const EChartsInfographic = React.lazy(loadCharts);
+
+// The chart chunk is heavy. On a page that shows many MV-VIZ-* cards at once
+// (the library grid) every card sits on the Suspense fallback until it lands,
+// which read as "the charts are missing". Warm it as soon as this module is
+// evaluated in a browser so the fallback window is as short as possible.
+if (typeof window !== "undefined") {
+  const warm = () => {
+    void loadCharts().catch(() => {
+      /* the ChartBoundary/retry path covers a genuine failure */
+    });
+  };
+  const idle = (window as unknown as { requestIdleCallback?: (cb: () => void) => void })
+    .requestIdleCallback;
+  if (typeof idle === "function") idle(warm);
+  else window.setTimeout(warm, 0);
+}
+
+/**
+ * Never hand back an empty rectangle while the chart chunk is in flight: draw a
+ * quiet plot skeleton carrying the chart's alt text so a card always reads as
+ * "chart, loading" rather than "chart missing".
+ */
+function ChartSkeleton({
+  label,
+  mode,
+  height,
+}: {
+  label: string;
+  mode: "light" | "dark";
+  height: number;
+}) {
+  const dark = mode === "dark";
+  const line = dark ? "rgba(255,255,255,0.16)" : "rgba(3,0,44,0.12)";
+  const bar = dark ? "rgba(255,255,255,0.10)" : "rgba(3,0,44,0.07)";
+  return (
+    <div
+      role="img"
+      aria-label={label}
+      aria-busy="true"
+      style={{
+        width: "100%",
+        minHeight: height,
+        display: "flex",
+        alignItems: "flex-end",
+        gap: "2.2%",
+        padding: "6% 4% 5%",
+        boxSizing: "border-box",
+        borderRadius: 16,
+        borderBottom: `1px solid ${line}`,
+        background: dark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.02)",
+      }}
+    >
+      {[62, 84, 47, 96, 71, 55, 88, 66].map((h, i) => (
+        <span
+          key={i}
+          style={{
+            flex: 1,
+            height: `${h}%`,
+            borderRadius: 6,
+            background: bar,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
 const SUPPORTED: InfographicKind[] = [
   "sankey",
@@ -94,29 +161,14 @@ const adapter: InfographicAdapter = {
     return SUPPORTED.includes(kind);
   },
   render(spec, ctx) {
+    const label = spec.accessibility.shortAlt || spec.title || "Chart";
+    const mode = spec.theme.mode === "dark" ? "dark" : "light";
+    const height = ctx.height || 480;
+    const skeleton = <ChartSkeleton label={label} mode={mode} height={height} />;
     return (
-      <ClientOnly
-        fallback={
-          <div
-            aria-hidden
-            style={{
-              width: "100%",
-              height: ctx.height || 480,
-              background:
-                spec.theme.mode === "dark" ? "rgba(255,255,255,0.02)" : "rgba(10,15,28,0.03)",
-              borderRadius: 16,
-            }}
-          />
-        }
-      >
-        <ChartBoundary
-          label={spec.accessibility.shortAlt || spec.title || "Chart"}
-          mode={spec.theme.mode === "dark" ? "dark" : "light"}
-          height={ctx.height || 480}
-        >
-          <React.Suspense
-            fallback={<div aria-hidden style={{ width: "100%", height: ctx.height || 480 }} />}
-          >
+      <ClientOnly fallback={skeleton}>
+        <ChartBoundary label={label} mode={mode} height={height}>
+          <React.Suspense fallback={skeleton}>
             <EChartsInfographic spec={spec} ctx={ctx} />
           </React.Suspense>
         </ChartBoundary>
