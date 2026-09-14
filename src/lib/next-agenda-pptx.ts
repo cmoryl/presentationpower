@@ -229,7 +229,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       const rowH = inX(b.rowH);
       s.addTable(
         rows.map(({ session }) => {
-          const rowInk = session.muted ? "8A93A6" : inkHex;
+          const rowInk = session.muted ? mutedHex : inkHex;
           return [
             {
               text: session.time ?? "",
