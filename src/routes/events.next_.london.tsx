@@ -892,7 +892,7 @@ function LondonSignagePage() {
         const reports: LondonQaReport[] = [];
         for (const panel of panels) {
           const art = resolveLondonArtwork(panel, pack, exportOptions(panel));
-          reports.push(auditSvg(panel, art.svg), auditAi(panel, art.ai));
+          reports.push(auditSvg(panel, art.svg, qaColorOpts), auditAi(panel, art.ai, qaColorOpts));
         }
         setQa(reports);
         download(
