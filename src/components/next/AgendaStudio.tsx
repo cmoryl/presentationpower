@@ -1418,7 +1418,7 @@ export function AgendaStudio({
                     // Up to four tracks can run alongside one slot; each gets its
                     // own aqua card on the board and in every export.
                     const pars = agendaParallels(session);
-                    const write = (next: { title: string; detail: string }[]) =>
+                    const write = (next: AgendaParallel[]) =>
                       setSession(i, {
                         parallels: next,
                         parallel: next[0] ?? null,
