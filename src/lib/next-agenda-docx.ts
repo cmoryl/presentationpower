@@ -155,21 +155,62 @@ function run(
   ].join("");
 }
 
-function para(runs: string, opts: { afterTwips?: number; align?: "left" | "right" } = {}): string {
+/**
+ * A paragraph placed on the printed grid. `lineTwips` is the measured band from
+ * `agendaBlocks`, applied with `atLeast` so Word honours the printed leading but
+ * never clips a descender when a machine substitutes the typeface.
+ */
+function para(
+  runs: string,
+  opts: {
+    afterTwips?: number;
+    beforeTwips?: number;
+    lineTwips?: number;
+    align?: "left" | "right";
+  } = {},
+): string {
+  const line = opts.lineTwips ? Math.max(120, Math.round(opts.lineTwips)) : 0;
   return [
     "<w:p><w:pPr>",
-    `<w:spacing w:after="${Math.round(opts.afterTwips ?? 60)}" w:line="240" w:lineRule="auto"/>`,
-    opts.align === "right" ? '<w:jc w:val="right"/>' : "",
+    // Keep Word from adding its own paragraph spacing on top of the print grid.
+    '<w:contextualSpacing/><w:widowControl w:val="false"/>',
+    `<w:spacing w:before="${Math.round(opts.beforeTwips ?? 0)}" w:after="${Math.round(
+      opts.afterTwips ?? 0,
+    )}"${line ? ` w:line="${line}" w:lineRule="atLeast"` : ' w:line="240" w:lineRule="auto"'}/>`,
+    '<w:ind w:left="0" w:right="0" w:firstLine="0"/>',
+    opts.align === "right" ? '<w:jc w:val="right"/>' : '<w:jc w:val="left"/>',
     "</w:pPr>",
     runs,
     "</w:p>",
   ].join("");
 }
 
-function cell(widthTwips: number, content: string): string {
+/**
+ * Empty paragraph of an exact measured height, used to reproduce the printed
+ * gaps (lockup band, gap above the footer) rather than letting Word guess.
+ */
+function spacer(heightTwips: number, runs = ""): string {
+  return [
+    "<w:p><w:pPr>",
+    `<w:spacing w:before="0" w:after="0" w:line="${Math.max(
+      20,
+      Math.round(heightTwips),
+    )}" w:lineRule="exact"/>`,
+    "</w:pPr>",
+    runs,
+    "</w:p>",
+  ].join("");
+}
+
+function cell(widthTwips: number, content: string, padTwips = 0): string {
   return [
     "<w:tc><w:tcPr>",
     `<w:tcW w:w="${Math.round(widthTwips)}" w:type="dxa"/>`,
+    `<w:tcMar><w:top w:w="${Math.round(padTwips)}" w:type="dxa"/><w:bottom w:w="${Math.round(
+      padTwips,
+    )}" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:right w:w="${Math.round(
+      padTwips,
+    )}" w:type="dxa"/></w:tcMar>`,
     '<w:vAlign w:val="center"/>',
     "</w:tcPr>",
     content || "<w:p/>",
@@ -226,11 +267,74 @@ export async function buildAgendaDocx(
   const timeW = contentTwips * 0.17;
   const trackW = contentTwips * 0.2;
   const bodyW = contentTwips - timeW - trackW;
+  const mmT = (mm: number) => Math.max(0, Math.round(mm * TWIPS_PER_MM));
+  /**
+   * Vertical space one line of a given printed size really occupies in Word.
+   * Sizes are cap-height millimetres, Word sets a full line box, so a headline
+   * takes more room on the page than its printed band — that difference is what
+   * used to push the programme and footer off the sheet.
+   */
+  // Calibrated against a rendered export: a headline set from a printed
+  // cap-height band occupies about twice that band as a Word line box.
+  const lineMm = (sizeMm: number) => sizeMm * 1.98;
+  const compensations: string[] = [];
 
   /** One programme page: header block, row table, footer and page stamp. */
   const buildPage = (cfg: AgendaConfig, groundRel: string): string => {
     const PL = agendaLayout(cfg);
+    const B = agendaBlocks(cfg);
     const pageTitleHex = hex(agendaTitleInk(cfg));
+    const rowCount = Math.max(1, (cfg.sessions ?? []).length);
+    const rowPad = mmT(B.rowH * 0.16);
+
+    // ── vertical budget, measured from the printed board ─────────────────────
+    // The page margin is the safe inset, so every measured y becomes a distance
+    // from the top of the Word text area. Walk the header with a cursor so the
+    // line boxes Word really uses are accounted for instead of assumed.
+    const hasEyebrow = !!(cfg.eyebrow ?? "").trim();
+    const hasMeta = !!(cfg.meta ?? "").trim();
+    let cursor = B.eyebrowY;
+    const eyebrowBand = Math.max(
+      B.titleY - B.eyebrowY,
+      hasEyebrow ? lineMm(PL.eyebrowSize) : 0,
+    );
+    cursor += eyebrowBand;
+    const titleGap = Math.max(0, B.titleY - cursor);
+    cursor += titleGap;
+    const titleBand = Math.max(B.metaY - B.titleY, lineMm(PL.titleSize));
+    cursor += titleBand;
+    const metaBand = Math.max(B.rowsTop - B.metaY, hasMeta ? lineMm(PL.metaSize) : 0);
+    cursor += metaBand;
+    const rowsTop = Math.max(B.rowsTop, cursor);
+    const preRowGap = Math.max(0, rowsTop - cursor);
+
+    const footLines = [
+      (cfg.qrData ?? "").trim() ? 1 : 0,
+      (cfg.footnote ?? "").trim() ? 1 : 0,
+      (cfg.pageLabel ?? "").trim() ? 1 : 0,
+    ].reduce((a, b) => a + b, 0);
+    // Reserve the room Word really gives those lines, so the QR line and page
+    // stamp stay on the sheet instead of starting a blank second page.
+    const footMm = footLines * lineMm(PL.footSize) + 12 + rowCount * 2;
+
+    // Space left on the sheet for the programme band plus the gap above the
+    // footer. Everything must land inside it, or Word starts a second page.
+    const budget = Math.max(20, geo.trimH - geo.safeInset - rowsTop - footMm);
+    let rowH = B.rowH;
+    let footGap = Math.max(0, B.footY - (B.rowsTop + B.rowH * rowCount));
+    if (rowH * rowCount + footGap > budget) {
+      footGap = Math.max(0, budget - rowH * rowCount);
+      if (rowH * rowCount > budget) {
+        rowH = budget / rowCount;
+        footGap = 0;
+        compensations.push(
+          `Row band tightened to ${rowH.toFixed(1)} mm (from ${B.rowH.toFixed(
+            1,
+          )} mm) so the day stays on one Word page`,
+        );
+      }
+    }
+    const rowBand = mmT(rowH);
 
     const rows = (cfg.sessions ?? [])
       .map((session) => {
@@ -243,26 +347,30 @@ export async function buildAgendaDocx(
               color: rowInk,
               bold: !muted,
             }),
-            { afterTwips: 20 },
+            { afterTwips: 0, lineTwips: mmT(PL.titleRowSize * 1.2) },
           ),
           (session.detail ?? "").trim()
             ? para(run(session.detail, { size: halfPt(PL.detailSize), color: rowInk }), {
+                beforeTwips: mmT(PL.detailSize * 0.35),
                 afterTwips: 0,
+                lineTwips: mmT(PL.detailSize * 1.25),
               })
             : "",
         ].join("");
         return [
-          "<w:tr>",
+          // Exact printed band height, and never split across a page.
+          // atLeast, not exact: the printed band is the target, but a session
+          // title that wraps must never have its second line sliced off.
+          `<w:tr><w:trPr><w:trHeight w:val="${rowBand}" w:hRule="atLeast"/><w:cantSplit/></w:trPr>`,
           cell(
             timeW,
             para(
               run(session.time ?? "", { size: halfPt(PL.timeSize), color: rowInk, bold: true }),
-              {
-                afterTwips: 0,
-              },
+              { afterTwips: 0, lineTwips: mmT(PL.timeSize * 1.2) },
             ),
+            rowPad,
           ),
-          cell(bodyW, body),
+          cell(bodyW, body, rowPad),
           cell(
             trackW,
             para(
@@ -272,8 +380,9 @@ export async function buildAgendaDocx(
                 caps: true,
                 spacing: 20,
               }),
-              { afterTwips: 0, align: "right" },
+              { afterTwips: 0, align: "right", lineTwips: mmT(PL.trackSize * 1.4) },
             ),
+            rowPad,
           ),
           "</w:tr>",
         ].join("");
@@ -283,8 +392,13 @@ export async function buildAgendaDocx(
     const table = [
       "<w:tbl><w:tblPr>",
       `<w:tblW w:w="${Math.round(contentTwips)}" w:type="dxa"/>`,
+      '<w:tblInd w:w="0" w:type="dxa"/>',
       '<w:tblBorders><w:insideH w:val="single" w:sz="2" w:color="7F8798"/></w:tblBorders>',
-      '<w:tblLayout w:type="fixed"/></w:tblPr>',
+      // Zero default cell padding: the row padding is measured per row above.
+      '<w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tblCellMar>',
+      '<w:tblLayout w:type="fixed"/>',
+      '<w:tblLook w:val="0000" w:firstRow="0" w:lastRow="0" w:firstColumn="0" w:lastColumn="0" w:noHBand="1" w:noVBand="1"/>',
+      "</w:tblPr>",
       "<w:tblGrid>",
       `<w:gridCol w:w="${Math.round(timeW)}"/><w:gridCol w:w="${Math.round(bodyW)}"/><w:gridCol w:w="${Math.round(trackW)}"/>`,
       "</w:tblGrid>",
@@ -293,7 +407,7 @@ export async function buildAgendaDocx(
     ].join("");
 
     const header = [
-      (cfg.eyebrow ?? "").trim()
+      hasEyebrow
         ? para(
             run(cfg.eyebrow, {
               size: halfPt(PL.eyebrowSize),
@@ -302,9 +416,10 @@ export async function buildAgendaDocx(
               bold: true,
               spacing: 40,
             }),
-            { afterTwips: 60 },
+            { afterTwips: 0, lineTwips: mmT(eyebrowBand) },
           )
-        : "",
+        : spacer(mmT(eyebrowBand)),
+      titleGap > 0.2 ? spacer(mmT(titleGap)) : "",
       para(
         run(cfg.title ?? "", {
           size: halfPt(PL.titleSize),
@@ -312,11 +427,15 @@ export async function buildAgendaDocx(
           bold: true,
           spacing: -20,
         }),
-        { afterTwips: 80 },
+        { afterTwips: 0, lineTwips: mmT(titleBand) },
       ),
-      (cfg.meta ?? "").trim()
-        ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), { afterTwips: 200 })
-        : "",
+      hasMeta
+        ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), {
+            afterTwips: 0,
+            lineTwips: mmT(metaBand),
+          })
+        : spacer(mmT(metaBand)),
+      preRowGap > 0.2 ? spacer(mmT(preRowGap)) : "",
     ].join("");
 
     const footer = [
@@ -326,11 +445,14 @@ export async function buildAgendaDocx(
               size: halfPt(PL.footSize),
               color: inkHex,
             }),
-            { afterTwips: 40 },
+            { afterTwips: 0, lineTwips: mmT(PL.footSize * 1.8) },
           )
         : "",
       (cfg.footnote ?? "").trim()
-        ? para(run(cfg.footnote, { size: halfPt(PL.footSize), color: inkHex }), { afterTwips: 0 })
+        ? para(run(cfg.footnote, { size: halfPt(PL.footSize), color: inkHex }), {
+            afterTwips: 0,
+            lineTwips: mmT(PL.footSize * 1.6),
+          })
         : "",
       (cfg.pageLabel ?? "").trim()
         ? para(
@@ -341,23 +463,18 @@ export async function buildAgendaDocx(
               bold: true,
               spacing: 30,
             }),
-            { afterTwips: 0, align: "right" },
+            { afterTwips: 0, align: "right", lineTwips: mmT(PL.footSize * 1.6) },
           )
         : "",
     ].join("");
 
     return [
-      `<w:p><w:pPr><w:spacing w:after="0"/></w:pPr>${backgroundDrawing(groundRel)}</w:p>`,
-      // The approved lockup is burned into the ground picture at its printed
-      // position, so the text block just reserves the same vertical space.
-      `<w:p><w:pPr><w:spacing w:after="0" w:line="${Math.max(
-        120,
-        Math.round(((blocks.lockup?.h ?? 0) + 4) * TWIPS_PER_MM),
-      )}" w:lineRule="exact"/></w:pPr></w:p>`,
-
+      // The ground rides in the first spacer so the picture costs no extra
+      // vertical space — that stray line was pushing every block down a step.
+      spacer(mmT(Math.max(0, B.eyebrowY - geo.safeInset)), backgroundDrawing(groundRel)),
       header,
       table,
-      '<w:p><w:pPr><w:spacing w:after="120"/></w:pPr></w:p>',
+      footGap > 0.2 ? spacer(mmT(footGap)) : "",
       footer,
     ].join("");
   };
@@ -396,6 +513,8 @@ export async function buildAgendaDocx(
       '<Default Extension="png" ContentType="image/png"/>',
       '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>',
       '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>',
+      '<Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>',
+      '<Override PartName="/word/fontTable.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml"/>',
       "</Types>",
     ].join(""),
   );
@@ -418,6 +537,8 @@ export async function buildAgendaDocx(
           `<Relationship Id="rIdGround${i === 0 ? "" : i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/ground.png"/>`,
       ),
       '<Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>',
+      '<Relationship Id="rIdSettings" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>',
+      '<Relationship Id="rIdFonts" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>',
       "</Relationships>",
     ].join(""),
   );
@@ -429,8 +550,49 @@ export async function buildAgendaDocx(
       "<w:docDefaults><w:rPrDefault><w:rPr>",
       `<w:rFonts w:ascii="${FONT}" w:hAnsi="${FONT}" w:cs="${FONT}" w:eastAsia="${FONT_FALLBACK}"/>`,
       `<w:color w:val="${inkHex}"/><w:sz w:val="${halfPt(L.detailSize)}"/>`,
-      "</w:rPr></w:rPrDefault></w:docDefaults>",
+      "</w:rPr></w:rPrDefault>",
+      // Paragraph defaults: no Word-added spacing, single leading. Without this
+      // Word applies its own Normal style spacing on top of the print grid.
+      "<w:pPrDefault><w:pPr>",
+      '<w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/>',
+      '<w:ind w:left="0" w:right="0" w:firstLine="0"/>',
+      "</w:pPr></w:pPrDefault>",
+      "</w:docDefaults>",
+      // "Normal" must exist and must be flat too, otherwise Word substitutes its
+      // built-in Normal (10pt body, 8pt after) and every measured gap shifts.
+      '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/>',
+      `<w:pPr><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/></w:pPr>`,
+      `<w:rPr><w:rFonts w:ascii="${FONT}" w:hAnsi="${FONT}" w:cs="${FONT}"/><w:sz w:val="${halfPt(
+        L.detailSize,
+      )}"/></w:rPr></w:style>`,
       "</w:styles>",
+    ].join(""),
+  );
+  zip.file(
+    "word/settings.xml",
+    [
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+      '<w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">',
+      // Modern layout mode, so Word does not re-flow the sheet with legacy rules.
+      '<w:defaultTabStop w:val="720"/>',
+      '<w:compat><w:compatSetting w:name="compatibilityMode"',
+      ' w:uri="http://schemas.microsoft.com/office/word" w:val="15"/></w:compat>',
+      "</w:settings>",
+    ].join(""),
+  );
+  zip.file(
+    "word/fontTable.xml",
+    [
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+      '<w:fonts xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">',
+      // Geist is not installed on most machines. Naming a metric-compatible
+      // alternative keeps the substitute close instead of letting Word fall back
+      // to a serif with different widths, which is what re-wrapped the rows.
+      `<w:font w:name="${FONT}"><w:altName w:val="${FONT_FALLBACK}"/>`,
+      '<w:charset w:val="00"/><w:family w:val="swiss"/><w:pitch w:val="variable"/></w:font>',
+      `<w:font w:name="${FONT_FALLBACK}"><w:altName w:val="Arial"/>`,
+      '<w:charset w:val="00"/><w:family w:val="swiss"/><w:pitch w:val="variable"/></w:font>',
+      "</w:fonts>",
     ].join(""),
   );
   zip.file("word/media/ground.png", groundBytes);
