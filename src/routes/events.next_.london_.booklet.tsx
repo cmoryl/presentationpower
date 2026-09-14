@@ -141,7 +141,7 @@ function BookletPage() {
     const pages: BookletImagePage[] = [];
     const warnings: string[] = [];
     if (config.includeMap && config.mapFloors.length) {
-      pages.push(...(await bookletMapPages(config.mapFloors, {}, bookletSize(config.sizeId))));
+      pages.push(...(await bookletMapPages(config.mapFloors, {}, { wMm: bookletGeo.trimW, hMm: bookletGeo.trimH })));
     }
     if (config.charts.length) {
       const charts = await bookletChartPages(config.charts, "light");
