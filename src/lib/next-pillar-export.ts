@@ -14,7 +14,8 @@ import jsPDF from "jspdf";
 import { fetchIccProfile, wrapPdfAsX4 } from "./pdf-x4";
 
 import { captureAssetCanvas } from "./asset-export";
-import { buildPillarVectorPdf } from "./pillar-vector-pdf";
+import { pillarCmykSignOffCsv, pillarTemplateCmykCsv } from "./next-pillar-cmyk";
+import { buildPillarVectorPdf, type PillarColorSpace } from "./pillar-vector-pdf";
 import { buildLondonPanelAi } from "./next-london-revise";
 import type { LondonPanel } from "./next-london-signage";
 import {
@@ -94,6 +95,7 @@ function readme(
   config: PillarConfig,
   ppi: number,
   vector: Awaited<ReturnType<typeof buildPillarVectorPdf>> | null,
+  colorSpace: PillarColorSpace,
 ): string {
   const geo = pillarGeometry(config);
   const qr = (config.qrData ?? "").trim();
@@ -115,7 +117,18 @@ function readme(
       ? `QR block:        ${Math.round(Number(config.qrSize) || 180)} mm square, quiet zone included, ECC level H`
       : `QR block:        n/a`,
     `Plate:           ${ppi} ppi (large-format issued tier ${PILLAR_SPEC.rasterPpi} ppi)`,
-    `Colour:          convert to ${PILLAR_SPEC.colorMode} at output; body text 100K`,
+    colorSpace === "cmyk"
+      ? `Colour:          artwork is built in DeviceCMYK — ground mesh, chevrons, lockup, type and QR`
+      : `Colour:          convert to ${PILLAR_SPEC.colorMode} at output; body text 100K`,
+    colorSpace === "cmyk" && vector?.cmyk
+      ? `Colour sign-off: ${vector.cmyk.summary} See printer-colour-sign-off.csv.`
+      : ``,
+    colorSpace === "cmyk"
+      ? `                 Nothing was converted silently: every colour without a signed-off`
+      : ``,
+    colorSpace === "cmyk"
+      ? `                 brand build is listed for the print house to proof and approve.`
+      : ``,
     `Export preset:   ${PILLAR_SPEC.exportPreset}`,
     vector
       ? `Standard:        PDF/X-4 — GTS_PDF_X output intent with an embedded ${vector.pdfx.outputIntent}`
@@ -154,12 +167,15 @@ export async function exportPillarSign(opts: {
   nativeHeight: number;
   config: PillarConfig;
   ppi?: number;
+  /** Output colour space. RGB is the house default; CMYK is opt-in. */
+  colorSpace?: PillarColorSpace;
   onProgress?: (p: PillarExportProgress) => void;
 }): Promise<PillarExportResult> {
   // Copy is outlined into vector paths, so the signage face must be in memory
   // before any master is built.
   await loadLondonSignageFace();
   const { node, nativeWidth, nativeHeight, config } = opts;
+  const colorSpace: PillarColorSpace = opts.colorSpace ?? "rgb";
   const ppi = opts.ppi ?? PILLAR_SPEC.rasterPpi;
   const slug = pillarSlug(config);
   const groundBg = pillarStops(config.styleId, config.face ?? "dark")[0]!;
@@ -168,7 +184,7 @@ export async function exportPillarSign(opts: {
   opts.onProgress?.({ stage: "vector", label: "Building the layered vector artwork" });
   let vector: Awaited<ReturnType<typeof buildPillarVectorPdf>> | null = null;
   try {
-    vector = await buildPillarVectorPdf(config);
+    vector = await buildPillarVectorPdf(config, { colorSpace });
   } catch {
     vector = null;
   }
@@ -221,7 +237,7 @@ export async function exportPillarSign(opts: {
     : rasterPdf;
 
   opts.onProgress?.({ stage: "vector", label: "Building the editable vector ground" });
-  const groundAi = buildLondonPanelAi(pillarPanelSpec(config) as LondonPanel);
+  const groundAi = buildLondonPanelAi(pillarPanelSpec(config) as LondonPanel, { colorSpace });
 
   opts.onProgress?.({ stage: "proof", label: "Rendering the proof PNG" });
   const proofCanvas = await plate(node, nativeWidth, nativeHeight, PROOF_PPI, groundBg, geo.bleedW);
@@ -235,17 +251,23 @@ export async function exportPillarSign(opts: {
 
   opts.onProgress?.({ stage: "package", label: "Packaging the zip" });
   const zip = new JSZip();
-  zip.file(`pdf/${slug}.pdf`, pdfBuffer);
-  zip.file(`ai/${slug}.ai`, pdfBuffer);
-  zip.file(`ai/${slug}-ground.ai`, groundAi);
+  const stem = colorSpace === "cmyk" ? `${slug}-cmyk` : slug;
+  zip.file(`pdf/${stem}.pdf`, pdfBuffer);
+  zip.file(`ai/${stem}.ai`, pdfBuffer);
+  zip.file(`ai/${stem}-ground.ai`, groundAi);
   zip.file(`proof/${slug}-proof.png`, proofBuffer);
-  zip.file("READ-ME.txt", readme(config, effectivePpi, vector));
+  zip.file("READ-ME.txt", readme(config, effectivePpi, vector, colorSpace));
+  // The sheet the print house signs: every colour on this pillar, approved or not.
+  if (colorSpace === "cmyk") {
+    zip.file("printer-colour-sign-off.csv", pillarCmykSignOffCsv(config));
+    zip.file("printer-colour-sign-off-all-templates.csv", pillarTemplateCmykCsv(config));
+  }
   if (!vector) zip.file("pdf/raster-fallback-notice.txt", RASTER_NOTICE);
   const blob = await zip.generateAsync({ type: "blob" });
 
   return {
     blob,
-    filename: `next-pillar-${slug}.zip`,
+    filename: `next-pillar-${stem}.zip`,
     plate: { width: canvas.width, height: canvas.height, ppi: effectivePpi },
     pdfBytes: pdfBuffer.byteLength,
   };

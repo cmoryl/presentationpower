@@ -21,6 +21,12 @@ import { PillarSign } from "@/components/next/PillarSign";
 import { PILLAR_TEMPLATES, pillarTemplate } from "@/lib/next-pillar-templates";
 import { MAX_PLATE_EDGE_PX } from "@/lib/event-print-pipeline";
 import { exportPillarSign } from "@/lib/next-pillar-export";
+import {
+  pillarCmykLedger,
+  pillarCmykSignOffCsv,
+  pillarTemplateCmykCsv,
+} from "@/lib/next-pillar-cmyk";
+import type { PillarColorSpace } from "@/lib/pillar-vector-pdf";
 import { exportPillarBatch, type PillarBatchItem } from "@/lib/next-pillar-batch-export";
 import {
   deletePillarFile,
@@ -196,6 +202,8 @@ export function PillarStudio({
   });
 
   const [ppi, setPpi] = useState<number>(PILLAR_SPEC.rasterPpi);
+  // RGB stays the house default; print colour is an explicit, labelled choice.
+  const [colorSpace, setColorSpace] = useState<PillarColorSpace>("rgb");
   const [fileName, setFileName] = useState("");
   const [openFileId, setOpenFileId] = useState<string | null>(initialFileId ?? null);
 
@@ -409,6 +417,7 @@ export function PillarStudio({
         nativeHeight: geo.bleedH * NATIVE_PX_PER_MM,
         config,
         ppi: effectivePpi,
+        colorSpace,
         onProgress: (p) => toast.loading(p.label, { id }),
       });
       const url = URL.createObjectURL(result.blob);
@@ -426,6 +435,18 @@ export function PillarStudio({
     } finally {
       setBusy(false);
     }
+  };
+
+  // Every colour this pillar would put on press, and whether it is signed off.
+  const cmykLedger = pillarCmykLedger(config);
+
+  const downloadCsv = (name: string, csv: string) => {
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const batchItems: PillarBatchItem[] = Object.entries(batch)
@@ -550,6 +571,7 @@ export function PillarStudio({
       const result = await exportPillarBatch({
         config,
         items: batchItems,
+        colorSpace,
         onProgress: (p) => {
           setBatchStage(p.label);
           toast.loading(p.label, { id });
@@ -1614,13 +1636,94 @@ export function PillarStudio({
               sizes the raster proof plate — up to {ppiCeiling} ppi for {geo.sizeName}
               {ppiCeiling < 300 ? "; 300 ppi needs a shorter panel footprint." : "."}
             </p>
+            <div className={label}>Print colour</div>
+            <div className="grid grid-cols-2 gap-2">
+              {(
+                [
+                  { id: "rgb" as const, name: "Brand RGB", note: "House default" },
+                  { id: "cmyk" as const, name: "Press CMYK", note: "Needs sign-off" },
+                ] as const
+              ).map((o) => (
+                <button
+                  key={o.id}
+                  type="button"
+                  onClick={() => setColorSpace(o.id)}
+                  className={`rounded-xl border px-3 py-2 text-left text-xs ${
+                    colorSpace === o.id
+                      ? "border-[#003FC7] bg-[#EEF1F7] text-[#03002C]"
+                      : "border-black/10 text-black/60"
+                  }`}
+                >
+                  <span className="block font-medium">{o.name}</span>
+                  <span className="block text-[10px] text-black/45">{o.note}</span>
+                </button>
+              ))}
+            </div>
+            {colorSpace === "cmyk" ? (
+              <div className="rounded-xl border border-black/10 bg-[#F2F2F2] p-3 space-y-2">
+                <p className="text-[11px] leading-relaxed text-black/60">
+                  {cmykLedger.fullyApproved
+                    ? `All ${cmykLedger.stops.length} colours on this pillar have signed-off press builds.`
+                    : `${cmykLedger.approved} of ${cmykLedger.stops.length} colours have signed-off press builds — ${cmykLedger.converted} are conversions your printer has to proof and approve. Nothing is converted silently.`}
+                </p>
+                <ul className="space-y-1">
+                  {cmykLedger.stops.map((stop) => (
+                    <li key={stop.hex} className="flex items-center gap-2 text-[10px]">
+                      <span
+                        className="h-3 w-3 shrink-0 rounded-sm border border-black/15"
+                        style={{ background: stop.hex }}
+                      />
+                      <span className="font-mono text-[#03002C]">{stop.hex}</span>
+                      <span className="text-black/45">{stop.roles.join(", ")}</span>
+                      <span
+                        className={`ml-auto shrink-0 rounded px-1.5 py-0.5 ${
+                          stop.build.approved
+                            ? "bg-[#A6FA87]/50 text-[#03002C]"
+                            : "bg-[#FFEB66]/70 text-[#03002C]"
+                        }`}
+                      >
+                        {stop.build.approved ? "approved" : "needs sign-off"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      downloadCsv("printer-colour-sign-off.csv", pillarCmykSignOffCsv(config))
+                    }
+                    className="rounded-lg border border-black/15 px-2.5 py-1.5 text-[11px] text-[#03002C]"
+                  >
+                    Sign-off sheet · this pillar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      downloadCsv(
+                        "printer-colour-sign-off-all-templates.csv",
+                        pillarTemplateCmykCsv(config),
+                      )
+                    }
+                    className="rounded-lg border border-black/15 px-2.5 py-1.5 text-[11px] text-[#03002C]"
+                  >
+                    Sign-off sheet · every template
+                  </button>
+                </div>
+              </div>
+            ) : null}
             <button
               type="button"
               onClick={runExport}
               disabled={busy}
               className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#003FC7] px-4 py-3 text-sm font-medium text-white disabled:opacity-60"
             >
-              <Download size={15} /> {busy ? "Exporting…" : "Export print package"}
+              <Download size={15} />{" "}
+              {busy
+                ? "Exporting…"
+                : colorSpace === "cmyk"
+                  ? "Export CMYK print package"
+                  : "Export print package"}
             </button>
           </div>
 
