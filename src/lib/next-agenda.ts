@@ -51,6 +51,7 @@ export const AGENDA_SPEC = {
  *  screens, room panels, lobby verticals and social frames. */
 export type AgendaSizeId =
   | "a4"
+  | "us-letter"
   | "a3"
   | "a2"
   | "a1"
@@ -91,6 +92,16 @@ export const AGENDA_SIZES: {
     note: "Desk / delegate-bag programme, digital print.",
     trimW: 210,
     trimH: 297,
+    medium: "print",
+  },
+  {
+    // US offices print on Letter stock, so an A4 file arrives scaled and the
+    // measured safe margins stop being true.
+    id: "us-letter",
+    name: "US Letter handout",
+    note: "US delegate-bag programme, 8.5 × 11 in digital print.",
+    trimW: 216,
+    trimH: 279,
     medium: "print",
   },
   {

@@ -44,6 +44,7 @@ import {
   type AgendaConfig,
 } from "./next-agenda";
 import { agendaCopyInk } from "./next-agenda-contrast";
+import type { BookletExtras } from "./next-booklet";
 import { logoInkPlacement } from "./next-logo-ink";
 import { qrModulePxForPrint, qrPng } from "./qr-print";
 
@@ -284,6 +285,8 @@ function cell(
  */
 export async function buildAgendaDocx(
   config: AgendaConfig,
+  /** Booklet mode: a cover page in front and rendered artwork pages behind. */
+  extras?: BookletExtras & { omitAgenda?: boolean },
 ): Promise<{ blob: Blob; notes: string[] }> {
   const pages = agendaPages(config);
   const geo = agendaGeometry(config);
@@ -955,9 +958,68 @@ export async function buildAgendaDocx(
   const pageBreak =
     '<w:p><w:pPr><w:spacing w:after="0"/></w:pPr><w:r><w:br w:type="page"/></w:r></w:p>';
 
-  const body = pages
-    .map((pageDef, i) => buildPage(pageDef.config, `rIdGround${i === 0 ? "" : i + 1}`))
-    .join(pageBreak);
+  // ── booklet extras ────────────────────────────────────────────────────────
+  // A booklet page is plain Word content: the cover sits on the same flattened
+  // ground as the programme, and each rendered page is an inline picture with a
+  // running head and a credit line, so the operator can still edit every word.
+  const bkRun = (text: string, sizeMm: number, colorHex: string, bold: boolean, caps = false) =>
+    `<w:r><w:rPr>${bold ? "<w:b/>" : ""}<w:rFonts w:ascii="${FONT}" w:hAnsi="${FONT}"/>` +
+    `<w:color w:val="${colorHex}"/><w:sz w:val="${halfPt(sizeMm)}"/>` +
+    `${caps ? '<w:caps/><w:spacing w:val="30"/>' : ""}</w:rPr>` +
+    `<w:t xml:space="preserve">${esc(text)}</w:t></w:r>`;
+
+  const bkPara = (inner: string, afterMm = 0) =>
+    `<w:p><w:pPr><w:spacing w:after="${mmT(afterMm)}" w:line="240" w:lineRule="auto"/></w:pPr>${inner}</w:p>`;
+
+  const inlinePicture = (rel: string, id: number, name: string, wMm: number, hMm: number) =>
+    [
+      "<w:r><w:drawing>",
+      '<wp:inline distT="0" distB="0" distL="0" distR="0">',
+      `<wp:extent cx="${Math.round(wMm * EMU_PER_MM)}" cy="${Math.round(hMm * EMU_PER_MM)}"/>`,
+      '<wp:effectExtent l="0" t="0" r="0" b="0"/>',
+      `<wp:docPr id="${id}" name="${esc(name)}" descr="${esc(name)}"/>`,
+      '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">',
+      '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">',
+      `<pic:nvPicPr><pic:cNvPr id="${id}" name="${esc(name)}"/><pic:cNvPicPr/></pic:nvPicPr>`,
+      `<pic:blipFill><a:blip r:embed="${rel}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>`,
+      `<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${Math.round(wMm * EMU_PER_MM)}" cy="${Math.round(hMm * EMU_PER_MM)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>`,
+      "</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>",
+    ].join("");
+
+  const cover = extras?.cover ?? null;
+  const imagePages = extras?.imagePages ?? [];
+  const contentMm = contentTwips / TWIPS_PER_MM;
+
+  const coverPage = cover
+    ? [
+        bkPara(backgroundDrawing("rIdCover"), 0),
+        bkPara(bkRun(cover.eyebrow ?? "", L.eyebrowSize, inkHex, true, true), 6),
+        bkPara(bkRun(cover.title ?? "", L.titleSize, titleHex, true), 5),
+        (cover.subtitle ?? "").trim() ? bkPara(bkRun(cover.subtitle, L.metaSize, inkHex, false), 4) : "",
+        (cover.footnote ?? "").trim() ? bkPara(bkRun(cover.footnote, L.footSize, inkHex, false), 0) : "",
+      ].join("")
+    : "";
+
+  const artPages = imagePages.map((art, i) => {
+    const scale = Math.min(1, contentMm / Math.max(1, art.wPx));
+    const wMm = Math.min(contentMm, art.wPx * scale);
+    const hMm = art.hPx * (wMm / Math.max(1, art.wPx));
+    // The artwork must not push its own caption onto a second page.
+    const maxH = Math.max(40, geo.trimH - geo.safeInset * 2 - lineMm(L.titleSize) - lineMm(L.footSize) * 2);
+    const fitH = Math.min(hMm, maxH);
+    const fitW = wMm * (fitH / Math.max(1, hMm));
+    return [
+      bkPara(bkRun(art.title ?? "", L.titleSize * 0.62, titleHex, true, true), 4),
+      bkPara(inlinePicture(`rIdArt${i + 1}`, 40 + i, art.id || `page-${i + 1}`, fitW, fitH), 3),
+      (art.caption ?? "").trim() ? bkPara(bkRun(art.caption, L.footSize, inkHex, false), 0) : "",
+    ].join("");
+  });
+
+  const programme = extras?.omitAgenda
+    ? []
+    : pages.map((pageDef, i) => buildPage(pageDef.config, `rIdGround${i === 0 ? "" : i + 1}`));
+
+  const body = [coverPage, ...programme, ...artPages].filter(Boolean).join(pageBreak);
 
   const document = [
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
@@ -1013,6 +1075,13 @@ export async function buildAgendaDocx(
       ...pages.map(
         (_p, i) =>
           `<Relationship Id="rIdGround${i === 0 ? "" : i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/ground.png"/>`,
+      ),
+      cover
+        ? '<Relationship Id="rIdCover" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/ground.png"/>'
+        : "",
+      ...imagePages.map(
+        (_a, i) =>
+          `<Relationship Id="rIdArt${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/art${i + 1}.png"/>`,
       ),
       qrImage
         ? '<Relationship Id="rIdQr" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/qr.png"/>'
@@ -1077,6 +1146,7 @@ export async function buildAgendaDocx(
     ].join(""),
   );
   zip.file("word/media/ground.png", groundBytes);
+  imagePages.forEach((art, i) => zip.file(`word/media/art${i + 1}.png`, art.png));
   if (qrImage) zip.file("word/media/qr.png", qrImage.bytes);
   zip.file("word/document.xml", document);
 
@@ -1093,6 +1163,12 @@ export async function buildAgendaDocx(
       `${pages.length} page${pages.length === 1 ? "" : "s"} across ${pages[pages.length - 1]!.dayCount} programme day${pages[pages.length - 1]!.dayCount === 1 ? "" : "s"}, each with the flattened ground behind it`,
       `Live editable Geist text at the printed sizes · programme rows in Word tables`,
       `Row band reference: ${blocks.rowH.toFixed(1)} mm per row on the printed board`,
+      ...(cover ? ["Cover page carries the editable cover copy on the approved ground"] : []),
+      ...(imagePages.length
+        ? [
+            `${imagePages.length} rendered page${imagePages.length === 1 ? "" : "s"} placed as pictures with printed credit lines`,
+          ]
+        : []),
       `Asset: ${agendaName(config)}`,
     ],
   };

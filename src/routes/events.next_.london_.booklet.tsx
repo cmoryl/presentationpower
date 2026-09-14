@@ -1,0 +1,482 @@
+// /events/next/london/booklet — one printed booklet from one place.
+//
+// Cover, the agenda days from the agenda studio, the venue floor maps and any
+// number of chart pages, exported as a press PDF, a Word file and a PowerPoint
+// deck at A4 or US Letter. The agenda pages stay vector; the map and chart pages
+// are rendered artwork and say so on the page.
+
+import { useMemo, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, BookOpen, FileDown, FileText, Presentation } from "lucide-react";
+
+import { AppShell } from "@/components/AppShell";
+import { Button } from "@/design-system/element";
+import { runWithExportFeedback } from "@/lib/export-feedback";
+import { agendaDefault, agendaPages, type AgendaConfig } from "@/lib/next-agenda";
+import { buildAgendaDocx } from "@/lib/next-agenda-docx";
+import { buildAgendaPptx } from "@/lib/next-agenda-pptx";
+import { listAgendaFiles } from "@/lib/next-agenda.functions";
+import {
+  BOOKLET_SIZES,
+  bookletAgendaSizeId,
+  bookletDefault,
+  bookletPagePlan,
+  bookletSlug,
+  type BookletChartPage,
+  type BookletConfig,
+  type BookletImagePage,
+} from "@/lib/next-booklet";
+import { buildBookletPdf } from "@/lib/next-booklet-pdf";
+import { bookletChartPages, bookletMapPages } from "@/lib/next-booklet-render";
+import { LONDON_FLOORS, LONDON_VENUE, type LondonFloorId } from "@/lib/next-london-signage";
+import { londonMappedFloors } from "@/lib/next-london-floorplan";
+import type { InfographicKind } from "@/lib/infographics/spec";
+
+export const Route = createFileRoute("/events/next_/london_/booklet")({
+  component: BookletPage,
+  head: () => ({
+    meta: [
+      { title: "NEXT London booklet builder | TransPerfect Element" },
+      {
+        name: "description",
+        content:
+          "Print one NEXT London booklet from one place: cover, agenda days, venue maps and chart pages as a press PDF, Word file or PowerPoint deck.",
+      },
+      { property: "og:title", content: "NEXT London booklet builder" },
+      {
+        property: "og:description",
+        content:
+          "Cover, agenda, venue maps and charts assembled into one A4 or US Letter booklet with press, Word and PowerPoint exports.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+});
+
+/** Chart looks offered on a booklet page — the ones that read at handout size. */
+const CHART_KINDS: { id: InfographicKind; label: string }[] = [
+  { id: "kpi", label: "Headline figures" },
+  { id: "column", label: "Columns" },
+  { id: "bar", label: "Bars" },
+  { id: "line", label: "Line" },
+  { id: "area", label: "Area" },
+  { id: "donut", label: "Donut" },
+  { id: "waterfall", label: "Waterfall" },
+  { id: "funnel", label: "Funnel" },
+  { id: "radar", label: "Radar" },
+  { id: "heatmap", label: "Heat map" },
+];
+
+function download(blob: Blob, name: string): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function BookletPage() {
+  const mappedFloors = useMemo<LondonFloorId[]>(() => londonMappedFloors(), []);
+  const [config, setConfig] = useState<BookletConfig>(() => ({
+    ...bookletDefault({
+      title: "NEXT 2026 LONDON",
+      subtitle: `${LONDON_VENUE.name} · ${LONDON_VENUE.dates}`,
+      footnote: "Programme subject to change · full agenda and speaker bios online",
+    }),
+    mapFloors: mappedFloors.slice(0, 2),
+  }));
+  const [savedId, setSavedId] = useState<string>("");
+  const [notes, setNotes] = useState<string[]>([]);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const list = useServerFn(listAgendaFiles);
+  const saved = useQuery({
+    queryKey: ["agenda-files"],
+    queryFn: () => list(),
+    retry: false,
+  });
+
+  const rows = (saved.data ?? []) as { id: string; name: string; config: AgendaConfig }[];
+
+  /** The agenda the booklet prints, forced to the booklet's own page format. */
+  const agenda = useMemo<AgendaConfig>(() => {
+    const base = rows.find((r) => r.id === savedId)?.config ?? agendaDefault("city-series");
+    return { ...base, sizeId: bookletAgendaSizeId(config.sizeId) };
+  }, [rows, savedId, config.sizeId]);
+
+  const agendaPageCount = useMemo(() => {
+    try {
+      return config.includeAgenda ? agendaPages(agenda).length : 0;
+    } catch {
+      return 0;
+    }
+  }, [agenda, config.includeAgenda]);
+
+  const plan = useMemo(() => bookletPagePlan(config, agendaPageCount), [config, agendaPageCount]);
+
+  /** Render the map and chart pages once per export. */
+  const renderExtras = async (): Promise<{ pages: BookletImagePage[]; warnings: string[] }> => {
+    const pages: BookletImagePage[] = [];
+    const warnings: string[] = [];
+    if (config.includeMap && config.mapFloors.length) {
+      pages.push(...(await bookletMapPages(config.mapFloors)));
+    }
+    if (config.charts.length) {
+      const charts = await bookletChartPages(config.charts, "light");
+      pages.push(...charts.pages);
+      warnings.push(...charts.warnings);
+    }
+    return { pages, warnings };
+  };
+
+  const runExport = async (kind: "pdf" | "docx" | "pptx") => {
+    setBusy(kind);
+    try {
+      await runWithExportFeedback(async () => {
+        const { pages, warnings } = await renderExtras();
+        const cover = config.includeCover ? config.cover : null;
+        const stem = bookletSlug(config);
+        if (kind === "pdf") {
+          const built = await buildBookletPdf({ config, agenda, imagePages: pages });
+          download(new Blob([built.bytes], { type: "application/pdf" }), `${stem}.pdf`);
+          setNotes([...built.notes, ...warnings]);
+        } else if (kind === "docx") {
+          const built = await buildAgendaDocx(agenda, {
+            cover,
+            imagePages: pages,
+            omitAgenda: !config.includeAgenda,
+          });
+          download(built.blob, `${stem}.docx`);
+          setNotes([...built.notes, ...warnings]);
+        } else {
+          const built = await buildAgendaPptx(agenda, {
+            cover,
+            imagePages: pages,
+            omitAgenda: !config.includeAgenda,
+          });
+          download(built.blob, `${stem}.pptx`);
+          setNotes([...built.notes, ...warnings]);
+        }
+      });
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const addChart = () => {
+    const chart: BookletChartPage = {
+      id: `c${Date.now().toString(36)}`,
+      kind: "column",
+      title: "Programme at a glance",
+      subtitle: "",
+    };
+    setConfig((c) => ({ ...c, charts: [...c.charts, chart] }));
+  };
+
+  const patchChart = (id: string, patch: Partial<BookletChartPage>) =>
+    setConfig((c) => ({
+      ...c,
+      charts: c.charts.map((ch) => (ch.id === id ? { ...ch, ...patch } : ch)),
+    }));
+
+  const field =
+    "w-full rounded-md border border-[color:var(--color-border)] bg-[color:var(--color-background)] px-3 py-2 text-sm";
+  const labelCls = "text-xs font-semibold uppercase tracking-wide text-[color:var(--color-muted-foreground)]";
+
+  return (
+    <AppShell>
+      <div className="mx-auto w-full max-w-6xl px-5 py-8">
+        <Link
+          to="/events/next/london"
+          className="mb-4 inline-flex items-center gap-2 text-sm text-[color:var(--color-muted-foreground)] hover:underline"
+        >
+          <ArrowLeft className="size-4" /> NEXT London kit
+        </Link>
+
+        <header className="mb-8">
+          <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--color-muted-foreground)]">
+            <BookOpen className="size-4" /> Booklet builder
+          </p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight">One printed NEXT booklet</h1>
+          <p className="mt-2 max-w-2xl text-sm text-[color:var(--color-muted-foreground)]">
+            Cover, the agenda days, the venue maps and any chart pages, in one file. The agenda pages
+            stay vector print artwork; map and chart pages are rendered artwork and carry a printed
+            credit line saying so.
+          </p>
+        </header>
+
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <section className="space-y-8">
+            {/* ── stock ─────────────────────────────────────────────────── */}
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold">Page size</h2>
+              <div className="flex flex-wrap gap-2">
+                {BOOKLET_SIZES.map((size) => (
+                  <button
+                    key={size.id}
+                    type="button"
+                    onClick={() => setConfig((c) => ({ ...c, sizeId: size.id }))}
+                    aria-pressed={config.sizeId === size.id}
+                    className={`rounded-md border px-3 py-2 text-sm ${
+                      config.sizeId === size.id
+                        ? "border-[color:var(--color-primary)] bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]"
+                        : "border-[color:var(--color-border)]"
+                    }`}
+                  >
+                    {size.name}
+                    <span className="block text-[11px] opacity-70">{size.note}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* ── cover ─────────────────────────────────────────────────── */}
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 text-lg font-semibold">
+                <input
+                  type="checkbox"
+                  checked={config.includeCover}
+                  onChange={(e) => setConfig((c) => ({ ...c, includeCover: e.target.checked }))}
+                />
+                Cover page
+              </label>
+              {config.includeCover ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {(
+                    [
+                      ["eyebrow", "Eyebrow"],
+                      ["title", "Title"],
+                      ["subtitle", "Sub-line"],
+                      ["footnote", "Footnote"],
+                    ] as const
+                  ).map(([key, label]) => (
+                    <label key={key} className="space-y-1">
+                      <span className={labelCls}>{label}</span>
+                      <input
+                        className={field}
+                        value={config.cover[key]}
+                        onChange={(e) =>
+                          setConfig((c) => ({ ...c, cover: { ...c.cover, [key]: e.target.value } }))
+                        }
+                      />
+                    </label>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
+            {/* ── agenda ────────────────────────────────────────────────── */}
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 text-lg font-semibold">
+                <input
+                  type="checkbox"
+                  checked={config.includeAgenda}
+                  onChange={(e) => setConfig((c) => ({ ...c, includeAgenda: e.target.checked }))}
+                />
+                Agenda days
+              </label>
+              <label className="block space-y-1">
+                <span className={labelCls}>Agenda</span>
+                <select
+                  className={field}
+                  value={savedId}
+                  onChange={(e) => setSavedId(e.target.value)}
+                >
+                  <option value="">Demo programme (city series)</option>
+                  {rows.map((row) => (
+                    <option key={row.id} value={row.id}>
+                      {row.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <p className="text-xs text-[color:var(--color-muted-foreground)]">
+                {saved.isError
+                  ? "Sign in to print a saved agenda — the demo programme is used until then."
+                  : `Printed at the booklet page size · ${agendaPageCount} agenda page${agendaPageCount === 1 ? "" : "s"}.`}
+              </p>
+            </div>
+
+            {/* ── maps ──────────────────────────────────────────────────── */}
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 text-lg font-semibold">
+                <input
+                  type="checkbox"
+                  checked={config.includeMap}
+                  onChange={(e) => setConfig((c) => ({ ...c, includeMap: e.target.checked }))}
+                />
+                Venue maps
+              </label>
+              {config.includeMap ? (
+                <div className="flex flex-wrap gap-2">
+                  {LONDON_FLOORS.filter((f) => mappedFloors.includes(f.id)).map((floor) => {
+                    const on = config.mapFloors.includes(floor.id);
+                    return (
+                      <button
+                        key={floor.id}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() =>
+                          setConfig((c) => ({
+                            ...c,
+                            mapFloors: on
+                              ? c.mapFloors.filter((f) => f !== floor.id)
+                              : [...c.mapFloors, floor.id],
+                          }))
+                        }
+                        className={`rounded-md border px-3 py-1.5 text-sm ${
+                          on
+                            ? "border-[color:var(--color-primary)] bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]"
+                            : "border-[color:var(--color-border)]"
+                        }`}
+                      >
+                        {floor.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
+
+            {/* ── charts ────────────────────────────────────────────────── */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Chart pages</h2>
+                <Button variant="secondary" size="sm" onClick={addChart}>
+                  Add chart page
+                </Button>
+              </div>
+              {config.charts.length === 0 ? (
+                <p className="text-sm text-[color:var(--color-muted-foreground)]">
+                  No chart pages yet. Added pages start from the module's sample figures and are
+                  labelled as sample data until you replace them.
+                </p>
+              ) : null}
+              <div className="space-y-3">
+                {config.charts.map((chart) => (
+                  <div
+                    key={chart.id}
+                    className="grid gap-3 rounded-lg border border-[color:var(--color-border)] p-3 sm:grid-cols-[150px_minmax(0,1fr)_minmax(0,1fr)_auto]"
+                  >
+                    <label className="space-y-1">
+                      <span className={labelCls}>Look</span>
+                      <select
+                        className={field}
+                        value={chart.kind}
+                        onChange={(e) =>
+                          patchChart(chart.id, { kind: e.target.value as InfographicKind })
+                        }
+                      >
+                        {CHART_KINDS.map((k) => (
+                          <option key={k.id} value={k.id}>
+                            {k.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="space-y-1">
+                      <span className={labelCls}>Title</span>
+                      <input
+                        className={field}
+                        value={chart.title}
+                        onChange={(e) => patchChart(chart.id, { title: e.target.value })}
+                      />
+                    </label>
+                    <label className="space-y-1">
+                      <span className={labelCls}>Sub-line</span>
+                      <input
+                        className={field}
+                        value={chart.subtitle}
+                        onChange={(e) => patchChart(chart.id, { subtitle: e.target.value })}
+                      />
+                    </label>
+                    <div className="flex items-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          setConfig((c) => ({
+                            ...c,
+                            charts: c.charts.filter((ch) => ch.id !== chart.id),
+                          }))
+                        }
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ── running order + exports ─────────────────────────────────── */}
+          <aside className="space-y-6">
+            <div className="rounded-lg border border-[color:var(--color-border)] p-4">
+              <h2 className="text-sm font-semibold uppercase tracking-wide">Running order</h2>
+              <ol className="mt-3 space-y-1 text-sm">
+                {plan.map((page, i) => (
+                  <li key={`${page.kind}-${i}`} className="flex gap-2">
+                    <span className="w-6 shrink-0 text-[color:var(--color-muted-foreground)]">
+                      {i + 1}
+                    </span>
+                    <span>{page.label}</span>
+                  </li>
+                ))}
+                {plan.length === 0 ? (
+                  <li className="text-[color:var(--color-muted-foreground)]">
+                    Nothing selected yet.
+                  </li>
+                ) : null}
+              </ol>
+            </div>
+
+            <div className="space-y-2">
+              <Button
+                className="w-full"
+                disabled={!plan.length || busy !== null}
+                onClick={() => runExport("pdf")}
+              >
+                <FileDown className="mr-2 size-4" />
+                {busy === "pdf" ? "Building…" : "Press PDF"}
+              </Button>
+              <Button
+                variant="secondary"
+                className="w-full"
+                disabled={!plan.length || busy !== null}
+                onClick={() => runExport("docx")}
+              >
+                <FileText className="mr-2 size-4" />
+                {busy === "docx" ? "Building…" : "Word"}
+              </Button>
+              <Button
+                variant="secondary"
+                className="w-full"
+                disabled={!plan.length || busy !== null}
+                onClick={() => runExport("pptx")}
+              >
+                <Presentation className="mr-2 size-4" />
+                {busy === "pptx" ? "Building…" : "PowerPoint"}
+              </Button>
+            </div>
+
+            {notes.length ? (
+              <div className="rounded-lg border border-[color:var(--color-border)] p-4">
+                <h2 className="text-sm font-semibold uppercase tracking-wide">Export notes</h2>
+                <ul className="mt-2 space-y-1 text-xs text-[color:var(--color-muted-foreground)]">
+                  {notes.map((note, i) => (
+                    <li key={i}>{note}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </aside>
+        </div>
+      </div>
+    </AppShell>
+  );
+}

@@ -38,6 +38,7 @@ import {
   type AgendaConfig,
 } from "./next-agenda";
 import { agendaCopyInk } from "./next-agenda-contrast";
+import type { BookletExtras } from "./next-booklet";
 import { flattenedGroundPng } from "./next-agenda-docx";
 import { qrModulePxForPrint, qrPng, qrPngDataUrl } from "./qr-print";
 
@@ -102,7 +103,11 @@ export type AgendaPptxResult = {
  * the board's trim, so a 16:9 holding screen exports as a normal widescreen
  * deck while an A2 board exports at its own aspect instead of being squashed.
  */
-export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxResult> {
+export async function buildAgendaPptx(
+  config: AgendaConfig,
+  /** Booklet mode: a cover slide in front and rendered artwork slides behind. */
+  extras?: BookletExtras & { omitAgenda?: boolean },
+): Promise<AgendaPptxResult> {
   const pages = agendaPages(config);
   const geo = agendaGeometry(config);
   const face = config.face ?? "dark";
@@ -136,7 +141,64 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
     notes.push("Gradient ground unavailable in this browser — slides use a flat brand fill.");
   }
 
-  for (const page of pages) {
+  const inMm = (mm: number) => mm * MM_TO_IN;
+  const bytesToDataUrl = (bytes: Uint8Array): string => {
+    let bin = "";
+    for (const byte of bytes) bin += String.fromCharCode(byte);
+    return `data:image/png;base64,${btoa(bin)}`;
+  };
+
+  // ── booklet cover slide ───────────────────────────────────────────────────
+  if (extras?.cover) {
+    const L0 = agendaBlocks(pages[0]!.config).layout;
+    const cover = extras.cover;
+    const s = pptx.addSlide();
+    if (ground) {
+      s.addImage({ data: ground, x: 0, y: 0, w: slideW, h: slideH, objectName: "NEXT booklet cover ground" });
+    } else {
+      s.background = { color: groundHex };
+    }
+    const pad = geo.safeInset;
+    let y = pad;
+    const line = (text: string, sizeMm: number, bold: boolean, caps: boolean, opacity?: number) => {
+      if (!text.trim()) return;
+      s.addText(caps ? text.toUpperCase() : text, {
+        x: inMm(pad),
+        y: inMm(y),
+        w: inMm(geo.trimW - pad * 2),
+        h: inMm(sizeMm * 2.2),
+        fontFace: FONT,
+        fontSize: pt(sizeMm),
+        bold,
+        charSpacing: caps ? 2 : 0,
+        color: inkHex,
+        transparency: opacity,
+        valign: "top",
+        margin: 0,
+      });
+      y += sizeMm * 2.4;
+    };
+    line(cover.eyebrow ?? "", L0.eyebrowSize, true, true, 18);
+    line(cover.title ?? "", L0.titleSize, true, true);
+    line(cover.subtitle ?? "", L0.metaSize, false, false, 10);
+    if ((cover.footnote ?? "").trim()) {
+      s.addText(cover.footnote, {
+        x: inMm(pad),
+        y: inMm(geo.trimH - pad - L0.footSize * 2.4),
+        w: inMm(geo.trimW - pad * 2),
+        h: inMm(L0.footSize * 2.2),
+        fontFace: FONT,
+        fontSize: pt(L0.footSize),
+        color: inkHex,
+        transparency: 30,
+        valign: "top",
+        margin: 0,
+      });
+    }
+    notes.push("Cover slide carries the editable cover copy on the approved ground.");
+  }
+
+  for (const page of extras?.omitAgenda ? [] : pages) {
     const cfg = page.config;
     const b = agendaBlocks(cfg);
     const L = b.layout;
@@ -621,6 +683,63 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
     }
   }
 
+  // ── booklet artwork slides ────────────────────────────────────────────────
+  const imagePages = extras?.imagePages ?? [];
+  for (const art of imagePages) {
+    const s = pptx.addSlide();
+    s.background = { color: "FFFFFF" };
+    const pad = geo.safeInset;
+    const headH = art.title.trim() ? geo.trimH * 0.06 : 0;
+    const capH = art.caption.trim() ? geo.trimH * 0.05 : 0;
+    if (headH) {
+      s.addText(art.title.toUpperCase(), {
+        x: inMm(pad),
+        y: inMm(pad),
+        w: inMm(geo.trimW - pad * 2),
+        h: inMm(headH),
+        fontFace: FONT,
+        fontSize: pt(agendaBlocks(pages[0]!.config).layout.titleSize * 0.62),
+        bold: true,
+        charSpacing: 2,
+        color: "03002C",
+        valign: "top",
+        margin: 0,
+      });
+    }
+    const boxW = geo.trimW - pad * 2;
+    const boxH = geo.trimH - pad * 2 - headH - capH;
+    const scale = Math.min(boxW / Math.max(1, art.wPx), boxH / Math.max(1, art.hPx));
+    const w = art.wPx * scale;
+    const h = art.hPx * scale;
+    s.addImage({
+      data: bytesToDataUrl(art.png),
+      x: inMm(pad + (boxW - w) / 2),
+      y: inMm(pad + headH + (boxH - h) / 2),
+      w: inMm(w),
+      h: inMm(h),
+      objectName: art.id || "NEXT booklet artwork",
+    });
+    if (capH) {
+      s.addText(art.caption, {
+        x: inMm(pad),
+        y: inMm(geo.trimH - pad - capH),
+        w: inMm(boxW),
+        h: inMm(capH),
+        fontFace: FONT,
+        fontSize: pt(agendaBlocks(pages[0]!.config).layout.footSize),
+        color: "03002C",
+        transparency: 38,
+        valign: "top",
+        margin: 0,
+      });
+    }
+  }
+  if (imagePages.length) {
+    notes.push(
+      `${imagePages.length} rendered slide${imagePages.length === 1 ? "" : "s"} placed as pictures with printed credit lines — the programme slides are the editable ones.`,
+    );
+  }
+
   const raw = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
   // Carry Geist inside the package and normalize the theme font scheme, so the
   // board's type does not re-flow into a substitute face on the machine that
@@ -638,7 +757,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
   return {
     blob,
     filename: `next-agenda-${agendaSlug(config)}.pptx`,
-    slideCount: pages.length,
+    slideCount: (extras?.omitAgenda ? 0 : pages.length) + (extras?.cover ? 1 : 0) + (extras?.imagePages?.length ?? 0),
     notes,
   };
 }
