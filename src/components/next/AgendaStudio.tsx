@@ -64,8 +64,11 @@ import {
   writeAgendaDay,
   agendaGeometry,
   agendaName,
+  AGENDA_ROW_STYLES,
   agendaProgramme,
   agendaProgrammeIsStock,
+  agendaRowStyle,
+  type AgendaRowStyleId,
   agendaSlug,
   agendaStyleLabel,
   normalizeAgendaConfig,
@@ -652,6 +655,59 @@ export function AgendaStudio({
               ))}
             </select>
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="agenda-row-style">Programme look</Label>
+            <select
+              id="agenda-row-style"
+              className={selectClass}
+              value={agendaRowStyle(config)}
+              onChange={(e) => set("rowStyle", e.target.value as AgendaRowStyleId)}
+            >
+              {AGENDA_ROW_STYLES.map((style) => (
+                <option key={style.id} value={style.id}>
+                  {style.name}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-muted-foreground">
+              {AGENDA_ROW_STYLES.find((style) => style.id === agendaRowStyle(config))?.note ?? ""}
+            </p>
+          </div>
+
+          {agendaRowStyle(config) === "card" ? (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="agenda-location">Room · floor line</Label>
+                <Input
+                  id="agenda-location"
+                  value={config.locationLine ?? ""}
+                  onChange={(e) => set("locationLine", e.target.value)}
+                  placeholder="FLEMING 3RD FLOOR"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-footer-left">Footer band · left</Label>
+                  <Input
+                    id="agenda-footer-left"
+                    value={config.footerLeft ?? ""}
+                    onChange={(e) => set("footerLeft", e.target.value)}
+                    placeholder="WWW.TRANSPERFECTNEXT.COM"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-footer-right">Footer band · right</Label>
+                  <Input
+                    id="agenda-footer-right"
+                    value={config.footerRight ?? ""}
+                    onChange={(e) => set("footerRight", e.target.value)}
+                    placeholder="24 & 25 SEPTEMBER, 2026"
+                  />
+                </div>
+              </div>
+            </>
+          ) : null}
 
           <div className="space-y-2">
             <Label htmlFor="agenda-eyebrow">Eyebrow</Label>
@@ -1293,6 +1349,49 @@ export function AgendaStudio({
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
+
+              {agendaRowStyle(config) === "card" ? (
+                <div className="space-y-2 md:col-span-5">
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      checked={!!session.parallel}
+                      onChange={(e) =>
+                        setSession(i, {
+                          parallel: e.target.checked ? { title: "", detail: "" } : null,
+                          pin: e.target.checked ? true : session.pin,
+                        })
+                      }
+                      aria-label={`Row ${i + 1} runs a parallel session`}
+                    />
+                    Parallel session alongside this slot
+                  </label>
+                  {session.parallel ? (
+                    <div className="grid gap-2 md:grid-cols-2">
+                      <Input
+                        aria-label={`Row ${i + 1} parallel title`}
+                        value={session.parallel.title ?? ""}
+                        placeholder="Parallel session title"
+                        onChange={(e) =>
+                          setSession(i, {
+                            parallel: { ...session.parallel!, title: e.target.value },
+                          })
+                        }
+                      />
+                      <Input
+                        aria-label={`Row ${i + 1} parallel detail`}
+                        value={session.parallel.detail ?? ""}
+                        placeholder="Speaker or room"
+                        onChange={(e) =>
+                          setSession(i, {
+                            parallel: { ...session.parallel!, detail: e.target.value },
+                          })
+                        }
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
