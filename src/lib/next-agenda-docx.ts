@@ -507,7 +507,15 @@ export async function buildAgendaDocx(
         const BAND = agendaBandPalette(cfg);
         const bandInk = hex(BAND.ink);
         const parInk = hex(BAND.parallelInk);
-        const fill = i % 2 === 0 ? BAND.fillA : BAND.fillB;
+        // Word shading is opaque, so the band's translucency is baked in: its
+        // fill is composited over the ground colour at this row's height.
+        const ground = groundColorAt(cfg, (i + 0.5) / Math.max(1, (cfg.sessions ?? []).length));
+        const fill = agendaBandComposite(
+          i % 2 === 0 ? BAND.fillA : BAND.fillB,
+          BAND.fillAlpha,
+          ground,
+        );
+        const parFill = agendaBandComposite(BAND.parallel, BAND.parallelAlpha, ground);
         const copy = (
           title: string,
           detail: string,
