@@ -117,6 +117,7 @@ import {
 import type { StylePack } from "@/lib/style-packs";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
+import { MapStylePanel } from "@/components/slide/MapStylePanel";
 import { StagePhasesPanel } from "@/components/slide/StagePhasesPanel";
 import { OrbitLayoutPanel } from "@/components/slide/OrbitLayoutPanel";
 import { LogoWallPanel } from "@/components/slide/LogoWallPanel";
