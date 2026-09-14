@@ -248,29 +248,45 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
           return [
             {
               text: session.time ?? "",
-              options: { fontSize: pt(L.timeSize), bold: true, color: rowInk, valign: "middle" },
+              options: {
+                fontSize: pt(L.timeSize),
+                lineSpacing: pt(L.timeSize * 1.3),
+                bold: true,
+                color: rowInk,
+                valign: "middle",
+              },
             },
             {
               text: [
                 {
                   text: session.title ?? "",
-                  options: { fontSize: pt(L.titleRowSize), bold: !session.muted, color: rowInk },
+                  options: {
+                    fontSize: pt(L.titleRowSize),
+                    bold: !session.muted,
+                    color: rowInk,
+                    breakLine: true,
+                  },
                 },
                 ...((session.detail ?? "").trim()
                   ? [
                       {
-                        text: `\n${session.detail}`,
-                        options: { fontSize: pt(L.detailSize), color: rowInk },
+                        text: session.detail!,
+                        options: {
+                          fontSize: pt(L.detailSize),
+                          color: rowInk,
+                          lineSpacing: pt(L.detailSize * 1.4),
+                        },
                       },
                     ]
                   : []),
               ],
-              options: { valign: "middle" },
+              options: { valign: "middle", lineSpacing: pt(L.titleRowSize * 1.25) },
             },
             {
               text: (session.track ?? "").toUpperCase(),
               options: {
                 fontSize: pt(L.trackSize),
+                lineSpacing: pt(L.trackSize * 1.4),
                 color: rowInk,
                 align: "right",
                 charSpacing: 2,
@@ -292,7 +308,9 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
             { type: "solid", color: "7F8798", pt: 0.5 },
             { type: "none" },
           ],
-          margin: 2,
+          // Zero cell padding: the column widths already come from the printed
+          // board, so any inset shifts every row off the measured grid.
+          margin: 0,
           objectName: "NEXT agenda programme",
         },
       );
