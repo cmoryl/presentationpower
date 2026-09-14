@@ -14,6 +14,7 @@
 
 import { londonPanelArtworkUrl } from "@/lib/next-london-supplied-masters";
 import { londonFileOwnsLayer } from "@/lib/next-london-live-layers";
+import { londonPlacedArt, type LondonPlacedArt } from "@/lib/next-london-placed-art";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
   pickNextLogo,
