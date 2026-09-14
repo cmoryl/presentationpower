@@ -185,7 +185,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       s.addText(cfg.eyebrow.toUpperCase(), {
         x: inX(b.x),
         y: inX(b.eyebrowY),
-        w: inX(b.contentW),
+        w: inX(b.headW),
         h: inX(eyebrowBand),
         fontFace: FONT,
         fontSize: pt(L.eyebrowSize),
@@ -200,7 +200,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
     s.addText(cfg.title ?? "", {
       x: inX(b.x),
       y: inX(b.titleY),
-      w: inX(b.contentW),
+      w: inX(b.headW),
       h: inX(titleBand),
       fontFace: FONT,
       fontSize: pt(L.titleSize),
@@ -214,7 +214,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       s.addText(cfg.meta, {
         x: inX(b.x),
         y: inX(b.metaY),
-        w: inX(b.contentW),
+        w: inX(b.headW),
         h: inX(metaBand),
         fontFace: FONT,
         fontSize: pt(L.metaSize),

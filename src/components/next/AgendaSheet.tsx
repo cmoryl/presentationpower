@@ -115,6 +115,7 @@ export function AgendaSheet({
         <div
           style={{
             ...at(blocks.x, blocks.eyebrowY),
+            width: mm(blocks.headW),
             fontSize: mm(L.eyebrowSize),
             fontWeight: 700,
             letterSpacing: "0.22em",
@@ -129,7 +130,7 @@ export function AgendaSheet({
       <div
         style={{
           ...at(blocks.x, blocks.titleY),
-          width: mm(blocks.contentW),
+          width: mm(blocks.headW),
           fontSize: mm(L.titleSize),
           lineHeight: 1,
           fontWeight: 700,
@@ -144,7 +145,7 @@ export function AgendaSheet({
         <div
           style={{
             ...at(blocks.x, blocks.metaY),
-            width: mm(blocks.contentW),
+            width: mm(blocks.headW),
             fontSize: mm(L.metaSize),
             fontWeight: 500,
             opacity: 0.86,

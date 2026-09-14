@@ -425,7 +425,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
     }
     if ((cfg.title ?? "").trim()) {
       const size = mm(L.titleSize);
-      page.drawText(fit(bold, cfg.title, size, mm(blocks.contentW)), {
+      page.drawText(fit(bold, cfg.title, size, mm(blocks.headW)), {
         x: px(blocks.x),
         y: py(blocks.titleY) - size * 0.86,
         size,
@@ -435,7 +435,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
     }
     if ((cfg.meta ?? "").trim()) {
       const size = mm(L.metaSize);
-      page.drawText(fit(regular, cfg.meta, size, mm(blocks.contentW)), {
+      page.drawText(fit(regular, cfg.meta, size, mm(blocks.headW)), {
         x: px(blocks.x),
         y: py(blocks.metaY) - size,
         size,
