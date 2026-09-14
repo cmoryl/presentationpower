@@ -28,3 +28,26 @@ describe("agenda header QR clearance", () => {
     expect(footQr.location!.right).toBeCloseTo(noQr.location!.right, 5);
   });
 });
+
+describe("agenda QR lockup clearance", () => {
+  it("keeps a stale dragged code off the lockup", () => {
+    const base = agendaDefault("globallink");
+    const cfg = {
+      ...base,
+      sizeId: "a4-handout" as typeof base.sizeId,
+      qrData: "https://presentationpower.lovable.app/events/next/london",
+      qrCaption: "FULL AGENDA",
+      qrAnchor: "top-right" as const,
+      qrOffsetX: 20,
+      qrOffsetY: 12,
+    };
+    const b = agendaBlocks(cfg);
+    expect(b.qr).toBeTruthy();
+    expect(b.lockup).toBeTruthy();
+    const lock = b.lockup!;
+    const qr = b.qr!;
+    const clearsRight = qr.x >= lock.x + lock.w;
+    const clearsBelow = qr.y >= lock.y + lock.h;
+    expect(clearsRight || clearsBelow).toBe(true);
+  });
+});
