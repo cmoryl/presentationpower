@@ -678,14 +678,15 @@ export function AgendaStudio({
                 value={config.titleColor}
                 onChange={(e) => set("titleColor", e.target.value)}
               >
-                <option value="">Face default</option>
-                {AGENDA_TEXT_COLORS.map((c) => (
-                  <option key={c.id} value={c.hex}>
-                    {c.label}
+                {agendaTitleInkOptions(config).map((o, i) => (
+                  <option key={`${o.hex}-${i}`} value={i === 0 ? "" : o.hex}>
+                    {i === 0 ? "Face default" : o.label} · {o.ratio.toFixed(1)}:1
+                    {o.ok ? "" : " (too low to read)"}
                   </option>
                 ))}
               </select>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="agenda-lockup">Lockup size</Label>
               <input
