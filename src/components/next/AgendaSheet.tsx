@@ -309,6 +309,18 @@ export function AgendaSheet({
                     position: "absolute",
                   }}
                 >
+                  {(par.time ?? "").trim() ? (
+                    <div
+                      style={{
+                        fontSize: mm(L.timeSize),
+                        fontWeight: 700,
+                        lineHeight: 1.4,
+                        marginBottom: mm(L.timeSize * 0.25),
+                      }}
+                    >
+                      {par.time}
+                    </div>
+                  ) : null}
                   <div
                     style={{
                       fontSize: mm(L.titleRowSize),
@@ -319,6 +331,19 @@ export function AgendaSheet({
                   >
                     {par.title}
                   </div>
+                  {(par.speaker ?? "").trim() ? (
+                    <div
+                      style={{
+                        fontSize: mm(L.detailSize),
+                        fontWeight: 600,
+                        lineHeight: 1.45,
+                        marginTop: mm(L.detailSize * 0.5),
+                        paddingRight: mm(L.locSize * 1.4),
+                      }}
+                    >
+                      {par.speaker}
+                    </div>
+                  ) : null}
                   {par.detail.trim() ? (
                     <div
                       style={{

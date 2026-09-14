@@ -420,7 +420,12 @@ export function agendaBandPalette(config: { bandTreatment?: string }): AgendaBan
 
 /** A session running in parallel with the row it sits on, in another room. */
 export type AgendaParallel = {
+  /** Own start time. Empty = the card inherits the slot's time. */
+  time?: string;
   title: string;
+  /** Speaker line, printed between the title and the notes. */
+  speaker?: string;
+  /** Free notes / room line. */
   detail: string;
 };
 
@@ -472,7 +477,12 @@ export function agendaParallels(
   return list
     .filter((p) => !!p)
     .slice(0, AGENDA_MAX_PARALLEL)
-    .map((p) => ({ title: p.title ?? "", detail: p.detail ?? "" }));
+    .map((p) => ({
+      time: p.time ?? "",
+      title: p.title ?? "",
+      speaker: p.speaker ?? "",
+      detail: p.detail ?? "",
+    }));
 }
 
 /** One programme day. Multi-day agendas hold an ordered list of these. */
@@ -1219,7 +1229,12 @@ export function agendaProgrammeIsStock(config: {
       s.detail ?? "",
       s.track ?? "",
       s.muted ? "1" : "0",
-      ...agendaParallels(s).flatMap((p) => [p.title, p.detail]),
+      ...agendaParallels(s).flatMap((p) => [
+        p.time ?? "",
+        p.title,
+        p.speaker ?? "",
+        p.detail,
+      ]),
     ].join("\u0001");
   const same = (a: Partial<AgendaSession>[], b: Partial<AgendaSession>[]) =>
     a.length === b.length && a.every((s, i) => sig(s) === sig(b[i]!));
@@ -1613,7 +1628,12 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
         : [];
     const parallels = list
       .filter((p) => !!p)
-      .map((p) => ({ title: str(p?.title, ""), detail: str(p?.detail, "") }))
+      .map((p) => ({
+        time: str(p?.time, ""),
+        title: str(p?.title, ""),
+        speaker: str(p?.speaker, ""),
+        detail: str(p?.detail, ""),
+      }))
       .slice(0, AGENDA_MAX_PARALLEL);
     return {
       time: str(s.time, ""),
@@ -1875,6 +1895,10 @@ export function agendaBlocks(config: AgendaConfig) {
           Math.max(
             tallest,
             agendaTextLines(p.title, L.titleRowSize, cardW) * L.titleRowSize * 1.5 +
+              // Own start time and speaker line each take a measured line box, so
+              // a card carrying all four fields is never clipped.
+              ((p.time ?? "").trim() ? L.timeSize * 1.5 : 0) +
+              agendaTextLines(p.speaker ?? "", L.detailSize, cardW) * L.detailSize * 1.55 +
               agendaTextLines(p.detail, L.detailSize, cardW) * L.detailSize * 1.55 +
               L.detailSize * 0.8,
           ),

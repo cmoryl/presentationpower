@@ -641,6 +641,17 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
           });
           const pw = mm(par.w) - padX * 2 - mm(L.locSize * 1.4);
           let py2 = py(par.y) - padY;
+          if ((copy.time ?? "").trim()) {
+            const ts = mm(L.timeSize);
+            page.drawText(copy.time!, {
+              x: px(par.x) + padX,
+              y: py2 - ts,
+              size: ts,
+              font: bold,
+              color: parInk,
+            });
+            py2 -= ts * 1.5;
+          }
           const size = mm(L.titleRowSize);
           for (const line of wrapLines(bold, copy.title, size, pw)) {
             page.drawText(line, {
@@ -651,6 +662,20 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
               color: parInk,
             });
             py2 -= size * 1.5;
+          }
+          if ((copy.speaker ?? "").trim()) {
+            const ss = mm(L.detailSize);
+            py2 -= ss * 0.4;
+            for (const line of wrapLines(bold, copy.speaker!, ss, pw)) {
+              page.drawText(line, {
+                x: px(par.x) + padX,
+                y: py2 - ss,
+                size: ss,
+                font: bold,
+                color: parInk,
+              });
+              py2 -= ss * 1.55;
+            }
           }
           if (copy.detail.trim()) {
             const ds = mm(L.detailSize);
