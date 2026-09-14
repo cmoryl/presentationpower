@@ -137,6 +137,7 @@ import {
   londonOverrideOptions,
   londonPanelFileBase,
   type LondonOverrides,
+  type LondonColorSpace,
   isAddedPanel,
   londonAiBytes,
   buildLondonPanelPrintPdfAsync,
@@ -528,6 +529,10 @@ function LondonSignagePage() {
   );
   const [editing, setEditing] = useState(false);
   const [ppi, setPpi] = useState<number>(72);
+  // Colour mode for the asset downloads in this drawer and for the whole-kit
+  // ZIP. RGB stays the default (the RIP separates in-house); CMYK hands over a
+  // press master, named `-cmyk` so the two are never confused on a hot folder.
+  const [exportSpace, setExportSpace] = useState<LondonColorSpace>("rgb");
   const [qa, setQa] = useState<LondonQaReport[] | null>(null);
 
   useEffect(() => {
@@ -667,10 +672,12 @@ function LondonSignagePage() {
   // edits (uploaded vector artwork, moved logo, resized board) the file is built
   // from them and stamped `rdraft-`, never with a revision number that has not
   // been published. With no local edits it is the revision in force, unchanged.
-  const exportOptions = (panel: LondonPanel) =>
-    isDraft(panel) ? previewOptions(panel) : artOptions(panel);
+  const exportOptions = (panel: LondonPanel) => ({
+    ...(isDraft(panel) ? previewOptions(panel) : artOptions(panel)),
+    colorSpace: exportSpace,
+  });
   const fileBase = (panel: LondonPanel) =>
-    londonPanelFileBase(panel, isDraft(panel) ? "draft" : headRev);
+    londonPanelFileBase(panel, isDraft(panel) ? "draft" : headRev, exportSpace);
 
   // Previews outline their copy with the shipped signage face. Until it is in
   // memory the synchronous builder throws by design, so the tile simply stays
@@ -1626,6 +1633,34 @@ function LondonSignagePage() {
               </div>
 
               <div className="rounded-xl border border-black/10 p-4">
+                {/* Colour mode sits with the downloads, not only in the editor:
+                    the AI, print PDF and whole-kit files below are built in the
+                    mode chosen here and named accordingly. */}
+                <div className="mb-3 flex flex-wrap items-center gap-2">
+                  <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">
+                    Colour
+                  </span>
+                  {(["rgb", "cmyk"] as const).map((space) => (
+                    <button
+                      key={space}
+                      type="button"
+                      aria-pressed={exportSpace === space}
+                      onClick={() => setExportSpace(space)}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                        exportSpace === space
+                          ? "border-[#003FC7] bg-[#003FC7]/10 text-[#003FC7]"
+                          : "border-black/15 text-[#03002C]/70 hover:bg-[#F2F2F2]"
+                      }`}
+                    >
+                      {space === "rgb" ? "RGB · RIP separates" : "CMYK · print master"}
+                    </button>
+                  ))}
+                  {exportSpace === "cmyk" ? (
+                    <em className="text-[11.5px] not-italic text-[#03002C]/55">
+                      files are named <code>-cmyk</code> — press colours need printer sign-off
+                    </em>
+                  ) : null}
+                </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">
                     Vector
