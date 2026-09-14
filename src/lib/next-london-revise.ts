@@ -22,7 +22,7 @@
 // from its own snapshot, and restoring an old revision publishes it forward as
 // a new revision rather than rewriting the past.
 
-import { londonPanelArtworkUrl } from "@/lib/next-london-supplied-masters";
+import { londonPanelArtworkUrl, londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
 import {
   LONDON_PANELS,
   LONDON_STYLES,
@@ -1724,6 +1724,29 @@ export async function buildLondonPanelAiAsync(
   panel: LondonPanel,
   options: LondonArtOptions = {},
 ): Promise<Uint8Array> {
+  // A live-file proof is only a screen preview. It must never be embedded into
+  // a CMYK master: doing so produces exactly the false export we are preventing
+  // here — RGB pixels inside a file labelled CMYK, with the artwork flattened.
+  // A hand-finished sign can only ship in CMYK from its hand-finished editable
+  // CMYK companion master. When one exists, return it byte-for-byte; otherwise
+  // stop visibly rather than substituting the JPEG proof.
+  if (options.colorSpace === "cmyk") {
+    const supplied = londonSuppliedMaster(panel);
+    if (supplied) {
+      if (!supplied.printUrl) {
+        throw new Error(
+          `${panel.name} has a finished live file but no editable CMYK print master. Upload its CMYK .ai or PDF beside the live file before exporting.`,
+        );
+      }
+      const response = await fetch(supplied.printUrl);
+      if (!response.ok) {
+        throw new Error(`The editable CMYK print master for ${panel.name} could not be opened.`);
+      }
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      assertEditableCmykMaster(bytes, panel.name);
+      return bytes;
+    }
+  }
   // Same resolution order as the preview (buildLondonPanelSvg): vendor booth
   // artwork first, then a hand-finished or uploaded live-file proof. Without the
   // second fallback a downloaded master would print the house gradient instead
@@ -1731,6 +1754,29 @@ export async function buildLondonPanelAiAsync(
   const art = londonPanelArtworkUrl(panel.id);
   const groundImage = options.groundImage ?? (art ? await loadLondonGroundImage(art) : null);
   return buildLondonPanelAi(panel, { ...options, groundImage });
+}
+
+/**
+ * A CMYK live master is accepted only when the bytes prove the claim. This gate
+ * prevents a renamed RGB PDF or a JPEG-in-PDF proof from being handed out as an
+ * editable Illustrator master. It intentionally follows the London print
+ * contract: analytic CMYK shading on a selectable pattern-filled path, no mesh,
+ * no RGB colour space, and no embedded image XObject.
+ */
+export function assertEditableCmykMaster(bytes: Uint8Array, panelName = "This sign"): void {
+  const text = new TextDecoder("latin1").decode(bytes);
+  const failures: string[] = [];
+  if (!text.startsWith("%PDF-")) failures.push("it is not a PDF-compatible Illustrator file");
+  if (!/\/DeviceCMYK\b/.test(text)) failures.push("it does not contain DeviceCMYK artwork");
+  if (/\/DeviceRGB\b/.test(text)) failures.push("it still contains DeviceRGB artwork");
+  if (/\/Subtype\s*\/Image\b/.test(text)) failures.push("it contains a flattened image");
+  if (!/\/ShadingType\s*[23]\b/.test(text) || !/\/PatternType\s*2\b/.test(text)) {
+    failures.push("its gradient is not an editable analytic gradient fill");
+  }
+  if (/\/ShadingType\s*[4-7]\b/.test(text)) failures.push("it contains a gradient mesh");
+  if (failures.length > 0) {
+    throw new Error(`${panelName} cannot export as an editable CMYK master: ${failures.join("; ")}.`);
+  }
 }
 
 function f3(n: number): string {

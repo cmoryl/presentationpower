@@ -42,6 +42,7 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
   const [master, setMaster] = useState<File | null>(null);
+  const [printMaster, setPrintMaster] = useState<File | null>(null);
   const [proof, setProof] = useState<File | null>(null);
 
   const refresh = async () => {
@@ -53,7 +54,7 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
     onChanged?.();
   };
 
-  const upload = async (file: File, kind: "master" | "proof", version: number) => {
+  const upload = async (file: File, kind: "master" | "print" | "proof", version: number) => {
     const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase() || ".ai";
     const path = `${panel.id}/v${version}-${kind}${ext}`;
     const { error } = await supabase.storage
@@ -72,6 +73,7 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
     try {
       const version = (inForce?.version ?? 0) + 1;
       const masterPath = await upload(master, "master", version);
+      const printPath = printMaster ? await upload(printMaster, "print", version) : null;
       const proofPath = proof ? await upload(proof, "proof", version) : null;
       await publish({
         data: {
@@ -79,6 +81,8 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
           masterPath,
           masterFilename: master.name,
           masterContentType: master.type || null,
+          printPath,
+          printFilename: printMaster?.name ?? null,
           proofPath,
           trimW: panel.trimW,
           trimH: panel.trimH,
@@ -97,6 +101,7 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
         /* an unreadable file is still a finished file */
       }
       setMaster(null);
+      setPrintMaster(null);
       setProof(null);
       setNote("");
       await refresh();
@@ -159,6 +164,15 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
             />
           </label>
           <label className="text-[12px] font-semibold text-[#03002C]">
+            Editable CMYK print master
+            <input
+              type="file"
+              accept=".ai,.pdf,application/pdf,application/illustrator"
+              onChange={(e) => setPrintMaster(e.target.files?.[0] ?? null)}
+              className="mt-1 block w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-[12px] font-normal"
+            />
+          </label>
+          <label className="text-[12px] font-semibold text-[#03002C]">
             Flat picture of it (shown on the cards)
             <input
               type="file"
@@ -197,6 +211,16 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
                   <FileUp className="h-3.5 w-3.5" />
                   Download version {inForce.version}
                 </a>
+                {inForce.printUrl ? (
+                  <a
+                    href={inForce.printUrl}
+                    download={inForce.printFilename ?? undefined}
+                    className="inline-flex items-center gap-2 rounded-full border border-black/15 px-4 py-2 text-xs font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
+                  >
+                    <FileUp className="h-3.5 w-3.5" />
+                    Download CMYK master
+                  </a>
+                ) : null}
                 <button
                   type="button"
                   disabled={busy}
