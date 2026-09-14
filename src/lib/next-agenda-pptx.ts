@@ -250,17 +250,31 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
     // geometry as shapes so the deck reads exactly like the printed sheet.
     if (cardMode && rows.length) {
       const BAND = agendaBandPalette(cfg);
-      /** Blue 500 time rail down the left edge of a band. */
-      const rail = (box: { x: number; y: number; h: number }, name: string) =>
-        s.addShape("rect", {
-          x: inX(box.x),
+      // Bands are curved plates carrying the treatment's transparency, so the
+      // gradient ground reads through them exactly as the board and press file
+      // print it. The rail is the plate beneath, showing at the left edge, which
+      // keeps the band's own curve rather than squaring a corner.
+      const radius = inX(BAND.radius * L.k);
+      const clear = (alpha: number) => Math.round((1 - alpha) * 100);
+      const plate = (
+        box: { x: number; y: number; w: number; h: number },
+        color: string,
+        alpha: number,
+        name: string,
+        inset = 0,
+      ) =>
+        s.addShape("roundRect", {
+          x: inX(box.x) + inset,
           y: inX(box.y),
-          w: inX(BAND.railW * L.k),
+          w: inX(box.w) - inset,
           h: inX(box.h),
-          fill: { color: hex(BAND.rail) },
+          rectRadius: radius,
+          fill: { color: hex(color), transparency: clear(alpha) },
           line: { type: "none" },
           objectName: name,
         });
+      const rail = (box: { x: number; y: number; w: number; h: number }, alpha: number, name: string) =>
+        plate(box, BAND.rail, alpha, name);
       const bandText = (
         box: { x: number; y: number; w: number; h: number },
         session: { time?: string; title?: string; speaker?: string; detail?: string },
@@ -353,16 +367,14 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       rows.forEach((r, i) => {
         const band = r.band;
         if (!band) return;
-        s.addShape("rect", {
-          x: inX(band.x),
-          y: inX(band.y),
-          w: inX(band.w),
-          h: inX(band.h),
-          fill: { color: hex(i % 2 === 0 ? BAND.fillA : BAND.fillB) },
-          line: { type: "none" },
-          objectName: `Session band ${i + 1}`,
-        });
-        rail(band, `Session rail ${i + 1}`);
+        rail(band, BAND.fillAlpha, `Session rail ${i + 1}`);
+        plate(
+          band,
+          i % 2 === 0 ? BAND.fillA : BAND.fillB,
+          BAND.fillAlpha,
+          `Session band ${i + 1}`,
+          inX(BAND.railW * L.k),
+        );
         bandText(band, r.session);
         // One editable aqua card per parallel track, each its own named shape.
         const parCopy = agendaParallels(r.session);
@@ -370,16 +382,14 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
           const copy = parCopy[pi];
           if (!copy) return;
           const label = parCopy.length > 1 ? `${i + 1}.${pi + 1}` : `${i + 1}`;
-          s.addShape("rect", {
-            x: inX(par.x),
-            y: inX(par.y),
-            w: inX(par.w),
-            h: inX(par.h),
-            fill: { color: hex(BAND.parallel) },
-            line: { type: "none" },
-            objectName: `Parallel session ${label}`,
-          });
-          rail(par, `Parallel rail ${label}`);
+          rail(par, BAND.parallelAlpha, `Parallel rail ${label}`);
+          plate(
+            par,
+            BAND.parallel,
+            BAND.parallelAlpha,
+            `Parallel session ${label}`,
+            inX(BAND.railW * L.k),
+          );
           bandText(
             par,
             {

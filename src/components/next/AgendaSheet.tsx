@@ -102,6 +102,14 @@ export function AgendaSheet({
     top: ty + mm(y),
   });
   const rule = face === "light" ? "rgba(3,0,44,0.22)" : "rgba(255,255,255,0.28)";
+  // Bands sit ON the gradient: the fill carries the treatment's alpha so the
+  // ground reads faintly through, exactly as the press file prints it.
+  const bandFill = (hex: string, alpha: number) => {
+    const h = hex.replace("#", "");
+    const n = parseInt(h.length === 3 ? h.replace(/./g, (c) => c + c) : h, 16);
+    return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+  };
+  const bandRadius = mm(BAND.radius * L.k);
 
   return (
     <div
@@ -235,9 +243,11 @@ export function AgendaSheet({
                 ...at(row.band.x, row.band.y),
                 width: mm(row.band.w),
                 height: mm(row.band.h),
-                background: i % 2 === 0 ? BAND.fillA : BAND.fillB,
+                background: bandFill(i % 2 === 0 ? BAND.fillA : BAND.fillB, BAND.fillAlpha),
                 color: BAND.ink,
                 borderLeft: `${mm(BAND.railW * L.k)}px solid ${BAND.rail}`,
+                borderRadius: bandRadius,
+                overflow: "hidden",
                 display: "flex",
                 alignItems: "flex-start",
                 padding: `${mm(L.bandPadY)}px ${mm(L.bandPadX)}px`,
@@ -309,7 +319,9 @@ export function AgendaSheet({
                     ...at(rect.x, rect.y),
                     width: mm(rect.w),
                     height: mm(rect.h),
-                    background: BAND.parallel,
+                    background: bandFill(BAND.parallel, BAND.parallelAlpha),
+                    borderRadius: bandRadius,
+                    overflow: "hidden",
                     color: BAND.parallelInk,
                     borderLeft: `${mm(BAND.railW * L.k)}px solid ${BAND.rail}`,
                     padding: `${mm(L.bandPadY)}px ${mm(ct.padX)}px`,
