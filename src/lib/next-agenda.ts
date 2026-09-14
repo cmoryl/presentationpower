@@ -28,6 +28,7 @@ import {
   type PillarCaptionAlign,
   type PillarQrStyleId,
 } from "@/lib/next-pillar-masters";
+import { qrPrintQuality, type QrModuleStyle } from "@/lib/qr-print";
 
 export const AGENDA_DIVISIONS: CityBadgeDivision[] = CITY_BADGE_DIVISIONS;
 export const agendaDivision = cityBadgeDivision;
