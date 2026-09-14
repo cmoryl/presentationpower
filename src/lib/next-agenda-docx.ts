@@ -433,6 +433,8 @@ export async function buildAgendaDocx(
           Math.max(
             tallest,
             cardLineCount(p.title, PL.titleRowSize, cardParColW) * lineMm(PL.titleRowSize) +
+              cardLineCount(p.speaker ?? "", PL.detailSize, cardParColW) *
+                lineMm(PL.detailSize) +
               cardLineCount(p.detail, PL.detailSize, cardParColW) * lineMm(PL.detailSize),
           ),
         0,
