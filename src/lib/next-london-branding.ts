@@ -223,6 +223,7 @@ export type LondonBrandingPlan = {
 export function londonBrandingPlan(
   panel: LondonPanel,
   placement?: LondonLogoPlacement,
+  placedArt?: LondonPlacedArt | null,
 ): LondonBrandingPlan {
   const familyId = londonPanelFamily(panel);
   const aspect = panel.trimW / Math.max(1, panel.trimH);
