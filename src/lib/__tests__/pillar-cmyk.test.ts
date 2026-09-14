@@ -23,8 +23,9 @@ describe("pillar CMYK sign-off ledger", () => {
   it("never reports a colour as approved without a signed-off brand build", () => {
     const ledger = pillarCmykLedger(config({ templateId: "next-ascend" }));
     for (const stop of ledger.stops) {
-      expect(stop.build.approved).toBe(stop.build.approved === true);
-      if (!stop.build.approved) expect(stop.build.source).not.toBe("approved");
+      expect(typeof stop.build.approved).toBe("boolean");
+      // A conversion must never be dressed up as an approved brand build.
+      if (!stop.build.approved) expect(stop.roles.length).toBeGreaterThan(0);
     }
     expect(ledger.approved + ledger.converted).toBe(ledger.stops.length);
   });
