@@ -22,7 +22,6 @@ import {
   WORLD_BORDER_PATH,
 } from "@/lib/world-geometry";
 
-
 // ── Projection ────────────────────────────────────────────────────────────
 // Equirectangular: full-world viewBox is 1000 × 500.
 export const WORLD_VIEWBOX = { w: 1000, h: 500 };
@@ -1132,8 +1131,6 @@ export function coerceMapStyle(raw: unknown, fallback: MapStyle = "halftone"): M
   return MAP_STYLE_IDS.has(v) ? (v as MapStyle) : fallback;
 }
 
-
-
 // ── Halftone land raster ──────────────────────────────────────────────────
 // The real coastlines are rasterized into a dot matrix so the map can read as
 // an infographic halftone while staying geographically exact. Computed once
@@ -1211,7 +1208,6 @@ export function landDots(spacing = 7.5): LandDot[] {
   DOT_CACHE.set(spacing, out);
   return out;
 }
-
 
 /** Curved great-circle-ish arc between two projected points. */
 function arcPath(a: { x: number; y: number }, b: { x: number; y: number }, lift = 0.2): string {
@@ -1398,7 +1394,6 @@ export function WorldMap({
           : [],
     [activeStyle],
   );
-
 
   const glow = `url(#tp-pin-glow-${uid})`;
 
@@ -1708,7 +1703,6 @@ export function WorldMap({
           />
         </>
       )}
-
 
       {/* Network mesh between hub-tier locations */}
       {network.length > 0 && (

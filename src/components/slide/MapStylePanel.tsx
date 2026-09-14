@@ -54,8 +54,8 @@ export function MapStylePanel({ brandId, accent, primary, items, mapStyle, onCha
     <section className="rounded-2xl border border-black/10 bg-white p-6">
       <div className="text-xs uppercase tracking-widest text-black/50">Map look</div>
       <p className="mt-2 text-sm text-black/60">
-        Ten treatments, one geography — each option inks the same measured
-        coastlines and borders, so pins always sit on their true coordinates.
+        Ten treatments, one geography — each option inks the same measured coastlines and borders,
+        so pins always sit on their true coordinates.
       </p>
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {MAP_STYLES.map((s) => {

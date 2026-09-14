@@ -1007,7 +1007,7 @@ function renderLocationsVariant(
             <div className="mt-10 grid flex-1 gap-12" style={{ gridTemplateColumns: "1.55fr 1fr" }}>
               <div className="relative overflow-hidden">
                 <LocWorldMap
-                mapStyle={mapStyle}
+                  mapStyle={mapStyle}
                   pins={pins}
                   region={region}
                   mode={mode}
@@ -1075,7 +1075,7 @@ function renderLocationsVariant(
         <Header />
         <div className="relative mt-10 flex-1 overflow-hidden">
           <LocWorldMap
-                mapStyle={mapStyle}
+            mapStyle={mapStyle}
             pins={pins}
             region="world"
             mode={mode}
