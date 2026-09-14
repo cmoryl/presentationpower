@@ -1620,6 +1620,16 @@ function DeckEditor() {
                     items={(active.content as Record<string, unknown>).items}
                     onChange={(items) => updateField(deck.id, active.id, "items", items)}
                   />
+                  <MapStylePanel
+                    key={`mapstyle-${active.id}`}
+                    brandId={brand.id}
+                    accent={brand.tokens.accent}
+                    primary={brand.tokens.primary}
+                    items={(active.content as Record<string, unknown>).items}
+                    mapStyle={(active.content as Record<string, unknown>).mapStyle}
+                    onChange={(next) => updateField(deck.id, active.id, "mapStyle", next)}
+                  />
+
                   {mv.id === "MV-LOC-WORLD-STATS" && (
                     <WorldStatsMetricsPanel
                       brandId={brand.id}
