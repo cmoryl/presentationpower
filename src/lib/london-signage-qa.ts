@@ -22,6 +22,11 @@ import {
   recommendedPpi,
   type LondonPanel,
 } from "@/lib/next-london-signage";
+import {
+  cmykShort,
+  londonCmykBuild,
+  readCmykShadingStops,
+} from "@/lib/next-london-cmyk";
 import { parseColor, readShadingStops } from "@/lib/pdf-gradient-shading";
 import {
   isStepRepeatPanel,
@@ -44,6 +49,17 @@ const MM_TO_PT = 72 / 25.4;
 /** Vendor booth wall or hand-finished venue master: supplied artwork ground. */
 function suppliedGround(panel: LondonPanel): boolean {
   return isBoothPanel(panel) || !!londonSuppliedGroundUrl(panel.id);
+}
+
+/**
+ * Colour space an audited file was generated in. `rgb` is the house default
+ * (the RIP separates); `cmyk` is the explicit, operator-chosen print master, so
+ * the gradient checks expect DeviceCMYK builds instead of DeviceRGB stops.
+ */
+export type QaColorOpts = { colorSpace?: "rgb" | "cmyk"; vibrance?: number };
+
+export function londonApprovedRamp(panel: LondonPanel): string[] {
+  return expectedRamp(panel);
 }
 
 function expectedRamp(panel: LondonPanel): string[] {
@@ -187,7 +203,11 @@ function attr(svg: string, name: string): string | null {
   return m ? m[1]! : null;
 }
 
-export function auditSvg(panel: LondonPanel, svg: string): LondonQaReport {
+export function auditSvg(
+  panel: LondonPanel,
+  svg: string,
+  opts: QaColorOpts = {},
+): LondonQaReport {
   const w = Number.parseFloat(attr(svg, "width") ?? "");
   const h = Number.parseFloat(attr(svg, "height") ?? "");
   const unitOk = /width="[\d.]+mm"/.test(svg) && /height="[\d.]+mm"/.test(svg);
@@ -304,6 +324,30 @@ export function auditSvg(panel: LondonPanel, svg: string): LondonQaReport {
         { warnOnly: true, note: "A non-https QR target can be blocked or warned on scan." },
       );
     })(),
+    (() => {
+      // A CMYK master must declare its space and carry a device-cmyk build on
+      // every ground stop; an RGB master must carry none, so a conversion can
+      // never slip in unlabelled.
+      const declared = attr(svg, "data-colorspace") ?? "rgb";
+      const builds = [...svg.matchAll(/data-cmyk="([^"]*)"/g)].length;
+      const unapproved = [...svg.matchAll(/data-cmyk-approved="false"/g)].length;
+      const cmykMode = opts.colorSpace === "cmyk";
+      return cmykMode
+        ? check(
+            "svg-colorspace",
+            "CMYK master declares its space and carries print builds",
+            declared === "cmyk" && builds > 0,
+            "data-colorspace=cmyk with device-cmyk builds",
+            `${declared}, ${builds} builds${unapproved ? `, ${unapproved} machine-converted` : ""}`,
+          )
+        : check(
+            "svg-colorspace",
+            "RGB master carries no hidden CMYK conversion",
+            declared !== "cmyk" && builds === 0,
+            "DeviceRGB only",
+            `${declared}${builds ? `, ${builds} cmyk builds found` : ""}`,
+          );
+    })(),
   ];
 
   return {
@@ -327,7 +371,11 @@ function box(pdf: string, name: string): number[] | null {
   return nums.length === 4 && nums.every((n) => Number.isFinite(n)) ? nums : null;
 }
 
-export function auditAi(panel: LondonPanel, ai: string | Uint8Array): LondonQaReport {
+export function auditAi(
+  panel: LondonPanel,
+  ai: string | Uint8Array,
+  opts: QaColorOpts = {},
+): LondonQaReport {
   const text = typeof ai === "string" ? ai : Array.from(ai, (b) => String.fromCharCode(b)).join("");
 
   const media = box(text, "MediaBox");
@@ -436,7 +484,7 @@ export function auditAi(panel: LondonPanel, ai: string | Uint8Array): LondonQaRe
         { warnOnly: true, note: "A non-https QR target can be blocked or warned on scan." },
       );
     })(),
-    ...auditAiGradient(panel, text),
+    ...auditAiGradient(panel, text, opts),
   ];
 
   return {
@@ -459,8 +507,14 @@ export function auditAi(panel: LondonPanel, ai: string | Uint8Array): LondonQaRe
  *   * a /Bounds array that is not strictly increasing (Illustrator drops the
  *     stops after the first bad bound, so the ramp collapses).
  */
-export function auditAiGradient(panel: LondonPanel, text: string): QaCheck[] {
+export function auditAiGradient(
+  panel: LondonPanel,
+  text: string,
+  opts: QaColorOpts = {},
+): QaCheck[] {
   const ramp = expectedRamp(panel);
+  const cmykMode = opts.colorSpace === "cmyk";
+  const vibrance = opts.vibrance ?? 1;
   const shadings = text.match(/\/Type\s*\/Shading[\s\S]*?>>\s*(?=endobj|\n\d+ 0 obj|$)/g) ?? [];
   const dict = shadings[0] ?? "";
   const spaces = Array.from(
@@ -468,11 +522,54 @@ export function auditAiGradient(panel: LondonPanel, text: string): QaCheck[] {
   ).map((m) => m[1]!);
   const meshTypes = Array.from(text.matchAll(/\/ShadingType\s*([4-7])/g)).map((m) => m[1]!);
 
+  const wantSpace = cmykMode ? "DeviceCMYK" : "DeviceRGB";
+  const spaceLabel = cmykMode
+    ? "Gradient is DeviceCMYK from the operator-chosen print master"
+    : "Gradient stays DeviceRGB (no silent CMYK conversion)";
+
   const found = readShadingStops(dict);
   const want = ramp.map((c) => parseColor(c));
-  const rampMatches =
-    found.length === want.length &&
-    want.every((c, i) => c.every((v, k) => Math.abs(v - found[i]![k]!) < 4 / 255));
+  const foundCmyk = readCmykShadingStops(dict);
+  // Two neighbouring RGB stops can resolve to the same CMYK build (paper white
+  // and a near-white, for instance). The PDF writes one stop, and the reader
+  // dedupes, so the expectation must dedupe the same way.
+  const wantCmyk = ramp
+    .map((c) => londonCmykBuild(c, vibrance))
+    .filter((v, i, all) => {
+      const prev = all[i - 1];
+      return (
+        !prev ||
+        Math.abs(prev.c - v.c) >= 5e-3 ||
+        Math.abs(prev.m - v.m) >= 5e-3 ||
+        Math.abs(prev.y - v.y) >= 5e-3 ||
+        Math.abs(prev.k - v.k) >= 5e-3
+      );
+    });
+  const rampMatches = cmykMode
+    ? foundCmyk.length === wantCmyk.length &&
+      wantCmyk.every((v, i) => {
+        const g = foundCmyk[i]!;
+        return (
+          Math.abs(v.c - g.c) < 0.01 &&
+          Math.abs(v.m - g.m) < 0.01 &&
+          Math.abs(v.y - g.y) < 0.01 &&
+          Math.abs(v.k - g.k) < 0.01
+        );
+      })
+    : found.length === want.length &&
+      want.every((c, i) => c.every((v, k) => Math.abs(v - found[i]![k]!) < 4 / 255));
+  const rampExpected = cmykMode
+    ? wantCmyk.map((v) => cmykShort(v)).join(" → ")
+    : ramp.map((c) => c.toUpperCase()).join(" → ");
+  const rampActual = cmykMode
+    ? foundCmyk.length
+      ? foundCmyk.map((v) => cmykShort(v)).join(" → ")
+      : "no CMYK stop colours found"
+    : found.length
+      ? found.map((c) => hex(c)).join(" → ")
+      : "no stop colours found";
+  const unapproved = cmykMode ? wantCmyk.filter((v) => !v.approved).length : 0;
+
 
   const bounds = /\/Bounds\s*\[([^\]]*)\]/.exec(dict)?.[1]?.trim() ?? "";
   const boundNums = bounds ? bounds.split(/\s+/).map(Number) : [];
@@ -492,18 +589,35 @@ export function auditAiGradient(panel: LondonPanel, text: string): QaCheck[] {
     ),
     check(
       "ai-gradient-colorspace",
-      "Gradient stays DeviceRGB (no silent CMYK conversion)",
-      spaces.length > 0 && spaces.every((s) => s === "DeviceRGB"),
-      "DeviceRGB",
+      spaceLabel,
+      spaces.length > 0 && spaces.every((s) => s === wantSpace),
+      wantSpace,
       spaces.length ? Array.from(new Set(spaces)).join(", ") : "absent",
     ),
     check(
       "ai-gradient-stops",
-      "Panel gradient keeps the approved colours",
+      cmykMode ? "Panel gradient carries the signed print builds" : "Panel gradient keeps the approved colours",
       rampMatches,
-      ramp.map((c) => c.toUpperCase()).join(" → "),
-      found.length ? found.map((c) => hex(c)).join(" → ") : "no stop colours found",
+      rampExpected,
+      rampActual,
     ),
+    ...(cmykMode
+      ? [
+          check(
+            "ai-cmyk-signoff",
+            "Every gradient stop has a signed-off press build",
+            unapproved === 0,
+            `${wantCmyk.length} approved builds`,
+            unapproved === 0
+              ? "all stops approved"
+              : `${unapproved} of ${wantCmyk.length} stops machine-converted`,
+            {
+              warnOnly: true,
+              note: "Converted stops must be proofed and signed off by the print house before this master is run.",
+            },
+          ),
+        ]
+      : []),
     check(
       "ai-gradient-bounds",
       "Stop ramp is strictly increasing across the full domain",
@@ -530,6 +644,7 @@ export function auditPrintPdf(
   panel: LondonPanel,
   pdf: string | Uint8Array,
   marginMm: number,
+  opts: QaColorOpts = {},
 ): LondonQaReport {
   const text =
     typeof pdf === "string" ? pdf : Array.from(pdf, (b) => String.fromCharCode(b)).join("");
@@ -605,7 +720,7 @@ export function auditPrintPdf(
         liveFont ? "live text found" : "outlined paths",
       );
     })(),
-    ...auditAiGradient(panel, text),
+    ...auditAiGradient(panel, text, opts),
   ];
 
   return {

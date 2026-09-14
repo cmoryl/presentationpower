@@ -258,3 +258,36 @@ export function cmykRadialShadingDict(
 export function cmykFillOp(v: Cmyk): string {
   return `${ink(v)} k`;
 }
+
+/**
+ * Read DeviceCMYK stop colours back out of a shading dictionary — the CMYK twin
+ * of `readShadingStops`, used by the print QA gate to prove an exported master
+ * still carries the builds the panel was signed off with.
+ */
+export function readCmykShadingStops(dict: string): Cmyk[] {
+  const out: Cmyk[] = [];
+  const re = /\/(C0|C1)\s*\[([^\]]*)\]/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(dict))) {
+    const nums = m[2]!.trim().split(/\s+/).map(Number);
+    if (nums.length !== 4 || nums.some((n) => !Number.isFinite(n))) continue;
+    const v: Cmyk = { c: nums[0]!, m: nums[1]!, y: nums[2]!, k: nums[3]! };
+    const prev = out[out.length - 1];
+    if (
+      prev &&
+      Math.abs(prev.c - v.c) < 5e-3 &&
+      Math.abs(prev.m - v.m) < 5e-3 &&
+      Math.abs(prev.y - v.y) < 5e-3 &&
+      Math.abs(prev.k - v.k) < 5e-3
+    )
+      continue;
+    out.push(v);
+  }
+  return out;
+}
+
+/** Compact "C92 M27 Y0 K5" for manifests and QA expectations. */
+export function cmykShort(v: Cmyk): string {
+  const p = (n: number) => Math.round(clamp01(n) * 100);
+  return `C${p(v.c)} M${p(v.m)} Y${p(v.y)} K${p(v.k)}`;
+}
