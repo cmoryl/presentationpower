@@ -91,6 +91,7 @@ import {
   withAgendaDivision,
   type AgendaConfig,
   type AgendaSession,
+  type AgendaParallel,
 } from "@/lib/next-agenda";
 import {
   AGENDA_GUARD_GAPS,
