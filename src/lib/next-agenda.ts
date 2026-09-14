@@ -28,6 +28,7 @@ import {
   type PillarCaptionAlign,
   type PillarQrStyleId,
 } from "@/lib/next-pillar-masters";
+import { logoInkRatio } from "@/lib/next-logo-ink";
 import { qrPrintQuality, type QrModuleStyle } from "@/lib/qr-print";
 
 export const AGENDA_DIVISIONS: CityBadgeDivision[] = CITY_BADGE_DIVISIONS;
@@ -1119,6 +1120,14 @@ export function agendaTitleInk(config: AgendaConfig): string {
  * board hold the same proportions. Both the live sheet and the vector PDF read
  * these numbers, so the export always matches the preview.
  */
+/** The approved lockup file for this board's face. */
+export function agendaLockupUrl(config: AgendaConfig): string {
+  const div = agendaDivision(config.divisionId);
+  return (config.face ?? "dark") === "light"
+    ? div.colorUrl || div.whiteUrl
+    : div.whiteUrl || div.colorUrl;
+}
+
 export function agendaLayout(config: AgendaConfig) {
   const geo = agendaGeometry(config);
   // A2 board is the reference sheet. Landscape and screen formats have far less
@@ -1127,7 +1136,10 @@ export function agendaLayout(config: AgendaConfig) {
   const k = Math.min(geo.trimW / 420, geo.trimH / 594) * (geo.trimH < geo.trimW ? 1.35 : 1);
   const rows = config.sessions.length || 1;
   const contentW = geo.trimW - geo.safeInset * 2;
-  const ratio = agendaDivision(config.divisionId).ratio || 1.7;
+  // Lay out against the visible artwork, not the file box: the supplied lockups
+  // carry clear space inside their viewBox, and sizing on the file box left the
+  // mark hanging away from the copy edge.
+  const ratio = logoInkRatio(agendaLockupUrl(config), agendaDivision(config.divisionId).ratio || 1.7);
   // Cap the lockup against the sheet height so wide formats keep room for the
   // programme; portrait boards stay on the established 44% content width.
   const lockupW = Math.min(contentW * 0.44, geo.trimH * 0.2 * ratio) * agendaLockupScale(config);

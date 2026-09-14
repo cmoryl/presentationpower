@@ -7,6 +7,7 @@ import {
   agendaDivision,
   agendaGeometry,
   agendaInk,
+  agendaLockupUrl,
   agendaQrBackground,
   agendaQrForeground,
   agendaQrStyle,
@@ -17,6 +18,7 @@ import {
 } from "@/lib/next-agenda";
 import { agendaCopyInk } from "@/lib/next-agenda-contrast";
 import { buildPillarQr } from "@/lib/pillar-qr";
+import { logoInkPlacement } from "@/lib/next-logo-ink";
 import { qrStructuralModule } from "@/lib/qr-print";
 
 type Props = {
@@ -48,6 +50,7 @@ export function AgendaSheet({
   const ink = agendaCopyInk(config).hex;
   const titleInk = (config.titleColor || "").trim() ? agendaTitleInk(config) : ink;
   const division = agendaDivision(config.divisionId);
+  const lockupUrl = agendaLockupUrl(config);
   const stops = agendaStops(config.styleId, face, config.divisionId);
   const isHalo = config.styleId.includes("halo");
   const ramp = isHalo ? [...stops].reverse() : stops;
@@ -94,23 +97,25 @@ export function AgendaSheet({
         ...style,
       }}
     >
-      {blocks.lockup && (division.whiteUrl || division.colorUrl) ? (
-        <img
-          src={
-            face === "light"
-              ? division.colorUrl || division.whiteUrl
-              : division.whiteUrl || division.colorUrl
-          }
-          alt={`${division.name} lockup`}
-          style={{
-            ...at(blocks.lockup.x, blocks.lockup.y),
-            width: mm(blocks.lockup.w),
-            height: mm(blocks.lockup.h),
-            objectFit: "contain",
-            objectPosition: "left top",
-          }}
-        />
-      ) : null}
+      {blocks.lockup && lockupUrl
+        ? (() => {
+            // Place the measured ink box so the mark sits flush on the copy edge;
+            // the file's own clear space falls outside that box.
+            const box = logoInkPlacement(lockupUrl, blocks.lockup);
+            return (
+              <img
+                src={lockupUrl}
+                alt={`${division.name} lockup`}
+                style={{
+                  ...at(box.x, box.y),
+                  width: mm(box.w),
+                  height: mm(box.h),
+                  objectFit: "fill",
+                }}
+              />
+            );
+          })()
+        : null}
 
       {config.eyebrow.trim() ? (
         <div

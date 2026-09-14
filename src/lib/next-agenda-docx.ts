@@ -18,6 +18,7 @@ import JSZip from "jszip";
 import {
   agendaBlocks,
   agendaDivision,
+  agendaLockupUrl,
   agendaGeometry,
   agendaInk,
   agendaLayout,
@@ -33,6 +34,7 @@ import {
   type AgendaConfig,
 } from "./next-agenda";
 import { agendaCopyInk } from "./next-agenda-contrast";
+import { logoInkPlacement } from "./next-logo-ink";
 import { qrModulePxForPrint, qrPng } from "./qr-print";
 
 /** Word measures pages in twentieths of a point. */
@@ -104,12 +106,7 @@ async function drawLockup(
   canvasWidth: number,
 ): Promise<void> {
   const blocks = agendaBlocks(config);
-  const division = agendaDivision(config.divisionId);
-  const face = config.face ?? "dark";
-  const src =
-    face === "light"
-      ? division.colorUrl || division.whiteUrl
-      : division.whiteUrl || division.colorUrl;
+  const src = agendaLockupUrl(config);
   if (!blocks.lockup || !src) return;
 
   const geo = agendaGeometry(config);
@@ -125,17 +122,10 @@ async function drawLockup(
       el.onerror = () => reject(new Error("lockup unavailable"));
       el.src = src;
     });
-    const boxW = blocks.lockup.w * scale;
-    const boxH = blocks.lockup.h * scale;
-    const ratio = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1;
-    // Match the sheet's contain / left-top placement.
-    let drawW = boxW;
-    let drawH = boxW / ratio;
-    if (drawH > boxH) {
-      drawH = boxH;
-      drawW = boxH * ratio;
-    }
-    ctx.drawImage(img, blocks.lockup.x * scale, blocks.lockup.y * scale, drawW, drawH);
+    // The block is the measured ink box, so the whole file is drawn to the box
+    // that lands the ink there — exactly what the sheet and the press PDF do.
+    const box = logoInkPlacement(src, blocks.lockup);
+    ctx.drawImage(img, box.x * scale, box.y * scale, box.w * scale, box.h * scale);
   } catch {
     /* lockup unavailable — the Word ground still carries the approved gradient */
   }

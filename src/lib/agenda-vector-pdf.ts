@@ -42,10 +42,12 @@ import { resolveAssetUrl } from "./asset-base-url";
 import { registerMeshShading, type MeshSampler } from "./pdf-mesh-shading";
 import { extractSvgPaths } from "./pillar-vector-pdf";
 import { buildPillarQr } from "./pillar-qr";
+import { logoInkBox, logoInkPlacement } from "./next-logo-ink";
 import { qrStructuralModule } from "./qr-print";
 import {
   agendaBlocks,
   agendaDivision,
+  agendaLockupUrl,
   agendaGeometry,
   agendaInk,
   agendaName,
@@ -314,13 +316,8 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
 
   // Approved division lockup is fetched once and reused on every page.
   const division = agendaDivision(config.divisionId);
-  const art = config.showLockup
-    ? await loadLockup(
-        face === "light"
-          ? division.colorUrl || division.whiteUrl
-          : division.whiteUrl || division.colorUrl,
-      )
-    : null;
+  const lockupSrc = agendaLockupUrl(config);
+  const art = config.showLockup ? await loadLockup(lockupSrc) : null;
   let lockupVector = false;
 
   // Every programme day / page of the live file becomes one press page.
@@ -383,12 +380,17 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       beginLayer(page, layer("02 Lockup"));
       if (art.kind === "svg") {
         lockupVector = true;
-        const [vx, vy, vw] = art.viewBox;
-        const scale = lw / vw;
+        const [vx, vy, vw, vh] = art.viewBox;
+        // blocks.lockup is the measured ink box, so the file is scaled and
+        // offset by its own clear space to land the ink exactly there.
+        const inkFrac = logoInkBox(lockupSrc);
+        const scale = lw / (vw * (inkFrac?.width ?? 1));
+        const offX = inkFrac ? inkFrac.left * vw * scale : 0;
+        const offY = inkFrac ? inkFrac.top * vh * scale : 0;
         for (const d of art.paths) {
           page.drawSvgPath(d, {
-            x: px(blocks.lockup.x) - vx * scale,
-            y: py(blocks.lockup.y) + vy * scale,
+            x: px(blocks.lockup.x) - vx * scale - offX,
+            y: py(blocks.lockup.y) + vy * scale + offY,
             scale,
             color: rgb(...hexRgb(ink)),
           });
@@ -396,11 +398,12 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       } else if (art.kind === "raster") {
         try {
           const image = art.png ? await doc.embedPng(art.bytes) : await doc.embedJpg(art.bytes);
+          const box = logoInkPlacement(lockupSrc, blocks.lockup);
           page.drawImage(image, {
-            x: px(blocks.lockup.x),
-            y: py(blocks.lockup.y) - lh,
-            width: lw,
-            height: lh,
+            x: px(box.x),
+            y: py(box.y) - mm(box.h),
+            width: mm(box.w),
+            height: mm(box.h),
           });
         } catch {
           /* lockup unavailable — the board still prints */
