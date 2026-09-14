@@ -16,6 +16,7 @@
 import JSZip from "jszip";
 
 import {
+  agendaTextLines,
   AGENDA_BAND,
   agendaBlocks,
   agendaDivision,
@@ -387,6 +388,36 @@ export async function buildAgendaDocx(
     const cardParallelW = contentTwips * 0.34;
     const cardBodyW = contentTwips - cardTimeW - cardParallelW;
 
+    // Card bands carry copy of very different lengths, so each band asks for the
+    // height its own copy really needs in Word line boxes; the whole set is then
+    // scaled to the sheet so a long day still lands on one page instead of
+    // clipping a speaker's name at the edge of the band.
+    const cardLineCount = (text: string, sizeMm: number, colTwips: number) =>
+      agendaTextLines(text, sizeMm, colTwips / TWIPS_PER_MM - 6);
+    const cardWanted = (cfg.sessions ?? []).map((s) => {
+      const bodyCol = s.parallel ? cardBodyW : cardBodyW + cardParallelW;
+      const left =
+        cardLineCount(s.title ?? "", PL.titleRowSize, bodyCol) * lineMm(PL.titleRowSize) +
+        cardLineCount(s.detail ?? "", PL.detailSize, bodyCol) * lineMm(PL.detailSize);
+      const right = s.parallel
+        ? cardLineCount(s.parallel.title ?? "", PL.titleRowSize, cardParallelW) *
+            lineMm(PL.titleRowSize) +
+          cardLineCount(s.parallel.detail ?? "", PL.detailSize, cardParallelW) *
+            lineMm(PL.detailSize)
+        : 0;
+      return Math.max(lineMm(PL.titleRowSize) * 1.2, left, right) + 3.4;
+    });
+    const cardGapMm = 1.2 * Math.max(0, cardWanted.length - 1);
+    const cardBudget = Math.max(20, budget - cardGapMm);
+    const cardTotal = cardWanted.reduce((a, b) => a + b, 0) || 1;
+    const cardScale = cardTotal > cardBudget ? cardBudget / cardTotal : 1;
+    if (cardScale < 1) {
+      compensations.push(
+        `Programme bands scaled to ${(cardScale * 100).toFixed(0)}% so the day stays on one Word page`,
+      );
+    }
+    const cardBands = cardWanted.map((h) => mmT(h * cardScale));
+
     const cardRows = (cfg.sessions ?? [])
       .map((session, i) => {
         const muted = session.muted;
@@ -412,7 +443,9 @@ export async function buildAgendaDocx(
           ].join("");
         const parallel = session.parallel;
         return [
-          `<w:tr><w:trPr><w:trHeight w:val="${rowBand}" w:hRule="atLeast"/><w:cantSplit/></w:trPr>`,
+          `<w:tr><w:trPr><w:trHeight w:val="${
+            cardBands[i] ?? rowBand
+          }" w:hRule="atLeast"/><w:cantSplit/></w:trPr>`,
           cell(
             cardTimeW,
             para(run(session.time ?? "", { size: halfPt(PL.timeSize), color: bandInk, bold: true }), {
@@ -524,6 +557,35 @@ export async function buildAgendaDocx(
       cardMode ? cardRows : rows,
       "</w:tbl>",
     ].join("");
+
+    // Card mode has no eyebrow or headline copy on the sheet — the lockup carries
+    // the name and the room line and date sit right of it. Walk that header from
+    // the measured positions instead of the ruled-board bands, or the empty
+    // eyebrow and headline bands open a hole above the programme.
+    const cardHeader =
+      cardMode && B.location
+        ? [
+            (cfg.locationLine ?? "").trim()
+              ? para(
+                  run((cfg.locationLine ?? "").trim(), {
+                    size: halfPt(PL.locSize),
+                    color: inkHex,
+                    caps: true,
+                    bold: true,
+                    spacing: 30,
+                  }),
+                  { afterTwips: 0, align: "right", lineTwips: mmT(lineMm(PL.locSize) * 0.62) },
+                )
+              : "",
+            hasMeta
+              ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), {
+                  afterTwips: 0,
+                  align: "right",
+                  lineTwips: mmT(lineMm(PL.metaSize) * 0.62),
+                })
+              : "",
+          ].join("")
+        : null;
 
     const header = [
       hasEyebrow
@@ -657,10 +719,15 @@ export async function buildAgendaDocx(
       // The ground rides in the first spacer so the picture costs no extra
       // vertical space — that stray line was pushing every block down a step.
       spacer(
-        mmT(Math.max(0, B.eyebrowY - geo.safeInset)),
+        mmT(
+          cardHeader
+            ? Math.max(0, (B.location?.y ?? B.rowsTop) - geo.safeInset)
+            : Math.max(0, B.eyebrowY - geo.safeInset),
+        ),
         backgroundDrawing(groundRel) + qrDrawing("rIdQr"),
       ),
-      header,
+      cardHeader ?? header,
+      cardHeader ? spacer(mmT(Math.max(2, B.rowsTop - B.metaY - lineMm(PL.metaSize)))) : "",
       table,
       footGap > 0.2 ? spacer(mmT(footGap)) : "",
       footer,
