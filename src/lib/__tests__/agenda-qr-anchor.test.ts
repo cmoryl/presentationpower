@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { agendaBlocks, agendaDefaultConfig, agendaQrAnchor } from "../next-agenda";
+import { agendaBlocks, agendaDefault, agendaQrAnchor } from "../next-agenda";
 
 const base = () => ({
-  ...agendaDefaultConfig(),
+  ...agendaDefault(),
   qrData: "https://next.transpointer.com/agenda",
   qrCaption: "FULL AGENDA",
 });
