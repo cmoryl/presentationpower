@@ -4,7 +4,7 @@ import {
   AGENDA_BAND_TREATMENTS,
   agendaBandPalette,
   agendaBandTreatment,
-  agendaDefaultConfig,
+  agendaDefault,
   normalizeAgendaConfig,
 } from "../next-agenda";
 import { contrastRatio } from "../wcag";
@@ -38,7 +38,7 @@ describe("agenda band treatments", () => {
   });
 
   it("round-trips through the config normalizer", () => {
-    const base = agendaDefaultConfig("globallink");
+    const base = agendaDefault("globallink");
     const kept = normalizeAgendaConfig({ ...base, bandTreatment: "ink" });
     expect(kept.bandTreatment).toBe("ink");
     const rejected = normalizeAgendaConfig({ ...base, bandTreatment: "sparkle" });
