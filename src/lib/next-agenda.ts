@@ -467,8 +467,10 @@ export function agendaParallels(
     : session?.parallel
       ? [session.parallel]
       : [];
+  // A track the operator has just added but not yet typed into is kept, so the
+  // empty card stays on the board while they fill it; removal is explicit.
   return list
-    .filter((p) => p && ((p.title ?? "").trim() || (p.detail ?? "").trim()))
+    .filter((p) => !!p)
     .slice(0, AGENDA_MAX_PARALLEL)
     .map((p) => ({ title: p.title ?? "", detail: p.detail ?? "" }));
 }
@@ -1610,8 +1612,8 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
         ? [s.parallel as AgendaParallel]
         : [];
     const parallels = list
+      .filter((p) => !!p)
       .map((p) => ({ title: str(p?.title, ""), detail: str(p?.detail, "") }))
-      .filter((p) => p.title.trim() || p.detail.trim())
       .slice(0, AGENDA_MAX_PARALLEL);
     return {
       time: str(s.time, ""),
