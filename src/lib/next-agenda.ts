@@ -1585,6 +1585,67 @@ export function agendaSplitWidths(
 }
 
 /**
+ * Type fit for one aqua parallel card. Two or more tracks share the right-hand
+ * half, so a card can be a third of the width the single-track board was drawn
+ * for. Left at the band sizes the copy wrapped to one or two characters a line —
+ * or vanished when the padding and the pin left no column at all. The card sizes
+ * are therefore fitted to the column: the title must carry ~11 characters a
+ * line, the notes ~15, and the padding tightens and the pin gutter is dropped on
+ * three or four tracks. Sizes never rise above the band sizes, and never fall
+ * below the reading floor the boards were signed off at.
+ */
+/** Longest run of non-space characters in a piece of copy. */
+export function agendaLongestWord(...parts: (string | undefined)[]): number {
+  return parts.reduce(
+    (longest, part) =>
+      (part ?? "")
+        .split(/\s+/)
+        .reduce((m, word) => Math.max(m, word.length), longest),
+    0,
+  );
+}
+
+export function agendaCardType(
+  L: { bandPadX: number; locSize: number; timeSize: number; titleRowSize: number; detailSize: number },
+  cardW: number,
+  count: number,
+  /**
+   * Longest unbreakable word in the card's copy. Word and the press renderers
+   * break a word mid-glyph when it cannot fit the column, so the title size is
+   * also held to the longest word.
+   */
+  longestWord = 0,
+): {
+  padX: number;
+  /** Room kept on the right for the location pin, 0 when the card is narrow. */
+  pinW: number;
+  textW: number;
+  timeSize: number;
+  titleSize: number;
+  detailSize: number;
+} {
+  const tight = count >= 3;
+  const padX = tight ? L.bandPadX * 0.62 : L.bandPadX;
+  const pinW = count >= 2 ? 0 : L.locSize * 1.4;
+  const textW = Math.max(4, cardW - padX * 2 - pinW);
+  const fit = (base: number, chars: number, floor: number) =>
+    Math.max(Math.min(base, floor), Math.min(base, textW / (chars * 0.55)));
+  const floorTitle = L.titleRowSize * 0.56;
+  let titleSize = fit(L.titleRowSize, 13, floorTitle);
+  if (longestWord > 0) {
+    titleSize = Math.max(floorTitle, Math.min(titleSize, textW / (longestWord * 0.78)));
+  }
+  return {
+    padX,
+    pinW,
+    textW,
+    timeSize: fit(L.timeSize, 6, L.timeSize * 0.62),
+    titleSize,
+    detailSize: fit(L.detailSize, 16, L.detailSize * 0.6),
+  };
+}
+
+/**
  * Lines a run of copy takes at a printed size inside a column. Cap-height mm to
  * average glyph advance is ~0.55, which matched the issued boards when the row
  * bands were measured against the approved Canva programme.
@@ -1874,6 +1935,8 @@ export function agendaBlocks(config: AgendaConfig) {
     parallels: { x: number; y: number; w: number; h: number }[];
   };
 
+  /** Unscaled height each row's copy really wants, in mm. */
+  let needs: number[] = [];
   let rows: AgendaRow[];
   if (L.card) {
     // Bands take the height their copy really needs, so a two-line title with a
@@ -1889,24 +1952,30 @@ export function agendaBlocks(config: AgendaConfig) {
         (session.detail.trim() ? L.detailSize * 0.8 : 0);
       // Every parallel card is measured on its own column width; the band takes
       // the tallest of them so no track is clipped.
-      const cardW = split.cardW - L.bandPadX * 2 - L.locSize;
+      const ct = agendaCardType(
+        L,
+        split.cardW,
+        pars.length,
+        pars.reduce((m, p) => Math.max(m, agendaLongestWord(p.title)), 0),
+      );
       const right = pars.reduce(
         (tallest, p) =>
           Math.max(
             tallest,
-            agendaTextLines(p.title, L.titleRowSize, cardW) * L.titleRowSize * 1.5 +
+            agendaTextLines(p.title, ct.titleSize, ct.textW) * ct.titleSize * 1.5 +
               // Own start time and speaker line each take a measured line box, so
               // a card carrying all four fields is never clipped.
-              ((p.time ?? "").trim() ? L.timeSize * 1.5 : 0) +
-              agendaTextLines(p.speaker ?? "", L.detailSize, cardW) * L.detailSize * 1.55 +
-              agendaTextLines(p.detail, L.detailSize, cardW) * L.detailSize * 1.55 +
-              L.detailSize * 0.8,
+              ((p.time ?? "").trim() || session.time.trim() ? ct.timeSize * 1.5 : 0) +
+              agendaTextLines(p.speaker ?? "", ct.detailSize, ct.textW) * ct.detailSize * 1.55 +
+              agendaTextLines(p.detail, ct.detailSize, ct.textW) * ct.detailSize * 1.55 +
+              ct.detailSize * 0.8,
           ),
         0,
       );
       return L.bandPadY * 2 + Math.max(L.titleRowSize * 1.6, left, right);
     };
     const wanted = config.sessions.map(height);
+    needs = wanted;
     const gaps = L.bandGap * Math.max(0, wanted.length - 1);
     const available = Math.max(20, listBottom - rowsTop - gaps);
     // Scale to the sheet: shrink proportionally when the day overruns, and share
@@ -1994,6 +2063,7 @@ export function agendaBlocks(config: AgendaConfig) {
     rowsTop,
     rowH,
     rows,
+    needs,
     rowsBottom,
     listBottom,
     footerBand,
@@ -2026,7 +2096,17 @@ export function agendaDays(config: AgendaConfig): AgendaDay[] {
 export function agendaCapacity(config: AgendaConfig): number {
   const probe = agendaBlocks({ ...config, sessions: config.sessions.slice(0, 1) });
   const band = Math.max(AGENDA_MIN_ROW_MM, probe.listBottom - probe.rowsTop);
-  return Math.max(1, Math.floor(band / AGENDA_MIN_ROW_MM));
+  const plain = Math.max(1, Math.floor(band / AGENDA_MIN_ROW_MM));
+  // Programme bands are copy-driven: a slot carrying four parallel cards with
+  // their own time, speaker and notes needs far more height than a plain ruled
+  // row. Page on the real measured need so no card is squeezed to the floor.
+  const full = agendaBlocks(config);
+  const needs = full.needs;
+  if (!needs.length) return plain;
+  const gap = full.layout.bandGap;
+  const tallest = Math.max(...needs);
+  const byNeed = Math.max(1, Math.floor((band + gap) / (tallest + gap)));
+  return Math.max(1, Math.min(plain, byNeed));
 }
 
 /** Rows placed on each page: the operator's setting, or an automatic fill. */

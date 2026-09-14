@@ -52,6 +52,8 @@ import {
   agendaGeometry,
   agendaInk,
   agendaName,
+  agendaCardType,
+  agendaLongestWord,
   agendaParallels,
   agendaQrBackground,
   agendaQrForeground,
@@ -639,12 +641,20 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             height: mm(par.h),
             color: railColor,
           });
-          const pw = mm(par.w) - padX * 2 - mm(L.locSize * 1.4);
+          // Narrow cards use fitted type and tighter padding: at the band sizes
+          // three or four tracks wrapped to a character a line, or lost the copy
+          // entirely when padding and the pin left no column.
+          const ct = agendaCardType(L, par.w, row.parallels.length, agendaLongestWord(copy.title));
+          const cardPadX = mm(ct.padX);
+          const pw = mm(ct.textW);
           let py2 = py(par.y) - padY;
-          if ((copy.time ?? "").trim()) {
-            const ts = mm(L.timeSize);
-            page.drawText(copy.time!, {
-              x: px(par.x) + padX,
+          // A track with its own start time prints that; otherwise it inherits the
+          // slot's time, exactly as the board and PowerPoint do.
+          const cardTime = (copy.time ?? "").trim() || row.session.time.trim();
+          if (cardTime) {
+            const ts = mm(ct.timeSize);
+            page.drawText(cardTime, {
+              x: px(par.x) + cardPadX,
               y: py2 - ts,
               size: ts,
               font: bold,
@@ -652,10 +662,10 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             });
             py2 -= ts * 1.5;
           }
-          const size = mm(L.titleRowSize);
+          const size = mm(ct.titleSize);
           for (const line of wrapLines(bold, copy.title, size, pw)) {
             page.drawText(line, {
-              x: px(par.x) + padX,
+              x: px(par.x) + cardPadX,
               y: py2 - size,
               size,
               font: bold,
@@ -664,11 +674,11 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             py2 -= size * 1.5;
           }
           if ((copy.speaker ?? "").trim()) {
-            const ss = mm(L.detailSize);
+            const ss = mm(ct.detailSize);
             py2 -= ss * 0.4;
             for (const line of wrapLines(bold, copy.speaker!, ss, pw)) {
               page.drawText(line, {
-                x: px(par.x) + padX,
+                x: px(par.x) + cardPadX,
                 y: py2 - ss,
                 size: ss,
                 font: bold,
@@ -678,11 +688,11 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             }
           }
           if (copy.detail.trim()) {
-            const ds = mm(L.detailSize);
+            const ds = mm(ct.detailSize);
             py2 -= ds * 0.5;
             for (const line of wrapLines(regular, copy.detail, ds, pw)) {
               page.drawText(line, {
-                x: px(par.x) + padX,
+                x: px(par.x) + cardPadX,
                 y: py2 - ds,
                 size: ds,
                 font: regular,
@@ -691,13 +701,15 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
               py2 -= ds * 1.55;
             }
           }
-          const pinH = mm(L.locSize * 1.5);
-          page.drawSvgPath(AGENDA_PIN_PATH, {
-            x: px(par.x + par.w) - padX - pinH * 0.72,
-            y: py(par.y + par.h) + padY + pinH,
-            scale: pinH / 25,
-            color: rgb(...hexRgb(BAND.pin)),
-          });
+          if (ct.pinW > 0) {
+            const pinH = mm(L.locSize * 1.5);
+            page.drawSvgPath(AGENDA_PIN_PATH, {
+              x: px(par.x + par.w) - cardPadX - pinH * 0.72,
+              y: py(par.y + par.h) + padY + pinH,
+              scale: pinH / 25,
+              color: rgb(...hexRgb(BAND.pin)),
+            });
+          }
         });
       });
       endLayer(page);
