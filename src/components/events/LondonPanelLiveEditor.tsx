@@ -88,6 +88,8 @@ import {
   setLondonLogoPlacement,
   useLondonLogoPlacements,
 } from "@/lib/next-london-logo-placement";
+import { cmykShort } from "@/lib/next-london-cmyk";
+import { londonPanelCmykStatus } from "@/lib/next-london-cmyk-signoff";
 import {
   applyLondonBoardSize,
   LONDON_BOARD_LIMITS,
@@ -100,11 +102,13 @@ import {
 const QR_DEFAULT_LINK = NEXT_LONDON_AGENDA_URL;
 
 /**
- * CMYK masters are hidden until every LONDON_STYLES stop has an approved build
- * in next-london-cmyk APPROVED and QA is colourspace-aware. The code stays so
- * the toggle can be switched back on once both land.
+ * CMYK masters are an explicit, operator-chosen output. The QA gate is now
+ * colourspace-aware (it proves the file really is DeviceCMYK and that the stops
+ * match the builds), and every colour without a signed-off brand build is
+ * labelled as a machine conversion awaiting printer sign-off — in the UI, in
+ * the filename and in the file's own metadata. Nothing converts silently.
  */
-const CMYK_ENABLED = false;
+const CMYK_ENABLED = true;
 
 function svgDataUrl(svg: string): string {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
@@ -217,6 +221,9 @@ export function LondonPanelLiveEditor({
     }),
     [colorSpace, placedArt, placement, wallConfigs, panel.id],
   );
+  // Honest colour status for the CMYK master: which ground stops carry a
+  // signed-off brand build and which are conversions awaiting printer approval.
+  const cmykStatus = useMemo(() => londonPanelCmykStatus(panel), [panel]);
   const faceReady = useLondonSignageFace();
   const svg = useMemo(
     () => (faceReady ? buildLondonPanelSvg(panel, art) : ""),
@@ -336,16 +343,16 @@ export function LondonPanelLiveEditor({
     let blob: Blob;
     if (kind === "svg") {
       const svg = buildLondonPanelSvg(panel, art);
-      gateOnQa(auditSvg(panel, svg));
+      gateOnQa(auditSvg(panel, svg, art));
       blob = new Blob([svg], { type: "image/svg+xml" });
     } else if (kind === "pdf") {
       // Print-ready: bleed sheet inside a marks margin, crop marks and boxes set.
       const pdf = await buildLondonPanelPrintPdfAsync(panel, art);
-      gateOnQa(auditPrintPdf(panel, pdf, LONDON_MARKS_MARGIN_MM));
+      gateOnQa(auditPrintPdf(panel, pdf, LONDON_MARKS_MARGIN_MM, art));
       blob = new Blob([londonAiBytes(pdf)], { type: "application/pdf" });
     } else {
       const ai = await buildLondonPanelAiAsync(panel, art);
-      gateOnQa(auditAi(panel, ai));
+      gateOnQa(auditAi(panel, ai, art));
       blob = new Blob([londonAiBytes(ai)], { type: "application/illustrator" });
     }
     const url = URL.createObjectURL(blob);
@@ -1336,6 +1343,25 @@ export function LondonPanelLiveEditor({
                 </button>
               ))
             : null}
+          {CMYK_ENABLED && colorSpace === "cmyk" ? (
+            <span
+              className={`rounded-full border px-3 py-1 text-[11px] ${
+                cmykStatus.converted === 0
+                  ? "border-border text-muted-foreground"
+                  : "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+              }`}
+              title={cmykStatus.stops
+                .map(
+                  (s) =>
+                    `${s.hex.toUpperCase()} → ${cmykShort(s.build)} · ${s.build.approved ? "approved build" : "conversion, needs sign-off"}`,
+                )
+                .join("\n")}
+            >
+              {cmykStatus.converted === 0
+                ? `All ${cmykStatus.total} print colours approved`
+                : `${cmykStatus.converted} of ${cmykStatus.total} print colours need printer sign-off`}
+            </span>
+          ) : null}
           <Button
             variant="outline"
             size="sm"

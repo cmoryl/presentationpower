@@ -201,3 +201,11 @@ it does not; grounds where nothing reads are named and surfaced in the editor.
 **Would change if:** an approved scrim treatment is signed off for the six
 flagged gradients, which would let them carry the dark face.
 **Applies to:** every city agenda board, all four export paths.
+
+### 2026-09 — CMYK signage masters ship as a labelled, opt-in pack
+**Area:** Print colour management (London / all NEXT venues)
+**Options tested:** (a) convert every signage master to CMYK and ship CMYK as the default; (b) stay RGB-only and refuse CMYK; (c) ship a parallel CMYK pack where every colour build is labelled approved-brand-build or machine-conversion, with a printer sign-off sheet.
+**Chosen:** (c). `scripts/export-london-cmyk-pack.ts` builds one DeviceCMYK `.ai` plus a marks-bearing print PDF per panel (154 panels, 308 files), audited by `london-signage-qa` in CMYK mode. `printer-colour-sign-off.csv` lists all 57 distinct print colours: 3 approved brand builds, 54 machine conversions awaiting sign-off.
+**Why:** Brand colour is never silently converted, but printers do ask for CMYK. Labelling makes the risk explicit instead of hiding it, and the ledger doubles as the approval sheet.
+**Would change if:** the print house signs off the remaining 54 builds — then those move into `APPROVED` in `next-london-cmyk.ts` and the sign-off warning disappears on its own.
+**Applies to:** any venue reusing the London sign families; supplied vendor/venue masters are still handed on untouched in their own colour space.
