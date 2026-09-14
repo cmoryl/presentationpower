@@ -64,6 +64,7 @@ import {
   agendaTitleInk,
   AGENDA_BAND,
   agendaBandPalette,
+  roundedRectPath,
   type AgendaConfig,
 } from "./next-agenda";
 import { agendaCopyInk } from "./next-agenda-contrast";
@@ -564,25 +565,41 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       const padX = mm(L.bandPadX);
       const padY = mm(L.bandPadY);
       const timeW = mm(L.timeColW);
+      const radius = mm(BAND.radius * L.k);
+      /**
+       * A band as a curved plate at the treatment's alpha, so the ground reads
+       * through it. drawSvgPath measures y downward from the given origin, which
+       * is the band's top edge.
+       */
+      const plate = (
+        x: number,
+        top: number,
+        w: number,
+        h: number,
+        color: ReturnType<typeof rgb>,
+        opacity: number,
+      ) =>
+        page.drawSvgPath(roundedRectPath(w, h, radius), {
+          x,
+          y: top,
+          color,
+          opacity,
+          borderWidth: 0,
+        });
       blocks.rows.forEach((row, i) => {
         const band = row.band;
         if (!band) return;
-        page.drawRectangle({
-          x: px(band.x),
-          y: py(band.y) - mm(band.h),
-          width: mm(band.w),
-          height: mm(band.h),
-          color: rgb(...hexRgb(i % 2 === 0 ? BAND.fillA : BAND.fillB)),
-        });
-        // Time rail: a Blue 500 edge down the band, the mark that makes the
-        // programme read as a built board rather than a tinted block.
-        page.drawRectangle({
-          x: px(band.x),
-          y: py(band.y) - mm(band.h),
-          width: railW,
-          height: mm(band.h),
-          color: railColor,
-        });
+        // Time rail first as a full curved plate, then the fill inset from the
+        // left: the rail keeps the band's own curve instead of squaring a corner.
+        plate(px(band.x), py(band.y), mm(band.w), mm(band.h), railColor, BAND.fillAlpha);
+        plate(
+          px(band.x) + railW,
+          py(band.y),
+          mm(band.w) - railW,
+          mm(band.h),
+          rgb(...hexRgb(i % 2 === 0 ? BAND.fillA : BAND.fillB)),
+          BAND.fillAlpha,
+        );
         const bodyX = px(band.x) + padX + timeW;
         const bodyW = mm(band.w) - padX * 2 - timeW;
         let y = py(band.y) - padY;
@@ -628,20 +645,15 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
         row.parallels.forEach((par, pi) => {
           const copy = parCopy[pi];
           if (!copy) return;
-          page.drawRectangle({
-            x: px(par.x),
-            y: py(par.y) - mm(par.h),
-            width: mm(par.w),
-            height: mm(par.h),
-            color: rgb(...hexRgb(BAND.parallel)),
-          });
-          page.drawRectangle({
-            x: px(par.x),
-            y: py(par.y) - mm(par.h),
-            width: railW,
-            height: mm(par.h),
-            color: railColor,
-          });
+          plate(px(par.x), py(par.y), mm(par.w), mm(par.h), railColor, BAND.parallelAlpha);
+          plate(
+            px(par.x) + railW,
+            py(par.y),
+            mm(par.w) - railW,
+            mm(par.h),
+            rgb(...hexRgb(BAND.parallel)),
+            BAND.parallelAlpha,
+          );
           // Narrow cards use fitted type and tighter padding: at the band sizes
           // three or four tracks wrapped to a character a line, or lost the copy
           // entirely when padding and the pin left no column.

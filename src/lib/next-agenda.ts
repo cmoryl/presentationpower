@@ -365,6 +365,17 @@ export type AgendaBandPalette = {
   rail: string;
   /** Rail width in millimetres at A2, scaled with the sheet by the caller. */
   railW: number;
+  /**
+   * Band fill alpha. The bands sit ON the gradient rather than hiding it, so the
+   * ground reads faintly through them. Held high enough that the composited fill
+   * still clears WCAG AA against the band ink on every approved ground — see
+   * `agenda-band-treatments.test.ts`.
+   */
+  fillAlpha: number;
+  /** Parallel-session card alpha. */
+  parallelAlpha: number;
+  /** Corner radius in millimetres at A2, scaled with the sheet by the caller. */
+  radius: number;
   pin: string;
   footerBand: string;
   footerInk: string;
@@ -387,6 +398,8 @@ export function agendaBandPalette(config: { bandTreatment?: string }): AgendaBan
     footerBand: AGENDA_BAND.footerBand,
     footerInk: AGENDA_BAND.footerInk,
     railW: 1.8,
+    // Softly curved band edges, ~2.6 mm at A2 — the house card radius, not a pill.
+    radius: 2.6,
   };
   switch (agendaBandTreatment(config)) {
     case "lavender":
@@ -396,6 +409,8 @@ export function agendaBandPalette(config: { bandTreatment?: string }): AgendaBan
         fillB: AGENDA_BAND.fillB,
         ink: AGENDA_BAND.ink,
         rail: AGENDA_BAND.footerBand,
+        fillAlpha: 0.9,
+        parallelAlpha: 0.9,
       };
     case "ink":
       return {
@@ -404,6 +419,9 @@ export function agendaBandPalette(config: { bandTreatment?: string }): AgendaBan
         fillB: "#003FC7",
         ink: "#FFFFFF",
         rail: AGENDA_BAND.parallel,
+        // Dark bands carry white copy, so they hold a little more body.
+        fillAlpha: 0.92,
+        parallelAlpha: 0.92,
       };
     default:
       return {
@@ -412,8 +430,48 @@ export function agendaBandPalette(config: { bandTreatment?: string }): AgendaBan
         fillB: "#E0E8F5",
         ink: AGENDA_BAND.ink,
         rail: AGENDA_BAND.footerBand,
+        fillAlpha: 0.9,
+        parallelAlpha: 0.9,
       };
   }
+}
+
+/**
+ * Composite a band fill over the ground it sits on. Used directly by Word, which
+ * cannot carry a translucent table shading, and by the legibility sweep, which
+ * has to judge the copy against what actually prints.
+ */
+export function agendaBandComposite(fill: string, alpha: number, ground: string): string {
+  const rgb = (hex: string) => {
+    const h = hex.replace("#", "");
+    const n = parseInt(h.length === 3 ? h.replace(/./g, (c) => c + c) : h, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255] as const;
+  };
+  const f = rgb(fill);
+  const g = rgb(ground);
+  const a = Math.min(1, Math.max(0, alpha));
+  const mix = f.map((c, i) => Math.round(c * a + g[i]! * (1 - a)));
+  return `#${mix.map((c) => c.toString(16).padStart(2, "0")).join("").toUpperCase()}`;
+}
+
+/**
+ * Rounded-rectangle SVG path in the PDF's own coordinate space (y grows down from
+ * the given origin), so a press band carries the same curved edge as the preview.
+ */
+export function roundedRectPath(w: number, h: number, r: number): string {
+  const rad = Math.max(0, Math.min(r, w / 2, h / 2));
+  return [
+    `M ${rad} 0`,
+    `H ${w - rad}`,
+    `A ${rad} ${rad} 0 0 1 ${w} ${rad}`,
+    `V ${h - rad}`,
+    `A ${rad} ${rad} 0 0 1 ${w - rad} ${h}`,
+    `H ${rad}`,
+    `A ${rad} ${rad} 0 0 1 0 ${h - rad}`,
+    `V ${rad}`,
+    `A ${rad} ${rad} 0 0 1 ${rad} 0`,
+    "Z",
+  ].join(" ");
 }
 
 // ── content ──────────────────────────────────────────────────────────────────
