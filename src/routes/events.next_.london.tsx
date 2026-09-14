@@ -528,6 +528,10 @@ function LondonSignagePage() {
   );
   const [editing, setEditing] = useState(false);
   const [ppi, setPpi] = useState<number>(72);
+  // Colour mode for the asset downloads in this drawer and for the whole-kit
+  // ZIP. RGB stays the default (the RIP separates in-house); CMYK hands over a
+  // press master, named `-cmyk` so the two are never confused on a hot folder.
+  const [exportSpace, setExportSpace] = useState<LondonColorSpace>("rgb");
   const [qa, setQa] = useState<LondonQaReport[] | null>(null);
 
   useEffect(() => {
