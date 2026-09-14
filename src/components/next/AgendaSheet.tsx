@@ -15,6 +15,7 @@ import {
   agendaTitleInk,
   type AgendaConfig,
 } from "@/lib/next-agenda";
+import { agendaCopyInk } from "@/lib/next-agenda-contrast";
 import { buildPillarQr } from "@/lib/pillar-qr";
 
 type Props = {
@@ -41,8 +42,10 @@ export function AgendaSheet({
   const blocks = agendaBlocks(config);
   const L = blocks.layout;
   const face = config.face ?? "dark";
-  const ink = agendaInk(face);
-  const titleInk = agendaTitleInk(config);
+  // Legibility guard: keeps the approved face ink unless it stops reading on
+  // this ground, so a board is never printed in copy no one can see.
+  const ink = agendaCopyInk(config).hex;
+  const titleInk = (config.titleColor || "").trim() ? agendaTitleInk(config) : ink;
   const division = agendaDivision(config.divisionId);
   const stops = agendaStops(config.styleId, face, config.divisionId);
   const isHalo = config.styleId.includes("halo");
