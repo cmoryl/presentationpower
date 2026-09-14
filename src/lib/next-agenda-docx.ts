@@ -18,6 +18,7 @@ import JSZip from "jszip";
 import {
   agendaTextLines,
   AGENDA_BAND,
+  agendaBandPalette,
   agendaBlocks,
   agendaDivision,
   agendaLockupUrl,
@@ -206,13 +207,26 @@ function cell(
   widthTwips: number,
   content: string,
   padTwips = 0,
-  opts: { fill?: string; span?: number; vAlign?: "top" | "center" } = {},
+  opts: {
+    fill?: string;
+    span?: number;
+    vAlign?: "top" | "center";
+    /** Colour of the time rail drawn down the left edge of the cell. */
+    rail?: string;
+    railW?: number;
+  } = {},
 ): string {
   return [
     "<w:tc><w:tcPr>",
     `<w:tcW w:w="${Math.round(widthTwips)}" w:type="dxa"/>`,
     opts.span && opts.span > 1 ? `<w:gridSpan w:val="${opts.span}"/>` : "",
     opts.fill ? `<w:shd w:val="clear" w:color="auto" w:fill="${hex(opts.fill)}"/>` : "",
+    opts.rail
+      ? `<w:tcBorders><w:left w:val="single" w:sz="${Math.max(
+          4,
+          Math.round((opts.railW ?? 1.8) * 8),
+        )}" w:space="0" w:color="${hex(opts.rail)}"/></w:tcBorders>`
+      : "",
     `<w:tcMar><w:top w:w="${Math.round(padTwips)}" w:type="dxa"/><w:bottom w:w="${Math.round(
       padTwips,
     )}" w:type="dxa"/><w:left w:w="${Math.round(
@@ -421,20 +435,22 @@ export async function buildAgendaDocx(
     const cardRows = (cfg.sessions ?? [])
       .map((session, i) => {
         const muted = session.muted;
-        const bandInk = hex(AGENDA_BAND.ink);
-        const fill = i % 2 === 0 ? AGENDA_BAND.fillA : AGENDA_BAND.fillB;
-        const copy = (title: string, detail: string) =>
+        const BAND = agendaBandPalette(cfg);
+        const bandInk = hex(BAND.ink);
+        const parInk = hex(BAND.parallelInk);
+        const fill = i % 2 === 0 ? BAND.fillA : BAND.fillB;
+        const copy = (title: string, detail: string, copyInk = bandInk) =>
           [
             para(
               run(title, {
                 size: halfPt(PL.titleRowSize),
-                color: bandInk,
+                color: copyInk,
                 bold: !muted,
               }),
               { afterTwips: 0, lineTwips: mmT(PL.titleRowSize * 1.4) },
             ),
             detail.trim()
-              ? para(run(detail, { size: halfPt(PL.detailSize), color: bandInk }), {
+              ? para(run(detail, { size: halfPt(PL.detailSize), color: copyInk }), {
                   beforeTwips: mmT(PL.detailSize * 0.35),
                   afterTwips: 0,
                   lineTwips: mmT(PL.detailSize * 1.4),
@@ -453,7 +469,7 @@ export async function buildAgendaDocx(
               lineTwips: mmT(PL.timeSize * 1.4),
             }),
             rowPad,
-            { fill, vAlign: "top" },
+            { fill, vAlign: "top", rail: BAND.rail, railW: BAND.railW * PL.k },
           ),
           parallel
             ? cell(cardBodyW, copy(session.title ?? "", session.detail ?? ""), rowPad, {
@@ -468,9 +484,14 @@ export async function buildAgendaDocx(
           parallel
             ? cell(
                 cardParallelW,
-                copy(parallel.title ?? "", parallel.detail ?? ""),
+                copy(parallel.title ?? "", parallel.detail ?? "", parInk),
                 rowPad,
-                { fill: AGENDA_BAND.parallel, vAlign: "top" },
+                {
+                  fill: BAND.parallel,
+                  vAlign: "top",
+                  rail: BAND.rail,
+                  railW: BAND.railW * PL.k,
+                },
               )
             : "",
           "</w:tr>",

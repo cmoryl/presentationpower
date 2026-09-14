@@ -59,6 +59,7 @@ import {
   agendaStops,
   agendaTitleInk,
   AGENDA_BAND,
+  agendaBandPalette,
   type AgendaConfig,
 } from "./next-agenda";
 import { agendaCopyInk } from "./next-agenda-contrast";
@@ -516,7 +517,11 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
     if (L.card) {
       // Programme bands: a pale plate per session, an aqua plate for a parallel
       // track, and the same copy geometry the preview measured.
-      const bandInk = rgb(...hexRgb(AGENDA_BAND.ink));
+      const BAND = agendaBandPalette(config);
+      const bandInk = rgb(...hexRgb(BAND.ink));
+      const parInk = rgb(...hexRgb(BAND.parallelInk));
+      const railColor = rgb(...hexRgb(BAND.rail));
+      const railW = mm(BAND.railW * L.k);
       const padX = mm(L.bandPadX);
       const padY = mm(L.bandPadY);
       const timeW = mm(L.timeColW);
@@ -528,7 +533,16 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
           y: py(band.y) - mm(band.h),
           width: mm(band.w),
           height: mm(band.h),
-          color: rgb(...hexRgb(i % 2 === 0 ? AGENDA_BAND.fillA : AGENDA_BAND.fillB)),
+          color: rgb(...hexRgb(i % 2 === 0 ? BAND.fillA : BAND.fillB)),
+        });
+        // Time rail: a Blue 500 edge down the band, the mark that makes the
+        // programme read as a built board rather than a tinted block.
+        page.drawRectangle({
+          x: px(band.x),
+          y: py(band.y) - mm(band.h),
+          width: railW,
+          height: mm(band.h),
+          color: railColor,
         });
         const bodyX = px(band.x) + padX + timeW;
         const bodyW = mm(band.w) - padX * 2 - timeW;
@@ -577,7 +591,14 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             y: py(par.y) - mm(par.h),
             width: mm(par.w),
             height: mm(par.h),
-            color: rgb(...hexRgb(AGENDA_BAND.parallel)),
+            color: rgb(...hexRgb(BAND.parallel)),
+          });
+          page.drawRectangle({
+            x: px(par.x),
+            y: py(par.y) - mm(par.h),
+            width: railW,
+            height: mm(par.h),
+            color: railColor,
           });
           const pw = mm(par.w) - padX * 2 - mm(L.locSize * 1.4);
           let py2 = py(par.y) - padY;
@@ -588,7 +609,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
               y: py2 - size,
               size,
               font: bold,
-              color: bandInk,
+              color: parInk,
             });
             py2 -= size * 1.5;
           }
@@ -601,7 +622,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
                 y: py2 - ds,
                 size: ds,
                 font: regular,
-                color: bandInk,
+                color: parInk,
               });
               py2 -= ds * 1.55;
             }
@@ -611,7 +632,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             x: px(par.x + par.w) - padX - pinH * 0.72,
             y: py(par.y + par.h) + padY + pinH,
             scale: pinH / 25,
-            color: rgb(...hexRgb(AGENDA_BAND.pin)),
+            color: rgb(...hexRgb(BAND.pin)),
           });
         }
       });

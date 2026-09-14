@@ -65,10 +65,13 @@ import {
   agendaGeometry,
   agendaName,
   AGENDA_ROW_STYLES,
+  AGENDA_BAND_TREATMENTS,
+  agendaBandTreatment,
   agendaProgramme,
   agendaProgrammeIsStock,
   agendaRowStyle,
   type AgendaRowStyleId,
+  type AgendaBandTreatmentId,
   agendaSlug,
   agendaStyleLabel,
   normalizeAgendaConfig,
@@ -677,6 +680,28 @@ export function AgendaStudio({
 
           {agendaRowStyle(config) === "card" ? (
             <>
+              <div className="space-y-2">
+                <Label htmlFor="agenda-band-treatment">Band treatment</Label>
+                <select
+                  id="agenda-band-treatment"
+                  className={selectClass}
+                  value={agendaBandTreatment(config)}
+                  onChange={(e) =>
+                    set("bandTreatment", e.target.value as AgendaBandTreatmentId)
+                  }
+                >
+                  {AGENDA_BAND_TREATMENTS.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground">
+                  {AGENDA_BAND_TREATMENTS.find((t) => t.id === agendaBandTreatment(config))?.note ??
+                    ""}
+                </p>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="agenda-location">Room · floor line</Label>
                 <Input

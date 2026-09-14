@@ -319,6 +319,103 @@ export function agendaRowStyle(config: { rowStyle?: string }): AgendaRowStyleId 
   return config.rowStyle === "card" ? "card" : "rule";
 }
 
+// ── band treatment ───────────────────────────────────────────────────────────
+//
+// How solid the programme bands sit on the gradient, and what marks them. Every
+// treatment is built from approved TransPerfect values, carries a Blue 500 time
+// rail down the left edge of each band, and pairs a fill with the one ink that
+// clears WCAG AA on it — so a treatment can never make the programme unreadable.
+
+export type AgendaBandTreatmentId = "solid" | "lavender" | "ink";
+
+export const AGENDA_BAND_TREATMENTS: {
+  id: AgendaBandTreatmentId;
+  name: string;
+  note: string;
+}[] = [
+  {
+    id: "solid",
+    name: "Solid · white & blue white",
+    note: "Fully opaque white and Blue White bands with a Blue 500 time rail. The clearest read on any gradient.",
+  },
+  {
+    id: "lavender",
+    name: "Lavender · issued board",
+    note: "White and Lavender bands, as first issued for the GlobalLink programme.",
+  },
+  {
+    id: "ink",
+    name: "Ink · Blue 800 & Blue 500",
+    note: "Solid brand blues with white copy and an Aqua rail. Strongest presence on a light gradient.",
+  },
+];
+
+export type AgendaBandPalette = {
+  /** Band fill for odd sessions (first, third, …). */
+  fillA: string;
+  /** Band fill for even sessions. */
+  fillB: string;
+  /** Copy on a band fill. */
+  ink: string;
+  /** Fill of the parallel-session card. */
+  parallel: string;
+  /** Copy on the parallel-session card. */
+  parallelInk: string;
+  /** Vertical rail down the left edge of every band. */
+  rail: string;
+  /** Rail width in millimetres at A2, scaled with the sheet by the caller. */
+  railW: number;
+  pin: string;
+  footerBand: string;
+  footerInk: string;
+};
+
+export function agendaBandTreatment(config: {
+  bandTreatment?: string;
+}): AgendaBandTreatmentId {
+  return AGENDA_BAND_TREATMENTS.some((t) => t.id === config.bandTreatment)
+    ? (config.bandTreatment as AgendaBandTreatmentId)
+    : "solid";
+}
+
+/** Resolved band colours for a board. Never returns an unapproved value. */
+export function agendaBandPalette(config: { bandTreatment?: string }): AgendaBandPalette {
+  const base = {
+    parallel: AGENDA_BAND.parallel,
+    parallelInk: AGENDA_BAND.ink,
+    pin: AGENDA_BAND.pin,
+    footerBand: AGENDA_BAND.footerBand,
+    footerInk: AGENDA_BAND.footerInk,
+    railW: 1.8,
+  };
+  switch (agendaBandTreatment(config)) {
+    case "lavender":
+      return {
+        ...base,
+        fillA: AGENDA_BAND.fillA,
+        fillB: AGENDA_BAND.fillB,
+        ink: AGENDA_BAND.ink,
+        rail: AGENDA_BAND.footerBand,
+      };
+    case "ink":
+      return {
+        ...base,
+        fillA: "#03002C",
+        fillB: "#003FC7",
+        ink: "#FFFFFF",
+        rail: AGENDA_BAND.parallel,
+      };
+    default:
+      return {
+        ...base,
+        fillA: AGENDA_BAND.fillA,
+        fillB: "#E0E8F5",
+        ink: AGENDA_BAND.ink,
+        rail: AGENDA_BAND.footerBand,
+      };
+  }
+}
+
 // ── content ──────────────────────────────────────────────────────────────────
 
 /** A session running in parallel with the row it sits on, in another room. */
@@ -368,6 +465,8 @@ export type AgendaConfig = {
   titleColor: string;
   /** Programme look: ruled list or pale programme bands. */
   rowStyle: AgendaRowStyleId;
+  /** How solid the programme bands sit on the gradient. */
+  bandTreatment: AgendaBandTreatmentId;
   /** Room / floor line printed with a pin beside the lockup. Empty = none. */
   locationLine: string;
   sessions: AgendaSession[];
@@ -523,6 +622,7 @@ type DivisionProgramme = {
   days?: AgendaDay[];
   /** Look, header pin line and footer lines this division opens on. */
   rowStyle?: AgendaRowStyleId;
+  bandTreatment?: AgendaBandTreatmentId;
   eyebrow?: string;
   locationLine?: string;
   footnote?: string;
@@ -1115,6 +1215,7 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
     meta: programme.meta,
     titleColor: "",
     rowStyle: programme.rowStyle ?? "rule",
+    bandTreatment: programme.bandTreatment ?? "solid",
     locationLine: programme.locationLine ?? "",
     sessions: programme.sessions.map((s) => ({ ...s })),
     footnote: programme.footnote ?? "Programme subject to change · full agenda and speaker bios online",
@@ -1155,6 +1256,7 @@ export function withAgendaDivision(config: AgendaConfig, divisionId: string): Ag
       sessions: fresh.sessions,
       days: fresh.days,
       rowStyle: fresh.rowStyle,
+      bandTreatment: fresh.bandTreatment,
       eyebrow: fresh.eyebrow,
       title: fresh.title,
       locationLine: fresh.locationLine,
@@ -1483,6 +1585,9 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
     meta: str(raw.meta, base.meta),
     titleColor: str(raw.titleColor, ""),
     rowStyle: raw.rowStyle === "card" ? "card" : raw.rowStyle === "rule" ? "rule" : base.rowStyle,
+    bandTreatment: AGENDA_BAND_TREATMENTS.some((t) => t.id === raw.bandTreatment)
+      ? (raw.bandTreatment as AgendaBandTreatmentId)
+      : base.bandTreatment,
     locationLine: str(raw.locationLine, base.locationLine),
     sessions: sessions.length ? sessions : base.sessions,
     footnote: str(raw.footnote, base.footnote),
