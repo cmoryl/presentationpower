@@ -116,12 +116,57 @@ export type LegalRefreshDirection = {
     note: string;
     /** CSS object-position for the crop, so copy always lands on clear space. */
     focus: string;
+    /** Crop for the square trim, where the clear space moves. */
+    focusSquare?: string;
     /** Ground-coloured scrim opacity behind the copy column (0–1). */
     scrim: number;
     /** Ink colour to use when the photograph is behind the copy. */
     ink: string;
   };
+  /**
+   * How this direction guarantees its copy is readable over artwork. Every
+   * direction declares one — nothing is ever set straight onto picture detail
+   * and left to luck.
+   *   curtain — a deep directional gradient of the ground colour holding one
+   *             edge of the frame, so the copy column is effectively solid.
+   *   plate   — a floating panel of the ground colour that the copy sits inside.
+   *   panel   — the layout already owns a solid area (band, split, plate).
+   */
+  copyBacking: "curtain" | "plate" | "panel";
 };
+
+/**
+ * How the artwork is graded so it reads as the centrepiece rather than as
+ * wallpaper behind type: contrast and saturation lift, a corner vignette that
+ * pulls the eye to the subject, and a soft highlight bloom. No colour is laid
+ * over the picture — the brief forbids a blue wash and this keeps to it.
+ */
+export type LegalRefreshGrade = {
+  contrast: number;
+  saturate: number;
+  brightness: number;
+  /** Corner darkening strength, 0–1. */
+  vignette: number;
+  /** Highlight bloom strength, 0–1. */
+  bloom: number;
+};
+
+export function legalRefreshGrade(mode: LegalRefreshRenderMode): LegalRefreshGrade {
+  switch (mode) {
+    case "cinematic":
+      return { contrast: 1.24, saturate: 1.04, brightness: 0.95, vignette: 0.55, bloom: 0.16 };
+    case "ink":
+      return { contrast: 1.06, saturate: 1.02, brightness: 1.03, vignette: 0.16, bloom: 0.04 };
+    case "riso":
+      return { contrast: 1.14, saturate: 1.12, brightness: 1.01, vignette: 0.18, bloom: 0 };
+    case "collage":
+      return { contrast: 1.08, saturate: 1.08, brightness: 1.02, vignette: 0.2, bloom: 0.05 };
+    case "drawn":
+      return { contrast: 1, saturate: 1, brightness: 1, vignette: 0, bloom: 0 };
+    default:
+      return { contrast: 1.12, saturate: 1.1, brightness: 1.01, vignette: 0.36, bloom: 0.1 };
+  }
+}
 
 /**
  * Four look-and-feel directions. Deliberately different registers so the
@@ -150,10 +195,12 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineCase: "sentence",
     photo: {
       note: "Golden hour in an ordinary back garden: a woman in gardening gloves calmly trims back a huge overgrown bramble hedge with hand shears. Normal chore, absurd tangle. Left half is empty sunlit lawn and haze for copy.",
-      focus: "70% 55%",
-      scrim: 0.42,
+      focus: "72% 55%",
+      focusSquare: "68% 62%",
+      scrim: 0.72,
       ink: "#03002C",
     },
+    copyBacking: "curtain",
   },
   {
     id: "redacted",
@@ -177,10 +224,12 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineCase: "caps",
     photo: {
       note: "Family living room at night: a man in pyjamas sits opening and sorting letters into neat piles while the room lies knee-deep in unopened post, cat on top. Left edge falls to near black for copy.",
-      focus: "74% 55%",
-      scrim: 0.3,
+      focus: "58% 55%",
+      focusSquare: "62% 58%",
+      scrim: 0.62,
       ink: "#FFFFFF",
     },
+    copyBacking: "curtain",
   },
   {
     id: "the-knot",
@@ -204,10 +253,12 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineCase: "sentence",
     photo: {
       note: "Domestic garage: two neighbours in hoodies crouch patiently untangling a garden hose the size of an armchair, one neat coil already done beside them. Empty pale block wall above as copy space.",
-      focus: "50% 72%",
+      focus: "50% 92%",
+      focusSquare: "50% 96%",
       scrim: 0.3,
       ink: "#03002C",
     },
+    copyBacking: "panel",
   },
   {
     id: "thicket-type",
@@ -231,10 +282,12 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineCase: "sentence",
     photo: {
       note: "Foggy residential street on moving day: a man in a coat carries one box to the kerb past an endless line of stacked boxes and bin bags. Left half is luminous empty fog for copy.",
-      focus: "72% 55%",
-      scrim: 0.24,
+      focus: "62% 55%",
+      focusSquare: "58% 55%",
+      scrim: 0.3,
       ink: "#03002C",
     },
+    copyBacking: "plate",
   },
   {
     id: "paper-trail",
@@ -257,10 +310,12 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineCase: "sentence",
     photo: {
       note: "Plain office corridor: a woman in a cardigan walks calmly holding the end of an absurdly long till receipt that trails the whole length of the hallway behind her. Right side is empty pale wall.",
-      focus: "34% 50%",
+      focus: "18% 50%",
+      focusSquare: "30% 70%",
       scrim: 0.2,
       ink: "#03002C",
     },
+    copyBacking: "panel",
   },
   {
     id: "cut-through",
@@ -283,10 +338,12 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineCase: "caps",
     photo: {
       note: "Dim warehouse: a man in overalls calmly cuts into a giant ball of tangled packing tape with a small craft knife, one clean straight cut already opened. Hard single light, dark empty space above.",
-      focus: "56% 60%",
-      scrim: 0.34,
+      focus: "50% 30%",
+      focusSquare: "50% 28%",
+      scrim: 0.55,
       ink: "#FFFFFF",
     },
+    copyBacking: "curtain",
   },
   {
     id: "fine-print",
@@ -309,10 +366,12 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineCase: "sentence",
     photo: {
       note: "Bright kitchen: a woman reads one page while the rest of the document unspools off the table, across the floor and out of the open back door. High-key daylight, blank white wall upper left.",
-      focus: "62% 44%",
-      scrim: 0.3,
+      focus: "66% 40%",
+      focusSquare: "72% 45%",
+      scrim: 0.6,
       ink: "#03002C",
     },
+    copyBacking: "curtain",
   },
   {
     id: "the-maze",
@@ -335,10 +394,12 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     headlineCase: "sentence",
     photo: {
       note: "Elevated view of a tall hedge maze in a park: one man in a raincoat walks a path with a takeaway coffee, entirely unbothered. Soft overcast light, empty lawn in the lower left.",
-      focus: "62% 40%",
-      scrim: 0,
+      focus: "62% 35%",
+      focusSquare: "70% 35%",
+      scrim: 0.0,
       ink: "#03002C",
     },
+    copyBacking: "panel",
   },
 ];
 

@@ -18,20 +18,22 @@ import { getDivisionLogos } from "@/lib/division-logos";
 import {
   LEGAL_REFRESH_CONCEPT,
   legalRefreshFinish,
+  legalRefreshGrade,
   legalRefreshModeIsDark,
   legalRefreshModeUsesPhoto,
   type LegalRefreshFinish,
+  type LegalRefreshGrade,
   type LegalRefreshDirection,
   type LegalRefreshRenderMode,
 } from "@/lib/social-legal-refresh";
-import photoThorn from "@/assets/legal-refresh/v2-thorn-line.jpg";
-import photoRedacted from "@/assets/legal-refresh/v2-redacted.jpg";
-import photoKnot from "@/assets/legal-refresh/v2-the-knot.jpg";
-import photoThicket from "@/assets/legal-refresh/v2-thicket-type.jpg";
-import photoTrail from "@/assets/legal-refresh/v2-paper-trail.jpg";
-import photoCut from "@/assets/legal-refresh/v2-cut-through.jpg";
-import photoFine from "@/assets/legal-refresh/v2-fine-print.jpg";
-import photoMaze from "@/assets/legal-refresh/v2-the-maze.jpg";
+import photoThorn from "@/assets/legal-refresh/v3-thorn-line.jpg";
+import photoRedacted from "@/assets/legal-refresh/v3-redacted.jpg";
+import photoKnot from "@/assets/legal-refresh/v3-the-knot.jpg";
+import photoThicket from "@/assets/legal-refresh/v3-thicket-type.jpg";
+import photoTrail from "@/assets/legal-refresh/v3-paper-trail.jpg";
+import photoCut from "@/assets/legal-refresh/v3-cut-through.jpg";
+import photoFine from "@/assets/legal-refresh/v3-fine-print.jpg";
+import photoMaze from "@/assets/legal-refresh/v3-the-maze.jpg";
 import cineThorn from "@/assets/legal-refresh/cine-thorn-line.jpg";
 import cineRedacted from "@/assets/legal-refresh/cine-redacted.jpg";
 import cineKnot from "@/assets/legal-refresh/cine-the-knot.jpg";
@@ -172,7 +174,8 @@ export function LegalRefreshAd({ direction: d, w, h, mode = "photo", className }
     : (logos?.color ?? logos?.white ?? "");
   const mono = d.motif === "redaction" || d.motif === "trail" || d.motif === "fineprint";
 
-  const art = <Art d={d} photo={photo} square={square} uid={uid} finish={finish} />;
+  const grade = legalRefreshGrade(mode);
+  const art = <Art d={d} photo={photo} square={square} uid={uid} finish={finish} grade={grade} />;
   const shared = { d, px, ink, mono, lockup, square } as const;
 
   return (
@@ -314,15 +317,51 @@ function Lockup({ px, lockup, d, size = 40 }: Shared & { size?: number }) {
   );
 }
 
-/** Ground-toned scrim, shaped for where the copy sits. Never a blue wash. */
-function Scrim({
+/**
+ * A curtain of the ground colour holding one edge of the frame. This is not a
+ * light haze: the copy edge is effectively solid, so headline, support, CTA and
+ * lockup all sit on flat colour and the picture is left clean everywhere else.
+ * Ground-toned only — never a blue wash over photography.
+ */
+function Curtain({
   d,
   direction,
   strength,
+  hold = 26,
+  fade = 78,
 }: {
   d: LegalRefreshDirection;
   direction: string;
   strength: number;
+  /** How far the solid part of the curtain runs, in percent of the frame. */
+  hold?: number;
+  /** Where the curtain has fully cleared the picture. */
+  fade?: number;
+}) {
+  const g = d.palette.ground;
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: "absolute",
+        inset: 0,
+        zIndex: 1,
+        background: `linear-gradient(${direction}, ${g} 0%, ${g} ${hold}%, ${withAlpha(g, 0.82 * strength)} ${hold + (fade - hold) * 0.3}%, ${withAlpha(g, 0.42 * strength)} ${hold + (fade - hold) * 0.62}%, transparent ${fade}%)`,
+        opacity: Math.min(1, 0.55 + strength * 0.45),
+      }}
+    />
+  );
+}
+
+/** A short curtain along one edge purely so a lockup or eyebrow stays legible. */
+function EdgeHold({
+  d,
+  direction,
+  strength = 0.6,
+}: {
+  d: LegalRefreshDirection;
+  direction: string;
+  strength?: number;
 }) {
   return (
     <div
@@ -331,14 +370,36 @@ function Scrim({
         position: "absolute",
         inset: 0,
         zIndex: 1,
-        opacity: strength,
-        background: `linear-gradient(${direction}, ${d.palette.ground} 0%, ${d.palette.ground} 32%, transparent 74%)`,
+        background: `linear-gradient(${direction}, ${withAlpha(d.palette.ground, strength)} 0%, transparent 26%)`,
       }}
     />
   );
 }
 
+/** #RRGGBB plus an alpha, for gradient stops of the ground colour. */
+function withAlpha(hex: string, a: number) {
+  const h = hex.replace("#", "");
+  const n = parseInt(
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h,
+    16,
+  );
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${Math.max(0, Math.min(1, a)).toFixed(3)})`;
+}
+
 /* ----------------------------------------------------------------- layouts */
+//
+// Every layout obeys three rules, because the earlier set broke all three:
+//   1. Copy, CTA and lockup never sit on picture detail. They sit on a panel,
+//      inside a plate, or on the solid part of a curtain.
+//   2. Nothing is clipped. Copy blocks are sized to their container and the
+//      footer always has reserved space of its own.
+//   3. The artwork is the centrepiece. Curtains hold one edge only, so the
+//      subject is never covered by a slab and the picture keeps the frame.
 
 // 01 · copy in the left third, art running right, one footer baseline.
 function EditorialLeft(p: Shared & { art: React.ReactNode; photo: boolean }) {
@@ -346,35 +407,51 @@ function EditorialLeft(p: Shared & { art: React.ReactNode; photo: boolean }) {
   return (
     <>
       {art}
-      {photo && <Scrim d={d} direction={square ? "to top" : "to right"} strength={d.photo.scrim} />}
+      {photo && (
+        <Curtain
+          d={d}
+          direction={square ? "to top" : "to right"}
+          strength={d.photo.scrim}
+          hold={square ? 30 : 34}
+          fade={square ? 76 : 72}
+        />
+      )}
       <div
         style={{
           position: "absolute",
           inset: 0,
           zIndex: 2,
-          padding: px(square ? 70 : 56),
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
+          padding: px(square ? 68 : 56),
+          display: "grid",
+          gridTemplateRows: "auto 1fr auto",
+          gap: px(square ? 24 : 20),
         }}
       >
         <Eyebrow {...p} size={square ? 20 : 17} />
+        {/* Copy stays inside the solid part of the curtain at both trims. */}
         <div
-          style={{ maxWidth: square ? "92%" : "60%", display: "grid", gap: px(square ? 26 : 22) }}
+          style={{
+            alignSelf: "end",
+            maxWidth: square ? "94%" : "54%",
+            display: "grid",
+            gap: px(square ? 24 : 20),
+          }}
         >
-          <Headline {...p} size={square ? 96 : 80} />
-          <Support {...p} size={square ? 32 : 27} />
+          <Headline {...p} size={square ? 88 : 72} />
+          <Support {...p} size={square ? 31 : 26} />
         </div>
+        {/* CTA and lockup share the copy column, so the mark never lands on
+            picture detail on the far side of the frame. */}
         <div
           style={{
             display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "space-between",
-            gap: px(24),
+            alignItems: "center",
+            gap: px(square ? 34 : 30),
+            maxWidth: square ? "94%" : "54%",
           }}
         >
           <Cta {...p} size={square ? 26 : 22} />
-          <Lockup {...p} size={square ? 46 : 40} />
+          <Lockup {...p} size={square ? 44 : 38} />
         </div>
       </div>
     </>
@@ -387,37 +464,47 @@ function PosterCaps(p: Shared & { art: React.ReactNode; photo: boolean }) {
   return (
     <>
       {art}
-      {photo && <Scrim d={d} direction="to bottom" strength={d.photo.scrim} />}
+      {photo && (
+        <>
+          <Curtain d={d} direction="to bottom" strength={d.photo.scrim} hold={20} fade={64} />
+          {/* The footer row gets its own hold so the lockup reads. */}
+          <Curtain d={d} direction="to top" strength={d.photo.scrim} hold={12} fade={34} />
+        </>
+      )}
       <div
         style={{
           position: "absolute",
           inset: 0,
           zIndex: 2,
-          padding: px(square ? 64 : 52),
+          padding: px(square ? 62 : 52),
           display: "grid",
           gridTemplateRows: "auto 1fr auto",
-          gap: px(square ? 24 : 18),
+          gap: px(square ? 22 : 18),
         }}
       >
         <Eyebrow {...p} size={square ? 19 : 16} />
-        <div style={{ alignSelf: "start", maxWidth: "96%" }}>
-          <Headline {...p} size={square ? 118 : 96} />
+        <div style={{ alignSelf: "start", maxWidth: square ? "94%" : "90%" }}>
+          <Headline {...p} size={square ? 104 : 88} />
         </div>
-        <div style={{ display: "grid", gap: px(square ? 22 : 18) }}>
+        <div style={{ display: "grid", gap: px(square ? 20 : 16) }}>
           <div style={{ height: 1, background: ink, opacity: 0.35 }} />
           <div
             style={{
-              display: "flex",
-              alignItems: "flex-end",
-              justifyContent: "space-between",
-              gap: px(24),
-              flexWrap: "wrap",
+              display: "grid",
+              gridTemplateColumns: square ? "1fr" : "1fr auto",
+              alignItems: "center",
+              gap: px(square ? 18 : 26),
             }}
           >
-            <div style={{ maxWidth: "52%" }}>
-              <Support {...p} size={square ? 28 : 24} />
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: px(28) }}>
+            <Support {...p} size={square ? 27 : 23} />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: square ? "space-between" : "flex-end",
+                gap: px(26),
+              }}
+            >
               <Cta {...p} size={square ? 25 : 21} />
               <Lockup {...p} size={square ? 42 : 36} />
             </div>
@@ -431,7 +518,9 @@ function PosterCaps(p: Shared & { art: React.ReactNode; photo: boolean }) {
 // 03 · art full bleed above, solid ground band holding all copy below.
 function BottomBand(p: Shared & { art: React.ReactNode }) {
   const { px, square, d, art } = p;
-  const bandH = square ? "42%" : "36%";
+  // Sized to the copy it has to hold: the old band clipped the support line and
+  // ran the CTA into it.
+  const bandH = square ? "46%" : "45%";
   return (
     <>
       <div style={{ position: "absolute", inset: 0, bottom: bandH, overflow: "hidden", zIndex: 1 }}>
@@ -446,23 +535,24 @@ function BottomBand(p: Shared & { art: React.ReactNode }) {
           height: bandH,
           background: d.palette.ground,
           zIndex: 2,
-          padding: `${px(square ? 40 : 34)} ${px(square ? 56 : 48)}`,
+          padding: `${px(square ? 40 : 36)} ${px(square ? 54 : 48)}`,
           display: "grid",
-          gridTemplateColumns: square ? "1fr" : "1.35fr auto",
-          alignItems: "end",
-          gap: px(square ? 20 : 32),
+          gridTemplateRows: "auto 1fr auto",
+          gap: px(square ? 16 : 14),
+          // A thin accent rule ties the band to the picture edge above it.
+          borderTop: `${px(6)} solid ${d.palette.accent}`,
         }}
       >
-        <div style={{ display: "grid", gap: px(14) }}>
-          <Eyebrow {...p} size={square ? 18 : 15} />
-          <Headline {...p} size={square ? 76 : 62} />
-          <Support {...p} size={square ? 28 : 24} />
+        <Eyebrow {...p} size={square ? 18 : 15} />
+        <div style={{ display: "grid", gap: px(square ? 14 : 12), alignContent: "start" }}>
+          <Headline {...p} size={square ? 68 : 56} />
+          <Support {...p} size={square ? 26 : 22} />
         </div>
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: square ? "space-between" : "flex-end",
+            justifyContent: "space-between",
             gap: px(26),
           }}
         >
@@ -474,21 +564,21 @@ function BottomBand(p: Shared & { art: React.ReactNode }) {
   );
 }
 
-// 04 · everything centred on the optical axis.
+// 04 · everything centred on the optical axis, inside a plate.
 function CenterStack(p: Shared & { art: React.ReactNode; photo: boolean }) {
   const { px, square, photo, d, art } = p;
   return (
     <>
       {art}
       {photo && (
+        // A quiet vignette so the picture reads as a full frame around the plate.
         <div
           aria-hidden
           style={{
             position: "absolute",
             inset: 0,
             zIndex: 1,
-            opacity: d.photo.scrim,
-            background: `radial-gradient(78% 68% at 50% 50%, ${d.palette.ground} 0%, ${d.palette.ground} 46%, transparent 88%)`,
+            background: `radial-gradient(120% 110% at 50% 50%, transparent 40%, ${withAlpha(d.palette.ink, 0.22)} 100%)`,
           }}
         />
       )}
@@ -497,25 +587,35 @@ function CenterStack(p: Shared & { art: React.ReactNode; photo: boolean }) {
           position: "absolute",
           inset: 0,
           zIndex: 2,
-          padding: px(square ? 72 : 54),
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          textAlign: "center",
-          gap: px(square ? 26 : 20),
+          padding: px(square ? 56 : 44),
         }}
       >
-        <Eyebrow {...p} size={square ? 19 : 16} />
-        <div style={{ maxWidth: square ? "88%" : "76%" }}>
-          <Headline {...p} size={square ? 92 : 74} align="center" />
-        </div>
-        <Support {...p} size={square ? 30 : 25} align="center" />
-        <div style={{ marginTop: px(6) }}>
+        {/* The plate is what makes this readable: centred type over a
+            photograph otherwise fights every detail underneath it. */}
+        <div
+          style={{
+            width: square ? "84%" : "62%",
+            background: photo ? withAlpha(d.palette.ground, 0.94) : d.palette.ground,
+            backdropFilter: photo ? "blur(2px)" : undefined,
+            padding: `${px(square ? 56 : 44)} ${px(square ? 50 : 44)}`,
+            display: "grid",
+            justifyItems: "center",
+            gap: px(square ? 22 : 18),
+            textAlign: "center",
+            borderTop: `${px(6)} solid ${d.palette.accent}`,
+            boxShadow: photo ? `0 ${px(20)} ${px(60)} rgba(3,0,44,0.26)` : undefined,
+          }}
+        >
+          <Eyebrow {...p} size={square ? 19 : 16} />
+          <Headline {...p} size={square ? 82 : 66} align="center" />
+          <Support {...p} size={square ? 28 : 24} align="center" />
           <Cta {...p} size={square ? 26 : 22} />
-        </div>
-        <div style={{ position: "absolute", bottom: px(square ? 56 : 42) }}>
-          <Lockup {...p} size={square ? 40 : 34} />
+          <div style={{ marginTop: px(square ? 10 : 6) }}>
+            <Lockup {...p} size={square ? 40 : 34} />
+          </div>
         </div>
       </div>
     </>
@@ -525,7 +625,7 @@ function CenterStack(p: Shared & { art: React.ReactNode; photo: boolean }) {
 // 05 · hard vertical split, no overlap of type and art.
 function SplitVertical(p: Shared & { art: React.ReactNode }) {
   const { px, square, d, art } = p;
-  const split = square ? "54%" : "46%";
+  const split = square ? "52%" : "46%";
   return (
     <>
       <div
@@ -550,17 +650,18 @@ function SplitVertical(p: Shared & { art: React.ReactNode }) {
           bottom: square ? `calc(100% - ${split})` : 0,
           background: d.palette.ground,
           zIndex: 2,
-          padding: px(square ? 56 : 50),
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          gap: px(20),
+          padding: px(square ? 54 : 50),
+          display: "grid",
+          gridTemplateRows: "auto 1fr auto",
+          gap: px(18),
+          borderRight: square ? undefined : `${px(6)} solid ${d.palette.accent}`,
+          borderBottom: square ? `${px(6)} solid ${d.palette.accent}` : undefined,
         }}
       >
         <Eyebrow {...p} size={square ? 18 : 15} />
-        <div style={{ display: "grid", gap: px(18) }}>
-          <Headline {...p} size={square ? 74 : 58} />
-          <Support {...p} size={square ? 27 : 22} />
+        <div style={{ display: "grid", gap: px(16), alignContent: "center" }}>
+          <Headline {...p} size={square ? 68 : 54} />
+          <Support {...p} size={square ? 26 : 21} />
         </div>
         <div
           style={{
@@ -578,79 +679,81 @@ function SplitVertical(p: Shared & { art: React.ReactNode }) {
   );
 }
 
-// 06 · skewed band carrying the headline, corners hold the rest.
+// 06 · one skewed band carrying the headline, low across the frame.
 function DiagonalBand(p: Shared & { art: React.ReactNode; photo: boolean }) {
   const { px, square, photo, d, art } = p;
+  const tilt = square ? -7 : -5;
+  // The band used to be 40% of the frame and sat straight over the subject.
+  // Slimmed and dropped into the lower third so the picture still reads.
+  const bandTop = square ? "50%" : "46%";
+  const bandH = square ? "23%" : "26%";
   return (
     <>
       {art}
       {photo && (
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 1,
-            opacity: d.photo.scrim,
-            background: `linear-gradient(to top, ${d.palette.ground} 0%, transparent 70%)`,
-          }}
-        />
+        <>
+          <Curtain d={d} direction="to top" strength={d.photo.scrim} hold={14} fade={44} />
+          <EdgeHold d={d} direction="to bottom" strength={0.5} />
+        </>
       )}
       {/* The band */}
       <div
         aria-hidden
         style={{
           position: "absolute",
-          left: "-12%",
-          right: "-12%",
-          top: square ? "34%" : "30%",
-          height: square ? "34%" : "40%",
+          left: "-10%",
+          right: "-10%",
+          top: bandTop,
+          height: bandH,
           background: d.palette.accent,
-          transform: `rotate(${square ? -8 : -6}deg)`,
+          transform: `rotate(${tilt}deg)`,
           zIndex: 2,
+          boxShadow: `0 ${px(16)} ${px(40)} rgba(3,0,44,0.35)`,
         }}
       />
       <div
         aria-hidden
         style={{
           position: "absolute",
-          left: "-12%",
-          right: "-12%",
-          top: square ? "31%" : "27%",
+          left: "-10%",
+          right: "-10%",
+          top: `calc(${bandTop} - ${px(14)})`,
           height: px(6),
           background: d.palette.second,
-          transform: `rotate(${square ? -8 : -6}deg)`,
+          transform: `rotate(${tilt}deg)`,
           zIndex: 2,
         }}
       />
       <div
         style={{
           position: "absolute",
-          left: "4%",
-          right: "4%",
-          top: square ? "37%" : "33%",
-          transform: `rotate(${square ? -8 : -6}deg)`,
+          left: "7%",
+          right: "7%",
+          top: `calc(${bandTop} + ${square ? px(30) : px(26)})`,
+          transform: `rotate(${tilt}deg)`,
           zIndex: 3,
+          display: "flex",
+          alignItems: "center",
         }}
       >
-        <Headline {...p} ink="#FFFFFF" size={square ? 74 : 58} />
+        <Headline {...p} ink="#FFFFFF" size={square ? 62 : 52} />
       </div>
       <div
         style={{
           position: "absolute",
           inset: 0,
           zIndex: 3,
-          padding: px(square ? 60 : 48),
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
+          padding: px(square ? 58 : 48),
+          display: "grid",
+          gridTemplateRows: "auto 1fr auto",
           pointerEvents: "none",
         }}
       >
         <Eyebrow {...p} size={square ? 19 : 16} />
-        <div style={{ display: "grid", gap: px(20) }}>
-          <div style={{ maxWidth: square ? "82%" : "54%" }}>
-            <Support {...p} size={square ? 29 : 24} />
+        <div />
+        <div style={{ display: "grid", gap: px(square ? 18 : 16) }}>
+          <div style={{ maxWidth: square ? "84%" : "56%" }}>
+            <Support {...p} size={square ? 28 : 23} />
           </div>
           <div
             style={{
@@ -669,19 +772,24 @@ function DiagonalBand(p: Shared & { art: React.ReactNode; photo: boolean }) {
   );
 }
 
-// 07 · headline anchored low left, fine-print column down the right edge.
+// 07 · headline anchored low, document reference at the top edge.
 function Footnote(p: Shared & { art: React.ReactNode; photo: boolean }) {
   const { px, square, photo, d, ink, art } = p;
   return (
     <>
       {art}
-      {photo && <Scrim d={d} direction="to top" strength={d.photo.scrim} />}
+      {photo && (
+        <>
+          <Curtain d={d} direction="to top" strength={d.photo.scrim} hold={26} fade={70} />
+          <EdgeHold d={d} direction="to bottom" strength={0.55} />
+        </>
+      )}
       <div
         style={{
           position: "absolute",
           inset: 0,
           zIndex: 2,
-          padding: px(square ? 62 : 50),
+          padding: px(square ? 60 : 50),
           display: "grid",
           gridTemplateRows: "auto 1fr auto",
         }}
@@ -690,7 +798,7 @@ function Footnote(p: Shared & { art: React.ReactNode; photo: boolean }) {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "flex-start",
+            alignItems: "center",
             gap: px(24),
           }}
         >
@@ -698,19 +806,19 @@ function Footnote(p: Shared & { art: React.ReactNode; photo: boolean }) {
           <Lockup {...p} size={square ? 38 : 32} />
         </div>
         <div />
-        <div style={{ display: "grid", gap: px(square ? 22 : 18) }}>
+        <div style={{ display: "grid", gap: px(square ? 20 : 16) }}>
           <div style={{ height: 1, background: ink, opacity: 0.25 }} />
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: square ? "1fr" : "1.5fr auto",
+              gridTemplateColumns: square ? "1fr" : "1.4fr auto",
               alignItems: "end",
-              gap: px(square ? 20 : 30),
+              gap: px(square ? 18 : 30),
             }}
           >
-            <div style={{ display: "grid", gap: px(14) }}>
-              <Headline {...p} size={square ? 72 : 58} />
-              <Support {...p} size={square ? 27 : 23} />
+            <div style={{ display: "grid", gap: px(12) }}>
+              <Headline {...p} size={square ? 66 : 54} />
+              <Support {...p} size={square ? 26 : 22} />
             </div>
             <Cta {...p} size={square ? 24 : 21} />
           </div>
@@ -729,12 +837,12 @@ function CornerPlate(p: Shared & { art: React.ReactNode }) {
       <div
         style={{
           position: "absolute",
-          left: px(square ? 48 : 44),
-          bottom: px(square ? 48 : 44),
-          width: square ? "72%" : "48%",
+          left: px(square ? 46 : 44),
+          bottom: px(square ? 46 : 44),
+          width: square ? "76%" : "54%",
           background: d.palette.ground,
           zIndex: 3,
-          padding: px(square ? 42 : 36),
+          padding: px(square ? 42 : 38),
           borderRadius: px(18),
           borderLeft: `${px(8)} solid ${d.palette.accent}`,
           display: "grid",
@@ -743,7 +851,7 @@ function CornerPlate(p: Shared & { art: React.ReactNode }) {
         }}
       >
         <Eyebrow {...p} size={square ? 17 : 15} />
-        <Headline {...p} size={square ? 62 : 50} />
+        <Headline {...p} size={square ? 58 : 48} />
         <Support {...p} size={square ? 25 : 21} />
         <div
           style={{
@@ -769,12 +877,14 @@ function Art({
   square,
   uid,
   finish,
+  grade,
 }: {
   d: LegalRefreshDirection;
   photo?: string;
   square: boolean;
   uid: string;
   finish: LegalRefreshFinish;
+  grade: LegalRefreshGrade;
 }) {
   if (photo) {
     const tone = (c: LegalRefreshFinish["tints"][number]["color"]) =>
@@ -800,11 +910,38 @@ function Art({
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            objectPosition: d.photo.focus,
-            filter: finish.filter,
+            // The square trim loses a third of the frame, so each direction
+            // declares where the subject and the clear space sit in that crop.
+            objectPosition: (square && d.photo.focusSquare) || d.photo.focus,
+            filter: `${finish.filter} contrast(${grade.contrast}) saturate(${grade.saturate}) brightness(${grade.brightness})`,
+            transform: "scale(1.02)",
             zIndex: 0,
           }}
         />
+        {grade.vignette > 0 && (
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 0,
+              background: `radial-gradient(120% 105% at 50% 42%, transparent 38%, rgba(3,0,44,${grade.vignette}) 100%)`,
+            }}
+          />
+        )}
+        {grade.bloom > 0 && (
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 0,
+              mixBlendMode: "soft-light",
+              opacity: grade.bloom,
+              background: "radial-gradient(58% 52% at 62% 34%, #FFFFFF 0%, transparent 70%)",
+            }}
+          />
+        )}
         {finish.tints.map((t, i) => (
           <div
             key={i}
