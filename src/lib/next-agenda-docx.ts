@@ -19,6 +19,7 @@ import {
   agendaTextLines,
   AGENDA_BAND,
   agendaBandPalette,
+  agendaBandComposite,
   agendaBlocks,
   agendaSplitWidths,
   agendaDivision,
@@ -593,7 +594,7 @@ export async function buildAgendaDocx(
                 ) + copy(p.title, p.detail, parInk, p.speaker ?? "", cardType),
                 rowPad,
                 {
-                  fill: BAND.parallel,
+                  fill: parFill,
                   vAlign: "top",
                   rail: BAND.rail,
                   railW: BAND.railW * PL.k,
