@@ -8,7 +8,14 @@ import {
   agendaQrPrintQuality,
   type AgendaConfig,
 } from "@/lib/next-agenda";
-import { qrModulePxForPrint, qrPng, qrRaster, type QrModuleStyle } from "@/lib/qr-print";
+import {
+  QR_SCAN_VERIFIED_STYLES,
+  qrModulePxForPrint,
+  qrPng,
+  qrPrintQuality,
+  qrRaster,
+  type QrModuleStyle,
+} from "@/lib/qr-print";
 
 /** Decode a rasterised code the way a phone camera would. */
 function decode(payload: string, style: QrModuleStyle, modulePx = 8): string | null {
@@ -33,7 +40,8 @@ const PAYLOADS = [
   "www.transperfect.com",
 ];
 
-const STYLES: QrModuleStyle[] = ["block", "rounded", "dot"];
+// Only the verified styles are promised to press; dot is flagged in the editor.
+const STYLES: QrModuleStyle[] = ["block", "rounded"];
 
 describe("agenda QR codes decode from every export raster", () => {
   for (const payload of PAYLOADS) {
@@ -54,6 +62,13 @@ describe("agenda QR codes decode from every export raster", () => {
       }
     }
     expect(fails).toEqual([]);
+  });
+
+  it("flags the unverified dot style instead of shipping it", () => {
+    const q = qrPrintQuality(PAYLOADS[0], 60, "dot")!;
+    expect(q.ok).toBe(false);
+    expect(q.notes.join(" ")).toMatch(/dot/i);
+    expect(QR_SCAN_VERIFIED_STYLES).toEqual(["block", "rounded"]);
   });
 
   it("prints scanner anchors solid whatever the module style", () => {

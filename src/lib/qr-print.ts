@@ -247,6 +247,14 @@ export function qrModulePxForPrint(payload: string, edgeMm: number, dpi = 300): 
   return Math.max(4, Math.min(24, Math.ceil(targetPx / qr.size)));
 }
 
+/**
+ * Module styles proven to decode across the whole density range the exports can
+ * emit. Round dots leave diagonal white gaps between adjacent dark modules and
+ * failed decoding at several densities in testing, so they are flagged rather
+ * than quietly shipped to press.
+ */
+export const QR_SCAN_VERIFIED_STYLES: QrModuleStyle[] = ["block", "rounded"];
+
 export type QrPrintQuality = {
   modules: number;
   /** Printed module size in mm, quiet zone included in the module count. */
@@ -271,6 +279,11 @@ export function qrPrintQuality(
   const moduleMm = edgeMm / qr.size;
   const floor = style === "block" ? 0.6 : 0.8;
   const notes: string[] = [];
+  if (!QR_SCAN_VERIFIED_STYLES.includes(style)) {
+    notes.push(
+      "Round dot modules did not decode reliably in our scan tests — use square or rounded modules for anything going to print.",
+    );
+  }
   if (moduleMm < floor) {
     notes.push(
       `Each module prints at ${moduleMm.toFixed(2)}mm — ${style === "block" ? "squares" : `${style} modules`} need ${floor}mm. Enlarge the code or shorten the link.`,
