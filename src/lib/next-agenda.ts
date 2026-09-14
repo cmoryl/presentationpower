@@ -167,6 +167,27 @@ export const AGENDA_QR_CAPTION_PAD = { min: 0, max: 40, step: 1 };
 /** Coarse / fine nudge steps for a placed code (mm). */
 export const AGENDA_QR_NUDGE = { fine: 1, coarse: 5 };
 
+/** Default resting place for the printed code. Dragging still overrides it. */
+export type AgendaQrAnchor = "foot-right" | "top-right";
+
+export const AGENDA_QR_ANCHORS: { id: AgendaQrAnchor; name: string; note: string }[] = [
+  {
+    id: "foot-right",
+    name: "Foot right",
+    note: "Code sits above the footer on the right — the issued London default.",
+  },
+  {
+    id: "top-right",
+    name: "Top right",
+    note: "Code sits beside the headline; the title block narrows so copy never runs under it.",
+  },
+];
+
+/** The anchor in force, defaulting to the issued foot-right position. */
+export function agendaQrAnchor(config: AgendaConfig): AgendaQrAnchor {
+  return config.qrAnchor === "top-right" ? "top-right" : "foot-right";
+}
+
 export type AgendaFaceId = "dark" | "light";
 
 export const AGENDA_FACES: { id: AgendaFaceId; name: string; note: string }[] = [
@@ -312,6 +333,8 @@ export type AgendaConfig = {
   qrCaptionSize: number;
   /** Padding between the code, its caption and the safe edges (mm). */
   qrCaptionPad: number;
+  /** Where the code sits by default: foot of the board or beside the headline. */
+  qrAnchor: AgendaQrAnchor;
   /** Placed QR position in mm from the trim top-left. null = default flow. */
   qrOffsetX: number | null;
   qrOffsetY: number | null;
@@ -930,6 +953,7 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
     qrCaptionAlign: "center",
     qrCaptionSize: 0,
     qrCaptionPad: 0,
+    qrAnchor: "foot-right",
     qrOffsetX: null,
     qrOffsetY: null,
     eventLabel: "",
@@ -1087,7 +1111,9 @@ export function agendaLayout(config: AgendaConfig) {
     eyebrowSize * 2.4 +
     titleSize * 1.16 +
     metaSize * 2.1;
-  const footBlock = (config.qrData.trim() ? qrEdge + footSize * 2.6 : 0) + footSize * 2.4;
+  // The foot only reserves height for the code when the code rests there.
+  const qrInFoot = config.qrData.trim() !== "" && agendaQrAnchor(config) === "foot-right";
+  const footBlock = (qrInFoot ? qrEdge + footSize * 2.6 : 0) + footSize * 2.4;
   const listTop = geo.safeInset + headBlock;
   const listBottom = geo.trimH - geo.safeInset - footBlock;
   const listH = Math.max(20, listBottom - listTop);
@@ -1185,6 +1211,7 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
         : "center",
     qrCaptionSize: Math.max(0, Math.min(AGENDA_QR_CAPTION_SIZE.max, num(raw.qrCaptionSize, 0))),
     qrCaptionPad: Math.max(0, Math.min(AGENDA_QR_CAPTION_PAD.max, num(raw.qrCaptionPad, 0))),
+    qrAnchor: raw.qrAnchor === "top-right" ? "top-right" : "foot-right",
     qrOffsetX: Number.isFinite(Number(raw.qrOffsetX)) ? Number(raw.qrOffsetX) : null,
     qrOffsetY: Number.isFinite(Number(raw.qrOffsetY)) ? Number(raw.qrOffsetY) : null,
     eventLabel: str(raw.eventLabel, ""),
@@ -1244,8 +1271,10 @@ export function agendaBlocks(config: AgendaConfig) {
   y += L.titleSize * 1.14;
   const metaY = y;
   y += L.metaSize * 2.2;
-  const rowsTop = y;
+  let rowsTop = y;
 
+  /** Width the eyebrow, headline and date line may occupy. */
+  let headW = L.contentW;
   const bottom = geo.trimH - geo.safeInset;
   const footY = bottom - L.footSize * 1.2;
   let listBottom = footY - L.footSize * 1.8;
@@ -1279,7 +1308,10 @@ export function agendaBlocks(config: AgendaConfig) {
     const minY = geo.safeInset + pad;
     const maxY = Math.max(minY, geo.trimH - geo.safeInset - pad - blockH);
     const defaultX = geo.trimW - geo.safeInset - L.qrEdge;
-    const defaultY = footY - L.footSize * 1.8 - capH - L.qrEdge;
+    const defaultY =
+      agendaQrAnchor(config) === "top-right"
+        ? geo.safeInset + pad
+        : footY - L.footSize * 1.8 - capH - L.qrEdge;
     const rawX = Number(config.qrOffsetX);
     const rawY = Number(config.qrOffsetY);
     const placed =
@@ -1305,9 +1337,18 @@ export function agendaBlocks(config: AgendaConfig) {
       defaultX,
       defaultY,
     };
-    // The programme only makes room for the code when the code sits in its way.
-    const clash = qrTop < listBottom && qrTop + blockH > rowsTop;
-    if (clash) listBottom = Math.max(rowsTop + 10, qrTop - L.footSize * 1.4);
+    const qrBottom = qrTop + blockH;
+    // A code resting in the header band pushes the programme down instead of
+    // eating it from the bottom, and narrows the title block beside it.
+    if (qrTop < rowsTop) {
+      const gutter = Math.max(6 * L.k, pad);
+      if (qrX > x + L.contentW * 0.4) headW = Math.max(L.contentW * 0.35, qrX - x - gutter);
+      if (qrBottom + gutter > rowsTop) rowsTop = Math.min(listBottom - 20, qrBottom + gutter);
+    } else {
+      // The programme only makes room for the code when the code sits in its way.
+      const clash = qrTop < listBottom && qrBottom > rowsTop;
+      if (clash) listBottom = Math.max(rowsTop + 10, qrTop - L.footSize * 1.4);
+    }
   }
 
   const rowH = Math.max(5, (listBottom - rowsTop) / rowCount);
@@ -1322,6 +1363,7 @@ export function agendaBlocks(config: AgendaConfig) {
     geo,
     x,
     contentW: L.contentW,
+    headW,
     lockup,
     eyebrowY,
     titleY,
