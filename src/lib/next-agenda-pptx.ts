@@ -367,16 +367,14 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       rows.forEach((r, i) => {
         const band = r.band;
         if (!band) return;
-        s.addShape("rect", {
-          x: inX(band.x),
-          y: inX(band.y),
-          w: inX(band.w),
-          h: inX(band.h),
-          fill: { color: hex(i % 2 === 0 ? BAND.fillA : BAND.fillB) },
-          line: { type: "none" },
-          objectName: `Session band ${i + 1}`,
-        });
-        rail(band, `Session rail ${i + 1}`);
+        rail(band, BAND.fillAlpha, `Session rail ${i + 1}`);
+        plate(
+          band,
+          i % 2 === 0 ? BAND.fillA : BAND.fillB,
+          BAND.fillAlpha,
+          `Session band ${i + 1}`,
+          inX(BAND.railW * L.k),
+        );
         bandText(band, r.session);
         // One editable aqua card per parallel track, each its own named shape.
         const parCopy = agendaParallels(r.session);
