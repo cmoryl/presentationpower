@@ -112,6 +112,15 @@ const samples: { name: string; config: PillarConfig }[] = [
     } as PillarConfig,
   },
   {
+    name: "next-ascend-chevron-template",
+    config: {
+      ...pillarDefault(),
+      templateId: "next-ascend",
+      headline: "LIFT YOUR GLOBAL PROFILE",
+      verticalHeadline: false,
+    } as PillarConfig,
+  },
+  {
     name: "logo-with-qr",
     config: {
       ...withPillarKind(pillarDefault(), "logo"),
