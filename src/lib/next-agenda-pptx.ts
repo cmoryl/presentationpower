@@ -48,6 +48,20 @@ function pt(mm: number): number {
   return Math.max(6, Math.round(mm * MM_TO_PT * 10) / 10);
 }
 
+/**
+ * The board renders a muted session as the ink at 70% opacity. PowerPoint runs
+ * carry no text transparency, so mix the ink into the ground instead of using a
+ * fixed grey — a hardcoded grey went unreadable on the light end of the ramp.
+ */
+function mix(inkHex6: string, groundHex6: string, amount: number): string {
+  const ch = (h: string, i: number) => parseInt(h.slice(i * 2, i * 2 + 2), 16);
+  const out = [0, 1, 2]
+    .map((i) => Math.round(ch(inkHex6, i) * amount + ch(groundHex6, i) * (1 - amount)))
+    .map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0"))
+    .join("");
+  return out.toUpperCase();
+}
+
 async function blobToDataUrl(blob: Blob): Promise<string> {
   return await new Promise((resolve, reject) => {
     const reader = new FileReader();
