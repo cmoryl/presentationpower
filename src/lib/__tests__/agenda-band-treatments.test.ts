@@ -9,6 +9,14 @@ import {
 } from "../next-agenda";
 import { contrastRatio } from "../wcag";
 
+/** contrastRatio parses rgb() only, so brand hex values are converted first. */
+const rgbOf = (hex: string) => {
+  const h = hex.replace("#", "");
+  const n = parseInt(h.length === 3 ? h.replace(/./g, (c) => c + c) : h, 16);
+  return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`;
+};
+const ratio = (fg: string, bg: string) => contrastRatio(rgbOf(fg), rgbOf(bg));
+
 /**
  * Every approved band treatment must stay readable. A treatment pairs a fill
  * with the one ink that clears WCAG AA on it, so switching the look can never
@@ -19,14 +27,14 @@ describe("agenda band treatments", () => {
     for (const t of AGENDA_BAND_TREATMENTS) {
       const p = agendaBandPalette({ bandTreatment: t.id });
       for (const fill of [p.fillA, p.fillB]) {
-        expect(contrastRatio(p.ink, fill), `${t.id} ink on ${fill}`).toBeGreaterThanOrEqual(4.5);
+        expect(ratio(p.ink, fill), `${t.id} ink on ${fill}`).toBeGreaterThanOrEqual(4.5);
       }
       expect(
-        contrastRatio(p.parallelInk, p.parallel),
+        ratio(p.parallelInk, p.parallel),
         `${t.id} parallel ink`,
       ).toBeGreaterThanOrEqual(4.5);
       // The rail is a graphic mark, so it only has to separate from both fills.
-      expect(contrastRatio(p.rail, p.fillA), `${t.id} rail on fillA`).toBeGreaterThanOrEqual(3);
+      expect(ratio(p.rail, p.fillA), `${t.id} rail on fillA`).toBeGreaterThanOrEqual(3);
       expect(p.railW).toBeGreaterThan(0);
     }
   });
