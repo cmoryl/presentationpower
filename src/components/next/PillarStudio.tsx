@@ -758,6 +758,29 @@ export function PillarStudio({
           </div>
 
           <div className="rounded-2xl border border-black/10 bg-white p-5">
+            <div className={label}>Template</div>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {PILLAR_TEMPLATES.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => set("templateId", t.id)}
+                  className={`rounded-lg border px-3 py-2 text-left text-sm ${
+                    pillarTemplate(config.templateId).id === t.id
+                      ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
+                      : "border-black/15 text-black/70 hover:border-[#003FC7]/50"
+                  }`}
+                >
+                  {t.name}
+                </button>
+              ))}
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-black/55">
+              {pillarTemplate(config.templateId).note}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-black/10 bg-white p-5">
             <div className={label}>Sign kind</div>
             <div className="mt-2 grid grid-cols-2 gap-2">
               {PILLAR_KINDS.map((k) => (

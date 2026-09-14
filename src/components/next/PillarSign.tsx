@@ -18,9 +18,15 @@ import {
   pillarQrPlacement,
   pillarSubSize,
   pillarInk,
-  pillarStops,
   type PillarConfig,
 } from "@/lib/next-pillar-masters";
+import {
+  pillarChevronBands,
+  pillarChevronInk,
+  pillarGroundStops,
+  pillarHeadlineLines,
+  pillarTemplate,
+} from "@/lib/next-pillar-templates";
 import { pillarArrowPath } from "@/lib/pillar-arrows";
 import { PILLAR_LOGO_DROP } from "@/lib/next-pillar-masters";
 import { buildPillarQr } from "@/lib/pillar-qr";
@@ -54,15 +60,20 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   const headlineOffset = pillarHeadlineOffset(config);
   const subSize = pillarSubSize(config);
 
-  const stops = pillarStops(config.styleId, face);
-  const vertical = Boolean(config.verticalHeadline) && config.kind !== "logo";
+  const template = pillarTemplate(config.templateId);
+  const stops = pillarGroundStops(config);
+  const vertical =
+    Boolean(config.verticalHeadline) && config.kind !== "logo" && template.align !== "left";
   const division = pillarDivision(config.divisionId);
-  const isHalo = config.styleId.includes("halo");
+  const isHalo = !template.stops && config.styleId.includes("halo");
   // Light core, saturated rim: keeps the halo ground readable at pillar scale.
   const haloStops = isHalo ? [...stops].reverse() : stops;
-  const gradientId = `pillar-${face}-${config.styleId.replace(/[^a-z0-9]/gi, "")}`;
+  const gradientId = `pillar-${template.id}-${face}-${config.styleId.replace(/[^a-z0-9]/gi, "")}`;
   const inset = mm(geo.bleedEdge + geo.safeInset);
-  const lockupW = mm(geo.trimW * 0.58 * pillarLockupScale(config));
+  const lockupW = mm(geo.trimW * template.lockupWidth * pillarLockupScale(config));
+  const chevronInk = pillarChevronInk(face);
+  const chevrons = template.chevrons ? pillarChevronBands(geo.bleedW, geo.bleedH) : [];
+  const headlineLines = pillarHeadlineLines(config.headline, template.stackWords);
 
   const linkLines =
     config.kind === "logo"
@@ -81,7 +92,11 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   // every other element stays editable.
   const placed = martPlacement(config);
 
-  const axis = config.styleId.includes("diagonal")
+  // A template that carries its own measured ground runs top-to-bottom, as the
+  // supplied master does; only gradient grounds take their axis from the style.
+  const axis = template.stops
+    ? { x1: "50%", y1: "0%", x2: "50%", y2: "100%" }
+    : config.styleId.includes("diagonal")
     ? { x1: "0%", y1: "0%", x2: "100%", y2: "100%" }
     : config.styleId.includes("prism")
       ? { x1: "0%", y1: "100%", x2: "100%", y2: "0%" }
@@ -226,6 +241,14 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
           )}
         </defs>
         <rect x={0} y={0} width={w} height={h} fill={`url(#${gradientId})`} />
+        {chevrons.map((band, i) => (
+          <polygon
+            key={i}
+            points={band.points.map(([x, y]) => `${mm(x)},${mm(y)}`).join(" ")}
+            fill={chevronInk.color}
+            opacity={chevronInk.opacity}
+          />
+        ))}
       </svg>
 
       {placed ? (
@@ -245,7 +268,92 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
         />
       ) : null}
 
+      {/* Left-set templates: lockup top left, headline stacked in the lower half,
+          exactly as the supplied NEXT master is measured. */}
+      {template.align === "left" ? (
+        <div
+          style={{
+            position: "absolute",
+            left: inset,
+            right: inset,
+            top: inset,
+            bottom: inset,
+            color: ink,
+          }}
+        >
+          {config.showLockup && (division.whiteUrl || division.colorUrl) ? (
+            <img
+              src={
+                face === "light"
+                  ? division.colorUrl || division.whiteUrl
+                  : division.whiteUrl || division.colorUrl
+              }
+              alt=""
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: lockupW,
+                height: lockupW / (division.ratio || 1.7),
+                objectFit: "contain",
+                objectPosition: "left top",
+                display: "block",
+              }}
+            />
+          ) : null}
+
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: mm(geo.trimH * template.headlineTop + headlineOffset),
+              textAlign: "left",
+            }}
+          >
+            {config.kind === "logo"
+              ? linkLines.map((line, i) => (
+                  <div
+                    key={`${line}-${i}`}
+                    style={{
+                      marginTop: mm(i === 0 ? 0 : 10),
+                      fontWeight: 600,
+                      letterSpacing: "0.04em",
+                      lineHeight: 1.2,
+                      fontSize: mm(subSize),
+                      color: headlineInk,
+                    }}
+                  >
+                    {line}
+                  </div>
+                ))
+              : headlineLines.map((line, i) => (
+                  <div
+                    key={`${line}-${i}`}
+                    style={{
+                      fontWeight: 700,
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1,
+                      fontSize: mm(headlineSize),
+                      textTransform: "uppercase",
+                      color: headlineInk,
+                    }}
+                  >
+                    {line}
+                  </div>
+                ))}
+            {subLine}
+          </div>
+
+          {qr && !qrPlace.placed ? (
+            <div style={{ position: "absolute", left: 0, bottom: 0 }}>{qrBlock}</div>
+          ) : null}
+        </div>
+      ) : null}
+
       {/* Content stack inside the safe area */}
+      {template.align === "left" ? null : (
       <div
         style={{
           position: "absolute",
@@ -382,6 +490,8 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
 
         {qr && !qrPlace.placed ? qrBlock : null}
       </div>
+      )}
+
 
       {qr && qrPlace.placed ? (
         <div
