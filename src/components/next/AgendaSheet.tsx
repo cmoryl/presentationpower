@@ -214,7 +214,7 @@ export function AgendaSheet({
             <div
               style={{
                 ...at(blocks.x, blocks.location.metaY),
-                width: mm(blocks.contentW),
+                width: mm(blocks.location.right - blocks.x),
                 textAlign: "right",
                 fontSize: mm(blocks.location.metaSize),
                 fontWeight: 500,
