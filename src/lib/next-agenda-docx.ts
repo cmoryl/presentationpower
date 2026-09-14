@@ -16,6 +16,7 @@
 import JSZip from "jszip";
 
 import {
+  AGENDA_BAND,
   agendaBlocks,
   agendaDivision,
   agendaLockupUrl,
@@ -29,6 +30,7 @@ import {
   agendaQrPlateColor,
   agendaQrStyle,
   agendaQrTransparent,
+  agendaRowStyle,
   agendaStops,
   agendaTitleInk,
   type AgendaConfig,
