@@ -513,9 +513,13 @@ export async function buildAgendaDocx(
       '<w:tblLook w:val="0000" w:firstRow="0" w:lastRow="0" w:firstColumn="0" w:lastColumn="0" w:noHBand="1" w:noVBand="1"/>',
       "</w:tblPr>",
       "<w:tblGrid>",
-      `<w:gridCol w:w="${Math.round(timeW)}"/><w:gridCol w:w="${Math.round(bodyW)}"/><w:gridCol w:w="${Math.round(trackW)}"/>`,
+      cardMode
+        ? `<w:gridCol w:w="${Math.round(cardTimeW)}"/><w:gridCol w:w="${Math.round(
+            cardBodyW,
+          )}"/><w:gridCol w:w="${Math.round(cardParallelW)}"/>`
+        : `<w:gridCol w:w="${Math.round(timeW)}"/><w:gridCol w:w="${Math.round(bodyW)}"/><w:gridCol w:w="${Math.round(trackW)}"/>`,
       "</w:tblGrid>",
-      rows,
+      cardMode ? cardRows : rows,
       "</w:tbl>",
     ].join("");
 
