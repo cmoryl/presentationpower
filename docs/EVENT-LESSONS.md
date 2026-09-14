@@ -141,3 +141,14 @@ could re-test a rejected approach from scratch.
 at the moment it is made, naming the options it beat and the condition that would reopen it.
 Decisions are harvested into the knowledge store alongside lessons and specs.
 **Enforced by:** `src/lib/__tests__/event-knowledge.test.ts` (decision log suite).
+
+### 2026-09 — Agenda copy inks were never contrast-checked
+
+Only the QR code was gated for contrast; the printed copy inks were a free
+choice, so white copy could land on the pale end of a gradient ground and stop
+reading. Swept every ground the agenda editor can build (11 gradients x 2 faces
+x every division) against the face inks and the approved headline inks, judging
+each band where it actually prints. Six dark grounds have no approved ink that
+reads across the whole board and are now named in `AGENDA_GUARD_GAPS`.
+
+**Enforced by:** `src/lib/__tests__/agenda-contrast.test.ts`

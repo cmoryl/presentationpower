@@ -185,3 +185,19 @@ slices driven from the page.
 silent harvest leaves records unsearchable with no sign of it.
 **Would change if:** the store grows large enough to need a scheduled job.
 **Applies to:** every venue.
+
+### 2026-09 — Agenda copy ink is guarded, not restyled
+
+**Area:** Agenda boards (screen preview, PDF/SVG, Word, PowerPoint)
+**Options tested:** (a) force a single dark ink on every board; (b) mix inks per
+band so each line takes the reading ink for its own patch of gradient; (c) add a
+scrim behind the copy column; (d) keep the approved face ink and only substitute
+when it drops below its floor.
+**Chosen:** (d) — the legibility guard. `agendaCopyInk()` keeps the signed-off
+face ink whenever it reads and swaps to the best-reading approved ink only when
+it does not; grounds where nothing reads are named and surfaced in the editor.
+**Why:** (a) restyles approved boards, (b) prints two ink colours on one board,
+(c) alters the approved ground. (d) changes nothing that already reads.
+**Would change if:** an approved scrim treatment is signed off for the six
+flagged gradients, which would let them carry the dark face.
+**Applies to:** every city agenda board, all four export paths.
