@@ -498,18 +498,33 @@ function Library() {
     [scopeBrand],
   );
 
+  // Tracks the scope we already activated a brand look for, so choosing another
+  // look does not get reverted while the brand filter stays on.
+  const appliedScopeLookRef = useRef<string | null>(null);
+
   // Keep the modal's brand preview in sync with the active scope filter so
   // opening a card while scope=TP Media (etc.) shows that brand's imagery in
   // the A/B previews instead of defaulting back to Enterprise.
+
   useEffect(() => {
-    if (!scopeBrand) return;
+    if (!scopeBrand) {
+      appliedScopeLookRef.current = null;
+      return;
+    }
     const i = brandModes.findIndex((b) => b.id === scopeBrand.id);
     if (i >= 0) setBrandIdx(i);
     // A brand that owns its own look (DataForce → AI · Data Signature) activates
-    // that template with the scope, unless the visitor is already holding it.
+    // that template once, when the scope is set. After that the visitor is free
+    // to hold any other look while the brand filter stays on.
+    if (appliedScopeLookRef.current === scopeBrand.id) return;
+    appliedScopeLookRef.current = scopeBrand.id;
     const ownLook = packIdForBrandMode(scopeBrand.id);
     if (ownLook && lookBrandModeId(packId) !== scopeBrand.id) setPackId(ownLook);
-  }, [scopeBrand?.id, brandModes, packId]);
+    // packId is read, not tracked: re-running on a manual look change would
+    // snap the picker back to the brand's own look.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scopeBrand?.id, brandModes]);
+
 
   const toggle = (set: Set<string>, id: string) => {
     const next = new Set(set);
