@@ -137,6 +137,7 @@ import {
   londonOverrideOptions,
   londonPanelFileBase,
   type LondonOverrides,
+  type LondonColorSpace,
   isAddedPanel,
   londonAiBytes,
   buildLondonPanelPrintPdfAsync,
