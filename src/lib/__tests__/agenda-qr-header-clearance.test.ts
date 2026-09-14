@@ -31,23 +31,13 @@ describe("agenda header QR clearance", () => {
 
 describe("agenda QR lockup clearance", () => {
   it("keeps a stale dragged code off the lockup", () => {
-    const base = agendaDefault("globallink");
-    const cfg = {
-      ...base,
-      sizeId: "a4-handout" as typeof base.sizeId,
-      qrData: "https://presentationpower.lovable.app/events/next/london",
-      qrCaption: "FULL AGENDA",
-      qrAnchor: "top-right" as const,
-      qrOffsetX: 20,
-      qrOffsetY: 12,
-    };
-    const b = agendaBlocks(cfg);
-    expect(b.qr).toBeTruthy();
-    expect(b.lockup).toBeTruthy();
+    const b = agendaBlocks(
+      cfg({ sizeId: "a4-handout", qrAnchor: "top-right", qrOffsetX: 20, qrOffsetY: 12 }),
+    );
+    expect(b.qr).not.toBeNull();
+    expect(b.lockup).not.toBeNull();
     const lock = b.lockup!;
     const qr = b.qr!;
-    const clearsRight = qr.x >= lock.x + lock.w;
-    const clearsBelow = qr.y >= lock.y + lock.h;
-    expect(clearsRight || clearsBelow).toBe(true);
+    expect(qr.x >= lock.x + lock.w || qr.y >= lock.y + lock.h).toBe(true);
   });
 });
