@@ -600,6 +600,57 @@ export async function buildAgendaDocx(
         : "",
     ].join("");
 
+    // The printed card board finishes on a solid brand band carrying the event
+    // URL and dates in white — reproduced here as a shaded full-width table.
+    const footerBand =
+      cardMode && ((cfg.footerLeft ?? "").trim() || (cfg.footerRight ?? "").trim())
+        ? [
+            "<w:tbl><w:tblPr>",
+            `<w:tblW w:w="${Math.round(contentTwips)}" w:type="dxa"/>`,
+            '<w:tblInd w:w="0" w:type="dxa"/>',
+            '<w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tblCellMar>',
+            '<w:tblLayout w:type="fixed"/>',
+            "</w:tblPr>",
+            `<w:tblGrid><w:gridCol w:w="${Math.round(contentTwips * 0.62)}"/><w:gridCol w:w="${Math.round(
+              contentTwips * 0.38,
+            )}"/></w:tblGrid>`,
+            `<w:tr><w:trPr><w:trHeight w:val="${mmT(
+              Math.max(6, PL.footSize * 3),
+            )}" w:hRule="atLeast"/><w:cantSplit/></w:trPr>`,
+            cell(
+              contentTwips * 0.62,
+              para(
+                run((cfg.footerLeft ?? "").trim(), {
+                  size: halfPt(PL.footSize),
+                  color: hex(AGENDA_BAND.footerInk, "FFFFFF"),
+                  caps: true,
+                  bold: true,
+                  spacing: 30,
+                }),
+                { afterTwips: 0, lineTwips: mmT(PL.footSize * 1.6) },
+              ),
+              mmT(PL.footSize * 0.8),
+              { fill: AGENDA_BAND.footerBand },
+            ),
+            cell(
+              contentTwips * 0.38,
+              para(
+                run((cfg.footerRight ?? "").trim(), {
+                  size: halfPt(PL.footSize),
+                  color: hex(AGENDA_BAND.footerInk, "FFFFFF"),
+                  caps: true,
+                  bold: true,
+                  spacing: 30,
+                }),
+                { afterTwips: 0, align: "right", lineTwips: mmT(PL.footSize * 1.6) },
+              ),
+              mmT(PL.footSize * 0.8),
+              { fill: AGENDA_BAND.footerBand },
+            ),
+            "</w:tr></w:tbl>",
+          ].join("")
+        : "";
+
     return [
       // The ground rides in the first spacer so the picture costs no extra
       // vertical space — that stray line was pushing every block down a step.
@@ -611,6 +662,7 @@ export async function buildAgendaDocx(
       table,
       footGap > 0.2 ? spacer(mmT(footGap)) : "",
       footer,
+      footerBand,
     ].join("");
   };
 
