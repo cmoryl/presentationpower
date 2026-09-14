@@ -398,9 +398,10 @@ function PanelCard({
           ) : null}
           {londonSuppliedMaster(panel) ? (
             <span className="ml-1.5 inline-flex align-middle rounded bg-[#A6FA87]/60 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-              Supplied master
+              Live file v{londonSuppliedMaster(panel)!.fromRevision}
             </span>
           ) : null}
+
           {variation ? (
             <span className="ml-1.5 inline-flex align-middle rounded bg-[#FF9B70]/55 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
               Copy
