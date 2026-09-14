@@ -667,10 +667,12 @@ function LondonSignagePage() {
   // edits (uploaded vector artwork, moved logo, resized board) the file is built
   // from them and stamped `rdraft-`, never with a revision number that has not
   // been published. With no local edits it is the revision in force, unchanged.
-  const exportOptions = (panel: LondonPanel) =>
-    isDraft(panel) ? previewOptions(panel) : artOptions(panel);
+  const exportOptions = (panel: LondonPanel) => ({
+    ...(isDraft(panel) ? previewOptions(panel) : artOptions(panel)),
+    colorSpace: exportSpace,
+  });
   const fileBase = (panel: LondonPanel) =>
-    londonPanelFileBase(panel, isDraft(panel) ? "draft" : headRev);
+    londonPanelFileBase(panel, isDraft(panel) ? "draft" : headRev, exportSpace);
 
   // Previews outline their copy with the shipped signage face. Until it is in
   // memory the synchronous builder throws by design, so the tile simply stays
