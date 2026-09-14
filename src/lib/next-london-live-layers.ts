@@ -219,14 +219,34 @@ export function londonFinishedLayerClaims(panelId: string): Set<LondonLiveLayerK
   return claims;
 }
 
+/**
+ * Layer kinds the designer explicitly handed back to the kit's editor, so the
+ * kit paints its own editable layer again.
+ */
+export function londonRebuiltLayerKinds(panelId: string): Set<LondonLiveLayerKind> {
+  const state = londonLiveLayers(panelId);
+  const kinds = new Set<LondonLiveLayerKind>();
+  if (!state) return kinds;
+  for (const layer of state.layers) {
+    if (state.rebuilt.includes(layer.name)) kinds.add(layer.kind);
+  }
+  return kinds;
+}
+
 /** True when the supplied file owns this kind of layer already. */
 export function londonFileOwnsLayer(panelId: string, kind: LondonLiveLayerKind): boolean {
   const claims = londonFinishedLayerClaims(panelId);
-  // Unknown layers: a hand-finished file is assumed to carry its own lockup and
-  // typesetting, which is what stops a card doubling up.
-  if (!claims) return kind === "lockup" || kind === "copy" || kind === "ground";
-  return claims.has(kind);
+  // A hand-finished file is assumed to carry its own lockup, typesetting and
+  // ground — that is what stops a card doubling up. Layer names are best effort:
+  // plenty of real files come back as "Layer 1", so an unrecognised name must
+  // NEVER be read as "this file has no headline". The kit only draws its own
+  // lockup/copy/ground again when the designer explicitly hands that layer back.
+  const typeset = kind === "lockup" || kind === "copy" || kind === "ground";
+  if (!claims) return typeset;
+  if (claims.has(kind)) return true;
+  return typeset && !londonRebuiltLayerKinds(panelId).has(kind);
 }
+
 
 function subscribe(listener: () => void): () => void {
   hydrate();
