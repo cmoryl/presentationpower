@@ -193,6 +193,22 @@ function exportCases(): { label: string; config: AgendaConfig }[] {
 describe("agenda export matrix", () => {
   const cases = exportCases();
 
+  beforeAll(() => {
+    // Node has no canvas: the Word file's flattened ground is proved elsewhere.
+    const ctx = new Proxy(
+      {},
+      { get: () => () => ({ addColorStop: () => undefined }) },
+    ) as unknown as CanvasRenderingContext2D;
+    (globalThis as Record<string, unknown>)["document"] = {
+      createElement: () => ({
+        width: 0,
+        height: 0,
+        getContext: () => ctx,
+        toBlob: (cb: (b: Blob) => void) => cb(new Blob([new Uint8Array([1])])),
+      }),
+    };
+  });
+
   for (const testCase of cases) {
     it(`exports press, Word and PowerPoint — ${testCase.label}`, async () => {
       const vector = await buildAgendaVectorPdf(testCase.config);
