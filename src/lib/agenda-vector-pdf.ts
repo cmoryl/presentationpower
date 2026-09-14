@@ -17,6 +17,7 @@ import fontkit from "@pdf-lib/fontkit";
 import {
   PDFDocument,
   PDFName,
+  PDFNumber,
   PDFOperator,
   PDFOperatorNames as Ops,
   PDFRef,
@@ -427,12 +428,12 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
     page.pushOperators(
       PDFOperator.of("cs" as never, [PDFName.of("Pattern")]),
       PDFOperator.of("scn" as never, [groundPattern]),
-      PDFNumber ? PDFOperator.of("re" as never, [
+      PDFOperator.of("re" as never, [
         PDFNumber.of(0),
         PDFNumber.of(0),
         PDFNumber.of(bleedW),
         PDFNumber.of(bleedH),
-      ]) : PDFOperator.of("re" as never, []),
+      ]),
       PDFOperator.of("f" as never),
     );
     page.pushOperators(popGraphicsState());
