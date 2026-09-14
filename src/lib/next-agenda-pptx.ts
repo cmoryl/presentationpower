@@ -168,14 +168,22 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       s.background = { color: groundHex };
     }
 
+    // Header bands come from the printed board: each block owns the space up to
+    // the next one, and the line pitch is set to that band so PowerPoint's own
+    // (larger) line box cannot push the headline down onto the date line.
+    const eyebrowBand = Math.max(L.eyebrowSize * 1.6, b.titleY - b.eyebrowY);
+    const titleBand = Math.max(L.titleSize * 1.15, b.metaY - b.titleY);
+    const metaBand = Math.max(L.metaSize * 1.6, b.rowsTop - b.metaY);
+
     if ((cfg.eyebrow ?? "").trim()) {
       s.addText(cfg.eyebrow.toUpperCase(), {
         x: inX(b.x),
         y: inX(b.eyebrowY),
         w: inX(b.contentW),
-        h: inX(L.eyebrowSize * 1.8),
+        h: inX(eyebrowBand),
         fontFace: FONT,
         fontSize: pt(L.eyebrowSize),
+        lineSpacing: pt(eyebrowBand),
         bold: true,
         charSpacing: 3,
         color: inkHex,
@@ -187,9 +195,10 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
       x: inX(b.x),
       y: inX(b.titleY),
       w: inX(b.contentW),
-      h: inX(L.titleSize * 1.2),
+      h: inX(titleBand),
       fontFace: FONT,
       fontSize: pt(L.titleSize),
+      lineSpacing: pt(titleBand),
       bold: true,
       color: hex(agendaTitleInk(cfg), inkHex),
       valign: "top",
@@ -200,9 +209,10 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
         x: inX(b.x),
         y: inX(b.metaY),
         w: inX(b.contentW),
-        h: inX(L.metaSize * 2),
+        h: inX(metaBand),
         fontFace: FONT,
         fontSize: pt(L.metaSize),
+        lineSpacing: pt(L.metaSize * 1.6),
         color: inkHex,
         valign: "top",
         margin: 0,
