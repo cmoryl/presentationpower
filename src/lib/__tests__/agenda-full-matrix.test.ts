@@ -44,7 +44,14 @@ function programmeBottom(blocks: ReturnType<typeof agendaBlocks>): number {
   return last.y + (last.band?.h ?? last.h);
 }
 
-function auditSheet(id: string, config: AgendaConfig, problems: string[]): void {
+function auditSheet(
+  id: string,
+  config: AgendaConfig,
+  problems: string[],
+  /** A printed page must always fit; an un-paginated day may legitimately
+   *  overrun, provided the fit report says so out loud in the studio. */
+  opts: { printedPage: boolean } = { printedPage: true },
+): void {
   const geo = agendaGeometry(config);
   const b = agendaBlocks(config);
 
@@ -52,7 +59,11 @@ function auditSheet(id: string, config: AgendaConfig, problems: string[]): void 
   if (numbers.some((n) => !Number.isFinite(n) || n < 0)) problems.push(`bad geometry — ${id}`);
   if (b.rowsTop >= b.listBottom) problems.push(`no programme band — ${id}`);
   if (b.footY + b.layout.footSize > geo.trimH + 0.01) problems.push(`footer past trim — ${id}`);
-  if (programmeBottom(b) > b.listBottom + 0.5) problems.push(`programme past its band — ${id}`);
+  if (programmeBottom(b) > b.listBottom + 0.5) {
+    if (opts.printedPage) problems.push(`programme past its band — ${id}`);
+    else if (agendaFit(config).status !== "over")
+      problems.push(`silent overflow — ${id}`);
+  }
 
   if (b.lockup) {
     if (b.lockup.x < geo.safeInset - 0.01) problems.push(`lockup left of safe — ${id}`);
