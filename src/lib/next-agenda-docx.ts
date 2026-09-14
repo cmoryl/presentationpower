@@ -23,11 +23,17 @@ import {
   agendaLayout,
   agendaName,
   agendaPages,
+  agendaQrBackground,
+  agendaQrForeground,
+  agendaQrPlateColor,
+  agendaQrStyle,
+  agendaQrTransparent,
   agendaStops,
   agendaTitleInk,
   type AgendaConfig,
 } from "./next-agenda";
 import { agendaCopyInk } from "./next-agenda-contrast";
+import { qrModulePxForPrint, qrPng } from "./qr-print";
 
 /** Word measures pages in twentieths of a point. */
 const TWIPS_PER_MM = 1440 / 25.4;
@@ -265,6 +271,45 @@ export async function buildAgendaDocx(
       "</pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r>",
     ].join("");
 
+  // The real, scannable code as a picture, placed on the same measured spot the
+  // board prints it — Word previously carried only the link as text, so a
+  // printed Word handout had nothing to scan.
+  const qrBlocks = agendaBlocks(config);
+  const qrPayload = (config.qrData ?? "").trim();
+  const qrImage =
+    qrPayload && qrBlocks.qr
+      ? qrPng(qrPayload, {
+          ink: agendaQrForeground(config),
+          ground: agendaQrTransparent(config)
+            ? agendaQrPlateColor(config)
+            : agendaQrBackground(config),
+          style: agendaQrStyle(config),
+          modulePx: qrModulePxForPrint(qrPayload, qrBlocks.qr.edge),
+        })
+      : null;
+
+  const qrDrawing = (rel: string): string => {
+    if (!qrImage || !qrBlocks.qr) return "";
+    const edge = Math.round(qrBlocks.qr.edge * EMU_PER_MM);
+    return [
+      "<w:r><w:drawing>",
+      '<wp:anchor behindDoc="0" distT="0" distB="0" distL="0" distR="0" simplePos="0" locked="0" layoutInCell="1" allowOverlap="1" relativeHeight="2">',
+      '<wp:simplePos x="0" y="0"/>',
+      `<wp:positionH relativeFrom="page"><wp:posOffset>${Math.round(qrBlocks.qr.x * EMU_PER_MM)}</wp:posOffset></wp:positionH>`,
+      `<wp:positionV relativeFrom="page"><wp:posOffset>${Math.round(qrBlocks.qr.y * EMU_PER_MM)}</wp:posOffset></wp:positionV>`,
+      `<wp:extent cx="${edge}" cy="${edge}"/>`,
+      '<wp:effectExtent l="0" t="0" r="0" b="0"/>',
+      "<wp:wrapNone/>",
+      `<wp:docPr id="2" name="Agenda QR code" descr="QR code linking to ${esc(qrPayload)}"/>`,
+      '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">',
+      '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">',
+      '<pic:nvPicPr><pic:cNvPr id="2" name="qr.png"/><pic:cNvPicPr/></pic:nvPicPr>',
+      `<pic:blipFill><a:blip r:embed="${rel}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>`,
+      `<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${edge}" cy="${edge}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>`,
+      "</pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r>",
+    ].join("");
+  };
+
   const timeW = contentTwips * 0.17;
   const trackW = contentTwips * 0.2;
   const bodyW = contentTwips - timeW - trackW;
@@ -472,7 +517,10 @@ export async function buildAgendaDocx(
     return [
       // The ground rides in the first spacer so the picture costs no extra
       // vertical space — that stray line was pushing every block down a step.
-      spacer(mmT(Math.max(0, B.eyebrowY - geo.safeInset)), backgroundDrawing(groundRel)),
+      spacer(
+        mmT(Math.max(0, B.eyebrowY - geo.safeInset)),
+        backgroundDrawing(groundRel) + qrDrawing("rIdQr"),
+      ),
       header,
       table,
       footGap > 0.2 ? spacer(mmT(footGap)) : "",
@@ -542,6 +590,9 @@ export async function buildAgendaDocx(
         (_p, i) =>
           `<Relationship Id="rIdGround${i === 0 ? "" : i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/ground.png"/>`,
       ),
+      qrImage
+        ? '<Relationship Id="rIdQr" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/qr.png"/>'
+        : "",
       '<Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>',
       '<Relationship Id="rIdSettings" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>',
       '<Relationship Id="rIdFonts" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>',
@@ -602,6 +653,7 @@ export async function buildAgendaDocx(
     ].join(""),
   );
   zip.file("word/media/ground.png", groundBytes);
+  if (qrImage) zip.file("word/media/qr.png", qrImage.bytes);
   zip.file("word/document.xml", document);
 
   const blob = await zip.generateAsync({

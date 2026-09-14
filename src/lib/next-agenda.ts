@@ -28,6 +28,7 @@ import {
   type PillarCaptionAlign,
   type PillarQrStyleId,
 } from "@/lib/next-pillar-masters";
+import { qrPrintQuality, type QrModuleStyle } from "@/lib/qr-print";
 
 export const AGENDA_DIVISIONS: CityBadgeDivision[] = CITY_BADGE_DIVISIONS;
 export const agendaDivision = cityBadgeDivision;
@@ -1067,6 +1068,37 @@ export function agendaQrPlateColor(config: AgendaConfig): string {
 export function agendaQrContrast(config: AgendaConfig): { ratio: number; ok: boolean } {
   const ratio = agendaContrastRatio(agendaQrForeground(config), agendaQrPlateColor(config));
   return { ratio, ok: ratio >= AGENDA_QR_MIN_CONTRAST };
+}
+
+/** Printed module size and quiet zone of the code as it will be output. */
+export function agendaQrPrintQuality(config: AgendaConfig) {
+  const payload = (config.qrData ?? "").trim();
+  const blocks = agendaBlocks(config);
+  if (!payload || !blocks.qr) return null;
+  return qrPrintQuality(payload, blocks.qr.edge, agendaQrStyle(config) as QrModuleStyle);
+}
+
+/**
+ * Everything that would stop a phone reading the printed code: no link, ink and
+ * plate too close in value, or modules printed too small to resolve. Returned as
+ * plain sentences so the editor can show them before the file is ordered.
+ */
+export function agendaQrBlockers(config: AgendaConfig): string[] {
+  const payload = (config.qrData ?? "").trim();
+  if (!payload) return [];
+  const out: string[] = [];
+  const contrast = agendaQrContrast(config);
+  if (!contrast.ok) {
+    out.push(
+      `Code contrast is ${contrast.ratio.toFixed(1)}:1 — it needs ${AGENDA_QR_MIN_CONTRAST}:1 to scan. Darken the modules or keep the plate.`,
+    );
+  }
+  const blocks = agendaBlocks(config);
+  const quality = blocks.qr
+    ? qrPrintQuality(payload, blocks.qr.edge, agendaQrStyle(config) as QrModuleStyle)
+    : null;
+  if (quality) out.push(...quality.notes);
+  return out;
 }
 
 export const AGENDA_LOCKUP_SCALE = { min: 0.5, max: 1.6, step: 0.05 };

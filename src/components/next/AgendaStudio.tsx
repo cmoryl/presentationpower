@@ -43,7 +43,9 @@ import {
   agendaBlocks,
   agendaQrAnchor,
   agendaQrCaptionAlign,
+  agendaQrBlockers,
   agendaQrContrast,
+  agendaQrPrintQuality,
   agendaQrStyle,
   type AgendaCaptionAlign,
   type AgendaQrAnchor,
@@ -78,6 +80,7 @@ import {
   agendaTitleInkOptions,
 } from "@/lib/next-agenda-contrast";
 import { NEXT_CITY_SERIES, NEXT_EVENT } from "@/lib/next-event";
+import { QR_SCAN_VERIFIED_STYLES, type QrModuleStyle } from "@/lib/qr-print";
 
 const NATIVE_PX_PER_MM = 1.2;
 
@@ -840,6 +843,9 @@ export function AgendaStudio({
                       {AGENDA_QR_STYLES.map((s) => (
                         <option key={s.id} value={s.id}>
                           {s.label}
+                          {QR_SCAN_VERIFIED_STYLES.includes(s.id as QrModuleStyle)
+                            ? ""
+                            : " — not scan-verified"}
                         </option>
                       ))}
                     </select>
@@ -911,13 +917,30 @@ export function AgendaStudio({
                     states the contrast it will actually be scanned at. */}
                 {(() => {
                   const c = agendaQrContrast(config);
+                  const quality = agendaQrPrintQuality(config);
+                  const blockers = agendaQrBlockers(config);
                   return (
-                    <p className={`text-xs ${c.ok ? "text-muted-foreground" : "text-destructive"}`}>
-                      Scan contrast {c.ratio.toFixed(1)}:1{" "}
-                      {c.ok
-                        ? "· comfortably scannable"
-                        : `· below ${AGENDA_QR_MIN_CONTRAST}:1, darken the ink or keep the plate`}
-                    </p>
+                    <div className="space-y-1">
+                      <p
+                        className={`text-xs ${c.ok ? "text-muted-foreground" : "text-destructive"}`}
+                      >
+                        Scan contrast {c.ratio.toFixed(1)}:1{" "}
+                        {c.ok
+                          ? "· comfortably scannable"
+                          : `· below ${AGENDA_QR_MIN_CONTRAST}:1, darken the ink or keep the plate`}
+                      </p>
+                      {quality ? (
+                        <p className="text-xs text-muted-foreground">
+                          {quality.modules} modules · {quality.moduleMm.toFixed(2)}mm each ·{" "}
+                          {quality.quietMm.toFixed(1)}mm quiet zone
+                        </p>
+                      ) : null}
+                      {blockers.map((b) => (
+                        <p key={b} className="text-xs text-destructive">
+                          {b}
+                        </p>
+                      ))}
+                    </div>
                   );
                 })()}
 

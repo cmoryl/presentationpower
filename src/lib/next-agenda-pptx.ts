@@ -33,7 +33,7 @@ import {
 } from "./next-agenda";
 import { agendaCopyInk } from "./next-agenda-contrast";
 import { flattenedGroundPng } from "./next-agenda-docx";
-import { buildPillarQr } from "./pillar-qr";
+import { qrModulePxForPrint, qrPng, qrPngDataUrl } from "./qr-print";
 
 const MM_TO_IN = 1 / 25.4;
 /** Cap-height millimetres → points, the same conversion the Word export uses. */
@@ -60,8 +60,10 @@ async function blobToDataUrl(blob: Blob): Promise<string> {
 }
 
 /**
- * Rasterize the real QR matrix at print density so it stays scannable, using
- * the same module shape, ink and plate the editor previewed.
+ * The real QR matrix as a PNG at print density, painted with the same module
+ * geometry, ink and plate the preview and the press PDF use. Density is derived
+ * from the printed edge size so the picture holds 300dpi on an A1 board instead
+ * of a fixed pixel guess.
  */
 function qrDataUrl(
   payload: string,
@@ -69,42 +71,16 @@ function qrDataUrl(
   ground: string,
   style: "block" | "rounded" | "dot" = "block",
   transparent = false,
+  edgeMm = 48,
 ): string | null {
-  const qr = buildPillarQr(payload);
-  if (!qr) return null;
-  const scale = 8;
-  const canvas = document.createElement("canvas");
-  canvas.width = qr.size * scale;
-  canvas.height = qr.size * scale;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return null;
-  if (!transparent) {
-    ctx.fillStyle = ground;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }
-  ctx.fillStyle = ink;
-  for (let y = 0; y < qr.size; y += 1) {
-    for (let x = 0; x < qr.size; x += 1) {
-      if (!qr.modules[y * qr.size + x]) continue;
-      const px = x * scale;
-      const py = y * scale;
-      if (style === "dot") {
-        ctx.beginPath();
-        ctx.arc(px + scale / 2, py + scale / 2, scale / 2, 0, Math.PI * 2);
-        ctx.fill();
-      } else if (style === "rounded") {
-        ctx.beginPath();
-        const inset = scale * 0.06;
-        const size = scale * 0.88;
-        const r = scale * 0.26;
-        ctx.roundRect(px + inset, py + inset, size, size, r);
-        ctx.fill();
-      } else {
-        ctx.fillRect(px, py, scale, scale);
-      }
-    }
-  }
-  return canvas.toDataURL("image/png");
+  const png = qrPng(payload, {
+    ink,
+    ground,
+    style,
+    transparent,
+    modulePx: qrModulePxForPrint(payload, edgeMm),
+  });
+  return png ? qrPngDataUrl(png) : null;
 }
 
 export type AgendaPptxResult = {
@@ -314,6 +290,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
         agendaQrBackground(cfg),
         agendaQrStyle(cfg),
         agendaQrTransparent(cfg),
+        b.qr.edge,
       );
       if (data) {
         s.addImage({
