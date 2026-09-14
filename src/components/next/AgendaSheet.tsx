@@ -278,7 +278,18 @@ export function AgendaSheet({
             ) : (
               qr.modules.map((on, i) =>
                 on ? (
-                  qrStyle === "dot" ? (
+                  // Finder patterns and timing lines print solid so the code
+                  // stays decodable — the same rule the exports follow.
+                  qrStructuralModule(i % qr.size, Math.floor(i / qr.size), qr.size) ? (
+                    <rect
+                      key={i}
+                      x={i % qr.size}
+                      y={Math.floor(i / qr.size)}
+                      width={1}
+                      height={1}
+                      fill={qrInk}
+                    />
+                  ) : qrStyle === "dot" ? (
                     <circle
                       key={i}
                       cx={(i % qr.size) + 0.5}
