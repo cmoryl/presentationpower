@@ -138,6 +138,7 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
   const face = config.face ?? "dark";
   const inkHex = hex(agendaInk(face), face === "light" ? "03002C" : "FFFFFF");
   const groundHex = face === "light" ? "EEF1F7" : "03002C";
+  const mutedHex = mix(inkHex, groundHex, 0.7);
   const notes: string[] = [];
 
   const pptx = new PptxGenJS();
