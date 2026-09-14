@@ -14,7 +14,7 @@ import { ArrowLeft, BookOpen, FileDown, FileText, Presentation } from "lucide-re
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/design-system/element";
 import { runWithExportFeedback } from "@/lib/export-feedback";
-import { agendaDefault, agendaPages, type AgendaConfig } from "@/lib/next-agenda";
+import { agendaDefault, agendaGeometry, agendaPages, type AgendaConfig } from "@/lib/next-agenda";
 import { buildAgendaDocx } from "@/lib/next-agenda-docx";
 import { buildAgendaPptx } from "@/lib/next-agenda-pptx";
 import { listAgendaFiles } from "@/lib/next-agenda.functions";
