@@ -44,9 +44,30 @@ describe("agenda QR codes decode from every export raster", () => {
     }
   }
 
-  it("still decodes at the lowest density the exports can emit", () => {
-    for (const style of STYLES) {
-      expect(decode(PAYLOADS[0], style, 4)).toBe(PAYLOADS[0]);
+  it("decodes at every density any export can emit", () => {
+    const fails: string[] = [];
+    for (const payload of PAYLOADS) {
+      for (const style of STYLES) {
+        for (const px of [4, 6, 8, 10, 12, 16, 20, 24]) {
+          if (decode(payload, style, px) !== payload) fails.push(`${style}@${px} ${payload}`);
+        }
+      }
+    }
+    expect(fails).toEqual([]);
+  });
+
+  it("prints scanner anchors solid whatever the module style", () => {
+    const block = qrRaster(PAYLOADS[0], { style: "block", modulePx: 10 })!;
+    for (const style of ["dot", "rounded"] as QrModuleStyle[]) {
+      const shaped = qrRaster(PAYLOADS[0], { style, modulePx: 10 })!;
+      // Sample the top-left finder: identical ink to the plain square version.
+      let diff = 0;
+      for (let y = 40; y < 110; y += 1) {
+        for (let x = 40; x < 110; x += 1) {
+          if (block.ink[y * block.width + x] !== shaped.ink[y * shaped.width + x]) diff += 1;
+        }
+      }
+      expect(diff).toBe(0);
     }
   });
 
