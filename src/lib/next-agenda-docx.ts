@@ -510,7 +510,18 @@ export async function buildAgendaDocx(
           ),
           pars
             .map((p) =>
-              cell(cardParColW, copy(p.title, p.detail, parInk), rowPad, {
+              cell(
+                cardParColW,
+                // A track with its own start time prints it above the title; the
+                // row's time cell only carries the main band's slot time.
+                ((p.time ?? "").trim()
+                  ? para(
+                      run(p.time!, { size: halfPt(PL.timeSize), color: parInk, bold: true }),
+                      { afterTwips: 0, lineTwips: mmT(PL.timeSize * 1.4) },
+                    )
+                  : "") + copy(p.title, p.detail, parInk, p.speaker ?? ""),
+                rowPad,
+                {
                 fill: BAND.parallel,
                 vAlign: "top",
                 rail: BAND.rail,
