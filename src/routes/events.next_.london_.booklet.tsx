@@ -80,11 +80,14 @@ function download(blob: Blob, name: string): void {
 }
 
 function BookletPage() {
-  const mappedFloors = useMemo<LondonFloorId[]>(() => londonMappedFloors(), []);
+  const mappedFloors = useMemo<LondonFloorId[]>(
+    () => londonMappedFloors().map((f) => f.id),
+    [],
+  );
   const [config, setConfig] = useState<BookletConfig>(() => ({
     ...bookletDefault({
       title: "NEXT 2026 LONDON",
-      subtitle: `${LONDON_VENUE.name} · ${LONDON_VENUE.dates}`,
+      subtitle: `${LONDON_VENUE.name} · ${LONDON_VENUE.datesLabel}`,
       footnote: "Programme subject to change · full agenda and speaker bios online",
     }),
     mapFloors: mappedFloors.slice(0, 2),
@@ -100,7 +103,7 @@ function BookletPage() {
     retry: false,
   });
 
-  const rows = (saved.data ?? []) as { id: string; name: string; config: AgendaConfig }[];
+  const rows = (saved.data ?? []) as unknown as { id: string; name: string; config: AgendaConfig }[];
 
   /** The agenda the booklet prints, forced to the booklet's own page format. */
   const agenda = useMemo<AgendaConfig>(() => {
@@ -136,7 +139,13 @@ function BookletPage() {
   const runExport = async (kind: "pdf" | "docx" | "pptx") => {
     setBusy(kind);
     try {
-      await runWithExportFeedback(async () => {
+      await runWithExportFeedback(
+        {
+          pending: "Building the booklet…",
+          success: "Booklet ready",
+          failure: "The booklet could not be built",
+        },
+        async () => {
         const { pages, warnings } = await renderExtras();
         const cover = config.includeCover ? config.cover : null;
         const stem = bookletSlug(config);
@@ -161,7 +170,8 @@ function BookletPage() {
           download(built.blob, `${stem}.pptx`);
           setNotes([...built.notes, ...warnings]);
         }
-      });
+        },
+      );
     } finally {
       setBusy(null);
     }
