@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import JSZip from "jszip";
 import { buildAgendaDocx } from "@/lib/next-agenda-docx";
 import { agendaDefault } from "@/lib/next-agenda";
@@ -8,6 +8,22 @@ import { agendaDefault } from "@/lib/next-agenda";
  * one page per day, and no clipped session titles.
  */
 describe("agenda Word export layout", () => {
+  beforeAll(() => {
+    // Node has no canvas: the flattened ground is not what this test checks.
+    const ctx = new Proxy(
+      {},
+      { get: () => () => ({ addColorStop: () => undefined }) },
+    ) as unknown as CanvasRenderingContext2D;
+    (globalThis as Record<string, unknown>)["document"] = {
+      createElement: () => ({
+        width: 0,
+        height: 0,
+        getContext: () => ctx,
+        toBlob: (cb: (b: Blob) => void) => cb(new Blob([new Uint8Array([1])])),
+      }),
+    };
+  });
+
   it("drives spacing from measured bands and keeps rows unclipped", async () => {
     const cfg = agendaDefault();
     const blob = await buildAgendaDocx(cfg);
