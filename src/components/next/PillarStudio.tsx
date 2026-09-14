@@ -18,6 +18,7 @@ import { useSignedIn } from "@/components/CloudDeckControls";
 import { announceNextMasterSaved } from "@/hooks/use-next-live-masters";
 
 import { PillarSign } from "@/components/next/PillarSign";
+import { PILLAR_TEMPLATES, pillarTemplate } from "@/lib/next-pillar-templates";
 import { MAX_PLATE_EDGE_PX } from "@/lib/event-print-pipeline";
 import { exportPillarSign } from "@/lib/next-pillar-export";
 import { exportPillarBatch, type PillarBatchItem } from "@/lib/next-pillar-batch-export";
@@ -862,7 +863,12 @@ export function PillarStudio({
                   <div className={label}>Lockup size</div>
                   <div className="text-xs tabular-nums text-black/55">
                     {Math.round(pillarLockupScale(config) * 100)}% ·{" "}
-                    {Math.round(geo.trimW * 0.58 * pillarLockupScale(config))} mm wide
+                    {Math.round(
+                      geo.trimW *
+                        pillarTemplate(config.templateId).lockupWidth *
+                        pillarLockupScale(config),
+                    )}{" "}
+                    mm wide
                   </div>
                 </div>
                 <input
@@ -889,6 +895,12 @@ export function PillarStudio({
                 </option>
               ))}
             </select>
+            {pillarTemplate(config.templateId).stops ? (
+              <p className="mt-2 text-xs leading-relaxed text-black/55">
+                This template carries its own measured ground from the supplied master, so the
+                gradient choice above is held for when you switch back to the classic column.
+              </p>
+            ) : null}
           </div>
 
           {config.kind === "logo" ? null : (
