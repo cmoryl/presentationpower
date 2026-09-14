@@ -729,7 +729,19 @@ export async function buildAgendaDocx(
       cardHeader ?? header,
       cardHeader ? spacer(mmT(Math.max(2, B.rowsTop - B.metaY - lineMm(PL.metaSize)))) : "",
       table,
-      footGap > 0.2 ? spacer(mmT(footGap)) : "",
+      // Card mode: whatever the bands did not use drops the footer band to the
+      // foot of the sheet, where the printed board carries it.
+      (cardMode
+        ? Math.max(0, cardBudget - cardWanted.reduce((a, b) => a + b, 0) * cardScale)
+        : footGap) > 0.2
+        ? spacer(
+            mmT(
+              cardMode
+                ? Math.max(0, cardBudget - cardWanted.reduce((a, b) => a + b, 0) * cardScale)
+                : footGap,
+            ),
+          )
+        : "",
       footer,
       footerBand,
     ].join("");
