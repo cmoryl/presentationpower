@@ -27,7 +27,7 @@ describe("agenda Word export layout", () => {
   it("drives spacing from measured bands and keeps rows unclipped", async () => {
     const cfg = agendaDefault();
     const blob = await buildAgendaDocx(cfg);
-    const zip = await JSZip.loadAsync(await blob.arrayBuffer());
+    const zip = await JSZip.loadAsync(await new Response(blob as BlobPart).arrayBuffer());
     const doc = await zip.file("word/document.xml")!.async("string");
 
     // Rows use the printed band as a minimum, never a hard cut.
