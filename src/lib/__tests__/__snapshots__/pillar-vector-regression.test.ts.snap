@@ -19,6 +19,7 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
     "06 QR code",
     "07 Guides + marks",
     "08 Placed artwork",
+    "09 Chevron device",
   ],
   "legacyShading": 0,
   "meshShading": 2,
@@ -53,6 +54,7 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
     "06 QR code",
     "07 Guides + marks",
     "08 Placed artwork",
+    "09 Chevron device",
   ],
   "legacyShading": 0,
   "meshShading": 2,
@@ -65,6 +67,41 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
   "rasterImages": 0,
   "subsetFont": false,
   "textShowOps": 10,
+}
+`;
+
+exports[`pillar vector export regression > keeps the Illustrator-safe vector structure for next-ascend-chevron-template 1`] = `
+{
+  "boxes": {
+    "bleed": true,
+    "media": true,
+    "trim": true,
+  },
+  "clips": 1,
+  "fillOps": 10,
+  "fontsEmbedded": 0,
+  "layers": [
+    "01 Ground",
+    "02 Lockup",
+    "03 Headline",
+    "04 Sub-line",
+    "05 Arrow",
+    "06 QR code",
+    "07 Guides + marks",
+    "08 Placed artwork",
+    "09 Chevron device",
+  ],
+  "legacyShading": 0,
+  "meshShading": 2,
+  "page": "1891x5815pt",
+  "pdfVersion": "%PDF-1.7",
+  "pdfx": {
+    "outputIntent": "sRGB IEC61966-2.1",
+    "outputIntentSpace": "RGB",
+  },
+  "rasterImages": 0,
+  "subsetFont": false,
+  "textShowOps": 1,
 }
 `;
 
@@ -87,6 +124,7 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
     "06 QR code",
     "07 Guides + marks",
     "08 Placed artwork",
+    "09 Chevron device",
   ],
   "legacyShading": 0,
   "meshShading": 2,
@@ -121,6 +159,7 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
     "06 QR code",
     "07 Guides + marks",
     "08 Placed artwork",
+    "09 Chevron device",
   ],
   "legacyShading": 0,
   "meshShading": 2,

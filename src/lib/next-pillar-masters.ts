@@ -273,7 +273,7 @@ export const PILLAR_FACES: { id: PillarFaceId; name: string; note: string }[] = 
   },
 ];
 
-const LIGHT_TINT = 0.68;
+export const LIGHT_TINT = 0.68;
 const LIGHT_BASE = [247, 249, 252] as const;
 
 function tint(hex: string, amount: number): string {
@@ -290,6 +290,11 @@ function tint(hex: string, amount: number): string {
   const rgb = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
   const out = rgb.map((c, i) => Math.round(c + (LIGHT_BASE[i]! - c) * amount));
   return `#${out.map((c) => c.toString(16).padStart(2, "0")).join("")}`.toUpperCase();
+}
+
+/** Tint an approved colour back toward the light face base. */
+export function tintTowardLight(hex: string, amount: number = LIGHT_TINT): string {
+  return tint(hex, amount);
 }
 
 export function pillarStops(styleId: string, face: PillarFaceId = "dark"): string[] {
@@ -312,6 +317,8 @@ export function pillarStyleLabel(styleId: string): string {
 
 export type PillarConfig = {
   kind: PillarKindId;
+  /** Layout template id from `next-pillar-templates` ("classic" | "next-ascend"). */
+  templateId?: string;
   divisionId: string;
   styleId: string;
   headline: string;
@@ -389,6 +396,7 @@ export function pillarDefault(
   const kind = pillarKind(kindId);
   return {
     kind: kind.id,
+    templateId: "classic",
     divisionId: pillarDivision(divisionId).id,
     styleId: kind.defaultStyle,
     headline: kind.headline,
@@ -660,7 +668,8 @@ export function pillarName(config: PillarConfig): string {
 
 export function pillarSlug(config: PillarConfig): string {
   const g = pillarGeometry(config);
-  return `${config.divisionId}-${config.kind}-${config.face ?? "dark"}-${Math.round(g.trimW)}x${Math.round(g.trimH)}-${config.styleId}`
+  const tpl = config.templateId && config.templateId !== "classic" ? `-${config.templateId}` : "";
+  return `${config.divisionId}-${config.kind}${tpl}-${config.face ?? "dark"}-${Math.round(g.trimW)}x${Math.round(g.trimH)}-${config.styleId}`
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");

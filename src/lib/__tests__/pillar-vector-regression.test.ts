@@ -112,6 +112,15 @@ const samples: { name: string; config: PillarConfig }[] = [
     } as PillarConfig,
   },
   {
+    name: "next-ascend-chevron-template",
+    config: {
+      ...pillarDefault(),
+      templateId: "next-ascend",
+      headline: "LIFT YOUR GLOBAL PROFILE",
+      verticalHeadline: false,
+    } as PillarConfig,
+  },
+  {
     name: "logo-with-qr",
     config: {
       ...withPillarKind(pillarDefault(), "logo"),
@@ -134,7 +143,7 @@ describe("pillar vector export regression", () => {
       expect(fp.legacyShading, "only Type 4 mesh shadings survive Illustrator").toBe(0);
       expect(fp.meshShading, "ground must be a live mesh gradient").toBeGreaterThan(0);
       expect(fp.subsetFont, "subset cmaps render as .notdef boxes").toBe(false);
-      expect(fp.layers.length, "eight named layers (OCGs)").toBe(8);
+      expect(fp.layers.length, "nine named layers (OCGs)").toBe(9);
       expect(fp.boxes).toEqual({ media: true, trim: true, bleed: true });
       expect(fp.clips, "ground is clipped to the bleed sheet").toBeGreaterThan(0);
 

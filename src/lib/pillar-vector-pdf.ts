@@ -66,6 +66,13 @@ import {
 } from "./next-pillar-masters";
 import { PILLAR_LOGO_DROP } from "./next-pillar-masters";
 import { registerMeshShading, type MeshSampler } from "./pdf-mesh-shading";
+import {
+  pillarChevronBands,
+  pillarChevronInk,
+  pillarGroundStops,
+  pillarHeadlineLines,
+  pillarTemplate,
+} from "./next-pillar-templates";
 import { pillarArrowStyle } from "./pillar-arrows";
 import { buildPillarQr } from "./pillar-qr";
 
@@ -80,7 +87,8 @@ export type PillarLayerName =
   | "05 Arrow"
   | "06 QR code"
   | "07 Guides + marks"
-  | "08 Placed artwork";
+  | "08 Placed artwork"
+  | "09 Chevron device";
 
 export type PillarVectorResult = {
   bytes: Uint8Array<ArrayBuffer>;
@@ -294,7 +302,9 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
   const face = config.face ?? "dark";
   const ink = pillarInk(face);
   const headlineInk = pillarHeadlineInk(config);
-  const stops = pillarStops(config.styleId, face);
+  const template = pillarTemplate(config.templateId);
+  const leftSet = template.align === "left";
+  const stops = pillarGroundStops(config);
 
   const bleedW = geo.bleedW * MM_TO_PT;
   const bleedH = geo.bleedH * MM_TO_PT;
@@ -328,6 +338,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     "06 QR code",
     "07 Guides + marks",
     "08 Placed artwork",
+    "09 Chevron device",
   ];
   const layers: Layer[] = names.map((name, i) => {
     const nonPrinting = name === "07 Guides + marks";
@@ -396,9 +407,44 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     clip(),
     endPath(),
   );
-  drawGround(doc, page, bleedW, bleedH, stops, config.styleId);
+  // A template with its own measured ground runs top-to-bottom like the master.
+  drawGround(doc, page, bleedW, bleedH, stops, template.stops ? "01-beam-violet-aqua" : config.styleId);
   page.pushOperators(popGraphicsState());
   endLayer(page);
+
+  // ── 09 Chevron device ──────────────────────────────────────────────────────
+  if (template.chevrons) {
+    const chev = pillarChevronInk(face);
+    const chevColor = hexRgb(chev.color);
+    beginLayer(page, layer("09 Chevron device"));
+    page.pushOperators(
+      pushGraphicsState(),
+      translate(round(ox), round(oy)),
+      moveTo(0, 0),
+      lineTo(bleedW, 0),
+      lineTo(bleedW, bleedH),
+      lineTo(0, bleedH),
+      closePath(),
+      clip(),
+      endPath(),
+    );
+    const alpha = doc.context.obj({ Type: "ExtGState", ca: chev.opacity });
+    const gsRef = doc.context.register(alpha);
+    const res = page.node.Resources()!;
+    const gsDict = doc.context.obj({ GSchev: gsRef });
+    res.set(PDFName.of("ExtGState"), gsDict);
+    page.pushOperators(PDFOperator.of(Ops.SetGraphicsStateParams, [PDFName.of("GSchev")]));
+    for (const band of pillarChevronBands(geo.bleedW, geo.bleedH)) {
+      // Bands are measured in mm from the sheet top; PDF y runs up from the foot.
+      polygon(
+        page,
+        band.points.map(([x, y]) => [mm(x), bleedH - mm(y)] as [number, number]),
+        chevColor,
+      );
+    }
+    page.pushOperators(popGraphicsState());
+    endLayer(page);
+  }
 
   // ── 08 Placed artwork ──────────────────────────────────────────────────────
   // Supplied NEXT MART masters re-placed as vector shapes, so the panel scales
@@ -433,7 +479,8 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
 
   // ── 02 Lockup ──────────────────────────────────────────────────────────────
   const division = pillarDivision(config.divisionId);
-  const lockupW = trimW * 0.58 * pillarLockupScale(config);
+  const lockupW = trimW * template.lockupWidth * pillarLockupScale(config);
+  const lockupX = leftSet ? safeX : centerX - lockupW / 2;
   const lockupH = lockupW / (division.ratio || 1.7);
   const isLogoOnly = config.kind === "logo";
   // Logo-only pillars drop a quarter of the column, mirroring the live sign.
@@ -449,7 +496,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
       const scale = lockupW / vw;
       for (const d of art.paths) {
         page.drawSvgPath(d, {
-          x: centerX - lockupW / 2 - vx * scale,
+          x: lockupX - vx * scale,
           y: lockupTop + vy * scale,
           scale,
           color: rgb(...hexRgb(ink)),
@@ -460,7 +507,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
       try {
         const image = art.png ? await doc.embedPng(art.bytes) : await doc.embedJpg(art.bytes);
         page.drawImage(image, {
-          x: centerX - lockupW / 2,
+          x: lockupX,
           y: lockupTop - lockupH,
           width: lockupW,
           height: lockupH,
@@ -478,11 +525,29 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
   const headlineSize = mm(pillarHeadlineSize(config));
   const subSize = mm(pillarSubSize(config));
   const drop = mm(pillarHeadlineOffset(config));
-  const vertical = Boolean(config.verticalHeadline) && !isLogoOnly;
+  const vertical = Boolean(config.verticalHeadline) && !isLogoOnly && !leftSet;
   const headTop = (config.showLockup ? lockupTop - lockupH : safeTop) - drop;
 
   let headlineBottom = headTop;
-  if (!isLogoOnly && headline) {
+  if (!isLogoOnly && headline && leftSet) {
+    // Left-set template: the headline stacks a word to a line, top measured as a
+    // fraction of the trim height exactly as the live sign places it.
+    beginLayer(page, layer("03 Headline"));
+    const lines = pillarHeadlineLines(headline, template.stackWords);
+    let baseline = trimY + trimH * (1 - template.headlineTop) - drop - headlineSize * 0.82;
+    for (const line of lines) {
+      page.drawText(line, {
+        x: safeX,
+        y: baseline,
+        size: headlineSize,
+        font: bold,
+        color: rgb(...hexRgb(headlineInk)),
+      });
+      baseline -= headlineSize;
+    }
+    headlineBottom = baseline;
+    endLayer(page);
+  } else if (!isLogoOnly && headline) {
     beginLayer(page, layer("03 Headline"));
     if (vertical) {
       const size = headlineSize * 1.45;
@@ -520,7 +585,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     beginLayer(page, layer("04 Sub-line"));
     const width = regular.widthOfTextAtSize(subline, subSize);
     page.drawText(subline, {
-      x: centerX - width / 2,
+      x: leftSet ? safeX : centerX - width / 2,
       y: headlineBottom - subSize * 1.5,
       size: subSize,
       font: regular,
