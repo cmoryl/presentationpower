@@ -814,8 +814,32 @@ export function AgendaStudio({
             const readouts = agendaCopyReadouts(config);
             const failing = readouts.filter((r) => !r.ok);
             return (
-              <div className="space-y-2 rounded-md border border-border/60 p-3">
-                <p className="text-sm font-medium">Copy legibility</p>
+               <details className="group rounded-md border border-border/60 p-3">
+                <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-medium">
+                  {failing.length ? (
+                    <AlertTriangle
+                      size={14}
+                      className="shrink-0 text-destructive"
+                      aria-hidden
+                    />
+                  ) : (
+                    <Check size={14} className="shrink-0 text-[#003FC7]" aria-hidden />
+                  )}
+                  <span>Copy legibility</span>
+                  <span
+                    className={`min-w-0 flex-1 truncate text-xs font-normal ${failing.length ? "text-destructive" : "text-muted-foreground"}`}
+                  >
+                    {failing.length
+                      ? `${failing.length} of ${readouts.length} bands below their floor`
+                      : `All ${readouts.length} bands pass`}
+                  </span>
+                  <ChevronDown
+                    size={14}
+                    aria-hidden
+                    className="shrink-0 text-muted-foreground transition group-open:rotate-180"
+                  />
+                </summary>
+                <div className="mt-2 space-y-2">
                 <p
                   className={`text-xs ${failing.length ? "text-destructive" : "text-muted-foreground"}`}
                 >
@@ -835,7 +859,8 @@ export function AgendaStudio({
                     </li>
                   ))}
                 </ul>
-              </div>
+                </div>
+              </details>
             );
           })()}
 
