@@ -3,7 +3,7 @@ import { agendaBlocks, normalizeAgendaConfig } from "@/lib/next-agenda";
 
 function cfg(extra: Record<string, unknown>) {
   return normalizeAgendaConfig({
-    look: "card",
+    rowStyle: "card",
     locationLine: "FLEMING 3RD FLOOR",
     title: "GlobalLink NEXT",
     qrData: "https://transperfect.com/next",
