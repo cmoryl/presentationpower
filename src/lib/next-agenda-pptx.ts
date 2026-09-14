@@ -386,11 +386,16 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
   }
 
   const raw = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
+  // Carry Geist inside the package and normalize the theme font scheme, so the
+  // board's type does not re-flow into a substitute face on the machine that
+  // opens it — the same pass every other deck export runs.
+  const { embedFontsInPptx } = await import("./pptx-font-embed");
+  const withFonts = await embedFontsInPptx(raw);
   // pptxgenjs emits presentation.xml with notesMasterIdLst after sldIdLst, which
   // the ECMA-376 sequence forbids and Office refuses to open. Reuse the same
   // terminal hygiene pass every other deck export in the app runs through.
   const { applyTerminalPptxHygiene } = await import("./pptx-terminal-hygiene");
-  const blob = await applyTerminalPptxHygiene(raw);
+  const blob = await applyTerminalPptxHygiene(withFonts);
   notes.push(
     `${pages.length} slide${pages.length === 1 ? "" : "s"} at ${geo.trimW} × ${geo.trimH} mm — every programme row is an editable PowerPoint table cell.`,
   );
