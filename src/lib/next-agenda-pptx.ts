@@ -382,16 +382,14 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
           const copy = parCopy[pi];
           if (!copy) return;
           const label = parCopy.length > 1 ? `${i + 1}.${pi + 1}` : `${i + 1}`;
-          s.addShape("rect", {
-            x: inX(par.x),
-            y: inX(par.y),
-            w: inX(par.w),
-            h: inX(par.h),
-            fill: { color: hex(BAND.parallel) },
-            line: { type: "none" },
-            objectName: `Parallel session ${label}`,
-          });
-          rail(par, `Parallel rail ${label}`);
+          rail(par, BAND.parallelAlpha, `Parallel rail ${label}`);
+          plate(
+            par,
+            BAND.parallel,
+            BAND.parallelAlpha,
+            `Parallel session ${label}`,
+            inX(BAND.railW * L.k),
+          );
           bandText(
             par,
             {
