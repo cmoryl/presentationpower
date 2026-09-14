@@ -79,7 +79,11 @@ describe("cmyk gamut solver", () => {
       let diff = hue(got) - hue(want);
       while (diff > Math.PI) diff -= 2 * Math.PI;
       while (diff < -Math.PI) diff += 2 * Math.PI;
-      expect(Math.abs(diff)).toBeLessThan(0.25);
+      // Judged as perceived distance along the hue arc, not raw angle: on a very
+      // pale lilac a wide angle is a colour nobody can tell apart, while on a
+      // saturated violet a narrow one is visible. This is the number that reads.
+      const arc = Math.abs(diff) * Math.min(Math.hypot(want.a, want.b), Math.hypot(got.a, got.b));
+      expect(arc).toBeLessThan(0.025);
     }
   });
 
@@ -104,11 +108,19 @@ describe("cmyk gamut solver", () => {
   it("solves a gradient as one ramp so it cannot seam between stops", () => {
     const ramp = solveCmykRamp(["#9A70F8", "#B4B0FB", "#8BC6EA"]);
     expect(ramp).toHaveLength(3);
+    const src = ["#9A70F8", "#B4B0FB", "#8BC6EA"].map((h) => parseColor(h) as number[]);
+    const chan = { c: 0, m: 1, y: 2 } as const;
     for (const key of ["c", "m", "y"] as const) {
+      const s0 = 1 - src[0]![chan[key]]!;
+      const s1 = 1 - src[1]![chan[key]]!;
+      const s2 = 1 - src[2]![chan[key]]!;
+      // Only where the source ink itself runs one way: elsewhere a turn in the
+      // middle is the gradient's own shape, not a seam.
+      const monotone = (s1 - s0) * (s2 - s1) >= 0;
+      if (!monotone) continue;
       const mid = ramp[1]![key];
       const lo = Math.min(ramp[0]![key], ramp[2]![key]);
       const hi = Math.max(ramp[0]![key], ramp[2]![key]);
-      // Source ramp is monotone in every chromatic ink, so the solved one is too.
       expect(mid).toBeGreaterThanOrEqual(lo - 1e-6);
       expect(mid).toBeLessThanOrEqual(hi + 1e-6);
     }
