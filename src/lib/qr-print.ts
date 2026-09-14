@@ -13,6 +13,24 @@ import { buildPillarQr } from "./pillar-qr";
 
 export type QrModuleStyle = "block" | "rounded" | "dot";
 
+/**
+ * Finder patterns, their separators and the timing lines are the geometry a
+ * scanner locks onto. Shaped modules (dot, rounded) leave white gaps there and
+ * decoding becomes a coin flip — proven with a decoder, not assumed — so those
+ * modules always print as solid squares while the data area keeps the style.
+ */
+export function qrStructuralModule(mx: number, my: number, size: number): boolean {
+  const QUIET = 4;
+  const n = size - QUIET * 2;
+  const x = mx - QUIET;
+  const y = my - QUIET;
+  if (x < 0 || y < 0 || x >= n || y >= n) return false;
+  const inFinder = (fx: number, fy: number) => x >= fx && x < fx + 8 && y >= fy && y < fy + 8;
+  if (inFinder(0, 0) || inFinder(n - 8, 0) || inFinder(0, n - 8)) return true;
+  // Timing lines run between the finders on row 6 and column 6.
+  return x === 6 || y === 6;
+}
+
 export type QrRaster = {
   /** Module count per side, including the 4-module quiet zone. */
   modules: number;
@@ -44,7 +62,8 @@ export function qrRaster(
       if (!qr.modules[my * qr.size + mx]) continue;
       const ox = mx * modulePx;
       const oy = my * modulePx;
-      if (style === "block") {
+      const solid = style === "block" || qrStructuralModule(mx, my, qr.size);
+      if (solid) {
         for (let y = 0; y < modulePx; y += 1) {
           ink.fill(1, (oy + y) * width + ox, (oy + y) * width + ox + modulePx);
         }
