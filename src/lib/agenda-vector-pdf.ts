@@ -217,7 +217,12 @@ async function ttf(doc: PDFDocument, path: string): Promise<PDFFont | null> {
   try {
     const res = await fetch(resolveAssetUrl(path));
     if (!res.ok) return null;
-    return await doc.embedFont(await res.arrayBuffer(), { subset: false });
+    // Ligatures off: the ff / tt pairs in the face substitute a single glyph but
+    // keep the pair's advance, so "coffee" printed as "coff ee" on the board.
+    return await doc.embedFont(await res.arrayBuffer(), {
+      subset: false,
+      features: { liga: false, clig: false, dlig: false, rlig: false },
+    });
   } catch {
     return null;
   }

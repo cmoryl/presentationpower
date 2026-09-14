@@ -171,7 +171,11 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
         h: inX(eyebrowBand),
         fontFace: FONT,
         fontSize: pt(L.eyebrowSize),
-        lineSpacing: pt(eyebrowBand),
+        // Pitch the eyebrow to its own line, not the whole band: a band-sized
+        // pitch dropped its baseline to the foot of the space, where the
+        // headline starts, and the two printed through each other.
+        lineSpacing: pt(L.eyebrowSize * 1.4),
+
         bold: true,
         charSpacing: 3,
         color: inkHex,
@@ -179,17 +183,28 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
         margin: 0,
       });
     }
+    // PowerPoint's line box is taller than the printed band, so the headline is
+    // hung from the bottom of the space the board leaves above the programme:
+    // the descender lands on the first row's edge instead of through it.
+    const titleRoom = Math.max(L.titleSize * 1.15, b.rowsTop - b.titleY);
+    // Hang the title from the foot of its space, but never above the eyebrow's
+    // own line — it printed straight through the eyebrow when it did.
+    const titleTop = Math.max(
+      b.eyebrowY + eyebrowBand,
+      b.rowsTop - Math.max(titleBand, titleRoom),
+    );
+
     s.addText(cfg.title ?? "", {
       x: inX(b.x),
-      y: inX(b.titleY),
+      y: inX(titleTop),
       w: inX(b.headW),
-      h: inX(titleBand),
+      h: inX(Math.max(L.titleSize, b.rowsTop - titleTop)),
       fontFace: FONT,
       fontSize: pt(L.titleSize),
-      lineSpacing: pt(titleBand),
+      lineSpacing: pt(L.titleSize * 1.08),
       bold: true,
       color: hex(agendaTitleInk(cfg), inkHex),
-      valign: "top",
+      valign: "bottom",
       margin: 0,
     });
     // Card mode puts the room line and the date right-aligned beside the lockup.
