@@ -1076,6 +1076,7 @@ export function AgendaStudio({
           ) : null}
 
           {step === 1 ? (
+          <>
           <p className="border-t border-border pt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
             Header type
           </p>
