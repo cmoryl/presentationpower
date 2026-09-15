@@ -439,15 +439,34 @@ export function LondonFloorMap({
                   className="absolute inset-y-0 left-0 w-[5px]"
                   style={{ background: style.accent, opacity: 0.9 }}
                 />
-                <span className="absolute left-2.5 top-1 text-[9.5px] font-bold uppercase tracking-[0.08em] text-[#03002C]/80">
-                  {z.label}
-                </span>
+                {/* Room name: fitted to its own tile. It stays inside the tile
+                    box, takes at most two lines, trims with an ellipsis, steps
+                    down a size on a small tile and disappears altogether when
+                    the tile cannot carry copy — so a long name can never spill
+                    over its neighbours or off the plan frame. */}
+                {z.w > 1.8 && z.h > 0.9 ? (
+                  <span
+                    className="pointer-events-none absolute left-2.5 right-1.5 top-1 overflow-hidden font-bold uppercase leading-[1.15] tracking-[0.08em] text-[#03002C]/80"
+                    style={{
+                      fontSize: z.w < 4 || z.h < 1.6 ? "8px" : "9.5px",
+                      display: "-webkit-box",
+                      WebkitBoxOrient: "vertical",
+                      WebkitLineClamp: z.h > 2.4 ? 2 : 1,
+                    }}
+                    title={z.label}
+                  >
+                    {z.label}
+                  </span>
+                ) : null}
                 {design.icons !== false && z.w > 3.2 && z.h > 2.4 && !quiet ? (
                   <AreaGlyph kind={z.kind} ink={style.accent} />
                 ) : null}
-                <span className="absolute bottom-0.5 right-1.5 font-mono text-[8.5px] tabular-nums text-[#03002C]/35">
-                  {z.w.toFixed(1)} × {z.h.toFixed(1)} m
-                </span>
+                {/* The size figure only prints where it cannot touch the name. */}
+                {design.roomDims !== false && z.w > 5 && z.h > 2 ? (
+                  <span className="pointer-events-none absolute bottom-0.5 right-1.5 font-mono text-[8.5px] tabular-nums text-[#03002C]/35">
+                    {z.w.toFixed(1)} × {z.h.toFixed(1)} m
+                  </span>
+                ) : null}
                 {canEdit && mine && onAreaRemove ? (
                   <button
                     type="button"
@@ -481,15 +500,30 @@ export function LondonFloorMap({
             );
           })}
 
-          {plan.entries.map((e) => (
-            <span
-              key={e.label}
-              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#03002C] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-white shadow-sm"
-              style={{ left: `${(e.x / plan.w) * 100}%`, top: `${(e.y / plan.h) * 100}%` }}
-            >
-              {e.label}
-            </span>
-          ))}
+          {plan.entries.map((e) => {
+            // An entrance sits on the plan edge, so a tab centred on it would
+            // hang half outside the frame. Near an edge the tab is anchored
+            // inside instead of centred, and its copy is capped so a long door
+            // name cannot stretch it back out of the plan.
+            const rx = e.x / plan.w;
+            const ry = e.y / plan.h;
+            const tx = rx < 0.12 ? "0" : rx > 0.88 ? "-100%" : "-50%";
+            const ty = ry < 0.06 ? "0" : ry > 0.94 ? "-100%" : "-50%";
+            return (
+              <span
+                key={e.label}
+                title={e.label}
+                className="absolute max-w-[42%] truncate rounded-full bg-[#03002C] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-white shadow-sm"
+                style={{
+                  left: `${rx * 100}%`,
+                  top: `${ry * 100}%`,
+                  transform: `translate(${tx}, ${ty})`,
+                }}
+              >
+                {e.label}
+              </span>
+            );
+          })}
 
           {markers.map((m) => {
             const active = m.panelId === selectedId;
