@@ -610,10 +610,22 @@ export async function buildAgendaDocx(
           // The body takes back any parallel column this slot does not use.
           cell(
             cardBodyW + spare * cardParColW,
-            copy(session.title ?? "", session.detail ?? ""),
+            // The tracked stage label prints above the title, as it does on the
+            // board and in the press file.
+            ((session.track ?? "").trim()
+              ? para(
+                  run(session.track!.toUpperCase(), {
+                    size: halfPt(PL.trackSize),
+                    color: bandInk,
+                    bold: true,
+                  }),
+                  { afterTwips: 0, lineTwips: mmT(PL.trackSize * 1.6) },
+                )
+              : "") + copy(session.title ?? "", session.detail ?? ""),
             rowPad,
             spare > 0 ? { fill, span: spare + 1, vAlign: "top" } : { fill, vAlign: "top" },
           ),
+
           pars
             .map((p) =>
               cell(
