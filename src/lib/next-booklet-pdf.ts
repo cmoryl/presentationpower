@@ -172,18 +172,43 @@ function drawCover(
   const mm = (v: number) => v * MM_TO_PT;
   const w = mm(geo.bleedW);
   const h = mm(geo.bleedH);
-  // Ground bleeds off every edge; the slug border stays paper.
-  page.drawRectangle({ x: SLUG_PT, y: SLUG_PT, width: w, height: h, color: hex(INK) });
+  if (!copyBand) {
+    // Plain ink cover: the ground bleeds off every edge, the slug stays paper.
+    page.drawRectangle({ x: SLUG_PT, y: SLUG_PT, width: w, height: h, color: hex(INK) });
+  }
 
   const pad = mm(geo.safeInset);
   const left = SLUG_PT + mm((geo.bleedW - geo.trimW) / 2) + pad;
   const right = SLUG_PT + mm(geo.bleedW - (geo.bleedW - geo.trimW) / 2) - pad;
   const inner = right - left;
+  const trimTop = SLUG_PT + h - mm((geo.bleedH - geo.trimH) / 2) - pad;
+  const trimBottom = SLUG_PT + mm((geo.bleedH - geo.trimH) / 2) + pad;
 
-  // Brick rail — the house device, drawn as plain rectangles so it stays live.
+  // ── measure the copy block, then place it inside its band ─────────────────
   const brickH = mm(4.2);
   const brickW = mm(9);
-  const railY = SLUG_PT + h - mm((geo.bleedH - geo.trimH) / 2) - pad - brickH;
+  const eyebrowSize = 11;
+  const titleSize = Math.min(54, Math.max(28, inner / 7));
+  const subSize = Math.max(12, titleSize * 0.3);
+  const eyebrow = (cover.eyebrow ?? "").toUpperCase();
+  const titleLines = wrap(fonts.bold, (cover.title ?? "").toUpperCase(), titleSize, inner);
+  const subLines = wrap(fonts.regular, cover.subtitle ?? "", subSize, inner * 0.82);
+
+  const blockH =
+    brickH +
+    mm(16) +
+    (eyebrow ? eyebrowSize + mm(10) : 0) +
+    titleLines.length * titleSize * 1.06 +
+    (subLines.length ? mm(12) + subLines.length * subSize * 1.35 : 0);
+
+  const bandTop = copyBand?.top ?? trimTop;
+  const bandBottom = copyBand?.bottom ?? trimBottom;
+  const railY =
+    copyBand?.anchor === "bottom"
+      ? Math.min(bandTop, bandBottom + blockH) - brickH
+      : bandTop - brickH;
+
+  // Brick rail — the house device, drawn as plain rectangles so it stays live.
   for (let i = 0; i < 5; i += 1) {
     page.drawRectangle({
       x: left + i * (brickW + mm(2.4)),
@@ -195,9 +220,7 @@ function drawCover(
     });
   }
 
-  const eyebrowSize = 11;
   let y = railY - mm(16);
-  const eyebrow = (cover.eyebrow ?? "").toUpperCase();
   if (eyebrow) {
     page.drawText(eyebrow, {
       x: left,
@@ -207,18 +230,15 @@ function drawCover(
       color: hex(PAPER),
       opacity: 0.82,
     });
+    y -= mm(10);
   }
 
-  const titleSize = Math.min(54, Math.max(28, inner / 7));
-  const titleLines = wrap(fonts.bold, (cover.title ?? "").toUpperCase(), titleSize, inner);
-  y -= mm(10) + titleSize;
+  y -= titleSize;
   for (const line of titleLines) {
     page.drawText(line, { x: left, y, size: titleSize, font: fonts.bold, color: hex(PAPER) });
     y -= titleSize * 1.06;
   }
 
-  const subSize = Math.max(12, titleSize * 0.3);
-  const subLines = wrap(fonts.regular, cover.subtitle ?? "", subSize, inner * 0.82);
   if (subLines.length) {
     y -= mm(6);
     page.drawRectangle({ x: left, y: y + subSize * 0.9, width: mm(28), height: mm(1.2), color: hex(ACCENT) });
@@ -235,6 +255,7 @@ function drawCover(
       y -= subSize * 1.35;
     }
   }
+
 
   const footnote = (cover.footnote ?? "").trim();
   if (footnote) {
