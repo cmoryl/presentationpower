@@ -2804,7 +2804,10 @@ export function agendaBlocks(config: AgendaConfig) {
     footerBand,
     footer,
     footY,
+    footnoteY,
+    footnoteH,
     qr,
+
   };
 }
 
