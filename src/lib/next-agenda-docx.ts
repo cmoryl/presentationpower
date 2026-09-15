@@ -919,23 +919,33 @@ export async function buildAgendaDocx(
             `<w:tr><w:trPr><w:trHeight w:val="${mmT(
               Math.max(6, PL.footSize * foot.heightMul),
             )}" w:hRule="atLeast"/><w:cantSplit/></w:trPr>`,
-            ...footCells.map((c) =>
-              cell(
+            ...footCells.map((c) => {
+              // Word's stand-in face sets the tracked footer wider than Geist, so
+              // each slot shrinks to hold one line instead of wrapping and
+              // dropping copy off the trimmed edge.
+              const usable = Math.max(4, B.contentW * c.share - PL.footSize * 1.6);
+              const est = Math.max(1, c.text.length * (PL.footSize * 0.62 + 0.35));
+              const size = Math.max(
+                PL.footSize * 0.6,
+                Math.min(PL.footSize, (PL.footSize * usable) / est),
+              );
+              return cell(
                 contentTwips * c.share,
                 para(
                   run(c.text, {
-                    size: halfPt(PL.footSize),
+                    size: halfPt(size),
                     color: footInk,
                     caps: false,
                     bold: true,
                     spacing: 30,
                   }),
-                  { afterTwips: 0, align: c.align, lineTwips: mmT(PL.footSize * 1.6) },
+                  { afterTwips: 0, align: c.align, lineTwips: mmT(size * 1.6) },
                 ),
                 mmT(PL.footSize * 0.8),
                 foot.style === "band" ? { fill: foot.fill } : {},
-              ),
-            ),
+              );
+            }),
+
             "</w:tr></w:tbl>",
           ].join("")
         : "";
