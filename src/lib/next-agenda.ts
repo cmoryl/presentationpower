@@ -2443,30 +2443,45 @@ export function agendaBlocks(config: AgendaConfig) {
 
   // Programme look: the room / floor line and the date sit right-aligned beside
   // the lockup, so the header reads lockup left, place and date right.
+  const locSpec = agendaLocation(config);
   let location: {
     y: number;
     metaY: number;
+    /** Left edge of the room / date block. */
+    left: number;
     right: number;
     size: number;
     metaSize: number;
+    align: AgendaLocationAlignId;
     pin: { x: number; y: number; h: number } | null;
   } | null = null;
   if (L.card) {
     const headTop = y;
+    const locH = L.locSize * 1.5 + L.metaSize * 1.8;
+    // A left or centred room line cannot share the top line with the lockup, so
+    // it stacks under it and takes the full content width instead.
+    const stacked = locationText !== "" && locSpec.align !== "right" && !!lockup;
     if (locationText) {
-      const locH = L.locSize * 1.5 + L.metaSize * 1.8;
-      const top = lockup ? headTop + Math.max(0, (L.lockupH - locH) * 0.62) : headTop;
+      const top = stacked
+        ? headTop + L.lockupH + 3 * L.k
+        : lockup
+          ? headTop + Math.max(0, (L.lockupH - locH) * 0.62)
+          : headTop;
       const pinH = L.locSize * 1.5;
       location = {
         y: top,
         metaY: top + L.locSize * 1.7,
+        left: x,
         right: x + L.contentW,
         size: L.locSize,
         metaSize: L.metaSize,
+        align: locSpec.align,
         pin: { x, y: top, h: pinH },
       };
     }
-    y = headTop + Math.max(lockup ? L.lockupH : 0, locationText ? L.locSize * 1.5 + L.metaSize * 1.8 : 0);
+    y = stacked
+      ? headTop + L.lockupH + 3 * L.k + locH
+      : headTop + Math.max(lockup ? L.lockupH : 0, locationText ? locH : 0);
     y += 8 * L.k;
   } else if (lockup) {
     y += L.lockupH + 9 * L.k;
