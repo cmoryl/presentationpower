@@ -42,24 +42,40 @@ function DecksIndex() {
   const [cloudDecks, setCloudDecks] = useState<
     Array<{ title: string; review_status: string | null }>
   >([]);
+  // A failed load used to fall back to an empty list, which reads exactly like
+  // "you have no decks" — the one message we must never show by accident.
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     if (!signedIn) {
       setAnalytics(null);
       setCloudDecks([]);
+      setLoadFailed(false);
       return;
     }
+    let live = true;
     fetchAnalytics()
-      .then(setAnalytics)
-      .catch(() => setAnalytics(null));
+      .then((a) => {
+        if (live) setAnalytics(a);
+      })
+      .catch(() => {
+        if (live) setLoadFailed(true);
+      });
     fetchCloud()
-      .then((rows) =>
+      .then((rows) => {
+        if (!live) return;
         setCloudDecks(
           rows.map((r) => ({ title: r.title, review_status: r.review_status ?? null })),
-        ),
-      )
-      .catch(() => setCloudDecks([]));
-  }, [signedIn, fetchAnalytics, fetchCloud]);
+        );
+      })
+      .catch(() => {
+        if (live) setLoadFailed(true);
+      });
+    return () => {
+      live = false;
+    };
+  }, [signedIn, fetchAnalytics, fetchCloud, reloadKey]);
 
   const reviewByTitle = useMemo(() => {
     const m = new Map<string, ReviewStatus>();
