@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import { AppShell } from "@/components/AppShell";
 import { AgendaStudio } from "@/components/next/AgendaStudio";
-import { pickAgendaFile, useSavedAgendaFiles } from "@/hooks/use-next-live-masters";
+import { useSavedAgendaFiles } from "@/hooks/use-next-live-masters";
 import { agendaDivision, normalizeAgendaConfig } from "@/lib/next-agenda";
 
 const search = z.object({ division: z.string().optional(), file: z.string().optional() });

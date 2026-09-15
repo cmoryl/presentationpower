@@ -279,8 +279,15 @@ export function AgendaStudio({
     onError: (e: Error) => toast.error("Could not delete", { description: e.message }),
   });
 
+  // Any edit through the UI marks the board dirty, so a saved file that
+  // arrives later can no longer replace work in progress.
+  const editConfig: typeof setConfig = (updater) => {
+    dirtyRef.current = true;
+    setConfig(updater);
+  };
+
   const set = <K extends keyof AgendaConfig>(key: K, value: AgendaConfig[K]) =>
-    setConfig((c) => ({ ...c, [key]: value }));
+    editConfig((c) => ({ ...c, [key]: value }));
 
   // Everything below edits the active programme day. A single-day file keeps the
   // top-level fields, so nothing changes for existing agendas.
@@ -288,7 +295,7 @@ export function AgendaStudio({
   const dayIndex = Math.min(activeDay, days.length - 1);
   const day = days[dayIndex]!;
   const patchDay = (patch: Parameters<typeof writeAgendaDay>[2]) =>
-    setConfig((c) => writeAgendaDay(c, dayIndex, patch));
+    editConfig((c) => writeAgendaDay(c, dayIndex, patch));
 
   const setSession = (index: number, patch: Partial<AgendaSession>) =>
     patchDay({ sessions: day.sessions.map((s, i) => (i === index ? { ...s, ...patch } : s)) });
@@ -335,7 +342,7 @@ export function AgendaStudio({
   const qrBlock = useMemo(() => agendaBlocks(pageConfig).qr, [pageConfig]);
 
   const placeQr = (x: number | null, y: number | null) =>
-    setConfig((c) => ({ ...c, qrOffsetX: x, qrOffsetY: y }));
+    editConfig((c) => ({ ...c, qrOffsetX: x, qrOffsetY: y }));
 
   const nudgeQr = (dx: number, dy: number) => {
     if (!qrBlock) return;
@@ -491,7 +498,7 @@ export function AgendaStudio({
                       className="h-6 w-6"
                       aria-label={`Remove ${d.label || `day ${i + 1}`}`}
                       onClick={() => {
-                        setConfig((c) => removeAgendaDay(c, i));
+                        editConfig((c) => removeAgendaDay(c, i));
                         setActiveDay(0);
                         setActivePage(0);
                       }}
@@ -505,7 +512,7 @@ export function AgendaStudio({
                 variant="secondary"
                 size="sm"
                 onClick={() => {
-                  setConfig((c) => addAgendaDay(c));
+                  editConfig((c) => addAgendaDay(c));
                   setActiveDay(days.length);
                 }}
               >
@@ -646,7 +653,7 @@ export function AgendaStudio({
               id="agenda-division"
               className={selectClass}
               value={config.divisionId}
-              onChange={(e) => setConfig((c) => withAgendaDivision(c, e.target.value))}
+              onChange={(e) => editConfig((c) => withAgendaDivision(c, e.target.value))}
             >
               {AGENDA_DIVISIONS.map((d) => (
                 <option key={d.id} value={d.id}>
@@ -677,7 +684,7 @@ export function AgendaStudio({
                 onChange={(e) =>
                   // A code dragged on one board size means nothing on another, so
                   // a format switch returns it to its anchored home.
-                  setConfig((c) => ({
+                  editConfig((c) => ({
                     ...c,
                     sizeId: e.target.value as AgendaConfig["sizeId"],
                     qrOffsetX: null,
@@ -1247,7 +1254,7 @@ export function AgendaStudio({
                     className={selectClass}
                     value={agendaQrAnchor(config)}
                     onChange={(e) =>
-                      setConfig((c) => ({
+                      editConfig((c) => ({
                         ...c,
                         qrAnchor: e.target.value as AgendaQrAnchor,
                         // A saved drag would win over the new position, so clear it.
@@ -1436,7 +1443,7 @@ export function AgendaStudio({
                         onClick={() => {
                           const b = qrBlock;
                           if (!b) return;
-                          setConfig((c) => ({
+                          editConfig((c) => ({
                             ...c,
                             qrOffsetX: Math.round(b.minX + (b.maxX - b.minX) * fx),
                             qrOffsetY: Math.round(b.minY + (b.maxY - b.minY) * fy),
@@ -1456,7 +1463,7 @@ export function AgendaStudio({
                         step={AGENDA_QR_NUDGE.fine}
                         value={Math.round(qrBlock?.x ?? 0)}
                         onChange={(e) =>
-                          setConfig((c) => ({
+                          editConfig((c) => ({
                             ...c,
                             qrOffsetX: Number(e.target.value),
                             qrOffsetY: c.qrOffsetY ?? Math.round(qrBlock?.y ?? 0),
@@ -1472,7 +1479,7 @@ export function AgendaStudio({
                         step={AGENDA_QR_NUDGE.fine}
                         value={Math.round(qrBlock?.y ?? 0)}
                         onChange={(e) =>
-                          setConfig((c) => ({
+                          editConfig((c) => ({
                             ...c,
                             qrOffsetY: Number(e.target.value),
                             qrOffsetX: c.qrOffsetX ?? Math.round(qrBlock?.x ?? 0),
