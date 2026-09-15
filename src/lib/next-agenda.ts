@@ -792,6 +792,12 @@ export const AGENDA_LOCATION_ICONS: {
   vh: number;
   /** Nearest PowerPoint preset shape, used by the deck export. */
   shape: string;
+  /**
+   * PowerPoint has no preset for a stepped mark, so a mark that a single preset
+   * would misrepresent lists its parts as rectangles in the icon box (0..1).
+   * The deck export draws these instead of one shape.
+   */
+  parts?: { x: number; y: number; w: number; h: number }[];
 }[] = [
   { id: "none", name: "No mark", path: "", vw: 1, vh: 1, shape: "rect" },
   {
@@ -821,6 +827,11 @@ export const AGENDA_LOCATION_ICONS: {
     vw: 24,
     vh: 24,
     shape: "rect",
+    parts: [
+      { x: 0.125, y: 0.708, w: 0.208, h: 0.208 },
+      { x: 0.375, y: 0.5, w: 0.208, h: 0.417 },
+      { x: 0.625, y: 0.292, w: 0.208, h: 0.625 },
+    ],
   },
   {
     id: "star",

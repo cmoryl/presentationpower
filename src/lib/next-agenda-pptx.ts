@@ -291,14 +291,31 @@ export async function buildAgendaPptx(
             ? loc.left + (loc.right - loc.left - (estW + iconW + gap)) / 2
             : Math.max(loc.left, loc.right - estW - iconW - gap);
       if (iconH) {
-        s.addShape(LOC.icon.shape as never, {
-          x: inX(blockLeft),
-          y: inX(loc.y + loc.size * 0.12),
-          w: inX(iconW),
-          h: inX(iconH),
-          fill: { color: hex(LOC.iconHex ?? LOC.ink ?? "", locInk) },
-          line: { width: 0 },
-        });
+        const markInk = hex(LOC.iconHex ?? LOC.ink ?? "", locInk);
+        const markY = loc.y + loc.size * 0.12;
+        // A stepped mark is drawn from its parts: one preset rectangle would
+        // print as a plain square and read as the wrong symbol.
+        if (LOC.icon.parts?.length) {
+          for (const part of LOC.icon.parts) {
+            s.addShape("rect" as never, {
+              x: inX(blockLeft + part.x * iconW),
+              y: inX(markY + part.y * iconH),
+              w: inX(part.w * iconW),
+              h: inX(part.h * iconH),
+              fill: { color: markInk },
+              line: { width: 0 },
+            });
+          }
+        } else {
+          s.addShape(LOC.icon.shape as never, {
+            x: inX(blockLeft),
+            y: inX(markY),
+            w: inX(iconW),
+            h: inX(iconH),
+            fill: { color: markInk },
+            line: { width: 0 },
+          });
+        }
       }
       s.addText(label, {
         x: inX(iconW ? blockLeft + iconW + gap : loc.left),
