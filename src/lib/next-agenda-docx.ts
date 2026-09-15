@@ -756,17 +756,20 @@ export async function buildAgendaDocx(
         ? [
             (cfg.locationLine ?? "").trim()
               ? para(
-                  run((cfg.locationLine ?? "").trim(), {
+                  run(agendaLocationText(cfg), {
                     size: halfPt(PL.locSize),
-                    color: inkHex,
-                    caps: true,
-                    bold: true,
-                    spacing: 30,
+                    color: agendaLocation(cfg).ink ?? inkHex,
+                    caps: false,
+                    bold: agendaLocation(cfg).bold,
+                    spacing: agendaLocation(cfg).weight === "regular" ? 20 : 30,
                   }),
                   {
                     afterTwips: 0,
-                    align: "right",
-                    rightTwips: cardLocRight,
+                    align:
+                      agendaLocation(cfg).align === "centre"
+                        ? "center"
+                        : agendaLocation(cfg).align,
+                    rightTwips: agendaLocation(cfg).align === "right" ? cardLocRight : 0,
                     lineTwips: mmT(lineMm(PL.locSize) * 0.62),
                   },
                 )
@@ -774,8 +777,9 @@ export async function buildAgendaDocx(
             hasMeta
               ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), {
                   afterTwips: 0,
-                  align: "right",
-                  rightTwips: cardLocRight,
+                  align:
+                    agendaLocation(cfg).align === "centre" ? "center" : agendaLocation(cfg).align,
+                  rightTwips: agendaLocation(cfg).align === "right" ? cardLocRight : 0,
                   lineTwips: mmT(lineMm(PL.metaSize) * 0.62),
                 })
               : "",
@@ -845,14 +849,18 @@ export async function buildAgendaDocx(
       // matching the printed board instead of stacking them on the left.
       cardMode && (cfg.locationLine ?? "").trim()
         ? para(
-            run((cfg.locationLine ?? "").trim(), {
+            run(agendaLocationText(cfg), {
               size: halfPt(PL.metaSize),
-              color: inkHex,
-              caps: true,
-              bold: true,
+              color: agendaLocation(cfg).ink ?? inkHex,
+              caps: false,
+              bold: agendaLocation(cfg).bold,
               spacing: 30,
             }),
-            { afterTwips: 0, align: "right", lineTwips: mmT(PL.metaSize * 1.6) },
+            {
+              afterTwips: 0,
+              align: agendaLocation(cfg).align === "centre" ? "center" : agendaLocation(cfg).align,
+              lineTwips: mmT(PL.metaSize * 1.6),
+            },
           )
         : "",
       hasMeta
