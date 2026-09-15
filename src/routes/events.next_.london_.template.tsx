@@ -167,6 +167,9 @@ function LondonTemplatePage() {
   const [printPreview, setPrintPreview] = useState(true);
   const stageRef = useRef<HTMLDivElement | null>(null);
 
+  // Nothing published yet (or unreachable) must ship as `rdraft-`, never `r000`.
+  const revStamp: number | "draft" = headRev > 0 ? headRev : "draft";
+
   useEffect(() => {
     let live = true;
     fetchHead({})
