@@ -229,6 +229,109 @@ function BookletPage() {
       charts: c.charts.map((ch) => (ch.id === id ? { ...ch, ...patch } : ch)),
     }));
 
+  // ── saved booklets ─────────────────────────────────────────────────────────
+  // A booklet is stored per event, city and year with the agenda snapshotted
+  // inside it, so a later year can open it, change the details and reprint.
+  const qc = useQueryClient();
+  const listBooklets = useServerFn(listEventBooklets);
+  const saveBooklet = useServerFn(saveEventBooklet);
+  const patchBooklet = useServerFn(updateEventBooklet);
+  const removeBooklet = useServerFn(deleteEventBooklet);
+
+  const booklets = useQuery({
+    queryKey: ["event-booklets"],
+    queryFn: () => listBooklets(),
+    retry: false,
+  });
+  const bookletRows = (booklets.data ?? []) as unknown as {
+    id: string;
+    name: string;
+    year: number;
+    city: string;
+    notes: string;
+    config: BookletConfig;
+    agenda: AgendaConfig | null;
+    updated_at: string;
+  }[];
+
+  const [openId, setOpenId] = useState<string>("");
+  const [bookletName, setBookletName] = useState("NEXT London booklet");
+  const [bookletYear, setBookletYear] = useState(2026);
+  const [libError, setLibError] = useState<string>("");
+
+  const refreshBooklets = () => qc.invalidateQueries({ queryKey: ["event-booklets"] });
+
+  const runLibrary = async (label: string, fn: () => Promise<void>) => {
+    setBusy(label);
+    setLibError("");
+    try {
+      await fn();
+      await refreshBooklets();
+    } catch (err) {
+      setLibError(err instanceof Error ? err.message : "That could not be saved.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const onSave = () =>
+    runLibrary("save", async () => {
+      const payload = {
+        name: bookletName.trim() || "Untitled booklet",
+        year: bookletYear,
+        city: "london",
+        eventId: "next",
+        notes: "",
+        config,
+        agenda: agenda as unknown as Record<string, unknown>,
+      };
+      if (openId) {
+        await patchBooklet({ data: { id: openId, ...payload } });
+      } else {
+        const row = (await saveBooklet({ data: payload })) as unknown as { id: string };
+        setOpenId(row.id);
+      }
+    });
+
+  const onOpen = (id: string) => {
+    const row = bookletRows.find((r) => r.id === id);
+    if (!row) return;
+    setOpenId(row.id);
+    setBookletName(row.name);
+    setBookletYear(row.year);
+    setConfig(row.config);
+    setAgendaSnapshot(row.agenda ?? null);
+    setSavedId("");
+    setLibError("");
+  };
+
+  /** Copy the open booklet into the next year as a fresh, editable record. */
+  const onDuplicate = () =>
+    runLibrary("copy", async () => {
+      const nextYear = bookletYear + 1;
+      const name = bookletName.replace(String(bookletYear), String(nextYear));
+      const row = (await saveBooklet({
+        data: {
+          name: name === bookletName ? `${bookletName} ${nextYear}` : name,
+          year: nextYear,
+          city: "london",
+          eventId: "next",
+          notes: "",
+          config,
+          agenda: agenda as unknown as Record<string, unknown>,
+        },
+      })) as unknown as { id: string; name: string };
+      setOpenId(row.id);
+      setBookletName(row.name);
+      setBookletYear(nextYear);
+    });
+
+  const onDelete = (id: string) =>
+    runLibrary("delete", async () => {
+      await removeBooklet({ data: { id } });
+      if (openId === id) setOpenId("");
+    });
+
   const field =
     "w-full rounded-md border border-[color:var(--color-border)] bg-[color:var(--color-background)] px-3 py-2 text-sm";
   const labelCls = "text-xs font-semibold uppercase tracking-wide text-[color:var(--color-muted-foreground)]";
