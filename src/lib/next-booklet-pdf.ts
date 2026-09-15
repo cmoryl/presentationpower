@@ -94,11 +94,80 @@ function fitBox(
   return { w, h, dx: (boxW - w) * 0.5, dy: (boxH - h) * 0.5 };
 }
 
+/**
+ * Places the cover picture and its ink veil.
+ *
+ * The veil is drawn as a stack of thin bands, which is how pdf-lib gets a
+ * gradient without a shading dictionary. It stays live artwork: no flattening,
+ * and the picture is placed at its own resolution.
+ */
+async function drawCoverArt(
+  doc: PDFDocument,
+  page: PDFPage,
+  art: BookletCoverArt,
+  layout: BookletCoverLayout,
+  scrim: number,
+  box: { x: number; y: number; w: number; h: number },
+): Promise<boolean> {
+  let bytes: ArrayBuffer;
+  try {
+    const res = await fetch(resolveAssetUrl(art.src));
+    if (!res.ok) return false;
+    bytes = await res.arrayBuffer();
+  } catch {
+    return false;
+  }
+  let image: Awaited<ReturnType<PDFDocument["embedJpg"]>>;
+  try {
+    image = await doc.embedJpg(bytes);
+  } catch {
+    return false;
+  }
+
+  const px = box.x + layout.photo.x * box.w;
+  const pw = layout.photo.w * box.w;
+  const ph = layout.photo.h * box.h;
+  // PDF y runs up the page; the layout rect is measured from the top.
+  const py = box.y + box.h - layout.photo.y * box.h - ph;
+  const fit = coverCrop(image.width, image.height, pw, ph);
+  page.drawImage(image, { x: px + fit.dx, y: py + fit.dy, width: fit.w, height: fit.h });
+
+  const strength = Math.max(0, Math.min(1, layout.scrim.strength * (scrim / 100)));
+  if (strength <= 0.001) return true;
+  if (layout.scrim.from === "all") {
+    page.drawRectangle({ x: px, y: py, width: pw, height: ph, color: hex(INK), opacity: strength });
+    return true;
+  }
+  const bands = 44;
+  const span = Math.max(0.05, Math.min(1, layout.scrim.span)) * ph;
+  const bandH = span / bands;
+  for (let i = 0; i < bands; i += 1) {
+    // 0 at the open end of the veil, 1 where the copy sits.
+    const t = (i + 1) / bands;
+    const opacity = strength * t * t;
+    const y =
+      layout.scrim.from === "bottom"
+        ? py + span - (i + 1) * bandH
+        : py + ph - span + i * bandH;
+    page.drawRectangle({
+      x: px,
+      y,
+      width: pw,
+      height: bandH + 0.6,
+      color: hex(INK),
+      opacity,
+    });
+  }
+  return true;
+}
+
 function drawCover(
   page: PDFPage,
   fonts: { bold: PDFFont; regular: PDFFont },
   cover: { eyebrow: string; title: string; subtitle: string; footnote: string },
   geo: { bleedW: number; bleedH: number; trimW: number; trimH: number; safeInset: number },
+  /** Vertical band the copy may use, in points from the page bottom. */
+  copyBand?: { top: number; bottom: number; anchor: "top" | "bottom" },
 ): void {
   const mm = (v: number) => v * MM_TO_PT;
   const w = mm(geo.bleedW);
