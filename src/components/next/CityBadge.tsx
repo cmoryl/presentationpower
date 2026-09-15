@@ -38,7 +38,6 @@ export function CityBadge({
   style,
   className,
 }: Props) {
-  const face = cityBadgeFace(config.face);
   const lockup = cityBadgeLockup(config.divisionId);
   const px = (inches: number) => inches * ppi;
   const w = px(BADGE_SPEC.bleedW);
