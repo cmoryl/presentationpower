@@ -2100,7 +2100,9 @@ export function agendaLayout(config: AgendaConfig) {
   const qrEdge = Math.min(agendaQrSize(config), contentW * 0.35);
   // Programme look: the room / floor line sits beside the lockup with a pin, the
   // date line under it, and the footer prints on a Blue 500 band across the foot.
-  const locSize = 8.2 * k;
+  // The room line carries its own cap height, so a Hero setting reserves the
+  // header space it actually needs instead of printing into the eyebrow.
+  const locSize = 8.2 * k * agendaLocation(config).sizeMul;
   const box = agendaBandLayout(config);
   const bandGap = 2.6 * k * box.gapMul;
   /** How far the band boxes step in from the safe edge. */
