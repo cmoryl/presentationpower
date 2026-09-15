@@ -1671,7 +1671,17 @@ export function AgendaStudio({
 
       {/* programme rows */}
       {step === 0 ? (
-      <section className="space-y-3">
+      <section
+        className={`space-y-3 ${ready ? "" : "pointer-events-none select-none opacity-60"}`}
+        aria-busy={!ready}
+      >
+        {!ready ? (
+          // The board is heavy: until the page is live, a keystroke here would be
+          // thrown away silently. Say so and hold the rows instead.
+          <p className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+            Preparing the board — the programme opens for editing in a moment.
+          </p>
+        ) : null}
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">
             {days.length > 1 ? `${day.label || `Day ${dayIndex + 1}`} programme` : "Programme"} —{" "}
