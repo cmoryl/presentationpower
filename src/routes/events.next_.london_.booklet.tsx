@@ -161,12 +161,12 @@ function CoverPreview({ cover, trim }: { cover: BookletConfig["cover"]; trim: { 
           justifyContent: art && layout.copy.anchor === "bottom" ? "flex-end" : "flex-start",
         }}
       >
-        <div className="flex gap-[1.4%]">
+        <div className="flex gap-1">
           {[0, 1, 2, 3, 4].map((i) => (
             <span
               key={i}
-              className="block h-[1.4cqw] w-[5%] rounded-[1px]"
-              style={{ background: i === 4 ? "#003FC7" : "rgba(255,255,255,0.9)", height: "1.6%" }}
+              className="block h-[5px] w-[22px] rounded-[1px]"
+              style={{ background: i === 4 ? "#003FC7" : "rgba(255,255,255,0.92)" }}
             />
           ))}
         </div>
