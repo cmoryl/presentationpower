@@ -83,7 +83,7 @@ export function toUuid(local: string): string {
 
 type QueryResult = { data: unknown; error: { message: string } | null };
 interface QueryBuilder extends PromiseLike<QueryResult> {
-  upsert: (row: Record<string, unknown>) => QueryBuilder;
+  upsert: (row: Record<string, unknown> | Record<string, unknown>[]) => QueryBuilder;
   insert: (rows: unknown) => QueryBuilder;
   select: (cols: string) => QueryBuilder;
   delete: () => QueryBuilder;
