@@ -2112,11 +2112,14 @@ export function agendaLayout(config: AgendaConfig) {
   const bandPadY = 3.4 * k;
   const foot = agendaFooter(config);
   const footerBandH = card ? footSize * foot.heightMul : 0;
+  const locBlockH = (config.locationLine ?? "").trim() ? locSize * 1.5 + metaSize * 1.8 : 0;
+  // A left or centred room line stacks under the lockup, so the header reserves
+  // both heights rather than the taller of the two.
+  const locStacked = locBlockH > 0 && agendaLocation(config).align !== "right" && config.showLockup;
   const headBlock = card
-    ? Math.max(
-        config.showLockup ? lockupH : 0,
-        (config.locationLine ?? "").trim() ? locSize * 1.5 + metaSize * 1.8 : 0,
-      ) +
+    ? (locStacked
+        ? lockupH + 3 * k + locBlockH
+        : Math.max(config.showLockup ? lockupH : 0, locBlockH)) +
       ((config.eyebrow ?? "").trim() ? eyebrowSize * 2.4 : 0) +
       ((config.title ?? "").trim() ? titleSize * 1.16 : 0) +
       8 * k
