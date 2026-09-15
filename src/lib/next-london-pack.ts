@@ -146,7 +146,12 @@ export async function buildLondonSignagePack(
     "README.txt",
     [
       "TransPerfect NEXT 2026 — London signage pack",
-      `Panels: ${panels.length} · files: ${files.length} · revision r${rev}`,
+      `Panels: ${panels.length} · files: ${files.length} · revision ${
+        rev === "draft" ? "UNPUBLISHED DRAFT (rdraft)" : `r${String(rev).padStart(3, "0")}`
+      }`,
+      skipped.length
+        ? `WARNING: ${skipped.length} panel(s) failed the print check and are NOT in this pack. See SKIPPED.txt.`
+        : "",
       `Colour space: ${
         colorSpace === "cmyk"
           ? `DeviceCMYK — vibrant-corrected print masters (vibrance ${art.vibrance}). ` +
