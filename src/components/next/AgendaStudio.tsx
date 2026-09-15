@@ -349,6 +349,14 @@ export function AgendaStudio({
 
   const previewScale = fitScale * zoom;
 
+  // The enlarged view fills the dialog on both edges, so the copy is big enough
+  // to type on for every format from A4 to a 21:9 screen board.
+  const largeScale = Math.min(
+    3.2,
+    1100 / (geo.bleedW * NATIVE_PX_PER_MM),
+    880 / (geo.bleedH * NATIVE_PX_PER_MM),
+  );
+
   const division = agendaDivision(config.divisionId);
 
   // Resolved QR geometry for the page on screen: the clamp range the placement
@@ -707,6 +715,40 @@ export function AgendaStudio({
             </div>
           </div>
         </div>
+
+        {/* Enlarged board: review size, copy editable in place. */}
+        <Dialog open={large} onOpenChange={setLarge}>
+          <DialogContent className="max-w-[96vw] sm:max-w-[1180px]">
+            <DialogHeader>
+              <DialogTitle>
+                {division.name} · {geo.sizeName}
+                {pages.length > 1 ? ` · page ${pageIndex + 1} of ${pages.length}` : ""}
+              </DialogTitle>
+              <DialogDescription>
+                Click any line on the board and type. Press Enter to commit, Escape to cancel. Every
+                change writes straight to the programme fields under the board.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="max-h-[76vh] overflow-auto rounded-lg bg-muted/40 p-3">
+              <div
+                className="mx-auto"
+                style={{
+                  width: geo.bleedW * NATIVE_PX_PER_MM * largeScale,
+                  height: geo.bleedH * NATIVE_PX_PER_MM * largeScale,
+                }}
+              >
+                <div style={{ transform: `scale(${largeScale})`, transformOrigin: "top left" }}>
+                  <AgendaSheet
+                    config={pageConfig}
+                    pxPerMm={NATIVE_PX_PER_MM}
+                    guides={guides}
+                    edit={sheetEdit}
+                  />
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* controls */}
         <div className="space-y-5">
