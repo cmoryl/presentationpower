@@ -138,6 +138,17 @@ async function drawCoverArt(
   const py = box.y + box.h - layout.photo.y * box.h - ph;
   const fit = coverCrop(image.width, image.height, pw, ph);
   page.drawImage(image, { x: px + fit.dx, y: py + fit.dy, width: fit.w, height: fit.h });
+  // pdf-lib has no clipping path, so a cover-cropped picture spills past its box.
+  // The spill is masked back to the ink ground, otherwise a split or framed cover
+  // would print the picture underneath its copy panel.
+  const mask = (x: number, y: number, w: number, h: number) => {
+    if (w <= 0.01 || h <= 0.01) return;
+    page.drawRectangle({ x, y, width: w, height: h, color: hex(INK) });
+  };
+  mask(box.x, py + ph, box.w, box.y + box.h - (py + ph));
+  mask(box.x, box.y, box.w, py - box.y);
+  mask(box.x, py, px - box.x, ph);
+  mask(px + pw, py, box.x + box.w - (px + pw), ph);
 
   const strength = Math.max(0, Math.min(1, layout.scrim.strength * (scrim / 100)));
   if (strength <= 0.001) return true;
