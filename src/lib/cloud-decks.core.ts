@@ -156,9 +156,24 @@ export async function saveDeckToCloudCore(
   });
   if (deckErr) throw new Error(deckErr.message);
 
-  // Replace slides.
-  await sb.from("deck_slides").delete().eq("deck_id", deckUuid);
-  if (data.deck.slides.length > 0) {
+  // Replace slides — write first, prune after. Deleting up front meant a failed
+  // insert left the deck with no slides at all, i.e. a save that destroyed work.
+  const { data: existingRows } = await sb.from("deck_slides").select("id").eq("deck_id", deckUuid);
+  const existingIds = Array.isArray(existingRows)
+    ? (existingRows as { id: string }[]).map((r) => r.id)
+    : [];
+
+  if (data.deck.slides.length === 0) {
+    // An empty deck overwriting saved slides is almost never what the user meant.
+    if (existingIds.length > 0) {
+      throw new Error(
+        `This copy of the deck has no slides, but ${existingIds.length} slide(s) are saved in the cloud. Nothing was changed — reload the saved deck before saving again.`,
+      );
+    }
+    return { deckUuid, briefUuid };
+  }
+
+  {
     const rows = data.deck.slides.map((s) => ({
       id: toUuid(`slide:${userId}:${data.deck.id}:${s.id}`),
       deck_id: deckUuid,
