@@ -131,6 +131,7 @@ export async function buildLondonSignagePack(
                 .join(" | ")
             : londonPanelStops(panel).join(" ")
         }"`,
+        `"${status}"`,
       ].join(","),
     );
 
