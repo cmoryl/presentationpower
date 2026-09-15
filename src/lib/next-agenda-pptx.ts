@@ -391,6 +391,23 @@ export async function buildAgendaPptx(
           : box.y + L.bandPadY;
         s.addText(
           [
+            // The tracked stage label prints above the title, matching the board
+            // and the press file.
+            ...((session.track ?? "").trim()
+              ? [
+                  {
+                    text: session.track!.toUpperCase(),
+                    options: {
+                      fontSize: pt(L.trackSize),
+                      bold: true,
+                      color: copyInk,
+                      charSpacing: 2,
+                      breakLine: true,
+                      lineSpacing: pt(L.trackSize * 1.6),
+                    },
+                  },
+                ]
+              : []),
             {
               text: session.title ?? "",
               options: {
@@ -401,6 +418,7 @@ export async function buildAgendaPptx(
                 lineSpacing: pt(titleSize * 1.5),
               },
             },
+
             // Speaker sits on its own line under the title, so the notes stay a
             // separate editable paragraph in PowerPoint.
             ...((session.speaker ?? "").trim()
