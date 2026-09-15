@@ -659,6 +659,9 @@ export function AgendaStudio({
 
           {step === 1 ? (
           <>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            Board
+          </p>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label htmlFor="agenda-size">Format</Label>
@@ -761,6 +764,9 @@ export function AgendaStudio({
             </select>
           </div>
 
+          <p className="border-t border-border pt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            Programme bands
+          </p>
           <div className="space-y-2">
             <Label htmlFor="agenda-row-style">Programme look</Label>
             <select
@@ -823,6 +829,9 @@ export function AgendaStudio({
                 </p>
               </div>
 
+              <p className="border-t border-border pt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                Room · floor line
+              </p>
               <div className="space-y-2">
                 <Label htmlFor="agenda-location">Room · floor line</Label>
                 <Input
@@ -936,6 +945,9 @@ export function AgendaStudio({
                   </select>
                 </div>
               </div>
+              <p className="border-t border-border pt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                Footer band
+              </p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="agenda-footer-left">Footer band · left</Label>
@@ -1064,6 +1076,9 @@ export function AgendaStudio({
           ) : null}
 
           {step === 1 ? (
+          <p className="border-t border-border pt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            Header type
+          </p>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label htmlFor="agenda-title-ink">Title ink</Label>
