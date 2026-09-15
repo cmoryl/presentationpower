@@ -21,6 +21,7 @@ import {
   agendaBandPalette,
   agendaLocation,
   agendaLocationText,
+  type AgendaLocationAlignId,
   agendaBandComposite,
   agendaFooter,
   agendaBlocks,
@@ -84,6 +85,11 @@ function hex(color: string, fallback = "000000"): string {
  * carries the real mark instead of a text substitute. Word gets a picture, but
  * it is the same gradient, the same stops and the same lockup as the press file.
  */
+/** Word alignment for the room line ("centre" is spelled the Word way here). */
+function docxLocAlign(a: AgendaLocationAlignId): "left" | "center" | "right" {
+  return a === "centre" ? "center" : a === "left" ? "left" : "right";
+}
+
 export async function flattenedGroundPng(
   config: AgendaConfig,
   px: { w: number; h: number },
@@ -765,10 +771,7 @@ export async function buildAgendaDocx(
                   }),
                   {
                     afterTwips: 0,
-                    align:
-                      agendaLocation(cfg).align === "centre"
-                        ? "center"
-                        : agendaLocation(cfg).align,
+                    align: docxLocAlign(agendaLocation(cfg).align),
                     rightTwips: agendaLocation(cfg).align === "right" ? cardLocRight : 0,
                     lineTwips: mmT(lineMm(PL.locSize) * 0.62),
                   },
@@ -777,8 +780,7 @@ export async function buildAgendaDocx(
             hasMeta
               ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), {
                   afterTwips: 0,
-                  align:
-                    agendaLocation(cfg).align === "centre" ? "center" : agendaLocation(cfg).align,
+                  align: docxLocAlign(agendaLocation(cfg).align),
                   rightTwips: agendaLocation(cfg).align === "right" ? cardLocRight : 0,
                   lineTwips: mmT(lineMm(PL.metaSize) * 0.62),
                 })
@@ -858,7 +860,7 @@ export async function buildAgendaDocx(
             }),
             {
               afterTwips: 0,
-              align: agendaLocation(cfg).align === "centre" ? "center" : agendaLocation(cfg).align,
+              align: docxLocAlign(agendaLocation(cfg).align),
               lineTwips: mmT(PL.metaSize * 1.6),
             },
           )
@@ -868,9 +870,7 @@ export async function buildAgendaDocx(
             afterTwips: 0,
             align:
               cardMode && (cfg.locationLine ?? "").trim()
-                ? agendaLocation(cfg).align === "centre"
-                  ? "center"
-                  : agendaLocation(cfg).align
+                ? docxLocAlign(agendaLocation(cfg).align)
                 : "left",
             lineTwips: mmT(metaBand),
           })
