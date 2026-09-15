@@ -652,9 +652,34 @@ export function AgendaStudio({
               <Button variant="ghost" size="sm" onClick={() => setZoom(1)}>
                 Fit
               </Button>
+              <Button variant="outline" size="sm" onClick={() => setLarge(true)}>
+                <Expand className="mr-1.5 h-3.5 w-3.5" /> View larger &amp; edit
+              </Button>
             </span>
           </div>
-          <div ref={plateRef} className="max-h-[780px] overflow-auto">
+          <p className="mb-2 text-[11px] text-muted-foreground">
+            Click the board to open it larger and type straight onto it — the fields below update
+            with every change.
+          </p>
+          <div
+            ref={plateRef}
+            className="max-h-[780px] cursor-zoom-in overflow-auto"
+            role="button"
+            tabIndex={0}
+            aria-label="Open the board larger and edit the copy on it"
+            onClick={(e) => {
+              // The code can be dragged on the small board; a drag must not open
+              // the large view.
+              if ((e.target as HTMLElement).closest('[data-agenda-qr="true"]')) return;
+              setLarge(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setLarge(true);
+              }
+            }}
+          >
             <div
               className="mx-auto"
               style={{
