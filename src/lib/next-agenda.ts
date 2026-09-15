@@ -917,8 +917,10 @@ export function agendaLocation(config: {
       : "right";
   return {
     icon,
-    // The pin keeps its house Peach unless the operator picks a colour.
-    iconHex: iconInk ?? (icon.id === "pin" ? AGENDA_BAND.pin : null),
+    // The mark follows the board ink by default — white on a dark ground, Blue 800
+    // on a light one. Peach sat too close to the warm end of several grounds, so it
+    // is now only used when the operator picks it.
+    iconHex: iconInk,
     ink,
     sizeMul: size.mul,
     sizeId: size.id,
