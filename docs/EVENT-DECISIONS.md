@@ -234,3 +234,12 @@ flagged gradients, which would let them carry the dark face.
 **Why:** only (3) reopens in Illustrator as a selectable path with a live, editable gradient — stops, angle and colour builds all retunable. (1) leaves no path to select; (2) leaves a grid of colour points a designer cannot retype a brand hex into. Print output is identical in all three; colour builds are unchanged. Pattern space is measured from the page origin, so the slug offset is added to the gradient geometry.
 **Would change if:** a printer's RIP mis-renders a shading pattern (none seen; poppler renders all three surfaces correctly).
 **Applies to:** every venue and every future city — all grounds go through the same builders.
+
+### 2026-09 — A re-issued live file becomes a new version, and only when it is newer
+
+**Area:** Live files (London QEII, and every city the same store serves)
+**Options tested:** (a) overwrite the file in force wherever the hand-back folder has a file of the same name; (b) load the whole folder as a fresh issue and retire everything before it; (c) compare the hand-back file against the version in force and publish a new version only where the supplied file is newer, leaving the rest untouched.
+**Chosen:** (c). The 15 Sept 2026 Dropbox hand-back was matched sign by sign against `london_live_files`: 21 signs had a genuinely newer master and got a v2; 30 signs whose files were unchanged since the 11 Sept issue were left exactly as they were; 14 assets in the folder had no sign at all and were appended to `LONDON_VENUE_ITEMS` (ids `ldn-v66`, `ldn-v74`–`ldn-v86`) with trims read off the supplied artboards.
+**Why:** a print vendor must always be handed the newest signed-off artwork, but re-publishing an unchanged file burns a version number and makes the history lie about when a sign was last changed. Matching on filename alone (a) is not enough — two different signs shared the basename `Lifts_Template.ai` (lift door vs lift walls), so the mapping is by folder path, not name. (b) would have retired files that are still the ones in force.
+**Would change if:** a hand-back arrives with no reliable file dates — then the comparison falls back to content hash against the stored object.
+**Applies to:** every venue hand-back. Old versions are never deleted: they stay in `london_live_files` with `is_active = false`, so a sign can always be rolled back.
