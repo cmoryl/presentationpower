@@ -647,13 +647,16 @@ export function AgendaSheet({
         />
       ) : null}
 
-      {/* Footnote: on the programme look it sits above the band with a pin. */}
+      {/* Footnote: on the programme look it sits in its own reserved strip above
+          the band, so neither the copy nor the pin can print on a row band or
+          the band foot. */}
       {config.footnote.trim() ? (
         blocks.footerBand ? (
           <div
             style={{
-              ...at(blocks.x, blocks.footerBand.y - L.footSize * 3.1),
+              ...at(blocks.x, blocks.footnoteY),
               width: mm(blocks.contentW),
+              height: mm(blocks.footnoteH),
               fontSize: mm(L.footSize * 1.15),
               fontWeight: 700,
               lineHeight: 1.3,
@@ -663,10 +666,11 @@ export function AgendaSheet({
             }}
           >
             {blocks.rows.some((r) => r.parallel) ? (
-              <AgendaPin size={mm(L.footSize * 2.6)} />
+              <AgendaPin size={mm(L.footSize * 2.2)} />
             ) : null}
             <span>{config.footnote}</span>
           </div>
+
         ) : (
           <div
             style={{
