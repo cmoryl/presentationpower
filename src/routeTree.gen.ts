@@ -151,6 +151,7 @@ import { Route as KnowledgeBrandGuidesNext2026BuildRouteImport } from './routes/
 import { Route as KnowledgeBrandGuidesNext2026RouteImport } from './routes/knowledge.brand-guides.next-2026'
 import { Route as KnowledgeBrandGuidesElementRouteImport } from './routes/knowledge.brand-guides.element'
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
+import { Route as EventsNextVenuesRouteImport } from './routes/events.next_.venues'
 import { Route as EventsNextVenueRouteImport } from './routes/events.next_.venue'
 import { Route as EventsNextPlaybookRouteImport } from './routes/events.next_.playbook'
 import { Route as EventsNextPillarsRouteImport } from './routes/events.next_.pillars'
@@ -903,6 +904,11 @@ const KnowledgeBrandGuidesSlugRoute =
     path: '/brand-guides/$slug',
     getParentRoute: () => KnowledgeRoute,
   } as any)
+const EventsNextVenuesRoute = EventsNextVenuesRouteImport.update({
+  id: '/next_/venues',
+  path: '/next/venues',
+  getParentRoute: () => EventsRoute,
+} as any)
 const EventsNextVenueRoute = EventsNextVenueRouteImport.update({
   id: '/next_/venue',
   path: '/next/venue',
@@ -1224,6 +1230,7 @@ export interface FileRoutesByFullPath {
   '/events/next/pillars': typeof EventsNextPillarsRoute
   '/events/next/playbook': typeof EventsNextPlaybookRoute
   '/events/next/venue': typeof EventsNextVenueRoute
+  '/events/next/venues': typeof EventsNextVenuesRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/element': typeof KnowledgeBrandGuidesElementRoute
   '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
@@ -1396,6 +1403,7 @@ export interface FileRoutesByTo {
   '/events/next/pillars': typeof EventsNextPillarsRoute
   '/events/next/playbook': typeof EventsNextPlaybookRoute
   '/events/next/venue': typeof EventsNextVenueRoute
+  '/events/next/venues': typeof EventsNextVenuesRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/element': typeof KnowledgeBrandGuidesElementRoute
   '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
@@ -1573,6 +1581,7 @@ export interface FileRoutesById {
   '/events/next_/pillars': typeof EventsNextPillarsRoute
   '/events/next_/playbook': typeof EventsNextPlaybookRoute
   '/events/next_/venue': typeof EventsNextVenueRoute
+  '/events/next_/venues': typeof EventsNextVenuesRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/element': typeof KnowledgeBrandGuidesElementRoute
   '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
@@ -1751,6 +1760,7 @@ export interface FileRouteTypes {
     | '/events/next/pillars'
     | '/events/next/playbook'
     | '/events/next/venue'
+    | '/events/next/venues'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/element'
     | '/knowledge/brand-guides/next-2026'
@@ -1923,6 +1933,7 @@ export interface FileRouteTypes {
     | '/events/next/pillars'
     | '/events/next/playbook'
     | '/events/next/venue'
+    | '/events/next/venues'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/element'
     | '/knowledge/brand-guides/next-2026'
@@ -2099,6 +2110,7 @@ export interface FileRouteTypes {
     | '/events/next_/pillars'
     | '/events/next_/playbook'
     | '/events/next_/venue'
+    | '/events/next_/venues'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/element'
     | '/knowledge/brand-guides/next-2026'
@@ -3217,6 +3229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeBrandGuidesSlugRouteImport
       parentRoute: typeof KnowledgeRoute
     }
+    '/events/next_/venues': {
+      id: '/events/next_/venues'
+      path: '/next/venues'
+      fullPath: '/events/next/venues'
+      preLoaderRoute: typeof EventsNextVenuesRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/venue': {
       id: '/events/next_/venue'
       path: '/next/venue'
@@ -3551,6 +3570,7 @@ interface EventsRouteChildren {
   EventsNextPillarsRoute: typeof EventsNextPillarsRoute
   EventsNextPlaybookRoute: typeof EventsNextPlaybookRoute
   EventsNextVenueRoute: typeof EventsNextVenueRoute
+  EventsNextVenuesRoute: typeof EventsNextVenuesRoute
   EventsNextLondonBookletRoute: typeof EventsNextLondonBookletRoute
   EventsNextLondonMapsRoute: typeof EventsNextLondonMapsRoute
   EventsNextLondonReviseRoute: typeof EventsNextLondonReviseRoute
@@ -3577,6 +3597,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextPillarsRoute: EventsNextPillarsRoute,
   EventsNextPlaybookRoute: EventsNextPlaybookRoute,
   EventsNextVenueRoute: EventsNextVenueRoute,
+  EventsNextVenuesRoute: EventsNextVenuesRoute,
   EventsNextLondonBookletRoute: EventsNextLondonBookletRoute,
   EventsNextLondonMapsRoute: EventsNextLondonMapsRoute,
   EventsNextLondonReviseRoute: EventsNextLondonReviseRoute,

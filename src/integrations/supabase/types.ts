@@ -4187,6 +4187,114 @@ export type Database = {
         }
         Relationships: []
       }
+      venue_pins: {
+        Row: {
+          asset_id: string
+          confirmed: boolean
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          created_by: string | null
+          face: string | null
+          floor: string
+          id: string
+          note: string
+          updated_at: string
+          venue_slug: string
+          x: number
+          y: number
+        }
+        Insert: {
+          asset_id: string
+          confirmed?: boolean
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          face?: string | null
+          floor: string
+          id?: string
+          note?: string
+          updated_at?: string
+          venue_slug: string
+          x: number
+          y: number
+        }
+        Update: {
+          asset_id?: string
+          confirmed?: boolean
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          face?: string | null
+          floor?: string
+          id?: string
+          note?: string
+          updated_at?: string
+          venue_slug?: string
+          x?: number
+          y?: number
+        }
+        Relationships: []
+      }
+      venue_plans: {
+        Row: {
+          caveat: string
+          city: string
+          created_at: string
+          created_by: string | null
+          dates_label: string
+          event_id: string
+          floors: Json
+          id: string
+          name: string
+          producer: string
+          slug: string
+          survey_date: string | null
+          survey_source: string
+          surveyed: boolean
+          updated_at: string
+          venue: string
+        }
+        Insert: {
+          caveat?: string
+          city?: string
+          created_at?: string
+          created_by?: string | null
+          dates_label?: string
+          event_id?: string
+          floors?: Json
+          id?: string
+          name: string
+          producer?: string
+          slug: string
+          survey_date?: string | null
+          survey_source?: string
+          surveyed?: boolean
+          updated_at?: string
+          venue?: string
+        }
+        Update: {
+          caveat?: string
+          city?: string
+          created_at?: string
+          created_by?: string | null
+          dates_label?: string
+          event_id?: string
+          floors?: Json
+          id?: string
+          name?: string
+          producer?: string
+          slug?: string
+          survey_date?: string | null
+          survey_source?: string
+          surveyed?: boolean
+          updated_at?: string
+          venue?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
