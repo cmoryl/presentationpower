@@ -55,7 +55,8 @@ function slug(value: string): string {
 export async function buildLondonSignagePack(
   panels: LondonPanel[],
   options: {
-    revision?: number;
+    /** Revision in force. Pass "draft" when nothing is published yet. */
+    revision?: number | "draft";
     /** "rgb" (default, RIP separates) or "cmyk" print masters with vibrant correction. */
     colorSpace?: LondonColorSpace;
     vibrance?: number;
@@ -65,13 +66,15 @@ export async function buildLondonSignagePack(
   // Copy is outlined into vector paths, so the signage face must be in memory
   // before any master is built.
   await loadLondonSignageFace();
-  const rev = options.revision ?? 1;
+  // Never invent a revision number: an unstated revision ships as `rdraft-`.
+  const rev = options.revision ?? "draft";
   const colorSpace: LondonColorSpace = options.colorSpace ?? "rgb";
   const art = { colorSpace, vibrance: options.vibrance ?? 1 };
   const zip = new JSZip();
   const files: LondonPackFile[] = [];
+  const skipped: LondonPackSkip[] = [];
   const rows: string[] = [
-    "panel_id,name,floor,room,style,trim_mm,bleed_mm,bleed_edge_mm,lockup,colourway,family,copy,logo_x_mm,logo_y_mm,logo_w_mm,nudge_dx,nudge_dy,scale,colour_space,ground_builds",
+    "panel_id,name,floor,room,style,trim_mm,bleed_mm,bleed_edge_mm,lockup,colourway,family,copy,logo_x_mm,logo_y_mm,logo_w_mm,nudge_dx,nudge_dy,scale,colour_space,ground_builds,status",
   ];
 
   for (const [index, panel] of panels.entries()) {
@@ -81,11 +84,24 @@ export async function buildLondonSignagePack(
     const svgPath = `${dir}/${base}.svg`;
     const aiPath = `${dir}/${base}.ai`;
 
-    zip.file(svgPath, buildLondonPanelSvg(panel, art));
-    // Vendor booths embed their supplied wall, so await the artwork resolve.
-    zip.file(aiPath, londonAiBytes(await buildLondonPanelAiAsync(panel, art)));
-    files.push({ path: svgPath, panelId: panel.id, kind: "svg" });
-    files.push({ path: aiPath, panelId: panel.id, kind: "ai" });
+    // Same print gate a single-panel download runs: a bulk pack must never be
+    // the loophole that lets a failing master reach a printer.
+    let status = "included";
+    try {
+      const svgOut = buildLondonPanelSvg(panel, art);
+      gateOnQa(auditSvg(panel, svgOut, art));
+      // Vendor booths embed their supplied wall, so await the artwork resolve.
+      const ai = await buildLondonPanelAiAsync(panel, art);
+      gateOnQa(auditAi(panel, ai, art));
+      zip.file(svgPath, svgOut);
+      zip.file(aiPath, londonAiBytes(ai));
+      files.push({ path: svgPath, panelId: panel.id, kind: "svg" });
+      files.push({ path: aiPath, panelId: panel.id, kind: "ai" });
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : "Print check failed";
+      skipped.push({ panelId: panel.id, name: panel.name, reason });
+      status = `SKIPPED — ${reason.replace(/[\r\n]+/g, " ")}`;
+    }
 
     rows.push(
       [
