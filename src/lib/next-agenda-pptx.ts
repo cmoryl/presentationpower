@@ -770,22 +770,25 @@ export async function buildAgendaPptx(
     }
 
     const foot = [(cfg.footnote ?? "").trim()].filter(Boolean).join(" ");
-    // On a card board the footnote sits above the brand band, not inside it.
-    const footNoteY = b.footerBand ? b.footerBand.y - L.footSize * 2.6 : b.footY;
+    // On a card board the footnote sits in its own reserved strip above the brand
+    // band, so it can never print on the last row band or inside the band.
+    const footNoteY = b.footerBand ? b.footnoteY : b.footY;
+    const footNoteH = b.footerBand ? Math.max(b.footnoteH, L.footSize * 2) : L.footSize * 2;
     if (foot) {
       s.addText(foot, {
         x: inX(b.x),
         y: inX(footNoteY),
         w: inX(b.contentW * 0.7),
-        h: inX(L.footSize * 2),
+        h: inX(footNoteH),
         fontFace: FONT,
         fontSize: pt(L.footSize),
         lineSpacing: pt(L.footSize * 1.4),
         color: inkHex,
-        valign: "top",
+        valign: "middle",
         margin: 0,
       });
     }
+
     if ((cfg.pageLabel ?? "").trim()) {
       s.addText(cfg.pageLabel!.toUpperCase(), {
         x: inX(b.x + b.contentW * 0.7),
