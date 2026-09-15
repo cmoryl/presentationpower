@@ -237,7 +237,7 @@ function LondonTemplatePage() {
   const downloadPanel = useCallback(
     async (kind: "svg" | "ai") => {
       await loadLondonSignageFace();
-      const base = londonPanelFileBase(panel, headRev, colorSpace);
+      const base = londonPanelFileBase(panel, revStamp, colorSpace);
       try {
         let blob: Blob;
         if (kind === "svg") {
