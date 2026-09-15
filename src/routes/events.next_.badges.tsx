@@ -9,7 +9,6 @@ import {
   CITY_BADGE_DEFAULT,
   CITY_BADGE_DIVISIONS,
   CITY_BADGE_FACE,
-  CITY_BADGE_ROLES,
   cityBadgeDivision,
 } from "@/lib/next-city-badge";
 
