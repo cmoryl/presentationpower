@@ -25,10 +25,11 @@ const board = (over: Partial<AgendaConfig> = {}): AgendaConfig => ({
 });
 
 describe("agenda room line", () => {
-  it("defaults to the house pin in Peach, capitals, bold, right", () => {
+  it("defaults to the house pin in the board ink, capitals, bold, right", () => {
     const spec = agendaLocation(board());
     expect(spec.icon.id).toBe("pin");
-    expect(spec.iconHex).toBe("#FF9B70");
+    // null = follow the board ink, so the mark never fights a warm ground.
+    expect(spec.iconHex).toBeNull();
     expect(spec.bold).toBe(true);
     expect(spec.align).toBe("right");
     expect(agendaLocationText(board())).toBe("FLEMING 3RD FLOOR");
