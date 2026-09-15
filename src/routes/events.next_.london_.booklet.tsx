@@ -131,9 +131,10 @@ function BookletPage() {
 
   /** The agenda the booklet prints, forced to the booklet's own page format. */
   const agenda = useMemo<AgendaConfig>(() => {
-    const base = rows.find((r) => r.id === savedId)?.config ?? agendaDefault("city-series");
+    const base =
+      rows.find((r) => r.id === savedId)?.config ?? agendaSnapshot ?? agendaDefault("city-series");
     return { ...base, sizeId: bookletAgendaSizeId(config.sizeId) };
-  }, [rows, savedId, config.sizeId]);
+  }, [rows, savedId, agendaSnapshot, config.sizeId]);
 
   const agendaPageCount = useMemo(() => {
     try {
