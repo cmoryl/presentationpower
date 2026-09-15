@@ -119,6 +119,8 @@ function BookletPage() {
   const [savedId, setSavedId] = useState<string>("");
   const [notes, setNotes] = useState<string[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
+  /** The agenda carried inside an opened saved booklet, when it has one. */
+  const [agendaSnapshot, setAgendaSnapshot] = useState<AgendaConfig | null>(null);
 
   const list = useServerFn(listAgendaFiles);
   const saved = useQuery({
