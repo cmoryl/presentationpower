@@ -500,7 +500,7 @@ const PLANS: LondonFloorPlan[] = [
         y: 24,
         w: 14,
         h: 12,
-        rooms: ["PAOLOZZI", "PILLARS", "STEP & REPEAT"],
+        rooms: ["PAOLOZZI", "PILLARS", "STEP & REPEAT", "METAL LOGO WALL"],
         note: "Cover panel hangs over the Paolozzi wall; directional pillar sits at the pinch point.",
       },
       {
@@ -532,7 +532,7 @@ const PLANS: LondonFloorPlan[] = [
         y: 23,
         w: 6,
         h: 6,
-        rooms: ["KITCHEN"],
+        rooms: ["KITCHEN", "CATERING"],
       },
     ],
   },
