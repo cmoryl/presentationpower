@@ -37,6 +37,12 @@ import {
   type BookletConfig,
   type BookletImagePage,
 } from "@/lib/next-booklet";
+import {
+  deleteEventBooklet,
+  listEventBooklets,
+  saveEventBooklet,
+  updateEventBooklet,
+} from "@/lib/next-booklet.functions";
 import { buildBookletPdf } from "@/lib/next-booklet-pdf";
 import { bookletChartPages, bookletMapPages } from "@/lib/next-booklet-render";
 import { SUPPORTED_VIZ_KINDS } from "@/lib/infographics/variant-kinds";
