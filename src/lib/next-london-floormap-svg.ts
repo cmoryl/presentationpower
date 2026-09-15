@@ -522,8 +522,17 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
   }
 
   const roomScale = Math.max(0.7, Math.min(1.8, DESIGN.roomLabelScale));
+  // Every room as a sheet-space rectangle, so a room's own copy can be tested
+  // against its neighbours before it is drawn.
+  const zoneRects = plan.zones.map((z) => ({
+    x: ox + z.x * PPM,
+    y: oy + z.y * PPM,
+    w: z.w * PPM,
+    h: z.h * PPM,
+  }));
   const zones = plan.zones
-    .map((z) => {
+    .map((z, zi) => {
+
       const style = zoneStyleFor(z.kind, DESIGN);
       const quiet = z.kind === "circulation" || z.kind === "core" || z.kind === "exterior";
       const inset = 1.5;
