@@ -15,6 +15,13 @@ import { resolveAssetUrl } from "./asset-base-url";
 import { buildAgendaVectorPdf } from "./agenda-vector-pdf";
 import { agendaGeometry, type AgendaConfig } from "./next-agenda";
 import {
+  bookletCoverArt,
+  bookletCoverLayout,
+  coverCrop,
+  type BookletCoverArt,
+  type BookletCoverLayout,
+} from "./next-booklet-cover-art";
+import {
   BOOKLET_ARTWORK_NOTE,
   bookletPageCount,
   type BookletConfig,
@@ -376,8 +383,52 @@ export async function buildBookletPdf(args: {
   const notes: string[] = [];
 
   if (config.includeCover) {
-    drawCover(doc.addPage([pageW, pageH]), fonts, config.cover, geo);
-    notes.push("Cover drawn as live vector type on the approved ink ground with the brick rail");
+    const page = doc.addPage([pageW, pageH]);
+    const art = bookletCoverArt(config.cover.artId);
+    const layout = bookletCoverLayout(config.cover.treatment ?? "full-bleed");
+    let placed = false;
+    if (art) {
+      // Ink ground first: a framed or split cover shows it around the picture.
+      page.drawRectangle({
+        x: SLUG_PT,
+        y: SLUG_PT,
+        width: geo.bleedW * MM_TO_PT,
+        height: geo.bleedH * MM_TO_PT,
+        color: hex(INK),
+      });
+      placed = await drawCoverArt(doc, page, art, layout, config.cover.scrim ?? 88, {
+        x: SLUG_PT,
+        y: SLUG_PT,
+        w: geo.bleedW * MM_TO_PT,
+        h: geo.bleedH * MM_TO_PT,
+      });
+      if (!placed) {
+        notes.push(
+          `⚠ Cover picture “${art.name}” could not be loaded — the cover printed on the plain ink ground instead.`,
+        );
+      }
+    }
+    const bleedTopPt = SLUG_PT + geo.bleedH * MM_TO_PT;
+    const band = placed
+      ? {
+          top:
+            bleedTopPt -
+            ((geo.bleedH - geo.trimH) / 2 + geo.safeInset) * MM_TO_PT -
+            layout.copy.y * geo.bleedH * MM_TO_PT,
+          bottom:
+            bleedTopPt -
+            ((geo.bleedH - geo.trimH) / 2) * MM_TO_PT -
+            (layout.copy.y + layout.copy.h) * geo.bleedH * MM_TO_PT,
+          anchor: layout.copy.anchor,
+        }
+      : undefined;
+    drawCover(page, fonts, config.cover, geo, band);
+    notes.push(
+      placed
+        ? `Cover picture “${art!.name}” placed live at its own resolution under a vector ink veil, with the title, sub-line and footnote as live type`
+        : "Cover drawn as live vector type on the approved ink ground with the brick rail",
+    );
+    if (placed) notes.push(art!.credit);
   }
 
   let agendaPageCount = 0;
