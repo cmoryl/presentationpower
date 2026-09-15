@@ -208,8 +208,14 @@ function drawCover(
     titleLines.length * titleSize * 1.06 +
     (subLines.length ? mm(12) + subLines.length * subSize * 1.35 : 0);
 
+  // The footnote owns the page foot, so a bottom-anchored copy block stops
+  // above it instead of printing through it.
+  const footSize = 9.5;
+  const footLines = wrap(fonts.regular, (cover.footnote ?? "").trim(), footSize, inner);
+  const footReserve = footLines.length ? footLines.length * footSize * 1.3 + mm(8) : 0;
+
   const bandTop = copyBand?.top ?? trimTop;
-  const bandBottom = copyBand?.bottom ?? trimBottom;
+  const bandBottom = (copyBand?.bottom ?? trimBottom) + footReserve;
   const railY =
     copyBand?.anchor === "bottom"
       ? Math.min(bandTop, bandBottom + blockH) - brickH
@@ -264,10 +270,7 @@ function drawCover(
   }
 
 
-  const footnote = (cover.footnote ?? "").trim();
-  if (footnote) {
-    const footSize = 9.5;
-    const footLines = wrap(fonts.regular, footnote, footSize, inner);
+  if (footLines.length) {
     let fy = SLUG_PT + mm((geo.bleedH - geo.trimH) / 2) + pad + (footLines.length - 1) * footSize * 1.3;
     for (const line of footLines) {
       page.drawText(line, {
