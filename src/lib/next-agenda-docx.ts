@@ -1028,16 +1028,23 @@ export async function buildAgendaDocx(
     ].join("");
 
   const cover = extras?.cover ?? null;
+  // A composed cover ground (location picture plus its ink veil) replaces the
+  // gradient behind the cover copy. The copy itself stays editable Word text.
+  const coverGround = cover ? (extras?.coverGround ?? null) : null;
   const imagePages = extras?.imagePages ?? [];
   const contentMm = contentTwips / TWIPS_PER_MM;
 
+  // A cover picture is veiled in brand ink, so ink-coloured copy would vanish
+  // into it: every cover line prints white over a picture ground.
+  const coverInk = coverGround ? "FFFFFF" : inkHex;
+  const coverTitle = coverGround ? "FFFFFF" : titleHex;
   const coverPage = cover
     ? [
         bkPara(backgroundDrawing("rIdCover"), 0),
-        bkPara(bkRun(cover.eyebrow ?? "", L.eyebrowSize, inkHex, true, true), 6),
-        bkPara(bkRun(cover.title ?? "", L.titleSize, titleHex, true), 5),
-        (cover.subtitle ?? "").trim() ? bkPara(bkRun(cover.subtitle, L.metaSize, inkHex, false), 4) : "",
-        (cover.footnote ?? "").trim() ? bkPara(bkRun(cover.footnote, L.footSize, inkHex, false), 0) : "",
+        bkPara(bkRun(cover.eyebrow ?? "", L.eyebrowSize, coverInk, true, true), 6),
+        bkPara(bkRun(cover.title ?? "", L.titleSize, coverTitle, true), 5),
+        (cover.subtitle ?? "").trim() ? bkPara(bkRun(cover.subtitle, L.metaSize, coverInk, false), 4) : "",
+        (cover.footnote ?? "").trim() ? bkPara(bkRun(cover.footnote, L.footSize, coverInk, false), 0) : "",
       ].join("")
     : "";
 
@@ -1121,7 +1128,9 @@ export async function buildAgendaDocx(
           `<Relationship Id="rIdGround${i === 0 ? "" : i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/ground.png"/>`,
       ),
       cover
-        ? '<Relationship Id="rIdCover" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/ground.png"/>'
+        ? `<Relationship Id="rIdCover" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${
+            coverGround ? "cover.png" : "ground.png"
+          }"/>`
         : "",
       ...imagePages.map(
         (_a, i) =>
@@ -1190,6 +1199,7 @@ export async function buildAgendaDocx(
     ].join(""),
   );
   zip.file("word/media/ground.png", groundBytes);
+  if (coverGround) zip.file("word/media/cover.png", coverGround);
   imagePages.forEach((art, i) => zip.file(`word/media/art${i + 1}.png`, art.png));
   if (qrImage) zip.file("word/media/qr.png", qrImage.bytes);
   zip.file("word/document.xml", document);
@@ -1207,7 +1217,13 @@ export async function buildAgendaDocx(
       `${pages.length} page${pages.length === 1 ? "" : "s"} across ${pages[pages.length - 1]!.dayCount} programme day${pages[pages.length - 1]!.dayCount === 1 ? "" : "s"}, each with the flattened ground behind it`,
       `Live editable Geist text at the printed sizes · programme rows in Word tables`,
       `Row band reference: ${blocks.rowH.toFixed(1)} mm per row on the printed board`,
-      ...(cover ? ["Cover page carries the editable cover copy on the approved ground"] : []),
+      ...(cover
+        ? [
+            coverGround
+              ? "Cover page carries the editable cover copy over the chosen location picture, veiled in brand ink so every line stays readable"
+              : "Cover page carries the editable cover copy on the approved ground",
+          ]
+        : []),
       ...(imagePages.length
         ? [
             `${imagePages.length} rendered page${imagePages.length === 1 ? "" : "s"} placed as pictures with printed credit lines`,

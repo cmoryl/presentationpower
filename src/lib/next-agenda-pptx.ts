@@ -155,49 +155,72 @@ export async function buildAgendaPptx(
     const L0 = agendaBlocks(pages[0]!.config).layout;
     const cover = extras.cover;
     const s = pptx.addSlide();
-    if (ground) {
-      s.addImage({ data: ground, x: 0, y: 0, w: slideW, h: slideH, objectName: "NEXT booklet cover ground" });
+    // A chosen location picture (already veiled in brand ink) becomes the cover
+    // ground; otherwise the cover keeps the approved gradient.
+    const coverGround = extras.coverGround
+      ? bytesToDataUrl(extras.coverGround)
+      : null;
+    if (coverGround ?? ground) {
+      s.addImage({
+        data: (coverGround ?? ground)!,
+        x: 0,
+        y: 0,
+        w: slideW,
+        h: slideH,
+        objectName: "NEXT booklet cover ground",
+      });
     } else {
       s.background = { color: groundHex };
     }
     const pad = geo.safeInset;
+    // Ink copy would disappear into a veiled picture: over a cover picture every
+    // line prints white.
+    const coverInk = coverGround ? "FFFFFF" : inkHex;
     let y = pad;
-    const line = (text: string, sizeMm: number, bold: boolean, caps: boolean, opacity?: number) => {
+    const line = (
+      text: string,
+      sizeMm: number,
+      bold: boolean,
+      caps: boolean,
+      opacity?: number,
+      track = false,
+    ) => {
       if (!text.trim()) return;
-      s.addText(caps ? text.toUpperCase() : text, {
+      const upper = caps ? text.toUpperCase() : text;
+      const shown = track ? upper.split("").join("\u2009") : upper;
+      s.addText(shown, {
         x: inMm(pad),
         y: inMm(y),
         w: inMm(geo.trimW - pad * 2),
-        h: inMm(sizeMm * 2.2),
+        h: inMm(sizeMm * 3),
         fontFace: FONT,
         fontSize: pt(sizeMm),
         bold,
-        charSpacing: caps ? 2 : 0,
-        color: inkHex,
+        // LibreOffice/PowerPoint clip a tracked-out run inside a measured cover
+        // box, so cover caps carry their letterspacing as thin spaces instead.
+        charSpacing: 0,
+        color: coverInk,
         transparency: opacity,
         valign: "top",
         margin: 0,
+        // Cover lines are single-line: wrapping clipped tracked-out caps
+        // ("GLOBALLINK N…") inside the measured box.
+        wrap: false,
+        fit: "none",
       });
-      y += sizeMm * 2.4;
+      y += sizeMm * 2.6;
     };
-    line(cover.eyebrow ?? "", L0.eyebrowSize, true, true, 18);
+    line(cover.eyebrow ?? "", L0.eyebrowSize, true, true, 18, true);
     line(cover.title ?? "", L0.titleSize, true, true);
     line(cover.subtitle ?? "", L0.metaSize, false, false, 10);
-    if ((cover.footnote ?? "").trim()) {
-      s.addText(cover.footnote, {
-        x: inMm(pad),
-        y: inMm(geo.trimH - pad - L0.footSize * 2.4),
-        w: inMm(geo.trimW - pad * 2),
-        h: inMm(L0.footSize * 2.2),
-        fontFace: FONT,
-        fontSize: pt(L0.footSize),
-        color: inkHex,
-        transparency: 30,
-        valign: "top",
-        margin: 0,
-      });
-    }
-    notes.push("Cover slide carries the editable cover copy on the approved ground.");
+    // The footnote stays with the cover copy block: at the sheet foot it printed
+    // over the picture and stopped being readable.
+    line(cover.footnote ?? "", L0.footSize, false, false, 25);
+    notes.push(
+      extras.coverGround
+        ? "Cover slide carries the editable cover copy over the chosen location picture, veiled in brand ink."
+        : "Cover slide carries the editable cover copy on the approved ground.",
+    );
   }
 
   for (const page of extras?.omitAgenda ? [] : pages) {

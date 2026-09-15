@@ -44,7 +44,14 @@ import {
   updateEventBooklet,
 } from "@/lib/next-booklet.functions";
 import { buildBookletPdf } from "@/lib/next-booklet-pdf";
-import { bookletChartPages, bookletMapPages } from "@/lib/next-booklet-render";
+import { bookletChartPages, bookletCoverGroundPng, bookletMapPages } from "@/lib/next-booklet-render";
+import {
+  BOOKLET_COVER_TREATMENTS,
+  bookletCoverArt,
+  bookletCoverArtFor,
+  bookletCoverLayout,
+  type BookletCoverTreatment,
+} from "@/lib/next-booklet-cover-art";
 import { SUPPORTED_VIZ_KINDS } from "@/lib/infographics/variant-kinds";
 import { LONDON_FLOORS, LONDON_VENUE, type LondonFloorId } from "@/lib/next-london-signage";
 import { londonMappedFloors } from "@/lib/next-london-floorplan";
@@ -107,6 +114,83 @@ function download(blob: Blob, name: string): void {
   a.download = name;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+/**
+ * On-screen cover proof. It follows the same fractions the press file uses, so
+ * what the operator moves here is what the printed cover does — but it is a
+ * screen proof, not the press artwork.
+ */
+function CoverPreview({ cover, trim }: { cover: BookletConfig["cover"]; trim: { w: number; h: number } }) {
+  const art = bookletCoverArt(cover.artId);
+  const layout = bookletCoverLayout(cover.treatment ?? "full-bleed");
+  const veil = Math.max(0, Math.min(1, layout.scrim.strength * ((cover.scrim ?? 88) / 100)));
+  const pct = (v: number) => `${(v * 100).toFixed(2)}%`;
+  const veilStyle =
+    layout.scrim.from === "all"
+      ? { background: `rgba(3,0,44,${veil})` }
+      : {
+          background: `linear-gradient(to ${layout.scrim.from === "bottom" ? "top" : "bottom"}, rgba(3,0,44,${veil}) 0%, rgba(3,0,44,${veil * 0.45}) ${pct(layout.scrim.span * 0.55)}, rgba(3,0,44,0) ${pct(layout.scrim.span)})`,
+        };
+  return (
+    <div
+      className="relative w-full overflow-hidden rounded-md bg-[#03002C]"
+      style={{ aspectRatio: `${trim.w} / ${trim.h}` }}
+    >
+      {art ? (
+        <div
+          className="absolute overflow-hidden"
+          style={{
+            left: pct(layout.photo.x),
+            top: pct(layout.photo.y),
+            width: pct(layout.photo.w),
+            height: pct(layout.photo.h),
+          }}
+        >
+          <img src={art.src} alt={art.name} loading="lazy" className="size-full object-cover" />
+          <div className="absolute inset-0" style={veilStyle} />
+        </div>
+      ) : null}
+      <div
+        className="absolute flex flex-col gap-[3%] px-[8%]"
+        style={{
+          left: 0,
+          right: 0,
+          top: art ? pct(layout.copy.y) : "8%",
+          height: art ? pct(layout.copy.h) : "60%",
+          justifyContent: art && layout.copy.anchor === "bottom" ? "flex-end" : "flex-start",
+        }}
+      >
+        <div className="flex gap-1">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <span
+              key={i}
+              className="block h-[5px] w-[22px] rounded-[1px]"
+              style={{ background: i === 4 ? "#003FC7" : "rgba(255,255,255,0.92)" }}
+            />
+          ))}
+        </div>
+        {cover.eyebrow ? (
+          <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/80">
+            {cover.eyebrow}
+          </p>
+        ) : null}
+        {cover.title ? (
+          <p className="text-[clamp(14px,3.2vw,26px)] font-bold uppercase leading-[1.04] text-white">
+            {cover.title}
+          </p>
+        ) : null}
+        {cover.subtitle ? (
+          <p className="text-[10px] leading-snug text-white/90">{cover.subtitle}</p>
+        ) : null}
+      </div>
+      {cover.footnote ? (
+        <p className="absolute inset-x-0 bottom-[4%] px-[8%] text-[8px] leading-snug text-white/70">
+          {cover.footnote}
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
 function BookletPage() {
@@ -190,6 +274,15 @@ function BookletPage() {
         async () => {
         const { pages, warnings } = await renderExtras();
         const cover = config.includeCover ? config.cover : null;
+        // Word and PowerPoint need the cover picture composed with its veil; the
+        // press PDF places the picture live and does its own veil in vector.
+        const coverGround =
+          cover && kind !== "pdf"
+            ? await bookletCoverGroundPng(cover, {
+                wMm: bookletGeo.trimW,
+                hMm: bookletGeo.trimH,
+              })
+            : null;
         const stem = bookletSlug(config);
         if (kind === "pdf") {
           const built = await buildBookletPdf({ config, agenda, imagePages: pages });
@@ -198,6 +291,7 @@ function BookletPage() {
         } else if (kind === "docx") {
           const built = await buildAgendaDocx(agenda, {
             cover,
+            coverGround,
             imagePages: pages,
             omitAgenda: !config.includeAgenda,
           });
@@ -206,6 +300,7 @@ function BookletPage() {
         } else {
           const built = await buildAgendaPptx(agenda, {
             cover,
+            coverGround,
             imagePages: pages,
             omitAgenda: !config.includeAgenda,
           });
@@ -420,6 +515,111 @@ function BookletPage() {
                       />
                     </label>
                   ))}
+                </div>
+              ) : null}
+
+              {config.includeCover ? (
+                <div className="space-y-3 rounded-md border border-[color:var(--color-border)] p-3">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <span className={labelCls}>Cover picture</span>
+                    <span className="text-[11px] text-[color:var(--color-muted-foreground)]">
+                      London starter set
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setConfig((c) => ({ ...c, cover: { ...c.cover, artId: "" } }))
+                      }
+                      aria-pressed={!config.cover.artId}
+                      className={`flex h-24 items-center justify-center rounded-md border-2 bg-[color:var(--color-primary)] text-xs font-semibold text-[color:var(--color-primary-foreground)] ${
+                        !config.cover.artId
+                          ? "border-[color:var(--color-primary)]"
+                          : "border-transparent opacity-70"
+                      }`}
+                    >
+                      No picture
+                    </button>
+                    {bookletCoverArtFor("london").map((art) => (
+                      <button
+                        key={art.id}
+                        type="button"
+                        onClick={() =>
+                          setConfig((c) => ({ ...c, cover: { ...c.cover, artId: art.id } }))
+                        }
+                        aria-pressed={config.cover.artId === art.id}
+                        title={art.name}
+                        className={`overflow-hidden rounded-md border-2 text-left ${
+                          config.cover.artId === art.id
+                            ? "border-[color:var(--color-primary)]"
+                            : "border-transparent"
+                        }`}
+                      >
+                        <img
+                          src={art.src}
+                          alt={art.name}
+                          loading="lazy"
+                          width={1280}
+                          height={1792}
+                          className="h-24 w-full object-cover"
+                        />
+                        <span className="block px-1.5 py-1 text-[11px] leading-tight">
+                          {art.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {config.cover.artId ? (
+                    <>
+                      <div className="flex flex-wrap gap-2">
+                        {BOOKLET_COVER_TREATMENTS.map((t) => (
+                          <button
+                            key={t.id}
+                            type="button"
+                            title={t.note}
+                            onClick={() =>
+                              setConfig((c) => ({
+                                ...c,
+                                cover: { ...c.cover, treatment: t.id as BookletCoverTreatment },
+                              }))
+                            }
+                            aria-pressed={(config.cover.treatment ?? "full-bleed") === t.id}
+                            className={`rounded-md border px-3 py-1.5 text-xs font-semibold ${
+                              (config.cover.treatment ?? "full-bleed") === t.id
+                                ? "border-[color:var(--color-primary)] bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]"
+                                : "border-[color:var(--color-border)]"
+                            }`}
+                          >
+                            {t.name}
+                          </button>
+                        ))}
+                      </div>
+                      <label className="block space-y-1">
+                        <span className={labelCls}>
+                          Ink veil · {config.cover.scrim ?? 88}%
+                        </span>
+                        <input
+                          type="range"
+                          min={40}
+                          max={100}
+                          step={2}
+                          value={config.cover.scrim ?? 88}
+                          onChange={(e) =>
+                            setConfig((c) => ({
+                              ...c,
+                              cover: { ...c.cover, scrim: Number(e.target.value) },
+                            }))
+                          }
+                          className="w-full"
+                        />
+                      </label>
+                      <p className="text-xs text-[color:var(--color-muted-foreground)]">
+                        {bookletCoverArt(config.cover.artId)?.credit}
+                      </p>
+                    </>
+                  ) : null}
                 </div>
               ) : null}
             </div>
@@ -653,6 +853,20 @@ function BookletPage() {
                 ) : null}
               </ul>
             </div>
+
+            {config.includeCover ? (
+              <div className="space-y-2 rounded-lg border border-[color:var(--color-border)] p-4">
+                <h2 className="text-sm font-semibold uppercase tracking-wide">Cover proof</h2>
+                <CoverPreview
+                  cover={config.cover}
+                  trim={{ w: bookletGeo.trimW, h: bookletGeo.trimH }}
+                />
+                <p className="text-[11px] text-[color:var(--color-muted-foreground)]">
+                  Screen proof at the booklet trim — the press file places the picture and type
+                  itself.
+                </p>
+              </div>
+            ) : null}
 
             <div className="rounded-lg border border-[color:var(--color-border)] p-4">
               <h2 className="text-sm font-semibold uppercase tracking-wide">Running order</h2>
