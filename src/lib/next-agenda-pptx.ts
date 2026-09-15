@@ -358,7 +358,14 @@ export async function buildAgendaPptx(
         BAND.railW > 0 ? plate(box, BAND.rail, alpha, name) : undefined;
       const bandText = (
         box: { x: number; y: number; w: number; h: number },
-        session: { time?: string; title?: string; speaker?: string; detail?: string },
+        session: {
+          time?: string;
+          title?: string;
+          speaker?: string;
+          detail?: string;
+          track?: string;
+        },
+
         copyInk: string = BAND.ink,
         /** Fitted type for a narrow parallel card; omitted on the main band. */
         card?: ReturnType<typeof agendaCardType>,
