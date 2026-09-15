@@ -358,10 +358,7 @@ function CityBadgePage() {
                             {row.name}
                           </div>
                           <div className="truncate text-[11px] text-black/55">
-                            NEXT template ·{" "}
-                            {[cfg.cityLabel, cfg.datesLabel, cfg.venueLabel]
-                              .filter(Boolean)
-                              .join(" · ") || "no event line"}
+                            NEXT template · {cityBadgeDivision(cfg.divisionId).name}
                             {row.notes ? ` · ${row.notes}` : ""}
                           </div>
                         </div>
