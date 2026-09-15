@@ -326,7 +326,14 @@ function LondonTemplatePage() {
       }.zip`;
       link.click();
       URL.revokeObjectURL(url);
-      toast.success(`${pack.files.length} files packed · ${colorSpace.toUpperCase()}`, { id });
+      if (pack.skipped.length) {
+        toast.warning(
+          `${pack.files.length} files packed · ${pack.skipped.length} sign(s) failed the print check and were left out — see SKIPPED.txt`,
+          { id, duration: 10000 },
+        );
+      } else {
+        toast.success(`${pack.files.length} files packed · ${colorSpace.toUpperCase()}`, { id });
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Pack failed", { id });
     } finally {
