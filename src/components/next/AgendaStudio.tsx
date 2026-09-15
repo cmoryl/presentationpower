@@ -1902,6 +1902,8 @@ export function AgendaStudio({
                       variant="secondary"
                       size="sm"
                       onClick={() => {
+                        // A deliberate open replaces the board and starts clean.
+                        dirtyRef.current = false;
                         setConfig(normalizeAgendaConfig(row.config));
                         setOpenFileId(row.id);
                         setFileName(row.name);
