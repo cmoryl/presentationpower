@@ -173,6 +173,9 @@ export async function buildAgendaPptx(
       s.background = { color: groundHex };
     }
     const pad = geo.safeInset;
+    // Ink copy would disappear into a veiled picture: over a cover picture every
+    // line prints white.
+    const coverInk = coverGround ? "FFFFFF" : inkHex;
     let y = pad;
     const line = (text: string, sizeMm: number, bold: boolean, caps: boolean, opacity?: number) => {
       if (!text.trim()) return;
@@ -185,7 +188,7 @@ export async function buildAgendaPptx(
         fontSize: pt(sizeMm),
         bold,
         charSpacing: caps ? 2 : 0,
-        color: inkHex,
+        color: coverInk,
         transparency: opacity,
         valign: "top",
         margin: 0,
@@ -203,7 +206,7 @@ export async function buildAgendaPptx(
         h: inMm(L0.footSize * 2.2),
         fontFace: FONT,
         fontSize: pt(L0.footSize),
-        color: inkHex,
+        color: coverInk,
         transparency: 30,
         valign: "top",
         margin: 0,
