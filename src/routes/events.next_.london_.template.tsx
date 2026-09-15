@@ -260,7 +260,7 @@ function LondonTemplatePage() {
         toast.error(error instanceof Error ? error.message : "Download blocked by QA");
       }
     },
-    [panel, art, colorSpace, headRev],
+    [panel, art, colorSpace, revStamp],
   );
 
   // Drag with window-level listeners so the pointer can leave the box.
