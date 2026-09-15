@@ -182,7 +182,7 @@ export function bookletCoverLayout(
       return {
         photo: { x: 0, y: 0, w: 1, h: 1 },
         fill: true,
-        scrim: { from: "all", span: 1, strength: 0.72 },
+        scrim: { from: "all", span: 1, strength: 0.82 },
         copy: top
           ? { x: 0, y: 0.06, w: 1, h: 0.5, anchor: "top" }
           : { x: 0, y: 0.4, w: 1, h: 0.54, anchor: "bottom" },
