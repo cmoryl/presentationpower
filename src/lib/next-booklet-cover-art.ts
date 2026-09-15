@@ -160,10 +160,12 @@ export function bookletCoverLayout(
             copy: { x: 0, y: 0.04, w: 1, h: 0.46, anchor: "top" },
           }
         : {
-            photo: { x: 0, y: 0, w: 1, h: 0.56 },
+            // The picture stops above the copy panel: the headline must never
+            // sit on the picture in this treatment.
+            photo: { x: 0, y: 0, w: 1, h: 0.5 },
             fill: true,
-            scrim: { from: "bottom", span: 0.5, strength: 0.86 },
-            copy: { x: 0, y: 0.58, w: 1, h: 0.38, anchor: "top" },
+            scrim: { from: "bottom", span: 0.34, strength: 0.7 },
+            copy: { x: 0, y: 0.54, w: 1, h: 0.4, anchor: "top" },
           };
     case "framed":
       return {

@@ -151,7 +151,7 @@ async function drawCoverArt(
   for (let i = 0; i < bands; i += 1) {
     // 0 at the open end of the veil, 1 where the copy sits.
     const t = (i + 1) / bands;
-    const opacity = strength * t * t;
+    const opacity = strength * Math.pow(t, 1.4);
     const y =
       layout.scrim.from === "bottom"
         ? py + span - (i + 1) * bandH
