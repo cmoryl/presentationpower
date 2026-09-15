@@ -1763,6 +1763,17 @@ export function AgendaStudio({
                 </Button>
               </div>
 
+              {agendaRowStyle(config) !== "card" && agendaParallels(session).length ? (
+                // Tracks already typed on this slot must never go quiet just
+                // because the row look changed — say where they print.
+                <p className="text-xs text-[#B45309] md:col-span-5">
+                  {agendaParallels(session).length} parallel track
+                  {agendaParallels(session).length === 1 ? "" : "s"} saved on this slot. They print
+                  on the card row look — choose “Card” under Look · Programme bands to show and edit
+                  them.
+                </p>
+              ) : null}
+
               {agendaRowStyle(config) === "card"
                 ? (() => {
                     // Up to four tracks can run alongside one slot; each gets its
