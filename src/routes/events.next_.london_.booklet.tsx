@@ -222,6 +222,7 @@ function BookletPage() {
         } else {
           const built = await buildAgendaPptx(agenda, {
             cover,
+            coverGround,
             imagePages: pages,
             omitAgenda: !config.includeAgenda,
           });
