@@ -767,6 +767,164 @@ export function agendaFooter(config: {
   };
 }
 
+// ── Room / floor line ───────────────────────────────────────────────────────
+// The header room line carries a mark and its own formatting. Every icon is a
+// single filled path on its own viewBox so the preview, the press PDF and the
+// deck all draw the same silhouette — no glyph, no font dependency.
+
+export type AgendaLocationIconId =
+  | "none"
+  | "pin"
+  | "dot"
+  | "square"
+  | "diamond"
+  | "chevron"
+  | "bar"
+  | "stairs"
+  | "star";
+
+export const AGENDA_LOCATION_ICONS: {
+  id: AgendaLocationIconId;
+  name: string;
+  /** Filled path on the viewBox below. Empty = no mark. */
+  path: string;
+  vw: number;
+  vh: number;
+  /** Nearest PowerPoint preset shape, used by the deck export. */
+  shape: string;
+}[] = [
+  { id: "none", name: "No mark", path: "", vw: 1, vh: 1, shape: "rect" },
+  {
+    id: "pin",
+    name: "Location pin",
+    path: "M9 0C4.03 0 0 4.03 0 9c0 6.36 7.4 14.68 7.72 15.03a1.72 1.72 0 0 0 2.56 0C10.6 23.68 18 15.36 18 9c0-4.97-4.03-9-9-9Zm0 13.1A4.1 4.1 0 1 1 9 4.9a4.1 4.1 0 0 1 0 8.2Z",
+    vw: 18,
+    vh: 25,
+    shape: "teardrop",
+  },
+  { id: "dot", name: "Dot", path: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z", vw: 24, vh: 24, shape: "ellipse" },
+  {
+    id: "square",
+    name: "Rounded square",
+    path: "M4 2h16a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z",
+    vw: 24,
+    vh: 24,
+    shape: "roundRect",
+  },
+  { id: "diamond", name: "Diamond", path: "M12 1 23 12 12 23 1 12Z", vw: 24, vh: 24, shape: "diamond" },
+  { id: "chevron", name: "Chevron", path: "M6 2 18 12 6 22Z", vw: 24, vh: 24, shape: "triangle" },
+  { id: "bar", name: "Bar rule", path: "M2 9h20v6H2Z", vw: 24, vh: 24, shape: "rect" },
+  {
+    id: "stairs",
+    name: "Floor steps",
+    path: "M3 17h5v5H3Zm6-5h5v10H9Zm6-5h5v15h-5Z",
+    vw: 24,
+    vh: 24,
+    shape: "rect",
+  },
+  {
+    id: "star",
+    name: "Star",
+    path: "M12 1.5l3.2 6.9 7.3.9-5.4 5.1 1.4 7.5L12 18.3l-6.5 3.6 1.4-7.5L1.5 9.3l7.3-.9Z",
+    vw: 24,
+    vh: 24,
+    shape: "star5",
+  },
+];
+
+export type AgendaLocationInkId =
+  | "auto"
+  | "ink"
+  | "white"
+  | "peach"
+  | "aqua"
+  | "lavender"
+  | "yellow";
+
+/** Approved copy / mark colours for the room line. `auto` follows the board ink. */
+export const AGENDA_LOCATION_INKS: { id: AgendaLocationInkId; name: string; hex: string | null }[] = [
+  { id: "auto", name: "Board ink", hex: null },
+  { id: "ink", name: "Blue 800", hex: "#03002C" },
+  { id: "white", name: "White", hex: "#FFFFFF" },
+  { id: "peach", name: "Peach", hex: "#FF9B70" },
+  { id: "aqua", name: "Aqua", hex: "#A1FBF9" },
+  { id: "lavender", name: "Lavender", hex: "#C2A3FF" },
+  { id: "yellow", name: "Yellow", hex: "#FFEB66" },
+];
+
+export type AgendaLocationSizeId = "compact" | "standard" | "large" | "hero";
+
+export const AGENDA_LOCATION_SIZES: { id: AgendaLocationSizeId; name: string; mul: number }[] = [
+  { id: "compact", name: "Compact", mul: 0.85 },
+  { id: "standard", name: "Standard", mul: 1 },
+  { id: "large", name: "Large", mul: 1.25 },
+  { id: "hero", name: "Hero", mul: 1.5 },
+];
+
+export type AgendaLocationWeightId = "regular" | "medium" | "bold";
+export type AgendaLocationAlignId = "right" | "left" | "centre";
+
+export type AgendaLocationSpec = {
+  icon: (typeof AGENDA_LOCATION_ICONS)[number];
+  /** Mark colour, or null to follow the copy colour. */
+  iconHex: string | null;
+  /** Copy colour, or null to follow the board ink. */
+  ink: string | null;
+  sizeMul: number;
+  sizeId: AgendaLocationSizeId;
+  caps: boolean;
+  weight: AgendaLocationWeightId;
+  bold: boolean;
+  align: AgendaLocationAlignId;
+  /** Letter spacing as a fraction of the cap height. */
+  tracking: number;
+};
+
+export function agendaLocation(config: {
+  locationIcon?: string;
+  locationIconInk?: string;
+  locationInk?: string;
+  locationSize?: string;
+  locationCaps?: boolean;
+  locationWeight?: string;
+  locationAlign?: string;
+}): AgendaLocationSpec {
+  const icon =
+    AGENDA_LOCATION_ICONS.find((i) => i.id === config.locationIcon) ?? AGENDA_LOCATION_ICONS[1]!;
+  const iconInk =
+    AGENDA_LOCATION_INKS.find((i) => i.id === config.locationIconInk)?.hex ?? null;
+  const ink = AGENDA_LOCATION_INKS.find((i) => i.id === config.locationInk)?.hex ?? null;
+  const size =
+    AGENDA_LOCATION_SIZES.find((s) => s.id === config.locationSize) ?? AGENDA_LOCATION_SIZES[1]!;
+  const weight: AgendaLocationWeightId =
+    config.locationWeight === "regular" || config.locationWeight === "medium"
+      ? config.locationWeight
+      : "bold";
+  const align: AgendaLocationAlignId =
+    config.locationAlign === "left" || config.locationAlign === "centre"
+      ? config.locationAlign
+      : "right";
+  return {
+    icon,
+    // The pin keeps its house Peach unless the operator picks a colour.
+    iconHex: iconInk ?? (icon.id === "pin" ? AGENDA_BAND.pin : null),
+    ink,
+    sizeMul: size.mul,
+    sizeId: size.id,
+    caps: config.locationCaps !== false,
+    weight,
+    bold: weight === "bold",
+    align,
+    tracking: weight === "regular" ? 0.01 : 0.03,
+  };
+}
+
+/** The room line exactly as it prints: capitals applied, trimmed. */
+export function agendaLocationText(config: { locationLine?: string; locationCaps?: boolean }): string {
+  const v = (config.locationLine ?? "").trim();
+  return config.locationCaps === false ? v : v.toUpperCase();
+}
+
 
 /**
  * Composite a band fill over the ground it sits on. Used directly by Word, which
