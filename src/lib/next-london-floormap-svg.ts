@@ -618,12 +618,36 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
           ? nameAt(z.label.toUpperCase(), 9.5 * roomScale, y + h - 7, 0.8)
           : "";
 
-      const dims =
-        !roomsOnly && DESIGN.roomDims !== false && h > 30 && w > z.label.length * 6.2 + 108
-          ? `<text x="${n(x + w - 6)}" y="${n(y + h - 7)}" text-anchor="end" font-family="${FONT}" font-size="8.5" letter-spacing="0.2" fill="${NAVY}" opacity="0.34">${z.w.toFixed(
-              1,
-            )} × ${z.h.toFixed(1)} m</text>`
-          : "";
+      // Size figure, bottom-right of the tile. Two frame rules decide whether it
+      // prints at all: it must clear the fitted room name by a real measured gap
+      // (not a character-count guess), and its box must sit clear of every other
+      // room on the plan — venue tiles do overlap, and a figure printed under a
+      // neighbour's tile reads as a stray letter beside the room name.
+      const dims = (() => {
+        if (roomsOnly || DESIGN.roomDims === false || h <= 30) return "";
+        const text = `${z.w.toFixed(1)} × ${z.h.toFixed(1)} m`;
+        const dimsW = textWidth(text, 8.5, 0.2);
+        const nameW = Math.min(
+          textWidth(z.label.toUpperCase(), 9.5 * roomScale, 0.9),
+          Math.max(0, w - bar - 15),
+        );
+        const right = x + w - 6;
+        if (right - dimsW - 12 < x + bar + 9 + nameW) return "";
+        const box = { x: right - dimsW, y: y + h - 16, w: dimsW, h: 12 };
+        const covered = zoneRects.some(
+          (r, j) =>
+            j !== zi &&
+            box.x < r.x + r.w &&
+            box.x + box.w > r.x &&
+            box.y < r.y + r.h &&
+            box.y + box.h > r.y,
+        );
+        if (covered) return "";
+        return `<text x="${n(right)}" y="${n(y + h - 7)}" text-anchor="end" font-family="${FONT}" font-size="8.5" letter-spacing="0.2" fill="${NAVY}" opacity="0.34">${esc(
+          text,
+        )}</text>`;
+      })();
+
 
       // Category icon, top-right of the tile: the directory symbol for this kind
       // of space. It sits away from both the label baseline and the pin field.
