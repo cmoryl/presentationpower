@@ -173,11 +173,25 @@ export async function buildLondonSignagePack(
       "Artboards are full bleed. Trim origin and bleed per edge are recorded in the",
       "SVG metadata and in manifest.csv. Body copy prints 100K; use only the approved",
       "lockup colourways shipped here and never place them on complex artwork.",
-    ].join("\n"),
+    ]
+      .filter(Boolean)
+      .join("\n"),
   );
+  if (skipped.length) {
+    zip.file(
+      "SKIPPED.txt",
+      [
+        "These panels failed the print check and are NOT in this pack.",
+        "Do not assume they are approved — open each one, fix the reported problem",
+        "and download it again.",
+        "",
+        ...skipped.map((s) => `- ${s.name} (${s.panelId}): ${s.reason}`),
+      ].join("\n"),
+    );
+  }
 
   const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE" });
-  return { blob, files, manifest };
+  return { blob, files, manifest, skipped };
 }
 
 /** One-line human description of a panel's lockup, for the UI. */
