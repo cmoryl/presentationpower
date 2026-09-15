@@ -7,7 +7,6 @@ import {
   NEXT_BADGE_GROUND,
   SAFE_INSET_X,
   SAFE_INSET_Y,
-  cityBadgeFace,
   cityBadgeLockup,
   type CityBadgeConfig,
 } from "@/lib/next-city-badge";
@@ -38,22 +37,16 @@ export function CityBadge({
   style,
   className,
 }: Props) {
-  const face = cityBadgeFace(config.face);
   const lockup = cityBadgeLockup(config.divisionId);
   const px = (inches: number) => inches * ppi;
   const w = px(BADGE_SPEC.bleedW);
   const h = px(BADGE_SPEC.bleedH);
   const safeX = px(SAFE_INSET_X);
-  const safeY = px(SAFE_INSET_Y);
   const klikTop = h - px(BADGE_SPEC.klik.fromBottom + BADGE_SPEC.klik.h);
   const scale = ppi / 96;
   const showMark = config.showLockup && !!lockup.url;
   const markW = px(side === "back" ? BADGE_LOCKUP_WINDOW.backMarkW : BADGE_LOCKUP_WINDOW.markW);
 
-  const eventLine = [config.cityLabel, config.datesLabel, config.venueLabel]
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .join(" · ");
 
   return (
     <div
@@ -102,109 +95,10 @@ export function CityBadge({
         </div>
       ) : null}
 
-      {/* Safe-area copy — front only. */}
-      {side === "front" ? (
-        <div
-          style={{
-            position: "absolute",
-            left: safeX,
-            right: safeX,
-            top: safeY,
-            bottom: h - klikTop + px(0.06),
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "flex-end",
-            gap: 10 * scale,
-          }}
-        >
-          {eventLine ? (
-            <div
-              style={{
-                fontSize: 11 * scale,
-                letterSpacing: 1.6 * scale,
-                textTransform: "uppercase",
-                fontWeight: 600,
-                color: face.ink,
-                textShadow: "0 1px 6px rgba(3,0,44,0.35)",
-              }}
-            >
-              {eventLine}
-            </div>
-          ) : null}
-
-          {config.showAttendee ? (
-            <div
-              style={{
-                background: face.panel,
-                color: face.panelInk,
-                borderRadius: 10 * scale,
-                padding: `${13 * scale}px ${15 * scale}px ${15 * scale}px`,
-              }}
-            >
-              <div
-                style={{
-                  display: "inline-block",
-                  background: face.band,
-                  color: face.bandInk,
-                  fontSize: 9.5 * scale,
-                  fontWeight: 700,
-                  letterSpacing: 1.5 * scale,
-                  padding: `${4 * scale}px ${9 * scale}px`,
-                  borderRadius: 999,
-                }}
-              >
-                {config.roleLabel || "ATTENDEE"}
-              </div>
-              <div
-                style={{
-                  marginTop: 9 * scale,
-                  fontSize: 25 * scale,
-                  lineHeight: 1.03,
-                  fontWeight: 600,
-                  letterSpacing: -0.7 * scale,
-                }}
-              >
-                {config.firstName}
-                {config.lastName ? (
-                  <>
-                    <br />
-                    {config.lastName}
-                  </>
-                ) : null}
-              </div>
-              {config.jobTitle ? (
-                <div
-                  style={{
-                    marginTop: 7 * scale,
-                    fontSize: 11 * scale,
-                    lineHeight: 1.35,
-                    opacity: 0.85,
-                  }}
-                >
-                  {config.jobTitle}
-                </div>
-              ) : null}
-              {config.company ? (
-                <div style={{ marginTop: 2 * scale, fontSize: 12 * scale, fontWeight: 600 }}>
-                  {config.company}
-                </div>
-              ) : null}
-              {config.reference ? (
-                <div
-                  style={{
-                    marginTop: 9 * scale,
-                    fontSize: 8.5 * scale,
-                    letterSpacing: 1.1 * scale,
-                    opacity: 0.6,
-                  }}
-                >
-                  {config.reference}
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
-      ) : (
+      {/* The front stays clear below the lockup — that area is covered by the
+          badge sleeve, so nothing is printed there. Only the back carries a
+          foot line. */}
+      {side === "back" ? (
         <div
           style={{
             position: "absolute",
@@ -220,7 +114,7 @@ export function CityBadge({
         >
           {BADGE_BACK_LINE}
         </div>
-      )}
+      ) : null}
 
       {guides ? <BadgeGuides ppi={ppi} /> : null}
     </div>

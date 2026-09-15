@@ -9,7 +9,6 @@ import {
   CITY_BADGE_DEFAULT,
   CITY_BADGE_DIVISIONS,
   CITY_BADGE_FACE,
-  CITY_BADGE_ROLES,
   cityBadgeDivision,
 } from "@/lib/next-city-badge";
 
@@ -49,7 +48,7 @@ function BadgesPage() {
   }, [divisionParam]);
 
   const [guides, setGuides] = useState(false);
-  const [roleLabel, setRoleLabel] = useState(CITY_BADGE_DEFAULT.roleLabel);
+  
 
   return (
     <AppShell>
@@ -66,26 +65,13 @@ function BadgesPage() {
           One approved NEXT template now covers NEXT and every sub-NEXT event — the violet-to-blue
           ascent ground with the chevron stack, full bleed on the {BADGE_SPEC.trimW}″ ×{" "}
           {BADGE_SPEC.trimH}″ dual-slot plastic template with the BLE Klik cutout. Every division
-          area has a live front and back carrying its own white-with-accent lockup; the older dark,
-          light and City Series badge templates are retired. Open any card to edit copy, save the
+          area has a live front and back carrying its own white-with-accent lockup and nothing else —
+          the clear area under the lockup is covered by the badge sleeve, so it stays blank. The
+          older dark, light and City Series badge templates are retired. Open any card to save the
           print run and export PDF, an Illustrator twin and a proof PNG.
         </p>
 
         <div className="mt-6 flex flex-wrap items-center gap-3 text-xs">
-          <label className="inline-flex items-center gap-2 text-muted-foreground">
-            Role
-            <select
-              value={roleLabel}
-              onChange={(e) => setRoleLabel(e.target.value)}
-              className="rounded-lg border border-border bg-background px-2 py-1 text-xs"
-            >
-              {CITY_BADGE_ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
-          </label>
           <label className="inline-flex items-center gap-2 text-muted-foreground">
             <input type="checkbox" checked={guides} onChange={(e) => setGuides(e.target.checked)} />
             Bleed / trim / safe-area guides
@@ -111,7 +97,6 @@ function BadgesPage() {
                       config={{
                         ...CITY_BADGE_DEFAULT,
                         divisionId: div.id,
-                        roleLabel,
                       }}
                       side={side}
                       ppi={PREVIEW_PPI}
