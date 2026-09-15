@@ -55,6 +55,12 @@ import {
   downloadMapCsv,
 } from "@/lib/next-london-floormap-export";
 import {
+  clearVenuePin,
+  listVenuePins,
+  saveVenuePins,
+} from "@/lib/venue-plan.functions";
+import { pinsToOverrides, type VenuePin } from "@/lib/venue-plan";
+import {
   DEFAULT_MAP_DESIGN,
   type MapAreaKind,
   type MapDesign,
@@ -86,6 +92,8 @@ function areaLabelFor(kind: MapAreaKind, existing: readonly LondonCustomArea[]):
   return used ? `${base} ${used + 1}` : base;
 }
 
+/** Venue this page pins against, in the shared venue-plan format. */
+const VENUE_SLUG = "london-2026";
 const STORE_KEY = "next-london-map-positions-v1";
 const DESIGN_KEY = "next-london-map-design-v1";
 const AREAS_KEY = "next-london-map-areas-v1";
@@ -139,9 +147,19 @@ function LondonMapsPage() {
    * re-reads the live pin — moving or re-facing it updates the 3D build.
    */
   const [viewer3dId, setViewer3dId] = useState<string | null>(null);
+  /**
+   * Positions saved against the venue itself, shared by everyone: the location
+   * team's marked-up spots stop being true only on the laptop that made them.
+   * A browser copy stays as the offline fallback on site.
+   */
+  const [pins, setPins] = useState<VenuePin[]>([]);
+  const [pinState, setPinState] = useState<"local" | "loading" | "synced" | "offline">("local");
+  const readPins = useServerFn(listVenuePins);
+  const writePins = useServerFn(saveVenuePins);
+  const dropPin = useServerFn(clearVenuePin);
 
-  // Corrections live per browser: the location team marks up positions on site
-  // and the same browser keeps producing corrected maps.
+  // Corrections are drafted in the browser first so a bad signal on site never
+  // loses a mark-up, then written to the venue for everyone else.
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORE_KEY);
@@ -165,6 +183,62 @@ function LondonMapsPage() {
       /* Private mode — the session still shows the corrected map. */
     }
   }, []);
+
+  // Whatever the venue already holds wins over this browser's draft: a colleague
+  // who marked a pin on site is the better source than a stale local copy.
+  useEffect(() => {
+    if (!userId) return;
+    let live = true;
+    setPinState("loading");
+    readPins({ data: { venueSlug: VENUE_SLUG } })
+      .then((res) => {
+        if (!live) return;
+        setPins(res.pins);
+        setPinState("synced");
+        if (res.pins.length) {
+          setOverrides((cur) => ({ ...cur, ...pinsToOverrides(res.pins) }));
+        }
+      })
+      .catch(() => {
+        if (live) setPinState("offline");
+      });
+    return () => {
+      live = false;
+    };
+  }, [readPins, userId]);
+
+  /** Write one moved pin to the venue, so every other sheet reads it too. */
+  const syncPin = useCallback(
+    (panelId: string, x: number, y: number, confirmed: boolean) => {
+      const panel = panels.find((p) => p.id === panelId);
+      if (!panel || !userId) return;
+      writePins({
+        data: {
+          pins: [
+            {
+              venueSlug: VENUE_SLUG,
+              floor: panel.floor,
+              assetId: panelId,
+              x,
+              y,
+              confirmed,
+              note: "",
+            },
+          ],
+        },
+      })
+        .then((res) => {
+          setPins((cur) => {
+            const kept = cur.filter((p) => !res.pins.some((n) => n.assetId === p.assetId));
+            return [...kept, ...res.pins];
+          });
+          setPinState("synced");
+        })
+        .catch(() => setPinState("offline"));
+    },
+    [panels, userId, writePins],
+  );
+
 
   useEffect(() => {
     if (!userId) return;
@@ -252,6 +326,8 @@ function LondonMapsPage() {
   }, []);
 
   const correctedCount = Object.keys(overrides).length;
+  const confirmedCount = pins.filter((p) => p.confirmed).length;
+
 
   useEffect(() => {
     if (floors.length && !floors.some((f) => f.id === floor)) setFloor(floors[0]!.id);
@@ -263,8 +339,10 @@ function LondonMapsPage() {
   const move = useCallback(
     (panelId: string, x: number, y: number) => {
       persist({ ...overrides, [panelId]: { x, y } });
+      // A moved pin is a marked position, not yet a signed-off one.
+      syncPin(panelId, x, y, false);
     },
-    [overrides, persist],
+    [overrides, persist, syncPin],
   );
 
   const resetOne = useCallback(
@@ -272,9 +350,45 @@ function LondonMapsPage() {
       const next = { ...overrides };
       delete next[panelId];
       persist(next);
+      setPins((cur) => cur.filter((p) => p.assetId !== panelId));
+      if (userId)
+        dropPin({ data: { venueSlug: VENUE_SLUG, assetId: panelId } }).catch(() =>
+          setPinState("offline"),
+        );
     },
-    [overrides, persist],
+    [dropPin, overrides, persist, userId],
   );
+
+  /**
+   * Sign the marked positions off for this venue. Once confirmed they are the
+   * source of truth every sheet reads, in place of the rule-placed guess.
+   */
+  const confirmAll = useCallback(() => {
+    const rows = Object.entries(overrides).flatMap(([assetId, pos]) => {
+      const panel = panels.find((p) => p.id === assetId);
+      if (!panel) return [];
+      return [
+        {
+          venueSlug: VENUE_SLUG,
+          floor: panel.floor,
+          assetId,
+          x: pos.x,
+          y: pos.y,
+          confirmed: true,
+          note: "",
+        },
+      ];
+    });
+    if (!rows.length || !userId) return;
+    setPinState("loading");
+    writePins({ data: { pins: rows } })
+      .then((res) => {
+        setPins(res.pins);
+        setPinState("synced");
+      })
+      .catch(() => setPinState("offline"));
+  }, [overrides, panels, userId, writePins]);
+
 
   // The large window is a modal surface: Escape closes it and the page behind
   // stops scrolling so the plan owns the screen.
@@ -392,7 +506,8 @@ function LondonMapsPage() {
                   k: "Assets pinned",
                   v: String(panels.filter((p) => londonFloorPlan(p.floor)).length),
                 },
-                { k: "Positions confirmed", v: String(correctedCount) },
+                { k: "Positions marked", v: String(correctedCount) },
+                { k: "Signed off for this venue", v: String(confirmedCount) },
               ].map((s) => (
                 <div key={s.k}>
                   <dd className="text-2xl font-semibold tracking-tight text-[#03002C]">{s.v}</dd>
@@ -457,6 +572,17 @@ function LondonMapsPage() {
               {correctedCount ? (
                 <button
                   type="button"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#003FC7] bg-[#003FC7] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+                  onClick={confirmAll}
+                  title="Save these positions against the venue so every sheet reads them"
+                >
+                  <MapIcon className="h-4 w-4" /> Sign off {correctedCount} position
+                  {correctedCount === 1 ? "" : "s"}
+                </button>
+              ) : null}
+              {correctedCount ? (
+                <button
+                  type="button"
                   className={btn}
                   onClick={() => persist({})}
                   title="Return every pin to its schematic position"
@@ -466,6 +592,16 @@ function LondonMapsPage() {
                 </button>
               ) : null}
             </div>
+            <p className="mt-4 max-w-[62ch] text-xs leading-relaxed text-[#03002C]/65">
+              {pinState === "offline"
+                ? "Working offline — your marks are held in this browser and will need signing off once you are back on."
+                : pinState === "synced"
+                  ? `Positions are saved against ${LONDON_VENUE.venue} for the whole crew — ${confirmedCount} signed off, and they carry forward to next year.`
+                  : "Marks are held in this browser until they are signed off against the venue."}{" "}
+              <Link to="/events/next/venues" className="font-semibold underline">
+                Venue plans
+              </Link>
+            </p>
           </div>
         </header>
 
