@@ -97,7 +97,6 @@ function BadgesPage() {
                       config={{
                         ...CITY_BADGE_DEFAULT,
                         divisionId: div.id,
-                        roleLabel,
                       }}
                       side={side}
                       ppi={PREVIEW_PPI}
