@@ -8,8 +8,17 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, BookOpen, FileDown, FileText, Presentation } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  ArrowLeft,
+  BookOpen,
+  Copy,
+  FileDown,
+  FileText,
+  Presentation,
+  Save,
+  Trash2,
+} from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/design-system/element";
@@ -28,6 +37,12 @@ import {
   type BookletConfig,
   type BookletImagePage,
 } from "@/lib/next-booklet";
+import {
+  deleteEventBooklet,
+  listEventBooklets,
+  saveEventBooklet,
+  updateEventBooklet,
+} from "@/lib/next-booklet.functions";
 import { buildBookletPdf } from "@/lib/next-booklet-pdf";
 import { bookletChartPages, bookletMapPages } from "@/lib/next-booklet-render";
 import { SUPPORTED_VIZ_KINDS } from "@/lib/infographics/variant-kinds";
@@ -110,6 +125,8 @@ function BookletPage() {
   const [savedId, setSavedId] = useState<string>("");
   const [notes, setNotes] = useState<string[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
+  /** The agenda carried inside an opened saved booklet, when it has one. */
+  const [agendaSnapshot, setAgendaSnapshot] = useState<AgendaConfig | null>(null);
 
   const list = useServerFn(listAgendaFiles);
   const saved = useQuery({
@@ -122,9 +139,10 @@ function BookletPage() {
 
   /** The agenda the booklet prints, forced to the booklet's own page format. */
   const agenda = useMemo<AgendaConfig>(() => {
-    const base = rows.find((r) => r.id === savedId)?.config ?? agendaDefault("city-series");
+    const base =
+      rows.find((r) => r.id === savedId)?.config ?? agendaSnapshot ?? agendaDefault("city-series");
     return { ...base, sizeId: bookletAgendaSizeId(config.sizeId) };
-  }, [rows, savedId, config.sizeId]);
+  }, [rows, savedId, agendaSnapshot, config.sizeId]);
 
   const agendaPageCount = useMemo(() => {
     try {
@@ -216,6 +234,109 @@ function BookletPage() {
       ...c,
       charts: c.charts.map((ch) => (ch.id === id ? { ...ch, ...patch } : ch)),
     }));
+
+  // ── saved booklets ─────────────────────────────────────────────────────────
+  // A booklet is stored per event, city and year with the agenda snapshotted
+  // inside it, so a later year can open it, change the details and reprint.
+  const qc = useQueryClient();
+  const listBooklets = useServerFn(listEventBooklets);
+  const saveBooklet = useServerFn(saveEventBooklet);
+  const patchBooklet = useServerFn(updateEventBooklet);
+  const removeBooklet = useServerFn(deleteEventBooklet);
+
+  const booklets = useQuery({
+    queryKey: ["event-booklets"],
+    queryFn: () => listBooklets(),
+    retry: false,
+  });
+  const bookletRows = (booklets.data ?? []) as unknown as {
+    id: string;
+    name: string;
+    year: number;
+    city: string;
+    notes: string;
+    config: BookletConfig;
+    agenda: AgendaConfig | null;
+    updated_at: string;
+  }[];
+
+  const [openId, setOpenId] = useState<string>("");
+  const [bookletName, setBookletName] = useState("NEXT London booklet");
+  const [bookletYear, setBookletYear] = useState(2026);
+  const [libError, setLibError] = useState<string>("");
+
+  const refreshBooklets = () => qc.invalidateQueries({ queryKey: ["event-booklets"] });
+
+  const runLibrary = async (label: string, fn: () => Promise<void>) => {
+    setBusy(label);
+    setLibError("");
+    try {
+      await fn();
+      await refreshBooklets();
+    } catch (err) {
+      setLibError(err instanceof Error ? err.message : "That could not be saved.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const onSave = () =>
+    runLibrary("save", async () => {
+      const payload = {
+        name: bookletName.trim() || "Untitled booklet",
+        year: bookletYear,
+        city: "london",
+        eventId: "next",
+        notes: "",
+        config,
+        agenda: agenda as unknown as Record<string, unknown>,
+      };
+      if (openId) {
+        await patchBooklet({ data: { id: openId, ...payload } });
+      } else {
+        const row = (await saveBooklet({ data: payload })) as unknown as { id: string };
+        setOpenId(row.id);
+      }
+    });
+
+  const onOpen = (id: string) => {
+    const row = bookletRows.find((r) => r.id === id);
+    if (!row) return;
+    setOpenId(row.id);
+    setBookletName(row.name);
+    setBookletYear(row.year);
+    setConfig(row.config);
+    setAgendaSnapshot(row.agenda ?? null);
+    setSavedId("");
+    setLibError("");
+  };
+
+  /** Copy the open booklet into the next year as a fresh, editable record. */
+  const onDuplicate = () =>
+    runLibrary("copy", async () => {
+      const nextYear = bookletYear + 1;
+      const name = bookletName.replace(String(bookletYear), String(nextYear));
+      const row = (await saveBooklet({
+        data: {
+          name: name === bookletName ? `${bookletName} ${nextYear}` : name,
+          year: nextYear,
+          city: "london",
+          eventId: "next",
+          notes: "",
+          config,
+          agenda: agenda as unknown as Record<string, unknown>,
+        },
+      })) as unknown as { id: string; name: string };
+      setOpenId(row.id);
+      setBookletName(row.name);
+      setBookletYear(nextYear);
+    });
+
+  const onDelete = (id: string) =>
+    runLibrary("delete", async () => {
+      await removeBooklet({ data: { id } });
+      if (openId === id) setOpenId("");
+    });
 
   const field =
     "w-full rounded-md border border-[color:var(--color-border)] bg-[color:var(--color-background)] px-3 py-2 text-sm";
@@ -450,6 +571,89 @@ function BookletPage() {
 
           {/* ── running order + exports ─────────────────────────────────── */}
           <aside className="space-y-6">
+            {/* ── saved booklets ───────────────────────────────────────── */}
+            <div className="space-y-3 rounded-lg border border-[color:var(--color-border)] p-4">
+              <h2 className="text-sm font-semibold uppercase tracking-wide">Saved booklets</h2>
+              <p className="text-xs text-[color:var(--color-muted-foreground)]">
+                Save this booklet so it can be re-opened, edited and reused for a later year.
+              </p>
+              <label className="block space-y-1">
+                <span className={labelCls}>Booklet name</span>
+                <input
+                  className={field}
+                  value={bookletName}
+                  onChange={(e) => setBookletName(e.target.value)}
+                />
+              </label>
+              <label className="block space-y-1">
+                <span className={labelCls}>Year</span>
+                <input
+                  className={field}
+                  type="number"
+                  min={2000}
+                  max={2100}
+                  value={bookletYear}
+                  onChange={(e) => setBookletYear(Number(e.target.value) || bookletYear)}
+                />
+              </label>
+              <div className="flex gap-2">
+                <Button size="sm" disabled={busy !== null} onClick={onSave}>
+                  <Save className="mr-2 size-4" />
+                  {busy === "save" ? "Saving…" : openId ? "Update" : "Save"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={busy !== null}
+                  onClick={onDuplicate}
+                  title="Copy this booklet into the following year"
+                >
+                  <Copy className="mr-2 size-4" />
+                  {busy === "copy" ? "Copying…" : `Reuse for ${bookletYear + 1}`}
+                </Button>
+              </div>
+              {libError ? (
+                <p className="text-xs text-[color:var(--color-destructive)]">{libError}</p>
+              ) : null}
+              <ul className="space-y-1 border-t border-[color:var(--color-border)] pt-3 text-sm">
+                {bookletRows.map((row) => (
+                  <li key={row.id} className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onOpen(row.id)}
+                      aria-pressed={openId === row.id}
+                      className={`flex-1 truncate rounded px-2 py-1 text-left ${
+                        openId === row.id
+                          ? "bg-[color:var(--color-muted)] font-semibold"
+                          : "hover:bg-[color:var(--color-muted)]"
+                      }`}
+                    >
+                      {row.name}
+                      <span className="ml-2 text-xs text-[color:var(--color-muted-foreground)]">
+                        {row.year}
+                      </span>
+                    </button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      aria-label={`Remove ${row.name}`}
+                      disabled={busy !== null}
+                      onClick={() => onDelete(row.id)}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </li>
+                ))}
+                {bookletRows.length === 0 ? (
+                  <li className="text-xs text-[color:var(--color-muted-foreground)]">
+                    {booklets.isError
+                      ? "Sign in to save and re-open booklets."
+                      : "No booklets saved yet."}
+                  </li>
+                ) : null}
+              </ul>
+            </div>
+
             <div className="rounded-lg border border-[color:var(--color-border)] p-4">
               <h2 className="text-sm font-semibold uppercase tracking-wide">Running order</h2>
               <ol className="mt-3 space-y-1 text-sm">

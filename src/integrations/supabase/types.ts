@@ -2005,6 +2005,51 @@ export type Database = {
         }
         Relationships: []
       }
+      event_booklets: {
+        Row: {
+          agenda: Json | null
+          city: string
+          config: Json
+          created_at: string
+          created_by: string | null
+          event_id: string
+          id: string
+          name: string
+          notes: string
+          size_id: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          agenda?: Json | null
+          city?: string
+          config: Json
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          name: string
+          notes?: string
+          size_id?: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          agenda?: Json | null
+          city?: string
+          config?: Json
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          name?: string
+          notes?: string
+          size_id?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
       event_pillar_versions: {
         Row: {
           config: Json
