@@ -439,6 +439,111 @@ function BookletPage() {
                   ))}
                 </div>
               ) : null}
+
+              {config.includeCover ? (
+                <div className="space-y-3 rounded-md border border-[color:var(--color-border)] p-3">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <span className={labelCls}>Cover picture</span>
+                    <span className="text-[11px] text-[color:var(--color-muted-foreground)]">
+                      London starter set
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setConfig((c) => ({ ...c, cover: { ...c.cover, artId: "" } }))
+                      }
+                      aria-pressed={!config.cover.artId}
+                      className={`flex h-24 items-center justify-center rounded-md border-2 bg-[color:var(--color-primary)] text-xs font-semibold text-[color:var(--color-primary-foreground)] ${
+                        !config.cover.artId
+                          ? "border-[color:var(--color-primary)]"
+                          : "border-transparent opacity-70"
+                      }`}
+                    >
+                      No picture
+                    </button>
+                    {bookletCoverArtFor("london").map((art) => (
+                      <button
+                        key={art.id}
+                        type="button"
+                        onClick={() =>
+                          setConfig((c) => ({ ...c, cover: { ...c.cover, artId: art.id } }))
+                        }
+                        aria-pressed={config.cover.artId === art.id}
+                        title={art.name}
+                        className={`overflow-hidden rounded-md border-2 text-left ${
+                          config.cover.artId === art.id
+                            ? "border-[color:var(--color-primary)]"
+                            : "border-transparent"
+                        }`}
+                      >
+                        <img
+                          src={art.src}
+                          alt={art.name}
+                          loading="lazy"
+                          width={1280}
+                          height={1792}
+                          className="h-24 w-full object-cover"
+                        />
+                        <span className="block px-1.5 py-1 text-[11px] leading-tight">
+                          {art.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {config.cover.artId ? (
+                    <>
+                      <div className="flex flex-wrap gap-2">
+                        {BOOKLET_COVER_TREATMENTS.map((t) => (
+                          <button
+                            key={t.id}
+                            type="button"
+                            title={t.note}
+                            onClick={() =>
+                              setConfig((c) => ({
+                                ...c,
+                                cover: { ...c.cover, treatment: t.id as BookletCoverTreatment },
+                              }))
+                            }
+                            aria-pressed={(config.cover.treatment ?? "full-bleed") === t.id}
+                            className={`rounded-md border px-3 py-1.5 text-xs font-semibold ${
+                              (config.cover.treatment ?? "full-bleed") === t.id
+                                ? "border-[color:var(--color-primary)] bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]"
+                                : "border-[color:var(--color-border)]"
+                            }`}
+                          >
+                            {t.name}
+                          </button>
+                        ))}
+                      </div>
+                      <label className="block space-y-1">
+                        <span className={labelCls}>
+                          Ink veil · {config.cover.scrim ?? 88}%
+                        </span>
+                        <input
+                          type="range"
+                          min={40}
+                          max={100}
+                          step={2}
+                          value={config.cover.scrim ?? 88}
+                          onChange={(e) =>
+                            setConfig((c) => ({
+                              ...c,
+                              cover: { ...c.cover, scrim: Number(e.target.value) },
+                            }))
+                          }
+                          className="w-full"
+                        />
+                      </label>
+                      <p className="text-xs text-[color:var(--color-muted-foreground)]">
+                        {bookletCoverArt(config.cover.artId)?.credit}
+                      </p>
+                    </>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
 
             {/* ── agenda ────────────────────────────────────────────────── */}
