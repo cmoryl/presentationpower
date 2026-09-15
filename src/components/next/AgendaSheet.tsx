@@ -100,7 +100,7 @@ function Editable({
           e.currentTarget.blur();
           return;
         }
-        if (e.key === "Enter" && !multiline) {
+        if (e.key === "Enter" && (!multiline || e.metaKey || e.ctrlKey)) {
           e.preventDefault();
           e.currentTarget.blur();
         }

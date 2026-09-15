@@ -725,8 +725,8 @@ export function AgendaStudio({
                 {pages.length > 1 ? ` · page ${pageIndex + 1} of ${pages.length}` : ""}
               </DialogTitle>
               <DialogDescription>
-                Click any line on the board and type. Press Enter to commit, Escape to cancel. Every
-                change writes straight to the programme fields under the board.
+                Click any line on the board and type. Click away to keep the change, Escape to
+                cancel. Every change writes straight to the programme fields under the board.
               </DialogDescription>
             </DialogHeader>
             <div className="max-h-[76vh] overflow-auto rounded-lg bg-muted/40 p-3">
