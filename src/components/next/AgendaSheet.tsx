@@ -42,6 +42,32 @@ function AgendaPin({ size, fill = AGENDA_BAND.pin }: { size: number; fill?: stri
   );
 }
 
+/**
+ * The chosen room-line mark. Every icon is a single filled path on its own
+ * viewBox, so the press PDF draws exactly this silhouette.
+ */
+function AgendaLocationMark({
+  icon,
+  height,
+  fill,
+}: {
+  icon: { path: string; vw: number; vh: number };
+  height: number;
+  fill: string;
+}) {
+  return (
+    <svg
+      width={(height * icon.vw) / icon.vh}
+      height={height}
+      viewBox={`0 0 ${icon.vw} ${icon.vh}`}
+      aria-hidden
+      style={{ flex: "0 0 auto" }}
+    >
+      <path d={icon.path} fill={fill} />
+    </svg>
+  );
+}
+
 type Props = {
   config: AgendaConfig;
   /** Preview pixels per mm on the bleed sheet. */
