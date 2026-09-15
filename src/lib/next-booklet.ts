@@ -48,12 +48,20 @@ export function bookletAgendaSizeId(id: BookletSizeId): AgendaSizeId {
 }
 
 /** Editable cover copy. Nothing here is invented — the studio seeds it from the
- *  event record and the operator can overwrite every line. */
+ *  event record and the operator can overwrite every line.
+ *
+ *  The art fields are optional so a booklet saved before cover imagery existed
+ *  still opens: no `artId` simply means the plain ink cover. */
 export type BookletCover = {
   eyebrow: string;
   title: string;
   subtitle: string;
   footnote: string;
+  /** Id from the cover art library, or "" for the plain ink cover. */
+  artId?: string;
+  treatment?: BookletCoverTreatment;
+  /** 0–100: how far the ink veil over the picture is pushed. */
+  scrim?: number;
 };
 
 /** A chart page the operator asked for. Sample data is labelled as sample data. */
