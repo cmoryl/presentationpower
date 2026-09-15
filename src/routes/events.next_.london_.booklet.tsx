@@ -44,7 +44,13 @@ import {
   updateEventBooklet,
 } from "@/lib/next-booklet.functions";
 import { buildBookletPdf } from "@/lib/next-booklet-pdf";
-import { bookletChartPages, bookletMapPages } from "@/lib/next-booklet-render";
+import { bookletChartPages, bookletCoverGroundPng, bookletMapPages } from "@/lib/next-booklet-render";
+import {
+  BOOKLET_COVER_TREATMENTS,
+  bookletCoverArt,
+  bookletCoverArtFor,
+  type BookletCoverTreatment,
+} from "@/lib/next-booklet-cover-art";
 import { SUPPORTED_VIZ_KINDS } from "@/lib/infographics/variant-kinds";
 import { LONDON_FLOORS, LONDON_VENUE, type LondonFloorId } from "@/lib/next-london-signage";
 import { londonMappedFloors } from "@/lib/next-london-floorplan";
@@ -190,6 +196,15 @@ function BookletPage() {
         async () => {
         const { pages, warnings } = await renderExtras();
         const cover = config.includeCover ? config.cover : null;
+        // Word and PowerPoint need the cover picture composed with its veil; the
+        // press PDF places the picture live and does its own veil in vector.
+        const coverGround =
+          cover && kind !== "pdf"
+            ? await bookletCoverGroundPng(cover, {
+                wMm: bookletGeo.trimW,
+                hMm: bookletGeo.trimH,
+              })
+            : null;
         const stem = bookletSlug(config);
         if (kind === "pdf") {
           const built = await buildBookletPdf({ config, agenda, imagePages: pages });
@@ -198,6 +213,7 @@ function BookletPage() {
         } else if (kind === "docx") {
           const built = await buildAgendaDocx(agenda, {
             cover,
+            coverGround,
             imagePages: pages,
             omitAgenda: !config.includeAgenda,
           });
