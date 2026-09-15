@@ -675,22 +675,30 @@ export async function buildAgendaPptx(
       ];
       for (const slot of slots) {
         if (!slot.text) continue;
+        // A stand-in face sets the tracked footer wider than Geist, so each slot
+        // shrinks to hold one line inside the band instead of wrapping off the
+        // trimmed edge.
+        const est = slot.text.length * (L.footSize * 0.62 + 0.35);
+        const size = Math.max(L.footSize * 0.62, Math.min(L.footSize, (L.footSize * slot.w) / est));
+        const lineH = size * 1.6;
+        const y = fb.y + Math.max(0, (fb.h - lineH) * 0.5);
         s.addText(slot.text, {
           x: inX(slot.x),
-          y: inX(bandY),
+          y: inX(y),
           w: inX(slot.w),
-          h: inX(L.footSize * 2),
+          h: inX(lineH),
           fontFace: FONT,
-          fontSize: pt(L.footSize),
-          lineSpacing: pt(L.footSize * 1.6),
+          fontSize: pt(size),
+          lineSpacing: pt(lineH),
           bold: true,
           charSpacing: 2,
           color: footInk,
           align: slot.align,
-          valign: "top",
+          valign: "middle",
           margin: 0,
         });
       }
+
     }
 
     const foot = [(cfg.footnote ?? "").trim()].filter(Boolean).join(" ");
