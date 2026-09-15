@@ -355,6 +355,31 @@ export function AgendaStudio({
   // controls work inside, and where the code currently sits.
   const qrBlock = useMemo(() => agendaBlocks(pageConfig).qr, [pageConfig]);
 
+  // Enlarged board: the same sheet at review size, with the copy editable in
+  // place. Every commit writes to the same day / session fields the controls
+  // under the board read, so the two can never drift apart.
+  const [large, setLarge] = useState(false);
+  const rowOffset = page.pageInDay * agendaRowsPerPage(config);
+  const sheetEdit: AgendaSheetEdit = {
+    onField: (field, value) => {
+      // On a paged board the title and date line belong to the day, not the file.
+      if (field === "title") patchDay({ label: value });
+      else if (field === "meta") patchDay({ meta: value });
+      else set(field, value);
+    },
+    onSession: (index, patch) => setSession(rowOffset + index, patch),
+    onParallel: (index, track, patch) => {
+      const i = rowOffset + index;
+      const session = day.sessions[i];
+      if (!session) return;
+      const list = agendaParallels(session).map((p) => ({ ...p }));
+      const current = list[track];
+      if (!current) return;
+      list[track] = { ...current, ...patch };
+      setSession(i, { parallel: undefined, parallels: list });
+    },
+  };
+
   const placeQr = (x: number | null, y: number | null) =>
     editConfig((c) => ({ ...c, qrOffsetX: x, qrOffsetY: y }));
 
