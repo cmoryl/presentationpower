@@ -12,6 +12,7 @@ import {
   Check,
   ChevronDown,
   Download,
+  Expand,
   FileText,
   Plus,
   Save,
@@ -20,7 +21,14 @@ import {
 import { toast } from "sonner";
 
 import { useSignedIn } from "@/components/CloudDeckControls";
-import { AgendaSheet } from "@/components/next/AgendaSheet";
+import { AgendaSheet, type AgendaSheetEdit } from "@/components/next/AgendaSheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,6 +79,7 @@ import {
   agendaDefault,
   agendaDivision,
   agendaPages,
+  agendaRowsPerPage,
   removeAgendaDay,
   writeAgendaDay,
   agendaGeometry,

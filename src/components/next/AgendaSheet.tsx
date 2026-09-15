@@ -620,6 +620,7 @@ export function AgendaSheet({
             cursor: onPlaceQr ? "grab" : undefined,
             touchAction: onPlaceQr ? "none" : undefined,
           }}
+          data-agenda-qr="true"
           data-export-ignore={undefined}
           onPointerDown={
             onPlaceQr
