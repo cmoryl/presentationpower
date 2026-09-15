@@ -20,6 +20,8 @@ import PptxGenJS from "pptxgenjs";
 import {
   AGENDA_BAND,
   agendaBandPalette,
+  agendaLocation,
+  agendaLocationText,
   agendaBlocks,
   agendaGeometry,
   agendaInk,

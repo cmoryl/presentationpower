@@ -19,6 +19,8 @@ import {
   agendaTextLines,
   AGENDA_BAND,
   agendaBandPalette,
+  agendaLocation,
+  agendaLocationText,
   agendaBandComposite,
   agendaFooter,
   agendaBlocks,
