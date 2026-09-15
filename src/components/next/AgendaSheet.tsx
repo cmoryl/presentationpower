@@ -70,6 +70,73 @@ function AgendaLocationMark({
   );
 }
 
+
+/**
+ * Inline editable copy for the enlarged board view. The board itself stays the
+ * proof: the span carries no chrome, commits on blur (or Enter on a single-line
+ * field) and writes straight back to the config field it came from, so the form
+ * controls under the board and the board never disagree.
+ */
+function Editable({
+  value,
+  onCommit,
+  multiline = false,
+}: {
+  value: string;
+  onCommit: (next: string) => void;
+  multiline?: boolean;
+}) {
+  return (
+    <span
+      contentEditable
+      suppressContentEditableWarning
+      role="textbox"
+      tabIndex={0}
+      data-agenda-editable="true"
+      spellCheck={false}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") {
+          e.currentTarget.textContent = value;
+          e.currentTarget.blur();
+          return;
+        }
+        if (e.key === "Enter" && !multiline) {
+          e.preventDefault();
+          e.currentTarget.blur();
+        }
+      }}
+      onBlur={(e) => {
+        const next = (e.currentTarget.textContent ?? "").replace(/\u00a0/g, " ");
+        if (next !== value) onCommit(next);
+      }}
+      style={{
+        outline: "none",
+        cursor: "text",
+        display: "inline-block",
+        minWidth: "1.2em",
+        maxWidth: "100%",
+        whiteSpace: "pre-wrap",
+      }}
+    >
+      {value}
+    </span>
+  );
+}
+
+/** Callbacks the enlarged view supplies so board copy edits the live config. */
+export type AgendaSheetEdit = {
+  onField: (field: "eyebrow" | "title" | "meta" | "footnote", value: string) => void;
+  onSession: (
+    index: number,
+    patch: Partial<{ time: string; title: string; detail: string; track: string }>,
+  ) => void;
+  onParallel: (
+    index: number,
+    track: number,
+    patch: Partial<{ time: string; title: string; speaker: string; detail: string }>,
+  ) => void;
+};
+
 type Props = {
   config: AgendaConfig;
   /** Preview pixels per mm on the bleed sheet. */
@@ -79,6 +146,8 @@ type Props = {
   style?: React.CSSProperties;
   /** Supplied by the editor: drag the QR block to a new spot on the sheet. */
   onPlaceQr?: (x: number, y: number) => void;
+  /** Supplied by the enlarged view: type directly on the board. */
+  edit?: AgendaSheetEdit;
 };
 
 export function AgendaSheet({
@@ -88,8 +157,16 @@ export function AgendaSheet({
   className,
   style,
   onPlaceQr,
+  edit,
 }: Props) {
   const mm = (v: number) => v * pxPerMm;
+  /** Board copy: plain text normally, an editable span in the enlarged view. */
+  const T = (value: string, commit?: (next: string) => void, multiline = false) =>
+    edit && commit ? (
+      <Editable value={value} onCommit={commit} multiline={multiline} />
+    ) : (
+      value
+    );
   const geo = agendaGeometry(config);
   const blocks = agendaBlocks(config);
   const L = blocks.layout;
