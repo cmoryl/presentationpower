@@ -169,7 +169,6 @@ import { Route as DecksDeckIdPrintRouteImport } from './routes/decks.$deckId.pri
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
 import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
 import { Route as DecksDeckIdDocumentRouteImport } from './routes/decks.$deckId.document'
-import { Route as ApiPublicTmpLondonIngestRouteImport } from './routes/api/public/tmp-london-ingest'
 import { Route as ApiPublicSkinBackdropRouteImport } from './routes/api/public/skin-backdrop'
 import { Route as ApiPublicPdfIndexProxyRouteImport } from './routes/api/public/pdf-index-proxy'
 import { Route as ApiPublicDivisionImageRouteImport } from './routes/api/public/division-image'
@@ -994,12 +993,6 @@ const DecksDeckIdDocumentRoute = DecksDeckIdDocumentRouteImport.update({
   path: '/decks/$deckId/document',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicTmpLondonIngestRoute =
-  ApiPublicTmpLondonIngestRouteImport.update({
-    id: '/api/public/tmp-london-ingest',
-    path: '/api/public/tmp-london-ingest',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiPublicSkinBackdropRoute = ApiPublicSkinBackdropRouteImport.update({
   id: '/api/public/skin-backdrop',
   path: '/api/public/skin-backdrop',
@@ -1213,7 +1206,6 @@ export interface FileRoutesByFullPath {
   '/api/public/division-image': typeof ApiPublicDivisionImageRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/api/public/skin-backdrop': typeof ApiPublicSkinBackdropRoute
-  '/api/public/tmp-london-ingest': typeof ApiPublicTmpLondonIngestRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
@@ -1386,7 +1378,6 @@ export interface FileRoutesByTo {
   '/api/public/division-image': typeof ApiPublicDivisionImageRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/api/public/skin-backdrop': typeof ApiPublicSkinBackdropRoute
-  '/api/public/tmp-london-ingest': typeof ApiPublicTmpLondonIngestRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
@@ -1564,7 +1555,6 @@ export interface FileRoutesById {
   '/api/public/division-image': typeof ApiPublicDivisionImageRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/api/public/skin-backdrop': typeof ApiPublicSkinBackdropRoute
-  '/api/public/tmp-london-ingest': typeof ApiPublicTmpLondonIngestRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
@@ -1743,7 +1733,6 @@ export interface FileRouteTypes {
     | '/api/public/division-image'
     | '/api/public/pdf-index-proxy'
     | '/api/public/skin-backdrop'
-    | '/api/public/tmp-london-ingest'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
@@ -1916,7 +1905,6 @@ export interface FileRouteTypes {
     | '/api/public/division-image'
     | '/api/public/pdf-index-proxy'
     | '/api/public/skin-backdrop'
-    | '/api/public/tmp-london-ingest'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
@@ -2093,7 +2081,6 @@ export interface FileRouteTypes {
     | '/api/public/division-image'
     | '/api/public/pdf-index-proxy'
     | '/api/public/skin-backdrop'
-    | '/api/public/tmp-london-ingest'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
@@ -2219,7 +2206,6 @@ export interface RootRouteChildren {
   ApiPublicDivisionImageRoute: typeof ApiPublicDivisionImageRoute
   ApiPublicPdfIndexProxyRoute: typeof ApiPublicPdfIndexProxyRoute
   ApiPublicSkinBackdropRoute: typeof ApiPublicSkinBackdropRoute
-  ApiPublicTmpLondonIngestRoute: typeof ApiPublicTmpLondonIngestRoute
   DecksDeckIdDocumentRoute: typeof DecksDeckIdDocumentRoute
   DecksDeckIdExportRoute: typeof DecksDeckIdExportRoute
   DecksDeckIdPresentRoute: typeof DecksDeckIdPresentRoute
@@ -3357,13 +3343,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DecksDeckIdDocumentRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/tmp-london-ingest': {
-      id: '/api/public/tmp-london-ingest'
-      path: '/api/public/tmp-london-ingest'
-      fullPath: '/api/public/tmp-london-ingest'
-      preLoaderRoute: typeof ApiPublicTmpLondonIngestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/skin-backdrop': {
       id: '/api/public/skin-backdrop'
       path: '/api/public/skin-backdrop'
@@ -3751,7 +3730,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicDivisionImageRoute: ApiPublicDivisionImageRoute,
   ApiPublicPdfIndexProxyRoute: ApiPublicPdfIndexProxyRoute,
   ApiPublicSkinBackdropRoute: ApiPublicSkinBackdropRoute,
-  ApiPublicTmpLondonIngestRoute: ApiPublicTmpLondonIngestRoute,
   DecksDeckIdDocumentRoute: DecksDeckIdDocumentRoute,
   DecksDeckIdExportRoute: DecksDeckIdExportRoute,
   DecksDeckIdPresentRoute: DecksDeckIdPresentRoute,
