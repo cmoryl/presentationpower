@@ -149,10 +149,10 @@ async function drawCoverArt(
   // print on the trimmed-away edge but still shows on the press proof.
   const pageW = page.getWidth();
   const pageH = page.getHeight();
-  mask(0, py + ph, pageW, pageH - (py + ph));
-  mask(0, 0, pageW, py);
-  mask(0, py, px, ph);
-  mask(px + pw, py, pageW - (px + pw), ph);
+  mask(-2, py + ph, pageW + 4, pageH - (py + ph) + 2);
+  mask(-2, -2, pageW + 4, py + 2);
+  mask(-2, py, px + 2, ph);
+  mask(px + pw, py, pageW - (px + pw) + 2, ph);
 
   const strength = Math.max(0, Math.min(1, layout.scrim.strength * (scrim / 100)));
   if (strength <= 0.001) return true;
