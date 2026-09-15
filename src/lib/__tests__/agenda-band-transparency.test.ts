@@ -22,9 +22,12 @@ describe("agenda programme bands read through to the ground", () => {
   it("carries a translucent fill and a curved edge on every treatment", () => {
     for (const t of AGENDA_BAND_TREATMENTS) {
       const p = agendaBandPalette({ bandTreatment: t.id });
-      expect(p.fillAlpha, `${t.id} fill alpha`).toBeGreaterThan(0.75);
+      // A veil fades to nothing down the band, so it starts lighter than a flat
+      // treatment; every treatment still has to let the ground read through.
+      const floor = p.fade ? 0.5 : 0.75;
+      expect(p.fillAlpha, `${t.id} fill alpha`).toBeGreaterThan(floor);
       expect(p.fillAlpha, `${t.id} fill alpha`).toBeLessThan(1);
-      expect(p.parallelAlpha, `${t.id} parallel alpha`).toBeGreaterThan(0.75);
+      expect(p.parallelAlpha, `${t.id} parallel alpha`).toBeGreaterThan(floor);
       expect(p.parallelAlpha, `${t.id} parallel alpha`).toBeLessThan(1);
       expect(p.radius, `${t.id} radius`).toBeGreaterThan(0);
     }

@@ -154,7 +154,13 @@ describe("agenda option matrix", () => {
     }
 
     expect(cells).toBe(
-      AGENDA_DIVISIONS.length * AGENDA_STYLE_IDS.length * 2 * AGENDA_SIZES.length * 3 * 2 * 2,
+      AGENDA_DIVISIONS.length *
+        AGENDA_STYLE_IDS.length *
+        2 *
+        AGENDA_SIZES.length *
+        AGENDA_BAND_TREATMENTS.length *
+        2 *
+        2,
     );
     expect(problems.slice(0, 20)).toEqual([]);
     expect(problems).toHaveLength(0);

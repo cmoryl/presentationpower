@@ -77,6 +77,16 @@ import {
   agendaName,
   AGENDA_ROW_STYLES,
   AGENDA_BAND_TREATMENTS,
+  AGENDA_BAND_LAYOUTS,
+  AGENDA_FOOTER_STYLES,
+  AGENDA_FOOTER_FILLS,
+  AGENDA_FOOTER_HEIGHTS,
+  agendaBandLayout,
+  agendaFooter,
+  type AgendaBandLayoutId,
+  type AgendaFooterStyleId,
+  type AgendaFooterFillId,
+  type AgendaFooterHeightId,
   agendaBandTreatment,
   agendaProgramme,
   agendaParallels,
@@ -727,6 +737,25 @@ export function AgendaStudio({
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="agenda-band-layout">Band box layout</Label>
+                <select
+                  id="agenda-band-layout"
+                  className={selectClass}
+                  value={agendaBandLayout(config).id}
+                  onChange={(e) => set("bandLayout", e.target.value as AgendaBandLayoutId)}
+                >
+                  {AGENDA_BAND_LAYOUTS.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground">
+                  {AGENDA_BAND_LAYOUTS.find((l) => l.id === agendaBandLayout(config).id)?.note ?? ""}
+                </p>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="agenda-location">Room · floor line</Label>
                 <Input
                   id="agenda-location"
@@ -753,6 +782,77 @@ export function AgendaStudio({
                     onChange={(e) => set("footerRight", e.target.value)}
                     placeholder="24 & 25 SEPTEMBER, 2026"
                   />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="agenda-footer-centre">Footer band · centre</Label>
+                <Input
+                  id="agenda-footer-centre"
+                  value={config.footerCentre ?? ""}
+                  onChange={(e) => set("footerCentre", e.target.value)}
+                  placeholder="QEII CENTRE, LONDON"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-footer-style">Footer style</Label>
+                  <select
+                    id="agenda-footer-style"
+                    className={selectClass}
+                    value={agendaFooter(config).style}
+                    onChange={(e) => set("footerStyle", e.target.value as AgendaFooterStyleId)}
+                  >
+                    {AGENDA_FOOTER_STYLES.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-footer-fill">Footer colour</Label>
+                  <select
+                    id="agenda-footer-fill"
+                    className={selectClass}
+                    value={agendaFooter(config).fillId}
+                    disabled={agendaFooter(config).style !== "band"}
+                    onChange={(e) => set("footerFill", e.target.value as AgendaFooterFillId)}
+                  >
+                    {AGENDA_FOOTER_FILLS.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-footer-height">Footer depth</Label>
+                  <select
+                    id="agenda-footer-height"
+                    className={selectClass}
+                    value={config.footerHeight ?? "standard"}
+                    onChange={(e) => set("footerHeight", e.target.value as AgendaFooterHeightId)}
+                  >
+                    {AGENDA_FOOTER_HEIGHTS.map((h) => (
+                      <option key={h.id} value={h.id}>
+                        {h.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-footer-caps">Footer lettering</Label>
+                  <select
+                    id="agenda-footer-caps"
+                    className={selectClass}
+                    value={config.footerCaps === false ? "sentence" : "caps"}
+                    onChange={(e) => set("footerCaps", e.target.value === "caps")}
+                  >
+                    <option value="caps">All caps</option>
+                    <option value="sentence">As typed</option>
+                  </select>
                 </div>
               </div>
             </>

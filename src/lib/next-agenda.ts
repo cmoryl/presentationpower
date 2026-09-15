@@ -273,6 +273,37 @@ export function agendaStops(
   return face === "light" ? merged.map((s) => tint(s, LIGHT_TINT)) : merged;
 }
 
+/**
+ * Ground colour at a vertical position on the board, 0 at the top edge and 1 at
+ * the foot. Used by the press file, which cannot fade a fill to transparent and
+ * instead fades a band's colour into the ground it sits on — the same picture the
+ * preview shows, painted as one editable gradient.
+ */
+export function agendaGroundHexAt(
+  config: { styleId: string; face?: AgendaFaceId; divisionId?: string },
+  ratio: number,
+): string {
+  const stops = agendaStops(config.styleId, config.face ?? "dark", config.divisionId);
+  const ramp = config.styleId.includes("halo") ? [...stops].reverse() : stops;
+  if (ramp.length === 0) return "#FFFFFF";
+  if (ramp.length === 1) return ramp[0]!;
+  const t = Math.max(0, Math.min(1, ratio)) * (ramp.length - 1);
+  const i = Math.min(ramp.length - 2, Math.floor(t));
+  const f = t - i;
+  const rgb = (hex: string) => {
+    const h = hex.replace("#", "");
+    const n = parseInt(h.length === 3 ? h.replace(/./g, (c) => c + c) : h, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  };
+  const a = rgb(ramp[i]!);
+  const b = rgb(ramp[i + 1]!);
+  return `#${a
+    .map((c, n) => Math.round(c + (b[n]! - c) * f))
+    .map((c) => c.toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase()}`;
+}
+
 /** Copy ink for a face. */
 export function agendaInk(face: AgendaFaceId): string {
   return face === "light" ? "#03002C" : "#FFFFFF";
@@ -337,7 +368,15 @@ export function agendaRowStyle(config: { rowStyle?: string }): AgendaRowStyleId 
 // rail down the left edge of each band, and pairs a fill with the one ink that
 // clears WCAG AA on it — so a treatment can never make the programme unreadable.
 
-export type AgendaBandTreatmentId = "solid" | "lavender" | "ink";
+export type AgendaBandTreatmentId =
+  | "solid"
+  | "lavender"
+  | "ink"
+  | "aqua"
+  | "mist"
+  | "signal"
+  | "veil"
+  | "veil-ink";
 
 export const AGENDA_BAND_TREATMENTS: {
   id: AgendaBandTreatmentId;
@@ -359,7 +398,116 @@ export const AGENDA_BAND_TREATMENTS: {
     name: "Ink · Blue 800 & Blue 500",
     note: "Solid brand blues with white copy and an Aqua rail. Strongest presence on a light gradient.",
   },
+  {
+    id: "aqua",
+    name: "Aqua · white & aqua",
+    note: "White alternating with Aqua. Brightest of the pale looks — best on a deep blue ground.",
+  },
+  {
+    id: "mist",
+    name: "Mist · white & light gray",
+    note: "White alternating with Light Gray. The quietest look, for dense programmes with long notes.",
+  },
+  {
+    id: "signal",
+    name: "Signal · white & yellow",
+    note: "White alternating with brand Yellow. Use where the programme has to carry the whole board.",
+  },
+  {
+    id: "veil",
+    name: "Veil · fades to clear",
+    note: "Each band starts as a half-strength white at the top and fades away to nothing at the bottom, so the ground runs straight through the programme. Check the legibility panel on a dark ground.",
+  },
+  {
+    id: "veil-ink",
+    name: "Ink veil · fades to clear",
+    note: "The same fade in Blue 800 with white copy — for light grounds. Check the legibility panel before print.",
+  },
 ];
+
+// ── band box layout ──────────────────────────────────────────────────────────
+//
+// The shape of the band box itself, kept separate from its colour: how far the
+// bands sit in from the safe edge, how curved their corners are, how heavy the
+// time rail is and how much air sits between rows. Every renderer reads these
+// numbers, so a layout choice prints the same on screen, in the press file, in
+// Word and in PowerPoint.
+
+export type AgendaBandLayoutId = "bar" | "inset" | "tile" | "pill" | "rail";
+
+export const AGENDA_BAND_LAYOUTS: {
+  id: AgendaBandLayoutId;
+  name: string;
+  note: string;
+  /** Inset from the safe edge as a fraction of the content width. */
+  inset: number;
+  /** Corner radius in mm at A2. A very large value reads as a pill. */
+  radius: number;
+  /** Time rail width in mm at A2. 0 = no rail. */
+  railW: number;
+  /** Multiplier on the printed gutter between rows. */
+  gapMul: number;
+}[] = [
+  {
+    id: "bar",
+    name: "Full-width bars",
+    note: "Bands run the full content width with the house 2.6 mm corner and a Blue 500 time rail. The issued board.",
+    inset: 0,
+    radius: 2.6,
+    railW: 1.8,
+    gapMul: 1,
+  },
+  {
+    id: "inset",
+    name: "Inset cards",
+    note: "Bands step in from the safe edge with a deeper corner and more air between rows — a calmer, more editorial page.",
+    inset: 0.05,
+    radius: 4.2,
+    railW: 1.8,
+    gapMul: 1.2,
+  },
+  {
+    id: "tile",
+    name: "Square tiles",
+    note: "Square-cut edges, no rail and a tight gutter, so the programme reads as one dense block.",
+    inset: 0,
+    radius: 0,
+    railW: 0,
+    gapMul: 0.55,
+  },
+  {
+    id: "pill",
+    name: "Pill rows",
+    note: "Fully rounded band ends with no rail and generous spacing. Best for short programmes on a large board.",
+    inset: 0.03,
+    radius: 400,
+    railW: 0,
+    gapMul: 1.25,
+  },
+  {
+    id: "rail",
+    name: "Heavy time rail",
+    note: "A thick Blue 500 rail down the time column with an almost square band — the strongest time-first read.",
+    inset: 0,
+    radius: 1.2,
+    railW: 4.2,
+    gapMul: 1,
+  },
+];
+
+export function agendaBandLayout(config: { bandLayout?: string }) {
+  return (
+    AGENDA_BAND_LAYOUTS.find((l) => l.id === config.bandLayout) ?? AGENDA_BAND_LAYOUTS[0]!
+  );
+}
+
+/**
+ * Band corner radius in the caller's own units, never more than half the box —
+ * a pill layout on a short band would otherwise draw an invalid path.
+ */
+export function agendaBandRadius(radius: number, w: number, h: number): number {
+  return Math.max(0, Math.min(radius, Math.min(w, h) / 2));
+}
 
 export type AgendaBandPalette = {
   /** Band fill for odd sessions (first, third, …). */
@@ -385,6 +533,13 @@ export type AgendaBandPalette = {
   fillAlpha: number;
   /** Parallel-session card alpha. */
   parallelAlpha: number;
+  /**
+   * Vertical fade down the band: alpha at the top edge and at the bottom edge.
+   * null = a flat fill at `fillAlpha`. A fade to 0 lets the ground run right
+   * through the foot of every band, so the legibility sweep treats the lower
+   * half as a warning state rather than a signed-off read.
+   */
+  fade: { top: number; bottom: number } | null;
   /** Corner radius in millimetres at A2, scaled with the sheet by the caller. */
   radius: number;
   pin: string;
@@ -401,16 +556,21 @@ export function agendaBandTreatment(config: {
 }
 
 /** Resolved band colours for a board. Never returns an unapproved value. */
-export function agendaBandPalette(config: { bandTreatment?: string }): AgendaBandPalette {
+export function agendaBandPalette(config: {
+  bandTreatment?: string;
+  bandLayout?: string;
+}): AgendaBandPalette {
+  const box = agendaBandLayout(config);
   const base = {
     parallel: AGENDA_BAND.parallel,
     parallelInk: AGENDA_BAND.ink,
     pin: AGENDA_BAND.pin,
     footerBand: AGENDA_BAND.footerBand,
     footerInk: AGENDA_BAND.footerInk,
-    railW: 1.8,
+    railW: box.railW,
     // Softly curved band edges, ~2.6 mm at A2 — the house card radius, not a pill.
-    radius: 2.6,
+    radius: box.radius,
+    fade: null as { top: number; bottom: number } | null,
   };
   switch (agendaBandTreatment(config)) {
     case "lavender":
@@ -434,6 +594,60 @@ export function agendaBandPalette(config: { bandTreatment?: string }): AgendaBan
         fillAlpha: 0.92,
         parallelAlpha: 0.92,
       };
+    case "aqua":
+      return {
+        ...base,
+        fillA: AGENDA_BAND.fillA,
+        fillB: AGENDA_BAND.parallel,
+        ink: AGENDA_BAND.ink,
+        // The parallel card takes Lavender here so it stays distinct from a band.
+        parallel: AGENDA_BAND.fillB,
+        rail: AGENDA_BAND.footerBand,
+        fillAlpha: 0.9,
+        parallelAlpha: 0.9,
+      };
+    case "mist":
+      return {
+        ...base,
+        fillA: AGENDA_BAND.fillA,
+        fillB: "#F2F2F2",
+        ink: AGENDA_BAND.ink,
+        rail: AGENDA_BAND.footerBand,
+        fillAlpha: 0.92,
+        parallelAlpha: 0.92,
+      };
+    case "signal":
+      return {
+        ...base,
+        fillA: AGENDA_BAND.fillA,
+        fillB: "#FFEB66",
+        ink: AGENDA_BAND.ink,
+        rail: AGENDA_BAND.footerBand,
+        fillAlpha: 0.94,
+        parallelAlpha: 0.94,
+      };
+    case "veil":
+      return {
+        ...base,
+        fillA: AGENDA_BAND.fillA,
+        fillB: AGENDA_BAND.fillA,
+        ink: AGENDA_BAND.ink,
+        rail: AGENDA_BAND.footerBand,
+        fillAlpha: 0.62,
+        parallelAlpha: 0.62,
+        fade: { top: 0.62, bottom: 0 },
+      };
+    case "veil-ink":
+      return {
+        ...base,
+        fillA: "#03002C",
+        fillB: "#03002C",
+        ink: "#FFFFFF",
+        rail: AGENDA_BAND.parallel,
+        fillAlpha: 0.78,
+        parallelAlpha: 0.78,
+        fade: { top: 0.78, bottom: 0 },
+      };
     default:
       return {
         ...base,
@@ -446,6 +660,113 @@ export function agendaBandPalette(config: { bandTreatment?: string }): AgendaBan
       };
   }
 }
+
+// ── footer band ──────────────────────────────────────────────────────────────
+//
+// The foot of a programme board. The issued London board carries a Blue 500 band
+// with the event URL left and the dates right; a board can now also print the
+// same lines on a hairline rule or straight on the ground, in any approved
+// colour, at three heights, with an optional centre line.
+
+export type AgendaFooterStyleId = "band" | "hairline" | "clear";
+export type AgendaFooterFillId = "blue" | "ink" | "aqua" | "lavender" | "white" | "gray";
+export type AgendaFooterHeightId = "compact" | "standard" | "tall";
+
+export const AGENDA_FOOTER_STYLES: { id: AgendaFooterStyleId; name: string; note: string }[] = [
+  {
+    id: "band",
+    name: "Colour band",
+    note: "A solid band across the foot of the board, as issued for London.",
+  },
+  {
+    id: "hairline",
+    name: "Hairline rule",
+    note: "A fine rule above the footer lines, which print on the gradient itself.",
+  },
+  {
+    id: "clear",
+    name: "No band",
+    note: "Footer lines print straight on the ground with nothing behind them.",
+  },
+];
+
+export const AGENDA_FOOTER_FILLS: {
+  id: AgendaFooterFillId;
+  name: string;
+  fill: string;
+  ink: string;
+}[] = [
+  { id: "blue", name: "Blue 500", fill: "#003FC7", ink: "#FFFFFF" },
+  { id: "ink", name: "Blue 800", fill: "#03002C", ink: "#FFFFFF" },
+  { id: "aqua", name: "Aqua", fill: "#A1FBF9", ink: "#03002C" },
+  { id: "lavender", name: "Lavender", fill: "#EFE0FA", ink: "#03002C" },
+  { id: "white", name: "White", fill: "#FFFFFF", ink: "#03002C" },
+  { id: "gray", name: "Light gray", fill: "#F2F2F2", ink: "#03002C" },
+];
+
+export const AGENDA_FOOTER_HEIGHTS: {
+  id: AgendaFooterHeightId;
+  name: string;
+  /** Band height as a multiple of the footer cap height. */
+  mul: number;
+}[] = [
+  { id: "compact", name: "Compact", mul: 2.6 },
+  { id: "standard", name: "Standard", mul: 3.6 },
+  { id: "tall", name: "Tall", mul: 5.2 },
+];
+
+export type AgendaFooterSpec = {
+  style: AgendaFooterStyleId;
+  fillId: AgendaFooterFillId;
+  /** Band fill. Ignored when the style is hairline or clear. */
+  fill: string;
+  /** Copy colour on the band. On a hairline or clear foot the caller uses the
+   * board ink instead, which `onGround` reports. */
+  ink: string;
+  /** True when the lines print on the gradient rather than on a band. */
+  onGround: boolean;
+  /** Band height as a multiple of the footer cap height. 0 = no band. */
+  heightMul: number;
+  caps: boolean;
+  left: string;
+  centre: string;
+  right: string;
+};
+
+export function agendaFooter(config: {
+  footerStyle?: string;
+  footerFill?: string;
+  footerHeight?: string;
+  footerCaps?: boolean;
+  footerLeft?: string;
+  footerCentre?: string;
+  footerRight?: string;
+}): AgendaFooterSpec {
+  const style =
+    AGENDA_FOOTER_STYLES.find((s) => s.id === config.footerStyle)?.id ?? "band";
+  const fill = AGENDA_FOOTER_FILLS.find((f) => f.id === config.footerFill) ?? AGENDA_FOOTER_FILLS[0]!;
+  const height =
+    AGENDA_FOOTER_HEIGHTS.find((h) => h.id === config.footerHeight) ?? AGENDA_FOOTER_HEIGHTS[1]!;
+  const caps = config.footerCaps !== false;
+  const line = (s?: string) => {
+    const v = (s ?? "").trim();
+    return caps ? v.toUpperCase() : v;
+  };
+  return {
+    style,
+    fillId: fill.id,
+    fill: fill.fill,
+    ink: fill.ink,
+    onGround: style !== "band",
+    // A hairline foot still reserves a little room for the rule and its air.
+    heightMul: style === "band" ? height.mul : style === "hairline" ? 2.4 : 2,
+    caps,
+    left: line(config.footerLeft),
+    centre: line(config.footerCentre),
+    right: line(config.footerRight),
+  };
+}
+
 
 /**
  * Composite a band fill over the ground it sits on. Used directly by Word, which
@@ -583,6 +904,8 @@ export type AgendaConfig = {
   rowStyle: AgendaRowStyleId;
   /** How solid the programme bands sit on the gradient. */
   bandTreatment: AgendaBandTreatmentId;
+  /** Shape of the band box: width, corner, rail weight and gutter. */
+  bandLayout: AgendaBandLayoutId;
   /** Room / floor line printed with a pin beside the lockup. Empty = none. */
   locationLine: string;
   sessions: AgendaSession[];
@@ -592,6 +915,16 @@ export type AgendaConfig = {
   footerLeft: string;
   /** Right-hand footer line, e.g. the event dates. Empty = none. */
   footerRight: string;
+  /** Centre footer line, e.g. a stand number or hashtag. Empty = none. */
+  footerCentre: string;
+  /** How the foot prints: colour band, hairline rule or straight on the ground. */
+  footerStyle: AgendaFooterStyleId;
+  /** Band colour. Copy ink follows the fill automatically. */
+  footerFill: AgendaFooterFillId;
+  /** Band height. */
+  footerHeight: AgendaFooterHeightId;
+  /** Set the footer lines in capitals (the issued board look). */
+  footerCaps: boolean;
   /** Printed QR payload. Empty = no QR. */
   qrData: string;
   qrSize: number;
@@ -739,11 +1072,17 @@ type DivisionProgramme = {
   /** Look, header pin line and footer lines this division opens on. */
   rowStyle?: AgendaRowStyleId;
   bandTreatment?: AgendaBandTreatmentId;
+  bandLayout?: AgendaBandLayoutId;
   eyebrow?: string;
   locationLine?: string;
   footnote?: string;
   footerLeft?: string;
   footerRight?: string;
+  footerCentre?: string;
+  footerStyle?: AgendaFooterStyleId;
+  footerFill?: AgendaFooterFillId;
+  footerHeight?: AgendaFooterHeightId;
+  footerCaps?: boolean;
 };
 
 const DIVISION_PROGRAMMES: Record<string, DivisionProgramme> = {
@@ -1336,11 +1675,17 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
     titleColor: "",
     rowStyle: programme.rowStyle ?? "rule",
     bandTreatment: programme.bandTreatment ?? "solid",
+    bandLayout: programme.bandLayout ?? "bar",
     locationLine: programme.locationLine ?? "",
     sessions: programme.sessions.map((s) => ({ ...s })),
     footnote: programme.footnote ?? "Programme subject to change · full agenda and speaker bios online",
     footerLeft: programme.footerLeft ?? "",
     footerRight: programme.footerRight ?? "",
+    footerCentre: programme.footerCentre ?? "",
+    footerStyle: programme.footerStyle ?? "band",
+    footerFill: programme.footerFill ?? "blue",
+    footerHeight: programme.footerHeight ?? "standard",
+    footerCaps: programme.footerCaps ?? true,
     qrData: "",
     qrSize: 48,
     qrCaption: "FULL AGENDA",
@@ -1377,12 +1722,18 @@ export function withAgendaDivision(config: AgendaConfig, divisionId: string): Ag
       days: fresh.days,
       rowStyle: fresh.rowStyle,
       bandTreatment: fresh.bandTreatment,
+      bandLayout: fresh.bandLayout,
       eyebrow: fresh.eyebrow,
       title: fresh.title,
       locationLine: fresh.locationLine,
       footnote: fresh.footnote,
       footerLeft: fresh.footerLeft,
       footerRight: fresh.footerRight,
+      footerCentre: fresh.footerCentre,
+      footerStyle: fresh.footerStyle,
+      footerFill: fresh.footerFill,
+      footerHeight: fresh.footerHeight,
+      footerCaps: fresh.footerCaps,
       meta: metaUntouched ? fresh.meta : config.meta,
     };
   }
@@ -1572,10 +1923,15 @@ export function agendaLayout(config: AgendaConfig) {
   // Programme look: the room / floor line sits beside the lockup with a pin, the
   // date line under it, and the footer prints on a Blue 500 band across the foot.
   const locSize = 8.2 * k;
-  const bandGap = 2.6 * k;
+  const box = agendaBandLayout(config);
+  const bandGap = 2.6 * k * box.gapMul;
+  /** How far the band boxes step in from the safe edge. */
+  const bandInset = contentW * box.inset;
+  const bandW = contentW - bandInset * 2;
   const bandPadX = 4.6 * k;
   const bandPadY = 3.4 * k;
-  const footerBandH = card ? footSize * 3.6 : 0;
+  const foot = agendaFooter(config);
+  const footerBandH = card ? footSize * foot.heightMul : 0;
   const headBlock = card
     ? Math.max(
         config.showLockup ? lockupH : 0,
@@ -1614,6 +1970,8 @@ export function agendaLayout(config: AgendaConfig) {
     footSize,
     footerBandH,
     bandGap,
+    bandInset,
+    bandW,
     bandPadX,
     bandPadY,
     qrEdge,
@@ -1801,11 +2159,25 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
     bandTreatment: AGENDA_BAND_TREATMENTS.some((t) => t.id === raw.bandTreatment)
       ? (raw.bandTreatment as AgendaBandTreatmentId)
       : base.bandTreatment,
+    bandLayout: AGENDA_BAND_LAYOUTS.some((l) => l.id === raw.bandLayout)
+      ? (raw.bandLayout as AgendaBandLayoutId)
+      : base.bandLayout,
     locationLine: str(raw.locationLine, base.locationLine),
     sessions: sessions.length ? sessions : base.sessions,
     footnote: str(raw.footnote, base.footnote),
     footerLeft: str(raw.footerLeft, base.footerLeft),
     footerRight: str(raw.footerRight, base.footerRight),
+    footerCentre: str(raw.footerCentre, base.footerCentre),
+    footerStyle: AGENDA_FOOTER_STYLES.some((f) => f.id === raw.footerStyle)
+      ? (raw.footerStyle as AgendaFooterStyleId)
+      : base.footerStyle,
+    footerFill: AGENDA_FOOTER_FILLS.some((f) => f.id === raw.footerFill)
+      ? (raw.footerFill as AgendaFooterFillId)
+      : base.footerFill,
+    footerHeight: AGENDA_FOOTER_HEIGHTS.some((h) => h.id === raw.footerHeight)
+      ? (raw.footerHeight as AgendaFooterHeightId)
+      : base.footerHeight,
+    footerCaps: typeof raw.footerCaps === "boolean" ? raw.footerCaps : base.footerCaps,
     qrData: str(raw.qrData, ""),
     qrSize: num(raw.qrSize, base.qrSize),
     qrCaption: str(raw.qrCaption, base.qrCaption),
@@ -1909,7 +2281,12 @@ export function agendaBlocks(config: AgendaConfig) {
   /** Width the eyebrow, headline and date line may occupy. */
   let headW = L.contentW;
   const bottom = geo.trimH - geo.safeInset;
-  /** Blue 500 footer band across the foot of a programme board. */
+  /**
+   * The foot of a programme board. The rectangle is reserved whatever the footer
+   * style: on a hairline or clear foot the renderers simply do not fill it, so the
+   * lines land in exactly the same place in every export.
+   */
+  const footer = agendaFooter(config);
   const footerBand = L.card
     ? { x: 0, y: geo.trimH - L.footerBandH, w: geo.trimW, h: L.footerBandH }
     : null;
@@ -2055,10 +2432,10 @@ export function agendaBlocks(config: AgendaConfig) {
   if (L.card) {
     // Bands take the height their copy really needs, so a two-line title with a
     // three-line speaker note is never crushed into the same band as "Lunch".
-    const bodyW = L.contentW - L.timeColW - L.bandPadX * 2;
+    const bodyW = L.bandW - L.timeColW - L.bandPadX * 2;
     const height = (session: AgendaSession) => {
       const pars = agendaParallels(session);
-      const split = agendaSplitWidths(L.contentW, L.bandGap, pars.length);
+      const split = agendaSplitWidths(L.bandW, L.bandGap, pars.length);
       const w = pars.length ? split.leftW - L.timeColW - L.bandPadX * 2 : bodyW;
       const left =
         agendaTextLines(session.title, L.titleRowSize, w) * L.titleRowSize * 1.5 +
@@ -2133,10 +2510,11 @@ export function agendaBlocks(config: AgendaConfig) {
       const y = cursor;
       cursor += h + L.bandGap;
       const pars = agendaParallels(session);
-      const split = agendaSplitWidths(L.contentW, L.bandGap, pars.length);
-      const band = { x, y, w: pars.length ? split.leftW : L.contentW, h };
+      const split = agendaSplitWidths(L.bandW, L.bandGap, pars.length);
+      const bx = x + L.bandInset;
+      const band = { x: bx, y, w: pars.length ? split.leftW : L.bandW, h };
       const parallels = pars.map((_, n) => ({
-        x: x + split.leftW + L.bandGap * (n + 1) + split.cardW * n,
+        x: bx + split.leftW + L.bandGap * (n + 1) + split.cardW * n,
         y,
         w: split.cardW,
         h,
@@ -2181,6 +2559,7 @@ export function agendaBlocks(config: AgendaConfig) {
     rowsBottom,
     listBottom,
     footerBand,
+    footer,
     footY,
     qr,
   };

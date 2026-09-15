@@ -20,6 +20,7 @@ import {
   AGENDA_BAND,
   agendaBandPalette,
   agendaBandComposite,
+  agendaFooter,
   agendaBlocks,
   agendaSplitWidths,
   agendaDivision,
@@ -199,7 +200,7 @@ function para(
     afterTwips?: number;
     beforeTwips?: number;
     lineTwips?: number;
-    align?: "left" | "right";
+    align?: "left" | "center" | "right";
     /** Right indent in twips: keeps a right-aligned line clear of the QR code. */
     rightTwips?: number;
   } = {},
@@ -213,7 +214,7 @@ function para(
       opts.afterTwips ?? 0,
     )}"${line ? ` w:line="${line}" w:lineRule="atLeast"` : ' w:line="240" w:lineRule="auto"'}/>`,
     `<w:ind w:left="0" w:right="${Math.max(0, Math.round(opts.rightTwips ?? 0))}" w:firstLine="0"/>`,
-    opts.align === "right" ? '<w:jc w:val="right"/>' : '<w:jc w:val="left"/>',
+    `<w:jc w:val="${opts.align === "right" ? "right" : opts.align === "center" ? "center" : "left"}"/>`,
     "</w:pPr>",
     runs,
     "</w:p>",
@@ -544,12 +545,19 @@ export async function buildAgendaDocx(
         // Word shading is opaque, so the band's translucency is baked in: its
         // fill is composited over the ground colour at this row's height.
         const ground = groundColorAt(cfg, (i + 0.5) / Math.max(1, (cfg.sessions ?? []).length));
+        // A veil treatment fades top to clear; Word cannot gradient a table
+        // shading, so the band takes the mid point of that fade over the ground.
+        const veilAlpha = BAND.fade ? (BAND.fade.top + BAND.fade.bottom) / 2 : null;
         const fill = agendaBandComposite(
           i % 2 === 0 ? BAND.fillA : BAND.fillB,
-          BAND.fillAlpha,
+          veilAlpha ?? BAND.fillAlpha,
           ground,
         );
-        const parFill = agendaBandComposite(BAND.parallel, BAND.parallelAlpha, ground);
+        const parFill = agendaBandComposite(
+          BAND.parallel,
+          veilAlpha ?? BAND.parallelAlpha,
+          ground,
+        );
         const copy = (
           title: string,
           detail: string,
@@ -602,10 +610,22 @@ export async function buildAgendaDocx(
           // The body takes back any parallel column this slot does not use.
           cell(
             cardBodyW + spare * cardParColW,
-            copy(session.title ?? "", session.detail ?? ""),
+            // The tracked stage label prints above the title, as it does on the
+            // board and in the press file.
+            ((session.track ?? "").trim()
+              ? para(
+                  run(session.track!.toUpperCase(), {
+                    size: halfPt(PL.trackSize),
+                    color: bandInk,
+                    bold: true,
+                  }),
+                  { afterTwips: 0, lineTwips: mmT(PL.trackSize * 1.6) },
+                )
+              : "") + copy(session.title ?? "", session.detail ?? ""),
             rowPad,
             spare > 0 ? { fill, span: spare + 1, vAlign: "top" } : { fill, vAlign: "top" },
           ),
+
           pars
             .map((p) =>
               cell(
@@ -875,8 +895,17 @@ export async function buildAgendaDocx(
 
     // The printed card board finishes on a solid brand band carrying the event
     // URL and dates in white — reproduced here as a shaded full-width table.
+    const foot = agendaFooter(cfg);
+    const footInk = hex(foot.onGround ? inkHex : foot.ink, "FFFFFF");
+    const footCells: { text: string; align: "left" | "center" | "right"; share: number }[] = [
+      { text: foot.left, align: "left", share: foot.centre ? 0.4 : 0.62 },
+      ...(foot.centre
+        ? [{ text: foot.centre, align: "center" as const, share: 0.28 }]
+        : []),
+      { text: foot.right, align: "right", share: foot.centre ? 0.32 : 0.38 },
+    ];
     const footerBand =
-      cardMode && ((cfg.footerLeft ?? "").trim() || (cfg.footerRight ?? "").trim())
+      cardMode && foot.style !== "clear" && footCells.some((c) => c.text)
         ? [
             "<w:tbl><w:tblPr>",
             `<w:tblW w:w="${Math.round(contentTwips)}" w:type="dxa"/>`,
@@ -884,42 +913,39 @@ export async function buildAgendaDocx(
             '<w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tblCellMar>',
             '<w:tblLayout w:type="fixed"/>',
             "</w:tblPr>",
-            `<w:tblGrid><w:gridCol w:w="${Math.round(contentTwips * 0.62)}"/><w:gridCol w:w="${Math.round(
-              contentTwips * 0.38,
-            )}"/></w:tblGrid>`,
+            `<w:tblGrid>${footCells
+              .map((c) => `<w:gridCol w:w="${Math.round(contentTwips * c.share)}"/>`)
+              .join("")}</w:tblGrid>`,
             `<w:tr><w:trPr><w:trHeight w:val="${mmT(
-              Math.max(6, PL.footSize * 3),
+              Math.max(6, PL.footSize * foot.heightMul),
             )}" w:hRule="atLeast"/><w:cantSplit/></w:trPr>`,
-            cell(
-              contentTwips * 0.62,
-              para(
-                run((cfg.footerLeft ?? "").trim(), {
-                  size: halfPt(PL.footSize),
-                  color: hex(AGENDA_BAND.footerInk, "FFFFFF"),
-                  caps: true,
-                  bold: true,
-                  spacing: 30,
-                }),
-                { afterTwips: 0, lineTwips: mmT(PL.footSize * 1.6) },
-              ),
-              mmT(PL.footSize * 0.8),
-              { fill: AGENDA_BAND.footerBand },
-            ),
-            cell(
-              contentTwips * 0.38,
-              para(
-                run((cfg.footerRight ?? "").trim(), {
-                  size: halfPt(PL.footSize),
-                  color: hex(AGENDA_BAND.footerInk, "FFFFFF"),
-                  caps: true,
-                  bold: true,
-                  spacing: 30,
-                }),
-                { afterTwips: 0, align: "right", lineTwips: mmT(PL.footSize * 1.6) },
-              ),
-              mmT(PL.footSize * 0.8),
-              { fill: AGENDA_BAND.footerBand },
-            ),
+            ...footCells.map((c) => {
+              // Word's stand-in face sets the tracked footer wider than Geist, so
+              // each slot shrinks to hold one line instead of wrapping and
+              // dropping copy off the trimmed edge.
+              const usable = Math.max(4, B.contentW * c.share - PL.footSize * 1.6);
+              const est = Math.max(1, c.text.length * (PL.footSize * 0.62 + 0.35));
+              const size = Math.max(
+                PL.footSize * 0.6,
+                Math.min(PL.footSize, (PL.footSize * usable) / est),
+              );
+              return cell(
+                contentTwips * c.share,
+                para(
+                  run(c.text, {
+                    size: halfPt(size),
+                    color: footInk,
+                    caps: false,
+                    bold: true,
+                    spacing: 30,
+                  }),
+                  { afterTwips: 0, align: c.align, lineTwips: mmT(size * 1.6) },
+                ),
+                mmT(PL.footSize * 0.8),
+                foot.style === "band" ? { fill: foot.fill } : {},
+              );
+            }),
+
             "</w:tr></w:tbl>",
           ].join("")
         : "";
