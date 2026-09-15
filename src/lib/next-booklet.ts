@@ -14,6 +14,7 @@
 import type { InfographicKind } from "@/lib/infographics/spec";
 import type { LondonFloorId } from "@/lib/next-london-signage";
 import { agendaSizePreset, type AgendaSizeId } from "@/lib/next-agenda";
+import { BOOKLET_COVER_ART, type BookletCoverTreatment } from "@/lib/next-booklet-cover-art";
 
 /** Booklet stock. Both are handout formats — a booklet never prints at board size. */
 export type BookletSizeId = "a4" | "us-letter";
@@ -101,6 +102,8 @@ export type BookletImagePage = {
 /** Cover + appended artwork pages, shared by the Word and PowerPoint builders. */
 export type BookletExtras = {
   cover?: BookletCover | null;
+  /** Composed cover ground (picture + veil) for the Word and PowerPoint covers. */
+  coverGround?: Uint8Array | null;
   imagePages?: BookletImagePage[];
 };
 
@@ -117,6 +120,9 @@ export function bookletDefault(cover: Partial<BookletCover> = {}): BookletConfig
       title: "EVENT PROGRAMME",
       subtitle: "",
       footnote: "",
+      artId: BOOKLET_COVER_ART[0]?.id ?? "",
+      treatment: "full-bleed",
+      scrim: 88,
       ...cover,
     },
   };
