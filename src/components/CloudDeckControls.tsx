@@ -254,13 +254,26 @@ export function MyCloudDecks() {
   const navigate = useNavigate();
   const [rows, setRows] = useState<CloudDeckRow[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  // Never let a failed read look like an empty account.
+  const [failed, setFailed] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     if (!signedIn) return;
+    let live = true;
     list()
-      .then((r) => setRows(r as CloudDeckRow[]))
-      .catch(() => setRows([]));
-  }, [signedIn, list]);
+      .then((r) => {
+        if (!live) return;
+        setRows(r as CloudDeckRow[]);
+        setFailed(false);
+      })
+      .catch(() => {
+        if (live) setFailed(true);
+      });
+    return () => {
+      live = false;
+    };
+  }, [signedIn, list, reloadKey]);
 
   if (!signedIn) return null;
 
