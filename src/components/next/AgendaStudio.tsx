@@ -728,7 +728,7 @@ export function AgendaStudio({
 
         {/* Enlarged board: review size, copy editable in place. */}
         <Dialog open={large} onOpenChange={setLarge}>
-          <DialogContent className="max-w-[96vw] sm:max-w-[1180px]">
+          <DialogContent className="flex h-[96vh] w-[98vw] max-w-[98vw] flex-col gap-3 sm:max-w-[98vw]">
             <DialogHeader>
               <DialogTitle>
                 {division.name} · {geo.sizeName}
@@ -739,7 +739,28 @@ export function AgendaStudio({
                 cancel. Every change writes straight to the programme fields under the board.
               </DialogDescription>
             </DialogHeader>
-            <div className="max-h-[76vh] overflow-auto rounded-lg bg-muted/40 p-3">
+            <div className="flex items-center gap-3 text-[12px] text-muted-foreground">
+              <span className="font-medium">Zoom</span>
+              <input
+                type="range"
+                min={0.5}
+                max={3}
+                step={0.05}
+                value={largeZoom}
+                onChange={(e) => setLargeZoom(Number(e.target.value))}
+                className="h-1.5 w-48 accent-[#003FC7]"
+                aria-label="Enlarged board zoom"
+              />
+              <span className="tabular-nums">{Math.round(largeZoom * 100)}%</span>
+              <button
+                type="button"
+                onClick={() => setLargeZoom(1)}
+                className="rounded border border-black/10 px-2 py-0.5 hover:bg-muted"
+              >
+                Fit
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-auto rounded-lg bg-muted/40 p-3">
               <div
                 className="mx-auto"
                 style={{
