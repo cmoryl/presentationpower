@@ -319,9 +319,33 @@ function DecksIndex() {
         </div>
       </div>
 
+      {loadFailed && (
+        <div
+          role="alert"
+          className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-500/40 bg-amber-50 px-4 py-3 text-sm text-[#03002C] dark:bg-amber-500/10 dark:text-white"
+        >
+          <span>
+            We couldn’t load your saved decks just now, so this list may be incomplete. Nothing has
+            been deleted.
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setLoadFailed(false);
+              setReloadKey((n) => n + 1);
+            }}
+            className="rounded-full bg-[#03002C] px-3 py-1 text-xs font-semibold text-white hover:opacity-90 dark:bg-white dark:text-[#03002C]"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
       {/* Grid */}
       {enriched.length === 0 ? (
-        <EmptyNew signedIn={signedIn} />
+        loadFailed ? null : (
+          <EmptyNew signedIn={signedIn} />
+        )
       ) : filtered.length === 0 ? (
         <EmptyNoMatches onClear={clearAll} />
       ) : (
