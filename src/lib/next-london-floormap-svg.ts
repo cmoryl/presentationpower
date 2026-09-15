@@ -761,7 +761,7 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
       const badge = numbered
         ? `<text x="${n(cx)}" y="${n(cy + 3)}" text-anchor="middle" font-family="${FONT}" font-size="8.5" font-weight="700" fill="${PAPER}">${i + 1}</text>`
         : named
-          ? markerLabel(m, cx, cy, i)
+          ? markerLabel(m, cx, cy, i, { left: PAD, right: size.w - PAD })
           : "";
       return `<g data-panel="${esc(m.panelId)}">${markerGlyph(m, cx, cy, active, numbered)}${badge}</g>`;
     })
