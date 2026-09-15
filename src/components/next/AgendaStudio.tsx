@@ -150,6 +150,31 @@ type AgendaFileRow = {
 const selectClass =
   "w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
+// The builder is guided: one task per step, with the board preview always on
+// screen. Every control below is assigned to exactly one of these steps.
+const AGENDA_STEPS = [
+  {
+    id: "programme",
+    label: "Programme",
+    hint: "Start here — pick the division area, set up the days, then type the sessions under the board.",
+  },
+  {
+    id: "look",
+    label: "Look",
+    hint: "Choose the board size, the light or dark face, the programme band treatment and the header type.",
+  },
+  {
+    id: "details",
+    label: "QR & details",
+    hint: "Add a scannable code and place it on the board. Everything here is optional.",
+  },
+  {
+    id: "export",
+    label: "Save & export",
+    hint: "Assign the event, save the live file, and download the press file, Word or PowerPoint.",
+  },
+] as const;
+
 export function AgendaStudio({
   divisionId = "city-series",
   heading = "NEXT division agenda",
