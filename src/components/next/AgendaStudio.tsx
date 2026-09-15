@@ -349,13 +349,23 @@ export function AgendaStudio({
 
   const previewScale = fitScale * zoom;
 
-  // The enlarged view fills the dialog on both edges, so the copy is big enough
-  // to type on for every format from A4 to a 21:9 screen board.
-  const largeScale = Math.min(
-    3.2,
-    1100 / (geo.bleedW * NATIVE_PX_PER_MM),
-    880 / (geo.bleedH * NATIVE_PX_PER_MM),
+  // The enlarged view fills the whole window, so the copy is big enough to type
+  // on for every format from A4 to a 21:9 screen board. The operator can push it
+  // past fit with the zoom control and scroll around.
+  const [largeZoom, setLargeZoom] = useState(1);
+  const [win, setWin] = useState({ w: 1440, h: 900 });
+  useEffect(() => {
+    const read = () => setWin({ w: window.innerWidth, h: window.innerHeight });
+    read();
+    window.addEventListener("resize", read);
+    return () => window.removeEventListener("resize", read);
+  }, []);
+  const largeFit = Math.min(
+    6,
+    (win.w - 96) / (geo.bleedW * NATIVE_PX_PER_MM),
+    (win.h - 210) / (geo.bleedH * NATIVE_PX_PER_MM),
   );
+  const largeScale = Math.max(0.2, largeFit * largeZoom);
 
   const division = agendaDivision(config.divisionId);
 
