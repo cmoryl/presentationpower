@@ -283,7 +283,7 @@ export function AgendaSheet({
             textTransform: "uppercase",
           }}
         >
-          {config.eyebrow}
+          {T(config.eyebrow, (v) => edit?.onField("eyebrow", v))}
         </div>
       ) : null}
 
@@ -298,7 +298,7 @@ export function AgendaSheet({
           color: titleInk,
         }}
       >
-        {config.title}
+        {T(config.title, (v) => edit?.onField("title", v), true)}
       </div>
 
       {/* The programme look prints the date beside the room line, not under the
@@ -313,7 +313,7 @@ export function AgendaSheet({
             opacity: 0.86,
           }}
         >
-          {config.meta}
+          {T(config.meta, (v) => edit?.onField("meta", v))}
         </div>
       ) : null}
 
@@ -361,7 +361,7 @@ export function AgendaSheet({
                 letterSpacing: "0.02em",
               }}
             >
-              {config.meta}
+              {T(config.meta, (v) => edit?.onField("meta", v))}
             </div>
           ) : null}
         </>
@@ -395,7 +395,7 @@ export function AgendaSheet({
                   lineHeight: 1.4,
                 }}
               >
-                {row.session.time}
+                {T(row.session.time, (v) => edit?.onSession(i, { time: v }))}
               </div>
               <div style={{ flex: "1 1 auto", minWidth: 0 }}>
                 {row.session.track.trim() ? (
@@ -407,7 +407,7 @@ export function AgendaSheet({
                       textTransform: "uppercase",
                     }}
                   >
-                    {row.session.track}
+                    {T(row.session.track, (v) => edit?.onSession(i, { track: v }))}
                   </div>
                 ) : null}
                 <div
@@ -417,7 +417,7 @@ export function AgendaSheet({
                     lineHeight: 1.35,
                   }}
                 >
-                  {row.session.title}
+                  {T(row.session.title, (v) => edit?.onSession(i, { title: v }), true)}
                 </div>
                 {row.session.detail.trim()
                   ? row.session.detail.split("\n").map((para, p) =>
@@ -430,7 +430,14 @@ export function AgendaSheet({
                             marginTop: mm(L.detailSize * 0.6),
                           }}
                         >
-                          {para}
+                          {T(para, (v) =>
+                            edit?.onSession(i, {
+                              detail: row.session.detail
+                                .split("\n")
+                                .map((line, q) => (q === p ? v : line))
+                                .join("\n"),
+                            }),
+                          )}
                         </div>
                       ) : null,
                     )
@@ -470,7 +477,9 @@ export function AgendaSheet({
                         marginBottom: mm(ct.timeSize * 0.25),
                       }}
                     >
-                      {(par.time ?? "").trim() || row.session.time}
+                      {T((par.time ?? "").trim() || row.session.time, (v) =>
+                        edit?.onParallel(i, n, { time: v }),
+                      )}
                     </div>
                   ) : null}
                   <div
@@ -481,7 +490,7 @@ export function AgendaSheet({
                       paddingRight: mm(ct.pinW),
                     }}
                   >
-                    {par.title}
+                    {T(par.title, (v) => edit?.onParallel(i, n, { title: v }), true)}
                   </div>
                   {(par.speaker ?? "").trim() ? (
                     <div
@@ -493,7 +502,7 @@ export function AgendaSheet({
                         paddingRight: mm(ct.pinW),
                       }}
                     >
-                      {par.speaker}
+                      {T(par.speaker ?? "", (v) => edit?.onParallel(i, n, { speaker: v }), true)}
                     </div>
                   ) : null}
                   {par.detail.trim() ? (
@@ -505,7 +514,7 @@ export function AgendaSheet({
                         paddingRight: mm(ct.pinW),
                       }}
                     >
-                      {par.detail}
+                      {T(par.detail, (v) => edit?.onParallel(i, n, { detail: v }), true)}
                     </div>
                   ) : null}
                   {ct.pinW > 0 ? (
@@ -547,7 +556,7 @@ export function AgendaSheet({
                 color: row.session.muted ? ink : titleInk,
               }}
             >
-              {row.session.time}
+              {T(row.session.time, (v) => edit?.onSession(i, { time: v }))}
             </div>
             <div style={{ flex: "1 1 auto", minWidth: 0, paddingRight: mm(4) }}>
               <div
@@ -558,7 +567,7 @@ export function AgendaSheet({
                   letterSpacing: "-0.01em",
                 }}
               >
-                {row.session.title}
+                {T(row.session.title, (v) => edit?.onSession(i, { title: v }), true)}
               </div>
               {row.session.detail.trim() ? (
                 <div
@@ -568,7 +577,7 @@ export function AgendaSheet({
                     marginTop: mm(L.detailSize * 0.35),
                   }}
                 >
-                  {row.session.detail}
+                  {T(row.session.detail, (v) => edit?.onSession(i, { detail: v }), true)}
                 </div>
               ) : null}
             </div>
@@ -585,7 +594,7 @@ export function AgendaSheet({
                   textTransform: "uppercase",
                 }}
               >
-                {row.session.track}
+                {T(row.session.track, (v) => edit?.onSession(i, { track: v }))}
               </div>
             ) : null}
           </div>
@@ -745,7 +754,7 @@ export function AgendaSheet({
             {blocks.rows.some((r) => r.parallel) ? (
               <AgendaPin size={mm(L.footSize * 2.2)} />
             ) : null}
-            <span>{config.footnote}</span>
+            <span>{T(config.footnote, (v) => edit?.onField("footnote", v), true)}</span>
           </div>
 
         ) : (
@@ -758,7 +767,7 @@ export function AgendaSheet({
               lineHeight: 1.25,
             }}
           >
-            {config.footnote}
+            {T(config.footnote, (v) => edit?.onField("footnote", v), true)}
           </div>
         )
       ) : null}
