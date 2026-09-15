@@ -408,17 +408,19 @@ export async function buildBookletPdf(args: {
         );
       }
     }
-    const bleedTopPt = SLUG_PT + geo.bleedH * MM_TO_PT;
+    // The copy band is measured on the trim, then kept inside the safe area so
+    // no cover line can drift into the trim edge.
+    const trimTopPt = SLUG_PT + (geo.bleedH - (geo.bleedH - geo.trimH) / 2) * MM_TO_PT;
+    const trimBottomPt = SLUG_PT + ((geo.bleedH - geo.trimH) / 2) * MM_TO_PT;
+    const safeTop = trimTopPt - geo.safeInset * MM_TO_PT;
+    const safeBottom = trimBottomPt + geo.safeInset * MM_TO_PT;
     const band = placed
       ? {
-          top:
-            bleedTopPt -
-            ((geo.bleedH - geo.trimH) / 2 + geo.safeInset) * MM_TO_PT -
-            layout.copy.y * geo.bleedH * MM_TO_PT,
-          bottom:
-            bleedTopPt -
-            ((geo.bleedH - geo.trimH) / 2) * MM_TO_PT -
-            (layout.copy.y + layout.copy.h) * geo.bleedH * MM_TO_PT,
+          top: Math.min(safeTop, trimTopPt - layout.copy.y * geo.trimH * MM_TO_PT),
+          bottom: Math.max(
+            safeBottom,
+            trimTopPt - (layout.copy.y + layout.copy.h) * geo.trimH * MM_TO_PT,
+          ),
           anchor: layout.copy.anchor,
         }
       : undefined;
