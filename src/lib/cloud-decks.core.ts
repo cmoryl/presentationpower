@@ -190,8 +190,15 @@ export async function saveDeckToCloudCore(
 
       notes: s.notes ?? null,
     }));
-    const { error: slideErr } = await sb.from("deck_slides").insert(rows);
+    // Ids are deterministic, so an upsert updates in place instead of colliding.
+    const { error: slideErr } = await sb.from("deck_slides").upsert(rows);
     if (slideErr) throw new Error(slideErr.message);
+
+    // Only now remove slides the user actually deleted.
+    const keep = new Set(rows.map((r) => r.id));
+    for (const id of existingIds) {
+      if (!keep.has(id)) await sb.from("deck_slides").delete().eq("id", id);
+    }
   }
 
   return { deckUuid, briefUuid };
