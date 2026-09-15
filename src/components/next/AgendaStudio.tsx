@@ -196,6 +196,7 @@ export function AgendaStudio({
 
   const [guides, setGuides] = useState(false);
   const [zoom, setZoom] = useState(1);
+  const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
   const [customEvent, setCustomEvent] = useState("");
   const [fileName, setFileName] = useState("");
@@ -417,7 +418,35 @@ export function AgendaStudio({
         <p className="max-w-3xl text-sm text-muted-foreground">{intro}</p>
       </header>
 
+      {/* Guided steps: one focused task at a time. */}
+      <nav aria-label="Agenda build steps" className="flex flex-wrap items-center gap-2">
+        {AGENDA_STEPS.map((s, i) => (
+          <button
+            key={s.id}
+            type="button"
+            aria-current={i === step ? "step" : undefined}
+            onClick={() => setStep(i)}
+            className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition ${
+              i === step
+                ? "border-[#003FC7] bg-background font-medium text-foreground"
+                : "border-border bg-background/60 text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <span
+              className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold ${
+                i === step ? "bg-[#003FC7] text-white" : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {i + 1}
+            </span>
+            {s.label}
+          </button>
+        ))}
+      </nav>
+      <p className="max-w-3xl text-sm text-muted-foreground">{AGENDA_STEPS[step]!.hint}</p>
+
       {/* programme days + printed pages */}
+      {step === 0 ? (
       <section
         aria-labelledby="agenda-days"
         className="rounded-xl border border-border bg-muted/30 p-4"
@@ -535,6 +564,7 @@ export function AgendaStudio({
             : null}
         </div>
       </section>
+      ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         {/* live sheet */}
@@ -604,6 +634,7 @@ export function AgendaStudio({
 
         {/* controls */}
         <div className="space-y-5">
+          {step === 0 ? (
           <div className="space-y-2">
             <Label htmlFor="agenda-division">Division area</Label>
             <select
@@ -624,7 +655,10 @@ export function AgendaStudio({
                 : "Programme edited: switching divisions keeps your copy and only swaps the lockup."}
             </p>
           </div>
+          ) : null}
 
+          {step === 1 ? (
+          <>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label htmlFor="agenda-size">Format</Label>
@@ -995,7 +1029,11 @@ export function AgendaStudio({
               </div>
             </>
           ) : null}
+          </>
+          ) : null}
 
+          {step === 0 ? (
+          <>
           <div className="space-y-2">
             <Label htmlFor="agenda-eyebrow">Eyebrow</Label>
             <Input
@@ -1022,7 +1060,10 @@ export function AgendaStudio({
               onChange={(e) => patchDay({ meta: e.target.value })}
             />
           </div>
+          </>
+          ) : null}
 
+          {step === 1 ? (
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label htmlFor="agenda-title-ink">Title ink</Label>
@@ -1116,7 +1157,10 @@ export function AgendaStudio({
           })()}
 
           </div>
+          ) : null}
 
+          {step === 0 ? (
+          <>
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -1135,7 +1179,10 @@ export function AgendaStudio({
               onChange={(e) => set("footnote", e.target.value)}
             />
           </div>
+          </>
+          ) : null}
 
+          {step === 2 ? (
           <div className="space-y-3 rounded-lg border border-border p-3">
             <div className="space-y-2">
               <Label htmlFor="agenda-qr">QR payload</Label>
@@ -1441,7 +1488,10 @@ export function AgendaStudio({
               </>
             ) : null}
           </div>
+          ) : null}
 
+          {step === 3 ? (
+          <>
           <div className="space-y-2">
             <Label htmlFor="agenda-event">Event</Label>
             <select
@@ -1517,10 +1567,30 @@ export function AgendaStudio({
               add you.
             </p>
           ) : null}
+          </>
+          ) : null}
+
+          {/* Step navigation lives with the controls it applies to. */}
+          <div className="flex items-center justify-between gap-2 border-t border-border pt-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={step === 0}
+              onClick={() => setStep((s) => Math.max(0, s - 1))}
+            >
+              Back
+            </Button>
+            {step < AGENDA_STEPS.length - 1 ? (
+              <Button size="sm" onClick={() => setStep((s) => s + 1)}>
+                Next · {AGENDA_STEPS[step + 1]!.label}
+              </Button>
+            ) : null}
+          </div>
         </div>
       </div>
 
       {/* live page fit — same page-size + overflow awareness as the other print areas */}
+      {step === 0 || step === 1 ? (
       <section
         aria-labelledby="agenda-fit"
         className={`rounded-xl border p-4 ${
@@ -1568,8 +1638,10 @@ export function AgendaStudio({
           </ul>
         )}
       </section>
+      ) : null}
 
       {/* programme rows */}
+      {step === 0 ? (
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">
@@ -1753,9 +1825,10 @@ export function AgendaStudio({
           ))}
         </div>
       </section>
+      ) : null}
 
       {/* saved live files */}
-      {signedIn === true ? (
+      {step === 3 && signedIn === true ? (
         <section className="space-y-3">
           <h2 className="text-lg font-semibold">Saved agenda files</h2>
           <div className="space-y-2">
