@@ -7,7 +7,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 // users; RLS restricts edits and deletes to the version owner or an admin.
 
 const configSchema = z.object({
-  face: z.enum(["dark", "light"]).default("dark"),
+  // Legacy rows carry dark / light; everything now saves the one NEXT template.
+  face: z.enum(["next", "dark", "light"]).default("next"),
   cityLabel: z.string().default(""),
   datesLabel: z.string().default(""),
   venueLabel: z.string().default(""),
