@@ -73,20 +73,6 @@ function BadgesPage() {
 
         <div className="mt-6 flex flex-wrap items-center gap-3 text-xs">
           <label className="inline-flex items-center gap-2 text-muted-foreground">
-            Role
-            <select
-              value={roleLabel}
-              onChange={(e) => setRoleLabel(e.target.value)}
-              className="rounded-lg border border-border bg-background px-2 py-1 text-xs"
-            >
-              {CITY_BADGE_ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="inline-flex items-center gap-2 text-muted-foreground">
             <input type="checkbox" checked={guides} onChange={(e) => setGuides(e.target.checked)} />
             Bleed / trim / safe-area guides
           </label>
