@@ -194,6 +194,11 @@ export function AgendaStudio({
     () => initialConfig ?? agendaDefault(divisionId),
   );
 
+  // True only after mount: the SSR HTML is not interactive yet, and typing into
+  // it was being discarded on hydration.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
+
   const [guides, setGuides] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [step, setStep] = useState(0);
