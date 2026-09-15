@@ -49,7 +49,7 @@ function BadgesPage() {
   }, [divisionParam]);
 
   const [guides, setGuides] = useState(false);
-  const [roleLabel, setRoleLabel] = useState(CITY_BADGE_DEFAULT.roleLabel);
+  
 
   return (
     <AppShell>
