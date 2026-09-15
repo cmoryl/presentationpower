@@ -43,16 +43,11 @@ export function CityBadge({
   const w = px(BADGE_SPEC.bleedW);
   const h = px(BADGE_SPEC.bleedH);
   const safeX = px(SAFE_INSET_X);
-  const safeY = px(SAFE_INSET_Y);
   const klikTop = h - px(BADGE_SPEC.klik.fromBottom + BADGE_SPEC.klik.h);
   const scale = ppi / 96;
   const showMark = config.showLockup && !!lockup.url;
   const markW = px(side === "back" ? BADGE_LOCKUP_WINDOW.backMarkW : BADGE_LOCKUP_WINDOW.markW);
 
-  const eventLine = [config.cityLabel, config.datesLabel, config.venueLabel]
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .join(" · ");
 
   return (
     <div
