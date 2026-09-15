@@ -866,7 +866,12 @@ export async function buildAgendaDocx(
       hasMeta
         ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), {
             afterTwips: 0,
-            align: cardMode && (cfg.locationLine ?? "").trim() ? "right" : "left",
+            align:
+              cardMode && (cfg.locationLine ?? "").trim()
+                ? agendaLocation(cfg).align === "centre"
+                  ? "center"
+                  : agendaLocation(cfg).align
+                : "left",
             lineTwips: mmT(metaBand),
           })
         : spacer(mmT(metaBand)),
