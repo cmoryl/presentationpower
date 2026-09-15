@@ -66,8 +66,9 @@ function BadgesPage() {
           One approved NEXT template now covers NEXT and every sub-NEXT event — the violet-to-blue
           ascent ground with the chevron stack, full bleed on the {BADGE_SPEC.trimW}″ ×{" "}
           {BADGE_SPEC.trimH}″ dual-slot plastic template with the BLE Klik cutout. Every division
-          area has a live front and back carrying its own white-with-accent lockup; the older dark,
-          light and City Series badge templates are retired. Open any card to edit copy, save the
+          area has a live front and back carrying its own white-with-accent lockup and nothing else —
+          the clear area under the lockup is covered by the badge sleeve, so it stays blank. The
+          older dark, light and City Series badge templates are retired. Open any card to save the
           print run and export PDF, an Illustrator twin and a proof PNG.
         </p>
 
