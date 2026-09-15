@@ -1066,6 +1066,19 @@ export type AgendaConfig = {
   bandLayout: AgendaBandLayoutId;
   /** Room / floor line printed with a pin beside the lockup. Empty = none. */
   locationLine: string;
+  /** Mark printed with the room line. */
+  locationIcon: AgendaLocationIconId;
+  /** Mark colour. `auto` follows the copy colour (the pin keeps Peach). */
+  locationIconInk: AgendaLocationInkId;
+  /** Room line copy colour. `auto` follows the board ink. */
+  locationInk: AgendaLocationInkId;
+  /** Room line cap height. */
+  locationSize: AgendaLocationSizeId;
+  /** Set the room line in capitals. */
+  locationCaps: boolean;
+  locationWeight: AgendaLocationWeightId;
+  /** Which edge the room line and the date sit on. */
+  locationAlign: AgendaLocationAlignId;
   sessions: AgendaSession[];
   /** Footer line printed at the foot of the board. */
   footnote: string;
