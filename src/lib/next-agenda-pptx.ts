@@ -183,7 +183,7 @@ export async function buildAgendaPptx(
         x: inMm(pad),
         y: inMm(y),
         w: inMm(geo.trimW - pad * 2),
-        h: inMm(sizeMm * 2.2),
+        h: inMm(sizeMm * 3),
         fontFace: FONT,
         fontSize: pt(sizeMm),
         bold,
@@ -192,26 +192,19 @@ export async function buildAgendaPptx(
         transparency: opacity,
         valign: "top",
         margin: 0,
+        // Cover lines are single-line: wrapping clipped tracked-out caps
+        // ("GLOBALLINK N…") inside the measured box.
+        wrap: false,
+        fit: "none",
       });
-      y += sizeMm * 2.4;
+      y += sizeMm * 2.6;
     };
     line(cover.eyebrow ?? "", L0.eyebrowSize, true, true, 18);
     line(cover.title ?? "", L0.titleSize, true, true);
     line(cover.subtitle ?? "", L0.metaSize, false, false, 10);
-    if ((cover.footnote ?? "").trim()) {
-      s.addText(cover.footnote, {
-        x: inMm(pad),
-        y: inMm(geo.trimH - pad - L0.footSize * 2.4),
-        w: inMm(geo.trimW - pad * 2),
-        h: inMm(L0.footSize * 2.2),
-        fontFace: FONT,
-        fontSize: pt(L0.footSize),
-        color: coverInk,
-        transparency: 30,
-        valign: "top",
-        margin: 0,
-      });
-    }
+    // The footnote stays with the cover copy block: at the sheet foot it printed
+    // over the picture and stopped being readable.
+    line(cover.footnote ?? "", L0.footSize, false, false, 25);
     notes.push(
       extras.coverGround
         ? "Cover slide carries the editable cover copy over the chosen location picture, veiled in brand ink."
