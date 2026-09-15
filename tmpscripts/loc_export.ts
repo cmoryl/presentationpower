@@ -12,7 +12,7 @@ const cases: Array<[string, Partial<AgendaConfig>]> = [
 for (const [name, over] of cases) {
   const cfg = { ...base, ...over } as AgendaConfig;
   const pdf = await buildAgendaVectorPdf(cfg);
-  const pdfBytes = new Uint8Array(await (pdf as any).blob?.arrayBuffer?.() ?? (pdf as any));
+  const pdfBytes = pdf.bytes;
   writeFileSync(`/tmp/loc-${name}.pdf`, pdfBytes);
   const pptx = await buildAgendaPptx(cfg);
   writeFileSync(`/tmp/loc-${name}.pptx`, new Uint8Array(await (pptx as any).blob.arrayBuffer()));
