@@ -68,6 +68,8 @@ import {
   agendaBandRadius,
   agendaFooter,
   agendaGroundHexAt,
+  agendaLocation,
+  agendaLocationText,
   roundedRectPath,
   type AgendaConfig,
 } from "./next-agenda";
@@ -529,29 +531,41 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       const size = mm(loc.size);
       // loc.right already steps back for a code parked in the header.
       const right = px(loc.right);
-      const label = (cfg.locationLine ?? "").trim();
+      const LOC = agendaLocation(cfg);
+      const label = agendaLocationText(cfg);
+      const left = px(loc.left);
+      const locFont = LOC.bold ? bold : regular;
+      const locInk = LOC.ink ?? ink;
+      // Left / centre / right all measure from the same block the preview used.
+      const place = (w: number) =>
+        LOC.align === "left" ? left : LOC.align === "centre" ? left + (right - left - w) / 2 : right - w;
       if (label) {
-        const w = bold.widthOfTextAtSize(label, size);
+        const iconH = LOC.icon.path ? size * 1.15 : 0;
+        const iconW = iconH ? (iconH * LOC.icon.vw) / LOC.icon.vh : 0;
+        const gap = iconW ? size * 0.3 : 0;
+        const textW = locFont.widthOfTextAtSize(label, size);
+        const blockX = place(textW + iconW + gap);
+        if (iconH) {
+          page.drawSvgPath(LOC.icon.path, {
+            x: blockX,
+            y: py(loc.pin!.y) - size * 0.05,
+            scale: iconH / LOC.icon.vh,
+            color: rgb(...hexRgb(LOC.iconHex ?? locInk)),
+          });
+        }
         page.drawText(label, {
-          x: right - w,
+          x: blockX + iconW + gap,
           y: py(loc.pin!.y) - size,
           size,
-          font: bold,
-          color: rgb(...hexRgb(ink)),
-        });
-        const pinH = size * 1.15;
-        page.drawSvgPath(AGENDA_PIN_PATH, {
-          x: right - w - pinH * 0.72 - size * 0.3,
-          y: py(loc.pin!.y) - size * 0.05,
-          scale: pinH / 25,
-          color: rgb(...hexRgb(AGENDA_BAND.pin)),
+          font: locFont,
+          color: rgb(...hexRgb(locInk)),
         });
       }
       if ((cfg.meta ?? "").trim()) {
         const ms = mm(loc.metaSize);
         const w = regular.widthOfTextAtSize(cfg.meta, ms);
         page.drawText(cfg.meta, {
-          x: right - w,
+          x: place(w),
           y: py(loc.metaY) - ms,
           size: ms,
           font: regular,

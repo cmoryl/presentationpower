@@ -19,6 +19,9 @@ import {
   agendaTextLines,
   AGENDA_BAND,
   agendaBandPalette,
+  agendaLocation,
+  agendaLocationText,
+  type AgendaLocationAlignId,
   agendaBandComposite,
   agendaFooter,
   agendaBlocks,
@@ -82,6 +85,11 @@ function hex(color: string, fallback = "000000"): string {
  * carries the real mark instead of a text substitute. Word gets a picture, but
  * it is the same gradient, the same stops and the same lockup as the press file.
  */
+/** Word alignment for the room line ("centre" is spelled the Word way here). */
+function docxLocAlign(a: AgendaLocationAlignId): "left" | "center" | "right" {
+  return a === "centre" ? "center" : a === "left" ? "left" : "right";
+}
+
 export async function flattenedGroundPng(
   config: AgendaConfig,
   px: { w: number; h: number },
@@ -754,17 +762,17 @@ export async function buildAgendaDocx(
         ? [
             (cfg.locationLine ?? "").trim()
               ? para(
-                  run((cfg.locationLine ?? "").trim(), {
+                  run(agendaLocationText(cfg), {
                     size: halfPt(PL.locSize),
-                    color: inkHex,
-                    caps: true,
-                    bold: true,
-                    spacing: 30,
+                    color: agendaLocation(cfg).ink ?? inkHex,
+                    caps: false,
+                    bold: agendaLocation(cfg).bold,
+                    spacing: agendaLocation(cfg).weight === "regular" ? 20 : 30,
                   }),
                   {
                     afterTwips: 0,
-                    align: "right",
-                    rightTwips: cardLocRight,
+                    align: docxLocAlign(agendaLocation(cfg).align),
+                    rightTwips: agendaLocation(cfg).align === "right" ? cardLocRight : 0,
                     lineTwips: mmT(lineMm(PL.locSize) * 0.62),
                   },
                 )
@@ -772,8 +780,8 @@ export async function buildAgendaDocx(
             hasMeta
               ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), {
                   afterTwips: 0,
-                  align: "right",
-                  rightTwips: cardLocRight,
+                  align: docxLocAlign(agendaLocation(cfg).align),
+                  rightTwips: agendaLocation(cfg).align === "right" ? cardLocRight : 0,
                   lineTwips: mmT(lineMm(PL.metaSize) * 0.62),
                 })
               : "",
@@ -843,20 +851,27 @@ export async function buildAgendaDocx(
       // matching the printed board instead of stacking them on the left.
       cardMode && (cfg.locationLine ?? "").trim()
         ? para(
-            run((cfg.locationLine ?? "").trim(), {
+            run(agendaLocationText(cfg), {
               size: halfPt(PL.metaSize),
-              color: inkHex,
-              caps: true,
-              bold: true,
+              color: agendaLocation(cfg).ink ?? inkHex,
+              caps: false,
+              bold: agendaLocation(cfg).bold,
               spacing: 30,
             }),
-            { afterTwips: 0, align: "right", lineTwips: mmT(PL.metaSize * 1.6) },
+            {
+              afterTwips: 0,
+              align: docxLocAlign(agendaLocation(cfg).align),
+              lineTwips: mmT(PL.metaSize * 1.6),
+            },
           )
         : "",
       hasMeta
         ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), {
             afterTwips: 0,
-            align: cardMode && (cfg.locationLine ?? "").trim() ? "right" : "left",
+            align:
+              cardMode && (cfg.locationLine ?? "").trim()
+                ? docxLocAlign(agendaLocation(cfg).align)
+                : "left",
             lineTwips: mmT(metaBand),
           })
         : spacer(mmT(metaBand)),

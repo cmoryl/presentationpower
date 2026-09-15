@@ -78,10 +78,19 @@ import {
   AGENDA_ROW_STYLES,
   AGENDA_BAND_TREATMENTS,
   AGENDA_BAND_LAYOUTS,
+  AGENDA_LOCATION_ICONS,
+  AGENDA_LOCATION_INKS,
+  AGENDA_LOCATION_SIZES,
   AGENDA_FOOTER_STYLES,
   AGENDA_FOOTER_FILLS,
   AGENDA_FOOTER_HEIGHTS,
   agendaBandLayout,
+  agendaLocation,
+  type AgendaLocationIconId,
+  type AgendaLocationInkId,
+  type AgendaLocationSizeId,
+  type AgendaLocationWeightId,
+  type AgendaLocationAlignId,
   agendaFooter,
   type AgendaBandLayoutId,
   type AgendaFooterStyleId,
@@ -763,6 +772,110 @@ export function AgendaStudio({
                   onChange={(e) => set("locationLine", e.target.value)}
                   placeholder="FLEMING 3RD FLOOR"
                 />
+              </div>
+              {/* Room line formatting: the mark, its colour, and how the line sets. */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-location-icon">Room line · mark</Label>
+                  <select
+                    id="agenda-location-icon"
+                    className={selectClass}
+                    value={agendaLocation(config).icon.id}
+                    onChange={(e) => set("locationIcon", e.target.value as AgendaLocationIconId)}
+                  >
+                    {AGENDA_LOCATION_ICONS.map((i) => (
+                      <option key={i.id} value={i.id}>
+                        {i.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-location-icon-ink">Mark colour</Label>
+                  <select
+                    id="agenda-location-icon-ink"
+                    className={selectClass}
+                    value={config.locationIconInk ?? "auto"}
+                    onChange={(e) => set("locationIconInk", e.target.value as AgendaLocationInkId)}
+                    disabled={agendaLocation(config).icon.id === "none"}
+                  >
+                    {AGENDA_LOCATION_INKS.map((i) => (
+                      <option key={i.id} value={i.id}>
+                        {i.id === "auto" ? "House / board ink" : i.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-location-ink">Room line colour</Label>
+                  <select
+                    id="agenda-location-ink"
+                    className={selectClass}
+                    value={config.locationInk ?? "auto"}
+                    onChange={(e) => set("locationInk", e.target.value as AgendaLocationInkId)}
+                  >
+                    {AGENDA_LOCATION_INKS.map((i) => (
+                      <option key={i.id} value={i.id}>
+                        {i.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-location-size">Room line size</Label>
+                  <select
+                    id="agenda-location-size"
+                    className={selectClass}
+                    value={config.locationSize ?? "standard"}
+                    onChange={(e) => set("locationSize", e.target.value as AgendaLocationSizeId)}
+                  >
+                    {AGENDA_LOCATION_SIZES.map((sz) => (
+                      <option key={sz.id} value={sz.id}>
+                        {sz.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-location-weight">Room line weight</Label>
+                  <select
+                    id="agenda-location-weight"
+                    className={selectClass}
+                    value={config.locationWeight ?? "bold"}
+                    onChange={(e) =>
+                      set("locationWeight", e.target.value as AgendaLocationWeightId)
+                    }
+                  >
+                    <option value="bold">Bold</option>
+                    <option value="medium">Medium</option>
+                    <option value="regular">Regular</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-location-align">Room line position</Label>
+                  <select
+                    id="agenda-location-align"
+                    className={selectClass}
+                    value={config.locationAlign ?? "right"}
+                    onChange={(e) => set("locationAlign", e.target.value as AgendaLocationAlignId)}
+                  >
+                    <option value="right">Right of the lockup</option>
+                    <option value="left">Left, under the lockup</option>
+                    <option value="centre">Centred, under the lockup</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-location-caps">Room line case</Label>
+                  <select
+                    id="agenda-location-caps"
+                    className={selectClass}
+                    value={config.locationCaps === false ? "sentence" : "caps"}
+                    onChange={(e) => set("locationCaps", e.target.value === "caps")}
+                  >
+                    <option value="caps">Capitals</option>
+                    <option value="sentence">As typed</option>
+                  </select>
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">

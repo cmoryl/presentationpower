@@ -20,6 +20,8 @@ import PptxGenJS from "pptxgenjs";
 import {
   AGENDA_BAND,
   agendaBandPalette,
+  agendaLocation,
+  agendaLocationText,
   agendaBlocks,
   agendaGeometry,
   agendaInk,
@@ -272,32 +274,75 @@ export async function buildAgendaPptx(
     // Card mode puts the room line and the date right-aligned beside the lockup.
     if (b.location && (cfg.locationLine ?? "").trim()) {
       const loc = b.location;
-      s.addText((cfg.locationLine ?? "").trim().toUpperCase(), {
-        x: inX(b.x),
+      const LOC = agendaLocation(cfg);
+      const label = agendaLocationText(cfg);
+      const locInk = hex(LOC.ink ?? "", inkHex);
+      const align = LOC.align === "centre" ? "center" : LOC.align;
+      const iconH = LOC.icon.path ? loc.size * 1.05 : 0;
+      const iconW = iconH ? (iconH * LOC.icon.vw) / LOC.icon.vh : 0;
+      const gap = iconW ? loc.size * 0.34 : 0;
+      // The mark is a preset shape in the deck ink, placed against the estimated
+      // copy width so it hugs the room line on any edge.
+      const estW = label.length * loc.size * 0.62;
+      const blockLeft =
+        LOC.align === "left"
+          ? loc.left
+          : LOC.align === "centre"
+            ? loc.left + (loc.right - loc.left - (estW + iconW + gap)) / 2
+            : Math.max(loc.left, loc.right - estW - iconW - gap);
+      if (iconH) {
+        const markInk = hex(LOC.iconHex ?? LOC.ink ?? "", locInk);
+        const markY = loc.y + loc.size * 0.12;
+        // A stepped mark is drawn from its parts: one preset rectangle would
+        // print as a plain square and read as the wrong symbol.
+        if (LOC.icon.parts?.length) {
+          for (const part of LOC.icon.parts) {
+            s.addShape("rect" as never, {
+              x: inX(blockLeft + part.x * iconW),
+              y: inX(markY + part.y * iconH),
+              w: inX(part.w * iconW),
+              h: inX(part.h * iconH),
+              fill: { color: markInk },
+              line: { width: 0 },
+            });
+          }
+        } else {
+          s.addShape(LOC.icon.shape as never, {
+            x: inX(blockLeft),
+            y: inX(markY),
+            w: inX(iconW),
+            h: inX(iconH),
+            fill: { color: markInk },
+            line: { width: 0 },
+          });
+        }
+      }
+      s.addText(label, {
+        x: inX(iconW ? blockLeft + iconW + gap : loc.left),
         y: inX(loc.y),
-        w: inX(loc.right - b.x),
+        w: inX(Math.max(loc.size * 4, loc.right - (iconW ? blockLeft + iconW + gap : loc.left))),
         h: inX(loc.size * 1.8),
         fontFace: FONT,
         fontSize: pt(loc.size),
         lineSpacing: pt(loc.size * 1.5),
-        bold: true,
-        charSpacing: 2,
-        color: inkHex,
-        align: "right",
+        bold: LOC.bold,
+        charSpacing: LOC.weight === "regular" ? 1 : 2,
+        color: locInk,
+        align: iconW ? "left" : align,
         valign: "top",
         margin: 0,
       });
       if ((cfg.meta ?? "").trim()) {
         s.addText(cfg.meta, {
-          x: inX(b.x),
+          x: inX(loc.left),
           y: inX(loc.metaY),
-          w: inX(loc.right - b.x),
+          w: inX(loc.right - loc.left),
           h: inX(loc.metaSize * 2),
           fontFace: FONT,
           fontSize: pt(loc.metaSize),
           lineSpacing: pt(loc.metaSize * 1.6),
           color: inkHex,
-          align: "right",
+          align,
           valign: "top",
           margin: 0,
         });

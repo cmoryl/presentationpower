@@ -20,6 +20,8 @@ import {
   AGENDA_BAND,
   agendaBandPalette,
   agendaBandRadius,
+  agendaLocation,
+  agendaLocationText,
   type AgendaConfig,
 } from "@/lib/next-agenda";
 import { agendaCopyInk } from "@/lib/next-agenda-contrast";
@@ -38,6 +40,32 @@ function AgendaPin({ size, fill = AGENDA_BAND.pin }: { size: number; fill?: stri
         d="M9 0C4.03 0 0 4.03 0 9c0 6.36 7.4 14.68 7.72 15.03a1.72 1.72 0 0 0 2.56 0C10.6 23.68 18 15.36 18 9c0-4.97-4.03-9-9-9Zm0 13.1A4.1 4.1 0 1 1 9 4.9a4.1 4.1 0 0 1 0 8.2Z"
         fill={fill}
       />
+    </svg>
+  );
+}
+
+/**
+ * The chosen room-line mark. Every icon is a single filled path on its own
+ * viewBox, so the press PDF draws exactly this silhouette.
+ */
+function AgendaLocationMark({
+  icon,
+  height,
+  fill,
+}: {
+  icon: { path: string; vw: number; vh: number };
+  height: number;
+  fill: string;
+}) {
+  return (
+    <svg
+      width={(height * icon.vw) / icon.vh}
+      height={height}
+      viewBox={`0 0 ${icon.vw} ${icon.vh}`}
+      aria-hidden
+      style={{ flex: "0 0 auto" }}
+    >
+      <path d={icon.path} fill={fill} />
     </svg>
   );
 }
@@ -66,6 +94,9 @@ export function AgendaSheet({
   const blocks = agendaBlocks(config);
   const L = blocks.layout;
   const BAND = agendaBandPalette(config);
+  const LOC = agendaLocation(config);
+  const locText = agendaLocationText(config);
+  const locAlign = LOC.align === "centre" ? "center" : LOC.align;
   const face = config.face ?? "dark";
   // Legibility guard: keeps the approved face ink unless it stops reading on
   // this ground, so a board is never printed in copy no one can see.
@@ -213,15 +244,16 @@ export function AgendaSheet({
         <>
           <div
             style={{
-              ...at(blocks.location.pin!.x, blocks.location.pin!.y),
+              ...at(blocks.location.left, blocks.location.pin!.y),
               // Right edge comes from the block maths, which pulls it clear of a
               // code parked in the header — never the full content width.
-              width: mm(blocks.location.right - blocks.x),
-              textAlign: "right",
+              width: mm(blocks.location.right - blocks.location.left),
+              textAlign: locAlign,
               fontSize: mm(blocks.location.size),
               lineHeight: 1.1,
-              fontWeight: 500,
-              letterSpacing: "0.01em",
+              fontWeight: LOC.bold ? 700 : LOC.weight === "medium" ? 600 : 500,
+              letterSpacing: `${LOC.tracking}em`,
+              color: LOC.ink ?? ink,
             }}
           >
             <span
@@ -231,16 +263,22 @@ export function AgendaSheet({
                 gap: mm(2.4),
               }}
             >
-              <AgendaPin size={mm(blocks.location.size * 1.15)} />
-              {config.locationLine}
+              {LOC.icon.path ? (
+                <AgendaLocationMark
+                  icon={LOC.icon}
+                  height={mm(blocks.location.size * 1.15)}
+                  fill={LOC.iconHex ?? LOC.ink ?? ink}
+                />
+              ) : null}
+              {locText}
             </span>
           </div>
           {config.meta.trim() ? (
             <div
               style={{
-                ...at(blocks.x, blocks.location.metaY),
-                width: mm(blocks.location.right - blocks.x),
-                textAlign: "right",
+                ...at(blocks.location.left, blocks.location.metaY),
+                width: mm(blocks.location.right - blocks.location.left),
+                textAlign: locAlign,
                 fontSize: mm(blocks.location.metaSize),
                 fontWeight: 500,
                 letterSpacing: "0.02em",
