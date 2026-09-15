@@ -179,7 +179,8 @@ export async function buildAgendaPptx(
     let y = pad;
     const line = (text: string, sizeMm: number, bold: boolean, caps: boolean, opacity?: number) => {
       if (!text.trim()) return;
-      s.addText(caps ? text.toUpperCase() : text, {
+      const shown = caps ? text.toUpperCase().split("").join("\u2009") : text;
+      s.addText(shown, {
         x: inMm(pad),
         y: inMm(y),
         w: inMm(geo.trimW - pad * 2),
@@ -187,7 +188,9 @@ export async function buildAgendaPptx(
         fontFace: FONT,
         fontSize: pt(sizeMm),
         bold,
-        charSpacing: caps ? 2 : 0,
+        // LibreOffice/PowerPoint clip a tracked-out run inside a measured cover
+        // box, so cover caps carry their letterspacing as thin spaces instead.
+        charSpacing: 0,
         color: coverInk,
         transparency: opacity,
         valign: "top",
