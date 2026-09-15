@@ -279,96 +279,14 @@ function CityBadgePage() {
             </section>
 
             <section className="rounded-2xl border border-black/10 bg-white p-5">
-              <h2 className="text-sm font-semibold text-[#03002C]">Event and attendee copy</h2>
-              <div className="mt-3 grid gap-4 sm:grid-cols-3">
-                <label className={label}>
-                  City
-                  <input
-                    className={`mt-1 ${field}`}
-                    value={config.cityLabel}
-                    onChange={(e) => set("cityLabel", e.target.value)}
-                  />
-                </label>
-                <label className={label}>
-                  Dates
-                  <input
-                    className={`mt-1 ${field}`}
-                    value={config.datesLabel}
-                    onChange={(e) => set("datesLabel", e.target.value)}
-                  />
-                </label>
-                <label className={label}>
-                  Venue
-                  <input
-                    className={`mt-1 ${field}`}
-                    value={config.venueLabel}
-                    onChange={(e) => set("venueLabel", e.target.value)}
-                  />
-                </label>
-                <label className={label}>
-                  Attendee tier
-                  <select
-                    className={`mt-1 ${field}`}
-                    value={config.roleLabel}
-                    onChange={(e) => set("roleLabel", e.target.value)}
-                  >
-                    {CITY_BADGE_ROLES.map((r) => (
-                      <option key={r} value={r}>
-                        {r}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className={label}>
-                  First name
-                  <input
-                    className={`mt-1 ${field}`}
-                    value={config.firstName}
-                    onChange={(e) => set("firstName", e.target.value)}
-                  />
-                </label>
-                <label className={label}>
-                  Last name
-                  <input
-                    className={`mt-1 ${field}`}
-                    value={config.lastName}
-                    onChange={(e) => set("lastName", e.target.value)}
-                  />
-                </label>
-                <label className={`${label} sm:col-span-2`}>
-                  Job title
-                  <input
-                    className={`mt-1 ${field}`}
-                    value={config.jobTitle}
-                    onChange={(e) => set("jobTitle", e.target.value)}
-                  />
-                </label>
-                <label className={label}>
-                  Company
-                  <input
-                    className={`mt-1 ${field}`}
-                    value={config.company}
-                    onChange={(e) => set("company", e.target.value)}
-                  />
-                </label>
-                <label className={label}>
-                  Reference
-                  <input
-                    className={`mt-1 ${field}`}
-                    value={config.reference}
-                    onChange={(e) => set("reference", e.target.value)}
-                  />
-                </label>
-                <label className="flex items-end gap-2 text-xs text-black/60 sm:col-span-2">
-                  <input
-                    type="checkbox"
-                    checked={config.showAttendee}
-                    onChange={(e) => set("showAttendee", e.target.checked)}
-                  />
-                  Print the attendee block (uncheck for blank stock)
-                </label>
-              </div>
+              <h2 className="text-sm font-semibold text-[#03002C]">Blank below the lockup</h2>
+              <p className="mt-1.5 text-[11.5px] leading-snug text-black/60">
+                The clear area under the lockup is covered by the badge sleeve, so nothing is
+                printed there — no attendee name, tier, company or event line. Each template is the
+                approved artwork plus that division&rsquo;s lockup on the front and the back.
+              </p>
             </section>
+
 
             <section className="rounded-2xl border border-black/10 bg-white p-5">
               <h2 className="text-sm font-semibold text-[#03002C]">Print run</h2>
