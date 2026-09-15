@@ -254,13 +254,26 @@ export function MyCloudDecks() {
   const navigate = useNavigate();
   const [rows, setRows] = useState<CloudDeckRow[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  // Never let a failed read look like an empty account.
+  const [failed, setFailed] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     if (!signedIn) return;
+    let live = true;
     list()
-      .then((r) => setRows(r as CloudDeckRow[]))
-      .catch(() => setRows([]));
-  }, [signedIn, list]);
+      .then((r) => {
+        if (!live) return;
+        setRows(r as CloudDeckRow[]);
+        setFailed(false);
+      })
+      .catch(() => {
+        if (live) setFailed(true);
+      });
+    return () => {
+      live = false;
+    };
+  }, [signedIn, list, reloadKey]);
 
   if (!signedIn) return null;
 
@@ -387,7 +400,26 @@ export function MyCloudDecks() {
           Synced to your account
         </span>
       </div>
-      {rows === null ? (
+      {failed ? (
+        <div
+          role="alert"
+          className="rounded-2xl border border-amber-500/40 bg-amber-50 p-8 text-center text-sm text-[#03002C]"
+        >
+          We couldn’t reach your account to list your saved presentations. Nothing has been lost.
+          <div className="mt-3">
+            <button
+              type="button"
+              onClick={() => {
+                setFailed(false);
+                setReloadKey((n) => n + 1);
+              }}
+              className="rounded-full bg-[#03002C] px-3 py-1 text-xs font-semibold text-white hover:opacity-90"
+            >
+              Try again
+            </button>
+          </div>
+        </div>
+      ) : rows === null ? (
         <div className="rounded-2xl border border-dashed border-black/15 bg-white p-8 text-center text-sm text-black/50">
           Loading…
         </div>

@@ -42,24 +42,40 @@ function DecksIndex() {
   const [cloudDecks, setCloudDecks] = useState<
     Array<{ title: string; review_status: string | null }>
   >([]);
+  // A failed load used to fall back to an empty list, which reads exactly like
+  // "you have no decks" — the one message we must never show by accident.
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     if (!signedIn) {
       setAnalytics(null);
       setCloudDecks([]);
+      setLoadFailed(false);
       return;
     }
+    let live = true;
     fetchAnalytics()
-      .then(setAnalytics)
-      .catch(() => setAnalytics(null));
+      .then((a) => {
+        if (live) setAnalytics(a);
+      })
+      .catch(() => {
+        if (live) setLoadFailed(true);
+      });
     fetchCloud()
-      .then((rows) =>
+      .then((rows) => {
+        if (!live) return;
         setCloudDecks(
           rows.map((r) => ({ title: r.title, review_status: r.review_status ?? null })),
-        ),
-      )
-      .catch(() => setCloudDecks([]));
-  }, [signedIn, fetchAnalytics, fetchCloud]);
+        );
+      })
+      .catch(() => {
+        if (live) setLoadFailed(true);
+      });
+    return () => {
+      live = false;
+    };
+  }, [signedIn, fetchAnalytics, fetchCloud, reloadKey]);
 
   const reviewByTitle = useMemo(() => {
     const m = new Map<string, ReviewStatus>();
@@ -303,9 +319,33 @@ function DecksIndex() {
         </div>
       </div>
 
+      {loadFailed && (
+        <div
+          role="alert"
+          className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-500/40 bg-amber-50 px-4 py-3 text-sm text-[#03002C] dark:bg-amber-500/10 dark:text-white"
+        >
+          <span>
+            We couldn’t load your saved decks just now, so this list may be incomplete. Nothing has
+            been deleted.
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setLoadFailed(false);
+              setReloadKey((n) => n + 1);
+            }}
+            className="rounded-full bg-[#03002C] px-3 py-1 text-xs font-semibold text-white hover:opacity-90 dark:bg-white dark:text-[#03002C]"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
       {/* Grid */}
       {enriched.length === 0 ? (
-        <EmptyNew signedIn={signedIn} />
+        loadFailed ? null : (
+          <EmptyNew signedIn={signedIn} />
+        )
       ) : filtered.length === 0 ? (
         <EmptyNoMatches onClear={clearAll} />
       ) : (
