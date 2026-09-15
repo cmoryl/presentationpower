@@ -63,7 +63,11 @@ import {
   agendaStops,
   agendaTitleInk,
   AGENDA_BAND,
+  agendaBandComposite,
   agendaBandPalette,
+  agendaBandRadius,
+  agendaFooter,
+  agendaGroundHexAt,
   roundedRectPath,
   type AgendaConfig,
 } from "./next-agenda";
@@ -584,25 +588,94 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
         color: ReturnType<typeof rgb>,
         opacity: number,
       ) =>
-        page.drawSvgPath(roundedRectPath(w, h, radius), {
+        page.drawSvgPath(roundedRectPath(w, h, agendaBandRadius(radius, w, h)), {
           x,
           y: top,
           color,
           opacity,
           borderWidth: 0,
         });
+      /**
+       * A veil band: the press file cannot fade a fill to nothing, so the plate is
+       * painted as one live axial gradient from the band colour into the ground
+       * colour beneath it. Same picture as the preview, still an editable gradient
+       * with real stops in Illustrator.
+       */
+      let veilSeq = 0;
+      const veilPlate = (
+        x: number,
+        top: number,
+        w: number,
+        h: number,
+        hex: string,
+        fade: { top: number; bottom: number },
+      ) => {
+        const trimTop = py(0);
+        const ratio = (yPt: number) => Math.max(0, Math.min(1, (trimTop - yPt) / mm(geo.trimH)));
+        const stopsPair: ShadingStop[] = [
+          {
+            offset: 0,
+            color: hexRgb(
+              agendaBandComposite(hex, fade.top, agendaGroundHexAt(config, ratio(top))),
+            ) as [number, number, number],
+          },
+          {
+            offset: 1,
+            color: hexRgb(
+              agendaBandComposite(hex, fade.bottom, agendaGroundHexAt(config, ratio(top - h))),
+            ) as [number, number, number],
+          },
+        ];
+        veilSeq += 1;
+        const { name } = registerGradientPattern(
+          doc,
+          page,
+          { kind: "axial", from: { x, y: top }, to: { x, y: top - h } },
+          stopsPair,
+          "rgb",
+          `PVeil${veilSeq}`,
+        );
+        const r = agendaBandRadius(radius, w, h);
+        const c = r * 0.5523;
+        const y0 = top - h;
+        const n = (v: number) => PDFNumber.of(round(v));
+        page.pushOperators(
+          pushGraphicsState(),
+          PDFOperator.of("cs" as never, [PDFName.of("Pattern")]),
+          PDFOperator.of("scn" as never, [name]),
+          PDFOperator.of("m" as never, [n(x + r), n(y0)]),
+          PDFOperator.of("l" as never, [n(x + w - r), n(y0)]),
+          PDFOperator.of("c" as never, [n(x + w - r + c), n(y0), n(x + w), n(y0 + r - c), n(x + w), n(y0 + r)]),
+          PDFOperator.of("l" as never, [n(x + w), n(y0 + h - r)]),
+          PDFOperator.of("c" as never, [n(x + w), n(y0 + h - r + c), n(x + w - r + c), n(y0 + h), n(x + w - r), n(y0 + h)]),
+          PDFOperator.of("l" as never, [n(x + r), n(y0 + h)]),
+          PDFOperator.of("c" as never, [n(x + r - c), n(y0 + h), n(x), n(y0 + h - r + c), n(x), n(y0 + h - r)]),
+          PDFOperator.of("l" as never, [n(x), n(y0 + r)]),
+          PDFOperator.of("c" as never, [n(x), n(y0 + r - c), n(x + r - c), n(y0), n(x + r), n(y0)]),
+          PDFOperator.of("h" as never, []),
+          PDFOperator.of("f" as never, []),
+          popGraphicsState(),
+        );
+      };
+      /** Paints a band box with whatever the treatment asks for. */
+      const bandBox = (x: number, top: number, w: number, h: number, hex: string, alpha: number) => {
+        if (BAND.fade) veilPlate(x, top, w, h, hex, BAND.fade);
+        else plate(x, top, w, h, rgb(...hexRgb(hex)), alpha);
+      };
       blocks.rows.forEach((row, i) => {
         const band = row.band;
         if (!band) return;
         // Time rail first as a full curved plate, then the fill inset from the
         // left: the rail keeps the band's own curve instead of squaring a corner.
-        plate(px(band.x), py(band.y), mm(band.w), mm(band.h), railColor, BAND.fillAlpha);
-        plate(
+        if (railW > 0) {
+          plate(px(band.x), py(band.y), mm(band.w), mm(band.h), railColor, BAND.fillAlpha);
+        }
+        bandBox(
           px(band.x) + railW,
           py(band.y),
           mm(band.w) - railW,
           mm(band.h),
-          rgb(...hexRgb(i % 2 === 0 ? BAND.fillA : BAND.fillB)),
+          i % 2 === 0 ? BAND.fillA : BAND.fillB,
           BAND.fillAlpha,
         );
         const bodyX = px(band.x) + padX + timeW;
@@ -650,13 +723,15 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
         row.parallels.forEach((par, pi) => {
           const copy = parCopy[pi];
           if (!copy) return;
-          plate(px(par.x), py(par.y), mm(par.w), mm(par.h), railColor, BAND.parallelAlpha);
-          plate(
+          if (railW > 0) {
+            plate(px(par.x), py(par.y), mm(par.w), mm(par.h), railColor, BAND.parallelAlpha);
+          }
+          bandBox(
             px(par.x) + railW,
             py(par.y),
             mm(par.w) - railW,
             mm(par.h),
-            rgb(...hexRgb(BAND.parallel)),
+            BAND.parallel,
             BAND.parallelAlpha,
           );
           // Narrow cards use fitted type and tighter padding: at the band sizes
@@ -818,15 +893,29 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       beginLayer(page, layer("05 Footer"));
       const size = mm(L.footSize);
       const band = blocks.footerBand;
-      // The band bleeds off the foot so no white edge survives trimming.
-      page.drawRectangle({
-        x: ox,
-        y: oy,
-        width: bleedW,
-        height: py(band.y) - oy,
-        color: rgb(...hexRgb(AGENDA_BAND.footerBand)),
-      });
-      const bandInk = rgb(...hexRgb(AGENDA_BAND.footerInk));
+      const foot = blocks.footer;
+      // A colour foot bleeds off the edge so no white strip survives trimming; a
+      // hairline foot draws a rule on the trim width; a clear foot draws nothing
+      // and the lines take the board ink.
+      if (foot.style === "band") {
+        page.drawRectangle({
+          x: ox,
+          y: oy,
+          width: bleedW,
+          height: py(band.y) - oy,
+          color: rgb(...hexRgb(foot.fill)),
+        });
+      } else if (foot.style === "hairline") {
+        page.drawRectangle({
+          x: px(blocks.x),
+          y: py(band.y) - mm(0.5 * L.k),
+          width: mm(blocks.contentW),
+          height: mm(0.5 * L.k),
+          color: rgb(...hexRgb(ink)),
+          opacity: 0.55,
+        });
+      }
+      const bandInk = rgb(...hexRgb(foot.onGround ? ink : foot.ink));
       if (footnote) {
         const fs = mm(L.footSize * 1.15);
         const hasPin = blocks.rows.some((r) => r.parallel);
@@ -849,9 +938,9 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
           color: rgb(...hexRgb(ink)),
         });
       }
-      const left = (cfg.footerLeft ?? "").trim();
+      const left = foot.left;
       if (left) {
-        page.drawText(fit(regular, left.toUpperCase(), size, mm(blocks.contentW * 0.6)), {
+        page.drawText(fit(regular, left, size, mm(blocks.contentW * 0.6)), {
           x: px(blocks.x),
           y: py(blocks.footY) - size,
           size,
@@ -859,9 +948,20 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
           color: bandInk,
         });
       }
-      const right = (cfg.footerRight ?? "").trim() || stamp;
+      if (foot.centre) {
+        const label = fit(regular, foot.centre, size, mm(blocks.contentW * 0.36));
+        const w = regular.widthOfTextAtSize(label, size);
+        page.drawText(label, {
+          x: px(blocks.x + blocks.contentW / 2) - w / 2,
+          y: py(blocks.footY) - size,
+          size,
+          font: regular,
+          color: bandInk,
+        });
+      }
+      const right = foot.right || (foot.caps ? stamp.toUpperCase() : stamp);
       if (right) {
-        const label = right.toUpperCase();
+        const label = right;
         const w = regular.widthOfTextAtSize(label, size);
         page.drawText(label, {
           x: px(blocks.x + blocks.contentW) - w,

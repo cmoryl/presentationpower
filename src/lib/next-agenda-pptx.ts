@@ -332,7 +332,11 @@ export async function buildAgendaPptx(
       // print it. The rail is the plate beneath, showing at the left edge, which
       // keeps the band's own curve rather than squaring a corner.
       const radius = inX(BAND.radius * L.k);
-      const clear = (alpha: number) => Math.round((1 - alpha) * 100);
+      // A veil treatment fades to clear down the band. PowerPoint shapes carry one
+      // transparency, so a veil band takes the mid point of that fade — the same
+      // weight the printed band averages to.
+      const veilAlpha = BAND.fade ? (BAND.fade.top + BAND.fade.bottom) / 2 : null;
+      const clear = (alpha: number) => Math.round((1 - (veilAlpha ?? alpha)) * 100);
       const plate = (
         box: { x: number; y: number; w: number; h: number },
         color: string,
@@ -345,13 +349,13 @@ export async function buildAgendaPptx(
           y: inX(box.y),
           w: inX(box.w) - inset,
           h: inX(box.h),
-          rectRadius: radius,
+          rectRadius: Math.min(radius, inX(box.h) / 2, (inX(box.w) - inset) / 2),
           fill: { color: hex(color), transparency: clear(alpha) },
           line: { type: "none" },
           objectName: name,
         });
       const rail = (box: { x: number; y: number; w: number; h: number }, alpha: number, name: string) =>
-        plate(box, BAND.rail, alpha, name);
+        BAND.railW > 0 ? plate(box, BAND.rail, alpha, name) : undefined;
       const bandText = (
         box: { x: number; y: number; w: number; h: number },
         session: { time?: string; title?: string; speaker?: string; detail?: string },
@@ -601,38 +605,55 @@ export async function buildAgendaPptx(
     // event URL and dates in white.
     if (b.footerBand) {
       const fb = b.footerBand;
-      s.addShape("rect", {
-        x: inX(fb.x),
-        y: inX(fb.y),
-        w: inX(fb.w),
-        h: inX(fb.h),
-        fill: { color: hex(AGENDA_BAND.footerBand) },
-        line: { type: "none" },
-        objectName: "NEXT agenda footer band",
-      });
-      const footInk = hex(AGENDA_BAND.footerInk, "FFFFFF");
-      const bandY = fb.y + (fb.h - L.footSize * 1.6) * 0.5;
-      if ((cfg.footerLeft ?? "").trim()) {
-        s.addText((cfg.footerLeft ?? "").trim().toUpperCase(), {
+      const ft = b.footer;
+      if (ft.style === "band") {
+        s.addShape("rect", {
+          x: inX(fb.x),
+          y: inX(fb.y),
+          w: inX(fb.w),
+          h: inX(fb.h),
+          fill: { color: hex(ft.fill) },
+          line: { type: "none" },
+          objectName: "NEXT agenda footer band",
+        });
+      } else if (ft.style === "hairline") {
+        s.addShape("rect", {
           x: inX(b.x),
-          y: inX(bandY),
-          w: inX(b.contentW * 0.62),
-          h: inX(L.footSize * 2),
-          fontFace: FONT,
-          fontSize: pt(L.footSize),
-          lineSpacing: pt(L.footSize * 1.6),
-          bold: true,
-          charSpacing: 2,
-          color: footInk,
-          valign: "top",
-          margin: 0,
+          y: inX(fb.y),
+          w: inX(b.contentW),
+          h: inX(0.5 * L.k),
+          fill: { color: hex(inkHex, "FFFFFF"), transparency: 45 },
+          line: { type: "none" },
+          objectName: "NEXT agenda footer rule",
         });
       }
-      if ((cfg.footerRight ?? "").trim()) {
-        s.addText((cfg.footerRight ?? "").trim().toUpperCase(), {
-          x: inX(b.x + b.contentW * 0.62),
+      const footInk = hex(ft.onGround ? inkHex : ft.ink, "FFFFFF");
+      const bandY = fb.y + (fb.h - L.footSize * 1.6) * 0.5;
+      const slots: { text: string; x: number; w: number; align: "left" | "center" | "right" }[] = [
+        { text: ft.left, x: b.x, w: b.contentW * (ft.centre ? 0.38 : 0.62), align: "left" },
+        ...(ft.centre
+          ? [
+              {
+                text: ft.centre,
+                x: b.x + b.contentW * 0.34,
+                w: b.contentW * 0.32,
+                align: "center" as const,
+              },
+            ]
+          : []),
+        {
+          text: ft.right,
+          x: b.x + b.contentW * (ft.centre ? 0.66 : 0.62),
+          w: b.contentW * (ft.centre ? 0.34 : 0.38),
+          align: "right",
+        },
+      ];
+      for (const slot of slots) {
+        if (!slot.text) continue;
+        s.addText(slot.text, {
+          x: inX(slot.x),
           y: inX(bandY),
-          w: inX(b.contentW * 0.38),
+          w: inX(slot.w),
           h: inX(L.footSize * 2),
           fontFace: FONT,
           fontSize: pt(L.footSize),
@@ -640,7 +661,7 @@ export async function buildAgendaPptx(
           bold: true,
           charSpacing: 2,
           color: footInk,
-          align: "right",
+          align: slot.align,
           valign: "top",
           margin: 0,
         });

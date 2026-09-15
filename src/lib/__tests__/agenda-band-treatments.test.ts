@@ -35,7 +35,7 @@ describe("agenda band treatments", () => {
       ).toBeGreaterThanOrEqual(4.5);
       // The rail is a graphic mark, so it only has to separate from both fills.
       expect(ratio(p.rail, p.fillA), `${t.id} rail on fillA`).toBeGreaterThanOrEqual(3);
-      expect(p.railW).toBeGreaterThan(0);
+      expect(p.railW).toBeGreaterThanOrEqual(0);
     }
   });
 

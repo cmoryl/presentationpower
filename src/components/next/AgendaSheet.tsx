@@ -19,6 +19,7 @@ import {
   agendaTitleInk,
   AGENDA_BAND,
   agendaBandPalette,
+  agendaBandRadius,
   type AgendaConfig,
 } from "@/lib/next-agenda";
 import { agendaCopyInk } from "@/lib/next-agenda-contrast";
@@ -109,7 +110,23 @@ export function AgendaSheet({
     const n = parseInt(h.length === 3 ? h.replace(/./g, (c) => c + c) : h, 16);
     return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
   };
-  const bandRadius = mm(BAND.radius * L.k);
+  /**
+   * A band box's fill. A veil treatment fades from its top alpha to clear at the
+   * foot of the band, so the gradient runs right through the programme; every
+   * other treatment is a flat translucent fill.
+   */
+  const bandBox = (hex: string, alpha: number) =>
+    BAND.fade
+      ? `linear-gradient(180deg, ${bandFill(hex, BAND.fade.top)} 0%, ${bandFill(hex, BAND.fade.bottom)} 100%)`
+      : bandFill(hex, alpha);
+  const bandRadius = (w: number, h: number) =>
+    mm(agendaBandRadius(BAND.radius * L.k, w, h));
+  const railW = mm(BAND.railW * L.k);
+  // Foot of the board: a colour band, a hairline rule, or nothing behind the
+  // lines. On anything but a band the copy takes the board ink so it still reads
+  // on the gradient.
+  const foot = blocks.footer;
+  const footInk = foot.onGround ? ink : foot.ink;
 
   return (
     <div
@@ -243,10 +260,10 @@ export function AgendaSheet({
                 ...at(row.band.x, row.band.y),
                 width: mm(row.band.w),
                 height: mm(row.band.h),
-                background: bandFill(i % 2 === 0 ? BAND.fillA : BAND.fillB, BAND.fillAlpha),
+                background: bandBox(i % 2 === 0 ? BAND.fillA : BAND.fillB, BAND.fillAlpha),
                 color: BAND.ink,
-                borderLeft: `${mm(BAND.railW * L.k)}px solid ${BAND.rail}`,
-                borderRadius: bandRadius,
+                borderLeft: railW ? `${railW}px solid ${BAND.rail}` : undefined,
+                borderRadius: bandRadius(row.band.w, row.band.h),
                 overflow: "hidden",
                 display: "flex",
                 alignItems: "flex-start",
@@ -319,11 +336,11 @@ export function AgendaSheet({
                     ...at(rect.x, rect.y),
                     width: mm(rect.w),
                     height: mm(rect.h),
-                    background: bandFill(BAND.parallel, BAND.parallelAlpha),
-                    borderRadius: bandRadius,
+                    background: bandBox(BAND.parallel, BAND.parallelAlpha),
+                    borderRadius: bandRadius(rect.w, rect.h),
                     overflow: "hidden",
                     color: BAND.parallelInk,
-                    borderLeft: `${mm(BAND.railW * L.k)}px solid ${BAND.rail}`,
+                    borderLeft: railW ? `${railW}px solid ${BAND.rail}` : undefined,
                     padding: `${mm(L.bandPadY)}px ${mm(ct.padX)}px`,
                     boxSizing: "border-box",
                     position: "absolute",
@@ -568,7 +585,7 @@ export function AgendaSheet({
         </div>
       ) : null}
 
-      {blocks.footerBand ? (
+      {blocks.footerBand && foot.style === "band" ? (
         <div
           style={{
             position: "absolute",
@@ -576,7 +593,18 @@ export function AgendaSheet({
             top: ty + mm(blocks.footerBand.y),
             width: mm(geo.bleedW),
             height: mm(blocks.footerBand.h) + ty,
-            background: AGENDA_BAND.footerBand,
+            background: foot.fill,
+          }}
+        />
+      ) : null}
+      {blocks.footerBand && foot.style === "hairline" ? (
+        <div
+          style={{
+            ...at(blocks.x, blocks.footerBand.y),
+            width: mm(blocks.contentW),
+            height: Math.max(0.6, mm(0.5 * L.k)),
+            background: footInk,
+            opacity: 0.55,
           }}
         />
       ) : null}
@@ -618,35 +646,24 @@ export function AgendaSheet({
 
       {blocks.footerBand ? (
         <>
-          <div
-            style={{
-              ...at(blocks.x, blocks.footY),
-              width: mm(blocks.contentW),
-              fontSize: mm(L.footSize),
-              fontWeight: 500,
-              letterSpacing: "0.04em",
-              color: AGENDA_BAND.footerInk,
-              textTransform: "uppercase",
-            }}
-          >
-            {config.footerLeft}
-          </div>
-          {config.footerRight.trim() ? (
-            <div
-              style={{
-                ...at(blocks.x, blocks.footY),
-                width: mm(blocks.contentW),
-                textAlign: "right",
-                fontSize: mm(L.footSize),
-                fontWeight: 500,
-                letterSpacing: "0.04em",
-                color: AGENDA_BAND.footerInk,
-                textTransform: "uppercase",
-              }}
-            >
-              {config.footerRight}
-            </div>
-          ) : null}
+          {(["left", "centre", "right"] as const).map((slot) =>
+            foot[slot] ? (
+              <div
+                key={slot}
+                style={{
+                  ...at(blocks.x, blocks.footY),
+                  width: mm(blocks.contentW),
+                  textAlign: slot === "left" ? "left" : slot === "centre" ? "center" : "right",
+                  fontSize: mm(L.footSize),
+                  fontWeight: 500,
+                  letterSpacing: "0.04em",
+                  color: footInk,
+                }}
+              >
+                {foot[slot]}
+              </div>
+            ) : null,
+          )}
         </>
       ) : null}
 
