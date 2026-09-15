@@ -213,15 +213,16 @@ export function AgendaSheet({
         <>
           <div
             style={{
-              ...at(blocks.location.pin!.x, blocks.location.pin!.y),
+              ...at(blocks.location.left, blocks.location.pin!.y),
               // Right edge comes from the block maths, which pulls it clear of a
               // code parked in the header — never the full content width.
-              width: mm(blocks.location.right - blocks.x),
-              textAlign: "right",
+              width: mm(blocks.location.right - blocks.location.left),
+              textAlign: locAlign,
               fontSize: mm(blocks.location.size),
               lineHeight: 1.1,
-              fontWeight: 500,
-              letterSpacing: "0.01em",
+              fontWeight: LOC.bold ? 700 : LOC.weight === "medium" ? 600 : 500,
+              letterSpacing: `${LOC.tracking}em`,
+              color: LOC.ink ?? ink,
             }}
           >
             <span
@@ -231,16 +232,22 @@ export function AgendaSheet({
                 gap: mm(2.4),
               }}
             >
-              <AgendaPin size={mm(blocks.location.size * 1.15)} />
-              {config.locationLine}
+              {LOC.icon.path ? (
+                <AgendaLocationMark
+                  icon={LOC.icon}
+                  height={mm(blocks.location.size * 1.15)}
+                  fill={LOC.iconHex ?? LOC.ink ?? ink}
+                />
+              ) : null}
+              {locText}
             </span>
           </div>
           {config.meta.trim() ? (
             <div
               style={{
-                ...at(blocks.x, blocks.location.metaY),
-                width: mm(blocks.location.right - blocks.x),
-                textAlign: "right",
+                ...at(blocks.location.left, blocks.location.metaY),
+                width: mm(blocks.location.right - blocks.location.left),
+                textAlign: locAlign,
                 fontSize: mm(blocks.location.metaSize),
                 fontWeight: 500,
                 letterSpacing: "0.02em",
