@@ -18,6 +18,7 @@ import {
   type LondonColorSpace,
 } from "@/lib/next-london-revise";
 import { cmykLabel, londonCmykBuild } from "@/lib/next-london-cmyk";
+import { auditAi, auditSvg, gateOnQa } from "@/lib/london-signage-qa";
 
 export type LondonPackFile = {
   path: string;
@@ -25,10 +26,18 @@ export type LondonPackFile = {
   kind: "svg" | "ai";
 };
 
+export type LondonPackSkip = {
+  panelId: string;
+  name: string;
+  reason: string;
+};
+
 export type LondonPackResult = {
   blob: Blob;
   files: LondonPackFile[];
   manifest: string;
+  /** Panels the print gate refused. Never treat these as approved. */
+  skipped: LondonPackSkip[];
 };
 
 function floorLabel(id: string): string {
@@ -46,7 +55,8 @@ function slug(value: string): string {
 export async function buildLondonSignagePack(
   panels: LondonPanel[],
   options: {
-    revision?: number;
+    /** Revision in force. Pass "draft" when nothing is published yet. */
+    revision?: number | "draft";
     /** "rgb" (default, RIP separates) or "cmyk" print masters with vibrant correction. */
     colorSpace?: LondonColorSpace;
     vibrance?: number;
@@ -56,13 +66,15 @@ export async function buildLondonSignagePack(
   // Copy is outlined into vector paths, so the signage face must be in memory
   // before any master is built.
   await loadLondonSignageFace();
-  const rev = options.revision ?? 1;
+  // Never invent a revision number: an unstated revision ships as `rdraft-`.
+  const rev = options.revision ?? "draft";
   const colorSpace: LondonColorSpace = options.colorSpace ?? "rgb";
   const art = { colorSpace, vibrance: options.vibrance ?? 1 };
   const zip = new JSZip();
   const files: LondonPackFile[] = [];
+  const skipped: LondonPackSkip[] = [];
   const rows: string[] = [
-    "panel_id,name,floor,room,style,trim_mm,bleed_mm,bleed_edge_mm,lockup,colourway,family,copy,logo_x_mm,logo_y_mm,logo_w_mm,nudge_dx,nudge_dy,scale,colour_space,ground_builds",
+    "panel_id,name,floor,room,style,trim_mm,bleed_mm,bleed_edge_mm,lockup,colourway,family,copy,logo_x_mm,logo_y_mm,logo_w_mm,nudge_dx,nudge_dy,scale,colour_space,ground_builds,status",
   ];
 
   for (const [index, panel] of panels.entries()) {
@@ -72,11 +84,24 @@ export async function buildLondonSignagePack(
     const svgPath = `${dir}/${base}.svg`;
     const aiPath = `${dir}/${base}.ai`;
 
-    zip.file(svgPath, buildLondonPanelSvg(panel, art));
-    // Vendor booths embed their supplied wall, so await the artwork resolve.
-    zip.file(aiPath, londonAiBytes(await buildLondonPanelAiAsync(panel, art)));
-    files.push({ path: svgPath, panelId: panel.id, kind: "svg" });
-    files.push({ path: aiPath, panelId: panel.id, kind: "ai" });
+    // Same print gate a single-panel download runs: a bulk pack must never be
+    // the loophole that lets a failing master reach a printer.
+    let status = "included";
+    try {
+      const svgOut = buildLondonPanelSvg(panel, art);
+      gateOnQa(auditSvg(panel, svgOut, art));
+      // Vendor booths embed their supplied wall, so await the artwork resolve.
+      const ai = await buildLondonPanelAiAsync(panel, art);
+      gateOnQa(auditAi(panel, ai, art));
+      zip.file(svgPath, svgOut);
+      zip.file(aiPath, londonAiBytes(ai));
+      files.push({ path: svgPath, panelId: panel.id, kind: "svg" });
+      files.push({ path: aiPath, panelId: panel.id, kind: "ai" });
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : "Print check failed";
+      skipped.push({ panelId: panel.id, name: panel.name, reason });
+      status = `SKIPPED — ${reason.replace(/[\r\n]+/g, " ")}`;
+    }
 
     rows.push(
       [
@@ -106,6 +131,7 @@ export async function buildLondonSignagePack(
                 .join(" | ")
             : londonPanelStops(panel).join(" ")
         }"`,
+        `"${status}"`,
       ].join(","),
     );
 
@@ -120,7 +146,12 @@ export async function buildLondonSignagePack(
     "README.txt",
     [
       "TransPerfect NEXT 2026 — London signage pack",
-      `Panels: ${panels.length} · files: ${files.length} · revision r${rev}`,
+      `Panels: ${panels.length} · files: ${files.length} · revision ${
+        rev === "draft" ? "UNPUBLISHED DRAFT (rdraft)" : `r${String(rev).padStart(3, "0")}`
+      }`,
+      skipped.length
+        ? `WARNING: ${skipped.length} panel(s) failed the print check and are NOT in this pack. See SKIPPED.txt.`
+        : "",
       `Colour space: ${
         colorSpace === "cmyk"
           ? `DeviceCMYK — vibrant-corrected print masters (vibrance ${art.vibrance}). ` +
@@ -142,11 +173,25 @@ export async function buildLondonSignagePack(
       "Artboards are full bleed. Trim origin and bleed per edge are recorded in the",
       "SVG metadata and in manifest.csv. Body copy prints 100K; use only the approved",
       "lockup colourways shipped here and never place them on complex artwork.",
-    ].join("\n"),
+    ]
+      .filter(Boolean)
+      .join("\n"),
   );
+  if (skipped.length) {
+    zip.file(
+      "SKIPPED.txt",
+      [
+        "These panels failed the print check and are NOT in this pack.",
+        "Do not assume they are approved — open each one, fix the reported problem",
+        "and download it again.",
+        "",
+        ...skipped.map((s) => `- ${s.name} (${s.panelId}): ${s.reason}`),
+      ].join("\n"),
+    );
+  }
 
   const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE" });
-  return { blob, files, manifest };
+  return { blob, files, manifest, skipped };
 }
 
 /** One-line human description of a panel's lockup, for the UI. */

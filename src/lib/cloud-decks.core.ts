@@ -83,7 +83,7 @@ export function toUuid(local: string): string {
 
 type QueryResult = { data: unknown; error: { message: string } | null };
 interface QueryBuilder extends PromiseLike<QueryResult> {
-  upsert: (row: Record<string, unknown>) => QueryBuilder;
+  upsert: (row: Record<string, unknown> | Record<string, unknown>[]) => QueryBuilder;
   insert: (rows: unknown) => QueryBuilder;
   select: (cols: string) => QueryBuilder;
   delete: () => QueryBuilder;
@@ -156,9 +156,24 @@ export async function saveDeckToCloudCore(
   });
   if (deckErr) throw new Error(deckErr.message);
 
-  // Replace slides.
-  await sb.from("deck_slides").delete().eq("deck_id", deckUuid);
-  if (data.deck.slides.length > 0) {
+  // Replace slides — write first, prune after. Deleting up front meant a failed
+  // insert left the deck with no slides at all, i.e. a save that destroyed work.
+  const { data: existingRows } = await sb.from("deck_slides").select("id").eq("deck_id", deckUuid);
+  const existingIds = Array.isArray(existingRows)
+    ? (existingRows as { id: string }[]).map((r) => r.id)
+    : [];
+
+  if (data.deck.slides.length === 0) {
+    // An empty deck overwriting saved slides is almost never what the user meant.
+    if (existingIds.length > 0) {
+      throw new Error(
+        `This copy of the deck has no slides, but ${existingIds.length} slide(s) are saved in the cloud. Nothing was changed — reload the saved deck before saving again.`,
+      );
+    }
+    return { deckUuid, briefUuid };
+  }
+
+  {
     const rows = data.deck.slides.map((s) => ({
       id: toUuid(`slide:${userId}:${data.deck.id}:${s.id}`),
       deck_id: deckUuid,
@@ -175,8 +190,15 @@ export async function saveDeckToCloudCore(
 
       notes: s.notes ?? null,
     }));
-    const { error: slideErr } = await sb.from("deck_slides").insert(rows);
+    // Ids are deterministic, so an upsert updates in place instead of colliding.
+    const { error: slideErr } = await sb.from("deck_slides").upsert(rows);
     if (slideErr) throw new Error(slideErr.message);
+
+    // Only now remove slides the user actually deleted.
+    const keep = new Set(rows.map((r) => r.id));
+    for (const id of existingIds) {
+      if (!keep.has(id)) await sb.from("deck_slides").delete().eq("id", id);
+    }
   }
 
   return { deckUuid, briefUuid };

@@ -167,6 +167,9 @@ function LondonTemplatePage() {
   const [printPreview, setPrintPreview] = useState(true);
   const stageRef = useRef<HTMLDivElement | null>(null);
 
+  // Nothing published yet (or unreachable) must ship as `rdraft-`, never `r000`.
+  const revStamp: number | "draft" = headRev > 0 ? headRev : "draft";
+
   useEffect(() => {
     let live = true;
     fetchHead({})
@@ -234,7 +237,7 @@ function LondonTemplatePage() {
   const downloadPanel = useCallback(
     async (kind: "svg" | "ai") => {
       await loadLondonSignageFace();
-      const base = londonPanelFileBase(panel, headRev, colorSpace);
+      const base = londonPanelFileBase(panel, revStamp, colorSpace);
       try {
         let blob: Blob;
         if (kind === "svg") {
@@ -257,7 +260,7 @@ function LondonTemplatePage() {
         toast.error(error instanceof Error ? error.message : "Download blocked by QA");
       }
     },
-    [panel, art, colorSpace, headRev],
+    [panel, art, colorSpace, revStamp],
   );
 
   // Drag with window-level listeners so the pointer can leave the box.
@@ -312,6 +315,8 @@ function LondonTemplatePage() {
     const id = toast.loading(`Building ${panels.length} panels…`);
     try {
       const pack = await buildLondonSignagePack(panels, {
+        // Stamp the revision actually in force — never a number nobody published.
+        revision: revStamp,
         colorSpace,
         vibrance,
         onProgress: (done, total) => setProgress({ done, total }),
@@ -324,7 +329,14 @@ function LondonTemplatePage() {
       }.zip`;
       link.click();
       URL.revokeObjectURL(url);
-      toast.success(`${pack.files.length} files packed · ${colorSpace.toUpperCase()}`, { id });
+      if (pack.skipped.length) {
+        toast.warning(
+          `${pack.files.length} files packed · ${pack.skipped.length} sign(s) failed the print check and were left out — see SKIPPED.txt`,
+          { id, duration: 10000 },
+        );
+      } else {
+        toast.success(`${pack.files.length} files packed · ${colorSpace.toUpperCase()}`, { id });
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Pack failed", { id });
     } finally {
