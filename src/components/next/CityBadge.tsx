@@ -3,10 +3,11 @@ import type { CSSProperties } from "react";
 import {
   BADGE_SPEC,
   BADGE_LOCKUP_WINDOW,
+  BADGE_BACK_LINE,
+  NEXT_BADGE_GROUND,
   SAFE_INSET_X,
   SAFE_INSET_Y,
   cityBadgeFace,
-  cityBadgeDivision,
   cityBadgeLockup,
   type CityBadgeConfig,
 } from "@/lib/next-city-badge";
@@ -17,17 +18,17 @@ type Props = {
   ppi?: number;
   /** Bleed / trim / safe-area / cutout guides over the artwork. */
   guides?: boolean;
-  /** Front carries the attendee copy; the back is the same artwork, logo only. */
+  /** Front carries the attendee copy; the back is the ground, mark and line. */
   side?: "front" | "back";
   style?: CSSProperties;
   className?: string;
 };
 
 /**
- * General NEXT badge — the approved artwork face run full bleed. The only thing
- * a division changes is the mark at the head: its window is repainted from the
- * same artwork and the division lockup is dropped straight in, so no plate,
- * panel or extra copy is ever added.
+ * NEXT attendee badge — the one approved template for NEXT and every sub-NEXT
+ * event. The ground, chevron stack and type are drawn live, so each division
+ * area is the same artwork with its own white-with-accent lockup on the front
+ * and the back.
  */
 export function CityBadge({
   config,
@@ -39,9 +40,6 @@ export function CityBadge({
 }: Props) {
   const face = cityBadgeFace(config.face);
   const lockup = cityBadgeLockup(config.divisionId);
-  const division = cityBadgeDivision(config.divisionId);
-  // City Series is already the baked mark, so its artwork stays untouched.
-  const swapLockup = config.showLockup && !!lockup.url && config.divisionId !== "city-series";
   const px = (inches: number) => inches * ppi;
   const w = px(BADGE_SPEC.bleedW);
   const h = px(BADGE_SPEC.bleedH);
@@ -49,7 +47,8 @@ export function CityBadge({
   const safeY = px(SAFE_INSET_Y);
   const klikTop = h - px(BADGE_SPEC.klik.fromBottom + BADGE_SPEC.klik.h);
   const scale = ppi / 96;
-  const markUrl = face.id === "light" ? division.colorUrl || lockup.url : lockup.url;
+  const showMark = config.showLockup && !!lockup.url;
+  const markW = px(side === "back" ? BADGE_LOCKUP_WINDOW.backMarkW : BADGE_LOCKUP_WINDOW.markW);
 
   const eventLine = [config.cityLabel, config.datesLabel, config.venueLabel]
     .map((s) => s.trim())
@@ -65,50 +64,37 @@ export function CityBadge({
         width: w,
         height: h,
         overflow: "hidden",
-        background: "#03002C",
+        background: NEXT_BADGE_GROUND.core,
         ...style,
       }}
     >
-      <img
-        src={face.artwork}
-        alt=""
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          display: "block",
-        }}
-      />
+      <BadgeGround w={w} h={h} side={side} />
 
-      {swapLockup ? (
+      {/* Division mark — front sits at the head, back is centred. */}
+      {showMark ? (
         <div
           style={{
             position: "absolute",
             left: 0,
             right: 0,
-            top: px(BADGE_LOCKUP_WINDOW.top),
-            height: px(BADGE_LOCKUP_WINDOW.height),
-            // Same artwork, sampled from a mark-free band, so the field reads
-            // continuous where the original lockup used to sit.
-            backgroundImage: `url(${face.artwork})`,
-            backgroundSize: `${w}px ${h}px`,
-            backgroundPosition: `0px ${-px(BADGE_LOCKUP_WINDOW.sampleFrom)}px`,
-            backgroundRepeat: "no-repeat",
+            ...(side === "back"
+              ? { top: 0, bottom: 0, alignItems: "center" }
+              : {
+                  top: px(BADGE_LOCKUP_WINDOW.top),
+                  height: px(BADGE_LOCKUP_WINDOW.height),
+                  alignItems: "center",
+                }),
             display: "flex",
-            alignItems: "center",
             justifyContent: "center",
           }}
         >
           <img
-            src={markUrl}
+            src={lockup.url}
             alt=""
             aria-hidden
             style={{
-              width: px(BADGE_LOCKUP_WINDOW.markW),
-              height: px(BADGE_LOCKUP_WINDOW.markW) / lockup.ratio,
+              width: markW,
+              height: markW / lockup.ratio,
               objectFit: "contain",
               display: "block",
             }}
@@ -116,7 +102,7 @@ export function CityBadge({
         </div>
       ) : null}
 
-      {/* Safe-area copy — front only; the back is artwork and mark alone. */}
+      {/* Safe-area copy — front only. */}
       {side === "front" ? (
         <div
           style={{
@@ -218,10 +204,79 @@ export function CityBadge({
             </div>
           ) : null}
         </div>
-      ) : null}
+      ) : (
+        <div
+          style={{
+            position: "absolute",
+            left: safeX,
+            right: safeX,
+            bottom: h - klikTop + px(0.1),
+            textAlign: "center",
+            color: "rgba(255,255,255,0.78)",
+            fontSize: 8.5 * scale,
+            fontWeight: 600,
+            letterSpacing: 3.4 * scale,
+          }}
+        >
+          {BADGE_BACK_LINE}
+        </div>
+      )}
 
       {guides ? <BadgeGuides ppi={ppi} /> : null}
     </div>
+  );
+}
+
+/**
+ * The approved ground: a violet → blue ascent with a cool aqua-blue foot, and
+ * the NEXT chevron stack as a faint white texture climbing the sheet.
+ */
+function BadgeGround({ w, h, side }: { w: number; h: number; side: "front" | "back" }) {
+  const chevW = w * 0.62;
+  const step = h * 0.185;
+  const rows = [-0.55, -0.18, 0.19, 0.56, 0.93].map((k) => h * 0.12 + k * step * 2);
+  return (
+    <svg
+      width={w}
+      height={h}
+      viewBox={`0 0 ${w} ${h}`}
+      style={{ position: "absolute", inset: 0, display: "block" }}
+      aria-hidden
+      preserveAspectRatio="none"
+    >
+      <defs>
+        <linearGradient id="nb-ground" x1="0" y1="0" x2="0.35" y2="1">
+          <stop offset="0" stopColor={NEXT_BADGE_GROUND.topLeft} />
+          <stop offset="0.34" stopColor={NEXT_BADGE_GROUND.topRight} />
+          <stop offset="0.62" stopColor={NEXT_BADGE_GROUND.core} />
+          <stop offset="1" stopColor={NEXT_BADGE_GROUND.foot} />
+        </linearGradient>
+        <radialGradient id="nb-glow" cx="0.16" cy="0.06" r="0.85">
+          <stop offset="0" stopColor={NEXT_BADGE_GROUND.topLeft} stopOpacity="0.9" />
+          <stop offset="1" stopColor={NEXT_BADGE_GROUND.glow} stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="nb-core" cx="0.5" cy="0.52" r="0.6">
+          <stop offset="0" stopColor="#0B2AB8" stopOpacity="0.55" />
+          <stop offset="1" stopColor="#0B2AB8" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width={w} height={h} fill="url(#nb-ground)" />
+      <rect width={w} height={h} fill="url(#nb-glow)" />
+      <rect width={w} height={h} fill="url(#nb-core)" />
+      <g fill={NEXT_BADGE_GROUND.chevronInk} opacity={side === "back" ? 1 : 0.55}>
+        {rows.map((y, i) => {
+          const x0 = (w - chevW) / 2;
+          const rise = step * 0.62;
+          const thick = step * 0.42;
+          return (
+            <path
+              key={i}
+              d={`M${x0} ${y + rise} L${x0 + chevW / 2} ${y} L${x0 + chevW} ${y + rise} L${x0 + chevW} ${y + rise + thick} L${x0 + chevW / 2} ${y + thick} L${x0} ${y + rise + thick} Z`}
+            />
+          );
+        })}
+      </g>
+    </svg>
   );
 }
 

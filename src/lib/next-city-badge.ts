@@ -1,26 +1,19 @@
 // -----------------------------------------------------------------------------
-// TransPerfect NEXT — City Series attendee badge.
+// TransPerfect NEXT — attendee badge (single approved template).
 //
-// The supplied source pack ("CityNEXT badge.ai" / "CityNEXT badge copy.pdf")
-// carries three pages: the plastic-badge print template, and two approved
-// artwork faces at the exact bleed size of 4.58" × 6.55".
+// One template now serves NEXT and every sub-NEXT event: the approved violet →
+// blue ascent ground with the chevron stack, the white-with-accent division
+// lockup on the front and the back, and BEYOND INTELLIGENCE on the back foot.
+// The earlier dark / light artwork faces and the supplied source pack are
+// retired — every division area renders live off this one template, so nothing
+// can drift between areas.
 //
-//   page 1  template / specification
-//   page 2  DARK face  — navy chevron ascent
-//   page 3  LIGHT face — aqua-to-blue diagonal
-//
-// Both faces are approved. Admins pick which face a print run uses; everything
-// else on the badge (city, dates, venue, role band, attendee copy) is typeset
-// over the artwork inside the template safe area.
+// Geometry is unchanged: the 4.33" × 6.3" dual-slot plastic template with the
+// BLE Klik cutout, art run full bleed at 4.58" × 6.55".
 // -----------------------------------------------------------------------------
 
 import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
 import { nextLockupSuite } from "@/lib/next-event-logos";
-import faceDark from "@/assets/next-city-badge/citynext-badge-face-dark.png.asset.json";
-import faceLight from "@/assets/next-city-badge/citynext-badge-face-light.png.asset.json";
-import sourceAi from "@/assets/next-city-badge/citynext-badge.ai.asset.json";
-import sourcePdf from "@/assets/next-city-badge/citynext-badge.pdf.asset.json";
-import templateJpg from "@/assets/next-city-badge/citynext-badge-template.jpg.asset.json";
 
 /** Approved plastic-badge production geometry (inches). */
 export const BADGE_SPEC = {
@@ -45,17 +38,16 @@ export const BADGE_SPEC = {
 export const SAFE_INSET_X = (BADGE_SPEC.bleedW - BADGE_SPEC.safeW) / 2;
 export const SAFE_INSET_Y = (BADGE_SPEC.bleedH - BADGE_SPEC.safeH) / 2;
 
-export type CityBadgeFaceId = "dark" | "light";
+/** One approved template for NEXT and every sub-NEXT event. */
+export type CityBadgeFaceId = "next";
 
 export type CityBadgeFace = {
   id: CityBadgeFaceId;
   label: string;
   description: string;
-  /** Full-bleed artwork, 300 ppi, exactly 4.58" × 6.55". */
-  artwork: string;
-  /** Ink the typeset copy uses on this face. */
+  /** Ink the typeset copy uses. */
   ink: string;
-  /** Panel behind the attendee block so copy always clears the artwork. */
+  /** Panel behind the attendee block so copy always clears the ground. */
   panel: string;
   panelInk: string;
   /** Role band fill / ink. */
@@ -63,36 +55,40 @@ export type CityBadgeFace = {
   bandInk: string;
 };
 
-export const CITY_BADGE_FACES: CityBadgeFace[] = [
-  {
-    id: "dark",
-    label: "Dark — chevron ascent",
-    description:
-      "Navy field with the ascending chevron stack and the NEXT City Series lockup at the head. Default for main-stage and evening programmes.",
-    artwork: faceDark.url,
-    ink: "#FFFFFF",
-    panel: "rgba(3,0,44,0.72)",
-    panelInk: "#FFFFFF",
-    band: "#A1FBF9",
-    bandInk: "#03002C",
-  },
-  {
-    id: "light",
-    label: "Light — diagonal aqua",
-    description:
-      "Aqua-to-blue diagonal field with the centred City Series lockup. Default for daytime sessions, expo and registration.",
-    artwork: faceLight.url,
-    ink: "#FFFFFF",
-    panel: "rgba(255,255,255,0.92)",
-    panelInk: "#03002C",
-    band: "#003FC7",
-    bandInk: "#FFFFFF",
-  },
-];
+export const CITY_BADGE_FACE: CityBadgeFace = {
+  id: "next",
+  label: "NEXT template",
+  description:
+    "Approved NEXT ground — violet-to-blue ascent with the chevron stack, the white-with-accent division lockup on the front and back, BEYOND INTELLIGENCE on the back foot.",
+  ink: "#FFFFFF",
+  panel: "rgba(3,0,44,0.58)",
+  panelInk: "#FFFFFF",
+  band: "#A1FBF9",
+  bandInk: "#03002C",
+};
 
-export function cityBadgeFace(id: string | undefined): CityBadgeFace {
-  return CITY_BADGE_FACES.find((f) => f.id === id) ?? CITY_BADGE_FACES[0]!;
+/** Kept as a one-entry list so existing callers keep working. */
+export const CITY_BADGE_FACES: CityBadgeFace[] = [CITY_BADGE_FACE];
+
+export function cityBadgeFace(_id?: string | undefined): CityBadgeFace {
+  return CITY_BADGE_FACE;
 }
+
+/**
+ * The approved ground, as the live renderer draws it: a violet → blue ascent
+ * with a cooler aqua-blue foot, and the chevron stack as a faint white texture.
+ */
+export const NEXT_BADGE_GROUND = {
+  topLeft: "#C266E8",
+  topRight: "#4457DE",
+  core: "#1D3FD1",
+  foot: "#8FD2F4",
+  glow: "#7A5BF0",
+  chevronInk: "rgba(255,255,255,0.10)",
+} as const;
+
+/** Standing line on the back foot of every NEXT badge. */
+export const BADGE_BACK_LINE = "BEYOND INTELLIGENCE";
 
 // ---------------------------------------------------------------------------
 // NEXT division tracks. The badge artwork, geometry and typesetting stay
@@ -129,36 +125,25 @@ export function cityBadgeDivision(id: string | undefined): CityBadgeDivision {
   );
 }
 
-/** Lockup artwork for a division on a given face — white on the dark and
- *  aqua-blue fields, full colour only where the ground is near-white. */
+/** Lockup for a division — always the white mark with its colour accent, which
+ *  is the only approved treatment on this ground. */
 export function cityBadgeLockup(divisionId: string | undefined): { url: string; ratio: number } {
   const div = cityBadgeDivision(divisionId);
   return { url: div.whiteUrl || div.colorUrl, ratio: div.ratio };
 }
 
-/** The originals, kept downloadable so production can work from source. */
-export const CITY_BADGE_SOURCE = {
-  ai: sourceAi.url,
-  pdf: sourcePdf.url,
-  template: templateJpg.url,
-} as const;
-
 /** Attendee tiers printed on the role band of the general NEXT badge. */
 export const CITY_BADGE_ROLES = ["ATTENDEE", "EMPLOYEE", "CLIENT", "SPECIAL GUEST", "VIP"] as const;
 
-/**
- * Where the supplied artwork carries its baked NEXT lockup. Swapping a division
- * mark replaces exactly this window — the field around it is resampled from the
- * same artwork, so nothing is added to the badge and no plate appears.
- */
+/** Where the division lockup sits on the template (inches from the bleed top). */
 export const BADGE_LOCKUP_WINDOW = {
-  /** Window covered on the plate (inches from the top of the bleed sheet). */
-  top: 0.28,
-  height: 1.95,
-  /** Mark-free band of the same artwork used to repaint that window. */
-  sampleFrom: 3.5,
-  /** Replacement lockup width on the plate. */
+  /** Front: mark at the head of the badge. */
+  top: 0.42,
+  height: 1.72,
+  /** Front mark width on the plate. */
   markW: 2.62,
+  /** Back: mark centred on the ground, a touch larger. */
+  backMarkW: 2.86,
 } as const;
 
 /**
@@ -185,7 +170,7 @@ export type CityBadgeConfig = {
 };
 
 export const CITY_BADGE_DEFAULT: CityBadgeConfig = {
-  face: "dark",
+  face: "next",
   divisionId: "city-series",
   showLockup: true,
   cityLabel: "City Series",
@@ -204,7 +189,9 @@ export function normalizeCityBadgeConfig(input: unknown): CityBadgeConfig {
   const raw = (input ?? {}) as Partial<CityBadgeConfig>;
   const str = (v: unknown, fallback: string) => (typeof v === "string" ? v : fallback);
   return {
-    face: raw.face === "light" ? "light" : "dark",
+    // Legacy rows saved a dark / light artwork face; both now resolve to the
+    // single approved NEXT template.
+    face: "next",
     divisionId: cityBadgeDivision(typeof raw.divisionId === "string" ? raw.divisionId : undefined)
       .id,
     showLockup: raw.showLockup !== false,

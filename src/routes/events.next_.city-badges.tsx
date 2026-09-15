@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Download, FileDown, Ruler, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Download, Ruler, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -13,9 +13,8 @@ import {
   BADGE_SPEC,
   CITY_BADGE_DEFAULT,
   CITY_BADGE_DIVISIONS,
-  CITY_BADGE_FACES,
   CITY_BADGE_ROLES,
-  CITY_BADGE_SOURCE,
+  CITY_BADGE_FACE,
   normalizeCityBadgeConfig,
   type CityBadgeConfig,
   type CityBadgeFaceId,
@@ -30,23 +29,23 @@ export const Route = createFileRoute("/events/next_/city-badges")({
   validateSearch: (search: Record<string, unknown>) => ({
     division: typeof search.division === "string" ? search.division : undefined,
     face:
-      search.face === "light" || search.face === "dark"
+      search.face === "next"
         ? (search.face as CityBadgeFaceId)
         : undefined,
   }),
   head: () => ({
     meta: [
-      { title: "NEXT City Series badge · Print-ready templates" },
+      { title: "NEXT attendee badge studio · Print-ready template" },
       {
         name: "description",
         content:
-          "Both approved TransPerfect NEXT City Series attendee badge faces on the 4.33″ × 6.3″ dual-slot plastic template, with admin print-run versions exporting PDF, .ai and a proof PNG.",
+          "The approved TransPerfect NEXT attendee badge template — front and back on the 4.33″ × 6.3″ dual-slot plastic sheet, with print-run versions exporting PDF, .ai and a proof PNG.",
       },
-      { property: "og:title", content: "NEXT City Series attendee badge" },
+      { property: "og:title", content: "NEXT attendee badge studio" },
       {
         property: "og:description",
         content:
-          "Dark and light City Series badge faces, press geometry, and saved print-run versions with PDF + .ai + proof exports.",
+          "One NEXT badge template with per-division front and back live versions, press geometry, and saved print-run versions with PDF + .ai + proof exports.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -159,10 +158,10 @@ function CityBadgePage() {
           NEXT attendee badge
         </h1>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-black/60">
-          One general NEXT badge for every area. Both supplied faces are approved artwork, run full
-          bleed on the {BADGE_SPEC.trimW}″ × {BADGE_SPEC.trimH}″ dual-slot plastic template with the
-          BLE Klik cutout. Swap the head mark for any division logo — front and back — pick the
-          attendee tier, then export PDF, an Illustrator twin and a proof PNG.
+          One approved NEXT template for every area, run full bleed on the {BADGE_SPEC.trimW}″ ×{" "}
+          {BADGE_SPEC.trimH}″ dual-slot plastic sheet with the BLE Klik cutout. Pick a division and
+          its white-with-accent lockup prints on the front and the back, pick the attendee tier, then
+          export PDF, an Illustrator twin and a proof PNG.
         </p>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
@@ -220,30 +219,6 @@ function CityBadgePage() {
                   as {BADGE_SPEC.exportPreset}
                 </li>
               </ul>
-              <div className="mt-3 flex flex-wrap gap-3">
-                <a
-                  className="inline-flex items-center gap-1.5 text-[#003FC7] hover:underline"
-                  href={CITY_BADGE_SOURCE.ai}
-                  download
-                >
-                  <FileDown size={13} /> Source .ai
-                </a>
-                <a
-                  className="inline-flex items-center gap-1.5 text-[#003FC7] hover:underline"
-                  href={CITY_BADGE_SOURCE.pdf}
-                  download
-                >
-                  <FileDown size={13} /> Source PDF
-                </a>
-                <a
-                  className="inline-flex items-center gap-1.5 text-[#003FC7] hover:underline"
-                  href={CITY_BADGE_SOURCE.template}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <FileDown size={13} /> Print template sheet
-                </a>
-              </div>
             </div>
           </div>
 
@@ -290,41 +265,17 @@ function CityBadgePage() {
                   checked={config.showLockup}
                   onChange={(e) => set("showLockup", e.target.checked)}
                 />
-                Swap the head mark for this logo
+                Print this division lockup on the front and back
               </label>
             </section>
 
             <section className="rounded-2xl border border-black/10 bg-white p-4">
-              <h2 className="text-sm font-semibold text-[#03002C]">Artwork face</h2>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                {CITY_BADGE_FACES.map((face) => {
-                  const active = config.face === face.id;
-                  return (
-                    <button
-                      key={face.id}
-                      type="button"
-                      onClick={() => set("face", face.id as CityBadgeFaceId)}
-                      aria-pressed={active}
-                      className={`rounded-xl border p-3 text-left transition ${
-                        active
-                          ? "border-[#003FC7] bg-[#E0E8F5]"
-                          : "border-black/10 bg-white hover:border-black/25"
-                      }`}
-                    >
-                      <img
-                        src={face.artwork}
-                        alt={face.label}
-                        className="h-32 w-full rounded-lg bg-[#03002C] object-contain"
-                        loading="lazy"
-                      />
-                      <div className="mt-2 text-xs font-semibold text-[#03002C]">{face.label}</div>
-                      <p className="mt-1 text-[11px] leading-snug text-black/55">
-                        {face.description}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
+              <h2 className="text-sm font-semibold text-[#03002C]">Template</h2>
+              <p className="mt-1.5 text-[11.5px] leading-snug text-black/60">
+                {CITY_BADGE_FACE.description} It is the only badge template — the earlier dark,
+                light and City Series faces are retired, so every division area prints the same
+                artwork with its own lockup.
+              </p>
             </section>
 
             <section className="rounded-2xl border border-black/10 bg-white p-5">
@@ -489,7 +440,7 @@ function CityBadgePage() {
                             {row.name}
                           </div>
                           <div className="truncate text-[11px] text-black/55">
-                            {cfg.face === "light" ? "Light face" : "Dark face"} ·{" "}
+                            NEXT template ·{" "}
                             {[cfg.cityLabel, cfg.datesLabel, cfg.venueLabel]
                               .filter(Boolean)
                               .join(" · ") || "no event line"}

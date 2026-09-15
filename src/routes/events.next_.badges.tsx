@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, FileDown, Ruler } from "lucide-react";
+import { ArrowLeft, ArrowRight, Ruler } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { CityBadge } from "@/components/next/CityBadge";
@@ -8,11 +8,9 @@ import {
   BADGE_SPEC,
   CITY_BADGE_DEFAULT,
   CITY_BADGE_DIVISIONS,
-  CITY_BADGE_FACES,
+  CITY_BADGE_FACE,
   CITY_BADGE_ROLES,
-  CITY_BADGE_SOURCE,
   cityBadgeDivision,
-  type CityBadgeFaceId,
 } from "@/lib/next-city-badge";
 
 export const Route = createFileRoute("/events/next_/badges")({
@@ -21,17 +19,17 @@ export const Route = createFileRoute("/events/next_/badges")({
   }),
   head: () => ({
     meta: [
-      { title: "NEXT 2026 attendee badges · Division variations" },
+      { title: "NEXT attendee badges · One template, every division" },
       {
         name: "description",
         content:
-          "Every TransPerfect NEXT 2026 division attendee badge on the approved City Series artwork — 4.33″ × 6.3″ dual-slot plastic template with the BLE Klik cutout, dark and light faces.",
+          "Every TransPerfect NEXT division attendee badge on the one approved NEXT template — front and back on the 4.33″ × 6.3″ dual-slot plastic sheet with the BLE Klik cutout.",
       },
-      { property: "og:title", content: "NEXT 2026 attendee badges" },
+      { property: "og:title", content: "NEXT attendee badges" },
       {
         property: "og:description",
         content:
-          "Approved City Series badge artwork with a division lockup swap for every NEXT area, print-ready with PDF, .ai and proof export.",
+          "The approved NEXT badge template with front and back live versions for every division area, print-ready with PDF, .ai and proof export.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -50,7 +48,6 @@ function BadgesPage() {
     return one ? [one] : CITY_BADGE_DIVISIONS;
   }, [divisionParam]);
 
-  const [face, setFace] = useState<CityBadgeFaceId>("dark");
   const [guides, setGuides] = useState(false);
   const [roleLabel, setRoleLabel] = useState(CITY_BADGE_DEFAULT.roleLabel);
 
@@ -64,33 +61,17 @@ function BadgesPage() {
           <ArrowLeft size={14} /> NEXT 2026 kit
         </Link>
 
-        <h1 className="mt-4 text-3xl font-semibold tracking-[-0.02em]">
-          NEXT 2026 attendee badges
-        </h1>
+        <h1 className="mt-4 text-3xl font-semibold tracking-[-0.02em]">NEXT attendee badges</h1>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-          Every division area now runs on the approved City Series badge artwork — full bleed on the{" "}
-          {BADGE_SPEC.trimW}″ × {BADGE_SPEC.trimH}″ dual-slot plastic template with the BLE Klik
-          cutout. Palette and geometry are fixed; only the division lockup and the typeset copy
-          change. Open any card to edit copy, save the print run and export PDF, an Illustrator twin
-          and a proof PNG.
+          One approved NEXT template now covers NEXT and every sub-NEXT event — the violet-to-blue
+          ascent ground with the chevron stack, full bleed on the {BADGE_SPEC.trimW}″ ×{" "}
+          {BADGE_SPEC.trimH}″ dual-slot plastic template with the BLE Klik cutout. Every division
+          area has a live front and back carrying its own white-with-accent lockup; the older dark,
+          light and City Series badge templates are retired. Open any card to edit copy, save the
+          print run and export PDF, an Illustrator twin and a proof PNG.
         </p>
 
         <div className="mt-6 flex flex-wrap items-center gap-3 text-xs">
-          <div className="flex items-center gap-1 rounded-full border border-border p-1">
-            {CITY_BADGE_FACES.map((f) => (
-              <button
-                key={f.id}
-                onClick={() => setFace(f.id)}
-                className={`rounded-full px-3 py-1 font-medium transition ${
-                  face === f.id
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
           <label className="inline-flex items-center gap-2 text-muted-foreground">
             Role
             <select
@@ -113,20 +94,6 @@ function BadgesPage() {
             <Ruler size={12} /> {BADGE_SPEC.colorMode} · {BADGE_SPEC.minImageDpi} ppi ·{" "}
             {BADGE_SPEC.exportPreset}
           </span>
-          <a
-            href={CITY_BADGE_SOURCE.ai}
-            download
-            className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline"
-          >
-            <FileDown size={12} /> Source .ai
-          </a>
-          <a
-            href={CITY_BADGE_SOURCE.pdf}
-            download
-            className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline"
-          >
-            <FileDown size={12} /> Source PDF
-          </a>
         </div>
 
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -137,29 +104,32 @@ function BadgesPage() {
                 key={div.id}
                 className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4"
               >
-                <div className="flex justify-center overflow-hidden rounded-xl bg-[#03002C] p-3">
-                  <CityBadge
-                    config={{
-                      ...CITY_BADGE_DEFAULT,
-                      face,
-                      divisionId: div.id,
-                      roleLabel,
-                    }}
-                    ppi={PREVIEW_PPI}
-                    guides={guides}
-                    style={{ borderRadius: 4 }}
-                  />
+                <div className="flex justify-center gap-2 overflow-hidden rounded-xl bg-[#03002C] p-3">
+                  {(["front", "back"] as const).map((side) => (
+                    <CityBadge
+                      key={side}
+                      config={{
+                        ...CITY_BADGE_DEFAULT,
+                        divisionId: div.id,
+                        roleLabel,
+                      }}
+                      side={side}
+                      ppi={PREVIEW_PPI}
+                      guides={guides}
+                      style={{ borderRadius: 4 }}
+                    />
+                  ))}
                 </div>
                 <div>
                   <p className="text-sm font-medium">{resolved.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {BADGE_SPEC.trimW}″ × {BADGE_SPEC.trimH}″ trim · bleed {BADGE_SPEC.bleedW}″ ×{" "}
-                    {BADGE_SPEC.bleedH}″
+                    Front + back · {BADGE_SPEC.trimW}″ × {BADGE_SPEC.trimH}″ trim · bleed{" "}
+                    {BADGE_SPEC.bleedW}″ × {BADGE_SPEC.bleedH}″
                   </p>
                 </div>
                 <Link
                   to="/events/next/city-badges"
-                  search={{ division: div.id, face }}
+                  search={{ division: div.id, face: CITY_BADGE_FACE.id }}
                   className="mt-auto inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
                 >
                   Edit + export this badge <ArrowRight size={12} />

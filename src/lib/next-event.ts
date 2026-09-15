@@ -395,8 +395,8 @@ export type NextRegistryRow = {
   secondaryLabel?: string;
   /** In-app route for designs rendered by this build rather than in Canva. */
   internalUrl?: string;
-  /** Set on attendee badge rows so the hub renders a live City Series preview. */
-  badgeFace?: "dark" | "light";
+  /** Set on attendee badge rows so the hub renders the live NEXT badge. */
+  badgeSide?: "front" | "back";
 };
 
 export function normalizeNextRow(r: NextRegistryRowRaw): NextRegistryRow {
@@ -416,24 +416,24 @@ export function normalizeNextRow(r: NextRegistryRowRaw): NextRegistryRow {
 
 /**
  * Attendee badge artwork lives in this build (not Canva). Every division runs
- * the approved City Series template — only the division lockup changes — in
- * the two approved faces.
+ * the one approved NEXT template — the ascent ground with the chevron stack —
+ * with its own white-with-accent lockup on the front and the back.
  */
 export function nextBadgeRows(): NextRegistryRow[] {
-  const faces: { face: "dark" | "light"; code: string; label: string }[] = [
-    { face: "dark", code: "B1", label: "Attendee badge — dark face" },
-    { face: "light", code: "B2", label: "Attendee badge — light face" },
+  const sides: { side: "front" | "back"; code: string; label: string }[] = [
+    { side: "front", code: "B1", label: "Attendee badge — front" },
+    { side: "back", code: "B2", label: "Attendee badge — back" },
   ];
   return NEXT_DIVISIONS.flatMap((d) =>
-    faces.map(({ face, code, label }) => ({
+    sides.map(({ side, code, label }) => ({
       divisionId: d.id,
       group: "attendee-credentials" as const,
       code,
       format: label,
       size: "4.33×6.3 in · bleed 4.58×6.55 in",
       category: "Attendee credentials",
-      internalUrl: `/events/next/city-badges?division=${d.id}&face=${face}`,
-      badgeFace: face,
+      internalUrl: `/events/next/city-badges?division=${d.id}`,
+      badgeSide: side,
     })),
   );
 }

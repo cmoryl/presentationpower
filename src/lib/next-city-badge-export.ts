@@ -77,11 +77,11 @@ function readme(config: CityBadgeConfig, name: string, dpi: number, x4: boolean)
     ? `Standard:        PDF/X-4 — GTS_PDF_X output intent (GRACoL 2013 CRPC6) embedded`
     : `Standard:        plain PDF — PDF/X-4 wrap FAILED (offline?). Re-export online before sending to press.`;
   return [
-    `TransPerfect NEXT — City Series attendee badge`,
+    `TransPerfect NEXT — attendee badge (approved NEXT template)`,
     `Version: ${name}`,
     ``,
     `Division track: ${cityBadgeDivision(config.divisionId).name}`,
-    `Artwork face:   ${config.face === "light" ? "LIGHT (diagonal aqua)" : "DARK (chevron ascent)"}`,
+    `Template:       NEXT ascent ground — chevron stack, white-with-accent division lockup, front + back`,
     `Trim:           ${BADGE_SPEC.trimW}in x ${BADGE_SPEC.trimH}in`,
     `Bleed:          ${BADGE_SPEC.bleedW}in x ${BADGE_SPEC.bleedH}in (${BADGE_SPEC.bleed}in per edge)`,
     `Safe area:      ${BADGE_SPEC.safeW}in x ${BADGE_SPEC.safeH}in`,
