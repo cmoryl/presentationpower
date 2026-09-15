@@ -33,6 +33,14 @@ import {
 } from "@/lib/next-london-floormap-design";
 import { mapLogoRatio, mapLogoSvg } from "@/lib/next-london-floormap-logos";
 import { areaIconSvg } from "@/lib/next-london-floormap-icons";
+import {
+  clampSpan,
+  fitInFrame,
+  MIN_TYPE_PX,
+  packRow,
+  textWidth,
+  truncateToWidth,
+} from "@/lib/next-london-floormap-text";
 
 import {
   isCustomAreaId,
@@ -190,11 +198,30 @@ function brandBar(x: number, y: number, w: number): string {
 
 /** Directory credit strip — same face and palette as the map, so print stays cohesive. */
 function footerStrip(w: number, y: number, right: string, note?: string): string {
-  const left = `${venueName()} · ${eventName()} · Job ${LONDON_VENUE.job} · ${LONDON_VENUE.datesLabel}`;
+  // Three strings share one strip. The right-hand credit is measured first, the
+  // venue line takes what is left with a gutter between them, and the small
+  // print gets the full width — so the strip never collides or runs off.
+  const frameW = Math.max(80, w - PAD * 2);
+  const rightFit = fitInFrame(right, 9, frameW * 0.44, MIN_TYPE_PX, 0.5);
+  const leftFit = fitInFrame(
+    `${venueName()} · ${eventName()} · Job ${LONDON_VENUE.job} · ${LONDON_VENUE.datesLabel}`,
+    9,
+    Math.max(0, frameW - rightFit.width - 18),
+    MIN_TYPE_PX,
+    0.5,
+  );
+  const noteFit = fitInFrame(
+    note ??
+      "Schematic install plan — confirm exact positions on site with the venue production partner.",
+    8,
+    frameW,
+    MIN_TYPE_PX,
+    0.2,
+  );
   return `<g><path d="M ${PAD} ${n(y)} H ${n(w - PAD)}" stroke="${LINE}" stroke-width="1" />
-<text x="${PAD}" y="${n(y + 18)}" font-family="${FONT}" font-size="9" letter-spacing="0.5" fill="${NAVY}" opacity="0.6">${esc(left)}</text>
-<text x="${n(w - PAD)}" y="${n(y + 18)}" text-anchor="end" font-family="${FONT}" font-size="9" font-weight="600" letter-spacing="0.5" fill="${BLUE}" opacity="0.9">${esc(right)}</text>
-<text x="${PAD}" y="${n(y + 31)}" font-family="${FONT}" font-size="8" letter-spacing="0.2" fill="${NAVY}" opacity="0.38">${esc(note ?? "Schematic install plan — confirm exact positions on site with the venue production partner.")}</text></g>`;
+<text x="${PAD}" y="${n(y + 18)}" font-family="${FONT}" font-size="${n(leftFit.size)}" letter-spacing="0.5" fill="${NAVY}" opacity="0.6">${esc(leftFit.text)}</text>
+<text x="${n(w - PAD)}" y="${n(y + 18)}" text-anchor="end" font-family="${FONT}" font-size="${n(rightFit.size)}" font-weight="600" letter-spacing="0.5" fill="${BLUE}" opacity="0.9">${esc(rightFit.text)}</text>
+<text x="${PAD}" y="${n(y + 31)}" font-family="${FONT}" font-size="${n(noteFit.size)}" letter-spacing="0.2" fill="${NAVY}" opacity="0.38">${esc(noteFit.text)}</text></g>`;
 }
 
 function defs(): string {
@@ -310,15 +337,34 @@ function markerGlyph(
   return `${ring}${body}${core}`;
 }
 
-/** Name label drawn beside a pin, for the "named" label mode. */
-function markerLabel(m: LondonMarker, cx: number, cy: number, index = 0): string {
+/**
+ * Name label drawn beside a pin, for the "named" label mode. The label is fitted
+ * to the space between the pin and the sheet margin: it flips to the left of the
+ * pin when the right-hand run is too tight, and trims rather than cross the
+ * margin.
+ */
+function markerLabel(
+  m: LondonMarker,
+  cx: number,
+  cy: number,
+  index = 0,
+  frame: { left: number; right: number } = { left: PAD, right: Infinity },
+): string {
   const scale = Math.max(0.6, Math.min(1.8, DESIGN.pinScale));
   // Alternate above / below the pin so a run of pillars staggers instead of
   // printing one long unreadable line of overlapping names.
   const dy = index % 2 === 0 ? -8 * scale : 15 * scale;
-  const name = m.name.length > 26 ? `${m.name.slice(0, 25)}…` : m.name;
-  return `<text x="${n(cx + 9 * scale)}" y="${n(cy + dy)}" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.2" fill="${NAVY}" opacity="0.78">${esc(
-    name,
+  const name = truncateToWidth(m.name, 8.5, 150, 0.2) || m.name.slice(0, 26);
+  const gap = 9 * scale;
+  const rightRoom = frame.right - (cx + gap);
+  const leftRoom = cx - gap - frame.left;
+  const useRight = rightRoom >= leftRoom || rightRoom >= textWidth(name, 8.5, 0.2);
+  const fitted = fitInFrame(name, 8.5, Math.max(0, useRight ? rightRoom : leftRoom), 7, 0.2);
+  if (!fitted.text) return "";
+  return `<text x="${n(useRight ? cx + gap : cx - gap)}" y="${n(cy + dy)}"${
+    useRight ? "" : ' text-anchor="end"'
+  } font-family="${FONT}" font-size="${n(fitted.size)}" font-weight="600" letter-spacing="0.2" fill="${NAVY}" opacity="0.78">${esc(
+    fitted.text,
   )}</text>`;
 }
 
@@ -342,43 +388,66 @@ function indexBlock(markers: LondonMarker[], x: number, y: number, w: number): s
       const row = i % rows;
       const cx = x + col * colW;
       const cy = y + 26 + row * INDEX_ROW;
-      const max = Math.floor(colW / 5.2) - 7;
-      const name = m.name.length > max ? `${m.name.slice(0, max - 1)}…` : m.name;
+      // Each entry lives in its own column: the name is fitted to the column
+      // width less the number gutter, so two columns never run into each other.
+      const name = fitInFrame(m.name, 8.75, Math.max(0, colW - 34), MIN_TYPE_PX, 0.1);
       return `<text x="${n(cx + 15)}" y="${n(cy)}" text-anchor="end" font-family="${FONT}" font-size="8.5" font-weight="700" fill="${inkFor(
         m.kind,
-      )}">${i + 1}</text><text x="${n(cx + 23)}" y="${n(cy)}" font-family="${FONT}" font-size="8.75" letter-spacing="0.1" fill="${NAVY}" opacity="0.74">${esc(
-        name,
+      )}">${i + 1}</text><text x="${n(cx + 23)}" y="${n(cy)}" font-family="${FONT}" font-size="${n(name.size)}" letter-spacing="0.1" fill="${NAVY}" opacity="0.74">${esc(
+        name.text,
       )}</text>`;
     })
     .join("");
   return `<g>${head}${entries}</g>`;
 }
 
-/** Legend chips, greedily packed into rows so nothing runs off the sheet. */
+/** Chip band geometry: one row height, shared by the asset key and room key. */
+const CHIP_ROW = 19;
+/** Gap between room-key chips (the asset key packs flush). */
+const ROOM_CHIP_GAP = 7;
+
+/** Measured chip widths for the asset key, in draw order. */
+function legendChipWidths(kinds: LondonAssetKind[]): number[] {
+  return kinds.map((k) => textWidth(LONDON_ASSET_KIND_LABEL[k], 9.5, 0.2) + 34);
+}
+
+/** Measured chip widths for the attendee room key, in draw order. */
+function roomChipWidths(rooms: LondonZone[]): number[] {
+  return rooms.map(
+    (z) => textWidth(z.label.toUpperCase(), 8.5, 0.7) + (DESIGN.icons === false ? 26 : 34),
+  );
+}
+
+/**
+ * Extra height a chip band needs beyond its first row. Measuring and drawing
+ * share `packRow`, so a band can never wrap into the strip below it.
+ */
+function chipExtraHeight(widths: number[], frameW: number, gap: number): number {
+  return Math.max(0, packRow(widths, frameW, gap).rows - 1) * CHIP_ROW;
+}
+
+/** Legend chips, packed into rows so nothing runs off the sheet. */
 function legendRow(kinds: LondonAssetKind[], x: number, y: number, w: number): string {
-  const chips = kinds.map((k) => ({
-    k,
-    label: LONDON_ASSET_KIND_LABEL[k],
-    w: LONDON_ASSET_KIND_LABEL[k].length * 5.5 + 34,
-  }));
-  let cx = x;
-  let row = 0;
-  const out: string[] = [];
-  for (const chip of chips) {
-    if (cx > x && cx + chip.w > x + w) {
-      row += 1;
-      cx = x;
-    }
-    const cy = y + row * 19;
-    out.push(
-      `<circle cx="${n(cx + 5)}" cy="${n(cy - 3)}" r="4" fill="${inkFor(chip.k)}" />` +
-        `<text x="${n(cx + 15)}" y="${n(cy)}" font-family="${FONT}" font-size="9.5" letter-spacing="0.2" fill="${NAVY}" opacity="0.7">${esc(
-          chip.label,
-        )}</text>`,
+  const widths = legendChipWidths(kinds);
+  const { chips } = packRow(widths, w, 0);
+  const out = chips.map(({ index, x: dx, row }) => {
+    const k = kinds[index]!;
+    const label = fitInFrame(LONDON_ASSET_KIND_LABEL[k], 9.5, Math.max(0, w - 20), MIN_TYPE_PX, 0.2);
+    const cx = x + dx;
+    const cy = y + row * CHIP_ROW;
+    return (
+      `<circle cx="${n(cx + 5)}" cy="${n(cy - 3)}" r="4" fill="${inkFor(k)}" />` +
+      `<text x="${n(cx + 15)}" y="${n(cy)}" font-family="${FONT}" font-size="${n(label.size)}" letter-spacing="0.2" fill="${NAVY}" opacity="0.7">${esc(
+        label.text,
+      )}</text>`
     );
-    cx += chip.w;
-  }
+  });
   return `<g>${out.join("")}</g>`;
+}
+
+/** Extra height the asset key needs beyond its single row. */
+function legendExtraHeight(kinds: LondonAssetKind[], w: number): number {
+  return chipExtraHeight(legendChipWidths(kinds), w, 0);
 }
 
 /** Attendee room key: one chip per named room, inked by its category. */
@@ -388,43 +457,36 @@ function roomKeyRooms(plan: LondonFloorPlan): LondonZone[] {
 
 /** Extra sheet height the room key needs beyond the single legend row. */
 function roomKeyExtraHeight(plan: LondonFloorPlan, w: number): number {
-  let rows = 1;
-  let cx = 0;
-  for (const z of roomKeyRooms(plan)) {
-    const cw = z.label.length * 5.5 + (DESIGN.icons === false ? 26 : 34);
-    if (cx + cw > w) {
-      rows += 1;
-      cx = 0;
-    }
-    cx += cw + 7;
-  }
-  return Math.max(0, rows - 1) * 19;
+  return chipExtraHeight(roomChipWidths(roomKeyRooms(plan)), w, ROOM_CHIP_GAP);
 }
 
 function roomKeyRow(plan: LondonFloorPlan, x: number, y: number, w: number): string {
   const rooms = roomKeyRooms(plan);
-
-  const out: string[] = [];
-  let cx = x;
-  let cy = y;
-  for (const z of rooms) {
-    const label = z.label.toUpperCase();
-    const cw = label.length * 5.5 + (DESIGN.icons === false ? 26 : 34);
-    if (cx + cw > x + w) {
-      cx = x;
-      cy += 19;
-    }
-    out.push(
-      `<g><rect x="${n(cx)}" y="${n(cy - 10)}" width="${n(cw)}" height="16" rx="8" fill="${PAPER}" stroke="${LINE}" stroke-width="1" />` +
-        (DESIGN.icons === false
-          ? `<circle cx="${n(cx + 10)}" cy="${n(cy - 2)}" r="3.4" fill="${zoneStyleFor(z.kind, DESIGN).accent}" />`
-          : areaIconSvg(z.kind, cx + 12, cy - 2, 13, zoneStyleFor(z.kind, DESIGN).accent, 0.95)) +
-        `<text x="${n(cx + (DESIGN.icons === false ? 18 : 22))}" y="${n(cy + 1.5)}" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.7" fill="${NAVY}" opacity="0.8">${esc(
-          label,
-        )}</text></g>`,
+  const widths = roomChipWidths(rooms);
+  const { chips } = packRow(widths, w, ROOM_CHIP_GAP);
+  const out = chips.map(({ index, x: dx, row }) => {
+    const z = rooms[index]!;
+    const cw = Math.min(widths[index]!, w);
+    const cx = x + dx;
+    const cy = y + row * CHIP_ROW;
+    const textX = cx + (DESIGN.icons === false ? 18 : 22);
+    const label = fitInFrame(
+      z.label.toUpperCase(),
+      8.5,
+      Math.max(0, cx + cw - 8 - textX),
+      MIN_TYPE_PX,
+      0.7,
     );
-    cx += cw + 7;
-  }
+    return (
+      `<g><rect x="${n(cx)}" y="${n(cy - 10)}" width="${n(cw)}" height="16" rx="8" fill="${PAPER}" stroke="${LINE}" stroke-width="1" />` +
+      (DESIGN.icons === false
+        ? `<circle cx="${n(cx + 10)}" cy="${n(cy - 2)}" r="3.4" fill="${zoneStyleFor(z.kind, DESIGN).accent}" />`
+        : areaIconSvg(z.kind, cx + 12, cy - 2, 13, zoneStyleFor(z.kind, DESIGN).accent, 0.95)) +
+      `<text x="${n(textX)}" y="${n(cy + 1.5)}" font-family="${FONT}" font-size="${n(label.size)}" font-weight="600" letter-spacing="0.7" fill="${NAVY}" opacity="0.8">${esc(
+        label.text,
+      )}</text></g>`
+    );
+  });
   return `<g>${out.join("")}</g>`;
 }
 
@@ -512,27 +574,43 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
         opacity: number,
         weight = 600,
       ) => {
-        const tw = text.length * size * 0.6;
-        let end = tw > w - bar - 16;
-        let ax = end ? x + w - 6 : x + bar + 9;
-        if (end && ax - tw < planL) {
-          end = false;
-          ax = Math.max(planL, x + bar + 9);
-        }
-        return `<text x="${n(ax)}" y="${n(baseline)}"${
-          end ? ' text-anchor="end"' : ""
-        } font-family="${FONT}" font-size="${n(size)}" font-weight="${weight}" letter-spacing="0.9" fill="${NAVY}" opacity="${opacity}">${esc(
-          text,
+        // House rule: a name is fitted to its own tile first — shrink to the
+        // legibility floor, then trim. Only when nothing legible fits inside the
+        // tile does it hang from the right-hand edge back across the plan, and
+        // never past the plan's left margin.
+        const inner = Math.max(0, w - bar - 15);
+        const inside = fitInFrame(text, size, inner, MIN_TYPE_PX, 0.9);
+        const fit = inside.text
+          ? { ...inside, end: false, ax: x + bar + 9 }
+          : (() => {
+              const room = Math.max(0, x + w - 6 - planL);
+              const hung = fitInFrame(text, size, room, MIN_TYPE_PX, 0.9);
+              return { ...hung, end: true, ax: x + w - 6 };
+            })();
+        if (!fit.text) return "";
+        return `<text x="${n(fit.ax)}" y="${n(baseline)}"${
+          fit.end ? ' text-anchor="end"' : ""
+        } font-family="${FONT}" font-size="${n(fit.size)}" font-weight="${weight}" letter-spacing="0.9" fill="${NAVY}" opacity="${opacity}">${esc(
+          fit.text,
         )}</text>`;
       };
 
       // Attendee sheets centre a larger room name in the tile — there are no pins
-      // to avoid, so the name can own the space and read from a phone.
+      // to avoid, so the name can own the space and read from a phone. It is
+      // still fitted to the tile so a long room name cannot bleed into its
+      // neighbours.
+      const centred = fitInFrame(
+        z.label.toUpperCase(),
+        (w > 150 ? 12 : w > 96 ? 10.5 : 9) * roomScale,
+        Math.max(0, w - bar - 12),
+        MIN_TYPE_PX,
+        0.8,
+      );
       const label = roomsOnly
-        ? h > 14 && !quiet
+        ? h > 14 && !quiet && centred.text
           ? `<text x="${n(x + bar + (w - bar) / 2)}" y="${n(y + h / 2 + 4)}" text-anchor="middle" font-family="${FONT}" font-size="${n(
-              (w > 150 ? 12 : w > 96 ? 10.5 : 9) * roomScale,
-            )}" font-weight="600" letter-spacing="0.8" fill="${NAVY}">${esc(z.label.toUpperCase())}</text>`
+              centred.size,
+            )}" font-weight="600" letter-spacing="0.8" fill="${NAVY}">${esc(centred.text)}</text>`
           : h > 12
             ? nameAt(z.label.toUpperCase(), 8.5, y + h / 2 + 3, 0.55)
             : ""
@@ -582,11 +660,16 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
     .map((e) => {
       const x = ox + e.x * PPM;
       const y = oy + e.y * PPM;
-      const tw = Math.max(44, e.label.length * 5.6 + 16);
-      return `<g><rect x="${n(x - tw / 2)}" y="${n(y - 8)}" width="${n(tw)}" height="16" rx="2" fill="${NAVY}" /><text x="${n(x)}" y="${n(
+      const label = e.label.toUpperCase();
+      // An entrance sits on the plan edge, so its tab is centred on the door and
+      // then pushed back inside the plan frame rather than hanging off the sheet.
+      const tw = Math.min(pw, Math.max(44, textWidth(label, 8.5, 0.9) + 16));
+      const bx = clampSpan(x - tw / 2, tw, ox, ox + pw);
+      const fitted = fitInFrame(label, 8.5, tw - 12, MIN_TYPE_PX, 0.9);
+      return `<g><rect x="${n(bx)}" y="${n(y - 8)}" width="${n(tw)}" height="16" rx="2" fill="${NAVY}" /><text x="${n(bx + tw / 2)}" y="${n(
         y + 3.5,
-      )}" text-anchor="middle" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.9" fill="${PAPER}">${esc(
-        e.label.toUpperCase(),
+      )}" text-anchor="middle" font-family="${FONT}" font-size="${n(fitted.size)}" font-weight="600" letter-spacing="0.9" fill="${PAPER}">${esc(
+        fitted.text,
       )}</text></g>`;
     })
     .join("");
@@ -678,7 +761,7 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
       const badge = numbered
         ? `<text x="${n(cx)}" y="${n(cy + 3)}" text-anchor="middle" font-family="${FONT}" font-size="8.5" font-weight="700" fill="${PAPER}">${i + 1}</text>`
         : named
-          ? markerLabel(m, cx, cy, i)
+          ? markerLabel(m, cx, cy, i, { left: PAD, right: size.w - PAD })
           : "";
       return `<g data-panel="${esc(m.panelId)}">${markerGlyph(m, cx, cy, active, numbered)}${badge}</g>`;
     })
@@ -686,7 +769,15 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
 
   const kinds = KIND_ORDER.filter((k) => markers.some((m) => m.kind === k));
   const legendOn = DESIGN.legend !== "none";
-  const legendY = size.h - FOOT - indexH - LEGEND;
+  const frameW = size.w - PAD * 2;
+  // A wrapping key needs its own height, or its second row prints over the index
+  // and the footer. The reserve comes from the same packing the drawing uses.
+  const legendExtra = !legendOn
+    ? 0
+    : roomsOnly
+      ? roomKeyExtraHeight(plan, frameW)
+      : legendExtraHeight(kinds, frameW);
+  const legendY = size.h - FOOT - indexH - LEGEND - legendExtra;
   const headRule = PAD + HEAD - 18;
   const roomCount = plan.zones.filter((z) => z.kind !== "circulation" && z.kind !== "core").length;
   const eyebrowText =
@@ -713,26 +804,42 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
           logoH,
           DESIGN.logoMono ? NAVY : undefined,
         );
-  // The compass cluster drops below the lockup so the two never collide.
-  const compassY = DESIGN.logo === "none" ? PAD + 22 : PAD - 6 + logoH + 22;
+  // The compass cluster drops below the lockup so the two never collide, and is
+  // held above the header rule so the scale bar cannot cross into the plan.
+  const compassY = Math.min(
+    DESIGN.logo === "none" ? PAD + 22 : PAD - 6 + logoH + 22,
+    headRule - 34,
+  );
+  // The scale bar keeps its right-hand alignment but never starts left of the margin.
+  const scaleX = Math.max(PAD, size.w - PAD - 30 - 4 * 2.5 * PPM - 92);
+  // Header copy owns the space up to the lockup / compass cluster and no further.
+  const chromeLeft = Math.min(
+    DESIGN.logo === "none" ? size.w - PAD : size.w - PAD - logoW,
+    DESIGN.compass === false ? size.w - PAD : scaleX,
+  );
+  const headW = Math.max(120, chromeLeft - PAD - 14);
+  const eyebrowFit = fitInFrame(eyebrowText.toUpperCase(), 9, headW, MIN_TYPE_PX, 1.9);
+  const titleFit = fitInFrame(titleText, 24, headW, 13, -0.4);
+  const subFit = fitInFrame(subtitleText, 10.5, headW, MIN_TYPE_PX, 0.3);
+  const legendTitleFit = fitInFrame(legendTitle.toUpperCase(), 9, frameW, MIN_TYPE_PX, 1.9);
 
   return `${defs()}
 <g>
 ${logo}
-${eyebrow(PAD, PAD + 8, eyebrowText)}
-<text x="${PAD}" y="${n(PAD + 38)}" font-family="${FONT}" font-size="24" font-weight="600" letter-spacing="-0.4" fill="${NAVY}">${esc(titleText)}</text>
-<text x="${PAD}" y="${n(PAD + 58)}" font-family="${FONT}" font-size="10.5" letter-spacing="0.3" fill="${NAVY}" opacity="0.62">${esc(
-    subtitleText,
+${eyebrow(PAD, PAD + 8, eyebrowFit.text, BLUE, eyebrowFit.size)}
+<text x="${PAD}" y="${n(PAD + 38)}" font-family="${FONT}" font-size="${n(titleFit.size)}" font-weight="600" letter-spacing="-0.4" fill="${NAVY}">${esc(titleFit.text)}</text>
+<text x="${PAD}" y="${n(PAD + 58)}" font-family="${FONT}" font-size="${n(subFit.size)}" letter-spacing="0.3" fill="${NAVY}" opacity="0.62">${esc(
+    subFit.text,
   )}</text>
 ${DESIGN.compass === false ? "" : northArrow(size.w - PAD - 15, compassY)}
-${DESIGN.compass === false ? "" : scaleBar(size.w - PAD - 30 - 4 * 2.5 * PPM - 92, compassY + 28)}
+${DESIGN.compass === false ? "" : scaleBar(scaleX, compassY + 28)}
 <path d="M ${PAD} ${n(headRule)} H ${n(size.w - PAD)}" stroke="${LINE}" stroke-width="1" />
 ${brandBar(PAD, headRule + 5, size.w - PAD * 2)}
 </g>
 
 ${planBody(plan, ox, oy, roomsOnly)}
 ${pins}
-${legendOn ? eyebrow(PAD, legendY + 16, legendTitle) : ""}
+${legendOn ? eyebrow(PAD, legendY + 16, legendTitleFit.text, BLUE, legendTitleFit.size) : ""}
 ${
   !legendOn
     ? ""
@@ -767,13 +874,20 @@ export function floorMapSheetSize(floor: LondonFloorId, opts: FloorMapOptions = 
     if (!base) return { w: 0, h: 0 };
     const plan = planWithAreas(base, opts.areas);
     const size = floorMapSize(plan);
+    const frameW = size.w - PAD * 2;
+    const legendOn = DESIGN.legend !== "none";
     if (opts.roomsOnly === true) {
-      return { w: size.w, h: size.h + roomKeyExtraHeight(plan, size.w - PAD * 2) };
+      return { w: size.w, h: size.h + (legendOn ? roomKeyExtraHeight(plan, frameW) : 0) };
     }
-    if (opts.labels !== true || DESIGN.labelMode !== "numbered") return size;
     const all = londonFloorMarkers(floor, opts.panels, opts.overrides);
     const markers = opts.kinds?.length ? all.filter((m) => opts.kinds!.includes(m.kind)) : all;
-    return { w: size.w, h: size.h + indexHeight(markers.length) };
+    const kinds = KIND_ORDER.filter((k) => markers.some((m) => m.kind === k));
+    // Both wrapping bands are reserved here, so nothing on the sheet is drawn
+    // into space the sheet does not have.
+    const extra = legendOn ? legendExtraHeight(kinds, frameW) : 0;
+    const index =
+      opts.labels === true && DESIGN.labelMode === "numbered" ? indexHeight(markers.length) : 0;
+    return { w: size.w, h: size.h + extra + index };
   } finally {
     restore();
   }
@@ -844,9 +958,13 @@ export function assetMapSvg(
         const row = Math.floor(i / 3);
         const x = PAD + col * colW;
         const y = base + 34 + row * 36;
-        return `${eyebrow(x, y, k, "#6C7B92", 8.5)}<text x="${n(x)}" y="${n(y + 16)}" font-family="${FONT}" font-size="12" font-weight="600" letter-spacing="-0.1" fill="${NAVY}">${esc(
-          v.length > 42 ? `${v.slice(0, 41)}…` : v,
-        )}</text>`;
+        // Each spec sits in its own column, label and value both fitted to it, so
+        // a long asset name cannot run into the column beside it.
+        const keyFit = fitInFrame(k.toUpperCase(), 8.5, Math.max(0, colW - 14), MIN_TYPE_PX, 1.9);
+        const valFit = fitInFrame(v, 12, Math.max(0, colW - 14), MIN_TYPE_PX, -0.1);
+        return `${eyebrow(x, y, keyFit.text, "#6C7B92", keyFit.size)}<text x="${n(x)}" y="${n(y + 16)}" font-family="${FONT}" font-size="${n(
+          valFit.size,
+        )}" font-weight="600" letter-spacing="-0.1" fill="${NAVY}">${esc(valFit.text)}</text>`;
       })
       .join("");
     const specOpacity = `<g opacity="0.55">${eyebrow(PAD, base + 12, "Install specification", BLUE, 9)}</g>`;
