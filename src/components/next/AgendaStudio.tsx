@@ -211,11 +211,16 @@ export function AgendaStudio({
     setOpenFileId(initialFileId ?? null);
   }, [initialFileId]);
 
-  // Re-seed the board when the host swaps in a different prepared config.
+  // Re-seed the board when the host swaps in a different prepared config — but
+  // never on top of work in progress. A saved file arriving late (the list query
+  // resolving a second or two after the page appears) must not wipe what the
+  // person has already typed.
   const seededRef = useRef<AgendaConfig | undefined>(initialConfig);
+  const dirtyRef = useRef(false);
   useEffect(() => {
     if (!initialConfig || seededRef.current === initialConfig) return;
     seededRef.current = initialConfig;
+    if (dirtyRef.current) return;
     setConfig(initialConfig);
   }, [initialConfig]);
 

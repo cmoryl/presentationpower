@@ -39,16 +39,17 @@ function AgendaPage() {
   const resolved = agendaDivision(division);
   const saved = useSavedAgendaFiles();
 
-  // Open straight onto the saved live board when the hub card points at one, so
-  // an update there flows back into the same file instead of a new copy.
+  // Open straight onto the saved live board ONLY when the link names one. A
+  // plain /agendas?division=… visit must start from the division default: with
+  // several people building at once, silently loading somebody else's latest
+  // saved file replaced a half-typed programme seconds after it appeared and
+  // turned Save into an overwrite of their file. The saved list in step 4 stays
+  // the way to pick a file up deliberately.
   const openFile = useMemo(() => {
-    if (file) {
-      const row = saved.data?.find((r) => r.id === file);
-      return row ? { id: row.id, config: normalizeAgendaConfig(row.config) } : undefined;
-    }
-    const latest = pickAgendaFile(saved.data, resolved.id);
-    return latest ? { id: latest.id, config: latest.config } : undefined;
-  }, [file, saved.data, resolved.id]);
+    if (!file) return undefined;
+    const row = saved.data?.find((r) => r.id === file);
+    return row ? { id: row.id, config: normalizeAgendaConfig(row.config) } : undefined;
+  }, [file, saved.data]);
 
   return (
     <AppShell>
