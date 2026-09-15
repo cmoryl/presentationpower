@@ -7,7 +7,6 @@ import {
   NEXT_BADGE_GROUND,
   SAFE_INSET_X,
   SAFE_INSET_Y,
-  cityBadgeFace,
   cityBadgeLockup,
   type CityBadgeConfig,
 } from "@/lib/next-city-badge";
