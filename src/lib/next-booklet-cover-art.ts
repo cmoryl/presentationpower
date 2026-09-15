@@ -169,9 +169,11 @@ export function bookletCoverLayout(
           };
     case "framed":
       return {
+        // The window stops clear of the foot so the footnote prints on ink, not
+        // on the picture.
         photo: top
-          ? { x: 0.1, y: 0.5, w: 0.8, h: 0.42 }
-          : { x: 0.1, y: 0.46, w: 0.8, h: 0.46 },
+          ? { x: 0.1, y: 0.5, w: 0.8, h: 0.38 }
+          : { x: 0.1, y: 0.46, w: 0.8, h: 0.38 },
         fill: true,
         scrim: { from: "all", span: 1, strength: 0.16 },
         copy: { x: 0, y: 0.06, w: 1, h: 0.34, anchor: "top" },

@@ -145,10 +145,14 @@ async function drawCoverArt(
     if (w <= 0.01 || h <= 0.01) return;
     page.drawRectangle({ x, y, width: w, height: h, color: hex(INK) });
   };
-  mask(box.x, py + ph, box.w, box.y + box.h - (py + ph));
-  mask(box.x, box.y, box.w, py - box.y);
-  mask(box.x, py, px - box.x, ph);
-  mask(px + pw, py, box.x + box.w - (px + pw), ph);
+  // Masked against the whole sheet, slug included — a spill into the slug would
+  // print on the trimmed-away edge but still shows on the press proof.
+  const pageW = page.getWidth();
+  const pageH = page.getHeight();
+  mask(0, py + ph, pageW, pageH - (py + ph));
+  mask(0, 0, pageW, py);
+  mask(0, py, px, ph);
+  mask(px + pw, py, pageW - (px + pw), ph);
 
   const strength = Math.max(0, Math.min(1, layout.scrim.strength * (scrim / 100)));
   if (strength <= 0.001) return true;
