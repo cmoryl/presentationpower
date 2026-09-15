@@ -177,9 +177,17 @@ export async function buildAgendaPptx(
     // line prints white.
     const coverInk = coverGround ? "FFFFFF" : inkHex;
     let y = pad;
-    const line = (text: string, sizeMm: number, bold: boolean, caps: boolean, opacity?: number) => {
+    const line = (
+      text: string,
+      sizeMm: number,
+      bold: boolean,
+      caps: boolean,
+      opacity?: number,
+      track = false,
+    ) => {
       if (!text.trim()) return;
-      const shown = caps ? text.toUpperCase().split("").join("\u2009") : text;
+      const upper = caps ? text.toUpperCase() : text;
+      const shown = track ? upper.split("").join("\u2009") : upper;
       s.addText(shown, {
         x: inMm(pad),
         y: inMm(y),
@@ -202,7 +210,7 @@ export async function buildAgendaPptx(
       });
       y += sizeMm * 2.6;
     };
-    line(cover.eyebrow ?? "", L0.eyebrowSize, true, true, 18);
+    line(cover.eyebrow ?? "", L0.eyebrowSize, true, true, 18, true);
     line(cover.title ?? "", L0.titleSize, true, true);
     line(cover.subtitle ?? "", L0.metaSize, false, false, 10);
     // The footnote stays with the cover copy block: at the sheet foot it printed
