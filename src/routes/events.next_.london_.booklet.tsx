@@ -49,6 +49,7 @@ import {
   BOOKLET_COVER_TREATMENTS,
   bookletCoverArt,
   bookletCoverArtFor,
+  bookletCoverLayout,
   type BookletCoverTreatment,
 } from "@/lib/next-booklet-cover-art";
 import { SUPPORTED_VIZ_KINDS } from "@/lib/infographics/variant-kinds";
@@ -113,6 +114,83 @@ function download(blob: Blob, name: string): void {
   a.download = name;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+/**
+ * On-screen cover proof. It follows the same fractions the press file uses, so
+ * what the operator moves here is what the printed cover does — but it is a
+ * screen proof, not the press artwork.
+ */
+function CoverPreview({ cover, trim }: { cover: BookletConfig["cover"]; trim: { w: number; h: number } }) {
+  const art = bookletCoverArt(cover.artId);
+  const layout = bookletCoverLayout(cover.treatment ?? "full-bleed");
+  const veil = Math.max(0, Math.min(1, layout.scrim.strength * ((cover.scrim ?? 88) / 100)));
+  const pct = (v: number) => `${(v * 100).toFixed(2)}%`;
+  const veilStyle =
+    layout.scrim.from === "all"
+      ? { background: `rgba(3,0,44,${veil})` }
+      : {
+          background: `linear-gradient(to ${layout.scrim.from === "bottom" ? "top" : "bottom"}, rgba(3,0,44,${veil}) 0%, rgba(3,0,44,${veil * 0.45}) ${pct(layout.scrim.span * 0.55)}, rgba(3,0,44,0) ${pct(layout.scrim.span)})`,
+        };
+  return (
+    <div
+      className="relative w-full overflow-hidden rounded-md bg-[#03002C]"
+      style={{ aspectRatio: `${trim.w} / ${trim.h}` }}
+    >
+      {art ? (
+        <div
+          className="absolute overflow-hidden"
+          style={{
+            left: pct(layout.photo.x),
+            top: pct(layout.photo.y),
+            width: pct(layout.photo.w),
+            height: pct(layout.photo.h),
+          }}
+        >
+          <img src={art.src} alt={art.name} loading="lazy" className="size-full object-cover" />
+          <div className="absolute inset-0" style={veilStyle} />
+        </div>
+      ) : null}
+      <div
+        className="absolute flex flex-col gap-[3%] px-[8%]"
+        style={{
+          left: 0,
+          right: 0,
+          top: art ? pct(layout.copy.y) : "8%",
+          height: art ? pct(layout.copy.h) : "60%",
+          justifyContent: art && layout.copy.anchor === "bottom" ? "flex-end" : "flex-start",
+        }}
+      >
+        <div className="flex gap-[1.4%]">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <span
+              key={i}
+              className="block h-[1.4cqw] w-[5%] rounded-[1px]"
+              style={{ background: i === 4 ? "#003FC7" : "rgba(255,255,255,0.9)", height: "1.6%" }}
+            />
+          ))}
+        </div>
+        {cover.eyebrow ? (
+          <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/80">
+            {cover.eyebrow}
+          </p>
+        ) : null}
+        {cover.title ? (
+          <p className="text-[clamp(14px,3.2vw,26px)] font-bold uppercase leading-[1.04] text-white">
+            {cover.title}
+          </p>
+        ) : null}
+        {cover.subtitle ? (
+          <p className="text-[10px] leading-snug text-white/90">{cover.subtitle}</p>
+        ) : null}
+      </div>
+      {cover.footnote ? (
+        <p className="absolute inset-x-0 bottom-[4%] px-[8%] text-[8px] leading-snug text-white/70">
+          {cover.footnote}
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
 function BookletPage() {
@@ -775,6 +853,20 @@ function BookletPage() {
                 ) : null}
               </ul>
             </div>
+
+            {config.includeCover ? (
+              <div className="space-y-2 rounded-lg border border-[color:var(--color-border)] p-4">
+                <h2 className="text-sm font-semibold uppercase tracking-wide">Cover proof</h2>
+                <CoverPreview
+                  cover={config.cover}
+                  trim={{ w: bookletGeo.trimW, h: bookletGeo.trimH }}
+                />
+                <p className="text-[11px] text-[color:var(--color-muted-foreground)]">
+                  Screen proof at the booklet trim — the press file places the picture and type
+                  itself.
+                </p>
+              </div>
+            ) : null}
 
             <div className="rounded-lg border border-[color:var(--color-border)] p-4">
               <h2 className="text-sm font-semibold uppercase tracking-wide">Running order</h2>
