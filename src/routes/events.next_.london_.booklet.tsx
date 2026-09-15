@@ -571,6 +571,89 @@ function BookletPage() {
 
           {/* ── running order + exports ─────────────────────────────────── */}
           <aside className="space-y-6">
+            {/* ── saved booklets ───────────────────────────────────────── */}
+            <div className="space-y-3 rounded-lg border border-[color:var(--color-border)] p-4">
+              <h2 className="text-sm font-semibold uppercase tracking-wide">Saved booklets</h2>
+              <p className="text-xs text-[color:var(--color-muted-foreground)]">
+                Save this booklet so it can be re-opened, edited and reused for a later year.
+              </p>
+              <label className="block space-y-1">
+                <span className={labelCls}>Booklet name</span>
+                <input
+                  className={field}
+                  value={bookletName}
+                  onChange={(e) => setBookletName(e.target.value)}
+                />
+              </label>
+              <label className="block space-y-1">
+                <span className={labelCls}>Year</span>
+                <input
+                  className={field}
+                  type="number"
+                  min={2000}
+                  max={2100}
+                  value={bookletYear}
+                  onChange={(e) => setBookletYear(Number(e.target.value) || bookletYear)}
+                />
+              </label>
+              <div className="flex gap-2">
+                <Button size="sm" disabled={busy !== null} onClick={onSave}>
+                  <Save className="mr-2 size-4" />
+                  {busy === "save" ? "Saving…" : openId ? "Update" : "Save"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={busy !== null}
+                  onClick={onDuplicate}
+                  title="Copy this booklet into the following year"
+                >
+                  <Copy className="mr-2 size-4" />
+                  {busy === "copy" ? "Copying…" : `Reuse for ${bookletYear + 1}`}
+                </Button>
+              </div>
+              {libError ? (
+                <p className="text-xs text-[color:var(--color-destructive)]">{libError}</p>
+              ) : null}
+              <ul className="space-y-1 border-t border-[color:var(--color-border)] pt-3 text-sm">
+                {bookletRows.map((row) => (
+                  <li key={row.id} className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onOpen(row.id)}
+                      aria-pressed={openId === row.id}
+                      className={`flex-1 truncate rounded px-2 py-1 text-left ${
+                        openId === row.id
+                          ? "bg-[color:var(--color-muted)] font-semibold"
+                          : "hover:bg-[color:var(--color-muted)]"
+                      }`}
+                    >
+                      {row.name}
+                      <span className="ml-2 text-xs text-[color:var(--color-muted-foreground)]">
+                        {row.year}
+                      </span>
+                    </button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      aria-label={`Remove ${row.name}`}
+                      disabled={busy !== null}
+                      onClick={() => onDelete(row.id)}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </li>
+                ))}
+                {bookletRows.length === 0 ? (
+                  <li className="text-xs text-[color:var(--color-muted-foreground)]">
+                    {booklets.isError
+                      ? "Sign in to save and re-open booklets."
+                      : "No booklets saved yet."}
+                  </li>
+                ) : null}
+              </ul>
+            </div>
+
             <div className="rounded-lg border border-[color:var(--color-border)] p-4">
               <h2 className="text-sm font-semibold uppercase tracking-wide">Running order</h2>
               <ol className="mt-3 space-y-1 text-sm">
