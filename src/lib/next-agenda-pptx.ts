@@ -155,8 +155,20 @@ export async function buildAgendaPptx(
     const L0 = agendaBlocks(pages[0]!.config).layout;
     const cover = extras.cover;
     const s = pptx.addSlide();
-    if (ground) {
-      s.addImage({ data: ground, x: 0, y: 0, w: slideW, h: slideH, objectName: "NEXT booklet cover ground" });
+    // A chosen location picture (already veiled in brand ink) becomes the cover
+    // ground; otherwise the cover keeps the approved gradient.
+    const coverGround = extras.coverGround
+      ? bytesToDataUrl(extras.coverGround)
+      : null;
+    if (coverGround ?? ground) {
+      s.addImage({
+        data: (coverGround ?? ground)!,
+        x: 0,
+        y: 0,
+        w: slideW,
+        h: slideH,
+        objectName: "NEXT booklet cover ground",
+      });
     } else {
       s.background = { color: groundHex };
     }
@@ -197,7 +209,11 @@ export async function buildAgendaPptx(
         margin: 0,
       });
     }
-    notes.push("Cover slide carries the editable cover copy on the approved ground.");
+    notes.push(
+      extras.coverGround
+        ? "Cover slide carries the editable cover copy over the chosen location picture, veiled in brand ink."
+        : "Cover slide carries the editable cover copy on the approved ground.",
+    );
   }
 
   for (const page of extras?.omitAgenda ? [] : pages) {
