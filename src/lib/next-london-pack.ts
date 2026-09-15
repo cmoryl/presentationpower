@@ -18,6 +18,7 @@ import {
   type LondonColorSpace,
 } from "@/lib/next-london-revise";
 import { cmykLabel, londonCmykBuild } from "@/lib/next-london-cmyk";
+import { auditAi, auditSvg, gateOnQa } from "@/lib/london-signage-qa";
 
 export type LondonPackFile = {
   path: string;
@@ -25,10 +26,18 @@ export type LondonPackFile = {
   kind: "svg" | "ai";
 };
 
+export type LondonPackSkip = {
+  panelId: string;
+  name: string;
+  reason: string;
+};
+
 export type LondonPackResult = {
   blob: Blob;
   files: LondonPackFile[];
   manifest: string;
+  /** Panels the print gate refused. Never treat these as approved. */
+  skipped: LondonPackSkip[];
 };
 
 function floorLabel(id: string): string {
