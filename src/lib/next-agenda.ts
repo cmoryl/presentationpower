@@ -2341,6 +2341,27 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
       ? (raw.bandLayout as AgendaBandLayoutId)
       : base.bandLayout,
     locationLine: str(raw.locationLine, base.locationLine),
+    locationIcon: AGENDA_LOCATION_ICONS.some((i) => i.id === raw.locationIcon)
+      ? (raw.locationIcon as AgendaLocationIconId)
+      : base.locationIcon,
+    locationIconInk: AGENDA_LOCATION_INKS.some((i) => i.id === raw.locationIconInk)
+      ? (raw.locationIconInk as AgendaLocationInkId)
+      : base.locationIconInk,
+    locationInk: AGENDA_LOCATION_INKS.some((i) => i.id === raw.locationInk)
+      ? (raw.locationInk as AgendaLocationInkId)
+      : base.locationInk,
+    locationSize: AGENDA_LOCATION_SIZES.some((s) => s.id === raw.locationSize)
+      ? (raw.locationSize as AgendaLocationSizeId)
+      : base.locationSize,
+    locationCaps: typeof raw.locationCaps === "boolean" ? raw.locationCaps : base.locationCaps,
+    locationWeight:
+      raw.locationWeight === "regular" || raw.locationWeight === "medium" || raw.locationWeight === "bold"
+        ? (raw.locationWeight as AgendaLocationWeightId)
+        : base.locationWeight,
+    locationAlign:
+      raw.locationAlign === "left" || raw.locationAlign === "centre" || raw.locationAlign === "right"
+        ? (raw.locationAlign as AgendaLocationAlignId)
+        : base.locationAlign,
     sessions: sessions.length ? sessions : base.sessions,
     footnote: str(raw.footnote, base.footnote),
     footerLeft: str(raw.footerLeft, base.footerLeft),
