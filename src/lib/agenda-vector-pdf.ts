@@ -935,15 +935,19 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
         const hasPin = blocks.rows.some((r) => r.parallel);
         const pinH = fs * 1.9;
         const x = px(blocks.x) + (hasPin ? pinH * 0.72 + fs * 0.4 : 0);
-        const y = py(band.y - L.footSize * 3.1) - fs;
+        // Centre the line in the reserved footnote strip, so the pin can never
+        // reach the row band above or the brand band below.
+        const mid = py(blocks.footnoteY + blocks.footnoteH / 2);
+        const y = mid - fs * 0.36;
         if (hasPin) {
           page.drawSvgPath(AGENDA_PIN_PATH, {
             x: px(blocks.x),
-            y: y + fs * 1.5,
+            y: mid + pinH / 2,
             scale: pinH / 25,
             color: rgb(...hexRgb(AGENDA_BAND.pin)),
           });
         }
+
         page.drawText(fit(bold, footnote, fs, mm(blocks.contentW) - (x - px(blocks.x))), {
           x,
           y,

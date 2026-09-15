@@ -12,6 +12,7 @@ import {
   Check,
   ChevronDown,
   Download,
+  Expand,
   FileText,
   Plus,
   Save,
@@ -20,7 +21,14 @@ import {
 import { toast } from "sonner";
 
 import { useSignedIn } from "@/components/CloudDeckControls";
-import { AgendaSheet } from "@/components/next/AgendaSheet";
+import { AgendaSheet, type AgendaSheetEdit } from "@/components/next/AgendaSheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,6 +79,7 @@ import {
   agendaDefault,
   agendaDivision,
   agendaPages,
+  agendaRowsPerPage,
   removeAgendaDay,
   writeAgendaDay,
   agendaGeometry,
@@ -340,11 +349,44 @@ export function AgendaStudio({
 
   const previewScale = fitScale * zoom;
 
+  // The enlarged view fills the dialog on both edges, so the copy is big enough
+  // to type on for every format from A4 to a 21:9 screen board.
+  const largeScale = Math.min(
+    3.2,
+    1100 / (geo.bleedW * NATIVE_PX_PER_MM),
+    880 / (geo.bleedH * NATIVE_PX_PER_MM),
+  );
+
   const division = agendaDivision(config.divisionId);
 
   // Resolved QR geometry for the page on screen: the clamp range the placement
   // controls work inside, and where the code currently sits.
   const qrBlock = useMemo(() => agendaBlocks(pageConfig).qr, [pageConfig]);
+
+  // Enlarged board: the same sheet at review size, with the copy editable in
+  // place. Every commit writes to the same day / session fields the controls
+  // under the board read, so the two can never drift apart.
+  const [large, setLarge] = useState(false);
+  const rowOffset = page.pageInDay * agendaRowsPerPage(config);
+  const sheetEdit: AgendaSheetEdit = {
+    onField: (field, value) => {
+      // On a paged board the title and date line belong to the day, not the file.
+      if (field === "title") patchDay({ label: value });
+      else if (field === "meta") patchDay({ meta: value });
+      else set(field, value);
+    },
+    onSession: (index, patch) => setSession(rowOffset + index, patch),
+    onParallel: (index, track, patch) => {
+      const i = rowOffset + index;
+      const session = day.sessions[i];
+      if (!session) return;
+      const list = agendaParallels(session).map((p) => ({ ...p }));
+      const current = list[track];
+      if (!current) return;
+      list[track] = { ...current, ...patch };
+      setSession(i, { parallel: undefined, parallels: list });
+    },
+  };
 
   const placeQr = (x: number | null, y: number | null) =>
     editConfig((c) => ({ ...c, qrOffsetX: x, qrOffsetY: y }));
@@ -618,9 +660,34 @@ export function AgendaStudio({
               <Button variant="ghost" size="sm" onClick={() => setZoom(1)}>
                 Fit
               </Button>
+              <Button variant="outline" size="sm" onClick={() => setLarge(true)}>
+                <Expand className="mr-1.5 h-3.5 w-3.5" /> View larger &amp; edit
+              </Button>
             </span>
           </div>
-          <div ref={plateRef} className="max-h-[780px] overflow-auto">
+          <p className="mb-2 text-[11px] text-muted-foreground">
+            Click the board to open it larger and type straight onto it — the fields below update
+            with every change.
+          </p>
+          <div
+            ref={plateRef}
+            className="max-h-[780px] cursor-zoom-in overflow-auto"
+            role="button"
+            tabIndex={0}
+            aria-label="Open the board larger and edit the copy on it"
+            onClick={(e) => {
+              // The code can be dragged on the small board; a drag must not open
+              // the large view.
+              if ((e.target as HTMLElement).closest('[data-agenda-qr="true"]')) return;
+              setLarge(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setLarge(true);
+              }
+            }}
+          >
             <div
               className="mx-auto"
               style={{
@@ -648,6 +715,40 @@ export function AgendaStudio({
             </div>
           </div>
         </div>
+
+        {/* Enlarged board: review size, copy editable in place. */}
+        <Dialog open={large} onOpenChange={setLarge}>
+          <DialogContent className="max-w-[96vw] sm:max-w-[1180px]">
+            <DialogHeader>
+              <DialogTitle>
+                {division.name} · {geo.sizeName}
+                {pages.length > 1 ? ` · page ${pageIndex + 1} of ${pages.length}` : ""}
+              </DialogTitle>
+              <DialogDescription>
+                Click any line on the board and type. Click away to keep the change, Escape to
+                cancel. Every change writes straight to the programme fields under the board.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="max-h-[76vh] overflow-auto rounded-lg bg-muted/40 p-3">
+              <div
+                className="mx-auto"
+                style={{
+                  width: geo.bleedW * NATIVE_PX_PER_MM * largeScale,
+                  height: geo.bleedH * NATIVE_PX_PER_MM * largeScale,
+                }}
+              >
+                <div style={{ transform: `scale(${largeScale})`, transformOrigin: "top left" }}>
+                  <AgendaSheet
+                    config={pageConfig}
+                    pxPerMm={NATIVE_PX_PER_MM}
+                    guides={guides}
+                    edit={sheetEdit}
+                  />
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* controls */}
         <div className="space-y-5">

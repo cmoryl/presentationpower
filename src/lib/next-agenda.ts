@@ -2523,7 +2523,20 @@ export function agendaBlocks(config: AgendaConfig) {
   const footY = footerBand
     ? footerBand.y + (L.footerBandH - L.footSize) * 0.5
     : bottom - L.footSize * 1.2;
-  let listBottom = footerBand ? footerBand.y - L.footSize * 3.4 : footY - L.footSize * 1.8;
+  /**
+   * The footnote gets its own reserved strip above the band, tall enough for the
+   * location pin the programme look draws beside it. Without the reservation the
+   * pin overhung the strip and printed on the last row band and the band foot.
+   */
+  const footnoteText = (config.footnote ?? "").trim();
+  const footnoteH = footnoteText ? L.footSize * 3 : 0;
+  const footnoteY = footerBand ? footerBand.y - L.footSize * 0.9 - footnoteH : footY;
+  let listBottom = footerBand
+    ? footnoteText
+      ? footnoteY - L.footSize * 0.9
+      : footerBand.y - L.footSize * 1.6
+    : footY - L.footSize * 1.8;
+
   let qr: {
     x: number;
     y: number;
@@ -2791,7 +2804,10 @@ export function agendaBlocks(config: AgendaConfig) {
     footerBand,
     footer,
     footY,
+    footnoteY,
+    footnoteH,
     qr,
+
   };
 }
 

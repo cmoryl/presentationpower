@@ -70,6 +70,73 @@ function AgendaLocationMark({
   );
 }
 
+
+/**
+ * Inline editable copy for the enlarged board view. The board itself stays the
+ * proof: the span carries no chrome, commits on blur (or Enter on a single-line
+ * field) and writes straight back to the config field it came from, so the form
+ * controls under the board and the board never disagree.
+ */
+function Editable({
+  value,
+  onCommit,
+  multiline = false,
+}: {
+  value: string;
+  onCommit: (next: string) => void;
+  multiline?: boolean;
+}) {
+  return (
+    <span
+      contentEditable
+      suppressContentEditableWarning
+      role="textbox"
+      tabIndex={0}
+      data-agenda-editable="true"
+      spellCheck={false}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") {
+          e.currentTarget.textContent = value;
+          e.currentTarget.blur();
+          return;
+        }
+        if (e.key === "Enter" && (!multiline || e.metaKey || e.ctrlKey)) {
+          e.preventDefault();
+          e.currentTarget.blur();
+        }
+      }}
+      onBlur={(e) => {
+        const next = (e.currentTarget.textContent ?? "").replace(/\u00a0/g, " ");
+        if (next !== value) onCommit(next);
+      }}
+      style={{
+        outline: "none",
+        cursor: "text",
+        display: "inline-block",
+        minWidth: "1.2em",
+        maxWidth: "100%",
+        whiteSpace: "pre-wrap",
+      }}
+    >
+      {value}
+    </span>
+  );
+}
+
+/** Callbacks the enlarged view supplies so board copy edits the live config. */
+export type AgendaSheetEdit = {
+  onField: (field: "eyebrow" | "title" | "meta" | "footnote", value: string) => void;
+  onSession: (
+    index: number,
+    patch: Partial<{ time: string; title: string; detail: string; track: string }>,
+  ) => void;
+  onParallel: (
+    index: number,
+    track: number,
+    patch: Partial<{ time: string; title: string; speaker: string; detail: string }>,
+  ) => void;
+};
+
 type Props = {
   config: AgendaConfig;
   /** Preview pixels per mm on the bleed sheet. */
@@ -79,6 +146,8 @@ type Props = {
   style?: React.CSSProperties;
   /** Supplied by the editor: drag the QR block to a new spot on the sheet. */
   onPlaceQr?: (x: number, y: number) => void;
+  /** Supplied by the enlarged view: type directly on the board. */
+  edit?: AgendaSheetEdit;
 };
 
 export function AgendaSheet({
@@ -88,8 +157,16 @@ export function AgendaSheet({
   className,
   style,
   onPlaceQr,
+  edit,
 }: Props) {
   const mm = (v: number) => v * pxPerMm;
+  /** Board copy: plain text normally, an editable span in the enlarged view. */
+  const T = (value: string, commit?: (next: string) => void, multiline = false) =>
+    edit && commit ? (
+      <Editable value={value} onCommit={commit} multiline={multiline} />
+    ) : (
+      value
+    );
   const geo = agendaGeometry(config);
   const blocks = agendaBlocks(config);
   const L = blocks.layout;
@@ -206,7 +283,7 @@ export function AgendaSheet({
             textTransform: "uppercase",
           }}
         >
-          {config.eyebrow}
+          {T(config.eyebrow, (v) => edit?.onField("eyebrow", v))}
         </div>
       ) : null}
 
@@ -221,7 +298,7 @@ export function AgendaSheet({
           color: titleInk,
         }}
       >
-        {config.title}
+        {T(config.title, (v) => edit?.onField("title", v), true)}
       </div>
 
       {/* The programme look prints the date beside the room line, not under the
@@ -236,7 +313,7 @@ export function AgendaSheet({
             opacity: 0.86,
           }}
         >
-          {config.meta}
+          {T(config.meta, (v) => edit?.onField("meta", v))}
         </div>
       ) : null}
 
@@ -284,7 +361,7 @@ export function AgendaSheet({
                 letterSpacing: "0.02em",
               }}
             >
-              {config.meta}
+              {T(config.meta, (v) => edit?.onField("meta", v))}
             </div>
           ) : null}
         </>
@@ -318,7 +395,7 @@ export function AgendaSheet({
                   lineHeight: 1.4,
                 }}
               >
-                {row.session.time}
+                {T(row.session.time, (v) => edit?.onSession(i, { time: v }))}
               </div>
               <div style={{ flex: "1 1 auto", minWidth: 0 }}>
                 {row.session.track.trim() ? (
@@ -330,7 +407,7 @@ export function AgendaSheet({
                       textTransform: "uppercase",
                     }}
                   >
-                    {row.session.track}
+                    {T(row.session.track, (v) => edit?.onSession(i, { track: v }))}
                   </div>
                 ) : null}
                 <div
@@ -340,7 +417,7 @@ export function AgendaSheet({
                     lineHeight: 1.35,
                   }}
                 >
-                  {row.session.title}
+                  {T(row.session.title, (v) => edit?.onSession(i, { title: v }), true)}
                 </div>
                 {row.session.detail.trim()
                   ? row.session.detail.split("\n").map((para, p) =>
@@ -353,7 +430,14 @@ export function AgendaSheet({
                             marginTop: mm(L.detailSize * 0.6),
                           }}
                         >
-                          {para}
+                          {T(para, (v) =>
+                            edit?.onSession(i, {
+                              detail: row.session.detail
+                                .split("\n")
+                                .map((line, q) => (q === p ? v : line))
+                                .join("\n"),
+                            }),
+                          )}
                         </div>
                       ) : null,
                     )
@@ -393,7 +477,9 @@ export function AgendaSheet({
                         marginBottom: mm(ct.timeSize * 0.25),
                       }}
                     >
-                      {(par.time ?? "").trim() || row.session.time}
+                      {T((par.time ?? "").trim() || row.session.time, (v) =>
+                        edit?.onParallel(i, n, { time: v }),
+                      )}
                     </div>
                   ) : null}
                   <div
@@ -404,7 +490,7 @@ export function AgendaSheet({
                       paddingRight: mm(ct.pinW),
                     }}
                   >
-                    {par.title}
+                    {T(par.title, (v) => edit?.onParallel(i, n, { title: v }), true)}
                   </div>
                   {(par.speaker ?? "").trim() ? (
                     <div
@@ -416,7 +502,7 @@ export function AgendaSheet({
                         paddingRight: mm(ct.pinW),
                       }}
                     >
-                      {par.speaker}
+                      {T(par.speaker ?? "", (v) => edit?.onParallel(i, n, { speaker: v }), true)}
                     </div>
                   ) : null}
                   {par.detail.trim() ? (
@@ -428,7 +514,7 @@ export function AgendaSheet({
                         paddingRight: mm(ct.pinW),
                       }}
                     >
-                      {par.detail}
+                      {T(par.detail, (v) => edit?.onParallel(i, n, { detail: v }), true)}
                     </div>
                   ) : null}
                   {ct.pinW > 0 ? (
@@ -470,7 +556,7 @@ export function AgendaSheet({
                 color: row.session.muted ? ink : titleInk,
               }}
             >
-              {row.session.time}
+              {T(row.session.time, (v) => edit?.onSession(i, { time: v }))}
             </div>
             <div style={{ flex: "1 1 auto", minWidth: 0, paddingRight: mm(4) }}>
               <div
@@ -481,7 +567,7 @@ export function AgendaSheet({
                   letterSpacing: "-0.01em",
                 }}
               >
-                {row.session.title}
+                {T(row.session.title, (v) => edit?.onSession(i, { title: v }), true)}
               </div>
               {row.session.detail.trim() ? (
                 <div
@@ -491,7 +577,7 @@ export function AgendaSheet({
                     marginTop: mm(L.detailSize * 0.35),
                   }}
                 >
-                  {row.session.detail}
+                  {T(row.session.detail, (v) => edit?.onSession(i, { detail: v }), true)}
                 </div>
               ) : null}
             </div>
@@ -508,7 +594,7 @@ export function AgendaSheet({
                   textTransform: "uppercase",
                 }}
               >
-                {row.session.track}
+                {T(row.session.track, (v) => edit?.onSession(i, { track: v }))}
               </div>
             ) : null}
           </div>
@@ -534,6 +620,7 @@ export function AgendaSheet({
             cursor: onPlaceQr ? "grab" : undefined,
             touchAction: onPlaceQr ? "none" : undefined,
           }}
+          data-agenda-qr="true"
           data-export-ignore={undefined}
           onPointerDown={
             onPlaceQr
@@ -647,13 +734,16 @@ export function AgendaSheet({
         />
       ) : null}
 
-      {/* Footnote: on the programme look it sits above the band with a pin. */}
+      {/* Footnote: on the programme look it sits in its own reserved strip above
+          the band, so neither the copy nor the pin can print on a row band or
+          the band foot. */}
       {config.footnote.trim() ? (
         blocks.footerBand ? (
           <div
             style={{
-              ...at(blocks.x, blocks.footerBand.y - L.footSize * 3.1),
+              ...at(blocks.x, blocks.footnoteY),
               width: mm(blocks.contentW),
+              height: mm(blocks.footnoteH),
               fontSize: mm(L.footSize * 1.15),
               fontWeight: 700,
               lineHeight: 1.3,
@@ -663,10 +753,11 @@ export function AgendaSheet({
             }}
           >
             {blocks.rows.some((r) => r.parallel) ? (
-              <AgendaPin size={mm(L.footSize * 2.6)} />
+              <AgendaPin size={mm(L.footSize * 2.2)} />
             ) : null}
-            <span>{config.footnote}</span>
+            <span>{T(config.footnote, (v) => edit?.onField("footnote", v), true)}</span>
           </div>
+
         ) : (
           <div
             style={{
@@ -677,7 +768,7 @@ export function AgendaSheet({
               lineHeight: 1.25,
             }}
           >
-            {config.footnote}
+            {T(config.footnote, (v) => edit?.onField("footnote", v), true)}
           </div>
         )
       ) : null}
