@@ -172,3 +172,14 @@ on the floor and the fit report / page capacity says "over" out loud. The single
 fitter collapses line breaks and tabs before measuring.
 **Enforced by:** `src/lib/__tests__/agenda-full-matrix.test.ts` — the full combination
 sweep plus a real press PDF, Word and PowerPoint build for every option value.
+
+## Two signs can share a live-file name — map by folder, never by filename
+
+**What happened:** the September hand-back folder contained `Lifts_Template.ai` twice —
+once under `GF/Lift Door Template/` (unchanged) and once under `GF/Lift Walls Template/`
+(newly finished). A basename match would have given the lift doors the wall artwork and
+missed the wall update entirely.
+
+**Rule:** map a hand-back file to a sign by its full path inside the pack, and record that
+path in the version note so the next issue can be diffed against it. Where a supplied
+artboard is a 1:10 proof, scale the trim up ×10 and say so in `dimsSource`.
