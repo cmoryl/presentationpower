@@ -1173,6 +1173,7 @@ export function AgendaStudio({
           })()}
 
           </div>
+          </>
           ) : null}
 
           {step === 0 ? (
