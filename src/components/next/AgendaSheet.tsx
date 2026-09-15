@@ -20,6 +20,8 @@ import {
   AGENDA_BAND,
   agendaBandPalette,
   agendaBandRadius,
+  agendaLocation,
+  agendaLocationText,
   type AgendaConfig,
 } from "@/lib/next-agenda";
 import { agendaCopyInk } from "@/lib/next-agenda-contrast";
@@ -92,6 +94,9 @@ export function AgendaSheet({
   const blocks = agendaBlocks(config);
   const L = blocks.layout;
   const BAND = agendaBandPalette(config);
+  const LOC = agendaLocation(config);
+  const locText = agendaLocationText(config);
+  const locAlign = LOC.align === "centre" ? "center" : LOC.align;
   const face = config.face ?? "dark";
   // Legibility guard: keeps the approved face ink unless it stops reading on
   // this ground, so a board is never printed in copy no one can see.
