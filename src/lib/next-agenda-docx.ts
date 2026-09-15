@@ -1034,13 +1034,17 @@ export async function buildAgendaDocx(
   const imagePages = extras?.imagePages ?? [];
   const contentMm = contentTwips / TWIPS_PER_MM;
 
+  // A cover picture is veiled in brand ink, so ink-coloured copy would vanish
+  // into it: every cover line prints white over a picture ground.
+  const coverInk = coverGround ? "FFFFFF" : inkHex;
+  const coverTitle = coverGround ? "FFFFFF" : titleHex;
   const coverPage = cover
     ? [
         bkPara(backgroundDrawing("rIdCover"), 0),
-        bkPara(bkRun(cover.eyebrow ?? "", L.eyebrowSize, inkHex, true, true), 6),
-        bkPara(bkRun(cover.title ?? "", L.titleSize, titleHex, true), 5),
-        (cover.subtitle ?? "").trim() ? bkPara(bkRun(cover.subtitle, L.metaSize, inkHex, false), 4) : "",
-        (cover.footnote ?? "").trim() ? bkPara(bkRun(cover.footnote, L.footSize, inkHex, false), 0) : "",
+        bkPara(bkRun(cover.eyebrow ?? "", L.eyebrowSize, coverInk, true, true), 6),
+        bkPara(bkRun(cover.title ?? "", L.titleSize, coverTitle, true), 5),
+        (cover.subtitle ?? "").trim() ? bkPara(bkRun(cover.subtitle, L.metaSize, coverInk, false), 4) : "",
+        (cover.footnote ?? "").trim() ? bkPara(bkRun(cover.footnote, L.footSize, coverInk, false), 0) : "",
       ].join("")
     : "";
 
