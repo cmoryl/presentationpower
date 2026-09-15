@@ -312,6 +312,8 @@ function LondonTemplatePage() {
     const id = toast.loading(`Building ${panels.length} panels…`);
     try {
       const pack = await buildLondonSignagePack(panels, {
+        // Stamp the revision actually in force — never a number nobody published.
+        revision: revStamp,
         colorSpace,
         vibrance,
         onProgress: (done, total) => setProgress({ done, total }),
