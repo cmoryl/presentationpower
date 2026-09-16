@@ -126,7 +126,7 @@ function AlongsideView() {
               Layout template
             </div>
             <h2 className="text-2xl font-semibold tracking-tight text-[#03002C]">
-              Sixteen frames, nine layouts, three trims
+              Sixteen frames, {LEGAL_ALONGSIDE_TEMPLATES.length} layouts, three trims
             </h2>
             <p className="max-w-2xl text-sm text-black/60">
               Pick a layout for the whole set here, or click the small layout buttons on any single
