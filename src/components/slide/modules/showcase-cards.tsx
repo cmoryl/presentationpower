@@ -14,6 +14,7 @@ import { DeviceFrame } from "@/components/device/DeviceFrame";
 import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { iconByName } from "@/lib/icon-library";
+import { cardBaseGradient, cardWashGradient, openBottomFrame } from "@/lib/surface-tokens";
 import {
   readBenefits,
   readCards,
