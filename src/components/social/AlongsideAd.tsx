@@ -362,7 +362,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
         <div
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(${dir}, ${P.ground}F5 0%, ${P.ground}E0 22%, ${P.ground}A6 44%, ${P.ground}45 68%, ${P.ground}00 94%)`,
+            background: `linear-gradient(${dir}, ${P.ground}F0 0%, ${P.ground}CC 20%, ${P.ground}85 40%, ${P.ground}2E 64%, ${P.ground}00 86%)`,
           }}
         />
         <div
@@ -402,7 +402,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
   } else if (template === "strata") {
     // Four stacked alpha strata climb the frame, each one denser than the last
     // and each divided by a gradient hairline. The copy sits in the deepest band.
-    const stops = [0.94, 0.66, 0.4, 0.18]; // densest at the base, under the copy
+    const stops = [0.92, 0.58, 0.28, 0.1]; // densest at the base, under the copy
     const base = wide ? 62 : square ? 58 : 56; // % height held by the strata
     const bandH = base / stops.length;
     body = (
@@ -456,7 +456,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
         <div
           className="absolute inset-0"
           style={{
-            background: `radial-gradient(120% 96% at ${clear === "right" ? "76%" : "26%"} 62%, ${P.ground}F0 0%, ${P.ground}BF 34%, ${P.ground}6B 60%, ${P.ground}12 86%, ${P.ground}00 100%)`,
+            background: `radial-gradient(112% 88% at ${clear === "right" ? "78%" : "24%"} 64%, ${P.ground}F0 0%, ${P.ground}B3 30%, ${P.ground}4D 56%, ${P.ground}0A 80%, ${P.ground}00 100%)`,
           }}
         />
         <div
@@ -495,10 +495,10 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           className="absolute overflow-hidden"
           style={{ left: 0, right: 0, bottom: 0, height: wide ? "32%" : square ? "40%" : "36%" }}
         >
-          {photo()}
+          {photo(undefined, "band")}
           <div
             className="absolute inset-0"
-            style={{ background: `linear-gradient(to top, ${P.ground}00 46%, ${P.ground}59 100%)` }}
+            style={{ background: `linear-gradient(to top, ${P.ground}00 52%, ${P.ground}47 100%)` }}
           />
         </div>
         <div
@@ -518,7 +518,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
                 maxWidth: "13em",
                 backgroundImage: `linear-gradient(${P.light}80, ${P.light}80), url(${scene.src})`,
                 backgroundSize: "cover",
-                backgroundPosition: focus,
+                backgroundPosition: framePos("band"),
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 color: "transparent",
@@ -546,7 +546,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
   } else if (template === "louvre") {
     // The frame is louvred into three panes of the same photograph, each cropped
     // differently, with the copy carried on an ink band across the base.
-    const panes = ["22% 50%", focus, "78% 50%"];
+    const panes = [offsetPos(-26, 2), framePos("panel"), offsetPos(26, 2)];
     const bandTop = wide ? "50%" : square ? "58%" : "60%";
     body = (
       <>
@@ -559,7 +559,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
                 className="absolute inset-0 size-full object-cover"
                 style={{
                   objectPosition: pos,
-                  filter: i === 1 ? "contrast(1.08) saturate(1.05)" : "contrast(1.02) saturate(0.5) brightness(0.82)",
+                  filter: i === 1 ? "contrast(1.08) saturate(1.05)" : "contrast(1.02) saturate(0.62) brightness(0.88)",
                 }}
               />
             </div>
@@ -610,9 +610,9 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     );
     body = (
       <>
-        {photo({ filter: "grayscale(1) contrast(1.2)" })}
-        <div className="absolute inset-0" style={{ background: P.accent, mixBlendMode: "multiply" }} />
-        <div className="absolute inset-0" style={{ background: `${P.ground}40` }} />
+        {photo({ filter: "grayscale(1) contrast(1.24) brightness(1.06)" })}
+        <div className="absolute inset-0" style={{ background: `${P.accent}D9`, mixBlendMode: "multiply" }} />
+        <div className="absolute inset-0" style={{ background: `${P.ground}1F` }} />
         <div
           className="absolute inset-0 flex flex-col justify-between overflow-hidden"
           style={{ padding: u(M) }}
@@ -667,7 +667,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           className="absolute overflow-hidden"
           style={{ ...archStyle, borderRadius: wide ? `${u(21)} ${u(21)} 0 0` : `${u(30)} ${u(30)} 0 0` }}
         >
-          {photo()}
+          {photo(undefined, wide ? "column" : "panel")}
         </div>
         <div
           className="absolute flex flex-col justify-between"
@@ -692,7 +692,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
   } else if (template === "contact") {
     // A proof sheet: the frame plus two tighter crops of it in a mono data
     // column, the way a photographer marks up a take.
-    const crops = ["18% 34%", "76% 62%"];
+    const crops = [offsetPos(-20, -12), offsetPos(20, 12)];
     body = (
       <>
         <div className="absolute inset-0" style={{ background: P.ground }} />
@@ -704,10 +704,10 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
               : { top: u(M), left: u(M), right: u(M), height: square ? "48%" : "44%" }
           }
         >
-          {photo()}
+          {photo(undefined, "panel")}
           <div
             className="absolute inset-0"
-            style={{ background: `linear-gradient(to top, ${P.ground}A6 0%, ${P.ground}00 52%)` }}
+            style={{ background: `linear-gradient(to top, ${P.ground}94 0%, ${P.ground}00 46%)` }}
           />
           <div className="absolute" style={{ left: u(1.6), bottom: u(1.4) }}>
             <span
@@ -914,7 +914,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     body = (
       <>
         {photo()}
-        <div className="absolute inset-0" style={{ background: `${P.ground}4D` }} />
+        <div className="absolute inset-0" style={{ background: `${P.ground}2E` }} />
         <div className="absolute inset-0" style={{ background: P.ground, clipPath: band }} />
         <div
           aria-hidden
@@ -994,7 +994,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           className="absolute overflow-hidden"
           style={{ top: imgTop, bottom: imgBottom, left: u(side), right: u(side) }}
         >
-          {photo()}
+          {photo(undefined, "panel")}
         </div>
         <div className="absolute" style={{ top: "6%", left: u(side), right: u(side) }}>
           {masthead()}
@@ -1024,7 +1024,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           className="absolute inset-y-0 overflow-hidden"
           style={{ left: spineLeft ? u(spine) : 0, right: spineLeft ? 0 : u(spine) }}
         >
-          {photo()}
+          {photo(undefined, "full")}
           <div
             className="absolute inset-0"
             style={{
@@ -1088,7 +1088,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     body = (
       <>
         <div className="absolute inset-x-0 top-0 overflow-hidden" style={{ bottom: `${ledger}%` }}>
-          {photo()}
+          {photo(undefined, wide ? "band" : "panel")}
           <div
             className="absolute inset-x-0 bottom-0"
             style={{ height: "34%", background: `linear-gradient(to top, ${P.ground}80, ${P.ground}00)` }}
@@ -1142,7 +1142,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     body = (
       <div className="absolute inset-0" style={{ background: P.ground }}>
         <div className="absolute inset-x-0 top-0 overflow-hidden" style={{ bottom: wide ? "22%" : "18%" }}>
-          {photo()}
+          {photo(undefined, "panel")}
         </div>
         <div
           className="absolute"
@@ -1179,7 +1179,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           {headline(square ? 4.8 : 3.8, { measure: 15 })}
         </div>
         <div className="absolute inset-x-0 overflow-hidden" style={{ top: head, bottom: "16%" }}>
-          {photo()}
+          {photo(undefined, "band")}
         </div>
         <div
           className="absolute inset-x-0 bottom-0 flex items-center"
@@ -1209,7 +1209,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           className="absolute overflow-hidden"
           style={{ top: `${imgTop}%`, left: u(side), right: u(side), height: `${imgH}%` }}
         >
-          {photo()}
+          {photo(undefined, "panel")}
         </div>
         <div
           className="absolute flex flex-col"
@@ -1252,7 +1252,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
                 }
           }
         >
-          {photo()}
+          {photo(undefined, tall ? "panel" : "column")}
         </div>
         <div
           className="absolute flex flex-col justify-between"
@@ -1288,7 +1288,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
         <div
           className="absolute inset-0"
           style={{
-            background: `radial-gradient(118% 92% at 50% 48%, ${P.ground}E6 0%, ${P.ground}AD 46%, ${P.ground}5C 100%)`,
+            background: `radial-gradient(118% 92% at 50% 48%, ${P.ground}E0 0%, ${P.ground}94 44%, ${P.ground}3D 100%)`,
           }}
         />
         <div
