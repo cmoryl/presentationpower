@@ -34,8 +34,10 @@ function PresenterGate() {
   const { deckId } = Route.useParams();
   const hydrated = useDeckHydrated();
   const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
+  const slideCount = useDeckStore((s) => s.decks[deckId]?.slides.length ?? 0);
   if (!hydrated) return <DeckHydratingFallback label="Loading presentation…" />;
   if (!hasDeck) throw notFound();
+  if (slideCount === 0) return <DeckEmptyNotice deckId={deckId} action="present" />;
   return <PresenterView />;
 }
 

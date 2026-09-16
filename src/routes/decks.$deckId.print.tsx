@@ -36,8 +36,12 @@ function PrintGate() {
   const { deckId } = Route.useParams();
   const hydrated = useDeckHydrated();
   const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
+  const slideCount = useDeckStore((s) => s.decks[deckId]?.slides.length ?? 0);
   if (!hydrated) return <DeckHydratingFallback label="Preparing print view…" />;
   if (!hasDeck) throw notFound();
+  // Gate before PrintView mounts — it auto-opens the print dialog, which would
+  // otherwise hand the user a blank PDF and claim the export finished.
+  if (slideCount === 0) return <DeckEmptyNotice deckId={deckId} action="print" />;
   return <PrintView />;
 }
 
