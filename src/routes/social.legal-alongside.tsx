@@ -267,6 +267,105 @@ function AlongsideView() {
           Back to social <ArrowRight size={14} />
         </Link>
       </section>
+
+      {zoomScene ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${zoomScene.no} · ${zoomScene.theme} — large view`}
+          className="fixed inset-0 z-50 flex flex-col bg-[#03002C]/92 p-4 backdrop-blur-sm sm:p-6"
+          onClick={() => setZoom(null)}
+        >
+          <div
+            className="mx-auto flex h-full w-full max-w-[1500px] flex-col gap-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3 text-white">
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">
+                  {zoomScene.no} · {zoomScene.pair}
+                </div>
+                <div className="text-lg font-semibold">{zoomScene.theme}</div>
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5">
+                {LEGAL_ALONGSIDE_SIZES.map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => setSizeId(s.id)}
+                    aria-pressed={s.id === sizeId}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                      s.id === sizeId
+                        ? "border-white bg-white text-[#03002C]"
+                        : "border-white/25 text-white/80 hover:border-white/60"
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+                <span aria-hidden className="mx-1 text-white/25">
+                  |
+                </span>
+                <button
+                  type="button"
+                  onClick={() => step(-1)}
+                  aria-label="Previous ad"
+                  className="rounded-full border border-white/25 p-2 text-white/80 hover:border-white/60"
+                >
+                  <ChevronLeft size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => step(1)}
+                  aria-label="Next ad"
+                  className="rounded-full border border-white/25 p-2 text-white/80 hover:border-white/60"
+                >
+                  <ChevronRight size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setZoom(null)}
+                  aria-label="Close large view"
+                  className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-white/25 px-3 py-1.5 text-xs font-medium text-white/85 hover:border-white/60"
+                >
+                  <X size={13} /> Close
+                </button>
+              </div>
+            </div>
+
+            <div className="flex min-h-0 flex-1 items-center justify-center">
+              <div
+                className="w-full overflow-hidden rounded-2xl shadow-[0_40px_120px_-40px_rgba(0,0,0,0.8)]"
+                style={{
+                  aspectRatio: `${size.w} / ${size.h}`,
+                  maxWidth: "100%",
+                  maxHeight: "100%",
+                  width: `min(100%, calc((100cqh) * ${size.w / size.h}))`,
+                }}
+              >
+                <AlongsideAd
+                  scene={zoomScene}
+                  template={perScene[zoomScene.id] ?? template}
+                  w={size.w}
+                  h={size.h}
+                />
+              </div>
+            </div>
+
+            <div className="mx-auto max-w-3xl space-y-1 text-center text-white/80">
+              <p className="text-base font-semibold text-white">{zoomScene.headline}</p>
+              <p className="text-sm">{zoomScene.caption}</p>
+              <p className="text-xs text-white/50">
+                {zoomScene.craft} · {size.w}×{size.h} ·{" "}
+                {LEGAL_ALONGSIDE_TEMPLATES.find(
+                  (t) => t.id === (perScene[zoomScene.id] ?? template),
+                )?.label}{" "}
+                · Arrow keys move between ads, Esc closes.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
