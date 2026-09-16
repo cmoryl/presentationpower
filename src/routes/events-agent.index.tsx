@@ -3,12 +3,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { ConsoleLoading } from "@/components/ConsoleLoading";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { createKitThread, listKitThreads } from "@/lib/kit-agent/threads";
 import { AgentSignInGate } from "@/components/AgentSignInGate";
 
 export const Route = createFileRoute("/events-agent/")({
   ssr: false,
+  pendingComponent: () => <ConsoleLoading label="events agent" />,
   head: () => ({
     meta: [
       { title: "Events agent · TransPerfect Element" },

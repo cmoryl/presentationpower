@@ -3,12 +3,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { ConsoleLoading } from "@/components/ConsoleLoading";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { createKitThread, listKitThreads } from "@/lib/kit-agent/threads";
 import { AgentSignInGate } from "@/components/AgentSignInGate";
 
 export const Route = createFileRoute("/social-agent/")({
   ssr: false,
+  pendingComponent: () => <ConsoleLoading label="social agent" />,
   head: () => ({
     meta: [
       { title: "Social agent · TransPerfect Element" },
