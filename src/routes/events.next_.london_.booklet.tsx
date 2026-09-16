@@ -516,23 +516,33 @@ function BookletPage() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   {(
                     [
-                      ["eyebrow", "Eyebrow"],
-                      ["title", "Title"],
-                      ["subtitle", "Sub-line"],
-                      ["footnote", "Footnote"],
+                      // Caps are what the printed cover can hold at the trim without
+                      // the copy running over the picture or the foot of the page.
+                      ["eyebrow", "Eyebrow", 40],
+                      ["title", "Title", 60],
+                      ["subtitle", "Sub-line", 120],
+                      ["footnote", "Footnote", 170],
                     ] as const
-                  ).map(([key, label]) => (
+                  ).map(([key, label, cap]) => (
                     <label key={key} className="space-y-1">
                       <span className={labelCls}>{label}</span>
                       <input
                         className={field}
+                        maxLength={cap}
                         value={config.cover[key]}
                         onChange={(e) =>
                           setConfig((c) => ({ ...c, cover: { ...c.cover, [key]: e.target.value } }))
                         }
                       />
+                      {config.cover[key].length > cap - 10 ? (
+                        <span className="block text-[11px] text-[color:var(--color-muted-foreground)]">
+                          {config.cover[key].length} of {cap} characters — the printed cover holds no
+                          more.
+                        </span>
+                      ) : null}
                     </label>
                   ))}
+
                 </div>
               ) : null}
 
