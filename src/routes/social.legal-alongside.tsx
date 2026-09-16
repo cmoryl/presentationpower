@@ -140,7 +140,8 @@ function AlongsideView() {
         </div>
 
         <p className="text-xs text-black/55">
-          {LEGAL_ALONGSIDE_TEMPLATES.find((t) => t.id === template)?.note}
+          {LEGAL_ALONGSIDE_TEMPLATES.find((t) => t.id === template)?.note}{" "}
+          <span className="text-black/40">— {LEGAL_ALONGSIDE_TYPE[template].note}</span>
         </p>
 
         <div className="grid gap-8 lg:grid-cols-2">
