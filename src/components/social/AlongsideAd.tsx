@@ -1,11 +1,20 @@
 // One rendered ad from the "You're not on it alone." Legal set.
 //
 // The photograph is the ad. Copy never sits on picture detail and hopes for the
-// best: every template either owns a solid area (band, split, plate) or lays a
-// deep directional curtain of the ground colour over the frame's clear side.
+// best: every template either owns a solid field (margin, plate, ledger, band)
+// or lays a deep directional curtain of the ground colour over the frame's
+// clear side.
 //
-// The frame scales with its container (container-query units), so the same
-// component proofs at 1200×628, 1080×1080 and 1080×1350.
+// Composition grammar shared by every template:
+//   · one outer margin token, so nothing ever crowds the trim
+//   · one type scale, so headlines relate across the set
+//   · a measured headline (max ~15em) so lines break like typeset copy
+//   · hairlines and accent rules instead of boxes
+//   · the master number set as a small numeral against the division line
+//
+// Horizontal measures are container-query units (cqw) and vertical measures are
+// percentages of the frame, so a 1200×628 banner and a 1080×1350 story hold the
+// same proportions instead of the banner running out of height.
 
 import { getDivisionLogos } from "@/lib/division-logos";
 import {
@@ -23,6 +32,11 @@ type Props = {
   h: number;
 };
 
+const hex = (alpha: number) =>
+  Math.round(Math.max(0, Math.min(1, alpha)) * 255)
+    .toString(16)
+    .padStart(2, "0");
+
 /** A deep gradient of the ground colour holding one edge of the frame. */
 function curtain(clear: AlongsideClear, strength = 0.94): string {
   const to =
@@ -33,228 +47,504 @@ function curtain(clear: AlongsideClear, strength = 0.94): string {
         : clear === "top"
           ? "to bottom"
           : "to top";
-  return `linear-gradient(${to}, ${P.ground}${Math.round(strength * 255)
-    .toString(16)
-    .padStart(2, "0")} 0%, ${P.ground}D9 34%, ${P.ground}59 62%, ${P.ground}00 88%)`;
+  return `linear-gradient(${to}, ${P.ground}${hex(strength)} 0%, ${P.ground}D9 34%, ${P.ground}59 62%, ${P.ground}00 88%)`;
 }
 
 export function AlongsideAd({ scene, template, w, h }: Props) {
   const logos = getDivisionLogos("bm-tp-legal");
   const lockup = logos?.white ?? logos?.color;
   const square = Math.abs(w / h - 1) < 0.2 || h > w;
+  const tall = h > w * 1.1;
+  const wide = !square && !tall;
   const focus = square ? scene.focusSquare : scene.focus;
   const clear = scene.clear;
 
-  // Everything is sized in cqw so one component covers every trim.
+  // Everything horizontal is sized in cqw so one component covers every trim.
   const u = (n: number) => `${n}cqw`;
 
-  const photo = (
+  // ---- one spacing + type scale, shared by every template ----------------
+  const M = square ? 5.4 : 4.6; // outer margin
+  const T = {
+    eyebrow: square ? 1.5 : 1.3,
+    numeral: square ? 1.5 : 1.3,
+    display: square ? 5.2 : 4.3,
+    displayTight: square ? 4.4 : 3.6,
+    support: square ? 1.9 : 1.6,
+    cta: square ? 1.75 : 1.5,
+    micro: square ? 1.3 : 1.1,
+    logo: square ? 3.3 : 2.7,
+  };
+
+  const photo = (extra?: React.CSSProperties) => (
     <img
       src={scene.src}
       alt={`${scene.pair} — ${scene.theme}`}
       loading="lazy"
       className="absolute inset-0 size-full object-cover"
-      style={{ objectPosition: focus, filter: "contrast(1.06) saturate(1.02)" }}
+      style={{ objectPosition: focus, filter: "contrast(1.06) saturate(1.02)", ...extra }}
     />
   );
 
-  const eyebrow = (
-    <div
-      style={{
-        fontSize: u(1.5),
-        letterSpacing: "0.22em",
-        textTransform: "uppercase",
-        fontWeight: 600,
-        opacity: 0.82,
-      }}
-    >
-      {LEGAL_ALONGSIDE_CONCEPT.division}
-    </div>
-  );
-
-  const footer = (color: string) => (
-    <div
-      className="flex items-end justify-between gap-4"
-      style={{ color, fontSize: u(1.7) }}
-    >
+  /** Division line with the master number set against it on a hairline. */
+  const masthead = (ink = P.ink) => (
+    <div className="flex w-full items-baseline gap-3" style={{ color: ink }}>
       <span
         style={{
-          borderBottom: `${u(0.22)} solid ${P.accent}`,
-          paddingBottom: u(0.5),
+          fontSize: u(T.eyebrow),
+          letterSpacing: "0.24em",
+          textTransform: "uppercase",
           fontWeight: 600,
+          whiteSpace: "nowrap",
         }}
       >
-        {LEGAL_ALONGSIDE_CONCEPT.cta}
+        {LEGAL_ALONGSIDE_CONCEPT.division}
       </span>
-      {lockup ? (
-        <img
-          src={lockup}
-          alt="TransPerfect Legal"
-          style={{ height: u(3.2), width: "auto", objectFit: "contain" }}
-        />
-      ) : null}
+      <span aria-hidden className="flex-1" style={{ height: 1, background: `${ink}3D` }} />
+      <span
+        style={{
+          fontSize: u(T.numeral),
+          fontVariantNumeric: "tabular-nums",
+          letterSpacing: "0.14em",
+          opacity: 0.7,
+        }}
+      >
+        {scene.no}
+      </span>
     </div>
   );
 
-  const headline = (size: number, caps = false) => (
+  const headline = (size: number, opts?: { caps?: boolean; measure?: number }) => (
     <div
       style={{
         fontSize: u(size),
-        lineHeight: 1.04,
+        lineHeight: opts?.caps ? 1.02 : 1.06,
         fontWeight: 600,
-        letterSpacing: caps ? "0.01em" : "-0.02em",
-        textTransform: caps ? "uppercase" : "none",
+        color: P.ink,
+        letterSpacing: opts?.caps ? "0.005em" : "-0.022em",
+        textTransform: opts?.caps ? "uppercase" : "none",
         textWrap: "balance",
+        maxWidth: `${opts?.measure ?? 15}em`,
       }}
     >
       {scene.headline}
     </div>
   );
 
-  const support = (
-    <div style={{ fontSize: u(1.85), lineHeight: 1.35, opacity: 0.85 }}>
+  const support = () => (
+    <div
+      style={{
+        fontSize: u(T.support),
+        lineHeight: 1.42,
+        color: P.ink,
+        opacity: 0.82,
+        maxWidth: "26em",
+      }}
+    >
       {LEGAL_ALONGSIDE_CONCEPT.support}
     </div>
+  );
+
+  const cta = () => (
+    <span
+      style={{
+        fontSize: u(T.cta),
+        fontWeight: 600,
+        color: P.ink,
+        borderBottom: `${u(0.22)} solid ${P.accent}`,
+        paddingBottom: u(0.55),
+        whiteSpace: "nowrap",
+      }}
+    >
+      {LEGAL_ALONGSIDE_CONCEPT.cta}
+    </span>
+  );
+
+  const mark = (size = T.logo) =>
+    lockup ? (
+      <img
+        src={lockup}
+        alt="TransPerfect Legal"
+        style={{ height: u(size), width: "auto", objectFit: "contain" }}
+      />
+    ) : null;
+
+  const footer = () => (
+    <div className="flex w-full items-end justify-between" style={{ gap: u(3) }}>
+      {cta()}
+      {mark()}
+    </div>
+  );
+
+  const themeLabel = () => (
+    <span
+      style={{
+        fontSize: u(T.micro),
+        letterSpacing: "0.16em",
+        textTransform: "uppercase",
+        color: P.ink,
+        opacity: 0.55,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {scene.theme}
+    </span>
+  );
+
+  const accentRule = (widthPct = 18) => (
+    <span
+      aria-hidden
+      style={{ display: "block", width: `${widthPct}%`, height: u(0.34), background: P.accent }}
+    />
   );
 
   let body: React.ReactNode = null;
 
   if (template === "editorial") {
+    // Art to the far edge; copy in a measured column on the clear side.
     const onLeft = clear !== "right";
     body = (
       <>
-        {photo}
+        {photo()}
+        <div className="absolute inset-0" style={{ background: curtain(onLeft ? "left" : "right") }} />
         <div
-          className="absolute inset-0"
-          style={{ background: curtain(onLeft ? "left" : "right") }}
-        />
-        <div
-          className="absolute inset-0 flex flex-col justify-between"
+          className="absolute inset-0 grid"
           style={{
-            padding: u(5),
-            color: P.ink,
-            alignItems: onLeft ? "flex-start" : "flex-end",
-            textAlign: onLeft ? "left" : "right",
+            padding: u(M),
+            gridTemplateColumns: onLeft ? "minmax(0,46%) 1fr" : "1fr minmax(0,46%)",
           }}
         >
-          {eyebrow}
-          <div style={{ maxWidth: "52%", display: "grid", gap: u(1.6) }}>
-            {headline(square ? 5.6 : 4.6)}
-            {support}
+          <div className="flex flex-col justify-between" style={{ gridColumn: onLeft ? 1 : 2 }}>
+            {masthead()}
+            <div style={{ display: "grid", gap: u(1.7), paddingBlock: u(1.6) }}>
+              {accentRule(26)}
+              {headline(tall ? T.display : T.displayTight, { measure: 13 })}
+              {support()}
+            </div>
+            {footer()}
           </div>
-          <div style={{ width: "100%" }}>{footer(P.ink)}</div>
         </div>
       </>
     );
-  } else if (template === "band") {
+  } else if (template === "inset") {
+    // The photograph floats inside a deep ground margin. Nothing on the picture.
+    const side = M * 1.1;
+    const imgTop = wide ? "17%" : "14%";
+    const imgBottom = wide ? "33%" : square ? "27%" : "24%";
     body = (
-      <>
-        <div className="absolute inset-x-0 top-0" style={{ bottom: "34%" }}>
-          {photo}
+      <div className="absolute inset-0" style={{ background: P.ground }}>
+        <div
+          className="absolute overflow-hidden"
+          style={{ top: imgTop, bottom: imgBottom, left: u(side), right: u(side) }}
+        >
+          {photo()}
+        </div>
+        <div className="absolute" style={{ top: "6%", left: u(side), right: u(side) }}>
+          {masthead()}
         </div>
         <div
-          className="absolute inset-x-0 bottom-0 flex flex-col justify-center"
-          style={{ height: "34%", background: P.ground, color: P.ink, padding: u(4), gap: u(1.4) }}
+          className="absolute flex items-end justify-between"
+          style={{ left: u(side), right: u(side), bottom: "7%", gap: u(3) }}
         >
-          {eyebrow}
-          {headline(square ? 4.6 : 3.9)}
-          {footer(P.ink)}
+          <div style={{ display: "grid", gap: u(1.1) }}>
+            {headline(square ? 4.2 : 3.2, { measure: 16 })}
+            {themeLabel()}
+          </div>
+          <div style={{ display: "grid", justifyItems: "end", gap: u(1.3) }}>
+            {cta()}
+            {mark()}
+          </div>
         </div>
-      </>
+      </div>
     );
-  } else if (template === "poster") {
+  } else if (template === "spine") {
+    // Narrow ground spine with rotated division line; headline on a soft wedge.
+    const spineLeft = clear !== "right";
+    const spine = square ? 9 : 7.5;
     body = (
       <>
-        {photo}
-        <div className="absolute inset-0" style={{ background: curtain("top", 0.92) }} />
         <div
-          className="absolute inset-0 flex flex-col justify-between"
-          style={{ padding: u(5), color: P.ink }}
+          className="absolute inset-y-0 overflow-hidden"
+          style={{ left: spineLeft ? u(spine) : 0, right: spineLeft ? 0 : u(spine) }}
         >
-          <div style={{ display: "grid", gap: u(1.8) }}>
-            {eyebrow}
-            {headline(square ? 5.4 : 4.4, true)}
-            <div style={{ height: 1, background: `${P.ink}59` }} />
+          {photo()}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(${spineLeft ? "to top right" : "to top left"}, ${P.ground}F2 0%, ${P.ground}B8 30%, ${P.ground}33 62%, ${P.ground}00 82%)`,
+            }}
+          />
+        </div>
+        <div
+          className="absolute inset-y-0 flex items-center justify-center"
+          style={{
+            width: u(spine),
+            left: spineLeft ? 0 : "auto",
+            right: spineLeft ? "auto" : 0,
+            background: P.ground,
+            borderRight: spineLeft ? `${u(0.28)} solid ${P.accent}` : undefined,
+            borderLeft: spineLeft ? undefined : `${u(0.28)} solid ${P.accent}`,
+          }}
+        >
+          <div
+            style={{
+              writingMode: "vertical-rl",
+              transform: spineLeft ? "rotate(180deg)" : "none",
+              color: P.ink,
+              fontSize: u(T.eyebrow),
+              letterSpacing: "0.34em",
+              textTransform: "uppercase",
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              gap: u(2.4),
+            }}
+          >
+            <span>{LEGAL_ALONGSIDE_CONCEPT.division}</span>
+            <span aria-hidden style={{ width: 1, height: u(6), background: `${P.ink}47` }} />
+            <span style={{ fontVariantNumeric: "tabular-nums", opacity: 0.7 }}>{scene.no}</span>
           </div>
-          <div style={{ display: "grid", gap: u(1.2) }}>
-            {support}
-            {footer(P.ink)}
+        </div>
+        <div
+          className="absolute flex flex-col justify-end"
+          style={{
+            inset: 0,
+            paddingLeft: u(spineLeft ? spine + M : M),
+            paddingRight: u(spineLeft ? M : spine + M),
+            paddingBottom: u(M),
+            paddingTop: u(M),
+            gap: u(1.6),
+            alignItems: spineLeft ? "flex-start" : "flex-end",
+            textAlign: spineLeft ? "left" : "right",
+          }}
+        >
+          {headline(square ? 5 : 4, { measure: 13 })}
+          {support()}
+          <div style={{ height: u(0.4) }} />
+          {footer()}
+        </div>
+      </>
+    );
+  } else if (template === "ledger") {
+    // Art above; a ledger below, divided by a hairline grid.
+    const ledger = tall ? 32 : square ? 34 : 42;
+    body = (
+      <>
+        <div className="absolute inset-x-0 top-0 overflow-hidden" style={{ bottom: `${ledger}%` }}>
+          {photo()}
+          <div
+            className="absolute inset-x-0 bottom-0"
+            style={{ height: "34%", background: `linear-gradient(to top, ${P.ground}80, ${P.ground}00)` }}
+          />
+        </div>
+        <div
+          className="absolute inset-x-0 bottom-0 flex flex-col"
+          style={{
+            height: `${ledger}%`,
+            background: P.ground,
+            paddingInline: u(M),
+            paddingBlock: u(M * 0.7),
+            gap: u(1.4),
+            borderTop: `${u(0.3)} solid ${P.accent}`,
+          }}
+        >
+          {masthead()}
+          <div
+            className="grid flex-1"
+            style={{
+              gridTemplateColumns: tall ? "1fr" : "minmax(0,20%) minmax(0,1fr) auto",
+              gap: u(2.4),
+              alignItems: "start",
+            }}
+          >
+            <div style={{ paddingTop: u(0.5) }}>{themeLabel()}</div>
+            <div style={{ display: "grid", gap: u(1) }}>
+              {headline(square ? 3.7 : 2.9, { measure: 18 })}
+              {!wide ? support() : null}
+            </div>
+            <div
+              style={{
+                display: "grid",
+                justifyItems: tall ? "start" : "end",
+                alignContent: "space-between",
+                gap: u(1.4),
+                height: "100%",
+              }}
+            >
+              {cta()}
+              {mark()}
+            </div>
           </div>
         </div>
       </>
     );
-  } else if (template === "plate") {
+  } else if (template === "stack") {
+    // Full-width art stepped up off the base, with a ground plate set into the
+    // margin below it — the plate overlaps the picture edge, never floats in it.
     const right = clear === "right";
     body = (
-      <>
-        {photo}
-        <div
-          className="absolute inset-0"
-          style={{ background: `linear-gradient(to top, ${P.ground}73, ${P.ground}00 55%)` }}
-        />
+      <div className="absolute inset-0" style={{ background: P.ground }}>
+        <div className="absolute inset-x-0 top-0 overflow-hidden" style={{ bottom: wide ? "22%" : "18%" }}>
+          {photo()}
+        </div>
         <div
           className="absolute"
           style={{
-            bottom: u(4.5),
-            left: right ? "auto" : u(4.5),
-            right: right ? u(4.5) : "auto",
-            width: square ? "72%" : "48%",
+            bottom: "7%",
+            left: right ? u(M) : "auto",
+            right: right ? "auto" : u(M),
+            width: tall ? "80%" : square ? "74%" : "58%",
             background: P.ground,
-            color: P.ink,
-            padding: u(3.4),
+            borderTop: `${u(0.34)} solid ${P.accent}`,
+            paddingInline: u(square ? 3.2 : 2.6),
+            paddingBlock: u(square ? 2.6 : 2),
             display: "grid",
-            gap: u(1.4),
-            borderTop: `${u(0.4)} solid ${P.accent}`,
+            gap: u(1.3),
+            boxShadow: `0 ${u(1.2)} ${u(4)} ${P.ground}8C`,
           }}
         >
-          {eyebrow}
-          {headline(square ? 4.4 : 3.6)}
-          {support}
-          {footer(P.ink)}
+          {masthead()}
+          {headline(square ? 4 : 3.1, { measure: 16 })}
+          {footer()}
         </div>
-      </>
+      </div>
     );
-  } else if (template === "split") {
-    const panelLeft = clear !== "right";
+  } else if (template === "poster") {
+    // Caps headline in a ground masthead; picture opens beneath as a window.
+    const head = wide ? "46%" : "44%";
     body = (
-      <div className="absolute inset-0 flex" style={{ flexDirection: panelLeft ? "row" : "row-reverse" }}>
+      <div className="absolute inset-0" style={{ background: P.ground }}>
         <div
-          className="relative flex flex-col justify-between"
+          className="absolute inset-x-0 top-0 flex flex-col justify-between"
+          style={{ height: head, paddingInline: u(M), paddingBlock: u(M * 0.8) }}
+        >
+          {masthead()}
+          {headline(square ? 4.8 : 3.8, { caps: true, measure: 15 })}
+        </div>
+        <div className="absolute inset-x-0 overflow-hidden" style={{ top: head, bottom: "16%" }}>
+          {photo()}
+        </div>
+        <div
+          className="absolute inset-x-0 bottom-0 flex items-center"
+          style={{ height: "16%", paddingInline: u(M) }}
+        >
+          <div className="flex w-full items-center justify-between" style={{ gap: u(3) }}>
+            {support()}
+            <div className="flex items-center" style={{ gap: u(2.4) }}>
+              {cta()}
+              {mark()}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  } else if (template === "window") {
+    // Frame cropped to a window on wide margins; copy set beneath on a baseline.
+    const side = M * 1.25;
+    const imgTop = wide ? 17 : 14;
+    const imgH = tall ? 46 : square ? 46 : 42;
+    body = (
+      <div className="absolute inset-0" style={{ background: P.ground }}>
+        <div className="absolute" style={{ top: "6%", left: u(side), right: u(side) }}>
+          {masthead()}
+        </div>
+        <div
+          className="absolute overflow-hidden"
+          style={{ top: `${imgTop}%`, left: u(side), right: u(side), height: `${imgH}%` }}
+        >
+          {photo()}
+        </div>
+        <div
+          className="absolute flex flex-col"
           style={{
-            width: square ? "50%" : "44%",
-            background: P.ground,
-            color: P.ink,
-            padding: u(4),
+            left: u(side),
+            right: u(side),
+            top: `${imgTop + imgH + 5}%`,
+            bottom: "7%",
+            gap: u(1.3),
           }}
         >
-          {eyebrow}
-          <div style={{ display: "grid", gap: u(1.4) }}>
-            {headline(square ? 5 : 4)}
-            {support}
+          {accentRule(14)}
+          {headline(square ? 4 : 3, { measure: 20 })}
+          <div className="mt-auto flex items-end justify-between" style={{ gap: u(3) }}>
+            {themeLabel()}
+            <div className="flex items-center" style={{ gap: u(2.2) }}>
+              {cta()}
+              {mark()}
+            </div>
           </div>
-          {footer(P.ink)}
         </div>
-        <div className="relative flex-1">{photo}</div>
+      </div>
+    );
+  } else if (template === "field") {
+    // Ground field with an accent bar; art stepped away from it.
+    const fieldLeft = clear !== "right";
+    const fieldW = tall ? 100 : square ? 52 : 46;
+    body = (
+      <div className="absolute inset-0" style={{ background: P.ground }}>
+        <div
+          className="absolute overflow-hidden"
+          style={
+            tall
+              ? { top: 0, left: 0, right: 0, bottom: "46%" }
+              : {
+                  top: "6%",
+                  bottom: "6%",
+                  left: fieldLeft ? `${fieldW}%` : 0,
+                  right: fieldLeft ? 0 : `${fieldW}%`,
+                }
+          }
+        >
+          {photo()}
+        </div>
+        <div
+          className="absolute flex flex-col justify-between"
+          style={
+            tall
+              ? { top: "54%", bottom: 0, left: 0, right: 0, padding: u(M) }
+              : {
+                  top: 0,
+                  bottom: 0,
+                  left: fieldLeft ? 0 : "auto",
+                  right: fieldLeft ? "auto" : 0,
+                  width: `${fieldW}%`,
+                  paddingInline: u(M),
+                  paddingBlock: u(M * 0.9),
+                }
+          }
+        >
+          {masthead()}
+          <div style={{ display: "grid", gap: u(1.5) }}>
+            {accentRule(30)}
+            {headline(square ? 4.4 : 3.5, { measure: 12 })}
+            {support()}
+          </div>
+          {footer()}
+        </div>
       </div>
     );
   } else {
+    // Centre axis between two accent rules over a deep scrim.
     body = (
       <>
-        {photo}
+        {photo()}
         <div
           className="absolute inset-0"
           style={{
-            background: `radial-gradient(120% 90% at 50% 50%, ${P.ground}E6 0%, ${P.ground}B3 45%, ${P.ground}59 100%)`,
+            background: `radial-gradient(118% 92% at 50% 48%, ${P.ground}E6 0%, ${P.ground}AD 46%, ${P.ground}5C 100%)`,
           }}
         />
         <div
-          className="absolute inset-0 flex flex-col items-center justify-center text-center"
-          style={{ padding: u(6), color: P.ink, gap: u(2) }}
+          className="absolute inset-0 flex flex-col items-center justify-between"
+          style={{ paddingInline: u(M * 1.2), paddingBlock: u(M) }}
         >
-          {eyebrow}
-          {headline(square ? 5.8 : 4.8)}
-          {support}
-          <div style={{ width: "100%", marginTop: u(2) }}>{footer(P.ink)}</div>
+          {masthead()}
+          <div className="flex flex-col items-center text-center" style={{ gap: u(1.8), maxWidth: "84%" }}>
+            <span aria-hidden style={{ width: u(6), height: u(0.3), background: P.accent }} />
+            {headline(square ? 5 : 4, { measure: 14 })}
+            {support()}
+            <span aria-hidden style={{ width: u(6), height: 1, background: `${P.ink}3D` }} />
+          </div>
+          {footer()}
         </div>
       </>
     );

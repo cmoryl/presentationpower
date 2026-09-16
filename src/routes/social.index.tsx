@@ -187,7 +187,7 @@ function SocialView() {
             </div>
             <p className="mt-1 max-w-2xl text-sm text-black/65">
               Sixteen documentary frames — one expert committed to something hard, one person already
-              in position — each with its own headline, caption and six switchable layouts.
+              in position — each with its own headline, caption and nine switchable layouts.
             </p>
           </div>
           <span className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-sm font-medium text-white group-hover:bg-[#003FC7]">
