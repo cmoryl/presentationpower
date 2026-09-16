@@ -336,6 +336,31 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
 /** Layout templates the board can switch between. */
 export const LEGAL_ALONGSIDE_TEMPLATES = [
   {
+    id: "knockout",
+    label: "Photo knockout",
+    note: "A light field with the headline cut clean out of it so the photograph shows through the letterforms, over a full-bleed strip of the same frame.",
+  },
+  {
+    id: "louvre",
+    label: "Louvre panes",
+    note: "The frame louvred into three panes of the same photograph, the centre pane in full colour and the outer two desaturated, copy on an ink band.",
+  },
+  {
+    id: "marquee",
+    label: "Duotone marquee",
+    note: "A blue duotone photograph under the turn repeated three times at poster scale — outline, solid, outline.",
+  },
+  {
+    id: "arch",
+    label: "Arch window",
+    note: "The photograph held in a tall arch with an accent ring struck off-register behind it, copy on the open side.",
+  },
+  {
+    id: "contact",
+    label: "Proof sheet",
+    note: "A photographer's proof sheet: the frame marked up, two tighter crops beside it and the camera note set as data.",
+  },
+  {
     id: "wedge",
     label: "Cut wedge",
     note: "The photograph runs full bleed and a hard ink wedge is cut into it on the diagonal; the headline sits huge inside the wedge over a solid accent call to action.",
@@ -483,6 +508,46 @@ export type AlongsideTypeTreatment = {
 };
 
 export const LEGAL_ALONGSIDE_TYPE: Record<AlongsideTemplateId, AlongsideTypeTreatment> = {
+  knockout: {
+    display: { family: F.anton, weight: 400, tracking: "-0.008em", lineHeight: 1.02, caps: true, scale: 1 },
+    action: { family: F.anton, weight: 400, caps: true, scale: 1 },
+    eyebrow: { family: F.archivo, weight: 700, tracking: "0.3em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.42 },
+    cta: { family: F.archivo, weight: 700, tracking: "0.16em", caps: true },
+    note: "One Anton caps block, the picture read through the letterforms.",
+  },
+  louvre: {
+    display: { family: F.work, weight: 700, tracking: "-0.026em", lineHeight: 1.04, scale: 1.02 },
+    action: { family: F.lora, weight: 400, italic: true, scale: 1.04 },
+    eyebrow: { family: F.grotesk, weight: 500, tracking: "0.3em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.44 },
+    cta: { family: F.work, weight: 600, tracking: "0.14em", caps: true },
+    note: "Work Sans across the band, the turn in a Lora italic.",
+  },
+  marquee: {
+    display: { family: F.anton, weight: 400, tracking: "0.006em", lineHeight: 0.94, caps: true, scale: 1 },
+    action: { family: F.anton, weight: 400, caps: true, scale: 1 },
+    eyebrow: { family: F.mono, weight: 400, tracking: "0.3em" },
+    support: { family: F.grotesk, weight: 500, lineHeight: 1.3 },
+    cta: { family: F.mono, weight: 500, tracking: "0.14em", caps: true },
+    note: "Anton repeated as a marquee, outline against solid.",
+  },
+  arch: {
+    display: { family: F.serif, weight: 400, tracking: "0em", lineHeight: 1, scale: 1.14 },
+    action: { family: F.grotesk, weight: 600, caps: true, tracking: "0.1em", scale: 0.6 },
+    eyebrow: { family: F.grotesk, weight: 500, tracking: "0.32em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.46 },
+    cta: { family: F.grotesk, weight: 600, tracking: "0.16em", caps: true },
+    note: "Instrument Serif in the arch, the turn in tracked Space Grotesk caps.",
+  },
+  contact: {
+    display: { family: F.plex, weight: 500, tracking: "-0.024em", lineHeight: 1.1, scale: 0.98 },
+    action: { family: F.lora, weight: 400, italic: true, scale: 1.06 },
+    eyebrow: { family: F.plex, weight: 400, tracking: "0.26em" },
+    support: { family: F.plex, weight: 400, lineHeight: 1.5 },
+    cta: { family: F.plex, weight: 500, tracking: "0.14em", caps: true },
+    note: "IBM Plex Mono as sheet data, the turn falling into a Lora italic.",
+  },
   wedge: {
     display: { family: F.archivo, weight: 800, tracking: "-0.042em", lineHeight: 0.92, scale: 1.16 },
     action: { family: F.serif, weight: 400, italic: true, scale: 1.2 },
