@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { useDeckStore } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
+import { DeckEmptyNotice } from "@/components/DeckEmptyNotice";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { VizSurfaceProvider } from "@/components/slide/VizSurfaceContext";

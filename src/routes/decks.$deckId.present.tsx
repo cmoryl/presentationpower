@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { useEffect, useRef, useState, type TouchEvent as ReactTouchEvent } from "react";
 import { useDeckStore, resolveSlideTransition } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
+import { DeckEmptyNotice } from "@/components/DeckEmptyNotice";
 
 import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
