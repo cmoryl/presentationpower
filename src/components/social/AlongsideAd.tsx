@@ -306,7 +306,141 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     </div>
   );
 
-  if (template === "knockout") {
+  if (template === "veil") {
+    // A single long alpha veil drawn across the frame on the diagonal: the ground
+    // colour falls from opaque to nothing in five stops, so the picture surfaces
+    // as the copy runs out. An accent bloom is screened into the base.
+    const dir = clear === "left" ? "108deg" : clear === "right" ? "252deg" : clear === "top" ? "180deg" : "0deg";
+    const side = clear === "right" ? "flex-end" : "flex-start";
+    body = (
+      <>
+        {photo()}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(${dir}, ${P.ground}F5 0%, ${P.ground}E0 22%, ${P.ground}A6 44%, ${P.ground}45 68%, ${P.ground}00 94%)`,
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(to top, ${P.accent}66 0%, ${P.accent}1F 26%, ${P.accent}00 54%)`,
+            mixBlendMode: "screen",
+          }}
+        />
+        <div
+          className="absolute inset-0 flex flex-col justify-between"
+          style={{ padding: u(M), alignItems: "stretch", textAlign: "left" }}
+        >
+          {masthead()}
+          <div
+            style={{
+              display: "grid",
+              gap: u(1.5),
+              maxWidth: wide ? "62%" : "88%",
+              justifySelf: side === "flex-end" ? "end" : "start",
+            }}
+          >
+            {alphaRule(64)}
+            <div style={{ opacity: 0.96 }}>
+              {headline(square ? T.display : T.displayTight * 1.04, { measure: 13 })}
+            </div>
+            <div style={{ opacity: 0.82 }}>{support()}</div>
+            {alphaRule(40, P.ink)}
+          </div>
+          <div className="flex items-end justify-between" style={{ gap: u(2) }}>
+            {themeLabel()}
+            {mark(T.logo * 0.85)}
+          </div>
+        </div>
+      </>
+    );
+  } else if (template === "strata") {
+    // Four stacked alpha strata climb the frame, each one denser than the last
+    // and each divided by a gradient hairline. The copy sits in the deepest band.
+    const stops = [0.16, 0.36, 0.62, 0.9];
+    const base = wide ? 62 : square ? 58 : 56; // % height held by the strata
+    const bandH = base / stops.length;
+    body = (
+      <>
+        {photo()}
+        {stops.map((a, i) => (
+          <div
+            key={a}
+            className="absolute inset-x-0"
+            style={{
+              bottom: `${i * bandH}%`,
+              height: `${bandH}%`,
+              background: `${P.ground}${hex(a)}`,
+              borderTop: i === stops.length - 1 ? undefined : `1px solid transparent`,
+              backgroundImage: `linear-gradient(${P.ground}${hex(a)}, ${P.ground}${hex(a)}), linear-gradient(to right, ${P.accent}5C 0%, ${P.accent}00 62%)`,
+              backgroundSize: `100% 100%, 100% ${u(0.18)}`,
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "top left, top left",
+            }}
+          />
+        ))}
+        <div className="absolute inset-0 flex flex-col justify-between" style={{ padding: u(M), textAlign: "left" }}>
+          {masthead()}
+          <div style={{ display: "grid", gap: u(1.4), maxWidth: wide ? "72%" : "94%" }}>
+            {headline(square ? T.displayTight : T.displayTight * 0.9, { measure: 15 })}
+            <div style={{ opacity: 0.78 }}>{support()}</div>
+            <div className="flex items-end justify-between" style={{ gap: u(2) }}>
+              {alphaRule(30)}
+              {mark(T.logo * 0.85)}
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  } else if (template === "bloom") {
+    // A soft radial bloom of the ground colour behind the headline, the headline
+    // itself doubled: a blurred low-alpha ghost under a near-solid face.
+    const size = square ? T.display * 1.02 : T.displayTight * 1.06;
+    const ghost = (
+      <div
+        aria-hidden
+        className="absolute inset-x-0"
+        style={{ top: 0, filter: `blur(${u(0.9)})`, opacity: 0.38 }}
+      >
+        {headline(size, { measure: 13 })}
+      </div>
+    );
+    body = (
+      <>
+        {photo()}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(120% 96% at ${clear === "right" ? "76%" : "26%"} 62%, ${P.ground}F0 0%, ${P.ground}BF 34%, ${P.ground}6B 60%, ${P.ground}12 86%, ${P.ground}00 100%)`,
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(to top, ${P.ground}A6 0%, ${P.ground}00 34%)`,
+          }}
+        />
+        <div className="absolute inset-0 flex flex-col justify-between" style={{ padding: u(M), textAlign: "left" }}>
+          {masthead()}
+          <div style={{ display: "grid", gap: u(1.6), maxWidth: wide ? "58%" : "92%" }}>
+            {alphaRule(52, P.ink)}
+            <div className="relative">
+              {ghost}
+              <div className="relative" style={{ opacity: 0.98 }}>
+                {headline(size, { measure: 13 })}
+              </div>
+            </div>
+            <div style={{ opacity: 0.76 }}>{support()}</div>
+          </div>
+          <div className="flex items-end justify-between" style={{ gap: u(2) }}>
+            {alphaRule(26)}
+            {mark(T.logo * 0.85)}
+          </div>
+        </div>
+      </>
+    );
+  } else if (template === "knockout") {
     // The headline is cut out of a light field and the photograph shows through
     // the letterforms. A full-bleed strip of the same frame runs under it.
     const size = (square ? T.display * 1.5 : T.display * 1.2) * TY.display.scale;

@@ -336,6 +336,21 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
 /** Layout templates the board can switch between. */
 export const LEGAL_ALONGSIDE_TEMPLATES = [
   {
+    id: "veil",
+    label: "Alpha veil",
+    note: "One long diagonal veil of the ground colour falling from opaque to nothing in five stops, with an accent bloom screened into the base.",
+  },
+  {
+    id: "strata",
+    label: "Alpha strata",
+    note: "Four stacked transparency bands climbing the frame, each denser than the last and divided by a gradient hairline.",
+  },
+  {
+    id: "bloom",
+    label: "Soft bloom",
+    note: "A radial bloom behind the copy with the headline doubled — a blurred low-opacity ghost under a near-solid face.",
+  },
+  {
     id: "knockout",
     label: "Photo knockout",
     note: "A light field with the headline cut clean out of it so the photograph shows through the letterforms, over a full-bleed strip of the same frame.",
@@ -508,6 +523,30 @@ export type AlongsideTypeTreatment = {
 };
 
 export const LEGAL_ALONGSIDE_TYPE: Record<AlongsideTemplateId, AlongsideTypeTreatment> = {
+  veil: {
+    display: { family: F.archivo, weight: 700, tracking: "-0.036em", lineHeight: 1.02, scale: 1.04 },
+    action: { family: F.serif, weight: 400, italic: true, scale: 1.16 },
+    eyebrow: { family: F.archivo, weight: 600, tracking: "0.3em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.46 },
+    cta: { family: F.archivo, weight: 600, tracking: "0.16em", caps: true },
+    note: "Archivo under the veil, the turn in Instrument Serif italic.",
+  },
+  strata: {
+    display: { family: F.grotesk, weight: 600, tracking: "-0.028em", lineHeight: 1.06, scale: 1 },
+    action: { family: F.fraunces, weight: 400, italic: true, scale: 1.1 },
+    eyebrow: { family: F.grotesk, weight: 500, tracking: "0.3em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.46 },
+    cta: { family: F.grotesk, weight: 600, tracking: "0.14em", caps: true },
+    note: "Space Grotesk across the strata, the turn in Fraunces italic.",
+  },
+  bloom: {
+    display: { family: F.serif, weight: 400, tracking: "0em", lineHeight: 1.04, scale: 1.16 },
+    action: { family: F.cormorant, weight: 500, italic: true, scale: 1.2 },
+    eyebrow: { family: F.mono, weight: 400, tracking: "0.3em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.5 },
+    cta: { family: F.mono, weight: 500, tracking: "0.14em", caps: true },
+    note: "Instrument Serif in the bloom, the turn in a Cormorant italic.",
+  },
   knockout: {
     display: { family: F.anton, weight: 400, tracking: "-0.008em", lineHeight: 1.02, caps: true, scale: 1 },
     action: { family: F.anton, weight: 400, caps: true, scale: 1 },
