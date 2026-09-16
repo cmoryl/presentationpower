@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type TouchEvent as ReactTouchEvent } from 
 import { useDeckStore, resolveSlideTransition } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { DeckEmptyNotice } from "@/components/DeckEmptyNotice";
+import { useCloudDeckGate } from "@/hooks/use-cloud-deck-gate";
 
 import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
@@ -33,11 +34,14 @@ export const Route = createFileRoute("/decks/$deckId/present")({
 
 function PresenterGate() {
   const { deckId } = Route.useParams();
-  const hydrated = useDeckHydrated();
-  const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
+  // Deep links (a deck the agent just built, a link pasted to a colleague) may
+  // point at a deck that only exists in the cloud — pull it in rather than 404.
+  const gate = useCloudDeckGate(deckId, "Loading presentation…", "/decks/$deckId/present");
   const slideCount = useDeckStore((s) => s.decks[deckId]?.slides.length ?? 0);
-  if (!hydrated) return <DeckHydratingFallback label="Loading presentation…" />;
-  if (!hasDeck) throw notFound();
+  if (!gate.ready) {
+    if (gate.fallback) return gate.fallback;
+    throw notFound();
+  }
   if (slideCount === 0) return <DeckEmptyNotice deckId={deckId} action="present" />;
   return <PresenterView />;
 }
