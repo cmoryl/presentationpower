@@ -243,6 +243,16 @@ function BookletPage() {
   }, [agenda, config.includeAgenda]);
 
   const plan = useMemo(() => bookletPagePlan(config, agendaPageCount), [config, agendaPageCount]);
+  const planKey = plan.map((p) => p.label).join("|");
+
+  // The notes describe a file that has already been made. As soon as the running
+  // order changes they no longer describe anything, so clear them.
+  useEffect(() => {
+    setNotes([]);
+    setNotesFor("");
+  }, [planKey]);
+
+
 
   /** The printed trim of the booklet, taken from the agenda page it prints. */
   const bookletGeo = useMemo(() => agendaGeometry(agenda), [agenda]);
