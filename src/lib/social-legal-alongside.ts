@@ -58,6 +58,8 @@ export type AlongsideScene = {
   theme: string;
   /** The ad headline this frame carries. */
   headline: string;
+  /** The turn in the headline — set in the template's emphasis face. */
+  action: string;
   /** Short caption shown under the frame on the board. */
   caption: string;
   /** The photographic craft note from the master prompt. */
@@ -79,6 +81,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Climber + Belayer",
     theme: "Extreme Exposure",
     headline: "The exposure is yours. The rope isn't.",
+    action: "The rope isn't.",
     caption:
       "A climber committed high on a limestone wall. Look again at the base of the frame and the belayer is already braced, watching the move.",
     craft: "35mm, f/5.6, 1/1600, ISO 320 — late raking light, real chalk and taped fingers.",
@@ -94,6 +97,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Rally Driver + Co-Driver",
     theme: "Complexity at Speed",
     headline: "Complex at speed is still readable — with the right notes.",
+    action: "with the right notes",
     caption:
       "Nobody drives a blind gravel stage on instinct. The pace notes in the right seat are what make the next corner survivable.",
     craft: "24mm, f/4, 1/500, ISO 800 — dust in every seam, hand-written notes, honest high-ISO grain.",
@@ -109,6 +113,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Golfer + Caddie",
     theme: "The Impossible Lie",
     headline: "Some lies you can't improve. You can still play them.",
+    action: "still play them",
     caption:
       "A buried lie in a wet revetted bunker, in filthy weather. On the lip above, the caddie holds the line and the wind.",
     craft: "50mm, f/4, 1/1250, ISO 640 — real rain, mud-caked spikes, muted links greens.",
@@ -124,6 +129,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Tennis Doubles",
     theme: "Covering the Open Court",
     headline: "You go for the ball. Someone covers the open court.",
+    action: "covers the open court",
     caption:
       "One player fully committed to a low return. The partner is already moving to the space that opens the second they do.",
     craft: "135mm, f/2.8, 1/2500, ISO 400 — court dust airborne, sweat-soaked kit, no styling.",
@@ -139,6 +145,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Boxer + Corner Coach",
     theme: "Between Rounds",
     headline: "The sixty seconds between rounds decide the next three minutes.",
+    action: "decide",
     caption:
       "Nobody is stepping in to fight it for you. The corner exists to make the next round different from the last one.",
     craft: "85mm, f/2, 1/500, ISO 1600 — practical overhead light, real swelling, honest grain.",
@@ -154,6 +161,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Sailing Crew",
     theme: "Calm Inside Chaos",
     headline: "Calm isn't the absence of weather.",
+    action: "the absence of weather",
     caption:
       "Green water across the foredeck and one crew member buried in it. Aft, the helm holds a steady line through the same sea.",
     craft: "70mm, f/4, 1/2000, ISO 500 — frozen spray, salt-crusted kit, desaturated overcast grade.",
@@ -169,6 +177,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Road Cyclists",
     theme: "Taking the Wind",
     headline: "Somebody has to take the wind.",
+    action: "take the wind",
     caption:
       "The front rider is paying for both of them. That is not generosity — it is how the pair arrives at all.",
     craft: "200mm, f/3.2, 1/1600, ISO 400 — compressed perspective, road grit, sunlit skin texture.",
@@ -184,6 +193,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Whitewater Pair",
     theme: "Committed to the Line",
     headline: "Once you're committed, the line is the plan.",
+    action: "the line is the plan",
     caption:
       "Two paddlers in a grade-five drop, reading the same water half a second apart. No hesitation available.",
     craft: "300mm, f/4, 1/2000, ISO 800 — frozen droplets, scuffed helmets, cool canyon light.",
@@ -199,6 +209,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Driver + Pit Crew",
     theme: "Never Stop Moving",
     headline: "Standing still is the expensive part.",
+    action: "the expensive part",
     caption:
       "The driver's hands never leave the wheel. Everything that makes the next two hours possible happens around the car in seconds.",
     craft: "35mm, f/2.8, 1/250, ISO 1250 — practical garage light, heat shimmer, blurred crew, sharp driver.",
@@ -214,6 +225,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Mountaineering Pair",
     theme: "Connected Through the Whiteout",
     headline: "When you can't see the route, stay connected.",
+    action: "stay connected",
     caption:
       "A corniced ridge in a near-whiteout. The only clear thing in the frame is the rope running back to the second climber.",
     craft: "85mm, f/2.8, 1/1000, ISO 640 — flat blizzard light, rime on every seam, delicate highlights.",
@@ -229,6 +241,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Chef + Sous-Chef",
     theme: "Controlled Pressure",
     headline: "Pressure isn't the problem. Uncontrolled pressure is.",
+    action: "Uncontrolled pressure is.",
     caption:
       "Peak service, one plate at a time, with the second pair of hands working a metre away on the part that can't wait.",
     craft: "35mm, f/2, 1/400, ISO 1600 — mixed tungsten and hood light, stained whites, real burns.",
@@ -244,6 +257,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Performer + Backstage Crew",
     theme: "Behind the Performance",
     headline: "The performance is yours. The cue isn't.",
+    action: "The cue isn't.",
     caption:
       "Seconds before an entrance. In the dark a metre away, the crew is holding the cue that makes the entrance work.",
     craft: "50mm, f/1.8, 1/160, ISO 2000 — chiaroscuro, cue-light glow, heavy black.",
@@ -259,6 +273,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Divers",
     theme: "Into the Unknown",
     headline: "Go into the unknown on a line, not a hunch.",
+    action: "on a line",
     caption:
       "One diver enters the wreck. The second holds position outside with the reel — the way back is the whole point.",
     craft: "20mm, f/5.6, 1/125, ISO 1250 — real particulate, torch scatter, cold cast with a warm pool.",
@@ -274,6 +289,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Weightlifter + Spotter",
     theme: "Ready, Not Interfering",
     headline: "Ready. Not interfering.",
+    action: "Not interfering.",
     caption:
       "Hands open, a hand's width from the bar, taking none of the weight. That is what real support looks like under load.",
     craft: "35mm, f/2.5, 1/500, ISO 1600 — chalk dust in a single overhead beam, honest skin flush.",
@@ -289,6 +305,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Rowing Crew",
     theme: "Precision Under Load",
     headline: "Precision is what survives the load.",
+    action: "survives the load",
     caption:
       "Eight people at the catch, one shape, at the point where it hurts most. Precision is the only thing holding it together.",
     craft: "300mm, f/4, 1/1600, ISO 640 — cold dawn haze, blistered taped hands, matched blade angles.",
@@ -304,6 +321,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     pair: "Big-Wave Surfer + Safety Rider",
     theme: "Far Outside the Path",
     headline: "The wave is yours. You're still not out there alone.",
+    action: "not out there alone",
     caption:
       "A surfer the size of a thumbnail on an enormous face. Far outside the path, the safety rider is watching and ready.",
     craft: "400mm, f/5.6, 1/2500, ISO 500 — long-lens documentary sharpness, wind-blown spray, restrained colour.",
