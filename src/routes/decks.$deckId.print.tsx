@@ -6,6 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { useDeckStore } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
+import { DeckEmptyNotice } from "@/components/DeckEmptyNotice";
+import { useCloudDeckGate } from "@/hooks/use-cloud-deck-gate";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { VizSurfaceProvider } from "@/components/slide/VizSurfaceContext";
@@ -34,10 +36,17 @@ export const Route = createFileRoute("/decks/$deckId/print")({
 
 function PrintGate() {
   const { deckId } = Route.useParams();
-  const hydrated = useDeckHydrated();
-  const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
-  if (!hydrated) return <DeckHydratingFallback label="Preparing print view…" />;
-  if (!hasDeck) throw notFound();
+  // Deep links (a deck the agent just built, a link pasted to a colleague) may
+  // point at a deck that only exists in the cloud — pull it in rather than 404.
+  const gate = useCloudDeckGate(deckId, "Preparing print view…", "/decks/$deckId/print");
+  const slideCount = useDeckStore((s) => s.decks[deckId]?.slides.length ?? 0);
+  if (!gate.ready) {
+    if (gate.fallback) return gate.fallback;
+    throw notFound();
+  }
+  // Gate before the view mounts — it auto-opens the print dialog, which would
+  // otherwise hand the user a blank PDF and claim the export finished.
+  if (slideCount === 0) return <DeckEmptyNotice deckId={deckId} action="print" />;
   return <PrintView />;
 }
 

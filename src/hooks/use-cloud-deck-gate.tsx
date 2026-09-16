@@ -37,7 +37,12 @@ export type CloudDeckGate =
 export function useCloudDeckGate(
   deckId: string,
   loadingLabel: string,
-  navigateTo?: "/decks/$deckId" | "/decks/$deckId/export",
+  navigateTo?:
+    | "/decks/$deckId"
+    | "/decks/$deckId/export"
+    | "/decks/$deckId/present"
+    | "/decks/$deckId/document"
+    | "/decks/$deckId/print",
 ): CloudDeckGate {
   const hydrated = useDeckHydrated();
   const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
