@@ -413,6 +413,7 @@ function AgentProgressHero({
 
 export const Route = createFileRoute("/agent/$threadId")({
   ssr: false,
+  pendingComponent: () => <ConsoleLoading label="presentation agent" />,
   head: () => ({
     meta: [
       { title: "Presentation agent · TransPerfect Element" },

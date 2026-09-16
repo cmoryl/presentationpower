@@ -1,9 +1,11 @@
 // Events agent workspace — conversation + live link to the event kit.
 import { createFileRoute } from "@tanstack/react-router";
 import { KitAgentWorkspace } from "@/components/kit-agent/KitAgentWorkspace";
+import { ConsoleLoading } from "@/components/ConsoleLoading";
 
 export const Route = createFileRoute("/events-agent/$threadId")({
   ssr: false,
+  pendingComponent: () => <ConsoleLoading label="events agent" />,
   head: () => ({
     meta: [
       { title: "Events agent · TransPerfect Element" },

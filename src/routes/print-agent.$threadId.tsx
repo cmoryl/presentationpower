@@ -30,6 +30,7 @@ const STARTERS = [
 
 export const Route = createFileRoute("/print-agent/$threadId")({
   ssr: false,
+  pendingComponent: () => <ConsoleLoading label="print agent" />,
   head: () => ({
     meta: [
       { title: "Print agent · TransPerfect Element" },
