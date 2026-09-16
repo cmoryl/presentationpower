@@ -389,7 +389,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     // The frame is louvred into three panes of the same photograph, each cropped
     // differently, with the copy carried on an ink band across the base.
     const panes = ["22% 50%", focus, "78% 50%"];
-    const bandTop = wide ? "58%" : square ? "62%" : "64%";
+    const bandTop = wide ? "50%" : square ? "58%" : "60%";
     body = (
       <>
         <div className="absolute inset-0 flex" style={{ gap: u(0.7), background: P.ground }}>
@@ -419,7 +419,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           style={{ top: bandTop, padding: u(M), gap: u(1.4) }}
         >
           <div style={{ display: "grid", gap: u(1.3) }}>
-            {headline(square ? T.display : T.displayTight, { measure: wide ? 16 : 13 })}
+            {headline(square ? T.displayTight : T.displayTight * 0.82, { measure: wide ? 18 : 14 })}
             {support()}
           </div>
           <div className="flex items-end justify-between" style={{ gap: u(2) }}>
@@ -432,7 +432,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
   } else if (template === "marquee") {
     // Duotone photograph under a stacked marquee: the headline repeated, the
     // middle line solid and the outer lines drawn in outline only.
-    const size = (square ? T.display * 1.24 : T.display * 1.06) * TY.display.scale;
+    const size = (square ? T.display * 2.5 : T.display * 2.2) * TY.display.scale;
     const line = (variant: "outline" | "solid") => (
       <div
         style={{
@@ -454,7 +454,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
       <>
         {photo({ filter: "grayscale(1) contrast(1.2)" })}
         <div className="absolute inset-0" style={{ background: P.accent, mixBlendMode: "multiply" }} />
-        <div className="absolute inset-0" style={{ background: `${P.ground}73` }} />
+        <div className="absolute inset-0" style={{ background: `${P.ground}40` }} />
         <div
           className="absolute inset-0 flex flex-col justify-between overflow-hidden"
           style={{ padding: u(M) }}
@@ -594,12 +594,14 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
             </div>
           </div>
           <div style={{ display: "grid", gap: u(1.3) }}>
-            {headline(square ? T.displayTight : T.displayTight * 0.9, { measure: 11 })}
+            <div style={{ textAlign: "left" }}>
+              {headline(square ? T.displayTight * 0.8 : T.displayTight * 0.66, { measure: 12 })}
+            </div>
             <div
               style={{
                 fontFamily: TY.support.family,
-                fontSize: u(T.micro * 1.1),
-                lineHeight: 1.5,
+                fontSize: u(T.micro * 0.95),
+                lineHeight: 1.45,
                 color: P.ink,
                 opacity: 0.7,
                 borderTop: `1px solid ${P.ink}2E`,
