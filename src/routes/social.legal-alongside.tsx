@@ -57,7 +57,28 @@ function AlongsideView() {
   const [template, setTemplate] = useState<AlongsideTemplateId>("editorial");
   const [sizeId, setSizeId] = useState<string>(LEGAL_ALONGSIDE_SIZES[0].id);
   const [perScene, setPerScene] = useState<Record<string, AlongsideTemplateId>>({});
+  const [zoom, setZoom] = useState<string | null>(null);
   const size = LEGAL_ALONGSIDE_SIZES.find((s) => s.id === sizeId) ?? LEGAL_ALONGSIDE_SIZES[0];
+
+  const zoomIndex = zoom ? LEGAL_ALONGSIDE_SCENES.findIndex((s) => s.id === zoom) : -1;
+  const zoomScene = zoomIndex >= 0 ? LEGAL_ALONGSIDE_SCENES[zoomIndex] : null;
+  const step = (dir: -1 | 1) => {
+    if (zoomIndex < 0) return;
+    const next =
+      (zoomIndex + dir + LEGAL_ALONGSIDE_SCENES.length) % LEGAL_ALONGSIDE_SCENES.length;
+    setZoom(LEGAL_ALONGSIDE_SCENES[next].id);
+  };
+
+  useEffect(() => {
+    if (!zoom) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setZoom(null);
+      if (e.key === "ArrowRight") step(1);
+      if (e.key === "ArrowLeft") step(-1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zoom, zoomIndex]);
 
   return (
     <div className="mx-auto max-w-7xl space-y-12 px-4 py-10 sm:px-6 lg:px-8">
