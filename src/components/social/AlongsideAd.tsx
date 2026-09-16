@@ -332,7 +332,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     const size = (square ? T.display * 1.5 : T.display * 1.2) * TY.display.scale;
     body = (
       <>
-        <div className="absolute inset-0" style={{ background: P.light }} />
+        <div className="absolute inset-0" style={{ background: P.ground }} />
         <div
           className="absolute overflow-hidden"
           style={{ left: 0, right: 0, bottom: 0, height: wide ? "30%" : square ? "27%" : "24%" }}
@@ -347,7 +347,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           className="absolute inset-x-0 top-0 flex flex-col"
           style={{ padding: u(M), gap: u(2), bottom: wide ? "30%" : square ? "27%" : "24%" }}
         >
-          {masthead(P.ground)}
+          {masthead()}
           <div className="flex flex-1 flex-col justify-center" style={{ gap: u(1.6) }}>
             <div
               style={{
@@ -358,7 +358,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
                 letterSpacing: TY.display.tracking,
                 textTransform: "uppercase",
                 maxWidth: "13em",
-                backgroundImage: `linear-gradient(${P.ground}4D, ${P.ground}4D), url(${scene.src})`,
+                backgroundImage: `linear-gradient(${P.light}40, ${P.light}40), url(${scene.src})`,
                 backgroundSize: "cover",
                 backgroundPosition: focus,
                 WebkitBackgroundClip: "text",
@@ -370,13 +370,13 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
               {parts.action}
               {parts.after}
             </div>
-            {supportIn(P.ground)}
+            {supportIn(P.ink)}
           </div>
           <div className="flex items-end justify-between" style={{ gap: u(2) }}>
             {ctaBlock()}
             {colourMark ? (
               <img
-                src={colourMark}
+                src={lockup ?? colourMark}
                 alt="TransPerfect Legal"
                 style={{ height: u(T.logo * 0.85), width: "auto", maxWidth: u(20), objectFit: "contain" }}
               />
