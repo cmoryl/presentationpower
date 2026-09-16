@@ -461,7 +461,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           style={{ height: head, paddingInline: u(M), paddingBlock: u(M * 0.8) }}
         >
           {masthead()}
-          {headline(square ? 4.8 : 3.8, { caps: true, measure: 15 })}
+          {headline(square ? 4.8 : 3.8, { measure: 15 })}
         </div>
         <div className="absolute inset-x-0 overflow-hidden" style={{ top: head, bottom: "16%" }}>
           {photo()}
