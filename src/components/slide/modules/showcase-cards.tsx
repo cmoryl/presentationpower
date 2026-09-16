@@ -140,10 +140,14 @@ registerSlideModule({
                     </span>
                   </div>
 
-                  {/* Copy block */}
+                  {/* Copy block — carries the top-lit wash that fades out before
+                      the bottom edge, so the card melts into the page. */}
                   <div
                     className="flex min-h-0 flex-1 flex-col"
-                    style={{ padding: dense ? "22px 22px 24px" : "28px 28px 30px" }}
+                    style={{
+                      padding: dense ? "22px 22px 24px" : "28px 28px 30px",
+                      backgroundImage: `${cardWashGradient(fill)}, ${baseTint}`,
+                    }}
                   >
                     {st.showBandRule && (
                       <div
