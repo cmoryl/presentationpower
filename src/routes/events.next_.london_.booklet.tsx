@@ -5,7 +5,7 @@
 // deck at A4 or US Letter. The agenda pages stay vector; the map and chart pages
 // are rendered artwork and say so on the page.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -161,7 +161,7 @@ function CoverPreview({ cover, trim }: { cover: BookletConfig["cover"]; trim: { 
           justifyContent: art && layout.copy.anchor === "bottom" ? "flex-end" : "flex-start",
           // The footnote owns the page foot in the press file, so a
           // bottom-anchored copy block stops above it here too.
-          paddingBottom: cover.footnote ? "8%" : undefined,
+          paddingBottom: cover.footnote ? "15%" : undefined,
         }}
       >
         <div className="flex gap-1">
@@ -211,6 +211,9 @@ function BookletPage() {
   }));
   const [savedId, setSavedId] = useState<string>("");
   const [notes, setNotes] = useState<string[]>([]);
+  /** Which file the notes below describe, so they never read as advice about the next one. */
+  const [notesFor, setNotesFor] = useState<string>("");
+
   const [busy, setBusy] = useState<string | null>(null);
   /** The agenda carried inside an opened saved booklet, when it has one. */
   const [agendaSnapshot, setAgendaSnapshot] = useState<AgendaConfig | null>(null);
@@ -240,6 +243,16 @@ function BookletPage() {
   }, [agenda, config.includeAgenda]);
 
   const plan = useMemo(() => bookletPagePlan(config, agendaPageCount), [config, agendaPageCount]);
+  const planKey = plan.map((p) => p.label).join("|");
+
+  // The notes describe a file that has already been made. As soon as the running
+  // order changes they no longer describe anything, so clear them.
+  useEffect(() => {
+    setNotes([]);
+    setNotesFor("");
+  }, [planKey]);
+
+
 
   /** The printed trim of the booklet, taken from the agenda page it prints. */
   const bookletGeo = useMemo(() => agendaGeometry(agenda), [agenda]);
@@ -266,8 +279,10 @@ function BookletPage() {
   };
 
   const runExport = async (kind: "pdf" | "docx" | "pptx") => {
+    setNotesFor(kind === "pdf" ? "press PDF" : kind === "docx" ? "Word file" : "PowerPoint file");
     setBusy(kind);
     try {
+
       await runWithExportFeedback(
         {
           pending: "Building the booklet…",
@@ -501,23 +516,33 @@ function BookletPage() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   {(
                     [
-                      ["eyebrow", "Eyebrow"],
-                      ["title", "Title"],
-                      ["subtitle", "Sub-line"],
-                      ["footnote", "Footnote"],
+                      // Caps are what the printed cover can hold at the trim without
+                      // the copy running over the picture or the foot of the page.
+                      ["eyebrow", "Eyebrow", 40],
+                      ["title", "Title", 60],
+                      ["subtitle", "Sub-line", 96],
+                      ["footnote", "Footnote", 120],
                     ] as const
-                  ).map(([key, label]) => (
+                  ).map(([key, label, cap]) => (
                     <label key={key} className="space-y-1">
                       <span className={labelCls}>{label}</span>
                       <input
                         className={field}
+                        maxLength={cap}
                         value={config.cover[key]}
                         onChange={(e) =>
                           setConfig((c) => ({ ...c, cover: { ...c.cover, [key]: e.target.value } }))
                         }
                       />
+                      {config.cover[key].length > cap - 10 ? (
+                        <span className="block text-[11px] text-[color:var(--color-muted-foreground)]">
+                          {config.cover[key].length} of {cap} characters — the printed cover holds no
+                          more.
+                        </span>
+                      ) : null}
                     </label>
                   ))}
+
                 </div>
               ) : null}
 
@@ -891,9 +916,16 @@ function BookletPage() {
             </div>
 
             <div className="space-y-2">
+              {plan.length === 0 ? (
+                <p className="text-xs text-[color:var(--color-muted-foreground)]">
+                  Nothing to make a file from yet — tick the cover page, the agenda days or the
+                  venue maps, or add a chart page.
+                </p>
+              ) : null}
               <Button
                 className="w-full"
                 disabled={!plan.length || busy !== null}
+                title={plan.length ? undefined : "Pick at least one page first"}
                 onClick={() => runExport("pdf")}
               >
                 <FileDown className="mr-2 size-4" />
@@ -903,6 +935,7 @@ function BookletPage() {
                 variant="secondary"
                 className="w-full"
                 disabled={!plan.length || busy !== null}
+                title={plan.length ? undefined : "Pick at least one page first"}
                 onClick={() => runExport("docx")}
               >
                 <FileText className="mr-2 size-4" />
@@ -912,6 +945,7 @@ function BookletPage() {
                 variant="secondary"
                 className="w-full"
                 disabled={!plan.length || busy !== null}
+                title={plan.length ? undefined : "Pick at least one page first"}
                 onClick={() => runExport("pptx")}
               >
                 <Presentation className="mr-2 size-4" />
@@ -921,7 +955,10 @@ function BookletPage() {
 
             {notes.length ? (
               <div className="rounded-lg border border-[color:var(--color-border)] p-4">
-                <h2 className="text-sm font-semibold uppercase tracking-wide">Export notes</h2>
+                <h2 className="text-sm font-semibold uppercase tracking-wide">
+                  {notesFor ? `About the ${notesFor} you just made` : "Export notes"}
+                </h2>
+
                 <ul className="mt-2 space-y-1 text-xs text-[color:var(--color-muted-foreground)]">
                   {notes.map((note, i) => (
                     <li key={i}>{note}</li>
