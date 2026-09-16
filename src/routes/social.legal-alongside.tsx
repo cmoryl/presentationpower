@@ -5,8 +5,18 @@
 
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowLeft, ArrowRight, Check, Images, Share2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Images,
+  Maximize2,
+  Share2,
+  X,
+} from "lucide-react";
 import { AlongsideAd } from "@/components/social/AlongsideAd";
 import {
   LEGAL_ALONGSIDE_CONCEPT,
