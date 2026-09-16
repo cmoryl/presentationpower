@@ -418,7 +418,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           className="absolute inset-x-0 bottom-0 flex flex-col justify-between"
           style={{ top: bandTop, padding: u(M), gap: u(1.4) }}
         >
-          <div style={{ display: "grid", gap: u(1.3) }}>
+          <div style={{ display: "grid", gap: u(1.3), textAlign: "left" }}>
             {headline(square ? T.displayTight : T.displayTight * 0.82, { measure: wide ? 18 : 14 })}
             {support()}
           </div>
@@ -460,7 +460,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           style={{ padding: u(M) }}
         >
           {masthead()}
-          <div style={{ display: "grid", gap: u(0.4) }}>
+          <div style={{ display: "grid", gap: u(0.4), textAlign: "left", justifyItems: "start" }}>
             {line("outline")}
             {line("solid")}
             {line("outline")}
