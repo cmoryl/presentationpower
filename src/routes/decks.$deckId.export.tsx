@@ -138,6 +138,8 @@ function ExportView() {
   const blocks = blockingIssues(qa);
   const warns = warningIssues(qa);
   const blocked = blocks.length > 0 && !override;
+  // A deck with no slides exports to a blank file — hold every download.
+  const empty = deck.slides.length === 0;
 
   useEffect(() => {
     document.body.classList.add("export-mode");
@@ -449,7 +451,7 @@ function ExportView() {
   }
 
   async function handlePptx() {
-    if (exporting || preflightBusy) return;
+    if (exporting || preflightBusy || empty) return;
     if (blocked) {
       explainBlocked("PowerPoint export", () => void runPptxExport());
       return;
@@ -571,8 +573,14 @@ function ExportView() {
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={handlePptx}
-                    disabled={exporting || preflightBusy}
-                    title={blocked ? "Resolve blocking QA issues first, or override" : ""}
+                    disabled={exporting || preflightBusy || empty}
+                    title={
+                      empty
+                        ? "This deck has no slides yet — add one first"
+                        : blocked
+                          ? "Resolve blocking QA issues first, or override"
+                          : ""
+                    }
                     className="inline-flex items-center gap-2 rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0B2A4A]/90 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {exporting || preflightBusy ? (
@@ -590,7 +598,10 @@ function ExportView() {
                     <FileText size={14} className="text-black/50" /> As document…
                   </Link>
                   <button
+                    disabled={empty}
+                    title={empty ? "This deck has no slides yet — add one first" : ""}
                     onClick={() => {
+                      if (empty) return;
                       if (blocked) {
                         explainBlocked("Print / PDF", () => notifyPrintToPdf("deck"));
                         return;
@@ -604,6 +615,7 @@ function ExportView() {
                   {glShareConfigured ? (
                     <button
                       onClick={() => {
+                        if (empty) return;
                         if (blocked) {
                           explainBlocked(
                             "GlobalLink upload",
@@ -613,14 +625,17 @@ function ExportView() {
                         }
                         void handleShareViaGlobalLink();
                       }}
-                      disabled={glShareBusy}
+                      disabled={glShareBusy || empty}
                       title={
-                        blocked
-                          ? "Resolve blocking QA issues first"
-                          : "Upload the .pptx directly to GlobalLink Share"
+                        empty
+                          ? "This deck has no slides yet — add one first"
+                          : blocked
+                            ? "Resolve blocking QA issues first"
+                            : "Upload the .pptx directly to GlobalLink Share"
                       }
                       className="inline-flex items-center gap-2 rounded-full bg-[#E11D48] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#be1740] disabled:cursor-not-allowed disabled:opacity-50"
                     >
+
                       {glShareBusy ? (
                         <Loader2 size={14} className="animate-spin" />
                       ) : (

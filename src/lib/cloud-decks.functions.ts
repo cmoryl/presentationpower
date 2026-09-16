@@ -134,9 +134,28 @@ export const deleteCloudDeck = createServerFn({ method: "POST" })
       // Local-only deck id — nothing to delete in the cloud.
       return { ok: true, skipped: true as const };
     }
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    // Check the caller may delete this deck before touching anything, and report
+    // the truth afterwards: a filter that matched nothing used to return "ok",
+    // so the deck vanished from the list while still living in the account.
+    const { assertCanManageRecord } = await import("./owner-or-admin");
+    const { data: deck, error: readError } = await supabase
+      .from("decks")
+      .select("id, owner_id")
+      .eq("id", data.deckId)
+      .maybeSingle();
+    if (readError) throw new Error(readError.message);
+    if (!deck) return { ok: true, skipped: true as const };
+    await assertCanManageRecord(supabase, userId, deck.owner_id);
     await supabase.from("deck_slides").delete().eq("deck_id", data.deckId);
-    const { error } = await supabase.from("decks").delete().eq("id", data.deckId);
+    const { data: removed, error } = await supabase
+      .from("decks")
+      .delete()
+      .eq("id", data.deckId)
+      .select("id");
     if (error) throw new Error(error.message);
+    if (!removed || removed.length === 0) {
+      throw new Error("Nothing was deleted — you may not have permission to delete this deck.");
+    }
     return { ok: true };
   });

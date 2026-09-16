@@ -12,6 +12,7 @@ import { resolveBrandMode } from "@/lib/brand-profiles";
 import { getLibraryAnalytics, type DeckAnalyticsSummary } from "@/lib/deck-analytics.functions";
 import { deleteCloudDeck, listMyCloudDecks } from "@/lib/cloud-decks.functions";
 import { ReviewStatusBadge, type ReviewStatus } from "@/components/ReviewStatusControl";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/decks/")({
   head: () => ({
@@ -470,8 +471,15 @@ function DeckTile({
     setDeleting(true);
     try {
       await removeCloud({ data: { deckId: d.id } });
-    } catch {
-      /* local-only */
+    } catch (err) {
+      // Removing only the local copy would hide a deck that still exists in the
+      // account — say so instead and leave the tile in place.
+      setDeleting(false);
+      toast.error("Deck was not deleted", {
+        description: err instanceof Error ? err.message : "The account could not be reached.",
+        duration: 9000,
+      });
+      return;
     }
     deleteDeck(d.id);
   };

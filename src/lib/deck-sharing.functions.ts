@@ -81,7 +81,11 @@ export const getDeckShareStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    // A share token is the private key to the deck: only the owner (or an admin)
+    // may read it. Team templates are readable by everyone, so a bare id filter
+    // handed the live link to any signed-in colleague.
+    await assertShareable(supabase, userId, data.deckId);
     const { data: row, error } = await supabase
       .from("decks")
       .select("share_token, shared_at, share_expires_at" as never)

@@ -350,6 +350,12 @@ export function ShareMenu({ deckId }: { deckId: string }) {
       navigate({ to: "/auth" });
       return;
     }
+    if (deck.slides.length === 0) {
+      toast.info("Nothing to share yet", {
+        description: "This deck has no slides — add one before publishing a link.",
+      });
+      return;
+    }
     setShareBusy(true);
     setShareErr(null);
     const toastId = toast.loading("Publishing your share link…");
