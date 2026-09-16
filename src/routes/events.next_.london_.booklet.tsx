@@ -520,8 +520,8 @@ function BookletPage() {
                       // the copy running over the picture or the foot of the page.
                       ["eyebrow", "Eyebrow", 40],
                       ["title", "Title", 60],
-                      ["subtitle", "Sub-line", 120],
-                      ["footnote", "Footnote", 170],
+                      ["subtitle", "Sub-line", 96],
+                      ["footnote", "Footnote", 120],
                     ] as const
                   ).map(([key, label, cap]) => (
                     <label key={key} className="space-y-1">
