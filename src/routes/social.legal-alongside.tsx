@@ -166,9 +166,17 @@ function AlongsideView() {
                 </div>
 
                 <div className="bg-[#F6F7FA] p-5">
-                  <div className="mx-auto max-w-[560px] overflow-hidden rounded-xl shadow-[0_16px_40px_-22px_rgba(3,0,44,0.45)]">
+                  <button
+                    type="button"
+                    onClick={() => setZoom(scene.id)}
+                    title="Click to view much larger"
+                    className="group relative mx-auto block w-full max-w-[560px] cursor-zoom-in overflow-hidden rounded-xl shadow-[0_16px_40px_-22px_rgba(3,0,44,0.45)] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+                  >
                     <AlongsideAd scene={scene} template={active} w={size.w} h={size.h} />
-                  </div>
+                    <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C]/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
+                      <Maximize2 size={11} /> View larger
+                    </span>
+                  </button>
                 </div>
 
                 <div className="space-y-3 px-5 py-4 text-sm">
