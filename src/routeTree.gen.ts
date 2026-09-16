@@ -46,6 +46,7 @@ import { Route as SocialPresetsRouteImport } from './routes/social.presets'
 import { Route as SocialNewRouteImport } from './routes/social.new'
 import { Route as SocialModulesRouteImport } from './routes/social.modules'
 import { Route as SocialLegalRefreshRouteImport } from './routes/social.legal-refresh'
+import { Route as SocialLegalAlongsideRouteImport } from './routes/social.legal-alongside'
 import { Route as SocialBannersRouteImport } from './routes/social.banners'
 import { Route as SocialAgentThreadIdRouteImport } from './routes/social-agent.$threadId'
 import { Route as ShowcasePresetIdRouteImport } from './routes/showcase.$presetId'
@@ -368,6 +369,11 @@ const SocialModulesRoute = SocialModulesRouteImport.update({
 const SocialLegalRefreshRoute = SocialLegalRefreshRouteImport.update({
   id: '/legal-refresh',
   path: '/legal-refresh',
+  getParentRoute: () => SocialRoute,
+} as any)
+const SocialLegalAlongsideRoute = SocialLegalAlongsideRouteImport.update({
+  id: '/legal-alongside',
+  path: '/legal-alongside',
   getParentRoute: () => SocialRoute,
 } as any)
 const SocialBannersRoute = SocialBannersRouteImport.update({
@@ -1187,6 +1193,7 @@ export interface FileRoutesByFullPath {
   '/showcase/$presetId': typeof ShowcasePresetIdRoute
   '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
+  '/social/legal-alongside': typeof SocialLegalAlongsideRoute
   '/social/legal-refresh': typeof SocialLegalRefreshRoute
   '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
@@ -1360,6 +1367,7 @@ export interface FileRoutesByTo {
   '/showcase/$presetId': typeof ShowcasePresetIdRoute
   '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
+  '/social/legal-alongside': typeof SocialLegalAlongsideRoute
   '/social/legal-refresh': typeof SocialLegalRefreshRoute
   '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
@@ -1538,6 +1546,7 @@ export interface FileRoutesById {
   '/showcase/$presetId': typeof ShowcasePresetIdRoute
   '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
+  '/social/legal-alongside': typeof SocialLegalAlongsideRoute
   '/social/legal-refresh': typeof SocialLegalRefreshRoute
   '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
@@ -1717,6 +1726,7 @@ export interface FileRouteTypes {
     | '/showcase/$presetId'
     | '/social-agent/$threadId'
     | '/social/banners'
+    | '/social/legal-alongside'
     | '/social/legal-refresh'
     | '/social/modules'
     | '/social/new'
@@ -1890,6 +1900,7 @@ export interface FileRouteTypes {
     | '/showcase/$presetId'
     | '/social-agent/$threadId'
     | '/social/banners'
+    | '/social/legal-alongside'
     | '/social/legal-refresh'
     | '/social/modules'
     | '/social/new'
@@ -2067,6 +2078,7 @@ export interface FileRouteTypes {
     | '/showcase/$presetId'
     | '/social-agent/$threadId'
     | '/social/banners'
+    | '/social/legal-alongside'
     | '/social/legal-refresh'
     | '/social/modules'
     | '/social/new'
@@ -2492,6 +2504,13 @@ declare module '@tanstack/react-router' {
       path: '/legal-refresh'
       fullPath: '/social/legal-refresh'
       preLoaderRoute: typeof SocialLegalRefreshRouteImport
+      parentRoute: typeof SocialRoute
+    }
+    '/social/legal-alongside': {
+      id: '/social/legal-alongside'
+      path: '/legal-alongside'
+      fullPath: '/social/legal-alongside'
+      preLoaderRoute: typeof SocialLegalAlongsideRouteImport
       parentRoute: typeof SocialRoute
     }
     '/social/banners': {
@@ -3643,6 +3662,7 @@ const KnowledgeRouteWithChildren = KnowledgeRoute._addFileChildren(
 
 interface SocialRouteChildren {
   SocialBannersRoute: typeof SocialBannersRoute
+  SocialLegalAlongsideRoute: typeof SocialLegalAlongsideRoute
   SocialLegalRefreshRoute: typeof SocialLegalRefreshRoute
   SocialModulesRoute: typeof SocialModulesRoute
   SocialNewRoute: typeof SocialNewRoute
@@ -3653,6 +3673,7 @@ interface SocialRouteChildren {
 
 const SocialRouteChildren: SocialRouteChildren = {
   SocialBannersRoute: SocialBannersRoute,
+  SocialLegalAlongsideRoute: SocialLegalAlongsideRoute,
   SocialLegalRefreshRoute: SocialLegalRefreshRoute,
   SocialModulesRoute: SocialModulesRoute,
   SocialNewRoute: SocialNewRoute,
