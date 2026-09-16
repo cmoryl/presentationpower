@@ -405,3 +405,158 @@ export const LEGAL_ALONGSIDE_PALETTE = {
 export function alongsideCopySide(clear: AlongsideClear): AlongsideClear {
   return clear;
 }
+
+// ---------------------------------------------------------------------------
+// TYPE TREATMENTS
+//
+// Each layout carries its own voice on the page: a different display face,
+// its own eyebrow/support/action pairing, and one emphasised phrase in the
+// headline — the turn — set in a contrasting face (usually an italic).
+// Emphasis is always ink; the accent only ever appears as a rule beneath it,
+// because the brand accent is never body text.
+// ---------------------------------------------------------------------------
+
+/** Font stacks, all faces already loaded in the app shell. */
+const F = {
+  geist: "Geist, ui-sans-serif, system-ui, sans-serif",
+  archivo: '"Archivo", Geist, sans-serif',
+  anton: '"Anton", Geist, sans-serif',
+  oswald: '"Oswald", Geist, sans-serif',
+  syne: '"Syne", Geist, sans-serif',
+  work: '"Work Sans", Geist, sans-serif',
+  grotesk: '"Space Grotesk", Geist, sans-serif',
+  serif: '"Instrument Serif", Georgia, serif',
+  fraunces: '"Fraunces", Georgia, serif',
+  cormorant: '"Cormorant Garamond", Georgia, serif',
+  baskerville: '"Libre Baskerville", Georgia, serif',
+  lora: '"Lora", Georgia, serif',
+  mono: '"Space Mono", ui-monospace, monospace',
+  plex: '"IBM Plex Mono", ui-monospace, monospace',
+} as const;
+
+export type AlongsideTypeTreatment = {
+  /** Headline face. `scale` corrects each face's optical size against the grid. */
+  display: {
+    family: string;
+    weight: number;
+    tracking: string;
+    lineHeight: number;
+    caps?: boolean;
+    scale: number;
+  };
+  /** The emphasised phrase inside the headline. */
+  action: {
+    family: string;
+    weight: number;
+    italic?: boolean;
+    tracking?: string;
+    caps?: boolean;
+    scale?: number;
+    /** Accent hairline under the phrase. */
+    rule?: boolean;
+  };
+  eyebrow: { family: string; weight: number; tracking: string };
+  support: { family: string; weight: number; italic?: boolean; lineHeight: number };
+  cta: { family: string; weight: number; tracking: string; caps?: boolean };
+  /** Plain-language description of the treatment, shown on the board. */
+  note: string;
+};
+
+export const LEGAL_ALONGSIDE_TYPE: Record<AlongsideTemplateId, AlongsideTypeTreatment> = {
+  editorial: {
+    display: { family: F.archivo, weight: 600, tracking: "-0.024em", lineHeight: 1.05, scale: 1 },
+    action: { family: F.serif, weight: 400, italic: true, scale: 1.14 },
+    eyebrow: { family: F.archivo, weight: 600, tracking: "0.24em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.42 },
+    cta: { family: F.archivo, weight: 600, tracking: "0.01em" },
+    note: "Archivo column with the turn in Instrument Serif italic.",
+  },
+  inset: {
+    display: { family: F.cormorant, weight: 500, tracking: "0em", lineHeight: 1.04, scale: 1.2 },
+    action: { family: F.cormorant, weight: 500, italic: true, scale: 1.02, rule: true },
+    eyebrow: { family: F.plex, weight: 400, tracking: "0.28em" },
+    support: { family: F.cormorant, weight: 500, lineHeight: 1.34 },
+    cta: { family: F.plex, weight: 500, tracking: "0.08em", caps: true },
+    note: "Cormorant Garamond, the turn italic over an accent hairline.",
+  },
+  spine: {
+    display: {
+      family: F.oswald,
+      weight: 500,
+      tracking: "0.008em",
+      lineHeight: 1.02,
+      caps: true,
+      scale: 1.02,
+    },
+    action: { family: F.mono, weight: 400, caps: true, tracking: "0.1em", scale: 0.72 },
+    eyebrow: { family: F.oswald, weight: 500, tracking: "0.34em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.42 },
+    cta: { family: F.oswald, weight: 500, tracking: "0.1em", caps: true },
+    note: "Condensed Oswald caps, the turn dropped into tracked Space Mono.",
+  },
+  ledger: {
+    display: { family: F.plex, weight: 400, tracking: "-0.012em", lineHeight: 1.22, scale: 0.94 },
+    action: { family: F.lora, weight: 500, italic: true, scale: 1.1 },
+    eyebrow: { family: F.plex, weight: 400, tracking: "0.2em" },
+    support: { family: F.plex, weight: 400, lineHeight: 1.5 },
+    cta: { family: F.plex, weight: 500, tracking: "0.08em", caps: true },
+    note: "IBM Plex Mono record type, the turn in Lora italic.",
+  },
+  stack: {
+    display: { family: F.work, weight: 600, tracking: "-0.02em", lineHeight: 1.07, scale: 1 },
+    action: { family: F.serif, weight: 400, italic: true, scale: 1.16 },
+    eyebrow: { family: F.work, weight: 600, tracking: "0.22em" },
+    support: { family: F.work, weight: 400, lineHeight: 1.44 },
+    cta: { family: F.work, weight: 600, tracking: "0.01em" },
+    note: "Work Sans plate, the turn swung into a serif italic.",
+  },
+  poster: {
+    display: { family: F.anton, weight: 400, tracking: "0.006em", lineHeight: 0.98, caps: true, scale: 1.04 },
+    action: { family: F.baskerville, weight: 400, italic: true, scale: 0.66 },
+    eyebrow: { family: F.archivo, weight: 600, tracking: "0.3em" },
+    support: { family: F.baskerville, weight: 400, lineHeight: 1.5 },
+    cta: { family: F.archivo, weight: 600, tracking: "0.06em", caps: true },
+    note: "Anton masthead caps against a small Libre Baskerville italic turn.",
+  },
+  window: {
+    display: { family: F.baskerville, weight: 400, tracking: "-0.004em", lineHeight: 1.2, scale: 0.9 },
+    action: { family: F.grotesk, weight: 500, caps: true, tracking: "0.08em", scale: 0.78, rule: true },
+    eyebrow: { family: F.grotesk, weight: 500, tracking: "0.26em" },
+    support: { family: F.baskerville, weight: 400, lineHeight: 1.52 },
+    cta: { family: F.grotesk, weight: 500, tracking: "0.08em", caps: true },
+    note: "Libre Baskerville book setting, the turn in tracked Space Grotesk caps.",
+  },
+  field: {
+    display: { family: F.syne, weight: 700, tracking: "-0.02em", lineHeight: 1.04, scale: 0.98 },
+    action: { family: F.fraunces, weight: 400, italic: true, scale: 1.08 },
+    eyebrow: { family: F.syne, weight: 700, tracking: "0.2em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.42 },
+    cta: { family: F.syne, weight: 700, tracking: "0.02em" },
+    note: "Syne on the colour field, the turn in Fraunces italic.",
+  },
+  centre: {
+    display: { family: F.serif, weight: 400, tracking: "-0.006em", lineHeight: 1.04, scale: 1.22 },
+    action: { family: F.archivo, weight: 600, caps: true, tracking: "0.07em", scale: 0.62 },
+    eyebrow: { family: F.archivo, weight: 600, tracking: "0.3em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.44 },
+    cta: { family: F.archivo, weight: 600, tracking: "0.08em", caps: true },
+    note: "Instrument Serif on the axis, the turn in small Archivo caps.",
+  },
+};
+
+/**
+ * Split a headline around its emphasised phrase. Returns the phrase as the
+ * middle part; when the phrase isn't found the headline comes back whole.
+ */
+export function alongsideHeadlineParts(
+  headline: string,
+  action: string,
+): { before: string; action: string; after: string } {
+  const at = action ? headline.indexOf(action) : -1;
+  if (at < 0) return { before: headline, action: "", after: "" };
+  return {
+    before: headline.slice(0, at),
+    action,
+    after: headline.slice(at + action.length),
+  };
+}
