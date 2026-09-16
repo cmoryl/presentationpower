@@ -205,7 +205,14 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
       <img
         src={lockup}
         alt="TransPerfect Legal"
-        style={{ height: u(size), width: "auto", objectFit: "contain" }}
+        style={{
+          height: u(size),
+          width: "auto",
+          maxWidth: u(22),
+          flexShrink: 0,
+          objectFit: "contain",
+          objectPosition: "right center",
+        }}
       />
     ) : null;
 
@@ -240,9 +247,247 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     />
   );
 
+  /** Solid accent call-to-action slab — the loudest object in the cut family. */
+  const ctaBlock = (opts?: { light?: boolean }) => (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: u(1.6),
+        background: opts?.light ? P.ink : P.accent,
+        color: opts?.light ? P.ground : P.ink,
+        paddingInline: u(square ? 2.6 : 2.2),
+        paddingBlock: u(square ? 1.3 : 1.05),
+        fontFamily: TY.cta.family,
+        fontWeight: TY.cta.weight,
+        fontSize: u(TY.cta.caps ? T.cta * 0.86 : T.cta * 0.94),
+        letterSpacing: TY.cta.tracking,
+        textTransform: TY.cta.caps ? "uppercase" : "none",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {LEGAL_ALONGSIDE_CONCEPT.cta}
+      <span aria-hidden style={{ width: u(2.2), height: u(0.18), background: "currentColor", opacity: 0.7 }} />
+    </span>
+  );
+
+  /** Division line + number set tight, for use inside a cut field. */
+  const cutMasthead = () => (
+    <div className="flex items-center" style={{ gap: u(1.4) }}>
+      <span
+        style={{
+          fontFamily: TY.eyebrow.family,
+          fontWeight: TY.eyebrow.weight,
+          fontSize: u(T.eyebrow),
+          letterSpacing: TY.eyebrow.tracking,
+          textTransform: "uppercase",
+          color: P.ink,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {LEGAL_ALONGSIDE_CONCEPT.division}
+      </span>
+      <span aria-hidden style={{ width: u(3.4), height: u(0.3), background: P.accent }} />
+      <span
+        style={{
+          fontFamily: TY.eyebrow.family,
+          fontWeight: TY.eyebrow.weight,
+          fontSize: u(T.numeral),
+          fontVariantNumeric: "tabular-nums",
+          letterSpacing: "0.14em",
+          color: P.ink,
+          opacity: 0.62,
+        }}
+      >
+        {scene.no}
+      </span>
+    </div>
+  );
+
   let body: React.ReactNode = null;
 
-  if (template === "editorial") {
+  if (template === "wedge" || template === "blade") {
+    // A hard ink wedge cut diagonally into a full-bleed photograph. The copy
+    // lives inside the cut; a curtain of ground colour keeps any descender that
+    // crosses the diagonal legible against the picture.
+    const fromLeft = template === "wedge" ? clear !== "right" : clear === "right";
+    const shape = wide
+      ? fromLeft
+        ? "polygon(0 0, 52% 0, 34% 100%, 0 100%)"
+        : "polygon(48% 0, 100% 0, 100% 100%, 66% 100%)"
+      : square
+        ? fromLeft
+          ? "polygon(0 0, 96% 0, 0 98%)"
+          : "polygon(4% 0, 100% 0, 100% 98%)"
+        : "polygon(0 60%, 100% 44%, 100% 100%, 0 100%)";
+    const copyBox: React.CSSProperties = wide
+      ? {
+          top: u(M),
+          bottom: u(M),
+          left: fromLeft ? u(M) : "auto",
+          right: fromLeft ? "auto" : u(M),
+          width: "40%",
+        }
+      : square
+        ? {
+            top: u(M),
+            bottom: u(M * 1.2),
+            left: fromLeft ? u(M) : "auto",
+            right: fromLeft ? "auto" : u(M),
+            width: "58%",
+          }
+        : { left: u(M), right: u(M), bottom: u(M), top: "62%" };
+    body = (
+      <>
+        {photo()}
+        <div className="absolute inset-0" style={{ background: curtain(tall ? "bottom" : fromLeft ? "left" : "right", 0.46) }} />
+        <div className="absolute inset-0" style={{ background: P.ground, clipPath: shape }} />
+        <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              background: template === "blade" ? P.accent : `${P.ink}66`,
+              clipPath: wide
+                ? fromLeft
+                  ? "polygon(52% 0, 53.4% 0, 35.4% 100%, 34% 100%)"
+                  : "polygon(46.6% 0, 48% 0, 66% 100%, 64.6% 100%)"
+                : square
+                  ? fromLeft
+                    ? "polygon(80% 0, 81.6% 0, 0 89.4%, 0 88%)"
+                    : "polygon(18.4% 0, 20% 0, 100% 89.4%, 100% 88%)"
+                  : "polygon(0 60%, 100% 44%, 100% 45.4%, 0 61.4%)",
+          }}
+        />
+        <div className="absolute flex flex-col justify-between" style={copyBox}>
+          {cutMasthead()}
+          <div style={{ display: "grid", gap: u(1.5), paddingBlock: u(1.4) }}>
+            {headline(square ? T.display : tall ? T.display * 0.94 : T.displayTight, {
+              measure: wide ? 9 : tall ? 13 : 11,
+            })}
+            {support()}
+          </div>
+          <div style={{ display: "grid", justifyItems: "start", gap: u(1.6) }}>
+            {ctaBlock()}
+            {mark(T.logo * 0.85)}
+          </div>
+        </div>
+      </>
+    );
+  } else if (template === "shard") {
+    // A triangular ink shard rising out of the base corner, with the frame
+    // numeral set oversized in the picture above it.
+    const fromLeft = clear !== "right";
+    const shape = wide
+      ? fromLeft
+        ? "polygon(0 8%, 62% 100%, 0 100%)"
+        : "polygon(100% 8%, 100% 100%, 38% 100%)"
+      : square
+        ? fromLeft
+          ? "polygon(0 26%, 88% 100%, 0 100%)"
+          : "polygon(100% 26%, 100% 100%, 12% 100%)"
+        : "polygon(0 34%, 100% 62%, 100% 100%, 0 100%)";
+    body = (
+      <>
+        {photo()}
+        <div className="absolute inset-0" style={{ background: curtain(tall ? "bottom" : fromLeft ? "left" : "right", 0.55) }} />
+        <div className="absolute inset-0" style={{ background: P.ground, clipPath: shape }} />
+        <div
+          aria-hidden
+          className="absolute"
+          style={{
+            top: wide ? "9%" : "7%",
+            right: fromLeft ? u(M) : "auto",
+            left: fromLeft ? "auto" : u(M),
+            fontFamily: TY.display.family,
+            fontWeight: 800,
+            fontSize: u(square ? 17 : 13),
+            lineHeight: 0.8,
+            letterSpacing: "-0.05em",
+            color: `${P.ink}2E`,
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          {scene.no}
+        </div>
+        <div
+          className="absolute"
+          style={{ top: u(M), left: u(M), right: u(M * 5) }}
+        >
+          {cutMasthead()}
+        </div>
+        <div
+          className="absolute flex flex-col"
+          style={{
+            left: u(M),
+            right: wide ? "44%" : square ? u(M * 2) : u(M),
+            bottom: u(M),
+            gap: u(1.4),
+            alignItems: "flex-start",
+          }}
+        >
+          {accentRule(22)}
+          {headline(square ? T.display * 0.94 : T.displayTight, { measure: wide ? 11 : 13 })}
+          {tall || square ? support() : null}
+          <div className="flex w-full items-end justify-between" style={{ gap: u(2), paddingTop: u(0.8) }}>
+            {ctaBlock()}
+            {mark(T.logo * 0.9)}
+          </div>
+        </div>
+      </>
+    );
+  } else if (template === "chevron") {
+    // An angled ink band driven across the frame, accent slabs on both cuts.
+    const bandTop = wide ? 26 : square ? 30 : 34;
+    const bandH = wide ? 52 : square ? 46 : 40;
+    const skew = wide ? 7 : 5;
+    const band = `polygon(0 ${bandTop + skew}%, 100% ${bandTop}%, 100% ${bandTop + bandH}%, 0 ${bandTop + bandH + skew}%)`;
+    body = (
+      <>
+        {photo()}
+        <div className="absolute inset-0" style={{ background: `${P.ground}4D` }} />
+        <div className="absolute inset-0" style={{ background: P.ground, clipPath: band }} />
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background: P.accent,
+            clipPath: `polygon(0 ${bandTop + skew}%, 100% ${bandTop}%, 100% ${bandTop + 1.4}%, 0 ${bandTop + skew + 1.4}%)`,
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background: P.accent,
+            clipPath: `polygon(0 ${bandTop + bandH + skew}%, 100% ${bandTop + bandH}%, 100% ${bandTop + bandH + 1}%, 0 ${bandTop + bandH + skew + 1}%)`,
+          }}
+        />
+        <div className="absolute" style={{ top: u(M * 0.9), left: u(M), right: u(M) }}>
+          {cutMasthead()}
+        </div>
+        <div
+          className="absolute flex flex-col justify-center"
+          style={{
+            top: `${bandTop + 4}%`,
+            height: `${bandH - 6}%`,
+            left: u(M),
+            right: u(M),
+            gap: u(1.3),
+          }}
+        >
+          {headline(square ? T.display : T.displayTight * 1.06, { measure: wide ? 14 : 11 })}
+          {support()}
+        </div>
+        <div
+          className="absolute flex items-end justify-between"
+          style={{ left: u(M), right: u(M), bottom: u(M * 0.9), gap: u(2) }}
+        >
+          {ctaBlock()}
+          {mark(T.logo * 0.9)}
+        </div>
+      </>
+    );
+  } else if (template === "editorial") {
     // Art to the far edge; copy in a measured column on the clear side.
     const onLeft = clear !== "right";
     body = (

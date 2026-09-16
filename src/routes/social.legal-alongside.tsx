@@ -55,7 +55,7 @@ export const Route = createFileRoute("/social/legal-alongside")({
 });
 
 function AlongsideView() {
-  const [template, setTemplate] = useState<AlongsideTemplateId>("editorial");
+  const [template, setTemplate] = useState<AlongsideTemplateId>("wedge");
   const [sizeId, setSizeId] = useState<string>(LEGAL_ALONGSIDE_SIZES[0].id);
   const [perScene, setPerScene] = useState<Record<string, AlongsideTemplateId>>({});
   const [zoom, setZoom] = useState<string | null>(null);

@@ -336,6 +336,26 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
 /** Layout templates the board can switch between. */
 export const LEGAL_ALONGSIDE_TEMPLATES = [
   {
+    id: "wedge",
+    label: "Cut wedge",
+    note: "The photograph runs full bleed and a hard ink wedge is cut into it on the diagonal; the headline sits huge inside the wedge over a solid accent call to action.",
+  },
+  {
+    id: "blade",
+    label: "Reverse blade",
+    note: "Wedge cut from the opposite edge with a thick accent blade along the cut; the headline crosses the diagonal at poster scale.",
+  },
+  {
+    id: "shard",
+    label: "Corner shard",
+    note: "A triangular ink shard rising from the base corner, an outsized frame numeral held in the picture and the headline on the shard's baseline.",
+  },
+  {
+    id: "chevron",
+    label: "Chevron band",
+    note: "An angled ink band driven straight across the frame carrying the headline, accent slabs closing both cut edges.",
+  },
+  {
     id: "editorial",
     label: "Editorial column",
     note: "Art to the far edge, copy held in a measured column on the clear side with a hairline masthead and the master number set against it.",
@@ -463,6 +483,45 @@ export type AlongsideTypeTreatment = {
 };
 
 export const LEGAL_ALONGSIDE_TYPE: Record<AlongsideTemplateId, AlongsideTypeTreatment> = {
+  wedge: {
+    display: { family: F.archivo, weight: 800, tracking: "-0.042em", lineHeight: 0.92, scale: 1.16 },
+    action: { family: F.serif, weight: 400, italic: true, scale: 1.2 },
+    eyebrow: { family: F.archivo, weight: 700, tracking: "0.3em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.4 },
+    cta: { family: F.archivo, weight: 700, tracking: "0.16em", caps: true },
+    note: "Archivo black at poster scale, the turn in Instrument Serif italic.",
+  },
+  blade: {
+    display: { family: F.anton, weight: 400, tracking: "-0.012em", lineHeight: 1.2, caps: true, scale: 0.95 },
+    action: { family: F.fraunces, weight: 400, italic: true, caps: false, scale: 0.74 },
+    eyebrow: { family: F.mono, weight: 400, tracking: "0.3em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.42 },
+    cta: { family: F.mono, weight: 500, tracking: "0.14em", caps: true },
+    note: "Anton caps across the blade, the turn falling into Fraunces italic.",
+  },
+  shard: {
+    display: { family: F.syne, weight: 800, tracking: "-0.03em", lineHeight: 0.96, scale: 1.08 },
+    action: { family: F.cormorant, weight: 500, italic: true, scale: 1.24 },
+    eyebrow: { family: F.plex, weight: 400, tracking: "0.28em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.42 },
+    cta: { family: F.syne, weight: 700, tracking: "0.14em", caps: true },
+    note: "Syne extra bold on the shard, the turn in a tall Cormorant italic.",
+  },
+  chevron: {
+    display: {
+      family: F.oswald,
+      weight: 600,
+      tracking: "0.004em",
+      lineHeight: 0.98,
+      caps: true,
+      scale: 1.08,
+    },
+    action: { family: F.baskerville, weight: 400, italic: true, caps: false, scale: 0.72 },
+    eyebrow: { family: F.oswald, weight: 500, tracking: "0.32em" },
+    support: { family: F.geist, weight: 400, lineHeight: 1.4 },
+    cta: { family: F.oswald, weight: 600, tracking: "0.16em", caps: true },
+    note: "Condensed Oswald caps riding the band, the turn in Libre Baskerville italic.",
+  },
   editorial: {
     display: { family: F.archivo, weight: 600, tracking: "-0.024em", lineHeight: 1.05, scale: 1 },
     action: { family: F.serif, weight: 400, italic: true, scale: 1.14 },
