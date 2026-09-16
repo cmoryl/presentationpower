@@ -254,9 +254,29 @@ export const decideApproval = createServerFn({ method: "POST" })
 
     const { data: before } = await supabase
       .from("approval_requests")
-      .select("status")
+      .select("status, requested_by")
       .eq("id", data.id)
       .maybeSingle();
+    if (!before) throw new Error("Approval request not found");
+
+    const isAdmin = !!(roleRows as RoleRow[] | null)?.some((r) => r.role === "admin");
+
+    // Nobody decides their own request — an approval has to come from someone else.
+    if (before.requested_by === userId) {
+      throw new Error("You cannot decide your own approval request. Ask another reviewer.");
+    }
+
+    // Once reviewers are named on a request, only those reviewers (or an admin)
+    // may decide it — otherwise "assign a reviewer" controlled nothing.
+    const { data: named } = await supabase
+      .from("approval_assignees")
+      .select("assignee_id")
+      .eq("request_id", data.id);
+    const assigned = (named ?? []).map((r) => r.assignee_id as string);
+    if (assigned.length > 0 && !assigned.includes(userId) && !isAdmin) {
+      throw new Error("Forbidden: this request is assigned to other reviewers");
+    }
+
 
     const decided = data.status !== "pending";
     const { error } = await supabase
@@ -304,10 +324,13 @@ export const decideApproval = createServerFn({ method: "POST" })
       await import("./notify-approvals.server")
     ).notifyRequesters(
       [data.id],
-      data.status === "approved" ? "approved" : "changes_requested",
+      // Reopening is not a "changes requested" decision — send the real status so
+      // the requester is not told their work was sent back.
+      data.status,
       userId,
       data.note?.trim() || null,
     );
+
     return { ok: true, status: data.status };
   });
 
@@ -332,8 +355,36 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
     if (!isReviewer) throw new Error("Forbidden: reviewer role required");
     const { data: before } = await supabase
       .from("approval_requests")
-      .select("id, status")
+      .select("id, status, requested_by")
       .in("id", data.ids);
+
+    const isAdmin = !!(roleRows as RoleRow[] | null)?.some((r) => r.role === "admin");
+    const { data: named } = await supabase
+      .from("approval_assignees")
+      .select("request_id, assignee_id")
+      .in("request_id", data.ids);
+    const assignedTo = new Map<string, string[]>();
+    for (const r of named ?? []) {
+      const key = r.request_id as string;
+      assignedTo.set(key, [...(assignedTo.get(key) ?? []), r.assignee_id as string]);
+    }
+
+    // Same two rules as a single decision: never your own request, and never a
+    // request that names other reviewers.
+    const allowed = (before ?? [])
+      .filter((r) => r.requested_by !== userId)
+      .filter((r) => {
+        const list = assignedTo.get(r.id as string) ?? [];
+        return list.length === 0 || isAdmin || list.includes(userId);
+      })
+      .map((r) => r.id as string);
+    const skipped = data.ids.length - allowed.length;
+    if (allowed.length === 0) {
+      throw new Error(
+        "None of the selected requests can be decided by you — they are your own or assigned to other reviewers.",
+      );
+    }
+
     const priorStatus = Object.fromEntries((before ?? []).map((r) => [r.id, r.status as string]));
     const { error } = await supabase
       .from("approval_requests")
@@ -343,13 +394,13 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
         decided_by: userId,
         decided_at: new Date().toISOString(),
       })
-      .in("id", data.ids);
+      .in("id", allowed);
     if (error) throw new Error(error.message);
     await (
       await import("./approval-events.server")
     ).logApprovalEvents(
       supabase,
-      data.ids.map((id) => ({
+      allowed.map((id) => ({
         requestId: id,
         actorId: userId,
         kind: data.status === "approved" ? ("approved" as const) : ("changes_requested" as const),
@@ -362,8 +413,9 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
 
     await (
       await import("./notify-approvals.server")
-    ).notifyRequesters(data.ids, data.status, userId, data.note?.trim() || null);
-    return { ok: true, count: data.ids.length };
+    ).notifyRequesters(allowed, data.status, userId, data.note?.trim() || null);
+    return { ok: true, count: allowed.length, skipped };
+
   });
 
 // ---------- Comment thread ----------

@@ -105,7 +105,16 @@ function ApprovalQueuePage() {
       setSelected(new Set());
       setNote("");
       invalidate();
-      toast.success(`${r.count} item${r.count === 1 ? "" : "s"} updated`);
+      toast.success(
+        `${r.count} item${r.count === 1 ? "" : "s"} updated`,
+        r.skipped
+          ? {
+              description: `${r.skipped} left alone — your own requests, or ones assigned to other reviewers.`,
+              duration: 8000,
+            }
+          : undefined,
+      );
+
     },
     onError: (e: Error) => toast.error(e.message),
   });

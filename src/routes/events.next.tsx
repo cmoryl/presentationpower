@@ -502,6 +502,27 @@ function Hero({
               </span>
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
             </Link>
+            <Link
+              to="/events/next/venues"
+              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
+            >
+              <span>
+                <span className="font-medium">Venue plans</span> · set up a new city&apos;s floors
+                and rooms once, then reuse every sheet
+              </span>
+              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+            </Link>
+            <Link
+              to="/events/next/venue"
+              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
+            >
+              <span>
+                <span className="font-medium">Next venue (provisional)</span> · draft layout study,
+                not orderable print
+              </span>
+              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+            </Link>
+
           </div>
         </div>
       </div>

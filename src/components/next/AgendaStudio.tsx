@@ -334,6 +334,19 @@ export function AgendaStudio({
   const autoCapacity = useMemo(() => agendaCapacity(config), [config]);
   const rowsPerPage = Math.round(Number(config.rowsPerPage) || 0);
 
+  // An agenda with no programme lines exports to a blank deliverable, which reads
+  // as a broken file rather than an empty board. Hold the export buttons instead.
+  const hasProgramme = useMemo(
+    () =>
+      pages.some((p) =>
+        (p.config.sessions ?? []).some((s) =>
+          [s.time, s.title, s.detail].some((v) => String(v ?? "").trim().length > 0),
+        ),
+      ),
+    [pages],
+  );
+
+
   // Live page-size + overflow read, recomputed on every keystroke so the editor
   // behaves like the other print areas.
   const fit = useMemo(() => agendaFit(pageConfig), [pageConfig]);
@@ -1126,7 +1139,14 @@ export function AgendaStudio({
                   placeholder="QEII CENTRE, LONDON"
                 />
               </div>
+              {agendaRowStyle(config) !== "card" ? (
+                <p className="rounded-lg border border-[#FFEB66] bg-[#FFEB66]/25 px-3 py-2 text-xs leading-relaxed text-[#03002C]">
+                  The ruled list look prints no footer band, so these footer settings won&apos;t
+                  show. Switch the programme look to cards in Look to use the footer.
+                </p>
+              ) : null}
               <div className="grid grid-cols-2 gap-3">
+
                 <div className="space-y-2">
                   <Label htmlFor="agenda-footer-style">Footer style</Label>
                   <select
@@ -1699,18 +1719,19 @@ export function AgendaStudio({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button onClick={runExport} disabled={busy}>
+            <Button onClick={runExport} disabled={busy || !hasProgramme}>
               <Download className="mr-2 h-4 w-4" />
               {busy ? "Exporting…" : "Export print package"}
             </Button>
-            <Button variant="outline" onClick={runWordExport} disabled={busy}>
+            <Button variant="outline" onClick={runWordExport} disabled={busy || !hasProgramme}>
               <FileText className="mr-2 h-4 w-4" />
               Export editable Word
             </Button>
-            <Button variant="outline" onClick={runDeckExport} disabled={busy}>
+            <Button variant="outline" onClick={runDeckExport} disabled={busy || !hasProgramme}>
               <FileText className="mr-2 h-4 w-4" />
               Export editable PowerPoint
             </Button>
+
 
             <Button
               variant="secondary"
@@ -1723,6 +1744,13 @@ export function AgendaStudio({
               {openFileId ? "Update live file" : "Save live file"}
             </Button>
           </div>
+          {!hasProgramme ? (
+            <p className="text-xs font-medium text-[#03002C]/80">
+              Add at least one programme line in Programme before exporting — an empty agenda would
+              download as a blank board.
+            </p>
+          ) : null}
+
           {signedIn !== true ? (
             <p className="text-xs text-muted-foreground">Sign in to save live agenda files.</p>
           ) : canEditLoading ? (

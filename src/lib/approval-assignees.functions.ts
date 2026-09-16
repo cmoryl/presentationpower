@@ -250,15 +250,22 @@ export const recordAssigneeDecision = createServerFn({ method: "POST" })
     const anyChanges = all.some((s) => s.decision === "changes_requested");
 
     if (allApproved || anyChanges) {
+      const rolled = allApproved ? "approved" : "changes_requested";
       await supabase
         .from("approval_requests")
         .update({
-          status: allApproved ? "approved" : "changes_requested",
+          status: rolled,
           decided_by: userId,
           decided_at: new Date().toISOString(),
         })
         .eq("id", row.request_id);
+      // An automatic roll-up is still a decision: tell the requester, exactly as a
+      // manual decision does, or the outcome lands silently.
+      await (
+        await import("./notify-approvals.server")
+      ).notifyRequesters([row.request_id], rolled, userId, data.note?.trim() || null);
     }
+
 
     return {
       ok: true as const,

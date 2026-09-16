@@ -257,6 +257,8 @@ function cell(
     /** Colour of the time rail drawn down the left edge of the cell. */
     rail?: string;
     railW?: number;
+    /** Colour of a hairline rule drawn along the top edge of the cell. */
+    topRule?: string;
   } = {},
 ): string {
   // Cell margins are printed padding, so on a narrow parallel column the board's
@@ -265,17 +267,26 @@ function cell(
   // column so every card keeps a real text measure.
   const pad = Math.max(0, Math.min(padTwips, widthTwips * 0.1));
   padTwips = pad;
+  // Left rail and top hairline share one <w:tcBorders> block: Word keeps only the
+  // last one it reads, so emitting two blocks silently dropped the footer rule.
+  const borders = [
+    opts.topRule
+      ? `<w:top w:val="single" w:sz="6" w:space="0" w:color="${hex(opts.topRule)}"/>`
+      : "",
+    opts.rail
+      ? `<w:left w:val="single" w:sz="${Math.max(
+          4,
+          Math.round((opts.railW ?? 1.8) * 8),
+        )}" w:space="0" w:color="${hex(opts.rail)}"/>`
+      : "",
+  ].join("");
   return [
     "<w:tc><w:tcPr>",
     `<w:tcW w:w="${Math.round(widthTwips)}" w:type="dxa"/>`,
     opts.span && opts.span > 1 ? `<w:gridSpan w:val="${opts.span}"/>` : "",
     opts.fill ? `<w:shd w:val="clear" w:color="auto" w:fill="${hex(opts.fill)}"/>` : "",
-    opts.rail
-      ? `<w:tcBorders><w:left w:val="single" w:sz="${Math.max(
-          4,
-          Math.round((opts.railW ?? 1.8) * 8),
-        )}" w:space="0" w:color="${hex(opts.rail)}"/></w:tcBorders>`
-      : "",
+    borders ? `<w:tcBorders>${borders}</w:tcBorders>` : "",
+
     `<w:tcMar><w:top w:w="${Math.round(padTwips)}" w:type="dxa"/><w:bottom w:w="${Math.round(
       padTwips,
     )}" w:type="dxa"/><w:left w:w="${Math.round(
@@ -957,7 +968,14 @@ export async function buildAgendaDocx(
                   { afterTwips: 0, align: c.align, lineTwips: mmT(size * 1.6) },
                 ),
                 mmT(PL.footSize * 0.8),
-                foot.style === "band" ? { fill: foot.fill } : {},
+                foot.style === "band"
+                  ? { fill: foot.fill }
+                  : // The hairline foot prints a rule above the copy, exactly as the
+                    // press file and PowerPoint draw it.
+                    foot.style === "hairline"
+                    ? { topRule: footInk }
+                    : {},
+
               );
             }),
 
