@@ -138,6 +138,8 @@ function ExportView() {
   const blocks = blockingIssues(qa);
   const warns = warningIssues(qa);
   const blocked = blocks.length > 0 && !override;
+  // A deck with no slides exports to a blank file — hold every download.
+  const empty = deck.slides.length === 0;
 
   useEffect(() => {
     document.body.classList.add("export-mode");
@@ -449,7 +451,7 @@ function ExportView() {
   }
 
   async function handlePptx() {
-    if (exporting || preflightBusy) return;
+    if (exporting || preflightBusy || empty) return;
     if (blocked) {
       explainBlocked("PowerPoint export", () => void runPptxExport());
       return;
