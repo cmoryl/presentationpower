@@ -107,8 +107,14 @@ const QR_DEFAULT_LINK = NEXT_LONDON_AGENDA_URL;
  * match the builds), and every colour without a signed-off brand build is
  * labelled as a machine conversion awaiting printer sign-off — in the UI, in
  * the filename and in the file's own metadata. Nothing converts silently.
+ *
+ * NOTE: this is NOT the house-wide `CMYK_ENABLED` safety switch. It is a local,
+ * deliberately-constant flag that keeps this editor's press-colour blocks
+ * mounted. Do not read it as a kill switch: turning it off only hides these
+ * controls, it does not stop CMYK output anywhere else.
  */
-const CMYK_ENABLED = true;
+const SHOW_PRESS_COLOUR_CONTROLS = true;
+
 
 function svgDataUrl(svg: string): string {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
