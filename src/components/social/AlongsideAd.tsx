@@ -18,8 +18,10 @@
 
 import { getDivisionLogos } from "@/lib/division-logos";
 import {
+  alongsideHeadlineParts,
   LEGAL_ALONGSIDE_CONCEPT,
   LEGAL_ALONGSIDE_PALETTE as P,
+  LEGAL_ALONGSIDE_TYPE,
   type AlongsideClear,
   type AlongsideScene,
   type AlongsideTemplateId,
@@ -53,6 +55,7 @@ function curtain(clear: AlongsideClear, strength = 0.94): string {
 export function AlongsideAd({ scene, template, w, h }: Props) {
   const logos = getDivisionLogos("bm-tp-legal");
   const lockup = logos?.white ?? logos?.color;
+  const TY = LEGAL_ALONGSIDE_TYPE[template];
   const square = Math.abs(w / h - 1) < 0.2 || h > w;
   const tall = h > w * 1.1;
   const wide = !square && !tall;
@@ -90,10 +93,11 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     <div className="flex w-full items-baseline gap-3" style={{ color: ink }}>
       <span
         style={{
+          fontFamily: TY.eyebrow.family,
           fontSize: u(T.eyebrow),
-          letterSpacing: "0.24em",
+          letterSpacing: TY.eyebrow.tracking,
           textTransform: "uppercase",
-          fontWeight: 600,
+          fontWeight: TY.eyebrow.weight,
           whiteSpace: "nowrap",
         }}
       >
@@ -102,6 +106,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
       <span aria-hidden className="flex-1" style={{ height: 1, background: `${ink}3D` }} />
       <span
         style={{
+          fontFamily: TY.eyebrow.family,
           fontSize: u(T.numeral),
           fontVariantNumeric: "tabular-nums",
           letterSpacing: "0.14em",
@@ -113,28 +118,61 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     </div>
   );
 
-  const headline = (size: number, opts?: { caps?: boolean; measure?: number }) => (
-    <div
-      style={{
-        fontSize: u(size),
-        lineHeight: opts?.caps ? 1.02 : 1.06,
-        fontWeight: 600,
-        color: P.ink,
-        letterSpacing: opts?.caps ? "0.005em" : "-0.022em",
-        textTransform: opts?.caps ? "uppercase" : "none",
-        textWrap: "balance",
-        maxWidth: `${opts?.measure ?? 15}em`,
-      }}
-    >
-      {scene.headline}
-    </div>
-  );
+  /**
+   * The headline in the layout's display face, with its one emphasised phrase —
+   * the turn — set in the contrasting face. Emphasis is always ink; the accent
+   * appears only as a hairline under the phrase.
+   */
+  const headline = (size: number, opts?: { measure?: number }) => {
+    const d = TY.display;
+    const a = TY.action;
+    const parts = alongsideHeadlineParts(scene.headline, scene.action);
+    const px = size * d.scale;
+    return (
+      <div
+        style={{
+          fontFamily: d.family,
+          fontSize: u(px),
+          lineHeight: d.lineHeight,
+          fontWeight: d.weight,
+          color: P.ink,
+          letterSpacing: d.tracking,
+          textTransform: d.caps ? "uppercase" : "none",
+          textWrap: "balance",
+          maxWidth: `${opts?.measure ?? 15}em`,
+        }}
+      >
+        {parts.before}
+        {parts.action ? (
+          <span
+            style={{
+              fontFamily: a.family,
+              fontWeight: a.weight,
+              fontStyle: a.italic ? "italic" : "normal",
+              fontSize: a.scale ? u(px * a.scale) : undefined,
+              letterSpacing: a.tracking ?? (a.italic ? "0em" : undefined),
+              textTransform: a.caps ? "uppercase" : d.caps ? "uppercase" : "none",
+              borderBottom: a.rule ? `${u(0.2)} solid ${P.accent}` : undefined,
+              paddingBottom: a.rule ? u(0.3) : undefined,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {parts.action}
+          </span>
+        ) : null}
+        {parts.after}
+      </div>
+    );
+  };
 
   const support = () => (
     <div
       style={{
+        fontFamily: TY.support.family,
+        fontWeight: TY.support.weight,
+        fontStyle: TY.support.italic ? "italic" : "normal",
         fontSize: u(T.support),
-        lineHeight: 1.42,
+        lineHeight: TY.support.lineHeight,
         color: P.ink,
         opacity: 0.82,
         maxWidth: "26em",
@@ -147,8 +185,11 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
   const cta = () => (
     <span
       style={{
-        fontSize: u(T.cta),
-        fontWeight: 600,
+        fontFamily: TY.cta.family,
+        fontSize: u(TY.cta.caps ? T.cta * 0.92 : T.cta),
+        fontWeight: TY.cta.weight,
+        letterSpacing: TY.cta.tracking,
+        textTransform: TY.cta.caps ? "uppercase" : "none",
         color: P.ink,
         borderBottom: `${u(0.22)} solid ${P.accent}`,
         paddingBottom: u(0.55),
@@ -178,6 +219,8 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
   const themeLabel = () => (
     <span
       style={{
+        fontFamily: TY.eyebrow.family,
+        fontWeight: TY.eyebrow.weight,
         fontSize: u(T.micro),
         letterSpacing: "0.16em",
         textTransform: "uppercase",
@@ -418,7 +461,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           style={{ height: head, paddingInline: u(M), paddingBlock: u(M * 0.8) }}
         >
           {masthead()}
-          {headline(square ? 4.8 : 3.8, { caps: true, measure: 15 })}
+          {headline(square ? 4.8 : 3.8, { measure: 15 })}
         </div>
         <div className="absolute inset-x-0 overflow-hidden" style={{ top: head, bottom: "16%" }}>
           {photo()}

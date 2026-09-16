@@ -13,6 +13,7 @@ import {
   LEGAL_ALONGSIDE_SCENES,
   LEGAL_ALONGSIDE_SIZES,
   LEGAL_ALONGSIDE_TEMPLATES,
+  LEGAL_ALONGSIDE_TYPE,
   type AlongsideTemplateId,
 } from "@/lib/social-legal-alongside";
 
@@ -140,7 +141,8 @@ function AlongsideView() {
         </div>
 
         <p className="text-xs text-black/55">
-          {LEGAL_ALONGSIDE_TEMPLATES.find((t) => t.id === template)?.note}
+          {LEGAL_ALONGSIDE_TEMPLATES.find((t) => t.id === template)?.note}{" "}
+          <span className="text-black/40">— {LEGAL_ALONGSIDE_TYPE[template].note}</span>
         </p>
 
         <div className="grid gap-8 lg:grid-cols-2">
@@ -175,6 +177,12 @@ function AlongsideView() {
                   </p>
                   <p className="text-black/70">{scene.caption}</p>
                   <p className="text-xs text-black/45">{scene.craft}</p>
+                  <p className="text-xs text-black/55">
+                    <span className="font-semibold uppercase tracking-widest text-black/40">
+                      Type
+                    </span>{" "}
+                    {LEGAL_ALONGSIDE_TYPE[active].note} Emphasis on “{scene.action}”.
+                  </p>
 
                   <div className="flex flex-wrap items-center gap-1.5 pt-1">
                     <span className="inline-flex items-center gap-1 pr-1 text-[10px] font-semibold uppercase tracking-widest text-black/40">
