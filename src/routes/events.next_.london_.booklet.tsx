@@ -5,7 +5,7 @@
 // deck at A4 or US Letter. The agenda pages stay vector; the map and chart pages
 // are rendered artwork and say so on the page.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
