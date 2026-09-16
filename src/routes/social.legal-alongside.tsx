@@ -333,14 +333,12 @@ function AlongsideView() {
               </div>
             </div>
 
-            <div className="flex min-h-0 flex-1 items-center justify-center">
+            <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto">
               <div
-                className="w-full overflow-hidden rounded-2xl shadow-[0_40px_120px_-40px_rgba(0,0,0,0.8)]"
+                className="mx-auto w-full shrink-0 overflow-hidden rounded-2xl shadow-[0_40px_120px_-40px_rgba(0,0,0,0.8)]"
                 style={{
                   aspectRatio: `${size.w} / ${size.h}`,
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                  width: `min(100%, calc((100cqh) * ${size.w / size.h}))`,
+                  maxWidth: `min(100%, ${Math.round((size.w / size.h) * 74)}vh)`,
                 }}
               >
                 <AlongsideAd
