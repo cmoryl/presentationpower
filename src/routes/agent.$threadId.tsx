@@ -18,6 +18,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { ConsoleLoading } from "@/components/ConsoleLoading";
 import { AgentScopeNotice } from "@/components/agent/AgentScopeNotice";
 import { consumeAgentPrompt } from "@/lib/agent-seed";
 import { AgentChat } from "@/components/agent/AgentChat";
