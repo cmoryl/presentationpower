@@ -78,13 +78,57 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     logo: square ? 3.3 : 2.7,
   };
 
-  const photo = (extra?: React.CSSProperties) => (
+  // ---- crop engine --------------------------------------------------------
+  // Every scene carries its own subject point (the two figures). A template
+  // never crops blind: it declares what SHAPE of frame the picture is going
+  // into, and the point is re-placed for that shape.
+  //
+  //   full    the picture is the whole frame — the subject is pushed away from
+  //           the copy field so type never lands on it
+  //   panel   an inset panel roughly the frame's own proportion — the scene's
+  //           point is authoritative, used verbatim
+  //   column  a tall narrow crop (arch, spine, field column) — subject held on
+  //           its own x, lifted slightly so heads stay in
+  //   band    a shallow strip (knockout base, poster window) — lifted harder,
+  //           because a 32% band centred on 45% loses the figures entirely
+  const clampPct = (n: number) => Math.max(0, Math.min(100, n));
+  const subject = (() => {
+    const [a, b] = focus.trim().split(/\s+/);
+    const x = Number.parseFloat(a ?? "");
+    const y = Number.parseFloat(b ?? "");
+    return { x: Number.isFinite(x) ? x : 50, y: Number.isFinite(y) ? y : 50 };
+  })();
+
+  type PhotoFrame = "full" | "panel" | "column" | "band";
+
+  const framePos = (kind: PhotoFrame): string => {
+    const s = subject;
+    if (kind === "panel") return `${s.x}% ${s.y}%`;
+    if (kind === "column") return `${clampPct(s.x)}% ${clampPct(s.y - 5)}%`;
+    if (kind === "band") return `${clampPct(s.x)}% ${clampPct(s.y - 10)}%`;
+    const push = wide ? 13 : 9;
+    const x =
+      clear === "left" ? clampPct(s.x + push) : clear === "right" ? clampPct(s.x - push) : s.x;
+    const y =
+      clear === "top"
+        ? clampPct(s.y + push * 0.5)
+        : clear === "bottom"
+          ? clampPct(s.y - push * 0.5)
+          : s.y;
+    return `${x}% ${y}%`;
+  };
+
+  /** A crop of the same frame offset from the subject, for pane/proof rows. */
+  const offsetPos = (dx: number, dy = 0) =>
+    `${clampPct(subject.x + dx)}% ${clampPct(subject.y + dy)}%`;
+
+  const photo = (extra?: React.CSSProperties, kind: PhotoFrame = "full") => (
     <img
       src={scene.src}
       alt={`${scene.pair} — ${scene.theme}`}
       loading="lazy"
       className="absolute inset-0 size-full object-cover"
-      style={{ objectPosition: focus, filter: "contrast(1.06) saturate(1.02)", ...extra }}
+      style={{ objectPosition: framePos(kind), filter: "contrast(1.06) saturate(1.02)", ...extra }}
     />
   );
 
