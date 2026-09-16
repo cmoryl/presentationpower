@@ -1,7 +1,7 @@
 // /social/legal-alongside — the "You're not on it alone." Legal campaign board.
 //
 // Sixteen commissioned documentary frames, each with its own headline and
-// caption, rendered through six switchable layout templates and three trims.
+// caption, rendered through nine switchable layout templates and three trims.
 
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/social/legal-alongside")({
       {
         name: "description",
         content:
-          "Sixteen commissioned documentary frames for the TransPerfect Legal campaign — one expert committed to something hard, one person already in position — with headline, caption and six switchable layout templates.",
+          "Sixteen commissioned documentary frames for the TransPerfect Legal campaign — one expert committed to something hard, one person already in position — with headline, caption and nine switchable layout templates.",
       },
       { property: "og:title", content: "You're not on it alone · Legal campaign board" },
       {
@@ -88,7 +88,7 @@ function AlongsideView() {
               Layout template
             </div>
             <h2 className="text-2xl font-semibold tracking-tight text-[#03002C]">
-              Sixteen frames, six layouts, three trims
+              Sixteen frames, nine layouts, three trims
             </h2>
             <p className="max-w-2xl text-sm text-black/60">
               Pick a layout for the whole set here, or click the small layout buttons on any single
