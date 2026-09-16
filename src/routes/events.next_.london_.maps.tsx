@@ -606,15 +606,15 @@ function LondonMapsPage() {
               <button type="button" className={btn} onClick={() => downloadMapCsv(installOpts)}>
                 <Table2 className="h-4 w-4" /> Install positions (CSV)
               </button>
-              {correctedCount ? (
+              {mineToSignOff.length ? (
                 <button
                   type="button"
                   className="inline-flex items-center gap-2 rounded-full border border-[#003FC7] bg-[#003FC7] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
                   onClick={confirmAll}
-                  title="Save these positions against the venue so every sheet reads them"
+                  title="Sign off the positions you marked, so every sheet reads them"
                 >
-                  <MapIcon className="h-4 w-4" /> Sign off {correctedCount} position
-                  {correctedCount === 1 ? "" : "s"}
+                  <MapIcon className="h-4 w-4" /> Sign off {mineToSignOff.length} position
+                  {mineToSignOff.length === 1 ? "" : "s"} you marked
                 </button>
               ) : null}
               {correctedCount ? (
