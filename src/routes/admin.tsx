@@ -1,12 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { AdminShell, AdminForbidden } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
+import { ConsoleLoading } from "@/components/ConsoleLoading";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
   head: () => ({ meta: [{ title: "Admin · TransPerfect Element" }] }),
+  pendingComponent: () => <ConsoleLoading label="admin console" />,
   component: AdminGate,
 });
 
