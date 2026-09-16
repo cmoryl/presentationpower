@@ -269,8 +269,10 @@ function BookletPage() {
   };
 
   const runExport = async (kind: "pdf" | "docx" | "pptx") => {
+    setNotesFor(kind === "pdf" ? "press PDF" : kind === "docx" ? "Word file" : "PowerPoint file");
     setBusy(kind);
     try {
+
       await runWithExportFeedback(
         {
           pending: "Building the booklet…",
