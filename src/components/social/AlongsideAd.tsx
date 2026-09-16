@@ -335,7 +335,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
         <div className="absolute inset-0" style={{ background: P.ground }} />
         <div
           className="absolute overflow-hidden"
-          style={{ left: 0, right: 0, bottom: 0, height: wide ? "30%" : square ? "27%" : "24%" }}
+          style={{ left: 0, right: 0, bottom: 0, height: wide ? "32%" : square ? "40%" : "36%" }}
         >
           {photo()}
           <div
@@ -345,7 +345,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
         </div>
         <div
           className="absolute inset-x-0 top-0 flex flex-col"
-          style={{ padding: u(M), gap: u(2), bottom: wide ? "30%" : square ? "27%" : "24%" }}
+          style={{ padding: u(M), gap: u(1.8), bottom: wide ? "32%" : square ? "40%" : "36%" }}
         >
           {masthead()}
           <div className="flex flex-1 flex-col justify-center" style={{ gap: u(1.6) }}>
