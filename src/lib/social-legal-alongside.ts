@@ -319,35 +319,51 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
 export const LEGAL_ALONGSIDE_TEMPLATES = [
   {
     id: "editorial",
-    label: "Editorial",
-    note: "Copy held in a third of the frame on the clear side, art running to the far edge.",
+    label: "Editorial column",
+    note: "Art to the far edge, copy held in a measured column on the clear side with a hairline masthead and the master number set against it.",
   },
   {
-    id: "band",
-    label: "Ground band",
-    note: "Art full bleed, every word in one solid band along the bottom.",
+    id: "inset",
+    label: "Museum inset",
+    note: "The photograph floats inside a deep ground margin — nothing sits on the picture, the frame does the work.",
+  },
+  {
+    id: "spine",
+    label: "Rotated spine",
+    note: "A narrow ground spine carries the division and number turned on its side; the headline sits on the art inside a soft wedge.",
+  },
+  {
+    id: "ledger",
+    label: "Ledger grid",
+    note: "Art above, a three-column ledger below divided by hairlines: theme, headline, action.",
+  },
+  {
+    id: "stack",
+    label: "Offset plate",
+    note: "Inset art with a ground plate stepped off the lower corner, accent hairline along its top edge.",
   },
   {
     id: "poster",
-    label: "Poster caps",
-    note: "Headline in caps across the top, hairline rule, tight footer row.",
+    label: "Poster masthead",
+    note: "Caps headline in a ground masthead, the photograph opening beneath it as a window, tight footer strip.",
   },
   {
-    id: "plate",
-    label: "Corner plate",
-    note: "Full-bleed art with a floating copy plate in one corner.",
+    id: "window",
+    label: "Centred window",
+    note: "The frame cropped to a window on wide margins, copy set beneath on a strict baseline.",
   },
   {
-    id: "split",
-    label: "Hard split",
-    note: "Solid copy panel one side, art the other. No type over picture at all.",
+    id: "field",
+    label: "Colour field step",
+    note: "A ground field with an accent bar, the art stepped away from it so field and picture never fight.",
   },
   {
     id: "centre",
-    label: "Centre stack",
-    note: "Everything centred on the optical axis over a deep scrim.",
+    label: "Centre axis",
+    note: "Everything on the optical axis between two accent rules over a deep scrim.",
   },
 ] as const;
+
 
 export type AlongsideTemplateId = (typeof LEGAL_ALONGSIDE_TEMPLATES)[number]["id"];
 
