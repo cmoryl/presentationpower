@@ -211,6 +211,9 @@ function BookletPage() {
   }));
   const [savedId, setSavedId] = useState<string>("");
   const [notes, setNotes] = useState<string[]>([]);
+  /** Which file the notes below describe, so they never read as advice about the next one. */
+  const [notesFor, setNotesFor] = useState<string>("");
+
   const [busy, setBusy] = useState<string | null>(null);
   /** The agenda carried inside an opened saved booklet, when it has one. */
   const [agendaSnapshot, setAgendaSnapshot] = useState<AgendaConfig | null>(null);
