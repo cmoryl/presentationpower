@@ -123,7 +123,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
    * the turn — set in the contrasting face. Emphasis is always ink; the accent
    * appears only as a hairline under the phrase.
    */
-  const headline = (size: number, opts?: { measure?: number }) => {
+  const headline = (size: number, opts?: { measure?: number; color?: string }) => {
     const d = TY.display;
     const a = TY.action;
     const parts = alongsideHeadlineParts(scene.headline, scene.action);
@@ -135,7 +135,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           fontSize: u(px),
           lineHeight: d.lineHeight,
           fontWeight: d.weight,
-          color: P.ink,
+          color: opts?.color ?? P.ink,
           letterSpacing: d.tracking,
           textTransform: d.caps ? "uppercase" : "none",
           textWrap: "balance",
@@ -306,7 +306,317 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
 
   let body: React.ReactNode = null;
 
-  if (template === "wedge" || template === "blade") {
+  const parts = alongsideHeadlineParts(scene.headline, scene.action);
+  const colourMark = logos?.color ?? lockup;
+
+  /** Body copy in an arbitrary ink, for the light-field templates. */
+  const supportIn = (ink: string) => (
+    <div
+      style={{
+        fontFamily: TY.support.family,
+        fontWeight: TY.support.weight,
+        fontSize: u(T.support),
+        lineHeight: TY.support.lineHeight,
+        color: ink,
+        opacity: 0.78,
+        maxWidth: "26em",
+      }}
+    >
+      {LEGAL_ALONGSIDE_CONCEPT.support}
+    </div>
+  );
+
+  if (template === "knockout") {
+    // The headline is cut out of a light field and the photograph shows through
+    // the letterforms. A full-bleed strip of the same frame runs under it.
+    const size = (square ? T.display * 1.62 : T.display * 1.3) * TY.display.scale;
+    body = (
+      <>
+        <div className="absolute inset-0" style={{ background: P.light }} />
+        <div
+          className="absolute overflow-hidden"
+          style={{ left: 0, right: 0, bottom: 0, height: wide ? "30%" : square ? "27%" : "24%" }}
+        >
+          {photo()}
+          <div
+            className="absolute inset-0"
+            style={{ background: `linear-gradient(to top, ${P.ground}00 46%, ${P.ground}59 100%)` }}
+          />
+        </div>
+        <div
+          className="absolute inset-x-0 top-0 flex flex-col"
+          style={{ padding: u(M), gap: u(2), bottom: wide ? "30%" : square ? "27%" : "24%" }}
+        >
+          {masthead(P.ground)}
+          <div className="flex flex-1 flex-col justify-center" style={{ gap: u(1.6) }}>
+            <div
+              style={{
+                fontFamily: TY.display.family,
+                fontWeight: TY.display.weight,
+                fontSize: u(size),
+                lineHeight: TY.display.lineHeight,
+                letterSpacing: TY.display.tracking,
+                textTransform: "uppercase",
+                maxWidth: "13em",
+                backgroundImage: `url(${scene.src})`,
+                backgroundSize: "cover",
+                backgroundPosition: focus,
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+              }}
+            >
+              {parts.before}
+              {parts.action}
+              {parts.after}
+            </div>
+            {supportIn(P.ground)}
+          </div>
+          <div className="flex items-end justify-between" style={{ gap: u(2) }}>
+            {ctaBlock()}
+            {colourMark ? (
+              <img
+                src={colourMark}
+                alt="TransPerfect Legal"
+                style={{ height: u(T.logo * 0.85), width: "auto", maxWidth: u(20), objectFit: "contain" }}
+              />
+            ) : null}
+          </div>
+        </div>
+      </>
+    );
+  } else if (template === "louvre") {
+    // The frame is louvred into three panes of the same photograph, each cropped
+    // differently, with the copy carried on an ink band across the base.
+    const panes = ["22% 50%", focus, "78% 50%"];
+    const bandTop = wide ? "58%" : square ? "62%" : "64%";
+    body = (
+      <>
+        <div className="absolute inset-0 flex" style={{ gap: u(0.7), background: P.ground }}>
+          {panes.map((pos, i) => (
+            <div key={pos + i} className="relative flex-1 overflow-hidden">
+              <img
+                src={scene.src}
+                alt=""
+                className="absolute inset-0 size-full object-cover"
+                style={{
+                  objectPosition: pos,
+                  filter: i === 1 ? "contrast(1.08) saturate(1.05)" : "contrast(1.02) saturate(0.5) brightness(0.82)",
+                }}
+              />
+            </div>
+          ))}
+        </div>
+        <div
+          className="absolute inset-x-0 bottom-0"
+          style={{ top: bandTop, background: P.ground, borderTop: `${u(0.34)} solid ${P.accent}` }}
+        />
+        <div className="absolute inset-x-0 top-0 flex" style={{ padding: u(M), bottom: bandTop }}>
+          {masthead()}
+        </div>
+        <div
+          className="absolute inset-x-0 bottom-0 flex flex-col justify-between"
+          style={{ top: bandTop, padding: u(M), gap: u(1.4) }}
+        >
+          <div style={{ display: "grid", gap: u(1.3) }}>
+            {headline(square ? T.display : T.displayTight, { measure: wide ? 16 : 13 })}
+            {support()}
+          </div>
+          <div className="flex items-end justify-between" style={{ gap: u(2) }}>
+            {ctaBlock()}
+            {mark(T.logo * 0.85)}
+          </div>
+        </div>
+      </>
+    );
+  } else if (template === "marquee") {
+    // Duotone photograph under a stacked marquee: the headline repeated, the
+    // middle line solid and the outer lines drawn in outline only.
+    const size = (square ? T.display * 1.24 : T.display * 1.06) * TY.display.scale;
+    const line = (variant: "outline" | "solid") => (
+      <div
+        style={{
+          fontFamily: TY.display.family,
+          fontWeight: TY.display.weight,
+          fontSize: u(size),
+          lineHeight: 0.94,
+          letterSpacing: TY.display.tracking,
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+          color: variant === "solid" ? P.ink : "transparent",
+          WebkitTextStroke: variant === "outline" ? `${u(0.12)} ${P.ink}8A` : undefined,
+        }}
+      >
+        {scene.action}
+      </div>
+    );
+    body = (
+      <>
+        {photo({ filter: "grayscale(1) contrast(1.2)" })}
+        <div className="absolute inset-0" style={{ background: P.accent, mixBlendMode: "multiply" }} />
+        <div className="absolute inset-0" style={{ background: `${P.ground}73` }} />
+        <div
+          className="absolute inset-0 flex flex-col justify-between overflow-hidden"
+          style={{ padding: u(M) }}
+        >
+          {masthead()}
+          <div style={{ display: "grid", gap: u(0.4) }}>
+            {line("outline")}
+            {line("solid")}
+            {line("outline")}
+          </div>
+          <div style={{ display: "grid", gap: u(1.6) }}>
+            <div
+              style={{
+                fontFamily: TY.support.family,
+                fontWeight: 500,
+                fontSize: u(T.support * 1.15),
+                lineHeight: 1.28,
+                color: P.ink,
+                maxWidth: "22em",
+              }}
+            >
+              {scene.headline}
+            </div>
+            <div className="flex items-end justify-between" style={{ gap: u(2) }}>
+              {ctaBlock({ light: true })}
+              {mark(T.logo * 0.85)}
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  } else if (template === "arch") {
+    // The photograph held inside a tall arch on the ground field, an accent ring
+    // struck around it and the copy set on the open side.
+    const archStyle: React.CSSProperties = wide
+      ? { top: u(M * 0.9), bottom: u(M * 0.9), right: u(M), width: "42%" }
+      : { top: u(M * 1.1), left: u(M), right: u(M), height: square ? "54%" : "50%" };
+    body = (
+      <>
+        <div className="absolute inset-0" style={{ background: P.ground }} />
+        <div
+          aria-hidden
+          className="absolute"
+          style={{
+            ...archStyle,
+            border: `${u(0.22)} solid ${P.accent}`,
+            borderRadius: wide ? `${u(21)} ${u(21)} 0 0` : `${u(30)} ${u(30)} 0 0`,
+            transform: `translate(${u(1.1)}, ${u(-1.1)})`,
+          }}
+        />
+        <div
+          className="absolute overflow-hidden"
+          style={{ ...archStyle, borderRadius: wide ? `${u(21)} ${u(21)} 0 0` : `${u(30)} ${u(30)} 0 0` }}
+        >
+          {photo()}
+        </div>
+        <div
+          className="absolute flex flex-col justify-between"
+          style={
+            wide
+              ? { top: u(M), bottom: u(M), left: u(M), width: "48%" }
+              : { left: u(M), right: u(M), bottom: u(M), top: square ? "58%" : "54%" }
+          }
+        >
+          {masthead()}
+          <div style={{ display: "grid", gap: u(1.5) }}>
+            {headline(square ? T.display * 0.94 : T.displayTight, { measure: 12 })}
+            {support()}
+          </div>
+          <div className="flex items-end justify-between" style={{ gap: u(2) }}>
+            {ctaBlock()}
+            {mark(T.logo * 0.85)}
+          </div>
+        </div>
+      </>
+    );
+  } else if (template === "contact") {
+    // A proof sheet: the frame plus two tighter crops of it in a mono data
+    // column, the way a photographer marks up a take.
+    const crops = ["18% 34%", "76% 62%"];
+    body = (
+      <>
+        <div className="absolute inset-0" style={{ background: P.ground }} />
+        <div
+          className="absolute overflow-hidden"
+          style={
+            wide
+              ? { top: u(M), bottom: u(M), left: u(M), right: "34%" }
+              : { top: u(M), left: u(M), right: u(M), height: square ? "48%" : "44%" }
+          }
+        >
+          {photo()}
+          <div
+            className="absolute inset-0"
+            style={{ background: `linear-gradient(to top, ${P.ground}A6 0%, ${P.ground}00 52%)` }}
+          />
+          <div className="absolute" style={{ left: u(1.6), bottom: u(1.4) }}>
+            <span
+              style={{
+                fontFamily: TY.eyebrow.family,
+                fontSize: u(T.micro),
+                letterSpacing: "0.24em",
+                textTransform: "uppercase",
+                color: P.ink,
+                opacity: 0.82,
+              }}
+            >
+              {`FRAME ${scene.no} / ${scene.pair}`}
+            </span>
+          </div>
+        </div>
+        <div
+          className="absolute flex flex-col justify-between"
+          style={
+            wide
+              ? { top: u(M), bottom: u(M), right: u(M), width: "29%", gap: u(1.6) }
+              : { left: u(M), right: u(M), bottom: u(M), top: square ? "52%" : "48%", gap: u(1.6) }
+          }
+        >
+          <div style={{ display: "grid", gap: u(1.2) }}>
+            {masthead()}
+            <div className="flex" style={{ gap: u(0.8) }}>
+              {crops.map((pos) => (
+                <div
+                  key={pos}
+                  className="relative flex-1 overflow-hidden"
+                  style={{ aspectRatio: "4 / 3", border: `1px solid ${P.ink}2E` }}
+                >
+                  <img
+                    src={scene.src}
+                    alt=""
+                    className="absolute inset-0 size-full object-cover"
+                    style={{ objectPosition: pos, filter: "grayscale(0.6) contrast(1.1)" }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: "grid", gap: u(1.3) }}>
+            {headline(square ? T.displayTight : T.displayTight * 0.9, { measure: 11 })}
+            <div
+              style={{
+                fontFamily: TY.support.family,
+                fontSize: u(T.micro * 1.1),
+                lineHeight: 1.5,
+                color: P.ink,
+                opacity: 0.7,
+                borderTop: `1px solid ${P.ink}2E`,
+                paddingTop: u(1),
+              }}
+            >
+              {scene.craft}
+            </div>
+          </div>
+          <div style={{ display: "grid", justifyItems: "start", gap: u(1.4) }}>
+            {ctaBlock()}
+            {mark(T.logo * 0.8)}
+          </div>
+        </div>
+      </>
+    );
+  } else if (template === "wedge" || template === "blade") {
     // A hard ink wedge cut diagonally into a full-bleed photograph. The copy
     // lives inside the cut; a curtain of ground colour keeps any descender that
     // crosses the diagonal legible against the picture.
