@@ -469,20 +469,26 @@ function DeckTile({
     e.stopPropagation();
     if (!window.confirm(`Delete "${d.title}"? This can't be undone.`)) return;
     setDeleting(true);
-    try {
-      await removeCloud({ data: { deckId: d.id } });
-    } catch (err) {
-      // Removing only the local copy would hide a deck that still exists in the
-      // account — say so instead and leave the tile in place.
-      setDeleting(false);
-      toast.error("Deck was not deleted", {
-        description: err instanceof Error ? err.message : "The account could not be reached.",
-        duration: 9000,
-      });
-      return;
+    // A draft that only ever lived in this browser has no saved copy to remove,
+    // and asking the account for one fails outright when nobody is signed in.
+    const CLOUD_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (CLOUD_ID.test(d.id)) {
+      try {
+        await removeCloud({ data: { deckId: d.id } });
+      } catch (err) {
+        // Removing only the local copy would hide a deck that still exists in the
+        // account — say so instead and leave the tile in place.
+        setDeleting(false);
+        toast.error("Deck was not deleted", {
+          description: err instanceof Error ? err.message : "The account could not be reached.",
+          duration: 9000,
+        });
+        return;
+      }
     }
     deleteDeck(d.id);
   };
+
   if (deleting) return null;
 
   return (
