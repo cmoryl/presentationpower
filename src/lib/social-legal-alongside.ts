@@ -111,7 +111,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     id: "golfer-caddie",
     no: "03",
     pair: "Golfer + Caddie",
-    theme: "The Impossible Lie",
+    theme: "The Unplayable Position",
     headline: "A bad position is still a playable one.",
     action: "still a playable one",
     caption:
