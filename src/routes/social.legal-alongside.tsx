@@ -5,8 +5,19 @@
 
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowLeft, ArrowRight, Check, Images, Share2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Images,
+  Maximize2,
+  Share2,
+  X,
+} from "lucide-react";
 import { AlongsideAd } from "@/components/social/AlongsideAd";
 import {
   LEGAL_ALONGSIDE_CONCEPT,
@@ -47,7 +58,33 @@ function AlongsideView() {
   const [template, setTemplate] = useState<AlongsideTemplateId>("editorial");
   const [sizeId, setSizeId] = useState<string>(LEGAL_ALONGSIDE_SIZES[0].id);
   const [perScene, setPerScene] = useState<Record<string, AlongsideTemplateId>>({});
+  const [zoom, setZoom] = useState<string | null>(null);
   const size = LEGAL_ALONGSIDE_SIZES.find((s) => s.id === sizeId) ?? LEGAL_ALONGSIDE_SIZES[0];
+
+  const zoomIndex = zoom ? LEGAL_ALONGSIDE_SCENES.findIndex((s) => s.id === zoom) : -1;
+  const zoomScene = zoomIndex >= 0 ? LEGAL_ALONGSIDE_SCENES[zoomIndex] : null;
+  const step = (dir: -1 | 1) => {
+    if (zoomIndex < 0) return;
+    const next =
+      (zoomIndex + dir + LEGAL_ALONGSIDE_SCENES.length) % LEGAL_ALONGSIDE_SCENES.length;
+    setZoom(LEGAL_ALONGSIDE_SCENES[next].id);
+  };
+
+  useEffect(() => {
+    if (!zoom) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setZoom(null);
+      if (e.key === "ArrowRight") step(1);
+      if (e.key === "ArrowLeft") step(-1);
+    };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [zoom, zoomIndex]);
 
   return (
     <div className="mx-auto max-w-7xl space-y-12 px-4 py-10 sm:px-6 lg:px-8">
@@ -166,9 +203,17 @@ function AlongsideView() {
                 </div>
 
                 <div className="bg-[#F6F7FA] p-5">
-                  <div className="mx-auto max-w-[560px] overflow-hidden rounded-xl shadow-[0_16px_40px_-22px_rgba(3,0,44,0.45)]">
+                  <button
+                    type="button"
+                    onClick={() => setZoom(scene.id)}
+                    title="Click to view much larger"
+                    className="group relative mx-auto block w-full max-w-[560px] cursor-zoom-in overflow-hidden rounded-xl shadow-[0_16px_40px_-22px_rgba(3,0,44,0.45)] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+                  >
                     <AlongsideAd scene={scene} template={active} w={size.w} h={size.h} />
-                  </div>
+                    <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C]/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
+                      <Maximize2 size={11} /> View larger
+                    </span>
+                  </button>
                 </div>
 
                 <div className="space-y-3 px-5 py-4 text-sm">
@@ -228,6 +273,106 @@ function AlongsideView() {
           Back to social <ArrowRight size={14} />
         </Link>
       </section>
+
+      {zoomScene && typeof document !== "undefined" ? (
+        createPortal(
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${zoomScene.no} · ${zoomScene.theme} — large view`}
+          className="fixed inset-0 z-[120] flex flex-col bg-[#03002C]/95 p-4 backdrop-blur-sm sm:p-6"
+          onClick={() => setZoom(null)}
+        >
+          <div
+            className="mx-auto flex h-full w-full max-w-[1500px] flex-col gap-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3 text-white">
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">
+                  {zoomScene.no} · {zoomScene.pair}
+                </div>
+                <div className="text-lg font-semibold">{zoomScene.theme}</div>
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5">
+                {LEGAL_ALONGSIDE_SIZES.map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => setSizeId(s.id)}
+                    aria-pressed={s.id === sizeId}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                      s.id === sizeId
+                        ? "border-white bg-white text-[#03002C]"
+                        : "border-white/25 text-white/80 hover:border-white/60"
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+                <span aria-hidden className="mx-1 text-white/25">
+                  |
+                </span>
+                <button
+                  type="button"
+                  onClick={() => step(-1)}
+                  aria-label="Previous ad"
+                  className="rounded-full border border-white/25 p-2 text-white/80 hover:border-white/60"
+                >
+                  <ChevronLeft size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => step(1)}
+                  aria-label="Next ad"
+                  className="rounded-full border border-white/25 p-2 text-white/80 hover:border-white/60"
+                >
+                  <ChevronRight size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setZoom(null)}
+                  aria-label="Close large view"
+                  className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-white/25 px-3 py-1.5 text-xs font-medium text-white/85 hover:border-white/60"
+                >
+                  <X size={13} /> Close
+                </button>
+              </div>
+            </div>
+
+            <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto">
+              <div
+                className="mx-auto w-full shrink-0 overflow-hidden rounded-2xl shadow-[0_40px_120px_-40px_rgba(0,0,0,0.8)]"
+                style={{
+                  aspectRatio: `${size.w} / ${size.h}`,
+                  maxWidth: `min(100%, ${Math.round((size.w / size.h) * 74)}vh)`,
+                }}
+              >
+                <AlongsideAd
+                  scene={zoomScene}
+                  template={perScene[zoomScene.id] ?? template}
+                  w={size.w}
+                  h={size.h}
+                />
+              </div>
+            </div>
+
+            <div className="mx-auto max-w-3xl space-y-1 text-center text-white/80">
+              <p className="text-base font-semibold text-white">{zoomScene.headline}</p>
+              <p className="text-sm">{zoomScene.caption}</p>
+              <p className="text-xs text-white/50">
+                {zoomScene.craft} · {size.w}×{size.h} ·{" "}
+                {LEGAL_ALONGSIDE_TEMPLATES.find(
+                  (t) => t.id === (perScene[zoomScene.id] ?? template),
+                )?.label}{" "}
+                · Arrow keys move between ads, Esc closes.
+              </p>
+            </div>
+          </div>
+        </div>,
+        document.body,
+        )
+      ) : null}
     </div>
   );
 }
