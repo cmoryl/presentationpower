@@ -358,7 +358,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
   } else if (template === "strata") {
     // Four stacked alpha strata climb the frame, each one denser than the last
     // and each divided by a gradient hairline. The copy sits in the deepest band.
-    const stops = [0.16, 0.36, 0.62, 0.9];
+    const stops = [0.94, 0.66, 0.4, 0.18]; // densest at the base, under the copy
     const base = wide ? 62 : square ? 58 : 56; // % height held by the strata
     const bandH = base / stops.length;
     body = (
