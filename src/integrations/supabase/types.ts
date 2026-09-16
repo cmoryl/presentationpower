@@ -4300,6 +4300,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_edit_venue: { Args: { _user_id: string }; Returns: boolean }
       display_names: {
         Args: { _ids: string[] }
         Returns: {

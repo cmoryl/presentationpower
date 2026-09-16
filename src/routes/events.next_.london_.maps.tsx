@@ -154,6 +154,11 @@ function LondonMapsPage() {
    */
   const [pins, setPins] = useState<VenuePin[]>([]);
   const [pinState, setPinState] = useState<"local" | "loading" | "synced" | "offline">("local");
+  /**
+   * The positions THIS person marked. Sign-off only ever covers these, so a
+   * user never puts their name to a spot a colleague marked and they never saw.
+   */
+  const [myEdits, setMyEdits] = useState<Set<string>>(() => new Set());
   const readPins = useServerFn(listVenuePins);
   const writePins = useServerFn(saveVenuePins);
   const dropPin = useServerFn(clearVenuePin);
@@ -163,7 +168,11 @@ function LondonMapsPage() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORE_KEY);
-      if (raw) setOverrides(JSON.parse(raw) as LondonMarkerOverrides);
+      if (raw) {
+        const mine = JSON.parse(raw) as LondonMarkerOverrides;
+        setOverrides(mine);
+        setMyEdits(new Set(Object.keys(mine)));
+      }
       const rawDesign = localStorage.getItem(DESIGN_KEY);
       // Merge over the defaults so a design saved before a new control existed
       // still opens with every field populated.
@@ -327,6 +336,14 @@ function LondonMapsPage() {
 
   const correctedCount = Object.keys(overrides).length;
   const confirmedCount = pins.filter((p) => p.confirmed).length;
+  /** Positions this person marked that nobody has signed off yet. */
+  const mineToSignOff = useMemo(
+    () =>
+      Object.keys(overrides).filter(
+        (id) => myEdits.has(id) && !pins.some((p) => p.assetId === id && p.confirmed),
+      ),
+    [myEdits, overrides, pins],
+  );
 
 
   useEffect(() => {
@@ -338,11 +355,21 @@ function LondonMapsPage() {
 
   const move = useCallback(
     (panelId: string, x: number, y: number) => {
+      // Moving a position someone already signed off takes it back to "marked"
+      // for the whole crew — never silently. Ask first.
+      const signedOff = pins.some((p) => p.assetId === panelId && p.confirmed);
+      if (signedOff && typeof window !== "undefined") {
+        const ok = window.confirm(
+          "This position was signed off for the venue. Moving it puts it back to a marked position until someone signs it off again. Move it?",
+        );
+        if (!ok) return;
+      }
       persist({ ...overrides, [panelId]: { x, y } });
+      setMyEdits((cur) => new Set(cur).add(panelId));
       // A moved pin is a marked position, not yet a signed-off one.
       syncPin(panelId, x, y, false);
     },
-    [overrides, persist, syncPin],
+    [overrides, persist, pins, syncPin],
   );
 
   const resetOne = useCallback(
@@ -350,6 +377,11 @@ function LondonMapsPage() {
       const next = { ...overrides };
       delete next[panelId];
       persist(next);
+      setMyEdits((cur) => {
+        const n = new Set(cur);
+        n.delete(panelId);
+        return n;
+      });
       setPins((cur) => cur.filter((p) => p.assetId !== panelId));
       if (userId)
         dropPin({ data: { venueSlug: VENUE_SLUG, assetId: panelId } }).catch(() =>
@@ -360,13 +392,15 @@ function LondonMapsPage() {
   );
 
   /**
-   * Sign the marked positions off for this venue. Once confirmed they are the
+   * Sign off the positions THIS person marked. Once confirmed they are the
    * source of truth every sheet reads, in place of the rule-placed guess.
+   * Positions marked by colleagues are left for them to sign off themselves.
    */
   const confirmAll = useCallback(() => {
-    const rows = Object.entries(overrides).flatMap(([assetId, pos]) => {
+    const rows = mineToSignOff.flatMap((assetId) => {
+      const pos = overrides[assetId];
       const panel = panels.find((p) => p.id === assetId);
-      if (!panel) return [];
+      if (!pos || !panel) return [];
       return [
         {
           venueSlug: VENUE_SLUG,
@@ -383,11 +417,14 @@ function LondonMapsPage() {
     setPinState("loading");
     writePins({ data: { pins: rows } })
       .then((res) => {
-        setPins(res.pins);
+        setPins((cur) => {
+          const kept = cur.filter((p) => !res.pins.some((n) => n.assetId === p.assetId));
+          return [...kept, ...res.pins];
+        });
         setPinState("synced");
       })
       .catch(() => setPinState("offline"));
-  }, [overrides, panels, userId, writePins]);
+  }, [mineToSignOff, overrides, panels, userId, writePins]);
 
 
   // The large window is a modal surface: Escape closes it and the page behind
@@ -569,15 +606,15 @@ function LondonMapsPage() {
               <button type="button" className={btn} onClick={() => downloadMapCsv(installOpts)}>
                 <Table2 className="h-4 w-4" /> Install positions (CSV)
               </button>
-              {correctedCount ? (
+              {mineToSignOff.length ? (
                 <button
                   type="button"
                   className="inline-flex items-center gap-2 rounded-full border border-[#003FC7] bg-[#003FC7] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
                   onClick={confirmAll}
-                  title="Save these positions against the venue so every sheet reads them"
+                  title="Sign off the positions you marked, so every sheet reads them"
                 >
-                  <MapIcon className="h-4 w-4" /> Sign off {correctedCount} position
-                  {correctedCount === 1 ? "" : "s"}
+                  <MapIcon className="h-4 w-4" /> Sign off {mineToSignOff.length} position
+                  {mineToSignOff.length === 1 ? "" : "s"} you marked
                 </button>
               ) : null}
               {correctedCount ? (
