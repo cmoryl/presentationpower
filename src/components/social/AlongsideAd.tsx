@@ -18,8 +18,10 @@
 
 import { getDivisionLogos } from "@/lib/division-logos";
 import {
+  alongsideHeadlineParts,
   LEGAL_ALONGSIDE_CONCEPT,
   LEGAL_ALONGSIDE_PALETTE as P,
+  LEGAL_ALONGSIDE_TYPE,
   type AlongsideClear,
   type AlongsideScene,
   type AlongsideTemplateId,
