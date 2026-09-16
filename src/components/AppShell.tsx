@@ -90,10 +90,12 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
   const showAdminChrome = !inAdmin && isAdminLinked && adminCtx;
   const caps = useWorkspaceCapabilities();
   const createOnly = caps.createOnly;
-  const { persona } = useWorkspacePersona();
+  const { persona, isLoading: personaLoading } = useWorkspacePersona();
   // The sidebar/top-nav Dashboard entry names the active persona dashboard so
-  // it matches the dashboard tabs and the page breadcrumb.
-  const dashboardLabel = personaById(persona).label;
+  // it matches the dashboard tabs and the page breadcrumb. Until the user's
+  // roles have resolved, stay on the neutral word — naming a workspace early
+  // makes the label visibly change under the user ("Sales" → "Admin").
+  const dashboardLabel = personaLoading ? "Dashboard" : personaById(persona).label;
 
   const nav = [
     { to: "/", label: "Home" },

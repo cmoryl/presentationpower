@@ -116,10 +116,12 @@ export function Breadcrumbs() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const router = useRouter();
   const decks = useDeckStore((s) => s.decks);
-  const { persona } = useWorkspacePersona();
+  const { persona, isLoading: personaLoading } = useWorkspacePersona();
   // The /dashboard crumb follows the active persona so the trail always names
   // the dashboard the user actually sees (Sales / MarOps / Admin dashboard).
-  const dashboardLabel = personaById(persona).label;
+  // Until roles resolve, keep the neutral word so the crumb doesn't rename
+  // itself under the user.
+  const dashboardLabel = personaLoading ? "Dashboard" : personaById(persona).label;
 
   const routePatterns = useMemo(() => Object.keys(router.routesByPath ?? {}), [router]);
 
