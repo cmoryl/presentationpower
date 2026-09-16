@@ -13,6 +13,7 @@ import {
   LEGAL_ALONGSIDE_SCENES,
   LEGAL_ALONGSIDE_SIZES,
   LEGAL_ALONGSIDE_TEMPLATES,
+  LEGAL_ALONGSIDE_TYPE,
   type AlongsideTemplateId,
 } from "@/lib/social-legal-alongside";
 
