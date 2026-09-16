@@ -56,14 +56,14 @@ registerSlideModule({
       const st = resolveCapCardStyle(c.cardStyle);
       const cards = readCards(c.cards);
       const dense = st.density === "compact" || cards.length > 3;
-      const cardBg =
-        st.cardLook === "outline" ? "transparent" : isDark ? "rgba(255,255,255,0.06)" : "#FFFFFF";
-      const cardShadow =
-        st.cardLook === "elevated"
-          ? isDark
-            ? "0 22px 48px -26px rgba(0,0,0,0.72)"
-            : "0 22px 48px -28px rgba(3,0,44,0.28)"
-          : "none";
+      // House card grammar (see `moduleCardSurface` in components/slide/flagship):
+      // a top-lit accent wash that fades to nothing before the bottom edge, with
+      // a hairline frame on the top and sides only. The wash is carried by the
+      // copy block (the photo plate covers the top of the card), and the frame is
+      // drawn as its own masked layer so the copy never fades with it.
+      const baseTint = isDark
+        ? cardBaseGradient("255,255,255", 0.07)
+        : cardBaseGradient("255,255,255", 0.62);
 
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -81,19 +81,22 @@ registerSlideModule({
               const bandInk = toneText(card.tone);
               const leadColor =
                 st.leadColor === "accent" ? accent : st.leadColor === "ink" ? ink.strong : fill;
+              const frameLine = card.tone === "ink" ? hairline : fill;
               return (
                 <div
                   key={i}
                   data-intro-item=""
                   data-intro-step={i + 1}
-                  className="flex min-w-0 flex-col overflow-hidden"
-                  style={{
-                    background: cardBg,
-                    border: `1px solid ${card.tone === "ink" ? hairline : fill}`,
-                    borderRadius: st.cardRadius,
-                    boxShadow: cardShadow,
-                  }}
+                  className="relative flex min-w-0 flex-col overflow-hidden"
+                  style={{ borderRadius: st.cardRadius }}
                 >
+                  {/* Hairline frame that dissolves along the bottom edge. */}
+                  <div
+                    aria-hidden
+                    data-decorative
+                    className="pointer-events-none absolute inset-0 z-10"
+                    style={openBottomFrame(frameLine, st.cardRadius)}
+                  />
                   {/* Photograph — each card owns its own image */}
                   <div
                     style={{
