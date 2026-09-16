@@ -336,6 +336,14 @@ function LondonMapsPage() {
 
   const correctedCount = Object.keys(overrides).length;
   const confirmedCount = pins.filter((p) => p.confirmed).length;
+  /** Positions this person marked that nobody has signed off yet. */
+  const mineToSignOff = useMemo(
+    () =>
+      Object.keys(overrides).filter(
+        (id) => myEdits.has(id) && !pins.some((p) => p.assetId === id && p.confirmed),
+      ),
+    [myEdits, overrides, pins],
+  );
 
 
   useEffect(() => {
@@ -347,11 +355,21 @@ function LondonMapsPage() {
 
   const move = useCallback(
     (panelId: string, x: number, y: number) => {
+      // Moving a position someone already signed off takes it back to "marked"
+      // for the whole crew — never silently. Ask first.
+      const signedOff = pins.some((p) => p.assetId === panelId && p.confirmed);
+      if (signedOff && typeof window !== "undefined") {
+        const ok = window.confirm(
+          "This position was signed off for the venue. Moving it puts it back to a marked position until someone signs it off again. Move it?",
+        );
+        if (!ok) return;
+      }
       persist({ ...overrides, [panelId]: { x, y } });
+      setMyEdits((cur) => new Set(cur).add(panelId));
       // A moved pin is a marked position, not yet a signed-off one.
       syncPin(panelId, x, y, false);
     },
-    [overrides, persist, syncPin],
+    [overrides, persist, pins, syncPin],
   );
 
   const resetOne = useCallback(
@@ -359,6 +377,11 @@ function LondonMapsPage() {
       const next = { ...overrides };
       delete next[panelId];
       persist(next);
+      setMyEdits((cur) => {
+        const n = new Set(cur);
+        n.delete(panelId);
+        return n;
+      });
       setPins((cur) => cur.filter((p) => p.assetId !== panelId));
       if (userId)
         dropPin({ data: { venueSlug: VENUE_SLUG, assetId: panelId } }).catch(() =>
@@ -369,13 +392,15 @@ function LondonMapsPage() {
   );
 
   /**
-   * Sign the marked positions off for this venue. Once confirmed they are the
+   * Sign off the positions THIS person marked. Once confirmed they are the
    * source of truth every sheet reads, in place of the rule-placed guess.
+   * Positions marked by colleagues are left for them to sign off themselves.
    */
   const confirmAll = useCallback(() => {
-    const rows = Object.entries(overrides).flatMap(([assetId, pos]) => {
+    const rows = mineToSignOff.flatMap((assetId) => {
+      const pos = overrides[assetId];
       const panel = panels.find((p) => p.id === assetId);
-      if (!panel) return [];
+      if (!pos || !panel) return [];
       return [
         {
           venueSlug: VENUE_SLUG,
@@ -392,11 +417,14 @@ function LondonMapsPage() {
     setPinState("loading");
     writePins({ data: { pins: rows } })
       .then((res) => {
-        setPins(res.pins);
+        setPins((cur) => {
+          const kept = cur.filter((p) => !res.pins.some((n) => n.assetId === p.assetId));
+          return [...kept, ...res.pins];
+        });
         setPinState("synced");
       })
       .catch(() => setPinState("offline"));
-  }, [overrides, panels, userId, writePins]);
+  }, [mineToSignOff, overrides, panels, userId, writePins]);
 
 
   // The large window is a modal surface: Escape closes it and the page behind
