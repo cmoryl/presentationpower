@@ -89,7 +89,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
   );
 
   /** Division line with the master number set against it on a hairline. */
-  const masthead = (ink = P.ink) => (
+  const masthead = (ink: string = P.ink) => (
     <div className="flex w-full items-baseline gap-3" style={{ color: ink }}>
       <span
         style={{
