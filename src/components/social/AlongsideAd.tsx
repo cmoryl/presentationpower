@@ -348,7 +348,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
           style={{ padding: u(M), gap: u(1.8), bottom: wide ? "32%" : square ? "40%" : "36%" }}
         >
           {masthead()}
-          <div className="flex flex-1 flex-col justify-center" style={{ gap: u(1.6) }}>
+          <div className="flex flex-1 flex-col justify-end" style={{ gap: u(1.6), textAlign: "left" }}>
             <div
               style={{
                 fontFamily: TY.display.family,
