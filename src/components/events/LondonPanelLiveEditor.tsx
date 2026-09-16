@@ -108,7 +108,7 @@ const QR_DEFAULT_LINK = NEXT_LONDON_AGENDA_URL;
  * labelled as a machine conversion awaiting printer sign-off — in the UI, in
  * the filename and in the file's own metadata. Nothing converts silently.
  *
- * NOTE: this is NOT the house-wide `CMYK_ENABLED` safety switch. It is a local,
+ * NOTE: this is NOT the house-wide `SHOW_PRESS_COLOUR_CONTROLS` safety switch. It is a local,
  * deliberately-constant flag that keeps this editor's press-colour blocks
  * mounted. Do not read it as a kill switch: turning it off only hides these
  * controls, it does not stop CMYK output anywhere else.
@@ -1332,7 +1332,7 @@ export function LondonPanelLiveEditor({
 
         {/* Output + panel actions */}
         <div className="flex flex-wrap items-center gap-2">
-          {CMYK_ENABLED
+          {SHOW_PRESS_COLOUR_CONTROLS
             ? (["rgb", "cmyk"] as const).map((space) => (
                 <button
                   key={space}
@@ -1349,7 +1349,7 @@ export function LondonPanelLiveEditor({
                 </button>
               ))
             : null}
-          {CMYK_ENABLED && colorSpace === "cmyk" ? (
+          {SHOW_PRESS_COLOUR_CONTROLS && colorSpace === "cmyk" ? (
             <span
               className={`rounded-full border px-3 py-1 text-[11px] ${
                 cmykStatus.converted === 0
