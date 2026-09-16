@@ -66,7 +66,9 @@ export function SaveToCloudButton({ deckId }: { deckId: string }) {
       try {
         await snapshot({ data: { deckId, changeSummary: "Manual save" } });
       } catch {
-        // versioning is best-effort — never break saves
+        // The save itself succeeded; say so plainly rather than implying there is
+        // version history behind it.
+        toast.warning("Saved, but no version was recorded for this save.");
       }
     } catch (e) {
       alert(`Save failed: ${e instanceof Error ? e.message : "unknown"}`);
@@ -513,7 +515,7 @@ export function SaveDeckButton({ deckId }: { deckId: string }) {
       try {
         await snapshot({ data: { deckId, changeSummary: "Manual save" } });
       } catch {
-        // versioning is best-effort
+        toast.warning("Saved, but no version was recorded for this save.");
       }
     } catch (e) {
       toast.error(`Save failed: ${e instanceof Error ? e.message : "unknown"}`);
@@ -583,7 +585,7 @@ export function SaveDeckToMyFilesButton({ deckId }: { deckId: string }) {
       try {
         await snapshot({ data: { deckId, changeSummary: "Saved to My Files" } });
       } catch {
-        // versioning is best-effort — never break saves
+        toast.warning("Saved, but no version was recorded for this save.");
       }
       toast.success("Saved to My Files — this deck now opens on any of your devices");
       if (res?.deckUuid) {

@@ -32,14 +32,29 @@ export const setDeckTemplateFlag = createServerFn({ method: "POST" })
   .validator((raw) => z.object({ deckId: z.string().uuid(), isTemplate: z.boolean() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase
+    // Report the truth: an owner filter that matches nothing used to return "ok",
+    // so an admin acting on someone else's deck saw success and no change.
+    const { assertCanManageRecord } = await import("./owner-or-admin");
+    const { data: deck, error: readError } = await supabase
+      .from("decks")
+      .select("id, owner_id")
+      .eq("id", data.deckId)
+      .maybeSingle();
+    if (readError) throw new Error(readError.message);
+    if (!deck) throw new Error("That deck no longer exists.");
+    await assertCanManageRecord(supabase, userId, deck.owner_id);
+    const { data: updated, error } = await supabase
       .from("decks")
       .update({ is_template: data.isTemplate })
       .eq("id", data.deckId)
-      .eq("owner_id", userId);
+      .select("id");
     if (error) throw new Error(error.message);
+    if (!updated || updated.length === 0) {
+      throw new Error("Nothing was changed — you may not have permission to edit this deck.");
+    }
     return { ok: true };
   });
+
 
 export const listTeamTemplates = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

@@ -6,6 +6,29 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import { enableDeckSharingCore, shareEnableInput } from "@/lib/deck-sharing.core";
 
+const NO_CHANGE =
+  "Nothing was changed — the share link may already be off, or you may not have permission to change it.";
+
+/** Owner or admin only: a bare id filter used to look like success for anyone. */
+async function assertShareable(supabase: unknown, userId: string, deckId: string) {
+  const sb = supabase as {
+    from: (t: string) => {
+      select: (c: string) => {
+        eq: (
+          c: string,
+          v: string,
+        ) => { maybeSingle: () => Promise<{ data: { owner_id: string | null } | null; error: unknown }> };
+      };
+    };
+  };
+  const { data: deck } = await sb.from("decks").select("owner_id").eq("id", deckId).maybeSingle();
+  if (!deck) throw new Error("That deck no longer exists.");
+  if (!(await canManageRecord(supabase, userId, deck.owner_id))) {
+    throw new Error("Forbidden");
+  }
+}
+
+
 export const enableDeckSharing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((raw) => shareEnableInput.parse(raw))
@@ -25,12 +48,15 @@ export const setDeckShareExpiry = createServerFn({ method: "POST" })
       .parse(raw),
   )
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
-    const { error } = await supabase
+    const { supabase, userId } = context;
+    await assertShareable(supabase, userId, data.deckId);
+    const { data: rows, error } = await supabase
       .from("decks")
       .update({ share_expires_at: data.expiresAt } as never)
-      .eq("id", data.deckId);
+      .eq("id", data.deckId)
+      .select("id");
     if (error) throw new Error(error.message);
+    if (!rows || rows.length === 0) throw new Error(NO_CHANGE);
     return { ok: true };
   });
 
@@ -38,14 +64,18 @@ export const disableDeckSharing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
-    const { error } = await supabase
+    const { supabase, userId } = context;
+    await assertShareable(supabase, userId, data.deckId);
+    const { data: rows, error } = await supabase
       .from("decks")
       .update({ share_token: null, shared_at: null, share_expires_at: null } as never)
-      .eq("id", data.deckId);
+      .eq("id", data.deckId)
+      .select("id");
     if (error) throw new Error(error.message);
+    if (!rows || rows.length === 0) throw new Error(NO_CHANGE);
     return { ok: true };
   });
+
 
 export const getDeckShareStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

@@ -217,6 +217,15 @@ function NextVenuePage() {
           {NEXT_VENUE.caveat}
         </p>
 
+        <p className="mt-3 max-w-3xl text-[13px] leading-relaxed text-[#03002C]/70">
+          This is a study on a stand-in layout. When the real venue is contracted, set it up on{" "}
+          <Link to="/events/next/venues" className="font-semibold underline">
+            Venue plans
+          </Link>{" "}
+          — that record is what every sheet, sign schedule and saved position reads from.
+        </p>
+
+
         <div className="mt-6 flex flex-wrap items-center gap-2">
           {NEXT_VENUE_FLOORS.map((f) => (
             <button
