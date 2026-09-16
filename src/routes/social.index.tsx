@@ -173,6 +173,28 @@ function SocialView() {
           </span>
         </Link>
 
+        {/* Live campaign: Legal — "You're not on it alone." documentary set */}
+        <Link
+          to="/social/legal-alongside"
+          className="group flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-black/10 bg-gradient-to-br from-[#03002C12] via-white/70 to-[#A1FBF922] p-6 transition hover:border-[#003FC7]/50"
+        >
+          <div className="min-w-0">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+              New campaign · TransPerfect Legal
+            </div>
+            <div className="mt-1 text-2xl font-semibold tracking-tight text-[#03002C]">
+              You&apos;re not on it alone.
+            </div>
+            <p className="mt-1 max-w-2xl text-sm text-black/65">
+              Sixteen documentary frames — one expert committed to something hard, one person already
+              in position — each with its own headline, caption and six switchable layouts.
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-sm font-medium text-white group-hover:bg-[#003FC7]">
+            Open the campaign board <ArrowRight size={14} />
+          </span>
+        </Link>
+
         {/* Angle filter */}
         <section id="playbooks" className="space-y-5">
           <SectionHead
