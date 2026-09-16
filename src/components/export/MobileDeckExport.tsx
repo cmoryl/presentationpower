@@ -67,6 +67,9 @@ export type MobileDeckExportProps = {
 
 export function MobileDeckExport({ deck, brand, blocked, className }: MobileDeckExportProps) {
   const [busy, setBusy] = useState<null | "pdf" | "pptx">(null);
+  // A deck with no slides builds an empty file, so hold both buttons and say why.
+  const empty = deck.slides.length === 0;
+
 
   async function run(kind: "pdf" | "pptx", force = false) {
     if (busy) return;
