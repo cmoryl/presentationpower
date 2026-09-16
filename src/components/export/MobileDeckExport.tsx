@@ -72,7 +72,7 @@ export function MobileDeckExport({ deck, brand, blocked, className }: MobileDeck
 
 
   async function run(kind: "pdf" | "pptx", force = false) {
-    if (busy) return;
+    if (busy || empty) return;
     if (blocked && !force) {
       const label = kind === "pdf" ? "PDF export" : "PowerPoint export";
       const { toast } = await import("sonner");
@@ -161,7 +161,8 @@ export function MobileDeckExport({ deck, brand, blocked, className }: MobileDeck
         <button
           type="button"
           onClick={() => void run("pdf")}
-          disabled={busy !== null}
+          disabled={busy !== null || empty}
+          title={empty ? "This deck has no slides yet — add one first" : ""}
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#003FC7] px-4 text-[13px] font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
         >
           {busy === "pdf" ? <Loader2 size={14} className="animate-spin" /> : <Share2 size={14} />}
@@ -170,7 +171,8 @@ export function MobileDeckExport({ deck, brand, blocked, className }: MobileDeck
         <button
           type="button"
           onClick={() => void run("pptx")}
-          disabled={busy !== null}
+          disabled={busy !== null || empty}
+          title={empty ? "This deck has no slides yet — add one first" : ""}
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/15 bg-white px-4 text-[13px] font-semibold text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
         >
           {busy === "pptx" ? (
@@ -181,6 +183,11 @@ export function MobileDeckExport({ deck, brand, blocked, className }: MobileDeck
           {busy === "pptx" ? "Building…" : "Share .pptx"}
         </button>
       </div>
+      {empty && (
+        <p className="mt-2 text-[12px] text-black/55">
+          This deck has no slides yet — add one in the editor before sending it.
+        </p>
+      )}
     </section>
   );
 }
