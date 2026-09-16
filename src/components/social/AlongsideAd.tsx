@@ -358,7 +358,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
                 letterSpacing: TY.display.tracking,
                 textTransform: "uppercase",
                 maxWidth: "13em",
-                backgroundImage: `linear-gradient(${P.light}40, ${P.light}40), url(${scene.src})`,
+                backgroundImage: `linear-gradient(${P.light}80, ${P.light}80), url(${scene.src})`,
                 backgroundSize: "cover",
                 backgroundPosition: focus,
                 WebkitBackgroundClip: "text",
