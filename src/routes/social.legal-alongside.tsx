@@ -268,12 +268,13 @@ function AlongsideView() {
         </Link>
       </section>
 
-      {zoomScene ? (
+      {zoomScene && typeof document !== "undefined" ? (
+        createPortal(
         <div
           role="dialog"
           aria-modal="true"
           aria-label={`${zoomScene.no} · ${zoomScene.theme} — large view`}
-          className="fixed inset-0 z-50 flex flex-col bg-[#03002C]/92 p-4 backdrop-blur-sm sm:p-6"
+          className="fixed inset-0 z-[120] flex flex-col bg-[#03002C]/95 p-4 backdrop-blur-sm sm:p-6"
           onClick={() => setZoom(null)}
         >
           <div
