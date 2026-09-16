@@ -1824,19 +1824,31 @@ export function PillarStudio({
             </ul>
             <div className="flex items-center justify-between text-xs text-black/55">
               <span>
-                {batchItems.length} size{batchItems.length === 1 ? "" : "s"} ·{" "}
-                {batchItems.reduce((n, i) => n + i.quantity, 0)} panels
+                {batchItems.length === 0
+                  ? "No sizes ticked yet"
+                  : `${batchItems.length} size${batchItems.length === 1 ? "" : "s"} · ${batchItems.reduce((n, i) => n + i.quantity, 0)} panels`}
               </span>
             </div>
             <button
               type="button"
               onClick={runBatchExport}
               disabled={batchBusy || busy || batchItems.length === 0}
+              title={
+                batchItems.length === 0
+                  ? "Tick at least one size above, then set how many of each"
+                  : "Build one package containing every ticked size"
+              }
               className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#003FC7] px-4 py-2.5 text-sm font-medium text-[#003FC7] disabled:opacity-50"
             >
               <Download size={14} />
               {batchBusy ? batchStage || "Building batch…" : "Export batch package"}
             </button>
+            {batchItems.length === 0 && (
+              <p className="text-xs text-black/55">
+                Tick one or more sizes above and set how many of each — then this builds a single
+                package with all of them.
+              </p>
+            )}
           </div>
 
           {/* Live files */}

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Plus, Printer, Trash2 } from "lucide-react";
 import { consumeAgentPrompt } from "@/lib/agent-seed";
 import { AppShell } from "@/components/AppShell";
+import { ConsoleLoading } from "@/components/ConsoleLoading";
 import { Button } from "@/components/ui/button";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { PrintAgentChat } from "@/components/print-agent/PrintAgentChat";
@@ -30,6 +31,7 @@ const STARTERS = [
 
 export const Route = createFileRoute("/print-agent/$threadId")({
   ssr: false,
+  pendingComponent: () => <ConsoleLoading label="print agent" />,
   head: () => ({
     meta: [
       { title: "Print agent · TransPerfect Element" },

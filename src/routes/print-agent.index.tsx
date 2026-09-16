@@ -3,12 +3,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { ConsoleLoading } from "@/components/ConsoleLoading";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { createPrintThread, listPrintThreads } from "@/lib/print-agent/threads";
 import { AgentSignInGate } from "@/components/AgentSignInGate";
 
 export const Route = createFileRoute("/print-agent/")({
   ssr: false,
+  pendingComponent: () => <ConsoleLoading label="print agent" />,
   head: () => ({
     meta: [
       { title: "Print agent · TransPerfect Element" },

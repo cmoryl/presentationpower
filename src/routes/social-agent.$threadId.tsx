@@ -1,9 +1,11 @@
 // Social agent workspace — conversation + live link to the social kit.
 import { createFileRoute } from "@tanstack/react-router";
 import { KitAgentWorkspace } from "@/components/kit-agent/KitAgentWorkspace";
+import { ConsoleLoading } from "@/components/ConsoleLoading";
 
 export const Route = createFileRoute("/social-agent/$threadId")({
   ssr: false,
+  pendingComponent: () => <ConsoleLoading label="social agent" />,
   head: () => ({
     meta: [
       { title: "Social agent · TransPerfect Element" },
