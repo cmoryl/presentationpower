@@ -906,9 +906,16 @@ function BookletPage() {
             </div>
 
             <div className="space-y-2">
+              {plan.length === 0 ? (
+                <p className="text-xs text-[color:var(--color-muted-foreground)]">
+                  Nothing to make a file from yet — tick the cover page, the agenda days or the
+                  venue maps, or add a chart page.
+                </p>
+              ) : null}
               <Button
                 className="w-full"
                 disabled={!plan.length || busy !== null}
+                title={plan.length ? undefined : "Pick at least one page first"}
                 onClick={() => runExport("pdf")}
               >
                 <FileDown className="mr-2 size-4" />
@@ -918,6 +925,7 @@ function BookletPage() {
                 variant="secondary"
                 className="w-full"
                 disabled={!plan.length || busy !== null}
+                title={plan.length ? undefined : "Pick at least one page first"}
                 onClick={() => runExport("docx")}
               >
                 <FileText className="mr-2 size-4" />
@@ -927,6 +935,7 @@ function BookletPage() {
                 variant="secondary"
                 className="w-full"
                 disabled={!plan.length || busy !== null}
+                title={plan.length ? undefined : "Pick at least one page first"}
                 onClick={() => runExport("pptx")}
               >
                 <Presentation className="mr-2 size-4" />
@@ -936,7 +945,10 @@ function BookletPage() {
 
             {notes.length ? (
               <div className="rounded-lg border border-[color:var(--color-border)] p-4">
-                <h2 className="text-sm font-semibold uppercase tracking-wide">Export notes</h2>
+                <h2 className="text-sm font-semibold uppercase tracking-wide">
+                  {notesFor ? `About the ${notesFor} you just made` : "Export notes"}
+                </h2>
+
                 <ul className="mt-2 space-y-1 text-xs text-[color:var(--color-muted-foreground)]">
                   {notes.map((note, i) => (
                     <li key={i}>{note}</li>
