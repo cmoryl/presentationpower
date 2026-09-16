@@ -159,6 +159,9 @@ function CoverPreview({ cover, trim }: { cover: BookletConfig["cover"]; trim: { 
           top: art ? pct(layout.copy.y) : "8%",
           height: art ? pct(layout.copy.h) : "60%",
           justifyContent: art && layout.copy.anchor === "bottom" ? "flex-end" : "flex-start",
+          // The footnote owns the page foot in the press file, so a
+          // bottom-anchored copy block stops above it here too.
+          paddingBottom: cover.footnote ? "8%" : undefined,
         }}
       >
         <div className="flex gap-1">
