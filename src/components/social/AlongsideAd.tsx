@@ -182,23 +182,24 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     </div>
   );
 
-  const cta = () => (
+  /**
+   * The campaign carries no call to action. Where one used to sit, a gradient
+   * alpha rule fades out of the accent so the composition still resolves.
+   */
+  const alphaRule = (len = 22, from: string = P.accent) => (
     <span
+      aria-hidden
       style={{
-        fontFamily: TY.cta.family,
-        fontSize: u(TY.cta.caps ? T.cta * 0.92 : T.cta),
-        fontWeight: TY.cta.weight,
-        letterSpacing: TY.cta.tracking,
-        textTransform: TY.cta.caps ? "uppercase" : "none",
-        color: P.ink,
-        borderBottom: `${u(0.22)} solid ${P.accent}`,
-        paddingBottom: u(0.55),
-        whiteSpace: "nowrap",
+        display: "block",
+        width: `${len}%`,
+        minWidth: u(10),
+        height: u(0.3),
+        background: `linear-gradient(to right, ${from} 0%, ${from}A6 38%, ${from}00 100%)`,
       }}
-    >
-      {LEGAL_ALONGSIDE_CONCEPT.cta}
-    </span>
+    />
   );
+
+  const cta = () => alphaRule(38);
 
   const mark = (size = T.logo) =>
     lockup ? (
@@ -247,29 +248,8 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     />
   );
 
-  /** Solid accent call-to-action slab — the loudest object in the cut family. */
-  const ctaBlock = (opts?: { light?: boolean }) => (
-    <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: u(1.6),
-        background: opts?.light ? P.ink : P.accent,
-        color: opts?.light ? P.ground : P.ink,
-        paddingInline: u(square ? 2.6 : 2.2),
-        paddingBlock: u(square ? 1.3 : 1.05),
-        fontFamily: TY.cta.family,
-        fontWeight: TY.cta.weight,
-        fontSize: u(TY.cta.caps ? T.cta * 0.86 : T.cta * 0.94),
-        letterSpacing: TY.cta.tracking,
-        textTransform: TY.cta.caps ? "uppercase" : "none",
-        whiteSpace: "nowrap",
-      }}
-    >
-      {LEGAL_ALONGSIDE_CONCEPT.cta}
-      <span aria-hidden style={{ width: u(2.2), height: u(0.18), background: "currentColor", opacity: 0.7 }} />
-    </span>
-  );
+  /** No call to action in the cut family either — a wider gradient alpha rule. */
+  const ctaBlock = (opts?: { light?: boolean }) => alphaRule(46, opts?.light ? P.ink : P.accent);
 
   /** Division line + number set tight, for use inside a cut field. */
   const cutMasthead = () => (
