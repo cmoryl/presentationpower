@@ -509,7 +509,7 @@ export type AlongsideTypeTreatment = {
 
 export const LEGAL_ALONGSIDE_TYPE: Record<AlongsideTemplateId, AlongsideTypeTreatment> = {
   knockout: {
-    display: { family: F.anton, weight: 400, tracking: "-0.008em", lineHeight: 0.88, caps: true, scale: 1 },
+    display: { family: F.anton, weight: 400, tracking: "-0.008em", lineHeight: 1.02, caps: true, scale: 1 },
     action: { family: F.anton, weight: 400, caps: true, scale: 1 },
     eyebrow: { family: F.archivo, weight: 700, tracking: "0.3em" },
     support: { family: F.geist, weight: 400, lineHeight: 1.42 },

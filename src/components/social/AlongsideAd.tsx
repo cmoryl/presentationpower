@@ -329,7 +329,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
   if (template === "knockout") {
     // The headline is cut out of a light field and the photograph shows through
     // the letterforms. A full-bleed strip of the same frame runs under it.
-    const size = (square ? T.display * 1.62 : T.display * 1.3) * TY.display.scale;
+    const size = (square ? T.display * 1.5 : T.display * 1.2) * TY.display.scale;
     body = (
       <>
         <div className="absolute inset-0" style={{ background: P.light }} />
@@ -358,7 +358,7 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
                 letterSpacing: TY.display.tracking,
                 textTransform: "uppercase",
                 maxWidth: "13em",
-                backgroundImage: `url(${scene.src})`,
+                backgroundImage: `linear-gradient(${P.ground}4D, ${P.ground}4D), url(${scene.src})`,
                 backgroundSize: "cover",
                 backgroundPosition: focus,
                 WebkitBackgroundClip: "text",
