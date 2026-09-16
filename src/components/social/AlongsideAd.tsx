@@ -55,6 +55,7 @@ function curtain(clear: AlongsideClear, strength = 0.94): string {
 export function AlongsideAd({ scene, template, w, h }: Props) {
   const logos = getDivisionLogos("bm-tp-legal");
   const lockup = logos?.white ?? logos?.color;
+  const TY = LEGAL_ALONGSIDE_TYPE[template];
   const square = Math.abs(w / h - 1) < 0.2 || h > w;
   const tall = h > w * 1.1;
   const wide = !square && !tall;
