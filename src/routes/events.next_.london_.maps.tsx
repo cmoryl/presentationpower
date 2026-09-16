@@ -154,6 +154,11 @@ function LondonMapsPage() {
    */
   const [pins, setPins] = useState<VenuePin[]>([]);
   const [pinState, setPinState] = useState<"local" | "loading" | "synced" | "offline">("local");
+  /**
+   * The positions THIS person marked. Sign-off only ever covers these, so a
+   * user never puts their name to a spot a colleague marked and they never saw.
+   */
+  const [myEdits, setMyEdits] = useState<Set<string>>(() => new Set());
   const readPins = useServerFn(listVenuePins);
   const writePins = useServerFn(saveVenuePins);
   const dropPin = useServerFn(clearVenuePin);
@@ -163,7 +168,11 @@ function LondonMapsPage() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORE_KEY);
-      if (raw) setOverrides(JSON.parse(raw) as LondonMarkerOverrides);
+      if (raw) {
+        const mine = JSON.parse(raw) as LondonMarkerOverrides;
+        setOverrides(mine);
+        setMyEdits(new Set(Object.keys(mine)));
+      }
       const rawDesign = localStorage.getItem(DESIGN_KEY);
       // Merge over the defaults so a design saved before a new control existed
       // still opens with every field populated.
