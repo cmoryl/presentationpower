@@ -200,7 +200,23 @@ export function bloomLayoutSettingsJson(entries: BloomPackEntry[], scale: number
   )}\n`;
 }
 
-export function bloomPackManifestJson(entries: BloomPackEntry[], scale: number, format: "png" | "jpeg"): string {
+/** The moving half of a bundle: what was recorded, and where it was filed. */
+export type BloomPackMotion = {
+  /** Paths inside the pack, e.g. 04_Motion/LinkedIn-Feed-Square_1080x1080/... */
+  paths: string[];
+  presetLabel: string;
+  seconds: number;
+  fps: number;
+  ext: string;
+  placementLabels: string[];
+};
+
+export function bloomPackManifestJson(
+  entries: BloomPackEntry[],
+  scale: number,
+  format: "png" | "jpeg",
+  motion?: BloomPackMotion,
+): string {
   const ads = [...new Set(entries.map((e) => e.scene.id))];
   const placements = [...new Set(entries.map((e) => e.size.id))];
   return `${JSON.stringify(
@@ -214,7 +230,9 @@ export function bloomPackManifestJson(entries: BloomPackEntry[], scale: number, 
       exportScale: `${scale}x`,
       adCount: ads.length,
       placementCount: placements.length,
-      fileCount: entries.length,
+      fileCount: entries.length + (motion?.paths.length ?? 0),
+      stillCount: entries.length,
+      motionCount: motion?.paths.length ?? 0,
       ads,
       placements,
       naming: "BRAND_CAMPAIGN_ACCENTWORD_PLACEMENT_WIDTHxHEIGHT_SCALE_VERSION",
@@ -222,7 +240,20 @@ export function bloomPackManifestJson(entries: BloomPackEntry[], scale: number, 
         "01_Artwork": "Rendered ads, one folder per placement.",
         "02_Copy": "The copy deck as a spreadsheet and as plain text.",
         "03_Specifications": "Placement list and the layout settings behind each file.",
+        ...(motion
+          ? { "04_Motion": "The animated versions, one folder per social placement." }
+          : {}),
       },
+      motion: motion
+        ? {
+            preset: motion.presetLabel,
+            seconds: motion.seconds,
+            fps: motion.fps,
+            fileType: motion.ext.toUpperCase(),
+            placements: motion.placementLabels,
+            files: motion.paths,
+          }
+        : null,
       files: entries.map((e) => e.path),
     },
     null,
@@ -230,7 +261,12 @@ export function bloomPackManifestJson(entries: BloomPackEntry[], scale: number, 
   )}\n`;
 }
 
-export function bloomPackReadme(entries: BloomPackEntry[], scale: number, format: "png" | "jpeg"): string {
+export function bloomPackReadme(
+  entries: BloomPackEntry[],
+  scale: number,
+  format: "png" | "jpeg",
+  motion?: BloomPackMotion,
+): string {
   const ads = [...new Set(entries.map((e) => e.scene.id))];
   const placements = [...new Set(entries.map((e) => e.size.label))];
   return `${[
@@ -241,12 +277,21 @@ export function bloomPackReadme(entries: BloomPackEntry[], scale: number, format
     `Written:     ${packStamp()}`,
     `Ads:         ${ads.length} (${ads.join(", ")})`,
     `Placements:  ${placements.length} (${placements.join(", ")})`,
-    `Files:       ${entries.length} ${format === "jpeg" ? "JPG" : "PNG"} at ${scale}x`,
+    `Still files: ${entries.length} ${format === "jpeg" ? "JPG" : "PNG"} at ${scale}x`,
+    ...(motion
+      ? [
+          `Motion:      ${motion.paths.length} ${motion.ext.toUpperCase()} clips, ${motion.presetLabel}, ${motion.seconds}s at ${motion.fps}fps`,
+          `             (${motion.placementLabels.join(", ")})`,
+        ]
+      : ["Motion:      none in this bundle"]),
     "",
     "WHAT IS IN HERE",
     "  01_Artwork/           the ads, one folder per placement",
     "  02_Copy/              copy-deck.csv and copy-deck.txt",
     "  03_Specifications/    placements.csv and layout-settings.json",
+    ...(motion
+      ? ["  04_Motion/            the animated versions, one folder per social placement"]
+      : []),
     "  manifest.json         a machine-readable index of the pack",
     "",
     "FILE NAMING",

@@ -22,7 +22,6 @@ import {
   bloomAspectLabel,
   bloomClipSeconds,
   bloomExpectedMb,
-  bloomMotionFrame,
   bloomMotionPath,
   bloomMotionReadme,
   bloomMotionSpecCsv,
@@ -31,15 +30,10 @@ import {
   bloomPlacementsByPlatform,
   bloomPreset,
   bloomSafeLayout,
-  bloomVideoBitrate,
 } from "@/lib/social-legal-bloom-motion";
 import { bloomPackRoot } from "@/lib/social-legal-bloom-pack";
-import {
-  drawBloomMotionFrame,
-  ensureBloomFonts,
-  loadBloomAssets,
-} from "@/lib/social-legal-bloom-draw";
-import { bloomVideoFormat, recordBloomClip } from "@/lib/social-legal-bloom-video";
+import { recordBloomSceneClip } from "@/lib/social-legal-bloom-record";
+import { bloomVideoFormat } from "@/lib/social-legal-bloom-video";
 
 const FPS = 30;
 
@@ -91,43 +85,18 @@ export function BloomMotionPanel({ aperture, side }: Props) {
   );
 
   /** Record one clip off an off-screen canvas at the placement's true size. */
-  const writeClip = async (s: BloomScene, p = placement): Promise<Blob> => {
-    if (!format) throw new Error("This browser cannot write video files.");
-    const canvas = recordRef.current;
-    if (!canvas) throw new Error("The recording area was not ready.");
-    canvas.width = p.w;
-    canvas.height = p.h;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("The recording area could not be prepared.");
-    await ensureBloomFonts();
-    const assets = await loadBloomAssets(s);
-    const cut = aperture === "scene" ? s.aperture : aperture;
-    const copySide = side === "scene" ? s.side : side;
-    const layout = bloomSafeLayout(
-      bloomAutoLayout(s, p.w, p.h, cut, copySide),
-      p.safeTop,
-      p.safeBottom,
-    );
-    const clip = bloomClipSeconds(p, wantSeconds);
-    return recordBloomClip({
-      canvas,
-      seconds: clip,
+  const writeClip = async (s: BloomScene, p = placement): Promise<Blob> =>
+    recordBloomSceneClip({
+      canvas: recordRef.current,
+      scene: s,
+      placement: p,
+      preset,
+      wantSeconds,
       fps: FPS,
-      bitsPerSecond: bloomVideoBitrate(p, clip),
       format,
-      draw: (t) =>
-        drawBloomMotionFrame(ctx, {
-          scene: s,
-          w: p.w,
-          h: p.h,
-          aperture: cut,
-          side: copySide,
-          layout,
-          motion: bloomMotionFrame(preset, t, clip),
-          assets,
-        }),
+      aperture,
+      side,
     });
-  };
 
   const save = (blob: Blob, name: string) => {
     const href = URL.createObjectURL(blob);

@@ -45,8 +45,20 @@ import {
   bloomPackRoot,
   bloomPlacementsCsv,
   type BloomPackEntry,
+  type BloomPackMotion,
   type BloomPackSize,
 } from "@/lib/social-legal-bloom-pack";
+import {
+  BLOOM_PLACEMENTS,
+  bloomClipSeconds,
+  bloomMotionPath,
+  bloomMotionReadme,
+  bloomMotionSpecCsv,
+  bloomPreset,
+  bloomPresetsByFamily,
+} from "@/lib/social-legal-bloom-motion";
+import { recordBloomSceneClip } from "@/lib/social-legal-bloom-record";
+import { bloomVideoFormat, type BloomVideoFormat } from "@/lib/social-legal-bloom-video";
 import {
   LEGAL_BLOOM_APERTURES,
   LEGAL_BLOOM_COLOURS,
@@ -103,6 +115,22 @@ function BloomView() {
   // pack export: which ads, which placements, and how far it has got
   const [packAd, setPackAd] = useState<string>("all");
   const [packSize, setPackSize] = useState<string>("all");
+  // the moving half of the bundle: which social placements, which motion, how long
+  const [packMotion, setPackMotion] = useState<"off" | "key" | "all">("key");
+  const [packMotionPreset, setPackMotionPreset] = useState<string>("push-slow");
+  const [packMotionSeconds, setPackMotionSeconds] = useState<number>(8);
+  const [videoFormat, setVideoFormat] = useState<BloomVideoFormat | null>(null);
+  const recordRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    setVideoFormat(bloomVideoFormat());
+  }, []);
+  const KEY_MOTION_PLACEMENTS = ["li-feed-square", "li-feed-landscape", "ig-reel"];
+  const motionPlacements =
+    packMotion === "off"
+      ? []
+      : packMotion === "key"
+        ? BLOOM_PLACEMENTS.filter((p) => KEY_MOTION_PLACEMENTS.includes(p.id))
+        : BLOOM_PLACEMENTS;
   const [packBusy, setPackBusy] = useState(false);
   const [packProgress, setPackProgress] = useState<{ done: number; total: number } | null>(null);
   const [packError, setPackError] = useState<string | null>(null);
@@ -259,7 +287,8 @@ function BloomView() {
       const root = zip.folder(bloomPackRoot())!;
       const entries: BloomPackEntry[] = [];
       let done = 0;
-      const total = scenes.length * sizes.length;
+      const clipCount = videoFormat ? scenes.length * motionPlacements.length : 0;
+      const total = scenes.length * sizes.length + clipCount;
       setPackProgress({ done, total });
 
       for (const s of sizes) {
@@ -289,8 +318,50 @@ function BloomView() {
         }
       }
 
-      root.file("README.txt", bloomPackReadme(entries, dlScale, dlFormat));
-      root.file("manifest.json", bloomPackManifestJson(entries, dlScale, dlFormat));
+      // The animated versions, recorded in real time at each social trim and
+      // filed beside the stills so one bundle carries both.
+      let motion: BloomPackMotion | undefined;
+      if (clipCount > 0 && videoFormat) {
+        const preset = bloomPreset(packMotionPreset);
+        const paths: string[] = [];
+        for (const p of motionPlacements) {
+          for (const scene of scenes) {
+            const clip = bloomClipSeconds(p, packMotionSeconds);
+            const blob = await recordBloomSceneClip({
+              canvas: recordRef.current,
+              scene,
+              placement: p,
+              preset,
+              wantSeconds: packMotionSeconds,
+              fps: 30,
+              format: videoFormat,
+              aperture,
+              side,
+            });
+            const path = bloomMotionPath(scene, p, clip, 30, videoFormat.ext);
+            root.file(path, blob);
+            paths.push(path);
+            done += 1;
+            setPackProgress({ done, total });
+          }
+        }
+        root.file(
+          "04_Motion/README.txt",
+          bloomMotionReadme(scenes, motionPlacements, preset, packMotionSeconds, 30, videoFormat.ext),
+        );
+        root.file("04_Motion/placements.csv", bloomMotionSpecCsv(motionPlacements, packMotionSeconds, 30));
+        motion = {
+          paths,
+          presetLabel: preset.label,
+          seconds: packMotionSeconds,
+          fps: 30,
+          ext: videoFormat.ext,
+          placementLabels: motionPlacements.map((p) => `${p.platform} ${p.placement}`),
+        };
+      }
+
+      root.file("README.txt", bloomPackReadme(entries, dlScale, dlFormat, motion));
+      root.file("manifest.json", bloomPackManifestJson(entries, dlScale, dlFormat, motion));
       root.file("02_Copy/copy-deck.csv", bloomCopyDeckCsv(scenes));
       root.file("02_Copy/copy-deck.txt", bloomCopyDeckText(scenes));
       root.file("03_Specifications/placements.csv", bloomPlacementsCsv(sizes, dlScale, dlFormat));
@@ -405,8 +476,9 @@ function BloomView() {
               Download a pack
             </div>
             <p className="mt-1 max-w-3xl text-xs leading-relaxed text-black/55">
-              One zip holding the artwork filed by placement, the copy deck as a spreadsheet and
-              plain text, and the placement list and layout settings behind every file.
+              One zip holding the still artwork filed by placement, the moving versions beside it,
+              the copy deck as a spreadsheet and plain text, and the placement list and layout
+              settings behind every file.
             </p>
             <div className="mt-3 flex flex-wrap items-end gap-4">
               <Field label="Ad set">
@@ -460,6 +532,50 @@ function BloomView() {
                   ))}
                 </select>
               </Field>
+              <Field label="Moving versions">
+                <select
+                  value={packMotion}
+                  onChange={(e) => setPackMotion(e.target.value as "off" | "key" | "all")}
+                  disabled={!videoFormat}
+                  className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm disabled:opacity-60"
+                >
+                  <option value="off">Still artwork only</option>
+                  <option value="key">Key social placements (3)</option>
+                  <option value="all">Every social placement ({BLOOM_PLACEMENTS.length})</option>
+                </select>
+              </Field>
+              {packMotion !== "off" && videoFormat ? (
+                <>
+                  <Field label="Motion">
+                    <select
+                      value={packMotionPreset}
+                      onChange={(e) => setPackMotionPreset(e.target.value)}
+                      className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm"
+                    >
+                      {bloomPresetsByFamily().map((group) => (
+                        <optgroup key={group.family} label={group.family}>
+                          {group.presets.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.label}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field label={`Clip length · ${packMotionSeconds}s`}>
+                    <input
+                      type="range"
+                      min={3}
+                      max={15}
+                      step={1}
+                      value={packMotionSeconds}
+                      onChange={(e) => setPackMotionSeconds(Number(e.target.value))}
+                      className="w-32"
+                    />
+                  </Field>
+                </>
+              ) : null}
               <button
                 type="button"
                 id="bloom-pack-button"
@@ -475,12 +591,40 @@ function BloomView() {
                   : "Download pack"}
               </button>
             </div>
+            {packMotion !== "off" && videoFormat ? (
+              <p className="mt-2 max-w-3xl text-xs leading-relaxed text-black/55">
+                The clips are recorded in real time, so a bundle with the moving versions takes about
+                as long as they play. They are filed under <strong>04_Motion</strong>, one folder per
+                social placement, with a placement sheet and a readme beside them.
+              </p>
+            ) : null}
+            {!videoFormat ? (
+              <p className="mt-2 text-xs text-black/50">
+                This browser cannot write video, so the bundle will hold the still artwork only.
+              </p>
+            ) : null}
             {packError ? (
               <p className="mt-2 text-xs text-[#E53D2E]">
                 The pack could not be written: {packError}
               </p>
             ) : null}
           </div>
+          {/* the off-screen canvas the pack's clips are recorded from */}
+          <canvas
+            ref={recordRef}
+            aria-hidden
+            data-export-ignore="true"
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: 1,
+              height: 1,
+              opacity: 0,
+              pointerEvents: "none",
+              zIndex: -1,
+            }}
+          />
         </div>
       </header>
 
