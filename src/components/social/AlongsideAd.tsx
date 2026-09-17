@@ -1069,7 +1069,8 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
               gap: u(2.4),
             }}
           >
-            <span style={{ whiteSpace: "nowrap" }}>{scene.theme}</span>
+            {/* A banner strip is only ~400px tall — the rotated label won't fit. */}
+            {banner ? null : <span style={{ whiteSpace: "nowrap" }}>{scene.theme}</span>}
             <span aria-hidden style={{ width: 1, height: u(6), background: `${P.ink}47` }} />
             <span style={{ fontVariantNumeric: "tabular-nums", opacity: 0.7 }}>{scene.no}</span>
           </div>
