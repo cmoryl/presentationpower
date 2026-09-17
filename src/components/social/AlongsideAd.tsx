@@ -145,8 +145,15 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   );
 
   /** Division line with the master number set against it on a hairline. */
+  // The lockup owns one corner of every ad (top-right, or bottom-left when the
+  // copy column sits on the right), so the masthead keeps the frame number on
+  // the LEFT with the division line and never competes for that corner.
   const masthead = (ink: string = P.ink) => (
-    <div className="flex w-full items-baseline gap-3" style={{ color: ink }}>
+    <div
+      className="flex w-full items-baseline gap-3"
+      style={{ color: ink, paddingRight: clear === "right" ? undefined : u(26) }}
+    >
+
       <span
         style={{
           fontFamily: TY.eyebrow.family,
@@ -159,7 +166,6 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       >
         {LEGAL_ALONGSIDE_CONCEPT.division}
       </span>
-      <span aria-hidden className="flex-1" style={{ height: 1, background: `${ink}3D` }} />
       <span
         style={{
           fontFamily: TY.eyebrow.family,
@@ -171,8 +177,10 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       >
         {scene.no}
       </span>
+      <span aria-hidden className="flex-1" style={{ height: 1, background: `${ink}3D` }} />
     </div>
   );
+
 
   /**
    * The headline in the layout's display face, with its one emphasised phrase —
@@ -277,21 +285,11 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
 
   const cta = () => alphaRule(38);
 
-  const mark = (size = T.logo) =>
-    lockup ? (
-      <img
-        src={lockup}
-        alt="TransPerfect Legal"
-        style={{
-          height: u(size),
-          width: "auto",
-          maxWidth: u(22),
-          flexShrink: 0,
-          objectFit: "contain",
-          objectPosition: "right center",
-        }}
-      />
-    ) : null;
+  // The lockup is no longer laid out inline by each template — it is pinned to
+  // one corner of the frame (see cornerLockup below), so every ad in the set
+  // signs off in the same place.
+  const mark = (_size = T.logo): React.ReactNode => null;
+
 
   const footer = () => (
     <div className="flex w-full items-end justify-between" style={{ gap: u(3) }}>
@@ -566,13 +564,8 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           </div>
           <div className="flex items-end justify-between" style={{ gap: u(2) }}>
             {ctaBlock()}
-            {colourMark ? (
-              <img
-                src={lockup ?? colourMark}
-                alt="TransPerfect Legal"
-                style={{ height: u(T.logo * 0.85), width: "auto", maxWidth: u(20), objectFit: "contain" }}
-              />
-            ) : null}
+            {null}
+
           </div>
         </div>
       </>
@@ -1342,6 +1335,28 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     );
   }
 
+  // ---- one signature corner for the whole set -----------------------------
+  // Top-right by default; bottom-left when the copy column is held on the
+  // right, so the lockup always lands on clear ground.
+  const lockupBottomLeft = clear === "right";
+  const cornerLockup = lockup ? (
+    <img
+      src={lockup}
+      alt="TransPerfect Legal"
+      style={{
+        position: "absolute",
+        ...(lockupBottomLeft
+          ? { bottom: u(M * 0.82), left: u(M) }
+          : { top: u(M * 0.82), right: u(M) }),
+        height: u(T.logo * 0.9),
+        width: "auto",
+        maxWidth: u(24),
+        objectFit: "contain",
+        pointerEvents: "none",
+      }}
+    />
+  ) : null;
+
   return (
     <div
       className="relative overflow-hidden"
@@ -1353,6 +1368,8 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       }}
     >
       {body}
+      {cornerLockup}
     </div>
   );
+
 }
