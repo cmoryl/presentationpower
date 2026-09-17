@@ -462,7 +462,7 @@ export function DeviceScreenPlaceholder({
           <span
             style={{
               flex: 1,
-              height: "1.4%",
+              height: "18%",
               borderRadius: 999,
               background: "rgba(255,255,255,0.7)",
             }}
