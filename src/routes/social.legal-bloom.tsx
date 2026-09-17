@@ -349,6 +349,34 @@ function BloomView() {
                   <RotateCcw size={12} /> Reset
                 </button>
               ) : null}
+              <div className="flex items-center gap-1 rounded-lg border border-white/25 px-1 py-0.5">
+                <button
+                  type="button"
+                  onClick={() => setViewZoom((z) => Math.max(0.25, Math.round((z - 0.25) * 100) / 100))}
+                  className="rounded-md px-1.5 py-1 text-white disabled:opacity-40"
+                  disabled={viewZoom <= 0.25}
+                  aria-label="Zoom out"
+                >
+                  <Minus size={12} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewZoom(1)}
+                  className="min-w-[3.2rem] rounded-md px-1 py-1 text-[11px] text-white"
+                  aria-label="Fit to the window"
+                >
+                  {Math.round(viewZoom * 100)}%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewZoom((z) => Math.min(4, Math.round((z + 0.25) * 100) / 100))}
+                  className="rounded-md px-1.5 py-1 text-white disabled:opacity-40"
+                  disabled={viewZoom >= 4}
+                  aria-label="Zoom in"
+                >
+                  <Plus size={12} />
+                </button>
+              </div>
               <select
                 value={dlFormat}
                 onChange={(e) => setDlFormat(e.target.value as "png" | "jpeg")}
