@@ -93,7 +93,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     craft: "35mm, f/5.6, 1/1600, ISO 320 — late raking light, real chalk and taped fingers.",
     buyer: "General counsel, bet-the-company litigation",
     objection:
-      ""Exposure" is my word for risk, and a rock face tells me nothing about who is accountable when the record is wrong.",
+      "Exposure is my word for risk, and a rock face tells me nothing about who is accountable when the record is wrong.",
     answer:
       "Multilingual document review that stays defensible: your privilege calls, our reviewers and certified translations under them.",
     src: climber,
