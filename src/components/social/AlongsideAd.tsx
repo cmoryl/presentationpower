@@ -18,6 +18,12 @@
 
 import { getDivisionLogos } from "@/lib/division-logos";
 import {
+  ACCENT_MARK_COLORS,
+  accentMarkDataUri,
+  alongsideAccentMark,
+  markSeed,
+} from "@/lib/social-legal-accent-marks";
+import {
   alongsideHeadlineParts,
   alongsideSceneType,
   LEGAL_ALONGSIDE_CONCEPT,
@@ -65,6 +71,62 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   // typeset in the voice chosen for its own picture. A named treatment from the
   // board overrides it for the whole set.
   const ST = alongsideSceneType(scene.id);
+  // ---- drawn accent marks -------------------------------------------------
+  // Every rule in this campaign is drawn, never ruled: a brush pass, a return
+  // loop, a chalk skip, a run of ticks. The hand and the colour are fixed per
+  // photograph, so the set carries eight hands and four brand colours instead
+  // of one blue hairline that reads as machine-made.
+  const SEED = markSeed(scene.id + template);
+  const MARK = alongsideAccentMark(scene.id);
+  const MARK_COLOR = ACCENT_MARK_COLORS[MARK.tint];
+  /** A drawn mark as a background image, so any box can carry the hand. */
+  const drawn = (
+    weight: number,
+    color: string,
+    seedOffset = 0,
+    kind = MARK.kind,
+  ): React.CSSProperties => ({
+    backgroundImage: accentMarkDataUri(kind, SEED + seedOffset, color, weight),
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "left center",
+    backgroundSize: "100% 100%",
+  });
+  /**
+   * A drawn edge along one side of a field, in place of a 1px accent border.
+   * Vertical edges are dragged in chalk: a stretched brush pass would read as a
+   * ruled line again, a broken drag still reads as a hand.
+   */
+  const drawnEdge = (
+    side: "top" | "bottom" | "left" | "right",
+    weight = 1.25,
+    seedOffset = 13,
+  ): React.ReactNode => {
+    const vertical = side === "left" || side === "right";
+    return (
+      <span
+        aria-hidden
+        style={
+          vertical
+            ? {
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                [side]: 0,
+                width: u(1.2),
+                ...drawn(weight * 2.4, MARK_COLOR, seedOffset, "chalk"),
+              }
+            : {
+                position: "absolute",
+                left: 0,
+                right: 0,
+                [side]: 0,
+                height: u(1.2),
+                ...drawn(weight, MARK_COLOR, seedOffset),
+              }
+        }
+      />
+    );
+  };
   const houseType = LEGAL_ALONGSIDE_TYPE[template];
   const voicedType = applyAlongsideTypeSet(houseType, typeSet === "house" ? ST.voice : typeSet);
   // The hard-cut family (wedge, blade, shard, chevron) is a geometric layout:
@@ -331,7 +393,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       className="flex w-full items-center"
       style={{ color: ink, paddingRight: clear === "right" ? undefined : u(26) }}
     >
-      <span aria-hidden className="flex-1" style={{ height: 1, background: `${ink}3D` }} />
+      <span aria-hidden className="flex-1" style={{ height: u(0.5), minHeight: 2, ...drawn(0.5, `${ink}59`) }} />
     </div>
   );
 
@@ -422,7 +484,15 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       // body text, so contrast rules still hold.
       if (treat === "accent")
         return { color: P.accent, fontWeight: Math.min(900, d.weight + 100) };
-      return { borderBottom: `${u(0.16)} solid ${P.accent}`, paddingBottom: u(0.16) };
+      // Rule: a drawn underline in the ad's own hand, not a border. A straight
+      // 1px border under a word is the machine tell this campaign avoids.
+      return {
+        paddingBottom: u(0.34),
+        backgroundImage: accentMarkDataUri(MARK.wordKind, SEED + 11, MARK_COLOR, 1.15),
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "left calc(100% - 0.02em)",
+        backgroundSize: "100% 0.30em",
+      };
     };
     // Word spaces either side of a call-out are bound, so the emphasis never
     // swallows the space between it and the next word.
@@ -470,8 +540,13 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
               fontSize: a2.scale && a2.scale !== 1 ? u(px * a2.scale) : undefined,
               letterSpacing: a2.tracking ?? (a2.italic ? "0em" : undefined),
               textTransform: a2.caps ? "uppercase" : d.caps ? "uppercase" : "none",
-              borderBottom: a2.rule ? `${u(0.2)} solid ${P.accent}` : undefined,
-              paddingBottom: a2.rule ? u(0.3) : undefined,
+              backgroundImage: a2.rule
+                ? accentMarkDataUri(MARK.wordKind, SEED + 3, MARK_COLOR, 1.35)
+                : undefined,
+              backgroundRepeat: a2.rule ? "no-repeat" : undefined,
+              backgroundPosition: a2.rule ? "left 100%" : undefined,
+              backgroundSize: a2.rule ? "100% 0.34em" : undefined,
+              paddingBottom: a2.rule ? u(0.42) : undefined,
               whiteSpace: longTurn ? "normal" : "nowrap",
             }}
           >
@@ -532,17 +607,17 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
    * stub instead of a long horizontal.
    */
   const ruleTilt = ST.axis === "rising" ? -1.6 : ST.axis === "falling" ? 1.6 : 0;
-  const alphaRule = (len = 22, from: string = P.accent) => (
+  const alphaRule = (len = 22, from?: string) => (
     <span
       aria-hidden
       style={{
         display: "block",
-        width: ST.axis === "vertical" ? `${Math.max(9, len * 0.5)}%` : `${len}%`,
-        minWidth: u(ST.axis === "vertical" ? 6 : 10),
-        height: u(ST.axis === "vertical" ? 0.48 : 0.3),
+        width: ST.axis === "vertical" ? `${Math.max(11, len * 0.55)}%` : `${len}%`,
+        minWidth: u(ST.axis === "vertical" ? 7 : 11),
+        height: u(ST.axis === "vertical" ? 2 : 1.5),
         transform: ruleTilt ? `rotate(${ruleTilt}deg)` : undefined,
         transformOrigin: "left center",
-        background: `linear-gradient(to right, ${from} 0%, ${from}A6 38%, ${from}00 100%)`,
+        ...drawn(ST.axis === "vertical" ? 1.8 : 1.4, from ?? MARK_COLOR),
       }}
     />
   );
@@ -583,7 +658,12 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   const accentRule = (widthPct = 18) => (
     <span
       aria-hidden
-      style={{ display: "block", width: `${widthPct}%`, height: u(0.34), background: P.accent }}
+      style={{
+        display: "block",
+        width: `${widthPct}%`,
+        height: u(1.1),
+        ...drawn(1.25, MARK_COLOR, 5),
+      }}
     />
   );
 
@@ -592,7 +672,10 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
 
   /** A short accent rule inside a cut field — the number it carried is gone. */
   const cutMasthead = () => (
-    <span aria-hidden style={{ display: "block", width: u(3.4), height: u(0.3), background: P.accent }} />
+    <span
+      aria-hidden
+      style={{ display: "block", width: u(4.6), height: u(1), ...drawn(1.5, MARK_COLOR, 7) }}
+    />
   );
 
   let body: React.ReactNode = null;
@@ -829,10 +912,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             </div>
           ))}
         </div>
-        <div
-          className="absolute inset-x-0 bottom-0"
-          style={{ top: bandTop, background: P.ground, borderTop: `${u(0.34)} solid ${P.accent}` }}
-        />
+        <div className="absolute inset-x-0 bottom-0" style={{ top: bandTop, background: P.ground }}>
+          {drawnEdge("top", 1.3)}
+        </div>
         <div className="absolute inset-x-0 top-0 flex" style={{ padding: u(M), bottom: bandTop }}>
           {masthead()}
         </div>
@@ -1295,10 +1377,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             left: spineLeft ? 0 : "auto",
             right: spineLeft ? "auto" : 0,
             background: P.ground,
-            borderRight: spineLeft ? `${u(0.28)} solid ${P.accent}` : undefined,
-            borderLeft: spineLeft ? undefined : `${u(0.28)} solid ${P.accent}`,
           }}
         >
+          {drawnEdge(spineLeft ? "right" : "left", 1.1, 21)}
           <div
             style={{
               writingMode: "vertical-rl",
@@ -1357,9 +1438,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             paddingInline: u(M),
             paddingBlock: u(M * 0.7),
             gap: u(1.4),
-            borderTop: `${u(0.3)} solid ${P.accent}`,
           }}
         >
+          {drawnEdge("top", 1.2, 17)}
           {masthead()}
           <div
             className="grid flex-1"
@@ -1407,7 +1488,6 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             right: right ? "auto" : u(M),
             width: tall ? "80%" : square ? "74%" : "58%",
             background: P.ground,
-            borderTop: `${u(0.34)} solid ${P.accent}`,
             paddingInline: u(square ? 3.2 : 2.6),
             paddingBlock: u(square ? 2.6 : 2),
             display: "grid",
@@ -1415,6 +1495,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             boxShadow: `0 ${u(1.2)} ${u(4)} ${P.ground}8C`,
           }}
         >
+          {drawnEdge("top", 1.3, 29)}
           {masthead()}
           {headline(square ? 4 : 3.1, { measure: 16 })}
           {footer()}
