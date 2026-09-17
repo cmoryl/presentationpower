@@ -912,6 +912,19 @@ const G = {
   bigShoulders: '"Big Shoulders Display", Geist, sans-serif',
   unbounded: '"Unbounded", Geist, sans-serif',
   gabarito: '"Gabarito", Geist, sans-serif',
+  caslon: '"Libre Caslon Display", Georgia, serif',
+  italiana: '"Italiana", Georgia, serif',
+  cardo: '"Cardo", Georgia, serif',
+  yeseva: '"Yeseva One", Georgia, serif',
+  rozha: '"Rozha One", Georgia, serif',
+  petrona: '"Petrona", Georgia, serif',
+  vollkorn: '"Vollkorn", Georgia, serif',
+  alegreya: '"Alegreya", Georgia, serif',
+  alegreyaSans: '"Alegreya Sans", Geist, sans-serif',
+  michroma: '"Michroma", Geist, sans-serif',
+  fjalla: '"Fjalla One", Geist, sans-serif',
+  syncopate: '"Syncopate", Geist, sans-serif',
+  darker: '"Darker Grotesque", Geist, sans-serif',
 } as const;
 
 export type AlongsideTypeSet = {
