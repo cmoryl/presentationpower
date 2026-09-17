@@ -195,8 +195,10 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     // one in the same slot. 46 characters is the reference line these layouts
     // were drawn against.
     const chars = scene.headline.trim().length;
-    const optical = Math.max(0.74, Math.min(1.24, (46 / Math.max(chars, 12)) ** 0.42));
+    const optical =
+      Math.max(0.74, Math.min(1.24, (46 / Math.max(chars, 12)) ** 0.42)) * ST.weight;
     const px = size * d.scale * optical;
+
     // Leading and tracking compensate for size: large type needs less of both.
     const baseLead = d.lineHeight ?? 1;
     const lead = Math.max(0.86, baseLead - (px > 4.6 ? 0.06 : px < 3 ? -0.04 : 0));
