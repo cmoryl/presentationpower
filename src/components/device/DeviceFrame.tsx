@@ -507,7 +507,7 @@ export function DeviceScreenPlaceholder({
               <span
                 style={{
                   flex: 1,
-                  height: "1.2%",
+                  height: "16%",
                   borderRadius: 999,
                   background: `color-mix(in srgb, ${accent} ${o}%, #E7ECF6)`,
                 }}
