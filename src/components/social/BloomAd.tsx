@@ -1,10 +1,12 @@
 // One rendered ad from the Legal "bloom" variation.
 //
-// Anatomy, at every trim:
-//   · near-white dotted ground
-//   · a soft colour bloom, offset behind the picture
-//   · the picture cut into an aperture, its own focus point held in frame
-//   · a fine keyline bracket that ties picture and copy together
+// The anatomy is taken straight from the Canva master:
+//   · a plain near-white ground, nothing printed on it
+//   · a soft colour bloom leaning out of the picture's turned end
+//   · the picture as a rectangle with ONE end turned right over and the other
+//     corners left almost square, its own focus point held in frame
+//   · a fine accent keyline — the same shape again, offset diagonally, running
+//     out under the copy
 //   · the headline beside (wide trims) or under (tall trims) the picture, with
 //     the turning word italic in the bloom's colour
 //   · the Legal lockup in one corner — the division is never typed out
@@ -16,7 +18,9 @@ import { getDivisionLogos } from "@/lib/division-logos";
 import {
   bloomColour,
   bloomHeadline,
+  bloomLean,
   bloomOptical,
+  bloomShapeRadius,
   LEGAL_BLOOM_PALETTE as P,
   type BloomAperture,
   type BloomScene,
@@ -31,23 +35,6 @@ type Props = {
   aperture?: BloomAperture;
   side?: BloomSide;
 };
-
-function apertureRadius(aperture: BloomAperture, side: BloomSide, px: number): string {
-  const big = `${px * 0.9}px`;
-  const mid = `${px * 0.28}px`;
-  const small = `${px * 0.09}px`;
-  switch (aperture) {
-    case "arch":
-      return side === "left" ? `${small} ${big} ${big} ${small}` : `${big} ${small} ${small} ${big}`;
-    case "lozenge":
-      return big;
-    case "soft":
-      return small;
-    case "rounded":
-    default:
-      return mid;
-  }
-}
 
 export function BloomAd({ scene, w, h, aperture, side }: Props) {
   const logos = getDivisionLogos("bm-tp-legal");
@@ -73,9 +60,20 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
     mode === "stacked"
       ? w - margin * 2
       : (w - margin * 2) * (1 - (pictureFlex ?? 0.48)) - short * 0.03;
-  const baseHead = mode === "strip" ? short * 0.155 : mode === "stacked" ? short * 0.105 : short * 0.098;
+  const baseHead =
+    mode === "strip" ? short * 0.155 : mode === "stacked" ? short * 0.105 : short * 0.098;
   const headPx = Math.min(baseHead * optical, colW * (mode === "stacked" ? 0.115 : 0.155));
   const supportPx = Math.max(10, Math.min(headPx * 0.3, short * 0.028));
+
+  // Picture box geometry. The turned end is half the box's short edge, so the
+  // radius has to be measured on the box, not on the frame.
+  const boxShort =
+    mode === "stacked" ? (w - margin * 2) * 0.84 : (h - margin * 2) * (mode === "strip" ? 0.88 : 0.7);
+  const radius = bloomShapeRadius(cut, boxShort);
+  const lean = bloomLean(cut);
+  // The keyline runs the other way from the bloom, out under the copy.
+  const keyOff = short * 0.055;
+  const keyX = copySide === "left" ? -keyOff : keyOff;
 
   const picture = (
     <div
@@ -90,30 +88,38 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
         justifyContent: "center",
       }}
     >
-      {/* the bloom — offset out past the picture on the open side */}
+      {/* the bloom — leaning out of the turned end, soft focus */}
       <div
         aria-hidden
         style={{
           position: "absolute",
-          inset: `-${short * 0.1}px`,
-          transform:
-            mode === "stacked"
-              ? `translate(${copySide === "left" ? "6%" : "-6%"}, -6%)`
-              : `translate(${copySide === "left" ? "9%" : "-9%"}, -4%)`,
-          background: `radial-gradient(circle at 50% 45%, ${C.glow}F2 0%, ${C.glow}B8 26%, ${C.glow}59 48%, ${C.glow}1F 66%, ${C.glow}00 78%)`,
-          filter: `blur(${short * 0.035}px)`,
+          inset: `-${short * 0.11}px`,
+          transform: `translate(${lean.x * 9}%, ${lean.y * 7}%)`,
+          background: `radial-gradient(circle at 50% 48%, ${C.glow}FF 0%, ${C.glow}D6 22%, ${C.glow}73 42%, ${C.glow}2B 60%, ${C.glow}00 74%)`,
+          filter: `blur(${short * 0.045}px)`,
         }}
       />
-      {/* the picture, cut to its aperture */}
+      {/* the accent keyline — the same shape, offset out under the copy */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          width: mode === "stacked" ? "84%" : "88%",
+          height: mode === "stacked" ? "100%" : mode === "strip" ? "88%" : "70%",
+          transform: `translate(${keyX}px, ${keyOff * 0.62}px)`,
+          border: `1px solid ${C.type}66`,
+          borderRadius: radius,
+        }}
+      />
+      {/* the picture, cut to its turned shape */}
       <div
         style={{
           position: "relative",
           width: mode === "stacked" ? "84%" : "88%",
-          height: mode === "stacked" ? "100%" : mode === "strip" ? "88%" : "66%",
-          borderRadius: apertureRadius(cut, copySide, short),
+          height: mode === "stacked" ? "100%" : mode === "strip" ? "88%" : "70%",
+          borderRadius: radius,
           overflow: "hidden",
-          border: `${Math.max(1, short * 0.0035)}px solid ${C.glow}CC`,
-          boxShadow: `0 ${short * 0.02}px ${short * 0.06}px ${P.ink}1A`,
+          boxShadow: `0 ${short * 0.018}px ${short * 0.055}px ${P.ink}1F, 0 0 ${short * 0.05}px ${C.glow}4D`,
         }}
       >
         <img
@@ -141,7 +147,7 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
         justifyContent: "center",
         alignItems: "flex-start",
         textAlign: "left",
-        gap: `${short * 0.028}px`,
+        gap: `${short * 0.026}px`,
         minWidth: 0,
         zIndex: 2,
       }}
@@ -171,16 +177,6 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
         </span>
         {scene.tail ? ` ${scene.tail}` : ""}
       </div>
-      {/* one drawn-feeling rule, tinted to the bloom */}
-      <div
-        aria-hidden
-        style={{
-          width: `${short * 0.16}px`,
-          height: `${Math.max(1.5, short * 0.006)}px`,
-          borderRadius: 999,
-          background: `linear-gradient(to right, ${C.type} 0%, ${C.glow} 62%, ${C.glow}00 100%)`,
-        }}
-      />
       <div
         style={{
           fontFamily: '"Instrument Sans", "Geist", system-ui, sans-serif',
@@ -195,8 +191,6 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
     </div>
   );
 
-  
-
   return (
     <div
       style={{
@@ -208,33 +202,6 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
         fontKerning: "normal",
       }}
     >
-      {/* dotted ground */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: `radial-gradient(${P.ink}12 ${Math.max(0.6, short * 0.0016)}px, transparent ${Math.max(0.6, short * 0.0016)}px)`,
-          backgroundSize: `${short * 0.028}px ${short * 0.028}px`,
-        }}
-      />
-      {/* keyline bracket */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: margin * 0.45,
-          bottom: margin * 0.45,
-          left: margin * 0.45,
-          right: margin * 0.45,
-          borderLeft: copySide === "left" ? `1px solid ${C.glow}80` : `1px solid ${C.glow}26`,
-          borderRight: copySide === "right" ? `1px solid ${C.glow}80` : `1px solid ${C.glow}26`,
-          borderBottom: `1px solid ${C.glow}80`,
-          borderTop: `1px solid ${C.glow}26`,
-          borderRadius: `${short * 0.02}px`,
-        }}
-      />
-
       <div
         style={{
           position: "absolute",
