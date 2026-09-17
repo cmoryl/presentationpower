@@ -179,7 +179,28 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     const d = TY.display;
     const a = TY.action;
     const parts = alongsideHeadlineParts(scene.headline, scene.action);
-    const px = size * d.scale;
+    // ---- optical sizing -----------------------------------------------------
+    // A display line is set to the LENGTH of the words in it, the way a
+    // typographer would: a six-word line earns more size than a fourteen-word
+    // one in the same slot. 46 characters is the reference line these layouts
+    // were drawn against.
+    const chars = scene.headline.trim().length;
+    const optical = Math.max(0.74, Math.min(1.24, (46 / Math.max(chars, 12)) ** 0.42));
+    const px = size * d.scale * optical;
+    // Leading and tracking compensate for size: large type needs less of both.
+    const baseLead = d.lineHeight ?? 1;
+    const lead = Math.max(0.86, baseLead - (px > 4.6 ? 0.06 : px < 3 ? -0.04 : 0));
+    // Measure follows size — a bigger face needs fewer ems to hold a good
+    // 34–52 character line.
+    const measure = opts?.measure ?? Math.max(11, Math.min(18, 15 * (1 / optical) ** 0.5));
+    // No widows: the last two words are bound together so a single word can
+    // never be left stranded on its own line.
+    const noWidow = (s: string) => {
+      const words = s.trimEnd().split(" ");
+      if (words.length < 3) return s;
+      const tail = words.slice(-2).join("\u00A0");
+      return `${words.slice(0, -2).join(" ")} ${tail}`;
+    };
     // A face switch only reads as emphasis on a SHORT phrase. When the turn is
     // most of the headline, swapping faces mid-line just looks like two
     // headlines colliding — so the phrase stays in the display face and is
