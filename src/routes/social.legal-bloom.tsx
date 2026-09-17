@@ -1,13 +1,33 @@
 // /social/legal-bloom — the Legal "We're here for the tricky ones." bloom board.
 //
-// Eight frames, four turned picture shapes, either side for the copy, five trims, and a
-// large view that writes the artwork at its true pixel size.
+// Eight frames, four turned picture shapes, either side for the copy, five trims, a
+// large view that writes the artwork at its true pixel size, and a live layout
+// editor: the picture and the text block can be dragged and resized per ad and
+// per size, with the type sizes on sliders. Moves are remembered in this browser.
 
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Download, Maximize2, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  Download,
+  Maximize2,
+  Move,
+  RotateCcw,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { BloomAd } from "@/components/social/BloomAd";
+import { BloomLayoutEditor } from "@/components/social/BloomLayoutEditor";
+import {
+  bloomAutoLayout,
+  bloomLayoutKey,
+  readBloomLayouts,
+  writeBloomLayouts,
+  type BloomAdLayout,
+  type BloomLayoutMap,
+} from "@/lib/social-legal-bloom-layout";
 import {
   LEGAL_BLOOM_APERTURES,
   LEGAL_BLOOM_COLOURS,
@@ -26,13 +46,13 @@ export const Route = createFileRoute("/social/legal-bloom")({
       {
         name: "description",
         content:
-          "The bloom variation of the TransPerfect Legal campaign: eight documentary frames cut to the turned house shape with an offset accent keyline and a soft colour bloom, one phrase across the set and one turning word per ad.",
+          "The bloom variation of the TransPerfect Legal campaign: eight documentary frames cut to the turned house shape with an accent keyline and a soft colour bloom, one phrase across the set, and a live layout editor for every ad and size.",
       },
       { property: "og:title", content: "We're here for the tricky ones · Legal bloom board" },
       {
         property: "og:description",
         content:
-          "Eight Legal frames on colour blooms — four turned picture shapes, copy either side, five trims and a full-size download.",
+          "Eight Legal frames on colour blooms — turned picture shapes, copy either side, five trims, live layout editing and a full-size download.",
       },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -50,14 +70,52 @@ function BloomView() {
   const [aperture, setAperture] = useState<BloomAperture | "scene">("scene");
   const [side, setSide] = useState<BloomSide | "scene">("scene");
   const [zoom, setZoom] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
   const [dlFormat, setDlFormat] = useState<"png" | "jpeg">("png");
   const [dlScale, setDlScale] = useState<number>(2);
   const [dlBusy, setDlBusy] = useState(false);
+  const [layouts, setLayouts] = useState<BloomLayoutMap>({});
   const exportRef = useRef<HTMLDivElement>(null);
+
+  // Saved moves live in this browser, so they survive a reload of the board.
+  useEffect(() => setLayouts(readBloomLayouts()), []);
 
   const size = LEGAL_BLOOM_SIZES.find((s) => s.id === sizeId) ?? LEGAL_BLOOM_SIZES[0];
   const zoomIndex = zoom ? LEGAL_BLOOM_SCENES.findIndex((s) => s.id === zoom) : -1;
   const zoomScene = zoomIndex >= 0 ? LEGAL_BLOOM_SCENES[zoomIndex] : null;
+
+  const cutFor = (sceneCut: BloomAperture) => (aperture === "scene" ? sceneCut : aperture);
+  const sideFor = (sceneSide: BloomSide) => (side === "scene" ? sceneSide : side);
+
+  const saved = useCallback(
+    (sceneId: string) => layouts[bloomLayoutKey(sceneId, size.id)],
+    [layouts, size.id],
+  );
+
+  const zoomLayout = useMemo<BloomAdLayout | undefined>(() => {
+    if (!zoomScene) return undefined;
+    return (
+      saved(zoomScene.id) ??
+      (editing
+        ? bloomAutoLayout(zoomScene, size.w, size.h, cutFor(zoomScene.aperture), sideFor(zoomScene.side))
+        : undefined)
+    );
+  }, [zoomScene, saved, editing, size.w, size.h, aperture, side]);
+
+  const putLayout = (next: BloomAdLayout) => {
+    if (!zoomScene) return;
+    const map = { ...layouts, [bloomLayoutKey(zoomScene.id, size.id)]: next };
+    setLayouts(map);
+    writeBloomLayouts(map);
+  };
+
+  const resetLayout = () => {
+    if (!zoomScene) return;
+    const map = { ...layouts };
+    delete map[bloomLayoutKey(zoomScene.id, size.id)];
+    setLayouts(map);
+    writeBloomLayouts(map);
+  };
 
   const step = (dir: -1 | 1) => {
     if (zoomIndex < 0) return;
@@ -69,12 +127,13 @@ function BloomView() {
     if (!zoom) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setZoom(null);
+      if (editing) return;
       if (e.key === "ArrowRight") step(1);
       if (e.key === "ArrowLeft") step(-1);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [zoom, zoomIndex]);
+  }, [zoom, zoomIndex, editing]);
 
   const download = async () => {
     const node = exportRef.current;
@@ -88,6 +147,7 @@ function BloomView() {
         height: size.h,
         cacheBust: true,
         backgroundColor: "#FBFBFD",
+        filter: (n: HTMLElement) => n?.dataset?.exportIgnore !== "true",
       };
       const url =
         dlFormat === "png" ? await toPng(node, opts) : await toJpeg(node, { ...opts, quality: 0.94 });
@@ -99,6 +159,27 @@ function BloomView() {
       setDlBusy(false);
     }
   };
+
+  const slider = (
+    label: string,
+    value: number,
+    min: number,
+    max: number,
+    apply: (v: number) => void,
+  ) => (
+    <label className="flex items-center gap-2 text-[11px] text-white/80">
+      {label}
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={(max - min) / 100}
+        value={value}
+        onChange={(e) => apply(Number(e.target.value))}
+        className="w-28"
+      />
+    </label>
+  );
 
   return (
     <div className="min-h-screen bg-[#FBFBFD] text-[#03002C]">
@@ -116,6 +197,11 @@ function BloomView() {
           <h1 className="mt-1 text-4xl font-semibold tracking-tight">{LEGAL_BLOOM_CONCEPT.name}</h1>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-black/65">
             {LEGAL_BLOOM_CONCEPT.premise}
+          </p>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-black/55">
+            Open any ad larger and switch on <strong>Move things</strong> to drag or stretch the
+            picture and the text — run the picture wide with the words over it, or hold it back and
+            set the words bigger beside it. Each ad remembers its own arrangement for each size.
           </p>
 
           <div className="mt-6 flex flex-wrap items-end gap-4">
@@ -172,16 +258,19 @@ function BloomView() {
                 aria-label={`View ${bloomHeadline(scene)} larger`}
               >
                 <Scaled w={size.w} h={size.h}>
-                  <BloomAd
-                    scene={scene}
-                    w={size.w}
-                    h={size.h}
-                    aperture={aperture === "scene" ? undefined : aperture}
-                    side={side === "scene" ? undefined : side}
-                  />
+                  {() => (
+                    <BloomAd
+                      scene={scene}
+                      w={size.w}
+                      h={size.h}
+                      aperture={aperture === "scene" ? undefined : aperture}
+                      side={side === "scene" ? undefined : side}
+                      layout={saved(scene.id)}
+                    />
+                  )}
                 </Scaled>
                 <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-[#03002C]/80 px-2.5 py-1 text-[11px] text-white opacity-0 transition group-hover:opacity-100">
-                  <Maximize2 size={11} /> Larger
+                  <Maximize2 size={11} /> Open & edit
                 </span>
               </button>
               <figcaption className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-black/55">
@@ -191,6 +280,11 @@ function BloomView() {
                 />
                 <span className="font-medium text-[#03002C]">{bloomHeadline(scene)}</span>
                 <span>{scene.shot}</span>
+                {saved(scene.id) ? (
+                  <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] font-medium text-[#003FC7]">
+                    Arranged for this size
+                  </span>
+                ) : null}
               </figcaption>
             </figure>
           ))}
@@ -204,6 +298,24 @@ function BloomView() {
               {bloomHeadline(zoomScene)} · {size.label} · {size.w}×{size.h}
             </div>
             <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setEditing((v) => !v)}
+                className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium ${
+                  editing ? "bg-[#A1FBF9] text-[#03002C]" : "border border-white/25 text-white"
+                }`}
+              >
+                <Move size={12} /> {editing ? "Done moving" : "Move things"}
+              </button>
+              {zoomLayout ? (
+                <button
+                  type="button"
+                  onClick={resetLayout}
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/25 px-3 py-1.5 text-xs text-white"
+                >
+                  <RotateCcw size={12} /> Reset
+                </button>
+              ) : null}
               <select
                 value={dlFormat}
                 onChange={(e) => setDlFormat(e.target.value as "png" | "jpeg")}
@@ -261,18 +373,50 @@ function BloomView() {
               </button>
             </div>
           </div>
+
+          {editing && zoomLayout ? (
+            <div className="mt-3 flex flex-wrap items-center gap-4 rounded-xl border border-white/15 bg-white/5 px-3 py-2">
+              {slider("Headline", zoomLayout.headPx, 0.03, 0.3, (v) =>
+                putLayout({ ...zoomLayout, headPx: v }),
+              )}
+              {slider("Small line", zoomLayout.supportPx, 0.012, 0.06, (v) =>
+                putLayout({ ...zoomLayout, supportPx: v }),
+              )}
+              {slider("Logo", zoomLayout.lockup.h, 0.02, 0.1, (v) =>
+                putLayout({ ...zoomLayout, lockup: { ...zoomLayout.lockup, h: v } }),
+              )}
+              <span className="text-[11px] text-white/55">
+                Drag the outlined boxes to move, corners to resize. Saved as you go.
+              </span>
+            </div>
+          ) : null}
+
           <div className="mt-4 min-h-0 flex-1 overflow-auto">
             <div className="mx-auto max-w-6xl">
               <Scaled w={size.w} h={size.h}>
-                <div ref={exportRef}>
-                  <BloomAd
-                    scene={zoomScene}
-                    w={size.w}
-                    h={size.h}
-                    aperture={aperture === "scene" ? undefined : aperture}
-                    side={side === "scene" ? undefined : side}
-                  />
-                </div>
+                {(scale) => (
+                  <div style={{ position: "relative", width: size.w, height: size.h }}>
+                    <div ref={exportRef}>
+                      <BloomAd
+                        scene={zoomScene}
+                        w={size.w}
+                        h={size.h}
+                        aperture={aperture === "scene" ? undefined : aperture}
+                        side={side === "scene" ? undefined : side}
+                        layout={zoomLayout}
+                      />
+                    </div>
+                    {editing && zoomLayout ? (
+                      <BloomLayoutEditor
+                        layout={zoomLayout}
+                        w={size.w}
+                        h={size.h}
+                        scale={scale}
+                        onChange={putLayout}
+                      />
+                    ) : null}
+                  </div>
+                )}
               </Scaled>
             </div>
           </div>
@@ -283,7 +427,15 @@ function BloomView() {
 }
 
 /** Holds an artwork at its true pixel size and scales it to the box it is in. */
-function Scaled({ w, h, children }: { w: number; h: number; children: React.ReactNode }) {
+function Scaled({
+  w,
+  h,
+  children,
+}: {
+  w: number;
+  h: number;
+  children: (scale: number) => React.ReactNode;
+}) {
   const box = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.4);
   useEffect(() => {
@@ -298,7 +450,7 @@ function Scaled({ w, h, children }: { w: number; h: number; children: React.Reac
   return (
     <div ref={box} style={{ width: "100%", height: h * scale, overflow: "hidden" }}>
       <div style={{ width: w, height: h, transform: `scale(${scale})`, transformOrigin: "top left" }}>
-        {children}
+        {children(scale)}
       </div>
     </div>
   );
