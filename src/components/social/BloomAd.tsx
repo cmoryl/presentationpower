@@ -61,6 +61,24 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
   // the call-out word may be set larger, but never smaller than the line it sits in
   const turnEm = Math.max(1, L.turnEm ?? 1.62);
 
+  // When the words sit over the picture they need their own soft ground, so the
+  // type never lands straight on the photograph. Measured as the share of the
+  // copy box that the picture box covers.
+  const ovX =
+    Math.max(
+      0,
+      Math.min(L.copy.x + L.copy.w, L.picture.x + L.picture.w) - Math.max(L.copy.x, L.picture.x),
+    ) * w;
+  const ovY =
+    Math.max(
+      0,
+      Math.min(L.copy.y + L.copy.h, L.picture.y + L.picture.h) - Math.max(L.copy.y, L.picture.y),
+    ) * h;
+  const overlap = (ovX * ovY) / Math.max(1, L.copy.w * w * L.copy.h * h);
+  const overText = overlap > 0.06;
+  // it fades in with the overlap so a slight clip does not get a hard plate
+  const scrimAlpha = Math.min(0.9, 0.42 + overlap * 0.55);
+
   return (
     <div
       style={{
@@ -138,6 +156,21 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
           zIndex: 2,
         }}
       >
+        {overText ? (
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: `-${short * 0.05}px`,
+              // a soft focus behind the words: the ground colour held at low
+              // alpha in the middle, feathered away to nothing at the edges
+              background: `radial-gradient(ellipse at 42% 50%, ${P.ground}${alphaHex(scrimAlpha)} 0%, ${P.ground}${alphaHex(scrimAlpha * 0.8)} 38%, ${P.ground}${alphaHex(scrimAlpha * 0.34)} 62%, ${P.ground}00 84%)`,
+              backdropFilter: `blur(${short * 0.022}px) saturate(112%)`,
+              zIndex: 0,
+              pointerEvents: "none",
+            }}
+          />
+        ) : null}
         <div
           style={{
             fontFamily: '"Playfair Display", Georgia, serif',
