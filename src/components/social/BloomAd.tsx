@@ -65,11 +65,16 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
   const headPx = Math.min(baseHead * optical, colW * (mode === "stacked" ? 0.115 : 0.155));
   const supportPx = Math.max(10, Math.min(headPx * 0.3, short * 0.028));
 
-  // Picture box geometry. The turned end is half the box's short edge, so the
-  // radius has to be measured on the box, not on the frame.
-  const boxShort =
-    mode === "stacked" ? (w - margin * 2) * 0.84 : (h - margin * 2) * (mode === "strip" ? 0.88 : 0.7);
-  const radius = bloomShapeRadius(cut, boxShort);
+  // Picture box geometry. The turned end is half the box's short edge, but it is
+  // also held back on a tall box so the picture never reads as a half circle —
+  // the master keeps the turn to a third of the long edge at most.
+  const boxW = (w - margin * 2) * (mode === "stacked" ? 0.84 : (pictureFlex ?? 0.48) * 0.88);
+  const boxH = (h - margin * 2) * (mode === "stacked" ? 0.62 : mode === "strip" ? 0.88 : 0.7);
+  const radiusPx = Math.min(
+    Math.min(boxW, boxH) * 0.5,
+    Math.max(boxW, boxH) * 0.3,
+  );
+  const radius = bloomShapeRadius(cut, radiusPx * 2);
   const lean = bloomLean(cut);
   // The keyline runs the other way from the bloom, out under the copy.
   const keyOff = short * 0.055;
