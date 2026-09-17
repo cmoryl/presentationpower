@@ -287,7 +287,8 @@ function BloomView() {
       const root = zip.folder(bloomPackRoot())!;
       const entries: BloomPackEntry[] = [];
       let done = 0;
-      const total = scenes.length * sizes.length;
+      const clipCount = videoFormat ? scenes.length * motionPlacements.length : 0;
+      const total = scenes.length * sizes.length + clipCount;
       setPackProgress({ done, total });
 
       for (const s of sizes) {
