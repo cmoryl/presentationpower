@@ -341,7 +341,9 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
   }
   ctx.restore();
 
-  // the solid accent keyline sits on the frame itself
+  // the solid accent keyline sits on the frame itself — the shape is rebuilt
+  // here because the reveal mask above left its own path behind
+  roundedPath(ctx, boxX, boxY, boxW, boxH, radii);
   ctx.lineWidth = strokePx;
   ctx.strokeStyle = C.type;
   ctx.stroke();
