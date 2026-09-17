@@ -484,6 +484,14 @@ export async function rasterizeObjectPlate(args: ExactPlateArgs): Promise<{
       ),
     );
 
+    // A media tile's house treatment (brand duotone, legibility scrim, vignette,
+    // grain) uses blend modes OOXML cannot express, so it stays on the flat
+    // plate — underneath the very picture it is meant to sit on. Bake it into
+    // the picture's own pixels so the exported photograph looks exactly like the
+    // editor while staying a real, replaceable picture object.
+    const { bakeMediaTileTreatments } = await import("./export-media-bake");
+    await bakeMediaTileTreatments(shapes);
+
     textLayer.hideTextRuns(nodes);
     dom.neutralizeCapturedPaint(shapes);
     await nextFrames(2);
