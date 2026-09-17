@@ -325,6 +325,27 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
   const radii = bloomCornerRadii(cut, boxW, boxH);
   const strokePx = Math.max(1.5, short * 0.008);
 
+  // ---- the ground's own figure, under the glow and behind everything else
+  const ground = m.backdrop;
+  const groundBreath = 1 + (ground?.pulse ?? 0) * 0.012;
+  if (ground && bloomEm > 0) {
+    drawBloomBackdrop(ctx, {
+      w,
+      h,
+      short,
+      glow: C.glow,
+      cut,
+      b: ground,
+      cx: boxX + boxW / 2,
+      cy: boxY + boxH / 2,
+      boxW,
+      boxH,
+      em: bloomEm,
+    });
+  }
+
+
+
   // ---- the accent splash in the lower corner away from the picture
   const pictureCentre = L.picture.x + L.picture.w / 2;
   const splashSide: "left" | "right" = pictureCentre >= 0.5 ? "left" : "right";
