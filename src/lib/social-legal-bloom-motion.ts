@@ -743,8 +743,8 @@ export function bloomMotionFrame(
   const auraB = Math.sin(raw * Math.PI * 4 + Math.PI / 3);
 
   return {
-
     photo,
+
     frame: {
       scale: 1 + (1 - frameIn) * 0.02,
       opacity: frameIn,
