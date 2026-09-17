@@ -67,7 +67,11 @@ export function BloomMotionPanel({ aperture, side }: Props) {
   // Which video format this browser can write is only knowable in the browser,
   // so it is settled after the first paint rather than during it.
   const [format, setFormat] = useState<ReturnType<typeof bloomVideoFormat>>(null);
-  useEffect(() => setFormat(bloomVideoFormat()), []);
+  const [formatChecked, setFormatChecked] = useState(false);
+  useEffect(() => {
+    setFormat(bloomVideoFormat());
+    setFormatChecked(true);
+  }, []);
 
   useEffect(() => {
     setError(null);
@@ -303,7 +307,7 @@ export function BloomMotionPanel({ aperture, side }: Props) {
               type="button"
               id="bloom-motion-one"
               onClick={downloadOne}
-              disabled={busy !== null || !format}
+              disabled={busy !== null || (formatChecked && !format)}
               className="inline-flex items-center gap-2 rounded-xl bg-[#003FC7] px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
             >
               <Film size={14} />
@@ -347,7 +351,7 @@ export function BloomMotionPanel({ aperture, side }: Props) {
                 type="button"
                 id="bloom-motion-pack"
                 onClick={downloadPack}
-                disabled={busy !== null || !format}
+                disabled={busy !== null || (formatChecked && !format)}
                 className="inline-flex items-center gap-2 rounded-xl bg-[#03002C] px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
               >
                 <Package size={14} />
@@ -365,7 +369,7 @@ export function BloomMotionPanel({ aperture, side }: Props) {
             </p>
           </div>
 
-          {format === null && typeof MediaRecorder === "undefined" ? (
+          {formatChecked && !format ? (
             <p className="text-xs text-[#E53D2E]">
               This browser cannot write video. Chrome, Edge or a recent Safari will record these
               clips; the still artwork downloads work everywhere.
