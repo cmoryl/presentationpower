@@ -101,6 +101,13 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
    */
   const stackedCut =
     (template === "wedge" || template === "blade" || template === "shard") && h >= w * 0.9;
+  /**
+   * Square, 4:5 and story trims all crop a 16:9 documentary frame so hard that
+   * the second figure — the whole point of the pairing — drops out of shot. On
+   * every layout those trims hold the WHOLE photograph in a band, on the ground
+   * colour, anchored away from wherever the copy sits.
+   */
+  const squareish = h >= w * 0.9;
   /** One multiplier keeps the shared scale legible in every sizing format. */
   const k = banner ? 0.6 : veryTall ? 1.22 : 1;
   const focus = square ? scene.focusSquare : scene.focus;
@@ -244,7 +251,12 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         </>
       );
     }
-    if (kind !== "full" || !stackedCut) return img;
+    if (kind !== "full" || !(stackedCut || squareish)) return img;
+    /** Copy at the top of the frame means the picture hangs from the bottom. */
+    const bandAtBottom = !stackedCut && clear === "top" && template !== "chevron";
+    /** The chevron drives its ink band across the lower frame, so the picture
+     * hangs from the TOP on the square trims and the band sits under it. */
+    const bandAtTop = template === "chevron";
     // A 9:16 story shows barely a third of the frame's width. Cropping that hard
     // always drops one of the two figures — and the pair IS the ad. So the story
     // format holds the whole photograph in a band across the upper frame, on the
@@ -254,7 +266,23 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         <div className="absolute inset-0" style={{ background: P.ground }} />
         <div
           className="absolute overflow-hidden"
-          style={{ left: 0, right: 0, top: "6%", aspectRatio: "1376 / 768" }}
+          style={
+            stackedCut
+              ? { left: 0, right: 0, top: "6%", aspectRatio: "1376 / 768" }
+              : bandAtBottom
+                ? { left: 0, right: 0, bottom: 0, aspectRatio: "1376 / 768" }
+                : bandAtTop
+                  ? { left: 0, right: 0, top: "2%", aspectRatio: "1376 / 768" }
+                  : {
+                    // Letterboxed in the middle of the frame: the whole picture
+                    // reads, and the ground above and below carries the copy.
+                    left: 0,
+                    right: 0,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    aspectRatio: "1376 / 768",
+                  }
+          }
         >
           <img
             src={scene.src}
@@ -267,13 +295,25 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         <div
           aria-hidden
           className="absolute"
-          style={{
-            left: 0,
-            right: 0,
-            top: veryTall ? "36%" : "60%",
-            height: "12%",
-            background: `linear-gradient(to bottom, ${P.ground}00, ${P.ground}FF)`,
-          }}
+          style={
+            !stackedCut && !bandAtBottom
+              ? { display: "none" }
+              : bandAtBottom
+              ? {
+                  left: 0,
+                  right: 0,
+                  bottom: veryTall ? "44%" : "42%",
+                  height: "12%",
+                  background: `linear-gradient(to top, ${P.ground}00, ${P.ground}FF)`,
+                }
+              : {
+                  left: 0,
+                  right: 0,
+                  top: veryTall ? (stackedCut ? "36%" : "39%") : stackedCut ? "60%" : "56%",
+                  height: "12%",
+                  background: `linear-gradient(to bottom, ${P.ground}00, ${P.ground}FF)`,
+                }
+          }
         />
       </>
     );
@@ -283,23 +323,14 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   // The lockup owns one corner of every ad (top-right, or bottom-left when the
   // copy column sits on the right), so the masthead keeps the frame number on
   // the LEFT and never competes for that corner.
+  // The frame numbers and the "FRAME 04 / pair" studio marks were struck from
+  // the ads: they are production bookkeeping, not campaign copy. The hairline
+  // stays so the layouts keep their measure line.
   const masthead = (ink: string = P.ink) => (
     <div
-      className="flex w-full items-center gap-3"
+      className="flex w-full items-center"
       style={{ color: ink, paddingRight: clear === "right" ? undefined : u(26) }}
     >
-      <span
-        style={{
-          fontFamily: TY.eyebrow.family,
-          fontSize: u(T.numeral),
-          fontVariantNumeric: "tabular-nums",
-          letterSpacing: "0.14em",
-          fontWeight: TY.eyebrow.weight,
-          opacity: 0.72,
-        }}
-      >
-        {scene.no}
-      </span>
       <span aria-hidden className="flex-1" style={{ height: 1, background: `${ink}3D` }} />
     </div>
   );
@@ -559,24 +590,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   /** No call to action in the cut family either — a wider gradient alpha rule. */
   const ctaBlock = (opts?: { light?: boolean }) => alphaRule(46, opts?.light ? P.ink : P.accent);
 
-  /** Frame number on a short accent rule, for use inside a cut field. */
+  /** A short accent rule inside a cut field — the number it carried is gone. */
   const cutMasthead = () => (
-    <div className="flex items-center" style={{ gap: u(1.4) }}>
-      <span
-        style={{
-          fontFamily: TY.eyebrow.family,
-          fontWeight: TY.eyebrow.weight,
-          fontSize: u(T.numeral),
-          fontVariantNumeric: "tabular-nums",
-          letterSpacing: "0.14em",
-          color: P.ink,
-          opacity: 0.72,
-        }}
-      >
-        {scene.no}
-      </span>
-      <span aria-hidden style={{ width: u(3.4), height: u(0.3), background: P.accent }} />
-    </div>
+    <span aria-hidden style={{ display: "block", width: u(3.4), height: u(0.3), background: P.accent }} />
   );
 
   let body: React.ReactNode = null;
@@ -962,20 +978,6 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             className="absolute inset-0"
             style={{ background: `linear-gradient(to top, ${P.ground}94 0%, ${P.ground}00 46%)` }}
           />
-          <div className="absolute" style={{ left: u(1.6), bottom: u(1.4) }}>
-            <span
-              style={{
-                fontFamily: TY.eyebrow.family,
-                fontSize: u(T.micro),
-                letterSpacing: "0.24em",
-                textTransform: "uppercase",
-                color: P.ink,
-                opacity: 0.82,
-              }}
-            >
-              {`FRAME ${scene.no} / ${scene.pair}`}
-            </span>
-          </div>
         </div>
         <div
           className="absolute flex flex-col justify-between"
@@ -1129,24 +1131,6 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         <div className="absolute inset-0" style={{ background: curtain(tall ? "bottom" : fromLeft ? "left" : "right", 0.55) }} />
         <div className="absolute inset-0" style={{ background: P.ground, clipPath: shape }} />
         <div
-          aria-hidden
-          className="absolute"
-          style={{
-            top: wide ? "9%" : "7%",
-            right: fromLeft ? u(M) : "auto",
-            left: fromLeft ? "auto" : u(M),
-            fontFamily: TY.display.family,
-            fontWeight: 800,
-            fontSize: u(square ? 17 : 13),
-            lineHeight: 0.8,
-            letterSpacing: "-0.05em",
-            color: `${P.ink}2E`,
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          {scene.no}
-        </div>
-        <div
           className="absolute"
           style={{ top: u(M), left: u(M), right: u(M * 5) }}
         >
@@ -1177,8 +1161,10 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     // An angled ink band driven across the frame, accent slabs on both cuts.
     // The band is held lower and shallower than it was: at the old depth it sat
     // straight across both figures and the photograph stopped reading.
-    const bandTop = wide ? 36 : veryTall ? 52 : 40;
-    const bandH = wide ? 44 : veryTall ? 34 : 40;
+    // On square and portrait trims the whole photograph hangs from the top of
+    // the frame, so the band is dropped clear of it.
+    const bandTop = wide ? 36 : veryTall ? 52 : 50;
+    const bandH = wide ? 44 : veryTall ? 34 : 38;
     const skew = wide ? 7 : 5;
     const band = `polygon(0 ${bandTop + skew}%, 100% ${bandTop}%, 100% ${bandTop + bandH}%, 0 ${bandTop + bandH + skew}%)`;
     body = (
@@ -1329,8 +1315,6 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           >
             {/* A banner strip is only ~400px tall — the rotated label won't fit. */}
             {banner ? null : <span style={{ whiteSpace: "nowrap" }}>{scene.theme}</span>}
-            <span aria-hidden style={{ width: 1, height: u(6), background: `${P.ink}47` }} />
-            <span style={{ fontVariantNumeric: "tabular-nums", opacity: 0.7 }}>{scene.no}</span>
           </div>
         </div>
         <div

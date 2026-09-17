@@ -5,7 +5,7 @@
 
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   ArrowLeft,
@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Images,
+  Download,
   Maximize2,
   Share2,
   X,
@@ -66,6 +67,12 @@ function AlongsideView() {
   const [typeSet, setTypeSet] = useState<string>("house");
   const [perScene, setPerScene] = useState<Record<string, AlongsideTemplateId>>({});
   const [zoom, setZoom] = useState<string | null>(null);
+  // Download settings for the large view: file type, and how many times the
+  // trim's own pixel size to render at.
+  const [dlFormat, setDlFormat] = useState<"png" | "jpeg">("png");
+  const [dlScale, setDlScale] = useState<number>(2);
+  const [dlBusy, setDlBusy] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
   const size = LEGAL_ALONGSIDE_SIZES.find((s) => s.id === sizeId) ?? LEGAL_ALONGSIDE_SIZES[0];
 
   const zoomIndex = zoom ? LEGAL_ALONGSIDE_SCENES.findIndex((s) => s.id === zoom) : -1;
@@ -75,6 +82,34 @@ function AlongsideView() {
     const next =
       (zoomIndex + dir + LEGAL_ALONGSIDE_SCENES.length) % LEGAL_ALONGSIDE_SCENES.length;
     setZoom(LEGAL_ALONGSIDE_SCENES[next].id);
+  };
+
+  /**
+   * Writes the ad exactly as it is set on screen. The capture is taken from an
+   * off-screen copy rendered at the trim's true pixel size, so the file is the
+   * real 1200x1200 (or x2, x3) artwork rather than a screenshot of a preview box.
+   */
+  const download = async () => {
+    const node = exportRef.current;
+    if (!node || !zoomScene) return;
+    setDlBusy(true);
+    try {
+      const { toPng, toJpeg } = await import("html-to-image");
+      const opts = {
+        pixelRatio: dlScale,
+        width: size.w,
+        height: size.h,
+        cacheBust: true,
+        backgroundColor: "#03002C",
+      };
+      const url = dlFormat === "png" ? await toPng(node, opts) : await toJpeg(node, { ...opts, quality: 0.94 });
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `tp-legal-${zoomScene.id}-${(perScene[zoomScene.id] ?? template)}-${size.id}-${dlScale}x.${dlFormat}`;
+      a.click();
+    } finally {
+      setDlBusy(false);
+    }
   };
 
   useEffect(() => {
@@ -444,6 +479,43 @@ function AlongsideView() {
                     ))}
                   </select>
                 </label>
+                <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-white/55">
+                  File
+                  <select
+                    value={dlFormat}
+                    onChange={(e) => setDlFormat(e.target.value as "png" | "jpeg")}
+                    className="rounded-lg border border-white/25 bg-transparent px-2 py-1.5 text-xs font-medium normal-case tracking-normal text-white"
+                  >
+                    <option value="png" className="text-[#03002C]">
+                      PNG
+                    </option>
+                    <option value="jpeg" className="text-[#03002C]">
+                      JPG
+                    </option>
+                  </select>
+                </label>
+                <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-white/55">
+                  Scale
+                  <select
+                    value={dlScale}
+                    onChange={(e) => setDlScale(Number(e.target.value))}
+                    className="rounded-lg border border-white/25 bg-transparent px-2 py-1.5 text-xs font-medium normal-case tracking-normal text-white"
+                  >
+                    {[1, 2, 3].map((n) => (
+                      <option key={n} value={n} className="text-[#03002C]">
+                        {n}x · {size.w * n}×{size.h * n}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  onClick={download}
+                  disabled={dlBusy}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/35 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:border-white/70 disabled:opacity-55"
+                >
+                  <Download size={13} /> {dlBusy ? "Preparing…" : "Download"}
+                </button>
                 <span aria-hidden className="mx-1 text-white/25">
                   |
                 </span>
@@ -482,6 +554,29 @@ function AlongsideView() {
                   maxWidth: `min(100%, ${Math.round((size.w / size.h) * 74)}vh)`,
                 }}
               >
+                <AlongsideAd
+                  scene={zoomScene}
+                  template={perScene[zoomScene.id] ?? template}
+                  w={size.w}
+                  h={size.h}
+                  typeSet={typeSet}
+                />
+              </div>
+            </div>
+
+            {/* Off-screen, true-pixel copy used for the download. */}
+            <div
+              aria-hidden
+              style={{
+                position: "fixed",
+                left: -100000,
+                top: 0,
+                width: size.w,
+                height: size.h,
+                pointerEvents: "none",
+              }}
+            >
+              <div ref={exportRef} style={{ width: size.w, height: size.h }}>
                 <AlongsideAd
                   scene={zoomScene}
                   template={perScene[zoomScene.id] ?? template}
