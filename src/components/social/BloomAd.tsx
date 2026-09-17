@@ -86,11 +86,19 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
   // "tricky" (landscape) runs long and horizontal while an upright shot stands up.
   const availW = (w - margin * 2) * (mode === "stacked" ? 1 : (pictureFlex ?? 0.6) * 0.99);
   const availH = (h - margin * 2) * (mode === "stacked" ? 0.72 : mode === "strip" ? 1 : 0.98);
+  // The frame still runs the way the photograph does, but it is not allowed to
+  // leave the ad half empty: the aspect is pulled towards the space it has, so
+  // the picture fills its column in every trim (the shot is cropped, not shrunk).
+  const spaceAspect = availW / availH;
+  const fitAspect = Math.min(
+    Math.max(frameAspect, spaceAspect * 0.72),
+    spaceAspect * 1.7,
+  );
   let boxW = availW;
-  let boxH = boxW / frameAspect;
+  let boxH = boxW / fitAspect;
   if (boxH > availH) {
     boxH = availH;
-    boxW = Math.min(availW, boxH * frameAspect);
+    boxW = Math.min(availW, boxH * fitAspect);
   }
   const radius = bloomShapeRadius(cut, boxW, boxH);
   const lean = bloomLean(cut);
