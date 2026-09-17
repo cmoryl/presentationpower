@@ -19,10 +19,12 @@ import {
   bloomFrameAspect,
   bloomHeadline,
   bloomLean,
+  bloomMotif,
   bloomOptical,
   bloomShapeRadius,
   LEGAL_BLOOM_PALETTE as P,
   type BloomAperture,
+  type BloomMotif,
   type BloomScene,
   type BloomSide,
 } from "@/lib/social-legal-bloom";
@@ -35,6 +37,126 @@ type Props = {
   aperture?: BloomAperture;
   side?: BloomSide;
 };
+
+/**
+ * The faint figure behind the picture. Every figure is drawn from the ad's own
+ * geometry — the frame's proportion and the diagonal the bloom leans through —
+ * so it belongs to the layout instead of decorating it.
+ */
+function BloomMark({
+  motif,
+  colour,
+  boxW,
+  boxH,
+  pad,
+  lean,
+}: {
+  motif: BloomMotif;
+  colour: string;
+  boxW: number;
+  boxH: number;
+  pad: number;
+  lean: { x: number; y: number };
+}) {
+  const W = boxW + pad * 2;
+  const H = boxH + pad * 2;
+  const stroke = Math.max(1, Math.min(W, H) * 0.006);
+  const right = lean.x > 0;
+  const sx = right ? 1 : -1;
+  const parts: React.ReactNode[] = [];
+
+  if (motif === "echo") {
+    // Two echoes of the picture's own rectangle, stepped out through the turn.
+    for (let i = 1; i <= 2; i += 1) {
+      const g = pad * (i * 0.62);
+      parts.push(
+        <rect
+          key={`e${i}`}
+          x={pad - g + sx * g * 0.5}
+          y={pad - g - g * 0.35}
+          width={boxW + g * 2}
+          height={boxH + g * 2}
+          rx={Math.min(boxW, boxH) * 0.16}
+          fill="none"
+          stroke={colour}
+          strokeWidth={stroke}
+        />,
+      );
+    }
+  } else if (motif === "arcs") {
+    // Concentric quarter turns opening out of the rounded corner.
+    const cx = right ? pad + boxW : pad;
+    const cy = pad;
+    for (let i = 0; i < 4; i += 1) {
+      const r = Math.min(boxW, boxH) * (0.34 + i * 0.13);
+      parts.push(
+        <path
+          key={`a${i}`}
+          d={`M ${cx - sx * r} ${cy} A ${r} ${r} 0 0 ${right ? 1 : 0} ${cx} ${cy + r}`}
+          fill="none"
+          stroke={colour}
+          strokeWidth={stroke}
+        />,
+      );
+    }
+  } else if (motif === "rules") {
+    // The run of the picture, drawn as a measured set of long rules.
+    for (let i = 0; i < 7; i += 1) {
+      const y = pad * 0.3 + (H - pad * 0.6) * (i / 6);
+      const inset = pad * (i % 2 === 0 ? 0.2 : 1.1);
+      parts.push(
+        <line
+          key={`r${i}`}
+          x1={right ? inset : pad * 0.2}
+          y1={y}
+          x2={right ? W - pad * 0.2 : W - inset}
+          y2={y}
+          stroke={colour}
+          strokeWidth={stroke}
+        />,
+      );
+    }
+  } else {
+    // A hatch running the same way as the diagonal the frame turns on.
+    const step = Math.min(W, H) * 0.11;
+    for (let i = -6; i < 22; i += 1) {
+      const x = i * step;
+      parts.push(
+        <line
+          key={`h${i}`}
+          x1={x}
+          y1={right ? 0 : H}
+          x2={x + sx * H}
+          y2={right ? H : 0}
+          stroke={colour}
+          strokeWidth={stroke}
+        />,
+      );
+    }
+  }
+
+  return (
+    <svg
+      aria-hidden
+      viewBox={`0 0 ${W} ${H}`}
+      width={W}
+      height={H}
+      style={{
+        position: "absolute",
+        left: "50%",
+        top: "50%",
+        transform: `translate(-50%, -50%) translate(${lean.x * pad * 0.5}px, ${lean.y * pad * 0.45}px)`,
+        opacity: 0.2,
+        // bounded to its own box, so a hatch or rule never runs out over the
+        // copy or off the trim
+        overflow: "hidden",
+        pointerEvents: "none",
+      }}
+    >
+      {parts}
+    </svg>
+  );
+}
 
 export function BloomAd({ scene, w, h, aperture, side }: Props) {
   const logos = getDivisionLogos("bm-tp-legal");
@@ -122,7 +244,18 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
           filter: `blur(${short * 0.045}px)`,
         }}
       />
+      {/* the quiet mark: abstracted from this ad's own layout, sharp, held at 20%,
+          in front of the bloom and behind the picture */}
+      <BloomMark
+        motif={bloomMotif(scene)}
+        colour={C.type}
+        boxW={boxW}
+        boxH={boxH}
+        pad={short * 0.06}
+        lean={lean}
+      />
       {/* the picture, cut to the master frame: two diagonal corners turned, two square */}
+
       <div
         style={{
           position: "relative",
