@@ -591,7 +591,9 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
       if (kind === "settle" || kind === "hold") {
         const alpha = mode === "typewrite" ? local : acc.progress;
         if (alpha > 0.01 && shown) {
-          const s = acc.overshoot + (1 - acc.overshoot) * acc.progress;
+          // the accent word takes a hair of the ground's own breath
+          const s = (acc.overshoot + (1 - acc.overshoot) * acc.progress) * groundBreath;
+
           ctx.globalAlpha = alpha;
           ctx.translate(leftX + full / 2, baseY);
           ctx.scale(s, s);
