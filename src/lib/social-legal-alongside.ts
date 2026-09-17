@@ -1091,8 +1091,9 @@ export type AlongsideTypeSet = {
 export const LEGAL_ALONGSIDE_TYPESETS: AlongsideTypeSet[] = [
   {
     id: "house",
-    label: "House (per layout)",
-    note: "Each layout keeps its own pairing — the treatment written for that composition.",
+    label: "Per photograph (recommended)",
+    note: "Each ad is set in the voice chosen for its own picture — the face, the scale and the rules follow that photograph's texture and its strongest line.",
+
   },
   {
     id: "editorial",
