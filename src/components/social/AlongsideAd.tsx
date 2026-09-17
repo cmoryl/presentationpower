@@ -492,30 +492,39 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     // an italic in the contrasting face, a heavier or lighter weight, tracked
     // caps, or an accent hairline. Call-outs are applied outside the turn only,
     // so a line never carries two competing emphases in the same breath.
+    // The colour a called-out word takes: on a light plate the word can only be
+    // brand blue (the light secondaries fail contrast there); over the picture it
+    // takes the ad's own accent tint, and blue swaps to aqua so it stays legible.
+    const onLight = (opts?.color ?? P.ink) === P.ink;
+    const WORD_COLOR = onLight
+      ? P.accent
+      : MARK.tint === "accent" || MARK.tint === "ink"
+        ? ACCENT_MARK_COLORS.aqua
+        : MARK_COLOR;
     const calloutStyle = (treat: string): React.CSSProperties => {
       if (treat === "italic")
         return { fontFamily: a.family, fontStyle: "italic", letterSpacing: "0em" };
       if (treat === "bold")
-        return { fontWeight: Math.min(900, d.weight + 200), color: MARK_COLOR };
+        return { fontWeight: Math.min(900, d.weight + 200), color: WORD_COLOR };
       if (treat === "light") return { fontWeight: Math.max(200, d.weight - 300) };
       if (treat === "caps")
         return {
           textTransform: "uppercase",
           letterSpacing: "0.05em",
           fontSize: "0.88em",
-          color: MARK_COLOR,
+          color: WORD_COLOR,
         };
       // Tracked: the word is opened up rather than restyled, so it slows the
       // reader down without breaking the line's texture.
       if (treat === "tracked")
-        return { letterSpacing: "0.08em", fontWeight: d.weight, color: MARK_COLOR };
+        return { letterSpacing: "0.08em", fontWeight: d.weight, color: WORD_COLOR };
       // Quiet: held back in weight and alpha so the words around it carry.
       if (treat === "quiet")
         return { fontWeight: Math.max(200, d.weight - 200), opacity: 0.72 };
       // Accent: the only place brand blue touches display copy — one word, never
       // body text, so contrast rules still hold.
       if (treat === "accent")
-        return { color: MARK_COLOR, fontWeight: Math.min(900, d.weight + 100) };
+        return { color: WORD_COLOR, fontWeight: Math.min(900, d.weight + 100) };
       // Rule: a drawn underline in the ad's own hand, not a border. A straight
       // 1px border under a word is the machine tell this campaign avoids.
       return {
