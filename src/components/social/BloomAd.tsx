@@ -92,6 +92,59 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
   // the lower accent splash sits in the corner the picture is furthest from
   const pictureCentre = L.picture.x + L.picture.w / 2;
   const splashSide: "left" | "right" = pictureCentre >= 0.5 ? "left" : "right";
+  const splash = L.splashShape ?? "soft";
+  const toCorner = splashSide === "left" ? "to top right" : "to top left";
+  const splashGeometry =
+    splash === "circle"
+      ? {
+          w: 0.58,
+          h: 0.58,
+          drop: 0.22,
+          out: 0.18,
+          blur: 0.035,
+          opacity: 0.86,
+          borderRadius: "50%",
+          clipPath: undefined as string | undefined,
+          background: `radial-gradient(circle at 50% 50%, ${C.glow}F2 0%, ${C.glow}C4 58%, ${C.glow}94 100%)`,
+        }
+      : splash === "curved"
+        ? {
+            w: 0.82,
+            h: 0.5,
+            drop: 0.16,
+            out: 0.2,
+            blur: 0.03,
+            opacity: 0.82,
+            borderRadius: splashSide === "left" ? "0 100% 0 0" : "100% 0 0 0",
+            clipPath: undefined as string | undefined,
+            background: `linear-gradient(${toCorner}, ${C.glow}F2 0%, ${C.glow}B8 52%, ${C.glow}7A 100%)`,
+          }
+        : splash === "triangle"
+          ? {
+              w: 0.72,
+              h: 0.58,
+              drop: 0.14,
+              out: 0.16,
+              blur: 0.026,
+              opacity: 0.82,
+              borderRadius: undefined as string | undefined,
+              clipPath:
+                splashSide === "left"
+                  ? "polygon(0% 0%, 100% 100%, 0% 100%)"
+                  : "polygon(100% 0%, 100% 100%, 0% 100%)",
+              background: `linear-gradient(${toCorner}, ${C.glow}F2 0%, ${C.glow}B8 54%, ${C.glow}7A 100%)`,
+            }
+          : {
+              w: 0.72,
+              h: 0.62,
+              drop: 0.24,
+              out: 0.2,
+              blur: 0.05,
+              opacity: 0.9,
+              borderRadius: undefined as string | undefined,
+              clipPath: undefined as string | undefined,
+              background: `radial-gradient(ellipse at ${splashSide === "left" ? "34%" : "66%"} 66%, ${C.glow}D9 0%, ${C.glow}8C 34%, ${C.glow}40 56%, ${C.glow}00 76%)`,
+            };
 
   return (
     <div
@@ -233,23 +286,28 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
         </div>
       </div>
 
-      {/* a soft accent splash in the lower corner away from the picture, so the
-          bottom of the ad carries some of the bloom's colour behind the lockup */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          bottom: `-${short * 0.24}px`,
-          [splashSide]: `-${short * 0.2}px`,
-          width: `${short * 0.72}px`,
-          height: `${short * 0.62}px`,
-          background: `radial-gradient(ellipse at ${splashSide === "left" ? "34%" : "66%"} 66%, ${C.glow}D9 0%, ${C.glow}8C 34%, ${C.glow}40 56%, ${C.glow}00 76%)`,
-          filter: `blur(${short * 0.05 * Math.max(0.35, bloomEm)}px)`,
-          opacity: bloomEm === 0 ? 0 : 0.9,
-          zIndex: 0,
-          pointerEvents: "none",
-        }}
-      />
+      {/* the accent splash in the lower corner away from the picture, so the
+          bottom of the ad carries some of the bloom's colour behind the lockup.
+          Its shape is chosen per ad: soft cloud, curved sweep, triangle, circle. */}
+      {splash !== "none" && bloomEm > 0 ? (
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            bottom: `-${short * splashGeometry.drop}px`,
+            [splashSide]: `-${short * splashGeometry.out}px`,
+            width: `${short * splashGeometry.w}px`,
+            height: `${short * splashGeometry.h}px`,
+            background: splashGeometry.background,
+            borderRadius: splashGeometry.borderRadius,
+            clipPath: splashGeometry.clipPath,
+            filter: `blur(${short * splashGeometry.blur * Math.max(0.35, bloomEm)}px)`,
+            opacity: splashGeometry.opacity,
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        />
+      ) : null}
 
       {/* the division lockup — black single line, always bottom right */}
       <img

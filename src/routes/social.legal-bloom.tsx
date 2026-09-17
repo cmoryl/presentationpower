@@ -24,12 +24,14 @@ import {
 import { BloomAd } from "@/components/social/BloomAd";
 import { BloomLayoutEditor } from "@/components/social/BloomLayoutEditor";
 import {
+  BLOOM_SPLASHES,
   bloomAutoLayout,
   bloomLayoutKey,
   readBloomLayouts,
   writeBloomLayouts,
   type BloomAdLayout,
   type BloomLayoutMap,
+  type BloomSplash,
 } from "@/lib/social-legal-bloom-layout";
 import {
   LEGAL_BLOOM_APERTURES,
@@ -463,6 +465,23 @@ function BloomView() {
               {slider("Bloom softness", zoomLayout.bloomEm ?? 1, 0, 3, (v) =>
                 putLayout({ ...zoomLayout, bloomEm: v }),
               )}
+              {/* the shape of the lower accent splash behind the lockup */}
+              <label className="flex items-center gap-2 text-[11px] text-white/70">
+                Splash shape
+                <select
+                  value={zoomLayout.splashShape ?? "soft"}
+                  onChange={(e) =>
+                    putLayout({ ...zoomLayout, splashShape: e.target.value as BloomSplash })
+                  }
+                  className="rounded-lg border border-white/25 bg-white/10 px-2 py-1 text-xs text-white"
+                >
+                  {BLOOM_SPLASHES.map((s) => (
+                    <option className="text-black" key={s.id} value={s.id}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <span className="text-[11px] text-white/55">
                 Drag the outlined boxes to move, corners to resize. Saved as you go.
               </span>

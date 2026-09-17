@@ -40,7 +40,20 @@ export type BloomAdLayout = {
   scrimEm?: number;
   /** How soft the colour bloom around the picture is. 1 = the composed amount. */
   bloomEm?: number;
+  /** The shape of the lower accent splash behind the lockup. */
+  splashShape?: BloomSplash;
 };
+
+/** The lower accent splash shapes a person can pick per ad. */
+export type BloomSplash = "soft" | "curved" | "triangle" | "circle" | "none";
+
+export const BLOOM_SPLASHES: { id: BloomSplash; label: string }[] = [
+  { id: "soft", label: "Soft cloud" },
+  { id: "curved", label: "Curved sweep" },
+  { id: "triangle", label: "Triangular" },
+  { id: "circle", label: "Circular" },
+  { id: "none", label: "None" },
+];
 
 export type BloomMode = "beside" | "stacked" | "strip";
 
