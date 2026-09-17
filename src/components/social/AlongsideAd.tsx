@@ -240,6 +240,36 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       const comp = px > 4.6 ? -0.012 : px < 2.8 ? 0.008 : 0;
       return `${(base + comp).toFixed(4)}em`;
     })();
+    // ---- word-level call-outs ----------------------------------------------
+    // Besides the turn phrase, the one word the sentence pivots on is set apart:
+    // an italic in the contrasting face, a heavier or lighter weight, tracked
+    // caps, or an accent hairline. Call-outs are applied outside the turn only,
+    // so a line never carries two competing emphases in the same breath.
+    const calloutStyle = (treat: string): React.CSSProperties => {
+      if (treat === "italic")
+        return { fontFamily: a.family, fontStyle: "italic", letterSpacing: "0em" };
+      if (treat === "bold") return { fontWeight: Math.min(900, d.weight + 200) };
+      if (treat === "light") return { fontWeight: Math.max(200, d.weight - 300) };
+      if (treat === "caps")
+        return { textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.88em" };
+      return { borderBottom: `${u(0.16)} solid ${P.accent}`, paddingBottom: u(0.16) };
+    };
+    const deco = (s: string, depth = 0): React.ReactNode => {
+      if (depth > 3) return s;
+      const hay = s.replace(/\u00A0/g, " ");
+      for (const c of ST.callouts ?? []) {
+        const i = hay.indexOf(c.text);
+        if (i < 0) continue;
+        return (
+          <>
+            {s.slice(0, i)}
+            <span style={calloutStyle(c.treat)}>{s.slice(i, i + c.text.length)}</span>
+            {deco(s.slice(i + c.text.length), depth + 1)}
+          </>
+        );
+      }
+      return s;
+    };
     return (
       <div
         style={{
@@ -256,7 +286,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           maxWidth: `${measure}em`,
         }}
       >
-        {parts.after ? parts.before : noWidow(parts.before)}
+        {deco(parts.after ? parts.before : noWidow(parts.before))}
         {parts.action ? (
           <span
             style={{
@@ -274,9 +304,10 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             {parts.action}
           </span>
         ) : null}
-        {parts.after ? noWidow(parts.after) : null}
+        {parts.after ? deco(noWidow(parts.after)) : null}
       </div>
     );
+
   };
 
   // A wide banner has no room for a second line of copy — the headline and the
