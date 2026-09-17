@@ -268,3 +268,45 @@ describe("intro and outro smoothing", () => {
     }
   });
 });
+
+describe("background motion", () => {
+  it("keeps a still ground perfectly quiet", () => {
+    for (const t of [0, 3, 8]) {
+      const f = bloomMotionFrame(bloomPreset("push-slow"), t, 8, "preset", "still");
+      expect(f.backdrop.kind).toBe("still");
+      expect(f.backdrop.strength).toBe(0);
+      expect(f.backdrop.pulse).toBe(0);
+    }
+  });
+
+  it("closes every figure exactly where it opened, so loops never jump", () => {
+    for (const b of BLOOM_BACKDROPS) {
+      const first = bloomMotionFrame(bloomPreset("loop-breathe"), 0, 8, "preset", b.id);
+      const last = bloomMotionFrame(bloomPreset("loop-breathe"), 8, 8, "preset", b.id);
+      expect(last.backdrop.phase).toBeCloseTo(first.backdrop.phase, 6);
+      expect(last.backdrop.turn).toBeCloseTo(first.backdrop.turn, 6);
+      expect(last.backdrop.wave).toBeCloseTo(first.backdrop.wave, 6);
+      expect(last.bloom.driftX).toBeCloseTo(first.bloom.driftX, 6);
+      expect(last.splash.driftY).toBeCloseTo(first.splash.driftY, 6);
+    }
+  });
+
+  it("stays a whisper: the aura never leaves its own range", () => {
+    for (const b of BLOOM_BACKDROPS) {
+      for (let i = 0; i <= 40; i += 1) {
+        const f = bloomMotionFrame(bloomPreset("swirl" in b ? "push-slow" : "push-slow"), (i / 40) * 6, 6, "preset", b.id);
+        expect(f.backdrop.phase).toBeGreaterThanOrEqual(0);
+        expect(f.backdrop.phase).toBeLessThanOrEqual(1);
+        expect(Math.abs(f.backdrop.pulse)).toBeLessThanOrEqual(1);
+        expect(f.bloom.opacity).toBeGreaterThanOrEqual(0);
+        expect(f.bloom.opacity).toBeLessThanOrEqual(1);
+        expect(f.splash.opacity).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+
+  it("falls back to the still ground for an unknown choice", () => {
+    expect(bloomBackdrop("nope").id).toBe("still");
+    expect(bloomBackdrop(undefined).kind).toBe("still");
+  });
+});
