@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { LEGAL_BLOOM_SCENES } from "../social-legal-bloom";
 import {
   BLOOM_MOTION_PRESETS,
+  bloomPresetsByFamily,
   BLOOM_PLACEMENTS,
   bloomAspectLabel,
   bloomClipSeconds,
@@ -49,12 +50,63 @@ describe("bloom motion placements", () => {
   });
 });
 
+describe("bloom motion preset library", () => {
+  it("offers a broad, grouped set of standard moves", () => {
+    expect(BLOOM_MOTION_PRESETS.length).toBeGreaterThanOrEqual(18);
+    const ids = new Set(BLOOM_MOTION_PRESETS.map((p) => p.id));
+    expect(ids.size).toBe(BLOOM_MOTION_PRESETS.length);
+    const families = bloomPresetsByFamily();
+    expect(families.map((f) => f.family)).toEqual([
+      "Camera",
+      "Reveal",
+      "Typography",
+      "Light",
+      "Loop",
+    ]);
+    for (const f of families) expect(f.presets.length).toBeGreaterThanOrEqual(2);
+    expect(families.flatMap((f) => f.presets).length).toBe(BLOOM_MOTION_PRESETS.length);
+  });
+
+  it("covers every camera move, reveal and text arrival", () => {
+    const moves = new Set(BLOOM_MOTION_PRESETS.map((p) => p.photo.move));
+    for (const m of ["push-in", "pull-back", "pan-left", "pan-right", "tilt-up", "tilt-down", "hold"])
+      expect(moves.has(m as never)).toBe(true);
+    const reveals = new Set(BLOOM_MOTION_PRESETS.map((p) => p.reveal.mode));
+    for (const r of ["none", "wipe-up", "wipe-side", "iris", "corner", "bloom-first"])
+      expect(reveals.has(r as never)).toBe(true);
+    const texts = new Set(BLOOM_MOTION_PRESETS.map((p) => p.text.mode));
+    for (const m of ["rise", "cascade", "fade", "slide", "typewrite", "drop", "hold"])
+      expect(texts.has(m as never)).toBe(true);
+  });
+
+  it("keeps every preset within the campaign's own rules", () => {
+    for (const p of BLOOM_MOTION_PRESETS) {
+      expect(p.turnOvershoot).toBeGreaterThanOrEqual(1);
+      expect(p.photo.zoom).toBeLessThanOrEqual(0.25);
+      expect(p.photo.travel).toBeLessThanOrEqual(0.1);
+      expect(p.text.start).toBeLessThan(0.5);
+      expect(p.endHold).toBeLessThanOrEqual(0.4);
+      expect(p.says.length).toBeGreaterThan(20);
+    }
+  });
+
+  it("reveals the picture fully and composes the ad before the clip ends", () => {
+    for (const p of BLOOM_MOTION_PRESETS) {
+      const end = bloomMotionFrame(p, 8, 8);
+      expect(end.frame.reveal).toBeCloseTo(1, 2);
+      expect(end.frame.opacity).toBeCloseTo(1, 2);
+      expect(end.support.opacity).toBeCloseTo(1, 2);
+    }
+  });
+});
+
 describe("bloom motion frames", () => {
   it("starts closed and ends fully composed on every preset", () => {
     for (const preset of BLOOM_MOTION_PRESETS) {
       const start = bloomMotionFrame(preset, 0, 8);
       const end = bloomMotionFrame(preset, 8, 8);
-      expect(start.words.progress).toBeLessThan(0.2);
+      // a "hold" arrival is composed from the first frame by design
+      if (preset.text.mode !== "hold") expect(start.words.progress).toBeLessThan(0.2);
       expect(end.words.progress).toBeCloseTo(1, 2);
       expect(end.turn.opacity).toBeCloseTo(1, 2);
       expect(end.logo.opacity).toBeCloseTo(1, 2);
@@ -74,6 +126,10 @@ describe("bloom motion frames", () => {
         expect(f.photo.scale).toBeGreaterThanOrEqual(1);
         expect(Math.abs(f.photo.x)).toBeLessThan(0.2);
         expect(f.sweep).toBeLessThanOrEqual(1);
+        expect(f.frame.reveal).toBeGreaterThanOrEqual(0);
+        expect(f.frame.reveal).toBeLessThanOrEqual(1);
+        expect(f.words.progress).toBeGreaterThanOrEqual(0);
+        expect(f.words.progress).toBeLessThanOrEqual(1);
       }
     }
   });

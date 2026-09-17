@@ -17,7 +17,7 @@ import {
 } from "@/lib/social-legal-bloom";
 import { bloomAutoLayout, type BloomAdLayout } from "@/lib/social-legal-bloom-layout";
 import {
-  BLOOM_MOTION_PRESETS,
+  bloomPresetsByFamily,
   BLOOM_PLACEMENTS,
   bloomAspectLabel,
   bloomClipSeconds,
@@ -50,7 +50,7 @@ type Props = {
 
 export function BloomMotionPanel({ aperture, side }: Props) {
   const [placementId, setPlacementId] = useState("li-feed-square");
-  const [presetId, setPresetId] = useState("lift");
+  const [presetId, setPresetId] = useState("push-slow");
   const [wantSeconds, setWantSeconds] = useState(8);
   const [sceneId, setSceneId] = useState(LEGAL_BLOOM_SCENES[0]!.id);
   const [scopeAd, setScopeAd] = useState("all");
@@ -64,7 +64,14 @@ export function BloomMotionPanel({ aperture, side }: Props) {
   const preset = bloomPreset(presetId);
   const seconds = bloomClipSeconds(placement, wantSeconds);
   const scene = LEGAL_BLOOM_SCENES.find((s) => s.id === sceneId) ?? LEGAL_BLOOM_SCENES[0]!;
-  const format = useMemo(() => bloomVideoFormat(), []);
+  // Which video format this browser can write is only knowable in the browser,
+  // so it is settled after the first paint rather than during it.
+  const [format, setFormat] = useState<ReturnType<typeof bloomVideoFormat>>(null);
+  const [formatChecked, setFormatChecked] = useState(false);
+  useEffect(() => {
+    setFormat(bloomVideoFormat());
+    setFormatChecked(true);
+  }, []);
 
   useEffect(() => {
     setError(null);
@@ -223,10 +230,14 @@ export function BloomMotionPanel({ aperture, side }: Props) {
             onChange={(e) => setPresetId(e.target.value)}
             className="mt-1 block rounded-xl border border-black/15 bg-white px-3 py-2 text-sm normal-case tracking-normal text-[#03002C]"
           >
-            {BLOOM_MOTION_PRESETS.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.label}
-              </option>
+            {bloomPresetsByFamily().map((group) => (
+              <optgroup key={group.family} label={group.family}>
+                {group.presets.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.label}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </label>
@@ -261,7 +272,9 @@ export function BloomMotionPanel({ aperture, side }: Props) {
       </div>
 
       <p className="mt-3 text-xs leading-relaxed text-black/55">
-        {preset.says} {placement.platform} · {placement.placement} — {placement.w}×{placement.h} (
+        {preset.says} Pace: {preset.pacing}
+        {preset.loopSafe ? ", and the last frame matches the first so the post loops cleanly" : ""}
+        {preset.endHold > 0.15 ? ", holding a clean still at the end" : ""}. {placement.platform} · {placement.placement} — {placement.w}×{placement.h} (
         {bloomAspectLabel(placement.w, placement.h)}), written at about{" "}
         {bloomExpectedMb(placement, seconds)}MB, under this placement's {placement.platformCapMb}MB
         limit. {placement.safeTop || placement.safeBottom ? (
@@ -294,11 +307,11 @@ export function BloomMotionPanel({ aperture, side }: Props) {
               type="button"
               id="bloom-motion-one"
               onClick={downloadOne}
-              disabled={busy !== null || !format}
+              disabled={busy !== null || (formatChecked && !format)}
               className="inline-flex items-center gap-2 rounded-xl bg-[#003FC7] px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
             >
               <Film size={14} />
-              {busy === "one" ? "Recording…" : `Download this clip (.${format?.ext ?? "—"})`}
+              {busy === "one" ? "Recording…" : `Download this clip${format ? ` (.${format.ext})` : ""}`}
             </button>
           </div>
 
@@ -338,7 +351,7 @@ export function BloomMotionPanel({ aperture, side }: Props) {
                 type="button"
                 id="bloom-motion-pack"
                 onClick={downloadPack}
-                disabled={busy !== null || !format}
+                disabled={busy !== null || (formatChecked && !format)}
                 className="inline-flex items-center gap-2 rounded-xl bg-[#03002C] px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
               >
                 <Package size={14} />
@@ -356,7 +369,7 @@ export function BloomMotionPanel({ aperture, side }: Props) {
             </p>
           </div>
 
-          {!format ? (
+          {formatChecked && !format ? (
             <p className="text-xs text-[#E53D2E]">
               This browser cannot write video. Chrome, Edge or a recent Safari will record these
               clips; the still artwork downloads work everywhere.
