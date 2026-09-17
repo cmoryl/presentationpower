@@ -938,20 +938,6 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             className="absolute inset-0"
             style={{ background: `linear-gradient(to top, ${P.ground}94 0%, ${P.ground}00 46%)` }}
           />
-          <div className="absolute" style={{ left: u(1.6), bottom: u(1.4) }}>
-            <span
-              style={{
-                fontFamily: TY.eyebrow.family,
-                fontSize: u(T.micro),
-                letterSpacing: "0.24em",
-                textTransform: "uppercase",
-                color: P.ink,
-                opacity: 0.82,
-              }}
-            >
-              {`FRAME ${scene.no} / ${scene.pair}`}
-            </span>
-          </div>
         </div>
         <div
           className="absolute flex flex-col justify-between"
@@ -1104,24 +1090,6 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         {photo(cutSlide())}
         <div className="absolute inset-0" style={{ background: curtain(tall ? "bottom" : fromLeft ? "left" : "right", 0.55) }} />
         <div className="absolute inset-0" style={{ background: P.ground, clipPath: shape }} />
-        <div
-          aria-hidden
-          className="absolute"
-          style={{
-            top: wide ? "9%" : "7%",
-            right: fromLeft ? u(M) : "auto",
-            left: fromLeft ? "auto" : u(M),
-            fontFamily: TY.display.family,
-            fontWeight: 800,
-            fontSize: u(square ? 17 : 13),
-            lineHeight: 0.8,
-            letterSpacing: "-0.05em",
-            color: `${P.ink}2E`,
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          {scene.no}
-        </div>
         <div
           className="absolute"
           style={{ top: u(M), left: u(M), right: u(M * 5) }}
@@ -1305,8 +1273,6 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           >
             {/* A banner strip is only ~400px tall — the rotated label won't fit. */}
             {banner ? null : <span style={{ whiteSpace: "nowrap" }}>{scene.theme}</span>}
-            <span aria-hidden style={{ width: 1, height: u(6), background: `${P.ink}47` }} />
-            <span style={{ fontVariantNumeric: "tabular-nums", opacity: 0.7 }}>{scene.no}</span>
           </div>
         </div>
         <div
