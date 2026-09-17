@@ -118,7 +118,7 @@ function BloomMark({
     }
   } else {
     // A hatch running the same way as the diagonal the frame turns on.
-    const step = Math.min(W, H) * 0.085;
+    const step = Math.min(W, H) * 0.11;
     for (let i = -6; i < 22; i += 1) {
       const x = i * step;
       parts.push(
@@ -251,7 +251,7 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
         colour={C.type}
         boxW={boxW}
         boxH={boxH}
-        pad={short * 0.13}
+        pad={short * 0.06}
         lean={lean}
       />
       {/* the picture, cut to the master frame: two diagonal corners turned, two square */}
