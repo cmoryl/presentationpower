@@ -58,6 +58,8 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
   const strokePx = Math.max(1.5, short * 0.008);
   const headPx = L.headPx * short;
   const supportPx = L.supportPx * short;
+  // the call-out word may be set larger, but never smaller than the line it sits in
+  const turnEm = Math.max(1, L.turnEm ?? 1.62);
 
   return (
     <div
@@ -143,7 +145,7 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
             color: P.ink,
             fontSize: `${headPx}px`,
             // the turning word is set much larger, so the line needs air under it
-            lineHeight: headPx > short * 0.12 ? 1.14 : 1.2,
+            lineHeight: headPx * turnEm > short * 0.19 ? 1.14 : 1.2,
             letterSpacing: "-0.015em",
             maxWidth: "100%",
             textWrap: "balance",
@@ -155,12 +157,12 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
               display: "inline-block",
               fontStyle: "italic",
               color: C.type,
-              fontSize: "1.62em",
+              fontSize: `${turnEm}em`,
               lineHeight: 0.92,
               letterSpacing: "-0.028em",
               // it sits slightly lower than the roman line so the big italic
               // reads as the called-out word rather than a broken line
-              transform: "translateY(0.055em)",
+              transform: turnEm > 1.15 ? "translateY(0.055em)" : "none",
             }}
           >
             {scene.turn}

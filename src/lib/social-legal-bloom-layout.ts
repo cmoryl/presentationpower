@@ -25,6 +25,12 @@ export type BloomAdLayout = {
   headPx: number;
   /** Supporting line size as a fraction of the trim's short edge. */
   supportPx: number;
+  /**
+   * The turning word's size, as a multiple of the rest of the headline.
+   * Never below 1 — the call-out word may match the line but never shrink
+   * under it.
+   */
+  turnEm?: number;
   /** Lockup height as a fraction of the short edge, plus its corner offsets. */
   lockup: { x: number; y: number; h: number };
 };
