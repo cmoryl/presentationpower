@@ -1718,6 +1718,7 @@ function DeckEditor() {
                               title={
                                 active.variantId === "MV-SHOW-LAPTOP" ||
                                 active.variantId === "MV-SHOW-MONITOR" ||
+                                active.variantId === "MV-SHOW-PHONE" ||
                                 active.variantId === "MV-SHOW-DEVICE-QUAD"
                                   ? "Device screen image"
                                   : undefined

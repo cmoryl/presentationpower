@@ -20,21 +20,25 @@
 
 import type { CSSProperties, ReactNode } from "react";
 
-export type DeviceKind = "laptop" | "monitor";
+export type DeviceKind = "laptop" | "monitor" | "phone";
 export type DeviceTone = "graphite" | "silver" | "ink";
 
-/** Screen aspect per device — laptop lids are taller than desktop panels. */
+/** Screen aspect per device — laptop lids are taller than desktop panels, and a
+ *  handset is a tall portrait panel (19.5:9, the modern phone ratio). */
 export function deviceScreenAspect(kind: DeviceKind): number {
-  return kind === "laptop" ? 16 / 10 : 16 / 9;
+  if (kind === "laptop") return 16 / 10;
+  if (kind === "phone") return 9 / 19.5;
+  return 16 / 9;
 }
 
-/** Normalise loose authored values ("Laptop", "desktop", undefined). */
+/** Normalise loose authored values ("Laptop", "desktop", "mobile", undefined). */
 export function deviceKindFrom(value: unknown, fallback: DeviceKind = "laptop"): DeviceKind {
   const v = String(value ?? "")
     .trim()
     .toLowerCase();
   if (v === "laptop" || v === "notebook") return "laptop";
   if (v === "monitor" || v === "desktop" || v === "display") return "monitor";
+  if (v === "phone" || v === "mobile" || v === "handset" || v === "smartphone") return "phone";
   return fallback;
 }
 
@@ -105,7 +109,7 @@ export function DeviceFrame({
         aspectRatio: `${aspect}`,
         overflow: "hidden",
         background: "#05070D",
-        borderRadius: kind === "laptop" ? "0.6%" : "0.4%",
+        borderRadius: kind === "phone" ? "6%" : kind === "laptop" ? "0.6%" : "0.4%",
       }}
     >
       <div style={{ position: "absolute", inset: 0 }}>{children}</div>
@@ -155,20 +159,115 @@ export function DeviceFrame({
         />
       )}
 
+      {/* Side buttons — phone only, drawn behind the chassis edge */}
+      {kind === "phone" && (
+        <>
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              right: "-1.4%",
+              top: "17%",
+              width: "1.4%",
+              height: "9%",
+              borderRadius: 999,
+              background: c.deep,
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: "-1.4%",
+              top: "22%",
+              width: "1.4%",
+              height: "6%",
+              borderRadius: 999,
+              background: c.deep,
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: "-1.4%",
+              top: "31%",
+              width: "1.4%",
+              height: "6%",
+              borderRadius: 999,
+              background: c.deep,
+            }}
+          />
+        </>
+      )}
+
       {/* Lid / bezel */}
       <div
         style={{
           position: "relative",
-          padding: kind === "laptop" ? "1.1%" : "1.4%",
-          paddingBottom: kind === "laptop" ? "1.6%" : "3.2%",
+          padding: kind === "phone" ? "2.4%" : kind === "laptop" ? "1.1%" : "1.4%",
+          paddingBottom: kind === "phone" ? "2.4%" : kind === "laptop" ? "1.6%" : "3.2%",
           background: c.body,
           border: `1px solid ${c.edge}`,
-          borderRadius: kind === "laptop" ? "1.6%" : "1.1%",
+          borderRadius: kind === "phone" ? "9%" : kind === "laptop" ? "1.6%" : "1.1%",
           boxShadow: shadow ? "0 2% 4% rgba(3,0,44,0.18)" : undefined,
         }}
       >
+        {kind === "phone" && (
+          // Earpiece / camera island above the screen
+          <div
+            aria-hidden
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "4%",
+              paddingBottom: "1.6%",
+            }}
+          >
+            <span
+              style={{
+                width: "26%",
+                aspectRatio: "26 / 2",
+                borderRadius: 999,
+                background: c.ink,
+                opacity: 0.45,
+              }}
+            />
+            <span
+              style={{
+                width: "4%",
+                aspectRatio: "1",
+                borderRadius: "50%",
+                background: c.ink,
+                opacity: 0.6,
+              }}
+            />
+          </div>
+        )}
         {screen}
-        {kind === "laptop" ? (
+        {kind === "phone" ? (
+          // Home indicator
+          <div
+            aria-hidden
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingTop: "1.6%",
+            }}
+          >
+            <span
+              style={{
+                width: "34%",
+                aspectRatio: "34 / 1.2",
+                borderRadius: 999,
+                background: c.ink,
+                opacity: 0.5,
+              }}
+            />
+          </div>
+        ) : kind === "laptop" ? (
           // Lid chin + camera pinhole
           <div
             aria-hidden
@@ -213,7 +312,8 @@ export function DeviceFrame({
         )}
       </div>
 
-      {kind === "laptop" ? (
+
+      {kind === "phone" ? null : kind === "laptop" ? (
         <>
           {/* Hinge deck — wider than the lid and tapered, as seen head-on */}
           <div
@@ -295,9 +395,12 @@ export function DeviceFrame({
 export function DeviceScreenPlaceholder({
   accent = "#003FC7",
   label,
+  kind = "laptop",
 }: {
   accent?: string;
   label?: string;
+  /** Portrait handsets get a stacked app wireframe instead of the desktop one. */
+  kind?: DeviceKind;
 }) {
   const card = (h: string, o: number) => (
     <div
@@ -308,6 +411,150 @@ export function DeviceScreenPlaceholder({
       }}
     />
   );
+
+  if (kind === "phone") {
+    return (
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          flexDirection: "column",
+          gap: "3%",
+          padding: "6% 5%",
+          background: "linear-gradient(180deg, #FFFFFF 0%, #F2F5FB 100%)",
+        }}
+      >
+        {/* Status row */}
+        <div style={{ display: "flex", alignItems: "center", gap: "4%" }}>
+          <span
+            style={{
+              width: "22%",
+              height: "1.1%",
+              borderRadius: 999,
+              background: "rgba(3,0,44,0.18)",
+            }}
+          />
+          <span style={{ flex: 1 }} />
+          <span
+            style={{
+              width: "14%",
+              height: "1.1%",
+              borderRadius: 999,
+              background: "rgba(3,0,44,0.12)",
+            }}
+          />
+        </div>
+        {/* App bar */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4%",
+            padding: "3% 4%",
+            borderRadius: "4%",
+            background: `color-mix(in srgb, ${accent} 92%, #FFFFFF)`,
+          }}
+        >
+          <span
+            style={{ width: "10%", aspectRatio: "1", borderRadius: "30%", background: "#FFFFFF" }}
+          />
+          <span
+            style={{
+              flex: 1,
+              height: "18%",
+              borderRadius: 999,
+              background: "rgba(255,255,255,0.7)",
+            }}
+          />
+        </div>
+        {/* Hero card */}
+        <div
+          style={{
+            height: "22%",
+            borderRadius: "5%",
+            background: `color-mix(in srgb, ${accent} 26%, #FFFFFF)`,
+          }}
+        />
+        {/* Two tiles */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4%", height: "13%" }}>
+          {card("100%", 16)}
+          {card("100%", 10)}
+        </div>
+        {/* List rows */}
+        <div style={{ display: "grid", gap: "3%", flex: 1, alignContent: "start" }}>
+          {[16, 12, 12, 10, 10].map((o, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4%",
+                padding: "3%",
+                borderRadius: "4%",
+                background: "#FFFFFF",
+                border: "1px solid rgba(3,0,44,0.08)",
+              }}
+            >
+              <span
+                style={{
+                  width: "12%",
+                  aspectRatio: "1",
+                  borderRadius: "30%",
+                  background: `color-mix(in srgb, ${accent} ${o + 24}%, #FFFFFF)`,
+                }}
+              />
+              <span
+                style={{
+                  flex: 1,
+                  height: "16%",
+                  borderRadius: 999,
+                  background: `color-mix(in srgb, ${accent} ${o}%, #E7ECF6)`,
+                }}
+              />
+            </div>
+          ))}
+        </div>
+        {/* Tab bar */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "3% 8%",
+            borderRadius: "5%",
+            background: "#FFFFFF",
+            border: "1px solid rgba(3,0,44,0.08)",
+          }}
+        >
+          {[0.9, 0.4, 0.4, 0.4].map((o, i) => (
+            <span
+              key={i}
+              style={{
+                width: "9%",
+                aspectRatio: "1",
+                borderRadius: "30%",
+                background: `color-mix(in srgb, ${accent} ${o * 100}%, #E7ECF6)`,
+              }}
+            />
+          ))}
+        </div>
+        {label && (
+          <div
+            style={{
+              fontSize: "1.6%",
+              fontWeight: 700,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: accent,
+            }}
+          >
+            {label}
+          </div>
+        )}
+      </div>
+    );
+  }
   return (
     <div
       style={{

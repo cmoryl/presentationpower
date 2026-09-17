@@ -1,6 +1,6 @@
 {
-  "fingerprint": "e8601562",
-  "updatedAt": "2026-09-06T03:15:13.416Z",
+  "fingerprint": "cef3f6ec",
+  "updatedAt": "2026-09-17T17:43:09.208760Z",
   "cells": {
     "base@light": [
       "MV-BENTO-5",
@@ -172,6 +172,7 @@
       "MV-SHOW-DEVICE-QUAD",
       "MV-SHOW-LAPTOP",
       "MV-SHOW-MONITOR",
+      "MV-SHOW-PHONE",
       "MV-SOL-ARCHITECTURE",
       "MV-SOL-CAP-CARDS",
       "MV-SOL-FEATURE-LIST",
@@ -385,6 +386,7 @@
       "MV-SHOW-DEVICE-QUAD",
       "MV-SHOW-LAPTOP",
       "MV-SHOW-MONITOR",
+      "MV-SHOW-PHONE",
       "MV-SOL-ARCHITECTURE",
       "MV-SOL-CAP-CARDS",
       "MV-SOL-FEATURE-LIST",

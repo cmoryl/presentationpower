@@ -149,6 +149,7 @@ registerSlideModule({
     "MV-REC-NEXT",
     "MV-SHOW-LAPTOP",
     "MV-SHOW-MONITOR",
+    "MV-SHOW-PHONE",
     "MV-CLIENT-MATRIX",
     "MV-CLIENT-DETAIL-3",
     "MV-CLIENT-COMPARE",
@@ -780,10 +781,15 @@ registerSlideModule({
 
       // ── Extended covers ────────────────────────────────────────────────
       case "MV-SHOW-LAPTOP":
+      case "MV-SHOW-PHONE":
       case "MV-SHOW-MONITOR": {
         const kind = deviceKindFrom(
           c.deviceKind,
-          variant.id === "MV-SHOW-MONITOR" ? "monitor" : "laptop",
+          variant.id === "MV-SHOW-MONITOR"
+            ? "monitor"
+            : variant.id === "MV-SHOW-PHONE"
+              ? "phone"
+              : "laptop",
         );
         const tone = (["graphite", "silver", "ink"] as const).includes(
           s(c.deviceTone) as "graphite",
@@ -815,8 +821,38 @@ registerSlideModule({
             className="h-full w-full"
           />
         ) : (
-          <DeviceScreenPlaceholder accent="var(--slide-accent-text)" />
+          <DeviceScreenPlaceholder accent="var(--slide-accent-text)" kind={kind} />
         );
+
+        if (kind === "phone") {
+          return (
+            <SlideFrame brand={brand} pageNumber={pageNumber}>
+              <div className="grid h-full grid-cols-[1fr_0.62fr] items-center gap-20">
+                <div className="flex flex-col justify-center">
+                  {s(c.eyebrow) && <Kicker brand={brand}>{s(c.eyebrow)}</Kicker>}
+                  <div className="mt-4">
+                    <SlideTitle brand={brand} title={s(c.title)} />
+                  </div>
+                  <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={760}>
+                    {s(c.body)}
+                  </SupportingText>
+                  {s(c.caption) && (
+                    <MetaRow className="mt-12">
+                      <span>{s(c.caption)}</span>
+                    </MetaRow>
+                  )}
+                </div>
+                <div className="flex h-full items-center justify-center">
+                  <div className="w-[62%]">
+                    <DeviceFrame kind="phone" tone={tone} accent="var(--slide-accent-text)">
+                      {screen}
+                    </DeviceFrame>
+                  </div>
+                </div>
+              </div>
+            </SlideFrame>
+          );
+        }
 
         if (kind === "monitor") {
           return (

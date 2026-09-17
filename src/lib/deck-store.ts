@@ -2150,6 +2150,16 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         deviceKind: "laptop",
         deviceTone: "graphite",
       };
+    case "MV-SHOW-PHONE":
+      return {
+        eyebrow: "On mobile",
+        title: "The same program, in your pocket",
+        body: "Approvals, reviewer comments and delivery status travel with the team — no desktop needed to keep a launch moving.",
+        caption: "Element · mobile app",
+        mediaSeed: `${clientName}-phone-screen`,
+        deviceKind: "phone",
+        deviceTone: "ink",
+      };
     case "MV-SHOW-MONITOR":
       return {
         eyebrow: "In the platform",

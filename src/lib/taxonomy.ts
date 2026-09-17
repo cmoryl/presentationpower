@@ -2897,6 +2897,26 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     lockedFields: ["footer", "logo"],
   },
   {
+    id: "MV-SHOW-PHONE",
+    familyId: "MF-04",
+    name: "Mobile screen showcase",
+    description: "Phone mockup with the app screen alongside supporting copy",
+    permittedLayoutIds: ["LF-03"],
+    capacity: {
+      fields: {
+        eyebrow: { kind: "text", chars: 28 },
+        title: { kind: "text", chars: 60 },
+        body: { kind: "text", chars: 280 },
+        caption: { kind: "text", chars: 60 },
+        mediaSeed: { kind: "image" },
+      },
+      titleChars: 60,
+      bodyChars: 280,
+    },
+    editableFields: ["eyebrow", "title", "body", "caption", "mediaSeed"],
+    lockedFields: ["footer", "logo"],
+  },
+  {
     id: "MV-IMG-GRID-3",
     familyId: "MF-04",
     name: "Media trio",
