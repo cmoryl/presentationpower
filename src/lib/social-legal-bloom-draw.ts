@@ -633,7 +633,7 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
           }
         }
       } else if (kind === "blur-in") {
-        const s = acc.overshoot + (1 - acc.overshoot) * acc.progress;
+        const s = (acc.overshoot + (1 - acc.overshoot) * acc.progress) * groundBreath;
         const blurPx = (1 - acc.progress) * word.size * 0.16;
         ctx.globalAlpha = acc.progress;
         if (blurPx > 0.2 && typeof ctx.filter === "string") ctx.filter = `blur(${blurPx}px)`;
