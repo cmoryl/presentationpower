@@ -17,7 +17,7 @@ import {
 } from "@/lib/social-legal-bloom";
 import { bloomAutoLayout, type BloomAdLayout } from "@/lib/social-legal-bloom-layout";
 import {
-  BLOOM_MOTION_PRESETS,
+  bloomPresetsByFamily,
   BLOOM_PLACEMENTS,
   bloomAspectLabel,
   bloomClipSeconds,
@@ -50,7 +50,7 @@ type Props = {
 
 export function BloomMotionPanel({ aperture, side }: Props) {
   const [placementId, setPlacementId] = useState("li-feed-square");
-  const [presetId, setPresetId] = useState("lift");
+  const [presetId, setPresetId] = useState("push-slow");
   const [wantSeconds, setWantSeconds] = useState(8);
   const [sceneId, setSceneId] = useState(LEGAL_BLOOM_SCENES[0]!.id);
   const [scopeAd, setScopeAd] = useState("all");
@@ -223,10 +223,14 @@ export function BloomMotionPanel({ aperture, side }: Props) {
             onChange={(e) => setPresetId(e.target.value)}
             className="mt-1 block rounded-xl border border-black/15 bg-white px-3 py-2 text-sm normal-case tracking-normal text-[#03002C]"
           >
-            {BLOOM_MOTION_PRESETS.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.label}
-              </option>
+            {bloomPresetsByFamily().map((group) => (
+              <optgroup key={group.family} label={group.family}>
+                {group.presets.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.label}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </label>
@@ -261,7 +265,9 @@ export function BloomMotionPanel({ aperture, side }: Props) {
       </div>
 
       <p className="mt-3 text-xs leading-relaxed text-black/55">
-        {preset.says} {placement.platform} · {placement.placement} — {placement.w}×{placement.h} (
+        {preset.says} Pace: {preset.pacing}
+        {preset.loopSafe ? ", and the last frame matches the first so the post loops cleanly" : ""}
+        {preset.endHold > 0.15 ? ", holding a clean still at the end" : ""}. {placement.platform} · {placement.placement} — {placement.w}×{placement.h} (
         {bloomAspectLabel(placement.w, placement.h)}), written at about{" "}
         {bloomExpectedMb(placement, seconds)}MB, under this placement's {placement.platformCapMb}MB
         limit. {placement.safeTop || placement.safeBottom ? (
