@@ -1109,8 +1109,8 @@ const G = {
   syncopate: '"Syncopate", Geist, sans-serif',
   darker: '"Darker Grotesque", Geist, sans-serif',
   caveat: '"Caveat", "Segoe Script", cursive',
-  kalam: '"Kalam", "Segoe Script", cursive',
-  architect: '"Architects Daughter", "Segoe Script", cursive',
+  formalScript: '"Petit Formal Script", "Apple Chancery", cursive',
+
 } as const;
 
 export type AlongsideTypeSet = {
