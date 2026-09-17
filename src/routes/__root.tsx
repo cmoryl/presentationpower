@@ -162,7 +162,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,800;1,500;1,700&family=DM+Serif+Display:ital@0;1&family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;1,6..96,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Newsreader:ital,wght@0,400;0,600;1,400&family=Spectral:ital,wght@0,400;0,600;1,400&family=Bricolage+Grotesque:wght@400;600;800&family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Sans:wght@400;500;600;700&family=Familjen+Grotesk:ital,wght@0,400;0,600;0,700;1,400&family=Epilogue:ital,wght@0,400;0,600;0,700;1,400&family=Chivo:ital,wght@0,400;0,500;0,700;1,400&family=Big+Shoulders+Display:wght@600;700;800&family=Unbounded:wght@400;600;700&family=Gabarito:wght@400;500;600;700&display=swap",
       },
-
+      // Campaign type sets, advanced pairings.
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Italiana&family=Cardo:ital,wght@0,400;0,700;1,400&family=Yeseva+One&family=Rozha+One&family=Petrona:ital,wght@0,400;0,600;1,400&family=Michroma&family=Alegreya:ital,wght@0,400;0,700;1,400;1,500&family=Alegreya+Sans:wght@400;500;700&family=Fjalla+One&family=Vollkorn:ital,wght@0,400;0,600;1,400&family=Syncopate:wght@400;700&family=Darker+Grotesque:wght@500;700;800&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
