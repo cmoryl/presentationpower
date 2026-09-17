@@ -24,8 +24,10 @@ import {
   LEGAL_ALONGSIDE_SCENES,
   LEGAL_ALONGSIDE_SIZES,
   LEGAL_ALONGSIDE_TEMPLATES,
+  LEGAL_ALONGSIDE_TEMPLATE_FAMILIES,
   LEGAL_ALONGSIDE_TYPE,
   LEGAL_ALONGSIDE_TYPESETS,
+  alongsideTemplateLabel,
   applyAlongsideTypeSet,
   type AlongsideTemplateId,
 } from "@/lib/social-legal-alongside";
