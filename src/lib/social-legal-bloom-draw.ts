@@ -287,6 +287,37 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
   roundedPath(ctx, boxX, boxY, boxW, boxH, radii);
   ctx.save();
   ctx.clip();
+  // the uncovering: the frame's shape holds, the picture arrives inside it
+  const rv = Math.max(0, Math.min(1, m.frame.reveal));
+  if (rv < 1) {
+    ctx.beginPath();
+    if (m.frame.revealMode === "wipe-up") {
+      ctx.rect(boxX, boxY + boxH * (1 - rv), boxW, boxH * rv);
+    } else if (m.frame.revealMode === "wipe-side") {
+      const fromRight = L.copy.x > L.picture.x;
+      if (fromRight) ctx.rect(boxX + boxW * (1 - rv), boxY, boxW * rv, boxH);
+      else ctx.rect(boxX, boxY, boxW * rv, boxH);
+    } else if (m.frame.revealMode === "iris") {
+      const r = Math.hypot(boxW, boxH) * 0.52 * rv;
+      ctx.arc(boxX + boxW / 2, boxY + boxH / 2, Math.max(0.5, r), 0, Math.PI * 2);
+    } else if (m.frame.revealMode === "corner") {
+      // opens along the ad's own turned diagonal
+      const d = (boxW + boxH) * rv;
+      if (cut.endsWith("left")) {
+        ctx.moveTo(boxX, boxY);
+        ctx.lineTo(boxX + d, boxY);
+        ctx.lineTo(boxX, boxY + d);
+      } else {
+        ctx.moveTo(boxX + boxW, boxY);
+        ctx.lineTo(boxX + boxW - d, boxY);
+        ctx.lineTo(boxX + boxW, boxY + d);
+      }
+      ctx.closePath();
+    } else {
+      ctx.rect(boxX, boxY, boxW, boxH);
+    }
+    ctx.clip();
+  }
   const pw = assets.photo.naturalWidth || assets.photo.width || boxW;
   const ph = assets.photo.naturalHeight || assets.photo.height || boxH;
   const { fx, fy } = focusFractions(scene.focus);
@@ -366,32 +397,72 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
     ctx.restore();
   }
 
-  // the line rises word by word; the accent word settles in on its own
-  const romanCount = Math.max(1, head.words.filter((wd) => !wd.accent).length);
+  // the line arrives in the way the chosen motion calls for
+  const mode = m.words.mode;
+  const romanWords = head.words.filter((wd) => !wd.accent);
+  const romanCount = Math.max(1, romanWords.length);
+  const totalChars = Math.max(1, head.words.reduce((a, wd) => a + wd.text.length, 0));
+  const shownChars = Math.round(totalChars * m.words.progress);
+  let charsBefore = 0;
   let romanIndex = 0;
+
   for (const word of head.words) {
+    const charsThisWord = word.text.length;
+    const before = charsBefore;
+    charsBefore += charsThisWord;
+
+    // how far this particular word has arrived
+    let local: number;
+    let shown = word.text;
+    if (mode === "hold") {
+      local = 1;
+    } else if (mode === "fade") {
+      local = m.words.progress;
+    } else if (mode === "typewrite") {
+      const chars = Math.max(0, Math.min(charsThisWord, shownChars - before));
+      shown = word.text.slice(0, chars);
+      local = chars > 0 ? 1 : 0;
+    } else {
+      const index = word.accent ? romanIndex : romanIndex;
+      local = Math.max(0, Math.min(1, m.words.progress * (romanCount + 1) - index));
+    }
+    if (!word.accent) romanIndex += 1;
+
+    const drop = mode === "drop" ? -1 : 1;
+    const dy = short * m.words.rise * (1 - local) * drop;
+    const dx = short * m.words.slide * (1 - local);
+
     if (word.accent) {
-      if (m.turn.opacity <= 0.01) continue;
+      // the italic word keeps its own settle, on top of the line's arrival
+      const alpha = mode === "typewrite" || mode === "hold" ? local : m.turn.opacity;
+      if (alpha <= 0.01 || !shown) continue;
       ctx.save();
-      ctx.globalAlpha = m.turn.opacity;
+      ctx.globalAlpha = alpha;
       ctx.fillStyle = C.type;
       ctx.font = `italic 700 ${word.size}px ${HEAD_FAMILY}`;
-      const centreX = copyX + word.x + ctx.measureText(word.text).width / 2;
-      const baseY = top + word.y + short * m.turn.rise + word.size * 0.055;
+      const full = ctx.measureText(word.text).width;
+      const centreX = copyX + word.x + full / 2 + dx;
+      const baseY = top + word.y + short * m.turn.rise + dy + word.size * 0.055;
       ctx.translate(centreX, baseY);
       ctx.scale(m.turn.scale, m.turn.scale);
-      ctx.fillText(word.text, -ctx.measureText(word.text).width / 2, 0);
+      ctx.fillText(shown, -full / 2, 0);
       ctx.restore();
       continue;
     }
-    const local = Math.max(0, Math.min(1, m.words.progress * (romanCount + 1) - romanIndex));
-    romanIndex += 1;
-    if (local <= 0.01) continue;
+
+    if (local <= 0.01 || !shown) continue;
     ctx.save();
-    ctx.globalAlpha = local;
+    ctx.globalAlpha = mode === "typewrite" || mode === "hold" ? 1 : local;
     ctx.fillStyle = P.ink;
     ctx.font = `700 ${word.size}px ${HEAD_FAMILY}`;
-    ctx.fillText(word.text, copyX + word.x, top + word.y + short * m.words.rise * (1 - local));
+    const scaleIn = mode === "cascade" ? 0.94 + 0.06 * local : 1;
+    if (scaleIn !== 1) {
+      ctx.translate(copyX + word.x + dx, top + word.y + dy);
+      ctx.scale(scaleIn, scaleIn);
+      ctx.fillText(shown, 0, 0);
+    } else {
+      ctx.fillText(shown, copyX + word.x + dx, top + word.y + dy);
+    }
     ctx.restore();
   }
 
