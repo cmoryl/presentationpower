@@ -13,7 +13,9 @@ import {
   ArrowLeft,
   Download,
   Maximize2,
+  Minus,
   Move,
+  Plus,
   RotateCcw,
   X,
   ChevronLeft,
@@ -72,6 +74,8 @@ function BloomView() {
   const [side, setSide] = useState<BloomSide | "scene">("scene");
   const [zoom, setZoom] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  /** How close the large view sits: 1 = fits the window, 4 = four times that. */
+  const [viewZoom, setViewZoom] = useState(1);
   const [dlFormat, setDlFormat] = useState<"png" | "jpeg">("png");
   const [dlScale, setDlScale] = useState<number>(2);
   const [dlBusy, setDlBusy] = useState(false);
@@ -145,6 +149,8 @@ function BloomView() {
   }, [zoom]);
 
   useEffect(() => setDlError(null), [zoom, sizeId]);
+  // a new ad or a new trim starts from the fitted view again
+  useEffect(() => setViewZoom(1), [zoom, sizeId]);
 
   useEffect(() => {
     if (!zoom) return;
@@ -349,6 +355,34 @@ function BloomView() {
                   <RotateCcw size={12} /> Reset
                 </button>
               ) : null}
+              <div className="flex items-center gap-1 rounded-lg border border-white/25 px-1 py-0.5">
+                <button
+                  type="button"
+                  onClick={() => setViewZoom((z) => Math.max(0.25, Math.round((z - 0.25) * 100) / 100))}
+                  className="rounded-md px-1.5 py-1 text-white disabled:opacity-40"
+                  disabled={viewZoom <= 0.25}
+                  aria-label="Zoom out"
+                >
+                  <Minus size={12} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewZoom(1)}
+                  className="min-w-[3.2rem] rounded-md px-1 py-1 text-[11px] text-white"
+                  aria-label="Fit to the window"
+                >
+                  {Math.round(viewZoom * 100)}%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewZoom((z) => Math.min(4, Math.round((z + 0.25) * 100) / 100))}
+                  className="rounded-md px-1.5 py-1 text-white disabled:opacity-40"
+                  disabled={viewZoom >= 4}
+                  aria-label="Zoom in"
+                >
+                  <Plus size={12} />
+                </button>
+              </div>
               <select
                 value={dlFormat}
                 onChange={(e) => setDlFormat(e.target.value as "png" | "jpeg")}
@@ -437,7 +471,7 @@ function BloomView() {
 
           <div className="mt-4 min-h-0 flex-1 overflow-auto">
             <div className="mx-auto max-w-6xl">
-              <Scaled w={size.w} h={size.h}>
+              <Scaled w={size.w} h={size.h} factor={viewZoom}>
                 {(scale) => (
                   <div style={{ position: "relative", width: size.w, height: size.h }}>
                     <div ref={exportRef}>
@@ -478,33 +512,46 @@ function BloomView() {
   );
 }
 
-/** Holds an artwork at its true pixel size and scales it to the box it is in. */
+/**
+ * Holds an artwork at its true pixel size and scales it to the box it is in.
+ * `factor` multiplies that fitted scale, so 1 = fits the width and 2 = twice as
+ * close; anything over 1 overflows and the scrolling parent takes over.
+ */
 function Scaled({
   w,
   h,
+  factor = 1,
   children,
 }: {
   w: number;
   h: number;
+  factor?: number;
   children: (scale: number) => React.ReactNode;
 }) {
   const box = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.4);
+  const [fitScale, setFitScale] = useState(0.4);
   useEffect(() => {
     const el = box.current;
     if (!el) return;
     // a zero-width box (a hidden or not-yet-laid-out panel) would give a scale of
-    // 0, which makes the drag handles unusable, so it is floored.
-    const fit = () => setScale(Math.max(0.02, el.clientWidth / w));
+    // 0, which makes the drag handles unusable, so it is floored. The width comes
+    // from the parent because this wrapper itself grows when zoomed in.
+    const fit = () =>
+      setFitScale(Math.max(0.02, (el.parentElement?.clientWidth || el.clientWidth) / w));
     fit();
     const ro = new ResizeObserver(fit);
-    ro.observe(el);
+    ro.observe(el.parentElement ?? el);
     return () => ro.disconnect();
   }, [w]);
+  const scale = fitScale * factor;
   return (
-    <div ref={box} style={{ width: "100%", height: h * scale, overflow: "hidden" }}>
-      <div style={{ width: w, height: h, transform: `scale(${scale})`, transformOrigin: "top left" }}>
-        {children(scale)}
+    <div ref={box} style={{ width: "fit-content", minWidth: "100%" }}>
+      <div style={{ width: w * scale, height: h * scale, overflow: "hidden" }}>
+        <div
+          style={{ width: w, height: h, transform: `scale(${scale})`, transformOrigin: "top left" }}
+        >
+          {children(scale)}
+        </div>
       </div>
     </div>
   );
