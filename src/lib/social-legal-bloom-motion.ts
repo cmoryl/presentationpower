@@ -822,6 +822,13 @@ export type BloomMotionFrame = {
   logo: { opacity: number; rise: number };
   /** -1 when no sweep, otherwise 0–1 across the picture. */
   sweep: number;
+  /**
+   * The whole shot's intro and outro smoothing: the ad eases up out of the
+   * ground at the top of the clip and settles to a rest at the end, so no clip
+   * starts or stops abruptly. Loop-safe presets keep this flat at 1 so their
+   * first and last frames still match exactly.
+   */
+  shot: { opacity: number; scale: number };
 };
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
@@ -892,6 +899,20 @@ export function bloomMotionFrame(
     seg(p, Math.min(0.7, start + span + 0.06), Math.min(0.98, start + span + 0.32)),
   );
 
+  // Intro and outro smoothing across the whole shot. Short clips get a shorter
+  // ease so the smoothing never eats the arrival it is meant to soften.
+  const introSec = Math.min(0.55, dur * 0.14);
+  const outroSec = Math.min(0.7, dur * 0.16);
+  const introIn = easeOut(clamp01(time / Math.max(0.08, introSec)));
+  const outroIn = easeInOut(clamp01((dur - time) / Math.max(0.08, outroSec)));
+  const shot = preset.loopSafe
+    ? { opacity: 1, scale: 1 }
+    : {
+        opacity: clamp01(0.06 + 0.94 * introIn),
+        // eases up a touch oversized, then settles a hair in on the way out
+        scale: 1 + 0.014 * (1 - introIn) - 0.006 * (1 - outroIn),
+      };
+
   // The aura's own slow life: whole sine cycles across the clip, so the closing
   // frame sits exactly where the opening one did and a loop never jumps.
   const aura = Math.sin(raw * Math.PI * 2);
@@ -955,6 +976,7 @@ export function bloomMotionFrame(
     support: { opacity: supportIn, rise: (1 - supportIn) * preset.text.rise * 0.7 },
     logo: { opacity: logoIn, rise: (1 - logoIn) * preset.text.rise * 0.4 },
     sweep: preset.sweep ? seg(p, 0.45, 0.86) : -1,
+    shot,
   };
 }
 

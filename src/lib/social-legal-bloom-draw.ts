@@ -207,6 +207,14 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
   ctx.fillStyle = P.ground;
   ctx.fillRect(0, 0, w, h);
 
+  // intro/outro smoothing for the whole composition
+  const shot = m.shot ?? { opacity: 1, scale: 1 };
+  if (shot.scale !== 1) {
+    ctx.translate(w / 2, h / 2);
+    ctx.scale(shot.scale, shot.scale);
+    ctx.translate(-w / 2, -h / 2);
+  }
+
   const bloomEm = Math.max(0, Math.min(3, L.bloomEm ?? 1));
   const scrimEm = Math.max(0, Math.min(2, L.scrimEm ?? 1));
   const splash = L.splashShape ?? "soft";
@@ -592,6 +600,15 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
       lh,
     );
     ctx.restore();
+  }
+
+  // the ease up out of the ground, and the settle back into it
+  if (shot.opacity < 0.999) {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = 1 - shot.opacity;
+    ctx.fillStyle = P.ground;
+    ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = 1;
   }
 
   ctx.restore();
