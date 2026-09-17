@@ -281,21 +281,11 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
 
   const cta = () => alphaRule(38);
 
-  const mark = (size = T.logo) =>
-    lockup ? (
-      <img
-        src={lockup}
-        alt="TransPerfect Legal"
-        style={{
-          height: u(size),
-          width: "auto",
-          maxWidth: u(22),
-          flexShrink: 0,
-          objectFit: "contain",
-          objectPosition: "right center",
-        }}
-      />
-    ) : null;
+  // The lockup is no longer laid out inline by each template — it is pinned to
+  // one corner of the frame (see cornerLockup below), so every ad in the set
+  // signs off in the same place.
+  const mark = (_size = T.logo): React.ReactNode => null;
+
 
   const footer = () => (
     <div className="flex w-full items-end justify-between" style={{ gap: u(3) }}>
