@@ -1340,11 +1340,11 @@ export const LEGAL_ALONGSIDE_TYPESETS: AlongsideTypeSet[] = [
   },
   {
     id: "hand",
-    label: "Written by hand",
-    note: "Caveat at marker scale — an adult hand, not a novelty face — with the turn in a Kalam brush and Instrument Sans holding the small type steady.",
+    label: "Written hand (restrained)",
+    note: "Caveat held at 500 and near-normal scale — a level adult hand, no flourish — with the turn in a Cormorant italic and Instrument Sans holding the small type steady.",
     faces: {
-      display: { family: G.caveat, weight: 700, tracking: "-0.006em", scale: 1.24 },
-      action: { family: G.kalam, weight: 700, scale: 1.12 },
+      display: { family: G.caveat, weight: 500, tracking: "0.004em", scale: 1.06 },
+      action: { family: G.cormorant, weight: 600, italic: true, scale: 0.96 },
       eyebrow: { family: G.instrumentSans, weight: 600, tracking: "0.28em" },
       support: { family: G.instrumentSans, weight: 400 },
       cta: { family: G.instrumentSans, weight: 600, tracking: "0.14em" },
@@ -1352,16 +1352,17 @@ export const LEGAL_ALONGSIDE_TYPESETS: AlongsideTypeSet[] = [
   },
   {
     id: "drafting",
-    label: "Drafting hand",
-    note: "Architects Daughter — a drawing-office hand, even and legible — with the turn written back in Caveat and Chivo under it.",
+    label: "Signed script",
+    note: "Petit Formal Script — a copperplate signing hand, formal rather than free — with the turn in Caveat and Chivo under it.",
     faces: {
-      display: { family: G.architect, weight: 400, tracking: "-0.012em", scale: 1.06 },
-      action: { family: G.caveat, weight: 700, scale: 1.22 },
+      display: { family: G.formalScript, weight: 400, tracking: "0.006em", scale: 0.94 },
+      action: { family: G.caveat, weight: 600, scale: 1.1 },
       eyebrow: { family: G.chivo, weight: 600, tracking: "0.3em" },
       support: { family: G.chivo, weight: 400 },
       cta: { family: G.chivo, weight: 600, tracking: "0.15em" },
     },
   },
+
 ];
 
 /** Re-voice a layout's house treatment in the chosen type set. */
