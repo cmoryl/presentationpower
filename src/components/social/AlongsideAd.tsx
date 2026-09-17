@@ -474,7 +474,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         maxWidth: "26em",
       }}
     >
-      {LEGAL_ALONGSIDE_CONCEPT.support}
+      {supportRun()}
     </div>
   );
 
