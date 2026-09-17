@@ -1059,7 +1059,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
               gap: u(2.4),
             }}
           >
-            <span>{LEGAL_ALONGSIDE_CONCEPT.division}</span>
+            <span style={{ whiteSpace: "nowrap" }}>{scene.theme}</span>
             <span aria-hidden style={{ width: 1, height: u(6), background: `${P.ink}47` }} />
             <span style={{ fontVariantNumeric: "tabular-nums", opacity: 0.7 }}>{scene.no}</span>
           </div>
