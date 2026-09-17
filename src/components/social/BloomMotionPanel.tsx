@@ -64,7 +64,10 @@ export function BloomMotionPanel({ aperture, side }: Props) {
   const preset = bloomPreset(presetId);
   const seconds = bloomClipSeconds(placement, wantSeconds);
   const scene = LEGAL_BLOOM_SCENES.find((s) => s.id === sceneId) ?? LEGAL_BLOOM_SCENES[0]!;
-  const format = useMemo(() => bloomVideoFormat(), []);
+  // Which video format this browser can write is only knowable in the browser,
+  // so it is settled after the first paint rather than during it.
+  const [format, setFormat] = useState<ReturnType<typeof bloomVideoFormat>>(null);
+  useEffect(() => setFormat(bloomVideoFormat()), []);
 
   useEffect(() => {
     setError(null);
@@ -304,7 +307,7 @@ export function BloomMotionPanel({ aperture, side }: Props) {
               className="inline-flex items-center gap-2 rounded-xl bg-[#003FC7] px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
             >
               <Film size={14} />
-              {busy === "one" ? "Recording…" : `Download this clip (.${format?.ext ?? "—"})`}
+              {busy === "one" ? "Recording…" : `Download this clip${format ? ` (.${format.ext})` : ""}`}
             </button>
           </div>
 
@@ -362,7 +365,7 @@ export function BloomMotionPanel({ aperture, side }: Props) {
             </p>
           </div>
 
-          {!format ? (
+          {format === null && typeof MediaRecorder === "undefined" ? (
             <p className="text-xs text-[#E53D2E]">
               This browser cannot write video. Chrome, Edge or a recent Safari will record these
               clips; the still artwork downloads work everywhere.
