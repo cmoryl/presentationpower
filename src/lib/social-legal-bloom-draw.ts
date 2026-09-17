@@ -181,6 +181,104 @@ function wrapBody(
   return out;
 }
 
+// ---------------------------------------------------------------------------
+// The ground's own quiet figure, drawn under the accent glow
+//
+// Semi-transparent panes cut to the SAME turned-corner shape as the picture
+// frame swirl, ripple and drift behind the aura. Everything here is blurred and
+// held at very low opacity: it should read as the page being alive, never as a
+// graphic element of its own.
+
+function drawBloomBackdrop(
+  ctx: CanvasRenderingContext2D,
+  o: {
+    w: number;
+    h: number;
+    short: number;
+    glow: string;
+    cut: BloomAperture;
+    b: NonNullable<BloomMotionFrame["backdrop"]>;
+    cx: number;
+    cy: number;
+    boxW: number;
+    boxH: number;
+    em: number;
+  },
+) {
+  const { b, short, glow, cx, cy, boxW, boxH, em } = o;
+  if (b.kind === "still" || b.strength <= 0) return;
+  const panes = Math.max(1, b.panes);
+  const power = b.strength * Math.max(0.35, Math.min(1.6, em));
+
+  ctx.save();
+  ctx.filter = `blur(${short * 0.05}px)`;
+
+  if (b.kind === "swirl") {
+    const orbit = short * 0.15;
+    for (let i = 0; i < panes; i += 1) {
+      const a = b.phase * Math.PI * 2 + (i / panes) * Math.PI * 2;
+      const px = cx + Math.cos(a) * orbit;
+      const py = cy + Math.sin(a) * orbit * 0.7;
+      const r = short * (0.34 + 0.06 * i);
+      const g = ctx.createRadialGradient(px, py, 0, px, py, r);
+      g.addColorStop(0, `${glow}${alphaHex(0.14 * power)}`);
+      g.addColorStop(0.55, `${glow}${alphaHex(0.06 * power)}`);
+      g.addColorStop(1, `${glow}00`);
+      ctx.fillStyle = g;
+      ctx.fillRect(px - r, py - r, r * 2, r * 2);
+    }
+  } else if (b.kind === "ripple" || b.kind === "echo") {
+    ctx.lineWidth = Math.max(1.5, short * (b.kind === "echo" ? 0.008 : 0.011));
+    for (let i = 0; i < panes; i += 1) {
+      const frac = (b.phase + i / panes) % 1;
+      const grow = b.kind === "echo" ? 1 + frac * 0.42 : 0.52 + frac * 0.95;
+      const pw = boxW * grow;
+      const ph = boxH * grow;
+      const alpha = Math.sin(Math.PI * frac) * (b.kind === "echo" ? 0.16 : 0.2) * power;
+      if (alpha <= 0.004) continue;
+      ctx.strokeStyle = `${glow}${alphaHex(alpha)}`;
+      roundedPath(ctx, cx - pw / 2, cy - ph / 2, pw, ph, bloomCornerRadii(o.cut, pw, ph));
+      ctx.stroke();
+    }
+  } else if (b.kind === "drift" || b.kind === "breathe") {
+    for (let i = 0; i < panes; i += 1) {
+      const lag = i / panes;
+      const wobble = Math.sin((b.phase + lag) * Math.PI * 2);
+      const wobbleB = Math.sin((b.phase + lag) * Math.PI * 4 + Math.PI / 3);
+      const grow = b.kind === "breathe" ? 1 + wobble * 0.05 : 1;
+      const pw = boxW * (0.78 + i * 0.16) * grow;
+      const ph = boxH * (0.78 + i * 0.16) * grow;
+      const dx = b.kind === "drift" ? wobble * short * 0.07 : wobble * short * 0.012;
+      const dy = b.kind === "drift" ? wobbleB * short * 0.05 : wobbleB * short * 0.01;
+      const alpha = (0.1 - i * 0.02) * power;
+      if (alpha <= 0.004) continue;
+      ctx.save();
+      ctx.translate(cx + dx, cy + dy);
+      ctx.rotate(wobble * 0.05);
+      ctx.fillStyle = `${glow}${alphaHex(alpha)}`;
+      roundedPath(ctx, -pw / 2, -ph / 2, pw, ph, bloomCornerRadii(o.cut, pw, ph));
+      ctx.fill();
+      ctx.restore();
+    }
+  } else if (b.kind === "tide") {
+    // a wide band of colour crossing diagonally; it fades to nothing at both
+    // ends of its pass, so a looping clip never shows it jump back
+    const alpha = Math.sin(Math.PI * b.phase) * 0.16 * power;
+    if (alpha > 0.004) {
+      const span = Math.hypot(o.w, o.h);
+      const at = -span * 0.3 + span * 1.6 * b.phase;
+      const g = ctx.createLinearGradient(at - span * 0.3, -span * 0.2, at + span * 0.3, o.h);
+      g.addColorStop(0, `${glow}00`);
+      g.addColorStop(0.5, `${glow}${alphaHex(alpha)}`);
+      g.addColorStop(1, `${glow}00`);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, o.w, o.h);
+    }
+  }
+
+  ctx.restore();
+}
+
 export type BloomDrawOptions = {
   scene: BloomScene;
   w: number;
@@ -191,6 +289,7 @@ export type BloomDrawOptions = {
   motion: BloomMotionFrame;
   assets: BloomDrawAssets;
 };
+
 
 /** Draw one frame of a moving ad, filling the whole canvas. */
 export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDrawOptions) {
