@@ -56,6 +56,8 @@ import {
   bloomMotionSpecCsv,
   bloomPreset,
   bloomPresetsByFamily,
+  BLOOM_ACCENT_MOTIONS,
+  bloomAccentMotion,
 } from "@/lib/social-legal-bloom-motion";
 import { recordBloomSceneClip } from "@/lib/social-legal-bloom-record";
 import { bloomVideoFormat, type BloomVideoFormat } from "@/lib/social-legal-bloom-video";
@@ -119,6 +121,7 @@ function BloomView() {
   const [packMotion, setPackMotion] = useState<"off" | "key" | "all">("key");
   const [packMotionPreset, setPackMotionPreset] = useState<string>("push-slow");
   const [packMotionSeconds, setPackMotionSeconds] = useState<number>(8);
+  const [packAccentMotion, setPackAccentMotion] = useState<string>("preset");
   const [videoFormat, setVideoFormat] = useState<BloomVideoFormat | null>(null);
   const recordRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -332,6 +335,7 @@ function BloomView() {
               scene,
               placement: p,
               preset,
+              accentMotionId: packAccentMotion,
               wantSeconds: packMotionSeconds,
               fps: 30,
               format: videoFormat,
@@ -352,7 +356,7 @@ function BloomView() {
         root.file("04_Motion/placements.csv", bloomMotionSpecCsv(motionPlacements, packMotionSeconds, 30));
         motion = {
           paths,
-          presetLabel: preset.label,
+          presetLabel: `${preset.label} · accent word: ${bloomAccentMotion(packAccentMotion).label}`,
           seconds: packMotionSeconds,
           fps: 30,
           ext: videoFormat.ext,
@@ -560,6 +564,19 @@ function BloomView() {
                             </option>
                           ))}
                         </optgroup>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field label="Accent word">
+                    <select
+                      value={packAccentMotion}
+                      onChange={(e) => setPackAccentMotion(e.target.value)}
+                      className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm"
+                    >
+                      {BLOOM_ACCENT_MOTIONS.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.label}
+                        </option>
                       ))}
                     </select>
                   </Field>

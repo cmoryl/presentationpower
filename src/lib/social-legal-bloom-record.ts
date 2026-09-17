@@ -25,6 +25,8 @@ export type RecordSceneClipArgs = {
   scene: BloomScene;
   placement: BloomPlacement;
   preset: BloomMotionPreset;
+  /** How the italic accent word arrives. */
+  accentMotionId?: string;
   /** Wanted length; capped to what the placement allows. */
   wantSeconds: number;
   fps: number;
@@ -66,7 +68,7 @@ export async function recordBloomSceneClip(args: RecordSceneClipArgs): Promise<B
         aperture: cut,
         side: copySide,
         layout,
-        motion: bloomMotionFrame(preset, t, clip),
+        motion: bloomMotionFrame(preset, t, clip, args.accentMotionId),
         assets,
       }),
   });

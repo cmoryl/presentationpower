@@ -631,6 +631,149 @@ export function bloomPreset(id: string): BloomMotionPreset {
   return BLOOM_MOTION_PRESETS.find((p) => p.id === id) ?? BLOOM_MOTION_PRESETS[0]!;
 }
 
+// ---------------------------------------------------------------------------
+// The accent word's own arrival
+//
+// The italic call-out is the point of the ad, so it gets its own choice of
+// arrival, set apart from the rest of the line. "As the motion sets" keeps the
+// preset's settle; everything else takes the word letter by letter or draws it
+// on. The word never ends smaller than the rest of the headline: these settings
+// change how it arrives, never its final size.
+
+export type BloomAccentKind =
+  | "settle"
+  | "write-on"
+  | "letters-rise"
+  | "letters-drop"
+  | "letters-pop"
+  | "letters-spread"
+  | "type"
+  | "underline"
+  | "blur-in"
+  | "hold";
+
+export type BloomAccentMotion = {
+  id: string;
+  label: string;
+  says: string;
+  kind: BloomAccentKind;
+  /** How much bigger the word starts, when the kind settles as a whole. */
+  overshoot: number;
+  /** Share of the word's arrival window each letter waits behind the last. */
+  letterStagger: number;
+  /** Where the word's own arrival sits relative to the line's, in clip shares. */
+  delay: number;
+  /** Length of the word's arrival, as a share of the clip. */
+  span: number;
+};
+
+export const BLOOM_ACCENT_MOTIONS: BloomAccentMotion[] = [
+  {
+    id: "preset",
+    label: "As the motion sets it",
+    says: "The word settles from slightly larger, in step with the chosen motion.",
+    kind: "settle",
+    overshoot: 0,
+    letterStagger: 0,
+    delay: 0,
+    span: 0,
+  },
+  {
+    id: "write-on",
+    label: "Written on",
+    says: "The word is drawn on from its first letter to its last, as if written.",
+    kind: "write-on",
+    overshoot: 1,
+    letterStagger: 0,
+    delay: 0.02,
+    span: 0.36,
+  },
+  {
+    id: "write-underline",
+    label: "Written on with a drawn rule",
+    says: "The word is written on and an accent rule is drawn under it.",
+    kind: "underline",
+    overshoot: 1,
+    letterStagger: 0,
+    delay: 0.02,
+    span: 0.4,
+  },
+  {
+    id: "letters-rise",
+    label: "Letter by letter, rising",
+    says: "Each letter lifts into place one clearly after the other.",
+    kind: "letters-rise",
+    overshoot: 1,
+    letterStagger: 0.5,
+    delay: 0.02,
+    span: 0.34,
+  },
+  {
+    id: "letters-drop",
+    label: "Letter by letter, dropping",
+    says: "Each letter falls in and settles, front to back.",
+    kind: "letters-drop",
+    overshoot: 1,
+    letterStagger: 0.5,
+    delay: 0.02,
+    span: 0.34,
+  },
+  {
+    id: "letters-pop",
+    label: "Letter by letter, popping",
+    says: "Each letter arrives a touch oversized and settles.",
+    kind: "letters-pop",
+    overshoot: 1.5,
+    letterStagger: 0.45,
+    delay: 0.02,
+    span: 0.32,
+  },
+  {
+    id: "letters-spread",
+    label: "Letters drawing together",
+    says: "The letters start apart and close into the word.",
+    kind: "letters-spread",
+    overshoot: 1,
+    letterStagger: 0.2,
+    delay: 0.02,
+    span: 0.38,
+  },
+  {
+    id: "type",
+    label: "Typed out",
+    says: "The word is typed a letter at a time, with no easing.",
+    kind: "type",
+    overshoot: 1,
+    letterStagger: 0.9,
+    delay: 0.02,
+    span: 0.3,
+  },
+  {
+    id: "blur-in",
+    label: "Focus pull",
+    says: "The word comes out of soft focus and sharpens.",
+    kind: "blur-in",
+    overshoot: 1.1,
+    letterStagger: 0,
+    delay: 0.03,
+    span: 0.3,
+  },
+  {
+    id: "hero-hold",
+    label: "Held from the first frame",
+    says: "The word is there from the start; the rest of the line arrives around it.",
+    kind: "hold",
+    overshoot: 1,
+    letterStagger: 0,
+    delay: 0,
+    span: 0,
+  },
+];
+
+export function bloomAccentMotion(id: string | undefined): BloomAccentMotion {
+  return BLOOM_ACCENT_MOTIONS.find((a) => a.id === id) ?? BLOOM_ACCENT_MOTIONS[0]!;
+}
+
 /** The presets grouped by family, in the order above. */
 export function bloomPresetsByFamily(): { family: BloomMotionFamily; presets: BloomMotionPreset[] }[] {
   const out: { family: BloomMotionFamily; presets: BloomMotionPreset[] }[] = [];
@@ -664,6 +807,17 @@ export type BloomMotionFrame = {
   /** How the line arrives, and how far through that arrival this moment is. */
   words: { progress: number; rise: number; slide: number; mode: BloomTextMode };
   turn: { scale: number; opacity: number; rise: number };
+  /**
+   * The accent word's own arrival. `progress` is 0–1 through that arrival;
+   * `kind` tells the renderer how to spend it (letter by letter, drawn on,
+   * out of focus). "settle" means follow `turn`, as the preset always did.
+   */
+  accent: {
+    kind: BloomAccentKind;
+    progress: number;
+    letterStagger: number;
+    overshoot: number;
+  };
   support: { opacity: number; rise: number };
   logo: { opacity: number; rise: number };
   /** -1 when no sweep, otherwise 0–1 across the picture. */
@@ -688,6 +842,7 @@ export function bloomMotionFrame(
   preset: BloomMotionPreset,
   t: number,
   seconds: number,
+  accentMotionId?: string,
 ): BloomMotionFrame {
   const dur = Math.max(0.5, seconds);
   const time = Math.max(0, Math.min(dur, t));
@@ -742,6 +897,26 @@ export function bloomMotionFrame(
   const aura = Math.sin(raw * Math.PI * 2);
   const auraB = Math.sin(raw * Math.PI * 4 + Math.PI / 3);
 
+  // The accent word's own arrival, when one has been chosen. It always finishes
+  // before the clip does, and a held word is simply there from the first frame.
+  const accentSet = bloomAccentMotion(accentMotionId);
+  const accentFrom = Math.min(0.8, start + span * 0.3 + accentSet.delay);
+  const accentTo = Math.min(0.94, accentFrom + Math.max(0.08, accentSet.span));
+  const accentRaw = seg(p, accentFrom, accentTo);
+  const accentState = {
+    kind: accentSet.kind,
+    progress:
+      accentSet.kind === "hold" || preset.text.mode === "hold"
+        ? 1
+        : accentSet.kind === "settle"
+          ? turnIn
+          : accentSet.kind === "type"
+            ? accentRaw
+            : easeOut(accentRaw),
+    letterStagger: accentSet.letterStagger,
+    overshoot: accentSet.kind === "settle" ? preset.turnOvershoot : accentSet.overshoot,
+  };
+
   return {
     photo,
 
@@ -776,6 +951,7 @@ export function bloomMotionFrame(
       opacity: turnIn,
       rise: (1 - turnIn) * preset.text.rise * 1.4,
     },
+    accent: accentState,
     support: { opacity: supportIn, rise: (1 - supportIn) * preset.text.rise * 0.7 },
     logo: { opacity: logoIn, rise: (1 - logoIn) * preset.text.rise * 0.4 },
     sweep: preset.sweep ? seg(p, 0.45, 0.86) : -1,

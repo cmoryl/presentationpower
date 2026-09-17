@@ -23,6 +23,8 @@ type Props = {
   side?: BloomSide;
   layout?: BloomAdLayout;
   preset: BloomMotionPreset;
+  /** How the italic accent word arrives; falls back to the preset's own settle. */
+  accentMotionId?: string;
   seconds: number;
   /** Runs on a loop while true; holds the last frame while false. */
   playing?: boolean;
@@ -39,6 +41,7 @@ export function BloomMotionAd({
   side,
   layout,
   preset,
+  accentMotionId,
   seconds,
   playing = true,
   onCanvas,
@@ -73,7 +76,7 @@ export function BloomMotionAd({
           aperture,
           side,
           layout,
-          motion: bloomMotionFrame(preset, t, seconds),
+          motion: bloomMotionFrame(preset, t, seconds, accentMotionId),
           assets,
         });
       };
