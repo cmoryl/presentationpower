@@ -944,6 +944,21 @@ export type BloomMotionFrame = {
   /** -1 when no sweep, otherwise 0–1 across the picture. */
   sweep: number;
   /**
+   * The ground's own quiet life behind the aura. `phase` is 0–1 through the
+   * figure's whole cycle, `turn` and `wave` are matched sine oscillators, and
+   * `pulse` is the shared breath the accent word borrows a hair of.
+   */
+  backdrop: {
+    kind: BloomBackdropKind;
+    strength: number;
+    panes: number;
+    phase: number;
+    turn: number;
+    wave: number;
+    pulse: number;
+  };
+
+  /**
    * The whole shot's intro and outro smoothing: the ad eases up out of the
    * ground at the top of the clip and settles to a rest at the end, so no clip
    * starts or stops abruptly. Loop-safe presets keep this flat at 1 so their
