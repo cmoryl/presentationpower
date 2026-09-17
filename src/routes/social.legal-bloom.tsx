@@ -478,33 +478,46 @@ function BloomView() {
   );
 }
 
-/** Holds an artwork at its true pixel size and scales it to the box it is in. */
+/**
+ * Holds an artwork at its true pixel size and scales it to the box it is in.
+ * `factor` multiplies that fitted scale, so 1 = fits the width and 2 = twice as
+ * close; anything over 1 overflows and the scrolling parent takes over.
+ */
 function Scaled({
   w,
   h,
+  factor = 1,
   children,
 }: {
   w: number;
   h: number;
+  factor?: number;
   children: (scale: number) => React.ReactNode;
 }) {
   const box = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.4);
+  const [fitScale, setFitScale] = useState(0.4);
   useEffect(() => {
     const el = box.current;
     if (!el) return;
     // a zero-width box (a hidden or not-yet-laid-out panel) would give a scale of
-    // 0, which makes the drag handles unusable, so it is floored.
-    const fit = () => setScale(Math.max(0.02, el.clientWidth / w));
+    // 0, which makes the drag handles unusable, so it is floored. The width comes
+    // from the parent because this wrapper itself grows when zoomed in.
+    const fit = () =>
+      setFitScale(Math.max(0.02, (el.parentElement?.clientWidth || el.clientWidth) / w));
     fit();
     const ro = new ResizeObserver(fit);
-    ro.observe(el);
+    ro.observe(el.parentElement ?? el);
     return () => ro.disconnect();
   }, [w]);
+  const scale = fitScale * factor;
   return (
-    <div ref={box} style={{ width: "100%", height: h * scale, overflow: "hidden" }}>
-      <div style={{ width: w, height: h, transform: `scale(${scale})`, transformOrigin: "top left" }}>
-        {children(scale)}
+    <div ref={box} style={{ width: "fit-content", minWidth: "100%" }}>
+      <div style={{ width: w * scale, height: h * scale, overflow: "hidden" }}>
+        <div
+          style={{ width: w, height: h, transform: `scale(${scale})`, transformOrigin: "top left" }}
+        >
+          {children(scale)}
+        </div>
       </div>
     </div>
   );
