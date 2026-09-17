@@ -27,6 +27,8 @@ import {
   LEGAL_ALONGSIDE_TEMPLATE_FAMILIES,
   LEGAL_ALONGSIDE_TYPE,
   LEGAL_ALONGSIDE_TYPESETS,
+  alongsideSceneType,
+
   alongsideTemplateLabel,
   applyAlongsideTypeSet,
   type AlongsideTemplateId,
