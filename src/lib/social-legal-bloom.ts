@@ -47,15 +47,55 @@ export const LEGAL_BLOOM_COLOURS: Record<string, BloomColour> = {
   blue: { id: "blue", label: "Brand blue", glow: "#3C6BFF", type: "#003FC7" },
 };
 
-/** The cut of the picture window. */
-export type BloomAperture = "rounded" | "arch" | "lozenge" | "soft";
+/**
+ * The cut of the picture window, taken from the Canva master: a plain rectangle
+ * with ONE end turned right over and the remaining corners left almost square.
+ * The turned end is where the colour bloom leans out.
+ */
+export type BloomAperture = "turned" | "d-right" | "d-left" | "arch";
 
 export const LEGAL_BLOOM_APERTURES: { id: BloomAperture; label: string }[] = [
-  { id: "rounded", label: "Rounded window" },
-  { id: "arch", label: "Arch (one end turned)" },
-  { id: "lozenge", label: "Lozenge" },
-  { id: "soft", label: "Soft corner" },
+  { id: "turned", label: "One corner turned" },
+  { id: "d-right", label: "Right end turned" },
+  { id: "d-left", label: "Left end turned" },
+  { id: "arch", label: "Top turned (arch)" },
 ];
+
+/**
+ * Corner radii for a picture box, as a CSS `border-radius` shorthand.
+ * `px` is the box's SHORT edge — the turned end is half of it, so the end reads
+ * as a true half-round; every other corner keeps the master's near-square nick.
+ */
+export function bloomShapeRadius(aperture: BloomAperture, px: number): string {
+  const round = `${px * 0.5}px`;
+  const nick = `${Math.max(2, px * 0.014)}px`;
+  switch (aperture) {
+    case "d-right":
+      return `${nick} ${round} ${round} ${nick}`;
+    case "d-left":
+      return `${round} ${nick} ${nick} ${round}`;
+    case "arch":
+      return `${round} ${round} ${nick} ${nick}`;
+    case "turned":
+    default:
+      return `${nick} ${px * 0.42}px ${nick} ${nick}`;
+  }
+}
+
+/** Which end of the picture the bloom leans out of, for a given cut. */
+export function bloomLean(aperture: BloomAperture): { x: number; y: number } {
+  switch (aperture) {
+    case "d-left":
+      return { x: -1, y: -0.35 };
+    case "arch":
+      return { x: 0.15, y: -1 };
+    case "d-right":
+      return { x: 1, y: -0.3 };
+    case "turned":
+    default:
+      return { x: 0.85, y: -0.75 };
+  }
+}
 
 /** Which side of the frame the copy holds. */
 export type BloomSide = "left" | "right";
