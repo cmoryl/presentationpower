@@ -9,6 +9,7 @@ import {
   bloomCornerRadii,
   bloomExpectedMb,
   bloomMotionFrame,
+  BLOOM_ACCENT_MOTIONS,
   bloomMotionPath,
   bloomMotionReadme,
   bloomMotionSpecCsv,
@@ -207,5 +208,38 @@ describe("bloom motion geometry and safe bands", () => {
     expect(safe.copy.y + safe.copy.h).toBeCloseTo(0.8, 5);
     expect(safe.lockup.y).toBeCloseTo(0.25, 5);
     expect(bloomSafeLayout(base, 0, 0)).toBe(base);
+  });
+});
+
+describe("accent word motion", () => {
+  it("every accent motion finishes composed before the clip ends", () => {
+    for (const a of BLOOM_ACCENT_MOTIONS) {
+      const f = bloomMotionFrame(bloomPreset("push-slow"), 8, 8, a.id);
+      expect(f.accent.kind).toBe(a.kind);
+      expect(f.accent.progress).toBeCloseTo(1, 3);
+    }
+  });
+
+  it("a held accent word is there from the first frame", () => {
+    const f = bloomMotionFrame(bloomPreset("push-slow"), 0, 8, "hero-hold");
+    expect(f.accent.progress).toBe(1);
+  });
+
+  it("an unknown id falls back to the preset's own settle", () => {
+    const f = bloomMotionFrame(bloomPreset("push-slow"), 4, 8, "nope");
+    expect(f.accent.kind).toBe("settle");
+    expect(f.accent.overshoot).toBeCloseTo(bloomPreset("push-slow").turnOvershoot, 5);
+  });
+
+  it("letter motions run forward and never past one", () => {
+    for (const a of BLOOM_ACCENT_MOTIONS) {
+      let last = -1;
+      for (let i = 0; i <= 40; i += 1) {
+        const f = bloomMotionFrame(bloomPreset("word-cascade"), (i / 40) * 6, 6, a.id);
+        expect(f.accent.progress).toBeGreaterThanOrEqual(last - 1e-6);
+        expect(f.accent.progress).toBeLessThanOrEqual(1 + 1e-9);
+        last = f.accent.progress;
+      }
+    }
   });
 });
