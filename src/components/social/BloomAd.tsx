@@ -37,8 +37,7 @@ type Props = {
 };
 
 export function BloomAd({ scene, w, h, aperture, side }: Props) {
-  const logos = getDivisionLogos("bm-tp-legal");
-  const lockup = logos?.color ?? logos?.white;
+  const lockup = tpLegalBlack;
   const C = bloomColour(scene);
   const cut = aperture ?? scene.aperture;
   const copySide = side ?? scene.side;
