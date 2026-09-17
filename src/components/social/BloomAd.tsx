@@ -13,7 +13,11 @@
 // Every measure is derived from the frame's short edge, so a banner and a story
 // hold the same proportions.
 
-import { getDivisionLogos } from "@/lib/division-logos";
+import tpLegalBlackRaw from "@/assets/legal-bloom/tp-legal-black.svg?raw";
+
+// The single-line Legal lockup, converted to solid black, inlined so the
+// downloadable renders carry it without a second network fetch.
+const tpLegalBlack = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(tpLegalBlackRaw)}`;
 import {
   bloomColour,
   bloomFrameAspect,
@@ -37,8 +41,7 @@ type Props = {
 };
 
 export function BloomAd({ scene, w, h, aperture, side }: Props) {
-  const logos = getDivisionLogos("bm-tp-legal");
-  const lockup = logos?.color ?? logos?.white;
+  const lockup = tpLegalBlack;
   const C = bloomColour(scene);
   const cut = aperture ?? scene.aperture;
   const copySide = side ?? scene.side;
@@ -244,7 +247,7 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
         {picture}
       </div>
 
-      {/* the division lockup — one corner, never typed out */}
+      {/* the division lockup — black single line, always bottom left */}
       {lockup ? (
         <img
           src={lockup}
@@ -252,13 +255,8 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
           aria-hidden
           style={{
             position: "absolute",
-            // On tall trims the picture fills the foot of the frame, so the
-            // lockup sits at the head where the ground is clear.
-            ...(mode === "stacked"
-              ? { right: margin * 0.9, top: margin * 0.5 }
-              : copySide === "left"
-                ? { right: margin * 0.9, bottom: margin * 0.6 }
-                : { left: margin * 0.9, bottom: margin * 0.6 }),
+            left: margin * 0.9,
+            bottom: margin * 0.6,
             height: `${Math.max(14, short * 0.042)}px`,
             width: "auto",
             opacity: 0.95,
