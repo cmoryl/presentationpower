@@ -688,7 +688,7 @@ function BloomView() {
       ) : null}
 
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6 lg:px-8">
-        <BloomMotionPanel aperture={aperture} side={side} />
+        <BloomMotionPanel aperture={aperture} side={side} layouts={layouts} />
 
         <div className="grid gap-8 lg:grid-cols-2">
           {LEGAL_BLOOM_SCENES.map((scene) => (
