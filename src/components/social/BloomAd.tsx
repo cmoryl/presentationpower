@@ -166,7 +166,7 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
           zIndex: 2,
         }}
       >
-        {overText ? (
+        {overText && scrimEm > 0 ? (
           <div
             aria-hidden
             style={{
