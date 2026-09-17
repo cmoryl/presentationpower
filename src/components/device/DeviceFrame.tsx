@@ -20,21 +20,25 @@
 
 import type { CSSProperties, ReactNode } from "react";
 
-export type DeviceKind = "laptop" | "monitor";
+export type DeviceKind = "laptop" | "monitor" | "phone";
 export type DeviceTone = "graphite" | "silver" | "ink";
 
-/** Screen aspect per device — laptop lids are taller than desktop panels. */
+/** Screen aspect per device — laptop lids are taller than desktop panels, and a
+ *  handset is a tall portrait panel (19.5:9, the modern phone ratio). */
 export function deviceScreenAspect(kind: DeviceKind): number {
-  return kind === "laptop" ? 16 / 10 : 16 / 9;
+  if (kind === "laptop") return 16 / 10;
+  if (kind === "phone") return 9 / 19.5;
+  return 16 / 9;
 }
 
-/** Normalise loose authored values ("Laptop", "desktop", undefined). */
+/** Normalise loose authored values ("Laptop", "desktop", "mobile", undefined). */
 export function deviceKindFrom(value: unknown, fallback: DeviceKind = "laptop"): DeviceKind {
   const v = String(value ?? "")
     .trim()
     .toLowerCase();
   if (v === "laptop" || v === "notebook") return "laptop";
   if (v === "monitor" || v === "desktop" || v === "display") return "monitor";
+  if (v === "phone" || v === "mobile" || v === "handset" || v === "smartphone") return "phone";
   return fallback;
 }
 
