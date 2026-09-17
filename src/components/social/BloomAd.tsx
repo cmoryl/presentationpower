@@ -3,10 +3,9 @@
 // The anatomy is taken straight from the Canva master:
 //   · a plain near-white ground, nothing printed on it
 //   · a soft colour bloom leaning out of the picture's turned end
-//   · the picture as a rectangle with ONE end turned right over and the other
-//     corners left almost square, its own focus point held in frame
-//   · a fine accent keyline — the same shape again, offset diagonally, running
-//     out under the copy
+//   · the picture as a rectangle with TWO DIAGONALLY OPPOSITE corners turned
+//     right over and the other two left perfectly square, focus held in frame
+//   · a solid accent keyline sitting on the frame itself, as in the master
 //   · the headline beside (wide trims) or under (tall trims) the picture, with
 //     the turning word italic in the bloom's colour
 //   · the Legal lockup in one corner — the division is never typed out
@@ -70,15 +69,11 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
   // the master keeps the turn to a third of the long edge at most.
   const boxW = (w - margin * 2) * (mode === "stacked" ? 0.84 : (pictureFlex ?? 0.48) * 0.88);
   const boxH = (h - margin * 2) * (mode === "stacked" ? 0.62 : mode === "strip" ? 0.88 : 0.7);
-  const radiusPx = Math.min(
-    Math.min(boxW, boxH) * 0.5,
-    Math.max(boxW, boxH) * 0.3,
-  );
-  const radius = bloomShapeRadius(cut, radiusPx * 2);
+  const radius = bloomShapeRadius(cut, boxW, boxH);
   const lean = bloomLean(cut);
-  // The keyline runs the other way from the bloom, out under the copy.
-  const keyOff = short * 0.055;
-  const keyX = copySide === "left" ? -keyOff : keyOff;
+  // The keyline in the master is a solid accent stroke sitting on the frame
+  // itself — measured at 9px on a 1920 x 1080 page.
+  const strokePx = Math.max(1.5, short * 0.008);
 
   const picture = (
     <div
@@ -104,19 +99,7 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
           filter: `blur(${short * 0.045}px)`,
         }}
       />
-      {/* the accent keyline — the same shape, offset out under the copy */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          width: mode === "stacked" ? "84%" : "88%",
-          height: mode === "stacked" ? "100%" : mode === "strip" ? "88%" : "70%",
-          transform: `translate(${keyX}px, ${keyOff * 0.62}px)`,
-          border: `1px solid ${C.type}66`,
-          borderRadius: radius,
-        }}
-      />
-      {/* the picture, cut to its turned shape */}
+      {/* the picture, cut to the master frame: two diagonal corners turned, two square */}
       <div
         style={{
           position: "relative",
@@ -124,7 +107,9 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
           height: mode === "stacked" ? "100%" : mode === "strip" ? "88%" : "70%",
           borderRadius: radius,
           overflow: "hidden",
-          boxShadow: `0 ${short * 0.018}px ${short * 0.055}px ${P.ink}1F, 0 0 ${short * 0.05}px ${C.glow}4D`,
+          boxSizing: "border-box",
+          border: `${strokePx}px solid ${C.type}`,
+          boxShadow: `0 ${short * 0.014}px ${short * 0.045}px ${P.ink}1A, 0 0 ${short * 0.05}px ${C.glow}59`,
         }}
       >
         <img
