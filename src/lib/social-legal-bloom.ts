@@ -48,54 +48,65 @@ export const LEGAL_BLOOM_COLOURS: Record<string, BloomColour> = {
 };
 
 /**
- * The cut of the picture window, taken from the Canva master: a plain rectangle
- * with ONE end turned right over and the remaining corners left almost square.
- * The turned end is where the colour bloom leans out.
+ * The picture frame, measured off page 6 of the Canva master. Every frame there
+ * rounds TWO DIAGONALLY OPPOSITE corners and leaves the other two perfectly
+ * square. Three radii are in use:
+ *   · leaf   — rx = half the width AND ry = half the height (a true leaf)
+ *   · turn   — a circular half-round on the short edge (r = short / 2)
+ *   · soft   — a quarter round (r = short / 4), the gentlest of the set
+ * The diagonal runs either top-right→bottom-left or top-left→bottom-right.
  */
-export type BloomAperture = "turned" | "d-right" | "d-left" | "arch";
+export type BloomAperture =
+  | "leaf-right"
+  | "leaf-left"
+  | "turn-right"
+  | "turn-left"
+  | "soft-right"
+  | "soft-left";
 
 export const LEGAL_BLOOM_APERTURES: { id: BloomAperture; label: string }[] = [
-  { id: "turned", label: "One corner turned" },
-  { id: "d-right", label: "Right end turned" },
-  { id: "d-left", label: "Left end turned" },
-  { id: "arch", label: "Top turned (arch)" },
+  { id: "leaf-right", label: "Leaf · top-right / bottom-left" },
+  { id: "leaf-left", label: "Leaf · top-left / bottom-right" },
+  { id: "turn-right", label: "Turned ends · top-right / bottom-left" },
+  { id: "turn-left", label: "Turned ends · top-left / bottom-right" },
+  { id: "soft-right", label: "Soft corners · top-right / bottom-left" },
+  { id: "soft-left", label: "Soft corners · top-left / bottom-right" },
 ];
 
-/**
- * Corner radii for a picture box, as a CSS `border-radius` shorthand.
- * `px` is the box's SHORT edge — the turned end is half of it, so the end reads
- * as a true half-round; every other corner keeps the master's near-square nick.
- */
-export function bloomShapeRadius(aperture: BloomAperture, px: number): string {
-  const round = `${px * 0.5}px`;
-  const nick = `${Math.max(2, px * 0.014)}px`;
-  switch (aperture) {
-    case "d-right":
-      return `${nick} ${round} ${round} ${nick}`;
-    case "d-left":
-      return `${round} ${nick} ${nick} ${round}`;
-    case "arch":
-      return `${round} ${round} ${nick} ${nick}`;
-    case "turned":
-    default:
-      return `${nick} ${px * 0.42}px ${nick} ${nick}`;
-  }
+/** Which diagonal a frame rounds. */
+function bloomDiagonal(aperture: BloomAperture): "right" | "left" {
+  return aperture.endsWith("left") ? "left" : "right";
 }
 
-/** Which end of the picture the bloom leans out of, for a given cut. */
-export function bloomLean(aperture: BloomAperture): { x: number; y: number } {
-  switch (aperture) {
-    case "d-left":
-      return { x: -1, y: -0.35 };
-    case "arch":
-      return { x: 0.15, y: -1 };
-    case "d-right":
-      return { x: 1, y: -0.3 };
-    case "turned":
-    default:
-      return { x: 0.85, y: -0.75 };
+/**
+ * The frame's corner radii as a CSS `border-radius` shorthand, for a picture box
+ * of `w` × `h` px. Square corners are exactly square, as in the master.
+ */
+export function bloomShapeRadius(aperture: BloomAperture, w: number, h: number): string {
+  const short = Math.min(w, h);
+  let rx: number;
+  let ry: number;
+  if (aperture.startsWith("leaf")) {
+    rx = w / 2;
+    ry = h / 2;
+  } else if (aperture.startsWith("turn")) {
+    rx = short / 2;
+    ry = short / 2;
+  } else {
+    rx = short / 4;
+    ry = short / 4;
   }
+  // TL TR BR BL / TL TR BR BL
+  return bloomDiagonal(aperture) === "right"
+    ? `0 ${rx}px 0 ${rx}px / 0 ${ry}px 0 ${ry}px`
+    : `${rx}px 0 ${rx}px 0 / ${ry}px 0 ${ry}px 0`;
 }
+
+/** Which way the bloom leans — out through the rounded diagonal. */
+export function bloomLean(aperture: BloomAperture): { x: number; y: number } {
+  return bloomDiagonal(aperture) === "right" ? { x: 0.85, y: -0.75 } : { x: -0.85, y: -0.75 };
+}
+
 
 /** Which side of the frame the copy holds. */
 export type BloomSide = "left" | "right";
