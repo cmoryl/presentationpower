@@ -64,6 +64,12 @@ export type AlongsideScene = {
   caption: string;
   /** The photographic craft note from the master prompt. */
   craft: string;
+  /** The legal-industry buyer this frame is aimed at. */
+  buyer: string;
+  /** What that buyer says against the ad on a first, sceptical read. */
+  objection: string;
+  /** The real service answer the frame has to earn in their language. */
+  answer: string;
   src: string;
   /** CSS object-position for the landscape crop. */
   focus: string;
@@ -85,6 +91,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "A climber committed high on a limestone wall. Look again at the base of the frame and the belayer is already braced, watching the move.",
     craft: "35mm, f/5.6, 1/1600, ISO 320 — late raking light, real chalk and taped fingers.",
+    buyer: "General counsel, bet-the-company litigation",
+    objection:
+      ""Exposure" is my word for risk, and a rock face tells me nothing about who is accountable when the record is wrong.",
+    answer:
+      "Multilingual document review that stays defensible: your privilege calls, our reviewers and certified translations under them.",
     src: climber,
     focus: "72% 45%",
     focusSquare: "72% 40%",
@@ -101,6 +112,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "Nobody drives a blind gravel stage on instinct. The pace notes in the right seat are what make the next corner survivable.",
     craft: "24mm, f/4, 1/500, ISO 800 — dust in every seam, hand-written notes, honest high-ISO grain.",
+    buyer: "Litigation support manager, cross-border discovery",
+    objection:
+      "Pace notes are a nice metaphor until a deadline moves and nobody can tell me what the next step actually is.",
+    answer:
+      "A named project team and a written production plan per jurisdiction, so the next filing date is already scheduled, not discovered.",
     src: rally,
     focus: "50% 50%",
     focusSquare: "45% 55%",
@@ -112,11 +128,16 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     no: "03",
     pair: "Golfer + Caddie",
     theme: "The Unplayable Position",
-    headline: "A bad position is still a playable one.",
-    action: "still a playable one",
+    headline: "A difficult matter is still a workable one.",
+    action: "still a workable one",
     caption:
       "A buried lie in a wet revetted bunker, in filthy weather. On the lip above, the caddie holds the line and the wind.",
     craft: "50mm, f/4, 1/1250, ISO 640 — real rain, mud-caked spikes, muted links greens.",
+    buyer: "Litigation partner, adverse-facts matter",
+    objection:
+      "If the pitch is that a bad position can be played, that sounds like spin, and I cannot put spin in front of a court.",
+    answer:
+      "No case theory from us. Accurate certified translation and transcription of the record you actually have, however unhelpful it is.",
     src: golfer,
     focus: "35% 55%",
     focusSquare: "40% 55%",
@@ -133,6 +154,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "One player fully committed to a low return. The partner is already moving to the space that opens the second they do.",
     craft: "135mm, f/2.8, 1/2500, ISO 400 — court dust airborne, sweat-soaked kit, no styling.",
+    buyer: "Legal operations director, panel management",
+    objection:
+      "Covering the open court means handovers, and handovers are where my matters lose a week.",
+    answer:
+      "One point of contact across translation, review and deposition support, so nothing sits between two vendors waiting to be picked up.",
     src: tennis,
     focus: "40% 45%",
     focusSquare: "45% 45%",
@@ -149,6 +175,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "Nobody is stepping in to fight it for you. The corner exists to make the next round different from the last one.",
     craft: "85mm, f/2, 1/500, ISO 1600 — practical overhead light, real swelling, honest grain.",
+    buyer: "Deputy GC, regulatory investigation",
+    objection:
+      "Between rounds is when I need a decision, not encouragement.",
+    answer:
+      "Overnight turnarounds on foreign-language evidence, with an interpreter briefed before the next interview, not after it.",
     src: boxer,
     focus: "50% 40%",
     focusSquare: "48% 40%",
@@ -165,6 +196,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "Green water across the foredeck and one crew member buried in it. Aft, the helm holds a steady line through the same sea.",
     craft: "70mm, f/4, 1/2000, ISO 500 — frozen spray, salt-crusted kit, desaturated overcast grade.",
+    buyer: "Chief compliance officer, multi-jurisdiction",
+    objection:
+      "Everyone claims calm. I want to know what happens on the worst week of the year.",
+    answer:
+      "Capacity that scales inside the same workflow: surge review teams and interpreters booked against a fixed rate card.",
     src: sailing,
     focus: "70% 45%",
     focusSquare: "68% 45%",
@@ -181,6 +217,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "The front rider is paying for both of them. That is not generosity — it is how the pair arrives at all.",
     craft: "200mm, f/3.2, 1/1600, ISO 400 — compressed perspective, road grit, sunlit skin texture.",
+    buyer: "Head of legal, lean in-house team",
+    objection:
+      "Taking the wind sounds like you do my job. My job is not delegable.",
+    answer:
+      "We take the volume work — translation, transcription, first-pass review — and leave the judgement calls with your team.",
     src: cycling,
     focus: "30% 50%",
     focusSquare: "35% 50%",
@@ -197,6 +238,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "Two paddlers in a grade-five drop, reading the same water half a second apart. No hesitation available.",
     craft: "300mm, f/4, 1/2000, ISO 800 — frozen droplets, scuffed helmets, cool canyon light.",
+    buyer: "eDiscovery manager",
+    objection:
+      "Once collection starts I cannot improvise. Tell me the chain of custody, not the drama.",
+    answer:
+      "Documented forensic collection and processing, one auditable trail from collection through production.",
     src: whitewater,
     focus: "55% 45%",
     focusSquare: "58% 45%",
@@ -213,6 +259,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "The driver's hands never leave the wheel. Everything that makes the next two hours possible happens around the car in seconds.",
     craft: "35mm, f/2.8, 1/250, ISO 1250 — practical garage light, heat shimmer, blurred crew, sharp driver.",
+    buyer: "Legal ops lead, cost and cycle time",
+    objection:
+      "Standing still being expensive is my line, and it usually means someone is about to bill me for speed.",
+    answer:
+      "Fixed per-word and per-hour pricing with turnaround committed up front, so the fast option is the priced option.",
     src: pit,
     focus: "40% 50%",
     focusSquare: "40% 50%",
@@ -229,6 +280,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "A corniced ridge in a near-whiteout. The only clear thing in the frame is the rope running back to the second climber.",
     craft: "85mm, f/2.8, 1/1000, ISO 640 — flat blizzard light, rime on every seam, delicate highlights.",
+    buyer: "General counsel, first matter in an unfamiliar jurisdiction",
+    objection:
+      "I do not know what I do not know there. A rope in a blizzard does not tell me who is qualified.",
+    answer:
+      "Local-language counsel support: certified translators and interpreters with the credentials the local court requires, named before you commit.",
     src: mountain,
     focus: "70% 50%",
     focusSquare: "72% 50%",
@@ -245,6 +301,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "Peak service, one plate at a time, with the second pair of hands working a metre away on the part that can't wait.",
     craft: "35mm, f/2, 1/400, ISO 1600 — mixed tungsten and hood light, stained whites, real burns.",
+    buyer: "Contracts lead, high-volume commercial",
+    objection:
+      "Unmanaged pressure is exactly what a vendor creates when the queue is theirs and the deadline is mine.",
+    answer:
+      "Visible queues: every contract translation tracked with status and due date, so volume is scheduled instead of negotiated.",
     src: kitchen,
     focus: "35% 45%",
     focusSquare: "38% 45%",
@@ -261,6 +322,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "Seconds before an entrance. In the dark a metre away, the crew is holding the cue that makes the entrance work.",
     craft: "50mm, f/1.8, 1/160, ISO 2000 — chiaroscuro, cue-light glow, heavy black.",
+    buyer: "Head of litigation, trial preparation",
+    objection:
+      "Preparation being shared is fine until a trial bundle is wrong in the room.",
+    answer:
+      "Trial-ready deliverables checked twice: exhibits, certified translations and transcripts assembled to your bundle, not ours.",
     src: backstage,
     focus: "60% 45%",
     focusSquare: "62% 45%",
@@ -277,6 +343,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "One diver enters the wreck. The second holds position outside with the reel — the way back is the whole point.",
     craft: "20mm, f/5.6, 1/125, ISO 1250 — real particulate, torch scatter, cold cast with a warm pool.",
+    buyer: "IP counsel, foreign filings",
+    objection:
+      "A line back out is a nice image. My risk is a mistranslated claim that cannot be fixed later.",
+    answer:
+      "Patent and filing translation by subject-matter linguists, with a review step and a certificate on every claim set.",
     src: divers,
     focus: "60% 50%",
     focusSquare: "62% 50%",
@@ -293,6 +364,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "Hands open, a hand's width from the bar, taking none of the weight. That is what real support looks like under load.",
     craft: "35mm, f/2.5, 1/500, ISO 1600 — chalk dust in a single overhead beam, honest skin flush.",
+    buyer: "Associate general counsel, day-to-day support",
+    objection:
+      "Most support interferes. I do not want to manage my supplier.",
+    answer:
+      "Standing capacity you call on without a new scope each time, and no involvement in the matter you have not asked for.",
     src: lifter,
     focus: "45% 45%",
     focusSquare: "45% 45%",
@@ -309,6 +385,11 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     caption:
       "Eight people at the catch, one shape, at the point where it hurts most. Precision is the only thing holding it together.",
     craft: "300mm, f/4, 1/1600, ISO 640 — cold dawn haze, blistered taped hands, matched blade angles.",
+    buyer: "Director of legal operations, multi-vendor programme",
+    objection:
+      "Precision under load is a slogan. Show me consistency across sixteen languages and four suppliers.",
+    answer:
+      "One terminology base and one quality standard applied across every language and every reviewer on the programme.",
     src: rowing,
     focus: "30% 45%",
     focusSquare: "32% 45%",
@@ -320,11 +401,16 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     no: "16",
     pair: "Big-Wave Surfer + Safety Rider",
     theme: "Far Outside the Path",
-    headline: "The wave is yours. The water isn't empty.",
-    action: "The water isn't empty.",
+    headline: "The big one is yours. You're not watching it alone.",
+    action: "You're not watching it alone.",
     caption:
       "A surfer the size of a thumbnail on an enormous face. Far outside the path, the safety rider is watching and ready.",
     craft: "400mm, f/5.6, 1/2500, ISO 500 — long-lens documentary sharpness, wind-blown spray, restrained colour.",
+    buyer: "General counsel, single existential matter",
+    objection:
+      "One matter can end the company. A distant watcher is not reassurance.",
+    answer:
+      "Escalation you can name: a senior lead on the matter, out-of-hours cover, and a standing plan for the day it turns.",
     src: surf,
     focus: "60% 35%",
     focusSquare: "62% 40%",
