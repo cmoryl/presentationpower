@@ -476,8 +476,9 @@ function BloomView() {
               Download a pack
             </div>
             <p className="mt-1 max-w-3xl text-xs leading-relaxed text-black/55">
-              One zip holding the artwork filed by placement, the copy deck as a spreadsheet and
-              plain text, and the placement list and layout settings behind every file.
+              One zip holding the still artwork filed by placement, the moving versions beside it,
+              the copy deck as a spreadsheet and plain text, and the placement list and layout
+              settings behind every file.
             </p>
             <div className="mt-3 flex flex-wrap items-end gap-4">
               <Field label="Ad set">
