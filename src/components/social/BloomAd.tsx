@@ -17,7 +17,6 @@
 import tpLegalBlackRaw from "@/assets/legal-bloom/tp-legal-black.svg?raw";
 import {
   bloomColour,
-  bloomHeadline,
   bloomLean,
   bloomShapeRadius,
   LEGAL_BLOOM_PALETTE as P,
@@ -199,5 +198,3 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
     </div>
   );
 }
-
-export { bloomHeadline };
