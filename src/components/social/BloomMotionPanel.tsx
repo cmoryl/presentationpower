@@ -15,7 +15,12 @@ import {
   type BloomScene,
   type BloomSide,
 } from "@/lib/social-legal-bloom";
-import { bloomAutoLayout, type BloomAdLayout } from "@/lib/social-legal-bloom-layout";
+import {
+  bloomAutoLayout,
+  bloomSavedLayout,
+  type BloomAdLayout,
+  type BloomLayoutMap,
+} from "@/lib/social-legal-bloom-layout";
 import {
   bloomPresetsByFamily,
   bloomAccentMotion,
@@ -42,9 +47,15 @@ const FPS = 30;
 type Props = {
   aperture: BloomAperture | "scene";
   side: BloomSide | "scene";
+  /**
+   * The arrangements the person has moved by hand, live from the board. The
+   * moving versions follow them, so a move made in the large view shows up in
+   * the animation and in every clip written from it.
+   */
+  layouts?: BloomLayoutMap;
 };
 
-export function BloomMotionPanel({ aperture, side }: Props) {
+export function BloomMotionPanel({ aperture, side, layouts = {} }: Props) {
   const [placementId, setPlacementId] = useState("li-feed-square");
   const [presetId, setPresetId] = useState("push-slow");
   const [accentId, setAccentId] = useState("preset");
@@ -79,13 +90,14 @@ export function BloomMotionPanel({ aperture, side }: Props) {
     const cut = aperture === "scene" ? s.aperture : aperture;
     const copySide = side === "scene" ? s.side : side;
     const p = bloomPlacement(placementId);
-    return bloomSafeLayout(bloomAutoLayout(s, w, h, cut, copySide), p.safeTop, p.safeBottom);
+    const own = bloomSavedLayout(layouts, s.id, p.id, w, h);
+    return bloomSafeLayout(own ?? bloomAutoLayout(s, w, h, cut, copySide), p.safeTop, p.safeBottom);
   };
 
   const previewLayout = useMemo(
     () => layoutFor(scene, placement.w, placement.h),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [scene, placement, aperture, side],
+    [scene, placement, aperture, side, layouts],
   );
 
   /** Record one clip off an off-screen canvas at the placement's true size. */
@@ -101,6 +113,7 @@ export function BloomMotionPanel({ aperture, side }: Props) {
       format,
       aperture,
       side,
+      layout: bloomSavedLayout(layouts, s.id, p.id, p.w, p.h),
     });
 
   const save = (blob: Blob, name: string) => {

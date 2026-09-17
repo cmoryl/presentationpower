@@ -4,7 +4,7 @@
 // routine and the same bitrate ceiling, so the routine lives here once.
 
 import type { BloomAperture, BloomScene, BloomSide } from "@/lib/social-legal-bloom";
-import { bloomAutoLayout } from "@/lib/social-legal-bloom-layout";
+import { bloomAutoLayout, type BloomAdLayout } from "@/lib/social-legal-bloom-layout";
 import {
   bloomClipSeconds,
   bloomMotionFrame,
@@ -33,6 +33,8 @@ export type RecordSceneClipArgs = {
   format: BloomVideoFormat | null;
   aperture: BloomAperture | "scene";
   side: BloomSide | "scene";
+  /** The person's own arrangement for this ad, when they have moved things. */
+  layout?: BloomAdLayout;
 };
 
 /** Record one ad at one placement, off the given canvas, at true pixel size. */
@@ -49,7 +51,7 @@ export async function recordBloomSceneClip(args: RecordSceneClipArgs): Promise<B
   const cut = args.aperture === "scene" ? scene.aperture : args.aperture;
   const copySide = args.side === "scene" ? scene.side : args.side;
   const layout = bloomSafeLayout(
-    bloomAutoLayout(scene, p.w, p.h, cut, copySide),
+    args.layout ?? bloomAutoLayout(scene, p.w, p.h, cut, copySide),
     p.safeTop,
     p.safeBottom,
   );

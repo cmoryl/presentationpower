@@ -7,6 +7,7 @@
 // ad AND per size, which is what the saved overrides carry.
 
 import {
+  LEGAL_BLOOM_SIZES,
   bloomFrameAspect,
   bloomHeadline,
   bloomOptical,
@@ -149,6 +150,44 @@ export function bloomAutoLayout(
     // the single-line lockup is wide (about 12:1), so it is set small.
     lockup: { x: (margin * 0.9) / w, y: (margin * 0.6) / h, h: Math.max(9, short * 0.018) / short },
   };
+}
+
+/**
+ * The still trim whose shape is closest to a given size. Arrangements are saved
+ * against the five board trims, so a social placement borrows the arrangement
+ * from the trim it most resembles (a reel from the story, a wide feed post from
+ * the landscape) rather than falling back to the composed default.
+ */
+export function bloomNearestSizeId(w: number, h: number): string {
+  const target = w / h;
+  let best: { id: string; w: number; h: number } = LEGAL_BLOOM_SIZES[0]!;
+  let gap = Infinity;
+  for (const s of LEGAL_BLOOM_SIZES) {
+    const d = Math.abs(Math.log(s.w / s.h) - Math.log(target));
+    if (d < gap) {
+      gap = d;
+      best = s;
+    }
+  }
+  return best.id;
+}
+
+/**
+ * The arrangement to draw for one ad at one size: the person's own saved move
+ * for that exact trim, then their move for the nearest trim, then the composed
+ * default. Boxes are fractions of the trim, so they carry across shapes.
+ */
+export function bloomSavedLayout(
+  layouts: BloomLayoutMap,
+  sceneId: string,
+  sizeId: string,
+  w: number,
+  h: number,
+): BloomAdLayout | undefined {
+  return (
+    layouts[bloomLayoutKey(sceneId, sizeId)] ??
+    layouts[bloomLayoutKey(sceneId, bloomNearestSizeId(w, h))]
+  );
 }
 
 export function bloomLayoutKey(sceneId: string, sizeId: string) {
