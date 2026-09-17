@@ -303,19 +303,28 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   /**
    * The campaign carries no call to action. Where one used to sit, a gradient
    * alpha rule fades out of the accent so the composition still resolves.
+   *
+   * The rule is not neutral: it echoes the strongest line in the photograph, so
+   * the typography and the picture resolve on the same axis. A rising frame
+   * lifts the rule, a falling one drops it, a vertical frame gets a short heavy
+   * stub instead of a long horizontal.
    */
+  const ruleTilt = ST.axis === "rising" ? -1.6 : ST.axis === "falling" ? 1.6 : 0;
   const alphaRule = (len = 22, from: string = P.accent) => (
     <span
       aria-hidden
       style={{
         display: "block",
-        width: `${len}%`,
-        minWidth: u(10),
-        height: u(0.3),
+        width: ST.axis === "vertical" ? `${Math.max(9, len * 0.5)}%` : `${len}%`,
+        minWidth: u(ST.axis === "vertical" ? 6 : 10),
+        height: u(ST.axis === "vertical" ? 0.48 : 0.3),
+        transform: ruleTilt ? `rotate(${ruleTilt}deg)` : undefined,
+        transformOrigin: "left center",
         background: `linear-gradient(to right, ${from} 0%, ${from}A6 38%, ${from}00 100%)`,
       }}
     />
   );
+
 
   const cta = () => alphaRule(38);
 
