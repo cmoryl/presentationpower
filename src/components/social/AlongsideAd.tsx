@@ -72,6 +72,22 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   // typeset in the voice chosen for its own picture. A named treatment from the
   // board overrides it for the whole set.
   const ST = alongsideSceneType(scene.id);
+  // ---- drawn accent marks -------------------------------------------------
+  // Every rule in this campaign is drawn, never ruled: a brush pass, a return
+  // loop, a chalk skip, a run of ticks. The hand and the colour are fixed per
+  // photograph, so the set carries eight hands and four brand colours instead
+  // of one blue hairline that reads as machine-made.
+  const SEED = markSeed(scene.id + template);
+  const MARK = alongsideAccentMark(scene.id);
+  const MARK_COLOR = ACCENT_MARK_COLORS[MARK.tint];
+  /** A drawn mark as a background image, so any box can carry the hand. */
+  const drawn = (weight: number, color: string, seedOffset = 0): React.CSSProperties => ({
+    backgroundImage: accentMarkDataUri(MARK.kind, SEED + seedOffset, color, weight),
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "left center",
+    backgroundSize: "100% 100%",
+    background: undefined,
+  });
   const houseType = LEGAL_ALONGSIDE_TYPE[template];
   const voicedType = applyAlongsideTypeSet(houseType, typeSet === "house" ? ST.voice : typeSet);
   // The hard-cut family (wedge, blade, shard, chevron) is a geometric layout:
