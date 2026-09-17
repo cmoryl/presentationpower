@@ -33,6 +33,7 @@ import {
   BLOOM_SPLASHES,
   bloomAutoLayout,
   bloomLayoutKey,
+  bloomSavedLayout,
   readBloomLayouts,
   writeBloomLayouts,
   type BloomAdLayout,
@@ -352,6 +353,7 @@ function BloomView() {
               format: videoFormat,
               aperture,
               side,
+              layout: bloomSavedLayout(layouts, scene.id, p.id, p.w, p.h),
             });
             const path = bloomMotionPath(scene, p, clip, 30, videoFormat.ext);
             root.file(path, blob);
