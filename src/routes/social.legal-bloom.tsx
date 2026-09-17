@@ -8,6 +8,7 @@
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   ArrowLeft,
   Download,
@@ -74,6 +75,7 @@ function BloomView() {
   const [dlFormat, setDlFormat] = useState<"png" | "jpeg">("png");
   const [dlScale, setDlScale] = useState<number>(2);
   const [dlBusy, setDlBusy] = useState(false);
+  const [dlError, setDlError] = useState<string | null>(null);
   const [layouts, setLayouts] = useState<BloomLayoutMap>({});
   const exportRef = useRef<HTMLDivElement>(null);
 
@@ -102,6 +104,10 @@ function BloomView() {
     );
   }, [zoomScene, saved, editing, size.w, size.h, aperture, side]);
 
+  // whether this ad has a stored arrangement for this size — the only case where
+  // "Reset" has anything to undo.
+  const hasSaved = zoomScene ? Boolean(saved(zoomScene.id)) : false;
+
   const putLayout = (next: BloomAdLayout) => {
     if (!zoomScene) return;
     const map = { ...layouts, [bloomLayoutKey(zoomScene.id, size.id)]: next };
@@ -117,28 +123,46 @@ function BloomView() {
     writeBloomLayouts(map);
   };
 
+  const closeZoom = () => {
+    setZoom(null);
+    setEditing(false);
+  };
+
   const step = (dir: -1 | 1) => {
     if (zoomIndex < 0) return;
     const next = (zoomIndex + dir + LEGAL_BLOOM_SCENES.length) % LEGAL_BLOOM_SCENES.length;
     setZoom(LEGAL_BLOOM_SCENES[next].id);
   };
 
+  // the large view covers the page, so the page behind it must not scroll
+  useEffect(() => {
+    if (!zoom) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [zoom]);
+
+  useEffect(() => setDlError(null), [zoom, sizeId]);
+
   useEffect(() => {
     if (!zoom) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setZoom(null);
+      if (e.key === "Escape") closeZoom();
       if (editing) return;
       if (e.key === "ArrowRight") step(1);
       if (e.key === "ArrowLeft") step(-1);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [zoom, zoomIndex, editing]);
+  }, [zoom, zoomIndex, editing]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const download = async () => {
     const node = exportRef.current;
     if (!node || !zoomScene) return;
     setDlBusy(true);
+    setDlError(null);
     try {
       const { toPng, toJpeg } = await import("html-to-image");
       const opts = {
@@ -155,6 +179,9 @@ function BloomView() {
       a.href = url;
       a.download = `tp-legal-bloom-${zoomScene.id}-${size.id}-${dlScale}x.${dlFormat}`;
       a.click();
+    } catch (err) {
+      // a failed write must be visible, never a silent no-op
+      setDlError(err instanceof Error ? err.message : "The file could not be written.");
     } finally {
       setDlBusy(false);
     }
@@ -174,7 +201,7 @@ function BloomView() {
         min={min}
         max={max}
         step={(max - min) / 100}
-        value={value}
+        value={Math.min(max, Math.max(min, value))}
         onChange={(e) => apply(Number(e.target.value))}
         className="w-28"
       />
@@ -291,8 +318,14 @@ function BloomView() {
         </div>
       </div>
 
-      {zoomScene ? (
-        <div className="fixed inset-0 z-50 flex flex-col bg-[#03002C]/92 p-4 backdrop-blur">
+      {zoomScene
+        ? createPortal(
+            <div
+              className="fixed inset-0 z-[100] flex flex-col bg-[#03002C]/92 p-4 backdrop-blur"
+              role="dialog"
+              aria-modal="true"
+              aria-label={`${bloomHeadline(zoomScene)} — full size`}
+            >
           <div className="flex flex-wrap items-center justify-between gap-3 text-white">
             <div className="text-sm">
               {bloomHeadline(zoomScene)} · {size.label} · {size.w}×{size.h}
@@ -307,7 +340,7 @@ function BloomView() {
               >
                 <Move size={12} /> {editing ? "Done moving" : "Move things"}
               </button>
-              {zoomLayout ? (
+              {hasSaved ? (
                 <button
                   type="button"
                   onClick={resetLayout}
@@ -365,7 +398,7 @@ function BloomView() {
               </button>
               <button
                 type="button"
-                onClick={() => setZoom(null)}
+                onClick={closeZoom}
                 className="rounded-lg border border-white/25 p-1.5 text-white"
                 aria-label="Close"
               >
@@ -386,7 +419,7 @@ function BloomView() {
               {slider("Accent word", zoomLayout.turnEm ?? 1.62, 1, 3, (v) =>
                 putLayout({ ...zoomLayout, turnEm: Math.max(1, v) }),
               )}
-              {slider("Logo", zoomLayout.lockup.h, 0.02, 0.1, (v) =>
+              {slider("Logo", zoomLayout.lockup.h, 0.01, 0.1, (v) =>
                 putLayout({ ...zoomLayout, lockup: { ...zoomLayout.lockup, h: v } }),
               )}
               {/* soft focus behind words that lie over the picture; 0 = none */}
@@ -430,9 +463,17 @@ function BloomView() {
                 )}
               </Scaled>
             </div>
-          </div>
-        </div>
-      ) : null}
+              </div>
+
+              {dlError ? (
+                <p className="mt-2 text-[11px] text-[#FF9B70]">
+                  The file could not be written: {dlError}
+                </p>
+              ) : null}
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }
@@ -452,7 +493,9 @@ function Scaled({
   useEffect(() => {
     const el = box.current;
     if (!el) return;
-    const fit = () => setScale(el.clientWidth / w);
+    // a zero-width box (a hidden or not-yet-laid-out panel) would give a scale of
+    // 0, which makes the drag handles unusable, so it is floored.
+    const fit = () => setScale(Math.max(0.02, el.clientWidth / w));
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
