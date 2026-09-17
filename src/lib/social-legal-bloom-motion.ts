@@ -1136,7 +1136,9 @@ export function bloomMotionFrame(
     support: { opacity: supportIn, rise: (1 - supportIn) * preset.text.rise * 0.7 },
     logo: { opacity: logoIn, rise: (1 - logoIn) * preset.text.rise * 0.4 },
     sweep: preset.sweep ? seg(p, 0.45, 0.86) : -1,
+    backdrop: backdropState,
     shot,
+
   };
 }
 
