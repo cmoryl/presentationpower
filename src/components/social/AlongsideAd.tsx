@@ -94,6 +94,13 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   const banner = aspect >= 2.1;
   /** 9:16 and taller: the frame is so long that the base scale reads small. */
   const veryTall = h >= w * 1.6;
+  /**
+   * Square and taller frames crop a 16:9 photograph so hard that one of the two
+   * figures is always lost. On the diagonal-cut family those sizes stack instead:
+   * the whole photograph sits in a band, the cut and the copy sit below it.
+   */
+  const stackedCut =
+    (template === "wedge" || template === "blade" || template === "shard") && h >= w * 0.9;
   /** One multiplier keeps the shared scale legible in every sizing format. */
   const k = banner ? 0.6 : veryTall ? 1.22 : 1;
   const focus = square ? scene.focusSquare : scene.focus;
@@ -145,19 +152,30 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
    * driven into the window that is actually left — otherwise a resize hides the
    * two figures behind the wedge and the ad loses its point.
    */
-  const cutFromLeft =
-    template === "wedge" ? clear !== "right" : template === "blade" ? clear === "right" : true;
+  const cutFromLeft = template === "blade" ? clear === "right" : clear !== "right";
   const inkBias = (): { dx: number; dy: number } => {
     if (template === "chevron") {
       // A band straight across the middle: lift the figures into the top light.
-      return { dx: 0, dy: banner ? -8 : -16 };
+      return { dx: 0, dy: banner ? -6 : -12 };
     }
     if (template === "wedge" || template === "blade" || template === "shard") {
-      if (tall) return { dx: 0, dy: template === "shard" ? -13 : -16 };
-      const away = template === "shard" ? 8 : banner ? 6 : 11;
-      return { dx: cutFromLeft ? away : -away, dy: template === "shard" ? -5 : -3 };
+      // Horizontal clearance is handled by sliding the whole picture (cutSlide),
+      // not by re-cropping — a crop shift here shaved the partner out of frame.
+      if (tall && !veryTall) return { dx: 0, dy: template === "shard" ? -12 : -14 };
+      return { dx: 0, dy: template === "shard" ? -4 : -2 };
     }
     return { dx: 0, dy: 0 };
+  };
+
+  /**
+   * Slides the whole photograph away from the ink cut so both figures land in the
+   * open window. The empty edge it opens up sits under the cut itself, so no gap
+   * is ever visible, and nothing is cropped out.
+   */
+  const cutSlide = (): React.CSSProperties => {
+    if (veryTall || tall) return {};
+    const shift = banner ? 5 : wide ? 9 : 6;
+    return { transform: `translateX(${cutFromLeft ? shift : -shift}%)` };
   };
 
   const framePos = (kind: PhotoFrame): string => {
@@ -184,15 +202,82 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   const offsetPos = (dx: number, dy = 0) =>
     `${clampPct(subject.x + dx)}% ${clampPct(subject.y + dy)}%`;
 
-  const photo = (extra?: React.CSSProperties, kind: PhotoFrame = "full") => (
-    <img
-      src={scene.src}
-      alt={`${scene.pair} — ${scene.theme}`}
-      loading="lazy"
-      className="absolute inset-0 size-full object-cover"
-      style={{ objectPosition: framePos(kind), filter: "contrast(1.06) saturate(1.02)", ...extra }}
-    />
-  );
+  const photo = (extra?: React.CSSProperties, kind: PhotoFrame = "full") => {
+    const img = (
+      <img
+        src={scene.src}
+        alt={`${scene.pair} — ${scene.theme}`}
+        loading="lazy"
+        className="absolute inset-0 size-full object-cover"
+        style={{ objectPosition: framePos(kind), filter: "contrast(1.06) saturate(1.02)", ...extra }}
+      />
+    );
+    // On a diagonal cut in a wide frame the ink takes a third of the width, so a
+    // full-bleed crop drops the second figure behind it. Fit the whole photograph
+    // into the open window instead — the pair is the point of the ad.
+    if (kind === "full" && hardCut && wide && !tall && template !== "chevron") {
+      return (
+        <>
+          <div className="absolute inset-0" style={{ background: P.ground }} />
+          <div
+            className="absolute overflow-hidden"
+            style={{
+              top: 0,
+              bottom: 0,
+              width: "63%",
+              ...(cutFromLeft ? { right: 0 } : { left: 0 }),
+            }}
+          >
+            <img
+              src={scene.src}
+              alt={`${scene.pair} — ${scene.theme}`}
+              loading="lazy"
+              className="absolute inset-0 size-full object-contain"
+              style={{
+                objectPosition: "center",
+                filter: "contrast(1.06) saturate(1.02)",
+                ...extra,
+                transform: undefined,
+              }}
+            />
+          </div>
+        </>
+      );
+    }
+    if (kind !== "full" || !stackedCut) return img;
+    // A 9:16 story shows barely a third of the frame's width. Cropping that hard
+    // always drops one of the two figures — and the pair IS the ad. So the story
+    // format holds the whole photograph in a band across the upper frame, on the
+    // ground colour, instead of a crop that loses the partner.
+    return (
+      <>
+        <div className="absolute inset-0" style={{ background: P.ground }} />
+        <div
+          className="absolute overflow-hidden"
+          style={{ left: 0, right: 0, top: "6%", aspectRatio: "1376 / 768" }}
+        >
+          <img
+            src={scene.src}
+            alt={`${scene.pair} — ${scene.theme}`}
+            loading="lazy"
+            className="absolute inset-0 size-full object-cover"
+            style={{ objectPosition: "center", filter: "contrast(1.06) saturate(1.02)", ...extra, transform: undefined }}
+          />
+        </div>
+        <div
+          aria-hidden
+          className="absolute"
+          style={{
+            left: 0,
+            right: 0,
+            top: veryTall ? "36%" : "60%",
+            height: "12%",
+            background: `linear-gradient(to bottom, ${P.ground}00, ${P.ground}FF)`,
+          }}
+        />
+      </>
+    );
+  };
 
   /** Frame number on a hairline. The lockup names the division — never typed. */
   // The lockup owns one corner of every ad (top-right, or bottom-left when the
@@ -954,15 +1039,20 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     // lives inside the cut; a curtain of ground colour keeps any descender that
     // crosses the diagonal legible against the picture.
     const fromLeft = template === "wedge" ? clear !== "right" : clear === "right";
+    // A 9:16 story is not a tall square: the diagonal that works in a square
+    // eats the whole picture in a story, so the cut lies across the frame under
+    // the photograph band instead.
     const shape = wide
       ? fromLeft
-        ? "polygon(0 0, 52% 0, 34% 100%, 0 100%)"
-        : "polygon(48% 0, 100% 0, 100% 100%, 66% 100%)"
-      : square
-        ? fromLeft
+        ? "polygon(0 0, 42% 0, 26% 100%, 0 100%)"
+        : "polygon(58% 0, 100% 0, 100% 100%, 74% 100%)"
+      : stackedCut
+        ? veryTall
+          ? "polygon(0 42%, 100% 36%, 100% 100%, 0 100%)"
+          : "polygon(0 68%, 100% 62%, 100% 100%, 0 100%)"
+        : fromLeft
           ? "polygon(0 0, 96% 0, 0 98%)"
-          : "polygon(4% 0, 100% 0, 100% 98%)"
-        : "polygon(0 60%, 100% 44%, 100% 100%, 0 100%)";
+          : "polygon(4% 0, 100% 0, 100% 98%)";
     const copyBox: React.CSSProperties = wide
       ? {
           top: u(M),
@@ -971,18 +1061,18 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           right: fromLeft ? "auto" : u(M),
           width: "40%",
         }
-      : square
-        ? {
+      : stackedCut
+        ? { left: u(M), right: u(M), bottom: u(M), top: veryTall ? "46%" : "70%" }
+        : {
             top: u(M),
             bottom: u(M * 1.2),
             left: fromLeft ? u(M) : "auto",
             right: fromLeft ? "auto" : u(M),
             width: "58%",
-          }
-        : { left: u(M), right: u(M), bottom: u(M), top: "62%" };
+          };
     body = (
       <>
-        {photo()}
+        {photo(cutSlide())}
         <div className="absolute inset-0" style={{ background: curtain(tall ? "bottom" : fromLeft ? "left" : "right", 0.46) }} />
         <div className="absolute inset-0" style={{ background: P.ground, clipPath: shape }} />
         <div
@@ -992,13 +1082,15 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
               background: template === "blade" ? P.accent : `${P.ink}66`,
               clipPath: wide
                 ? fromLeft
-                  ? "polygon(52% 0, 53.4% 0, 35.4% 100%, 34% 100%)"
-                  : "polygon(46.6% 0, 48% 0, 66% 100%, 64.6% 100%)"
-                : square
-                  ? fromLeft
+                  ? "polygon(42% 0, 43.4% 0, 27.4% 100%, 26% 100%)"
+                  : "polygon(56.6% 0, 58% 0, 74% 100%, 72.6% 100%)"
+                : stackedCut
+                  ? veryTall
+                    ? "polygon(0 42%, 100% 36%, 100% 37.1%, 0 43.1%)"
+                    : "polygon(0 68%, 100% 62%, 100% 63.1%, 0 69.1%)"
+                  : fromLeft
                     ? "polygon(80% 0, 81.6% 0, 0 89.4%, 0 88%)"
-                    : "polygon(18.4% 0, 20% 0, 100% 89.4%, 100% 88%)"
-                  : "polygon(0 60%, 100% 44%, 100% 45.4%, 0 61.4%)",
+                    : "polygon(18.4% 0, 20% 0, 100% 89.4%, 100% 88%)",
           }}
         />
         <div className="absolute flex flex-col justify-between" style={copyBox}>
@@ -1022,16 +1114,18 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     const fromLeft = clear !== "right";
     const shape = wide
       ? fromLeft
-        ? "polygon(0 8%, 62% 100%, 0 100%)"
-        : "polygon(100% 8%, 100% 100%, 38% 100%)"
-      : square
-        ? fromLeft
+        ? "polygon(0 8%, 48% 100%, 0 100%)"
+        : "polygon(100% 8%, 100% 100%, 52% 100%)"
+      : stackedCut
+        ? veryTall
+          ? "polygon(0 40%, 100% 48%, 100% 100%, 0 100%)"
+          : "polygon(0 64%, 100% 72%, 100% 100%, 0 100%)"
+        : fromLeft
           ? "polygon(0 26%, 88% 100%, 0 100%)"
-          : "polygon(100% 26%, 100% 100%, 12% 100%)"
-        : "polygon(0 34%, 100% 62%, 100% 100%, 0 100%)";
+          : "polygon(100% 26%, 100% 100%, 12% 100%)";
     body = (
       <>
-        {photo()}
+        {photo(cutSlide())}
         <div className="absolute inset-0" style={{ background: curtain(tall ? "bottom" : fromLeft ? "left" : "right", 0.55) }} />
         <div className="absolute inset-0" style={{ background: P.ground, clipPath: shape }} />
         <div
@@ -1062,7 +1156,8 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           className="absolute flex flex-col"
           style={{
             left: u(M),
-            right: wide ? "44%" : square ? u(M * 2) : u(M),
+            right: wide ? "44%" : stackedCut && !veryTall ? u(M * 2) : u(M),
+            ...(stackedCut && veryTall ? { top: "44%" } : {}),
             bottom: u(M),
             gap: u(1.4),
             alignItems: "flex-start",
@@ -1080,8 +1175,10 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     );
   } else if (template === "chevron") {
     // An angled ink band driven across the frame, accent slabs on both cuts.
-    const bandTop = wide ? 26 : square ? 30 : 34;
-    const bandH = wide ? 52 : square ? 46 : 40;
+    // The band is held lower and shallower than it was: at the old depth it sat
+    // straight across both figures and the photograph stopped reading.
+    const bandTop = wide ? 36 : veryTall ? 52 : 40;
+    const bandH = wide ? 44 : veryTall ? 34 : 40;
     const skew = wide ? 7 : 5;
     const band = `polygon(0 ${bandTop + skew}%, 100% ${bandTop}%, 100% ${bandTop + bandH}%, 0 ${bandTop + bandH + skew}%)`;
     body = (
