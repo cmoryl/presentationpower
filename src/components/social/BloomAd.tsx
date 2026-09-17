@@ -52,7 +52,7 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
 
   const headline = bloomHeadline(scene);
   const optical = bloomOptical(headline.length);
-  const margin = short * (mode === "strip" ? 0.09 : 0.075);
+  const margin = short * (mode === "strip" ? 0.06 : 0.05);
   const frameAspect = bloomFrameAspect(scene.frame);
   // A landscape photograph is given a longer horizontal column than an upright
   // one, so the frame runs the way the picture does.
@@ -61,19 +61,19 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
       ? undefined
       : mode === "strip"
         ? frameAspect > 1.2
-          ? 0.5
-          : 0.44
+          ? 0.6
+          : 0.52
         : frameAspect > 1.2
-          ? 0.56
+          ? 0.66
           : frameAspect < 0.9
-            ? 0.44
-            : 0.48;
+            ? 0.54
+            : 0.6;
   // The headline is set to the column it actually has, so a square trim reads
   // three or four words a line instead of stacking one word at a time.
   const colW =
     mode === "stacked"
       ? w - margin * 2
-      : (w - margin * 2) * (1 - (pictureFlex ?? 0.48)) - short * 0.03;
+      : (w - margin * 2) * (1 - (pictureFlex ?? 0.6)) - short * 0.03;
   const baseHead =
     mode === "strip" ? short * 0.155 : mode === "stacked" ? short * 0.105 : short * 0.098;
   const headPx = Math.min(baseHead * optical, colW * (mode === "stacked" ? 0.115 : 0.155));
@@ -84,8 +84,8 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
   // the master keeps the turn to a third of the long edge at most.
   // The box is fitted to the photograph's own aspect inside the space it has, so
   // "tricky" (landscape) runs long and horizontal while an upright shot stands up.
-  const availW = (w - margin * 2) * (mode === "stacked" ? 0.9 : (pictureFlex ?? 0.48) * 0.94);
-  const availH = (h - margin * 2) * (mode === "stacked" ? 0.6 : mode === "strip" ? 0.9 : 0.82);
+  const availW = (w - margin * 2) * (mode === "stacked" ? 1 : (pictureFlex ?? 0.6) * 0.99);
+  const availH = (h - margin * 2) * (mode === "stacked" ? 0.72 : mode === "strip" ? 1 : 0.98);
   let boxW = availW;
   let boxH = boxW / frameAspect;
   if (boxH > availH) {
@@ -102,7 +102,7 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
     <div
       style={{
         position: "relative",
-        flex: mode === "stacked" ? "1 1 auto" : `0 0 ${(pictureFlex ?? 0.48) * 100}%`,
+        flex: mode === "stacked" ? "1 1 auto" : `0 0 ${(pictureFlex ?? 0.6) * 100}%`,
         width: mode === "stacked" ? "100%" : undefined,
         height: mode === "stacked" ? undefined : "100%",
         minHeight: 0,
