@@ -313,7 +313,7 @@ export function DeviceFrame({
       </div>
 
 
-      {kind === "laptop" ? (
+      {kind === "phone" ? null : kind === "laptop" ? (
         <>
           {/* Hinge deck — wider than the lid and tapered, as seen head-on */}
           <div
