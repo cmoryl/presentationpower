@@ -1344,7 +1344,7 @@ export const LEGAL_ALONGSIDE_TYPESETS: AlongsideTypeSet[] = [
     note: "Caveat held at 500 and near-normal scale — a level adult hand, no flourish — with the turn in a Cormorant italic and Instrument Sans holding the small type steady.",
     faces: {
       display: { family: G.caveat, weight: 500, tracking: "0.004em", scale: 1.06 },
-      action: { family: G.cormorant, weight: 600, italic: true, scale: 0.96 },
+      action: { family: F.cormorant, weight: 600, italic: true, scale: 0.96 },
       eyebrow: { family: G.instrumentSans, weight: 600, tracking: "0.28em" },
       support: { family: G.instrumentSans, weight: 400 },
       cta: { family: G.instrumentSans, weight: 600, tracking: "0.14em" },
