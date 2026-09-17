@@ -1,6 +1,6 @@
 // /social/legal-bloom — the Legal "We're here for the tricky ones." bloom board.
 //
-// Eight frames, four aperture cuts, either side for the copy, five trims, and a
+// Eight frames, four turned picture shapes, either side for the copy, five trims, and a
 // large view that writes the artwork at its true pixel size.
 
 import { AppShell } from "@/components/AppShell";
@@ -26,13 +26,13 @@ export const Route = createFileRoute("/social/legal-bloom")({
       {
         name: "description",
         content:
-          "The bloom variation of the TransPerfect Legal campaign: eight documentary frames cut into soft apertures on colour blooms, one phrase across the set and one turning word per ad.",
+          "The bloom variation of the TransPerfect Legal campaign: eight documentary frames cut to the turned house shape with an offset accent keyline and a soft colour bloom, one phrase across the set and one turning word per ad.",
       },
       { property: "og:title", content: "We're here for the tricky ones · Legal bloom board" },
       {
         property: "og:description",
         content:
-          "Eight Legal frames on colour blooms — four aperture cuts, copy either side, five trims and a full-size download.",
+          "Eight Legal frames on colour blooms — four turned picture shapes, copy either side, five trims and a full-size download.",
       },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary_large_image" },
