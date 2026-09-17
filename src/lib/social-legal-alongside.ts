@@ -445,11 +445,19 @@ export const LEGAL_ALONGSIDE_TEMPLATES = [
 
 export type AlongsideTemplateId = (typeof LEGAL_ALONGSIDE_TEMPLATES)[number]["id"];
 
+// Every sizing format the set has to survive, grouped for the picker. Ids are
+// stable — they are what the board stores when you switch trim.
 export const LEGAL_ALONGSIDE_SIZES = [
-  { id: "linkedin", label: "LinkedIn", w: 1200, h: 628 },
-  { id: "square", label: "Square", w: 1080, h: 1080 },
-  { id: "story", label: "Story", w: 1080, h: 1350 },
+  { id: "banner", label: "Wide banner", group: "Banner", w: 1584, h: 396 },
+  { id: "hd", label: "HD / screen", group: "Landscape", w: 1920, h: 1080 },
+  { id: "linkedin", label: "LinkedIn", group: "Landscape", w: 1200, h: 628 },
+  { id: "post", label: "Post 16:9", group: "Landscape", w: 1200, h: 675 },
+  { id: "square", label: "Square", group: "Square", w: 1080, h: 1080 },
+  { id: "portrait", label: "Portrait 4:5", group: "Portrait", w: 1080, h: 1350 },
+  { id: "story", label: "Story 9:16", group: "Portrait", w: 1080, h: 1920 },
+  { id: "halfpage", label: "Half page", group: "Portrait", w: 600, h: 900 },
 ] as const;
+
 
 export type AlongsideSizeId = (typeof LEGAL_ALONGSIDE_SIZES)[number]["id"];
 

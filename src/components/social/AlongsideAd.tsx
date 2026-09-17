@@ -56,9 +56,16 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
   const logos = getDivisionLogos("bm-tp-legal");
   const lockup = logos?.white ?? logos?.color;
   const TY = LEGAL_ALONGSIDE_TYPE[template];
-  const square = Math.abs(w / h - 1) < 0.2 || h > w;
+  const aspect = w / h;
+  const square = Math.abs(aspect - 1) < 0.2 || h > w;
   const tall = h > w * 1.1;
   const wide = !square && !tall;
+  /** Ultra-wide strips (email / LinkedIn banners): height, not width, is scarce. */
+  const banner = aspect >= 2.1;
+  /** 9:16 and taller: the frame is so long that the base scale reads small. */
+  const veryTall = h >= w * 1.6;
+  /** One multiplier keeps the shared scale legible in every sizing format. */
+  const k = banner ? 0.6 : veryTall ? 1.22 : 1;
   const focus = square ? scene.focusSquare : scene.focus;
   const clear = scene.clear;
 
@@ -66,17 +73,18 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
   const u = (n: number) => `${n}cqw`;
 
   // ---- one spacing + type scale, shared by every template ----------------
-  const M = square ? 5.4 : 4.6; // outer margin
+  const M = (square ? 5.4 : 4.6) * (banner ? 0.72 : 1); // outer margin
   const T = {
-    eyebrow: square ? 1.5 : 1.3,
-    numeral: square ? 1.5 : 1.3,
-    display: square ? 5.2 : 4.3,
-    displayTight: square ? 4.4 : 3.6,
-    support: square ? 1.9 : 1.6,
-    cta: square ? 1.75 : 1.5,
-    micro: square ? 1.3 : 1.1,
-    logo: square ? 3.3 : 2.7,
+    eyebrow: (square ? 1.5 : 1.3) * k,
+    numeral: (square ? 1.5 : 1.3) * k,
+    display: (square ? 5.2 : 4.3) * k,
+    displayTight: (square ? 4.4 : 3.6) * k,
+    support: (square ? 1.9 : 1.6) * k,
+    cta: (square ? 1.75 : 1.5) * k,
+    micro: (square ? 1.3 : 1.1) * k,
+    logo: (square ? 3.3 : 2.7) * k,
   };
+
 
   // ---- crop engine --------------------------------------------------------
   // Every scene carries its own subject point (the two figures). A template
@@ -209,7 +217,11 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     );
   };
 
-  const support = () => (
+  // A wide banner has no room for a second line of copy — the headline and the
+  // division line carry it, and the picture keeps the rest of the strip.
+  const support = () =>
+    banner ? null : (
+
     <div
       style={{
         fontFamily: TY.support.family,
@@ -334,7 +346,9 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
   const colourMark = logos?.color ?? lockup;
 
   /** Body copy in an arbitrary ink, for the light-field templates. */
-  const supportIn = (ink: string) => (
+  const supportIn = (ink: string) =>
+    banner ? null : (
+
     <div
       style={{
         fontFamily: TY.support.family,

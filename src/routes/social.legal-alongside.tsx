@@ -56,7 +56,7 @@ export const Route = createFileRoute("/social/legal-alongside")({
 
 function AlongsideView() {
   const [template, setTemplate] = useState<AlongsideTemplateId>("knockout");
-  const [sizeId, setSizeId] = useState<string>(LEGAL_ALONGSIDE_SIZES[0].id);
+  const [sizeId, setSizeId] = useState<string>("linkedin");
   const [perScene, setPerScene] = useState<Record<string, AlongsideTemplateId>>({});
   const [zoom, setZoom] = useState<string | null>(null);
   const size = LEGAL_ALONGSIDE_SIZES.find((s) => s.id === sizeId) ?? LEGAL_ALONGSIDE_SIZES[0];
@@ -126,7 +126,9 @@ function AlongsideView() {
               Layout template
             </div>
             <h2 className="text-2xl font-semibold tracking-tight text-[#03002C]">
-              Sixteen frames, {LEGAL_ALONGSIDE_TEMPLATES.length} layouts, three trims
+              Sixteen frames, {LEGAL_ALONGSIDE_TEMPLATES.length} layouts,{" "}
+              {LEGAL_ALONGSIDE_SIZES.length} sizing formats
+
             </h2>
             <p className="max-w-2xl text-sm text-black/60">
               Pick a layout for the whole set here, or click the small layout buttons on any single
@@ -162,6 +164,7 @@ function AlongsideView() {
                 type="button"
                 onClick={() => setSizeId(s.id)}
                 aria-pressed={s.id === sizeId}
+                title={`${s.group} · ${s.w}×${s.h}`}
                 className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                   s.id === sizeId
                     ? "border-[#003FC7] bg-[#003FC7] text-white"
@@ -176,6 +179,7 @@ function AlongsideView() {
             ))}
           </div>
         </div>
+
 
         <p className="text-xs text-black/55">
           {LEGAL_ALONGSIDE_TEMPLATES.find((t) => t.id === template)?.note}{" "}
