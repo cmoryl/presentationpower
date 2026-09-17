@@ -149,7 +149,11 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   // copy column sits on the right), so the masthead keeps the frame number on
   // the LEFT with the division line and never competes for that corner.
   const masthead = (ink: string = P.ink) => (
-    <div className="flex w-full items-baseline gap-3" style={{ color: ink }}>
+    <div
+      className="flex w-full items-baseline gap-3"
+      style={{ color: ink, paddingRight: clear === "right" ? undefined : u(26) }}
+    >
+
       <span
         style={{
           fontFamily: TY.eyebrow.family,
