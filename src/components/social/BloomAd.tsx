@@ -81,9 +81,10 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
     <div
       style={{
         position: "relative",
-        flex: pictureFlex === undefined ? undefined : `0 0 ${pictureFlex * 100}%`,
+        flex: mode === "stacked" ? "1 1 auto" : `0 0 ${(pictureFlex ?? 0.48) * 100}%`,
         width: mode === "stacked" ? "100%" : undefined,
-        height: mode === "stacked" ? `${h * 0.46}px` : "100%",
+        height: mode === "stacked" ? undefined : "100%",
+        minHeight: 0,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -134,7 +135,7 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
   const copy = (
     <div
       style={{
-        flex: pictureFlex === undefined ? undefined : "1 1 auto",
+        flex: mode === "stacked" ? "0 0 auto" : "1 1 auto",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
