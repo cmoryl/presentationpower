@@ -19,6 +19,7 @@
 import { getDivisionLogos } from "@/lib/division-logos";
 import {
   alongsideHeadlineParts,
+  alongsideSceneType,
   LEGAL_ALONGSIDE_CONCEPT,
   LEGAL_ALONGSIDE_PALETTE as P,
   LEGAL_ALONGSIDE_TYPE,
@@ -27,6 +28,7 @@ import {
   type AlongsideScene,
   type AlongsideTemplateId,
 } from "@/lib/social-legal-alongside";
+
 
 type Props = {
   scene: AlongsideScene;
