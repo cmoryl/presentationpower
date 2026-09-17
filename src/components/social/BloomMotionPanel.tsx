@@ -24,7 +24,9 @@ import {
 import {
   bloomPresetsByFamily,
   bloomAccentMotion,
+  bloomBackdrop,
   BLOOM_ACCENT_MOTIONS,
+  BLOOM_BACKDROPS,
   BLOOM_PLACEMENTS,
   bloomAspectLabel,
   bloomClipSeconds,
@@ -59,6 +61,7 @@ export function BloomMotionPanel({ aperture, side, layouts = {} }: Props) {
   const [placementId, setPlacementId] = useState("li-feed-square");
   const [presetId, setPresetId] = useState("push-slow");
   const [accentId, setAccentId] = useState("preset");
+  const [backdropId, setBackdropId] = useState("swirl-slow");
   const [wantSeconds, setWantSeconds] = useState(8);
   const [sceneId, setSceneId] = useState(LEGAL_BLOOM_SCENES[0]!.id);
   const [scopeAd, setScopeAd] = useState("all");
@@ -71,6 +74,7 @@ export function BloomMotionPanel({ aperture, side, layouts = {} }: Props) {
   const placement = bloomPlacement(placementId);
   const preset = bloomPreset(presetId);
   const accent = bloomAccentMotion(accentId);
+  const backdrop = bloomBackdrop(backdropId);
   const seconds = bloomClipSeconds(placement, wantSeconds);
   const scene = LEGAL_BLOOM_SCENES.find((s) => s.id === sceneId) ?? LEGAL_BLOOM_SCENES[0]!;
   // Which video format this browser can write is only knowable in the browser,
@@ -84,7 +88,7 @@ export function BloomMotionPanel({ aperture, side, layouts = {} }: Props) {
 
   useEffect(() => {
     setError(null);
-  }, [placementId, presetId, accentId, sceneId]);
+  }, [placementId, presetId, accentId, backdropId, sceneId]);
 
   const layoutFor = (s: BloomScene, w: number, h: number): BloomAdLayout => {
     const cut = aperture === "scene" ? s.aperture : aperture;
@@ -108,6 +112,7 @@ export function BloomMotionPanel({ aperture, side, layouts = {} }: Props) {
       placement: p,
       preset,
       accentMotionId: accentId,
+      backdropId,
       wantSeconds,
       fps: FPS,
       format,
@@ -245,6 +250,21 @@ export function BloomMotionPanel({ aperture, side, layouts = {} }: Props) {
         </label>
 
         <label className="text-[11px] uppercase tracking-[0.12em] text-black/50">
+          Background
+          <select
+            value={backdropId}
+            onChange={(e) => setBackdropId(e.target.value)}
+            className="mt-1 block rounded-xl border border-black/15 bg-white px-3 py-2 text-sm normal-case tracking-normal text-[#03002C]"
+          >
+            {BLOOM_BACKDROPS.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="text-[11px] uppercase tracking-[0.12em] text-black/50">
           Which ad
           <select
             value={sceneId}
@@ -274,7 +294,7 @@ export function BloomMotionPanel({ aperture, side, layouts = {} }: Props) {
       </div>
 
       <p className="mt-3 text-xs leading-relaxed text-black/55">
-        {preset.says} Accent word: {accent.says.toLowerCase()} Pace: {preset.pacing}
+        {preset.says} Accent word: {accent.says.toLowerCase()} Background: {backdrop.says.toLowerCase()} Pace: {preset.pacing}
         {preset.loopSafe ? ", and the last frame matches the first so the post loops cleanly" : ""}
         {preset.endHold > 0.15 ? ", holding a clean still at the end" : ""}. {placement.platform} · {placement.placement} — {placement.w}×{placement.h} (
         {bloomAspectLabel(placement.w, placement.h)}), written at about{" "}
@@ -292,6 +312,7 @@ export function BloomMotionPanel({ aperture, side, layouts = {} }: Props) {
         <div className="overflow-hidden rounded-2xl border border-black/10 bg-white">
           <BloomMotionAd
             accentMotionId={accentId}
+            backdropId={backdropId}
             scene={scene}
             w={placement.w}
             h={placement.h}
