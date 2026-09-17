@@ -774,6 +774,127 @@ export function bloomAccentMotion(id: string | undefined): BloomAccentMotion {
   return BLOOM_ACCENT_MOTIONS.find((a) => a.id === id) ?? BLOOM_ACCENT_MOTIONS[0]!;
 }
 
+// ---------------------------------------------------------------------------
+// The ground's own life: very subtle background motion behind the aura
+//
+// These never compete with the picture or the copy. Semi-transparent panes cut
+// to the SAME turned-corner shape as the picture frames drift, swirl and ripple
+// under the accent glow, and the accent word takes a hair of the same breath so
+// the whole ad reads as one living surface rather than a moving photograph on a
+// dead page. Every figure runs whole cycles across the clip, so a looping
+// placement still closes exactly where it opened.
+
+export type BloomBackdropKind =
+  | "still"
+  | "swirl"
+  | "ripple"
+  | "drift"
+  | "breathe"
+  | "tide"
+  | "echo";
+
+export type BloomBackdrop = {
+  id: string;
+  label: string;
+  says: string;
+  kind: BloomBackdropKind;
+  /** 0–1: how much of the effect is spent. Everything here stays whisper quiet. */
+  strength: number;
+  /** How many frame-shaped panes the figure uses. */
+  panes: number;
+  /** Whole cycles across the clip — keeps loops seamless. */
+  cycles: number;
+};
+
+export const BLOOM_BACKDROPS: BloomBackdrop[] = [
+  {
+    id: "still",
+    label: "Still ground",
+    says: "Nothing behind the glow — the page stays perfectly quiet.",
+    kind: "still",
+    strength: 0,
+    panes: 0,
+    cycles: 1,
+  },
+  {
+    id: "swirl-slow",
+    label: "Slow swirl",
+    says: "The colour turns slowly under the glow, like light moving through water.",
+    kind: "swirl",
+    strength: 0.62,
+    panes: 2,
+    cycles: 1,
+  },
+  {
+    id: "swirl-wide",
+    label: "Wide swirl",
+    says: "A broader, slightly stronger turn that carries across the whole ad.",
+    kind: "swirl",
+    strength: 0.9,
+    panes: 3,
+    cycles: 1,
+  },
+  {
+    id: "ripple-soft",
+    label: "Soft ripple",
+    says: "Frame-shaped rings open out of the glow and fade away.",
+    kind: "ripple",
+    strength: 0.6,
+    panes: 2,
+    cycles: 2,
+  },
+  {
+    id: "ripple-fine",
+    label: "Fine ripple",
+    says: "Quicker, finer rings — good on short clips.",
+    kind: "ripple",
+    strength: 0.45,
+    panes: 3,
+    cycles: 3,
+  },
+  {
+    id: "pane-drift",
+    label: "Drifting panes",
+    says: "Faint panes cut to the picture's own turned corners drift behind the glow.",
+    kind: "drift",
+    strength: 0.7,
+    panes: 3,
+    cycles: 1,
+  },
+  {
+    id: "pane-breathe",
+    label: "Breathing panes",
+    says: "The same panes grow and settle in place instead of travelling.",
+    kind: "breathe",
+    strength: 0.66,
+    panes: 2,
+    cycles: 2,
+  },
+  {
+    id: "tide",
+    label: "Colour tide",
+    says: "A wide band of colour passes diagonally under everything.",
+    kind: "tide",
+    strength: 0.55,
+    panes: 1,
+    cycles: 1,
+  },
+  {
+    id: "echo",
+    label: "Frame echo",
+    says: "Outlines of the frame pulse gently outwards behind the picture.",
+    kind: "echo",
+    strength: 0.5,
+    panes: 3,
+    cycles: 2,
+  },
+];
+
+export function bloomBackdrop(id: string | undefined): BloomBackdrop {
+  return BLOOM_BACKDROPS.find((b) => b.id === id) ?? BLOOM_BACKDROPS[0]!;
+}
+
+
 /** The presets grouped by family, in the order above. */
 export function bloomPresetsByFamily(): { family: BloomMotionFamily; presets: BloomMotionPreset[] }[] {
   const out: { family: BloomMotionFamily; presets: BloomMotionPreset[] }[] = [];
