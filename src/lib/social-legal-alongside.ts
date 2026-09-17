@@ -497,7 +497,15 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
  *   axis   the strongest line in the frame — rules and hairlines echo it
  *   weight scale bias: a quiet, open frame carries larger type than a busy one
  */
-export type AlongsideCalloutTreat = "italic" | "bold" | "caps" | "accent" | "light";
+export type AlongsideCalloutTreat =
+  | "italic"
+  | "bold"
+  | "caps"
+  | "accent"
+  | "light"
+  | "rule"
+  | "tracked"
+  | "quiet";
 
 /** One word or phrase inside the headline given its own treatment. */
 export type AlongsideCallout = { text: string; treat: AlongsideCalloutTreat };
@@ -530,7 +538,7 @@ export const LEGAL_ALONGSIDE_SCENE_TYPE: Record<string, AlongsideSceneType> = {
     axis: "rising",
     weight: 0.95,
     why: "The frame is full of hand-written data, so the copy is set like a working document, not a poster.",
-    callouts: [{ text: "easy", treat: "italic" }],
+    callouts: [{ text: "easy", treat: "quiet" }],
   },
   "golfer-caddie": {
     voice: "bookface",
@@ -544,7 +552,7 @@ export const LEGAL_ALONGSIDE_SCENE_TYPE: Record<string, AlongsideSceneType> = {
     axis: "flat",
     weight: 1.02,
     why: "Painted court lines already rule the frame, so the headline is compressed to sit between them.",
-    callouts: [{ text: "ball", treat: "italic" }],
+    callouts: [{ text: "ball", treat: "rule" }],
   },
   "boxer-corner": {
     voice: "billposter",
@@ -565,7 +573,7 @@ export const LEGAL_ALONGSIDE_SCENE_TYPE: Record<string, AlongsideSceneType> = {
     axis: "falling",
     weight: 1.0,
     why: "A crosswind road falling away, set in condensed press type that leans with it.",
-    callouts: [{ text: "Someone", treat: "italic" }],
+    callouts: [{ text: "Someone", treat: "tracked" }],
   },
   "whitewater-pair": {
     voice: "grotesque",
@@ -586,28 +594,28 @@ export const LEGAL_ALONGSIDE_SCENE_TYPE: Record<string, AlongsideSceneType> = {
     axis: "rising",
     weight: 1.05,
     why: "Whiteout is nearly empty field: open, widely tracked caps rising with the ridge.",
-    callouts: [{ text: "disappears", treat: "italic" }],
+    callouts: [{ text: "disappears", treat: "light" }],
   },
   "kitchen-service": {
     voice: "humanist",
     axis: "flat",
     weight: 0.96,
     why: "An orderly pass of identical plates: humanist type on a level line, no theatre.",
-    callouts: [{ text: "fine", treat: "italic" }],
+    callouts: [{ text: "fine", treat: "light" }],
   },
   "backstage-crew": {
     voice: "ornament",
     axis: "vertical",
     weight: 1.0,
     why: "Flown bars and standing crew make the frame vertical, and the face carries the theatre without shouting.",
-    callouts: [{ text: "yours", treat: "italic" }],
+    callouts: [{ text: "yours", treat: "rule" }],
   },
   "dive-partners": {
     voice: "revival",
     axis: "falling",
     weight: 1.02,
     why: "Descending light through water, set in a high-contrast face that fades with the depth.",
-    callouts: [{ text: "unknown", treat: "italic" }],
+    callouts: [{ text: "unknown", treat: "accent" }],
   },
   "lifter-spotter": {
     voice: "statement",

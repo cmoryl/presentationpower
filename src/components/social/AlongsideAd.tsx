@@ -256,6 +256,16 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       if (treat === "light") return { fontWeight: Math.max(200, d.weight - 300) };
       if (treat === "caps")
         return { textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.88em" };
+      // Tracked: the word is opened up rather than restyled, so it slows the
+      // reader down without breaking the line's texture.
+      if (treat === "tracked") return { letterSpacing: "0.08em", fontWeight: d.weight };
+      // Quiet: held back in weight and alpha so the words around it carry.
+      if (treat === "quiet")
+        return { fontWeight: Math.max(200, d.weight - 200), opacity: 0.72 };
+      // Accent: the only place brand blue touches display copy — one word, never
+      // body text, so contrast rules still hold.
+      if (treat === "accent")
+        return { color: P.accent, fontWeight: Math.min(900, d.weight + 100) };
       return { borderBottom: `${u(0.16)} solid ${P.accent}`, paddingBottom: u(0.16) };
     };
     // Word spaces either side of a call-out are bound, so the emphasis never
@@ -318,6 +328,23 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
 
   };
 
+  // The supporting line carries one emphasis of its own — the word the offer
+  // turns on — set in the support face's italic so it stays subordinate to the
+  // headline's call-out rather than competing with it.
+  const supportRun = (): React.ReactNode => {
+    const text = LEGAL_ALONGSIDE_CONCEPT.support;
+    const word = "complex";
+    const i = text.indexOf(word);
+    if (i < 0) return text;
+    return (
+      <>
+        {text.slice(0, i)}
+        <span style={{ fontStyle: TY.support.italic ? "normal" : "italic" }}>{word}</span>
+        {text.slice(i + word.length)}
+      </>
+    );
+  };
+
   // A wide banner has no room for a second line of copy — the headline and the
   // division line carry it, and the picture keeps the rest of the strip.
   const support = () =>
@@ -335,7 +362,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         maxWidth: "26em",
       }}
     >
-      {LEGAL_ALONGSIDE_CONCEPT.support}
+      {supportRun()}
     </div>
   );
 
@@ -447,7 +474,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         maxWidth: "26em",
       }}
     >
-      {LEGAL_ALONGSIDE_CONCEPT.support}
+      {supportRun()}
     </div>
   );
 
