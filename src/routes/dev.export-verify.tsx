@@ -880,7 +880,8 @@ async function certifiedOne(
         continue;
       }
       compare(el, run, `run[${i}]`);
-      if (!(el.textContent ?? "").trim() && run.text.trim()) out.emptyText += 1;
+      const blockText = run.runs.map((r) => r.text).join(" ").trim();
+      if (!(el.textContent ?? "").trim() && blockText) out.emptyText += 1;
     }
 
     if (!out.painted.plate) out.problems.push("decor plate missing from preview");
