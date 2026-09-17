@@ -566,13 +566,8 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           </div>
           <div className="flex items-end justify-between" style={{ gap: u(2) }}>
             {ctaBlock()}
-            {colourMark ? (
-              <img
-                src={lockup ?? colourMark}
-                alt="TransPerfect Legal"
-                style={{ height: u(T.logo * 0.85), width: "auto", maxWidth: u(20), objectFit: "contain" }}
-              />
-            ) : null}
+            {null}
+
           </div>
         </div>
       </>
