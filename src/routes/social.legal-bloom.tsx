@@ -149,6 +149,8 @@ function BloomView() {
   }, [zoom]);
 
   useEffect(() => setDlError(null), [zoom, sizeId]);
+  // a new ad or a new trim starts from the fitted view again
+  useEffect(() => setViewZoom(1), [zoom, sizeId]);
 
   useEffect(() => {
     if (!zoom) return;
