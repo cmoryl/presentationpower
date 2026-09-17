@@ -56,6 +56,8 @@ import {
   bloomMotionSpecCsv,
   bloomPreset,
   bloomPresetsByFamily,
+  BLOOM_ACCENT_MOTIONS,
+  bloomAccentMotion,
 } from "@/lib/social-legal-bloom-motion";
 import { recordBloomSceneClip } from "@/lib/social-legal-bloom-record";
 import { bloomVideoFormat, type BloomVideoFormat } from "@/lib/social-legal-bloom-video";
