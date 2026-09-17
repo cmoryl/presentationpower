@@ -592,7 +592,12 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   } else if (template === "marquee") {
     // Duotone photograph under a stacked marquee: the headline repeated, the
     // middle line solid and the outer lines drawn in outline only.
-    const size = (square ? T.display * 2.5 : T.display * 2.2) * TY.display.scale;
+    // The marquee word is set on one line, so its size is capped by how many
+    // characters have to fit inside the margins — otherwise a long turn runs
+    // straight off the right edge on square and story trims.
+    const chars = Math.max(6, scene.action.replace(/\s+$/, "").length);
+    const fit = (100 - M * 2.4) / (chars * 0.56);
+    const size = Math.min((square ? T.display * 2.5 : T.display * 2.2) * TY.display.scale, fit);
     const line = (variant: "outline" | "solid") => (
       <div
         style={{
