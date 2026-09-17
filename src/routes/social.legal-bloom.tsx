@@ -469,7 +469,7 @@ function BloomView() {
 
           <div className="mt-4 min-h-0 flex-1 overflow-auto">
             <div className="mx-auto max-w-6xl">
-              <Scaled w={size.w} h={size.h}>
+              <Scaled w={size.w} h={size.h} factor={viewZoom}>
                 {(scale) => (
                   <div style={{ position: "relative", width: size.w, height: size.h }}>
                     <div ref={exportRef}>
