@@ -120,7 +120,8 @@ export function bloomAutoLayout(
     copy,
     headPx: headPx / short,
     supportPx: supportPx / short,
-    lockup: { x: (margin * 0.9) / w, y: (margin * 0.6) / h, h: Math.max(14, short * 0.042) / short },
+    // the single-line lockup is wide (about 12:1), so it is set small.
+    lockup: { x: (margin * 0.9) / w, y: (margin * 0.6) / h, h: Math.max(9, short * 0.018) / short },
   };
 }
 
