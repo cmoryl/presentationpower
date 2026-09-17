@@ -1446,15 +1446,20 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   // Top-right by default; bottom-left when the copy column is held on the
   // right, so the lockup always lands on clear ground.
   const lockupBottomLeft = clear === "right";
+  // Soft bloom holds its copy low on the left, and its top-right is live
+  // picture, so the lockup sits in the bottom-right corner instead.
+  const lockupBottomRight = template === "bloom" && !lockupBottomLeft;
   const cornerLockup = lockup ? (
     <img
       src={lockup}
       alt="TransPerfect Legal"
       style={{
         position: "absolute",
-        ...(lockupBottomLeft
-          ? { bottom: u(M * 0.82), left: u(M) }
-          : { top: u(M * 0.82), right: u(M) }),
+        ...(lockupBottomRight
+          ? { bottom: u(M * 0.82), right: u(M) }
+          : lockupBottomLeft
+            ? { bottom: u(M * 0.82), left: u(M) }
+            : { top: u(M * 0.82), right: u(M) }),
         height: u(T.logo * 0.9),
         width: "auto",
         maxWidth: u(24),
