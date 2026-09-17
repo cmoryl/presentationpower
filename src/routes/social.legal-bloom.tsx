@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { BloomAd } from "@/components/social/BloomAd";
 import { BloomLayoutEditor } from "@/components/social/BloomLayoutEditor";
+import { BloomMotionPanel } from "@/components/social/BloomMotionPanel";
 import {
   BLOOM_SPLASHES,
   bloomAutoLayout,
@@ -515,6 +516,8 @@ function BloomView() {
       ) : null}
 
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6 lg:px-8">
+        <BloomMotionPanel aperture={aperture} side={side} />
+
         <div className="grid gap-8 lg:grid-cols-2">
           {LEGAL_BLOOM_SCENES.map((scene) => (
             <figure key={scene.id} className="space-y-3">
