@@ -71,6 +71,14 @@ export interface DomShape {
   natH?: number;
   /** How the image fills its box. */
   fit?: "cover" | "contain" | "fill";
+  /**
+   * Colour-grade CSS filter the photograph is displayed with (brightness /
+   * saturate / contrast / grayscale …). PowerPoint has no picture filter, so the
+   * grade is BAKED into the inlined pixels — which keeps the photograph a real,
+   * replaceable picture object instead of being parked on the flat plate.
+   */
+  cssFilter?: string;
+
 
   rotationDeg: number;
   name: string;
@@ -601,6 +609,41 @@ function hasUnexpressiblePaint(cs: CSSStyleDeclaration): boolean {
 }
 
 /**
+ * A COLOUR GRADE a photograph is merely displayed with (brightness, contrast,
+ * saturation, duotone conversions) — no geometry, no blur, no blend.
+ *
+ * Every photographic tile in the library is graded like this, and because the
+ * grade is a CSS filter the picture used to be parked on the flat plate: the
+ * imagery modules arrived in PowerPoint with nothing but their captions
+ * selectable. A grade can be baked into the picture's own pixels instead, so the
+ * photograph ships as a real, replaceable picture object that still looks right.
+ *
+ * Returns the filter string to bake, or null when the element must stay plated.
+ */
+const GRADE_FUNCTIONS = /^(brightness|contrast|saturate|grayscale|sepia|hue-rotate|invert|opacity)$/;
+export function pictureGradeFilter(cs: {
+  filter?: string;
+  mixBlendMode?: string;
+  maskImage?: string;
+  webkitMaskImage?: string;
+  clipPath?: string;
+}): string | null {
+  const filter = (cs.filter || "none").trim();
+  if (!filter || filter === "none") return null;
+  if ((cs.mixBlendMode || "normal") !== "normal") return null;
+  const mask = cs.maskImage || cs.webkitMaskImage || "none";
+  if (mask !== "none" && mask.trim() !== "") return null;
+  const clip = (cs.clipPath || "none").trim();
+  if (clip !== "none" && !/^inset\(/.test(clip)) return null;
+  const fns = filter.match(/([a-z-]+)\(/g) ?? [];
+  if (fns.length === 0) return null;
+  for (const fn of fns) {
+    if (!GRADE_FUNCTIONS.test(fn.slice(0, -1))) return null;
+  }
+  return filter;
+}
+
+/**
  * Frosted glass: `backdrop-filter` blurs what is BEHIND the element, not the
  * element's own children.
  *
@@ -816,7 +859,19 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
       const opacity = parseFloat(cs.opacity);
       if (Number.isFinite(opacity) && opacity < MIN_ALPHA) continue;
       if (insidePlatedSubtree(el)) continue;
-      if (hasUnexpressiblePaint(cs)) {
+      // A graded photograph stays a native picture: the grade is baked into its
+      // pixels further down the pipeline instead of parking it on the plate.
+      const isPicture = tag === "IMG" || tag === "CANVAS" || tag === "VIDEO";
+      const gradeFilter = isPicture
+        ? pictureGradeFilter({
+            filter: cs.filter,
+            mixBlendMode: cs.mixBlendMode,
+            maskImage: (cs as unknown as { maskImage?: string }).maskImage,
+            webkitMaskImage: (cs as unknown as { webkitMaskImage?: string }).webkitMaskImage,
+            clipPath: cs.clipPath,
+          })
+        : null;
+      if (!gradeFilter && hasUnexpressiblePaint(cs)) {
         // Pure decorative effect (blur bloom, drop-shadow halo, gradient
         // feather) → ship the effect itself as a transparent picture layer so it
         // stays selectable and renders identically on light and dark slides.
@@ -890,6 +945,10 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         const svg = el as unknown as SVGSVGElement;
         natW = svg.viewBox?.baseVal?.width || w;
         natH = svg.viewBox?.baseVal?.height || h;
+      } else if (tag === "VIDEO") {
+        const v = el as HTMLVideoElement;
+        src = v.poster || null;
+        fit = objectFitOf(cs);
       } else if (tag === "CANVAS") {
         try {
           src = (el as HTMLCanvasElement).toDataURL("image/png");
@@ -916,6 +975,7 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           natW: natW > 0 ? natW : undefined,
           natH: natH > 0 ? natH : undefined,
           fit,
+          cssFilter: gradeFilter ?? undefined,
           rotationDeg,
           name: nameFor(el, tag === "SVG" ? "TP Vector" : "TP Image"),
           node: el,
@@ -1281,8 +1341,23 @@ export function keepBackgroundPaintOnPlate(
     // divider rules are module furniture. Parking those on the plate is exactly
     // what made timeline / rail modules arrive in PowerPoint as one flat picture
     // with nothing selectable.
-    const vertical = nearFull(s.h, space.h) && thin(s.w, space.w);
-    const horizontal = nearFull(s.w, space.w) && thin(s.h, space.h);
+    // A sliver only counts as background furniture when it also HUGS a stage
+    // edge. Without that check, agenda row rules and other in-layout hairlines
+    // that happen to run nearly wall-to-wall were parked on the plate, which is
+    // why the agenda modules came back with only their copy selectable.
+    const atEdge = (v: number, size: number, total: number) =>
+      v <= total * 0.03 || v + size >= total * 0.97;
+    const railAlpha = s.gradient
+      ? Math.max(...s.gradient.stops.map((st) => st.color.alpha), 0)
+      : (s.fill?.alpha ?? 1);
+    // A full-height translucent strip is a ground column rail wherever it sits —
+    // that is the comb of see-through bars users found stacked over dark exports.
+    const vertical =
+      nearFull(s.h, space.h) &&
+      thin(s.w, space.w) &&
+      (atEdge(s.x, s.w, space.w) || railAlpha <= 0.5);
+    const horizontal =
+      nearFull(s.w, space.w) && thin(s.h, space.h) && atEdge(s.y, s.h, space.h);
     // A sliver that runs the FULL stage — top edge to bottom edge, or wall to
     // wall — is never module furniture: no timeline spine, stat rule or divider
     // reaches past the layout padding. Those stage-spanning rules are the
@@ -1606,16 +1681,19 @@ export async function resolveShapeImages(
       note();
       continue;
     }
-    let resolved = cache.get(src);
+    const key = s.cssFilter ? `${src}::${s.cssFilter}` : src;
+    let resolved = cache.get(key);
     if (resolved === undefined) {
       resolved = await inlineImage(src, s.w, s.h);
-      cache.set(src, resolved);
+      if (resolved && s.cssFilter) resolved = (await bakeGrade(resolved, s.cssFilter)) ?? resolved;
+      cache.set(key, resolved);
     }
     if (!resolved) {
       note();
       continue;
     }
-    out.push({ ...s, src: resolved });
+    const { cssFilter: _grade, ...rest } = s;
+    out.push({ ...rest, src: resolved });
   }
   return out;
 }
@@ -1646,6 +1724,42 @@ async function inlineImage(src: string, w: number, h: number): Promise<string | 
   }
 }
 
+/**
+ * Re-encode a picture with its CSS colour grade burnt in, at full resolution.
+ * PowerPoint carries no picture filter, so this is the only way a graded
+ * photograph can look right AND stay a replaceable picture object.
+ */
+async function bakeGrade(dataUrl: string, filter: string): Promise<string | null> {
+  try {
+    const img = new Image();
+    img.decoding = "sync";
+    const loaded = new Promise<boolean>((resolve) => {
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+    });
+    img.src = dataUrl;
+    if (!(await loaded)) return null;
+    const w = img.naturalWidth || 0;
+    const h = img.naturalHeight || 0;
+    if (w < 2 || h < 2) return null;
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    const filterable = ctx as CanvasRenderingContext2D & { filter?: string };
+    if (typeof filterable.filter !== "string") return null; // no canvas filter → ship ungraded
+    filterable.filter = filter;
+    ctx.drawImage(img, 0, 0, w, h);
+    filterable.filter = "none";
+    // JPEG for opaque photographs (a graded 1920px PNG is many megabytes).
+    const opaque = /^data:image\/jpe?g/.test(dataUrl);
+    return canvas.toDataURL(opaque ? "image/jpeg" : "image/png", opaque ? 0.92 : undefined);
+  } catch {
+    return null;
+  }
+}
+
 async function svgToPng(dataUrl: string, w: number, h: number): Promise<string | null> {
   try {
     const img = new Image();
@@ -1656,7 +1770,11 @@ async function svgToPng(dataUrl: string, w: number, h: number): Promise<string |
     });
     img.src = dataUrl;
     if (!(await loaded)) return null;
-    const scale = 2;
+    // 2x for legibility, but never below ~160px on the long edge: a 24px
+    // authoring icon rasterized at 48px looks soft the moment PowerPoint scales
+    // it up on a projector.
+    const longEdge = Math.max(w, h, 8);
+    const scale = Math.max(2, 160 / longEdge);
     const cw = Math.max(2, Math.round(Math.max(w, 8) * scale));
     const ch = Math.max(2, Math.round(Math.max(h, 8) * scale));
     const canvas = document.createElement("canvas");
