@@ -145,6 +145,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   );
 
   /** Division line with the master number set against it on a hairline. */
+  // The lockup owns one corner of every ad (top-right, or bottom-left when the
+  // copy column sits on the right), so the masthead keeps the frame number on
+  // the LEFT with the division line and never competes for that corner.
   const masthead = (ink: string = P.ink) => (
     <div className="flex w-full items-baseline gap-3" style={{ color: ink }}>
       <span
@@ -159,7 +162,6 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       >
         {LEGAL_ALONGSIDE_CONCEPT.division}
       </span>
-      <span aria-hidden className="flex-1" style={{ height: 1, background: `${ink}3D` }} />
       <span
         style={{
           fontFamily: TY.eyebrow.family,
@@ -171,8 +173,10 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       >
         {scene.no}
       </span>
+      <span aria-hidden className="flex-1" style={{ height: 1, background: `${ink}3D` }} />
     </div>
   );
+
 
   /**
    * The headline in the layout's display face, with its one emphasised phrase —
