@@ -133,7 +133,7 @@ export const LEGAL_BLOOM_CONCEPT = {
   name: "We're here for the tricky ones.",
   line: "Bloom variation · TransPerfect Legal",
   premise:
-    "Eight documentary frames of people deep in something awkward. Each picture is cut to the house shape — two diagonally opposite corners turned right over, the other two perfectly square — with an accent keyline offset behind it and a soft colour bloom leaning out of the turn. One phrase runs the set; one word turns in each ad.",
+    "Eight documentary frames of people deep in something awkward. Each picture is cut to the house shape — two diagonally opposite corners turned right over, the other two perfectly square — with a solid accent keyline on the frame and a soft colour bloom leaning out through the turned diagonal. One phrase runs the set; one word turns in each ad.",
 } as const;
 
 export const LEGAL_BLOOM_SCENES: BloomScene[] = [
