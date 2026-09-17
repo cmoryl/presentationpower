@@ -532,6 +532,50 @@ function BloomView() {
                   ))}
                 </select>
               </Field>
+              <Field label="Moving versions">
+                <select
+                  value={packMotion}
+                  onChange={(e) => setPackMotion(e.target.value as "off" | "key" | "all")}
+                  disabled={!videoFormat}
+                  className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm disabled:opacity-60"
+                >
+                  <option value="off">Still artwork only</option>
+                  <option value="key">Key social placements (3)</option>
+                  <option value="all">Every social placement ({BLOOM_PLACEMENTS.length})</option>
+                </select>
+              </Field>
+              {packMotion !== "off" && videoFormat ? (
+                <>
+                  <Field label="Motion">
+                    <select
+                      value={packMotionPreset}
+                      onChange={(e) => setPackMotionPreset(e.target.value)}
+                      className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm"
+                    >
+                      {bloomPresetsByFamily().map((group) => (
+                        <optgroup key={group.family} label={group.family}>
+                          {group.presets.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.label}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field label={`Clip length · ${packMotionSeconds}s`}>
+                    <input
+                      type="range"
+                      min={3}
+                      max={15}
+                      step={1}
+                      value={packMotionSeconds}
+                      onChange={(e) => setPackMotionSeconds(Number(e.target.value))}
+                      className="w-32"
+                    />
+                  </Field>
+                </>
+              ) : null}
               <button
                 type="button"
                 id="bloom-pack-button"
