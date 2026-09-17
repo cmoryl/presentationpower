@@ -1107,18 +1107,19 @@ export function bloomMotionFrame(
       revealMode: preset.reveal.mode,
     },
     bloom: {
-      scale: (0.94 + inA * 0.06) * (1 + aura * 0.035),
+      scale: (0.94 + inA * 0.06) * (1 + aura * 0.035 + backTurn * 0.02 * withGround),
       opacity: clamp01(inA * (1 - auraB * 0.05)),
-      driftX: aura * 0.02,
-      driftY: auraB * 0.016,
+      driftX: aura * 0.02 + backTurn * 0.016 * withGround,
+      driftY: auraB * 0.016 + backWave * 0.012 * withGround,
     },
     splash: {
       scale: (0.9 + easeOut(seg(p, 0.1, 0.7)) * 0.1) * (1 - aura * 0.03),
       opacity: clamp01(easeOut(seg(p, 0.05, 0.6)) * (1 + auraB * 0.04)),
 
-      driftX: -auraB * 0.018,
-      driftY: aura * 0.012,
+      driftX: -auraB * 0.018 - backWave * 0.014 * withGround,
+      driftY: aura * 0.012 + backTurn * 0.01 * withGround,
     },
+
 
     words: {
       progress: words,
