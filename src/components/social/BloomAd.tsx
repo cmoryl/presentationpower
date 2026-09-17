@@ -171,7 +171,8 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
           fontWeight: 700,
           color: P.ink,
           fontSize: `${headPx}px`,
-          lineHeight: headPx > short * 0.12 ? 0.98 : 1.04,
+          // the turning word is set much larger, so the line needs air under it
+          lineHeight: headPx > short * 0.12 ? 1.14 : 1.2,
           letterSpacing: "-0.015em",
           maxWidth: "15em",
           textWrap: "balance",
@@ -180,10 +181,15 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
         {scene.lead}{" "}
         <span
           style={{
+            display: "inline-block",
             fontStyle: "italic",
             color: C.type,
-            fontSize: "1.24em",
-            letterSpacing: "-0.02em",
+            fontSize: "1.62em",
+            lineHeight: 0.92,
+            letterSpacing: "-0.028em",
+            // it sits slightly lower than the roman line so the big italic
+            // reads as the called-out word rather than a broken line
+            transform: "translateY(0.055em)",
           }}
         >
           {scene.turn}
