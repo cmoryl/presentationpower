@@ -382,6 +382,10 @@ function BloomView() {
               {slider("Small line", zoomLayout.supportPx, 0.012, 0.06, (v) =>
                 putLayout({ ...zoomLayout, supportPx: v }),
               )}
+              {/* 1 = the same size as the rest of the headline; never below it. */}
+              {slider("Accent word", zoomLayout.turnEm ?? 1.62, 1, 3, (v) =>
+                putLayout({ ...zoomLayout, turnEm: Math.max(1, v) }),
+              )}
               {slider("Logo", zoomLayout.lockup.h, 0.02, 0.1, (v) =>
                 putLayout({ ...zoomLayout, lockup: { ...zoomLayout.lockup, h: v } }),
               )}
