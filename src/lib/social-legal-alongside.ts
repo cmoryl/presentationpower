@@ -128,7 +128,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     photoObjection:
       "A rally car reads as speed for its own sake, which is the opposite of how I want my matters run.",
     photoVerdict:
-      "Holds only because the frame is the cockpit, not the car: hand-written notes and a second person reading them. Cut it if the set ever needs to look less macho.",
+      "Re-shot inside the cockpit only: no car body, no livery, no speed theatrics — two people and a hand-written note book calling the next corner.",
     src: rally,
     focus: "50% 50%",
     focusSquare: "45% 55%",
@@ -153,7 +153,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     photoObjection:
       "Golf is the corporate-hospitality cliché, and half my panel firms already use it. It also signals a client I am not.",
     photoVerdict:
-      "Weakest frame in the set for a legal audience. The filthy weather and buried lie save it from country-club, but it is the first one I would drop.",
+      "Re-shot to answer that: every country-club cue is gone — wild coastal links, storm light, mud, no clubhouse, no spectators, no branding. It now reads as work in bad conditions, not hospitality.",
     src: golfer,
     focus: "35% 55%",
     focusSquare: "40% 55%",
@@ -203,7 +203,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     photoObjection:
       "Combat sport next to a legal brand implies we are looking for a fight. My board would not sign it.",
     photoVerdict:
-      "Real risk. Keep it for litigation audiences only; it is wrong for compliance or contracts, where a fight framing is exactly the wrong promise.",
+      "Re-shot without the fight: the boxer sits between rounds, no blood, no raised fists, no crowd, and the coach works quietly a metre away. Safe for any legal audience now.",
     src: boxer,
     focus: "50% 40%",
     focusSquare: "48% 40%",
@@ -253,7 +253,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     photoObjection:
       "Cycling is the most over-used metaphor in consulting, full stop.",
     photoVerdict:
-      "Survives on the honesty of the picture rather than the idea — road grit and one rider visibly paying for both. Rotate it out first if the set feels generic.",
+      "Re-shot to stop being stock: an exposed crosswind coast road, plain unbranded kit, the front rider visibly paying for both. Specific weather, specific cost.",
     src: cycling,
     focus: "30% 50%",
     focusSquare: "35% 50%",
@@ -278,7 +278,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     photoObjection:
       "Whitewater looks like risk-taking, and I am the person paid to reduce risk.",
     photoVerdict:
-      "Holds because both paddlers are reading the same line rather than thrill-seeking, but the caption has to do the work; the image alone reads as adrenaline.",
+      "Re-shot without the adrenaline: both paddlers upright and composed, blades set on the same line, eyes on the water. It reads as control, not risk-taking.",
     src: whitewater,
     focus: "55% 45%",
     focusSquare: "58% 45%",
@@ -353,7 +353,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     photoObjection:
       "A restaurant kitchen has no relationship to legal work, and chef culture reads as shouting.",
     photoVerdict:
-      "Holds as a picture of managed volume — two people, one plate, no theatre — but it is the least legible link to legal of the sixteen.",
+      "Re-shot as managed volume: an orderly pass of identical plates, a ticket rail, calm precise hands and no kitchen theatre. The link to scheduled work now reads without the caption.",
     src: kitchen,
     focus: "35% 45%",
     focusSquare: "38% 45%",
@@ -403,7 +403,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     photoObjection:
       "Wreck diving looks reckless, and dark water is hard to read at LinkedIn size.",
     photoVerdict:
-      "Holds on the guideline and reel, which is the whole argument, but it is the weakest at small sizes; use it on the larger placements only.",
+      "Re-shot for small sizes: clearer water, stronger torch beams and the taut guideline now the brightest thing in the frame, so the argument survives at feed scale.",
     src: divers,
     focus: "60% 50%",
     focusSquare: "62% 50%",
@@ -428,7 +428,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     photoObjection:
       "Gym imagery reads as hustle culture, which lands badly with senior in-house counsel.",
     photoVerdict:
-      "Holds because the spotter's open hands take none of the weight, and that is the exact promise. Keep the crop tight enough that it is not a physique shot.",
+      "Re-shot tight on the spotter's open palms a hand's width from the bar, torsos covered, no mirrors or hustle styling. The promise is the whole picture now.",
     src: lifter,
     focus: "45% 45%",
     focusSquare: "45% 45%",
@@ -453,7 +453,7 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
     photoObjection:
       "Rowing signals a specific university background. It can read as exclusive.",
     photoVerdict:
-      "Holds on the work rather than the club: taped, blistered hands at the catch, no boat livery, no crest. Do not add any identifying kit.",
+      "Re-shot with every club identifier removed — no crest, no livery, no landmarks on the bank — so it reads as matched work under load rather than a particular institution.",
     src: rowing,
     focus: "30% 45%",
     focusSquare: "32% 45%",
