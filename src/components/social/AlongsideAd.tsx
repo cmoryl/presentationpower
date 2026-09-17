@@ -1211,8 +1211,8 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   } else if (template === "window") {
     // Frame cropped to a window on wide margins; copy set beneath on a baseline.
     const side = M * 1.25;
-    const imgTop = wide ? 17 : 14;
-    const imgH = tall ? 46 : square ? 46 : 42;
+    const imgTop = banner ? 12 : wide ? 17 : 14;
+    const imgH = tall ? 46 : square ? 46 : banner ? 32 : 42;
     body = (
       <div className="absolute inset-0" style={{ background: P.ground }}>
         <div className="absolute" style={{ top: "6%", left: u(side), right: u(side) }}>
