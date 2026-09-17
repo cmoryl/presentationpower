@@ -244,7 +244,7 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
         {picture}
       </div>
 
-      {/* the division lockup — one corner, never typed out */}
+      {/* the division lockup — black single line, always bottom left */}
       {lockup ? (
         <img
           src={lockup}
@@ -252,13 +252,8 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
           aria-hidden
           style={{
             position: "absolute",
-            // On tall trims the picture fills the foot of the frame, so the
-            // lockup sits at the head where the ground is clear.
-            ...(mode === "stacked"
-              ? { right: margin * 0.9, top: margin * 0.5 }
-              : copySide === "left"
-                ? { right: margin * 0.9, bottom: margin * 0.6 }
-                : { left: margin * 0.9, bottom: margin * 0.6 }),
+            left: margin * 0.9,
+            bottom: margin * 0.6,
             height: `${Math.max(14, short * 0.042)}px`,
             width: "auto",
             opacity: 0.95,
