@@ -208,11 +208,15 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     // No widows: the last two words are bound together so a single word can
     // never be left stranded on its own line.
     const noWidow = (s: string) => {
+      // Trailing word space is kept: this fragment can be followed by the turn
+      // phrase in another face, and losing the space runs the words together.
+      const trail = /\s$/.test(s) ? "\u00A0" : "";
       const words = s.trimEnd().split(" ");
       if (words.length < 3) return s;
       const tail = words.slice(-2).join("\u00A0");
-      return `${words.slice(0, -2).join(" ")} ${tail}`;
+      return `${words.slice(0, -2).join(" ")} ${tail}${trail}`;
     };
+
     // A face switch only reads as emphasis on a SHORT phrase. When the turn is
     // most of the headline, swapping faces mid-line just looks like two
     // headlines colliding — so the phrase stays in the display face and is
@@ -240,6 +244,40 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       const comp = px > 4.6 ? -0.012 : px < 2.8 ? 0.008 : 0;
       return `${(base + comp).toFixed(4)}em`;
     })();
+    // ---- word-level call-outs ----------------------------------------------
+    // Besides the turn phrase, the one word the sentence pivots on is set apart:
+    // an italic in the contrasting face, a heavier or lighter weight, tracked
+    // caps, or an accent hairline. Call-outs are applied outside the turn only,
+    // so a line never carries two competing emphases in the same breath.
+    const calloutStyle = (treat: string): React.CSSProperties => {
+      if (treat === "italic")
+        return { fontFamily: a.family, fontStyle: "italic", letterSpacing: "0em" };
+      if (treat === "bold") return { fontWeight: Math.min(900, d.weight + 200) };
+      if (treat === "light") return { fontWeight: Math.max(200, d.weight - 300) };
+      if (treat === "caps")
+        return { textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.88em" };
+      return { borderBottom: `${u(0.16)} solid ${P.accent}`, paddingBottom: u(0.16) };
+    };
+    // Word spaces either side of a call-out are bound, so the emphasis never
+    // swallows the space between it and the next word.
+    const ws = (s: string) => s.replace(/^ /, "\u00A0").replace(/ $/, "\u00A0");
+    const deco = (s: string, depth = 0): React.ReactNode => {
+      if (depth > 3) return s;
+      const hay = s.replace(/\u00A0/g, " ");
+      for (const c of ST.callouts ?? []) {
+        const i = hay.indexOf(c.text);
+        if (i < 0) continue;
+        return (
+          <>
+            {ws(s.slice(0, i))}
+            <span style={calloutStyle(c.treat)}>{s.slice(i, i + c.text.length)}</span>
+            {deco(ws(s.slice(i + c.text.length)), depth + 1)}
+          </>
+        );
+      }
+      return s;
+    };
+
     return (
       <div
         style={{
@@ -256,7 +294,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           maxWidth: `${measure}em`,
         }}
       >
-        {parts.after ? parts.before : noWidow(parts.before)}
+        {deco(parts.after ? parts.before : noWidow(parts.before))}
         {parts.action ? (
           <span
             style={{
@@ -274,9 +312,10 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             {parts.action}
           </span>
         ) : null}
-        {parts.after ? noWidow(parts.after) : null}
+        {parts.after ? deco(noWidow(parts.after)) : null}
       </div>
     );
+
   };
 
   // A wide banner has no room for a second line of copy — the headline and the
