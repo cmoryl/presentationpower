@@ -256,6 +256,16 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       if (treat === "light") return { fontWeight: Math.max(200, d.weight - 300) };
       if (treat === "caps")
         return { textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.88em" };
+      // Tracked: the word is opened up rather than restyled, so it slows the
+      // reader down without breaking the line's texture.
+      if (treat === "tracked") return { letterSpacing: "0.08em", fontWeight: d.weight };
+      // Quiet: held back in weight and alpha so the words around it carry.
+      if (treat === "light" || treat === "quiet")
+        return { fontWeight: Math.max(200, d.weight - 200), opacity: 0.72 };
+      // Accent: the only place brand blue touches display copy — one word, never
+      // body text, so contrast rules still hold.
+      if (treat === "accent")
+        return { color: P.accent, fontWeight: Math.min(900, d.weight + 100) };
       return { borderBottom: `${u(0.16)} solid ${P.accent}`, paddingBottom: u(0.16) };
     };
     // Word spaces either side of a call-out are bound, so the emphasis never
