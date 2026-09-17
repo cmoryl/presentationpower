@@ -109,7 +109,7 @@ export function DeviceFrame({
         aspectRatio: `${aspect}`,
         overflow: "hidden",
         background: "#05070D",
-        borderRadius: kind === "laptop" ? "0.6%" : "0.4%",
+        borderRadius: kind === "phone" ? "6%" : kind === "laptop" ? "0.6%" : "0.4%",
       }}
     >
       <div style={{ position: "absolute", inset: 0 }}>{children}</div>
