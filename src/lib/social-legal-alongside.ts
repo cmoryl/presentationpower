@@ -599,6 +599,23 @@ export const LEGAL_ALONGSIDE_TEMPLATES = [
 
 export type AlongsideTemplateId = (typeof LEGAL_ALONGSIDE_TEMPLATES)[number]["id"];
 
+// Layouts grouped into families so the picker reads as five short lists
+// instead of twenty-one identical pills.
+export const LEGAL_ALONGSIDE_TEMPLATE_FAMILIES: Array<{
+  label: string;
+  ids: AlongsideTemplateId[];
+}> = [
+  { label: "Transparency & light", ids: ["veil", "strata", "bloom"] },
+  { label: "Photograph-led", ids: ["knockout", "louvre", "marquee", "arch", "contact"] },
+  { label: "Hard cut shapes", ids: ["wedge", "blade", "shard", "chevron"] },
+  { label: "Editorial & grid", ids: ["editorial", "inset", "ledger", "window", "centre"] },
+  { label: "Poster & plate", ids: ["spine", "stack", "poster", "field"] },
+];
+
+export function alongsideTemplateLabel(id: AlongsideTemplateId): string {
+  return LEGAL_ALONGSIDE_TEMPLATES.find((t) => t.id === id)?.label ?? id;
+}
+
 // Every sizing format the set has to survive, grouped for the picker. Ids are
 // stable — they are what the board stores when you switch trim.
 export const LEGAL_ALONGSIDE_SIZES = [
