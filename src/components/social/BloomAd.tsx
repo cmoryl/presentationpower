@@ -122,7 +122,18 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
           filter: `blur(${short * 0.045}px)`,
         }}
       />
+      {/* the quiet mark: abstracted from this ad's own layout, sharp, held at 20%,
+          in front of the bloom and behind the picture */}
+      <BloomMark
+        motif={bloomMotif(scene)}
+        colour={C.type}
+        boxW={boxW}
+        boxH={boxH}
+        pad={short * 0.13}
+        lean={lean}
+      />
       {/* the picture, cut to the master frame: two diagonal corners turned, two square */}
+
       <div
         style={{
           position: "relative",
