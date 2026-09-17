@@ -33,7 +33,10 @@ type Props = {
   template: AlongsideTemplateId;
   w: number;
   h: number;
+  /** Google-font pairing applied over the layout's house treatment. */
+  typeSet?: string;
 };
+
 
 const hex = (alpha: number) =>
   Math.round(Math.max(0, Math.min(1, alpha)) * 255)
