@@ -8,7 +8,8 @@
 //   · a solid accent keyline sitting on the frame itself, as in the master
 //   · the headline beside (wide trims) or under (tall trims) the picture, with
 //     the turning word italic in the bloom's colour
-//   · the Legal lockup, black single line, always bottom left
+//   · a soft accent splash in the lower corner away from the picture
+//   · the Legal lockup, black single line, always bottom right
 //
 // The picture frame and the copy block are placed from a layout (fractions of
 // the trim), so the board can move and resize them per ad and per size. With no
@@ -87,6 +88,10 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
   const scrimEm = Math.max(0, Math.min(2, L.scrimEm ?? 1));
   const bloomEm = Math.max(0, Math.min(3, L.bloomEm ?? 1));
   const scrimAlpha = Math.min(0.95, (0.42 + overlap * 0.55) * scrimEm);
+
+  // the lower accent splash sits in the corner the picture is furthest from
+  const pictureCentre = L.picture.x + L.picture.w / 2;
+  const splashSide: "left" | "right" = pictureCentre >= 0.5 ? "left" : "right";
 
   return (
     <div
@@ -228,14 +233,32 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
         </div>
       </div>
 
-      {/* the division lockup — black single line, always bottom left */}
+      {/* a soft accent splash in the lower corner away from the picture, so the
+          bottom of the ad carries some of the bloom's colour behind the lockup */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          bottom: `-${short * 0.24}px`,
+          [splashSide]: `-${short * 0.2}px`,
+          width: `${short * 0.72}px`,
+          height: `${short * 0.62}px`,
+          background: `radial-gradient(ellipse at ${splashSide === "left" ? "34%" : "66%"} 66%, ${C.glow}D9 0%, ${C.glow}8C 34%, ${C.glow}40 56%, ${C.glow}00 76%)`,
+          filter: `blur(${short * 0.05 * Math.max(0.35, bloomEm)}px)`,
+          opacity: bloomEm === 0 ? 0 : 0.9,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* the division lockup — black single line, always bottom right */}
       <img
         src={tpLegalBlack}
         alt=""
         aria-hidden
         style={{
           position: "absolute",
-          left: `${L.lockup.x * w}px`,
+          right: `${L.lockup.x * w}px`,
           bottom: `${L.lockup.y * h}px`,
           height: `${L.lockup.h * short}px`,
           width: "auto",
