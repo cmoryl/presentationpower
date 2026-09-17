@@ -105,7 +105,8 @@ describe("bloom motion frames", () => {
     for (const preset of BLOOM_MOTION_PRESETS) {
       const start = bloomMotionFrame(preset, 0, 8);
       const end = bloomMotionFrame(preset, 8, 8);
-      expect(start.words.progress).toBeLessThan(0.2);
+      // a "hold" arrival is composed from the first frame by design
+      if (preset.text.mode !== "hold") expect(start.words.progress).toBeLessThan(0.2);
       expect(end.words.progress).toBeCloseTo(1, 2);
       expect(end.turn.opacity).toBeCloseTo(1, 2);
       expect(end.logo.opacity).toBeCloseTo(1, 2);
