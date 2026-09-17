@@ -25,6 +25,8 @@ import {
   LEGAL_ALONGSIDE_SIZES,
   LEGAL_ALONGSIDE_TEMPLATES,
   LEGAL_ALONGSIDE_TYPE,
+  LEGAL_ALONGSIDE_TYPESETS,
+  applyAlongsideTypeSet,
   type AlongsideTemplateId,
 } from "@/lib/social-legal-alongside";
 
@@ -57,6 +59,7 @@ export const Route = createFileRoute("/social/legal-alongside")({
 function AlongsideView() {
   const [template, setTemplate] = useState<AlongsideTemplateId>("knockout");
   const [sizeId, setSizeId] = useState<string>("linkedin");
+  const [typeSet, setTypeSet] = useState<string>("house");
   const [perScene, setPerScene] = useState<Record<string, AlongsideTemplateId>>({});
   const [zoom, setZoom] = useState<string | null>(null);
   const size = LEGAL_ALONGSIDE_SIZES.find((s) => s.id === sizeId) ?? LEGAL_ALONGSIDE_SIZES[0];
@@ -181,9 +184,38 @@ function AlongsideView() {
         </div>
 
 
+        <div className="space-y-2 rounded-2xl border border-black/10 bg-white/70 p-4">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+            Type treatment
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {LEGAL_ALONGSIDE_TYPESETS.map((ts) => (
+              <button
+                key={ts.id}
+                type="button"
+                onClick={() => setTypeSet(ts.id)}
+                aria-pressed={ts.id === typeSet}
+                title={ts.note}
+                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                  ts.id === typeSet
+                    ? "border-[#03002C] bg-[#03002C] text-white"
+                    : "border-black/15 bg-white text-[#03002C] hover:border-[#003FC7]/50"
+                }`}
+              >
+                {ts.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-black/55">
+            {LEGAL_ALONGSIDE_TYPESETS.find((ts) => ts.id === typeSet)?.note}
+          </p>
+        </div>
+
         <p className="text-xs text-black/55">
           {LEGAL_ALONGSIDE_TEMPLATES.find((t) => t.id === template)?.note}{" "}
-          <span className="text-black/40">— {LEGAL_ALONGSIDE_TYPE[template].note}</span>
+          <span className="text-black/40">
+            — {applyAlongsideTypeSet(LEGAL_ALONGSIDE_TYPE[template], typeSet).note}
+          </span>
         </p>
 
         <div className="grid gap-8 lg:grid-cols-2">
@@ -213,7 +245,13 @@ function AlongsideView() {
                     title="Click to view much larger"
                     className="group relative mx-auto block w-full max-w-[560px] cursor-zoom-in overflow-hidden rounded-xl shadow-[0_16px_40px_-22px_rgba(3,0,44,0.45)] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
                   >
-                    <AlongsideAd scene={scene} template={active} w={size.w} h={size.h} />
+                    <AlongsideAd
+                      scene={scene}
+                      template={active}
+                      w={size.w}
+                      h={size.h}
+                      typeSet={typeSet}
+                    />
                     <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C]/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
                       <Maximize2 size={11} /> View larger
                     </span>
@@ -251,7 +289,8 @@ function AlongsideView() {
                     <span className="font-semibold uppercase tracking-widest text-black/40">
                       Type
                     </span>{" "}
-                    {LEGAL_ALONGSIDE_TYPE[active].note} Emphasis on “{scene.action}”.
+                    {applyAlongsideTypeSet(LEGAL_ALONGSIDE_TYPE[active], typeSet).note} Emphasis
+                    on “{scene.action}”.
                   </p>
 
                   <div className="flex flex-wrap items-center gap-1.5 pt-1">
@@ -320,6 +359,25 @@ function AlongsideView() {
                 <div className="text-lg font-semibold">{zoomScene.theme}</div>
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
+                {LEGAL_ALONGSIDE_TYPESETS.map((ts) => (
+                  <button
+                    key={ts.id}
+                    type="button"
+                    onClick={() => setTypeSet(ts.id)}
+                    aria-pressed={ts.id === typeSet}
+                    title={ts.note}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                      ts.id === typeSet
+                        ? "border-white bg-white text-[#03002C]"
+                        : "border-white/25 text-white/80 hover:border-white/60"
+                    }`}
+                  >
+                    {ts.label}
+                  </button>
+                ))}
+                <span aria-hidden className="mx-1 text-white/25">
+                  |
+                </span>
                 {LEGAL_ALONGSIDE_SIZES.map((s) => (
                   <button
                     key={s.id}
@@ -378,6 +436,7 @@ function AlongsideView() {
                   template={perScene[zoomScene.id] ?? template}
                   w={size.w}
                   h={size.h}
+                  typeSet={typeSet}
                 />
               </div>
             </div>

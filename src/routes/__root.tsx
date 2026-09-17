@@ -157,6 +157,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;600;700&family=Space+Grotesk:wght@400;500;700&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600&family=Manrope:wght@400;600&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:wght@400;500;600&family=Karla:wght@400;700&family=Jura:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&family=Bebas+Neue&family=Barlow:wght@400;600;700&family=Lora:wght@400;500;600&family=Nunito+Sans:wght@400;700&family=Outfit:wght@200;300;400;600&family=Figtree:wght@400;600&family=Syne:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700&family=Libre+Baskerville:wght@400;700&family=Tektur:wght@500;600;700&family=Rubik:wght@400;500;700&family=Hind:wght@400;500;600;700&family=Poiret+One&family=Anton&family=Oswald:wght@300;400;500;600&family=Great+Vibes&family=Fraunces:ital,wght@0,400;0,600;1,400&family=Courgette&display=swap",
       },
+      // Campaign type sets — the wider Google-font pairings offered on the ad boards.
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,800;1,500;1,700&family=DM+Serif+Display:ital@0;1&family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;1,6..96,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Newsreader:ital,wght@0,400;0,600;1,400&family=Spectral:ital,wght@0,400;0,600;1,400&family=Bricolage+Grotesque:wght@400;600;800&family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Sans:wght@400;500;600;700&family=Familjen+Grotesk:ital,wght@0,400;0,600;0,700;1,400&family=Epilogue:ital,wght@0,400;0,600;0,700;1,400&family=Chivo:ital,wght@0,400;0,500;0,700;1,400&family=Big+Shoulders+Display:wght@600;700;800&family=Unbounded:wght@400;600;700&family=Gabarito:wght@400;500;600;700&display=swap",
+      },
+
     ],
   }),
   shellComponent: RootShell,
