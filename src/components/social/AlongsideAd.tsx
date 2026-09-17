@@ -287,7 +287,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     if (kind === "full" && hardCut && wide && !tall && template !== "chevron") {
       return (
         <>
-          <div className="absolute inset-0" style={{ background: P.ground }} />
+          <div className="absolute inset-0" style={{ background: GROUND }} />
           <div
             className="absolute overflow-hidden"
             style={{
@@ -325,7 +325,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     // ground colour, instead of a crop that loses the partner.
     return (
       <>
-        <div className="absolute inset-0" style={{ background: P.ground }} />
+        <div className="absolute inset-0" style={{ background: GROUND }} />
         <div
           className="absolute overflow-hidden"
           style={
@@ -388,6 +388,31 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   // The frame numbers and the "FRAME 04 / pair" studio marks were struck from
   // the ads: they are production bookkeeping, not campaign copy. The hairline
   // stays so the layouts keep their measure line.
+  // ---- full-frame ground --------------------------------------------------
+  // Every ad in the set now carries its whole photograph edge to edge. The
+  // layouts' solid plates become deep washes of the ground colour instead of
+  // opaque fields, so the picture reads underneath the copy while the type keeps
+  // its contrast. The key visual is preserved: this layer is cropped on the
+  // scene's own subject point, not centred blind.
+  const GROUND = `${P.ground}BF`;
+  const fullGround = (
+    <div aria-hidden className="absolute inset-0 overflow-hidden">
+      <img
+        src={scene.src}
+        alt=""
+        loading="lazy"
+        className="absolute inset-0 size-full object-cover"
+        style={{ objectPosition: framePos("panel"), filter: "contrast(1.04) saturate(1.02)" }}
+      />
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `linear-gradient(to top, ${P.ground}E0 0%, ${P.ground}8F 48%, ${P.ground}B3 100%)`,
+        }}
+      />
+    </div>
+  );
+
   const masthead = (ink: string = P.ink) => (
     <div
       className="flex w-full items-center"
@@ -467,23 +492,39 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     // an italic in the contrasting face, a heavier or lighter weight, tracked
     // caps, or an accent hairline. Call-outs are applied outside the turn only,
     // so a line never carries two competing emphases in the same breath.
+    // The colour a called-out word takes: on a light plate the word can only be
+    // brand blue (the light secondaries fail contrast there); over the picture it
+    // takes the ad's own accent tint, and blue swaps to aqua so it stays legible.
+    const onLight = (opts?.color ?? P.ink) === P.ink;
+    const WORD_COLOR = onLight
+      ? P.accent
+      : MARK.tint === "accent" || MARK.tint === "ink"
+        ? ACCENT_MARK_COLORS.aqua
+        : MARK_COLOR;
     const calloutStyle = (treat: string): React.CSSProperties => {
       if (treat === "italic")
         return { fontFamily: a.family, fontStyle: "italic", letterSpacing: "0em" };
-      if (treat === "bold") return { fontWeight: Math.min(900, d.weight + 200) };
+      if (treat === "bold")
+        return { fontWeight: Math.min(900, d.weight + 200), color: WORD_COLOR };
       if (treat === "light") return { fontWeight: Math.max(200, d.weight - 300) };
       if (treat === "caps")
-        return { textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.88em" };
+        return {
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+          fontSize: "0.88em",
+          color: WORD_COLOR,
+        };
       // Tracked: the word is opened up rather than restyled, so it slows the
       // reader down without breaking the line's texture.
-      if (treat === "tracked") return { letterSpacing: "0.08em", fontWeight: d.weight };
+      if (treat === "tracked")
+        return { letterSpacing: "0.08em", fontWeight: d.weight, color: WORD_COLOR };
       // Quiet: held back in weight and alpha so the words around it carry.
       if (treat === "quiet")
         return { fontWeight: Math.max(200, d.weight - 200), opacity: 0.72 };
       // Accent: the only place brand blue touches display copy — one word, never
       // body text, so contrast rules still hold.
       if (treat === "accent")
-        return { color: P.accent, fontWeight: Math.min(900, d.weight + 100) };
+        return { color: WORD_COLOR, fontWeight: Math.min(900, d.weight + 100) };
       // Rule: a drawn underline in the ad's own hand, not a border. A straight
       // 1px border under a word is the machine tell this campaign avoids.
       return {
@@ -842,7 +883,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     const size = (square ? T.display * 1.5 : T.display * 1.2) * TY.display.scale;
     body = (
       <>
-        <div className="absolute inset-0" style={{ background: P.ground }} />
+        <div className="absolute inset-0" style={{ background: GROUND }} />
         <div
           className="absolute overflow-hidden"
           style={{ left: 0, right: 0, bottom: 0, height: wide ? "32%" : square ? "40%" : "36%" }}
@@ -897,7 +938,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     const bandTop = wide ? "50%" : square ? "58%" : "60%";
     body = (
       <>
-        <div className="absolute inset-0 flex" style={{ gap: u(0.7), background: P.ground }}>
+        <div className="absolute inset-0 flex" style={{ gap: u(0.7), background: GROUND }}>
           {panes.map((pos, i) => (
             <div key={pos + i} className="relative flex-1 overflow-hidden">
               <img
@@ -912,7 +953,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             </div>
           ))}
         </div>
-        <div className="absolute inset-x-0 bottom-0" style={{ top: bandTop, background: P.ground }}>
+        <div className="absolute inset-x-0 bottom-0" style={{ top: bandTop, background: GROUND }}>
           {drawnEdge("top", 1.3)}
         </div>
         <div className="absolute inset-x-0 top-0 flex" style={{ padding: u(M), bottom: bandTop }}>
@@ -1003,7 +1044,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       : { top: u(M * 1.1), left: u(M), right: u(M), height: square ? "54%" : "50%" };
     body = (
       <>
-        <div className="absolute inset-0" style={{ background: P.ground }} />
+        <div className="absolute inset-0" style={{ background: GROUND }} />
         <div
           aria-hidden
           className="absolute"
@@ -1046,7 +1087,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     const crops = [offsetPos(-20, -12), offsetPos(20, 12)];
     body = (
       <>
-        <div className="absolute inset-0" style={{ background: P.ground }} />
+        <div className="absolute inset-0" style={{ background: GROUND }} />
         <div
           className="absolute overflow-hidden"
           style={
@@ -1158,7 +1199,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       <>
         {photo(cutSlide())}
         <div className="absolute inset-0" style={{ background: curtain(tall ? "bottom" : fromLeft ? "left" : "right", 0.46) }} />
-        <div className="absolute inset-0" style={{ background: P.ground, clipPath: shape }} />
+        <div className="absolute inset-0" style={{ background: `${P.ground}D9`, clipPath: shape }} />
         <div
             aria-hidden
             className="absolute inset-0"
@@ -1211,7 +1252,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       <>
         {photo(cutSlide())}
         <div className="absolute inset-0" style={{ background: curtain(tall ? "bottom" : fromLeft ? "left" : "right", 0.55) }} />
-        <div className="absolute inset-0" style={{ background: P.ground, clipPath: shape }} />
+        <div className="absolute inset-0" style={{ background: `${P.ground}D9`, clipPath: shape }} />
         <div
           className="absolute"
           style={{ top: u(M), left: u(M), right: u(M * 5) }}
@@ -1253,7 +1294,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       <>
         {photo()}
         <div className="absolute inset-0" style={{ background: `${P.ground}2E` }} />
-        <div className="absolute inset-0" style={{ background: P.ground, clipPath: band }} />
+        <div className="absolute inset-0" style={{ background: `${P.ground}D9`, clipPath: band }} />
         <div
           aria-hidden
           className="absolute inset-0"
@@ -1327,7 +1368,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     const imgTop = wide ? "17%" : "14%";
     const imgBottom = wide ? "33%" : square ? "27%" : "24%";
     body = (
-      <div className="absolute inset-0" style={{ background: P.ground }}>
+      <div className="absolute inset-0" style={{ background: GROUND }}>
         <div
           className="absolute overflow-hidden"
           style={{ top: imgTop, bottom: imgBottom, left: u(side), right: u(side) }}
@@ -1376,7 +1417,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             width: u(spine),
             left: spineLeft ? 0 : "auto",
             right: spineLeft ? "auto" : 0,
-            background: P.ground,
+            background: GROUND,
           }}
         >
           {drawnEdge(spineLeft ? "right" : "left", 1.1, 21)}
@@ -1434,7 +1475,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           className="absolute inset-x-0 bottom-0 flex flex-col"
           style={{
             height: `${ledger}%`,
-            background: P.ground,
+            background: GROUND,
             paddingInline: u(M),
             paddingBlock: u(M * 0.7),
             gap: u(1.4),
@@ -1476,7 +1517,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     // margin below it — the plate overlaps the picture edge, never floats in it.
     const right = clear === "right";
     body = (
-      <div className="absolute inset-0" style={{ background: P.ground }}>
+      <div className="absolute inset-0" style={{ background: GROUND }}>
         <div className="absolute inset-x-0 top-0 overflow-hidden" style={{ bottom: wide ? "22%" : "18%" }}>
           {photo(undefined, "panel")}
         </div>
@@ -1487,7 +1528,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             left: right ? u(M) : "auto",
             right: right ? "auto" : u(M),
             width: tall ? "80%" : square ? "74%" : "58%",
-            background: P.ground,
+            background: GROUND,
             paddingInline: u(square ? 3.2 : 2.6),
             paddingBlock: u(square ? 2.6 : 2),
             display: "grid",
@@ -1506,7 +1547,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     // Caps headline in a ground masthead; picture opens beneath as a window.
     const head = wide ? "46%" : "44%";
     body = (
-      <div className="absolute inset-0" style={{ background: P.ground }}>
+      <div className="absolute inset-0" style={{ background: GROUND }}>
         <div
           className="absolute inset-x-0 top-0 flex flex-col justify-between"
           style={{ height: head, paddingInline: u(M), paddingBlock: u(M * 0.8) }}
@@ -1537,7 +1578,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     const imgTop = banner ? 12 : wide ? 17 : 14;
     const imgH = tall ? 46 : square ? 46 : banner ? 32 : 42;
     body = (
-      <div className="absolute inset-0" style={{ background: P.ground }}>
+      <div className="absolute inset-0" style={{ background: GROUND }}>
         <div className="absolute" style={{ top: "6%", left: u(side), right: u(side) }}>
           {masthead()}
         </div>
@@ -1574,7 +1615,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     const fieldLeft = clear !== "right";
     const fieldW = tall ? 100 : square ? 52 : 46;
     body = (
-      <div className="absolute inset-0" style={{ background: P.ground }}>
+      <div className="absolute inset-0" style={{ background: GROUND }}>
         <div
           className="absolute overflow-hidden"
           style={
@@ -1681,6 +1722,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
       }}
     >
+      {fullGround}
       {body}
       {cornerLockup}
     </div>
