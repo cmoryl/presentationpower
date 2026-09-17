@@ -253,7 +253,10 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     }
     if (kind !== "full" || !(stackedCut || squareish)) return img;
     /** Copy at the top of the frame means the picture hangs from the bottom. */
-    const bandAtBottom = !stackedCut && clear === "top";
+    const bandAtBottom = !stackedCut && clear === "top" && template !== "chevron";
+    /** The chevron drives its ink band across the lower frame, so the picture
+     * hangs from the TOP on the square trims and the band sits under it. */
+    const bandAtTop = template === "chevron";
     // A 9:16 story shows barely a third of the frame's width. Cropping that hard
     // always drops one of the two figures — and the pair IS the ad. So the story
     // format holds the whole photograph in a band across the upper frame, on the
@@ -268,7 +271,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
               ? { left: 0, right: 0, top: "6%", aspectRatio: "1376 / 768" }
               : bandAtBottom
                 ? { left: 0, right: 0, bottom: 0, aspectRatio: "1376 / 768" }
-                : {
+                : bandAtTop
+                  ? { left: 0, right: 0, top: "2%", aspectRatio: "1376 / 768" }
+                  : {
                     // Letterboxed in the middle of the frame: the whole picture
                     // reads, and the ground above and below carries the copy.
                     left: 0,
@@ -1156,8 +1161,10 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     // An angled ink band driven across the frame, accent slabs on both cuts.
     // The band is held lower and shallower than it was: at the old depth it sat
     // straight across both figures and the photograph stopped reading.
-    const bandTop = wide ? 36 : veryTall ? 52 : 40;
-    const bandH = wide ? 44 : veryTall ? 34 : 40;
+    // On square and portrait trims the whole photograph hangs from the top of
+    // the frame, so the band is dropped clear of it.
+    const bandTop = wide ? 36 : veryTall ? 52 : 50;
+    const bandH = wide ? 44 : veryTall ? 34 : 38;
     const skew = wide ? 7 : 5;
     const band = `polygon(0 ${bandTop + skew}%, 100% ${bandTop}%, 100% ${bandTop + bandH}%, 0 ${bandTop + bandH + skew}%)`;
     body = (
