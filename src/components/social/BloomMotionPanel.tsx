@@ -22,7 +22,6 @@ import {
   bloomAspectLabel,
   bloomClipSeconds,
   bloomExpectedMb,
-  bloomMotionFrame,
   bloomMotionPath,
   bloomMotionReadme,
   bloomMotionSpecCsv,
@@ -31,15 +30,10 @@ import {
   bloomPlacementsByPlatform,
   bloomPreset,
   bloomSafeLayout,
-  bloomVideoBitrate,
 } from "@/lib/social-legal-bloom-motion";
 import { bloomPackRoot } from "@/lib/social-legal-bloom-pack";
-import {
-  drawBloomMotionFrame,
-  ensureBloomFonts,
-  loadBloomAssets,
-} from "@/lib/social-legal-bloom-draw";
-import { bloomVideoFormat, recordBloomClip } from "@/lib/social-legal-bloom-video";
+import { recordBloomSceneClip } from "@/lib/social-legal-bloom-record";
+import { bloomVideoFormat } from "@/lib/social-legal-bloom-video";
 
 const FPS = 30;
 
