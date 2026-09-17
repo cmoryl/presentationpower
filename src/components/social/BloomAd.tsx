@@ -222,14 +222,14 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
         aria-hidden
         style={{
           position: "absolute",
-          bottom: margin * 0.45,
           top: margin * 0.45,
-          ...bracketSide,
-          width: `${w - margin * 0.8}px`,
-          borderLeft: copySide === "left" ? `1px solid ${C.glow}66` : undefined,
-          borderRight: copySide === "right" ? `1px solid ${C.glow}66` : undefined,
-          borderBottom: `1px solid ${C.glow}66`,
-          borderTop: `1px solid ${C.glow}33`,
+          bottom: margin * 0.45,
+          left: margin * 0.45,
+          right: margin * 0.45,
+          borderLeft: copySide === "left" ? `1px solid ${C.glow}80` : `1px solid ${C.glow}26`,
+          borderRight: copySide === "right" ? `1px solid ${C.glow}80` : `1px solid ${C.glow}26`,
+          borderBottom: `1px solid ${C.glow}80`,
+          borderTop: `1px solid ${C.glow}26`,
           borderRadius: `${short * 0.02}px`,
         }}
       />
