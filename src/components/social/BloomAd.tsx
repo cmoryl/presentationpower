@@ -83,7 +83,10 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
   const overlap = (ovX * ovY) / Math.max(1, L.copy.w * w * L.copy.h * h);
   const overText = overlap > 0.06;
   // it fades in with the overlap so a slight clip does not get a hard plate
-  const scrimAlpha = Math.min(0.9, 0.42 + overlap * 0.55);
+  // the strength is adjustable per ad and per size; 0 turns it off entirely
+  const scrimEm = Math.max(0, Math.min(2, L.scrimEm ?? 1));
+  const bloomEm = Math.max(0, Math.min(3, L.bloomEm ?? 1));
+  const scrimAlpha = Math.min(0.95, (0.42 + overlap * 0.55) * scrimEm);
 
   return (
     <div
@@ -115,7 +118,8 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
             inset: `-${short * 0.11}px`,
             transform: `translate(${lean.x * 9}%, ${lean.y * 7}%)`,
             background: `radial-gradient(circle at 50% 48%, ${C.glow}FF 0%, ${C.glow}D6 22%, ${C.glow}73 42%, ${C.glow}2B 60%, ${C.glow}00 74%)`,
-            filter: `blur(${short * 0.045}px)`,
+            filter: `blur(${short * 0.045 * bloomEm}px)`,
+            opacity: bloomEm === 0 ? 0 : 1,
           }}
         />
         <div
@@ -162,7 +166,7 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
           zIndex: 2,
         }}
       >
-        {overText ? (
+        {overText && scrimEm > 0 ? (
           <div
             aria-hidden
             style={{
@@ -171,7 +175,7 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
               // a soft focus behind the words: the ground colour held at low
               // alpha in the middle, feathered away to nothing at the edges
               background: `radial-gradient(ellipse at 42% 50%, ${P.ground}${alphaHex(scrimAlpha)} 0%, ${P.ground}${alphaHex(scrimAlpha * 0.8)} 38%, ${P.ground}${alphaHex(scrimAlpha * 0.34)} 62%, ${P.ground}00 84%)`,
-              backdropFilter: `blur(${short * 0.022}px) saturate(112%)`,
+              backdropFilter: `blur(${short * 0.022 * scrimEm}px) saturate(112%)`,
               // the same feather is masked over the blur, so the soft ground has
               // no straight edge where the copy box ends
               maskImage: `radial-gradient(ellipse at 42% 50%, #000 0%, #000 46%, rgba(0,0,0,0.35) 68%, rgba(0,0,0,0) 86%)`,

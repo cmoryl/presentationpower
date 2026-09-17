@@ -389,6 +389,13 @@ function BloomView() {
               {slider("Logo", zoomLayout.lockup.h, 0.02, 0.1, (v) =>
                 putLayout({ ...zoomLayout, lockup: { ...zoomLayout.lockup, h: v } }),
               )}
+              {/* soft focus behind words that lie over the picture; 0 = none */}
+              {slider("Soft focus behind text", zoomLayout.scrimEm ?? 1, 0, 2, (v) =>
+                putLayout({ ...zoomLayout, scrimEm: v }),
+              )}
+              {slider("Bloom softness", zoomLayout.bloomEm ?? 1, 0, 3, (v) =>
+                putLayout({ ...zoomLayout, bloomEm: v }),
+              )}
               <span className="text-[11px] text-white/55">
                 Drag the outlined boxes to move, corners to resize. Saved as you go.
               </span>
