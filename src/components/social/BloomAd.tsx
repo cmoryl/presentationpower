@@ -138,7 +138,8 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        alignItems: mode === "stacked" ? "flex-start" : copySide === "left" ? "flex-start" : "flex-start",
+        alignItems: "flex-start",
+        textAlign: "left",
         gap: `${short * 0.028}px`,
         minWidth: 0,
         zIndex: 2,
@@ -193,7 +194,7 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
     </div>
   );
 
-  const bracketSide = copySide === "left" ? { left: margin * 0.4 } : { right: margin * 0.4 };
+  
 
   return (
     <div
