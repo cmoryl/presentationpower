@@ -986,6 +986,8 @@ export function bloomMotionFrame(
   t: number,
   seconds: number,
   accentMotionId?: string,
+  backdropId?: string,
+
 ): BloomMotionFrame {
   const dur = Math.max(0.5, seconds);
   const time = Math.max(0, Math.min(dur, t));
