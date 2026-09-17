@@ -15,6 +15,7 @@ import {
   Maximize2,
   Minus,
   Move,
+  Package,
   Plus,
   RotateCcw,
   X,
@@ -34,6 +35,18 @@ import {
   type BloomSplash,
 } from "@/lib/social-legal-bloom-layout";
 import {
+  bloomAssetPath,
+  bloomCopyDeckCsv,
+  bloomCopyDeckText,
+  bloomLayoutSettingsJson,
+  bloomPackManifestJson,
+  bloomPackReadme,
+  bloomPackRoot,
+  bloomPlacementsCsv,
+  type BloomPackEntry,
+  type BloomPackSize,
+} from "@/lib/social-legal-bloom-pack";
+import {
   LEGAL_BLOOM_APERTURES,
   LEGAL_BLOOM_COLOURS,
   LEGAL_BLOOM_CONCEPT,
@@ -41,6 +54,7 @@ import {
   LEGAL_BLOOM_SIZES,
   bloomHeadline,
   type BloomAperture,
+  type BloomScene,
   type BloomSide,
 } from "@/lib/social-legal-bloom";
 
@@ -84,6 +98,34 @@ function BloomView() {
   const [dlError, setDlError] = useState<string | null>(null);
   const [layouts, setLayouts] = useState<BloomLayoutMap>({});
   const exportRef = useRef<HTMLDivElement>(null);
+
+  // pack export: which ads, which placements, and how far it has got
+  const [packAd, setPackAd] = useState<string>("all");
+  const [packSize, setPackSize] = useState<string>("all");
+  const [packBusy, setPackBusy] = useState(false);
+  const [packProgress, setPackProgress] = useState<{ done: number; total: number } | null>(null);
+  const [packError, setPackError] = useState<string | null>(null);
+  // one ad is rendered off-screen at its true pixel size at a time, so the pack
+  // writes exactly what the board shows.
+  type StageItem = { scene: BloomScene; size: BloomPackSize; layout: BloomAdLayout };
+  const [stageItem, setStageItem] = useState<StageItem | null>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const stageResolve = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    if (!stageItem || !stageResolve.current) return;
+    const resolve = stageResolve.current;
+    stageResolve.current = null;
+    // two frames: one to lay the ad out, one to let the browser paint it
+    const raf = requestAnimationFrame(() => requestAnimationFrame(resolve));
+    return () => cancelAnimationFrame(raf);
+  }, [stageItem]);
+
+  const stage = (item: StageItem) =>
+    new Promise<void>((resolve) => {
+      stageResolve.current = resolve;
+      setStageItem(item);
+    });
 
   // Saved moves live in this browser, so they survive a reload of the board.
   useEffect(() => setLayouts(readBloomLayouts()), []);
@@ -195,6 +237,81 @@ function BloomView() {
     }
   };
 
+  // ------------------------------------------------------------------
+  // The pack export: every requested ad at every requested placement, filed
+  // into one .zip with the copy deck and the layout settings beside it.
+  const buildPack = async () => {
+    setPackBusy(true);
+    setPackError(null);
+    const scenes =
+      packAd === "all" ? LEGAL_BLOOM_SCENES : LEGAL_BLOOM_SCENES.filter((s) => s.id === packAd);
+    const sizes: BloomPackSize[] =
+      packSize === "all"
+        ? LEGAL_BLOOM_SIZES.map((s) => ({ ...s }))
+        : LEGAL_BLOOM_SIZES.filter((s) => s.id === packSize).map((s) => ({ ...s }));
+    try {
+      const [{ default: JSZip }, { toPng, toJpeg }] = await Promise.all([
+        import("jszip"),
+        import("html-to-image"),
+      ]);
+      const zip = new JSZip();
+      const root = zip.folder(bloomPackRoot())!;
+      const entries: BloomPackEntry[] = [];
+      let done = 0;
+      const total = scenes.length * sizes.length;
+      setPackProgress({ done, total });
+
+      for (const s of sizes) {
+        for (const scene of scenes) {
+          const cut = cutFor(scene.aperture);
+          const sceneSide = sideFor(scene.side);
+          const stored = layouts[bloomLayoutKey(scene.id, s.id)];
+          const layout = stored ?? bloomAutoLayout(scene, s.w, s.h, cut, sceneSide);
+          await stage({ scene, size: s, layout });
+          const node = stageRef.current;
+          if (!node) throw new Error("The staging area was not ready.");
+          const opts = {
+            pixelRatio: dlScale,
+            width: s.w,
+            height: s.h,
+            cacheBust: true,
+            backgroundColor: "#FBFBFD",
+            filter: (n: HTMLElement) => n?.dataset?.exportIgnore !== "true",
+          };
+          const url =
+            dlFormat === "png" ? await toPng(node, opts) : await toJpeg(node, { ...opts, quality: 0.94 });
+          const path = bloomAssetPath(scene, s, dlScale, dlFormat);
+          root.file(path, url.slice(url.indexOf(",") + 1), { base64: true });
+          entries.push({ scene, size: s, aperture: cut, side: sceneSide, layout, arranged: Boolean(stored), path });
+          done += 1;
+          setPackProgress({ done, total });
+        }
+      }
+
+      root.file("README.txt", bloomPackReadme(entries, dlScale, dlFormat));
+      root.file("manifest.json", bloomPackManifestJson(entries, dlScale, dlFormat));
+      root.file("02_Copy/copy-deck.csv", bloomCopyDeckCsv(scenes));
+      root.file("02_Copy/copy-deck.txt", bloomCopyDeckText(scenes));
+      root.file("03_Specifications/placements.csv", bloomPlacementsCsv(sizes, dlScale, dlFormat));
+      root.file("03_Specifications/layout-settings.json", bloomLayoutSettingsJson(entries, dlScale));
+
+      const blob = await zip.generateAsync({ type: "blob" });
+      const href = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = href;
+      a.download = `${bloomPackRoot()}${packAd === "all" ? "" : `_${packAd}`}.zip`;
+      a.click();
+      // let the browser take hold of the file before the handle is released
+      setTimeout(() => URL.revokeObjectURL(href), 4000);
+    } catch (err) {
+      setPackError(err instanceof Error ? err.message : "The pack could not be written.");
+    } finally {
+      setStageItem(null);
+      setPackProgress(null);
+      setPackBusy(false);
+    }
+  };
+
   const slider = (
     label: string,
     value: number,
@@ -279,8 +396,123 @@ function BloomView() {
               </select>
             </Field>
           </div>
+
+          {/* the pack export: one zip, filed into sections, for a whole set or
+              just the ads a person wants */}
+          <div className="mt-6 rounded-2xl border border-black/10 bg-white p-4">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/45">
+              Download a pack
+            </div>
+            <p className="mt-1 max-w-3xl text-xs leading-relaxed text-black/55">
+              One zip holding the artwork filed by placement, the copy deck as a spreadsheet and
+              plain text, and the placement list and layout settings behind every file.
+            </p>
+            <div className="mt-3 flex flex-wrap items-end gap-4">
+              <Field label="Ad set">
+                <select
+                  value={packAd}
+                  onChange={(e) => setPackAd(e.target.value)}
+                  className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm"
+                >
+                  <option value="all">All {LEGAL_BLOOM_SCENES.length} ads</option>
+                  {LEGAL_BLOOM_SCENES.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {bloomHeadline(s)}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Placements">
+                <select
+                  value={packSize}
+                  onChange={(e) => setPackSize(e.target.value)}
+                  className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm"
+                >
+                  <option value="all">All {LEGAL_BLOOM_SIZES.length} sizes</option>
+                  {LEGAL_BLOOM_SIZES.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.label} · {s.w}×{s.h}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="File type">
+                <select
+                  value={dlFormat}
+                  onChange={(e) => setDlFormat(e.target.value as "png" | "jpeg")}
+                  className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm"
+                >
+                  <option value="png">PNG</option>
+                  <option value="jpeg">JPG</option>
+                </select>
+              </Field>
+              <Field label="Size written">
+                <select
+                  value={dlScale}
+                  onChange={(e) => setDlScale(Number(e.target.value))}
+                  className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm"
+                >
+                  {[1, 2, 3].map((s) => (
+                    <option key={s} value={s}>
+                      {s}× size
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <button
+                type="button"
+                id="bloom-pack-button"
+                onClick={buildPack}
+                disabled={packBusy}
+                className="inline-flex items-center gap-2 rounded-xl bg-[#03002C] px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+              >
+                <Package size={14} />
+                {packBusy
+                  ? packProgress
+                    ? `Writing ${packProgress.done} of ${packProgress.total}…`
+                    : "Writing…"
+                  : "Download pack"}
+              </button>
+            </div>
+            {packError ? (
+              <p className="mt-2 text-xs text-[#E53D2E]">
+                The pack could not be written: {packError}
+              </p>
+            ) : null}
+          </div>
         </div>
       </header>
+
+      {/* the off-screen staging area the pack renders through — kept out of the
+          reading order and out of the page's own exports */}
+      {stageItem ? (
+        <div
+          aria-hidden
+          data-export-ignore="true"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: stageItem.size.w,
+            height: stageItem.size.h,
+            opacity: 0,
+            pointerEvents: "none",
+            zIndex: -1,
+            overflow: "hidden",
+          }}
+        >
+          <div ref={stageRef}>
+            <BloomAd
+              scene={stageItem.scene}
+              w={stageItem.size.w}
+              h={stageItem.size.h}
+              aperture={aperture === "scene" ? undefined : aperture}
+              side={side === "scene" ? undefined : side}
+              layout={stageItem.layout}
+            />
+          </div>
+        </div>
+      ) : null}
 
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-2">
