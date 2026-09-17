@@ -108,6 +108,21 @@ export function bloomLean(aperture: BloomAperture): { x: number; y: number } {
 }
 
 
+/** The shape of the picture box, following the photograph's own orientation. */
+export type BloomFrame = "wide" | "square" | "upright";
+
+/** Target width-to-height for each. */
+export function bloomFrameAspect(frame: BloomFrame | undefined): number {
+  switch (frame) {
+    case "wide":
+      return 1.6;
+    case "upright":
+      return 0.72;
+    default:
+      return 1;
+  }
+}
+
 /** Which side of the frame the copy holds. */
 export type BloomSide = "left" | "right";
 
@@ -125,6 +140,11 @@ export type BloomScene = {
   colour: keyof typeof LEGAL_BLOOM_COLOURS;
   aperture: BloomAperture;
   side: BloomSide;
+  /**
+   * How the photograph itself sits, so the frame runs the same way: a landscape
+   * frame gets a long horizontal box, an upright one a taller box.
+   */
+  frame?: BloomFrame;
   /** Where the interest sits, so every crop keeps it. */
   focus: string;
 };
@@ -139,6 +159,7 @@ export const LEGAL_BLOOM_CONCEPT = {
 export const LEGAL_BLOOM_SCENES: BloomScene[] = [
   {
     id: "soapbox",
+    frame: "wide",
     photo: bloomSoapbox,
     shot: "Two-up gravity racer through standing water, wet descent",
     lead: "We're here for the",
@@ -152,6 +173,7 @@ export const LEGAL_BLOOM_SCENES: BloomScene[] = [
   },
   {
     id: "kayak",
+    frame: "upright",
     photo: bloomKayak,
     shot: "Tandem kayak threading a granite chute",
     lead: "We're here for the",
@@ -165,6 +187,7 @@ export const LEGAL_BLOOM_SCENES: BloomScene[] = [
   },
   {
     id: "ocean",
+    frame: "wide",
     photo: bloomOcean,
     shot: "Offshore crew working the rail, second boat on the horizon",
     lead: "We're here for when it gets",
@@ -178,6 +201,7 @@ export const LEGAL_BLOOM_SCENES: BloomScene[] = [
   },
   {
     id: "cliff",
+    frame: "wide",
     photo: bloomCliff,
     shot: "Portaledge under an overhang at dusk, climber on the anchor line",
     lead: "We're here for the",
@@ -191,6 +215,7 @@ export const LEGAL_BLOOM_SCENES: BloomScene[] = [
   },
   {
     id: "ice",
+    frame: "square",
     photo: bloomIce,
     shot: "Ice climber placing an axe, belayer holding below",
     lead: "We're here for the",
@@ -204,6 +229,7 @@ export const LEGAL_BLOOM_SCENES: BloomScene[] = [
   },
   {
     id: "rally",
+    frame: "wide",
     photo: bloomRally,
     shot: "Rally car in deep ruts, co-driver on the notes",
     lead: "We're here when the route gets",
@@ -217,6 +243,7 @@ export const LEGAL_BLOOM_SCENES: BloomScene[] = [
   },
   {
     id: "cave",
+    frame: "square",
     photo: bloomCave,
     shot: "Cavers threading a hauling line through a wet passage",
     lead: "We're here for the",
@@ -230,6 +257,7 @@ export const LEGAL_BLOOM_SCENES: BloomScene[] = [
   },
   {
     id: "deep",
+    frame: "upright",
     photo: bloomDeep,
     shot: "Freediver on the line, safety diver watching from above",
     lead: "We're here for the",

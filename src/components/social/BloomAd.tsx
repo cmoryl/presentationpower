@@ -16,6 +16,7 @@
 import { getDivisionLogos } from "@/lib/division-logos";
 import {
   bloomColour,
+  bloomFrameAspect,
   bloomHeadline,
   bloomLean,
   bloomOptical,
@@ -52,7 +53,21 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
   const headline = bloomHeadline(scene);
   const optical = bloomOptical(headline.length);
   const margin = short * (mode === "strip" ? 0.09 : 0.075);
-  const pictureFlex = mode === "stacked" ? undefined : mode === "strip" ? 0.44 : 0.48;
+  const frameAspect = bloomFrameAspect(scene.frame);
+  // A landscape photograph is given a longer horizontal column than an upright
+  // one, so the frame runs the way the picture does.
+  const pictureFlex =
+    mode === "stacked"
+      ? undefined
+      : mode === "strip"
+        ? frameAspect > 1.2
+          ? 0.5
+          : 0.44
+        : frameAspect > 1.2
+          ? 0.56
+          : frameAspect < 0.9
+            ? 0.44
+            : 0.48;
   // The headline is set to the column it actually has, so a square trim reads
   // three or four words a line instead of stacking one word at a time.
   const colW =
@@ -67,8 +82,16 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
   // Picture box geometry. The turned end is half the box's short edge, but it is
   // also held back on a tall box so the picture never reads as a half circle —
   // the master keeps the turn to a third of the long edge at most.
-  const boxW = (w - margin * 2) * (mode === "stacked" ? 0.84 : (pictureFlex ?? 0.48) * 0.88);
-  const boxH = (h - margin * 2) * (mode === "stacked" ? 0.62 : mode === "strip" ? 0.88 : 0.7);
+  // The box is fitted to the photograph's own aspect inside the space it has, so
+  // "tricky" (landscape) runs long and horizontal while an upright shot stands up.
+  const availW = (w - margin * 2) * (mode === "stacked" ? 0.9 : (pictureFlex ?? 0.48) * 0.94);
+  const availH = (h - margin * 2) * (mode === "stacked" ? 0.6 : mode === "strip" ? 0.9 : 0.82);
+  let boxW = availW;
+  let boxH = boxW / frameAspect;
+  if (boxH > availH) {
+    boxH = availH;
+    boxW = Math.min(availW, boxH * frameAspect);
+  }
   const radius = bloomShapeRadius(cut, boxW, boxH);
   const lean = bloomLean(cut);
   // The keyline in the master is a solid accent stroke sitting on the frame
@@ -103,8 +126,8 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
       <div
         style={{
           position: "relative",
-          width: mode === "stacked" ? "84%" : "88%",
-          height: mode === "stacked" ? "100%" : mode === "strip" ? "88%" : "70%",
+          width: `${boxW}px`,
+          height: `${boxH}px`,
           borderRadius: radius,
           overflow: "hidden",
           boxSizing: "border-box",
