@@ -735,46 +735,51 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           className="absolute flex flex-col justify-between"
           style={
             wide
-              ? { top: u(M), bottom: u(M), right: u(M), width: "29%", gap: u(1.6) }
-              : { left: u(M), right: u(M), bottom: u(M), top: square ? "52%" : "48%", gap: u(1.6) }
+              ? { top: u(M), bottom: u(M), right: u(M), width: "29%", gap: u(1.2) }
+              : { left: u(M), right: u(M), bottom: u(M), top: square ? "47%" : "44%", gap: u(1.2) }
           }
         >
           <div style={{ display: "grid", gap: u(1.2) }}>
             {masthead()}
-            <div className="flex" style={{ gap: u(0.8) }}>
-              {crops.map((pos) => (
-                <div
-                  key={pos}
-                  className="relative flex-1 overflow-hidden"
-                  style={{ aspectRatio: "4 / 3", border: `1px solid ${P.ink}2E` }}
-                >
-                  <img
-                    src={scene.src}
-                    alt=""
-                    className="absolute inset-0 size-full object-cover"
-                    style={{ objectPosition: pos, filter: "grayscale(0.6) contrast(1.1)" }}
-                  />
-                </div>
-              ))}
-            </div>
+            {/* The proof crops need real height — a 396px banner strip has none. */}
+            {banner ? null : (
+              <div className="flex" style={{ gap: u(0.8) }}>
+                {crops.map((pos) => (
+                  <div
+                    key={pos}
+                    className="relative flex-1 overflow-hidden"
+                    style={{ aspectRatio: "4 / 3", border: `1px solid ${P.ink}2E` }}
+                  >
+                    <img
+                      src={scene.src}
+                      alt=""
+                      className="absolute inset-0 size-full object-cover"
+                      style={{ objectPosition: pos, filter: "grayscale(0.6) contrast(1.1)" }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <div style={{ display: "grid", gap: u(1.3) }}>
+          <div style={{ display: "grid", gap: u(1) }}>
             <div style={{ textAlign: "left" }}>
-              {headline(square ? T.displayTight * 0.8 : T.displayTight * 0.66, { measure: 12 })}
+              {headline(square ? T.displayTight * 0.74 : T.displayTight * 0.62, { measure: 12 })}
             </div>
-            <div
-              style={{
-                fontFamily: TY.support.family,
-                fontSize: u(T.micro * 0.95),
-                lineHeight: 1.45,
-                color: P.ink,
-                opacity: 0.7,
-                borderTop: `1px solid ${P.ink}2E`,
-                paddingTop: u(1),
-              }}
-            >
-              {scene.craft}
-            </div>
+            {banner ? null : (
+              <div
+                style={{
+                  fontFamily: TY.support.family,
+                  fontSize: u(T.micro * 0.95),
+                  lineHeight: 1.45,
+                  color: P.ink,
+                  opacity: 0.7,
+                  borderTop: `1px solid ${P.ink}2E`,
+                  paddingTop: u(1),
+                }}
+              >
+                {scene.craft}
+              </div>
+            )}
           </div>
           <div style={{ display: "grid", justifyItems: "start", gap: u(1.4) }}>
             {ctaBlock()}
