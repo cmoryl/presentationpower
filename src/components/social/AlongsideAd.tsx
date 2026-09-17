@@ -283,23 +283,14 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   // The lockup owns one corner of every ad (top-right, or bottom-left when the
   // copy column sits on the right), so the masthead keeps the frame number on
   // the LEFT and never competes for that corner.
+  // The frame numbers and the "FRAME 04 / pair" studio marks were struck from
+  // the ads: they are production bookkeeping, not campaign copy. The hairline
+  // stays so the layouts keep their measure line.
   const masthead = (ink: string = P.ink) => (
     <div
-      className="flex w-full items-center gap-3"
+      className="flex w-full items-center"
       style={{ color: ink, paddingRight: clear === "right" ? undefined : u(26) }}
     >
-      <span
-        style={{
-          fontFamily: TY.eyebrow.family,
-          fontSize: u(T.numeral),
-          fontVariantNumeric: "tabular-nums",
-          letterSpacing: "0.14em",
-          fontWeight: TY.eyebrow.weight,
-          opacity: 0.72,
-        }}
-      >
-        {scene.no}
-      </span>
       <span aria-hidden className="flex-1" style={{ height: 1, background: `${ink}3D` }} />
     </div>
   );
@@ -559,24 +550,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   /** No call to action in the cut family either — a wider gradient alpha rule. */
   const ctaBlock = (opts?: { light?: boolean }) => alphaRule(46, opts?.light ? P.ink : P.accent);
 
-  /** Frame number on a short accent rule, for use inside a cut field. */
+  /** A short accent rule inside a cut field — the number it carried is gone. */
   const cutMasthead = () => (
-    <div className="flex items-center" style={{ gap: u(1.4) }}>
-      <span
-        style={{
-          fontFamily: TY.eyebrow.family,
-          fontWeight: TY.eyebrow.weight,
-          fontSize: u(T.numeral),
-          fontVariantNumeric: "tabular-nums",
-          letterSpacing: "0.14em",
-          color: P.ink,
-          opacity: 0.72,
-        }}
-      >
-        {scene.no}
-      </span>
-      <span aria-hidden style={{ width: u(3.4), height: u(0.3), background: P.accent }} />
-    </div>
+    <span aria-hidden style={{ display: "block", width: u(3.4), height: u(0.3), background: P.accent }} />
   );
 
   let body: React.ReactNode = null;
