@@ -217,21 +217,34 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           scale: 1,
         }
       : a;
+    // Optical tracking: display sizes tighten, small sizes stay open. Only
+    // applied when the treatment expresses tracking in em (so caps tracking
+    // authored per layout is respected, not overwritten).
+    const trackEm = (() => {
+      const raw = typeof d.tracking === "string" ? d.tracking.trim() : "";
+      const m = /^(-?[\d.]+)em$/.exec(raw);
+      if (!m) return d.tracking;
+      const base = Number.parseFloat(m[1]!);
+      const comp = px > 4.6 ? -0.012 : px < 2.8 ? 0.008 : 0;
+      return `${(base + comp).toFixed(4)}em`;
+    })();
     return (
       <div
         style={{
           fontFamily: d.family,
           fontSize: u(px),
-          lineHeight: d.lineHeight,
+          lineHeight: lead,
           fontWeight: d.weight,
           color: opts?.color ?? P.ink,
-          letterSpacing: d.tracking,
+          letterSpacing: trackEm,
           textTransform: d.caps ? "uppercase" : "none",
           textWrap: "balance",
-          maxWidth: `${opts?.measure ?? 15}em`,
+          fontOpticalSizing: "auto",
+          hangingPunctuation: "first last",
+          maxWidth: `${measure}em`,
         }}
       >
-        {parts.before}
+        {noWidow(parts.before)}
         {parts.action ? (
           <span
             style={{
