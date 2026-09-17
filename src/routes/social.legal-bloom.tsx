@@ -12,7 +12,10 @@ import { createPortal } from "react-dom";
 import {
   ArrowLeft,
   Download,
+  Film,
   Maximize2,
+  Pause,
+  Play,
   Minus,
   Move,
   Package,
@@ -24,6 +27,7 @@ import {
 } from "lucide-react";
 import { BloomAd } from "@/components/social/BloomAd";
 import { BloomLayoutEditor } from "@/components/social/BloomLayoutEditor";
+import { BloomMotionAd } from "@/components/social/BloomMotionAd";
 import { BloomMotionPanel } from "@/components/social/BloomMotionPanel";
 import {
   BLOOM_SPLASHES,
@@ -107,6 +111,12 @@ function BloomView() {
   const [editing, setEditing] = useState(false);
   /** How close the large view sits: 1 = fits the window, 4 = four times that. */
   const [viewZoom, setViewZoom] = useState(1);
+  // the large view can show the moving version of the same ad, at the same trim
+  const [viewMoving, setViewMoving] = useState(false);
+  const [viewPreset, setViewPreset] = useState("push-slow");
+  const [viewAccent, setViewAccent] = useState("preset");
+  const [viewSeconds, setViewSeconds] = useState(8);
+  const [viewPlaying, setViewPlaying] = useState(true);
   const [dlFormat, setDlFormat] = useState<"png" | "jpeg">("png");
   const [dlScale, setDlScale] = useState<number>(2);
   const [dlBusy, setDlBusy] = useState(false);
@@ -737,6 +747,73 @@ function BloomView() {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
+                onClick={() => {
+                  setViewMoving((v) => !v);
+                  setEditing(false);
+                  setViewPlaying(true);
+                }}
+                className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium ${
+                  viewMoving ? "bg-[#A1FBF9] text-[#03002C]" : "border border-white/25 text-white"
+                }`}
+              >
+                <Film size={12} /> {viewMoving ? "Show the still" : "Show it moving"}
+              </button>
+              {viewMoving ? (
+                <>
+                  <select
+                    value={viewPreset}
+                    onChange={(e) => setViewPreset(e.target.value)}
+                    className="rounded-lg border border-white/25 bg-white/10 px-2 py-1.5 text-xs text-white"
+                    aria-label="Motion"
+                  >
+                    {bloomPresetsByFamily().map((group) => (
+                      <optgroup className="text-black" key={group.family} label={group.family}>
+                        {group.presets.map((pr) => (
+                          <option className="text-black" key={pr.id} value={pr.id}>
+                            {pr.label}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                  <select
+                    value={viewAccent}
+                    onChange={(e) => setViewAccent(e.target.value)}
+                    className="rounded-lg border border-white/25 bg-white/10 px-2 py-1.5 text-xs text-white"
+                    aria-label="Accent word"
+                  >
+                    {BLOOM_ACCENT_MOTIONS.map((a) => (
+                      <option className="text-black" key={a.id} value={a.id}>
+                        {a.label}
+                      </option>
+                    ))}
+                  </select>
+                  <label className="flex items-center gap-2 text-[11px] text-white/70">
+                    {viewSeconds}s
+                    <input
+                      type="range"
+                      min={3}
+                      max={15}
+                      step={1}
+                      value={viewSeconds}
+                      onChange={(e) => setViewSeconds(Number(e.target.value))}
+                      className="w-24"
+                      aria-label="Clip length in seconds"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setViewPlaying((v) => !v)}
+                    className="rounded-lg border border-white/25 p-1.5 text-white"
+                    aria-label={viewPlaying ? "Pause" : "Play"}
+                  >
+                    {viewPlaying ? <Pause size={14} /> : <Play size={14} />}
+                  </button>
+                </>
+              ) : null}
+              <button
+                type="button"
+                disabled={viewMoving}
                 onClick={() => setEditing((v) => !v)}
                 className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium ${
                   editing ? "bg-[#A1FBF9] text-[#03002C]" : "border border-white/25 text-white"
@@ -807,7 +884,8 @@ function BloomView() {
               <button
                 type="button"
                 onClick={download}
-                disabled={dlBusy}
+                disabled={dlBusy || viewMoving}
+                title={viewMoving ? "Moving versions are written from the motion panel below" : undefined}
                 className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] disabled:opacity-60"
               >
                 <Download size={12} /> {dlBusy ? "Writing…" : "Download"}
@@ -839,7 +917,7 @@ function BloomView() {
             </div>
           </div>
 
-          {editing && zoomLayout ? (
+          {editing && !viewMoving && zoomLayout ? (
             <div className="mt-3 flex flex-wrap items-center gap-4 rounded-xl border border-white/15 bg-white/5 px-3 py-2">
               {slider("Headline", zoomLayout.headPx, 0.03, 0.3, (v) =>
                 putLayout({ ...zoomLayout, headPx: v }),
@@ -890,6 +968,20 @@ function BloomView() {
                 {(scale) => (
                   <div style={{ position: "relative", width: size.w, height: size.h }}>
                     <div ref={exportRef}>
+                      {viewMoving ? (
+                        <BloomMotionAd
+                          scene={zoomScene}
+                          w={size.w}
+                          h={size.h}
+                          aperture={aperture === "scene" ? undefined : aperture}
+                          side={side === "scene" ? undefined : side}
+                          layout={zoomLayout}
+                          preset={bloomPreset(viewPreset)}
+                          accentMotionId={viewAccent}
+                          seconds={viewSeconds}
+                          playing={viewPlaying}
+                        />
+                      ) : (
                       <BloomAd
                         scene={zoomScene}
                         w={size.w}
@@ -898,8 +990,9 @@ function BloomView() {
                         side={side === "scene" ? undefined : side}
                         layout={zoomLayout}
                       />
+                      )}
                     </div>
-                    {editing && zoomLayout ? (
+                    {editing && !viewMoving && zoomLayout ? (
                       <BloomLayoutEditor
                         layout={zoomLayout}
                         w={size.w}
