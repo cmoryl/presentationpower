@@ -626,9 +626,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         >
           {masthead()}
           <div style={{ display: "grid", gap: u(0.4), textAlign: "left", justifyItems: "start" }}>
-            {line("outline")}
+            {banner ? null : line("outline")}
             {line("solid")}
-            {line("outline")}
+            {banner ? null : line("outline")}
           </div>
           <div style={{ display: "grid", gap: u(1.6) }}>
             <div
