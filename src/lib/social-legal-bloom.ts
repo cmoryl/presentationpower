@@ -293,3 +293,22 @@ export function bloomHeadline(scene: BloomScene): string {
 export function bloomColour(scene: BloomScene): BloomColour {
   return LEGAL_BLOOM_COLOURS[scene.colour];
 }
+
+// ---------------------------------------------------------------------------
+// The quiet mark behind the picture
+//
+// A faint abstract figure sits between the bloom and the picture: sharp, drawn
+// in the ad's accent, held at 20% so it reads as texture rather than a second
+// subject. Each figure is abstracted from the ad's own layout — the frame's
+// turned diagonal, the copy column, the run of the picture.
+
+export type BloomMotif = "echo" | "arcs" | "rules" | "hatch";
+
+export const BLOOM_MOTIFS: BloomMotif[] = ["echo", "arcs", "rules", "hatch"];
+
+/** Which figure an ad carries — settled per scene, so a frame never changes. */
+export function bloomMotif(scene: BloomScene): BloomMotif {
+  let n = 0;
+  for (const ch of scene.id) n = (n * 31 + ch.charCodeAt(0)) % 9973;
+  return BLOOM_MOTIFS[n % BLOOM_MOTIFS.length]!;
+}
