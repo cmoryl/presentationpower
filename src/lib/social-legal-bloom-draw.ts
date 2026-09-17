@@ -525,7 +525,7 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
     ) * h;
   const overlap = (ovX * ovY) / Math.max(1, copyW * copyH);
   if (overlap > 0.06 && scrimEm > 0) {
-    const a = Math.min(0.95, (0.42 + overlap * 0.55) * scrimEm);
+    const a = Math.min(0.95, (0.42 + overlap * 0.55) * scrimEm * groundBreath);
     const cx = copyX + copyW * 0.42;
     const cy = top + blockH / 2;
     const r = Math.max(copyW, blockH) * 0.78;
