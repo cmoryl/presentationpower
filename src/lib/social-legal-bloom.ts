@@ -11,10 +11,10 @@
 // every claim stays inside what Legal actually does.
 // ---------------------------------------------------------------------------
 
-import bloomSoapbox from "@/assets/legal-bloom/bloom-soapbox-run.jpg";
+import bloomSoapbox from "@/assets/legal-bloom/ref-soapbox.png";
 import bloomKayak from "@/assets/legal-bloom/bloom-kayak-chute.jpg";
-import bloomOcean from "@/assets/legal-bloom/bloom-ocean-race.jpg";
-import bloomCliff from "@/assets/legal-bloom/bloom-cliff-camp.jpg";
+import bloomOcean from "@/assets/legal-bloom/ref-ocean.jpg";
+import bloomCliff from "@/assets/legal-bloom/ref-cliff.jpg";
 import bloomIce from "@/assets/legal-bloom/bloom-ice-fall.jpg";
 import bloomRally from "@/assets/legal-bloom/bloom-rally-rut.jpg";
 import bloomCave from "@/assets/legal-bloom/bloom-cave-haul.jpg";
