@@ -301,7 +301,8 @@ function BloomView() {
       a.href = href;
       a.download = `${bloomPackRoot()}${packAd === "all" ? "" : `_${packAd}`}.zip`;
       a.click();
-      URL.revokeObjectURL(href);
+      // let the browser take hold of the file before the handle is released
+      setTimeout(() => URL.revokeObjectURL(href), 4000);
     } catch (err) {
       setPackError(err instanceof Error ? err.message : "The pack could not be written.");
     } finally {
