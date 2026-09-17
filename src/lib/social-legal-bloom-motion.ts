@@ -654,8 +654,13 @@ export type BloomMotionFrame = {
     reveal: number;
     revealMode: BloomRevealMode;
   };
-  bloom: { scale: number; opacity: number };
-  splash: { scale: number; opacity: number };
+  /**
+   * The accent aura. `drift` is a slow wander in fractions of the short edge;
+   * it runs whole cycles across the clip so the last frame matches the first.
+   */
+  bloom: { scale: number; opacity: number; driftX: number; driftY: number };
+  splash: { scale: number; opacity: number; driftX: number; driftY: number };
+
   /** How the line arrives, and how far through that arrival this moment is. */
   words: { progress: number; rise: number; slide: number; mode: BloomTextMode };
   turn: { scale: number; opacity: number; rise: number };
@@ -732,16 +737,34 @@ export function bloomMotionFrame(
     seg(p, Math.min(0.7, start + span + 0.06), Math.min(0.98, start + span + 0.32)),
   );
 
+  // The aura's own slow life: whole sine cycles across the clip, so the closing
+  // frame sits exactly where the opening one did and a loop never jumps.
+  const aura = Math.sin(raw * Math.PI * 2);
+  const auraB = Math.sin(raw * Math.PI * 4 + Math.PI / 3);
+
   return {
     photo,
+
     frame: {
       scale: 1 + (1 - frameIn) * 0.02,
       opacity: frameIn,
       reveal: revealed,
       revealMode: preset.reveal.mode,
     },
-    bloom: { scale: 0.94 + inA * 0.06, opacity: inA },
-    splash: { scale: 0.9 + easeOut(seg(p, 0.1, 0.7)) * 0.1, opacity: easeOut(seg(p, 0.05, 0.6)) },
+    bloom: {
+      scale: (0.94 + inA * 0.06) * (1 + aura * 0.035),
+      opacity: clamp01(inA * (1 - auraB * 0.05)),
+      driftX: aura * 0.02,
+      driftY: auraB * 0.016,
+    },
+    splash: {
+      scale: (0.9 + easeOut(seg(p, 0.1, 0.7)) * 0.1) * (1 - aura * 0.03),
+      opacity: clamp01(easeOut(seg(p, 0.05, 0.6)) * (1 + auraB * 0.04)),
+
+      driftX: -auraB * 0.018,
+      driftY: aura * 0.012,
+    },
+
     words: {
       progress: words,
       rise: (1 - words) * preset.text.rise,

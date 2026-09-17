@@ -224,8 +224,10 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
   if (splash !== "none" && bloomEm > 0 && m.splash.opacity > 0.01) {
     const sw = short * (splash === "curved" ? 0.82 : splash === "circle" ? 0.58 : 0.72);
     const sh = short * (splash === "curved" ? 0.5 : splash === "circle" ? 0.58 : 0.6);
-    const sx = splashSide === "left" ? -short * 0.2 : w - sw + short * 0.2;
-    const sy = h - sh + short * 0.2;
+    const sx =
+      (splashSide === "left" ? -short * 0.2 : w - sw + short * 0.2) + short * m.splash.driftX;
+    const sy = h - sh + short * 0.2 + short * m.splash.driftY;
+
     ctx.save();
     ctx.globalAlpha = 0.86 * m.splash.opacity;
     ctx.filter = `blur(${short * 0.04 * Math.max(0.35, bloomEm)}px)`;
@@ -260,8 +262,9 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
   if (bloomEm > 0 && m.bloom.opacity > 0.01) {
     const lean = bloomLean(cut);
     const pad = short * 0.11;
-    const bx = boxX - pad + boxW * lean.x * 0.09;
-    const by = boxY - pad + boxH * lean.y * 0.07;
+    const bx = boxX - pad + boxW * lean.x * 0.09 + short * m.bloom.driftX;
+    const by = boxY - pad + boxH * lean.y * 0.07 + short * m.bloom.driftY;
+
     const bw = boxW + pad * 2;
     const bh = boxH + pad * 2;
     const cx = bx + bw / 2;
