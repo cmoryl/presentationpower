@@ -18,6 +18,8 @@ import {
 import { bloomAutoLayout, type BloomAdLayout } from "@/lib/social-legal-bloom-layout";
 import {
   bloomPresetsByFamily,
+  bloomAccentMotion,
+  BLOOM_ACCENT_MOTIONS,
   BLOOM_PLACEMENTS,
   bloomAspectLabel,
   bloomClipSeconds,
@@ -45,6 +47,7 @@ type Props = {
 export function BloomMotionPanel({ aperture, side }: Props) {
   const [placementId, setPlacementId] = useState("li-feed-square");
   const [presetId, setPresetId] = useState("push-slow");
+  const [accentId, setAccentId] = useState("preset");
   const [wantSeconds, setWantSeconds] = useState(8);
   const [sceneId, setSceneId] = useState(LEGAL_BLOOM_SCENES[0]!.id);
   const [scopeAd, setScopeAd] = useState("all");
@@ -56,6 +59,7 @@ export function BloomMotionPanel({ aperture, side }: Props) {
 
   const placement = bloomPlacement(placementId);
   const preset = bloomPreset(presetId);
+  const accent = bloomAccentMotion(accentId);
   const seconds = bloomClipSeconds(placement, wantSeconds);
   const scene = LEGAL_BLOOM_SCENES.find((s) => s.id === sceneId) ?? LEGAL_BLOOM_SCENES[0]!;
   // Which video format this browser can write is only knowable in the browser,
@@ -69,7 +73,7 @@ export function BloomMotionPanel({ aperture, side }: Props) {
 
   useEffect(() => {
     setError(null);
-  }, [placementId, presetId, sceneId]);
+  }, [placementId, presetId, accentId, sceneId]);
 
   const layoutFor = (s: BloomScene, w: number, h: number): BloomAdLayout => {
     const cut = aperture === "scene" ? s.aperture : aperture;
@@ -91,6 +95,7 @@ export function BloomMotionPanel({ aperture, side }: Props) {
       scene: s,
       placement: p,
       preset,
+      accentMotionId: accentId,
       wantSeconds,
       fps: FPS,
       format,
@@ -212,6 +217,21 @@ export function BloomMotionPanel({ aperture, side }: Props) {
         </label>
 
         <label className="text-[11px] uppercase tracking-[0.12em] text-black/50">
+          Accent word
+          <select
+            value={accentId}
+            onChange={(e) => setAccentId(e.target.value)}
+            className="mt-1 block rounded-xl border border-black/15 bg-white px-3 py-2 text-sm normal-case tracking-normal text-[#03002C]"
+          >
+            {BLOOM_ACCENT_MOTIONS.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="text-[11px] uppercase tracking-[0.12em] text-black/50">
           Which ad
           <select
             value={sceneId}
@@ -241,7 +261,7 @@ export function BloomMotionPanel({ aperture, side }: Props) {
       </div>
 
       <p className="mt-3 text-xs leading-relaxed text-black/55">
-        {preset.says} Pace: {preset.pacing}
+        {preset.says} Accent word: {accent.says.toLowerCase()} Pace: {preset.pacing}
         {preset.loopSafe ? ", and the last frame matches the first so the post loops cleanly" : ""}
         {preset.endHold > 0.15 ? ", holding a clean still at the end" : ""}. {placement.platform} · {placement.placement} — {placement.w}×{placement.h} (
         {bloomAspectLabel(placement.w, placement.h)}), written at about{" "}
@@ -258,6 +278,7 @@ export function BloomMotionPanel({ aperture, side }: Props) {
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
         <div className="overflow-hidden rounded-2xl border border-black/10 bg-white">
           <BloomMotionAd
+            accentMotionId={accentId}
             scene={scene}
             w={placement.w}
             h={placement.h}
