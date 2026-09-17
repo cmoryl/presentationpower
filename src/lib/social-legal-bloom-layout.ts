@@ -33,6 +33,13 @@ export type BloomAdLayout = {
   turnEm?: number;
   /** Lockup height as a fraction of the short edge, plus its corner offsets. */
   lockup: { x: number; y: number; h: number };
+  /**
+   * How much soft focus sits behind words that lie over the picture.
+   * 1 = the composed amount; 0 = none at all.
+   */
+  scrimEm?: number;
+  /** How soft the colour bloom around the picture is. 1 = the composed amount. */
+  bloomEm?: number;
 };
 
 export type BloomMode = "beside" | "stacked" | "strip";
