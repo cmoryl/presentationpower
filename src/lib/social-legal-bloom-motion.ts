@@ -842,6 +842,7 @@ export function bloomMotionFrame(
   preset: BloomMotionPreset,
   t: number,
   seconds: number,
+  accentMotionId?: string,
 ): BloomMotionFrame {
   const dur = Math.max(0.5, seconds);
   const time = Math.max(0, Math.min(dur, t));
@@ -930,6 +931,7 @@ export function bloomMotionFrame(
       opacity: turnIn,
       rise: (1 - turnIn) * preset.text.rise * 1.4,
     },
+    accent: accentState,
     support: { opacity: supportIn, rise: (1 - supportIn) * preset.text.rise * 0.7 },
     logo: { opacity: logoIn, rise: (1 - logoIn) * preset.text.rise * 0.4 },
     sweep: preset.sweep ? seg(p, 0.45, 0.86) : -1,
