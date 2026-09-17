@@ -238,6 +238,14 @@ function AlongsideView() {
                       <span className="font-semibold text-[#03002C]">What it has to answer:</span>{" "}
                       {scene.answer}
                     </p>
+                    <p className="mt-2 border-t border-black/10 pt-2 text-black/70">
+                      <span className="font-semibold text-[#03002C]">On the photograph:</span>{" "}
+                      {scene.photoObjection}
+                    </p>
+                    <p className="mt-1.5 text-black/70">
+                      <span className="font-semibold text-[#03002C]">Verdict:</span>{" "}
+                      {scene.photoVerdict}
+                    </p>
                   </div>
                   <p className="text-xs text-black/55">
                     <span className="font-semibold uppercase tracking-widest text-black/40">
@@ -388,6 +396,14 @@ function AlongsideView() {
                 <p className="mt-1.5">
                   <span className="font-semibold text-white">What it has to answer:</span>{" "}
                   {zoomScene.answer}
+                </p>
+                <p className="mt-2 border-t border-white/15 pt-2">
+                  <span className="font-semibold text-white">On the photograph:</span>{" "}
+                  {zoomScene.photoObjection}
+                </p>
+                <p className="mt-1.5">
+                  <span className="font-semibold text-white">Verdict:</span>{" "}
+                  {zoomScene.photoVerdict}
                 </p>
               </div>
               <p className="text-xs text-white/50">

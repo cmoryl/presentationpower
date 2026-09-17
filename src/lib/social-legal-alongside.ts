@@ -70,6 +70,10 @@ export type AlongsideScene = {
   objection: string;
   /** The real service answer the frame has to earn in their language. */
   answer: string;
+  /** What that buyer says against the photograph itself. */
+  photoObjection: string;
+  /** Whether the picture survives that look, and on what evidence. */
+  photoVerdict: string;
   src: string;
   /** CSS object-position for the landscape crop. */
   focus: string;
@@ -96,6 +100,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "Exposure is my word for risk, and a rock face tells me nothing about who is accountable when the record is wrong.",
     answer:
       "Multilingual document review that stays defensible: your privilege calls, our reviewers and certified translations under them.",
+    photoObjection:
+      "Adventure climbing is the most over-used image in professional services. I have seen it on three insurance ads this month.",
+    photoVerdict:
+      "Holds, because the belayer is doing unglamorous work at the bottom of the frame and nobody is summiting. It is the least heroic climbing picture in the category.",
     src: climber,
     focus: "72% 45%",
     focusSquare: "72% 40%",
@@ -117,6 +125,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "Pace notes are a nice metaphor until a deadline moves and nobody can tell me what the next step actually is.",
     answer:
       "A named project team and a written production plan per jurisdiction, so the next filing date is already scheduled, not discovered.",
+    photoObjection:
+      "A rally car reads as speed for its own sake, which is the opposite of how I want my matters run.",
+    photoVerdict:
+      "Holds only because the frame is the cockpit, not the car: hand-written notes and a second person reading them. Cut it if the set ever needs to look less macho.",
     src: rally,
     focus: "50% 50%",
     focusSquare: "45% 55%",
@@ -138,6 +150,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "If the pitch is that a bad position can be played, that sounds like spin, and I cannot put spin in front of a court.",
     answer:
       "No case theory from us. Accurate certified translation and transcription of the record you actually have, however unhelpful it is.",
+    photoObjection:
+      "Golf is the corporate-hospitality cliché, and half my panel firms already use it. It also signals a client I am not.",
+    photoVerdict:
+      "Weakest frame in the set for a legal audience. The filthy weather and buried lie save it from country-club, but it is the first one I would drop.",
     src: golfer,
     focus: "35% 55%",
     focusSquare: "40% 55%",
@@ -159,6 +175,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "Covering the open court means handovers, and handovers are where my matters lose a week.",
     answer:
       "One point of contact across translation, review and deposition support, so nothing sits between two vendors waiting to be picked up.",
+    photoObjection:
+      "Doubles tennis looks like a sales conference slide about teamwork.",
+    photoVerdict:
+      "Holds because there is no eye contact and no celebration — one player low and committed, the other already moving into empty court.",
     src: tennis,
     focus: "40% 45%",
     focusSquare: "45% 45%",
@@ -180,6 +200,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "Between rounds is when I need a decision, not encouragement.",
     answer:
       "Overnight turnarounds on foreign-language evidence, with an interpreter briefed before the next interview, not after it.",
+    photoObjection:
+      "Combat sport next to a legal brand implies we are looking for a fight. My board would not sign it.",
+    photoVerdict:
+      "Real risk. Keep it for litigation audiences only; it is wrong for compliance or contracts, where a fight framing is exactly the wrong promise.",
     src: boxer,
     focus: "50% 40%",
     focusSquare: "48% 40%",
@@ -201,6 +225,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "Everyone claims calm. I want to know what happens on the worst week of the year.",
     answer:
       "Capacity that scales inside the same workflow: surge review teams and interpreters booked against a fixed rate card.",
+    photoObjection:
+      "Yachting says wealth, not competence.",
+    photoVerdict:
+      "Holds, because it is offshore work in green water rather than a regatta: soaked crew, no logos, nothing aspirational about it.",
     src: sailing,
     focus: "70% 45%",
     focusSquare: "68% 45%",
@@ -222,6 +250,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "Taking the wind sounds like you do my job. My job is not delegable.",
     answer:
       "We take the volume work — translation, transcription, first-pass review — and leave the judgement calls with your team.",
+    photoObjection:
+      "Cycling is the most over-used metaphor in consulting, full stop.",
+    photoVerdict:
+      "Survives on the honesty of the picture rather than the idea — road grit and one rider visibly paying for both. Rotate it out first if the set feels generic.",
     src: cycling,
     focus: "30% 50%",
     focusSquare: "35% 50%",
@@ -243,6 +275,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "Once collection starts I cannot improvise. Tell me the chain of custody, not the drama.",
     answer:
       "Documented forensic collection and processing, one auditable trail from collection through production.",
+    photoObjection:
+      "Whitewater looks like risk-taking, and I am the person paid to reduce risk.",
+    photoVerdict:
+      "Holds because both paddlers are reading the same line rather than thrill-seeking, but the caption has to do the work; the image alone reads as adrenaline.",
     src: whitewater,
     focus: "55% 45%",
     focusSquare: "58% 45%",
@@ -264,6 +300,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "Standing still being expensive is my line, and it usually means someone is about to bill me for speed.",
     answer:
       "Fixed per-word and per-hour pricing with turnaround committed up front, so the fast option is the priced option.",
+    photoObjection:
+      "Motorsport pit stops are the standard efficiency stock shot in every outsourcing deck.",
+    photoVerdict:
+      "Holds because the driver's hands never leave the wheel — the point being made is who stays in control, not how fast the crew is.",
     src: pit,
     focus: "40% 50%",
     focusSquare: "40% 50%",
@@ -285,6 +325,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "I do not know what I do not know there. A rope in a blizzard does not tell me who is qualified.",
     answer:
       "Local-language counsel support: certified translators and interpreters with the credentials the local court requires, named before you commit.",
+    photoObjection:
+      "Summit imagery says ego. In a whiteout it also says poor planning.",
+    photoVerdict:
+      "Strongest frame for an unfamiliar-jurisdiction message: nothing is visible except the rope back to the second climber. Nobody looks triumphant.",
     src: mountain,
     focus: "70% 50%",
     focusSquare: "72% 50%",
@@ -306,6 +350,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "Unmanaged pressure is exactly what a vendor creates when the queue is theirs and the deadline is mine.",
     answer:
       "Visible queues: every contract translation tracked with status and due date, so volume is scheduled instead of negotiated.",
+    photoObjection:
+      "A restaurant kitchen has no relationship to legal work, and chef culture reads as shouting.",
+    photoVerdict:
+      "Holds as a picture of managed volume — two people, one plate, no theatre — but it is the least legible link to legal of the sixteen.",
     src: kitchen,
     focus: "35% 45%",
     focusSquare: "38% 45%",
@@ -327,6 +375,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "Preparation being shared is fine until a trial bundle is wrong in the room.",
     answer:
       "Trial-ready deliverables checked twice: exhibits, certified translations and transcripts assembled to your bundle, not ours.",
+    photoObjection:
+      "Theatre says performance, and performance is what clients accuse lawyers of.",
+    photoVerdict:
+      "Holds because the performer is not performing yet; it is the quiet second before an entrance, with the crew in the dark. Read it as preparation, never showmanship.",
     src: backstage,
     focus: "60% 45%",
     focusSquare: "62% 45%",
@@ -348,6 +400,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "A line back out is a nice image. My risk is a mistranslated claim that cannot be fixed later.",
     answer:
       "Patent and filing translation by subject-matter linguists, with a review step and a certificate on every claim set.",
+    photoObjection:
+      "Wreck diving looks reckless, and dark water is hard to read at LinkedIn size.",
+    photoVerdict:
+      "Holds on the guideline and reel, which is the whole argument, but it is the weakest at small sizes; use it on the larger placements only.",
     src: divers,
     focus: "60% 50%",
     focusSquare: "62% 50%",
@@ -369,6 +425,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "Most support interferes. I do not want to manage my supplier.",
     answer:
       "Standing capacity you call on without a new scope each time, and no involvement in the matter you have not asked for.",
+    photoObjection:
+      "Gym imagery reads as hustle culture, which lands badly with senior in-house counsel.",
+    photoVerdict:
+      "Holds because the spotter's open hands take none of the weight, and that is the exact promise. Keep the crop tight enough that it is not a physique shot.",
     src: lifter,
     focus: "45% 45%",
     focusSquare: "45% 45%",
@@ -390,6 +450,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "Precision under load is a slogan. Show me consistency across sixteen languages and four suppliers.",
     answer:
       "One terminology base and one quality standard applied across every language and every reviewer on the programme.",
+    photoObjection:
+      "Rowing signals a specific university background. It can read as exclusive.",
+    photoVerdict:
+      "Holds on the work rather than the club: taped, blistered hands at the catch, no boat livery, no crest. Do not add any identifying kit.",
     src: rowing,
     focus: "30% 45%",
     focusSquare: "32% 45%",
@@ -411,6 +475,10 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
       "One matter can end the company. A distant watcher is not reassurance.",
     answer:
       "Escalation you can name: a senior lead on the matter, out-of-hours cover, and a standing plan for the day it turns.",
+    photoObjection:
+      "Big-wave surfing is the boldest picture here and the easiest to dismiss as a car advert.",
+    photoVerdict:
+      "Holds because the surfer is almost too small to find and the safety rider sits far outside the path. It is the clearest statement of scale in the set.",
     src: surf,
     focus: "60% 35%",
     focusSquare: "62% 40%",
