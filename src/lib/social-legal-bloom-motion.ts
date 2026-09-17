@@ -1056,6 +1056,27 @@ export function bloomMotionFrame(
   const aura = Math.sin(raw * Math.PI * 2);
   const auraB = Math.sin(raw * Math.PI * 4 + Math.PI / 3);
 
+  // The ground's own figure. Its phase runs whole cycles too, and the aura is
+  // nudged along with it so the glow and the background move as one thing.
+  const back = bloomBackdrop(backdropId);
+  const cycles = Math.max(1, Math.round(back.cycles));
+  const backPhase = back.kind === "still" ? 0 : (raw * cycles) % 1;
+  const backTurn = back.kind === "still" ? 0 : Math.sin(raw * cycles * Math.PI * 2);
+  const backWave =
+    back.kind === "still" ? 0 : Math.sin(raw * cycles * Math.PI * 4 + Math.PI / 4);
+  const backdropState = {
+    kind: back.kind,
+    strength: back.strength,
+    panes: back.panes,
+    phase: backPhase,
+    turn: backTurn,
+    wave: backWave,
+    pulse: back.kind === "still" ? 0 : backTurn * back.strength,
+  };
+  // the aura takes the ground's swirl with it, very slightly
+  const withGround = back.strength * 0.5;
+
+
   // The accent word's own arrival, when one has been chosen. It always finishes
   // before the clip does, and a held word is simply there from the first frame.
   const accentSet = bloomAccentMotion(accentMotionId);
