@@ -45,8 +45,20 @@ import {
   bloomPackRoot,
   bloomPlacementsCsv,
   type BloomPackEntry,
+  type BloomPackMotion,
   type BloomPackSize,
 } from "@/lib/social-legal-bloom-pack";
+import {
+  BLOOM_PLACEMENTS,
+  bloomClipSeconds,
+  bloomMotionPath,
+  bloomMotionReadme,
+  bloomMotionSpecCsv,
+  bloomPreset,
+  bloomPresetsByFamily,
+} from "@/lib/social-legal-bloom-motion";
+import { recordBloomSceneClip } from "@/lib/social-legal-bloom-record";
+import { bloomVideoFormat, type BloomVideoFormat } from "@/lib/social-legal-bloom-video";
 import {
   LEGAL_BLOOM_APERTURES,
   LEGAL_BLOOM_COLOURS,
