@@ -264,9 +264,19 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         <div
           className="absolute overflow-hidden"
           style={
-            bandAtBottom
-              ? { left: 0, right: 0, bottom: "6%", aspectRatio: "1376 / 768" }
-              : { left: 0, right: 0, top: stackedCut ? "6%" : veryTall ? "9%" : "4%", aspectRatio: "1376 / 768" }
+            stackedCut
+              ? { left: 0, right: 0, top: "6%", aspectRatio: "1376 / 768" }
+              : bandAtBottom
+                ? { left: 0, right: 0, bottom: 0, aspectRatio: "1376 / 768" }
+                : {
+                    // Letterboxed in the middle of the frame: the whole picture
+                    // reads, and the ground above and below carries the copy.
+                    left: 0,
+                    right: 0,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    aspectRatio: "1376 / 768",
+                  }
           }
         >
           <img
@@ -281,7 +291,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           aria-hidden
           className="absolute"
           style={
-            bandAtBottom
+            !stackedCut && !bandAtBottom
+              ? { display: "none" }
+              : bandAtBottom
               ? {
                   left: 0,
                   right: 0,
