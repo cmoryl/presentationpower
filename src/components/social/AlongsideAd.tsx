@@ -1097,7 +1097,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     );
   } else if (template === "ledger") {
     // Art above; a ledger below, divided by a hairline grid.
-    const ledger = tall ? 32 : square ? 34 : 42;
+    const ledger = tall ? 32 : square ? 34 : banner ? 56 : 42;
     body = (
       <>
         <div className="absolute inset-x-0 top-0 overflow-hidden" style={{ bottom: `${ledger}%` }}>
