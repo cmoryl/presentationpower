@@ -65,10 +65,26 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   // typeset in the voice chosen for its own picture. A named treatment from the
   // board overrides it for the whole set.
   const ST = alongsideSceneType(scene.id);
-  const TY = applyAlongsideTypeSet(
-    LEGAL_ALONGSIDE_TYPE[template],
-    typeSet === "house" ? ST.voice : typeSet,
-  );
+  const houseType = LEGAL_ALONGSIDE_TYPE[template];
+  const voicedType = applyAlongsideTypeSet(houseType, typeSet === "house" ? ST.voice : typeSet);
+  // The hard-cut family (wedge, blade, shard, chevron) is a geometric layout:
+  // the display face IS the cut — Anton across a blade, condensed Oswald riding
+  // the chevron. Swapping in a soft serif per photograph broke the shape, so on
+  // these four the layout keeps its own display, eyebrow, support and CTA faces
+  // and the per-photograph voice only colours the turn phrase and the weight.
+  const hardCut =
+    template === "wedge" || template === "blade" || template === "shard" || template === "chevron";
+  const TY =
+    hardCut && typeSet === "house"
+      ? {
+          ...voicedType,
+          display: houseType.display,
+          eyebrow: houseType.eyebrow,
+          support: houseType.support,
+          cta: houseType.cta,
+          note: houseType.note,
+        }
+      : voicedType;
   const aspect = w / h;
 
   const square = Math.abs(aspect - 1) < 0.2 || h > w;
@@ -123,12 +139,36 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
 
   type PhotoFrame = "full" | "panel" | "column" | "band";
 
+  /**
+   * Which side of the frame the ink cut takes, and how much. The hard-cut
+   * templates cover up to two thirds of the picture, so the subject has to be
+   * driven into the window that is actually left — otherwise a resize hides the
+   * two figures behind the wedge and the ad loses its point.
+   */
+  const cutFromLeft =
+    template === "wedge" ? clear !== "right" : template === "blade" ? clear === "right" : true;
+  const inkBias = (): { dx: number; dy: number } => {
+    if (template === "chevron") {
+      // A band straight across the middle: lift the figures into the top light.
+      return { dx: 0, dy: banner ? -8 : -16 };
+    }
+    if (template === "wedge" || template === "blade" || template === "shard") {
+      if (tall) return { dx: 0, dy: template === "shard" ? -13 : -16 };
+      const away = template === "shard" ? 8 : banner ? 6 : 11;
+      return { dx: cutFromLeft ? away : -away, dy: template === "shard" ? -5 : -3 };
+    }
+    return { dx: 0, dy: 0 };
+  };
+
   const framePos = (kind: PhotoFrame): string => {
     const s = subject;
     if (kind === "panel") return `${s.x}% ${s.y}%`;
     if (kind === "column") return `${clampPct(s.x)}% ${clampPct(s.y - 5)}%`;
     if (kind === "band") return `${clampPct(s.x)}% ${clampPct(s.y - 10)}%`;
-    const push = wide ? 13 : 9;
+    // A 2.1:1 banner is nearly all subject already — a big horizontal push there
+    // walks the figures out of the strip instead of clearing the copy.
+    const push = banner ? 6 : wide ? 13 : 9;
+    const bias = inkBias();
     const x =
       clear === "left" ? clampPct(s.x + push) : clear === "right" ? clampPct(s.x - push) : s.x;
     const y =
@@ -137,7 +177,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         : clear === "bottom"
           ? clampPct(s.y - push * 0.5)
           : s.y;
-    return `${x}% ${y}%`;
+    return `${clampPct(x + bias.dx)}% ${clampPct(y + bias.dy)}%`;
   };
 
   /** A crop of the same frame offset from the subject, for pane/proof rows. */
