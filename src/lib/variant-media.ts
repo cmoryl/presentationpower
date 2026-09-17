@@ -78,6 +78,7 @@ const VIDEO_VARIANT_IDS = new Set<string>([
   // Screen recordings play inside the device screen
   "MV-SHOW-LAPTOP",
   "MV-SHOW-MONITOR",
+  "MV-SHOW-PHONE",
 ]);
 
 /** True when the variant renders a slide-level photograph from
