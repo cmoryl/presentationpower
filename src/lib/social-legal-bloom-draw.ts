@@ -262,8 +262,9 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
   if (bloomEm > 0 && m.bloom.opacity > 0.01) {
     const lean = bloomLean(cut);
     const pad = short * 0.11;
-    const bx = boxX - pad + boxW * lean.x * 0.09;
-    const by = boxY - pad + boxH * lean.y * 0.07;
+    const bx = boxX - pad + boxW * lean.x * 0.09 + short * m.bloom.driftX;
+    const by = boxY - pad + boxH * lean.y * 0.07 + short * m.bloom.driftY;
+
     const bw = boxW + pad * 2;
     const bh = boxH + pad * 2;
     const cx = bx + bw / 2;
