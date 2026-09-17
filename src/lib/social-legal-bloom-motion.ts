@@ -226,88 +226,404 @@ export function bloomPlacementsByPlatform(): { platform: string; placements: Blo
 
 // ---------------------------------------------------------------------------
 // Motion presets
+//
+// A standard motion library, grouped the way an edit suite groups it: camera
+// moves on the photograph, reveals of the picture itself, typography arrivals,
+// light passes, and loop-safe moves for placements that run round again.
+//
+// Every preset obeys the campaign: the photograph travels INSIDE its frame, the
+// frame's turned shape never distorts, the accent word never ends smaller than
+// the line, and the lockup lands last and holds to the end.
+
+/** How the photograph itself travels inside the frame. */
+export type BloomPhotoMove =
+  | "push-in"
+  | "pull-back"
+  | "pan-right"
+  | "pan-left"
+  | "tilt-up"
+  | "tilt-down"
+  | "hold";
+
+/** How the picture is uncovered at the top of the clip. */
+export type BloomRevealMode =
+  | "none"
+  | "wipe-up"
+  | "wipe-side"
+  | "iris"
+  | "corner"
+  | "bloom-first";
+
+/** How the line arrives. */
+export type BloomTextMode =
+  | "rise"
+  | "cascade"
+  | "fade"
+  | "slide"
+  | "typewrite"
+  | "drop"
+  | "hold";
+
+export type BloomMotionFamily = "Camera" | "Reveal" | "Typography" | "Light" | "Loop";
 
 export type BloomMotionPreset = {
   id: string;
   label: string;
+  family: BloomMotionFamily;
   /** Plain description for the board. */
   says: string;
-  /** How far the picture is pushed in at the start (1 = no push). */
-  push: number;
-  /** How far the picture drifts across its frame, as a share of the frame. */
-  drift: { x: number; y: number };
-  /** Words rise this far, as a share of the short edge. */
-  rise: number;
-  /** Seconds between one word and the next. */
-  stagger: number;
+  /** How fast the whole thing reads. */
+  pacing: "slow" | "steady" | "quick";
+  photo: {
+    move: BloomPhotoMove;
+    /** Push or pull as a share of the frame (0.1 = 10% bigger at its widest). */
+    zoom: number;
+    /** Travel across the frame, as a share of the frame. */
+    travel: number;
+  };
+  reveal: {
+    mode: BloomRevealMode;
+    /** Share of the clip by which the picture is fully uncovered. */
+    until: number;
+  };
+  text: {
+    mode: BloomTextMode;
+    /** Seconds between one word and the next. */
+    stagger: number;
+    /** Words rise (or drop) this far, as a share of the short edge. */
+    rise: number;
+    /** Words slide in from this far to the side, as a share of the short edge. */
+    slide: number;
+    /** Share of the clip at which the line begins. */
+    start: number;
+  };
   /** How much bigger the accent word starts before it settles. */
   turnOvershoot: number;
   /** A light sweep crosses the picture once when true. */
   sweep: boolean;
   /** The last frame returns to the first, for placements that loop. */
   loopSafe: boolean;
+  /** Share of the clip held fully composed at the end, for a clean last frame. */
+  endHold: number;
 };
 
 export const BLOOM_MOTION_PRESETS: BloomMotionPreset[] = [
+  // ---- Camera: the classic slow moves on a still photograph
   {
-    id: "lift",
-    label: "Quiet lift",
-    says: "The picture pushes in slowly while the line rises word by word.",
-    push: 1.1,
-    drift: { x: 0.012, y: -0.02 },
-    rise: 0.05,
-    stagger: 0.09,
+    id: "push-slow",
+    label: "Slow push in",
+    family: "Camera",
+    says: "The photograph moves gently closer while the line rises word by word.",
+    pacing: "slow",
+    photo: { move: "push-in", zoom: 0.1, travel: 0.012 },
+    reveal: { mode: "none", until: 0.28 },
+    text: { mode: "rise", stagger: 0.09, rise: 0.05, slide: 0, start: 0.1 },
     turnOvershoot: 1.22,
     sweep: false,
     loopSafe: false,
+    endHold: 0.12,
   },
   {
-    id: "travel",
-    label: "Long travel",
-    says: "A long pan across the photograph, the words already holding.",
-    push: 1.18,
-    drift: { x: 0.075, y: 0 },
-    rise: 0.03,
-    stagger: 0.05,
+    id: "push-strong",
+    label: "Strong push in",
+    family: "Camera",
+    says: "A firmer move in on the subject, for a short, punchy cut.",
+    pacing: "quick",
+    photo: { move: "push-in", zoom: 0.2, travel: 0.02 },
+    reveal: { mode: "none", until: 0.18 },
+    text: { mode: "cascade", stagger: 0.06, rise: 0.06, slide: 0, start: 0.06 },
+    turnOvershoot: 1.34,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.14,
+  },
+  {
+    id: "pull-back",
+    label: "Slow pull back",
+    family: "Camera",
+    says: "Opens tight on the subject and eases out to the whole scene.",
+    pacing: "slow",
+    photo: { move: "pull-back", zoom: 0.16, travel: 0.01 },
+    reveal: { mode: "none", until: 0.3 },
+    text: { mode: "fade", stagger: 0.05, rise: 0.03, slide: 0, start: 0.16 },
+    turnOvershoot: 1.16,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.16,
+  },
+  {
+    id: "pan-across",
+    label: "Pan across",
+    family: "Camera",
+    says: "A long move left to right across the photograph, the words holding.",
+    pacing: "slow",
+    photo: { move: "pan-right", zoom: 0.14, travel: 0.075 },
+    reveal: { mode: "none", until: 0.24 },
+    text: { mode: "rise", stagger: 0.05, rise: 0.03, slide: 0, start: 0.08 },
     turnOvershoot: 1.1,
     sweep: false,
     loopSafe: false,
+    endHold: 0.12,
   },
   {
-    id: "turn",
-    label: "Turn and settle",
-    says: "The accent word arrives big and settles into the line.",
-    push: 1.06,
-    drift: { x: -0.02, y: 0.02 },
-    rise: 0.045,
-    stagger: 0.11,
-    turnOvershoot: 1.55,
+    id: "pan-back",
+    label: "Pan back",
+    family: "Camera",
+    says: "The same long move, running the other way.",
+    pacing: "slow",
+    photo: { move: "pan-left", zoom: 0.14, travel: 0.075 },
+    reveal: { mode: "none", until: 0.24 },
+    text: { mode: "rise", stagger: 0.05, rise: 0.03, slide: 0, start: 0.08 },
+    turnOvershoot: 1.1,
     sweep: false,
     loopSafe: false,
+    endHold: 0.12,
   },
   {
-    id: "sweep",
+    id: "tilt-up",
+    label: "Tilt up",
+    family: "Camera",
+    says: "Rises up the frame — good for cliffs, masts and tall shots.",
+    pacing: "steady",
+    photo: { move: "tilt-up", zoom: 0.14, travel: 0.06 },
+    reveal: { mode: "none", until: 0.26 },
+    text: { mode: "rise", stagger: 0.08, rise: 0.055, slide: 0, start: 0.12 },
+    turnOvershoot: 1.24,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.12,
+  },
+  {
+    id: "tilt-down",
+    label: "Tilt down",
+    family: "Camera",
+    says: "Settles down the frame onto the subject.",
+    pacing: "steady",
+    photo: { move: "tilt-down", zoom: 0.14, travel: 0.06 },
+    reveal: { mode: "none", until: 0.26 },
+    text: { mode: "drop", stagger: 0.08, rise: 0.05, slide: 0, start: 0.12 },
+    turnOvershoot: 1.24,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.12,
+  },
+
+  // ---- Reveal: the picture itself is uncovered
+  {
+    id: "wipe-up",
+    label: "Wipe up",
+    family: "Reveal",
+    says: "The picture is uncovered from the bottom up, then holds.",
+    pacing: "steady",
+    photo: { move: "push-in", zoom: 0.08, travel: 0.01 },
+    reveal: { mode: "wipe-up", until: 0.34 },
+    text: { mode: "rise", stagger: 0.08, rise: 0.05, slide: 0, start: 0.22 },
+    turnOvershoot: 1.24,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.14,
+  },
+  {
+    id: "wipe-side",
+    label: "Side wipe",
+    family: "Reveal",
+    says: "The picture opens across from the copy side outwards.",
+    pacing: "quick",
+    photo: { move: "pan-right", zoom: 0.08, travel: 0.03 },
+    reveal: { mode: "wipe-side", until: 0.3 },
+    text: { mode: "slide", stagger: 0.07, rise: 0.02, slide: 0.05, start: 0.18 },
+    turnOvershoot: 1.2,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.14,
+  },
+  {
+    id: "iris-open",
+    label: "Iris open",
+    family: "Reveal",
+    says: "The picture opens out from the middle of the frame.",
+    pacing: "steady",
+    photo: { move: "pull-back", zoom: 0.12, travel: 0.01 },
+    reveal: { mode: "iris", until: 0.38 },
+    text: { mode: "fade", stagger: 0.05, rise: 0.03, slide: 0, start: 0.28 },
+    turnOvershoot: 1.18,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.14,
+  },
+  {
+    id: "corner-open",
+    label: "Turned-corner open",
+    family: "Reveal",
+    says: "The picture arrives along its own turned diagonal — the house shape moving.",
+    pacing: "steady",
+    photo: { move: "push-in", zoom: 0.1, travel: 0.015 },
+    reveal: { mode: "corner", until: 0.4 },
+    text: { mode: "cascade", stagger: 0.09, rise: 0.05, slide: 0, start: 0.26 },
+    turnOvershoot: 1.3,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.14,
+  },
+  {
+    id: "bloom-first",
+    label: "Bloom first",
+    family: "Reveal",
+    says: "The colour blooms open on the empty ground and the picture lands into it.",
+    pacing: "slow",
+    photo: { move: "push-in", zoom: 0.12, travel: 0.012 },
+    reveal: { mode: "bloom-first", until: 0.46 },
+    text: { mode: "rise", stagger: 0.09, rise: 0.05, slide: 0, start: 0.34 },
+    turnOvershoot: 1.28,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.12,
+  },
+
+  // ---- Typography: the line does the work
+  {
+    id: "word-cascade",
+    label: "Word cascade",
+    family: "Typography",
+    says: "Each word steps up in turn, one clearly after the other.",
+    pacing: "steady",
+    photo: { move: "push-in", zoom: 0.08, travel: 0.012 },
+    reveal: { mode: "none", until: 0.22 },
+    text: { mode: "cascade", stagger: 0.13, rise: 0.07, slide: 0, start: 0.08 },
+    turnOvershoot: 1.3,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.14,
+  },
+  {
+    id: "type-on",
+    label: "Type on",
+    family: "Typography",
+    says: "The line types itself on, letter by letter.",
+    pacing: "quick",
+    photo: { move: "hold", zoom: 0.05, travel: 0.008 },
+    reveal: { mode: "none", until: 0.2 },
+    text: { mode: "typewrite", stagger: 0.03, rise: 0, slide: 0, start: 0.08 },
+    turnOvershoot: 1.12,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.18,
+  },
+  {
+    id: "line-slide",
+    label: "Line slide in",
+    family: "Typography",
+    says: "The words slide in from the side and lock into place.",
+    pacing: "quick",
+    photo: { move: "pan-left", zoom: 0.08, travel: 0.03 },
+    reveal: { mode: "none", until: 0.2 },
+    text: { mode: "slide", stagger: 0.07, rise: 0.01, slide: 0.07, start: 0.08 },
+    turnOvershoot: 1.2,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.14,
+  },
+  {
+    id: "drop-settle",
+    label: "Drop and settle",
+    family: "Typography",
+    says: "The words drop in from above and settle.",
+    pacing: "steady",
+    photo: { move: "push-in", zoom: 0.09, travel: 0.012 },
+    reveal: { mode: "none", until: 0.22 },
+    text: { mode: "drop", stagger: 0.09, rise: 0.06, slide: 0, start: 0.1 },
+    turnOvershoot: 1.26,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.14,
+  },
+  {
+    id: "turn-hero",
+    label: "Accent word hero",
+    family: "Typography",
+    says: "The italic word arrives large and settles into the line — the campaign's own move.",
+    pacing: "steady",
+    photo: { move: "push-in", zoom: 0.07, travel: 0.015 },
+    reveal: { mode: "none", until: 0.22 },
+    text: { mode: "rise", stagger: 0.1, rise: 0.045, slide: 0, start: 0.06 },
+    turnOvershoot: 1.62,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.16,
+  },
+
+  // ---- Light: a single pass across the picture
+  {
+    id: "light-sweep",
     label: "Light sweep",
+    family: "Light",
     says: "Light crosses the picture once as the line completes.",
-    push: 1.12,
-    drift: { x: 0.02, y: -0.015 },
-    rise: 0.04,
-    stagger: 0.08,
+    pacing: "steady",
+    photo: { move: "push-in", zoom: 0.12, travel: 0.02 },
+    reveal: { mode: "none", until: 0.24 },
+    text: { mode: "rise", stagger: 0.08, rise: 0.04, slide: 0, start: 0.1 },
     turnOvershoot: 1.28,
     sweep: true,
     loopSafe: false,
+    endHold: 0.14,
   },
   {
-    id: "hold",
-    label: "Held drift",
-    says: "Almost still: a slow drift only, for looping placements and banners.",
-    push: 1.07,
-    drift: { x: 0.03, y: 0 },
-    rise: 0.018,
-    stagger: 0.04,
+    id: "shine-hold",
+    label: "Shine and hold",
+    family: "Light",
+    says: "Almost still, with one late pass of light and a long clean last frame.",
+    pacing: "slow",
+    photo: { move: "hold", zoom: 0.05, travel: 0.008 },
+    reveal: { mode: "none", until: 0.2 },
+    text: { mode: "fade", stagger: 0.04, rise: 0.02, slide: 0, start: 0.12 },
+    turnOvershoot: 1.1,
+    sweep: true,
+    loopSafe: false,
+    endHold: 0.24,
+  },
+
+  // ---- Loop: the last frame matches the first
+  {
+    id: "loop-breathe",
+    label: "Loop breathe",
+    family: "Loop",
+    says: "A slow breath in and back out — seamless when the post loops.",
+    pacing: "slow",
+    photo: { move: "push-in", zoom: 0.07, travel: 0.01 },
+    reveal: { mode: "none", until: 0.2 },
+    text: { mode: "hold", stagger: 0.03, rise: 0.012, slide: 0, start: 0.02 },
     turnOvershoot: 1.06,
     sweep: false,
     loopSafe: true,
+    endHold: 0,
+  },
+  {
+    id: "loop-drift",
+    label: "Loop drift",
+    family: "Loop",
+    says: "A drift across and back, for banners and site headers.",
+    pacing: "slow",
+    photo: { move: "pan-right", zoom: 0.06, travel: 0.03 },
+    reveal: { mode: "none", until: 0.2 },
+    text: { mode: "hold", stagger: 0.03, rise: 0.01, slide: 0, start: 0.02 },
+    turnOvershoot: 1.04,
+    sweep: false,
+    loopSafe: true,
+    endHold: 0,
+  },
+  {
+    id: "end-card",
+    label: "Held end card",
+    family: "Loop",
+    says: "Arrives early and holds still — a title card at the end of a longer edit.",
+    pacing: "quick",
+    photo: { move: "hold", zoom: 0.04, travel: 0.006 },
+    reveal: { mode: "none", until: 0.14 },
+    text: { mode: "fade", stagger: 0.03, rise: 0.02, slide: 0, start: 0.04 },
+    turnOvershoot: 1.1,
+    sweep: false,
+    loopSafe: false,
+    endHold: 0.4,
   },
 ];
 
@@ -315,16 +631,33 @@ export function bloomPreset(id: string): BloomMotionPreset {
   return BLOOM_MOTION_PRESETS.find((p) => p.id === id) ?? BLOOM_MOTION_PRESETS[0]!;
 }
 
+/** The presets grouped by family, in the order above. */
+export function bloomPresetsByFamily(): { family: BloomMotionFamily; presets: BloomMotionPreset[] }[] {
+  const out: { family: BloomMotionFamily; presets: BloomMotionPreset[] }[] = [];
+  for (const p of BLOOM_MOTION_PRESETS) {
+    const row = out.find((r) => r.family === p.family);
+    if (row) row.presets.push(p);
+    else out.push({ family: p.family, presets: [p] });
+  }
+  return out;
+}
+
 /** What every part of the ad is doing at one moment of the clip. */
 export type BloomMotionFrame = {
   /** The photograph inside its frame — the frame itself never moves. */
   photo: { scale: number; x: number; y: number };
   /** The whole picture unit, easing into place at the top of the clip. */
-  frame: { scale: number; opacity: number };
+  frame: {
+    scale: number;
+    opacity: number;
+    /** 0–1 of the uncovering; 1 = fully visible. */
+    reveal: number;
+    revealMode: BloomRevealMode;
+  };
   bloom: { scale: number; opacity: number };
   splash: { scale: number; opacity: number };
-  /** Per-word reveal of the headline: how far through the line the reveal is. */
-  words: { progress: number; rise: number };
+  /** How the line arrives, and how far through that arrival this moment is. */
+  words: { progress: number; rise: number; slide: number; mode: BloomTextMode };
   turn: { scale: number; opacity: number; rise: number };
   support: { opacity: number; rise: number };
   logo: { opacity: number; rise: number };
@@ -353,37 +686,67 @@ export function bloomMotionFrame(
 ): BloomMotionFrame {
   const dur = Math.max(0.5, seconds);
   const time = Math.max(0, Math.min(dur, t));
-  const p = time / dur;
+  const raw = time / dur;
 
-  // The picture travels for the whole clip; on a looping preset it comes back.
-  const travel = preset.loopSafe ? Math.sin(p * Math.PI * 2) * 0.5 + 0.5 : easeInOut(p);
-  const settle = preset.loopSafe ? travel : p;
-  const scale = preset.push + (1 - preset.push) * settle;
+  // Everything after the hold point stays exactly as the hold point left it, so
+  // the last frame of a clip is a clean, composed still.
+  const active = Math.max(0.2, 1 - preset.endHold);
+  const p = preset.loopSafe ? raw : clamp01(raw / active);
 
-  const inA = easeOut(seg(p, 0, 0.28));
-  const words = seg(p, 0.1, 0.1 + Math.min(0.55, preset.stagger * 8));
-  const turnIn = easeOut(seg(p, 0.22, 0.58));
-  const supportIn = easeOut(seg(p, 0.4, 0.72));
-  const logoIn = easeOut(seg(p, 0.55, 0.85));
+  // The camera move: a share of the clip travelled, coming back on a loop.
+  const travel = preset.loopSafe ? Math.sin(raw * Math.PI * 2) * 0.5 + 0.5 : easeInOut(p);
+  const journey = preset.loopSafe ? travel : travel;
+  const z = preset.photo.zoom;
+  const move = preset.photo.move;
+  const scale =
+    move === "pull-back" ? 1 + z * (1 - journey) : move === "hold" ? 1 + z * 0.5 : 1 + z * journey;
+  const across = (journey - 0.5) * 2 * preset.photo.travel;
+  const photo = {
+    scale,
+    x: move === "pan-right" ? across : move === "pan-left" ? -across : across * 0.18,
+    y: move === "tilt-up" ? -across : move === "tilt-down" ? across : across * -0.12,
+  };
+
+  const inA = easeOut(seg(p, 0, preset.reveal.mode === "bloom-first" ? 0.1 : 0.24));
+  const revealed =
+    preset.reveal.mode === "none"
+      ? 1
+      : easeOut(seg(p, preset.reveal.mode === "bloom-first" ? 0.2 : 0.04, preset.reveal.until));
+  const frameIn = preset.reveal.mode === "bloom-first" ? easeOut(seg(p, 0.2, 0.5)) : inA;
+
+  const start = preset.text.start;
+  const span = Math.min(0.62, Math.max(0.16, preset.text.stagger * 7));
+  const wordsRaw = preset.text.mode === "hold" ? 1 : seg(p, start, start + span);
+  const words = preset.text.mode === "typewrite" ? wordsRaw : easeOut(wordsRaw);
+  const turnIn =
+    preset.text.mode === "hold" ? 1 : easeOut(seg(p, start + span * 0.35, start + span + 0.16));
+  const supportIn = easeOut(seg(p, start + span * 0.7, start + span + 0.3));
+  const logoIn = easeOut(seg(p, Math.min(0.72, start + span + 0.1), Math.min(0.94, start + span + 0.4)));
 
   return {
-    photo: {
-      scale,
-      x: preset.drift.x * (travel - 0.5) * 2,
-      y: preset.drift.y * (travel - 0.5) * 2,
+    photo,
+    frame: {
+      scale: 1 + (1 - frameIn) * 0.02,
+      opacity: frameIn,
+      reveal: revealed,
+      revealMode: preset.reveal.mode,
     },
-    frame: { scale: 1 + (1 - inA) * 0.02, opacity: inA },
     bloom: { scale: 0.94 + inA * 0.06, opacity: inA },
     splash: { scale: 0.9 + easeOut(seg(p, 0.1, 0.7)) * 0.1, opacity: easeOut(seg(p, 0.05, 0.6)) },
-    words: { progress: easeOut(words), rise: (1 - easeOut(words)) * preset.rise },
+    words: {
+      progress: words,
+      rise: (1 - words) * preset.text.rise,
+      slide: (1 - words) * preset.text.slide,
+      mode: preset.text.mode,
+    },
     turn: {
       scale: preset.turnOvershoot + (1 - preset.turnOvershoot) * turnIn,
       opacity: turnIn,
-      rise: (1 - turnIn) * preset.rise * 1.4,
+      rise: (1 - turnIn) * preset.text.rise * 1.4,
     },
-    support: { opacity: supportIn, rise: (1 - supportIn) * preset.rise * 0.7 },
-    logo: { opacity: logoIn, rise: (1 - logoIn) * preset.rise * 0.4 },
-    sweep: preset.sweep ? seg(p, 0.45, 0.8) : -1,
+    support: { opacity: supportIn, rise: (1 - supportIn) * preset.text.rise * 0.7 },
+    logo: { opacity: logoIn, rise: (1 - logoIn) * preset.text.rise * 0.4 },
+    sweep: preset.sweep ? seg(p, 0.45, 0.86) : -1,
   };
 }
 
