@@ -159,20 +159,115 @@ export function DeviceFrame({
         />
       )}
 
+      {/* Side buttons — phone only, drawn behind the chassis edge */}
+      {kind === "phone" && (
+        <>
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              right: "-1.4%",
+              top: "17%",
+              width: "1.4%",
+              height: "9%",
+              borderRadius: 999,
+              background: c.deep,
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: "-1.4%",
+              top: "22%",
+              width: "1.4%",
+              height: "6%",
+              borderRadius: 999,
+              background: c.deep,
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: "-1.4%",
+              top: "31%",
+              width: "1.4%",
+              height: "6%",
+              borderRadius: 999,
+              background: c.deep,
+            }}
+          />
+        </>
+      )}
+
       {/* Lid / bezel */}
       <div
         style={{
           position: "relative",
-          padding: kind === "laptop" ? "1.1%" : "1.4%",
-          paddingBottom: kind === "laptop" ? "1.6%" : "3.2%",
+          padding: kind === "phone" ? "2.4%" : kind === "laptop" ? "1.1%" : "1.4%",
+          paddingBottom: kind === "phone" ? "2.4%" : kind === "laptop" ? "1.6%" : "3.2%",
           background: c.body,
           border: `1px solid ${c.edge}`,
-          borderRadius: kind === "laptop" ? "1.6%" : "1.1%",
+          borderRadius: kind === "phone" ? "9%" : kind === "laptop" ? "1.6%" : "1.1%",
           boxShadow: shadow ? "0 2% 4% rgba(3,0,44,0.18)" : undefined,
         }}
       >
+        {kind === "phone" && (
+          // Earpiece / camera island above the screen
+          <div
+            aria-hidden
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "4%",
+              paddingBottom: "1.6%",
+            }}
+          >
+            <span
+              style={{
+                width: "26%",
+                aspectRatio: "26 / 2",
+                borderRadius: 999,
+                background: c.ink,
+                opacity: 0.45,
+              }}
+            />
+            <span
+              style={{
+                width: "4%",
+                aspectRatio: "1",
+                borderRadius: "50%",
+                background: c.ink,
+                opacity: 0.6,
+              }}
+            />
+          </div>
+        )}
         {screen}
-        {kind === "laptop" ? (
+        {kind === "phone" ? (
+          // Home indicator
+          <div
+            aria-hidden
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingTop: "1.6%",
+            }}
+          >
+            <span
+              style={{
+                width: "34%",
+                aspectRatio: "34 / 1.2",
+                borderRadius: 999,
+                background: c.ink,
+                opacity: 0.5,
+              }}
+            />
+          </div>
+        ) : kind === "laptop" ? (
           // Lid chin + camera pinhole
           <div
             aria-hidden
@@ -216,6 +311,7 @@ export function DeviceFrame({
           </div>
         )}
       </div>
+
 
       {kind === "laptop" ? (
         <>
