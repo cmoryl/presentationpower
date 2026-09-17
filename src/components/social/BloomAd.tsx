@@ -88,6 +88,10 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
   const bloomEm = Math.max(0, Math.min(3, L.bloomEm ?? 1));
   const scrimAlpha = Math.min(0.95, (0.42 + overlap * 0.55) * scrimEm);
 
+  // the lower accent splash sits in the corner the picture is furthest from
+  const pictureCentre = L.picture.x + L.picture.w / 2;
+  const splashSide: "left" | "right" = pictureCentre >= 0.5 ? "left" : "right";
+
   return (
     <div
       style={{
