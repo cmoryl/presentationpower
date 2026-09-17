@@ -118,7 +118,8 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
             inset: `-${short * 0.11}px`,
             transform: `translate(${lean.x * 9}%, ${lean.y * 7}%)`,
             background: `radial-gradient(circle at 50% 48%, ${C.glow}FF 0%, ${C.glow}D6 22%, ${C.glow}73 42%, ${C.glow}2B 60%, ${C.glow}00 74%)`,
-            filter: `blur(${short * 0.045}px)`,
+            filter: `blur(${short * 0.045 * bloomEm}px)`,
+            opacity: bloomEm === 0 ? 0 : 1,
           }}
         />
         <div
