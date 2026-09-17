@@ -753,13 +753,14 @@ export function bloomMotionFrame(
     },
     bloom: {
       scale: (0.94 + inA * 0.06) * (1 + aura * 0.035),
-      opacity: inA * (1 - auraB * 0.05),
+      opacity: clamp01(inA * (1 - auraB * 0.05)),
       driftX: aura * 0.02,
       driftY: auraB * 0.016,
     },
     splash: {
       scale: (0.9 + easeOut(seg(p, 0.1, 0.7)) * 0.1) * (1 - aura * 0.03),
-      opacity: easeOut(seg(p, 0.05, 0.6)) * (1 + auraB * 0.04),
+      opacity: clamp01(easeOut(seg(p, 0.05, 0.6)) * (1 + auraB * 0.04)),
+
       driftX: -auraB * 0.018,
       driftY: aura * 0.012,
     },
