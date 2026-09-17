@@ -10,6 +10,7 @@ import {
   bloomExpectedMb,
   bloomMotionFrame,
   BLOOM_ACCENT_MOTIONS,
+  bloomPreset,
   bloomMotionPath,
   bloomMotionReadme,
   bloomMotionSpecCsv,
