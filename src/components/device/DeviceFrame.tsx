@@ -395,9 +395,12 @@ export function DeviceFrame({
 export function DeviceScreenPlaceholder({
   accent = "#003FC7",
   label,
+  kind = "laptop",
 }: {
   accent?: string;
   label?: string;
+  /** Portrait handsets get a stacked app wireframe instead of the desktop one. */
+  kind?: DeviceKind;
 }) {
   const card = (h: string, o: number) => (
     <div
@@ -408,6 +411,150 @@ export function DeviceScreenPlaceholder({
       }}
     />
   );
+
+  if (kind === "phone") {
+    return (
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          flexDirection: "column",
+          gap: "3%",
+          padding: "6% 5%",
+          background: "linear-gradient(180deg, #FFFFFF 0%, #F2F5FB 100%)",
+        }}
+      >
+        {/* Status row */}
+        <div style={{ display: "flex", alignItems: "center", gap: "4%" }}>
+          <span
+            style={{
+              width: "22%",
+              height: "1.1%",
+              borderRadius: 999,
+              background: "rgba(3,0,44,0.18)",
+            }}
+          />
+          <span style={{ flex: 1 }} />
+          <span
+            style={{
+              width: "14%",
+              height: "1.1%",
+              borderRadius: 999,
+              background: "rgba(3,0,44,0.12)",
+            }}
+          />
+        </div>
+        {/* App bar */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4%",
+            padding: "3% 4%",
+            borderRadius: "4%",
+            background: `color-mix(in srgb, ${accent} 92%, #FFFFFF)`,
+          }}
+        >
+          <span
+            style={{ width: "10%", aspectRatio: "1", borderRadius: "30%", background: "#FFFFFF" }}
+          />
+          <span
+            style={{
+              flex: 1,
+              height: "1.4%",
+              borderRadius: 999,
+              background: "rgba(255,255,255,0.7)",
+            }}
+          />
+        </div>
+        {/* Hero card */}
+        <div
+          style={{
+            height: "22%",
+            borderRadius: "5%",
+            background: `color-mix(in srgb, ${accent} 26%, #FFFFFF)`,
+          }}
+        />
+        {/* Two tiles */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4%", height: "13%" }}>
+          {card("100%", 16)}
+          {card("100%", 10)}
+        </div>
+        {/* List rows */}
+        <div style={{ display: "grid", gap: "3%", flex: 1, alignContent: "start" }}>
+          {[16, 12, 12, 10, 10].map((o, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4%",
+                padding: "3%",
+                borderRadius: "4%",
+                background: "#FFFFFF",
+                border: "1px solid rgba(3,0,44,0.08)",
+              }}
+            >
+              <span
+                style={{
+                  width: "12%",
+                  aspectRatio: "1",
+                  borderRadius: "30%",
+                  background: `color-mix(in srgb, ${accent} ${o + 24}%, #FFFFFF)`,
+                }}
+              />
+              <span
+                style={{
+                  flex: 1,
+                  height: "1.2%",
+                  borderRadius: 999,
+                  background: `color-mix(in srgb, ${accent} ${o}%, #E7ECF6)`,
+                }}
+              />
+            </div>
+          ))}
+        </div>
+        {/* Tab bar */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "3% 8%",
+            borderRadius: "5%",
+            background: "#FFFFFF",
+            border: "1px solid rgba(3,0,44,0.08)",
+          }}
+        >
+          {[0.9, 0.4, 0.4, 0.4].map((o, i) => (
+            <span
+              key={i}
+              style={{
+                width: "9%",
+                aspectRatio: "1",
+                borderRadius: "30%",
+                background: `color-mix(in srgb, ${accent} ${o * 100}%, #E7ECF6)`,
+              }}
+            />
+          ))}
+        </div>
+        {label && (
+          <div
+            style={{
+              fontSize: "1.6%",
+              fontWeight: 700,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: accent,
+            }}
+          >
+            {label}
+          </div>
+        )}
+      </div>
+    );
+  }
   return (
     <div
       style={{
