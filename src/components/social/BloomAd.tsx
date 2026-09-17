@@ -13,7 +13,11 @@
 // Every measure is derived from the frame's short edge, so a banner and a story
 // hold the same proportions.
 
-import { getDivisionLogos } from "@/lib/division-logos";
+import tpLegalBlackRaw from "@/assets/legal-bloom/tp-legal-black.svg?raw";
+
+// The single-line Legal lockup, converted to solid black, inlined so the
+// downloadable renders carry it without a second network fetch.
+const tpLegalBlack = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(tpLegalBlackRaw)}`;
 import {
   bloomColour,
   bloomFrameAspect,
