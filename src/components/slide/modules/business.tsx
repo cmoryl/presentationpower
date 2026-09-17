@@ -149,6 +149,7 @@ registerSlideModule({
     "MV-REC-NEXT",
     "MV-SHOW-LAPTOP",
     "MV-SHOW-MONITOR",
+    "MV-SHOW-PHONE",
     "MV-CLIENT-MATRIX",
     "MV-CLIENT-DETAIL-3",
     "MV-CLIENT-COMPARE",
