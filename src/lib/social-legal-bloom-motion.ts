@@ -715,13 +715,22 @@ export function bloomMotionFrame(
   const frameIn = preset.reveal.mode === "bloom-first" ? easeOut(seg(p, 0.2, 0.5)) : inA;
 
   const start = preset.text.start;
-  const span = Math.min(0.62, Math.max(0.16, preset.text.stagger * 7));
+  // The whole arrival — line, supporting sentence and lockup — has to finish
+  // before the clip does, whatever the pacing, so no clip ends mid-move.
+  const span = Math.min(
+    Math.min(0.62, Math.max(0.16, preset.text.stagger * 7)),
+    Math.max(0.12, 0.94 - 0.32 - start),
+  );
   const wordsRaw = preset.text.mode === "hold" ? 1 : seg(p, start, start + span);
   const words = preset.text.mode === "typewrite" ? wordsRaw : easeOut(wordsRaw);
   const turnIn =
-    preset.text.mode === "hold" ? 1 : easeOut(seg(p, start + span * 0.35, start + span + 0.16));
-  const supportIn = easeOut(seg(p, start + span * 0.7, start + span + 0.3));
-  const logoIn = easeOut(seg(p, Math.min(0.72, start + span + 0.1), Math.min(0.94, start + span + 0.4)));
+    preset.text.mode === "hold"
+      ? 1
+      : easeOut(seg(p, start + span * 0.35, Math.min(0.94, start + span + 0.16)));
+  const supportIn = easeOut(seg(p, start + span * 0.7, Math.min(0.96, start + span + 0.3)));
+  const logoIn = easeOut(
+    seg(p, Math.min(0.7, start + span + 0.06), Math.min(0.98, start + span + 0.32)),
+  );
 
   return {
     photo,
