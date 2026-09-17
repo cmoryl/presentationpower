@@ -101,6 +101,13 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
    */
   const stackedCut =
     (template === "wedge" || template === "blade" || template === "shard") && h >= w * 0.9;
+  /**
+   * Square, 4:5 and story trims all crop a 16:9 documentary frame so hard that
+   * the second figure — the whole point of the pairing — drops out of shot. On
+   * every layout those trims hold the WHOLE photograph in a band, on the ground
+   * colour, anchored away from wherever the copy sits.
+   */
+  const squareish = h >= w * 0.9;
   /** One multiplier keeps the shared scale legible in every sizing format. */
   const k = banner ? 0.6 : veryTall ? 1.22 : 1;
   const focus = square ? scene.focusSquare : scene.focus;
@@ -244,7 +251,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         </>
       );
     }
-    if (kind !== "full" || !stackedCut) return img;
+    if (kind !== "full" || !(stackedCut || squareish)) return img;
+    /** Copy at the top of the frame means the picture hangs from the bottom. */
+    const bandAtBottom = !stackedCut && clear === "top";
     // A 9:16 story shows barely a third of the frame's width. Cropping that hard
     // always drops one of the two figures — and the pair IS the ad. So the story
     // format holds the whole photograph in a band across the upper frame, on the
@@ -254,7 +263,11 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         <div className="absolute inset-0" style={{ background: P.ground }} />
         <div
           className="absolute overflow-hidden"
-          style={{ left: 0, right: 0, top: "6%", aspectRatio: "1376 / 768" }}
+          style={
+            bandAtBottom
+              ? { left: 0, right: 0, bottom: "6%", aspectRatio: "1376 / 768" }
+              : { left: 0, right: 0, top: stackedCut ? "6%" : veryTall ? "9%" : "4%", aspectRatio: "1376 / 768" }
+          }
         >
           <img
             src={scene.src}
@@ -267,13 +280,23 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         <div
           aria-hidden
           className="absolute"
-          style={{
-            left: 0,
-            right: 0,
-            top: veryTall ? "36%" : "60%",
-            height: "12%",
-            background: `linear-gradient(to bottom, ${P.ground}00, ${P.ground}FF)`,
-          }}
+          style={
+            bandAtBottom
+              ? {
+                  left: 0,
+                  right: 0,
+                  bottom: veryTall ? "44%" : "42%",
+                  height: "12%",
+                  background: `linear-gradient(to top, ${P.ground}00, ${P.ground}FF)`,
+                }
+              : {
+                  left: 0,
+                  right: 0,
+                  top: veryTall ? (stackedCut ? "36%" : "39%") : stackedCut ? "60%" : "56%",
+                  height: "12%",
+                  background: `linear-gradient(to bottom, ${P.ground}00, ${P.ground}FF)`,
+                }
+          }
         />
       </>
     );
