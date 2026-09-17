@@ -75,7 +75,7 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
       : (w - margin * 2) * (1 - (pictureFlex ?? 0.48)) - short * 0.03;
   const baseHead = mode === "strip" ? short * 0.155 : mode === "stacked" ? short * 0.105 : short * 0.098;
   const headPx = Math.min(baseHead * optical, colW * (mode === "stacked" ? 0.115 : 0.155));
-  const supportPx = Math.max(9, headPx * 0.21);
+  const supportPx = Math.max(10, Math.min(headPx * 0.3, short * 0.028));
 
   const picture = (
     <div
@@ -108,7 +108,7 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
         style={{
           position: "relative",
           width: mode === "stacked" ? "84%" : "88%",
-          height: mode === "stacked" ? "100%" : "72%",
+          height: mode === "stacked" ? "100%" : mode === "strip" ? "88%" : "66%",
           borderRadius: apertureRadius(cut, copySide, short),
           overflow: "hidden",
           border: `${Math.max(1, short * 0.0035)}px solid ${C.glow}CC`,
@@ -259,7 +259,7 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
             ...(copySide === "left"
               ? { right: margin * 0.9, bottom: margin * 0.6 }
               : { left: margin * 0.9, bottom: margin * 0.6 }),
-            height: `${Math.max(14, short * 0.05)}px`,
+            height: `${Math.max(14, short * 0.042)}px`,
             width: "auto",
             opacity: 0.95,
             zIndex: 3,
