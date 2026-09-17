@@ -264,6 +264,12 @@ export const DRIFTED_NATIVE_RENDERER_IDS: readonly string[] = [
   "MV-PROC-PLATFORM-LOOP",
   "MV-PROC-PROOF-PAIRS",
   "MV-RISK-MITIGATION",
+  // The device module on screen is a real chassis with the screen photograph
+  // inside it, icon glyph tiles and mode-aware label ink. The hand-written
+  // renderer drew two blank rects (no screen image at all) plus white tiles with
+  // `p.primary` labels — which in dark mode is white text on a white card, and
+  // an empty white box sitting over the plate photograph. Layered route instead.
+  "MV-SHOW-DEVICE-QUAD",
   "MV-SOL-ARCHITECTURE",
   "MV-SPLIT-MANIFESTO",
   "MV-TIMELINE-VERTICAL",
