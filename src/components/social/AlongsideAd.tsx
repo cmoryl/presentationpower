@@ -22,6 +22,7 @@ import {
   LEGAL_ALONGSIDE_CONCEPT,
   LEGAL_ALONGSIDE_PALETTE as P,
   LEGAL_ALONGSIDE_TYPE,
+  applyAlongsideTypeSet,
   type AlongsideClear,
   type AlongsideScene,
   type AlongsideTemplateId,
@@ -52,10 +53,10 @@ function curtain(clear: AlongsideClear, strength = 0.94): string {
   return `linear-gradient(${to}, ${P.ground}${hex(strength)} 0%, ${P.ground}D9 34%, ${P.ground}59 62%, ${P.ground}00 88%)`;
 }
 
-export function AlongsideAd({ scene, template, w, h }: Props) {
+export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props) {
   const logos = getDivisionLogos("bm-tp-legal");
   const lockup = logos?.white ?? logos?.color;
-  const TY = LEGAL_ALONGSIDE_TYPE[template];
+  const TY = applyAlongsideTypeSet(LEGAL_ALONGSIDE_TYPE[template], typeSet);
   const aspect = w / h;
   const square = Math.abs(aspect - 1) < 0.2 || h > w;
   const tall = h > w * 1.1;
@@ -180,6 +181,22 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     const a = TY.action;
     const parts = alongsideHeadlineParts(scene.headline, scene.action);
     const px = size * d.scale;
+    // A face switch only reads as emphasis on a SHORT phrase. When the turn is
+    // most of the headline, swapping faces mid-line just looks like two
+    // headlines colliding — so the phrase stays in the display face and is
+    // emphasised by weight/italic instead.
+    const longTurn = parts.action.length > scene.headline.length * 0.45;
+    const a2 = longTurn
+      ? {
+          ...a,
+          family: d.family,
+          weight: Math.min(900, d.weight + (d.weight >= 700 ? 0 : 200)),
+          italic: false,
+          caps: d.caps,
+          tracking: d.tracking,
+          scale: 1,
+        }
+      : a;
     return (
       <div
         style={{
@@ -198,15 +215,15 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
         {parts.action ? (
           <span
             style={{
-              fontFamily: a.family,
-              fontWeight: a.weight,
-              fontStyle: a.italic ? "italic" : "normal",
-              fontSize: a.scale ? u(px * a.scale) : undefined,
-              letterSpacing: a.tracking ?? (a.italic ? "0em" : undefined),
-              textTransform: a.caps ? "uppercase" : d.caps ? "uppercase" : "none",
-              borderBottom: a.rule ? `${u(0.2)} solid ${P.accent}` : undefined,
-              paddingBottom: a.rule ? u(0.3) : undefined,
-              whiteSpace: "nowrap",
+              fontFamily: a2.family,
+              fontWeight: a2.weight,
+              fontStyle: a2.italic ? "italic" : "normal",
+              fontSize: a2.scale && a2.scale !== 1 ? u(px * a2.scale) : undefined,
+              letterSpacing: a2.tracking ?? (a2.italic ? "0em" : undefined),
+              textTransform: a2.caps ? "uppercase" : d.caps ? "uppercase" : "none",
+              borderBottom: a2.rule ? `${u(0.2)} solid ${P.accent}` : undefined,
+              paddingBottom: a2.rule ? u(0.3) : undefined,
+              whiteSpace: longTurn ? "normal" : "nowrap",
             }}
           >
             {parts.action}
