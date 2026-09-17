@@ -287,9 +287,10 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
   roundedPath(ctx, boxX, boxY, boxW, boxH, radii);
   ctx.save();
   ctx.clip();
-  // the uncovering: the frame's shape holds, the picture arrives inside it
+  // the uncovering: the frame's shape holds, the picture arrives inside it,
+  // and the accent keyline arrives with it rather than ringing an empty box
   const rv = Math.max(0, Math.min(1, m.frame.reveal));
-  if (rv < 1) {
+  const revealPath = () => {
     ctx.beginPath();
     if (m.frame.revealMode === "wipe-up") {
       ctx.rect(boxX, boxY + boxH * (1 - rv), boxW, boxH * rv);
@@ -316,6 +317,9 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
     } else {
       ctx.rect(boxX, boxY, boxW, boxH);
     }
+  };
+  if (rv < 1) {
+    revealPath();
     ctx.clip();
   }
   const pw = assets.photo.naturalWidth || assets.photo.width || boxW;
@@ -341,12 +345,19 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
   }
   ctx.restore();
 
-  // the solid accent keyline sits on the frame itself — the shape is rebuilt
-  // here because the reveal mask above left its own path behind
+  // the solid accent keyline sits on the frame itself. While the picture is
+  // still arriving the line is held to the uncovered part, so it never reads as
+  // an empty square around nothing.
+  ctx.save();
+  if (rv < 1) {
+    revealPath();
+    ctx.clip();
+  }
   roundedPath(ctx, boxX, boxY, boxW, boxH, radii);
   ctx.lineWidth = strokePx;
   ctx.strokeStyle = C.type;
   ctx.stroke();
+  ctx.restore();
   ctx.restore();
 
   // ---- the copy block
