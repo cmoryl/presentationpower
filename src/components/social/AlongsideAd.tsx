@@ -328,6 +328,23 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
 
   };
 
+  // The supporting line carries one emphasis of its own — the word the offer
+  // turns on — set in the support face's italic so it stays subordinate to the
+  // headline's call-out rather than competing with it.
+  const supportRun = (): React.ReactNode => {
+    const text = LEGAL_ALONGSIDE_CONCEPT.support;
+    const word = "complex";
+    const i = text.indexOf(word);
+    if (i < 0) return text;
+    return (
+      <>
+        {text.slice(0, i)}
+        <span style={{ fontStyle: TY.support.italic ? "normal" : "italic" }}>{word}</span>
+        {text.slice(i + word.length)}
+      </>
+    );
+  };
+
   // A wide banner has no room for a second line of copy — the headline and the
   // division line carry it, and the picture keeps the rest of the strip.
   const support = () =>
