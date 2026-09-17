@@ -591,12 +591,40 @@ function BloomView() {
                   : "Download pack"}
               </button>
             </div>
+            {packMotion !== "off" && videoFormat ? (
+              <p className="mt-2 max-w-3xl text-xs leading-relaxed text-black/55">
+                The clips are recorded in real time, so a bundle with the moving versions takes about
+                as long as they play. They are filed under <strong>04_Motion</strong>, one folder per
+                social placement, with a placement sheet and a readme beside them.
+              </p>
+            ) : null}
+            {!videoFormat ? (
+              <p className="mt-2 text-xs text-black/50">
+                This browser cannot write video, so the bundle will hold the still artwork only.
+              </p>
+            ) : null}
             {packError ? (
               <p className="mt-2 text-xs text-[#E53D2E]">
                 The pack could not be written: {packError}
               </p>
             ) : null}
           </div>
+          {/* the off-screen canvas the pack's clips are recorded from */}
+          <canvas
+            ref={recordRef}
+            aria-hidden
+            data-export-ignore="true"
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: 1,
+              height: 1,
+              opacity: 0,
+              pointerEvents: "none",
+              zIndex: -1,
+            }}
+          />
         </div>
       </header>
 
