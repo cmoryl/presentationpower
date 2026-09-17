@@ -318,8 +318,50 @@ function BloomView() {
         }
       }
 
-      root.file("README.txt", bloomPackReadme(entries, dlScale, dlFormat));
-      root.file("manifest.json", bloomPackManifestJson(entries, dlScale, dlFormat));
+      // The animated versions, recorded in real time at each social trim and
+      // filed beside the stills so one bundle carries both.
+      let motion: BloomPackMotion | undefined;
+      if (clipCount > 0 && videoFormat) {
+        const preset = bloomPreset(packMotionPreset);
+        const paths: string[] = [];
+        for (const p of motionPlacements) {
+          for (const scene of scenes) {
+            const clip = bloomClipSeconds(p, packMotionSeconds);
+            const blob = await recordBloomSceneClip({
+              canvas: recordRef.current,
+              scene,
+              placement: p,
+              preset,
+              wantSeconds: packMotionSeconds,
+              fps: 30,
+              format: videoFormat,
+              aperture,
+              side,
+            });
+            const path = bloomMotionPath(scene, p, clip, 30, videoFormat.ext);
+            root.file(path, blob);
+            paths.push(path);
+            done += 1;
+            setPackProgress({ done, total });
+          }
+        }
+        root.file(
+          "04_Motion/README.txt",
+          bloomMotionReadme(scenes, motionPlacements, preset, packMotionSeconds, 30, videoFormat.ext),
+        );
+        root.file("04_Motion/placements.csv", bloomMotionSpecCsv(motionPlacements, packMotionSeconds, 30));
+        motion = {
+          paths,
+          presetLabel: preset.label,
+          seconds: packMotionSeconds,
+          fps: 30,
+          ext: videoFormat.ext,
+          placementLabels: motionPlacements.map((p) => `${p.platform} ${p.placement}`),
+        };
+      }
+
+      root.file("README.txt", bloomPackReadme(entries, dlScale, dlFormat, motion));
+      root.file("manifest.json", bloomPackManifestJson(entries, dlScale, dlFormat, motion));
       root.file("02_Copy/copy-deck.csv", bloomCopyDeckCsv(scenes));
       root.file("02_Copy/copy-deck.txt", bloomCopyDeckText(scenes));
       root.file("03_Specifications/placements.csv", bloomPlacementsCsv(sizes, dlScale, dlFormat));
