@@ -659,7 +659,9 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
             let ls = 1;
             if (kind === "letters-rise") ly = (1 - eased) * word.size * 0.5;
             if (kind === "letters-drop") ly = -(1 - eased) * word.size * 0.5;
-            if (kind === "letters-pop") ls = acc.overshoot + (1 - acc.overshoot) * eased;
+            if (kind === "letters-pop")
+              ls = (acc.overshoot + (1 - acc.overshoot) * eased) * groundBreath;
+
             if (kind === "letters-spread") lx = (i - (n - 1) / 2) * (1 - eased) * word.size * 0.55;
             ctx.save();
             ctx.globalAlpha = eased;
