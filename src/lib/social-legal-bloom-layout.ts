@@ -160,7 +160,7 @@ export function bloomAutoLayout(
  */
 export function bloomNearestSizeId(w: number, h: number): string {
   const target = w / h;
-  let best = LEGAL_BLOOM_SIZES[0]!;
+  let best: { id: string; w: number; h: number } = LEGAL_BLOOM_SIZES[0]!;
   let gap = Infinity;
   for (const s of LEGAL_BLOOM_SIZES) {
     const d = Math.abs(Math.log(s.w / s.h) - Math.log(target));
