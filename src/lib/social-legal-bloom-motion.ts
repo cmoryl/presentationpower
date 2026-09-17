@@ -807,6 +807,17 @@ export type BloomMotionFrame = {
   /** How the line arrives, and how far through that arrival this moment is. */
   words: { progress: number; rise: number; slide: number; mode: BloomTextMode };
   turn: { scale: number; opacity: number; rise: number };
+  /**
+   * The accent word's own arrival. `progress` is 0–1 through that arrival;
+   * `kind` tells the renderer how to spend it (letter by letter, drawn on,
+   * out of focus). "settle" means follow `turn`, as the preset always did.
+   */
+  accent: {
+    kind: BloomAccentKind;
+    progress: number;
+    letterStagger: number;
+    overshoot: number;
+  };
   support: { opacity: number; rise: number };
   logo: { opacity: number; rise: number };
   /** -1 when no sweep, otherwise 0–1 across the picture. */
