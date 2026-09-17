@@ -18,6 +18,13 @@
 
 import { getDivisionLogos } from "@/lib/division-logos";
 import {
+  ACCENT_MARK_COLORS,
+  accentMarkDataUri,
+  accentMarkStrokes,
+  alongsideAccentMark,
+  markSeed,
+} from "@/lib/social-legal-accent-marks";
+import {
   alongsideHeadlineParts,
   alongsideSceneType,
   LEGAL_ALONGSIDE_CONCEPT,
@@ -331,7 +338,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       className="flex w-full items-center"
       style={{ color: ink, paddingRight: clear === "right" ? undefined : u(26) }}
     >
-      <span aria-hidden className="flex-1" style={{ height: 1, background: `${ink}3D` }} />
+      <span aria-hidden className="flex-1" style={{ height: u(0.5), minHeight: 2, ...drawn(0.5, `${ink}59`) }} />
     </div>
   );
 
@@ -422,7 +429,15 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       // body text, so contrast rules still hold.
       if (treat === "accent")
         return { color: P.accent, fontWeight: Math.min(900, d.weight + 100) };
-      return { borderBottom: `${u(0.16)} solid ${P.accent}`, paddingBottom: u(0.16) };
+      // Rule: a drawn underline in the ad's own hand, not a border. A straight
+      // 1px border under a word is the machine tell this campaign avoids.
+      return {
+        paddingBottom: u(0.34),
+        backgroundImage: accentMarkDataUri(MARK.wordKind, SEED + 11, MARK_COLOR, 1.15),
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "left calc(100% - 0.02em)",
+        backgroundSize: "100% 0.30em",
+      };
     };
     // Word spaces either side of a call-out are bound, so the emphasis never
     // swallows the space between it and the next word.
@@ -470,8 +485,13 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
               fontSize: a2.scale && a2.scale !== 1 ? u(px * a2.scale) : undefined,
               letterSpacing: a2.tracking ?? (a2.italic ? "0em" : undefined),
               textTransform: a2.caps ? "uppercase" : d.caps ? "uppercase" : "none",
-              borderBottom: a2.rule ? `${u(0.2)} solid ${P.accent}` : undefined,
-              paddingBottom: a2.rule ? u(0.3) : undefined,
+              backgroundImage: a2.rule
+                ? accentMarkDataUri(MARK.wordKind, SEED + 3, MARK_COLOR, 1.35)
+                : undefined,
+              backgroundRepeat: a2.rule ? "no-repeat" : undefined,
+              backgroundPosition: a2.rule ? "left 100%" : undefined,
+              backgroundSize: a2.rule ? "100% 0.34em" : undefined,
+              paddingBottom: a2.rule ? u(0.42) : undefined,
               whiteSpace: longTurn ? "normal" : "nowrap",
             }}
           >
@@ -532,17 +552,17 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
    * stub instead of a long horizontal.
    */
   const ruleTilt = ST.axis === "rising" ? -1.6 : ST.axis === "falling" ? 1.6 : 0;
-  const alphaRule = (len = 22, from: string = P.accent) => (
+  const alphaRule = (len = 22, from?: string) => (
     <span
       aria-hidden
       style={{
         display: "block",
-        width: ST.axis === "vertical" ? `${Math.max(9, len * 0.5)}%` : `${len}%`,
-        minWidth: u(ST.axis === "vertical" ? 6 : 10),
-        height: u(ST.axis === "vertical" ? 0.48 : 0.3),
+        width: ST.axis === "vertical" ? `${Math.max(11, len * 0.55)}%` : `${len}%`,
+        minWidth: u(ST.axis === "vertical" ? 7 : 11),
+        height: u(ST.axis === "vertical" ? 1.5 : 1.2),
         transform: ruleTilt ? `rotate(${ruleTilt}deg)` : undefined,
         transformOrigin: "left center",
-        background: `linear-gradient(to right, ${from} 0%, ${from}A6 38%, ${from}00 100%)`,
+        ...drawn(ST.axis === "vertical" ? 1.5 : 1.15, from ?? MARK_COLOR),
       }}
     />
   );
@@ -583,7 +603,12 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   const accentRule = (widthPct = 18) => (
     <span
       aria-hidden
-      style={{ display: "block", width: `${widthPct}%`, height: u(0.34), background: P.accent }}
+      style={{
+        display: "block",
+        width: `${widthPct}%`,
+        height: u(1.1),
+        ...drawn(1.25, MARK_COLOR, 5),
+      }}
     />
   );
 
@@ -592,7 +617,10 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
 
   /** A short accent rule inside a cut field — the number it carried is gone. */
   const cutMasthead = () => (
-    <span aria-hidden style={{ display: "block", width: u(3.4), height: u(0.3), background: P.accent }} />
+    <span
+      aria-hidden
+      style={{ display: "block", width: u(4.6), height: u(1), ...drawn(1.5, MARK_COLOR, 7) }}
+    />
   );
 
   let body: React.ReactNode = null;
