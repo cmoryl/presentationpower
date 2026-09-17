@@ -495,7 +495,7 @@ function AlongsideView() {
                   </select>
                 </label>
                 <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-white/55">
-                  Size
+                  Scale
                   <select
                     value={dlScale}
                     onChange={(e) => setDlScale(Number(e.target.value))}
