@@ -224,8 +224,10 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
   if (splash !== "none" && bloomEm > 0 && m.splash.opacity > 0.01) {
     const sw = short * (splash === "curved" ? 0.82 : splash === "circle" ? 0.58 : 0.72);
     const sh = short * (splash === "curved" ? 0.5 : splash === "circle" ? 0.58 : 0.6);
-    const sx = splashSide === "left" ? -short * 0.2 : w - sw + short * 0.2;
-    const sy = h - sh + short * 0.2;
+    const sx =
+      (splashSide === "left" ? -short * 0.2 : w - sw + short * 0.2) + short * m.splash.driftX;
+    const sy = h - sh + short * 0.2 + short * m.splash.driftY;
+
     ctx.save();
     ctx.globalAlpha = 0.86 * m.splash.opacity;
     ctx.filter = `blur(${short * 0.04 * Math.max(0.35, bloomEm)}px)`;
