@@ -123,100 +123,110 @@ function AlongsideView() {
       </header>
 
       <section className="space-y-5">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div className="space-y-1">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
-              Layout template
-            </div>
-            <h2 className="text-2xl font-semibold tracking-tight text-[#03002C]">
-              Sixteen frames, {LEGAL_ALONGSIDE_TEMPLATES.length} layouts,{" "}
-              {LEGAL_ALONGSIDE_SIZES.length} sizing formats
-
-            </h2>
-            <p className="max-w-2xl text-sm text-black/60">
-              Pick a layout for the whole set here, or click the small layout buttons on any single
-              card to try that frame in a different template without changing the rest.
-            </p>
-          </div>
-          <div className="flex flex-wrap justify-end gap-1.5">
-            {LEGAL_ALONGSIDE_TEMPLATES.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => {
-                  setTemplate(t.id);
-                  setPerScene({});
-                }}
-                aria-pressed={t.id === template}
-                title={t.note}
-                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                  t.id === template
-                    ? "border-[#03002C] bg-[#03002C] text-white"
-                    : "border-black/15 bg-white text-[#03002C] hover:border-[#003FC7]/50"
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-            <span aria-hidden className="mx-1 self-center text-black/20">
-              |
-            </span>
-            {LEGAL_ALONGSIDE_SIZES.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setSizeId(s.id)}
-                aria-pressed={s.id === sizeId}
-                title={`${s.group} · ${s.w}×${s.h}`}
-                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                  s.id === sizeId
-                    ? "border-[#003FC7] bg-[#003FC7] text-white"
-                    : "border-black/15 bg-white text-[#03002C] hover:border-[#003FC7]/50"
-                }`}
-              >
-                {s.label}
-                <span className={s.id === sizeId ? "ml-2 text-white/70" : "ml-2 text-black/40"}>
-                  {s.w}×{s.h}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-
-        <div className="space-y-2 rounded-2xl border border-black/10 bg-white/70 p-4">
+        <div className="space-y-1">
           <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
-            Type treatment
+            Design controls
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {LEGAL_ALONGSIDE_TYPESETS.map((ts) => (
-              <button
-                key={ts.id}
-                type="button"
-                onClick={() => setTypeSet(ts.id)}
-                aria-pressed={ts.id === typeSet}
-                title={ts.note}
-                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                  ts.id === typeSet
-                    ? "border-[#03002C] bg-[#03002C] text-white"
-                    : "border-black/15 bg-white text-[#03002C] hover:border-[#003FC7]/50"
-                }`}
-              >
-                {ts.label}
-              </button>
-            ))}
-          </div>
-          <p className="text-xs text-black/55">
-            {LEGAL_ALONGSIDE_TYPESETS.find((ts) => ts.id === typeSet)?.note}
+          <h2 className="text-2xl font-semibold tracking-tight text-[#03002C]">
+            Sixteen frames, {LEGAL_ALONGSIDE_TEMPLATES.length} layouts,{" "}
+            {LEGAL_ALONGSIDE_SIZES.length} sizing formats
+          </h2>
+          <p className="max-w-2xl text-sm text-black/60">
+            Set the look for the whole set with the three choices below. Any single card can be
+            switched to a different layout underneath it without changing the rest.
           </p>
         </div>
 
-        <p className="text-xs text-black/55">
-          {LEGAL_ALONGSIDE_TEMPLATES.find((t) => t.id === template)?.note}{" "}
-          <span className="text-black/40">
-            — {applyAlongsideTypeSet(LEGAL_ALONGSIDE_TYPE[template], typeSet).note}
-          </span>
-        </p>
+        <div className="rounded-2xl border border-black/10 bg-white/75 p-5">
+          <div className="grid gap-5 md:grid-cols-3">
+            <label className="block space-y-1.5">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+                1 · Layout
+              </span>
+              <select
+                value={template}
+                onChange={(e) => {
+                  setTemplate(e.target.value as AlongsideTemplateId);
+                  setPerScene({});
+                }}
+                className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
+              >
+                {LEGAL_ALONGSIDE_TEMPLATE_FAMILIES.map((fam) => (
+                  <optgroup key={fam.label} label={fam.label}>
+                    {fam.ids.map((id) => (
+                      <option key={id} value={id}>
+                        {alongsideTemplateLabel(id)}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+              <span className="block text-xs leading-relaxed text-black/55">
+                {LEGAL_ALONGSIDE_TEMPLATES.find((t) => t.id === template)?.note}
+              </span>
+            </label>
+
+            <label className="block space-y-1.5">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+                2 · Size
+              </span>
+              <select
+                value={sizeId}
+                onChange={(e) => setSizeId(e.target.value)}
+                className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
+              >
+                {["Banner", "Landscape", "Square", "Portrait"].map((group) => (
+                  <optgroup key={group} label={group}>
+                    {LEGAL_ALONGSIDE_SIZES.filter((s) => s.group === group).map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.label} · {s.w}×{s.h}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+              <span className="block text-xs leading-relaxed text-black/55">
+                Every ad is drawn at {size.w}×{size.h} — the type scales to the shape.
+              </span>
+            </label>
+
+            <label className="block space-y-1.5">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+                3 · Type treatment
+              </span>
+              <select
+                value={typeSet}
+                onChange={(e) => setTypeSet(e.target.value)}
+                className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
+              >
+                {LEGAL_ALONGSIDE_TYPESETS.map((ts) => (
+                  <option key={ts.id} value={ts.id}>
+                    {ts.label}
+                  </option>
+                ))}
+              </select>
+              <span className="block text-xs leading-relaxed text-black/55">
+                {applyAlongsideTypeSet(LEGAL_ALONGSIDE_TYPE[template], typeSet).note}
+              </span>
+            </label>
+          </div>
+
+          {Object.keys(perScene).length > 0 ? (
+            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-black/10 pt-3 text-xs text-black/60">
+              <span>
+                {Object.keys(perScene).length} card
+                {Object.keys(perScene).length === 1 ? "" : "s"} using a different layout to the set.
+              </span>
+              <button
+                type="button"
+                onClick={() => setPerScene({})}
+                className="font-medium text-[#003FC7] underline-offset-2 hover:underline"
+              >
+                Put them all back
+              </button>
+            </div>
+          ) : null}
+        </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
           {LEGAL_ALONGSIDE_SCENES.map((scene) => {
