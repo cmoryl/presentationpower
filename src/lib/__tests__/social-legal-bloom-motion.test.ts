@@ -9,6 +9,8 @@ import {
   bloomCornerRadii,
   bloomExpectedMb,
   bloomMotionFrame,
+  bloomBackdrop,
+  BLOOM_BACKDROPS,
   BLOOM_ACCENT_MOTIONS,
   bloomPreset,
   bloomMotionPath,
@@ -294,7 +296,7 @@ describe("background motion", () => {
   it("stays a whisper: the aura never leaves its own range", () => {
     for (const b of BLOOM_BACKDROPS) {
       for (let i = 0; i <= 40; i += 1) {
-        const f = bloomMotionFrame(bloomPreset("swirl" in b ? "push-slow" : "push-slow"), (i / 40) * 6, 6, "preset", b.id);
+        const f = bloomMotionFrame(bloomPreset("push-slow"), (i / 40) * 6, 6, "preset", b.id);
         expect(f.backdrop.phase).toBeGreaterThanOrEqual(0);
         expect(f.backdrop.phase).toBeLessThanOrEqual(1);
         expect(Math.abs(f.backdrop.pulse)).toBeLessThanOrEqual(1);
