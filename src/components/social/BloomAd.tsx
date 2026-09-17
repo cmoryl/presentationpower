@@ -8,7 +8,8 @@
 //   · a solid accent keyline sitting on the frame itself, as in the master
 //   · the headline beside (wide trims) or under (tall trims) the picture, with
 //     the turning word italic in the bloom's colour
-//   · the Legal lockup, black single line, always bottom left
+//   · a soft accent splash in the lower corner away from the picture
+//   · the Legal lockup, black single line, always bottom right
 //
 // The picture frame and the copy block are placed from a layout (fractions of
 // the trim), so the board can move and resize them per ad and per size. With no
