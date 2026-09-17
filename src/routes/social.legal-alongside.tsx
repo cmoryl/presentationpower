@@ -226,6 +226,19 @@ function AlongsideView() {
                   </p>
                   <p className="text-black/70">{scene.caption}</p>
                   <p className="text-xs text-black/45">{scene.craft}</p>
+                  <div className="rounded-lg border border-black/10 bg-[#F6F7FA] p-3 text-xs">
+                    <div className="font-semibold uppercase tracking-widest text-black/40">
+                      Industry read · {scene.buyer}
+                    </div>
+                    <p className="mt-1.5 text-black/70">
+                      <span className="font-semibold text-[#03002C]">Their objection:</span>{" "}
+                      {scene.objection}
+                    </p>
+                    <p className="mt-1.5 text-black/70">
+                      <span className="font-semibold text-[#03002C]">What it has to answer:</span>{" "}
+                      {scene.answer}
+                    </p>
+                  </div>
                   <p className="text-xs text-black/55">
                     <span className="font-semibold uppercase tracking-widest text-black/40">
                       Type
@@ -364,6 +377,19 @@ function AlongsideView() {
             <div className="mx-auto max-w-3xl space-y-1 text-center text-white/80">
               <p className="text-base font-semibold text-white">{zoomScene.headline}</p>
               <p className="text-sm">{zoomScene.caption}</p>
+              <div className="mt-3 rounded-lg border border-white/15 bg-white/5 p-3 text-xs text-white/75">
+                <div className="font-semibold uppercase tracking-widest text-white/50">
+                  Industry read · {zoomScene.buyer}
+                </div>
+                <p className="mt-1.5">
+                  <span className="font-semibold text-white">Their objection:</span>{" "}
+                  {zoomScene.objection}
+                </p>
+                <p className="mt-1.5">
+                  <span className="font-semibold text-white">What it has to answer:</span>{" "}
+                  {zoomScene.answer}
+                </p>
+              </div>
               <p className="text-xs text-white/50">
                 {zoomScene.craft} · {size.w}×{size.h} ·{" "}
                 {LEGAL_ALONGSIDE_TEMPLATES.find(
