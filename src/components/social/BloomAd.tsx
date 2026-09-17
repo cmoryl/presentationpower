@@ -41,6 +41,12 @@ type Props = {
   layout?: BloomAdLayout;
 };
 
+/** 0–1 opacity as a two-digit hex suffix for an 8-digit colour. */
+function alphaHex(a: number) {
+  const v = Math.round(Math.min(1, Math.max(0, a)) * 255);
+  return v.toString(16).padStart(2, "0").toUpperCase();
+}
+
 export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
   const C = bloomColour(scene);
   const cut = aperture ?? scene.aperture;
@@ -166,7 +172,7 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
               // alpha in the middle, feathered away to nothing at the edges
               background: `radial-gradient(ellipse at 42% 50%, ${P.ground}${alphaHex(scrimAlpha)} 0%, ${P.ground}${alphaHex(scrimAlpha * 0.8)} 38%, ${P.ground}${alphaHex(scrimAlpha * 0.34)} 62%, ${P.ground}00 84%)`,
               backdropFilter: `blur(${short * 0.022}px) saturate(112%)`,
-              zIndex: 0,
+              zIndex: -1,
               pointerEvents: "none",
             }}
           />
