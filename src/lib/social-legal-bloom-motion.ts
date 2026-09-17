@@ -897,6 +897,26 @@ export function bloomMotionFrame(
   const aura = Math.sin(raw * Math.PI * 2);
   const auraB = Math.sin(raw * Math.PI * 4 + Math.PI / 3);
 
+  // The accent word's own arrival, when one has been chosen. It always finishes
+  // before the clip does, and a held word is simply there from the first frame.
+  const accentSet = bloomAccentMotion(accentMotionId);
+  const accentFrom = Math.min(0.8, start + span * 0.3 + accentSet.delay);
+  const accentTo = Math.min(0.94, accentFrom + Math.max(0.08, accentSet.span));
+  const accentRaw = seg(p, accentFrom, accentTo);
+  const accentState = {
+    kind: accentSet.kind,
+    progress:
+      accentSet.kind === "hold" || preset.text.mode === "hold"
+        ? 1
+        : accentSet.kind === "settle"
+          ? turnIn
+          : accentSet.kind === "type"
+            ? accentRaw
+            : easeOut(accentRaw),
+    letterStagger: accentSet.letterStagger,
+    overshoot: accentSet.kind === "settle" ? preset.turnOvershoot : accentSet.overshoot,
+  };
+
   return {
     photo,
 
