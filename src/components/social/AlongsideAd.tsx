@@ -144,35 +144,23 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     />
   );
 
-  /** Division line with the master number set against it on a hairline. */
+  /** Frame number on a hairline. The lockup names the division — never typed. */
   // The lockup owns one corner of every ad (top-right, or bottom-left when the
   // copy column sits on the right), so the masthead keeps the frame number on
-  // the LEFT with the division line and never competes for that corner.
+  // the LEFT and never competes for that corner.
   const masthead = (ink: string = P.ink) => (
     <div
-      className="flex w-full items-baseline gap-3"
+      className="flex w-full items-center gap-3"
       style={{ color: ink, paddingRight: clear === "right" ? undefined : u(26) }}
     >
-
-      <span
-        style={{
-          fontFamily: TY.eyebrow.family,
-          fontSize: u(T.eyebrow),
-          letterSpacing: TY.eyebrow.tracking,
-          textTransform: "uppercase",
-          fontWeight: TY.eyebrow.weight,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {LEGAL_ALONGSIDE_CONCEPT.division}
-      </span>
       <span
         style={{
           fontFamily: TY.eyebrow.family,
           fontSize: u(T.numeral),
           fontVariantNumeric: "tabular-nums",
           letterSpacing: "0.14em",
-          opacity: 0.7,
+          fontWeight: TY.eyebrow.weight,
+          opacity: 0.72,
         }}
       >
         {scene.no}
@@ -325,23 +313,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   /** No call to action in the cut family either — a wider gradient alpha rule. */
   const ctaBlock = (opts?: { light?: boolean }) => alphaRule(46, opts?.light ? P.ink : P.accent);
 
-  /** Division line + number set tight, for use inside a cut field. */
+  /** Frame number on a short accent rule, for use inside a cut field. */
   const cutMasthead = () => (
     <div className="flex items-center" style={{ gap: u(1.4) }}>
-      <span
-        style={{
-          fontFamily: TY.eyebrow.family,
-          fontWeight: TY.eyebrow.weight,
-          fontSize: u(T.eyebrow),
-          letterSpacing: TY.eyebrow.tracking,
-          textTransform: "uppercase",
-          color: P.ink,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {LEGAL_ALONGSIDE_CONCEPT.division}
-      </span>
-      <span aria-hidden style={{ width: u(3.4), height: u(0.3), background: P.accent }} />
       <span
         style={{
           fontFamily: TY.eyebrow.family,
@@ -350,11 +324,12 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           fontVariantNumeric: "tabular-nums",
           letterSpacing: "0.14em",
           color: P.ink,
-          opacity: 0.62,
+          opacity: 0.72,
         }}
       >
         {scene.no}
       </span>
+      <span aria-hidden style={{ width: u(3.4), height: u(0.3), background: P.accent }} />
     </div>
   );
 
@@ -617,7 +592,12 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   } else if (template === "marquee") {
     // Duotone photograph under a stacked marquee: the headline repeated, the
     // middle line solid and the outer lines drawn in outline only.
-    const size = (square ? T.display * 2.5 : T.display * 2.2) * TY.display.scale;
+    // The marquee word is set on one line, so its size is capped by how many
+    // characters have to fit inside the margins — otherwise a long turn runs
+    // straight off the right edge on square and story trims.
+    const chars = Math.max(6, scene.action.replace(/\s+$/, "").length);
+    const fit = (100 - M * 2.4) / (chars * 0.56);
+    const size = Math.min((square ? T.display * 2.5 : T.display * 2.2) * TY.display.scale, fit);
     const line = (variant: "outline" | "solid") => (
       <div
         style={{
@@ -646,9 +626,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         >
           {masthead()}
           <div style={{ display: "grid", gap: u(0.4), textAlign: "left", justifyItems: "start" }}>
-            {line("outline")}
+            {banner ? null : line("outline")}
             {line("solid")}
-            {line("outline")}
+            {banner ? null : line("outline")}
           </div>
           <div style={{ display: "grid", gap: u(1.6) }}>
             <div
@@ -728,7 +708,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           style={
             wide
               ? { top: u(M), bottom: u(M), left: u(M), right: "34%" }
-              : { top: u(M), left: u(M), right: u(M), height: square ? "48%" : "44%" }
+              : { top: u(M), left: u(M), right: u(M), height: square ? "42%" : "40%" }
           }
         >
           {photo(undefined, "panel")}
@@ -755,46 +735,51 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           className="absolute flex flex-col justify-between"
           style={
             wide
-              ? { top: u(M), bottom: u(M), right: u(M), width: "29%", gap: u(1.6) }
-              : { left: u(M), right: u(M), bottom: u(M), top: square ? "52%" : "48%", gap: u(1.6) }
+              ? { top: u(M), bottom: u(M), right: u(M), width: "29%", gap: u(1.2) }
+              : { left: u(M), right: u(M), bottom: u(M), top: square ? "47%" : "44%", gap: u(1.2) }
           }
         >
           <div style={{ display: "grid", gap: u(1.2) }}>
             {masthead()}
-            <div className="flex" style={{ gap: u(0.8) }}>
-              {crops.map((pos) => (
-                <div
-                  key={pos}
-                  className="relative flex-1 overflow-hidden"
-                  style={{ aspectRatio: "4 / 3", border: `1px solid ${P.ink}2E` }}
-                >
-                  <img
-                    src={scene.src}
-                    alt=""
-                    className="absolute inset-0 size-full object-cover"
-                    style={{ objectPosition: pos, filter: "grayscale(0.6) contrast(1.1)" }}
-                  />
-                </div>
-              ))}
-            </div>
+            {/* The proof crops need real height — a 396px banner strip has none. */}
+            {banner ? null : (
+              <div className="flex" style={{ gap: u(0.8) }}>
+                {crops.map((pos) => (
+                  <div
+                    key={pos}
+                    className="relative flex-1 overflow-hidden"
+                    style={{ aspectRatio: "4 / 3", border: `1px solid ${P.ink}2E` }}
+                  >
+                    <img
+                      src={scene.src}
+                      alt=""
+                      className="absolute inset-0 size-full object-cover"
+                      style={{ objectPosition: pos, filter: "grayscale(0.6) contrast(1.1)" }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <div style={{ display: "grid", gap: u(1.3) }}>
+          <div style={{ display: "grid", gap: u(1) }}>
             <div style={{ textAlign: "left" }}>
-              {headline(square ? T.displayTight * 0.8 : T.displayTight * 0.66, { measure: 12 })}
+              {headline(square ? T.displayTight * 0.74 : T.displayTight * 0.62, { measure: 12 })}
             </div>
-            <div
-              style={{
-                fontFamily: TY.support.family,
-                fontSize: u(T.micro * 0.95),
-                lineHeight: 1.45,
-                color: P.ink,
-                opacity: 0.7,
-                borderTop: `1px solid ${P.ink}2E`,
-                paddingTop: u(1),
-              }}
-            >
-              {scene.craft}
-            </div>
+            {banner ? null : (
+              <div
+                style={{
+                  fontFamily: TY.support.family,
+                  fontSize: u(T.micro * 0.95),
+                  lineHeight: 1.45,
+                  color: P.ink,
+                  opacity: 0.7,
+                  borderTop: `1px solid ${P.ink}2E`,
+                  paddingTop: u(1),
+                }}
+              >
+                {scene.craft}
+              </div>
+            )}
           </div>
           <div style={{ display: "grid", justifyItems: "start", gap: u(1.4) }}>
             {ctaBlock()}
@@ -1084,7 +1069,8 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
               gap: u(2.4),
             }}
           >
-            <span>{LEGAL_ALONGSIDE_CONCEPT.division}</span>
+            {/* A banner strip is only ~400px tall — the rotated label won't fit. */}
+            {banner ? null : <span style={{ whiteSpace: "nowrap" }}>{scene.theme}</span>}
             <span aria-hidden style={{ width: 1, height: u(6), background: `${P.ink}47` }} />
             <span style={{ fontVariantNumeric: "tabular-nums", opacity: 0.7 }}>{scene.no}</span>
           </div>
@@ -1111,7 +1097,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     );
   } else if (template === "ledger") {
     // Art above; a ledger below, divided by a hairline grid.
-    const ledger = tall ? 32 : square ? 34 : 42;
+    const ledger = tall ? 32 : square ? 34 : banner ? 56 : 42;
     body = (
       <>
         <div className="absolute inset-x-0 top-0 overflow-hidden" style={{ bottom: `${ledger}%` }}>
@@ -1225,8 +1211,8 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   } else if (template === "window") {
     // Frame cropped to a window on wide margins; copy set beneath on a baseline.
     const side = M * 1.25;
-    const imgTop = wide ? 17 : 14;
-    const imgH = tall ? 46 : square ? 46 : 42;
+    const imgTop = banner ? 12 : wide ? 17 : 14;
+    const imgH = tall ? 46 : square ? 46 : banner ? 32 : 42;
     body = (
       <div className="absolute inset-0" style={{ background: P.ground }}>
         <div className="absolute" style={{ top: "6%", left: u(side), right: u(side) }}>
