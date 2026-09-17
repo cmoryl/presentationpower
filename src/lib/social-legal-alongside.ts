@@ -487,6 +487,136 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
   },
 ];
 
+/**
+ * Per-photograph typographic integration.
+ *
+ * A master typographer does not set every picture in the same voice. Each frame
+ * carries the face pairing whose texture belongs to that photograph, the
+ * dominant line the copy's rules follow, and a scale bias for how much empty
+ * field the picture actually offers the type.
+ *   axis   the strongest line in the frame — rules and hairlines echo it
+ *   weight scale bias: a quiet, open frame carries larger type than a busy one
+ */
+export type AlongsideSceneType = {
+  voice: string;
+  axis: "rising" | "falling" | "flat" | "vertical";
+  weight: number;
+  /** Why this pairing belongs to this photograph — shown under the card. */
+  why: string;
+};
+
+export const LEGAL_ALONGSIDE_SCENE_TYPE: Record<string, AlongsideSceneType> = {
+  "climber-belayer": {
+    voice: "engineered",
+    axis: "vertical",
+    weight: 1.06,
+    why: "A vertical wall, so the type is wide-set and structural and the rules stand up with the rock.",
+  },
+  "rally-codriver": {
+    voice: "technical",
+    axis: "rising",
+    weight: 0.95,
+    why: "The frame is full of hand-written data, so the copy is set like a working document, not a poster.",
+  },
+  "golfer-caddie": {
+    voice: "bookface",
+    axis: "flat",
+    weight: 1.0,
+    why: "Flat storm light and a level horizon: a quiet book face, set level with the land.",
+  },
+  "tennis-doubles": {
+    voice: "compressed",
+    axis: "flat",
+    weight: 1.02,
+    why: "Painted court lines already rule the frame, so the headline is compressed to sit between them.",
+  },
+  "boxer-corner": {
+    voice: "billposter",
+    axis: "flat",
+    weight: 1.08,
+    why: "The corner between rounds is bill-poster territory, held to one flat line so it never reads as hype.",
+  },
+  "storm-sailing": {
+    voice: "literary",
+    axis: "rising",
+    weight: 1.02,
+    why: "A heeling deck: the copy rises with the rig and the face keeps its composure.",
+  },
+  "cycling-pair": {
+    voice: "press",
+    axis: "falling",
+    weight: 1.0,
+    why: "A crosswind road falling away, set in condensed press type that leans with it.",
+  },
+  "whitewater-pair": {
+    voice: "grotesque",
+    axis: "falling",
+    weight: 1.0,
+    why: "Water dropping through the frame, so the type is plain and the rules follow the fall.",
+  },
+  "pit-crew": {
+    voice: "monoset",
+    axis: "flat",
+    weight: 0.96,
+    why: "Everything here is timed, so the copy is set as a monospaced record on a level line.",
+  },
+  "mountaineering-pair": {
+    voice: "gallery",
+    axis: "rising",
+    weight: 1.05,
+    why: "Whiteout is nearly empty field: open, widely tracked caps rising with the ridge.",
+  },
+  "kitchen-service": {
+    voice: "humanist",
+    axis: "flat",
+    weight: 0.96,
+    why: "An orderly pass of identical plates: humanist type on a level line, no theatre.",
+  },
+  "backstage-crew": {
+    voice: "ornament",
+    axis: "vertical",
+    weight: 1.0,
+    why: "Flown bars and standing crew make the frame vertical, and the face carries the theatre without shouting.",
+  },
+  "dive-partners": {
+    voice: "revival",
+    axis: "falling",
+    weight: 1.02,
+    why: "Descending light through water, set in a high-contrast face that fades with the depth.",
+  },
+  "lifter-spotter": {
+    voice: "statement",
+    axis: "vertical",
+    weight: 1.04,
+    why: "Load travels straight down the frame, so the headline is heavy and stacked on that axis.",
+  },
+  "rowing-crew": {
+    voice: "caslon",
+    axis: "flat",
+    weight: 1.0,
+    why: "A long level pull across open water: a classical face set on the waterline.",
+  },
+  "surf-safety-rider": {
+    voice: "couture",
+    axis: "rising",
+    weight: 1.1,
+    why: "The wave gives the largest empty field in the set, so the type is at its biggest and finest, rising with the face.",
+  },
+};
+
+const DEFAULT_SCENE_TYPE: AlongsideSceneType = {
+  voice: "house",
+  axis: "flat",
+  weight: 1,
+  why: "The layout's own pairing.",
+};
+
+/** The typographic voice belonging to one photograph. */
+export function alongsideSceneType(sceneId: string): AlongsideSceneType {
+  return LEGAL_ALONGSIDE_SCENE_TYPE[sceneId] ?? DEFAULT_SCENE_TYPE;
+}
+
+
 /** Layout templates the board can switch between. */
 export const LEGAL_ALONGSIDE_TEMPLATES = [
   {
@@ -961,8 +1091,9 @@ export type AlongsideTypeSet = {
 export const LEGAL_ALONGSIDE_TYPESETS: AlongsideTypeSet[] = [
   {
     id: "house",
-    label: "House (per layout)",
-    note: "Each layout keeps its own pairing — the treatment written for that composition.",
+    label: "Per photograph (recommended)",
+    note: "Each ad is set in the voice chosen for its own picture — the face, the scale and the rules follow that photograph's texture and its strongest line.",
+
   },
   {
     id: "editorial",

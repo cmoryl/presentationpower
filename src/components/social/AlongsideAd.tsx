@@ -19,6 +19,7 @@
 import { getDivisionLogos } from "@/lib/division-logos";
 import {
   alongsideHeadlineParts,
+  alongsideSceneType,
   LEGAL_ALONGSIDE_CONCEPT,
   LEGAL_ALONGSIDE_PALETTE as P,
   LEGAL_ALONGSIDE_TYPE,
@@ -27,6 +28,7 @@ import {
   type AlongsideScene,
   type AlongsideTemplateId,
 } from "@/lib/social-legal-alongside";
+
 
 type Props = {
   scene: AlongsideScene;
@@ -59,8 +61,16 @@ function curtain(clear: AlongsideClear, strength = 0.94): string {
 export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props) {
   const logos = getDivisionLogos("bm-tp-legal");
   const lockup = logos?.white ?? logos?.color;
-  const TY = applyAlongsideTypeSet(LEGAL_ALONGSIDE_TYPE[template], typeSet);
+  // Typographic integration: with the set left on "per photograph", each ad is
+  // typeset in the voice chosen for its own picture. A named treatment from the
+  // board overrides it for the whole set.
+  const ST = alongsideSceneType(scene.id);
+  const TY = applyAlongsideTypeSet(
+    LEGAL_ALONGSIDE_TYPE[template],
+    typeSet === "house" ? ST.voice : typeSet,
+  );
   const aspect = w / h;
+
   const square = Math.abs(aspect - 1) < 0.2 || h > w;
   const tall = h > w * 1.1;
   const wide = !square && !tall;
@@ -185,8 +195,10 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     // one in the same slot. 46 characters is the reference line these layouts
     // were drawn against.
     const chars = scene.headline.trim().length;
-    const optical = Math.max(0.74, Math.min(1.24, (46 / Math.max(chars, 12)) ** 0.42));
+    const optical =
+      Math.max(0.74, Math.min(1.24, (46 / Math.max(chars, 12)) ** 0.42)) * ST.weight;
     const px = size * d.scale * optical;
+
     // Leading and tracking compensate for size: large type needs less of both.
     const baseLead = d.lineHeight ?? 1;
     const lead = Math.max(0.86, baseLead - (px > 4.6 ? 0.06 : px < 3 ? -0.04 : 0));
@@ -291,19 +303,28 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   /**
    * The campaign carries no call to action. Where one used to sit, a gradient
    * alpha rule fades out of the accent so the composition still resolves.
+   *
+   * The rule is not neutral: it echoes the strongest line in the photograph, so
+   * the typography and the picture resolve on the same axis. A rising frame
+   * lifts the rule, a falling one drops it, a vertical frame gets a short heavy
+   * stub instead of a long horizontal.
    */
+  const ruleTilt = ST.axis === "rising" ? -1.6 : ST.axis === "falling" ? 1.6 : 0;
   const alphaRule = (len = 22, from: string = P.accent) => (
     <span
       aria-hidden
       style={{
         display: "block",
-        width: `${len}%`,
-        minWidth: u(10),
-        height: u(0.3),
+        width: ST.axis === "vertical" ? `${Math.max(9, len * 0.5)}%` : `${len}%`,
+        minWidth: u(ST.axis === "vertical" ? 6 : 10),
+        height: u(ST.axis === "vertical" ? 0.48 : 0.3),
+        transform: ruleTilt ? `rotate(${ruleTilt}deg)` : undefined,
+        transformOrigin: "left center",
         background: `linear-gradient(to right, ${from} 0%, ${from}A6 38%, ${from}00 100%)`,
       }}
     />
   );
+
 
   const cta = () => alphaRule(38);
 

@@ -27,6 +27,8 @@ import {
   LEGAL_ALONGSIDE_TEMPLATE_FAMILIES,
   LEGAL_ALONGSIDE_TYPE,
   LEGAL_ALONGSIDE_TYPESETS,
+  alongsideSceneType,
+
   alongsideTemplateLabel,
   applyAlongsideTypeSet,
   type AlongsideTemplateId,
@@ -301,9 +303,12 @@ function AlongsideView() {
                     <span className="font-semibold uppercase tracking-widest text-black/40">
                       Type
                     </span>{" "}
-                    {applyAlongsideTypeSet(LEGAL_ALONGSIDE_TYPE[active], typeSet).note} Emphasis
-                    on “{scene.action}”.
+                    {typeSet === "house"
+                      ? alongsideSceneType(scene.id).why
+                      : applyAlongsideTypeSet(LEGAL_ALONGSIDE_TYPE[active], typeSet).note}{" "}
+                    Emphasis on “{scene.action}”.
                   </p>
+
 
                   <div className="flex flex-wrap items-center gap-2 border-t border-black/10 pt-3">
                     <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-black/40">
