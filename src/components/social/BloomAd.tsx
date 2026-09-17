@@ -172,6 +172,9 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
               // alpha in the middle, feathered away to nothing at the edges
               background: `radial-gradient(ellipse at 42% 50%, ${P.ground}${alphaHex(scrimAlpha)} 0%, ${P.ground}${alphaHex(scrimAlpha * 0.8)} 38%, ${P.ground}${alphaHex(scrimAlpha * 0.34)} 62%, ${P.ground}00 84%)`,
               backdropFilter: `blur(${short * 0.022}px) saturate(112%)`,
+              // the same feather is masked over the blur, so the soft ground has
+              // no straight edge where the copy box ends
+              maskImage: `radial-gradient(ellipse at 42% 50%, #000 0%, #000 46%, rgba(0,0,0,0.35) 68%, rgba(0,0,0,0) 86%)`,
               zIndex: -1,
               pointerEvents: "none",
             }}
