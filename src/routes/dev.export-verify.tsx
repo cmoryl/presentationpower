@@ -775,12 +775,27 @@ async function certifiedOne(
     if (!capture) return { ...out, problems: ["capture returned null"], error: "no capture" };
 
     const imageShapes = capture.shapes.filter((s) => s.kind === "image" && s.src);
+    // Text parity is measured against the MERGED blocks, because those are the
+    // objects PowerPoint receives: same-line fragments and the continuation
+    // halves of one wrapped paragraph ship as a single text box. Counting raw
+    // fragments would fail a preview that is in fact exact.
+    const { mergeTextRuns } = await import("@/lib/export-text-merge");
+    const mergedBlocks = mergeTextRuns(capture.runs);
     out.captured = {
       plate: !!capture.plate,
       shapes: capture.shapes.length - imageShapes.length,
       images: imageShapes.length,
-      runs: capture.runs.length,
+      runs: mergedBlocks.length,
     };
+    // Nothing with visible copy may be lost on the way into a block.
+    const representedText = new Set(
+      mergedBlocks.flatMap((b) => b.runs.map((r) => r.text.trim())).filter(Boolean),
+    );
+    for (const r of capture.runs) {
+      if (r.text.trim() && !representedText.has(r.text.trim())) {
+        out.problems.push(`captured run "${r.text.trim().slice(0, 24)}" is in no text block`);
+      }
+    }
 
     const [{ createRoot }, { PptxCertifiedCanvas }, { STAGE_W }] = await Promise.all([
       import("react-dom/client"),
@@ -859,7 +874,7 @@ async function certifiedOne(
     }
     for (const el of paintedText) {
       const i = Number(el.dataset.certIndex ?? "-1");
-      const run = capture.runs[i];
+      const run = mergedBlocks[i];
       if (!run) {
         out.problems.push(`painted run #${i} has no captured source`);
         continue;
