@@ -24,12 +24,14 @@ import {
 import { BloomAd } from "@/components/social/BloomAd";
 import { BloomLayoutEditor } from "@/components/social/BloomLayoutEditor";
 import {
+  BLOOM_SPLASHES,
   bloomAutoLayout,
   bloomLayoutKey,
   readBloomLayouts,
   writeBloomLayouts,
   type BloomAdLayout,
   type BloomLayoutMap,
+  type BloomSplash,
 } from "@/lib/social-legal-bloom-layout";
 import {
   LEGAL_BLOOM_APERTURES,
