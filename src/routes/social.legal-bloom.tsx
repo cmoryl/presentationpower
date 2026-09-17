@@ -74,6 +74,8 @@ function BloomView() {
   const [side, setSide] = useState<BloomSide | "scene">("scene");
   const [zoom, setZoom] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  /** How close the large view sits: 1 = fits the window, 4 = four times that. */
+  const [viewZoom, setViewZoom] = useState(1);
   const [dlFormat, setDlFormat] = useState<"png" | "jpeg">("png");
   const [dlScale, setDlScale] = useState<number>(2);
   const [dlBusy, setDlBusy] = useState(false);
