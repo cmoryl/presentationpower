@@ -885,3 +885,196 @@ export function alongsideHeadlineParts(
     after: headline.slice(at + action.length),
   };
 }
+
+// ---------------------------------------------------------------------------
+// TYPE SETS — a wider range of Google font families for the whole ad set.
+//
+// Each layout still has its own house treatment (LEGAL_ALONGSIDE_TYPE). A type
+// set re-voices every ad in one considered Google-font pairing without touching
+// the layout geometry: display face + the emphasised phrase's contrasting face,
+// plus the eyebrow, supporting line and CTA so the frame reads as one piece of
+// typography rather than a font swap.
+// ---------------------------------------------------------------------------
+
+const G = {
+  playfair: '"Playfair Display", Georgia, serif',
+  dmserif: '"DM Serif Display", Georgia, serif',
+  bodoni: '"Bodoni Moda", Georgia, serif',
+  garamond: '"EB Garamond", Georgia, serif',
+  newsreader: '"Newsreader", Georgia, serif',
+  spectral: '"Spectral", Georgia, serif',
+  bricolage: '"Bricolage Grotesque", Geist, sans-serif',
+  schibsted: '"Schibsted Grotesk", Geist, sans-serif',
+  instrumentSans: '"Instrument Sans", Geist, sans-serif',
+  familjen: '"Familjen Grotesk", Geist, sans-serif',
+  epilogue: '"Epilogue", Geist, sans-serif',
+  chivo: '"Chivo", Geist, sans-serif',
+  bigShoulders: '"Big Shoulders Display", Geist, sans-serif',
+  unbounded: '"Unbounded", Geist, sans-serif',
+  gabarito: '"Gabarito", Geist, sans-serif',
+} as const;
+
+export type AlongsideTypeSet = {
+  id: string;
+  label: string;
+  note: string;
+  /** Undefined for the house set: each layout keeps its own faces. */
+  faces?: {
+    display: { family: string; weight: number; tracking?: string; caps?: boolean; scale?: number };
+    action: { family: string; weight: number; italic?: boolean; caps?: boolean; scale?: number; tracking?: string };
+    eyebrow: { family: string; weight: number; tracking?: string };
+    support: { family: string; weight: number; italic?: boolean };
+    cta: { family: string; weight: number; tracking?: string };
+  };
+};
+
+export const LEGAL_ALONGSIDE_TYPESETS: AlongsideTypeSet[] = [
+  {
+    id: "house",
+    label: "House (per layout)",
+    note: "Each layout keeps its own pairing — the treatment written for that composition.",
+  },
+  {
+    id: "editorial",
+    label: "Editorial serif",
+    note: "Playfair Display with its own italic for the turn; Instrument Sans carries the small type.",
+    faces: {
+      display: { family: G.playfair, weight: 700, tracking: "-0.018em", scale: 1.06 },
+      action: { family: G.playfair, weight: 500, italic: true, scale: 1.04 },
+      eyebrow: { family: G.instrumentSans, weight: 600, tracking: "0.28em" },
+      support: { family: G.instrumentSans, weight: 400 },
+      cta: { family: G.instrumentSans, weight: 600, tracking: "0.14em" },
+    },
+  },
+  {
+    id: "grotesque",
+    label: "Modern grotesque",
+    note: "Bricolage Grotesque at weight, the turn dropping into a Newsreader italic.",
+    faces: {
+      display: { family: G.bricolage, weight: 800, tracking: "-0.03em", scale: 1.02 },
+      action: { family: G.newsreader, weight: 400, italic: true, scale: 1.1 },
+      eyebrow: { family: G.schibsted, weight: 600, tracking: "0.3em" },
+      support: { family: G.schibsted, weight: 400 },
+      cta: { family: G.schibsted, weight: 600, tracking: "0.14em" },
+    },
+  },
+  {
+    id: "couture",
+    label: "High contrast",
+    note: "Bodoni Moda with a fine italic turn; Spectral for the supporting line.",
+    faces: {
+      display: { family: G.bodoni, weight: 700, tracking: "-0.01em", scale: 1.04 },
+      action: { family: G.bodoni, weight: 500, italic: true, scale: 1.04 },
+      eyebrow: { family: G.schibsted, weight: 500, tracking: "0.34em" },
+      support: { family: G.spectral, weight: 400 },
+      cta: { family: G.schibsted, weight: 600, tracking: "0.16em" },
+    },
+  },
+  {
+    id: "press",
+    label: "Condensed press",
+    note: "Big Shoulders Display caps at newspaper scale, the turn in a Newsreader italic.",
+    faces: {
+      display: { family: G.bigShoulders, weight: 800, tracking: "-0.005em", caps: true, scale: 1.12 },
+      action: { family: G.newsreader, weight: 400, italic: true, caps: false, scale: 0.82 },
+      eyebrow: { family: G.chivo, weight: 700, tracking: "0.3em" },
+      support: { family: G.chivo, weight: 400 },
+      cta: { family: G.chivo, weight: 700, tracking: "0.16em" },
+    },
+  },
+  {
+    id: "literary",
+    label: "Literary",
+    note: "EB Garamond throughout, the turn in its own italic — quiet and read-first.",
+    faces: {
+      display: { family: G.garamond, weight: 600, tracking: "-0.006em", scale: 1.14 },
+      action: { family: G.garamond, weight: 500, italic: true, scale: 1.12 },
+      eyebrow: { family: G.chivo, weight: 500, tracking: "0.3em" },
+      support: { family: G.garamond, weight: 400 },
+      cta: { family: G.chivo, weight: 600, tracking: "0.14em" },
+    },
+  },
+  {
+    id: "technical",
+    label: "Technical",
+    note: "Familjen Grotesk with a Spectral italic turn; small type in IBM Plex Mono.",
+    faces: {
+      display: { family: G.familjen, weight: 700, tracking: "-0.026em", scale: 1.02 },
+      action: { family: G.spectral, weight: 400, italic: true, scale: 1.06 },
+      eyebrow: { family: F.plex, weight: 500, tracking: "0.26em" },
+      support: { family: F.plex, weight: 400 },
+      cta: { family: F.plex, weight: 500, tracking: "0.14em" },
+    },
+  },
+  {
+    id: "statement",
+    label: "Statement",
+    note: "Unbounded as a display voice, Fraunces italic for the turn, Gabarito underneath.",
+    faces: {
+      display: { family: G.unbounded, weight: 700, tracking: "-0.03em", scale: 0.92 },
+      action: { family: F.fraunces, weight: 400, italic: true, scale: 1.12 },
+      eyebrow: { family: G.gabarito, weight: 600, tracking: "0.28em" },
+      support: { family: G.gabarito, weight: 400 },
+      cta: { family: G.gabarito, weight: 600, tracking: "0.14em" },
+    },
+  },
+  {
+    id: "humanist",
+    label: "Humanist",
+    note: "Epilogue with a DM Serif Display turn — plain, warm, corporate-safe.",
+    faces: {
+      display: { family: G.epilogue, weight: 700, tracking: "-0.028em", scale: 1.02 },
+      action: { family: G.dmserif, weight: 400, italic: true, scale: 1.08 },
+      eyebrow: { family: G.epilogue, weight: 600, tracking: "0.3em" },
+      support: { family: G.epilogue, weight: 400 },
+      cta: { family: G.epilogue, weight: 600, tracking: "0.14em" },
+    },
+  },
+];
+
+/** Re-voice a layout's house treatment in the chosen type set. */
+export function applyAlongsideTypeSet(
+  base: AlongsideTypeTreatment,
+  setId: string,
+): AlongsideTypeTreatment {
+  const set = LEGAL_ALONGSIDE_TYPESETS.find((s) => s.id === setId);
+  if (!set?.faces) return base;
+  const f = set.faces;
+  return {
+    display: {
+      ...base.display,
+      family: f.display.family,
+      weight: f.display.weight,
+      tracking: f.display.tracking ?? base.display.tracking,
+      caps: f.display.caps ?? base.display.caps,
+      scale: base.display.scale * (f.display.scale ?? 1),
+    },
+    action: {
+      ...base.action,
+      family: f.action.family,
+      weight: f.action.weight,
+      italic: f.action.italic,
+      caps: f.action.caps ?? base.action.caps,
+      tracking: f.action.tracking,
+      scale: f.action.scale ?? base.action.scale,
+    },
+    eyebrow: {
+      family: f.eyebrow.family,
+      weight: f.eyebrow.weight,
+      tracking: f.eyebrow.tracking ?? base.eyebrow.tracking,
+    },
+    support: {
+      ...base.support,
+      family: f.support.family,
+      weight: f.support.weight,
+      italic: f.support.italic,
+    },
+    cta: {
+      ...base.cta,
+      family: f.cta.family,
+      weight: f.cta.weight,
+      tracking: f.cta.tracking ?? base.cta.tracking,
+    },
+    note: set.note,
+  };
+}
