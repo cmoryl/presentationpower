@@ -61,8 +61,16 @@ function curtain(clear: AlongsideClear, strength = 0.94): string {
 export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props) {
   const logos = getDivisionLogos("bm-tp-legal");
   const lockup = logos?.white ?? logos?.color;
-  const TY = applyAlongsideTypeSet(LEGAL_ALONGSIDE_TYPE[template], typeSet);
+  // Typographic integration: with the set left on "per photograph", each ad is
+  // typeset in the voice chosen for its own picture. A named treatment from the
+  // board overrides it for the whole set.
+  const ST = alongsideSceneType(scene.id);
+  const TY = applyAlongsideTypeSet(
+    LEGAL_ALONGSIDE_TYPE[template],
+    typeSet === "house" ? ST.voice : typeSet,
+  );
   const aspect = w / h;
+
   const square = Math.abs(aspect - 1) < 0.2 || h > w;
   const tall = h > w * 1.1;
   const wide = !square && !tall;
