@@ -654,8 +654,13 @@ export type BloomMotionFrame = {
     reveal: number;
     revealMode: BloomRevealMode;
   };
-  bloom: { scale: number; opacity: number };
-  splash: { scale: number; opacity: number };
+  /**
+   * The accent aura. `drift` is a slow wander in fractions of the short edge;
+   * it runs whole cycles across the clip so the last frame matches the first.
+   */
+  bloom: { scale: number; opacity: number; driftX: number; driftY: number };
+  splash: { scale: number; opacity: number; driftX: number; driftY: number };
+
   /** How the line arrives, and how far through that arrival this moment is. */
   words: { progress: number; rise: number; slide: number; mode: BloomTextMode };
   turn: { scale: number; opacity: number; rise: number };
