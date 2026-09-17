@@ -1108,6 +1108,9 @@ const G = {
   fjalla: '"Fjalla One", Geist, sans-serif',
   syncopate: '"Syncopate", Geist, sans-serif',
   darker: '"Darker Grotesque", Geist, sans-serif',
+  caveat: '"Caveat", "Segoe Script", cursive',
+  kalam: '"Kalam", "Segoe Script", cursive',
+  architect: '"Architects Daughter", "Segoe Script", cursive',
 } as const;
 
 export type AlongsideTypeSet = {
@@ -1333,6 +1336,30 @@ export const LEGAL_ALONGSIDE_TYPESETS: AlongsideTypeSet[] = [
       eyebrow: { family: F.plex, weight: 500, tracking: "0.24em" },
       support: { family: F.plex, weight: 400 },
       cta: { family: F.plex, weight: 500, tracking: "0.14em" },
+    },
+  },
+  {
+    id: "hand",
+    label: "Written by hand",
+    note: "Caveat at marker scale — an adult hand, not a novelty face — with the turn in a Kalam brush and Instrument Sans holding the small type steady.",
+    faces: {
+      display: { family: G.caveat, weight: 700, tracking: "-0.006em", scale: 1.24 },
+      action: { family: G.kalam, weight: 700, scale: 1.12 },
+      eyebrow: { family: G.instrumentSans, weight: 600, tracking: "0.28em" },
+      support: { family: G.instrumentSans, weight: 400 },
+      cta: { family: G.instrumentSans, weight: 600, tracking: "0.14em" },
+    },
+  },
+  {
+    id: "drafting",
+    label: "Drafting hand",
+    note: "Architects Daughter — a drawing-office hand, even and legible — with the turn written back in Caveat and Chivo under it.",
+    faces: {
+      display: { family: G.architect, weight: 400, tracking: "-0.012em", scale: 1.06 },
+      action: { family: G.caveat, weight: 700, scale: 1.22 },
+      eyebrow: { family: G.chivo, weight: 600, tracking: "0.3em" },
+      support: { family: G.chivo, weight: 400 },
+      cta: { family: G.chivo, weight: 600, tracking: "0.15em" },
     },
   },
 ];

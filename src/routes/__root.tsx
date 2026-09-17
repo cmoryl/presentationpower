@@ -165,7 +165,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // Campaign type sets, advanced pairings.
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Italiana&family=Cardo:ital,wght@0,400;0,700;1,400&family=Yeseva+One&family=Rozha+One&family=Petrona:ital,wght@0,400;0,600;1,400&family=Michroma&family=Alegreya:ital,wght@0,400;0,700;1,400;1,500&family=Alegreya+Sans:wght@400;500;700&family=Fjalla+One&family=Vollkorn:ital,wght@0,400;0,600;1,400&family=Syncopate:wght@400;700&family=Darker+Grotesque:wght@500;700;800&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Italiana&family=Cardo:ital,wght@0,400;0,700;1,400&family=Yeseva+One&family=Rozha+One&family=Petrona:ital,wght@0,400;0,600;1,400&family=Michroma&family=Alegreya:ital,wght@0,400;0,700;1,400;1,500&family=Alegreya+Sans:wght@400;500;700&family=Fjalla+One&family=Vollkorn:ital,wght@0,400;0,600;1,400&family=Syncopate:wght@400;700&family=Darker+Grotesque:wght@500;700;800&family=Caveat:wght@500;600;700&family=Kalam:wght@400;700&family=Architects+Daughter&display=swap",
       },
     ],
   }),
