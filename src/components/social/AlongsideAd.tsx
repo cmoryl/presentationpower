@@ -81,13 +81,53 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   const MARK = alongsideAccentMark(scene.id);
   const MARK_COLOR = ACCENT_MARK_COLORS[MARK.tint];
   /** A drawn mark as a background image, so any box can carry the hand. */
-  const drawn = (weight: number, color: string, seedOffset = 0): React.CSSProperties => ({
-    backgroundImage: accentMarkDataUri(MARK.kind, SEED + seedOffset, color, weight),
+  const drawn = (
+    weight: number,
+    color: string,
+    seedOffset = 0,
+    kind = MARK.kind,
+  ): React.CSSProperties => ({
+    backgroundImage: accentMarkDataUri(kind, SEED + seedOffset, color, weight),
     backgroundRepeat: "no-repeat",
     backgroundPosition: "left center",
     backgroundSize: "100% 100%",
-    background: undefined,
   });
+  /**
+   * A drawn edge along one side of a field, in place of a 1px accent border.
+   * Vertical edges are dragged in chalk: a stretched brush pass would read as a
+   * ruled line again, a broken drag still reads as a hand.
+   */
+  const drawnEdge = (
+    side: "top" | "bottom" | "left" | "right",
+    weight = 1.25,
+    seedOffset = 13,
+  ): React.ReactNode => {
+    const vertical = side === "left" || side === "right";
+    return (
+      <span
+        aria-hidden
+        style={
+          vertical
+            ? {
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                [side]: 0,
+                width: u(1.2),
+                ...drawn(weight * 2.4, MARK_COLOR, seedOffset, "chalk"),
+              }
+            : {
+                position: "absolute",
+                left: 0,
+                right: 0,
+                [side]: 0,
+                height: u(1.2),
+                ...drawn(weight, MARK_COLOR, seedOffset),
+              }
+        }
+      />
+    );
+  };
   const houseType = LEGAL_ALONGSIDE_TYPE[template];
   const voicedType = applyAlongsideTypeSet(houseType, typeSet === "house" ? ST.voice : typeSet);
   // The hard-cut family (wedge, blade, shard, chevron) is a geometric layout:
@@ -873,10 +913,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             </div>
           ))}
         </div>
-        <div
-          className="absolute inset-x-0 bottom-0"
-          style={{ top: bandTop, background: P.ground, borderTop: `${u(0.34)} solid ${P.accent}` }}
-        />
+        <div className="absolute inset-x-0 bottom-0" style={{ top: bandTop, background: P.ground }}>
+          {drawnEdge("top", 1.3)}
+        </div>
         <div className="absolute inset-x-0 top-0 flex" style={{ padding: u(M), bottom: bandTop }}>
           {masthead()}
         </div>
@@ -1339,10 +1378,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             left: spineLeft ? 0 : "auto",
             right: spineLeft ? "auto" : 0,
             background: P.ground,
-            borderRight: spineLeft ? `${u(0.28)} solid ${P.accent}` : undefined,
-            borderLeft: spineLeft ? undefined : `${u(0.28)} solid ${P.accent}`,
           }}
         >
+          {drawnEdge(spineLeft ? "right" : "left", 1.1, 21)}
           <div
             style={{
               writingMode: "vertical-rl",
@@ -1401,9 +1439,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             paddingInline: u(M),
             paddingBlock: u(M * 0.7),
             gap: u(1.4),
-            borderTop: `${u(0.3)} solid ${P.accent}`,
           }}
         >
+          {drawnEdge("top", 1.2, 17)}
           {masthead()}
           <div
             className="grid flex-1"
