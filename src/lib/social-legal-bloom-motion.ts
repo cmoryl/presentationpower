@@ -737,7 +737,13 @@ export function bloomMotionFrame(
     seg(p, Math.min(0.7, start + span + 0.06), Math.min(0.98, start + span + 0.32)),
   );
 
+  // The aura's own slow life: whole sine cycles across the clip, so the closing
+  // frame sits exactly where the opening one did and a loop never jumps.
+  const aura = Math.sin(raw * Math.PI * 2);
+  const auraB = Math.sin(raw * Math.PI * 4 + Math.PI / 3);
+
   return {
+
     photo,
     frame: {
       scale: 1 + (1 - frameIn) * 0.02,
