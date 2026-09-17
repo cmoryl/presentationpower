@@ -83,7 +83,10 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
   const overlap = (ovX * ovY) / Math.max(1, L.copy.w * w * L.copy.h * h);
   const overText = overlap > 0.06;
   // it fades in with the overlap so a slight clip does not get a hard plate
-  const scrimAlpha = Math.min(0.9, 0.42 + overlap * 0.55);
+  // the strength is adjustable per ad and per size; 0 turns it off entirely
+  const scrimEm = Math.max(0, Math.min(2, L.scrimEm ?? 1));
+  const bloomEm = Math.max(0, Math.min(3, L.bloomEm ?? 1));
+  const scrimAlpha = Math.min(0.95, (0.42 + overlap * 0.55) * scrimEm);
 
   return (
     <div
