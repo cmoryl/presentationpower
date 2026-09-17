@@ -81,7 +81,7 @@ export async function bakeMediaTileTreatments(shapes: DomShape[]): Promise<numbe
       if (!data.startsWith("data:image/")) continue;
       shape.src = data;
       // The grade is now IN the pixels; leaving the filter on would double it.
-      shape.cssFilter = null;
+      delete shape.cssFilter;
       baked += 1;
     } catch {
       /* keep the untreated picture rather than losing the photograph */
