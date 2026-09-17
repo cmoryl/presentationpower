@@ -65,12 +65,17 @@ export function BloomAd({ scene, w, h, aperture, side }: Props) {
 
   const headline = bloomHeadline(scene);
   const optical = bloomOptical(headline.length);
-  const baseHead = mode === "strip" ? short * 0.155 : mode === "stacked" ? short * 0.105 : short * 0.098;
-  const headPx = baseHead * optical;
-  const supportPx = Math.max(9, headPx * 0.2);
   const margin = short * (mode === "strip" ? 0.09 : 0.075);
-
-  const pictureFlex = mode === "stacked" ? undefined : mode === "strip" ? 0.46 : 0.52;
+  const pictureFlex = mode === "stacked" ? undefined : mode === "strip" ? 0.44 : 0.48;
+  // The headline is set to the column it actually has, so a square trim reads
+  // three or four words a line instead of stacking one word at a time.
+  const colW =
+    mode === "stacked"
+      ? w - margin * 2
+      : (w - margin * 2) * (1 - (pictureFlex ?? 0.48)) - short * 0.03;
+  const baseHead = mode === "strip" ? short * 0.155 : mode === "stacked" ? short * 0.105 : short * 0.098;
+  const headPx = Math.min(baseHead * optical, colW * (mode === "stacked" ? 0.115 : 0.155));
+  const supportPx = Math.max(9, headPx * 0.21);
 
   const picture = (
     <div
