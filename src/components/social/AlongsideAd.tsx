@@ -244,7 +244,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           maxWidth: `${measure}em`,
         }}
       >
-        {noWidow(parts.before)}
+        {parts.after ? parts.before : noWidow(parts.before)}
         {parts.action ? (
           <span
             style={{
