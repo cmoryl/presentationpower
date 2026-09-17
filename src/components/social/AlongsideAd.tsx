@@ -208,11 +208,15 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     // No widows: the last two words are bound together so a single word can
     // never be left stranded on its own line.
     const noWidow = (s: string) => {
+      // Trailing word space is kept: this fragment can be followed by the turn
+      // phrase in another face, and losing the space runs the words together.
+      const trail = /\s$/.test(s) ? "\u00A0" : "";
       const words = s.trimEnd().split(" ");
       if (words.length < 3) return s;
       const tail = words.slice(-2).join("\u00A0");
-      return `${words.slice(0, -2).join(" ")} ${tail}`;
+      return `${words.slice(0, -2).join(" ")} ${tail}${trail}`;
     };
+
     // A face switch only reads as emphasis on a SHORT phrase. When the turn is
     // most of the headline, swapping faces mid-line just looks like two
     // headlines colliding — so the phrase stays in the display face and is
