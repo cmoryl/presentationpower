@@ -1331,6 +1331,28 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
     );
   }
 
+  // ---- one signature corner for the whole set -----------------------------
+  // Top-right by default; bottom-left when the copy column is held on the
+  // right, so the lockup always lands on clear ground.
+  const lockupBottomLeft = clear === "right";
+  const cornerLockup = lockup ? (
+    <img
+      src={lockup}
+      alt="TransPerfect Legal"
+      style={{
+        position: "absolute",
+        ...(lockupBottomLeft
+          ? { bottom: u(M * 0.82), left: u(M) }
+          : { top: u(M * 0.82), right: u(M) }),
+        height: u(T.logo * 0.9),
+        width: "auto",
+        maxWidth: u(24),
+        objectFit: "contain",
+        pointerEvents: "none",
+      }}
+    />
+  ) : null;
+
   return (
     <div
       className="relative overflow-hidden"
@@ -1342,6 +1364,8 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       }}
     >
       {body}
+      {cornerLockup}
     </div>
   );
+
 }
