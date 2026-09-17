@@ -293,28 +293,45 @@ function AlongsideView() {
                     on “{scene.action}”.
                   </p>
 
-                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                    <span className="inline-flex items-center gap-1 pr-1 text-[10px] font-semibold uppercase tracking-widest text-black/40">
-                      <Images size={12} /> Layout
+                  <div className="flex flex-wrap items-center gap-2 border-t border-black/10 pt-3">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-black/40">
+                      <Images size={12} /> Layout for this frame
                     </span>
-                    {LEGAL_ALONGSIDE_TEMPLATES.map((t) => (
+                    <select
+                      value={active}
+                      onChange={(e) =>
+                        setPerScene((prev) => ({
+                          ...prev,
+                          [scene.id]: e.target.value as AlongsideTemplateId,
+                        }))
+                      }
+                      className="rounded-lg border border-black/15 bg-white px-2.5 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7]/50"
+                    >
+                      {LEGAL_ALONGSIDE_TEMPLATE_FAMILIES.map((fam) => (
+                        <optgroup key={fam.label} label={fam.label}>
+                          {fam.ids.map((id) => (
+                            <option key={id} value={id}>
+                              {alongsideTemplateLabel(id)}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                    {perScene[scene.id] && perScene[scene.id] !== template ? (
                       <button
-                        key={t.id}
                         type="button"
-                        title={t.note}
-                        aria-pressed={t.id === active}
                         onClick={() =>
-                          setPerScene((prev) => ({ ...prev, [scene.id]: t.id }))
+                          setPerScene((prev) => {
+                            const next = { ...prev };
+                            delete next[scene.id];
+                            return next;
+                          })
                         }
-                        className={`rounded-full border px-2.5 py-1 text-[11px] transition ${
-                          t.id === active
-                            ? "border-[#003FC7] bg-[#003FC7] text-white"
-                            : "border-black/15 bg-white text-[#03002C] hover:border-[#003FC7]/50"
-                        }`}
+                        className="text-xs font-medium text-[#003FC7] underline-offset-2 hover:underline"
                       >
-                        {t.label}
+                        Match the set
                       </button>
-                    ))}
+                    ) : null}
                   </div>
                 </div>
               </article>
