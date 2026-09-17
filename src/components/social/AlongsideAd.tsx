@@ -217,7 +217,11 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
     );
   };
 
-  const support = () => (
+  // A wide banner has no room for a second line of copy — the headline and the
+  // division line carry it, and the picture keeps the rest of the strip.
+  const support = () =>
+    banner ? null : (
+
     <div
       style={{
         fontFamily: TY.support.family,
@@ -342,7 +346,9 @@ export function AlongsideAd({ scene, template, w, h }: Props) {
   const colourMark = logos?.color ?? lockup;
 
   /** Body copy in an arbitrary ink, for the light-field templates. */
-  const supportIn = (ink: string) => (
+  const supportIn = (ink: string) =>
+    banner ? null : (
+
     <div
       style={{
         fontFamily: TY.support.family,
