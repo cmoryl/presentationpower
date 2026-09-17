@@ -71,3 +71,25 @@ describe("keepBackgroundPaintOnPlate", () => {
     expect(kept).toEqual([photo]);
   });
 });
+
+describe("in-layout rules stay editable", () => {
+  it("keeps a near-full-width agenda row rule native", () => {
+    // Agenda rows run almost wall to wall but sit inside the layout, so they are
+    // module furniture — parking them on the plate left the agenda modules with
+    // only their copy selectable in PowerPoint.
+    const rowRule = box({
+      x: 96,
+      y: 520,
+      w: 1728,
+      h: 2,
+      fill: { hex: "003FC7", alpha: 0.35 },
+      name: "TP Row rule",
+    });
+    expect(keepBackgroundPaintOnPlate([rowRule], SPACE)).toEqual([rowRule]);
+  });
+
+  it("still parks an opaque edge band", () => {
+    const band = box({ x: 0, y: 1074, w: 1920, h: 6, name: "TP Edge band" });
+    expect(keepBackgroundPaintOnPlate([band], SPACE)).toEqual([]);
+  });
+});
