@@ -228,14 +228,32 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
         </div>
       </div>
 
-      {/* the division lockup — black single line, always bottom left */}
+      {/* a soft accent splash in the lower corner away from the picture, so the
+          bottom of the ad carries some of the bloom's colour behind the lockup */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          bottom: `-${short * 0.24}px`,
+          [splashSide]: `-${short * 0.2}px`,
+          width: `${short * 0.72}px`,
+          height: `${short * 0.62}px`,
+          background: `radial-gradient(ellipse at ${splashSide === "left" ? "34%" : "66%"} 66%, ${C.glow}D9 0%, ${C.glow}8C 34%, ${C.glow}40 56%, ${C.glow}00 76%)`,
+          filter: `blur(${short * 0.05 * Math.max(0.35, bloomEm)}px)`,
+          opacity: bloomEm === 0 ? 0 : 0.9,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* the division lockup — black single line, always bottom right */}
       <img
         src={tpLegalBlack}
         alt=""
         aria-hidden
         style={{
           position: "absolute",
-          left: `${L.lockup.x * w}px`,
+          right: `${L.lockup.x * w}px`,
           bottom: `${L.lockup.y * h}px`,
           height: `${L.lockup.h * short}px`,
           width: "auto",
