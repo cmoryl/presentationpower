@@ -51,22 +51,17 @@ export const LEGAL_BLOOM_COLOURS: Record<string, BloomColour> = {
  * The picture frame, measured off page 6 of the Canva master. Every frame there
  * rounds TWO DIAGONALLY OPPOSITE corners and leaves the other two perfectly
  * square. Three radii are in use:
- *   · leaf   — rx = half the width AND ry = half the height (a true leaf)
  *   · turn   — a circular half-round on the short edge (r = short / 2)
  *   · soft   — a quarter round (r = short / 4), the gentlest of the set
  * The diagonal runs either top-right→bottom-left or top-left→bottom-right.
  */
 export type BloomAperture =
-  | "leaf-right"
-  | "leaf-left"
   | "turn-right"
   | "turn-left"
   | "soft-right"
   | "soft-left";
 
 export const LEGAL_BLOOM_APERTURES: { id: BloomAperture; label: string }[] = [
-  { id: "leaf-right", label: "Leaf · top-right / bottom-left" },
-  { id: "leaf-left", label: "Leaf · top-left / bottom-right" },
   { id: "turn-right", label: "Turned ends · top-right / bottom-left" },
   { id: "turn-left", label: "Turned ends · top-left / bottom-right" },
   { id: "soft-right", label: "Soft corners · top-right / bottom-left" },
@@ -86,10 +81,7 @@ export function bloomShapeRadius(aperture: BloomAperture, w: number, h: number):
   const short = Math.min(w, h);
   let rx: number;
   let ry: number;
-  if (aperture.startsWith("leaf")) {
-    rx = w / 2;
-    ry = h / 2;
-  } else if (aperture.startsWith("turn")) {
+  if (aperture.startsWith("turn")) {
     rx = short / 2;
     ry = short / 2;
   } else {
@@ -195,7 +187,7 @@ export const LEGAL_BLOOM_SCENES: BloomScene[] = [
     tail: "",
     support: "Cross-border disclosure, translated and tracked as it moves.",
     colour: "aqua",
-    aperture: "leaf-right",
+    aperture: "turn-right",
     side: "left",
     focus: "42% 55%",
   },
@@ -209,7 +201,7 @@ export const LEGAL_BLOOM_SCENES: BloomScene[] = [
     tail: "jobs.",
     support: "Late document sets, mixed formats, one certified output.",
     colour: "green",
-    aperture: "leaf-left",
+    aperture: "turn-left",
     side: "right",
     focus: "34% 52%",
   },
@@ -265,7 +257,7 @@ export const LEGAL_BLOOM_SCENES: BloomScene[] = [
     tail: "ones.",
     support: "Long-running disputes, one team on the record the whole way down.",
     colour: "aqua",
-    aperture: "leaf-right",
+    aperture: "turn-right",
     side: "right",
     focus: "50% 46%",
   },
