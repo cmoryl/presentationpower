@@ -20,7 +20,6 @@ import { getDivisionLogos } from "@/lib/division-logos";
 import {
   ACCENT_MARK_COLORS,
   accentMarkDataUri,
-  accentMarkStrokes,
   alongsideAccentMark,
   markSeed,
 } from "@/lib/social-legal-accent-marks";
@@ -1489,7 +1488,6 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             right: right ? "auto" : u(M),
             width: tall ? "80%" : square ? "74%" : "58%",
             background: P.ground,
-            borderTop: `${u(0.34)} solid ${P.accent}`,
             paddingInline: u(square ? 3.2 : 2.6),
             paddingBlock: u(square ? 2.6 : 2),
             display: "grid",
@@ -1497,6 +1495,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             boxShadow: `0 ${u(1.2)} ${u(4)} ${P.ground}8C`,
           }}
         >
+          {drawnEdge("top", 1.3, 29)}
           {masthead()}
           {headline(square ? 4 : 3.1, { measure: 16 })}
           {footer()}
