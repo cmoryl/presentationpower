@@ -260,7 +260,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
       // reader down without breaking the line's texture.
       if (treat === "tracked") return { letterSpacing: "0.08em", fontWeight: d.weight };
       // Quiet: held back in weight and alpha so the words around it carry.
-      if (treat === "light" || treat === "quiet")
+      if (treat === "quiet")
         return { fontWeight: Math.max(200, d.weight - 200), opacity: 0.72 };
       // Accent: the only place brand blue touches display copy — one word, never
       // body text, so contrast rules still hold.
@@ -345,7 +345,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         maxWidth: "26em",
       }}
     >
-      {LEGAL_ALONGSIDE_CONCEPT.support}
+      {supportRun()}
     </div>
   );
 
