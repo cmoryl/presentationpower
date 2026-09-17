@@ -708,7 +708,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           style={
             wide
               ? { top: u(M), bottom: u(M), left: u(M), right: "34%" }
-              : { top: u(M), left: u(M), right: u(M), height: square ? "48%" : "44%" }
+              : { top: u(M), left: u(M), right: u(M), height: square ? "42%" : "40%" }
           }
         >
           {photo(undefined, "panel")}
