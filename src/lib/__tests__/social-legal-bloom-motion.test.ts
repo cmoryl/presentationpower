@@ -244,3 +244,27 @@ describe("accent word motion", () => {
     }
   });
 });
+
+describe("intro and outro smoothing", () => {
+  it("eases up out of the ground and settles at the end", () => {
+    const preset = bloomPreset("push-slow");
+    const first = bloomMotionFrame(preset, 0, 8);
+    const mid = bloomMotionFrame(preset, 4, 8);
+    const last = bloomMotionFrame(preset, 8, 8);
+    expect(first.shot.opacity).toBeLessThan(0.2);
+    expect(first.shot.scale).toBeGreaterThan(1);
+    expect(mid.shot.opacity).toBeCloseTo(1, 3);
+    expect(mid.shot.scale).toBeCloseTo(1, 3);
+    expect(last.shot.opacity).toBeCloseTo(1, 3);
+    expect(last.shot.scale).toBeLessThan(1);
+  });
+
+  it("leaves loop-safe presets flat so a loop never jumps", () => {
+    const loop = bloomPreset("loop-breathe");
+    for (const t of [0, 2, 6, 8]) {
+      const f = bloomMotionFrame(loop, t, 8);
+      expect(f.shot.opacity).toBe(1);
+      expect(f.shot.scale).toBe(1);
+    }
+  });
+});
