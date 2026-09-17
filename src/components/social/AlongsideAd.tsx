@@ -254,6 +254,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         return { textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.88em" };
       return { borderBottom: `${u(0.16)} solid ${P.accent}`, paddingBottom: u(0.16) };
     };
+    // Word spaces either side of a call-out are bound, so the emphasis never
+    // swallows the space between it and the next word.
+    const ws = (s: string) => s.replace(/^ /, "\u00A0").replace(/ $/, "\u00A0");
     const deco = (s: string, depth = 0): React.ReactNode => {
       if (depth > 3) return s;
       const hay = s.replace(/\u00A0/g, " ");
@@ -262,14 +265,15 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         if (i < 0) continue;
         return (
           <>
-            {s.slice(0, i)}
+            {ws(s.slice(0, i))}
             <span style={calloutStyle(c.treat)}>{s.slice(i, i + c.text.length)}</span>
-            {deco(s.slice(i + c.text.length), depth + 1)}
+            {deco(ws(s.slice(i + c.text.length)), depth + 1)}
           </>
         );
       }
       return s;
     };
+
     return (
       <div
         style={{
