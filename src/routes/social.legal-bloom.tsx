@@ -62,6 +62,8 @@ import {
   bloomPreset,
   bloomPresetsByFamily,
   BLOOM_ACCENT_MOTIONS,
+  BLOOM_BACKDROPS,
+  bloomBackdrop,
   bloomAccentMotion,
 } from "@/lib/social-legal-bloom-motion";
 import { recordBloomSceneClip } from "@/lib/social-legal-bloom-record";
@@ -116,6 +118,7 @@ function BloomView() {
   const [viewMoving, setViewMoving] = useState(false);
   const [viewPreset, setViewPreset] = useState("push-slow");
   const [viewAccent, setViewAccent] = useState("preset");
+  const [viewBackdrop, setViewBackdrop] = useState("swirl-slow");
   const [viewSeconds, setViewSeconds] = useState(8);
   const [viewPlaying, setViewPlaying] = useState(true);
   const [dlFormat, setDlFormat] = useState<"png" | "jpeg">("png");
@@ -133,6 +136,7 @@ function BloomView() {
   const [packMotionPreset, setPackMotionPreset] = useState<string>("push-slow");
   const [packMotionSeconds, setPackMotionSeconds] = useState<number>(8);
   const [packAccentMotion, setPackAccentMotion] = useState<string>("preset");
+  const [packBackdrop, setPackBackdrop] = useState<string>("swirl-slow");
   const [videoFormat, setVideoFormat] = useState<BloomVideoFormat | null>(null);
   const recordRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -348,6 +352,7 @@ function BloomView() {
               placement: p,
               preset,
               accentMotionId: packAccentMotion,
+              backdropId: packBackdrop,
               wantSeconds: packMotionSeconds,
               fps: 30,
               format: videoFormat,
@@ -369,7 +374,7 @@ function BloomView() {
         root.file("04_Motion/placements.csv", bloomMotionSpecCsv(motionPlacements, packMotionSeconds, 30));
         motion = {
           paths,
-          presetLabel: `${preset.label} · accent word: ${bloomAccentMotion(packAccentMotion).label}`,
+          presetLabel: `${preset.label} · accent word: ${bloomAccentMotion(packAccentMotion).label} · background: ${bloomBackdrop(packBackdrop).label}`,
           seconds: packMotionSeconds,
           fps: 30,
           ext: videoFormat.ext,
@@ -593,6 +598,19 @@ function BloomView() {
                       ))}
                     </select>
                   </Field>
+                  <Field label="Background">
+                    <select
+                      value={packBackdrop}
+                      onChange={(e) => setPackBackdrop(e.target.value)}
+                      className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm"
+                    >
+                      {BLOOM_BACKDROPS.map((b) => (
+                        <option key={b.id} value={b.id}>
+                          {b.label}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
                   <Field label={`Clip length · ${packMotionSeconds}s`}>
                     <input
                       type="range"
@@ -791,6 +809,18 @@ function BloomView() {
                       </option>
                     ))}
                   </select>
+                  <select
+                    value={viewBackdrop}
+                    onChange={(e) => setViewBackdrop(e.target.value)}
+                    className="rounded-lg border border-white/25 bg-white/10 px-2 py-1.5 text-xs text-white"
+                    aria-label="Background motion"
+                  >
+                    {BLOOM_BACKDROPS.map((b) => (
+                      <option className="text-black" key={b.id} value={b.id}>
+                        {b.label}
+                      </option>
+                    ))}
+                  </select>
                   <label className="flex items-center gap-2 text-[11px] text-white/70">
                     {viewSeconds}s
                     <input
@@ -981,6 +1011,7 @@ function BloomView() {
                           layout={zoomLayout}
                           preset={bloomPreset(viewPreset)}
                           accentMotionId={viewAccent}
+                          backdropId={viewBackdrop}
                           seconds={viewSeconds}
                           playing={viewPlaying}
                         />

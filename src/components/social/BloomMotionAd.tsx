@@ -25,7 +25,10 @@ type Props = {
   preset: BloomMotionPreset;
   /** How the italic accent word arrives; falls back to the preset's own settle. */
   accentMotionId?: string;
+  /** The ground's own quiet figure behind the glow; defaults to a still ground. */
+  backdropId?: string;
   seconds: number;
+
   /** Runs on a loop while true; holds the last frame while false. */
   playing?: boolean;
   /** Hands the canvas back so the board can record straight off it. */
@@ -42,6 +45,7 @@ export function BloomMotionAd({
   layout,
   preset,
   accentMotionId,
+  backdropId,
   seconds,
   playing = true,
   onCanvas,
@@ -76,7 +80,7 @@ export function BloomMotionAd({
           aperture,
           side,
           layout,
-          motion: bloomMotionFrame(preset, t, seconds, accentMotionId),
+          motion: bloomMotionFrame(preset, t, seconds, accentMotionId, backdropId),
           assets,
         });
       };
@@ -101,7 +105,7 @@ export function BloomMotionAd({
     };
     // onCanvas is a reporting callback; the animation restarts on real changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scene, w, h, aperture, side, layout, preset, seconds]);
+  }, [scene, w, h, aperture, side, layout, preset, seconds, accentMotionId, backdropId]);
 
   return (
     <canvas

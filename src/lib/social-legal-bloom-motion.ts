@@ -774,6 +774,127 @@ export function bloomAccentMotion(id: string | undefined): BloomAccentMotion {
   return BLOOM_ACCENT_MOTIONS.find((a) => a.id === id) ?? BLOOM_ACCENT_MOTIONS[0]!;
 }
 
+// ---------------------------------------------------------------------------
+// The ground's own life: very subtle background motion behind the aura
+//
+// These never compete with the picture or the copy. Semi-transparent panes cut
+// to the SAME turned-corner shape as the picture frames drift, swirl and ripple
+// under the accent glow, and the accent word takes a hair of the same breath so
+// the whole ad reads as one living surface rather than a moving photograph on a
+// dead page. Every figure runs whole cycles across the clip, so a looping
+// placement still closes exactly where it opened.
+
+export type BloomBackdropKind =
+  | "still"
+  | "swirl"
+  | "ripple"
+  | "drift"
+  | "breathe"
+  | "tide"
+  | "echo";
+
+export type BloomBackdrop = {
+  id: string;
+  label: string;
+  says: string;
+  kind: BloomBackdropKind;
+  /** 0–1: how much of the effect is spent. Everything here stays whisper quiet. */
+  strength: number;
+  /** How many frame-shaped panes the figure uses. */
+  panes: number;
+  /** Whole cycles across the clip — keeps loops seamless. */
+  cycles: number;
+};
+
+export const BLOOM_BACKDROPS: BloomBackdrop[] = [
+  {
+    id: "still",
+    label: "Still ground",
+    says: "Nothing behind the glow — the page stays perfectly quiet.",
+    kind: "still",
+    strength: 0,
+    panes: 0,
+    cycles: 1,
+  },
+  {
+    id: "swirl-slow",
+    label: "Slow swirl",
+    says: "The colour turns slowly under the glow, like light moving through water.",
+    kind: "swirl",
+    strength: 0.62,
+    panes: 2,
+    cycles: 1,
+  },
+  {
+    id: "swirl-wide",
+    label: "Wide swirl",
+    says: "A broader, slightly stronger turn that carries across the whole ad.",
+    kind: "swirl",
+    strength: 0.9,
+    panes: 3,
+    cycles: 1,
+  },
+  {
+    id: "ripple-soft",
+    label: "Soft ripple",
+    says: "Frame-shaped rings open out of the glow and fade away.",
+    kind: "ripple",
+    strength: 0.6,
+    panes: 2,
+    cycles: 2,
+  },
+  {
+    id: "ripple-fine",
+    label: "Fine ripple",
+    says: "Quicker, finer rings — good on short clips.",
+    kind: "ripple",
+    strength: 0.45,
+    panes: 3,
+    cycles: 3,
+  },
+  {
+    id: "pane-drift",
+    label: "Drifting panes",
+    says: "Faint panes cut to the picture's own turned corners drift behind the glow.",
+    kind: "drift",
+    strength: 0.7,
+    panes: 3,
+    cycles: 1,
+  },
+  {
+    id: "pane-breathe",
+    label: "Breathing panes",
+    says: "The same panes grow and settle in place instead of travelling.",
+    kind: "breathe",
+    strength: 0.66,
+    panes: 2,
+    cycles: 2,
+  },
+  {
+    id: "tide",
+    label: "Colour tide",
+    says: "A wide band of colour passes diagonally under everything.",
+    kind: "tide",
+    strength: 0.55,
+    panes: 1,
+    cycles: 1,
+  },
+  {
+    id: "echo",
+    label: "Frame echo",
+    says: "Outlines of the frame pulse gently outwards behind the picture.",
+    kind: "echo",
+    strength: 0.5,
+    panes: 3,
+    cycles: 2,
+  },
+];
+
+export function bloomBackdrop(id: string | undefined): BloomBackdrop {
+  return BLOOM_BACKDROPS.find((b) => b.id === id) ?? BLOOM_BACKDROPS[0]!;
+}
+
+
 /** The presets grouped by family, in the order above. */
 export function bloomPresetsByFamily(): { family: BloomMotionFamily; presets: BloomMotionPreset[] }[] {
   const out: { family: BloomMotionFamily; presets: BloomMotionPreset[] }[] = [];
@@ -823,6 +944,21 @@ export type BloomMotionFrame = {
   /** -1 when no sweep, otherwise 0–1 across the picture. */
   sweep: number;
   /**
+   * The ground's own quiet life behind the aura. `phase` is 0–1 through the
+   * figure's whole cycle, `turn` and `wave` are matched sine oscillators, and
+   * `pulse` is the shared breath the accent word borrows a hair of.
+   */
+  backdrop: {
+    kind: BloomBackdropKind;
+    strength: number;
+    panes: number;
+    phase: number;
+    turn: number;
+    wave: number;
+    pulse: number;
+  };
+
+  /**
    * The whole shot's intro and outro smoothing: the ad eases up out of the
    * ground at the top of the clip and settles to a rest at the end, so no clip
    * starts or stops abruptly. Loop-safe presets keep this flat at 1 so their
@@ -850,6 +986,8 @@ export function bloomMotionFrame(
   t: number,
   seconds: number,
   accentMotionId?: string,
+  backdropId?: string,
+
 ): BloomMotionFrame {
   const dur = Math.max(0.5, seconds);
   const time = Math.max(0, Math.min(dur, t));
@@ -918,6 +1056,27 @@ export function bloomMotionFrame(
   const aura = Math.sin(raw * Math.PI * 2);
   const auraB = Math.sin(raw * Math.PI * 4 + Math.PI / 3);
 
+  // The ground's own figure. Its phase runs whole cycles too, and the aura is
+  // nudged along with it so the glow and the background move as one thing.
+  const back = bloomBackdrop(backdropId);
+  const cycles = Math.max(1, Math.round(back.cycles));
+  const backPhase = back.kind === "still" ? 0 : (raw * cycles) % 1;
+  const backTurn = back.kind === "still" ? 0 : Math.sin(raw * cycles * Math.PI * 2);
+  const backWave =
+    back.kind === "still" ? 0 : Math.sin(raw * cycles * Math.PI * 4 + Math.PI / 4);
+  const backdropState = {
+    kind: back.kind,
+    strength: back.strength,
+    panes: back.panes,
+    phase: backPhase,
+    turn: backTurn,
+    wave: backWave,
+    pulse: back.kind === "still" ? 0 : backTurn * back.strength,
+  };
+  // the aura takes the ground's swirl with it, very slightly
+  const withGround = back.strength * 0.5;
+
+
   // The accent word's own arrival, when one has been chosen. It always finishes
   // before the clip does, and a held word is simply there from the first frame.
   const accentSet = bloomAccentMotion(accentMotionId);
@@ -948,18 +1107,19 @@ export function bloomMotionFrame(
       revealMode: preset.reveal.mode,
     },
     bloom: {
-      scale: (0.94 + inA * 0.06) * (1 + aura * 0.035),
+      scale: (0.94 + inA * 0.06) * (1 + aura * 0.035 + backTurn * 0.02 * withGround),
       opacity: clamp01(inA * (1 - auraB * 0.05)),
-      driftX: aura * 0.02,
-      driftY: auraB * 0.016,
+      driftX: aura * 0.02 + backTurn * 0.016 * withGround,
+      driftY: auraB * 0.016 + backWave * 0.012 * withGround,
     },
     splash: {
       scale: (0.9 + easeOut(seg(p, 0.1, 0.7)) * 0.1) * (1 - aura * 0.03),
       opacity: clamp01(easeOut(seg(p, 0.05, 0.6)) * (1 + auraB * 0.04)),
 
-      driftX: -auraB * 0.018,
-      driftY: aura * 0.012,
+      driftX: -auraB * 0.018 - backWave * 0.014 * withGround,
+      driftY: aura * 0.012 + backTurn * 0.01 * withGround,
     },
+
 
     words: {
       progress: words,
@@ -976,7 +1136,9 @@ export function bloomMotionFrame(
     support: { opacity: supportIn, rise: (1 - supportIn) * preset.text.rise * 0.7 },
     logo: { opacity: logoIn, rise: (1 - logoIn) * preset.text.rise * 0.4 },
     sweep: preset.sweep ? seg(p, 0.45, 0.86) : -1,
+    backdrop: backdropState,
     shot,
+
   };
 }
 
