@@ -147,7 +147,9 @@ function BloomMark({
         top: "50%",
         transform: `translate(-50%, -50%) translate(${lean.x * pad * 0.5}px, ${lean.y * pad * 0.45}px)`,
         opacity: 0.2,
-        overflow: "visible",
+        // bounded to its own box, so a hatch or rule never runs out over the
+        // copy or off the trim
+        overflow: "hidden",
         pointerEvents: "none",
       }}
     >
