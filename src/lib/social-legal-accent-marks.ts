@@ -51,7 +51,9 @@ const KINDS: AccentMarkKind[] = [
 
 const WORD_KINDS: AccentMarkKind[] = ["brush", "return", "swell", "wave", "chalk"];
 
-const TINTS: AccentMarkTint[] = ["accent", "accent", "aqua", "lavender", "chalk"];
+// On the campaign's near-black ground a hairline of Blue 500 disappears, so the
+// drawn marks lean on the light secondaries and keep blue for the heavier hands.
+const TINTS: AccentMarkTint[] = ["aqua", "lavender", "chalk", "accent", "aqua", "lavender"];
 
 /** Small stable string hash, so a scene always draws the same hand. */
 export function markSeed(id: string): number {
@@ -200,9 +202,9 @@ export function accentMarkStrokes(
     default: {
       // A dragged line that breaks twice, the way chalk skips on board.
       const segs: [number, number][] = [
-        [0, 34 + j(6)],
-        [42 + j(5), 71 + j(5)],
-        [78 + j(4), 100],
+        [0, 52 + j(8)],
+        [57 + j(4), 88 + j(6)],
+        [92 + j(3), 100],
       ];
       return segs.map(([a, b], i) => ({
         d: `M${n(a)} ${n(y + j(1.4))} C ${n(a + (b - a) * 0.35)} ${n(y - 1.4 + j(1))}, ${n(a + (b - a) * 0.7)} ${n(y + 1.3 + j(1))}, ${n(b)} ${n(y + j(1.4))}`,

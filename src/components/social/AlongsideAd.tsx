@@ -614,10 +614,10 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
         display: "block",
         width: ST.axis === "vertical" ? `${Math.max(11, len * 0.55)}%` : `${len}%`,
         minWidth: u(ST.axis === "vertical" ? 7 : 11),
-        height: u(ST.axis === "vertical" ? 1.5 : 1.2),
+        height: u(ST.axis === "vertical" ? 2 : 1.5),
         transform: ruleTilt ? `rotate(${ruleTilt}deg)` : undefined,
         transformOrigin: "left center",
-        ...drawn(ST.axis === "vertical" ? 1.5 : 1.15, from ?? MARK_COLOR),
+        ...drawn(ST.axis === "vertical" ? 1.8 : 1.4, from ?? MARK_COLOR),
       }}
     />
   );
