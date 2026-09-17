@@ -262,7 +262,7 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
             {parts.action}
           </span>
         ) : null}
-        {parts.after}
+        {parts.after ? noWidow(parts.after) : null}
       </div>
     );
   };
