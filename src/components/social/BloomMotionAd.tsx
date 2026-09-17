@@ -25,7 +25,10 @@ type Props = {
   preset: BloomMotionPreset;
   /** How the italic accent word arrives; falls back to the preset's own settle. */
   accentMotionId?: string;
+  /** The ground's own quiet figure behind the glow; defaults to a still ground. */
+  backdropId?: string;
   seconds: number;
+
   /** Runs on a loop while true; holds the last frame while false. */
   playing?: boolean;
   /** Hands the canvas back so the board can record straight off it. */
