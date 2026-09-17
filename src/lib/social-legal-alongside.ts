@@ -497,13 +497,25 @@ export const LEGAL_ALONGSIDE_SCENES: AlongsideScene[] = [
  *   axis   the strongest line in the frame — rules and hairlines echo it
  *   weight scale bias: a quiet, open frame carries larger type than a busy one
  */
+export type AlongsideCalloutTreat = "italic" | "bold" | "caps" | "accent" | "light";
+
+/** One word or phrase inside the headline given its own treatment. */
+export type AlongsideCallout = { text: string; treat: AlongsideCalloutTreat };
+
 export type AlongsideSceneType = {
   voice: string;
   axis: "rising" | "falling" | "flat" | "vertical";
   weight: number;
   /** Why this pairing belongs to this photograph — shown under the card. */
   why: string;
+  /**
+   * Word-level call-outs inside the headline, set apart from the turn phrase:
+   * the one word the sentence pivots on takes an italic, a heavier weight,
+   * tracked caps, a lighter weight or an accent hairline.
+   */
+  callouts?: AlongsideCallout[];
 };
+
 
 export const LEGAL_ALONGSIDE_SCENE_TYPE: Record<string, AlongsideSceneType> = {
   "climber-belayer": {
