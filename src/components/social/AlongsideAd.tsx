@@ -313,23 +313,9 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
   /** No call to action in the cut family either — a wider gradient alpha rule. */
   const ctaBlock = (opts?: { light?: boolean }) => alphaRule(46, opts?.light ? P.ink : P.accent);
 
-  /** Division line + number set tight, for use inside a cut field. */
+  /** Frame number on a short accent rule, for use inside a cut field. */
   const cutMasthead = () => (
     <div className="flex items-center" style={{ gap: u(1.4) }}>
-      <span
-        style={{
-          fontFamily: TY.eyebrow.family,
-          fontWeight: TY.eyebrow.weight,
-          fontSize: u(T.eyebrow),
-          letterSpacing: TY.eyebrow.tracking,
-          textTransform: "uppercase",
-          color: P.ink,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {LEGAL_ALONGSIDE_CONCEPT.division}
-      </span>
-      <span aria-hidden style={{ width: u(3.4), height: u(0.3), background: P.accent }} />
       <span
         style={{
           fontFamily: TY.eyebrow.family,
@@ -338,11 +324,12 @@ export function AlongsideAd({ scene, template, w, h, typeSet = "house" }: Props)
           fontVariantNumeric: "tabular-nums",
           letterSpacing: "0.14em",
           color: P.ink,
-          opacity: 0.62,
+          opacity: 0.72,
         }}
       >
         {scene.no}
       </span>
+      <span aria-hidden style={{ width: u(3.4), height: u(0.3), background: P.accent }} />
     </div>
   );
 
