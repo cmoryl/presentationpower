@@ -115,6 +115,22 @@ function BloomView() {
   // pack export: which ads, which placements, and how far it has got
   const [packAd, setPackAd] = useState<string>("all");
   const [packSize, setPackSize] = useState<string>("all");
+  // the moving half of the bundle: which social placements, which motion, how long
+  const [packMotion, setPackMotion] = useState<"off" | "key" | "all">("key");
+  const [packMotionPreset, setPackMotionPreset] = useState<string>("push-slow");
+  const [packMotionSeconds, setPackMotionSeconds] = useState<number>(8);
+  const [videoFormat, setVideoFormat] = useState<BloomVideoFormat | null>(null);
+  const recordRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    setVideoFormat(bloomVideoFormat());
+  }, []);
+  const KEY_MOTION_PLACEMENTS = ["li-feed-square", "li-feed-landscape", "ig-reel"];
+  const motionPlacements =
+    packMotion === "off"
+      ? []
+      : packMotion === "key"
+        ? BLOOM_PLACEMENTS.filter((p) => KEY_MOTION_PLACEMENTS.includes(p.id))
+        : BLOOM_PLACEMENTS;
   const [packBusy, setPackBusy] = useState(false);
   const [packProgress, setPackProgress] = useState<{ done: number; total: number } | null>(null);
   const [packError, setPackError] = useState<string | null>(null);
