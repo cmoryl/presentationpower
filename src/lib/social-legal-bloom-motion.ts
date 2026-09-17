@@ -631,6 +631,149 @@ export function bloomPreset(id: string): BloomMotionPreset {
   return BLOOM_MOTION_PRESETS.find((p) => p.id === id) ?? BLOOM_MOTION_PRESETS[0]!;
 }
 
+// ---------------------------------------------------------------------------
+// The accent word's own arrival
+//
+// The italic call-out is the point of the ad, so it gets its own choice of
+// arrival, set apart from the rest of the line. "As the motion sets" keeps the
+// preset's settle; everything else takes the word letter by letter or draws it
+// on. The word never ends smaller than the rest of the headline: these settings
+// change how it arrives, never its final size.
+
+export type BloomAccentKind =
+  | "settle"
+  | "write-on"
+  | "letters-rise"
+  | "letters-drop"
+  | "letters-pop"
+  | "letters-spread"
+  | "type"
+  | "underline"
+  | "blur-in"
+  | "hold";
+
+export type BloomAccentMotion = {
+  id: string;
+  label: string;
+  says: string;
+  kind: BloomAccentKind;
+  /** How much bigger the word starts, when the kind settles as a whole. */
+  overshoot: number;
+  /** Share of the word's arrival window each letter waits behind the last. */
+  letterStagger: number;
+  /** Where the word's own arrival sits relative to the line's, in clip shares. */
+  delay: number;
+  /** Length of the word's arrival, as a share of the clip. */
+  span: number;
+};
+
+export const BLOOM_ACCENT_MOTIONS: BloomAccentMotion[] = [
+  {
+    id: "preset",
+    label: "As the motion sets it",
+    says: "The word settles from slightly larger, in step with the chosen motion.",
+    kind: "settle",
+    overshoot: 0,
+    letterStagger: 0,
+    delay: 0,
+    span: 0,
+  },
+  {
+    id: "write-on",
+    label: "Written on",
+    says: "The word is drawn on from its first letter to its last, as if written.",
+    kind: "write-on",
+    overshoot: 1,
+    letterStagger: 0,
+    delay: 0.02,
+    span: 0.36,
+  },
+  {
+    id: "write-underline",
+    label: "Written on with a drawn rule",
+    says: "The word is written on and an accent rule is drawn under it.",
+    kind: "underline",
+    overshoot: 1,
+    letterStagger: 0,
+    delay: 0.02,
+    span: 0.4,
+  },
+  {
+    id: "letters-rise",
+    label: "Letter by letter, rising",
+    says: "Each letter lifts into place one clearly after the other.",
+    kind: "letters-rise",
+    overshoot: 1,
+    letterStagger: 0.5,
+    delay: 0.02,
+    span: 0.34,
+  },
+  {
+    id: "letters-drop",
+    label: "Letter by letter, dropping",
+    says: "Each letter falls in and settles, front to back.",
+    kind: "letters-drop",
+    overshoot: 1,
+    letterStagger: 0.5,
+    delay: 0.02,
+    span: 0.34,
+  },
+  {
+    id: "letters-pop",
+    label: "Letter by letter, popping",
+    says: "Each letter arrives a touch oversized and settles.",
+    kind: "letters-pop",
+    overshoot: 1.5,
+    letterStagger: 0.45,
+    delay: 0.02,
+    span: 0.32,
+  },
+  {
+    id: "letters-spread",
+    label: "Letters drawing together",
+    says: "The letters start apart and close into the word.",
+    kind: "letters-spread",
+    overshoot: 1,
+    letterStagger: 0.2,
+    delay: 0.02,
+    span: 0.38,
+  },
+  {
+    id: "type",
+    label: "Typed out",
+    says: "The word is typed a letter at a time, with no easing.",
+    kind: "type",
+    overshoot: 1,
+    letterStagger: 0.9,
+    delay: 0.02,
+    span: 0.3,
+  },
+  {
+    id: "blur-in",
+    label: "Focus pull",
+    says: "The word comes out of soft focus and sharpens.",
+    kind: "blur-in",
+    overshoot: 1.1,
+    letterStagger: 0,
+    delay: 0.03,
+    span: 0.3,
+  },
+  {
+    id: "hero-hold",
+    label: "Held from the first frame",
+    says: "The word is there from the start; the rest of the line arrives around it.",
+    kind: "hold",
+    overshoot: 1,
+    letterStagger: 0,
+    delay: 0,
+    span: 0,
+  },
+];
+
+export function bloomAccentMotion(id: string | undefined): BloomAccentMotion {
+  return BLOOM_ACCENT_MOTIONS.find((a) => a.id === id) ?? BLOOM_ACCENT_MOTIONS[0]!;
+}
+
 /** The presets grouped by family, in the order above. */
 export function bloomPresetsByFamily(): { family: BloomMotionFamily; presets: BloomMotionPreset[] }[] {
   const out: { family: BloomMotionFamily; presets: BloomMotionPreset[] }[] = [];
