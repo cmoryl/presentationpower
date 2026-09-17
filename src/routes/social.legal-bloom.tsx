@@ -216,6 +216,7 @@ function BloomView() {
   const closeZoom = () => {
     setZoom(null);
     setEditing(false);
+    setViewMoving(false);
   };
 
   const step = (dir: -1 | 1) => {
