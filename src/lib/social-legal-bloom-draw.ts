@@ -449,19 +449,98 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
     const dx = short * m.words.slide * (1 - local);
 
     if (word.accent) {
-      // the italic word keeps its own settle, on top of the line's arrival
-      const alpha = mode === "typewrite" || mode === "hold" ? local : m.turn.opacity;
-      if (alpha <= 0.01 || !shown) continue;
+      // The italic word arrives in its own chosen way, on top of the line's
+      // arrival. Its final size is never changed by any of this.
+      const acc = m.accent;
+      const kind = acc.kind;
       ctx.save();
-      ctx.globalAlpha = alpha;
       ctx.fillStyle = C.type;
       ctx.font = `italic 700 ${word.size}px ${HEAD_FAMILY}`;
       const full = ctx.measureText(word.text).width;
-      const centreX = copyX + word.x + full / 2 + dx;
+      const leftX = copyX + word.x + dx;
       const baseY = top + word.y + short * m.turn.rise + dy + word.size * 0.055;
-      ctx.translate(centreX, baseY);
-      ctx.scale(m.turn.scale, m.turn.scale);
-      ctx.fillText(shown, -full / 2, 0);
+
+      if (kind === "settle" || kind === "hold") {
+        const alpha = mode === "typewrite" ? local : acc.progress;
+        if (alpha > 0.01 && shown) {
+          const s = acc.overshoot + (1 - acc.overshoot) * acc.progress;
+          ctx.globalAlpha = alpha;
+          ctx.translate(leftX + full / 2, baseY);
+          ctx.scale(s, s);
+          ctx.fillText(shown, -full / 2, 0);
+        }
+      } else if (kind === "type") {
+        const chars = Math.round(word.text.length * acc.progress);
+        if (chars > 0) {
+          ctx.globalAlpha = 1;
+          ctx.fillText(word.text.slice(0, chars), leftX, baseY);
+        }
+      } else if (kind === "write-on" || kind === "underline") {
+        // drawn on from the first letter to the last, then a rule beneath it
+        const drawn = kind === "underline" ? Math.min(1, acc.progress / 0.72) : acc.progress;
+        if (drawn > 0.001) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(leftX - word.size * 0.1, baseY - word.size * 1.3, full * drawn + word.size * 0.06, word.size * 1.8);
+          ctx.clip();
+          ctx.globalAlpha = 1;
+          ctx.fillText(word.text, leftX, baseY);
+          ctx.restore();
+        }
+        if (kind === "underline") {
+          const ruled = Math.max(0, (acc.progress - 0.55) / 0.45);
+          if (ruled > 0.001) {
+            ctx.save();
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = C.type;
+            ctx.lineWidth = Math.max(1.5, word.size * 0.055);
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(leftX, baseY + word.size * 0.2);
+            ctx.lineTo(leftX + full * Math.min(1, ruled), baseY + word.size * 0.2);
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+      } else if (kind === "blur-in") {
+        const s = acc.overshoot + (1 - acc.overshoot) * acc.progress;
+        const blurPx = (1 - acc.progress) * word.size * 0.16;
+        ctx.globalAlpha = acc.progress;
+        if (blurPx > 0.2 && typeof ctx.filter === "string") ctx.filter = `blur(${blurPx}px)`;
+        ctx.translate(leftX + full / 2, baseY);
+        ctx.scale(s, s);
+        ctx.fillText(word.text, -full / 2, 0);
+        ctx.filter = "none";
+      } else {
+        // letter by letter: rising, dropping, popping or drawing together
+        const letters = [...word.text];
+        const n = letters.length;
+        const stagger = Math.max(0.01, acc.letterStagger);
+        let penX = leftX;
+        for (let i = 0; i < n; i += 1) {
+          const wid = ctx.measureText(letters[i]!).width;
+          const from = (i / Math.max(1, n)) * stagger;
+          const span2 = Math.max(0.08, 1 - stagger);
+          const lp = Math.max(0, Math.min(1, (acc.progress - from) / span2));
+          if (lp > 0.001) {
+            const eased = 1 - Math.pow(1 - lp, 3);
+            let ly = 0;
+            let lx = 0;
+            let ls = 1;
+            if (kind === "letters-rise") ly = (1 - eased) * word.size * 0.5;
+            if (kind === "letters-drop") ly = -(1 - eased) * word.size * 0.5;
+            if (kind === "letters-pop") ls = acc.overshoot + (1 - acc.overshoot) * eased;
+            if (kind === "letters-spread") lx = (i - (n - 1) / 2) * (1 - eased) * word.size * 0.55;
+            ctx.save();
+            ctx.globalAlpha = eased;
+            ctx.translate(penX + wid / 2 + lx, baseY + ly);
+            ctx.scale(ls, ls);
+            ctx.fillText(letters[i]!, -wid / 2, 0);
+            ctx.restore();
+          }
+          penX += wid;
+        }
+      }
       ctx.restore();
       continue;
     }
