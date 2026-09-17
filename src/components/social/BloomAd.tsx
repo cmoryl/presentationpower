@@ -233,23 +233,28 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
         </div>
       </div>
 
-      {/* a soft accent splash in the lower corner away from the picture, so the
-          bottom of the ad carries some of the bloom's colour behind the lockup */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          bottom: `-${short * 0.24}px`,
-          [splashSide]: `-${short * 0.2}px`,
-          width: `${short * 0.72}px`,
-          height: `${short * 0.62}px`,
-          background: `radial-gradient(ellipse at ${splashSide === "left" ? "34%" : "66%"} 66%, ${C.glow}D9 0%, ${C.glow}8C 34%, ${C.glow}40 56%, ${C.glow}00 76%)`,
-          filter: `blur(${short * 0.05 * Math.max(0.35, bloomEm)}px)`,
-          opacity: bloomEm === 0 ? 0 : 0.9,
-          zIndex: 0,
-          pointerEvents: "none",
-        }}
-      />
+      {/* the accent splash in the lower corner away from the picture, so the
+          bottom of the ad carries some of the bloom's colour behind the lockup.
+          Its shape is chosen per ad: soft cloud, curved sweep, triangle, circle. */}
+      {splash !== "none" && bloomEm > 0 ? (
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            bottom: `-${short * splashGeometry.drop}px`,
+            [splashSide]: `-${short * splashGeometry.out}px`,
+            width: `${short * splashGeometry.w}px`,
+            height: `${short * splashGeometry.h}px`,
+            background: splashGeometry.background,
+            borderRadius: splashGeometry.borderRadius,
+            clipPath: splashGeometry.clipPath,
+            filter: `blur(${short * splashGeometry.blur * Math.max(0.35, bloomEm)}px)`,
+            opacity: splashGeometry.opacity,
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        />
+      ) : null}
 
       {/* the division lockup — black single line, always bottom right */}
       <img
