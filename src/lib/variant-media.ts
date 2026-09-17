@@ -22,9 +22,10 @@ const IMAGE_VARIANT_IDS = new Set<string>([
   "MV-IMG-PORTRAIT",
   "MV-IMG-QUOTE-BG",
   "MV-IMG-STAT-CALLOUT",
-  // Device showcases — the screenshot inside the laptop / monitor
+  // Device showcases — the screenshot inside the laptop / monitor / phone
   "MV-SHOW-LAPTOP",
   "MV-SHOW-MONITOR",
+  "MV-SHOW-PHONE",
   "MV-SHOW-DEVICE-QUAD",
   // Portrait quote uses a subject photo
   "MV-QUOTE-PORTRAIT",
