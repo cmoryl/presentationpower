@@ -445,7 +445,7 @@ export function AgendaSheet({
                 style={{
                   width: mm(L.timeColW),
                   flex: "0 0 auto",
-                  fontSize: mm(L.timeSize),
+                  fontSize: mm(L.timeSize * row.fit),
                   fontWeight: L.weights.time === 700 ? 500 : L.weights.time,
                   lineHeight: 1.4,
                 }}
@@ -456,7 +456,7 @@ export function AgendaSheet({
                 {row.session.track.trim() ? (
                   <div
                     style={{
-                      fontSize: mm(L.trackSize),
+                      fontSize: mm(L.trackSize * row.fit),
                       fontWeight: 700,
                       lineHeight: 1.4,
                       textTransform: "uppercase",
@@ -467,7 +467,7 @@ export function AgendaSheet({
                 ) : null}
                 <div
                   style={{
-                    fontSize: mm(L.titleRowSize),
+                    fontSize: mm(L.titleRowSize * row.fit),
                     fontWeight: row.session.muted ? 400 : L.weights.row,
                     lineHeight: 1.35,
                   }}
@@ -480,9 +480,9 @@ export function AgendaSheet({
                         <div
                           key={p}
                           style={{
-                            fontSize: mm(L.detailSize),
+                            fontSize: mm(L.detailSize * row.fit),
                             lineHeight: 1.45,
-                            marginTop: mm(L.detailSize * 0.6),
+                            marginTop: mm(L.detailSize * 0.6 * row.fit),
                           }}
                         >
                           {T(para, (v) =>
@@ -526,10 +526,10 @@ export function AgendaSheet({
                   {((par.time ?? "").trim() || row.session.time.trim()) ? (
                     <div
                       style={{
-                        fontSize: mm(ct.timeSize),
+                        fontSize: mm(ct.timeSize * row.fit),
                         fontWeight: 700,
                         lineHeight: 1.4,
-                        marginBottom: mm(ct.timeSize * 0.25),
+                        marginBottom: mm(ct.timeSize * 0.25 * row.fit),
                       }}
                     >
                       {T((par.time ?? "").trim() || row.session.time, (v) =>
@@ -539,7 +539,7 @@ export function AgendaSheet({
                   ) : null}
                   <div
                     style={{
-                      fontSize: mm(ct.titleSize),
+                      fontSize: mm(ct.titleSize * row.fit),
                       fontWeight: 700,
                       lineHeight: 1.35,
                       paddingRight: mm(ct.pinW),
@@ -550,10 +550,10 @@ export function AgendaSheet({
                   {(par.speaker ?? "").trim() ? (
                     <div
                       style={{
-                        fontSize: mm(ct.detailSize),
+                        fontSize: mm(ct.detailSize * row.fit),
                         fontWeight: 600,
                         lineHeight: 1.45,
-                        marginTop: mm(ct.detailSize * 0.5),
+                        marginTop: mm(ct.detailSize * 0.5 * row.fit),
                         paddingRight: mm(ct.pinW),
                       }}
                     >
@@ -563,9 +563,9 @@ export function AgendaSheet({
                   {par.detail.trim() ? (
                     <div
                       style={{
-                        fontSize: mm(ct.detailSize),
+                        fontSize: mm(ct.detailSize * row.fit),
                         lineHeight: 1.45,
-                        marginTop: mm(ct.detailSize * 0.6),
+                        marginTop: mm(ct.detailSize * 0.6 * row.fit),
                         paddingRight: mm(ct.pinW),
                       }}
                     >
