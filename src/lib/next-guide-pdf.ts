@@ -28,10 +28,12 @@ import {
 import { resolveAssetUrl } from "./asset-base-url";
 import {
   GUIDE_ARTWORK_NOTE,
+  guidePhotoKey,
   guideSize,
   type GuideBlock,
   type GuideConfig,
 } from "./next-guide";
+
 import {
   GUIDE_IMAGES,
   guideAccent,
@@ -301,7 +303,7 @@ function drawCover(
   const ink = guideGround(block.ground).ink;
 
   // Photograph band across the foot, under a graduated scrim so the facts read.
-  const photo = block.imagePlace === "none" ? null : images.get(block.imageId ?? "");
+  const photo = block.imagePlace === "none" ? null : images.get(guidePhotoKey(block));
   if (photo) {
     const bandH = h * 0.38;
     paintPhoto(page, photo, { x: 0, y: 0, w, h: bandH });
@@ -409,7 +411,7 @@ function drawPage(
   paintGround(doc, page, block);
   const accent = guideAccent(block.accent);
   const ink = guideGround(block.ground).ink;
-  const photo = block.imagePlace === "none" ? null : (images.get(block.imageId ?? "") ?? null);
+  const photo = block.imagePlace === "none" ? null : (images.get(guidePhotoKey(block)) ?? null);
   const place = block.imagePlace ?? "band";
   paintChevrons(page, photo && place === "band" ? "band" : "page");
 
@@ -706,9 +708,31 @@ export async function buildGuidePdf(config: GuideConfig): Promise<GuidePdfResult
   const images = new Map<string, PDFImage>();
   const wanted = new Set(
     config.blocks
-      .filter((b) => b.imagePlace !== "none" && b.imageId)
+      .filter((b) => b.imagePlace !== "none" && b.imageId && !b.imageUrl)
       .map((b) => b.imageId as string),
   );
+  // An uploaded venue photograph arrives as a link rather than a library id.
+  for (const block of config.blocks) {
+    if (block.imagePlace === "none" || !block.imageUrl) continue;
+    const key = guidePhotoKey(block);
+    if (images.has(key)) continue;
+    try {
+      const res = await fetch(block.imageUrl);
+      if (!res.ok) throw new Error(String(res.status));
+      const bytes = await res.arrayBuffer();
+      let placed: PDFImage;
+      try {
+        placed = await doc.embedJpg(bytes);
+      } catch {
+        placed = await doc.embedPng(bytes);
+      }
+      images.set(key, placed);
+    } catch {
+      notes.push(
+        "The uploaded venue photograph could not be placed, so that page prints without it.",
+      );
+    }
+  }
   for (const id of wanted) {
     const spec = guideImage(id) ?? GUIDE_IMAGES.find((i) => i.id === id) ?? null;
     if (!spec) continue;

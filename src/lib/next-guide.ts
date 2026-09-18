@@ -13,6 +13,7 @@
 
 import { NEXT_APP_ORIGIN, NEXT_EVENT } from "@/lib/next-event";
 import { GUIDE_LOOK_NOTE, type GuideAccentId, type GuideGroundId } from "@/lib/next-guide-theme";
+import { venueAddressLine, venueDirectionsUrl, venueHoursLines, type VenuePage } from "@/lib/venue-page";
 
 
 /** Handout stock. A guide never prints at board size. */
@@ -49,7 +50,14 @@ export type GuideLocation = {
   wifi: string;
   supportEmail: string;
   siteUrl: string;
+  /**
+   * The venue record this guide follows. While it is set, the address, opening
+   * times, travel notes and venue photograph are taken from that record rather
+   * than typed here, so the guide cannot drift from the real place.
+   */
+  venueSlug?: string;
 };
+
 
 export type GuideItem = { id: string; label: string; body: string };
 export type GuideRow = { id: string; time: string; item: string };
@@ -69,12 +77,15 @@ export type GuideStyle = {
   imageId?: string;
   /** Where the photograph sits on the page. */
   imagePlace?: "band" | "side" | "hero" | "none";
+  /** Photograph supplied by URL — an uploaded venue photograph, not the library. */
+  imageUrl?: string;
   /** Vertical label down the inside edge, as the master uses. */
   sidebar?: string;
   /** Small white QR card. */
   qrLabel?: string;
   qrUrl?: string;
 };
+
 
 type GuideBlockCore =
   | {
@@ -518,3 +529,101 @@ export function guidePageCount(config: GuideConfig): number {
 /** Provenance line every builder repeats. */
 export const GUIDE_ARTWORK_NOTE = GUIDE_LOOK_NOTE;
 
+
+// ── venue records ────────────────────────────────────────────────────────────
+
+/** Items on the practical page that the venue record owns, not the editor. */
+const VENUE_ITEM_PREFIX = "venue-";
+
+function venueOwnedItems(venue: VenuePage): GuideItem[] {
+  const items: GuideItem[] = [];
+  const address = venueAddressLine(venue);
+  if (address || venue.mapNote) {
+    items.push({
+      id: `${VENUE_ITEM_PREFIX}address`,
+      label: venue.venue ? `${venue.venue} · getting here` : "Getting here",
+      body: [address, venue.mapNote].filter(Boolean).join(". "),
+    });
+  }
+  const hours = venueHoursLines(venue);
+  if (hours.length) {
+    items.push({
+      id: `${VENUE_ITEM_PREFIX}hours`,
+      label: "Opening times",
+      body: hours.join(" · "),
+    });
+  }
+  venue.travel
+    .filter((t) => t.label.trim() || t.body.trim())
+    .forEach((t, i) => {
+      items.push({
+        id: `${VENUE_ITEM_PREFIX}travel-${i}`,
+        label: t.label || "Travel",
+        body: t.body,
+      });
+    });
+  return items;
+}
+
+/**
+ * Take the real venue detail into a guide. The venue record wins on address,
+ * opening times, travel and the venue photograph; everything the editor typed
+ * elsewhere on the page is left exactly as it is.
+ *
+ * `photoUrl` is the signed link to an uploaded photograph, when there is one —
+ * the caller resolves it, because this module stays free of the backend.
+ */
+export function applyVenueToGuide(
+  config: GuideConfig,
+  venue: VenuePage,
+  photoUrl: string | null = null,
+): GuideConfig {
+  const keep = (next: string, current: string) => (next.trim() ? next : current);
+  const location: GuideLocation = {
+    ...config.location,
+    venueSlug: venue.slug,
+    city: keep(venue.city, config.location.city),
+    venue: keep(venue.venue, config.location.venue),
+    address: keep(venueAddressLine(venue), config.location.address),
+    wifi: keep(venue.wifi, config.location.wifi),
+    supportEmail: keep(venue.supportEmail, config.location.supportEmail),
+    siteUrl: keep(venue.siteUrl, config.location.siteUrl),
+  };
+
+  const owned = venueOwnedItems(venue);
+  const directions = venueDirectionsUrl(venue);
+  let touchedInfo = false;
+
+  const blocks = config.blocks.map((block) => {
+    if (block.kind !== "info" || touchedInfo) return block;
+    touchedInfo = true;
+    const typed = block.items.filter((i) => !i.id.startsWith(VENUE_ITEM_PREFIX));
+    const standfirst = [
+      location.venue && location.address ? `${location.venue}, ${location.address}` : location.venue || location.address,
+      location.wifi ? `Event Wi-Fi: ${location.wifi}` : "",
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    return {
+      ...block,
+      standfirst: standfirst || block.standfirst,
+      items: [...owned, ...typed],
+      imageId: venue.photoId || block.imageId,
+      imageUrl: photoUrl ?? undefined,
+      qrLabel: directions ? "Directions to the venue" : block.qrLabel,
+      qrUrl: directions || block.qrUrl,
+    };
+  });
+
+  return { ...config, location, blocks };
+}
+
+/** True when this guide is following a venue record. */
+export function guideVenueSlug(config: GuideConfig): string {
+  return config.location.venueSlug ?? "";
+}
+
+/** How a page's photograph is keyed while a builder embeds images. */
+export function guidePhotoKey(block: GuideBlock): string {
+  return block.imageUrl ? `url:${block.imageUrl}` : (block.imageId ?? "");
+}

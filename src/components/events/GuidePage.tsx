@@ -71,7 +71,14 @@ export function GuidePage({
   const ground = guideGround(block.ground);
   const accent = guideAccent(block.accent);
   const ink = ground.ink;
-  const photo = block.imagePlace === "none" ? null : guideImage(block.imageId);
+  // An uploaded venue photograph arrives as a link and wins over the library.
+  const photo =
+    block.imagePlace === "none"
+      ? null
+      : block.imageUrl
+        ? { id: "uploaded", label: "Venue photograph", url: block.imageUrl, note: "" }
+        : guideImage(block.imageId);
+
   const head = [config.location.city, config.location.dates].filter(Boolean).join(" · ");
 
   const shell = {

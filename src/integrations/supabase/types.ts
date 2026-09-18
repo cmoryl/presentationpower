@@ -2229,6 +2229,90 @@ export type Database = {
         }
         Relationships: []
       }
+      event_venue_pages: {
+        Row: {
+          address: string
+          city: string
+          country: string
+          created_at: string
+          created_by: string | null
+          directions_url: string
+          event_id: string
+          id: string
+          lat: number | null
+          lng: number | null
+          map_note: string
+          map_zoom: number
+          notes: string
+          opening_times: Json
+          photo_credit: string
+          photo_id: string
+          photo_path: string
+          postcode: string
+          site_url: string
+          slug: string
+          support_email: string
+          travel: Json
+          updated_at: string
+          venue: string
+          wifi: string
+        }
+        Insert: {
+          address?: string
+          city?: string
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          directions_url?: string
+          event_id?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          map_note?: string
+          map_zoom?: number
+          notes?: string
+          opening_times?: Json
+          photo_credit?: string
+          photo_id?: string
+          photo_path?: string
+          postcode?: string
+          site_url?: string
+          slug: string
+          support_email?: string
+          travel?: Json
+          updated_at?: string
+          venue?: string
+          wifi?: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          directions_url?: string
+          event_id?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          map_note?: string
+          map_zoom?: number
+          notes?: string
+          opening_times?: Json
+          photo_credit?: string
+          photo_id?: string
+          photo_path?: string
+          postcode?: string
+          site_url?: string
+          slug?: string
+          support_email?: string
+          travel?: Json
+          updated_at?: string
+          venue?: string
+          wifi?: string
+        }
+        Relationships: []
+      }
       globallink_config: {
         Row: {
           batch_size: number

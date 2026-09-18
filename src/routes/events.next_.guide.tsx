@@ -781,6 +781,7 @@ function GuideStudio() {
                   />
                 ))}
               </div>
+              <VenuePicker config={config} onApply={setConfig} />
               <div className="mt-3">
                 <Field label="Internal notes" value={notes} onChange={setNotes} long />
               </div>
