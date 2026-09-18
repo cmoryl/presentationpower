@@ -65,7 +65,7 @@ export const Route = createFileRoute("/api/public/canva-ad")({
         const headPx = Math.max(24, Math.min(copyW / 9.2, short * 0.098));
         const turnPx = headPx * 1.62;
         const supportPx = Math.max(12, Math.min(headPx * 0.3, short * 0.028));
-        const markH = short * 0.052;
+        const markH = short * 0.027;
 
         const html = `<!doctype html>
 <html lang="en">
@@ -77,8 +77,8 @@ export const Route = createFileRoute("/api/public/canva-ad")({
 <style>
   html, body { margin: 0; padding: 0; background: #FBFBFD; }
   .page { position: relative; width: ${w}px; height: ${h}px; background: #FBFBFD; overflow: hidden; }
-  .bloom { position: absolute; border-radius: 50%; filter: blur(${short * 0.08}px); }
-  .splash { position: absolute; border-radius: 50%; filter: blur(${short * 0.06}px); }
+  .bloom { position: absolute; border-radius: 50%; opacity: 0.2; filter: blur(${short * 0.08}px); }
+  .splash { position: absolute; border-radius: 50%; opacity: 0.16; filter: blur(${short * 0.06}px); }
   .frame { position: absolute; overflow: hidden; box-sizing: border-box;
            border: ${Math.max(2, short * 0.008)}px solid ${C.type};
            border-radius: ${r}px 0 ${r}px 0; }
