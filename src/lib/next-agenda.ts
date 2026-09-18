@@ -2350,7 +2350,17 @@ export function agendaBlocks(config: AgendaConfig) {
     parallel: { x: number; y: number; w: number; h: number } | null;
     /** One aqua card per parallel track, left to right. */
     parallels: { x: number; y: number; w: number; h: number }[];
+    /**
+     * Type multiplier for this band, 1 when the band holds its copy at the
+     * board's sizes. A tightened board used to keep full-size type inside a
+     * shortened band, and the bands clip, so the last speaker lines simply
+     * vanished from the sheet and the press file. Every renderer scales its
+     * sizes by this so the copy shrinks honestly instead of being cut, and the
+     * fit report still flags anything below the legible floor.
+     */
+    fit: number;
   };
+
 
   /** Unscaled height each row's copy really wants, in mm. */
   let needs: number[] = [];
