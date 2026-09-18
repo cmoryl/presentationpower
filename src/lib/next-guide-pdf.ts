@@ -255,16 +255,19 @@ function drawPage(
         fitted = flow.text(block.byline, { size: body, bold: true, color: ACCENT }) && fitted;
       if (block.note) {
         flow.space(22);
+        // The panel is sized to the wrapped note so no line falls outside it.
+        const noteLines = wrap(fonts.regular, block.note, body, inner - w * 0.04);
+        const panelH = noteLines.length * lead + w * 0.03;
         page.drawRectangle({
           x: margin,
-          y: flow.y - w * 0.055,
+          y: flow.y - panelH,
           width: inner,
-          height: w * 0.055,
+          height: panelH,
           color: hex(SURFACE),
         });
-        flow.space(12);
+        flow.space(w * 0.014);
         fitted = flow.text(block.note, { size: body, leading: lead, indent: w * 0.02 }) && fitted;
-        flow.space(10);
+        flow.space(w * 0.016);
       }
       break;
     }
