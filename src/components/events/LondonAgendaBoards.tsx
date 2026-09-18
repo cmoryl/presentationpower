@@ -10,7 +10,14 @@ import { useMemo } from "react";
 
 import { AgendaSheet } from "@/components/next/AgendaSheet";
 import { pickAgendaFile, useSavedAgendaFiles } from "@/hooks/use-next-live-masters";
-import { AGENDA_DIVISIONS, agendaDefault, type AgendaConfig } from "@/lib/next-agenda";
+import {
+  AGENDA_DIVISIONS,
+  agendaDays,
+  agendaDefault,
+  agendaLocationText,
+  agendaPages,
+  type AgendaConfig,
+} from "@/lib/next-agenda";
 import type { AgendaFileRecord } from "@/hooks/use-next-live-masters";
 
 function AgendaCard({
@@ -27,10 +34,19 @@ function AgendaCard({
     [saved, id],
   );
 
+  // Render the card from the board's first printed page, exactly as it comes off
+  // the press: when the programme holds on one sheet that is the merged
+  // multi-day board, otherwise it is day one, page one.
+  const pages = useMemo(() => agendaPages(config), [config]);
+  const first = pages[0]?.config ?? config;
+  const dayCount = agendaDays(config).length;
+  const room = agendaLocationText(config).trim();
+  const sessionCount = agendaDays(config).reduce((n, d) => n + (d.sessions?.length ?? 0), 0);
+
   return (
     <article className="flex flex-col overflow-hidden rounded-xl border border-black/10 bg-white">
       <div className="flex justify-center bg-[#F2F2F2] p-3">
-        <AgendaSheet config={config} pxPerMm={0.2} />
+        <AgendaSheet config={first} pxPerMm={0.2} />
       </div>
       <div className="flex flex-1 flex-col p-4">
         <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">
@@ -38,8 +54,19 @@ function AgendaCard({
         </p>
         <h3 className="mt-1 text-sm font-semibold text-[#03002C]">{name}</h3>
         <p className="mt-1.5 text-[12.5px] leading-relaxed text-[#03002C]/65">
-          {config.trimW}×{config.trimH} mm · {config.face} face · multi-day, multi-page programme.
+          {config.trimW}×{config.trimH} mm · {config.face} face ·{" "}
+          {pages.length === 1
+            ? dayCount > 1
+              ? `all ${dayCount} days on one sheet`
+              : "one sheet"
+            : `${pages.length} pages`}
+          {sessionCount ? ` · ${sessionCount} sessions` : ""}
         </p>
+        {room ? (
+          <p className="mt-0.5 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#03002C]/45">
+            {room}
+          </p>
+        ) : null}
         <Link
           to="/events/next/agendas"
           search={{ division: id, file: saved?.id }}
@@ -51,6 +78,7 @@ function AgendaCard({
     </article>
   );
 }
+
 
 export function LondonAgendaBoards() {
   const savedFiles = useSavedAgendaFiles();
