@@ -2359,14 +2359,27 @@ export function agendaBlocks(config: AgendaConfig) {
     // Bands take the height their copy really needs, so a two-line title with a
     // three-line speaker note is never crushed into the same band as "Lunch".
     const bodyW = L.bandW - L.timeColW - L.bandPadX * 2;
+    /**
+     * A day heading prints as one nowrap line of caps in a slim bar, so it is
+     * measured as that and never as a stacked band. Measured as a full band it
+     * both wasted a session's worth of height and, on an underrun, swelled into
+     * a giant blue plate when the spare height was shared out.
+     */
+    const dayBarH = L.bandPadY * 1.2 + L.titleRowSize * 1.05 * 1.35;
     const height = (session: AgendaSession) => {
+      if (session.dayBreak) return dayBarH;
       const pars = agendaParallels(session);
       const split = agendaSplitWidths(L.bandW, L.bandGap, pars.length);
       const w = pars.length ? split.leftW - L.timeColW - L.bandPadX * 2 : bodyW;
       const left =
+        // The track eyebrow prints above the title on both renderers and used to
+        // be measured as nothing at all, so every tracked slot ran a line over.
+        ((session.track ?? "").trim() ? L.trackSize * 1.5 : 0) +
         agendaTextLines(session.title, L.titleRowSize, w) * L.titleRowSize * 1.5 +
         agendaTextLines(session.detail, L.detailSize, w) * L.detailSize * 1.55 +
-        (session.detail.trim() ? L.detailSize * 0.8 : 0);
+        // Each speaker/notes paragraph opens with its own lead on the live board,
+        // so a four-name panel list costs four leads, not one.
+        agendaParagraphCount(session.detail) * L.detailSize * 0.6;
       // Every parallel card is measured on its own column width; the band takes
       // the tallest of them so no track is clipped.
       const ct = agendaCardType(
@@ -2381,11 +2394,13 @@ export function agendaBlocks(config: AgendaConfig) {
             tallest,
             agendaTextLines(p.title, ct.titleSize, ct.textW) * ct.titleSize * 1.5 +
               // Own start time and speaker line each take a measured line box, so
-              // a card carrying all four fields is never clipped.
-              ((p.time ?? "").trim() || session.time.trim() ? ct.timeSize * 1.5 : 0) +
+              // a card carrying all four fields is never clipped. The time line
+              // carries its own gap under it (1.4 line + 0.25 gap).
+              ((p.time ?? "").trim() || session.time.trim() ? ct.timeSize * 1.65 : 0) +
               agendaTextLines(p.speaker ?? "", ct.detailSize, ct.textW) * ct.detailSize * 1.55 +
+              ((p.speaker ?? "").trim() ? ct.detailSize * 0.5 : 0) +
               agendaTextLines(p.detail, ct.detailSize, ct.textW) * ct.detailSize * 1.55 +
-              ct.detailSize * 0.8,
+              (p.detail.trim() ? ct.detailSize * 0.6 : 0),
           ),
         0,
       );
@@ -2407,12 +2422,21 @@ export function agendaBlocks(config: AgendaConfig) {
     // even the floor no longer fits, every band sits on the floor and the fit
     // report / page capacity reports the overflow honestly.
     const floorH = L.titleRowSize * 2.4;
+    const fixedRow = config.sessions.map((s) => Boolean(s.dayBreak));
     const heights = new Array<number>(wanted.length).fill(floorH);
-    let free = wanted.map((_, i) => i);
+    let free: number[] = [];
     let budget = available;
+    wanted.forEach((h, i) => {
+      // Day headings hold their measured bar height in every pass: they neither
+      // shrink below a legible cap line nor grow into the spare height.
+      if (fixedRow[i]) {
+        heights[i] = h;
+        budget -= h;
+      } else free.push(i);
+    });
     for (let pass = 0; pass < wanted.length + 1 && free.length > 0; pass += 1) {
       const freeTotal = free.reduce((a, i) => a + wanted[i]!, 0) || 1;
-      const scale = budget / freeTotal;
+      const scale = Math.max(0, budget) / freeTotal;
       const pinned = free.filter((i) => wanted[i]! * scale < floorH);
       if (pinned.length === 0) {
         for (const i of free) heights[i] = wanted[i]! * scale;
@@ -2430,6 +2454,7 @@ export function agendaBlocks(config: AgendaConfig) {
       }
     }
     for (const i of free) heights[i] = floorH;
+
     let cursor = rowsTop;
     rows = config.sessions.map((session, i) => {
       const h = heights[i]!;
