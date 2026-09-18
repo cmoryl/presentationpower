@@ -44,7 +44,12 @@ import {
   type GuideBlockKind,
   type GuideConfig,
   type GuideSizeId,
+  applyVenueToGuide,
+  guideVenueSlug,
 } from "@/lib/next-guide";
+import { supabase } from "@/integrations/supabase/client";
+import { venueTitle, type VenuePage } from "@/lib/venue-page";
+import { listVenuePages } from "@/lib/venue-page.functions";
 import {
   GUIDE_ACCENTS,
   GUIDE_GROUNDS,
@@ -982,5 +987,73 @@ function GuideStudio() {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+/**
+ * Venue picker — points this guide at a saved venue page so the practical
+ * information follows that record instead of a re-typed copy. Anything the
+ * editor typed elsewhere in the guide is left exactly as it is.
+ */
+function VenuePicker({
+  config,
+  onApply,
+}: {
+  config: GuideConfig;
+  onApply: (next: GuideConfig) => void;
+}) {
+  const fetchVenues = useServerFn(listVenuePages);
+  const venues = useQuery({
+    queryKey: ["venue-pages"],
+    queryFn: () => fetchVenues({}),
+  });
+  const current = guideVenueSlug(config);
+  const [note, setNote] = useState("");
+
+  const apply = async (venue: VenuePage) => {
+    let photoUrl: string | null = null;
+    if (venue.photoPath) {
+      const { data } = await supabase.storage
+        .from("venue-photos")
+        .createSignedUrl(venue.photoPath, 60 * 60 * 24);
+      photoUrl = data?.signedUrl ?? null;
+      if (!photoUrl) setNote("The venue photograph could not be read, so the set photograph stays.");
+    }
+    onApply(applyVenueToGuide(config, venue, photoUrl));
+    if (venue.photoPath && photoUrl) setNote("");
+    toast.success(`Guide following ${venueTitle(venue)}.`);
+  };
+
+  const list = venues.data?.venues ?? [];
+
+  return (
+    <div className="mt-3 rounded-lg border border-border/60 p-3">
+      <p className="text-xs uppercase tracking-wide text-muted-foreground">Venue page</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Follow a saved location and the address, opening times, travel notes and photograph come
+        from there.
+      </p>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        {list.map((venue) => (
+          <Button
+            key={venue.slug}
+            variant={venue.slug === current ? "default" : "outline"}
+            size="sm"
+            onClick={() => void apply(venue)}
+          >
+            {venueTitle(venue)}
+          </Button>
+        ))}
+        {!list.length ? (
+          <span className="text-xs text-muted-foreground">
+            {venues.isLoading ? "Loading locations…" : "No venue pages saved yet."}
+          </span>
+        ) : null}
+        <Link to="/events/next/locations" className="text-xs font-semibold underline">
+          Edit venue pages
+        </Link>
+      </div>
+      {note ? <p className="mt-2 text-xs text-muted-foreground">{note}</p> : null}
+    </div>
   );
 }
