@@ -102,8 +102,7 @@ import {
   agendaBandLayout,
   agendaLocation,
   type AgendaLocationIconId,
-  type AgendaLocationInkId,
-  type AgendaLocationSizeId,
+
 
   type AgendaLocationInkId,
   type AgendaLocationSizeId,
