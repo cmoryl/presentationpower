@@ -23,6 +23,7 @@ import { isAuthoringChrome } from "./export-chrome-suppress";
 import { STAGE_H, STAGE_W } from "./export-quality";
 import { resolveSvgMarkupVars } from "./export-svg-vars";
 import { classifyEffectStyle, effectSvgDataUrl } from "./export-effect-style";
+import { outlineContainsRect, parseClipOutline, type ClipCmd } from "./export-clip-geom";
 import { resolveAssetUrl, responseToDataUrl, withCacheBuster } from "./asset-base-url";
 
 export interface DomColor {
@@ -78,6 +79,14 @@ export interface DomShape {
    * replaceable picture object instead of being parked on the flat plate.
    */
   cssFilter?: string;
+  /**
+   * Shape mask, normalised to 0..1 of this object's own box. Emitted as native
+   * PowerPoint custom geometry (`a:custGeom`) — the same thing "Edit Points" and
+   * "Crop to Shape" write — so an angular card or a shape-cropped photograph
+   * stays a real, editable object instead of flat artwork.
+   */
+  clip?: ClipCmd[];
+
 
 
   rotationDeg: number;
