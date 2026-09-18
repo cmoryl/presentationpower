@@ -1959,6 +1959,14 @@ export function agendaParagraphCount(text: string): number {
  */
 export const AGENDA_MIN_BAND_FIT = 0.62;
 
+/**
+ * Most a band may grow past the height its own copy needs when the programme
+ * underruns the sheet. Spare height past this is shared as gap between bands.
+ */
+export const AGENDA_MAX_BAND_STRETCH = 1.25;
+
+
+
 
 
 
