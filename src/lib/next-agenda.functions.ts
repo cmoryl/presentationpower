@@ -24,7 +24,15 @@ const sessionSchema = z
     detail: z.string().default(""),
     track: z.string().default(""),
     muted: z.boolean().default(false),
-    pin: z.string().optional(),
+    // `pin` is a flag on the row (AgendaSession.pin: boolean), not a string.
+    // It was typed as a string here, so every board carrying pinned rows —
+    // i.e. every approved London programme — failed validation on save.
+    pin: z.boolean().optional(),
+    dayBreak: z.boolean().optional(),
+    icon: z.string().optional(),
+    iconInk: z.string().optional(),
+    iconSize: z.string().optional(),
+    room: z.string().optional(),
     parallel: parallelSchema.nullable().optional(),
     parallels: z.array(parallelSchema).max(4).optional(),
   })
