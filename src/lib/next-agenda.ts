@@ -1015,6 +1015,13 @@ export type AgendaSession = {
   parallels?: AgendaParallel[];
   /** Mark the row with the location pin (session runs off the main floor). */
   pin?: boolean;
+  /**
+   * Day heading on an all-days-on-one-sheet board. Printed as a solid Blue 500
+   * bar with white caps rather than a programme band, so a reader sees where one
+   * day ends and the next begins instead of reading it as another session.
+   */
+  dayBreak?: boolean;
+
 };
 
 /**
@@ -1919,6 +1926,8 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
       // that only knows the single-track shape.
       parallel: parallels[0] ?? null,
       pin: Boolean(s.pin),
+      dayBreak: Boolean(s.dayBreak),
+
     };
   };
   const sessions = Array.isArray(raw.sessions)
@@ -2491,6 +2500,8 @@ export function agendaPages(config: AgendaConfig): AgendaPage[] {
           detail: (day.label || "").trim() ? (day.meta || "").trim() : "",
           track: "",
           muted: true,
+          dayBreak: true,
+
         });
       }
       rows.push(...(day.sessions ?? []));

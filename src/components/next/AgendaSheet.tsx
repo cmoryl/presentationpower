@@ -368,7 +368,61 @@ export function AgendaSheet({
       ) : null}
 
       {blocks.rows.map((row, i) =>
-        row.band ? (
+        row.band && row.session.dayBreak ? (
+          // Day heading: a solid Blue 500 bar with white caps, so a two-day board
+          // reads as two days rather than one long list.
+          <div
+            key={i}
+            style={{
+              ...at(row.band.x, row.band.y),
+              width: mm(row.band.w),
+              height: mm(row.band.h),
+              background: "#003FC7",
+              color: "#FFFFFF",
+              borderRadius: bandRadius(row.band.w, row.band.h),
+              overflow: "hidden",
+              display: "flex",
+              alignItems: "center",
+              gap: mm(L.bandPadX * 0.8),
+              padding: `${mm(L.bandPadY * 0.6)}px ${mm(L.bandPadX)}px`,
+              boxSizing: "border-box",
+            }}
+          >
+            <div
+              style={{
+                fontSize: mm(L.titleRowSize * 1.05),
+                fontWeight: 700,
+                lineHeight: 1.2,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {T(row.session.title, (v) => edit?.onSession(i, { title: v }))}
+            </div>
+            <div
+              style={{
+                flex: "1 1 auto",
+                height: mm(Math.max(0.4, L.titleRowSize * 0.08)),
+                background: "rgba(255,255,255,0.55)",
+              }}
+            />
+            {row.session.detail.trim() ? (
+              <div
+                style={{
+                  fontSize: mm(L.detailSize),
+                  fontWeight: 500,
+                  lineHeight: 1.2,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {T(row.session.detail, (v) => edit?.onSession(i, { detail: v }))}
+              </div>
+            ) : null}
+          </div>
+        ) : row.band ? (
           <div key={i}>
             <div
               style={{
@@ -386,6 +440,7 @@ export function AgendaSheet({
                 boxSizing: "border-box",
               }}
             >
+
               <div
                 style={{
                   width: mm(L.timeColW),
@@ -532,6 +587,48 @@ export function AgendaSheet({
               );
             })}
           </div>
+        ) : row.session.dayBreak ? (
+          // Rule-style board: the day heading takes a solid Blue 500 bar too.
+          <div
+            key={i}
+            style={{
+              ...at(blocks.x, row.y),
+              width: mm(blocks.contentW),
+              height: mm(row.h),
+              background: "#003FC7",
+              color: "#FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              gap: mm(4),
+              padding: `0 ${mm(4)}px`,
+              boxSizing: "border-box",
+            }}
+          >
+            <div
+              style={{
+                fontSize: mm(L.titleRowSize * 1.05),
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {T(row.session.title, (v) => edit?.onSession(i, { title: v }))}
+            </div>
+            {row.session.detail.trim() ? (
+              <div
+                style={{
+                  fontSize: mm(L.detailSize),
+                  fontWeight: 500,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {T(row.session.detail, (v) => edit?.onSession(i, { detail: v }))}
+              </div>
+            ) : null}
+          </div>
         ) : (
           <div
             key={i}
@@ -546,6 +643,7 @@ export function AgendaSheet({
               opacity: row.session.muted ? 0.7 : 1,
             }}
           >
+
             <div
               style={{
                 width: mm(L.timeColW),

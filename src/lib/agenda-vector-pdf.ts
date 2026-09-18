@@ -688,6 +688,48 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       blocks.rows.forEach((row, i) => {
         const band = row.band;
         if (!band) return;
+        // Day heading: a solid Blue 500 bar with white caps, so a two-day board
+        // prints as two days rather than one continuous list.
+        if (row.session.dayBreak) {
+          plate(px(band.x), py(band.y), mm(band.w), mm(band.h), rgb(...hexRgb("#003FC7")), 1);
+          const white = rgb(1, 1, 1);
+          const size = mm(L.titleRowSize) * 1.05;
+          const label = row.session.title.trim().toUpperCase();
+          const baseY = py(band.y) - mm(band.h) / 2 - size * 0.36;
+          page.drawText(label, {
+            x: px(band.x) + padX,
+            y: baseY,
+            size,
+            font: bold,
+            color: white,
+          });
+          const labelW = bold.widthOfTextAtSize(label, size);
+          const note = row.session.detail.trim().toUpperCase();
+          const noteSize = mm(L.detailSize);
+          const noteW = note ? regular.widthOfTextAtSize(note, noteSize) : 0;
+          const ruleX = px(band.x) + padX + labelW + size * 0.7;
+          const ruleEnd = px(band.x) + mm(band.w) - padX - (note ? noteW + size * 0.7 : 0);
+          if (ruleEnd > ruleX) {
+            plate(
+              ruleX,
+              py(band.y) - mm(band.h) / 2 + size * 0.06,
+              ruleEnd - ruleX,
+              Math.max(0.4, size * 0.08),
+              white,
+              0.55,
+            );
+          }
+          if (note) {
+            page.drawText(note, {
+              x: px(band.x) + mm(band.w) - padX - noteW,
+              y: baseY,
+              size: noteSize,
+              font: regular,
+              color: white,
+            });
+          }
+          return;
+        }
         // Time rail first as a full curved plate, then the fill inset from the
         // left: the rail keeps the band's own curve instead of squaring a corner.
         if (railW > 0) {
@@ -704,6 +746,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
         const bodyX = px(band.x) + padX + timeW;
         const bodyW = mm(band.w) - padX * 2 - timeW;
         let y = py(band.y) - padY;
+
         if (row.session.time.trim()) {
           const size = mm(L.timeSize);
           page.drawText(fit(timeFont, row.session.time, size, timeW), {
@@ -836,6 +879,27 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
     const bodyW = mm(blocks.contentW) - timeW - trackW - mm(4);
     for (const row of blocks.rows) {
       const top = py(row.y);
+      if (row.session.dayBreak) {
+        // Rule-style board: the day heading takes the same solid Blue 500 bar.
+        page.drawRectangle({
+          x: px(blocks.x),
+          y: top - mm(row.h),
+          width: mm(blocks.contentW),
+          height: mm(row.h),
+          color: rgb(...hexRgb("#003FC7")),
+        });
+
+        const size = mm(L.titleRowSize) * 1.05;
+        page.drawText(row.session.title.trim().toUpperCase(), {
+          x: px(blocks.x) + mm(4),
+          y: top - mm(row.h) / 2 - size * 0.36,
+          size,
+          font: bold,
+          color: rgb(1, 1, 1),
+        });
+        continue;
+      }
+
       page.drawLine({
         start: { x: px(blocks.x), y: top },
         end: { x: px(blocks.x + blocks.contentW), y: top },
