@@ -1384,11 +1384,16 @@ export function agendaProgrammeIsStale(config: {
       : (src.sessions ?? []);
     return new Set(
       rows
+        // Muted housekeeping rows are excluded: every programme ever issued
+        // carries a break and a lunch, so they match across unrelated
+        // programmes and would hide a stale file.
+        .filter((s) => !s.muted)
         .flatMap((s) => [s.title ?? "", ...agendaParallels(s).map((p) => p.title)])
         .map((t) => t.trim().toLowerCase())
-        .filter(Boolean),
+        .filter((t) => !!t && !GENERIC_ROW_TITLES.has(t)),
     );
   };
+
   const approved = titles(programme);
   if (!approved.size) return false;
   const saved = titles(config);
