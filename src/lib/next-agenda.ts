@@ -2660,7 +2660,14 @@ export function agendaPages(config: AgendaConfig): AgendaPage[] {
     const probe = agendaBlocks(merged);
     const last = probe.rows[probe.rows.length - 1];
     const bottom = last ? last.y + (last.band?.h ?? last.h) : probe.rowsTop;
-    if (bottom <= probe.listBottom + 0.5) {
+    // The bands are always solved to fill the list area exactly, so the bottom
+    // edge alone always "passed" and a two-day programme landed on one sheet
+    // with every band half the height its copy needed. Gate on the bands: one
+    // sheet engages only when each one still holds its own copy at close to the
+    // board's sizes.
+    const holdsCopy = probe.rows.every((r) => r.fit >= 0.97);
+    if (bottom <= probe.listBottom + 0.5 && holdsCopy) {
+
     return [
       {
         config: merged,
