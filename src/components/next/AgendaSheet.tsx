@@ -11,6 +11,9 @@ import {
   agendaCardType,
   agendaLongestWord,
   agendaParallels,
+  agendaSessionIcon,
+  agendaSessionRoom,
+
   agendaQrBackground,
   agendaQrForeground,
   agendaQrStyle,
@@ -128,7 +131,7 @@ export type AgendaSheetEdit = {
   onField: (field: "eyebrow" | "title" | "meta" | "footnote", value: string) => void;
   onSession: (
     index: number,
-    patch: Partial<{ time: string; title: string; detail: string; track: string }>,
+    patch: Partial<{ time: string; title: string; detail: string; track: string; room: string }>,
   ) => void;
   onParallel: (
     index: number,
@@ -451,7 +454,19 @@ export function AgendaSheet({
                 }}
               >
                 {T(row.session.time, (v) => edit?.onSession(i, { time: v }))}
+                {/* Optional per-row mark, printed under the time so it never
+                    steals width from the session title. */}
+                {agendaSessionIcon(row.session) ? (
+                  <div style={{ marginTop: mm(L.timeSize * 0.35) }}>
+                    <AgendaLocationMark
+                      icon={agendaSessionIcon(row.session)!}
+                      height={mm(L.timeSize * row.fit * 0.9)}
+                      fill={BAND.ink}
+                    />
+                  </div>
+                ) : null}
               </div>
+
               <div style={{ flex: "1 1 auto", minWidth: 0 }}>
                 {row.session.track.trim() ? (
                   <div
@@ -474,6 +489,23 @@ export function AgendaSheet({
                 >
                   {T(row.session.title, (v) => edit?.onSession(i, { title: v }), true)}
                 </div>
+                {/* Room / floor line: its own small caps line, only when one is
+                    known, so a programme can publish without rooms. */}
+                {agendaSessionRoom(row.session) ? (
+                  <div
+                    style={{
+                      fontSize: mm(L.detailSize * row.fit),
+                      fontWeight: 700,
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      lineHeight: 1.45,
+                      marginTop: mm(L.detailSize * 0.5 * row.fit),
+                    }}
+                  >
+                    {T(agendaSessionRoom(row.session), (v) => edit?.onSession(i, { room: v }))}
+                  </div>
+                ) : null}
+
                 {row.session.detail.trim()
                   ? row.session.detail.split("\n").map((para, p) =>
                       para.trim() ? (
@@ -655,7 +687,17 @@ export function AgendaSheet({
               }}
             >
               {T(row.session.time, (v) => edit?.onSession(i, { time: v }))}
+              {agendaSessionIcon(row.session) ? (
+                <div style={{ marginTop: mm(L.timeSize * 0.3) }}>
+                  <AgendaLocationMark
+                    icon={agendaSessionIcon(row.session)!}
+                    height={mm(L.timeSize * 0.85)}
+                    fill={row.session.muted ? ink : titleInk}
+                  />
+                </div>
+              ) : null}
             </div>
+
             <div style={{ flex: "1 1 auto", minWidth: 0, paddingRight: mm(4) }}>
               <div
                 style={{
@@ -667,6 +709,20 @@ export function AgendaSheet({
               >
                 {T(row.session.title, (v) => edit?.onSession(i, { title: v }), true)}
               </div>
+              {agendaSessionRoom(row.session) ? (
+                <div
+                  style={{
+                    fontSize: mm(L.detailSize),
+                    fontWeight: 700,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    marginTop: mm(L.detailSize * 0.35),
+                  }}
+                >
+                  {T(agendaSessionRoom(row.session), (v) => edit?.onSession(i, { room: v }))}
+                </div>
+              ) : null}
+
               {row.session.detail.trim() ? (
                 <div
                   style={{

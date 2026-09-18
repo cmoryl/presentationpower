@@ -2013,6 +2013,32 @@ export function AgendaStudio({
                 placeholder="MAIN STAGE"
                 onChange={(e) => setSession(i, { track: e.target.value })}
               />
+              {/* Room and mark for this row. Both optional: the row prints
+                  exactly as before until one is filled in. */}
+              <div className="flex items-center gap-2 md:col-span-5">
+                <Input
+                  aria-label={`Row ${i + 1} room`}
+                  className="max-w-[240px]"
+                  value={session.room ?? ""}
+                  placeholder="Room / floor (optional)"
+                  onChange={(e) => setSession(i, { room: e.target.value })}
+                />
+                <select
+                  aria-label={`Row ${i + 1} mark`}
+                  className={`${selectClass} max-w-[180px]`}
+                  value={session.icon ?? "none"}
+                  onChange={(e) =>
+                    setSession(i, { icon: e.target.value as AgendaLocationIconId })
+                  }
+                >
+                  {AGENDA_LOCATION_ICONS.map((ic) => (
+                    <option key={ic.id} value={ic.id}>
+                      {ic.id === "none" ? "No mark" : `Mark · ${ic.name}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="flex items-center gap-1">
                 <label className="flex items-center gap-1 pr-2 text-xs text-muted-foreground">
                   <input

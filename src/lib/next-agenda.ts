@@ -1021,11 +1021,42 @@ export type AgendaSession = {
    * day ends and the next begins instead of reading it as another session.
    */
   dayBreak?: boolean;
+  /**
+   * Small mark printed in the time column of this row, from the approved icon
+   * set (`AGENDA_LOCATION_ICONS`). Optional and off by default, so every saved
+   * board renders exactly as before until someone chooses a mark.
+   */
+  icon?: AgendaLocationIconId;
+  /**
+   * Room / floor for this session, printed as its own small caps line above the
+   * speaker notes. Empty when the room is not known yet, so a programme can be
+   * published without one and the rooms dropped in later.
+   */
+  room?: string;
 
 };
 
+
+/**
+ * The mark a row prints in its time column, or null when the row carries none.
+ * Rows saved before per-row marks existed return null, so nothing changes on an
+ * older board.
+ */
+export function agendaSessionIcon(
+  session: Pick<AgendaSession, "icon"> | null | undefined,
+): (typeof AGENDA_LOCATION_ICONS)[number] | null {
+  const found = AGENDA_LOCATION_ICONS.find((i) => i.id === session?.icon);
+  return found && found.path ? found : null;
+}
+
+/** Room / floor line for a row, already trimmed. Empty when none is known. */
+export function agendaSessionRoom(session: Pick<AgendaSession, "room"> | null | undefined): string {
+  return (session?.room ?? "").trim();
+}
+
 /**
  * Most parallel tracks one slot can print. Four cards is the point where the
+
  * narrowest approved board (A4) can still hold a legible session title beside
  * the main band, so the cap is a print limit, not an arbitrary one.
  */
@@ -2019,8 +2050,13 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
       parallel: parallels[0] ?? null,
       pin: Boolean(s.pin),
       dayBreak: Boolean(s.dayBreak),
+      icon: AGENDA_LOCATION_ICONS.some((ic) => ic.id === s.icon)
+        ? (s.icon as AgendaLocationIconId)
+        : "none",
+      room: str(s.room, ""),
 
     };
+
   };
   const sessions = Array.isArray(raw.sessions)
     ? raw.sessions.slice(0, 60).map(session)
@@ -2403,10 +2439,17 @@ export function agendaBlocks(config: AgendaConfig) {
         // be measured as nothing at all, so every tracked slot ran a line over.
         ((session.track ?? "").trim() ? L.trackSize * 1.5 : 0) +
         agendaTextLines(session.title, L.titleRowSize, w) * L.titleRowSize * 1.5 +
+        // A room line prints as its own small caps line under the title, so it is
+        // measured as one, and never squeezes the speaker notes out of the band.
+        (agendaSessionRoom(session)
+          ? agendaTextLines(agendaSessionRoom(session), L.detailSize, w) * L.detailSize * 1.55 +
+            L.detailSize * 0.5
+          : 0) +
         agendaTextLines(session.detail, L.detailSize, w) * L.detailSize * 1.55 +
         // Each speaker/notes paragraph opens with its own lead on the live board,
         // so a four-name panel list costs four leads, not one.
         agendaParagraphCount(session.detail) * L.detailSize * 0.6;
+
       // Every parallel card is measured on its own column width; the band takes
       // the tallest of them so no track is clipped.
       const ct = agendaCardType(

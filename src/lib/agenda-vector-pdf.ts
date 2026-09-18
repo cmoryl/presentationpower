@@ -55,6 +55,9 @@ import {
   agendaCardType,
   agendaLongestWord,
   agendaParallels,
+  agendaSessionIcon,
+  agendaSessionRoom,
+
   agendaQrBackground,
   agendaQrForeground,
   agendaQrStyle,
@@ -757,6 +760,18 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             color: bandInk,
           });
         }
+        // Optional per-row mark, under the time in the time column.
+        const rowMark = agendaSessionIcon(row.session);
+        if (rowMark) {
+          const markH = mm(L.timeSize) * row.fit * 0.9;
+          page.drawSvgPath(rowMark.path, {
+            x: px(band.x) + padX,
+            y: y - mm(L.timeSize) * row.fit * 1.45,
+            scale: markH / rowMark.vh,
+            color: bandInk,
+            borderWidth: 0,
+          });
+        }
         if (row.session.track.trim()) {
           const size = mm(L.trackSize) * row.fit;
           page.drawText(row.session.track.toUpperCase(), {
@@ -776,6 +791,17 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             y -= size * 1.5;
           }
         }
+        // Room / floor line, printed in caps above the speaker notes.
+        const roomLine = agendaSessionRoom(row.session);
+        if (roomLine) {
+          const size = mm(L.detailSize) * row.fit;
+          y -= size * 0.5;
+          for (const line of wrapLines(bold, roomLine.toUpperCase(), size, bodyW)) {
+            page.drawText(line, { x: bodyX, y: y - size, size, font: bold, color: bandInk });
+            y -= size * 1.55;
+          }
+        }
+
         if (row.session.detail.trim()) {
           const size = mm(L.detailSize) * row.fit;
           y -= size * 0.5;
@@ -934,6 +960,31 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
         });
         y -= size * 1.12;
       }
+      const ruledRoom = agendaSessionRoom(row.session);
+      if (ruledRoom) {
+        const size = mm(L.detailSize);
+        page.drawText(fit(bold, ruledRoom.toUpperCase(), size, bodyW), {
+          x: px(blocks.x) + timeW,
+          y: y - size * 0.9,
+          size,
+          font: bold,
+          color: rgb(...hexRgb(ink)),
+          opacity: 0.9 * alpha,
+        });
+        y -= size * 1.35;
+      }
+      const ruledMark = agendaSessionIcon(row.session);
+      if (ruledMark) {
+        const markH = mm(L.timeSize) * 0.85;
+        page.drawSvgPath(ruledMark.path, {
+          x: px(blocks.x),
+          y: top - pad - mm(L.timeSize) * 1.25,
+          scale: markH / ruledMark.vh,
+          color: rgb(...hexRgb(row.session.muted ? ink : titleInk)),
+          borderWidth: 0,
+        });
+      }
+
       if (row.session.detail.trim()) {
         const size = mm(L.detailSize);
         page.drawText(fit(regular, row.session.detail, size, bodyW), {
