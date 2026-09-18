@@ -55,6 +55,8 @@ const SLOT_LABELS: Record<VenueTemplateSlot, string> = {
 
 const GROUND_LABELS: Record<string, string> = {
   "house-gradient": "House gradient",
+  "desk-gradient": "Front-of-house desk ramp",
+  "brew-gradient": "NEXTbrew ramp",
   "division-gradient": "Division gradient",
   "repeat-white": "Press-wall white",
   supplied: "Supplied artwork",
