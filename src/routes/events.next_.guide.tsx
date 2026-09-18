@@ -30,6 +30,7 @@ import { Button, Input, Textarea } from "@/design-system/element";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { NEXT_EVENT } from "@/lib/next-event";
 import {
+  GUIDE_ARTWORK_NOTE,
   GUIDE_BLOCK_LABELS,
   GUIDE_SIZES,
   guideDefault,
