@@ -347,7 +347,8 @@ export async function buildAgendaDocx(
     fill: string,
   ): Promise<ArrayBuffer> => {
     const scale = 96 / Math.max(mark.icon.vw, mark.icon.vh);
-    const canvas = document.createElement("canvas");
+    // `document` is shadowed by the built WordprocessingML string below.
+    const canvas = globalThis.document.createElement("canvas");
     canvas.width = Math.max(8, Math.round(mark.icon.vw * scale));
     canvas.height = Math.max(8, Math.round(mark.icon.vh * scale));
     const ctx = canvas.getContext("2d");
@@ -357,7 +358,8 @@ export async function buildAgendaDocx(
     ctx.fill(new Path2D(mark.icon.path));
     const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob(
-        (b) => (b ? resolve(b) : reject(new Error("Could not rasterize an agenda row mark"))),
+        (b: Blob | null) =>
+          b ? resolve(b) : reject(new Error("Could not rasterize an agenda row mark")),
         "image/png",
       );
     });
