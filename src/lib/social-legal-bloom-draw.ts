@@ -513,7 +513,7 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
   const bodyLines = L.hideSupport
     ? []
     : wrapBody(ctx, scene.support, supportPx, Math.min(copyW, supportPx * 24));
-  const gap = short * 0.026;
+  const gap = bodyLines.length ? short * 0.026 : 0;
   const bodyH = bodyLines.length * supportPx * 1.42;
   const blockH = head.height + gap + bodyH;
   const top = copyY + Math.max(0, (copyH - blockH) / 2);
