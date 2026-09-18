@@ -73,6 +73,12 @@ import {
   AGENDA_SPEC,
   AGENDA_STYLE_IDS,
   AGENDA_TEXT_COLORS,
+  AGENDA_TYPE_SCALE,
+  AGENDA_TYPE_WEIGHTS,
+  AGENDA_DAY_LAYOUTS,
+  agendaDayLayout,
+  agendaTypeScale,
+  type AgendaTypeWeightId,
   addAgendaDay,
   agendaCapacity,
   agendaDays,
@@ -1343,6 +1349,92 @@ export function AgendaStudio({
 
           </div>
           </>
+          ) : null}
+
+          {step === 1 ? (
+          <div className="space-y-3 border-t border-border pt-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              Programme type
+            </p>
+            <p className="text-xs text-muted-foreground">
+              The board fits the programme automatically. These settings size the copy against that
+              fit, so the proportions hold at every format — the fit report still says honestly what
+              will print.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {([
+                { key: "titleScale", label: "Headline size" },
+                { key: "rowScale", label: "Session title size" },
+                { key: "timeScale", label: "Time size" },
+                { key: "detailScale", label: "Speaker / notes size" },
+              ] as const).map((f) => (
+                <div key={f.key} className="space-y-2">
+                  <Label htmlFor={`agenda-${f.key}`}>{f.label}</Label>
+                  <input
+                    id={`agenda-${f.key}`}
+                    type="range"
+                    className="w-full"
+                    min={AGENDA_TYPE_SCALE.min}
+                    max={AGENDA_TYPE_SCALE.max}
+                    step={AGENDA_TYPE_SCALE.step}
+                    value={agendaTypeScale(config[f.key])}
+                    onChange={(e) => set(f.key, Number(e.target.value))}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {Math.round(agendaTypeScale(config[f.key]) * 100)}% of the fitted size
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {([
+                { key: "titleWeight", label: "Headline weight" },
+                { key: "rowWeight", label: "Session title weight" },
+                { key: "timeWeight", label: "Time weight" },
+              ] as const).map((f) => (
+                <div key={f.key} className="space-y-2">
+                  <Label htmlFor={`agenda-${f.key}`}>{f.label}</Label>
+                  <select
+                    id={`agenda-${f.key}`}
+                    className={selectClass}
+                    value={config[f.key] ?? "bold"}
+                    onChange={(e) => set(f.key, e.target.value as AgendaTypeWeightId)}
+                  >
+                    {AGENDA_TYPE_WEIGHTS.map((w) => (
+                      <option key={w.id} value={w.id}>
+                        {w.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              The press file carries two cut faces, so Medium and Bold both print Bold.
+            </p>
+            {agendaDays(config).length > 1 ? (
+              <div className="space-y-2">
+                <Label htmlFor="agenda-day-layout">Programme days</Label>
+                <select
+                  id="agenda-day-layout"
+                  className={selectClass}
+                  value={agendaDayLayout(config)}
+                  onChange={(e) =>
+                    set("dayLayout", e.target.value === "one-sheet" ? "one-sheet" : "pages")
+                  }
+                >
+                  {AGENDA_DAY_LAYOUTS.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground">
+                  {AGENDA_DAY_LAYOUTS.find((d) => d.id === agendaDayLayout(config))?.note}
+                </p>
+              </div>
+            ) : null}
+          </div>
           ) : null}
 
           {step === 0 ? (

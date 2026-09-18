@@ -14,7 +14,6 @@
 
 import { LONDON_2026_PROGRAMMES } from "./next-agenda-london-2026";
 import { LONDON_STYLES } from "@/lib/next-london-signage";
-import { NEXT_DIVISIONS } from "@/lib/next-event";
 import {
   CITY_BADGE_DIVISIONS,
   cityBadgeDivision,
@@ -251,11 +250,15 @@ function tint(hex: string, amount: number): string {
     .join("")}`.toUpperCase();
 }
 
-/** Approved division accent for the NEXT event programme, or null when the
- *  division has none (City Series keeps the standard gradient). */
-export function agendaDivisionAccent(divisionId: string | undefined): string | null {
-  return NEXT_DIVISIONS.find((d) => d.id === divisionId)?.accent ?? null;
+/**
+ * Retired August 2026: division accent grounds are no longer used. Every
+ * division agenda prints on the approved enterprise ramp, so this always
+ * resolves to null and the ground is identical across the programme.
+ */
+export function agendaDivisionAccent(_divisionId: string | undefined): string | null {
+  return null;
 }
+
 
 /**
  * Gradient stops for an agenda ground. When the division carries an approved
@@ -1056,6 +1059,67 @@ export type AgendaDay = {
   sessions: AgendaSession[];
 };
 
+// ── manual type sizing ───────────────────────────────────────────────────────
+//
+// The board fits its programme automatically. These settings ride on top of the
+// fitted sizes as multipliers, so a size change keeps every proportion and the
+// fit report still tells the truth about what will print.
+
+export type AgendaTypeWeightId = "regular" | "medium" | "bold";
+
+export const AGENDA_TYPE_WEIGHTS: { id: AgendaTypeWeightId; name: string; css: number }[] = [
+  { id: "regular", name: "Regular", css: 400 },
+  { id: "medium", name: "Medium", css: 600 },
+  { id: "bold", name: "Bold", css: 700 },
+];
+
+export const AGENDA_TYPE_SCALE = { min: 0.7, max: 1.5, step: 0.05 };
+
+export function agendaTypeScale(value: unknown): number {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return 1;
+  return Math.min(AGENDA_TYPE_SCALE.max, Math.max(AGENDA_TYPE_SCALE.min, n));
+}
+
+function typeWeight(id: unknown, fallback: AgendaTypeWeightId): AgendaTypeWeightId {
+  return AGENDA_TYPE_WEIGHTS.some((w) => w.id === id) ? (id as AgendaTypeWeightId) : fallback;
+}
+
+/** CSS weight numbers for the headline, session titles and times. */
+export function agendaTypeWeights(config: {
+  titleWeight?: AgendaTypeWeightId;
+  rowWeight?: AgendaTypeWeightId;
+  timeWeight?: AgendaTypeWeightId;
+}): { title: number; row: number; time: number } {
+  const css = (id: AgendaTypeWeightId) =>
+    AGENDA_TYPE_WEIGHTS.find((w) => w.id === id)?.css ?? 700;
+  return {
+    title: css(typeWeight(config.titleWeight, "bold")),
+    row: css(typeWeight(config.rowWeight, "bold")),
+    time: css(typeWeight(config.timeWeight, "bold")),
+  };
+}
+
+/** How a multi-day programme prints: a page per day, or every day on one sheet. */
+export type AgendaDayLayoutId = "pages" | "one-sheet";
+
+export const AGENDA_DAY_LAYOUTS: { id: AgendaDayLayoutId; name: string; note: string }[] = [
+  {
+    id: "pages",
+    name: "A page per day",
+    note: "Each programme day prints on its own sheet, continuing onto further pages when a day is long.",
+  },
+  {
+    id: "one-sheet",
+    name: "All days on one sheet",
+    note: "Every day on a single board, each opening with its own date band. The rows tighten to fit — the fit report flags a board that will not hold.",
+  },
+];
+
+export function agendaDayLayout(config: { dayLayout?: string }): AgendaDayLayoutId {
+  return config.dayLayout === "one-sheet" ? "one-sheet" : "pages";
+}
+
 export type AgendaConfig = {
   divisionId: string;
   face: AgendaFaceId;
@@ -1144,6 +1208,19 @@ export type AgendaConfig = {
   rowsPerPage?: number;
   /** Derived page stamp, e.g. "DAY ONE · PAGE 2 OF 3". Set by `agendaPages`. */
   pageLabel?: string;
+  /** Headline / eyebrow / date-line size against the fitted default. 1 = fitted. */
+  titleScale?: number;
+  /** Session title, notes and track size against the fitted default. */
+  rowScale?: number;
+  /** Time column size against the fitted default. */
+  timeScale?: number;
+  /** Speaker / notes line size against the fitted default. */
+  detailScale?: number;
+  titleWeight?: AgendaTypeWeightId;
+  rowWeight?: AgendaTypeWeightId;
+  timeWeight?: AgendaTypeWeightId;
+  /** How a multi-day programme prints. */
+  dayLayout?: AgendaDayLayoutId;
 };
 
 /** Row helper: keeps the issued programmes readable. */
@@ -1334,6 +1411,14 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
     qrOffsetY: null,
     eventLabel: "",
     days: programme.days?.map((d) => ({ ...d, sessions: d.sessions.map((s) => ({ ...s })) })),
+    titleScale: 1,
+    rowScale: 1,
+    timeScale: 1,
+    detailScale: 1,
+    titleWeight: "bold",
+    rowWeight: "bold",
+    timeWeight: "bold",
+    dayLayout: (programme.days?.length ?? 0) > 1 ? "one-sheet" : "pages",
   };
 }
 
@@ -1548,9 +1633,14 @@ export function agendaLayout(config: AgendaConfig) {
 
   const card = agendaRowStyle(config) === "card";
 
-  const eyebrowSize = 5.4 * k;
-  const titleSize = 22 * k;
-  const metaSize = card ? 4.6 * k : 6.4 * k;
+  // Manual type settings ride on the fitted sizes as multipliers.
+  const tS = agendaTypeScale(config.titleScale);
+  const rS = agendaTypeScale(config.rowScale);
+  const tmS = agendaTypeScale(config.timeScale);
+  const dS = agendaTypeScale(config.detailScale);
+  const eyebrowSize = 5.4 * k * tS;
+  const titleSize = 22 * k * tS;
+  const metaSize = (card ? 4.6 * k : 6.4 * k) * tS;
   const footSize = 4.4 * k;
   const qrEdge = Math.min(agendaQrSize(config), contentW * 0.35);
   // Programme look: the room / floor line sits beside the lockup with a pin, the
@@ -1590,10 +1680,10 @@ export function agendaLayout(config: AgendaConfig) {
   const listBottom = geo.trimH - (card ? 0 : geo.safeInset) - footBlock;
   const listH = Math.max(20, listBottom - listTop);
   const rowH = listH / rows;
-  const timeSize = card ? 4.6 * k : Math.min(rowH * 0.3, 7.6 * k);
-  const titleRowSize = card ? 5.0 * k : Math.min(rowH * 0.34, 8.4 * k);
-  const detailSize = card ? 4.3 * k : Math.min(rowH * 0.24, 5.6 * k);
-  const trackSize = card ? 4.3 * k : Math.max(2.6, Math.min(rowH * 0.18, 4.2 * k));
+  const timeSize = (card ? 4.6 * k : Math.min(rowH * 0.3, 7.6 * k)) * tmS;
+  const titleRowSize = (card ? 5.0 * k : Math.min(rowH * 0.34, 8.4 * k)) * rS;
+  const detailSize = (card ? 4.3 * k : Math.min(rowH * 0.24, 5.6 * k)) * dS;
+  const trackSize = (card ? 4.3 * k : Math.max(2.6, Math.min(rowH * 0.18, 4.2 * k))) * rS;
   return {
     geo,
     k,
@@ -1621,6 +1711,8 @@ export function agendaLayout(config: AgendaConfig) {
     titleRowSize,
     detailSize,
     trackSize,
+    /** CSS weight numbers for the headline, session titles and times. */
+    weights: agendaTypeWeights(config),
     /** Time column width, measured from the left safe edge. */
     timeColW: contentW * (card ? 0.21 : 0.17),
     /** Track chip column width on the right. */
@@ -1869,6 +1961,14 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
           })
         : undefined,
     rowsPerPage: Math.max(0, Math.min(40, Math.round(num(raw.rowsPerPage, 0)))),
+    titleScale: agendaTypeScale(raw.titleScale),
+    rowScale: agendaTypeScale(raw.rowScale),
+    timeScale: agendaTypeScale(raw.timeScale),
+    detailScale: agendaTypeScale(raw.detailScale),
+    titleWeight: typeWeight(raw.titleWeight, base.titleWeight ?? "bold"),
+    rowWeight: typeWeight(raw.rowWeight, base.rowWeight ?? "bold"),
+    timeWeight: typeWeight(raw.timeWeight, base.timeWeight ?? "bold"),
+    dayLayout: raw.dayLayout === "one-sheet" ? "one-sheet" : raw.dayLayout === "pages" ? "pages" : base.dayLayout,
   };
 }
 
@@ -2321,6 +2421,65 @@ export function agendaPages(config: AgendaConfig): AgendaPage[] {
   const days = agendaDays(config);
   const perPage = agendaRowsPerPage(config);
   const multiDay = days.length > 1;
+
+  // Every day on one board: each day opens with its own date band and the rows
+  // that follow belong to it. The rows tighten to the sheet; the fit report is
+  // what says honestly whether the board will hold them.
+  if (multiDay && agendaDayLayout(config) === "one-sheet") {
+    const rows: AgendaSession[] = [];
+    days.forEach((day) => {
+      const head = (day.label || "").trim() || (day.meta || "").trim();
+      if (head) {
+        rows.push({
+          time: "",
+          title: head,
+          detail: (day.label || "").trim() ? (day.meta || "").trim() : "",
+          track: "",
+          muted: true,
+        });
+      }
+      rows.push(...(day.sessions ?? []));
+    });
+    const first = days[0]!;
+    const merged: AgendaConfig = {
+      ...config,
+      days: undefined,
+      rowsPerPage: 0,
+      title: (config.title ?? "").trim() || (first.label ?? ""),
+      meta: config.meta ?? first.meta ?? "",
+      sessions: rows,
+      pageLabel: "",
+    };
+    // One sheet only when the board can actually hold every day at a legible
+    // row height. A smaller format falls back to a page per day rather than
+    // printing a programme squeezed past its floor.
+    // Honest gate: measure what this merged programme actually needs — each
+    // band at its own copy height plus the gaps — against the band the board
+    // gives. One sheet engages only when it truly holds; otherwise the board
+    // falls back to a page per day rather than printing past the safe edge.
+    // Honest gate: the rows compress to their legible floor, so one sheet
+    // engages when every band still clears that floor inside the board's list
+    // area at the height its copy needs. Anything tighter falls back to a page
+    // per day rather than printing a programme past the safe edge.
+    const probe = agendaBlocks(merged);
+    const last = probe.rows[probe.rows.length - 1];
+    const bottom = last ? last.y + (last.band?.h ?? last.h) : probe.rowsTop;
+    if (bottom <= probe.listBottom + 0.5) {
+    return [
+      {
+        config: merged,
+        dayIndex: 0,
+        dayCount: days.length,
+        dayLabel: days.map((d) => (d.label || d.meta || "").trim()).filter(Boolean).join(" · "),
+        pageInDay: 0,
+        pagesInDay: 1,
+        index: 0,
+        total: 1,
+        label: `All ${days.length} days · one sheet`,
+      },
+    ];
+    }
+  }
 
   const chunks: {
     dayIndex: number;

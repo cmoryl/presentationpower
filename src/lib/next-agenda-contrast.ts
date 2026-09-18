@@ -45,12 +45,13 @@ export const AGENDA_GUARD_GAPS: string[] = [
   // violet through the copy region and no longer clears the floor in the dark
   // face, while the Churchill glass ramp (prism sweep) sits light enough that
   // it does. Both changes come from the delivered artwork, not a preference.
+  // The repeat wash left this list when division accent tints were retired:
+  // every board now prints on the approved enterprise ramp, which reads.
   "01-beam-violet-aqua/dark",
   "03-wash-diagonal/dark",
   "05-bloom-corner/dark",
   "08-chevron-sweep/dark",
   "11-brew-diagonal/dark",
-  "12-repeat-wash/dark",
 ];
 
 /** Key used against AGENDA_GUARD_GAPS. */

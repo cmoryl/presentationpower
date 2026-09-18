@@ -62,6 +62,7 @@ import {
   agendaPages,
   agendaStops,
   agendaTitleInk,
+  agendaTypeWeights,
   AGENDA_BAND,
   agendaBandComposite,
   agendaBandPalette,
@@ -334,6 +335,14 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
   const regular =
     (await ttf(doc, "/fonts/Geist-Regular.ttf")) ?? doc.embedStandardFont(StandardFonts.Helvetica);
 
+  // Manual weight settings: the file carries two cut faces, so Medium and Bold
+  // both print Bold and Regular prints Regular — the press file never fakes a
+  // weight the typeface does not supply.
+  const weightPick = agendaTypeWeights(config);
+  const titleFont = weightPick.title >= 600 ? bold : regular;
+  const rowFont = weightPick.row >= 600 ? bold : regular;
+  const timeFont = weightPick.time >= 600 ? bold : regular;
+
   const names: AgendaLayerName[] = [
     "01 Ground",
     "02 Lockup",
@@ -505,11 +514,11 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
     }
     if ((cfg.title ?? "").trim()) {
       const size = mm(L.titleSize);
-      page.drawText(fit(bold, cfg.title, size, mm(blocks.headW)), {
+      page.drawText(fit(titleFont, cfg.title, size, mm(blocks.headW)), {
         x: px(blocks.x),
         y: py(blocks.titleY) - size * 0.86,
         size,
-        font: bold,
+        font: titleFont,
         color: rgb(...hexRgb(titleInk)),
       });
     }
@@ -697,11 +706,11 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
         let y = py(band.y) - padY;
         if (row.session.time.trim()) {
           const size = mm(L.timeSize);
-          page.drawText(fit(regular, row.session.time, size, timeW), {
+          page.drawText(fit(timeFont, row.session.time, size, timeW), {
             x: px(band.x) + padX,
             y: y - size,
             size,
-            font: regular,
+            font: timeFont,
             color: bandInk,
           });
         }
@@ -718,7 +727,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
         }
         if (row.session.title.trim()) {
           const size = mm(L.titleRowSize);
-          const font = row.session.muted ? regular : bold;
+          const font = row.session.muted ? regular : rowFont;
           for (const line of wrapLines(font, row.session.title, size, bodyW)) {
             page.drawText(line, { x: bodyX, y: y - size, size, font, color: bandInk });
             y -= size * 1.5;
@@ -838,11 +847,11 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       const alpha = row.session.muted ? 0.72 : 1;
       if (row.session.time.trim()) {
         const size = mm(L.timeSize);
-        page.drawText(fit(bold, row.session.time, size, timeW), {
+        page.drawText(fit(timeFont, row.session.time, size, timeW), {
           x: px(blocks.x),
           y: top - pad - size * 0.86,
           size,
-          font: bold,
+          font: timeFont,
           color: rgb(...hexRgb(row.session.muted ? ink : titleInk)),
           opacity: alpha,
         });
@@ -850,7 +859,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       let y = top - pad;
       if (row.session.title.trim()) {
         const size = mm(L.titleRowSize);
-        const font = row.session.muted ? regular : bold;
+        const font = row.session.muted ? regular : rowFont;
         page.drawText(fit(font, row.session.title, size, bodyW), {
           x: px(blocks.x) + timeW,
           y: y - size * 0.86,
