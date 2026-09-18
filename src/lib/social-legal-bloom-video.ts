@@ -50,12 +50,26 @@ export type RecordOptions = {
 export function recordBloomClip(o: RecordOptions): Promise<Blob> {
   const { canvas, draw, seconds, fps, bitsPerSecond, format } = o;
   return new Promise((resolve, reject) => {
+    // Frames are pushed by hand (captureStream(0) + requestFrame) so a clip does
+    // not depend on the browser compositing a canvas that is kept out of sight.
     let stream: MediaStream;
+    let pushFrame: (() => void) | null = null;
     try {
-      stream = canvas.captureStream(fps);
+      stream = canvas.captureStream(0);
+      const track = stream.getVideoTracks()[0] as (MediaStreamTrack & { requestFrame?: () => void }) | undefined;
+      if (track && typeof track.requestFrame === "function") {
+        pushFrame = () => track.requestFrame!();
+      } else {
+        stream.getTracks().forEach((t) => t.stop());
+        stream = canvas.captureStream(fps);
+      }
     } catch {
-      reject(new Error("This browser will not record from a canvas."));
-      return;
+      try {
+        stream = canvas.captureStream(fps);
+      } catch {
+        reject(new Error("This browser will not record from a canvas."));
+        return;
+      }
     }
     let recorder: MediaRecorder;
     try {
@@ -82,12 +96,14 @@ export function recordBloomClip(o: RecordOptions): Promise<Blob> {
     };
 
     draw(0);
+    pushFrame?.();
     recorder.start(200);
     const started = performance.now();
     const step = () => {
       const t = (performance.now() - started) / 1000;
       if (t >= seconds) {
         draw(seconds);
+        pushFrame?.();
         o.onProgress?.(1);
         // one last frame has to reach the stream before the recorder closes
         setTimeout(() => {
@@ -96,6 +112,7 @@ export function recordBloomClip(o: RecordOptions): Promise<Blob> {
         return;
       }
       draw(t);
+      pushFrame?.();
       o.onProgress?.(t / seconds);
       requestAnimationFrame(step);
     };
