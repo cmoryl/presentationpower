@@ -1902,15 +1902,56 @@ export function agendaCardType(
  * Lines a run of copy takes at a printed size inside a column. Cap-height mm to
  * average glyph advance is ~0.55, which matched the issued boards when the row
  * bands were measured against the approved Canva programme.
+ *
+ * The wrap is solved greedily, word by word, exactly as the browser and the
+ * press renderer break a paragraph. Dividing the character count by the column
+ * width undercounted every run with long words in it — a speaker list or a
+ * seven-word session title measured a line short, so the band was built too
+ * shallow and the copy printed past its frame (the bands clip, so it vanished).
+ * A word wider than the column breaks mid-glyph, which both renderers also do.
  */
 export function agendaTextLines(text: string, sizeMm: number, colW: number): number {
   const clean = (text ?? "").trim();
   if (!clean) return 0;
-  const perLine = Math.max(8, Math.floor(colW / (sizeMm * 0.55)));
-  return clean
-    .split("\n")
-    .reduce((sum, para) => sum + Math.max(1, Math.ceil(para.trim().length / perLine)), 0);
+  const perLine = Math.max(8, colW / (sizeMm * 0.55));
+  let total = 0;
+  for (const para of clean.split("\n")) {
+    const words = para.trim().split(/\s+/).filter(Boolean);
+    if (!words.length) continue;
+    let lines = 1;
+    let used = 0;
+    for (const word of words) {
+      const w = word.length;
+      if (w > perLine) {
+        if (used > 0) {
+          lines += 1;
+          used = 0;
+        }
+        const spans = Math.ceil(w / perLine);
+        lines += spans - 1;
+        used = w - (spans - 1) * perLine;
+        continue;
+      }
+      const next = used === 0 ? w : used + 1 + w;
+      if (next > perLine) {
+        lines += 1;
+        used = w;
+      } else {
+        used = next;
+      }
+    }
+    total += lines;
+  }
+  return total;
 }
+
+/** Paragraphs a run of copy prints as; each takes its own lead on the board. */
+export function agendaParagraphCount(text: string): number {
+  return (text ?? "")
+    .split("\n")
+    .filter((line) => line.trim()).length;
+}
+
 
 // ── naming + persistence ─────────────────────────────────────────────────────
 
