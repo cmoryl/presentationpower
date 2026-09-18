@@ -792,6 +792,14 @@ function effectShapeFor(
   };
 }
 
+/** A measured box in stage px, used for mask containment checks. */
+interface ClipBox {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 export interface DecomposeOptions {
   /**
    * Measurement space in stage px. Defaults to the 1920x1080 deck stage; print
