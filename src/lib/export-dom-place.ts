@@ -111,9 +111,15 @@ export function placeDomShapes(
         frame.exact || s.fit === "contain" || s.fit === "fill"
           ? ""
           : coverCropTag(ratio, frame.w, frame.h);
+      // A masked picture keeps its rectangle's crop but takes a custom outline,
+      // which is exactly PowerPoint's own "Crop to Shape" — so the rounded-corner
+      // tag would fight it and is skipped.
+      const clip = s.clip && s.clip.length >= 2 ? clipGeomTag(s.clip) : null;
       const round =
-        s.radiusPx >= 1 ? `${roundPicTag(rectRadiusAdj(radiusIn, frame.w, frame.h))} ` : "";
-      const tag = `${crop ? `${crop} ` : ""}${round}`;
+        !clip && s.radiusPx >= 1
+          ? `${roundPicTag(rectRadiusAdj(radiusIn, frame.w, frame.h))} `
+          : "";
+      const tag = `${crop ? `${crop} ` : ""}${round}${clip ? `${clip} ` : ""}`;
       const common: Record<string, unknown> = {
         x: frame.x,
         y: frame.y,

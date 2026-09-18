@@ -36,6 +36,7 @@ import {
 } from "./export-surface";
 import { withGroups } from "./pptx-group-xml";
 import { withCroppedPictures, withRoundedPictures } from "./pptx-shape-normalize";
+import { withCustomGeometry } from "./pptx-clip-geom";
 import { withExplicitInsets } from "./pptx-body-insets";
 import { withParagraphOrder } from "./pptx-para-order";
 
