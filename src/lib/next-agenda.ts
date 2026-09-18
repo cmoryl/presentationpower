@@ -1360,6 +1360,18 @@ export function agendaProgrammeIsStock(config: {
   return same(config.sessions, programme.sessions);
 }
 
+/** Housekeeping rows shared by every programme ever issued. */
+const GENERIC_ROW_TITLES = new Set([
+  "break",
+  "lunch",
+  "lunch & networking",
+  "registration",
+  "registration & networking",
+  "doors open, coffee & networking",
+  "networking",
+]);
+
+
 /**
  * True when a saved board was built before the division's current approved
  * programme was issued, so it cannot be an edit of it.
