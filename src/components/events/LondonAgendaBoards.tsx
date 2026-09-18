@@ -59,7 +59,7 @@ function AgendaCard({
       </div>
       <div className="flex flex-1 flex-col p-4">
         <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">
-          {saved ? "Live board" : "Editable master"}
+          {live ? "Live board" : "Editable master"}
         </p>
         <h3 className="mt-1 text-sm font-semibold text-[#03002C]">{name}</h3>
         <p className="mt-1.5 text-[12.5px] leading-relaxed text-[#03002C]/65">
@@ -78,10 +78,10 @@ function AgendaCard({
         ) : null}
         <Link
           to="/events/next/agendas"
-          search={{ division: id, file: saved?.id }}
+          search={{ division: id, file: live?.id }}
           className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[#003FC7] hover:underline"
         >
-          <CalendarDays size={13} /> {saved ? "Edit this agenda" : "Create this agenda"}
+          <CalendarDays size={13} /> {live ? "Edit this agenda" : "Create this agenda"}
         </Link>
       </div>
     </article>
