@@ -587,6 +587,48 @@ export function AgendaSheet({
               );
             })}
           </div>
+        ) : row.session.dayBreak ? (
+          // Rule-style board: the day heading takes a solid Blue 500 bar too.
+          <div
+            key={i}
+            style={{
+              ...at(blocks.x, row.y),
+              width: mm(blocks.contentW),
+              height: mm(row.h),
+              background: "#003FC7",
+              color: "#FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              gap: mm(4),
+              padding: `0 ${mm(4)}px`,
+              boxSizing: "border-box",
+            }}
+          >
+            <div
+              style={{
+                fontSize: mm(L.titleRowSize * 1.05),
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {T(row.session.title, (v) => edit?.onSession(i, { title: v }))}
+            </div>
+            {row.session.detail.trim() ? (
+              <div
+                style={{
+                  fontSize: mm(L.detailSize),
+                  fontWeight: 500,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {T(row.session.detail, (v) => edit?.onSession(i, { detail: v }))}
+              </div>
+            ) : null}
+          </div>
         ) : (
           <div
             key={i}
@@ -601,6 +643,7 @@ export function AgendaSheet({
               opacity: row.session.muted ? 0.7 : 1,
             }}
           >
+
             <div
               style={{
                 width: mm(L.timeColW),
