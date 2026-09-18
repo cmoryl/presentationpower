@@ -109,15 +109,6 @@ type Placed = {
   size: number;
 };
 
-function focusFractions(focus: string): { fx: number; fy: number } {
-  const parts = focus.split(/\s+/);
-  const num = (s: string | undefined, fallback: number) => {
-    const v = Number.parseFloat(s ?? "");
-    return Number.isFinite(v) ? Math.min(1, Math.max(0, v / 100)) : fallback;
-  };
-  return { fx: num(parts[0], 0.5), fy: num(parts[1], 0.5) };
-}
-
 /**
  * Lay the headline out word by word: the roman words at the base size, the
  * accent word larger and italic, wrapped to the copy column.
