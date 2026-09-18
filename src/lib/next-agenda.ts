@@ -2455,7 +2455,11 @@ export function agendaBlocks(config: AgendaConfig) {
     });
     for (let pass = 0; pass < wanted.length + 1 && free.length > 0; pass += 1) {
       const freeTotal = free.reduce((a, i) => a + wanted[i]!, 0) || 1;
-      const scale = Math.max(0, budget) / freeTotal;
+      // Spare height is only ever shared out so far. A short programme used to
+      // take every millimetre going, so a two-line session printed as a band
+      // three times the height of its copy with a cavern under it. Past the cap
+      // the air goes between the bands instead, which is where it reads.
+      const scale = Math.min(AGENDA_MAX_BAND_STRETCH, Math.max(0, budget) / freeTotal);
       const pinned = free.filter((i) => wanted[i]! * scale < floorH);
       if (pinned.length === 0) {
         for (const i of free) heights[i] = wanted[i]! * scale;
@@ -2474,11 +2478,21 @@ export function agendaBlocks(config: AgendaConfig) {
     }
     for (const i of free) heights[i] = floorH;
 
+    // Whatever the bands did not take is shared between them as extra gap, up to
+    // twice the board's own gap; anything past that stays as honest slack at the
+    // foot rather than stretching the programme out of its rhythm.
+    const takenH = heights.reduce((a, h) => a + h, 0);
+    const spare = Math.max(0, available - takenH);
+    const gapExtra =
+      heights.length > 1 ? Math.min(spare / (heights.length - 1), L.bandGap * 2) : 0;
+    const rowGap = L.bandGap + gapExtra;
+
     let cursor = rowsTop;
     rows = config.sessions.map((session, i) => {
       const h = heights[i]!;
       const y = cursor;
-      cursor += h + L.bandGap;
+      cursor += h + rowGap;
+
       const pars = agendaParallels(session);
       const split = agendaSplitWidths(L.bandW, L.bandGap, pars.length);
       const bx = x + L.bandInset;
