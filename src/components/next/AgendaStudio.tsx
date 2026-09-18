@@ -630,6 +630,23 @@ export function AgendaStudio({
           <span className="text-xs text-muted-foreground">
             {pages.length} printed page{pages.length === 1 ? "" : "s"} · previewing {page.label}
           </span>
+          {agendaDays(config).length > 1 ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const next = agendaDayLayout(config) === "one-sheet" ? "pages" : "one-sheet";
+                set("dayLayout", next);
+                setActivePage(0);
+                setActiveDay(0);
+              }}
+            >
+              {agendaDayLayout(config) === "one-sheet"
+                ? "Split into a sheet per day"
+                : "Put every day on one sheet"}
+            </Button>
+          ) : null}
+
           {pages.length > 1
             ? pages.map((p, i) => (
                 <button
