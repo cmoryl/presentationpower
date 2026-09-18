@@ -657,7 +657,9 @@ function BloomView() {
               </p>
             ) : null}
           </div>
-          {/* the off-screen canvas the pack's clips are recorded from */}
+          {/* the canvas the pack's clips are recorded from — kept a single pixel
+              in the corner, but painted, because a canvas the browser never
+              composites hands the recorder no frames */}
           <canvas
             ref={recordRef}
             aria-hidden
@@ -666,13 +668,14 @@ function BloomView() {
               position: "fixed",
               top: 0,
               left: 0,
-              width: 1,
-              height: 1,
-              opacity: 0,
+              width: 2,
+              height: 2,
+              opacity: 0.01,
               pointerEvents: "none",
-              zIndex: -1,
+              zIndex: 0,
             }}
           />
+
         </div>
       </header>
 
