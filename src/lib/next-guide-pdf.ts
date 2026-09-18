@@ -196,7 +196,9 @@ function drawPage(
   config: GuideConfig,
   pageNo: number,
   notes: string[],
-) {
+  /** First unprinted entry, for continuation pages. */
+  start = 0,
+): number {
   const w = page.getWidth();
   const h = page.getHeight();
   page.drawRectangle({ x: 0, y: 0, width: w, height: h, color: hex(PAPER) });
@@ -224,13 +226,17 @@ function drawPage(
     flow.space(6);
   }
   if (title) {
-    flow.text(title, { size: w * 0.056, bold: true, leading: w * 0.062 });
+    flow.text(start > 0 ? `${title} (continued)` : title, {
+      size: w * 0.056,
+      bold: true,
+      leading: w * 0.062,
+    });
     flow.space(12);
     flow.rule();
   }
 
   let fitted = true;
-  const standfirst = "standfirst" in block ? block.standfirst : "";
+  const standfirst = start > 0 ? "" : "standfirst" in block ? block.standfirst : "";
   if (standfirst) {
     fitted = flow.text(standfirst, { size: w * 0.024, color: ACCENT, leading: w * 0.034 }) && fitted;
     flow.space(16);
@@ -264,21 +270,25 @@ function drawPage(
     }
     case "info":
     case "list": {
-      for (const it of block.items) {
-        if (flow.room < lead * 3) {
-          fitted = false;
-          break;
-        }
-        fitted = flow.text(it.label, { size: w * 0.026, bold: true }) && fitted;
-        flow.space(4);
-        fitted = flow.text(it.body, { size: body, leading: lead }) && fitted;
+      for (let i = start; i < block.items.length; i += 1) {
+        const it = block.items[i]!;
+        if (flow.room < lead * 3 && i > start) return i;
+        const ok =
+          flow.text(it.label, { size: w * 0.026, bold: true }) &&
+          (flow.space(4), flow.text(it.body, { size: body, leading: lead }));
         flow.space(16);
+        if (!ok) {
+          if (i > start) return i;
+          fitted = false;
+        }
       }
       break;
     }
     case "schedule": {
-      for (const day of block.days) {
+      for (let d = start; d < block.days.length; d += 1) {
+        const day = block.days[d]!;
         if (flow.room < lead * 4) {
+          if (d > start) return d;
           fitted = false;
           break;
         }
@@ -286,6 +296,7 @@ function drawPage(
         flow.space(8);
         for (const r of day.rows) {
           if (flow.room < lead * 1.4) {
+            if (d > start) return d;
             fitted = false;
             break;
           }
@@ -325,8 +336,10 @@ function drawPage(
       break;
     }
     case "floors": {
-      for (const floor of block.floors) {
+      for (let i = start; i < block.floors.length; i += 1) {
+        const floor = block.floors[i]!;
         if (flow.room < lead * 3) {
+          if (i > start) return i;
           fitted = false;
           break;
         }
@@ -338,6 +351,7 @@ function drawPage(
         flow.space(4);
         for (const line of floor.lines) {
           if (flow.room < lead * 1.2) {
+            if (i > start) return i;
             fitted = false;
             break;
           }
@@ -348,8 +362,10 @@ function drawPage(
       break;
     }
     case "links": {
-      for (const link of block.links) {
+      for (let i = start; i < block.links.length; i += 1) {
+        const link = block.links[i]!;
         if (flow.room < lead * 2.4) {
+          if (i > start) return i;
           fitted = false;
           break;
         }
@@ -375,6 +391,7 @@ function drawPage(
     font: fonts.bold,
     color: hex(ACCENT),
   });
+  return -1;
 }
 
 export async function buildGuidePdf(config: GuideConfig): Promise<GuidePdfResult> {
@@ -398,8 +415,20 @@ export async function buildGuidePdf(config: GuideConfig): Promise<GuidePdfResult
   for (const block of config.blocks) {
     const page = doc.addPage([widthPt, heightPt]);
     pageNo += 1;
-    if (block.kind === "cover") drawCover(page, { bold, regular }, block, config);
-    else drawPage(page, { bold, regular }, block, config, pageNo, notes);
+    if (block.kind === "cover") {
+      drawCover(page, { bold, regular }, block, config);
+      continue;
+    }
+    // A block longer than one page carries on over continuation pages rather
+    // than silently losing its tail.
+    let next = drawPage(page, { bold, regular }, block, config, pageNo, notes, 0);
+    let guard = 0;
+    while (next >= 0 && guard < 20) {
+      guard += 1;
+      const more = doc.addPage([widthPt, heightPt]);
+      pageNo += 1;
+      next = drawPage(more, { bold, regular }, block, config, pageNo, notes, next);
+    }
   }
   if (!pageNo) doc.addPage([widthPt, heightPt]);
 
