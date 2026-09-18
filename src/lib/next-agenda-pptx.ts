@@ -35,6 +35,9 @@ import {
   agendaQrStyle,
   agendaQrTransparent,
   agendaRowStyle,
+  agendaSessionMark,
+  agendaSessionRoom,
+
   agendaSlug,
   agendaTitleInk,
   type AgendaConfig,
@@ -424,6 +427,45 @@ export async function buildAgendaPptx(
         });
       const rail = (box: { x: number; y: number; w: number; h: number }, alpha: number, name: string) =>
         BAND.railW > 0 ? plate(box, BAND.rail, alpha, name) : undefined;
+      /**
+       * Per-row mark, drawn as native PowerPoint shape geometry (the approved
+       * preset, or the mark's own parts for a stepped glyph) so it stays vector
+       * and recolourable in the deck instead of arriving as a flat picture.
+       */
+      const rowMarkShape = (
+        mark: NonNullable<ReturnType<typeof agendaSessionMark>>,
+        left: number,
+        top: number,
+        h: number,
+        fallbackInk: string,
+        name: string,
+      ) => {
+        const color = hex(mark.hex ?? "", fallbackInk);
+        const w = (h * mark.icon.vw) / mark.icon.vh;
+        if (mark.icon.parts?.length) {
+          mark.icon.parts.forEach((part, pi) => {
+            s.addShape("rect" as never, {
+              x: inX(left + part.x * w),
+              y: inX(top + part.y * h),
+              w: inX(part.w * w),
+              h: inX(part.h * h),
+              fill: { color },
+              line: { type: "none" },
+              objectName: `${name} ${pi + 1}`,
+            });
+          });
+          return;
+        }
+        s.addShape(mark.icon.shape as never, {
+          x: inX(left),
+          y: inX(top),
+          w: inX(w),
+          h: inX(h),
+          fill: { color },
+          line: { type: "none" },
+          objectName: name,
+        });
+      };
       const bandText = (
         box: { x: number; y: number; w: number; h: number },
         session: {
@@ -432,12 +474,14 @@ export async function buildAgendaPptx(
           speaker?: string;
           detail?: string;
           track?: string;
+          room?: string;
         },
 
         copyInk: string = BAND.ink,
         /** Fitted type for a narrow parallel card; omitted on the main band. */
         card?: ReturnType<typeof agendaCardType>,
       ) => {
+
         // The main band runs the time in its own left column. A parallel card is
         // far too narrow for that column, so the time sits above the copy at the
         // fitted card size.
@@ -493,6 +537,25 @@ export async function buildAgendaPptx(
                 lineSpacing: pt(titleSize * 1.5),
               },
             },
+            // Room / floor, its own small caps paragraph above the notes — only
+            // when the programme knows one.
+            ...((session.room ?? "").trim()
+              ? [
+                  {
+                    text: session.room!.toUpperCase(),
+                    options: {
+                      fontSize: pt(detailSize),
+                      bold: true,
+                      color: copyInk,
+                      charSpacing: 1.5,
+                      breakLine: true,
+                      lineSpacing: pt(detailSize * 1.5),
+                    },
+                  },
+                ]
+              : []),
+
+
 
             // Speaker sits on its own line under the title, so the notes stay a
             // separate editable paragraph in PowerPoint.
@@ -549,7 +612,19 @@ export async function buildAgendaPptx(
           `Session band ${i + 1}`,
           inX(BAND.railW * L.k),
         );
-        bandText(band, r.session);
+        bandText(band, { ...r.session, room: agendaSessionRoom(r.session) });
+        const rowMark = agendaSessionMark(r.session);
+        if (rowMark) {
+          rowMarkShape(
+            rowMark,
+            band.x + L.bandPadX,
+            band.y + L.bandPadY + L.timeSize * 1.7,
+            L.timeSize * 0.9 * rowMark.mul,
+            BAND.ink,
+            `Session mark ${i + 1}`,
+          );
+        }
+
         // One editable aqua card per parallel track, each its own named shape.
         const parCopy = agendaParallels(r.session);
         r.parallels.forEach((par, pi) => {
@@ -609,7 +684,23 @@ export async function buildAgendaPptx(
                     breakLine: true,
                   },
                 },
+                ...(agendaSessionRoom(session)
+                  ? [
+                      {
+                        text: agendaSessionRoom(session).toUpperCase(),
+                        options: {
+                          fontSize: pt(L.detailSize),
+                          bold: true,
+                          color: rowInk,
+                          charSpacing: 1.5,
+                          breakLine: true,
+                          lineSpacing: pt(L.detailSize * 1.4),
+                        },
+                      },
+                    ]
+                  : []),
                 ...((session.detail ?? "").trim()
+
                   ? [
                       {
                         text: session.detail!,

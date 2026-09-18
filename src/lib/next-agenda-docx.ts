@@ -43,6 +43,9 @@ import {
   agendaQrStyle,
   agendaQrTransparent,
   agendaRowStyle,
+  agendaSessionMark,
+  agendaSessionRoom,
+
   agendaStops,
   agendaTitleInk,
   type AgendaConfig,
@@ -327,6 +330,95 @@ export async function buildAgendaDocx(
   const groundPx = { w: (geo.trimW / 25.4) * 150, h: (geo.trimH / 25.4) * 150 };
   const ground = await flattenedGroundPng(config, groundPx);
   const groundBytes = await ground.arrayBuffer();
+
+  // ── per-row marks ─────────────────────────────────────────────────────────
+  // Word carries each mark as a real SVG part (vector, so it stays crisp at any
+  // zoom or print size in Word 2016+) with a PNG twin as the fallback older
+  // readers use. One pair per unique mark + colour, referenced by every row that
+  // uses it, so a board with fifty pinned rows still ships two small parts.
+  type MarkPart = { key: string; svg: string; png: ArrayBuffer; index: number };
+  const markParts: MarkPart[] = [];
+  const markIndex = new Map<string, MarkPart>();
+  const markSvgMarkup = (mark: NonNullable<ReturnType<typeof agendaSessionMark>>, fill: string) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${mark.icon.vw} ${mark.icon.vh}" ` +
+    `width="${mark.icon.vw}" height="${mark.icon.vh}"><path d="${mark.icon.path}" fill="#${fill}"/></svg>`;
+  const markPngBytes = async (
+    mark: NonNullable<ReturnType<typeof agendaSessionMark>>,
+    fill: string,
+  ): Promise<ArrayBuffer> => {
+    const scale = 96 / Math.max(mark.icon.vw, mark.icon.vh);
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(8, Math.round(mark.icon.vw * scale));
+    canvas.height = Math.max(8, Math.round(mark.icon.vh * scale));
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Could not rasterize an agenda row mark");
+    ctx.scale(scale, scale);
+    ctx.fillStyle = `#${fill}`;
+    ctx.fill(new Path2D(mark.icon.path));
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(
+        (b) => (b ? resolve(b) : reject(new Error("Could not rasterize an agenda row mark"))),
+        "image/png",
+      );
+    });
+    return await blob.arrayBuffer();
+  };
+  /** Register (once) the parts a mark needs and return them. */
+  const useMark = async (
+    mark: NonNullable<ReturnType<typeof agendaSessionMark>>,
+    fallbackInk: string,
+  ): Promise<MarkPart> => {
+    const fill = hex(mark.hex ?? "", fallbackInk);
+    const key = `${mark.icon.id}-${fill}`;
+    const hit = markIndex.get(key);
+    if (hit) return hit;
+    const part: MarkPart = {
+      key,
+      svg: markSvgMarkup(mark, fill),
+      png: await markPngBytes(mark, fill),
+      index: markParts.length + 1,
+    };
+    markParts.push(part);
+    markIndex.set(key, part);
+    return part;
+  };
+  for (const page of pages) {
+    for (const session of page.config.sessions ?? []) {
+      const mark = agendaSessionMark(session);
+      if (mark) await useMark(mark, session.muted ? hex(ink, "8A93A6") : inkHex);
+    }
+  }
+  let markDrawingId = 900;
+  /** Inline run for a row mark, sized in printed millimetres. */
+  const markDrawing = (
+    mark: NonNullable<ReturnType<typeof agendaSessionMark>>,
+    fallbackInk: string,
+    hMm: number,
+  ): string => {
+    const part = markIndex.get(`${mark.icon.id}-${hex(mark.hex ?? "", fallbackInk)}`);
+    if (!part) return "";
+    const h = Math.round(hMm * mark.mul * EMU_PER_MM);
+    const w = Math.round(((hMm * mark.mul * mark.icon.vw) / mark.icon.vh) * EMU_PER_MM);
+    const id = (markDrawingId += 1);
+    return [
+      "<w:r><w:drawing>",
+      '<wp:inline distT="0" distB="0" distL="0" distR="0">',
+      `<wp:extent cx="${w}" cy="${h}"/>`,
+      '<wp:effectExtent l="0" t="0" r="0" b="0"/>',
+      `<wp:docPr id="${id}" name="Row mark ${part.index}" descr="${esc(mark.icon.name)}"/>`,
+      '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">',
+      '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">',
+      `<pic:nvPicPr><pic:cNvPr id="${id}" name="mark${part.index}.svg"/><pic:cNvPicPr/></pic:nvPicPr>`,
+      `<pic:blipFill><a:blip r:embed="rIdMarkPng${part.index}">` +
+        '<a:extLst><a:ext uri="{96DAC541-7B7A-43D3-8B79-37D633B846F1}">' +
+        `<asvg:svgBlip xmlns:asvg="http://schemas.microsoft.com/office/drawing/2016/SVG/main" r:embed="rIdMark${part.index}"/>` +
+        "</a:ext></a:extLst></a:blip>" +
+        "<a:stretch><a:fillRect/></a:stretch></pic:blipFill>",
+      `<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${w}" cy="${h}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>`,
+      "</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>",
+    ].join("");
+  };
+
 
   const backgroundDrawing = (rel: string) =>
     [
@@ -622,10 +714,21 @@ export async function buildAgendaDocx(
             para(run(session.time ?? "", { size: halfPt(cardTimeSize), color: bandInk, bold: true }), {
               afterTwips: 0,
               lineTwips: mmT(cardTimeSize * 1.4),
-            }),
+            }) +
+              // The row's mark sits under the time, as a vector picture Word can
+              // resize and recolour-free reprint at any zoom.
+              ((rowMark) =>
+                rowMark
+                  ? para(markDrawing(rowMark, bandInk, cardTimeSize * 0.9), {
+                      beforeTwips: mmT(cardTimeSize * 0.4),
+                      afterTwips: 0,
+                      lineTwips: mmT(cardTimeSize * 1.2),
+                    })
+                  : "")(agendaSessionMark(session)),
             rowPad,
             { fill, vAlign: "top", rail: BAND.rail, railW: BAND.railW * PL.k },
           ),
+
           // The body takes back any parallel column this slot does not use.
           cell(
             cardBodyW + spare * cardParColW,
@@ -640,7 +743,21 @@ export async function buildAgendaDocx(
                   }),
                   { afterTwips: 0, lineTwips: mmT(PL.trackSize * 1.6) },
                 )
-              : "") + copy(session.title ?? "", session.detail ?? ""),
+              : "") +
+              // The room / floor line prints in small caps above the speakers,
+              // exactly as it does on the board and in the press file.
+              (agendaSessionRoom(session)
+                ? para(
+                    run(agendaSessionRoom(session).toUpperCase(), {
+                      size: halfPt(cardBodyType.detailSize),
+                      color: bandInk,
+                      bold: true,
+                    }),
+                    { afterTwips: 0, lineTwips: mmT(cardBodyType.detailSize * 1.4) },
+                  )
+                : "") +
+              copy(session.title ?? "", session.detail ?? ""),
+
             rowPad,
             spare > 0 ? { fill, span: spare + 1, vAlign: "top" } : { fill, vAlign: "top" },
           ),
@@ -684,6 +801,7 @@ export async function buildAgendaDocx(
       .map((session) => {
         const muted = session.muted;
         const rowInk = muted ? hex(ink, "8A93A6") : inkHex;
+        const rowMark = agendaSessionMark(session);
         const body = [
           para(
             run(session.title ?? "", {
@@ -693,6 +811,20 @@ export async function buildAgendaDocx(
             }),
             { afterTwips: 0, lineTwips: mmT(PL.titleRowSize * 1.2) },
           ),
+          agendaSessionRoom(session)
+            ? para(
+                run(agendaSessionRoom(session).toUpperCase(), {
+                  size: halfPt(PL.detailSize),
+                  color: rowInk,
+                  bold: true,
+                }),
+                {
+                  beforeTwips: mmT(PL.detailSize * 0.3),
+                  afterTwips: 0,
+                  lineTwips: mmT(PL.detailSize * 1.25),
+                },
+              )
+            : "",
           (session.detail ?? "").trim()
             ? para(run(session.detail, { size: halfPt(PL.detailSize), color: rowInk }), {
                 beforeTwips: mmT(PL.detailSize * 0.35),
@@ -711,9 +843,17 @@ export async function buildAgendaDocx(
             para(
               run(session.time ?? "", { size: halfPt(PL.timeSize), color: rowInk, bold: true }),
               { afterTwips: 0, lineTwips: mmT(PL.timeSize * 1.2) },
-            ),
+            ) +
+              (rowMark
+                ? para(markDrawing(rowMark, rowInk, PL.timeSize * 0.85), {
+                    beforeTwips: mmT(PL.timeSize * 0.35),
+                    afterTwips: 0,
+                    lineTwips: mmT(PL.timeSize * 1.2),
+                  })
+                : ""),
             rowPad,
           ),
+
           cell(bodyW, body, rowPad),
           cell(
             trackW,
@@ -1120,6 +1260,7 @@ export async function buildAgendaDocx(
       '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>',
       '<Default Extension="xml" ContentType="application/xml"/>',
       '<Default Extension="png" ContentType="image/png"/>',
+      '<Default Extension="svg" ContentType="image/svg+xml"/>',
       '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>',
       '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>',
       '<Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>',
@@ -1157,6 +1298,11 @@ export async function buildAgendaDocx(
       qrImage
         ? '<Relationship Id="rIdQr" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/qr.png"/>'
         : "",
+      // One vector part plus its PNG twin per unique row mark.
+      ...markParts.flatMap((part) => [
+        `<Relationship Id="rIdMark${part.index}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/mark${part.index}.svg"/>`,
+        `<Relationship Id="rIdMarkPng${part.index}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/mark${part.index}.png"/>`,
+      ]),
       '<Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>',
       '<Relationship Id="rIdSettings" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>',
       '<Relationship Id="rIdFonts" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>',
@@ -1220,6 +1366,10 @@ export async function buildAgendaDocx(
   if (coverGround) zip.file("word/media/cover.png", coverGround);
   imagePages.forEach((art, i) => zip.file(`word/media/art${i + 1}.png`, art.png));
   if (qrImage) zip.file("word/media/qr.png", qrImage.bytes);
+  markParts.forEach((part) => {
+    zip.file(`word/media/mark${part.index}.svg`, part.svg);
+    zip.file(`word/media/mark${part.index}.png`, part.png);
+  });
   zip.file("word/document.xml", document);
 
   const blob = await zip.generateAsync({
