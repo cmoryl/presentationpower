@@ -2500,6 +2500,8 @@ export function agendaPages(config: AgendaConfig): AgendaPage[] {
           detail: (day.label || "").trim() ? (day.meta || "").trim() : "",
           track: "",
           muted: true,
+          dayBreak: true,
+
         });
       }
       rows.push(...(day.sessions ?? []));
