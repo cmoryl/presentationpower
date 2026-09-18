@@ -510,7 +510,9 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
     ...(scene.tail ? scene.tail.split(/\s+/).map((text) => ({ text, accent: false })) : []),
   ];
   const head = layoutHeadline(ctx, tokens, headPx, turnEm, copyW);
-  const bodyLines = wrapBody(ctx, scene.support, supportPx, Math.min(copyW, supportPx * 24));
+  const bodyLines = L.hideSupport
+    ? []
+    : wrapBody(ctx, scene.support, supportPx, Math.min(copyW, supportPx * 24));
   const gap = short * 0.026;
   const bodyH = bodyLines.length * supportPx * 1.42;
   const blockH = head.height + gap + bodyH;
