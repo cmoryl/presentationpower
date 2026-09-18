@@ -6,6 +6,7 @@
 // drives the press PDF, the Word file and the PowerPoint deck, and each save
 // keeps a numbered snapshot so an earlier state can be brought back.
 
+import { toast } from "sonner";
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -29,6 +30,7 @@ import { Button, Input, Textarea } from "@/design-system/element";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { NEXT_EVENT } from "@/lib/next-event";
 import {
+  GUIDE_ARTWORK_NOTE,
   GUIDE_BLOCK_LABELS,
   GUIDE_SIZES,
   guideDefault,
@@ -508,6 +510,9 @@ function GuideStudio() {
       },
       async () => {
         const built = await buildGuidePdf(config);
+        // Press faults are surfaced, never swallowed.
+        const faults = built.notes.filter((n) => n !== GUIDE_ARTWORK_NOTE);
+        if (faults.length) toast.warning(faults.join(" "));
         download(
           new Blob([built.bytes as unknown as BlobPart], { type: "application/pdf" }),
           `${guideSlug(config)}.pdf`,
