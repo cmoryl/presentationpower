@@ -68,6 +68,21 @@ const BY_PANEL = new Map(MASTERS.map((m) => [m.panelId, m] as const));
 
 export const LONDON_SUPPLIED_MASTERS = MASTERS;
 
+/** Every print area covered by the pack in force, reference sheets included. */
+const PACK_PANEL_IDS = new Set(LONDON_PACK_AREAS.map((area) => area.panelId));
+
+/**
+ * Does this sign have a file from the delivery in force (or a newer published
+ * live file)? The kit lists these by default: an area with no supplied file is
+ * an older spec-sheet entry, and showing it beside the delivered artwork made
+ * the schedule read as out of date.
+ */
+export function londonHasSuppliedFile(panel: { id: string } | string): boolean {
+  const id = typeof panel === "string" ? panel : panel.id;
+  if (londonLiveFile(id)?.masterUrl) return true;
+  return PACK_PANEL_IDS.has(id);
+}
+
 /** The supplied live file for a panel, when the team has handed one back. */
 export function londonSuppliedMaster(panel: { id: string } | string): LondonSuppliedMaster | null {
   const id = typeof panel === "string" ? panel : panel.id;
