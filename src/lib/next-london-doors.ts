@@ -88,10 +88,11 @@ export const LONDON_DOOR_SPECS: LondonDoorSpec[] = [
     leafW: [920, 380],
     leafH: 2020,
     scope: "leaf",
-    source: "4F/Abbey_doors.ai — 920 × 2020 mm leading leaf + 380 × 2020 mm secondary leaf",
+    source:
+      "4F/Abbey/Abbey_doors.ai — 920 × 2020 mm leading leaf + 380 × 2020 mm secondary leaf, plus a second 920 mm leaf on page 3 (18 Sep 2026 pack)",
     confidence: "measured",
     perLeafArt: true,
-    note: "Unequal pair: wide leading leaf with a narrow secondary leaf.",
+    note: "Unequal pair: wide leading leaf with a narrow secondary leaf. The third artboard page is the alternate wide leaf for the second entrance.",
   },
   {
     match: "DOOR BRANDING ST JAMES",
@@ -99,20 +100,37 @@ export const LONDON_DOOR_SPECS: LondonDoorSpec[] = [
     leafW: [900, 420],
     leafH: 2020,
     scope: "leaf",
-    source: "4F/St_James_door.ai — 900 × 2020 mm leading leaf + 420 × 2020 mm secondary leaf",
+    source:
+      "4F/St James/St_James_door.ai — 900 × 2020 mm leading leaf + 420 × 2020 mm secondary leaf (18 Sep 2026 pack)",
     confidence: "measured",
     perLeafArt: true,
     note: "Unequal pair, as supplied.",
   },
   {
-    match: "DOOR BRANDING WESTMINSTER",
+    // Listed BEFORE the room door so the corridor pair is not read as the
+    // unequal door pair: the two items are different openings.
+    match: "WESTMINSTER CORRIDOR PANEL",
     leaves: 2,
     leafW: [900, 900],
     leafH: 2020,
     scope: "leaf",
-    source: "4F/Westminster__Corridoor_1.ai — 2 pages, 900 × 2020 mm each",
+    source:
+      "4F/Westminster/Westminster__Corridoor_1.ai — 2 pages, 900 × 2020 mm each (18 Sep 2026 pack)",
     confidence: "measured",
     perLeafArt: true,
+    note: "Equal corridor pair, one artboard page per leaf.",
+  },
+  {
+    match: "DOOR BRANDING WESTMINSTER",
+    leaves: 2,
+    leafW: [900, 440],
+    leafH: 2000,
+    scope: "leaf",
+    source:
+      "4F/Westminster/Westminster_door_A_copy.ai — 900 × 2000 mm leading leaf + 440 × 2000 mm secondary leaf (18 Sep 2026 pack)",
+    confidence: "measured",
+    perLeafArt: true,
+    note: "Unequal pair as supplied — 2000 mm high, 20 mm shorter than the corridor panel next to it.",
   },
   {
     match: "DOOR BRANDING WORDSWORTH",
@@ -120,7 +138,7 @@ export const LONDON_DOOR_SPECS: LondonDoorSpec[] = [
     leafW: [920],
     leafH: 2020,
     scope: "leaf",
-    source: "4F/Wordsworth_door.ai — single 920 × 2020 mm artboard",
+    source: "4F/Wordsworth/Wordsworth_door.ai — single 920 × 2020 mm artboard (18 Sep 2026 pack)",
     confidence: "measured",
     note: "Single leaf: the supplied file holds one page only.",
   },
@@ -130,9 +148,10 @@ export const LONDON_DOOR_SPECS: LondonDoorSpec[] = [
     leafW: [890, 890],
     leafH: 2200,
     scope: "spanning",
-    source: "GF/Curchill Double Doors/Churchill_Double_doors.ai — 1780 × 2200 mm pair",
+    source:
+      "GF/Curchill Double Doors/Churchill_Double_doors.ai — 2 pages, 1780 × 2200 mm pair each (18 Sep 2026 pack)",
     confidence: "measured",
-    note: "One sheet across the pair; the shut line falls in the middle of the artwork.",
+    note: "One sheet across the pair; the shut line falls in the middle of the artwork. Two versions supplied — the lockup pair and the INNOVATION LOUNGE pair — one per entrance.",
   },
   {
     match: "MAIN ENTRANCE DOOR VINYL",
@@ -169,8 +188,9 @@ export const LONDON_DOOR_SPECS: LondonDoorSpec[] = [
     leafW: [750, 750],
     leafH: 1500,
     scope: "spanning",
-    source: "3F/Fleming Whittle Doors/Fleming and Whittle doors.ai — 1500 × 1500 mm",
-    confidence: "assumed",
+    source:
+      "3F/Fleming Whittle Doors/Fleming and Whittle doors.ai — page 1, 1500 × 1500 mm across the pair (18 Sep 2026 pack)",
+    confidence: "measured",
     note: "Square graphic across the pair; leaf split taken as the centre of the opening.",
   },
   {
@@ -179,8 +199,9 @@ export const LONDON_DOOR_SPECS: LondonDoorSpec[] = [
     leafW: [750, 750],
     leafH: 1500,
     scope: "spanning",
-    source: "3F/Fleming Whittle Doors/Fleming and Whittle doors.ai — 1500 × 1500 mm",
-    confidence: "assumed",
+    source:
+      "3F/Fleming Whittle Doors/Fleming and Whittle doors.ai — page 2, 1500 × 1500 mm across the pair (18 Sep 2026 pack)",
+    confidence: "measured",
     note: "Square graphic across the pair; leaf split taken as the centre of the opening.",
   },
 ];
