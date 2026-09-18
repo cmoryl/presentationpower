@@ -263,6 +263,77 @@ export const LEGAL_BLOOM_SCENES: BloomScene[] = [
   },
 ];
 
+// ---------------------------------------------------------------------------
+// The picture library
+//
+// Every photograph in the set is available to every ad, so a person can swap the
+// picture in a frame without touching the copy. The zoom and the point held in
+// the middle are saved with the ad's arrangement, per ad and per size.
+
+export type BloomPhoto = {
+  id: string;
+  /** What the photograph shows, in plain words — never printed in the ad. */
+  label: string;
+  src: string;
+  frame: BloomFrame;
+  focus: string;
+};
+
+export const LEGAL_BLOOM_PHOTOS: BloomPhoto[] = [
+  { id: "soapbox", label: "Gravity racer in the wet", src: bloomSoapbox, frame: "wide", focus: "50% 42%" },
+  { id: "kayak", label: "Kayak in the granite chute", src: bloomKayak, frame: "upright", focus: "52% 48%" },
+  { id: "ocean", label: "Offshore crew on the rail", src: bloomOcean, frame: "wide", focus: "42% 55%" },
+  { id: "cliff", label: "Portaledge at dusk", src: bloomCliff, frame: "wide", focus: "34% 52%" },
+  { id: "ice", label: "Ice climber on the axe", src: bloomIce, frame: "square", focus: "60% 40%" },
+  { id: "rally", label: "Rally car in the ruts", src: bloomRally, frame: "wide", focus: "56% 50%" },
+  { id: "cave", label: "Cavers on the haul line", src: bloomCave, frame: "square", focus: "40% 45%" },
+  { id: "deep", label: "Freediver on the line", src: bloomDeep, frame: "upright", focus: "50% 46%" },
+];
+
+/** How the picture sits in its frame, as saved with an arrangement. */
+export type BloomPictureFit = {
+  /** Which photograph from the library, if it has been swapped out. */
+  photoId?: string;
+  /** How close in, 1 = the whole photograph fitted to the frame. */
+  photoZoom?: number;
+  /** The point held in the middle of the frame, in fractions of the picture. */
+  photoX?: number;
+  photoY?: number;
+};
+
+/** Fractions of a CSS-style "50% 42%" focus point. */
+export function bloomFocusFractions(focus: string): { fx: number; fy: number } {
+  const parts = focus.trim().split(/\s+/);
+  const one = (v: string | undefined, fallback: number) => {
+    const n = Number.parseFloat(v ?? "");
+    return Number.isFinite(n) ? Math.min(1, Math.max(0, n / 100)) : fallback;
+  };
+  return { fx: one(parts[0], 0.5), fy: one(parts[1] ?? parts[0], 0.5) };
+}
+
+/**
+ * The picture to draw for one ad: the photograph, the point held in the middle
+ * of the frame and how close in it sits. A frame with nothing saved shows the
+ * scene's own photograph at its composed crop.
+ */
+export function bloomPicture(
+  scene: BloomScene,
+  fit?: BloomPictureFit,
+): { src: string; fx: number; fy: number; zoom: number } {
+  const swap = fit?.photoId ? LEGAL_BLOOM_PHOTOS.find((p) => p.id === fit.photoId) : undefined;
+  const base = bloomFocusFractions(swap?.focus ?? scene.focus);
+  return {
+    src: swap?.src ?? scene.photo,
+    fx: clamp01(fit?.photoX ?? base.fx),
+    fy: clamp01(fit?.photoY ?? base.fy),
+    zoom: Math.min(4, Math.max(1, fit?.photoZoom ?? 1)),
+  };
+}
+
+function clamp01(v: number) {
+  return Math.min(1, Math.max(0, v));
+}
+
 /** The trims the set is checked at. */
 export const LEGAL_BLOOM_SIZES = [
   { id: "linkedin", label: "LinkedIn post", w: 1200, h: 1200 },
