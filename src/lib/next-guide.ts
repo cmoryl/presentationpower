@@ -12,6 +12,8 @@
 // -----------------------------------------------------------------------------
 
 import { NEXT_APP_ORIGIN, NEXT_EVENT } from "@/lib/next-event";
+import { GUIDE_LOOK_NOTE, type GuideAccentId, type GuideGroundId } from "@/lib/next-guide-theme";
+
 
 /** Handout stock. A guide never prints at board size. */
 export type GuideSizeId = "a4" | "us-letter";
@@ -55,7 +57,26 @@ export type GuideDay = { id: string; name: string; rows: GuideRow[] };
 export type GuideFloor = { id: string; name: string; room: string; lines: string[] };
 export type GuideLink = { id: string; label: string; url: string };
 
-export type GuideBlock =
+/**
+ * The look choices every page carries. They are optional so a guide saved
+ * before the master design landed still opens, and simply takes the defaults.
+ */
+export type GuideStyle = {
+  ground?: GuideGroundId;
+  /** Display colour for headings and rules on this page. */
+  accent?: GuideAccentId;
+  /** Photograph from the guide library. */
+  imageId?: string;
+  /** Where the photograph sits on the page. */
+  imagePlace?: "band" | "side" | "hero" | "none";
+  /** Vertical label down the inside edge, as the master uses. */
+  sidebar?: string;
+  /** Small white QR card. */
+  qrLabel?: string;
+  qrUrl?: string;
+};
+
+type GuideBlockCore =
   | {
       id: string;
       kind: "cover";
@@ -64,6 +85,8 @@ export type GuideBlock =
       strapline: string;
       theme: string;
       footnote: string;
+      /** Text inside the yellow date disc. */
+      disc?: string;
     }
   | { id: string; kind: "welcome"; title: string; body: string; byline: string; note: string }
   | { id: string; kind: "info"; title: string; standfirst: string; items: GuideItem[] }
@@ -79,9 +102,12 @@ export type GuideBlock =
     }
   | { id: string; kind: "list"; title: string; standfirst: string; items: GuideItem[] }
   | { id: string; kind: "floors"; title: string; standfirst: string; floors: GuideFloor[] }
-  | { id: string; kind: "links"; title: string; standfirst: string; links: GuideLink[] };
+  | { id: string; kind: "links"; title: string; standfirst: string; links: GuideLink[] }
+  | { id: string; kind: "closing"; title: string; standfirst: string };
 
-export type GuideBlockKind = GuideBlock["kind"];
+export type GuideBlock = GuideBlockCore & GuideStyle;
+
+export type GuideBlockKind = GuideBlockCore["kind"];
 
 export const GUIDE_BLOCK_LABELS: Record<GuideBlockKind, string> = {
   cover: "Cover",
@@ -92,7 +118,9 @@ export const GUIDE_BLOCK_LABELS: Record<GuideBlockKind, string> = {
   list: "List page",
   floors: "Floor directory",
   links: "Links and app",
+  closing: "Back cover",
 };
+
 
 export type GuideConfig = {
   sizeId: GuideSizeId;
@@ -120,7 +148,10 @@ export function guideNewBlock(kind: GuideBlockKind, seed = ""): GuideBlock {
       return { id, kind, title: seed || "Explore the exhibits", standfirst: "", floors: [] };
     case "links":
       return { id, kind, title: seed || "Your agenda", standfirst: "", links: [] };
+    case "closing":
+      return { id, kind, title: seed || "", standfirst: "", ground: "gradient" };
   }
+
 }
 
 const item = (label: string, body: string): GuideItem => ({
@@ -159,7 +190,13 @@ export function londonGuideConfig(): GuideConfig {
         strapline: "LEARN | CONNECT | DISCOVER | ELEVATE | ENJOY",
         theme: "BEYOND INTELLIGENCE",
         footnote: LONDON_GUIDE_LOCATION.siteUrl,
+        disc: LONDON_GUIDE_LOCATION.dates.toUpperCase(),
+        ground: "gradient",
+        accent: "yellow",
+        imageId: "facade",
+        imagePlace: "band",
       },
+
       {
         id: "welcome",
         kind: "welcome",
@@ -169,12 +206,22 @@ export function londonGuideConfig(): GuideConfig {
         byline: "Matt Hauser · Chief Experience Officer, TransPerfect",
         note:
           "Friday, 25 September at 9:45 AM: join Matt for his keynote, \u201cBeyond Intelligence\u201d, in the Fleming Space (third floor).",
+        ground: "gradient",
+        accent: "yellow",
+        imageId: "plenary",
+        imagePlace: "side",
       },
       {
         id: "practical",
         kind: "info",
         title: "Practical information",
         standfirst: `Venue: ${LONDON_GUIDE_LOCATION.venue}, ${LONDON_GUIDE_LOCATION.address} · Event Wi-Fi: ${LONDON_GUIDE_LOCATION.wifi}`,
+        ground: "gradient",
+        accent: "yellow",
+        sidebar: "NETWORK, EAT, DRINK",
+        qrLabel: "Live chat support",
+        qrUrl: `mailto:${LONDON_GUIDE_LOCATION.supportEmail}`,
+
         items: [
           item(
             "NEXTBREW Cafe · Ground floor",
@@ -199,6 +246,9 @@ export function londonGuideConfig(): GuideConfig {
         kind: "schedule",
         title: "Event at a glance",
         standfirst: "Times are local to London.",
+        ground: "gradient",
+        accent: "yellow",
+        sidebar: "AT A GLANCE",
         days: [
           {
             id: "thu",
@@ -231,6 +281,10 @@ export function londonGuideConfig(): GuideConfig {
         when: "Friday, 25 September · 10:30 AM",
         body:
           "For most of America's history we functioned as a manufacturing economy; now we're a service economy, with more than three-quarters of GDP coming from service. Whether you're in retail, finance, education, healthcare, computer services or communications, you are in the business of serving other people. Making good products is no longer enough, and serving efficiently is no longer enough — now it's how you make the people you work with, and those you serve, feel that matters most of all. In this talk Will shares why he believes our world is on the precipice of becoming a hospitality economy, and how every business can choose to be in the business of hospitality by turning ordinary transactions into extraordinary experiences.",
+        ground: "gradient",
+        accent: "yellow",
+        imageId: "plenary",
+        imagePlace: "hero",
       },
       {
         id: "whats-on",
@@ -238,6 +292,11 @@ export function londonGuideConfig(): GuideConfig {
         title: "What's on",
         standfirst:
           "The sessions and speakers may be the main attraction, but there are plenty of other ways to connect, learn and explore.",
+        ground: "gradient",
+        accent: "yellow",
+        imageId: "churchill",
+        imagePlace: "band",
+
         items: [
           item(
             "Innovation Lounge · Churchill, ground floor",
@@ -263,6 +322,11 @@ export function londonGuideConfig(): GuideConfig {
         title: "Explore the exhibits",
         standfirst:
           "Visit the exhibit booths to explore TransPerfect solutions and the teams behind them.",
+        ground: "gradient",
+        accent: "green",
+        sidebar: "EXPLORE THE EXHIBITS",
+        imageId: "foyer",
+        imagePlace: "band",
         floors: [
           {
             id: "third",
@@ -302,6 +366,9 @@ export function londonGuideConfig(): GuideConfig {
         title: "The 10 programmes",
         standfirst:
           "TransPerfectNEXT is a collection of events built around the people, industries and technologies shaping global performance. Your registration gives you access to all 10 specialised events on site, so move between tracks and sessions based on your interests.",
+        ground: "gradient",
+        accent: "yellow",
+        sidebar: "THE 10 PROGRAMMES",
         items: [
           item(
             "Global content",
@@ -350,6 +417,9 @@ export function londonGuideConfig(): GuideConfig {
         kind: "floors",
         title: "Venue directory",
         standfirst: "Rooms and spaces in use across the QEII Centre.",
+        ground: "navy",
+        accent: "yellow",
+        sidebar: "VENUE DIRECTORY",
         floors: [
           {
             id: "ground",
@@ -380,13 +450,26 @@ export function londonGuideConfig(): GuideConfig {
         title: "Your agenda",
         standfirst:
           "Download the mobile app for the full event agenda. Your registration gives you access to all events, so explore the full agenda and discover sessions across TransPerfectNEXT.",
+        ground: "gradient",
+        accent: "yellow",
+        qrLabel: "Event site",
+        qrUrl: `https://${LONDON_GUIDE_LOCATION.siteUrl}`,
         links: [
           { id: "l-site", label: "Event site", url: `https://${LONDON_GUIDE_LOCATION.siteUrl}` },
           { id: "l-agenda", label: "All agendas", url: `${NEXT_APP_ORIGIN}/events/next/agendas` },
           { id: "l-support", label: "Support", url: `mailto:${LONDON_GUIDE_LOCATION.supportEmail}` },
         ],
       },
+      {
+        id: "closing",
+        kind: "closing",
+        title: "BEYOND INTELLIGENCE",
+        standfirst: LONDON_GUIDE_LOCATION.siteUrl,
+        ground: "gradient",
+        accent: "yellow",
+      },
     ],
+
   };
 }
 
@@ -433,5 +516,5 @@ export function guidePageCount(config: GuideConfig): number {
 }
 
 /** Provenance line every builder repeats. */
-export const GUIDE_ARTWORK_NOTE =
-  "Every page of the guide is live vector type on brand ink — no page is a placed render.";
+export const GUIDE_ARTWORK_NOTE = GUIDE_LOOK_NOTE;
+

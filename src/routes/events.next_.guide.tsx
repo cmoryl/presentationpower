@@ -35,6 +35,7 @@ import {
   GUIDE_SIZES,
   guideDefault,
   guideNewBlock,
+  type GuideStyle,
   guidePagePlan,
   guideSize,
   guideSlug,
@@ -44,6 +45,13 @@ import {
   type GuideConfig,
   type GuideSizeId,
 } from "@/lib/next-guide";
+import {
+  GUIDE_ACCENTS,
+  GUIDE_GROUNDS,
+  GUIDE_IMAGES,
+  type GuideAccentId,
+  type GuideGroundId,
+} from "@/lib/next-guide-theme";
 import { buildGuideDocx } from "@/lib/next-guide-docx";
 import { buildGuidePdf } from "@/lib/next-guide-pdf";
 import { buildGuidePptx } from "@/lib/next-guide-pptx";
@@ -121,6 +129,116 @@ function Field({
   );
 }
 
+/** Picker row: the look choices every page shares. */
+function LookEditor({
+  block,
+  onChange,
+}: {
+  block: GuideBlock;
+  onChange: (next: GuideBlock) => void;
+}) {
+  const set = (patch: Partial<GuideStyle>) => onChange({ ...block, ...patch } as GuideBlock);
+  const chip = (on: boolean) =>
+    `rounded-full border px-2.5 py-1 text-xs ${on ? "border-primary bg-primary/10 font-medium" : "border-border/60"}`;
+
+  return (
+    <div className="mb-4 grid gap-3 rounded-md border border-border/60 bg-muted/30 p-3">
+      <div>
+        <p className="mb-1.5 text-xs font-medium text-muted-foreground">Ground</p>
+        <div className="flex flex-wrap gap-1.5">
+          {(Object.keys(GUIDE_GROUNDS) as GuideGroundId[]).map((id) => (
+            <button
+              key={id}
+              type="button"
+              className={chip((block.ground ?? "gradient") === id)}
+              onClick={() => set({ ground: id })}
+            >
+              {GUIDE_GROUNDS[id].label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <p className="mb-1.5 text-xs font-medium text-muted-foreground">Display colour</p>
+        <div className="flex flex-wrap gap-1.5">
+          {(Object.keys(GUIDE_ACCENTS) as GuideAccentId[]).map((id) => (
+            <button
+              key={id}
+              type="button"
+              className={chip((block.accent ?? "yellow") === id)}
+              onClick={() => set({ accent: id })}
+            >
+              <span
+                className="mr-1.5 inline-block size-2.5 rounded-full align-middle"
+                style={{ background: GUIDE_ACCENTS[id].hex }}
+              />
+              {GUIDE_ACCENTS[id].label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <p className="mb-1.5 text-xs font-medium text-muted-foreground">Photograph</p>
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            className={chip(!block.imageId || block.imagePlace === "none")}
+            onClick={() => set({ imagePlace: "none" })}
+          >
+            No photograph
+          </button>
+          {GUIDE_IMAGES.map((img) => (
+            <button
+              key={img.id}
+              type="button"
+              className={chip(block.imageId === img.id && block.imagePlace !== "none")}
+              onClick={() =>
+                set({ imageId: img.id, imagePlace: block.imagePlace === "none" ? "band" : (block.imagePlace ?? "band") })
+              }
+            >
+              {img.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {block.imageId && block.imagePlace !== "none" ? (
+        <div>
+          <p className="mb-1.5 text-xs font-medium text-muted-foreground">Where it sits</p>
+          <div className="flex flex-wrap gap-1.5">
+            {(
+              [
+                ["band", "Band across the foot"],
+                ["hero", "Wide, under the heading"],
+                ["side", "Beside the copy"],
+              ] as [NonNullable<GuideStyle["imagePlace"]>, string][]
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className={chip((block.imagePlace ?? "band") === id)}
+                onClick={() => set({ imagePlace: id })}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {block.kind !== "cover" && block.kind !== "closing" ? (
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Field
+            label="Edge label (runs up the inside edge)"
+            value={block.sidebar ?? ""}
+            onChange={(v) => set({ sidebar: v })}
+          />
+          <Field label="Code card label" value={block.qrLabel ?? ""} onChange={(v) => set({ qrLabel: v })} />
+          <Field label="Code card address" value={block.qrUrl ?? ""} onChange={(v) => set({ qrUrl: v })} />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function BlockEditor({
   block,
   onChange,
@@ -139,6 +257,7 @@ function BlockEditor({
           <Field label="Theme" value={block.theme} onChange={(v) => set({ theme: v })} />
           <Field label="Strapline" value={block.strapline} onChange={(v) => set({ strapline: v })} />
           <Field label="Footnote" value={block.footnote} onChange={(v) => set({ footnote: v })} />
+          <Field label="Date disc" value={block.disc ?? ""} onChange={(v) => set({ disc: v })} />
         </div>
       );
     case "welcome":
@@ -456,6 +575,13 @@ function BlockEditor({
           </Button>
         </div>
       );
+    case "closing":
+      return (
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Theme line" value={block.title} onChange={(v) => set({ title: v })} />
+          <Field label="Address line" value={block.standfirst} onChange={(v) => set({ standfirst: v })} />
+        </div>
+      );
   }
 }
 
@@ -724,6 +850,7 @@ function GuideStudio() {
                   </div>
                   {open === block.id ? (
                     <div className="border-t border-border/60 p-4">
+                      <LookEditor block={block} onChange={setBlock} />
                       <BlockEditor block={block} onChange={setBlock} />
                     </div>
                   ) : null}
