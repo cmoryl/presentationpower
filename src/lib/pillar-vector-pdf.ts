@@ -576,16 +576,27 @@ export async function buildPillarVectorPdf(
   const eyebrowDrop = eyebrow ? eyebrowSize * 2.1 : 0;
   if (eyebrow) {
     beginLayer(page, layer("10 Strapline"));
-    const text = eyebrow.toUpperCase();
-    const tracked = text.split("").join("\u2009");
-    const width = bold.widthOfTextAtSize(tracked, eyebrowSize);
-    page.drawText(tracked, {
-      x: leftSet ? safeX : centerX - width / 2,
-      y: safeTop - eyebrowSize * 0.82,
-      size: eyebrowSize,
-      font: bold,
-      color: paint(headlineInk),
-    });
+    // Tracked caps, set glyph by glyph: pdf-lib has no letter-spacing, and a
+    // thin space is not in the fallback font's encoding.
+    const glyphs = [...eyebrow.toUpperCase()];
+    const tracking = eyebrowSize * 0.16;
+    const width =
+      glyphs.reduce((sum, g) => sum + bold.widthOfTextAtSize(g, eyebrowSize) + tracking, 0) -
+      tracking;
+    let gx = leftSet ? safeX : centerX - width / 2;
+    const gy = safeTop - eyebrowSize * 0.82;
+    for (const glyph of glyphs) {
+      if (glyph.trim()) {
+        page.drawText(glyph, {
+          x: gx,
+          y: gy,
+          size: eyebrowSize,
+          font: bold,
+          color: paint(headlineInk),
+        });
+      }
+      gx += bold.widthOfTextAtSize(glyph, eyebrowSize) + tracking;
+    }
     endLayer(page);
   }
 

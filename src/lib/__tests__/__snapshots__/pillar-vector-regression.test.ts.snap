@@ -74,6 +74,43 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
 }
 `;
 
+exports[`pillar vector export regression > keeps the Illustrator-safe vector structure for division-profile-template 1`] = `
+{
+  "boxes": {
+    "bleed": true,
+    "media": true,
+    "trim": true,
+  },
+  "clips": 1,
+  "fillOps": 10,
+  "fontsEmbedded": 0,
+  "gradientPattern": 2,
+  "layers": [
+    "01 Ground",
+    "02 Lockup",
+    "03 Headline",
+    "04 Sub-line",
+    "05 Arrow",
+    "06 QR code",
+    "07 Guides + marks",
+    "08 Placed artwork",
+    "09 Chevron device",
+    "10 Strapline",
+  ],
+  "legacyShading": 2,
+  "meshShading": 0,
+  "page": "1891x5815pt",
+  "pdfVersion": "%PDF-1.7",
+  "pdfx": {
+    "outputIntent": "sRGB IEC61966-2.1",
+    "outputIntentSpace": "RGB",
+  },
+  "rasterImages": 0,
+  "subsetFont": false,
+  "textShowOps": 20,
+}
+`;
+
 exports[`pillar vector export regression > keeps the Illustrator-safe vector structure for logo-with-qr 1`] = `
 {
   "boxes": {
