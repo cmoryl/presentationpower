@@ -425,7 +425,10 @@ export const LONDON_2026_PROGRAMMES: Record<string, LondonAgendaProgramme> = {
     rowStyle: "card",
     bandTreatment: "lavender",
     eyebrow: "",
-    locationLine: "",
+    // The LearnNEXT sheet carries no room, but the delivered London door
+    // branding does: 4F ST JAMES is the LearnNEXT room (next-london-venue-items).
+    locationLine: "ST JAMES 4TH FLOOR",
+
     footnote: "",
     footerLeft: "WWW.TRANSPERFECTNEXT.COM/EMEA/LEARN",
     footerRight: "24 & 25 SEPTEMBER, 2026",
