@@ -104,6 +104,9 @@ import {
   type AgendaLocationIconId,
   type AgendaLocationInkId,
   type AgendaLocationSizeId,
+
+  type AgendaLocationInkId,
+  type AgendaLocationSizeId,
   type AgendaLocationWeightId,
   type AgendaLocationAlignId,
   agendaFooter,
