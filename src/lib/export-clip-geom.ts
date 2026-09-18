@@ -433,3 +433,105 @@ export function custGeomXml(cmds: ClipCmd[]): string {
     "</a:custGeom>"
   );
 }
+
+// -----------------------------------------------------------------------------
+// Containment test — is a descendant safe to export UNCLIPPED?
+//
+// On screen a clip applies to the whole subtree; PowerPoint has no clipping
+// container. A descendant that sits wholly INSIDE its ancestor's outline is
+// unaffected by the mask and ships as an ordinary editable object. One that
+// crosses the outline would visibly overflow, so the caller keeps it on the flat
+// plate rather than exporting a shape that spills past the designed edge.
+// -----------------------------------------------------------------------------
+
+export interface ClipContextBox {
+  cmds: ClipCmd[];
+  /** Stage px. */
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export interface StageRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** Flatten an outline to a polygon in stage px (beziers sampled). */
+export function flattenOutline(ctx: ClipContextBox, steps = 8): Array<[number, number]> {
+  const px = (nx: number, ny: number): [number, number] => [ctx.x + nx * ctx.w, ctx.y + ny * ctx.h];
+  const pts: Array<[number, number]> = [];
+  let cur: [number, number] = [0, 0];
+  for (const c of ctx.cmds) {
+    if (c.c === "C") {
+      const p0 = cur;
+      const p1 = px(c.x1, c.y1);
+      const p2 = px(c.x2, c.y2);
+      const p3 = px(c.x, c.y);
+      for (let i = 1; i <= steps; i += 1) {
+        const t = i / steps;
+        const mt = 1 - t;
+        pts.push([
+          mt * mt * mt * p0[0] + 3 * mt * mt * t * p1[0] + 3 * mt * t * t * p2[0] + t * t * t * p3[0],
+          mt * mt * mt * p0[1] + 3 * mt * mt * t * p1[1] + 3 * mt * t * t * p2[1] + t * t * t * p3[1],
+        ]);
+      }
+      cur = p3;
+      continue;
+    }
+    cur = px(c.x, c.y);
+    pts.push(cur);
+  }
+  return pts;
+}
+
+function pointInPolygon(poly: Array<[number, number]>, x: number, y: number): boolean {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i, i += 1) {
+    const [xi, yi] = poly[i];
+    const [xj, yj] = poly[j];
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+function segmentsCross(
+  a: [number, number],
+  b: [number, number],
+  c: [number, number],
+  d: [number, number],
+): boolean {
+  const s = (p: [number, number], q: [number, number], r: [number, number]) =>
+    Math.sign((q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]));
+  return s(a, b, c) !== s(a, b, d) && s(c, d, a) !== s(c, d, b);
+}
+
+/** True when `rect` lies wholly inside the outline (edges included). */
+export function outlineContainsRect(ctx: ClipContextBox, rect: StageRect, pad = 0.5): boolean {
+  const poly = flattenOutline(ctx);
+  if (poly.length < 3) return false;
+  const l = rect.x + pad;
+  const t = rect.y + pad;
+  const r = rect.x + rect.w - pad;
+  const b = rect.y + rect.h - pad;
+  const corners: Array<[number, number]> = [
+    [l, t],
+    [r, t],
+    [r, b],
+    [l, b],
+  ];
+  for (const [cx, cy] of corners) {
+    if (!pointInPolygon(poly, cx, cy)) return false;
+  }
+  // Concave outlines (notches, chevrons) can cut through a rectangle whose
+  // corners are all inside, so every edge pair is checked too.
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i, i += 1) {
+    for (let k = 0; k < 4; k += 1) {
+      if (segmentsCross(poly[j], poly[i], corners[k], corners[(k + 1) % 4])) return false;
+    }
+  }
+  return true;
+}
