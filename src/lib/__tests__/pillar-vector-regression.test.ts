@@ -123,6 +123,20 @@ const samples: { name: string; config: PillarConfig }[] = [
     } as PillarConfig,
   },
   {
+    name: "division-profile-template",
+    config: {
+      ...withPillarKind(pillarDefault(undefined, "finance"), "division"),
+      verticalHeadline: false,
+    } as PillarConfig,
+  },
+  {
+    name: "blank-pillar",
+    config: {
+      ...withPillarKind(pillarDefault(), "blank"),
+      verticalHeadline: false,
+    } as PillarConfig,
+  },
+  {
     name: "logo-with-qr",
     config: {
       ...withPillarKind(pillarDefault(), "logo"),
@@ -150,7 +164,7 @@ describe("pillar vector export regression", () => {
       expect(fp.legacyShading, "ground is an analytic axial/radial shading").toBeGreaterThan(0);
       expect(fp.gradientPattern, "shading is a pattern fill on a path").toBeGreaterThan(0);
       expect(fp.subsetFont, "subset cmaps render as .notdef boxes").toBe(false);
-      expect(fp.layers.length, "nine named layers (OCGs)").toBe(9);
+      expect(fp.layers.length, "ten named layers (OCGs)").toBe(10);
       expect(fp.boxes).toEqual({ media: true, trim: true, bleed: true });
       expect(fp.clips, "ground is clipped to the bleed sheet").toBeGreaterThan(0);
 
