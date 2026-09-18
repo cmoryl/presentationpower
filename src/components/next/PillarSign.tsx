@@ -17,6 +17,7 @@ import {
   pillarQrStyle,
   pillarQrPlacement,
   pillarSubSize,
+  pillarEyebrowSize,
   pillarInk,
   type PillarConfig,
 } from "@/lib/next-pillar-masters";
@@ -71,9 +72,32 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   const gradientId = `pillar-${template.id}-${face}-${config.styleId.replace(/[^a-z0-9]/gi, "")}`;
   const inset = mm(geo.bleedEdge + geo.safeInset);
   const lockupW = mm(geo.trimW * template.lockupWidth * pillarLockupScale(config));
-  const chevronInk = pillarChevronInk(face);
-  const chevrons = template.chevrons ? pillarChevronBands(geo.bleedW, geo.bleedH) : [];
+  const chevronInk = pillarChevronInk(face, template.chevronSet);
+  const chevrons = template.chevrons
+    ? pillarChevronBands(geo.bleedW, geo.bleedH, template.chevronSet)
+    : [];
   const headlineLines = pillarHeadlineLines(config.headline, template.stackWords);
+
+  // Strapline across the top of the column, as the supplied division masters
+  // carry it. It pushes the lockup down by its own line box so nothing collides.
+  const eyebrowText = (config.eyebrow ?? "").trim();
+  const eyebrowSize = pillarEyebrowSize(config);
+  const eyebrowDrop = eyebrowText ? mm(eyebrowSize * 2.1) : 0;
+  const eyebrowNode = eyebrowText ? (
+    <div
+      style={{
+        fontWeight: 600,
+        letterSpacing: "0.16em",
+        lineHeight: 1.1,
+        fontSize: mm(eyebrowSize),
+        textTransform: "uppercase",
+        color: headlineInk,
+        opacity: 0.95,
+      }}
+    >
+      {eyebrowText}
+    </div>
+  ) : null;
 
   const linkLines =
     config.kind === "logo"
@@ -281,6 +305,12 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
             color: ink,
           }}
         >
+          {eyebrowNode ? (
+            <div style={{ position: "absolute", left: 0, right: 0, top: 0, textAlign: "left" }}>
+              {eyebrowNode}
+            </div>
+          ) : null}
+
           {config.showLockup && (division.whiteUrl || division.colorUrl) ? (
             <img
               src={
@@ -293,7 +323,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
               style={{
                 position: "absolute",
                 left: 0,
-                top: 0,
+                top: eyebrowDrop,
                 width: lockupW,
                 height: lockupW / (division.ratio || 1.7),
                 objectFit: "contain",
@@ -369,6 +399,10 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
           color: ink,
         }}
       >
+        {eyebrowNode ? (
+          <div style={{ marginBottom: mm(eyebrowSize), width: "100%" }}>{eyebrowNode}</div>
+        ) : null}
+
         {config.showLockup && (division.whiteUrl || division.colorUrl) ? (
           <img
             src={

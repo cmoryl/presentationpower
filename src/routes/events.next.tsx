@@ -1187,10 +1187,10 @@ function LivePillars({ division }: { division: NextDivision }) {
             Live pillar masters · {division.name}
           </h2>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Welcome, registration, general logo and directional pillars on the approved NEXT
-            grounds, carrying the {division.name} lockup. Every one is a live studio file — open it
-            to edit copy, footprint, QR codes and lockup scale, then export layered PDF/X-4 and
-            Illustrator art.
+            Welcome, registration, general logo, directional, the {division.name} profile pillar and
+            the blank pillar, on the approved NEXT grounds and carrying the {division.name} lockup.
+            Every one is a live studio file — open it to edit the strapline, copy, footprint, QR
+            codes and lockup scale, then export layered PDF/X-4 and Illustrator art.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">

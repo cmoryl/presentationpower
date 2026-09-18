@@ -44,6 +44,8 @@ import {
   PILLAR_HEADLINE_OFFSET,
   PILLAR_HEADLINE_SIZE,
   PILLAR_KINDS,
+  PILLAR_EYEBROW_SIZE,
+  pillarEyebrowSize,
   PILLAR_LOCKUP_SCALE,
   PILLAR_QR_SIZE,
   PILLAR_SIZES,
@@ -927,6 +929,37 @@ export function PillarStudio({
 
           {config.kind === "logo" ? null : (
             <div className="rounded-2xl border border-black/10 bg-white p-5 space-y-3">
+              <div>
+                <div className={label}>Strapline (optional)</div>
+                <input
+                  className={`${field} mt-1`}
+                  placeholder="e.g. BEYOND INTELLIGENCE"
+                  value={config.eyebrow ?? ""}
+                  onChange={(e) => set("eyebrow", e.target.value)}
+                />
+                <p className="mt-1 text-[11px] text-black/45">
+                  Sits across the top of the column, over the division lockup.
+                </p>
+              </div>
+              {(config.eyebrow ?? "").trim() ? (
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className={label}>Strapline size</div>
+                    <div className="text-xs tabular-nums text-black/55">
+                      {pillarEyebrowSize(config)} mm
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    className="mt-2 w-full accent-[#003FC7]"
+                    min={PILLAR_EYEBROW_SIZE.min}
+                    max={PILLAR_EYEBROW_SIZE.max}
+                    step={PILLAR_EYEBROW_SIZE.step}
+                    value={pillarEyebrowSize(config)}
+                    onChange={(e) => set("eyebrowSize", Number(e.target.value))}
+                  />
+                </div>
+              ) : null}
               <div>
                 <div className={label}>Headline</div>
                 <input

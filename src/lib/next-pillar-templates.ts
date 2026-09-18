@@ -24,7 +24,10 @@ import {
   type PillarFaceId,
 } from "./next-pillar-masters";
 
-export type PillarTemplateId = "classic" | "next-ascend";
+export type PillarTemplateId = "classic" | "next-ascend" | "next-blank" | "next-profile";
+
+/** Which measured chevron run a template draws. */
+export type PillarChevronSet = "ascend" | "profile";
 
 export type PillarTemplate = {
   id: PillarTemplateId;
@@ -35,6 +38,10 @@ export type PillarTemplate = {
   align: "center" | "left";
   /** Ascending chevron device behind the copy. */
   chevrons: boolean;
+  /** Which measured chevron run to draw. Defaults to the ascending stack. */
+  chevronSet?: PillarChevronSet;
+  /** Strapline over the lockup, as the supplied division masters carry it. */
+  eyebrow?: boolean;
   /** Set each word of the headline on its own line. */
   stackWords: boolean;
   /** Headline block top, as a fraction of trim height from the trim top. */
@@ -66,6 +73,31 @@ export const PILLAR_TEMPLATES: PillarTemplate[] = [
     headlineTop: 0.46,
     lockupWidth: 0.76,
   },
+  {
+    id: "next-blank",
+    name: "NEXT blank ground",
+    note: "The supplied blank pillar: the violet-to-aqua ground with the measured chevron run and nothing else. Start here and add the lockup, strapline and copy you need.",
+    stops: ["#9A70F8", "#B4B0FB", "#8BC6EA"],
+    align: "center",
+    chevrons: true,
+    chevronSet: "profile",
+    stackWords: false,
+    headlineTop: 0,
+    lockupWidth: 0.58,
+  },
+  {
+    id: "next-profile",
+    name: "NEXT division profile",
+    note: "Measured from the supplied division pillars (DataForce, Finance): strapline across the top, division lockup under it, the chevron run through the middle and the headline stacked a word to a line in the lower half. Swap the division and every line of copy freely.",
+    stops: ["#9A70F8", "#B4B0FB", "#8BC6EA"],
+    align: "left",
+    chevrons: true,
+    chevronSet: "profile",
+    eyebrow: true,
+    stackWords: true,
+    headlineTop: 0.5,
+    lockupWidth: 0.8,
+  },
 ];
 
 export function pillarTemplate(id: string | undefined): PillarTemplate {
@@ -81,7 +113,13 @@ export function pillarGroundStops(config: PillarConfig): string[] {
 }
 
 /** Ink + opacity of the chevron device on a face. */
-export function pillarChevronInk(face: PillarFaceId): { color: string; opacity: number } {
+export function pillarChevronInk(
+  face: PillarFaceId,
+  set: PillarChevronSet = "ascend",
+): { color: string; opacity: number } {
+  // The supplied division masters hold the run back to a whisper on both faces,
+  // so the headline stays the loudest thing on the column.
+  if (set === "profile") return { color: "#FFFFFF", opacity: face === "light" ? 0.3 : 0.16 };
   return face === "light"
     ? { color: "#FFFFFF", opacity: 0.62 }
     : { color: "#FFFFFF", opacity: 0.1 };
@@ -97,7 +135,12 @@ export type PillarChevronBand = {
  * centre, bands rising left and right, stacked from just under the lockup down
  * past the foot so the run never shows a seam.
  */
-export function pillarChevronBands(bleedW: number, bleedH: number): PillarChevronBand[] {
+export function pillarChevronBands(
+  bleedW: number,
+  bleedH: number,
+  set: PillarChevronSet = "ascend",
+): PillarChevronBand[] {
+  if (set === "profile") return pillarProfileBands(bleedW, bleedH);
   const apexX = bleedW * 0.5;
   const rise = bleedW * 0.42;
   const thickness = bleedW * 0.3;
@@ -117,6 +160,43 @@ export function pillarChevronBands(bleedW: number, bleedH: number): PillarChevro
       ],
     });
   }
+  return bands;
+}
+
+/**
+ * The chevron run measured off the supplied division pillars: two wide bands
+ * across the middle of the column, then a narrower stack held to the left of the
+ * column under them, which is what carries the eye down to the headline.
+ * Fractions are of the bleed sheet, so every pillar size keeps the proportion.
+ */
+function pillarProfileBands(bleedW: number, bleedH: number): PillarChevronBand[] {
+  const bands: PillarChevronBand[] = [];
+  const band = (apexY: number, thickness: number, left: number, right: number) => {
+    const apexX = (left + right) / 2;
+    const rise = (right - left) * 0.42;
+    const a = apexY;
+    const b = apexY + thickness;
+    bands.push({
+      points: [
+        [left, a + rise],
+        [apexX, a],
+        [right, a + rise],
+        [right, b + rise],
+        [apexX, b],
+        [left, b + rise],
+      ],
+    });
+  };
+
+  // Two wide bands through the middle of the column.
+  band(bleedH * 0.345, bleedW * 0.2, 0, bleedW);
+  band(bleedH * 0.425, bleedW * 0.2, 0, bleedW);
+
+  // The narrow stack, held to the left two thirds under them.
+  const narrowRight = bleedW * 0.66;
+  const thin = bleedW * 0.085;
+  const step = bleedW * 0.155;
+  for (let i = 0; i < 8; i += 1) band(bleedH * 0.62 + step * i, thin, 0, narrowRight);
   return bands;
 }
 
