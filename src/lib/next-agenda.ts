@@ -1952,6 +1952,15 @@ export function agendaParagraphCount(text: string): number {
     .filter((line) => line.trim()).length;
 }
 
+/**
+ * Smallest type multiplier a tightened band may print at. Below this the copy
+ * stops being legible at board distance, so the fit report is left to flag the
+ * overflow rather than shrinking the sheet into unreadability.
+ */
+export const AGENDA_MIN_BAND_FIT = 0.62;
+
+
+
 
 // ── naming + persistence ─────────────────────────────────────────────────────
 
