@@ -166,6 +166,11 @@ export function placeDomShapes(
         }),
       );
     }
+    // Shape mask → native custom geometry, applied on the finished part by
+    // `withCustomGeometry`. The corner radius is dropped for a masked box: the
+    // outline already describes its corners.
+    const shapeClip = s.clip && s.clip.length >= 2 ? clipGeomTag(s.clip) : null;
+    if (shapeClip) nameParts.push(shapeClip);
     // No `[sh:…]` ambient tag here: the measured CSS shadow already ships as
     // the shape's native drop shadow (`props.shadow` below). Tagging it too made
     // the surface pass add a second effect for the same shadow, which is what
@@ -192,7 +197,7 @@ export function placeDomShapes(
           : { type: "none" },
       objectName: `${groupPrefix(s)}${nameParts.join("")} ${s.name}`.trim(),
     };
-    if (type === "roundRect") props.rectRadius = radiusIn;
+    if (type === "roundRect" && !shapeClip) props.rectRadius = radiusIn;
     if (shadow) props.shadow = { ...shadow };
 
     try {

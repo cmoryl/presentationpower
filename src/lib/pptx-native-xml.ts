@@ -454,6 +454,9 @@ export async function applyNativePptxFeatures(
         // are folded into group children.
         xml = withCroppedPictures(xml);
         xml = withRoundedPictures(xml);
+        // Shape masks: `[cg:…]` → native a:custGeom on shapes and pictures, so a
+        // clipped card or a shape-cropped photograph stays editable.
+        xml = withCustomGeometry(xml);
         // Baked line layouts must not inherit PowerPoint's default text insets.
         xml = withExplicitInsets(xml);
         // One <a:pPr>, first child of <a:p> — duplicates make PowerPoint drop
