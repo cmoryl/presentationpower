@@ -84,8 +84,6 @@ import {
   pillarArtworkBox,
   PILLAR_ART_WIDTH,
   pillarSubSize,
-  PILLAR_EYEBROW_SIZE,
-  pillarEyebrowSize,
   withPillarKind,
   type PillarConfig,
 } from "@/lib/next-pillar-masters";
