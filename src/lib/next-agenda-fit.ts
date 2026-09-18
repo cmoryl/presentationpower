@@ -101,20 +101,31 @@ export function agendaFit(config: AgendaConfig): AgendaFitReport {
     ];
 
     for (const check of checks) {
-      const chars = check.text.trim().length;
+      const clean = check.text.trim();
+      const chars = clean.length;
       if (!chars) continue;
-      const w = textWidth(chars, check.size, check.field === "track");
+      // Titles and speaker notes wrap inside the band, so a long run is not an
+      // overflow — only a single unbreakable word wider than the column is. The
+      // time and track lines print on one line and are measured whole. Measuring
+      // whole runs flagged every panel list on the dense Legal slots as over-long
+      // when they read perfectly well across two or three wrapped lines.
+      const wraps = check.field === "title" || check.field === "detail";
+      const measured = wraps
+        ? clean.split(/\s+/).reduce((longest, word) => (word.length > longest.length ? word : longest), "")
+        : clean;
+      const w = textWidth(measured.length, check.size, check.field === "track");
       if (w <= check.col) continue;
-      const perChar = w / chars;
+      const perChar = w / Math.max(1, measured.length);
       lines.push({
         index,
         field: check.field,
-        label: check.text.trim(),
+        label: clean,
         overMm: Math.round((w - check.col) * 10) / 10,
         trimChars: Math.max(1, Math.ceil((w - check.col) / perChar)),
       });
     }
   });
+
 
   const overflows = slackMm < -0.5 || rowCount > maxRows;
 
