@@ -16,6 +16,7 @@ import type PptxGenJS from "pptxgenjs";
 import { isGhostPaint, type DomColor, type DomShape } from "./export-dom-decompose";
 import { aspectFrame, getImageAspect } from "./export-image-aspect";
 import { PX_PER_IN, pxToRadiusIn, rectRadiusAdj } from "./export-radius";
+import { clipGeomTag } from "./export-clip-geom";
 import { gradientTag, pxToPt } from "./export-surface";
 import { coverCropTag, roundPicTag } from "./pptx-shape-normalize";
 import { groupTag } from "./pptx-group-xml";
@@ -110,9 +111,15 @@ export function placeDomShapes(
         frame.exact || s.fit === "contain" || s.fit === "fill"
           ? ""
           : coverCropTag(ratio, frame.w, frame.h);
+      // A masked picture keeps its rectangle's crop but takes a custom outline,
+      // which is exactly PowerPoint's own "Crop to Shape" — so the rounded-corner
+      // tag would fight it and is skipped.
+      const clip = s.clip && s.clip.length >= 2 ? clipGeomTag(s.clip) : null;
       const round =
-        s.radiusPx >= 1 ? `${roundPicTag(rectRadiusAdj(radiusIn, frame.w, frame.h))} ` : "";
-      const tag = `${crop ? `${crop} ` : ""}${round}`;
+        !clip && s.radiusPx >= 1
+          ? `${roundPicTag(rectRadiusAdj(radiusIn, frame.w, frame.h))} `
+          : "";
+      const tag = `${crop ? `${crop} ` : ""}${round}${clip ? `${clip} ` : ""}`;
       const common: Record<string, unknown> = {
         x: frame.x,
         y: frame.y,
@@ -159,6 +166,11 @@ export function placeDomShapes(
         }),
       );
     }
+    // Shape mask → native custom geometry, applied on the finished part by
+    // `withCustomGeometry`. The corner radius is dropped for a masked box: the
+    // outline already describes its corners.
+    const shapeClip = s.clip && s.clip.length >= 2 ? clipGeomTag(s.clip) : null;
+    if (shapeClip) nameParts.push(shapeClip);
     // No `[sh:…]` ambient tag here: the measured CSS shadow already ships as
     // the shape's native drop shadow (`props.shadow` below). Tagging it too made
     // the surface pass add a second effect for the same shadow, which is what
@@ -185,7 +197,7 @@ export function placeDomShapes(
           : { type: "none" },
       objectName: `${groupPrefix(s)}${nameParts.join("")} ${s.name}`.trim(),
     };
-    if (type === "roundRect") props.rectRadius = radiusIn;
+    if (type === "roundRect" && !shapeClip) props.rectRadius = radiusIn;
     if (shadow) props.shadow = { ...shadow };
 
     try {

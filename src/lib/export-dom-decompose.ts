@@ -23,6 +23,7 @@ import { isAuthoringChrome } from "./export-chrome-suppress";
 import { STAGE_H, STAGE_W } from "./export-quality";
 import { resolveSvgMarkupVars } from "./export-svg-vars";
 import { classifyEffectStyle, effectSvgDataUrl } from "./export-effect-style";
+import { outlineContainsRect, parseClipOutline, type ClipCmd } from "./export-clip-geom";
 import { resolveAssetUrl, responseToDataUrl, withCacheBuster } from "./asset-base-url";
 
 export interface DomColor {
@@ -78,6 +79,14 @@ export interface DomShape {
    * replaceable picture object instead of being parked on the flat plate.
    */
   cssFilter?: string;
+  /**
+   * Shape mask, normalised to 0..1 of this object's own box. Emitted as native
+   * PowerPoint custom geometry (`a:custGeom`) — the same thing "Edit Points" and
+   * "Crop to Shape" write — so an angular card or a shape-cropped photograph
+   * stays a real, editable object instead of flat artwork.
+   */
+  clip?: ClipCmd[];
+
 
 
   rotationDeg: number;
@@ -592,7 +601,7 @@ function nameFor(el: Element, fallback: string): string {
  * descendants, which inherit the filter/blend context) stay baked into the
  * design-exact plate instead, which reproduces them pixel-for-pixel.
  */
-function hasUnexpressiblePaint(cs: CSSStyleDeclaration): boolean {
+function hasUnexpressiblePaint(cs: CSSStyleDeclaration, clipHandled = false): boolean {
   const filter = cs.filter || "none";
   const blend = cs.mixBlendMode || "normal";
   const mask =
@@ -603,8 +612,11 @@ function hasUnexpressiblePaint(cs: CSSStyleDeclaration): boolean {
   if (filter !== "none" && filter.trim() !== "") return true;
   if (blend !== "normal") return true;
   if (mask !== "none" && mask.trim() !== "") return true;
-  // inset()/round rectangles are expressible; polygons, circles and paths are not.
-  if (clip !== "none" && !/^inset\(/.test(clip.trim())) return true;
+  // Rectangles are expressible directly; polygons, circles, ellipses and paths
+  // travel as native custom geometry when the caller resolved the outline
+  // (`clipHandled`). Anything else — a url() clip, an arc, unresolvable units —
+  // still stays on the flat plate.
+  if (!clipHandled && clip !== "none" && !/^inset\(/.test(clip.trim())) return true;
   return false;
 }
 
@@ -780,6 +792,14 @@ function effectShapeFor(
   };
 }
 
+/** A measured box in stage px, used for mask containment checks. */
+interface ClipBox {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 export interface DecomposeOptions {
   /**
    * Measurement space in stage px. Defaults to the 1920x1080 deck stage; print
@@ -833,6 +853,9 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
   // plate or approximated with a:glow. Descendants inherit the blur/mask, so the
   // subtree is owned by the effect record.
   const effectRoots: Element[] = [];
+  // Elements carrying a mask we resolved into native custom geometry. Kept so a
+  // descendant can be checked against the outline it inherits on screen.
+  const clipContexts: Array<ClipBox & { el: Element; cmds: ClipCmd[] }> = [];
   const insidePlatedSubtree = (el: Element) =>
     platedRoots.some((root) => root === el || root.contains(el)) ||
     effectRoots.some((root) => root === el || root.contains(el));
@@ -859,6 +882,63 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
       const opacity = parseFloat(cs.opacity);
       if (Number.isFinite(opacity) && opacity < MIN_ALPHA) continue;
       if (insidePlatedSubtree(el)) continue;
+
+      // ---- shape masking -------------------------------------------------
+      // A clip PowerPoint CAN hold (polygon, inset, circle, ellipse, path) is
+      // resolved here and travels with the object as custom geometry, instead of
+      // flattening the element and its whole subtree onto the plate.
+      const clipBox = (): { cmds: ClipCmd[] | null; box: ClipBox } => {
+        const cr = el.getBoundingClientRect();
+        const box = {
+          x: (cr.left - root.left) * sx,
+          y: (cr.top - root.top) * sy,
+          w: cr.width * sx,
+          h: cr.height * sy,
+        };
+        return { cmds: parseClipOutline(cs.clipPath, box.w, box.h), box };
+      };
+      const clipCss = (cs.clipPath || "none").trim();
+      const ancestorClip = clipContexts.find((c) => c.el !== el && c.el.contains(el));
+      let ownClip: ClipCmd[] | null = null;
+      let inheritedClip: ClipCmd[] | null = null;
+      if (clipCss && clipCss !== "none") {
+        const resolved = clipBox();
+        if (resolved.cmds) {
+          // Two stacked masks intersect on screen; OOXML holds one geometry per
+          // object, so the honest outcome is to keep this branch plated.
+          if (ancestorClip) {
+            platedRoots.push(el);
+            continue;
+          }
+          ownClip = resolved.cmds;
+          clipContexts.push({ el, cmds: resolved.cmds, ...resolved.box });
+        }
+      } else if (ancestorClip) {
+        const cr = el.getBoundingClientRect();
+        const rect = {
+          x: (cr.left - root.left) * sx,
+          y: (cr.top - root.top) * sy,
+          w: cr.width * sx,
+          h: cr.height * sy,
+        };
+        const sameBox =
+          Math.abs(rect.x - ancestorClip.x) <= 1.5 &&
+          Math.abs(rect.y - ancestorClip.y) <= 1.5 &&
+          Math.abs(rect.w - ancestorClip.w) <= 1.5 &&
+          Math.abs(rect.h - ancestorClip.h) <= 1.5;
+        if (sameBox) {
+          // The classic masked photograph: the picture fills the clipped frame,
+          // so it carries the same outline — PowerPoint's own "Crop to Shape".
+          inheritedClip = ancestorClip.cmds;
+        } else if (!outlineContainsRect(ancestorClip, rect)) {
+          // It crosses the mask edge: exporting it native would spill past the
+          // designed cut, so those pixels stay on the plate.
+          platedRoots.push(el);
+          continue;
+        }
+      }
+      const clipCmds = ownClip ?? inheritedClip;
+
       // A graded photograph stays a native picture: the grade is baked into its
       // pixels further down the pipeline instead of parking it on the plate.
       const isPicture = tag === "IMG" || tag === "CANVAS" || tag === "VIDEO";
@@ -868,10 +948,10 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
             mixBlendMode: cs.mixBlendMode,
             maskImage: (cs as unknown as { maskImage?: string }).maskImage,
             webkitMaskImage: (cs as unknown as { webkitMaskImage?: string }).webkitMaskImage,
-            clipPath: cs.clipPath,
+            clipPath: ownClip ? "none" : cs.clipPath,
           })
         : null;
-      if (!gradeFilter && hasUnexpressiblePaint(cs)) {
+      if (!gradeFilter && hasUnexpressiblePaint(cs, !!ownClip)) {
         // Pure decorative effect (blur bloom, drop-shadow halo, gradient
         // feather) → ship the effect itself as a transparent picture layer so it
         // stays selectable and renders identically on light and dark slides.
@@ -976,6 +1056,7 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           natH: natH > 0 ? natH : undefined,
           fit,
           cssFilter: gradeFilter ?? undefined,
+          clip: clipCmds ?? undefined,
           rotationDeg,
           name: nameFor(el, tag === "SVG" ? "TP Vector" : "TP Image"),
           node: el,
@@ -1025,6 +1106,7 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           shadow,
           src: urlMatch[1],
           fit: cs.backgroundSize === "contain" ? "contain" : "cover",
+          clip: clipCmds ?? undefined,
           rotationDeg,
           name: nameFor(el, "TP Image"),
           node: el,
@@ -1097,14 +1179,17 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           : null,
         line: line ? { ...line, alpha: line.alpha * alphaMul } : null,
         shadow,
+        clip: clipCmds ?? undefined,
         rotationDeg,
         name: nameFor(el, "TP Shape"),
         node: el,
       });
 
       // Accent edges become their own hairline bars so a one-sided CSS rule
-      // never widens into a full outline in PowerPoint.
-      for (const e of edges) {
+      // never widens into a full outline in PowerPoint. A masked box is skipped:
+      // its border is cut by the mask on screen, and a full-length bar would
+      // print outside the designed outline.
+      for (const e of clipCmds ? [] : edges) {
         const t = Math.max(1, e.widthPx);
         const bar =
           e.side === "left"
