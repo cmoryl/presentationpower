@@ -2480,6 +2480,14 @@ export function agendaBlocks(config: AgendaConfig) {
         w: split.cardW,
         h,
       }));
+      // The copy area is the band less its fixed padding, so the multiplier only
+      // measures the type against the room the type actually has.
+      const pad = L.bandPadY * 2;
+      const copyNeed = Math.max(0.1, needs[i]! - pad);
+      const copyRoom = Math.max(0.1, h - pad);
+      const fit = session.dayBreak
+        ? 1
+        : Math.max(AGENDA_MIN_BAND_FIT, Math.min(1, copyRoom / copyNeed));
       return {
         session,
         y,
@@ -2487,6 +2495,7 @@ export function agendaBlocks(config: AgendaConfig) {
         band,
         parallel: parallels[0] ?? null,
         parallels,
+        fit,
       };
     });
   } else {
@@ -2497,8 +2506,10 @@ export function agendaBlocks(config: AgendaConfig) {
       band: null,
       parallel: null,
       parallels: [],
+      fit: 1,
     }));
   }
+
 
   const rowsBottom = rows.length ? rows[rows.length - 1]!.y + rows[rows.length - 1]!.h : rowsTop;
 
