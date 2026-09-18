@@ -12,25 +12,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { bloomColour, LEGAL_BLOOM_SCENES } from "@/lib/social-legal-bloom";
 
-import soapbox from "@/assets/legal-bloom/bloom-soapbox-run.jpg?url";
-import kayak from "@/assets/legal-bloom/bloom-kayak-chute.jpg?url";
-import ocean from "@/assets/legal-bloom/bloom-ocean-race.jpg?url";
-import cliff from "@/assets/legal-bloom/bloom-cliff-camp.jpg?url";
-import ice from "@/assets/legal-bloom/bloom-ice-fall.jpg?url";
-import rally from "@/assets/legal-bloom/bloom-rally-rut.jpg?url";
-import cave from "@/assets/legal-bloom/bloom-cave-haul.jpg?url";
-import deep from "@/assets/legal-bloom/bloom-deep-line.jpg?url";
-import lockup from "@/assets/legal-bloom/tp-legal-black.svg?url";
+// Served from public/legal-bloom so the published page can fetch them: assets
+// only referenced by this server route are not emitted into the client build.
+const soapbox = "/legal-bloom/bloom-soapbox-run.jpg";
+const lockup = "/legal-bloom/tp-legal-black.svg";
 
 const PHOTOS: Record<string, string> = {
   soapbox,
-  kayak,
-  ocean,
-  cliff,
-  ice,
-  rally,
-  cave,
-  deep,
+  kayak: "/legal-bloom/bloom-kayak-chute.jpg",
+  ocean: "/legal-bloom/bloom-ocean-race.jpg",
+  cliff: "/legal-bloom/bloom-cliff-camp.jpg",
+  ice: "/legal-bloom/bloom-ice-fall.jpg",
+  rally: "/legal-bloom/bloom-rally-rut.jpg",
+  cave: "/legal-bloom/bloom-cave-haul.jpg",
+  deep: "/legal-bloom/bloom-deep-line.jpg",
 };
 
 const esc = (s: string) =>
