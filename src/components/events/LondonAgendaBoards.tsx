@@ -16,6 +16,7 @@ import {
   agendaDefault,
   agendaLocationText,
   agendaPages,
+  agendaProgrammeIsStale,
   type AgendaConfig,
 } from "@/lib/next-agenda";
 import type { AgendaFileRecord } from "@/hooks/use-next-live-masters";
@@ -29,9 +30,16 @@ function AgendaCard({
   name: string;
   saved: AgendaFileRecord | undefined;
 }) {
+  // A file saved off an older programme is not a live board: it would hide the
+  // approved London programme behind stale rows. It stays in the saved list,
+  // but the card and the edit link start from the approved master.
+  const live = useMemo(
+    () => (saved && !agendaProgrammeIsStale(saved.config) ? saved : undefined),
+    [saved],
+  );
   const config: AgendaConfig = useMemo(
-    () => (saved ? saved.config : agendaDefault(id)),
-    [saved, id],
+    () => (live ? live.config : agendaDefault(id)),
+    [live, id],
   );
 
   // Render the card from the board's first printed page, exactly as it comes off
@@ -42,6 +50,7 @@ function AgendaCard({
   const dayCount = agendaDays(config).length;
   const room = agendaLocationText(config).trim();
   const sessionCount = agendaDays(config).reduce((n, d) => n + (d.sessions?.length ?? 0), 0);
+
 
   return (
     <article className="flex flex-col overflow-hidden rounded-xl border border-black/10 bg-white">
