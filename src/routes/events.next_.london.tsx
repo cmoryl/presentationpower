@@ -61,7 +61,11 @@ import {
 } from "@/lib/next-london-logo-placement";
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import { useStepRepeatConfigs } from "@/lib/next-london-step-repeat";
-import { londonPanelArtworkUrl, londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
+import {
+  londonHasSuppliedFile,
+  londonPanelArtworkUrl,
+  londonSuppliedMaster,
+} from "@/lib/next-london-supplied-masters";
 import { LONDON_PACK_ISSUE, londonPackReference } from "@/lib/next-london-pack-2281";
 import { buildLondonKitZip } from "@/lib/next-london-kit-zip";
 import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
@@ -403,6 +407,13 @@ function PanelCard({
               Live file v{londonSuppliedMaster(panel)!.fromRevision}
             </span>
           ) : null}
+          {/* Honest about coverage: an area with no file from the delivery in
+              force must not read as current artwork. */}
+          {!londonHasSuppliedFile(panel) && !booth ? (
+            <span className="ml-1.5 inline-flex align-middle rounded bg-[#F2F2F2] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#03002C]/70">
+              No supplied file
+            </span>
+          ) : null}
 
           {variation ? (
             <span className="ml-1.5 inline-flex align-middle rounded bg-[#FF9B70]/55 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
@@ -502,18 +513,29 @@ function LondonSignagePage() {
       ),
     [publishedPanels, variations, localBoardSizes, removals],
   );
+  // What the schedule LISTS. The kit shows the print areas we hold a supplied
+  // file for — the delivery in force — so a card can never show an older
+  // spec-sheet area as though it were current artwork. The rest of the kit is
+  // still reachable behind the second chip, marked as having no supplied file.
+  const [source, setSource] = useState<"supplied" | "all">("supplied");
+  const suppliedPanels = useMemo(
+    () => panels.filter((p) => londonHasSuppliedFile(p)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- a replaced live file changes coverage
+    [panels, liveFileSignature],
+  );
+  const listed = source === "supplied" ? suppliedPanels : panels;
   // Booth masters live in the backend: applying them patches the booth specs
   // and panel records in place, so `applied` is what re-renders the cards.
   const boothTemplates = useBoothTemplates();
   const boothPanels = useMemo(
-    () => panels.filter(isBoothPanel),
+    () => listed.filter(isBoothPanel),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- templates mutate the panel records
-    [panels, boothTemplates.applied],
+    [listed, boothTemplates.applied],
   );
   // Booths belong to the floor they stand on, so they group with the rest of
   // that floor's schedule instead of sitting above every floor view. The
   // "booths" filter is the one place the whole partner set is listed together.
-  const floors = useMemo(() => londonPanelsByFloor(panels), [panels]);
+  const floors = useMemo(() => londonPanelsByFloor(listed), [listed]);
   const [floorId, setFloorId] = useState<string>("all");
   // Cards default to the flat artwork itself: the in-scene visualisations were
   // not reading true enough to stand as the primary card image, so they stay
@@ -1134,7 +1156,7 @@ function LondonSignagePage() {
                   : "border-black/15 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
               }`}
             >
-              All floors · {panels.length}
+              All floors · {listed.length}
             </button>
             {floors.map((floor) => (
               <button
@@ -1164,6 +1186,34 @@ function LondonSignagePage() {
               </button>
             ) : null}
             <span className="ml-auto inline-flex overflow-hidden rounded-full border border-black/15">
+              <button
+                type="button"
+                onClick={() => setSource("supplied")}
+                aria-pressed={source === "supplied"}
+                title={`Only the print areas with a file from the ${LONDON_PACK_ISSUE.label}`}
+                className={`px-3 py-1 font-mono text-[11px] uppercase tracking-[0.12em] ${
+                  source === "supplied"
+                    ? "bg-[#03002C] text-white"
+                    : "bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+                }`}
+              >
+                Supplied files · {suppliedPanels.length}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSource("all")}
+                aria-pressed={source === "all"}
+                title="Every area in the kit, including ones with no supplied file yet"
+                className={`px-3 py-1 font-mono text-[11px] uppercase tracking-[0.12em] ${
+                  source === "all"
+                    ? "bg-[#03002C] text-white"
+                    : "bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+                }`}
+              >
+                Whole kit · {panels.length}
+              </button>
+            </span>
+            <span className="inline-flex overflow-hidden rounded-full border border-black/15">
               {(["flat", "scene"] as const).map((v) => (
                 <button
                   key={v}
@@ -1181,6 +1231,23 @@ function LondonSignagePage() {
               ))}
             </span>
           </div>
+
+          <p className="mt-3 text-[12px] leading-snug text-[#03002C]/65">
+            {source === "supplied" ? (
+              <>
+                Showing the {suppliedPanels.length} print areas with a file from the{" "}
+                {LONDON_PACK_ISSUE.label} — every card render comes from that file. Switch to
+                Whole kit to see the older areas we hold no supplied artwork for.
+              </>
+            ) : (
+              <>
+                Showing every area in the kit. The ones marked{" "}
+                <span className="font-semibold">No supplied file</span> are older spec-sheet
+                entries with nothing delivered for them — their card render is generated, not the
+                artwork in force.
+              </>
+            )}
+          </p>
 
           {artworkError ? (
             <p className="mt-4 rounded-xl border border-[#E53D2E]/30 bg-[#E53D2E]/8 p-4 text-[13px] text-[#03002C]">
