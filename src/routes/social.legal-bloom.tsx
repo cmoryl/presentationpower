@@ -310,33 +310,8 @@ function BloomView() {
       const total = scenes.length * sizes.length + clipCount;
       setPackProgress({ done, total });
 
-      for (const s of sizes) {
-        for (const scene of scenes) {
-          const cut = cutFor(scene.aperture);
-          const sceneSide = sideFor(scene.side);
-          const stored = layouts[bloomLayoutKey(scene.id, s.id)];
-          const layout = stored ?? bloomAutoLayout(scene, s.w, s.h, cut, sceneSide);
-          await stage({ scene, size: s, layout });
-          const node = stageRef.current;
-          if (!node) throw new Error("The staging area was not ready.");
-          const opts = {
-            pixelRatio: dlScale,
-            width: s.w,
-            height: s.h,
-            cacheBust: true,
-            backgroundColor: "#FBFBFD",
-            filter: (n: HTMLElement) => n?.dataset?.exportIgnore !== "true",
-          };
-          const url =
-            dlFormat === "png" ? await toPng(node, opts) : await toJpeg(node, { ...opts, quality: 0.94 });
-          const path = bloomAssetPath(scene, s, dlScale, dlFormat);
-          root.file(path, url.slice(url.indexOf(",") + 1), { base64: true });
-          entries.push({ scene, size: s, aperture: cut, side: sceneSide, layout, arranged: Boolean(stored), path });
-          done += 1;
-          setPackProgress({ done, total });
-        }
-      }
-
+      // The clips are recorded first, while the page is still light: the still
+      // renders leave it slow enough to starve a real-time recording.
       // The animated versions, recorded in real time at each social trim and
       // filed beside the stills so one bundle carries both.
       let motion: BloomPackMotion | undefined;
@@ -381,6 +356,34 @@ function BloomView() {
           placementLabels: motionPlacements.map((p) => `${p.platform} ${p.placement}`),
         };
       }
+
+      for (const s of sizes) {
+        for (const scene of scenes) {
+          const cut = cutFor(scene.aperture);
+          const sceneSide = sideFor(scene.side);
+          const stored = layouts[bloomLayoutKey(scene.id, s.id)];
+          const layout = stored ?? bloomAutoLayout(scene, s.w, s.h, cut, sceneSide);
+          await stage({ scene, size: s, layout });
+          const node = stageRef.current;
+          if (!node) throw new Error("The staging area was not ready.");
+          const opts = {
+            pixelRatio: dlScale,
+            width: s.w,
+            height: s.h,
+            cacheBust: true,
+            backgroundColor: "#FBFBFD",
+            filter: (n: HTMLElement) => n?.dataset?.exportIgnore !== "true",
+          };
+          const url =
+            dlFormat === "png" ? await toPng(node, opts) : await toJpeg(node, { ...opts, quality: 0.94 });
+          const path = bloomAssetPath(scene, s, dlScale, dlFormat);
+          root.file(path, url.slice(url.indexOf(",") + 1), { base64: true });
+          entries.push({ scene, size: s, aperture: cut, side: sceneSide, layout, arranged: Boolean(stored), path });
+          done += 1;
+          setPackProgress({ done, total });
+        }
+      }
+
 
       root.file("README.txt", bloomPackReadme(entries, dlScale, dlFormat, motion));
       root.file("manifest.json", bloomPackManifestJson(entries, dlScale, dlFormat, motion));
@@ -657,7 +660,9 @@ function BloomView() {
               </p>
             ) : null}
           </div>
-          {/* the off-screen canvas the pack's clips are recorded from */}
+          {/* the canvas the pack's clips are recorded from — kept a single pixel
+              in the corner, but painted, because a canvas the browser never
+              composites hands the recorder no frames */}
           <canvas
             ref={recordRef}
             aria-hidden
@@ -666,13 +671,14 @@ function BloomView() {
               position: "fixed",
               top: 0,
               left: 0,
-              width: 1,
-              height: 1,
-              opacity: 0,
+              width: 2,
+              height: 2,
+              opacity: 0.01,
               pointerEvents: "none",
-              zIndex: -1,
+              zIndex: 0,
             }}
           />
+
         </div>
       </header>
 
