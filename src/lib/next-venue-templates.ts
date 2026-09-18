@@ -33,7 +33,15 @@ export type VenueTemplateFamily = {
   /** Editable copy slots this family carries, in reading order. */
   slots: VenueTemplateSlot[];
   /** Ground treatment the family uses, by house gradient family id. */
-  ground: "house-gradient" | "division-gradient" | "repeat-white" | "supplied";
+  ground:
+    | "house-gradient"
+    /** Front-of-house desk ramp measured from the supplied files: orchid → blue. */
+    | "desk-gradient"
+    /** NEXTbrew café ramp: navy → blue → aqua with the live café motif. */
+    | "brew-gradient"
+    | "division-gradient"
+    | "repeat-white"
+    | "supplied";
   /** Whether the face is portrait, landscape, square or a run of any ratio. */
   orientation: "portrait" | "landscape" | "square" | "any";
   /** London signs this family was settled on. */
