@@ -102,6 +102,8 @@ import {
   agendaBandLayout,
   agendaLocation,
   type AgendaLocationIconId,
+
+
   type AgendaLocationInkId,
   type AgendaLocationSizeId,
   type AgendaLocationWeightId,
@@ -2037,7 +2039,39 @@ export function AgendaStudio({
                     </option>
                   ))}
                 </select>
+                {/* Mark colour and size. "Follows the row" keeps the band ink. */}
+                <select
+                  aria-label={`Row ${i + 1} mark colour`}
+                  className={`${selectClass} max-w-[170px]`}
+                  value={session.iconInk ?? "auto"}
+                  disabled={(session.icon ?? "none") === "none"}
+                  onChange={(e) =>
+                    setSession(i, { iconInk: e.target.value as AgendaLocationInkId })
+                  }
+                >
+                  {AGENDA_LOCATION_INKS.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  aria-label={`Row ${i + 1} mark size`}
+                  className={`${selectClass} max-w-[150px]`}
+                  value={session.iconSize ?? "standard"}
+                  disabled={(session.icon ?? "none") === "none"}
+                  onChange={(e) =>
+                    setSession(i, { iconSize: e.target.value as AgendaLocationSizeId })
+                  }
+                >
+                  {AGENDA_LOCATION_SIZES.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
               </div>
+
 
               <div className="flex items-center gap-1">
                 <label className="flex items-center gap-1 pr-2 text-xs text-muted-foreground">

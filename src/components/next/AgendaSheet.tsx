@@ -11,8 +11,9 @@ import {
   agendaCardType,
   agendaLongestWord,
   agendaParallels,
-  agendaSessionIcon,
+  agendaSessionMark,
   agendaSessionRoom,
+
 
   agendaQrBackground,
   agendaQrForeground,
@@ -456,15 +457,18 @@ export function AgendaSheet({
                 {T(row.session.time, (v) => edit?.onSession(i, { time: v }))}
                 {/* Optional per-row mark, printed under the time so it never
                     steals width from the session title. */}
-                {agendaSessionIcon(row.session) ? (
+                {agendaSessionMark(row.session) ? (
                   <div style={{ marginTop: mm(L.timeSize * 0.35) }}>
                     <AgendaLocationMark
-                      icon={agendaSessionIcon(row.session)!}
-                      height={mm(L.timeSize * row.fit * 0.9)}
-                      fill={BAND.ink}
+                      icon={agendaSessionMark(row.session)!.icon}
+                      height={mm(
+                        L.timeSize * row.fit * 0.9 * agendaSessionMark(row.session)!.mul,
+                      )}
+                      fill={agendaSessionMark(row.session)!.hex ?? BAND.ink}
                     />
                   </div>
                 ) : null}
+
               </div>
 
               <div style={{ flex: "1 1 auto", minWidth: 0 }}>
@@ -687,15 +691,18 @@ export function AgendaSheet({
               }}
             >
               {T(row.session.time, (v) => edit?.onSession(i, { time: v }))}
-              {agendaSessionIcon(row.session) ? (
+              {agendaSessionMark(row.session) ? (
                 <div style={{ marginTop: mm(L.timeSize * 0.3) }}>
                   <AgendaLocationMark
-                    icon={agendaSessionIcon(row.session)!}
-                    height={mm(L.timeSize * 0.85)}
-                    fill={row.session.muted ? ink : titleInk}
+                    icon={agendaSessionMark(row.session)!.icon}
+                    height={mm(L.timeSize * 0.85 * agendaSessionMark(row.session)!.mul)}
+                    fill={
+                      agendaSessionMark(row.session)!.hex ?? (row.session.muted ? ink : titleInk)
+                    }
                   />
                 </div>
               ) : null}
+
             </div>
 
             <div style={{ flex: "1 1 auto", minWidth: 0, paddingRight: mm(4) }}>

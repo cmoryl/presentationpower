@@ -1033,6 +1033,13 @@ export type AgendaSession = {
    * published without one and the rooms dropped in later.
    */
   room?: string;
+  /**
+   * Mark colour for this row, from the approved ink set. `auto` (the default)
+   * follows the band ink, so an older board is unchanged.
+   */
+  iconInk?: AgendaLocationInkId;
+  /** Mark scale for this row, from the approved size steps. Default `standard`. */
+  iconSize?: AgendaLocationSizeId;
 
 };
 
@@ -1049,10 +1056,33 @@ export function agendaSessionIcon(
   return found && found.path ? found : null;
 }
 
+/**
+ * Resolved per-row mark: the glyph, its approved colour (null = follow the band
+ * ink, which every renderer supplies as its own fallback) and its scale.
+ * Returns null when the row carries no mark.
+ */
+export function agendaSessionMark(
+  session: Pick<AgendaSession, "icon" | "iconInk" | "iconSize"> | null | undefined,
+): {
+  icon: (typeof AGENDA_LOCATION_ICONS)[number];
+  /** Approved hex, or null when the row follows the board ink. */
+  hex: string | null;
+  mul: number;
+} | null {
+  const icon = agendaSessionIcon(session);
+  if (!icon) return null;
+  return {
+    icon,
+    hex: AGENDA_LOCATION_INKS.find((i) => i.id === session?.iconInk)?.hex ?? null,
+    mul: AGENDA_LOCATION_SIZES.find((s) => s.id === session?.iconSize)?.mul ?? 1,
+  };
+}
+
 /** Room / floor line for a row, already trimmed. Empty when none is known. */
 export function agendaSessionRoom(session: Pick<AgendaSession, "room"> | null | undefined): string {
   return (session?.room ?? "").trim();
 }
+
 
 /**
  * Most parallel tracks one slot can print. Four cards is the point where the
@@ -2054,6 +2084,13 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
         ? (s.icon as AgendaLocationIconId)
         : "none",
       room: str(s.room, ""),
+      iconInk: AGENDA_LOCATION_INKS.some((i) => i.id === s.iconInk)
+        ? (s.iconInk as AgendaLocationInkId)
+        : "auto",
+      iconSize: AGENDA_LOCATION_SIZES.some((z) => z.id === s.iconSize)
+        ? (s.iconSize as AgendaLocationSizeId)
+        : "standard",
+
 
     };
 

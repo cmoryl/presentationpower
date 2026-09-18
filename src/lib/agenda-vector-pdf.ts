@@ -55,7 +55,7 @@ import {
   agendaCardType,
   agendaLongestWord,
   agendaParallels,
-  agendaSessionIcon,
+  agendaSessionMark,
   agendaSessionRoom,
 
   agendaQrBackground,
@@ -761,17 +761,18 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
           });
         }
         // Optional per-row mark, under the time in the time column.
-        const rowMark = agendaSessionIcon(row.session);
+        const rowMark = agendaSessionMark(row.session);
         if (rowMark) {
-          const markH = mm(L.timeSize) * row.fit * 0.9;
-          page.drawSvgPath(rowMark.path, {
+          const markH = mm(L.timeSize) * row.fit * 0.9 * rowMark.mul;
+          page.drawSvgPath(rowMark.icon.path, {
             x: px(band.x) + padX,
             y: y - mm(L.timeSize) * row.fit * 1.45,
-            scale: markH / rowMark.vh,
-            color: bandInk,
+            scale: markH / rowMark.icon.vh,
+            color: rowMark.hex ? rgb(...hexRgb(rowMark.hex)) : bandInk,
             borderWidth: 0,
           });
         }
+
         if (row.session.track.trim()) {
           const size = mm(L.trackSize) * row.fit;
           page.drawText(row.session.track.toUpperCase(), {
@@ -973,17 +974,18 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
         });
         y -= size * 1.35;
       }
-      const ruledMark = agendaSessionIcon(row.session);
+      const ruledMark = agendaSessionMark(row.session);
       if (ruledMark) {
-        const markH = mm(L.timeSize) * 0.85;
-        page.drawSvgPath(ruledMark.path, {
+        const markH = mm(L.timeSize) * 0.85 * ruledMark.mul;
+        page.drawSvgPath(ruledMark.icon.path, {
           x: px(blocks.x),
           y: top - pad - mm(L.timeSize) * 1.25,
-          scale: markH / ruledMark.vh,
-          color: rgb(...hexRgb(row.session.muted ? ink : titleInk)),
+          scale: markH / ruledMark.icon.vh,
+          color: rgb(...hexRgb(ruledMark.hex ?? (row.session.muted ? ink : titleInk))),
           borderWidth: 0,
         });
       }
+
 
       if (row.session.detail.trim()) {
         const size = mm(L.detailSize);
