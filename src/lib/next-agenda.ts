@@ -2492,7 +2492,7 @@ export function agendaBlocks(config: AgendaConfig) {
     const takenH = heights.reduce((a, h) => a + h, 0);
     const spare = Math.max(0, available - takenH);
     const gapExtra =
-      heights.length > 1 ? Math.min(spare / (heights.length - 1), L.bandGap * 2) : 0;
+      heights.length > 1 ? Math.min(spare / (heights.length - 1), L.bandGap * 6) : 0;
     const rowGap = L.bandGap + gapExtra;
 
     let cursor = rowsTop;
