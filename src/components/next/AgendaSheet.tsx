@@ -293,7 +293,7 @@ export function AgendaSheet({
           width: mm(blocks.headW),
           fontSize: mm(L.titleSize),
           lineHeight: 1,
-          fontWeight: 700,
+          fontWeight: L.weights.title,
           letterSpacing: "-0.02em",
           color: titleInk,
         }}
@@ -391,7 +391,7 @@ export function AgendaSheet({
                   width: mm(L.timeColW),
                   flex: "0 0 auto",
                   fontSize: mm(L.timeSize),
-                  fontWeight: 400,
+                  fontWeight: L.weights.time === 700 ? 500 : L.weights.time,
                   lineHeight: 1.4,
                 }}
               >
@@ -413,7 +413,7 @@ export function AgendaSheet({
                 <div
                   style={{
                     fontSize: mm(L.titleRowSize),
-                    fontWeight: row.session.muted ? 400 : 700,
+                    fontWeight: row.session.muted ? 400 : L.weights.row,
                     lineHeight: 1.35,
                   }}
                 >
@@ -551,7 +551,7 @@ export function AgendaSheet({
                 width: mm(L.timeColW),
                 flex: "0 0 auto",
                 fontSize: mm(L.timeSize),
-                fontWeight: 700,
+                fontWeight: L.weights.time,
                 letterSpacing: "-0.01em",
                 color: row.session.muted ? ink : titleInk,
               }}
@@ -562,7 +562,7 @@ export function AgendaSheet({
               <div
                 style={{
                   fontSize: mm(L.titleRowSize),
-                  fontWeight: row.session.muted ? 500 : 700,
+                  fontWeight: row.session.muted ? 500 : L.weights.row,
                   lineHeight: 1.12,
                   letterSpacing: "-0.01em",
                 }}
