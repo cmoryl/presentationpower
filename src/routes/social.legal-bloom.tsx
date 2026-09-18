@@ -1019,6 +1019,17 @@ function BloomView() {
               >
                 {cropping ? "Done cropping" : "Crop picture"}
               </button>
+              {/* the small supporting line under the headline can be taken off */}
+              <label className="flex items-center gap-2 text-[11px] text-white/70">
+                <input
+                  type="checkbox"
+                  checked={!zoomLayout.hideSupport}
+                  onChange={(e) =>
+                    putLayout({ ...zoomLayout, hideSupport: !e.target.checked })
+                  }
+                />
+                Small line
+              </label>
               {/* the shape of the lower accent splash behind the lockup */}
               <label className="flex items-center gap-2 text-[11px] text-white/70">
                 Splash shape
