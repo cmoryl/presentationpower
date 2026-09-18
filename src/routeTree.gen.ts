@@ -175,6 +175,7 @@ import { Route as DecksDeckIdDocumentRouteImport } from './routes/decks.$deckId.
 import { Route as ApiPublicSkinBackdropRouteImport } from './routes/api/public/skin-backdrop'
 import { Route as ApiPublicPdfIndexProxyRouteImport } from './routes/api/public/pdf-index-proxy'
 import { Route as ApiPublicDivisionImageRouteImport } from './routes/api/public/division-image'
+import { Route as ApiPublicCanvaAdRouteImport } from './routes/api/public/canva-ad'
 import { Route as ApiPublicBrandhubSeedProxyRouteImport } from './routes/api/public/brandhub-seed-proxy'
 import { Route as AdminPrintLibraryItemIdRouteImport } from './routes/admin.print-library_.$itemId'
 import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns.kit'
@@ -1026,6 +1027,11 @@ const ApiPublicDivisionImageRoute = ApiPublicDivisionImageRouteImport.update({
   path: '/api/public/division-image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCanvaAdRoute = ApiPublicCanvaAdRouteImport.update({
+  id: '/api/public/canva-ad',
+  path: '/api/public/canva-ad',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicBrandhubSeedProxyRoute =
   ApiPublicBrandhubSeedProxyRouteImport.update({
     id: '/api/public/brandhub-seed-proxy',
@@ -1223,6 +1229,7 @@ export interface FileRoutesByFullPath {
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/admin/print-library/$itemId': typeof AdminPrintLibraryItemIdRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
+  '/api/public/canva-ad': typeof ApiPublicCanvaAdRoute
   '/api/public/division-image': typeof ApiPublicDivisionImageRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/api/public/skin-backdrop': typeof ApiPublicSkinBackdropRoute
@@ -1398,6 +1405,7 @@ export interface FileRoutesByTo {
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/admin/print-library/$itemId': typeof AdminPrintLibraryItemIdRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
+  '/api/public/canva-ad': typeof ApiPublicCanvaAdRoute
   '/api/public/division-image': typeof ApiPublicDivisionImageRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/api/public/skin-backdrop': typeof ApiPublicSkinBackdropRoute
@@ -1578,6 +1586,7 @@ export interface FileRoutesById {
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/admin/print-library_/$itemId': typeof AdminPrintLibraryItemIdRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
+  '/api/public/canva-ad': typeof ApiPublicCanvaAdRoute
   '/api/public/division-image': typeof ApiPublicDivisionImageRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/api/public/skin-backdrop': typeof ApiPublicSkinBackdropRoute
@@ -1759,6 +1768,7 @@ export interface FileRouteTypes {
     | '/admin/campaigns/kit'
     | '/admin/print-library/$itemId'
     | '/api/public/brandhub-seed-proxy'
+    | '/api/public/canva-ad'
     | '/api/public/division-image'
     | '/api/public/pdf-index-proxy'
     | '/api/public/skin-backdrop'
@@ -1934,6 +1944,7 @@ export interface FileRouteTypes {
     | '/admin/campaigns/kit'
     | '/admin/print-library/$itemId'
     | '/api/public/brandhub-seed-proxy'
+    | '/api/public/canva-ad'
     | '/api/public/division-image'
     | '/api/public/pdf-index-proxy'
     | '/api/public/skin-backdrop'
@@ -2113,6 +2124,7 @@ export interface FileRouteTypes {
     | '/admin/campaigns/kit'
     | '/admin/print-library_/$itemId'
     | '/api/public/brandhub-seed-proxy'
+    | '/api/public/canva-ad'
     | '/api/public/division-image'
     | '/api/public/pdf-index-proxy'
     | '/api/public/skin-backdrop'
@@ -2239,6 +2251,7 @@ export interface RootRouteChildren {
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
+  ApiPublicCanvaAdRoute: typeof ApiPublicCanvaAdRoute
   ApiPublicDivisionImageRoute: typeof ApiPublicDivisionImageRoute
   ApiPublicPdfIndexProxyRoute: typeof ApiPublicPdfIndexProxyRoute
   ApiPublicSkinBackdropRoute: typeof ApiPublicSkinBackdropRoute
@@ -3421,6 +3434,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicDivisionImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/canva-ad': {
+      id: '/api/public/canva-ad'
+      path: '/api/public/canva-ad'
+      fullPath: '/api/public/canva-ad'
+      preLoaderRoute: typeof ApiPublicCanvaAdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/brandhub-seed-proxy': {
       id: '/api/public/brandhub-seed-proxy'
       path: '/api/public/brandhub-seed-proxy'
@@ -3790,6 +3810,7 @@ const rootRouteChildren: RootRouteChildren = {
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
+  ApiPublicCanvaAdRoute: ApiPublicCanvaAdRoute,
   ApiPublicDivisionImageRoute: ApiPublicDivisionImageRoute,
   ApiPublicPdfIndexProxyRoute: ApiPublicPdfIndexProxyRoute,
   ApiPublicSkinBackdropRoute: ApiPublicSkinBackdropRoute,
