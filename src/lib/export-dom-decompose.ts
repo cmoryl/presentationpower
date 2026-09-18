@@ -871,6 +871,63 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
       const opacity = parseFloat(cs.opacity);
       if (Number.isFinite(opacity) && opacity < MIN_ALPHA) continue;
       if (insidePlatedSubtree(el)) continue;
+
+      // ---- shape masking -------------------------------------------------
+      // A clip PowerPoint CAN hold (polygon, inset, circle, ellipse, path) is
+      // resolved here and travels with the object as custom geometry, instead of
+      // flattening the element and its whole subtree onto the plate.
+      const clipBox = (): { cmds: ClipCmd[] | null; box: ClipBox } => {
+        const cr = el.getBoundingClientRect();
+        const box = {
+          x: (cr.left - root.left) * sx,
+          y: (cr.top - root.top) * sy,
+          w: cr.width * sx,
+          h: cr.height * sy,
+        };
+        return { cmds: parseClipOutline(cs.clipPath, box.w, box.h), box };
+      };
+      const clipCss = (cs.clipPath || "none").trim();
+      const ancestorClip = clipContexts.find((c) => c.el !== el && c.el.contains(el));
+      let ownClip: ClipCmd[] | null = null;
+      let inheritedClip: ClipCmd[] | null = null;
+      if (clipCss && clipCss !== "none") {
+        const resolved = clipBox();
+        if (resolved.cmds) {
+          // Two stacked masks intersect on screen; OOXML holds one geometry per
+          // object, so the honest outcome is to keep this branch plated.
+          if (ancestorClip) {
+            platedRoots.push(el);
+            continue;
+          }
+          ownClip = resolved.cmds;
+          clipContexts.push({ el, cmds: resolved.cmds, ...resolved.box });
+        }
+      } else if (ancestorClip) {
+        const cr = el.getBoundingClientRect();
+        const rect = {
+          x: (cr.left - root.left) * sx,
+          y: (cr.top - root.top) * sy,
+          w: cr.width * sx,
+          h: cr.height * sy,
+        };
+        const sameBox =
+          Math.abs(rect.x - ancestorClip.x) <= 1.5 &&
+          Math.abs(rect.y - ancestorClip.y) <= 1.5 &&
+          Math.abs(rect.w - ancestorClip.w) <= 1.5 &&
+          Math.abs(rect.h - ancestorClip.h) <= 1.5;
+        if (sameBox) {
+          // The classic masked photograph: the picture fills the clipped frame,
+          // so it carries the same outline — PowerPoint's own "Crop to Shape".
+          inheritedClip = ancestorClip.cmds;
+        } else if (!outlineContainsRect(ancestorClip, rect)) {
+          // It crosses the mask edge: exporting it native would spill past the
+          // designed cut, so those pixels stay on the plate.
+          platedRoots.push(el);
+          continue;
+        }
+      }
+      const clipCmds = ownClip ?? inheritedClip;
+
       // A graded photograph stays a native picture: the grade is baked into its
       // pixels further down the pipeline instead of parking it on the plate.
       const isPicture = tag === "IMG" || tag === "CANVAS" || tag === "VIDEO";
@@ -880,10 +937,10 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
             mixBlendMode: cs.mixBlendMode,
             maskImage: (cs as unknown as { maskImage?: string }).maskImage,
             webkitMaskImage: (cs as unknown as { webkitMaskImage?: string }).webkitMaskImage,
-            clipPath: cs.clipPath,
+            clipPath: ownClip ? "none" : cs.clipPath,
           })
         : null;
-      if (!gradeFilter && hasUnexpressiblePaint(cs)) {
+      if (!gradeFilter && hasUnexpressiblePaint(cs, !!ownClip)) {
         // Pure decorative effect (blur bloom, drop-shadow halo, gradient
         // feather) → ship the effect itself as a transparent picture layer so it
         // stays selectable and renders identically on light and dark slides.
