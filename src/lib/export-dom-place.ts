@@ -16,6 +16,7 @@ import type PptxGenJS from "pptxgenjs";
 import { isGhostPaint, type DomColor, type DomShape } from "./export-dom-decompose";
 import { aspectFrame, getImageAspect } from "./export-image-aspect";
 import { PX_PER_IN, pxToRadiusIn, rectRadiusAdj } from "./export-radius";
+import { clipGeomTag } from "./export-clip-geom";
 import { gradientTag, pxToPt } from "./export-surface";
 import { coverCropTag, roundPicTag } from "./pptx-shape-normalize";
 import { groupTag } from "./pptx-group-xml";
