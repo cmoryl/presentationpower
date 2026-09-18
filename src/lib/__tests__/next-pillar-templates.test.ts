@@ -19,7 +19,7 @@ describe("NEXT pillar templates", () => {
 
   it("uses the gradient ground for classic and the measured ground for the ascent", () => {
     const classic = pillarDefault();
-    expect(pillarGroundStops(classic)[0]).toBe("#7C4EF4");
+    expect(pillarGroundStops(classic)[0]).toBe("#542E96");
 
     const ascent = { ...classic, templateId: "next-ascend" };
     expect(pillarGroundStops(ascent)).toEqual(["#9A70F8", "#B4B0FB", "#8BC6EA"]);

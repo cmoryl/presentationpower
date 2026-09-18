@@ -40,9 +40,14 @@ export const AGENDA_DISPLAY_MM = 7;
  * the dark face, and the editor says so.
  */
 export const AGENDA_GUARD_GAPS: string[] = [
+  // Re-measured when the grounds moved to the ink builds decoded from the
+  // supplied live Illustrator files: the beam ramp now carries a mid-tone
+  // violet through the copy region and no longer clears the floor in the dark
+  // face, while the Churchill glass ramp (prism sweep) sits light enough that
+  // it does. Both changes come from the delivered artwork, not a preference.
+  "01-beam-violet-aqua/dark",
   "03-wash-diagonal/dark",
   "05-bloom-corner/dark",
-  "07-prism-sweep/dark",
   "08-chevron-sweep/dark",
   "11-brew-diagonal/dark",
   "12-repeat-wash/dark",

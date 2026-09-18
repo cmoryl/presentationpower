@@ -77,59 +77,70 @@ export const LONDON_FLOORS: { id: LondonFloorId; label: string }[] = [
   { id: "6F", label: "Sixth floor" },
 ];
 
-/** Gradient treatments used across the London panel set. */
+/**
+ * Gradient treatments used across the London panel set.
+ *
+ * Every ground here is now built from ink MEASURED OUT OF THE SUPPLIED LIVE
+ * ILLUSTRATOR FILES (18 September 2026 delivery, job 2281) — see
+ * `next-london-pack-grounds.ts` for the decoded builds and their provenance.
+ * The earlier RGB ramps (violet #7C4EF4 / aqua #7FE3E8 and friends) were the
+ * app's own invention and never matched the delivered artwork on press; they
+ * were retired when the delivery landed. Each hex below is the delivered ink
+ * as it proofs, and each is an approved CMYK build, so a CMYK master carries
+ * the supplied numbers verbatim rather than a conversion.
+ */
 export const LONDON_STYLES: Record<string, { label: string; note: string; stops: string[] }> = {
   "01-beam-violet-aqua": {
     label: "Beam · violet → aqua",
-    note: "Hero treatment. Vertical beam of brand violet resolving into aqua — used on the Churchill demo columns and the Whittle stage wings.",
-    stops: ["#7C4EF4", "#8FA6FF", "#7FE3E8"],
+    note: "Hero treatment, on the delivery's house scenic ground run at full travel: violet head into aqua. Used on the Churchill demo columns and the Whittle stage wings.",
+    stops: ["#542E96", "#5342A2", "#5373B9", "#64AAD3", "#B2E1F5"],
   },
   "03-wash-diagonal": {
     label: "Wash · diagonal",
-    note: "Low-energy diagonal wash for long horizontal runs: coffee bars, merch mart, stage fascias.",
-    stops: ["#7C4EF4", "#B9A6FF", "#CFF6F7"],
+    note: "Low-energy diagonal wash for long horizontal runs (coffee bars, merch mart, stage fascias): the light half of the house scenic ground, so a 4 m panel holds no visible turn.",
+    stops: ["#5373B9", "#64AAD3", "#8ECEE7", "#B2E1F5"],
   },
   "04-horizon": {
     label: "Horizon",
-    note: "Single soft horizon band — reads calmly behind help-desk copy and wide desk fronts.",
-    stops: ["#135CFB", "#8FA6FF", "#CFF6F7"],
+    note: "The delivery's front-of-house desk ground — orchid into brand blue, no black in the build. Reads calmly behind help-desk copy and wide desk fronts, exactly as the registration desk vinyls print.",
+    stops: ["#BC7DC5", "#B17FC6", "#8A7FC7", "#5586C5", "#1E84C1"],
   },
   "05-bloom-corner": {
     label: "Bloom · corner",
-    note: "Corner bloom that anchors a panel to its neighbour. Used inside the Flemming LED surround set.",
-    stops: ["#7C4EF4", "#B9A6FF", "#7FE3E8"],
+    note: "Corner bloom that anchors a panel to its neighbour, on the house scenic ground. Used inside the Flemming LED surround set.",
+    stops: ["#542E96", "#5342A2", "#64AAD3", "#B2E1F5"],
   },
   "07-prism-sweep": {
     label: "Prism sweep",
-    note: "Widest hue travel in the set — reserved for the merch mart and the Westminster/Cambridge screens.",
-    stops: ["#7C4EF4", "#135CFB", "#7FE3E8"],
+    note: "The Churchill glass-vinyl ground: saturated cyan turning through to pink, the widest hue travel in the delivery. Reserved for the merch mart and the Westminster/Cambridge screens.",
+    stops: ["#0C8CC6", "#268BCA", "#6097D0", "#9C8FCD", "#F573C0"],
   },
   "08-chevron-sweep": {
     label: "Chevron sweep",
-    note: "Low-angle brand sweep for cloakroom, help-desk and close-up square panels. Replaces the old centred halo: no soft centre sphere to read as a smudge, and the white lockup keeps full contrast at arm's length.",
-    stops: ["#03002C", "#135CFB", "#7FE3E8"],
+    note: "Low-angle brand sweep for cloakroom, help-desk and close-up square panels: brand navy head into the house scenic ground, so a white lockup keeps full contrast at arm's length.",
+    stops: ["#14142D", "#542E96", "#5373B9", "#8ECEE7"],
   },
 
   "09-dawn": {
     label: "Dawn",
-    note: "Lightest ground in the pack. Default for plinths, tall surrounds and the Whittle centre panels.",
-    stops: ["#B9A6FF", "#CFF6F7", "#F7F9FC"],
+    note: "Lightest ground in the pack — the aqua end of the house scenic ramp on its own. Default for plinths, tall surrounds and the Whittle centre panels.",
+    stops: ["#64AAD3", "#8ECEE7", "#B2E1F5"],
   },
   "10-veil": {
     label: "Veil",
-    note: "Near-flat veil for slivers and thin fascia strips where a gradient would band.",
-    stops: ["#8FA6FF", "#B9A6FF"],
+    note: "Near-flat veil for slivers and thin fascia strips where a gradient would band: two adjacent stops of the house scenic ramp.",
+    stops: ["#8ECEE7", "#64AAD3"],
   },
   "11-brew-diagonal": {
     label: "Brew · diagonal",
-    note: "NEXTbrew ground: a deep diagonal run out of brand navy through brand blue into aqua, themed with a live café motif — cup rings, steam ribbons and a bean tick row, all editable vector marks in the masters. The darker head end keeps the white lockup at full contrast under warm café lighting.",
-    stops: ["#03002C", "#135CFB", "#5AC8F0", "#A1FBF9"],
+    note: "NEXTbrew ground: a deep diagonal run out of brand navy through brand blue into the delivery's aqua, themed with a live café motif — cup rings, steam ribbons and a bean tick row, all editable vector marks in the masters. The darker head end keeps the white lockup at full contrast under warm café lighting.",
+    stops: ["#14142D", "#244299", "#1E84C1", "#8ECEE7"],
   },
 
   "12-repeat-wash": {
     label: "Repeat wash",
     note: "Deep vertical wash sized for step-and-repeat walls, so the tiled lockup rows stay legible in on-camera flash.",
-    stops: ["#03002C", "#135CFB", "#7C4EF4"],
+    stops: ["#14142D", "#542E96", "#5373B9"],
   },
 
   "13-repeat-white": {

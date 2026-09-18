@@ -37,12 +37,19 @@ describe("London gradient grounds reference", () => {
 
   it("reports every stop with position, hex, rgb, hsl and luminance", () => {
     const g = londonGroundInfo("01-beam-violet-aqua", null, []);
-    expect(g.colors.map((c) => c.hex)).toEqual(["#7C4EF4", "#8FA6FF", "#7FE3E8"]);
-    expect(g.colors.map((c) => c.position)).toEqual([0, 50, 100]);
-    expect(g.colors[0]!.rgb).toBe("rgb(124 78 244)");
+    // Ground ink measured out of the supplied live Illustrator files.
+    expect(g.colors.map((c) => c.hex)).toEqual([
+      "#542E96",
+      "#5342A2",
+      "#5373B9",
+      "#64AAD3",
+      "#B2E1F5",
+    ]);
+    expect(g.colors.map((c) => c.position)).toEqual([0, 25, 50, 75, 100]);
+    expect(g.colors[0]!.rgb).toBe("rgb(84 46 150)");
     expect(g.colors[0]!.hsl).toMatch(/^hsl\(\d+ \d+% \d+%\)$/);
-    expect(g.colors[2]!.luminance).toBeGreaterThan(g.colors[0]!.luminance);
-    expect(g.css).toContain("#7C4EF4 0%");
+    expect(g.colors[4]!.luminance).toBeGreaterThan(g.colors[0]!.luminance);
+    expect(g.css).toContain("#542E96 0%");
   });
 
   it("keeps the dark head of a division ramp untouched", () => {

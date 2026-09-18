@@ -487,7 +487,7 @@ function stopsFor(panel: LondonPanel): string[] {
  */
 export function londonPanelStops(panel: LondonPanel, tintId?: string | null): string[] {
   const stops = LONDON_STYLES[panel.style]?.stops;
-  const base = stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
+  const base = stops && stops.length > 0 ? stops : ["#542E96", "#B2E1F5"];
   // Division items carry their NEXT 2026 accent as a slight tint at the light
   // end of the ramp; master-brand items are returned unchanged.
   // Doors take the stronger soft-focus accent weight; scenic panels keep the
