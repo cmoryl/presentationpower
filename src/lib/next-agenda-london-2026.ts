@@ -233,14 +233,14 @@ const LEARN_DAY_TWO: AgendaSession[] = [
 const LEGAL_DAY_ONE: AgendaSession[] = [
   row("11:30 AM-1:30 PM", "Registration & Networking", "", { muted: true }),
   row("1:30-2:00 PM", "Legal Networking & Introductions", ""),
-  row("2:00-2:50 PM", "The Future Lawyer", "Speakers: Richard Coopey, Grosvenor Law | Sian Whitby, Latham & Watkins | Nik Bruce Smith, Quinn Emanuel | Thai Nguyen, Close Brothers | Al-Karim Makhani, TransPerfect Legal"),
+  row("2:00-2:50 PM", "The Future Lawyer", "Speakers:\nRichard Coopey, Grosvenor Law\nSian Whitby, Latham & Watkins\nNik Bruce Smith, Quinn Emanuel\nThai Nguyen, Close Brothers\nAl-Karim Makhani, TransPerfect Legal"),
   row("2:50-2:55 PM", "BREAK", "", { muted: true }),
   row("2:55-3:00 PM", "In-House | Roundtable (Rutherford)", "", { parallels: [{ time: "2:55-3:00 PM", title: "Rising Stars | Panel (Moore)", detail: "" }, { time: "2:55-3:00 PM", title: "Disclosure | Panel (Whittle)", detail: "" }] }),
-  row("3:00-3:50 PM", "Managing External Counsel in the AI Era", "Speaker: Christian Breen, TransPerfect Legal", { parallels: [{ time: "3:00-4:00 PM", title: "AI in Practice: The Work Lawyers Do Every Day", detail: "Speakers: Edward Irwin, Peters & Peters | Josie Welland, Sidley Austin | Aimee Mullan, Signature Litigation | Maz Jamnejad, Gibson Dunn" }, { time: "3:00-4:00 PM", title: "Modern Data: Beyond Emails & Documents", detail: "Speakers: Sasha Shearer, RPC | Sally Mantell, Farrer & Co | Stephanie Silverston, Greenberg Traurig\n(MODERATOR: BILLY OLIVER)" }] }),
+  row("3:00-3:50 PM", "Managing External Counsel in the AI Era", "Speaker: Christian Breen, TransPerfect Legal", { parallels: [{ time: "3:00-4:00 PM", title: "AI in Practice: The Work Lawyers Do Every Day", detail: "Speakers:\nEdward Irwin, Peters & Peters\nJosie Welland, Sidley Austin\nAimee Mullan, Signature Litigation\nMaz Jamnejad, Gibson Dunn" }, { time: "3:00-4:00 PM", title: "Modern Data: Beyond Emails & Documents", detail: "Speakers:\nSasha Shearer, RPC\nSally Mantell, Farrer & Co\nStephanie Silverston, Greenberg Traurig\n(MODERATOR: BILLY OLIVER)" }] }),
   row("3:50-4:00 PM", "BREAK", "", { muted: true }),
-  row("4:00-4:50 PM", "Data Discipline: Getting Your House In Order", "Speaker: Kelly Hagedorn, Alston & Bird", { parallels: [{ time: "4:00-5:00 PM", title: "Thriving, Not Just Surviving: Building a Sustainable Career in an AI World", detail: "Speakers: Louise Lau, Pallas Partners | Andrew Woolsey, Cooke, Young & Keidan| Katie Byrne, Irwin Mitchell | Colin Gibson, ex-Fieldfisher" }, { time: "4:00-5:00 PM", title: "Generative AI: From Document Review to Legal Strategy", detail: "Speakers: Imogen Jones, DAC Beachcroft | Perveen Hill, Withers | Francesca Ruddy, Fountain Court Chambers | Georgie Rawson, Cleary Gottlieb\n(MODERATOR: STEFAN NIGAM)" }] }),
+  row("4:00-4:50 PM", "Data Discipline: Getting Your House In Order", "Speaker: Kelly Hagedorn, Alston & Bird", { parallels: [{ time: "4:00-5:00 PM", title: "Thriving, Not Just Surviving: Building a Sustainable Career in an AI World", detail: "Speakers:\nLouise Lau, Pallas Partners\nAndrew Woolsey, Cooke, Young & Keidan\nKatie Byrne, Irwin Mitchell\nColin Gibson, ex-Fieldfisher" }, { time: "4:00-5:00 PM", title: "Generative AI: From Document Review to Legal Strategy", detail: "Speakers:\nImogen Jones, DAC Beachcroft\nPerveen Hill, Withers\nFrancesca Ruddy, Fountain Court Chambers\nGeorgie Rawson, Cleary Gottlieb\n(MODERATOR: STEFAN NIGAM)" }] }),
   row("4:50-5:00 PM", "BREAK", "", { muted: true }),
-  row("5:00-5:50 PM", "Risk to Resolut: Using Data to Make Better Decisions", "Speaker: Angie Nolet, TransPerfect Legal", { parallels: [{ time: "5:00 PM", title: "Quiz & Social", detail: "(MODERATORS: Chidubem Agu and Clara Tinkler)" }, { time: "5:00 PM", title: "From Terabytes to Truth", detail: "Speakers: Susie Buergi, Norton Rose Fulbright | James Rickwood-Dodsworth, Kelkoo Group | Rupert Goodway, Quinn Emanuel\n(MODERATOR: RAJUAN PASHA)" }] }),
+  row("5:00-5:50 PM", "Risk to Resolut: Using Data to Make Better Decisions", "Speaker: Angie Nolet, TransPerfect Legal", { parallels: [{ time: "5:00 PM", title: "Quiz & Social", detail: "(MODERATORS: Chidubem Agu and Clara Tinkler)" }, { time: "5:00 PM", title: "From Terabytes to Truth", detail: "Speakers:\nSusie Buergi, Norton Rose Fulbright\nJames Rickwood-Dodsworth, Kelkoo Group\nRupert Goodway, Quinn Emanuel\n(MODERATOR: RAJUAN PASHA)" }] }),
   row("5:50-6:00 PM", "LegalNEXT Closing Remarks", ""),
   row("6:00 PM", "Post-event Networking Cocktail Reception", "", { muted: true }),
 ];
@@ -251,11 +251,11 @@ const LEGAL_DAY_TWO: AgendaSession[] = [
   row("9:45-10:30 AM", "Beyond Intelligence", "Matt Hauser, TransPerfect"),
   row("10:30-11:45 AM", "Unreasonable Brands: How to Build a Brand Centered on Unreasonable Hospitality", "Will Guidara", { track: "KEYNOTE" }),
   row("11:45 AM-12:45 PM", "Lunch", "", { muted: true }),
-  row("12:45-1:40 PM", "AI Economics: Pricing, Licensing & Profitability", "Speakers: Natalia Chumak, Signature Litigation | Ben Sigler, Stephenson Harwood | Matthew Dashper Hughes, gunnercooke\n(MODERATOR: DAN MEYERS)"),
+  row("12:45-1:40 PM", "AI Economics: Pricing, Licensing & Profitability", "Speakers:\nNatalia Chumak, Signature Litigation\nBen Sigler, Stephenson Harwood\nMatthew Dashper Hughes, gunnercooke\n(MODERATOR: DAN MEYERS)"),
   row("1:40-1:45 PM", "BREAK", "", { muted: true }),
-  row("1:45-2:20 PM", "Building the NextGen: AI, Culture & Succession", "Speakers: Lucy Pert, Hausfeld | Kate Vernon, Quinn Emanuel | Alex Sciannaca, Hogan Lovells | Duran Ross, Lewis Silkin\n(MODERATOR: DANIELLE GIANNECCHINI)"),
+  row("1:45-2:20 PM", "Building the NextGen: AI, Culture & Succession", "Speakers:\nLucy Pert, Hausfeld\nKate Vernon, Quinn Emanuel\nAlex Sciannaca, Hogan Lovells\nDuran Ross, Lewis Silkin\n(MODERATOR: DANIELLE GIANNECCHINI)"),
   row("2:20-2:25 PM", "BREAK", "", { muted: true }),
-  row("2:25-3:00 PM", "The Human Advantage: Winning Clients in an AI World", "Speakers: Amy Schnee, Informa | Layla Bakkar, Tesco | Christos Matthews, AND Digital | Rich Harris, Robert Walters\n(MODERATOR: Matthew Felten)"),
+  row("2:25-3:00 PM", "The Human Advantage: Winning Clients in an AI World", "Speakers:\nAmy Schnee, Informa\nLayla Bakkar, Tesco\nChristos Matthews, AND Digital\nRich Harris, Robert Walters\n(MODERATOR: Matthew Felten)"),
   row("3:00 PM", "Event Close & Takedown", "(no on-site cocktail)", { muted: true }),
 ];
 
