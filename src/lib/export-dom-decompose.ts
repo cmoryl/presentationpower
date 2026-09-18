@@ -845,6 +845,9 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
   // plate or approximated with a:glow. Descendants inherit the blur/mask, so the
   // subtree is owned by the effect record.
   const effectRoots: Element[] = [];
+  // Elements carrying a mask we resolved into native custom geometry. Kept so a
+  // descendant can be checked against the outline it inherits on screen.
+  const clipContexts: Array<ClipBox & { el: Element; cmds: ClipCmd[] }> = [];
   const insidePlatedSubtree = (el: Element) =>
     platedRoots.some((root) => root === el || root.contains(el)) ||
     effectRoots.some((root) => root === el || root.contains(el));
