@@ -811,7 +811,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
           // slot's time, exactly as the board and PowerPoint do.
           const cardTime = (copy.time ?? "").trim() || row.session.time.trim();
           if (cardTime) {
-            const ts = mm(ct.timeSize);
+            const ts = mm(ct.timeSize) * row.fit;
             page.drawText(cardTime, {
               x: px(par.x) + cardPadX,
               y: py2 - ts,
@@ -821,7 +821,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             });
             py2 -= ts * 1.5;
           }
-          const size = mm(ct.titleSize);
+          const size = mm(ct.titleSize) * row.fit;
           for (const line of wrapLines(bold, copy.title, size, pw)) {
             page.drawText(line, {
               x: px(par.x) + cardPadX,
@@ -833,7 +833,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             py2 -= size * 1.5;
           }
           if ((copy.speaker ?? "").trim()) {
-            const ss = mm(ct.detailSize);
+            const ss = mm(ct.detailSize) * row.fit;
             py2 -= ss * 0.4;
             for (const line of wrapLines(bold, copy.speaker!, ss, pw)) {
               page.drawText(line, {
@@ -847,7 +847,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             }
           }
           if (copy.detail.trim()) {
-            const ds = mm(ct.detailSize);
+            const ds = mm(ct.detailSize) * row.fit;
             py2 -= ds * 0.5;
             for (const line of wrapLines(regular, copy.detail, ds, pw)) {
               page.drawText(line, {
