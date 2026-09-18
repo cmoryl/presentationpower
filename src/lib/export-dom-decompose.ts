@@ -601,7 +601,7 @@ function nameFor(el: Element, fallback: string): string {
  * descendants, which inherit the filter/blend context) stay baked into the
  * design-exact plate instead, which reproduces them pixel-for-pixel.
  */
-function hasUnexpressiblePaint(cs: CSSStyleDeclaration): boolean {
+function hasUnexpressiblePaint(cs: CSSStyleDeclaration, clipHandled = false): boolean {
   const filter = cs.filter || "none";
   const blend = cs.mixBlendMode || "normal";
   const mask =
@@ -612,8 +612,11 @@ function hasUnexpressiblePaint(cs: CSSStyleDeclaration): boolean {
   if (filter !== "none" && filter.trim() !== "") return true;
   if (blend !== "normal") return true;
   if (mask !== "none" && mask.trim() !== "") return true;
-  // inset()/round rectangles are expressible; polygons, circles and paths are not.
-  if (clip !== "none" && !/^inset\(/.test(clip.trim())) return true;
+  // Rectangles are expressible directly; polygons, circles, ellipses and paths
+  // travel as native custom geometry when the caller resolved the outline
+  // (`clipHandled`). Anything else — a url() clip, an arc, unresolvable units —
+  // still stays on the flat plate.
+  if (!clipHandled && clip !== "none" && !/^inset\(/.test(clip.trim())) return true;
   return false;
 }
 
