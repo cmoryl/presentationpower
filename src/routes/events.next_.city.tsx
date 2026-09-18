@@ -42,6 +42,10 @@ const COUNTS: { key: keyof CityBrief; label: string; hint: string }[] = [
   { key: "entrances", label: "Entrances", hint: "Street-facing doors" },
   { key: "lifts", label: "Lifts", hint: "Inside the event footprint" },
   { key: "desks", label: "Staffed desks", hint: "Registration, information, support" },
+  { key: "registrationBanks", label: "Registration banks", hint: "Each a run of desks to wrap" },
+  { key: "cloakrooms", label: "Cloakrooms", hint: "Staffed coat counters" },
+  { key: "brewBars", label: "NEXTbrew bars", hint: "Coffee bars and lounges" },
+  { key: "merchRuns", label: "Merch mart runs", hint: "Retail walls to brand" },
   { key: "divisions", label: "Divisions present", hint: "Each taking branded space" },
   { key: "partnerStands", label: "Partner stands", hint: "Exhibition space" },
 ];
