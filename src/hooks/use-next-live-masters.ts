@@ -13,7 +13,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { listAgendaFiles } from "@/lib/next-agenda.functions";
 import { listPillarFiles } from "@/lib/event-pillar.functions";
-import { normalizeAgendaConfig, type AgendaConfig } from "@/lib/next-agenda";
+import {
+  agendaProgrammeIsCurrent,
+  normalizeAgendaConfig,
+  type AgendaConfig,
+} from "@/lib/next-agenda";
 import type { PillarConfig, PillarKindId } from "@/lib/next-pillar-masters";
 
 export const PILLAR_FILES_KEY = ["event-pillar-files"] as const;
@@ -121,11 +125,15 @@ export function pickAgendaFile(
   divisionId: string,
 ): AgendaFileRecord | undefined {
   if (!rows?.length) return undefined;
-  const matches = rows.filter((row) => {
-    const config = row.config as AgendaConfig | null;
-    return (config?.divisionId ?? row.division_id) === divisionId;
-  });
-  const best = matches.sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
-  if (!best) return undefined;
-  return { ...best, config: normalizeAgendaConfig(best.config) };
+  // Only a board carrying the division's whole approved programme counts as a
+  // live file. An older or partial save is kept as a version, never served here:
+  // it used to be the newest row and quietly replaced the approved programme.
+  const matches = rows
+    .filter((row) => {
+      const config = row.config as AgendaConfig | null;
+      return (config?.divisionId ?? row.division_id) === divisionId;
+    })
+    .map((row) => ({ ...row, config: normalizeAgendaConfig(row.config) }))
+    .filter((row) => agendaProgrammeIsCurrent(row.config));
+  return matches.sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
 }

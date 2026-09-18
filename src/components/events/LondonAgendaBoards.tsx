@@ -16,7 +16,7 @@ import {
   agendaDefault,
   agendaLocationText,
   agendaPages,
-  agendaProgrammeIsStale,
+  agendaProgrammeIsCurrent,
   type AgendaConfig,
 } from "@/lib/next-agenda";
 import type { AgendaFileRecord } from "@/hooks/use-next-live-masters";
@@ -34,7 +34,7 @@ function AgendaCard({
   // approved London programme behind stale rows. It stays in the saved list,
   // but the card and the edit link start from the approved master.
   const live = useMemo(
-    () => (saved && !agendaProgrammeIsStale(saved.config) ? saved : undefined),
+    () => (saved && agendaProgrammeIsCurrent(saved.config) ? saved : undefined),
     [saved],
   );
   const config: AgendaConfig = useMemo(

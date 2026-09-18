@@ -23,7 +23,13 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/design-system/element";
 import { runWithExportFeedback } from "@/lib/export-feedback";
-import { agendaDefault, agendaGeometry, agendaPages, type AgendaConfig } from "@/lib/next-agenda";
+import {
+  agendaDefault,
+  agendaGeometry,
+  agendaPages,
+  agendaProgrammeIsCurrent,
+  type AgendaConfig,
+} from "@/lib/next-agenda";
 import { buildAgendaDocx } from "@/lib/next-agenda-docx";
 import { buildAgendaPptx } from "@/lib/next-agenda-pptx";
 import { listAgendaFiles } from "@/lib/next-agenda.functions";
@@ -229,8 +235,13 @@ function BookletPage() {
 
   /** The agenda the booklet prints, forced to the booklet's own page format. */
   const agenda = useMemo<AgendaConfig>(() => {
+    // An older or partial saved board is never printed into the booklet: fall
+    // back to the division's approved programme instead of reprinting stale rows.
+    const picked = rows.find((r) => r.id === savedId)?.config ?? agendaSnapshot;
     const base =
-      rows.find((r) => r.id === savedId)?.config ?? agendaSnapshot ?? agendaDefault("city-series");
+      picked && agendaProgrammeIsCurrent(picked)
+        ? picked
+        : agendaDefault(picked?.divisionId ?? "city-series");
     return { ...base, sizeId: bookletAgendaSizeId(config.sizeId) };
   }, [rows, savedId, agendaSnapshot, config.sizeId]);
 
