@@ -2050,6 +2050,86 @@ export type Database = {
         }
         Relationships: []
       }
+      event_guide_versions: {
+        Row: {
+          config: Json
+          created_at: string
+          created_by: string | null
+          guide_id: string
+          id: string
+          note: string
+          rev: number
+        }
+        Insert: {
+          config: Json
+          created_at?: string
+          created_by?: string | null
+          guide_id: string
+          id?: string
+          note?: string
+          rev: number
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          created_by?: string | null
+          guide_id?: string
+          id?: string
+          note?: string
+          rev?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_guide_versions_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "event_guides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_guides: {
+        Row: {
+          city: string
+          config: Json
+          created_at: string
+          created_by: string | null
+          event_id: string
+          id: string
+          name: string
+          notes: string
+          size_id: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          city?: string
+          config?: Json
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          name: string
+          notes?: string
+          size_id?: string
+          updated_at?: string
+          year?: number
+        }
+        Update: {
+          city?: string
+          config?: Json
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          name?: string
+          notes?: string
+          size_id?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
       event_pillar_versions: {
         Row: {
           config: Json
