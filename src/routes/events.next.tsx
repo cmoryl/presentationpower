@@ -62,6 +62,11 @@ import {
 } from "@/lib/next-pillar-masters";
 import { CITY_BADGE_DEFAULT, cityBadgeDivision } from "@/lib/next-city-badge";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import {
+  NEXT_WORKSPACE_GROUPS,
+  NEXT_WORKSPACE_PAGES,
+  nextWorkspaceGroup,
+} from "@/lib/next-workspace";
 
 export const Route = createFileRoute("/events/next")({
   head: () => ({
@@ -145,6 +150,8 @@ function NextHub() {
   return (
     <div className="mx-auto w-full max-w-[1200px] px-6 pb-24 pt-8">
       <Hero division={division} total={rows?.length ?? 0} onSelect={setDivisionId} />
+
+      <WorkspaceDirectory />
 
       <DivisionDetail division={division} count={divisionRows.length} />
 
@@ -1460,6 +1467,55 @@ function PlaybookCta() {
             </h3>
             <p className="mt-2 text-sm text-muted-foreground">{c.detail}</p>
           </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * "Where everything lives" — the whole NEXT workspace in one grouped index,
+ * driven by src/lib/next-workspace.ts so a new page can never be orphaned.
+ */
+function WorkspaceDirectory() {
+  return (
+    <section className="mt-10" aria-labelledby="next-directory">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="next-directory" className="text-xl font-semibold tracking-tight">
+          Where everything lives
+        </h2>
+        <span className="text-sm text-black/50 dark:text-white/50">
+          {NEXT_WORKSPACE_PAGES.length} pages · London-only pages are marked
+        </span>
+      </div>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {NEXT_WORKSPACE_GROUPS.map((g) => (
+          <div key={g.id} className="rounded-2xl border border-border p-4">
+            <div className="text-[11px] font-medium tracking-[0.14em] text-primary uppercase">
+              {g.label}
+            </div>
+            <p className="mt-1 text-xs text-black/55 dark:text-white/55">{g.blurb}</p>
+            <ul className="mt-3 space-y-1.5">
+              {nextWorkspaceGroup(g.id).map((p) => (
+                <li key={p.to}>
+                  <Link
+                    to={p.to}
+                    className="block rounded-lg px-2 py-1.5 transition hover:bg-primary/8"
+                  >
+                    <span className="text-sm font-medium">{p.label}</span>
+                    {p.scope === "london" ? (
+                      <span className="ml-1.5 rounded-full border border-black/15 px-1.5 py-px text-[10px] text-black/50 dark:border-white/15 dark:text-white/50">
+                        London
+                      </span>
+                    ) : null}
+                    <span className="block text-xs text-black/55 dark:text-white/55">
+                      {p.purpose}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
       </div>
     </section>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AdminSidebar } from "@/components/AdminShell";
 import { NotificationBell } from "@/components/NotificationBell";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { NextSubnav } from "@/components/next/NextSubnav";
 import { ElementLockup } from "@/components/brand/ElementLogo";
 
 // Pages that live outside /admin/* but are linked from the admin console.
@@ -579,12 +580,14 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
             <AdminSidebar />
             <div className="min-w-0 flex-1">
               <Breadcrumbs />
+              <NextSubnav />
               {children ?? <Outlet />}
             </div>
           </div>
         ) : (
           <>
             <Breadcrumbs />
+            <NextSubnav />
             {children ?? <Outlet />}
           </>
         )}
