@@ -1395,31 +1395,62 @@ export function agendaProgrammeIsStale(config: {
   days?: AgendaDay[];
 }): boolean {
   const programme = agendaProgramme(config.divisionId);
-  const titles = (
-    src: { sessions?: Partial<AgendaSession>[]; days?: { sessions?: Partial<AgendaSession>[] }[] },
-  ) => {
-    const rows = src.days?.length
-      ? src.days.flatMap((d) => d.sessions ?? [])
-      : (src.sessions ?? []);
-    return new Set(
-      rows
-        // Muted housekeeping rows are excluded: every programme ever issued
-        // carries a break and a lunch, so they match across unrelated
-        // programmes and would hide a stale file.
-        .filter((s) => !s.muted)
-        .flatMap((s) => [s.title ?? "", ...agendaParallels(s).map((p) => p.title)])
-        .map((t) => t.trim().toLowerCase())
-        .filter((t) => !!t && !GENERIC_ROW_TITLES.has(t)),
-    );
-  };
-
-  const approved = titles(programme);
+  const approved = agendaSessionTitles(programme);
   if (!approved.size) return false;
-  const saved = titles(config);
+  const saved = agendaSessionTitles(config);
   if (!saved.size) return false;
   for (const t of saved) if (approved.has(t)) return false;
   return true;
 }
+
+/** Printed, non-housekeeping session titles on a board or programme. */
+function agendaSessionTitles(src: {
+  sessions?: Partial<AgendaSession>[];
+  days?: { sessions?: Partial<AgendaSession>[] }[];
+}): Set<string> {
+  const rows = src.days?.length ? src.days.flatMap((d) => d.sessions ?? []) : (src.sessions ?? []);
+  return new Set(
+    rows
+      // Muted housekeeping rows are excluded: every programme ever issued
+      // carries a break and a lunch, so they match across unrelated
+      // programmes and would hide a stale file.
+      .filter((s) => !s.muted)
+      .flatMap((s) => [s.title ?? "", ...agendaParallels(s).map((p) => p.title)])
+      .map((t) => t.trim().toLowerCase())
+      .filter((t) => !!t && !GENERIC_ROW_TITLES.has(t)),
+  );
+}
+
+/**
+ * Approved sessions this board is missing.
+ *
+ * A saved file only counts as a live board when it carries every session of its
+ * division's approved programme. Files saved off an earlier programme — or off a
+ * partial copy of the current one — were still the newest row for their
+ * division, so the hub cards, the division cards and the booklet were serving
+ * an incomplete programme. They stay in the saved list as versions; they are
+ * never loaded automatically.
+ */
+export function agendaMissingApprovedSessions(config: {
+  divisionId?: string;
+  sessions?: AgendaSession[];
+  days?: AgendaDay[];
+}): string[] {
+  const approved = agendaSessionTitles(agendaProgramme(config.divisionId));
+  if (!approved.size) return [];
+  const saved = agendaSessionTitles(config);
+  return [...approved].filter((t) => !saved.has(t));
+}
+
+/** True when a saved board carries the division's whole approved programme. */
+export function agendaProgrammeIsCurrent(config: {
+  divisionId?: string;
+  sessions?: AgendaSession[];
+  days?: AgendaDay[];
+}): boolean {
+  return agendaMissingApprovedSessions(config).length === 0;
+}
+
 
 
 export function agendaDefault(divisionId = "city-series"): AgendaConfig {
