@@ -8,6 +8,7 @@
 // silently substituting a different look.
 // -----------------------------------------------------------------------------
 
+import fontkit from "@pdf-lib/fontkit";
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 
 import { resolveAssetUrl } from "./asset-base-url";
@@ -378,6 +379,7 @@ function drawPage(
 
 export async function buildGuidePdf(config: GuideConfig): Promise<GuidePdfResult> {
   const doc = await PDFDocument.create();
+  doc.registerFontkit(fontkit);
   const notes: string[] = [GUIDE_ARTWORK_NOTE];
   const bold = (await ttf(doc, "/fonts/Geist-Bold.ttf")) ?? (await doc.embedFont(StandardFonts.HelveticaBold));
   const regular =
