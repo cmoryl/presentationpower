@@ -1179,14 +1179,17 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           : null,
         line: line ? { ...line, alpha: line.alpha * alphaMul } : null,
         shadow,
+        clip: clipCmds ?? undefined,
         rotationDeg,
         name: nameFor(el, "TP Shape"),
         node: el,
       });
 
       // Accent edges become their own hairline bars so a one-sided CSS rule
-      // never widens into a full outline in PowerPoint.
-      for (const e of edges) {
+      // never widens into a full outline in PowerPoint. A masked box is skipped:
+      // its border is cut by the mask on screen, and a full-length bar would
+      // print outside the designed outline.
+      for (const e of clipCmds ? [] : edges) {
         const t = Math.max(1, e.widthPx);
         const bar =
           e.side === "left"
