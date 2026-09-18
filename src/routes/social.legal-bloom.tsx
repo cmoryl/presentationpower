@@ -73,7 +73,9 @@ import {
   LEGAL_BLOOM_COLOURS,
   LEGAL_BLOOM_CONCEPT,
   LEGAL_BLOOM_SCENES,
+  LEGAL_BLOOM_PHOTOS,
   LEGAL_BLOOM_SIZES,
+
   bloomHeadline,
   type BloomAperture,
   type BloomScene,
