@@ -49,7 +49,7 @@ export async function recordBloomSceneClip(args: RecordSceneClipArgs): Promise<B
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("The recording area could not be prepared.");
   await ensureBloomFonts();
-  const assets = await loadBloomAssets(scene);
+  const assets = await loadBloomAssets(scene, args.layout);
   const cut = args.aperture === "scene" ? scene.aperture : args.aperture;
   const copySide = args.side === "scene" ? scene.side : args.side;
   const layout = bloomSafeLayout(

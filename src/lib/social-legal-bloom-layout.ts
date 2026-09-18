@@ -43,7 +43,15 @@ export type BloomAdLayout = {
   bloomEm?: number;
   /** The shape of the lower accent splash behind the lockup. */
   splashShape?: BloomSplash;
+  /** Which photograph sits in the frame, if it has been swapped out. */
+  photoId?: string;
+  /** How close in the picture sits, 1 = the whole photograph fitted. */
+  photoZoom?: number;
+  /** The point of the picture held in the middle of the frame, 0–1. */
+  photoX?: number;
+  photoY?: number;
 };
+
 
 /** The lower accent splash shapes a person can pick per ad. */
 export type BloomSplash = "soft" | "curved" | "triangle" | "circle" | "none";

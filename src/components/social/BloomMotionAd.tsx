@@ -64,7 +64,7 @@ export function BloomMotionAd({
 
     const run = async () => {
       await ensureBloomFonts();
-      const assets = await loadBloomAssets(scene);
+      const assets = await loadBloomAssets(scene, layout);
       if (!live) return;
       assetsRef.current = assets;
       onCanvas?.(canvasRef.current, assets);

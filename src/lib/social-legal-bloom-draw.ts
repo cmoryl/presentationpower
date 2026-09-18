@@ -17,6 +17,7 @@ import {
   bloomLean,
   LEGAL_BLOOM_PALETTE as P,
   type BloomAperture,
+  bloomPicture,
   type BloomScene,
   type BloomSide,
 } from "./social-legal-bloom";
@@ -40,9 +41,18 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-/** The photograph and the lockup, ready to draw. */
-export async function loadBloomAssets(scene: BloomScene): Promise<BloomDrawAssets> {
-  const [photo, logo] = await Promise.all([loadImage(scene.photo), loadImage(tpLegalBlack)]);
+/**
+ * The photograph and the lockup, ready to draw. The arrangement is passed in so
+ * a frame whose picture has been swapped out loads the picture it now shows.
+ */
+export async function loadBloomAssets(
+  scene: BloomScene,
+  layout?: BloomAdLayout,
+): Promise<BloomDrawAssets> {
+  const [photo, logo] = await Promise.all([
+    loadImage(bloomPicture(scene, layout).src),
+    loadImage(tpLegalBlack),
+  ]);
   return { photo, logo };
 }
 
@@ -98,15 +108,6 @@ type Placed = {
   y: number;
   size: number;
 };
-
-function focusFractions(focus: string): { fx: number; fy: number } {
-  const parts = focus.split(/\s+/);
-  const num = (s: string | undefined, fallback: number) => {
-    const v = Number.parseFloat(s ?? "");
-    return Number.isFinite(v) ? Math.min(1, Math.max(0, v / 100)) : fallback;
-  };
-  return { fx: num(parts[0], 0.5), fy: num(parts[1], 0.5) };
-}
 
 /**
  * Lay the headline out word by word: the roman words at the base size, the
@@ -455,8 +456,11 @@ export function drawBloomMotionFrame(ctx: CanvasRenderingContext2D, o: BloomDraw
   }
   const pw = assets.photo.naturalWidth || assets.photo.width || boxW;
   const ph = assets.photo.naturalHeight || assets.photo.height || boxH;
-  const { fx, fy } = focusFractions(scene.focus);
-  const cover = Math.max(boxW / pw, boxH / ph) * m.photo.scale;
+  // the held point and the in-frame zoom come from the ad's arrangement
+  const fit = bloomPicture(scene, L);
+  const fx = fit.fx;
+  const fy = fit.fy;
+  const cover = Math.max(boxW / pw, boxH / ph) * m.photo.scale * fit.zoom;
   const dw = pw * cover;
   const dh = ph * cover;
   const dx = boxX + (boxW - dw) * fx + m.photo.x * boxW;

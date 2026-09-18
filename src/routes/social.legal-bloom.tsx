@@ -73,7 +73,9 @@ import {
   LEGAL_BLOOM_COLOURS,
   LEGAL_BLOOM_CONCEPT,
   LEGAL_BLOOM_SCENES,
+  LEGAL_BLOOM_PHOTOS,
   LEGAL_BLOOM_SIZES,
+
   bloomHeadline,
   type BloomAperture,
   type BloomScene,
@@ -203,6 +205,9 @@ function BloomView() {
   // "Reset" has anything to undo.
   const hasSaved = zoomScene ? Boolean(saved(zoomScene.id)) : false;
 
+  // whether a drag inside the picture moves the frame or the photograph in it
+  const [cropping, setCropping] = useState(false);
+
   const putLayout = (next: BloomAdLayout) => {
     if (!zoomScene) return;
     const map = { ...layouts, [bloomLayoutKey(zoomScene.id, size.id)]: next };
@@ -222,6 +227,7 @@ function BloomView() {
     setZoom(null);
     setEditing(false);
     setViewMoving(false);
+    setCropping(false);
   };
 
   const step = (dir: -1 | 1) => {
@@ -978,6 +984,41 @@ function BloomView() {
               {slider("Bloom softness", zoomLayout.bloomEm ?? 1, 0, 3, (v) =>
                 putLayout({ ...zoomLayout, bloomEm: v }),
               )}
+              {/* which photograph sits in the frame, and how close in */}
+              <label className="flex items-center gap-2 text-[11px] text-white/70">
+                Picture
+                <select
+                  value={zoomLayout.photoId ?? zoomScene?.id ?? ""}
+                  onChange={(e) =>
+                    putLayout({
+                      ...zoomLayout,
+                      photoId: e.target.value,
+                      // a new photograph starts on its own composed crop
+                      photoX: undefined,
+                      photoY: undefined,
+                    })
+                  }
+                  className="rounded-lg border border-white/25 bg-white/10 px-2 py-1 text-xs text-white"
+                >
+                  {LEGAL_BLOOM_PHOTOS.map((ph) => (
+                    <option className="text-black" key={ph.id} value={ph.id}>
+                      {ph.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {slider("Picture zoom", zoomLayout.photoZoom ?? 1, 1, 4, (v) =>
+                putLayout({ ...zoomLayout, photoZoom: v }),
+              )}
+              <button
+                type="button"
+                onClick={() => setCropping((v) => !v)}
+                className={`rounded-lg px-2 py-1 text-[11px] ${
+                  cropping ? "bg-[#A6FA87] text-[#03002C]" : "border border-white/25 text-white"
+                }`}
+              >
+                {cropping ? "Done cropping" : "Crop picture"}
+              </button>
               {/* the shape of the lower accent splash behind the lockup */}
               <label className="flex items-center gap-2 text-[11px] text-white/70">
                 Splash shape
@@ -996,7 +1037,9 @@ function BloomView() {
                 </select>
               </label>
               <span className="text-[11px] text-white/55">
-                Drag the outlined boxes to move, corners to resize. Saved as you go.
+                {cropping
+                  ? "Drag inside the picture to move it, scroll to come closer."
+                  : "Drag the outlined boxes to move, corners to resize. Saved as you go."}
               </span>
             </div>
           ) : null}
@@ -1038,6 +1081,7 @@ function BloomView() {
                         w={size.w}
                         h={size.h}
                         scale={scale}
+                        crop={cropping}
                         onChange={putLayout}
                       />
                     ) : null}
