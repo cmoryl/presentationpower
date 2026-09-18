@@ -879,6 +879,20 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
     const bodyW = mm(blocks.contentW) - timeW - trackW - mm(4);
     for (const row of blocks.rows) {
       const top = py(row.y);
+      if (row.session.dayBreak) {
+        // Rule-style board: the day heading takes the same solid Blue 500 bar.
+        plate(px(blocks.x), top, mm(blocks.contentW), mm(row.h), rgb(...hexRgb("#003FC7")), 1);
+        const size = mm(L.titleRowSize) * 1.05;
+        page.drawText(row.session.title.trim().toUpperCase(), {
+          x: px(blocks.x) + mm(4),
+          y: top - mm(row.h) / 2 - size * 0.36,
+          size,
+          font: bold,
+          color: rgb(1, 1, 1),
+        });
+        continue;
+      }
+
       page.drawLine({
         start: { x: px(blocks.x), y: top },
         end: { x: px(blocks.x + blocks.contentW), y: top },
