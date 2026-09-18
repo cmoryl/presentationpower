@@ -281,17 +281,19 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
           </span>
           {scene.tail ? ` ${scene.tail}` : ""}
         </div>
-        <div
-          style={{
-            fontFamily: '"Instrument Sans", "Geist", system-ui, sans-serif',
-            fontSize: `${supportPx}px`,
-            lineHeight: 1.42,
-            color: `${P.ink}B8`,
-            maxWidth: "24em",
-          }}
-        >
-          {scene.support}
-        </div>
+        {L.hideSupport ? null : (
+          <div
+            style={{
+              fontFamily: '"Instrument Sans", "Geist", system-ui, sans-serif',
+              fontSize: `${supportPx}px`,
+              lineHeight: 1.42,
+              color: `${P.ink}B8`,
+              maxWidth: "24em",
+            }}
+          >
+            {scene.support}
+          </div>
+        )}
       </div>
 
       {/* the accent splash in the lower corner away from the picture, so the

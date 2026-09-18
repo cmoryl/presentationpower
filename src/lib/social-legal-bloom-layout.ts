@@ -43,6 +43,8 @@ export type BloomAdLayout = {
   bloomEm?: number;
   /** The shape of the lower accent splash behind the lockup. */
   splashShape?: BloomSplash;
+  /** True hides the small supporting line under the headline. */
+  hideSupport?: boolean;
   /** Which photograph sits in the frame, if it has been swapped out. */
   photoId?: string;
   /** How close in the picture sits, 1 = the whole photograph fitted. */
