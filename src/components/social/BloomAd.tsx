@@ -19,6 +19,7 @@ import tpLegalBlackRaw from "@/assets/legal-bloom/tp-legal-black.svg?raw";
 import {
   bloomColour,
   bloomLean,
+  bloomPicture,
   bloomShapeRadius,
   LEGAL_BLOOM_PALETTE as P,
   type BloomAperture,
@@ -55,6 +56,7 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
 
   const short = Math.min(w, h);
   const L = layout ?? bloomAutoLayout(scene, w, h, cut, copySide);
+  const picture = bloomPicture(scene, L);
 
   const boxW = L.picture.w * w;
   const boxH = L.picture.h * h;
@@ -192,15 +194,21 @@ export function BloomAd({ scene, w, h, aperture, side, layout }: Props) {
             boxShadow: `0 ${short * 0.014}px ${short * 0.045}px ${P.ink}1A, 0 0 ${short * 0.05}px ${C.glow}59`,
           }}
         >
+          {/* the photograph: swapped from the library if the ad says so, held on
+              its own point and zoomed inside the frame. The frame never moves. */}
           <img
-            src={scene.photo}
+            src={picture.src}
             alt={scene.shot}
             loading="lazy"
             style={{
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              objectPosition: scene.focus,
+              objectPosition: `${picture.fx * 100}% ${picture.fy * 100}%`,
+              // the held point stays put as the picture comes closer, which is
+              // exactly how the canvas renders it for downloads and clips
+              transform: picture.zoom === 1 ? undefined : `scale(${picture.zoom})`,
+              transformOrigin: `${picture.fx * 100}% ${picture.fy * 100}%`,
               display: "block",
             }}
           />
