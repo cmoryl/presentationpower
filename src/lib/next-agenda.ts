@@ -1902,15 +1902,73 @@ export function agendaCardType(
  * Lines a run of copy takes at a printed size inside a column. Cap-height mm to
  * average glyph advance is ~0.55, which matched the issued boards when the row
  * bands were measured against the approved Canva programme.
+ *
+ * The wrap is solved greedily, word by word, exactly as the browser and the
+ * press renderer break a paragraph. Dividing the character count by the column
+ * width undercounted every run with long words in it — a speaker list or a
+ * seven-word session title measured a line short, so the band was built too
+ * shallow and the copy printed past its frame (the bands clip, so it vanished).
+ * A word wider than the column breaks mid-glyph, which both renderers also do.
  */
 export function agendaTextLines(text: string, sizeMm: number, colW: number): number {
   const clean = (text ?? "").trim();
   if (!clean) return 0;
-  const perLine = Math.max(8, Math.floor(colW / (sizeMm * 0.55)));
-  return clean
-    .split("\n")
-    .reduce((sum, para) => sum + Math.max(1, Math.ceil(para.trim().length / perLine)), 0);
+  const perLine = Math.max(8, colW / (sizeMm * 0.55));
+  let total = 0;
+  for (const para of clean.split("\n")) {
+    const words = para.trim().split(/\s+/).filter(Boolean);
+    if (!words.length) continue;
+    let lines = 1;
+    let used = 0;
+    for (const word of words) {
+      const w = word.length;
+      if (w > perLine) {
+        if (used > 0) {
+          lines += 1;
+          used = 0;
+        }
+        const spans = Math.ceil(w / perLine);
+        lines += spans - 1;
+        used = w - (spans - 1) * perLine;
+        continue;
+      }
+      const next = used === 0 ? w : used + 1 + w;
+      if (next > perLine) {
+        lines += 1;
+        used = w;
+      } else {
+        used = next;
+      }
+    }
+    total += lines;
+  }
+  return total;
 }
+
+/** Paragraphs a run of copy prints as; each takes its own lead on the board. */
+export function agendaParagraphCount(text: string): number {
+  return (text ?? "")
+    .split("\n")
+    .filter((line) => line.trim()).length;
+}
+
+/**
+ * Smallest type multiplier a tightened band may print at. Below this the copy
+ * stops being legible at board distance, so the fit report is left to flag the
+ * overflow rather than shrinking the sheet into unreadability.
+ */
+export const AGENDA_MIN_BAND_FIT = 0.62;
+
+/**
+ * Most a band may grow past the height its own copy needs when the programme
+ * underruns the sheet. Spare height past this is shared as gap between bands.
+ */
+export const AGENDA_MAX_BAND_STRETCH = 1.25;
+
+
+
+
+
 
 // ── naming + persistence ─────────────────────────────────────────────────────
 
@@ -2309,7 +2367,17 @@ export function agendaBlocks(config: AgendaConfig) {
     parallel: { x: number; y: number; w: number; h: number } | null;
     /** One aqua card per parallel track, left to right. */
     parallels: { x: number; y: number; w: number; h: number }[];
+    /**
+     * Type multiplier for this band, 1 when the band holds its copy at the
+     * board's sizes. A tightened board used to keep full-size type inside a
+     * shortened band, and the bands clip, so the last speaker lines simply
+     * vanished from the sheet and the press file. Every renderer scales its
+     * sizes by this so the copy shrinks honestly instead of being cut, and the
+     * fit report still flags anything below the legible floor.
+     */
+    fit: number;
   };
+
 
   /** Unscaled height each row's copy really wants, in mm. */
   let needs: number[] = [];
@@ -2318,14 +2386,27 @@ export function agendaBlocks(config: AgendaConfig) {
     // Bands take the height their copy really needs, so a two-line title with a
     // three-line speaker note is never crushed into the same band as "Lunch".
     const bodyW = L.bandW - L.timeColW - L.bandPadX * 2;
+    /**
+     * A day heading prints as one nowrap line of caps in a slim bar, so it is
+     * measured as that and never as a stacked band. Measured as a full band it
+     * both wasted a session's worth of height and, on an underrun, swelled into
+     * a giant blue plate when the spare height was shared out.
+     */
+    const dayBarH = L.bandPadY * 1.2 + L.titleRowSize * 1.05 * 1.35;
     const height = (session: AgendaSession) => {
+      if (session.dayBreak) return dayBarH;
       const pars = agendaParallels(session);
       const split = agendaSplitWidths(L.bandW, L.bandGap, pars.length);
       const w = pars.length ? split.leftW - L.timeColW - L.bandPadX * 2 : bodyW;
       const left =
+        // The track eyebrow prints above the title on both renderers and used to
+        // be measured as nothing at all, so every tracked slot ran a line over.
+        ((session.track ?? "").trim() ? L.trackSize * 1.5 : 0) +
         agendaTextLines(session.title, L.titleRowSize, w) * L.titleRowSize * 1.5 +
         agendaTextLines(session.detail, L.detailSize, w) * L.detailSize * 1.55 +
-        (session.detail.trim() ? L.detailSize * 0.8 : 0);
+        // Each speaker/notes paragraph opens with its own lead on the live board,
+        // so a four-name panel list costs four leads, not one.
+        agendaParagraphCount(session.detail) * L.detailSize * 0.6;
       // Every parallel card is measured on its own column width; the band takes
       // the tallest of them so no track is clipped.
       const ct = agendaCardType(
@@ -2340,11 +2421,13 @@ export function agendaBlocks(config: AgendaConfig) {
             tallest,
             agendaTextLines(p.title, ct.titleSize, ct.textW) * ct.titleSize * 1.5 +
               // Own start time and speaker line each take a measured line box, so
-              // a card carrying all four fields is never clipped.
-              ((p.time ?? "").trim() || session.time.trim() ? ct.timeSize * 1.5 : 0) +
+              // a card carrying all four fields is never clipped. The time line
+              // carries its own gap under it (1.4 line + 0.25 gap).
+              ((p.time ?? "").trim() || session.time.trim() ? ct.timeSize * 1.65 : 0) +
               agendaTextLines(p.speaker ?? "", ct.detailSize, ct.textW) * ct.detailSize * 1.55 +
+              ((p.speaker ?? "").trim() ? ct.detailSize * 0.5 : 0) +
               agendaTextLines(p.detail, ct.detailSize, ct.textW) * ct.detailSize * 1.55 +
-              ct.detailSize * 0.8,
+              (p.detail.trim() ? ct.detailSize * 0.6 : 0),
           ),
         0,
       );
@@ -2366,12 +2449,25 @@ export function agendaBlocks(config: AgendaConfig) {
     // even the floor no longer fits, every band sits on the floor and the fit
     // report / page capacity reports the overflow honestly.
     const floorH = L.titleRowSize * 2.4;
+    const fixedRow = config.sessions.map((s) => Boolean(s.dayBreak));
     const heights = new Array<number>(wanted.length).fill(floorH);
-    let free = wanted.map((_, i) => i);
+    let free: number[] = [];
     let budget = available;
+    wanted.forEach((h, i) => {
+      // Day headings hold their measured bar height in every pass: they neither
+      // shrink below a legible cap line nor grow into the spare height.
+      if (fixedRow[i]) {
+        heights[i] = h;
+        budget -= h;
+      } else free.push(i);
+    });
     for (let pass = 0; pass < wanted.length + 1 && free.length > 0; pass += 1) {
       const freeTotal = free.reduce((a, i) => a + wanted[i]!, 0) || 1;
-      const scale = budget / freeTotal;
+      // Spare height is only ever shared out so far. A short programme used to
+      // take every millimetre going, so a two-line session printed as a band
+      // three times the height of its copy with a cavern under it. Past the cap
+      // the air goes between the bands instead, which is where it reads.
+      const scale = Math.min(AGENDA_MAX_BAND_STRETCH, Math.max(0, budget) / freeTotal);
       const pinned = free.filter((i) => wanted[i]! * scale < floorH);
       if (pinned.length === 0) {
         for (const i of free) heights[i] = wanted[i]! * scale;
@@ -2389,11 +2485,22 @@ export function agendaBlocks(config: AgendaConfig) {
       }
     }
     for (const i of free) heights[i] = floorH;
+
+    // Whatever the bands did not take is shared between them as extra gap, up to
+    // twice the board's own gap; anything past that stays as honest slack at the
+    // foot rather than stretching the programme out of its rhythm.
+    const takenH = heights.reduce((a, h) => a + h, 0);
+    const spare = Math.max(0, available - takenH);
+    const gapExtra =
+      heights.length > 1 ? Math.min(spare / (heights.length - 1), L.bandGap * 6) : 0;
+    const rowGap = L.bandGap + gapExtra;
+
     let cursor = rowsTop;
     rows = config.sessions.map((session, i) => {
       const h = heights[i]!;
       const y = cursor;
-      cursor += h + L.bandGap;
+      cursor += h + rowGap;
+
       const pars = agendaParallels(session);
       const split = agendaSplitWidths(L.bandW, L.bandGap, pars.length);
       const bx = x + L.bandInset;
@@ -2404,6 +2511,14 @@ export function agendaBlocks(config: AgendaConfig) {
         w: split.cardW,
         h,
       }));
+      // The copy area is the band less its fixed padding, so the multiplier only
+      // measures the type against the room the type actually has.
+      const pad = L.bandPadY * 2;
+      const copyNeed = Math.max(0.1, needs[i]! - pad);
+      const copyRoom = Math.max(0.1, h - pad);
+      const fit = session.dayBreak
+        ? 1
+        : Math.max(AGENDA_MIN_BAND_FIT, Math.min(1, copyRoom / copyNeed));
       return {
         session,
         y,
@@ -2411,6 +2526,7 @@ export function agendaBlocks(config: AgendaConfig) {
         band,
         parallel: parallels[0] ?? null,
         parallels,
+        fit,
       };
     });
   } else {
@@ -2421,8 +2537,10 @@ export function agendaBlocks(config: AgendaConfig) {
       band: null,
       parallel: null,
       parallels: [],
+      fit: 1,
     }));
   }
+
 
   const rowsBottom = rows.length ? rows[rows.length - 1]!.y + rows[rows.length - 1]!.h : rowsTop;
 
@@ -2564,7 +2682,14 @@ export function agendaPages(config: AgendaConfig): AgendaPage[] {
     const probe = agendaBlocks(merged);
     const last = probe.rows[probe.rows.length - 1];
     const bottom = last ? last.y + (last.band?.h ?? last.h) : probe.rowsTop;
-    if (bottom <= probe.listBottom + 0.5) {
+    // The bands are always solved to fill the list area exactly, so the bottom
+    // edge alone always "passed" and a two-day programme landed on one sheet
+    // with every band half the height its copy needed. Gate on the bands: one
+    // sheet engages only when each one still holds its own copy at close to the
+    // board's sizes.
+    const holdsCopy = probe.rows.every((r) => r.fit >= 0.97);
+    if (bottom <= probe.listBottom + 0.5 && holdsCopy) {
+
     return [
       {
         config: merged,

@@ -67,40 +67,65 @@ export function agendaFit(config: AgendaConfig): AgendaFitReport {
   const L = blocks.layout;
   const rowCount = Math.max(1, config.sessions.length);
   const bandH = Math.max(1, blocks.listBottom - blocks.rowsTop);
-  const usedH = blocks.rowH * rowCount;
+  // Programme bands take the height their own copy needs, so the band the rows
+  // really occupy is the distance to the last one — not one uniform ruled row
+  // height multiplied out, which read as a full band on every card board.
+  const usedH = L.card
+    ? Math.max(0, blocks.rowsBottom - blocks.rowsTop - L.bandGap)
+    : blocks.rowH * rowCount;
   const usedFraction = usedH / bandH;
   const slackMm = bandH - usedH;
 
+  /** Type multiplier a band prints at once it has been tightened to the sheet. */
+  const rowFit = (index: number) => blocks.rows[index]?.fit ?? 1;
+  const tightest = blocks.rows.reduce((m, r) => Math.min(m, r.fit), 1);
+
   // A row is legible when its title and detail type clear the floor. The row
-  // heights come straight off the shared layout, so this floor tracks format.
-  const tooTight = L.titleRowSize < MIN_ROW_TITLE_MM || L.detailSize < MIN_DETAIL_MM;
+  // heights come straight off the shared layout, so this floor tracks format —
+  // and a band that shrank its type to hold its copy is judged on the size it
+  // actually prints at.
+  const tooTight =
+    L.titleRowSize * tightest < MIN_ROW_TITLE_MM || L.detailSize * tightest < MIN_DETAIL_MM;
   const perRowFloor = Math.max(MIN_ROW_TITLE_MM / 0.34, MIN_DETAIL_MM / 0.24);
   const maxRows = Math.max(1, Math.floor(bandH / perRowFloor));
 
   const titleColW = L.contentW - L.timeColW - L.trackColW - 6;
   const lines: AgendaFitLine[] = [];
   config.sessions.forEach((session, index) => {
+    const f = rowFit(index);
     const checks: { field: AgendaFitLine["field"]; text: string; col: number; size: number }[] = [
-      { field: "time", text: session.time ?? "", col: L.timeColW - 2, size: L.timeSize },
-      { field: "title", text: session.title ?? "", col: titleColW, size: L.titleRowSize },
-      { field: "detail", text: session.detail ?? "", col: titleColW, size: L.detailSize },
-      { field: "track", text: session.track ?? "", col: L.trackColW - 2, size: L.trackSize },
+      { field: "time", text: session.time ?? "", col: L.timeColW - 2, size: L.timeSize * f },
+      { field: "title", text: session.title ?? "", col: titleColW, size: L.titleRowSize * f },
+      { field: "detail", text: session.detail ?? "", col: titleColW, size: L.detailSize * f },
+      { field: "track", text: session.track ?? "", col: L.trackColW - 2, size: L.trackSize * f },
     ];
+
     for (const check of checks) {
-      const chars = check.text.trim().length;
+      const clean = check.text.trim();
+      const chars = clean.length;
       if (!chars) continue;
-      const w = textWidth(chars, check.size, check.field === "track");
+      // Titles and speaker notes wrap inside the band, so a long run is not an
+      // overflow — only a single unbreakable word wider than the column is. The
+      // time and track lines print on one line and are measured whole. Measuring
+      // whole runs flagged every panel list on the dense Legal slots as over-long
+      // when they read perfectly well across two or three wrapped lines.
+      const wraps = check.field === "title" || check.field === "detail";
+      const measured = wraps
+        ? clean.split(/\s+/).reduce((longest, word) => (word.length > longest.length ? word : longest), "")
+        : clean;
+      const w = textWidth(measured.length, check.size, check.field === "track");
       if (w <= check.col) continue;
-      const perChar = w / chars;
+      const perChar = w / Math.max(1, measured.length);
       lines.push({
         index,
         field: check.field,
-        label: check.text.trim(),
+        label: clean,
         overMm: Math.round((w - check.col) * 10) / 10,
         trimChars: Math.max(1, Math.ceil((w - check.col) / perChar)),
       });
     }
   });
+
 
   const overflows = slackMm < -0.5 || rowCount > maxRows;
 
