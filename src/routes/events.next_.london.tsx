@@ -62,6 +62,7 @@ import {
 import { useLondonPlacedArt } from "@/lib/next-london-placed-art";
 import { useStepRepeatConfigs } from "@/lib/next-london-step-repeat";
 import { londonPanelArtworkUrl, londonSuppliedMaster } from "@/lib/next-london-supplied-masters";
+import { LONDON_PACK_ISSUE, londonPackReference } from "@/lib/next-london-pack-2281";
 import { buildLondonKitZip } from "@/lib/next-london-kit-zip";
 import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles, useLondonLiveFileSignature } from "@/lib/next-london-live-files";
@@ -1745,6 +1746,27 @@ function LondonSignagePage() {
                     supplied master” serves that exact file, untouched. “AI · with your edits”
                     rebuilds it here so anything you added on top — uploaded vector artwork, logo,
                     copy — is live in the file.
+                  </p>
+                ) : null}
+
+                {londonPackReference(openPanel.id) ? (
+                  <p className="mt-3 rounded-lg border border-black/15 bg-[#F2F2F2] p-3 text-[12.5px] leading-relaxed text-[#03002C]">
+                    The {LONDON_PACK_ISSUE.label} supplied{" "}
+                    <strong>{londonPackReference(openPanel.id)!.masterFilename}</strong> for this
+                    area — a{" "}
+                    {londonPackReference(openPanel.id)!.kind === "survey"
+                      ? "dimensioned photograph of the site"
+                      : "cut and geometry template"}
+                    , not finished artwork. It is reference for sizing only, so it is not painted
+                    here and is not served as the print file.{" "}
+                    <a
+                      className="font-semibold text-[#003FC7] underline"
+                      href={londonPackReference(openPanel.id)!.masterUrl}
+                      download={londonPackReference(openPanel.id)!.masterFilename}
+                    >
+                      Open the reference sheet
+                    </a>
+                    .
                   </p>
                 ) : null}
 
