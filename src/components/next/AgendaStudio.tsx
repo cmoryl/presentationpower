@@ -113,6 +113,8 @@ import {
   type AgendaFooterHeightId,
   agendaBandTreatment,
   agendaProgramme,
+  agendaMissingApprovedSessions,
+  agendaProgrammeIsCurrent,
   agendaParallels,
   AGENDA_MAX_PARALLEL,
   agendaProgrammeIsStock,
@@ -2179,6 +2181,9 @@ export function AgendaStudio({
                           the host locale/timezone, so SSR and the browser
                           produced different text and hydration failed. */}
                       {new Date(row.updated_at).toISOString().slice(0, 10)}
+                      {agendaProgrammeIsCurrent(normalizeAgendaConfig(row.config))
+                        ? ""
+                        : " · earlier version, not the approved programme"}
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -2188,10 +2193,18 @@ export function AgendaStudio({
                       onClick={() => {
                         // A deliberate open replaces the board and starts clean.
                         dirtyRef.current = false;
-                        setConfig(normalizeAgendaConfig(row.config));
+                        const opened = normalizeAgendaConfig(row.config);
+                        setConfig(opened);
                         setOpenFileId(row.id);
                         setFileName(row.name);
-                        toast.success("Agenda file opened");
+                        const missing = agendaMissingApprovedSessions(opened).length;
+                        if (missing > 0) {
+                          toast.warning(
+                            `Opened an earlier version — ${missing} approved session${missing === 1 ? "" : "s"} missing`,
+                          );
+                        } else {
+                          toast.success("Agenda file opened");
+                        }
                       }}
                     >
                       Open
