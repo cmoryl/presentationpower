@@ -1,13 +1,14 @@
 import type { AgendaBandLayoutId, AgendaBandTreatmentId, AgendaFooterFillId, AgendaFooterHeightId, AgendaFooterStyleId, AgendaRowStyleId, AgendaSession } from "./next-agenda";
 
 /**
- * NEXT 2026 London (EMEA, 24–25 September 2026, QEII Centre) division
- * programmes, as supplied on the approved agenda sheets. One record per NEXT
- * division: room line, footer lines and the two-day session list, set in the
- * approved agenda look (programme cards, no eyebrow).
+ * NEXT 2026 London (EMEA, 24-25 September 2026, QEII Centre) division
+ * programmes, generated from the approved agenda workbook (Agenda_EMEA_2026).
+ * One record per NEXT division: room line, footer lines and the day session
+ * lists, set in the approved agenda look (programme cards, no eyebrow).
  *
- * Copy here is the issued programme. Do not paraphrase it — an operator edits a
- * saved board, never this record.
+ * Copy here is the issued programme, speaker names and companies included,
+ * exactly as supplied. Do not paraphrase it - an operator edits a saved board,
+ * never this record.
  */
 export type LondonAgendaProgramme = {
   title: string;
@@ -36,7 +37,7 @@ const row = (
   extra: Partial<AgendaSession> = {},
 ): AgendaSession => ({ time, title, detail, track: "", muted: false, ...extra });
 
-/** DataForceNEXT London — THURSDAY, SEPTEMBER 24, 2026. */
+/** dataforce London - THURSDAY, SEPTEMBER 24, 2026. */
 const DATAFORCE_DAY_ONE: AgendaSession[] = [
   row("11:30 AM-2:15 PM", "Registration & Networking", "", { muted: true }),
   row("2:15-2:30 PM", "Welcome to DataForceNEXT, Robert Rizzo", ""),
@@ -48,7 +49,7 @@ const DATAFORCE_DAY_ONE: AgendaSession[] = [
   row("5:55 PM", "Post-event Cocktail Reception", "", { muted: true }),
 ];
 
-/** DigitalNEXT London — THURSDAY, SEPTEMBER 24, 2026. */
+/** digital London - THURSDAY, SEPTEMBER 24, 2026. */
 const DIGITAL_DAY_ONE: AgendaSession[] = [
   row("11:30 AM-1:30 PM", "Registration & Networking", "", { muted: true }),
   row("1:30-1:45 PM", "Welcome to DigitalNEXT", "Tim Coughlin, TransPerfect"),
@@ -65,7 +66,7 @@ const DIGITAL_DAY_ONE: AgendaSession[] = [
   row("6:00 PM", "Post-event Cocktail into Evening Reception", "", { muted: true }),
 ];
 
-/** DigitalNEXT London — FRIDAY, SEPTEMBER 25, 2026. */
+/** digital London - FRIDAY, SEPTEMBER 25, 2026. */
 const DIGITAL_DAY_TWO: AgendaSession[] = [
   row("9:00-9:45 AM", "Doors Open, Coffee & Networking", "", { muted: true }),
   row("9:45-10:30 AM", "Beyond Intelligence", "Matt Hauser, TransPerfect"),
@@ -79,7 +80,7 @@ const DIGITAL_DAY_TWO: AgendaSession[] = [
   row("2:55 PM", "Event Close & Takedown", "(no on-site cocktail)", { muted: true }),
 ];
 
-/** ExperienceNEXT London — THURSDAY, SEPTEMBER 24, 2026. */
+/** experience London - THURSDAY, SEPTEMBER 24, 2026. */
 const EXPERIENCE_DAY_ONE: AgendaSession[] = [
   row("11:30 AM-1:30 PM", "Registration & Networking", "", { muted: true }),
   row("1:30-1:45 PM", "Welcome to ExperienceNEXT", "Nate Fong, TRANSPERFECT"),
@@ -94,7 +95,7 @@ const EXPERIENCE_DAY_ONE: AgendaSession[] = [
   row("6:00 PM", "Post-event Networking Cocktail Reception", "", { muted: true }),
 ];
 
-/** ExperienceNEXT London — FRIDAY, SEPTEMBER 25, 2026. */
+/** experience London - FRIDAY, SEPTEMBER 25, 2026. */
 const EXPERIENCE_DAY_TWO: AgendaSession[] = [
   row("9:00-9:45 AM", "Doors Open, Coffee & Networking", "", { muted: true }),
   row("9:45-10:30 AM", "Beyond Intelligence", "Matt Hauser, TransPerfect"),
@@ -110,7 +111,7 @@ const EXPERIENCE_DAY_TWO: AgendaSession[] = [
   row("3:10 PM", "Event Close & Takedown", "(no on-site cocktail)", { muted: true }),
 ];
 
-/** FinanceNEXT London — THURSDAY, SEPTEMBER 24, 2026. */
+/** finance London - THURSDAY, SEPTEMBER 24, 2026. */
 const FINANCE_DAY_ONE: AgendaSession[] = [
   row("11:30 AM-1:30 PM", "Registration & Networking", "", { muted: true }),
   row("1:30-3:30 PM", "Will join GlobalLinkNEXT agenda", ""),
@@ -121,7 +122,7 @@ const FINANCE_DAY_ONE: AgendaSession[] = [
   row("6:00 PM", "Post-event Networking Cocktail Reception", "", { muted: true }),
 ];
 
-/** FinanceNEXT London — FRIDAY, SEPTEMBER 25, 2026. */
+/** finance London - FRIDAY, SEPTEMBER 25, 2026. */
 const FINANCE_DAY_TWO: AgendaSession[] = [
   row("9:00-9:45 AM", "Doors Open, Coffee & Networking", "", { muted: true }),
   row("9:45-10:30 AM", "Beyond Intelligence", "Matt Hauser, TransPerfect"),
@@ -135,7 +136,7 @@ const FINANCE_DAY_TWO: AgendaSession[] = [
   row("3:10 PM", "Event Close & Takedown", "(no on-site cocktail)", { muted: true }),
 ];
 
-/** GamesNEXT London — THURSDAY, SEPTEMBER 24, 2026. */
+/** games London - THURSDAY, SEPTEMBER 24, 2026. */
 const GAMES_DAY_ONE: AgendaSession[] = [
   row("11:30 AM-1:30 PM", "Registration & Networking", "", { muted: true }),
   row("1:30-1:45 PM", "Welcome to GamesNEXT", "Semion Branzburg, TransPerfect"),
@@ -150,7 +151,7 @@ const GAMES_DAY_ONE: AgendaSession[] = [
   row("6:00 PM", "Post-event Networking Cocktail Reception", "", { muted: true }),
 ];
 
-/** GamesNEXT London — FRIDAY, SEPTEMBER 25, 2026. */
+/** games London - FRIDAY, SEPTEMBER 25, 2026. */
 const GAMES_DAY_TWO: AgendaSession[] = [
   row("9:00-9:45 AM", "Doors Open, Coffee & Networking", "", { muted: true }),
   row("9:45-10:30 AM", "Beyond Intelligence", "Matt Hauser, TransPerfect"),
@@ -164,7 +165,7 @@ const GAMES_DAY_TWO: AgendaSession[] = [
   row("3:05 PM", "Event Close & Takedown", "(no on-site cocktail)", { muted: true }),
 ];
 
-/** GlobalLinkNEXT London — THURSDAY, SEPTEMBER 24, 2026. */
+/** globallink London - THURSDAY, SEPTEMBER 24, 2026. */
 const GLOBALLINK_DAY_ONE: AgendaSession[] = [
   row("11:30 AM-1:30 PM", "Registration & Networking", "", { muted: true }),
   row("1:30-1:45 PM", "Welcome to GlobalLink NEXT", "Jens Huijgen & Chi Patel, TransPerfect & Pep Rosenfeld, BOOM Chicago"),
@@ -180,7 +181,7 @@ const GLOBALLINK_DAY_ONE: AgendaSession[] = [
   row("6:00 PM", "Post-event Networking Cocktail Reception", "", { muted: true }),
 ];
 
-/** GlobalLinkNEXT London — FRIDAY, SEPTEMBER 25, 2026. */
+/** globallink London - FRIDAY, SEPTEMBER 25, 2026. */
 const GLOBALLINK_DAY_TWO: AgendaSession[] = [
   row("9:00-9:45 AM", "Doors Open, Coffee & Networking", "", { muted: true }),
   row("9:45-10:30 AM", "Beyond Intelligence", "Matt Hauser, TransPerfect"),
@@ -195,7 +196,7 @@ const GLOBALLINK_DAY_TWO: AgendaSession[] = [
   row("3:15 PM", "Event Close & Takedown", "(no on-site cocktail)", { muted: true }),
 ];
 
-/** LearnNEXT London — THURSDAY, SEPTEMBER 24, 2026. */
+/** learn London - THURSDAY, SEPTEMBER 24, 2026. */
 const LEARN_DAY_ONE: AgendaSession[] = [
   row("11:30 AM-1:30 PM", "Registration & Networking", "", { muted: true }),
   row("1:30-1:45 PM", "Welcome to LearnNEXT", "Rob Rusk, TransPerfect"),
@@ -214,7 +215,7 @@ const LEARN_DAY_ONE: AgendaSession[] = [
   row("6:00 PM", "Post-event Networking Cocktail Reception", "", { muted: true }),
 ];
 
-/** LearnNEXT London — FRIDAY, SEPTEMBER 25, 2026. */
+/** learn London - FRIDAY, SEPTEMBER 25, 2026. */
 const LEARN_DAY_TWO: AgendaSession[] = [
   row("9:00-9:45 AM", "Doors Open, Coffee & Networking", "", { muted: true }),
   row("9:45-10:30 AM", "Beyond Intelligence", "Matt Hauser, TransPerfect"),
@@ -229,7 +230,7 @@ const LEARN_DAY_TWO: AgendaSession[] = [
   row("3:00 PM", "Event Close & Takedown", "", { muted: true }),
 ];
 
-/** LegalNEXT London — THURSDAY, SEPTEMBER 24, 2026. */
+/** legal London - THURSDAY, SEPTEMBER 24, 2026. */
 const LEGAL_DAY_ONE: AgendaSession[] = [
   row("11:30 AM-1:30 PM", "Registration & Networking", "", { muted: true }),
   row("1:30-2:00 PM", "Legal Networking & Introductions", ""),
@@ -245,7 +246,7 @@ const LEGAL_DAY_ONE: AgendaSession[] = [
   row("6:00 PM", "Post-event Networking Cocktail Reception", "", { muted: true }),
 ];
 
-/** LegalNEXT London — FRIDAY, SEPTEMBER 25, 2026. */
+/** legal London - FRIDAY, SEPTEMBER 25, 2026. */
 const LEGAL_DAY_TWO: AgendaSession[] = [
   row("9:00-9:45 AM", "Doors Open, Coffee & Networking", "", { muted: true }),
   row("9:45-10:30 AM", "Beyond Intelligence", "Matt Hauser, TransPerfect"),
@@ -259,7 +260,7 @@ const LEGAL_DAY_TWO: AgendaSession[] = [
   row("3:00 PM", "Event Close & Takedown", "(no on-site cocktail)", { muted: true }),
 ];
 
-/** LifeSciNEXT London — THURSDAY, SEPTEMBER 24, 2026. */
+/** life-sci London - THURSDAY, SEPTEMBER 24, 2026. */
 const LIFE_SCI_DAY_ONE: AgendaSession[] = [
   row("11:35 AM-1:30 PM", "Registration & Networking", "", { muted: true }),
   row("1:30-2:05 PM", "Innovation in Motion: TransPerfect’s Life Sciences Product Roadmap", "Nick Peris & Adam Schefflan, TransPerfect"),
@@ -277,7 +278,7 @@ const LIFE_SCI_DAY_ONE: AgendaSession[] = [
   row("6:00 PM", "Post-event Networking Cocktail Reception", "(6:00-7:00 PM on 5th, 7:00-8:00 PM LifeSci & OpTImize invited to join everyone on the Ground Floor)", { muted: true }),
 ];
 
-/** LifeSciNEXT London — FRIDAY, SEPTEMBER 25, 2026. */
+/** life-sci London - FRIDAY, SEPTEMBER 25, 2026. */
 const LIFE_SCI_DAY_TWO: AgendaSession[] = [
   row("9:00-9:45 AM", "Doors Open, Coffee & Networking", "", { muted: true }),
   row("9:45-10:30 AM", "Beyond Intelligence", "Matt Hauser, TransPerfect"),
@@ -286,13 +287,13 @@ const LIFE_SCI_DAY_TWO: AgendaSession[] = [
   row("12:45-1:10 PM", "Mission: Possible", "A Transformation Story - From Impossible Odds to Global Impact\nIgnacio Matias Hernández-Agramonte, Baxter &\nMar Zaragoza Gomez, TransPerfect"),
   row("1:10-1:20 PM", "TransPerfect Digital Health Spotlight", "Heidi Campbell, TransPerfect"),
   row("1:20-1:45 PM", "Digital Health Product Roadmapping Panel: Aligning Sponsor Expectations, Minimizing Patient Burden, and Streamlining Language & File Management", "Michael Hannon, Daiichi Sankyo, INES Smajic, Medidata, Adam Schefflan, TransPerfect"),
-  row("1:45-2:10 PM", "AI Governance & Responsible AI", "Fireside Chat\nAndrew Cochrane, Novartis\nTy Trainer, TransPerfect"),
+  row("1:45-2:10 PM", "AI Governance & Responsible AI (Fireside Chat)", "Andrew Cochrane, Novartis\nTy Trainer, TransPerfect"),
   row("2:10-2:35 PM", "A Scalable Foundation for ePI, Reuse and Automation", "Giacomo Testori, NovoNordisk"),
   row("2:35-2:40 PM", "Day Two Closing Remarks", ""),
   row("2:40 PM", "Event Close & Takedown (no on-site cocktail)", "", { muted: true }),
 ];
 
-/** MediaNEXT London — THURSDAY, SEPTEMBER 24, 2026. */
+/** media London - THURSDAY, SEPTEMBER 24, 2026. */
 const MEDIA_DAY_ONE: AgendaSession[] = [
   row("11:30 AM-1:30 PM", "Registration & Networking", "", { muted: true }),
   row("1:30-1:40 PM", "Welcome to MediaNext", ""),
@@ -308,7 +309,7 @@ const MEDIA_DAY_ONE: AgendaSession[] = [
   row("6:00 PM", "Post-event Networking Cocktail Reception", "", { muted: true }),
 ];
 
-/** MediaNEXT London — FRIDAY, SEPTEMBER 25, 2026. */
+/** media London - FRIDAY, SEPTEMBER 25, 2026. */
 const MEDIA_DAY_TWO: AgendaSession[] = [
   row("9:00-9:45 AM", "Doors Open, Coffee & Networking", "", { muted: true }),
   row("9:45-10:30 AM", "Beyond Intelligence", "Matt Hauser, TransPerfect"),
@@ -322,7 +323,6 @@ const MEDIA_DAY_TWO: AgendaSession[] = [
   row("2:50 PM", "Event Close & Takedown", "(no on-site cocktail)", { muted: true }),
 ];
 
-/** Every London 2026 division programme, keyed by NEXT division id. */
 export const LONDON_2026_PROGRAMMES: Record<string, LondonAgendaProgramme> = {
   "dataforce": {
     title: "",
@@ -403,7 +403,7 @@ export const LONDON_2026_PROGRAMMES: Record<string, LondonAgendaProgramme> = {
     meta: "THURSDAY, SEPTEMBER 24, 2026",
     rowStyle: "card",
     eyebrow: "",
-    locationLine: "FLEMING 3RD FLOOR",
+    locationLine: "FLEMMING 3RD FLOOR",
     footnote: "",
     footerLeft: "WWW.TRANSPERFECTNEXT.COM/EMEA/GLOBALLINK",
     footerRight: "24 & 25 SEPTEMBER, 2026",
