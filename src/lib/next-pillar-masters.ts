@@ -167,7 +167,13 @@ export const pillarDivision = cityBadgeDivision;
 
 import type { PillarArrowStyleId } from "./pillar-arrows";
 
-export type PillarKindId = "welcome" | "registration" | "logo" | "directional";
+export type PillarKindId =
+  | "welcome"
+  | "registration"
+  | "logo"
+  | "directional"
+  | "blank"
+  | "division";
 
 export type PillarKind = {
   id: PillarKindId;
@@ -177,6 +183,12 @@ export type PillarKind = {
   headline: string;
   /** Default headline cap height in mm on the trim sheet. */
   headlineSize: number;
+  /** Layout template this kind opens on. Defaults to the classic column. */
+  defaultTemplate?: string;
+  /** Strapline over the lockup, as the supplied division masters carry it. */
+  eyebrow?: string;
+  /** Print the division lockup by default. */
+  showLockup?: boolean;
 };
 
 export const PILLAR_KINDS: PillarKind[] = [
@@ -212,7 +224,30 @@ export const PILLAR_KINDS: PillarKind[] = [
     headline: "MAIN STAGE",
     headlineSize: 90,
   },
+  {
+    id: "blank",
+    name: "Blank pillar",
+    note: "The supplied blank pillar: measured ground and chevron run, no lockup and no copy. Start here when a pillar is being built from scratch.",
+    defaultStyle: "01-beam-violet-aqua",
+    headline: "",
+    headlineSize: 104,
+    defaultTemplate: "next-blank",
+    showLockup: false,
+  },
+  {
+    id: "division",
+    name: "Division profile",
+    note: "The supplied division pillar (DataForce, Finance and the rest): strapline, division lockup, chevron run and a stacked headline. Every line is editable.",
+    defaultStyle: "01-beam-violet-aqua",
+    headline: "LIFT YOUR GLOBAL PROFILE",
+    headlineSize: 56,
+    defaultTemplate: "next-profile",
+    eyebrow: "BEYOND INTELLIGENCE",
+  },
 ];
+
+/** Approved strapline cap-height range in mm on the trim sheet. */
+export const PILLAR_EYEBROW_SIZE = { min: 14, max: 60, step: 1 };
 
 /** Approved headline size range in mm (cap height on the trim sheet). */
 export const PILLAR_HEADLINE_SIZE = { min: 40, max: 220, step: 2 };
@@ -347,6 +382,10 @@ export type PillarConfig = {
   /** Measured trim width/height in mm, used when sizeId is "custom". */
   trimW: number;
   trimH: number;
+  /** Strapline set across the top of the column, over the lockup. */
+  eyebrow?: string;
+  /** Strapline cap height in mm. 0 = derive from the column width. */
+  eyebrowSize?: number;
   /** Optional supporting line under the headline. */
   subheadline: string;
   /** Sub-headline cap height in mm. */
@@ -396,15 +435,17 @@ export function pillarDefault(
   const kind = pillarKind(kindId);
   return {
     kind: kind.id,
-    templateId: "classic",
+    templateId: kind.defaultTemplate ?? "classic",
     divisionId: pillarDivision(divisionId).id,
     styleId: kind.defaultStyle,
     headline: kind.headline,
+    eyebrow: kind.eyebrow ?? "",
+    eyebrowSize: 0,
     arrow: "right",
     arrowStyle: "solid",
     logoUrl: "",
     logoSocial: "",
-    showLockup: true,
+    showLockup: kind.showLockup !== false,
     face: "dark",
     verticalHeadline: true,
     headlineSize: kind.headlineSize,
@@ -458,6 +499,14 @@ export function pillarArtworkBox(
   const y = Number.isFinite(wanted) && config.artworkOffsetY !== null ? wanted : fallback;
   const maxY = geo.trimH - geo.safeInset - h;
   return { x, y: Math.min(Math.max(geo.safeInset, y), Math.max(geo.safeInset, maxY)), w, h };
+}
+
+/** Strapline cap height in mm: the set size, else measured off the column width. */
+export function pillarEyebrowSize(config: PillarConfig): number {
+  const raw = Number(config.eyebrowSize);
+  const geo = pillarGeometry(config);
+  const value = Number.isFinite(raw) && raw > 0 ? raw : Math.round(geo.trimW * 0.045);
+  return Math.min(PILLAR_EYEBROW_SIZE.max, Math.max(PILLAR_EYEBROW_SIZE.min, value));
 }
 
 /** Clamp the sub-headline size into the approved range. */
@@ -658,6 +707,15 @@ export function withPillarKind(config: PillarConfig, kindId: PillarKindId): Pill
     styleId: config.styleId === from.defaultStyle ? to.defaultStyle : config.styleId,
     headline: keep(config.headline, from.headline, to.headline),
     headlineSize: config.headlineSize === from.headlineSize ? to.headlineSize : config.headlineSize,
+    // A kind that carries its own layout and strapline opens on them, but any
+    // copy or template the user has already chosen is left alone.
+    templateId:
+      config.templateId === (from.defaultTemplate ?? "classic")
+        ? (to.defaultTemplate ?? "classic")
+        : config.templateId,
+    eyebrow: keep(config.eyebrow ?? "", from.eyebrow ?? "", to.eyebrow ?? ""),
+    showLockup:
+      config.showLockup === (from.showLockup !== false) ? to.showLockup !== false : config.showLockup,
   };
 }
 

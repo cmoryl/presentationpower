@@ -21,7 +21,14 @@ type PillarSearch = {
   file?: string;
 };
 
-const KINDS: PillarKindId[] = ["welcome", "registration", "logo", "directional"];
+const KINDS: PillarKindId[] = [
+  "welcome",
+  "registration",
+  "logo",
+  "directional",
+  "division",
+  "blank",
+];
 
 export const Route = createFileRoute("/events/next_/pillars")({
   validateSearch: (search: Record<string, unknown>): PillarSearch => ({

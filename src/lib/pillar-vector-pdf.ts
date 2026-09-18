@@ -65,6 +65,7 @@ import {
   pillarQrStyle,
   pillarStops,
   pillarSubSize,
+  pillarEyebrowSize,
   type PillarConfig,
 } from "./next-pillar-masters";
 import { PILLAR_LOGO_DROP } from "./next-pillar-masters";
@@ -93,7 +94,8 @@ export type PillarLayerName =
   | "06 QR code"
   | "07 Guides + marks"
   | "08 Placed artwork"
-  | "09 Chevron device";
+  | "09 Chevron device"
+  | "10 Strapline";
 
 /** Output colour space. RGB stays the house default; CMYK is opt-in. */
 export type PillarColorSpace = "rgb" | "cmyk";
@@ -407,6 +409,7 @@ export async function buildPillarVectorPdf(
     "07 Guides + marks",
     "08 Placed artwork",
     "09 Chevron device",
+    "10 Strapline",
   ];
   const layers: Layer[] = names.map((name, i) => {
     const nonPrinting = name === "07 Guides + marks";
@@ -493,7 +496,7 @@ export async function buildPillarVectorPdf(
 
   // ── 09 Chevron device ──────────────────────────────────────────────────────
   if (template.chevrons) {
-    const chev = pillarChevronInk(face);
+    const chev = pillarChevronInk(face, template.chevronSet);
     const chevColor = paint(chev.color);
     beginLayer(page, layer("09 Chevron device"));
     page.pushOperators(
@@ -513,7 +516,7 @@ export async function buildPillarVectorPdf(
     const gsDict = doc.context.obj({ GSchev: gsRef });
     res.set(PDFName.of("ExtGState"), gsDict);
     page.pushOperators(PDFOperator.of(Ops.SetGraphicsStateParams, [PDFName.of("GSchev")]));
-    for (const band of pillarChevronBands(geo.bleedW, geo.bleedH)) {
+    for (const band of pillarChevronBands(geo.bleedW, geo.bleedH, template.chevronSet)) {
       // Bands are measured in mm from the sheet top; PDF y runs up from the foot.
       polygon(
         page,
@@ -565,6 +568,27 @@ export async function buildPillarVectorPdf(
   }
   void placedVector;
 
+  // ── 10 Strapline ───────────────────────────────────────────────────────────
+  // Set across the top of the column on the supplied division masters; the
+  // lockup drops by its own line box so the two never collide.
+  const eyebrow = (config.eyebrow || "").trim();
+  const eyebrowSize = mm(pillarEyebrowSize(config));
+  const eyebrowDrop = eyebrow ? eyebrowSize * 2.1 : 0;
+  if (eyebrow) {
+    beginLayer(page, layer("10 Strapline"));
+    const text = eyebrow.toUpperCase();
+    const tracked = text.split("").join("\u2009");
+    const width = bold.widthOfTextAtSize(tracked, eyebrowSize);
+    page.drawText(tracked, {
+      x: leftSet ? safeX : centerX - width / 2,
+      y: safeTop - eyebrowSize * 0.82,
+      size: eyebrowSize,
+      font: bold,
+      color: paint(headlineInk),
+    });
+    endLayer(page);
+  }
+
   // ── 02 Lockup ──────────────────────────────────────────────────────────────
   const division = pillarDivision(config.divisionId);
   const lockupW = trimW * template.lockupWidth * pillarLockupScale(config);
@@ -572,7 +596,7 @@ export async function buildPillarVectorPdf(
   const lockupH = lockupW / (division.ratio || 1.7);
   const isLogoOnly = config.kind === "logo";
   // Logo-only pillars drop a quarter of the column, mirroring the live sign.
-  const lockupTop = isLogoOnly ? safeTop - trimH * PILLAR_LOGO_DROP : safeTop;
+  const lockupTop = isLogoOnly ? safeTop - trimH * PILLAR_LOGO_DROP : safeTop - eyebrowDrop;
   let lockupVector = false;
 
   if (config.showLockup) {
