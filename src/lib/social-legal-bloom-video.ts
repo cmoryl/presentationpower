@@ -72,7 +72,13 @@ export function recordBloomClip(o: RecordOptions): Promise<Blob> {
     recorder.onerror = () => reject(new Error("The recorder stopped unexpectedly."));
     recorder.onstop = () => {
       stream.getTracks().forEach((t) => t.stop());
-      resolve(new Blob(chunks, { type: format.mime.split(";")[0] }));
+      const blob = new Blob(chunks, { type: format.mime.split(";")[0] });
+      // an empty file must never travel as if it were a clip
+      if (!blob.size) {
+        reject(new Error("No frames reached the recorder, so no clip was written."));
+        return;
+      }
+      resolve(blob);
     };
 
     draw(0);
