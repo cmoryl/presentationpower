@@ -155,9 +155,12 @@ function LondonTemplatePage() {
   const [floor, setFloor] = useState<string>("all");
   const [selectedId, setSelectedId] = useState<string>(LONDON_PANELS[0]?.id ?? "");
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
-  // Output colour space for every download on this page. RGB stays the house
-  // default (the RIP separates); CMYK is the explicit vibrant-corrected master.
-  const [colorSpace, setColorSpace] = useState<LondonColorSpace>("rgb");
+  // Output colour space for every download on this page. The London grounds are
+  // now the ink builds measured out of the supplied live files, so CMYK is the
+  // default here: a master carries the delivered numbers verbatim and matches
+  // the location artwork on press. RGB stays one click away for in-house work
+  // where the RIP separates.
+  const [colorSpace, setColorSpace] = useState<LondonColorSpace>("cmyk");
   // Filenames carry the revision in force, so a download from this page matches
   // the kit page byte-for-byte in name as well as content.
   const fetchHead = useServerFn(getLondonHeadRevision);
@@ -579,8 +582,8 @@ function LondonTemplatePage() {
               </div>
               <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
                 {colorSpace === "cmyk"
-                  ? "DeviceCMYK masters: signed-off brand builds are used verbatim, everything else converts with skeletal black (no black under saturated colour) and a 300% ink ceiling. Copy prints 100K or 0-0-0-0 knockout. Files are suffixed -cmyk."
-                  : "Brand RGB ships untouched and the printer's RIP performs the separation — the house default. Switch to CMYK only when the printer asks for separated masters."}
+                  ? "DeviceCMYK masters — the default for London. Grounds are the ink builds measured out of the supplied 18 September Illustrator files and print verbatim; signed-off brand builds likewise. Anything else converts with skeletal black (no black under saturated colour) and a 300% ink ceiling. Copy prints 100K or 0-0-0-0 knockout. Files are suffixed -cmyk."
+                  : "Brand RGB ships untouched and the printer's RIP performs the separation — useful for in-house proofing, but it will not hold the delivered ground ink as exactly as the CMYK master."}
               </p>
               {colorSpace === "cmyk" ? (
                 <ul className="mt-2 grid gap-1 sm:grid-cols-2">

@@ -23,6 +23,7 @@ import {
   solveCmyk,
   solveCmykRamp,
 } from "@/lib/cmyk-gamut-solver";
+import { LONDON_PACK_BUILDS } from "@/lib/next-london-pack-grounds";
 import { parseColor } from "@/lib/pdf-gradient-shading";
 
 export type Cmyk = { c: number; m: number; y: number; k: number };
@@ -43,6 +44,10 @@ export const CMYK_TAC_LIMIT = 3.0;
  * master brand core (Blue 500 / Blue 800 / white / 100K text).
  */
 const APPROVED: Record<string, Cmyk> = {
+  // Ground ramps measured out of the supplied live Illustrator files. These are
+  // the delivery's own ink, so they count as signed off: a CMYK master prints
+  // them verbatim instead of converting a screen colour back into ink.
+  ...LONDON_PACK_BUILDS,
   // Master brand core
   "#003fc7": { c: 1, m: 0.83, y: 0, k: 0.06 },
   "#03002c": { c: 1, m: 1, y: 0.4, k: 0.6 },

@@ -9,7 +9,9 @@ const brewPanels = LONDON_PANELS.filter((p) => isBrewPanel(p));
 describe("NEXTbrew theming", () => {
   it("has brew panels on the deep navy → aqua ramp", () => {
     expect(brewPanels.length).toBeGreaterThan(0);
-    expect(LONDON_STYLES["11-brew-diagonal"]!.stops[0]).toBe("#03002C");
+    // Deep head is the approved navy build as it proofs out of the supplied
+    // live files (#03002C separated is C100 M100 Y40 K60 → #14142D on press).
+    expect(LONDON_STYLES["11-brew-diagonal"]!.stops[0]).toBe("#14142D");
   });
 
   it("plans no background vector graphics on brew grounds", () => {

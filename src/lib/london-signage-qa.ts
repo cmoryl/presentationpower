@@ -64,7 +64,7 @@ export function londonApprovedRamp(panel: LondonPanel): string[] {
 
 function expectedRamp(panel: LondonPanel): string[] {
   const stops = LONDON_STYLES[panel.style]?.stops;
-  const base = stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
+  const base = stops && stops.length > 0 ? stops : ["#542E96", "#B2E1F5"];
   // Doors carry the heavier soft-focus accent weight; mirror the art layer.
   const placement = londonLogoPlacement(panel.id);
   return londonTintedStops(londonPanelFamily(panel), base, {

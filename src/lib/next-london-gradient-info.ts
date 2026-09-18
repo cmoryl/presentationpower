@@ -117,7 +117,7 @@ function cssFor(angle: number, colors: LondonColorReadout[]): string {
 
 function baseStops(styleId: string): string[] {
   const stops = LONDON_STYLES[styleId]?.stops;
-  return stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
+  return stops && stops.length > 0 ? stops : ["#542E96", "#B2E1F5"];
 }
 
 /** One ground readout from a style and an optional division family. */
