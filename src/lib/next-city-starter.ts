@@ -42,6 +42,14 @@ export type CityBrief = {
   lifts: number;
   /** Staffed desks: registration, information, support. */
   desks: number;
+  /** Registration desk banks — each a continuous run of desks to wrap. */
+  registrationBanks: number;
+  /** Staffed cloakroom counters. */
+  cloakrooms: number;
+  /** NEXTbrew coffee bars and lounge bars. */
+  brewBars: number;
+  /** Merch mart retail runs. */
+  merchRuns: number;
   /** Divisions taking their own branded space. */
   divisions: number;
   /** Partner stands in the exhibition space. */
@@ -57,6 +65,10 @@ export const DEFAULT_CITY_BRIEF: CityBrief = {
   entrances: 1,
   lifts: 2,
   desks: 3,
+  registrationBanks: 2,
+  cloakrooms: 1,
+  brewBars: 2,
+  merchRuns: 1,
   divisions: 11,
   partnerStands: 8,
 };
@@ -112,8 +124,16 @@ const PLACEMENT: Record<string, { area: string; qty: (b: CityBrief) => number }>
   "vt-floor-vinyl": { area: "Entrance floor", qty: (b) => b.entrances },
   "vt-lift-door": { area: "Lift lobbies", qty: (b) => b.lifts * b.floors },
   "vt-lift-walls": { area: "Lift cars", qty: (b) => b.lifts },
-  "vt-desk-front": { area: "Staffed desks", qty: (b) => b.desks },
-  "vt-desk-return": { area: "Staffed desks", qty: (b) => b.desks },
+  "vt-desk-front": { area: "Help and information desks", qty: (b) => b.desks },
+  "vt-desk-return": { area: "Help and information desks", qty: (b) => b.desks },
+  "vt-registration-desk": {
+    area: "Registration hall",
+    // A bank needs its fronts panelised, plus two side cheeks and an end return.
+    qty: (b) => b.registrationBanks * 4,
+  },
+  "vt-cloakroom": { area: "Cloakroom", qty: (b) => b.cloakrooms * 2 },
+  "vt-merch-mart": { area: "Merch mart", qty: (b) => b.merchRuns * 2 },
+  "vt-brew-bar": { area: "NEXTbrew bars", qty: (b) => b.brewBars * 4 },
   "vt-glass-vinyl": { area: "Glazed room fronts and partitions", qty: (b) => b.breakoutRooms },
   "vt-door-branding": {
     area: "Session room and division doors",
