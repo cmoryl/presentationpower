@@ -1689,8 +1689,11 @@ export function agendaLayout(config: AgendaConfig) {
   // mark hanging away from the copy edge.
   const ratio = logoInkRatio(agendaLockupUrl(config), agendaDivision(config.divisionId).ratio || 1.7);
   // Cap the lockup against the sheet height so wide formats keep room for the
-  // programme; portrait boards stay on the established 44% content width.
-  const lockupW = Math.min(contentW * 0.44, geo.trimH * 0.2 * ratio) * agendaLockupScale(config);
+  // programme. Every division board now sits on the same half-size lockup — 22%
+  // of the content width, capped at 10% of the sheet height — so the header gives
+  // the height back to the schedule.
+  const lockupW = Math.min(contentW * 0.22, geo.trimH * 0.1 * ratio) * agendaLockupScale(config);
+
   const lockupH = lockupW / ratio;
 
   const card = agendaRowStyle(config) === "card";
