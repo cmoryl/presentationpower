@@ -6,7 +6,7 @@ import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { AgendaStudio } from "@/components/next/AgendaStudio";
 import { useSavedAgendaFiles } from "@/hooks/use-next-live-masters";
-import { agendaDivision, normalizeAgendaConfig } from "@/lib/next-agenda";
+import { agendaDivision, agendaProgrammeIsStale, normalizeAgendaConfig } from "@/lib/next-agenda";
 
 const search = z.object({ division: z.string().optional(), file: z.string().optional() });
 
@@ -45,11 +45,18 @@ function AgendaPage() {
   // saved file replaced a half-typed programme seconds after it appeared and
   // turned Save into an overwrite of their file. The saved list in step 4 stays
   // the way to pick a file up deliberately.
+  // A file saved off an older programme is skipped: opening it would show stale
+  // rows in place of the division's approved programme. It stays in the saved
+  // list in step 4 for anyone who wants it deliberately.
   const openFile = useMemo(() => {
     if (!file) return undefined;
     const row = saved.data?.find((r) => r.id === file);
-    return row ? { id: row.id, config: normalizeAgendaConfig(row.config) } : undefined;
+    if (!row) return undefined;
+    const config = normalizeAgendaConfig(row.config);
+    if (agendaProgrammeIsStale(config)) return undefined;
+    return { id: row.id, config };
   }, [file, saved.data]);
+
 
   return (
     <AppShell>

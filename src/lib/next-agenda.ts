@@ -1360,6 +1360,61 @@ export function agendaProgrammeIsStock(config: {
   return same(config.sessions, programme.sessions);
 }
 
+/** Housekeeping rows shared by every programme ever issued. */
+const GENERIC_ROW_TITLES = new Set([
+  "break",
+  "lunch",
+  "lunch & networking",
+  "registration",
+  "registration & networking",
+  "doors open, coffee & networking",
+  "networking",
+]);
+
+
+/**
+ * True when a saved board was built before the division's current approved
+ * programme was issued, so it cannot be an edit of it.
+ *
+ * Measured on shared session titles rather than a whole-config comparison: an
+ * operator's edited board still keeps most of the approved rows, while a file
+ * saved off an older programme shares none of them. Those older files were
+ * shadowing the approved London programme on the division cards and in the
+ * studio, which is what "the update is not showing" was.
+ */
+export function agendaProgrammeIsStale(config: {
+  divisionId?: string;
+  sessions?: AgendaSession[];
+  days?: AgendaDay[];
+}): boolean {
+  const programme = agendaProgramme(config.divisionId);
+  const titles = (
+    src: { sessions?: Partial<AgendaSession>[]; days?: { sessions?: Partial<AgendaSession>[] }[] },
+  ) => {
+    const rows = src.days?.length
+      ? src.days.flatMap((d) => d.sessions ?? [])
+      : (src.sessions ?? []);
+    return new Set(
+      rows
+        // Muted housekeeping rows are excluded: every programme ever issued
+        // carries a break and a lunch, so they match across unrelated
+        // programmes and would hide a stale file.
+        .filter((s) => !s.muted)
+        .flatMap((s) => [s.title ?? "", ...agendaParallels(s).map((p) => p.title)])
+        .map((t) => t.trim().toLowerCase())
+        .filter((t) => !!t && !GENERIC_ROW_TITLES.has(t)),
+    );
+  };
+
+  const approved = titles(programme);
+  if (!approved.size) return false;
+  const saved = titles(config);
+  if (!saved.size) return false;
+  for (const t of saved) if (approved.has(t)) return false;
+  return true;
+}
+
+
 export function agendaDefault(divisionId = "city-series"): AgendaConfig {
   const div = agendaDivision(divisionId);
   const programme = agendaProgramme(div.id);
