@@ -474,6 +474,22 @@ function AboutPage() {
       blurb: "Case study, spotlight, ebrochure, adaptor brief.",
     },
     { to: "/events", label: "Event", blurb: "Event playbooks and full kit previews." },
+    {
+      to: "/events/next",
+      label: "NEXT",
+      blurb: "Directory of every event page, grouped by the job you are doing.",
+    },
+    {
+      to: "/events/next/agendas",
+      label: "NEXT agendas",
+      blurb: "Approved division programmes, day bands, icons and room lines.",
+    },
+    {
+      to: "/events/next/knowledge",
+      label: "Event knowledge",
+      blurb: "Ask past venues: measured specs, grounds, lessons, shipped files.",
+    },
+
     { to: "/social", label: "Social", blurb: "Division-scoped social playbooks and kits." },
     { to: "/templates", label: "Templates", blurb: "Team template gallery from duplicated decks." },
     {
