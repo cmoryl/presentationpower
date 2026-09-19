@@ -97,14 +97,19 @@ export async function buildLondonKitZip(
       }
 
       files += written.length;
+      // Generated files pass the QA audit before they are written. A supplied
+      // master is the design team's own file, copied verbatim — it is never
+      // machine-audited, and the manifest has to say so rather than calling it
+      // "included" like the rest.
       rows.push([
         builders.floorLabel(panel),
         panel.room,
         panel.name,
         `${panel.trimW}x${panel.trimH}mm`,
         written.join(" | "),
-        "included",
+        supplied ? "included · supplied master copied verbatim, not QA-audited" : "included",
       ]);
+
     } catch (err) {
       const reason = err instanceof Error ? err.message : "Build failed";
       skipped.push({ panel: panel.name, reason });
