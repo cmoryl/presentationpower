@@ -1671,7 +1671,11 @@ function LondonSignagePage() {
               )}
 
               {/* Check every resolution tier on screen before downloading. */}
-              <LondonPpiPreview panel={openPanel} svg={previewSvg(openPanel)} />
+              <LondonPpiPreview
+                panel={openPanel}
+                svg={previewSvg(openPanel)}
+                fileBase={fileBase(openPanel)}
+              />
 
               {/* Live panel editing, same editor as the revise screen. Placement,
                   copy and board size write to the shared stores, so thumbnails
@@ -1690,7 +1694,7 @@ function LondonSignagePage() {
                   <div className="mt-4">
                     <LondonPanelLiveEditor
                       panel={openPanel}
-                      revisionLabel={headRev}
+                      revisionLabel={isDraft(openPanel) ? "draft" : headRev}
                       siblingIds={panels.filter((p) => p.id !== openPanel.id).map((p) => p.id)}
                       onStyleChange={(styleId) => {
                         const style = styleId as LondonPanel["style"];

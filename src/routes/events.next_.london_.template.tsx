@@ -37,7 +37,10 @@ import { auditAi, auditSvg, gateOnQa } from "@/lib/london-signage-qa";
 import { getLondonHeadRevision } from "@/lib/next-london-revise.functions";
 import { LondonAutoPublish } from "@/components/events/LondonAutoPublish";
 import { adoptLondonPublishedOverrides } from "@/lib/next-london-adopt-published";
-import { setLondonPublishedOverrides } from "@/lib/next-london-published-overrides";
+import {
+  londonEditsArePublished,
+  setLondonPublishedOverrides,
+} from "@/lib/next-london-published-overrides";
 import { NEXT_LONDON_AGENDA_URL } from "@/lib/next-event";
 import { cmykLabel, cmykToHex, londonCmykBuild } from "@/lib/next-london-cmyk";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
@@ -210,6 +213,17 @@ function LondonTemplatePage() {
   const placement = placements[panel.id] ?? DEFAULT_LOGO_PLACEMENT;
   const placedArtMap = useLondonPlacedArt();
   const placedArt = placedArtMap[panel.id] ?? null;
+  // Local edits that are not in the revision in force make this an unpublished
+  // draft: its files must read `rdraft-`, never a revision number that does not
+  // contain them.
+  const panelIsDraft = (p: { id: string }) =>
+    !londonEditsArePublished(p.id, {
+      placement: placements[p.id],
+      boardSize: boardSizes[p.id],
+      placedArt: placedArtMap[p.id],
+    });
+  const panelStamp: number | "draft" = panelIsDraft(panel) ? "draft" : revStamp;
+  const packStamp: number | "draft" = panels.some(panelIsDraft) ? "draft" : revStamp;
   const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
   const art = useMemo(
     () => ({ colorSpace, vibrance, placedArt }),
@@ -240,7 +254,7 @@ function LondonTemplatePage() {
   const downloadPanel = useCallback(
     async (kind: "svg" | "ai") => {
       await loadLondonSignageFace();
-      const base = londonPanelFileBase(panel, revStamp, colorSpace);
+      const base = londonPanelFileBase(panel, panelStamp, colorSpace);
       try {
         let blob: Blob;
         if (kind === "svg") {
@@ -263,7 +277,7 @@ function LondonTemplatePage() {
         toast.error(error instanceof Error ? error.message : "Download blocked by QA");
       }
     },
-    [panel, art, colorSpace, revStamp],
+    [panel, art, colorSpace, panelStamp],
   );
 
   // Drag with window-level listeners so the pointer can leave the box.
@@ -319,7 +333,7 @@ function LondonTemplatePage() {
     try {
       const pack = await buildLondonSignagePack(panels, {
         // Stamp the revision actually in force — never a number nobody published.
-        revision: revStamp,
+        revision: packStamp,
         colorSpace,
         vibrance,
         onProgress: (done, total) => setProgress({ done, total }),
