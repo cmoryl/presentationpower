@@ -254,7 +254,7 @@ export const decideApproval = createServerFn({ method: "POST" })
 
     const { data: before } = await supabase
       .from("approval_requests")
-      .select("status, requested_by")
+      .select("status, requested_by, checks")
       .eq("id", data.id)
       .maybeSingle();
     if (!before) throw new Error("Approval request not found");
@@ -277,8 +277,33 @@ export const decideApproval = createServerFn({ method: "POST" })
       throw new Error("Forbidden: this request is assigned to other reviewers");
     }
 
-
+    // Step order: only an open request can be decided, and only a decided
+    // request can be reopened. Without this, a closed request could be decided
+    // again and again, renotifying the requester each time.
     const decided = data.status !== "pending";
+    if (decided && before.status !== "pending") {
+      throw new Error(
+        `This request is already ${String(before.status).replace("_", " ")}. Reopen it before deciding again.`,
+      );
+    }
+    if (!decided && before.status === "pending") {
+      throw new Error("This request is already open for review.");
+    }
+
+    // A blocking check is a blocker. Requesting changes is always allowed;
+    // approving over an unresolved blocker is not.
+    if (data.status === "approved") {
+      const blocking = (
+        Array.isArray(before.checks) ? (before.checks as { severity?: string }[]) : []
+      ).filter((c) => c?.severity === "blocking").length;
+      if (blocking > 0) {
+        throw new Error(
+          `This request still has ${blocking} blocking issue${blocking === 1 ? "" : "s"}. Ask for changes instead, or have them resolved and resubmitted before approving.`,
+        );
+      }
+    }
+
+
     const { error } = await supabase
       .from("approval_requests")
       .update({
