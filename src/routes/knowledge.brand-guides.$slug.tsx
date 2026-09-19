@@ -105,7 +105,21 @@ function BrandGuideView() {
         <Link to="/knowledge/brand-guides" className="hover:underline">
           Brand Guides
         </Link>
+        <span className="mx-2">/</span>
+        <Link
+          to="/knowledge/brand-guides/$slug_/edit"
+          params={{ slug: guide.slug }}
+          className="font-medium text-foreground hover:underline"
+        >
+          Edit this guide
+        </Link>
+        {edited && (
+          <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[11px]">
+            Live edits applied
+          </span>
+        )}
       </div>
+
 
       {/* Hero */}
       <section
