@@ -449,6 +449,11 @@ function ApprovalQueuePage() {
                           placeholder="What has to change, or why this is cleared…"
                           className="w-full rounded-xl border border-foreground/15 bg-background px-3 py-2 text-sm"
                         />
+                        <ReviewReasonPicker
+                          idPrefix={`reason-${r.id}`}
+                          selected={reasons}
+                          onChange={setReasons}
+                        />
                         <div className="flex flex-wrap gap-2">
                           <button
                             type="button"
