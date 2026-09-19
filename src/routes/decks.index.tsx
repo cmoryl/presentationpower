@@ -632,6 +632,43 @@ function DecksIndex() {
 
 /* -------- pieces -------- */
 
+/** Tick box shown on a tile while selecting. Locked work says why it can't go. */
+function SelectCheck({
+  checked,
+  onToggle,
+  title,
+  locked,
+  className = "",
+}: {
+  checked: boolean;
+  onToggle: () => void;
+  title: string;
+  locked: boolean;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={locked}
+      aria-pressed={checked}
+      aria-label={locked ? `${title} — in review or approved, cannot be deleted` : `Select ${title}`}
+      title={locked ? "In review or approved — finish the decision first" : undefined}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onToggle();
+      }}
+      className={`z-20 inline-flex items-center justify-center rounded-lg bg-white/95 p-1.5 shadow ring-1 ring-black/10 disabled:opacity-40 dark:bg-[#03002C]/90 dark:ring-white/15 ${className}`}
+    >
+      {checked ? (
+        <CheckSquare size={16} className="text-[#003FC7] dark:text-[#A1FBF9]" />
+      ) : (
+        <Square size={16} className="text-black/45 dark:text-white/45" />
+      )}
+    </button>
+  );
+}
+
 /**
  * A deck saved to the account that this browser has never opened. Shown in the
  * same grid so the workspace total matches what is actually saved.
@@ -642,20 +679,41 @@ function CloudOnlyTile({
   updatedAt,
   isTemplate,
   reviewStatus,
+  selectMode = false,
+  selected = false,
+  onToggleSelected,
 }: {
   id: string;
   title: string;
   updatedAt: string | null;
   isTemplate: boolean;
   reviewStatus: ReviewStatus;
+  selectMode?: boolean;
+  selected?: boolean;
+  onToggleSelected?: () => void;
 }) {
   const openCloudDeck = useOpenCloudDeck();
   const [busy, setBusy] = useState(false);
+  const locked = LOCKED_STATUSES.includes(reviewStatus);
 
   return (
-    <div className="flex flex-col justify-between gap-4 rounded-2xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.04]">
+    <div
+      className={`flex flex-col justify-between gap-4 rounded-2xl border bg-white p-5 dark:bg-white/[0.04] ${
+        selectMode && selected
+          ? "border-[#003FC7] ring-2 ring-[#003FC7]/25 dark:border-[#A1FBF9]"
+          : "border-black/10 dark:border-white/10"
+      }`}
+    >
       <div className="min-w-0">
         <div className="flex items-center gap-2">
+          {selectMode && onToggleSelected && (
+            <SelectCheck
+              checked={selected}
+              onToggle={onToggleSelected}
+              title={title}
+              locked={locked}
+            />
+          )}
           <ReviewStatusBadge status={reviewStatus} />
           {isTemplate && (
             <span className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-black/50 dark:border-white/10 dark:text-white/50">
