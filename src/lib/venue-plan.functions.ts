@@ -8,7 +8,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { normalizeVenuePins, normalizeVenuePlan, type VenuePlanRecord } from "@/lib/venue-plan";
+import {
+  normalizeVenuePins,
+  normalizeVenuePlan,
+  scrubCarriedProvenance,
+  type VenuePlanRecord,
+} from "@/lib/venue-plan";
 
 const zoneSchema = z.object({
   id: z.string(),
