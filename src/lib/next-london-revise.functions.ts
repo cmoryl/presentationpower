@@ -188,6 +188,19 @@ export const publishLondonRevision = createServerFn({ method: "POST" })
       .select(COLUMNS)
       .single();
 
-    if (error) throw new Error(`Could not publish revision ${nextRev}: ${error.message}`);
+    if (error) {
+      // rev is UNIQUE, so a duplicate means somebody published while this
+      // revision was being prepared. Say so plainly instead of leaking the
+      // database error — the history stays append-only either way.
+      const dupe =
+        /duplicate key|unique/i.test(error.message) ||
+        (error as { code?: string }).code === "23505";
+      throw new Error(
+        dupe
+          ? `Revision ${nextRev} was just published by someone else. Reload the London signage page so you are working from the newest revision, then publish again — nothing was saved.`
+          : `Could not publish revision ${nextRev}: ${error.message}`,
+      );
+    }
+
     return { revision: toRevision(row as Row) };
   });
