@@ -244,7 +244,25 @@ export const bulkApproveModules = createServerFn({ method: "POST" })
   .validator((data: { moduleIds: string[]; expiresAt?: string | null }) => data)
   .handler(async ({ data, context }) => {
     await assertReviewer(context);
-    if (data.moduleIds.length === 0) return { ok: true, count: 0 };
+    if (data.moduleIds.length === 0) return { ok: true, count: 0, skipped: 0 };
+
+    // Same rules as a single approval: only modules waiting for review, and
+    // never the reviewer's own work.
+    const { data: rows } = await context.supabase
+      .from("slide_modules")
+      .select("id, owner_id, approval_status")
+      .in("id", data.moduleIds);
+    const allowed = ((rows ?? []) as { id: string; owner_id: string | null; approval_status: string | null }[])
+      .filter((r) => r.owner_id !== context.userId)
+      .filter((r) => r.approval_status === "pending" || r.approval_status === "changes-requested")
+      .map((r) => r.id);
+    const skipped = data.moduleIds.length - allowed.length;
+    if (allowed.length === 0) {
+      throw new Error(
+        "None of the selected modules can be approved by you — they are your own, or not waiting for review.",
+      );
+    }
+
     const { error } = await context.supabase
       .from("slide_modules")
       .update({
@@ -253,17 +271,18 @@ export const bulkApproveModules = createServerFn({ method: "POST" })
         reviewer_id: context.userId,
         expires_at: data.expiresAt ?? null,
       })
-      .in("id", data.moduleIds);
+      .in("id", allowed);
     if (error) throw error;
     await Promise.all(
-      data.moduleIds.map((id) =>
+      allowed.map((id) =>
         writeAudit(context.userId, "module.approve", id, {
           bulk: true,
           expires_at: data.expiresAt ?? null,
         }),
       ),
     );
-    return { ok: true, count: data.moduleIds.length };
+    return { ok: true, count: allowed.length, skipped };
+
   });
 
 // ── Expiring soon queue ───────────────────────────────────────────────────
