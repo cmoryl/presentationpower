@@ -108,7 +108,7 @@ export function BrandDocReadPanel({
       const { group, ...swatch } = s;
       (colors[group] ??= []).push(swatch);
     }
-    const apply: DocApply = { colors };
+    const apply: DocApply = { colors, mode: replace ? "replace" : "add" };
     if (faces.primary && read.typefacePrimary) apply.typefacePrimary = read.typefacePrimary;
     if (faces.web && read.typefaceWeb) apply.typefaceWeb = read.typefaceWeb;
     onApply(apply);
@@ -116,6 +116,7 @@ export function BrandDocReadPanel({
       `${chosen.length} colour${chosen.length === 1 ? "" : "s"} taken from ${fileName} — press Save changes to publish them.`,
     );
   }
+
 
   async function addTerms() {
     if (!read?.terms.length) return;
