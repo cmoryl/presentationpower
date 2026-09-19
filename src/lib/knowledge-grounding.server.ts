@@ -162,6 +162,8 @@ export async function retrieveGrounding({
     market_position: string | null;
     competitive_advantages: unknown;
   }>(brandIntelRes, "brand_intelligence");
+  const eventRows = unwrap<EventKnowledgeRow>(eventRes, "event_venue_knowledge");
+  const glossaryRows = unwrap<GlossaryRow>(glossaryRes, "glossary_terms");
 
   // kb rows first so the editable copy survives dedup against the oracle mirror.
   const haystack: GroundingSnippet[] = dedupeKnowledge([
