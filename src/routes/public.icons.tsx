@@ -219,12 +219,12 @@ function PublicIconLibrary() {
                             )}
                           </span>
                           <span className="mt-3 flex items-center gap-2">
-                            {preview.map((icon) => {
+                            {preview.map((icon, previewIndex) => {
                               const Glyph = iconByName(icon.name);
                               if (!Glyph) return null;
                               return (
                                 <span
-                                  key={icon.name}
+                                  key={`${icon.name}:${previewIndex}`}
                                   className="flex h-8 w-8 items-center justify-center rounded-lg border"
                                   style={{
                                     background: `${ink}14`,

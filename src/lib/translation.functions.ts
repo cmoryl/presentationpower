@@ -928,6 +928,43 @@ export const listSharedLocales = createServerFn({ method: "POST" })
     return (rows ?? []) as Array<{ target_lang: string; ready: number; total: number }>;
   });
 
+// Public: active language reference data (labels/native names/RTL flags).
+// Share-link visitors are anonymous, so this must NOT be auth-gated — the
+// auth-gated listLanguages above left the share viewer's language switcher
+// empty. Reads through the publishable key against the anon SELECT policy.
+export const listPublicLanguages = createServerFn({ method: "GET" }).handler(async () => {
+  const { createClient } = await import("@supabase/supabase-js");
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+  const url = process.env.SUPABASE_URL!;
+  const client = createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      fetch: (input, init) => {
+        const h = new Headers(init?.headers);
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+          h.delete("Authorization");
+        h.set("apikey", key);
+        return fetch(input, { ...init, headers: h });
+      },
+    },
+  });
+  const { data, error } = await client
+    .from("languages")
+    .select("id, label, native, rtl, active, sort_order")
+    .eq("active", true)
+    .order("sort_order", { ascending: true });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Array<{
+    id: string;
+    label: string;
+    native: string;
+    rtl: boolean;
+    active: boolean;
+    sort_order: number;
+  }>;
+});
+
+
 // ---------------------------------------------------------------------------
 // Job history + per-slide progress + cancel/retry
 // ---------------------------------------------------------------------------

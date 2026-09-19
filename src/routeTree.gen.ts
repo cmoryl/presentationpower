@@ -180,7 +180,7 @@ import { Route as ApiPublicDivisionImageRouteImport } from './routes/api/public/
 import { Route as ApiPublicCanvaAdRouteImport } from './routes/api/public/canva-ad'
 import { Route as ApiPublicBrandhubSeedProxyRouteImport } from './routes/api/public/brandhub-seed-proxy'
 import { Route as AdminPrintLibraryItemIdRouteImport } from './routes/admin.print-library_.$itemId'
-import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns.kit'
+import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns_.kit'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as EventsNextMartStopIdRouteImport } from './routes/events.next_.mart_.$stopId'
@@ -1056,9 +1056,9 @@ const AdminPrintLibraryItemIdRoute = AdminPrintLibraryItemIdRouteImport.update({
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminCampaignsKitRoute = AdminCampaignsKitRouteImport.update({
-  id: '/kit',
-  path: '/kit',
-  getParentRoute: () => AdminCampaignsRoute,
+  id: '/campaigns_/kit',
+  path: '/campaigns/kit',
+  getParentRoute: () => AdminRoute,
 } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
@@ -1133,7 +1133,7 @@ export interface FileRoutesByFullPath {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
-  '/admin/campaigns': typeof AdminCampaignsRouteWithChildren
+  '/admin/campaigns': typeof AdminCampaignsRoute
   '/admin/division-seeds': typeof AdminDivisionSeedsRoute
   '/admin/export-audit': typeof AdminExportAuditRoute
   '/admin/globallink': typeof AdminGloballinkRoute
@@ -1311,7 +1311,7 @@ export interface FileRoutesByTo {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
-  '/admin/campaigns': typeof AdminCampaignsRouteWithChildren
+  '/admin/campaigns': typeof AdminCampaignsRoute
   '/admin/division-seeds': typeof AdminDivisionSeedsRoute
   '/admin/export-audit': typeof AdminExportAuditRoute
   '/admin/globallink': typeof AdminGloballinkRoute
@@ -1494,7 +1494,7 @@ export interface FileRoutesById {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
-  '/admin/campaigns': typeof AdminCampaignsRouteWithChildren
+  '/admin/campaigns': typeof AdminCampaignsRoute
   '/admin/division-seeds': typeof AdminDivisionSeedsRoute
   '/admin/export-audit': typeof AdminExportAuditRoute
   '/admin/globallink': typeof AdminGloballinkRoute
@@ -1599,7 +1599,7 @@ export interface FileRoutesById {
   '/social/': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
-  '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
+  '/admin/campaigns_/kit': typeof AdminCampaignsKitRoute
   '/admin/print-library_/$itemId': typeof AdminPrintLibraryItemIdRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/canva-ad': typeof ApiPublicCanvaAdRoute
@@ -2143,7 +2143,7 @@ export interface FileRouteTypes {
     | '/social/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
-    | '/admin/campaigns/kit'
+    | '/admin/campaigns_/kit'
     | '/admin/print-library_/$itemId'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/canva-ad'
@@ -3493,12 +3493,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPrintLibraryItemIdRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/campaigns/kit': {
-      id: '/admin/campaigns/kit'
-      path: '/kit'
+    '/admin/campaigns_/kit': {
+      id: '/admin/campaigns_/kit'
+      path: '/campaigns/kit'
       fullPath: '/admin/campaigns/kit'
       preLoaderRoute: typeof AdminCampaignsKitRouteImport
-      parentRoute: typeof AdminCampaignsRoute
+      parentRoute: typeof AdminRoute
     }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
@@ -3559,18 +3559,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AdminCampaignsRouteChildren {
-  AdminCampaignsKitRoute: typeof AdminCampaignsKitRoute
-}
-
-const AdminCampaignsRouteChildren: AdminCampaignsRouteChildren = {
-  AdminCampaignsKitRoute: AdminCampaignsKitRoute,
-}
-
-const AdminCampaignsRouteWithChildren = AdminCampaignsRoute._addFileChildren(
-  AdminCampaignsRouteChildren,
-)
-
 interface AdminRouteChildren {
   AdminAiRoute: typeof AdminAiRoute
   AdminAlertsRoute: typeof AdminAlertsRoute
@@ -3578,7 +3566,7 @@ interface AdminRouteChildren {
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBrandAssetsRoute: typeof AdminBrandAssetsRoute
-  AdminCampaignsRoute: typeof AdminCampaignsRouteWithChildren
+  AdminCampaignsRoute: typeof AdminCampaignsRoute
   AdminDivisionSeedsRoute: typeof AdminDivisionSeedsRoute
   AdminExportAuditRoute: typeof AdminExportAuditRoute
   AdminGloballinkRoute: typeof AdminGloballinkRoute
@@ -3604,6 +3592,7 @@ interface AdminRouteChildren {
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVizLabRoute: typeof AdminVizLabRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminCampaignsKitRoute: typeof AdminCampaignsKitRoute
   AdminPrintLibraryItemIdRoute: typeof AdminPrintLibraryItemIdRoute
   AdminModulesPrintModuleIdRoute: typeof AdminModulesPrintModuleIdRoute
 }
@@ -3615,7 +3604,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminApprovalsRoute: AdminApprovalsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBrandAssetsRoute: AdminBrandAssetsRoute,
-  AdminCampaignsRoute: AdminCampaignsRouteWithChildren,
+  AdminCampaignsRoute: AdminCampaignsRoute,
   AdminDivisionSeedsRoute: AdminDivisionSeedsRoute,
   AdminExportAuditRoute: AdminExportAuditRoute,
   AdminGloballinkRoute: AdminGloballinkRoute,
@@ -3641,6 +3630,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminUsersRoute: AdminUsersRoute,
   AdminVizLabRoute: AdminVizLabRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminCampaignsKitRoute: AdminCampaignsKitRoute,
   AdminPrintLibraryItemIdRoute: AdminPrintLibraryItemIdRoute,
   AdminModulesPrintModuleIdRoute: AdminModulesPrintModuleIdRoute,
 }
