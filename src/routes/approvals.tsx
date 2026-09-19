@@ -259,12 +259,19 @@ function ApprovalQueuePage() {
           </button>
           <button
             type="button"
-            disabled={bulk.isPending}
+            disabled={bulk.isPending || reasons.length === 0}
+            title={reasons.length === 0 ? "Pick at least one reason below" : undefined}
             onClick={() => bulk.mutate("changes_requested")}
             className="rounded-full border border-foreground/20 px-4 py-1.5 text-xs font-medium hover:bg-foreground/5 disabled:opacity-40"
           >
             Request changes
           </button>
+          <ReviewReasonPicker
+            idPrefix="bulk-reason"
+            selected={reasons}
+            onChange={setReasons}
+            className="w-full border-t border-foreground/10 pt-3"
+          />
         </div>
       )}
 
@@ -354,6 +361,11 @@ function ApprovalQueuePage() {
                   {r.decision_note && (
                     <p className="mt-2 whitespace-pre-wrap break-words rounded-xl bg-foreground/5 px-3 py-2 text-xs leading-relaxed text-foreground/70">
                       Reviewer note: {r.decision_note}
+                    </p>
+                  )}
+                  {(r.change_reasons?.length ?? 0) > 0 && (
+                    <p className="mt-2 text-xs leading-relaxed text-foreground/60">
+                      Sent back for: {describeReasons(r.change_reasons ?? [])}
                     </p>
                   )}
                 </div>
