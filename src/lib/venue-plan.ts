@@ -216,7 +216,15 @@ export const CARRIED_FROM_LONDON_CAVEAT =
  * provenance is still London's, under a different slug, is reset to the honest
  * carried-over wording.
  */
-export function scrubCarriedProvenance(rec: VenuePlanRecord): VenuePlanRecord {
+export function scrubCarriedProvenance<
+  T extends {
+    slug: string;
+    surveyed: boolean;
+    surveySource: string;
+    surveyDate: string | null;
+    caveat: string;
+  },
+>(rec: T): T {
   if (rec.slug === LONDON_PLAN_SLUG) return rec;
   const london = londonVenuePlan();
   const sameSource = rec.surveySource.trim() === london.surveySource.trim();
