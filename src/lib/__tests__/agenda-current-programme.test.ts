@@ -36,7 +36,6 @@ describe("approved agenda programme coverage", () => {
     };
     expect(agendaProgrammeIsCurrent(older)).toBe(false);
   });
-}
 
   it("keeps an edited board live even when a session is renamed or dropped", () => {
     const config = agendaDefault("legal");
