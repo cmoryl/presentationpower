@@ -59,6 +59,8 @@ export function DeckApprovalPanel({ walk, ink }: { walk: DeckWalkReport; ink: st
   const qc = useQueryClient();
 
   const checks = useMemo(() => checksFromWalk(walk), [walk]);
+  // A send-back has to name its reasons — design-fit ones teach the recommender.
+  const [reasons, setReasons] = useState<string[]>([]);
   const stateKey = ["approval-state", "deck", walk.deckId] as const;
 
   const state = useQuery({
