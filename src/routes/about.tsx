@@ -71,6 +71,7 @@ const CHANGELOG: Array<{ date: string; title: string; body: string }> = [
     title: "Real shapes and masks in PowerPoint",
     body: "Polygons, insets, circles, ellipses and resolvable drawn outlines export as editable custom shapes, and a photo inside one arrives as a replaceable picture cropped to that shape. Blur, feathering, gradients and stacked masks stay finished artwork rather than being approximated.",
   },
+  {
 
     date: "2026-09",
     title: "NEXT London signage kit — outlined masters, gated downloads, live revisions",
