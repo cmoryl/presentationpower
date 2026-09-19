@@ -79,7 +79,7 @@ export const Route = createFileRoute("/knowledge/brand-guides/$slug_/edit")({
       </div>
     </AppShell>
   ),
-  component: BrandGuideEditor;
+  component: BrandGuideEditor,
 });
 
 type Draft = {
