@@ -7,7 +7,7 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus, RotateCcw, Save, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -38,6 +38,9 @@ import {
   listGlossary,
   upsertGlossaryTerm,
 } from "@/lib/translation.functions";
+import { BrandDocReadPanel, type DocApply } from "@/components/brand/BrandDocReadPanel";
+import type { ColorGroupKey } from "@/lib/brand-guide-doc-read";
+
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug_/edit")({
   loader: async ({ params }) => {
@@ -455,6 +458,37 @@ function BrandGuideEditor() {
   const save = useServerFn(saveBrandGuideEdit);
   const reset = useServerFn(resetBrandGuideEdit);
   const retheme = colorEditsRetheme(base.divisionId);
+  const queryClient = useQueryClient();
+
+  /** Folds what a brand document says into the unsaved draft. */
+  function applyFromDocument(apply: DocApply) {
+    setDraft((prev) => {
+      const next: Draft = { ...prev };
+      const groups: ColorGroupKey[] = [
+        "primaryColors",
+        "secondaryColors",
+        "tertiaryColors",
+        "neutrals",
+      ];
+      for (const key of groups) {
+        const found = apply.colors[key];
+        if (!found?.length) continue;
+        if (apply.mode === "replace") {
+          next[key] = found.map((c) => ({ ...c }));
+        } else {
+          const have = new Set(prev[key].map((c) => c.hex.toUpperCase()));
+          next[key] = [
+            ...prev[key],
+            ...found.filter((c) => !have.has(c.hex.toUpperCase())).map((c) => ({ ...c })),
+          ];
+        }
+      }
+      if (apply.typefacePrimary) next.typefacePrimary = apply.typefacePrimary;
+      if (apply.typefaceWeb) next.typefaceWeb = apply.typefaceWeb;
+      return next;
+    });
+  }
+
 
   const badHex = [
     ...draft.primaryColors,
@@ -540,6 +574,14 @@ function BrandGuideEditor() {
       </header>
 
       <div className="mt-6 grid grid-cols-1 gap-4">
+        <BrandDocReadPanel
+          divisionId={base.divisionId}
+          onApply={applyFromDocument}
+          onTermsAdded={() =>
+            void queryClient.invalidateQueries({ queryKey: ["guide-glossary", base.divisionId] })
+          }
+        />
+
         <Panel title="Wording" hint="Tagline and opening paragraph shown on the guide.">
           <div>
             <Label className="text-xs text-muted-foreground">Tagline</Label>
