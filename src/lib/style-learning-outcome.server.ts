@@ -156,7 +156,7 @@ export async function logDeckStyleOutcome(
       objective: typeof brief?.meetingObjective === "string" ? brief.meetingObjective : null,
       audience: typeof brief?.audience === "string" ? brief.audience : null,
     };
-    const key = await resolveOutcomeCohort(supabase, input.deckId, profileKey(fallback));
+    const key = await resolveOutcomeCohort(supabase, deckId, profileKey(fallback));
 
     const { error } = await supabase.from("style_reco_events").insert({
       user_id: input.userId,
@@ -166,7 +166,8 @@ export async function logDeckStyleOutcome(
       rank_shown: null,
       profile_key: key,
       brief: (brief ?? {}) as never,
-      deck_id: input.deckId,
+      deck_id: deckId,
+
       polarity: input.violatesRules ? 0 : signalPolarity(input.signal),
       learnable: !input.violatesRules,
     });
