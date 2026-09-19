@@ -107,7 +107,7 @@ function BrandGuideView() {
         </Link>
         <span className="mx-2">/</span>
         <Link
-          to="/knowledge/brand-guides/$slug_/edit"
+          to="/knowledge/brand-guides/$slug/edit"
           params={{ slug: guide.slug }}
           className="font-medium text-foreground hover:underline"
         >

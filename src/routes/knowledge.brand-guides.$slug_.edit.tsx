@@ -330,7 +330,7 @@ function GlossaryPanel({ divisionId }: { divisionId: string }) {
       }),
   });
 
-  const rows = (q.data ?? []) as Array<{
+  const rows = (q.data ?? []) as unknown as Array<{
     id: string;
     term: string;
     do_not_translate: boolean;
