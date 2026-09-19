@@ -26,6 +26,8 @@ describe("outcome cohort attribution", () => {
       "deck_exported",
       "manual_restyle",
       "module_saved",
+      // A reviewer sending work back is evidence too, when the reason is design-fit.
+      "review_changes_requested",
       "variant_reused",
     ]);
   });
