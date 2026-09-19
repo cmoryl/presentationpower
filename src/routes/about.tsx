@@ -43,6 +43,36 @@ type Pillar = {
 const CHANGELOG: Array<{ date: string; title: string; body: string }> = [
   {
     date: "2026-09",
+    title: "One place for every NEXT page",
+    body: "Event work is catalogued in a single register and grouped by the job you are doing: plan the event, programme & delegate print, signage & identity, London 2026, and reference. The NEXT home opens on that directory, and the same shortcut row sits at the top of every event page, so nothing is buried and city-specific work is kept separate from the pages that serve any location.",
+  },
+  {
+    date: "2026-09",
+    title: "Editable venue pages per location",
+    body: "One record per venue holds the address, a looked-up map, opening times, travel, Wi-Fi, the on-site contact, the website, notes and a private venue photograph. The location guide and its PDFs print those details instead of placeholders, and anything typed into the guide by hand is left untouched.",
+  },
+  {
+    date: "2026-09",
+    title: "Location guide builder",
+    body: "A per-city brochure you maintain yourself in the approved violet-to-blue style: cover, welcome, venue, schedule, note panels, scan-code cards and a per-page Look row. The press PDF keeps the design as live vector with photographs placed as images, and Word and PowerPoint versions ship alongside it for people who need to edit copy.",
+  },
+  {
+    date: "2026-09",
+    title: "Approved London division agendas",
+    body: "Ten division areas and 210 sessions of the signed-off London 2026 programme are wired in with rooms, dates, parallel tracks and breaks. Both days sit on one sheet with a solid blue day band per date, and one click splits them into a sheet per day. Type size and weight are adjustable per field, rows can carry an icon and a room or floor line, and every division uses the same half-size lockup to leave room for schedule. Only boards holding every approved session count as live; earlier files stay as labelled versions and warn on open.",
+  },
+  {
+    date: "2026-09",
+    title: "Signage templates on the approved press grounds",
+    body: "Template grounds are measured from the delivered live Illustrator files — aqua-to-violet house scenic, orchid-to-blue front-of-house desk, cyan-to-pink Churchill glass and a white press wall. Registration desks, cloakrooms, merch marts, brew bars and help desks are reusable catalogue families with city-brief quantities. Downloads default to press, proofing is one click and labelled, and a face that is too close to the copy on it warns instead of going to print.",
+  },
+  {
+    date: "2026-09",
+    title: "Real shapes and masks in PowerPoint",
+    body: "Polygons, insets, circles, ellipses and resolvable drawn outlines export as editable custom shapes, and a photo inside one arrives as a replaceable picture cropped to that shape. Blur, feathering, gradients and stacked masks stay finished artwork rather than being approximated.",
+  },
+
+    date: "2026-09",
     title: "NEXT London signage kit — outlined masters, gated downloads, live revisions",
     body: "The London hub always shows the revision in force. Headline, caption and wall copy are outlined vector paths in every master, so no font travels with the file; every .svg, .ai and .png passes the signage QA gate before it is written; files are stamped with the published revision, or rdraft- when unpublished; and publishing pushes live to open pages. Step-and-repeat walls, door vinyls, four master pillars, booth artwork, print previews with trim/bleed/safe guides and click-to-enlarge thumbnails are all editable in place. CMYK output stays switched off until every colour stop has an approved press build.",
   },
