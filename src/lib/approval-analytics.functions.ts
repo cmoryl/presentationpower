@@ -38,6 +38,21 @@ export type ApprovalTypeStat = {
   bottleneckReason: string;
 };
 
+/**
+ * Why work is being sent back, from the structured reviewer reasons. This is the
+ * reporting half of the learning loop: the recommender absorbs design-fit
+ * rejections quietly, and this is where a human can see the pattern.
+ */
+export type ApprovalReasonStat = {
+  id: string;
+  label: string;
+  group: "look" | "compliance" | "content";
+  /** True when this reason moves learned style preference. */
+  learnable: boolean;
+  count: number;
+  share: number;
+};
+
 export type ApprovalAnalytics = {
   windowDays: number;
   totals: {
@@ -51,6 +66,9 @@ export type ApprovalAnalytics = {
   states: ApprovalStateStat[];
   types: ApprovalTypeStat[];
   bottlenecks: ApprovalTypeStat[];
+  reasons: ApprovalReasonStat[];
+  /** Rejections carrying no structured reason (older decisions). */
+  reasonlessRejections: number;
   isReviewer: boolean;
 };
 
@@ -97,6 +115,7 @@ type Row = {
   created_at: string;
   updated_at: string;
   decided_at: string | null;
+  change_reasons: string[] | null;
 };
 
 export const getApprovalAnalytics = createServerFn({ method: "POST" })
@@ -119,7 +138,7 @@ export const getApprovalAnalytics = createServerFn({ method: "POST" })
     // RLS scopes this: reviewers see the whole queue, submitters only their own.
     const { data: rows, error } = await supabase
       .from("approval_requests")
-      .select("subject_type, status, created_at, updated_at, decided_at")
+      .select("subject_type, status, created_at, updated_at, decided_at, change_reasons")
       .gte("created_at", since)
       .limit(5000)
       .returns<Row[]>();
@@ -223,6 +242,8 @@ export const getApprovalAnalytics = createServerFn({ method: "POST" })
       states,
       types: typeStats,
       bottlenecks: typeStats.filter((t) => t.bottleneckScore > 0 && t.open > 0).slice(0, 3),
+      reasons: reasonStats,
+      reasonlessRejections,
       isReviewer,
     };
   });

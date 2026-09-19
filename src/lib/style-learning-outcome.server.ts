@@ -24,6 +24,7 @@ export const OUTCOME_SIGNALS = new Set([
   "variant_reused",
   "module_saved",
   "manual_restyle",
+  "review_changes_requested",
 ]);
 
 /** True when a key carries no cohort detail beyond (maybe) the industry. */

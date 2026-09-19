@@ -153,7 +153,7 @@ export const listApprovalRequests = createServerFn({ method: "POST" })
       .from("approval_requests")
       .select(
         sel(
-          "id, subject_type, subject_id, title, subject_path, requested_by, status, priority, checks, summary, decided_by, decided_at, decision_note, created_at, updated_at",
+          "id, subject_type, subject_id, title, subject_path, requested_by, status, priority, checks, summary, decided_by, decided_at, decision_note, change_reasons, created_at, updated_at",
         ),
       )
       .order("created_at", { ascending: false })
@@ -207,6 +207,8 @@ export type ApprovalRequestRow = {
   decided_by: string | null;
   decided_at: string | null;
   decision_note: string | null;
+  /** Structured reviewer reasons for the current decision. */
+  change_reasons: string[] | null;
   created_at: string;
   updated_at: string;
 };
@@ -240,6 +242,8 @@ export const decideApproval = createServerFn({ method: "POST" })
         id: z.string().uuid(),
         status: z.enum(["approved", "changes_requested", "pending"]),
         note: z.string().max(2000).optional(),
+        /** Structured reasons from the fixed taxonomy in review-reasons.ts. */
+        reasons: z.array(z.string().max(60)).max(12).optional(),
       })
       .parse(raw),
   )
@@ -304,10 +308,25 @@ export const decideApproval = createServerFn({ method: "POST" })
     }
 
 
+    // Structured reasons are what makes a rejection teachable. Free text alone
+    // could never be separated into "wrong look for this audience" (learnable)
+    // and "contrast fails" (a rule violation that must never become taste).
+    const { normalizeReasons, reasonLearnability, describeReasons } = await import(
+      "./review-reasons"
+    );
+    const reasons = normalizeReasons(data.reasons);
+    if (data.status === "changes_requested" && reasons.length === 0) {
+      throw new Error(
+        "Pick at least one reason before sending this back, so the system learns what went wrong.",
+      );
+    }
+    const learnability = reasonLearnability(reasons);
+
     const { error } = await supabase
       .from("approval_requests")
       .update({
         status: data.status,
+        change_reasons: data.status === "pending" ? [] : reasons,
         decision_note: data.note?.trim() || null,
         decided_by: decided ? userId : null,
         decided_at: decided ? new Date().toISOString() : null,
@@ -329,23 +348,36 @@ export const decideApproval = createServerFn({ method: "POST" })
       fromStatus: before?.status ?? null,
       toStatus: data.status,
       note: data.note?.trim() || null,
+      changeReasons: data.status === "pending" ? [] : reasons,
     });
 
 
-    // A deck signed off by a reviewer is the one outcome that says the visual
-    // language actually held up under review — the learning loop's cleanest
-    // positive after an export. Best-effort: it never blocks the decision.
+    // Reviewer outcomes are the loop's best evidence: a sign-off says the visual
+    // language held up, and a design-fit rejection says it did not. Both are
+    // best-effort — neither ever blocks the decision.
     let styleLearning: { ok: boolean; reason?: string } | null = null;
-    if (data.status === "approved" && before.subject_type === "deck" && before.subject_id) {
+    let learningNote: string | null = null;
+    const isDeck = before.subject_type === "deck" && !!before.subject_id;
+    if (data.status === "approved" && isDeck) {
       const { logDeckStyleOutcome } = await import("./style-learning-outcome.server");
       styleLearning = await logDeckStyleOutcome(supabase as never, {
         userId,
         deckId: String(before.subject_id),
         signal: "deck_completed",
       });
+    } else if (data.status === "changes_requested" && isDeck) {
+      const { logDeckStyleOutcome } = await import("./style-learning-outcome.server");
+      styleLearning = await logDeckStyleOutcome(supabase as never, {
+        userId,
+        deckId: String(before.subject_id),
+        signal: "review_changes_requested",
+        // A rule violation is stored for reporting but is never learnable.
+        violatesRules: !learnability.learnable,
+      });
+      learningNote = learnability.reason;
     }
 
-    if (data.note?.trim()) {
+    if (data.note?.trim() || reasons.length > 0) {
       await supabase.from("approval_comments").insert({
         request_id: data.id,
         author_id: userId,
@@ -355,7 +387,9 @@ export const decideApproval = createServerFn({ method: "POST" })
             : data.status === "changes_requested"
               ? "Changes requested"
               : "Reopened"
-        }] ${data.note.trim()}`,
+        }]${reasons.length ? ` ${describeReasons(reasons)}.` : ""}${
+          data.note?.trim() ? ` ${data.note.trim()}` : ""
+        }`,
       });
     }
 
@@ -367,21 +401,27 @@ export const decideApproval = createServerFn({ method: "POST" })
       // the requester is not told their work was sent back.
       data.status,
       userId,
-      data.note?.trim() || null,
+      // The requester needs the reasons, not just the free text.
+      [reasons.length ? describeReasons(reasons) : "", data.note?.trim() ?? ""]
+        .filter(Boolean)
+        .join(" — ") || null,
     );
 
     return {
       ok: true,
       status: data.status,
+      reasons,
       historyWarning: history.ok
         ? null
         : "The decision was saved, but it could not be added to the approval history.",
-      // Honest reporting: if the sign-off could not be fed back into style
+      // Honest reporting: if the outcome could not be fed back into style
       // learning, say so rather than pretending the system learned from it.
       learningWarning:
         styleLearning && !styleLearning.ok && styleLearning.reason
-          ? `Approved, but this sign-off was not added to style learning: ${styleLearning.reason}`
+          ? `Decision saved, but it was not added to style learning: ${styleLearning.reason}`
           : null,
+      /** What the system took from this decision, in plain English. */
+      learningNote,
     };
 
   });
@@ -394,6 +434,7 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
         ids: z.array(z.string().uuid()).min(1).max(50),
         status: z.enum(["approved", "changes_requested"]),
         note: z.string().max(2000).optional(),
+        reasons: z.array(z.string().max(60)).max(12).optional(),
       })
       .parse(raw),
   )
@@ -407,7 +448,7 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
     if (!isReviewer) throw new Error("Forbidden: reviewer role required");
     const { data: before } = await supabase
       .from("approval_requests")
-      .select("id, status, requested_by, checks")
+      .select("id, status, requested_by, checks, subject_type, subject_id")
       .in("id", data.ids);
 
     const isAdmin = !!(roleRows as RoleRow[] | null)?.some((r) => r.role === "admin");
@@ -445,11 +486,22 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
     }
 
 
+    // Same rule as a single decision: a rejection must name why, or the system
+    // learns nothing from a whole batch of sent-back work.
+    const { normalizeReasons } = await import("./review-reasons");
+    const reasons = normalizeReasons(data.reasons);
+    if (data.status === "changes_requested" && reasons.length === 0) {
+      throw new Error(
+        "Pick at least one reason before sending these back, so the system learns what went wrong.",
+      );
+    }
+
     const priorStatus = Object.fromEntries((before ?? []).map((r) => [r.id, r.status as string]));
     const { error } = await supabase
       .from("approval_requests")
       .update({
         status: data.status,
+        change_reasons: reasons,
         decision_note: data.note?.trim() || null,
         decided_by: userId,
         decided_at: new Date().toISOString(),
@@ -467,10 +519,30 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
         fromStatus: priorStatus[id] ?? null,
         toStatus: data.status,
         note: data.note?.trim() || null,
+        changeReasons: reasons,
         meta: { bulk: true },
       })),
     );
 
+
+    // A batch decision is evidence too — feed each deck in it back into learning
+    // under the same governance as a single decision.
+    const { reasonLearnability } = await import("./review-reasons");
+    const learnability = reasonLearnability(reasons);
+    const { logDeckStyleOutcome } = await import("./style-learning-outcome.server");
+    const allowedSet = new Set(allowed);
+    let learningFailed = 0;
+    for (const row of before ?? []) {
+      if (!allowedSet.has(row.id as string)) continue;
+      if (row.subject_type !== "deck" || !row.subject_id) continue;
+      const res = await logDeckStyleOutcome(supabase as never, {
+        userId,
+        deckId: String(row.subject_id),
+        signal: data.status === "approved" ? "deck_completed" : "review_changes_requested",
+        violatesRules: data.status === "approved" ? false : !learnability.learnable,
+      });
+      if (!res.ok) learningFailed += 1;
+    }
 
     await (
       await import("./notify-approvals.server")
@@ -479,6 +551,10 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       ok: true,
       count: allowed.length,
       skipped,
+      learningWarning: learningFailed
+        ? `${learningFailed} decision${learningFailed === 1 ? "" : "s"} could not be added to style learning.`
+        : null,
+      learningNote: data.status === "changes_requested" ? learnability.reason : null,
       historyWarning: history.ok
         ? null
         : `${history.failed} decision${history.failed === 1 ? "" : "s"} could not be added to the approval history.`,

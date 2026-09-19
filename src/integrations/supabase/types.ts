@@ -464,6 +464,7 @@ export type Database = {
       approval_events: {
         Row: {
           actor_id: string | null
+          change_reasons: string[]
           created_at: string
           from_status: string | null
           id: string
@@ -475,6 +476,7 @@ export type Database = {
         }
         Insert: {
           actor_id?: string | null
+          change_reasons?: string[]
           created_at?: string
           from_status?: string | null
           id?: string
@@ -486,6 +488,7 @@ export type Database = {
         }
         Update: {
           actor_id?: string | null
+          change_reasons?: string[]
           created_at?: string
           from_status?: string | null
           id?: string
@@ -507,6 +510,7 @@ export type Database = {
       }
       approval_requests: {
         Row: {
+          change_reasons: string[]
           checks: Json
           created_at: string
           decided_at: string | null
@@ -524,6 +528,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          change_reasons?: string[]
           checks?: Json
           created_at?: string
           decided_at?: string | null
@@ -541,6 +546,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          change_reasons?: string[]
           checks?: Json
           created_at?: string
           decided_at?: string | null

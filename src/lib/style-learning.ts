@@ -41,7 +41,14 @@ export type StyleSignal =
   /** A module was saved into the user's library under that style. */
   | "module_saved"
   /** Heavy manual restyling after selection — the look did not fit. */
-  | "manual_restyle";
+  | "manual_restyle"
+  /**
+   * A reviewer sent the work back naming a DESIGN-FIT problem. The strongest
+   * negative we have: a second pair of eyes judged the look wrong for the job.
+   * Only raised when `reasonLearnability` allows it — brand / accessibility
+   * violations are recorded but never learned from.
+   */
+  | "review_changes_requested";
 
 /**
  * Signal polarity. Deliberately conservative: no single action is treated as
@@ -59,6 +66,7 @@ export const SIGNAL_POLARITY: Record<StyleSignal, number> = {
   variant_reused: 1.2,
   module_saved: 0.9,
   manual_restyle: -1.2,
+  review_changes_requested: -1.5,
 };
 
 export const SIGNAL_LABELS: Record<StyleSignal, string> = {
@@ -72,6 +80,7 @@ export const SIGNAL_LABELS: Record<StyleSignal, string> = {
   variant_reused: "Variant reused",
   module_saved: "Module saved",
   manual_restyle: "Major manual restyling",
+  review_changes_requested: "Reviewer sent it back — design fit",
 };
 
 export function signalPolarity(signal: string): number {
