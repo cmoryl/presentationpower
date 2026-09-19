@@ -62,7 +62,7 @@ function packForCode(code: string) {
 export function lookName(code: string): string {
   const skin = skinByCode(code.toUpperCase());
   if (skin?.name) return skin.name;
-  return packForCode(code)?.name ?? code.toUpperCase();
+  return packForCode(code)?.label ?? code.toUpperCase();
 }
 
 export function describeUsageLook(look: GuideUsageLook): GuideUsageLookView {
