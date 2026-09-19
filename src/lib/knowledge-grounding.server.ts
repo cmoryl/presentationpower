@@ -194,6 +194,8 @@ export async function retrieveGrounding({
         .join(" — "),
       tags: [r.entity_type, r.entity_id].filter(Boolean),
     })),
+    ...eventKnowledgeSnippets(eventRows).map((r) => ({ ...r, source: "event" as const })),
+    ...glossarySnippets(glossaryRows).map((r) => ({ ...r, source: "glossary" as const })),
   ]);
 
   const scores = bm25Scores(
