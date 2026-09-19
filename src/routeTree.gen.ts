@@ -21,6 +21,7 @@ import { Route as FilesRouteImport } from './routes/files'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ElementsRouteImport } from './routes/elements'
+import { Route as DemosRouteImport } from './routes/demos'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AtlasRouteImport } from './routes/atlas'
@@ -248,6 +249,11 @@ const EventsRoute = EventsRouteImport.update({
 const ElementsRoute = ElementsRouteImport.update({
   id: '/elements',
   path: '/elements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemosRoute = DemosRouteImport.update({
+  id: '/demos',
+  path: '/demos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -1113,6 +1119,7 @@ export interface FileRoutesByFullPath {
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/demos': typeof DemosRoute
   '/elements': typeof ElementsRoute
   '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
@@ -1294,6 +1301,7 @@ export interface FileRoutesByTo {
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/demos': typeof DemosRoute
   '/elements': typeof ElementsRoute
   '/faq': typeof FaqRoute
   '/files': typeof FilesRoute
@@ -1474,6 +1482,7 @@ export interface FileRoutesById {
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/demos': typeof DemosRoute
   '/elements': typeof ElementsRoute
   '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
@@ -1658,6 +1667,7 @@ export interface FileRouteTypes {
     | '/atlas'
     | '/auth'
     | '/dashboard'
+    | '/demos'
     | '/elements'
     | '/events'
     | '/faq'
@@ -1839,6 +1849,7 @@ export interface FileRouteTypes {
     | '/atlas'
     | '/auth'
     | '/dashboard'
+    | '/demos'
     | '/elements'
     | '/faq'
     | '/files'
@@ -2018,6 +2029,7 @@ export interface FileRouteTypes {
     | '/atlas'
     | '/auth'
     | '/dashboard'
+    | '/demos'
     | '/elements'
     | '/events'
     | '/faq'
@@ -2201,6 +2213,7 @@ export interface RootRouteChildren {
   AtlasRoute: typeof AtlasRoute
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
+  DemosRoute: typeof DemosRoute
   ElementsRoute: typeof ElementsRoute
   EventsRoute: typeof EventsRouteWithChildren
   FaqRoute: typeof FaqRoute
@@ -2378,6 +2391,13 @@ declare module '@tanstack/react-router' {
       path: '/elements'
       fullPath: '/elements'
       preLoaderRoute: typeof ElementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demos': {
+      id: '/demos'
+      path: '/demos'
+      fullPath: '/demos'
+      preLoaderRoute: typeof DemosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -3767,6 +3787,7 @@ const rootRouteChildren: RootRouteChildren = {
   AtlasRoute: AtlasRoute,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
+  DemosRoute: DemosRoute,
   ElementsRoute: ElementsRoute,
   EventsRoute: EventsRouteWithChildren,
   FaqRoute: FaqRoute,

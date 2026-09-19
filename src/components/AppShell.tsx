@@ -104,6 +104,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
     { to: "/brief/new", label: "New brief" },
 
     { to: "/elements", label: "Elements" },
+    { to: "/demos", label: "Demos" },
 
     { to: "/files", label: "My files" },
     { to: "/admin", label: "Admin" },
