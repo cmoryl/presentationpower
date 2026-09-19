@@ -141,7 +141,8 @@ export function DeckApprovalPanel({ walk, ink }: { walk: DeckWalkReport; ink: st
           </button>
           <button
             type="button"
-            disabled={!request || decide.isPending}
+            disabled={!request || decide.isPending || reasons.length === 0}
+            title={reasons.length === 0 ? "Pick at least one reason below" : undefined}
             onClick={() => decide.mutate("changes_requested")}
             className="rounded-lg border px-3 py-2 text-sm font-medium disabled:opacity-50"
             style={{ borderColor: `${ink}33`, color: ink }}
@@ -150,6 +151,14 @@ export function DeckApprovalPanel({ walk, ink }: { walk: DeckWalkReport; ink: st
           </button>
           {!request && (
             <span className="text-xs text-black/50">Submit the run before deciding.</span>
+          )}
+          {request && (
+            <ReviewReasonPicker
+              idPrefix={`deck-reason-${walk.deckId}`}
+              selected={reasons}
+              onChange={setReasons}
+              className="w-full border-t border-black/10 pt-3"
+            />
           )}
         </div>
       )}
