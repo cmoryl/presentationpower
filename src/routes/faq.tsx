@@ -755,6 +755,11 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
         a: "Yes. Decks and solution proposals export layered and editable — text frames, images, surfaces, icons, and backgrounds arrive as real PowerPoint objects with fonts mapped and corner radii preserved, not flattened pictures.",
       },
       {
+        q: "Do cut-out shapes and masked photos survive the PowerPoint export?",
+        a: "Yes, for the shapes PowerPoint can actually draw: polygons, insets, circles, ellipses and simple drawn outlines arrive as editable custom shapes, and a photo inside one arrives as a replaceable picture cropped to that shape. Soft blur, feathered edges, gradients and stacked masks export as finished artwork instead of a rough approximation.",
+      },
+
+      {
         q: "How do I know the export will match the preview?",
         a: "Use the certified PowerPoint view in the editor: it renders through the export pipeline at true 1:1 scale, and the Layers inspector lists every object the file will contain.",
       },
