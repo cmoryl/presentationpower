@@ -75,3 +75,48 @@ export function glossaryOracleDocs(rows: GlossaryOracleRow[]): OracleMirrorDoc[]
   }
   return docs;
 }
+
+/**
+ * Continuous learning: after any glossary edit, rebuild that scope's Oracle
+ * sheets from the live rows so the store never drifts behind the glossary.
+ * Returns the outcome instead of throwing — a save must not fail because the
+ * mirror did, but the caller reports the failure rather than hiding it.
+ */
+export async function mirrorGlossaryScope(
+  supabase: unknown,
+  scope: string,
+  scopeId: string | null,
+  userId?: string | null,
+): Promise<{ synced: boolean; error?: string }> {
+  type QB = PromiseLike<{ data: unknown; error: unknown }> & {
+    select: (cols?: string) => QB;
+    eq: (col: string, val: unknown) => QB;
+    is: (col: string, val: unknown) => QB;
+    limit: (n: number) => QB;
+  };
+  const sb = supabase as { from: (t: string) => QB };
+  try {
+    let q = sb
+      .from("glossary_terms")
+      .select("term, scope, scope_id, do_not_translate, notes, translations")
+      .eq("scope", scope);
+    q = scopeId ? q.eq("scope_id", scopeId) : q.is("scope_id", null);
+    const { data, error } = await q.limit(2000);
+    if (error) throw new Error(String((error as { message?: string }).message ?? error));
+    const rows = ((data ?? []) as Array<Record<string, unknown>>).map((r) => ({
+      term: String(r["term"] ?? ""),
+      scope: String(r["scope"] ?? "global"),
+      scopeId: (r["scope_id"] as string | null) ?? null,
+      doNotTranslate: Boolean(r["do_not_translate"]),
+      notes: (r["notes"] as string | null) ?? null,
+      translations: (r["translations"] ?? {}) as Record<string, unknown>,
+    }));
+    if (rows.length === 0) return { synced: true };
+    const { mirrorOracleKnowledge } = await import("@/lib/oracle-mirror.server");
+    const res = await mirrorOracleKnowledge(supabase, glossaryOracleDocs(rows), userId ?? null);
+    if (res.errors.length) return { synced: false, error: res.errors.join("; ") };
+    return { synced: true };
+  } catch (e) {
+    return { synced: false, error: (e as Error).message };
+  }
+}
