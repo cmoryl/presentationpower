@@ -80,6 +80,51 @@ async function assertReviewer(ctx: { supabase: unknown; userId: string }) {
   }
 }
 
+/**
+ * A module can only be decided while it is waiting for review, and never by the
+ * person who made it. Without this, a draft nobody submitted could be approved,
+ * an approval could be re-applied over a closed decision, and an author could
+ * sign off their own work.
+ */
+async function assertDecidable(
+  ctx: {
+    supabase: {
+      from: (t: string) => {
+        select: (c: string) => {
+          eq: (
+            c: string,
+            v: string,
+          ) => {
+            maybeSingle: () => Promise<{
+              data: { owner_id: string | null; approval_status: string | null } | null;
+            }>;
+          };
+        };
+      };
+    };
+    userId: string;
+  },
+  moduleId: string,
+) {
+  const { data: row } = await ctx.supabase
+    .from("slide_modules")
+    .select("owner_id, approval_status")
+    .eq("id", moduleId)
+    .maybeSingle();
+  if (!row) throw new Error("Module not found");
+  if (row.owner_id && row.owner_id === ctx.userId) {
+    throw new Error("You cannot review your own module. Ask another reviewer.");
+  }
+  const status = row.approval_status ?? "draft";
+  if (status === "draft") {
+    throw new Error("This module has not been submitted for review yet.");
+  }
+  if (status === "approved" || status === "rejected") {
+    throw new Error(`This module is already ${status}. It has to be submitted again first.`);
+  }
+}
+
+
 // ── Approval queue ────────────────────────────────────────────────────────
 export const listPendingModules = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
