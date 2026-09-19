@@ -259,12 +259,19 @@ function ApprovalQueuePage() {
           </button>
           <button
             type="button"
-            disabled={bulk.isPending}
+            disabled={bulk.isPending || reasons.length === 0}
+            title={reasons.length === 0 ? "Pick at least one reason below" : undefined}
             onClick={() => bulk.mutate("changes_requested")}
             className="rounded-full border border-foreground/20 px-4 py-1.5 text-xs font-medium hover:bg-foreground/5 disabled:opacity-40"
           >
             Request changes
           </button>
+          <ReviewReasonPicker
+            idPrefix="bulk-reason"
+            selected={reasons}
+            onChange={setReasons}
+            className="w-full border-t border-foreground/10 pt-3"
+          />
         </div>
       )}
 
@@ -356,6 +363,11 @@ function ApprovalQueuePage() {
                       Reviewer note: {r.decision_note}
                     </p>
                   )}
+                  {(r.change_reasons?.length ?? 0) > 0 && (
+                    <p className="mt-2 text-xs leading-relaxed text-foreground/60">
+                      Sent back for: {describeReasons(r.change_reasons ?? [])}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
@@ -437,6 +449,11 @@ function ApprovalQueuePage() {
                           placeholder="What has to change, or why this is cleared…"
                           className="w-full rounded-xl border border-foreground/15 bg-background px-3 py-2 text-sm"
                         />
+                        <ReviewReasonPicker
+                          idPrefix={`reason-${r.id}`}
+                          selected={reasons}
+                          onChange={setReasons}
+                        />
                         <div className="flex flex-wrap gap-2">
                           <button
                             type="button"
@@ -448,7 +465,8 @@ function ApprovalQueuePage() {
                           </button>
                           <button
                             type="button"
-                            disabled={decide.isPending}
+                            disabled={decide.isPending || reasons.length === 0}
+                            title={reasons.length === 0 ? "Pick at least one reason" : undefined}
                             onClick={() => decide.mutate({ id: r.id, status: "changes_requested" })}
                             className="rounded-full border border-foreground/20 px-4 py-2 text-xs font-medium hover:bg-foreground/5 disabled:opacity-40"
                           >

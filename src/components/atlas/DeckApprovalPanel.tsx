@@ -2,7 +2,7 @@
 // submitted for brand review (carrying its stage-vs-spec checks as evidence),
 // a reviewer approves or sends it back, and approved runs appear in the live
 // division decks list below.
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +14,7 @@ import {
   type ApprovalCheck,
 } from "@/lib/brand-approvals.functions";
 import { ApprovalGate } from "@/components/approvals/ApprovalGate";
+import { ReviewReasonPicker } from "@/components/approvals/ReviewReasonPicker";
 import type { DeckWalkReport } from "@/lib/division-deck-run";
 
 /** Turn the deck walk into reviewer-readable evidence. */
@@ -58,6 +59,8 @@ export function DeckApprovalPanel({ walk, ink }: { walk: DeckWalkReport; ink: st
   const qc = useQueryClient();
 
   const checks = useMemo(() => checksFromWalk(walk), [walk]);
+  // A send-back has to name its reasons — design-fit ones teach the recommender.
+  const [reasons, setReasons] = useState<string[]>([]);
   const stateKey = ["approval-state", "deck", walk.deckId] as const;
 
   const state = useQuery({
@@ -76,9 +79,10 @@ export function DeckApprovalPanel({ walk, ink }: { walk: DeckWalkReport; ink: st
     mutationFn: (status: "approved" | "changes_requested") => {
       const id = state.data?.request?.id;
       if (!id) throw new Error("Submit the run for review first");
-      return decideFn({ data: { id, status } });
+      return decideFn({ data: { id, status, reasons } });
     },
-    onSuccess: (_r, status) => {
+    onSuccess: (r, status) => {
+      setReasons([]);
       void qc.invalidateQueries({ queryKey: stateKey });
       void qc.invalidateQueries({ queryKey: ["approval-timeline"] });
       void qc.invalidateQueries({ queryKey: ["approval-activity", "deck"] });
@@ -86,6 +90,7 @@ export function DeckApprovalPanel({ walk, ink }: { walk: DeckWalkReport; ink: st
         status === "approved"
           ? "Approved into the live division decks"
           : "Sent back to the run owner",
+        r.learningNote ? { description: r.learningNote, duration: 8000 } : undefined,
       );
     },
     onError: (e: Error) =>
@@ -136,7 +141,8 @@ export function DeckApprovalPanel({ walk, ink }: { walk: DeckWalkReport; ink: st
           </button>
           <button
             type="button"
-            disabled={!request || decide.isPending}
+            disabled={!request || decide.isPending || reasons.length === 0}
+            title={reasons.length === 0 ? "Pick at least one reason below" : undefined}
             onClick={() => decide.mutate("changes_requested")}
             className="rounded-lg border px-3 py-2 text-sm font-medium disabled:opacity-50"
             style={{ borderColor: `${ink}33`, color: ink }}
@@ -145,6 +151,14 @@ export function DeckApprovalPanel({ walk, ink }: { walk: DeckWalkReport; ink: st
           </button>
           {!request && (
             <span className="text-xs text-black/50">Submit the run before deciding.</span>
+          )}
+          {request && (
+            <ReviewReasonPicker
+              idPrefix={`deck-reason-${walk.deckId}`}
+              selected={reasons}
+              onChange={setReasons}
+              className="w-full border-t border-black/10 pt-3"
+            />
           )}
         </div>
       )}
