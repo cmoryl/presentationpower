@@ -213,26 +213,39 @@ export const oracleChat = createServerFn({ method: "POST" })
           if (eRes.ok) {
             const eJson = (await eRes.json()) as { data?: Array<{ embedding: number[] }> };
             const vec = eJson.data?.[0]?.embedding;
-            if (vec) {
-              const filterDivision = await resolveDivisionFilter(data.divisionId);
-              const embeddingLiteral = `[${vec.join(",")}]`;
-              const { data: chunks } = await s.rpc("match_brand_chunks", {
-                query_embedding: embeddingLiteral,
-                match_count: 5,
-                filter_division: filterDivision,
-              });
-              let rows = (chunks ?? []) as Array<{ id: string; asset_id: string; content: string }>;
-              if (filterDivision) {
-                divisionScoped = rows.length > 0;
-                if (rows.length === 0) {
-                  const { data: un } = await s.rpc("match_brand_chunks", {
+              if (vec) {
+                const embeddingLiteral = `[${vec.join(",")}]`;
+                type ChunkRow = {
+                  id: string;
+                  asset_id: string;
+                  content: string;
+                  similarity?: number | null;
+                };
+                // Similarity floor, same as every other retrieval path: a
+                // 0.05-similarity chunk was previously cited as verified
+                // knowledge simply because it was in the top 5.
+                const runMatch = async (division: string | null): Promise<ChunkRow[]> => {
+                  const { data: got } = await s.rpc("match_brand_chunks", {
                     query_embedding: embeddingLiteral,
-                    match_count: 5,
-                    filter_division: null,
+                    match_count: 8,
+                    filter_division: division,
                   });
-                  rows = (un ?? []) as typeof rows;
+                  return ((got ?? []) as ChunkRow[]).filter(
+                    (c) => (c.similarity ?? 1) >= MIN_CHUNK_SIMILARITY,
+                  );
+                };
+                let rows = await runMatch(filterDivision);
+                if (filterDivision) {
+                  divisionScoped = rows.length > 0;
+                  // Only widen past the division when there is nothing else at
+                  // all — widening whenever the vector pass came back empty
+                  // surfaced another division's documents even though the
+                  // keyword pass had already answered the question.
+                  if (rows.length === 0 && topKw.length === 0) {
+                    rows = await runMatch(null);
+                  }
                 }
-              }
+
               if (rows.length) {
                 const { data: assets } = await s
                   .from("brand_assets")
