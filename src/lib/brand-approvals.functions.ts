@@ -380,7 +380,7 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
     if (!isReviewer) throw new Error("Forbidden: reviewer role required");
     const { data: before } = await supabase
       .from("approval_requests")
-      .select("id, status, requested_by")
+      .select("id, status, requested_by, checks")
       .in("id", data.ids);
 
     const isAdmin = !!(roleRows as RoleRow[] | null)?.some((r) => r.role === "admin");
@@ -394,21 +394,29 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       assignedTo.set(key, [...(assignedTo.get(key) ?? []), r.assignee_id as string]);
     }
 
-    // Same two rules as a single decision: never your own request, and never a
-    // request that names other reviewers.
+    // Same rules as a single decision: never your own request, never a request
+    // that names other reviewers, never a request that is already decided, and
+    // never approve over an unresolved blocking issue.
+    const blockingCount = (row: { checks?: unknown }) =>
+      (Array.isArray(row.checks) ? (row.checks as { severity?: string }[]) : []).filter(
+        (c) => c?.severity === "blocking",
+      ).length;
     const allowed = (before ?? [])
       .filter((r) => r.requested_by !== userId)
       .filter((r) => {
         const list = assignedTo.get(r.id as string) ?? [];
         return list.length === 0 || isAdmin || list.includes(userId);
       })
+      .filter((r) => r.status === "pending")
+      .filter((r) => data.status !== "approved" || blockingCount(r) === 0)
       .map((r) => r.id as string);
     const skipped = data.ids.length - allowed.length;
     if (allowed.length === 0) {
       throw new Error(
-        "None of the selected requests can be decided by you — they are your own or assigned to other reviewers.",
+        "None of the selected requests can be decided by you — they are your own, assigned to other reviewers, already decided, or still have blocking issues.",
       );
     }
+
 
     const priorStatus = Object.fromEntries((before ?? []).map((r) => [r.id, r.status as string]));
     const { error } = await supabase
