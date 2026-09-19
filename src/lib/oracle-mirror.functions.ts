@@ -104,7 +104,25 @@ export const backfillOracleMirror = createServerFn({ method: "POST" })
         })),
       );
 
-      const docs2 = [...docs, ...eventDocs];
+      // The translation glossary is its own store too — mirror the approved
+      // terms so the Oracle can cite "never translate" rules from the record.
+      const { data: glos } = await sa
+        .from("glossary_terms")
+        .select("term, scope, scope_id, do_not_translate, notes, translations")
+        .limit(2000);
+      const { glossaryOracleDocs } = await import("@/lib/glossary-oracle.server");
+      const glossaryDocs = glossaryOracleDocs(
+        ((glos ?? []) as Array<Record<string, unknown>>).map((r) => ({
+          term: String(r["term"] ?? ""),
+          scope: String(r["scope"] ?? "global"),
+          scopeId: (r["scope_id"] as string | null) ?? null,
+          doNotTranslate: Boolean(r["do_not_translate"]),
+          notes: (r["notes"] as string | null) ?? null,
+          translations: (r["translations"] ?? {}) as Record<string, unknown>,
+        })),
+      );
+
+      const docs2 = [...docs, ...eventDocs, ...glossaryDocs];
       const res = await mirrorOracleKnowledge(sa, docs2, context.userId);
       return { ok: res.errors.length === 0, considered: docs2.length, ...res };
 
