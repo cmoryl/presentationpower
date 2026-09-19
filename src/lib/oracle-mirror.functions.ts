@@ -79,7 +79,34 @@ export const backfillOracleMirror = createServerFn({ method: "POST" })
           tags: r.tags ?? [],
         }));
 
-      const res = await mirrorOracleKnowledge(sa, docs, context.userId);
-      return { ok: res.errors.length === 0, considered: docs.length, ...res };
+      // Event knowledge lives in its own store with its own embeddings; the
+      // Oracle only reads oracle_knowledge_base, so mirror it here too.
+      const { data: evk } = await sa
+        .from("event_venue_knowledge")
+        .select(
+          "event_id, city, venue, template_family_id, panel_id, kind, title, body, facts, source, fingerprint",
+        )
+        .limit(1000);
+      const { eventKnowledgeOracleDocs } = await import("@/lib/event-knowledge-oracle.server");
+      const eventDocs = eventKnowledgeOracleDocs(
+        ((evk ?? []) as Array<Record<string, unknown>>).map((r) => ({
+          eventId: String(r["event_id"] ?? ""),
+          city: String(r["city"] ?? ""),
+          venue: String(r["venue"] ?? ""),
+          templateFamilyId: (r["template_family_id"] as string | null) ?? null,
+          panelId: (r["panel_id"] as string | null) ?? null,
+          kind: r["kind"] as never,
+          title: String(r["title"] ?? ""),
+          body: String(r["body"] ?? ""),
+          facts: (r["facts"] ?? {}) as never,
+          source: r["source"] as never,
+          fingerprint: String(r["fingerprint"] ?? ""),
+        })),
+      );
+
+      const docs2 = [...docs, ...eventDocs];
+      const res = await mirrorOracleKnowledge(sa, docs2, context.userId);
+      return { ok: res.errors.length === 0, considered: docs2.length, ...res };
+
     },
   );
