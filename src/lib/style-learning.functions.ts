@@ -37,13 +37,22 @@ export const recordStyleSignal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => signalInput.parse(data))
   .handler(async ({ data, context }) => {
+    // Outcome signals are raised away from the picker (export page, approval),
+    // where only the deck is known. Attribute them to the cohort that actually
+    // produced the recommendation, or the strongest positives never reinforce it.
+    const { OUTCOME_SIGNALS, resolveOutcomeCohort } = await import(
+      "./style-learning-outcome.server"
+    );
+    const profileKeyToStore = OUTCOME_SIGNALS.has(data.signal)
+      ? await resolveOutcomeCohort(context.supabase as never, data.deckId, data.profileKey)
+      : data.profileKey;
     const { error } = await context.supabase.from("style_reco_events").insert({
       user_id: context.userId,
       signal: data.signal,
       style_code: data.styleCode ? data.styleCode.toUpperCase() : null,
       recommended_codes: data.recommendedCodes.map((c) => c.toUpperCase()),
       rank_shown: data.rankShown ?? null,
-      profile_key: data.profileKey,
+      profile_key: profileKeyToStore,
       brief: data.brief as never,
       deck_id: data.deckId ?? null,
       polarity: data.violatesRules ? 0 : signalPolarity(data.signal),

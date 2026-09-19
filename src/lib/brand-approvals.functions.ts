@@ -254,7 +254,7 @@ export const decideApproval = createServerFn({ method: "POST" })
 
     const { data: before } = await supabase
       .from("approval_requests")
-      .select("status, requested_by, checks")
+      .select("status, requested_by, checks, subject_type, subject_id")
       .eq("id", data.id)
       .maybeSingle();
     if (!before) throw new Error("Approval request not found");
@@ -332,6 +332,19 @@ export const decideApproval = createServerFn({ method: "POST" })
     });
 
 
+    // A deck signed off by a reviewer is the one outcome that says the visual
+    // language actually held up under review — the learning loop's cleanest
+    // positive after an export. Best-effort: it never blocks the decision.
+    let styleLearning: { ok: boolean; reason?: string } | null = null;
+    if (data.status === "approved" && before.subject_type === "deck" && before.subject_id) {
+      const { logDeckStyleOutcome } = await import("./style-learning-outcome.server");
+      styleLearning = await logDeckStyleOutcome(supabase as never, {
+        userId,
+        deckId: String(before.subject_id),
+        signal: "deck_completed",
+      });
+    }
+
     if (data.note?.trim()) {
       await supabase.from("approval_comments").insert({
         request_id: data.id,
@@ -363,6 +376,12 @@ export const decideApproval = createServerFn({ method: "POST" })
       historyWarning: history.ok
         ? null
         : "The decision was saved, but it could not be added to the approval history.",
+      // Honest reporting: if the sign-off could not be fed back into style
+      // learning, say so rather than pretending the system learned from it.
+      learningWarning:
+        styleLearning && !styleLearning.ok && styleLearning.reason
+          ? `Approved, but this sign-off was not added to style learning: ${styleLearning.reason}`
+          : null,
     };
 
   });
