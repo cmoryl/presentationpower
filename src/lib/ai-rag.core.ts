@@ -302,13 +302,21 @@ export async function synthesizeKnowledgeForBriefCore(
             match_count: 10,
             filter_division: filterDivision,
           });
-          let chunkRows = (chunks ?? []) as Array<{
+          type RagChunkRow = {
             id: string;
             asset_id: string;
             content: string;
             tags: string[];
             similarity: number;
-          }>;
+          };
+          // Relevance floor, shared with every other retrieval path: without it
+          // a barely-related document passage was handed to synthesis as
+          // grounding simply for being in the top ten.
+          const aboveFloor = (rows: unknown): RagChunkRow[] =>
+            ((rows ?? []) as RagChunkRow[]).filter(
+              (c) => (c.similarity ?? 1) >= MIN_CHUNK_SIMILARITY,
+            );
+          let chunkRows = aboveFloor(chunks);
           if (filterDivision) {
             divisionScoped = chunkRows.length > 0;
             if (chunkRows.length === 0) {
@@ -317,7 +325,8 @@ export async function synthesizeKnowledgeForBriefCore(
                 match_count: 10,
                 filter_division: null,
               });
-              chunkRows = (unfiltered ?? []) as typeof chunkRows;
+              chunkRows = aboveFloor(unfiltered);
+
             }
           }
           if (chunkRows.length) {
