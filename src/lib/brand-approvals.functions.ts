@@ -376,6 +376,12 @@ export const decideApproval = createServerFn({ method: "POST" })
       historyWarning: history.ok
         ? null
         : "The decision was saved, but it could not be added to the approval history.",
+      // Honest reporting: if the sign-off could not be fed back into style
+      // learning, say so rather than pretending the system learned from it.
+      learningWarning:
+        styleLearning && !styleLearning.ok && styleLearning.reason
+          ? `Approved, but this sign-off was not added to style learning: ${styleLearning.reason}`
+          : null,
     };
 
   });
