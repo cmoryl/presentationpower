@@ -15,12 +15,25 @@ import {
 export const Route = createFileRoute("/knowledge/")({
   head: () => ({
     meta: [
-      { title: "Knowledge · TransPerfect Element" },
-      { name: "description", content: "Per-division knowledge with cross-division sharing." },
+      { title: "Division knowledge base · TransPerfect Element" },
+      {
+        name: "description",
+        content:
+          "Per-division knowledge with cross-division sharing: each division owns its entries and can share them with siblings or publish them across TransPerfect.",
+      },
+      { property: "og:title", content: "Division knowledge base · TransPerfect Element" },
+      {
+        property: "og:description",
+        content:
+          "Own, share and publish division knowledge — the grounding the build uses when it writes decks, print and event work.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: KnowledgeView,
 });
+
 
 function KnowledgeView() {
   const list = useServerFn(listKnowledgeEntries);
@@ -74,7 +87,14 @@ function KnowledgeView() {
           <p className="mt-3 max-w-2xl text-black/60">
             Each division owns its own entries. Mark an entry <em>shared</em> to make it visible to
             specific sibling divisions, or <em>global</em> to publish it across all of TransPerfect.
+            Everything here grounds what the build writes — decks, print, social and event copy.
+            Event build precedent lives separately in the{" "}
+            <Link to={"/events/next/knowledge" as never} className="underline">
+              NEXT event knowledge store
+            </Link>
+            .
           </p>
+
         </div>
         <div className="flex items-center gap-2">
           <Link
