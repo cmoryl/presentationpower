@@ -75,14 +75,40 @@ export const oracleChat = createServerFn({ method: "POST" })
       let divisionScoped: boolean | undefined = undefined;
 
       // ── 1. Keyword search over oracle_knowledge_base + knowledge_entries ─
-      const [oracleRes, entriesRes] = await Promise.all([
-        s.from("oracle_knowledge_base").select("id, title, content, category, tags").limit(400),
+      // Same scope rules as knowledge-grounding.server.ts: division scoping on
+      // both stores, inactive rows excluded, expiry honoured, ordered + generous
+      // caps so no part of the corpus is silently unreachable, and brand
+      // intelligence included. Before this, Oracle chat read an arbitrary 400
+      // rows of the Oracle store with no division filter and no is_active
+      // check, so one division's knowledge answered another's question.
+      const filterDivision = normalizeDivisionFilter(data.divisionId);
+      let oracleQuery = s
+        .from("oracle_knowledge_base")
+        .select("id, title, content, category, tags")
+        .eq("is_active", true)
+        .order("updated_at", { ascending: false })
+        .limit(2000);
+      if (filterDivision) {
+        oracleQuery = oracleQuery.or(`category.is.null,category.eq.${filterDivision}`);
+      }
+      let entriesQuery = s
+        .from("knowledge_entries")
+        .select("id, title, body, tags")
+        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+        .order("updated_at", { ascending: false })
+        .limit(2000);
+      if (filterDivision) {
+        entriesQuery = entriesQuery.or(knowledgeDivisionFilter(filterDivision));
+      }
+      const [oracleRes, entriesRes, brandIntelRes] = await Promise.all([
+        oracleQuery,
+        entriesQuery,
         s
-          .from("knowledge_entries")
-          .select("id, title, body, tags")
-          .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
-          .order("updated_at", { ascending: false })
-          .limit(2000),
+          .from("brand_intelligence")
+          .select(
+            "id, entity_type, entity_id, brand_summary, market_position, competitive_advantages",
+          )
+          .limit(200),
       ]);
       const oracle = (oracleRes?.data ?? []) as Array<{
         id: string;
@@ -97,10 +123,18 @@ export const oracleChat = createServerFn({ method: "POST" })
         body: string;
         tags: string[] | null;
       }>;
+      const brandIntel = (brandIntelRes?.data ?? []) as Array<{
+        id: string;
+        entity_type: string;
+        entity_id: string;
+        brand_summary: string | null;
+        market_position: string | null;
+        competitive_advantages: unknown;
+      }>;
 
       type Hit = {
         id: string;
-        source: "oracle" | "kb" | "asset";
+        source: "oracle" | "kb" | "asset" | "brand-intel";
         title: string;
         body: string;
         score: number;
@@ -110,15 +144,11 @@ export const oracleChat = createServerFn({ method: "POST" })
       // substring count. The old scorer had no IDF and no length
       // normalisation, so the longest entries in the KB out-ranked genuinely
       // relevant short ones on almost every question.
-      const candidates = [
-        ...oracle.map((r) => ({
-          id: `oracle:${r.id}`,
-          source: "oracle" as const,
-          title: r.title,
-          body: (r.content ?? "").slice(0, 800),
-          text: `${r.title} ${r.content ?? ""} ${(r.tags ?? []).join(" ")} ${r.category ?? ""}`,
-          tags: r.tags ?? [],
-        })),
+      //
+      // kb rows are listed first so the editable copy survives dedup against
+      // its own oracle_knowledge_base mirror — without this the same fact was
+      // cited twice, as two apparently independent sources.
+      const candidates = dedupeKnowledge([
         ...entries.map((r) => ({
           id: `kb:${r.id}`,
           source: "kb" as const,
@@ -127,7 +157,32 @@ export const oracleChat = createServerFn({ method: "POST" })
           text: `${r.title} ${r.body ?? ""} ${(r.tags ?? []).join(" ")}`,
           tags: r.tags ?? [],
         })),
-      ];
+        ...oracle.map((r) => ({
+          id: `oracle:${r.id}`,
+          source: "oracle" as const,
+          title: r.title,
+          body: (r.content ?? "").slice(0, 800),
+          text: `${r.title} ${r.content ?? ""} ${(r.tags ?? []).join(" ")} ${r.category ?? ""}`,
+          tags: r.tags ?? [],
+        })),
+        ...brandIntel.map((r) => ({
+          id: `bi:${r.id}`,
+          source: "brand-intel" as const,
+          title: `Brand intelligence: ${r.entity_type}`,
+          body: [
+            r.brand_summary,
+            r.market_position,
+            Array.isArray(r.competitive_advantages) ? r.competitive_advantages.join(" · ") : "",
+          ]
+            .filter(Boolean)
+            .join(" — ")
+            .slice(0, 800),
+          text: [r.brand_summary, r.market_position, r.entity_type, r.entity_id]
+            .filter(Boolean)
+            .join(" "),
+          tags: [r.entity_type, r.entity_id].filter(Boolean),
+        })),
+      ]);
       const kwScores = bm25Scores(candidates, data.userMessage);
       const topKw: Hit[] = candidates
         .map((c, i) => ({
@@ -140,6 +195,7 @@ export const oracleChat = createServerFn({ method: "POST" })
         .filter((h) => h.score > 0)
         .sort((a, b) => b.score - a.score)
         .slice(0, 10);
+
 
       // ── 2. Vector search over brand_asset_chunks ─────────────────────────
       const apiKey = process.env.LOVABLE_API_KEY;
