@@ -144,12 +144,12 @@ export async function saveDeckToCloudCore(
   };
   // An ordinary content save must not reset the deck's lifecycle status — that
   // silently undid whatever moved it out of draft.
-  const { data: existingDeck } = await sb
-    .from("decks")
-    .select("status")
-    .eq("id", deckUuid)
-    .maybeSingle();
-  const keepStatus = (existingDeck as { status?: string | null } | null)?.status ?? "draft";
+  const { data: existingDeck } = await sb.from("decks").select("status").eq("id", deckUuid);
+  const existingStatus = Array.isArray(existingDeck)
+    ? (existingDeck[0] as { status?: string | null } | undefined)?.status
+    : undefined;
+  const keepStatus = existingStatus ?? "draft";
+
   const { error: deckErr } = await sb.from("decks").upsert({
     id: deckUuid,
     owner_id: userId,
