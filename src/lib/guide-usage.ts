@@ -72,7 +72,7 @@ export function describeUsageLook(look: GuideUsageLook): GuideUsageLookView {
     ...look,
     code,
     name: lookName(code),
-    motif: SKIN_MOTIF[code] ?? null,
+    motif: SKIN_MOTIF[code] ? MOTIF_LABEL[SKIN_MOTIF[code]!] : null,
     accent: pack?.tokens.accent ?? null,
     surface: pack?.tokens.surface ?? null,
     mode: pack ? (pack.mode === "dark" ? "dark" : "light") : null,
