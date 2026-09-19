@@ -1512,6 +1512,25 @@ export function agendaProgrammeIsCurrent(config: {
   return agendaMissingApprovedSessions(config).length === 0;
 }
 
+/**
+ * True when a saved file is the division's live board.
+ *
+ * An edited board — a renamed session, a dropped row, an added line-up — is
+ * still an edit of the approved programme and must keep being served: requiring
+ * every approved title made any real edit vanish from the hub and the London
+ * cards, and dropped the edit link back to the default master. Only a file
+ * saved off an unrelated older programme (sharing none of the approved
+ * sessions) is withheld.
+ */
+export function agendaFileIsLive(config: {
+  divisionId?: string;
+  sessions?: AgendaSession[];
+  days?: AgendaDay[];
+}): boolean {
+  return !agendaProgrammeIsStale(config);
+}
+
+
 
 
 export function agendaDefault(divisionId = "city-series"): AgendaConfig {
