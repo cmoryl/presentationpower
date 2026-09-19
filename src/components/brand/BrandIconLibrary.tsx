@@ -206,12 +206,12 @@ export function BrandIconLibrary({ slug, hero }: Props) {
 
       {/* Grid */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {icons.map((icon) => {
+        {icons.map((icon, iconIndex) => {
           const Icon = iconByName(icon.name);
           const key = `icon:${icon.name}`;
           return (
             <div
-              key={icon.name}
+              key={`${icon.name}:${iconIndex}`}
               className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-4 text-center"
             >
               <div
