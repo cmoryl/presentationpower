@@ -574,6 +574,14 @@ function BrandGuideEditor() {
       </header>
 
       <div className="mt-6 grid grid-cols-1 gap-4">
+        <BrandDocReadPanel
+          divisionId={base.divisionId}
+          onApply={applyFromDocument}
+          onTermsAdded={() =>
+            void queryClient.invalidateQueries({ queryKey: ["guide-glossary", base.divisionId] })
+          }
+        />
+
         <Panel title="Wording" hint="Tagline and opening paragraph shown on the guide.">
           <div>
             <Label className="text-xs text-muted-foreground">Tagline</Label>
