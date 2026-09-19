@@ -274,7 +274,10 @@ export const oracleChat = createServerFn({ method: "POST" })
         }
       }
 
-      const combined = [...topKw, ...assetHits].slice(0, 12);
+      // Second dedup pass: a curated entry and the document chunk it was
+      // written from are the same fact, and must not be cited twice.
+      const combined = dedupeKnowledge([...topKw, ...assetHits]).slice(0, 12);
+
 
       const sources: OracleSource[] = combined.map((h, i) => ({
         n: i + 1,
