@@ -17,6 +17,12 @@
 
 import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
 import {
+  eventKnowledgeSnippets,
+  glossarySnippets,
+  type EventKnowledgeRow,
+  type GlossaryRow,
+} from "@/lib/knowledge-silo-sources";
+import {
   EMBEDDING_MODEL,
   MIN_CHUNK_SIMILARITY,
   applySourceQuota,
