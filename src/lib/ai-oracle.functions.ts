@@ -146,10 +146,12 @@ export const oracleChat = createServerFn({ method: "POST" })
         market_position: string | null;
         competitive_advantages: unknown;
       }>;
+      const eventRows = (eventRes?.data ?? []) as EventKnowledgeRow[];
+      const glossaryRows = (glossaryRes?.data ?? []) as GlossaryRow[];
 
       type Hit = {
         id: string;
-        source: "oracle" | "kb" | "asset" | "brand-intel";
+        source: OracleSource["source"];
         title: string;
         body: string;
         score: number;
