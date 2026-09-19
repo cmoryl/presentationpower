@@ -357,7 +357,14 @@ export const decideApproval = createServerFn({ method: "POST" })
       data.note?.trim() || null,
     );
 
-    return { ok: true, status: data.status };
+    return {
+      ok: true,
+      status: data.status,
+      historyWarning: history.ok
+        ? null
+        : "The decision was saved, but it could not be added to the approval history.",
+    };
+
   });
 
 export const bulkDecideApprovals = createServerFn({ method: "POST" })
@@ -430,7 +437,7 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       })
       .in("id", allowed);
     if (error) throw new Error(error.message);
-    await (
+    const history = await (
       await import("./approval-events.server")
     ).logApprovalEvents(
       supabase,
@@ -444,6 +451,7 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
         meta: { bulk: true },
       })),
     );
+
 
     await (
       await import("./notify-approvals.server")
