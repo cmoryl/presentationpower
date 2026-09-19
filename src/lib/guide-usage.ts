@@ -13,7 +13,7 @@
 import { skinByCode } from "@/lib/skin-backdrop-prompt";
 import { stylePackFromSkin } from "@/lib/design-skin-pack";
 import { stylePackById } from "@/lib/style-packs";
-import { SKIN_MOTIF } from "@/lib/skin-backgrounds";
+import { SKIN_MOTIF, MOTIF_LABEL } from "@/lib/skin-backgrounds";
 import type { BrandGuide } from "@/lib/brand-guides";
 
 export interface GuideUsageSurfaces {

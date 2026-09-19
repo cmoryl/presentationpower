@@ -47,6 +47,7 @@ import { toast } from "sonner";
 import { brandSwatchSpec, brandSwatchSpecText } from "@/lib/brand-swatch-spec";
 import { applyBrandGuidePatch } from "@/lib/brand-guide-edits";
 import { getBrandGuideEdit } from "@/lib/brand-guide-edits.functions";
+import { GuideUsagePanel } from "@/components/brand/GuideUsagePanel";
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
   loader: async ({ params }) => {
@@ -559,6 +560,10 @@ function BrandGuideView() {
       )}
 
       {intel && <BrandhubIntelSections intel={intel} hero={hero} accent={accent} />}
+
+      {/* Reported from real work — never edits the guide above. */}
+      <GuideUsagePanel guide={guide} />
+
 
       <div className="my-16 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground">
         <div>
