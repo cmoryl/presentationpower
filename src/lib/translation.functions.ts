@@ -94,7 +94,16 @@ export const upsertGlossaryTerm = createServerFn({ method: "POST" })
       ? await supabase.from("glossary_terms").update(row).eq("id", data.id).select().maybeSingle()
       : await supabase.from("glossary_terms").insert(row).select().maybeSingle();
     if (error) throw new Error(error.message);
-    return saved;
+    // Continuous learning: push the edited scope into the Oracle store now, so
+    // the knowledge everything else reads is never a resync behind the term.
+    const { mirrorGlossaryScope } = await import("@/lib/glossary-oracle.server");
+    const knowledgeSync = await mirrorGlossaryScope(
+      supabase,
+      row.scope,
+      row.scope_id,
+      context.userId,
+    );
+    return { ...(saved as Record<string, unknown> | null), knowledgeSync };
   });
 
 export const deleteGlossaryTerm = createServerFn({ method: "POST" })
@@ -102,9 +111,25 @@ export const deleteGlossaryTerm = createServerFn({ method: "POST" })
   .validator((raw) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const supabase = context.supabase as AnySupabase;
+    const { data: prior } = await supabase
+      .from("glossary_terms")
+      .select("scope, scope_id")
+      .eq("id", data.id)
+      .maybeSingle();
     const { error } = await supabase.from("glossary_terms").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
-    return { ok: true };
+    const scope = (prior as { scope?: string } | null)?.scope ?? null;
+    let knowledgeSync: { synced: boolean; error?: string } = { synced: true };
+    if (scope) {
+      const { mirrorGlossaryScope } = await import("@/lib/glossary-oracle.server");
+      knowledgeSync = await mirrorGlossaryScope(
+        supabase,
+        scope,
+        (prior as { scope_id?: string | null } | null)?.scope_id ?? null,
+        context.userId,
+      );
+    }
+    return { ok: true, knowledgeSync };
   });
 
 // ---------------------------------------------------------------------------
