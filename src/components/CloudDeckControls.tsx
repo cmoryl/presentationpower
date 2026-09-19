@@ -238,50 +238,18 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
   );
 }
 
-type CloudDeckRow = {
-  id: string;
-  title: string;
-  updated_at: string | null;
-  created_at: string | null;
-  brand_mode_id: string | null;
-};
-
-export function MyCloudDecks() {
-  const signedIn = useSignedIn();
-  const list = useServerFn(listMyCloudDecks);
+/**
+ * Load a deck saved in the account into the editor and go to it.
+ *
+ * Shared so every list of saved presentations opens them the same way — the
+ * workspace deck list used to be unable to open a deck it could not already see.
+ */
+export function useOpenCloudDeck() {
   const load = useServerFn(loadCloudDeck);
-  const del = useServerFn(deleteCloudDeck);
   const hydrate = useDeckStore((s) => s.hydrate);
-  const localDecks = useDeckStore((s) => s.decks);
   const navigate = useNavigate();
-  const [rows, setRows] = useState<CloudDeckRow[] | null>(null);
-  const [busy, setBusy] = useState<string | null>(null);
-  // Never let a failed read look like an empty account.
-  const [failed, setFailed] = useState(false);
-  const [reloadKey, setReloadKey] = useState(0);
-
-  useEffect(() => {
-    if (!signedIn) return;
-    let live = true;
-    list()
-      .then((r) => {
-        if (!live) return;
-        setRows(r as CloudDeckRow[]);
-        setFailed(false);
-      })
-      .catch(() => {
-        if (live) setFailed(true);
-      });
-    return () => {
-      live = false;
-    };
-  }, [signedIn, list, reloadKey]);
-
-  if (!signedIn) return null;
-
-  async function onLoad(deckId: string) {
-    setBusy(deckId);
-    try {
+  return async function openCloudDeck(deckId: string) {
+    {
       const res = await load({ data: { deckId } });
       const d = res.deck as {
         id: string;
@@ -374,6 +342,54 @@ export function MyCloudDecks() {
       hydrate({ brief: briefLocal, deck: deckLocal });
       useDeckStore.getState().markCloudLinked(localDeckId, true);
       navigate({ to: "/decks/$deckId", params: { deckId: localDeckId } });
+    }
+  };
+}
+
+type CloudDeckRow = {
+  id: string;
+  title: string;
+  updated_at: string | null;
+  created_at: string | null;
+  brand_mode_id: string | null;
+};
+
+export function MyCloudDecks() {
+  const signedIn = useSignedIn();
+  const list = useServerFn(listMyCloudDecks);
+  const del = useServerFn(deleteCloudDeck);
+  const openCloudDeck = useOpenCloudDeck();
+  const localDecks = useDeckStore((s) => s.decks);
+  const navigate = useNavigate();
+  const [rows, setRows] = useState<CloudDeckRow[] | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  // Never let a failed read look like an empty account.
+  const [failed, setFailed] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    if (!signedIn) return;
+    let live = true;
+    list()
+      .then((r) => {
+        if (!live) return;
+        setRows(r as CloudDeckRow[]);
+        setFailed(false);
+      })
+      .catch(() => {
+        if (live) setFailed(true);
+      });
+    return () => {
+      live = false;
+    };
+  }, [signedIn, list, reloadKey]);
+
+  if (!signedIn) return null;
+
+  async function onLoad(deckId: string) {
+    setBusy(deckId);
+    try {
+      await openCloudDeck(deckId);
     } catch (e) {
       alert(`Load failed: ${e instanceof Error ? e.message : "unknown"}`);
     } finally {
