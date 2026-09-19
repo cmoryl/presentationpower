@@ -54,10 +54,16 @@ export type OracleSourceDoc = {
 
 export type OracleSourceResult = OracleSourceDoc | { ok: false; error: string };
 
-function fileKind(filename: string): OracleSourceFile["kind"] {
-  const ext = filename.toLowerCase().split(".").pop() ?? "";
+// Many stored documents carry no extension (print-library paths) or a cache-
+// busting query on the URL, so the record's own `kind` is the fallback — without
+// it a real PDF opened as a bare "open in a new tab" link.
+function fileKind(target: string, kind?: string | null): OracleSourceFile["kind"] {
+  const ext = (target.split(/[?#]/)[0] ?? "").toLowerCase().split(".").pop() ?? "";
   if (ext === "pdf") return "pdf";
   if (["png", "jpg", "jpeg", "webp", "gif", "svg", "avif"].includes(ext)) return "image";
+  const k = (kind ?? "").toLowerCase();
+  if (["pdf", "brochure", "guide"].includes(k)) return "pdf";
+  if (["image", "logo"].includes(k)) return "image";
   return "other";
 }
 
@@ -94,7 +100,8 @@ async function loadAsset(
       .from(BUCKET)
       .createSignedUrl(row.storage_path, SIGNED_TTL);
     const url = signed?.signedUrl;
-    if (url) return { row, file: { url, filename, kind: fileKind(filename) } };
+    if (url)
+      return { row, file: { url, filename, kind: fileKind(row.storage_path, row.kind) } };
     return {
       row,
       fileNote: `The stored file could not be opened: ${String(
@@ -103,7 +110,7 @@ async function loadAsset(
     };
   }
   if (row.url) {
-    return { row, file: { url: row.url, filename, kind: fileKind(row.url) } };
+    return { row, file: { url: row.url, filename, kind: fileKind(row.url, row.kind) } };
   }
   return {
     row,
