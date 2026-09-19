@@ -102,20 +102,36 @@ export async function retrieveGrounding({
     .from("oracle_knowledge_base")
     .select("id, title, content, category, tags")
     .eq("is_active", true)
-    .limit(200);
+    .order("updated_at", { ascending: false })
+    .limit(2000);
   if (filterDivision) {
     oracleQuery = oracleQuery.or(`category.is.null,category.eq.${filterDivision}`);
   }
 
+  // Event knowledge and the translation glossary used to be silos reachable
+  // only through their own dedicated searches. They are measured, curated fact
+  // stores, so general grounding reads them like any other source. Neither
+  // carries a division axis (they are event- and language-scoped), so they are
+  // treated as global knowledge — exactly how `category IS NULL` oracle rows are.
   // allSettled, not all+catch: a single failing source used to zero out all
   // three, turning one bad table read into total retrieval loss.
-  const [oracleRes, entriesRes, brandIntelRes] = await Promise.allSettled([
+  const [oracleRes, entriesRes, brandIntelRes, eventRes, glossaryRes] = await Promise.allSettled([
     oracleQuery,
     entriesQuery,
     s
       .from("brand_intelligence")
       .select("id, entity_type, entity_id, brand_summary, market_position, competitive_advantages")
       .limit(200),
+    s
+      .from("event_venue_knowledge")
+      .select("id, title, body, kind, city, venue, event_id, panel_id")
+      .order("updated_at", { ascending: false })
+      .limit(2000),
+    s
+      .from("glossary_terms")
+      .select("id, term, notes, do_not_translate, scope, scope_id")
+      .order("updated_at", { ascending: false })
+      .limit(2000),
   ]);
   const unwrap = <T>(r: PromiseSettledResult<QueryResult>, label: string): T[] => {
     if (r.status !== "fulfilled" || r.value?.error) {
