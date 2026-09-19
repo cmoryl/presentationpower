@@ -77,9 +77,10 @@ export function DeckApprovalPanel({ walk, ink }: { walk: DeckWalkReport; ink: st
     mutationFn: (status: "approved" | "changes_requested") => {
       const id = state.data?.request?.id;
       if (!id) throw new Error("Submit the run for review first");
-      return decideFn({ data: { id, status } });
+      return decideFn({ data: { id, status, reasons } });
     },
-    onSuccess: (_r, status) => {
+    onSuccess: (r, status) => {
+      setReasons([]);
       void qc.invalidateQueries({ queryKey: stateKey });
       void qc.invalidateQueries({ queryKey: ["approval-timeline"] });
       void qc.invalidateQueries({ queryKey: ["approval-activity", "deck"] });
@@ -87,6 +88,7 @@ export function DeckApprovalPanel({ walk, ink }: { walk: DeckWalkReport; ink: st
         status === "approved"
           ? "Approved into the live division decks"
           : "Sent back to the run owner",
+        r.learningNote ? { description: r.learningNote, duration: 8000 } : undefined,
       );
     },
     onError: (e: Error) =>
