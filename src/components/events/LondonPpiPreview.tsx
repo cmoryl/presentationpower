@@ -51,11 +51,17 @@ function download(blob: Blob, name: string) {
 export function LondonPpiPreview({
   panel: input,
   svg,
+  fileBase,
   className,
 }: {
   panel: LondonPanel;
   /** Optional artwork override; defaults to artwork rebuilt from the panel spec. */
   svg?: string;
+  /**
+   * Revision-stamped file stem, so a tier PNG is named exactly like the master
+   * it was rendered from. Without one the file can only honestly read `rdraft-`.
+   */
+  fileBase?: string;
   className?: string;
 }) {
   const faceReady = useLondonSignageFace();
