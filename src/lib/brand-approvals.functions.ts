@@ -364,6 +364,7 @@ export const decideApproval = createServerFn({ method: "POST" })
         userId,
         deckId: String(before.subject_id),
         signal: "deck_completed",
+        ownerId: before.requested_by ? String(before.requested_by) : undefined,
       });
     } else if (data.status === "changes_requested" && isDeck) {
       const { logDeckStyleOutcome } = await import("./style-learning-outcome.server");
@@ -373,6 +374,7 @@ export const decideApproval = createServerFn({ method: "POST" })
         signal: "review_changes_requested",
         // A rule violation is stored for reporting but is never learnable.
         violatesRules: !learnability.learnable,
+        ownerId: before.requested_by ? String(before.requested_by) : undefined,
       });
       learningNote = learnability.reason;
     }
@@ -540,6 +542,9 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
         deckId: String(row.subject_id),
         signal: data.status === "approved" ? "deck_completed" : "review_changes_requested",
         violatesRules: data.status === "approved" ? false : !learnability.learnable,
+        ownerId: (row as { requested_by?: string | null }).requested_by
+          ? String((row as { requested_by?: string | null }).requested_by)
+          : undefined,
       });
       if (!res.ok) learningFailed += 1;
     }

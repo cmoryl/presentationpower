@@ -76,6 +76,35 @@ export interface DeckOutcomeResult {
 }
 
 /**
+ * Editor-side deck ids are not deck row ids. A deck loaded from the cloud is
+ * addressed as `cloud-<uuid>` in the editor, and a locally created deck keeps
+ * its nanoid until it is saved (where it maps to a deterministic uuid). An
+ * approval request stores whichever id the editor had, so an outcome raised
+ * from a decision must resolve it or the credit lands nowhere.
+ */
+export async function resolveDeckRowId(
+  supabase: Db,
+  deckIdInput: string,
+  ownerId: string,
+): Promise<string | null> {
+  const candidates: string[] = [];
+  const uuidLike = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (uuidLike.test(deckIdInput)) candidates.push(deckIdInput);
+  if (deckIdInput.startsWith("cloud-")) {
+    const rest = deckIdInput.slice("cloud-".length);
+    if (uuidLike.test(rest)) candidates.push(rest);
+  } else {
+    const { deckCloudId } = await import("@/lib/deck-uuid");
+    candidates.push(deckCloudId(ownerId, deckIdInput));
+  }
+  for (const id of candidates) {
+    const { data } = await supabase.from("decks").select("id").eq("id", id).maybeSingle();
+    if (data?.id) return String(data.id);
+  }
+  return null;
+}
+
+/**
  * Log an outcome signal for a deck from server code that only knows the deck id.
  * Reads the deck's own style pack and cohort; never throws.
  */
@@ -87,13 +116,30 @@ export async function logDeckStyleOutcome(
     signal: string;
     /** Rule-violating work is stored for audit but never learned from. */
     violatesRules?: boolean;
+    /**
+     * Who owns the deck, when that is not the caller — a reviewer deciding
+     * someone else's submission. Local ids map to a uuid per owner.
+     */
+    ownerId?: string;
   },
 ): Promise<DeckOutcomeResult> {
   try {
+    const deckId = await resolveDeckRowId(
+      supabase,
+      input.deckId,
+      input.ownerId || input.userId,
+    );
+    if (!deckId) {
+      return {
+        ok: false,
+        reason:
+          "This deck is not saved to the cloud, so the outcome could not be matched to a deck record.",
+      };
+    }
     const { data } = await supabase
       .from("decks")
       .select("context")
-      .eq("id", input.deckId)
+      .eq("id", deckId)
       .maybeSingle();
     const ctx = (data?.context ?? null) as Record<string, unknown> | null;
     const packId = typeof ctx?.stylePackId === "string" ? ctx.stylePackId : null;
@@ -103,13 +149,14 @@ export async function logDeckStyleOutcome(
     const styleCode = skinCodeFromPackId(packId);
     if (!styleCode) return { ok: false, reason: "Style pack has no approved S-code." };
 
+
     const brief = (ctx?.brief ?? null) as Record<string, unknown> | null;
     const fallback: LearningProfile = {
       recipeId: typeof ctx?.designRecipeId === "string" ? ctx.designRecipeId : null,
       objective: typeof brief?.meetingObjective === "string" ? brief.meetingObjective : null,
       audience: typeof brief?.audience === "string" ? brief.audience : null,
     };
-    const key = await resolveOutcomeCohort(supabase, input.deckId, profileKey(fallback));
+    const key = await resolveOutcomeCohort(supabase, deckId, profileKey(fallback));
 
     const { error } = await supabase.from("style_reco_events").insert({
       user_id: input.userId,
@@ -119,7 +166,8 @@ export async function logDeckStyleOutcome(
       rank_shown: null,
       profile_key: key,
       brief: (brief ?? {}) as never,
-      deck_id: input.deckId,
+      deck_id: deckId,
+
       polarity: input.violatesRules ? 0 : signalPolarity(input.signal),
       learnable: !input.violatesRules,
     });
