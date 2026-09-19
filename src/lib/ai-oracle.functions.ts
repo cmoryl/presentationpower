@@ -44,7 +44,7 @@ type SbClient = {
 export type OracleSource = {
   n: number;
   id: string;
-  source: "oracle" | "kb" | "asset" | "brand-intel";
+  source: "oracle" | "kb" | "asset" | "brand-intel" | "event" | "glossary";
   title: string;
   href?: string;
 };
