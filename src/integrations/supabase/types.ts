@@ -904,6 +904,36 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_guide_edits: {
+        Row: {
+          created_at: string
+          division_id: string
+          id: string
+          patch: Json
+          slug: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          division_id: string
+          id?: string
+          patch?: Json
+          slug: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          division_id?: string
+          id?: string
+          patch?: Json
+          slug?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       brand_intelligence: {
         Row: {
           brand_summary: string | null

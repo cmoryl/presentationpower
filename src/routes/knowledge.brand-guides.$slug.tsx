@@ -45,12 +45,16 @@ import {
 import { Download } from "lucide-react";
 import { toast } from "sonner";
 import { brandSwatchSpec, brandSwatchSpecText } from "@/lib/brand-swatch-spec";
+import { applyBrandGuidePatch } from "@/lib/brand-guide-edits";
+import { getBrandGuideEdit } from "@/lib/brand-guide-edits.functions";
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
-  loader: ({ params }) => {
-    const guide = getBrandGuide(params.slug);
-    if (!guide) throw notFound();
-    return { guide };
+  loader: async ({ params }) => {
+    const base = getBrandGuide(params.slug);
+    if (!base) throw notFound();
+    // Live brand-lead edits are merged over the authored baseline at read time.
+    const edit = await getBrandGuideEdit({ data: { slug: base.slug } });
+    return { guide: applyBrandGuidePatch(base, edit?.patch ?? null), edited: !!edit };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -79,7 +83,7 @@ export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
 });
 
 function BrandGuideView() {
-  const { guide } = Route.useLoaderData() as { guide: BrandGuide };
+  const { guide, edited } = Route.useLoaderData() as { guide: BrandGuide; edited: boolean };
   const division = BRAND_MODES.find((b) => b.id === guide.divisionId);
   const hero = guide.primaryColors[0]?.hex ?? "#03002C";
   const accent = guide.secondaryColors[0]?.hex ?? "#A1FBF9";
@@ -101,7 +105,21 @@ function BrandGuideView() {
         <Link to="/knowledge/brand-guides" className="hover:underline">
           Brand Guides
         </Link>
+        <span className="mx-2">/</span>
+        <Link
+          to="/knowledge/brand-guides/$slug/edit"
+          params={{ slug: guide.slug }}
+          className="font-medium text-foreground hover:underline"
+        >
+          Edit this guide
+        </Link>
+        {edited && (
+          <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[11px]">
+            Live edits applied
+          </span>
+        )}
       </div>
+
 
       {/* Hero */}
       <section

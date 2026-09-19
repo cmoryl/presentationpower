@@ -184,6 +184,7 @@ import { Route as AdminPrintLibraryItemIdRouteImport } from './routes/admin.prin
 import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns_.kit'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as KnowledgeBrandGuidesSlugEditRouteImport } from './routes/knowledge.brand-guides.$slug_.edit'
 import { Route as EventsNextMartStopIdRouteImport } from './routes/events.next_.mart_.$stopId'
 import { Route as EventsNextLondonTemplateRouteImport } from './routes/events.next_.london_.template'
 import { Route as EventsNextLondonReviseRouteImport } from './routes/events.next_.london_.revise'
@@ -1077,6 +1078,12 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KnowledgeBrandGuidesSlugEditRoute =
+  KnowledgeBrandGuidesSlugEditRouteImport.update({
+    id: '/brand-guides/$slug_/edit',
+    path: '/brand-guides/$slug/edit',
+    getParentRoute: () => KnowledgeRoute,
+  } as any)
 const EventsNextMartStopIdRoute = EventsNextMartStopIdRouteImport.update({
   id: '/next_/mart_/$stopId',
   path: '/next/mart/$stopId',
@@ -1292,6 +1299,7 @@ export interface FileRoutesByFullPath {
   '/events/next/london/revise': typeof EventsNextLondonReviseRoute
   '/events/next/london/template': typeof EventsNextLondonTemplateRoute
   '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
+  '/knowledge/brand-guides/$slug/edit': typeof KnowledgeBrandGuidesSlugEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -1471,6 +1479,7 @@ export interface FileRoutesByTo {
   '/events/next/london/revise': typeof EventsNextLondonReviseRoute
   '/events/next/london/template': typeof EventsNextLondonTemplateRoute
   '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
+  '/knowledge/brand-guides/$slug/edit': typeof KnowledgeBrandGuidesSlugEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1655,6 +1664,7 @@ export interface FileRoutesById {
   '/events/next_/london_/revise': typeof EventsNextLondonReviseRoute
   '/events/next_/london_/template': typeof EventsNextLondonTemplateRoute
   '/events/next_/mart_/$stopId': typeof EventsNextMartStopIdRoute
+  '/knowledge/brand-guides/$slug_/edit': typeof KnowledgeBrandGuidesSlugEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1840,6 +1850,7 @@ export interface FileRouteTypes {
     | '/events/next/london/revise'
     | '/events/next/london/template'
     | '/events/next/mart/$stopId'
+    | '/knowledge/brand-guides/$slug/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -2019,6 +2030,7 @@ export interface FileRouteTypes {
     | '/events/next/london/revise'
     | '/events/next/london/template'
     | '/events/next/mart/$stopId'
+    | '/knowledge/brand-guides/$slug/edit'
   id:
     | '__root__'
     | '/'
@@ -2202,6 +2214,7 @@ export interface FileRouteTypes {
     | '/events/next_/london_/revise'
     | '/events/next_/london_/template'
     | '/events/next_/mart_/$stopId'
+    | '/knowledge/brand-guides/$slug_/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -3534,6 +3547,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/knowledge/brand-guides/$slug_/edit': {
+      id: '/knowledge/brand-guides/$slug_/edit'
+      path: '/brand-guides/$slug/edit'
+      fullPath: '/knowledge/brand-guides/$slug/edit'
+      preLoaderRoute: typeof KnowledgeBrandGuidesSlugEditRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
     '/events/next_/mart_/$stopId': {
       id: '/events/next_/mart_/$stopId'
       path: '/next/mart/$stopId'
@@ -3730,6 +3750,7 @@ interface KnowledgeRouteChildren {
   KnowledgeBrandGuidesNext2026Route: typeof KnowledgeBrandGuidesNext2026Route
   KnowledgeBrandGuidesNext2026BuildRoute: typeof KnowledgeBrandGuidesNext2026BuildRoute
   KnowledgeBrandGuidesIndexRoute: typeof KnowledgeBrandGuidesIndexRoute
+  KnowledgeBrandGuidesSlugEditRoute: typeof KnowledgeBrandGuidesSlugEditRoute
 }
 
 const KnowledgeRouteChildren: KnowledgeRouteChildren = {
@@ -3745,6 +3766,7 @@ const KnowledgeRouteChildren: KnowledgeRouteChildren = {
   KnowledgeBrandGuidesNext2026BuildRoute:
     KnowledgeBrandGuidesNext2026BuildRoute,
   KnowledgeBrandGuidesIndexRoute: KnowledgeBrandGuidesIndexRoute,
+  KnowledgeBrandGuidesSlugEditRoute: KnowledgeBrandGuidesSlugEditRoute,
 }
 
 const KnowledgeRouteWithChildren = KnowledgeRoute._addFileChildren(
