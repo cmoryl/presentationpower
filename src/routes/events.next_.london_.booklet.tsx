@@ -234,9 +234,16 @@ function BookletPage() {
   const rows = (saved.data ?? []) as unknown as { id: string; name: string; config: AgendaConfig }[];
 
   /** The agenda the booklet prints, forced to the booklet's own page format. */
+  const agendaSwapped = useMemo(() => {
+    const picked = rows.find((r) => r.id === savedId)?.config ?? agendaSnapshot;
+    return !!picked && !agendaProgrammeIsCurrent(picked);
+  }, [rows, savedId, agendaSnapshot]);
+
   const agenda = useMemo<AgendaConfig>(() => {
     // An older or partial saved board is never printed into the booklet: fall
     // back to the division's approved programme instead of reprinting stale rows.
+    // The swap is announced below so nobody prints a booklet believing it came
+    // from the file they picked.
     const picked = rows.find((r) => r.id === savedId)?.config ?? agendaSnapshot;
     const base =
       picked && agendaProgrammeIsCurrent(picked)
@@ -244,6 +251,7 @@ function BookletPage() {
         : agendaDefault(picked?.divisionId ?? "city-series");
     return { ...base, sizeId: bookletAgendaSizeId(config.sizeId) };
   }, [rows, savedId, agendaSnapshot, config.sizeId]);
+
 
   const agendaPageCount = useMemo(() => {
     try {
@@ -693,7 +701,15 @@ function BookletPage() {
                   ? "Sign in to print a saved agenda — the demo programme is used until then."
                   : `Printed at the booklet page size · ${agendaPageCount} agenda page${agendaPageCount === 1 ? "" : "s"}.`}
               </p>
+              {agendaSwapped ? (
+                <p className="rounded-md border border-[#FF9B70] bg-[#FF9B70]/12 px-3 py-2 text-xs text-[#03002C]">
+                  This saved agenda was built on an older programme, so the booklet is printing the
+                  division’s approved programme instead. Open the agenda studio and save the board
+                  again if you want your own version printed.
+                </p>
+              ) : null}
             </div>
+
 
             {/* ── maps ──────────────────────────────────────────────────── */}
             <div className="space-y-3">

@@ -76,6 +76,13 @@ function AgendaCard({
             {room}
           </p>
         ) : null}
+        {saved && !live ? (
+          <p className="mt-2 rounded-md border border-[#FF9B70] bg-[#FF9B70]/12 px-2 py-1.5 text-[11.5px] leading-snug text-[#03002C]">
+            A saved file exists for this division but was built on an older programme, so the
+            approved master is shown instead.
+          </p>
+        ) : null}
+
         <Link
           to="/events/next/agendas"
           search={{ division: id, file: live?.id }}

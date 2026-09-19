@@ -97,14 +97,19 @@ export async function buildLondonKitZip(
       }
 
       files += written.length;
+      // Generated files pass the QA audit before they are written. A supplied
+      // master is the design team's own file, copied verbatim — it is never
+      // machine-audited, and the manifest has to say so rather than calling it
+      // "included" like the rest.
       rows.push([
         builders.floorLabel(panel),
         panel.room,
         panel.name,
         `${panel.trimW}x${panel.trimH}mm`,
         written.join(" | "),
-        "included",
+        supplied ? "included · supplied master copied verbatim, not QA-audited" : "included",
       ]);
+
     } catch (err) {
       const reason = err instanceof Error ? err.message : "Build failed";
       skipped.push({ panel: panel.name, reason });
@@ -145,6 +150,9 @@ export async function buildLondonKitZip(
       "  live-ai/        Illustrator-compatible vector masters — editable, no live text.",
       "  print-pdf/      Print-ready PDFs with bleed, trim, crop marks and registration.",
       "  supplied-master/ The design team's hand-finished file, verbatim, where one exists.",
+      "                   Copied as delivered — these are not put through the kit's QA audit,",
+      "                   and their filenames are the ones the design team supplied.",
+
       "",
       "manifest.csv lists every file in this pack. print-schedule.csv is the run sheet.",
       skipped.length ? "SKIPPED.txt lists signs missing from this pack." : "",

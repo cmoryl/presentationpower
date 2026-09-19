@@ -254,7 +254,7 @@ export const decideApproval = createServerFn({ method: "POST" })
 
     const { data: before } = await supabase
       .from("approval_requests")
-      .select("status, requested_by")
+      .select("status, requested_by, checks")
       .eq("id", data.id)
       .maybeSingle();
     if (!before) throw new Error("Approval request not found");
@@ -277,8 +277,33 @@ export const decideApproval = createServerFn({ method: "POST" })
       throw new Error("Forbidden: this request is assigned to other reviewers");
     }
 
-
+    // Step order: only an open request can be decided, and only a decided
+    // request can be reopened. Without this, a closed request could be decided
+    // again and again, renotifying the requester each time.
     const decided = data.status !== "pending";
+    if (decided && before.status !== "pending") {
+      throw new Error(
+        `This request is already ${String(before.status).replace("_", " ")}. Reopen it before deciding again.`,
+      );
+    }
+    if (!decided && before.status === "pending") {
+      throw new Error("This request is already open for review.");
+    }
+
+    // A blocking check is a blocker. Requesting changes is always allowed;
+    // approving over an unresolved blocker is not.
+    if (data.status === "approved") {
+      const blocking = (
+        Array.isArray(before.checks) ? (before.checks as { severity?: string }[]) : []
+      ).filter((c) => c?.severity === "blocking").length;
+      if (blocking > 0) {
+        throw new Error(
+          `This request still has ${blocking} blocking issue${blocking === 1 ? "" : "s"}. Ask for changes instead, or have them resolved and resubmitted before approving.`,
+        );
+      }
+    }
+
+
     const { error } = await supabase
       .from("approval_requests")
       .update({
@@ -290,7 +315,7 @@ export const decideApproval = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
 
-    await (
+    const history = await (
       await import("./approval-events.server")
     ).logApprovalEvent(supabase, {
       requestId: data.id,
@@ -305,6 +330,7 @@ export const decideApproval = createServerFn({ method: "POST" })
       toStatus: data.status,
       note: data.note?.trim() || null,
     });
+
 
     if (data.note?.trim()) {
       await supabase.from("approval_comments").insert({
@@ -331,7 +357,14 @@ export const decideApproval = createServerFn({ method: "POST" })
       data.note?.trim() || null,
     );
 
-    return { ok: true, status: data.status };
+    return {
+      ok: true,
+      status: data.status,
+      historyWarning: history.ok
+        ? null
+        : "The decision was saved, but it could not be added to the approval history.",
+    };
+
   });
 
 export const bulkDecideApprovals = createServerFn({ method: "POST" })
@@ -355,7 +388,7 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
     if (!isReviewer) throw new Error("Forbidden: reviewer role required");
     const { data: before } = await supabase
       .from("approval_requests")
-      .select("id, status, requested_by")
+      .select("id, status, requested_by, checks")
       .in("id", data.ids);
 
     const isAdmin = !!(roleRows as RoleRow[] | null)?.some((r) => r.role === "admin");
@@ -369,21 +402,29 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       assignedTo.set(key, [...(assignedTo.get(key) ?? []), r.assignee_id as string]);
     }
 
-    // Same two rules as a single decision: never your own request, and never a
-    // request that names other reviewers.
+    // Same rules as a single decision: never your own request, never a request
+    // that names other reviewers, never a request that is already decided, and
+    // never approve over an unresolved blocking issue.
+    const blockingCount = (row: { checks?: unknown }) =>
+      (Array.isArray(row.checks) ? (row.checks as { severity?: string }[]) : []).filter(
+        (c) => c?.severity === "blocking",
+      ).length;
     const allowed = (before ?? [])
       .filter((r) => r.requested_by !== userId)
       .filter((r) => {
         const list = assignedTo.get(r.id as string) ?? [];
         return list.length === 0 || isAdmin || list.includes(userId);
       })
+      .filter((r) => r.status === "pending")
+      .filter((r) => data.status !== "approved" || blockingCount(r) === 0)
       .map((r) => r.id as string);
     const skipped = data.ids.length - allowed.length;
     if (allowed.length === 0) {
       throw new Error(
-        "None of the selected requests can be decided by you — they are your own or assigned to other reviewers.",
+        "None of the selected requests can be decided by you — they are your own, assigned to other reviewers, already decided, or still have blocking issues.",
       );
     }
+
 
     const priorStatus = Object.fromEntries((before ?? []).map((r) => [r.id, r.status as string]));
     const { error } = await supabase
@@ -396,7 +437,7 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       })
       .in("id", allowed);
     if (error) throw new Error(error.message);
-    await (
+    const history = await (
       await import("./approval-events.server")
     ).logApprovalEvents(
       supabase,
@@ -411,10 +452,19 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       })),
     );
 
+
     await (
       await import("./notify-approvals.server")
     ).notifyRequesters(allowed, data.status, userId, data.note?.trim() || null);
-    return { ok: true, count: allowed.length, skipped };
+    return {
+      ok: true,
+      count: allowed.length,
+      skipped,
+      historyWarning: history.ok
+        ? null
+        : `${history.failed} decision${history.failed === 1 ? "" : "s"} could not be added to the approval history.`,
+    };
+
 
   });
 

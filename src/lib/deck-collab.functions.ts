@@ -149,12 +149,33 @@ export const setDeckReviewStatus = createServerFn({ method: "POST" })
 
     // Transition rules
     const next = data.status;
+    const current = (deck.review_status ?? "draft") as
+      | "draft"
+      | "in_review"
+      | "approved"
+      | "changes_requested";
     if (next === "in_review" && !isOwner && !isAdmin)
       throw new Error("Only the owner or an admin can submit for review");
     if ((next === "approved" || next === "changes_requested") && !isAdmin)
       throw new Error("Only an admin can approve or request changes");
     if (next === "draft" && !isOwner && !isAdmin)
       throw new Error("Only the owner can move back to draft");
+
+    // Step order: a deck must be in review before it can be decided, a decided
+    // deck must be reopened (submitted again) before a new decision, and an
+    // approved deck cannot be quietly dropped back to draft.
+    if (next === current) throw new Error(`This deck is already ${current.replace("_", " ")}.`);
+    if ((next === "approved" || next === "changes_requested") && current !== "in_review")
+      throw new Error(
+        current === "draft"
+          ? "Submit the deck for review before approving it or requesting changes."
+          : `This deck is already ${current.replace("_", " ")} — submit it for review again before deciding.`,
+      );
+    if (next === "in_review" && current === "approved" && !isAdmin)
+      throw new Error("This deck is approved. Only an admin can reopen it for review.");
+    if (next === "draft" && current === "approved" && !isAdmin)
+      throw new Error("This deck is approved. Only an admin can move it back to draft.");
+
 
     const patch: {
       review_status: "draft" | "in_review" | "approved" | "changes_requested";

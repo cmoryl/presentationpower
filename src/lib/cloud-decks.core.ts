@@ -142,6 +142,14 @@ export async function saveDeckToCloudCore(
     ...(data.deck.context ?? {}),
     ...(data.deck.subCompany ? { subCompany: data.deck.subCompany } : {}),
   };
+  // An ordinary content save must not reset the deck's lifecycle status — that
+  // silently undid whatever moved it out of draft.
+  const { data: existingDeck } = await sb.from("decks").select("status").eq("id", deckUuid);
+  const existingStatus = Array.isArray(existingDeck)
+    ? (existingDeck[0] as { status?: string | null } | undefined)?.status
+    : undefined;
+  const keepStatus = existingStatus ?? "draft";
+
   const { error: deckErr } = await sb.from("decks").upsert({
     id: deckUuid,
     owner_id: userId,
@@ -150,10 +158,11 @@ export async function saveDeckToCloudCore(
     archetype_id: deckArchetype,
     brand_mode_id: deckBrandMode,
 
-    status: "draft",
+    status: keepStatus,
     context: deckContext,
     is_template: data.deck.isTemplate ?? false,
   });
+
   if (deckErr) throw new Error(deckErr.message);
 
   // Replace slides — write first, prune after. Deleting up front meant a failed

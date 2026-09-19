@@ -80,6 +80,51 @@ async function assertReviewer(ctx: { supabase: unknown; userId: string }) {
   }
 }
 
+/**
+ * A module can only be decided while it is waiting for review, and never by the
+ * person who made it. Without this, a draft nobody submitted could be approved,
+ * an approval could be re-applied over a closed decision, and an author could
+ * sign off their own work.
+ */
+async function assertDecidable(
+  ctx: {
+    supabase: {
+      from: (t: string) => {
+        select: (c: string) => {
+          eq: (
+            c: string,
+            v: string,
+          ) => {
+            maybeSingle: () => Promise<{
+              data: { owner_id: string | null; approval_status: string | null } | null;
+            }>;
+          };
+        };
+      };
+    };
+    userId: string;
+  },
+  moduleId: string,
+) {
+  const { data: row } = await ctx.supabase
+    .from("slide_modules")
+    .select("owner_id, approval_status")
+    .eq("id", moduleId)
+    .maybeSingle();
+  if (!row) throw new Error("Module not found");
+  if (row.owner_id && row.owner_id === ctx.userId) {
+    throw new Error("You cannot review your own module. Ask another reviewer.");
+  }
+  const status = row.approval_status ?? "draft";
+  if (status === "draft") {
+    throw new Error("This module has not been submitted for review yet.");
+  }
+  if (status === "approved" || status === "rejected") {
+    throw new Error(`This module is already ${status}. It has to be submitted again first.`);
+  }
+}
+
+
 // ── Approval queue ────────────────────────────────────────────────────────
 export const listPendingModules = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -131,6 +176,8 @@ export const approveModule = createServerFn({ method: "POST" })
   .validator((data: { moduleId: string; notes?: string; expiresAt?: string | null }) => data)
   .handler(async ({ data, context }) => {
     await assertReviewer(context);
+    await assertDecidable(context as never, data.moduleId);
+
     const { error } = await context.supabase
       .from("slide_modules")
       .update({
@@ -154,6 +201,8 @@ export const rejectModule = createServerFn({ method: "POST" })
   .validator((data: { moduleId: string; notes: string }) => data)
   .handler(async ({ data, context }) => {
     await assertReviewer(context);
+    await assertDecidable(context as never, data.moduleId);
+
     const { error } = await context.supabase
       .from("slide_modules")
       .update({
@@ -172,6 +221,8 @@ export const requestChanges = createServerFn({ method: "POST" })
   .validator((data: { moduleId: string; notes: string }) => data)
   .handler(async ({ data, context }) => {
     await assertReviewer(context);
+    await assertDecidable(context as never, data.moduleId);
+
     const { error } = await context.supabase
       .from("slide_modules")
       .update({
@@ -193,7 +244,25 @@ export const bulkApproveModules = createServerFn({ method: "POST" })
   .validator((data: { moduleIds: string[]; expiresAt?: string | null }) => data)
   .handler(async ({ data, context }) => {
     await assertReviewer(context);
-    if (data.moduleIds.length === 0) return { ok: true, count: 0 };
+    if (data.moduleIds.length === 0) return { ok: true, count: 0, skipped: 0 };
+
+    // Same rules as a single approval: only modules waiting for review, and
+    // never the reviewer's own work.
+    const { data: rows } = await context.supabase
+      .from("slide_modules")
+      .select("id, owner_id, approval_status")
+      .in("id", data.moduleIds);
+    const allowed = ((rows ?? []) as { id: string; owner_id: string | null; approval_status: string | null }[])
+      .filter((r) => r.owner_id !== context.userId)
+      .filter((r) => r.approval_status === "pending" || r.approval_status === "changes-requested")
+      .map((r) => r.id);
+    const skipped = data.moduleIds.length - allowed.length;
+    if (allowed.length === 0) {
+      throw new Error(
+        "None of the selected modules can be approved by you — they are your own, or not waiting for review.",
+      );
+    }
+
     const { error } = await context.supabase
       .from("slide_modules")
       .update({
@@ -202,17 +271,18 @@ export const bulkApproveModules = createServerFn({ method: "POST" })
         reviewer_id: context.userId,
         expires_at: data.expiresAt ?? null,
       })
-      .in("id", data.moduleIds);
+      .in("id", allowed);
     if (error) throw error;
     await Promise.all(
-      data.moduleIds.map((id) =>
+      allowed.map((id) =>
         writeAudit(context.userId, "module.approve", id, {
           bulk: true,
           expires_at: data.expiresAt ?? null,
         }),
       ),
     );
-    return { ok: true, count: data.moduleIds.length };
+    return { ok: true, count: allowed.length, skipped };
+
   });
 
 // ── Expiring soon queue ───────────────────────────────────────────────────

@@ -239,8 +239,23 @@ export const restoreDeckVersion = createServerFn({ method: "POST" })
       })
       .eq("id", deckUuid);
 
-    // Replace slides.
-    await supabase.from("deck_slides").delete().eq("deck_id", deckUuid);
+    // Replace slides — park the current rows out of the way, write the restored
+    // rows, and only then remove the parked ones. Deleting up front meant a
+    // failed insert left the deck with no slides at all, i.e. a restore that
+    // destroyed work.
+    const { data: parkRows } = await supabase
+      .from("deck_slides")
+      .select("id")
+      .eq("deck_id", deckUuid);
+    const parkedIds = Array.isArray(parkRows) ? (parkRows as { id: string }[]).map((r) => r.id) : [];
+    // position is UNIQUE per deck, so shift the old rows to negative slots.
+    for (let i = 0; i < parkedIds.length; i += 1) {
+      await supabase
+        .from("deck_slides")
+        .update({ position: -(i + 1) })
+        .eq("id", parkedIds[i]!);
+    }
+
     if (snapshot.slides.length > 0) {
       const rows = snapshot.slides.map((s) => ({
         deck_id: deckUuid,
@@ -252,8 +267,27 @@ export const restoreDeckVersion = createServerFn({ method: "POST" })
         notes: s.notes ?? null,
       }));
       const { error: sErr } = await supabase.from("deck_slides").insert(rows);
-      if (sErr) throw new Error(sErr.message);
+      if (sErr) {
+        // Put the original slides back where they were before failing.
+        for (let i = 0; i < parkedIds.length; i += 1) {
+          const original = (currentSlides as { id: string; position: number }[] | null)?.find(
+            (r) => r.id === parkedIds[i],
+          );
+          if (original)
+            await supabase
+              .from("deck_slides")
+              .update({ position: original.position })
+              .eq("id", parkedIds[i]!);
+        }
+        throw new Error(`${sErr.message} — nothing was changed, the deck still has its slides.`);
+      }
     }
+
+    // Only now remove the parked rows.
+    for (const id of parkedIds) {
+      await supabase.from("deck_slides").delete().eq("id", id);
+    }
+
 
     // Post-restore version entry.
     const { data: nextNum } = await supabase
