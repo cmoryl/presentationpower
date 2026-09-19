@@ -44,17 +44,11 @@ type SbClient = {
 export type OracleSource = {
   n: number;
   id: string;
-  source: "oracle" | "kb" | "asset";
+  source: "oracle" | "kb" | "asset" | "brand-intel";
   title: string;
   href?: string;
 };
 
-async function resolveDivisionFilter(
-  divisionId: string | null | undefined,
-): Promise<string | null> {
-  if (divisionId && divisionId.trim() && divisionId !== "master") return divisionId.trim();
-  return null;
-}
 
 export const oracleChat = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
