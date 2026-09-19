@@ -150,6 +150,9 @@ export async function buildLondonKitZip(
       "  live-ai/        Illustrator-compatible vector masters — editable, no live text.",
       "  print-pdf/      Print-ready PDFs with bleed, trim, crop marks and registration.",
       "  supplied-master/ The design team's hand-finished file, verbatim, where one exists.",
+      "                   Copied as delivered — these are not put through the kit's QA audit,",
+      "                   and their filenames are the ones the design team supplied.",
+
       "",
       "manifest.csv lists every file in this pack. print-schedule.csv is the run sheet.",
       skipped.length ? "SKIPPED.txt lists signs missing from this pack." : "",
