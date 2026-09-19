@@ -176,6 +176,8 @@ export const approveModule = createServerFn({ method: "POST" })
   .validator((data: { moduleId: string; notes?: string; expiresAt?: string | null }) => data)
   .handler(async ({ data, context }) => {
     await assertReviewer(context);
+    await assertDecidable(context as never, data.moduleId);
+
     const { error } = await context.supabase
       .from("slide_modules")
       .update({
@@ -199,6 +201,8 @@ export const rejectModule = createServerFn({ method: "POST" })
   .validator((data: { moduleId: string; notes: string }) => data)
   .handler(async ({ data, context }) => {
     await assertReviewer(context);
+    await assertDecidable(context as never, data.moduleId);
+
     const { error } = await context.supabase
       .from("slide_modules")
       .update({
@@ -217,6 +221,8 @@ export const requestChanges = createServerFn({ method: "POST" })
   .validator((data: { moduleId: string; notes: string }) => data)
   .handler(async ({ data, context }) => {
     await assertReviewer(context);
+    await assertDecidable(context as never, data.moduleId);
+
     const { error } = await context.supabase
       .from("slide_modules")
       .update({
