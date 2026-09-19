@@ -39,11 +39,12 @@ describe("approved agenda programme coverage", () => {
 
   it("keeps an edited board live even when a session is renamed or dropped", () => {
     const config = agendaDefault("legal");
-    const days = (config.days ?? []).map((d) => ({
+    const days = (config.days ?? []).map((d, di) => ({
       ...d,
-      sessions: d.sessions
-        .slice(0, Math.max(1, d.sessions.length - 1))
-        .map((s, i) => (i === 0 ? { ...s, title: "Our own opening" } : s)),
+      sessions:
+        di === 0
+          ? d.sessions.slice(0, 2).map((s, i) => (i === 0 ? { ...s, title: "Our own opening" } : s))
+          : [],
     }));
     const edited = { ...config, days, sessions: days[0]?.sessions ?? config.sessions };
     expect(agendaProgrammeIsCurrent(edited)).toBe(false);
