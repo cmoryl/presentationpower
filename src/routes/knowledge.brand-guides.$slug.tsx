@@ -45,12 +45,16 @@ import {
 import { Download } from "lucide-react";
 import { toast } from "sonner";
 import { brandSwatchSpec, brandSwatchSpecText } from "@/lib/brand-swatch-spec";
+import { applyBrandGuidePatch } from "@/lib/brand-guide-edits";
+import { getBrandGuideEdit } from "@/lib/brand-guide-edits.functions";
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
-  loader: ({ params }) => {
-    const guide = getBrandGuide(params.slug);
-    if (!guide) throw notFound();
-    return { guide };
+  loader: async ({ params }) => {
+    const base = getBrandGuide(params.slug);
+    if (!base) throw notFound();
+    // Live brand-lead edits are merged over the authored baseline at read time.
+    const edit = await getBrandGuideEdit({ data: { slug: base.slug } });
+    return { guide: applyBrandGuidePatch(base, edit?.patch ?? null), edited: !!edit };
   },
   head: ({ loaderData }) => ({
     meta: [
