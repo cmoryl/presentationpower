@@ -3,12 +3,19 @@
 // and brand_asset_chunks. One Claude call answers ONLY from provided sources
 // and cites them inline as [1], [2] mapped to the returned sources array.
 
-import { EMBEDDING_MODEL } from "@/lib/knowledge-scope";
+import {
+  EMBEDDING_MODEL,
+  MIN_CHUNK_SIMILARITY,
+  bm25Scores,
+  knowledgeDivisionFilter,
+  normalizeDivisionFilter,
+} from "@/lib/knowledge-scope";
+import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { ANTHROPIC_SETUP_MESSAGE, callAnthropic, hasAnthropicKey } from "@/lib/ai-core";
-import { bm25Scores } from "@/lib/knowledge-scope";
+
 
 const Msg = z.object({
   role: z.enum(["user", "assistant"]),
