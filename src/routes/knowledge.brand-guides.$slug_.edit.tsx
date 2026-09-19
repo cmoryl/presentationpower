@@ -464,6 +464,7 @@ function BrandGuideEditor() {
   ].filter((c) => !isBrandHex(c.hex));
 
   async function onSave() {
+    console.log("[guide-editor] save clicked", badHex.length);
     if (badHex.length) {
       toast.error(`${badHex.length} colour${badHex.length > 1 ? "s" : ""} need a valid hex value`);
       return;
