@@ -15,12 +15,25 @@ import {
 export const Route = createFileRoute("/knowledge/")({
   head: () => ({
     meta: [
-      { title: "Knowledge · TransPerfect Element" },
-      { name: "description", content: "Per-division knowledge with cross-division sharing." },
+      { title: "Division knowledge base · TransPerfect Element" },
+      {
+        name: "description",
+        content:
+          "Per-division knowledge with cross-division sharing: each division owns its entries and can share them with siblings or publish them across TransPerfect.",
+      },
+      { property: "og:title", content: "Division knowledge base · TransPerfect Element" },
+      {
+        property: "og:description",
+        content:
+          "Own, share and publish division knowledge — the grounding the build uses when it writes decks, print and event work.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: KnowledgeView,
 });
+
 
 function KnowledgeView() {
   const list = useServerFn(listKnowledgeEntries);
