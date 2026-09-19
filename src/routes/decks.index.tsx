@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Rocket, Search, X, Eye, Share2, LayoutGrid } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { useSignedIn, MyCloudDecks } from "@/components/CloudDeckControls";
+import { useSignedIn, MyCloudDecks, useOpenCloudDeck } from "@/components/CloudDeckControls";
 import { useDeckStore, type Deck } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -41,7 +41,14 @@ function DecksIndex() {
   const [reach, setReach] = useState<Reach>("all");
   const [analytics, setAnalytics] = useState<DeckAnalyticsSummary | null>(null);
   const [cloudDecks, setCloudDecks] = useState<
-    Array<{ title: string; review_status: string | null }>
+    Array<{
+      id: string;
+      title: string;
+      review_status: string | null;
+      is_template: boolean | null;
+      updated_at: string | null;
+      created_at: string | null;
+    }>
   >([]);
   // A failed load used to fall back to an empty list, which reads exactly like
   // "you have no decks" — the one message we must never show by accident.
@@ -67,7 +74,14 @@ function DecksIndex() {
       .then((rows) => {
         if (!live) return;
         setCloudDecks(
-          rows.map((r) => ({ title: r.title, review_status: r.review_status ?? null })),
+          rows.map((r) => ({
+            id: r.id,
+            title: r.title,
+            review_status: r.review_status ?? null,
+            is_template: r.is_template ?? false,
+            updated_at: r.updated_at ?? null,
+            created_at: r.created_at ?? null,
+          })),
         );
       })
       .catch(() => {
@@ -114,6 +128,21 @@ function DecksIndex() {
     () => Object.values(decksMap).filter((d) => d.context?.masterSet?.presentation !== false),
     [decksMap],
   );
+
+  // Decks that live in the account but not in this browser. Without these the
+  // workspace count read 0 while the same decks were listed under "My saved
+  // presentations" — the same work counted in one place and missing in another.
+  const cloudOnly = useMemo(() => {
+    const localTitles = new Set(allDecks.map((d) => d.title.trim().toLowerCase()));
+    const localCloudIds = new Set(
+      Object.values(decksMap)
+        .map((d) => (d.id.startsWith("cloud-") ? d.id.slice("cloud-".length) : null))
+        .filter((v): v is string => Boolean(v)),
+    );
+    return cloudDecks.filter(
+      (r) => !localCloudIds.has(r.id) && !localTitles.has(r.title.trim().toLowerCase()),
+    );
+  }, [cloudDecks, allDecks, decksMap]);
 
   const enriched = useMemo(() => {
     return allDecks.map((d) => {
@@ -165,9 +194,22 @@ function DecksIndex() {
     return out;
   }, [enriched, q, kind, reach, sort]);
 
+  const visibleCloudOnly = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return cloudOnly.filter((r) => {
+      if (kind === "decks" && r.is_template) return false;
+      if (kind === "templates" && !r.is_template) return false;
+      if (reach === "shared") return false;
+      if (!needle) return true;
+      return r.title.toLowerCase().includes(needle);
+    });
+  }, [cloudOnly, q, kind, reach]);
+
   const active = q.trim() !== "" || kind !== "all" || reach !== "all" || sort !== "recent";
-  const totalDecks = enriched.filter((r) => !r.deck.isTemplate).length;
-  const totalTemplates = enriched.length - totalDecks;
+  const cloudOnlyTemplates = cloudOnly.filter((r) => r.is_template).length;
+  const totalDecks =
+    enriched.filter((r) => !r.deck.isTemplate).length + (cloudOnly.length - cloudOnlyTemplates);
+  const totalTemplates = enriched.filter((r) => r.deck.isTemplate).length + cloudOnlyTemplates;
   const totalShared = enriched.filter((r) => r.shared).length;
   const totalUnseen = enriched.filter((r) => r.views === 0 && !r.deck.isTemplate).length;
 
@@ -311,7 +353,8 @@ function DecksIndex() {
 
         <div className="mt-3 flex items-center gap-2 text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
           <LayoutGrid size={12} />
-          {filtered.length} of {enriched.length} {enriched.length === 1 ? "deck" : "decks"}
+          {filtered.length + visibleCloudOnly.length} of {enriched.length + cloudOnly.length}{" "}
+          {enriched.length + cloudOnly.length === 1 ? "deck" : "decks"}
           {!signedIn && (
             <span className="text-black/35 dark:text-white/35">
               · sign in to enable view analytics
@@ -343,11 +386,11 @@ function DecksIndex() {
       )}
 
       {/* Grid */}
-      {enriched.length === 0 ? (
+      {enriched.length === 0 && cloudOnly.length === 0 ? (
         loadFailed ? null : (
           <EmptyNew signedIn={signedIn} />
         )
-      ) : filtered.length === 0 ? (
+      ) : filtered.length === 0 && visibleCloudOnly.length === 0 ? (
         <EmptyNoMatches onClear={clearAll} />
       ) : (
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -362,6 +405,16 @@ function DecksIndex() {
               reviewStatus={r.reviewStatus}
             />
           ))}
+          {visibleCloudOnly.map((r) => (
+            <CloudOnlyTile
+              key={r.id}
+              id={r.id}
+              title={r.title}
+              updatedAt={r.updated_at}
+              isTemplate={Boolean(r.is_template)}
+              reviewStatus={(r.review_status ?? "draft") as ReviewStatus}
+            />
+          ))}
         </div>
       )}
 
@@ -373,6 +426,66 @@ function DecksIndex() {
 }
 
 /* -------- pieces -------- */
+
+/**
+ * A deck saved to the account that this browser has never opened. Shown in the
+ * same grid so the workspace total matches what is actually saved.
+ */
+function CloudOnlyTile({
+  id,
+  title,
+  updatedAt,
+  isTemplate,
+  reviewStatus,
+}: {
+  id: string;
+  title: string;
+  updatedAt: string | null;
+  isTemplate: boolean;
+  reviewStatus: ReviewStatus;
+}) {
+  const openCloudDeck = useOpenCloudDeck();
+  const [busy, setBusy] = useState(false);
+
+  return (
+    <div className="flex flex-col justify-between gap-4 rounded-2xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.04]">
+      <div className="min-w-0">
+        <div className="flex items-center gap-2">
+          <ReviewStatusBadge status={reviewStatus} />
+          {isTemplate && (
+            <span className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-black/50 dark:border-white/10 dark:text-white/50">
+              Template
+            </span>
+          )}
+        </div>
+        <div className="mt-3 truncate text-base font-semibold">{title}</div>
+        <div className="mt-1 text-xs text-black/50 dark:text-white/50">
+          Saved in your account · updated{" "}
+          {updatedAt ? new Date(updatedAt).toLocaleDateString() : "—"}
+        </div>
+      </div>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          try {
+            await openCloudDeck(id);
+          } catch (e) {
+            setBusy(false);
+            toast.error("Could not open this deck", {
+              description: e instanceof Error ? e.message : "The account could not be reached.",
+              duration: 9000,
+            });
+          }
+        }}
+        className="self-start rounded-full bg-[#03002C] px-4 py-2 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60 dark:bg-[#A1FBF9] dark:text-[#03002C]"
+      >
+        {busy ? "Opening…" : "Open"}
+      </button>
+    </div>
+  );
+}
 
 function StatChip({
   label,
