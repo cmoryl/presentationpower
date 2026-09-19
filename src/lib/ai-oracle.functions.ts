@@ -199,6 +199,18 @@ export const oracleChat = createServerFn({ method: "POST" })
             .join(" "),
           tags: [r.entity_type, r.entity_id].filter(Boolean),
         })),
+        ...eventKnowledgeSnippets(eventRows).map((r) => ({
+          ...r,
+          source: "event" as const,
+          body: r.body.slice(0, 800),
+          text: `${r.title} ${r.body} ${r.tags.join(" ")}`,
+        })),
+        ...glossarySnippets(glossaryRows).map((r) => ({
+          ...r,
+          source: "glossary" as const,
+          body: r.body.slice(0, 800),
+          text: `${r.title} ${r.body} ${r.tags.join(" ")}`,
+        })),
       ]);
       const kwScores = bm25Scores(candidates, data.userMessage);
       const topKw: Hit[] = candidates
