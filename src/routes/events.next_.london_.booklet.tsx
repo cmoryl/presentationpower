@@ -27,7 +27,7 @@ import {
   agendaDefault,
   agendaGeometry,
   agendaPages,
-  agendaProgrammeIsCurrent,
+  agendaFileIsLive,
   type AgendaConfig,
 } from "@/lib/next-agenda";
 import { buildAgendaDocx } from "@/lib/next-agenda-docx";
@@ -236,7 +236,7 @@ function BookletPage() {
   /** The agenda the booklet prints, forced to the booklet's own page format. */
   const agendaSwapped = useMemo(() => {
     const picked = rows.find((r) => r.id === savedId)?.config ?? agendaSnapshot;
-    return !!picked && !agendaProgrammeIsCurrent(picked);
+    return !!picked && !agendaFileIsLive(picked);
   }, [rows, savedId, agendaSnapshot]);
 
   const agenda = useMemo<AgendaConfig>(() => {
@@ -246,7 +246,7 @@ function BookletPage() {
     // from the file they picked.
     const picked = rows.find((r) => r.id === savedId)?.config ?? agendaSnapshot;
     const base =
-      picked && agendaProgrammeIsCurrent(picked)
+      picked && agendaFileIsLive(picked)
         ? picked
         : agendaDefault(picked?.divisionId ?? "city-series");
     return { ...base, sizeId: bookletAgendaSizeId(config.sizeId) };

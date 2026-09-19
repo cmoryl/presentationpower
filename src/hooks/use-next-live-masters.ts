@@ -14,7 +14,7 @@ import { useSignedIn } from "@/components/CloudDeckControls";
 import { listAgendaFiles } from "@/lib/next-agenda.functions";
 import { listPillarFiles } from "@/lib/event-pillar.functions";
 import {
-  agendaProgrammeIsCurrent,
+  agendaFileIsLive,
   normalizeAgendaConfig,
   type AgendaConfig,
 } from "@/lib/next-agenda";
@@ -125,15 +125,14 @@ export function pickAgendaFile(
   divisionId: string,
 ): AgendaFileRecord | undefined {
   if (!rows?.length) return undefined;
-  // Only a board carrying the division's whole approved programme counts as a
-  // live file. An older or partial save is kept as a version, never served here:
-  // it used to be the newest row and quietly replaced the approved programme.
+  // An edited board is still a live file. Only a save off an unrelated older
+  // programme is kept as a version rather than served here.
   const matches = rows
     .filter((row) => {
       const config = row.config as AgendaConfig | null;
       return (config?.divisionId ?? row.division_id) === divisionId;
     })
     .map((row) => ({ ...row, config: normalizeAgendaConfig(row.config) }))
-    .filter((row) => agendaProgrammeIsCurrent(row.config));
+    .filter((row) => agendaFileIsLive(row.config));
   return matches.sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
 }

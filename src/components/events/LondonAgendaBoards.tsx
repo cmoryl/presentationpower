@@ -16,7 +16,7 @@ import {
   agendaDefault,
   agendaLocationText,
   agendaPages,
-  agendaProgrammeIsCurrent,
+  agendaFileIsLive,
   type AgendaConfig,
 } from "@/lib/next-agenda";
 import type { AgendaFileRecord } from "@/hooks/use-next-live-masters";
@@ -30,11 +30,10 @@ function AgendaCard({
   name: string;
   saved: AgendaFileRecord | undefined;
 }) {
-  // A file saved off an older programme is not a live board: it would hide the
-  // approved London programme behind stale rows. It stays in the saved list,
-  // but the card and the edit link start from the approved master.
+  // A file saved off an unrelated older programme is not a live board. An
+  // edited board is: it stays on the card and behind the edit link.
   const live = useMemo(
-    () => (saved && agendaProgrammeIsCurrent(saved.config) ? saved : undefined),
+    () => (saved && agendaFileIsLive(saved.config) ? saved : undefined),
     [saved],
   );
   const config: AgendaConfig = useMemo(

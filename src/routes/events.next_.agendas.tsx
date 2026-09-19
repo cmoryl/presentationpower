@@ -6,7 +6,7 @@ import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { AgendaStudio } from "@/components/next/AgendaStudio";
 import { useSavedAgendaFiles } from "@/hooks/use-next-live-masters";
-import { agendaDivision, agendaProgrammeIsCurrent, normalizeAgendaConfig } from "@/lib/next-agenda";
+import { agendaDivision, agendaFileIsLive, normalizeAgendaConfig } from "@/lib/next-agenda";
 
 const search = z.object({ division: z.string().optional(), file: z.string().optional() });
 
@@ -53,7 +53,7 @@ function AgendaPage() {
     const row = saved.data?.find((r) => r.id === file);
     if (!row) return undefined;
     const config = normalizeAgendaConfig(row.config);
-    if (!agendaProgrammeIsCurrent(config)) return undefined;
+    if (!agendaFileIsLive(config)) return undefined;
     return { id: row.id, config };
   }, [file, saved.data]);
 
