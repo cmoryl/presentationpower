@@ -2,7 +2,7 @@
 // submitted for brand review (carrying its stage-vs-spec checks as evidence),
 // a reviewer approves or sends it back, and approved runs appear in the live
 // division decks list below.
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +14,7 @@ import {
   type ApprovalCheck,
 } from "@/lib/brand-approvals.functions";
 import { ApprovalGate } from "@/components/approvals/ApprovalGate";
+import { ReviewReasonPicker } from "@/components/approvals/ReviewReasonPicker";
 import type { DeckWalkReport } from "@/lib/division-deck-run";
 
 /** Turn the deck walk into reviewer-readable evidence. */
