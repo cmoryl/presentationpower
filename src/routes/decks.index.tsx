@@ -823,6 +823,9 @@ function DeckTile({
   views,
   shared,
   reviewStatus,
+  selectMode = false,
+  selected = false,
+  onToggleSelected,
 }: {
   deck: Deck;
   industry: string;
@@ -830,6 +833,9 @@ function DeckTile({
   views: number;
   shared: boolean;
   reviewStatus: ReviewStatus | null;
+  selectMode?: boolean;
+  selected?: boolean;
+  onToggleSelected?: () => void;
 }) {
   const brand = resolveBrandMode(d.brandModeId, d.subCompany);
   const cover = d.slides[0];
