@@ -105,6 +105,49 @@ async function existingRefId(sb: MinimalSb, table: string, id: unknown): Promise
   return Array.isArray(data) && data.length > 0 ? raw : null;
 }
 
+/** How close together two saves of the same title count as the same deck. */
+export const DUPLICATE_SAVE_WINDOW_MS = 15 * 60 * 1000;
+
+/**
+ * Find a deck row this save should land on instead of creating a second one.
+ *
+ * Generating the same deck twice (agent re-run, a second click on save while the
+ * first was still in flight) produced a fresh local id each time, so the
+ * deterministic upsert wrote a brand-new row — three near-identical "Meridian
+ * Legal Group" decks minutes apart, none of them obviously the real one. A save
+ * that matches an untouched draft of the same title by the same owner, made
+ * inside the window, updates that draft instead. Anything a human has moved on
+ * (in review, approved, renamed, older than the window) is left alone.
+ */
+export async function findRecentDuplicateDeck(
+  sb: MinimalSb,
+  userId: string,
+  title: string,
+  deckUuid: string,
+  now = Date.now(),
+): Promise<string | null> {
+  const clean = title.trim();
+  if (!clean) return null;
+  const { data, error } = await sb
+    .from("decks")
+    .select("id, title, status, created_at")
+    .eq("owner_id", userId)
+    .eq("title", clean);
+  if (error || !Array.isArray(data)) return null;
+  const rows = data as Array<{
+    id?: string;
+    status?: string | null;
+    created_at?: string | null;
+  }>;
+  const candidates = rows
+    .filter((r) => typeof r.id === "string" && r.id !== deckUuid)
+    .filter((r) => (r.status ?? "draft") === "draft")
+    .map((r) => ({ id: r.id as string, at: Date.parse(r.created_at ?? "") }))
+    .filter((r) => Number.isFinite(r.at) && now - r.at <= DUPLICATE_SAVE_WINDOW_MS && now - r.at >= 0)
+    .sort((a, b) => b.at - a.at);
+  return candidates[0]?.id ?? null;
+}
+
 /** Upsert a brief + deck + its slides. Owner-scoped through RLS. */
 export async function saveDeckToCloudCore(
   supabase: unknown,
@@ -114,7 +157,7 @@ export async function saveDeckToCloudCore(
   const data = SaveInput.parse(rawInput);
   const sb = supabase as MinimalSb;
   const briefUuid = toUuid(`brief:${userId}:${data.brief.id}`);
-  const deckUuid = toUuid(`deck:${userId}:${data.deck.id}`);
+  let deckUuid = toUuid(`deck:${userId}:${data.deck.id}`);
 
   // Reference columns are FK-checked in the database; unknown/synthetic ids are
   // stored as NULL rather than failing the whole save.
@@ -144,7 +187,16 @@ export async function saveDeckToCloudCore(
   };
   // An ordinary content save must not reset the deck's lifecycle status — that
   // silently undid whatever moved it out of draft.
-  const { data: existingDeck } = await sb.from("decks").select("status").eq("id", deckUuid);
+  let { data: existingDeck } = await sb.from("decks").select("status").eq("id", deckUuid);
+  const alreadySaved = Array.isArray(existingDeck) && existingDeck.length > 0;
+  if (!alreadySaved) {
+    // Land on the draft this is a re-save of rather than stacking up another row.
+    const dupId = await findRecentDuplicateDeck(sb, userId, data.deck.title, deckUuid);
+    if (dupId) {
+      deckUuid = dupId;
+      existingDeck = (await sb.from("decks").select("status").eq("id", deckUuid)).data;
+    }
+  }
   const existingStatus = Array.isArray(existingDeck)
     ? (existingDeck[0] as { status?: string | null } | undefined)?.status
     : undefined;
