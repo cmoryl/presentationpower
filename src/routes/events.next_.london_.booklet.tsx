@@ -701,7 +701,15 @@ function BookletPage() {
                   ? "Sign in to print a saved agenda — the demo programme is used until then."
                   : `Printed at the booklet page size · ${agendaPageCount} agenda page${agendaPageCount === 1 ? "" : "s"}.`}
               </p>
+              {agendaSwapped ? (
+                <p className="rounded-md border border-[#FF9B70] bg-[#FF9B70]/12 px-3 py-2 text-xs text-[#03002C]">
+                  This saved agenda was built on an older programme, so the booklet is printing the
+                  division’s approved programme instead. Open the agenda studio and save the board
+                  again if you want your own version printed.
+                </p>
+              ) : null}
             </div>
+
 
             {/* ── maps ──────────────────────────────────────────────────── */}
             <div className="space-y-3">
