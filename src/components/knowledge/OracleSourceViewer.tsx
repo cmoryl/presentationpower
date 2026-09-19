@@ -3,7 +3,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Download, FileText, X } from "lucide-react";
 import { getOracleSource } from "@/lib/oracle-source.functions";
 
@@ -70,12 +69,12 @@ export function OracleSourceViewer({
               </a>
             )}
             {doc?.href && (
-              <Link
-                to={doc.href}
+              <a
+                href={doc.href}
                 className="inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-[11px] text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:text-white/70"
               >
                 Manage <ArrowUpRight size={12} />
-              </Link>
+              </a>
             )}
             <button
               type="button"
