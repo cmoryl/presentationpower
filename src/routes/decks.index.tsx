@@ -873,8 +873,25 @@ function DeckTile({
 
   if (deleting) return null;
 
+  const locked = reviewStatus ? LOCKED_STATUSES.includes(reviewStatus) : false;
+
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/30 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
+    <div
+      className={`group relative overflow-hidden rounded-2xl border bg-white transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-white/[0.04] ${
+        selectMode && selected
+          ? "border-[#003FC7] ring-2 ring-[#003FC7]/25 dark:border-[#A1FBF9]"
+          : "border-black/10 hover:border-black/30 dark:border-white/10"
+      }`}
+    >
+      {selectMode && onToggleSelected && (
+        <SelectCheck
+          checked={selected}
+          onToggle={onToggleSelected}
+          title={d.title}
+          locked={locked}
+          className="absolute left-3 top-3"
+        />
+      )}
       <Link to="/decks/$deckId" params={{ deckId: d.id }} className="block">
         <div className="aspect-[16/9] bg-white">
           {cover && coverVariant && (
