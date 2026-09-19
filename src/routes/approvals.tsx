@@ -465,7 +465,8 @@ function ApprovalQueuePage() {
                           </button>
                           <button
                             type="button"
-                            disabled={decide.isPending}
+                            disabled={decide.isPending || reasons.length === 0}
+                            title={reasons.length === 0 ? "Pick at least one reason" : undefined}
                             onClick={() => decide.mutate({ id: r.id, status: "changes_requested" })}
                             className="rounded-full border border-foreground/20 px-4 py-2 text-xs font-medium hover:bg-foreground/5 disabled:opacity-40"
                           >
