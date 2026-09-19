@@ -34,9 +34,12 @@ function toBase64(bytes: Uint8Array): string {
 
 export type DocApply = {
   colors: Partial<Record<ColorGroupKey, ColorSwatch[]>>;
+  /** "replace" swaps each group's list; "add" appends new colours to it. */
+  mode: "replace" | "add";
   typefacePrimary?: string;
   typefaceWeb?: string;
 };
+
 
 export function BrandDocReadPanel({
   divisionId,
