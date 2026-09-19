@@ -87,7 +87,14 @@ function KnowledgeView() {
           <p className="mt-3 max-w-2xl text-black/60">
             Each division owns its own entries. Mark an entry <em>shared</em> to make it visible to
             specific sibling divisions, or <em>global</em> to publish it across all of TransPerfect.
+            Everything here grounds what the build writes — decks, print, social and event copy.
+            Event build precedent lives separately in the{" "}
+            <Link to={"/events/next/knowledge" as never} className="underline">
+              NEXT event knowledge store
+            </Link>
+            .
           </p>
+
         </div>
         <div className="flex items-center gap-2">
           <Link
