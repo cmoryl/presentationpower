@@ -69,6 +69,16 @@ export const syncEventKnowledge = createServerFn({ method: "POST" })
       .upsert(rows as never, { onConflict: "fingerprint" });
     if (error) throw new Error(error.message);
 
+    // Keep the Oracle's corpus in step with the event store, so a question
+    // phrased in the document's own wording can still reach it.
+    const { eventKnowledgeOracleDocs } = await import("@/lib/event-knowledge-oracle.server");
+    const { mirrorOracleKnowledge } = await import("@/lib/oracle-mirror.server");
+    const mirror = await mirrorOracleKnowledge(
+      supabase,
+      eventKnowledgeOracleDocs(records),
+      userId,
+    );
+
     const offset = data.offset + records.length;
     return {
       total: all.length,
@@ -77,9 +87,11 @@ export const syncEventKnowledge = createServerFn({ method: "POST" })
       embedded: vectors.filter(Boolean).length,
       // Surfaced, never swallowed: an un-embedded record cannot be found.
       pending: vectors.filter((v) => !v).length,
+      mirrored: mirror.inserted + mirror.updated,
       done: offset >= all.length,
-      failures: failures.map((f) => f.message),
+      failures: [...failures.map((f) => f.message), ...mirror.errors],
     };
+
   });
 
 
@@ -200,7 +212,12 @@ export const captureEventOutcome = createServerFn({ method: "POST" })
         onConflict: "fingerprint",
       });
     if (error) throw new Error(error.message);
-    return { captured: true };
+
+    const { eventKnowledgeOracleDocs } = await import("@/lib/event-knowledge-oracle.server");
+    const { mirrorOracleKnowledge } = await import("@/lib/oracle-mirror.server");
+    const mirror = await mirrorOracleKnowledge(supabase, eventKnowledgeOracleDocs([record]), userId);
+    return { captured: true, mirrored: mirror.errors.length === 0, mirrorErrors: mirror.errors };
+
   });
 
 /** Embeds records captured without a vector — the search backlog. */
