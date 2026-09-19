@@ -38,6 +38,9 @@ import {
   listGlossary,
   upsertGlossaryTerm,
 } from "@/lib/translation.functions";
+import { BrandDocReadPanel, type DocApply } from "@/components/brand/BrandDocReadPanel";
+import type { ColorGroupKey } from "@/lib/brand-guide-doc-read";
+
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug_/edit")({
   loader: async ({ params }) => {
