@@ -212,7 +212,12 @@ export const captureEventOutcome = createServerFn({ method: "POST" })
         onConflict: "fingerprint",
       });
     if (error) throw new Error(error.message);
-    return { captured: true };
+
+    const { eventKnowledgeOracleDocs } = await import("@/lib/event-knowledge-oracle.server");
+    const { mirrorOracleKnowledge } = await import("@/lib/oracle-mirror.server");
+    const mirror = await mirrorOracleKnowledge(supabase, eventKnowledgeOracleDocs([record]), userId);
+    return { captured: true, mirrored: mirror.errors.length === 0, mirrorErrors: mirror.errors };
+
   });
 
 /** Embeds records captured without a vector — the search backlog. */
