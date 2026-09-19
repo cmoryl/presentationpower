@@ -150,13 +150,23 @@ export async function synthesizeKnowledgeForBriefCore(
     // only `is.null` here silently dropped the entire curated KB.
     entriesQuery = entriesQuery.or(knowledgeDivisionFilter(filterDivision));
   }
+  // The Oracle store is scoped by division too. Previously only the
+  // knowledge_entries pass was division-filtered, so a division-locked brief
+  // could still be grounded in another division's Oracle rows. Ordered with a
+  // generous cap so no part of the store is unreachable.
+  let oracleQuery = s
+    .from("oracle_knowledge_base")
+    .select("id, title, content, category, tags")
+    .eq("is_active", true)
+    .order("updated_at", { ascending: false })
+    .limit(2000);
+  if (filterDivision) {
+    oracleQuery = oracleQuery.or(`category.is.null,category.eq.${filterDivision}`);
+  }
   const [oracleRes, entriesRes, brandIntelRes] = await Promise.all([
-    s
-      .from("oracle_knowledge_base")
-      .select("id, title, content, category, tags")
-      .eq("is_active", true)
-      .limit(200),
+    oracleQuery,
     entriesQuery,
+
     s
       .from("brand_intelligence")
       .select("id, entity_type, entity_id, brand_summary, market_position, competitive_advantages"),
