@@ -101,7 +101,11 @@ export const oracleChat = createServerFn({ method: "POST" })
       if (filterDivision) {
         entriesQuery = entriesQuery.or(knowledgeDivisionFilter(filterDivision));
       }
-      const [oracleRes, entriesRes, brandIntelRes] = await Promise.all([
+      // Event knowledge and the translation glossary are read here too, on the
+      // same terms as the shared grounding path, so an Oracle answer about a
+      // venue spec or an approved term cites the real record instead of the
+      // lossy digest mirror.
+      const [oracleRes, entriesRes, brandIntelRes, eventRes, glossaryRes] = await Promise.all([
         oracleQuery,
         entriesQuery,
         s
@@ -110,6 +114,16 @@ export const oracleChat = createServerFn({ method: "POST" })
             "id, entity_type, entity_id, brand_summary, market_position, competitive_advantages",
           )
           .limit(200),
+        s
+          .from("event_venue_knowledge")
+          .select("id, title, body, kind, city, venue, event_id, panel_id")
+          .order("updated_at", { ascending: false })
+          .limit(2000),
+        s
+          .from("glossary_terms")
+          .select("id, term, notes, do_not_translate, scope, scope_id")
+          .order("updated_at", { ascending: false })
+          .limit(2000),
       ]);
       const oracle = (oracleRes?.data ?? []) as Array<{
         id: string;
