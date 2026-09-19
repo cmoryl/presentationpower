@@ -16,6 +16,8 @@ import {
 import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
 import { ApprovalAnalyticsPanel } from "@/components/approvals/ApprovalAnalyticsPanel";
 import { ReviewerAssignments } from "@/components/approvals/ReviewerAssignments";
+import { ReviewReasonPicker } from "@/components/approvals/ReviewReasonPicker";
+import { describeReasons } from "@/lib/review-reasons";
 
 export const Route = createFileRoute("/approvals")({
   head: () => ({
@@ -70,6 +72,8 @@ function ApprovalQueuePage() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [note, setNote] = useState("");
+  // Structured reasons for the decision being written right now.
+  const [reasons, setReasons] = useState<string[]>([]);
 
   const queue = useQuery({
     queryKey: ["approval-queue"],
