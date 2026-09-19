@@ -398,7 +398,92 @@ const GUIDES: Array<{ title: string; blurb: string; steps: string[] }> = [
       "All of them export as editable PowerPoint objects.",
     ],
   },
+  {
+    title: "Find anything in the NEXT event build",
+    blurb: "One directory instead of hunting for pages.",
+    steps: [
+      "Open Event → NEXT. The page opens with a directory of every event page, grouped by the job you are doing.",
+      "The groups are: plan the event, programme & delegate print, signage & identity, London 2026, and reference.",
+      "The same row of shortcuts sits at the top of every NEXT page, so you can move sideways without going home first.",
+      "Each entry says what the page is for and which city it applies to, so nothing is a guess.",
+    ],
+  },
+  {
+    title: "Set up a venue page for a location",
+    blurb: "Enter the real venue details once and let every printed piece use them.",
+    steps: [
+      "Open Event → NEXT → Venues and pick or add a location.",
+      "Type the address — the lookup finds it and drops a map on the page.",
+      "Fill in opening times, how to get there, Wi-Fi, the on-site contact, the venue website and any notes.",
+      "Add a venue photograph; it is stored privately and only shown through the app.",
+      "Save. The location guide and its PDFs now print those details instead of placeholder text.",
+    ],
+  },
+  {
+    title: "Build a guide for an event location",
+    blurb: "A per-city brochure you can update yourself.",
+    steps: [
+      "Open Event → NEXT → Locations and choose the city.",
+      "Work page by page: cover, welcome, venue, schedule, note panels and scan-code cards.",
+      "Use the Look row on each page to change the ground, the chevron treatment and the date disc.",
+      "Photographs are placed images; the design around them stays live vector.",
+      "Export a press PDF, or a Word or PowerPoint version for people who need to edit copy themselves.",
+    ],
+  },
+  {
+    title: "Print a division agenda for London 2026",
+    blurb: "The approved programme, exactly as signed off.",
+    steps: [
+      "Open Event → NEXT → Agendas and pick the division area.",
+      "The board opens on that division's real approved London programme — rooms, dates, parallel tracks and breaks included.",
+      "Both days sit on one sheet by default. Use Split into a sheet per day when you want one sheet per date, and switch back with one click.",
+      "Save the live file. Saving again updates the same file rather than creating a second copy, and the hub cards refresh straight away.",
+      "Only boards holding every approved session count as live; older files stay available as labelled versions and warn you when opened.",
+    ],
+  },
+  {
+    title: "Tune an agenda's type, icons and rooms",
+    blurb: "Fit more schedule on the sheet without breaking the layout.",
+    steps: [
+      "Open the agenda and go to the Look step.",
+      "Set headline, session title, time and speaker sizes between 70% and 150%, and switch each between regular, medium and bold.",
+      "Add an icon to any row and choose its colour and size; add a room or floor line above the speaker note.",
+      "Day changes print as a solid blue band with the date in white, so a multi-day sheet reads as separate days.",
+      "The division lockup is a consistent size on every board and can still be scaled with the Logo size control.",
+    ],
+  },
+  {
+    title: "Order repeatable event furniture signage",
+    blurb: "Desks, cloakrooms, merch and brew bars for any city.",
+    steps: [
+      "Open Event → NEXT and go to the signage templates.",
+      "Pick a family: registration desk, cloakroom, merch mart, brew bar or help desk.",
+      "Quantities come from the city brief, so a new city starts with the right count instead of a blank list.",
+      "Each family carries its own approved ground, so a desk and a brew bar are recognisably different pieces.",
+    ],
+  },
+  {
+    title: "Use the approved press grounds on signage templates",
+    blurb: "The same colour builds as the delivered Illustrator files.",
+    steps: [
+      "Open a signage template — the ground is measured from the approved live artwork, not re-invented.",
+      "House scenic runs aqua to violet, front-of-house desks orchid to blue, the Churchill glass cyan to pink, and the press wall stays white.",
+      "Downloads default to the press version; in-house proofing is one click away and labelled as a proof.",
+      "Where a dark face is too close to the copy sitting on it, the page warns you rather than letting it go to print.",
+    ],
+  },
+  {
+    title: "Keep shapes and masks editable in PowerPoint",
+    blurb: "Cut-out artwork that stays a real object in the file.",
+    steps: [
+      "Design with the standard shapes and masks — polygons, insets, circles and ellipses, and simple drawn outlines.",
+      "Export the deck or asset as PowerPoint.",
+      "Those cut-outs arrive as editable custom shapes, and a photo inside one arrives as a replaceable picture cropped to that shape.",
+      "Soft blur, feathered edges, gradients and stacked masks cannot be rebuilt as shapes, so they export as finished artwork instead of a rough approximation.",
+    ],
+  },
 ];
+
 
 const FAQS: Array<{ section: string; items: QA[] }> = [
   {
