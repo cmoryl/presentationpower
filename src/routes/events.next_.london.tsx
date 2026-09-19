@@ -1694,7 +1694,7 @@ function LondonSignagePage() {
                   <div className="mt-4">
                     <LondonPanelLiveEditor
                       panel={openPanel}
-                      revisionLabel={headRev}
+                      revisionLabel={isDraft(openPanel) ? "draft" : headRev}
                       siblingIds={panels.filter((p) => p.id !== openPanel.id).map((p) => p.id)}
                       onStyleChange={(styleId) => {
                         const style = styleId as LondonPanel["style"];
