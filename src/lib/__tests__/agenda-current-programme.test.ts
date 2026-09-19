@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   agendaDefault,
+  agendaFileIsLive,
   agendaMissingApprovedSessions,
   agendaProgrammeIsCurrent,
 } from "../next-agenda";
@@ -34,5 +35,31 @@ describe("approved agenda programme coverage", () => {
       ],
     };
     expect(agendaProgrammeIsCurrent(older)).toBe(false);
+  });
+}
+
+  it("keeps an edited board live even when a session is renamed or dropped", () => {
+    const config = agendaDefault("legal");
+    const days = (config.days ?? []).map((d) => ({
+      ...d,
+      sessions: d.sessions
+        .slice(0, Math.max(1, d.sessions.length - 1))
+        .map((s, i) => (i === 0 ? { ...s, title: "Our own opening" } : s)),
+    }));
+    const edited = { ...config, days, sessions: days[0]?.sessions ?? config.sessions };
+    expect(agendaProgrammeIsCurrent(edited)).toBe(false);
+    expect(agendaFileIsLive(edited)).toBe(true);
+  });
+
+  it("withholds a board built off an unrelated older programme", () => {
+    const config = agendaDefault("legal");
+    const older = {
+      ...config,
+      days: undefined,
+      sessions: [
+        { time: "09:00", title: "Old opening plenary", detail: "", track: "", muted: false },
+      ],
+    };
+    expect(agendaFileIsLive(older)).toBe(false);
   });
 });
