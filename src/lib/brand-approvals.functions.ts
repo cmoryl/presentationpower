@@ -456,7 +456,15 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
     await (
       await import("./notify-approvals.server")
     ).notifyRequesters(allowed, data.status, userId, data.note?.trim() || null);
-    return { ok: true, count: allowed.length, skipped };
+    return {
+      ok: true,
+      count: allowed.length,
+      skipped,
+      historyWarning: history.ok
+        ? null
+        : `${history.failed} decision${history.failed === 1 ? "" : "s"} could not be added to the approval history.`,
+    };
+
 
   });
 
