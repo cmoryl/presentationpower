@@ -1,7 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Rocket, Search, X, Eye, Share2, LayoutGrid } from "lucide-react";
+import {
+  Rocket,
+  Search,
+  X,
+  Eye,
+  Share2,
+  LayoutGrid,
+  CheckSquare,
+  Square,
+  Trash2,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useSignedIn, MyCloudDecks, useOpenCloudDeck } from "@/components/CloudDeckControls";
 import { useDeckStore, type Deck } from "@/lib/deck-store";
@@ -27,6 +37,23 @@ export const Route = createFileRoute("/decks/")({
 type SortKey = "recent" | "created" | "alpha" | "views";
 type Kind = "all" | "decks" | "templates";
 type Reach = "all" | "unseen" | "shared";
+/** "Older than" filter so a long list of old work can be found in one move. */
+type Age = "any" | "3m" | "6m" | "12m";
+
+const AGE_MONTHS: Record<Age, number | null> = { any: null, "3m": 3, "6m": 6, "12m": 12 };
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/** Decisions in flight are never swept up by a bulk delete. */
+const LOCKED_STATUSES: ReviewStatus[] = ["in_review", "approved"];
+
+/** True only when we know the date and it is past the cutoff — an unknown date
+ *  is never claimed to be old. */
+function olderThan(iso: string | null, months: number | null): boolean {
+  if (!months) return true;
+  if (!iso) return false;
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return false;
+  return t < Date.now() - months * 30 * 24 * 60 * 60 * 1000;
+}
 
 function DecksIndex() {
   const decksMap = useDeckStore((s) => s.decks);
@@ -39,6 +66,12 @@ function DecksIndex() {
   const [sort, setSort] = useState<SortKey>("recent");
   const [kind, setKind] = useState<Kind>("all");
   const [reach, setReach] = useState<Reach>("all");
+  const [age, setAge] = useState<Age>("any");
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const deleteDeckLocal = useDeckStore((s) => s.deleteDeck);
+  const removeCloud = useServerFn(deleteCloudDeck);
   const [analytics, setAnalytics] = useState<DeckAnalyticsSummary | null>(null);
   const [cloudDecks, setCloudDecks] = useState<
     Array<{
@@ -167,6 +200,7 @@ function DecksIndex() {
       if (kind === "templates" && !r.deck.isTemplate) return false;
       if (reach === "unseen" && r.views > 0) return false;
       if (reach === "shared" && !r.shared) return false;
+      if (!olderThan(r.deck.createdAt, AGE_MONTHS[age])) return false;
       if (!needle) return true;
       return (
         r.deck.title.toLowerCase().includes(needle) ||
@@ -192,7 +226,7 @@ function DecksIndex() {
         out = out.sort((a, b) => b.deck.createdAt.localeCompare(a.deck.createdAt));
     }
     return out;
-  }, [enriched, q, kind, reach, sort]);
+  }, [enriched, q, kind, reach, sort, age]);
 
   const visibleCloudOnly = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -200,12 +234,107 @@ function DecksIndex() {
       if (kind === "decks" && r.is_template) return false;
       if (kind === "templates" && !r.is_template) return false;
       if (reach === "shared") return false;
+      if (!olderThan(r.updated_at ?? r.created_at, AGE_MONTHS[age])) return false;
       if (!needle) return true;
       return r.title.toLowerCase().includes(needle);
     });
-  }, [cloudOnly, q, kind, reach]);
+  }, [cloudOnly, q, kind, reach, age]);
 
-  const active = q.trim() !== "" || kind !== "all" || reach !== "all" || sort !== "recent";
+  // Everything currently on screen, in one shape, so selection and bulk delete
+  // treat a browser draft and an account-saved deck the same way.
+  const shownItems = useMemo(
+    () => [
+      ...filtered.map((r) => ({
+        id: r.deck.id,
+        title: r.deck.title,
+        status: r.reviewStatus,
+        kind: "local" as const,
+      })),
+      ...visibleCloudOnly.map((r) => ({
+        id: r.id,
+        title: r.title,
+        status: (r.review_status ?? "draft") as ReviewStatus,
+        kind: "cloud" as const,
+      })),
+    ],
+    [filtered, visibleCloudOnly],
+  );
+
+  const selectedItems = useMemo(
+    () => shownItems.filter((i) => selected.has(i.id)),
+    [shownItems, selected],
+  );
+
+  const toggleSelected = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const bulkDelete = async () => {
+    const locked = selectedItems.filter((i) => i.status && LOCKED_STATUSES.includes(i.status));
+    const go = selectedItems.filter((i) => !(i.status && LOCKED_STATUSES.includes(i.status)));
+    if (go.length === 0) {
+      toast.error("Nothing was deleted", {
+        description:
+          "Everything you picked is in review or approved. Those stay until the decision is finished.",
+        duration: 9000,
+      });
+      return;
+    }
+    if (
+      !window.confirm(
+        `Delete ${go.length} presentation${go.length === 1 ? "" : "s"}? This can't be undone.`,
+      )
+    )
+      return;
+    setBulkBusy(true);
+    const failed: string[] = [];
+    for (const item of go) {
+      const uuid =
+        item.kind === "cloud"
+          ? item.id
+          : item.id.startsWith("cloud-")
+            ? item.id.slice("cloud-".length)
+            : UUID_RE.test(item.id)
+              ? item.id
+              : null;
+      try {
+        // Remove the saved copy first — dropping only the local one would hide a
+        // deck that still exists in the account.
+        if (uuid && UUID_RE.test(uuid)) await removeCloud({ data: { deckId: uuid } });
+        if (item.kind === "local") deleteDeckLocal(item.id);
+        else setCloudDecks((prev) => prev.filter((r) => r.id !== item.id));
+        setSelected((prev) => {
+          const next = new Set(prev);
+          next.delete(item.id);
+          return next;
+        });
+      } catch {
+        failed.push(item.title);
+      }
+    }
+    setBulkBusy(false);
+    const done = go.length - failed.length;
+    if (done > 0)
+      toast.success(`Deleted ${done} presentation${done === 1 ? "" : "s"}`, {
+        description:
+          locked.length > 0
+            ? `${locked.length} in review or approved ${locked.length === 1 ? "was" : "were"} left in place.`
+            : undefined,
+      });
+    if (failed.length > 0)
+      toast.error(`${failed.length} could not be deleted`, {
+        description: `Still in your account: ${failed.slice(0, 4).join(", ")}${failed.length > 4 ? "…" : ""}`,
+        duration: 12000,
+      });
+    if (done > 0 && failed.length === 0 && locked.length === 0) setSelectMode(false);
+  };
+
+  const active =
+    q.trim() !== "" || kind !== "all" || reach !== "all" || age !== "any" || sort !== "recent";
   const cloudOnlyTemplates = cloudOnly.filter((r) => r.is_template).length;
   const totalDecks =
     enriched.filter((r) => !r.deck.isTemplate).length + (cloudOnly.length - cloudOnlyTemplates);
@@ -217,6 +346,7 @@ function DecksIndex() {
     setQ("");
     setKind("all");
     setReach("all");
+    setAge("any");
     setSort("recent");
   };
 
@@ -340,6 +470,20 @@ function DecksIndex() {
               Shared
             </Chip>
           </ChipGroup>
+          <ChipGroup label="Older than">
+            <Chip active={age === "any"} onClick={() => setAge("any")}>
+              Any age
+            </Chip>
+            <Chip active={age === "3m"} onClick={() => setAge("3m")}>
+              3 months
+            </Chip>
+            <Chip active={age === "6m"} onClick={() => setAge("6m")}>
+              6 months
+            </Chip>
+            <Chip active={age === "12m"} onClick={() => setAge("12m")}>
+              12 months
+            </Chip>
+          </ChipGroup>
           {active && (
             <button
               type="button"
@@ -350,6 +494,63 @@ function DecksIndex() {
             </button>
           )}
         </div>
+
+        {/* Bulk selection — clearing out a long list of old work in one move. */}
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3 dark:border-white/10">
+          <button
+            type="button"
+            onClick={() => {
+              setSelectMode((on) => !on);
+              setSelected(new Set());
+            }}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              selectMode
+                ? "bg-[#03002C] text-white dark:bg-[#A1FBF9] dark:text-[#03002C]"
+                : "border border-black/10 bg-white text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+            }`}
+          >
+            <CheckSquare size={13} /> {selectMode ? "Done selecting" : "Select"}
+          </button>
+          {selectMode && (
+            <>
+              <button
+                type="button"
+                onClick={() => setSelected(new Set(shownItems.map((i) => i.id)))}
+                className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+              >
+                Select all shown ({shownItems.length})
+              </button>
+              {selectedItems.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setSelected(new Set())}
+                  className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+                >
+                  Clear selection
+                </button>
+              )}
+              <span className="text-xs text-black/55 dark:text-white/55">
+                {selectedItems.length} selected
+              </span>
+              <button
+                type="button"
+                disabled={selectedItems.length === 0 || bulkBusy}
+                onClick={bulkDelete}
+                className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-red-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                <Trash2 size={13} />
+                {bulkBusy
+                  ? "Deleting…"
+                  : `Delete selected${selectedItems.length ? ` (${selectedItems.length})` : ""}`}
+              </button>
+            </>
+          )}
+        </div>
+        {selectMode && (
+          <p className="mt-2 text-[11px] text-black/45 dark:text-white/45">
+            Anything in review or approved is left in place, even if you tick it.
+          </p>
+        )}
 
         <div className="mt-3 flex items-center gap-2 text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
           <LayoutGrid size={12} />
@@ -403,6 +604,9 @@ function DecksIndex() {
               views={r.views}
               shared={r.shared}
               reviewStatus={r.reviewStatus}
+              selectMode={selectMode}
+              selected={selected.has(r.deck.id)}
+              onToggleSelected={() => toggleSelected(r.deck.id)}
             />
           ))}
           {visibleCloudOnly.map((r) => (
@@ -413,6 +617,9 @@ function DecksIndex() {
               updatedAt={r.updated_at}
               isTemplate={Boolean(r.is_template)}
               reviewStatus={(r.review_status ?? "draft") as ReviewStatus}
+              selectMode={selectMode}
+              selected={selected.has(r.id)}
+              onToggleSelected={() => toggleSelected(r.id)}
             />
           ))}
         </div>
@@ -427,6 +634,43 @@ function DecksIndex() {
 
 /* -------- pieces -------- */
 
+/** Tick box shown on a tile while selecting. Locked work says why it can't go. */
+function SelectCheck({
+  checked,
+  onToggle,
+  title,
+  locked,
+  className = "",
+}: {
+  checked: boolean;
+  onToggle: () => void;
+  title: string;
+  locked: boolean;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={locked}
+      aria-pressed={checked}
+      aria-label={locked ? `${title} — in review or approved, cannot be deleted` : `Select ${title}`}
+      title={locked ? "In review or approved — finish the decision first" : undefined}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onToggle();
+      }}
+      className={`z-20 inline-flex items-center justify-center rounded-lg bg-white/95 p-1.5 shadow ring-1 ring-black/10 disabled:opacity-40 dark:bg-[#03002C]/90 dark:ring-white/15 ${className}`}
+    >
+      {checked ? (
+        <CheckSquare size={16} className="text-[#003FC7] dark:text-[#A1FBF9]" />
+      ) : (
+        <Square size={16} className="text-black/45 dark:text-white/45" />
+      )}
+    </button>
+  );
+}
+
 /**
  * A deck saved to the account that this browser has never opened. Shown in the
  * same grid so the workspace total matches what is actually saved.
@@ -437,20 +681,41 @@ function CloudOnlyTile({
   updatedAt,
   isTemplate,
   reviewStatus,
+  selectMode = false,
+  selected = false,
+  onToggleSelected,
 }: {
   id: string;
   title: string;
   updatedAt: string | null;
   isTemplate: boolean;
   reviewStatus: ReviewStatus;
+  selectMode?: boolean;
+  selected?: boolean;
+  onToggleSelected?: () => void;
 }) {
   const openCloudDeck = useOpenCloudDeck();
   const [busy, setBusy] = useState(false);
+  const locked = LOCKED_STATUSES.includes(reviewStatus);
 
   return (
-    <div className="flex flex-col justify-between gap-4 rounded-2xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.04]">
+    <div
+      className={`flex flex-col justify-between gap-4 rounded-2xl border bg-white p-5 dark:bg-white/[0.04] ${
+        selectMode && selected
+          ? "border-[#003FC7] ring-2 ring-[#003FC7]/25 dark:border-[#A1FBF9]"
+          : "border-black/10 dark:border-white/10"
+      }`}
+    >
       <div className="min-w-0">
         <div className="flex items-center gap-2">
+          {selectMode && onToggleSelected && (
+            <SelectCheck
+              checked={selected}
+              onToggle={onToggleSelected}
+              title={title}
+              locked={locked}
+            />
+          )}
           <ReviewStatusBadge status={reviewStatus} />
           {isTemplate && (
             <span className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-black/50 dark:border-white/10 dark:text-white/50">
@@ -560,6 +825,9 @@ function DeckTile({
   views,
   shared,
   reviewStatus,
+  selectMode = false,
+  selected = false,
+  onToggleSelected,
 }: {
   deck: Deck;
   industry: string;
@@ -567,6 +835,9 @@ function DeckTile({
   views: number;
   shared: boolean;
   reviewStatus: ReviewStatus | null;
+  selectMode?: boolean;
+  selected?: boolean;
+  onToggleSelected?: () => void;
 }) {
   const brand = resolveBrandMode(d.brandModeId, d.subCompany);
   const cover = d.slides[0];
@@ -604,8 +875,25 @@ function DeckTile({
 
   if (deleting) return null;
 
+  const locked = reviewStatus ? LOCKED_STATUSES.includes(reviewStatus) : false;
+
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/30 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
+    <div
+      className={`group relative overflow-hidden rounded-2xl border bg-white transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-white/[0.04] ${
+        selectMode && selected
+          ? "border-[#003FC7] ring-2 ring-[#003FC7]/25 dark:border-[#A1FBF9]"
+          : "border-black/10 hover:border-black/30 dark:border-white/10"
+      }`}
+    >
+      {selectMode && onToggleSelected && (
+        <SelectCheck
+          checked={selected}
+          onToggle={onToggleSelected}
+          title={d.title}
+          locked={locked}
+          className="absolute left-3 top-3"
+        />
+      )}
       <Link to="/decks/$deckId" params={{ deckId: d.id }} className="block">
         <div className="aspect-[16/9] bg-white">
           {cover && coverVariant && (
