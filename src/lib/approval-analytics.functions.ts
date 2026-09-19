@@ -228,6 +228,36 @@ export const getApprovalAnalytics = createServerFn({ method: "POST" })
 
     typeStats.sort((a, b) => b.bottleneckScore - a.bottleneckScore || b.open - a.open);
 
+    // Reason tally across sent-back work. Rejections recorded before structured
+    // reasons existed are counted separately rather than hidden.
+    const { REVIEW_REASONS, normalizeReasons, reviewReason } = await import("./review-reasons");
+    const sentBack = all.filter((r) => r.status === "changes_requested");
+    const tally = new Map<string, number>();
+    let reasonlessRejections = 0;
+    for (const r of sentBack) {
+      const ids = normalizeReasons(r.change_reasons ?? []);
+      if (ids.length === 0) {
+        reasonlessRejections += 1;
+        continue;
+      }
+      for (const id of ids) tally.set(id, (tally.get(id) ?? 0) + 1);
+    }
+    const tallyTotal = [...tally.values()].reduce((a, v) => a + v, 0);
+    const reasonStats = REVIEW_REASONS.filter((r) => tally.has(r.id))
+      .map((r) => {
+        const count = tally.get(r.id) ?? 0;
+        const learnable = reviewReason(r.id)?.group === "look";
+        return {
+          id: r.id,
+          label: r.label,
+          group: r.group,
+          learnable,
+          count,
+          share: tallyTotal ? Math.round((count / tallyTotal) * 100) : 0,
+        };
+      })
+      .sort((a, b) => b.count - a.count);
+
     const decidedTotal = all.filter((r) => r.decided_at).length;
     return {
       windowDays,
