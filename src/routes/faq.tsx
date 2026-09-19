@@ -938,7 +938,100 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
       },
     ],
   },
+  {
+    section: "Finding your way around NEXT",
+    items: [
+      {
+        q: "Where do I start for an event?",
+        a: "Event → NEXT. It opens on a directory of every event page grouped by the job you are doing: plan the event, programme and delegate print, signage and identity, London 2026, and reference. Each entry says what it is for and which city it applies to.",
+      },
+      {
+        q: "Do I have to go back home to switch pages?",
+        a: "No. The same row of shortcuts sits at the top of every NEXT page, so you can move between venue details, agendas, signage and the city guide without navigating back up.",
+      },
+      {
+        q: "Is anything city-specific mixed in with the general pages?",
+        a: "No. City-specific work — currently London 2026 — is grouped on its own, separate from the pages that serve any location.",
+      },
+    ],
+  },
+  {
+    section: "Venue pages",
+    items: [
+      {
+        q: "What is a venue page?",
+        a: "One editable record per location holding the address, a map, opening times, travel notes, Wi-Fi, the on-site contact, the venue website, general notes and a venue photograph. Fill it in once and the location guide and its PDFs use it.",
+      },
+      {
+        q: "Do I have to type the map coordinates?",
+        a: "No. Type the address and the lookup places the map for you. Directions come from the same record.",
+      },
+      {
+        q: "Who can see the venue photos?",
+        a: "Only people in the app. Venue photographs are stored privately and shown through signed links, never as open URLs.",
+      },
+      {
+        q: "Will editing a venue page overwrite my guide copy?",
+        a: "No. The venue record fills the venue details; anything you typed into the guide yourself stays as you left it.",
+      },
+    ],
+  },
+  {
+    section: "Agendas",
+    items: [
+      {
+        q: "Are the London agendas the approved ones?",
+        a: "Yes. Every division area opens on its real signed-off London 2026 programme, with rooms, dates, parallel tracks and breaks as delivered — 210 sessions across ten division areas.",
+      },
+      {
+        q: "Can I keep both days on one sheet?",
+        a: "Yes, that is the default. Each day change prints as a solid blue band with the date in white. Use Split into a sheet per day for one sheet per date, and switch back with one click. When a day genuinely cannot fit, the board falls back to separate sheets rather than clipping copy.",
+      },
+      {
+        q: "Can I change type size and weight?",
+        a: "Yes. Headline, session title, time and speaker each scale between 70% and 150% and can be set to regular, medium or bold from the Look step.",
+      },
+      {
+        q: "Can I add icons and room numbers?",
+        a: "Yes. Any row can carry an icon with its own colour and size, and a room or floor line above the speaker note. Both appear on screen, on division cards, in the press PDF and in the PowerPoint and Word exports.",
+      },
+      {
+        q: "Will I ever get an out-of-date agenda?",
+        a: "No. Only boards containing every approved session are treated as live. Earlier files stay available as labelled versions and warn you when you open them, so an old programme is never served as the current one.",
+      },
+      {
+        q: "Does saving twice create duplicates?",
+        a: "No. Save live file creates the file; reopening it and choosing Update live file writes back to the same file.",
+      },
+      {
+        q: "Is the agenda logo the same on every division?",
+        a: "Yes. Every division board uses the same top-left lockup at the same size — half its original width, to leave room for more schedule — and you can still scale it with the Logo size control.",
+      },
+    ],
+  },
+  {
+    section: "Location guides & event furniture",
+    items: [
+      {
+        q: "What is the location guide?",
+        a: "A per-city brochure you maintain yourself: cover, welcome, venue, schedule, note panels and scan-code cards, in the approved violet-to-blue style with chevrons and an editable date disc. Each page has its own Look row.",
+      },
+      {
+        q: "Which formats does the guide export?",
+        a: "A press PDF where the design stays live vector and photographs are placed images, plus Word and PowerPoint versions for people who need to edit the copy themselves.",
+      },
+      {
+        q: "Are registration desks and brew bars reusable across cities?",
+        a: "Yes. Registration desks, cloakrooms, merch marts, brew bars and help desks are catalogue families with their own approved grounds, and quantities come from the city brief so a new city starts with the right counts.",
+      },
+      {
+        q: "Do the signage templates match the delivered artwork?",
+        a: "Yes. The grounds are measured from the approved live Illustrator files: aqua-to-violet house scenic, orchid-to-blue front-of-house desk, cyan-to-pink Churchill glass and a white press wall. Downloads default to the press version, and in-house proofing is one click and labelled as a proof.",
+      },
+    ],
+  },
 ];
+
 
 export const Route = createFileRoute("/faq")({
   head: () => ({
