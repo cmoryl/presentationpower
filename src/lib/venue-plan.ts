@@ -158,10 +158,13 @@ export function blankVenuePlan(slug: string, name: string): VenuePlanRecord {
   };
 }
 
+/** Slug of the London reference record — the one venue whose provenance is its own. */
+export const LONDON_PLAN_SLUG = "london-2026";
+
 /** The London build as a venue record — the reference the format was taken from. */
 export function londonVenuePlan(): VenuePlanRecord {
   return {
-    slug: "london-2026",
+    slug: LONDON_PLAN_SLUG,
     eventId: "next",
     name: "TransPerfect NEXT 2026 — London",
     city: "London",
@@ -193,9 +196,38 @@ export function venuePlanFromLondon(slug: string, name: string): VenuePlanRecord
     datesLabel: "",
     producer: "",
     surveySource: "",
-    caveat:
-      "CARRIED OVER FROM LONDON — floors, rooms and sizes are the London build reused as a stage set, not this venue's layout. Replace each floor as the real plans arrive.",
+    surveyDate: null,
+    caveat: CARRIED_FROM_LONDON_CAVEAT,
     floors: base.floors.map((f) => structuredCloneish(f)),
+  };
+}
+
+/** The carried-over caveat a non-London venue prints while it reuses London geometry. */
+export const CARRIED_FROM_LONDON_CAVEAT =
+  "CARRIED OVER FROM LONDON — floors, rooms and sizes are the London build reused as a stage set, not this venue's layout. Replace each floor as the real plans arrive.";
+
+/**
+ * Strip London's provenance off a record saved under another venue.
+ *
+ * The venue editor opens on the London record, so typing a new city and slug
+ * over it used to save London's "traced from the QEII plan pack" line and
+ * London's room-roster caveat as the new venue's own provenance — a sheet would
+ * then print a source that was never looked at for that city. Any record whose
+ * provenance is still London's, under a different slug, is reset to the honest
+ * carried-over wording.
+ */
+export function scrubCarriedProvenance(rec: VenuePlanRecord): VenuePlanRecord {
+  if (rec.slug === LONDON_PLAN_SLUG) return rec;
+  const london = londonVenuePlan();
+  const sameSource = rec.surveySource.trim() === london.surveySource.trim();
+  const sameCaveat = rec.caveat.trim() === london.caveat.trim();
+  if (!sameSource && !sameCaveat) return rec;
+  return {
+    ...rec,
+    surveyed: sameSource ? false : rec.surveyed,
+    surveySource: sameSource ? "" : rec.surveySource,
+    surveyDate: sameSource ? null : rec.surveyDate,
+    caveat: sameCaveat ? CARRIED_FROM_LONDON_CAVEAT : rec.caveat,
   };
 }
 
