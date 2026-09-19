@@ -11,6 +11,12 @@ import {
   normalizeDivisionFilter,
 } from "@/lib/knowledge-scope";
 import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
+import {
+  eventKnowledgeSnippets,
+  glossarySnippets,
+  type EventKnowledgeRow,
+  type GlossaryRow,
+} from "@/lib/knowledge-silo-sources";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
