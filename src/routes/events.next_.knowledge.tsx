@@ -81,9 +81,12 @@ const EXAMPLES = [
   "Which grounds are approved for a press wall?",
   "What did we learn about exporting QR codes for print?",
   "Step and repeat wall sizes and returns",
+  "Registration desk, cloakroom and brew bar quantities",
+  "Which division agenda needed two sheets per day, and why?",
   "Why do hub cards show flat artwork instead of the in-scene render?",
   "Which sign families have no template yet?",
 ];
+
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
