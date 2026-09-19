@@ -11,6 +11,12 @@ import {
   normalizeDivisionFilter,
 } from "@/lib/knowledge-scope";
 import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
+import {
+  eventKnowledgeSnippets,
+  glossarySnippets,
+  type EventKnowledgeRow,
+  type GlossaryRow,
+} from "@/lib/knowledge-silo-sources";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -44,7 +50,7 @@ type SbClient = {
 export type OracleSource = {
   n: number;
   id: string;
-  source: "oracle" | "kb" | "asset" | "brand-intel";
+  source: "oracle" | "kb" | "asset" | "brand-intel" | "event" | "glossary";
   title: string;
   href?: string;
 };
@@ -101,7 +107,11 @@ export const oracleChat = createServerFn({ method: "POST" })
       if (filterDivision) {
         entriesQuery = entriesQuery.or(knowledgeDivisionFilter(filterDivision));
       }
-      const [oracleRes, entriesRes, brandIntelRes] = await Promise.all([
+      // Event knowledge and the translation glossary are read here too, on the
+      // same terms as the shared grounding path, so an Oracle answer about a
+      // venue spec or an approved term cites the real record instead of the
+      // lossy digest mirror.
+      const [oracleRes, entriesRes, brandIntelRes, eventRes, glossaryRes] = await Promise.all([
         oracleQuery,
         entriesQuery,
         s
@@ -110,6 +120,16 @@ export const oracleChat = createServerFn({ method: "POST" })
             "id, entity_type, entity_id, brand_summary, market_position, competitive_advantages",
           )
           .limit(200),
+        s
+          .from("event_venue_knowledge")
+          .select("id, title, body, kind, city, venue, event_id, panel_id")
+          .order("updated_at", { ascending: false })
+          .limit(2000),
+        s
+          .from("glossary_terms")
+          .select("id, term, notes, do_not_translate, scope, scope_id")
+          .order("updated_at", { ascending: false })
+          .limit(2000),
       ]);
       const oracle = (oracleRes?.data ?? []) as Array<{
         id: string;
@@ -132,10 +152,12 @@ export const oracleChat = createServerFn({ method: "POST" })
         market_position: string | null;
         competitive_advantages: unknown;
       }>;
+      const eventRows = (eventRes?.data ?? []) as EventKnowledgeRow[];
+      const glossaryRows = (glossaryRes?.data ?? []) as GlossaryRow[];
 
       type Hit = {
         id: string;
-        source: "oracle" | "kb" | "asset" | "brand-intel";
+        source: OracleSource["source"];
         title: string;
         body: string;
         score: number;
@@ -182,6 +204,18 @@ export const oracleChat = createServerFn({ method: "POST" })
             .filter(Boolean)
             .join(" "),
           tags: [r.entity_type, r.entity_id].filter(Boolean),
+        })),
+        ...eventKnowledgeSnippets(eventRows).map((r) => ({
+          ...r,
+          source: "event" as const,
+          body: r.body.slice(0, 800),
+          text: `${r.title} ${r.body} ${r.tags.join(" ")}`,
+        })),
+        ...glossarySnippets(glossaryRows).map((r) => ({
+          ...r,
+          source: "glossary" as const,
+          body: r.body.slice(0, 800),
+          text: `${r.title} ${r.body} ${r.tags.join(" ")}`,
         })),
       ]);
       const kwScores = bm25Scores(candidates, data.userMessage);
