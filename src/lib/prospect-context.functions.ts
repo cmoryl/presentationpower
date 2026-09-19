@@ -53,6 +53,9 @@ export const lookupProspectContext = createServerFn({ method: "POST" })
         .from("knowledge_entries")
         .select("id, title, kind, tags, body")
         .or(`title.ilike.${like},body.ilike.${like}`)
+        // Expired facts are excluded here as everywhere else; this lookup
+        // previously matched on text alone and could show retired knowledge.
+        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
         .limit(4),
     ]);
 
@@ -72,6 +75,7 @@ export const lookupProspectContext = createServerFn({ method: "POST" })
         .from("knowledge_entries")
         .select("title")
         .or(`title.ilike.%${industry}%,tags.cs.{${industry}}`)
+        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
         .limit(5);
       industrySignals = (byIndustry ?? []).map((r) => r.title as string);
     }

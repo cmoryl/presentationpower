@@ -8,7 +8,7 @@
 // is missing or the reasoning call fails — zero regression against the
 // existing `retrieveKnowledgeForBrief` path.
 
-import { EMBEDDING_MODEL } from "@/lib/knowledge-scope";
+import { EMBEDDING_MODEL, MIN_CHUNK_SIMILARITY } from "@/lib/knowledge-scope";
 import { z } from "zod";
 import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
 import { knowledgeDivisionFilter } from "@/lib/knowledge-scope";
@@ -150,13 +150,23 @@ export async function synthesizeKnowledgeForBriefCore(
     // only `is.null` here silently dropped the entire curated KB.
     entriesQuery = entriesQuery.or(knowledgeDivisionFilter(filterDivision));
   }
+  // The Oracle store is scoped by division too. Previously only the
+  // knowledge_entries pass was division-filtered, so a division-locked brief
+  // could still be grounded in another division's Oracle rows. Ordered with a
+  // generous cap so no part of the store is unreachable.
+  let oracleQuery = s
+    .from("oracle_knowledge_base")
+    .select("id, title, content, category, tags")
+    .eq("is_active", true)
+    .order("updated_at", { ascending: false })
+    .limit(2000);
+  if (filterDivision) {
+    oracleQuery = oracleQuery.or(`category.is.null,category.eq.${filterDivision}`);
+  }
   const [oracleRes, entriesRes, brandIntelRes] = await Promise.all([
-    s
-      .from("oracle_knowledge_base")
-      .select("id, title, content, category, tags")
-      .eq("is_active", true)
-      .limit(200),
+    oracleQuery,
     entriesQuery,
+
     s
       .from("brand_intelligence")
       .select("id, entity_type, entity_id, brand_summary, market_position, competitive_advantages"),
@@ -292,13 +302,21 @@ export async function synthesizeKnowledgeForBriefCore(
             match_count: 10,
             filter_division: filterDivision,
           });
-          let chunkRows = (chunks ?? []) as Array<{
+          type RagChunkRow = {
             id: string;
             asset_id: string;
             content: string;
             tags: string[];
             similarity: number;
-          }>;
+          };
+          // Relevance floor, shared with every other retrieval path: without it
+          // a barely-related document passage was handed to synthesis as
+          // grounding simply for being in the top ten.
+          const aboveFloor = (rows: unknown): RagChunkRow[] =>
+            ((rows ?? []) as RagChunkRow[]).filter(
+              (c) => (c.similarity ?? 1) >= MIN_CHUNK_SIMILARITY,
+            );
+          let chunkRows = aboveFloor(chunks);
           if (filterDivision) {
             divisionScoped = chunkRows.length > 0;
             if (chunkRows.length === 0) {
@@ -307,7 +325,8 @@ export async function synthesizeKnowledgeForBriefCore(
                 match_count: 10,
                 filter_division: null,
               });
-              chunkRows = (unfiltered ?? []) as typeof chunkRows;
+              chunkRows = aboveFloor(unfiltered);
+
             }
           }
           if (chunkRows.length) {
