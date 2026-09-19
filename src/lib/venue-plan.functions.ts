@@ -8,7 +8,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { normalizeVenuePins, normalizeVenuePlan, type VenuePlanRecord } from "@/lib/venue-plan";
+import {
+  normalizeVenuePins,
+  normalizeVenuePlan,
+  scrubCarriedProvenance,
+  type VenuePlanRecord,
+} from "@/lib/venue-plan";
 
 const zoneSchema = z.object({
   id: z.string(),
@@ -62,18 +67,22 @@ export const saveVenuePlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => planSchema.parse(data))
   .handler(async ({ data, context }) => {
+    // London's provenance never rides along under another venue: the editor
+    // opens on the London record, so a new city typed over it used to save
+    // London's traced-from line as its own.
+    const clean = scrubCarriedProvenance({ ...data, surveyDate: data.surveyDate ?? null });
     const row = {
-      slug: data.slug,
+      slug: clean.slug,
       event_id: data.eventId,
-      name: data.name,
+      name: clean.name,
       city: data.city,
       venue: data.venue,
       dates_label: data.datesLabel,
       producer: data.producer,
-      surveyed: data.surveyed,
-      survey_source: data.surveySource,
-      survey_date: data.surveyDate || null,
-      caveat: data.caveat,
+      surveyed: clean.surveyed,
+      survey_source: clean.surveySource,
+      survey_date: clean.surveyDate || null,
+      caveat: clean.caveat,
       floors: data.floors,
       created_by: context.userId,
     };

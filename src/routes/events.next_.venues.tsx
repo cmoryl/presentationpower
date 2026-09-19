@@ -21,7 +21,6 @@ import {
   VENUE_ZONE_KINDS,
   blankVenueFloor,
   blankVenuePlan,
-  londonVenuePlan,
   newVenueZone,
   planCaveat,
   venuePlanFromLondon,
@@ -79,7 +78,7 @@ function VenuePlansPage() {
   const removePlan = useServerFn(deleteVenuePlan);
 
   const [plans, setPlans] = useState<VenuePlanRecord[]>([]);
-  const [draft, setDraft] = useState<VenuePlanRecord>(() => londonVenuePlan());
+  const [draft, setDraft] = useState<VenuePlanRecord>(() => blankVenuePlan("new-venue", "New NEXT venue"));
   const [floorId, setFloorId] = useState<LondonFloorId>("GF");
   const [status, setStatus] = useState<string>("");
   const [busy, setBusy] = useState(false);
