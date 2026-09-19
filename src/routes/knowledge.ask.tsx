@@ -7,6 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { oracleChat, type OracleSource } from "@/lib/ai-oracle.functions";
 import { listKnowledgeEntries, KNOWLEDGE_KIND_META } from "@/lib/knowledge.functions";
+import { OracleSourceViewer } from "@/components/knowledge/OracleSourceViewer";
 
 export const Route = createFileRoute("/knowledge/ask")({
   head: () => ({
@@ -74,6 +75,7 @@ function OracleAskView() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [divisionId, setDivisionId] = useState<string>("master");
+  const [openSource, setOpenSource] = useState<{ id: string; label: string } | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
 
@@ -285,7 +287,7 @@ function OracleAskView() {
 
         <div className="space-y-4">
           {messages.map((m, i) => (
-            <MessageBubble key={i} msg={m} />
+            <MessageBubble key={i} msg={m} onOpenSource={setOpenSource} />
           ))}
           {busy && (
             <div className="flex items-center gap-2 text-xs text-black/50 dark:text-white/50">
@@ -332,11 +334,20 @@ function OracleAskView() {
           </button>
         </form>
       </div>
+      {openSource && (
+        <OracleSourceViewer
+          sourceId={openSource.id}
+          label={openSource.label}
+          onClose={() => setOpenSource(null)}
+        />
+      )}
     </AppShell>
   );
 }
 
-function MessageBubble({ msg }: { msg: ChatMsg }) {
+type OpenSource = (s: { id: string; label: string }) => void;
+
+function MessageBubble({ msg, onOpenSource }: { msg: ChatMsg; onOpenSource: OpenSource }) {
   const isUser = msg.role === "user";
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
@@ -347,7 +358,13 @@ function MessageBubble({ msg }: { msg: ChatMsg }) {
             : "max-w-[92%] rounded-2xl rounded-tl-sm border border-black/10 bg-white px-4 py-3 text-sm text-black shadow-sm dark:border-white/10 dark:bg-white/[0.05] dark:text-white"
         }
       >
-        <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
+        <div className="whitespace-pre-wrap leading-relaxed">
+          {isUser ? (
+            msg.content
+          ) : (
+            <CitedText text={msg.content} sources={msg.sources ?? []} onOpenSource={onOpenSource} />
+          )}
+        </div>
         {!isUser && msg.setup && (
           <div className="mt-3 rounded-md border border-amber-400/60 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900 dark:border-amber-400/40 dark:bg-amber-500/10 dark:text-amber-200">
             <div className="font-semibold uppercase tracking-wider text-[10px] mb-1">
@@ -363,10 +380,15 @@ function MessageBubble({ msg }: { msg: ChatMsg }) {
           </div>
         )}
         {!isUser && msg.sources && msg.sources.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1.5 border-t border-black/[0.06] pt-2 dark:border-white/10">
-            {msg.sources.map((s) => (
-              <SourceChip key={`${s.n}-${s.id}`} src={s} />
-            ))}
+          <div className="mt-3 border-t border-black/[0.06] pt-2 dark:border-white/10">
+            <div className="mb-1.5 text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">
+              Sources — click to open the document
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {msg.sources.map((s) => (
+                <SourceChip key={`${s.n}-${s.id}`} src={s} onOpenSource={onOpenSource} />
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -374,20 +396,50 @@ function MessageBubble({ msg }: { msg: ChatMsg }) {
   );
 }
 
-function SourceChip({ src }: { src: OracleSource }) {
-  const label = `[${src.n}] ${src.title}`;
-  const cls =
-    "inline-flex items-center gap-1 rounded-full border border-black/10 bg-black/[0.03] px-2 py-0.5 text-[10px] text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:bg-white/[0.05] dark:text-white/70 dark:hover:border-[#A1FBF9] dark:hover:text-[#A1FBF9]";
-  if (src.href) {
-    return (
-      <a href={src.href} className={cls}>
-        {label}
-      </a>
-    );
-  }
+/** Renders inline [n] markers as buttons that open the cited document. */
+function CitedText({
+  text,
+  sources,
+  onOpenSource,
+}: {
+  text: string;
+  sources: OracleSource[];
+  onOpenSource: OpenSource;
+}) {
+  if (sources.length === 0) return <>{text}</>;
+  const byN = new Map(sources.map((s) => [s.n, s]));
+  const parts = text.split(/(\[\d{1,2}\])/g);
   return (
-    <span className={cls} title={src.id}>
-      {label}
-    </span>
+    <>
+      {parts.map((part, i) => {
+        const m = /^\[(\d{1,2})\]$/.exec(part);
+        const src = m ? byN.get(Number(m[1])) : undefined;
+        if (!src) return <span key={i}>{part}</span>;
+        return (
+          <button
+            key={i}
+            type="button"
+            onClick={() => onOpenSource({ id: src.id, label: src.title })}
+            title={src.title}
+            className="mx-0.5 rounded bg-[#003FC7]/10 px-1 align-baseline text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/20 dark:bg-[#A1FBF9]/15 dark:text-[#A1FBF9]"
+          >
+            {part}
+          </button>
+        );
+      })}
+    </>
+  );
+}
+
+function SourceChip({ src, onOpenSource }: { src: OracleSource; onOpenSource: OpenSource }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onOpenSource({ id: src.id, label: src.title })}
+      title={`Open ${src.title}`}
+      className="inline-flex max-w-full items-center gap-1 truncate rounded-full border border-black/10 bg-black/[0.03] px-2 py-0.5 text-[10px] text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:bg-white/[0.05] dark:text-white/70 dark:hover:border-[#A1FBF9] dark:hover:text-[#A1FBF9]"
+    >
+      [{src.n}] {src.title}
+    </button>
   );
 }
