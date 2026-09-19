@@ -346,6 +346,7 @@ function DecksIndex() {
     setQ("");
     setKind("all");
     setReach("all");
+    setAge("any");
     setSort("recent");
   };
 
@@ -469,6 +470,20 @@ function DecksIndex() {
               Shared
             </Chip>
           </ChipGroup>
+          <ChipGroup label="Older than">
+            <Chip active={age === "any"} onClick={() => setAge("any")}>
+              Any age
+            </Chip>
+            <Chip active={age === "3m"} onClick={() => setAge("3m")}>
+              3 months
+            </Chip>
+            <Chip active={age === "6m"} onClick={() => setAge("6m")}>
+              6 months
+            </Chip>
+            <Chip active={age === "12m"} onClick={() => setAge("12m")}>
+              12 months
+            </Chip>
+          </ChipGroup>
           {active && (
             <button
               type="button"
@@ -479,6 +494,61 @@ function DecksIndex() {
             </button>
           )}
         </div>
+
+        {/* Bulk selection — clearing out a long list of old work in one move. */}
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3 dark:border-white/10">
+          <button
+            type="button"
+            onClick={() => {
+              setSelectMode((on) => !on);
+              setSelected(new Set());
+            }}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              selectMode
+                ? "bg-[#03002C] text-white dark:bg-[#A1FBF9] dark:text-[#03002C]"
+                : "border border-black/10 bg-white text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+            }`}
+          >
+            <CheckSquare size={13} /> {selectMode ? "Done selecting" : "Select"}
+          </button>
+          {selectMode && (
+            <>
+              <button
+                type="button"
+                onClick={() => setSelected(new Set(shownItems.map((i) => i.id)))}
+                className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+              >
+                Select all shown ({shownItems.length})
+              </button>
+              {selected.size > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setSelected(new Set())}
+                  className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+                >
+                  Clear selection
+                </button>
+              )}
+              <span className="text-xs text-black/55 dark:text-white/55">
+                {selected.size} selected
+              </span>
+              <button
+                type="button"
+                disabled={selected.size === 0 || bulkBusy}
+                onClick={bulkDelete}
+                className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-red-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                <Trash2 size={13} />
+                {bulkBusy ? "Deleting…" : `Delete selected${selected.size ? ` (${selected.size})` : ""}`}
+              </button>
+            </>
+          )}
+        </div>
+        {selectMode && (
+          <p className="mt-2 text-[11px] text-black/45 dark:text-white/45">
+            Anything in review or approved is left in place, even if you tick it.
+          </p>
+        )}
 
         <div className="mt-3 flex items-center gap-2 text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
           <LayoutGrid size={12} />
@@ -532,6 +602,9 @@ function DecksIndex() {
               views={r.views}
               shared={r.shared}
               reviewStatus={r.reviewStatus}
+              selectMode={selectMode}
+              selected={selected.has(r.deck.id)}
+              onToggleSelected={() => toggleSelected(r.deck.id)}
             />
           ))}
           {visibleCloudOnly.map((r) => (
@@ -542,6 +615,9 @@ function DecksIndex() {
               updatedAt={r.updated_at}
               isTemplate={Boolean(r.is_template)}
               reviewStatus={(r.review_status ?? "draft") as ReviewStatus}
+              selectMode={selectMode}
+              selected={selected.has(r.id)}
+              onToggleSelected={() => toggleSelected(r.id)}
             />
           ))}
         </div>
