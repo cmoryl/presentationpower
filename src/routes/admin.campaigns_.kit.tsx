@@ -41,7 +41,7 @@ const searchSchema = z.object({
   blank: z.union([z.literal(1), z.literal("1"), z.boolean()]).optional(),
 });
 
-export const Route = createFileRoute("/admin/campaigns/kit")({
+export const Route = createFileRoute("/admin/campaigns_/kit")({
   head: () => ({
     meta: [{ title: "Social kit builder · Campaigns · Admin" }],
   }),
