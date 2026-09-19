@@ -315,7 +315,7 @@ export const decideApproval = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
 
-    await (
+    const history = await (
       await import("./approval-events.server")
     ).logApprovalEvent(supabase, {
       requestId: data.id,
@@ -330,6 +330,7 @@ export const decideApproval = createServerFn({ method: "POST" })
       toStatus: data.status,
       note: data.note?.trim() || null,
     });
+
 
     if (data.note?.trim()) {
       await supabase.from("approval_comments").insert({

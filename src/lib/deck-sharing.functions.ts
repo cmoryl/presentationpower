@@ -246,16 +246,24 @@ export const recordShareView = createServerFn({ method: "POST" })
           },
         },
       });
-      await supabasePublic.rpc("record_share_view", {
+      const { error } = await supabasePublic.rpc("record_share_view", {
         _token: data.token,
         _session_key: data.sessionKey,
         _slides_viewed: data.slidesViewed ?? 0,
         _max_slide: data.maxSlide ?? 0,
       });
-    } catch {
-      // swallow
+      // Viewing must never break, but a failed write is reported rather than
+      // being reported as a success — view counts would silently go missing.
+      if (error) {
+        console.error("recordShareView failed", error);
+        return { ok: false, reason: error.message };
+      }
+    } catch (err) {
+      console.error("recordShareView failed", err);
+      return { ok: false, reason: err instanceof Error ? err.message : "view not recorded" };
     }
     return { ok: true };
+
   });
 
 export const getShareAnalytics = createServerFn({ method: "POST" })
