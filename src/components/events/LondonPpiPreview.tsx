@@ -140,17 +140,21 @@ export function LondonPpiPreview({
     return () => ro.disconnect();
   }, [img, tier, zoom, anchor]);
 
+  // A tier PNG carries the same revision stamp as the master it was rendered
+  // from. With no stamp supplied it can only honestly read as an unpublished draft.
+  const tierBase = fileBase ?? `rdraft-${panelSlug(panel)}`;
+
   const downloadTier = () =>
     void runWithExportFeedback(
       {
-        pending: `Rendering ${panelSlug(panel)} at ${tier.ppi} ppi…`,
-        success: `${panelSlug(panel)}-${tier.ppi}ppi.png downloaded`,
+        pending: `Rendering ${tierBase} at ${tier.ppi} ppi…`,
+        success: `${tierBase}-${tier.ppi}ppi.png downloaded`,
         failure: "PNG render failed",
         successDescription: `${tier.w}×${tier.h}px · approx. ${tier.mb} MB`,
       },
       async () => {
         const blob = await renderDitheredPng(artwork, tier.w, tier.h);
-        download(blob, `${panelSlug(panel)}-${tier.ppi}ppi.png`);
+        download(blob, `${tierBase}-${tier.ppi}ppi.png`);
       },
     );
 
