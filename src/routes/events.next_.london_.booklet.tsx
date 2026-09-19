@@ -234,9 +234,16 @@ function BookletPage() {
   const rows = (saved.data ?? []) as unknown as { id: string; name: string; config: AgendaConfig }[];
 
   /** The agenda the booklet prints, forced to the booklet's own page format. */
+  const agendaSwapped = useMemo(() => {
+    const picked = rows.find((r) => r.id === savedId)?.config ?? agendaSnapshot;
+    return !!picked && !agendaProgrammeIsCurrent(picked);
+  }, [rows, savedId, agendaSnapshot]);
+
   const agenda = useMemo<AgendaConfig>(() => {
     // An older or partial saved board is never printed into the booklet: fall
     // back to the division's approved programme instead of reprinting stale rows.
+    // The swap is announced below so nobody prints a booklet believing it came
+    // from the file they picked.
     const picked = rows.find((r) => r.id === savedId)?.config ?? agendaSnapshot;
     const base =
       picked && agendaProgrammeIsCurrent(picked)
@@ -244,6 +251,7 @@ function BookletPage() {
         : agendaDefault(picked?.divisionId ?? "city-series");
     return { ...base, sizeId: bookletAgendaSizeId(config.sizeId) };
   }, [rows, savedId, agendaSnapshot, config.sizeId]);
+
 
   const agendaPageCount = useMemo(() => {
     try {
