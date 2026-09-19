@@ -5,7 +5,7 @@ import { getSharedDeck, recordShareView } from "@/lib/deck-sharing.functions";
 import {
   getSharedDeckTranslations,
   listSharedLocales,
-  listLanguages,
+  listPublicLanguages,
 } from "@/lib/translation.functions";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
@@ -186,7 +186,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   // ---- Language overlay ----
   const listLocalesFn = useServerFn(listSharedLocales);
   const fetchTxFn = useServerFn(getSharedDeckTranslations);
-  const listLangsFn = useServerFn(listLanguages);
+  const listLangsFn = useServerFn(listPublicLanguages);
   const [locales, setLocales] = useState<
     Array<{ target_lang: string; ready: number; total: number }>
   >([]);
