@@ -269,28 +269,8 @@ export function BrandDocReadPanel({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button
-              size="sm"
-              disabled={!picked.size && !hasFaces}
-              onClick={() => {
-                if (!read) return;
-                const chosen = read.swatches.filter((_, i) => picked.has(String(i)));
-                const colors: Partial<Record<ColorGroupKey, ColorSwatch[]>> = {};
-                for (const s of chosen) {
-                  const { group, ...swatch } = s;
-                  (colors[group] ??= []).push(swatch);
-                }
-                if (replace) applyPicked();
-                else {
-                  const apply: DocApply = { colors };
-                  if (faces.primary && read.typefacePrimary)
-                    apply.typefacePrimary = read.typefacePrimary;
-                  if (faces.web && read.typefaceWeb) apply.typefaceWeb = read.typefaceWeb;
-                  onApply({ ...apply, colors });
-                  toast.success(`Added ${chosen.length} colour(s) from ${fileName}.`);
-                }
-              }}
-            >
+            <Button size="sm" disabled={!picked.size && !hasFaces} onClick={applyPicked}>
+
               Use these in the guide
             </Button>
             {read.terms.length > 0 && (
