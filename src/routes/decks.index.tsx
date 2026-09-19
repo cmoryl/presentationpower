@@ -520,7 +520,7 @@ function DecksIndex() {
               >
                 Select all shown ({shownItems.length})
               </button>
-              {selected.size > 0 && (
+              {selectedItems.length > 0 && (
                 <button
                   type="button"
                   onClick={() => setSelected(new Set())}
@@ -530,16 +530,18 @@ function DecksIndex() {
                 </button>
               )}
               <span className="text-xs text-black/55 dark:text-white/55">
-                {selected.size} selected
+                {selectedItems.length} selected
               </span>
               <button
                 type="button"
-                disabled={selected.size === 0 || bulkBusy}
+                disabled={selectedItems.length === 0 || bulkBusy}
                 onClick={bulkDelete}
                 className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-red-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
               >
                 <Trash2 size={13} />
-                {bulkBusy ? "Deleting…" : `Delete selected${selected.size ? ` (${selected.size})` : ""}`}
+                {bulkBusy
+                  ? "Deleting…"
+                  : `Delete selected${selectedItems.length ? ` (${selectedItems.length})` : ""}`}
               </button>
             </>
           )}
