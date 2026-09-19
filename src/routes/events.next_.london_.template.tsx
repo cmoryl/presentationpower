@@ -213,6 +213,17 @@ function LondonTemplatePage() {
   const placement = placements[panel.id] ?? DEFAULT_LOGO_PLACEMENT;
   const placedArtMap = useLondonPlacedArt();
   const placedArt = placedArtMap[panel.id] ?? null;
+  // Local edits that are not in the revision in force make this an unpublished
+  // draft: its files must read `rdraft-`, never a revision number that does not
+  // contain them.
+  const panelIsDraft = (p: { id: string }) =>
+    !londonEditsArePublished(p.id, {
+      placement: placements[p.id],
+      boardSize: boardSizes[p.id],
+      placedArt: placedArtMap[p.id],
+    });
+  const panelStamp: number | "draft" = panelIsDraft(panel) ? "draft" : revStamp;
+  const packStamp: number | "draft" = panels.some(panelIsDraft) ? "draft" : revStamp;
   const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
   const art = useMemo(
     () => ({ colorSpace, vibrance, placedArt }),
