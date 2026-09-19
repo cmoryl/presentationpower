@@ -8,7 +8,7 @@
 // is missing or the reasoning call fails — zero regression against the
 // existing `retrieveKnowledgeForBrief` path.
 
-import { EMBEDDING_MODEL } from "@/lib/knowledge-scope";
+import { EMBEDDING_MODEL, MIN_CHUNK_SIMILARITY } from "@/lib/knowledge-scope";
 import { z } from "zod";
 import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
 import { knowledgeDivisionFilter } from "@/lib/knowledge-scope";

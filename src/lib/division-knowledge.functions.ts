@@ -121,6 +121,8 @@ export const getDivisionContext = createServerFn({ method: "POST" })
             // Org-wide facts are stored under owner 'global'; matching only the
             // division id hid all of them from this pack.
             .or(knowledgeDivisionFilter(divisionId))
+            // Retired facts must not keep shipping in division packs.
+            .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
             .order("updated_at", { ascending: false })
             .limit(data.knowledgeLimit)
         : Promise.resolve({ data: [], error: null } as { data: unknown[]; error: null }),
