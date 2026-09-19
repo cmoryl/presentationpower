@@ -25,6 +25,8 @@ export type ApprovalEventInput = {
   fromStatus?: string | null;
   toStatus?: string | null;
   note?: string | null;
+  /** Structured reviewer reasons (see review-reasons.ts) for this decision. */
+  changeReasons?: readonly string[] | null;
   meta?: Record<string, string | number | boolean | null>;
 };
 
@@ -45,6 +47,7 @@ export async function logApprovalEvent(
       from_status: input.fromStatus ?? null,
       to_status: input.toStatus ?? null,
       note: input.note ?? null,
+      change_reasons: input.changeReasons ? [...input.changeReasons] : [],
       meta: input.meta ?? {},
     });
     if (res?.error) {

@@ -16,6 +16,8 @@ import {
 import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
 import { ApprovalAnalyticsPanel } from "@/components/approvals/ApprovalAnalyticsPanel";
 import { ReviewerAssignments } from "@/components/approvals/ReviewerAssignments";
+import { ReviewReasonPicker } from "@/components/approvals/ReviewReasonPicker";
+import { describeReasons } from "@/lib/review-reasons";
 
 export const Route = createFileRoute("/approvals")({
   head: () => ({
@@ -70,6 +72,8 @@ function ApprovalQueuePage() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [note, setNote] = useState("");
+  // Structured reasons for the decision being written right now.
+  const [reasons, setReasons] = useState<string[]>([]);
 
   const queue = useQuery({
     queryKey: ["approval-queue"],
@@ -83,9 +87,12 @@ function ApprovalQueuePage() {
 
   const decide = useMutation({
     mutationFn: (input: { id: string; status: "approved" | "changes_requested" | "pending" }) =>
-      decideFn({ data: { ...input, note: note.trim() || undefined } }),
-    onSuccess: (_r, input) => {
+      decideFn({
+        data: { ...input, note: note.trim() || undefined, reasons },
+      }),
+    onSuccess: (r, input) => {
       setNote("");
+      setReasons([]);
       invalidate();
       toast.success(
         input.status === "approved"
@@ -93,6 +100,10 @@ function ApprovalQueuePage() {
           : input.status === "changes_requested"
             ? "Changes requested"
             : "Reopened for review",
+        // Never leave the reviewer guessing what the system took from this.
+        r.learningWarning || r.learningNote
+          ? { description: r.learningWarning ?? r.learningNote ?? undefined, duration: 8000 }
+          : undefined,
       );
     },
     onError: (e: Error) => toast.error(e.message),
@@ -100,21 +111,26 @@ function ApprovalQueuePage() {
 
   const bulk = useMutation({
     mutationFn: (status: "approved" | "changes_requested") =>
-      bulkFn({ data: { ids: Array.from(selected), status, note: note.trim() || undefined } }),
+      bulkFn({
+        data: { ids: Array.from(selected), status, note: note.trim() || undefined, reasons },
+      }),
     onSuccess: (r) => {
       setSelected(new Set());
       setNote("");
+      setReasons([]);
       invalidate();
+      const extra = [
+        r.skipped
+          ? `${r.skipped} left alone — your own requests, or ones assigned to other reviewers.`
+          : "",
+        r.learningWarning ?? r.learningNote ?? "",
+      ]
+        .filter(Boolean)
+        .join(" ");
       toast.success(
         `${r.count} item${r.count === 1 ? "" : "s"} updated`,
-        r.skipped
-          ? {
-              description: `${r.skipped} left alone — your own requests, or ones assigned to other reviewers.`,
-              duration: 8000,
-            }
-          : undefined,
+        extra ? { description: extra, duration: 8000 } : undefined,
       );
-
     },
     onError: (e: Error) => toast.error(e.message),
   });

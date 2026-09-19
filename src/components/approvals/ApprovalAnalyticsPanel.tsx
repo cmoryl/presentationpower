@@ -192,6 +192,44 @@ export function ApprovalAnalyticsPanel() {
             </ul>
           )}
 
+          {(data.reasons.length > 0 || data.reasonlessRejections > 0) && (
+            <div className="mt-4 rounded-2xl border border-foreground/10 bg-background p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
+                Why work goes back
+              </p>
+              <ul className="mt-3 space-y-2">
+                {data.reasons.slice(0, 6).map((r) => (
+                  <li key={r.id} className="text-sm">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="min-w-0">{r.label}</span>
+                      <span className="shrink-0 tabular-nums text-foreground/55">
+                        {r.count} · {r.share}%
+                      </span>
+                    </div>
+                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-foreground/10">
+                      <div
+                        className={`h-full rounded-full ${
+                          r.learnable ? "bg-foreground/70" : "bg-foreground/25"
+                        }`}
+                        style={{ width: `${Math.max(3, r.share)}%` }}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-xs leading-relaxed text-foreground/50">
+                Solid bars are design-fit reasons, which teach style suggestions. Faded bars are
+                brand, accessibility, copy or fact problems — recorded, never learned as taste.
+                {data.reasonlessRejections > 0 &&
+                  ` ${data.reasonlessRejections} earlier rejection${
+                    data.reasonlessRejections === 1 ? "" : "s"
+                  } carried no reason, so nothing was learned from ${
+                    data.reasonlessRejections === 1 ? "it" : "them"
+                  }.`}
+              </p>
+            </div>
+          )}
+
           {open && (
             <div className="mt-4 overflow-x-auto">
               <table className="w-full min-w-[560px] text-sm">
