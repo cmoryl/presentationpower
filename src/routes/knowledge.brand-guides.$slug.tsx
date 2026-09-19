@@ -83,7 +83,7 @@ export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
 });
 
 function BrandGuideView() {
-  const { guide } = Route.useLoaderData() as { guide: BrandGuide };
+  const { guide, edited } = Route.useLoaderData() as { guide: BrandGuide; edited: boolean };
   const division = BRAND_MODES.find((b) => b.id === guide.divisionId);
   const hero = guide.primaryColors[0]?.hex ?? "#03002C";
   const accent = guide.secondaryColors[0]?.hex ?? "#A1FBF9";
