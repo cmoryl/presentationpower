@@ -29,7 +29,7 @@ import {
 
 export type GroundingSnippet = {
   id: string;
-  source: "kb" | "oracle" | "brand-intel" | "asset";
+  source: "kb" | "oracle" | "brand-intel" | "asset" | "event" | "glossary";
   title: string;
   body: string;
   tags: string[];
