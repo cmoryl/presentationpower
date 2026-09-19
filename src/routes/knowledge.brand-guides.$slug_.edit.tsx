@@ -458,6 +458,37 @@ function BrandGuideEditor() {
   const save = useServerFn(saveBrandGuideEdit);
   const reset = useServerFn(resetBrandGuideEdit);
   const retheme = colorEditsRetheme(base.divisionId);
+  const queryClient = useQueryClient();
+
+  /** Folds what a brand document says into the unsaved draft. */
+  function applyFromDocument(apply: DocApply) {
+    setDraft((prev) => {
+      const next: Draft = { ...prev };
+      const groups: ColorGroupKey[] = [
+        "primaryColors",
+        "secondaryColors",
+        "tertiaryColors",
+        "neutrals",
+      ];
+      for (const key of groups) {
+        const found = apply.colors[key];
+        if (!found?.length) continue;
+        if (apply.mode === "replace") {
+          next[key] = found.map((c) => ({ ...c }));
+        } else {
+          const have = new Set(prev[key].map((c) => c.hex.toUpperCase()));
+          next[key] = [
+            ...prev[key],
+            ...found.filter((c) => !have.has(c.hex.toUpperCase())).map((c) => ({ ...c })),
+          ];
+        }
+      }
+      if (apply.typefacePrimary) next.typefacePrimary = apply.typefacePrimary;
+      if (apply.typefaceWeb) next.typefaceWeb = apply.typefaceWeb;
+      return next;
+    });
+  }
+
 
   const badHex = [
     ...draft.primaryColors,
