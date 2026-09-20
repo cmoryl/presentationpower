@@ -99,6 +99,7 @@ describe("agenda room line", () => {
   it("carries a chosen mark colour over the house pin", () => {
     expect(agendaLocation(board({ locationIconInk: "aqua" })).iconHex).toBe("#A1FBF9");
     expect(agendaLocation(board({ locationInk: "yellow" })).ink).toBe("#FFEB66");
-    expect(agendaLocation(board()).ink).toBeNull();
+    // The house default is the white line on the Bloom Corner ground.
+    expect(agendaLocation(board()).ink).toBe("#FFFFFF");
   });
 });

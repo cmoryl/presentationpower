@@ -69,7 +69,8 @@ describe("agenda copy legibility", () => {
   });
 
   it("scores each approved headline ink so an unreadable pick is visible", () => {
-    const options = agendaTitleInkOptions({ ...agendaDefault(), titleColor: "" });
+    // Read on a light face, where the pale approved inks genuinely fail.
+    const options = agendaTitleInkOptions({ ...agendaDefault(), face: "light", titleColor: "" });
     expect(options.length).toBeGreaterThan(5);
     expect(options.some((o) => !o.ok)).toBe(true);
     expect(options.some((o) => o.ok)).toBe(true);
