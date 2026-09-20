@@ -177,3 +177,76 @@ export async function logDeckStyleOutcome(
     return { ok: false, reason: err instanceof Error ? err.message : "Outcome not recorded" };
   }
 }
+
+/** Approval subject types that carry a style pack we can learn from. */
+const SURFACE_TABLES: Record<string, string> = {
+  print: "print_assets",
+  social: "surfaces",
+  event: "surfaces",
+};
+
+/**
+ * Same loop as `logDeckStyleOutcome`, for the other surfaces a reviewer signs
+ * off: print pieces, social posts and event assets. Before this, only decks
+ * taught the recommender, so an approved case study or social post was
+ * evidence the system threw away.
+ */
+export async function logSurfaceStyleOutcome(
+  supabase: Db,
+  input: {
+    userId: string;
+    subjectType: string;
+    subjectId: string;
+    signal: string;
+    violatesRules?: boolean;
+  },
+): Promise<DeckOutcomeResult> {
+  const table = SURFACE_TABLES[input.subjectType];
+  if (!table)
+    return {
+      ok: false,
+      reason: `${input.subjectType} work has no recorded style code, so there is nothing to learn from it.`,
+    };
+  try {
+    const { data } = await supabase
+      .from(table)
+      .select("context")
+      .eq("id", input.subjectId)
+      .maybeSingle();
+    if (!data)
+      return { ok: false, reason: "The reviewed item could not be found, so nothing was learned." };
+    const ctx = (data.context ?? null) as Record<string, unknown> | null;
+    const packId = typeof ctx?.stylePackId === "string" ? ctx.stylePackId : null;
+    if (!packId || !isSkinPackId(packId))
+      return {
+        ok: false,
+        reason: "This piece uses the approved brand system, which has no style code to learn about.",
+      };
+    const styleCode = skinCodeFromPackId(packId);
+    if (!styleCode) return { ok: false, reason: "Style pack has no approved S-code." };
+
+    const brief = (ctx?.brief ?? null) as Record<string, unknown> | null;
+    const key = profileKey({
+      recipeId: typeof ctx?.designRecipeId === "string" ? ctx.designRecipeId : null,
+      objective: typeof brief?.meetingObjective === "string" ? brief.meetingObjective : null,
+      audience: typeof brief?.audience === "string" ? brief.audience : null,
+    } as LearningProfile);
+
+    const { error } = await supabase.from("style_reco_events").insert({
+      user_id: input.userId,
+      signal: input.signal,
+      style_code: styleCode.toUpperCase(),
+      recommended_codes: [],
+      rank_shown: null,
+      profile_key: key,
+      brief: (brief ?? {}) as never,
+      deck_id: null,
+      polarity: input.violatesRules ? 0 : signalPolarity(input.signal),
+      learnable: !input.violatesRules,
+    });
+    if (error) return { ok: false, reason: error.message };
+    return { ok: true, styleCode, profileKey: key };
+  } catch (err) {
+    return { ok: false, reason: err instanceof Error ? err.message : "Outcome not recorded" };
+  }
+}
