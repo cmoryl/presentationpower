@@ -17,6 +17,8 @@ import { KitProposalCard, kitProposalFromTool } from "./KitProposalCard";
 import { messagesFingerprint, useKitThreadMessageSync } from "@/lib/kit-agent/sync";
 import { AgentDocumentUpload, useAgentDocuments } from "@/components/agent/AgentDocumentUpload";
 import { withDocumentContext } from "@/lib/agent/doc-intake";
+import { readStoredDesignDna } from "@/lib/agent/design-dna";
+import { AgentDesignDnaImport } from "@/components/agent/AgentDesignDnaImport";
 
 const TOOL_LABELS: Record<string, string> = {
   list_divisions: "Checking divisions",
@@ -125,9 +127,14 @@ export function KitAgentChat({
       if (!value || busy) return;
       if (messages.length === 0) onFirstUserMessage?.(value);
       setInput("");
-      void sendMessage({ text: withDocumentContext(value, docs) });
+      // An imported visual knowledge map travels with every turn.
+      const dna = readStoredDesignDna(threadId);
+      void sendMessage(
+        { text: withDocumentContext(value, docs) },
+        dna ? { body: { designDna: dna } } : undefined,
+      );
     },
-    [busy, docs, messages.length, onFirstUserMessage, sendMessage],
+    [busy, docs, messages.length, onFirstUserMessage, sendMessage, threadId],
   );
 
   const sentPending = useRef(false);
@@ -221,8 +228,9 @@ export function KitAgentChat({
         </div>
       ) : null}
 
-      <div className="border-t border-border bg-background px-4 pt-2 sm:px-6">
+      <div className="space-y-2 border-t border-border bg-background px-4 pt-2 sm:px-6">
         <AgentDocumentUpload docs={docs} onChange={setDocs} disabled={busy} />
+        <AgentDesignDnaImport threadId={threadId} />
       </div>
 
       <form

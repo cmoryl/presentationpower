@@ -17,6 +17,10 @@ import { buildLayoutArbiterToolSet } from "@/lib/agent/layout-arbiter-tool";
 import { coerceDesignDna, designDnaPromptBlock } from "@/lib/agent/design-dna";
 import { coerceDesignOverrides, designOverridesPromptBlock } from "@/lib/agent/design-overrides";
 import {
+  SHARED_KNOWLEDGE_PROMPT,
+  buildSharedKnowledgeToolSet,
+} from "@/lib/agent/knowledge-tools";
+import {
   bridgeToolResultTurns,
   dropUnknownToolParts,
   repairDanglingToolParts,
@@ -112,6 +116,10 @@ export const Route = createFileRoute("/api/agent-chat")({
         const scope = await fetchAgentScope(supabase as never);
 
         const toolSet: ToolSet = {
+          // Shared grounding first: the deck agent's own MCP search_knowledge
+          // keeps precedence, and it gains the glossary, division facts and
+          // event/venue lookups the other agents have.
+          ...buildSharedKnowledgeToolSet({ supabase: supabase as never }),
           ...buildAgentToolSet(toolContextForToken(token, userId)),
           ...buildOutlineToolSet(),
           ...buildDesignKnowledgeToolSet(),
@@ -126,6 +134,7 @@ export const Route = createFileRoute("/api/agent-chat")({
           model: gateway(MODEL),
           system: [
             AGENT_SYSTEM_PROMPT,
+            SHARED_KNOWLEDGE_PROMPT,
             scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : "",
             dna ? designDnaPromptBlock(dna) : "",
             overrides ? designOverridesPromptBlock(overrides) : "",

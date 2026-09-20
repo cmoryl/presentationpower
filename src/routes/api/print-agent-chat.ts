@@ -13,10 +13,13 @@ import {
   SHARED_KNOWLEDGE_PROMPT,
   buildSharedKnowledgeToolSet,
 } from "@/lib/agent/knowledge-tools";
+import { coerceDesignDna, designDnaPromptBlock } from "@/lib/agent/design-dna";
+import { tool, type ToolSet } from "ai";
+import { z } from "zod";
 
 const MODEL = "google/gemini-3.6-flash";
 
-type Body = { messages?: UIMessage[]; threadId?: string };
+type Body = { messages?: UIMessage[]; threadId?: string; designDna?: unknown };
 
 export const Route = createFileRoute("/api/print-agent-chat")({
   server: {
@@ -76,15 +79,35 @@ export const Route = createFileRoute("/api/print-agent-chat")({
 
         const scope = await fetchAgentScope(supabase as never);
 
+        // An imported visual knowledge map ("design DNA") becomes the design
+        // authority for this print piece, exactly as it does for decks.
+        const dna = coerceDesignDna(body.designDna);
+        const dnaTools: ToolSet = dna
+          ? {
+              read_design_dna: tool({
+                description:
+                  "Read the visual knowledge map the user imported for this print piece (their own design DNA): palette, typography, geometry, section intent, rules and the raw source.",
+                inputSchema: z.object({}),
+                execute: async () => dna,
+              }),
+            }
+          : {};
+
         const result = streamText({
           model: gateway(MODEL),
-          system: [PRINT_AGENT_SYSTEM_PROMPT, SHARED_KNOWLEDGE_PROMPT, scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : ""]
+          system: [
+            PRINT_AGENT_SYSTEM_PROMPT,
+            SHARED_KNOWLEDGE_PROMPT,
+            dna ? designDnaPromptBlock(dna) : "",
+            scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : "",
+          ]
             .filter(Boolean)
             .join("\n"),
           messages: await convertToModelMessages(messages),
           tools: {
             ...buildPrintAgentToolSet({ supabase, userId }),
             ...buildSharedKnowledgeToolSet({ supabase }),
+            ...dnaTools,
           },
           stopWhen: stepCountIs(50),
           abortSignal: request.signal,
