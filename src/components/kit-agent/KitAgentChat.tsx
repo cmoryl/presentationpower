@@ -17,6 +17,8 @@ import { KitProposalCard, kitProposalFromTool } from "./KitProposalCard";
 import { messagesFingerprint, useKitThreadMessageSync } from "@/lib/kit-agent/sync";
 import { AgentDocumentUpload, useAgentDocuments } from "@/components/agent/AgentDocumentUpload";
 import { withDocumentContext } from "@/lib/agent/doc-intake";
+import { readStoredDesignDna } from "@/lib/agent/design-dna";
+import { AgentDesignDnaImport } from "@/components/agent/AgentDesignDnaImport";
 
 const TOOL_LABELS: Record<string, string> = {
   list_divisions: "Checking divisions",
