@@ -134,6 +134,7 @@ export const Route = createFileRoute("/api/agent-chat")({
           model: gateway(MODEL),
           system: [
             AGENT_SYSTEM_PROMPT,
+            SHARED_KNOWLEDGE_PROMPT,
             scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : "",
             dna ? designDnaPromptBlock(dna) : "",
             overrides ? designOverridesPromptBlock(overrides) : "",
