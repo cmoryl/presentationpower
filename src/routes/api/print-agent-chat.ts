@@ -82,7 +82,10 @@ export const Route = createFileRoute("/api/print-agent-chat")({
             .filter(Boolean)
             .join("\n"),
           messages: await convertToModelMessages(messages),
-          tools: buildPrintAgentToolSet({ supabase, userId }),
+          tools: {
+            ...buildPrintAgentToolSet({ supabase, userId }),
+            ...buildSharedKnowledgeToolSet({ supabase }),
+          },
           stopWhen: stepCountIs(50),
           abortSignal: request.signal,
           onError: ({ error }) => console.error("print agent stream error:", error),

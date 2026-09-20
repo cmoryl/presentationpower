@@ -84,7 +84,10 @@ export const Route = createFileRoute("/api/kit-agent-chat")({
             .filter(Boolean)
             .join("\n"),
           messages: await convertToModelMessages(messages),
-          tools: buildKitAgentToolSet({ supabase, userId, surface, threadId }),
+          tools: {
+            ...buildKitAgentToolSet({ supabase, userId, surface, threadId }),
+            ...buildSharedKnowledgeToolSet({ supabase }),
+          },
           stopWhen: stepCountIs(50),
           abortSignal: request.signal,
           onError: ({ error }) => console.error("kit agent stream error:", error),
