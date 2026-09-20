@@ -17,6 +17,10 @@ import { buildLayoutArbiterToolSet } from "@/lib/agent/layout-arbiter-tool";
 import { coerceDesignDna, designDnaPromptBlock } from "@/lib/agent/design-dna";
 import { coerceDesignOverrides, designOverridesPromptBlock } from "@/lib/agent/design-overrides";
 import {
+  SHARED_KNOWLEDGE_PROMPT,
+  buildSharedKnowledgeToolSet,
+} from "@/lib/agent/knowledge-tools";
+import {
   bridgeToolResultTurns,
   dropUnknownToolParts,
   repairDanglingToolParts,
