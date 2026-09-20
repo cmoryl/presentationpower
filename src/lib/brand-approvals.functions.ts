@@ -377,7 +377,20 @@ export const decideApproval = createServerFn({ method: "POST" })
         ownerId: before.requested_by ? String(before.requested_by) : undefined,
       });
       learningNote = learnability.reason;
+    } else if (!isDeck && before.subject_id && data.status !== "pending") {
+      // Print pieces, social posts and event assets are evidence too — same
+      // governance: a design-fit rejection teaches, a rule breach never does.
+      const { logSurfaceStyleOutcome } = await import("./style-learning-outcome.server");
+      styleLearning = await logSurfaceStyleOutcome(supabase as never, {
+        userId,
+        subjectType: String(before.subject_type),
+        subjectId: String(before.subject_id),
+        signal: data.status === "approved" ? "deck_completed" : "review_changes_requested",
+        violatesRules: data.status === "approved" ? false : !learnability.learnable,
+      });
+      if (data.status === "changes_requested") learningNote = learnability.reason;
     }
+
 
     if (data.note?.trim() || reasons.length > 0) {
       await supabase.from("approval_comments").insert({
