@@ -544,21 +544,34 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
     // under the same governance as a single decision.
     const { reasonLearnability } = await import("./review-reasons");
     const learnability = reasonLearnability(reasons);
-    const { logDeckStyleOutcome } = await import("./style-learning-outcome.server");
+    const { logDeckStyleOutcome, logSurfaceStyleOutcome } = await import(
+      "./style-learning-outcome.server"
+    );
     const allowedSet = new Set(allowed);
     let learningFailed = 0;
     for (const row of before ?? []) {
       if (!allowedSet.has(row.id as string)) continue;
-      if (row.subject_type !== "deck" || !row.subject_id) continue;
-      const res = await logDeckStyleOutcome(supabase as never, {
-        userId,
-        deckId: String(row.subject_id),
-        signal: data.status === "approved" ? "deck_completed" : "review_changes_requested",
-        violatesRules: data.status === "approved" ? false : !learnability.learnable,
-        ownerId: (row as { requested_by?: string | null }).requested_by
-          ? String((row as { requested_by?: string | null }).requested_by)
-          : undefined,
-      });
+      if (!row.subject_id) continue;
+      const signal = data.status === "approved" ? "deck_completed" : "review_changes_requested";
+      const violatesRules = data.status === "approved" ? false : !learnability.learnable;
+      const res =
+        row.subject_type === "deck"
+          ? await logDeckStyleOutcome(supabase as never, {
+              userId,
+              deckId: String(row.subject_id),
+              signal,
+              violatesRules,
+              ownerId: (row as { requested_by?: string | null }).requested_by
+                ? String((row as { requested_by?: string | null }).requested_by)
+                : undefined,
+            })
+          : await logSurfaceStyleOutcome(supabase as never, {
+              userId,
+              subjectType: String(row.subject_type),
+              subjectId: String(row.subject_id),
+              signal,
+              violatesRules,
+            });
       if (!res.ok) learningFailed += 1;
     }
 
