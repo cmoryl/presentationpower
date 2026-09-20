@@ -28,6 +28,8 @@ import { PrintExportCard, printExportFromTool } from "./PrintExportCard";
 
 import { AgentDocumentUpload, useAgentDocuments } from "@/components/agent/AgentDocumentUpload";
 import { withDocumentContext } from "@/lib/agent/doc-intake";
+import { readStoredDesignDna } from "@/lib/agent/design-dna";
+import { AgentDesignDnaImport } from "@/components/agent/AgentDesignDnaImport";
 
 const TOOL_LABELS: Record<string, string> = {
   list_print_types: "Checking print types",
