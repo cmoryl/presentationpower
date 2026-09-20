@@ -112,6 +112,10 @@ export const Route = createFileRoute("/api/agent-chat")({
         const scope = await fetchAgentScope(supabase as never);
 
         const toolSet: ToolSet = {
+          // Shared grounding first: the deck agent's own MCP search_knowledge
+          // keeps precedence, and it gains the glossary, division facts and
+          // event/venue lookups the other agents have.
+          ...buildSharedKnowledgeToolSet({ supabase: supabase as never }),
           ...buildAgentToolSet(toolContextForToken(token, userId)),
           ...buildOutlineToolSet(),
           ...buildDesignKnowledgeToolSet(),
