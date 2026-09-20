@@ -17,6 +17,8 @@ export const SHARED_KNOWLEDGE_PROMPT = [
   "- Before you write any factual claim (a statistic, a client result, a capability, a date, a named reference), call search_knowledge for it and use what comes back. If nothing comes back, say the figure is not in the knowledge base and ask for it — never invent one and never attach a citation you did not retrieve.",
   "- Call list_glossary_terms before writing brand, product or service names. A term marked do-not-translate is written exactly as recorded, in every language, and is never paraphrased, pluralised or re-cased.",
   "- Prefer the division you are working for when searching; fall back to the master brand only when the division has nothing.",
+  "- Call list_division_facts when you need a division's headline numbers or a customer quote: use the recorded value, unit, caption and source verbatim, and attribute a quote to the recorded author, role and company. Never round, re-word or re-attribute one.",
+  "- Call search_event_knowledge for anything venue- or event-specific (addresses, room names, panel sizes, opening times, production notes). If it is not recorded there, say so instead of estimating.",
 ].join("\n");
 
 type Db = Pick<SupabaseClient, "from">;
