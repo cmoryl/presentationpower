@@ -86,15 +86,34 @@ export const Route = createFileRoute("/api/kit-agent-chat")({
 
         const scope = await fetchAgentScope(supabase as never);
 
+        // Imported visual knowledge map ("design DNA") — same authority as decks.
+        const dna = coerceDesignDna(body.designDna);
+        const dnaTools: ToolSet = dna
+          ? {
+              read_design_dna: tool({
+                description:
+                  "Read the visual knowledge map the user imported for this kit (their own design DNA): palette, typography, geometry, section intent, rules and the raw source.",
+                inputSchema: z.object({}),
+                execute: async () => dna,
+              }),
+            }
+          : {};
+
         const result = streamText({
           model: gateway(MODEL),
-          system: [kitAgentSystemPrompt(surface), SHARED_KNOWLEDGE_PROMPT, scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : ""]
+          system: [
+            kitAgentSystemPrompt(surface),
+            SHARED_KNOWLEDGE_PROMPT,
+            dna ? designDnaPromptBlock(dna) : "",
+            scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : "",
+          ]
             .filter(Boolean)
             .join("\n"),
           messages: await convertToModelMessages(messages),
           tools: {
             ...buildKitAgentToolSet({ supabase, userId, surface, threadId }),
             ...buildSharedKnowledgeToolSet({ supabase }),
+            ...dnaTools,
           },
           stopWhen: stepCountIs(50),
           abortSignal: request.signal,
