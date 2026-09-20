@@ -118,9 +118,14 @@ export function PrintAgentChat({
       if (!value || busy) return;
       if (messages.length === 0) onFirstUserMessage?.(value);
       setInput("");
-      void sendMessage({ text: withDocumentContext(value, docs) });
+      // An imported visual knowledge map travels with every turn.
+      const dna = readStoredDesignDna(threadId);
+      void sendMessage(
+        { text: withDocumentContext(value, docs) },
+        dna ? { body: { designDna: dna } } : undefined,
+      );
     },
-    [busy, docs, messages.length, onFirstUserMessage, sendMessage],
+    [busy, docs, messages.length, onFirstUserMessage, sendMessage, threadId],
   );
 
   const sentPending = useRef(false);
