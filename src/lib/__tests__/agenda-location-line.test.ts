@@ -28,8 +28,8 @@ describe("agenda room line", () => {
   it("defaults to the house pin in the board ink, capitals, bold, right", () => {
     const spec = agendaLocation(board());
     expect(spec.icon.id).toBe("pin");
-    // null = follow the board ink, so the mark never fights a warm ground.
-    expect(spec.iconHex).toBeNull();
+    // House default: the white pin, matching the white location line.
+    expect(spec.iconHex).toBe("#FFFFFF");
     expect(spec.bold).toBe(true);
     expect(spec.align).toBe("right");
     expect(agendaLocationText(board())).toBe("FLEMING 3RD FLOOR");
@@ -99,6 +99,7 @@ describe("agenda room line", () => {
   it("carries a chosen mark colour over the house pin", () => {
     expect(agendaLocation(board({ locationIconInk: "aqua" })).iconHex).toBe("#A1FBF9");
     expect(agendaLocation(board({ locationInk: "yellow" })).ink).toBe("#FFEB66");
-    expect(agendaLocation(board()).ink).toBeNull();
+    // The house default is the white line on the Bloom Corner ground.
+    expect(agendaLocation(board()).ink).toBe("#FFFFFF");
   });
 });

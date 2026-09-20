@@ -1538,8 +1538,10 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
   const programme = agendaProgramme(div.id);
   return {
     divisionId: div.id,
+    // House agenda ground: Bloom Corner on the dark face, so every division
+    // board carries the same gradient and its white lockup.
     face: "dark",
-    styleId: "01-beam-violet-aqua",
+    styleId: "05-bloom-corner",
     sizeId: "a2",
     trimW: 420,
     trimH: 594,
@@ -1554,8 +1556,8 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
     bandLayout: programme.bandLayout ?? "bar",
     locationLine: programme.locationLine ?? "",
     locationIcon: "pin",
-    locationIconInk: "auto",
-    locationInk: "auto",
+    locationIconInk: "white",
+    locationInk: "white",
     locationSize: "standard",
     locationCaps: true,
     locationWeight: "bold",
