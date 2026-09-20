@@ -13,10 +13,13 @@ import {
   SHARED_KNOWLEDGE_PROMPT,
   buildSharedKnowledgeToolSet,
 } from "@/lib/agent/knowledge-tools";
+import { coerceDesignDna, designDnaPromptBlock } from "@/lib/agent/design-dna";
+import { tool, type ToolSet } from "ai";
+import { z } from "zod";
 
 const MODEL = "google/gemini-3.6-flash";
 
-type Body = { messages?: UIMessage[]; threadId?: string };
+type Body = { messages?: UIMessage[]; threadId?: string; designDna?: unknown };
 
 export const Route = createFileRoute("/api/print-agent-chat")({
   server: {
