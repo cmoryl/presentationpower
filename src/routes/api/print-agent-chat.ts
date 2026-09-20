@@ -9,6 +9,10 @@ import { createClient } from "@supabase/supabase-js";
 import { PRINT_AGENT_SYSTEM_PROMPT } from "@/lib/print-agent/prompt";
 import { buildPrintAgentToolSet } from "@/lib/print-agent/tools";
 import { repairDanglingToolParts } from "@/lib/agent/repair-tool-parts";
+import {
+  SHARED_KNOWLEDGE_PROMPT,
+  buildSharedKnowledgeToolSet,
+} from "@/lib/agent/knowledge-tools";
 
 const MODEL = "google/gemini-3.6-flash";
 
@@ -74,12 +78,12 @@ export const Route = createFileRoute("/api/print-agent-chat")({
 
         const result = streamText({
           model: gateway(MODEL),
-          system: [PRINT_AGENT_SYSTEM_PROMPT, scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : ""]
+          system: [PRINT_AGENT_SYSTEM_PROMPT, SHARED_KNOWLEDGE_PROMPT, scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : ""]
             .filter(Boolean)
             .join("\n"),
           messages: await convertToModelMessages(messages),
           tools: buildPrintAgentToolSet({ supabase, userId }),
-          stopWhen: stepCountIs(40),
+          stopWhen: stepCountIs(50),
           abortSignal: request.signal,
           onError: ({ error }) => console.error("print agent stream error:", error),
         });

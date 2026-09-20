@@ -10,6 +10,10 @@ import { kitAgentSystemPrompt } from "@/lib/kit-agent/prompt";
 import { buildKitAgentToolSet } from "@/lib/kit-agent/tools";
 import type { KitSurface } from "@/lib/kit-agent/threads";
 import { repairDanglingToolParts } from "@/lib/agent/repair-tool-parts";
+import {
+  SHARED_KNOWLEDGE_PROMPT,
+  buildSharedKnowledgeToolSet,
+} from "@/lib/agent/knowledge-tools";
 
 const MODEL = "google/gemini-3.6-flash";
 
@@ -76,12 +80,12 @@ export const Route = createFileRoute("/api/kit-agent-chat")({
 
         const result = streamText({
           model: gateway(MODEL),
-          system: [kitAgentSystemPrompt(surface), scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : ""]
+          system: [kitAgentSystemPrompt(surface), SHARED_KNOWLEDGE_PROMPT, scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : ""]
             .filter(Boolean)
             .join("\n"),
           messages: await convertToModelMessages(messages),
           tools: buildKitAgentToolSet({ supabase, userId, surface, threadId }),
-          stopWhen: stepCountIs(40),
+          stopWhen: stepCountIs(50),
           abortSignal: request.signal,
           onError: ({ error }) => console.error("kit agent stream error:", error),
         });
