@@ -28,8 +28,8 @@ describe("agenda room line", () => {
   it("defaults to the house pin in the board ink, capitals, bold, right", () => {
     const spec = agendaLocation(board());
     expect(spec.icon.id).toBe("pin");
-    // null = follow the board ink, so the mark never fights a warm ground.
-    expect(spec.iconHex).toBeNull();
+    // House default: the white pin, matching the white location line.
+    expect(spec.iconHex).toBe("#FFFFFF");
     expect(spec.bold).toBe(true);
     expect(spec.align).toBe("right");
     expect(agendaLocationText(board())).toBe("FLEMING 3RD FLOOR");
