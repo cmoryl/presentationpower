@@ -224,8 +224,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
 
     type Variant = { use?: string; marks: SpaceUseMark[] };
     const variants: Variant[] = [];
-    if (fullUse && allMarks.length) variants.push({ use: fullUse, marks: allMarks });
-    if (fullUse && allMarks.length) variants.push({ use: shortUse(fullUse), marks: allMarks });
+    if (markedUse && allMarks.length) variants.push({ use: markedUse, marks: allMarks });
     if (fullUse) variants.push({ use: fullUse, marks: [] });
     if (fullUse) variants.push({ use: shortUse(fullUse), marks: [] });
     if (allMarks.length) variants.push({ use: undefined, marks: allMarks });
