@@ -1131,6 +1131,33 @@ export function agendaParallelRoom(par: Pick<AgendaParallel, "room"> | null | un
 }
 
 /**
+ * Honest placeholder for a session that runs at the same time as its
+ * neighbours but whose room has not been recorded yet. A reader must be able to
+ * tell the cards are different rooms, so a slot never prints a nameless card:
+ * it says the room is still to be confirmed rather than inventing one.
+ */
+export const AGENDA_ROOM_TBC = "ROOM TO BE CONFIRMED";
+
+/**
+ * Room line as it prints on a card inside a simultaneous slot. `inSlot` is
+ * false for an ordinary single-track row, which publishes without a room.
+ */
+export function agendaParallelRoomLine(
+  par: Pick<AgendaParallel, "room"> | null | undefined,
+  inSlot = true,
+): string {
+  return agendaParallelRoom(par) || (inSlot ? AGENDA_ROOM_TBC : "");
+}
+
+/** Room line for the main band of a row, with the same slot rule. */
+export function agendaSessionRoomLine(
+  session: Pick<AgendaSession, "room"> | null | undefined,
+  inSlot: boolean,
+): string {
+  return agendaSessionRoom(session) || (inSlot ? AGENDA_ROOM_TBC : "");
+}
+
+/**
  * Start / end of a time label, in minutes from midnight. Handles "3:00-3:50 PM",
  * "11:30 AM-1:30 PM", "4:15 PM" and 24h "14:00-15:00". Free text returns null,
  * so a label the board cannot read is never treated as an overlap.
