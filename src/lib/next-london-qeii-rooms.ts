@@ -9,7 +9,8 @@
 // Colours come from the approved palette only. Backgrounds stay solid brand
 // tokens — no artwork is used as a ground.
 
-import type { QeiiFloorVector, QeiiShape } from "@/lib/next-london-qeii-vectors";
+import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
+import { qeiiShapeHolds } from "@/lib/next-london-qeii-geometry";
 import { qeiiLabelGroups } from "@/lib/next-london-qeii-layout";
 import { spaceUsesForRoom } from "@/lib/next-london-space-use";
 
