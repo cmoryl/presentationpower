@@ -120,6 +120,13 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
   const writeEdits = useServerFn(saveVenueMapEdits);
   const clearEdits = useServerFn(resetVenueMapEdits);
 
+  // Arriving from the room schedule: open that floor and ring that room.
+  useEffect(() => {
+    if (initialSheetId && LONDON_VENUE_SHEETS.some((s) => s.id === initialSheetId))
+      setSheetId(initialSheetId);
+    if (initialRoom) setHighlightRoom(initialRoom);
+  }, [initialSheetId, initialRoom]);
+
   // The crew set a plan up once and come back to it, so the view settings and
   // room colours are kept in this browser rather than reset on every visit.
   useEffect(() => {
