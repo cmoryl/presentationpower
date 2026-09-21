@@ -992,7 +992,13 @@ export type AgendaParallel = {
   speaker?: string;
   /** Free notes / room line. */
   detail: string;
+  /**
+   * Room / floor this simultaneous session runs in, printed in small caps on
+   * the card. Empty on older saved boards, which render exactly as before.
+   */
+  room?: string;
 };
+
 
 export type AgendaSession = {
   time: string;
