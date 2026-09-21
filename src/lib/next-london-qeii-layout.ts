@@ -253,19 +253,21 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     const steps = [1, 0.92, 0.84, 0.76, 0.68, 0.6, 0.52];
     let chosen: Fit | undefined;
     let insideHolder = true;
+    // Content first, size second: a full block is set smaller before any line
+    // comes off it, and only then does the event line or the lockup give way.
     for (const useHolder of [true, false]) {
-      for (const step of steps) {
-        const size = Math.max(minSize, baseSize * step);
-        for (const variant of variants) {
+      for (const variant of variants) {
+        for (const step of steps) {
+          const size = Math.max(minSize, baseSize * step);
           const fit = measure(variant, size);
           if (clearOf(fit, useHolder)) {
             chosen = fit;
             insideHolder = useHolder;
             break;
           }
+          if (baseSize * step <= minSize) break;
         }
         if (chosen) break;
-        if (baseSize * step <= minSize) break;
       }
       if (chosen) break;
     }

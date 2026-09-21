@@ -14,28 +14,29 @@ export type QeiiRect = { x0: number; y0: number; x1: number; y1: number };
 export function qeiiRings(d: string): QeiiRing[] {
   const out: QeiiRing[] = [];
   let pts: [number, number][] = [];
-  const tokens = d.match(/[MLZ]|-?\d+(?:\.\d+)?/g) ?? [];
+  // Curves are read as their control points: close enough for a bounding box and
+  // for asking whether a label sits inside a drawn shape, and it means the round
+  // marker dots and symbol glyphs are seen rather than skipped.
+  const tokens = d.match(/[MLCQSTAZmlcqstaz]|-?\d+(?:\.\d+)?/g) ?? [];
   let i = 0;
   while (i < tokens.length) {
     const t = tokens[i]!;
-    if (t === "M" || t === "L") {
-      const x = Number(tokens[i + 1]);
-      const y = Number(tokens[i + 2]);
-      if (t === "M" && pts.length > 2) {
+    if (/^[A-Za-z]$/.test(t)) {
+      if ((t === "M" || t === "m") && pts.length > 2) {
         out.push({ pts });
         pts = [];
       }
-      if (Number.isFinite(x) && Number.isFinite(y)) pts.push([x, y]);
-      i += 3;
-      continue;
-    }
-    if (t === "Z") {
-      if (pts.length > 2) out.push({ pts });
-      pts = [];
+      if (t === "Z" || t === "z") {
+        if (pts.length > 2) out.push({ pts });
+        pts = [];
+      }
       i += 1;
       continue;
     }
-    i += 1;
+    const x = Number(tokens[i]);
+    const y = Number(tokens[i + 1]);
+    if (Number.isFinite(x) && Number.isFinite(y)) pts.push([x, y]);
+    i += 2;
   }
   if (pts.length > 2) out.push({ pts });
   return out;
