@@ -48,6 +48,7 @@ import { brandSwatchSpec, brandSwatchSpecText } from "@/lib/brand-swatch-spec";
 import { applyBrandGuidePatch } from "@/lib/brand-guide-edits";
 import { getBrandGuideEdit } from "@/lib/brand-guide-edits.functions";
 import { GuideUsagePanel } from "@/components/brand/GuideUsagePanel";
+import { GlobalLinkUniverse } from "@/components/brand/GlobalLinkUniverse";
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
   loader: async ({ params }) => {
