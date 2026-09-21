@@ -93,6 +93,7 @@ const CHECK_LABEL: Record<BrandHealthCheck, string> = {
   ink: "Text ink from the approved set",
   typeface: "Approved typeface",
   "type-scale": "Recorded type scale",
+  ...LOGO_MATRIX_CHECK_LABEL,
 };
 
 export function brandHealthCheckLabel(check: BrandHealthCheck): string {
@@ -168,8 +169,10 @@ function truncate(text: string, max = 72): string {
 export function scoreBrandHealth(
   samples: BrandHealthSample[],
   guide: BrandGuide = MASTER_TRANSPERFECT_GUIDE,
+  /** Measured brand lockups on the same surfaces, for the placement matrix. */
+  logos: LogoPlacementInput[] = [],
 ): BrandHealthReport {
-  const findings: BrandHealthFinding[] = [];
+  const findings: BrandHealthFinding[] = [...validateLogoPlacements(logos)];
   const ink = approvedInk(guide);
   const accents = accentSwatches(guide);
   const accentByHex = new Map(accents.map((c) => [hex(c.hex), c] as const));
