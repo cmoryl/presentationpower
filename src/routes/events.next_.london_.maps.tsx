@@ -126,6 +126,7 @@ export const Route = createFileRoute("/events/next_/london_/maps")({
 });
 
 function LondonMapsPage() {
+  const search = Route.useSearch();
   const userId = useSessionUser();
   const fetchRevisions = useServerFn(listLondonRevisions);
   const [panels, setPanels] = useState<LondonPanel[]>(LONDON_PANELS);
