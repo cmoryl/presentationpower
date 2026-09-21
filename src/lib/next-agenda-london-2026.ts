@@ -1,3 +1,4 @@
+import { INNOVATION_LOUNGE_PROGRAMME } from "./next-innovation-lounge";
 import type { AgendaBandLayoutId, AgendaBandTreatmentId, AgendaFooterFillId, AgendaFooterHeightId, AgendaFooterStyleId, AgendaRowStyleId, AgendaSession } from "./next-agenda";
 
 /**
@@ -488,4 +489,7 @@ export const LONDON_2026_PROGRAMMES: Record<string, LondonAgendaProgramme> = {
       { label: "", meta: "FRIDAY, SEPTEMBER 25, 2026", sessions: MEDIA_DAY_TWO },
     ],
   },
+  // The Innovation Lounge is a stage area rather than a division; its record
+  // lives beside the product write-ups it is issued with.
+  "innovation-lounge": INNOVATION_LOUNGE_PROGRAMME,
 };

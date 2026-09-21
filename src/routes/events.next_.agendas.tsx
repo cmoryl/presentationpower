@@ -5,6 +5,8 @@ import { z } from "zod";
 
 import { AppShell } from "@/components/AppShell";
 import { AgendaHouseTimesPanel } from "@/components/next/AgendaHouseTimesPanel";
+import { InnovationLoungeInfo } from "@/components/next/InnovationLoungeInfo";
+
 import { AgendaStudio } from "@/components/next/AgendaStudio";
 
 import { useSavedAgendaFiles } from "@/hooks/use-next-live-masters";
@@ -79,6 +81,8 @@ function AgendaPage() {
           heading={`${resolved.name} — agenda`}
           intro="The approved NEXT agenda master, live for this division area. Edit the programme rows, choose the board format and face, add a scannable QR code, save the live file and export layered vector artwork for print and Illustrator."
         />
+        {resolved.id === "innovation-lounge" ? <InnovationLoungeInfo /> : null}
+
       </div>
     </AppShell>
   );
