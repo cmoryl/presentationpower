@@ -347,7 +347,33 @@ function BrandGuideView() {
             </div>
           </div>
         </div>
+
+        {guide.typeScaleNotes && (
+          <p className="mt-6 max-w-[80ch] text-sm leading-[1.55] text-foreground/75">
+            {guide.typeScaleNotes}
+          </p>
+        )}
       </Section>
+
+      {/* Colour accessibility — recorded rules for text on brand colour */}
+      {guide.colorAccessibility && (
+        <Section title="Colour and legibility" eyebrow="03b">
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="text-sm font-semibold">{guide.colorAccessibility.headline}</div>
+            <ul className="mt-3 space-y-2 text-sm text-foreground/85">
+              {guide.colorAccessibility.notes.map((n) => (
+                <li key={n} className="flex gap-2">
+                  <span
+                    className="mt-2 h-1 w-1 shrink-0 rounded-full"
+                    style={{ background: hero }}
+                  />
+                  <span>{n}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Section>
+      )}
 
       {/* Photography + Visuals */}
       {(guide.photography || guide.brandVisuals) && (
@@ -369,6 +395,34 @@ function BrandGuideView() {
               </div>
             )}
           </div>
+
+          {guide.photographyRules && (
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              {(
+                [
+                  ["Do", guide.photographyRules.do],
+                  ["Don't", guide.photographyRules.dont],
+                ] as const
+              ).map(([label, items]) => (
+                <div key={label} className="rounded-2xl border border-border bg-card p-6">
+                  <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                    {label}
+                  </div>
+                  <ul className="mt-3 space-y-2 text-sm text-foreground/85">
+                    {items.map((r) => (
+                      <li key={r} className="flex gap-2">
+                        <span
+                          className="mt-2 h-1 w-1 shrink-0 rounded-full"
+                          style={{ background: label === "Do" ? hero : "#E53D2E" }}
+                        />
+                        <span>{r}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
         </Section>
       )}
 
@@ -562,7 +616,7 @@ function BrandGuideView() {
 
       {/* The recorded product ecosystem — GlobalLink only. */}
       {guide.slug === "globallink" && (
-        <Section title="Product ecosystem" eyebrow="09">
+        <Section title="Product ecosystem" eyebrow="08b">
           <GlobalLinkUniverse />
         </Section>
       )}

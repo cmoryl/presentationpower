@@ -57,13 +57,52 @@ export type BrandGuide = {
   bodyScale: TypeStyle[];
   subBrands?: { group: string; items: string[] }[];
   photography?: string;
+  /** Photography direction as recorded in the brand kit: what to shoot, what to avoid. */
+  photographyRules?: { do: string[]; dont: string[] };
   brandVisuals?: string;
+  /** Recorded colour-accessibility rules: which pairings are safe for text. */
+  colorAccessibility?: { headline: string; notes: string[] };
+  /** How the shared type scale is applied in this division. */
+  typeScaleNotes?: string;
   /** Approved motion assets — ids from `brand-videos.ts` plus usage notes. */
   motion?: { headline: string; body: string; videoIds: string[] };
   iconography?: { headline: string; body: string; sourceUrl?: string };
   socialMedia?: { platform: string; rules: string[] }[];
   sourceUrl?: string;
 };
+
+// ─── Shared BrandHub direction ───────────────────────────────────────────
+// Photography, colour-accessibility and type-scale direction recorded in the
+// master brand kit. Divisions inherit these unless they record their own.
+
+const MASTER_PHOTOGRAPHY_RULES: NonNullable<BrandGuide["photographyRules"]> = {
+  do: [
+    "Shoot real people at work — collaboration, conversation, hands on screens.",
+    "Keep lighting soft and directional; shallow depth of field on the subject.",
+    "Leave open space on one side so a headline or lockup can sit clear of faces.",
+    "Blend imagery into brand colour with the soft-transition gradient wash.",
+  ],
+  dont: [
+    "No stock cliches — handshakes, globes, floating binary, staged boardrooms.",
+    "Never recolour skin tones or push saturation to match an accent.",
+    "Never set body copy straight onto a busy area of a photo; use a scrim.",
+    "Never place the logo over a complex part of the image.",
+  ],
+};
+
+const MASTER_COLOR_ACCESSIBILITY: NonNullable<BrandGuide["colorAccessibility"]> = {
+  headline: "Accent colours are for fills, never for text",
+  notes: [
+    "Body and heading text is Blue 800 #03002C on light, or white on Blue 500 #003FC7 and darker.",
+    "Aqua #A1FBF9, Lavender #C2A3FF and every tertiary pop fail WCAG AA as text on white — use them as fills, rules, bars and icon shapes only.",
+    "White on Blue 500 #003FC7 clears AA at all sizes; white on Blue 800 #03002C clears AAA.",
+    "Dark Gray #666 is the lightest grey allowed for small text on white; never use it on a tinted surface.",
+    "Colour is never the only signal — pair status colour with a label, icon or position.",
+  ],
+};
+
+const MASTER_TYPE_SCALE_NOTES =
+  "One Geist Sans scale across every surface. Headings run tight (-4 to 0 tracking, 100-120% leading) and drop weight as they shrink; body copy always keeps 140% leading for readability at length. Verdana is the fallback on web and in email where Geist cannot load. Never introduce a second display face, and never set a heading below 18px — use body styles instead.";
 
 // ─── Master TransPerfect Brand Guide (unified — v26.06 / v3.0) ───────────
 // Consolidates the BrandHub Canva source (v26.06) and the v3.0 digital
@@ -326,6 +365,9 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
   ],
   photography:
     "Photography captures the human side of transformation — professional, collaborative settings with soft lighting and shallow depth of field. Use a soft-transition treatment (blurred gradient wash) to blend imagery with brand color.",
+  photographyRules: MASTER_PHOTOGRAPHY_RULES,
+  colorAccessibility: MASTER_COLOR_ACCESSIBILITY,
+  typeScaleNotes: MASTER_TYPE_SCALE_NOTES,
   brandVisuals:
     "Brand visuals translate transformation into abstract form — glowing spheres, vertical light gradients, ambient blue/purple washes. Use as hero compositions, section dividers or subtle ambient gradients.",
   iconography: {
@@ -361,6 +403,7 @@ export const TRANSPERFECT_SUBCOMPANIES: string[] = Array.from(
   new Set((MASTER_TRANSPERFECT_GUIDE.subBrands ?? []).flatMap((g) => g.items)),
 ).sort((a, b) => a.localeCompare(b));
 
+
 // ─── Division-scoped guides ──────────────────────────────────────────────
 // Each division extends the master system: same type ramp, same logo rules,
 // but a bespoke intro, accent tint, sub-brand slice, and photography /
@@ -378,7 +421,12 @@ type DivisionSeed = {
   pops: ColorSwatch[];
   subBrandGroup: { group: string; items: string[] };
   photography: string;
+  photographyRules?: BrandGuide["photographyRules"];
   brandVisuals: string;
+  colorAccessibility?: BrandGuide["colorAccessibility"];
+  typeScaleNotes?: string;
+  /** Division-specific core values; falls back to the master framework. */
+  values?: BrandGuide["values"];
   motion?: BrandGuide["motion"];
   sourceUrl?: string;
 };
@@ -403,6 +451,36 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     },
     photography:
       "Product-first imagery: UI captures, connector diagrams, and calm office scenes where technology is present but not the hero. Prefer light surfaces with Aqua and Lavender ambient washes.",
+    photographyRules: {
+      do: [
+        "Lead with the product: real UI, real connector maps, real dashboards.",
+        "Show people alongside the screen, never instead of it.",
+        "Keep surfaces light and uncluttered so diagram lines stay readable.",
+      ],
+      dont: [
+        "No abstract AI stock — glowing brains, robot hands, floating code.",
+        "Never mock up UI with off-brand colour; screens use the product palette.",
+        "Never crop a product screen so tightly that it stops being legible.",
+      ],
+    },
+    colorAccessibility: {
+      headline: "Diagrams carry the accents; text stays Blue 800 or white",
+      notes: [
+        "Aqua #A1FBF9 and Lavender #C2A3FF are node fills, edge highlights and surface tints — never label text.",
+        "Node labels are Blue 800 #03002C on a light node, white on Blue 500 #003FC7 or darker.",
+        "Connector lines need a 3:1 contrast against their background to read at print size.",
+        "Product-status colour always carries a word as well as the colour.",
+      ],
+    },
+    typeScaleNotes:
+      "Product-first application of the shared scale: Heading L and M do most of the work, Heading XXL is reserved for covers. UI captions sit at Body S and never below 14px. Numerals in stat blocks keep tabular spacing so columns align.",
+    values: [
+      { label: "Connected", description: "Every product talks to the platform — no dead ends." },
+      { label: "Continuous", description: "Localization runs with the release, not after it." },
+      { label: "Measurable", description: "Quality, cost and turnaround are visible, not claimed." },
+      { label: "Open", description: "Connectors and APIs meet customers in their own stack." },
+      { label: "Human-checked", description: "Automation accelerates people; it never replaces review." },
+    ],
     brandVisuals:
       "Isometric flows, node-and-edge graphs, ambient Aqua→Lavender gradients. Avoid heavy people-first hero shots — GlobalLink is a platform brand.",
   },
@@ -430,6 +508,36 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     },
     photography:
       "Clinical settings, patient-facing hands and screens, lab environments — always human-first, never sterile stock. Use soft-transition washes over imagery to keep tone warm.",
+    photographyRules: {
+      do: [
+        "Real clinical settings: coordinators, monitors, sites, patient-facing screens.",
+        "Human-first framing — a person in the frame, warmly lit, never anonymous.",
+        "Keep consent and privacy in mind: no identifiable patient records on screen.",
+      ],
+      dont: [
+        "No sterile empty labs or gloved hands holding a vial as the only subject.",
+        "Never imply a clinical outcome the copy cannot support.",
+        "Never use Green as a badge that reads as regulatory approval.",
+      ],
+    },
+    colorAccessibility: {
+      headline: "Regulated copy stays high contrast",
+      notes: [
+        "Submission, safety and consent copy is Blue 800 #03002C on white or white on Blue 800 — no tinted grounds behind it.",
+        "Green #A6FA87 marks accuracy and completion as a fill only; it never sets text and never stands alone as a compliance signal.",
+        "Small print — footnotes, references, regulatory lines — holds at least 4.5:1 and never sits at Dark Gray on a tint.",
+        "Print body text is 100K black, never a four-colour build.",
+      ],
+    },
+    typeScaleNotes:
+      "Evidence-led restraint: Heading L for section openers, Body M for running copy at 140% leading, and long reference lists set at Body S with generous leading. Never compress leading to win space on a regulated document — add a page.",
+    values: [
+      { label: "Accuracy first", description: "A number is checked to source before it ships." },
+      { label: "Traceable", description: "Every claim, translation and approval can be evidenced." },
+      { label: "Patient-centred", description: "Plain language wherever a patient will read it." },
+      { label: "Compliant by default", description: "The regulated path is the easy path." },
+      { label: "Measured tone", description: "Confident, never promotional, about clinical outcomes." },
+    ],
     brandVisuals:
       "Calm gradients, subtle grid infographics, timeline visuals for submission journeys. Green appears sparingly as a signal of accuracy or approval.",
   },
@@ -558,6 +666,36 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     },
     photography:
       "Contributor networks, annotators at work, capture rigs, model dashboards. Prefer authentic scenes over stylized AI stock.",
+    photographyRules: {
+      do: [
+        "Show the contributor network: annotators, recording rigs, field collection.",
+        "Real workspaces and real devices — the work is human, so show humans.",
+        "Keep dashboards legible; crop to one readable metric rather than many.",
+      ],
+      dont: [
+        "No synthetic AI imagery — neural swirls, android faces, glowing grids.",
+        "Never show real contributor faces or data without recorded consent.",
+        "Never invent a chart shape that no dataset behind it supports.",
+      ],
+    },
+    colorAccessibility: {
+      headline: "Dense data needs contrast, not more colour",
+      notes: [
+        "Numerals and axis labels are Blue 800 #03002C on light, white on Blue 800 — never an accent.",
+        "Green #A6FA87 and Aqua #A1FBF9 fill bars, cells and callout frames; each series also carries a label.",
+        "Adjacent series keep a 3:1 contrast against each other so the chart reads in greyscale print.",
+        "Never rely on red/green alone for pass and fail — add the word.",
+      ],
+    },
+    typeScaleNotes:
+      "The most numeric of the divisions: stat figures run at Heading XL or XXL with tabular numerals, units at Body S beneath, and table text no smaller than 12px in print. Keep one figure per cell so the scale can stay large.",
+    values: [
+      { label: "Human in the loop", description: "People judge quality; tooling only speeds them up." },
+      { label: "Consent and care", description: "Contributors are informed, paid fairly and credited." },
+      { label: "Measured quality", description: "Every dataset ships with its own accuracy record." },
+      { label: "Representative data", description: "Coverage across language, accent, region and context." },
+      { label: "Reproducible", description: "Method documented so a result can be repeated." },
+    ],
     brandVisuals:
       "Stat grids, distribution charts, dense number blocks. Green signals accuracy; Aqua and Lavender frame model callouts.",
     motion: {
@@ -633,7 +771,7 @@ function buildDivisionGuide(seed: DivisionSeed): BrandGuide {
     updatedAt: MASTER_TRANSPERFECT_GUIDE.updatedAt,
     tagline: seed.tagline,
     intro: seed.intro,
-    values: MASTER_TRANSPERFECT_GUIDE.values,
+    values: seed.values ?? MASTER_TRANSPERFECT_GUIDE.values,
     logoNotes: {
       headline: `${seed.title} lockup follows the master rules`,
       body: `${seed.title} uses the TransPerfect wordmark with a division line beneath it. All master logo rules apply — clear space, color use, no distortion. The division line is always secondary in weight to the wordmark.`,
@@ -658,7 +796,10 @@ function buildDivisionGuide(seed: DivisionSeed): BrandGuide {
     bodyScale: MASTER_TRANSPERFECT_GUIDE.bodyScale,
     subBrands: [seed.subBrandGroup],
     photography: seed.photography,
+    photographyRules: seed.photographyRules ?? MASTER_PHOTOGRAPHY_RULES,
     brandVisuals: seed.brandVisuals,
+    colorAccessibility: seed.colorAccessibility ?? MASTER_COLOR_ACCESSIBILITY,
+    typeScaleNotes: seed.typeScaleNotes ?? MASTER_TYPE_SCALE_NOTES,
     motion: seed.motion,
     iconography: MASTER_TRANSPERFECT_GUIDE.iconography,
     socialMedia: MASTER_TRANSPERFECT_GUIDE.socialMedia,
