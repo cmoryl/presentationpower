@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   QEII_ROOM_PALETTE,
+  qeiiColourByDivision,
   qeiiColourByFunction,
   qeiiColourKey,
   qeiiColourPaint,
@@ -11,6 +12,7 @@ import {
 } from "@/lib/next-london-qeii-rooms";
 import { qeiiPlanSvg } from "@/lib/next-london-qeii-plan";
 import { qeiiFloorVector } from "@/lib/next-london-qeii-vectors";
+import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
 
 describe("QEII room colours", () => {
   it("finds the drawn shape each room name sits inside", () => {
@@ -54,5 +56,18 @@ describe("QEII room colours", () => {
     });
     expect(svg).toContain("#FFEB66");
     expect(svg).toContain("Games track");
+  });
+});
+
+describe("division accent colouring", () => {
+  it("fills each division's rooms with that division's approved accent", () => {
+    const floor = qeiiFloorVector("fourth")!;
+    const colours = qeiiColourByDivision(floor);
+    const westminster = Object.entries(colours).find(([room]) => room.includes("Westminster"));
+    expect(westminster).toBeTruthy();
+    const games = NEXT_DIVISIONS.find((d) => d.id === "games")!.accent;
+    expect(westminster![1]).toBe(games);
+    // A house space with no division recorded is never given a colour.
+    expect(colours["Courtyard"]).toBeUndefined();
   });
 });

@@ -11,7 +11,11 @@ import { Download, FileDown, Maximize2, Search, X } from "lucide-react";
 import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { QeiiRoomColourPanel } from "@/components/events/QeiiRoomColourPanel";
-import { qeiiSharedShapeNotes, type QeiiRoomColours } from "@/lib/next-london-qeii-rooms";
+import {
+  qeiiColourByDivision,
+  qeiiSharedShapeNotes,
+  type QeiiRoomColours,
+} from "@/lib/next-london-qeii-rooms";
 import { spaceUseLine, spaceUseMarks, spaceUsesOnFloor } from "@/lib/next-london-space-use";
 
 import {
@@ -319,6 +323,10 @@ export function LondonVenueSheets() {
           onColours={(next) => setRoomColourMap({ ...roomColourMap, [sheet.id]: next })}
           keyLabels={keyLabels}
           onKeyLabels={(next) => setKeyLabelMap({ ...keyLabelMap, [sheet.id]: next })}
+          onColourByDivision={() => {
+            setRoomColourMap({ ...roomColourMap, [sheet.id]: qeiiColourByDivision(plan.floor) });
+            setMarkVariant("white");
+          }}
         />
       ) : null}
 

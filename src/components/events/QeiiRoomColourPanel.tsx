@@ -11,6 +11,8 @@ import {
   QEII_ROOM_PALETTE,
   qeiiColourByFunction,
   qeiiColourKey,
+  qeiiRoomDivisionAccent,
+  qeiiRoomDivisionName,
   qeiiRoomFunction,
   qeiiRoomIsExclusive,
   qeiiRoomShapes,
@@ -24,6 +26,8 @@ export type QeiiRoomColourPanelProps = {
   onColours: (next: QeiiRoomColours) => void;
   keyLabels: Record<string, string>;
   onKeyLabels: (next: Record<string, string>) => void;
+  /** Fill every room with its division's accent and switch the lockups to all white. */
+  onColourByDivision?: () => void;
 };
 
 export function QeiiRoomColourPanel({
@@ -32,6 +36,7 @@ export function QeiiRoomColourPanel({
   onColours,
   keyLabels,
   onKeyLabels,
+  onColourByDivision,
 }: QeiiRoomColourPanelProps) {
   const rooms = useMemo(() => qeiiRoomShapes(floor), [floor]);
   const keyRows = useMemo(() => qeiiColourKey(floor, colours, keyLabels), [floor, colours, keyLabels]);
@@ -56,6 +61,15 @@ export function QeiiRoomColourPanel({
             >
               <Wand2 className="h-3.5 w-3.5" /> Colour by function
             </button>
+            {onColourByDivision ? (
+              <button
+                type="button"
+                onClick={onColourByDivision}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/20 px-3 py-1.5 text-[12px] font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
+              >
+                <Wand2 className="h-3.5 w-3.5" /> Colour by division accent
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={() => {
@@ -73,6 +87,8 @@ export function QeiiRoomColourPanel({
           {rooms.map((entry) => {
             const fn = qeiiRoomFunction(entry.room, floor.id);
             const chosen = colours[entry.room];
+            const accent = qeiiRoomDivisionAccent(entry.room, floor.id);
+            const division = qeiiRoomDivisionName(entry.room, floor.id);
             return (
               <li key={`${entry.room}-${entry.shapeIndex}`} className="flex flex-wrap items-center gap-2 py-2">
                 <span className="min-w-[9rem] text-[12.5px] font-semibold text-[#03002C]">
@@ -82,6 +98,20 @@ export function QeiiRoomColourPanel({
                   {fn ?? (qeiiRoomIsExclusive(entry) ? "—" : "colours as a name tag")}
                 </span>
                 <span className="flex flex-wrap items-center gap-1">
+                  {accent ? (
+                    <button
+                      type="button"
+                      aria-label={`${entry.room} in the ${division ?? "division"} accent`}
+                      aria-pressed={chosen === accent}
+                      onClick={() => set(entry.room, accent)}
+                      style={{ backgroundColor: accent }}
+                      className={`mr-1 h-5 w-5 rounded-full border ${
+                        chosen === accent
+                          ? "border-[#03002C] ring-2 ring-[#003FC7]/40"
+                          : "border-black/15"
+                      }`}
+                    />
+                  ) : null}
                   {QEII_ROOM_PALETTE.map((swatch) => (
                     <button
                       key={swatch.id}

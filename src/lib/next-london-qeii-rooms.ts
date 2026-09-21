@@ -12,7 +12,8 @@
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 import { qeiiShapeHolds } from "@/lib/next-london-qeii-geometry";
 import { qeiiLabelGroups } from "@/lib/next-london-qeii-layout";
-import { spaceUsesForRoom } from "@/lib/next-london-space-use";
+import { spaceUseMarks, spaceUsesForRoom } from "@/lib/next-london-space-use";
+import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
 
 /** Approved colours a room may be filled with. */
 export const QEII_ROOM_PALETTE = [
@@ -173,6 +174,34 @@ export function qeiiColourByFunction(floor: QeiiFloorVector): QeiiRoomColours {
   return out;
 }
 
+/**
+ * Colour every room by the accent of the NEXT division whose area holds it.
+ *
+ * Event signage is the one place a division accent is used as a ground, and the
+ * accents come from the approved NEXT division brand records — nothing is mixed
+ * or recoloured here. A house space with no division recorded is left unfilled.
+ */
+export function qeiiColourByDivision(floor: QeiiFloorVector): QeiiRoomColours {
+  const out: QeiiRoomColours = {};
+  for (const entry of qeiiRoomShapes(floor)) {
+    const id = spaceUseMarks(entry.room, floor.id)[0]?.divisionId;
+    const accent = id ? NEXT_DIVISIONS.find((d) => d.id === id)?.accent : undefined;
+    if (accent) out[entry.room] = accent;
+  }
+  return out;
+}
+
+/** The division whose accent fills a room, for the colour key. */
+export function qeiiRoomDivisionName(room: string, sheetId: string): string | undefined {
+  return spaceUseMarks(room, sheetId)[0]?.name;
+}
+
+/** The approved accent of the division holding this room, when one is recorded. */
+export function qeiiRoomDivisionAccent(room: string, sheetId: string): string | undefined {
+  const id = spaceUseMarks(room, sheetId)[0]?.divisionId;
+  return id ? NEXT_DIVISIONS.find((d) => d.id === id)?.accent : undefined;
+}
+
 export type QeiiKeyEntry = { hex: string; label: string; rooms: string[] };
 
 /**
@@ -196,9 +225,11 @@ export function qeiiColourKey(
     .map(([hex, list]) => {
       const fns = new Set(list.map((r) => qeiiRoomFunction(r, floor.id) ?? ""));
       const only = fns.size === 1 ? [...fns][0] : "";
+      const divs = new Set(list.map((r) => qeiiRoomDivisionName(r, floor.id) ?? ""));
+      const oneDiv = divs.size === 1 ? [...divs][0] : "";
       return {
         hex,
-        label: labels[hex]?.trim() || only || list.slice().sort().join(", "),
+        label: labels[hex]?.trim() || oneDiv || only || list.slice().sort().join(", "),
         rooms: list.slice().sort(),
       };
     });
