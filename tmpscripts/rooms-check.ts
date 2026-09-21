@@ -6,6 +6,6 @@ import { writeFileSync } from "node:fs";
 const p = LONDON_2026_PROGRAMMES["legal"]!;
 const cfg = normalizeAgendaConfig({ ...agendaDefault("legal"), ...p, sizeId: "a4" } as never);
 const out = await buildAgendaVectorPdf(cfg, { guides: false } as never);
-const buf = Buffer.from(await (out.blob ?? out).arrayBuffer());
+const buf = Buffer.from(out.bytes ?? out.data ?? out);
 writeFileSync("/tmp/a4pdf/legal.pdf", buf);
-console.log("bytes", buf.length);
+console.log("bytes", buf.length, Object.keys(out));
