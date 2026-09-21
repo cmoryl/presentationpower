@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
+import { useSessionEmail } from "@/hooks/use-session-email";
+import { liveProjectsFor } from "@/lib/live-projects";
 import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
 import {
   PERSONAS,
