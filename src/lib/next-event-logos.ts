@@ -19,6 +19,9 @@ export type NextLockupSuite = {
   /** Stacked mark for square and portrait frames. */
   stacked: NextLogoEntry;
   stackedWhite: NextLogoEntry;
+  /** Stacked reverse — white wordmark with the division accent kept live. */
+  stackedReverse: NextLogoEntry;
+
   /** Every approved lockup in the track, for the identity showcase. */
   showcase: { id: string; label: string; note: string; color: string; white: string }[];
 };
