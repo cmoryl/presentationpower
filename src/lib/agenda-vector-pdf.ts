@@ -1192,7 +1192,9 @@ export async function buildAgendaVectorPdf(
           y: py(blocks.footY) - size,
           size,
           font: bold,
-          color: hexRgb(ink),
+          // Printed straight on the ground, so it uses the chrome ink (white on
+          // the dark boards) like every other footer line.
+          color: hexRgb(chromeInk),
           opacity: 0.72,
           spacing,
         });
