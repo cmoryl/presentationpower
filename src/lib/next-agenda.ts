@@ -1499,8 +1499,19 @@ type DivisionProgramme = {
 
 const DIVISION_PROGRAMMES: Record<string, DivisionProgramme> = {
   "city-series": {
-    title: "DAY ONE",
-    meta: "City Series · 2026 season",
+    // Same standard layout block as the twelve division boards: no display
+    // title, the date on the meta line, lavender session cards and the
+    // footer URL / dates pair. The venue room line is left blank because the
+    // season board is not tied to one venue — it is typed in per city.
+    title: "",
+    meta: "CITY SERIES · 2026 SEASON",
+    rowStyle: "card",
+    bandTreatment: "lavender",
+    eyebrow: "",
+    locationLine: "",
+    footnote: "",
+    footerLeft: "WWW.TRANSPERFECTNEXT.COM/CITY-SERIES",
+    footerRight: "2026 SEASON",
     sessions: [
       {
         time: "08:30",
