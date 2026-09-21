@@ -36,6 +36,7 @@ import {
   agendaQrTransparent,
   agendaRowStyle,
   agendaSessionMark,
+  agendaParallelRoom,
   agendaSessionRoom,
 
   agendaSlug,
