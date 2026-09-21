@@ -154,6 +154,17 @@ export function AssetPreviewCard({
                 : [];
             }}
           />
+          <PrintProofMenu
+            label="Print proof"
+            context={{ Document: formatLabel, Division: rendererProps.brandId, Mode: mode }}
+            resolveTarget={() => {
+              const node =
+                cardRef.current?.querySelector<HTMLElement>("[data-kit-asset-frame]") ?? null;
+              return node
+                ? { node, width: formatWidth, height: formatHeight, label: formatLabel }
+                : null;
+            }}
+          />
           {editable ? (
             <SocialAssetEditorButton
               rendererProps={rendererProps}
