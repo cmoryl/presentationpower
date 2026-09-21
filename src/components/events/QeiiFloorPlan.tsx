@@ -9,6 +9,7 @@ import {
   qeiiLabelInk,
   qeiiLabelSize,
   qeiiLabelTransform,
+  qeiiLabelUse,
   qeiiPlanInk,
   type QeiiPlanFace,
 } from "@/lib/next-london-qeii-plan";
