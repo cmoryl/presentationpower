@@ -204,6 +204,17 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     const room = lines.join(" ").replace(/-\s/g, "-");
     const fullUse = options.showUse ? spaceUseLine(room, floor.id) : undefined;
     const allMarks = options.showMarks ? spaceUseMarks(room, floor.id) : [];
+    // With the division lockup printed, the division's name is not repeated as text.
+    const markedUse = allMarks.length
+      ? options.showUse
+        ? spaceUseLineWithoutDivisions(
+            room,
+            floor.id,
+            allMarks.map((m) => m.divisionId),
+          )
+        : undefined
+      : fullUse;
+
 
     // The space the artwork actually draws for this room, and the objects inside it.
     const holder: QeiiRect | undefined = qeiiHolderBox(floor.shapes, group.x, group.y);
