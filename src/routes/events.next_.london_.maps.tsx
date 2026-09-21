@@ -647,7 +647,7 @@ function LondonMapsPage() {
           </div>
         </header>
 
-        <LondonVenueSheets />
+        <LondonVenueSheets initialSheetId={search.sheet} initialRoom={search.room} />
 
         {/* Floor picker */}
         <section className="mt-9">
