@@ -1,0 +1,252 @@
+// Interactive viewer for the issued QEII Centre floor sheets.
+//
+// Floor chips switch the sheet, the sheet is shown as framed artwork (never as a
+// background), and the room directory beside it jumps to the floor a room is on.
+// Downloads are the supplied artwork itself — one sheet, or the full eight-page
+// PDF, unchanged.
+
+import { useMemo, useState } from "react";
+import { Download, FileDown, Maximize2, Search, X } from "lucide-react";
+
+import {
+  LONDON_VENUE_SHEETS,
+  VENUE_SHEET_LEGEND,
+  VENUE_SHEET_PDF,
+  searchVenueRooms,
+  venueRoomDirectory,
+  venueSheetFilename,
+  type VenueSheet,
+} from "@/lib/next-london-venue-sheets";
+
+const chip =
+  "rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]";
+const btn =
+  "inline-flex items-center gap-2 rounded-full border border-[#03002C]/20 bg-white px-4 py-2 text-[13px] font-semibold text-[#03002C] transition-colors hover:bg-[#F2F2F2]";
+
+function download(url: string, filename: string) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.rel = "noopener";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+export function LondonVenueSheets() {
+  const [sheetId, setSheetId] = useState(LONDON_VENUE_SHEETS[0]!.id);
+  const [query, setQuery] = useState("");
+  const [zoom, setZoom] = useState(false);
+
+  const rows = useMemo(() => venueRoomDirectory(), []);
+  const found = useMemo(() => searchVenueRooms(query, rows), [query, rows]);
+  const sheet: VenueSheet =
+    LONDON_VENUE_SHEETS.find((s) => s.id === sheetId) ?? LONDON_VENUE_SHEETS[0]!;
+
+  return (
+    <section className="mt-10">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#03002C]/60">
+            Venue floor sheets · Queen Elizabeth II Centre
+          </p>
+          <h2 className="mt-1 text-lg font-semibold text-[#03002C]">
+            Every floor, as issued to the crew
+          </h2>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            className={btn}
+            onClick={() => download(sheet.url, venueSheetFilename(sheet))}
+          >
+            <Download className="h-4 w-4" /> This sheet (PNG)
+          </button>
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+            onClick={() => download(VENUE_SHEET_PDF.url, VENUE_SHEET_PDF.filename)}
+          >
+            <FileDown className="h-4 w-4" /> All {VENUE_SHEET_PDF.pages} sheets (
+            {VENUE_SHEET_PDF.paper} PDF)
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {LONDON_VENUE_SHEETS.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            aria-pressed={s.id === sheet.id}
+            onClick={() => setSheetId(s.id)}
+            className={`${chip} ${
+              s.id === sheet.id
+                ? "border-[#03002C] bg-[#03002C] text-white"
+                : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+            }`}
+          >
+            {s.kind === "room" ? s.title : `${s.marker} · ${s.title}`}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+        <figure className="overflow-hidden rounded-2xl border border-black/10 bg-[#F2F2F2]">
+          <button
+            type="button"
+            onClick={() => setZoom(true)}
+            aria-label={`Enlarge the ${sheet.title} sheet`}
+            className="group relative block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+          >
+            <img
+              src={sheet.url}
+              alt={`Queen Elizabeth II Centre ${sheet.title} plan, page ${sheet.page} of the issued set`}
+              width={sheet.w}
+              height={sheet.h}
+              loading="lazy"
+              className="block w-full"
+            />
+            <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C]/85 px-3 py-1.5 text-[11px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100">
+              <Maximize2 className="h-3.5 w-3.5" /> Enlarge
+            </span>
+          </button>
+          <figcaption className="flex flex-wrap items-center justify-between gap-2 border-t border-black/10 bg-white px-4 py-3 text-[12px] text-[#03002C]/70">
+            <span>
+              Page {sheet.page} of {VENUE_SHEET_PDF.pages} · issued venue artwork
+            </span>
+            <span>
+              {sheet.w} × {sheet.h} px
+            </span>
+          </figcaption>
+        </figure>
+
+        <div>
+          <h3 className="text-sm font-semibold text-[#03002C]">{sheet.title}</h3>
+          {sheet.note ? (
+            <p className="mt-2 text-[13px] leading-relaxed text-[#03002C]/75">{sheet.note}</p>
+          ) : null}
+          {sheet.capacities?.length ? (
+            <dl className="mt-3 grid grid-cols-2 gap-2">
+              {sheet.capacities.map((c) => (
+                <div key={c.label} className="rounded-xl border border-black/10 bg-white px-3 py-2">
+                  <dd className="text-lg font-semibold tracking-tight text-[#03002C]">{c.value}</dd>
+                  <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#03002C]/60">
+                    {c.label}
+                  </dt>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+
+          {sheet.rooms.length ? (
+            <>
+              <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-[#03002C]/60">
+                Rooms on this sheet
+              </p>
+              <ul className="mt-2 flex flex-wrap gap-1.5">
+                {sheet.rooms.map((r) => (
+                  <li
+                    key={r}
+                    className="rounded-full border border-[#003FC7]/30 bg-[#E0E8F5] px-2.5 py-1 text-[12px] font-semibold text-[#03002C]"
+                  >
+                    {r}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+
+          {sheet.facilities.length ? (
+            <>
+              <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-[#03002C]/60">
+                Also marked
+              </p>
+              <ul className="mt-2 flex flex-wrap gap-1.5">
+                {sheet.facilities.map((f) => (
+                  <li
+                    key={f}
+                    className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[12px] text-[#03002C]/80"
+                  >
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+
+          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-[#03002C]/60">
+            Sheet legend
+          </p>
+          <p className="mt-1.5 text-[12px] leading-relaxed text-[#03002C]/70">
+            {VENUE_SHEET_LEGEND.join(" · ")}
+          </p>
+
+          <div className="mt-5 rounded-2xl border border-black/10 bg-white p-4">
+            <label
+              htmlFor="venue-room-search"
+              className="flex items-center gap-2 text-sm font-semibold text-[#03002C]"
+            >
+              <Search className="h-4 w-4 text-[#003FC7]" /> Room directory
+            </label>
+            <input
+              id="venue-room-search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Find a room — Fleming, Abbey, Churchill…"
+              className="mt-2 w-full rounded-xl border border-black/15 px-3 py-2 text-[13px] text-[#03002C] focus:border-[#003FC7] focus:outline-none"
+            />
+            <p className="mt-2 text-[11.5px] text-[#03002C]/60">
+              {found.length} of {rows.length} spaces
+            </p>
+            <ul className="mt-2 max-h-72 divide-y divide-black/5 overflow-y-auto">
+              {found.map((r) => (
+                <li key={`${r.sheetId}-${r.room}`}>
+                  <button
+                    type="button"
+                    onClick={() => setSheetId(r.sheetId)}
+                    className="flex w-full items-center justify-between gap-3 px-1 py-2 text-left text-[13px] text-[#03002C] hover:bg-[#F2F2F2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+                  >
+                    <span className={r.kind === "room" ? "font-semibold" : ""}>{r.room}</span>
+                    <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#03002C]/55">
+                      {r.marker} · {r.floor}
+                    </span>
+                  </button>
+                </li>
+              ))}
+              {found.length === 0 ? (
+                <li className="py-3 text-[13px] text-[#03002C]/65">
+                  No room of that name is printed on these sheets.
+                </li>
+              ) : null}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {zoom ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${sheet.title} sheet, enlarged`}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#03002C]/90 p-4"
+          onClick={() => setZoom(false)}
+        >
+          <button
+            type="button"
+            aria-label="Close"
+            className="absolute right-5 top-5 rounded-full bg-white/15 p-2 text-white hover:bg-white/25"
+            onClick={() => setZoom(false)}
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <img
+            src={sheet.url}
+            alt={`Queen Elizabeth II Centre ${sheet.title} plan, enlarged`}
+            className="max-h-full max-w-full rounded-xl bg-white object-contain"
+          />
+        </div>
+      ) : null}
+    </section>
+  );
+}
