@@ -810,7 +810,8 @@ export function parseSvgArtwork(source: string, name: string): PlacedArtImport {
   // in the uploaded file survive into the master exactly as drawn.
   const walk = (el: Element, m: PlacedArtMatrix, group: number) => {
     const tag = el.tagName.toLowerCase();
-    if (BANNED_TAGS.includes(tag)) return;
+    if (BANNED_TAGS.includes(tag) || NON_PAINTING_TAGS.has(tag)) return;
+
     const here = mul(m, parseTransform(el.getAttribute("transform")));
     const alphaHere = group * (own(el, "opacity") ?? 1);
     const raw = shapeToPath(el);
