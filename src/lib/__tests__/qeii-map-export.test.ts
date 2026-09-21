@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildQeiiPlanAi } from "@/lib/next-london-qeii-ai";
 import { qeiiPlanState } from "@/lib/next-london-qeii-plan";
-import { LONDON_VENUE_SHEETS } from "@/lib/next-london-venue";
+import { LONDON_VENUE_SHEETS } from "@/lib/next-london-venue-sheets";
 
 describe("QEII Illustrator map export", () => {
   const sheet = LONDON_VENUE_SHEETS.find((s) => qeiiPlanState(s.id)?.rebuilt)!;
