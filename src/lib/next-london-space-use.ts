@@ -41,15 +41,9 @@ export const LONDON_SPACE_USE: SpaceUse[] = [
     space: "Churchill",
     floor: "Ground Floor",
     sheetId: "ground",
-    event: "Mart",
+    fn: "Mart",
+    event: "GlobalLink Space / Innovation Lounge / Mart",
     rooms: ["Churchill"],
-  },
-  {
-    space: "GlobalLink Space / Innovation Lounge / Mart",
-    floor: "1st Floor",
-    sheetId: "first",
-    event: "Pickwick",
-    rooms: ["Pickwick"],
   },
   {
     space: "Pickwick",
