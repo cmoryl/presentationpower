@@ -10,6 +10,7 @@
 import { NEXT_APP_ORIGIN } from "@/lib/next-event";
 import { spaceUseLine, spaceUseMarks, type SpaceUseMark } from "@/lib/next-london-space-use";
 
+import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { qeiiFloorVector, type QeiiFloorVector, type QeiiLabel } from "@/lib/next-london-qeii-vectors";
 
 
