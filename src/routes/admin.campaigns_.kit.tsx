@@ -447,16 +447,25 @@ function KitBuilderInner() {
         eyebrow="Step 4"
         title={`Generated kit · ${assets.length} asset${assets.length === 1 ? "" : "s"}`}
         actions={
-          <button
-            type="button"
-            onClick={() => {
-              setRemoved(new Set());
-              setRegenTick((t) => t + 1);
-            }}
-            className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
-          >
-            <RefreshCw size={12} /> Regenerate all
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setRemoved(new Set());
+                setRegenTick((t) => t + 1);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
+            >
+              <RefreshCw size={12} /> Regenerate all
+            </button>
+            {/* One click: deck + social cards + print collateral in one ZIP
+                with a manifest naming every file, format and resolution. */}
+            <CampaignBundleButton
+              campaignName={copy.title || "Campaign"}
+              brandId={brandId}
+              resolveSources={collectKitSources}
+            />
+          </div>
         }
       >
         {source == null ? (
@@ -527,7 +536,14 @@ function AssetCard({
     facts: { hashtag, registrationUrl },
   } as const;
   return (
-    <div className="group space-y-2">
+    <div
+      className="group space-y-2"
+      data-bundle-asset={asset.id}
+      data-bundle-label={format.label}
+      data-bundle-platform={format.platform}
+      data-bundle-w={format.width}
+      data-bundle-h={format.height}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="truncate text-[11px] uppercase tracking-widest text-black/60">
