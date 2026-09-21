@@ -1,9 +1,12 @@
 import { buildAgendaVectorPdf } from "@/lib/agenda-vector-pdf";
 import { AGENDA_DIVISIONS, agendaDefault, normalizeAgendaConfig } from "@/lib/next-agenda";
+import { setAssetBaseUrl } from "@/lib/asset-base-url";
 import { mkdirSync, writeFileSync } from "node:fs";
 
 const OUT = "/tmp/a4pdf/pack";
 mkdirSync(OUT, { recursive: true });
+
+setAssetBaseUrl("http://localhost:8080");
 
 const lines: string[] = [];
 for (const div of AGENDA_DIVISIONS) {
