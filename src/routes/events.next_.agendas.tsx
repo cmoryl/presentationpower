@@ -4,7 +4,9 @@ import { useMemo } from "react";
 import { z } from "zod";
 
 import { AppShell } from "@/components/AppShell";
+import { AgendaHouseTimesPanel } from "@/components/next/AgendaHouseTimesPanel";
 import { AgendaStudio } from "@/components/next/AgendaStudio";
+
 import { useSavedAgendaFiles } from "@/hooks/use-next-live-masters";
 import { agendaDivision, agendaFileIsLive, normalizeAgendaConfig } from "@/lib/next-agenda";
 
@@ -67,7 +69,9 @@ function AgendaPage() {
         >
           <ArrowLeft size={13} /> TransPerfect NEXT
         </Link>
+        <AgendaHouseTimesPanel divisionId={resolved.id} />
         <AgendaStudio
+
           key={`${resolved.id}|${openFile?.id ?? "new"}`}
           divisionId={resolved.id}
           initialConfig={openFile?.config}
