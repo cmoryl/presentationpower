@@ -5,7 +5,7 @@ import {
   agendaParallelRoomLine,
   agendaSessionRoomLine,
 } from "@/lib/next-agenda";
-import { LONDON_AGENDAS } from "@/lib/next-agenda-london-2026";
+import { LONDON_2026_PROGRAMMES } from "@/lib/next-agenda-london-2026";
 
 describe("rooms on simultaneous sessions", () => {
   it("names the room when one is recorded", () => {
@@ -23,7 +23,7 @@ describe("rooms on simultaneous sessions", () => {
   });
 
   it("carries the issued Legal rooms as rooms, not bracketed titles", () => {
-    const legal = LONDON_AGENDAS["legal"];
+    const legal = LONDON_2026_PROGRAMMES["legal"];
     const rows = (legal?.days?.[0]?.sessions ?? legal?.sessions ?? []).filter(
       (s) => (s.parallels ?? []).length > 0,
     );
