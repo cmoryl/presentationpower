@@ -56,3 +56,17 @@ describe("QEII room colours", () => {
     expect(svg).toContain("Games track");
   });
 });
+
+describe("division accent colouring", () => {
+  it("fills each division's rooms with that division's approved accent", () => {
+    const plan = qeiiPlanState("fourth");
+    if (!plan?.rebuilt) return;
+    const colours = qeiiColourByDivision(plan.floor);
+    const westminster = Object.entries(colours).find(([room]) => room.includes("Westminster"));
+    expect(westminster).toBeTruthy();
+    const games = NEXT_DIVISIONS.find((d) => d.id === "games")!.accent;
+    expect(westminster![1]).toBe(games);
+    // A house space with no division recorded is never given a colour.
+    expect(colours["Courtyard"]).toBeUndefined();
+  });
+});
