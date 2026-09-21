@@ -17,6 +17,12 @@
 import type { BrandGuide, ColorSwatch } from "./brand-guides";
 import { MASTER_TRANSPERFECT_GUIDE } from "./brand-guides";
 import { contrastRatio } from "./contrast-audit";
+import {
+  LOGO_MATRIX_CHECK_LABEL,
+  validateLogoPlacements,
+  type LogoMatrixCheck,
+  type LogoPlacementInput,
+} from "./logo-placement-matrix";
 
 /** WCAG AA thresholds used by the pre-flight. */
 export const BH_AA_NORMAL = 4.5;
@@ -27,7 +33,13 @@ export const APPROVED_TEXT_INK = ["#03002c", "#003fc7", "#ffffff", "#666666"] as
 
 export type BrandHealthSeverity = "pass" | "warn" | "fail";
 
-export type BrandHealthCheck = "contrast" | "accent-on-text" | "ink" | "typeface" | "type-scale";
+export type BrandHealthCheck =
+  | "contrast"
+  | "accent-on-text"
+  | "ink"
+  | "typeface"
+  | "type-scale"
+  | LogoMatrixCheck;
 
 /** One measured run of text from a rendered surface. */
 export type BrandHealthSample = {
