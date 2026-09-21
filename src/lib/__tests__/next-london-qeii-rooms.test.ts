@@ -1,0 +1,58 @@
+import { describe, expect, it } from "vitest";
+
+import {
+  QEII_ROOM_PALETTE,
+  qeiiColourByFunction,
+  qeiiColourKey,
+  qeiiColourPaint,
+  qeiiRoomShapes,
+  qeiiRoomTextInk,
+  qeiiSharedShapeNotes,
+} from "@/lib/next-london-qeii-rooms";
+import { qeiiPlanSvg } from "@/lib/next-london-qeii-plan";
+import { qeiiFloorVector } from "@/lib/next-london-qeii-vectors";
+
+describe("QEII room colours", () => {
+  it("finds the drawn shape each room name sits inside", () => {
+    const floor = qeiiFloorVector("sixth")!;
+    const rooms = qeiiRoomShapes(floor);
+    expect(rooms.some((r) => r.room === "Mountbatten")).toBe(true);
+  });
+
+  it("fills a room drawn on its own and tags one sharing a shape", () => {
+    const floor = qeiiFloorVector("fourth")!;
+    const paint = qeiiColourPaint(floor, { Westminster: "#FFEB66", Abbey: "#A1FBF9" });
+    expect(paint.fills.size).toBe(1); // Westminster has its own shape
+    expect(paint.tags.get("Abbey")).toBe("#A1FBF9"); // shares with Moore and Rutherford
+    expect(qeiiSharedShapeNotes(floor).some((n) => n.includes("Abbey"))).toBe(true);
+  });
+
+  it("offers approved colours only", () => {
+    const approved = ["#003FC7", "#03002C", "#A1FBF9", "#C2A3FF", "#FFEB66", "#A6FA87", "#FF9B70", "#EC388A", "#E53D2E"];
+    for (const swatch of QEII_ROOM_PALETTE) expect(approved).toContain(swatch.hex);
+  });
+
+  it("keeps room type readable over any fill", () => {
+    expect(qeiiRoomTextInk("#FFEB66")).toBe("#03002C");
+    expect(qeiiRoomTextInk("#003FC7")).toBe("#FFFFFF");
+  });
+
+  it("names a key row from the recorded function when every room shares one", () => {
+    const floor = qeiiFloorVector("fourth")!;
+    const colours = qeiiColourByFunction(floor);
+    const key = qeiiColourKey(floor, colours);
+    const plenary = key.find((r) => r.hex === "#003FC7");
+    expect(plenary?.label).toBe("Plenary");
+    expect(plenary?.rooms).toContain("Westminster");
+  });
+
+  it("prints the colours and the key into the editable download", () => {
+    const floor = qeiiFloorVector("fourth")!;
+    const svg = qeiiPlanSvg(floor, {
+      roomColours: { Westminster: "#FFEB66" },
+      keyLabels: { "#FFEB66": "Games track" },
+    });
+    expect(svg).toContain("#FFEB66");
+    expect(svg).toContain("Games track");
+  });
+});

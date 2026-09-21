@@ -11,6 +11,12 @@ import { NEXT_APP_ORIGIN } from "@/lib/next-event";
 import { spaceUseLine, spaceUseMarks, type SpaceUseMark } from "@/lib/next-london-space-use";
 
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
+import {
+  qeiiColourKey,
+  qeiiColourPaint,
+  qeiiRoomTextInk,
+  type QeiiRoomColours,
+} from "@/lib/next-london-qeii-rooms";
 import { qeiiFloorVector, type QeiiFloorVector, type QeiiLabel } from "@/lib/next-london-qeii-vectors";
 
 
@@ -52,6 +58,12 @@ export type QeiiPlanOptions = {
   markVariant?: QeiiMarkVariant;
   /** Multiplies the lockup height; 1 keeps the house setting. */
   markScale?: number;
+  /** Room name → approved fill colour. */
+  roomColours?: QeiiRoomColours;
+  /** Saved names for the colour key, keyed by colour. */
+  keyLabels?: Record<string, string>;
+  /** Print the colour key beneath the plan. */
+  showKey?: boolean;
 };
 
 /**
@@ -139,9 +151,11 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
   const face = options.face ?? "issued";
   const scale = options.labelScale ?? 1;
   const showLabels = options.showLabels ?? true;
+  const roomColours = options.roomColours ?? {};
+  const paint = qeiiColourPaint(floor, roomColours);
   const shapes = floor.shapes
-    .map((s) => {
-      const fill = qeiiPlanInk(s.fill, face);
+    .map((s, i) => {
+      const fill = paint.fills.get(i) ?? qeiiPlanInk(s.fill, face);
       const stroke = qeiiPlanInk(s.stroke, face);
       const bits = [`d="${s.d}"`, `fill="${fill ?? "none"}"`];
       if (stroke) bits.push(`stroke="${stroke}"`, `stroke-width="${s.w ?? 1}"`);
@@ -168,12 +182,21 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
               `x="${block.x}" y="${y}"`,
               'text-anchor="middle" dominant-baseline="middle"',
               `font-family="Geist, Geist Variable, sans-serif" font-weight="600" font-size="${fontSize}"`,
-              `fill="${qeiiLabelInk()}"`,
+              `fill="${ink}"`,
               transform ? `transform="${transform}"` : "",
               `>${esc(body)}</text>`,
             ]
               .filter(Boolean)
               .join(" ");
+          const room = block.lines.join(" ");
+          const tag = paint.tags.get(room);
+          const ink = tag
+            ? qeiiRoomTextInk(tag)
+            : roomColours[room]
+              ? qeiiRoomTextInk(roomColours[room])
+              : qeiiLabelInk();
+          // A light room colour needs the colour lockup, not the reverse one.
+          const variant = ink === "#03002C" ? ("colour" as QeiiMarkVariant) : options.markVariant;
           const nameTop = block.y - ((block.lines.length - 1) * block.size * 1.05) / 2;
           const lastLine = nameTop + (block.lines.length - 1) * block.size * 1.05;
           // The lockup is linked by its full site URL so the downloaded file
@@ -189,7 +212,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
               markX += w + block.size * 0.35;
               return [
                 "<image",
-                `href="${(() => { const u = qeiiMarkUrl(m, options.markVariant); return u.startsWith("http") ? u : `${NEXT_APP_ORIGIN}${u}`; })()}"`,
+                `href="${(() => { const u = qeiiMarkUrl(m, variant); return u.startsWith("http") ? u : `${NEXT_APP_ORIGIN}${u}`; })()}"`,
                 `x="${x}" y="${nameTop - block.size * 0.7 - block.markH}" width="${w}" height="${block.markH}"`,
                 'preserveAspectRatio="xMidYMid meet"',
                 transform ? `transform="${transform}"` : "",
@@ -205,18 +228,48 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
           const use = block.use
             ? text(lastLine + block.size * 0.62 + block.useSize * 0.6, block.useSize, block.use)
             : "";
-          return markSvg + names + use;
+          const pad = block.size * 0.32;
+          const tagSvg = tag
+            ? [
+                "<rect",
+                `x="${block.box.x0 - pad}" y="${block.box.y0 - pad * 0.6}"`,
+                `width="${block.box.x1 - block.box.x0 + pad * 2}"`,
+                `height="${block.box.y1 - block.box.y0 + pad * 1.2}"`,
+                `rx="${block.size * 0.35}" fill="${tag}"`,
+                transform ? `transform="${transform}"` : "",
+                "/>",
+              ]
+                .filter(Boolean)
+                .join(" ")
+            : "";
+          return tagSvg + markSvg + names + use;
         })
         .join("")
     : "";
 
 
+  const keyRows =
+    options.showKey === false ? [] : qeiiColourKey(floor, roomColours, options.keyLabels ?? {});
+  const keyStep = floor.w * 0.038;
+  const keyH = keyRows.length ? keyStep * (keyRows.length + 1.2) : 0;
+  const keySvg = keyRows
+    .map((row, i) => {
+      const y = floor.h + keyStep * (0.9 + i);
+      const esc2 = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      return [
+        `<rect x="${floor.w * 0.02}" y="${y - keyStep * 0.34}" width="${keyStep * 0.72}" height="${keyStep * 0.72}" rx="${keyStep * 0.14}" fill="${row.hex}"/>`,
+        `<text x="${floor.w * 0.02 + keyStep}" y="${y}" dominant-baseline="middle" font-family="Geist, Geist Variable, sans-serif" font-weight="600" font-size="${keyStep * 0.52}" fill="${QEII_PLAN_TOKENS.ink}">${esc2(row.label)}</text>`,
+      ].join("");
+    })
+    .join("");
+
   return [
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${floor.w}" height="${floor.h}" viewBox="0 0 ${floor.w} ${floor.h}">`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${floor.w}" height="${floor.h + keyH}" viewBox="0 0 ${floor.w} ${floor.h + keyH}">`,
     `<title>Queen Elizabeth II Centre — ${floor.title}</title>`,
-    `<rect width="${floor.w}" height="${floor.h}" fill="${QEII_PLAN_TOKENS.surface}"/>`,
+    `<rect width="${floor.w}" height="${floor.h + keyH}" fill="${QEII_PLAN_TOKENS.surface}"/>`,
     shapes,
     labels,
+    keySvg,
     "</svg>",
   ].join("");
 }

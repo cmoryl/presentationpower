@@ -16,6 +16,12 @@ import {
   type QeiiPlanFace,
 } from "@/lib/next-london-qeii-plan";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
+import {
+  qeiiColourKey,
+  qeiiColourPaint,
+  qeiiRoomTextInk,
+  type QeiiRoomColours,
+} from "@/lib/next-london-qeii-rooms";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 
 export type QeiiFloorPlanProps = {
@@ -31,6 +37,12 @@ export type QeiiFloorPlanProps = {
   markVariant?: QeiiMarkVariant;
   /** Multiplies the lockup height; 1 keeps the house setting. */
   markScale?: number;
+  /** Room name → approved fill colour. */
+  roomColours?: QeiiRoomColours;
+  /** Saved names for the colour key, keyed by colour. */
+  keyLabels?: Record<string, string>;
+  /** Print the colour key beneath the plan. */
+  showKey?: boolean;
   className?: string;
 };
 
@@ -43,6 +55,9 @@ export function QeiiFloorPlan({
   showMarks = false,
   markVariant = "reverse",
   markScale = 1,
+  roomColours = {},
+  keyLabels = {},
+  showKey = true,
   className,
 }: QeiiFloorPlanProps) {
   const layout = useMemo(
@@ -50,21 +65,30 @@ export function QeiiFloorPlan({
     [floor, labelScale, showUse, showMarks, markScale],
   );
 
+  const paint = useMemo(() => qeiiColourPaint(floor, roomColours), [floor, roomColours]);
+  const keyRows = useMemo(
+    () => (showKey ? qeiiColourKey(floor, roomColours, keyLabels) : []),
+    [floor, roomColours, keyLabels, showKey],
+  );
+  const keyStep = floor.w * 0.038;
+  const keyH = keyRows.length ? keyStep * (keyRows.length + 1.2) : 0;
+
   return (
     <svg
-      viewBox={`0 0 ${floor.w} ${floor.h}`}
+      viewBox={`0 0 ${floor.w} ${floor.h + keyH}`}
       role="img"
       aria-label={`Queen Elizabeth II Centre ${floor.title} plan, rebuilt as native artwork`}
       className={className}
     >
-      <rect width={floor.w} height={floor.h} fill={QEII_PLAN_TOKENS.surface} />
+      <rect width={floor.w} height={floor.h + keyH} fill={QEII_PLAN_TOKENS.surface} />
       {floor.shapes.map((shape, i) => {
         const stroke = qeiiPlanInk(shape.stroke, face);
+        const chosen = paint.fills.get(i);
         return (
           <path
             key={`s-${i}`}
             d={shape.d}
-            fill={qeiiPlanInk(shape.fill, face) ?? "none"}
+            fill={chosen ?? qeiiPlanInk(shape.fill, face) ?? "none"}
             stroke={stroke}
             strokeWidth={stroke ? (shape.w ?? 1) : undefined}
           />
@@ -83,8 +107,26 @@ export function QeiiFloorPlan({
             let markX = block.x - markRow / 2;
             const nameTop = block.y - ((block.lines.length - 1) * block.size * 1.05) / 2;
             const lastLine = nameTop + (block.lines.length - 1) * block.size * 1.05;
+            const room = block.lines.join(" ");
+            const tag = paint.tags.get(room);
+            const fill = roomColours[room];
+            const ink = tag ? qeiiRoomTextInk(tag) : fill ? qeiiRoomTextInk(fill) : qeiiLabelInk();
+            // A light room colour needs the colour lockup, not the reverse one.
+            const variant = ink === "#03002C" ? "colour" : markVariant;
+            const pad = block.size * 0.32;
             return (
               <g key={block.key}>
+                {tag ? (
+                  <rect
+                    x={block.box.x0 - pad}
+                    y={block.box.y0 - pad * 0.6}
+                    width={block.box.x1 - block.box.x0 + pad * 2}
+                    height={block.box.y1 - block.box.y0 + pad * 1.2}
+                    rx={block.size * 0.35}
+                    fill={tag}
+                    transform={transform}
+                  />
+                ) : null}
                 {block.marks.map((m) => {
                   const w = block.markH * m.ratio;
                   const x = markX;
@@ -92,7 +134,7 @@ export function QeiiFloorPlan({
                   return (
                     <image
                       key={m.divisionId}
-                      href={qeiiMarkUrl(m, markVariant)}
+                      href={qeiiMarkUrl(m, variant)}
                       x={x}
                       y={nameTop - block.size * 0.7 - block.markH}
                       width={w}
@@ -112,7 +154,7 @@ export function QeiiFloorPlan({
                     textAnchor="middle"
                     dominantBaseline="middle"
                     fontSize={block.size}
-                    fill={qeiiLabelInk()}
+                    fill={ink}
                     transform={transform}
                     style={font}
                   >
@@ -126,7 +168,7 @@ export function QeiiFloorPlan({
                     textAnchor="middle"
                     dominantBaseline="middle"
                     fontSize={block.useSize}
-                    fill={qeiiLabelInk()}
+                    fill={ink}
                     transform={transform}
                     style={font}
                   >
@@ -137,6 +179,35 @@ export function QeiiFloorPlan({
             );
           })
         : null}
+      {keyRows.length ? (
+        <g>
+          {keyRows.map((row, i) => {
+            const y = floor.h + keyStep * (0.9 + i);
+            return (
+              <g key={row.hex}>
+                <rect
+                  x={floor.w * 0.02}
+                  y={y - keyStep * 0.34}
+                  width={keyStep * 0.72}
+                  height={keyStep * 0.72}
+                  rx={keyStep * 0.14}
+                  fill={row.hex}
+                />
+                <text
+                  x={floor.w * 0.02 + keyStep}
+                  y={y}
+                  dominantBaseline="middle"
+                  fontSize={keyStep * 0.52}
+                  fill={QEII_PLAN_TOKENS.ink}
+                  style={{ fontFamily: "Geist, 'Geist Variable', sans-serif", fontWeight: 600 }}
+                >
+                  {row.label}
+                </text>
+              </g>
+            );
+          })}
+        </g>
+      ) : null}
     </svg>
   );
 }
