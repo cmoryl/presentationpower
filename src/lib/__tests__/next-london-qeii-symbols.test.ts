@@ -20,8 +20,9 @@ describe("washroom symbols and wall weight", () => {
     const ground = QEII_FLOOR_VECTORS.find((f) => f.id === "ground")!;
     const drop = qeiiRepeatedSymbolShapes(ground);
     expect(drop.size).toBeGreaterThan(0);
-    // The first figure of the washroom row at ~(382, 401) is the one we keep.
-    expect(drop.has(95)).toBe(false);
+    // The washroom row at ~y 401 keeps exactly one of its three figures.
+    const row = [95, 115, 120].filter((i) => !drop.has(i));
+    expect(row).toHaveLength(1);
   });
 
   it("thins walls below the issued weight without losing them", () => {
