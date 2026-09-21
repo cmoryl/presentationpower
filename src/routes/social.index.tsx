@@ -151,71 +151,11 @@ function SocialView() {
         {/* Your saved kits (signed-in, non-empty only) */}
         <SavedKitsSection surface="social" />
 
-        {/* Live campaign: Legal creative refresh — four look & feel directions */}
-        <Link
-          to="/social/legal-refresh"
-          className="group flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-black/10 bg-gradient-to-br from-[#003FC71A] via-white/70 to-[#C2A3FF22] p-6 transition hover:border-[#003FC7]/50"
-        >
-          <div className="min-w-0">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
-              New campaign · TransPerfect Legal
-            </div>
-            <div className="mt-1 text-2xl font-semibold tracking-tight text-[#03002C]">
-              We&apos;re here for the thorny work.
-            </div>
-            <p className="mt-1 max-w-2xl text-sm text-black/65">
-              Four look-and-feel directions for the LinkedIn test — four headline variations, all
-              drawn, no stock photography and no legal clichés.
-            </p>
-          </div>
-          <span className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-sm font-medium text-white group-hover:bg-[#003FC7]">
-            See the four directions <ArrowRight size={14} />
-          </span>
-        </Link>
+        {/* The three Legal campaign boards moved to their owner's own workspace
+            page (see src/lib/live-projects.ts) — they are one person's work in
+            progress, not a public entry point on the social tool page. */}
 
-        {/* Live campaign: Legal — "You're not on it alone." documentary set */}
-        <Link
-          to="/social/legal-alongside"
-          className="group flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-black/10 bg-gradient-to-br from-[#03002C12] via-white/70 to-[#A1FBF922] p-6 transition hover:border-[#003FC7]/50"
-        >
-          <div className="min-w-0">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
-              New campaign · TransPerfect Legal
-            </div>
-            <div className="mt-1 text-2xl font-semibold tracking-tight text-[#03002C]">
-              You&apos;re not on it alone.
-            </div>
-            <p className="mt-1 max-w-2xl text-sm text-black/65">
-              Sixteen documentary frames — one expert committed to something hard, one person already
-              in position — each with its own headline, caption and nine switchable layouts.
-            </p>
-          </div>
-          <span className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-sm font-medium text-white group-hover:bg-[#003FC7]">
-            Open the campaign board <ArrowRight size={14} />
-          </span>
-        </Link>
 
-        {/* Live campaign: Legal — bloom variation */}
-        <Link
-          to="/social/legal-bloom"
-          className="group flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-black/10 bg-gradient-to-br from-[#FF7A1A1F] via-white/70 to-[#2CC4E822] p-6 transition hover:border-[#003FC7]/50"
-        >
-          <div className="min-w-0">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
-              New variation · TransPerfect Legal
-            </div>
-            <div className="mt-1 text-2xl font-semibold tracking-tight text-[#03002C]">
-              We&apos;re here for the tricky ones.
-            </div>
-            <p className="mt-1 max-w-2xl text-sm text-black/65">
-              Eight documentary frames cut into soft apertures on colour blooms — one phrase across
-              the set, one turning word per ad, five trims and a full-size download.
-            </p>
-          </div>
-          <span className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-sm font-medium text-white group-hover:bg-[#003FC7]">
-            Open the bloom board <ArrowRight size={14} />
-          </span>
-        </Link>
 
         {/* Angle filter */}
         <section id="playbooks" className="space-y-5">
