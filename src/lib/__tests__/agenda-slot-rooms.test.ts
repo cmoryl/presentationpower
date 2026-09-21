@@ -33,3 +33,27 @@ describe("rooms on simultaneous sessions", () => {
     expect((slot?.parallels ?? []).map((p) => p.room)).toEqual(["MOORE", "WHITTLE"]);
   });
 });
+
+describe("normalising a board", () => {
+  it("keeps the room on every simultaneous card", async () => {
+    const { normalizeAgendaConfig, agendaDefault, agendaParallels } = await import(
+      "@/lib/next-agenda"
+    );
+    const cfg = normalizeAgendaConfig({
+      ...agendaDefault("legal"),
+      sessions: [
+        {
+          time: "3:00 PM",
+          title: "Slot",
+          detail: "",
+          track: "",
+          muted: false,
+          room: "RUTHERFORD",
+          parallels: [{ time: "3:00 PM", title: "Track B", detail: "", room: "MOORE" }],
+        },
+      ],
+    } as never);
+    expect(agendaParallels(cfg.sessions[0]!)[0]!.room).toBe("MOORE");
+    expect(cfg.sessions[0]!.room).toBe("RUTHERFORD");
+  });
+});
