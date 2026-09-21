@@ -11,3 +11,10 @@
 - [x] Export sweep for the 3 new slide types — swept locally (ticker strip, sparkline hero, gauge stack all pass); coverage ledger now carries prior cells across matrix additions (904/6270 verified)
 
 - [x] Update Churchill partner booth specs from uploaded `Churchill_SI_Booths.pdf` — nine glass vinyls added (1300x1230 ×6, 7000x1230 ×3, 10mm bleed, CMYK vector)
+
+## NEXT agendas / brand kits (Sept 2026)
+- [x] Innovation Lounge agenda board + product write-ups under the schedule
+- [ ] Division accent on agenda day headings + left time rails (screen + PDF/AI/DOCX/PPTX)
+- [ ] Innovation Lounge extra info from Canva file canva.link/0qp10ba0b4r6poq
+- [ ] GlobalLink Universe ecosystem component on /knowledge/brand-guides/globallink
+- [ ] Enrich brand guides with BrandHub division profiles (GlobalLink, Dataforce, Life Sciences, master identity): photography, type scale, colour accessibility, core values — no Canva audits, no BoothHUB
