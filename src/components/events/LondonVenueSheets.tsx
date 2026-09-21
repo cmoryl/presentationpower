@@ -11,7 +11,11 @@ import { Download, FileDown, Maximize2, Search, X } from "lucide-react";
 import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { QeiiRoomColourPanel } from "@/components/events/QeiiRoomColourPanel";
-import { qeiiSharedShapeNotes, type QeiiRoomColours } from "@/lib/next-london-qeii-rooms";
+import {
+  qeiiColourByDivision,
+  qeiiSharedShapeNotes,
+  type QeiiRoomColours,
+} from "@/lib/next-london-qeii-rooms";
 import { spaceUseLine, spaceUseMarks, spaceUsesOnFloor } from "@/lib/next-london-space-use";
 
 import {
