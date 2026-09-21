@@ -1261,7 +1261,9 @@ export async function buildAgendaVectorPdf(
     }
 
     // ── 07 Guides + marks ────────────────────────────────────────────────────
+    if (!drawGuides) continue;
     beginLayer(page, layer("07 Guides + marks"));
+
     const guideInk = rgb(...hexRgb(face === "light" ? "#03002C" : "#FFFFFF"));
     page.drawRectangle({
       x: trimX,
