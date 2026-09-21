@@ -1247,6 +1247,25 @@ export function agendaMergeSimultaneous(
   return { sessions: next, merged: added.length, leftInPlace };
 }
 
+/**
+ * Fold every simultaneous group in a programme onto one line. Rows that already
+ * sit side by side are untouched, and anything past the four-card limit stays as
+ * its own row rather than being dropped.
+ */
+export function agendaFoldSimultaneous(sessions: readonly AgendaSession[]): AgendaSession[] {
+  let list: AgendaSession[] = [...sessions];
+  // Each merge renumbers the rows, so re-scan after every fold.
+  for (let guard = 0; guard < 200; guard += 1) {
+    const group = agendaSimultaneousGroups(list)[0];
+    if (!group) break;
+    const merged = agendaMergeSimultaneous(list, group);
+    if (!merged.merged) break;
+    list = merged.sessions;
+  }
+  return list;
+}
+
+
 
 /** One programme day. Multi-day agendas hold an ordered list of these. */
 export type AgendaDay = {
