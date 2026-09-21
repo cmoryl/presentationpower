@@ -215,20 +215,28 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     const head = group.labels[0]!;
     const baseSize = qeiiFontSize(head, floor, scale);
     const minSize = Math.max(floor.w * QEII_LABEL_MIN_SHARE * scale, 0.01);
-    const lines = group.labels.map((l) => l.text);
-    const room = lines.join(" ").replace(/-\s/g, "-");
-    const fullUse = options.showUse ? spaceUseLine(room, floor.id) : undefined;
+    const issuedLines = group.labels.map((l) => l.text);
+    const room = issuedLines.join(" ").replace(/-\s/g, "-");
+    // A live correction replaces the printed name and the line beneath it; the
+    // schedule is still read against the name the venue issued.
+    const edit = qeiiRoomEdit(options.edits, room);
+    const lines = edit?.name ? [edit.name] : issuedLines;
+    const issuedUse = options.showUse ? spaceUseLine(room, floor.id) : undefined;
     const allMarks = options.showMarks ? spaceUseMarks(room, floor.id) : [];
+    const overridden = edit?.use !== undefined;
+    const fullUse = overridden ? (edit!.use || undefined) : issuedUse;
     // With the division lockup printed, the division's name is not repeated as text.
-    const markedUse = allMarks.length
-      ? options.showUse
-        ? spaceUseLineWithoutDivisions(
-            room,
-            floor.id,
-            allMarks.map((m) => m.divisionId),
-          )
-        : undefined
-      : fullUse;
+    const markedUse = overridden
+      ? fullUse
+      : allMarks.length
+        ? options.showUse
+          ? spaceUseLineWithoutDivisions(
+              room,
+              floor.id,
+              allMarks.map((m) => m.divisionId),
+            )
+          : undefined
+        : fullUse;
 
 
     // The space the artwork actually draws for this room, and the objects inside it.
@@ -244,6 +252,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     if (fullUse) variants.push({ use: shortUse(fullUse), marks: [] });
     if (allMarks.length) variants.push({ use: undefined, marks: allMarks });
     variants.push({ use: undefined, marks: [] });
+
 
     type Fit = {
       variant: Variant;
