@@ -311,7 +311,8 @@ function DecksIndex() {
         // deck that still exists in the account.
         if (uuid && UUID_RE.test(uuid)) await removeCloud({ data: { deckId: uuid } });
         if (item.kind === "local") deleteDeckLocal(item.id);
-        else setCloudDecks((prev) => prev.filter((r) => r.id !== item.id));
+        if (item.kind === "cloud" || uuid)
+          setCloudDecks((prev) => prev.filter((r) => r.id !== item.id && r.id !== uuid));
         setSelected((prev) => {
           const next = new Set(prev);
           next.delete(item.id);
