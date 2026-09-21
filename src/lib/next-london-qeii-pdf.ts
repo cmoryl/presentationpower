@@ -8,6 +8,7 @@
 // master: the plan artwork is rasterised, so it is labelled as a proof on every
 // page and in the file name.
 
+import { NEXT_APP_ORIGIN } from "@/lib/next-event";
 import type { QeiiPlanFace } from "@/lib/next-london-qeii-plan";
 
 export type QeiiPdfPage = {
