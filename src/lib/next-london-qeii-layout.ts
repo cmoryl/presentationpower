@@ -15,7 +15,12 @@
 // and the lockup come off first and the reason is reported back in plain language
 // for the page to show. The ground behind a plan stays a solid brand token.
 
-import { spaceUseLine, spaceUseMarks, type SpaceUseMark } from "@/lib/next-london-space-use";
+import {
+  spaceUseLine,
+  spaceUseLineWithoutDivisions,
+  spaceUseMarks,
+  type SpaceUseMark,
+} from "@/lib/next-london-space-use";
 import type { QeiiFloorVector, QeiiLabel } from "@/lib/next-london-qeii-vectors";
 import {
   qeiiHolderBox,
@@ -199,6 +204,17 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     const room = lines.join(" ").replace(/-\s/g, "-");
     const fullUse = options.showUse ? spaceUseLine(room, floor.id) : undefined;
     const allMarks = options.showMarks ? spaceUseMarks(room, floor.id) : [];
+    // With the division lockup printed, the division's name is not repeated as text.
+    const markedUse = allMarks.length
+      ? options.showUse
+        ? spaceUseLineWithoutDivisions(
+            room,
+            floor.id,
+            allMarks.map((m) => m.divisionId),
+          )
+        : undefined
+      : fullUse;
+
 
     // The space the artwork actually draws for this room, and the objects inside it.
     const holder: QeiiRect | undefined = qeiiHolderBox(floor.shapes, group.x, group.y);
@@ -208,8 +224,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
 
     type Variant = { use?: string; marks: SpaceUseMark[] };
     const variants: Variant[] = [];
-    if (fullUse && allMarks.length) variants.push({ use: fullUse, marks: allMarks });
-    if (fullUse && allMarks.length) variants.push({ use: shortUse(fullUse), marks: allMarks });
+    if (markedUse && allMarks.length) variants.push({ use: markedUse, marks: allMarks });
     if (fullUse) variants.push({ use: fullUse, marks: [] });
     if (fullUse) variants.push({ use: shortUse(fullUse), marks: [] });
     if (allMarks.length) variants.push({ use: undefined, marks: allMarks });
