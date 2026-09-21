@@ -116,7 +116,7 @@ export function qeiiLabelGroups(floor: QeiiFloorVector): Group[] {
       const tail = run[run.length - 1]!;
       const sameTurn = Math.abs((next.angle ?? 0) - (tail.angle ?? 0)) < 0.5;
       const sameSize = Math.abs(next.size - tail.size) < 0.4;
-      const sameColumn = Math.abs(next.x - tail.x) <= tail.size * 0.9;
+      const sameColumn = Math.abs(next.x - tail.x) <= tail.size * 1.4;
       const stacked = next.y - tail.y > 0 && next.y - tail.y <= tail.size * 1.6;
       if (sameTurn && sameSize && sameColumn && stacked) {
         run.push(next);

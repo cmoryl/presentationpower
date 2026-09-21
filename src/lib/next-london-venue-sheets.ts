@@ -154,7 +154,7 @@ export const LONDON_VENUE_SHEETS: VenueSheet[] = [
     w: 1123,
     h: 1587,
     rooms: ["Windsor", "Cambridge", "Turing", "Berners-Lee", "Darwin", "Hawking"],
-    facilities: ["Screen/Stage", "Void"],
+    facilities: ["Stage/Screen", "Void"],
   },
   {
     id: "sixth",
