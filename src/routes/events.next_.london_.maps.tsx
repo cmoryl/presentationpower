@@ -100,6 +100,10 @@ const DESIGN_KEY = "next-london-map-design-v1";
 const AREAS_KEY = "next-london-map-areas-v1";
 
 export const Route = createFileRoute("/events/next_/london_/maps")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    sheet: typeof search['sheet'] === "string" ? (search['sheet'] as string) : undefined,
+    room: typeof search['room'] === "string" ? (search['room'] as string) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "NEXT 2026 London install maps · QEII Centre floor plans" },
