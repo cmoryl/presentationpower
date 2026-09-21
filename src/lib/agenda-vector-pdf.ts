@@ -50,6 +50,7 @@ import {
   agendaDivision,
   agendaLockupUrl,
   agendaLockupInk,
+  agendaChromeInk,
   agendaGeometry,
   agendaInk,
   agendaName,
@@ -390,6 +391,8 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
   // The mark takes the ink of its own approved file (white on a dark board), not
   // the copy-contrast ink — that guard is for body copy.
   const lockupInk = agendaLockupInk(config);
+  // Date line and footer lines follow the face, so they stay white on a dark board.
+  const chromeInk = agendaChromeInk(config);
   const art = config.showLockup ? await loadLockup(lockupSrc) : null;
   let lockupVector = false;
 
@@ -536,7 +539,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
         y: py(blocks.metaY) - size,
         size,
         font: regular,
-        color: rgb(...hexRgb(ink)),
+        color: rgb(...hexRgb(chromeInk)),
         opacity: 0.86,
       });
     }
@@ -585,7 +588,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
           y: py(loc.metaY) - ms,
           size: ms,
           font: regular,
-          color: rgb(...hexRgb(ink)),
+          color: rgb(...hexRgb(chromeInk)),
         });
       }
     }
@@ -1059,7 +1062,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
           opacity: 0.55,
         });
       }
-      const bandInk = rgb(...hexRgb(foot.onGround ? ink : foot.ink));
+      const bandInk = rgb(...hexRgb(foot.onGround ? chromeInk : foot.ink));
       if (footnote) {
         const fs = mm(L.footSize * 1.15);
         const hasPin = blocks.rows.some((r) => r.parallel);

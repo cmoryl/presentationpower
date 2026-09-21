@@ -122,6 +122,8 @@ export async function buildAgendaPptx(
   // grounds run light at one end, so a dimmed grey (the previous 8A93A6) fell
   // below contrast there. Same rule the Word export follows.
   const mutedHex = inkHex;
+  // Chrome (date line, footer lines) follows the face, not the body-copy guard.
+  const chromeHex = hex(agendaChromeInk(config), face === "light" ? "03002C" : "FFFFFF");
   const notes: string[] = [];
 
   const pptx = new PptxGenJS();
@@ -367,7 +369,7 @@ export async function buildAgendaPptx(
           fontFace: FONT,
           fontSize: pt(loc.metaSize),
           lineSpacing: pt(loc.metaSize * 1.6),
-          color: inkHex,
+          color: chromeHex,
           align,
           valign: "top",
           margin: 0,
@@ -382,7 +384,7 @@ export async function buildAgendaPptx(
         fontFace: FONT,
         fontSize: pt(L.metaSize),
         lineSpacing: pt(L.metaSize * 1.6),
-        color: inkHex,
+        color: chromeHex,
         valign: "top",
         margin: 0,
       });
@@ -811,7 +813,7 @@ export async function buildAgendaPptx(
           objectName: "NEXT agenda footer rule",
         });
       }
-      const footInk = hex(ft.onGround ? inkHex : ft.ink, "FFFFFF");
+      const footInk = hex(ft.onGround ? chromeHex : ft.ink, "FFFFFF");
       const bandY = fb.y + (fb.h - L.footSize * 1.6) * 0.5;
       const slots: { text: string; x: number; w: number; align: "left" | "center" | "right" }[] = [
         { text: ft.left, x: b.x, w: b.contentW * (ft.centre ? 0.38 : 0.62), align: "left" },
