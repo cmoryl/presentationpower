@@ -235,7 +235,53 @@ export function QeiiFloorPlan({
                     {block.use}
                   </text>
                 ) : null}
+                {editable ? (
+                  <rect
+                    x={block.box.x0 - pad}
+                    y={block.box.y0 - pad}
+                    width={block.box.x1 - block.box.x0 + pad * 2}
+                    height={block.box.y1 - block.box.y0 + pad * 2}
+                    rx={block.size * 0.4}
+                    fill="transparent"
+                    stroke={QEII_PLAN_TOKENS.accent}
+                    strokeWidth={block.size * 0.06}
+                    strokeDasharray={`${block.size * 0.3} ${block.size * 0.3}`}
+                    transform={transform}
+                    style={{ cursor: "grab" }}
+                    onPointerDown={(e) => {
+                      e.stopPropagation();
+                      (e.target as Element).setPointerCapture?.(e.pointerId);
+                      const start = qeiiRoomOffset(edits, room);
+                      drag.current = {
+                        room,
+                        x: e.clientX,
+                        y: e.clientY,
+                        dx: start.dx,
+                        dy: start.dy,
+                      };
+                      onPickRoom?.(room);
+                    }}
+                    onPointerMove={(e) => {
+                      const d = drag.current;
+                      if (!d || d.room !== room) return;
+                      e.stopPropagation();
+                      const u = unitsPerPixel();
+                      onMoveRoom?.(
+                        room,
+                        d.dx + (e.clientX - d.x) * u,
+                        d.dy + (e.clientY - d.y) * u,
+                      );
+                    }}
+                    onPointerUp={(e) => {
+                      (e.target as Element).releasePointerCapture?.(e.pointerId);
+                      drag.current = null;
+                    }}
+                  >
+                    <title>{`Drag ${shown} to move its name`}</title>
+                  </rect>
+                ) : null}
               </g>
+
             );
           })
         : null}
