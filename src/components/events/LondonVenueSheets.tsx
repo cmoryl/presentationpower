@@ -185,6 +185,58 @@ export function LondonVenueSheets() {
     keyLabelMap,
   ]);
 
+  /**
+   * One PDF of every floor, as each one currently reads — colours, room names,
+   * event use and division lockups all carried. A floor that cannot be rebuilt
+   * is carried as its issued sheet.
+   */
+  async function printAllFloorsPdf() {
+    setPrinting(true);
+    setPrintNote(undefined);
+    try {
+      const { exportQeiiFloorsPdf } = await import("@/lib/next-london-qeii-pdf");
+      const pages = LONDON_VENUE_SHEETS.map((s) => {
+        const state = qeiiPlanState(s.id);
+        if (state?.rebuilt) {
+          return {
+            title: s.title,
+            svg: qeiiPlanSvg(state.floor, {
+              face,
+              labelScale,
+              showLabels,
+              showUse,
+              showMarks,
+              markVariant,
+              markScale,
+              roomColours: roomColourMap[s.id] ?? {},
+              keyLabels: keyLabelMap[s.id] ?? {},
+              wallWeight,
+              showAllSymbols,
+            }),
+          };
+        }
+        return {
+          title: s.title,
+          imageUrl: s.url,
+          note: "Issued sheet — this floor is a placed picture in the issued design, so it is not rebuilt artwork.",
+        };
+      });
+      const result = await exportQeiiFloorsPdf(pages, face);
+      const lines = [`${result.pages} floor${result.pages === 1 ? "" : "s"} in ${result.filename}.`];
+      for (const s of result.skipped) lines.push(`${s.title} is missing: ${s.reason}`);
+      lines.push(...result.warnings);
+      setPrintNote(lines.join(" "));
+    } catch (err) {
+      setPrintNote(
+        err instanceof Error
+          ? `The PDF could not be made: ${err.message}`
+          : "The PDF could not be made.",
+      );
+    } finally {
+      setPrinting(false);
+    }
+  }
+
   function downloadPlanSvg() {
     if (!plan?.rebuilt) return;
     const svg = qeiiPlanSvg(plan.floor, {
