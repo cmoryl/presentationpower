@@ -881,6 +881,24 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
               py2 -= ss * 1.55;
             }
           }
+          // Each simultaneous card names its own room, so a slot running in two
+          // places at once reads correctly in print.
+          const cardRoom = agendaParallelRoom(copy);
+          if (cardRoom) {
+            const rs = mm(ct.detailSize) * row.fit;
+            py2 -= rs * 0.4;
+            for (const line of wrapLines(bold, cardRoom.toUpperCase(), rs, pw)) {
+              page.drawText(line, {
+                x: px(par.x) + cardPadX,
+                y: py2 - rs,
+                size: rs,
+                font: bold,
+                color: parInk,
+              });
+              py2 -= rs * 1.55;
+            }
+          }
+
           if (copy.detail.trim()) {
             const ds = mm(ct.detailSize) * row.fit;
             py2 -= ds * 0.5;
