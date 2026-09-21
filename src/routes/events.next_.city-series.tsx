@@ -62,10 +62,11 @@ function CitySeriesDemoPage() {
             City Series agenda board + light-face pillars
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-[1.5] text-muted-foreground">
-            A prepared demo set for {CITY_SERIES_DEMO_EVENT}: one A1 agenda board and the four
-            master pillars — welcome, registration, general logo and directional — all built on the
-            approved light gradient face. Everything below is a live studio file, so edit the copy,
-            programme, QR codes and geometry, save it to the event and export layered vector art.
+            A prepared demo set for {CITY_SERIES_DEMO_EVENT}: one A1 agenda board on the house
+            agenda look — Bloom Corner, dark face, same as every TransPerfect NEXT agenda — plus the
+            four master pillars (welcome, registration, general logo and directional) on the approved
+            light gradient face. Everything below is a live studio file, so edit the copy, programme,
+            QR codes and geometry, save it to the event and export layered vector art.
           </p>
         </header>
 
@@ -117,7 +118,7 @@ function CitySeriesDemoPage() {
             divisionId="city-series"
             initialConfig={agenda}
             heading="City Series agenda board — demo"
-            intro="A prepared City Series day-one programme on the approved light face at A1. Edit the rows, format, QR code and footer, save it to the event and export layered vector artwork for print and Illustrator."
+            intro="A prepared City Series day-one programme on the house agenda look — Bloom Corner, dark face — at A1. Edit the rows, format, QR code and footer, save it to the event and export layered vector artwork for print and Illustrator."
           />
         </div>
       </div>
