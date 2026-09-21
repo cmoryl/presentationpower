@@ -173,6 +173,28 @@ export function qeiiColourByFunction(floor: QeiiFloorVector): QeiiRoomColours {
   return out;
 }
 
+/**
+ * Colour every room by the accent of the NEXT division whose area holds it.
+ *
+ * Event signage is the one place a division accent is used as a ground, and the
+ * accents come from the approved NEXT division brand records — nothing is mixed
+ * or recoloured here. A house space with no division recorded is left unfilled.
+ */
+export function qeiiColourByDivision(floor: QeiiFloorVector): QeiiRoomColours {
+  const out: QeiiRoomColours = {};
+  for (const entry of qeiiRoomShapes(floor)) {
+    const id = spaceUseMarks(entry.room, floor.id)[0]?.divisionId;
+    const accent = id ? NEXT_DIVISIONS.find((d) => d.id === id)?.accent : undefined;
+    if (accent) out[entry.room] = accent;
+  }
+  return out;
+}
+
+/** The division whose accent fills a room, for the colour key. */
+export function qeiiRoomDivisionName(room: string, sheetId: string): string | undefined {
+  return spaceUseMarks(room, sheetId)[0]?.name;
+}
+
 export type QeiiKeyEntry = { hex: string; label: string; rooms: string[] };
 
 /**
