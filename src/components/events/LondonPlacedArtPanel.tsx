@@ -14,11 +14,15 @@ import {
   PLACED_ART_ROTATE,
   PLACED_ART_SIZE,
   parseArtworkFile,
+  parseSvgArtwork,
   placedArtInks,
   setLondonPlacedArt,
   type LondonPlacedArt,
 } from "@/lib/next-london-placed-art";
 import type { LondonPanel } from "@/lib/next-london-signage";
+import { NEXT_MART_ARTWORK } from "@/lib/next-mart";
+import { resolveAssetUrl } from "@/lib/asset-base-url";
+
 
 function Slider({
   label,
