@@ -103,6 +103,9 @@ export type CityBadgeDivision = {
   /** Stacked lockup URLs + aspect ratio, per colourway. */
   colorUrl: string;
   whiteUrl: string;
+  /** Stacked reverse: white wordmark with the division accent kept live. This is
+   *  the approved mark for a dark ground where the accent should still read. */
+  reverseUrl: string;
   ratio: number;
 };
 
@@ -113,9 +116,11 @@ export const CITY_BADGE_DIVISIONS: CityBadgeDivision[] = NEXT_DIVISIONS.map((div
     name: div.name,
     colorUrl: suite?.stacked.url ?? "",
     whiteUrl: suite?.stackedWhite.url ?? suite?.stacked.url ?? "",
+    reverseUrl: suite?.stackedReverse.url ?? "",
     ratio: suite?.stacked.ratio ?? 1.7,
   };
 }).filter((d) => d.colorUrl || d.whiteUrl);
+
 
 export function cityBadgeDivision(id: string | undefined): CityBadgeDivision {
   return (
