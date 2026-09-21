@@ -14,11 +14,15 @@ import {
   PLACED_ART_ROTATE,
   PLACED_ART_SIZE,
   parseArtworkFile,
+  parseSvgArtwork,
   placedArtInks,
   setLondonPlacedArt,
   type LondonPlacedArt,
 } from "@/lib/next-london-placed-art";
 import type { LondonPanel } from "@/lib/next-london-signage";
+import { NEXT_MART_ARTWORK } from "@/lib/next-mart";
+import { resolveAssetUrl } from "@/lib/asset-base-url";
+
 
 function Slider({
   label,
@@ -108,6 +112,27 @@ export function LondonPlacedArtPanel({
     }
   }
 
+  // The seven NEXT Mart signs issued for London 2026 are general-purpose, so
+  // they can be placed on any panel here without re-uploading the file.
+  const [placing, setPlacing] = useState<string | null>(null);
+  async function placeMartSign(artwork: (typeof NEXT_MART_ARTWORK)[number]) {
+    setError(null);
+    setWarnings([]);
+    setPlacing(artwork.id);
+    try {
+      const res = await fetch(resolveAssetUrl(artwork.url));
+      if (!res.ok) throw new Error(`That sign file could not be loaded (${res.status}).`);
+      const result = parseSvgArtwork(await res.text(), artwork.filename);
+      setLondonPlacedArt(panel.id, result.art);
+      setWarnings(result.warnings);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "That sign file could not be read.");
+    } finally {
+      setPlacing(null);
+    }
+  }
+
+
   const [fine, setFine] = useState(false);
 
   const mmWide = art ? panel.trimW * art.size : 0;
@@ -180,6 +205,27 @@ export function LondonPlacedArtPanel({
           ) : null}
         </span>
       </div>
+
+      <div className="mt-3 rounded-md border border-dashed border-border p-2">
+        <p className="text-[11px] text-muted-foreground">
+          NEXT Mart signs (London 2026) — place one straight onto this panel
+        </p>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {NEXT_MART_ARTWORK.map((artwork) => (
+            <button
+              key={artwork.id}
+              type="button"
+              disabled={placing !== null}
+              onClick={() => void placeMartSign(artwork)}
+              className="rounded border border-border px-2 py-1 text-[11px] text-foreground hover:bg-muted disabled:opacity-50"
+            >
+              {placing === artwork.id ? "Placing…" : artwork.headline}
+            </button>
+          ))}
+        </div>
+      </div>
+
+
 
       {error ? <p className="mt-2 text-xs text-destructive">{error}</p> : null}
       {warnings.map((w) => (

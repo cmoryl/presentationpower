@@ -222,13 +222,20 @@ export function martTotalPanels(): number {
  * 04_ICON, 05_TYPE, 07_CUT-CONTOUR (magenta spot path for the cutter).
  * ------------------------------------------------------------------------- */
 
-import artTravelRight from "@/assets/next-mart/02_TRAVEL_pack-light-travel-right.svg.asset.json";
-import artTravelPro from "@/assets/next-mart/02b_TRAVEL_pack-like-a-pro.svg.asset.json";
-import artTechToGo from "@/assets/next-mart/03_TECH_tech-to-go.svg.asset.json";
-import artPowerUp from "@/assets/next-mart/03b_TECH_power-up-and-go.svg.asset.json";
-import artHydrated from "@/assets/next-mart/04_WATER_keep-hydrated.svg.asset.json";
-import artLocalLegends from "@/assets/next-mart/06_LOCAL_local-legends.svg.asset.json";
-import artTravelRightOutlined from "@/assets/next-mart/02_TRAVEL_pack-light-travel-right-outlined.svg.asset.json";
+// Live London 2026 mart signage (NextMartsigns_2026_london.ai, issued Sept 2026).
+// Each sign below is one page of that Illustrator file, carried as outlined
+// vector paths so the browser preview and the layered masters agree.
+import artTravelRight from "@/assets/next-mart/02_TRAVEL_pack-light-travel-right_london2026.svg.asset.json";
+import artTravelPro from "@/assets/next-mart/02b_TRAVEL_pack-like-a-pro_london2026.svg.asset.json";
+import artTechToGo from "@/assets/next-mart/03_TECH_tech-to-go_london2026.svg.asset.json";
+import artPowerUp from "@/assets/next-mart/03b_TECH_feel-the-power_london2026.svg.asset.json";
+import artHydrated from "@/assets/next-mart/04_WATER_hydration-fixation_london2026.svg.asset.json";
+import artLayerUp from "@/assets/next-mart/05_LAYERS_layer-up-show-up_london2026.svg.asset.json";
+import artLocalLegends from "@/assets/next-mart/06_LOCAL_local-legends_london2026.svg.asset.json";
+import artShapeSet from "@/assets/next-mart/00_SHAPES_next-mart-shape-set_london2026.svg.asset.json";
+import artSource from "@/assets/next-mart/NextMartsigns_2026_london.ai.asset.json";
+
+
 
 /* ---------------------------------------------------------------------------
  * NEXT MART lockup — supplied master logo (colour gradient + reversed white).
@@ -301,9 +308,26 @@ export type MartArtwork = {
   finishing: string;
 };
 
-/** Supplied board dimensions: artwork is 1620 × 972 units at 1 unit = 0.5 mm. */
+/**
+ * Default board size, kept for any slot added before a designer measures it.
+ * The London 2026 signs each carry their own live-art size (below), taken from
+ * the artboard in the supplied Illustrator file.
+ */
 export const MART_ART_TRIM_W = 810;
 export const MART_ART_TRIM_H = 486;
+
+/** The supplied Illustrator file every London 2026 mart sign is cut from. */
+export const NEXT_MART_ART_SOURCE = {
+  filename: artSource.original_filename,
+  url: artSource.url,
+  issued: "September 2026",
+};
+
+/** The blank shape set (page 8): the sign silhouettes, with no copy. */
+export const NEXT_MART_SHAPE_SET = {
+  filename: artShapeSet.original_filename,
+  url: artShapeSet.url,
+};
 
 export const NEXT_MART_ARTWORK: MartArtwork[] = [
   {
@@ -313,11 +337,11 @@ export const NEXT_MART_ARTWORK: MartArtwork[] = [
     headline: "Pack light, travel right",
     url: artTravelRight.url,
     filename: artTravelRight.original_filename,
-    previewUrl: artTravelRightOutlined.url,
+    previewUrl: artTravelRight.url,
     face: "light",
-    die: "Rounded panel with notched corner and punched hang hole",
-    trimW: MART_ART_TRIM_W,
-    trimH: MART_ART_TRIM_H,
+    die: "Portrait rounded plaque with a chevron crown above",
+    trimW: 117,
+    trimH: 212,
     bleed: 6,
     quantity: 2,
     substrate: "5 mm Foamex, matte laminate",
@@ -332,9 +356,9 @@ export const NEXT_MART_ARTWORK: MartArtwork[] = [
     filename: artTravelPro.original_filename,
     previewUrl: artTravelPro.url,
     face: "light",
-    die: "Rounded panel with notched corner and punched hang hole",
-    trimW: MART_ART_TRIM_W,
-    trimH: MART_ART_TRIM_H,
+    die: "Landscape rounded plaque with double chevron flashes left and right",
+    trimW: 224,
+    trimH: 148,
     bleed: 6,
     quantity: 2,
     substrate: "5 mm Foamex, matte laminate",
@@ -348,10 +372,10 @@ export const NEXT_MART_ARTWORK: MartArtwork[] = [
     url: artTechToGo.url,
     filename: artTechToGo.original_filename,
     previewUrl: artTechToGo.url,
-    face: "dark",
-    die: "Chamfered hex board with pinched waist",
-    trimW: MART_ART_TRIM_W,
-    trimH: MART_ART_TRIM_H,
+    face: "light",
+    die: "Landscape rounded plaque over a stepped chevron fan",
+    trimW: 211,
+    trimH: 183,
     bleed: 6,
     quantity: 2,
     substrate: "5 mm Foamex, matte laminate",
@@ -361,14 +385,14 @@ export const NEXT_MART_ARTWORK: MartArtwork[] = [
     id: "mart-art-03b",
     code: "03b",
     category: "Tech",
-    headline: "Power up and go",
+    headline: "Feel the power",
     url: artPowerUp.url,
     filename: artPowerUp.original_filename,
     previewUrl: artPowerUp.url,
-    face: "dark",
-    die: "Chamfered hex board with pinched waist",
-    trimW: MART_ART_TRIM_W,
-    trimH: MART_ART_TRIM_H,
+    face: "light",
+    die: "Landscape rounded plaque with an offset keyline and chevron flashes",
+    trimW: 234,
+    trimH: 153,
     bleed: 6,
     quantity: 2,
     substrate: "5 mm Foamex, matte laminate",
@@ -378,14 +402,31 @@ export const NEXT_MART_ARTWORK: MartArtwork[] = [
     id: "mart-art-04",
     code: "04",
     category: "Water",
-    headline: "Keep hydrated",
+    headline: "Hydration fixation",
     url: artHydrated.url,
     filename: artHydrated.original_filename,
     previewUrl: artHydrated.url,
+    face: "light",
+    die: "Circle badge on a chevron column tail",
+    trimW: 151,
+    trimH: 228,
+    bleed: 6,
+    quantity: 2,
+    substrate: "5 mm Foamex, matte laminate",
+    finishing: "Cut to CutContour path",
+  },
+  {
+    id: "mart-art-05",
+    code: "05",
+    category: "Layers",
+    headline: "Layer up, show up!",
+    url: artLayerUp.url,
+    filename: artLayerUp.original_filename,
+    previewUrl: artLayerUp.url,
     face: "dark",
-    die: "Rounded top with scalloped wave base",
-    trimW: MART_ART_TRIM_W,
-    trimH: MART_ART_TRIM_H,
+    die: "Tall portrait plaque on a chevron spine above and below",
+    trimW: 66,
+    trimH: 222,
     bleed: 6,
     quantity: 2,
     substrate: "5 mm Foamex, matte laminate",
@@ -399,16 +440,17 @@ export const NEXT_MART_ARTWORK: MartArtwork[] = [
     url: artLocalLegends.url,
     filename: artLocalLegends.original_filename,
     previewUrl: artLocalLegends.url,
-    face: "light",
-    die: "Dome top with rounded base corners",
-    trimW: MART_ART_TRIM_W,
-    trimH: MART_ART_TRIM_H,
+    face: "dark",
+    die: "Octagonal keyline plaque with a chevron tail below",
+    trimW: 227,
+    trimH: 170,
     bleed: 6,
     quantity: 2,
     substrate: "5 mm Foamex, matte laminate",
     finishing: "Cut to CutContour path",
   },
 ];
+
 
 export function martArtworkPanels(): number {
   return NEXT_MART_ARTWORK.reduce((n, a) => n + a.quantity, 0);

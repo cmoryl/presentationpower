@@ -113,23 +113,31 @@ export function parsePaint(value: unknown): { hex: string; alpha: number; painte
   }
   const rgb = /^rgba?\(([^)]+)\)$/i.exec(s);
   if (rgb) {
-    const parts = rgb[1]!
-      .split(/[,\s/]+/)
-      .filter(Boolean)
-      .map((p) => Number(p.trim()));
-    if (parts.length >= 3 && parts.slice(0, 3).every((n) => Number.isFinite(n))) {
-      const hex = `#${parts
-        .slice(0, 3)
+    const raw = rgb[1]!.split(/[,\s/]+/).filter(Boolean);
+    // A PDF-derived master writes percentages — rgb(27.7%, 61.5%, 86.2%).
+    // Reading those as plain numbers used to collapse every colour to navy.
+    const chan = raw
+      .slice(0, 3)
+      .map((p) => (p.includes("%") ? (Number(p.replace("%", "")) / 100) * 255 : Number(p)));
+    if (chan.length >= 3 && chan.every((n) => Number.isFinite(n))) {
+      const hex = `#${chan
         .map((n) =>
           Math.max(0, Math.min(255, Math.round(n)))
             .toString(16)
             .padStart(2, "0"),
         )
         .join("")}`.toUpperCase();
-      const a = parts.length >= 4 && Number.isFinite(parts[3]!) ? parts[3]! : 1;
-      return { hex, alpha: Math.max(0, Math.min(1, a)), painted: true };
+      const alphaRaw = raw[3];
+      const a =
+        alphaRaw === undefined
+          ? 1
+          : alphaRaw.includes("%")
+            ? Number(alphaRaw.replace("%", "")) / 100
+            : Number(alphaRaw);
+      return { hex, alpha: Number.isFinite(a) ? Math.max(0, Math.min(1, a)) : 1, painted: true };
     }
   }
+
   const named = NAMED_INK[key];
   if (named) return { hex: named, alpha: 1, painted: true };
   return { hex: "#03002C", alpha: 1, painted: true };
@@ -334,6 +342,27 @@ export type PlacedArtImport = {
 };
 
 const BANNED_TAGS = ["script", "foreignobject", "use", "image", "text", "tspan", "textpath"];
+
+/**
+ * Definition blocks paint nothing on their own. Walking into them printed
+ * clipping and mask shapes as solid ink — always black, because a clip path
+ * carries no fill.
+ */
+const NON_PAINTING_TAGS = new Set([
+  "defs",
+  "clippath",
+  "mask",
+  "filter",
+  "symbol",
+  "marker",
+  "pattern",
+  "lineargradient",
+  "radialgradient",
+  "metadata",
+  "title",
+  "desc",
+]);
+
 
 function mul(a: PlacedArtMatrix, b: PlacedArtMatrix): PlacedArtMatrix {
   return [
@@ -802,7 +831,8 @@ export function parseSvgArtwork(source: string, name: string): PlacedArtImport {
   // in the uploaded file survive into the master exactly as drawn.
   const walk = (el: Element, m: PlacedArtMatrix, group: number) => {
     const tag = el.tagName.toLowerCase();
-    if (BANNED_TAGS.includes(tag)) return;
+    if (BANNED_TAGS.includes(tag) || NON_PAINTING_TAGS.has(tag)) return;
+
     const here = mul(m, parseTransform(el.getAttribute("transform")));
     const alphaHere = group * (own(el, "opacity") ?? 1);
     const raw = shapeToPath(el);
