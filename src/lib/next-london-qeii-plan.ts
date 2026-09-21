@@ -7,7 +7,9 @@
 //
 // The ground behind a plan is a solid brand token — never imported artwork.
 
+import { spaceUseLine } from "@/lib/next-london-space-use";
 import { qeiiFloorVector, type QeiiFloorVector, type QeiiLabel } from "@/lib/next-london-qeii-vectors";
+
 
 export type QeiiPlanFace = "issued" | "element";
 
