@@ -231,9 +231,17 @@ export function scoreBrandHealth(
     // 3a. Typeface.
     const family = primaryFamily(s.fontFamily);
     // "Geist" and "Geist Sans" are the same face; compare on letters only, both ways.
-    const famKey = family.toLowerCase().replace(/[^a-z0-9]/g, "");
-    const wantKey = wantFamily.toLowerCase().replace(/[^a-z0-9]/g, "");
+    // "Geist", "Geist Sans" and "Geist Variable" are the same face; compare on
+    // letters only, with face descriptors dropped, both ways.
+    const faceKey = (v: string) =>
+      v
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "")
+        .replace(/(variable|vf|sans|text|display|pro)$/g, "");
+    const famKey = faceKey(family);
+    const wantKey = faceKey(wantFamily);
     const faceMatches = Boolean(famKey) && (famKey.includes(wantKey) || wantKey.includes(famKey));
+
     if (family && !faceMatches) {
       findings.push({
         id: `${s.id}-typeface`,
