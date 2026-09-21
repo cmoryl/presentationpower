@@ -9,6 +9,7 @@ import { AlertTriangle, Check, ShieldCheck, X } from "lucide-react";
 import { brandHealthCheckLabel, type BrandHealthReport } from "@/lib/brand-health";
 import { scanBrandHealth } from "@/lib/brand-health-scan";
 import { getBrandGuideForDivision, MASTER_TRANSPERFECT_GUIDE } from "@/lib/brand-guides";
+import type { LogoMedium } from "@/lib/logo-placement-matrix";
 
 export type BrandHealthBadgeProps = {
   /** Returns the rendered surfaces to measure, in display order. */
@@ -35,6 +36,7 @@ export function BrandHealthBadge({
   divisionId,
   labels,
   surfaceLabel = "this deck",
+  medium = "slide",
   className,
 }: BrandHealthBadgeProps) {
   const [report, setReport] = useState<BrandHealthReport | null>(null);
