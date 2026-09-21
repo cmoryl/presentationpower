@@ -124,13 +124,14 @@ export async function findRecentDuplicateDeck(
   userId: string,
   title: string,
   deckUuid: string,
+  briefUuid: string,
   now = Date.now(),
 ): Promise<string | null> {
   const clean = title.trim();
-  if (!clean) return null;
+  if (!clean || !briefUuid) return null;
   const { data, error } = await sb
     .from("decks")
-    .select("id, title, status, created_at")
+    .select("id, title, status, created_at, brief_id")
     .eq("owner_id", userId)
     .eq("title", clean);
   if (error || !Array.isArray(data)) return null;
@@ -138,9 +139,14 @@ export async function findRecentDuplicateDeck(
     id?: string;
     status?: string | null;
     created_at?: string | null;
+    brief_id?: string | null;
   }>;
   const candidates = rows
     .filter((r) => typeof r.id === "string" && r.id !== deckUuid)
+    // Two different decks can share a title (same prospect, two versions). Only a
+    // re-save of the very same brief may land on an existing row; anything else
+    // gets its own record rather than overwriting someone's earlier work.
+    .filter((r) => r.brief_id === briefUuid)
     .filter((r) => (r.status ?? "draft") === "draft")
     .map((r) => ({ id: r.id as string, at: Date.parse(r.created_at ?? "") }))
     .filter((r) => Number.isFinite(r.at) && now - r.at <= DUPLICATE_SAVE_WINDOW_MS && now - r.at >= 0)
