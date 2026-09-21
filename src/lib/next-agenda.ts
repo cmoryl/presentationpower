@@ -2297,6 +2297,10 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
         title: str(p?.title, ""),
         speaker: str(p?.speaker, ""),
         detail: str(p?.detail, ""),
+        // The card's own room survives normalising. It was dropped here, so
+        // every saved or reloaded board lost the second room of a simultaneous
+        // slot and printed the cards with no room at all.
+        room: str(p?.room, ""),
       }))
       .slice(0, AGENDA_MAX_PARALLEL);
     return {
