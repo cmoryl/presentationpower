@@ -276,13 +276,53 @@ type LockupArt =
   | { kind: "raster"; bytes: Uint8Array; png: boolean }
   | null;
 
-/** Every drawable shape in a mono lockup SVG, normalised to path data.
+/** A drawable shape from a lockup SVG: path data plus the fill the file itself
+ *  asks for, where one is declared. Illustrator exports the colour as a CSS
+ *  class in a <style> block, so a reverse lockup (white wordmark + live accent)
+ *  only keeps its accent if the class is resolved — painting every path in one
+ *  ink flattens it to all-white. */
+export type SvgShape = { d: string; fill?: string };
+
+/** class name -> fill hex, read from the SVG's own <style> block. */
+function svgClassFills(svg: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const block of svg.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)) {
+    for (const rule of block[1]!.matchAll(/\.([\w-]+)\s*\{([^}]*)\}/g)) {
+      const fill = /fill\s*:\s*([^;]+)/i.exec(rule[2]!)?.[1]?.trim();
+      if (fill) out[rule[1]!] = fill;
+    }
+  }
+  return out;
+}
+
+/** Fill declared on one element, via style="", fill="" or class="". */
+function shapeFill(tag: string, classFills: Record<string, string>): string | undefined {
+  const inline = /style\s*=\s*["'][^"']*fill\s*:\s*([^;"']+)/i.exec(tag)?.[1]?.trim();
+  if (inline) return inline === "none" ? undefined : inline;
+  const attr = /\sfill\s*=\s*["']([^"']+)["']/i.exec(tag)?.[1]?.trim();
+  if (attr) return attr === "none" ? undefined : attr;
+  const cls = /\sclass\s*=\s*["']([^"']+)["']/i.exec(tag)?.[1]?.trim();
+  if (cls) {
+    for (const name of cls.split(/\s+/)) {
+      const hit = classFills[name];
+      if (hit && hit !== "none") return hit;
+    }
+  }
+  return undefined;
+}
+
+/** Every drawable shape in a lockup SVG, normalised to path data.
  * Illustrator exports mix <path>, <polygon>, <polyline> and <rect>; taking only
  * <path> silently dropped whole letters from the wordmark. */
-export function extractSvgPaths(svg: string): string[] {
-  const out: string[] = [];
-  for (const m of svg.matchAll(/<path[^>]*\sd\s*=\s*["']([^"']+)["']/gi)) out.push(m[1]!);
-  for (const m of svg.matchAll(/<(polygon|polyline)[^>]*\spoints\s*=\s*["']([^"']+)["']/gi)) {
+export function extractSvgShapes(svg: string): SvgShape[] {
+  const classFills = svgClassFills(svg);
+  const out: SvgShape[] = [];
+  const push = (tag: string, d: string) => out.push({ d, fill: shapeFill(tag, classFills) });
+
+  for (const m of svg.matchAll(/<path[^>]*\sd\s*=\s*["']([^"']+)["'][^>]*>/gi)) {
+    push(m[0]!, m[1]!);
+  }
+  for (const m of svg.matchAll(/<(polygon|polyline)[^>]*\spoints\s*=\s*["']([^"']+)["'][^>]*>/gi)) {
     const nums = m[2]!
       .trim()
       .split(/[\s,]+/)
@@ -293,7 +333,7 @@ export function extractSvgPaths(svg: string): string[] {
     for (let i = 0; i + 1 < nums.length; i += 2) {
       parts.push(`${i === 0 ? "M" : "L"}${nums[i]} ${nums[i + 1]}`);
     }
-    out.push(`${parts.join(" ")} Z`);
+    push(m[0]!, `${parts.join(" ")} Z`);
   }
   for (const m of svg.matchAll(/<rect\b[^>]*>/gi)) {
     const attr = (name: string) =>
@@ -303,7 +343,7 @@ export function extractSvgPaths(svg: string): string[] {
     const w = attr("width");
     const h = attr("height");
     if (!Number.isFinite(w) || !Number.isFinite(h)) continue;
-    out.push(`M${x} ${y} H${x + w} V${y + h} H${x} Z`);
+    push(m[0]!, `M${x} ${y} H${x + w} V${y + h} H${x} Z`);
   }
   for (const m of svg.matchAll(/<(circle|ellipse)\b[^>]*>/gi)) {
     const attr = (name: string) =>
@@ -313,12 +353,19 @@ export function extractSvgPaths(svg: string): string[] {
     const rx = Number.isFinite(attr("r")) ? attr("r") : attr("rx");
     const ry = Number.isFinite(attr("r")) ? attr("r") : attr("ry");
     if (!Number.isFinite(rx) || !Number.isFinite(ry)) continue;
-    out.push(
+    push(
+      m[0]!,
       `M${cx - rx} ${cy} A${rx} ${ry} 0 1 0 ${cx + rx} ${cy} A${rx} ${ry} 0 1 0 ${cx - rx} ${cy} Z`,
     );
   }
   return out;
 }
+
+/** Path data only, for callers that paint the whole mark in one ink. */
+export function extractSvgPaths(svg: string): string[] {
+  return extractSvgShapes(svg).map((s) => s.d);
+}
+
 
 async function loadLockup(url: string): Promise<LockupArt> {
   if (!url) return null;
