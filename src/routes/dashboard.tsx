@@ -154,6 +154,7 @@ function titleCase(value: string): string {
 
 function RoleDashboard() {
   const userId = useSessionUser();
+  const sessionEmail = useSessionEmail();
   const signedIn = !!userId;
   const {
     persona: personaId,
