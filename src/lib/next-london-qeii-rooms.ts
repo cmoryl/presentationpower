@@ -154,7 +154,12 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
   }));
 }
 
-/** Rooms that cannot be coloured on their own, in plain language. */
+/** True when this room is the only name inside its drawn shape. */
+export function qeiiRoomIsExclusive(entry: QeiiRoomShape): boolean {
+  return entry.sharedWith.length === 0;
+}
+
+/** Rooms that cannot be filled on their own, in plain language. */
 export function qeiiSharedShapeNotes(floor: QeiiFloorVector): string[] {
   const seen = new Set<number>();
   const notes: string[] = [];
@@ -162,37 +167,45 @@ export function qeiiSharedShapeNotes(floor: QeiiFloorVector): string[] {
     if (!entry.sharedWith.length || seen.has(entry.shapeIndex)) continue;
     seen.add(entry.shapeIndex);
     notes.push(
-      `${[entry.room, ...entry.sharedWith].join(", ")} are drawn as one shape in the issued artwork, so they take a colour together.`,
+      `${[entry.room, ...entry.sharedWith].join(", ")} are drawn as one shape in the issued artwork, so their colour shows as a tag behind each room name rather than filling the space.`,
     );
   }
   return notes;
 }
 
-/** Shape index → fill, from a room-name → colour map. */
-export function qeiiShapeColours(
-  floor: QeiiFloorVector,
-  rooms: QeiiRoomColours,
-): Map<number, string> {
-  const out = new Map<number, string>();
+/**
+ * How each chosen colour is painted on a plan.
+ *
+ * A room drawn as its own shape is filled. A room the artwork draws inside a
+ * shared block gets a tag behind its name instead, so the colour still reads
+ * without painting a neighbour's space by mistake.
+ */
+export type QeiiColourPaint = {
+  /** Shape index → fill, for rooms drawn as their own shape. */
+  fills: Map<number, string>;
+  /** Room name → tag colour, for rooms sharing a drawn shape. */
+  tags: Map<string, string>;
+};
+
+export function qeiiColourPaint(floor: QeiiFloorVector, rooms: QeiiRoomColours): QeiiColourPaint {
+  const fills = new Map<number, string>();
+  const tags = new Map<string, string>();
   for (const entry of qeiiRoomShapes(floor)) {
     const hex = rooms[entry.room];
-    if (hex) out.set(entry.shapeIndex, hex);
+    if (!hex) continue;
+    if (qeiiRoomIsExclusive(entry)) fills.set(entry.shapeIndex, hex);
+    else tags.set(entry.room, hex);
   }
-  return out;
+  return { fills, tags };
 }
 
-/** Room name → fill, so a label can be set in a readable ink. */
+/** The fill a room's own name sits on, so its ink stays readable. */
 export function qeiiRoomFill(
   floor: QeiiFloorVector,
   rooms: QeiiRoomColours,
   room: string,
 ): string | undefined {
-  if (rooms[room]) return rooms[room];
-  // A room sharing its shape with a coloured neighbour is filled too.
-  const entry = qeiiRoomShapes(floor).find((e) => e.room === room);
-  if (!entry) return undefined;
-  for (const other of entry.sharedWith) if (rooms[other]) return rooms[other];
-  return undefined;
+  return rooms[room];
 }
 
 /** What a space holds, used by the by-function colour preset. */
