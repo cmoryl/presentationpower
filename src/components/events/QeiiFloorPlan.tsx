@@ -50,21 +50,42 @@ export function QeiiFloorPlan({
         );
       })}
       {showLabels
-        ? floor.labels.map((label, i) => (
-            <text
-              key={`l-${i}`}
-              x={label.x}
-              y={label.y}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fontSize={qeiiLabelSize(label, labelScale)}
-              fill={qeiiLabelInk()}
-              transform={qeiiLabelTransform(label)}
-              style={{ fontFamily: "Geist, 'Geist Variable', sans-serif", fontWeight: 600 }}
-            >
-              {label.text}
-            </text>
-          ))
+        ? floor.labels.map((label, i) => {
+            const size = qeiiLabelSize(label, labelScale);
+            const use = showUse ? qeiiLabelUse(label, floor.id) : undefined;
+            const transform = qeiiLabelTransform(label);
+            const font = { fontFamily: "Geist, 'Geist Variable', sans-serif", fontWeight: 600 };
+            return (
+              <g key={`l-${i}`}>
+                <text
+                  x={label.x}
+                  y={label.y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontSize={size}
+                  fill={qeiiLabelInk()}
+                  transform={transform}
+                  style={font}
+                >
+                  {label.text}
+                </text>
+                {use ? (
+                  <text
+                    x={label.x}
+                    y={label.y + size * 1.15}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize={size * 0.72}
+                    fill={qeiiLabelInk()}
+                    transform={transform}
+                    style={font}
+                  >
+                    {use}
+                  </text>
+                ) : null}
+              </g>
+            );
+          })
         : null}
     </svg>
   );
