@@ -6,7 +6,7 @@
 // PDF, unchanged.
 
 import { useEffect, useMemo, useState } from "react";
-import { Download, FileDown, Maximize2, Search, X } from "lucide-react";
+import { Download, FileDown, Maximize2, Printer, Search, X } from "lucide-react";
 
 import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
