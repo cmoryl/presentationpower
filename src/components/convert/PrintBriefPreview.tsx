@@ -174,7 +174,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
               color: "#666666",
             }}
           >
-            <span>{brand.label ?? "TransPerfect"}</span>
+            <span>{brand.name}</span>
             {content.footnote ? <span style={{ maxWidth: "48ch" }}>{content.footnote}</span> : null}
             {content.cta ? <span style={{ color: ink, fontWeight: 600 }}>{content.cta}</span> : null}
           </div>
