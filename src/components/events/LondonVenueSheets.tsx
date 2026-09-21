@@ -73,6 +73,13 @@ export function LondonVenueSheets() {
   const sheet: VenueSheet =
     LONDON_VENUE_SHEETS.find((s) => s.id === sheetId) ?? LONDON_VENUE_SHEETS[0]!;
   const plan = useMemo(() => qeiiPlanState(sheet.id), [sheet.id]);
+  const planNotes = useMemo(
+    () =>
+      plan
+        ? qeiiPlanLayout(plan.floor, { labelScale, showUse, showMarks }).notes
+        : [],
+    [plan, labelScale, showUse, showMarks],
+  );
   const uses = useMemo(() => spaceUsesOnFloor(sheet.id), [sheet.id]);
 
   const showRebuilt = rebuiltView && !!plan?.rebuilt;
