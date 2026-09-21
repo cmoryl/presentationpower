@@ -2506,7 +2506,8 @@ export function agendaBlocks(config: AgendaConfig) {
    * them on every multi-day board, so the stamp takes its own baseline above the
    * footer lines whenever the right-hand line is occupied.
    */
-  const stampY = footer.right.trim() ? footY - L.footSize * 1.9 : footY;
+  const stampY =
+    footerBand && footer.right.trim() ? footY - L.footSize * 1.9 : footY;
   /**
    * The footnote gets its own reserved strip above the band, tall enough for the
    * location pin the programme look draws beside it. Without the reservation the
