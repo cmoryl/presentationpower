@@ -2515,11 +2515,14 @@ export function agendaBlocks(config: AgendaConfig) {
   const footnoteText = (config.footnote ?? "").trim();
   const footnoteH = footnoteText ? L.footSize * 3 : 0;
   const footnoteY = footerBand ? footerBand.y - L.footSize * 0.9 - footnoteH : footY;
-  let listBottom = footerBand
-    ? footnoteText
-      ? footnoteY - L.footSize * 0.9
-      : footerBand.y - L.footSize * 1.6
-    : footY - L.footSize * 1.8;
+  // The raised stamp line needs clearing too, or the last row band prints over it.
+  const stampGap = stampY < footY ? L.footSize * 1.9 : 0;
+  let listBottom =
+    (footerBand
+      ? footnoteText
+        ? footnoteY - L.footSize * 0.9
+        : footerBand.y - L.footSize * 1.6
+      : footY - L.footSize * 1.8) - stampGap;
 
   let qr: {
     x: number;
