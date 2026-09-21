@@ -30,9 +30,17 @@ describe("agenda Word export layout", () => {
     const zip = await JSZip.loadAsync(await new Response(blob as BlobPart).arrayBuffer());
     const doc = await zip.file("word/document.xml")!.async("string");
 
-    // Rows use the printed band as a minimum, never a hard cut.
+    // Session rows use the printed band as a minimum, never a hard cut. The
+    // thin gutter rows between cards are deliberately exact spacers, so only
+    // rows carrying content (the unsplittable ones) are checked here.
     expect(doc).toContain('w:hRule="atLeast"');
-    expect(doc).not.toContain('w:hRule="exact"');
+    const contentRows = doc
+      .split("<w:tr>")
+      .slice(1)
+      .filter((row) => row.includes("<w:cantSplit/>"));
+    expect(contentRows.length).toBeGreaterThan(0);
+    for (const row of contentRows) expect(row).not.toContain('w:hRule="exact"');
+
     // Measured gaps are exact spacers, so Word cannot re-flow the header.
     expect(doc).toContain('w:lineRule="exact"');
     // Rows cannot break across pages.
