@@ -22,6 +22,8 @@ import {
   type SpaceUseMark,
 } from "@/lib/next-london-space-use";
 import type { QeiiFloorVector, QeiiLabel } from "@/lib/next-london-qeii-vectors";
+import { qeiiRoomEdit, type QeiiMapEdits } from "@/lib/qeii-map-edits";
+
 import {
   qeiiHolderBox,
   qeiiObjectBoxes,
@@ -52,12 +54,16 @@ export type QeiiLayoutOptions = {
   showMarks?: boolean;
   /** Multiplies the division lockup height; 1 keeps the house setting. */
   markScale?: number;
+  /** Saved live edits: corrected names, corrected lines, nudged positions. */
+  edits?: QeiiMapEdits;
 };
 
 export type QeiiBox = { x0: number; y0: number; x1: number; y1: number };
 
 export type QeiiLayoutBlock = {
   key: string;
+  /** The room name as the venue issued it — the key every edit is held under. */
+  room: string;
   /** Centre of the first name line. */
   x: number;
   y: number;
@@ -73,6 +79,7 @@ export type QeiiLayoutBlock = {
   markH: number;
   box: QeiiBox;
 };
+
 
 export type QeiiLayout = {
   blocks: QeiiLayoutBlock[];
