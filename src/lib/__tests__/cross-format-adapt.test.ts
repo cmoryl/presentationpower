@@ -54,7 +54,8 @@ describe("cross-format adapter", () => {
   });
 
   it("shortens on a word boundary and reports it, never clipping silently", () => {
-    const long = "Language technology that scales across every regulated market we serve today";
+    const long =
+      "Language technology that scales across every regulated market we serve today, in every language our clients publish in";
     const trimmed = trimToWords(long, 40)!;
     expect(trimmed.length).toBeLessThanOrEqual(41);
     expect(trimmed.endsWith("…")).toBe(true);
