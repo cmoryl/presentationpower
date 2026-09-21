@@ -87,6 +87,8 @@ export function QeiiRoomColourPanel({
           {rooms.map((entry) => {
             const fn = qeiiRoomFunction(entry.room, floor.id);
             const chosen = colours[entry.room];
+            const accent = qeiiRoomDivisionAccent(entry.room, floor.id);
+            const division = qeiiRoomDivisionName(entry.room, floor.id);
             return (
               <li key={`${entry.room}-${entry.shapeIndex}`} className="flex flex-wrap items-center gap-2 py-2">
                 <span className="min-w-[9rem] text-[12.5px] font-semibold text-[#03002C]">
