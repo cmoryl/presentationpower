@@ -15,6 +15,7 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import { SocialAssetEditorButton } from "@/components/campaigns/SocialAssetEditor";
 import type { SocialAssetEdit } from "@/lib/social-asset-edit";
 import { AssetExportMenu } from "@/components/AssetExportMenu";
+import { PrintProofMenu } from "@/components/export/PrintProofMenu";
 
 /** Division accent for the card aura — falls back to TransPerfect blue. */
 function divisionAccent(brandId: string): string {
