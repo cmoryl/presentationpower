@@ -12,6 +12,7 @@ import { spaceUseLine, spaceUseMarks, type SpaceUseMark } from "@/lib/next-londo
 
 import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
+import type { QeiiMapEdits } from "@/lib/qeii-map-edits";
 import {
   qeiiColourKey,
   qeiiColourPaint,
@@ -69,6 +70,8 @@ export type QeiiPlanOptions = {
   wallWeight?: number;
   /** Draw every WC cubicle figure the venue drew instead of one bathroom symbol. */
   showAllSymbols?: boolean;
+  /** Saved live edits: corrected names, corrected lines, nudged positions. */
+  edits?: QeiiMapEdits;
 };
 
 /**
@@ -174,6 +177,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
     showUse: options.showUse,
     showMarks: options.showMarks,
     markScale: options.markScale,
+    edits: options.edits,
   });
   const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const labels = showLabels
@@ -195,7 +199,9 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
             ]
               .filter(Boolean)
               .join(" ");
-          const room = block.lines.join(" ");
+          // Colours and the key are held under the issued name, so a renamed
+          // room keeps the colour it was given.
+          const room = block.room;
           const tag = paint.tags.get(room);
           const ink = tag
             ? qeiiRoomTextInk(tag)
