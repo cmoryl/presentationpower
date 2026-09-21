@@ -15,9 +15,11 @@ import {
   type BrandHealthSample,
 } from "./brand-health";
 
-/** Chrome, guides and decorative type are never scored. */
+// Chrome, guides and decorative type are never scored. `aria-hidden` is NOT a
+// skip: a decorative <svg aria-hidden="true"> often carries the visible
+// headline, and icons have no text of their own to score anyway.
 const SKIP_SELECTOR =
-  "[aria-hidden='true'],[data-decorative],[data-accent-glow],[data-ui-chrome],[data-export-ignore='true']";
+  "[data-decorative],[data-accent-glow],[data-ui-chrome],[data-export-ignore='true'],[data-brand-health-ignore]";
 
 /** Surfaces that mean "this text sits on photography or a curated plate". */
 const MEDIA_SELECTOR = "[data-on-media],[data-media-backing],[data-chrome-on-media],[data-on-fill]";
