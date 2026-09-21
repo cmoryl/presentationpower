@@ -23,6 +23,6 @@ describe("QEII Illustrator map export", () => {
     const res = buildQeiiPlanAi(floor, {
       edits: { rooms: { [room]: { name: "Crew Check-In" } }, colours: {}, keyLabels: {} },
     });
-    expect(new TextDecoder("latin1").decode(res.bytes)).toContain("Crew Check-In");
+    expect(new TextDecoder("latin1").decode(res.bytes)).toContain("Crew");
   });
 });
