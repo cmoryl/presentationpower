@@ -5,7 +5,7 @@
 // qeiiPlanLayout, so the page, the SVG download and the tests agree exactly. The
 // ground is a solid brand token; no artwork is used as a background.
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 
 import {
   QEII_PLAN_TOKENS,
@@ -23,6 +23,7 @@ import {
   qeiiRoomTextInk,
   type QeiiRoomColours,
 } from "@/lib/next-london-qeii-rooms";
+import type { QeiiMapEdits } from "@/lib/qeii-map-edits";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 
 export type QeiiFloorPlanProps = {
@@ -50,6 +51,14 @@ export type QeiiFloorPlanProps = {
   showAllSymbols?: boolean;
   /** Ring the block of this room so a search result is findable on the plan. */
   highlightRoom?: string;
+  /** Saved live edits: corrected names and lines, nudged positions. */
+  edits?: QeiiMapEdits;
+  /** Names and lockups can be dragged, and picking one opens its fields. */
+  editable?: boolean;
+  /** Called with the room's issued name and its new total nudge, in plan units. */
+  onMoveRoom?: (room: string, dx: number, dy: number) => void;
+  /** Called when a room block is clicked in editing mode. */
+  onPickRoom?: (room: string) => void;
   className?: string;
 };
 
@@ -68,12 +77,18 @@ export function QeiiFloorPlan({
   wallWeight,
   showAllSymbols = false,
   highlightRoom,
+  edits,
+  editable = false,
+  onMoveRoom,
+  onPickRoom,
   className,
 }: QeiiFloorPlanProps) {
   const layout = useMemo(
-    () => qeiiPlanLayout(floor, { labelScale, showUse, showMarks, markScale }),
-    [floor, labelScale, showUse, showMarks, markScale],
+    () => qeiiPlanLayout(floor, { labelScale, showUse, showMarks, markScale, edits }),
+    [floor, labelScale, showUse, showMarks, markScale, edits],
   );
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const drag = useRef<{ room: string; x: number; y: number; dx: number; dy: number } | null>(null);
 
   const paint = useMemo(() => qeiiColourPaint(floor, roomColours), [floor, roomColours]);
   const hidden = useMemo(
@@ -87,14 +102,23 @@ export function QeiiFloorPlan({
   const keyStep = floor.w * 0.038;
   const keyH = keyRows.length ? keyStep * (keyRows.length + 1.2) : 0;
 
+  /** Screen pixels → plan units, so a drag moves the name exactly as far as the pointer. */
+  function unitsPerPixel(): number {
+    const box = svgRef.current?.getBoundingClientRect();
+    if (!box || box.width === 0) return 1;
+    return floor.w / box.width;
+  }
+
   return (
     <svg
+      ref={svgRef}
       viewBox={`0 0 ${floor.w} ${floor.h + keyH}`}
       role="img"
       aria-label={`Queen Elizabeth II Centre ${floor.title} plan, rebuilt as native artwork`}
       className={className}
     >
       <rect width={floor.w} height={floor.h + keyH} fill={QEII_PLAN_TOKENS.surface} />
+
       {floor.shapes.map((shape, i) => {
         // Repeated WC cubicle figures are left undrawn; one bathroom symbol stays.
         if (hidden.has(i)) return null;
