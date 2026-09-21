@@ -207,6 +207,8 @@ export function LondonVenueSheets() {
               face={face}
               labelScale={labelScale}
               showLabels={showLabels}
+              showUse={showUse}
+
               className="block w-full bg-[#EEF1F7]"
             />
           ) : (
