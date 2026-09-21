@@ -1000,6 +1000,9 @@ export function AgendaSheet({
             letterSpacing: "0.16em",
             opacity: 0.72,
             textTransform: "uppercase",
+            // The stamp sits on the footer, so it takes the footer ink (white on
+            // the dark boards) rather than inheriting the dark body copy colour.
+            color: footInk,
           }}
         >
           {config.pageLabel}

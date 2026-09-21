@@ -899,7 +899,7 @@ export async function buildAgendaPptx(
         lineSpacing: pt(L.footSize * 1.4),
         bold: true,
         charSpacing: 2,
-        color: inkHex,
+        color: chromeHex,
         align: "right",
         valign: "top",
         margin: 0,
