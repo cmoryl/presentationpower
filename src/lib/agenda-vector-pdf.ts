@@ -1154,6 +1154,22 @@ export async function buildAgendaVectorPdf(
           color: bandInk,
         });
       }
+      // The stamp only doubled as the right-hand line when that line was empty;
+      // with dates in place it takes its own baseline above them.
+      if (stamp && foot.right) {
+        const label = stamp.toUpperCase();
+        const spacing = size * 0.16;
+        const w = trackedWidth(bold, label, size, spacing);
+        drawTracked(page, label, {
+          x: px(blocks.x + blocks.contentW) - w,
+          y: py(blocks.stampY) - size,
+          size,
+          font: bold,
+          color: hexRgb(foot.onGround ? chromeInk : foot.ink),
+          opacity: 0.85,
+          spacing,
+        });
+      }
       endLayer(page);
     } else if (footnote || stamp) {
       beginLayer(page, layer("05 Footer"));
