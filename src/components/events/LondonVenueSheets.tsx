@@ -362,7 +362,17 @@ export function LondonVenueSheets() {
                     onClick={() => setSheetId(r.sheetId)}
                     className="flex w-full items-center justify-between gap-3 px-1 py-2 text-left text-[13px] text-[#03002C] hover:bg-[#F2F2F2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
                   >
-                    <span className={r.kind === "room" ? "font-semibold" : ""}>{r.room}</span>
+                    <span className="min-w-0">
+                      <span className={`block ${r.kind === "room" ? "font-semibold" : ""}`}>
+                        {r.room}
+                      </span>
+                      {spaceUseLine(r.room, r.sheetId) ? (
+                        <span className="block text-[11.5px] text-[#03002C]/60">
+                          {spaceUseLine(r.room, r.sheetId)}
+                        </span>
+                      ) : null}
+                    </span>
+
                     <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#03002C]/55">
                       {r.marker} · {r.floor}
                     </span>
