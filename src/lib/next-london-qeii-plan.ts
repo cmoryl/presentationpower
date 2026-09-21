@@ -28,6 +28,8 @@ export type QeiiPlanOptions = {
   showLabels?: boolean;
   /** Print what the space holds at NEXT 2026 London beneath each room name. */
   showUse?: boolean;
+  /** Print the division's NEXT lockup above a room its area holds. */
+  showMarks?: boolean;
 };
 
 /**
@@ -39,6 +41,15 @@ export type QeiiPlanOptions = {
 export function qeiiLabelUse(label: QeiiLabel, floorId: string): string | undefined {
   return spaceUseLine(label.text, floorId);
 }
+
+/**
+ * Division lockups for a room label. Empty for a house space — the schedule
+ * names no division area, so no mark is invented for it.
+ */
+export function qeiiLabelMarks(label: QeiiLabel, floorId: string): SpaceUseMark[] {
+  return spaceUseMarks(label.text, floorId);
+}
+
 
 
 function luminance(hex: string): number {
