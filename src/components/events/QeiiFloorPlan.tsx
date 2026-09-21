@@ -7,6 +7,7 @@
 import {
   QEII_PLAN_TOKENS,
   qeiiLabelInk,
+  qeiiLabelMarks,
   qeiiLabelSize,
   qeiiLabelTransform,
   qeiiLabelUse,
@@ -22,6 +23,8 @@ export type QeiiFloorPlanProps = {
   showLabels?: boolean;
   /** Print what each recorded space holds at the event beneath its name. */
   showUse?: boolean;
+  /** Print the division lockup above a room held by a division area. */
+  showMarks?: boolean;
   className?: string;
 };
 
@@ -31,6 +34,7 @@ export function QeiiFloorPlan({
   labelScale = 1,
   showLabels = true,
   showUse = false,
+  showMarks = false,
   className,
 }: QeiiFloorPlanProps) {
 
@@ -60,8 +64,32 @@ export function QeiiFloorPlan({
             const use = showUse ? qeiiLabelUse(label, floor.id) : undefined;
             const transform = qeiiLabelTransform(label);
             const font = { fontFamily: "Geist, 'Geist Variable', sans-serif", fontWeight: 600 };
+            const marks = showMarks ? qeiiLabelMarks(label, floor.id) : [];
+            const markH = size * 2.2;
+            const markRow = marks.reduce((w, m) => w + markH * m.ratio + size * 0.4, 0) - size * 0.4;
+            let markX = label.x - markRow / 2;
             return (
               <g key={`l-${i}`}>
+                {marks.map((m) => {
+                  const w = markH * m.ratio;
+                  const x = markX;
+                  markX += w + size * 0.4;
+                  return (
+                    <image
+                      key={m.divisionId}
+                      href={m.urlReverse}
+                      x={x}
+                      y={label.y - size * 1.1 - markH}
+                      width={w}
+                      height={markH}
+                      transform={transform}
+                      preserveAspectRatio="xMidYMid meet"
+                    >
+                      <title>{`${m.name} NEXT`}</title>
+                    </image>
+                  );
+                })}
+
                 <text
                   x={label.x}
                   y={label.y}

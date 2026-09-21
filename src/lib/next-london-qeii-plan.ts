@@ -7,7 +7,9 @@
 //
 // The ground behind a plan is a solid brand token — never imported artwork.
 
-import { spaceUseLine } from "@/lib/next-london-space-use";
+import { NEXT_APP_ORIGIN } from "@/lib/next-event";
+import { spaceUseLine, spaceUseMarks, type SpaceUseMark } from "@/lib/next-london-space-use";
+
 import { qeiiFloorVector, type QeiiFloorVector, type QeiiLabel } from "@/lib/next-london-qeii-vectors";
 
 
@@ -28,6 +30,8 @@ export type QeiiPlanOptions = {
   showLabels?: boolean;
   /** Print what the space holds at NEXT 2026 London beneath each room name. */
   showUse?: boolean;
+  /** Print the division's NEXT lockup above a room its area holds. */
+  showMarks?: boolean;
 };
 
 /**
@@ -39,6 +43,15 @@ export type QeiiPlanOptions = {
 export function qeiiLabelUse(label: QeiiLabel, floorId: string): string | undefined {
   return spaceUseLine(label.text, floorId);
 }
+
+/**
+ * Division lockups for a room label. Empty for a house space — the schedule
+ * names no division area, so no mark is invented for it.
+ */
+export function qeiiLabelMarks(label: QeiiLabel, floorId: string): SpaceUseMark[] {
+  return spaceUseMarks(label.text, floorId);
+}
+
 
 
 function luminance(hex: string): number {
@@ -134,9 +147,34 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
               .filter(Boolean)
               .join(" ");
           const use = options.showUse ? qeiiLabelUse(l, floor.id) : undefined;
-          return use
+          // The lockup is linked by its full site URL so the downloaded file
+          // still finds the approved artwork instead of embedding a copy.
+          const marks = options.showMarks ? qeiiLabelMarks(l, floor.id) : [];
+          const markH = size * 2.2;
+          const row = marks.reduce((w, m) => w + markH * m.ratio + size * 0.4, 0) - size * 0.4;
+          let markX = l.x - row / 2;
+          const markSvg = marks
+            .map((m) => {
+              const w = markH * m.ratio;
+              const x = markX;
+              markX += w + size * 0.4;
+              return [
+                "<image",
+                `href="${m.urlReverse.startsWith("http") ? m.urlReverse : `${NEXT_APP_ORIGIN}${m.urlReverse}`}"`,
+                `x="${x}" y="${l.y - size * 1.1 - markH}" width="${w}" height="${markH}"`,
+                'preserveAspectRatio="xMidYMid meet"',
+                transform ? `transform="${transform}"` : "",
+                "/>",
+              ]
+                .filter(Boolean)
+                .join(" ");
+            })
+            .join("");
+          const body = use
             ? text(l.y, size, l.text) + text(l.y + size * 1.15, size * 0.72, use)
             : text(l.y, size, l.text);
+          return markSvg + body;
+
         })
         .join("")
     : "";
