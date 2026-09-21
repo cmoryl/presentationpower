@@ -9,7 +9,7 @@ import { useMemo, useState } from "react";
 import { Download, FileDown, Maximize2, Search, X } from "lucide-react";
 
 import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
-import { spaceUseLine, spaceUsesOnFloor } from "@/lib/next-london-space-use";
+import { spaceUseLine, spaceUseMarks, spaceUsesOnFloor } from "@/lib/next-london-space-use";
 
 import {
   qeiiPlanFilename,
@@ -52,6 +52,7 @@ export function LondonVenueSheets() {
   const [labelScale, setLabelScale] = useState(1);
   const [showLabels, setShowLabels] = useState(true);
   const [showUse, setShowUse] = useState(true);
+  const [showMarks, setShowMarks] = useState(true);
 
 
   const rows = useMemo(() => venueRoomDirectory(), []);
@@ -78,7 +79,7 @@ export function LondonVenueSheets() {
 
   function downloadPlanSvg() {
     if (!plan?.rebuilt) return;
-    const svg = qeiiPlanSvg(plan.floor, { face, labelScale, showLabels, showUse });
+    const svg = qeiiPlanSvg(plan.floor, { face, labelScale, showLabels, showUse, showMarks });
     const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
     download(url, qeiiPlanFilename(plan.floor, face));
     URL.revokeObjectURL(url);
@@ -189,6 +190,14 @@ export function LondonVenueSheets() {
             >
               {showUse ? "Event use on" : "Event use off"}
             </button>
+            <button
+              type="button"
+              aria-pressed={showMarks}
+              onClick={() => setShowMarks(!showMarks)}
+              className={`${chip} border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]`}
+            >
+              {showMarks ? "Division logos on" : "Division logos off"}
+            </button>
 
             <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
               Name size
@@ -225,6 +234,7 @@ export function LondonVenueSheets() {
               labelScale={labelScale}
               showLabels={showLabels}
               showUse={showUse}
+              showMarks={showMarks}
 
               className="block w-full bg-[#EEF1F7]"
             />
@@ -306,7 +316,16 @@ export function LondonVenueSheets() {
               </p>
               <ul className="mt-2 divide-y divide-black/5 rounded-xl border border-black/10 bg-white">
                 {uses.map((u) => (
-                  <li key={`${u.space}-${u.event}`} className="px-3 py-2">
+                  <li key={`${u.space}-${u.event}`} className="flex items-center gap-3 px-3 py-2">
+                    {spaceUseMarks(u.space, u.sheetId).map((m) => (
+                      <img
+                        key={m.divisionId}
+                        src={m.url}
+                        alt={`${m.name} NEXT lockup`}
+                        className="h-7 w-auto shrink-0"
+                      />
+                    ))}
+                    <span className="min-w-0">
                     <p className="text-[13px] font-semibold text-[#03002C]">{u.space}</p>
                     <p className="text-[12px] text-[#03002C]/70">
                       {u.fn ? `${u.fn} · ` : ""}
@@ -317,6 +336,7 @@ export function LondonVenueSheets() {
                         No function recorded for this space.
                       </p>
                     )}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -375,6 +395,14 @@ export function LondonVenueSheets() {
                     onClick={() => setSheetId(r.sheetId)}
                     className="flex w-full items-center justify-between gap-3 px-1 py-2 text-left text-[13px] text-[#03002C] hover:bg-[#F2F2F2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
                   >
+                    {spaceUseMarks(r.room, r.sheetId).map((m) => (
+                      <img
+                        key={m.divisionId}
+                        src={m.url}
+                        alt={`${m.name} NEXT lockup`}
+                        className="mr-2 inline-block h-5 w-auto align-middle"
+                      />
+                    ))}
                     <span className="min-w-0">
                       <span className={`block ${r.kind === "room" ? "font-semibold" : ""}`}>
                         {r.room}
