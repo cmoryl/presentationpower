@@ -67,7 +67,9 @@ function AgendaPage() {
         >
           <ArrowLeft size={13} /> TransPerfect NEXT
         </Link>
+        <AgendaHouseTimesPanel divisionId={resolved.id} />
         <AgendaStudio
+
           key={`${resolved.id}|${openFile?.id ?? "new"}`}
           divisionId={resolved.id}
           initialConfig={openFile?.config}
