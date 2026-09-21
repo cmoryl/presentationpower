@@ -103,7 +103,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
   const [wallWeight, setWallWeight] = useState(QEII_WALL_WEIGHT);
   const [showAllSymbols, setShowAllSymbols] = useState(false);
   // A search result is ringed on the plan so it can actually be found.
-  const [highlightRoom, setHighlightRoom] = useState<string | undefined>(undefined);
+  const [highlightRoom, setHighlightRoom] = useState<string | undefined>(initialRoom);
   const [printing, setPrinting] = useState(false);
   const [printNote, setPrintNote] = useState<string | undefined>(undefined);
   // Live editing: room names, the line beneath them and nudged positions, saved
