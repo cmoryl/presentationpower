@@ -12,9 +12,11 @@
 
 import {
   AGENDA_DIVISIONS,
+  AGENDA_EVENT_AREA_IDS,
   agendaProgramme,
   type AgendaSession,
 } from "./next-agenda";
+
 
 export type HouseSlotKind = "registration" | "lunch" | "reception";
 
@@ -95,7 +97,11 @@ function findSlot(rows: AgendaSession[], spec: SlotSpec): AgendaSession | null {
  * missing a second-day lunch.
  */
 export function agendaHouseSlotReports(divisionIds?: string[]): HouseSlotReport[] {
-  const ids = divisionIds ?? AGENDA_DIVISIONS.map((d) => d.id);
+  // Event areas (the Innovation Lounge stage) keep their own timings and have no
+  // registration, lunch or reception of their own, so they are never compared.
+  const ids =
+    divisionIds ??
+    AGENDA_DIVISIONS.filter((d) => !AGENDA_EVENT_AREA_IDS.includes(d.id)).map((d) => d.id);
   const nameOf = new Map(AGENDA_DIVISIONS.map((d) => [d.id, d.name] as const));
   const maxDays = ids.reduce((m, id) => Math.max(m, dayCount(id)), 1);
   const reports: HouseSlotReport[] = [];

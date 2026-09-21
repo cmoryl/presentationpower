@@ -31,8 +31,28 @@ import {
 import { logoInkRatio } from "@/lib/next-logo-ink";
 import { qrPrintQuality, type QrModuleStyle } from "@/lib/qr-print";
 
-export const AGENDA_DIVISIONS: CityBadgeDivision[] = CITY_BADGE_DIVISIONS;
-export const agendaDivision = cityBadgeDivision;
+/**
+ * Stage areas that get their own agenda board but are not NEXT divisions, so
+ * they must not appear in badge, pillar or cross-division comparisons. They
+ * print under the TransPerfect NEXT lockup, which is the approved mark for a
+ * whole-event area.
+ */
+export const AGENDA_EVENT_AREAS: CityBadgeDivision[] = [
+  { ...cityBadgeDivision("transperfect"), id: "innovation-lounge", name: "Innovation Lounge" },
+];
+
+/** Ids in `AGENDA_DIVISIONS` that are event areas rather than divisions. */
+export const AGENDA_EVENT_AREA_IDS: string[] = AGENDA_EVENT_AREAS.map((a) => a.id);
+
+export const AGENDA_DIVISIONS: CityBadgeDivision[] = [
+  ...CITY_BADGE_DIVISIONS,
+  ...AGENDA_EVENT_AREAS,
+];
+
+export function agendaDivision(id: string | undefined): CityBadgeDivision {
+  return AGENDA_EVENT_AREAS.find((a) => a.id === id) ?? cityBadgeDivision(id);
+}
+
 
 export const AGENDA_QR_STYLES = PILLAR_QR_STYLES;
 export const AGENDA_QR_MIN_CONTRAST = PILLAR_QR_MIN_CONTRAST;
