@@ -2,6 +2,7 @@
 // plus procedural generation of new on-brand variants and PNG export across
 // LinkedIn banner, X/Twitter header and Facebook cover geometries.
 
+import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { useMemo, useState } from "react";
 import { Download, RefreshCw, Sparkles, Check } from "lucide-react";
 import { toast } from "sonner";
@@ -181,7 +182,13 @@ export function LinkedInBannerStudio() {
             <h2 className="text-xl font-semibold tracking-tight text-[#03002C]">{selected.name}</h2>
             <p className="mt-1 max-w-xl text-xs text-black/55">{surface.note}</p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <BrandHealthBadge
+              getRoots={() =>
+                Array.from(document.querySelectorAll<HTMLElement>("[data-brand-health-root]"))
+              }
+              surfaceLabel="this banner"
+            />
             <button
               type="button"
               disabled={busy}
@@ -231,12 +238,14 @@ export function LinkedInBannerStudio() {
           ))}
         </div>
 
-        <BannerPreview
-          rec={selected}
-          copy={copy}
-          surface={surface}
-          className="shadow-[0_18px_50px_-24px_rgba(3,0,44,0.45)]"
-        />
+        <div data-brand-health-root="">
+          <BannerPreview
+            rec={selected}
+            copy={copy}
+            surface={surface}
+            className="shadow-[0_18px_50px_-24px_rgba(3,0,44,0.45)]"
+          />
+        </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <label className="space-y-1">

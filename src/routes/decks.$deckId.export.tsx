@@ -22,6 +22,7 @@ import { runQa, blockingIssues, warningIssues } from "@/lib/qa";
 import { gateQaIssues, isApprovedDemo } from "@/lib/demo-approved";
 import type { GeometryRepairReport } from "@/lib/canvas-repair-report";
 import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
+import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 import { auditExportCoverage, type ExportCoverageReport } from "@/lib/export-coverage";
@@ -571,6 +572,13 @@ function ExportView() {
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
+                  <BrandHealthBadge
+                    getRoots={() =>
+                      Array.from(document.querySelectorAll<HTMLElement>("[data-slide-stage]"))
+                    }
+                    divisionId={deck.brandModeId ?? null}
+                    surfaceLabel="every slide in this export"
+                  />
                   <button
                     onClick={handlePptx}
                     disabled={exporting || preflightBusy || empty}

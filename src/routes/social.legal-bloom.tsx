@@ -5,6 +5,7 @@
 // editor: the picture and the text block can be dragged and resized per ad and
 // per size, with the type sizes on sliders. Moves are remembered in this browser.
 
+import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -503,8 +504,16 @@ function BloomView() {
           {/* the pack export: one zip, filed into sections, for a whole set or
               just the ads a person wants */}
           <div className="mt-6 rounded-2xl border border-black/10 bg-white p-4">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/45">
-              Download a pack
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/45">
+                Download a pack
+              </div>
+              <BrandHealthBadge
+                getRoots={() =>
+                  Array.from(document.querySelectorAll<HTMLElement>("[data-brand-health-root]"))
+                }
+                surfaceLabel="these campaign boards"
+              />
             </div>
             <p className="mt-1 max-w-3xl text-xs leading-relaxed text-black/55">
               One zip holding the still artwork filed by placement, the moving versions beside it,
@@ -724,7 +733,7 @@ function BloomView() {
 
         <div className="grid gap-8 lg:grid-cols-2">
           {LEGAL_BLOOM_SCENES.map((scene) => (
-            <figure key={scene.id} className="space-y-3">
+            <figure key={scene.id} className="space-y-3" data-brand-health-root="">
               <button
                 type="button"
                 onClick={() => setZoom(scene.id)}
@@ -935,6 +944,12 @@ function BloomView() {
               >
                 <Download size={12} /> {dlBusy ? "Writing…" : "Download"}
               </button>
+              <BrandHealthBadge
+                getRoots={() =>
+                  Array.from(document.querySelectorAll<HTMLElement>("[data-brand-health-root]"))
+                }
+                surfaceLabel="this campaign board"
+              />
               <button
                 type="button"
                 onClick={() => step(-1)}
@@ -1060,7 +1075,7 @@ function BloomView() {
               <Scaled w={size.w} h={size.h} factor={viewZoom}>
                 {(scale) => (
                   <div style={{ position: "relative", width: size.w, height: size.h }}>
-                    <div ref={exportRef}>
+                    <div ref={exportRef} data-brand-health-root="">
                       {viewMoving ? (
                         <BloomMotionAd
                           scene={zoomScene}
