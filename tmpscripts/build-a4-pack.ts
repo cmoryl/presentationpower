@@ -15,8 +15,7 @@ for (const div of AGENDA_DIVISIONS) {
   } as never);
   try {
     const out = await buildAgendaVectorPdf(cfg, { guides: false } as never);
-    const blob = (out as any).blob ?? out;
-    const buf = Buffer.from(await blob.arrayBuffer());
+    const buf = Buffer.from(out.bytes);
     writeFileSync(`${OUT}/${div.id}-agenda-a4.pdf`, buf);
     lines.push(`${div.id}\tOK\t${buf.length} bytes`);
     console.log("ok", div.id, buf.length);
