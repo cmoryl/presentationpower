@@ -49,6 +49,7 @@ import {
   agendaBlocks,
   agendaDivision,
   agendaLockupUrl,
+  agendaLockupInk,
   agendaGeometry,
   agendaInk,
   agendaName,
@@ -386,6 +387,9 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
   // Approved division lockup is fetched once and reused on every page.
   const division = agendaDivision(config.divisionId);
   const lockupSrc = agendaLockupUrl(config);
+  // The mark takes the ink of its own approved file (white on a dark board), not
+  // the copy-contrast ink — that guard is for body copy.
+  const lockupInk = agendaLockupInk(config);
   const art = config.showLockup ? await loadLockup(lockupSrc) : null;
   let lockupVector = false;
 
@@ -480,7 +484,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
             x: px(blocks.lockup.x) - vx * scale - offX,
             y: py(blocks.lockup.y) + vy * scale + offY,
             scale,
-            color: rgb(...hexRgb(ink)),
+            color: rgb(...hexRgb(lockupInk)),
           });
         }
       } else if (art.kind === "raster") {
