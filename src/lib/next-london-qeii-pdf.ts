@@ -90,7 +90,11 @@ export async function inlineSvgImages(
   return { svg, dropped };
 }
 
-async function rasterise(svg: string): Promise<{ dataUrl: string; w: number; h: number }> {
+/**
+ * Rasterise a plan SVG at print resolution. Shared with the Office exports so a
+ * PowerPoint or Word map carries exactly the artwork the proof PDF shows.
+ */
+export async function qeiiRasteriseSvg(svg: string): Promise<{ dataUrl: string; w: number; h: number }> {
   const blobUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -158,7 +162,7 @@ export async function exportQeiiFloorsPdf(
             `${page.title}: ${inlined.dropped.length} division lockup${inlined.dropped.length === 1 ? "" : "s"} could not be embedded, so ${inlined.dropped.length === 1 ? "it is" : "they are"} not on this page.`,
           );
         }
-        art = await rasterise(inlined.svg);
+        art = await qeiiRasteriseSvg(inlined.svg);
       } else if (page.imageUrl) {
         art = await loadRaster(page.imageUrl);
       } else {
