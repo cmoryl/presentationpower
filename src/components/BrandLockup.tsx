@@ -164,7 +164,7 @@ export function BrandLockup({
     const markPx = Math.round(dims.markPx * (isMarkOnly ? 1.25 * 1.5 : 1.5));
     if (isMarkOnly) {
       return (
-        <div className="inline-flex" style={{ color }}>
+        <div className="inline-flex" style={{ color }} {...lockupAttrs("mark-only", "color")}>
           {unit ? (
             <div style={{ height: uh(markPx), display: "flex", maxWidth: capWidth }}>
               <ElementMark
@@ -187,6 +187,7 @@ export function BrandLockup({
         style={{ color }}
         role="img"
         aria-label="TransPerfect Element lockup"
+        {...lockupAttrs("horizontal", onDark ? "white" : "color")}
       >
         <img
           src={onDark ? ELEMENT_LOCKUP_URLS.reversed : ELEMENT_LOCKUP_URLS.color}
@@ -209,6 +210,10 @@ export function BrandLockup({
         style={{ color }}
         role="img"
         aria-label={`${logo.wordmark} mark`}
+        {...lockupAttrs(
+          "mark-only",
+          /^#?fff(fff)?$/i.test(color) || color.toLowerCase() === "white" ? "white" : "black",
+        )}
       >
         <div
           className="flex items-center justify-center font-semibold tracking-tight"
