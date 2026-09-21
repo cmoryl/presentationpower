@@ -3,7 +3,7 @@
 // flat artwork), so opening them in the agenda / pillar editors gives an
 // operator a real starting point they can edit and export.
 
-import { agendaDefault, type AgendaConfig } from "./next-agenda";
+import { agendaDefault, agendaFoldSimultaneous, type AgendaConfig } from "./next-agenda";
 import { pillarDefault, type PillarConfig, type PillarKindId } from "./next-pillar-masters";
 
 export const CITY_SERIES_DEMO_EVENT = "NEXT City Series — Barcelona";
@@ -84,7 +84,7 @@ export function citySeriesDemoAgenda(): AgendaConfig {
         track: "MAIN STAGE",
         muted: false,
       },
-    ],
+    ]),
   };
 }
 
