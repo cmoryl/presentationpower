@@ -280,6 +280,8 @@ export type SpaceUseMark = {
   name: string;
   /** Stacked lockup file for a light ground. */
   url: string;
+  /** Reverse stacked lockup — white wordmark, accent live — for a dark ground. */
+  urlReverse: string;
   /** Approved lockup aspect ratio (width / height). */
   ratio: number;
 };
@@ -298,6 +300,7 @@ export function spaceUseMarks(room: string, sheetId?: string): SpaceUseMark[] {
       divisionId,
       name: suite?.trackName ?? divisionId,
       url: art.url,
+      urlReverse: suite?.stackedReverse.url || suite?.stackedWhite.url || art.url,
       ratio: art.ratio || 1.7,
     });
   }

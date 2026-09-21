@@ -77,7 +77,7 @@ export function QeiiFloorPlan({
                   return (
                     <image
                       key={m.divisionId}
-                      href={m.url}
+                      href={m.urlReverse}
                       x={x}
                       y={label.y - size * 1.1 - markH}
                       width={w}

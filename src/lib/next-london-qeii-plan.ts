@@ -160,7 +160,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
               markX += w + size * 0.4;
               return [
                 "<image",
-                `href="${m.url.startsWith("http") ? m.url : `${NEXT_APP_ORIGIN}${m.url}`}"`,
+                `href="${m.urlReverse.startsWith("http") ? m.urlReverse : `${NEXT_APP_ORIGIN}${m.urlReverse}`}"`,
                 `x="${x}" y="${l.y - size * 1.1 - markH}" width="${w}" height="${markH}"`,
                 'preserveAspectRatio="xMidYMid meet"',
                 transform ? `transform="${transform}"` : "",
