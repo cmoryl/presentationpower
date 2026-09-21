@@ -4,7 +4,9 @@ import { LONDON_VENUE_SHEETS } from "@/lib/next-london-venue-sheets";
 import {
   LONDON_SPACE_USE,
   spaceFunctionMissing,
+  spaceUseDivisionId,
   spaceUseLine,
+  spaceUseMarks,
   spaceUsesForRoom,
   spaceUsesOnFloor,
 } from "@/lib/next-london-space-use";
@@ -52,5 +54,27 @@ describe("NEXT 2026 London event space use", () => {
       "Windsor",
     ]);
     expect(spaceUsesOnFloor("sixth").map((u) => u.event)).toEqual(["LifeSciNEXT"]);
+  });
+});
+
+describe("division marks on the plans", () => {
+  it("gives a room its division lockup, deduplicated where a room holds two", () => {
+    expect(spaceUseMarks("Westminster", "fourth").map((m) => m.divisionId)).toEqual(["games"]);
+    expect(spaceUseMarks("Fleming", "third").map((m) => m.divisionId)).toEqual([
+      "globallink",
+      "transperfect",
+    ]);
+    expect(spaceUseMarks("Mountbatten", "sixth")[0]?.url).toBeTruthy();
+  });
+
+  it("leaves a house space without a mark instead of inventing one", () => {
+    expect(spaceUseMarks("Darwin", "fifth")).toEqual([]);
+    expect(spaceUseMarks("Brunel", "ground")).toEqual([]);
+    expect(spaceUseMarks("Nightingale", "ground")).toEqual([]);
+  });
+
+  it("reads the division from the event column, longest name first", () => {
+    expect(spaceUseDivisionId(spaceUsesForRoom("Churchill", "ground")[0]!)).toBe("globallink");
+    expect(spaceUseDivisionId(spaceUsesForRoom("Cambridge", "fifth")[0]!)).toBe("lifesci");
   });
 });
