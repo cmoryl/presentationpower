@@ -55,7 +55,20 @@ export function LondonVenueSheets() {
 
 
   const rows = useMemo(() => venueRoomDirectory(), []);
-  const found = useMemo(() => searchVenueRooms(query, rows), [query, rows]);
+  const found = useMemo(() => {
+    const byName = searchVenueRooms(query, rows);
+    const q = query.trim().toLowerCase();
+    if (!q) return byName;
+    const seen = new Set(byName.map((r) => `${r.sheetId}|${r.room}`));
+    // A search also finds a space by what it holds — "LegalNEXT", "Plenary", "Mart".
+    const byUse = rows.filter(
+      (r) =>
+        !seen.has(`${r.sheetId}|${r.room}`) &&
+        (spaceUseLine(r.room, r.sheetId) ?? "").toLowerCase().includes(q),
+    );
+    return [...byName, ...byUse];
+  }, [query, rows]);
+
   const sheet: VenueSheet =
     LONDON_VENUE_SHEETS.find((s) => s.id === sheetId) ?? LONDON_VENUE_SHEETS[0]!;
   const plan = useMemo(() => qeiiPlanState(sheet.id), [sheet.id]);
