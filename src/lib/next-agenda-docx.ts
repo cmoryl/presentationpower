@@ -681,6 +681,9 @@ export async function buildAgendaDocx(
           speaker = "",
           /** Fitted card sizes; the main band keeps its own type. */
           T: { titleSize: number; detailSize: number } = cardBodyType,
+          /** Room / floor for a simultaneous card, printed in caps. */
+          room = "",
+
         ) =>
           [
             para(
