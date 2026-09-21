@@ -138,7 +138,14 @@ export type AgendaSheetEdit = {
   onParallel: (
     index: number,
     track: number,
-    patch: Partial<{ time: string; title: string; speaker: string; detail: string }>,
+    patch: Partial<{
+      time: string;
+      title: string;
+      speaker: string;
+      detail: string;
+      room: string;
+    }>,
+
   ) => void;
 };
 
