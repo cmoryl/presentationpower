@@ -2246,13 +2246,21 @@ export function AgendaStudio({
                                   onChange={(e) => edit({ speaker: e.target.value })}
                                 />
                               </div>
-                              <Input
-                                className="mt-2"
-                                aria-label={`Row ${i + 1} parallel ${pi + 1} notes`}
-                                value={par.detail}
-                                placeholder="Notes or room"
-                                onChange={(e) => edit({ detail: e.target.value })}
-                              />
+                              <div className="mt-2 grid gap-2 md:grid-cols-[200px_1fr]">
+                                <Input
+                                  aria-label={`Row ${i + 1} parallel ${pi + 1} room`}
+                                  value={par.room ?? ""}
+                                  placeholder="Room / floor"
+                                  onChange={(e) => edit({ room: e.target.value })}
+                                />
+                                <Input
+                                  aria-label={`Row ${i + 1} parallel ${pi + 1} notes`}
+                                  value={par.detail}
+                                  placeholder="Notes"
+                                  onChange={(e) => edit({ detail: e.target.value })}
+                                />
+                              </div>
+
                             </div>
                           );
                         })}
