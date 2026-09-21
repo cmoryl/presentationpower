@@ -24,7 +24,20 @@ export type QeiiPlanOptions = {
   /** Multiplies the issued label size; 1 keeps the venue's own typesetting. */
   labelScale?: number;
   showLabels?: boolean;
+  /** Print what the space holds at NEXT 2026 London beneath each room name. */
+  showUse?: boolean;
 };
+
+/**
+ * What a named room holds at the event, set beneath the room name.
+ *
+ * Only spaces the event schedule records get a line; nothing is invented for a
+ * room the schedule does not mention.
+ */
+export function qeiiLabelUse(label: QeiiLabel, floorId: string): string | undefined {
+  return spaceUseLine(label.text, floorId);
+}
+
 
 function luminance(hex: string): number {
   const v = hex.replace("#", "");
