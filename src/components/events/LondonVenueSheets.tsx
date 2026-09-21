@@ -287,8 +287,23 @@ export function LondonVenueSheets() {
             <FileDown className="h-4 w-4" /> All {VENUE_SHEET_PDF.pages} sheets (
             {VENUE_SHEET_PDF.paper} PDF)
           </button>
+          <button
+            type="button"
+            className={btn}
+            onClick={printAllFloorsPdf}
+            disabled={printing}
+          >
+            <Printer className="h-4 w-4" />
+            {printing ? "Making the PDF…" : "Print all floors (PDF)"}
+          </button>
         </div>
       </div>
+
+      {printNote ? (
+        <p className="mt-3 rounded-xl border border-black/10 bg-white px-3.5 py-2.5 text-[12.5px] leading-relaxed text-[#03002C]/80">
+          {printNote}
+        </p>
+      ) : null}
 
       <div className="mt-4 flex flex-wrap gap-2">
         {LONDON_VENUE_SHEETS.map((s) => (
