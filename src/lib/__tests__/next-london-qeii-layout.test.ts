@@ -6,7 +6,8 @@ import {
   qeiiLabelGroups,
   qeiiPlanLayout,
 } from "@/lib/next-london-qeii-layout";
-import { qeiiFloorVector } from "@/lib/next-london-qeii-vectors";
+import { qeiiObjectBoxes } from "@/lib/next-london-qeii-geometry";
+import { QEII_FLOOR_VECTORS, qeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 import { LONDON_VENUE_SHEETS } from "@/lib/next-london-venue-sheets";
 
 function boxesOverlap(a: any, b: any, pad = 0) {
