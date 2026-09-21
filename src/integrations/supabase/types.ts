@@ -4387,6 +4387,36 @@ export type Database = {
         }
         Relationships: []
       }
+      venue_map_edits: {
+        Row: {
+          created_at: string
+          edits: Json
+          floor_id: string
+          id: string
+          updated_at: string
+          updated_by: string | null
+          venue_slug: string
+        }
+        Insert: {
+          created_at?: string
+          edits?: Json
+          floor_id: string
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+          venue_slug: string
+        }
+        Update: {
+          created_at?: string
+          edits?: Json
+          floor_id?: string
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+          venue_slug?: string
+        }
+        Relationships: []
+      }
       venue_pins: {
         Row: {
           asset_id: string
