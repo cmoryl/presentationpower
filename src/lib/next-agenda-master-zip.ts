@@ -25,7 +25,6 @@ import {
   AGENDA_SPEC,
   agendaDefault,
   agendaDivision,
-  agendaName,
   agendaPages,
   agendaSlug,
   type AgendaConfig,
@@ -181,7 +180,7 @@ function masterReadme(
     `Boards included:`,
     ...entries.map(
       (e) =>
-        `  ${e.divisionName} — ${agendaName({ ...agendaDefault(e.divisionId) })} · ${e.sessions} rows · ${e.pages || "?"} page(s) · ${e.formats.join(", ") || "nothing built"}`,
+        `  ${e.divisionName} — ${e.slug} · ${e.sessions} rows · ${e.pages || "?"} page(s) · ${e.formats.join(", ") || "nothing built"}`,
     ),
     ``,
     ...(failed.length
