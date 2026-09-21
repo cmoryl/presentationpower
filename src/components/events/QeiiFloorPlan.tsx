@@ -1,19 +1,14 @@
 // The rebuilt QEII floor plan, drawn from our own geometry and live type.
 //
-// Every wall and symbol is the issued artwork rebuilt as paths, so the plan can be
-// re-inked, room names retypeset and the whole thing handed on as an SVG. The
+// Every wall and symbol is the issued artwork rebuilt as paths. All typesetting —
+// size, multi-line names, event lines, lockups and collision handling — comes from
+// qeiiPlanLayout, so the page, the SVG download and the tests agree exactly. The
 // ground is a solid brand token; no artwork is used as a background.
 
-import {
-  QEII_PLAN_TOKENS,
-  qeiiLabelInk,
-  qeiiLabelMarks,
-  qeiiLabelSize,
-  qeiiLabelTransform,
-  qeiiLabelUse,
-  qeiiPlanInk,
-  type QeiiPlanFace,
-} from "@/lib/next-london-qeii-plan";
+import { useMemo } from "react";
+
+import { QEII_PLAN_TOKENS, qeiiLabelInk, qeiiPlanInk, type QeiiPlanFace } from "@/lib/next-london-qeii-plan";
+import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 
 export type QeiiFloorPlanProps = {
@@ -37,6 +32,10 @@ export function QeiiFloorPlan({
   showMarks = false,
   className,
 }: QeiiFloorPlanProps) {
+  const layout = useMemo(
+    () => qeiiPlanLayout(floor, { labelScale, showUse, showMarks }),
+    [floor, labelScale, showUse, showMarks],
+  );
 
   return (
     <svg
@@ -59,29 +58,32 @@ export function QeiiFloorPlan({
         );
       })}
       {showLabels
-        ? floor.labels.map((label, i) => {
-            const size = qeiiLabelSize(label, labelScale);
-            const use = showUse ? qeiiLabelUse(label, floor.id) : undefined;
-            const transform = qeiiLabelTransform(label);
+        ? layout.blocks.map((block) => {
+            const transform =
+              Math.abs(block.angle) < 0.5
+                ? undefined
+                : `rotate(${block.angle} ${block.x} ${block.y})`;
             const font = { fontFamily: "Geist, 'Geist Variable', sans-serif", fontWeight: 600 };
-            const marks = showMarks ? qeiiLabelMarks(label, floor.id) : [];
-            const markH = size * 2.2;
-            const markRow = marks.reduce((w, m) => w + markH * m.ratio + size * 0.4, 0) - size * 0.4;
-            let markX = label.x - markRow / 2;
+            const markRow =
+              block.marks.reduce((w, m) => w + block.markH * m.ratio + block.size * 0.35, 0) -
+              block.size * 0.35;
+            let markX = block.x - markRow / 2;
+            const nameTop = block.y - ((block.lines.length - 1) * block.size * 1.05) / 2;
+            const lastLine = nameTop + (block.lines.length - 1) * block.size * 1.05;
             return (
-              <g key={`l-${i}`}>
-                {marks.map((m) => {
-                  const w = markH * m.ratio;
+              <g key={block.key}>
+                {block.marks.map((m) => {
+                  const w = block.markH * m.ratio;
                   const x = markX;
-                  markX += w + size * 0.4;
+                  markX += w + block.size * 0.35;
                   return (
                     <image
                       key={m.divisionId}
                       href={m.urlReverse}
                       x={x}
-                      y={label.y - size * 1.1 - markH}
+                      y={nameTop - block.size * 0.7 - block.markH}
                       width={w}
-                      height={markH}
+                      height={block.markH}
                       transform={transform}
                       preserveAspectRatio="xMidYMid meet"
                     >
@@ -89,31 +91,33 @@ export function QeiiFloorPlan({
                     </image>
                   );
                 })}
-
-                <text
-                  x={label.x}
-                  y={label.y}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontSize={size}
-                  fill={qeiiLabelInk()}
-                  transform={transform}
-                  style={font}
-                >
-                  {label.text}
-                </text>
-                {use ? (
+                {block.lines.map((line, li) => (
                   <text
-                    x={label.x}
-                    y={label.y + size * 1.15}
+                    key={`${block.key}-${li}`}
+                    x={block.x}
+                    y={nameTop + li * block.size * 1.05}
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    fontSize={size * 0.72}
+                    fontSize={block.size}
                     fill={qeiiLabelInk()}
                     transform={transform}
                     style={font}
                   >
-                    {use}
+                    {line}
+                  </text>
+                ))}
+                {block.use ? (
+                  <text
+                    x={block.x}
+                    y={lastLine + block.size * 0.62 + block.useSize * 0.6}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize={block.useSize}
+                    fill={qeiiLabelInk()}
+                    transform={transform}
+                    style={font}
+                  >
+                    {block.use}
                   </text>
                 ) : null}
               </g>
