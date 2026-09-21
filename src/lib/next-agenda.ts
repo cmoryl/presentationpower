@@ -288,6 +288,13 @@ export function agendaDivisionAccent(_divisionId: string | undefined): string | 
  * times. Event areas (the Innovation Lounge) print under the master NEXT lockup,
  * so they take the master NEXT accent.
  */
+/**
+ * Visibility floor for the accent time rail against the band fill behind it.
+ * The rail carries no information of its own, so this is a "can you see it"
+ * threshold rather than the AA text ratio.
+ */
+export const AGENDA_RAIL_MIN_CONTRAST = 1.35;
+
 export function agendaDivisionDayAccent(
   divisionId: string | undefined,
 ): { hex: string; ink: string } | null {
@@ -721,10 +728,10 @@ function agendaBandPaletteBase(config: {
  * On a division board the day heading bar and the left time rail take the
  * division's own NEXT accent, so a Legal programme reads as Legal at a glance
  * while the ground, the band fills and every line of copy stay enterprise. The
- * accent is only kept where it still reads: the day bar needs an approved ink at
- * AA on it, and the rail needs 3:1 against both band fills. Where it does not,
- * the treatment's own Blue 500 / Aqua stays — a board is never made less legible
- * to carry a colour.
+ * The day bar always carries the approved ink that clears AA on the accent. The
+ * rail is decoration beside the time, never the only way a time is read, so it
+ * needs only to be visibly distinct from the band fill it sits on; where an
+ * accent would disappear into the fill the treatment's own rail stays.
  */
 export function agendaBandPalette(config: {
   bandTreatment?: string;
@@ -735,8 +742,8 @@ export function agendaBandPalette(config: {
   const accent = agendaDivisionDayAccent(config.divisionId);
   if (!accent) return base;
   const railReads =
-    agendaContrastRatio(accent.hex, base.fillA) >= 3 &&
-    agendaContrastRatio(accent.hex, base.fillB) >= 3;
+    agendaContrastRatio(accent.hex, base.fillA) >= AGENDA_RAIL_MIN_CONTRAST &&
+    agendaContrastRatio(accent.hex, base.fillB) >= AGENDA_RAIL_MIN_CONTRAST;
   return {
     ...base,
     dayBar: accent.hex,

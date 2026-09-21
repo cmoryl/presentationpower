@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   AGENDA_DIVISIONS,
   agendaBandPalette,
+  AGENDA_RAIL_MIN_CONTRAST,
   agendaContrastRatio,
   agendaDivisionDayAccent,
 } from "@/lib/next-agenda";
@@ -23,13 +24,20 @@ describe("division accents on agenda days and times", () => {
     }
   });
 
-  it("only takes the accent for the time rail where it reads on both band fills", () => {
+  it("takes the accent for the time rail on every division board", () => {
+    for (const div of NEXT_DIVISIONS) {
+      const p = agendaBandPalette({ bandTreatment: "lavender", divisionId: div.id });
+      expect(p.rail).toBe(div.accent);
+    }
+  });
+
+  it("only takes the accent for the time rail where it is visible on both fills", () => {
     for (const div of AGENDA_DIVISIONS) {
       const p = agendaBandPalette({ bandTreatment: "lavender", divisionId: div.id });
       const accent = agendaDivisionDayAccent(div.id)!;
       if (p.rail === accent.hex) {
-        expect(agendaContrastRatio(p.rail, p.fillA)).toBeGreaterThanOrEqual(3);
-        expect(agendaContrastRatio(p.rail, p.fillB)).toBeGreaterThanOrEqual(3);
+        expect(agendaContrastRatio(p.rail, p.fillA)).toBeGreaterThanOrEqual(AGENDA_RAIL_MIN_CONTRAST);
+        expect(agendaContrastRatio(p.rail, p.fillB)).toBeGreaterThanOrEqual(AGENDA_RAIL_MIN_CONTRAST);
       } else {
         // Held back honestly rather than printed too faint to see.
         expect(p.rail).toBe("#003FC7");
