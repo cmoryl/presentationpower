@@ -8,7 +8,10 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { CityBadge } from "@/components/next/CityBadge";
 import { useSignedIn } from "@/components/CloudDeckControls";
-import { exportCityBadge } from "@/lib/next-city-badge-export";
+// jspdf + jszip live in this module — loaded on demand, never during server rendering.
+const exportCityBadge: (typeof import("@/lib/next-city-badge-export"))["exportCityBadge"] = async (...args) =>
+  (await import("@/lib/next-city-badge-export")).exportCityBadge(...args);
+
 import {
   BADGE_SPEC,
   CITY_BADGE_DEFAULT,

@@ -5,7 +5,11 @@
 // spec-compliant downloads: vector .ai / .svg for the RIP, plus dithered PNG
 // rasters generated in-browser at the spec resolution tiers.
 
-import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
+// opentype.js is browser-only — loaded when a print file is asked for, never
+// during server rendering.
+const loadLondonSignageFace: (typeof import("@/lib/next-london-text-outline"))["loadLondonSignageFace"] =
+  async (...args) => (await import("@/lib/next-london-text-outline")).loadLondonSignageFace(...args);
+
 import { useEffect, useMemo, useState } from "react";
 
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
@@ -67,7 +71,10 @@ import {
   londonSuppliedMaster,
 } from "@/lib/next-london-supplied-masters";
 import { LONDON_PACK_ISSUE, londonPackReference } from "@/lib/next-london-pack-2281";
-import { buildLondonKitZip } from "@/lib/next-london-kit-zip";
+const buildLondonKitZip: (typeof import("@/lib/next-london-kit-zip"))["buildLondonKitZip"] = async (
+  ...args
+) => (await import("@/lib/next-london-kit-zip")).buildLondonKitZip(...args);
+
 import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles, useLondonLiveFileSignature } from "@/lib/next-london-live-files";
 import { LondonLiveFilePanel } from "@/components/events/LondonLiveFilePanel";
@@ -95,7 +102,9 @@ import {
 } from "@/lib/next-london-removals";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
-import { handleLondonDirectoryDownload } from "@/lib/london-directory-pdf";
+const handleLondonDirectoryDownload: (typeof import("@/lib/london-directory-pdf"))["handleLondonDirectoryDownload"] =
+  async (...args) => (await import("@/lib/london-directory-pdf")).handleLondonDirectoryDownload(...args);
+
 import { renderDitheredPng } from "@/lib/london-panel-raster";
 import {
   LONDON_SIGNAGE_FONT,

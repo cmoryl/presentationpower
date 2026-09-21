@@ -30,8 +30,12 @@ import {
   agendaFileIsLive,
   type AgendaConfig,
 } from "@/lib/next-agenda";
-import { buildAgendaDocx } from "@/lib/next-agenda-docx";
-import { buildAgendaPptx } from "@/lib/next-agenda-pptx";
+// Browser-only export bundles — loaded on demand, never during server rendering.
+const buildAgendaDocx: (typeof import("@/lib/next-agenda-docx"))["buildAgendaDocx"] = async (...args) =>
+  (await import("@/lib/next-agenda-docx")).buildAgendaDocx(...args);
+const buildAgendaPptx: (typeof import("@/lib/next-agenda-pptx"))["buildAgendaPptx"] = async (...args) =>
+  (await import("@/lib/next-agenda-pptx")).buildAgendaPptx(...args);
+
 import { listAgendaFiles } from "@/lib/next-agenda.functions";
 import {
   BOOKLET_SIZES,
@@ -49,7 +53,9 @@ import {
   saveEventBooklet,
   updateEventBooklet,
 } from "@/lib/next-booklet.functions";
-import { buildBookletPdf } from "@/lib/next-booklet-pdf";
+const buildBookletPdf: (typeof import("@/lib/next-booklet-pdf"))["buildBookletPdf"] = async (...args) =>
+  (await import("@/lib/next-booklet-pdf")).buildBookletPdf(...args);
+
 import { bookletChartPages, bookletCoverGroundPng, bookletMapPages } from "@/lib/next-booklet-render";
 import {
   BOOKLET_COVER_TREATMENTS,

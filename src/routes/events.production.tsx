@@ -36,7 +36,11 @@ import {
   deliverySummary,
   type DeliveryProgress,
 } from "@/lib/event-print-deliver";
-import { downloadAssetBlob } from "@/lib/asset-export";
+// jspdf/jszip live in asset-export — loaded on demand, never during server rendering.
+const downloadAssetBlob = async (
+  ...args: Parameters<(typeof import("@/lib/asset-export"))["downloadAssetBlob"]>
+) => (await import("@/lib/asset-export")).downloadAssetBlob(...args);
+
 import { runWithExportFeedback, notifyBlocked } from "@/lib/export-feedback";
 import { NEXT_EVENT } from "@/lib/next-event";
 
@@ -178,7 +182,7 @@ function EventProductionPage() {
             onProgress: setProgress,
           }),
       );
-      downloadAssetBlob(result.blob, result.filename);
+      await downloadAssetBlob(result.blob, result.filename);
       const sum = deliverySummary(result);
       setReceipt(
         `${sum.items} item${sum.items === 1 ? "" : "s"} · ${(sum.pdfBytes / 1_048_576).toFixed(1)} MB of PDF` +
