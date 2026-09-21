@@ -78,6 +78,8 @@ export function LondonVenueSheets() {
   const [showAllSymbols, setShowAllSymbols] = useState(false);
   // A search result is ringed on the plan so it can actually be found.
   const [highlightRoom, setHighlightRoom] = useState<string | undefined>(undefined);
+  const [printing, setPrinting] = useState(false);
+  const [printNote, setPrintNote] = useState<string | undefined>(undefined);
 
   // The crew set a plan up once and come back to it, so the view settings and
   // room colours are kept in this browser rather than reset on every visit.
