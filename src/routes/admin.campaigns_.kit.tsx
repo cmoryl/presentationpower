@@ -996,16 +996,23 @@ function WizardFlow(p: WizardProps) {
             eyebrow="Step 5 of 5"
             title={`Your kit · ${assets.length} asset${assets.length === 1 ? "" : "s"}`}
             actions={
-              <button
-                type="button"
-                onClick={() => {
-                  setRemoved(new Set());
-                  setRegenTick((n) => n + 1);
-                }}
-                className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
-              >
-                <RefreshCw size={12} /> Regenerate all
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRemoved(new Set());
+                    setRegenTick((n) => n + 1);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
+                >
+                  <RefreshCw size={12} /> Regenerate all
+                </button>
+                <CampaignBundleButton
+                  campaignName={manualCopy.title || assets[0]?.copy?.title || "Campaign"}
+                  brandId={brandId}
+                  resolveSources={collectKitSources}
+                />
+              </div>
             }
           >
             {source == null ? (
@@ -1030,7 +1037,15 @@ function WizardFlow(p: WizardProps) {
             ) : (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {assets.map((asset) => (
-                  <div key={asset.id} className="space-y-2">
+                  <div
+                    key={asset.id}
+                    className="space-y-2"
+                    data-bundle-asset={asset.id}
+                    data-bundle-label={asset.format.label}
+                    data-bundle-platform={asset.format.platform}
+                    data-bundle-w={asset.format.width}
+                    data-bundle-h={asset.format.height}
+                  >
                     <div className="text-[11px] uppercase tracking-widest text-black/60">
                       {asset.format.label}
                     </div>
