@@ -747,7 +747,7 @@ export function agendaFooter(config: {
   footerRight?: string;
 }): AgendaFooterSpec {
   const style =
-    AGENDA_FOOTER_STYLES.find((s) => s.id === config.footerStyle)?.id ?? "band";
+    AGENDA_FOOTER_STYLES.find((s) => s.id === config.footerStyle)?.id ?? "clear";
   const fill = AGENDA_FOOTER_FILLS.find((f) => f.id === config.footerFill) ?? AGENDA_FOOTER_FILLS[0]!;
   const height =
     AGENDA_FOOTER_HEIGHTS.find((h) => h.id === config.footerHeight) ?? AGENDA_FOOTER_HEIGHTS[1]!;
@@ -1567,7 +1567,9 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
     footerLeft: programme.footerLeft ?? "",
     footerRight: programme.footerRight ?? "",
     footerCentre: programme.footerCentre ?? "",
-    footerStyle: programme.footerStyle ?? "band",
+    // No colour band across the foot: the footer lines print straight on the
+    // approved gradient, keeping every line of information.
+    footerStyle: programme.footerStyle ?? "clear",
     footerFill: programme.footerFill ?? "blue",
     footerHeight: programme.footerHeight ?? "standard",
     footerCaps: programme.footerCaps ?? true,
@@ -1788,6 +1790,18 @@ export function agendaLockupUrl(config: AgendaConfig): string {
     ? div.colorUrl || div.whiteUrl
     : div.whiteUrl || div.colorUrl;
 }
+
+/**
+ * Ink the lockup prints in. This follows the lockup FILE, not the copy-contrast
+ * guard: on a dark board the approved file is the white lockup, so the mark must
+ * print white even when the guard darkens body copy for legibility further down
+ * the sheet. Painting it with the copy ink printed every exported board's logo
+ * in black on the dark gradient.
+ */
+export function agendaLockupInk(config: AgendaConfig): string {
+  return (config.face ?? "dark") === "light" ? "#03002C" : "#FFFFFF";
+}
+
 
 export function agendaLayout(config: AgendaConfig) {
   const geo = agendaGeometry(config);
