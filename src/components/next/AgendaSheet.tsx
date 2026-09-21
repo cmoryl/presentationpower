@@ -8,6 +8,7 @@ import {
   agendaGeometry,
   agendaInk,
   agendaLockupUrl,
+  agendaChromeInk,
   agendaCardType,
   agendaLongestWord,
   agendaParallels,
@@ -237,6 +238,8 @@ export function AgendaSheet({
   // Foot of the board: a colour band, a hairline rule, or nothing behind the
   // lines. On anything but a band the copy takes the board ink so it still reads
   // on the gradient.
+  // Date line and footer lines follow the face so they stay white on a dark board.
+  const chromeInk = agendaChromeInk(config);
   const foot = blocks.footer;
   const footInk = foot.onGround ? chromeInk : foot.ink;
 

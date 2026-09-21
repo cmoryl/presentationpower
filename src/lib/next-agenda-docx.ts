@@ -28,6 +28,7 @@ import {
   agendaSplitWidths,
   agendaDivision,
   agendaLockupUrl,
+  agendaChromeInk,
   agendaGeometry,
   agendaInk,
   agendaLayout,
@@ -316,6 +317,8 @@ export async function buildAgendaDocx(
   const L = agendaLayout(pages[0]!.config);
   const blocks = agendaBlocks(config);
   const ink = agendaCopyInk(config).hex;
+  // Date line and footer lines follow the face, so they stay white on a dark board.
+  const chromeHex = hex(agendaChromeInk(config), "FFFFFF");
   const inkHex = hex(ink, config.face === "light" ? "03002C" : "FFFFFF");
   const titleHex = hex(agendaTitleInk(config));
   const division = agendaDivision(config.divisionId);
