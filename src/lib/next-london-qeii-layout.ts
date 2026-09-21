@@ -375,11 +375,22 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       noteSet.add(`${room} is printed wider than the space the issued artwork draws for it.`);
     }
 
-    placed.push(chosen.box);
+    // A saved nudge is a deliberate human correction, so it is applied after the
+    // automatic placement and moves the whole block, ring and all.
+    const nx = edit?.dx ?? 0;
+    const ny = edit?.dy ?? 0;
+    const box = {
+      x0: chosen.box.x0 + nx,
+      y0: chosen.box.y0 + ny,
+      x1: chosen.box.x1 + nx,
+      y1: chosen.box.y1 + ny,
+    };
+    placed.push(box);
     blocks.push({
       key: `${room}-${group.order}`,
-      x: group.x + chosen.dx,
-      y: group.y + chosen.dy,
+      room,
+      x: group.x + chosen.dx + nx,
+      y: group.y + chosen.dy + ny,
       angle: group.angle,
       size: chosen.size,
       lines,
@@ -387,8 +398,9 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       useSize: chosen.useSize,
       marks: chosen.variant.marks,
       markH: chosen.markH,
-      box: chosen.box,
+      box,
     });
+
   }
 
   return { blocks, notes: [...noteSet] };
