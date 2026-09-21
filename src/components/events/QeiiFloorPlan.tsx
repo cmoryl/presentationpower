@@ -111,8 +111,9 @@ export function QeiiFloorPlan({
             const tag = paint.tags.get(room);
             const fill = roomColours[room];
             const ink = tag ? qeiiRoomTextInk(tag) : fill ? qeiiRoomTextInk(fill) : qeiiLabelInk();
-            // A light room colour needs the colour lockup, not the reverse one.
-            const variant = ink === "#03002C" ? "colour" : markVariant;
+            // A light room colour swallows the reverse lockup, so that one falls back
+            // to the colour file. An explicit all-white or colour choice is kept.
+            const variant = ink === "#03002C" && markVariant === "reverse" ? "colour" : markVariant;
             const pad = block.size * 0.32;
             return (
               <g key={block.key}>
