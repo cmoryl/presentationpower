@@ -247,10 +247,13 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
                 .join(" ");
             })
             .join("");
-          const names = block.lines
-            .map((line, li) => text(nameTop + li * block.size * 1.05, block.size, line))
-            .join("");
-          const use = block.use
+          const showText = options.showText ?? true;
+          const names = !showText
+            ? ""
+            : block.lines
+                .map((line, li) => text(nameTop + li * block.size * 1.05, block.size, line))
+                .join("");
+          const use = showText && block.use
             ? text(lastLine + block.size * 0.62 + block.useSize * 0.6, block.useSize, block.use)
             : "";
           const pad = block.size * 0.32;
@@ -283,7 +286,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
       const esc2 = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
       return [
         `<rect x="${floor.w * 0.02}" y="${y - keyStep * 0.34}" width="${keyStep * 0.72}" height="${keyStep * 0.72}" rx="${keyStep * 0.14}" fill="${row.hex}"/>`,
-        `<text x="${floor.w * 0.02 + keyStep}" y="${y}" dominant-baseline="middle" font-family="Geist, Geist Variable, sans-serif" font-weight="600" font-size="${keyStep * 0.52}" fill="${QEII_PLAN_TOKENS.ink}">${esc2(row.label)}</text>`,
+        options.showText === false ? "" : `<text x="${floor.w * 0.02 + keyStep}" y="${y}" dominant-baseline="middle" font-family="Geist, Geist Variable, sans-serif" font-weight="600" font-size="${keyStep * 0.52}" fill="${QEII_PLAN_TOKENS.ink}">${esc2(row.label)}</text>`,
       ].join("");
     })
     .join("");
