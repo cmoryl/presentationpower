@@ -314,7 +314,14 @@ function wrapLines(font: PDFFont, text: string, size: number, maxWidth: number):
 const AGENDA_PIN_PATH =
   "M9 0C4.03 0 0 4.03 0 9c0 6.36 7.4 14.68 7.72 15.03a1.72 1.72 0 0 0 2.56 0C10.6 23.68 18 15.36 18 9c0-4.97-4.03-9-9-9Zm0 13.1A4.1 4.1 0 1 1 9 4.9a4.1 4.1 0 0 1 0 8.2Z";
 
-export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<AgendaVectorResult> {
+export async function buildAgendaVectorPdf(
+  config: AgendaConfig,
+  /** `guides: false` leaves out the trim / safe dashed guides and the crop
+   *  marks — used for a finished handout PDF that is not going to a printer. */
+  opts: { guides?: boolean } = {},
+): Promise<AgendaVectorResult> {
+  const drawGuides = opts.guides !== false;
+
   const pages = agendaPages(config);
   const geo = agendaGeometry(config);
   const face = config.face ?? "dark";
