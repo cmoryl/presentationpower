@@ -77,6 +77,8 @@ function suiteFor(div: NextDivisionBrand): NextLockupSuite {
     wideWhite: entry(pick(div.lockups, wideOrder, "white")),
     stacked: entry(pick(div.lockups, stackedOrder, "color")),
     stackedWhite: entry(pick(div.lockups, stackedOrder, "white")),
+    stackedReverse: entry(pick(div.lockups, stackedOrder, "reverse")),
+
     showcase,
   };
 }
