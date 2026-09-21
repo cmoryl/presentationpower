@@ -315,6 +315,10 @@ export function LondonVenueSheets() {
     keyLabelMap,
   ]);
 
+  /** Which live export is being made, and what to tell the crew about it. */
+  const [exporting, setExporting] = useState<string | null>(null);
+  const [exportNote, setExportNote] = useState<string | undefined>(undefined);
+
   /**
    * One PDF of every floor, as each one currently reads — colours, room names,
    * event use and division lockups all carried. A floor that cannot be rebuilt
