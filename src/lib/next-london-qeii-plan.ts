@@ -65,6 +65,10 @@ export type QeiiPlanOptions = {
   keyLabels?: Record<string, string>;
   /** Print the colour key beneath the plan. */
   showKey?: boolean;
+  /** Multiplies the venue's own wall weight; 0.55 is the house setting. */
+  wallWeight?: number;
+  /** Draw every WC cubicle figure the venue drew instead of one bathroom symbol. */
+  showAllSymbols?: boolean;
 };
 
 /**
@@ -154,14 +158,14 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
   const showLabels = options.showLabels ?? true;
   const roomColours = options.roomColours ?? {};
   const paint = qeiiColourPaint(floor, roomColours);
-  const hidden = qeiiRepeatedSymbolShapes(floor);
+  const hidden = options.showAllSymbols ? new Set<number>() : qeiiRepeatedSymbolShapes(floor);
   const shapes = floor.shapes
     .map((s, i) => {
       if (hidden.has(i)) return "";
       const fill = paint.fills.get(i) ?? qeiiPlanInk(s.fill, face);
       const stroke = qeiiPlanInk(s.stroke, face);
       const bits = [`d="${s.d}"`, `fill="${fill ?? "none"}"`];
-      if (stroke) bits.push(`stroke="${stroke}"`, `stroke-width="${qeiiWallWidth(s)}"`);
+      if (stroke) bits.push(`stroke="${stroke}"`, `stroke-width="${qeiiWallWidth(s, options.wallWeight)}"`);
       return `<path ${bits.join(" ")}/>`;
     })
     .join("");

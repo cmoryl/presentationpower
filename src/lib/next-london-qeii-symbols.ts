@@ -112,6 +112,17 @@ export function qeiiRepeatedSymbolShapes(floor: QeiiFloorVector): Set<number> {
 /** Thins the issued wall weight; the plans print heavy at screen sizes. */
 export const QEII_WALL_WEIGHT = 0.55;
 
-export function qeiiWallWidth(shape: QeiiShape): number {
-  return (shape.w ?? 1) * QEII_WALL_WEIGHT;
+/** How thin and how heavy a wall may be set on the page. */
+export const QEII_WALL_WEIGHT_RANGE = { min: 0.25, max: 1.2 } as const;
+
+/**
+ * Wall weight for a drawn shape. The venue's own weight is multiplied, never
+ * replaced, so a thick wall stays thicker than a thin one at every setting.
+ */
+export function qeiiWallWidth(shape: QeiiShape, weight = QEII_WALL_WEIGHT): number {
+  const w = Math.min(
+    QEII_WALL_WEIGHT_RANGE.max,
+    Math.max(QEII_WALL_WEIGHT_RANGE.min, Number.isFinite(weight) ? weight : QEII_WALL_WEIGHT),
+  );
+  return (shape.w ?? 1) * w;
 }
