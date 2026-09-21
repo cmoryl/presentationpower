@@ -99,7 +99,12 @@ export function proofGeometry(
     bleedIn,
     bleedPx: px(bleedIn),
     sheetIn,
-    sheetPx: { width: px(sheetIn.width), height: px(sheetIn.height) },
+    // Composed from the trim so the sheet is exactly trim + bleed on all four
+    // edges — independent rounding would leave a 1 px sliver of paper.
+    sheetPx: {
+      width: px(trimIn.width) + px(bleedIn) * 2,
+      height: px(trimIn.height) + px(bleedIn) * 2,
+    },
     cropMarks: opts.cropMarks && bleedIn > 0,
     markLenPx: Math.max(6, Math.round(0.125 * dpi)),
     markGapPx: Math.max(2, Math.round(0.0625 * dpi)),
