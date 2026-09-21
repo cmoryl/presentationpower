@@ -61,6 +61,15 @@ export function QeiiRoomColourPanel({
             >
               <Wand2 className="h-3.5 w-3.5" /> Colour by function
             </button>
+            {onColourByDivision ? (
+              <button
+                type="button"
+                onClick={onColourByDivision}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/20 px-3 py-1.5 text-[12px] font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
+              >
+                <Wand2 className="h-3.5 w-3.5" /> Colour by division accent
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={() => {
