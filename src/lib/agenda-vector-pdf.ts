@@ -195,7 +195,7 @@ function groundGradient(
 }
 
 type LockupArt =
-  | { kind: "svg"; paths: string[]; viewBox: [number, number, number, number] }
+  | { kind: "svg"; shapes: SvgShape[]; viewBox: [number, number, number, number] }
   | { kind: "raster"; bytes: Uint8Array; png: boolean }
   | null;
 
@@ -213,12 +213,13 @@ async function loadLockup(url: string): Promise<LockupArt> {
         .split(/[\s,]+/)
         .map(Number)
         .filter((n) => Number.isFinite(n));
-      const paths = extractSvgPaths(svg);
-      if (paths.length && nums.length === 4) {
-        return { kind: "svg", paths, viewBox: nums as [number, number, number, number] };
+      const shapes = extractSvgShapes(svg);
+      if (shapes.length && nums.length === 4) {
+        return { kind: "svg", shapes, viewBox: nums as [number, number, number, number] };
       }
       return null;
     }
+
     const png = buf[0] === 0x89 && buf[1] === 0x50;
     return { kind: "raster", bytes: buf, png };
   } catch {
