@@ -703,6 +703,21 @@ export async function buildAgendaDocx(
                   lineTwips: mmT(T.detailSize * 1.4),
                 })
               : "",
+            room.trim()
+              ? para(
+                  run(room.trim().toUpperCase(), {
+                    size: halfPt(T.detailSize),
+                    color: copyInk,
+                    bold: true,
+                  }),
+                  {
+                    beforeTwips: mmT(T.detailSize * 0.3),
+                    afterTwips: 0,
+                    lineTwips: mmT(T.detailSize * 1.4),
+                  },
+                )
+              : "",
+
             detail.trim()
               ? para(run(detail, { size: halfPt(T.detailSize), color: copyInk }), {
                   beforeTwips: mmT(T.detailSize * 0.35),
