@@ -96,6 +96,20 @@ export function QeiiRoomColourPanel({
                   {fn ?? (qeiiRoomIsExclusive(entry) ? "—" : "colours as a name tag")}
                 </span>
                 <span className="flex flex-wrap items-center gap-1">
+                  {accent ? (
+                    <button
+                      type="button"
+                      aria-label={`${entry.room} in the ${division ?? "division"} accent`}
+                      aria-pressed={chosen === accent}
+                      onClick={() => set(entry.room, accent)}
+                      style={{ backgroundColor: accent }}
+                      className={`mr-1 h-5 w-5 rounded-full border ${
+                        chosen === accent
+                          ? "border-[#03002C] ring-2 ring-[#003FC7]/40"
+                          : "border-black/15"
+                      }`}
+                    />
+                  ) : null}
                   {QEII_ROOM_PALETTE.map((swatch) => (
                     <button
                       key={swatch.id}
