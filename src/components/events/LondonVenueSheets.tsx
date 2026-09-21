@@ -6,7 +6,21 @@
 // PDF, unchanged.
 
 import { useEffect, useMemo, useState } from "react";
-import { Download, FileDown, Maximize2, Printer, Search, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Download, FileDown, Maximize2, Pencil, Printer, Save, Search, X } from "lucide-react";
+
+import { useSessionUser } from "@/hooks/use-session-user";
+import { QeiiMapEditPanel } from "@/components/events/QeiiMapEditPanel";
+import {
+  EMPTY_QEII_MAP_EDITS,
+  qeiiApplyRoomEdit,
+  type QeiiMapEdits,
+} from "@/lib/qeii-map-edits";
+import {
+  listVenueMapEdits,
+  resetVenueMapEdits,
+  saveVenueMapEdits,
+} from "@/lib/qeii-map-edits.functions";
 
 import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
@@ -48,6 +62,9 @@ const btn =
 
 const VIEW_STORAGE_KEY = "tp-element:qeii-plan-view:v1";
 
+/** The venue these saved map edits belong to. */
+const VENUE_SLUG = "next-2026-london";
+
 function download(url: string, filename: string) {
   const a = document.createElement("a");
   a.href = url;
@@ -80,6 +97,19 @@ export function LondonVenueSheets() {
   const [highlightRoom, setHighlightRoom] = useState<string | undefined>(undefined);
   const [printing, setPrinting] = useState(false);
   const [printNote, setPrintNote] = useState<string | undefined>(undefined);
+  // Live editing: room names, the line beneath them and nudged positions, saved
+  // for the whole crew rather than kept in one browser.
+  const [editsMap, setEditsMap] = useState<Record<string, QeiiMapEdits>>({});
+  const [savedAt, setSavedAt] = useState<Record<string, string | null>>({});
+  const [editMode, setEditMode] = useState(false);
+  const [picked, setPicked] = useState<string | undefined>(undefined);
+  const [saving, setSaving] = useState(false);
+  const [saveNote, setSaveNote] = useState<string | undefined>(undefined);
+  const [dirty, setDirty] = useState<Record<string, boolean>>({});
+  const userId = useSessionUser();
+  const readEdits = useServerFn(listVenueMapEdits);
+  const writeEdits = useServerFn(saveVenueMapEdits);
+  const clearEdits = useServerFn(resetVenueMapEdits);
 
   // The crew set a plan up once and come back to it, so the view settings and
   // room colours are kept in this browser rather than reset on every visit.
@@ -117,6 +147,47 @@ export function LondonVenueSheets() {
   }, []);
 
 
+  // Saved edits are read for everyone, signed in or not, so a vendor opening the
+  // link sees the same corrected plans the crew saved.
+  useEffect(() => {
+    let active = true;
+    readEdits({ data: { venueSlug: VENUE_SLUG } })
+      .then((res) => {
+        if (!active) return;
+        const next: Record<string, QeiiMapEdits> = {};
+        const when: Record<string, string | null> = {};
+        for (const floor of res.floors) {
+          next[floor.floorId] = floor.edits;
+          when[floor.floorId] = floor.updatedAt;
+        }
+        setEditsMap(next);
+        setSavedAt(when);
+        // A saved colour set is the crew's, so it outranks this browser's copy.
+        setRoomColourMap((prev) => {
+          const merged = { ...prev };
+          for (const floor of res.floors) {
+            if (Object.keys(floor.edits.colours).length) merged[floor.floorId] = floor.edits.colours;
+          }
+          return merged;
+        });
+        setKeyLabelMap((prev) => {
+          const merged = { ...prev };
+          for (const floor of res.floors) {
+            if (Object.keys(floor.edits.keyLabels).length)
+              merged[floor.floorId] = floor.edits.keyLabels;
+          }
+          return merged;
+        });
+      })
+      .catch(() => {
+        // Saved edits could not be read; the issued plans stand and the page works.
+        if (active) setSaveNote("Saved map edits could not be read just now, so these plans are the issued ones.");
+      });
+    return () => {
+      active = false;
+    };
+  }, [readEdits]);
+
   const rows = useMemo(() => venueRoomDirectory(), []);
   const found = useMemo(() => {
     const byName = searchVenueRooms(query, rows);
@@ -138,13 +209,70 @@ export function LondonVenueSheets() {
   const planNotes = useMemo(
     () =>
       plan
-        ? qeiiPlanLayout(plan.floor, { labelScale, showUse, showMarks, markScale }).notes
+        ? qeiiPlanLayout(plan.floor, {
+            labelScale,
+            showUse,
+            showMarks,
+            markScale,
+            edits: editsMap[plan.floor.id],
+          }).notes
         : [],
-    [plan, labelScale, showUse, showMarks, markScale],
+    [plan, labelScale, showUse, showMarks, markScale, editsMap],
   );
   const uses = useMemo(() => spaceUsesOnFloor(sheet.id), [sheet.id]);
   const roomColours = roomColourMap[sheet.id] ?? {};
   const keyLabels = keyLabelMap[sheet.id] ?? {};
+  const edits = editsMap[sheet.id] ?? EMPTY_QEII_MAP_EDITS;
+
+  function setEdits(next: QeiiMapEdits) {
+    setEditsMap({ ...editsMap, [sheet.id]: next });
+    setDirty({ ...dirty, [sheet.id]: true });
+  }
+
+  /** Save this floor's edits, colours and key names for the whole crew. */
+  async function saveFloorEdits() {
+    setSaving(true);
+    setSaveNote(undefined);
+    try {
+      const payload: QeiiMapEdits = { ...edits, colours: roomColours, keyLabels };
+      const res = await writeEdits({
+        data: { venueSlug: VENUE_SLUG, floorId: sheet.id, edits: payload },
+      });
+      setEditsMap({ ...editsMap, [sheet.id]: res.floor.edits });
+      setSavedAt({ ...savedAt, [sheet.id]: res.floor.updatedAt });
+      setDirty({ ...dirty, [sheet.id]: false });
+      setSaveNote(`${sheet.title} saved for everyone.`);
+    } catch (err) {
+      setSaveNote(
+        err instanceof Error
+          ? `Nothing was saved: ${err.message}`
+          : "Nothing was saved. Please try again.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  /** Put this floor back to exactly what the venue issued, for everyone. */
+  async function resetFloorEdits() {
+    setSaving(true);
+    setSaveNote(undefined);
+    try {
+      await clearEdits({ data: { venueSlug: VENUE_SLUG, floorId: sheet.id } });
+      setEditsMap({ ...editsMap, [sheet.id]: EMPTY_QEII_MAP_EDITS });
+      setRoomColourMap({ ...roomColourMap, [sheet.id]: {} });
+      setKeyLabelMap({ ...keyLabelMap, [sheet.id]: {} });
+      setSavedAt({ ...savedAt, [sheet.id]: null });
+      setDirty({ ...dirty, [sheet.id]: false });
+      setSaveNote(`${sheet.title} is back to the issued plan for everyone.`);
+    } catch (err) {
+      setSaveNote(
+        err instanceof Error ? `Nothing was changed: ${err.message}` : "Nothing was changed.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
   const sharedNotes = useMemo(
     () => (plan?.rebuilt && Object.keys(roomColours).length ? qeiiSharedShapeNotes(plan.floor) : []),
     [plan, roomColours],
@@ -214,6 +342,7 @@ export function LondonVenueSheets() {
               keyLabels: keyLabelMap[s.id] ?? {},
               wallWeight,
               showAllSymbols,
+              edits: editsMap[s.id],
             }),
           };
         }
@@ -253,6 +382,7 @@ export function LondonVenueSheets() {
       keyLabels,
       wallWeight,
       showAllSymbols,
+      edits,
     });
     const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
     download(url, qeiiPlanFilename(plan.floor, face));
@@ -445,6 +575,48 @@ export function LondonVenueSheets() {
               Room colours &amp; key
             </button>
 
+            {userId ? (
+              <>
+                <button
+                  type="button"
+                  aria-pressed={editMode}
+                  onClick={() => {
+                    setEditMode(!editMode);
+                    setPicked(undefined);
+                  }}
+                  className={`${chip} ${
+                    editMode
+                      ? "border-[#003FC7] bg-[#003FC7] text-white"
+                      : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+                  }`}
+                >
+                  <Pencil className="mr-1.5 inline-block h-3.5 w-3.5" />
+                  {editMode ? "Editing this map" : "Edit this map"}
+                </button>
+                {editMode ? (
+                  <>
+                    <button
+                      type="button"
+                      className={btn}
+                      onClick={saveFloorEdits}
+                      disabled={saving}
+                    >
+                      <Save className="h-4 w-4" />
+                      {saving ? "Saving…" : "Save for everyone"}
+                    </button>
+                    <button
+                      type="button"
+                      className={btn}
+                      onClick={resetFloorEdits}
+                      disabled={saving}
+                    >
+                      Back to the issued plan
+                    </button>
+                  </>
+                ) : null}
+              </>
+            ) : null}
+
             <button
               type="button"
               aria-pressed={showAllSymbols}
@@ -498,13 +670,40 @@ export function LondonVenueSheets() {
         <QeiiRoomColourPanel
           floor={plan.floor}
           colours={roomColours}
-          onColours={(next) => setRoomColourMap({ ...roomColourMap, [sheet.id]: next })}
+          onColours={(next) => {
+            setRoomColourMap({ ...roomColourMap, [sheet.id]: next });
+            setDirty({ ...dirty, [sheet.id]: true });
+          }}
           keyLabels={keyLabels}
-          onKeyLabels={(next) => setKeyLabelMap({ ...keyLabelMap, [sheet.id]: next })}
+          onKeyLabels={(next) => {
+            setKeyLabelMap({ ...keyLabelMap, [sheet.id]: next });
+            setDirty({ ...dirty, [sheet.id]: true });
+          }}
           onColourByDivision={() => {
             setRoomColourMap({ ...roomColourMap, [sheet.id]: qeiiColourByDivision(plan.floor) });
             setMarkVariant("white");
           }}
+        />
+      ) : null}
+
+      {(saveNote || dirty[sheet.id] || savedAt[sheet.id]) ? (
+        <p className="mt-3 rounded-xl border border-black/10 bg-white px-3.5 py-2.5 text-[12.5px] leading-relaxed text-[#03002C]/80">
+          {saveNote ? `${saveNote} ` : ""}
+          {dirty[sheet.id]
+            ? "This floor has unsaved changes — only you can see them until you save."
+            : savedAt[sheet.id]
+              ? `Saved for everyone on ${new Date(savedAt[sheet.id]!).toLocaleString()}.`
+              : ""}
+        </p>
+      ) : null}
+
+      {showRebuilt && editMode && plan ? (
+        <QeiiMapEditPanel
+          floor={plan.floor}
+          edits={edits}
+          onEdits={setEdits}
+          picked={picked}
+          onPick={setPicked}
         />
       ) : null}
 
@@ -559,6 +758,10 @@ export function LondonVenueSheets() {
               wallWeight={wallWeight}
               showAllSymbols={showAllSymbols}
               highlightRoom={highlightRoom}
+              edits={edits}
+              editable={editMode}
+              onMoveRoom={(room, dx, dy) => setEdits(qeiiApplyRoomEdit(edits, room, { dx, dy }))}
+              onPickRoom={(room) => setPicked(room)}
               className="block w-full bg-[#EEF1F7]"
             />
             </PlanZoomFrame>

@@ -215,20 +215,28 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     const head = group.labels[0]!;
     const baseSize = qeiiFontSize(head, floor, scale);
     const minSize = Math.max(floor.w * QEII_LABEL_MIN_SHARE * scale, 0.01);
-    const lines = group.labels.map((l) => l.text);
-    const room = lines.join(" ").replace(/-\s/g, "-");
-    const fullUse = options.showUse ? spaceUseLine(room, floor.id) : undefined;
+    const issuedLines = group.labels.map((l) => l.text);
+    const room = issuedLines.join(" ").replace(/-\s/g, "-");
+    // A live correction replaces the printed name and the line beneath it; the
+    // schedule is still read against the name the venue issued.
+    const edit = qeiiRoomEdit(options.edits, room);
+    const lines = edit?.name ? [edit.name] : issuedLines;
+    const issuedUse = options.showUse ? spaceUseLine(room, floor.id) : undefined;
     const allMarks = options.showMarks ? spaceUseMarks(room, floor.id) : [];
+    const overridden = edit?.use !== undefined;
+    const fullUse = overridden ? (edit!.use || undefined) : issuedUse;
     // With the division lockup printed, the division's name is not repeated as text.
-    const markedUse = allMarks.length
-      ? options.showUse
-        ? spaceUseLineWithoutDivisions(
-            room,
-            floor.id,
-            allMarks.map((m) => m.divisionId),
-          )
-        : undefined
-      : fullUse;
+    const markedUse = overridden
+      ? fullUse
+      : allMarks.length
+        ? options.showUse
+          ? spaceUseLineWithoutDivisions(
+              room,
+              floor.id,
+              allMarks.map((m) => m.divisionId),
+            )
+          : undefined
+        : fullUse;
 
 
     // The space the artwork actually draws for this room, and the objects inside it.
@@ -244,6 +252,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     if (fullUse) variants.push({ use: shortUse(fullUse), marks: [] });
     if (allMarks.length) variants.push({ use: undefined, marks: allMarks });
     variants.push({ use: undefined, marks: [] });
+
 
     type Fit = {
       variant: Variant;
@@ -366,11 +375,22 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       noteSet.add(`${room} is printed wider than the space the issued artwork draws for it.`);
     }
 
-    placed.push(chosen.box);
+    // A saved nudge is a deliberate human correction, so it is applied after the
+    // automatic placement and moves the whole block, ring and all.
+    const nx = edit?.dx ?? 0;
+    const ny = edit?.dy ?? 0;
+    const box = {
+      x0: chosen.box.x0 + nx,
+      y0: chosen.box.y0 + ny,
+      x1: chosen.box.x1 + nx,
+      y1: chosen.box.y1 + ny,
+    };
+    placed.push(box);
     blocks.push({
       key: `${room}-${group.order}`,
-      x: group.x + chosen.dx,
-      y: group.y + chosen.dy,
+      room,
+      x: group.x + chosen.dx + nx,
+      y: group.y + chosen.dy + ny,
       angle: group.angle,
       size: chosen.size,
       lines,
@@ -378,8 +398,9 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       useSize: chosen.useSize,
       marks: chosen.variant.marks,
       markH: chosen.markH,
-      box: chosen.box,
+      box,
     });
+
   }
 
   return { blocks, notes: [...noteSet] };
