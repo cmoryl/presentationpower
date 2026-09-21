@@ -12,9 +12,9 @@ import { QEII_FLOOR_VECTORS, qeiiFloorVector } from "@/lib/next-london-qeii-vect
 import { LONDON_VENUE_SHEETS } from "@/lib/next-london-venue-sheets";
 
 describe("QEII native floor plans", () => {
-  it("rebuilds every floor the issued design draws as vectors", () => {
+  it("rebuilds every floor, including the one the design placed as a picture", () => {
     const vector = QEII_FLOOR_VECTORS.filter((f) => f.kind === "vector");
-    expect(vector.length).toBe(6);
+    expect(vector.length).toBe(QEII_FLOOR_VECTORS.length);
     for (const floor of vector) {
       expect(floor.shapes.length).toBeGreaterThan(80);
       expect(floor.w).toBeGreaterThan(100);
@@ -22,10 +22,11 @@ describe("QEII native floor plans", () => {
     }
   });
 
-  it("says plainly which floor cannot be rebuilt instead of shipping an empty plan", () => {
+  it("rebuilds the 3rd floor as real geometry, not a picture", () => {
     const third = qeiiPlanState("third");
-    expect(third?.rebuilt).toBe(false);
-    expect(third?.reason).toContain("placed picture");
+    expect(third?.rebuilt).toBe(true);
+    expect(third?.reason).toBeUndefined();
+    expect(qeiiFloorVector("third")!.shapes.length).toBeGreaterThan(80);
     expect(qeiiPlanState("ground")?.rebuilt).toBe(true);
   });
 
