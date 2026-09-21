@@ -22,6 +22,7 @@ import {
 import decisionsMarkdown from "../../docs/EVENT-DECISIONS.md?raw";
 
 import { AppShell } from "@/components/AppShell";
+import { DirectionalArrowPanel } from "@/components/events/DirectionalArrowPanel";
 import { parseEventDecisions } from "@/lib/event-knowledge";
 import {
   LONDON_PANELS,
@@ -430,6 +431,8 @@ function PlaybookPage() {
             );
           })}
         </ul>
+
+        <DirectionalArrowPanel />
 
         <div className="mt-10 flex flex-wrap gap-3">
           <Link
