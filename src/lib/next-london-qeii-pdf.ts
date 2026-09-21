@@ -201,7 +201,16 @@ export async function exportQeiiFloorsPdf(
       margin + 11.5,
       { maxWidth: boxW },
     );
-    doc.addImage(art.dataUrl, "PNG", margin + (boxW - w) / 2, margin + headH, w, h, undefined, "FAST");
+    doc.addImage(
+      art.dataUrl,
+      "PNG",
+      margin + (boxW - w) / 2,
+      margin + headH + (boxH - h) / 2,
+      w,
+      h,
+      undefined,
+      "FAST",
+    );
     doc.setFontSize(7.5);
     doc.text(
       "Proof for event materials — rasterised from the Element floor plan. Not a press master.",
