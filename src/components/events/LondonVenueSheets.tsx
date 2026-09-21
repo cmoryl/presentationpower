@@ -61,7 +61,7 @@ export function LondonVenueSheets() {
 
   function downloadPlanSvg() {
     if (!plan?.rebuilt) return;
-    const svg = qeiiPlanSvg(plan.floor, { face, labelScale, showLabels });
+    const svg = qeiiPlanSvg(plan.floor, { face, labelScale, showLabels, showUse });
     const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
     download(url, qeiiPlanFilename(plan.floor, face));
     URL.revokeObjectURL(url);
