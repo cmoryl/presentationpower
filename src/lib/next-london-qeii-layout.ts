@@ -15,7 +15,12 @@
 // and the lockup come off first and the reason is reported back in plain language
 // for the page to show. The ground behind a plan stays a solid brand token.
 
-import { spaceUseLine, spaceUseMarks, type SpaceUseMark } from "@/lib/next-london-space-use";
+import {
+  spaceUseLine,
+  spaceUseLineWithoutDivisions,
+  spaceUseMarks,
+  type SpaceUseMark,
+} from "@/lib/next-london-space-use";
 import type { QeiiFloorVector, QeiiLabel } from "@/lib/next-london-qeii-vectors";
 import {
   qeiiHolderBox,
