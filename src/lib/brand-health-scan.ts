@@ -154,11 +154,16 @@ export function collectLogoPlacements(
 ): LogoPlacementInput[] {
   const rootRect = root.getBoundingClientRect();
   if (rootRect.width < 1 || rootRect.height < 1) return [];
+  // Previews are often painted at a display scale (a transform on the stage).
+  // Minimum-size rules are about the DESIGN size, so undo the scale and measure
+  // everything in the surface's own pixels.
+  const scale = root.offsetWidth > 0 ? rootRect.width / root.offsetWidth : 1;
+  const k = scale > 0.01 ? 1 / scale : 1;
   const rel = (r: DOMRect): LogoBox => ({
-    x: r.left - rootRect.left,
-    y: r.top - rootRect.top,
-    w: r.width,
-    h: r.height,
+    x: (r.left - rootRect.left) * k,
+    y: (r.top - rootRect.top) * k,
+    w: r.width * k,
+    h: r.height * k,
   });
 
   const lockups = Array.from(root.querySelectorAll<HTMLElement>("[data-brand-lockup]")).filter(
@@ -207,7 +212,7 @@ export function collectLogoPlacements(
       id: `${prefix}-logo-${i + 1}`,
       label: `${prefix} · brand lockup`,
       medium,
-      surface: { w: rootRect.width, h: rootRect.height },
+      surface: { w: rootRect.width * k, h: rootRect.height * k },
       box,
       ground,
       orientation,
