@@ -1889,6 +1889,10 @@ export function AgendaStudio({
               <FileText className="mr-2 h-4 w-4" />
               Export editable Word
             </Button>
+            <Button variant="outline" onClick={runMasterExport} disabled={busy}>
+              <Download className="mr-2 h-4 w-4" />
+              Download all agendas (master zip)
+            </Button>
             <Button variant="outline" onClick={runDeckExport} disabled={busy || !hasProgramme}>
               <FileText className="mr-2 h-4 w-4" />
               Export editable PowerPoint
