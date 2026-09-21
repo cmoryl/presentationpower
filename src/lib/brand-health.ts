@@ -170,8 +170,22 @@ export function scoreBrandHealth(
     const large = isLargeText(s.fontSizePx, s.fontWeight);
     const required = large ? BH_AA_LARGE : BH_AA_NORMAL;
 
-    // 1. Contrast.
-    if (fg && bg) {
+    // 1. Contrast. Text sitting on photography has no measurable flat
+    //    surface behind it — white type is the approved treatment there, so
+    //    we never invent a ratio against a fallback colour.
+    if (s.onMedia) {
+      if (hex(fg) !== "#ffffff") {
+        findings.push({
+          id: `${s.id}-media-ink`,
+          check: "contrast",
+          severity: "warn",
+          label: s.label,
+          detail: `Text sits over photography in ${fg} — the recorded treatment is white type on a deepened scrim.`,
+          fix: "Set this text to #FFFFFF and deepen the image scrim behind it.",
+          text: truncate(s.text),
+        });
+      }
+    } else if (fg && bg) {
       const ratio = Math.round(contrastRatio(fg, bg) * 100) / 100;
       if (ratio < required) {
         const onDarkSurface = contrastRatio("#ffffff", bg) >= contrastRatio("#03002c", bg);
@@ -181,15 +195,14 @@ export function scoreBrandHealth(
           severity: ratio < required - 1 ? "fail" : "warn",
           label: s.label,
           detail: `${fg} on ${bg} measures ${ratio}:1 — AA needs ${required}:1 at ${Math.round(s.fontSizePx)}px.`,
-          fix: s.onMedia
-            ? "Text over photography stays white; deepen the image scrim behind it rather than recolouring the type."
-            : `Set this text to ${onDarkSurface ? "#FFFFFF" : "#03002C"} on this surface.`,
+          fix: `Set this text to ${onDarkSurface ? "#FFFFFF" : "#03002C"} on this surface.`,
           ratio,
           required,
           text: truncate(s.text),
         });
       }
     }
+
 
     // 2. Colour hierarchy — accents and pops are fills, never text.
     const accent = accentByHex.get(fg);
