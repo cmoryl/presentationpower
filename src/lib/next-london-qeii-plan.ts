@@ -147,9 +147,34 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
               .filter(Boolean)
               .join(" ");
           const use = options.showUse ? qeiiLabelUse(l, floor.id) : undefined;
-          return use
+          // The lockup is linked by its full site URL so the downloaded file
+          // still finds the approved artwork instead of embedding a copy.
+          const marks = options.showMarks ? qeiiLabelMarks(l, floor.id) : [];
+          const markH = size * 2.2;
+          const row = marks.reduce((w, m) => w + markH * m.ratio + size * 0.4, 0) - size * 0.4;
+          let markX = l.x - row / 2;
+          const markSvg = marks
+            .map((m) => {
+              const w = markH * m.ratio;
+              const x = markX;
+              markX += w + size * 0.4;
+              return [
+                "<image",
+                `href="${m.url.startsWith("http") ? m.url : `${NEXT_APP_ORIGIN}${m.url}`}"`,
+                `x="${x}" y="${l.y - size * 1.1 - markH}" width="${w}" height="${markH}"`,
+                'preserveAspectRatio="xMidYMid meet"',
+                transform ? `transform="${transform}"` : "",
+                "/>",
+              ]
+                .filter(Boolean)
+                .join(" ");
+            })
+            .join("");
+          const body = use
             ? text(l.y, size, l.text) + text(l.y + size * 1.15, size * 0.72, use)
             : text(l.y, size, l.text);
+          return markSvg + body;
+
         })
         .join("")
     : "";
