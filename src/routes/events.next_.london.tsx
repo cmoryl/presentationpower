@@ -71,7 +71,10 @@ import {
   londonSuppliedMaster,
 } from "@/lib/next-london-supplied-masters";
 import { LONDON_PACK_ISSUE, londonPackReference } from "@/lib/next-london-pack-2281";
-import { buildLondonKitZip } from "@/lib/next-london-kit-zip";
+const buildLondonKitZip: (typeof import("@/lib/next-london-kit-zip"))["buildLondonKitZip"] = async (
+  ...args
+) => (await import("@/lib/next-london-kit-zip")).buildLondonKitZip(...args);
+
 import { listLondonLiveFiles } from "@/lib/london-live-files.functions";
 import { setLondonLiveFiles, useLondonLiveFileSignature } from "@/lib/next-london-live-files";
 import { LondonLiveFilePanel } from "@/components/events/LondonLiveFilePanel";
