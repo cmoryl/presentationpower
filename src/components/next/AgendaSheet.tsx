@@ -992,7 +992,7 @@ export function AgendaSheet({
       {(config.pageLabel ?? "").trim() ? (
         <div
           style={{
-            ...at(blocks.x, blocks.footY),
+            ...at(blocks.x, blocks.stampY),
             width: mm(blocks.contentW),
             textAlign: "right",
             fontSize: mm(L.footSize),

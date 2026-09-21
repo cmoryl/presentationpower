@@ -2501,6 +2501,14 @@ export function agendaBlocks(config: AgendaConfig) {
     ? footerBand.y + (L.footerBandH - L.footSize) * 0.5
     : bottom - L.footSize * 1.2;
   /**
+   * The multi-day page stamp (DAY 1 · PAGE 2 OF 3) is right-aligned, and so is the
+   * right-hand footer line (the event dates). Printing both on `footY` overlapped
+   * them on every multi-day board, so the stamp takes its own baseline above the
+   * footer lines whenever the right-hand line is occupied.
+   */
+  const stampY =
+    footerBand && footer.right.trim() ? footY - L.footSize * 1.9 : footY;
+  /**
    * The footnote gets its own reserved strip above the band, tall enough for the
    * location pin the programme look draws beside it. Without the reservation the
    * pin overhung the strip and printed on the last row band and the band foot.
@@ -2508,11 +2516,14 @@ export function agendaBlocks(config: AgendaConfig) {
   const footnoteText = (config.footnote ?? "").trim();
   const footnoteH = footnoteText ? L.footSize * 3 : 0;
   const footnoteY = footerBand ? footerBand.y - L.footSize * 0.9 - footnoteH : footY;
-  let listBottom = footerBand
-    ? footnoteText
-      ? footnoteY - L.footSize * 0.9
-      : footerBand.y - L.footSize * 1.6
-    : footY - L.footSize * 1.8;
+  // The raised stamp line needs clearing too, or the last row band prints over it.
+  const stampGap = stampY < footY ? L.footSize * 1.9 : 0;
+  let listBottom =
+    (footerBand
+      ? footnoteText
+        ? footnoteY - L.footSize * 0.9
+        : footerBand.y - L.footSize * 1.6
+      : footY - L.footSize * 1.8) - stampGap;
 
   let qr: {
     x: number;
@@ -2857,6 +2868,7 @@ export function agendaBlocks(config: AgendaConfig) {
     footerBand,
     footer,
     footY,
+    stampY,
     footnoteY,
     footnoteH,
     qr,
