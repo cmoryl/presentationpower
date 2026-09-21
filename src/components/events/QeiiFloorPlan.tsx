@@ -7,7 +7,14 @@
 
 import { useMemo } from "react";
 
-import { QEII_PLAN_TOKENS, qeiiLabelInk, qeiiPlanInk, type QeiiPlanFace } from "@/lib/next-london-qeii-plan";
+import {
+  QEII_PLAN_TOKENS,
+  qeiiLabelInk,
+  qeiiMarkUrl,
+  qeiiPlanInk,
+  type QeiiMarkVariant,
+  type QeiiPlanFace,
+} from "@/lib/next-london-qeii-plan";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 
@@ -20,6 +27,10 @@ export type QeiiFloorPlanProps = {
   showUse?: boolean;
   /** Print the division lockup above a room held by a division area. */
   showMarks?: boolean;
+  /** Which approved lockup file the markers use. */
+  markVariant?: QeiiMarkVariant;
+  /** Multiplies the lockup height; 1 keeps the house setting. */
+  markScale?: number;
   className?: string;
 };
 
@@ -30,11 +41,13 @@ export function QeiiFloorPlan({
   showLabels = true,
   showUse = false,
   showMarks = false,
+  markVariant = "reverse",
+  markScale = 1,
   className,
 }: QeiiFloorPlanProps) {
   const layout = useMemo(
-    () => qeiiPlanLayout(floor, { labelScale, showUse, showMarks }),
-    [floor, labelScale, showUse, showMarks],
+    () => qeiiPlanLayout(floor, { labelScale, showUse, showMarks, markScale }),
+    [floor, labelScale, showUse, showMarks, markScale],
   );
 
   return (
@@ -79,7 +92,7 @@ export function QeiiFloorPlan({
                   return (
                     <image
                       key={m.divisionId}
-                      href={m.urlReverse}
+                      href={qeiiMarkUrl(m, markVariant)}
                       x={x}
                       y={nameTop - block.size * 0.7 - block.markH}
                       width={w}

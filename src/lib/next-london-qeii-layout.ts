@@ -38,6 +38,8 @@ export type QeiiLayoutOptions = {
   labelScale?: number;
   showUse?: boolean;
   showMarks?: boolean;
+  /** Multiplies the division lockup height; 1 keeps the house setting. */
+  markScale?: number;
 };
 
 export type QeiiBox = { x0: number; y0: number; x1: number; y1: number };
@@ -191,7 +193,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
         Math.min(size * 0.92, Math.max(size * QEII_USE_RATIO, floor.w * QEII_LABEL_MIN_SHARE * scale)) *
           100,
       ) / 100;
-    const markH = Math.round(size * QEII_MARK_RATIO * 100) / 100;
+    const markH = Math.round(size * QEII_MARK_RATIO * (options.markScale ?? 1) * 100) / 100;
 
     const nameWidth = Math.max(...lines.map((t) => qeiiTextWidth(t, size)));
     const nameHeight = size * (0.72 + (lines.length - 1) * 1.05);
