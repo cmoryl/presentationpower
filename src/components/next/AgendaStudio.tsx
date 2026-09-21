@@ -126,6 +126,7 @@ import {
   agendaSlug,
   agendaStyleLabel,
   normalizeAgendaConfig,
+  agendaFileIsLive,
   withAgendaDivision,
   type AgendaConfig,
   type AgendaSession,
