@@ -3,30 +3,34 @@
 // flat artwork), so opening them in the agenda / pillar editors gives an
 // operator a real starting point they can edit and export.
 
-import { agendaDefault, type AgendaConfig } from "./next-agenda";
+import { agendaDefault, agendaFoldSimultaneous, type AgendaConfig } from "./next-agenda";
 import { pillarDefault, type PillarConfig, type PillarKindId } from "./next-pillar-masters";
 
 export const CITY_SERIES_DEMO_EVENT = "NEXT City Series — Barcelona";
 
-/** Demo agenda board: City Series, light face, real programme, live QR. */
+/** Demo agenda board: City Series on the standard house agenda layout. */
 export function citySeriesDemoAgenda(): AgendaConfig {
   const base = agendaDefault("city-series");
   return {
-    // Same house look as every other NEXT agenda: Bloom Corner, dark face.
+    // Identical standard layout to the twelve division boards: Bloom Corner
+    // dark ground, A2 trim, white location/date/footer lines, no footer band,
+    // stacked reverse lockup and the foot-right QR block. Only the copy,
+    // programme and QR target are City Series' own.
     ...base,
-    sizeId: "a1",
-    trimW: 594,
-    trimH: 841,
-    eyebrow: "AGENDA · DAY ONE",
-    title: "CITY SERIES",
-    meta: "Barcelona · 12 November 2026 · Palau de Congressos",
-    footnote: "Programme subject to change · scan for the live agenda and speaker bios",
+    eyebrow: "",
+    title: "",
+    meta: "THURSDAY, NOVEMBER 12, 2026",
+    locationLine: "PALAU DE CONGRESSOS · BARCELONA",
+    footnote: "",
+    footerLeft: "WWW.TRANSPERFECTNEXT.COM/CITY-SERIES/BARCELONA",
+    footerRight: "12 NOVEMBER, 2026",
     qrData: "https://next.transperfect.com/city-series/barcelona/agenda",
-    qrSize: 56,
     qrCaption: "LIVE AGENDA",
     eventLabel: CITY_SERIES_DEMO_EVENT,
-    sessions: [
+    // Same simultaneous-session folding as every other board.
+    sessions: agendaFoldSimultaneous([
       {
+
         time: "08:30",
         title: "Registration & welcome coffee",
         detail: "Concourse, Level 1",
@@ -83,7 +87,7 @@ export function citySeriesDemoAgenda(): AgendaConfig {
         track: "MAIN STAGE",
         muted: false,
       },
-    ],
+    ]),
   };
 }
 
