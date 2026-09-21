@@ -282,6 +282,18 @@ export function BrandLockup({
         style={{ gap: u(dims.gapPx), color }}
         role="img"
         aria-label={`${logo.wordmark}${divisionLine ? " — " + divisionLine : ""}${clientLogoUrl ? " × client" : ""} lockup`}
+        {...lockupAttrs(
+          innerOrientation,
+          flattenOfficialLogo || !useOfficialImage
+            ? isDarkChrome
+              ? "white"
+              : "black"
+            : /-white\./.test(officialLogoUrl ?? "")
+              ? "white"
+              : /-black\./.test(officialLogoUrl ?? "")
+                ? "black"
+                : "color",
+        )}
       >
         {showMark && !useOfficialWordmark && !useOfficialImage && (
           <div
