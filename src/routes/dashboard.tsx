@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
+import { useSessionEmail } from "@/hooks/use-session-email";
+import { liveProjectsFor } from "@/lib/live-projects";
 import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
 import {
   PERSONAS,
@@ -152,6 +154,7 @@ function titleCase(value: string): string {
 
 function RoleDashboard() {
   const userId = useSessionUser();
+  const sessionEmail = useSessionEmail();
   const signedIn = !!userId;
   const {
     persona: personaId,
@@ -194,6 +197,9 @@ function RoleDashboard() {
   const kitRows = useMemo(() => (Array.isArray(kits.data) ? kits.data : []), [kits.data]);
 
   const loading = decks.isLoading || printAssets.isLoading || kits.isLoading;
+
+  // Live projects belong to a named person, so they only appear for that account.
+  const myProjects = useMemo(() => liveProjectsFor(sessionEmail), [sessionEmail]);
 
   const counters: Record<WorkKind, { label: string; count: number | null; to: string }> = {
     decks: {
@@ -419,6 +425,38 @@ function RoleDashboard() {
 
         {/* Quick create — one click into the right template set */}
         <QuickCreate personaId={personaId} signedIn={signedIn} />
+
+        {/* Live projects that belong to this person only */}
+        {myProjects.length > 0 ? (
+          <section className="mt-10">
+            <SectionHead
+              theme={theme}
+              title="Your live projects"
+              hint="Campaign boards in progress on your account"
+              icon={Megaphone}
+            />
+            <div className="mt-4 grid gap-3">
+              {myProjects.map((p) => (
+                <Link key={p.id} to={p.to} className={`${CARD_LINK} group block`}>
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50 dark:text-white/50">
+                    {p.eyebrow}
+                  </div>
+                  <div className="mt-1 text-lg font-semibold tracking-tight">{p.title}</div>
+                  <p className="mt-1 max-w-3xl text-sm text-black/65 dark:text-white/65">
+                    {p.summary}
+                  </p>
+                  <span
+                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium"
+                    style={{ color: theme.ink }}
+                  >
+                    {p.cta} <ArrowRight className="size-3.5" aria-hidden />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
 
         {/* Needs attention */}
         {signedIn && attention.length > 0 ? (
