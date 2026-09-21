@@ -2684,6 +2684,15 @@ export function agendaBlocks(config: AgendaConfig) {
               ((p.time ?? "").trim() || session.time.trim() ? ct.timeSize * 1.65 : 0) +
               agendaTextLines(p.speaker ?? "", ct.detailSize, ct.textW) * ct.detailSize * 1.55 +
               ((p.speaker ?? "").trim() ? ct.detailSize * 0.5 : 0) +
+              // The card's own room line is measured too, so a slot running in two
+              // rooms at once never clips the second room off the board.
+              (agendaParallelRoom(p)
+                ? agendaTextLines(agendaParallelRoom(p), ct.detailSize, ct.textW) *
+                    ct.detailSize *
+                    1.55 +
+                  ct.detailSize * 0.5
+                : 0) +
+
               agendaTextLines(p.detail, ct.detailSize, ct.textW) * ct.detailSize * 1.55 +
               (p.detail.trim() ? ct.detailSize * 0.6 : 0),
           ),
