@@ -23,7 +23,7 @@ import {
   qeiiRoomTextInk,
   type QeiiRoomColours,
 } from "@/lib/next-london-qeii-rooms";
-import type { QeiiMapEdits } from "@/lib/qeii-map-edits";
+import { qeiiRoomOffset, type QeiiMapEdits } from "@/lib/qeii-map-edits";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 
 export type QeiiFloorPlanProps = {
