@@ -206,6 +206,27 @@ export function LondonPlacedArtPanel({
         </span>
       </div>
 
+      <div className="mt-3 rounded-md border border-dashed border-border p-2">
+        <p className="text-[11px] text-muted-foreground">
+          NEXT Mart signs (London 2026) — place one straight onto this panel
+        </p>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {NEXT_MART_ARTWORK.map((artwork) => (
+            <button
+              key={artwork.id}
+              type="button"
+              disabled={placing !== null}
+              onClick={() => void placeMartSign(artwork)}
+              className="rounded border border-border px-2 py-1 text-[11px] text-foreground hover:bg-muted disabled:opacity-50"
+            >
+              {placing === artwork.id ? "Placing…" : artwork.headline}
+            </button>
+          ))}
+        </div>
+      </div>
+
+
+
       {error ? <p className="mt-2 text-xs text-destructive">{error}</p> : null}
       {warnings.map((w) => (
         <p key={w} className="mt-2 text-xs text-muted-foreground">
