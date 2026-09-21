@@ -17,6 +17,12 @@
 import type { BrandGuide, ColorSwatch } from "./brand-guides";
 import { MASTER_TRANSPERFECT_GUIDE } from "./brand-guides";
 import { contrastRatio } from "./contrast-audit";
+import {
+  LOGO_MATRIX_CHECK_LABEL,
+  validateLogoPlacements,
+  type LogoMatrixCheck,
+  type LogoPlacementInput,
+} from "./logo-placement-matrix";
 
 /** WCAG AA thresholds used by the pre-flight. */
 export const BH_AA_NORMAL = 4.5;
@@ -27,7 +33,13 @@ export const APPROVED_TEXT_INK = ["#03002c", "#003fc7", "#ffffff", "#666666"] as
 
 export type BrandHealthSeverity = "pass" | "warn" | "fail";
 
-export type BrandHealthCheck = "contrast" | "accent-on-text" | "ink" | "typeface" | "type-scale";
+export type BrandHealthCheck =
+  | "contrast"
+  | "accent-on-text"
+  | "ink"
+  | "typeface"
+  | "type-scale"
+  | LogoMatrixCheck;
 
 /** One measured run of text from a rendered surface. */
 export type BrandHealthSample = {
@@ -81,6 +93,7 @@ const CHECK_LABEL: Record<BrandHealthCheck, string> = {
   ink: "Text ink from the approved set",
   typeface: "Approved typeface",
   "type-scale": "Recorded type scale",
+  ...LOGO_MATRIX_CHECK_LABEL,
 };
 
 export function brandHealthCheckLabel(check: BrandHealthCheck): string {
@@ -156,8 +169,10 @@ function truncate(text: string, max = 72): string {
 export function scoreBrandHealth(
   samples: BrandHealthSample[],
   guide: BrandGuide = MASTER_TRANSPERFECT_GUIDE,
+  /** Measured brand lockups on the same surfaces, for the placement matrix. */
+  logos: LogoPlacementInput[] = [],
 ): BrandHealthReport {
-  const findings: BrandHealthFinding[] = [];
+  const findings: BrandHealthFinding[] = [...validateLogoPlacements(logos)];
   const ink = approvedInk(guide);
   const accents = accentSwatches(guide);
   const accentByHex = new Map(accents.map((c) => [hex(c.hex), c] as const));
@@ -279,8 +294,12 @@ export function scoreBrandHealth(
   const floor = failures === 0 ? 40 : 0;
   const score = Math.max(floor, Math.min(100, raw));
   const reported = new Set(findings.map((f) => f.check));
+  // A logo check is only reported clean when a lockup was actually measured —
+  // a surface with no lockup on it never counts as a logo pass.
+  const logoChecks = new Set(Object.keys(LOGO_MATRIX_CHECK_LABEL));
   const passed = (Object.keys(CHECK_LABEL) as BrandHealthCheck[])
     .filter((c) => !reported.has(c))
+    .filter((c) => logos.length > 0 || !logoChecks.has(c))
     .map((c) => ({ check: c, label: CHECK_LABEL[c] }));
 
   return {

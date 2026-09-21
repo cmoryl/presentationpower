@@ -13,6 +13,7 @@ import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { AssetExportMenu } from "@/components/AssetExportMenu";
 import { PrintProofMenu } from "@/components/export/PrintProofMenu";
+import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { PrintBriefPreview } from "@/components/convert/PrintBriefPreview";
 import {
@@ -301,6 +302,19 @@ function ConvertPage() {
                         }
                       : null;
                   }}
+                />
+                <BrandHealthBadge
+                  getRoots={() => {
+                    const node = format
+                      ? (socialWrapRef.current?.querySelector<HTMLElement>(
+                          "[data-kit-asset-frame]",
+                        ) ?? null)
+                      : printPageRef.current;
+                    return node ? [node] : [];
+                  }}
+                  surfaceLabel={`this ${result.target.label.toLowerCase()}`}
+                  medium={format ? "social" : "print"}
+                  divisionId={brandId}
                 />
               </div>
             </div>

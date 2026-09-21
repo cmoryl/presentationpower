@@ -94,6 +94,15 @@ export function BrandLockup({
 }) {
   // `u()` formats a template px value in the caller's unit system.
   const u = (px: number): string | number => (unit ? unit(px) : px);
+  // ---- LOGO PLACEMENT MATRIX -------------------------------------------
+  // Every lockup tags itself with the orientation and tone it actually
+  // painted, so the brand-health pre-flight can measure clear space, minimum
+  // size and whether the tone matches the ground it sits on.
+  const lockupAttrs = (o: "horizontal" | "stacked" | "mark-only", tone: string) => ({
+    "data-brand-lockup": "",
+    "data-lockup-orientation": o,
+    "data-lockup-tone": tone,
+  });
   // ---- RESPONSIVE LOGO CLAMPS -------------------------------------------
   // Only container-scaled callers (those passing `unit`) sit inside a
   // [container-type:inline-size] page/card, so cqw is meaningful there.
@@ -155,7 +164,7 @@ export function BrandLockup({
     const markPx = Math.round(dims.markPx * (isMarkOnly ? 1.25 * 1.5 : 1.5));
     if (isMarkOnly) {
       return (
-        <div className="inline-flex" style={{ color }}>
+        <div className="inline-flex" style={{ color }} {...lockupAttrs("mark-only", "color")}>
           {unit ? (
             <div style={{ height: uh(markPx), display: "flex", maxWidth: capWidth }}>
               <ElementMark
@@ -178,6 +187,7 @@ export function BrandLockup({
         style={{ color }}
         role="img"
         aria-label="TransPerfect Element lockup"
+        {...lockupAttrs("horizontal", onDark ? "white" : "color")}
       >
         <img
           src={onDark ? ELEMENT_LOCKUP_URLS.reversed : ELEMENT_LOCKUP_URLS.color}
@@ -200,6 +210,10 @@ export function BrandLockup({
         style={{ color }}
         role="img"
         aria-label={`${logo.wordmark} mark`}
+        {...lockupAttrs(
+          "mark-only",
+          /^#?fff(fff)?$/i.test(color) || color.toLowerCase() === "white" ? "white" : "black",
+        )}
       >
         <div
           className="flex items-center justify-center font-semibold tracking-tight"
@@ -268,6 +282,18 @@ export function BrandLockup({
         style={{ gap: u(dims.gapPx), color }}
         role="img"
         aria-label={`${logo.wordmark}${divisionLine ? " — " + divisionLine : ""}${clientLogoUrl ? " × client" : ""} lockup`}
+        {...lockupAttrs(
+          innerOrientation,
+          flattenOfficialLogo || !useOfficialImage
+            ? isDarkChrome
+              ? "white"
+              : "black"
+            : /-white\./.test(officialLogoUrl ?? "")
+              ? "white"
+              : /-black\./.test(officialLogoUrl ?? "")
+                ? "black"
+                : "color",
+        )}
       >
         {showMark && !useOfficialWordmark && !useOfficialImage && (
           <div

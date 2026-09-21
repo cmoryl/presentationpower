@@ -14,6 +14,14 @@ import {
   type BrandHealthReport,
   type BrandHealthSample,
 } from "./brand-health";
+import type {
+  LogoBox,
+  LogoGround,
+  LogoMedium,
+  LogoPlacementInput,
+  LogoTone,
+  MatrixOrientation,
+} from "./logo-placement-matrix";
 
 // Chrome, guides and decorative type are never scored. `aria-hidden` is NOT a
 // skip: a decorative <svg aria-hidden="true"> often carries the visible
@@ -135,6 +143,88 @@ export function collectBrandHealthSamples(root: HTMLElement, prefix = "s"): Bran
 }
 
 /**
+ * Collect every brand lockup rendered inside one surface, with the box it
+ * occupies, the ground behind it and everything near enough to intrude on its
+ * clear space. Measuring only — no background is drawn or replaced.
+ */
+export function collectLogoPlacements(
+  root: HTMLElement,
+  medium: LogoMedium = "slide",
+  prefix = "s",
+): LogoPlacementInput[] {
+  const rootRect = root.getBoundingClientRect();
+  if (rootRect.width < 1 || rootRect.height < 1) return [];
+  // Previews are often painted at a display scale (a transform on the stage).
+  // Minimum-size rules are about the DESIGN size, so undo the scale and measure
+  // everything in the surface's own pixels.
+  const scale = root.offsetWidth > 0 ? rootRect.width / root.offsetWidth : 1;
+  const k = scale > 0.01 ? 1 / scale : 1;
+  const rel = (r: DOMRect): LogoBox => ({
+    x: (r.left - rootRect.left) * k,
+    y: (r.top - rootRect.top) * k,
+    w: r.width * k,
+    h: r.height * k,
+  });
+
+  const lockups = Array.from(root.querySelectorAll<HTMLElement>("[data-brand-lockup]")).filter(
+    (el) => {
+      const cs = getComputedStyle(el);
+      return cs.display !== "none" && cs.visibility !== "hidden" && el.offsetWidth > 0;
+    },
+  );
+  if (!lockups.length) return [];
+
+  // Anything painted on the surface that could crowd a lockup: runs of text and
+  // media tiles. Elements inside a lockup are excluded.
+  const others: Array<LogoBox & { label?: string }> = [];
+  root.querySelectorAll<HTMLElement>("*").forEach((el) => {
+    if (el.closest("[data-brand-lockup]")) return;
+    if (el.closest(SKIP_SELECTOR)) return;
+    const isMedia = el.matches("[data-media-tile],[data-logo-tile]");
+    const ownText = Array.from(el.childNodes).some(
+      (n) => n.nodeType === 3 && (n.textContent ?? "").trim().length > 0,
+    );
+    if (!ownText && !isMedia) return;
+    const cs = getComputedStyle(el);
+    if (cs.display === "none" || cs.visibility === "hidden") return;
+    const r = el.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) return;
+    others.push({
+      ...rel(r),
+      label: ownText ? `“${(el.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 28)}”` : "Media",
+    });
+  });
+
+  return lockups.map((el, i) => {
+    const box = rel(el.getBoundingClientRect());
+    const { bg, onMedia } = surfaceFor(el, root);
+    const curated = Boolean(el.closest("[data-curated-image]"));
+    const ground: LogoGround = onMedia
+      ? {
+          kind: curated ? "image" : "photo",
+          hex: bg || undefined,
+          scrim: Boolean(el.closest("[data-scrim],[data-media-backing],[data-chrome-on-media]")),
+        }
+      : { kind: "solid-token", hex: bg || "#ffffff" };
+    const orientation = (el.dataset.lockupOrientation as MatrixOrientation) || "horizontal";
+    const tone = (el.dataset.lockupTone as LogoTone) || "color";
+    return {
+      id: `${prefix}-logo-${i + 1}`,
+      label: `${prefix} · brand lockup`,
+      medium,
+      surface: { w: rootRect.width * k, h: rootRect.height * k },
+      box,
+      ground,
+      orientation,
+      tone,
+      // Only neighbours that actually reach the safe zone matter; the matrix
+      // does the geometry, so pass everything measured on the surface.
+      neighbours: others,
+    } satisfies LogoPlacementInput;
+  });
+}
+
+/**
  * Scan one or more rendered surfaces and score them.
  *
  * `roots` are the rendered stages — `[data-slide-stage]` for slides, the board
@@ -144,13 +234,16 @@ export function scanBrandHealth(
   roots: HTMLElement[],
   guide: BrandGuide = MASTER_TRANSPERFECT_GUIDE,
   labels?: string[],
+  medium: LogoMedium = "slide",
 ): BrandHealthReport {
   const samples: BrandHealthSample[] = [];
+  const logos: LogoPlacementInput[] = [];
   roots.forEach((root, i) => {
     const prefix = labels?.[i] ?? `Item ${String(i + 1).padStart(2, "0")}`;
     for (const s of collectBrandHealthSamples(root, prefix)) {
       samples.push({ ...s, label: `${prefix} · ${s.text.slice(0, 40)}` });
     }
+    logos.push(...collectLogoPlacements(root, medium, prefix));
   });
-  return scoreBrandHealth(samples, guide);
+  return scoreBrandHealth(samples, guide, logos);
 }

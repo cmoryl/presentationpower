@@ -513,6 +513,7 @@ function BloomView() {
                   Array.from(document.querySelectorAll<HTMLElement>("[data-brand-health-root]"))
                 }
                 surfaceLabel="these campaign boards"
+                medium="social"
               />
             </div>
             <p className="mt-1 max-w-3xl text-xs leading-relaxed text-black/55">
@@ -949,6 +950,7 @@ function BloomView() {
                   Array.from(document.querySelectorAll<HTMLElement>("[data-brand-health-root]"))
                 }
                 surfaceLabel="this campaign board"
+                medium="social"
               />
               <button
                 type="button"
