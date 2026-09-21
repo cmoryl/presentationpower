@@ -182,7 +182,7 @@ function EventProductionPage() {
             onProgress: setProgress,
           }),
       );
-      downloadAssetBlob(result.blob, result.filename);
+      await downloadAssetBlob(result.blob, result.filename);
       const sum = deliverySummary(result);
       setReceipt(
         `${sum.items} item${sum.items === 1 ? "" : "s"} · ${(sum.pdfBytes / 1_048_576).toFixed(1)} MB of PDF` +
