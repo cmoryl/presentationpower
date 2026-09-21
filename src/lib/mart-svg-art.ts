@@ -33,6 +33,20 @@ function rgbOf(raw: string | undefined): [number, number, number] | null {
   if (!raw) return null;
   const value = (NAMED[raw.trim().toLowerCase()] ?? raw.trim()).toLowerCase();
   if (value === "none" || value.startsWith("url(")) return null;
+  // Illustrator writes hex; a PDF-derived master writes rgb(9%, 12%, 21%) or
+  // rgb(23, 31, 54). Both are real colour — read either rather than drop it.
+  const fn = /^rgba?\(([^)]+)\)$/.exec(value);
+  if (fn) {
+    const parts = fn[1]!.split(/[\s,/]+/).filter(Boolean).slice(0, 3);
+    if (parts.length !== 3) return null;
+    const chans = parts.map((p) => {
+      const n = Number(p.replace("%", ""));
+      if (!Number.isFinite(n)) return NaN;
+      return p.includes("%") ? n / 100 : n / 255;
+    });
+    if (chans.some((c) => !Number.isFinite(c))) return null;
+    return chans.map((c) => Math.min(1, Math.max(0, c))) as [number, number, number];
+  }
   const m = HEX.exec(value);
   if (!m) return null;
   const hex =
@@ -45,6 +59,7 @@ function rgbOf(raw: string | undefined): [number, number, number] | null {
   const n = parseInt(hex, 16);
   return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
 }
+
 
 type Decls = Record<string, string>;
 
