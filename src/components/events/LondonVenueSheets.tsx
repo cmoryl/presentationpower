@@ -164,6 +164,15 @@ export function LondonVenueSheets() {
             >
               {showLabels ? "Room names on" : "Room names off"}
             </button>
+            <button
+              type="button"
+              aria-pressed={showUse}
+              onClick={() => setShowUse(!showUse)}
+              className={`${chip} border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]`}
+            >
+              {showUse ? "Event use on" : "Event use off"}
+            </button>
+
             <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
               Name size
               <input
