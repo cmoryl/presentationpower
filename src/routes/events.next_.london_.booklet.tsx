@@ -53,7 +53,9 @@ import {
   saveEventBooklet,
   updateEventBooklet,
 } from "@/lib/next-booklet.functions";
-import { buildBookletPdf } from "@/lib/next-booklet-pdf";
+const buildBookletPdf: (typeof import("@/lib/next-booklet-pdf"))["buildBookletPdf"] = async (...args) =>
+  (await import("@/lib/next-booklet-pdf")).buildBookletPdf(...args);
+
 import { bookletChartPages, bookletCoverGroundPng, bookletMapPages } from "@/lib/next-booklet-render";
 import {
   BOOKLET_COVER_TREATMENTS,
