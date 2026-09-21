@@ -28,6 +28,7 @@ import {
   type PillarCaptionAlign,
   type PillarQrStyleId,
 } from "@/lib/next-pillar-masters";
+import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
 import { logoInkRatio } from "@/lib/next-logo-ink";
 import { qrPrintQuality, type QrModuleStyle } from "@/lib/qr-print";
 
@@ -278,6 +279,35 @@ function tint(hex: string, amount: number): string {
 export function agendaDivisionAccent(_divisionId: string | undefined): string | null {
   return null;
 }
+
+/**
+ * Event accent for a division agenda — the division's own NEXT accent, used for
+ * the day heading bar and the time rail down the left edge of each band. This is
+ * the event exception to the retired accent grounds: the ground, the copy and the
+ * geometry stay enterprise on every board, and the accent only marks days and
+ * times. Event areas (the Innovation Lounge) print under the master NEXT lockup,
+ * so they take the master NEXT accent.
+ */
+/**
+ * Visibility floor for the accent time rail against the band fill behind it.
+ * The rail carries no information of its own, so this is a "can you see it"
+ * threshold rather than the AA text ratio.
+ */
+export const AGENDA_RAIL_MIN_CONTRAST = 1.35;
+
+export function agendaDivisionDayAccent(
+  divisionId: string | undefined,
+): { hex: string; ink: string } | null {
+  const id = divisionId && AGENDA_EVENT_AREA_IDS.includes(divisionId) ? "transperfect" : divisionId;
+  const div = NEXT_DIVISIONS.find((d) => d.id === id);
+  if (!div?.accent) return null;
+  // Copy on the accent takes whichever brand ink clears AA on it — Learn yellow
+  // and Life Sci green carry Blue 800, deep accents carry white.
+  const ink = agendaContrastRatio("#FFFFFF", div.accent) >= 4.5 ? "#FFFFFF" : "#03002C";
+  return { hex: div.accent, ink };
+}
+
+
 
 
 /**
@@ -569,6 +599,10 @@ export type AgendaBandPalette = {
   pin: string;
   footerBand: string;
   footerInk: string;
+  /** Fill of the day heading bar on a multi-day board. */
+  dayBar: string;
+  /** Copy on the day heading bar. */
+  dayBarInk: string;
 };
 
 export function agendaBandTreatment(config: {
@@ -579,16 +613,19 @@ export function agendaBandTreatment(config: {
     : "solid";
 }
 
-/** Resolved band colours for a board. Never returns an unapproved value. */
-export function agendaBandPalette(config: {
+function agendaBandPaletteBase(config: {
   bandTreatment?: string;
   bandLayout?: string;
 }): AgendaBandPalette {
+
   const box = agendaBandLayout(config);
   const base = {
     parallel: AGENDA_BAND.parallel,
     parallelInk: AGENDA_BAND.ink,
     pin: AGENDA_BAND.pin,
+    dayBar: AGENDA_BAND.footerBand,
+    dayBarInk: "#FFFFFF",
+
     footerBand: AGENDA_BAND.footerBand,
     footerInk: AGENDA_BAND.footerInk,
     railW: box.railW,
@@ -684,6 +721,38 @@ export function agendaBandPalette(config: {
       };
   }
 }
+
+/**
+ * Resolved band colours for a board. Never returns an unapproved value.
+ *
+ * On a division board the day heading bar and the left time rail take the
+ * division's own NEXT accent, so a Legal programme reads as Legal at a glance
+ * while the ground, the band fills and every line of copy stay enterprise. The
+ * The day bar always carries the approved ink that clears AA on the accent. The
+ * rail is decoration beside the time, never the only way a time is read, so it
+ * needs only to be visibly distinct from the band fill it sits on; where an
+ * accent would disappear into the fill the treatment's own rail stays.
+ */
+export function agendaBandPalette(config: {
+  bandTreatment?: string;
+  bandLayout?: string;
+  divisionId?: string;
+}): AgendaBandPalette {
+  const base = agendaBandPaletteBase(config);
+  const accent = agendaDivisionDayAccent(config.divisionId);
+  if (!accent) return base;
+  const railReads =
+    agendaContrastRatio(accent.hex, base.fillA) >= AGENDA_RAIL_MIN_CONTRAST &&
+    agendaContrastRatio(accent.hex, base.fillB) >= AGENDA_RAIL_MIN_CONTRAST;
+  return {
+    ...base,
+    dayBar: accent.hex,
+    dayBarInk: accent.ink,
+    rail: railReads ? accent.hex : base.rail,
+  };
+}
+
+
 
 // ── footer band ──────────────────────────────────────────────────────────────
 //

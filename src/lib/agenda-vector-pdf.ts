@@ -714,11 +714,12 @@ export async function buildAgendaVectorPdf(
       blocks.rows.forEach((row, i) => {
         const band = row.band;
         if (!band) return;
-        // Day heading: a solid Blue 500 bar with white caps, so a two-day board
-        // prints as two days rather than one continuous list.
+        // Day heading: a solid bar in the division accent with caps in the ink
+        // that clears AA on it, so a two-day board prints as two days rather
+        // than one continuous list.
         if (row.session.dayBreak) {
-          plate(px(band.x), py(band.y), mm(band.w), mm(band.h), rgb(...hexRgb("#003FC7")), 1);
-          const white = rgb(1, 1, 1);
+          plate(px(band.x), py(band.y), mm(band.w), mm(band.h), rgb(...hexRgb(BAND.dayBar)), 1);
+          const white = rgb(...hexRgb(BAND.dayBarInk));
           const size = mm(L.titleRowSize) * 1.05;
           const label = row.session.title.trim().toUpperCase();
           const baseY = py(band.y) - mm(band.h) / 2 - size * 0.36;
@@ -948,13 +949,13 @@ export async function buildAgendaVectorPdf(
     for (const row of blocks.rows) {
       const top = py(row.y);
       if (row.session.dayBreak) {
-        // Rule-style board: the day heading takes the same solid Blue 500 bar.
+        // Rule-style board: the day heading takes the same accent bar.
         page.drawRectangle({
           x: px(blocks.x),
           y: top - mm(row.h),
           width: mm(blocks.contentW),
           height: mm(row.h),
-          color: rgb(...hexRgb("#003FC7")),
+          color: rgb(...hexRgb(agendaBandPalette(config).dayBar)),
         });
 
         const size = mm(L.titleRowSize) * 1.05;
@@ -963,7 +964,7 @@ export async function buildAgendaVectorPdf(
           y: top - mm(row.h) / 2 - size * 0.36,
           size,
           font: bold,
-          color: rgb(1, 1, 1),
+          color: rgb(...hexRgb(agendaBandPalette(config).dayBarInk)),
         });
         continue;
       }

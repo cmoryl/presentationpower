@@ -388,16 +388,16 @@ export function AgendaSheet({
 
       {blocks.rows.map((row, i) =>
         row.band && row.session.dayBreak ? (
-          // Day heading: a solid Blue 500 bar with white caps, so a two-day board
-          // reads as two days rather than one long list.
+          // Day heading: a solid bar in the division accent, with the one brand
+          // ink that clears AA on it, so a two-day board reads as two days.
           <div
             key={i}
             style={{
               ...at(row.band.x, row.band.y),
               width: mm(row.band.w),
               height: mm(row.band.h),
-              background: "#003FC7",
-              color: "#FFFFFF",
+              background: BAND.dayBar,
+              color: BAND.dayBarInk,
               borderRadius: bandRadius(row.band.w, row.band.h),
               overflow: "hidden",
               display: "flex",
@@ -423,7 +423,11 @@ export function AgendaSheet({
               style={{
                 flex: "1 1 auto",
                 height: mm(Math.max(0.4, L.titleRowSize * 0.08)),
-                background: "rgba(255,255,255,0.55)",
+                // The rule across the day bar follows the bar's own ink, so it
+                // still reads on a pale accent such as Learn yellow.
+                background:
+                  BAND.dayBarInk === "#FFFFFF" ? "rgba(255,255,255,0.55)" : "rgba(3,0,44,0.45)",
+
               }}
             />
             {row.session.detail.trim() ? (
@@ -660,15 +664,15 @@ export function AgendaSheet({
             })}
           </div>
         ) : row.session.dayBreak ? (
-          // Rule-style board: the day heading takes a solid Blue 500 bar too.
+          // Rule-style board: the day heading takes the same accent bar too.
           <div
             key={i}
             style={{
               ...at(blocks.x, row.y),
               width: mm(blocks.contentW),
               height: mm(row.h),
-              background: "#003FC7",
-              color: "#FFFFFF",
+              background: BAND.dayBar,
+              color: BAND.dayBarInk,
               display: "flex",
               alignItems: "center",
               gap: mm(4),
