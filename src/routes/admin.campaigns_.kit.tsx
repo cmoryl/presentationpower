@@ -34,6 +34,8 @@ import { AdminPageHeader, AdminSection, AdminEmpty } from "@/components/admin/Ad
 import { GroundedCopyDrafter } from "@/components/campaigns/GroundedCopyDrafter";
 import { SocialAssetEditorButton } from "@/components/campaigns/SocialAssetEditor";
 import { useSocialAssetEdits, socialEditKey, type SocialAssetEdit } from "@/lib/social-asset-edit";
+import { CampaignBundleButton } from "@/components/campaigns/CampaignBundleButton";
+import { channelForPlatform, type BundleSource } from "@/lib/campaign-bundle";
 
 const searchSchema = z.object({
   source: z.string().optional(),
@@ -104,6 +106,27 @@ function KitBuilderInner() {
   );
   const [regenTick, setRegenTick] = useState(0);
   const assetEdits = useSocialAssetEdits();
+
+  // Every rendered kit card on this page, resolved at click time so the bundle
+  // contains exactly what is on screen (social cards and signage/print sizes go
+  // to their own folders). DOM captures are proofs, which the manifest states.
+  const collectKitSources = (): BundleSource[] =>
+    Array.from(document.querySelectorAll<HTMLElement>("[data-bundle-asset]")).flatMap((card) => {
+      const node = card.querySelector<HTMLElement>("[data-kit-asset-frame]");
+      const width = Number(card.dataset.bundleW);
+      const height = Number(card.dataset.bundleH);
+      if (!node || !(width > 0) || !(height > 0)) return [];
+      return [
+        {
+          kind: "capture" as const,
+          channel: channelForPlatform(card.dataset.bundlePlatform),
+          label: card.dataset.bundleLabel || "Asset",
+          node,
+          width,
+          height,
+        },
+      ];
+    });
 
   // Wizard mode — triggered by ?blank=1 from /social and /events blank-kit CTAs.
   const isWizard = !!search.blank;
@@ -461,7 +484,7 @@ function KitBuilderInner() {
             {/* One click: deck + social cards + print collateral in one ZIP
                 with a manifest naming every file, format and resolution. */}
             <CampaignBundleButton
-              campaignName={copy.title || "Campaign"}
+              campaignName={source?.copy?.title || "Campaign"}
               brandId={brandId}
               resolveSources={collectKitSources}
             />
