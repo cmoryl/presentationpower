@@ -1694,7 +1694,10 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
     locationCaps: true,
     locationWeight: "bold",
     locationAlign: "right",
-    sessions: programme.sessions.map((s) => ({ ...s })),
+    // Sessions running at the same time in different rooms belong on one line,
+    // not stacked as if they ran back to back — fold them as the timeline asks.
+    sessions: agendaFoldSimultaneous(programme.sessions.map((s) => ({ ...s }))),
+
     footnote: programme.footnote ?? "Programme subject to change · full agenda and speaker bios online",
     footerLeft: programme.footerLeft ?? "",
     footerRight: programme.footerRight ?? "",
