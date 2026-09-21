@@ -715,6 +715,38 @@ function agendaBandPaletteBase(config: {
   }
 }
 
+/**
+ * Resolved band colours for a board. Never returns an unapproved value.
+ *
+ * On a division board the day heading bar and the left time rail take the
+ * division's own NEXT accent, so a Legal programme reads as Legal at a glance
+ * while the ground, the band fills and every line of copy stay enterprise. The
+ * accent is only kept where it still reads: the day bar needs an approved ink at
+ * AA on it, and the rail needs 3:1 against both band fills. Where it does not,
+ * the treatment's own Blue 500 / Aqua stays — a board is never made less legible
+ * to carry a colour.
+ */
+export function agendaBandPalette(config: {
+  bandTreatment?: string;
+  bandLayout?: string;
+  divisionId?: string;
+}): AgendaBandPalette {
+  const base = agendaBandPaletteBase(config);
+  const accent = agendaDivisionDayAccent(config.divisionId);
+  if (!accent) return base;
+  const railReads =
+    agendaContrastRatio(accent.hex, base.fillA) >= 3 &&
+    agendaContrastRatio(accent.hex, base.fillB) >= 3;
+  return {
+    ...base,
+    dayBar: accent.hex,
+    dayBarInk: accent.ink,
+    rail: railReads ? accent.hex : base.rail,
+  };
+}
+
+
+
 // ── footer band ──────────────────────────────────────────────────────────────
 //
 // The foot of a programme board. The issued London board carries a Blue 500 band
