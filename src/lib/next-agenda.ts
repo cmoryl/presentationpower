@@ -279,6 +279,28 @@ export function agendaDivisionAccent(_divisionId: string | undefined): string | 
   return null;
 }
 
+/**
+ * Event accent for a division agenda — the division's own NEXT accent, used for
+ * the day heading bar and the time rail down the left edge of each band. This is
+ * the event exception to the retired accent grounds: the ground, the copy and the
+ * geometry stay enterprise on every board, and the accent only marks days and
+ * times. Event areas (the Innovation Lounge) print under the master NEXT lockup,
+ * so they take the master NEXT accent.
+ */
+export function agendaDivisionDayAccent(
+  divisionId: string | undefined,
+): { hex: string; ink: string } | null {
+  const id = divisionId && AGENDA_EVENT_AREA_IDS.includes(divisionId) ? "transperfect" : divisionId;
+  const div = NEXT_DIVISIONS.find((d) => d.id === id);
+  if (!div?.accent) return null;
+  // Copy on the accent takes whichever brand ink clears AA on it — Learn yellow
+  // and Life Sci green carry Blue 800, deep accents carry white.
+  const ink = agendaContrastRatio("#FFFFFF", div.accent) >= 4.5 ? "#FFFFFF" : "#03002C";
+  return { hex: div.accent, ink };
+}
+
+
+
 
 /**
  * Gradient stops for an agenda ground. When the division carries an approved
