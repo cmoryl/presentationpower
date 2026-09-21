@@ -1542,8 +1542,10 @@ export function agendaProgrammeIsStock(config: {
         p.time ?? "",
         p.title,
         p.speaker ?? "",
+        p.room ?? "",
         p.detail,
       ]),
+
     ].join("\u0001");
   const same = (a: Partial<AgendaSession>[], b: Partial<AgendaSession>[]) =>
     a.length === b.length && a.every((s, i) => sig(s) === sig(b[i]!));
