@@ -592,6 +592,10 @@ export type AgendaBandPalette = {
   pin: string;
   footerBand: string;
   footerInk: string;
+  /** Fill of the day heading bar on a multi-day board. */
+  dayBar: string;
+  /** Copy on the day heading bar. */
+  dayBarInk: string;
 };
 
 export function agendaBandTreatment(config: {
@@ -602,11 +606,11 @@ export function agendaBandTreatment(config: {
     : "solid";
 }
 
-/** Resolved band colours for a board. Never returns an unapproved value. */
-export function agendaBandPalette(config: {
+function agendaBandPaletteBase(config: {
   bandTreatment?: string;
   bandLayout?: string;
 }): AgendaBandPalette {
+
   const box = agendaBandLayout(config);
   const base = {
     parallel: AGENDA_BAND.parallel,
