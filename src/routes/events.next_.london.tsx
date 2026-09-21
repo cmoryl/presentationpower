@@ -5,7 +5,11 @@
 // spec-compliant downloads: vector .ai / .svg for the RIP, plus dithered PNG
 // rasters generated in-browser at the spec resolution tiers.
 
-import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
+// opentype.js is browser-only — loaded when a print file is asked for, never
+// during server rendering.
+const loadLondonSignageFace: (typeof import("@/lib/next-london-text-outline"))["loadLondonSignageFace"] =
+  async (...args) => (await import("@/lib/next-london-text-outline")).loadLondonSignageFace(...args);
+
 import { useEffect, useMemo, useState } from "react";
 
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
