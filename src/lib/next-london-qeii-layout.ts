@@ -185,7 +185,12 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     const room = lines.join(" ").replace(/-\s/g, "-");
     const fullUse = options.showUse ? spaceUseLine(room, floor.id) : undefined;
     const allMarks = options.showMarks ? spaceUseMarks(room, floor.id) : [];
-    const useSize = Math.round(size * QEII_USE_RATIO * 100) / 100;
+    // The event line never falls under the readable floor, even beneath a small name.
+    const useSize =
+      Math.round(
+        Math.min(size * 0.92, Math.max(size * QEII_USE_RATIO, floor.w * QEII_LABEL_MIN_SHARE * scale)) *
+          100,
+      ) / 100;
     const markH = Math.round(size * QEII_MARK_RATIO * 100) / 100;
 
     const nameWidth = Math.max(...lines.map((t) => qeiiTextWidth(t, size)));
