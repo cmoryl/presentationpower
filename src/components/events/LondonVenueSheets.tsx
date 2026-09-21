@@ -225,8 +225,17 @@ export function LondonVenueSheets() {
         </p>
       ) : null}
 
+      {showRebuilt && planNotes.length ? (
+        <ul className="mt-4 space-y-1 rounded-xl border border-black/10 bg-white px-4 py-3 text-[12px] text-[#03002C]/75">
+          {planNotes.map((note) => (
+            <li key={note}>{note}</li>
+          ))}
+        </ul>
+      ) : null}
+
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <figure className="overflow-hidden rounded-2xl border border-black/10 bg-[#F2F2F2]">
+
           {showRebuilt && plan ? (
             <QeiiFloorPlan
               floor={plan.floor}
