@@ -28,6 +28,7 @@ import {
   agendaSplitWidths,
   agendaDivision,
   agendaLockupUrl,
+  agendaChromeInk,
   agendaGeometry,
   agendaInk,
   agendaLayout,
@@ -316,6 +317,8 @@ export async function buildAgendaDocx(
   const L = agendaLayout(pages[0]!.config);
   const blocks = agendaBlocks(config);
   const ink = agendaCopyInk(config).hex;
+  // Date line and footer lines follow the face, so they stay white on a dark board.
+  const chromeHex = hex(agendaChromeInk(config), "FFFFFF");
   const inkHex = hex(ink, config.face === "light" ? "03002C" : "FFFFFF");
   const titleHex = hex(agendaTitleInk(config));
   const division = agendaDivision(config.divisionId);
@@ -931,7 +934,7 @@ export async function buildAgendaDocx(
                 )
               : "",
             hasMeta
-              ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), {
+              ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: chromeHex }), {
                   afterTwips: 0,
                   align: docxLocAlign(agendaLocation(cfg).align),
                   rightTwips: agendaLocation(cfg).align === "right" ? cardLocRight : 0,
@@ -1019,7 +1022,7 @@ export async function buildAgendaDocx(
           )
         : "",
       hasMeta
-        ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), {
+        ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: chromeHex }), {
             afterTwips: 0,
             align:
               cardMode && (cfg.locationLine ?? "").trim()
@@ -1064,7 +1067,7 @@ export async function buildAgendaDocx(
     // The printed card board finishes on a solid brand band carrying the event
     // URL and dates in white — reproduced here as a shaded full-width table.
     const foot = agendaFooter(cfg);
-    const footInk = hex(foot.onGround ? inkHex : foot.ink, "FFFFFF");
+    const footInk = hex(foot.onGround ? chromeHex : foot.ink, "FFFFFF");
     const footCells: { text: string; align: "left" | "center" | "right"; share: number }[] = [
       { text: foot.left, align: "left", share: foot.centre ? 0.4 : 0.62 },
       ...(foot.centre

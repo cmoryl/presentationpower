@@ -1802,6 +1802,17 @@ export function agendaLockupInk(config: AgendaConfig): string {
   return (config.face ?? "dark") === "light" ? "#03002C" : "#FFFFFF";
 }
 
+/**
+ * Ink for the board chrome that sits directly on the ground rather than inside a
+ * card: the date/meta line under the location and the footer lines. These follow
+ * the face (white on a dark board) so the header and foot read as one piece with
+ * the lockup, instead of inheriting the body-copy contrast guard, which darkens
+ * the whole sheet when a gradient's pale corner fails white somewhere.
+ */
+export function agendaChromeInk(config: AgendaConfig): string {
+  return agendaLockupInk(config);
+}
+
 
 export function agendaLayout(config: AgendaConfig) {
   const geo = agendaGeometry(config);
