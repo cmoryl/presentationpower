@@ -58,6 +58,7 @@ import {
   agendaLongestWord,
   agendaParallels,
   agendaSessionMark,
+  agendaParallelRoom,
   agendaSessionRoom,
 
   agendaQrBackground,

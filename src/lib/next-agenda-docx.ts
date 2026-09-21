@@ -45,6 +45,7 @@ import {
   agendaQrTransparent,
   agendaRowStyle,
   agendaSessionMark,
+  agendaParallelRoom,
   agendaSessionRoom,
 
   agendaStops,
@@ -800,7 +801,8 @@ export async function buildAgendaDocx(
                     bold: true,
                   }),
                   { afterTwips: 0, lineTwips: mmT(cardParType.timeSize * 1.4) },
-                ) + copy(p.title, p.detail, parInk, p.speaker ?? "", cardParType),
+                ) +
+                  copy(p.title, p.detail, parInk, p.speaker ?? "", cardParType, agendaParallelRoom(p)),
                 rowPad,
                 {
                   fill: parFill,
