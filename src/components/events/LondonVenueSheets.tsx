@@ -15,6 +15,7 @@ import { spaceUseLine, spaceUseMarks, spaceUsesOnFloor } from "@/lib/next-london
 import {
   qeiiPlanFilename,
   qeiiPlanState,
+  type QeiiMarkVariant,
   qeiiPlanSvg,
   type QeiiPlanFace,
 } from "@/lib/next-london-qeii-plan";
@@ -54,6 +55,8 @@ export function LondonVenueSheets() {
   const [showLabels, setShowLabels] = useState(true);
   const [showUse, setShowUse] = useState(true);
   const [showMarks, setShowMarks] = useState(true);
+  const [markVariant, setMarkVariant] = useState<QeiiMarkVariant>("reverse");
+  const [markScale, setMarkScale] = useState(1);
 
 
   const rows = useMemo(() => venueRoomDirectory(), []);
@@ -77,9 +80,9 @@ export function LondonVenueSheets() {
   const planNotes = useMemo(
     () =>
       plan
-        ? qeiiPlanLayout(plan.floor, { labelScale, showUse, showMarks }).notes
+        ? qeiiPlanLayout(plan.floor, { labelScale, showUse, showMarks, markScale }).notes
         : [],
-    [plan, labelScale, showUse, showMarks],
+    [plan, labelScale, showUse, showMarks, markScale],
   );
   const uses = useMemo(() => spaceUsesOnFloor(sheet.id), [sheet.id]);
 
@@ -87,7 +90,15 @@ export function LondonVenueSheets() {
 
   function downloadPlanSvg() {
     if (!plan?.rebuilt) return;
-    const svg = qeiiPlanSvg(plan.floor, { face, labelScale, showLabels, showUse, showMarks });
+    const svg = qeiiPlanSvg(plan.floor, {
+      face,
+      labelScale,
+      showLabels,
+      showUse,
+      showMarks,
+      markVariant,
+      markScale,
+    });
     const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
     download(url, qeiiPlanFilename(plan.floor, face));
     URL.revokeObjectURL(url);
@@ -207,6 +218,47 @@ export function LondonVenueSheets() {
               {showMarks ? "Division logos on" : "Division logos off"}
             </button>
 
+            {showMarks ? (
+              <>
+                <span className="inline-flex overflow-hidden rounded-full border border-[#03002C]/20 bg-white">
+                  {(
+                    [
+                      ["reverse", "Reverse logo"],
+                      ["white", "All white logo"],
+                      ["colour", "Colour logo"],
+                    ] as [QeiiMarkVariant, string][]
+                  ).map(([id, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      aria-pressed={markVariant === id}
+                      onClick={() => setMarkVariant(id)}
+                      className={`px-3 py-1.5 text-[12px] font-semibold ${
+                        markVariant === id
+                          ? "bg-[#03002C] text-white"
+                          : "text-[#03002C] hover:bg-[#F2F2F2]"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </span>
+                <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
+                  Logo size
+                  <input
+                    type="range"
+                    min={0.6}
+                    max={2.4}
+                    step={0.1}
+                    value={markScale}
+                    onChange={(e) => setMarkScale(Number(e.target.value))}
+                    aria-label="Division logo size"
+                  />
+                  {markScale.toFixed(1)}×
+                </label>
+              </>
+            ) : null}
+
             <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
               Name size
               <input
@@ -252,6 +304,8 @@ export function LondonVenueSheets() {
               showLabels={showLabels}
               showUse={showUse}
               showMarks={showMarks}
+              markVariant={markVariant}
+              markScale={markScale}
 
               className="block w-full bg-[#EEF1F7]"
             />
