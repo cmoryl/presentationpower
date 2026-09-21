@@ -490,14 +490,19 @@ export async function buildAgendaVectorPdf(
         const scale = lw / (vw * (inkFrac?.width ?? 1));
         const offX = inkFrac ? inkFrac.left * vw * scale : 0;
         const offY = inkFrac ? inkFrac.top * vh * scale : 0;
-        for (const d of art.paths) {
-          page.drawSvgPath(d, {
+        for (const shape of art.shapes) {
+          // A reverse lockup declares its own fills (white wordmark + live
+          // division accent). Honour them; fall back to the board's lockup ink
+          // only where the file leaves a shape uncoloured.
+          const fill = shape.fill && /^#[0-9a-f]{3,8}$/i.test(shape.fill) ? shape.fill : lockupInk;
+          page.drawSvgPath(shape.d, {
             x: px(blocks.lockup.x) - vx * scale - offX,
             y: py(blocks.lockup.y) + vy * scale + offY,
             scale,
-            color: rgb(...hexRgb(lockupInk)),
+            color: rgb(...hexRgb(fill)),
           });
         }
+
       } else if (art.kind === "raster") {
         try {
           const image = art.png ? await doc.embedPng(art.bytes) : await doc.embedJpg(art.bytes);
