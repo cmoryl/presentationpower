@@ -10,6 +10,7 @@
 import { NEXT_APP_ORIGIN } from "@/lib/next-event";
 import { spaceUseLine, spaceUseMarks, type SpaceUseMark } from "@/lib/next-london-space-use";
 
+import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import {
   qeiiColourKey,
@@ -153,12 +154,14 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
   const showLabels = options.showLabels ?? true;
   const roomColours = options.roomColours ?? {};
   const paint = qeiiColourPaint(floor, roomColours);
+  const hidden = qeiiRepeatedSymbolShapes(floor);
   const shapes = floor.shapes
     .map((s, i) => {
+      if (hidden.has(i)) return "";
       const fill = paint.fills.get(i) ?? qeiiPlanInk(s.fill, face);
       const stroke = qeiiPlanInk(s.stroke, face);
       const bits = [`d="${s.d}"`, `fill="${fill ?? "none"}"`];
-      if (stroke) bits.push(`stroke="${stroke}"`, `stroke-width="${s.w ?? 1}"`);
+      if (stroke) bits.push(`stroke="${stroke}"`, `stroke-width="${qeiiWallWidth(s)}"`);
       return `<path ${bits.join(" ")}/>`;
     })
     .join("");

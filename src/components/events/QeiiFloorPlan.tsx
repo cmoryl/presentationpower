@@ -16,6 +16,7 @@ import {
   type QeiiPlanFace,
 } from "@/lib/next-london-qeii-plan";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
+import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import {
   qeiiColourKey,
   qeiiColourPaint,
@@ -66,6 +67,7 @@ export function QeiiFloorPlan({
   );
 
   const paint = useMemo(() => qeiiColourPaint(floor, roomColours), [floor, roomColours]);
+  const hidden = useMemo(() => qeiiRepeatedSymbolShapes(floor), [floor]);
   const keyRows = useMemo(
     () => (showKey ? qeiiColourKey(floor, roomColours, keyLabels) : []),
     [floor, roomColours, keyLabels, showKey],
@@ -82,6 +84,8 @@ export function QeiiFloorPlan({
     >
       <rect width={floor.w} height={floor.h + keyH} fill={QEII_PLAN_TOKENS.surface} />
       {floor.shapes.map((shape, i) => {
+        // Repeated WC cubicle figures are left undrawn; one bathroom symbol stays.
+        if (hidden.has(i)) return null;
         const stroke = qeiiPlanInk(shape.stroke, face);
         const chosen = paint.fills.get(i);
         return (
@@ -90,7 +94,7 @@ export function QeiiFloorPlan({
             d={shape.d}
             fill={chosen ?? qeiiPlanInk(shape.fill, face) ?? "none"}
             stroke={stroke}
-            strokeWidth={stroke ? (shape.w ?? 1) : undefined}
+            strokeWidth={stroke ? qeiiWallWidth(shape) : undefined}
           />
         );
       })}
