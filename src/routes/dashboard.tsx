@@ -195,6 +195,9 @@ function RoleDashboard() {
 
   const loading = decks.isLoading || printAssets.isLoading || kits.isLoading;
 
+  // Live projects belong to a named person, so they only appear for that account.
+  const myProjects = useMemo(() => liveProjectsFor(sessionEmail), [sessionEmail]);
+
   const counters: Record<WorkKind, { label: string; count: number | null; to: string }> = {
     decks: {
       label: "Saved decks",
