@@ -128,40 +128,48 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
       return `<path ${bits.join(" ")}/>`;
     })
     .join("");
+  const layout = qeiiPlanLayout(floor, {
+    labelScale: scale,
+    showUse: options.showUse,
+    showMarks: options.showMarks,
+  });
+  const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const labels = showLabels
-    ? floor.labels
-        .map((l) => {
-          const transform = qeiiLabelTransform(l);
-          const size = qeiiLabelSize(l, scale);
-          const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    ? layout.blocks
+        .map((block) => {
+          const transform =
+            Math.abs(block.angle) < 0.5
+              ? undefined
+              : `rotate(${block.angle} ${block.x} ${block.y})`;
           const text = (y: number, fontSize: number, body: string) =>
             [
               "<text",
-              `x="${l.x}" y="${y}"`,
+              `x="${block.x}" y="${y}"`,
               'text-anchor="middle" dominant-baseline="middle"',
-              `font-family="Geist, Geist Variable, sans-serif" font-size="${fontSize}"`,
+              `font-family="Geist, Geist Variable, sans-serif" font-weight="600" font-size="${fontSize}"`,
               `fill="${qeiiLabelInk()}"`,
               transform ? `transform="${transform}"` : "",
               `>${esc(body)}</text>`,
             ]
               .filter(Boolean)
               .join(" ");
-          const use = options.showUse ? qeiiLabelUse(l, floor.id) : undefined;
+          const nameTop = block.y - ((block.lines.length - 1) * block.size * 1.05) / 2;
+          const lastLine = nameTop + (block.lines.length - 1) * block.size * 1.05;
           // The lockup is linked by its full site URL so the downloaded file
           // still finds the approved artwork instead of embedding a copy.
-          const marks = options.showMarks ? qeiiLabelMarks(l, floor.id) : [];
-          const markH = size * 2.2;
-          const row = marks.reduce((w, m) => w + markH * m.ratio + size * 0.4, 0) - size * 0.4;
-          let markX = l.x - row / 2;
-          const markSvg = marks
+          const row =
+            block.marks.reduce((w, m) => w + block.markH * m.ratio + block.size * 0.35, 0) -
+            block.size * 0.35;
+          let markX = block.x - row / 2;
+          const markSvg = block.marks
             .map((m) => {
-              const w = markH * m.ratio;
+              const w = block.markH * m.ratio;
               const x = markX;
-              markX += w + size * 0.4;
+              markX += w + block.size * 0.35;
               return [
                 "<image",
                 `href="${m.urlReverse.startsWith("http") ? m.urlReverse : `${NEXT_APP_ORIGIN}${m.urlReverse}`}"`,
-                `x="${x}" y="${l.y - size * 1.1 - markH}" width="${w}" height="${markH}"`,
+                `x="${x}" y="${nameTop - block.size * 0.7 - block.markH}" width="${w}" height="${block.markH}"`,
                 'preserveAspectRatio="xMidYMid meet"',
                 transform ? `transform="${transform}"` : "",
                 "/>",
@@ -170,14 +178,17 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
                 .join(" ");
             })
             .join("");
-          const body = use
-            ? text(l.y, size, l.text) + text(l.y + size * 1.15, size * 0.72, use)
-            : text(l.y, size, l.text);
-          return markSvg + body;
-
+          const names = block.lines
+            .map((line, li) => text(nameTop + li * block.size * 1.05, block.size, line))
+            .join("");
+          const use = block.use
+            ? text(lastLine + block.size * 0.62 + block.useSize * 0.6, block.useSize, block.use)
+            : "";
+          return markSvg + names + use;
         })
         .join("")
     : "";
+
 
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${floor.w}" height="${floor.h}" viewBox="0 0 ${floor.w} ${floor.h}">`,
