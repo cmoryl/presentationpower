@@ -2036,7 +2036,46 @@ export function AgendaStudio({
             <Plus className="mr-2 h-4 w-4" /> Add row
           </Button>
         </div>
+        {(() => {
+          // Two rows at the same time print stacked, as if they ran one after the
+          // other. Spot that and offer to put them side by side in one slot.
+          const groups = agendaSimultaneousGroups(day.sessions);
+          if (!groups.length) return null;
+          return (
+            <div className="space-y-2 rounded-lg border border-[#B45309]/40 bg-[#FFEB66]/20 p-3">
+              {groups.map((group, gi) => {
+                const label = day.sessions[group[0]!]?.time || "this time";
+                return (
+                  <div
+                    key={gi}
+                    className="flex flex-wrap items-center justify-between gap-2 text-xs"
+                  >
+                    <span className="text-[#7C4A02] dark:text-[#FFEB66]">
+                      {group.length} sessions run at {label} in different rooms, but they print one
+                      under the other.
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const merged = agendaMergeSimultaneous(day.sessions, group);
+                        patchDay({ sessions: merged.sessions });
+                        if (merged.leftInPlace > 0)
+                          toast.warning(
+                            `${merged.leftInPlace} session${merged.leftInPlace === 1 ? "" : "s"} left as its own row — a slot holds at most ${AGENDA_MAX_PARALLEL} side by side.`,
+                          );
+                      }}
+                    >
+                      Put side by side
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
         <div className="space-y-2">
+
           {day.sessions.map((session, i) => (
             <div
               key={i}
