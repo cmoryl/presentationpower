@@ -48,3 +48,17 @@ describe("simultaneous agenda sessions", () => {
     expect(agendaSimultaneousGroups([row("9:00 AM", "A"), row("10:00 AM", "B")])).toEqual([]);
   });
 });
+
+describe("folding a whole programme", () => {
+  it("puts every simultaneous group on one line and leaves clean rows alone", async () => {
+    const { agendaFoldSimultaneous, agendaParallels } = await import("../next-agenda");
+    const folded = agendaFoldSimultaneous([
+      row("9:00 AM", "Welcome"),
+      row("3:00 PM", "Legal track", "ST JAMES"),
+      row("3:00 PM", "Media track", "WESTMINSTER"),
+      row("4:00 PM", "Close"),
+    ]);
+    expect(folded.map((s) => s.title)).toEqual(["Welcome", "Legal track", "Close"]);
+    expect(agendaParallels(folded[1]!)).toHaveLength(1);
+  });
+});

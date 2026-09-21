@@ -1225,9 +1225,9 @@ export function agendaMergeSimultaneous(
   const host = sessions[keepAt];
   if (!host) return { sessions: [...sessions], merged: 0, leftInPlace: 0 };
   const existing = agendaParallels(host);
-  const room = 
-    AGENDA_MAX_PARALLEL - existing.length;
-  const folding = order.slice(1, 1 + Math.max(0, room));
+  const spare = AGENDA_MAX_PARALLEL - existing.length;
+  const folding = order.slice(1, 1 + Math.max(0, spare));
+
   const leftInPlace = order.length - 1 - folding.length;
   const added: AgendaParallel[] = folding.map((idx) => {
     const s = sessions[idx]!;
@@ -1246,6 +1246,25 @@ export function agendaMergeSimultaneous(
     .filter((_, i) => !folding.includes(i));
   return { sessions: next, merged: added.length, leftInPlace };
 }
+
+/**
+ * Fold every simultaneous group in a programme onto one line. Rows that already
+ * sit side by side are untouched, and anything past the four-card limit stays as
+ * its own row rather than being dropped.
+ */
+export function agendaFoldSimultaneous(sessions: readonly AgendaSession[]): AgendaSession[] {
+  let list: AgendaSession[] = [...sessions];
+  // Each merge renumbers the rows, so re-scan after every fold.
+  for (let guard = 0; guard < 200; guard += 1) {
+    const group = agendaSimultaneousGroups(list)[0];
+    if (!group) break;
+    const merged = agendaMergeSimultaneous(list, group);
+    if (!merged.merged) break;
+    list = merged.sessions;
+  }
+  return list;
+}
+
 
 
 /** One programme day. Multi-day agendas hold an ordered list of these. */
@@ -1694,7 +1713,10 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
     locationCaps: true,
     locationWeight: "bold",
     locationAlign: "right",
-    sessions: programme.sessions.map((s) => ({ ...s })),
+    // Sessions running at the same time in different rooms belong on one line,
+    // not stacked as if they ran back to back — fold them as the timeline asks.
+    sessions: agendaFoldSimultaneous(programme.sessions.map((s) => ({ ...s }))),
+
     footnote: programme.footnote ?? "Programme subject to change · full agenda and speaker bios online",
     footerLeft: programme.footerLeft ?? "",
     footerRight: programme.footerRight ?? "",
