@@ -242,7 +242,10 @@ export function LondonVenueSheets() {
             key={s.id}
             type="button"
             aria-pressed={s.id === sheet.id}
-            onClick={() => setSheetId(s.id)}
+            onClick={() => {
+              setSheetId(s.id);
+              setHighlightRoom(undefined);
+            }}
             className={`${chip} ${
               s.id === sheet.id
                 ? "border-[#03002C] bg-[#03002C] text-white"
@@ -434,6 +437,22 @@ export function LondonVenueSheets() {
             setMarkVariant("white");
           }}
         />
+      ) : null}
+
+      {showRebuilt && highlightRoom ? (
+        <p className="mt-3 flex flex-wrap items-center gap-2 text-[12.5px] text-[#03002C]/75">
+          <span className="rounded-full border border-[#003FC7]/40 bg-[#E0E8F5] px-3 py-1 font-semibold text-[#03002C]">
+            {highlightRoom} ringed on the plan
+          </span>
+          <span>The ring is a screen aid only — it is not drawn into the download.</span>
+          <button
+            type="button"
+            className="font-semibold text-[#003FC7] underline"
+            onClick={() => setHighlightRoom(undefined)}
+          >
+            Clear
+          </button>
+        </p>
       ) : null}
 
       {showRebuilt && sharedNotes.length ? (
