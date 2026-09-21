@@ -195,6 +195,8 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
             : roomColours[room]
               ? qeiiRoomTextInk(roomColours[room])
               : qeiiLabelInk();
+          // A light room colour needs the colour lockup, not the reverse one.
+          const variant = ink === "#03002C" ? ("colour" as QeiiMarkVariant) : options.markVariant;
           const nameTop = block.y - ((block.lines.length - 1) * block.size * 1.05) / 2;
           const lastLine = nameTop + (block.lines.length - 1) * block.size * 1.05;
           // The lockup is linked by its full site URL so the downloaded file
@@ -210,7 +212,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
               markX += w + block.size * 0.35;
               return [
                 "<image",
-                `href="${(() => { const u = qeiiMarkUrl(m, options.markVariant); return u.startsWith("http") ? u : `${NEXT_APP_ORIGIN}${u}`; })()}"`,
+                `href="${(() => { const u = qeiiMarkUrl(m, variant); return u.startsWith("http") ? u : `${NEXT_APP_ORIGIN}${u}`; })()}"`,
                 `x="${x}" y="${nameTop - block.size * 0.7 - block.markH}" width="${w}" height="${block.markH}"`,
                 'preserveAspectRatio="xMidYMid meet"',
                 transform ? `transform="${transform}"` : "",
