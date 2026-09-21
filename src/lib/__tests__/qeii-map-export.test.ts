@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildQeiiPlanAi } from "@/lib/next-london-qeii-ai";
+import { qeiiRoomKey } from "@/lib/qeii-map-edits";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { qeiiPlanState } from "@/lib/next-london-qeii-plan";
 import { LONDON_VENUE_SHEETS } from "@/lib/next-london-venue-sheets";
@@ -22,7 +23,7 @@ describe("QEII Illustrator map export", () => {
   it("keeps a renamed room's corrected name in the file", () => {
     const room = qeiiPlanLayout(floor).blocks[0]!.room;
     const res = buildQeiiPlanAi(floor, {
-      edits: { rooms: { [room]: { name: "Crew Check-In" } }, colours: {}, keyLabels: {} },
+      edits: { rooms: { [qeiiRoomKey(room)]: { name: "Crew Check-In" } }, colours: {}, keyLabels: {} },
     });
     expect(new TextDecoder("latin1").decode(res.bytes)).toContain("Crew Check-In");
   });
