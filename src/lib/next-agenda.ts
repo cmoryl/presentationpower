@@ -616,6 +616,9 @@ function agendaBandPaletteBase(config: {
     parallel: AGENDA_BAND.parallel,
     parallelInk: AGENDA_BAND.ink,
     pin: AGENDA_BAND.pin,
+    dayBar: AGENDA_BAND.footerBand,
+    dayBarInk: "#FFFFFF",
+
     footerBand: AGENDA_BAND.footerBand,
     footerInk: AGENDA_BAND.footerInk,
     railW: box.railW,
