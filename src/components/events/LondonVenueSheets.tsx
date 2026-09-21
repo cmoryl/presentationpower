@@ -9,6 +9,8 @@ import { useMemo, useState } from "react";
 import { Download, FileDown, Maximize2, Search, X } from "lucide-react";
 
 import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
+import { spaceUseLine, spaceUsesOnFloor } from "@/lib/next-london-space-use";
+
 import {
   qeiiPlanFilename,
   qeiiPlanState,
