@@ -1131,6 +1131,33 @@ export function agendaParallelRoom(par: Pick<AgendaParallel, "room"> | null | un
 }
 
 /**
+ * Honest placeholder for a session that runs at the same time as its
+ * neighbours but whose room has not been recorded yet. A reader must be able to
+ * tell the cards are different rooms, so a slot never prints a nameless card:
+ * it says the room is still to be confirmed rather than inventing one.
+ */
+export const AGENDA_ROOM_TBC = "ROOM TO BE CONFIRMED";
+
+/**
+ * Room line as it prints on a card inside a simultaneous slot. `inSlot` is
+ * false for an ordinary single-track row, which publishes without a room.
+ */
+export function agendaParallelRoomLine(
+  par: Pick<AgendaParallel, "room"> | null | undefined,
+  inSlot = true,
+): string {
+  return agendaParallelRoom(par) || (inSlot ? AGENDA_ROOM_TBC : "");
+}
+
+/** Room line for the main band of a row, with the same slot rule. */
+export function agendaSessionRoomLine(
+  session: Pick<AgendaSession, "room"> | null | undefined,
+  inSlot: boolean,
+): string {
+  return agendaSessionRoom(session) || (inSlot ? AGENDA_ROOM_TBC : "");
+}
+
+/**
  * Start / end of a time label, in minutes from midnight. Handles "3:00-3:50 PM",
  * "11:30 AM-1:30 PM", "4:15 PM" and 24h "14:00-15:00". Free text returns null,
  * so a label the board cannot read is never treated as an overlap.
@@ -2270,6 +2297,10 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
         title: str(p?.title, ""),
         speaker: str(p?.speaker, ""),
         detail: str(p?.detail, ""),
+        // The card's own room survives normalising. It was dropped here, so
+        // every saved or reloaded board lost the second room of a simultaneous
+        // slot and printed the cards with no room at all.
+        room: str(p?.room, ""),
       }))
       .slice(0, AGENDA_MAX_PARALLEL);
     return {
@@ -2693,8 +2724,10 @@ export function agendaBlocks(config: AgendaConfig) {
         agendaTextLines(session.title, L.titleRowSize, w) * L.titleRowSize * 1.5 +
         // A room line prints as its own small caps line under the title, so it is
         // measured as one, and never squeezes the speaker notes out of the band.
-        (agendaSessionRoom(session)
-          ? agendaTextLines(agendaSessionRoom(session), L.detailSize, w) * L.detailSize * 1.55 +
+        (agendaSessionRoomLine(session, pars.length > 0)
+          ? agendaTextLines(agendaSessionRoomLine(session, pars.length > 0), L.detailSize, w) *
+              L.detailSize *
+              1.55 +
             L.detailSize * 0.5
           : 0) +
         agendaTextLines(session.detail, L.detailSize, w) * L.detailSize * 1.55 +
@@ -2723,8 +2756,8 @@ export function agendaBlocks(config: AgendaConfig) {
               ((p.speaker ?? "").trim() ? ct.detailSize * 0.5 : 0) +
               // The card's own room line is measured too, so a slot running in two
               // rooms at once never clips the second room off the board.
-              (agendaParallelRoom(p)
-                ? agendaTextLines(agendaParallelRoom(p), ct.detailSize, ct.textW) *
+              (agendaParallelRoomLine(p)
+                ? agendaTextLines(agendaParallelRoomLine(p), ct.detailSize, ct.textW) *
                     ct.detailSize *
                     1.55 +
                   ct.detailSize * 0.5

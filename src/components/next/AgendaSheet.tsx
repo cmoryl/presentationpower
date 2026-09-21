@@ -14,7 +14,9 @@ import {
   agendaParallels,
   agendaSessionMark,
   agendaParallelRoom,
+  agendaParallelRoomLine,
   agendaSessionRoom,
+  agendaSessionRoomLine,
 
 
   agendaQrBackground,
@@ -508,7 +510,7 @@ export function AgendaSheet({
                 </div>
                 {/* Room / floor line: its own small caps line, only when one is
                     known, so a programme can publish without rooms. */}
-                {agendaSessionRoom(row.session) ? (
+                {agendaSessionRoomLine(row.session, row.parallels.length > 0) ? (
                   <div
                     style={{
                       fontSize: mm(L.detailSize * row.fit),
@@ -519,7 +521,9 @@ export function AgendaSheet({
                       marginTop: mm(L.detailSize * 0.5 * row.fit),
                     }}
                   >
-                    {T(agendaSessionRoom(row.session), (v) => edit?.onSession(i, { room: v }))}
+                    {T(agendaSessionRoomLine(row.session, row.parallels.length > 0), (v) =>
+                      edit?.onSession(i, { room: v }),
+                    )}
                   </div>
                 ) : null}
 
@@ -609,7 +613,7 @@ export function AgendaSheet({
                       {T(par.speaker ?? "", (v) => edit?.onParallel(i, n, { speaker: v }), true)}
                     </div>
                   ) : null}
-                  {agendaParallelRoom(par) ? (
+                  {agendaParallelRoomLine(par) ? (
                     <div
                       style={{
                         fontSize: mm(ct.detailSize * row.fit),
@@ -621,7 +625,7 @@ export function AgendaSheet({
                       }}
                     >
                       {T(
-                        agendaParallelRoom(par).toUpperCase(),
+                        agendaParallelRoomLine(par).toUpperCase(),
                         (v) => edit?.onParallel(i, n, { room: v }),
                         true,
                       )}
