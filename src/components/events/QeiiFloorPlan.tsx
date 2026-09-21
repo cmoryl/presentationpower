@@ -20,6 +20,8 @@ export type QeiiFloorPlanProps = {
   face?: QeiiPlanFace;
   labelScale?: number;
   showLabels?: boolean;
+  /** Print what each recorded space holds at the event beneath its name. */
+  showUse?: boolean;
   className?: string;
 };
 
@@ -28,8 +30,10 @@ export function QeiiFloorPlan({
   face = "issued",
   labelScale = 1,
   showLabels = true,
+  showUse = false,
   className,
 }: QeiiFloorPlanProps) {
+
   return (
     <svg
       viewBox={`0 0 ${floor.w} ${floor.h}`}
