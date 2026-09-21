@@ -28,6 +28,7 @@ import {
   type PillarCaptionAlign,
   type PillarQrStyleId,
 } from "@/lib/next-pillar-masters";
+import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
 import { logoInkRatio } from "@/lib/next-logo-ink";
 import { qrPrintQuality, type QrModuleStyle } from "@/lib/qr-print";
 
