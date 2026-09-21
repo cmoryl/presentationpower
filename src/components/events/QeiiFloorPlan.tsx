@@ -44,6 +44,12 @@ export type QeiiFloorPlanProps = {
   keyLabels?: Record<string, string>;
   /** Print the colour key beneath the plan. */
   showKey?: boolean;
+  /** Multiplies the venue's own wall weight; 0.55 is the house setting. */
+  wallWeight?: number;
+  /** Draw every cubicle figure the venue drew instead of one bathroom symbol. */
+  showAllSymbols?: boolean;
+  /** Ring the block of this room so a search result is findable on the plan. */
+  highlightRoom?: string;
   className?: string;
 };
 
@@ -59,6 +65,9 @@ export function QeiiFloorPlan({
   roomColours = {},
   keyLabels = {},
   showKey = true,
+  wallWeight,
+  showAllSymbols = false,
+  highlightRoom,
   className,
 }: QeiiFloorPlanProps) {
   const layout = useMemo(
@@ -67,7 +76,10 @@ export function QeiiFloorPlan({
   );
 
   const paint = useMemo(() => qeiiColourPaint(floor, roomColours), [floor, roomColours]);
-  const hidden = useMemo(() => qeiiRepeatedSymbolShapes(floor), [floor]);
+  const hidden = useMemo(
+    () => (showAllSymbols ? new Set<number>() : qeiiRepeatedSymbolShapes(floor)),
+    [floor, showAllSymbols],
+  );
   const keyRows = useMemo(
     () => (showKey ? qeiiColourKey(floor, roomColours, keyLabels) : []),
     [floor, roomColours, keyLabels, showKey],
@@ -94,7 +106,7 @@ export function QeiiFloorPlan({
             d={shape.d}
             fill={chosen ?? qeiiPlanInk(shape.fill, face) ?? "none"}
             stroke={stroke}
-            strokeWidth={stroke ? qeiiWallWidth(shape) : undefined}
+            strokeWidth={stroke ? qeiiWallWidth(shape, wallWeight) : undefined}
           />
         );
       })}
@@ -119,8 +131,23 @@ export function QeiiFloorPlan({
             // to the colour file. An explicit all-white or colour choice is kept.
             const variant = ink === "#03002C" && markVariant === "reverse" ? "colour" : markVariant;
             const pad = block.size * 0.32;
+            const lit =
+              !!highlightRoom && room.toLowerCase() === highlightRoom.trim().toLowerCase();
             return (
               <g key={block.key}>
+                {lit ? (
+                  <rect
+                    x={block.box.x0 - block.size * 0.9}
+                    y={block.box.y0 - block.size * 0.9}
+                    width={block.box.x1 - block.box.x0 + block.size * 1.8}
+                    height={block.box.y1 - block.box.y0 + block.size * 1.8}
+                    rx={block.size * 0.6}
+                    fill="none"
+                    stroke={QEII_PLAN_TOKENS.accent}
+                    strokeWidth={block.size * 0.16}
+                    transform={transform}
+                  />
+                ) : null}
                 {tag ? (
                   <rect
                     x={block.box.x0 - pad}

@@ -25,6 +25,14 @@ describe("washroom symbols and wall weight", () => {
     expect(row).toHaveLength(1);
   });
 
+  it("keeps the wall weight inside its range and honours a heavier setting", () => {
+    const shape = { d: "", stroke: "#ffffff", w: 2 };
+    expect(qeiiWallWidth(shape, 99)).toBeCloseTo(2 * 1.2);
+    expect(qeiiWallWidth(shape, 0)).toBeCloseTo(2 * 0.25);
+    expect(qeiiWallWidth(shape, Number.NaN)).toBeCloseTo(2 * QEII_WALL_WEIGHT);
+    expect(qeiiWallWidth(shape, 1)).toBeGreaterThan(qeiiWallWidth(shape));
+  });
+
   it("thins walls below the issued weight without losing them", () => {
     expect(QEII_WALL_WEIGHT).toBeLessThan(1);
     expect(qeiiWallWidth({ d: "", stroke: "#ffffff", w: 1.556 })).toBeCloseTo(1.556 * QEII_WALL_WEIGHT);
