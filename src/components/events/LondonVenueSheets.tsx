@@ -5,10 +5,15 @@
 // Downloads are the supplied artwork itself — one sheet, or the full eight-page
 // PDF, unchanged.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Download, FileDown, Maximize2, Search, X } from "lucide-react";
 
 import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
+import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
+import {
+  QEII_WALL_WEIGHT,
+  QEII_WALL_WEIGHT_RANGE,
+} from "@/lib/next-london-qeii-symbols";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { QeiiRoomColourPanel } from "@/components/events/QeiiRoomColourPanel";
 import {
@@ -41,6 +46,8 @@ const chip =
 const btn =
   "inline-flex items-center gap-2 rounded-full border border-[#03002C]/20 bg-white px-4 py-2 text-[13px] font-semibold text-[#03002C] transition-colors hover:bg-[#F2F2F2]";
 
+const VIEW_STORAGE_KEY = "tp-element:qeii-plan-view:v1";
+
 function download(url: string, filename: string) {
   const a = document.createElement("a");
   a.href = url;
@@ -67,6 +74,45 @@ export function LondonVenueSheets() {
   // Colours are held per floor, so one sheet's key never leaks onto another.
   const [roomColourMap, setRoomColourMap] = useState<Record<string, QeiiRoomColours>>({});
   const [keyLabelMap, setKeyLabelMap] = useState<Record<string, Record<string, string>>>({});
+  const [wallWeight, setWallWeight] = useState(QEII_WALL_WEIGHT);
+  const [showAllSymbols, setShowAllSymbols] = useState(false);
+  // A search result is ringed on the plan so it can actually be found.
+  const [highlightRoom, setHighlightRoom] = useState<string | undefined>(undefined);
+
+  // The crew set a plan up once and come back to it, so the view settings and
+  // room colours are kept in this browser rather than reset on every visit.
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(VIEW_STORAGE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as Partial<{
+        face: QeiiPlanFace;
+        labelScale: number;
+        showLabels: boolean;
+        showUse: boolean;
+        showMarks: boolean;
+        markVariant: QeiiMarkVariant;
+        markScale: number;
+        wallWeight: number;
+        showAllSymbols: boolean;
+        roomColourMap: Record<string, QeiiRoomColours>;
+        keyLabelMap: Record<string, Record<string, string>>;
+      }>;
+      if (saved.face) setFace(saved.face);
+      if (typeof saved.labelScale === "number") setLabelScale(saved.labelScale);
+      if (typeof saved.showLabels === "boolean") setShowLabels(saved.showLabels);
+      if (typeof saved.showUse === "boolean") setShowUse(saved.showUse);
+      if (typeof saved.showMarks === "boolean") setShowMarks(saved.showMarks);
+      if (saved.markVariant) setMarkVariant(saved.markVariant);
+      if (typeof saved.markScale === "number") setMarkScale(saved.markScale);
+      if (typeof saved.wallWeight === "number") setWallWeight(saved.wallWeight);
+      if (typeof saved.showAllSymbols === "boolean") setShowAllSymbols(saved.showAllSymbols);
+      if (saved.roomColourMap) setRoomColourMap(saved.roomColourMap);
+      if (saved.keyLabelMap) setKeyLabelMap(saved.keyLabelMap);
+    } catch {
+      // A stored setting we cannot read is ignored; the house defaults stand.
+    }
+  }, []);
 
 
   const rows = useMemo(() => venueRoomDirectory(), []);
@@ -104,6 +150,41 @@ export function LondonVenueSheets() {
 
   const showRebuilt = rebuiltView && !!plan?.rebuilt;
 
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        VIEW_STORAGE_KEY,
+        JSON.stringify({
+          face,
+          labelScale,
+          showLabels,
+          showUse,
+          showMarks,
+          markVariant,
+          markScale,
+          wallWeight,
+          showAllSymbols,
+          roomColourMap,
+          keyLabelMap,
+        }),
+      );
+    } catch {
+      // Private browsing can refuse storage; the page still works this session.
+    }
+  }, [
+    face,
+    labelScale,
+    showLabels,
+    showUse,
+    showMarks,
+    markVariant,
+    markScale,
+    wallWeight,
+    showAllSymbols,
+    roomColourMap,
+    keyLabelMap,
+  ]);
+
   function downloadPlanSvg() {
     if (!plan?.rebuilt) return;
     const svg = qeiiPlanSvg(plan.floor, {
@@ -116,6 +197,8 @@ export function LondonVenueSheets() {
       markScale,
       roomColours,
       keyLabels,
+      wallWeight,
+      showAllSymbols,
     });
     const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
     download(url, qeiiPlanFilename(plan.floor, face));
@@ -290,6 +373,29 @@ export function LondonVenueSheets() {
               Room colours &amp; key
             </button>
 
+            <button
+              type="button"
+              aria-pressed={showAllSymbols}
+              onClick={() => setShowAllSymbols(!showAllSymbols)}
+              className={`${chip} border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]`}
+            >
+              {showAllSymbols ? "Every cubicle symbol" : "One bathroom symbol"}
+            </button>
+
+            <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
+              Wall weight
+              <input
+                type="range"
+                min={QEII_WALL_WEIGHT_RANGE.min}
+                max={QEII_WALL_WEIGHT_RANGE.max}
+                step={0.05}
+                value={wallWeight}
+                onChange={(e) => setWallWeight(Number(e.target.value))}
+                aria-label="Wall weight"
+              />
+              {wallWeight.toFixed(2)}×
+            </label>
+
             <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
               Name size
               <input
@@ -350,6 +456,7 @@ export function LondonVenueSheets() {
         <figure className="overflow-hidden rounded-2xl border border-black/10 bg-[#F2F2F2]">
 
           {showRebuilt && plan ? (
+            <PlanZoomFrame label={sheet.title}>
             <QeiiFloorPlan
               floor={plan.floor}
               face={face}
@@ -361,9 +468,12 @@ export function LondonVenueSheets() {
               markScale={markScale}
               roomColours={roomColours}
               keyLabels={keyLabels}
-
+              wallWeight={wallWeight}
+              showAllSymbols={showAllSymbols}
+              highlightRoom={highlightRoom}
               className="block w-full bg-[#EEF1F7]"
             />
+            </PlanZoomFrame>
           ) : (
             <button
               type="button"
@@ -518,7 +628,10 @@ export function LondonVenueSheets() {
                 <li key={`${r.sheetId}-${r.room}`}>
                   <button
                     type="button"
-                    onClick={() => setSheetId(r.sheetId)}
+                    onClick={() => {
+                      setSheetId(r.sheetId);
+                      setHighlightRoom(r.room);
+                    }}
                     className="flex w-full items-center justify-between gap-3 px-1 py-2 text-left text-[13px] text-[#03002C] hover:bg-[#F2F2F2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
                   >
                     {spaceUseMarks(r.room, r.sheetId).map((m) => (
