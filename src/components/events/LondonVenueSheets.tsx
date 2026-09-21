@@ -9,6 +9,7 @@ import { useMemo, useState } from "react";
 import { Download, FileDown, Maximize2, Search, X } from "lucide-react";
 
 import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
+import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { spaceUseLine, spaceUseMarks, spaceUsesOnFloor } from "@/lib/next-london-space-use";
 
 import {
@@ -73,6 +74,13 @@ export function LondonVenueSheets() {
   const sheet: VenueSheet =
     LONDON_VENUE_SHEETS.find((s) => s.id === sheetId) ?? LONDON_VENUE_SHEETS[0]!;
   const plan = useMemo(() => qeiiPlanState(sheet.id), [sheet.id]);
+  const planNotes = useMemo(
+    () =>
+      plan
+        ? qeiiPlanLayout(plan.floor, { labelScale, showUse, showMarks }).notes
+        : [],
+    [plan, labelScale, showUse, showMarks],
+  );
   const uses = useMemo(() => spaceUsesOnFloor(sheet.id), [sheet.id]);
 
   const showRebuilt = rebuiltView && !!plan?.rebuilt;
@@ -225,8 +233,17 @@ export function LondonVenueSheets() {
         </p>
       ) : null}
 
+      {showRebuilt && planNotes.length ? (
+        <ul className="mt-4 space-y-1 rounded-xl border border-black/10 bg-white px-4 py-3 text-[12px] text-[#03002C]/75">
+          {planNotes.map((note) => (
+            <li key={note}>{note}</li>
+          ))}
+        </ul>
+      ) : null}
+
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <figure className="overflow-hidden rounded-2xl border border-black/10 bg-[#F2F2F2]">
+
           {showRebuilt && plan ? (
             <QeiiFloorPlan
               floor={plan.floor}
