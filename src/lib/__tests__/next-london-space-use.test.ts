@@ -75,6 +75,6 @@ describe("division marks on the plans", () => {
 
   it("reads the division from the event column, longest name first", () => {
     expect(spaceUseDivisionId(spaceUsesForRoom("Churchill", "ground")[0]!)).toBe("globallink");
-    expect(spaceUseDivisionId(spaceUsesForRoom("Cambridge", "fifth")[0]!)).toBe("lifesci");
+    expect(spaceUseDivisionId(spaceUsesForRoom("Cambridge", "fifth")[0]!)).toBe("life-sci");
   });
 });

@@ -265,7 +265,7 @@ const EVENT_DIVISION: [needle: string, divisionId: string][] = [
   ["financenext", "finance"],
   ["learnnext", "learn"],
   ["dataforcenext", "dataforce"],
-  ["lifesci", "lifesci"],
+  ["lifesci", "life-sci"],
 ];
 
 /** The NEXT division whose area holds this space, or undefined for a house space. */
