@@ -219,9 +219,11 @@ export function qeiiColourKey(
     .map(([hex, list]) => {
       const fns = new Set(list.map((r) => qeiiRoomFunction(r, floor.id) ?? ""));
       const only = fns.size === 1 ? [...fns][0] : "";
+      const divs = new Set(list.map((r) => qeiiRoomDivisionName(r, floor.id) ?? ""));
+      const oneDiv = divs.size === 1 ? [...divs][0] : "";
       return {
         hex,
-        label: labels[hex]?.trim() || only || list.slice().sort().join(", "),
+        label: labels[hex]?.trim() || oneDiv || only || list.slice().sort().join(", "),
         rooms: list.slice().sort(),
       };
     });
