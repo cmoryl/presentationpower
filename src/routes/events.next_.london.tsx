@@ -102,7 +102,9 @@ import {
 } from "@/lib/next-london-removals";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
-import { handleLondonDirectoryDownload } from "@/lib/london-directory-pdf";
+const handleLondonDirectoryDownload: (typeof import("@/lib/london-directory-pdf"))["handleLondonDirectoryDownload"] =
+  async (...args) => (await import("@/lib/london-directory-pdf")).handleLondonDirectoryDownload(...args);
+
 import { renderDitheredPng } from "@/lib/london-panel-raster";
 import {
   LONDON_SIGNAGE_FONT,
