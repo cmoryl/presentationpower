@@ -24,6 +24,7 @@ import { useStylePack } from "@/components/slide/StylePackContext";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { skinCodeFromPackId } from "@/lib/design-skin-pack";
 import { useFillCssVars, useOverflowGuard } from "@/components/slide/OpenSpaceFill";
+import { useAutoRefit } from "@/components/text/AutoRefit";
 import {
   GRAIN_PLATE,
   packCompositionFor,
@@ -633,6 +634,10 @@ export function SlideFrame({
   // grown page actually overflows the sheet.
   const fillVars = useFillCssVars();
   useOverflowGuard(rootRef);
+  // Multilingual refit: after the fill guard has had its say, any copy that
+  // still runs past its box (typically translated headlines) is sized down
+  // inside the approved type floors rather than clipped.
+  useAutoRefit(rootRef, `${variant}-${layoutId ?? ""}-${pageNumber ?? ""}`);
 
   const logoColor = darkBackdrop || slideDark || logoOnMedia ? "#ffffff" : "#03002C";
 

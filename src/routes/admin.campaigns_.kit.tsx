@@ -34,6 +34,8 @@ import { AdminPageHeader, AdminSection, AdminEmpty } from "@/components/admin/Ad
 import { GroundedCopyDrafter } from "@/components/campaigns/GroundedCopyDrafter";
 import { SocialAssetEditorButton } from "@/components/campaigns/SocialAssetEditor";
 import { useSocialAssetEdits, socialEditKey, type SocialAssetEdit } from "@/lib/social-asset-edit";
+import { CampaignBundleButton } from "@/components/campaigns/CampaignBundleButton";
+import { channelForPlatform, type BundleSource } from "@/lib/campaign-bundle";
 
 const searchSchema = z.object({
   source: z.string().optional(),
@@ -79,6 +81,27 @@ function KitBuilderView() {
   return <KitBuilderInner />;
 }
 
+// Every rendered kit card on this page, resolved at click time so the bundle
+// contains exactly what is on screen (social cards and signage/print sizes go
+// to their own folders). DOM captures are proofs, which the manifest states.
+const collectKitSources = (): BundleSource[] =>
+  Array.from(document.querySelectorAll<HTMLElement>("[data-bundle-asset]")).flatMap((card) => {
+    const node = card.querySelector<HTMLElement>("[data-kit-asset-frame]");
+    const width = Number(card.dataset.bundleW);
+    const height = Number(card.dataset.bundleH);
+    if (!node || !(width > 0) || !(height > 0)) return [];
+    return [
+      {
+        kind: "capture" as const,
+        channel: channelForPlatform(card.dataset.bundlePlatform),
+        label: card.dataset.bundleLabel || "Asset",
+        node,
+        width,
+        height,
+      },
+    ];
+  });
+
 function KitBuilderInner() {
   const search = useSearch({ from: Route.id });
   const { favorites } = useFavorites();
@@ -104,6 +127,7 @@ function KitBuilderInner() {
   );
   const [regenTick, setRegenTick] = useState(0);
   const assetEdits = useSocialAssetEdits();
+
 
   // Wizard mode — triggered by ?blank=1 from /social and /events blank-kit CTAs.
   const isWizard = !!search.blank;
@@ -447,16 +471,25 @@ function KitBuilderInner() {
         eyebrow="Step 4"
         title={`Generated kit · ${assets.length} asset${assets.length === 1 ? "" : "s"}`}
         actions={
-          <button
-            type="button"
-            onClick={() => {
-              setRemoved(new Set());
-              setRegenTick((t) => t + 1);
-            }}
-            className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
-          >
-            <RefreshCw size={12} /> Regenerate all
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setRemoved(new Set());
+                setRegenTick((t) => t + 1);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
+            >
+              <RefreshCw size={12} /> Regenerate all
+            </button>
+            {/* One click: deck + social cards + print collateral in one ZIP
+                with a manifest naming every file, format and resolution. */}
+            <CampaignBundleButton
+              campaignName={assets[0]?.copy?.title || "Campaign"}
+              brandId={brandId}
+              resolveSources={collectKitSources}
+            />
+          </div>
         }
       >
         {source == null ? (
@@ -527,7 +560,14 @@ function AssetCard({
     facts: { hashtag, registrationUrl },
   } as const;
   return (
-    <div className="group space-y-2">
+    <div
+      className="group space-y-2"
+      data-bundle-asset={asset.id}
+      data-bundle-label={format.label}
+      data-bundle-platform={format.platform}
+      data-bundle-w={format.width}
+      data-bundle-h={format.height}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="truncate text-[11px] uppercase tracking-widest text-black/60">
@@ -957,16 +997,23 @@ function WizardFlow(p: WizardProps) {
             eyebrow="Step 5 of 5"
             title={`Your kit · ${assets.length} asset${assets.length === 1 ? "" : "s"}`}
             actions={
-              <button
-                type="button"
-                onClick={() => {
-                  setRemoved(new Set());
-                  setRegenTick((n) => n + 1);
-                }}
-                className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
-              >
-                <RefreshCw size={12} /> Regenerate all
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRemoved(new Set());
+                    setRegenTick((n) => n + 1);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
+                >
+                  <RefreshCw size={12} /> Regenerate all
+                </button>
+                <CampaignBundleButton
+                  campaignName={manualCopy.title || assets[0]?.copy?.title || "Campaign"}
+                  brandId={brandId}
+                  resolveSources={collectKitSources}
+                />
+              </div>
             }
           >
             {source == null ? (
@@ -991,7 +1038,15 @@ function WizardFlow(p: WizardProps) {
             ) : (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {assets.map((asset) => (
-                  <div key={asset.id} className="space-y-2">
+                  <div
+                    key={asset.id}
+                    className="space-y-2"
+                    data-bundle-asset={asset.id}
+                    data-bundle-label={asset.format.label}
+                    data-bundle-platform={asset.format.platform}
+                    data-bundle-w={asset.format.width}
+                    data-bundle-h={asset.format.height}
+                  >
                     <div className="text-[11px] uppercase tracking-widest text-black/60">
                       {asset.format.label}
                     </div>

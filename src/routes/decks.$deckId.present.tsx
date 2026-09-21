@@ -22,12 +22,25 @@ import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { useResolvedClientLogo } from "@/hooks/use-client-logos";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  formatElapsed,
+  openPresentWindow,
+  presentRoleFromSearch,
+  usePresentSync,
+  type PresentRole,
+} from "@/lib/present-sync";
 
 const focusThumb = (el: HTMLButtonElement | null) => {
   el?.focus({ preventScroll: true });
 };
 
 export const Route = createFileRoute("/decks/$deckId/present")({
+  // ?view=console opens the presenter display (notes, next slide, timer);
+  // ?view=audience opens the clean borderless slide for the projector.
+  validateSearch: (search: Record<string, unknown>): { view?: PresentRole } => {
+    const view = presentRoleFromSearch(search.view);
+    return view === "solo" ? {} : { view };
+  },
   head: () => ({ meta: [{ title: "Presenting · TransPerfect Element" }] }),
   component: PresenterGate,
 });
@@ -51,7 +64,18 @@ function PresenterView() {
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const navigate = useNavigate();
+  const role: PresentRole = Route.useSearch().view ?? "solo";
   const [i, setI] = useState(0);
+  // Elapsed timer on the presenter display. Whichever view starts first owns
+  // the clock and shares it, so a reopened console keeps counting.
+  const [startedAt, setStartedAt] = useState<number | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (role !== "console") return;
+    if (startedAt == null) setStartedAt(Date.now());
+    const t = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(t);
+  }, [role, startedAt]);
   const prevIRef = useRef(0);
   const direction: Direction = i >= prevIRef.current ? "forward" : "back";
   useEffect(() => {
@@ -120,6 +144,17 @@ function PresenterView() {
     : undefined;
   const notesText = slide?.notes?.trim() || sectionKeyMsg || "";
 
+  // Keep the presenter console and the audience display on the same slide.
+  usePresentSync({
+    deckId,
+    role,
+    index: i,
+    total: visibleSlides.length,
+    startedAt,
+    onIndex: setI,
+    onStartedAt: (ts) => setStartedAt((cur) => cur ?? ts),
+  });
+
   // Signals MediaTile to autoplay <video> in present mode.
   useEffect(() => {
     document.body.classList.add("present-mode");
@@ -177,6 +212,7 @@ function PresenterView() {
     setFocusedThumb(i);
   }, [i]);
 
+  const audience = role === "audience";
   const pct = visibleSlides.length > 0 ? ((i + 1) / visibleSlides.length) * 100 : 0;
   const stripRef = useRef<HTMLDivElement>(null);
   const activeThumbRef = useRef<HTMLButtonElement>(null);
@@ -190,6 +226,150 @@ function PresenterView() {
     });
   }, [i]);
 
+  // ---- Presenter console --------------------------------------------------
+  // The screen only the presenter sees: the live slide, what is coming next,
+  // the speaker notes and an elapsed clock. Navigation here moves the audience
+  // window too, and vice versa.
+  if (role === "console") {
+    return (
+      <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
+        <SlideSkinProvider skin={deck.context?.skin}>
+          <SlideMediaRefreshProvider slides={visibleSlides}>
+            <div className="fixed inset-0 flex flex-col bg-[#03002C] text-white">
+              <header className="flex items-center justify-between border-b border-white/15 px-5 py-3">
+                <div className="min-w-0">
+                  <div className="text-[10px] font-medium uppercase tracking-widest text-white/50">
+                    Presenter console
+                  </div>
+                  <div className="truncate text-sm text-white/90">{deck.title}</div>
+                </div>
+                <div className="flex items-center gap-5">
+                  <div className="text-right">
+                    <div className="text-[10px] font-medium uppercase tracking-widest text-white/50">
+                      Elapsed
+                    </div>
+                    <div className="text-2xl font-semibold tabular-nums">
+                      {formatElapsed(startedAt != null ? now - startedAt : 0)}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => openPresentWindow(deckId, "audience")}
+                    className="rounded-full border border-white/25 px-3 py-1.5 text-xs hover:bg-white/10"
+                  >
+                    Open audience screen
+                  </button>
+                  <Link
+                    to="/decks/$deckId"
+                    params={{ deckId }}
+                    className="rounded-full border border-white/25 px-3 py-1.5 text-xs hover:bg-white/10"
+                  >
+                    Exit
+                  </Link>
+                </div>
+              </header>
+
+              <div className="grid min-h-0 flex-1 grid-cols-1 gap-5 p-5 lg:grid-cols-[1.6fr_1fr]">
+                <div className="flex min-h-0 flex-col gap-3">
+                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-white/15 bg-black">
+                    {slide && variant && (
+                      <DeckPackScope pack={packFor(slide)}>
+                        <VariantRenderer
+                          slide={slide}
+                          variant={variant}
+                          brand={brand}
+                          pageNumber={i + 1}
+                          clientName={brief?.prospect}
+                          clientLogoUrl={clientLogo.url}
+                          mode={slide.mode ?? "light"}
+                        />
+                      </DeckPackScope>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-white/80">
+                    <button
+                      onClick={() => setI((n) => Math.max(0, n - 1))}
+                      className="rounded-full border border-white/25 px-4 py-2 hover:bg-white/10"
+                      aria-label="Previous slide"
+                    >
+                      ←
+                    </button>
+                    <span className="tabular-nums">
+                      {i + 1} / {visibleSlides.length}
+                    </span>
+                    <button
+                      onClick={() => setI((n) => Math.min(visibleSlides.length - 1, n + 1))}
+                      className="rounded-full border border-white/25 px-4 py-2 hover:bg-white/10"
+                      aria-label="Next slide"
+                    >
+                      →
+                    </button>
+                    <span className="ml-auto truncate text-xs text-white/50">
+                      {variant?.name}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex min-h-0 flex-col gap-4">
+                  <div>
+                    <div className="text-[10px] font-medium uppercase tracking-widest text-white/50">
+                      Up next
+                    </div>
+                    <div className="mt-2 aspect-[16/9] overflow-hidden rounded-lg border border-white/15 bg-black">
+                      {nextSlide && nextVariant ? (
+                        <div className="relative h-full w-full">
+                          <div
+                            className="absolute inset-0"
+                            style={{
+                              transform: "scale(0.2)",
+                              transformOrigin: "top left",
+                              width: 1920,
+                              height: 1080,
+                            }}
+                          >
+                            <SlideThumbnailContext.Provider value={true}>
+                              <DeckPackScope pack={packFor(nextSlide)}>
+                                <VariantRenderer
+                                  slide={nextSlide}
+                                  variant={nextVariant}
+                                  brand={brand}
+                                  pageNumber={i + 2}
+                                  clientName={brief?.prospect}
+                                  clientLogoUrl={clientLogo.url}
+                                  mode={nextSlide.mode ?? "light"}
+                                />
+                              </DeckPackScope>
+                            </SlideThumbnailContext.Provider>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-xs text-white/40">
+                          End of deck
+                        </div>
+                      )}
+                    </div>
+                    {nextSlide ? (
+                      <div className="mt-2 text-xs text-white/60">
+                        {i + 2}. {nextVariant?.name}
+                      </div>
+                    ) : null}
+                  </div>
+                  <div className="flex min-h-0 flex-1 flex-col">
+                    <div className="text-[10px] font-medium uppercase tracking-widest text-white/50">
+                      Speaker notes · Slide {i + 1}
+                    </div>
+                    <div className="mt-2 flex-1 overflow-y-auto whitespace-pre-wrap rounded-lg border border-white/15 bg-black/40 p-4 text-[17px] leading-relaxed text-white/95">
+                      {notesText || <span className="text-white/40">No notes</span>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </SlideMediaRefreshProvider>
+        </SlideSkinProvider>
+      </SlideTemplateIndustryProvider>
+    );
+  }
+
   return (
     <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
       <SlideSkinProvider skin={deck.context?.skin}>
@@ -199,7 +379,7 @@ function PresenterView() {
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           >
-            <div className="w-full max-w-[95vw]">
+            <div className={audience ? "w-full" : "w-full max-w-[95vw]"}>
               <div className="relative mx-auto aspect-[16/9] w-full">
                 <SectionCue
                   sectionId={slide?.sectionId}
@@ -226,6 +406,8 @@ function PresenterView() {
                 )}
               </div>
             </div>
+            {!audience ? (
+              <>
             {/* Progress bar */}
             <div className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-white/10">
               <div
@@ -348,6 +530,20 @@ function PresenterView() {
                 <span className="sm:hidden">N</span>
                 <span className="hidden sm:inline">{notesOpen ? "▾ Notes" : "▴ Notes"}</span>
               </button>
+              <button
+                onClick={() => openPresentWindow(deckId, "console")}
+                className="hidden shrink-0 rounded-full px-2 hover:text-white sm:inline"
+                title="Open the presenter console on your own screen"
+              >
+                ▦ Presenter console
+              </button>
+              <button
+                onClick={() => openPresentWindow(deckId, "audience")}
+                className="hidden shrink-0 rounded-full px-2 hover:text-white sm:inline"
+                title="Open a clean slide window for the projector"
+              >
+                ▢ Audience screen
+              </button>
               <Link
                 to="/decks/$deckId"
                 params={{ deckId }}
@@ -423,6 +619,8 @@ function PresenterView() {
                 </div>
               </div>
             </div>
+              </>
+            ) : null}
           </div>
         </SlideMediaRefreshProvider>
       </SlideSkinProvider>
