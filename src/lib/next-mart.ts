@@ -233,6 +233,8 @@ import artHydrated from "@/assets/next-mart/04_WATER_hydration-fixation_london20
 import artLayerUp from "@/assets/next-mart/05_LAYERS_layer-up-show-up_london2026.svg.asset.json";
 import artLocalLegends from "@/assets/next-mart/06_LOCAL_local-legends_london2026.svg.asset.json";
 import artShapeSet from "@/assets/next-mart/00_SHAPES_next-mart-shape-set_london2026.svg.asset.json";
+import artSource from "@/assets/next-mart/NextMartsigns_2026_london.ai.asset.json";
+
 
 
 /* ---------------------------------------------------------------------------
