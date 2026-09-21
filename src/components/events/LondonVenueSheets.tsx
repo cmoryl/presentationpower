@@ -315,6 +315,10 @@ export function LondonVenueSheets() {
     keyLabelMap,
   ]);
 
+  /** Which live export is being made, and what to tell the crew about it. */
+  const [exporting, setExporting] = useState<string | null>(null);
+  const [exportNote, setExportNote] = useState<string | undefined>(undefined);
+
   /**
    * One PDF of every floor, as each one currently reads — colours, room names,
    * event use and division lockups all carried. A floor that cannot be rebuilt
@@ -389,6 +393,89 @@ export function LondonVenueSheets() {
     URL.revokeObjectURL(url);
   }
 
+  /** Every export builds from the plan exactly as it reads on screen right now. */
+  function planOptions() {
+    return {
+      face,
+      labelScale,
+      showLabels,
+      showUse,
+      showMarks,
+      markVariant,
+      markScale,
+      roomColours,
+      keyLabels,
+      wallWeight,
+      showAllSymbols,
+      edits,
+    };
+  }
+
+  function downloadBlob(blob: Blob, filename: string) {
+    const url = URL.createObjectURL(blob);
+    download(url, filename);
+    URL.revokeObjectURL(url);
+  }
+
+  /**
+   * Live exports of this floor: PowerPoint and Word carry the plan as a picture
+   * with editable room names over it; Illustrator carries the drawing itself as
+   * live vector art. Nothing is invented — every file is this floor as it reads.
+   */
+  async function exportPlan(kind: "pptx" | "docx" | "ai" | "zip") {
+    if (!plan?.rebuilt) return;
+    setExporting(kind);
+    setExportNote(undefined);
+    try {
+      const notes: string[] = [];
+      const files: { name: string; blob: Blob }[] = [];
+      const options = planOptions();
+      if (kind === "pptx" || kind === "zip") {
+        const { buildQeiiPlanPptx } = await import("@/lib/next-london-qeii-office");
+        const res = await buildQeiiPlanPptx(plan.floor, options);
+        files.push({ name: res.filename, blob: res.blob });
+        notes.push(...res.notes);
+      }
+      if (kind === "docx" || kind === "zip") {
+        const { buildQeiiPlanDocx } = await import("@/lib/next-london-qeii-office");
+        const res = await buildQeiiPlanDocx(plan.floor, options);
+        files.push({ name: res.filename, blob: res.blob });
+        notes.push(...res.notes);
+      }
+      if (kind === "ai" || kind === "zip") {
+        const { buildQeiiPlanAi } = await import("@/lib/next-london-qeii-ai");
+        const res = buildQeiiPlanAi(plan.floor, options);
+        files.push({
+          name: res.filename,
+          blob: new Blob([res.bytes as unknown as BlobPart], { type: "application/pdf" }),
+        });
+        notes.push(...res.notes);
+      }
+      if (kind === "zip") {
+        const JSZip = (await import("jszip")).default;
+        const zip = new JSZip();
+        const svg = qeiiPlanSvg(plan.floor, options);
+        zip.file(qeiiPlanFilename(plan.floor, face), svg);
+        for (const file of files) zip.file(file.name, file.blob);
+        const blob = await zip.generateAsync({ type: "blob" });
+        const name = `TP-NEXT-2026-London-QEII-${plan.floor.title.replace(/\s+/g, "-")}-map-pack.zip`;
+        downloadBlob(blob, name);
+        setExportNote([`${name} — PowerPoint, Word, Illustrator and the editable SVG.`, ...new Set(notes)].join(" "));
+        return;
+      }
+      for (const file of files) downloadBlob(file.blob, file.name);
+      setExportNote([`${files[0]?.name} is downloading.`, ...new Set(notes)].join(" "));
+    } catch (err) {
+      setExportNote(
+        err instanceof Error
+          ? `That file could not be made: ${err.message}`
+          : "That file could not be made.",
+      );
+    } finally {
+      setExporting(null);
+    }
+  }
+
 
   return (
     <section className="mt-10">
@@ -432,6 +519,12 @@ export function LondonVenueSheets() {
       {printNote ? (
         <p className="mt-3 rounded-xl border border-black/10 bg-white px-3.5 py-2.5 text-[12.5px] leading-relaxed text-[#03002C]/80">
           {printNote}
+        </p>
+      ) : null}
+
+      {exportNote ? (
+        <p className="mt-3 rounded-xl border border-black/10 bg-white px-3.5 py-2.5 text-[12.5px] leading-relaxed text-[#03002C]/80">
+          {exportNote}
         </p>
       ) : null}
 
@@ -655,6 +748,42 @@ export function LondonVenueSheets() {
             </label>
             <button type="button" className={btn} onClick={downloadPlanSvg}>
               <Download className="h-4 w-4" /> This plan (editable SVG)
+            </button>
+            <button
+              type="button"
+              className={btn}
+              disabled={exporting !== null}
+              onClick={() => exportPlan("pptx")}
+            >
+              <Download className="h-4 w-4" />
+              {exporting === "pptx" ? "Making the deck…" : "This plan (PowerPoint)"}
+            </button>
+            <button
+              type="button"
+              className={btn}
+              disabled={exporting !== null}
+              onClick={() => exportPlan("docx")}
+            >
+              <Download className="h-4 w-4" />
+              {exporting === "docx" ? "Making the document…" : "This plan (Word)"}
+            </button>
+            <button
+              type="button"
+              className={btn}
+              disabled={exporting !== null}
+              onClick={() => exportPlan("ai")}
+            >
+              <Download className="h-4 w-4" />
+              {exporting === "ai" ? "Making the artwork…" : "This plan (Illustrator)"}
+            </button>
+            <button
+              type="button"
+              className={btn}
+              disabled={exporting !== null}
+              onClick={() => exportPlan("zip")}
+            >
+              <Download className="h-4 w-4" />
+              {exporting === "zip" ? "Making the pack…" : "Map pack (ZIP)"}
             </button>
           </>
         ) : null}
