@@ -49,6 +49,8 @@ export function LondonVenueSheets() {
   const [face, setFace] = useState<QeiiPlanFace>("issued");
   const [labelScale, setLabelScale] = useState(1);
   const [showLabels, setShowLabels] = useState(true);
+  const [showUse, setShowUse] = useState(true);
+
 
   const rows = useMemo(() => venueRoomDirectory(), []);
   const found = useMemo(() => searchVenueRooms(query, rows), [query, rows]);
