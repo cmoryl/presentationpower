@@ -319,6 +319,10 @@ export function LondonVenueSheets() {
           onColours={(next) => setRoomColourMap({ ...roomColourMap, [sheet.id]: next })}
           keyLabels={keyLabels}
           onKeyLabels={(next) => setKeyLabelMap({ ...keyLabelMap, [sheet.id]: next })}
+          onColourByDivision={() => {
+            setRoomColourMap({ ...roomColourMap, [sheet.id]: qeiiColourByDivision(plan.floor) });
+            setMarkVariant("white");
+          }}
         />
       ) : null}
 
