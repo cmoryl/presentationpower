@@ -1937,13 +1937,17 @@ export function agendaTitleInk(config: AgendaConfig): string {
  * board hold the same proportions. Both the live sheet and the vector PDF read
  * these numbers, so the export always matches the preview.
  */
-/** The approved lockup file for this board's face. */
+/** The approved lockup file for this board's face. On a dark board that is the
+ *  stacked REVERSE mark — white wordmark with the division accent kept live —
+ *  not the all-white one; the all-white file is only the fallback where a
+ *  division has no reverse artwork. */
 export function agendaLockupUrl(config: AgendaConfig): string {
   const div = agendaDivision(config.divisionId);
   return (config.face ?? "dark") === "light"
     ? div.colorUrl || div.whiteUrl
-    : div.whiteUrl || div.colorUrl;
+    : div.reverseUrl || div.whiteUrl || div.colorUrl;
 }
+
 
 /**
  * Ink the lockup prints in. This follows the lockup FILE, not the copy-contrast
