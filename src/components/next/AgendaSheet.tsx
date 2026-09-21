@@ -423,7 +423,11 @@ export function AgendaSheet({
               style={{
                 flex: "1 1 auto",
                 height: mm(Math.max(0.4, L.titleRowSize * 0.08)),
-                background: "rgba(255,255,255,0.55)",
+                // The rule across the day bar follows the bar's own ink, so it
+                // still reads on a pale accent such as Learn yellow.
+                background:
+                  BAND.dayBarInk === "#FFFFFF" ? "rgba(255,255,255,0.55)" : "rgba(3,0,44,0.45)",
+
               }}
             />
             {row.session.detail.trim() ? (
