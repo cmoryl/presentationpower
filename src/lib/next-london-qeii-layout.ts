@@ -17,6 +17,13 @@
 
 import { spaceUseLine, spaceUseMarks, type SpaceUseMark } from "@/lib/next-london-space-use";
 import type { QeiiFloorVector, QeiiLabel } from "@/lib/next-london-qeii-vectors";
+import {
+  qeiiHolderBox,
+  qeiiObjectBoxes,
+  qeiiRectInside,
+  qeiiRectsOverlap,
+  type QeiiRect,
+} from "@/lib/next-london-qeii-geometry";
 
 /**
  * Issued cap-height → rendered em size.
