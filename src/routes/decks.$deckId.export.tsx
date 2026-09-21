@@ -23,6 +23,7 @@ import { gateQaIssues, isApprovedDemo } from "@/lib/demo-approved";
 import type { GeometryRepairReport } from "@/lib/canvas-repair-report";
 import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
 import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
+import { PrintProofMenu } from "@/components/export/PrintProofMenu";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 import { auditExportCoverage, type ExportCoverageReport } from "@/lib/export-coverage";
@@ -572,6 +573,38 @@ function ExportView() {
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    to="/convert"
+                    search={{ deck: deckId }}
+                    className="inline-flex items-center rounded-full border border-black/15 bg-white px-3 py-1.5 text-[11px] font-medium text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7]"
+                  >
+                    Convert a slide
+                  </Link>
+                  <PrintProofMenu
+                    label="Print proof"
+                    context={{ Document: deck.title, Division: deck.brandModeId ?? null }}
+                    resolveTarget={() => {
+                      // The slide nearest the middle of the viewport is the one
+                      // the operator is looking at.
+                      const stages = Array.from(
+                        document.querySelectorAll<HTMLElement>("[data-slide-stage]"),
+                      );
+                      if (stages.length === 0) return null;
+                      const mid = window.innerHeight / 2;
+                      const node = stages.reduce((best, el) => {
+                        const d = Math.abs(el.getBoundingClientRect().top - mid);
+                        const bd = Math.abs(best.getBoundingClientRect().top - mid);
+                        return d < bd ? el : best;
+                      }, stages[0]);
+                      const index = stages.indexOf(node) + 1;
+                      return {
+                        node,
+                        width: 1920,
+                        height: 1080,
+                        label: `${deck.title} · slide ${index}`,
+                      };
+                    }}
+                  />
                   <BrandHealthBadge
                     getRoots={() =>
                       Array.from(document.querySelectorAll<HTMLElement>("[data-slide-stage]"))

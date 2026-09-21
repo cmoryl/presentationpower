@@ -165,6 +165,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
         { to: "/social", label: "Social assets" },
         { to: "/social/new", label: "New social asset" },
         { to: "/social/presets", label: "Presets" },
+        { to: "/convert", label: "Cross-format adapter" },
       ],
     },
   ];
