@@ -343,6 +343,27 @@ export type PlacedArtImport = {
 
 const BANNED_TAGS = ["script", "foreignobject", "use", "image", "text", "tspan", "textpath"];
 
+/**
+ * Definition blocks paint nothing on their own. Walking into them printed
+ * clipping and mask shapes as solid ink — always black, because a clip path
+ * carries no fill.
+ */
+const NON_PAINTING_TAGS = new Set([
+  "defs",
+  "clippath",
+  "mask",
+  "filter",
+  "symbol",
+  "marker",
+  "pattern",
+  "lineargradient",
+  "radialgradient",
+  "metadata",
+  "title",
+  "desc",
+]);
+
+
 function mul(a: PlacedArtMatrix, b: PlacedArtMatrix): PlacedArtMatrix {
   return [
     a[0] * b[0] + a[2] * b[1],
