@@ -57,9 +57,15 @@ import {
   type GuideAccentId,
   type GuideGroundId,
 } from "@/lib/next-guide-theme";
-import { buildGuideDocx } from "@/lib/next-guide-docx";
-import { buildGuidePdf } from "@/lib/next-guide-pdf";
-import { buildGuidePptx } from "@/lib/next-guide-pptx";
+// Browser-only export bundles (pdf-lib/fontkit, pptxgenjs, jszip) must never be
+// evaluated during server rendering — they are loaded when a download is asked for.
+const buildGuideDocx: (typeof import("@/lib/next-guide-docx"))["buildGuideDocx"] = async (...args) =>
+  (await import("@/lib/next-guide-docx")).buildGuideDocx(...args);
+const buildGuidePdf: (typeof import("@/lib/next-guide-pdf"))["buildGuidePdf"] = async (...args) =>
+  (await import("@/lib/next-guide-pdf")).buildGuidePdf(...args);
+const buildGuidePptx: (typeof import("@/lib/next-guide-pptx"))["buildGuidePptx"] = async (...args) =>
+  (await import("@/lib/next-guide-pptx")).buildGuidePptx(...args);
+
 import {
   deleteEventGuide,
   listEventGuideVersions,
