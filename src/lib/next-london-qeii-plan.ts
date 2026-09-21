@@ -119,20 +119,28 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
     ? floor.labels
         .map((l) => {
           const transform = qeiiLabelTransform(l);
-          return [
-            "<text",
-            `x="${l.x}" y="${l.y}"`,
-            'text-anchor="middle" dominant-baseline="middle"',
-            `font-family="Geist, Geist Variable, sans-serif" font-size="${qeiiLabelSize(l, scale)}"`,
-            `fill="${qeiiLabelInk()}"`,
-            transform ? `transform="${transform}"` : "",
-            `>${l.text.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text>`,
-          ]
-            .filter(Boolean)
-            .join(" ");
+          const size = qeiiLabelSize(l, scale);
+          const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+          const text = (y: number, fontSize: number, body: string) =>
+            [
+              "<text",
+              `x="${l.x}" y="${y}"`,
+              'text-anchor="middle" dominant-baseline="middle"',
+              `font-family="Geist, Geist Variable, sans-serif" font-size="${fontSize}"`,
+              `fill="${qeiiLabelInk()}"`,
+              transform ? `transform="${transform}"` : "",
+              `>${esc(body)}</text>`,
+            ]
+              .filter(Boolean)
+              .join(" ");
+          const use = options.showUse ? qeiiLabelUse(l, floor.id) : undefined;
+          return use
+            ? text(l.y, size, l.text) + text(l.y + size * 1.15, size * 0.72, use)
+            : text(l.y, size, l.text);
         })
         .join("")
     : "";
+
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${floor.w}" height="${floor.h}" viewBox="0 0 ${floor.w} ${floor.h}">`,
     `<title>Queen Elizabeth II Centre — ${floor.title}</title>`,
