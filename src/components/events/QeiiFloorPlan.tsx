@@ -7,6 +7,7 @@
 import {
   QEII_PLAN_TOKENS,
   qeiiLabelInk,
+  qeiiLabelMarks,
   qeiiLabelSize,
   qeiiLabelTransform,
   qeiiLabelUse,
@@ -22,6 +23,8 @@ export type QeiiFloorPlanProps = {
   showLabels?: boolean;
   /** Print what each recorded space holds at the event beneath its name. */
   showUse?: boolean;
+  /** Print the division lockup above a room held by a division area. */
+  showMarks?: boolean;
   className?: string;
 };
 
@@ -31,6 +34,7 @@ export function QeiiFloorPlan({
   labelScale = 1,
   showLabels = true,
   showUse = false,
+  showMarks = false,
   className,
 }: QeiiFloorPlanProps) {
 
