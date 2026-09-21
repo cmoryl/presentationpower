@@ -51,8 +51,8 @@ export function BrandHealthBadge({
     const guide = divisionId
       ? (getBrandGuideForDivision(divisionId) ?? MASTER_TRANSPERFECT_GUIDE)
       : MASTER_TRANSPERFECT_GUIDE;
-    setReport(scanBrandHealth(roots, guide, labels));
-  }, [divisionId, getRoots, labels]);
+    setReport(scanBrandHealth(roots, guide, labels, medium));
+  }, [divisionId, getRoots, labels, medium]);
 
   // First pass once the surface has painted, then on every drawer open.
   useEffect(() => {
