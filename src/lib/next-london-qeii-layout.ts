@@ -215,9 +215,17 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     if (allMarks.length) variants.push({ use: undefined, marks: allMarks });
     variants.push({ use: undefined, marks: [] });
 
-    type Fit = { variant: Variant; box: QeiiBox; size: number; useSize: number; markH: number };
+    type Fit = {
+      variant: Variant;
+      box: QeiiBox;
+      size: number;
+      useSize: number;
+      markH: number;
+      dx: number;
+      dy: number;
+    };
 
-    const measure = (variant: Variant, size: number): Fit => {
+    const measure = (variant: Variant, size: number, dx = 0, dy = 0): Fit => {
       const useSize =
         Math.round(Math.min(size * 0.92, Math.max(size * QEII_USE_RATIO, minSize)) * 100) / 100;
       const markH = Math.round(size * QEII_MARK_RATIO * (options.markScale ?? 1) * 100) / 100;
@@ -233,7 +241,9 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       const below = nameHeight / 2 + (variant.use ? useSize * 1.5 : 0);
       return {
         variant,
-        box: boxFor(group.x, group.y, group.angle, width, above, below),
+        box: boxFor(group.x + dx, group.y + dy, group.angle, width, above, below),
+        dx,
+        dy,
         size: Math.round(size * 100) / 100,
         useSize,
         markH,
@@ -255,16 +265,22 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     let insideHolder = true;
     // Content first, size second: a full block is set smaller before any line
     // comes off it, and only then does the event line or the lockup give way.
+    // A small nudge inside the room is tried before the type is made smaller, so a
+    // name clears a lift symbol or a marker dot at its proper size.
+    const nudges = [0, 0.7, -0.7, 1.4, -1.4, 2.2, -2.2];
     for (const useHolder of [true, false]) {
       for (const variant of variants) {
         for (const step of steps) {
           const size = Math.max(minSize, baseSize * step);
-          const fit = measure(variant, size);
-          if (clearOf(fit, useHolder)) {
-            chosen = fit;
-            insideHolder = useHolder;
-            break;
+          for (const nudge of nudges) {
+            const fit = measure(variant, size, 0, nudge * size);
+            if (clearOf(fit, useHolder)) {
+              chosen = fit;
+              insideHolder = useHolder;
+              break;
+            }
           }
+          if (chosen) break;
           if (baseSize * step <= minSize) break;
         }
         if (chosen) break;
@@ -296,8 +312,8 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     placed.push(chosen.box);
     blocks.push({
       key: `${room}-${group.order}`,
-      x: group.x,
-      y: group.y,
+      x: group.x + chosen.dx,
+      y: group.y + chosen.dy,
       angle: group.angle,
       size: chosen.size,
       lines,
