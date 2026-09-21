@@ -294,8 +294,12 @@ export function scoreBrandHealth(
   const floor = failures === 0 ? 40 : 0;
   const score = Math.max(floor, Math.min(100, raw));
   const reported = new Set(findings.map((f) => f.check));
+  // A logo check is only reported clean when a lockup was actually measured —
+  // a surface with no lockup on it never counts as a logo pass.
+  const logoChecks = new Set(Object.keys(LOGO_MATRIX_CHECK_LABEL));
   const passed = (Object.keys(CHECK_LABEL) as BrandHealthCheck[])
     .filter((c) => !reported.has(c))
+    .filter((c) => logos.length > 0 || !logoChecks.has(c))
     .map((c) => ({ check: c, label: CHECK_LABEL[c] }));
 
   return {
