@@ -8,6 +8,13 @@
 import { useMemo, useState } from "react";
 import { Download, FileDown, Maximize2, Search, X } from "lucide-react";
 
+import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
+import {
+  qeiiPlanFilename,
+  qeiiPlanState,
+  qeiiPlanSvg,
+  type QeiiPlanFace,
+} from "@/lib/next-london-qeii-plan";
 import {
   LONDON_VENUE_SHEETS,
   VENUE_SHEET_LEGEND,
@@ -17,6 +24,7 @@ import {
   venueSheetFilename,
   type VenueSheet,
 } from "@/lib/next-london-venue-sheets";
+
 
 const chip =
   "rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]";
@@ -37,11 +45,26 @@ export function LondonVenueSheets() {
   const [sheetId, setSheetId] = useState(LONDON_VENUE_SHEETS[0]!.id);
   const [query, setQuery] = useState("");
   const [zoom, setZoom] = useState(false);
+  const [rebuiltView, setRebuiltView] = useState(true);
+  const [face, setFace] = useState<QeiiPlanFace>("issued");
+  const [labelScale, setLabelScale] = useState(1);
+  const [showLabels, setShowLabels] = useState(true);
 
   const rows = useMemo(() => venueRoomDirectory(), []);
   const found = useMemo(() => searchVenueRooms(query, rows), [query, rows]);
   const sheet: VenueSheet =
     LONDON_VENUE_SHEETS.find((s) => s.id === sheetId) ?? LONDON_VENUE_SHEETS[0]!;
+  const plan = useMemo(() => qeiiPlanState(sheet.id), [sheet.id]);
+  const showRebuilt = rebuiltView && !!plan?.rebuilt;
+
+  function downloadPlanSvg() {
+    if (!plan?.rebuilt) return;
+    const svg = qeiiPlanSvg(plan.floor, { face, labelScale, showLabels });
+    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+    download(url, qeiiPlanFilename(plan.floor, face));
+    URL.revokeObjectURL(url);
+  }
+
 
   return (
     <section className="mt-10">
@@ -91,35 +114,124 @@ export function LondonVenueSheets() {
         ))}
       </div>
 
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          aria-pressed={showRebuilt}
+          disabled={!plan?.rebuilt}
+          onClick={() => setRebuiltView(true)}
+          className={`${chip} ${
+            showRebuilt
+              ? "border-[#003FC7] bg-[#003FC7] text-white"
+              : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2] disabled:opacity-40"
+          }`}
+        >
+          Rebuilt in Element
+        </button>
+        <button
+          type="button"
+          aria-pressed={!showRebuilt}
+          onClick={() => setRebuiltView(false)}
+          className={`${chip} ${
+            !showRebuilt
+              ? "border-[#03002C] bg-[#03002C] text-white"
+              : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+          }`}
+        >
+          Issued artwork
+        </button>
+        {showRebuilt ? (
+          <>
+            <button
+              type="button"
+              aria-pressed={face === "element"}
+              onClick={() => setFace(face === "element" ? "issued" : "element")}
+              className={`${chip} ${
+                face === "element"
+                  ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
+                  : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+              }`}
+            >
+              {face === "element" ? "Enterprise inks on" : "Enterprise inks off"}
+            </button>
+            <button
+              type="button"
+              aria-pressed={showLabels}
+              onClick={() => setShowLabels(!showLabels)}
+              className={`${chip} border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]`}
+            >
+              {showLabels ? "Room names on" : "Room names off"}
+            </button>
+            <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
+              Name size
+              <input
+                type="range"
+                min={0.8}
+                max={1.6}
+                step={0.05}
+                value={labelScale}
+                onChange={(e) => setLabelScale(Number(e.target.value))}
+                aria-label="Room name size"
+              />
+              {labelScale.toFixed(2)}×
+            </label>
+            <button type="button" className={btn} onClick={downloadPlanSvg}>
+              <Download className="h-4 w-4" /> This plan (editable SVG)
+            </button>
+          </>
+        ) : null}
+      </div>
+
+      {plan && !plan.rebuilt ? (
+        <p className="mt-3 rounded-xl border border-[#FFEB66] bg-[#FFEB66]/25 px-3.5 py-2.5 text-[12.5px] leading-relaxed text-[#03002C]">
+          {plan.reason}
+        </p>
+      ) : null}
+
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <figure className="overflow-hidden rounded-2xl border border-black/10 bg-[#F2F2F2]">
-          <button
-            type="button"
-            onClick={() => setZoom(true)}
-            aria-label={`Enlarge the ${sheet.title} sheet`}
-            className="group relative block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
-          >
-            <img
-              src={sheet.url}
-              alt={`Queen Elizabeth II Centre ${sheet.title} plan, page ${sheet.page} of the issued set`}
-              width={sheet.w}
-              height={sheet.h}
-              loading="lazy"
-              className="block w-full"
+          {showRebuilt && plan ? (
+            <QeiiFloorPlan
+              floor={plan.floor}
+              face={face}
+              labelScale={labelScale}
+              showLabels={showLabels}
+              className="block w-full bg-[#EEF1F7]"
             />
-            <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C]/85 px-3 py-1.5 text-[11px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100">
-              <Maximize2 className="h-3.5 w-3.5" /> Enlarge
-            </span>
-          </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setZoom(true)}
+              aria-label={`Enlarge the ${sheet.title} sheet`}
+              className="group relative block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+            >
+              <img
+                src={sheet.url}
+                alt={`Queen Elizabeth II Centre ${sheet.title} plan, page ${sheet.page} of the issued set`}
+                width={sheet.w}
+                height={sheet.h}
+                loading="lazy"
+                className="block w-full"
+              />
+              <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C]/85 px-3 py-1.5 text-[11px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100">
+                <Maximize2 className="h-3.5 w-3.5" /> Enlarge
+              </span>
+            </button>
+          )}
           <figcaption className="flex flex-wrap items-center justify-between gap-2 border-t border-black/10 bg-white px-4 py-3 text-[12px] text-[#03002C]/70">
             <span>
-              Page {sheet.page} of {VENUE_SHEET_PDF.pages} · issued venue artwork
+              {showRebuilt
+                ? `Page ${sheet.page} rebuilt as native artwork · ${plan?.floor.shapes.length} shapes, ${plan?.floor.labels.length} names`
+                : `Page ${sheet.page} of ${VENUE_SHEET_PDF.pages} · issued venue artwork`}
             </span>
             <span>
-              {sheet.w} × {sheet.h} px
+              {showRebuilt && plan
+                ? `${Math.round(plan.floor.w)} × ${Math.round(plan.floor.h)} units`
+                : `${sheet.w} × ${sheet.h} px`}
             </span>
           </figcaption>
         </figure>
+
 
         <div>
           <h3 className="text-sm font-semibold text-[#03002C]">{sheet.title}</h3>
