@@ -643,6 +643,9 @@ function LondonMapsPage() {
                   : "Marks are held in this browser until they are signed off against the venue."}{" "}
               <Link to="/events/next/venues" className="font-semibold underline">
                 Venue plans
+              </Link>{" "}
+              <Link to="/events/next/london/schedule" className="font-semibold underline">
+                Room schedule
               </Link>
             </p>
           </div>
