@@ -37,7 +37,9 @@ import {
   agendaRowStyle,
   agendaSessionMark,
   agendaParallelRoom,
+  agendaParallelRoomLine,
   agendaSessionRoom,
+  agendaSessionRoomLine,
 
   agendaSlug,
   agendaTitleInk,
@@ -616,7 +618,10 @@ export async function buildAgendaPptx(
           `Session band ${i + 1}`,
           inX(BAND.railW * L.k),
         );
-        bandText(band, { ...r.session, room: agendaSessionRoom(r.session) });
+        bandText(band, {
+          ...r.session,
+          room: agendaSessionRoomLine(r.session, r.parallels.length > 0),
+        });
         const rowMark = agendaSessionMark(r.session);
         if (rowMark) {
           rowMarkShape(
@@ -654,7 +659,7 @@ export async function buildAgendaPptx(
               detail: copy.detail,
               // Each simultaneous card names its own room, so a slot running in
               // two places at once is never ambiguous in print.
-              room: agendaParallelRoom(copy),
+              room: agendaParallelRoomLine(copy),
 
             },
             BAND.parallelInk,

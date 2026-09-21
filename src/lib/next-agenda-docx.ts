@@ -46,7 +46,9 @@ import {
   agendaRowStyle,
   agendaSessionMark,
   agendaParallelRoom,
+  agendaParallelRoomLine,
   agendaSessionRoom,
+  agendaSessionRoomLine,
 
   agendaStops,
   agendaTitleInk,
@@ -770,9 +772,9 @@ export async function buildAgendaDocx(
               : "") +
               // The room / floor line prints in small caps above the speakers,
               // exactly as it does on the board and in the press file.
-              (agendaSessionRoom(session)
+              (agendaSessionRoomLine(session, pars.length > 0)
                 ? para(
-                    run(agendaSessionRoom(session).toUpperCase(), {
+                    run(agendaSessionRoomLine(session, pars.length > 0).toUpperCase(), {
                       size: halfPt(cardBodyType.detailSize),
                       color: bandInk,
                       bold: true,
@@ -802,7 +804,7 @@ export async function buildAgendaDocx(
                   }),
                   { afterTwips: 0, lineTwips: mmT(cardParType.timeSize * 1.4) },
                 ) +
-                  copy(p.title, p.detail, parInk, p.speaker ?? "", cardParType, agendaParallelRoom(p)),
+                  copy(p.title, p.detail, parInk, p.speaker ?? "", cardParType, agendaParallelRoomLine(p)),
                 rowPad,
                 {
                   fill: parFill,

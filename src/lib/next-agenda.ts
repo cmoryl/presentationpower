@@ -2720,8 +2720,10 @@ export function agendaBlocks(config: AgendaConfig) {
         agendaTextLines(session.title, L.titleRowSize, w) * L.titleRowSize * 1.5 +
         // A room line prints as its own small caps line under the title, so it is
         // measured as one, and never squeezes the speaker notes out of the band.
-        (agendaSessionRoom(session)
-          ? agendaTextLines(agendaSessionRoom(session), L.detailSize, w) * L.detailSize * 1.55 +
+        (agendaSessionRoomLine(session, pars.length > 0)
+          ? agendaTextLines(agendaSessionRoomLine(session, pars.length > 0), L.detailSize, w) *
+              L.detailSize *
+              1.55 +
             L.detailSize * 0.5
           : 0) +
         agendaTextLines(session.detail, L.detailSize, w) * L.detailSize * 1.55 +
@@ -2750,8 +2752,8 @@ export function agendaBlocks(config: AgendaConfig) {
               ((p.speaker ?? "").trim() ? ct.detailSize * 0.5 : 0) +
               // The card's own room line is measured too, so a slot running in two
               // rooms at once never clips the second room off the board.
-              (agendaParallelRoom(p)
-                ? agendaTextLines(agendaParallelRoom(p), ct.detailSize, ct.textW) *
+              (agendaParallelRoomLine(p)
+                ? agendaTextLines(agendaParallelRoomLine(p), ct.detailSize, ct.textW) *
                     ct.detailSize *
                     1.55 +
                   ct.detailSize * 0.5

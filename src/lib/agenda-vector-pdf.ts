@@ -59,7 +59,9 @@ import {
   agendaParallels,
   agendaSessionMark,
   agendaParallelRoom,
+  agendaParallelRoomLine,
   agendaSessionRoom,
+  agendaSessionRoomLine,
 
   agendaQrBackground,
   agendaQrForeground,
@@ -814,7 +816,7 @@ export async function buildAgendaVectorPdf(
           }
         }
         // Room / floor line, printed in caps above the speaker notes.
-        const roomLine = agendaSessionRoom(row.session);
+        const roomLine = agendaSessionRoomLine(row.session, row.parallels.length > 0);
         if (roomLine) {
           const size = mm(L.detailSize) * row.fit;
           y -= size * 0.5;
@@ -896,7 +898,7 @@ export async function buildAgendaVectorPdf(
           }
           // Each simultaneous card names its own room, so a slot running in two
           // places at once reads correctly in print.
-          const cardRoom = agendaParallelRoom(copy);
+          const cardRoom = agendaParallelRoomLine(copy);
           if (cardRoom) {
             const rs = mm(ct.detailSize) * row.fit;
             py2 -= rs * 0.4;
