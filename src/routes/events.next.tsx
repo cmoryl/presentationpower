@@ -428,128 +428,17 @@ function Hero({
               </span>
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
             </a>
-            <Link
-              to={"/knowledge/brand-guides/next-2026" as never}
+            <a
+              href="#next-directory"
               className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
             >
               <span>
-                <span className="font-medium">Master brand guide</span> · lockups, palette, rules
+                <span className="font-medium">Where everything lives</span> · every NEXT page in one
+                index
               </span>
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              to="/events/next/london"
-              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
-            >
-              <span>
-                <span className="font-medium">London location signage</span> · QEII Centre, 54
-                panels
-              </span>
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              to="/events/next/city-badges"
-              search={{ division: undefined, face: undefined }}
-              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
-            >
-              <span>
-                <span className="font-medium">City Series badge</span> · dark + light faces,
-                print-run versions
-              </span>
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              to="/events/next/city-series"
-              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
-            >
-              <span>
-                <span className="font-medium">City Series demo kit</span> · editable agenda board +
-                light-face pillars
-              </span>
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              to="/events/next/pillars"
-              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
-            >
-              <span>
-                <span className="font-medium">Master pillar signs</span> · welcome, registration,
-                logo, directional — every division
-              </span>
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              to="/events/next/agendas"
-              search={{ division: undefined }}
-              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
-            >
-              <span>
-                <span className="font-medium">Division agendas</span> · editable agenda boards, A4
-                to A1, every division
-              </span>
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              to="/events/next/guide"
-              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
-            >
-              <span>
-                <span className="font-medium">Delegate guide</span> · the printed "your guide"
-                handout, one per city
-              </span>
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              to="/events/next/locations"
-              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
-            >
-              <span>
-                <span className="font-medium">Venue pages</span> · address, map, opening times and
-                photo the guide reads from
-              </span>
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </Link>
+            </a>
 
-            <Link
-              to="/events/next/mart"
-              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
-            >
-              <span>
-                <span className="font-medium">NEXT MART signage</span> · merch shop pillars,
-                banners, wayfinding
-              </span>
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              to="/events/next/playbook"
-              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
-            >
-              <span>
-                <span className="font-medium">Venue playbook</span> · reusable sign families,
-                grounds and print rules for the next venue
-              </span>
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              to="/events/next/venues"
-              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
-            >
-              <span>
-                <span className="font-medium">Venue plans</span> · set up a new city&apos;s floors
-                and rooms once, then reuse every sheet
-              </span>
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              to="/events/next/venue"
-              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
-            >
-              <span>
-                <span className="font-medium">Next venue (provisional)</span> · draft layout study,
-                not orderable print
-              </span>
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </Link>
 
           </div>
         </div>
