@@ -187,23 +187,24 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
   const blocks: QeiiLayoutBlock[] = [];
   const noteSet = new Set<string>();
 
+  // Lift symbols, WC and access glyphs, stair runs and the marker dots: drawn
+  // objects a room name must never print across.
+  const objects = qeiiObjectBoxes(floor.shapes, floor.w * floor.h);
+
   for (const group of groups) {
     const head = group.labels[0]!;
-    const size = qeiiFontSize(head, floor, scale);
+    const baseSize = qeiiFontSize(head, floor, scale);
+    const minSize = Math.max(floor.w * QEII_LABEL_MIN_SHARE * scale, 0.01);
     const lines = group.labels.map((l) => l.text);
     const room = lines.join(" ").replace(/-\s/g, "-");
     const fullUse = options.showUse ? spaceUseLine(room, floor.id) : undefined;
     const allMarks = options.showMarks ? spaceUseMarks(room, floor.id) : [];
-    // The event line never falls under the readable floor, even beneath a small name.
-    const useSize =
-      Math.round(
-        Math.min(size * 0.92, Math.max(size * QEII_USE_RATIO, floor.w * QEII_LABEL_MIN_SHARE * scale)) *
-          100,
-      ) / 100;
-    const markH = Math.round(size * QEII_MARK_RATIO * (options.markScale ?? 1) * 100) / 100;
 
-    const nameWidth = Math.max(...lines.map((t) => qeiiTextWidth(t, size)));
-    const nameHeight = size * (0.72 + (lines.length - 1) * 1.05);
+    // The space the artwork actually draws for this room, and the objects inside it.
+    const holder: QeiiRect | undefined = qeiiHolderBox(floor.shapes, group.x, group.y);
+    const nearby = objects.filter(
+      (o) => !(group.x >= o.x0 && group.x <= o.x1 && group.y >= o.y0 && group.y <= o.y1),
+    );
 
     type Variant = { use?: string; marks: SpaceUseMark[] };
     const variants: Variant[] = [];
@@ -214,8 +215,14 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     if (allMarks.length) variants.push({ use: undefined, marks: allMarks });
     variants.push({ use: undefined, marks: [] });
 
-    let chosen: { variant: Variant; box: QeiiBox } | undefined;
-    for (const variant of variants) {
+    type Fit = { variant: Variant; box: QeiiBox; size: number; useSize: number; markH: number };
+
+    const measure = (variant: Variant, size: number): Fit => {
+      const useSize =
+        Math.round(Math.min(size * 0.92, Math.max(size * QEII_USE_RATIO, minSize)) * 100) / 100;
+      const markH = Math.round(size * QEII_MARK_RATIO * (options.markScale ?? 1) * 100) / 100;
+      const nameWidth = Math.max(...lines.map((t) => qeiiTextWidth(t, size)));
+      const nameHeight = size * (0.72 + (lines.length - 1) * 1.05);
       const markRow = variant.marks.reduce((w, m) => w + markH * m.ratio + size * 0.35, 0);
       const width = Math.max(
         nameWidth,
@@ -224,19 +231,49 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       );
       const above = nameHeight / 2 + (variant.marks.length ? markH + size * 0.5 : 0);
       const below = nameHeight / 2 + (variant.use ? useSize * 1.5 : 0);
-      const box = boxFor(group.x, group.y, group.angle, width, above, below);
-      const clear =
-        inside(box, floor, 2) && !placed.some((p) => overlaps(box, p, size * 0.18));
-      if (clear) {
-        chosen = { variant, box };
-        break;
+      return {
+        variant,
+        box: boxFor(group.x, group.y, group.angle, width, above, below),
+        size: Math.round(size * 100) / 100,
+        useSize,
+        markH,
+      };
+    };
+
+    const clearOf = (fit: Fit, useHolder: boolean): boolean => {
+      if (!inside(fit.box, floor, 2)) return false;
+      if (placed.some((p) => overlaps(fit.box, p, fit.size * 0.18))) return false;
+      if (nearby.some((o) => overlaps(fit.box, o, fit.size * 0.12))) return false;
+      if (useHolder && holder && !qeiiRectInside(fit.box, holder, fit.size * 0.22)) return false;
+      return true;
+    };
+
+    // Type steps down inside its own room before any line comes off it, so a long
+    // name stays whole and stays inside the space the artwork draws for it.
+    const steps = [1, 0.92, 0.84, 0.76, 0.68, 0.6, 0.52];
+    let chosen: Fit | undefined;
+    let insideHolder = true;
+    for (const useHolder of [true, false]) {
+      for (const step of steps) {
+        const size = Math.max(minSize, baseSize * step);
+        for (const variant of variants) {
+          const fit = measure(variant, size);
+          if (clearOf(fit, useHolder)) {
+            chosen = fit;
+            insideHolder = useHolder;
+            break;
+          }
+        }
+        if (chosen) break;
+        if (baseSize * step <= minSize) break;
       }
+      if (chosen) break;
     }
 
     if (!chosen) {
       // The name itself always prints. Record what came off it and why.
-      const box = boxFor(group.x, group.y, group.angle, nameWidth, nameHeight / 2, nameHeight / 2);
-      chosen = { variant: { use: undefined, marks: [] }, box };
+      chosen = measure({ use: undefined, marks: [] }, Math.max(minSize, baseSize * 0.52));
+      insideHolder = false;
       noteSet.add(
         `${room} sits too tight on this plan for its event line — read it in the floor list below.`,
       );
@@ -250,6 +287,9 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
         noteSet.add(`${room} has no room for its division lockup on the plan.`);
       }
     }
+    if (holder && !insideHolder) {
+      noteSet.add(`${room} is printed wider than the space the issued artwork draws for it.`);
+    }
 
     placed.push(chosen.box);
     blocks.push({
@@ -257,12 +297,12 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       x: group.x,
       y: group.y,
       angle: group.angle,
-      size,
+      size: chosen.size,
       lines,
       use: chosen.variant.use,
-      useSize,
+      useSize: chosen.useSize,
       marks: chosen.variant.marks,
-      markH,
+      markH: chosen.markH,
       box: chosen.box,
     });
   }
