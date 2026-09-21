@@ -19,6 +19,8 @@ export type BrandHealthBadgeProps = {
   labels?: string[];
   /** What is being checked, shown in the drawer heading. */
   surfaceLabel?: string;
+  /** Which render surface this is, so the logo matrix uses the right minimums. */
+  medium?: LogoMedium;
   className?: string;
 };
 
