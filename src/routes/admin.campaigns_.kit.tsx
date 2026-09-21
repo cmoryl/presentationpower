@@ -81,6 +81,27 @@ function KitBuilderView() {
   return <KitBuilderInner />;
 }
 
+// Every rendered kit card on this page, resolved at click time so the bundle
+// contains exactly what is on screen (social cards and signage/print sizes go
+// to their own folders). DOM captures are proofs, which the manifest states.
+const collectKitSources = (): BundleSource[] =>
+  Array.from(document.querySelectorAll<HTMLElement>("[data-bundle-asset]")).flatMap((card) => {
+    const node = card.querySelector<HTMLElement>("[data-kit-asset-frame]");
+    const width = Number(card.dataset.bundleW);
+    const height = Number(card.dataset.bundleH);
+    if (!node || !(width > 0) || !(height > 0)) return [];
+    return [
+      {
+        kind: "capture" as const,
+        channel: channelForPlatform(card.dataset.bundlePlatform),
+        label: card.dataset.bundleLabel || "Asset",
+        node,
+        width,
+        height,
+      },
+    ];
+  });
+
 function KitBuilderInner() {
   const search = useSearch({ from: Route.id });
   const { favorites } = useFavorites();
@@ -107,26 +128,6 @@ function KitBuilderInner() {
   const [regenTick, setRegenTick] = useState(0);
   const assetEdits = useSocialAssetEdits();
 
-  // Every rendered kit card on this page, resolved at click time so the bundle
-  // contains exactly what is on screen (social cards and signage/print sizes go
-  // to their own folders). DOM captures are proofs, which the manifest states.
-  const collectKitSources = (): BundleSource[] =>
-    Array.from(document.querySelectorAll<HTMLElement>("[data-bundle-asset]")).flatMap((card) => {
-      const node = card.querySelector<HTMLElement>("[data-kit-asset-frame]");
-      const width = Number(card.dataset.bundleW);
-      const height = Number(card.dataset.bundleH);
-      if (!node || !(width > 0) || !(height > 0)) return [];
-      return [
-        {
-          kind: "capture" as const,
-          channel: channelForPlatform(card.dataset.bundlePlatform),
-          label: card.dataset.bundleLabel || "Asset",
-          node,
-          width,
-          height,
-        },
-      ];
-    });
 
   // Wizard mode — triggered by ?blank=1 from /social and /events blank-kit CTAs.
   const isWizard = !!search.blank;
