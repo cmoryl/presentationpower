@@ -239,6 +239,36 @@ export function spaceUseLine(room: string, sheetId?: string): string | undefined
     .join(" / ");
 }
 
+/**
+ * The same line with the division names taken out, for plans that already print
+ * the division lockup. Only segments naming a division whose lockup is printed
+ * are dropped — anything else the schedule records (Innovation Lounge, Mart,
+ * Optimize) is kept word for word.
+ */
+export function spaceUseLineWithoutDivisions(
+  room: string,
+  sheetId: string | undefined,
+  printedDivisionIds: string[],
+): string | undefined {
+  const uses = spaceUsesForRoom(room, sheetId);
+  if (!uses.length) return undefined;
+  const lines: string[] = [];
+  for (const use of uses) {
+    const kept = use.event
+      .split(" / ")
+      .map((s) => s.trim())
+      .filter((segment) => {
+        const hay = segment.toLowerCase();
+        const id = EVENT_DIVISION.find(([needle]) => hay.includes(needle))?.[1];
+        return !(id && printedDivisionIds.includes(id));
+      })
+      .filter((segment) => segment && segment.toLowerCase() !== (use.fn ?? "").toLowerCase());
+    const line = [use.fn, kept.join(" / ")].filter(Boolean).join(" · ");
+    if (line && !lines.includes(line)) lines.push(line);
+  }
+  return lines.length ? lines.join(" / ") : undefined;
+}
+
 /** True when the schedule left this space's function blank. */
 export function spaceFunctionMissing(use: SpaceUse): boolean {
   return !use.fn;
