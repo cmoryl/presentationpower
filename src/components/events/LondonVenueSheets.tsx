@@ -282,6 +282,32 @@ export function LondonVenueSheets() {
             </>
           ) : null}
 
+          {uses.length ? (
+            <>
+              <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-[#03002C]/60">
+                What this floor holds at NEXT 2026
+              </p>
+              <ul className="mt-2 divide-y divide-black/5 rounded-xl border border-black/10 bg-white">
+                {uses.map((u) => (
+                  <li key={`${u.space}-${u.event}`} className="px-3 py-2">
+                    <p className="text-[13px] font-semibold text-[#03002C]">{u.space}</p>
+                    <p className="text-[12px] text-[#03002C]/70">
+                      {u.fn ? `${u.fn} · ` : ""}
+                      {u.event}
+                    </p>
+                    {u.fn ? null : (
+                      <p className="mt-0.5 text-[11px] text-[#03002C]/55">
+                        No function recorded for this space.
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+
+
+
           {sheet.facilities.length ? (
             <>
               <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-[#03002C]/60">
