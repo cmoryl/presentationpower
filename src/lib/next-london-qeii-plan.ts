@@ -16,6 +16,21 @@ import { qeiiFloorVector, type QeiiFloorVector, type QeiiLabel } from "@/lib/nex
 
 export type QeiiPlanFace = "issued" | "element";
 
+/** Which approved lockup file a division marker uses on the plan. */
+export type QeiiMarkVariant = "reverse" | "white" | "colour";
+
+/**
+ * The approved lockup file for a marker.
+ *
+ * Only the three issued stacked variants are offered — a lockup is never
+ * recoloured on our side.
+ */
+export function qeiiMarkUrl(mark: SpaceUseMark, variant: QeiiMarkVariant = "reverse"): string {
+  if (variant === "white") return mark.urlWhite;
+  if (variant === "colour") return mark.url;
+  return mark.urlReverse;
+}
+
 /** Approved enterprise values used when a plan is inked on our side. */
 export const QEII_PLAN_TOKENS = {
   ink: "#03002C",
@@ -33,6 +48,10 @@ export type QeiiPlanOptions = {
   showUse?: boolean;
   /** Print the division's NEXT lockup above a room its area holds. */
   showMarks?: boolean;
+  /** Which lockup file the markers use. */
+  markVariant?: QeiiMarkVariant;
+  /** Multiplies the lockup height; 1 keeps the house setting. */
+  markScale?: number;
 };
 
 /**
@@ -133,6 +152,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
     labelScale: scale,
     showUse: options.showUse,
     showMarks: options.showMarks,
+    markScale: options.markScale,
   });
   const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const labels = showLabels
@@ -169,7 +189,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
               markX += w + block.size * 0.35;
               return [
                 "<image",
-                `href="${m.urlReverse.startsWith("http") ? m.urlReverse : `${NEXT_APP_ORIGIN}${m.urlReverse}`}"`,
+                `href="${(() => { const u = qeiiMarkUrl(m, options.markVariant); return u.startsWith("http") ? u : `${NEXT_APP_ORIGIN}${u}`; })()}"`,
                 `x="${x}" y="${nameTop - block.size * 0.7 - block.markH}" width="${w}" height="${block.markH}"`,
                 'preserveAspectRatio="xMidYMid meet"',
                 transform ? `transform="${transform}"` : "",

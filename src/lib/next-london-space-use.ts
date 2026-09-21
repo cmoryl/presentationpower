@@ -282,6 +282,8 @@ export type SpaceUseMark = {
   url: string;
   /** Reverse stacked lockup — white wordmark, accent live — for a dark ground. */
   urlReverse: string;
+  /** All-white stacked lockup, for a dark ground with no accent wanted. */
+  urlWhite: string;
   /** Approved lockup aspect ratio (width / height). */
   ratio: number;
 };
@@ -301,6 +303,7 @@ export function spaceUseMarks(room: string, sheetId?: string): SpaceUseMark[] {
       name: suite?.trackName ?? divisionId,
       url: art.url,
       urlReverse: suite?.stackedReverse.url || suite?.stackedWhite.url || art.url,
+      urlWhite: suite?.stackedWhite.url || suite?.stackedReverse.url || art.url,
       ratio: art.ratio || 1.7,
     });
   }
