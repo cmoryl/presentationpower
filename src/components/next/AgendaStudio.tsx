@@ -478,6 +478,54 @@ export function AgendaStudio({
     }
   };
 
+  /** Every division agenda, every file format, in one zip. */
+  const runMasterExport = async () => {
+    setBusy(true);
+    const id = toast.loading("Building the master agenda pack…");
+    try {
+      const { agendaMasterConfigs, buildAgendaMasterZip } = await import(
+        "@/lib/next-agenda-master-zip"
+      );
+      // Prefer each division's saved live board; fall back to its approved default.
+      const savedLive: AgendaConfig[] = [];
+      for (const row of files.data ?? []) {
+        const c = normalizeAgendaConfig(row.config);
+        if (!agendaFileIsLive(c)) continue;
+        if (savedLive.some((s) => s.divisionId === c.divisionId)) continue;
+        savedLive.push(c);
+      }
+      const result = await buildAgendaMasterZip({
+        configs: agendaMasterConfigs(savedLive),
+        onProgress: (p) =>
+          toast.loading(`${p.label} (${p.index} of ${p.total})`, { id }),
+      });
+      const url = URL.createObjectURL(result.blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = result.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      const missing = result.entries.filter((e) => e.problems.length);
+      if (missing.length) {
+        toast.warning("Master pack downloaded with gaps", {
+          id,
+          description: `${result.boards} boards · ${result.files} files. Could not build: ${missing
+            .map((e) => e.divisionName)
+            .join(", ")} — see READ-ME.txt.`,
+        });
+      } else {
+        toast.success("Master agenda pack downloaded", {
+          id,
+          description: `${result.boards} division boards · ${result.files} files · PDF, Illustrator, Word and PowerPoint`,
+        });
+      }
+    } catch (e) {
+      toast.error("Master pack failed", { id, description: (e as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const runDeckExport = async () => {
     setBusy(true);
     const id = toast.loading("Building the editable PowerPoint deck…");
