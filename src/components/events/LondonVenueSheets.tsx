@@ -522,6 +522,12 @@ export function LondonVenueSheets() {
         </p>
       ) : null}
 
+      {exportNote ? (
+        <p className="mt-3 rounded-xl border border-black/10 bg-white px-3.5 py-2.5 text-[12.5px] leading-relaxed text-[#03002C]/80">
+          {exportNote}
+        </p>
+      ) : null}
+
       <div className="mt-4 flex flex-wrap gap-2">
         {LONDON_VENUE_SHEETS.map((s) => (
           <button
