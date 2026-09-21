@@ -12,9 +12,8 @@ export const CITY_SERIES_DEMO_EVENT = "NEXT City Series — Barcelona";
 export function citySeriesDemoAgenda(): AgendaConfig {
   const base = agendaDefault("city-series");
   return {
+    // Same house look as every other NEXT agenda: Bloom Corner, dark face.
     ...base,
-    face: "light",
-    styleId: "01-beam-violet-aqua",
     sizeId: "a1",
     trimW: 594,
     trimH: 841,
