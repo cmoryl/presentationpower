@@ -41,6 +41,7 @@ import {
   agendaSlug,
   agendaTitleInk,
   type AgendaConfig,
+  agendaChromeInk,
 } from "./next-agenda";
 import { agendaCopyInk } from "./next-agenda-contrast";
 import type { BookletExtras } from "./next-booklet";
