@@ -39,21 +39,24 @@ function symbolGroups(floor: QeiiFloorVector): SymbolGroup[] {
     const pad = 8;
     const reach = { x0: box.x0 - pad, y0: box.y0 - pad, x1: box.x1 + pad, y1: box.y1 + pad };
     const indexes = [i];
-    for (let j = i + 1; j < floor.shapes.length; j += 1) {
+    // The figure drawn on the base usually follows it, but a floor rebuilt from
+    // traced artwork groups its shapes by ink, so the whole list is checked for
+    // anything sitting inside this base rather than only the next few shapes.
+    for (let j = 0; j < floor.shapes.length; j += 1) {
+      if (j === i) continue;
       const next = boxes[j];
-      if (!next) break;
+      if (!next) continue;
       const inside =
         next.x0 >= reach.x0 && next.x1 <= reach.x1 && next.y0 >= reach.y0 && next.y1 <= reach.y1;
-      if (!inside) break;
-      indexes.push(j);
+      if (inside) indexes.push(j);
     }
     groups.push({
       indexes,
       cx: (box.x0 + box.x1) / 2,
       cy: (box.y0 + box.y1) / 2,
     });
-    i = indexes[indexes.length - 1]!;
   }
+
   return groups;
 }
 
