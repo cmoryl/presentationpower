@@ -293,6 +293,9 @@ function DecksIndex() {
     setBulkBusy(true);
     const failed: string[] = [];
     for (const item of go) {
+      // A browser-authored deck saved to the account lives under a deterministic
+      // id derived from the signed-in user + its local id — without that
+      // fallback the saved copy survived and reappeared after a refresh.
       const uuid =
         item.kind === "cloud"
           ? item.id
@@ -300,7 +303,9 @@ function DecksIndex() {
             ? item.id.slice("cloud-".length)
             : UUID_RE.test(item.id)
               ? item.id
-              : null;
+              : userId
+                ? deckCloudId(userId, item.id)
+                : null;
       try {
         // Remove the saved copy first — dropping only the local one would hide a
         // deck that still exists in the account.
