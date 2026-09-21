@@ -11,8 +11,10 @@ import {
 
 describe("London venue floor sheets", () => {
   it("carries every issued page once, in page order", () => {
-    expect(LONDON_VENUE_SHEETS.length).toBe(VENUE_SHEET_PDF.pages);
-    expect(LONDON_VENUE_SHEETS.map((s) => s.page)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    // The issued PDF has eight pages; the separate Mountbatten room sheet
+    // (page 8) is not carried, so seven floors are shown.
+    expect(LONDON_VENUE_SHEETS.length).toBe(VENUE_SHEET_PDF.pages - 1);
+    expect(LONDON_VENUE_SHEETS.map((s) => s.page)).toEqual([1, 2, 3, 4, 5, 6, 7]);
     expect(new Set(LONDON_VENUE_SHEETS.map((s) => s.id)).size).toBe(LONDON_VENUE_SHEETS.length);
   });
 
@@ -35,9 +37,9 @@ describe("London venue floor sheets", () => {
     expect(venueSheet("sixth")!.rooms).toEqual(["Mountbatten"]);
   });
 
-  it("keeps the Mountbatten capacities as issued", () => {
-    const sheet = venueSheet("sixth-mountbatten")!;
-    expect(sheet.kind).toBe("room");
+  it("keeps the Mountbatten capacities as issued, on the 6th floor", () => {
+    const sheet = venueSheet("sixth")!;
+    expect(venueSheet("sixth-mountbatten")).toBeUndefined();
     expect(sheet.capacities).toEqual([
       { label: "Theatre", value: "410" },
       { label: "Dinners", value: "384" },
@@ -52,7 +54,7 @@ describe("London venue floor sheets", () => {
     const names = rows.map((r) => r.room);
     expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
     expect(rows.some((r) => r.room === "Fleming" && r.marker === "3")).toBe(true);
-    expect(rows.some((r) => r.sheetId === "sixth-mountbatten")).toBe(false);
+    expect(rows.every((r) => r.sheetId !== "sixth-mountbatten")).toBe(true);
   });
 
   it("finds a room by name or by floor", () => {

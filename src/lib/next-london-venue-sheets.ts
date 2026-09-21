@@ -1,9 +1,9 @@
 // QEII Centre venue floor sheets for NEXT 2026 London.
 //
 // These are the issued Canva floor sheets (design DAHV2tkeXlk) — one A3 sheet
-// per floor plus the sixth-floor Mountbatten room sheet, and the full PDF of
-// all eight pages. The room and facility lists below are transcribed from the
-// sheets themselves, so the directory never says a room the artwork does not.
+// per floor, and the full PDF of all eight pages. The separate Mountbatten room
+// sheet is not carried; its capacities and write-up sit with the 6th floor.
+// The room and facility lists below are transcribed from the sheets themselves, so the directory never says a room the artwork does not.
 //
 // The sheets are supplied raster artwork, held as CDN assets. They are shown as
 // artwork in their own frame, never used as a page or panel background.
@@ -15,7 +15,6 @@ import third from "@/assets/next-london-floors/qeii-third.png.asset.json";
 import fourth from "@/assets/next-london-floors/qeii-fourth.png.asset.json";
 import fifth from "@/assets/next-london-floors/qeii-fifth.png.asset.json";
 import sixth from "@/assets/next-london-floors/qeii-sixth.png.asset.json";
-import mountbatten from "@/assets/next-london-floors/qeii-sixth-mountbatten-sheet.png.asset.json";
 import fullPdf from "@/assets/next-london-floors/qeii-floor-maps.pdf.asset.json";
 
 export type VenueSheetKind = "floor" | "room";
@@ -167,18 +166,8 @@ export const LONDON_VENUE_SHEETS: VenueSheet[] = [
     h: 1587,
     rooms: ["Mountbatten"],
     facilities: ["Stage"],
-  },
-  {
-    id: "sixth-mountbatten",
-    marker: "6",
-    title: "Sixth — Mountbatten room sheet",
-    kind: "room",
-    page: 8,
-    url: mountbatten.url,
-    w: 794,
-    h: 1123,
-    rooms: ["Mountbatten", "Cambridge"],
-    facilities: [],
+    // The separate Mountbatten room sheet is not carried, so its issued
+    // capacities and write-up are kept here with the floor rather than lost.
     capacities: [
       { label: "Theatre", value: "410" },
       { label: "Dinners", value: "384" },
@@ -190,6 +179,7 @@ export const LONDON_VENUE_SHEETS: VenueSheet[] = [
       "the London Eye and Westminster Abbey. Hire of the space includes the Cambridge which can be " +
       "used as a drinks reception, exhibition or networking lounge in conjunction with the Mountbatten.",
   },
+
 ];
 
 /** A sheet by id. */

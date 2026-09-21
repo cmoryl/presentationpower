@@ -166,6 +166,14 @@ function overlaps(a: QeiiBox, b: QeiiBox, pad: number): boolean {
   return a.x0 < b.x1 + pad && b.x0 < a.x1 + pad && a.y0 < b.y1 + pad && b.y0 < a.y1 + pad;
 }
 
+/** How much of a drawn object a block would cover, used to pick the least bad spot. */
+function overlapArea(a: QeiiBox, b: QeiiBox): number {
+  const w = Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0);
+  const h = Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0);
+  return w > 0 && h > 0 ? w * h : 0;
+}
+
+
 function inside(b: QeiiBox, floor: QeiiFloorVector, pad: number): boolean {
   return b.x0 >= pad && b.y0 >= pad && b.x1 <= floor.w - pad && b.y1 <= floor.h - pad;
 }
@@ -304,12 +312,39 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     }
 
     if (!chosen) {
-      // The name itself always prints. Record what came off it and why.
-      chosen = measure({ use: undefined, marks: [] }, Math.max(minSize, baseSize * 0.52));
+      // The name itself always prints, so the last resort is to walk it a short
+      // way off its anchor at the smallest allowed size rather than let it sit
+      // across a drawn symbol. If nothing is genuinely clear, the least covered
+      // position is used and the crowding is reported instead of hidden.
+      const small = Math.max(minSize, baseSize * 0.52);
+      const bare = { use: undefined, marks: [] };
+      const walk = [0, 0.8, -0.8, 1.6, -1.6, 2.4, -2.4, 3.2, -3.2];
+      let best: Fit | undefined;
+      let bestCover = Infinity;
+      for (const dy of walk) {
+        for (const dx of walk) {
+          const fit = measure(bare, small, dx * small, dy * small);
+          if (clearOf(fit, false)) {
+            best = fit;
+            bestCover = 0;
+            break;
+          }
+          const cover = nearby.reduce((sum, o) => sum + overlapArea(fit.box, o), 0);
+          if (cover < bestCover) {
+            best = fit;
+            bestCover = cover;
+          }
+        }
+        if (bestCover === 0) break;
+      }
+      chosen = best ?? measure(bare, small);
       insideHolder = false;
       noteSet.add(
-        `${room} sits too tight on this plan for its event line — read it in the floor list below.`,
+        bestCover === 0
+          ? `${room} is moved slightly off its printed position to clear a symbol, and its event line is in the floor list below.`
+          : `${room} sits too tight on this plan for its event line — read it in the floor list below.`,
       );
+
     } else {
       if (fullUse && !chosen.variant.use) {
         noteSet.add(
