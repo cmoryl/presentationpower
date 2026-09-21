@@ -9,6 +9,8 @@ import { useMemo, useState } from "react";
 import { Download, FileDown, Maximize2, Search, X } from "lucide-react";
 
 import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
+import { spaceUseLine, spaceUsesOnFloor } from "@/lib/next-london-space-use";
+
 import {
   qeiiPlanFilename,
   qeiiPlanState,
@@ -49,17 +51,34 @@ export function LondonVenueSheets() {
   const [face, setFace] = useState<QeiiPlanFace>("issued");
   const [labelScale, setLabelScale] = useState(1);
   const [showLabels, setShowLabels] = useState(true);
+  const [showUse, setShowUse] = useState(true);
+
 
   const rows = useMemo(() => venueRoomDirectory(), []);
-  const found = useMemo(() => searchVenueRooms(query, rows), [query, rows]);
+  const found = useMemo(() => {
+    const byName = searchVenueRooms(query, rows);
+    const q = query.trim().toLowerCase();
+    if (!q) return byName;
+    const seen = new Set(byName.map((r) => `${r.sheetId}|${r.room}`));
+    // A search also finds a space by what it holds — "LegalNEXT", "Plenary", "Mart".
+    const byUse = rows.filter(
+      (r) =>
+        !seen.has(`${r.sheetId}|${r.room}`) &&
+        (spaceUseLine(r.room, r.sheetId) ?? "").toLowerCase().includes(q),
+    );
+    return [...byName, ...byUse];
+  }, [query, rows]);
+
   const sheet: VenueSheet =
     LONDON_VENUE_SHEETS.find((s) => s.id === sheetId) ?? LONDON_VENUE_SHEETS[0]!;
   const plan = useMemo(() => qeiiPlanState(sheet.id), [sheet.id]);
+  const uses = useMemo(() => spaceUsesOnFloor(sheet.id), [sheet.id]);
+
   const showRebuilt = rebuiltView && !!plan?.rebuilt;
 
   function downloadPlanSvg() {
     if (!plan?.rebuilt) return;
-    const svg = qeiiPlanSvg(plan.floor, { face, labelScale, showLabels });
+    const svg = qeiiPlanSvg(plan.floor, { face, labelScale, showLabels, showUse });
     const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
     download(url, qeiiPlanFilename(plan.floor, face));
     URL.revokeObjectURL(url);
@@ -162,6 +181,15 @@ export function LondonVenueSheets() {
             >
               {showLabels ? "Room names on" : "Room names off"}
             </button>
+            <button
+              type="button"
+              aria-pressed={showUse}
+              onClick={() => setShowUse(!showUse)}
+              className={`${chip} border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]`}
+            >
+              {showUse ? "Event use on" : "Event use off"}
+            </button>
+
             <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
               Name size
               <input
@@ -196,6 +224,8 @@ export function LondonVenueSheets() {
               face={face}
               labelScale={labelScale}
               showLabels={showLabels}
+              showUse={showUse}
+
               className="block w-full bg-[#EEF1F7]"
             />
           ) : (
@@ -269,6 +299,32 @@ export function LondonVenueSheets() {
             </>
           ) : null}
 
+          {uses.length ? (
+            <>
+              <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-[#03002C]/60">
+                What this floor holds at NEXT 2026
+              </p>
+              <ul className="mt-2 divide-y divide-black/5 rounded-xl border border-black/10 bg-white">
+                {uses.map((u) => (
+                  <li key={`${u.space}-${u.event}`} className="px-3 py-2">
+                    <p className="text-[13px] font-semibold text-[#03002C]">{u.space}</p>
+                    <p className="text-[12px] text-[#03002C]/70">
+                      {u.fn ? `${u.fn} · ` : ""}
+                      {u.event}
+                    </p>
+                    {u.fn ? null : (
+                      <p className="mt-0.5 text-[11px] text-[#03002C]/55">
+                        No function recorded for this space.
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+
+
+
           {sheet.facilities.length ? (
             <>
               <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-[#03002C]/60">
@@ -319,7 +375,17 @@ export function LondonVenueSheets() {
                     onClick={() => setSheetId(r.sheetId)}
                     className="flex w-full items-center justify-between gap-3 px-1 py-2 text-left text-[13px] text-[#03002C] hover:bg-[#F2F2F2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
                   >
-                    <span className={r.kind === "room" ? "font-semibold" : ""}>{r.room}</span>
+                    <span className="min-w-0">
+                      <span className={`block ${r.kind === "room" ? "font-semibold" : ""}`}>
+                        {r.room}
+                      </span>
+                      {spaceUseLine(r.room, r.sheetId) ? (
+                        <span className="block text-[11.5px] text-[#03002C]/60">
+                          {spaceUseLine(r.room, r.sheetId)}
+                        </span>
+                      ) : null}
+                    </span>
+
                     <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#03002C]/55">
                       {r.marker} · {r.floor}
                     </span>

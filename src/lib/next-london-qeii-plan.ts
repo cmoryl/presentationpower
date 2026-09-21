@@ -7,7 +7,9 @@
 //
 // The ground behind a plan is a solid brand token — never imported artwork.
 
+import { spaceUseLine } from "@/lib/next-london-space-use";
 import { qeiiFloorVector, type QeiiFloorVector, type QeiiLabel } from "@/lib/next-london-qeii-vectors";
+
 
 export type QeiiPlanFace = "issued" | "element";
 
@@ -24,7 +26,20 @@ export type QeiiPlanOptions = {
   /** Multiplies the issued label size; 1 keeps the venue's own typesetting. */
   labelScale?: number;
   showLabels?: boolean;
+  /** Print what the space holds at NEXT 2026 London beneath each room name. */
+  showUse?: boolean;
 };
+
+/**
+ * What a named room holds at the event, set beneath the room name.
+ *
+ * Only spaces the event schedule records get a line; nothing is invented for a
+ * room the schedule does not mention.
+ */
+export function qeiiLabelUse(label: QeiiLabel, floorId: string): string | undefined {
+  return spaceUseLine(label.text, floorId);
+}
+
 
 function luminance(hex: string): number {
   const v = hex.replace("#", "");
@@ -104,20 +119,28 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
     ? floor.labels
         .map((l) => {
           const transform = qeiiLabelTransform(l);
-          return [
-            "<text",
-            `x="${l.x}" y="${l.y}"`,
-            'text-anchor="middle" dominant-baseline="middle"',
-            `font-family="Geist, Geist Variable, sans-serif" font-size="${qeiiLabelSize(l, scale)}"`,
-            `fill="${qeiiLabelInk()}"`,
-            transform ? `transform="${transform}"` : "",
-            `>${l.text.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text>`,
-          ]
-            .filter(Boolean)
-            .join(" ");
+          const size = qeiiLabelSize(l, scale);
+          const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+          const text = (y: number, fontSize: number, body: string) =>
+            [
+              "<text",
+              `x="${l.x}" y="${y}"`,
+              'text-anchor="middle" dominant-baseline="middle"',
+              `font-family="Geist, Geist Variable, sans-serif" font-size="${fontSize}"`,
+              `fill="${qeiiLabelInk()}"`,
+              transform ? `transform="${transform}"` : "",
+              `>${esc(body)}</text>`,
+            ]
+              .filter(Boolean)
+              .join(" ");
+          const use = options.showUse ? qeiiLabelUse(l, floor.id) : undefined;
+          return use
+            ? text(l.y, size, l.text) + text(l.y + size * 1.15, size * 0.72, use)
+            : text(l.y, size, l.text);
         })
         .join("")
     : "";
+
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${floor.w}" height="${floor.h}" viewBox="0 0 ${floor.w} ${floor.h}">`,
     `<title>Queen Elizabeth II Centre — ${floor.title}</title>`,
