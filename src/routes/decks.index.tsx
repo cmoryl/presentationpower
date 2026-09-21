@@ -21,6 +21,8 @@ import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { getLibraryAnalytics, type DeckAnalyticsSummary } from "@/lib/deck-analytics.functions";
 import { deleteCloudDeck, listMyCloudDecks } from "@/lib/cloud-decks.functions";
+import { deckCloudId } from "@/lib/deck-uuid";
+import { useSessionUser } from "@/hooks/use-session-user";
 import { ReviewStatusBadge, type ReviewStatus } from "@/components/ReviewStatusControl";
 import { toast } from "sonner";
 
