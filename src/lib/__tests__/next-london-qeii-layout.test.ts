@@ -6,7 +6,8 @@ import {
   qeiiLabelGroups,
   qeiiPlanLayout,
 } from "@/lib/next-london-qeii-layout";
-import { qeiiFloorVector } from "@/lib/next-london-qeii-vectors";
+import { qeiiObjectBoxes } from "@/lib/next-london-qeii-geometry";
+import { QEII_FLOOR_VECTORS, qeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 import { LONDON_VENUE_SHEETS } from "@/lib/next-london-venue-sheets";
 
 function boxesOverlap(a: any, b: any, pad = 0) {
@@ -57,5 +58,27 @@ describe("QEII rebuilt plan layout", () => {
     const hawking = blocks.find((b) => b.lines.join(" ") === "Hawking");
     expect(hawking).toBeDefined();
     expect(hawking!.lines).toEqual(["Hawking"]);
+  });
+});
+
+describe("objects and rooms", () => {
+  it("never prints a room block across a drawn object or outside the plan", () => {
+    for (const floor of QEII_FLOOR_VECTORS.filter((f) => f.kind === "vector")) {
+      const objects = qeiiObjectBoxes(floor.shapes, floor.w * floor.h);
+      const { blocks } = qeiiPlanLayout(floor, { showUse: true, showMarks: true });
+      for (const block of blocks) {
+        expect(block.box.x0).toBeGreaterThanOrEqual(0);
+        expect(block.box.x1).toBeLessThanOrEqual(floor.w);
+        const hits = objects.filter(
+          (o) =>
+            !(block.x >= o.x0 && block.x <= o.x1 && block.y >= o.y0 && block.y <= o.y1) &&
+            block.box.x0 < o.x1 &&
+            o.x0 < block.box.x1 &&
+            block.box.y0 < o.y1 &&
+            o.y0 < block.box.y1,
+        );
+        expect(hits, `${floor.id} ${block.lines.join(" ")}`).toHaveLength(0);
+      }
+    }
   });
 });

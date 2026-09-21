@@ -9,7 +9,8 @@
 // Colours come from the approved palette only. Backgrounds stay solid brand
 // tokens — no artwork is used as a ground.
 
-import type { QeiiFloorVector, QeiiShape } from "@/lib/next-london-qeii-vectors";
+import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
+import { qeiiShapeHolds } from "@/lib/next-london-qeii-geometry";
 import { qeiiLabelGroups } from "@/lib/next-london-qeii-layout";
 import { spaceUsesForRoom } from "@/lib/next-london-space-use";
 
@@ -47,72 +48,7 @@ export function qeiiRoomTextInk(fill?: string): string {
   return luminance(fill) > 0.55 ? "#03002C" : "#FFFFFF";
 }
 
-type Ring = { pts: [number, number][] };
-
-/** Every closed outline in a path, in sheet units. */
-function rings(d: string): Ring[] {
-  const out: Ring[] = [];
-  let pts: [number, number][] = [];
-  const tokens = d.match(/[MLZ]|-?\d+(?:\.\d+)?/g) ?? [];
-  let i = 0;
-  while (i < tokens.length) {
-    const t = tokens[i]!;
-    if (t === "M" || t === "L") {
-      const x = Number(tokens[i + 1]);
-      const y = Number(tokens[i + 2]);
-      if (t === "M" && pts.length > 2) {
-        out.push({ pts });
-        pts = [];
-      }
-      if (Number.isFinite(x) && Number.isFinite(y)) pts.push([x, y]);
-      i += 3;
-      continue;
-    }
-    if (t === "Z") {
-      if (pts.length > 2) out.push({ pts });
-      pts = [];
-      i += 1;
-      continue;
-    }
-    i += 1;
-  }
-  if (pts.length > 2) out.push({ pts });
-  return out;
-}
-
-function ringArea(ring: Ring): number {
-  let a = 0;
-  for (let i = 0; i < ring.pts.length; i += 1) {
-    const [x1, y1] = ring.pts[i]!;
-    const [x2, y2] = ring.pts[(i + 1) % ring.pts.length]!;
-    a += x1 * y2 - x2 * y1;
-  }
-  return Math.abs(a) / 2;
-}
-
-function inRing(ring: Ring, x: number, y: number): boolean {
-  let hit = false;
-  for (let i = 0, j = ring.pts.length - 1; i < ring.pts.length; j = i, i += 1) {
-    const [xi, yi] = ring.pts[i]!;
-    const [xj, yj] = ring.pts[j]!;
-    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) hit = !hit;
-  }
-  return hit;
-}
-
-function shapeHolds(shape: QeiiShape, x: number, y: number): { held: boolean; area: number } {
-  if (!shape.fill) return { held: false, area: 0 };
-  const rs = rings(shape.d);
-  let held = false;
-  let area = 0;
-  for (const ring of rs) {
-    if (inRing(ring, x, y)) {
-      held = !held;
-      area = Math.max(area, ringArea(ring));
-    }
-  }
-  return { held, area };
-}
+const shapeHolds = qeiiShapeHolds;
 
 export type QeiiRoomShape = {
   room: string;
