@@ -41,7 +41,7 @@ import {
 import { applyPdfX4, type PdfX4Applied } from "./pdf-x4-vector";
 import { resolveAssetUrl } from "./asset-base-url";
 import { registerGradientPattern, type ShadingStop } from "./pdf-analytic-shading";
-import { extractSvgPaths } from "./pillar-vector-pdf";
+import { extractSvgShapes, type SvgShape } from "./pillar-vector-pdf";
 import { buildPillarQr } from "./pillar-qr";
 import { logoInkBox, logoInkPlacement } from "./next-logo-ink";
 import { qrStructuralModule } from "./qr-print";
@@ -195,7 +195,7 @@ function groundGradient(
 }
 
 type LockupArt =
-  | { kind: "svg"; paths: string[]; viewBox: [number, number, number, number] }
+  | { kind: "svg"; shapes: SvgShape[]; viewBox: [number, number, number, number] }
   | { kind: "raster"; bytes: Uint8Array; png: boolean }
   | null;
 
@@ -213,12 +213,13 @@ async function loadLockup(url: string): Promise<LockupArt> {
         .split(/[\s,]+/)
         .map(Number)
         .filter((n) => Number.isFinite(n));
-      const paths = extractSvgPaths(svg);
-      if (paths.length && nums.length === 4) {
-        return { kind: "svg", paths, viewBox: nums as [number, number, number, number] };
+      const shapes = extractSvgShapes(svg);
+      if (shapes.length && nums.length === 4) {
+        return { kind: "svg", shapes, viewBox: nums as [number, number, number, number] };
       }
       return null;
     }
+
     const png = buf[0] === 0x89 && buf[1] === 0x50;
     return { kind: "raster", bytes: buf, png };
   } catch {
@@ -490,14 +491,19 @@ export async function buildAgendaVectorPdf(
         const scale = lw / (vw * (inkFrac?.width ?? 1));
         const offX = inkFrac ? inkFrac.left * vw * scale : 0;
         const offY = inkFrac ? inkFrac.top * vh * scale : 0;
-        for (const d of art.paths) {
-          page.drawSvgPath(d, {
+        for (const shape of art.shapes) {
+          // A reverse lockup declares its own fills (white wordmark + live
+          // division accent). Honour them; fall back to the board's lockup ink
+          // only where the file leaves a shape uncoloured.
+          const fill = shape.fill && /^#[0-9a-f]{3,8}$/i.test(shape.fill) ? shape.fill : lockupInk;
+          page.drawSvgPath(shape.d, {
             x: px(blocks.lockup.x) - vx * scale - offX,
             y: py(blocks.lockup.y) + vy * scale + offY,
             scale,
-            color: rgb(...hexRgb(lockupInk)),
+            color: rgb(...hexRgb(fill)),
           });
         }
+
       } else if (art.kind === "raster") {
         try {
           const image = art.png ? await doc.embedPng(art.bytes) : await doc.embedJpg(art.bytes);

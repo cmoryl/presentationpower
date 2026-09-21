@@ -19,6 +19,9 @@ export type NextLockupSuite = {
   /** Stacked mark for square and portrait frames. */
   stacked: NextLogoEntry;
   stackedWhite: NextLogoEntry;
+  /** Stacked reverse — white wordmark with the division accent kept live. */
+  stackedReverse: NextLogoEntry;
+
   /** Every approved lockup in the track, for the identity showcase. */
   showcase: { id: string; label: string; note: string; color: string; white: string }[];
 };
@@ -74,6 +77,8 @@ function suiteFor(div: NextDivisionBrand): NextLockupSuite {
     wideWhite: entry(pick(div.lockups, wideOrder, "white")),
     stacked: entry(pick(div.lockups, stackedOrder, "color")),
     stackedWhite: entry(pick(div.lockups, stackedOrder, "white")),
+    stackedReverse: entry(pick(div.lockups, stackedOrder, "reverse")),
+
     showcase,
   };
 }
