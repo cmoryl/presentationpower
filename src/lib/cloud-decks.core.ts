@@ -197,7 +197,13 @@ export async function saveDeckToCloudCore(
   const alreadySaved = Array.isArray(existingDeck) && existingDeck.length > 0;
   if (!alreadySaved) {
     // Land on the draft this is a re-save of rather than stacking up another row.
-    const dupId = await findRecentDuplicateDeck(sb, userId, data.deck.title, deckUuid);
+    const dupId = await findRecentDuplicateDeck(
+      sb,
+      userId,
+      data.deck.title,
+      deckUuid,
+      briefUuid,
+    );
     if (dupId) {
       deckUuid = dupId;
       existingDeck = (await sb.from("decks").select("status").eq("id", deckUuid)).data;
