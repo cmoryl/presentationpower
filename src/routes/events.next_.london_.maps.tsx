@@ -100,10 +100,13 @@ const DESIGN_KEY = "next-london-map-design-v1";
 const AREAS_KEY = "next-london-map-areas-v1";
 
 export const Route = createFileRoute("/events/next_/london_/maps")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    sheet: typeof search['sheet'] === "string" ? (search['sheet'] as string) : undefined,
-    room: typeof search['room'] === "string" ? (search['room'] as string) : undefined,
-  }),
+  // Arriving from the room schedule may name a floor and a room; both optional.
+  validateSearch: (search: Record<string, unknown>): { sheet?: string; room?: string } => {
+    const out: { sheet?: string; room?: string } = {};
+    if (typeof search['sheet'] === "string" && search['sheet']) out.sheet = search['sheet'];
+    if (typeof search['room'] === "string" && search['room']) out.room = search['room'];
+    return out;
+  },
   head: () => ({
     meta: [
       { title: "NEXT 2026 London install maps · QEII Centre floor plans" },
