@@ -559,6 +559,13 @@ function BrandGuideView() {
         </Section>
       )}
 
+      {/* The recorded product ecosystem — GlobalLink only. */}
+      {guide.slug === "globallink" && (
+        <Section title="Product ecosystem" eyebrow="09">
+          <GlobalLinkUniverse />
+        </Section>
+      )}
+
       {intel && <BrandhubIntelSections intel={intel} hero={hero} accent={accent} />}
 
       {/* Reported from real work — never edits the guide above. */}
