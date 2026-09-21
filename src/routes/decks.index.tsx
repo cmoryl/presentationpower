@@ -59,6 +59,7 @@ function DecksIndex() {
   const decksMap = useDeckStore((s) => s.decks);
   const briefs = useDeckStore((s) => s.briefs);
   const signedIn = useSignedIn();
+  const userId = useSessionUser();
   const fetchAnalytics = useServerFn(getLibraryAnalytics);
   const fetchCloud = useServerFn(listMyCloudDecks);
 
