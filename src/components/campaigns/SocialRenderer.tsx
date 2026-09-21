@@ -12,7 +12,8 @@
 // the shared preset in opposite directions and eventually want bespoke
 // layouts, not pure scaling.
 
-import type { CSSProperties } from "react";
+import { useRef, type CSSProperties } from "react";
+import { useAutoRefit } from "@/components/text/AutoRefit";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
@@ -438,6 +439,13 @@ export function SocialRenderer({
   displayShortEdge = 320,
 }: SocialRendererProps) {
   const copy = applySocialCopyEdit(copyProp, edit);
+  // Multilingual refit: translated headlines and summaries are sized down into
+  // their boxes inside the approved type floors instead of clipping.
+  const frameRef = useRef<HTMLDivElement>(null);
+  useAutoRefit(
+    frameRef,
+    `${format.id}-${copy.title ?? ""}-${copy.summary ?? ""}-${copy.eyebrow ?? ""}`,
+  );
   const brand = findBrand(brandId);
   const preset = presetFor(format);
   const tune = format.tune ?? {};
@@ -770,7 +778,7 @@ export function SocialRenderer({
       className="relative overflow-hidden rounded-xl shadow-[0_6px_24px_rgba(3,0,44,0.14)]"
       style={wrapperStyle}
     >
-      <div className="relative" style={inner} data-kit-asset-frame="true">
+      <div ref={frameRef} className="relative" style={inner} data-kit-asset-frame="true">
         {/* Force mode into the aurora subtree — SocialRenderer is invoked
             outside the deck editor's provider. */}
         <SlideModeContext.Provider value={mode}>
