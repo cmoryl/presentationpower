@@ -14,7 +14,6 @@ import { QeiiMapEditPanel } from "@/components/events/QeiiMapEditPanel";
 import {
   EMPTY_QEII_MAP_EDITS,
   qeiiApplyRoomEdit,
-  qeiiMapEditsEmpty,
   type QeiiMapEdits,
 } from "@/lib/qeii-map-edits";
 import {
