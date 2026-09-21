@@ -147,7 +147,10 @@ export function QeiiFloorPlan({
             let markX = block.x - markRow / 2;
             const nameTop = block.y - ((block.lines.length - 1) * block.size * 1.05) / 2;
             const lastLine = nameTop + (block.lines.length - 1) * block.size * 1.05;
-            const room = block.lines.join(" ");
+            // Colours and the key are held under the name the venue issued, so a
+            // renamed room keeps the colour it was given.
+            const room = block.room;
+            const shown = block.lines.join(" ");
             const tag = paint.tags.get(room);
             const fill = roomColours[room];
             const ink = tag ? qeiiRoomTextInk(tag) : fill ? qeiiRoomTextInk(fill) : qeiiLabelInk();
@@ -155,10 +158,11 @@ export function QeiiFloorPlan({
             // to the colour file. An explicit all-white or colour choice is kept.
             const variant = ink === "#03002C" && markVariant === "reverse" ? "colour" : markVariant;
             const pad = block.size * 0.32;
-            const lit =
-              !!highlightRoom && room.toLowerCase() === highlightRoom.trim().toLowerCase();
+            const wanted = highlightRoom?.trim().toLowerCase();
+            const lit = !!wanted && (room.toLowerCase() === wanted || shown.toLowerCase() === wanted);
             return (
               <g key={block.key}>
+
                 {lit ? (
                   <rect
                     x={block.box.x0 - block.size * 0.9}
