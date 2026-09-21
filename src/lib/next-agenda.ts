@@ -2864,6 +2864,7 @@ export function agendaBlocks(config: AgendaConfig) {
     footerBand,
     footer,
     footY,
+    stampY,
     footnoteY,
     footnoteH,
     qr,
