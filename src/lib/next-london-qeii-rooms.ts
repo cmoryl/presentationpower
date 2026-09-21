@@ -196,6 +196,12 @@ export function qeiiRoomDivisionName(room: string, sheetId: string): string | un
   return spaceUseMarks(room, sheetId)[0]?.name;
 }
 
+/** The approved accent of the division holding this room, when one is recorded. */
+export function qeiiRoomDivisionAccent(room: string, sheetId: string): string | undefined {
+  const id = spaceUseMarks(room, sheetId)[0]?.divisionId;
+  return id ? NEXT_DIVISIONS.find((d) => d.id === id)?.accent : undefined;
+}
+
 export type QeiiKeyEntry = { hex: string; label: string; rooms: string[] };
 
 /**
