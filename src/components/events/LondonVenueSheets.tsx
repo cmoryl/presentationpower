@@ -10,6 +10,8 @@ import { Download, FileDown, Maximize2, Search, X } from "lucide-react";
 
 import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
+import { QeiiRoomColourPanel } from "@/components/events/QeiiRoomColourPanel";
+import { qeiiSharedShapeNotes, type QeiiRoomColours } from "@/lib/next-london-qeii-rooms";
 import { spaceUseLine, spaceUseMarks, spaceUsesOnFloor } from "@/lib/next-london-space-use";
 
 import {
@@ -57,6 +59,10 @@ export function LondonVenueSheets() {
   const [showMarks, setShowMarks] = useState(true);
   const [markVariant, setMarkVariant] = useState<QeiiMarkVariant>("reverse");
   const [markScale, setMarkScale] = useState(1);
+  const [showColourPanel, setShowColourPanel] = useState(false);
+  // Colours are held per floor, so one sheet's key never leaks onto another.
+  const [roomColourMap, setRoomColourMap] = useState<Record<string, QeiiRoomColours>>({});
+  const [keyLabelMap, setKeyLabelMap] = useState<Record<string, Record<string, string>>>({});
 
 
   const rows = useMemo(() => venueRoomDirectory(), []);
@@ -85,6 +91,12 @@ export function LondonVenueSheets() {
     [plan, labelScale, showUse, showMarks, markScale],
   );
   const uses = useMemo(() => spaceUsesOnFloor(sheet.id), [sheet.id]);
+  const roomColours = roomColourMap[sheet.id] ?? {};
+  const keyLabels = keyLabelMap[sheet.id] ?? {};
+  const sharedNotes = useMemo(
+    () => (plan?.rebuilt && Object.keys(roomColours).length ? qeiiSharedShapeNotes(plan.floor) : []),
+    [plan, roomColours],
+  );
 
   const showRebuilt = rebuiltView && !!plan?.rebuilt;
 
@@ -98,6 +110,8 @@ export function LondonVenueSheets() {
       showMarks,
       markVariant,
       markScale,
+      roomColours,
+      keyLabels,
     });
     const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
     download(url, qeiiPlanFilename(plan.floor, face));
@@ -259,6 +273,19 @@ export function LondonVenueSheets() {
               </>
             ) : null}
 
+            <button
+              type="button"
+              aria-pressed={showColourPanel}
+              onClick={() => setShowColourPanel(!showColourPanel)}
+              className={`${chip} ${
+                showColourPanel
+                  ? "border-[#003FC7] bg-[#003FC7] text-white"
+                  : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+              }`}
+            >
+              Room colours &amp; key
+            </button>
+
             <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
               Name size
               <input
@@ -285,6 +312,24 @@ export function LondonVenueSheets() {
         </p>
       ) : null}
 
+      {showRebuilt && showColourPanel && plan ? (
+        <QeiiRoomColourPanel
+          floor={plan.floor}
+          colours={roomColours}
+          onColours={(next) => setRoomColourMap({ ...roomColourMap, [sheet.id]: next })}
+          keyLabels={keyLabels}
+          onKeyLabels={(next) => setKeyLabelMap({ ...keyLabelMap, [sheet.id]: next })}
+        />
+      ) : null}
+
+      {showRebuilt && sharedNotes.length ? (
+        <ul className="mt-4 space-y-1 rounded-xl border border-black/10 bg-white px-4 py-3 text-[12px] text-[#03002C]/75">
+          {sharedNotes.map((note) => (
+            <li key={note}>{note}</li>
+          ))}
+        </ul>
+      ) : null}
+
       {showRebuilt && planNotes.length ? (
         <ul className="mt-4 space-y-1 rounded-xl border border-black/10 bg-white px-4 py-3 text-[12px] text-[#03002C]/75">
           {planNotes.map((note) => (
@@ -306,6 +351,8 @@ export function LondonVenueSheets() {
               showMarks={showMarks}
               markVariant={markVariant}
               markScale={markScale}
+              roomColours={roomColours}
+              keyLabels={keyLabels}
 
               className="block w-full bg-[#EEF1F7]"
             />
