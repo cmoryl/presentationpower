@@ -51,17 +51,19 @@ function programmeFor(use: SpaceUse) {
   return { divisionId, programme: LONDON_2026_PROGRAMMES[divisionId] };
 }
 
+/** Letters only, doubled letters collapsed — the issued sheets carry variants
+ *  such as "FLEMMING" for Fleming and "ST JAMES" for St. James. */
+function loose(text: string): string {
+  return text.toLowerCase().replace(/[^a-z]/g, "").replace(/(.)\1+/g, "$1");
+}
+
 /** True when the programme's printed room line names one of this space's rooms. */
 function roomLineAgrees(line: string, rooms: string[], space: string): boolean {
-  const hay = line.toLowerCase();
-  const names = [...rooms, space].map((r) => r.trim().toLowerCase()).filter(Boolean);
-  return names.some((name) => {
-    if (!name) return false;
-    if (hay.includes(name)) return true;
-    // The issued sheets carry a few spelling variants ("FLEMMING", "ST JAMES").
-    const loose = name.replace(/[^a-z]/g, "");
-    return hay.replace(/[^a-z]/g, "").includes(loose);
-  });
+  const hay = loose(line);
+  return [...rooms, space]
+    .map((r) => loose(r))
+    .filter(Boolean)
+    .some((name) => hay.includes(name));
 }
 
 /** Every recorded space, in schedule order, with its sessions attached. */
@@ -70,14 +72,24 @@ export function londonRoomSchedule(): RoomScheduleEntry[] {
     const { divisionId, programme } = programmeFor(use);
     const notes: string[] = [];
     const days: RoomScheduleDay[] = [];
+    const programmeRoomLine = programme?.locationLine || undefined;
+    // A programme that prints a different room belongs to that other space, so
+    // its times are not repeated here — the disagreement is reported instead.
+    const belongsHere =
+      !!programme &&
+      (!programmeRoomLine || roomLineAgrees(programmeRoomLine, use.rooms, use.space));
 
-    if (programme) {
+    if (programme && belongsHere) {
       const source = programme.days?.length
         ? programme.days.map((d) => ({ meta: d.meta, sessions: d.sessions }))
         : [{ meta: programme.meta, sessions: programme.sessions }];
       for (const day of source) {
         if (day.sessions.length) days.push({ meta: day.meta, sessions: day.sessions });
       }
+    } else if (programme && programmeRoomLine) {
+      notes.push(
+        `The ${use.event} programme prints “${programmeRoomLine}” as its room, so its session times are listed under that space rather than here. Both records are shown as issued — check with the venue before printing.`,
+      );
     } else {
       notes.push(
         divisionId
@@ -86,15 +98,6 @@ export function londonRoomSchedule(): RoomScheduleEntry[] {
       );
     }
 
-    const programmeRoomLine = programme?.locationLine || undefined;
-    if (
-      programmeRoomLine &&
-      !roomLineAgrees(programmeRoomLine, use.rooms, use.space)
-    ) {
-      notes.push(
-        `The programme prints “${programmeRoomLine}” as its room, which is not the space the event schedule records. Both are shown as issued — check with the venue before printing.`,
-      );
-    }
 
     return {
       space: use.space,
