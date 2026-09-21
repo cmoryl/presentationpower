@@ -254,7 +254,7 @@ export function qeiiColourKey(
   for (const [room, hex] of Object.entries(rooms)) {
     byHex.set(hex, [...(byHex.get(hex) ?? []), room]);
   }
-  const order = QEII_ROOM_PALETTE.map((p) => p.hex);
+  const order: string[] = QEII_ROOM_PALETTE.map((p) => p.hex);
   return [...byHex.entries()]
     .sort((a, b) => order.indexOf(a[0]) - order.indexOf(b[0]))
     .map(([hex, list]) => {
