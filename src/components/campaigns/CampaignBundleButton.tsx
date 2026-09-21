@@ -35,7 +35,7 @@ export function CampaignBundleButton({
     () =>
       Object.values(decks)
         .filter((d) => d.slides.length > 0)
-        .sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""))
+        .sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""))
         .slice(0, 40),
     [decks],
   );

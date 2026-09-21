@@ -484,7 +484,7 @@ function KitBuilderInner() {
             {/* One click: deck + social cards + print collateral in one ZIP
                 with a manifest naming every file, format and resolution. */}
             <CampaignBundleButton
-              campaignName={source?.copy?.title || "Campaign"}
+              campaignName={assets[0]?.copy?.title || "Campaign"}
               brandId={brandId}
               resolveSources={collectKitSources}
             />
