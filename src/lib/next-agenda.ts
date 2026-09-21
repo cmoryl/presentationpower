@@ -741,15 +741,39 @@ export function agendaBandPalette(config: {
   const base = agendaBandPaletteBase(config);
   const accent = agendaDivisionDayAccent(config.divisionId);
   if (!accent) return base;
-  const railReads =
-    agendaContrastRatio(accent.hex, base.fillA) >= AGENDA_RAIL_MIN_CONTRAST &&
-    agendaContrastRatio(accent.hex, base.fillB) >= AGENDA_RAIL_MIN_CONTRAST;
   return {
     ...base,
     dayBar: accent.hex,
     dayBarInk: accent.ink,
-    rail: railReads ? accent.hex : base.rail,
+    rail: agendaAccentRail(accent.hex, base.fillA, base.fillB),
   };
+}
+
+/**
+ * The time rail in the division accent, deepened only as far as it must be to
+ * stay visible on the band fill behind it. Games green and Learn yellow are
+ * almost white at full strength, so printing them flat would lose the rail; a
+ * deeper shade of the same hue keeps the division's colour on the board instead
+ * of falling back to a blue that belongs to no division.
+ */
+export function agendaAccentRail(accent: string, fillA: string, fillB: string): string {
+  const seen = (hex: string) =>
+    agendaContrastRatio(hex, fillA) >= AGENDA_RAIL_MIN_CONTRAST &&
+    agendaContrastRatio(hex, fillB) >= AGENDA_RAIL_MIN_CONTRAST;
+  if (seen(accent)) return accent;
+  const rgb = [1, 3, 5].map((i) => Number.parseInt(accent.slice(i, i + 2), 16));
+  for (let step = 1; step <= 12; step += 1) {
+    const k = 1 - step * 0.07;
+    const hex = `#${rgb
+      .map((c) =>
+        Math.max(0, Math.round(c * k))
+          .toString(16)
+          .padStart(2, "0"),
+      )
+      .join("")}`.toUpperCase();
+    if (seen(hex)) return hex;
+  }
+  return "#03002C";
 }
 
 

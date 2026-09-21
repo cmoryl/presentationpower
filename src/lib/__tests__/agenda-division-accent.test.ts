@@ -24,25 +24,18 @@ describe("division accents on agenda days and times", () => {
     }
   });
 
-  it("takes the accent for the time rail on every division board", () => {
+  it("keeps the division's own hue on the time rail, deepened where needed", () => {
     for (const div of NEXT_DIVISIONS) {
       const p = agendaBandPalette({ bandTreatment: "lavender", divisionId: div.id });
-      expect(p.rail).toBe(div.accent);
+      expect(agendaContrastRatio(p.rail, p.fillA)).toBeGreaterThanOrEqual(AGENDA_RAIL_MIN_CONTRAST);
+      expect(agendaContrastRatio(p.rail, p.fillB)).toBeGreaterThanOrEqual(AGENDA_RAIL_MIN_CONTRAST);
+      expect(p.rail).not.toBe("#003FC7");
     }
   });
 
-  it("only takes the accent for the time rail where it is visible on both fills", () => {
-    for (const div of AGENDA_DIVISIONS) {
-      const p = agendaBandPalette({ bandTreatment: "lavender", divisionId: div.id });
-      const accent = agendaDivisionDayAccent(div.id)!;
-      if (p.rail === accent.hex) {
-        expect(agendaContrastRatio(p.rail, p.fillA)).toBeGreaterThanOrEqual(AGENDA_RAIL_MIN_CONTRAST);
-        expect(agendaContrastRatio(p.rail, p.fillB)).toBeGreaterThanOrEqual(AGENDA_RAIL_MIN_CONTRAST);
-      } else {
-        // Held back honestly rather than printed too faint to see.
-        expect(p.rail).toBe("#003FC7");
-      }
-    }
+  it("leaves a rail that already reads exactly as the approved accent", () => {
+    const media = agendaBandPalette({ bandTreatment: "lavender", divisionId: "media" });
+    expect(media.rail).toBe("#EC388A");
   });
 
   it("leaves the ground, the band fills and the copy enterprise", () => {

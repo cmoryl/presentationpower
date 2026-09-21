@@ -21,6 +21,13 @@ const row = (
   extra: Partial<AgendaSession> = {},
 ): AgendaSession => ({ time, title, detail, track: "", muted: false, ...extra });
 
+/**
+ * The standing line printed on both days of the issued lounge board, exactly as
+ * it reads on the master.
+ */
+export const INNOVATION_LOUNGE_STANDING_NOTE =
+  "These sessions will take place in the Innovation Lounge";
+
 /** Innovation Lounge — THURSDAY, SEPTEMBER 24, 2026. */
 export const INNOVATION_LOUNGE_DAY_ONE: AgendaSession[] = [
   row(
@@ -79,7 +86,7 @@ export const INNOVATION_LOUNGE_DAY_TWO: AgendaSession[] = [
   row(
     "11:45 AM-12:05 PM",
     "GlobalLink LIVE",
-    "Presenters: Peter Cselenyi, Nate Fong, or Justyn Vasquez\nPeter selected to reduce pressure on Nate and Justyn.",
+    "Presenter: Peter Cselenyi\nPeter selected to reduce pressure on Nate and Justyn.",
     { track: "DEMO" },
   ),
   row(
@@ -91,7 +98,7 @@ export const INNOVATION_LOUNGE_DAY_TWO: AgendaSession[] = [
   row("12:45-1:05 PM", "Media Creator", "Presenter: Paulette Pantoja\n10-minute turnover on both sides.", {
     track: "DEMO",
   }),
-  row("1:15-1:35 PM", "GlobalLink ONE", "Presenters: Sofia Alves and Keith Brazil", { track: "DEMO" }),
+  row("1:15-1:35 PM", "GlobalLink ONE", "Presenter: Keith Brazil", { track: "DEMO" }),
   row(
     "1:45-2:05 PM",
     "GlobalLink Coach",
@@ -119,7 +126,7 @@ export const INNOVATION_LOUNGE_PROGRAMME: LondonAgendaProgramme = {
   bandTreatment: "lavender",
   eyebrow: "",
   locationLine: "INNOVATION LOUNGE",
-  footnote: "",
+  footnote: INNOVATION_LOUNGE_STANDING_NOTE,
   footerLeft: "WWW.TRANSPERFECTNEXT.COM/EMEA/INNOVATION",
   footerRight: "24 & 25 SEPTEMBER, 2026",
   sessions: INNOVATION_LOUNGE_DAY_ONE,
