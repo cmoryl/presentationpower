@@ -6,7 +6,7 @@
 // PDF, unchanged.
 
 import { useEffect, useMemo, useState } from "react";
-import { Download, FileDown, Maximize2, Search, X } from "lucide-react";
+import { Download, FileDown, Maximize2, Printer, Search, X } from "lucide-react";
 
 import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
@@ -78,6 +78,8 @@ export function LondonVenueSheets() {
   const [showAllSymbols, setShowAllSymbols] = useState(false);
   // A search result is ringed on the plan so it can actually be found.
   const [highlightRoom, setHighlightRoom] = useState<string | undefined>(undefined);
+  const [printing, setPrinting] = useState(false);
+  const [printNote, setPrintNote] = useState<string | undefined>(undefined);
 
   // The crew set a plan up once and come back to it, so the view settings and
   // room colours are kept in this browser rather than reset on every visit.
@@ -185,6 +187,58 @@ export function LondonVenueSheets() {
     keyLabelMap,
   ]);
 
+  /**
+   * One PDF of every floor, as each one currently reads — colours, room names,
+   * event use and division lockups all carried. A floor that cannot be rebuilt
+   * is carried as its issued sheet.
+   */
+  async function printAllFloorsPdf() {
+    setPrinting(true);
+    setPrintNote(undefined);
+    try {
+      const { exportQeiiFloorsPdf } = await import("@/lib/next-london-qeii-pdf");
+      const pages = LONDON_VENUE_SHEETS.map((s) => {
+        const state = qeiiPlanState(s.id);
+        if (state?.rebuilt) {
+          return {
+            title: s.title,
+            svg: qeiiPlanSvg(state.floor, {
+              face,
+              labelScale,
+              showLabels,
+              showUse,
+              showMarks,
+              markVariant,
+              markScale,
+              roomColours: roomColourMap[s.id] ?? {},
+              keyLabels: keyLabelMap[s.id] ?? {},
+              wallWeight,
+              showAllSymbols,
+            }),
+          };
+        }
+        return {
+          title: s.title,
+          imageUrl: s.url,
+          note: "Issued sheet — this floor is a placed picture in the issued design, so it is not rebuilt artwork.",
+        };
+      });
+      const result = await exportQeiiFloorsPdf(pages, face);
+      const lines = [`${result.pages} floor${result.pages === 1 ? "" : "s"} in ${result.filename}.`];
+      for (const s of result.skipped) lines.push(`${s.title} is missing: ${s.reason}`);
+      lines.push(...result.warnings);
+      setPrintNote(lines.join(" "));
+    } catch (err) {
+      setPrintNote(
+        err instanceof Error
+          ? `The PDF could not be made: ${err.message}`
+          : "The PDF could not be made.",
+      );
+    } finally {
+      setPrinting(false);
+    }
+  }
+
   function downloadPlanSvg() {
     if (!plan?.rebuilt) return;
     const svg = qeiiPlanSvg(plan.floor, {
@@ -233,8 +287,23 @@ export function LondonVenueSheets() {
             <FileDown className="h-4 w-4" /> All {VENUE_SHEET_PDF.pages} sheets (
             {VENUE_SHEET_PDF.paper} PDF)
           </button>
+          <button
+            type="button"
+            className={btn}
+            onClick={printAllFloorsPdf}
+            disabled={printing}
+          >
+            <Printer className="h-4 w-4" />
+            {printing ? "Making the PDF…" : "Print all floors (PDF)"}
+          </button>
         </div>
       </div>
+
+      {printNote ? (
+        <p className="mt-3 rounded-xl border border-black/10 bg-white px-3.5 py-2.5 text-[12.5px] leading-relaxed text-[#03002C]/80">
+          {printNote}
+        </p>
+      ) : null}
 
       <div className="mt-4 flex flex-wrap gap-2">
         {LONDON_VENUE_SHEETS.map((s) => (
