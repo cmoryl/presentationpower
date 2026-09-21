@@ -1,0 +1,256 @@
+// Colouring individual rooms on the natively rebuilt QEII floor plans.
+//
+// The issued artwork draws rooms as filled polygons. To colour one room we have
+// to know which polygon holds which name, so this module reads each shape's own
+// outline and works out, geometrically, which room name sits inside it. Nothing
+// is guessed: where the issued artwork draws several rooms as a single shape,
+// that is reported plainly rather than colouring the wrong space.
+//
+// Colours come from the approved palette only. Backgrounds stay solid brand
+// tokens — no artwork is used as a ground.
+
+import type { QeiiFloorVector, QeiiShape } from "@/lib/next-london-qeii-vectors";
+import { qeiiLabelGroups } from "@/lib/next-london-qeii-layout";
+import { spaceUsesForRoom } from "@/lib/next-london-space-use";
+
+/** Approved colours a room may be filled with. */
+export const QEII_ROOM_PALETTE = [
+  { id: "blue", label: "Blue 500", hex: "#003FC7" },
+  { id: "ink", label: "Blue 800", hex: "#03002C" },
+  { id: "aqua", label: "Aqua", hex: "#A1FBF9" },
+  { id: "lavender", label: "Lavender", hex: "#C2A3FF" },
+  { id: "yellow", label: "Yellow", hex: "#FFEB66" },
+  { id: "green", label: "Green", hex: "#A6FA87" },
+  { id: "peach", label: "Peach", hex: "#FF9B70" },
+  { id: "pink", label: "Pink", hex: "#EC388A" },
+  { id: "red", label: "Red", hex: "#E53D2E" },
+] as const;
+
+export type QeiiRoomColours = Record<string, string>;
+
+/** Luminance of a hex colour, 0–1. */
+function luminance(hex: string): number {
+  const v = hex.replace("#", "");
+  if (v.length !== 6) return 0.5;
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(v.slice(i, i + 2), 16) / 255);
+  return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+}
+
+/**
+ * Readable text colour over a filled room.
+ *
+ * Only the two approved text values are used: Blue 800 on a light fill, white on
+ * a dark one. A room fill never tints its own type.
+ */
+export function qeiiRoomTextInk(fill?: string): string {
+  if (!fill) return "#FFFFFF";
+  return luminance(fill) > 0.55 ? "#03002C" : "#FFFFFF";
+}
+
+type Ring = { pts: [number, number][] };
+
+/** Every closed outline in a path, in sheet units. */
+function rings(d: string): Ring[] {
+  const out: Ring[] = [];
+  let pts: [number, number][] = [];
+  const tokens = d.match(/[MLZ]|-?\d+(?:\.\d+)?/g) ?? [];
+  let i = 0;
+  while (i < tokens.length) {
+    const t = tokens[i]!;
+    if (t === "M" || t === "L") {
+      const x = Number(tokens[i + 1]);
+      const y = Number(tokens[i + 2]);
+      if (t === "M" && pts.length > 2) {
+        out.push({ pts });
+        pts = [];
+      }
+      if (Number.isFinite(x) && Number.isFinite(y)) pts.push([x, y]);
+      i += 3;
+      continue;
+    }
+    if (t === "Z") {
+      if (pts.length > 2) out.push({ pts });
+      pts = [];
+      i += 1;
+      continue;
+    }
+    i += 1;
+  }
+  if (pts.length > 2) out.push({ pts });
+  return out;
+}
+
+function ringArea(ring: Ring): number {
+  let a = 0;
+  for (let i = 0; i < ring.pts.length; i += 1) {
+    const [x1, y1] = ring.pts[i]!;
+    const [x2, y2] = ring.pts[(i + 1) % ring.pts.length]!;
+    a += x1 * y2 - x2 * y1;
+  }
+  return Math.abs(a) / 2;
+}
+
+function inRing(ring: Ring, x: number, y: number): boolean {
+  let hit = false;
+  for (let i = 0, j = ring.pts.length - 1; i < ring.pts.length; j = i, i += 1) {
+    const [xi, yi] = ring.pts[i]!;
+    const [xj, yj] = ring.pts[j]!;
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) hit = !hit;
+  }
+  return hit;
+}
+
+function shapeHolds(shape: QeiiShape, x: number, y: number): { held: boolean; area: number } {
+  if (!shape.fill) return { held: false, area: 0 };
+  const rs = rings(shape.d);
+  let held = false;
+  let area = 0;
+  for (const ring of rs) {
+    if (inRing(ring, x, y)) {
+      held = !held;
+      area = Math.max(area, ringArea(ring));
+    }
+  }
+  return { held, area };
+}
+
+export type QeiiRoomShape = {
+  room: string;
+  /** Index into floor.shapes of the polygon this room is drawn as. */
+  shapeIndex: number;
+  /** Other room names drawn inside the very same shape. */
+  sharedWith: string[];
+};
+
+/**
+ * Work out which drawn shape each room name sits inside.
+ *
+ * The smallest filled shape containing a name wins, so a room inside a larger
+ * block is matched to the room, not the block. A name with no shape under it —
+ * a corridor caption, an access note — is simply left out.
+ */
+export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
+  const names = qeiiLabelGroups(floor).map((g) => ({
+    room: g.labels.map((l) => l.text).join(" "),
+    x: g.x,
+    y: g.y,
+  }));
+  const matched: { room: string; shapeIndex: number }[] = [];
+  for (const name of names) {
+    let best: { index: number; area: number } | undefined;
+    floor.shapes.forEach((shape, index) => {
+      const { held, area } = shapeHolds(shape, name.x, name.y);
+      if (!held || area <= 0) return;
+      if (!best || area < best.area) best = { index, area };
+    });
+    if (best) matched.push({ room: name.room, shapeIndex: best.index });
+  }
+  return matched.map((m) => ({
+    room: m.room,
+    shapeIndex: m.shapeIndex,
+    sharedWith: matched
+      .filter((o) => o.shapeIndex === m.shapeIndex && o.room !== m.room)
+      .map((o) => o.room),
+  }));
+}
+
+/** Rooms that cannot be coloured on their own, in plain language. */
+export function qeiiSharedShapeNotes(floor: QeiiFloorVector): string[] {
+  const seen = new Set<number>();
+  const notes: string[] = [];
+  for (const entry of qeiiRoomShapes(floor)) {
+    if (!entry.sharedWith.length || seen.has(entry.shapeIndex)) continue;
+    seen.add(entry.shapeIndex);
+    notes.push(
+      `${[entry.room, ...entry.sharedWith].join(", ")} are drawn as one shape in the issued artwork, so they take a colour together.`,
+    );
+  }
+  return notes;
+}
+
+/** Shape index → fill, from a room-name → colour map. */
+export function qeiiShapeColours(
+  floor: QeiiFloorVector,
+  rooms: QeiiRoomColours,
+): Map<number, string> {
+  const out = new Map<number, string>();
+  for (const entry of qeiiRoomShapes(floor)) {
+    const hex = rooms[entry.room];
+    if (hex) out.set(entry.shapeIndex, hex);
+  }
+  return out;
+}
+
+/** Room name → fill, so a label can be set in a readable ink. */
+export function qeiiRoomFill(
+  floor: QeiiFloorVector,
+  rooms: QeiiRoomColours,
+  room: string,
+): string | undefined {
+  if (rooms[room]) return rooms[room];
+  // A room sharing its shape with a coloured neighbour is filled too.
+  const entry = qeiiRoomShapes(floor).find((e) => e.room === room);
+  if (!entry) return undefined;
+  for (const other of entry.sharedWith) if (rooms[other]) return rooms[other];
+  return undefined;
+}
+
+/** What a space holds, used by the by-function colour preset. */
+export function qeiiRoomFunction(room: string, sheetId: string): string | undefined {
+  const use = spaceUsesForRoom(room, sheetId)[0];
+  return use?.fn;
+}
+
+/** Approved colour per recorded function, for a one-click starting point. */
+export const QEII_FUNCTION_COLOURS: Record<string, string> = {
+  Plenary: "#003FC7",
+  "Keynote Room": "#C2A3FF",
+  Breakout: "#A1FBF9",
+  Foyer: "#FFEB66",
+  "Meeting Room": "#A6FA87",
+  Mart: "#FF9B70",
+  Café: "#EC388A",
+  Registration: "#E53D2E",
+};
+
+/** Colour every recorded space by what it holds. */
+export function qeiiColourByFunction(floor: QeiiFloorVector): QeiiRoomColours {
+  const out: QeiiRoomColours = {};
+  for (const entry of qeiiRoomShapes(floor)) {
+    const fn = qeiiRoomFunction(entry.room, floor.id);
+    const hex = fn ? QEII_FUNCTION_COLOURS[fn] : undefined;
+    if (hex) out[entry.room] = hex;
+  }
+  return out;
+}
+
+export type QeiiKeyEntry = { hex: string; label: string; rooms: string[] };
+
+/**
+ * The colour key for a plan: one row per colour in use, with the rooms it marks.
+ *
+ * A saved label overrides the default; the default is the recorded function when
+ * every room on that colour shares one, otherwise the room names themselves.
+ */
+export function qeiiColourKey(
+  floor: QeiiFloorVector,
+  rooms: QeiiRoomColours,
+  labels: Record<string, string> = {},
+): QeiiKeyEntry[] {
+  const byHex = new Map<string, string[]>();
+  for (const [room, hex] of Object.entries(rooms)) {
+    byHex.set(hex, [...(byHex.get(hex) ?? []), room]);
+  }
+  const order = QEII_ROOM_PALETTE.map((p) => p.hex);
+  return [...byHex.entries()]
+    .sort((a, b) => order.indexOf(a[0]) - order.indexOf(b[0]))
+    .map(([hex, list]) => {
+      const fns = new Set(list.map((r) => qeiiRoomFunction(r, floor.id) ?? ""));
+      const only = fns.size === 1 ? [...fns][0] : "";
+      return {
+        hex,
+        label: labels[hex]?.trim() || only || list.slice().sort().join(", "),
+        rooms: list.slice().sort(),
+      };
+    });
+}
