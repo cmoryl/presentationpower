@@ -94,6 +94,15 @@ export function BrandLockup({
 }) {
   // `u()` formats a template px value in the caller's unit system.
   const u = (px: number): string | number => (unit ? unit(px) : px);
+  // ---- LOGO PLACEMENT MATRIX -------------------------------------------
+  // Every lockup tags itself with the orientation and tone it actually
+  // painted, so the brand-health pre-flight can measure clear space, minimum
+  // size and whether the tone matches the ground it sits on.
+  const lockupAttrs = (o: "horizontal" | "stacked" | "mark-only", tone: string) => ({
+    "data-brand-lockup": "",
+    "data-lockup-orientation": o,
+    "data-lockup-tone": tone,
+  });
   // ---- RESPONSIVE LOGO CLAMPS -------------------------------------------
   // Only container-scaled callers (those passing `unit`) sit inside a
   // [container-type:inline-size] page/card, so cqw is meaningful there.
