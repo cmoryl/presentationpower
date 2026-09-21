@@ -188,6 +188,7 @@ export function LinkedInBannerStudio() {
                 Array.from(document.querySelectorAll<HTMLElement>("[data-brand-health-root]"))
               }
               surfaceLabel="this banner"
+              medium="social"
             />
             <button
               type="button"
