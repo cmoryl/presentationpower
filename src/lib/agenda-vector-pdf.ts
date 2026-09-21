@@ -41,7 +41,7 @@ import {
 import { applyPdfX4, type PdfX4Applied } from "./pdf-x4-vector";
 import { resolveAssetUrl } from "./asset-base-url";
 import { registerGradientPattern, type ShadingStop } from "./pdf-analytic-shading";
-import { extractSvgPaths } from "./pillar-vector-pdf";
+import { extractSvgShapes, type SvgShape } from "./pillar-vector-pdf";
 import { buildPillarQr } from "./pillar-qr";
 import { logoInkBox, logoInkPlacement } from "./next-logo-ink";
 import { qrStructuralModule } from "./qr-print";
