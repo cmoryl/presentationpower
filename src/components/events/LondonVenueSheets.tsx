@@ -75,8 +75,17 @@ function download(url: string, filename: string) {
   a.remove();
 }
 
-export function LondonVenueSheets() {
-  const [sheetId, setSheetId] = useState(LONDON_VENUE_SHEETS[0]!.id);
+export type LondonVenueSheetsProps = {
+  /** Floor to open on, e.g. arriving from the room schedule. */
+  initialSheetId?: string;
+  /** Room to ring on that floor, e.g. arriving from the room schedule. */
+  initialRoom?: string;
+};
+
+export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSheetsProps = {}) {
+  const [sheetId, setSheetId] = useState(
+    LONDON_VENUE_SHEETS.find((s) => s.id === initialSheetId)?.id ?? LONDON_VENUE_SHEETS[0]!.id,
+  );
   const [query, setQuery] = useState("");
   const [zoom, setZoom] = useState(false);
   const [rebuiltView, setRebuiltView] = useState(true);
