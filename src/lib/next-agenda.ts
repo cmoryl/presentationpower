@@ -1225,9 +1225,9 @@ export function agendaMergeSimultaneous(
   const host = sessions[keepAt];
   if (!host) return { sessions: [...sessions], merged: 0, leftInPlace: 0 };
   const existing = agendaParallels(host);
-  const room = 
-    AGENDA_MAX_PARALLEL - existing.length;
-  const folding = order.slice(1, 1 + Math.max(0, room));
+  const spare = AGENDA_MAX_PARALLEL - existing.length;
+  const folding = order.slice(1, 1 + Math.max(0, spare));
+
   const leftInPlace = order.length - 1 - folding.length;
   const added: AgendaParallel[] = folding.map((idx) => {
     const s = sessions[idx]!;
