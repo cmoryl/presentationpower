@@ -11,6 +11,8 @@ import {
   QEII_ROOM_PALETTE,
   qeiiColourByFunction,
   qeiiColourKey,
+  qeiiRoomDivisionAccent,
+  qeiiRoomDivisionName,
   qeiiRoomFunction,
   qeiiRoomIsExclusive,
   qeiiRoomShapes,
@@ -24,6 +26,8 @@ export type QeiiRoomColourPanelProps = {
   onColours: (next: QeiiRoomColours) => void;
   keyLabels: Record<string, string>;
   onKeyLabels: (next: Record<string, string>) => void;
+  /** Fill every room with its division's accent and switch the lockups to all white. */
+  onColourByDivision?: () => void;
 };
 
 export function QeiiRoomColourPanel({
@@ -32,6 +36,7 @@ export function QeiiRoomColourPanel({
   onColours,
   keyLabels,
   onKeyLabels,
+  onColourByDivision,
 }: QeiiRoomColourPanelProps) {
   const rooms = useMemo(() => qeiiRoomShapes(floor), [floor]);
   const keyRows = useMemo(() => qeiiColourKey(floor, colours, keyLabels), [floor, colours, keyLabels]);
