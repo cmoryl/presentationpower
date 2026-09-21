@@ -16,5 +16,4 @@
 - [x] Innovation Lounge agenda board + product write-ups under the schedule
 - [ ] Division accent on agenda day headings + left time rails (screen + PDF/AI/DOCX/PPTX)
 - [ ] Innovation Lounge extra info from Canva file canva.link/0qp10ba0b4r6poq
-- [ ] GlobalLink Universe ecosystem component on /knowledge/brand-guides/globallink
 - [ ] Enrich brand guides with BrandHub division profiles (GlobalLink, Dataforce, Life Sciences, master identity): photography, type scale, colour accessibility, core values — no Canva audits, no BoothHUB
