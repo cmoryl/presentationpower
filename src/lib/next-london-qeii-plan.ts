@@ -52,6 +52,13 @@ export type QeiiPlanOptions = {
   /** Multiplies the issued label size; 1 keeps the venue's own typesetting. */
   labelScale?: number;
   showLabels?: boolean;
+  /**
+   * Draw the room names, use lines and key wording as text. False keeps the
+   * artwork — colour tags, lockups, swatches — and leaves the words out, so an
+   * export can lay its own editable text over the picture in exactly the places
+   * the plan sets them.
+   */
+  showText?: boolean;
   /** Print what the space holds at NEXT 2026 London beneath each room name. */
   showUse?: boolean;
   /** Print the division's NEXT lockup above a room its area holds. */
