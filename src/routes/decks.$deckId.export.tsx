@@ -23,6 +23,7 @@ import { gateQaIssues, isApprovedDemo } from "@/lib/demo-approved";
 import type { GeometryRepairReport } from "@/lib/canvas-repair-report";
 import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
 import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
+import { PrintProofMenu } from "@/components/export/PrintProofMenu";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 import { auditExportCoverage, type ExportCoverageReport } from "@/lib/export-coverage";
