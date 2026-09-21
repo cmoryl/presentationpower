@@ -1074,7 +1074,8 @@ export async function buildAgendaDocx(
         ? para(
             run(cfg.pageLabel ?? "", {
               size: halfPt(PL.footSize),
-              color: inkHex,
+              // Footer ink, not body ink — white on the dark boards.
+              color: chromeHex,
               caps: true,
               bold: true,
               spacing: 30,
