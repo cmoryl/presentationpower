@@ -61,11 +61,21 @@ export async function inlineSvgImages(
   for (const url of new Set(urls)) {
     if (url.startsWith("data:")) continue;
     if (!cache.has(url)) {
-      try {
-        cache.set(url, await fetchDataUrl(url));
-      } catch {
-        cache.set(url, null);
+      // The plan links a lockup by its full site URL so a handed-on SVG still
+      // finds it. Inside this app the same file sits on our own origin, which is
+      // the only place a browser will let us read the bytes from.
+      const candidates = [url];
+      if (url.startsWith(NEXT_APP_ORIGIN)) candidates.unshift(url.slice(NEXT_APP_ORIGIN.length));
+      let data: string | null = null;
+      for (const candidate of candidates) {
+        try {
+          data = await fetchDataUrl(candidate);
+          break;
+        } catch {
+          // Try the next candidate; a total failure is reported below.
+        }
       }
+      cache.set(url, data);
     }
     const data = cache.get(url);
     if (data) {
