@@ -149,6 +149,7 @@ import { resolveDivisionBrief } from "@/lib/library-preview";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
 import { gateQaIssues } from "@/lib/demo-approved";
 import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
+import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { QaAiCopyFixButton } from "@/components/deck/QaAiCopyFixButton";
 import { RelatedModulesPanel } from "@/components/deck/RelatedModulesPanel";
 
@@ -580,6 +581,15 @@ function DeckEditor() {
               }
               status={
                 <div className="flex flex-wrap items-center gap-3 text-[11px] text-black/50">
+                  <BrandHealthBadge
+                    getRoots={() =>
+                      Array.from(
+                        document.querySelectorAll<HTMLElement>("[data-slide-stage]"),
+                      )
+                    }
+                    divisionId={deck.brandModeId ?? null}
+                    surfaceLabel="the slides on screen"
+                  />
                   <SaveDeckToMyFilesButton deckId={deckId} />
                   <SaveDeckButton deckId={deckId} />
                   <AutosaveIndicator deckId={deckId} />
