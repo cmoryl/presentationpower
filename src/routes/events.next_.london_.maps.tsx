@@ -28,6 +28,7 @@ import { AppShell } from "@/components/AppShell";
 import { LondonFloorMap, londonKindsPresent } from "@/components/events/LondonFloorMap";
 import { BoothHub3DViewer } from "@/components/events/BoothHub3DViewer";
 import { LondonRoomAccordion } from "@/components/events/LondonRoomAccordion";
+import { LondonVenueSheets } from "@/components/events/LondonVenueSheets";
 import { boothHubDivisionFor } from "@/lib/boothhub-3d";
 
 import { LondonMapDesignPanel } from "@/components/events/LondonMapDesignPanel";
@@ -641,6 +642,8 @@ function LondonMapsPage() {
             </p>
           </div>
         </header>
+
+        <LondonVenueSheets />
 
         {/* Floor picker */}
         <section className="mt-9">
