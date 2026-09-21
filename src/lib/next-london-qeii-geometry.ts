@@ -144,6 +144,9 @@ export function qeiiObjectBoxes(shapes: QeiiShape[], planArea: number): QeiiRect
   const limit = planArea * QEII_OBJECT_AREA_SHARE;
   const out: QeiiRect[] = [];
   for (const shape of shapes) {
+    // Only drawn objects count: a filled glyph or marker. Stroked wall runs are
+    // the room's own outline, and a caption is allowed to sit against one.
+    if (!shape.fill) continue;
     for (const ring of qeiiRings(shape.d)) {
       const box = qeiiRingBox(ring);
       const w = box.x1 - box.x0;
