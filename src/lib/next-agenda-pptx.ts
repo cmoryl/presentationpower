@@ -36,6 +36,7 @@ import {
   agendaQrTransparent,
   agendaRowStyle,
   agendaSessionMark,
+  agendaParallelRoom,
   agendaSessionRoom,
 
   agendaSlug,
@@ -651,6 +652,10 @@ export async function buildAgendaPptx(
               title: copy.title,
               speaker: copy.speaker,
               detail: copy.detail,
+              // Each simultaneous card names its own room, so a slot running in
+              // two places at once is never ambiguous in print.
+              room: agendaParallelRoom(copy),
+
             },
             BAND.parallelInk,
             agendaCardType(L, par.w, r.parallels.length, agendaLongestWord(copy.title)),

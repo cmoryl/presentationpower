@@ -13,6 +13,7 @@ import {
   agendaLongestWord,
   agendaParallels,
   agendaSessionMark,
+  agendaParallelRoom,
   agendaSessionRoom,
 
 
@@ -138,7 +139,14 @@ export type AgendaSheetEdit = {
   onParallel: (
     index: number,
     track: number,
-    patch: Partial<{ time: string; title: string; speaker: string; detail: string }>,
+    patch: Partial<{
+      time: string;
+      title: string;
+      speaker: string;
+      detail: string;
+      room: string;
+    }>,
+
   ) => void;
 };
 
@@ -601,6 +609,25 @@ export function AgendaSheet({
                       {T(par.speaker ?? "", (v) => edit?.onParallel(i, n, { speaker: v }), true)}
                     </div>
                   ) : null}
+                  {agendaParallelRoom(par) ? (
+                    <div
+                      style={{
+                        fontSize: mm(ct.detailSize * row.fit),
+                        fontWeight: 700,
+                        letterSpacing: "0.06em",
+                        lineHeight: 1.4,
+                        marginTop: mm(ct.detailSize * 0.5 * row.fit),
+                        paddingRight: mm(ct.pinW),
+                      }}
+                    >
+                      {T(
+                        agendaParallelRoom(par).toUpperCase(),
+                        (v) => edit?.onParallel(i, n, { room: v }),
+                        true,
+                      )}
+                    </div>
+                  ) : null}
+
                   {par.detail.trim() ? (
                     <div
                       style={{

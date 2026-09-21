@@ -45,6 +45,7 @@ import {
   agendaQrTransparent,
   agendaRowStyle,
   agendaSessionMark,
+  agendaParallelRoom,
   agendaSessionRoom,
 
   agendaStops,
@@ -681,6 +682,9 @@ export async function buildAgendaDocx(
           speaker = "",
           /** Fitted card sizes; the main band keeps its own type. */
           T: { titleSize: number; detailSize: number } = cardBodyType,
+          /** Room / floor for a simultaneous card, printed in caps. */
+          room = "",
+
         ) =>
           [
             para(
@@ -700,6 +704,21 @@ export async function buildAgendaDocx(
                   lineTwips: mmT(T.detailSize * 1.4),
                 })
               : "",
+            room.trim()
+              ? para(
+                  run(room.trim().toUpperCase(), {
+                    size: halfPt(T.detailSize),
+                    color: copyInk,
+                    bold: true,
+                  }),
+                  {
+                    beforeTwips: mmT(T.detailSize * 0.3),
+                    afterTwips: 0,
+                    lineTwips: mmT(T.detailSize * 1.4),
+                  },
+                )
+              : "",
+
             detail.trim()
               ? para(run(detail, { size: halfPt(T.detailSize), color: copyInk }), {
                   beforeTwips: mmT(T.detailSize * 0.35),
@@ -782,7 +801,8 @@ export async function buildAgendaDocx(
                     bold: true,
                   }),
                   { afterTwips: 0, lineTwips: mmT(cardParType.timeSize * 1.4) },
-                ) + copy(p.title, p.detail, parInk, p.speaker ?? "", cardParType),
+                ) +
+                  copy(p.title, p.detail, parInk, p.speaker ?? "", cardParType, agendaParallelRoom(p)),
                 rowPad,
                 {
                   fill: parFill,
