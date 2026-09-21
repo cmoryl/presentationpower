@@ -222,13 +222,18 @@ export function martTotalPanels(): number {
  * 04_ICON, 05_TYPE, 07_CUT-CONTOUR (magenta spot path for the cutter).
  * ------------------------------------------------------------------------- */
 
-import artTravelRight from "@/assets/next-mart/02_TRAVEL_pack-light-travel-right.svg.asset.json";
-import artTravelPro from "@/assets/next-mart/02b_TRAVEL_pack-like-a-pro.svg.asset.json";
-import artTechToGo from "@/assets/next-mart/03_TECH_tech-to-go.svg.asset.json";
-import artPowerUp from "@/assets/next-mart/03b_TECH_power-up-and-go.svg.asset.json";
-import artHydrated from "@/assets/next-mart/04_WATER_keep-hydrated.svg.asset.json";
-import artLocalLegends from "@/assets/next-mart/06_LOCAL_local-legends.svg.asset.json";
-import artTravelRightOutlined from "@/assets/next-mart/02_TRAVEL_pack-light-travel-right-outlined.svg.asset.json";
+// Live London 2026 mart signage (NextMartsigns_2026_london.ai, issued Sept 2026).
+// Each sign below is one page of that Illustrator file, carried as outlined
+// vector paths so the browser preview and the layered masters agree.
+import artTravelRight from "@/assets/next-mart/02_TRAVEL_pack-light-travel-right_london2026.svg.asset.json";
+import artTravelPro from "@/assets/next-mart/02b_TRAVEL_pack-like-a-pro_london2026.svg.asset.json";
+import artTechToGo from "@/assets/next-mart/03_TECH_tech-to-go_london2026.svg.asset.json";
+import artPowerUp from "@/assets/next-mart/03b_TECH_feel-the-power_london2026.svg.asset.json";
+import artHydrated from "@/assets/next-mart/04_WATER_hydration-fixation_london2026.svg.asset.json";
+import artLayerUp from "@/assets/next-mart/05_LAYERS_layer-up-show-up_london2026.svg.asset.json";
+import artLocalLegends from "@/assets/next-mart/06_LOCAL_local-legends_london2026.svg.asset.json";
+import artShapeSet from "@/assets/next-mart/00_SHAPES_next-mart-shape-set_london2026.svg.asset.json";
+
 
 /* ---------------------------------------------------------------------------
  * NEXT MART lockup — supplied master logo (colour gradient + reversed white).
