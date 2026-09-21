@@ -5,6 +5,8 @@
 // it holds. Nothing here is inferred — a space with no function recorded reads
 // as not recorded rather than being guessed.
 
+import { nextLockupSuite } from "@/lib/next-event-logos";
+
 export type SpaceUse = {
   /** The space exactly as written on the schedule. */
   space: string;
@@ -240,4 +242,64 @@ export function spaceUseLine(room: string, sheetId?: string): string | undefined
 /** True when the schedule left this space's function blank. */
 export function spaceFunctionMissing(use: SpaceUse): boolean {
   return !use.fn;
+}
+
+// ---------------------------------------------------------------------------
+// Division marks on the plans. The event column names the division area that
+// holds the space, so the approved NEXT lockup for that division can print
+// beside the room. Only the divisions actually named get a mark — a house space
+// (the café, the war room, Optimize meeting rooms) has no division lockup, and
+// none is invented for it.
+// ---------------------------------------------------------------------------
+
+/** Event text → NEXT division id. Longest names first so "GlobalLink NEXT" is not
+ *  read as plain GlobalLink and "LifeSciencesNEXT" is not missed. */
+const EVENT_DIVISION: [needle: string, divisionId: string][] = [
+  ["transperfect next", "transperfect"],
+  ["globallink", "globallink"],
+  ["legalnext", "legal"],
+  ["gamesnext", "games"],
+  ["medianext", "media"],
+  ["digitalnext", "digital"],
+  ["experiencenext", "experience"],
+  ["financenext", "finance"],
+  ["learnnext", "learn"],
+  ["dataforcenext", "dataforce"],
+  ["lifesci", "lifesci"],
+];
+
+/** The NEXT division whose area holds this space, or undefined for a house space. */
+export function spaceUseDivisionId(use: SpaceUse): string | undefined {
+  const hay = use.event.toLowerCase();
+  return EVENT_DIVISION.find(([needle]) => hay.includes(needle))?.[1];
+}
+
+export type SpaceUseMark = {
+  divisionId: string;
+  /** Division name as recorded in the NEXT division list. */
+  name: string;
+  /** Stacked lockup file for a light ground. */
+  url: string;
+  /** Approved lockup aspect ratio (width / height). */
+  ratio: number;
+};
+
+/** Division lockups to print beside a room, in schedule order, deduplicated.
+ *  Empty where the schedule records no division area for the room. */
+export function spaceUseMarks(room: string, sheetId?: string): SpaceUseMark[] {
+  const marks: SpaceUseMark[] = [];
+  for (const use of spaceUsesForRoom(room, sheetId)) {
+    const divisionId = spaceUseDivisionId(use);
+    if (!divisionId || marks.some((m) => m.divisionId === divisionId)) continue;
+    const suite = nextLockupSuite(divisionId);
+    const art = suite?.stacked.url ? suite.stacked : undefined;
+    if (!art) continue;
+    marks.push({
+      divisionId,
+      name: suite?.trackName ?? divisionId,
+      url: art.url,
+      ratio: art.ratio || 1.7,
+    });
+  }
+  return marks;
 }
