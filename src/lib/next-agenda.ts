@@ -1121,8 +1121,132 @@ export function agendaParallels(
       title: p.title ?? "",
       speaker: p.speaker ?? "",
       detail: p.detail ?? "",
+      room: p.room ?? "",
     }));
 }
+
+/** Room line for a simultaneous card. Empty when no room has been typed in. */
+export function agendaParallelRoom(par: Pick<AgendaParallel, "room"> | null | undefined): string {
+  return (par?.room ?? "").trim();
+}
+
+/**
+ * Start / end of a time label, in minutes from midnight. Handles "3:00-3:50 PM",
+ * "11:30 AM-1:30 PM", "4:15 PM" and 24h "14:00-15:00". Free text returns null,
+ * so a label the board cannot read is never treated as an overlap.
+ */
+export function agendaTimeSpan(label: string | null | undefined): {
+  start: number;
+  end: number;
+} | null {
+  const raw = (label ?? "").trim();
+  if (!raw) return null;
+  const parts = raw.split(/\s*(?:–|—|-|to)\s*/i).filter((p) => p.trim().length > 0);
+  if (!parts.length) return null;
+  const tail = parts[parts.length - 1] ?? "";
+  const tailMeridiem = /([ap])\.?m\.?/i.exec(tail)?.[1]?.toLowerCase() ?? null;
+  const read = (token: string, fallbackMeridiem: string | null): number | null => {
+    const m = /^(\d{1,2})(?::(\d{2}))?\s*(?:([ap])\.?m\.?)?$/i.exec(token.trim());
+    if (!m) return null;
+    let h = Number(m[1]);
+    const min = Number(m[2] ?? "0");
+    if (!Number.isFinite(h) || h > 24 || min > 59) return null;
+    const mer = (m[3] ?? fallbackMeridiem)?.toLowerCase() ?? null;
+    if (mer === "p" && h < 12) h += 12;
+    if (mer === "a" && h === 12) h = 0;
+    return h * 60 + min;
+  };
+  const start = read(parts[0] ?? "", tailMeridiem);
+  if (start === null) return null;
+  if (parts.length === 1) return { start, end: start };
+  let end = read(tail, tailMeridiem);
+  if (end === null) return { start, end: start };
+  // "11:30 AM-1:30 PM": the trailing meridiem belongs to the end only, so when
+  // borrowing it runs the range backwards the start keeps its own half of the day.
+  if (end < start) {
+    const startOwn = read(parts[0] ?? "", null);
+    if (startOwn !== null && startOwn <= end) return { start: startOwn, end };
+    end = start;
+  }
+  return { start, end };
+}
+
+/**
+ * True when two time labels describe sessions running at the same time. Back to
+ * back (one ends exactly as the next starts) is not simultaneous.
+ */
+export function agendaTimesOverlap(a: string | null | undefined, b: string | null | undefined): boolean {
+  const x = agendaTimeSpan(a);
+  const y = agendaTimeSpan(b);
+  if (!x || !y) return false;
+  // A point in time (no end) counts as simultaneous with the span it sits in.
+  if (x.start === x.end) return x.start >= y.start && x.start < Math.max(y.end, y.start + 1);
+  if (y.start === y.end) return y.start >= x.start && y.start < Math.max(x.end, x.start + 1);
+  return x.start < y.end && y.start < x.end;
+}
+
+/**
+ * Groups of row indexes that run at the same time as ordinary stacked rows.
+ * Day breaks, muted rows (breaks, lunch) and untitled rows are ignored.
+ */
+export function agendaSimultaneousGroups(
+  sessions: readonly AgendaSession[] | null | undefined,
+): number[][] {
+  const rows = (sessions ?? []).map((s, i) => ({ s, i }));
+  const live = rows.filter(
+    ({ s }) => !s.dayBreak && !s.muted && (s.title ?? "").trim().length > 0,
+  );
+  const seen = new Set<number>();
+  const groups: number[][] = [];
+  for (const row of live) {
+    if (seen.has(row.i)) continue;
+    const group = live.filter(
+      (other) => other.i === row.i || agendaTimesOverlap(row.s.time, other.s.time),
+    );
+    if (group.length < 2) continue;
+    group.forEach((g) => seen.add(g.i));
+    groups.push(group.map((g) => g.i));
+  }
+  return groups;
+}
+
+/**
+ * Folds simultaneous rows into one slot: the first keeps the band, the rest
+ * become side-by-side cards carrying their own room. Rows beyond the card limit
+ * are left where they are rather than dropped.
+ */
+export function agendaMergeSimultaneous(
+  sessions: readonly AgendaSession[],
+  group: readonly number[],
+): { sessions: AgendaSession[]; merged: number; leftInPlace: number } {
+  const order = [...group].sort((a, b) => a - b);
+  const keepAt = order[0];
+  if (keepAt === undefined) return { sessions: [...sessions], merged: 0, leftInPlace: 0 };
+  const host = sessions[keepAt];
+  if (!host) return { sessions: [...sessions], merged: 0, leftInPlace: 0 };
+  const existing = agendaParallels(host);
+  const room = 
+    AGENDA_MAX_PARALLEL - existing.length;
+  const folding = order.slice(1, 1 + Math.max(0, room));
+  const leftInPlace = order.length - 1 - folding.length;
+  const added: AgendaParallel[] = folding.map((idx) => {
+    const s = sessions[idx]!;
+    return {
+      time: s.time ?? "",
+      title: s.title ?? "",
+      speaker: "",
+      detail: s.detail ?? "",
+      room: agendaSessionRoom(s),
+    };
+  });
+  const next = sessions
+    .map((s, i) =>
+      i === keepAt ? { ...s, parallels: [...existing, ...added], parallel: null } : s,
+    )
+    .filter((_, i) => !folding.includes(i));
+  return { sessions: next, merged: added.length, leftInPlace };
+}
+
 
 /** One programme day. Multi-day agendas hold an ordered list of these. */
 export type AgendaDay = {
