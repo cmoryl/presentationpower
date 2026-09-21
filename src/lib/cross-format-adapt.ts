@@ -316,7 +316,7 @@ export function contentFromPrint(content: Record<string, unknown>): AdaptContent
   const challenge = pick(content, ["challenge", "problem"]);
   const approach = pick(content, ["approach", "solution"]);
   const result = pick(content, ["result", "results", "outcome"]);
-  const body = base.body ?? [challenge, approach, result].filter(Boolean).join(" ") || undefined;
+  const body = base.body ?? ([challenge, approach, result].filter(Boolean).join(" ") || undefined);
   return { ...base, body };
 }
 
