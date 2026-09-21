@@ -6,7 +6,22 @@
 // PDF, unchanged.
 
 import { useEffect, useMemo, useState } from "react";
-import { Download, FileDown, Maximize2, Printer, Search, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Download, FileDown, Maximize2, Pencil, Printer, Save, Search, X } from "lucide-react";
+
+import { useSessionUser } from "@/hooks/use-session-user";
+import { QeiiMapEditPanel } from "@/components/events/QeiiMapEditPanel";
+import {
+  EMPTY_QEII_MAP_EDITS,
+  qeiiApplyRoomEdit,
+  qeiiMapEditsEmpty,
+  type QeiiMapEdits,
+} from "@/lib/qeii-map-edits";
+import {
+  listVenueMapEdits,
+  resetVenueMapEdits,
+  saveVenueMapEdits,
+} from "@/lib/qeii-map-edits.functions";
 
 import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
@@ -48,6 +63,9 @@ const btn =
 
 const VIEW_STORAGE_KEY = "tp-element:qeii-plan-view:v1";
 
+/** The venue these saved map edits belong to. */
+const VENUE_SLUG = "next-2026-london";
+
 function download(url: string, filename: string) {
   const a = document.createElement("a");
   a.href = url;
@@ -80,6 +98,19 @@ export function LondonVenueSheets() {
   const [highlightRoom, setHighlightRoom] = useState<string | undefined>(undefined);
   const [printing, setPrinting] = useState(false);
   const [printNote, setPrintNote] = useState<string | undefined>(undefined);
+  // Live editing: room names, the line beneath them and nudged positions, saved
+  // for the whole crew rather than kept in one browser.
+  const [editsMap, setEditsMap] = useState<Record<string, QeiiMapEdits>>({});
+  const [savedAt, setSavedAt] = useState<Record<string, string | null>>({});
+  const [editMode, setEditMode] = useState(false);
+  const [picked, setPicked] = useState<string | undefined>(undefined);
+  const [saving, setSaving] = useState(false);
+  const [saveNote, setSaveNote] = useState<string | undefined>(undefined);
+  const [dirty, setDirty] = useState<Record<string, boolean>>({});
+  const userId = useSessionUser();
+  const readEdits = useServerFn(listVenueMapEdits);
+  const writeEdits = useServerFn(saveVenueMapEdits);
+  const clearEdits = useServerFn(resetVenueMapEdits);
 
   // The crew set a plan up once and come back to it, so the view settings and
   // room colours are kept in this browser rather than reset on every visit.
@@ -116,6 +147,47 @@ export function LondonVenueSheets() {
     }
   }, []);
 
+
+  // Saved edits are read for everyone, signed in or not, so a vendor opening the
+  // link sees the same corrected plans the crew saved.
+  useEffect(() => {
+    let active = true;
+    readEdits({ data: { venueSlug: VENUE_SLUG } })
+      .then((res) => {
+        if (!active) return;
+        const next: Record<string, QeiiMapEdits> = {};
+        const when: Record<string, string | null> = {};
+        for (const floor of res.floors) {
+          next[floor.floorId] = floor.edits;
+          when[floor.floorId] = floor.updatedAt;
+        }
+        setEditsMap(next);
+        setSavedAt(when);
+        // A saved colour set is the crew's, so it outranks this browser's copy.
+        setRoomColourMap((prev) => {
+          const merged = { ...prev };
+          for (const floor of res.floors) {
+            if (Object.keys(floor.edits.colours).length) merged[floor.floorId] = floor.edits.colours;
+          }
+          return merged;
+        });
+        setKeyLabelMap((prev) => {
+          const merged = { ...prev };
+          for (const floor of res.floors) {
+            if (Object.keys(floor.edits.keyLabels).length)
+              merged[floor.floorId] = floor.edits.keyLabels;
+          }
+          return merged;
+        });
+      })
+      .catch(() => {
+        // Saved edits could not be read; the issued plans stand and the page works.
+        if (active) setSaveNote("Saved map edits could not be read just now, so these plans are the issued ones.");
+      });
+    return () => {
+      active = false;
+    };
+  }, [readEdits]);
 
   const rows = useMemo(() => venueRoomDirectory(), []);
   const found = useMemo(() => {
