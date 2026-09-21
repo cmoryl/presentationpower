@@ -1,6 +1,7 @@
 // NEXT MART artwork — editable slots plus an importer.
 //
-// The six supplied London masters stay the shipped reference. This store lets a
+// The seven signs issued in NextMartsigns_2026_london.ai stay the shipped
+// reference. This store lets a
 // producer edit every field on any slot, drop a replacement file (upload or
 // link) onto an existing slot, or register a brand-new slot for a design that
 // arrives later. Everything downstream — previews, placed artwork on the live
