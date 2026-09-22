@@ -1835,9 +1835,11 @@ export function agendaFileIsLive(config: {
 
 
 
-export function agendaDefault(divisionId = "city-series"): AgendaConfig {
+export function agendaDefault(divisionId = "city-series", edition?: string): AgendaConfig {
   const div = agendaDivision(divisionId);
-  const programme = agendaProgramme(div.id);
+  const programme =
+    edition === SF_AGENDA_EDITION ? sfProgramme(div.id) : agendaProgramme(div.id);
+
   return {
     divisionId: div.id,
     // House agenda ground: Bloom Corner on the dark face, so every division
