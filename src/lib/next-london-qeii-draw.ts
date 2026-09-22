@@ -9,7 +9,7 @@
 // -----------------------------------------------------------------------------
 
 import { qeiiCellsByShape, qeiiColourPaint } from "@/lib/next-london-qeii-rooms";
-import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
+import { qeiiRepeatedSymbolShapes, qeiiWallGain, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import { qeiiPlanInk, type QeiiPlanOptions } from "@/lib/next-london-qeii-plan";
 import { qeiiLookWallWeight, qeiiStyledPaint } from "@/lib/next-london-qeii-style";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";

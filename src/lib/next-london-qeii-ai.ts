@@ -23,7 +23,7 @@ import {
   qeiiColourPaint,
   qeiiRoomTextInk,
 } from "@/lib/next-london-qeii-rooms";
-import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
+import { qeiiRepeatedSymbolShapes, qeiiWallGain, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import {
   QEII_PLAN_TOKENS,
   qeiiGroundInk,

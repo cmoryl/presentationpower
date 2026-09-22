@@ -24,7 +24,7 @@ import {
   qeiiStyledPaint,
 } from "@/lib/next-london-qeii-style";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
-import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
+import { qeiiRepeatedSymbolShapes, qeiiWallGain, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import {
   qeiiColourKey,
   qeiiCellsByShape,
