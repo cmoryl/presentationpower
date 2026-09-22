@@ -51,7 +51,11 @@ const FLOORS: QeiiFloorVector[] = LONDON_VENUE_SHEETS.map((s) => qeiiPlanState(s
 function copyOf(floor: QeiiFloorVector) {
   const layout = qeiiPlanLayout(floor, { showUse: true, showMarks: true });
   const names = layout.blocks.flatMap((b) => b.lines);
-  const uses = layout.blocks.map((b) => b.use).filter((u): u is string => Boolean(u));
+  // The event line prints as the rows the layout set it on — a long line in a
+  // narrow slot is broken over its own words, so grade the rows, not the whole line.
+  const uses = layout.blocks.flatMap((b) =>
+    b.useLines.length ? b.useLines : b.use ? [b.use] : [],
+  );
   const key = qeiiColourKey(floor, {}, {}).map((r) => r.label);
   return { names, uses, key, lines: [...names, ...uses, ...key] };
 }

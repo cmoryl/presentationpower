@@ -74,6 +74,11 @@ export type QeiiLayoutBlock = {
   lines: string[];
   /** What the space holds at the event, or undefined when it is not printed. */
   use?: string;
+  /**
+   * The event line as it prints, one entry per row. A long line in a narrow slot
+   * is broken over its own words rather than printed wider than the room.
+   */
+  useLines: string[];
   useSize: number;
   marks: SpaceUseMark[];
   markH: number;
@@ -261,6 +266,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     type Fit = {
       variant: Variant;
       lines: string[];
+      useLines: string[];
       box: QeiiBox;
       size: number;
       useSize: number;
@@ -276,6 +282,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       dy = 0,
       markFactor = 1,
       ls: string[] = lines,
+      us: string[] = variant.use ? [variant.use] : [],
     ): Fit => {
       const useSize =
         Math.round(Math.min(size * 0.92, Math.max(size * QEII_USE_RATIO, minSize)) * 100) / 100;
@@ -287,14 +294,16 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       const markRow = variant.marks.reduce((w, m) => w + markH * m.ratio + size * 0.35, 0);
       const width = Math.max(
         nameWidth,
-        variant.use ? qeiiTextWidth(variant.use, useSize) : 0,
+        ...us.map((t) => qeiiTextWidth(t, useSize)),
         markRow > 0 ? markRow - size * 0.35 : 0,
       );
       const above = nameHeight / 2 + (variant.marks.length ? markH + size * 0.5 : 0);
-      const below = nameHeight / 2 + (variant.use ? useSize * 1.5 : 0);
+      const below =
+        nameHeight / 2 + (us.length ? useSize * (1.5 + (us.length - 1) * 1.15) : 0);
       return {
         variant,
         lines: ls,
+        useLines: us,
         box: boxFor(group.x + dx, group.y + dy, group.angle, width, above, below),
         dx,
         dy,
@@ -302,6 +311,24 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
         useSize,
         markH,
       };
+    };
+
+    /**
+     * Row sets for an event line: the whole line first, then breaks over its own
+     * words. No word is shortened, reordered or dropped.
+     */
+    const useSetsFor = (use?: string): string[][] => {
+      if (!use) return [[]];
+      const sets: string[][] = [[use]];
+      const words = use.split(" ").filter(Boolean);
+      for (const rows of [2, 3]) {
+        if (words.length < rows * 2) continue;
+        const per = Math.ceil(words.length / rows);
+        const wrapped: string[] = [];
+        for (let w = 0; w < words.length; w += per) wrapped.push(words.slice(w, w + per).join(" "));
+        if (wrapped.length > 1) sets.push(wrapped);
+      }
+      return sets;
     };
 
 
@@ -341,10 +368,18 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     // space rather than printed half over the edge of it.
     const nudges: Array<[number, number]> = [
       [0, 0],
+      [0, 0.35],
+      [0, -0.35],
+      [0.35, 0],
+      [-0.35, 0],
       [0, 0.7],
       [0, -0.7],
       [0.7, 0],
       [-0.7, 0],
+      [0, 1.05],
+      [0, -1.05],
+      [1.05, 0],
+      [-1.05, 0],
       [0, 1.4],
       [0, -1.4],
       [1.4, 0],
@@ -364,16 +399,20 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
           for (const markFactor of variant.marks.length ? markFactors : [1]) {
             if (markFactor < 1 && QEII_MARK_RATIO * markFactor < 1) break;
             for (const ls of lineSets) {
-              for (const [ndx, ndy] of nudges) {
-                const fit = measure(variant, size, ndx * size, ndy * size, markFactor, ls);
-                if (clearOf(fit, useHolder)) {
-                  chosen = fit;
-                  insideHolder = useHolder;
-                  break;
+              for (const us of useSetsFor(variant.use)) {
+                for (const [ndx, ndy] of nudges) {
+                  const fit = measure(variant, size, ndx * size, ndy * size, markFactor, ls, us);
+                  if (clearOf(fit, useHolder)) {
+                    chosen = fit;
+                    insideHolder = useHolder;
+                    break;
+                  }
                 }
+                if (chosen) break;
               }
               if (chosen) break;
             }
+
 
             if (chosen) break;
           }
@@ -461,6 +500,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       lines: chosen.lines,
 
       use: chosen.variant.use,
+      useLines: chosen.useLines,
       useSize: chosen.useSize,
       marks: chosen.variant.marks,
       markH: chosen.markH,
