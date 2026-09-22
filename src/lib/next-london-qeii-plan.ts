@@ -186,20 +186,42 @@ export type QeiiPlanState = {
  * the exports and the schedule always agree. The artwork itself is untouched —
  * only the name is left off.
  */
-const QEII_LABELS_OFF_PLAN = ["catering lift", "void"];
+const QEII_LABELS_OFF_PLAN = ["catering lift", "catering", "void"];
 
 export function qeiiLabelOffPlan(text: string): boolean {
   const clean = text.trim().toLowerCase().replace(/\s+/g, " ");
   return QEII_LABELS_OFF_PLAN.includes(clean);
 }
 
+/**
+ * Some sheets set the caption over two lines ("CATERING" above "LIFT"), so the
+ * second line has to go with the first or a stray "LIFT" is left on the plan.
+ * Only a "LIFT" line sitting right next to a dropped caption is taken off —
+ * every other lift caption on the sheet stays exactly as issued.
+ */
+function qeiiStrayLiftLine(
+  label: { text: string; x: number; y: number; size: number },
+  dropped: { x: number; y: number; size: number }[],
+): boolean {
+  if (label.text.trim().toLowerCase() !== "lift") return false;
+  return dropped.some(
+    (near) =>
+      Math.abs(near.x - label.x) <= near.size * 4 &&
+      Math.abs(near.y - label.y) <= near.size * 2.2,
+  );
+}
+
 export function qeiiPlanState(id: string): QeiiPlanState | undefined {
   const source = qeiiFloorVector(id);
   if (!source) return undefined;
+  const dropped = source.labels.filter((label) => qeiiLabelOffPlan(label.text));
   const floor: QeiiFloorVector = {
     ...source,
-    labels: source.labels.filter((label) => !qeiiLabelOffPlan(label.text)),
+    labels: source.labels.filter(
+      (label) => !qeiiLabelOffPlan(label.text) && !qeiiStrayLiftLine(label, dropped),
+    ),
   };
+
   if (floor.kind === "vector" && floor.shapes.length >= 20) {
     return { floor, rebuilt: true };
   }
