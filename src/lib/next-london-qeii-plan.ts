@@ -15,6 +15,7 @@ import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import type { QeiiMapEdits } from "@/lib/qeii-map-edits";
 import {
   qeiiColourKey,
+  qeiiCellsByShape,
   qeiiColourPaint,
   qeiiRoomTextInk,
   type QeiiRoomColours,
@@ -168,6 +169,8 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
   const showLabels = options.showLabels ?? true;
   const roomColours = options.roomColours ?? {};
   const paint = qeiiColourPaint(floor, roomColours);
+  const cellsByShape = qeiiCellsByShape(paint);
+  const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   const hidden = options.showAllSymbols ? new Set<number>() : qeiiRepeatedSymbolShapes(floor);
   const shapes = floor.shapes
     .map((s, i) => {
@@ -176,7 +179,12 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
       const stroke = qeiiPlanInk(s.stroke, face);
       const bits = [`d="${s.d}"`, `fill="${fill ?? "none"}"`];
       if (stroke) bits.push(`stroke="${stroke}"`, `stroke-width="${qeiiWallWidth(s, options.wallWeight)}"`);
-      return `<path ${bits.join(" ")}/>`;
+      // Rooms the artwork draws inside this block are cut out along the issued
+      // wall runs, so a colour fills the whole room in the downloaded file too.
+      const cut = (cellsByShape.get(i) ?? [])
+        .map((c) => `<path d="${c.d}" fill="${c.hex}" data-room="${esc(c.room)}"/>`)
+        .join("");
+      return `<path ${bits.join(" ")}/>${cut}`;
     })
     .join("");
   const layout = qeiiPlanLayout(floor, {
@@ -186,7 +194,6 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
     markScale: options.markScale,
     edits: options.edits,
   });
-  const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const labels = showLabels
     ? layout.blocks
         .map((block) => {
