@@ -682,18 +682,24 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
         </button>
         {showRebuilt ? (
           <>
-            <button
-              type="button"
-              aria-pressed={face === "element"}
-              onClick={() => setFace(face === "element" ? "issued" : "element")}
-              className={`${chip} ${
-                face === "element"
-                  ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
-                  : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
-              }`}
-            >
-              {face === "element" ? "Enterprise inks on" : "Enterprise inks off"}
-            </button>
+            {/* One master style sheet decides the look of every floor and every
+                download; these three are the only looks offered. */}
+            {QEII_MAP_LOOK_ORDER.map((id) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={face === id}
+                title={QEII_MAP_LOOKS[id].note}
+                onClick={() => setFace(id)}
+                className={`${chip} ${
+                  face === id
+                    ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
+                    : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+                }`}
+              >
+                {QEII_MAP_LOOKS[id].name}
+              </button>
+            ))}
             <button
               type="button"
               aria-pressed={showLabels}
