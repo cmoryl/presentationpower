@@ -146,7 +146,7 @@ function SanFranciscoPage() {
         <section className="mt-12">
           <div className="flex flex-wrap items-center gap-3">
             <span className={pill}>{SF_VENUE.datesLabel}</span>
-            <span className={pill}>{SF_VENUE.colourSpace}</span>
+            <span className={pill}>House colour space · RGB</span>
             <Link
               to="/events/next/london"
               className="text-[13px] font-semibold text-[#003FC7] hover:underline"
