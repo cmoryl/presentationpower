@@ -1273,6 +1273,13 @@ function LondonKit() {
               Open the London panel kit
               <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
             </Link>
+            <Link
+              to="/events/next/california"
+              className="group inline-flex items-center gap-2 rounded-full border border-[#03002C]/20 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-[#F2F2F2]"
+            >
+              California partner kiosks
+              <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
+            </Link>
             <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
               <MapPin size={13} aria-hidden /> {LONDON_VENUE.address}
             </span>
