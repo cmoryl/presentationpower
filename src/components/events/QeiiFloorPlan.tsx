@@ -5,7 +5,7 @@
 // qeiiPlanLayout, so the page, the SVG download and the tests agree exactly. The
 // ground is a solid brand token; no artwork is used as a background.
 
-import { Fragment, useMemo, useRef } from "react";
+import { Fragment, useMemo, useRef, type CSSProperties } from "react";
 
 import {
   QEII_PLAN_TOKENS,
@@ -62,6 +62,8 @@ export type QeiiFloorPlanProps = {
   /** Called when a room block is clicked in editing mode. */
   onPickRoom?: (room: string) => void;
   className?: string;
+  /** Sizing for comparison views, e.g. all floors at one shared scale. */
+  style?: CSSProperties;
 };
 
 export function QeiiFloorPlan({
@@ -84,6 +86,7 @@ export function QeiiFloorPlan({
   onMoveRoom,
   onPickRoom,
   className,
+  style,
 }: QeiiFloorPlanProps) {
   const layout = useMemo(
     () => qeiiPlanLayout(floor, { labelScale, showUse, showMarks, markScale, edits }),
@@ -119,6 +122,7 @@ export function QeiiFloorPlan({
       role="img"
       aria-label={`Queen Elizabeth II Centre ${floor.title} plan, rebuilt as native artwork`}
       className={className}
+      style={style}
     >
       <rect width={floor.w} height={floor.h + keyH} fill={QEII_PLAN_TOKENS.surface} />
 
