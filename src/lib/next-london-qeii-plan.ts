@@ -262,13 +262,17 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
   const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   const hidden = options.showAllSymbols ? new Set<number>() : qeiiRepeatedSymbolShapes(floor);
   const wall = qeiiLookWallWeight(face, options.wallWeight);
+  // A traced floor carries its walls as one fine outline, so it is set heavier to
+  // read at the same weight as the floors the venue supplies as drawn artwork.
+  const gain = qeiiWallGain(floor.id);
   const shapes = floor.shapes
     .map((s, i) => {
       if (hidden.has(i)) return "";
       const fill = paint.fills.get(i) ?? qeiiPlanInk(s.fill, face);
       const stroke = qeiiPlanInk(s.stroke, face);
       const bits = [`d="${s.d}"`, `fill="${fill ?? "none"}"`];
-      if (stroke) bits.push(`stroke="${stroke}"`, `stroke-width="${qeiiWallWidth(s, wall)}"`);
+      if (stroke) bits.push(`stroke="${stroke}"`, `stroke-width="${qeiiWallWidth(s, wall, gain)}"`);
+
       // Rooms the artwork draws inside this block are cut out along the issued
       // wall runs, so a colour fills the whole room in the downloaded file too.
       const cut = (cellsByShape.get(i) ?? [])

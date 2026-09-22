@@ -112,6 +112,7 @@ export function qeiiDrawShapes(
   const cellsByShape = qeiiCellsByShape(paint);
   const hidden = options.showAllSymbols ? new Set<number>() : qeiiRepeatedSymbolShapes(floor);
   const wall = qeiiLookWallWeight(face, options.wallWeight);
+  const gain = qeiiWallGain(floor.id);
   const out: QeiiDrawShape[] = [];
   floor.shapes.forEach((s, i) => {
     if (hidden.has(i)) return;
@@ -123,8 +124,9 @@ export function qeiiDrawShapes(
       segs,
       fill: fill ?? undefined,
       stroke: stroke ?? undefined,
-      strokeW: stroke ? qeiiWallWidth(s, wall) : 0,
+      strokeW: stroke ? qeiiWallWidth(s, wall, gain) : 0,
     });
+
     // Rooms drawn inside this block, cut along the issued wall runs, so a colour
     // fills the whole room as its own editable shape in PowerPoint and Word.
     for (const cell of cellsByShape.get(i) ?? []) {
