@@ -10,7 +10,9 @@ import {
   qeiiRoomTextInk,
   qeiiSharedShapeNotes,
 } from "@/lib/next-london-qeii-rooms";
-import { qeiiPlanSvg } from "@/lib/next-london-qeii-plan";
+import { qeiiPlanSvg, qeiiPlanState } from "@/lib/next-london-qeii-plan";
+import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
+import { EMPTY_QEII_MAP_EDITS, qeiiApplyRoomEdit, sanitizeQeiiMapEdits } from "@/lib/qeii-map-edits";
 import { qeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
 
@@ -100,5 +102,35 @@ describe("division accent colouring", () => {
     expect(westminster![1]).toBe(games);
     // A house space with no division recorded is never given a colour.
     expect(colours["Courtyard"]).toBeUndefined();
+  });
+});
+
+describe("hand-picked division logos", () => {
+  it("prints the chosen lockups, or none, in place of the schedule's reading", () => {
+    const floor = qeiiPlanState("fourth")!.floor;
+    const issued = qeiiPlanLayout(floor, { showUse: true, showMarks: true });
+    const abbey = issued.blocks.find((b) => b.room === "Abbey")!;
+    expect(abbey.marks.map((m) => m.divisionId)).toEqual(["globallink"]);
+
+    const swapped = qeiiPlanLayout(floor, {
+      showUse: true,
+      showMarks: true,
+      edits: qeiiApplyRoomEdit(EMPTY_QEII_MAP_EDITS, "Abbey", { marks: ["legal"] }),
+    });
+    expect(
+      swapped.blocks.find((b) => b.room === "Abbey")!.marks.map((m) => m.divisionId),
+    ).toEqual(["legal"]);
+
+    const none = qeiiPlanLayout(floor, {
+      showUse: true,
+      showMarks: true,
+      edits: qeiiApplyRoomEdit(EMPTY_QEII_MAP_EDITS, "Abbey", { marks: [] }),
+    });
+    expect(none.blocks.find((b) => b.room === "Abbey")!.marks).toEqual([]);
+  });
+
+  it("drops an unapproved division id rather than drawing something else", () => {
+    const edits = sanitizeQeiiMapEdits({ rooms: { abbey: { marks: ["learn", "not-a-division"] } } });
+    expect(edits.rooms["abbey"]!.marks).toEqual(["learn"]);
   });
 });

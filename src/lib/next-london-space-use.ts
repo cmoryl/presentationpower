@@ -318,24 +318,45 @@ export type SpaceUseMark = {
   ratio: number;
 };
 
+/** The approved stacked lockup for one division, or undefined when none is published. */
+export function spaceUseMarkFor(divisionId: string): SpaceUseMark | undefined {
+  const suite = nextLockupSuite(divisionId);
+  const art = suite?.stacked.url ? suite.stacked : undefined;
+  if (!art) return undefined;
+  return {
+    divisionId,
+    name: suite?.trackName ?? divisionId,
+    url: art.url,
+    urlReverse: suite?.stackedReverse.url || suite?.stackedWhite.url || art.url,
+    urlWhite: suite?.stackedWhite.url || suite?.stackedReverse.url || art.url,
+    ratio: art.ratio || 1.7,
+  };
+}
+
+/** Lockups for a hand-picked set of division ids, in the order given, deduplicated.
+ *  A division with no approved lockup is left out rather than drawn some other way. */
+export function spaceUseMarksForIds(divisionIds: string[]): SpaceUseMark[] {
+  const marks: SpaceUseMark[] = [];
+  for (const id of divisionIds) {
+    if (marks.some((m) => m.divisionId === id)) continue;
+    const mark = spaceUseMarkFor(id);
+    if (mark) marks.push(mark);
+  }
+  return marks;
+}
+
+/** Every division whose approved lockup can be printed on a plan, for the picker. */
+export function spaceUseMarkChoices(): SpaceUseMark[] {
+  return spaceUseMarksForIds(EVENT_DIVISION.map(([, id]) => id));
+}
+
 /** Division lockups to print beside a room, in schedule order, deduplicated.
  *  Empty where the schedule records no division area for the room. */
 export function spaceUseMarks(room: string, sheetId?: string): SpaceUseMark[] {
-  const marks: SpaceUseMark[] = [];
+  const ids: string[] = [];
   for (const use of spaceUsesForRoom(room, sheetId)) {
     const divisionId = spaceUseDivisionId(use);
-    if (!divisionId || marks.some((m) => m.divisionId === divisionId)) continue;
-    const suite = nextLockupSuite(divisionId);
-    const art = suite?.stacked.url ? suite.stacked : undefined;
-    if (!art) continue;
-    marks.push({
-      divisionId,
-      name: suite?.trackName ?? divisionId,
-      url: art.url,
-      urlReverse: suite?.stackedReverse.url || suite?.stackedWhite.url || art.url,
-      urlWhite: suite?.stackedWhite.url || suite?.stackedReverse.url || art.url,
-      ratio: art.ratio || 1.7,
-    });
+    if (divisionId) ids.push(divisionId);
   }
-  return marks;
+  return spaceUseMarksForIds(ids);
 }
