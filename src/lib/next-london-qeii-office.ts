@@ -67,6 +67,17 @@ type PlanPieces = {
     ink: string;
   }[];
   key: { hex: string; label: string; x: number; y: number; size: number }[];
+  /** Division lockups as embedded PNG artwork, placed in plan units. */
+  marks: {
+    name: string;
+    dataUrl: string;
+    /** Centre of the lockup, in plan units. */
+    cx: number;
+    cy: number;
+    w: number;
+    h: number;
+    angle: number;
+  }[];
   notes: string[];
 };
 
