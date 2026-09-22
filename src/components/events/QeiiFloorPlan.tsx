@@ -19,6 +19,7 @@ import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import {
   qeiiColourKey,
+  qeiiCellsByShape,
   qeiiColourPaint,
   qeiiRoomTextInk,
   type QeiiRoomColours,
@@ -91,6 +92,7 @@ export function QeiiFloorPlan({
   const drag = useRef<{ room: string; x: number; y: number; dx: number; dy: number } | null>(null);
 
   const paint = useMemo(() => qeiiColourPaint(floor, roomColours), [floor, roomColours]);
+  const cellsByShape = useMemo(() => qeiiCellsByShape(paint), [paint]);
   const hidden = useMemo(
     () => (showAllSymbols ? new Set<number>() : qeiiRepeatedSymbolShapes(floor)),
     [floor, showAllSymbols],
@@ -125,13 +127,19 @@ export function QeiiFloorPlan({
         const stroke = qeiiPlanInk(shape.stroke, face);
         const chosen = paint.fills.get(i);
         return (
-          <path
-            key={`s-${i}`}
-            d={shape.d}
-            fill={chosen ?? qeiiPlanInk(shape.fill, face) ?? "none"}
-            stroke={stroke}
-            strokeWidth={stroke ? qeiiWallWidth(shape, wallWeight) : undefined}
-          />
+          <Fragment key={`s-${i}`}>
+            <path
+              d={shape.d}
+              fill={chosen ?? qeiiPlanInk(shape.fill, face) ?? "none"}
+              stroke={stroke}
+              strokeWidth={stroke ? qeiiWallWidth(shape, wallWeight) : undefined}
+            />
+            {/* Rooms the artwork draws inside this block, cut out along the
+                issued wall runs so each colour fills the whole room. */}
+            {(cellsByShape.get(i) ?? []).map((cell) => (
+              <path key={`c-${cell.room}`} d={cell.d} fill={cell.hex} />
+            ))}
+          </Fragment>
         );
       })}
       {showLabels

@@ -11,9 +11,11 @@
 
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 import { qeiiShapeHolds } from "@/lib/next-london-qeii-geometry";
+import { qeiiCutCell, QEII_CELL_MAX_SHARE } from "@/lib/next-london-qeii-cells";
 import { qeiiLabelGroups } from "@/lib/next-london-qeii-layout";
 import { spaceUseMarks, spaceUsesForRoom } from "@/lib/next-london-space-use";
 import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
+
 
 /** Approved colours a room may be filled with. */
 export const QEII_ROOM_PALETTE = [
@@ -51,12 +53,29 @@ export function qeiiRoomTextInk(fill?: string): string {
 
 const shapeHolds = qeiiShapeHolds;
 
+/**
+ * Cutting a plan into room cells is real geometry, so each floor is worked out
+ * once and remembered — the screen plan and every export then read the identical
+ * outlines.
+ */
+const shapeCache = new WeakMap<QeiiFloorVector, QeiiRoomShape[]>();
+
+
 export type QeiiRoomShape = {
   room: string;
   /** Index into floor.shapes of the polygon this room is drawn as. */
   shapeIndex: number;
   /** Other room names drawn inside the very same shape. */
   sharedWith: string[];
+  /** Centre of the room's name, in plan units. */
+  x: number;
+  y: number;
+  /**
+   * The exact outline of the room, cut out of a shared block along the issued
+   * wall runs. Absent when the room is drawn as its own shape (nothing to cut)
+   * or when the walls do not close the space.
+   */
+  cell?: string;
 };
 
 /**
@@ -64,15 +83,19 @@ export type QeiiRoomShape = {
  *
  * The smallest filled shape containing a name wins, so a room inside a larger
  * block is matched to the room, not the block. A name with no shape under it —
- * a corridor caption, an access note — is simply left out.
+ * a corridor caption, an access note — is simply left out. Where several names
+ * share one block, the block is cut along the issued wall runs so each room gets
+ * its own exact outline.
  */
 export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
+  const cached = shapeCache.get(floor);
+  if (cached) return cached;
   const names = qeiiLabelGroups(floor).map((g) => ({
     room: g.labels.map((l) => l.text).join(" "),
     x: g.x,
     y: g.y,
   }));
-  const matched: { room: string; shapeIndex: number }[] = [];
+  const matched: { room: string; shapeIndex: number; x: number; y: number }[] = [];
   for (const name of names) {
     let best: { index: number; area: number } | undefined;
     floor.shapes.forEach((shape, index) => {
@@ -80,16 +103,23 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
       if (!held || area <= 0) return;
       if (!best || area < best.area) best = { index, area };
     });
-    if (best) matched.push({ room: name.room, shapeIndex: best.index });
+    if (best) matched.push({ room: name.room, shapeIndex: best.index, x: name.x, y: name.y });
   }
-  return matched.map((m) => ({
-    room: m.room,
-    shapeIndex: m.shapeIndex,
-    sharedWith: matched
+  const out = matched.map((m) => {
+    const sharedWith = matched
       .filter((o) => o.shapeIndex === m.shapeIndex && o.room !== m.room)
-      .map((o) => o.room),
-  }));
+      .map((o) => o.room);
+    let cell: string | undefined;
+    if (sharedWith.length) {
+      const cut = qeiiCutCell(floor, m.shapeIndex, m.x, m.y);
+      if (cut && cut.share <= QEII_CELL_MAX_SHARE) cell = cut.d;
+    }
+    return { room: m.room, shapeIndex: m.shapeIndex, sharedWith, x: m.x, y: m.y, cell };
+  });
+  shapeCache.set(floor, out);
+  return out;
 }
+
 
 /** True when this room is the only name inside its drawn shape. */
 export function qeiiRoomIsExclusive(entry: QeiiRoomShape): boolean {
@@ -101,10 +131,16 @@ export function qeiiSharedShapeNotes(floor: QeiiFloorVector): string[] {
   const seen = new Set<number>();
   const notes: string[] = [];
   for (const entry of qeiiRoomShapes(floor)) {
-    if (!entry.sharedWith.length || seen.has(entry.shapeIndex)) continue;
+    // A room whose exact outline could be cut from the block is filled properly,
+    // so it is no longer a limitation worth reporting.
+    if (!entry.sharedWith.length || entry.cell || seen.has(entry.shapeIndex)) continue;
+    const stuck = [entry.room, ...entry.sharedWith].filter(
+      (r) => !qeiiRoomShapes(floor).find((e) => e.room === r)?.cell,
+    );
+    if (stuck.length < 2) continue;
     seen.add(entry.shapeIndex);
     notes.push(
-      `${[entry.room, ...entry.sharedWith].join(", ")} are drawn as one shape in the issued artwork, so their colour shows as a tag behind each room name rather than filling the space.`,
+      `${stuck.join(", ")} are drawn as one shape in the issued artwork with no wall run closing them off, so their colour shows as a tag behind each room name rather than filling the space.`,
     );
   }
   return notes;
@@ -114,27 +150,34 @@ export function qeiiSharedShapeNotes(floor: QeiiFloorVector): string[] {
  * How each chosen colour is painted on a plan.
  *
  * A room drawn as its own shape is filled. A room the artwork draws inside a
- * shared block gets a tag behind its name instead, so the colour still reads
- * without painting a neighbour's space by mistake.
+ * shared block is filled with its own outline, cut from that block along the
+ * issued wall runs. Only where the walls leave a room open does the colour fall
+ * back to a tag behind the name, so a neighbour's space is never painted.
  */
 export type QeiiColourPaint = {
   /** Shape index → fill, for rooms drawn as their own shape. */
   fills: Map<number, string>;
   /** Room name → tag colour, for rooms sharing a drawn shape. */
   tags: Map<string, string>;
+  /** Exact room outlines cut from a shared block, drawn over the plan fill. */
+  cells: { room: string; shapeIndex: number; d: string; hex: string }[];
 };
 
 export function qeiiColourPaint(floor: QeiiFloorVector, rooms: QeiiRoomColours): QeiiColourPaint {
   const fills = new Map<number, string>();
   const tags = new Map<string, string>();
+  const cells: { room: string; shapeIndex: number; d: string; hex: string }[] = [];
   for (const entry of qeiiRoomShapes(floor)) {
     const hex = rooms[entry.room];
     if (!hex) continue;
     if (qeiiRoomIsExclusive(entry)) fills.set(entry.shapeIndex, hex);
+    else if (entry.cell)
+      cells.push({ room: entry.room, shapeIndex: entry.shapeIndex, d: entry.cell, hex });
     else tags.set(entry.room, hex);
   }
-  return { fills, tags };
+  return { fills, tags, cells };
 }
+
 
 /** The fill a room's own name sits on, so its ink stays readable. */
 export function qeiiRoomFill(
@@ -233,4 +276,13 @@ export function qeiiColourKey(
         rooms: list.slice().sort(),
       };
     });
+}
+
+/** Cut room outlines grouped by the block they were cut from. */
+export function qeiiCellsByShape(paint: QeiiColourPaint): Map<number, QeiiColourPaint["cells"]> {
+  const out = new Map<number, QeiiColourPaint["cells"]>();
+  for (const cell of paint.cells) {
+    out.set(cell.shapeIndex, [...(out.get(cell.shapeIndex) ?? []), cell]);
+  }
+  return out;
 }
