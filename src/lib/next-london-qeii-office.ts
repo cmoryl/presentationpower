@@ -23,6 +23,7 @@ import {
   type QeiiMarkVariant,
   type QeiiPlanOptions,
 } from "@/lib/next-london-qeii-plan";
+import { qeiiMarkBoxes } from "@/lib/next-london-qeii-mark-art";
 import { inlineSvgImages, qeiiRasteriseLockup, qeiiRasteriseSvg } from "@/lib/next-london-qeii-pdf";
 import { qeiiColourKey, qeiiColourPaint, qeiiRoomTextInk } from "@/lib/next-london-qeii-rooms";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
@@ -154,42 +155,22 @@ async function planPieces(
   let droppedMarks = 0;
   if (rebuilt && (options.showLabels ?? true)) {
     const cache = new Map<string, { dataUrl: string; w: number; h: number } | null>();
-    for (const block of layout.blocks) {
-      if (!block.marks.length) continue;
-      const tag = paint.tags.get(block.room) ?? roomColours[block.room];
-      const ink = tag ? qeiiRoomTextInk(tag) : "#FFFFFF";
-      // A light room fill would swallow the reverse lockup, exactly as on screen.
-      const variant: QeiiMarkVariant =
-        ink === "#03002C" && (options.markVariant ?? "reverse") === "reverse"
-          ? "colour"
-          : (options.markVariant ?? "reverse");
-      const nameTop = block.y - ((block.lines.length - 1) * block.size * 1.05) / 2;
-      const row =
-        block.marks.reduce((w, m) => w + block.markH * m.ratio + block.size * 0.35, 0) -
-        block.size * 0.35;
-      let markX = block.x - row / 2;
-      for (const m of block.marks) {
-        const w = block.markH * m.ratio;
-        const x = markX;
-        markX += w + block.size * 0.35;
-        const url = qeiiMarkUrl(m, variant);
-        const key = `${url}`;
-        if (!cache.has(key)) cache.set(key, await qeiiRasteriseLockup(url));
-        const art = cache.get(key);
-        if (!art) {
-          droppedMarks += 1;
-          continue;
-        }
-        marks.push({
-          name: m.name,
-          dataUrl: art.dataUrl,
-          cx: x + w / 2,
-          cy: nameTop - block.size * 0.7 - block.markH / 2,
-          w,
-          h: block.markH,
-          angle: block.angle,
-        });
+    for (const box of qeiiMarkBoxes(floor, options)) {
+      if (!cache.has(box.url)) cache.set(box.url, await qeiiRasteriseLockup(box.url));
+      const art = cache.get(box.url);
+      if (!art) {
+        droppedMarks += 1;
+        continue;
       }
+      marks.push({
+        name: box.name,
+        dataUrl: art.dataUrl,
+        cx: box.cx,
+        cy: box.cy,
+        w: box.w,
+        h: box.h,
+        angle: box.angle,
+      });
     }
     if (marks.length) {
       notes.push(

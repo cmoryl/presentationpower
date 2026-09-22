@@ -388,9 +388,9 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
     }
   }
 
-  function downloadPlanSvg() {
+  async function downloadPlanSvg() {
     if (!plan?.rebuilt) return;
-    const svg = qeiiPlanSvg(plan.floor, {
+    const plain = qeiiPlanSvg(plan.floor, {
       face,
       labelScale,
       showLabels,
@@ -404,9 +404,29 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
       showAllSymbols,
       edits,
     });
+    // Linked lockups are swapped for the approved artwork's own outlines, so the
+    // file carries live vector logos instead of a link only this site can follow.
+    let svg = plain;
+    const notes: string[] = [];
+    try {
+      const { qeiiVectoriseSvgLockups } = await import("@/lib/next-london-qeii-mark-art");
+      const done = await qeiiVectoriseSvgLockups(plain);
+      svg = done.svg;
+      if (done.placed)
+        notes.push(
+          `${done.placed} division lockup${done.placed === 1 ? " is" : "s are"} embedded as editable vector artwork.`,
+        );
+      if (done.dropped.length)
+        notes.push(
+          `${done.dropped.length} division lockup${done.dropped.length === 1 ? "" : "s"} could not be read as outlines, so ${done.dropped.length === 1 ? "it stays" : "they stay"} linked to the site.`,
+        );
+    } catch {
+      notes.push("The division lockups stay linked to the site in this file.");
+    }
     const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
     download(url, qeiiPlanFilename(plan.floor, face));
     URL.revokeObjectURL(url);
+    if (notes.length) setExportNote(notes.join(" "));
   }
 
   /** Every export builds from the plan exactly as it reads on screen right now. */
@@ -460,7 +480,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
       }
       if (kind === "ai" || kind === "zip") {
         const { buildQeiiPlanAi } = await import("@/lib/next-london-qeii-ai");
-        const res = buildQeiiPlanAi(plan.floor, options);
+        const res = await buildQeiiPlanAi(plan.floor, options);
         files.push({
           name: res.filename,
           blob: new Blob([res.bytes as unknown as BlobPart], { type: "application/pdf" }),
@@ -470,8 +490,13 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
       if (kind === "zip") {
         const JSZip = (await import("jszip")).default;
         const zip = new JSZip();
-        const svg = qeiiPlanSvg(plan.floor, options);
-        zip.file(qeiiPlanFilename(plan.floor, face), svg);
+        const { qeiiVectoriseSvgLockups } = await import("@/lib/next-london-qeii-mark-art");
+        const vector = await qeiiVectoriseSvgLockups(qeiiPlanSvg(plan.floor, options));
+        zip.file(qeiiPlanFilename(plan.floor, face), vector.svg);
+        if (vector.dropped.length)
+          notes.push(
+            `${vector.dropped.length} division lockup${vector.dropped.length === 1 ? "" : "s"} could not be read as outlines, so ${vector.dropped.length === 1 ? "it stays" : "they stay"} linked in the SVG.`,
+          );
         for (const file of files) zip.file(file.name, file.blob);
         const blob = await zip.generateAsync({ type: "blob" });
         const name = `TP-NEXT-2026-London-QEII-${plan.floor.title.replace(/\s+/g, "-")}-map-pack.zip`;
