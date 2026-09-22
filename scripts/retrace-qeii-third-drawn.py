@@ -93,13 +93,81 @@ def classify(rgb: np.ndarray, alpha: np.ndarray) -> np.ndarray:
     return np.where(alpha < 128, 3, dist.argmin(0))
 
 
-def regions(cls: np.ndarray) -> tuple[np.ndarray, list[int]]:
+# A gap in a wall line up to this many picture pixels long is a doorway: the wall
+# either side of it is one drawn run, so the rooms it divides are separate rooms.
+DOOR_GAP = 7
+# A partition line is drawn as a fine dotted trail inside a hall. It reads as a
+# run of pixels lighter than the ink around it, at least this long and no wider
+# than this across.
+PARTITION_MIN = 20
+PARTITION_MAX_ACROSS = 12
+# How far a pixel's colour may sit from the three inks before it counts as part of
+# a dotted trail rather than ink or the softened edge of a shape.
+PARTITION_LIFT = 150
+
+
+def separators(rgb: np.ndarray, cls: np.ndarray, label_pts) -> np.ndarray:
+    """Every divider the picture draws that a plain wall mask misses.
+
+    Two readings of the issued drawing, no invention in either:
+
+      * a doorway leaves a short gap in a drawn wall run — the run either side of
+        it is the same line, so the gap is closed along that line's own direction
+        and the rooms on each side stand as separate rooms;
+      * a hall divided by movable partitions carries a fine dotted trail from one
+        wall to the other. That trail is joined along its own axis, so the hall
+        splits exactly where the drawing splits it.
+
+    A dotted trail sitting under a printed name is type, not a partition, and is
+    left alone.
+    """
+    wall = cls == 2
+
+    def close_axis(mask: np.ndarray, vertical: bool) -> np.ndarray:
+        st = np.zeros((DOOR_GAP, DOOR_GAP), bool)
+        if vertical:
+            st[:, DOOR_GAP // 2] = True
+        else:
+            st[DOOR_GAP // 2, :] = True
+        return ndimage.binary_closing(mask, structure=st)
+
+    sep = close_axis(wall, True) | close_axis(wall, False)
+
+    # The dotted partition trails. Only the inside of a shape is read, so the
+    # softened edge where two inks meet is never mistaken for a trail.
+    dist = np.stack([((rgb - np.array(t)) ** 2).sum(-1) for t in (NAVY, CYAN, WHITE)])
+    off_ink = dist.min(0) > PARTITION_LIFT
+    trail = np.zeros(cls.shape, bool)
+    for ink in (0, 1):
+        inside = ndimage.binary_erosion(cls == ink, structure=np.ones((5, 5), bool))
+        trail |= inside & off_ink
+    lab, _ = ndimage.label(ndimage.binary_dilation(trail, structure=np.ones((5, 5), bool)))
+    for idx, sl in enumerate(ndimage.find_objects(lab), start=1):
+        rows = sl[0].stop - sl[0].start
+        cols = sl[1].stop - sl[1].start
+        if max(rows, cols) < PARTITION_MIN or min(rows, cols) > PARTITION_MAX_ACROSS:
+            continue
+        if any(
+            sl[1].start - 2 <= px <= sl[1].stop + 2 and sl[0].start - 2 <= py <= sl[0].stop + 2
+            for px, py in label_pts
+        ):
+            continue
+        if rows >= cols:
+            x = (sl[1].start + sl[1].stop - 1) // 2
+            sep[sl[0].start : sl[0].stop, max(x - 1, 0) : x + 2] = True
+        else:
+            y = (sl[0].start + sl[0].stop - 1) // 2
+            sep[max(y - 1, 0) : y + 2, sl[1].start : sl[1].stop] = True
+    return sep
+
+
+def regions(cls: np.ndarray, sep: np.ndarray) -> tuple[np.ndarray, list[int]]:
     """Every room and circulation area as its own region, with its tone index."""
     seeds = np.zeros(cls.shape, dtype=np.int32)
     tone: list[int] = []
     nxt = 1
     for ink in (0, 1):
-        mask = cls == ink
+        mask = (cls == ink) & ~sep
         lab, n = ndimage.label(mask)
         sizes = ndimage.sum(mask, lab, range(1, n + 1))
         for idx, size in enumerate(sizes, start=1):
@@ -111,11 +179,12 @@ def regions(cls: np.ndarray) -> tuple[np.ndarray, list[int]]:
     return seeds, tone
 
 
-def grow_to_wall_centre(seeds: np.ndarray, cls: np.ndarray) -> np.ndarray:
+def grow_to_wall_centre(seeds: np.ndarray, cls: np.ndarray, sep: np.ndarray) -> np.ndarray:
     """Close the white band by taking each region to the middle of it.
 
     Outside the building is seeded too, so a region grows into the wall between
-    rooms but never out past the face of the building.
+    rooms but never out past the face of the building, and never across a divider
+    the drawing carries.
     """
     outside = seeds.max() + 1
     field = seeds.copy()
@@ -123,10 +192,11 @@ def grow_to_wall_centre(seeds: np.ndarray, cls: np.ndarray) -> np.ndarray:
     empty = field == 0
     dist, (iy, ix) = ndimage.distance_transform_edt(empty, return_indices=True)
     nearest = field[iy, ix]
-    take = empty & (nearest > 0) & (nearest < outside) & (dist <= WALL_REACH)
+    take = empty & (nearest > 0) & (nearest < outside) & (dist <= WALL_REACH) & ~sep
     out = seeds.copy()
     out[take] = nearest[take]
     return out
+
 
 
 # Tracing detail. The picture is only 368 pixels wide, so the outline of a wall
@@ -279,15 +349,21 @@ def main() -> None:
             return raster.apply(ctm, x, y)
 
         cls = classify(rgb, alpha)
-        seeds, tone = regions(cls)
-        grown = grow_to_wall_centre(seeds, cls)
         labels = qeii.collect_labels(boxes.read_text(errors="replace"))
 
-        # Which regions carry a room name on the sheet, read by putting each name
-        # back on the picture through the picture's own placement.
+        # Every name put back on the picture through the picture's own placement,
+        # so a dotted trail under a printed name is read as type, not a partition.
         inv = invert(ctm)
+        label_pts = [raster.apply(inv, label.x, label.y) for label in labels]
+
+        sep = separators(rgb, cls, label_pts)
+        seeds, tone = regions(cls, sep)
+        grown = grow_to_wall_centre(seeds, cls, sep)
+
+        # Which regions carry a room name on the sheet.
         named: set[int] = set()
         h, w = grown.shape
+
         for label in labels:
             px, py = raster.apply(inv, label.x, label.y)
             for dy in (0, -6, -12, 6):
