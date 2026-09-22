@@ -335,8 +335,24 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     // Content first, size second: a full block is set smaller before any line
     // comes off it, and only then does the event line or the lockup give way.
     // A small nudge inside the room is tried before the type is made smaller, so a
-    // name clears a lift symbol or a marker dot at its proper size.
-    const nudges = [0, 0.7, -0.7, 1.4, -1.4, 2.2, -2.2];
+    // name clears a lift symbol or a marker dot at its proper size. Sideways nudges
+    // are tried too, so a name anchored hard against a wall is drawn back inside the
+    // space rather than printed half over the edge of it.
+    const nudges: Array<[number, number]> = [
+      [0, 0],
+      [0, 0.7],
+      [0, -0.7],
+      [0.7, 0],
+      [-0.7, 0],
+      [0, 1.4],
+      [0, -1.4],
+      [1.4, 0],
+      [-1.4, 0],
+      [0, 2.2],
+      [0, -2.2],
+      [2.2, 0],
+      [-2.2, 0],
+    ];
     // A tight room sets its lockup smaller before it loses it altogether; the
     // floor is the room name's own height, below which the lockup would not read.
     const markFactors = [1, 0.86, 0.72, 0.6, 0.5];
@@ -347,8 +363,8 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
           for (const markFactor of variant.marks.length ? markFactors : [1]) {
             if (markFactor < 1 && QEII_MARK_RATIO * markFactor < 1) break;
             for (const ls of lineSets) {
-              for (const nudge of nudges) {
-                const fit = measure(variant, size, 0, nudge * size, markFactor, ls);
+              for (const [ndx, ndy] of nudges) {
+                const fit = measure(variant, size, ndx * size, ndy * size, markFactor, ls);
                 if (clearOf(fit, useHolder)) {
                   chosen = fit;
                   insideHolder = useHolder;
@@ -357,6 +373,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
               }
               if (chosen) break;
             }
+
             if (chosen) break;
           }
           if (chosen) break;
