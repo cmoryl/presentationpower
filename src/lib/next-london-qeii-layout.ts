@@ -341,16 +341,22 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
      */
     const useSetsFor = (use?: string): string[][] => {
       if (!use) return [[]];
-      const sets: string[][] = [[use]];
+      const wrappedSets: string[][] = [];
       const words = use.split(" ").filter(Boolean);
       for (const rows of [2, 3]) {
         if (words.length < rows * 2) continue;
         const per = Math.ceil(words.length / rows);
         const wrapped: string[] = [];
         for (let w = 0; w < words.length; w += per) wrapped.push(words.slice(w, w + per).join(" "));
-        if (wrapped.length > 1) sets.push(wrapped);
+        if (wrapped.length > 1) wrappedSets.push(wrapped);
       }
-      return sets;
+      // Very long event lines cannot remain on one row in the fifth floor's
+      // narrow meeting rooms: their holder is part of the floor's large base
+      // polygon, so its broad bounding box does not reveal the internal wall.
+      // Prefer the exact same words over two rows when a line is wider than a
+      // fifth of the plan. Shorter foyer and plenary lines keep their issued row.
+      const long = qeiiTextWidth(use, baseSize * QEII_USE_RATIO) > floor.w * 0.2;
+      return long ? [...wrappedSets, [use]] : [[use], ...wrappedSets];
     };
 
 
