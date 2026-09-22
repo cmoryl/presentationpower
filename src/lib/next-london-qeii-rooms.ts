@@ -11,9 +11,11 @@
 
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 import { qeiiShapeHolds } from "@/lib/next-london-qeii-geometry";
+import { qeiiCutCell, QEII_CELL_MAX_SHARE } from "@/lib/next-london-qeii-cells";
 import { qeiiLabelGroups } from "@/lib/next-london-qeii-layout";
 import { spaceUseMarks, spaceUsesForRoom } from "@/lib/next-london-space-use";
 import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
+
 
 /** Approved colours a room may be filled with. */
 export const QEII_ROOM_PALETTE = [
