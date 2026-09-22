@@ -500,6 +500,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       lines: chosen.lines,
 
       use: chosen.variant.use,
+      useLines: chosen.useLines,
       useSize: chosen.useSize,
       marks: chosen.variant.marks,
       markH: chosen.markH,
