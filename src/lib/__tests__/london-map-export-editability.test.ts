@@ -21,7 +21,7 @@ import JSZip from "jszip";
 import { qeiiPlanSvg, qeiiPlanState } from "@/lib/next-london-qeii-plan";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { qeiiColourKey } from "@/lib/next-london-qeii-rooms";
-import { buildQeiiPlanAi } from "@/lib/next-london-qeii-ai";
+import { buildQeiiPlanAi, qeiiPdfCopy } from "@/lib/next-london-qeii-ai";
 import { LONDON_VENUE_SHEETS } from "@/lib/next-london-venue-sheets";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 
