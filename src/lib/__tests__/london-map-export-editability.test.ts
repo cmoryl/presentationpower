@@ -128,10 +128,12 @@ describe("London map exports are editable", () => {
       const xml = await zip.file("ppt/slides/slide1.xml")!.async("string");
       const copy = copyOf(floor);
 
-      // The plan is live shapes; the only pictures are the approved division
-      // lockups, which are placed artwork by definition.
-      expect(xml.match(/<p:pic>/g)?.length ?? 0).toBe(markCount(floor));
+      // The plan and the division lockups are all live shapes: no picture at all.
+      expect(xml.match(/<p:pic>/g)?.length ?? 0).toBe(0);
       expect(xml.match(/<a:custGeom>/g)?.length ?? 0).toBeGreaterThanOrEqual(20);
+      if (markCount(floor) > 0) {
+        expect(res.notes.join(" ")).toMatch(/rebuilt as editable shapes/i);
+      }
       // Every line is a real editable run.
       expect(xml.match(/<a:t>/g)?.length ?? 0).toBeGreaterThanOrEqual(copy.lines.length);
       for (const line of copy.lines) {
@@ -155,13 +157,16 @@ describe("London map exports are editable", () => {
       // The plan itself is a group of editable Word shapes, not a picture.
       expect(xml).toContain("<wpg:wgp>");
       expect(xml.match(/<a:custGeom>/g)?.length ?? 0).toBeGreaterThanOrEqual(20);
-      // Only the approved division lockups arrive as pictures.
-      expect(xml.match(/<pic:pic>/g)?.length ?? 0).toBe(markCount(floor));
+      // Division lockups are rebuilt as shapes too, so nothing is a picture.
+      expect(xml.match(/<pic:pic>/g)?.length ?? 0).toBe(0);
+      if (markCount(floor) > 0) {
+        expect(res.notes.join(" ")).toMatch(/rebuilt as editable shapes/i);
+      }
       for (const line of [...copy.names, ...copy.key]) {
         expect(xml).toContain(line.replace(/&/g, "&amp;").replace(/</g, "&lt;"));
       }
       expect(zip.file("word/media/plan.png")).toBeNull();
-      expect(zip.file(/word\/media\/lockup-\d+\.png/).length).toBe(markCount(floor));
+      expect(zip.file(/word\/media\/lockup-\d+\.png/).length).toBe(0);
       expect(res.notes.join(" ")).toMatch(/editable group of Word shapes/i);
     },
     120_000,

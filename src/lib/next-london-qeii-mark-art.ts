@@ -25,6 +25,8 @@ import {
 import { qeiiColourPaint, qeiiRoomTextInk } from "@/lib/next-london-qeii-rooms";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 import { parseSvgArtwork, type PlacedArtPath } from "@/lib/next-london-placed-art";
+import { parseSvgPathCmds } from "@/lib/export-clip-geom";
+import type { QeiiDrawShape, QeiiSeg } from "@/lib/next-london-qeii-draw";
 
 /** One lockup, placed on the plan in plan units. */
 export type QeiiMarkBox = {
@@ -246,6 +248,76 @@ export async function qeiiMarkVectors(
     placements.push({ ...box, art });
   }
   return { placements, dropped };
+}
+
+/**
+ * Every lockup on this floor as plan-unit shapes, for the Office exports.
+ *
+ * Office cannot follow a linked image and a pasted PNG is not editable, so each
+ * lockup outline is transformed into the plan's own coordinate space — artwork
+ * matrix, fit, rotation and placement all baked in — and handed back as plain
+ * segment lists PowerPoint and Word rebuild as their own shapes.
+ *
+ * `unsupported` names any lockup whose outlines use a path command this cannot
+ * read, so the caller reports it instead of printing a gap.
+ */
+export function qeiiMarkPlanShapes(placements: QeiiMarkPlacement[]): {
+  shapes: QeiiDrawShape[];
+  placed: string[];
+  unsupported: string[];
+} {
+  const shapes: QeiiDrawShape[] = [];
+  const placed: string[] = [];
+  const unsupported: string[] = [];
+  for (const mark of placements) {
+    const fit = Math.min(mark.w / mark.art.w, mark.h / mark.art.h);
+    const rad = (mark.angle * Math.PI) / 180;
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+    const at = (px: number, py: number, m: PlacedArtPath["m"]) => {
+      const ax = m[0] * px + m[2] * py + m[4];
+      const ay = m[1] * px + m[3] * py + m[5];
+      const bx = (ax - mark.art.w / 2) * fit;
+      const by = (ay - mark.art.h / 2) * fit;
+      return { x: mark.cx + bx * cos - by * sin, y: mark.cy + bx * sin + by * cos };
+    };
+    const markShapes: QeiiDrawShape[] = [];
+    let failed = false;
+    for (const path of mark.art.paths) {
+      const cmds = parseSvgPathCmds(path.d);
+      if (!cmds) {
+        failed = true;
+        break;
+      }
+      const segs: QeiiSeg[] = [];
+      for (const cmd of cmds) {
+        if (cmd.c === "M") {
+          if (segs.length) segs.push({ k: "Z" });
+          const p = at(cmd.x, cmd.y, path.m);
+          segs.push({ k: "M", x: p.x, y: p.y });
+        } else if (cmd.c === "L") {
+          const p = at(cmd.x, cmd.y, path.m);
+          segs.push({ k: "L", x: p.x, y: p.y });
+        } else {
+          const c1 = at(cmd.x1, cmd.y1, path.m);
+          const c2 = at(cmd.x2, cmd.y2, path.m);
+          const p = at(cmd.x, cmd.y, path.m);
+          segs.push({ k: "C", x1: c1.x, y1: c1.y, x2: c2.x, y2: c2.y, x: p.x, y: p.y });
+        }
+      }
+      if (segs.length) segs.push({ k: "Z" });
+      const fill = (path.fill ?? "").trim();
+      const painted = /^#[0-9a-f]{6}$/i.test(fill) ? fill : null;
+      if (segs.length > 1 && painted) markShapes.push({ segs, fill: painted, strokeW: 0 });
+    }
+    if (failed || !markShapes.length) {
+      unsupported.push(mark.name);
+      continue;
+    }
+    shapes.push(...markShapes);
+    placed.push(mark.name);
+  }
+  return { shapes, placed, unsupported };
 }
 
 function xml(value: string): string {

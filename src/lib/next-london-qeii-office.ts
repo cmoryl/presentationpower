@@ -4,8 +4,11 @@
 // The plan is rebuilt as real shapes in both files: every wall line, room fill
 // and venue symbol arrives as its own editable PowerPoint / Word shape taken
 // straight from the issued geometry, and every room name, use line and colour-key
-// row is live text over it. Nothing is a flattened picture, so the crew can
-// recolour a room or move a wall in Office without redrawing anything.
+// row is live text over it. The division lockups are rebuilt the same way, from
+// the approved artwork's own outlines and colours, so nothing is a flattened
+// picture and the crew can recolour a room or move a wall in Office without
+// redrawing anything. A lockup whose outlines cannot be read falls back to the
+// approved artwork as a picture, and the file says so.
 //
 // A floor the issued design only places as a picture cannot be rebuilt; that one
 // falls back to print-resolution artwork with the wording still editable on top,
@@ -23,7 +26,11 @@ import {
   type QeiiMarkVariant,
   type QeiiPlanOptions,
 } from "@/lib/next-london-qeii-plan";
-import { qeiiMarkBoxes } from "@/lib/next-london-qeii-mark-art";
+import {
+  qeiiMarkBoxes,
+  qeiiMarkPlanShapes,
+  qeiiMarkVectors,
+} from "@/lib/next-london-qeii-mark-art";
 import { inlineSvgImages, qeiiRasteriseLockup, qeiiRasteriseSvg } from "@/lib/next-london-qeii-pdf";
 import { qeiiColourKey, qeiiColourPaint, qeiiRoomTextInk } from "@/lib/next-london-qeii-rooms";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
@@ -153,29 +160,48 @@ async function planPieces(
   // cannot follow, so each one is embedded as print-resolution PNG here.
   const marks: PlanPieces["marks"] = [];
   let droppedMarks = 0;
-  if (rebuilt && (options.showLabels ?? true)) {
-    const cache = new Map<string, { dataUrl: string; w: number; h: number } | null>();
-    for (const box of qeiiMarkBoxes(floor, options)) {
-      if (!cache.has(box.url)) cache.set(box.url, await qeiiRasteriseLockup(box.url));
-      const art = cache.get(box.url);
-      if (!art) {
-        droppedMarks += 1;
-        continue;
-      }
-      marks.push({
-        name: box.name,
-        dataUrl: art.dataUrl,
-        cx: box.cx,
-        cy: box.cy,
-        w: box.w,
-        h: box.h,
-        angle: box.angle,
-      });
-    }
-    if (marks.length) {
+  if (rebuilt && shapes && (options.showLabels ?? true)) {
+    // First choice: the lockup's own outlines, rebuilt as Office shapes so the
+    // artwork stays editable and keeps the approved colours.
+    const vectors = await qeiiMarkVectors(floor, options);
+    const vector = qeiiMarkPlanShapes(vectors.placements);
+    shapes.push(...vector.shapes);
+    if (vector.placed.length) {
       notes.push(
-        `${marks.length} division lockup${marks.length === 1 ? " is" : "s are"} embedded as the approved artwork, so ${marks.length === 1 ? "it travels" : "they travel"} with the file.`,
+        `${vector.placed.length} division lockup${vector.placed.length === 1 ? " is" : "s are"} rebuilt as editable shapes from the approved artwork, in its own colours.`,
       );
+    }
+    // Anything whose outlines could not be rebuilt falls back to the approved
+    // artwork as print-resolution picture — never redrawn, never faked.
+    const fallback = [
+      ...vectors.dropped,
+      ...vector.unsupported,
+    ];
+    if (fallback.length) {
+      const cache = new Map<string, { dataUrl: string; w: number; h: number } | null>();
+      for (const box of qeiiMarkBoxes(floor, options)) {
+        if (!fallback.includes(box.name)) continue;
+        if (!cache.has(box.url)) cache.set(box.url, await qeiiRasteriseLockup(box.url));
+        const art = cache.get(box.url);
+        if (!art) {
+          droppedMarks += 1;
+          continue;
+        }
+        marks.push({
+          name: box.name,
+          dataUrl: art.dataUrl,
+          cx: box.cx,
+          cy: box.cy,
+          w: box.w,
+          h: box.h,
+          angle: box.angle,
+        });
+      }
+      if (marks.length) {
+        notes.push(
+          `${marks.length} division lockup${marks.length === 1 ? " is" : "s are"} embedded as the approved artwork rather than shapes, so ${marks.length === 1 ? "it travels" : "they travel"} with the file but cannot be recoloured.`,
+        );
+      }
     }
     if (droppedMarks) {
       notes.push(
