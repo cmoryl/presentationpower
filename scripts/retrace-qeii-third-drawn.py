@@ -173,6 +173,22 @@ def main() -> None:
         cls = classify(rgb, alpha)
         seeds, tone = regions(cls)
         grown = grow_to_wall_centre(seeds, cls)
+        labels = qeii.collect_labels(boxes.read_text(errors="replace"))
+
+        # Which regions carry a room name on the sheet, read by putting each name
+        # back on the picture through the picture's own placement.
+        inv = invert(ctm)
+        named: set[int] = set()
+        h, w = grown.shape
+        for label in labels:
+            px, py = raster.apply(inv, label.x, label.y)
+            for dy in (0, -6, -12, 6):
+                iy, ix = int(round(py + dy)), int(round(px))
+                if 0 <= iy < h and 0 <= ix < w and grown[iy, ix] > 0:
+                    named.add(int(grown[iy, ix]))
+                    break
+
+        building = float((cls != 3).sum())
 
         shapes: list[dict] = []
         # The band itself sits underneath, so a wall thicker than the reach still
@@ -191,7 +207,14 @@ def main() -> None:
             ring = biggest_ring(mask, tmp, f"r{rid}")
             if ring is None:
                 continue
-            ink = ROOM_INK if tone[rid - 1] == 0 else CIRCULATION_INK
+            # House convention on the drawn floors: a room reads dark and
+            # circulation reads light. The picture paints this floor the other way
+            # round, so the tone is decided by what the region is, not by the ink
+            # the picture happens to use: a region with a room name on it is a
+            # room, and so is a small enclosure, while a large unnamed area is the
+            # circulation running through the floor.
+            room = rid in named or float(mask.sum()) / building < ROOM_SHARE
+            ink = ROOM_INK if room else CIRCULATION_INK
             pieces.append(
                 (
                     raster.area_of(ring),
@@ -207,7 +230,7 @@ def main() -> None:
         shapes += [p[1] for p in pieces]
         shapes += detail_shapes(cls, grown, tmp, place)
 
-        labels = qeii.collect_labels(boxes.read_text(errors="replace"))
+
         print(f"{len(pieces)} regions, {len(shapes)} shapes, {len(labels)} labels")
         emit(shapes, labels, out_record)
 
