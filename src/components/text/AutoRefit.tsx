@@ -111,9 +111,13 @@ export function runAutoRefit(
     // The worst of the two: the slot's own clipped box, and the box that clips it.
     const ratio = Math.max(overflowRatio(own), box === root ? 1 : overflowRatio(inBox));
     if (ratio <= 1.005) {
-      restore(el);
+      // It fits. If that is because an earlier pass sized it down, leave the fit
+      // in place — measuring the fitted copy and then restoring the authored
+      // size would put the overflow straight back. A fresh signature, a resize
+      // or a copy edit restores the authored design before measuring again.
       continue;
     }
+
 
     const lineHeightPx = parseFloat(cs.lineHeight);
     const plan = refitPlan({
