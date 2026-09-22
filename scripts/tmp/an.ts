@@ -1,6 +1,6 @@
-import { QEII_FLOOR_VECTORS } from "@/lib/next-london-qeii-vectors";
+import { qeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 import { qeiiTracedSymbolShapes } from "@/lib/next-london-qeii-symbols";
-const f = QEII_FLOOR_VECTORS["third"]!;
+const f = qeiiFloorVector("third")!;
 const drop = qeiiTracedSymbolShapes(f);
 function box(d:string){const n=d.match(/-?\d+(\.\d+)?/g)!.map(Number);const xs:number[]=[],ys:number[]=[];n.forEach((v,i)=>i%2?ys.push(v):xs.push(v));return{x0:Math.min(...xs),y0:Math.min(...ys),x1:Math.max(...xs),y1:Math.max(...ys)};}
 let small=0;
