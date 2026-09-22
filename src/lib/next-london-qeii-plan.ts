@@ -124,8 +124,36 @@ export function qeiiPlanInk(colour: string | undefined, face: QeiiPlanFace): str
   return QEII_PLAN_TOKENS.ink;
 }
 
-/** Colour a label takes over the plan: white reads on every plan tone we use. */
-export function qeiiLabelInk(): string {
+/**
+ * The plan tone a point sits on, read from the artwork rather than assumed.
+ *
+ * Shapes are painted in order, so the topmost shape holding the point is the one
+ * a room name is printed over. Used to ink a name so it reads: the venue sets a
+ * couple of labels over white artwork, where a white name would disappear.
+ */
+export function qeiiToneUnder(
+  floor: QeiiFloorVector,
+  x: number,
+  y: number,
+  face: QeiiPlanFace = "issued",
+): string | undefined {
+  for (let i = floor.shapes.length - 1; i >= 0; i -= 1) {
+    const shape = floor.shapes[i]!;
+    if (!shape.fill) continue;
+    if (qeiiShapeHolds(shape, x, y).held) return qeiiPlanInk(shape.fill, face);
+  }
+  return undefined;
+}
+
+/**
+ * Colour a label takes over the plan.
+ *
+ * White reads on the dark and mid plan tones, which carry almost every room name.
+ * Over white artwork — the mezzanine marker on the 3rd floor — the name is set in
+ * ink instead, so it is never printed white on white.
+ */
+export function qeiiLabelInk(tone?: string): string {
+  if (tone && luminance(tone) > 0.62) return QEII_PLAN_TOKENS.ink;
   return QEII_PLAN_TOKENS.white;
 }
 
