@@ -137,6 +137,7 @@ async function planPieces(
             room: block.room,
             lines: block.lines,
             use: block.use,
+            useLines: block.useLines?.length ? block.useLines : block.use ? [block.use] : [],
             x: block.x,
             y: block.y,
             size: block.size,
