@@ -73,6 +73,7 @@ type PlanPieces = {
     room: string;
     lines: string[];
     use?: string;
+    useLines: string[];
     x: number;
     y: number;
     size: number;
