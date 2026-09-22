@@ -225,7 +225,7 @@ export async function buildQeiiPlanPptx(
             },
           });
       }
-      slide.addShape("custGeom", {
+      slide.addShape("custGeom" as never, {
         x: ox + x0 * k,
         y: oy + y0 * k,
         w,
