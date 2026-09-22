@@ -709,10 +709,17 @@ export async function buildQeiiPlanDocx(
       (picBytes
         ? `<Relationship Id="rId10" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/plan.png"/>`
         : "") +
+      markMedia
+        .map(
+          (m) =>
+            `<Relationship Id="${m.rel}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${m.file}"/>`,
+        )
+        .join("") +
       `</Relationships>`,
   );
   zip.file("word/document.xml", document);
   if (picBytes) zip.file("word/media/plan.png", picBytes);
+  for (const m of markMedia) zip.file(`word/media/${m.file}`, m.bytes);
 
   const blob = await zip.generateAsync({
     type: "blob",
