@@ -1124,6 +1124,7 @@ export function SlideFrame({
           <div
             aria-hidden
             data-decorative="true"
+            data-brand-system-ground="true"
             className="pointer-events-none absolute inset-0"
             // ARTIFACT GUARD — longhand only. Mixing the `background` shorthand
             // with backgroundSize/Position makes React patch the layer list in
