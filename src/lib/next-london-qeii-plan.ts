@@ -401,7 +401,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${floor.w}" height="${floor.h + keyH}" viewBox="0 0 ${floor.w} ${floor.h + keyH}">`,
     `<title>Queen Elizabeth II Centre — ${floor.title}</title>`,
-    `<rect width="${floor.w}" height="${floor.h + keyH}" fill="${QEII_PLAN_TOKENS.surface}"/>`,
+    `<rect width="${floor.w}" height="${floor.h + keyH}" fill="${qeiiPlanGround(face)}"/>`,
     shapes,
     labels,
     keySvg,
