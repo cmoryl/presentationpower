@@ -128,18 +128,15 @@ function luminance(hex: string): number {
 }
 
 /**
- * Map an issued plan colour onto the enterprise palette.
+ * Map an issued plan colour onto the chosen look.
  *
  * The venue draws in three tones: a dark room fill, a mid cyan circulation fill,
- * and white walls and symbols. We keep that three-tone reading and only change
- * which approved colour carries each tone, so nothing in the plan is lost.
+ * and white walls and symbols. Every look keeps that three-tone reading and only
+ * changes which approved colour carries each tone, so nothing in the plan is lost.
+ * The mapping itself lives in the master style sheet.
  */
 export function qeiiPlanInk(colour: string | undefined, face: QeiiPlanFace): string | undefined {
-  if (!colour || face === "issued") return colour;
-  const lum = luminance(colour);
-  if (lum > 0.78) return QEII_PLAN_TOKENS.white;
-  if (lum > 0.32) return QEII_PLAN_TOKENS.accent;
-  return QEII_PLAN_TOKENS.ink;
+  return qeiiStyledInk(colour, face);
 }
 
 /**
