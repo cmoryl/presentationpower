@@ -141,6 +141,52 @@ export const LONDON_BOOTH_SHELLS: LondonBoothShell[] = [
   },
 ];
 
+// ---------------------------------------------------------------------------
+// CALIFORNIA TV KIOSK — the supplied three-artboard kiosk template.
+//
+// The front face carries the monitor aperture measured out of the supplied
+// artboard; the two 4 in return strips carry no screen at all, so they are a
+// separate shell rather than the same shell at another size. No in-situ
+// visualisation has been issued for the kiosk, so the render plate is the flat
+// supplied artboard and is labelled as such — never a survey photograph.
+// ---------------------------------------------------------------------------
+LONDON_BOOTH_SHELLS.push(
+  {
+    id: "tv-kiosk",
+    label: "California TV kiosk — front face",
+    sourceFile: "TVKioskTemplate.ai",
+    aiUrl: kioskTemplateAi,
+    previewUrl: kioskProof,
+    trimW: CALIFORNIA_KIOSK_FRONT_TRIM.w,
+    trimH: CALIFORNIA_KIOSK_FRONT_TRIM.h,
+    bleedMm: CALIFORNIA_KIOSK_BLEED_MM,
+    hasScreen: true,
+    screen: { ...CALIFORNIA_KIOSK_SCREEN_FRACTION },
+    renderUrl: kioskProof,
+    renderFace: { x: 0, y: 0, w: 1, h: 1 },
+    note:
+      `TV kiosk front: a ${Math.round(CALIFORNIA_KIOSK_SCREEN_MM.w)} × ` +
+      `${Math.round(CALIFORNIA_KIOSK_SCREEN_MM.h)} mm monitor aperture sits flush to the left trim ` +
+      `edge, ${Math.round(CALIFORNIA_KIOSK_SCREEN_MM.y)} mm below the trim top. Keep the lockup ` +
+      "above it and the copy below it. No in-situ visualisation has been issued for this kiosk.",
+  },
+  {
+    id: "tv-kiosk-return",
+    label: "California TV kiosk — return strip",
+    sourceFile: "TVKioskTemplate.ai",
+    aiUrl: kioskTemplateAi,
+    previewUrl: kioskReturnProof,
+    trimW: CALIFORNIA_KIOSK_RETURN_TRIM.w,
+    trimH: CALIFORNIA_KIOSK_RETURN_TRIM.h,
+    bleedMm: CALIFORNIA_KIOSK_BLEED_MM,
+    hasScreen: false,
+    screen: null,
+    renderUrl: kioskReturnProof,
+    renderFace: { x: 0, y: 0, w: 1, h: 1 },
+    note: "Return strip: 101.6 × 2438.4 mm, no screen, the whole face is live artwork.",
+  },
+);
+
 export const DEFAULT_BOOTH_SHELL_ID: LondonBoothShellId = "tradebooth-a";
 
 /**
