@@ -269,7 +269,13 @@ export function qeiiMarkPlanShapes(placements: QeiiMarkPlacement[]): {
   const shapes: QeiiDrawShape[] = [];
   const placed: string[] = [];
   const unsupported: string[] = [];
+  let seq = 0;
   for (const mark of placements) {
+    // One group name per placement, so two rooms carrying the same division
+    // lockup stay separate objects and move independently.
+    seq += 1;
+    const groupName = `${mark.name} lockup ${seq}`;
+
     const fit = Math.min(mark.w / mark.art.w, mark.h / mark.art.h);
     const rad = (mark.angle * Math.PI) / 180;
     const cos = Math.cos(rad);
