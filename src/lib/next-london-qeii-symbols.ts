@@ -101,9 +101,38 @@ export function qeiiTracedSymbolShapes(floor: QeiiFloorVector): Set<number> {
       if (b.x0 >= box.x0 && b.x1 <= box.x1 && b.y0 >= box.y0 && b.y1 <= box.y1) pieces += 1;
     }
     if (pieces >= TRACED_HOST_PIECES) drop.add(i);
-  });
+  // Some remnants of the same pictogram come back as fine lines rather than
+  // filled blocks, and a few sit a hair outside the block they belong to. A
+  // piece that small, sitting right on top of pieces we are already leaving off,
+  // is part of the same broken mark, so it goes with them. A lone small mark —
+  // a wall end, the level arrow — has no such company and stays on the plan.
+  const allBoxes = floor.shapes.map(shapeBox);
+  const centre = (b: Box) => ({ x: (b.x0 + b.x1) / 2, y: (b.y0 + b.y1) / 2 });
+  for (let pass = 0; pass < 3; pass += 1) {
+    let added = false;
+    allBoxes.forEach((box, i) => {
+      if (!box || drop.has(i)) return;
+      const size = Math.max(box.x1 - box.x0, box.y1 - box.y0);
+      if (size > TRACED_HOST_MAX) return;
+      const c = centre(box);
+      let company = 0;
+      for (const j of drop) {
+        const b = allBoxes[j];
+        if (!b) continue;
+        const o = centre(b);
+        if (Math.hypot(c.x - o.x, c.y - o.y) <= TRACED_DEBRIS_REACH) company += 1;
+        if (company >= TRACED_DEBRIS_COMPANY) break;
+      }
+      if (company >= TRACED_DEBRIS_COMPANY) {
+        drop.add(i);
+        added = true;
+      }
+    });
+    if (!added) break;
+  }
   return drop;
 }
+
 
 /** How close two pictograms must be to count as the same washroom. */
 const CLUSTER_REACH = 46;
