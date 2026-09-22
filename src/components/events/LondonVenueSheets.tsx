@@ -458,8 +458,9 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
    * with editable room names over it; Illustrator carries the drawing itself as
    * live vector art. Nothing is invented — every file is this floor as it reads.
    */
-  async function exportPlan(kind: "pptx" | "docx" | "ai" | "zip") {
+  async function exportPlan(kind: "pptx" | "docx" | "ai" | "zip" | "canva" | "canva-all") {
     if (!plan?.rebuilt) return;
+
     setExporting(kind);
     setExportNote(undefined);
     try {
