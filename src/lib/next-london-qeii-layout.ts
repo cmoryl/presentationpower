@@ -169,10 +169,25 @@ function boxFor(
   above: number,
   below: number,
 ): QeiiBox {
-  const turned = Math.abs(Math.abs(angle) - 90) < 15;
-  const w = turned ? above + below : width;
-  const h = turned ? width : above + below;
-  return { x0: x - w / 2, y0: y - h / 2, x1: x + w / 2, y1: y + h / 2 };
+  // Text is anchored on the room name, not at the vertical centre of its whole
+  // block: lockups extend above that anchor and event rows extend below it.
+  // Keep that asymmetry when building the collision box. The previous centred
+  // approximation could say two blocks were clear while the rendered event row
+  // crossed a wall or neighbouring caption. Rotating all four corners also keeps
+  // angled labels such as Stage/Screen honest instead of treating them as flat.
+  const radians = (angle * Math.PI) / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  const corners: Array<[number, number]> = [
+    [-width / 2, -above],
+    [width / 2, -above],
+    [width / 2, below],
+    [-width / 2, below],
+  ];
+  const rotated = corners.map(([dx, dy]) => [x + dx * cos - dy * sin, y + dx * sin + dy * cos]);
+  const xs = rotated.map(([px]) => px);
+  const ys = rotated.map(([, py]) => py);
+  return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) };
 }
 
 function overlaps(a: QeiiBox, b: QeiiBox, pad: number): boolean {
