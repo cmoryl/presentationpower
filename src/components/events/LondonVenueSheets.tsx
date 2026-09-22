@@ -7,7 +7,18 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, FileDown, Maximize2, Pencil, Printer, Save, Search, X } from "lucide-react";
+import {
+  ChevronDown,
+  Download,
+  FileDown,
+  Maximize2,
+  Pencil,
+  Printer,
+  Save,
+  Search,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 
 import { useSessionUser } from "@/hooks/use-session-user";
 import { QeiiMapEditPanel } from "@/components/events/QeiiMapEditPanel";
