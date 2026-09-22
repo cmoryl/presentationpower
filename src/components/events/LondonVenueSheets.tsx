@@ -997,7 +997,32 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
         </ul>
       ) : null}
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+      {allFloors ? (
+        <QeiiAllFloors
+          face={face}
+          labelScale={labelScale}
+          showLabels={showLabels}
+          showUse={showUse}
+          showMarks={showMarks}
+          markVariant={markVariant}
+          markScale={markScale}
+          wallWeight={wallWeight}
+          showAllSymbols={showAllSymbols}
+          roomColourMap={roomColourMap}
+          keyLabelMap={keyLabelMap}
+          editsMap={editsMap}
+          onOpenFloor={(id) => {
+            setSheetId(id);
+            setAllFloors(false);
+          }}
+        />
+      ) : null}
+
+      <div
+        className={`mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] ${
+          allFloors ? "hidden" : ""
+        }`}
+      >
         <figure className="overflow-hidden rounded-2xl border border-black/10 bg-[#F2F2F2]">
 
           {showRebuilt && plan ? (
