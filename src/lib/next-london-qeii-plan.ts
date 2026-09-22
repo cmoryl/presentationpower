@@ -179,9 +179,27 @@ export type QeiiPlanState = {
   reason?: string;
 };
 
+/**
+ * Names the issued sheets carry that nobody at the event needs on a plan:
+ * the catering lifts and the voids over double-height spaces. They are dropped
+ * from every plan, room list and download from one place here, so the drawing,
+ * the exports and the schedule always agree. The artwork itself is untouched —
+ * only the name is left off.
+ */
+const QEII_LABELS_OFF_PLAN = ["catering lift", "void"];
+
+export function qeiiLabelOffPlan(text: string): boolean {
+  const clean = text.trim().toLowerCase().replace(/\s+/g, " ");
+  return QEII_LABELS_OFF_PLAN.includes(clean);
+}
+
 export function qeiiPlanState(id: string): QeiiPlanState | undefined {
-  const floor = qeiiFloorVector(id);
-  if (!floor) return undefined;
+  const source = qeiiFloorVector(id);
+  if (!source) return undefined;
+  const floor: QeiiFloorVector = {
+    ...source,
+    labels: source.labels.filter((label) => !qeiiLabelOffPlan(label.text)),
+  };
   if (floor.kind === "vector" && floor.shapes.length >= 20) {
     return { floor, rebuilt: true };
   }
@@ -192,6 +210,7 @@ export function qeiiPlanState(id: string): QeiiPlanState | undefined {
       "This floor is a placed picture in the issued design rather than drawn shapes, so it cannot be rebuilt as native artwork. The issued sheet is shown instead.",
   };
 }
+
 
 /** A standalone SVG of the rebuilt plan, for handing on or editing elsewhere. */
 export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {}): string {
