@@ -152,7 +152,7 @@ def trace_rings(mask: np.ndarray, tmp: Path, tag: str) -> list[list[tuple[float,
     pbm = tmp / f"{tag}.pbm"
     svg = tmp / f"{tag}.svg"
     bw.save(pbm)
-    raster.run("potrace", "-s", "-a", "1.0", "-t", "16", "-O", "0.8", "-o", str(svg), str(pbm))
+    raster.run("potrace", "-s", "-a", "1.0", "-t", "6", "-O", "0.8", "-o", str(svg), str(pbm))
     out: list[list[tuple[float, float]]] = []
     for ring in raster.contours(svg.read_text()):
         pts = [(x / TRACE_UP, y / TRACE_UP) for x, y in ring]
