@@ -6,12 +6,16 @@
 // plan, the SVG, the Illustrator master, PowerPoint and Word all read this file,
 // so a change here changes the whole set at once and every floor stays cohesive.
 //
-// Three looks are offered and nothing else:
-//   issued  — the venue's own inks, untouched, for checking against their sheet.
-//   element — the venue's three tones mapped onto the approved enterprise palette.
-//   studio  — the house drawing style: pale rooms, near-white circulation, fine
-//             dark wall lines and softened room colours, so a plan reads as a
-//             professional architectural drawing rather than a painted diagram.
+// The presets on offer, and nothing else:
+//   studio    — the house drawing style: pale rooms, near-white circulation, fine
+//               dark wall lines and softened room colours, so a plan reads as a
+//               professional architectural drawing rather than a painted diagram.
+//   line      — a pure line drawing: white throughout, grey walls, palest colour.
+//   press     — a high-contrast print look: white rooms, heavier ink wall lines.
+//   wayfinder — light navy rooms on white, for attendee-facing directories.
+//   blueprint — reversed: navy ground, blue rooms, aqua wall lines.
+//   element   — the venue's three tones mapped onto the approved enterprise palette.
+//   issued    — the venue's own inks, untouched, for checking against their sheet.
 //
 // The ground is always a solid approved token; no artwork is ever used behind a
 // plan, and no colour outside the approved palette is introduced.
@@ -19,7 +23,14 @@
 
 import type { QeiiColourPaint } from "@/lib/next-london-qeii-rooms";
 
-export type QeiiPlanFace = "issued" | "element" | "studio";
+export type QeiiPlanFace =
+  | "issued"
+  | "element"
+  | "studio"
+  | "line"
+  | "press"
+  | "wayfinder"
+  | "blueprint";
 
 export type QeiiMapLook = {
   id: QeiiPlanFace;
@@ -56,6 +67,50 @@ export const QEII_MAP_LOOKS: Record<QeiiPlanFace, QeiiMapLook> = {
     wallScale: 0.62,
     tint: 0.62,
   },
+  line: {
+    id: "line",
+    name: "Line drawing",
+    note: "White throughout with fine grey walls — the quietest look, for plans printed inside a document.",
+    ground: "#FFFFFF",
+    room: "#F2F2F2",
+    circulation: "#FFFFFF",
+    wall: "#666666",
+    wallScale: 0.5,
+    tint: 0.74,
+  },
+  press: {
+    id: "press",
+    name: "Press contrast",
+    note: "White rooms and heavy ink walls — the most robust look for offset print and mono copies.",
+    ground: "#FFFFFF",
+    room: "#FFFFFF",
+    circulation: "#FFFFFF",
+    wall: "#03002C",
+    wallScale: 1.15,
+    tint: 0.42,
+  },
+  wayfinder: {
+    id: "wayfinder",
+    name: "Wayfinder",
+    note: "Rooms in Blue White against white walkways — an attendee-facing directory look.",
+    ground: "#FFFFFF",
+    room: "#003FC7",
+    circulation: "#E0E8F5",
+    wall: "#FFFFFF",
+    wallScale: 0.9,
+    tint: 0.2,
+  },
+  blueprint: {
+    id: "blueprint",
+    name: "Blueprint",
+    note: "Reversed onto Blue 800 with aqua wall lines — for dark slides and signage.",
+    ground: "#03002C",
+    room: "#003FC7",
+    circulation: "#03002C",
+    wall: "#A1FBF9",
+    wallScale: 0.8,
+    tint: 0,
+  },
   element: {
     id: "element",
     name: "Enterprise inks",
@@ -77,7 +132,15 @@ export const QEII_MAP_LOOKS: Record<QeiiPlanFace, QeiiMapLook> = {
   },
 };
 
-export const QEII_MAP_LOOK_ORDER: QeiiPlanFace[] = ["studio", "element", "issued"];
+export const QEII_MAP_LOOK_ORDER: QeiiPlanFace[] = [
+  "studio",
+  "line",
+  "press",
+  "wayfinder",
+  "blueprint",
+  "element",
+  "issued",
+];
 
 export function qeiiLook(face: QeiiPlanFace = "issued"): QeiiMapLook {
   return QEII_MAP_LOOKS[face] ?? QEII_MAP_LOOKS.issued;
@@ -86,6 +149,15 @@ export function qeiiLook(face: QeiiPlanFace = "issued"): QeiiMapLook {
 /** Solid ground behind a plan in this look. */
 export function qeiiPlanGround(face: QeiiPlanFace = "issued"): string {
   return qeiiLook(face).ground;
+}
+
+/**
+ * Ink for text sitting on the look's own ground — the key rows beneath a plan and
+ * the odd name the artwork leaves over bare ground. A reversed look grounds in
+ * Blue 800, so that text has to set white or it would print invisibly.
+ */
+export function qeiiGroundInk(face: QeiiPlanFace = "issued"): string {
+  return qeiiLuminance(qeiiLook(face).ground) > 0.55 ? "#03002C" : "#FFFFFF";
 }
 
 function channels(hex: string): [number, number, number] | undefined {

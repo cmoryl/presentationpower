@@ -26,7 +26,10 @@ import {
 import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import {
   QEII_PLAN_TOKENS,
+  qeiiGroundInk,
   qeiiLabelInk,
+  qeiiPlanGround,
+  qeiiRoomTint,
   qeiiToneUnder,
   qeiiPlanInk,
   type QeiiPlanOptions,
@@ -208,7 +211,7 @@ export async function buildQeiiPlanAi(
         ? qeiiRoomTextInk(tag)
         : roomColours[block.room]
           ? qeiiRoomTextInk(roomColours[block.room])
-          : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face));
+          : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face), face);
       const turned = Math.abs(block.angle) >= 0.5;
       const open = turned
         ? (() => {
@@ -268,11 +271,13 @@ export async function buildQeiiPlanAi(
       const y = floor.h + keyStep * (0.9 + i);
       const swatch = keyStep * 0.72;
       const size = keyStep * 0.52 * k;
+      // The key carries the same softened colour and readable ink as the screen.
+      const swatchHex = qeiiRoomTint(row.hex, face) ?? row.hex;
       return (
-        `q ${fillOp(row.hex, [0, 0.25, 0.78])} ${f3(px(floor.w * 0.02))} ${f3(
+        `q ${fillOp(swatchHex, [0, 0.25, 0.78])} ${f3(px(floor.w * 0.02))} ${f3(
           py(y + keyStep * 0.38),
         )} ${f3(swatch * k)} ${f3(swatch * k)} re f Q\n` +
-        `BT /F1 ${f3(size)} Tf ${fillOp(QEII_PLAN_TOKENS.ink, [0.01, 0, 0.17])} ${f3(
+        `BT /F1 ${f3(size)} Tf ${fillOp(qeiiGroundInk(face), [0.01, 0, 0.17])} ${f3(
           px(floor.w * 0.02 + keyStep),
         )} ${f3(py(y) - size * 0.36)} Td (${pdfText(row.label)}) Tj ET\n`
       );
@@ -347,7 +352,7 @@ export async function buildQeiiPlanAi(
   );
 
   const content =
-    `q\n/OC /oc1 BDC\n${fillOp(QEII_PLAN_TOKENS.surface, [0.93, 0.95, 0.97])} 0 0 ${f3(pageW)} ${f3(
+    `q\n/OC /oc1 BDC\n${fillOp(qeiiPlanGround(face), [0.93, 0.95, 0.97])} 0 0 ${f3(pageW)} ${f3(
       pageH,
     )} re f\n${planOps}EMC\nQ\n` +
     `q\n/OC /oc2 BDC\n${textOps}EMC\nQ\n` +

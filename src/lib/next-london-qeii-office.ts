@@ -21,7 +21,13 @@ import { qeiiDrawShapes, qeiiSegsBox, type QeiiDrawShape } from "@/lib/next-lond
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import {
   QEII_PLAN_TOKENS,
+  qeiiGroundInk,
+  qeiiLabelInk,
   qeiiMarkUrl,
+  qeiiPlanGround,
+  qeiiRoomTint,
+  qeiiStyledPaint,
+  qeiiToneUnder,
   qeiiPlanSvg,
   type QeiiMarkVariant,
   type QeiiPlanOptions,
@@ -69,6 +75,10 @@ type PlanPieces = {
   art?: { dataUrl: string; w: number; h: number };
   /** Plan-unit geometry of the drawing, including the key strip. */
   units: { w: number; h: number };
+  /** Solid ground the chosen preset puts behind the plan. */
+  ground: string;
+  /** Ink that reads on that ground, for the key rows. */
+  groundInk: string;
   blocks: {
     room: string;
     lines: string[];
@@ -120,7 +130,10 @@ async function planPieces(
     );
   }
   const roomColours = options.roomColours ?? {};
-  const paint = qeiiColourPaint(floor, roomColours);
+  // The chosen preset decides the tones here too, so a PowerPoint or Word file
+  // matches the plan on screen rather than reverting to the issued look.
+  const face = options.face ?? "issued";
+  const paint = qeiiStyledPaint(qeiiColourPaint(floor, roomColours), face);
   const layout = qeiiPlanLayout(floor, {
     labelScale: options.labelScale ?? 1,
     showUse: options.showUse,
@@ -131,8 +144,10 @@ async function planPieces(
   const blocks =
     (options.showLabels ?? true)
       ? layout.blocks.map((block) => {
-          const tag = paint.tags.get(block.room) ?? roomColours[block.room];
-          const ink = tag ? qeiiRoomTextInk(tag) : "#FFFFFF";
+          const tag = paint.tags.get(block.room) ?? qeiiRoomTint(roomColours[block.room], face);
+          const ink = tag
+            ? qeiiRoomTextInk(tag)
+            : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face), face);
           return {
             room: block.room,
             lines: block.lines,
@@ -152,7 +167,7 @@ async function planPieces(
   const keyStep = floor.w * 0.038;
   const keyH = keyRows.length ? keyStep * (keyRows.length + 1.2) : 0;
   const key = keyRows.map((row, i) => ({
-    hex: row.hex,
+    hex: qeiiRoomTint(row.hex, face) ?? row.hex,
     label: row.label,
     x: floor.w * 0.02 + keyStep,
     y: floor.h + keyStep * (0.9 + i),
@@ -211,7 +226,17 @@ async function planPieces(
       );
     }
   }
-  return { shapes, art, units: { w: floor.w, h: floor.h + keyH }, blocks, key, marks, notes };
+  return {
+    shapes,
+    art,
+    units: { w: floor.w, h: floor.h + keyH },
+    ground: qeiiPlanGround(face),
+    groundInk: qeiiGroundInk(face),
+    blocks,
+    key,
+    marks,
+    notes,
+  };
 }
 
 // ── PowerPoint ───────────────────────────────────────────────────────────────
@@ -273,7 +298,7 @@ export async function buildQeiiPlanPptx(
     y: oy,
     w: artW,
     h: artH,
-    fill: { color: hex(QEII_PLAN_TOKENS.surface, "EEF1F7") },
+    fill: { color: hex(plan.ground, "EEF1F7") },
     line: { type: "none" },
   });
 
@@ -403,7 +428,7 @@ export async function buildQeiiPlanPptx(
       fontFace: FONT,
       fontSize: size,
       bold: true,
-      color: "03002C",
+      color: hex(plan.groundInk, "03002C"),
       margin: 0,
       fit: "none",
     });
@@ -599,7 +624,7 @@ export async function buildQeiiPlanDocx(
         "Plan ground",
         { x: 0, y: 0, w: artWemu, h: artHemu },
         `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>`,
-        `<a:solidFill><a:srgbClr val="${hex(QEII_PLAN_TOKENS.surface, "EEF1F7")}"/></a:solidFill><a:ln><a:noFill/></a:ln>`,
+        `<a:solidFill><a:srgbClr val="${hex(plan.ground, "EEF1F7")}"/></a:solidFill><a:ln><a:noFill/></a:ln>`,
       ),
     ];
     for (const shape of plan.shapes) {
@@ -735,7 +760,7 @@ export async function buildQeiiPlanDocx(
           `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln><a:noFill/></a:ln></wps:spPr>` +
           `<wps:txbx><w:txbxContent><w:p><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr>` +
           `<w:r><w:rPr><w:rFonts w:ascii="${FONT}" w:hAnsi="${FONT}"/><w:b/>` +
-          `<w:sz w:val="${Math.max(2, Math.round(ptSize * 2))}"/><w:color w:val="03002C"/></w:rPr>` +
+          `<w:sz w:val="${Math.max(2, Math.round(ptSize * 2))}"/><w:color w:val="${hex(plan.groundInk, "03002C")}"/></w:rPr>` +
           `<w:t xml:space="preserve">${esc(row.label)}</w:t></w:r></w:p></w:txbxContent></wps:txbx>` +
           `<wps:bodyPr wrap="none" lIns="0" tIns="0" rIns="0" bIns="0" anchor="ctr"><a:noAutofit/></wps:bodyPr></wps:wsp>`,
       );

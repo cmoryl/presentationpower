@@ -23,6 +23,7 @@ import {
 } from "@/lib/next-london-qeii-rooms";
 import { qeiiFloorVector, type QeiiFloorVector, type QeiiLabel } from "@/lib/next-london-qeii-vectors";
 import {
+  qeiiGroundInk,
   qeiiLookWallWeight,
   qeiiPlanGround,
   qeiiRoomTint,
@@ -36,6 +37,7 @@ export type { QeiiPlanFace };
 export {
   QEII_MAP_LOOKS,
   QEII_MAP_LOOK_ORDER,
+  qeiiGroundInk,
   qeiiLook,
   qeiiLookWallWeight,
   qeiiPlanGround,
@@ -167,10 +169,11 @@ export function qeiiToneUnder(
  * Over white artwork — the mezzanine marker on the 3rd floor — the name is set in
  * ink instead, so it is never printed white on white.
  */
-export function qeiiLabelInk(tone?: string): string {
-  // No artwork under the point means the plan's own light ground is behind the
-  // name — the mezzanine marker on the 3rd floor sits there — so it is set in ink.
-  if (!tone) return QEII_PLAN_TOKENS.ink;
+export function qeiiLabelInk(tone?: string, face: QeiiPlanFace = "issued"): string {
+  // No artwork under the point means the plan's own ground is behind the name —
+  // the mezzanine marker on the 3rd floor sits there — so it takes whichever ink
+  // reads on that ground, dark on a light look and white on a reversed one.
+  if (!tone) return qeiiGroundInk(face);
   return luminance(tone) > 0.62 ? QEII_PLAN_TOKENS.ink : QEII_PLAN_TOKENS.white;
 }
 
@@ -309,7 +312,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
             ? qeiiRoomTextInk(tag)
             : roomFill
               ? qeiiRoomTextInk(roomFill)
-              : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face));
+              : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face), face);
           // A light room colour needs the colour lockup, not the reverse one.
           // A light room fill would swallow the reverse lockup, so that one falls
           // back to the colour file. An explicit all-white or colour choice stands.
@@ -393,7 +396,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
       const esc2 = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
       return [
         `<rect x="${floor.w * 0.02}" y="${y - keyStep * 0.34}" width="${keyStep * 0.72}" height="${keyStep * 0.72}" rx="${keyStep * 0.14}" fill="${qeiiRoomTint(row.hex, face)}"/>`,
-        options.showText === false ? "" : `<text x="${floor.w * 0.02 + keyStep}" y="${y}" dominant-baseline="middle" font-family="Geist, Geist Variable, sans-serif" font-weight="600" font-size="${keyStep * 0.52}" fill="${QEII_PLAN_TOKENS.ink}">${esc2(row.label)}</text>`,
+        options.showText === false ? "" : `<text x="${floor.w * 0.02 + keyStep}" y="${y}" dominant-baseline="middle" font-family="Geist, Geist Variable, sans-serif" font-weight="600" font-size="${keyStep * 0.52}" fill="${qeiiGroundInk(face)}">${esc2(row.label)}</text>`,
       ].join("");
     })
     .join("");

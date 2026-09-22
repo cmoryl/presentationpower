@@ -17,6 +17,7 @@ import {
   type QeiiPlanFace,
 } from "@/lib/next-london-qeii-plan";
 import {
+  qeiiGroundInk,
   qeiiLookWallWeight,
   qeiiPlanGround,
   qeiiRoomTint,
@@ -187,7 +188,7 @@ export function QeiiFloorPlan({
               ? qeiiRoomTextInk(tag)
               : fill
                 ? qeiiRoomTextInk(fill)
-                : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face));
+                : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face), face);
             // A light room colour swallows the reverse lockup, so that one falls back
             // to the colour file. An explicit all-white or colour choice is kept.
             const variant = ink === "#03002C" && markVariant === "reverse" ? "colour" : markVariant;
@@ -346,7 +347,7 @@ export function QeiiFloorPlan({
                   y={y}
                   dominantBaseline="middle"
                   fontSize={keyStep * 0.52}
-                  fill={QEII_PLAN_TOKENS.ink}
+                  fill={qeiiGroundInk(face)}
                   style={{ fontFamily: "Geist, 'Geist Variable', sans-serif", fontWeight: 600 }}
                 >
                   {row.label}
