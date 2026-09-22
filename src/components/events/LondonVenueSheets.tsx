@@ -942,7 +942,10 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
           picked={picked}
           onPick={setPicked}
           roomColours={roomColours}
-          onRoomColours={(next) => setRoomColourMap({ ...roomColourMap, [sheet.id]: next })}
+          onRoomColours={(next) => {
+            setRoomColourMap({ ...roomColourMap, [sheet.id]: next });
+            setDirty({ ...dirty, [sheet.id]: true });
+          }}
         />
       ) : null}
 
