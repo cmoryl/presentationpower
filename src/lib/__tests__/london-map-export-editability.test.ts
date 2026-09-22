@@ -89,10 +89,10 @@ describe("London map exports are editable", () => {
         expect(pdf).toContain(`/Name (${name})`);
       }
       for (const line of copy.lines) {
-        expect(pdf).toContain(
-          `(${line.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)")}) Tj`,
-        );
+        // Curly quotes and dashes must survive as printable WinAnsi bytes.
+        expect(pdf).toContain(`(${qeiiPdfCopy(line)}) Tj`);
       }
+
       expect(res.notes.join(" ")).toMatch(/editable text/i);
     },
   );
