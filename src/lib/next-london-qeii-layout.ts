@@ -366,29 +366,13 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     // name clears a lift symbol or a marker dot at its proper size. Sideways nudges
     // are tried too, so a name anchored hard against a wall is drawn back inside the
     // space rather than printed half over the edge of it.
-    const nudges: Array<[number, number]> = [
-      [0, 0],
-      [0, 0.35],
-      [0, -0.35],
-      [0.35, 0],
-      [-0.35, 0],
-      [0, 0.7],
-      [0, -0.7],
-      [0.7, 0],
-      [-0.7, 0],
-      [0, 1.05],
-      [0, -1.05],
-      [1.05, 0],
-      [-1.05, 0],
-      [0, 1.4],
-      [0, -1.4],
-      [1.4, 0],
-      [-1.4, 0],
-      [0, 2.2],
-      [0, -2.2],
-      [2.2, 0],
-      [-2.2, 0],
-    ];
+    // A room in the corner of its space needs to come in along both axes at once —
+    // down off the wall above it and in from the wall beside it — so every
+    // combination is tried, nearest its printed position first.
+    const offsets = [0, 0.35, -0.35, 0.7, -0.7, 1.05, -1.05, 1.4, -1.4, 2.2, -2.2];
+    const nudges: Array<[number, number]> = offsets
+      .flatMap((dx) => offsets.map((dy) => [dx, dy] as [number, number]))
+      .sort((a, b) => a[0] * a[0] + a[1] * a[1] - (b[0] * b[0] + b[1] * b[1]));
     // A tight room sets its lockup smaller before it loses it altogether; the
     // floor is the room name's own height, below which the lockup would not read.
     const markFactors = [1, 0.86, 0.72, 0.6, 0.5];
