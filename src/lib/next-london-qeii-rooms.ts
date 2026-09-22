@@ -121,10 +121,16 @@ export function qeiiSharedShapeNotes(floor: QeiiFloorVector): string[] {
   const seen = new Set<number>();
   const notes: string[] = [];
   for (const entry of qeiiRoomShapes(floor)) {
-    if (!entry.sharedWith.length || seen.has(entry.shapeIndex)) continue;
+    // A room whose exact outline could be cut from the block is filled properly,
+    // so it is no longer a limitation worth reporting.
+    if (!entry.sharedWith.length || entry.cell || seen.has(entry.shapeIndex)) continue;
+    const stuck = [entry.room, ...entry.sharedWith].filter(
+      (r) => !qeiiRoomShapes(floor).find((e) => e.room === r)?.cell,
+    );
+    if (stuck.length < 2) continue;
     seen.add(entry.shapeIndex);
     notes.push(
-      `${[entry.room, ...entry.sharedWith].join(", ")} are drawn as one shape in the issued artwork, so their colour shows as a tag behind each room name rather than filling the space.`,
+      `${stuck.join(", ")} are drawn as one shape in the issued artwork with no wall run closing them off, so their colour shows as a tag behind each room name rather than filling the space.`,
     );
   }
   return notes;
@@ -134,27 +140,33 @@ export function qeiiSharedShapeNotes(floor: QeiiFloorVector): string[] {
  * How each chosen colour is painted on a plan.
  *
  * A room drawn as its own shape is filled. A room the artwork draws inside a
- * shared block gets a tag behind its name instead, so the colour still reads
- * without painting a neighbour's space by mistake.
+ * shared block is filled with its own outline, cut from that block along the
+ * issued wall runs. Only where the walls leave a room open does the colour fall
+ * back to a tag behind the name, so a neighbour's space is never painted.
  */
 export type QeiiColourPaint = {
   /** Shape index → fill, for rooms drawn as their own shape. */
   fills: Map<number, string>;
   /** Room name → tag colour, for rooms sharing a drawn shape. */
   tags: Map<string, string>;
+  /** Exact room outlines cut from a shared block, drawn over the plan fill. */
+  cells: { room: string; d: string; hex: string }[];
 };
 
 export function qeiiColourPaint(floor: QeiiFloorVector, rooms: QeiiRoomColours): QeiiColourPaint {
   const fills = new Map<number, string>();
   const tags = new Map<string, string>();
+  const cells: { room: string; d: string; hex: string }[] = [];
   for (const entry of qeiiRoomShapes(floor)) {
     const hex = rooms[entry.room];
     if (!hex) continue;
     if (qeiiRoomIsExclusive(entry)) fills.set(entry.shapeIndex, hex);
+    else if (entry.cell) cells.push({ room: entry.room, d: entry.cell, hex });
     else tags.set(entry.room, hex);
   }
-  return { fills, tags };
+  return { fills, tags, cells };
 }
+
 
 /** The fill a room's own name sits on, so its ink stays readable. */
 export function qeiiRoomFill(
