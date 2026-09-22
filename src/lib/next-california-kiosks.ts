@@ -27,12 +27,23 @@
 
 import kioskTemplate from "@/assets/california-kiosks/tv-kiosk-template.ai?url";
 import {
+  CALIFORNIA_KIOSK_BLEED_MM,
+  CALIFORNIA_KIOSK_FRONT_TRIM,
+  CALIFORNIA_KIOSK_RETURN_TRIM,
+} from "@/lib/next-california-kiosk-geometry";
+import {
   LONDON_BOOTHS,
   type LondonBoothArtboard,
   type LondonBoothSpec,
 } from "@/lib/next-london-booths";
 
-const PT_TO_MM = 25.4 / 72;
+export {
+  CALIFORNIA_KIOSK_BLEED_MM,
+  CALIFORNIA_KIOSK_FRONT_TRIM,
+  CALIFORNIA_KIOSK_RETURN_TRIM,
+  CALIFORNIA_KIOSK_SCREEN_FRACTION,
+  CALIFORNIA_KIOSK_SCREEN_MM,
+} from "@/lib/next-california-kiosk-geometry";
 
 /** The supplied kiosk template, as issued. */
 export const CALIFORNIA_KIOSK_TEMPLATE = {
@@ -44,36 +55,6 @@ export const CALIFORNIA_KIOSK_TEMPLATE = {
     "The TV keep-clear rectangle is measured out of the front artboard.",
 } as const;
 
-/** Bleed held per edge on every kiosk sheet, in mm (1/8 in). */
-export const CALIFORNIA_KIOSK_BLEED_MM = Math.round(9 * PT_TO_MM * 1000) / 1000;
-
-/** Front face trim, in mm (45 × 96 in). */
-export const CALIFORNIA_KIOSK_FRONT_TRIM = { w: 1143, h: 2438.4 } as const;
-
-/** Return strip trim, in mm (4 × 96 in). */
-export const CALIFORNIA_KIOSK_RETURN_TRIM = { w: 101.6, h: 2438.4 } as const;
-
-/**
- * TV keep-clear aperture on the front face, in mm from the trim origin.
- * Measured off the supplied artboard: the art rectangle runs x 9 → 2765 pt and
- * y 4319.5 → 5923.5 pt on the 3258 × 6930 pt media page, whose 3240 × 6912 pt
- * trim starts at (9, 9) — i.e. flush to the left trim edge, 997.5 pt below the
- * trim top, 2756 × 1604 pt.
- */
-export const CALIFORNIA_KIOSK_SCREEN_MM = {
-  x: 0,
-  y: Math.round(997.5 * PT_TO_MM * 100) / 100,
-  w: Math.round(2756 * PT_TO_MM * 100) / 100,
-  h: Math.round(1604 * PT_TO_MM * 100) / 100,
-} as const;
-
-/** The same aperture as fractions of the front trim, for the shell record. */
-export const CALIFORNIA_KIOSK_SCREEN_FRACTION = {
-  x: 0,
-  y: 997.5 / 6912,
-  w: 2756 / 3240,
-  h: 1604 / 6912,
-} as const;
 
 /** Suffix that turns a London booth id into its California kiosk id. */
 export const CALIFORNIA_KIOSK_SUFFIX = "-cal-kiosk";
