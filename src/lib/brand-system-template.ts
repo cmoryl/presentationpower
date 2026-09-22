@@ -149,8 +149,21 @@ function brandSystemLightLayers(base: StylePack, seed: string, accentHex?: strin
   const edited = brandSystemHasEdit(seed);
   const code = edited ? BRAND_SYSTEM_CODE : BRAND_SYSTEM_BASE_CODE;
   const layers = resolveGroundLayers(authoredGround(base), code, seed, ENTERPRISE_WHITE.surface);
-  if (edited || brandSystemGroundIsReplaced(seed)) return layers;
-  return [...brandSystemLightDepthLayers(accentHex, seed), ...layers];
+  // Replacement artwork IS the page; a saved BSYS edit is the admin's own look.
+  // Everything else — including a saved edit that resolves to NO layers, which
+  // is how the light page ended up painting a bare white sheet — gets the house
+  // depth field over the approved Spatial Clarity ground.
+  if (brandSystemGroundIsReplaced(seed)) return layers;
+  if (edited && layers.length) return layers;
+  const authored = layers.length
+    ? layers
+    : resolveGroundLayers(
+        authoredGround(base),
+        BRAND_SYSTEM_BASE_CODE,
+        seed,
+        ENTERPRISE_WHITE.surface,
+      );
+  return [...brandSystemLightDepthLayers(accentHex, seed), ...authored];
 }
 
 
