@@ -20,7 +20,12 @@ import { enterpriseGroundFor } from "./enterprise-grounds";
 import { sceneFromSeed } from "./skin-backgrounds";
 import { ENTERPRISE_WHITE } from "./slide-skin";
 import { overrideFor } from "./template-registry";
-import { authoredGround, groundIsReplaced, resolveGroundLayers } from "./template-background";
+import {
+  authoredGround,
+  groundIsReplaced,
+  resolveGroundLayers,
+  withAlpha,
+} from "./template-background";
 import { stylePackById, type StylePack } from "./style-packs";
 
 /** Pack id the Template Studio lists the default system under. */
@@ -93,19 +98,61 @@ export function brandSystemDarkGroundIsReplaced(seed: string): boolean {
 export const BRAND_SYSTEM_DARK_SURFACE = "#03002C";
 
 /**
+ * HOUSE DEPTH ON THE LIGHT PAGE — the approved white page kept reading as a
+ * bare sheet, so the master's light face now carries a colour field by default:
+ * a Blue White vertical graduation plus three soft approved-token washes placed
+ * in the corners. Alphas are held low so the Spatial Clarity geometry still
+ * shows through and the middle of the page — where the copy sits — stays pale.
+ *
+ * Tokens only (Blue 500, Blue White, Aqua, Lavender); the secondaries stay a
+ * small share of the field. An admin BSYS edit still outranks this.
+ */
+export function brandSystemLightDepthLayers(accentHex?: string, seed = ""): string[] {
+  const accent = accentHex || ENTERPRISE_WHITE.accent;
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i += 1) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  const flip = Math.abs(h) % 2 === 1;
+  const x = (left: string, right: string) => (flip ? right : left);
+  // withAlpha, never raw 8-digit hex: brand accents reach here as rgb()/oklch
+  // strings on some surfaces, and `${accent}1F` made the WHOLE layer list
+  // invalid CSS — which is exactly how the light page ended up painting nothing.
+  const a = (c: string, v: number) => withAlpha(c, v);
+  return [
+    `radial-gradient(112% 86% at ${x("92% 4%", "8% 4%")}, ${a(accent, 0.13)} 0%, ${a(accent, 0.05)} 38%, transparent 66%)`,
+    `radial-gradient(96% 78% at ${x("4% 96%", "96% 96%")}, ${a("#A1FBF9", 0.26)} 0%, transparent 58%)`,
+    `radial-gradient(74% 66% at ${x("10% 12%", "90% 12%")}, ${a("#C2A3FF", 0.2)} 0%, transparent 56%)`,
+    `linear-gradient(176deg, ${a("#E0E8F5", 0.68)} 0%, ${a("#EEF1F7", 0.32)} 42%, ${a("#FFFFFF", 0)} 62%, ${a("#E0E8F5", 0.58)} 100%)`,
+  ];
+}
+
+
+/**
  * CSS background for the default system's light page.
  *
  * Resolves the Spatial Clarity authored layers through the one shared override
  * resolver, keyed to BSYS when the default system carries its own edit, so the
- * editor, present, share, print, export and library previews all agree.
+ * editor, present, share, print, export and library previews all agree. With no
+ * admin edit the house depth field paints in front of that quiet geometry.
  */
 export function brandSystemLightGround(seed: string, accentHex?: string): string {
   const base = stylePackById(BRAND_SYSTEM_BASE_PACK_ID);
   if (!base) return enterpriseGroundFor(seed, accentHex);
-  const code = brandSystemHasEdit(seed) ? BRAND_SYSTEM_CODE : BRAND_SYSTEM_BASE_CODE;
-  const layers = resolveGroundLayers(authoredGround(base), code, seed, ENTERPRISE_WHITE.surface);
+  const layers = brandSystemLightLayers(base, seed, accentHex);
   return layers.length ? layers.join(", ") : enterpriseGroundFor(seed, accentHex);
 }
+
+/** Light-face layers: house depth (unless edited/replaced) over Spatial Clarity. */
+function brandSystemLightLayers(base: StylePack, seed: string, accentHex?: string): string[] {
+  const edited = brandSystemHasEdit(seed);
+  const code = edited ? BRAND_SYSTEM_CODE : BRAND_SYSTEM_BASE_CODE;
+  const layers = resolveGroundLayers(authoredGround(base), code, seed, ENTERPRISE_WHITE.surface);
+  if (edited || brandSystemGroundIsReplaced(seed)) return layers;
+  return [...brandSystemLightDepthLayers(accentHex, seed), ...layers];
+}
+
 
 /** True when the default system's ground for this seed is replaced artwork. */
 export function brandSystemGroundIsReplaced(seed: string): boolean {
@@ -127,8 +174,6 @@ export function brandSystemGroundIsReplaced(seed: string): boolean {
 export function brandSystemPack(mode: "light" | "dark" = "light"): StylePack | null {
   const base = stylePackById(BRAND_SYSTEM_BASE_PACK_ID);
   if (!base) return null;
-  const authored = authoredGround(base);
-
   if (mode === "dark") {
     return {
       ...base,
@@ -168,12 +213,6 @@ export function brandSystemPack(mode: "light" | "dark" = "light"): StylePack | n
       accent: ENTERPRISE_WHITE.accent,
       primary: ENTERPRISE_WHITE.primary,
     },
-    ground: (seed: string) =>
-      resolveGroundLayers(
-        authored,
-        brandSystemHasEdit(seed) ? BRAND_SYSTEM_CODE : BRAND_SYSTEM_BASE_CODE,
-        seed,
-        ENTERPRISE_WHITE.surface,
-      ),
+    ground: (seed: string) => brandSystemLightLayers(base, seed, ENTERPRISE_WHITE.accent),
   };
 }
