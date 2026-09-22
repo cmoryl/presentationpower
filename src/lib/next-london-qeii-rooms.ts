@@ -76,6 +76,11 @@ export type QeiiRoomShape = {
    * or when the walls do not close the space.
    */
   cell?: string;
+  /**
+   * Index of the last drawn shape that covers this room's cell. The cell is drawn
+   * after it, so a later block painted over the same spot cannot hide the colour.
+   */
+  cellAfter?: number;
 };
 
 /**
@@ -117,7 +122,19 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
       const cut = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, others);
       if (cut) cell = cut.d;
     }
-    return { room: m.room, shapeIndex: m.shapeIndex, sharedWith, x: m.x, y: m.y, cell };
+    let cellAfter = m.shapeIndex;
+    if (cell) {
+      const big = floor.w * floor.h * 0.01;
+      floor.shapes.forEach((shape, index) => {
+        if (index <= cellAfter || !shape.fill) return;
+        for (const ring of qeiiRings(shape.d))
+          if (qeiiRingArea(ring) >= big && qeiiInRing(ring, m.x, m.y)) {
+            cellAfter = index;
+            return;
+          }
+      });
+    }
+    return { room: m.room, shapeIndex: m.shapeIndex, sharedWith, x: m.x, y: m.y, cell, cellAfter };
   });
   shapeCache.set(floor, out);
   return out;
@@ -163,19 +180,25 @@ export type QeiiColourPaint = {
   /** Room name → tag colour, for rooms sharing a drawn shape. */
   tags: Map<string, string>;
   /** Exact room outlines cut from a shared block, drawn over the plan fill. */
-  cells: { room: string; shapeIndex: number; d: string; hex: string }[];
+  cells: { room: string; shapeIndex: number; after: number; d: string; hex: string }[];
 };
 
 export function qeiiColourPaint(floor: QeiiFloorVector, rooms: QeiiRoomColours): QeiiColourPaint {
   const fills = new Map<number, string>();
   const tags = new Map<string, string>();
-  const cells: { room: string; shapeIndex: number; d: string; hex: string }[] = [];
+  const cells: QeiiColourPaint["cells"] = [];
   for (const entry of qeiiRoomShapes(floor)) {
     const hex = rooms[entry.room];
     if (!hex) continue;
     if (qeiiRoomIsExclusive(entry)) fills.set(entry.shapeIndex, hex);
     else if (entry.cell)
-      cells.push({ room: entry.room, shapeIndex: entry.shapeIndex, d: entry.cell, hex });
+      cells.push({
+        room: entry.room,
+        shapeIndex: entry.shapeIndex,
+        after: entry.cellAfter ?? entry.shapeIndex,
+        d: entry.cell,
+        hex,
+      });
     else tags.set(entry.room, hex);
   }
   return { fills, tags, cells };
@@ -285,7 +308,7 @@ export function qeiiColourKey(
 export function qeiiCellsByShape(paint: QeiiColourPaint): Map<number, QeiiColourPaint["cells"]> {
   const out = new Map<number, QeiiColourPaint["cells"]>();
   for (const cell of paint.cells) {
-    out.set(cell.shapeIndex, [...(out.get(cell.shapeIndex) ?? []), cell]);
+    out.set(cell.after, [...(out.get(cell.after) ?? []), cell]);
   }
   return out;
 }
