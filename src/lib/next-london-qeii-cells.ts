@@ -200,6 +200,7 @@ export function qeiiCutCell(
   shapeIndex: number,
   x: number,
   y: number,
+  others: { x: number; y: number }[] = [],
 ): { d: string; share: number; planShare: number } | undefined {
   const block = floor.shapes[shapeIndex];
   if (!block?.fill) return undefined;
@@ -252,6 +253,9 @@ export function qeiiCutCell(
   }
   const hit = pieces.find((poly) => poly[0] && inClipRing(poly[0], x, y));
   if (!hit || !hit[0]) return undefined;
+  // The piece is only this room's when no other room's label sits in it. Two labels
+  // in one piece means the wall between them is not drawn in the issued artwork.
+  if (others.some((o) => inClipRing(hit[0]!, o.x, o.y))) return undefined;
   const area = polyArea(hit[0]) - hit.slice(1).reduce((s, h) => s + polyArea(h), 0);
   if (area <= 0) return undefined;
   const planArea = floor.w * floor.h;

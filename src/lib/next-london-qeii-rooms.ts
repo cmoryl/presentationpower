@@ -11,11 +11,7 @@
 
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 import { qeiiShapeHolds } from "@/lib/next-london-qeii-geometry";
-import {
-  qeiiCutCell,
-  QEII_CELL_MAX_PLAN_SHARE,
-  QEII_CELL_MAX_SHARE,
-} from "@/lib/next-london-qeii-cells";
+import { qeiiCutCell } from "@/lib/next-london-qeii-cells";
 import { qeiiLabelGroups } from "@/lib/next-london-qeii-layout";
 import { spaceUseMarks, spaceUsesForRoom } from "@/lib/next-london-space-use";
 import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
@@ -115,9 +111,11 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
       .map((o) => o.room);
     let cell: string | undefined;
     if (sharedWith.length) {
-      const cut = qeiiCutCell(floor, m.shapeIndex, m.x, m.y);
-      if (cut && cut.share <= QEII_CELL_MAX_SHARE && cut.planShare <= QEII_CELL_MAX_PLAN_SHARE)
-        cell = cut.d;
+      const others = matched
+        .filter((o) => o !== m && o.shapeIndex === m.shapeIndex)
+        .map((o) => ({ x: o.x, y: o.y }));
+      const cut = qeiiCutCell(floor, m.shapeIndex, m.x, m.y, others);
+      if (cut) cell = cut.d;
     }
     return { room: m.room, shapeIndex: m.shapeIndex, sharedWith, x: m.x, y: m.y, cell };
   });
