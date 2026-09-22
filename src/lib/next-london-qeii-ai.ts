@@ -265,7 +265,10 @@ export async function buildQeiiPlanAi(
     .join("");
 
   // ── layer 4: division lockups, as the approved outlines ───────────────────
+  // Each lockup is written as its own form, which Illustrator opens as a single
+  // group — one click picks up the whole logo instead of every outline in it.
   let markOps = "";
+  const markForms: { name: string; ops: string; w: number; h: number }[] = [];
   if (options.showMarks ?? true) {
     const { placements, dropped } = await qeiiMarkVectors(floor, options);
     for (const mark of placements) {
@@ -301,11 +304,20 @@ export async function buildQeiiPlanAi(
           } Q\n`;
         })
         .join("");
-      if (body) markOps += `${head}${body}Q\n`;
+      if (body) {
+        const form = `Xm${markForms.length + 1}`;
+        markForms.push({ name: form, ops: body, w: art.w, h: art.h });
+        markOps += `${head}/${form} Do\nQ\n`;
+      }
     }
     if (placements.length) {
       notes.push(
         `${placements.length} division lockup${placements.length === 1 ? " is" : "s are"} embedded as live vector outlines from the approved artwork, on their own "Division lockups" layer.`,
+      );
+    }
+    if (markForms.length) {
+      notes.push(
+        `Each lockup is one group in Illustrator (${markForms.length} in all), so a single click picks up the whole logo to move or resize.`,
       );
     }
     if (dropped.length) {
@@ -314,6 +326,7 @@ export async function buildQeiiPlanAi(
       );
     }
   }
+
   notes.push(
     "Room names and the key are live, editable text set in the standard PDF face; apply Geist in Illustrator. This is a working map file, not a press master.",
   );
@@ -326,6 +339,12 @@ export async function buildQeiiPlanAi(
     `q\n/OC /oc3 BDC\n${keyOps}EMC\nQ\n` +
     (markOps ? `q\n/OC /oc4 BDC\n${markOps}EMC\nQ\n` : "");
 
+  // Lockup forms live after the nine fixed objects, so /Xm1 is object 10.
+  const formStart = 10;
+  const formRes = markForms
+    .map((form, i) => `/${form.name} ${formStart + i} 0 R`)
+    .join(" ");
+
   const objects: string[] = [
     `<< /Type /Catalog /Pages 2 0 R /OCProperties << /OCGs [6 0 R 7 0 R 8 0 R 9 0 R] /D << /Order [6 0 R 7 0 R 8 0 R 9 0 R] /ON [6 0 R 7 0 R 8 0 R 9 0 R] >> >> >>`,
     `<< /Type /Pages /Kids [3 0 R] /Count 1 >>`,
@@ -334,6 +353,7 @@ export async function buildQeiiPlanAi(
       `/TPVenue (Queen Elizabeth II Centre) /TPFloor (${pdfText(floor.title)}) ` +
       `/TPFace (${pdfText(face)}) /TPColorSpace (DeviceRGB) ` +
       `/Resources << /Font << /F1 5 0 R >> ` +
+      (formRes ? `/XObject << ${formRes} >> ` : "") +
       `/Properties << /oc1 6 0 R /oc2 7 0 R /oc3 8 0 R /oc4 9 0 R >> >> /Contents 4 0 R >>`,
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
     `<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>`,
@@ -341,9 +361,16 @@ export async function buildQeiiPlanAi(
     `<< /Type /OCG /Name (Room names) >>`,
     `<< /Type /OCG /Name (Colour key) >>`,
     `<< /Type /OCG /Name (Division lockups) >>`,
+    ...markForms.map(
+      (form) =>
+        `<< /Type /XObject /Subtype /Form /FormType 1 /Name (${pdfText(form.name)}) ` +
+        `/BBox [0 0 ${f3(form.w)} ${f3(form.h)}] /Resources << >> /Length ${form.ops.length} >>\n` +
+        `stream\n${form.ops}endstream`,
+    ),
     `<< /Title (Queen Elizabeth II Centre — ${pdfText(floor.title)}) /Creator (TransPerfect Element) ` +
       `/Subject (NEXT 2026 London venue map · live vector artwork) >>`,
   ];
+
 
   let pdf = "%PDF-1.5\n%\u00e2\u00e3\u00cf\u00d3\n";
   const offsets: number[] = [];

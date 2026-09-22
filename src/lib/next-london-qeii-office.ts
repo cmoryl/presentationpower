@@ -275,8 +275,10 @@ export async function buildQeiiPlanPptx(
     line: { type: "none" },
   });
 
+  const shapeGroups = new Set<string>();
   if (plan.shapes) {
     for (const shape of plan.shapes) {
+
       const b = qeiiSegsBox(shape.segs);
       const pad = shape.strokeW / 2;
       const x0 = b.x0 - pad;
@@ -313,8 +315,13 @@ export async function buildQeiiPlanPptx(
         line: shape.stroke
           ? { color: hex(shape.stroke, "FFFFFF"), width: Math.max(0.25, shape.strokeW * k * 72) }
           : { type: "none" },
-      });
+        // A lockup outline carries its lockup's name, so the outlines can be
+        // welded into one grouped object below — one click moves the whole logo.
+        ...(shape.group ? { objectName: shape.group } : {}),
+      } as never);
+      if (shape.group) shapeGroups.add(shape.group);
     }
+
   } else if (plan.art) {
     slide.addImage({ data: plan.art.dataUrl, x: ox, y: oy, w: artW, h: artH });
   }
@@ -407,7 +414,13 @@ export async function buildQeiiPlanPptx(
     { x: 0.5, y: slideH - 0.48, w: slideW - 1, h: 0.3, fontFace: FONT, fontSize: 8.5, color: "666666" },
   );
 
-  const blob = (await pptx.write({ outputType: "blob" })) as Blob;
+  let blob = (await pptx.write({ outputType: "blob" })) as Blob;
+  let grouped = 0;
+  if (shapeGroups.size) {
+    const welded = await weldPptxGroups(blob, [...shapeGroups]);
+    blob = welded.blob;
+    grouped = welded.grouped;
+  }
   return {
     blob,
     filename: `TP-NEXT-2026-London-QEII-${slug(floor)}-map.pptx`,
@@ -416,9 +429,87 @@ export async function buildQeiiPlanPptx(
       plan.shapes
         ? "The plan drawing is live PowerPoint shapes; room names, use lines and the key are live PowerPoint text."
         : "Room names, use lines and the key are live PowerPoint text; this floor's drawing is a picture.",
+      ...(grouped
+        ? [
+            `Each division lockup is one grouped object (${grouped} in all), so a single click picks up the whole logo to move or resize.`,
+          ]
+        : []),
     ],
   };
 }
+
+/**
+ * Weld the outlines of each division lockup into one PowerPoint group, so the
+ * crew picks up a whole logo with one click instead of dozens of separate
+ * outlines. PowerPoint's own group element is written straight into the slide —
+ * pptxgenjs has no grouping of its own.
+ */
+async function weldPptxGroups(
+  blob: Blob,
+  groups: string[],
+): Promise<{ blob: Blob; grouped: number }> {
+  const zip = await JSZip.loadAsync(await blob.arrayBuffer());
+  const file = zip.file("ppt/slides/slide1.xml");
+  if (!file) return { blob, grouped: 0 };
+  const xml = await file.async("string");
+  const sps = [...xml.matchAll(/<p:sp>[\s\S]*?<\/p:sp>/g)];
+  const members = new Map<string, number[]>();
+  const nameOf = (sp: string) => /name="([^"]*)"/.exec(sp)?.[1] ?? "";
+  sps.forEach((m, i) => {
+    const name = nameOf(m[0]);
+    if (!groups.includes(name)) return;
+    const list = members.get(name) ?? [];
+    list.push(i);
+    members.set(name, list);
+  });
+  if (!members.size) return { blob, grouped: 0 };
+  const boxOf = (sp: string) => {
+    const off = /<a:off x="(-?\d+)" y="(-?\d+)"\/>/.exec(sp);
+    const ext = /<a:ext cx="(\d+)" cy="(\d+)"\/>/.exec(sp);
+    if (!off || !ext) return null;
+    const x = Number(off[1]);
+    const y = Number(off[2]);
+    return { x, y, x1: x + Number(ext[1]), y1: y + Number(ext[2]) };
+  };
+  /** Where each lockup's group is written, and which shapes it swallows. */
+  const head = new Map<number, string>();
+  const swallowed = new Set<number>();
+  let grouped = 0;
+  let id = 9000;
+  for (const [name, list] of members) {
+    const boxes = list.map((i) => boxOf(sps[i]![0])).filter((b) => b !== null);
+    if (boxes.length !== list.length) continue;
+    const x = Math.min(...boxes.map((b) => b!.x));
+    const y = Math.min(...boxes.map((b) => b!.y));
+    const cx = Math.max(1, Math.max(...boxes.map((b) => b!.x1)) - x);
+    const cy = Math.max(1, Math.max(...boxes.map((b) => b!.y1)) - y);
+    const children = list.map((i) => sps[i]![0]).join("");
+    head.set(
+      list[0]!,
+      `<p:grpSp><p:nvGrpSpPr><p:cNvPr id="${id++}" name="${esc(name)}"/>` +
+        `<p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm>` +
+        `<a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/>` +
+        `<a:chOff x="${x}" y="${y}"/><a:chExt cx="${cx}" cy="${cy}"/>` +
+        `</a:xfrm></p:grpSpPr>${children}</p:grpSp>`,
+    );
+    for (const i of list.slice(1)) swallowed.add(i);
+    grouped += 1;
+  }
+  if (!grouped) return { blob, grouped: 0 };
+  let out = "";
+  let cursor = 0;
+  sps.forEach((m, i) => {
+    const at = m.index ?? 0;
+    out += xml.slice(cursor, at);
+    if (head.has(i)) out += head.get(i);
+    else if (!swallowed.has(i)) out += m[0];
+    cursor = at + m[0].length;
+  });
+  out += xml.slice(cursor);
+  zip.file("ppt/slides/slide1.xml", out);
+  return { blob: await zip.generateAsync({ type: "blob" }), grouped };
+}
+
 
 // ── Word ─────────────────────────────────────────────────────────────────────
 
@@ -492,8 +583,14 @@ export async function buildQeiiPlanDocx(
   const markMedia: { rel: string; file: string; bytes: ArrayBuffer }[] = [];
 
 
+  /** Division lockups, each gathered into one Word group. */
+  const markGroups = new Map<
+    string,
+    { parts: string[]; box: { x: number; y: number; x1: number; y1: number } | null }
+  >();
   if (plan.shapes) {
     let id = 2;
+
     const children: string[] = [
       wpsShape(
         id++,
@@ -535,10 +632,26 @@ export async function buildQeiiPlanDocx(
         (shape.stroke
           ? `<a:ln w="${Math.max(635, Math.round(shape.strokeW * k * 0.75))}" cap="rnd"><a:solidFill><a:srgbClr val="${hex(shape.stroke, "FFFFFF")}"/></a:solidFill></a:ln>`
           : `<a:ln><a:noFill/></a:ln>`);
-      children.push(
-        wpsShape(id++, `Plan shape ${id}`, { x: Math.round(x0 * k), y: Math.round(y0 * k), w, h }, geom, paint),
-      );
+      const frame = { x: Math.round(x0 * k), y: Math.round(y0 * k), w, h };
+      if (shape.group) {
+        // A lockup's outlines go into their own Word group, so the whole logo
+        // moves as one object rather than as dozens of loose outlines.
+        const pack = markGroups.get(shape.group) ?? { parts: [], box: null };
+        pack.parts.push(wpsShape(id++, `${shape.group} outline ${pack.parts.length + 1}`, frame, geom, paint));
+        pack.box = pack.box
+          ? {
+              x: Math.min(pack.box.x, frame.x),
+              y: Math.min(pack.box.y, frame.y),
+              x1: Math.max(pack.box.x1, frame.x + w),
+              y1: Math.max(pack.box.y1, frame.y + h),
+            }
+          : { x: frame.x, y: frame.y, x1: frame.x + w, y1: frame.y + h };
+        markGroups.set(shape.group, pack);
+        continue;
+      }
+      children.push(wpsShape(id++, `Plan shape ${id}`, frame, geom, paint));
     }
+
 
     // Room names, use lines and the key as live Word text over the drawing.
     for (const block of plan.blocks) {
@@ -625,6 +738,24 @@ export async function buildQeiiPlanDocx(
           `<wps:bodyPr wrap="none" lIns="0" tIns="0" rIns="0" bIns="0" anchor="ctr"><a:noAutofit/></wps:bodyPr></wps:wsp>`,
       );
     }
+
+    // Each division lockup as one nested Word group — one click, whole logo.
+    for (const [name, pack] of markGroups) {
+      if (!pack.parts.length || !pack.box) continue;
+      const gx = pack.box.x;
+      const gy = pack.box.y;
+      const gw = Math.max(1, pack.box.x1 - gx);
+      const gh = Math.max(1, pack.box.y1 - gy);
+      children.push(
+        `<wpg:grpSp><wpg:cNvPr id="${id++}" name="${esc(name)}"/><wpg:cNvGrpSpPr/>` +
+          `<wpg:grpSpPr><a:xfrm><a:off x="${gx}" y="${gy}"/><a:ext cx="${gw}" cy="${gh}"/>` +
+          `<a:chOff x="${gx}" y="${gy}"/><a:chExt cx="${gw}" cy="${gh}"/></a:xfrm></wpg:grpSpPr>` +
+          pack.parts.join("") +
+          `</wpg:grpSp>`,
+      );
+    }
+
+
 
     drawing =
       `<w:p><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0">` +
@@ -745,6 +876,12 @@ export async function buildQeiiPlanDocx(
       plan.shapes
         ? "The plan drawing is an editable group of Word shapes; room names, the room list and the key are live Word text."
         : "The room list and key are live Word text; this floor's drawing is a picture.",
+      ...(markGroups.size
+        ? [
+            `Each division lockup is one grouped object (${markGroups.size} in all), so a single click picks up the whole logo.`,
+          ]
+        : []),
     ],
+
   };
 }

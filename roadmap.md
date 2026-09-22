@@ -17,3 +17,7 @@
 - [ ] Division accent on agenda day headings + left time rails (screen + PDF/AI/DOCX/PPTX)
 - [ ] Innovation Lounge extra info from Canva file canva.link/0qp10ba0b4r6poq
 - [ ] Enrich brand guides with BrandHub division profiles (GlobalLink, Dataforce, Life Sciences, master identity): photography, type scale, colour accessibility, core values — no Canva audits, no BoothHUB
+
+## London map exports (Sept 22)
+- [ ] Group each division lockup so it moves as one object in every live export (SVG group, AI layer group, PPTX/Word grouped shape)
+- [ ] Canva hand-off on the maps page: per-floor + all-floors PowerPoint, with a clear "download then upload to Canva" step (no public link)
