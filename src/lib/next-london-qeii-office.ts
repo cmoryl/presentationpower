@@ -1,22 +1,22 @@
 // -----------------------------------------------------------------------------
 // QEII Centre floor plan — editable PowerPoint and Word exports.
 //
-// Neither PowerPoint nor Word can carry the venue's plan as live vector art, so
-// the drawing itself arrives as one picture at print resolution — the same
-// artwork the proof PDF shows, with the room wording left out of it. Every room
-// name, use line and colour-key row is then laid over that picture as real,
-// editable text in the same place, at the same size and in the same ink the plan
-// sets, so the crew can retype a room in PowerPoint or Word without redrawing
-// anything.
+// The plan is rebuilt as real shapes in both files: every wall line, room fill
+// and venue symbol arrives as its own editable PowerPoint / Word shape taken
+// straight from the issued geometry, and every room name, use line and colour-key
+// row is live text over it. Nothing is a flattened picture, so the crew can
+// recolour a room or move a wall in Office without redrawing anything.
 //
-// The Illustrator export (next-london-qeii-ai.ts) is the one that keeps the plan
-// as live vector paths.
+// A floor the issued design only places as a picture cannot be rebuilt; that one
+// falls back to print-resolution artwork with the wording still editable on top,
+// and says so in the file.
 // -----------------------------------------------------------------------------
 
 import JSZip from "jszip";
 
+import { qeiiDrawShapes, qeiiSegsBox, type QeiiDrawShape } from "@/lib/next-london-qeii-draw";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
-import { qeiiPlanSvg, type QeiiPlanOptions } from "@/lib/next-london-qeii-plan";
+import { QEII_PLAN_TOKENS, qeiiPlanSvg, type QeiiPlanOptions } from "@/lib/next-london-qeii-plan";
 import { inlineSvgImages, qeiiRasteriseSvg } from "@/lib/next-london-qeii-pdf";
 import { qeiiColourKey, qeiiColourPaint, qeiiRoomTextInk } from "@/lib/next-london-qeii-rooms";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
@@ -42,10 +42,18 @@ function slug(floor: QeiiFloorVector): string {
   return floor.title.replace(/\s+/g, "-");
 }
 
-/** Room names, lines and key rows in the places the plan sets them. */
-type PlanText = {
-  art: { dataUrl: string; w: number; h: number };
-  /** Plan-unit geometry of the artwork, including the key strip. */
+/** A floor the issued design draws, rather than places as a picture. */
+function isRebuilt(floor: QeiiFloorVector): boolean {
+  return floor.kind === "vector" && floor.shapes.length >= 20;
+}
+
+/** The plan, its wording, and where both belong — all in plan units. */
+type PlanPieces = {
+  /** Live plan shapes, or null when this floor can only be a picture. */
+  shapes: QeiiDrawShape[] | null;
+  /** Fallback artwork, only built when the plan cannot be rebuilt. */
+  art?: { dataUrl: string; w: number; h: number };
+  /** Plan-unit geometry of the drawing, including the key strip. */
   units: { w: number; h: number };
   blocks: {
     room: string;
@@ -62,20 +70,29 @@ type PlanText = {
   notes: string[];
 };
 
-/**
- * Rasterise the plan without its wording and work out where each piece of copy
- * belongs, in plan units.
- */
-async function planText(floor: QeiiFloorVector, options: QeiiPlanOptions): Promise<PlanText> {
+async function planPieces(
+  floor: QeiiFloorVector,
+  options: QeiiPlanOptions,
+): Promise<PlanPieces> {
   const notes: string[] = [];
-  const svg = qeiiPlanSvg(floor, { ...options, showText: false });
-  const inlined = await inlineSvgImages(svg, new Map());
-  if (inlined.dropped.length) {
+  const rebuilt = isRebuilt(floor);
+  let art: PlanPieces["art"];
+  let shapes: QeiiDrawShape[] | null = null;
+  if (rebuilt) {
+    shapes = qeiiDrawShapes(floor, options);
+  } else {
+    const svg = qeiiPlanSvg(floor, { ...options, showText: false });
+    const inlined = await inlineSvgImages(svg, new Map());
+    if (inlined.dropped.length) {
+      notes.push(
+        `${inlined.dropped.length} division lockup${inlined.dropped.length === 1 ? "" : "s"} could not be read, so ${inlined.dropped.length === 1 ? "it is" : "they are"} not on this map.`,
+      );
+    }
+    art = await qeiiRasteriseSvg(inlined.svg);
     notes.push(
-      `${inlined.dropped.length} division lockup${inlined.dropped.length === 1 ? "" : "s"} could not be read, so ${inlined.dropped.length === 1 ? "it is" : "they are"} not on this map.`,
+      "The issued design places this floor as a picture rather than drawn shapes, so the drawing here is artwork, not editable shapes.",
     );
   }
-  const art = await qeiiRasteriseSvg(inlined.svg);
   const roomColours = options.roomColours ?? {};
   const paint = qeiiColourPaint(floor, roomColours);
   const layout = qeiiPlanLayout(floor, {
@@ -114,21 +131,26 @@ async function planText(floor: QeiiFloorVector, options: QeiiPlanOptions): Promi
     y: floor.h + keyStep * (0.9 + i),
     size: keyStep * 0.52,
   }));
-  return { art, units: { w: floor.w, h: floor.h + keyH }, blocks, key, notes };
+  return { shapes, art, units: { w: floor.w, h: floor.h + keyH }, blocks, key, notes };
 }
 
 // ── PowerPoint ───────────────────────────────────────────────────────────────
 
+type PptxPoint =
+  | { x: number; y: number; moveTo?: boolean }
+  | { x: number; y: number; curve: { type: "cubic"; x1: number; y1: number; x2: number; y2: number } }
+  | { close: true };
+
 /**
- * One 16:9 slide per floor: the plan as a picture with every room name as its
- * own editable text box on top.
+ * One 16:9 slide per floor: the plan rebuilt as editable PowerPoint shapes with
+ * every room name as its own text box on top.
  */
 export async function buildQeiiPlanPptx(
   floor: QeiiFloorVector,
   options: QeiiPlanOptions = {},
 ): Promise<QeiiOfficeResult> {
   const { default: PptxGenJS } = await import("pptxgenjs");
-  const plan = await planText(floor, options);
+  const plan = await planPieces(floor, options);
   const pptx = new PptxGenJS();
   const slideW = 13.333;
   const slideH = 7.5;
@@ -164,7 +186,60 @@ export async function buildQeiiPlanPptx(
   const artH = plan.units.h * k;
   const ox = box.x + (box.w - artW) / 2;
   const oy = box.y + (box.h - artH) / 2;
-  slide.addImage({ data: plan.art.dataUrl, x: ox, y: oy, w: artW, h: artH });
+
+  // The ground the plan sits on — a brand token, as on screen.
+  slide.addShape("rect", {
+    x: ox,
+    y: oy,
+    w: artW,
+    h: artH,
+    fill: { color: hex(QEII_PLAN_TOKENS.surface, "EEF1F7") },
+    line: { type: "none" },
+  });
+
+  if (plan.shapes) {
+    for (const shape of plan.shapes) {
+      const b = qeiiSegsBox(shape.segs);
+      const pad = shape.strokeW / 2;
+      const x0 = b.x0 - pad;
+      const y0 = b.y0 - pad;
+      const w = Math.max((b.x1 - b.x0 + pad * 2) * k, 0.004);
+      const h = Math.max((b.y1 - b.y0 + pad * 2) * k, 0.004);
+      const px = (v: number) => (v - x0) * k;
+      const py = (v: number) => (v - y0) * k;
+      const points: PptxPoint[] = [];
+      for (const seg of shape.segs) {
+        if (seg.k === "Z") points.push({ close: true });
+        else if (seg.k === "M") points.push({ x: px(seg.x), y: py(seg.y), moveTo: true });
+        else if (seg.k === "L") points.push({ x: px(seg.x), y: py(seg.y) });
+        else
+          points.push({
+            x: px(seg.x),
+            y: py(seg.y),
+            curve: {
+              type: "cubic",
+              x1: px(seg.x1),
+              y1: py(seg.y1),
+              x2: px(seg.x2),
+              y2: py(seg.y2),
+            },
+          });
+      }
+      slide.addShape("custGeom", {
+        x: ox + x0 * k,
+        y: oy + y0 * k,
+        w,
+        h,
+        points: points as never,
+        fill: shape.fill ? { color: hex(shape.fill, "03002C") } : { type: "none" },
+        line: shape.stroke
+          ? { color: hex(shape.stroke, "FFFFFF"), width: Math.max(0.25, shape.strokeW * k * 72) }
+          : { type: "none" },
+      });
+    }
+  } else if (plan.art) {
+    slide.addImage({ data: plan.art.dataUrl, x: ox, y: oy, w: artW, h: artH });
+  }
 
   /** Plan units → inches on the slide. */
   const ptSize = (units: number) => Math.max(4, units * k * 72);
@@ -233,7 +308,9 @@ export async function buildQeiiPlanPptx(
   }
 
   slide.addText(
-    "Room names and the key are editable text. The plan drawing is a picture — use the Illustrator file to change the drawing itself.",
+    plan.shapes
+      ? "The plan, the room names and the key are all editable PowerPoint shapes and text — nothing here is a flattened picture."
+      : "Room names and the key are editable text. This floor's drawing is a picture — use the Illustrator file to change the drawing itself.",
     { x: 0.5, y: slideH - 0.48, w: slideW - 1, h: 0.3, fontFace: FONT, fontSize: 8.5, color: "666666" },
   );
 
@@ -243,7 +320,9 @@ export async function buildQeiiPlanPptx(
     filename: `TP-NEXT-2026-London-QEII-${slug(floor)}-map.pptx`,
     notes: [
       ...plan.notes,
-      "Room names, use lines and the key are live PowerPoint text; the plan drawing is a picture.",
+      plan.shapes
+        ? "The plan drawing is live PowerPoint shapes; room names, use lines and the key are live PowerPoint text."
+        : "Room names, use lines and the key are live PowerPoint text; this floor's drawing is a picture.",
     ],
   };
 }
@@ -252,6 +331,7 @@ export async function buildQeiiPlanPptx(
 
 const TWIPS_PER_MM = 1440 / 25.4;
 const EMU_PER_MM = 36000;
+const EMU_PER_PT = 12700;
 
 function docxParagraph(
   text: string,
@@ -269,22 +349,183 @@ function docxParagraph(
   );
 }
 
+/** One Word shape inside the plan group. */
+function wpsShape(
+  id: number,
+  name: string,
+  frame: { x: number; y: number; w: number; h: number },
+  geom: string,
+  paint: string,
+  body = `<wps:bodyPr/>`,
+): string {
+  return (
+    `<wps:wsp><wps:cNvPr id="${id}" name="${esc(name)}"/><wps:cNvSpPr/>` +
+    `<wps:spPr><a:xfrm><a:off x="${Math.round(frame.x)}" y="${Math.round(frame.y)}"/>` +
+    `<a:ext cx="${Math.max(1, Math.round(frame.w))}" cy="${Math.max(1, Math.round(frame.h))}"/></a:xfrm>` +
+    geom +
+    paint +
+    `</wps:spPr>${body}</wps:wsp>`
+  );
+}
+
 /**
- * An A3 landscape Word page: the plan as a full-width picture, then the room
- * list and the key as editable Word text the crew can retype.
+ * An A3 landscape Word page: the plan rebuilt as an editable group of Word
+ * shapes with the room names as live text over it, then the room list and key as
+ * Word text the crew can retype.
  */
 export async function buildQeiiPlanDocx(
   floor: QeiiFloorVector,
   options: QeiiPlanOptions = {},
 ): Promise<QeiiOfficeResult> {
-  const plan = await planText(floor, options);
+  const plan = await planPieces(floor, options);
   const pageWmm = 420;
   const pageHmm = 297;
   const marginMm = 15;
   const contentMm = pageWmm - marginMm * 2;
   const artWmm = contentMm;
   const artHmm = (plan.units.h / plan.units.w) * artWmm;
-  const bytes = await (await fetch(plan.art.dataUrl)).arrayBuffer();
+  const artWemu = Math.round(artWmm * EMU_PER_MM);
+  const artHemu = Math.round(artHmm * EMU_PER_MM);
+  /** Plan units → EMU. */
+  const k = artWemu / plan.units.w;
+
+  let drawing = "";
+  let picBytes: ArrayBuffer | undefined;
+
+  if (plan.shapes) {
+    let id = 2;
+    const children: string[] = [
+      wpsShape(
+        id++,
+        "Plan ground",
+        { x: 0, y: 0, w: artWemu, h: artHemu },
+        `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>`,
+        `<a:solidFill><a:srgbClr val="${hex(QEII_PLAN_TOKENS.surface, "EEF1F7")}"/></a:solidFill><a:ln><a:noFill/></a:ln>`,
+      ),
+    ];
+    for (const shape of plan.shapes) {
+      const b = qeiiSegsBox(shape.segs);
+      const pad = shape.strokeW / 2;
+      const x0 = b.x0 - pad;
+      const y0 = b.y0 - pad;
+      const w = Math.max(Math.round((b.x1 - b.x0 + pad * 2) * k), 1);
+      const h = Math.max(Math.round((b.y1 - b.y0 + pad * 2) * k), 1);
+      const px = (v: number) => Math.round((v - x0) * k);
+      const py = (v: number) => Math.round((v - y0) * k);
+      const ops = shape.segs
+        .map((seg) => {
+          if (seg.k === "Z") return `<a:close/>`;
+          if (seg.k === "M") return `<a:moveTo><a:pt x="${px(seg.x)}" y="${py(seg.y)}"/></a:moveTo>`;
+          if (seg.k === "L") return `<a:lnTo><a:pt x="${px(seg.x)}" y="${py(seg.y)}"/></a:lnTo>`;
+          return (
+            `<a:cubicBezTo><a:pt x="${px(seg.x1)}" y="${py(seg.y1)}"/>` +
+            `<a:pt x="${px(seg.x2)}" y="${py(seg.y2)}"/>` +
+            `<a:pt x="${px(seg.x)}" y="${py(seg.y)}"/></a:cubicBezTo>`
+          );
+        })
+        .join("");
+      const geom =
+        `<a:custGeom><a:avLst/><a:gdLst/><a:ahLst/><a:cxnLst/>` +
+        `<a:rect l="0" t="0" r="${w}" b="${h}"/>` +
+        `<a:pathLst><a:path w="${w}" h="${h}">${ops}</a:path></a:pathLst></a:custGeom>`;
+      const paint =
+        (shape.fill
+          ? `<a:solidFill><a:srgbClr val="${hex(shape.fill, "03002C")}"/></a:solidFill>`
+          : `<a:noFill/>`) +
+        (shape.stroke
+          ? `<a:ln w="${Math.max(635, Math.round(shape.strokeW * k * 0.75))}" cap="rnd"><a:solidFill><a:srgbClr val="${hex(shape.stroke, "FFFFFF")}"/></a:solidFill></a:ln>`
+          : `<a:ln><a:noFill/></a:ln>`);
+      children.push(
+        wpsShape(id++, `Plan shape ${id}`, { x: px(x0) + Math.round(x0 * k), y: Math.round(y0 * k), w, h }, geom, paint),
+      );
+    }
+
+    // Room names, use lines and the key as live Word text over the drawing.
+    for (const block of plan.blocks) {
+      const lines: { text: string; y: number; size: number }[] = [];
+      const nameTop = block.y - ((block.lines.length - 1) * block.size * 1.05) / 2;
+      block.lines.forEach((line, li) => {
+        lines.push({ text: line, y: nameTop + li * block.size * 1.05, size: block.size });
+      });
+      const lastLine = nameTop + (block.lines.length - 1) * block.size * 1.05;
+      if (block.use) {
+        lines.push({
+          text: block.use,
+          y: lastLine + block.size * 0.62 + block.useSize * 0.6,
+          size: block.useSize,
+        });
+      }
+      for (const line of lines) {
+        const ptSize = Math.max(3, (line.size * k) / EMU_PER_PT);
+        const boxH = Math.round(ptSize * 1.6 * EMU_PER_PT);
+        const boxW = Math.round(Math.max(line.text.length * ptSize * 0.62, 12) * EMU_PER_PT);
+        const rot = Math.abs(block.angle) < 0.5 ? "" : ` rot="${Math.round(block.angle * 60000)}"`;
+        const txBody =
+          `<wps:txbx><w:txbxContent><w:p><w:pPr><w:jc w:val="center"/>` +
+          `<w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr><w:r><w:rPr>` +
+          `<w:rFonts w:ascii="${FONT}" w:hAnsi="${FONT}"/><w:b/>` +
+          `<w:sz w:val="${Math.max(2, Math.round(ptSize * 2))}"/>` +
+          `<w:color w:val="${hex(block.ink, "FFFFFF")}"/></w:rPr>` +
+          `<w:t xml:space="preserve">${esc(line.text)}</w:t></w:r></w:p></w:txbxContent></wps:txbx>` +
+          `<wps:bodyPr wrap="none" lIns="0" tIns="0" rIns="0" bIns="0" anchor="ctr"><a:noAutofit/></wps:bodyPr>`;
+        children.push(
+          `<wps:wsp><wps:cNvPr id="${id++}" name="${esc(line.text)}"/><wps:cNvSpPr txBox="1"/>` +
+            `<wps:spPr><a:xfrm${rot}><a:off x="${Math.round(block.x * k - boxW / 2)}" y="${Math.round(line.y * k - boxH / 2)}"/>` +
+            `<a:ext cx="${boxW}" cy="${boxH}"/></a:xfrm>` +
+            `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln><a:noFill/></a:ln>` +
+            `</wps:spPr>${txBody}</wps:wsp>`,
+        );
+      }
+    }
+
+    for (const row of plan.key) {
+      const sw = Math.round(row.size * 1.1 * k);
+      children.push(
+        wpsShape(
+          id++,
+          `Key swatch ${row.label}`,
+          { x: Math.round((row.x - row.size * 1.5) * k), y: Math.round(row.y * k - sw / 2), w: sw, h: sw },
+          `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>`,
+          `<a:solidFill><a:srgbClr val="${hex(row.hex, "003FC7")}"/></a:solidFill><a:ln><a:noFill/></a:ln>`,
+        ),
+      );
+      const ptSize = Math.max(3, (row.size * k) / EMU_PER_PT);
+      const boxH = Math.round(ptSize * 1.6 * EMU_PER_PT);
+      children.push(
+        `<wps:wsp><wps:cNvPr id="${id++}" name="${esc(`Key ${row.label}`)}"/><wps:cNvSpPr txBox="1"/>` +
+          `<wps:spPr><a:xfrm><a:off x="${Math.round(row.x * k)}" y="${Math.round(row.y * k - boxH / 2)}"/>` +
+          `<a:ext cx="${Math.round(Math.max(row.label.length * ptSize * 0.62, 24) * EMU_PER_PT)}" cy="${boxH}"/></a:xfrm>` +
+          `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln><a:noFill/></a:ln></wps:spPr>` +
+          `<wps:txbx><w:txbxContent><w:p><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr>` +
+          `<w:r><w:rPr><w:rFonts w:ascii="${FONT}" w:hAnsi="${FONT}"/><w:b/>` +
+          `<w:sz w:val="${Math.max(2, Math.round(ptSize * 2))}"/><w:color w:val="03002C"/></w:rPr>` +
+          `<w:t xml:space="preserve">${esc(row.label)}</w:t></w:r></w:p></w:txbxContent></wps:txbx>` +
+          `<wps:bodyPr wrap="none" lIns="0" tIns="0" rIns="0" bIns="0" anchor="ctr"><a:noAutofit/></wps:bodyPr></wps:wsp>`,
+      );
+    }
+
+    drawing =
+      `<w:p><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0">` +
+      `<wp:extent cx="${artWemu}" cy="${artHemu}"/><wp:docPr id="1" name="Floor plan"/>` +
+      `<a:graphic><a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup">` +
+      `<wpg:wgp><wpg:cNvGrpSpPr/><wpg:grpSpPr><a:xfrm><a:off x="0" y="0"/>` +
+      `<a:ext cx="${artWemu}" cy="${artHemu}"/><a:chOff x="0" y="0"/>` +
+      `<a:chExt cx="${artWemu}" cy="${artHemu}"/></a:xfrm></wpg:grpSpPr>` +
+      children.join("") +
+      `</wpg:wgp></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;
+  } else if (plan.art) {
+    picBytes = await (await fetch(plan.art.dataUrl)).arrayBuffer();
+    drawing =
+      `<w:p><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0">` +
+      `<wp:extent cx="${artWemu}" cy="${artHemu}"/>` +
+      `<wp:docPr id="1" name="Floor plan"/><a:graphic><a:graphicData ` +
+      `uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic>` +
+      `<pic:nvPicPr><pic:cNvPr id="1" name="plan.png"/><pic:cNvPicPr/></pic:nvPicPr>` +
+      `<pic:blipFill><a:blip r:embed="rId10"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>` +
+      `<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${artWemu}" cy="${artHemu}"/></a:xfrm>` +
+      `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic>` +
+      `</wp:inline></w:drawing></w:r></w:p>`;
+  }
 
   const rows = plan.blocks
     .map((block) => {
@@ -305,18 +546,12 @@ export async function buildQeiiPlanDocx(
     `xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ` +
     `xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" ` +
     `xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" ` +
+    `xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" ` +
+    `xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape" ` +
     `xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><w:body>` +
     docxParagraph(`Queen Elizabeth II Centre — ${floor.title}`, { size: 36, bold: true }) +
     docxParagraph("NEXT 2026 London · 24–25 September 2026", { size: 18, colour: "666666" }) +
-    `<w:p><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0">` +
-    `<wp:extent cx="${Math.round(artWmm * EMU_PER_MM)}" cy="${Math.round(artHmm * EMU_PER_MM)}"/>` +
-    `<wp:docPr id="1" name="Floor plan"/><a:graphic><a:graphicData ` +
-    `uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic>` +
-    `<pic:nvPicPr><pic:cNvPr id="1" name="plan.png"/><pic:cNvPicPr/></pic:nvPicPr>` +
-    `<pic:blipFill><a:blip r:embed="rId10"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>` +
-    `<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${Math.round(artWmm * EMU_PER_MM)}" cy="${Math.round(artHmm * EMU_PER_MM)}"/></a:xfrm>` +
-    `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic>` +
-    `</wp:inline></w:drawing></w:r></w:p>` +
+    drawing +
     docxParagraph("Rooms on this floor", { size: 26, bold: true }) +
     `<w:tbl><w:tblPr><w:tblW w:w="${Math.round(contentMm * TWIPS_PER_MM)}" w:type="dxa"/>` +
     `<w:tblBorders><w:top w:val="single" w:sz="4" w:color="E0E8F5"/><w:bottom w:val="single" w:sz="4" w:color="E0E8F5"/>` +
@@ -328,7 +563,9 @@ export async function buildQeiiPlanDocx(
           .join("")
       : "") +
     docxParagraph(
-      "Room names and the key are editable Word text. The plan drawing is a picture — use the Illustrator file to change the drawing itself.",
+      plan.shapes
+        ? "The plan is a group of editable Word shapes — click into the group to recolour a room or move a wall. Room names and the key are live Word text."
+        : "Room names and the key are editable Word text. This floor's drawing is a picture — use the Illustrator file to change the drawing itself.",
       { size: 16, colour: "666666" },
     ) +
     `<w:sectPr><w:pgSz w:w="${Math.round(pageWmm * TWIPS_PER_MM)}" w:h="${Math.round(pageHmm * TWIPS_PER_MM)}" w:orient="landscape"/>` +
@@ -358,11 +595,13 @@ export async function buildQeiiPlanDocx(
     "word/_rels/document.xml.rels",
     `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
       `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">` +
-      `<Relationship Id="rId10" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/plan.png"/>` +
+      (picBytes
+        ? `<Relationship Id="rId10" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/plan.png"/>`
+        : "") +
       `</Relationships>`,
   );
   zip.file("word/document.xml", document);
-  zip.file("word/media/plan.png", bytes);
+  if (picBytes) zip.file("word/media/plan.png", picBytes);
 
   const blob = await zip.generateAsync({
     type: "blob",
@@ -373,7 +612,9 @@ export async function buildQeiiPlanDocx(
     filename: `TP-NEXT-2026-London-QEII-${slug(floor)}-map.docx`,
     notes: [
       ...plan.notes,
-      "The room list and key are live Word text; the plan drawing is a picture.",
+      plan.shapes
+        ? "The plan drawing is an editable group of Word shapes; room names, the room list and the key are live Word text."
+        : "The room list and key are live Word text; this floor's drawing is a picture.",
     ],
   };
 }
