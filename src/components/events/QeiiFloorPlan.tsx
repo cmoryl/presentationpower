@@ -95,7 +95,13 @@ export function QeiiFloorPlan({
   const svgRef = useRef<SVGSVGElement | null>(null);
   const drag = useRef<{ room: string; x: number; y: number; dx: number; dy: number } | null>(null);
 
-  const paint = useMemo(() => qeiiColourPaint(floor, roomColours), [floor, roomColours]);
+  // Everything about the look — ground, tones, wall weight, colour strength —
+  // comes from the master style sheet, so the screen and every export agree.
+  const wall = qeiiLookWallWeight(face, wallWeight);
+  const paint = useMemo(
+    () => qeiiStyledPaint(qeiiColourPaint(floor, roomColours), face),
+    [floor, roomColours, face],
+  );
   const cellsByShape = useMemo(() => qeiiCellsByShape(paint), [paint]);
   const hidden = useMemo(
     () => (showAllSymbols ? new Set<number>() : qeiiRepeatedSymbolShapes(floor)),
