@@ -17,7 +17,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 
 const FILE = "src/lib/next-london-qeii-vectors.ts";
-const FLOOR_KEY = '"3"';
+const FLOOR_KEY = `id: "third"`;
 const TOLERANCE = 0.45; // units on a ~600-unit sheet: below a hairline in print
 
 type Pt = [number, number];
@@ -62,7 +62,7 @@ function num(v: number): string {
 const src = readFileSync(FILE, "utf8");
 const keyAt = src.indexOf(FLOOR_KEY + ":");
 if (keyAt < 0) throw new Error("third floor record not found");
-const nextKey = src.indexOf('\n  "4":', keyAt);
+const nextKey = src.indexOf(`id: "fourth"`, keyAt);
 const end = nextKey > 0 ? nextKey : src.length;
 const block = src.slice(keyAt, end);
 
