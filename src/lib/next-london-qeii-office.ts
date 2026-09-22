@@ -191,6 +191,11 @@ async function planPieces(
         });
       }
     }
+    if (marks.length) {
+      notes.push(
+        `${marks.length} division lockup${marks.length === 1 ? " is" : "s are"} embedded as the approved artwork, so ${marks.length === 1 ? "it travels" : "they travel"} with the file.`,
+      );
+    }
     if (droppedMarks) {
       notes.push(
         `${droppedMarks} division lockup${droppedMarks === 1 ? "" : "s"} could not be read, so ${droppedMarks === 1 ? "it is" : "they are"} not on this map.`,
