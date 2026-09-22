@@ -436,7 +436,8 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       y: group.y + chosen.dy + ny,
       angle: group.angle,
       size: chosen.size,
-      lines,
+      lines: chosen.lines,
+
       use: chosen.variant.use,
       useSize: chosen.useSize,
       marks: chosen.variant.marks,
