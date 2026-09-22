@@ -26,7 +26,13 @@ export type QeiiDrawShape = {
   stroke?: string;
   /** Stroke width in plan units. */
   strokeW: number;
+  /**
+   * Shapes sharing a group name travel as one selection in the exports — a
+   * division lockup is one object to move, not dozens of separate outlines.
+   */
+  group?: string;
 };
+
 
 /**
  * Read an issued path into segments, in plan units.

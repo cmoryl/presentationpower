@@ -458,15 +458,63 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
    * with editable room names over it; Illustrator carries the drawing itself as
    * live vector art. Nothing is invented — every file is this floor as it reads.
    */
-  async function exportPlan(kind: "pptx" | "docx" | "ai" | "zip") {
+  async function exportPlan(kind: "pptx" | "docx" | "ai" | "zip" | "canva" | "canva-all") {
     if (!plan?.rebuilt) return;
+
     setExporting(kind);
     setExportNote(undefined);
     try {
       const notes: string[] = [];
       const files: { name: string; blob: Blob }[] = [];
       const options = planOptions();
+      const CANVA_STEP =
+        "To bring it into Canva: open Canva, choose Create a design → Import file, and pick this PowerPoint. The plan shapes and every room name arrive as real Canva shapes and text, and each division logo comes in as one grouped object.";
+      if (kind === "canva") {
+        const { buildQeiiPlanPptx } = await import("@/lib/next-london-qeii-office");
+        const res = await buildQeiiPlanPptx(plan.floor, options);
+        downloadBlob(res.blob, res.filename);
+        setExportNote([`${res.filename} is downloading.`, CANVA_STEP, ...new Set(res.notes)].join(" "));
+        return;
+      }
+      if (kind === "canva-all") {
+        const { buildQeiiPlanPptx } = await import("@/lib/next-london-qeii-office");
+        const JSZip = (await import("jszip")).default;
+        const zip = new JSZip();
+        let made = 0;
+        const skipped: string[] = [];
+        for (const sheet of LONDON_VENUE_SHEETS) {
+          const state = qeiiPlanState(sheet.id);
+          if (!state?.rebuilt) {
+            skipped.push(sheet.title);
+            continue;
+          }
+          // Only this floor carries your current on-screen changes; the rest are
+          // built from the plan as it stands, never from a guess.
+          const perFloor =
+            state.floor.id === plan.floor.id
+              ? options
+              : { ...options, roomColours: undefined, keyLabels: undefined, edits: undefined };
+          const res = await buildQeiiPlanPptx(state.floor, perFloor as typeof options);
+          zip.file(res.filename, res.blob);
+          made += 1;
+        }
+        if (!made) throw new Error("no rebuilt floor to export");
+        const name = "TP-NEXT-2026-London-QEII-all-floors-canva.zip";
+        downloadBlob(await zip.generateAsync({ type: "blob" }), name);
+        setExportNote(
+          [
+            `${name} — one PowerPoint per rebuilt floor (${made} in all).`,
+            skipped.length ? `${skipped.join(", ")} ${skipped.length === 1 ? "is" : "are"} not rebuilt yet, so ${skipped.length === 1 ? "it is" : "they are"} not in the pack.` : "",
+            "Unzip it, then import each PowerPoint into Canva one at a time.",
+            `Only ${plan.floor.title} carries your current on-screen colours and edits; the other floors are built from the plan as it stands.`,
+          ]
+            .filter(Boolean)
+            .join(" "),
+        );
+        return;
+      }
       if (kind === "pptx" || kind === "zip") {
+
         const { buildQeiiPlanPptx } = await import("@/lib/next-london-qeii-office");
         const res = await buildQeiiPlanPptx(plan.floor, options);
         files.push({ name: res.filename, blob: res.blob });
@@ -826,7 +874,26 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
               <Download className="h-4 w-4" />
               {exporting === "zip" ? "Making the pack…" : "Map pack (ZIP)"}
             </button>
+            <button
+              type="button"
+              className={btn}
+              disabled={exporting !== null}
+              onClick={() => exportPlan("canva")}
+            >
+              <Download className="h-4 w-4" />
+              {exporting === "canva" ? "Making the file…" : "For Canva (this plan)"}
+            </button>
+            <button
+              type="button"
+              className={btn}
+              disabled={exporting !== null}
+              onClick={() => exportPlan("canva-all")}
+            >
+              <Download className="h-4 w-4" />
+              {exporting === "canva-all" ? "Making the pack…" : "For Canva (all floors)"}
+            </button>
           </>
+
         ) : null}
       </div>
 

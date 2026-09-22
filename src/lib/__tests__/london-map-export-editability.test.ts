@@ -94,9 +94,9 @@ describe("London map exports are editable", () => {
       const pdf = new TextDecoder("latin1").decode(res.bytes);
       const copy = copyOf(floor);
 
-      // Live vector: real path operators, not one placed picture.
+      // Live vector: real path operators, not one placed picture. Forms are
+      // allowed — each one is a lockup group — but never an image.
       expect(pdf).not.toContain("/Subtype /Image");
-      expect(pdf).not.toContain("/XObject");
       expect((pdf.match(/ c\n| c | l /g)?.length ?? 0) + (pdf.match(/ re /g)?.length ?? 0)).toBeGreaterThan(50);
       // Live text, one run per line, in named layers.
       expect(pdf.match(/ Tj/g)?.length ?? 0).toBeGreaterThanOrEqual(copy.lines.length);
@@ -111,11 +111,17 @@ describe("London map exports are editable", () => {
       expect(res.notes.join(" ")).toMatch(/editable text/i);
 
       // Division lockups travel as the approved outlines, on their own layer —
-      // never a placed picture and never a link only the site can follow.
+      // never a placed picture and never a link only the site can follow. Each
+      // one is a single form, so Illustrator opens it as one group.
       if (markCount(floor) > 0) {
         expect(pdf).toContain("/Name (Division lockups)");
         expect(res.notes.join(" ")).toMatch(/embedded as live vector outlines/i);
+        expect(pdf.match(/\/Subtype \/Form/g)?.length ?? 0).toBe(markCount(floor));
+        expect(res.notes.join(" ")).toMatch(/one group in Illustrator/i);
+      } else {
+        expect(pdf).not.toContain("/XObject");
       }
+
     },
   );
 
@@ -133,7 +139,11 @@ describe("London map exports are editable", () => {
       expect(xml.match(/<a:custGeom>/g)?.length ?? 0).toBeGreaterThanOrEqual(20);
       if (markCount(floor) > 0) {
         expect(res.notes.join(" ")).toMatch(/rebuilt as editable shapes/i);
+        // One group per lockup, so a click picks up the whole logo.
+        expect(xml.match(/<p:grpSp>/g)?.length ?? 0).toBe(markCount(floor));
+        expect(res.notes.join(" ")).toMatch(/one grouped object/i);
       }
+
       // Every line is a real editable run.
       expect(xml.match(/<a:t>/g)?.length ?? 0).toBeGreaterThanOrEqual(copy.lines.length);
       for (const line of copy.lines) {
@@ -161,7 +171,10 @@ describe("London map exports are editable", () => {
       expect(xml.match(/<pic:pic>/g)?.length ?? 0).toBe(0);
       if (markCount(floor) > 0) {
         expect(res.notes.join(" ")).toMatch(/rebuilt as editable shapes/i);
+        expect(xml.match(/<wpg:grpSp>/g)?.length ?? 0).toBe(markCount(floor));
+        expect(res.notes.join(" ")).toMatch(/one grouped object/i);
       }
+
       for (const line of [...copy.names, ...copy.key]) {
         expect(xml).toContain(line.replace(/&/g, "&amp;").replace(/</g, "&lt;"));
       }
