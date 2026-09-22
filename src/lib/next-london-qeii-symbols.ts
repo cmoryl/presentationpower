@@ -77,6 +77,11 @@ const TRACED_SYMBOL_MAX = 20;
 const TRACED_HOST_MAX = 26;
 const TRACED_HOST_PIECES = 2;
 
+/** How close a small piece must sit to pieces already left off to go with them. */
+const TRACED_DEBRIS_REACH = 22;
+const TRACED_DEBRIS_COMPANY = 2;
+
+
 /** Shape indexes to leave undrawn on a traced floor: the pictogram debris. */
 export function qeiiTracedSymbolShapes(floor: QeiiFloorVector): Set<number> {
   const drop = new Set<number>();
