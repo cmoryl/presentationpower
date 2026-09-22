@@ -57,6 +57,15 @@ export type QeiiRoomShape = {
   shapeIndex: number;
   /** Other room names drawn inside the very same shape. */
   sharedWith: string[];
+  /** Centre of the room's name, in plan units. */
+  x: number;
+  y: number;
+  /**
+   * The exact outline of the room, cut out of a shared block along the issued
+   * wall runs. Absent when the room is drawn as its own shape (nothing to cut)
+   * or when the walls do not close the space.
+   */
+  cell?: string;
 };
 
 /**
@@ -64,15 +73,19 @@ export type QeiiRoomShape = {
  *
  * The smallest filled shape containing a name wins, so a room inside a larger
  * block is matched to the room, not the block. A name with no shape under it —
- * a corridor caption, an access note — is simply left out.
+ * a corridor caption, an access note — is simply left out. Where several names
+ * share one block, the block is cut along the issued wall runs so each room gets
+ * its own exact outline.
  */
 export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
+  const cached = shapeCache.get(floor);
+  if (cached) return cached;
   const names = qeiiLabelGroups(floor).map((g) => ({
     room: g.labels.map((l) => l.text).join(" "),
     x: g.x,
     y: g.y,
   }));
-  const matched: { room: string; shapeIndex: number }[] = [];
+  const matched: { room: string; shapeIndex: number; x: number; y: number }[] = [];
   for (const name of names) {
     let best: { index: number; area: number } | undefined;
     floor.shapes.forEach((shape, index) => {
@@ -80,16 +93,23 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
       if (!held || area <= 0) return;
       if (!best || area < best.area) best = { index, area };
     });
-    if (best) matched.push({ room: name.room, shapeIndex: best.index });
+    if (best) matched.push({ room: name.room, shapeIndex: best.index, x: name.x, y: name.y });
   }
-  return matched.map((m) => ({
-    room: m.room,
-    shapeIndex: m.shapeIndex,
-    sharedWith: matched
+  const out = matched.map((m) => {
+    const sharedWith = matched
       .filter((o) => o.shapeIndex === m.shapeIndex && o.room !== m.room)
-      .map((o) => o.room),
-  }));
+      .map((o) => o.room);
+    let cell: string | undefined;
+    if (sharedWith.length) {
+      const cut = qeiiCutCell(floor, m.shapeIndex, m.x, m.y);
+      if (cut && cut.share <= QEII_CELL_MAX_SHARE) cell = cut.d;
+    }
+    return { room: m.room, shapeIndex: m.shapeIndex, sharedWith, x: m.x, y: m.y, cell };
+  });
+  shapeCache.set(floor, out);
+  return out;
 }
+
 
 /** True when this room is the only name inside its drawn shape. */
 export function qeiiRoomIsExclusive(entry: QeiiRoomShape): boolean {
