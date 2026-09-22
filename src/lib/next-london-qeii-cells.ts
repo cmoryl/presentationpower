@@ -164,6 +164,18 @@ export type QeiiRoomCell = {
   share: number;
 };
 
+/**
+ * Whether a fill is the pale ink the issued sheets draw walls and partitions in.
+ *
+ * Only a near-white fill counts: a coloured block is a space, not a wall.
+ */
+function isWallFill(hex: string): boolean {
+  const v = hex.replace("#", "");
+  if (v.length !== 6) return false;
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(v.slice(i, i + 2), 16) / 255);
+  return 0.2126 * r! + 0.7152 * g! + 0.0722 * b! > 0.85;
+}
+
 /** Largest filled outline of a shape that holds a point. */
 function holdingRing(shape: QeiiShape, x: number, y: number): QeiiRing | undefined {
   let best: { ring: QeiiRing; area: number } | undefined;
@@ -205,15 +217,28 @@ export function qeiiCutCell(
   const by1 = Math.max(...ys);
 
   const bands: MultiPoly = [];
+  const reaches = (pts: Pt[]) =>
+    pts.some(([rx, ry]) => rx >= bx0 - 2 && rx <= bx1 + 2 && ry >= by0 - 2 && ry <= by1 + 2);
+  // Some issued sheets draw the walls as white filled shapes on top of the block
+  // rather than as stroked runs. Both cut the block the same way.
+  for (const shape of floor.shapes) {
+    if (!shape.fill || shape.fill === block.fill) continue;
+    if (!isWallFill(shape.fill)) continue;
+    for (const ring of qeiiRings(shape.d)) {
+      const clipped = ringToClip(ring);
+      if (!reaches(clipped)) continue;
+      const area = polyArea(clipped);
+      // A shape at least as big as the block is the sheet ground, not a wall.
+      if (area <= 0 || area >= blockArea * 0.9) continue;
+      bands.push([clipped]);
+    }
+  }
   for (const shape of floor.shapes) {
     if (!shape.stroke) continue;
     const half = Math.max((shape.w ?? 1) / 2, 0.2) + WALL_BITE;
     for (const run of qeiiStrokeRuns(shape.d)) {
       // Only runs that reach into this block can cut it.
-      const touches = run.some(
-        ([rx, ry]) => rx >= bx0 - 2 && rx <= bx1 + 2 && ry >= by0 - 2 && ry <= by1 + 2,
-      );
-      if (!touches) continue;
+      if (!reaches(run)) continue;
       bands.push(...runBand(run, half));
     }
   }
