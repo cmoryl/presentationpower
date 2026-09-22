@@ -71,20 +71,36 @@ function symbolGroups(floor: QeiiFloorVector): SymbolGroup[] {
 const QEII_TRACED_FLOORS = new Set(["third"]);
 
 /** Anything at or under this size on a traced floor is pictogram debris. */
-const TRACED_SYMBOL_MAX = 26;
+const TRACED_SYMBOL_MAX = 20;
+
+/** A slightly larger piece goes too when it is the block the debris sits on. */
+const TRACED_HOST_MAX = 26;
+const TRACED_HOST_PIECES = 2;
 
 /** Shape indexes to leave undrawn on a traced floor: the pictogram debris. */
 export function qeiiTracedSymbolShapes(floor: QeiiFloorVector): Set<number> {
   const drop = new Set<number>();
   if (!QEII_TRACED_FLOORS.has(floor.id)) return drop;
-  floor.shapes.forEach((shape, i) => {
-    // Wall runs are strokes, never pictograms.
-    if (shape.stroke) return;
-    const box = shapeBox(shape);
+  const boxes = floor.shapes.map((s) => (s.stroke ? undefined : shapeBox(s)));
+  boxes.forEach((box, i) => {
     if (!box) return;
-    const w = box.x1 - box.x0;
-    const h = box.y1 - box.y0;
-    if (Math.max(w, h) <= TRACED_SYMBOL_MAX) drop.add(i);
+    const size = Math.max(box.x1 - box.x0, box.y1 - box.y0);
+    if (size <= TRACED_SYMBOL_MAX) drop.add(i);
+  });
+  // The square a pictogram is drawn on is a touch bigger than its parts, so it
+  // is only dropped when the dropped parts actually sit on it — that keeps real
+  // drawn marks of the same size, such as the level arrow, on the plan.
+  boxes.forEach((box, i) => {
+    if (!box || drop.has(i)) return;
+    const size = Math.max(box.x1 - box.x0, box.y1 - box.y0);
+    if (size > TRACED_HOST_MAX) return;
+    let pieces = 0;
+    for (const j of drop) {
+      const b = boxes[j];
+      if (!b) continue;
+      if (b.x0 >= box.x0 && b.x1 <= box.x1 && b.y0 >= box.y0 && b.y1 <= box.y1) pieces += 1;
+    }
+    if (pieces >= TRACED_HOST_PIECES) drop.add(i);
   });
   return drop;
 }
