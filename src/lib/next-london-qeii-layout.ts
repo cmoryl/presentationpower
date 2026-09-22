@@ -320,7 +320,8 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     // printed wider than the space the artwork draws. Only the line breaks change
     // — no word is shortened, reordered or dropped.
     const lineSets: string[][] = [lines];
-    if (lines.length === 1) {
+    // A corrected name prints exactly as it was typed, so only issued copy is broken.
+    if (lines.length === 1 && !edit?.name) {
       const words = lines[0]!.split(" ").filter(Boolean);
       for (const rows of [2, 3]) {
         if (words.length < rows) continue;
