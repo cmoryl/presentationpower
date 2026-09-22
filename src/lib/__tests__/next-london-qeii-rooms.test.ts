@@ -52,14 +52,23 @@ describe("QEII room colours", () => {
     expect(rooms.find((r) => r.room === "Rutherford")?.cell).toBeTruthy();
   });
 
-  it("never paints a room the issued walls leave open", () => {
+  it("fills a third-floor hall room the sheet divides with a partition", () => {
     const floor = qeiiFloorVector("third")!;
     const paint = qeiiColourPaint(floor, { Whittle: "#FFEB66" });
-    // The third-floor hall is drawn as one space with no wall between the rooms.
-    expect(paint.tags.get("Whittle")).toBe("#FFEB66");
-    expect(paint.cells.some((c) => c.room === "Whittle")).toBe(false);
-    expect(qeiiSharedShapeNotes(floor).some((n) => n.includes("Whittle"))).toBe(true);
+    expect(paint.cells.some((c) => c.room === "Whittle" && c.hex === "#FFEB66")).toBe(true);
+    expect(paint.tags.get("Whittle")).toBeUndefined();
+    expect(qeiiSharedShapeNotes(floor)).toHaveLength(0);
   });
+
+  it("never paints a room the issued walls leave open", () => {
+    const floor = qeiiFloorVector("second")!;
+    const paint = qeiiColourPaint(floor, { Victoria: "#FFEB66" });
+    // Victoria and Albert are drawn as one space with no wall between them.
+    expect(paint.tags.get("Victoria")).toBe("#FFEB66");
+    expect(paint.cells.some((c) => c.room === "Victoria")).toBe(false);
+    expect(qeiiSharedShapeNotes(floor).some((n) => n.includes("Victoria"))).toBe(true);
+  });
+
 
 
   it("offers approved colours only", () => {
