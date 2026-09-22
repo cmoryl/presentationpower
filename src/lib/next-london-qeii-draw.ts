@@ -31,6 +31,8 @@ export type QeiiDrawShape = {
    * division lockup is one object to move, not dozens of separate outlines.
    */
   group?: string;
+  /** Human-readable object name exposed by PowerPoint and Word. */
+  name?: string;
 };
 
 
@@ -124,7 +126,13 @@ export function qeiiDrawShapes(
     // fills the whole room as its own editable shape in PowerPoint and Word.
     for (const cell of cellsByShape.get(i) ?? []) {
       const cellSegs = qeiiPathSegs(cell.d);
-      if (cellSegs.length) out.push({ segs: cellSegs, fill: cell.hex, strokeW: 0 });
+      if (cellSegs.length)
+        out.push({
+          segs: cellSegs,
+          fill: cell.hex ?? qeiiPlanInk(s.fill, face) ?? undefined,
+          strokeW: 0,
+          name: `Room — ${cell.room}`,
+        });
     }
   });
   return out;

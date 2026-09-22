@@ -403,7 +403,11 @@ export function qeiiCutRoomCell(
   y: number,
   others: { x: number; y: number }[] = [],
 ): { d: string; share: number; planShare: number } | undefined {
-  for (const bridge of [0, 2, 4, 8]) {
+  // A few issued wall runs stop farther short of the adjoining outer wall than
+  // the early floors do (notably Moore/Rutherford and the ground-floor service
+  // bays). Continue only along the line's own issued angle; never draw a new
+  // divider between labels.
+  for (const bridge of [0, 2, 4, 8, 12, 16, 24]) {
     const cut = qeiiCutCell(floor, shapeIndex, x, y, others, bridge);
     if (cut) return cut;
   }

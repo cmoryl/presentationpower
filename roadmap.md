@@ -21,3 +21,4 @@
 ## London map exports (Sept 22)
 - [x] Group each division lockup so it moves as one object in every live export (SVG group, AI layer group, PPTX/Word grouped shape)
 - [x] Canva hand-off on the maps page: per-floor + all-floors PowerPoint, with a clear "download then upload to Canva" step (no public link)
+- [x] Keep every wall-defined room as a named, independently selectable vector in uncoloured SVG, AI, PowerPoint and Word exports

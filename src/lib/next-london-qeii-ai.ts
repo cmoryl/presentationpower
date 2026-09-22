@@ -189,7 +189,9 @@ export async function buildQeiiPlanAi(
         .map((c) => {
           const cellOps = svgPathToPdfOps(c.d, { scale: k, x: 0, y: 0, artHeight: artH });
           if (!cellOps) return "";
-          return `q ${fillOp(c.hex, [0.01, 0, 0.17])} ${cellOps} f Q\n`;
+          const cellFill = c.hex ?? fill;
+          if (!cellFill) return "";
+          return `q ${fillOp(cellFill, [0.01, 0, 0.17])} ${cellOps} f Q\n`;
         })
         .join("");
       return `${bits.join(" ")}\n${cut}`;

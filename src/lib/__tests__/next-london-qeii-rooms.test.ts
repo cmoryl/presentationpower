@@ -34,6 +34,22 @@ describe("QEII room colours", () => {
     expect(qeiiSharedShapeNotes(floor).some((n) => n.includes("Abbey"))).toBe(false);
   });
 
+  it("keeps cut rooms as named live paths even before a colour is applied", () => {
+    const floor = qeiiFloorVector("fourth")!;
+    const paint = qeiiColourPaint(floor, {});
+    expect(paint.cells.some((c) => c.room === "Abbey" && c.hex === undefined)).toBe(true);
+    const svg = qeiiPlanSvg(floor, { showKey: false });
+    expect(svg).toContain('data-room="Abbey"');
+    expect(svg).toContain('id="room-abbey"');
+  });
+
+  it("closes longer issued wall runs without inventing a divider", () => {
+    const floor = qeiiFloorVector("fourth")!;
+    const rooms = qeiiRoomShapes(floor);
+    expect(rooms.find((r) => r.room === "Moore")?.cell).toBeTruthy();
+    expect(rooms.find((r) => r.room === "Rutherford")?.cell).toBeTruthy();
+  });
+
   it("never paints a room the issued walls leave open", () => {
     const floor = qeiiFloorVector("third")!;
     const paint = qeiiColourPaint(floor, { Whittle: "#FFEB66" });

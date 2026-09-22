@@ -137,7 +137,12 @@ export function QeiiFloorPlan({
             {/* Rooms the artwork draws inside this block, cut out along the
                 issued wall runs so each colour fills the whole room. */}
             {(cellsByShape.get(i) ?? []).map((cell) => (
-              <path key={`c-${cell.room}`} d={cell.d} fill={cell.hex} />
+              <path
+                key={`c-${cell.room}`}
+                d={cell.d}
+                fill={cell.hex ?? chosen ?? qeiiPlanInk(shape.fill, face) ?? "none"}
+                data-room={cell.room}
+              />
             ))}
           </Fragment>
         );
