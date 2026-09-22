@@ -67,7 +67,7 @@ export const SF_READINESS: SfReadiness[] = [
     id: "badges",
     label: "Name badges",
     detail:
-      "The badge family carries straight over: the city line and date line below read from this page, so every badge prints the San Francisco line.",
+      "The badge family carries over as it stands. Paste the issued location and venue lines above into the badge's city and date fields so every badge prints them word for word.",
     state: "ready",
     to: "/events/next/badges",
   },
@@ -75,10 +75,11 @@ export const SF_READINESS: SfReadiness[] = [
     id: "pillars",
     label: "Pillars and signage faces",
     detail:
-      "Welcome, registration, logo and directional pillars on the approved faces, with the San Francisco location line in place of London's.",
+      "Welcome, registration, logo and directional pillars on the approved faces. Set the location line to the issued San Francisco line in place of London's.",
     state: "ready",
     to: "/events/next/pillars",
   },
+
   {
     id: "schedule",
     label: "Sign schedule",
