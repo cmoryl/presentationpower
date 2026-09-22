@@ -220,14 +220,33 @@ export const QEII_WALL_WEIGHT = 0.55;
 /** How thin and how heavy a wall may be set on the page. */
 export const QEII_WALL_WEIGHT_RANGE = { min: 0.25, max: 1.2 } as const;
 
+/** True when the issued design supplies this floor as a picture, not artwork. */
+export function qeiiFloorTraced(floorId: string): boolean {
+  return QEII_TRACED_FLOORS.has(floorId);
+}
+
+/**
+ * On a drawn floor the venue paints the wall band as a filled shape, so the wall
+ * reads as a solid run of ink. A traced floor has no band to paint — its rooms
+ * already reach the middle of the band and carry the wall as a fine outline — so
+ * that one line is set heavier to match the weight the drawn floors read at.
+ * Without this the traced floor's walls print as hairlines beside the others.
+ */
+export const QEII_TRACED_WALL_GAIN = 6;
+
+export function qeiiWallGain(floorId?: string): number {
+  return floorId && qeiiFloorTraced(floorId) ? QEII_TRACED_WALL_GAIN : 1;
+}
+
 /**
  * Wall weight for a drawn shape. The venue's own weight is multiplied, never
  * replaced, so a thick wall stays thicker than a thin one at every setting.
  */
-export function qeiiWallWidth(shape: QeiiShape, weight = QEII_WALL_WEIGHT): number {
+export function qeiiWallWidth(shape: QeiiShape, weight = QEII_WALL_WEIGHT, gain = 1): number {
   const w = Math.min(
     QEII_WALL_WEIGHT_RANGE.max,
     Math.max(QEII_WALL_WEIGHT_RANGE.min, Number.isFinite(weight) ? weight : QEII_WALL_WEIGHT),
   );
-  return (shape.w ?? 1) * w;
+  return (shape.w ?? 1) * w * (gain > 0 ? gain : 1);
 }
+

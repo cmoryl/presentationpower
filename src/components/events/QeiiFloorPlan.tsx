@@ -24,7 +24,7 @@ import {
   qeiiStyledPaint,
 } from "@/lib/next-london-qeii-style";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
-import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
+import { qeiiRepeatedSymbolShapes, qeiiWallGain, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import {
   qeiiColourKey,
   qeiiCellsByShape,
@@ -105,6 +105,10 @@ export function QeiiFloorPlan({
   // Everything about the look — ground, tones, wall weight, colour strength —
   // comes from the master style sheet, so the screen and every export agree.
   const wall = qeiiLookWallWeight(face, wallWeight);
+  // A traced floor draws its walls as one fine outline; it is set heavier so the
+  // set reads at one wall weight across every floor.
+  const wallGain = qeiiWallGain(floor.id);
+
   const paint = useMemo(
     () => qeiiStyledPaint(qeiiColourPaint(floor, roomColours), face),
     [floor, roomColours, face],
@@ -150,7 +154,7 @@ export function QeiiFloorPlan({
               d={shape.d}
               fill={chosen ?? qeiiPlanInk(shape.fill, face) ?? "none"}
               stroke={stroke}
-              strokeWidth={stroke ? qeiiWallWidth(shape, wall) : undefined}
+              strokeWidth={stroke ? qeiiWallWidth(shape, wall, wallGain) : undefined}
             />
             {/* Rooms the artwork draws inside this block, cut out along the
                 issued wall runs so each colour fills the whole room. */}

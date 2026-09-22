@@ -23,7 +23,7 @@ import {
   qeiiColourPaint,
   qeiiRoomTextInk,
 } from "@/lib/next-london-qeii-rooms";
-import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
+import { qeiiRepeatedSymbolShapes, qeiiWallGain, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import {
   QEII_PLAN_TOKENS,
   qeiiGroundInk,
@@ -184,7 +184,10 @@ export async function buildQeiiPlanAi(
       if (fill) bits.push(fillOp(fill, [0.01, 0, 0.17]));
       if (stroke) {
         bits.push(strokeOp(stroke, [1, 1, 1]));
-        bits.push(`${f3(Math.max(0.05, qeiiWallWidth(shape, options.wallWeight) * k))} w`);
+        bits.push(
+          `${f3(Math.max(0.05, qeiiWallWidth(shape, options.wallWeight, qeiiWallGain(floor.id)) * k))} w`,
+        );
+
       }
       bits.push(ops, fill && stroke ? "B" : stroke ? "S" : "f", "Q");
       // Rooms the artwork draws inside this block, cut out along the issued wall
