@@ -66,6 +66,25 @@ REGION_MIN = 280
 WALL_REACH = 4.0
 # The fine white wall line, at the weight the drawn floors carry.
 WALL_WEIGHT = 1.6
+# An unnamed area larger than this share of the floor is circulation, not a room.
+ROOM_SHARE = 0.055
+
+
+def invert(m):
+    """The inverse of a placement matrix, to put page positions back on the picture."""
+    a, b, c, d, e, f = m
+    det = a * d - b * c
+    if abs(det) < 1e-9:
+        raise SystemExit("The picture placement cannot be inverted.")
+    return (
+        d / det,
+        -b / det,
+        -c / det,
+        a / det,
+        (c * f - d * e) / det,
+        (b * e - a * f) / det,
+    )
+
 
 
 def classify(rgb: np.ndarray, alpha: np.ndarray) -> np.ndarray:
