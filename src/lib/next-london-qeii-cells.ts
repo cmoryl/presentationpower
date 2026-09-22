@@ -77,8 +77,9 @@ export function qeiiStrokeRuns(d: string): Pt[][] {
 }
 
 /** One wall run widened into a closed outline, so it can be cut from a block. */
-function runBand(run: Pt[], half: number): MultiPoly {
+function runBand(run: Pt[], half: number, bridge = 0): MultiPoly {
   const parts: MultiPoly = [];
+  const last = run.length - 1;
   for (let i = 0; i + 1 < run.length; i += 1) {
     const [x1, y1] = run[i]!;
     const [x2, y2] = run[i + 1]!;
@@ -92,10 +93,16 @@ function runBand(run: Pt[], half: number): MultiPoly {
     const uy = dy / len;
     const nx = -uy * half;
     const ny = ux * half;
-    const ax = x1 - ux * half;
-    const ay = y1 - uy * half;
-    const bx = x2 + ux * half;
-    const by = y2 + uy * half;
+    // A run that stops a hair short of the block wall leaves the two spaces joined,
+    // so the first and last segment may be carried a little further along their own
+    // direction to close that gap. The direction is the issued line's own, never a
+    // guessed one.
+    const startPad = half + (i === 0 ? bridge : 0);
+    const endPad = half + (i + 1 === last ? bridge : 0);
+    const ax = x1 - ux * startPad;
+    const ay = y1 - uy * startPad;
+    const bx = x2 + ux * endPad;
+    const by = y2 + uy * endPad;
     parts.push([
       [
         [snap(ax + nx), snap(ay + ny)],
@@ -164,6 +171,64 @@ export type QeiiRoomCell = {
   share: number;
 };
 
+/**
+ * Whether a fill is the pale ink the issued sheets draw walls and partitions in.
+ *
+ * Only a near-white fill counts: a coloured block is a space, not a wall.
+ */
+function isWallFill(hex: string): boolean {
+  const v = hex.replace("#", "");
+  if (v.length !== 6) return false;
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(v.slice(i, i + 2), 16) / 255);
+  return 0.2126 * r! + 0.7152 * g! + 0.0722 * b! > 0.85;
+}
+
+/** Longest gap between two dots of the same dotted partition line, in plan units. */
+const DOT_LINK = 4;
+/** A near-white fill this small is a dot of a dotted partition, not a wall block. */
+const DOT_AREA = 4;
+
+/**
+ * The issued sheets draw movable partitions as a dotted line: a chain of tiny
+ * near-white squares. Each chain is joined into one run so the partition cuts the
+ * block like any other wall. Only dots that really are in one chain are joined —
+ * no line is invented between separate marks.
+ */
+function dottedRuns(dots: Pt[]): Pt[][] {
+  const used = new Array<boolean>(dots.length).fill(false);
+  const runs: Pt[][] = [];
+  const near = (a: Pt, b: Pt) => Math.hypot(a[0] - b[0], a[1] - b[1]) <= DOT_LINK;
+  for (let i = 0; i < dots.length; i += 1) {
+    if (used[i]) continue;
+    used[i] = true;
+    const run: Pt[] = [dots[i]!];
+    // Walk forwards from this dot, then backwards from the start, so the run
+    // follows the chain in drawn order.
+    for (const dir of [0, 1]) {
+      let end = run[dir === 0 ? run.length - 1 : 0]!;
+      for (;;) {
+        let next = -1;
+        let best = Infinity;
+        for (let j = 0; j < dots.length; j += 1) {
+          if (used[j] || !near(end, dots[j]!)) continue;
+          const dist = Math.hypot(end[0] - dots[j]![0], end[1] - dots[j]![1]);
+          if (dist < best) {
+            best = dist;
+            next = j;
+          }
+        }
+        if (next < 0) break;
+        used[next] = true;
+        end = dots[next]!;
+        if (dir === 0) run.push(end);
+        else run.unshift(end);
+      }
+    }
+    if (run.length >= 4) runs.push(run);
+  }
+  return runs;
+}
+
 /** Largest filled outline of a shape that holds a point. */
 function holdingRing(shape: QeiiShape, x: number, y: number): QeiiRing | undefined {
   let best: { ring: QeiiRing; area: number } | undefined;
@@ -188,7 +253,9 @@ export function qeiiCutCell(
   shapeIndex: number,
   x: number,
   y: number,
-): { d: string; share: number } | undefined {
+  others: { x: number; y: number }[] = [],
+  bridge = 0,
+): { d: string; share: number; planShare: number } | undefined {
   const block = floor.shapes[shapeIndex];
   if (!block?.fill) return undefined;
   const ring = holdingRing(block, x, y);
@@ -205,16 +272,37 @@ export function qeiiCutCell(
   const by1 = Math.max(...ys);
 
   const bands: MultiPoly = [];
+  const dots: Pt[] = [];
+  const reaches = (pts: Pt[]) =>
+    pts.some(([rx, ry]) => rx >= bx0 - 2 && rx <= bx1 + 2 && ry >= by0 - 2 && ry <= by1 + 2);
+  // Some issued sheets draw the walls as white filled shapes on top of the block
+  // rather than as stroked runs. Both cut the block the same way.
+  for (const shape of floor.shapes) {
+    if (!shape.fill || shape.fill === block.fill) continue;
+    if (!isWallFill(shape.fill)) continue;
+    for (const ring of qeiiRings(shape.d)) {
+      const clipped = ringToClip(ring);
+      if (!reaches(clipped)) continue;
+      const area = polyArea(clipped);
+      // A shape at least as big as the block is the sheet ground, not a wall.
+      if (area <= 0 || area >= blockArea * 0.9) continue;
+      if (area <= DOT_AREA) {
+        const cx = clipped.reduce((t, p) => t + p[0], 0) / clipped.length;
+        const cy = clipped.reduce((t, p) => t + p[1], 0) / clipped.length;
+        dots.push([cx, cy]);
+        continue;
+      }
+      bands.push([clipped]);
+    }
+  }
+  for (const run of dottedRuns(dots)) bands.push(...runBand(run, 1.1 + WALL_BITE, bridge));
   for (const shape of floor.shapes) {
     if (!shape.stroke) continue;
     const half = Math.max((shape.w ?? 1) / 2, 0.2) + WALL_BITE;
     for (const run of qeiiStrokeRuns(shape.d)) {
       // Only runs that reach into this block can cut it.
-      const touches = run.some(
-        ([rx, ry]) => rx >= bx0 - 2 && rx <= bx1 + 2 && ry >= by0 - 2 && ry <= by1 + 2,
-      );
-      if (!touches) continue;
-      bands.push(...runBand(run, half));
+      if (!reaches(run)) continue;
+      bands.push(...runBand(run, half, bridge));
     }
   }
   if (!bands.length) return undefined;
@@ -227,10 +315,44 @@ export function qeiiCutCell(
   }
   const hit = pieces.find((poly) => poly[0] && inClipRing(poly[0], x, y));
   if (!hit || !hit[0]) return undefined;
+  // The piece is only this room's when no other room's label sits in it. Two labels
+  // in one piece means the wall between them is not drawn in the issued artwork.
+  if (others.some((o) => inClipRing(hit[0]!, o.x, o.y))) return undefined;
   const area = polyArea(hit[0]) - hit.slice(1).reduce((s, h) => s + polyArea(h), 0);
   if (area <= 0) return undefined;
-  return { d: qeiiPolyPath(hit), share: area / blockArea };
+  const planArea = floor.w * floor.h;
+  return {
+    d: qeiiPolyPath(hit),
+    share: area / blockArea,
+    planShare: planArea > 0 ? area / planArea : 1,
+  };
+}
+
+/**
+ * Cut a room cell, carrying wall runs a little further along their own direction
+ * if the first pass leaves two rooms joined. Returns `undefined` when no pass
+ * closes the room — nothing is coloured on a guess.
+ */
+export function qeiiCutRoomCell(
+  floor: QeiiFloorVector,
+  shapeIndex: number,
+  x: number,
+  y: number,
+  others: { x: number; y: number }[] = [],
+): { d: string; share: number; planShare: number } | undefined {
+  for (const bridge of [0, 2, 4, 8]) {
+    const cut = qeiiCutCell(floor, shapeIndex, x, y, others, bridge);
+    if (cut) return cut;
+  }
+  return undefined;
 }
 
 /** A cut cell only counts as a room when the walls really close it off. */
 export const QEII_CELL_MAX_SHARE = 0.9;
+
+/**
+ * A cut piece bigger than this share of the sheet is the circulation ground, not
+ * a room — a goods-lift or entrance caption printed on the open floor. Those keep
+ * a colour tag behind the name instead of flooding the plan.
+ */
+export const QEII_CELL_MAX_PLAN_SHARE = 0.22;

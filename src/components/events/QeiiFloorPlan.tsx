@@ -5,7 +5,7 @@
 // qeiiPlanLayout, so the page, the SVG download and the tests agree exactly. The
 // ground is a solid brand token; no artwork is used as a background.
 
-import { useMemo, useRef } from "react";
+import { Fragment, useMemo, useRef } from "react";
 
 import {
   QEII_PLAN_TOKENS,

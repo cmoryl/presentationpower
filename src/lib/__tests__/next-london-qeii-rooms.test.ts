@@ -21,13 +21,28 @@ describe("QEII room colours", () => {
     expect(rooms.some((r) => r.room === "Mountbatten")).toBe(true);
   });
 
-  it("fills a room drawn on its own and tags one sharing a shape", () => {
+  it("fills a room drawn on its own and cuts one sharing a shape", () => {
     const floor = qeiiFloorVector("fourth")!;
     const paint = qeiiColourPaint(floor, { Westminster: "#FFEB66", Abbey: "#A1FBF9" });
     expect(paint.fills.size).toBe(1); // Westminster has its own shape
-    expect(paint.tags.get("Abbey")).toBe("#A1FBF9"); // shares with Moore and Rutherford
-    expect(qeiiSharedShapeNotes(floor).some((n) => n.includes("Abbey"))).toBe(true);
+    // Abbey shares a block with Moore and Rutherford, but the issued walls close it,
+    // so it is filled with its own cut outline rather than tagged.
+    const abbey = paint.cells.find((c) => c.room === "Abbey");
+    expect(abbey?.hex).toBe("#A1FBF9");
+    expect(abbey?.d.length ?? 0).toBeGreaterThan(20);
+    expect(paint.tags.get("Abbey")).toBeUndefined();
+    expect(qeiiSharedShapeNotes(floor).some((n) => n.includes("Abbey"))).toBe(false);
   });
+
+  it("never paints a room the issued walls leave open", () => {
+    const floor = qeiiFloorVector("third")!;
+    const paint = qeiiColourPaint(floor, { Whittle: "#FFEB66" });
+    // The third-floor hall is drawn as one space with no wall between the rooms.
+    expect(paint.tags.get("Whittle")).toBe("#FFEB66");
+    expect(paint.cells.some((c) => c.room === "Whittle")).toBe(false);
+    expect(qeiiSharedShapeNotes(floor).some((n) => n.includes("Whittle"))).toBe(true);
+  });
+
 
   it("offers approved colours only", () => {
     const approved = ["#003FC7", "#03002C", "#A1FBF9", "#C2A3FF", "#FFEB66", "#A6FA87", "#FF9B70", "#EC388A", "#E53D2E"];

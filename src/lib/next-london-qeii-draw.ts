@@ -8,7 +8,7 @@
 // the drawing as real shapes instead of showing a picture of it.
 // -----------------------------------------------------------------------------
 
-import { qeiiColourPaint } from "@/lib/next-london-qeii-rooms";
+import { qeiiCellsByShape, qeiiColourPaint } from "@/lib/next-london-qeii-rooms";
 import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import { qeiiPlanInk, type QeiiPlanOptions } from "@/lib/next-london-qeii-plan";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
@@ -105,6 +105,7 @@ export function qeiiDrawShapes(
 ): QeiiDrawShape[] {
   const face = options.face ?? "issued";
   const paint = qeiiColourPaint(floor, options.roomColours ?? {});
+  const cellsByShape = qeiiCellsByShape(paint);
   const hidden = options.showAllSymbols ? new Set<number>() : qeiiRepeatedSymbolShapes(floor);
   const out: QeiiDrawShape[] = [];
   floor.shapes.forEach((s, i) => {
@@ -119,6 +120,12 @@ export function qeiiDrawShapes(
       stroke: stroke ?? undefined,
       strokeW: stroke ? qeiiWallWidth(s, options.wallWeight) : 0,
     });
+    // Rooms drawn inside this block, cut along the issued wall runs, so a colour
+    // fills the whole room as its own editable shape in PowerPoint and Word.
+    for (const cell of cellsByShape.get(i) ?? []) {
+      const cellSegs = qeiiPathSegs(cell.d);
+      if (cellSegs.length) out.push({ segs: cellSegs, fill: cell.hex, strokeW: 0 });
+    }
   });
   return out;
 }
