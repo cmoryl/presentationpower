@@ -309,17 +309,24 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     // A small nudge inside the room is tried before the type is made smaller, so a
     // name clears a lift symbol or a marker dot at its proper size.
     const nudges = [0, 0.7, -0.7, 1.4, -1.4, 2.2, -2.2];
+    // A tight room sets its lockup smaller before it loses it altogether; the
+    // floor is the room name's own height, below which the lockup would not read.
+    const markFactors = [1, 0.86, 0.72, 0.6, 0.5];
     for (const useHolder of [true, false]) {
       for (const variant of variants) {
         for (const step of steps) {
           const size = Math.max(minSize, baseSize * step);
-          for (const nudge of nudges) {
-            const fit = measure(variant, size, 0, nudge * size);
-            if (clearOf(fit, useHolder)) {
-              chosen = fit;
-              insideHolder = useHolder;
-              break;
+          for (const markFactor of variant.marks.length ? markFactors : [1]) {
+            if (markFactor < 1 && QEII_MARK_RATIO * markFactor < 1) break;
+            for (const nudge of nudges) {
+              const fit = measure(variant, size, 0, nudge * size, markFactor);
+              if (clearOf(fit, useHolder)) {
+                chosen = fit;
+                insideHolder = useHolder;
+                break;
+              }
             }
+            if (chosen) break;
           }
           if (chosen) break;
           if (baseSize * step <= minSize) break;
@@ -328,6 +335,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       }
       if (chosen) break;
     }
+
 
     if (!chosen) {
       // The name itself always prints, so the last resort is to walk it a short
