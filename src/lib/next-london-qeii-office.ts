@@ -507,6 +507,7 @@ export async function buildQeiiPlanDocx(
     drawing =
       `<w:p><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0">` +
       `<wp:extent cx="${artWemu}" cy="${artHemu}"/><wp:docPr id="1" name="Floor plan"/>` +
+      `<wp:cNvGraphicFramePr/>` +
       `<a:graphic><a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup">` +
       `<wpg:wgp><wpg:cNvGrpSpPr/><wpg:grpSpPr><a:xfrm><a:off x="0" y="0"/>` +
       `<a:ext cx="${artWemu}" cy="${artHemu}"/><a:chOff x="0" y="0"/>` +
