@@ -1,8 +1,7 @@
 // Diagnostic: are the cut room cells clean vector outlines, and are the lockups
 // placed at their own aspect? Run: bun scripts/qeii-cell-quality.ts
 import { QEII_FLOOR_VECTORS } from "../src/lib/next-london-qeii-vectors";
-import { qeiiColourPaint, QEII_ROOM_PALETTE } from "../src/lib/next-london-qeii-rooms";
-import { qeiiFloorRooms } from "../src/lib/next-london-qeii-data";
+import { qeiiColourPaint, QEII_ROOM_PALETTE, qeiiRoomShapes } from "../src/lib/next-london-qeii-rooms";
 
 function pts(d: string): [number, number][][] {
   const rings: [number, number][][] = [];
@@ -33,7 +32,7 @@ let dupes = 0;
 const angles = new Set<string>();
 
 for (const floor of QEII_FLOOR_VECTORS) {
-  const rooms = qeiiFloorRooms(floor.id).map((r) => r.name);
+  const rooms = qeiiRoomShapes(floor).map((r) => r.room);
   const colours: Record<string, string> = {};
   rooms.forEach((n, i) => (colours[n] = QEII_ROOM_PALETTE[i % QEII_ROOM_PALETTE.length]!.hex));
   const paint = qeiiColourPaint(floor, colours);
