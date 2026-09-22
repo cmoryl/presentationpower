@@ -1124,18 +1124,23 @@ export function SlideFrame({
           <div
             aria-hidden
             data-decorative="true"
+            data-brand-system-ground="true"
             className="pointer-events-none absolute inset-0"
-            // ARTIFACT GUARD — longhand only. Mixing the `background` shorthand
-            // with backgroundSize/Position makes React patch the layer list in
-            // place, which left the *previous* template's layers painted under
-            // the new ones (the ghost columns admins saw on the modules page).
-            style={{
-              backgroundImage: brandSystemLightGround(groundSeed, brand.tokens.accent),
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }}
+            // SHORTHAND ONLY, and NOTHING alongside it.
+            //
+            // The resolved ground legitimately contains positional layers
+            // (`url(...) center center / cover no-repeat` for replaced artwork).
+            // Those are invalid inside the `background-image` longhand, and ONE
+            // invalid layer voids the WHOLE declaration — which is why the light
+            // page was painting a bare white sheet and admin replacement artwork
+            // never showed. The shorthand accepts them.
+            //
+            // The old ghost-layer artifact came from mixing the shorthand WITH
+            // backgroundSize/Position, so those longhands stay off: gradients
+            // fill the box on their own and image layers carry their own sizing.
+            style={{ background: brandSystemLightGround(groundSeed, brand.tokens.accent) }}
           />
+
           {/* Grain — barely-there tactile finish, matches media tiles. Skipped
               when replacement artwork IS the page. */}
           {!brandSystemGroundIsReplaced(groundSeed) && (
