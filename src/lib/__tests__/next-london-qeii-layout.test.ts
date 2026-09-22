@@ -29,13 +29,37 @@ describe("QEII rebuilt plan layout", () => {
     }
   });
 
-  it("never lets two blocks sit on top of one another", () => {
-    const floor = qeiiFloorVector("fourth")!;
-    const { blocks } = qeiiPlanLayout(floor, { showUse: true, showMarks: true });
-    for (let i = 0; i < blocks.length; i += 1) {
-      for (let j = i + 1; j < blocks.length; j += 1) {
-        expect(boxesOverlap(blocks[i]!.box, blocks[j]!.box, 0.01)).toBe(false);
+  it("never lets two blocks sit on top of one another on any rebuilt floor", () => {
+    for (const floor of QEII_FLOOR_VECTORS.filter((item) => item.kind === "vector")) {
+      const { blocks } = qeiiPlanLayout(floor, { showUse: true, showMarks: true });
+      for (let i = 0; i < blocks.length; i += 1) {
+        for (let j = i + 1; j < blocks.length; j += 1) {
+          expect(
+            boxesOverlap(blocks[i]!.box, blocks[j]!.box, 0.01),
+            `${floor.id}: ${blocks[i]!.room} overlaps ${blocks[j]!.room}`,
+          ).toBe(false);
+        }
       }
+    }
+  });
+
+  it("keeps the fifth-floor event rows above the room's lower wall", () => {
+    const floor = qeiiFloorVector("fifth")!;
+    const { blocks } = qeiiPlanLayout(floor, { showUse: true, showMarks: true });
+    for (const room of ["Darwin", "Hawking"]) {
+      const block = blocks.find((item) => item.room === room);
+      expect(block, room).toBeDefined();
+      expect(block!.box.y1, room).toBeLessThan(floor.h - 1);
+    }
+  });
+
+  it("wraps both fifth-floor meeting-room lines before they cross a room division", () => {
+    const floor = qeiiFloorVector("fifth")!;
+    const { blocks } = qeiiPlanLayout(floor, { showUse: true, showMarks: true });
+    for (const room of ["Darwin", "Hawking"]) {
+      const block = blocks.find((item) => item.room === room);
+      expect(block, room).toBeDefined();
+      expect(block!.useLines, room).toEqual(["Meeting Room", "· Optimize"]);
     }
   });
 

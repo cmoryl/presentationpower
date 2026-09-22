@@ -169,10 +169,25 @@ function boxFor(
   above: number,
   below: number,
 ): QeiiBox {
-  const turned = Math.abs(Math.abs(angle) - 90) < 15;
-  const w = turned ? above + below : width;
-  const h = turned ? width : above + below;
-  return { x0: x - w / 2, y0: y - h / 2, x1: x + w / 2, y1: y + h / 2 };
+  // Text is anchored on the room name, not at the vertical centre of its whole
+  // block: lockups extend above that anchor and event rows extend below it.
+  // Keep that asymmetry when building the collision box. The previous centred
+  // approximation could say two blocks were clear while the rendered event row
+  // crossed a wall or neighbouring caption. Rotating all four corners also keeps
+  // angled labels such as Stage/Screen honest instead of treating them as flat.
+  const radians = (angle * Math.PI) / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  const corners: Array<[number, number]> = [
+    [-width / 2, -above],
+    [width / 2, -above],
+    [width / 2, below],
+    [-width / 2, below],
+  ];
+  const rotated = corners.map(([dx, dy]) => [x + dx * cos - dy * sin, y + dx * sin + dy * cos]);
+  const xs = rotated.map(([px]) => px);
+  const ys = rotated.map(([, py]) => py);
+  return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) };
 }
 
 function overlaps(a: QeiiBox, b: QeiiBox, pad: number): boolean {
@@ -326,16 +341,22 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
      */
     const useSetsFor = (use?: string): string[][] => {
       if (!use) return [[]];
-      const sets: string[][] = [[use]];
+      const wrappedSets: string[][] = [];
       const words = use.split(" ").filter(Boolean);
       for (const rows of [2, 3]) {
         if (words.length < rows * 2) continue;
         const per = Math.ceil(words.length / rows);
         const wrapped: string[] = [];
         for (let w = 0; w < words.length; w += per) wrapped.push(words.slice(w, w + per).join(" "));
-        if (wrapped.length > 1) sets.push(wrapped);
+        if (wrapped.length > 1) wrappedSets.push(wrapped);
       }
-      return sets;
+      // Very long event lines cannot remain on one row in the fifth floor's
+      // narrow meeting rooms: their holder is part of the floor's large base
+      // polygon, so its broad bounding box does not reveal the internal wall.
+      // Prefer the exact same words over two rows when a line is wider than a
+      // fifth of the plan. Shorter foyer and plenary lines keep their issued row.
+      const long = qeiiTextWidth(use, baseSize * QEII_USE_RATIO) > floor.w * 0.2;
+      return long ? [...wrappedSets, [use]] : [[use], ...wrappedSets];
     };
 
 
