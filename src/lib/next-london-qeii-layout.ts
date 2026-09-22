@@ -399,16 +399,20 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
           for (const markFactor of variant.marks.length ? markFactors : [1]) {
             if (markFactor < 1 && QEII_MARK_RATIO * markFactor < 1) break;
             for (const ls of lineSets) {
-              for (const [ndx, ndy] of nudges) {
-                const fit = measure(variant, size, ndx * size, ndy * size, markFactor, ls);
-                if (clearOf(fit, useHolder)) {
-                  chosen = fit;
-                  insideHolder = useHolder;
-                  break;
+              for (const us of useSetsFor(variant.use)) {
+                for (const [ndx, ndy] of nudges) {
+                  const fit = measure(variant, size, ndx * size, ndy * size, markFactor, ls, us);
+                  if (clearOf(fit, useHolder)) {
+                    chosen = fit;
+                    insideHolder = useHolder;
+                    break;
+                  }
                 }
+                if (chosen) break;
               }
               if (chosen) break;
             }
+
 
             if (chosen) break;
           }
