@@ -12,6 +12,13 @@ const OUT = process.argv[2] ?? "/mnt/documents/TP-NEXT-2026-London-QEII-floor-pl
 // The lockups are site-relative paths the browser resolves against the origin.
 // Off the browser they resolve off disk, so the artwork still goes in as
 // outlines rather than being dropped from the file.
+// The lockup reader uses the browser's XML parser to fold the approved files'
+// class fills onto their paths, so this script lends it one.
+const { JSDOM } = await import("jsdom");
+const jsdom = new JSDOM("").window;
+(globalThis as any).DOMParser ??= jsdom.DOMParser;
+(globalThis as any).XMLSerializer ??= jsdom.XMLSerializer;
+
 const realFetch = globalThis.fetch;
 globalThis.fetch = (async (input: any, init?: any) => {
   const url = typeof input === "string" ? input : String(input?.url ?? input);
