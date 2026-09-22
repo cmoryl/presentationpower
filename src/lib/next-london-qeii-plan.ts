@@ -154,8 +154,10 @@ export function qeiiToneUnder(
  * ink instead, so it is never printed white on white.
  */
 export function qeiiLabelInk(tone?: string): string {
-  if (tone && luminance(tone) > 0.62) return QEII_PLAN_TOKENS.ink;
-  return QEII_PLAN_TOKENS.white;
+  // No artwork under the point means the plan's own light ground is behind the
+  // name — the mezzanine marker on the 3rd floor sits there — so it is set in ink.
+  if (!tone) return QEII_PLAN_TOKENS.ink;
+  return luminance(tone) > 0.62 ? QEII_PLAN_TOKENS.ink : QEII_PLAN_TOKENS.white;
 }
 
 export function qeiiLabelSize(label: QeiiLabel, scale = 1): number {
