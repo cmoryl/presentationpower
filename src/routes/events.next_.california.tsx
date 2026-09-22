@@ -19,6 +19,8 @@ import {
   CALIFORNIA_KIOSK_TEMPLATE,
   londonWallCropIntoKiosk,
 } from "@/lib/next-california-kiosks";
+import { SF_VENUE } from "@/lib/next-sf-event";
+
 import { CALIFORNIA_KIOSK_PANELS, londonBoothPanelMeta } from "@/lib/next-london-signage";
 import type { LondonPanel } from "@/lib/next-london-signage";
 
