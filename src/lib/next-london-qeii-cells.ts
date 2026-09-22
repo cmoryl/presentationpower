@@ -200,7 +200,7 @@ export function qeiiCutCell(
   shapeIndex: number,
   x: number,
   y: number,
-): { d: string; share: number } | undefined {
+): { d: string; share: number; planShare: number } | undefined {
   const block = floor.shapes[shapeIndex];
   if (!block?.fill) return undefined;
   const ring = holdingRing(block, x, y);
@@ -254,8 +254,20 @@ export function qeiiCutCell(
   if (!hit || !hit[0]) return undefined;
   const area = polyArea(hit[0]) - hit.slice(1).reduce((s, h) => s + polyArea(h), 0);
   if (area <= 0) return undefined;
-  return { d: qeiiPolyPath(hit), share: area / blockArea };
+  const planArea = floor.w * floor.h;
+  return {
+    d: qeiiPolyPath(hit),
+    share: area / blockArea,
+    planShare: planArea > 0 ? area / planArea : 1,
+  };
 }
 
 /** A cut cell only counts as a room when the walls really close it off. */
 export const QEII_CELL_MAX_SHARE = 0.9;
+
+/**
+ * A cut piece bigger than this share of the sheet is the circulation ground, not
+ * a room — a goods-lift or entrance caption printed on the open floor. Those keep
+ * a colour tag behind the name instead of flooding the plan.
+ */
+export const QEII_CELL_MAX_PLAN_SHARE = 0.22;
