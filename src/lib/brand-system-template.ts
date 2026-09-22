@@ -139,10 +139,16 @@ export function brandSystemLightDepthLayers(accentHex?: string, seed = ""): stri
  */
 export function brandSystemLightGround(seed: string, accentHex?: string): string {
   const base = stylePackById(BRAND_SYSTEM_BASE_PACK_ID);
-  if (!base) return enterpriseGroundFor(seed, accentHex);
-  const layers = brandSystemLightLayers(base, seed, accentHex);
-  return layers.length ? layers.join(", ") : enterpriseGroundFor(seed, accentHex);
+  const layers = base ? brandSystemLightLayers(base, seed, accentHex) : [];
+  if (layers.length) return layers.join(", ");
+  // NEVER return an empty ground. The light page was painting literally nothing
+  // whenever the S01 pack or its resolved layers came back empty on a surface —
+  // the bare-white-sheet symptom. The house depth field is the floor.
+  const fallback = enterpriseGroundFor(seed, accentHex);
+  const depth = brandSystemLightDepthLayers(accentHex, seed).join(", ");
+  return fallback ? `${depth}, ${fallback}` : depth;
 }
+
 
 /** Light-face layers: house depth (unless edited/replaced) over Spatial Clarity. */
 function brandSystemLightLayers(base: StylePack, seed: string, accentHex?: string): string[] {
