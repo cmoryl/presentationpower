@@ -454,7 +454,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       insideHolder = false;
       // How far the name had to travel is reported as it is: a hair's move to clear
       // a marker dot reads differently from a name carried across its own block.
-      const moved = Math.hypot(chosen.x - anchorX, chosen.y - anchorY);
+      const moved = Math.hypot(chosen.dx, chosen.dy);
       noteSet.add(
         bestCover !== 0
           ? `${room} sits too tight on this plan for its event line — read it in the floor list below.`
