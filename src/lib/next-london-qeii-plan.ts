@@ -182,7 +182,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
       // Rooms the artwork draws inside this block are cut out along the issued
       // wall runs, so a colour fills the whole room in the downloaded file too.
       const cut = (cellsByShape.get(i) ?? [])
-        .map((c) => `<path d="${c.d}" fill="${c.hex}" data-room="${esc(c.room)}"/>`)
+        .map((c) => `<path d="${c.d}" fill="${c.hex ?? fill ?? "none"}" data-room="${esc(c.room)}" id="room-${esc(c.room).replace(/\s+/g, "-").toLowerCase()}"/>`)
         .join("");
       return `<path ${bits.join(" ")}/>${cut}`;
     })

@@ -317,7 +317,7 @@ export async function buildQeiiPlanPptx(
           : { type: "none" },
         // A lockup outline carries its lockup's name, so the outlines can be
         // welded into one grouped object below — one click moves the whole logo.
-        ...(shape.group ? { objectName: shape.group } : {}),
+        ...((shape.group ?? shape.name) ? { objectName: shape.group ?? shape.name } : {}),
       } as never);
       if (shape.group) shapeGroups.add(shape.group);
     }
@@ -649,7 +649,7 @@ export async function buildQeiiPlanDocx(
         markGroups.set(shape.group, pack);
         continue;
       }
-      children.push(wpsShape(id++, `Plan shape ${id}`, frame, geom, paint));
+      children.push(wpsShape(id++, shape.name ?? `Plan shape ${id}`, frame, geom, paint));
     }
 
 

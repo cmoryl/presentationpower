@@ -16,7 +16,7 @@ import {
   qeiiRings,
   qeiiShapeHolds,
 } from "@/lib/next-london-qeii-geometry";
-import { qeiiCutRoomCell } from "@/lib/next-london-qeii-cells";
+import { QEII_CELL_MAX_PLAN_SHARE, qeiiCutRoomCell } from "@/lib/next-london-qeii-cells";
 import { qeiiLabelGroups } from "@/lib/next-london-qeii-layout";
 import { spaceUseMarks, spaceUsesForRoom } from "@/lib/next-london-space-use";
 import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
@@ -125,7 +125,7 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
         .filter((o) => o !== m && o.shapeIndex === m.shapeIndex)
         .map((o) => ({ x: o.x, y: o.y }));
       const cut = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, others);
-      if (cut) cell = cut.d;
+      if (cut && cut.planShare <= QEII_CELL_MAX_PLAN_SHARE) cell = cut.d;
     }
     let cellAfter = m.shapeIndex;
     if (cell) {
@@ -185,7 +185,7 @@ export type QeiiColourPaint = {
   /** Room name → tag colour, for rooms sharing a drawn shape. */
   tags: Map<string, string>;
   /** Exact room outlines cut from a shared block, drawn over the plan fill. */
-  cells: { room: string; shapeIndex: number; after: number; d: string; hex: string }[];
+  cells: { room: string; shapeIndex: number; after: number; d: string; hex?: string }[];
 };
 
 export function qeiiColourPaint(floor: QeiiFloorVector, rooms: QeiiRoomColours): QeiiColourPaint {
@@ -194,9 +194,10 @@ export function qeiiColourPaint(floor: QeiiFloorVector, rooms: QeiiRoomColours):
   const cells: QeiiColourPaint["cells"] = [];
   for (const entry of qeiiRoomShapes(floor)) {
     const hex = rooms[entry.room];
-    if (!hex) continue;
-    if (qeiiRoomIsExclusive(entry)) fills.set(entry.shapeIndex, hex);
-    else if (entry.cell)
+    // Every defensibly cut room is always present as its own path, even before
+    // somebody gives it a colour. This is what makes the uncoloured SVG, AI,
+    // PowerPoint and Word files expose one selectable room object per room.
+    if (entry.cell)
       cells.push({
         room: entry.room,
         shapeIndex: entry.shapeIndex,
@@ -204,7 +205,9 @@ export function qeiiColourPaint(floor: QeiiFloorVector, rooms: QeiiRoomColours):
         d: entry.cell,
         hex,
       });
-    else tags.set(entry.room, hex);
+    if (!hex) continue;
+    if (qeiiRoomIsExclusive(entry)) fills.set(entry.shapeIndex, hex);
+    else if (!entry.cell) tags.set(entry.room, hex);
   }
   return { fills, tags, cells };
 }
