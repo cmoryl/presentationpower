@@ -1,17 +1,14 @@
 import { QEII_FLOOR_VECTORS } from "@/lib/next-london-qeii-vectors";
-for (const [id, rec] of Object.entries(QEII_FLOOR_VECTORS as any)) {
-  const shapes = (rec as any).shapes ?? [];
-  let pts = 0, curves = 0, subs = 0;
-  const fills: Record<string, number> = {};
-  for (const s of shapes) {
-    const d: string = s.d ?? "";
-    pts += (d.match(/[LlMm]/g) ?? []).length;
-    curves += (d.match(/[CcQqSsTt]/g) ?? []).length;
-    subs += (d.match(/[Mm]/g) ?? []).length;
-    fills[s.fill ?? "none"] = (fills[s.fill ?? "none"] ?? 0) + 1;
-    if (s.stroke) fills["stroke:" + s.stroke] = (fills["stroke:" + s.stroke] ?? 0) + 1;
+
+const rec = (QEII_FLOOR_VECTORS as any)["3"] ?? (QEII_FLOOR_VECTORS as any)[3];
+const lens: number[] = [];
+for (const s of rec.shapes) {
+  const nums = (s.d as string).match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+  for (let i = 2; i + 1 < nums.length; i += 2) {
+    lens.push(Math.hypot(nums[i] - nums[i - 2], nums[i + 1] - nums[i - 1]));
   }
-  console.log(id, "shapes", shapes.length, "pts", pts, "curves", curves, "subpaths", subs,
-    "labels", ((rec as any).labels ?? []).length);
-  console.log("   fills", JSON.stringify(fills));
 }
+lens.sort((a, b) => a - b);
+const q = (p: number) => lens[Math.floor(lens.length * p)].toFixed(3);
+console.log("segments", lens.length, "p10", q(0.1), "median", q(0.5), "p90", q(0.9), "max", lens.at(-1)?.toFixed(2));
+console.log("under 0.5:", lens.filter((l) => l < 0.5).length, "under 1:", lens.filter((l) => l < 1).length);
