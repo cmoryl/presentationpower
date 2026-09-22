@@ -5,6 +5,8 @@
 // name, the line beneath it, a nudged position, and the room colours and key
 // names. A floor with no patch renders precisely as it did before.
 
+import { spaceUseMarkFor } from "@/lib/next-london-space-use";
+
 /** One room's corrections. Absent fields mean "as issued". */
 export type QeiiRoomEdit = {
   /** Replacement room name printed on the plan. */
@@ -14,6 +16,11 @@ export type QeiiRoomEdit = {
   /** Nudge off the printed anchor, in plan units. */
   dx?: number;
   dy?: number;
+  /**
+   * Division lockups to print beside the name, chosen by hand. An empty list
+   * means "no lockup here"; absent means the schedule's own reading stands.
+   */
+  marks?: string[];
 };
 
 export type QeiiMapEdits = {
@@ -66,6 +73,18 @@ export function sanitizeQeiiMapEdits(raw: unknown): QeiiMapEdits {
       if (dx !== undefined && dx !== 0) edit.dx = dx;
       const dy = num(v['dy']);
       if (dy !== undefined && dy !== 0) edit.dy = dy;
+      // A hand-picked lockup set: only approved division ids survive, and an
+      // empty list is kept because it means "print no lockup on this room".
+      const marks = v['marks'];
+      if (Array.isArray(marks)) {
+        const ids = marks
+          .filter((m): m is string => typeof m === "string")
+          .map((m) => m.trim().toLowerCase())
+          .filter((m, i, all) => m.length > 0 && all.indexOf(m) === i)
+          .slice(0, 4)
+          .filter((m) => spaceUseMarkFor(m));
+        edit.marks = ids;
+      }
       if (Object.keys(edit).length) out.rooms[qeiiRoomKey(key)] = edit;
     }
   }
@@ -131,6 +150,8 @@ export function qeiiApplyRoomEdit(
   if (next.name !== undefined && (next.name === "" || next.name === room)) delete next.name;
   if (next.dx === 0) delete next.dx;
   if (next.dy === 0) delete next.dy;
+  // Clearing the lockup choice hands the room back to the schedule's own reading.
+  if (next.marks === undefined) delete next.marks;
   const rooms = { ...edits.rooms };
   if (Object.keys(next).length === 0) delete rooms[key];
   else rooms[key] = next;

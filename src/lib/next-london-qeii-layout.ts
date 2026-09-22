@@ -19,6 +19,7 @@ import {
   spaceUseLine,
   spaceUseLineWithoutDivisions,
   spaceUseMarks,
+  spaceUseMarksForIds,
   type SpaceUseMark,
 } from "@/lib/next-london-space-use";
 import type { QeiiFloorVector, QeiiLabel } from "@/lib/next-london-qeii-vectors";
@@ -227,7 +228,13 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     const edit = qeiiRoomEdit(options.edits, room);
     const lines = edit?.name ? [edit.name] : issuedLines;
     const issuedUse = options.showUse ? spaceUseLine(room, floor.id) : undefined;
-    const allMarks = options.showMarks ? spaceUseMarks(room, floor.id) : [];
+    // A hand-picked lockup set replaces the schedule's own reading, including an
+    // empty set, which prints no lockup on the room at all.
+    const allMarks = options.showMarks
+      ? edit?.marks
+        ? spaceUseMarksForIds(edit.marks)
+        : spaceUseMarks(room, floor.id)
+      : [];
     const overridden = edit?.use !== undefined;
     const fullUse = overridden ? (edit!.use || undefined) : issuedUse;
     // With the division lockup printed, the division's name is not repeated as text.
