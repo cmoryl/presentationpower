@@ -7,6 +7,7 @@
 // and are loaded lazily by the London signage route.
 
 import artworkAsset from "@/assets/next-london-signage-artwork.json.asset.json";
+import { CALIFORNIA_KIOSKS } from "@/lib/next-california-kiosks";
 import {
   LONDON_BOOTHS,
   LONDON_BOOTH_BLEED_MM,
