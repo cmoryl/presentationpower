@@ -675,7 +675,7 @@ export async function buildQeiiPlanDocx(
       : "") +
     docxParagraph(
       plan.shapes
-        ? "The plan is a group of editable Word shapes — click into the group to recolour a room or move a wall. Room names and the key are live Word text."
+        ? "The plan is a group of editable Word shapes — click into the group to recolour a room or move a wall. Room names and the key are live Word text, and the division lockups are the approved artwork, placed as pictures."
         : "Room names and the key are editable Word text. This floor's drawing is a picture — use the Illustrator file to change the drawing itself.",
       { size: 16, colour: "666666" },
     ) +
