@@ -260,6 +260,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
 
     type Fit = {
       variant: Variant;
+      lines: string[];
       box: QeiiBox;
       size: number;
       useSize: number;
@@ -268,14 +269,21 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       dy: number;
     };
 
-    const measure = (variant: Variant, size: number, dx = 0, dy = 0, markFactor = 1): Fit => {
+    const measure = (
+      variant: Variant,
+      size: number,
+      dx = 0,
+      dy = 0,
+      markFactor = 1,
+      ls: string[] = lines,
+    ): Fit => {
       const useSize =
         Math.round(Math.min(size * 0.92, Math.max(size * QEII_USE_RATIO, minSize)) * 100) / 100;
       const markH =
         Math.round(size * QEII_MARK_RATIO * (options.markScale ?? 1) * markFactor * 100) / 100;
 
-      const nameWidth = Math.max(...lines.map((t) => qeiiTextWidth(t, size)));
-      const nameHeight = size * (0.72 + (lines.length - 1) * 1.05);
+      const nameWidth = Math.max(...ls.map((t) => qeiiTextWidth(t, size)));
+      const nameHeight = size * (0.72 + (ls.length - 1) * 1.05);
       const markRow = variant.marks.reduce((w, m) => w + markH * m.ratio + size * 0.35, 0);
       const width = Math.max(
         nameWidth,
@@ -286,6 +294,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       const below = nameHeight / 2 + (variant.use ? useSize * 1.5 : 0);
       return {
         variant,
+        lines: ls,
         box: boxFor(group.x + dx, group.y + dy, group.angle, width, above, below),
         dx,
         dy,
@@ -294,6 +303,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
         markH,
       };
     };
+
 
     const clearOf = (fit: Fit, useHolder: boolean): boolean => {
       if (!inside(fit.box, floor, 2)) return false;
