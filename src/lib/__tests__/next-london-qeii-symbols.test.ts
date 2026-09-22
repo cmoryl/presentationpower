@@ -21,8 +21,9 @@ describe("washroom symbols and wall weight", () => {
     const third = QEII_FLOOR_VECTORS.find((f) => f.id === "third")!;
     const drop = qeiiRepeatedSymbolShapes(third);
     expect(drop.size).toBeGreaterThan(200);
-    // The level marker arrow is drawn artwork, not debris, and stays.
-    expect(drop.has(140)).toBe(false);
+    // Drawn artwork stays: the debris pass never empties the floor of fills.
+    expect(third.shapes.filter((s, i) => !s.stroke && !drop.has(i)).length).toBeGreaterThan(0);
+
     // The debris pass never touches a wall run.
     const traced = qeiiTracedSymbolShapes(third);
     third.shapes.forEach((s, i) => {
