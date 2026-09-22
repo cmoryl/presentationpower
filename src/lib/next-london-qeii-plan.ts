@@ -392,7 +392,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
       const y = floor.h + keyStep * (0.9 + i);
       const esc2 = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
       return [
-        `<rect x="${floor.w * 0.02}" y="${y - keyStep * 0.34}" width="${keyStep * 0.72}" height="${keyStep * 0.72}" rx="${keyStep * 0.14}" fill="${row.hex}"/>`,
+        `<rect x="${floor.w * 0.02}" y="${y - keyStep * 0.34}" width="${keyStep * 0.72}" height="${keyStep * 0.72}" rx="${keyStep * 0.14}" fill="${qeiiRoomTint(row.hex, face)}"/>`,
         options.showText === false ? "" : `<text x="${floor.w * 0.02 + keyStep}" y="${y}" dominant-baseline="middle" font-family="Geist, Geist Variable, sans-serif" font-weight="600" font-size="${keyStep * 0.52}" fill="${QEII_PLAN_TOKENS.ink}">${esc2(row.label)}</text>`,
       ].join("");
     })
