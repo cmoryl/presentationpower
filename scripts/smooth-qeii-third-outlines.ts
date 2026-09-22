@@ -60,7 +60,7 @@ function num(v: number): string {
 }
 
 const src = readFileSync(FILE, "utf8");
-const keyAt = src.indexOf(FLOOR_KEY + ":");
+const keyAt = src.indexOf(FLOOR_KEY);
 if (keyAt < 0) throw new Error("third floor record not found");
 const nextKey = src.indexOf(`id: "fourth"`, keyAt);
 const end = nextKey > 0 ? nextKey : src.length;
