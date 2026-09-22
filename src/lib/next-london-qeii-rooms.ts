@@ -10,7 +10,12 @@
 // tokens — no artwork is used as a ground.
 
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
-import { qeiiShapeHolds } from "@/lib/next-london-qeii-geometry";
+import {
+  qeiiInRing,
+  qeiiRingArea,
+  qeiiRings,
+  qeiiShapeHolds,
+} from "@/lib/next-london-qeii-geometry";
 import { qeiiCutRoomCell } from "@/lib/next-london-qeii-cells";
 import { qeiiLabelGroups } from "@/lib/next-london-qeii-layout";
 import { spaceUseMarks, spaceUsesForRoom } from "@/lib/next-london-space-use";
