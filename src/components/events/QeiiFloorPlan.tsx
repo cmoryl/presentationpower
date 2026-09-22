@@ -234,20 +234,28 @@ export function QeiiFloorPlan({
                     {line}
                   </text>
                 ))}
-                {block.use ? (
-                  <text
-                    x={block.x}
-                    y={lastLine + block.size * 0.62 + block.useSize * 0.6}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fontSize={block.useSize}
-                    fill={ink}
-                    transform={transform}
-                    style={font}
-                  >
-                    {block.use}
-                  </text>
-                ) : null}
+                {(block.useLines?.length ? block.useLines : block.use ? [block.use] : []).map(
+                  (row, ri) => (
+                    <text
+                      key={`${block.key}-use-${ri}`}
+                      x={block.x}
+                      y={
+                        lastLine +
+                        block.size * 0.62 +
+                        block.useSize * 0.6 +
+                        ri * block.useSize * 1.15
+                      }
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fontSize={block.useSize}
+                      fill={ink}
+                      transform={transform}
+                      style={font}
+                    >
+                      {row}
+                    </text>
+                  ),
+                )}
                 {editable ? (
                   <rect
                     x={block.box.x0 - pad}
