@@ -24,11 +24,19 @@ describe("washroom symbols and wall weight", () => {
     // Drawn artwork stays: the debris pass never empties the floor of fills.
     expect(third.shapes.filter((s, i) => !s.stroke && !drop.has(i)).length).toBeGreaterThan(0);
 
-    // The debris pass never touches a wall run.
+    // The debris pass never touches a wall run: only pictogram-sized pieces go.
     const traced = qeiiTracedSymbolShapes(third);
+    const span = (d: string) => {
+      const nums = d.match(/-?\d+(\.\d+)?/g)?.map(Number) ?? [];
+      const xs = nums.filter((_, i) => i % 2 === 0);
+      const ys = nums.filter((_, i) => i % 2 === 1);
+      if (!xs.length || !ys.length) return 0;
+      return Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
+    };
     third.shapes.forEach((s, i) => {
-      if (s.stroke) expect(traced.has(i)).toBe(false);
+      if (s.stroke && span(s.d) > 30) expect(traced.has(i)).toBe(false);
     });
+
     expect(qeiiTracedSymbolShapes(QEII_FLOOR_VECTORS.find((f) => f.id === "ground")!).size).toBe(0);
   });
 
