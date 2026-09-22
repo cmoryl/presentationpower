@@ -12,7 +12,11 @@ import { AgendaStudio } from "@/components/next/AgendaStudio";
 import { useSavedAgendaFiles } from "@/hooks/use-next-live-masters";
 import { agendaDivision, agendaFileIsLive, normalizeAgendaConfig } from "@/lib/next-agenda";
 
-const search = z.object({ division: z.string().optional(), file: z.string().optional() });
+const search = z.object({
+  division: z.string().optional(),
+  file: z.string().optional(),
+  edition: z.string().optional(),
+});
 
 export const Route = createFileRoute("/events/next_/agendas")({
   validateSearch: (input: Record<string, unknown>) => search.parse(input),
@@ -39,7 +43,7 @@ export const Route = createFileRoute("/events/next_/agendas")({
 });
 
 function AgendaPage() {
-  const { division, file } = Route.useSearch();
+  const { division, file, edition } = Route.useSearch();
   const resolved = agendaDivision(division);
   const saved = useSavedAgendaFiles();
 
@@ -71,11 +75,32 @@ function AgendaPage() {
         >
           <ArrowLeft size={13} /> TransPerfect NEXT
         </Link>
-        <AgendaHouseTimesPanel divisionId={resolved.id} />
+        {edition === "san-francisco" ? (
+          <div className="mt-4 rounded-2xl border border-dashed border-[#03002C]/25 bg-white/70 p-4">
+            <div className="text-sm font-semibold text-[#03002C]">
+              San Francisco default board · October 27–28, 2026
+            </div>
+            <p className="mt-1 text-sm leading-relaxed text-[#03002C]/70">
+              No San Francisco programme has been issued, so every session slot reads TO BE
+              CONFIRMED. Registration, break, lunch, reception and close times are carried from the
+              flagship house times, not measured against a San Francisco run of show. Type the
+              programme in when it arrives — the frame, dates and venue line are already right.
+            </p>
+            <Link
+              to="/events/next/san-francisco"
+              className="mt-2 inline-flex text-xs font-semibold text-[#003FC7] hover:underline"
+            >
+              San Francisco event page
+            </Link>
+          </div>
+        ) : (
+          <AgendaHouseTimesPanel divisionId={resolved.id} />
+        )}
         <AgendaStudio
 
-          key={`${resolved.id}|${openFile?.id ?? "new"}`}
+          key={`${resolved.id}|${edition ?? "london"}|${openFile?.id ?? "new"}`}
           divisionId={resolved.id}
+          edition={edition}
           initialConfig={openFile?.config}
           initialFileId={openFile?.id ?? null}
           heading={`${resolved.name} — agenda`}
