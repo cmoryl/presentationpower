@@ -63,3 +63,23 @@ for (const floor of QEII_FLOOR_VECTORS) {
 }
 console.log({ cells, curveCells, spikes, shortSegs, dupes });
 console.log("turn angles seen (deg buckets):", [...angles].map(Number).sort((a, b) => a - b).join(","));
+
+// per-cell detail
+import { QEII_FLOOR_VECTORS as FV } from "../src/lib/next-london-qeii-vectors";
+for (const floor of FV) {
+  const rs = qeiiRoomShapes(floor).map((r) => r.room);
+  const colours: Record<string, string> = {};
+  rs.forEach((n, i) => (colours[n] = QEII_ROOM_PALETTE[i % QEII_ROOM_PALETTE.length]!.hex));
+  for (const cell of qeiiColourPaint(floor, colours).cells) {
+    const rings = pts(cell.d);
+    const n = rings.reduce((a, r) => a + r.length, 0);
+    const lens: number[] = [];
+    for (const r of rings)
+      for (let i = 0; i < r.length; i += 1) {
+        const a = r[i]!, b = r[(i + 1) % r.length]!;
+        lens.push(Math.hypot(b[0] - a[0], b[1] - a[1]));
+      }
+    lens.sort((a, b) => a - b);
+    console.log(floor.id, cell.room, "rings", rings.length, "pts", n, "minSeg", lens[0]?.toFixed(4), "median", lens[Math.floor(lens.length / 2)]?.toFixed(3), "max", lens.at(-1)?.toFixed(1));
+  }
+}
