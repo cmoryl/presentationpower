@@ -452,10 +452,15 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       }
       chosen = best ?? measure(bare, small);
       insideHolder = false;
+      // How far the name had to travel is reported as it is: a hair's move to clear
+      // a marker dot reads differently from a name carried across its own block.
+      const moved = Math.hypot(chosen.x - anchorX, chosen.y - anchorY);
       noteSet.add(
-        bestCover === 0
-          ? `${room} is moved slightly off its printed position to clear a symbol, and its event line is in the floor list below.`
-          : `${room} sits too tight on this plan for its event line — read it in the floor list below.`,
+        bestCover !== 0
+          ? `${room} sits too tight on this plan for its event line — read it in the floor list below.`
+          : moved > small * 2.5
+            ? `${room} is printed away from its position on the issued sheet — it is the only clear space in its own block — and its event line is in the floor list below.`
+            : `${room} is moved slightly off its printed position to clear a symbol, and its event line is in the floor list below.`,
       );
 
     } else {
