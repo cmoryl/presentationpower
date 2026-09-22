@@ -144,6 +144,63 @@ function inClipRing(ring: Ring, x: number, y: number): boolean {
   return hit;
 }
 
+/**
+ * Tidy a cut outline so it opens as clean vector artwork.
+ *
+ * A boolean subtraction leaves hairline anchors where wall bands cross: points a
+ * ten-thousandth of a unit apart, and long straight runs broken into dozens of
+ * micro-segments. They are invisible on screen but they are what makes an edge
+ * look ragged when a vendor zooms in, and they turn one wall into a hundred
+ * anchor points in Illustrator. Only noise is removed: every point kept sits on
+ * the issued line within 0.04 plan units, so real corners and angles survive
+ * exactly as drawn.
+ */
+export function qeiiTidyPoly(poly: Poly): Poly {
+  const EPS = 0.04;
+  const out: Poly = [];
+  for (const ring of poly) {
+    const pts: Ring = [];
+    for (const p of ring) {
+      const q: Pt = [Math.round(p[0] * 100) / 100, Math.round(p[1] * 100) / 100];
+      const last = pts[pts.length - 1];
+      if (last && Math.hypot(q[0] - last[0], q[1] - last[1]) < EPS) continue;
+      pts.push(q);
+    }
+    // Closing point is implicit in the path data.
+    while (pts.length > 1) {
+      const a = pts[0]!;
+      const b = pts[pts.length - 1]!;
+      if (Math.hypot(a[0] - b[0], a[1] - b[1]) >= EPS) break;
+      pts.pop();
+    }
+    // Drop points that sit on the straight line between their neighbours.
+    let changed = true;
+    while (changed && pts.length > 3) {
+      changed = false;
+      for (let i = 0; i < pts.length && pts.length > 3; i += 1) {
+        const a = pts[(i - 1 + pts.length) % pts.length]!;
+        const b = pts[i]!;
+        const c = pts[(i + 1) % pts.length]!;
+        const len = Math.hypot(c[0] - a[0], c[1] - a[1]);
+        if (len === 0) continue;
+        const dev =
+          Math.abs((c[0] - a[0]) * (a[1] - b[1]) - (a[0] - b[0]) * (c[1] - a[1])) / len;
+        if (dev < EPS) {
+          pts.splice(i, 1);
+          i -= 1;
+          changed = true;
+        }
+      }
+    }
+    if (pts.length < 3) continue;
+    const closed: Ring = [...pts, [pts[0]![0], pts[0]![1]]];
+    // A sliver this small is subtraction debris, not a piece of the room.
+    if (polyArea(closed) < 0.75) continue;
+    out.push(closed);
+  }
+  return out;
+}
+
 /** A cut polygon written back as SVG path data in plan units. */
 export function qeiiPolyPath(poly: Poly): string {
   return poly
@@ -160,6 +217,7 @@ export function qeiiPolyPath(poly: Poly): string {
     })
     .join(" ");
 }
+
 
 export type QeiiRoomCell = {
   room: string;
@@ -313,11 +371,15 @@ export function qeiiCutCell(
   } catch {
     return undefined;
   }
-  const hit = pieces.find((poly) => poly[0] && inClipRing(poly[0], x, y));
-  if (!hit || !hit[0]) return undefined;
+  const raw = pieces.find((poly) => poly[0] && inClipRing(poly[0], x, y));
+  if (!raw || !raw[0]) return undefined;
   // The piece is only this room's when no other room's label sits in it. Two labels
   // in one piece means the wall between them is not drawn in the issued artwork.
-  if (others.some((o) => inClipRing(hit[0]!, o.x, o.y))) return undefined;
+  if (others.some((o) => inClipRing(raw[0]!, o.x, o.y))) return undefined;
+  const hit = qeiiTidyPoly(raw);
+  if (!hit[0]) return undefined;
+  // The tidy pass must not move the room out from under its own label.
+  if (!inClipRing(hit[0], x, y)) return undefined;
   const area = polyArea(hit[0]) - hit.slice(1).reduce((s, h) => s + polyArea(h), 0);
   if (area <= 0) return undefined;
   const planArea = floor.w * floor.h;
@@ -327,6 +389,7 @@ export function qeiiCutCell(
     planShare: planArea > 0 ? area / planArea : 1,
   };
 }
+
 
 /**
  * Cut a room cell, carrying wall runs a little further along their own direction
