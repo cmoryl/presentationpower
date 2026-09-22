@@ -874,7 +874,26 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
               <Download className="h-4 w-4" />
               {exporting === "zip" ? "Making the pack…" : "Map pack (ZIP)"}
             </button>
+            <button
+              type="button"
+              className={btn}
+              disabled={exporting !== null}
+              onClick={() => exportPlan("canva")}
+            >
+              <Download className="h-4 w-4" />
+              {exporting === "canva" ? "Making the file…" : "For Canva (this plan)"}
+            </button>
+            <button
+              type="button"
+              className={btn}
+              disabled={exporting !== null}
+              onClick={() => exportPlan("canva-all")}
+            >
+              <Download className="h-4 w-4" />
+              {exporting === "canva-all" ? "Making the pack…" : "For Canva (all floors)"}
+            </button>
           </>
+
         ) : null}
       </div>
 
