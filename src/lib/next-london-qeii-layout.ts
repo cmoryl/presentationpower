@@ -376,10 +376,11 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       );
 
     } else {
-      if (fullUse && !chosen.variant.use) {
+      if (fullUse && !chosen.variant.use && !(chosen.variant.marks.length && !markedUse)) {
         noteSet.add(
           `${room} has no room for its event line on the plan — read it in the floor list below.`,
         );
+
       }
       if (allMarks.length && !chosen.variant.marks.length) {
         noteSet.add(`${room} has no room for its division lockup on the plan.`);
