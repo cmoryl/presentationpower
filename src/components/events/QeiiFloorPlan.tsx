@@ -10,6 +10,7 @@ import { Fragment, useMemo, useRef } from "react";
 import {
   QEII_PLAN_TOKENS,
   qeiiLabelInk,
+  qeiiToneUnder,
   qeiiMarkUrl,
   qeiiPlanInk,
   type QeiiMarkVariant,
@@ -166,7 +167,11 @@ export function QeiiFloorPlan({
             const shown = block.lines.join(" ");
             const tag = paint.tags.get(room);
             const fill = roomColours[room];
-            const ink = tag ? qeiiRoomTextInk(tag) : fill ? qeiiRoomTextInk(fill) : qeiiLabelInk();
+            const ink = tag
+              ? qeiiRoomTextInk(tag)
+              : fill
+                ? qeiiRoomTextInk(fill)
+                : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face));
             // A light room colour swallows the reverse lockup, so that one falls back
             // to the colour file. An explicit all-white or colour choice is kept.
             const variant = ink === "#03002C" && markVariant === "reverse" ? "colour" : markVariant;

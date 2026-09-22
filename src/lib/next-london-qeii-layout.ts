@@ -424,31 +424,43 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       // position is used and the crowding is reported instead of hidden.
       const small = Math.max(minSize, baseSize * 0.52);
       const bare = { use: undefined, marks: [] };
-      const walk = [0, 0.8, -0.8, 1.6, -1.6, 2.4, -2.4, 3.2, -3.2];
+      // A room boxed in by symbols on every side — a service kitchen ringed by
+      // lift and stair glyphs — needs to walk further than a nudge to reach clear
+      // space. Positions are tried nearest the printed position first, and a spot
+      // inside the space the artwork draws for the room is preferred over one
+      // outside it, so the name never wanders into a neighbour's room.
+      const steps2 = [0, 0.8, -0.8, 1.6, -1.6, 2.4, -2.4, 3.2, -3.2, 4.2, -4.2, 5.4, -5.4, 6.8, -6.8];
+      const walk: Array<[number, number]> = steps2
+        .flatMap((dx) => steps2.map((dy) => [dx, dy] as [number, number]))
+        .sort((a, b) => a[0] * a[0] + a[1] * a[1] - (b[0] * b[0] + b[1] * b[1]));
       let best: Fit | undefined;
       let bestCover = Infinity;
-      for (const dy of walk) {
-        for (const dx of walk) {
-          const fit = measure(bare, small, dx * small, dy * small);
-          if (clearOf(fit, false)) {
-            best = fit;
-            bestCover = 0;
-            break;
-          }
-          const cover = nearby.reduce((sum, o) => sum + overlapArea(fit.box, o), 0);
-          if (cover < bestCover) {
-            best = fit;
-            bestCover = cover;
-          }
+      for (const [dx, dy] of walk) {
+        const fit = measure(bare, small, dx * small, dy * small);
+        const home = !holder || qeiiRectInside(fit.box, holder, small * 0.22);
+        if (clearOf(fit, false) && home) {
+          best = fit;
+          bestCover = 0;
+          break;
         }
-        if (bestCover === 0) break;
+        const cover =
+          nearby.reduce((sum, o) => sum + overlapArea(fit.box, o), 0) + (home ? 0 : small * small);
+        if (cover < bestCover) {
+          best = fit;
+          bestCover = cover;
+        }
       }
       chosen = best ?? measure(bare, small);
       insideHolder = false;
+      // How far the name had to travel is reported as it is: a hair's move to clear
+      // a marker dot reads differently from a name carried across its own block.
+      const moved = Math.hypot(chosen.dx, chosen.dy);
       noteSet.add(
-        bestCover === 0
-          ? `${room} is moved slightly off its printed position to clear a symbol, and its event line is in the floor list below.`
-          : `${room} sits too tight on this plan for its event line — read it in the floor list below.`,
+        bestCover !== 0
+          ? `${room} sits too tight on this plan for its event line — read it in the floor list below.`
+          : moved > small * 2.5
+            ? `${room} is printed away from its position on the issued sheet — it is the only clear space in its own block — and its event line is in the floor list below.`
+            : `${room} is moved slightly off its printed position to clear a symbol, and its event line is in the floor list below.`,
       );
 
     } else {
