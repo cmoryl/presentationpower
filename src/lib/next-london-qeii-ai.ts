@@ -27,6 +27,7 @@ import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-
 import {
   QEII_PLAN_TOKENS,
   qeiiLabelInk,
+  qeiiToneUnder,
   qeiiPlanInk,
   type QeiiPlanOptions,
 } from "@/lib/next-london-qeii-plan";
