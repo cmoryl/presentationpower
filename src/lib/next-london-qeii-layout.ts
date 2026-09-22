@@ -248,10 +248,14 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     type Variant = { use?: string; marks: SpaceUseMark[] };
     const variants: Variant[] = [];
     if (markedUse && allMarks.length) variants.push({ use: markedUse, marks: allMarks });
+    // Where the schedule records nothing but the division itself, the approved
+    // lockup is the better reading of that line, so it is tried before the words.
+    if (allMarks.length && !markedUse) variants.push({ use: undefined, marks: allMarks });
     if (fullUse) variants.push({ use: fullUse, marks: [] });
     if (fullUse) variants.push({ use: shortUse(fullUse), marks: [] });
     if (allMarks.length) variants.push({ use: undefined, marks: allMarks });
     variants.push({ use: undefined, marks: [] });
+
 
 
     type Fit = {
