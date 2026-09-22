@@ -11,6 +11,7 @@ import { NEXT_APP_ORIGIN } from "@/lib/next-event";
 import { spaceUseLine, spaceUseMarks, type SpaceUseMark } from "@/lib/next-london-space-use";
 
 import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
+import { qeiiShapeHolds } from "@/lib/next-london-qeii-geometry";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import type { QeiiMapEdits } from "@/lib/qeii-map-edits";
 import {
