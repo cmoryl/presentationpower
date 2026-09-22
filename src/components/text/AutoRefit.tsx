@@ -172,11 +172,17 @@ export function useAutoRefit(
     let passes = 0;
     let stop = false;
 
+    const restoreAll = () => {
+      const node = ref.current;
+      if (!node) return;
+      for (const el of Array.from(node.querySelectorAll<HTMLElement>("[data-refit-applied='1']"))) {
+        restore(el);
+      }
+    };
+
     // A fresh signature means new words: drop what the last pass applied so the
     // authored sizes are measured, not last language's shrunken ones.
-    for (const el of Array.from(root.querySelectorAll<HTMLElement>("[data-refit-applied='1']"))) {
-      restore(el);
-    }
+    restoreAll();
 
     const pass = () => {
       if (stop || !ref.current) return;
@@ -189,14 +195,18 @@ export function useAutoRefit(
     };
     frame = requestAnimationFrame(pass);
 
+    // A resize or a copy edit changes what will fit, so start again from the
+    // authored design rather than measuring the last fit.
     const again = () => {
       passes = 0;
       cancelAnimationFrame(frame);
+      restoreAll();
       frame = requestAnimationFrame(pass);
     };
 
     const obs = typeof ResizeObserver !== "undefined" ? new ResizeObserver(again) : null;
     obs?.observe(root);
+
 
     // Copy edits and translations replace the words in place, which no resize
     // reports — watch the text itself so a longer language refits immediately.
