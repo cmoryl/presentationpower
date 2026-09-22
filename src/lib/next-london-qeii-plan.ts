@@ -250,7 +250,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
             ? qeiiRoomTextInk(tag)
             : roomColours[room]
               ? qeiiRoomTextInk(roomColours[room])
-              : qeiiLabelInk();
+              : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face));
           // A light room colour needs the colour lockup, not the reverse one.
           // A light room fill would swallow the reverse lockup, so that one falls
           // back to the colour file. An explicit all-white or colour choice stands.
