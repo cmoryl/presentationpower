@@ -24,6 +24,16 @@ import shellARender from "@/assets/london-booths/renders/tradebooth-a-render.jpg
 import shellBAi from "@/assets/london-booths/tradebooth-b-shell.ai?url";
 import shellBProof from "@/assets/london-booths/tradebooth-b-shell.jpg";
 import shellBRender from "@/assets/london-booths/renders/tradebooth-b-render.jpg";
+import kioskReturnProof from "@/assets/california-kiosks/tv-kiosk-return.jpg";
+import kioskProof from "@/assets/california-kiosks/tv-kiosk-shell.jpg";
+import kioskTemplateAi from "@/assets/california-kiosks/tv-kiosk-template.ai?url";
+import {
+  CALIFORNIA_KIOSK_BLEED_MM,
+  CALIFORNIA_KIOSK_FRONT_TRIM,
+  CALIFORNIA_KIOSK_RETURN_TRIM,
+  CALIFORNIA_KIOSK_SCREEN_FRACTION,
+  CALIFORNIA_KIOSK_SCREEN_MM,
+} from "@/lib/next-california-kiosk-geometry";
 
 export type LondonBoothShellId =
   | "tradebooth-a"
