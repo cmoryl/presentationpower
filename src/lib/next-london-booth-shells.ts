@@ -25,7 +25,13 @@ import shellBAi from "@/assets/london-booths/tradebooth-b-shell.ai?url";
 import shellBProof from "@/assets/london-booths/tradebooth-b-shell.jpg";
 import shellBRender from "@/assets/london-booths/renders/tradebooth-b-render.jpg";
 
-export type LondonBoothShellId = "tradebooth-a" | "tradebooth-b";
+export type LondonBoothShellId =
+  | "tradebooth-a"
+  | "tradebooth-b"
+  // California TV kiosk: supplied as one front face with a screen aperture plus
+  // two screenless return strips (see next-california-kiosks.ts).
+  | "tv-kiosk"
+  | "tv-kiosk-return";
 
 /** A rectangle on the wall, in mm from the TRIM origin (top-left of trim). */
 export type BoothRectMm = { x: number; y: number; w: number; h: number };
