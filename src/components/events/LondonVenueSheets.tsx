@@ -7,7 +7,18 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, FileDown, Maximize2, Pencil, Printer, Save, Search, X } from "lucide-react";
+import {
+  ChevronDown,
+  Download,
+  FileDown,
+  Maximize2,
+  Pencil,
+  Printer,
+  Save,
+  Search,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 
 import { useSessionUser } from "@/hooks/use-session-user";
 import { QeiiMapEditPanel } from "@/components/events/QeiiMapEditPanel";
@@ -102,6 +113,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
   const [markVariant, setMarkVariant] = useState<QeiiMarkVariant>("reverse");
   const [markScale, setMarkScale] = useState(1);
   const [showColourPanel, setShowColourPanel] = useState(false);
+  const [showPlanOptions, setShowPlanOptions] = useState(false);
   // Colours are held per floor, so one sheet's key never leaks onto another.
   const [roomColourMap, setRoomColourMap] = useState<Record<string, QeiiRoomColours>>({});
   const [keyLabelMap, setKeyLabelMap] = useState<Record<string, Record<string, string>>>({});
@@ -656,52 +668,160 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
         ))}
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          aria-pressed={showRebuilt}
-          disabled={!plan?.rebuilt}
-          onClick={() => setRebuiltView(true)}
-          className={`${chip} ${
-            showRebuilt
-              ? "border-[#003FC7] bg-[#003FC7] text-white"
-              : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2] disabled:opacity-40"
-          }`}
-        >
-          Rebuilt in Element
-        </button>
-        <button
-          type="button"
-          aria-pressed={!showRebuilt}
-          onClick={() => setRebuiltView(false)}
-          className={`${chip} ${
-            !showRebuilt
-              ? "border-[#03002C] bg-[#03002C] text-white"
-              : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
-          }`}
-        >
-          Issued artwork
-        </button>
-        {showRebuilt ? (
-          <>
-            {/* One master style sheet decides the look of every floor and every
-                download; these three are the only looks offered. */}
-            {QEII_MAP_LOOK_ORDER.map((id) => (
+      {/* One tidy control panel: what you are looking at, what prints on it, the
+          tools, and one menu for every download — instead of one long chip run. */}
+      <div className="mt-4 rounded-2xl border border-black/10 bg-white p-3.5">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#03002C]/45">
+              Drawing
+            </span>
+            <span className="inline-flex overflow-hidden rounded-full border border-[#03002C]/20 bg-white">
               <button
-                key={id}
                 type="button"
-                aria-pressed={face === id}
-                title={QEII_MAP_LOOKS[id].note}
-                onClick={() => setFace(id)}
-                className={`${chip} ${
-                  face === id
-                    ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
-                    : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+                aria-pressed={showRebuilt}
+                disabled={!plan?.rebuilt}
+                onClick={() => setRebuiltView(true)}
+                className={`px-3 py-1.5 text-[12px] font-semibold disabled:opacity-40 ${
+                  showRebuilt ? "bg-[#003FC7] text-white" : "text-[#03002C] hover:bg-[#F2F2F2]"
                 }`}
               >
-                {QEII_MAP_LOOKS[id].name}
+                Rebuilt in Element
               </button>
-            ))}
+              <button
+                type="button"
+                aria-pressed={!showRebuilt}
+                onClick={() => setRebuiltView(false)}
+                className={`px-3 py-1.5 text-[12px] font-semibold ${
+                  !showRebuilt ? "bg-[#03002C] text-white" : "text-[#03002C] hover:bg-[#F2F2F2]"
+                }`}
+              >
+                Issued artwork
+              </button>
+            </span>
+          </div>
+
+          {showRebuilt ? (
+            <>
+              {/* One master style sheet decides the look of every floor and every
+                  download; these are the only looks offered. */}
+              <label className="flex items-center gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#03002C]/45">
+                  Look
+                </span>
+                <select
+                  value={face}
+                  aria-label="Map look"
+                  title={QEII_MAP_LOOKS[face].note}
+                  onChange={(e) => setFace(e.target.value as typeof face)}
+                  className="rounded-full border border-[#03002C]/20 bg-white px-3 py-1.5 text-[12px] font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
+                >
+                  {QEII_MAP_LOOK_ORDER.map((id) => (
+                    <option key={id} value={id}>
+                      {QEII_MAP_LOOKS[id].name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#03002C]/45">
+                  Tools
+                </span>
+                <button
+                  type="button"
+                  aria-pressed={showColourPanel}
+                  onClick={() => setShowColourPanel(!showColourPanel)}
+                  className={`${chip} ${
+                    showColourPanel
+                      ? "border-[#003FC7] bg-[#003FC7] text-white"
+                      : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+                  }`}
+                >
+                  Room colours &amp; key
+                </button>
+                {userId ? (
+                  <button
+                    type="button"
+                    aria-pressed={editMode}
+                    onClick={() => {
+                      setEditMode(!editMode);
+                      setPicked(undefined);
+                    }}
+                    className={`${chip} ${
+                      editMode
+                        ? "border-[#003FC7] bg-[#003FC7] text-white"
+                        : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+                    }`}
+                  >
+                    <Pencil className="mr-1.5 inline-block h-3.5 w-3.5" />
+                    {editMode ? "Editing this map" : "Edit this map"}
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  aria-pressed={showPlanOptions}
+                  onClick={() => setShowPlanOptions(!showPlanOptions)}
+                  className={`${chip} ${
+                    showPlanOptions
+                      ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
+                      : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+                  }`}
+                >
+                  <SlidersHorizontal className="mr-1.5 inline-block h-3.5 w-3.5" />
+                  What prints on the plan
+                </button>
+              </div>
+
+              <details className="relative ml-auto">
+                <summary className={`${btn} cursor-pointer list-none`}>
+                  <Download className="h-4 w-4" />
+                  {exporting ? "Making the file…" : "Download this plan"}
+                  <ChevronDown className="h-3.5 w-3.5" />
+                </summary>
+                <div className="absolute right-0 z-20 mt-2 w-64 rounded-2xl border border-black/10 bg-white p-2 shadow-lg">
+                  {(
+                    [
+                      ["svg", "Editable SVG"],
+                      ["pptx", "PowerPoint"],
+                      ["docx", "Word"],
+                      ["ai", "Illustrator"],
+                      ["zip", "Map pack (ZIP)"],
+                      ["canva", "For Canva (this plan)"],
+                      ["canva-all", "For Canva (all floors)"],
+                    ] as [string, string][]
+                  ).map(([kind, label]) => (
+                    <button
+                      key={kind}
+                      type="button"
+                      disabled={exporting !== null}
+                      onClick={() => (kind === "svg" ? downloadPlanSvg() : exportPlan(kind as never))}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-[12.5px] font-semibold text-[#03002C] hover:bg-[#F2F2F2] disabled:opacity-40"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </details>
+            </>
+          ) : null}
+        </div>
+
+        {showRebuilt && editMode ? (
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3">
+            <button type="button" className={btn} onClick={saveFloorEdits} disabled={saving}>
+              <Save className="h-4 w-4" />
+              {saving ? "Saving…" : "Save for everyone"}
+            </button>
+            <button type="button" className={btn} onClick={resetFloorEdits} disabled={saving}>
+              Back to the issued plan
+            </button>
+          </div>
+        ) : null}
+
+        {showRebuilt && showPlanOptions ? (
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-black/5 pt-3">
             <button
               type="button"
               aria-pressed={showLabels}
@@ -726,32 +846,30 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
             >
               {showMarks ? "Division logos on" : "Division logos off"}
             </button>
+            <button
+              type="button"
+              aria-pressed={showAllSymbols}
+              onClick={() => setShowAllSymbols(!showAllSymbols)}
+              className={`${chip} border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]`}
+            >
+              {showAllSymbols ? "Every cubicle symbol" : "One bathroom symbol"}
+            </button>
 
             {showMarks ? (
               <>
-                <span className="inline-flex overflow-hidden rounded-full border border-[#03002C]/20 bg-white">
-                  {(
-                    [
-                      ["reverse", "Reverse logo"],
-                      ["white", "All white logo"],
-                      ["colour", "Colour logo"],
-                    ] as [QeiiMarkVariant, string][]
-                  ).map(([id, label]) => (
-                    <button
-                      key={id}
-                      type="button"
-                      aria-pressed={markVariant === id}
-                      onClick={() => setMarkVariant(id)}
-                      className={`px-3 py-1.5 text-[12px] font-semibold ${
-                        markVariant === id
-                          ? "bg-[#03002C] text-white"
-                          : "text-[#03002C] hover:bg-[#F2F2F2]"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </span>
+                <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
+                  Logo
+                  <select
+                    value={markVariant}
+                    aria-label="Division logo colour"
+                    onChange={(e) => setMarkVariant(e.target.value as QeiiMarkVariant)}
+                    className="rounded-full border border-[#03002C]/20 bg-white px-3 py-1.5 text-[12px] font-semibold text-[#03002C]"
+                  >
+                    <option value="reverse">Reverse</option>
+                    <option value="white">All white</option>
+                    <option value="colour">Colour</option>
+                  </select>
+                </label>
                 <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
                   Logo size
                   <input
@@ -767,70 +885,6 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
                 </label>
               </>
             ) : null}
-
-            <button
-              type="button"
-              aria-pressed={showColourPanel}
-              onClick={() => setShowColourPanel(!showColourPanel)}
-              className={`${chip} ${
-                showColourPanel
-                  ? "border-[#003FC7] bg-[#003FC7] text-white"
-                  : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
-              }`}
-            >
-              Room colours &amp; key
-            </button>
-
-            {userId ? (
-              <>
-                <button
-                  type="button"
-                  aria-pressed={editMode}
-                  onClick={() => {
-                    setEditMode(!editMode);
-                    setPicked(undefined);
-                  }}
-                  className={`${chip} ${
-                    editMode
-                      ? "border-[#003FC7] bg-[#003FC7] text-white"
-                      : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
-                  }`}
-                >
-                  <Pencil className="mr-1.5 inline-block h-3.5 w-3.5" />
-                  {editMode ? "Editing this map" : "Edit this map"}
-                </button>
-                {editMode ? (
-                  <>
-                    <button
-                      type="button"
-                      className={btn}
-                      onClick={saveFloorEdits}
-                      disabled={saving}
-                    >
-                      <Save className="h-4 w-4" />
-                      {saving ? "Saving…" : "Save for everyone"}
-                    </button>
-                    <button
-                      type="button"
-                      className={btn}
-                      onClick={resetFloorEdits}
-                      disabled={saving}
-                    >
-                      Back to the issued plan
-                    </button>
-                  </>
-                ) : null}
-              </>
-            ) : null}
-
-            <button
-              type="button"
-              aria-pressed={showAllSymbols}
-              onClick={() => setShowAllSymbols(!showAllSymbols)}
-              className={`${chip} border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]`}
-            >
-              {showAllSymbols ? "Every cubicle symbol" : "One bathroom symbol"}
-            </button>
 
             <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
               Wall weight
@@ -859,67 +913,10 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
               />
               {labelScale.toFixed(2)}×
             </label>
-            <button type="button" className={btn} onClick={downloadPlanSvg}>
-              <Download className="h-4 w-4" /> This plan (editable SVG)
-            </button>
-            <button
-              type="button"
-              className={btn}
-              disabled={exporting !== null}
-              onClick={() => exportPlan("pptx")}
-            >
-              <Download className="h-4 w-4" />
-              {exporting === "pptx" ? "Making the deck…" : "This plan (PowerPoint)"}
-            </button>
-            <button
-              type="button"
-              className={btn}
-              disabled={exporting !== null}
-              onClick={() => exportPlan("docx")}
-            >
-              <Download className="h-4 w-4" />
-              {exporting === "docx" ? "Making the document…" : "This plan (Word)"}
-            </button>
-            <button
-              type="button"
-              className={btn}
-              disabled={exporting !== null}
-              onClick={() => exportPlan("ai")}
-            >
-              <Download className="h-4 w-4" />
-              {exporting === "ai" ? "Making the artwork…" : "This plan (Illustrator)"}
-            </button>
-            <button
-              type="button"
-              className={btn}
-              disabled={exporting !== null}
-              onClick={() => exportPlan("zip")}
-            >
-              <Download className="h-4 w-4" />
-              {exporting === "zip" ? "Making the pack…" : "Map pack (ZIP)"}
-            </button>
-            <button
-              type="button"
-              className={btn}
-              disabled={exporting !== null}
-              onClick={() => exportPlan("canva")}
-            >
-              <Download className="h-4 w-4" />
-              {exporting === "canva" ? "Making the file…" : "For Canva (this plan)"}
-            </button>
-            <button
-              type="button"
-              className={btn}
-              disabled={exporting !== null}
-              onClick={() => exportPlan("canva-all")}
-            >
-              <Download className="h-4 w-4" />
-              {exporting === "canva-all" ? "Making the pack…" : "For Canva (all floors)"}
-            </button>
-          </>
-
+          </div>
         ) : null}
       </div>
+
 
       {plan && !plan.rebuilt ? (
         <p className="mt-3 rounded-xl border border-[#FFEB66] bg-[#FFEB66]/25 px-3.5 py-2.5 text-[12.5px] leading-relaxed text-[#03002C]">
