@@ -19,6 +19,8 @@ import {
   CALIFORNIA_KIOSK_TEMPLATE,
   londonWallCropIntoKiosk,
 } from "@/lib/next-california-kiosks";
+import { SF_VENUE } from "@/lib/next-sf-event";
+
 import { CALIFORNIA_KIOSK_PANELS, londonBoothPanelMeta } from "@/lib/next-london-signage";
 import type { LondonPanel } from "@/lib/next-london-signage";
 
@@ -125,9 +127,17 @@ function CaliforniaKiosksPage() {
             the London kit.
           </p>
           <p className="mt-2 text-sm leading-relaxed text-[#03002C]/70">
-            No venue, dates or floor plan have been issued for California yet, so nothing on these
-            boards states them.
+            These kiosks are the partner stands for{" "}
+            <Link
+              to="/events/next/san-francisco"
+              className="font-semibold text-[#003FC7] hover:underline"
+            >
+              {SF_VENUE.locationLine} · {SF_VENUE.venue}
+            </Link>
+            . No floor plan, room list or programme has been issued for the venue yet, so nothing on
+            these boards states them.
           </p>
+
         </div>
 
         <label className="mt-6 flex items-center gap-2 rounded-xl border border-[#03002C]/15 bg-white px-3 py-2">

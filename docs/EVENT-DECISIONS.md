@@ -243,3 +243,28 @@ flagged gradients, which would let them carry the dark face.
 **Why:** a print vendor must always be handed the newest signed-off artwork, but re-publishing an unchanged file burns a version number and makes the history lie about when a sign was last changed. Matching on filename alone (a) is not enough — two different signs shared the basename `Lifts_Template.ai` (lift door vs lift walls), so the mapping is by folder path, not name. (b) would have retired files that are still the ones in force.
 **Would change if:** a hand-back arrives with no reliable file dates — then the comparison falls back to content hash against the stored object.
 **Applies to:** every venue hand-back. Old versions are never deleted: they stay in `london_live_files` with `is_active = false`, so a sign can always be rolled back.
+
+## NEXT 2026 San Francisco (InterContinental San Francisco)
+
+### 2026-09 — San Francisco gets its own event page; the kiosk URL stays
+**Area:** the San Francisco edition and the partner kiosk route.
+**Options tested:** renaming `/events/next/california` to a San Francisco URL;
+folding the kiosks into a San Francisco page; keeping the kiosk URL and adding a
+separate event page that links to it.
+**Chosen:** keep `/events/next/california` and add `/events/next/san-francisco`,
+cross-linked both ways.
+**Why:** the kiosk URL is already in vendors' hands; breaking it to tidy naming
+costs more than the tidiness is worth, and the event page is where the issued
+location line lives.
+**Would change if:** the kiosk link has not yet gone out to partners, or a
+second Californian city joins the series and the name becomes ambiguous.
+**Applies to:** San Francisco only.
+
+### 2026-09 — Only issued San Francisco facts appear anywhere
+**Area:** every San Francisco surface.
+**Options tested:** carrying London's address/plan/programme shapes as
+placeholders; leaving the slots blank with a named blocker.
+**Chosen:** blank with a named blocker.
+**Why:** a placeholder address or capacity reads as issued and gets printed.
+**Would change if:** the hotel issues its floor sheets and room list.
+**Applies to:** every venue.
