@@ -347,6 +347,21 @@ export async function buildQeiiPlanPptx(
     }
   }
 
+  // Division lockups, as the approved artwork placed on the slide.
+  for (const mark of plan.marks) {
+    const w = mark.w * k;
+    const h = mark.h * k;
+    slide.addImage({
+      data: mark.dataUrl,
+      x: ox + mark.cx * k - w / 2,
+      y: oy + mark.cy * k - h / 2,
+      w,
+      h,
+      rotate: Math.abs(mark.angle) < 0.5 ? 0 : mark.angle,
+      altText: `${mark.name} lockup`,
+    });
+  }
+
   for (const row of plan.key) {
     const size = ptSize(row.size);
     const sw = (size / 72) * 1.1;
