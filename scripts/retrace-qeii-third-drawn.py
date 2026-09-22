@@ -31,7 +31,7 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 from scipy import ndimage
 
 HERE = Path(__file__).resolve().parent
@@ -129,14 +129,105 @@ def grow_to_wall_centre(seeds: np.ndarray, cls: np.ndarray) -> np.ndarray:
     return out
 
 
-def biggest_ring(mask: np.ndarray, tmp: Path, tag: str):
-    """The outline of one region, traced at scale so its corners stay true."""
+# Tracing detail. The picture is only 368 pixels wide, so the outline of a wall
+# lands on whole pixels and comes back as a staircase unless it is traced much
+# larger with the edge softened first, and then straightened.
+TRACE_UP = 10
+EDGE_SOFTEN = 2.6  # blur radius at the traced size: about a quarter of a pixel
+# A wall run out of true by less than this many picture pixels is a trace wobble,
+# not a drawn angle, so it is pulled straight.
+STRAIGHT_TOL = 0.62
+# Outlines land on pixel boundaries, so positions settle on the half pixel.
+SNAP_GRID = 0.5
+
+
+def trace_rings(mask: np.ndarray, tmp: Path, tag: str) -> list[list[tuple[float, float]]]:
+    """Every outline of one mask, in picture pixels, drawn clean and straight."""
     im = Image.fromarray((mask * 255).astype(np.uint8), mode="L")
-    svg = raster.trace_mask(im, tmp, tag)
-    rings = raster.contours(svg)
+    w, h = im.size
+    big = im.resize((w * TRACE_UP, h * TRACE_UP), Image.BICUBIC).filter(
+        ImageFilter.GaussianBlur(EDGE_SOFTEN)
+    )
+    bw = big.point(lambda v: 0 if v >= 128 else 255, mode="1")
+    pbm = tmp / f"{tag}.pbm"
+    svg = tmp / f"{tag}.svg"
+    bw.save(pbm)
+    raster.run("potrace", "-s", "-a", "1.0", "-t", "16", "-O", "0.8", "-o", str(svg), str(pbm))
+    out: list[list[tuple[float, float]]] = []
+    for ring in raster.contours(svg.read_text()):
+        pts = [(x / TRACE_UP, y / TRACE_UP) for x, y in ring]
+        cleaned = straighten(pts)
+        if len(cleaned) >= 3:
+            out.append(cleaned)
+    return out
+
+
+def straighten(pts: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """Pull a traced outline back to the lines the drawing actually carries.
+
+    Three passes, none of which moves a true corner or a drawn angle: a run that
+    is within a fraction of a pixel of level or upright is set exactly level or
+    upright, every position settles on the pixel grid the picture is drawn on, and
+    points that then sit on a straight run are dropped.
+    """
+    p = [list(pt) for pt in pts]
+    n = len(p)
+    if n < 3:
+        return [tuple(v) for v in p]
+    for _ in range(3):
+        for i in range(n):
+            j = (i + 1) % n
+            dx = p[j][0] - p[i][0]
+            dy = p[j][1] - p[i][1]
+            if abs(dx) < STRAIGHT_TOL and abs(dy) >= STRAIGHT_TOL:
+                x = (p[i][0] + p[j][0]) / 2
+                p[i][0] = p[j][0] = x
+            elif abs(dy) < STRAIGHT_TOL and abs(dx) >= STRAIGHT_TOL:
+                y = (p[i][1] + p[j][1]) / 2
+                p[i][1] = p[j][1] = y
+    snapped = [
+        (round(x / SNAP_GRID) * SNAP_GRID, round(y / SNAP_GRID) * SNAP_GRID) for x, y in p
+    ]
+    # Drop repeats and points that sit on a straight run between their neighbours.
+    out: list[tuple[float, float]] = []
+    for pt in snapped:
+        if not out or abs(pt[0] - out[-1][0]) > 1e-6 or abs(pt[1] - out[-1][1]) > 1e-6:
+            out.append(pt)
+    if len(out) > 1 and out[0] == out[-1]:
+        out.pop()
+    kept: list[tuple[float, float]] = []
+    m = len(out)
+    for i in range(m):
+        a = out[(i - 1) % m]
+        b = out[i]
+        c = out[(i + 1) % m]
+        cross = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+        span = max(abs(c[0] - a[0]), abs(c[1] - a[1]), 1e-6)
+        if abs(cross) / span > 0.05:
+            kept.append(b)
+    return kept if len(kept) >= 3 else out
+
+
+def path_of(pts: list[tuple[float, float]], place) -> str:
+    placed = [place(x, y) for x, y in pts]
+    head = f"M {round(placed[0][0], 2)} {round(placed[0][1], 2)}"
+    rest = " ".join(f"L {round(x, 2)} {round(y, 2)}" for x, y in placed[1:])
+    return f"{head} {rest} Z"
+
+
+def ring_area(pts: list[tuple[float, float]]) -> float:
+    total = 0.0
+    for (x0, y0), (x1, y1) in zip(pts, pts[1:] + pts[:1]):
+        total += x0 * y1 - x1 * y0
+    return abs(total) / 2
+
+
+def biggest_ring(mask: np.ndarray, tmp: Path, tag: str):
+    """The outline of one region."""
+    rings = trace_rings(mask, tmp, tag)
     if not rings:
         return None
-    return max(rings, key=raster.area_of)
+    return max(rings, key=ring_area)
 
 
 def detail_shapes(cls: np.ndarray, grown: np.ndarray, tmp: Path, place) -> list[dict]:
@@ -163,10 +254,8 @@ def detail_shapes(cls: np.ndarray, grown: np.ndarray, tmp: Path, place) -> list[
                 mask = mask & (lab != band)
         if not mask.any():
             continue
-        im = Image.fromarray((mask * 255).astype(np.uint8), mode="L")
-        svg = raster.trace_mask(im, tmp, f"detail-{hexv.strip('#')}")
-        for ring in sorted(raster.contours(svg), key=raster.area_of, reverse=True):
-            out.append({"d": raster.path_data(ring, place), "fill": hexv})
+        for ring in sorted(trace_rings(mask, tmp, f"detail-{hexv.strip('#')}"), key=ring_area, reverse=True):
+            out.append({"d": path_of(ring, place), "fill": hexv})
     return out
 
 
@@ -216,7 +305,7 @@ def main() -> None:
         if band.any():
             ring = biggest_ring(band, tmp, "band")
             if ring:
-                shapes.append({"d": raster.path_data(ring, place), "fill": WALL_INK})
+                shapes.append({"d": path_of(ring, place), "fill": WALL_INK})
 
         pieces: list[tuple[float, dict]] = []
         for rid in range(1, seeds.max() + 1):
@@ -236,9 +325,9 @@ def main() -> None:
             ink = ROOM_INK if room else CIRCULATION_INK
             pieces.append(
                 (
-                    raster.area_of(ring),
+                    ring_area(ring),
                     {
-                        "d": raster.path_data(ring, place),
+                        "d": path_of(ring, place),
                         "fill": ink,
                         "stroke": WALL_INK,
                         "w": WALL_WEIGHT,
