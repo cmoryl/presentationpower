@@ -339,7 +339,7 @@ export function QeiiFloorPlan({
                   width={keyStep * 0.72}
                   height={keyStep * 0.72}
                   rx={keyStep * 0.14}
-                  fill={row.hex}
+                  fill={qeiiRoomTint(row.hex, face)}
                 />
                 <text
                   x={floor.w * 0.02 + keyStep}
