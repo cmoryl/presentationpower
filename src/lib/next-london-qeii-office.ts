@@ -382,8 +382,12 @@ export async function buildQeiiPlanDocx(
   const pageHmm = 297;
   const marginMm = 15;
   const contentMm = pageWmm - marginMm * 2;
-  const artWmm = contentMm;
-  const artHmm = (plan.units.h / plan.units.w) * artWmm;
+  // The drawing has to fit the printable area on the page, or Word and every
+  // other reader drops it: title block + margins take roughly 40 mm of height.
+  const availHmm = pageHmm - marginMm * 2 - 40;
+  const ratio = plan.units.h / plan.units.w;
+  const artWmm = Math.min(contentMm, availHmm / ratio);
+  const artHmm = artWmm * ratio;
   const artWemu = Math.round(artWmm * EMU_PER_MM);
   const artHemu = Math.round(artHmm * EMU_PER_MM);
   /** Plan units → EMU. */
