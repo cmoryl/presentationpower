@@ -16,8 +16,14 @@ import JSZip from "jszip";
 
 import { qeiiDrawShapes, qeiiSegsBox, type QeiiDrawShape } from "@/lib/next-london-qeii-draw";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
-import { QEII_PLAN_TOKENS, qeiiPlanSvg, type QeiiPlanOptions } from "@/lib/next-london-qeii-plan";
-import { inlineSvgImages, qeiiRasteriseSvg } from "@/lib/next-london-qeii-pdf";
+import {
+  QEII_PLAN_TOKENS,
+  qeiiMarkUrl,
+  qeiiPlanSvg,
+  type QeiiMarkVariant,
+  type QeiiPlanOptions,
+} from "@/lib/next-london-qeii-plan";
+import { inlineSvgImages, qeiiRasteriseLockup, qeiiRasteriseSvg } from "@/lib/next-london-qeii-pdf";
 import { qeiiColourKey, qeiiColourPaint, qeiiRoomTextInk } from "@/lib/next-london-qeii-rooms";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 
@@ -67,6 +73,17 @@ type PlanPieces = {
     ink: string;
   }[];
   key: { hex: string; label: string; x: number; y: number; size: number }[];
+  /** Division lockups as embedded PNG artwork, placed in plan units. */
+  marks: {
+    name: string;
+    dataUrl: string;
+    /** Centre of the lockup, in plan units. */
+    cx: number;
+    cy: number;
+    w: number;
+    h: number;
+    angle: number;
+  }[];
   notes: string[];
 };
 
@@ -131,7 +148,61 @@ async function planPieces(
     y: floor.h + keyStep * (0.9 + i),
     size: keyStep * 0.52,
   }));
-  return { shapes, art, units: { w: floor.w, h: floor.h + keyH }, blocks, key, notes };
+  // Division lockups. The plan links the approved artwork by URL, which Office
+  // cannot follow, so each one is embedded as print-resolution PNG here.
+  const marks: PlanPieces["marks"] = [];
+  let droppedMarks = 0;
+  if (rebuilt && (options.showLabels ?? true)) {
+    const cache = new Map<string, { dataUrl: string; w: number; h: number } | null>();
+    for (const block of layout.blocks) {
+      if (!block.marks.length) continue;
+      const tag = paint.tags.get(block.room) ?? roomColours[block.room];
+      const ink = tag ? qeiiRoomTextInk(tag) : "#FFFFFF";
+      // A light room fill would swallow the reverse lockup, exactly as on screen.
+      const variant: QeiiMarkVariant =
+        ink === "#03002C" && (options.markVariant ?? "reverse") === "reverse"
+          ? "colour"
+          : (options.markVariant ?? "reverse");
+      const nameTop = block.y - ((block.lines.length - 1) * block.size * 1.05) / 2;
+      const row =
+        block.marks.reduce((w, m) => w + block.markH * m.ratio + block.size * 0.35, 0) -
+        block.size * 0.35;
+      let markX = block.x - row / 2;
+      for (const m of block.marks) {
+        const w = block.markH * m.ratio;
+        const x = markX;
+        markX += w + block.size * 0.35;
+        const url = qeiiMarkUrl(m, variant);
+        const key = `${url}`;
+        if (!cache.has(key)) cache.set(key, await qeiiRasteriseLockup(url));
+        const art = cache.get(key);
+        if (!art) {
+          droppedMarks += 1;
+          continue;
+        }
+        marks.push({
+          name: m.name,
+          dataUrl: art.dataUrl,
+          cx: x + w / 2,
+          cy: nameTop - block.size * 0.7 - block.markH / 2,
+          w,
+          h: block.markH,
+          angle: block.angle,
+        });
+      }
+    }
+    if (marks.length) {
+      notes.push(
+        `${marks.length} division lockup${marks.length === 1 ? " is" : "s are"} embedded as the approved artwork, so ${marks.length === 1 ? "it travels" : "they travel"} with the file.`,
+      );
+    }
+    if (droppedMarks) {
+      notes.push(
+        `${droppedMarks} division lockup${droppedMarks === 1 ? "" : "s"} could not be read, so ${droppedMarks === 1 ? "it is" : "they are"} not on this map.`,
+      );
+    }
+  }
+  return { shapes, art, units: { w: floor.w, h: floor.h + keyH }, blocks, key, marks, notes };
 }
 
 // ── PowerPoint ───────────────────────────────────────────────────────────────
@@ -281,6 +352,21 @@ export async function buildQeiiPlanPptx(
     }
   }
 
+  // Division lockups, as the approved artwork placed on the slide.
+  for (const mark of plan.marks) {
+    const w = mark.w * k;
+    const h = mark.h * k;
+    slide.addImage({
+      data: mark.dataUrl,
+      x: ox + mark.cx * k - w / 2,
+      y: oy + mark.cy * k - h / 2,
+      w,
+      h,
+      rotate: Math.abs(mark.angle) < 0.5 ? 0 : mark.angle,
+      altText: `${mark.name} lockup`,
+    });
+  }
+
   for (const row of plan.key) {
     const size = ptSize(row.size);
     const sw = (size / 72) * 1.1;
@@ -395,6 +481,9 @@ export async function buildQeiiPlanDocx(
 
   let drawing = "";
   let picBytes: ArrayBuffer | undefined;
+  /** Embedded division lockups: relationship id → PNG bytes. */
+  const markMedia: { rel: string; file: string; bytes: ArrayBuffer }[] = [];
+
 
   if (plan.shapes) {
     let id = 2;
@@ -480,6 +569,28 @@ export async function buildQeiiPlanDocx(
             `</wps:spPr>${txBody}</wps:wsp>`,
         );
       }
+    }
+
+    // Division lockups, embedded as pictures inside the plan group.
+    for (const mark of plan.marks) {
+      const w = Math.max(1, Math.round(mark.w * k));
+      const h = Math.max(1, Math.round(mark.h * k));
+      const rel = `rId${20 + markMedia.length}`;
+      const file = `lockup-${markMedia.length + 1}.png`;
+      markMedia.push({
+        rel,
+        file,
+        bytes: await (await fetch(mark.dataUrl)).arrayBuffer(),
+      });
+      const rot = Math.abs(mark.angle) < 0.5 ? "" : ` rot="${Math.round(mark.angle * 60000)}"`;
+      children.push(
+        `<pic:pic><pic:nvPicPr><pic:cNvPr id="${id++}" name="${esc(`${mark.name} lockup`)}"/>` +
+          `<pic:cNvPicPr/></pic:nvPicPr>` +
+          `<pic:blipFill><a:blip r:embed="${rel}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>` +
+          `<pic:spPr><a:xfrm${rot}><a:off x="${Math.round(mark.cx * k - w / 2)}" y="${Math.round(mark.cy * k - h / 2)}"/>` +
+          `<a:ext cx="${w}" cy="${h}"/></a:xfrm>` +
+          `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic>`,
+      );
     }
 
     for (const row of plan.key) {
@@ -569,7 +680,7 @@ export async function buildQeiiPlanDocx(
       : "") +
     docxParagraph(
       plan.shapes
-        ? "The plan is a group of editable Word shapes — click into the group to recolour a room or move a wall. Room names and the key are live Word text."
+        ? "The plan is a group of editable Word shapes — click into the group to recolour a room or move a wall. Room names and the key are live Word text, and the division lockups are the approved artwork, placed as pictures."
         : "Room names and the key are editable Word text. This floor's drawing is a picture — use the Illustrator file to change the drawing itself.",
       { size: 16, colour: "666666" },
     ) +
@@ -603,10 +714,17 @@ export async function buildQeiiPlanDocx(
       (picBytes
         ? `<Relationship Id="rId10" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/plan.png"/>`
         : "") +
+      markMedia
+        .map(
+          (m) =>
+            `<Relationship Id="${m.rel}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${m.file}"/>`,
+        )
+        .join("") +
       `</Relationships>`,
   );
   zip.file("word/document.xml", document);
   if (picBytes) zip.file("word/media/plan.png", picBytes);
+  for (const m of markMedia) zip.file(`word/media/${m.file}`, m.bytes);
 
   const blob = await zip.generateAsync({
     type: "blob",

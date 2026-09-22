@@ -132,6 +132,52 @@ async function loadRaster(url: string): Promise<{ dataUrl: string; w: number; h:
   return { dataUrl, w: img.naturalWidth, h: img.naturalHeight };
 }
 
+/**
+ * A division lockup as PNG bytes, ready to embed in a PowerPoint or Word file.
+ *
+ * Office cannot carry the linked SVG lockup, so the approved file is drawn to a
+ * canvas at print size. Anything unreadable comes back as null and is reported
+ * rather than left as a silent blank.
+ */
+export async function qeiiRasteriseLockup(
+  url: string,
+  heightPx = 220,
+): Promise<{ dataUrl: string; w: number; h: number } | null> {
+  const candidates = url.startsWith(NEXT_APP_ORIGIN)
+    ? [url.slice(NEXT_APP_ORIGIN.length), url]
+    : [url];
+  let data: string | null = null;
+  for (const candidate of candidates) {
+    try {
+      data = await fetchDataUrl(candidate);
+      break;
+    } catch {
+      // Try the next candidate; a total failure is reported by the caller.
+    }
+  }
+  if (!data) return null;
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("unreadable"));
+      el.src = data!;
+    });
+    const ratio = (img.naturalWidth || 170) / (img.naturalHeight || 100);
+    const h = heightPx;
+    const w = Math.max(1, Math.round(h * ratio));
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.drawImage(img, 0, 0, w, h);
+    return { dataUrl: canvas.toDataURL("image/png"), w, h };
+  } catch {
+    return null;
+  }
+}
+
 export function qeiiPdfFilename(face: QeiiPlanFace): string {
   return `TP-NEXT-2026-London-QEII-floor-plans-${face}-PROOF.pdf`;
 }

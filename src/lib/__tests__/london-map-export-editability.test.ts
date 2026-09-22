@@ -32,7 +32,13 @@ const PNG =
 vi.mock("@/lib/next-london-qeii-pdf", () => ({
   inlineSvgImages: async (svg: string) => ({ svg, dropped: [] }),
   qeiiRasteriseSvg: async () => ({ dataUrl: PNG, w: 4960, h: 3508 }),
+  qeiiRasteriseLockup: async () => ({ dataUrl: PNG, w: 170, h: 100 }),
 }));
+
+/** How many division lockups the plan sets on a floor. */
+function markCount(floor: QeiiFloorVector): number {
+  return qeiiPlanLayout(floor, { showUse: true, showMarks: true }).blocks.reduce((n, b) => n + b.marks.length, 0);
+}
 
 const FLOORS: QeiiFloorVector[] = LONDON_VENUE_SHEETS.map((s) => qeiiPlanState(s.id))
   .filter((s): s is NonNullable<typeof s> => Boolean(s?.rebuilt))
@@ -40,7 +46,7 @@ const FLOORS: QeiiFloorVector[] = LONDON_VENUE_SHEETS.map((s) => qeiiPlanState(s
 
 /** Every word the plan sets on a floor: name lines, use lines, key rows. */
 function copyOf(floor: QeiiFloorVector) {
-  const layout = qeiiPlanLayout(floor, { showUse: true });
+  const layout = qeiiPlanLayout(floor, { showUse: true, showMarks: true });
   const names = layout.blocks.flatMap((b) => b.lines);
   const uses = layout.blocks.map((b) => b.use).filter((u): u is string => Boolean(u));
   const key = qeiiColourKey(floor, {}, {}).map((r) => r.label);
@@ -53,7 +59,7 @@ beforeAll(() => {
 
 describe("London map exports are editable", () => {
   it.each(FLOORS.map((f) => [f.title, f] as const))("%s — SVG is live vector art", (_t, floor) => {
-    const svg = qeiiPlanSvg(floor, { showUse: true });
+    const svg = qeiiPlanSvg(floor, { showUse: true, showMarks: true });
     const paths = svg.match(/<path /g)?.length ?? 0;
     const texts = svg.match(/<text /g)?.length ?? 0;
     const copy = copyOf(floor);
@@ -73,7 +79,7 @@ describe("London map exports are editable", () => {
   it.each(FLOORS.map((f) => [f.title, f] as const))(
     "%s — Illustrator file keeps paths and live text",
     (_t, floor) => {
-      const res = buildQeiiPlanAi(floor, { showUse: true });
+      const res = buildQeiiPlanAi(floor, { showUse: true, showMarks: true });
       const pdf = new TextDecoder("latin1").decode(res.bytes);
       const copy = copyOf(floor);
 
@@ -99,13 +105,14 @@ describe("London map exports are editable", () => {
     "%s — PowerPoint carries every word as its own text box",
     async (_t, floor) => {
       const { buildQeiiPlanPptx } = await import("@/lib/next-london-qeii-office");
-      const res = await buildQeiiPlanPptx(floor, { showUse: true });
+      const res = await buildQeiiPlanPptx(floor, { showUse: true, showMarks: true });
       const zip = await JSZip.loadAsync(await res.blob.arrayBuffer());
       const xml = await zip.file("ppt/slides/slide1.xml")!.async("string");
       const copy = copyOf(floor);
 
-      // Nothing rasterised: the plan is live shapes.
-      expect(xml.match(/<p:pic>/g)?.length ?? 0).toBe(0);
+      // The plan is live shapes; the only pictures are the approved division
+      // lockups, which are placed artwork by definition.
+      expect(xml.match(/<p:pic>/g)?.length ?? 0).toBe(markCount(floor));
       expect(xml.match(/<a:custGeom>/g)?.length ?? 0).toBeGreaterThanOrEqual(20);
       // Every line is a real editable run.
       expect(xml.match(/<a:t>/g)?.length ?? 0).toBeGreaterThanOrEqual(copy.lines.length);
@@ -121,7 +128,7 @@ describe("London map exports are editable", () => {
     "%s — Word carries every room name as live text",
     async (_t, floor) => {
       const { buildQeiiPlanDocx } = await import("@/lib/next-london-qeii-office");
-      const res = await buildQeiiPlanDocx(floor, { showUse: true });
+      const res = await buildQeiiPlanDocx(floor, { showUse: true, showMarks: true });
       const zip = await JSZip.loadAsync(await res.blob.arrayBuffer());
       const xml = await zip.file("word/document.xml")!.async("string");
       const copy = copyOf(floor);
@@ -130,11 +137,13 @@ describe("London map exports are editable", () => {
       // The plan itself is a group of editable Word shapes, not a picture.
       expect(xml).toContain("<wpg:wgp>");
       expect(xml.match(/<a:custGeom>/g)?.length ?? 0).toBeGreaterThanOrEqual(20);
-      expect(xml).not.toContain("<pic:pic>");
+      // Only the approved division lockups arrive as pictures.
+      expect(xml.match(/<pic:pic>/g)?.length ?? 0).toBe(markCount(floor));
       for (const line of [...copy.names, ...copy.key]) {
         expect(xml).toContain(line.replace(/&/g, "&amp;").replace(/</g, "&lt;"));
       }
       expect(zip.file("word/media/plan.png")).toBeNull();
+      expect(zip.file(/word\/media\/lockup-\d+\.png/).length).toBe(markCount(floor));
       expect(res.notes.join(" ")).toMatch(/editable group of Word shapes/i);
     },
     120_000,
