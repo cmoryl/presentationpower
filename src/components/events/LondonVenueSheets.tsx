@@ -93,7 +93,8 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
   // All floors side by side at one shared scale, for comparing the set.
   const [allFloors, setAllFloors] = useState(false);
   const [rebuiltView, setRebuiltView] = useState(true);
-  const [face, setFace] = useState<QeiiPlanFace>("issued");
+  // The house style is the default look for every floor and every download.
+  const [face, setFace] = useState<QeiiPlanFace>("studio");
   const [labelScale, setLabelScale] = useState(1);
   const [showLabels, setShowLabels] = useState(true);
   const [showUse, setShowUse] = useState(true);
