@@ -182,7 +182,7 @@ export function QeiiFloorPlan({
             const room = block.room;
             const shown = block.lines.join(" ");
             const tag = paint.tags.get(room);
-            const fill = roomColours[room];
+            const fill = qeiiRoomTint(roomColours[room], face);
             const ink = tag
               ? qeiiRoomTextInk(tag)
               : fill
