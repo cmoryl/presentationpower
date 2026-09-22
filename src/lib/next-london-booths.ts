@@ -317,6 +317,24 @@ export const LONDON_BOOTH_TRIM_PRESETS: LondonBoothTrimPreset[] = [
     trimH: 2250,
     bleedMm: 25,
   },
+  // California TV kiosk (TVKioskTemplate.ai). Scaling a London wall into the
+  // front face loses about 38 % of its width, which is why the California
+  // kiosks are re-laid natively rather than resized — this preset is here so
+  // that crop is reported honestly before anyone orders it.
+  {
+    id: "cal-kiosk-front-45x96in",
+    label: "California kiosk front · 1143 × 2438 mm (45 × 96 in)",
+    trimW: 1143,
+    trimH: 2438.4,
+    bleedMm: 3.175,
+  },
+  {
+    id: "cal-kiosk-return-4x96in",
+    label: "California kiosk return · 102 × 2438 mm (4 × 96 in)",
+    trimW: 101.6,
+    trimH: 2438.4,
+    bleedMm: 3.175,
+  },
 ];
 
 export type LondonBoothResize = {

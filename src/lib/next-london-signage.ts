@@ -7,6 +7,7 @@
 // and are loaded lazily by the London signage route.
 
 import artworkAsset from "@/assets/next-london-signage-artwork.json.asset.json";
+import { CALIFORNIA_KIOSKS } from "@/lib/next-california-kiosks";
 import {
   LONDON_BOOTHS,
   LONDON_BOOTH_BLEED_MM,
@@ -1487,9 +1488,12 @@ export const LONDON_BOOTH_PANEL_META: Record<string, LondonBoothPanelMeta> = Obj
   ]),
 );
 
-/** True for a vendor booth kiosk panel. */
+/**
+ * True for a vendor booth kiosk panel — London trade booths and the California
+ * TV kiosks alike, since both are registered in the booth metadata.
+ */
 export function isBoothPanel(panel: LondonPanel | { id: string }): boolean {
-  return panel.id.startsWith("ldn-b");
+  return panel.id.startsWith("ldn-b") || panel.id in LONDON_BOOTH_PANEL_META;
 }
 
 export function londonBoothPanelMeta(
@@ -1558,6 +1562,51 @@ export function londonBoothScreenRect(
 }
 
 LONDON_PANELS.push(...LONDON_BOOTH_PANELS);
+
+// ---------------------------------------------------------------------------
+// CALIFORNIA PARTNER KIOSKS
+//
+// The same partner set, re-laid on the supplied TV kiosk template (front face
+// plus two return strips). These panels are registered in the booth metadata so
+// they get the branding planner, the live editor, the QA gate and the `.svg` /
+// `.ai` / print-PDF builders unchanged — but they are deliberately NOT pushed
+// into LONDON_PANELS: they belong to California, not to the QEII job.
+// ---------------------------------------------------------------------------
+
+const KIOSK_ROWS: { booth: LondonBoothSpec; artboard: LondonBoothArtboard }[] =
+  CALIFORNIA_KIOSKS.flatMap((booth) => booth.artboards.map((artboard) => ({ booth, artboard })));
+
+export const CALIFORNIA_KIOSK_PANELS: LondonPanel[] = KIOSK_ROWS.map((row, i) => ({
+  ...boothPanel(row.booth, row.artboard, i),
+  // Own id space, so a kiosk never collides with a London booth panel.
+  id: `cal-k${String(i + 1).padStart(2, "0")}`,
+  room: `${row.booth.vendor.toUpperCase()} KIOSK`,
+  ground: "Brand plate (native kiosk template)",
+  proof: "Native template (app-built) · TVKioskTemplate.ai",
+}));
+
+for (const [i, panel] of CALIFORNIA_KIOSK_PANELS.entries()) {
+  const row = KIOSK_ROWS[i]!;
+  LONDON_BOOTH_PANEL_META[panel.id] = {
+    panelId: panel.id,
+    booth: row.booth,
+    artboard: row.artboard,
+    // The front face carries the monitor aperture; the returns are screenless.
+    shell: boothShell(row.artboard.kind === "main" ? "tv-kiosk" : "tv-kiosk-return"),
+  };
+}
+
+/** True for a California TV kiosk panel. */
+export function isCaliforniaKioskPanel(panel: LondonPanel | { id: string }): boolean {
+  return panel.id.startsWith("cal-k");
+}
+
+/** The kiosk panels belonging to one partner, front face first. */
+export function californiaKioskPanelsForBooth(boothId: string): LondonPanel[] {
+  return CALIFORNIA_KIOSK_PANELS.filter(
+    (panel) => LONDON_BOOTH_PANEL_META[panel.id]?.booth.id === boothId,
+  );
+}
 
 // ---------------------------------------------------------------------------
 // BESPOKE SCENIC FACES — fourth issue (app-built scenic artwork)

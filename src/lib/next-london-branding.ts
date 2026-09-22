@@ -348,8 +348,11 @@ export function londonBrandingPlan(
 
   // Pillars and other tall, narrow sheets set their copy running DOWN the
   // panel by default — the same treatment as the master NEXT pillar set. The
-  // location designer can force either direction per panel.
-  const vertical = nudge.textVertical ?? aspect <= 0.5;
+  // location designer can force either direction per panel. Wide-but-tall
+  // sheets (a 1143mm kiosk front, a booth wall) stay horizontal: turned copy
+  // there collides with the subhead and body, which never rotate.
+  const vertical = nudge.textVertical ?? (aspect <= 0.5 && panel.trimW <= 900);
+
 
   const copySizeMm = vertical
     ? Math.min(liveW * 0.42, Math.max(24, liveH * 0.036)) * nudge.textScale

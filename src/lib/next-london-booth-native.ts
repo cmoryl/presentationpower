@@ -194,14 +194,23 @@ export const NATIVE_BOOTH_TEMPLATES: NativeBoothTemplate[] = [
 
 const BY_SLUG = new Map(NATIVE_BOOTH_TEMPLATES.map((t) => [t.slug, t]));
 
+/**
+ * A booth re-issued at another location keeps its own copy: the California TV
+ * kiosk ids are the London booth id plus `-cal-kiosk`, so they resolve to the
+ * same native template and the same words are re-laid at the new size.
+ */
+function baseSlug(slug: string): string {
+  return slug.replace(/-cal-kiosk$/, "");
+}
+
 /** True when this booth is built by the app rather than supplied by a vendor. */
 export function isNativeBoothSlug(slug: string | null | undefined): boolean {
-  return !!slug && BY_SLUG.has(slug);
+  return !!slug && BY_SLUG.has(baseSlug(slug));
 }
 
 /** The native template for a booth slug, or null for a supplied wall. */
 export function nativeBoothTemplate(slug: string | null | undefined): NativeBoothTemplate | null {
-  return (slug && BY_SLUG.get(slug)) || null;
+  return (slug && BY_SLUG.get(baseSlug(slug))) || null;
 }
 
 /** The style ramp a native booth's plate is painted from. */

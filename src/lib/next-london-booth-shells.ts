@@ -24,8 +24,24 @@ import shellARender from "@/assets/london-booths/renders/tradebooth-a-render.jpg
 import shellBAi from "@/assets/london-booths/tradebooth-b-shell.ai?url";
 import shellBProof from "@/assets/london-booths/tradebooth-b-shell.jpg";
 import shellBRender from "@/assets/london-booths/renders/tradebooth-b-render.jpg";
+import kioskReturnProof from "@/assets/california-kiosks/tv-kiosk-return.jpg";
+import kioskProof from "@/assets/california-kiosks/tv-kiosk-shell.jpg";
+import kioskTemplateAi from "@/assets/california-kiosks/tv-kiosk-template.ai?url";
+import {
+  CALIFORNIA_KIOSK_BLEED_MM,
+  CALIFORNIA_KIOSK_FRONT_TRIM,
+  CALIFORNIA_KIOSK_RETURN_TRIM,
+  CALIFORNIA_KIOSK_SCREEN_FRACTION,
+  CALIFORNIA_KIOSK_SCREEN_MM,
+} from "@/lib/next-california-kiosk-geometry";
 
-export type LondonBoothShellId = "tradebooth-a" | "tradebooth-b";
+export type LondonBoothShellId =
+  | "tradebooth-a"
+  | "tradebooth-b"
+  // California TV kiosk: supplied as one front face with a screen aperture plus
+  // two screenless return strips (see next-california-kiosks.ts).
+  | "tv-kiosk"
+  | "tv-kiosk-return";
 
 /** A rectangle on the wall, in mm from the TRIM origin (top-left of trim). */
 export type BoothRectMm = { x: number; y: number; w: number; h: number };
@@ -134,6 +150,52 @@ export const LONDON_BOOTH_SHELLS: LondonBoothShell[] = [
     note: "No screen: the whole 1830 × 2440 mm face is live artwork.",
   },
 ];
+
+// ---------------------------------------------------------------------------
+// CALIFORNIA TV KIOSK — the supplied three-artboard kiosk template.
+//
+// The front face carries the monitor aperture measured out of the supplied
+// artboard; the two 4 in return strips carry no screen at all, so they are a
+// separate shell rather than the same shell at another size. No in-situ
+// visualisation has been issued for the kiosk, so the render plate is the flat
+// supplied artboard and is labelled as such — never a survey photograph.
+// ---------------------------------------------------------------------------
+LONDON_BOOTH_SHELLS.push(
+  {
+    id: "tv-kiosk",
+    label: "California TV kiosk — front face",
+    sourceFile: "TVKioskTemplate.ai",
+    aiUrl: kioskTemplateAi,
+    previewUrl: kioskProof,
+    trimW: CALIFORNIA_KIOSK_FRONT_TRIM.w,
+    trimH: CALIFORNIA_KIOSK_FRONT_TRIM.h,
+    bleedMm: CALIFORNIA_KIOSK_BLEED_MM,
+    hasScreen: true,
+    screen: { ...CALIFORNIA_KIOSK_SCREEN_FRACTION },
+    renderUrl: kioskProof,
+    renderFace: { x: 0, y: 0, w: 1, h: 1 },
+    note:
+      `TV kiosk front: a ${Math.round(CALIFORNIA_KIOSK_SCREEN_MM.w)} × ` +
+      `${Math.round(CALIFORNIA_KIOSK_SCREEN_MM.h)} mm monitor aperture sits flush to the left trim ` +
+      `edge, ${Math.round(CALIFORNIA_KIOSK_SCREEN_MM.y)} mm below the trim top. Keep the lockup ` +
+      "above it and the copy below it. No in-situ visualisation has been issued for this kiosk.",
+  },
+  {
+    id: "tv-kiosk-return",
+    label: "California TV kiosk — return strip",
+    sourceFile: "TVKioskTemplate.ai",
+    aiUrl: kioskTemplateAi,
+    previewUrl: kioskReturnProof,
+    trimW: CALIFORNIA_KIOSK_RETURN_TRIM.w,
+    trimH: CALIFORNIA_KIOSK_RETURN_TRIM.h,
+    bleedMm: CALIFORNIA_KIOSK_BLEED_MM,
+    hasScreen: false,
+    screen: null,
+    renderUrl: kioskReturnProof,
+    renderFace: { x: 0, y: 0, w: 1, h: 1 },
+    note: "Return strip: 101.6 × 2438.4 mm, no screen, the whole face is live artwork.",
+  },
+);
 
 export const DEFAULT_BOOTH_SHELL_ID: LondonBoothShellId = "tradebooth-a";
 
