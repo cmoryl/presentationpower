@@ -315,7 +315,7 @@ export function qeiiMarkPlanShapes(placements: QeiiMarkPlacement[]): {
       const fill = (path.fill ?? "").trim();
       const painted = /^#[0-9a-f]{6}$/i.test(fill) ? fill : null;
       if (segs.length > 1 && painted)
-        markShapes.push({ segs, fill: painted, strokeW: 0, group: `${mark.name} lockup` });
+        markShapes.push({ segs, fill: painted, strokeW: 0, group: groupName });
 
     }
     if (failed || !markShapes.length) {
