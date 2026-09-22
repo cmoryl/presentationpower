@@ -566,6 +566,28 @@ export async function buildQeiiPlanDocx(
       }
     }
 
+    // Division lockups, embedded as pictures inside the plan group.
+    for (const mark of plan.marks) {
+      const w = Math.max(1, Math.round(mark.w * k));
+      const h = Math.max(1, Math.round(mark.h * k));
+      const rel = `rId${20 + markMedia.length}`;
+      const file = `lockup-${markMedia.length + 1}.png`;
+      markMedia.push({
+        rel,
+        file,
+        bytes: await (await fetch(mark.dataUrl)).arrayBuffer(),
+      });
+      const rot = Math.abs(mark.angle) < 0.5 ? "" : ` rot="${Math.round(mark.angle * 60000)}"`;
+      children.push(
+        `<pic:pic><pic:nvPicPr><pic:cNvPr id="${id++}" name="${esc(`${mark.name} lockup`)}"/>` +
+          `<pic:cNvPicPr/></pic:nvPicPr>` +
+          `<pic:blipFill><a:blip r:embed="${rel}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>` +
+          `<pic:spPr><a:xfrm${rot}><a:off x="${Math.round(mark.cx * k - w / 2)}" y="${Math.round(mark.cy * k - h / 2)}"/>` +
+          `<a:ext cx="${w}" cy="${h}"/></a:xfrm>` +
+          `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic>`,
+      );
+    }
+
     for (const row of plan.key) {
       const sw = Math.round(row.size * 1.1 * k);
       children.push(
