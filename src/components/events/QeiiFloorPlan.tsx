@@ -130,7 +130,7 @@ export function QeiiFloorPlan({
       className={className}
       style={style}
     >
-      <rect width={floor.w} height={floor.h + keyH} fill={QEII_PLAN_TOKENS.surface} />
+      <rect width={floor.w} height={floor.h + keyH} fill={qeiiPlanGround(face)} />
 
       {floor.shapes.map((shape, i) => {
         // Repeated WC cubicle figures are left undrawn; one bathroom symbol stays.
