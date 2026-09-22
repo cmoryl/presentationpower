@@ -60,7 +60,7 @@ WALL_INK = "#ffffff"
 
 # A coloured piece smaller than this is symbol artwork (a lift or toilet mark),
 # not a room, so it is drawn on top instead of becoming a region.
-REGION_MIN = 280
+REGION_MIN = 90
 # How far a region may grow into the white band, in picture pixels. The band runs
 # 2-6 pixels wide, so meeting in the middle needs about three.
 WALL_REACH = 4.0
