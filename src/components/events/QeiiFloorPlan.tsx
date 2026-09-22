@@ -143,7 +143,7 @@ export function QeiiFloorPlan({
               d={shape.d}
               fill={chosen ?? qeiiPlanInk(shape.fill, face) ?? "none"}
               stroke={stroke}
-              strokeWidth={stroke ? qeiiWallWidth(shape, wallWeight) : undefined}
+              strokeWidth={stroke ? qeiiWallWidth(shape, wall) : undefined}
             />
             {/* Rooms the artwork draws inside this block, cut out along the
                 issued wall runs so each colour fills the whole room. */}
