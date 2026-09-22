@@ -436,7 +436,7 @@ export async function buildQeiiPlanDocx(
           ? `<a:ln w="${Math.max(635, Math.round(shape.strokeW * k * 0.75))}" cap="rnd"><a:solidFill><a:srgbClr val="${hex(shape.stroke, "FFFFFF")}"/></a:solidFill></a:ln>`
           : `<a:ln><a:noFill/></a:ln>`);
       children.push(
-        wpsShape(id++, `Plan shape ${id}`, { x: px(x0) + Math.round(x0 * k), y: Math.round(y0 * k), w, h }, geom, paint),
+        wpsShape(id++, `Plan shape ${id}`, { x: Math.round(x0 * k), y: Math.round(y0 * k), w, h }, geom, paint),
       );
     }
 
