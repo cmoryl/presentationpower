@@ -316,6 +316,20 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     // Type steps down inside its own room before any line comes off it, so a long
     // name stays whole and stays inside the space the artwork draws for it.
     const steps = [1, 0.92, 0.84, 0.76, 0.68, 0.6, 0.52];
+    // A long caption in a narrow slot is broken over its own words rather than
+    // printed wider than the space the artwork draws. Only the line breaks change
+    // — no word is shortened, reordered or dropped.
+    const lineSets: string[][] = [lines];
+    if (lines.length === 1) {
+      const words = lines[0]!.split(" ").filter(Boolean);
+      for (const rows of [2, 3]) {
+        if (words.length < rows) continue;
+        const per = Math.ceil(words.length / rows);
+        const wrapped: string[] = [];
+        for (let w = 0; w < words.length; w += per) wrapped.push(words.slice(w, w + per).join(" "));
+        if (wrapped.length > 1) lineSets.push(wrapped);
+      }
+    }
     let chosen: Fit | undefined;
     let insideHolder = true;
     // Content first, size second: a full block is set smaller before any line
@@ -332,13 +346,16 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
           const size = Math.max(minSize, baseSize * step);
           for (const markFactor of variant.marks.length ? markFactors : [1]) {
             if (markFactor < 1 && QEII_MARK_RATIO * markFactor < 1) break;
-            for (const nudge of nudges) {
-              const fit = measure(variant, size, 0, nudge * size, markFactor);
-              if (clearOf(fit, useHolder)) {
-                chosen = fit;
-                insideHolder = useHolder;
-                break;
+            for (const ls of lineSets) {
+              for (const nudge of nudges) {
+                const fit = measure(variant, size, 0, nudge * size, markFactor, ls);
+                if (clearOf(fit, useHolder)) {
+                  chosen = fit;
+                  insideHolder = useHolder;
+                  break;
+                }
               }
+              if (chosen) break;
             }
             if (chosen) break;
           }
@@ -349,6 +366,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       }
       if (chosen) break;
     }
+
 
 
     if (!chosen) {
