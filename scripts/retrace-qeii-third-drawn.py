@@ -321,7 +321,7 @@ def main() -> None:
             # the picture happens to use: a region with a room name on it is a
             # room, and so is a small enclosure, while a large unnamed area is the
             # circulation running through the floor.
-            room = rid in named or float(mask.sum()) / building < ROOM_SHARE
+            room = rid in named
             ink = ROOM_INK if room else CIRCULATION_INK
             pieces.append(
                 (
