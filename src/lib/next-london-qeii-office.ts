@@ -16,8 +16,14 @@ import JSZip from "jszip";
 
 import { qeiiDrawShapes, qeiiSegsBox, type QeiiDrawShape } from "@/lib/next-london-qeii-draw";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
-import { QEII_PLAN_TOKENS, qeiiPlanSvg, type QeiiPlanOptions } from "@/lib/next-london-qeii-plan";
-import { inlineSvgImages, qeiiRasteriseSvg } from "@/lib/next-london-qeii-pdf";
+import {
+  QEII_PLAN_TOKENS,
+  qeiiMarkUrl,
+  qeiiPlanSvg,
+  type QeiiMarkVariant,
+  type QeiiPlanOptions,
+} from "@/lib/next-london-qeii-plan";
+import { inlineSvgImages, qeiiRasteriseLockup, qeiiRasteriseSvg } from "@/lib/next-london-qeii-pdf";
 import { qeiiColourKey, qeiiColourPaint, qeiiRoomTextInk } from "@/lib/next-london-qeii-rooms";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 
