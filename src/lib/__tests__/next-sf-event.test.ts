@@ -17,7 +17,7 @@ describe("NEXT San Francisco", () => {
 
   it("states no address, plan or programme", () => {
     const blob = JSON.stringify(SF_READINESS);
-    expect(blob).not.toMatch(/\d{2,5}\s+\w+\s+(Street|St|Avenue|Ave|Road)/i);
+    expect(blob).not.toMatch(/\b\d{2,5}\s+\w+\s+(Street|St|Avenue|Ave|Road|Rd)\b/i);
     expect(SF_WAITING.map((r) => r.id).sort()).toEqual(["agenda", "floorplan", "survey"]);
     for (const item of SF_WAITING) expect(item.blockedOn).toBeTruthy();
   });
