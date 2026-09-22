@@ -9,6 +9,24 @@ import { LONDON_VENUE_SHEETS } from "@/lib/next-london-venue-sheets";
 
 const OUT = process.argv[2] ?? "/mnt/documents/TP-NEXT-2026-London-QEII-floor-plans-ai.zip";
 
+// The lockups are site-relative paths the browser resolves against the origin.
+// Off the browser they resolve off disk, so the artwork still goes in as
+// outlines rather than being dropped from the file.
+const realFetch = globalThis.fetch;
+globalThis.fetch = (async (input: any, init?: any) => {
+  const url = typeof input === "string" ? input : String(input?.url ?? input);
+  if (url.startsWith("/")) {
+    const { readFile } = await import("node:fs/promises");
+    try {
+      const body = await readFile(`public${url}`, "utf8");
+      return new Response(body, { headers: { "content-type": "image/svg+xml" } });
+    } catch {
+      return new Response("not found", { status: 404 });
+    }
+  }
+  return realFetch(input, init);
+}) as typeof fetch;
+
 async function main() {
   const zip = new JSZip();
   const rows = ["file,floor,bytes,notes"];
