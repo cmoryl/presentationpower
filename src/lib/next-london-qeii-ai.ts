@@ -238,13 +238,14 @@ export async function buildQeiiPlanAi(
         y: nameTop + li * block.size * 1.05,
         size: block.size,
       }));
-      if (block.use) {
+      const useRows = block.useLines?.length ? block.useLines : block.use ? [block.use] : [];
+      useRows.forEach((row, ri) => {
         lines.push({
-          text: block.use,
-          y: lastLine + block.size * 0.62 + block.useSize * 0.6,
+          text: row,
+          y: lastLine + block.size * 0.62 + block.useSize * 0.6 + ri * block.useSize * 1.15,
           size: block.useSize,
         });
-      }
+      });
       const runs = lines
         .map((line) => {
           const size = line.size * k;
