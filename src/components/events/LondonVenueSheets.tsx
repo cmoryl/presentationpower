@@ -23,6 +23,7 @@ import {
 } from "@/lib/qeii-map-edits.functions";
 
 import { QeiiFloorPlan } from "@/components/events/QeiiFloorPlan";
+import { QeiiAllFloors } from "@/components/events/QeiiAllFloors";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
 import {
   QEII_WALL_WEIGHT,
@@ -88,6 +89,8 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
   );
   const [query, setQuery] = useState("");
   const [zoom, setZoom] = useState(false);
+  // All floors side by side at one shared scale, for comparing the set.
+  const [allFloors, setAllFloors] = useState(false);
   const [rebuiltView, setRebuiltView] = useState(true);
   const [face, setFace] = useState<QeiiPlanFace>("issued");
   const [labelScale, setLabelScale] = useState(1);
@@ -618,6 +621,18 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
       ) : null}
 
       <div className="mt-4 flex flex-wrap gap-2">
+        <button
+          type="button"
+          aria-pressed={allFloors}
+          onClick={() => setAllFloors(!allFloors)}
+          className={`${chip} ${
+            allFloors
+              ? "border-[#003FC7] bg-[#003FC7] text-white"
+              : "border-[#003FC7]/40 bg-[#E0E8F5] text-[#03002C] hover:bg-[#d5e1f2]"
+          }`}
+        >
+          All floors together
+        </button>
         {LONDON_VENUE_SHEETS.map((s) => (
           <button
             key={s.id}
@@ -626,6 +641,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
             onClick={() => {
               setSheetId(s.id);
               setHighlightRoom(undefined);
+              setAllFloors(false);
             }}
             className={`${chip} ${
               s.id === sheet.id
@@ -981,7 +997,32 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
         </ul>
       ) : null}
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+      {allFloors ? (
+        <QeiiAllFloors
+          face={face}
+          labelScale={labelScale}
+          showLabels={showLabels}
+          showUse={showUse}
+          showMarks={showMarks}
+          markVariant={markVariant}
+          markScale={markScale}
+          wallWeight={wallWeight}
+          showAllSymbols={showAllSymbols}
+          roomColourMap={roomColourMap}
+          keyLabelMap={keyLabelMap}
+          editsMap={editsMap}
+          onOpenFloor={(id) => {
+            setSheetId(id);
+            setAllFloors(false);
+          }}
+        />
+      ) : null}
+
+      <div
+        className={`mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] ${
+          allFloors ? "hidden" : ""
+        }`}
+      >
         <figure className="overflow-hidden rounded-2xl border border-black/10 bg-[#F2F2F2]">
 
           {showRebuilt && plan ? (
