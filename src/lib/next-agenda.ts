@@ -13,6 +13,8 @@
 // -----------------------------------------------------------------------------
 
 import { LONDON_2026_PROGRAMMES } from "./next-agenda-london-2026";
+import { SF_AGENDA_EDITION, sfProgramme } from "./next-agenda-sf-2026";
+
 import { LONDON_STYLES } from "@/lib/next-london-signage";
 import {
   CITY_BADGE_DIVISIONS,
