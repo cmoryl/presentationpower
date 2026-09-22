@@ -113,6 +113,7 @@ export function qeiiCohesionNotes(profiles = qeiiFloorProfiles()): QeiiCohesionN
   const houseName = median(profiles.map((p) => p.nameShare));
   const houseWeight = median(profiles.filter((p) => p.wallWeight > 0).map((p) => p.wallWeight));
   const houseWidth = median(profiles.map((p) => p.w));
+  const houseWhite = median(profiles.map((p) => p.white));
 
   for (const p of profiles) {
     if (p.traced) {
@@ -122,7 +123,7 @@ export function qeiiCohesionNotes(profiles = qeiiFloorProfiles()): QeiiCohesionN
         note: `${p.title} is the one floor the issued design supplies as a picture, so it was traced back into shapes. Its walls read as slightly softer edges than the drawn floors.`,
       });
     }
-    if (houseName > 0 && Math.abs(p.nameShare - houseName) / houseName > 0.25) {
+    if (houseName > 0 && Math.abs(p.nameShare - houseName) / houseName > 0.4) {
       notes.push({
         floorId: p.id,
         kind: "differs",
@@ -146,11 +147,16 @@ export function qeiiCohesionNotes(profiles = qeiiFloorProfiles()): QeiiCohesionN
         note: `${p.title} covers a ${p.w > houseWidth ? "wider" : "narrower"} footprint than the others. Shown here at the same scale as the rest, so the sizes compare truthfully.`,
       });
     }
-    if (p.white > 0.55) {
+    // Only a floor built differently from the rest is worth saying anything about;
+    // the way most of the set is drawn is the house norm, not a difference.
+    if (houseWhite > 0 && Math.abs(p.white - houseWhite) > 0.2) {
       notes.push({
         floorId: p.id,
         kind: "differs",
-        note: `${p.title} is drawn mostly as white blocks with the rooms cut into them, so its tones sit lighter than floors drawn room by room.`,
+        note:
+          p.white > houseWhite
+            ? `${p.title} is drawn with more white blocking than the rest of the set, so its tones sit a shade lighter.`
+            : `${p.title} is drawn with less white blocking than the rest of the set, so its tones sit a shade heavier.`,
       });
     }
   }
