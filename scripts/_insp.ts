@@ -1,11 +1,8 @@
 import { QEII_FLOOR_VECTORS } from "@/lib/next-london-qeii-vectors";
-for (const [id, rec] of Object.entries(QEII_FLOOR_VECTORS as any)) {
-  const r: any = rec;
-  const shapes = r.shapes ?? [];
-  const ws = shapes.filter((s:any)=>s.stroke).map((s:any)=>s.w ?? 1).sort((a:number,b:number)=>a-b);
-  const fills: Record<string, number> = {};
-  for (const s of shapes) if (s.fill) fills[s.fill.toLowerCase()] = (fills[s.fill.toLowerCase()]||0)+1;
-  console.log(id, "size", r.w, r.h, "shapes", shapes.length, "stroked", ws.length,
-    "medianW", ws[Math.floor(ws.length/2)], "minW", ws[0], "maxW", ws[ws.length-1]);
-  console.log("   fills", Object.entries(fills).sort((a,b)=>b[1]-a[1]).slice(0,6));
+function area(s:any){ const nums = (s.d.match(/-?\d+(\.\d+)?/g)||[]).map(Number); let xs=[],ys=[]; for(let i=0;i+1<nums.length;i+=2){xs.push(nums[i]);ys.push(nums[i+1]);} if(!xs.length) return 0; return (Math.max(...xs)-Math.min(...xs))*(Math.max(...ys)-Math.min(...ys)); }
+for (const key of ["3","0"]) {
+  const r:any = (QEII_FLOOR_VECTORS as any)[key];
+  const by: Record<string, number> = {};
+  for (const s of r.shapes) if (s.fill) by[s.fill.toLowerCase()] = (by[s.fill.toLowerCase()]||0) + area(s);
+  console.log(key, r.w*r.h, Object.entries(by).map(([k,v])=>[k,(v/(r.w*r.h)).toFixed(2)]));
 }
