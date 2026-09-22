@@ -4,6 +4,7 @@ import { QEII_FLOOR_VECTORS } from "@/lib/next-london-qeii-vectors";
 import {
   QEII_WALL_WEIGHT,
   qeiiRepeatedSymbolShapes,
+  qeiiTracedSymbolShapes,
   qeiiWallWidth,
 } from "@/lib/next-london-qeii-symbols";
 
@@ -22,10 +23,12 @@ describe("washroom symbols and wall weight", () => {
     expect(drop.size).toBeGreaterThan(200);
     // The level marker arrow is drawn artwork, not debris, and stays.
     expect(drop.has(140)).toBe(false);
-    // Every wall run survives.
+    // The debris pass never touches a wall run.
+    const traced = qeiiTracedSymbolShapes(third);
     third.shapes.forEach((s, i) => {
-      if (s.stroke) expect(drop.has(i)).toBe(false);
+      if (s.stroke) expect(traced.has(i)).toBe(false);
     });
+    expect(qeiiTracedSymbolShapes(QEII_FLOOR_VECTORS.find((f) => f.id === "ground")!).size).toBe(0);
   });
 
   it("leaves one symbol standing where the artwork drew a row of them", () => {
