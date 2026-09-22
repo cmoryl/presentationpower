@@ -77,8 +77,9 @@ export function qeiiStrokeRuns(d: string): Pt[][] {
 }
 
 /** One wall run widened into a closed outline, so it can be cut from a block. */
-function runBand(run: Pt[], half: number): MultiPoly {
+function runBand(run: Pt[], half: number, bridge = 0): MultiPoly {
   const parts: MultiPoly = [];
+  const last = run.length - 1;
   for (let i = 0; i + 1 < run.length; i += 1) {
     const [x1, y1] = run[i]!;
     const [x2, y2] = run[i + 1]!;
@@ -92,10 +93,16 @@ function runBand(run: Pt[], half: number): MultiPoly {
     const uy = dy / len;
     const nx = -uy * half;
     const ny = ux * half;
-    const ax = x1 - ux * half;
-    const ay = y1 - uy * half;
-    const bx = x2 + ux * half;
-    const by = y2 + uy * half;
+    // A run that stops a hair short of the block wall leaves the two spaces joined,
+    // so the first and last segment may be carried a little further along their own
+    // direction to close that gap. The direction is the issued line's own, never a
+    // guessed one.
+    const startPad = half + (i === 0 ? bridge : 0);
+    const endPad = half + (i + 1 === last ? bridge : 0);
+    const ax = x1 - ux * startPad;
+    const ay = y1 - uy * startPad;
+    const bx = x2 + ux * endPad;
+    const by = y2 + uy * endPad;
     parts.push([
       [
         [snap(ax + nx), snap(ay + ny)],
@@ -201,6 +208,7 @@ export function qeiiCutCell(
   x: number,
   y: number,
   others: { x: number; y: number }[] = [],
+  bridge = 0,
 ): { d: string; share: number; planShare: number } | undefined {
   const block = floor.shapes[shapeIndex];
   if (!block?.fill) return undefined;
@@ -240,7 +248,7 @@ export function qeiiCutCell(
     for (const run of qeiiStrokeRuns(shape.d)) {
       // Only runs that reach into this block can cut it.
       if (!reaches(run)) continue;
-      bands.push(...runBand(run, half));
+      bands.push(...runBand(run, half, bridge));
     }
   }
   if (!bands.length) return undefined;
@@ -264,6 +272,25 @@ export function qeiiCutCell(
     share: area / blockArea,
     planShare: planArea > 0 ? area / planArea : 1,
   };
+}
+
+/**
+ * Cut a room cell, carrying wall runs a little further along their own direction
+ * if the first pass leaves two rooms joined. Returns `undefined` when no pass
+ * closes the room — nothing is coloured on a guess.
+ */
+export function qeiiCutRoomCell(
+  floor: QeiiFloorVector,
+  shapeIndex: number,
+  x: number,
+  y: number,
+  others: { x: number; y: number }[] = [],
+): { d: string; share: number; planShare: number } | undefined {
+  for (const bridge of [0, 2, 4, 8]) {
+    const cut = qeiiCutCell(floor, shapeIndex, x, y, others, bridge);
+    if (cut) return cut;
+  }
+  return undefined;
 }
 
 /** A cut cell only counts as a room when the walls really close it off. */
