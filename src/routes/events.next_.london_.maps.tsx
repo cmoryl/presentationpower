@@ -100,6 +100,13 @@ const DESIGN_KEY = "next-london-map-design-v1";
 const AREAS_KEY = "next-london-map-areas-v1";
 
 export const Route = createFileRoute("/events/next_/london_/maps")({
+  // Arriving from the room schedule may name a floor and a room; both optional.
+  validateSearch: (search: Record<string, unknown>): { sheet?: string; room?: string } => {
+    const out: { sheet?: string; room?: string } = {};
+    if (typeof search['sheet'] === "string" && search['sheet']) out.sheet = search['sheet'];
+    if (typeof search['room'] === "string" && search['room']) out.room = search['room'];
+    return out;
+  },
   head: () => ({
     meta: [
       { title: "NEXT 2026 London install maps · QEII Centre floor plans" },
@@ -122,6 +129,7 @@ export const Route = createFileRoute("/events/next_/london_/maps")({
 });
 
 function LondonMapsPage() {
+  const search = Route.useSearch();
   const userId = useSessionUser();
   const fetchRevisions = useServerFn(listLondonRevisions);
   const [panels, setPanels] = useState<LondonPanel[]>(LONDON_PANELS);
@@ -638,12 +646,15 @@ function LondonMapsPage() {
                   : "Marks are held in this browser until they are signed off against the venue."}{" "}
               <Link to="/events/next/venues" className="font-semibold underline">
                 Venue plans
+              </Link>{" "}
+              <Link to="/events/next/london/schedule" className="font-semibold underline">
+                Room schedule
               </Link>
             </p>
           </div>
         </header>
 
-        <LondonVenueSheets />
+        <LondonVenueSheets initialSheetId={search.sheet} initialRoom={search.room} />
 
         {/* Floor picker */}
         <section className="mt-9">

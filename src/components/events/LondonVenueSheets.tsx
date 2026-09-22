@@ -75,8 +75,17 @@ function download(url: string, filename: string) {
   a.remove();
 }
 
-export function LondonVenueSheets() {
-  const [sheetId, setSheetId] = useState(LONDON_VENUE_SHEETS[0]!.id);
+export type LondonVenueSheetsProps = {
+  /** Floor to open on, e.g. arriving from the room schedule. */
+  initialSheetId?: string;
+  /** Room to ring on that floor, e.g. arriving from the room schedule. */
+  initialRoom?: string;
+};
+
+export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSheetsProps = {}) {
+  const [sheetId, setSheetId] = useState(
+    LONDON_VENUE_SHEETS.find((s) => s.id === initialSheetId)?.id ?? LONDON_VENUE_SHEETS[0]!.id,
+  );
   const [query, setQuery] = useState("");
   const [zoom, setZoom] = useState(false);
   const [rebuiltView, setRebuiltView] = useState(true);
@@ -94,7 +103,7 @@ export function LondonVenueSheets() {
   const [wallWeight, setWallWeight] = useState(QEII_WALL_WEIGHT);
   const [showAllSymbols, setShowAllSymbols] = useState(false);
   // A search result is ringed on the plan so it can actually be found.
-  const [highlightRoom, setHighlightRoom] = useState<string | undefined>(undefined);
+  const [highlightRoom, setHighlightRoom] = useState<string | undefined>(initialRoom);
   const [printing, setPrinting] = useState(false);
   const [printNote, setPrintNote] = useState<string | undefined>(undefined);
   // Live editing: room names, the line beneath them and nudged positions, saved
@@ -110,6 +119,13 @@ export function LondonVenueSheets() {
   const readEdits = useServerFn(listVenueMapEdits);
   const writeEdits = useServerFn(saveVenueMapEdits);
   const clearEdits = useServerFn(resetVenueMapEdits);
+
+  // Arriving from the room schedule: open that floor and ring that room.
+  useEffect(() => {
+    if (initialSheetId && LONDON_VENUE_SHEETS.some((s) => s.id === initialSheetId))
+      setSheetId(initialSheetId);
+    if (initialRoom) setHighlightRoom(initialRoom);
+  }, [initialSheetId, initialRoom]);
 
   // The crew set a plan up once and come back to it, so the view settings and
   // room colours are kept in this browser rather than reset on every visit.
