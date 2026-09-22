@@ -74,6 +74,11 @@ export type QeiiLayoutBlock = {
   lines: string[];
   /** What the space holds at the event, or undefined when it is not printed. */
   use?: string;
+  /**
+   * The event line as it prints, one entry per row. A long line in a narrow slot
+   * is broken over its own words rather than printed wider than the room.
+   */
+  useLines: string[];
   useSize: number;
   marks: SpaceUseMark[];
   markH: number;
