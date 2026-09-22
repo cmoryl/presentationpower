@@ -368,10 +368,18 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     // space rather than printed half over the edge of it.
     const nudges: Array<[number, number]> = [
       [0, 0],
+      [0, 0.35],
+      [0, -0.35],
+      [0.35, 0],
+      [-0.35, 0],
       [0, 0.7],
       [0, -0.7],
       [0.7, 0],
       [-0.7, 0],
+      [0, 1.05],
+      [0, -1.05],
+      [1.05, 0],
+      [-1.05, 0],
       [0, 1.4],
       [0, -1.4],
       [1.4, 0],
