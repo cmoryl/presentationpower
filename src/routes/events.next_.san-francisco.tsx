@@ -104,6 +104,7 @@ function SanFranciscoPage() {
                 {item.to ? (
                   <Link
                     to={item.to}
+                    search={item.search ?? {}}
                     className="group mt-4 inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
                   >
                     Open

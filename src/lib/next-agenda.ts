@@ -13,6 +13,8 @@
 // -----------------------------------------------------------------------------
 
 import { LONDON_2026_PROGRAMMES } from "./next-agenda-london-2026";
+import { SF_AGENDA_EDITION, sfProgramme } from "./next-agenda-sf-2026";
+
 import { LONDON_STYLES } from "@/lib/next-london-signage";
 import {
   CITY_BADGE_DIVISIONS,
@@ -1835,9 +1837,11 @@ export function agendaFileIsLive(config: {
 
 
 
-export function agendaDefault(divisionId = "city-series"): AgendaConfig {
+export function agendaDefault(divisionId = "city-series", edition?: string): AgendaConfig {
   const div = agendaDivision(divisionId);
-  const programme = agendaProgramme(div.id);
+  const programme =
+    edition === SF_AGENDA_EDITION ? sfProgramme(div.id) : agendaProgramme(div.id);
+
   return {
     divisionId: div.id,
     // House agenda ground: Bloom Corner on the dark face, so every division

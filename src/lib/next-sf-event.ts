@@ -45,6 +45,8 @@ export type SfReadiness = {
   state: "ready" | "waiting";
   /** Route to open when it is ready. */
   to?: string;
+  /** Search params for that route, when it needs them. */
+  search?: Record<string, string>;
   /** What we are waiting for, in the requester's words. */
   blockedOn?: string;
 };
@@ -92,9 +94,10 @@ export const SF_READINESS: SfReadiness[] = [
     id: "agenda",
     label: "Agenda board",
     detail:
-      "The agenda board prints the programme exactly as issued. No San Francisco programme has been sent, so there is nothing to set.",
-    state: "waiting",
-    blockedOn: "the two-day programme: session titles, times, rooms and speakers",
+      "Default San Francisco boards for every division: right frame, venue line and both dates, with registration, break, lunch, reception and close carried from the flagship house times. Every session slot prints TO BE CONFIRMED until the programme is issued.",
+    state: "ready",
+    to: "/events/next/agendas",
+    search: { edition: "san-francisco" },
   },
   {
     id: "floorplan",

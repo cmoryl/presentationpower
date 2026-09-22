@@ -203,17 +203,20 @@ export function AgendaStudio({
   intro = "The approved NEXT agenda master, live for every division area. Edit the programme, pick the format and face, add a scannable QR code, save the live file and export layered vector art for print and Illustrator.",
   initialConfig,
   initialFileId,
+  edition,
 }: {
   divisionId?: string;
   heading?: string;
   intro?: string;
+  /** Which NEXT edition's default board to start from (e.g. "san-francisco"). */
+  edition?: string;
   /** Seed the editor with a prepared board (demo asset, saved master, etc.). */
   initialConfig?: AgendaConfig;
   /** Open directly onto a saved live file so Save becomes Update. */
   initialFileId?: string | null;
 }) {
   const [config, setConfig] = useState<AgendaConfig>(
-    () => initialConfig ?? agendaDefault(divisionId),
+    () => initialConfig ?? agendaDefault(divisionId, edition),
   );
 
   // True only after mount: the SSR HTML is not interactive yet, and typing into
