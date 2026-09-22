@@ -60,6 +60,35 @@ function symbolGroups(floor: QeiiFloorVector): SymbolGroup[] {
   return groups;
 }
 
+/**
+ * Floors the issued design supplies as a picture rather than drawn artwork.
+ *
+ * Their walls and rooms trace back cleanly, but the small wayfinding pictograms
+ * do not: at the resolution supplied they come back as unreadable blocks and
+ * specks. We leave those marks off rather than print a broken symbol or invent a
+ * replacement. Walls, room shapes and every issued name are untouched.
+ */
+const QEII_TRACED_FLOORS = new Set(["third"]);
+
+/** Anything at or under this size on a traced floor is pictogram debris. */
+const TRACED_SYMBOL_MAX = 20;
+
+/** Shape indexes to leave undrawn on a traced floor: the pictogram debris. */
+export function qeiiTracedSymbolShapes(floor: QeiiFloorVector): Set<number> {
+  const drop = new Set<number>();
+  if (!QEII_TRACED_FLOORS.has(floor.id)) return drop;
+  floor.shapes.forEach((shape, i) => {
+    // Wall runs are strokes, never pictograms.
+    if (shape.stroke) return;
+    const box = shapeBox(shape);
+    if (!box) return;
+    const w = box.x1 - box.x0;
+    const h = box.y1 - box.y0;
+    if (Math.max(w, h) <= TRACED_SYMBOL_MAX) drop.add(i);
+  });
+  return drop;
+}
+
 /** How close two pictograms must be to count as the same washroom. */
 const CLUSTER_REACH = 46;
 
@@ -69,7 +98,7 @@ const CLUSTER_REACH = 46;
  */
 export function qeiiRepeatedSymbolShapes(floor: QeiiFloorVector): Set<number> {
   const groups = symbolGroups(floor);
-  const drop = new Set<number>();
+  const drop = qeiiTracedSymbolShapes(floor);
   const kept: SymbolGroup[] = [];
   const claimed = new Set<number>();
 
