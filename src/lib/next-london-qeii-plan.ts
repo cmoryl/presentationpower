@@ -22,9 +22,26 @@ import {
   type QeiiRoomColours,
 } from "@/lib/next-london-qeii-rooms";
 import { qeiiFloorVector, type QeiiFloorVector, type QeiiLabel } from "@/lib/next-london-qeii-vectors";
+import {
+  qeiiLookWallWeight,
+  qeiiPlanGround,
+  qeiiRoomTint,
+  qeiiStyledInk,
+  qeiiStyledPaint,
+  type QeiiPlanFace,
+} from "@/lib/next-london-qeii-style";
 
-
-export type QeiiPlanFace = "issued" | "element";
+// The look of a plan is decided once, in the master style sheet.
+export type { QeiiPlanFace };
+export {
+  QEII_MAP_LOOKS,
+  QEII_MAP_LOOK_ORDER,
+  qeiiLook,
+  qeiiLookWallWeight,
+  qeiiPlanGround,
+  qeiiRoomTint,
+  qeiiStyledPaint,
+} from "@/lib/next-london-qeii-style";
 
 /** Which approved lockup file a division marker uses on the plan. */
 export type QeiiMarkVariant = "reverse" | "white" | "colour";
