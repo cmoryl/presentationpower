@@ -85,18 +85,31 @@ const rewritten = block.replace(/d:\s*"([^"]+)"/g, (whole, d: string) => {
     }
     before += ring.length;
     rings += 1;
-    // A closed ring has no natural start, so simplify it twice from opposite
-    // starts and keep the run that holds every corner both passes agreed on.
-    let kept = simplify(ring, TOLERANCE);
-    if (closed && ring.length > 8) {
-      const half = Math.floor(ring.length / 2);
-      const rolled = [...ring.slice(half), ...ring.slice(0, half)];
-      const other = simplify(rolled, TOLERANCE);
-      if (other.length < kept.length) {
-        const back = other.map(([x, y]) => [x, y] as Pt);
-        kept = back;
-      }
+    let kept: Pt[];
+    if (closed && ring.length > 3) {
+      // A closed ring has no start and no end, so it is cut at two points that
+      // are certainly corners — the first traced point and the point farthest
+      // from it — and each half is simplified as an open run.
+      const open = ring.slice();
+      const [fx, fy] = open[0];
+      const last = open[open.length - 1];
+      if (Math.hypot(last[0] - fx, last[1] - fy) < 1e-6 && open.length > 2) open.pop();
+      let far = 0;
+      let farDist = -1;
+      open.forEach(([x, y], i) => {
+        const dist = Math.hypot(x - fx, y - fy);
+        if (dist > farDist) {
+          farDist = dist;
+          far = i;
+        }
+      });
+      const front = simplify(open.slice(0, far + 1), TOLERANCE);
+      const back = simplify([...open.slice(far), open[0]], TOLERANCE);
+      kept = [...front, ...back.slice(1, -1)];
+    } else {
+      kept = simplify(ring, TOLERANCE);
     }
+
     after += kept.length;
     const body = kept
       .map(([x, y], i) => `${i === 0 ? "M" : "L"}${num(x)} ${num(y)}`)
