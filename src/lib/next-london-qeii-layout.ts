@@ -264,10 +264,12 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       dy: number;
     };
 
-    const measure = (variant: Variant, size: number, dx = 0, dy = 0): Fit => {
+    const measure = (variant: Variant, size: number, dx = 0, dy = 0, markFactor = 1): Fit => {
       const useSize =
         Math.round(Math.min(size * 0.92, Math.max(size * QEII_USE_RATIO, minSize)) * 100) / 100;
-      const markH = Math.round(size * QEII_MARK_RATIO * (options.markScale ?? 1) * 100) / 100;
+      const markH =
+        Math.round(size * QEII_MARK_RATIO * (options.markScale ?? 1) * markFactor * 100) / 100;
+
       const nameWidth = Math.max(...lines.map((t) => qeiiTextWidth(t, size)));
       const nameHeight = size * (0.72 + (lines.length - 1) * 1.05);
       const markRow = variant.marks.reduce((w, m) => w + markH * m.ratio + size * 0.35, 0);
