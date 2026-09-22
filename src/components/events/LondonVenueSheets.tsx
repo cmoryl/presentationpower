@@ -113,6 +113,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
   const [markVariant, setMarkVariant] = useState<QeiiMarkVariant>("reverse");
   const [markScale, setMarkScale] = useState(1);
   const [showColourPanel, setShowColourPanel] = useState(false);
+  const [showPlanOptions, setShowPlanOptions] = useState(false);
   // Colours are held per floor, so one sheet's key never leaks onto another.
   const [roomColourMap, setRoomColourMap] = useState<Record<string, QeiiRoomColours>>({});
   const [keyLabelMap, setKeyLabelMap] = useState<Record<string, Record<string, string>>>({});
