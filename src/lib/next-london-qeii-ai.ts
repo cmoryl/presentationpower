@@ -11,8 +11,9 @@
 // - Type is written with the PDF base face (Helvetica). Illustrator will ask for
 //   Geist on open; the copy itself stays editable. This is a working map file, not
 //   a press master — press masters carry outlined Geist paths.
-// - Division lockups are linked artwork on the plan, so they are not embedded
-//   here. Place them from the approved lockup files if the map needs them.
+// - Division lockups are embedded from the approved lockup files as live vector
+//   outlines on their own layer. A lockup file that cannot be read as outlines is
+//   named and left off rather than approximated.
 // -----------------------------------------------------------------------------
 
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
@@ -29,6 +30,7 @@ import {
   type QeiiPlanOptions,
 } from "@/lib/next-london-qeii-plan";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
+import { qeiiMarkVectors } from "@/lib/next-london-qeii-mark-art";
 import { svgPathToPdfOps } from "@/lib/vector-path-pdf";
 
 /** Longest edge of the Illustrator artboard, in points — A3. */
@@ -135,10 +137,10 @@ export function qeiiPlanAiFilename(floor: QeiiFloorVector, face: string): string
  * The plan is drawn in its own units and scaled to an A3 artboard. Three named
  * layers arrive in Illustrator: the plan artwork, the room names, and the key.
  */
-export function buildQeiiPlanAi(
+export async function buildQeiiPlanAi(
   floor: QeiiFloorVector,
   options: QeiiPlanOptions = {},
-): QeiiAiResult {
+): Promise<QeiiAiResult> {
   const face = options.face ?? "issued";
   const notes: string[] = [];
   const roomColours = options.roomColours ?? {};
@@ -262,11 +264,53 @@ export function buildQeiiPlanAi(
     })
     .join("");
 
+  // ── layer 4: division lockups, as the approved outlines ───────────────────
+  let markOps = "";
   if (options.showMarks ?? true) {
-    const marked = layout.blocks.filter((b) => b.marks.length).length;
-    if (marked) {
+    const { placements, dropped } = await qeiiMarkVectors(floor, options);
+    for (const mark of placements) {
+      const art = mark.art;
+      // Fitted centred inside its box at the artwork's own aspect, exactly as the
+      // plan places it on screen.
+      const fit = Math.min(mark.w / art.w, mark.h / art.h) * k;
+      const rad = (-mark.angle * Math.PI) / 180;
+      const cos = Math.cos(rad);
+      const sin = Math.sin(rad);
+      const head =
+        `q 1 0 0 1 ${f3(px(mark.cx))} ${f3(py(mark.cy))} cm ` +
+        `${f3(cos)} ${f3(sin)} ${f3(-sin)} ${f3(cos)} 0 0 cm ` +
+        `${f3(fit)} 0 0 ${f3(fit)} 0 0 cm ` +
+        `1 0 0 1 ${f3(-art.w / 2)} ${f3(-art.h / 2)} cm\n`;
+      const body = art.paths
+        .map((path) => {
+          const ops = svgPathToPdfOps(path.d, { scale: 1, x: 0, y: 0, artHeight: art.h });
+          if (!ops) return "";
+          const m = path.m;
+          // F·M·F⁻¹ for the y-flip of the artwork's own height.
+          const n = [
+            m[0],
+            -m[1],
+            -m[2],
+            m[3],
+            m[2] * art.h + m[4],
+            art.h - m[3] * art.h - m[5],
+          ];
+          const cm = `${n.map((v) => f3(v)).join(" ")} cm `;
+          return `q ${cm}${fillOp(path.fill, [0, 0.25, 0.78])} ${ops} ${
+            path.fillRule === "evenodd" ? "f*" : "f"
+          } Q\n`;
+        })
+        .join("");
+      if (body) markOps += `${head}${body}Q\n`;
+    }
+    if (placements.length) {
       notes.push(
-        `${marked} division lockup${marked === 1 ? "" : "s"} on this plan are linked artwork, so they are not in the Illustrator file — place them from the approved lockup files if you need them.`,
+        `${placements.length} division lockup${placements.length === 1 ? " is" : "s are"} embedded as live vector outlines from the approved artwork, on their own "Division lockups" layer.`,
+      );
+    }
+    if (dropped.length) {
+      notes.push(
+        `${dropped.join(", ")} could not be read as outlines, so ${dropped.length === 1 ? "it is" : "they are"} not in this file — place ${dropped.length === 1 ? "it" : "them"} from the approved lockup files.`,
       );
     }
   }
@@ -279,22 +323,24 @@ export function buildQeiiPlanAi(
       pageH,
     )} re f\n${planOps}EMC\nQ\n` +
     `q\n/OC /oc2 BDC\n${textOps}EMC\nQ\n` +
-    `q\n/OC /oc3 BDC\n${keyOps}EMC\nQ\n`;
+    `q\n/OC /oc3 BDC\n${keyOps}EMC\nQ\n` +
+    (markOps ? `q\n/OC /oc4 BDC\n${markOps}EMC\nQ\n` : "");
 
   const objects: string[] = [
-    `<< /Type /Catalog /Pages 2 0 R /OCProperties << /OCGs [6 0 R 7 0 R 8 0 R] /D << /Order [6 0 R 7 0 R 8 0 R] /ON [6 0 R 7 0 R 8 0 R] >> >> >>`,
+    `<< /Type /Catalog /Pages 2 0 R /OCProperties << /OCGs [6 0 R 7 0 R 8 0 R 9 0 R] /D << /Order [6 0 R 7 0 R 8 0 R 9 0 R] /ON [6 0 R 7 0 R 8 0 R 9 0 R] >> >> >>`,
     `<< /Type /Pages /Kids [3 0 R] /Count 1 >>`,
     `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f3(pageW)} ${f3(pageH)}] ` +
       `/TrimBox [0 0 ${f3(pageW)} ${f3(pageH)}] ` +
       `/TPVenue (Queen Elizabeth II Centre) /TPFloor (${pdfText(floor.title)}) ` +
       `/TPFace (${pdfText(face)}) /TPColorSpace (DeviceRGB) ` +
       `/Resources << /Font << /F1 5 0 R >> ` +
-      `/Properties << /oc1 6 0 R /oc2 7 0 R /oc3 8 0 R >> >> /Contents 4 0 R >>`,
+      `/Properties << /oc1 6 0 R /oc2 7 0 R /oc3 8 0 R /oc4 9 0 R >> >> /Contents 4 0 R >>`,
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
     `<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>`,
     `<< /Type /OCG /Name (Plan artwork) >>`,
     `<< /Type /OCG /Name (Room names) >>`,
     `<< /Type /OCG /Name (Colour key) >>`,
+    `<< /Type /OCG /Name (Division lockups) >>`,
     `<< /Title (Queen Elizabeth II Centre — ${pdfText(floor.title)}) /Creator (TransPerfect Element) ` +
       `/Subject (NEXT 2026 London venue map · live vector artwork) >>`,
   ];

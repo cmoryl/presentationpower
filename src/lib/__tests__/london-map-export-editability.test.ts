@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * London (QEII) map exports — editability audit.
  *
@@ -22,6 +23,8 @@ import { qeiiColourKey } from "@/lib/next-london-qeii-rooms";
 import { buildQeiiPlanAi, qeiiPdfCopy } from "@/lib/next-london-qeii-ai";
 import { LONDON_VENUE_SHEETS } from "@/lib/next-london-venue-sheets";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
+import fs from "node:fs";
+import path from "node:path";
 
 // A 1×1 PNG stands in for the print-resolution plan raster: the Office builders
 // need a canvas, which no test environment has. Everything graded below is the
@@ -53,8 +56,16 @@ function copyOf(floor: QeiiFloorVector) {
   return { names, uses, key, lines: [...names, ...uses, ...key] };
 }
 
+// The approved lockups are read off disk exactly as the browser would fetch
+// them, so the grade below proves the real artwork lands in the file.
 beforeAll(() => {
   expect(FLOORS.length).toBeGreaterThan(0);
+  vi.stubGlobal("fetch", async (input: string) => {
+    const rel = String(input).replace(/^https?:\/\/[^/]+/, "").split("?")[0]!;
+    const file = path.join(process.cwd(), "public", decodeURIComponent(rel));
+    if (!fs.existsSync(file)) return new Response("missing", { status: 404 });
+    return new Response(fs.readFileSync(file, "utf8"), { status: 200 });
+  });
 });
 
 describe("London map exports are editable", () => {
@@ -78,8 +89,8 @@ describe("London map exports are editable", () => {
 
   it.each(FLOORS.map((f) => [f.title, f] as const))(
     "%s — Illustrator file keeps paths and live text",
-    (_t, floor) => {
-      const res = buildQeiiPlanAi(floor, { showUse: true, showMarks: true });
+    async (_t, floor) => {
+      const res = await buildQeiiPlanAi(floor, { showUse: true, showMarks: true });
       const pdf = new TextDecoder("latin1").decode(res.bytes);
       const copy = copyOf(floor);
 
@@ -98,6 +109,13 @@ describe("London map exports are editable", () => {
       }
 
       expect(res.notes.join(" ")).toMatch(/editable text/i);
+
+      // Division lockups travel as the approved outlines, on their own layer —
+      // never a placed picture and never a link only the site can follow.
+      if (markCount(floor) > 0) {
+        expect(pdf).toContain("/Name (Division lockups)");
+        expect(res.notes.join(" ")).toMatch(/embedded as live vector outlines/i);
+      }
     },
   );
 
