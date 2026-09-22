@@ -16,6 +16,12 @@ import {
   type QeiiMarkVariant,
   type QeiiPlanFace,
 } from "@/lib/next-london-qeii-plan";
+import {
+  qeiiLookWallWeight,
+  qeiiPlanGround,
+  qeiiRoomTint,
+  qeiiStyledPaint,
+} from "@/lib/next-london-qeii-style";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import {
