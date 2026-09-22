@@ -4,16 +4,31 @@ import { QEII_FLOOR_VECTORS } from "@/lib/next-london-qeii-vectors";
 import {
   QEII_WALL_WEIGHT,
   qeiiRepeatedSymbolShapes,
+  qeiiTracedSymbolShapes,
   qeiiWallWidth,
 } from "@/lib/next-london-qeii-symbols";
 
 describe("washroom symbols and wall weight", () => {
   it("trims the repeated cubicle figures but keeps artwork on every floor", () => {
-    QEII_FLOOR_VECTORS.filter((f) => f.kind === "vector").forEach((floor) => {
+    QEII_FLOOR_VECTORS.filter((f) => f.kind === "vector" && f.id !== "third").forEach((floor) => {
       const drop = qeiiRepeatedSymbolShapes(floor);
       // Never a wholesale cull: the plan keeps the great majority of its shapes.
       expect(drop.size).toBeLessThan(floor.shapes.length * 0.45);
     });
+  });
+
+  it("drops the unreadable pictogram debris on the traced third floor only", () => {
+    const third = QEII_FLOOR_VECTORS.find((f) => f.id === "third")!;
+    const drop = qeiiRepeatedSymbolShapes(third);
+    expect(drop.size).toBeGreaterThan(200);
+    // The level marker arrow is drawn artwork, not debris, and stays.
+    expect(drop.has(140)).toBe(false);
+    // The debris pass never touches a wall run.
+    const traced = qeiiTracedSymbolShapes(third);
+    third.shapes.forEach((s, i) => {
+      if (s.stroke) expect(traced.has(i)).toBe(false);
+    });
+    expect(qeiiTracedSymbolShapes(QEII_FLOOR_VECTORS.find((f) => f.id === "ground")!).size).toBe(0);
   });
 
   it("leaves one symbol standing where the artwork drew a row of them", () => {

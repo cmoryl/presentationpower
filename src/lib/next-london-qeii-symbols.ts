@@ -60,6 +60,51 @@ function symbolGroups(floor: QeiiFloorVector): SymbolGroup[] {
   return groups;
 }
 
+/**
+ * Floors the issued design supplies as a picture rather than drawn artwork.
+ *
+ * Their walls and rooms trace back cleanly, but the small wayfinding pictograms
+ * do not: at the resolution supplied they come back as unreadable blocks and
+ * specks. We leave those marks off rather than print a broken symbol or invent a
+ * replacement. Walls, room shapes and every issued name are untouched.
+ */
+const QEII_TRACED_FLOORS = new Set(["third"]);
+
+/** Anything at or under this size on a traced floor is pictogram debris. */
+const TRACED_SYMBOL_MAX = 20;
+
+/** A slightly larger piece goes too when it is the block the debris sits on. */
+const TRACED_HOST_MAX = 26;
+const TRACED_HOST_PIECES = 2;
+
+/** Shape indexes to leave undrawn on a traced floor: the pictogram debris. */
+export function qeiiTracedSymbolShapes(floor: QeiiFloorVector): Set<number> {
+  const drop = new Set<number>();
+  if (!QEII_TRACED_FLOORS.has(floor.id)) return drop;
+  const boxes = floor.shapes.map((s) => (s.stroke ? undefined : shapeBox(s)));
+  boxes.forEach((box, i) => {
+    if (!box) return;
+    const size = Math.max(box.x1 - box.x0, box.y1 - box.y0);
+    if (size <= TRACED_SYMBOL_MAX) drop.add(i);
+  });
+  // The square a pictogram is drawn on is a touch bigger than its parts, so it
+  // is only dropped when the dropped parts actually sit on it — that keeps real
+  // drawn marks of the same size, such as the level arrow, on the plan.
+  boxes.forEach((box, i) => {
+    if (!box || drop.has(i)) return;
+    const size = Math.max(box.x1 - box.x0, box.y1 - box.y0);
+    if (size > TRACED_HOST_MAX) return;
+    let pieces = 0;
+    for (const j of drop) {
+      const b = boxes[j];
+      if (!b) continue;
+      if (b.x0 >= box.x0 && b.x1 <= box.x1 && b.y0 >= box.y0 && b.y1 <= box.y1) pieces += 1;
+    }
+    if (pieces >= TRACED_HOST_PIECES) drop.add(i);
+  });
+  return drop;
+}
+
 /** How close two pictograms must be to count as the same washroom. */
 const CLUSTER_REACH = 46;
 
@@ -69,7 +114,7 @@ const CLUSTER_REACH = 46;
  */
 export function qeiiRepeatedSymbolShapes(floor: QeiiFloorVector): Set<number> {
   const groups = symbolGroups(floor);
-  const drop = new Set<number>();
+  const drop = qeiiTracedSymbolShapes(floor);
   const kept: SymbolGroup[] = [];
   const claimed = new Set<number>();
 
