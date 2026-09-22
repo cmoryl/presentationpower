@@ -476,6 +476,9 @@ export async function buildQeiiPlanDocx(
 
   let drawing = "";
   let picBytes: ArrayBuffer | undefined;
+  /** Embedded division lockups: relationship id → PNG bytes. */
+  const markMedia: { rel: string; file: string; bytes: ArrayBuffer }[] = [];
+
 
   if (plan.shapes) {
     let id = 2;
