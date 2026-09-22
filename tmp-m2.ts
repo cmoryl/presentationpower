@@ -1,10 +1,8 @@
 import { qeiiFloorVector } from "@/lib/next-london-qeii-vectors";
-import { spaceUseMarks } from "@/lib/next-london-space-use";
+import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 for (const id of ["second","fourth"]) {
-  const f = qeiiFloorVector(id as any);
-  console.log("=== ", id, f?.labels?.length);
-  for (const l of f?.labels ?? []) {
-    const m = spaceUseMarks(l.text, id);
-    console.log(JSON.stringify(l.text), l.kind ?? "", m.map(x=>x.divisionId).join(","));
-  }
+  const f = qeiiFloorVector(id as any)!;
+  const l = qeiiPlanLayout(f, { showUse: true, showMarks: true });
+  console.log("===", id);
+  for (const b of l.blocks) console.log(b.room, "marks:", b.marks.length, "markH:", b.markH, "size:", b.size, "lines:", JSON.stringify(b.lines));
 }
