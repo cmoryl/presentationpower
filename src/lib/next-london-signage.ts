@@ -1487,9 +1487,12 @@ export const LONDON_BOOTH_PANEL_META: Record<string, LondonBoothPanelMeta> = Obj
   ]),
 );
 
-/** True for a vendor booth kiosk panel. */
+/**
+ * True for a vendor booth kiosk panel — London trade booths and the California
+ * TV kiosks alike, since both are registered in the booth metadata.
+ */
 export function isBoothPanel(panel: LondonPanel | { id: string }): boolean {
-  return panel.id.startsWith("ldn-b");
+  return panel.id.startsWith("ldn-b") || panel.id in LONDON_BOOTH_PANEL_META;
 }
 
 export function londonBoothPanelMeta(
