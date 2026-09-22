@@ -260,6 +260,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
 
     type Fit = {
       variant: Variant;
+      lines: string[];
       box: QeiiBox;
       size: number;
       useSize: number;
@@ -268,14 +269,21 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       dy: number;
     };
 
-    const measure = (variant: Variant, size: number, dx = 0, dy = 0, markFactor = 1): Fit => {
+    const measure = (
+      variant: Variant,
+      size: number,
+      dx = 0,
+      dy = 0,
+      markFactor = 1,
+      ls: string[] = lines,
+    ): Fit => {
       const useSize =
         Math.round(Math.min(size * 0.92, Math.max(size * QEII_USE_RATIO, minSize)) * 100) / 100;
       const markH =
         Math.round(size * QEII_MARK_RATIO * (options.markScale ?? 1) * markFactor * 100) / 100;
 
-      const nameWidth = Math.max(...lines.map((t) => qeiiTextWidth(t, size)));
-      const nameHeight = size * (0.72 + (lines.length - 1) * 1.05);
+      const nameWidth = Math.max(...ls.map((t) => qeiiTextWidth(t, size)));
+      const nameHeight = size * (0.72 + (ls.length - 1) * 1.05);
       const markRow = variant.marks.reduce((w, m) => w + markH * m.ratio + size * 0.35, 0);
       const width = Math.max(
         nameWidth,
@@ -286,6 +294,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       const below = nameHeight / 2 + (variant.use ? useSize * 1.5 : 0);
       return {
         variant,
+        lines: ls,
         box: boxFor(group.x + dx, group.y + dy, group.angle, width, above, below),
         dx,
         dy,
@@ -294,6 +303,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
         markH,
       };
     };
+
 
     const clearOf = (fit: Fit, useHolder: boolean): boolean => {
       if (!inside(fit.box, floor, 2)) return false;
@@ -306,13 +316,44 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     // Type steps down inside its own room before any line comes off it, so a long
     // name stays whole and stays inside the space the artwork draws for it.
     const steps = [1, 0.92, 0.84, 0.76, 0.68, 0.6, 0.52];
+    // A long caption in a narrow slot is broken over its own words rather than
+    // printed wider than the space the artwork draws. Only the line breaks change
+    // — no word is shortened, reordered or dropped.
+    const lineSets: string[][] = [lines];
+    // A corrected name prints exactly as it was typed, so only issued copy is broken.
+    if (lines.length === 1 && !edit?.name) {
+      const words = lines[0]!.split(" ").filter(Boolean);
+      for (const rows of [2, 3]) {
+        if (words.length < rows) continue;
+        const per = Math.ceil(words.length / rows);
+        const wrapped: string[] = [];
+        for (let w = 0; w < words.length; w += per) wrapped.push(words.slice(w, w + per).join(" "));
+        if (wrapped.length > 1) lineSets.push(wrapped);
+      }
+    }
     let chosen: Fit | undefined;
     let insideHolder = true;
     // Content first, size second: a full block is set smaller before any line
     // comes off it, and only then does the event line or the lockup give way.
     // A small nudge inside the room is tried before the type is made smaller, so a
-    // name clears a lift symbol or a marker dot at its proper size.
-    const nudges = [0, 0.7, -0.7, 1.4, -1.4, 2.2, -2.2];
+    // name clears a lift symbol or a marker dot at its proper size. Sideways nudges
+    // are tried too, so a name anchored hard against a wall is drawn back inside the
+    // space rather than printed half over the edge of it.
+    const nudges: Array<[number, number]> = [
+      [0, 0],
+      [0, 0.7],
+      [0, -0.7],
+      [0.7, 0],
+      [-0.7, 0],
+      [0, 1.4],
+      [0, -1.4],
+      [1.4, 0],
+      [-1.4, 0],
+      [0, 2.2],
+      [0, -2.2],
+      [2.2, 0],
+      [-2.2, 0],
+    ];
     // A tight room sets its lockup smaller before it loses it altogether; the
     // floor is the room name's own height, below which the lockup would not read.
     const markFactors = [1, 0.86, 0.72, 0.6, 0.5];
@@ -322,14 +363,18 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
           const size = Math.max(minSize, baseSize * step);
           for (const markFactor of variant.marks.length ? markFactors : [1]) {
             if (markFactor < 1 && QEII_MARK_RATIO * markFactor < 1) break;
-            for (const nudge of nudges) {
-              const fit = measure(variant, size, 0, nudge * size, markFactor);
-              if (clearOf(fit, useHolder)) {
-                chosen = fit;
-                insideHolder = useHolder;
-                break;
+            for (const ls of lineSets) {
+              for (const [ndx, ndy] of nudges) {
+                const fit = measure(variant, size, ndx * size, ndy * size, markFactor, ls);
+                if (clearOf(fit, useHolder)) {
+                  chosen = fit;
+                  insideHolder = useHolder;
+                  break;
+                }
               }
+              if (chosen) break;
             }
+
             if (chosen) break;
           }
           if (chosen) break;
@@ -339,6 +384,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       }
       if (chosen) break;
     }
+
 
 
     if (!chosen) {
@@ -386,9 +432,13 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
         noteSet.add(`${room} has no room for its division lockup on the plan.`);
       }
     }
-    if (holder && !insideHolder) {
+    // Only report this when the block genuinely runs outside the space the artwork
+    // draws for the room. A block that simply had to give way to a neighbouring
+    // name is still inside its own room, and saying otherwise misreads the sheet.
+    if (holder && !qeiiRectInside(chosen.box, holder, chosen.size * 0.22)) {
       noteSet.add(`${room} is printed wider than the space the issued artwork draws for it.`);
     }
+
 
     // A saved nudge is a deliberate human correction, so it is applied after the
     // automatic placement and moves the whole block, ring and all.
@@ -408,7 +458,8 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       y: group.y + chosen.dy + ny,
       angle: group.angle,
       size: chosen.size,
-      lines,
+      lines: chosen.lines,
+
       use: chosen.variant.use,
       useSize: chosen.useSize,
       marks: chosen.variant.marks,
