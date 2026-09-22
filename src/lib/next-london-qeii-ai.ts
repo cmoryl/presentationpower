@@ -19,6 +19,7 @@
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import {
   qeiiColourKey,
+  qeiiCellsByShape,
   qeiiColourPaint,
   qeiiRoomTextInk,
 } from "@/lib/next-london-qeii-rooms";
@@ -145,6 +146,7 @@ export async function buildQeiiPlanAi(
   const notes: string[] = [];
   const roomColours = options.roomColours ?? {};
   const paint = qeiiColourPaint(floor, roomColours);
+  const cellsByShape = qeiiCellsByShape(paint);
   const layout = qeiiPlanLayout(floor, {
     labelScale: options.labelScale ?? 1,
     showUse: options.showUse,
@@ -181,7 +183,16 @@ export async function buildQeiiPlanAi(
         bits.push(`${f3(Math.max(0.05, qeiiWallWidth(shape, options.wallWeight) * k))} w`);
       }
       bits.push(ops, fill && stroke ? "B" : stroke ? "S" : "f", "Q");
-      return `${bits.join(" ")}\n`;
+      // Rooms the artwork draws inside this block, cut out along the issued wall
+      // runs: each is its own editable path at the exact angles drawn.
+      const cut = (cellsByShape.get(i) ?? [])
+        .map((c) => {
+          const cellOps = svgPathToPdfOps(c.d, { scale: k, x: 0, y: 0, artHeight: artH });
+          if (!cellOps) return "";
+          return `q ${fillOp(c.hex, [0.01, 0, 0.17])} ${cellOps} f Q\n`;
+        })
+        .join("");
+      return `${bits.join(" ")}\n${cut}`;
     })
     .join("");
 
