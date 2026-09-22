@@ -115,6 +115,7 @@ export function QeiiAllFloors({
                     showAllSymbols={showAllSymbols}
                     edits={editsMap[floor.id]}
                     className="block rounded-xl bg-[#EEF1F7]"
+                    style={{ width: `${(floor.w / maxW) * 100}%` }}
                   />
                 </div>
               </div>
