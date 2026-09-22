@@ -22,9 +22,26 @@ import {
   type QeiiRoomColours,
 } from "@/lib/next-london-qeii-rooms";
 import { qeiiFloorVector, type QeiiFloorVector, type QeiiLabel } from "@/lib/next-london-qeii-vectors";
+import {
+  qeiiLookWallWeight,
+  qeiiPlanGround,
+  qeiiRoomTint,
+  qeiiStyledInk,
+  qeiiStyledPaint,
+  type QeiiPlanFace,
+} from "@/lib/next-london-qeii-style";
 
-
-export type QeiiPlanFace = "issued" | "element";
+// The look of a plan is decided once, in the master style sheet.
+export type { QeiiPlanFace };
+export {
+  QEII_MAP_LOOKS,
+  QEII_MAP_LOOK_ORDER,
+  qeiiLook,
+  qeiiLookWallWeight,
+  qeiiPlanGround,
+  qeiiRoomTint,
+  qeiiStyledPaint,
+} from "@/lib/next-london-qeii-style";
 
 /** Which approved lockup file a division marker uses on the plan. */
 export type QeiiMarkVariant = "reverse" | "white" | "colour";
@@ -111,18 +128,15 @@ function luminance(hex: string): number {
 }
 
 /**
- * Map an issued plan colour onto the enterprise palette.
+ * Map an issued plan colour onto the chosen look.
  *
  * The venue draws in three tones: a dark room fill, a mid cyan circulation fill,
- * and white walls and symbols. We keep that three-tone reading and only change
- * which approved colour carries each tone, so nothing in the plan is lost.
+ * and white walls and symbols. Every look keeps that three-tone reading and only
+ * changes which approved colour carries each tone, so nothing in the plan is lost.
+ * The mapping itself lives in the master style sheet.
  */
 export function qeiiPlanInk(colour: string | undefined, face: QeiiPlanFace): string | undefined {
-  if (!colour || face === "issued") return colour;
-  const lum = luminance(colour);
-  if (lum > 0.78) return QEII_PLAN_TOKENS.white;
-  if (lum > 0.32) return QEII_PLAN_TOKENS.accent;
-  return QEII_PLAN_TOKENS.ink;
+  return qeiiStyledInk(colour, face);
 }
 
 /**
@@ -240,17 +254,18 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
   const scale = options.labelScale ?? 1;
   const showLabels = options.showLabels ?? true;
   const roomColours = options.roomColours ?? {};
-  const paint = qeiiColourPaint(floor, roomColours);
+  const paint = qeiiStyledPaint(qeiiColourPaint(floor, roomColours), face);
   const cellsByShape = qeiiCellsByShape(paint);
   const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   const hidden = options.showAllSymbols ? new Set<number>() : qeiiRepeatedSymbolShapes(floor);
+  const wall = qeiiLookWallWeight(face, options.wallWeight);
   const shapes = floor.shapes
     .map((s, i) => {
       if (hidden.has(i)) return "";
       const fill = paint.fills.get(i) ?? qeiiPlanInk(s.fill, face);
       const stroke = qeiiPlanInk(s.stroke, face);
       const bits = [`d="${s.d}"`, `fill="${fill ?? "none"}"`];
-      if (stroke) bits.push(`stroke="${stroke}"`, `stroke-width="${qeiiWallWidth(s, options.wallWeight)}"`);
+      if (stroke) bits.push(`stroke="${stroke}"`, `stroke-width="${qeiiWallWidth(s, wall)}"`);
       // Rooms the artwork draws inside this block are cut out along the issued
       // wall runs, so a colour fills the whole room in the downloaded file too.
       const cut = (cellsByShape.get(i) ?? [])
@@ -289,10 +304,11 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
           // room keeps the colour it was given.
           const room = block.room;
           const tag = paint.tags.get(room);
+          const roomFill = qeiiRoomTint(roomColours[room], face);
           const ink = tag
             ? qeiiRoomTextInk(tag)
-            : roomColours[room]
-              ? qeiiRoomTextInk(roomColours[room])
+            : roomFill
+              ? qeiiRoomTextInk(roomFill)
               : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face));
           // A light room colour needs the colour lockup, not the reverse one.
           // A light room fill would swallow the reverse lockup, so that one falls
@@ -376,7 +392,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
       const y = floor.h + keyStep * (0.9 + i);
       const esc2 = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
       return [
-        `<rect x="${floor.w * 0.02}" y="${y - keyStep * 0.34}" width="${keyStep * 0.72}" height="${keyStep * 0.72}" rx="${keyStep * 0.14}" fill="${row.hex}"/>`,
+        `<rect x="${floor.w * 0.02}" y="${y - keyStep * 0.34}" width="${keyStep * 0.72}" height="${keyStep * 0.72}" rx="${keyStep * 0.14}" fill="${qeiiRoomTint(row.hex, face)}"/>`,
         options.showText === false ? "" : `<text x="${floor.w * 0.02 + keyStep}" y="${y}" dominant-baseline="middle" font-family="Geist, Geist Variable, sans-serif" font-weight="600" font-size="${keyStep * 0.52}" fill="${QEII_PLAN_TOKENS.ink}">${esc2(row.label)}</text>`,
       ].join("");
     })
@@ -385,7 +401,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${floor.w}" height="${floor.h + keyH}" viewBox="0 0 ${floor.w} ${floor.h + keyH}">`,
     `<title>Queen Elizabeth II Centre — ${floor.title}</title>`,
-    `<rect width="${floor.w}" height="${floor.h + keyH}" fill="${QEII_PLAN_TOKENS.surface}"/>`,
+    `<rect width="${floor.w}" height="${floor.h + keyH}" fill="${qeiiPlanGround(face)}"/>`,
     shapes,
     labels,
     keySvg,

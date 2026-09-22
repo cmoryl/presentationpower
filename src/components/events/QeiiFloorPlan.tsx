@@ -16,6 +16,12 @@ import {
   type QeiiMarkVariant,
   type QeiiPlanFace,
 } from "@/lib/next-london-qeii-plan";
+import {
+  qeiiLookWallWeight,
+  qeiiPlanGround,
+  qeiiRoomTint,
+  qeiiStyledPaint,
+} from "@/lib/next-london-qeii-style";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { qeiiRepeatedSymbolShapes, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import {
@@ -95,7 +101,13 @@ export function QeiiFloorPlan({
   const svgRef = useRef<SVGSVGElement | null>(null);
   const drag = useRef<{ room: string; x: number; y: number; dx: number; dy: number } | null>(null);
 
-  const paint = useMemo(() => qeiiColourPaint(floor, roomColours), [floor, roomColours]);
+  // Everything about the look — ground, tones, wall weight, colour strength —
+  // comes from the master style sheet, so the screen and every export agree.
+  const wall = qeiiLookWallWeight(face, wallWeight);
+  const paint = useMemo(
+    () => qeiiStyledPaint(qeiiColourPaint(floor, roomColours), face),
+    [floor, roomColours, face],
+  );
   const cellsByShape = useMemo(() => qeiiCellsByShape(paint), [paint]);
   const hidden = useMemo(
     () => (showAllSymbols ? new Set<number>() : qeiiRepeatedSymbolShapes(floor)),
@@ -124,7 +136,7 @@ export function QeiiFloorPlan({
       className={className}
       style={style}
     >
-      <rect width={floor.w} height={floor.h + keyH} fill={QEII_PLAN_TOKENS.surface} />
+      <rect width={floor.w} height={floor.h + keyH} fill={qeiiPlanGround(face)} />
 
       {floor.shapes.map((shape, i) => {
         // Repeated WC cubicle figures are left undrawn; one bathroom symbol stays.
@@ -137,7 +149,7 @@ export function QeiiFloorPlan({
               d={shape.d}
               fill={chosen ?? qeiiPlanInk(shape.fill, face) ?? "none"}
               stroke={stroke}
-              strokeWidth={stroke ? qeiiWallWidth(shape, wallWeight) : undefined}
+              strokeWidth={stroke ? qeiiWallWidth(shape, wall) : undefined}
             />
             {/* Rooms the artwork draws inside this block, cut out along the
                 issued wall runs so each colour fills the whole room. */}
@@ -170,7 +182,7 @@ export function QeiiFloorPlan({
             const room = block.room;
             const shown = block.lines.join(" ");
             const tag = paint.tags.get(room);
-            const fill = roomColours[room];
+            const fill = qeiiRoomTint(roomColours[room], face);
             const ink = tag
               ? qeiiRoomTextInk(tag)
               : fill
@@ -327,7 +339,7 @@ export function QeiiFloorPlan({
                   width={keyStep * 0.72}
                   height={keyStep * 0.72}
                   rx={keyStep * 0.14}
-                  fill={row.hex}
+                  fill={qeiiRoomTint(row.hex, face)}
                 />
                 <text
                   x={floor.w * 0.02 + keyStep}
