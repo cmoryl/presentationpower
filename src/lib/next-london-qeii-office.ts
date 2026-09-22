@@ -338,13 +338,13 @@ export async function buildQeiiPlanPptx(
       lines.push({ text: line, y: nameTop + li * block.size * 1.05, size: block.size });
     });
     const lastLine = nameTop + (block.lines.length - 1) * block.size * 1.05;
-    if (block.use) {
+    block.useLines.forEach((row, ri) => {
       lines.push({
-        text: block.use,
-        y: lastLine + block.size * 0.62 + block.useSize * 0.6,
+        text: row,
+        y: lastLine + block.size * 0.62 + block.useSize * 0.6 + ri * block.useSize * 1.15,
         size: block.useSize,
       });
-    }
+    });
     for (const line of lines) {
       const fontSize = ptSize(line.size);
       const h = (fontSize / 72) * 1.5;
