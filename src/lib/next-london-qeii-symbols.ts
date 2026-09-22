@@ -106,7 +106,9 @@ export function qeiiTracedSymbolShapes(floor: QeiiFloorVector): Set<number> {
       if (b.x0 >= box.x0 && b.x1 <= box.x1 && b.y0 >= box.y0 && b.y1 <= box.y1) pieces += 1;
     }
     if (pieces >= TRACED_HOST_PIECES) drop.add(i);
+  });
   // Some remnants of the same pictogram come back as fine lines rather than
+
   // filled blocks, and a few sit a hair outside the block they belong to. A
   // piece that small, sitting right on top of pieces we are already leaving off,
   // is part of the same broken mark, so it goes with them. A lone small mark —
