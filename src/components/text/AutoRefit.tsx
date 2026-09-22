@@ -111,9 +111,13 @@ export function runAutoRefit(
     // The worst of the two: the slot's own clipped box, and the box that clips it.
     const ratio = Math.max(overflowRatio(own), box === root ? 1 : overflowRatio(inBox));
     if (ratio <= 1.005) {
-      restore(el);
+      // It fits. If that is because an earlier pass sized it down, leave the fit
+      // in place — measuring the fitted copy and then restoring the authored
+      // size would put the overflow straight back. A fresh signature, a resize
+      // or a copy edit restores the authored design before measuring again.
       continue;
     }
+
 
     const lineHeightPx = parseFloat(cs.lineHeight);
     const plan = refitPlan({
@@ -167,32 +171,53 @@ export function useAutoRefit(
     let frame = 0;
     let passes = 0;
     let stop = false;
+    // True while this hook is writing type sizes, so the observers do not read
+    // our own work as a new change and start over endlessly.
+    let applying = false;
+
+    const restoreAll = () => {
+      const node = ref.current;
+      if (!node) return;
+      applying = true;
+      for (const el of Array.from(node.querySelectorAll<HTMLElement>("[data-refit-applied='1']"))) {
+        restore(el);
+      }
+    };
 
     // A fresh signature means new words: drop what the last pass applied so the
     // authored sizes are measured, not last language's shrunken ones.
-    for (const el of Array.from(root.querySelectorAll<HTMLElement>("[data-refit-applied='1']"))) {
-      restore(el);
-    }
+    restoreAll();
 
     const pass = () => {
       if (stop || !ref.current) return;
+      applying = true;
       const result = runAutoRefit(ref.current, { floorPx, minScale });
       setSummary(result);
       passes += 1;
       if (result.refitted > 0 && passes < MAX_PASSES) {
         frame = requestAnimationFrame(pass);
+      } else {
+        frame = requestAnimationFrame(() => {
+          applying = false;
+        });
       }
     };
     frame = requestAnimationFrame(pass);
 
+    // A resize or a copy edit changes what will fit, so start again from the
+    // authored design rather than measuring the last fit.
     const again = () => {
+      if (applying) return;
       passes = 0;
       cancelAnimationFrame(frame);
+      restoreAll();
       frame = requestAnimationFrame(pass);
     };
 
+
     const obs = typeof ResizeObserver !== "undefined" ? new ResizeObserver(again) : null;
     obs?.observe(root);
+
 
     // Copy edits and translations replace the words in place, which no resize
     // reports — watch the text itself so a longer language refits immediately.
