@@ -81,6 +81,26 @@ const TRACED_HOST_PIECES = 2;
 const TRACED_DEBRIS_REACH = 22;
 const TRACED_DEBRIS_COMPANY = 2;
 
+/**
+ * A traced piece that is small and heavily wiggled is a pictogram or a scrap of
+ * set copy the picture could not hold, never a wall or a room: a wall comes back
+ * as a few straight runs, a room as a large outline.
+ */
+const TRACED_WIGGLE_MAX = 60;
+const TRACED_WIGGLE_POINTS = 20;
+
+/**
+ * On a traced floor the picture paints the gap between rooms white, so a white
+ * filled patch is a leftover piece of that wall band. The rooms already reach the
+ * middle of the band and the band itself is drawn as a fine line, so the patches
+ * are left off — otherwise a house look paints them as solid blocks.
+ */
+function isTracedDebris(shape: QeiiShape, box: Box): boolean {
+  const size = Math.max(box.x1 - box.x0, box.y1 - box.y0);
+  if (!shape.stroke && shape.fill?.toLowerCase() === "#ffffff") return true;
+  const points = (shape.d.match(/[MLCQSAZ]/gi) ?? []).length;
+  return size <= TRACED_WIGGLE_MAX && points >= TRACED_WIGGLE_POINTS;
+}
 
 /** Shape indexes to leave undrawn on a traced floor: the pictogram debris. */
 export function qeiiTracedSymbolShapes(floor: QeiiFloorVector): Set<number> {
@@ -90,9 +110,10 @@ export function qeiiTracedSymbolShapes(floor: QeiiFloorVector): Set<number> {
   boxes.forEach((box, i) => {
     if (!box) return;
     const size = Math.max(box.x1 - box.x0, box.y1 - box.y0);
-    if (size <= TRACED_SYMBOL_MAX) drop.add(i);
+    if (size <= TRACED_SYMBOL_MAX || isTracedDebris(floor.shapes[i]!, box)) drop.add(i);
   });
   // The square a pictogram is drawn on is a touch bigger than its parts, so it
+
   // is only dropped when the dropped parts actually sit on it — that keeps real
   // drawn marks of the same size, such as the level arrow, on the plan.
   boxes.forEach((box, i) => {
