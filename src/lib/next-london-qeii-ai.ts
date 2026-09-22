@@ -207,7 +207,7 @@ export async function buildQeiiPlanAi(
         ? qeiiRoomTextInk(tag)
         : roomColours[block.room]
           ? qeiiRoomTextInk(roomColours[block.room])
-          : qeiiLabelInk();
+          : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face));
       const turned = Math.abs(block.angle) >= 0.5;
       const open = turned
         ? (() => {
