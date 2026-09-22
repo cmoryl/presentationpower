@@ -171,10 +171,14 @@ export function useAutoRefit(
     let frame = 0;
     let passes = 0;
     let stop = false;
+    // True while this hook is writing type sizes, so the observers do not read
+    // our own work as a new change and start over endlessly.
+    let applying = false;
 
     const restoreAll = () => {
       const node = ref.current;
       if (!node) return;
+      applying = true;
       for (const el of Array.from(node.querySelectorAll<HTMLElement>("[data-refit-applied='1']"))) {
         restore(el);
       }
@@ -186,11 +190,16 @@ export function useAutoRefit(
 
     const pass = () => {
       if (stop || !ref.current) return;
+      applying = true;
       const result = runAutoRefit(ref.current, { floorPx, minScale });
       setSummary(result);
       passes += 1;
       if (result.refitted > 0 && passes < MAX_PASSES) {
         frame = requestAnimationFrame(pass);
+      } else {
+        frame = requestAnimationFrame(() => {
+          applying = false;
+        });
       }
     };
     frame = requestAnimationFrame(pass);
@@ -198,11 +207,13 @@ export function useAutoRefit(
     // A resize or a copy edit changes what will fit, so start again from the
     // authored design rather than measuring the last fit.
     const again = () => {
+      if (applying) return;
       passes = 0;
       cancelAnimationFrame(frame);
       restoreAll();
       frame = requestAnimationFrame(pass);
     };
+
 
     const obs = typeof ResizeObserver !== "undefined" ? new ResizeObserver(again) : null;
     obs?.observe(root);
