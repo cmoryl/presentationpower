@@ -260,9 +260,21 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
             : block.lines
                 .map((line, li) => text(nameTop + li * block.size * 1.05, block.size, line))
                 .join("");
-          const use = showText && block.use
-            ? text(lastLine + block.size * 0.62 + block.useSize * 0.6, block.useSize, block.use)
-            : "";
+          const useRows = block.useLines?.length ? block.useLines : block.use ? [block.use] : [];
+          const use = !showText
+            ? ""
+            : useRows
+                .map((row, ri) =>
+                  text(
+                    lastLine +
+                      block.size * 0.62 +
+                      block.useSize * 0.6 +
+                      ri * block.useSize * 1.15,
+                    block.useSize,
+                    row,
+                  ),
+                )
+                .join("");
           const pad = block.size * 0.32;
           const tagSvg = tag
             ? [
