@@ -53,6 +53,14 @@ export function qeiiRoomTextInk(fill?: string): string {
 
 const shapeHolds = qeiiShapeHolds;
 
+/**
+ * Cutting a plan into room cells is real geometry, so each floor is worked out
+ * once and remembered — the screen plan and every export then read the identical
+ * outlines.
+ */
+const shapeCache = new WeakMap<QeiiFloorVector, QeiiRoomShape[]>();
+
+
 export type QeiiRoomShape = {
   room: string;
   /** Index into floor.shapes of the polygon this room is drawn as. */
