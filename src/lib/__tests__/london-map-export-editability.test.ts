@@ -9,12 +9,10 @@
  *          plate; the only <image> allowed is a linked division lockup.
  *   .ai  — live PDF path operators, room names as live text runs (Tj), named
  *          layers, and NO image XObject anywhere.
- *   PPTX — plan picture + one editable text box per name/use line/key row.
- *   DOCX — plan picture + every room name as live Word text.
- *
- * PowerPoint and Word cannot carry live vector plans, so those two are graded
- * "layered": picture below, every word editable above. That limit is stated in
- * the files themselves and asserted here so it can never silently widen.
+ *   PPTX — plan as custom-geometry shapes (no picture at all) + one editable
+ *          text box per name/use line/key row.
+ *   DOCX — plan as a group of Word custom-geometry shapes (no picture) + every
+ *          room name as live Word text.
  */
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import JSZip from "jszip";
@@ -106,14 +104,15 @@ describe("London map exports are editable", () => {
       const xml = await zip.file("ppt/slides/slide1.xml")!.async("string");
       const copy = copyOf(floor);
 
-      // One picture (the plan) and nothing else rasterised.
-      expect(xml.match(/<p:pic>/g)?.length ?? 0).toBe(1);
+      // Nothing rasterised: the plan is live shapes.
+      expect(xml.match(/<p:pic>/g)?.length ?? 0).toBe(0);
+      expect(xml.match(/<a:custGeom>/g)?.length ?? 0).toBeGreaterThanOrEqual(20);
       // Every line is a real editable run.
       expect(xml.match(/<a:t>/g)?.length ?? 0).toBeGreaterThanOrEqual(copy.lines.length);
       for (const line of copy.lines) {
         expect(xml).toContain(`<a:t>${line.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</a:t>`);
       }
-      expect(res.notes.join(" ")).toMatch(/live PowerPoint text/i);
+      expect(res.notes.join(" ")).toMatch(/live PowerPoint shapes/i);
     },
     120_000,
   );
@@ -128,11 +127,15 @@ describe("London map exports are editable", () => {
       const copy = copyOf(floor);
 
       expect(xml.match(/<w:drawing>/g)?.length ?? 0).toBe(1);
+      // The plan itself is a group of editable Word shapes, not a picture.
+      expect(xml).toContain("<wpg:wgp>");
+      expect(xml.match(/<a:custGeom>/g)?.length ?? 0).toBeGreaterThanOrEqual(20);
+      expect(xml).not.toContain("<pic:pic>");
       for (const line of [...copy.names, ...copy.key]) {
         expect(xml).toContain(line.replace(/&/g, "&amp;").replace(/</g, "&lt;"));
       }
-      expect(zip.file("word/media/plan.png")).toBeTruthy();
-      expect(res.notes.join(" ")).toMatch(/live Word text/i);
+      expect(zip.file("word/media/plan.png")).toBeNull();
+      expect(res.notes.join(" ")).toMatch(/editable group of Word shapes/i);
     },
     120_000,
   );
