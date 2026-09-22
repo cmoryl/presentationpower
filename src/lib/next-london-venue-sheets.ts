@@ -92,7 +92,7 @@ export const LONDON_VENUE_SHEETS: VenueSheet[] = [
     w: 1123,
     h: 1587,
     rooms: ["Churchill Gallery", "Pickwick"],
-    facilities: ["Catering lift", "Void"],
+    facilities: [],
   },
   {
     id: "second",
@@ -104,7 +104,7 @@ export const LONDON_VENUE_SHEETS: VenueSheet[] = [
     w: 1123,
     h: 1587,
     rooms: ["Victoria", "Albert", "Redgrave", "Burton", "Gielgud", "Olivier"],
-    facilities: ["Catering lift", "Void"],
+    facilities: [],
   },
   {
     id: "third",
@@ -116,7 +116,7 @@ export const LONDON_VENUE_SHEETS: VenueSheet[] = [
     w: 1123,
     h: 1587,
     rooms: ["Fleming", "Whittle", "Britten", "Guild"],
-    facilities: ["West Room", "East Room", "Kitchen", "Catering lift", "Mezzanine Level"],
+    facilities: ["West Room", "East Room", "Kitchen", "Mezzanine Level"],
   },
   {
     id: "fourth",
@@ -141,7 +141,7 @@ export const LONDON_VENUE_SHEETS: VenueSheet[] = [
       "Rutherford",
       "Abbey",
     ],
-    facilities: ["Garden", "Courtyard", "Void"],
+    facilities: ["Garden", "Courtyard"],
   },
   {
     id: "fifth",
@@ -153,7 +153,7 @@ export const LONDON_VENUE_SHEETS: VenueSheet[] = [
     w: 1123,
     h: 1587,
     rooms: ["Windsor", "Cambridge", "Turing", "Berners-Lee", "Darwin", "Hawking"],
-    facilities: ["Stage/Screen", "Void"],
+    facilities: ["Stage/Screen"],
   },
   {
     id: "sixth",
