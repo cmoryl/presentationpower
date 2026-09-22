@@ -304,10 +304,11 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
           // room keeps the colour it was given.
           const room = block.room;
           const tag = paint.tags.get(room);
+          const roomFill = qeiiRoomTint(roomColours[room], face);
           const ink = tag
             ? qeiiRoomTextInk(tag)
-            : roomColours[room]
-              ? qeiiRoomTextInk(roomColours[room])
+            : roomFill
+              ? qeiiRoomTextInk(roomFill)
               : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face));
           // A light room colour needs the colour lockup, not the reverse one.
           // A light room fill would swallow the reverse lockup, so that one falls
