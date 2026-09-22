@@ -157,6 +157,7 @@ import { Route as KnowledgeBrandGuidesElementRouteImport } from './routes/knowle
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
 import { Route as EventsNextVenuesRouteImport } from './routes/events.next_.venues'
 import { Route as EventsNextVenueRouteImport } from './routes/events.next_.venue'
+import { Route as EventsNextSanFranciscoRouteImport } from './routes/events.next_.san-francisco'
 import { Route as EventsNextPlaybookRouteImport } from './routes/events.next_.playbook'
 import { Route as EventsNextPillarsRouteImport } from './routes/events.next_.pillars'
 import { Route as EventsNextMartRouteImport } from './routes/events.next_.mart'
@@ -944,6 +945,11 @@ const EventsNextVenueRoute = EventsNextVenueRouteImport.update({
   path: '/next/venue',
   getParentRoute: () => EventsRoute,
 } as any)
+const EventsNextSanFranciscoRoute = EventsNextSanFranciscoRouteImport.update({
+  id: '/next_/san-francisco',
+  path: '/next/san-francisco',
+  getParentRoute: () => EventsRoute,
+} as any)
 const EventsNextPlaybookRoute = EventsNextPlaybookRouteImport.update({
   id: '/next_/playbook',
   path: '/next/playbook',
@@ -1299,6 +1305,7 @@ export interface FileRoutesByFullPath {
   '/events/next/mart': typeof EventsNextMartRoute
   '/events/next/pillars': typeof EventsNextPillarsRoute
   '/events/next/playbook': typeof EventsNextPlaybookRoute
+  '/events/next/san-francisco': typeof EventsNextSanFranciscoRoute
   '/events/next/venue': typeof EventsNextVenueRoute
   '/events/next/venues': typeof EventsNextVenuesRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
@@ -1482,6 +1489,7 @@ export interface FileRoutesByTo {
   '/events/next/mart': typeof EventsNextMartRoute
   '/events/next/pillars': typeof EventsNextPillarsRoute
   '/events/next/playbook': typeof EventsNextPlaybookRoute
+  '/events/next/san-francisco': typeof EventsNextSanFranciscoRoute
   '/events/next/venue': typeof EventsNextVenueRoute
   '/events/next/venues': typeof EventsNextVenuesRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
@@ -1670,6 +1678,7 @@ export interface FileRoutesById {
   '/events/next_/mart': typeof EventsNextMartRoute
   '/events/next_/pillars': typeof EventsNextPillarsRoute
   '/events/next_/playbook': typeof EventsNextPlaybookRoute
+  '/events/next_/san-francisco': typeof EventsNextSanFranciscoRoute
   '/events/next_/venue': typeof EventsNextVenueRoute
   '/events/next_/venues': typeof EventsNextVenuesRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
@@ -1859,6 +1868,7 @@ export interface FileRouteTypes {
     | '/events/next/mart'
     | '/events/next/pillars'
     | '/events/next/playbook'
+    | '/events/next/san-francisco'
     | '/events/next/venue'
     | '/events/next/venues'
     | '/knowledge/brand-guides/$slug'
@@ -2042,6 +2052,7 @@ export interface FileRouteTypes {
     | '/events/next/mart'
     | '/events/next/pillars'
     | '/events/next/playbook'
+    | '/events/next/san-francisco'
     | '/events/next/venue'
     | '/events/next/venues'
     | '/knowledge/brand-guides/$slug'
@@ -2229,6 +2240,7 @@ export interface FileRouteTypes {
     | '/events/next_/mart'
     | '/events/next_/pillars'
     | '/events/next_/playbook'
+    | '/events/next_/san-francisco'
     | '/events/next_/venue'
     | '/events/next_/venues'
     | '/knowledge/brand-guides/$slug'
@@ -3396,6 +3408,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsNextVenueRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/events/next_/san-francisco': {
+      id: '/events/next_/san-francisco'
+      path: '/next/san-francisco'
+      fullPath: '/events/next/san-francisco'
+      preLoaderRoute: typeof EventsNextSanFranciscoRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/playbook': {
       id: '/events/next_/playbook'
       path: '/next/playbook'
@@ -3757,6 +3776,7 @@ interface EventsRouteChildren {
   EventsNextMartRoute: typeof EventsNextMartRoute
   EventsNextPillarsRoute: typeof EventsNextPillarsRoute
   EventsNextPlaybookRoute: typeof EventsNextPlaybookRoute
+  EventsNextSanFranciscoRoute: typeof EventsNextSanFranciscoRoute
   EventsNextVenueRoute: typeof EventsNextVenueRoute
   EventsNextVenuesRoute: typeof EventsNextVenuesRoute
   EventsNextLondonBookletRoute: typeof EventsNextLondonBookletRoute
@@ -3788,6 +3808,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextMartRoute: EventsNextMartRoute,
   EventsNextPillarsRoute: EventsNextPillarsRoute,
   EventsNextPlaybookRoute: EventsNextPlaybookRoute,
+  EventsNextSanFranciscoRoute: EventsNextSanFranciscoRoute,
   EventsNextVenueRoute: EventsNextVenueRoute,
   EventsNextVenuesRoute: EventsNextVenuesRoute,
   EventsNextLondonBookletRoute: EventsNextLondonBookletRoute,
