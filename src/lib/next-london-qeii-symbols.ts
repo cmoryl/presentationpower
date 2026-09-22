@@ -71,7 +71,7 @@ function symbolGroups(floor: QeiiFloorVector): SymbolGroup[] {
 const QEII_TRACED_FLOORS = new Set(["third"]);
 
 /** Anything at or under this size on a traced floor is pictogram debris. */
-const TRACED_SYMBOL_MAX = 20;
+const TRACED_SYMBOL_MAX = 26;
 
 /** Shape indexes to leave undrawn on a traced floor: the pictogram debris. */
 export function qeiiTracedSymbolShapes(floor: QeiiFloorVector): Set<number> {
