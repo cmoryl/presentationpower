@@ -414,9 +414,13 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
         noteSet.add(`${room} has no room for its division lockup on the plan.`);
       }
     }
-    if (holder && !insideHolder) {
+    // Only report this when the block genuinely runs outside the space the artwork
+    // draws for the room. A block that simply had to give way to a neighbouring
+    // name is still inside its own room, and saying otherwise misreads the sheet.
+    if (holder && !qeiiRectInside(chosen.box, holder, chosen.size * 0.22)) {
       noteSet.add(`${room} is printed wider than the space the issued artwork draws for it.`);
     }
+
 
     // A saved nudge is a deliberate human correction, so it is applied after the
     // automatic placement and moves the whole block, ring and all.
