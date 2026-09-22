@@ -24,7 +24,7 @@ SRC = Path(__file__).resolve().parent.parent / "src/lib/next-london-qeii-vectors
 # A white fill larger than this share of the sheet is part of the traced wall
 # band, not artwork drawn inside a room: on the drawn floors the largest white
 # fill is a thousandth of the sheet.
-BAND_SHARE = 0.004
+BAND_SHARE = 0.0008
 SHAPE = re.compile(r'^(\s*)\{ d: "(.*?)", fill: "(#\w+)"(.*)\},\s*$')
 
 
