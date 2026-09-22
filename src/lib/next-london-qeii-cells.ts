@@ -371,11 +371,15 @@ export function qeiiCutCell(
   } catch {
     return undefined;
   }
-  const hit = pieces.find((poly) => poly[0] && inClipRing(poly[0], x, y));
-  if (!hit || !hit[0]) return undefined;
+  const raw = pieces.find((poly) => poly[0] && inClipRing(poly[0], x, y));
+  if (!raw || !raw[0]) return undefined;
   // The piece is only this room's when no other room's label sits in it. Two labels
   // in one piece means the wall between them is not drawn in the issued artwork.
-  if (others.some((o) => inClipRing(hit[0]!, o.x, o.y))) return undefined;
+  if (others.some((o) => inClipRing(raw[0]!, o.x, o.y))) return undefined;
+  const hit = qeiiTidyPoly(raw);
+  if (!hit[0]) return undefined;
+  // The tidy pass must not move the room out from under its own label.
+  if (!inClipRing(hit[0], x, y)) return undefined;
   const area = polyArea(hit[0]) - hit.slice(1).reduce((s, h) => s + polyArea(h), 0);
   if (area <= 0) return undefined;
   const planArea = floor.w * floor.h;
@@ -385,6 +389,7 @@ export function qeiiCutCell(
     planShare: planArea > 0 ? area / planArea : 1,
   };
 }
+
 
 /**
  * Cut a room cell, carrying wall runs a little further along their own direction
