@@ -52,10 +52,66 @@ function strokeOp(hex: string | undefined, fallback: [number, number, number]): 
   return `${f3(r)} ${f3(g)} ${f3(b)} RG`;
 }
 
-/** PDF string literal escaping. */
-function pdfText(value: string): string {
-  return value.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+/**
+ * Curly quotes, dashes and bullets the venue's wording actually uses, mapped to
+ * the WinAnsi codes the PDF face reads. Without this the byte writer truncates
+ * them to control characters and a name like STOREY’S GATE loses its apostrophe.
+ */
+const WIN_ANSI: Record<string, string> = {
+  "\u2018": "\u0091",
+  "\u2019": "\u0092",
+  "\u201A": "\u0082",
+  "\u201C": "\u0093",
+  "\u201D": "\u0094",
+  "\u201E": "\u0084",
+  "\u2020": "\u0086",
+  "\u2021": "\u0087",
+  "\u2022": "\u0095",
+  "\u2026": "\u0085",
+  "\u2013": "\u0096",
+  "\u2014": "\u0097",
+  "\u2030": "\u0089",
+  "\u2039": "\u008B",
+  "\u203A": "\u009B",
+  "\u20AC": "\u0080",
+  "\u2122": "\u0099",
+  "\u0152": "\u008C",
+  "\u0153": "\u009C",
+  "\u0160": "\u008A",
+  "\u0161": "\u009A",
+  "\u0178": "\u009F",
+  "\u017D": "\u008E",
+  "\u017E": "\u009E",
+  "\u0192": "\u0083",
+  "\u02C6": "\u0088",
+  "\u02DC": "\u0098",
+};
+
+/** Fold one character into a byte the PDF face can print, honestly or not at all. */
+function winAnsiChar(ch: string): string {
+  const mapped = WIN_ANSI[ch];
+  if (mapped) return mapped;
+  if (ch.charCodeAt(0) <= 0xff) return ch;
+  // Anything outside the face is normalised to its closest plain letter rather
+  // than written as a broken byte.
+  const plain = ch.normalize("NFKD").replace(/[^\x20-\xff]/g, "");
+  return plain;
 }
+
+/** Text as a WinAnsi-safe PDF string literal. */
+export function qeiiPdfCopy(value: string): string {
+  return [...value]
+    .map(winAnsiChar)
+    .join("")
+    .replace(/\\/g, "\\\\")
+    .replace(/\(/g, "\\(")
+    .replace(/\)/g, "\\)");
+}
+
+function pdfText(value: string): string {
+  return qeiiPdfCopy(value);
+}
+
 
 /** Rough advance width of Helvetica text, used to centre a line. */
 function textWidth(text: string, size: number): number {
