@@ -176,7 +176,8 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
       if (typeof saved.markScale === "number") setMarkScale(saved.markScale);
       if (typeof saved.wallWeight === "number") setWallWeight(saved.wallWeight);
       if (typeof saved.showAllSymbols === "boolean") setShowAllSymbols(saved.showAllSymbols);
-      if (saved.roomColourMap) setRoomColourMap(saved.roomColourMap);
+      if (saved.roomColourMap)
+        setRoomColourMap((prev) => ({ ...prev, ...saved.roomColourMap }));
       if (saved.keyLabelMap) setKeyLabelMap(saved.keyLabelMap);
     } catch {
       // A stored setting we cannot read is ignored; the house defaults stand.
