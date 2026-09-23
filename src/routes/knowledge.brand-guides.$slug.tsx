@@ -583,6 +583,13 @@ function BrandGuideView() {
         </Section>
       )}
 
+      {/* Backgrounds & gradients used for NEXT 2026 */}
+      {guideHasGrounds(guide.slug) && (
+        <Section title="Backgrounds & gradients" eyebrow="07a">
+          <GuideGrounds slug={guide.slug} />
+        </Section>
+      )}
+
       {/* Approved icon library */}
       <Section title="Approved icons" eyebrow="07b">
         <BrandIconLibrary slug={guide.slug} hero={hero} />
