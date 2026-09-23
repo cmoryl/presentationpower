@@ -54,9 +54,34 @@ export const DeckSchema = z
   })
   .passthrough();
 
-export const SaveInput = z.object({ brief: BriefSchema, deck: DeckSchema });
+export const SaveInput = z.object({
+  brief: BriefSchema,
+  deck: DeckSchema,
+  /**
+   * The `updated_at` this editor believes the saved deck carries — captured when
+   * it was opened or last saved.
+   *
+   * Saves used to be last-write-wins: two people (or two tabs) editing the same
+   * deck silently overwrote each other, and neither was told. When this is
+   * supplied and the saved row has moved on since, the save is refused instead
+   * of destroying the other person's work. Omitted = no guard, which is how a
+   * brand-new deck and older clients behave.
+   */
+  baseUpdatedAt: z.string().optional(),
+});
 
 export type SaveDeckInput = z.infer<typeof SaveInput>;
+
+/** Raised when the saved deck moved on since this editor opened it. */
+export class DeckConflictError extends Error {
+  readonly conflict = true;
+  constructor(readonly serverUpdatedAt: string) {
+    super(
+      "Someone else saved changes to this deck after you opened it, so your save was stopped to avoid overwriting their work. Reload the deck to see their version, then re-apply your changes.",
+    );
+    this.name = "DeckConflictError";
+  }
+}
 
 // A namespace UUID (v5) — deterministic mapping from nanoid local id → uuid.
 const NS = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
