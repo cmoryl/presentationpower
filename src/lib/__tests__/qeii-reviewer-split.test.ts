@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { qeiiPlanState } from "@/lib/next-london-qeii-plan";
 import { qeiiRoomShapes } from "@/lib/next-london-qeii-rooms";
-import { QEII_REVIEWER_SPLITS } from "@/lib/next-london-qeii-reviewer-splits";
+import {
+  QEII_REVIEWER_SPLITS,
+  qeiiReviewerSplitFor,
+} from "@/lib/next-london-qeii-reviewer-splits";
 
 describe("reviewer-marked room splits", () => {
   it("cuts Victoria and Albert into their own halves", () => {
@@ -21,9 +24,22 @@ describe("reviewer-marked room splits", () => {
 
   it("only splits what the reviewer marked", () => {
     expect(QEII_REVIEWER_SPLITS).toHaveLength(1);
+    expect(QEII_REVIEWER_SPLITS[0]!.rooms).toEqual(["Victoria", "Albert"]);
     const state = qeiiPlanState("second");
     const rooms = qeiiRoomShapes(state!.floor);
-    // Olivier and Burton were merged, not split, so no divider is drawn for them.
-    expect(rooms.find((r) => r.room === "Gielgud")?.cell).toBeFalsy();
+    // Olivier and Burton were merged, not split, so the reviewer table draws no
+    // divider for them and no other room is handed a split partner.
+    for (const room of rooms) {
+      const split = qeiiReviewerSplitFor(
+        "second",
+        room.room,
+        room.sharedWith ?? [],
+      );
+      if (room.room === "Victoria" || room.room === "Albert") {
+        expect(split).toBeDefined();
+      } else {
+        expect(split).toBeUndefined();
+      }
+    }
   });
 });
