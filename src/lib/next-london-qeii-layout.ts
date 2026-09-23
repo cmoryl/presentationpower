@@ -48,6 +48,9 @@ export const QEII_LABEL_MAX_SHARE = 0.042;
 /** The event line and the lockup are set from the room name's size. */
 export const QEII_USE_RATIO = 0.74;
 export const QEII_MARK_RATIO = 1.9;
+/** Floor for the event caption as a share of the plan width — about 3mm on A3. */
+export const QEII_USE_MIN_SHARE = 0.0085;
+
 
 export type QeiiLayoutOptions = {
   labelScale?: number;
@@ -306,8 +309,14 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       ls: string[] = lines,
       us: string[] = variant.use ? [variant.use] : [],
     ): Fit => {
+      // The event line may be set below the room-name floor — it is a caption, not
+      // a room name — so a narrow room such as Brunel on the ground floor can still
+      // carry what it holds at the event instead of losing the line altogether.
+      // The caption floor still prints at about 3mm on the A3 sheet.
+      const useFloor = Math.max(floor.w * QEII_USE_MIN_SHARE * scale, 0.01);
       const useSize =
-        Math.round(Math.min(size * 0.92, Math.max(size * QEII_USE_RATIO, minSize)) * 100) / 100;
+        Math.round(Math.min(size * 0.92, Math.max(size * QEII_USE_RATIO, useFloor)) * 100) / 100;
+
       const markH =
         Math.round(size * QEII_MARK_RATIO * (options.markScale ?? 1) * markFactor * 100) / 100;
 
@@ -344,11 +353,19 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       const wrappedSets: string[][] = [];
       const words = use.split(" ").filter(Boolean);
       for (const rows of [2, 3]) {
-        if (words.length < rows * 2) continue;
+        // A short line of only two or three words — "Registration & Helpdesk" in a
+        // narrow ground-floor room — still has to be allowed to break, or it never
+        // prints at all in the space the artwork draws for it.
+        if (words.length < rows) continue;
+
         const per = Math.ceil(words.length / rows);
         const wrapped: string[] = [];
         for (let w = 0; w < words.length; w += per) wrapped.push(words.slice(w, w + per).join(" "));
-        if (wrapped.length > 1) wrappedSets.push(wrapped);
+        // A row left holding only a joining word ("&", "·") reads as a mistake, so
+        // that break is not offered — the same words are broken elsewhere instead.
+        const orphan = wrapped.some((row) => ["&", "·", "and"].includes(row.trim().toLowerCase()));
+        if (wrapped.length > 1 && !orphan) wrappedSets.push(wrapped);
+
       }
       // Very long event lines cannot remain on one row in the fifth floor's
       // narrow meeting rooms: their holder is part of the floor's large base
@@ -397,7 +414,12 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     // A room in the corner of its space needs to come in along both axes at once —
     // down off the wall above it and in from the wall beside it — so every
     // combination is tried, nearest its printed position first.
-    const offsets = [0, 0.35, -0.35, 0.7, -0.7, 1.05, -1.05, 1.4, -1.4, 2.2, -2.2];
+    // A caption anchored hard against the sheet edge — Brunel on the ground floor
+    // sits at the foot of the plan — needs to come further in than a nudge before
+    // its event line has anywhere to print, so the walk reaches deeper here too.
+    const offsets = [0, ...Array.from({ length: 14 }, (_, i) => (i + 1) * 0.35).flatMap((d) => [d, -d])];
+
+
     const nudges: Array<[number, number]> = offsets
       .flatMap((dx) => offsets.map((dy) => [dx, dy] as [number, number]))
       .sort((a, b) => a[0] * a[0] + a[1] * a[1] - (b[0] * b[0] + b[1] * b[1]));

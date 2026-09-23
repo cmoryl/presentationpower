@@ -9,6 +9,8 @@
 
 import { NEXT_APP_ORIGIN } from "@/lib/next-event";
 import { spaceUseLine, spaceUseMarks, type SpaceUseMark } from "@/lib/next-london-space-use";
+import { qeiiWithCallouts } from "@/lib/next-london-qeii-callouts";
+
 
 import { qeiiRepeatedSymbolShapes, qeiiWallGain, qeiiWallWidth } from "@/lib/next-london-qeii-symbols";
 import { qeiiShapeHolds } from "@/lib/next-london-qeii-geometry";
@@ -232,12 +234,15 @@ export function qeiiPlanState(id: string): QeiiPlanState | undefined {
   const source = qeiiFloorVector(id);
   if (!source) return undefined;
   const dropped = source.labels.filter((label) => qeiiLabelOffPlan(label.text));
-  const floor: QeiiFloorVector = {
+  // The reviewer's own captions for the two scheduled spaces the venue sheet
+  // leaves unnamed are added here, so every plan, export and room list sees them.
+  const floor: QeiiFloorVector = qeiiWithCallouts({
     ...source,
     labels: source.labels.filter(
       (label) => !qeiiLabelOffPlan(label.text) && !qeiiStrayLiftLine(label, dropped),
     ),
-  };
+  });
+
 
   if (floor.kind === "vector" && floor.shapes.length >= 20) {
     return { floor, rebuilt: true };
