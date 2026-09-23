@@ -26,7 +26,9 @@ describe("QEII room colours", () => {
   it("fills a room drawn on its own and cuts one sharing a shape", () => {
     const floor = qeiiFloorVector("fourth")!;
     const paint = qeiiColourPaint(floor, { Westminster: "#FFEB66", Abbey: "#A1FBF9" });
-    expect(paint.fills.size).toBe(1); // Westminster has its own shape
+    // Westminster is cut to its own walls, so its colour is a cell, not the whole block.
+    expect(paint.fills.size).toBe(0);
+    expect(paint.cells.find((c) => c.room === "Westminster")?.hex).toBe("#FFEB66");
     // Abbey shares a block with Moore and Rutherford, but the issued walls close it,
     // so it is filled with its own cut outline rather than tagged.
     const abbey = paint.cells.find((c) => c.room === "Abbey");

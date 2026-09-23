@@ -149,6 +149,19 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
         : [];
       const cut = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, others, extraRuns);
       if (cut && cut.planShare <= QEII_CELL_MAX_PLAN_SHARE) cell = cut.d;
+    } else {
+      // A room that is the only name in its block can still be drawn inside a
+      // bigger block whose walls close it in at an angle (St. James, Westminster).
+      // Cut it along those walls too, so its colour stops at the room's walls
+      // instead of filling the whole rectangle behind them.
+      const cut = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, [], []);
+      if (
+        cut &&
+        cut.share >= 0.15 &&
+        cut.share < 0.985 &&
+        cut.planShare <= QEII_CELL_MAX_PLAN_SHARE
+      )
+        cell = cut.d;
     }
     // Which later block paints over this room's space. The issued sheets draw
     // some wings after the room block they sit on top of, so a colour written
@@ -248,6 +261,8 @@ export function qeiiColourPaint(floor: QeiiFloorVector, rooms: QeiiRoomColours):
       });
     if (!hex) continue;
     if (qeiiRoomIsExclusive(entry)) {
+      // Cut to its walls: the cell carries the colour, the block stays pale.
+      if (entry.cell) continue;
       fills.set(entry.shapeIndex, hex);
       // A room drawn as its own shape can still sit under a block the sheet
       // draws later. Re-draw the room's own outline — the identical path, so no
