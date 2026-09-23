@@ -36,7 +36,7 @@ export type NextDivision = {
 };
 
 /** Public origin for this TransPerfect Element deployment. */
-export const NEXT_APP_ORIGIN = "https://presentationpower.lovable.app";
+export const NEXT_APP_ORIGIN = "https://transperfectelement.lovable.app";
 
 /**
  * Canonical live agenda board for NEXT 2026 London — the single URL any QR code

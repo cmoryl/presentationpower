@@ -3,4 +3,4 @@
 - [x] 2. Venue intake checklist per event
 - [x] 3. Online venue research (suggestions only, confirm to use)
 - [x] 5. "Start this event" step (button + events assistant tool)
-- [ ] 4. Map system for any venue — QEII look/colour/export engine still reads London data; needs a venue-neutral floor shape (next job)
+- [x] 4. Any venue loads its own floors (SVG import → same map engine) at /events/next/maps/<event>

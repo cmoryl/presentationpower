@@ -132,6 +132,11 @@ export type QeiiPlanOptions = {
   showAllSymbols?: boolean;
   /** Saved live edits: corrected names, corrected lines, nudged positions. */
   edits?: QeiiMapEdits;
+  /**
+   * Venue framing for the sheet. Defaults to the QEII Centre; another event
+   * passes its own venue name and floor tabs so nothing London prints on it.
+   */
+  sheet?: { venueName: string; tabs: { id: string; label: string }[] };
 };
 
 /**
@@ -455,8 +460,10 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
   const H = floor.h + keyH;
   const defs = `${options.markVariant === "black" ? qeiiMarkBlackFilter() : ""}${qeiiGradientDefs(face)}${qeiiCellGradientDefs(paint.cells, face)}`;
   const body = [`<rect width="${W}" height="${H}" fill="${qeiiPlanGround(face)}"/>`, shapes, labels, keySvg].join("");
-  const title = `<title>Queen Elizabeth II Centre — ${floor.title}</title>`;
-  if (face === "signage") return qeiiSignageSheet(floor, W, H, body, defs, title, options.showText !== false);
+  const venue = options.sheet?.venueName ?? "Queen Elizabeth II Centre";
+  const title = `<title>${esc(venue)} — ${esc(floor.title)}</title>`;
+  if (face === "signage")
+    return qeiiSignageSheet(floor, W, H, body, defs, title, options.showText !== false, options.sheet);
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`,
     title,
@@ -491,7 +498,10 @@ function qeiiSignageSheet(
   defs: string,
   title: string,
   showText: boolean,
+  sheet?: QeiiPlanOptions["sheet"],
 ): string {
+  const TABS = sheet?.tabs ?? QEII_SIGNAGE_TABS;
+  const venueBar = (sheet?.venueName ?? "QEII Centre").toUpperCase().replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const SW = Math.max(W, H * 0.62) * 1.34;
   const SH = SW * 1.414;
   const m = SW * 0.035;
@@ -514,8 +524,8 @@ function qeiiSignageSheet(
   const footY = SH - footH;
   const tabW = SW * 0.075;
   const tabTop = bandY + bandH + m;
-  const tabH = (SH - tabTop) / QEII_SIGNAGE_TABS.length;
-  const tabs = QEII_SIGNAGE_TABS.map((t, i) => {
+  const tabH = (SH - tabTop) / TABS.length;
+  const tabs = TABS.map((t, i) => {
     const y = tabTop + i * tabH;
     const lit = t.id === floor.id;
     return (
@@ -537,7 +547,7 @@ function qeiiSignageSheet(
   const foot =
     `<rect x="0" y="${footY}" width="${SW - tabW}" height="${footH}" fill="#003FC7"/>` + footChevrons +
     (showText
-      ? `<text x="${m}" y="${footY + footH / 2}" dominant-baseline="middle" ${font} font-weight="700" font-size="${footH * 0.34}" letter-spacing="${footH * 0.03}" fill="#FFFFFF">QEII CENTRE</text>`
+      ? `<text x="${m}" y="${footY + footH / 2}" dominant-baseline="middle" ${font} font-weight="700" font-size="${footH * 0.34}" letter-spacing="${footH * 0.03}" fill="#FFFFFF">${venueBar}</text>`
       : "");
   const areaX = m;
   const areaY = tabTop;
@@ -547,7 +557,7 @@ function qeiiSignageSheet(
   const px = areaX + (areaW - W * k) / 2;
   const py = areaY + (areaH - H * k) / 2;
   const heading = showText
-    ? `<text x="${m}" y="${m + titleSize * 0.8}" ${font} font-weight="400" font-size="${titleSize}" fill="#03002C">${floor.title}</text>`
+    ? `<text x="${m}" y="${m + titleSize * 0.8}" ${font} font-weight="400" font-size="${titleSize}" fill="#03002C">${floor.title.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text>`
     : "";
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${SW}" height="${SH}" viewBox="0 0 ${SW} ${SH}">`,

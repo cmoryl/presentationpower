@@ -248,7 +248,7 @@ export function buildEventIntakeToolSet(ctx: { supabase: Db }): ToolSet {
           EVENT_INTAKE_ITEMS.map((i) => ({ event_id: id, item_key: i.key, status: "missing" })),
           { onConflict: "event_id,item_key", ignoreDuplicates: true },
         );
-        return { event_id: id, link: `/events/next/intake/${id}`, needs: EVENT_INTAKE_ITEMS.map((i) => i.label) };
+        return { event_id: id, link: `/events/next/intake/${id}`, maps: `/events/next/maps/${id}`, needs: EVENT_INTAKE_ITEMS.map((i) => i.label) };
       },
     }),
 
