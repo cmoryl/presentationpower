@@ -80,7 +80,7 @@ export function QeiiFloorPlan({
   showLabels = true,
   showUse = false,
   showMarks = false,
-  markVariant = "reverse",
+  markVariant = "white",
   markScale = 1,
   roomColours = {},
   keyLabels = {},

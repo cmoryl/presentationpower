@@ -44,6 +44,7 @@ import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { QeiiRoomColourPanel } from "@/components/events/QeiiRoomColourPanel";
 import {
   qeiiColourByDivision,
+  qeiiDefaultRoomColours,
   qeiiSharedShapeNotes,
   type QeiiRoomColours,
 } from "@/lib/next-london-qeii-rooms";
@@ -78,6 +79,20 @@ const VIEW_STORAGE_KEY = "tp-element:qeii-plan-view:v1";
 /** The venue these saved map edits belong to. */
 const VENUE_SLUG = "next-2026-london";
 
+/**
+ * The house starting point: on every rebuilt floor, each space the issued event
+ * schedule puts to use is filled with the approved accent. Rooms the schedule
+ * does not mention stay unfilled.
+ */
+function defaultQeiiColourMap(): Record<string, QeiiRoomColours> {
+  const out: Record<string, QeiiRoomColours> = {};
+  for (const sheet of LONDON_VENUE_SHEETS) {
+    const state = qeiiPlanState(sheet.id);
+    if (state?.rebuilt) out[sheet.id] = qeiiDefaultRoomColours(state.floor);
+  }
+  return out;
+}
+
 function download(url: string, filename: string) {
   const a = document.createElement("a");
   a.href = url;
@@ -110,12 +125,16 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
   const [showLabels, setShowLabels] = useState(true);
   const [showUse, setShowUse] = useState(true);
   const [showMarks, setShowMarks] = useState(true);
-  const [markVariant, setMarkVariant] = useState<QeiiMarkVariant>("reverse");
+  // House default: white lockups only, on the accent-filled rooms.
+  const [markVariant, setMarkVariant] = useState<QeiiMarkVariant>("white");
   const [markScale, setMarkScale] = useState(1);
   const [showColourPanel, setShowColourPanel] = useState(false);
   const [showPlanOptions, setShowPlanOptions] = useState(false);
   // Colours are held per floor, so one sheet's key never leaks onto another.
-  const [roomColourMap, setRoomColourMap] = useState<Record<string, QeiiRoomColours>>({});
+  // Every space the schedule puts to use starts in the approved accent, on all
+  // floors; a saved colour or this browser's own choice still outranks it.
+  const [roomColourMap, setRoomColourMap] =
+    useState<Record<string, QeiiRoomColours>>(defaultQeiiColourMap);
   const [keyLabelMap, setKeyLabelMap] = useState<Record<string, Record<string, string>>>({});
   const [wallWeight, setWallWeight] = useState(QEII_WALL_WEIGHT);
   const [showAllSymbols, setShowAllSymbols] = useState(false);
@@ -172,7 +191,8 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
       if (typeof saved.markScale === "number") setMarkScale(saved.markScale);
       if (typeof saved.wallWeight === "number") setWallWeight(saved.wallWeight);
       if (typeof saved.showAllSymbols === "boolean") setShowAllSymbols(saved.showAllSymbols);
-      if (saved.roomColourMap) setRoomColourMap(saved.roomColourMap);
+      if (saved.roomColourMap)
+        setRoomColourMap((prev) => ({ ...prev, ...saved.roomColourMap }));
       if (saved.keyLabelMap) setKeyLabelMap(saved.keyLabelMap);
     } catch {
       // A stored setting we cannot read is ignored; the house defaults stand.
