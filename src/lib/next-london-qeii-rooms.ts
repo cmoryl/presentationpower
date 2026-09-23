@@ -236,9 +236,34 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
  * Reviewer-confirmed closing lines where the issued drawing leaves an opening
  * in a room's wall. Each continues an existing wall along its own line only.
  */
-const QEII_ROOM_CLOSING_RUNS: Record<string, Record<string, [number, number][][]>> = {
-  // Wordsworth's right-hand wall (x≈394) stops short of the lower diagonal.
-  fourth: { Wordsworth: [[[394, 286], [394, 305]]] },
+export const QEII_ROOM_CLOSING_RUNS: Record<string, Record<string, [number, number][][]>> = {
+  ground: {
+    // Churchill: the top-left diagonal wall carried on to the top wall, the left
+    // wall line, the line along the top of the lower bays, and the right wall
+    // line past the lift — so the colour stops at the hall's own walls.
+    Churchill: [
+      [[245, 105.5], [301, 50]],
+      [[256.5, 95], [256.5, 330]],
+      [[245, 317], [541, 317]],
+      [[528, 276], [528, 330]],
+    ],
+  },
+  fourth: {
+    // Wordsworth's right-hand wall (x≈394) stops short of the lower diagonal.
+    Wordsworth: [[[394, 286], [394, 305]]],
+    // St. James: its upper-left diagonal wall carried on to the WC block, and its
+    // right-hand diagonal carried back to the WC block's corner.
+    "St. James": [
+      [[28, 151], [106, 76]],
+      [[129, 104], [143, 118]],
+    ],
+    // Westminster: closes the corridor band above the inner block, and the lip
+    // below the room by the lift.
+    Westminster: [
+      [[358, 74], [358, 34]],
+      [[410, 236.2], [505, 236.2]],
+    ],
+  },
   // Mountbatten ends at the folding partition (the zigzag line, x≈472.6).
   sixth: {
     Mountbatten: [[[472.6, 70], [472.6, 400]]],
