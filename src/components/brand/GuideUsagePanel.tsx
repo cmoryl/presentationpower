@@ -12,6 +12,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getGuideUsage } from "@/lib/guide-usage.functions";
 import { describeUsageLook, guideUsageDrift, type GuideUsage } from "@/lib/guide-usage";
 import type { BrandGuide } from "@/lib/brand-guides";
+import { useSessionUser } from "@/hooks/use-session-user";
 
 function when(iso: string | null): string {
   if (!iso) return "—";
@@ -23,8 +24,11 @@ function when(iso: string | null): string {
 
 export function GuideUsagePanel({ guide }: { guide: BrandGuide }) {
   const fetchUsage = useServerFn(getGuideUsage);
+  const userId = useSessionUser();
   const q = useQuery({
-    queryKey: ["guide-usage", guide.divisionId],
+    queryKey: ["guide-usage", guide.divisionId, userId],
+    // Only ask once a session exists — the count requires sign-in.
+    enabled: !!userId,
     queryFn: () => fetchUsage({ data: { divisionId: guide.divisionId } }) as Promise<GuideUsage>,
     retry: false,
   });
