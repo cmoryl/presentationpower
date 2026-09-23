@@ -167,9 +167,10 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
       // block's own diagonal — a line stretched across the whole sheet is both
       // pointless and far slower to cut with.
       const reach = blockReach(floor, m.shapeIndex, m.x, m.y);
-      const extraRuns = partner
-        ? [qeiiReviewerSplitRun(m, partner, reach)].filter((run) => run.length)
-        : [];
+      const extraRuns = [
+        ...(partner ? [qeiiReviewerSplitRun(m, partner, reach)].filter((run) => run.length) : []),
+        ...(QEII_ROOM_CLOSING_RUNS[floor.id]?.[m.room] ?? []),
+      ];
       const cut = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, others, extraRuns);
       if (cut && cut.planShare <= QEII_CELL_MAX_PLAN_SHARE) cell = cut.d;
     } else {
