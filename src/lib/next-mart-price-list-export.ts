@@ -194,13 +194,7 @@ export async function buildMartPriceListPdf(
           x: x - box[0]! * scale,
           y: y + box[1]! * scale,
           scale,
-          // The reversed master is a single-colour white mark; only the
-          // full-colour master carries its own declared fills.
-          color: hexRgb(
-            config.face === "light" && shape.fill && shape.fill !== "none"
-              ? shape.fill
-              : "#FFFFFF",
-          ),
+          color: hexRgb(shape.fill && shape.fill !== "none" ? shape.fill : "#FFFFFF"),
           borderWidth: 0,
         });
       }
