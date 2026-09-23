@@ -105,7 +105,18 @@ function MapsPage() {
     () => (floor ? [...new Set(qeiiRoomShapes(floor).map((r) => r.room))].sort() : []),
     [floor],
   );
-  const svg = useMemo(() => (floor ? qeiiPlanSvg(floor, { face, roomColours }) : ""), [floor, face, roomColours]);
+  const plan = q.data?.plan;
+  const sheet = useMemo(
+    () => ({
+      venueName: plan?.venue || plan?.name || "Venue",
+      tabs: rows.map((r) => ({ id: eventFloorId(eventId, r.floor_key), label: r.marker })),
+    }),
+    [plan, rows, eventId],
+  );
+  const svg = useMemo(
+    () => (floor ? qeiiPlanSvg(floor, { face, roomColours, sheet }) : ""),
+    [floor, face, roomColours, sheet],
+  );
 
   async function onFile(file: File) {
     if (!title.trim()) return toast.error("Name the floor first, e.g. “Third floor”.");
@@ -177,7 +188,6 @@ function MapsPage() {
     setColours((c) => ({ ...c, [current.floor_key]: next }));
   };
 
-  const plan = q.data?.plan;
   return (
     <AppShell>
       <div className="mx-auto max-w-6xl space-y-6 px-6 py-8 text-[#03002C]">
