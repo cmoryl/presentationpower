@@ -1811,21 +1811,43 @@ function TextField({
   value,
   onChange,
   placeholder,
+  limit,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
+  /**
+   * How much of this field is kept when the kit is saved. Typing past the limit
+   * used to be accepted here and then silently trimmed on save, so the field now
+   * stops at the same point and says how much room is left.
+   */
+  limit?: number;
 }) {
+  const near = limit ? value.length >= limit * 0.9 : false;
   return (
     <label className="block text-sm">
-      <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-black/50">
-        {label}
+      <div className="mb-1 flex items-baseline justify-between gap-2">
+        <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
+          {label}
+        </div>
+        {limit && near ? (
+          <div
+            className={`text-[10px] font-semibold tabular-nums ${
+              value.length >= limit ? "text-[#E53D2E]" : "text-black/45"
+            }`}
+          >
+            {value.length >= limit
+              ? `${limit} character limit reached`
+              : `${limit - value.length} left`}
+          </div>
+        ) : null}
       </div>
       <input
         type="text"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        maxLength={limit}
+        onChange={(e) => onChange(limit ? e.target.value.slice(0, limit) : e.target.value)}
         placeholder={placeholder}
         className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
       />
