@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -12,6 +12,8 @@ import {
   Sparkles,
   Target,
 } from "lucide-react";
+import { toast } from "sonner";
+import { useOpenCloudDeck } from "@/components/CloudDeckControls";
 import { briefCampaignSearch, type BriefCampaignSearch } from "@/lib/brief-campaign-context";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
@@ -578,5 +580,38 @@ function KitSideCard({
         />
       </span>
     </Link>
+  );
+}
+
+/**
+ * Fetches a brief that lives in the account but not on this device, then lands
+ * on it. Failure is stated plainly rather than leaving a dead button.
+ */
+function FetchSavedBriefButton({ savedId }: { savedId: string }) {
+  const openCloudDeck = useOpenCloudDeck();
+  const [busy, setBusy] = useState(false);
+  return (
+    <button
+      type="button"
+      disabled={busy}
+      onClick={async () => {
+        setBusy(true);
+        try {
+          await openCloudDeck(savedId);
+        } catch (err) {
+          toast.error("Couldn't open this brief", {
+            description:
+              err instanceof Error
+                ? err.message
+                : "It may have been deleted, or it belongs to another account.",
+          });
+        } finally {
+          setBusy(false);
+        }
+      }}
+      className="inline-flex items-center gap-2 rounded-full border border-[#003FC7] px-5 py-2.5 text-sm font-medium text-[#003FC7] disabled:opacity-50"
+    >
+      {busy ? "Opening…" : "Fetch from my account"}
+    </button>
   );
 }
