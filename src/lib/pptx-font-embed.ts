@@ -19,7 +19,6 @@
  * variant being dropped by LibreOffice).
  */
 
-import JSZip from "jszip";
 import {
   CANONICAL_FONTS,
   FONT_PANOSE,
@@ -92,6 +91,7 @@ export async function embedFontsInPptx(
     // Read the bytes first: JSZip only accepts a Blob where the runtime has
     // Blob-reading support (browser). On the server (headless MCP export) a
     // Blob argument throws, which silently dropped font embedding.
+    const { default: JSZip } = await import("jszip");
     const zip = await JSZip.loadAsync(await blob.arrayBuffer());
 
     // Prepare font parts (only those we actually fetched).
