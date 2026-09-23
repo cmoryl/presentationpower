@@ -239,8 +239,8 @@ const QEII_ROOM_CLOSING_RUNS: Record<string, Record<string, [number, number][][]
   fourth: { Wordsworth: [[[394, 286], [394, 305]]] },
   // Mountbatten ends at the folding partition (the zigzag line, x≈472.6).
   sixth: {
-    Mountbatten: [[[472.6, 70], [472.6, 300]]],
-    "General area": [[[472.6, 70], [472.6, 300]]],
+    Mountbatten: [[[472.6, 70], [472.6, 400]]],
+    "General area": [[[472.6, 70], [472.6, 400]]],
   },
 };
 
