@@ -132,6 +132,8 @@ export type QeiiDirectoryOptions = {
   markVariant?: QeiiMarkVariant;
   /** Print the approved lockups; false prints the issued track wording instead. */
   showMarks?: boolean;
+  /** "token" (flat look ground) or a measured event gradient ground id. */
+  groundId?: string;
 };
 
 /**
@@ -143,13 +145,31 @@ export function qeiiDirectorySvg(options: QeiiDirectoryOptions = {}): string {
   const face = options.face ?? "studio";
   const showMarks = options.showMarks ?? true;
   const { w, h } = QEII_DIRECTORY_PAGE;
+  const groundId = options.groundId ?? "token";
+  const ramp = qeiiDirectoryGroundHexes(groundId);
   const ground = qeiiPlanGround(face);
-  const ink = qeiiGroundInk(face);
-  const dark = qeiiLuminance(ground) <= 0.55;
+  // A gradient ground is judged on its darkest stop, so the type and lockups are
+  // legible across the whole run rather than only at the pale end.
+  const deepest = ramp.length
+    ? ramp.reduce((a, b) => (qeiiLuminance(b) < qeiiLuminance(a) ? b : a))
+    : ground;
+  const dark = qeiiLuminance(ramp.length ? deepest : ground) <= 0.55;
+  const ink = ramp.length ? (dark ? "#FFFFFF" : "#03002C") : qeiiGroundInk(face);
   // A reversed ground takes the all-white lockup; a light one takes the colour
   // file, so no lockup is ever printed into a ground it cannot be read on.
   const variant: QeiiMarkVariant = options.markVariant ?? (dark ? "white" : "colour");
   const rule = dark ? "#A1FBF9" : "#003FC7";
+  const gradientId = "qeii-directory-ground";
+  const groundPaint = ramp.length ? `url(#${gradientId})` : ground;
+  const defs = ramp.length
+    ? `<defs><linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">${ramp
+        .map(
+          (hex, i) =>
+            `<stop offset="${((i / (ramp.length - 1)) * 100).toFixed(2)}%" stop-color="${hex}"/>`,
+        )
+        .join("")}</linearGradient></defs>`
+    : "";
+
 
   const marginX = 64;
   const colGap = 46;
