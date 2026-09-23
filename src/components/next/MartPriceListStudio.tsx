@@ -42,8 +42,11 @@ function download(blob: Blob, filename: string) {
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
+  a.rel = "noopener";
+  document.body.append(a);
   a.click();
-  URL.revokeObjectURL(url);
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
 export function MartPriceListStudio() {
