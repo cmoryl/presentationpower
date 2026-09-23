@@ -252,7 +252,8 @@ export function qeiiDirectorySvg(options: QeiiDirectoryOptions = {}): string {
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`,
     `<title>Queen Elizabeth II Centre — Find your way</title>`,
-    `<rect width="${w}" height="${h}" fill="${ground}"/>`,
+    defs,
+    `<rect width="${w}" height="${h}" fill="${groundPaint}"/>`,
     head,
     body.join(""),
     foot,
@@ -262,6 +263,7 @@ export function qeiiDirectorySvg(options: QeiiDirectoryOptions = {}): string {
 
 export const QEII_DIRECTORY_TITLE = "Find your way";
 
-export function qeiiDirectoryFilename(face: QeiiPlanFace): string {
-  return `TP-NEXT-2026-London-QEII-find-your-way-${face}.svg`;
+export function qeiiDirectoryFilename(face: QeiiPlanFace, groundId = "token"): string {
+  const ground = groundId === "token" ? face : `${face}-${groundId}`;
+  return `TP-NEXT-2026-London-QEII-find-your-way-${ground}.svg`;
 }
