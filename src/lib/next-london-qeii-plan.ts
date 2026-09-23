@@ -372,9 +372,11 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
                 `href="${(() => { const u = qeiiMarkUrl(m, variant); return u.startsWith("http") ? u : `${NEXT_APP_ORIGIN}${u}`; })()}"`,
                 `x="${x}" y="${nameTop - block.size * 0.7 - block.markH}" width="${w}" height="${block.markH}"`,
                 'preserveAspectRatio="xMidYMid meet"',
+                variant === "black" ? `filter="url(#${QEII_MARK_BLACK_FILTER_ID})"` : "",
                 transform ? `transform="${transform}"` : "",
                 "/>",
               ]
+
                 .filter(Boolean)
                 .join(" ");
             })
