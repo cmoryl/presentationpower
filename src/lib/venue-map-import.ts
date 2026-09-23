@@ -288,7 +288,6 @@ export function importSvgFloor(
   const labels: QeiiLabel[] = [];
   let arcs = 0;
   let images = 0;
-  let scale = 1;
 
   const styleOf = (el: Element, inherited: Style): Style => {
     const s: Style = { ...inherited };
@@ -357,7 +356,6 @@ export function importSvgFloor(
 
   // The viewBox maps to sheet units 1:1; width/height only scale the page.
   walk(root, I, {});
-  void scale;
 
   const notes: string[] = [];
   if (!raw.length) {
@@ -398,7 +396,7 @@ export function importSvgFloor(
       marker: meta.marker,
       title: meta.title,
       page: meta.page ?? 1,
-      kind: shapes.length >= 20 ? "vector" : "vector",
+      kind: "vector",
       w: r2(maxX - minX + MARGIN * 2),
       h: r2(maxY - minY + MARGIN * 2),
       shapes,
