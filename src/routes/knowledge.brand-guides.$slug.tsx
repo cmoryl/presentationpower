@@ -594,7 +594,7 @@ function BrandGuideView() {
 
       {/* Event signage templates for this division, from the London kit */}
       {GUIDE_GROUND_FAMILY[guide.slug] && (
-        <Section title="Event signage" eyebrow="07b">
+        <Section title="Event signage" eyebrow="Events">
           <p className="mb-4 max-w-2xl text-sm text-muted-foreground">
             Starter NEXT signs for this division, built from the London 2026 kit. Open the full set for
             every sign type and the SVG and Illustrator downloads.
