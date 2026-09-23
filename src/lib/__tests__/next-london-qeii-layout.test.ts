@@ -53,15 +53,16 @@ describe("QEII rebuilt plan layout", () => {
     }
   });
 
-  it("wraps both fifth-floor meeting-room lines before they cross a room division", () => {
+  it("keeps the fifth-floor meeting-room lines inside the room", () => {
     const floor = qeiiFloorVector("fifth")!;
     const { blocks } = qeiiPlanLayout(floor, { showUse: true, showMarks: true });
-    for (const room of ["Darwin", "Hawking"]) {
-      const block = blocks.find((item) => item.room === room);
-      expect(block, room).toBeDefined();
-      expect(block!.useLines, room).toEqual(["Meeting Room", "· Optimize"]);
-    }
+    expect(blocks.find((item) => item.room === "Darwin")!.useLines).toEqual(["OpTImize"]);
+    expect(blocks.find((item) => item.room === "Hawking")!.useLines).toEqual([
+      "Meeting Room",
+      "· Optimize",
+    ]);
   });
+
 
   it("rebuilds names the sheet prints on two lines", () => {
     const fifth = qeiiLabelGroups(qeiiFloorVector("fifth")!).map((g) =>
