@@ -247,6 +247,29 @@ function EventsView() {
                 </span>
               </div>
             </Link>
+            <Link
+              to="/events/next/start"
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-dashed border-[#03002C]/25 bg-white p-5 transition hover:border-[#003FC7]"
+            >
+              <div className="flex items-center justify-between">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#003FC7]/10 text-[#003FC7]">
+                  <Map size={16} />
+                </span>
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-[#03002C]/55">
+                  New event
+                </span>
+              </div>
+              <div className="mt-4 text-lg font-semibold text-[#03002C]">Start a new event</div>
+              <p className="mt-1 flex-1 text-sm text-[#03002C]/70">
+                One step sets up the map set, the checklist of what the venue must send, and a web
+                search for the venue's published plans and rooms.
+              </p>
+              <div className="mt-4 flex items-center justify-end text-[11px]">
+                <span className="inline-flex items-center gap-1 font-medium text-[#003FC7]">
+                  Start <ArrowRight size={12} />
+                </span>
+              </div>
+            </Link>
 
             {EVENT_PLAYBOOKS.map((p) => {
               const Icon = PLAYBOOK_ICON[p.kind] ?? CalendarDays;
