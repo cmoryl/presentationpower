@@ -30,7 +30,8 @@ export type QeiiPlanFace =
   | "line"
   | "press"
   | "wayfinder"
-  | "blueprint";
+  | "blueprint"
+  | "signage";
 
 export type QeiiMapLook = {
   id: QeiiPlanFace;
@@ -56,6 +57,17 @@ export type QeiiMapLook = {
 };
 
 export const QEII_MAP_LOOKS: Record<QeiiPlanFace, QeiiMapLook> = {
+  signage: {
+    id: "signage",
+    name: "Event signage",
+    note: "The NEXT 2026 venue-map sheet: white plan, grey walls, rooms in full division colour, framed with the chevron band, floor tabs and venue bar.",
+    ground: "#FFFFFF",
+    room: "#FFFFFF",
+    circulation: "#FFFFFF",
+    wall: "#666666",
+    wallScale: 0.55,
+    tint: 0,
+  },
   studio: {
     id: "studio",
     name: "House style",
@@ -133,6 +145,7 @@ export const QEII_MAP_LOOKS: Record<QeiiPlanFace, QeiiMapLook> = {
 };
 
 export const QEII_MAP_LOOK_ORDER: QeiiPlanFace[] = [
+  "signage",
   "studio",
   "line",
   "press",
@@ -234,4 +247,34 @@ export function qeiiStyledInk(colour: string | undefined, face: QeiiPlanFace): s
 /** Wall weight for this look, multiplying the house setting. */
 export function qeiiLookWallWeight(face: QeiiPlanFace = "issued", wallWeight?: number): number {
   return (wallWeight ?? 0.55) * qeiiLook(face).wallScale;
+}
+
+
+/**
+ * Rooms the NEXT 2026 venue-map sheet paints as a gradient rather than a flat
+ * colour, in the "signage" look only. Both stops are approved palette colours.
+ */
+export const QEII_SIGNAGE_GRADIENTS: Record<string, [string, string]> = {
+  Churchill: ["#A1FBF9", "#C2A3FF"],
+};
+
+export function qeiiGradientId(room: string): string {
+  return `qeii-grad-${room.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
+}
+
+/** Gradient definitions for the rooms that carry one in this look. */
+export function qeiiGradientDefs(face: QeiiPlanFace): string {
+  if (face !== "signage") return "";
+  return Object.entries(QEII_SIGNAGE_GRADIENTS)
+    .map(
+      ([room, [a, b]]) =>
+        `<linearGradient id="${qeiiGradientId(room)}" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`,
+    )
+    .join("");
+}
+
+/** Fill for a room in this look: its gradient where one is set, else the colour. */
+export function qeiiRoomPaint(room: string, hex: string | undefined, face: QeiiPlanFace): string | undefined {
+  if (face === "signage" && hex && QEII_SIGNAGE_GRADIENTS[room]) return `url(#${qeiiGradientId(room)})`;
+  return hex;
 }
