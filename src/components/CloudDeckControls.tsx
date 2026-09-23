@@ -376,8 +376,36 @@ export function useOpenCloudDeck() {
           : undefined) as Deck["context"],
       };
 
+      // Opening a deck used to replace whatever sat in this slot without looking.
+      // If an unsaved copy is already here (a second tab, a save that never
+      // flushed), overwriting it silently destroys the newer work — so ask.
+      const existing = useDeckStore.getState().decks[localDeckId];
+      if (existing) {
+        const savedSig = useUnsavedStore.getState().savedSig[localDeckId];
+        const currentSig = deckSignature(
+          existing,
+          useDeckStore.getState().briefs[existing.briefId],
+        );
+        if (savedSig && savedSig !== currentSig) {
+          const proceed = window.confirm(
+            "This deck has changes on this device that haven't been saved yet. Opening the saved version will replace them.\n\nOpen the saved version anyway?",
+          );
+          if (!proceed) {
+            navigate({ to: "/decks/$deckId", params: { deckId: localDeckId } });
+            return;
+          }
+        }
+      }
+
       hydrate({ brief: briefLocal, deck: deckLocal });
       useDeckStore.getState().markCloudLinked(localDeckId, true);
+      // Remember which saved version this editor now holds, so its next save can
+      // be checked against it.
+      setDeckStamp(
+        localDeckId,
+        (d as unknown as { updated_at?: string | null }).updated_at ?? null,
+      );
+      markDeckSaved(localDeckId, deckSignature(deckLocal, briefLocal));
       navigate({ to: "/decks/$deckId", params: { deckId: localDeckId } });
     }
   };
