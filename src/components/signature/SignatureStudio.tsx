@@ -124,10 +124,15 @@ export function SignatureStudio() {
     () => (unlocked ? draft : applyBrandLock(draft, brandModeId, { lockupWidth })),
     [draft, brandModeId, lockupWidth, unlocked],
   );
-  const shown = useMemo(
-    () => (replyShort ? replyShortSignature(governed) : governed),
-    [governed, replyShort],
-  );
+  // A field nobody has filled in is left off the signature rather than printed
+  // as an empty label — the person can see exactly what will be sent.
+  const shown = useMemo(() => {
+    const base = replyShort ? replyShortSignature(governed) : governed;
+    return {
+      ...base,
+      sections: base.sections.map((s) => ({ ...s, enabled: s.enabled && s.value.trim().length > 0 })),
+    };
+  }, [governed, replyShort]);
 
   const look = brandSignatureLook(brandModeId);
   const lockup = signatureLockup(brandModeId);
