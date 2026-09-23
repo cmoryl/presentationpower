@@ -209,8 +209,16 @@ export function qeiiColourPaint(floor: QeiiFloorVector, rooms: QeiiRoomColours):
         hex,
       });
     if (!hex) continue;
-    if (qeiiRoomIsExclusive(entry)) fills.set(entry.shapeIndex, hex);
-    else if (!entry.cell) tags.set(entry.room, hex);
+    if (qeiiRoomIsExclusive(entry)) {
+      fills.set(entry.shapeIndex, hex);
+      // A room drawn as its own shape can still sit under a block the sheet
+      // draws later. Re-draw the room's own outline — the identical path, so no
+      // geometry is invented — above that block, or the colour never shows.
+      const after = entry.cellAfter ?? entry.shapeIndex;
+      const own = floor.shapes[entry.shapeIndex];
+      if (after > entry.shapeIndex && own && !entry.cell)
+        cells.push({ room: entry.room, shapeIndex: entry.shapeIndex, after, d: own.d, hex });
+    } else if (!entry.cell) tags.set(entry.room, hex);
   }
   return { fills, tags, cells };
 }
