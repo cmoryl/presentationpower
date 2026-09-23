@@ -129,7 +129,9 @@ export const getDivisionContext = createServerFn({ method: "POST" })
       data.includeImagery
         ? supabase
             .from("division_imagery")
-            .select("id, storage_path, variant")
+            // The column is `variants` (jsonb) — asking for `variant` made
+            // every imagery lookup fail, so packs silently had no images.
+            .select("id, storage_path, variants")
             .eq("division_id", divisionId)
             .limit(30)
         : Promise.resolve({ data: [], error: null } as { data: unknown[]; error: null }),
@@ -157,7 +159,15 @@ export const getDivisionContext = createServerFn({ method: "POST" })
       stats: (statsQ.data ?? []) as DivisionStat[],
       quotes: (quotesQ.data ?? []) as DivisionQuote[],
       knowledge: (knowledgeQ.data ?? []) as unknown as DivisionKnowledgeEntry[],
-      imagery: (imageryQ.data ?? []) as DivisionImageryRef[],
+      imagery: ((imageryQ.data ?? []) as Array<Record<string, unknown>>).map((r) => {
+        const variants = (r["variants"] ?? {}) as Record<string, unknown>;
+        const first = Object.keys(variants)[0] ?? null;
+        return {
+          id: r["id"] as string,
+          storage_path: (r["storage_path"] as string) ?? "",
+          variant: first,
+        } satisfies DivisionImageryRef;
+      }),
       logos,
       caseStudies: [],
     };
