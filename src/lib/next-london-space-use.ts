@@ -336,7 +336,23 @@ const EVENT_DIVISION: [needle: string, divisionId: string][] = [
   ["learnnext", "learn"],
   ["dataforcenext", "dataforce"],
   ["lifesci", "life-sci"],
+  ["nextbrew", "nextbrew"],
 ];
+
+/**
+ * NEXTBrew is a house space, not a division, but it has its own approved
+ * stacked lockup — taken as outlined vectors from the issued table-top sign
+ * (rdraft TABLE TOP SQUARE 600x600mm). It prints black (Blue 800) on the plan
+ * by default; the white file is for dark grounds.
+ */
+const NEXTBREW_MARK: SpaceUseMark = {
+  divisionId: "nextbrew",
+  name: "NEXTBrew",
+  url: "/next-2026/logos/nextbrew-stacked-black.svg",
+  urlReverse: "/next-2026/logos/nextbrew-stacked-white.svg",
+  urlWhite: "/next-2026/logos/nextbrew-stacked-white.svg",
+  ratio: 1.623,
+};
 
 /** The NEXT division whose area holds this space, or undefined for a house space. */
 export function spaceUseDivisionId(use: SpaceUse): string | undefined {
@@ -360,6 +376,7 @@ export type SpaceUseMark = {
 
 /** The approved stacked lockup for one division, or undefined when none is published. */
 export function spaceUseMarkFor(divisionId: string): SpaceUseMark | undefined {
+  if (divisionId === "nextbrew") return NEXTBREW_MARK;
   const suite = nextLockupSuite(divisionId);
   const art = suite?.stacked.url ? suite.stacked : undefined;
   if (!art) return undefined;
