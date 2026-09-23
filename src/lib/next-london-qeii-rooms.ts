@@ -280,11 +280,10 @@ export function qeiiColourByDivision(floor: QeiiFloorVector): QeiiRoomColours {
 }
 
 /**
- * The approved accent every space we are using is filled with by default.
+ * The approved accent a space in use falls back to when no division holds it.
  *
- * One accent across all seven floors, so the set reads as one system: the rooms
- * the event schedule records are accent, everything else stays the pale plan
- * ground. Nothing outside the issued schedule is filled.
+ * House spaces — registration, the mart, the café, circulation in use — carry
+ * the enterprise accent, so the set still reads as one system.
  */
 export const QEII_ROOM_ACCENT = "#003FC7";
 
@@ -301,18 +300,26 @@ export const QEII_DEFAULT_ROOM_COLOUR_OVERRIDES: Record<string, string> = {
 
 /**
  * Default fills for a floor: every space the issued event schedule puts to use —
- * sessions, registration, the mart, the café — in the approved accent.
+ * sessions, registration, the mart, the café — filled with the approved accent
+ * of the NEXT division that holds it.
  *
- * A room the schedule does not mention is left unfilled rather than guessed.
+ * Order is deliberate: a colour the reviewer marked on the proof wins, then the
+ * division's own approved accent, then the enterprise accent for a house space
+ * with no division recorded. A room the schedule does not mention is left
+ * unfilled rather than guessed.
  */
 export function qeiiDefaultRoomColours(floor: QeiiFloorVector): QeiiRoomColours {
   const out: QeiiRoomColours = {};
   for (const entry of qeiiRoomShapes(floor)) {
     if (!spaceUsesForRoom(entry.room, floor.id).length) continue;
-    out[entry.room] = QEII_DEFAULT_ROOM_COLOUR_OVERRIDES[entry.room] ?? QEII_ROOM_ACCENT;
+    out[entry.room] =
+      QEII_DEFAULT_ROOM_COLOUR_OVERRIDES[entry.room] ??
+      qeiiRoomDivisionAccent(entry.room, floor.id) ??
+      QEII_ROOM_ACCENT;
   }
   return out;
 }
+
 
 
 /** The same defaults for a set of floors, keyed by floor id. */
