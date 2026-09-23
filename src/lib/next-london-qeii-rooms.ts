@@ -182,7 +182,9 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
         ...(QEII_ROOM_CLOSING_RUNS[floor.id]?.[m.room] ?? []),
       ];
       const cut = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, others, extraRuns);
-      if (cut && cut.planShare <= QEII_CELL_MAX_PLAN_SHARE) cell = cut.d;
+      // A reviewer-confirmed closing line vouches for the room, whatever its size.
+      const confirmed = Boolean(QEII_ROOM_CLOSING_RUNS[floor.id]?.[m.room]);
+      if (cut && (confirmed || cut.planShare <= QEII_CELL_MAX_PLAN_SHARE)) cell = cut.d;
     } else {
       // A room that is the only name in its block can still be drawn inside a
       // bigger block whose walls close it in at an angle (St. James, Westminster).
