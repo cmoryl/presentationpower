@@ -16,7 +16,7 @@ import {
   qeiiRings,
   qeiiShapeHolds,
 } from "@/lib/next-london-qeii-geometry";
-import { QEII_CELL_MAX_PLAN_SHARE, qeiiCutRoomCell } from "@/lib/next-london-qeii-cells";
+import { QEII_CELL_MAX_PLAN_SHARE, qeiiCutCell, qeiiCutRoomCell } from "@/lib/next-london-qeii-cells";
 import { qeiiLabelGroups } from "@/lib/next-london-qeii-layout";
 import {
   qeiiReviewerSplitFor,
