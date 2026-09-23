@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as SocialRouteImport } from './routes/social'
+import { Route as SignaturesRouteImport } from './routes/signatures'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LooksRouteImport } from './routes/looks'
@@ -204,6 +205,11 @@ const TemplatesRoute = TemplatesRouteImport.update({
 const SocialRoute = SocialRouteImport.update({
   id: '/social',
   path: '/social',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignaturesRoute = SignaturesRouteImport.update({
+  id: '/signatures',
+  path: '/signatures',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -1163,6 +1169,7 @@ export interface FileRoutesByFullPath {
   '/looks': typeof LooksRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/signatures': typeof SignaturesRoute
   '/social': typeof SocialRouteWithChildren
   '/templates': typeof TemplatesRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -1348,6 +1355,7 @@ export interface FileRoutesByTo {
   '/looks': typeof LooksRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/signatures': typeof SignaturesRoute
   '/templates': typeof TemplatesRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -1536,6 +1544,7 @@ export interface FileRoutesById {
   '/looks': typeof LooksRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/signatures': typeof SignaturesRoute
   '/social': typeof SocialRouteWithChildren
   '/templates': typeof TemplatesRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -1726,6 +1735,7 @@ export interface FileRouteTypes {
     | '/looks'
     | '/mcp'
     | '/reset-password'
+    | '/signatures'
     | '/social'
     | '/templates'
     | '/.mcp/list-tools'
@@ -1911,6 +1921,7 @@ export interface FileRouteTypes {
     | '/looks'
     | '/mcp'
     | '/reset-password'
+    | '/signatures'
     | '/templates'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -2098,6 +2109,7 @@ export interface FileRouteTypes {
     | '/looks'
     | '/mcp'
     | '/reset-password'
+    | '/signatures'
     | '/social'
     | '/templates'
     | '/.mcp/list-tools'
@@ -2287,6 +2299,7 @@ export interface RootRouteChildren {
   LooksRoute: typeof LooksRoute
   McpRoute: typeof McpRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SignaturesRoute: typeof SignaturesRoute
   SocialRoute: typeof SocialRouteWithChildren
   TemplatesRoute: typeof TemplatesRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
@@ -2384,6 +2397,13 @@ declare module '@tanstack/react-router' {
       path: '/social'
       fullPath: '/social'
       preLoaderRoute: typeof SocialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signatures': {
+      id: '/signatures'
+      path: '/signatures'
+      fullPath: '/signatures'
+      preLoaderRoute: typeof SignaturesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -3905,6 +3925,7 @@ const rootRouteChildren: RootRouteChildren = {
   LooksRoute: LooksRoute,
   McpRoute: McpRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SignaturesRoute: SignaturesRoute,
   SocialRoute: SocialRouteWithChildren,
   TemplatesRoute: TemplatesRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
