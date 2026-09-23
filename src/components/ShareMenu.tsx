@@ -20,6 +20,7 @@ import { useDeckStore, type Deck, type Brief } from "@/lib/deck-store";
 import { toast } from "sonner";
 import { describeExportError } from "@/lib/export-feedback";
 import { exportDeckToPptx } from "@/lib/pptx-export";
+import { toastExportWarnings } from "@/lib/export-warning-toast";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
@@ -226,6 +227,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
           duration: 12000,
         });
       }
+      toastExportWarnings(res.warnings);
       stamp("pptx");
       toast.success("PowerPoint downloaded", {
         id: progressId,
@@ -294,7 +296,10 @@ export function ShareMenu({ deckId }: { deckId: string }) {
           return t ? { ...s, content: t as typeof s.content } : s;
         }),
       };
-      await exportDeckToPptx(translatedDeck, brand, { strategy: deck.context?.strategy ?? null });
+      const tRes = await exportDeckToPptx(translatedDeck, brand, {
+        strategy: deck.context?.strategy ?? null,
+      });
+      toastExportWarnings(tRes.warnings);
       stamp("pptx");
       toast.success(`${langLabel} PowerPoint downloaded`, { duration: 7000 });
     } catch (e) {

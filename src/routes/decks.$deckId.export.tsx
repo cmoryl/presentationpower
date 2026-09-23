@@ -495,8 +495,12 @@ function ExportView() {
       let held = lastBlobRef.current;
       if (!held) {
         const { exportDeckToPptx } = await import("@/lib/pptx-export");
-        const { blob } = await exportDeckToPptx(deck, brand, { output: "blob" });
+        const { blob, warnings: glWarnings } = await exportDeckToPptx(deck, brand, {
+          output: "blob",
+        });
         if (!blob) throw new Error("Export produced no blob");
+        const { toastExportWarnings } = await import("@/lib/export-warning-toast");
+        toastExportWarnings(glWarnings);
         held = { blob, fileName: `${deck.title.replace(/[^a-z0-9-_]+/gi, "-")}.pptx` };
         lastBlobRef.current = held;
       }
