@@ -35,15 +35,15 @@ describe("NEXT 2026 London event space use", () => {
   it("names the rooms each entry covers, including shared rooms", () => {
     expect(spaceUsesForRoom("Olivier", "second")[0]?.event).toBe("MediaNEXT");
     expect(spaceUsesForRoom("Burton", "second")[0]?.event).toBe("MediaNEXT");
+    // The combined Fleming & Whittle keynote entry is marked elsewhere, so each
+    // room reads its own track on the plan.
     const fleming = spaceUsesForRoom("Fleming", "third").map((u) => u.event);
-    expect(fleming).toEqual(["GlobalLink NEXT", "TransPerfect NEXT"]);
+    expect(fleming).toEqual(["GlobalLink NEXT"]);
   });
 
   it("writes one plain line per room, both uses where a room has two", () => {
     expect(spaceUseLine("Westminster", "fourth")).toBe("Plenary · GamesNEXT");
-    expect(spaceUseLine("Whittle", "third")).toBe(
-      "Plenary · LegalNEXT / Keynote Room · TransPerfect NEXT",
-    );
+    expect(spaceUseLine("Whittle", "third")).toBe("Plenary · LegalNEXT");
     expect(spaceUseLine("Gielgud", "second")).toBe("DigitalNEXT");
     expect(spaceUseLine("Nightingale", "ground")).toBeUndefined();
   });
@@ -68,10 +68,7 @@ describe("NEXT 2026 London event space use", () => {
 describe("division marks on the plans", () => {
   it("gives a room its division lockup, deduplicated where a room holds two", () => {
     expect(spaceUseMarks("Westminster", "fourth").map((m) => m.divisionId)).toEqual(["games"]);
-    expect(spaceUseMarks("Fleming", "third").map((m) => m.divisionId)).toEqual([
-      "globallink",
-      "transperfect",
-    ]);
+    expect(spaceUseMarks("Fleming", "third").map((m) => m.divisionId)).toEqual(["globallink"]);
     expect(spaceUseMarks("Mountbatten", "sixth")[0]?.url).toBeTruthy();
   });
 

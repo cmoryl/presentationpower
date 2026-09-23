@@ -20,6 +20,17 @@ export type SpaceUse = {
   event: string;
   /** Room names on the floor plans this entry covers. */
   rooms: string[];
+  /**
+   * True when the plan marks this use somewhere other than the space's own
+   * caption — set where the reviewer pinned the callout at a different room.
+   */
+  markedElsewhere?: boolean;
+  /**
+   * True when the reviewer asked for this wording printed as written, so the
+   * division name is kept in the line even though its lockup is shown too.
+   */
+  keepWording?: boolean;
+
 };
 
 export const LONDON_SPACE_USE: SpaceUse[] = [
@@ -28,15 +39,21 @@ export const LONDON_SPACE_USE: SpaceUse[] = [
     floor: "Ground Floor",
     sheetId: "ground",
     event: "NEXTBrew",
-    rooms: [],
+    // The venue sheet does not name this space; the reviewer pinned where it sits,
+    // so the plan carries a caption of its own (see next-london-qeii-callouts.ts).
+    rooms: ["Foyer Café Space"],
   },
   {
     space: "Brunel",
     floor: "Ground Floor",
     sheetId: "ground",
     event: "Registration & Helpdesk",
-    rooms: ["Brunel"],
+    // Registration is marked on the plan at the room the reviewer pinned for it,
+    // which is not the Brunel caption, so no line is printed on Brunel itself.
+    rooms: [],
+    markedElsewhere: true,
   },
+
   {
     space: "Cloakroom",
     floor: "Ground Floor",
@@ -119,6 +136,9 @@ export const LONDON_SPACE_USE: SpaceUse[] = [
     fn: "Keynote Room",
     event: "TransPerfect NEXT",
     rooms: ["Fleming", "Whittle"],
+    // The combined keynote configuration: the reviewer asked each room to carry
+    // its own track on the plan, so this entry stays in the schedule only.
+    markedElsewhere: true,
   },
   {
     space: "Abbey",
@@ -182,6 +202,7 @@ export const LONDON_SPACE_USE: SpaceUse[] = [
     floor: "5th Floor",
     sheetId: "fifth",
     event: "LifeSci & OpTImize Mealspace & Networking",
+    keepWording: true,
 
     rooms: ["Cambridge"],
   },
@@ -230,10 +251,12 @@ export function spaceUsesForRoom(room: string, sheetId?: string): SpaceUse[] {
   return LONDON_SPACE_USE.filter(
     (u) =>
       (!sheetId || u.sheetId === sheetId) &&
+      !u.markedElsewhere &&
       (u.space.trim().toLowerCase() === key ||
         u.rooms.some((r) => r.trim().toLowerCase() === key)),
   );
 }
+
 
 /** One short line for a room: "Plenary · GlobalLink NEXT". Undefined when nothing is recorded. */
 export function spaceUseLine(room: string, sheetId?: string): string | undefined {
@@ -265,7 +288,13 @@ export function spaceUseLineWithoutDivisions(
   if (!uses.length) return undefined;
   const lines: string[] = [];
   for (const use of uses) {
+    if (use.keepWording) {
+      const asWritten = [use.fn, use.event].filter(Boolean).join(" · ");
+      if (asWritten && !lines.includes(asWritten)) lines.push(asWritten);
+      continue;
+    }
     const kept = use.event
+
       .split(" / ")
       .map((s) => s.trim())
       .filter((segment) => {
