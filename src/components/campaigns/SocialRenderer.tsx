@@ -12,7 +12,7 @@
 // the shared preset in opposite directions and eventually want bespoke
 // layouts, not pure scaling.
 
-import { useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useAutoRefit } from "@/components/text/AutoRefit";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext } from "@/components/slide/SlideChrome";
@@ -123,6 +123,59 @@ function findBrand(brandId: string): BrandMode {
   return BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0];
 }
 
+// ---- Stack fit -------------------------------------------------------------
+// The copy band has a fixed height. Line clamps bound each block on its own,
+// but nothing bounded the SUM of the blocks, so a long headline plus summary,
+// stat and call to action could total more than the band holds — and a flex
+// column answers that by squeezing every block, which is what printed as
+// blocks of copy sitting on top of one another.
+//
+// This measures the stack against its band after layout and returns one scale
+// for the whole stack, stepping down until it fits. It only ever shrinks, is
+// floored so copy never becomes unreadable, and resets to the authored design
+// whenever the words change.
+const STACK_FIT_FLOOR = 0.62;
+
+function useStackFit(signature: string) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const stackRef = useRef<HTMLDivElement>(null);
+  const [fit, setFit] = useState(1);
+
+  // New words — measure the authored design again, not the last fit.
+  useEffect(() => {
+    setFit(1);
+  }, [signature]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const box = boxRef.current;
+    const stack = stackRef.current;
+    if (!box || !stack) return;
+    let raf = 0;
+    const measure = () => {
+      const avail = box.clientHeight;
+      const need = stack.scrollHeight;
+      if (!avail || !need) return;
+      if (need <= avail + 1) return;
+      setFit((prev) => {
+        if (prev <= STACK_FIT_FLOOR) return prev;
+        // Damped step so wrapping changes converge instead of oscillating.
+        const step = Math.max(0.82, Math.sqrt(avail / need));
+        return Math.max(STACK_FIT_FLOOR, prev * step);
+      });
+    };
+    raf = requestAnimationFrame(measure);
+    const obs = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
+    obs?.observe(box);
+    return () => {
+      cancelAnimationFrame(raf);
+      obs?.disconnect();
+    };
+  }, [signature, fit]);
+
+  return { boxRef, stackRef, fit };
+}
+
 // ---- Stat figure ----------------------------------------------------------
 // Stats used to be "big number + words". This renders them as a small
 // infographic instead: a percentage becomes a donut gauge, a plain figure
@@ -183,6 +236,9 @@ function StatFigure({
       style={{
         marginTop: (short * 1.6) / 100,
         alignSelf: "flex-start",
+        // A stat block must never be squeezed by the flex column it sits in:
+        // a shrunken box clips the figure and the next block rides over it.
+        flexShrink: 0,
         gap,
         // No plate/box behind stats — figures sit directly on the artwork.
         padding: `${pad * 0.2}px 0`,
@@ -442,10 +498,13 @@ export function SocialRenderer({
   // Multilingual refit: translated headlines and summaries are sized down into
   // their boxes inside the approved type floors instead of clipping.
   const frameRef = useRef<HTMLDivElement>(null);
-  useAutoRefit(
-    frameRef,
-    `${format.id}-${copy.title ?? ""}-${copy.summary ?? ""}-${copy.eyebrow ?? ""}`,
-  );
+  const copySignature = `${format.id}-${copy.title ?? ""}-${copy.summary ?? ""}-${copy.eyebrow ?? ""}-${copy.cta ?? ""}`;
+  useAutoRefit(frameRef, copySignature);
+  // Stack fit: the copy band is a fixed box, so a long headline plus a summary,
+  // a stat and a call to action can add up to more than the band holds. This
+  // sizes the WHOLE stack down together until it sits inside the band, which
+  // keeps the authored rhythm instead of letting one block ride over the next.
+  const { boxRef: stackBoxRef, stackRef, fit: stackFit } = useStackFit(copySignature);
   const brand = findBrand(brandId);
   const preset = presetFor(format);
   const tune = format.tune ?? {};
@@ -602,7 +661,8 @@ export function SocialRenderer({
         : 1) *
     (tune.copyScaleMul ?? 1) *
     Math.min(1.35, Math.max(0.7, edit?.typeScale ?? typeScaleProp ?? 1)) *
-    safeFit;
+    safeFit *
+    stackFit;
   const titleLines =
     tune.titleLines ??
     (cls === "landscape-wide" ? (imageUrl ? 3 : 2) : panelMode ? 4 : imageUrl ? 3 : 4);
@@ -877,6 +937,7 @@ export function SocialRenderer({
             capped to the rule-of-thirds copy band so it can never grow into
             the photo's subject third. */}
         <div
+          ref={stackBoxRef}
           className="absolute flex flex-col"
           style={{
             top: contentInset.top,
@@ -888,6 +949,7 @@ export function SocialRenderer({
           }}
         >
           <div
+            ref={stackRef}
             className="flex flex-col"
             // Marker for the corner-rounding visual regression sweep
             // (scripts/visual-regression-social-corners.mjs): only the plate
@@ -898,8 +960,12 @@ export function SocialRenderer({
               // NOTE: width is constrained on the text itself, not here — the
               // plate still needs to bleed full width on full-bleed styles.
 
-              // Soft guide, not a clip: the per-element line clamps do the
-              // bounding, so copy never gets sliced through a line of text.
+              // The stack keeps its natural height: if the column were allowed
+              // to shrink, each block would be squeezed shorter than its own
+              // copy and the next block would print over it. Height is handled
+              // by `stackFit` (which sizes the whole stack down to the band)
+              // rather than by crushing boxes.
+              flexShrink: 0,
               minHeight: 0,
 
               ...(bleedImage ? plateStyle : null),
@@ -913,6 +979,7 @@ export function SocialRenderer({
                   style.eyebrow === "pill"
                     ? {
                         alignSelf: "flex-start",
+                        flexShrink: 0,
                         fontSize: (short * preset.eyebrowPct * 0.95) / 100,
                         letterSpacing: "0.14em",
                         textTransform: "uppercase",
@@ -924,6 +991,7 @@ export function SocialRenderer({
                         padding: `${(short * 0.9) / 100}px ${(short * 1.8) / 100}px`,
                       }
                     : {
+                        flexShrink: 0,
                         fontSize: (short * preset.eyebrowPct) / 100,
                         letterSpacing: "0.18em",
                         textTransform: "uppercase",
@@ -938,6 +1006,7 @@ export function SocialRenderer({
 
             <div
               style={{
+                flexShrink: 0,
                 fontSize: (short * preset.titlePct * style.titleScale * copyScale) / 100,
                 lineHeight: style.titleUppercase ? 1.06 : 1.04,
                 letterSpacing: style.titleTracking,
@@ -956,6 +1025,7 @@ export function SocialRenderer({
             {preset.showSummary && copy.summary && (
               <div
                 style={{
+                  flexShrink: 0,
                   fontSize: (short * preset.summaryPct * copyScale) / 100,
                   lineHeight: 1.28,
                   color: dimColor,
@@ -989,6 +1059,7 @@ export function SocialRenderer({
             {edit?.caption?.trim() ? (
               <div
                 style={{
+                  flexShrink: 0,
                   fontSize: (short * preset.summaryPct * 0.82 * copyScale) / 100,
                   lineHeight: 1.3,
                   color: dimColor,
@@ -1002,7 +1073,7 @@ export function SocialRenderer({
 
             <div
               className="flex flex-wrap items-center gap-3"
-              style={{ marginTop: (short * 1.6) / 100 }}
+              style={{ flexShrink: 0, marginTop: (short * 1.6) / 100 }}
             >
               {showCta && (
                 <span
