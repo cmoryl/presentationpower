@@ -60,12 +60,12 @@ describe("QEII room colours", () => {
     expect(qeiiSharedShapeNotes(floor)).toHaveLength(0);
   });
 
-  it("never paints a room the issued walls leave open", () => {
+  it("paints the half the reviewer marked, and says so", () => {
     const floor = qeiiFloorVector("second")!;
     const paint = qeiiColourPaint(floor, { Victoria: "#FFEB66" });
-    // Victoria and Albert are drawn as one space with no wall between them.
-    expect(paint.tags.get("Victoria")).toBe("#FFEB66");
-    expect(paint.cells.some((c) => c.room === "Victoria")).toBe(false);
+    // The issued walls draw Victoria and Albert as one space; the reviewer marked
+    // it split in half, so the colour fills that half instead of tagging it.
+    expect(paint.cells.some((c) => c.room === "Victoria" && c.hex === "#FFEB66")).toBe(true);
     expect(qeiiSharedShapeNotes(floor).some((n) => n.includes("Victoria"))).toBe(true);
   });
 
