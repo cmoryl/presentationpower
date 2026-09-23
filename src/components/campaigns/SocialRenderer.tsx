@@ -852,7 +852,7 @@ export function SocialRenderer({
 
         {/* Designed ground — light frames without a full-bleed photo used to
             render as near-white voids. A deterministic composition of brand
-            geometry (accent wash, brick rail, hairline grid) gives them a
+            geometry (accent wash, hairline grid, corner rule) gives them a
             designed base at every aspect. */}
         {!bleedImage ? (
           <DesignGround
