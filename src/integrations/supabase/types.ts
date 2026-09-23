@@ -2205,6 +2205,69 @@ export type Database = {
         }
         Relationships: []
       }
+      event_map_floors: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          event_id: string
+          floor_key: string
+          h: number
+          id: string
+          labels: Json
+          marker: string
+          position: number
+          room_colours: Json
+          room_uses: Json
+          shapes: Json
+          source_kind: string
+          source_name: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+          w: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          floor_key: string
+          h: number
+          id?: string
+          labels?: Json
+          marker?: string
+          position?: number
+          room_colours?: Json
+          room_uses?: Json
+          shapes?: Json
+          source_kind?: string
+          source_name?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          w: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          floor_key?: string
+          h?: number
+          id?: string
+          labels?: Json
+          marker?: string
+          position?: number
+          room_colours?: Json
+          room_uses?: Json
+          shapes?: Json
+          source_kind?: string
+          source_name?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          w?: number
+        }
+        Relationships: []
+      }
       event_pillar_versions: {
         Row: {
           config: Json
