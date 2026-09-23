@@ -56,8 +56,10 @@ export function CampaignBundleButton({
         notes: `${deck.slides.length} slides`,
         blob: async () => {
           const { exportDeckToPptx } = await import("@/lib/pptx-export");
-          const { blob } = await exportDeckToPptx(deck, brand, { output: "blob" });
+          const { blob, warnings } = await exportDeckToPptx(deck, brand, { output: "blob" });
           if (!blob) throw new Error("PowerPoint export returned no file");
+          const { toastExportWarnings } = await import("@/lib/export-warning-toast");
+          toastExportWarnings(warnings);
           return blob;
         },
       });

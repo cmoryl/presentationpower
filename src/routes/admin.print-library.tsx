@@ -200,7 +200,15 @@ function PrintLibraryCurator() {
           <button
             type="button"
             disabled={!pickerAsset || publishMutation.isPending}
-            onClick={() =>
+            onClick={() => {
+              // Publishing puts this piece in front of everyone in the business,
+              // so it is confirmed rather than done on one click.
+              if (
+                !window.confirm(
+                  "Publish this piece to the shared library? Everyone will be able to see and reuse it.",
+                )
+              )
+                return;
               publishMutation.mutate(
                 {
                   assetId: pickerAsset,
@@ -213,8 +221,8 @@ function PrintLibraryCurator() {
                     setPickerTitle("");
                   },
                 },
-              )
-            }
+              );
+            }}
             className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white disabled:opacity-50"
           >
             <ArrowUpCircle size={12} /> Publish to library

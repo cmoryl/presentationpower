@@ -18,6 +18,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ToastAssertiveLiveRegion, installToastA11y } from "@/lib/toast-a11y";
 import { UxDebugDock } from "@/components/debug/UxDebugDock";
 import { BackToTop } from "@/components/BackToTop";
+import { ConnectionBanner } from "@/components/ConnectionBanner";
 import { supabase } from "@/integrations/supabase/client";
 import { LOGIN_PATH, isPublicNoLoginPath, loginUrl } from "@/lib/sign-out";
 
@@ -254,6 +255,9 @@ function RootComponent() {
         </ClientLogoPoolProvider>
       </SkinBackdropLibrary>
 
+      {/* Connection state: says plainly when the network is gone, so an empty
+          page is never mistaken for an empty account. */}
+      <ConnectionBanner />
       <Toaster />
       <ToastAssertiveLiveRegion />
       {/* Back-to-top appears on every scrollable page once the user scrolls past the fold. */}

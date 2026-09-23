@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -12,6 +12,8 @@ import {
   Sparkles,
   Target,
 } from "lucide-react";
+import { toast } from "sonner";
+import { useOpenCloudDeck } from "@/components/CloudDeckControls";
 import { briefCampaignSearch, type BriefCampaignSearch } from "@/lib/brief-campaign-context";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
@@ -98,19 +100,30 @@ function BriefOutputHub() {
   const coverVariant = cover ? byId(MODULE_VARIANTS, cover.variantId) : undefined;
 
   if (!deck) {
+    // Saved work opened on another device landed on a flat "not found", which
+    // reads as "your work is gone". When the link points at a saved deck, fetch
+    // it from the account instead of blaming the browser.
+    const savedId = deckId.startsWith("cloud-") ? deckId.slice("cloud-".length) : null;
     return (
       <AppShell>
         <div className="mx-auto max-w-2xl px-6 py-24 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Brief not found</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {savedId ? "Opening this brief…" : "Brief not found"}
+          </h1>
           <p className="mt-2 text-sm text-black/60">
-            This brief isn't in this browser's workspace. Open it from your deck library instead.
+            {savedId
+              ? "This brief is saved to your account but isn't on this device yet. Fetch it below."
+              : "This brief was made in another browser and was never saved to your account, so there's nothing to fetch. Anything you saved is in your deck library."}
           </p>
-          <Link
-            to="/decks"
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white"
-          >
-            Go to decks <ArrowRight size={15} strokeWidth={1.75} />
-          </Link>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            {savedId ? <FetchSavedBriefButton savedId={savedId} /> : null}
+            <Link
+              to="/decks"
+              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white"
+            >
+              Go to decks <ArrowRight size={15} strokeWidth={1.75} />
+            </Link>
+          </div>
         </div>
       </AppShell>
     );
@@ -567,5 +580,38 @@ function KitSideCard({
         />
       </span>
     </Link>
+  );
+}
+
+/**
+ * Fetches a brief that lives in the account but not on this device, then lands
+ * on it. Failure is stated plainly rather than leaving a dead button.
+ */
+function FetchSavedBriefButton({ savedId }: { savedId: string }) {
+  const openCloudDeck = useOpenCloudDeck();
+  const [busy, setBusy] = useState(false);
+  return (
+    <button
+      type="button"
+      disabled={busy}
+      onClick={async () => {
+        setBusy(true);
+        try {
+          await openCloudDeck(savedId);
+        } catch (err) {
+          toast.error("Couldn't open this brief", {
+            description:
+              err instanceof Error
+                ? err.message
+                : "It may have been deleted, or it belongs to another account.",
+          });
+        } finally {
+          setBusy(false);
+        }
+      }}
+      className="inline-flex items-center gap-2 rounded-full border border-[#003FC7] px-5 py-2.5 text-sm font-medium text-[#003FC7] disabled:opacity-50"
+    >
+      {busy ? "Opening…" : "Fetch from my account"}
+    </button>
   );
 }

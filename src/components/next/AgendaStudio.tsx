@@ -3,6 +3,7 @@
 // live files and layered vector press export for Illustrator.
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useDirtyExitGuard } from "@/hooks/use-dirty-exit-guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -247,6 +248,10 @@ export function AgendaStudio({
   // person has already typed.
   const seededRef = useRef<AgendaConfig | undefined>(initialConfig);
   const dirtyRef = useRef(false);
+  // Mirrored in state purely so the browser can warn before the tab closes on
+  // an agenda board that has never been saved.
+  const [dirty, setDirty] = useState(false);
+  useDirtyExitGuard(dirty);
   useEffect(() => {
     if (!initialConfig || seededRef.current === initialConfig) return;
     seededRef.current = initialConfig;
@@ -284,6 +289,9 @@ export function AgendaStudio({
       return create({ data: payload });
     },
     onSuccess: (row: unknown) => {
+      // Saved to the account, so there is no longer unsaved work to warn about.
+      dirtyRef.current = false;
+      setDirty(false);
       const saved = row as AgendaFileRow | null;
       if (saved?.id) setOpenFileId(saved.id);
       if (saved?.name) setFileName(saved.name);
@@ -313,6 +321,7 @@ export function AgendaStudio({
   // arrives later can no longer replace work in progress.
   const editConfig: typeof setConfig = (updater) => {
     dirtyRef.current = true;
+    setDirty(true);
     setConfig(updater);
   };
 
@@ -2088,29 +2097,36 @@ export function AgendaStudio({
                 overRows.has(i) ? "border-destructive/60 bg-destructive/5" : "border-border"
               } ${i >= fit.maxRows ? "opacity-70" : ""}`}
             >
+              {/* Caps match what the printed board can physically hold, so a
+                  pasted paragraph is refused at the keyboard rather than
+                  silently overflowing or being trimmed at save. */}
               <Input
                 aria-label={`Row ${i + 1} time`}
                 value={session.time}
+                maxLength={24}
                 placeholder="09:30"
-                onChange={(e) => setSession(i, { time: e.target.value })}
+                onChange={(e) => setSession(i, { time: e.target.value.slice(0, 24) })}
               />
               <Input
                 aria-label={`Row ${i + 1} title`}
                 value={session.title}
+                maxLength={160}
                 placeholder="Session title"
-                onChange={(e) => setSession(i, { title: e.target.value })}
+                onChange={(e) => setSession(i, { title: e.target.value.slice(0, 160) })}
               />
               <Input
                 aria-label={`Row ${i + 1} detail`}
                 value={session.detail}
+                maxLength={160}
                 placeholder="Speaker or room"
-                onChange={(e) => setSession(i, { detail: e.target.value })}
+                onChange={(e) => setSession(i, { detail: e.target.value.slice(0, 160) })}
               />
               <Input
                 aria-label={`Row ${i + 1} track`}
                 value={session.track}
+                maxLength={48}
                 placeholder="MAIN STAGE"
-                onChange={(e) => setSession(i, { track: e.target.value })}
+                onChange={(e) => setSession(i, { track: e.target.value.slice(0, 48) })}
               />
               {/* Room and mark for this row. Both optional: the row prints
                   exactly as before until one is filled in. */}
@@ -2119,8 +2135,9 @@ export function AgendaStudio({
                   aria-label={`Row ${i + 1} room`}
                   className="max-w-[240px]"
                   value={session.room ?? ""}
+                  maxLength={80}
                   placeholder="Room / floor (optional)"
-                  onChange={(e) => setSession(i, { room: e.target.value })}
+                  onChange={(e) => setSession(i, { room: e.target.value.slice(0, 80) })}
                 />
                 <select
                   aria-label={`Row ${i + 1} mark`}
@@ -2358,6 +2375,7 @@ export function AgendaStudio({
                       onClick={() => {
                         // A deliberate open replaces the board and starts clean.
                         dirtyRef.current = false;
+                        setDirty(false);
                         const opened = normalizeAgendaConfig(row.config);
                         setConfig(opened);
                         setOpenFileId(row.id);

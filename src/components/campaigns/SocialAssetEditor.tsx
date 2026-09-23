@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { SocialRenderer, type SocialRendererProps } from "@/components/campaigns/SocialRenderer";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 import { useIsAdmin } from "@/hooks/use-is-admin";
+import { checkUploadSize } from "@/lib/upload-limits";
 import type { SocialAssetEdit } from "@/lib/social-asset-edit";
 import { clearSocialAssetDefault, saveSocialAssetDefault } from "@/lib/social-asset-edit";
 import { photoForFormat, SOCIAL_PHOTO_SETS } from "@/lib/social-photography";
@@ -342,7 +343,7 @@ function SocialAssetEditorModal({
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   e.target.value = "";
-                  if (f) void onUpload(f);
+                  if (f && checkUploadSize(f)) void onUpload(f);
                 }}
               />
               <div className="flex flex-wrap items-center gap-2">

@@ -128,6 +128,10 @@ function DecksIndex() {
     };
   }, [signedIn, fetchAnalytics, fetchCloud, reloadKey]);
 
+  /** The saved-deck id a local deck belongs to, when it has one. */
+  const savedIdOf = (localId: string) =>
+    localId.startsWith("cloud-") ? localId.slice("cloud-".length) : null;
+
   const reviewByTitle = useMemo(() => {
     const m = new Map<string, ReviewStatus>();
     const order: ReviewStatus[] = ["approved", "in_review", "changes_requested", "draft"];
@@ -140,18 +144,61 @@ function DecksIndex() {
     return m;
   }, [cloudDecks]);
 
-  // Map local decks to view/share data via title match (best-effort — local
-  // deck IDs are nanoids while analytics keys by DB uuid). Multiple same-title
-  // decks accumulate views to the max value.
+  const reviewById = useMemo(() => {
+    const m = new Map<string, ReviewStatus>();
+    for (const r of cloudDecks) m.set(r.id, (r.review_status ?? "draft") as ReviewStatus);
+    return m;
+  }, [cloudDecks]);
+
+  /**
+   * Titles used by more than one saved deck. Two decks both called "Overview"
+   * used to be shown each other's review state and view counts, because the
+   * only thing joining them was the name. Where the name is shared and there is
+   * no id to go on, nothing is shown rather than something wrong.
+   */
+  const ambiguousTitles = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of cloudDecks) {
+      const key = r.title.trim().toLowerCase();
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    for (const s of analytics?.deckStats ?? []) {
+      const key = s.title.trim().toLowerCase();
+      counts.set(key, Math.max(counts.get(key) ?? 0, 1));
+    }
+    const dupes = new Set<string>();
+    const seen = new Map<string, number>();
+    for (const s of analytics?.deckStats ?? []) {
+      const key = s.title.trim().toLowerCase();
+      seen.set(key, (seen.get(key) ?? 0) + 1);
+    }
+    for (const [key, n] of counts) if (n > 1 || (seen.get(key) ?? 0) > 1) dupes.add(key);
+    return dupes;
+  }, [cloudDecks, analytics]);
+
+  /** View/share figures keyed by the saved deck id — the only exact match. */
+  const statsById = useMemo(() => {
+    const m = new Map<string, { views: number; shared: boolean; lastViewedAt: string | null }>();
+    for (const s of analytics?.deckStats ?? []) {
+      m.set(s.deckId, {
+        views: s.views,
+        shared: Boolean(s.shareToken),
+        lastViewedAt: s.lastViewedAt ?? null,
+      });
+    }
+    return m;
+  }, [analytics]);
+
+  // Fallback for decks made in this browser that have no saved id yet: matched
+  // by name, and only when that name belongs to exactly one deck.
   const statsByTitle = useMemo(() => {
     const m = new Map<string, { views: number; shared: boolean; lastViewedAt: string | null }>();
     for (const s of analytics?.deckStats ?? []) {
       const key = s.title.trim().toLowerCase();
-      const prev = m.get(key);
       m.set(key, {
-        views: Math.max(prev?.views ?? 0, s.views),
-        shared: (prev?.shared ?? false) || Boolean(s.shareToken),
-        lastViewedAt: s.lastViewedAt ?? prev?.lastViewedAt ?? null,
+        views: s.views,
+        shared: Boolean(s.shareToken),
+        lastViewedAt: s.lastViewedAt ?? null,
       });
     }
     return m;
@@ -183,7 +230,20 @@ function DecksIndex() {
   const enriched = useMemo(() => {
     return allDecks.map((d) => {
       const key = d.title.trim().toLowerCase();
-      const s = statsByTitle.get(key);
+      const savedId = savedIdOf(d.id);
+      // Exact match by saved deck first; name matching only as a fallback, and
+      // never when that name is shared with another deck.
+      const nameSafe = !ambiguousTitles.has(key);
+      const s = savedId
+        ? statsById.get(savedId) ?? (nameSafe ? statsByTitle.get(key) : undefined)
+        : nameSafe
+          ? statsByTitle.get(key)
+          : undefined;
+      const review = savedId
+        ? reviewById.get(savedId) ?? (nameSafe ? reviewByTitle.get(key) : undefined)
+        : nameSafe
+          ? reviewByTitle.get(key)
+          : undefined;
       const brief = briefs[d.briefId];
       return {
         deck: d,
@@ -191,10 +251,10 @@ function DecksIndex() {
         shared: s?.shared ?? false,
         client: brief?.prospect ?? "",
         industry: brief?.industry ?? "",
-        reviewStatus: reviewByTitle.get(key) ?? null,
+        reviewStatus: review ?? null,
       };
     });
-  }, [allDecks, statsByTitle, briefs, reviewByTitle]);
+  }, [allDecks, statsById, statsByTitle, briefs, reviewById, reviewByTitle, ambiguousTitles]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();

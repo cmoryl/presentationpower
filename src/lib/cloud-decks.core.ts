@@ -54,9 +54,34 @@ export const DeckSchema = z
   })
   .passthrough();
 
-export const SaveInput = z.object({ brief: BriefSchema, deck: DeckSchema });
+export const SaveInput = z.object({
+  brief: BriefSchema,
+  deck: DeckSchema,
+  /**
+   * The `updated_at` this editor believes the saved deck carries — captured when
+   * it was opened or last saved.
+   *
+   * Saves used to be last-write-wins: two people (or two tabs) editing the same
+   * deck silently overwrote each other, and neither was told. When this is
+   * supplied and the saved row has moved on since, the save is refused instead
+   * of destroying the other person's work. Omitted = no guard, which is how a
+   * brand-new deck and older clients behave.
+   */
+  baseUpdatedAt: z.string().optional(),
+});
 
 export type SaveDeckInput = z.infer<typeof SaveInput>;
+
+/** Raised when the saved deck moved on since this editor opened it. */
+export class DeckConflictError extends Error {
+  readonly conflict = true;
+  constructor(readonly serverUpdatedAt: string) {
+    super(
+      "Someone else saved changes to this deck after you opened it, so your save was stopped to avoid overwriting their work. Reload the deck to see their version, then re-apply your changes.",
+    );
+    this.name = "DeckConflictError";
+  }
+}
 
 // A namespace UUID (v5) — deterministic mapping from nanoid local id → uuid.
 const NS = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
@@ -155,11 +180,21 @@ export async function findRecentDuplicateDeck(
 }
 
 /** Upsert a brief + deck + its slides. Owner-scoped through RLS. */
+/**
+ * The saved deck's current `updated_at`, handed back after every save so the
+ * editor can prove on its next save that it is still working from this version.
+ */
+async function readDeckStamp(sb: MinimalSb, deckUuid: string): Promise<string | null> {
+  const { data } = await sb.from("decks").select("updated_at").eq("id", deckUuid);
+  const row = Array.isArray(data) ? (data[0] as { updated_at?: string | null }) : undefined;
+  return row?.updated_at ?? null;
+}
+
 export async function saveDeckToCloudCore(
   supabase: unknown,
   userId: string,
   rawInput: unknown,
-): Promise<{ deckUuid: string; briefUuid: string }> {
+): Promise<{ deckUuid: string; briefUuid: string; serverUpdatedAt: string | null }> {
   const data = SaveInput.parse(rawInput);
   const sb = supabase as MinimalSb;
   const briefUuid = toUuid(`brief:${userId}:${data.brief.id}`);
@@ -193,7 +228,10 @@ export async function saveDeckToCloudCore(
   };
   // An ordinary content save must not reset the deck's lifecycle status — that
   // silently undid whatever moved it out of draft.
-  let { data: existingDeck } = await sb.from("decks").select("status").eq("id", deckUuid);
+  let { data: existingDeck } = await sb
+    .from("decks")
+    .select("status, updated_at")
+    .eq("id", deckUuid);
   const alreadySaved = Array.isArray(existingDeck) && existingDeck.length > 0;
   if (!alreadySaved) {
     // Land on the draft this is a re-save of rather than stacking up another row.
@@ -206,13 +244,28 @@ export async function saveDeckToCloudCore(
     );
     if (dupId) {
       deckUuid = dupId;
-      existingDeck = (await sb.from("decks").select("status").eq("id", deckUuid)).data;
+      existingDeck = (await sb.from("decks").select("status, updated_at").eq("id", deckUuid)).data;
     }
   }
-  const existingStatus = Array.isArray(existingDeck)
-    ? (existingDeck[0] as { status?: string | null } | undefined)?.status
+  const existingRow = Array.isArray(existingDeck)
+    ? (existingDeck[0] as { status?: string | null; updated_at?: string | null } | undefined)
     : undefined;
+  const existingStatus = existingRow?.status;
   const keepStatus = existingStatus ?? "draft";
+
+  // Concurrency guard. Refuse rather than overwrite when the saved deck has been
+  // written by someone else since this editor read it. Compared as instants, so
+  // clock formatting differences can't be mistaken for a conflict.
+  const serverStamp = existingRow?.updated_at ?? null;
+  if (data.baseUpdatedAt && serverStamp) {
+    const base = Date.parse(data.baseUpdatedAt);
+    const server = Date.parse(serverStamp);
+    // One second of slack absorbs storage rounding; anything beyond it is a
+    // genuine write we would be discarding.
+    if (Number.isFinite(base) && Number.isFinite(server) && server - base > 1000) {
+      throw new DeckConflictError(serverStamp);
+    }
+  }
 
   const { error: deckErr } = await sb.from("decks").upsert({
     id: deckUuid,
@@ -243,7 +296,7 @@ export async function saveDeckToCloudCore(
         `This copy of the deck has no slides, but ${existingIds.length} slide(s) are saved in the cloud. Nothing was changed — reload the saved deck before saving again.`,
       );
     }
-    return { deckUuid, briefUuid };
+    return { deckUuid, briefUuid, serverUpdatedAt: await readDeckStamp(sb, deckUuid) };
   }
 
   {
@@ -274,5 +327,5 @@ export async function saveDeckToCloudCore(
     }
   }
 
-  return { deckUuid, briefUuid };
+  return { deckUuid, briefUuid, serverUpdatedAt: await readDeckStamp(sb, deckUuid) };
 }

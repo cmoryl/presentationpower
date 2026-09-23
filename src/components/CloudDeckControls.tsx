@@ -13,6 +13,7 @@ import {
 import { snapshotDeckVersion } from "@/lib/deck-versions.functions";
 import { deckSignature, markDeckSaved, useUnsavedStore } from "@/lib/unsaved-changes";
 import { applySlideExtras, splitSlideContent } from "@/lib/cloud-slide-extras";
+import { getDeckStamp, setDeckStamp } from "@/lib/deck-version-stamp";
 
 import { SaveActionButton } from "@/components/editor/SaveActionButton";
 import { toast } from "sonner";
@@ -115,6 +116,9 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
   const pending = useRef<{ deck: Deck; brief: Brief; serialized: string } | null>(null);
   const saveRef = useRef(save);
   saveRef.current = save;
+  // The conflict message already reported, so a stalled editor isn't told the
+  // same thing on every keystroke.
+  const conflict = useRef<string | null>(null);
 
   // Cloud-loaded decks use "cloud-<id>" — treat as pre-linked.
   useEffect(() => {
@@ -141,13 +145,46 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
     pending.current = null;
     if (timer.current) clearTimeout(timer.current);
     try {
-      await saveRef.current({ data: { deck: p.deck, brief: p.brief } });
+      const res = await saveRef.current({
+        data: {
+          deck: p.deck,
+          brief: p.brief,
+          // Prove which saved version this editor is working from, so a save can
+          // be refused rather than overwrite someone else's newer work.
+          ...(getDeckStamp(deckId) ? { baseUpdatedAt: getDeckStamp(deckId)! } : {}),
+        },
+      });
+      setDeckStamp(deckId, (res as { serverUpdatedAt?: string | null })?.serverUpdatedAt ?? null);
       lastSerialized.current = p.serialized;
       markDeckSaved(deckId, deckSignature(p.deck, p.brief));
       markCloudLinked(deckId, true);
+      conflict.current = null;
       return true;
     } catch (e) {
+      // A conflict is not a transport error: someone else's work is at stake, so
+      // it must be said out loud instead of retried on the next keystroke.
+      const message = e instanceof Error ? e.message : String(e);
+      if (message.includes("Someone else saved changes")) {
+        if (conflict.current !== message) {
+          conflict.current = message;
+          toast.error("This deck changed somewhere else", {
+            description: message,
+            duration: 15000,
+            action: {
+              label: "Reload saved version",
+              onClick: () => window.location.reload(),
+            },
+          });
+        }
+        return false;
+      }
       console.warn("[autosave] save failed", e);
+      toast.error("Your last change didn't save", {
+        description: navigator.onLine
+          ? "The save was refused. Your work is still on screen — try editing again, or reload to see the saved version."
+          : "You appear to be offline. Your work is still on screen and will save once you reconnect.",
+        duration: 10000,
+      });
       return false;
     }
   };
@@ -157,8 +194,20 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
   const registerSaver = useUnsavedStore((s) => s.registerSaver);
   const unregisterSaver = useUnsavedStore((s) => s.unregisterSaver);
   useEffect(() => {
-    if (!signedIn) return;
-    registerSaver(deckId, () => flush.current());
+    if (signedIn) {
+      registerSaver(deckId, () => flush.current());
+      return () => unregisterSaver(deckId);
+    }
+    // Signed out there is nowhere to save to, but the editor keeps the deck on
+    // this device. Register a local-only saver so leaving the page records the
+    // deck as settled instead of showing a "couldn't be saved — leave anyway?"
+    // alarm on every single navigation.
+    registerSaver(deckId, async () => {
+      const d = useDeckStore.getState().decks[deckId];
+      const b = d ? useDeckStore.getState().briefs[d.briefId] : undefined;
+      if (d) markDeckSaved(deckId, deckSignature(d, b));
+      return true;
+    });
     return () => unregisterSaver(deckId);
   }, [deckId, signedIn, registerSaver, unregisterSaver]);
 
@@ -339,8 +388,36 @@ export function useOpenCloudDeck() {
           : undefined) as Deck["context"],
       };
 
+      // Opening a deck used to replace whatever sat in this slot without looking.
+      // If an unsaved copy is already here (a second tab, a save that never
+      // flushed), overwriting it silently destroys the newer work — so ask.
+      const existing = useDeckStore.getState().decks[localDeckId];
+      if (existing) {
+        const savedSig = useUnsavedStore.getState().savedSig[localDeckId];
+        const currentSig = deckSignature(
+          existing,
+          useDeckStore.getState().briefs[existing.briefId],
+        );
+        if (savedSig && savedSig !== currentSig) {
+          const proceed = window.confirm(
+            "This deck has changes on this device that haven't been saved yet. Opening the saved version will replace them.\n\nOpen the saved version anyway?",
+          );
+          if (!proceed) {
+            navigate({ to: "/decks/$deckId", params: { deckId: localDeckId } });
+            return;
+          }
+        }
+      }
+
       hydrate({ brief: briefLocal, deck: deckLocal });
       useDeckStore.getState().markCloudLinked(localDeckId, true);
+      // Remember which saved version this editor now holds, so its next save can
+      // be checked against it.
+      setDeckStamp(
+        localDeckId,
+        (d as unknown as { updated_at?: string | null }).updated_at ?? null,
+      );
+      markDeckSaved(localDeckId, deckSignature(deckLocal, briefLocal));
       navigate({ to: "/decks/$deckId", params: { deckId: localDeckId } });
     }
   };

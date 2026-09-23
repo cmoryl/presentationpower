@@ -95,6 +95,16 @@ export function MobileDeckExport({ deck, brand, blocked, className }: MobileDeck
         const { exportDeckToPptx } = await import("@/lib/pptx-export");
         const res = await exportDeckToPptx(deck, brand, { output: "blob" });
         if (!res.blob) throw new Error("Export produced no file");
+        // A picture or logo that could not be fetched used to be left out in
+        // silence, so a file could be sent to a client missing its artwork.
+        if (res.warnings?.length) {
+          toast.warning(
+            res.warnings.length === 1
+              ? "The file downloaded, with one thing missing"
+              : `The file downloaded, with ${res.warnings.length} things missing`,
+            { description: res.warnings.slice(0, 3).join(" "), duration: 12000 },
+          );
+        }
         blob = res.blob;
         fileName = `${safeName(deck.title)}.pptx`;
         mime = "application/vnd.openxmlformats-officedocument.presentationml.presentation";

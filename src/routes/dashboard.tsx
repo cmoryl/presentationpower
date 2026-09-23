@@ -35,6 +35,7 @@ import { taxonomyQueryOptions } from "@/hooks/use-taxonomy";
 import { QuickCreate } from "@/components/dashboard/QuickCreate";
 import { PersonaHero, type HeroCounter } from "@/components/dashboard/PersonaHero";
 import { personaTheme, type PersonaTheme } from "@/lib/persona-theme";
+import { LoadFailureNotice } from "@/components/LoadFailureNotice";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -197,6 +198,18 @@ function RoleDashboard() {
   const kitRows = useMemo(() => (Array.isArray(kits.data) ? kits.data : []), [kits.data]);
 
   const loading = decks.isLoading || printAssets.isLoading || kits.isLoading;
+
+  // Which reads actually failed, named the way the user names them — so the
+  // notice says what is missing rather than "an error occurred".
+  const loadFailed = decks.isError || printAssets.isError || kits.isError;
+  const failedWhat = [
+    decks.isError ? "saved decks" : null,
+    printAssets.isError ? "print assets" : null,
+    kits.isError ? "campaign kits" : null,
+  ]
+    .filter(Boolean)
+    .join(", ")
+    .replace(/, ([^,]*)$/, " and $1");
 
   // Live projects belong to a named person, so they only appear for that account.
   const myProjects = useMemo(() => liveProjectsFor(sessionEmail), [sessionEmail]);
@@ -502,6 +515,21 @@ function RoleDashboard() {
               hint="Your most recent work across this workspace"
               icon={Clock}
             />
+
+            {/* A failed read used to fall through to an empty list, which read
+                as "you have no saved work". Name the failure instead. */}
+            {loadFailed ? (
+              <LoadFailureNotice
+                what={`Your ${failedWhat}`}
+                className="mt-4"
+                onRetry={() => {
+                  if (decks.isError) void decks.refetch();
+                  if (printAssets.isError) void printAssets.refetch();
+                  if (kits.isError) void kits.refetch();
+                }}
+                retrying={decks.isFetching || printAssets.isFetching || kits.isFetching}
+              />
+            ) : null}
 
             {loading ? (
               <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -24,6 +24,37 @@ export const LOVABLE_GATEWAY_MODEL = "google/gemini-3.6-flash";
 
 export type AiProvider = "anthropic" | "lovable-gateway" | "none";
 
+/**
+ * How long any single model call may take before we stop waiting.
+ *
+ * Without this, a stalled upstream connection never resolved: the request hung
+ * open, the caller's spinner span forever, and the user had no way to tell a
+ * slow answer from a dead one. A timeout converts that into an honest, visible
+ * failure the caller already knows how to report.
+ */
+export const AI_REQUEST_TIMEOUT_MS = 120_000;
+
+/**
+ * `fetch` with a hard deadline, shaped so every existing `!res.ok` branch keeps
+ * working: a timeout or transport fault comes back as a real Response carrying
+ * a plain-language body, never as a hang and never as a silent success.
+ */
+async function aiFetch(url: string, init: RequestInit, timeoutMs = AI_REQUEST_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (err) {
+    const timedOut = controller.signal.aborted;
+    const detail = timedOut
+      ? `The AI service did not respond within ${Math.round(timeoutMs / 1000)} seconds. Nothing was changed — please try again.`
+      : `Could not reach the AI service: ${err instanceof Error ? err.message : String(err)}`;
+    return new Response(detail, { status: timedOut ? 504 : 502 });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export type AnthropicResult =
   | { ok: true; text: string }
   | { ok: false; status: number; body: string };
@@ -64,7 +95,7 @@ async function callAnthropicDirect(
   opts?: { maxTokens?: number; temperature?: number },
 ): Promise<AnthropicResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY!;
-  const res = await fetch(ANTHROPIC_URL, {
+  const res = await aiFetch(ANTHROPIC_URL, {
     method: "POST",
     headers: {
       "x-api-key": apiKey,
@@ -106,7 +137,7 @@ async function callLovableGateway(
   opts?: { maxTokens?: number; temperature?: number },
 ): Promise<AnthropicResult> {
   const apiKey = process.env.LOVABLE_API_KEY!;
-  const res = await fetch(LOVABLE_GATEWAY_URL, {
+  const res = await aiFetch(LOVABLE_GATEWAY_URL, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -213,7 +244,7 @@ async function callAnthropicWithToolsDirect(
       messages: convo,
     };
     if (withTools) body.tools = tools;
-    const res = await fetch(ANTHROPIC_URL, {
+    const res = await aiFetch(ANTHROPIC_URL, {
       method: "POST",
       headers: {
         "x-api-key": apiKey,
@@ -339,7 +370,7 @@ async function callGatewayWithTools(
       messages: convo,
     };
     if (withTools) body.tools = openaiTools;
-    return fetch(LOVABLE_GATEWAY_URL, {
+    return aiFetch(LOVABLE_GATEWAY_URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,

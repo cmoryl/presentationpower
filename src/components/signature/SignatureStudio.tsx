@@ -95,9 +95,13 @@ function applyTemplate(signature: SignatureData, templateId: string): SignatureD
   };
 }
 
+/** Where the in-progress signature is kept on this device between visits. */
+const SIGNATURE_DRAFT_KEY = "element.signature.draft.v1";
+
 export function SignatureStudio() {
   const isAdmin = useIsAdmin();
   const [brandModeId, setBrandModeId] = useState("bm-enterprise");
+
   const [unlocked, setUnlocked] = useState(false);
   const [lockupWidth, setLockupWidth] = useState(150);
   const [replyShort, setReplyShort] = useState(false);
@@ -117,6 +121,38 @@ export function SignatureStudio() {
       "corporate-bold",
     );
   });
+
+  // A signature is typed out once and used for years, so losing it to a stray
+  // reload is the worst outcome here. The details stay on this device (they are
+  // the person's own contact details, nothing is sent anywhere) and are put back
+  // the next time the studio opens.
+  const restored = useRef(false);
+  useEffect(() => {
+    if (restored.current) return;
+    restored.current = true;
+    try {
+      const raw = window.localStorage.getItem(SIGNATURE_DRAFT_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as { brandModeId?: string; draft?: SignatureData };
+      if (saved.brandModeId) setBrandModeId(saved.brandModeId);
+      if (saved.draft && Array.isArray(saved.draft.sections)) setDraft(saved.draft);
+    } catch {
+      // A draft we cannot read is discarded rather than allowed to break the page.
+      window.localStorage.removeItem(SIGNATURE_DRAFT_KEY);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!restored.current) return;
+    try {
+      window.localStorage.setItem(
+        SIGNATURE_DRAFT_KEY,
+        JSON.stringify({ brandModeId, draft }),
+      );
+    } catch {
+      // Out of space or storage blocked: the signature on screen is unaffected.
+    }
+  }, [brandModeId, draft]);
 
   // Admins who have not opened the controls get the same locked look as
   // everyone else, so an admin previews exactly what the business will send.

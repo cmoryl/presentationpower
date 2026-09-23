@@ -118,6 +118,13 @@ function PrintAgentThreadPage() {
   };
 
   const removeThread = async (id: string) => {
+    // Cannot be undone, so never on a single stray click.
+    if (
+      !window.confirm(
+        "Delete this conversation? Its messages can't be recovered. Any print pieces it produced are kept.",
+      )
+    )
+      return;
     try {
       await deletePrintThread(id);
       const rest = threads.filter((t) => t.id !== id);

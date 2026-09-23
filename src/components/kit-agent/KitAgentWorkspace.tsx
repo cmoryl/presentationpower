@@ -117,9 +117,15 @@ export function KitAgentWorkspace({
   const onKitDetected = useCallback(
     (id: string) => {
       setKitId(id);
+      // Losing this link means the conversation stops pointing at the kit it
+      // built, so it is worth saying rather than swallowing.
       void setKitThreadKit(threadId, id)
         .then(refreshThreads)
-        .catch(() => undefined);
+        .catch(() =>
+          toast.error("Couldn't link this conversation to the kit", {
+            description: "The kit itself is saved. Reload the page to try linking again.",
+          }),
+        );
     },
     [threadId, refreshThreads],
   );
@@ -144,6 +150,13 @@ export function KitAgentWorkspace({
   };
 
   const removeThread = async (id: string) => {
+    // Cannot be undone, so never on a single stray click.
+    if (
+      !window.confirm(
+        "Delete this conversation? Its messages can't be recovered. Any kits it produced are kept.",
+      )
+    )
+      return;
     try {
       await deleteKitThread(id);
       const rest = threads.filter((t) => t.id !== id);

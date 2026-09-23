@@ -9,6 +9,7 @@ import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
+import { useDirtyExitGuard } from "@/hooks/use-dirty-exit-guard";
 import { AssetExportMenu } from "@/components/AssetExportMenu";
 
 import { toast } from "sonner";
@@ -262,6 +263,9 @@ export function KitWizard({
       kitLook,
     });
   const lastSavedSnapshot = useRef<string | null>(null);
+  // A part-built kit lives only in this page until Finish, so closing the tab
+  // half way through used to throw the whole setup away without a word.
+  useDirtyExitGuard(lastSavedSnapshot.current !== snapshotKey());
   const [finishDialogOpen, setFinishDialogOpen] = useState(false);
   const [finishDialogName, setFinishDialogName] = useState("");
 
@@ -750,6 +754,7 @@ export function KitWizard({
                   value={manualCopy.title}
                   onChange={(v) => setManualCopy((prev) => ({ ...prev, title: v }))}
                   placeholder="One-clause title that reads at story width."
+                  limit={400}
                 />
               </div>
               <div className="sm:col-span-2">
@@ -758,6 +763,7 @@ export function KitWizard({
                   value={manualCopy.summary}
                   onChange={(v) => setManualCopy((prev) => ({ ...prev, summary: v }))}
                   placeholder="1–2 sentences. Drops on extreme landscape formats."
+                  limit={1200}
                 />
               </div>
               <TextField
@@ -765,6 +771,7 @@ export function KitWizard({
                 value={manualCopy.cta}
                 onChange={(v) => setManualCopy((prev) => ({ ...prev, cta: v }))}
                 placeholder="Register · Learn more · Read the story"
+                limit={120}
               />
               <div className="grid grid-cols-2 gap-3">
                 <TextField
@@ -772,12 +779,14 @@ export function KitWizard({
                   value={manualCopy.statValue}
                   onChange={(v) => setManualCopy((prev) => ({ ...prev, statValue: v }))}
                   placeholder="62"
+                  limit={40}
                 />
                 <TextField
                   label="Stat label"
                   value={manualCopy.statLabel}
                   onChange={(v) => setManualCopy((prev) => ({ ...prev, statLabel: v }))}
                   placeholder="trials in readiness"
+                  limit={120}
                 />
               </div>
             </div>
@@ -1807,21 +1816,43 @@ function TextField({
   value,
   onChange,
   placeholder,
+  limit,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
+  /**
+   * How much of this field is kept when the kit is saved. Typing past the limit
+   * used to be accepted here and then silently trimmed on save, so the field now
+   * stops at the same point and says how much room is left.
+   */
+  limit?: number;
 }) {
+  const near = limit ? value.length >= limit * 0.9 : false;
   return (
     <label className="block text-sm">
-      <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-black/50">
-        {label}
+      <div className="mb-1 flex items-baseline justify-between gap-2">
+        <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
+          {label}
+        </div>
+        {limit && near ? (
+          <div
+            className={`text-[10px] font-semibold tabular-nums ${
+              value.length >= limit ? "text-[#E53D2E]" : "text-black/45"
+            }`}
+          >
+            {value.length >= limit
+              ? `${limit} character limit reached`
+              : `${limit - value.length} left`}
+          </div>
+        ) : null}
       </div>
       <input
         type="text"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        maxLength={limit}
+        onChange={(e) => onChange(limit ? e.target.value.slice(0, limit) : e.target.value)}
         placeholder={placeholder}
         className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
       />
