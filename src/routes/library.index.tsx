@@ -2900,7 +2900,9 @@ function VariantDetailModal({
   const [pngBusy, setPngBusy] = useState<null | "light" | "dark" | "both">(null);
   const downloadPng = async (modes: Array<"light" | "dark">) => {
     if (pngBusy) return;
-    setPngBusy(modes.length > 1 ? "both" : modes[0]!);
+    const firstMode = modes[0];
+    if (!firstMode) return;
+    setPngBusy(modes.length > 1 ? "both" : firstMode);
     const resLabel = pixelRatio === 3840 ? "4k" : "hd";
     try {
       const imgMod = await import("@/lib/slide-image-export");

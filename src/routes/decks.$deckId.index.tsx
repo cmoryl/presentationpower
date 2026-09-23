@@ -469,7 +469,13 @@ function DeckEditor() {
   const [userId, setUserId] = useState<string | null>(null);
   const [overlay, setOverlay] = useState<LocaleOverlay | null>(null);
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setUserId(data.session?.user.id ?? null));
+    let alive = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (alive) setUserId(data.session?.user.id ?? null);
+    });
+    return () => {
+      alive = false;
+    };
   }, []);
   const cloudDeckId = userId ? deckCloudId(userId, deckId) : null;
   // Apply translation overlay by slide position without mutating the deck store.
