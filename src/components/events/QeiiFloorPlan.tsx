@@ -11,8 +11,10 @@ import {
   QEII_PLAN_TOKENS,
   qeiiLabelInk,
   qeiiToneUnder,
+  qeiiMarkBlackFilter,
   qeiiMarkUrl,
   qeiiPlanInk,
+  QEII_MARK_BLACK_FILTER_ID,
   type QeiiMarkVariant,
   type QeiiPlanFace,
 } from "@/lib/next-london-qeii-plan";
@@ -141,6 +143,10 @@ export function QeiiFloorPlan({
       className={className}
       style={style}
     >
+      {/* The all-black option prints the approved one-colour lockup in Blue 800. */}
+      {markVariant === "black" ? (
+        <defs dangerouslySetInnerHTML={{ __html: qeiiMarkBlackFilter() }} />
+      ) : null}
       <rect width={floor.w} height={floor.h + keyH} fill={qeiiPlanGround(face)} />
 
       {floor.shapes.map((shape, i) => {
@@ -240,6 +246,7 @@ export function QeiiFloorPlan({
                       height={block.markH}
                       transform={transform}
                       preserveAspectRatio="xMidYMid meet"
+                      filter={variant === "black" ? `url(#${QEII_MARK_BLACK_FILTER_ID})` : undefined}
                     >
                       <title>{`${m.name} NEXT`}</title>
                     </image>

@@ -48,19 +48,44 @@ export {
 } from "@/lib/next-london-qeii-style";
 
 /** Which approved lockup file a division marker uses on the plan. */
-export type QeiiMarkVariant = "reverse" | "white" | "colour";
+export type QeiiMarkVariant = "reverse" | "white" | "colour" | "black";
 
 /**
  * The approved lockup file for a marker.
  *
- * Only the three issued stacked variants are offered — a lockup is never
- * recoloured on our side.
+ * "black" is the approved all-white one-colour lockup printed in Blue 800: the
+ * identical outlines, one flat ink, nothing redrawn — no all-black lockup file is
+ * published for the NEXT divisions, so it is derived from the one-colour artwork
+ * and labelled as such wherever it is offered.
  */
 export function qeiiMarkUrl(mark: SpaceUseMark, variant: QeiiMarkVariant = "white"): string {
-  if (variant === "white") return mark.urlWhite;
+  if (variant === "white" || variant === "black") return mark.urlWhite;
   if (variant === "colour") return mark.url;
   return mark.urlReverse;
 }
+
+/** Ink a marker is recoloured to, or undefined when the approved file stands. */
+export function qeiiMarkInk(variant: QeiiMarkVariant = "white"): string | undefined {
+  return variant === "black" ? QEII_MARK_BLACK : undefined;
+}
+
+/** Blue 800 — the one ink an all-black lockup prints in. */
+export const QEII_MARK_BLACK = "#03002C";
+
+export const QEII_MARK_BLACK_FILTER_ID = "qeii-mark-black";
+
+/**
+ * Filter that prints a one-colour lockup in Blue 800, keeping its own alpha.
+ * Used on screen and in the SVG; the vector exports ink the outlines directly.
+ */
+export function qeiiMarkBlackFilter(): string {
+  return (
+    `<filter id="${QEII_MARK_BLACK_FILTER_ID}" color-interpolation-filters="sRGB">` +
+    `<feColorMatrix type="matrix" values="0 0 0 0 0.011765 0 0 0 0 0 0 0 0 0 0.172549 0 0 0 1 0"/>` +
+    `</filter>`
+  );
+}
+
 
 /** Approved enterprise values used when a plan is inked on our side. */
 export const QEII_PLAN_TOKENS = {
@@ -347,9 +372,11 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
                 `href="${(() => { const u = qeiiMarkUrl(m, variant); return u.startsWith("http") ? u : `${NEXT_APP_ORIGIN}${u}`; })()}"`,
                 `x="${x}" y="${nameTop - block.size * 0.7 - block.markH}" width="${w}" height="${block.markH}"`,
                 'preserveAspectRatio="xMidYMid meet"',
+                variant === "black" ? `filter="url(#${QEII_MARK_BLACK_FILTER_ID})"` : "",
                 transform ? `transform="${transform}"` : "",
                 "/>",
               ]
+
                 .filter(Boolean)
                 .join(" ");
             })
@@ -413,7 +440,9 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${floor.w}" height="${floor.h + keyH}" viewBox="0 0 ${floor.w} ${floor.h + keyH}">`,
     `<title>Queen Elizabeth II Centre — ${floor.title}</title>`,
+    options.markVariant === "black" ? `<defs>${qeiiMarkBlackFilter()}</defs>` : "",
     `<rect width="${floor.w}" height="${floor.h + keyH}" fill="${qeiiPlanGround(face)}"/>`,
+
     shapes,
     labels,
     keySvg,

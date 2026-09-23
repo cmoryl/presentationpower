@@ -59,6 +59,12 @@ import {
 } from "@/lib/next-london-qeii-plan";
 import { QEII_MAP_LOOKS, QEII_MAP_LOOK_ORDER } from "@/lib/next-london-qeii-style";
 import {
+  QEII_DIRECTORY_SOURCE,
+  QEII_DIRECTORY_TITLE,
+  qeiiDirectoryFilename,
+  qeiiDirectorySvg,
+} from "@/lib/next-london-qeii-directory";
+import {
   LONDON_EVENT_SHEETS,
   VENUE_SHEET_LEGEND,
   VENUE_SHEET_PDF,
@@ -118,6 +124,8 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
   const [zoom, setZoom] = useState(false);
   // All floors side by side at one shared scale, for comparing the set.
   const [allFloors, setAllFloors] = useState(false);
+  /** Page 1 of the set — the issued "find your way" directory. */
+  const [showIndex, setShowIndex] = useState(false);
   const [rebuiltView, setRebuiltView] = useState(true);
   // The house style is the default look for every floor and every download.
   const [face, setFace] = useState<QeiiPlanFace>("studio");
@@ -382,7 +390,20 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
     setPrintNote(undefined);
     try {
       const { exportQeiiFloorsPdf } = await import("@/lib/next-london-qeii-pdf");
-      const pages = LONDON_EVENT_SHEETS.map((s) => {
+      // Page 1 is the issued directory, rebuilt in the house look.
+      const pages: {
+        title: string;
+        svg?: string;
+        imageUrl?: string;
+        note?: string;
+      }[] = [
+        {
+          title: QEII_DIRECTORY_TITLE,
+          svg: qeiiDirectorySvg({ face, showMarks }),
+          note: QEII_DIRECTORY_SOURCE,
+        },
+      ];
+      pages.push(...LONDON_EVENT_SHEETS.map((s) => {
         const state = qeiiPlanState(s.id);
         if (state?.rebuilt) {
           return {
@@ -408,7 +429,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
           imageUrl: s.url,
           note: "Issued sheet — this floor is a placed picture in the issued design, so it is not rebuilt artwork.",
         };
-      });
+      }));
       const result = await exportQeiiFloorsPdf(pages, face);
       const lines = [`${result.pages} floor${result.pages === 1 ? "" : "s"} in ${result.filename}.`];
       for (const s of result.skipped) lines.push(`${s.title} is missing: ${s.reason}`);
@@ -657,8 +678,26 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
       <div className="mt-4 flex flex-wrap gap-2">
         <button
           type="button"
+          aria-pressed={showIndex}
+          onClick={() => {
+            setShowIndex(!showIndex);
+            setAllFloors(false);
+          }}
+          className={`${chip} ${
+            showIndex
+              ? "border-[#003FC7] bg-[#003FC7] text-white"
+              : "border-[#003FC7]/40 bg-[#E0E8F5] text-[#03002C] hover:bg-[#d5e1f2]"
+          }`}
+        >
+          Find your way (page 1)
+        </button>
+        <button
+          type="button"
           aria-pressed={allFloors}
-          onClick={() => setAllFloors(!allFloors)}
+          onClick={() => {
+            setAllFloors(!allFloors);
+            setShowIndex(false);
+          }}
           className={`${chip} ${
             allFloors
               ? "border-[#003FC7] bg-[#003FC7] text-white"
@@ -676,6 +715,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
               setSheetId(s.id);
               setHighlightRoom(undefined);
               setAllFloors(false);
+              setShowIndex(false);
             }}
             className={`${chip} ${
               s.id === sheet.id
@@ -887,7 +927,9 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
                   >
                     <option value="reverse">Reverse</option>
                     <option value="white">All white</option>
+                    <option value="black">All black</option>
                     <option value="colour">Colour</option>
+
                   </select>
                 </label>
                 <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
@@ -1022,6 +1064,37 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
         </ul>
       ) : null}
 
+      {showIndex ? (
+        <figure className="mt-5 overflow-hidden rounded-2xl border border-black/10 bg-white p-4">
+          <div
+            className="mx-auto max-w-[520px] [&>svg]:h-auto [&>svg]:w-full"
+            dangerouslySetInnerHTML={{
+              __html: qeiiDirectorySvg({ face, showMarks }),
+            }}
+          />
+          <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[12px] text-[#03002C]/70">
+            <span>
+              Page 1 of the map set — {QEII_DIRECTORY_TITLE}. {QEII_DIRECTORY_SOURCE}
+            </span>
+            <button
+              type="button"
+              className={btn}
+              onClick={() => {
+                const url = URL.createObjectURL(
+                  new Blob([qeiiDirectorySvg({ face, showMarks })], {
+                    type: "image/svg+xml",
+                  }),
+                );
+                download(url, qeiiDirectoryFilename(face));
+                URL.revokeObjectURL(url);
+              }}
+            >
+              <Download className="h-4 w-4" /> This page (editable SVG)
+            </button>
+          </figcaption>
+        </figure>
+      ) : null}
+
       {allFloors ? (
         <QeiiAllFloors
           face={face}
@@ -1045,7 +1118,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
 
       <div
         className={`mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] ${
-          allFloors ? "hidden" : ""
+          allFloors || showIndex ? "hidden" : ""
         }`}
       >
         <figure className="overflow-hidden rounded-2xl border border-black/10 bg-[#F2F2F2]">
