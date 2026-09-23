@@ -9,7 +9,9 @@ import { useMemo, useState } from "react";
 import { Check, RotateCcw, Search, Wand2, X } from "lucide-react";
 
 import {
+  QEII_ROOM_GRADIENTS,
   QEII_ROOM_PALETTE,
+  qeiiGradientKey,
   qeiiColourByFunction,
   qeiiColourKey,
   qeiiRoomDivisionAccent,
@@ -33,7 +35,10 @@ export type QeiiRoomColourPanelProps = {
 };
 
 /** What the brush is holding: an approved colour, each room's own division accent, or nothing. */
-type Brush = { kind: "colour"; hex: string; label: string } | { kind: "division" } | { kind: "none" };
+type Brush =
+  | { kind: "colour"; hex: string; label: string }
+  | { kind: "gradient"; from: string; to: string; label: string }
+  | { kind: "division" } | { kind: "none" };
 
 const pill =
   "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]";
@@ -76,10 +81,16 @@ export function QeiiRoomColourPanel({
 
   const colouredCount = rooms.filter((entry) => colours[entry.room]).length;
 
-  function set(room: string, hex?: string) {
-    const next = { ...colours };
+  function write(next: QeiiRoomColours, room: string, hex?: string, to?: string) {
     if (hex) next[room] = hex;
     else delete next[room];
+    if (hex && to) next[qeiiGradientKey(room)] = to;
+    else delete next[qeiiGradientKey(room)];
+  }
+
+  function set(room: string, hex?: string, to?: string) {
+    const next = { ...colours };
+    write(next, room, hex, to);
     onColours(next);
   }
 
@@ -87,6 +98,7 @@ export function QeiiRoomColourPanel({
   function paint(room: string) {
     if (brush.kind === "none") return set(room);
     if (brush.kind === "division") return set(room, qeiiRoomDivisionAccent(room, floor.id));
+    if (brush.kind === "gradient") return set(room, brush.from, brush.to);
     return set(room, brush.hex);
   }
 
@@ -94,11 +106,12 @@ export function QeiiRoomColourPanel({
   function paintShown() {
     const next = { ...colours };
     for (const entry of shown) {
-      if (brush.kind === "none") delete next[entry.room];
+      if (brush.kind === "none") write(next, entry.room);
       else if (brush.kind === "division") {
         const accent = qeiiRoomDivisionAccent(entry.room, floor.id);
-        if (accent) next[entry.room] = accent;
-      } else next[entry.room] = brush.hex;
+        if (accent) write(next, entry.room, accent);
+      } else if (brush.kind === "gradient") write(next, entry.room, brush.from, brush.to);
+      else write(next, entry.room, brush.hex);
     }
     onColours(next);
   }
@@ -107,7 +120,8 @@ export function QeiiRoomColourPanel({
   function clearColour(hex: string) {
     const next = { ...colours };
     for (const room of Object.keys(next)) {
-      if (next[room]?.toLowerCase() === hex.toLowerCase()) delete next[room];
+      if (room.startsWith("gradient-to:")) continue;
+      if (next[room]?.toLowerCase() === hex.toLowerCase()) write(next, room);
     }
     onColours(next);
     const labels = { ...keyLabels };
@@ -116,7 +130,7 @@ export function QeiiRoomColourPanel({
   }
 
   const brushLabel =
-    brush.kind === "colour"
+    brush.kind === "colour" || brush.kind === "gradient"
       ? brush.label
       : brush.kind === "division"
         ? "each room’s division accent"
@@ -153,6 +167,33 @@ export function QeiiRoomColourPanel({
               </button>
             );
           })}
+        </div>
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/60">
+            Gradients
+          </span>
+          {QEII_ROOM_GRADIENTS.map((g) => {
+            const on = brush.kind === "gradient" && brush.from === g.from && brush.to === g.to;
+            return (
+              <button
+                key={g.id}
+                type="button"
+                aria-pressed={on}
+                title={g.label}
+                onClick={() => setBrush({ kind: "gradient", from: g.from, to: g.to, label: g.label })}
+                style={{
+                  backgroundImage: `linear-gradient(45deg, ${g.from}, ${g.to})`,
+                  color: qeiiRoomTextInk(g.from),
+                }}
+                className={`${pill} ${on ? "border-[#03002C] ring-2 ring-[#003FC7]/40" : "border-black/15"}`}
+              >
+                {on ? <Check className="h-3.5 w-3.5" /> : null}
+                {g.label}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
           <button
             type="button"
             aria-pressed={brush.kind === "division"}
