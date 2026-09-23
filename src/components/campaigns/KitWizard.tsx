@@ -262,7 +262,10 @@ export function KitWizard({
       imageUrl: imageUrl?.startsWith("data:") ? undefined : imageUrl,
       kitLook,
     });
+  // Seed with the untouched opening state so simply opening the wizard is not
+  // treated as unsaved work; a saved kit re-seeds this once it has hydrated.
   const lastSavedSnapshot = useRef<string | null>(null);
+  if (lastSavedSnapshot.current === null) lastSavedSnapshot.current = snapshotKey();
   // A part-built kit lives only in this page until Finish, so closing the tab
   // half way through used to throw the whole setup away without a word.
   useDirtyExitGuard(lastSavedSnapshot.current !== snapshotKey());
