@@ -22,6 +22,30 @@ import {
   type QeiiPlanFace,
 } from "@/lib/next-london-qeii-style";
 import { qeiiMarkUrl, type QeiiMarkVariant } from "@/lib/next-london-qeii-plan";
+import {
+  LONDON_PACK_GROUNDS,
+  londonPackGroundHexes,
+} from "@/lib/next-london-pack-grounds";
+
+/**
+ * Backgrounds this page can sit on: the flat template ground of the chosen look,
+ * or one of the measured event gradient grounds from the supplied signage pack —
+ * the same ink ramps the printed signs carry, drawn as a live gradient. No new
+ * ramp is invented here.
+ */
+export const QEII_DIRECTORY_GROUNDS: { id: string; label: string; note: string }[] = [
+  {
+    id: "token",
+    label: "Template ground",
+    note: "Flat approved token ground of the selected look.",
+  },
+  ...LONDON_PACK_GROUNDS.map((g) => ({ id: g.id, label: g.label, note: g.note })),
+];
+
+export function qeiiDirectoryGroundHexes(groundId: string): string[] {
+  return groundId === "token" ? [] : londonPackGroundHexes(groundId);
+}
+
 
 
 export type QeiiDirectoryRow = {
