@@ -215,3 +215,8 @@ artboard is a 1:10 proof, scale the trim up ×10 and say so in `dimsSource`.
 **What happened:** (rule set before first use) web-published room names, capacities and plans are often out of date or marketing renders.
 **Rule now:** anything found online is stored as "found online — confirm with venue" with its source link, and nothing prints from it until someone confirms it. A found plan is a tracing reference, never the print master.
 **Enforced by:** `event_venue_research` status column; print paths read confirmed values only.
+
+### 2026-09 — Any venue's maps load from the venue's own SVG
+- New venues don't need a build job: export each floor from the venue's vector file as SVG and load it at /events/next/maps/<event>. The same map engine (looks, room cuts, approved palette) draws it.
+- Room names must be live text inside closed room shapes, or rooms can't be matched and coloured. Outlined text and picture-only files are reported, never faked.
+- Floor ids are namespaced `<event>:<floor>` so London-only room rules never touch another venue.
