@@ -754,6 +754,7 @@ export function KitWizard({
                   value={manualCopy.title}
                   onChange={(v) => setManualCopy((prev) => ({ ...prev, title: v }))}
                   placeholder="One-clause title that reads at story width."
+                  limit={400}
                 />
               </div>
               <div className="sm:col-span-2">
@@ -762,6 +763,7 @@ export function KitWizard({
                   value={manualCopy.summary}
                   onChange={(v) => setManualCopy((prev) => ({ ...prev, summary: v }))}
                   placeholder="1–2 sentences. Drops on extreme landscape formats."
+                  limit={1200}
                 />
               </div>
               <TextField
@@ -769,6 +771,7 @@ export function KitWizard({
                 value={manualCopy.cta}
                 onChange={(v) => setManualCopy((prev) => ({ ...prev, cta: v }))}
                 placeholder="Register · Learn more · Read the story"
+                limit={120}
               />
               <div className="grid grid-cols-2 gap-3">
                 <TextField
@@ -776,12 +779,14 @@ export function KitWizard({
                   value={manualCopy.statValue}
                   onChange={(v) => setManualCopy((prev) => ({ ...prev, statValue: v }))}
                   placeholder="62"
+                  limit={40}
                 />
                 <TextField
                   label="Stat label"
                   value={manualCopy.statLabel}
                   onChange={(v) => setManualCopy((prev) => ({ ...prev, statLabel: v }))}
                   placeholder="trials in readiness"
+                  limit={120}
                 />
               </div>
             </div>
