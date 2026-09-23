@@ -27,7 +27,10 @@ import { qeiiFloorVector, type QeiiFloorVector, type QeiiLabel } from "@/lib/nex
 import {
   qeiiGroundInk,
   qeiiLookWallWeight,
+  qeiiGradientDefs,
+  qeiiMixToWhite,
   qeiiPlanGround,
+  qeiiRoomPaint,
   qeiiRoomTint,
   qeiiStyledInk,
   qeiiStyledPaint,
@@ -306,7 +309,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
       // Rooms the artwork draws inside this block are cut out along the issued
       // wall runs, so a colour fills the whole room in the downloaded file too.
       const cut = (cellsByShape.get(i) ?? [])
-        .map((c) => `<path d="${c.d}" fill="${c.hex ?? fill ?? "none"}" data-room="${esc(c.room)}" id="room-${esc(c.room).replace(/\s+/g, "-").toLowerCase()}"/>`)
+        .map((c) => `<path d="${c.d}" fill="${qeiiRoomPaint(c.room, c.hex, face) ?? fill ?? "none"}" data-room="${esc(c.room)}" id="room-${esc(c.room).replace(/\s+/g, "-").toLowerCase()}"/>`)
         .join("");
       return `<path ${bits.join(" ")}/>${cut}`;
     })
@@ -410,7 +413,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
                 `x="${block.box.x0 - pad}" y="${block.box.y0 - pad * 0.6}"`,
                 `width="${block.box.x1 - block.box.x0 + pad * 2}"`,
                 `height="${block.box.y1 - block.box.y0 + pad * 1.2}"`,
-                `rx="${block.size * 0.35}" fill="${tag}"`,
+                `rx="${block.size * 0.35}" fill="${qeiiRoomPaint(room, tag, face)}"`,
                 transform ? `transform="${transform}"` : "",
                 "/>",
               ]
@@ -438,15 +441,105 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
     })
     .join("");
 
+  const W = floor.w;
+  const H = floor.h + keyH;
+  const defs = `${options.markVariant === "black" ? qeiiMarkBlackFilter() : ""}${qeiiGradientDefs(face)}`;
+  const body = [`<rect width="${W}" height="${H}" fill="${qeiiPlanGround(face)}"/>`, shapes, labels, keySvg].join("");
+  const title = `<title>Queen Elizabeth II Centre — ${floor.title}</title>`;
+  if (face === "signage") return qeiiSignageSheet(floor, W, H, body, defs, title, options.showText !== false);
   return [
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${floor.w}" height="${floor.h + keyH}" viewBox="0 0 ${floor.w} ${floor.h + keyH}">`,
-    `<title>Queen Elizabeth II Centre — ${floor.title}</title>`,
-    options.markVariant === "black" ? `<defs>${qeiiMarkBlackFilter()}</defs>` : "",
-    `<rect width="${floor.w}" height="${floor.h + keyH}" fill="${qeiiPlanGround(face)}"/>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`,
+    title,
+    defs ? `<defs>${defs}</defs>` : "",
+    body,
+    "</svg>",
+  ].join("");
+}
 
-    shapes,
-    labels,
-    keySvg,
+/** Floor order for the tab column on the event-signage sheet. */
+export const QEII_SIGNAGE_TABS: { id: string; label: string }[] = [
+  { id: "ground", label: "G" },
+  { id: "first", label: "1" },
+  { id: "second", label: "2" },
+  { id: "third", label: "3" },
+  { id: "fourth", label: "4" },
+  { id: "fifth", label: "5" },
+  { id: "sixth", label: "6" },
+];
+
+/**
+ * The NEXT 2026 venue-map sheet (Canva DAHWCDMtmSI): floor title top left, a
+ * chevron band running into the TransPerfect NEXT lockup, the plan, a floor tab
+ * column down the right with this floor lit, and the venue bar along the foot.
+ * A2-proportioned portrait (1:1.414), every part a separate editable object.
+ */
+function qeiiSignageSheet(
+  floor: QeiiFloorVector,
+  W: number,
+  H: number,
+  body: string,
+  defs: string,
+  title: string,
+  showText: boolean,
+): string {
+  const SW = Math.max(W, H * 0.62) * 1.34;
+  const SH = SW * 1.414;
+  const m = SW * 0.035;
+  const font = 'font-family="Geist, Geist Variable, sans-serif"';
+  const titleSize = SW * 0.042;
+  const bandY = m + titleSize * 1.5;
+  const bandH = SW * 0.085;
+  const lockW = bandH * 2.3;
+  const chevronEnd = SW - m - lockW - m * 0.6;
+  const n = 14;
+  const step = chevronEnd / n;
+  const chevrons = Array.from({ length: n }, (_, i) => {
+    const x = i * step;
+    const k = bandH * 0.42;
+    const colour = qeiiMixToWhite("#003FC7", 0.9 - (0.9 * i) / (n - 1));
+    return `<path d="M${x} ${bandY} L${x + step * 0.55} ${bandY} L${x + step * 0.55 + k} ${bandY + bandH / 2} L${x + step * 0.55} ${bandY + bandH} L${x} ${bandY + bandH} L${x + k} ${bandY + bandH / 2} Z" fill="${colour}"/>`;
+  }).join("");
+  const lockup = `<image href="${NEXT_APP_ORIGIN}/next-2026/logos/transperfect-side-by-side-color.svg" x="${SW - m - lockW}" y="${bandY}" width="${lockW}" height="${bandH}" preserveAspectRatio="xMidYMid meet"/>`;
+  const footH = SW * 0.075;
+  const footY = SH - footH;
+  const tabW = SW * 0.075;
+  const tabTop = bandY + bandH + m;
+  const tabH = (SH - tabTop) / QEII_SIGNAGE_TABS.length;
+  const tabs = QEII_SIGNAGE_TABS.map((t, i) => {
+    const y = tabTop + i * tabH;
+    const lit = t.id === floor.id;
+    return (
+      `<rect x="${SW - tabW}" y="${y}" width="${tabW}" height="${tabH}" fill="${lit ? "#003FC7" : "#03002C"}"/>` +
+      (showText
+        ? `<text x="${SW - tabW / 2}" y="${y + tabH / 2}" text-anchor="middle" dominant-baseline="middle" ${font} font-weight="400" font-size="${tabW * 0.5}" fill="#FFFFFF">${t.label}</text>`
+        : "")
+    );
+  }).join("");
+  const foot =
+    `<rect x="0" y="${footY}" width="${SW - tabW}" height="${footH}" fill="#003FC7"/>` +
+    (showText
+      ? `<text x="${m}" y="${footY + footH / 2}" dominant-baseline="middle" ${font} font-weight="700" font-size="${footH * 0.34}" letter-spacing="${footH * 0.03}" fill="#FFFFFF">QEII CENTRE</text>`
+      : "");
+  const areaX = m;
+  const areaY = tabTop;
+  const areaW = SW - tabW - m * 2;
+  const areaH = footY - m - areaY;
+  const k = Math.min(areaW / W, areaH / H);
+  const px = areaX + (areaW - W * k) / 2;
+  const py = areaY + (areaH - H * k) / 2;
+  const heading = showText
+    ? `<text x="${m}" y="${m + titleSize * 0.8}" ${font} font-weight="400" font-size="${titleSize}" fill="#03002C">${floor.title}</text>`
+    : "";
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${SW}" height="${SH}" viewBox="0 0 ${SW} ${SH}">`,
+    title,
+    defs ? `<defs>${defs}</defs>` : "",
+    `<rect width="${SW}" height="${SH}" fill="#FFFFFF"/>`,
+    `<g id="sheet-title">${heading}</g>`,
+    `<g id="chevron-band">${chevrons}${lockup}</g>`,
+    `<g id="plan" transform="translate(${px} ${py}) scale(${k})">${body}</g>`,
+    `<g id="floor-tabs">${tabs}</g>`,
+    `<g id="venue-bar">${foot}</g>`,
     "</svg>",
   ].join("");
 }
