@@ -19,7 +19,9 @@ import {
   type QeiiPlanFace,
 } from "@/lib/next-london-qeii-plan";
 import {
+  qeiiCellGradientDefs,
   qeiiGroundInk,
+  qeiiRoomPaint,
   qeiiLookWallWeight,
   qeiiPlanGround,
   qeiiRoomTint,
