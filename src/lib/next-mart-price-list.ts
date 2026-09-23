@@ -208,7 +208,7 @@ export const MART_PRICE_SHEET = {
   /** Category bar height, mm. */
   barH: 11,
   /** Item row height, mm. */
-  rowH: 11.5,
+  rowH: 11.5 as number,
   /** Price cell width, mm. */
   priceW: 22,
   substrate: "350 gsm silk board, matt laminate",
