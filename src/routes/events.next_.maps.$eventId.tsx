@@ -98,13 +98,12 @@ function MapsPage() {
   const [busy, setBusy] = useState(false);
   const [notes, setNotes] = useState<string[]>([]);
 
-  const floor = current ? toFloor(eventId, current) : null;
+  const floor = useMemo(() => (current ? toFloor(eventId, current) : null), [eventId, current]);
   const roomColours = current ? (colours[current.floor_key] ?? (current.room_colours as Record<string, string>) ?? {}) : {};
   const roomUses = current ? (uses[current.floor_key] ?? (current.room_uses as Record<string, string>) ?? {}) : {};
   const rooms = useMemo(
     () => (floor ? [...new Set(qeiiRoomShapes(floor).map((r) => r.room))].sort() : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [current?.floor_key, current?.shapes],
+    [floor],
   );
   const svg = useMemo(() => (floor ? qeiiPlanSvg(floor, { face, roomColours }) : ""), [floor, face, roomColours]);
 

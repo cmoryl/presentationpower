@@ -192,6 +192,7 @@ import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.
 import { Route as KnowledgeBrandGuidesSlugEditRouteImport } from './routes/knowledge.brand-guides.$slug_.edit'
 import { Route as EventsNextMartPriceListRouteImport } from './routes/events.next_.mart_.price-list'
 import { Route as EventsNextMartStopIdRouteImport } from './routes/events.next_.mart_.$stopId'
+import { Route as EventsNextMapsEventIdRouteImport } from './routes/events.next_.maps.$eventId'
 import { Route as EventsNextLondonTemplateRouteImport } from './routes/events.next_.london_.template'
 import { Route as EventsNextLondonScheduleRouteImport } from './routes/events.next_.london_.schedule'
 import { Route as EventsNextLondonReviseRouteImport } from './routes/events.next_.london_.revise'
@@ -1127,6 +1128,11 @@ const EventsNextMartStopIdRoute = EventsNextMartStopIdRouteImport.update({
   path: '/next/mart/$stopId',
   getParentRoute: () => EventsRoute,
 } as any)
+const EventsNextMapsEventIdRoute = EventsNextMapsEventIdRouteImport.update({
+  id: '/next_/maps/$eventId',
+  path: '/next/maps/$eventId',
+  getParentRoute: () => EventsRoute,
+} as any)
 const EventsNextLondonTemplateRoute =
   EventsNextLondonTemplateRouteImport.update({
     id: '/next_/london_/template',
@@ -1354,6 +1360,7 @@ export interface FileRoutesByFullPath {
   '/events/next/london/revise': typeof EventsNextLondonReviseRoute
   '/events/next/london/schedule': typeof EventsNextLondonScheduleRoute
   '/events/next/london/template': typeof EventsNextLondonTemplateRoute
+  '/events/next/maps/$eventId': typeof EventsNextMapsEventIdRoute
   '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
   '/events/next/mart/price-list': typeof EventsNextMartPriceListRoute
   '/knowledge/brand-guides/$slug/edit': typeof KnowledgeBrandGuidesSlugEditRoute
@@ -1542,6 +1549,7 @@ export interface FileRoutesByTo {
   '/events/next/london/revise': typeof EventsNextLondonReviseRoute
   '/events/next/london/schedule': typeof EventsNextLondonScheduleRoute
   '/events/next/london/template': typeof EventsNextLondonTemplateRoute
+  '/events/next/maps/$eventId': typeof EventsNextMapsEventIdRoute
   '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
   '/events/next/mart/price-list': typeof EventsNextMartPriceListRoute
   '/knowledge/brand-guides/$slug/edit': typeof KnowledgeBrandGuidesSlugEditRoute
@@ -1735,6 +1743,7 @@ export interface FileRoutesById {
   '/events/next_/london_/revise': typeof EventsNextLondonReviseRoute
   '/events/next_/london_/schedule': typeof EventsNextLondonScheduleRoute
   '/events/next_/london_/template': typeof EventsNextLondonTemplateRoute
+  '/events/next_/maps/$eventId': typeof EventsNextMapsEventIdRoute
   '/events/next_/mart_/$stopId': typeof EventsNextMartStopIdRoute
   '/events/next_/mart_/price-list': typeof EventsNextMartPriceListRoute
   '/knowledge/brand-guides/$slug_/edit': typeof KnowledgeBrandGuidesSlugEditRoute
@@ -1929,6 +1938,7 @@ export interface FileRouteTypes {
     | '/events/next/london/revise'
     | '/events/next/london/schedule'
     | '/events/next/london/template'
+    | '/events/next/maps/$eventId'
     | '/events/next/mart/$stopId'
     | '/events/next/mart/price-list'
     | '/knowledge/brand-guides/$slug/edit'
@@ -2117,6 +2127,7 @@ export interface FileRouteTypes {
     | '/events/next/london/revise'
     | '/events/next/london/schedule'
     | '/events/next/london/template'
+    | '/events/next/maps/$eventId'
     | '/events/next/mart/$stopId'
     | '/events/next/mart/price-list'
     | '/knowledge/brand-guides/$slug/edit'
@@ -2309,6 +2320,7 @@ export interface FileRouteTypes {
     | '/events/next_/london_/revise'
     | '/events/next_/london_/schedule'
     | '/events/next_/london_/template'
+    | '/events/next_/maps/$eventId'
     | '/events/next_/mart_/$stopId'
     | '/events/next_/mart_/price-list'
     | '/knowledge/brand-guides/$slug_/edit'
@@ -3702,6 +3714,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsNextMartStopIdRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/events/next_/maps/$eventId': {
+      id: '/events/next_/maps/$eventId'
+      path: '/next/maps/$eventId'
+      fullPath: '/events/next/maps/$eventId'
+      preLoaderRoute: typeof EventsNextMapsEventIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/london_/template': {
       id: '/events/next_/london_/template'
       path: '/next/london/template'
@@ -3863,6 +3882,7 @@ interface EventsRouteChildren {
   EventsNextLondonReviseRoute: typeof EventsNextLondonReviseRoute
   EventsNextLondonScheduleRoute: typeof EventsNextLondonScheduleRoute
   EventsNextLondonTemplateRoute: typeof EventsNextLondonTemplateRoute
+  EventsNextMapsEventIdRoute: typeof EventsNextMapsEventIdRoute
   EventsNextMartStopIdRoute: typeof EventsNextMartStopIdRoute
   EventsNextMartPriceListRoute: typeof EventsNextMartPriceListRoute
 }
@@ -3898,6 +3918,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextLondonReviseRoute: EventsNextLondonReviseRoute,
   EventsNextLondonScheduleRoute: EventsNextLondonScheduleRoute,
   EventsNextLondonTemplateRoute: EventsNextLondonTemplateRoute,
+  EventsNextMapsEventIdRoute: EventsNextMapsEventIdRoute,
   EventsNextMartStopIdRoute: EventsNextMartStopIdRoute,
   EventsNextMartPriceListRoute: EventsNextMartPriceListRoute,
 }
