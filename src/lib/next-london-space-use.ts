@@ -336,7 +336,6 @@ const EVENT_DIVISION: [needle: string, divisionId: string][] = [
   ["learnnext", "learn"],
   ["dataforcenext", "dataforce"],
   ["lifesci", "life-sci"],
-  ["nextbrew", "nextbrew"],
 ];
 
 /**
@@ -404,7 +403,7 @@ export function spaceUseMarksForIds(divisionIds: string[]): SpaceUseMark[] {
 
 /** Every division whose approved lockup can be printed on a plan, for the picker. */
 export function spaceUseMarkChoices(): SpaceUseMark[] {
-  return spaceUseMarksForIds(EVENT_DIVISION.map(([, id]) => id));
+  return spaceUseMarksForIds([...EVENT_DIVISION.map(([, id]) => id), "nextbrew"]);
 }
 
 /** Division lockups to print beside a room, in schedule order, deduplicated.
@@ -414,6 +413,7 @@ export function spaceUseMarks(room: string, sheetId?: string): SpaceUseMark[] {
   for (const use of spaceUsesForRoom(room, sheetId)) {
     const divisionId = spaceUseDivisionId(use);
     if (divisionId) ids.push(divisionId);
+    else if (/nextbrew/i.test(use.event)) ids.push("nextbrew");
   }
   return spaceUseMarksForIds(ids);
 }
