@@ -87,12 +87,23 @@ export type SignatureLockup = {
  * ships as SVG only, which Outlook will not draw) — the caller must say so
  * rather than substitute another division's mark.
  */
+/**
+ * Which approved artwork file carries each lockup in a signature. The master
+ * TransPerfect `-color` file is the NEXT event lockup, which must never stand in
+ * for the corporate wordmark on business email, so the master brands use the
+ * approved black wordmark instead. It is used as supplied — never recoloured.
+ */
+const LOCKUP_FILE: Record<string, string> = {
+  tp: "tp-black",
+};
+
 export function signatureLockup(brandModeId: string): SignatureLockup | null {
   const slug = divisionLogoSlug(brandModeId);
   if (!slug) return null;
   const aspect = LOCKUP_ASPECT[slug];
   if (!aspect) return null;
-  return { slug, url: `${SIGNATURE_ORIGIN}/brand-logos/${slug}-color.png`, aspect };
+  const file = LOCKUP_FILE[slug] ?? `${slug}-color`;
+  return { slug, url: `${SIGNATURE_ORIGIN}/brand-logos/${file}.png`, aspect };
 }
 
 /** Lockup height, in px, for a requested printed width. */
