@@ -211,7 +211,28 @@ export function qeiiRepeatedSymbolShapes(floor: QeiiFloorVector): Set<number> {
     });
   });
 
+  // Reviewer: structural pillar dots are not wanted on any floor.
+  qeiiPillarDotShapes(floor).forEach((i) => drop.add(i));
   return drop;
+}
+
+/**
+ * The venue's structural pillar dots: a single small round filled outline drawn
+ * in curves. Walls still use them to close room cells; they are only not drawn.
+ */
+export function qeiiPillarDotShapes(floor: QeiiFloorVector): Set<number> {
+  const out = new Set<number>();
+  floor.shapes.forEach((shape, i) => {
+    if (!shape.fill || shape.stroke || !/C/i.test(shape.d)) return;
+    if ((shape.d.match(/[Mm]/g) ?? []).length !== 1) return;
+    const nums = (shape.d.match(/-?\d*\.?\d+/g) ?? []).map(Number);
+    const xs = nums.filter((_, k) => k % 2 === 0);
+    const ys = nums.filter((_, k) => k % 2 === 1);
+    const w = Math.max(...xs) - Math.min(...xs);
+    const h = Math.max(...ys) - Math.min(...ys);
+    if (w >= 3 && w <= 12 && Math.abs(w - h) <= 1.5) out.add(i);
+  });
+  return out;
 }
 
 /** Thins the issued wall weight; the plans print heavy at screen sizes. */

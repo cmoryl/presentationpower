@@ -1,3 +1,4 @@
+import { qeiiPillarDotShapes } from "@/lib/next-london-qeii-symbols";
 // Cutting an exact room cell out of the issued QEII Centre plan blocks.
 //
 // The issued artwork draws a whole wing as one filled block and then draws the
@@ -337,9 +338,12 @@ export function qeiiCutCell(
     pts.some(([rx, ry]) => rx >= bx0 - 2 && rx <= bx1 + 2 && ry >= by0 - 2 && ry <= by1 + 2);
   // Some issued sheets draw the walls as white filled shapes on top of the block
   // rather than as stroked runs. Both cut the block the same way.
-  for (const shape of floor.shapes) {
+  const pillars = qeiiPillarDotShapes(floor);
+  for (const [index, shape] of floor.shapes.entries()) {
     if (!shape.fill || shape.fill === block.fill) continue;
     if (!isWallFill(shape.fill)) continue;
+    // Pillar dots are not printed, so they must not punch holes in a room.
+    if (pillars.has(index)) continue;
     for (const ring of qeiiRings(shape.d)) {
       const clipped = ringToClip(ring);
       if (!reaches(clipped)) continue;
