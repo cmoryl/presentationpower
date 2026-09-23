@@ -83,49 +83,13 @@ export const setResearchStatus = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-async function runResearch(
-  supabase: import("@supabase/supabase-js").SupabaseClient,
-  userId: string,
-  id: string,
-  venue: string,
-  city: string,
-) {
-  const { researchVenueOnline } = await import("./event-intake.server");
-  const result = await researchVenueOnline(venue, city);
-  if (result.findings.length) {
-    const { error } = await supabase.from("event_venue_research").insert(
-      result.findings.map((f) => ({
-        ...f,
-        event_id: id,
-        status: "suggested",
-        query: result.queries.join(" | "),
-        created_by: userId,
-      })),
-    );
-    if (error) throw new Error(error.message);
-    // Researchable items that were missing now show "found online", never "received".
-    const keys = [...new Set(result.findings.map((f) => f.item_key))];
-    const { data: rows } = await supabase
-      .from("event_intake_items")
-      .select("item_key,status")
-      .eq("event_id", id);
-    const current = new Map((rows ?? []).map((r) => [r.item_key, r.status]));
-    const upgrades = keys
-      .filter((k) => (current.get(k) ?? "missing") === "missing")
-      .map((k) => ({ event_id: id, item_key: k, status: "found_online", updated_by: userId }));
-    if (upgrades.length)
-      await supabase.from("event_intake_items").upsert(upgrades, { onConflict: "event_id,item_key" });
-  }
-  return { found: result.findings.length, pagesRead: result.pagesRead };
-}
-
 export const researchVenue = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
     z.object({ eventId, venue: z.string().trim().min(2).max(160), city: z.string().trim().min(2).max(120) }).parse(d),
   )
   .handler(async ({ data, context }) =>
-    runResearch(context.supabase as never, context.userId, data.eventId, data.venue, data.city),
+    (await import("./event-intake.server")).runResearch(context.supabase as never, context.userId, data.eventId, data.venue, data.city),
   );
 
 export const startEvent = createServerFn({ method: "POST" })
@@ -177,7 +141,7 @@ export const startEvent = createServerFn({ method: "POST" })
     let research: { found: number; pagesRead: number; error?: string } | null = null;
     if (data.research) {
       try {
-        research = await runResearch(context.supabase as never, context.userId, id, data.venue, data.city);
+        research = await (await import("./event-intake.server")).runResearch(context.supabase as never, context.userId, id, data.venue, data.city);
       } catch (e) {
         research = { found: 0, pagesRead: 0, error: e instanceof Error ? e.message : "Research failed" };
       }
