@@ -887,7 +887,9 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
                   >
                     <option value="reverse">Reverse</option>
                     <option value="white">All white</option>
+                    <option value="black">All black</option>
                     <option value="colour">Colour</option>
+
                   </select>
                 </label>
                 <label className="flex items-center gap-2 text-[12px] text-[#03002C]/70">
