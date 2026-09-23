@@ -110,7 +110,8 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
   const [showLabels, setShowLabels] = useState(true);
   const [showUse, setShowUse] = useState(true);
   const [showMarks, setShowMarks] = useState(true);
-  const [markVariant, setMarkVariant] = useState<QeiiMarkVariant>("reverse");
+  // House default: white lockups only, on the accent-filled rooms.
+  const [markVariant, setMarkVariant] = useState<QeiiMarkVariant>("white");
   const [markScale, setMarkScale] = useState(1);
   const [showColourPanel, setShowColourPanel] = useState(false);
   const [showPlanOptions, setShowPlanOptions] = useState(false);
