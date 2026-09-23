@@ -148,7 +148,7 @@ export function QeiiFloorPlan({
       {/* The all-black option prints the approved one-colour lockup in Blue 800. */}
       <defs
         dangerouslySetInnerHTML={{
-          __html: `${markVariant === "black" ? qeiiMarkBlackFilter() : ""}${qeiiCellGradientDefs(paint.cells)}`,
+          __html: `${markVariant === "black" ? qeiiMarkBlackFilter() : ""}${qeiiCellGradientDefs(paint.cells, face)}`,
         }}
       />
       <rect width={floor.w} height={floor.h + keyH} fill={qeiiPlanGround(face)} />
