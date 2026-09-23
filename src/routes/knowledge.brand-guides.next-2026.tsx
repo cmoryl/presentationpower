@@ -1,4 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { LONDON_PACK_GROUNDS, LONDON_PACK_GROUND_NOTE } from "@/lib/next-london-pack-grounds";
+import { LONDON_STYLES } from "@/lib/next-london-signage";
+import { QEII_ROOM_GRADIENTS } from "@/lib/next-london-qeii-rooms";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
@@ -694,8 +697,68 @@ function NextBrandGuide() {
           </div>
         </Section>
 
+        {/* Grounds */}
+        <Section
+          id="grounds"
+          eyebrow="09 · Grounds"
+          title="Backgrounds & gradients"
+          intro="Every background built for NEXT 2026 London: the three grounds measured from the supplied live files, the signage treatments cut from them, and the room gradients used on the venue maps. New events start from these — no new ramps are invented."
+        >
+          <h3 className="text-lg font-semibold">Measured pack grounds</h3>
+          <p className="mt-1 max-w-3xl text-sm text-black/60 dark:text-white/60">{LONDON_PACK_GROUND_NOTE}</p>
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
+            {LONDON_PACK_GROUNDS.map((g) => (
+              <div key={g.id} className="overflow-hidden rounded-2xl border border-black/10 dark:border-white/10">
+                <div className="h-28" style={{ background: `linear-gradient(135deg, ${g.stops.map((x) => x.hex).join(", ")})` }} />
+                <div className="p-4">
+                  <div className="font-semibold">{g.label}</div>
+                  <p className="mt-1 text-xs text-black/60 dark:text-white/60">{g.note}</p>
+                  <ul className="mt-3 space-y-1 font-mono text-[11px] text-black/70 dark:text-white/70">
+                    {g.stops.map((x) => (
+                      <li key={x.hex} className="flex items-center gap-2">
+                        <span className="h-3 w-3 rounded-sm" style={{ background: x.hex }} />
+                        {x.hex} · C{x.cmyk.c} M{x.cmyk.m} Y{x.cmyk.y} K{x.cmyk.k}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <h3 className="mt-10 text-lg font-semibold">Signage treatments</h3>
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
+            {Object.entries(LONDON_STYLES).map(([id, st]) => (
+              <div key={id} className="overflow-hidden rounded-2xl border border-black/10 dark:border-white/10">
+                <div className="h-20" style={{ background: `linear-gradient(135deg, ${st.stops.join(", ")})` }} />
+                <div className="p-4">
+                  <div className="font-semibold">{st.label}</div>
+                  <p className="mt-1 text-xs text-black/60 dark:text-white/60">{st.note}</p>
+                  <p className="mt-2 font-mono text-[11px] text-black/60 dark:text-white/60">{st.stops.join(" → ")}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <h3 className="mt-10 text-lg font-semibold">Venue-map room gradients</h3>
+          <p className="mt-1 max-w-3xl text-sm text-black/60 dark:text-white/60">
+            Two approved palette colours per room, clipped to the room's walls. In the signage map look a flat room colour also fades to a pale tint of itself.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {QEII_ROOM_GRADIENTS.map((g) => (
+              <div key={g.id} className="overflow-hidden rounded-xl border border-black/10 dark:border-white/10">
+                <div className="h-14" style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }} />
+                <div className="p-3 text-xs">
+                  <div className="font-semibold">{g.label}</div>
+                  <div className="font-mono text-black/60 dark:text-white/60">{g.from} → {g.to}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Section>
+
         {/* Files */}
-        <Section id="files" eyebrow="09 · Assets" title="File formats & where to get them">
+        <Section id="files" eyebrow="10 · Assets" title="File formats & where to get them">
           <div className="grid gap-4 md:grid-cols-4">
             {[
               ["EPS", "Print, signage, fabrication. Send to vendors with the Pantone build."],
@@ -723,7 +786,7 @@ function NextBrandGuide() {
         {/* Icons */}
         <Section
           id="icons"
-          eyebrow="10 · Icons"
+          eyebrow="11 · Icons"
           title="Icon system — event set & track sets"
           intro="One event-wide icon set for the NEXT 2026 program, plus a set for every track. Pick a set, choose your size and approved colour, then download a single glyph, a whole sub-area or the full set as SVG or PNG."
         >
