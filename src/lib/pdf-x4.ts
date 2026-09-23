@@ -26,16 +26,24 @@
  * All work is client-side. No native binaries. No server round-trip.
  */
 
-import {
-  PDFArray,
+// pdf-lib loads on first wrap. The profile catalog and page maths below are
+// plain data, so a page that only offers the download never pays for the
+// press writer on first paint.
+import type {
   PDFDocument,
-  PDFHeader,
-  PDFHexString,
-  PDFName,
-  PDFRawStream,
+  PDFName as PDFNameT,
+  PDFRawStream as PDFRawStreamT,
   PDFRef,
-  PDFString,
 } from "pdf-lib";
+
+type PdfLib = typeof import("pdf-lib");
+
+let pdfLib: PdfLib | null = null;
+
+function pl(): PdfLib {
+  if (!pdfLib) throw new Error("pdf-lib not loaded — wrapPdfAsX4 loads it");
+  return pdfLib;
+}
 import { sRgbIccBytes } from "./icc-srgb";
 import gracolAsset from "@/assets/icc/GRACoL2013_CRPC6.icc.asset.json";
 import swopAsset from "@/assets/icc/SWOP2013_CRPC5.icc.asset.json";
@@ -120,12 +128,13 @@ export async function wrapPdfAsX4(
 ): Promise<Uint8Array> {
   const source = pdfBytes instanceof Uint8Array ? pdfBytes : new Uint8Array(pdfBytes);
 
-  const pdfDoc = await PDFDocument.load(source, { updateMetadata: false });
+  pdfLib = await import("pdf-lib");
+  const pdfDoc = await pl().PDFDocument.load(source, { updateMetadata: false });
 
   // ── PDF 1.7 ────────────────────────────────────────────────────────────
   // jsPDF emits PDF 1.3 in its default configuration. PDF/X-4 requires
   // at least 1.6; 1.7 is preferred. pdf-lib exposes header on the context.
-  pdfDoc.context.header = PDFHeader.forVersion(1, 7);
+  pdfDoc.context.header = pl().PDFHeader.forVersion(1, 7);
 
   // ── Page boxes ─────────────────────────────────────────────────────────
   const bleedPt = opts.bleedIn * IN_TO_PT;
@@ -138,14 +147,14 @@ export async function wrapPdfAsX4(
   const pages = pdfDoc.getPages();
   for (const page of pages) {
     // Ensure MediaBox is authoritative (matches what jsPDF produced).
-    page.node.set(PDFName.of("MediaBox"), pdfDoc.context.obj([0, 0, mediaWpt, mediaHpt]));
+    page.node.set(pl().PDFName.of("MediaBox"), pdfDoc.context.obj([0, 0, mediaWpt, mediaHpt]));
     page.node.set(
-      PDFName.of("BleedBox"),
+      pl().PDFName.of("BleedBox"),
       pdfDoc.context.obj([slugPt, slugPt, mediaWpt - slugPt, mediaHpt - slugPt]),
     );
     const trimInset = slugPt + bleedPt;
     page.node.set(
-      PDFName.of("TrimBox"),
+      pl().PDFName.of("TrimBox"),
       pdfDoc.context.obj([trimInset, trimInset, trimInset + trimWpt, trimInset + trimHpt]),
     );
   }
@@ -173,22 +182,22 @@ export async function wrapPdfAsX4(
   const destSpace = componentsForSpace(profileSpace);
   const iccStream = pdfDoc.context.stream(opts.iccProfileBytes, {
     N: destSpace.n,
-    Alternate: PDFName.of(destSpace.alt),
+    Alternate: pl().PDFName.of(destSpace.alt),
   });
   const iccRef = pdfDoc.context.register(iccStream);
 
   // ── OutputIntent dictionary ───────────────────────────────────────────
   const oiDict = pdfDoc.context.obj({
-    Type: PDFName.of("OutputIntent"),
-    S: PDFName.of("GTS_PDF_X"),
-    OutputConditionIdentifier: PDFString.of(opts.iccProfileName),
-    Info: PDFString.of(opts.iccProfileName),
-    RegistryName: PDFString.of("http://www.color.org"),
+    Type: pl().PDFName.of("OutputIntent"),
+    S: pl().PDFName.of("GTS_PDF_X"),
+    OutputConditionIdentifier: pl().PDFString.of(opts.iccProfileName),
+    Info: pl().PDFString.of(opts.iccProfileName),
+    RegistryName: pl().PDFString.of("http://www.color.org"),
     DestOutputProfile: iccRef,
   });
-  const oiArray = PDFArray.withContext(pdfDoc.context);
+  const oiArray = pl().PDFArray.withContext(pdfDoc.context);
   oiArray.push(oiDict);
-  pdfDoc.catalog.set(PDFName.of("OutputIntents"), oiArray);
+  pdfDoc.catalog.set(pl().PDFName.of("OutputIntents"), oiArray);
 
   // ── Tag every raster as ICCBased/sRGB ─────────────────────────────────
   const tagged = opts.tagRastersAsSRgb === false ? 0 : tagRgbImagesAsSRgb(pdfDoc);
@@ -204,16 +213,16 @@ export async function wrapPdfAsX4(
     iccProfileName: opts.iccProfileName,
   });
   const xmpBytes = new TextEncoder().encode(xmp);
-  const metaStream = PDFRawStream.of(
+  const metaStream = pl().PDFRawStream.of(
     pdfDoc.context.obj({
-      Type: PDFName.of("Metadata"),
-      Subtype: PDFName.of("XML"),
+      Type: pl().PDFName.of("Metadata"),
+      Subtype: pl().PDFName.of("XML"),
       Length: xmpBytes.length,
     }),
     xmpBytes,
   );
   const metaRef = pdfDoc.context.register(metaStream);
-  pdfDoc.catalog.set(PDFName.of("Metadata"), metaRef);
+  pdfDoc.catalog.set(pl().PDFName.of("Metadata"), metaRef);
 
   // ── Save ──────────────────────────────────────────────────────────────
   // Keep object streams enabled — PDF 1.5+ compressed xref/objstm is
@@ -249,7 +258,7 @@ function tagRgbImagesAsSRgb(pdfDoc: PDFDocument): number {
     const bytes = sRgbIccBytes();
     const stream = pdfDoc.context.stream(bytes, {
       N: 3,
-      Alternate: PDFName.of("DeviceRGB"),
+      Alternate: pl().PDFName.of("DeviceRGB"),
     });
     iccRef = pdfDoc.context.register(stream);
     return iccRef;
@@ -257,17 +266,17 @@ function tagRgbImagesAsSRgb(pdfDoc: PDFDocument): number {
 
   let count = 0;
   for (const [, obj] of pdfDoc.context.enumerateIndirectObjects()) {
-    const dict = obj instanceof PDFRawStream ? obj.dict : null;
+    const dict = obj instanceof pl().PDFRawStream ? obj.dict : null;
     if (!dict) continue;
-    const subtype = dict.get(PDFName.of("Subtype"));
-    if (!(subtype instanceof PDFName) || subtype.asString() !== "/Image") continue;
-    const cs = dict.get(PDFName.of("ColorSpace"));
-    if (!(cs instanceof PDFName) || cs.asString() !== "/DeviceRGB") continue;
+    const subtype = dict.get(pl().PDFName.of("Subtype"));
+    if (!(subtype instanceof pl().PDFName) || subtype.asString() !== "/Image") continue;
+    const cs = dict.get(pl().PDFName.of("ColorSpace"));
+    if (!(cs instanceof pl().PDFName) || cs.asString() !== "/DeviceRGB") continue;
 
-    const arr = PDFArray.withContext(pdfDoc.context);
-    arr.push(PDFName.of("ICCBased"));
+    const arr = pl().PDFArray.withContext(pdfDoc.context);
+    arr.push(pl().PDFName.of("ICCBased"));
     arr.push(ensureSRgbRef());
-    dict.set(PDFName.of("ColorSpace"), arr);
+    dict.set(pl().PDFName.of("ColorSpace"), arr);
     count += 1;
   }
   return count;
@@ -319,4 +328,3 @@ function buildXmpMetadata(opts: {
 
 // Silence unused-import warnings in strict builds (some symbols are only
 // used indirectly through the pdf-lib object graph).
-export const _unusedImportGuard = { PDFHexString };
