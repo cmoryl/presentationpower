@@ -64,7 +64,7 @@ export function brandSignatureLook(brandModeId: string): SignatureBrandLook {
  * so it can never be stretched.
  */
 const LOCKUP_ASPECT: Record<string, number> = {
-  tp: 2500 / 284,
+  tp: 1600 / 163,
   globallink: 2500 / 507,
   legal: 2500 / 734,
   lifesci: 2500 / 640,
