@@ -154,7 +154,17 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
       // bigger block whose walls close it in at an angle (St. James, Westminster).
       // Cut it along those walls too, so its colour stops at the room's walls
       // instead of filling the whole rectangle behind them.
-      const cut = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, [], []);
+      // Walls with a doorway gap let the colour run into the hallway, so each
+      // run is also carried along its own line to close the gap, and the
+      // tightest piece that is still the room (not a sliver) is kept.
+      const base = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, [], []);
+      let cut = base;
+      if (base)
+        for (const bridge of [4, 8, 12]) {
+          const c = qeiiCutCell(floor, m.shapeIndex, m.x, m.y, [], bridge);
+          if (c && c.planShare >= base.planShare * 0.45 && c.planShare < (cut?.planShare ?? 1))
+            cut = c;
+        }
       if (
         cut &&
         cut.share >= 0.15 &&
@@ -351,6 +361,9 @@ export const QEII_DEFAULT_ROOM_COLOUR_OVERRIDES: Record<string, string> = {
   Churchill: "#C2A3FF",
 };
 
+/** Rooms the reviewer asked to keep without a background colour. */
+export const QEII_DEFAULT_UNFILLED = new Set(["shelley"]);
+
 /**
  * Default fills for a floor: every space the issued event schedule puts to use —
  * sessions, registration, the mart, the café — filled with the approved accent
@@ -365,6 +378,8 @@ export function qeiiDefaultRoomColours(floor: QeiiFloorVector): QeiiRoomColours 
   const out: QeiiRoomColours = {};
   for (const entry of qeiiRoomShapes(floor)) {
     if (!spaceUsesForRoom(entry.room, floor.id).length) continue;
+    // Reviewer: these spaces carry no background colour.
+    if (QEII_DEFAULT_UNFILLED.has(entry.room.trim().toLowerCase())) continue;
     out[entry.room] =
       QEII_DEFAULT_ROOM_COLOUR_OVERRIDES[entry.room] ??
       qeiiRoomDivisionAccent(entry.room, floor.id) ??
