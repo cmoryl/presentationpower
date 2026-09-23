@@ -942,6 +942,7 @@ function LondonSignagePage() {
     <AppShell bare={!userId}>
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
         {userId && (
+          <>
           <Link
             to="/events/next"
             className="inline-flex items-center gap-2 text-sm font-medium text-[#003FC7] hover:underline"
@@ -955,6 +956,7 @@ function LondonSignagePage() {
           >
             Event home
           </Link>
+          </>
         )}
 
         {headError && (
