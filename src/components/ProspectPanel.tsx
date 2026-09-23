@@ -142,10 +142,18 @@ export function ProspectPanel({
               <span className={labelClass}>Prospect / client</span>
               <input
                 value={value.prospect}
-                onChange={(e) => set("prospect", e.target.value)}
+                onChange={(e) => set("prospect", e.target.value.slice(0, 160))}
+                maxLength={160}
                 placeholder="Company name"
                 className={fieldClass}
               />
+              {/* A pasted web address here ends up printed as the client name on
+                  every slide, so say so before that happens. */}
+              {/^\s*(https?:\/\/|www\.)/i.test(value.prospect) ? (
+                <span className="mt-1 block text-[11px] text-[#E53D2E]">
+                  That looks like a web address. Type the company name as it should be printed.
+                </span>
+              ) : null}
             </label>
             <div className="block">
               <span className={labelClass}>Industry</span>

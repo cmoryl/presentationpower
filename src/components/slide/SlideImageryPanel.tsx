@@ -1,3 +1,4 @@
+import { checkUploadSize, UPLOAD_IMAGE_MAX_BYTES } from "@/lib/upload-limits";
 // Slide-level imagery control (the photograph MediaTile renders for
 // image-forward variants). Backgrounds are handled elsewhere by
 // BackgroundImageryPanel — this panel drives `content.mediaUrl`, the
@@ -191,7 +192,9 @@ export function SlideImageryPanel({
               accept={ALLOWED.join(",")}
               className="hidden"
               onChange={(e) => {
-                const files = Array.from(e.target.files ?? []);
+                const files = Array.from(e.target.files ?? []).filter((f) =>
+                  checkUploadSize(f, UPLOAD_IMAGE_MAX_BYTES),
+                );
                 if (files.length) void drop.ingest(files);
                 e.target.value = "";
               }}

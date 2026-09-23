@@ -1,3 +1,4 @@
+import { checkUploadSize, UPLOAD_IMAGE_MAX_BYTES } from "@/lib/upload-limits";
 // Image picker for Slide Studio imagery cells.
 //
 // Lets a curator either upload a new file (click or drag & drop) or re-select
@@ -108,7 +109,7 @@ export function SlideMediaPicker({
               e.preventDefault();
               setDragging(false);
               const file = e.dataTransfer.files?.[0];
-              if (file) void upload(file);
+              if (file && checkUploadSize(file, UPLOAD_IMAGE_MAX_BYTES)) void upload(file);
             }}
             onClick={() => fileRef.current?.click()}
             className={`cursor-pointer rounded-xl border border-dashed px-4 py-6 text-center transition ${
@@ -131,7 +132,7 @@ export function SlideMediaPicker({
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 e.target.value = "";
-                if (file) void upload(file);
+                if (file && checkUploadSize(file, UPLOAD_IMAGE_MAX_BYTES)) void upload(file);
               }}
             />
           </div>

@@ -1,3 +1,4 @@
+import { checkUploadSize, UPLOAD_IMAGE_MAX_BYTES } from "@/lib/upload-limits";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, useRef } from "react";
 import { AppShell } from "@/components/AppShell";
@@ -112,6 +113,8 @@ function ImageryPage() {
   async function handleUpload(files: FileList | null) {
     if (!files) return;
     for (const f of Array.from(files)) {
+      // A 50MB photo used to just hang here with no explanation.
+      if (!checkUploadSize(f, UPLOAD_IMAGE_MAX_BYTES)) continue;
       const dataUrl = await new Promise<string>((resolve, reject) => {
         const r = new FileReader();
         r.onload = () => resolve(r.result as string);

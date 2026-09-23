@@ -1,3 +1,4 @@
+import { checkUploadSize, UPLOAD_ARTWORK_MAX_BYTES } from "@/lib/upload-limits";
 // London signage — LIVE FILE for one sign.
 //
 // When Illustrator hands back a finished file for a sign, this is where it goes
@@ -159,7 +160,10 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
             <input
               type="file"
               accept=".ai,.pdf,.eps,.svg,application/pdf,application/postscript,image/svg+xml"
-              onChange={(e) => setMaster(e.target.files?.[0] ?? null)}
+              onChange={(e) => {
+                const f = e.target.files?.[0] ?? null;
+                setMaster(f && checkUploadSize(f, UPLOAD_ARTWORK_MAX_BYTES) ? f : null);
+              }}
               className="mt-1 block w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-[12px] font-normal"
             />
           </label>
@@ -168,7 +172,10 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
             <input
               type="file"
               accept=".ai,.pdf,application/pdf,application/illustrator"
-              onChange={(e) => setPrintMaster(e.target.files?.[0] ?? null)}
+              onChange={(e) => {
+                const f = e.target.files?.[0] ?? null;
+                setPrintMaster(f && checkUploadSize(f, UPLOAD_ARTWORK_MAX_BYTES) ? f : null);
+              }}
               className="mt-1 block w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-[12px] font-normal"
             />
           </label>
@@ -177,7 +184,10 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              onChange={(e) => setProof(e.target.files?.[0] ?? null)}
+              onChange={(e) => {
+                const f = e.target.files?.[0] ?? null;
+                setProof(f && checkUploadSize(f, UPLOAD_ARTWORK_MAX_BYTES) ? f : null);
+              }}
               className="mt-1 block w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-[12px] font-normal"
             />
           </label>
