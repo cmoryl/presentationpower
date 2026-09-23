@@ -183,3 +183,35 @@ missed the wall update entirely.
 **Rule:** map a hand-back file to a sign by its full path inside the pack, and record that
 path in the version note so the next issue can be diffed against it. Where a supplied
 artboard is a 1:10 proof, scale the trim up ×10 and say so in `dimsSource`.
+
+## Venue maps (learned on the QEII Centre map set — applies to every venue)
+
+### 2026-09 — Ask for vector floor plans, never picture scans
+**Context:** QEII map set, third floor.
+**What happened:** the third floor arrived as a low-resolution picture. Tracing it took several rebuild passes and it never reached the line quality of the six vector floors.
+**Rule now:** the venue intake asks for vector plans (PDF, AI or SVG) per level. A picture scan is accepted only as a tracing reference and is flagged "lower quality" on the intake checklist until a vector replaces it.
+**Enforced by:** intake checklist (`src/lib/event-intake.ts`) — floor plans marked `scan` stay amber.
+
+### 2026-09 — Room colour only fills rooms closed by walls
+**Context:** QEII room colours (Churchill, St. James, Westminster, Wordsworth, Mountbatten).
+**What happened:** colour leaked into corridors wherever the venue drawing left a doorway gap, and a shared block (Churchill) flooded a plain rectangle. Trimming colour off neighbouring spaces cut real parts out of St. James and was undone.
+**Rule now:** close a gap only by carrying an existing wall on along its own line (`QEII_ROOM_CLOSING_RUNS`), never by drawing a new wall. An open area gets a colour only after the reviewer names where it ends (`QEII_ADDED_ROOMS`). Every coloured room keeps its own named, selectable shape in every export.
+**Enforced by:** `src/lib/__tests__/qeii-room-containment.test.ts` — every coloured room holds its label and known hallway points stay outside.
+
+### 2026-09 — Strip venue clutter, keep what closes walls
+**Context:** QEII plans.
+**What happened:** catering lifts, voids and pillar dots made the plans busy and pillar dots punched holes in room colour.
+**Rule now:** drop catering-lift and void labels (`QEII_LABELS_OFF_PLAN`) and do not draw pillar dots, but keep pillar positions in the wall model so rooms still close.
+**Enforced by:** `next-london-qeii-symbols.test.ts`.
+
+### 2026-09 — Every map export must carry the live state of every floor
+**Context:** all-floors PowerPoint/Illustrator packs.
+**What happened:** floors other than the one on screen exported without fills, key names or edits, and white logos vanished on pale rooms.
+**Rule now:** exports build every floor from its own saved colours, key and edits; a white or reverse logo on a pale room falls back to the colour lockup. The "Find your way" directory leads every all-floors export.
+**Enforced by:** `qeii-map-export.test.ts`.
+
+### 2026-09 — Online research is a suggestion, never an issued fact
+**Context:** venue research for new events.
+**What happened:** (rule set before first use) web-published room names, capacities and plans are often out of date or marketing renders.
+**Rule now:** anything found online is stored as "found online — confirm with venue" with its source link, and nothing prints from it until someone confirms it. A found plan is a tracing reference, never the print master.
+**Enforced by:** `event_venue_research` status column; print paths read confirmed values only.

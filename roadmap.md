@@ -1,24 +1,6 @@
-# Roadmap — advanced stat & module design options
-
-- [x] New figure treatments: halo, ribbon, echo, ticked dial, pie share, area sparkline, micro waterfall
-- [x] New materials: dot matrix, hairline stripes
-- [x] New reveals: focus pull (blur), drift in — with reduced-motion guards
-- [x] Monumental emphasis weight
-- [x] New multi-stat arrangements: magazine lead, ladder, duo lead
-- [x] New slide types: ticker strip, sparkline hero, gauge stack (taxonomy, render, layout, backdrop, library copy, starter content)
-- [x] Credential module: point marker, logo tone, accent strength, badge size, heading alignment
-- [x] Tests + typecheck + build green
-- [x] Export sweep for the 3 new slide types — swept locally (ticker strip, sparkline hero, gauge stack all pass); coverage ledger now carries prior cells across matrix additions (904/6270 verified)
-
-- [x] Update Churchill partner booth specs from uploaded `Churchill_SI_Booths.pdf` — nine glass vinyls added (1300x1230 ×6, 7000x1230 ×3, 10mm bleed, CMYK vector)
-
-## NEXT agendas / brand kits (Sept 2026)
-- [x] Innovation Lounge agenda board + product write-ups under the schedule
-- [ ] Division accent on agenda day headings + left time rails (screen + PDF/AI/DOCX/PPTX)
-- [ ] Innovation Lounge extra info from Canva file canva.link/0qp10ba0b4r6poq
-- [ ] Enrich brand guides with BrandHub division profiles (GlobalLink, Dataforce, Life Sciences, master identity): photography, type scale, colour accessibility, core values — no Canva audits, no BoothHUB
-
-## London map exports (Sept 22)
-- [x] Group each division lockup so it moves as one object in every live export (SVG group, AI layer group, PPTX/Word grouped shape)
-- [x] Canva hand-off on the maps page: per-floor + all-floors PowerPoint, with a clear "download then upload to Canva" step (no public link)
-- [x] Keep every wall-defined room as a named, independently selectable vector in uncoloured SVG, AI, PowerPoint and Word exports
+# Roadmap — new event map pipeline
+- [x] 1. London map lessons + decisions written into the logs
+- [ ] 2. Venue intake checklist per event
+- [ ] 3. Online venue research (suggestions only, confirm to use)
+- [ ] 5. "Start this event" step (button + events assistant tool)
+- [ ] 4. Map system for any venue

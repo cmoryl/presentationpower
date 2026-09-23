@@ -2166,6 +2166,45 @@ export type Database = {
         }
         Relationships: []
       }
+      event_intake_items: {
+        Row: {
+          created_at: string
+          event_id: string
+          file_path: string | null
+          id: string
+          item_key: string
+          note: string | null
+          source_url: string | null
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          file_path?: string | null
+          id?: string
+          item_key: string
+          note?: string | null
+          source_url?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          file_path?: string | null
+          id?: string
+          item_key?: string
+          note?: string | null
+          source_url?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       event_pillar_versions: {
         Row: {
           config: Json
@@ -2346,6 +2385,54 @@ export type Database = {
           updated_at?: string
           venue?: string
           wifi?: string
+        }
+        Relationships: []
+      }
+      event_venue_research: {
+        Row: {
+          confirmed_by: string | null
+          created_at: string
+          created_by: string | null
+          event_id: string
+          id: string
+          item_key: string
+          label: string
+          query: string | null
+          source_title: string | null
+          source_url: string
+          status: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          confirmed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          id?: string
+          item_key: string
+          label: string
+          query?: string | null
+          source_title?: string | null
+          source_url: string
+          status?: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          confirmed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          item_key?: string
+          label?: string
+          query?: string | null
+          source_title?: string | null
+          source_url?: string
+          status?: string
+          updated_at?: string
+          value?: string
         }
         Relationships: []
       }

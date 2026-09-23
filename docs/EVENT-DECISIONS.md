@@ -268,3 +268,29 @@ placeholders; leaving the slots blank with a named blocker.
 **Why:** a placeholder address or capacity reads as issued and gets printed.
 **Would change if:** the hotel issues its floor sheets and room list.
 **Applies to:** every venue.
+
+## Venue maps (every venue)
+
+### 2026-09 — Map rooms use the division accent, house spaces enterprise blue
+**Area:** venue map room fills.
+**Options tested:** one house accent for every room; division accent per room; free colour per room.
+**Chosen:** division accent by default, enterprise blue for house spaces (registration, cloakroom, Brew), reviewer overrides on top.
+**Why:** a reader finds their division's rooms by colour, and the key stays short.
+**Would change if:** an event is single-division.
+**Applies to:** every venue.
+
+### 2026-09 — Signage look is the default map look
+**Area:** venue map style.
+**Options tested:** issued, element, studio, line, press, wayfinder, blueprint, signage.
+**Chosen:** signage (Canva DAHWCDMtmSI): chevron heading, floor tabs, venue bar, rooms fading from division colour to a pale tint.
+**Why:** it matches the printed event signage, so maps and signs read as one family.
+**Would change if:** the event's own Canva master uses a different map sheet.
+**Applies to:** every venue in the NEXT series.
+
+### 2026-09 — Map logos are white or black only, with colour fallback
+**Area:** logos on map rooms.
+**Options tested:** full-colour lockups; reverse; white only; white and black.
+**Chosen:** white on filled rooms, black (Blue 800) on unfilled, colour lockup automatically when white would sit on a pale fill.
+**Why:** one-colour logos stay legible on every division colour and gradient.
+**Would change if:** approved all-black division artwork is published.
+**Applies to:** every venue.
