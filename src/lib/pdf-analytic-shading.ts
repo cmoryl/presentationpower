@@ -17,6 +17,10 @@
 
 import { PDFDict, PDFName, type PDFDocument, type PDFPage, type PDFRef } from "pdf-lib";
 
+// Re-exported so existing callers keep one import site; the writers themselves
+// carry no pdf-lib dependency (see pdf-analytic-shading-ops.ts).
+export { patternDictBody, patternFillOps } from "./pdf-analytic-shading-ops";
+
 /** One gradient stop: 0–1 position and 3 (RGB) or 4 (CMYK) 0–1 components. */
 export type ShadingStop = { offset: number; color: number[] };
 
@@ -161,28 +165,4 @@ export function registerGradientPattern(
   const name = PDFName.of(resourceName);
   patterns.set(name, patternRef);
   return { name, ref: patternRef };
-}
-
-/**
- * Raw-string writers (the London `.ai` masters are assembled byte by byte, not
- * through pdf-lib). Returns the pattern dictionary body; the caller registers it
- * as an object and points `/Pattern << /P0 n 0 R >>` at it.
- */
-export function patternDictBody(shadingObjNum: number, matrix?: number[]): string {
-  const m = matrix ?? [1, 0, 0, 1, 0, 0];
-  return (
-    `<< /Type /Pattern /PatternType 2 /Matrix [${m.map(r3).join(" ")}] ` +
-    `/Shading ${shadingObjNum} 0 R >>`
-  );
-}
-
-/** Content-stream operators that fill a rectangle with a registered pattern. */
-export function patternFillOps(
-  name: string,
-  box: { x: number; y: number; w: number; h: number },
-): string {
-  return (
-    `q /Pattern cs /${name} scn ` +
-    `${r3(box.x)} ${r3(box.y)} ${r3(box.w)} ${r3(box.h)} re f Q\n`
-  );
 }

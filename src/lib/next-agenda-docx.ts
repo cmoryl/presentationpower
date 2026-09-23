@@ -13,7 +13,6 @@
 // dependency is needed and the result opens natively in Word, Pages and Docs.
 // -----------------------------------------------------------------------------
 
-import JSZip from "jszip";
 
 import {
   agendaTextLines,
@@ -1279,6 +1278,7 @@ export async function buildAgendaDocx(
     "</w:body></w:document>",
   ].join("");
 
+  const { default: JSZip } = await import("jszip");
   const zip = new JSZip();
   zip.file(
     "[Content_Types].xml",

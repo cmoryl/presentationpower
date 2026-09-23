@@ -7,7 +7,6 @@
 //   READ-ME.txt             geometry, colour and output notes
 // -----------------------------------------------------------------------------
 
-import JSZip from "jszip";
 
 import { captureAssetCanvas } from "./asset-export";
 import { buildAgendaVectorPdf } from "./agenda-vector-pdf";
@@ -148,6 +147,7 @@ export async function exportAgendaSheet(opts: {
   const deck = await buildAgendaPptx(config).catch(() => null);
 
   opts.onProgress?.({ stage: "package", label: "Packaging the zip" });
+  const { default: JSZip } = await import("jszip");
   const zip = new JSZip();
   zip.file(`pdf/${slug}.pdf`, pdfBuffer);
   zip.file(`ai/${slug}.ai`, pdfBuffer);

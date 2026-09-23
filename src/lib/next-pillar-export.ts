@@ -9,8 +9,7 @@
 // -----------------------------------------------------------------------------
 
 import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
-import JSZip from "jszip";
-import jsPDF from "jspdf";
+import type jsPDF from "jspdf";
 import { fetchIccProfile, wrapPdfAsX4 } from "./pdf-x4";
 
 import { captureAssetCanvas } from "./asset-export";
@@ -197,7 +196,8 @@ export async function exportPillarSign(opts: {
   const effectivePpi = Math.round(canvas.width / artW);
 
   opts.onProgress?.({ stage: "pdf", label: "Writing the press PDF" });
-  const pdf = new jsPDF({
+  const { default: JsPdf } = await import("jspdf");
+  const pdf = new JsPdf({
     orientation: artW > artH ? "landscape" : "portrait",
     unit: "in",
     format: [artW + SLUG_IN * 2, artH + SLUG_IN * 2],
@@ -250,6 +250,9 @@ export async function exportPillarSign(opts: {
   const proofBuffer = await proofBlob.arrayBuffer();
 
   opts.onProgress?.({ stage: "package", label: "Packaging the zip" });
+  // jszip only matters when a pack is actually asked for, so it loads here
+  // instead of riding along in every page that can offer the download.
+  const { default: JSZip } = await import("jszip");
   const zip = new JSZip();
   const stem = colorSpace === "cmyk" ? `${slug}-cmyk` : slug;
   zip.file(`pdf/${stem}.pdf`, pdfBuffer);

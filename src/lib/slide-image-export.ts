@@ -22,7 +22,7 @@
  *     can show meaningful status ("Fonts…", "Images…", "Rendering…").
  */
 import { toPng } from "html-to-image";
-import { jsPDF } from "jspdf";
+import type { jsPDF } from "jspdf";
 import { beginExportChrome, exportNodeFilter } from "./export-chrome-suppress";
 import { exportSlideBounds } from "./export-space";
 
@@ -931,7 +931,8 @@ export async function exportSlidesAsImagePdf(
   const sizeOf = (node: HTMLElement): [number, number] =>
     opts.pageSizeIn ?? pdfPageSizeForNode(node);
   const first = sizeOf(nodes[0]!.node);
-  const pdf = new jsPDF({
+  const { jsPDF: JsPdf } = await import("jspdf");
+  const pdf = new JsPdf({
     orientation: first[0] >= first[1] ? "landscape" : "portrait",
     unit: "in",
     format: first,

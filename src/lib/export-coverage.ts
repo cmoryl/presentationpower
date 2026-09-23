@@ -13,7 +13,6 @@
 //   • in notes  — not on the canvas but present in the notes part
 //   • missing   — in neither, i.e. genuinely lost by the export (a real bug)
 
-import JSZip from "jszip";
 import type { Deck } from "./deck-store";
 import { collectStrings, isCovered, norm, OVERFLOW_HEADER } from "./reinterpret-design";
 
@@ -98,6 +97,7 @@ export async function auditExportCoverage(
   blob: Blob | ArrayBuffer,
 ): Promise<ExportCoverageReport> {
   const data = blob instanceof Blob ? await blob.arrayBuffer() : blob;
+  const { default: JSZip } = await import("jszip");
   const zip = await JSZip.loadAsync(data);
 
   const slideParts = Object.keys(zip.files)

@@ -13,7 +13,6 @@
 // -----------------------------------------------------------------------------
 
 import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
-import JSZip from "jszip";
 
 import { buildLondonPanelAi } from "./next-london-revise";
 import type { LondonPanel } from "./next-london-signage";
@@ -129,6 +128,9 @@ export async function exportPillarBatch(opts: {
   const items = opts.items.filter((i) => i.quantity > 0);
   if (items.length === 0) throw new Error("Pick at least one pillar size with a quantity");
 
+  // jszip only matters when a pack is actually asked for, so it loads here
+  // instead of riding along in every page that can offer the download.
+  const { default: JSZip } = await import("jszip");
   const zip = new JSZip();
   const rows: { config: PillarConfig; item: PillarBatchItem; vector: boolean }[] = [];
   const entries: PillarBatchResult["entries"] = [];

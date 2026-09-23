@@ -15,7 +15,7 @@
 // export uses, so all three outputs agree pixel-for-pixel on brand paint.
 // -----------------------------------------------------------------------------
 
-import PptxGenJS from "pptxgenjs";
+import type PptxGenJS from "pptxgenjs";
 
 import {
   AGENDA_BAND,
@@ -130,7 +130,8 @@ export async function buildAgendaPptx(
   const chromeHex = hex(agendaChromeInk(config), face === "light" ? "03002C" : "FFFFFF");
   const notes: string[] = [];
 
-  const pptx = new PptxGenJS();
+  const { default: Pptx } = await import("pptxgenjs");
+  const pptx = new Pptx();
   const slideW = geo.trimW * MM_TO_IN;
   const slideH = geo.trimH * MM_TO_IN;
   pptx.defineLayout({ name: "NEXT_AGENDA", width: slideW, height: slideH });

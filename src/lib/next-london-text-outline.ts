@@ -11,13 +11,19 @@
 
 // opentype.js ships a CommonJS build for dev SSR and an ESM build (named
 // exports only, no default) for the production bundle. A namespace import with
-// an interop unwrap resolves `parse` on both.
-import * as opentypeNs from "opentype.js";
+// an interop unwrap resolves `parse` on both. It loads on first use rather than
+// at module scope: the parser is only needed while a print master is being
+// built, so no page pays for it just to show a preview.
 import type { Font } from "opentype.js";
 
-const opentypeMod = ((opentypeNs as unknown as { default?: typeof opentypeNs }).default ??
-  opentypeNs) as typeof opentypeNs;
-const parse = opentypeMod.parse;
+type OpentypeModule = typeof import("opentype.js");
+
+async function opentypeParse(): Promise<OpentypeModule["parse"]> {
+  const ns = await import("opentype.js");
+  const mod = ((ns as unknown as { default?: OpentypeModule }).default ??
+    ns) as OpentypeModule;
+  return mod.parse;
+}
 
 /** Path to the shipped signage face, relative to the site root. */
 export const LONDON_SIGNAGE_FONT_URL = "/fonts/Geist-Bold.ttf";
@@ -39,7 +45,8 @@ let pending: Promise<LondonSignageFace> | null = null;
 export const LONDON_SIGNAGE_FONT_MISSING =
   "Signage font unavailable — refusing to build a master with substituted text";
 
-function wrap(buffer: ArrayBuffer): LondonSignageFace {
+async function wrap(buffer: ArrayBuffer): Promise<LondonSignageFace> {
+  const parse = await opentypeParse();
   const font = parse(buffer);
   return { name: "Geist-Bold", font, unitsPerEm: font.unitsPerEm };
 }
@@ -62,7 +69,7 @@ export async function loadLondonSignageFace(): Promise<LondonSignageFace> {
     if (nodeProcess?.versions?.node) {
       try {
         const fs = await import("node:fs/promises");
-        cached = wrap(toArrayBuffer(await fs.readFile(LONDON_SIGNAGE_FONT_FILE)));
+        cached = await wrap(toArrayBuffer(await fs.readFile(LONDON_SIGNAGE_FONT_FILE)));
         return cached;
       } catch {
         /* fall through to fetch */
@@ -70,7 +77,7 @@ export async function loadLondonSignageFace(): Promise<LondonSignageFace> {
     }
     const res = await fetch(LONDON_SIGNAGE_FONT_URL);
     if (!res.ok) throw new Error(LONDON_SIGNAGE_FONT_MISSING);
-    cached = wrap(await res.arrayBuffer());
+    cached = await wrap(await res.arrayBuffer());
     return cached;
   })().catch((error) => {
     pending = null;

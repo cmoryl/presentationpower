@@ -2,7 +2,6 @@
 // and a zip of one install card per asset.
 
 import { jsPDF } from "jspdf";
-import JSZip from "jszip";
 
 import { loadSvgImage } from "@/lib/london-panel-raster";
 import {
@@ -199,6 +198,9 @@ export async function downloadFloorMapPdf(opts: MapExportOptions) {
 
 /** A zip with one location map per asset, plus the install schedule. */
 export async function downloadAssetMapPack(opts: MapExportOptions) {
+  // jszip only matters when a pack is actually asked for, so it loads here
+  // instead of riding along in every page that can offer the download.
+  const { default: JSZip } = await import("jszip");
   const zip = new JSZip();
   const mapped = new Set(LONDON_FLOOR_PLANS.map((p) => p.floor));
   for (const panel of opts.panels) {

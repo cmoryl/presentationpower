@@ -4,7 +4,7 @@
 // fallback for anything unrecognized. Everything is guarded — missing or
 // oddly-shaped content falls back gracefully rather than throwing.
 
-import PptxGenJS from "pptxgenjs";
+import type PptxGenJS from "pptxgenjs";
 import { resetImageEmbedLedger } from "./export-image-report";
 import { fitOrbitLayout, resolveOrbitLayout } from "./orbit-layout";
 import { orbitDotColor, orbitRingColor, resolveOrbitFace } from "./orbit-style";
@@ -911,7 +911,8 @@ export async function exportDeckToPptx(
     console.warn("[pptx-export] icon pack warm-up skipped", e);
   }
 
-  const pptx = new PptxGenJS();
+  const { default: Pptx } = await import("pptxgenjs");
+  const pptx = new Pptx();
   pptx.layout = "LAYOUT_WIDE";
   pptx.title = deck.title;
   pptx.company = "TransPerfect";
