@@ -2097,29 +2097,36 @@ export function AgendaStudio({
                 overRows.has(i) ? "border-destructive/60 bg-destructive/5" : "border-border"
               } ${i >= fit.maxRows ? "opacity-70" : ""}`}
             >
+              {/* Caps match what the printed board can physically hold, so a
+                  pasted paragraph is refused at the keyboard rather than
+                  silently overflowing or being trimmed at save. */}
               <Input
                 aria-label={`Row ${i + 1} time`}
                 value={session.time}
+                maxLength={24}
                 placeholder="09:30"
-                onChange={(e) => setSession(i, { time: e.target.value })}
+                onChange={(e) => setSession(i, { time: e.target.value.slice(0, 24) })}
               />
               <Input
                 aria-label={`Row ${i + 1} title`}
                 value={session.title}
+                maxLength={160}
                 placeholder="Session title"
-                onChange={(e) => setSession(i, { title: e.target.value })}
+                onChange={(e) => setSession(i, { title: e.target.value.slice(0, 160) })}
               />
               <Input
                 aria-label={`Row ${i + 1} detail`}
                 value={session.detail}
+                maxLength={160}
                 placeholder="Speaker or room"
-                onChange={(e) => setSession(i, { detail: e.target.value })}
+                onChange={(e) => setSession(i, { detail: e.target.value.slice(0, 160) })}
               />
               <Input
                 aria-label={`Row ${i + 1} track`}
                 value={session.track}
+                maxLength={48}
                 placeholder="MAIN STAGE"
-                onChange={(e) => setSession(i, { track: e.target.value })}
+                onChange={(e) => setSession(i, { track: e.target.value.slice(0, 48) })}
               />
               {/* Room and mark for this row. Both optional: the row prints
                   exactly as before until one is filled in. */}
@@ -2128,8 +2135,9 @@ export function AgendaStudio({
                   aria-label={`Row ${i + 1} room`}
                   className="max-w-[240px]"
                   value={session.room ?? ""}
+                  maxLength={80}
                   placeholder="Room / floor (optional)"
-                  onChange={(e) => setSession(i, { room: e.target.value })}
+                  onChange={(e) => setSession(i, { room: e.target.value.slice(0, 80) })}
                 />
                 <select
                   aria-label={`Row ${i + 1} mark`}
