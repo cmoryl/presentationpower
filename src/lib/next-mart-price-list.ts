@@ -229,9 +229,9 @@ export type MartPriceBlock = {
 };
 
 /** Rough advance width of Geist Bold caps, in mm per point of cap height. */
-const CAP_ADVANCE = 0.62;
+const CAP_ADVANCE = 0.52;
 
-function wrap(text: string, sizeMm: number, widthMm: number): string[] {
+function wrap(text: string, sizeMm: number, widthMm: number, maxLines = 3): string[] {
   const perChar = sizeMm * CAP_ADVANCE;
   const max = Math.max(4, Math.floor(widthMm / perChar));
   if (text.length <= max) return [text];
@@ -289,19 +289,21 @@ export function martPriceListLayout(config: MartPriceListConfig): MartPriceLayou
       let y = TABLE_TOP;
       for (const category of config.categories.filter((c) => c.column === column)) {
         if (!category.items.length && !category.title.trim()) continue;
+        const barLines = wrap(category.title, 9, columnW - 8, 2);
+        const barH = S.barH + (barLines.length - 1) * 5;
         blocks.push({
           kind: "bar",
           categoryId: category.id,
-          lines: wrap(category.title, 10, columnW - 8),
+          lines: barLines,
           x,
           y,
           w: columnW,
-          h: S.barH,
+          h: barH,
         });
-        y += S.barH;
+        y += barH;
         for (const it of category.items) {
           const lines = wrap(it.name, itemSize, nameW);
-          const h = lines.length > 1 ? rowH + itemSize * 0.5 : rowH;
+          const h = rowH + (lines.length - 1) * itemSize * 0.72;
           blocks.push({
             kind: "row",
             categoryId: category.id,
