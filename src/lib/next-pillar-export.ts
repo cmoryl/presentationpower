@@ -9,7 +9,7 @@
 // -----------------------------------------------------------------------------
 
 import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
-import jsPDF from "jspdf";
+import type jsPDF from "jspdf";
 import { fetchIccProfile, wrapPdfAsX4 } from "./pdf-x4";
 
 import { captureAssetCanvas } from "./asset-export";
@@ -196,7 +196,8 @@ export async function exportPillarSign(opts: {
   const effectivePpi = Math.round(canvas.width / artW);
 
   opts.onProgress?.({ stage: "pdf", label: "Writing the press PDF" });
-  const pdf = new jsPDF({
+  const { default: JsPdf } = await import("jspdf");
+  const pdf = new JsPdf({
     orientation: artW > artH ? "landscape" : "portrait",
     unit: "in",
     format: [artW + SLUG_IN * 2, artH + SLUG_IN * 2],

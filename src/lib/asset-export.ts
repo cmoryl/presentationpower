@@ -11,7 +11,7 @@
 // -----------------------------------------------------------------------------
 
 import { toCanvas } from "html-to-image";
-import jsPDF from "jspdf";
+import type jsPDF from "jspdf";
 import { exportNodeFilter, withExportChrome } from "@/lib/export-chrome-suppress";
 import { getCachedFontEmbedCSS } from "@/lib/slide-image-export";
 
@@ -166,7 +166,8 @@ export async function exportAssetsPdf(
     });
     const dataUrl = canvas.toDataURL("image/jpeg", opts.quality ?? 0.92);
     if (!pdf) {
-      pdf = new jsPDF({ orientation, unit: "in", format: [wIn, hIn], compress: true });
+      const { default: JsPdf } = await import("jspdf");
+      pdf = new JsPdf({ orientation, unit: "in", format: [wIn, hIn], compress: true });
     } else {
       pdf.addPage([wIn, hIn], orientation);
     }

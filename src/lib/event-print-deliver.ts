@@ -22,8 +22,7 @@
 // reverse-engineered legacy .ai binary.
 // -----------------------------------------------------------------------------
 
-import JSZip from "jszip";
-import jsPDF from "jspdf";
+import type jsPDF from "jspdf";
 import { captureAssetCanvas } from "./asset-export";
 import { MAX_PLATE_EDGE_PX, pressGeometryFor, type PressGeometry } from "./event-print-pipeline";
 import type { EventPrintSpec } from "./event-spec-intake";
@@ -178,7 +177,8 @@ async function pressPdf(item: DeliveryItem, geometry: PressGeometry) {
   const artH = geometry.trimHeightIn + geometry.bleedIn * 2;
   const pageW = artW + SLUG_IN * 2;
   const pageH = artH + SLUG_IN * 2;
-  const pdf = new jsPDF({
+  const { default: JsPdf } = await import("jspdf");
+  const pdf = new JsPdf({
     orientation: pageW >= pageH ? "landscape" : "portrait",
     unit: "in",
     format: [pageW, pageH],
@@ -289,6 +289,7 @@ export async function deliverEventPrintPackage(
 ): Promise<DeliveryResult> {
   if (items.length === 0) throw new Error("deliverEventPrintPackage: no items to deliver");
   const includeAi = opts.includeAi !== false;
+  const { default: JSZip } = await import("jszip");
   const zip = new JSZip();
   const pdfDir = zip.folder("pdf")!;
   const aiDir = includeAi ? zip.folder("ai")! : null;
