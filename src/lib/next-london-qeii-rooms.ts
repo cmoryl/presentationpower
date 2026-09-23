@@ -18,6 +18,10 @@ import {
 } from "@/lib/next-london-qeii-geometry";
 import { QEII_CELL_MAX_PLAN_SHARE, qeiiCutRoomCell } from "@/lib/next-london-qeii-cells";
 import { qeiiLabelGroups } from "@/lib/next-london-qeii-layout";
+import {
+  qeiiReviewerSplitFor,
+  qeiiReviewerSplitRun,
+} from "@/lib/next-london-qeii-reviewer-splits";
 import { spaceUseMarks, spaceUsesForRoom } from "@/lib/next-london-space-use";
 import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
 
@@ -121,10 +125,25 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
       .map((o) => o.room);
     let cell: string | undefined;
     if (sharedWith.length) {
-      const others = matched
-        .filter((o) => o !== m && o.shapeIndex === m.shapeIndex)
-        .map((o) => ({ x: o.x, y: o.y }));
-      const cut = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, others);
+      const inBlock = matched.filter((o) => o !== m && o.shapeIndex === m.shapeIndex);
+      const others = inBlock.map((o) => ({ x: o.x, y: o.y }));
+      // Where the reviewer marked an undivided space as split between two rooms,
+      // the divider is drawn midway between the two names so each room fills its
+      // own half instead of showing a colour tag behind its name.
+      const split = qeiiReviewerSplitFor(
+        floor.id,
+        m.room,
+        inBlock.map((o) => o.room),
+      );
+      const partner = split
+        ? inBlock.find((o) =>
+            split.rooms.some((r) => r.toLowerCase() === o.room.trim().toLowerCase()),
+          )
+        : undefined;
+      const extraRuns = partner
+        ? [qeiiReviewerSplitRun(m, partner, (floor.w + floor.h) * 2)].filter((run) => run.length)
+        : [];
+      const cut = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, others, extraRuns);
       if (cut && cut.planShare <= QEII_CELL_MAX_PLAN_SHARE) cell = cut.d;
     }
     // Which later block paints over this room's space. The issued sheets draw

@@ -313,6 +313,8 @@ export function qeiiCutCell(
   y: number,
   others: { x: number; y: number }[] = [],
   bridge = 0,
+  /** Reviewer-authorised divider runs, for a space the venue draws undivided. */
+  extraRuns: Pt[][] = [],
 ): { d: string; share: number; planShare: number } | undefined {
   const block = floor.shapes[shapeIndex];
   if (!block?.fill) return undefined;
@@ -354,6 +356,8 @@ export function qeiiCutCell(
     }
   }
   for (const run of dottedRuns(dots)) bands.push(...runBand(run, 1.1 + WALL_BITE, bridge));
+  // A divider the reviewer asked for cuts the block exactly like a drawn wall.
+  for (const run of extraRuns) bands.push(...runBand(run, 1.1 + WALL_BITE, bridge));
   for (const shape of floor.shapes) {
     if (!shape.stroke) continue;
     const half = Math.max((shape.w ?? 1) / 2, 0.2) + WALL_BITE;
@@ -402,13 +406,14 @@ export function qeiiCutRoomCell(
   x: number,
   y: number,
   others: { x: number; y: number }[] = [],
+  extraRuns: Pt[][] = [],
 ): { d: string; share: number; planShare: number } | undefined {
   // A few issued wall runs stop farther short of the adjoining outer wall than
   // the early floors do (notably Moore/Rutherford and the ground-floor service
   // bays). Continue only along the line's own issued angle; never draw a new
   // divider between labels.
   for (const bridge of [0, 2, 4, 8, 12, 16, 24]) {
-    const cut = qeiiCutCell(floor, shapeIndex, x, y, others, bridge);
+    const cut = qeiiCutCell(floor, shapeIndex, x, y, others, bridge, extraRuns);
     if (cut) return cut;
   }
   return undefined;
