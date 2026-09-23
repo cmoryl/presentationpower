@@ -290,7 +290,7 @@ export function martPriceListLayout(config: MartPriceListConfig): MartPriceLayou
       for (const category of config.categories.filter((c) => c.column === column)) {
         if (!category.items.length && !category.title.trim()) continue;
         const barLines = wrap(category.title, 9, columnW - 8, 2);
-        const barH = S.barH + (barLines.length - 1) * 5;
+        const barH = S.barH + (barLines.length - 1) * 6.5;
         blocks.push({
           kind: "bar",
           categoryId: category.id,
@@ -471,8 +471,8 @@ export function martPriceListSvg(
             text(
               line,
               x + b.w / 2,
-              y + b.h / 2 + 3.4 + (i - (b.lines.length - 1) / 2) * 4.6,
-              layout.barSize * 0.62 + 2,
+              y + b.h / 2 + (b.lines.length > 1 ? 2.3 : 2.9) + (i - (b.lines.length - 1) / 2) * 6.5,
+              b.lines.length > 1 ? 6.4 : 7.6,
               "#FFFFFF",
               "middle",
             ),

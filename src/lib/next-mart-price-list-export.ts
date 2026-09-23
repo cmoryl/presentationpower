@@ -242,7 +242,7 @@ export async function buildMartPriceListPdf(
         height: hPt,
         color: hexRgb(config.barHex),
       });
-      const size = (layout.barSize * 0.62 + 2) * MM_TO_PT * 0.62;
+      const size = (b.lines.length > 1 ? 6.4 : 7.6) * MM_TO_PT;
       b.lines.forEach((line, i) => {
         const lw = bold.widthOfTextAtSize(line, size);
         page.drawText(line, {
@@ -251,7 +251,7 @@ export async function buildMartPriceListPdf(
             yTop -
             hPt / 2 -
             size * 0.35 -
-            (i - (b.lines.length - 1) / 2) * size * 1.2 * -1,
+            (i - (b.lines.length - 1) / 2) * 6.5 * MM_TO_PT * -1,
           size,
           font: bold,
           color: hexRgb("#FFFFFF"),
