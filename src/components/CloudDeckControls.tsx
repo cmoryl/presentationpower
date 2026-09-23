@@ -141,13 +141,46 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
     pending.current = null;
     if (timer.current) clearTimeout(timer.current);
     try {
-      await saveRef.current({ data: { deck: p.deck, brief: p.brief } });
+      const res = await saveRef.current({
+        data: {
+          deck: p.deck,
+          brief: p.brief,
+          // Prove which saved version this editor is working from, so a save can
+          // be refused rather than overwrite someone else's newer work.
+          ...(getDeckStamp(deckId) ? { baseUpdatedAt: getDeckStamp(deckId)! } : {}),
+        },
+      });
+      setDeckStamp(deckId, (res as { serverUpdatedAt?: string | null })?.serverUpdatedAt ?? null);
       lastSerialized.current = p.serialized;
       markDeckSaved(deckId, deckSignature(p.deck, p.brief));
       markCloudLinked(deckId, true);
+      conflict.current = null;
       return true;
     } catch (e) {
+      // A conflict is not a transport error: someone else's work is at stake, so
+      // it must be said out loud instead of retried on the next keystroke.
+      const message = e instanceof Error ? e.message : String(e);
+      if (message.includes("Someone else saved changes")) {
+        if (conflict.current !== message) {
+          conflict.current = message;
+          toast.error("This deck changed somewhere else", {
+            description: message,
+            duration: 15000,
+            action: {
+              label: "Reload saved version",
+              onClick: () => window.location.reload(),
+            },
+          });
+        }
+        return false;
+      }
       console.warn("[autosave] save failed", e);
+      toast.error("Your last change didn't save", {
+        description: navigator.onLine
+          ? "The save was refused. Your work is still on screen — try editing again, or reload to see the saved version."
+          : "You appear to be offline. Your work is still on screen and will save once you reconnect.",
+        duration: 10000,
+      });
       return false;
     }
   };
