@@ -246,7 +246,12 @@ function wrap(text: string, sizeMm: number, widthMm: number): string[] {
     } else line = next;
   }
   if (line) lines.push(line);
-  return lines.slice(0, 2);
+  if (lines.length <= maxLines) return lines;
+  // Never drop issued words: fold everything past the last printed line back on.
+  const keep = lines.slice(0, maxLines - 1);
+  keep.push(lines.slice(maxLines - 1).join(" "));
+  return keep;
+
 }
 
 export type MartPriceLayout = {
