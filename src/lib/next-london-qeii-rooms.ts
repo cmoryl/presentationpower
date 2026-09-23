@@ -140,8 +140,12 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
             split.rooms.some((r) => r.toLowerCase() === o.room.trim().toLowerCase()),
           )
         : undefined;
+      // The divider only has to cross the block it cuts, so it is carried to the
+      // block's own diagonal — a line stretched across the whole sheet is both
+      // pointless and far slower to cut with.
+      const reach = blockReach(floor, m.shapeIndex, m.x, m.y);
       const extraRuns = partner
-        ? [qeiiReviewerSplitRun(m, partner, (floor.w + floor.h) * 2)].filter((run) => run.length)
+        ? [qeiiReviewerSplitRun(m, partner, reach)].filter((run) => run.length)
         : [];
       const cut = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, others, extraRuns);
       if (cut && cut.planShare <= QEII_CELL_MAX_PLAN_SHARE) cell = cut.d;
@@ -167,6 +171,21 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
   return out;
 }
 
+
+/** How far a reviewer divider has to run to cross the block holding a point. */
+function blockReach(floor: QeiiFloorVector, shapeIndex: number, x: number, y: number): number {
+  const shape = floor.shapes[shapeIndex];
+  if (!shape) return 0;
+  for (const ring of qeiiRings(shape.d)) {
+    if (!qeiiInRing(ring, x, y)) continue;
+    const xs = ring.pts.map((p) => p[0]);
+    const ys = ring.pts.map((p) => p[1]);
+    const w = Math.max(...xs) - Math.min(...xs);
+    const h = Math.max(...ys) - Math.min(...ys);
+    return Math.hypot(w, h) * 0.75;
+  }
+  return 0;
+}
 
 /** True when this room is the only name inside its drawn shape. */
 export function qeiiRoomIsExclusive(entry: QeiiRoomShape): boolean {
