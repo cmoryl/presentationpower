@@ -180,11 +180,21 @@ export async function findRecentDuplicateDeck(
 }
 
 /** Upsert a brief + deck + its slides. Owner-scoped through RLS. */
+/**
+ * The saved deck's current `updated_at`, handed back after every save so the
+ * editor can prove on its next save that it is still working from this version.
+ */
+async function readDeckStamp(sb: MinimalSb, deckUuid: string): Promise<string | null> {
+  const { data } = await sb.from("decks").select("updated_at").eq("id", deckUuid);
+  const row = Array.isArray(data) ? (data[0] as { updated_at?: string | null }) : undefined;
+  return row?.updated_at ?? null;
+}
+
 export async function saveDeckToCloudCore(
   supabase: unknown,
   userId: string,
   rawInput: unknown,
-): Promise<{ deckUuid: string; briefUuid: string }> {
+): Promise<{ deckUuid: string; briefUuid: string; serverUpdatedAt: string | null }> {
   const data = SaveInput.parse(rawInput);
   const sb = supabase as MinimalSb;
   const briefUuid = toUuid(`brief:${userId}:${data.brief.id}`);
