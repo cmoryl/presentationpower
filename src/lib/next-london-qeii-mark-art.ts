@@ -98,12 +98,14 @@ export function qeiiMarkBoxes(
       out.push({
         name: m.name,
         url: qeiiMarkUrl(m, variant),
+        ink: qeiiMarkInk(variant),
         cx: x + w / 2,
         cy: nameTop - block.size * 0.7 - block.markH / 2,
         w,
         h: block.markH,
         angle: block.angle,
       });
+
     }
   }
   return out;
