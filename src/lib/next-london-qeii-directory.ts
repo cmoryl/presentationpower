@@ -12,7 +12,7 @@
 // issued wording instead of a substituted mark.
 // -----------------------------------------------------------------------------
 
-import { NEXT_APP_ORIGIN, NEXT_EVENT } from "@/lib/next-event";
+import { NEXT_EVENT } from "@/lib/next-event";
 import { LONDON_VENUE } from "@/lib/next-london-signage";
 import { spaceUseMarkFor, type SpaceUseMark } from "@/lib/next-london-space-use";
 import {
@@ -43,7 +43,7 @@ export type QeiiDirectoryFloor = {
 export const QEII_DIRECTORY: QeiiDirectoryFloor[] = [
   {
     floor: "6th Floor",
-    rows: [{ room: "MOUNTBATTEN", holds: "LifeSciNEXT", divisionId: "lifesci" }],
+    rows: [{ room: "MOUNTBATTEN", holds: "LifeSciNEXT", divisionId: "life-sci" }],
   },
   {
     floor: "5th Floor",
@@ -172,11 +172,10 @@ export function qeiiDirectorySvg(options: QeiiDirectoryOptions = {}): string {
       );
       const mark = showMarks ? qeiiDirectoryMark(row) : undefined;
       if (mark) {
-        const markH = 20;
-        const url = qeiiMarkUrl(mark, variant);
-        const href = url.startsWith("http") ? url : `${NEXT_APP_ORIGIN}${url}`;
+        const markH = 26;
+        const href = qeiiMarkUrl(mark, variant);
         body.push(
-          `<image href="${esc(href)}" x="${holdsLeft}" y="${y - markH + 4}" width="${markH * mark.ratio}" height="${markH}" preserveAspectRatio="xMinYMid meet"><title>${esc(row.holds)}</title></image>`,
+          `<image href="${esc(href)}" x="${holdsLeft}" y="${y - markH + 6}" width="${markH * mark.ratio}" height="${markH}" preserveAspectRatio="xMinYMid meet"><title>${esc(row.holds)}</title></image>`,
         );
       } else {
         // The sheet's own wording, wrapped rather than shortened.
