@@ -3,6 +3,7 @@
 // live files and layered vector press export for Illustrator.
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useDirtyExitGuard } from "@/hooks/use-dirty-exit-guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -288,6 +289,9 @@ export function AgendaStudio({
       return create({ data: payload });
     },
     onSuccess: (row: unknown) => {
+      // Saved to the account, so there is no longer unsaved work to warn about.
+      dirtyRef.current = false;
+      setDirty(false);
       const saved = row as AgendaFileRow | null;
       if (saved?.id) setOpenFileId(saved.id);
       if (saved?.name) setFileName(saved.name);
@@ -2363,6 +2367,7 @@ export function AgendaStudio({
                       onClick={() => {
                         // A deliberate open replaces the board and starts clean.
                         dirtyRef.current = false;
+                        setDirty(false);
                         const opened = normalizeAgendaConfig(row.config);
                         setConfig(opened);
                         setOpenFileId(row.id);
