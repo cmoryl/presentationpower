@@ -1,3 +1,4 @@
+import { GuideGrounds, guideHasGrounds } from "@/components/brand/GuideGrounds";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
@@ -580,6 +581,13 @@ function BrandGuideView() {
               </a>
             )}
           </div>
+        </Section>
+      )}
+
+      {/* Backgrounds & gradients used for NEXT 2026 */}
+      {guideHasGrounds(guide.slug) && (
+        <Section title="Backgrounds & gradients" eyebrow="07a">
+          <GuideGrounds slug={guide.slug} />
         </Section>
       )}
 
