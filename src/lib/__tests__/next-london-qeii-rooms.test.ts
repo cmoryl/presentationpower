@@ -66,7 +66,8 @@ describe("QEII room colours", () => {
     // The issued walls draw Victoria and Albert as one space; the reviewer marked
     // it split in half, so the colour fills that half instead of tagging it.
     expect(paint.cells.some((c) => c.room === "Victoria" && c.hex === "#FFEB66")).toBe(true);
-    expect(qeiiSharedShapeNotes(floor).some((n) => n.includes("Victoria"))).toBe(true);
+    // Albert keeps its own half, so neither room needs a shared-shape note.
+    expect(paint.cells.some((c) => c.room === "Albert")).toBe(true);
   });
 
 
