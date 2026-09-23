@@ -180,11 +180,12 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
       // Walls with a doorway gap let the colour run into the hallway, so each
       // run is also carried along its own line to close the gap, and the
       // tightest piece that is still the room (not a sliver) is kept.
-      const base = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, [], []);
+      const closing = QEII_ROOM_CLOSING_RUNS[floor.id]?.[m.room] ?? [];
+      const base = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, [], closing);
       let cut = base;
       if (base)
         for (const bridge of [4, 8, 12]) {
-          const c = qeiiCutCell(floor, m.shapeIndex, m.x, m.y, [], bridge);
+          const c = qeiiCutCell(floor, m.shapeIndex, m.x, m.y, [], bridge, closing);
           if (c && c.planShare >= base.planShare * 0.45 && c.planShare < (cut?.planShare ?? 1))
             cut = c;
         }
@@ -217,6 +218,15 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
   return out;
 }
 
+
+/**
+ * Reviewer-confirmed closing lines where the issued drawing leaves an opening
+ * in a room's wall. Each continues an existing wall along its own line only.
+ */
+const QEII_ROOM_CLOSING_RUNS: Record<string, Record<string, [number, number][][]>> = {
+  // Wordsworth's right-hand wall (x≈394) stops short of the lower diagonal.
+  fourth: { Wordsworth: [[[394, 286], [394, 305]]] },
+};
 
 /** How far a reviewer divider has to run to cross the block holding a point. */
 function blockReach(floor: QeiiFloorVector, shapeIndex: number, x: number, y: number): number {
