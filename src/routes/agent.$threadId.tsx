@@ -579,6 +579,14 @@ function AgentThreadPage() {
 
   const removeThread = useCallback(
     async (id: string) => {
+      // Deleting a conversation takes its whole history with it and cannot be
+      // undone, so it is never done on a single stray click.
+      if (
+        !window.confirm(
+          "Delete this conversation? Its messages can't be recovered. Any decks or files it produced are kept.",
+        )
+      )
+        return;
       try {
         await deleteAgentThread(id);
         const rest = await listAgentThreads();

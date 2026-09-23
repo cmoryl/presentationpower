@@ -144,6 +144,13 @@ export function KitAgentWorkspace({
   };
 
   const removeThread = async (id: string) => {
+    // Cannot be undone, so never on a single stray click.
+    if (
+      !window.confirm(
+        "Delete this conversation? Its messages can't be recovered. Any kits it produced are kept.",
+      )
+    )
+      return;
     try {
       await deleteKitThread(id);
       const rest = threads.filter((t) => t.id !== id);
