@@ -127,6 +127,9 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
   const [allFloors, setAllFloors] = useState(false);
   /** Page 1 of the set — the issued "find your way" directory. */
   const [showIndex, setShowIndex] = useState(false);
+  // Background for page 1: the flat look ground, or one of the event's measured
+  // gradient grounds from the supplied signage pack.
+  const [directoryGround, setDirectoryGround] = useState("token");
   const [rebuiltView, setRebuiltView] = useState(true);
   // The house style is the default look for every floor and every download.
   const [face, setFace] = useState<QeiiPlanFace>("studio");
