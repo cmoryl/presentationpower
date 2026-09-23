@@ -1024,6 +1024,37 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
         </ul>
       ) : null}
 
+      {showIndex ? (
+        <figure className="mt-5 overflow-hidden rounded-2xl border border-black/10 bg-white p-4">
+          <div
+            className="mx-auto max-w-[520px] [&>svg]:h-auto [&>svg]:w-full"
+            dangerouslySetInnerHTML={{
+              __html: qeiiDirectorySvg({ face, showMarks }),
+            }}
+          />
+          <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[12px] text-[#03002C]/70">
+            <span>
+              Page 1 of the map set — {QEII_DIRECTORY_TITLE}. {QEII_DIRECTORY_SOURCE}
+            </span>
+            <button
+              type="button"
+              className={btn}
+              onClick={() => {
+                const url = URL.createObjectURL(
+                  new Blob([qeiiDirectorySvg({ face, showMarks })], {
+                    type: "image/svg+xml",
+                  }),
+                );
+                download(url, qeiiDirectoryFilename(face));
+                URL.revokeObjectURL(url);
+              }}
+            >
+              <Download className="h-4 w-4" /> This page (editable SVG)
+            </button>
+          </figcaption>
+        </figure>
+      ) : null}
+
       {allFloors ? (
         <QeiiAllFloors
           face={face}
