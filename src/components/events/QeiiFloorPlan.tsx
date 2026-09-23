@@ -201,7 +201,10 @@ export function QeiiFloorPlan({
                 : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face), face);
             // A light room colour swallows the reverse lockup, so that one falls back
             // to the colour file. An explicit all-white or colour choice is kept.
-            const variant = ink === "#03002C" && markVariant === "reverse" ? "colour" : markVariant;
+            const variant =
+              ink === "#03002C" && ["reverse", "white"].includes(markVariant)
+                ? "colour"
+                : markVariant;
             const pad = block.size * 0.32;
             const wanted = highlightRoom?.trim().toLowerCase();
             const lit = !!wanted && (room.toLowerCase() === wanted || shown.toLowerCase() === wanted);

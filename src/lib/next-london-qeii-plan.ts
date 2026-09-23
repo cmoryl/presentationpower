@@ -351,7 +351,8 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
           // A light room fill would swallow the reverse lockup, so that one falls
           // back to the colour file. An explicit all-white or colour choice stands.
           const variant =
-            ink === "#03002C" && (options.markVariant ?? "reverse") === "reverse"
+            ink === "#03002C" &&
+            ["reverse", "white"].includes(options.markVariant ?? "reverse")
               ? ("colour" as QeiiMarkVariant)
               : options.markVariant;
           const nameTop = block.y - ((block.lines.length - 1) * block.size * 1.05) / 2;
