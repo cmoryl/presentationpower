@@ -12,7 +12,8 @@
 // issued wording instead of a substituted mark.
 // -----------------------------------------------------------------------------
 
-import { LONDON_VENUE, NEXT_EVENT } from "@/lib/next-event";
+import { NEXT_APP_ORIGIN, NEXT_EVENT } from "@/lib/next-event";
+import { LONDON_VENUE } from "@/lib/next-london-signage";
 import { spaceUseMarkFor, type SpaceUseMark } from "@/lib/next-london-space-use";
 import {
   qeiiGroundInk,
@@ -21,7 +22,7 @@ import {
   type QeiiPlanFace,
 } from "@/lib/next-london-qeii-style";
 import { qeiiMarkUrl, type QeiiMarkVariant } from "@/lib/next-london-qeii-plan";
-import { NEXT_APP_ORIGIN } from "@/lib/next-event";
+
 
 export type QeiiDirectoryRow = {
   /** Room name exactly as the sheet prints it. */
@@ -42,7 +43,7 @@ export type QeiiDirectoryFloor = {
 export const QEII_DIRECTORY: QeiiDirectoryFloor[] = [
   {
     floor: "6th Floor",
-    rows: [{ room: "MOUNTBATTEN", holds: "LifeSciNEXT", divisionId: "life-sci" }],
+    rows: [{ room: "MOUNTBATTEN", holds: "LifeSciNEXT", divisionId: "lifesci" }],
   },
   {
     floor: "5th Floor",
@@ -145,11 +146,11 @@ export function qeiiDirectorySvg(options: QeiiDirectoryOptions = {}): string {
 
   const head = [
     text(marginX, 108, "FIND YOUR WAY", 42, 700),
-    text(marginX, 138, LONDON_VENUE.name, 13, 600, "start", ink, 0.72),
+    text(marginX, 138, LONDON_VENUE.venue, 13, 600, "start", ink, 0.72),
     text(
       marginX,
       158,
-      `${NEXT_EVENT.name} · ${NEXT_EVENT.dates}`,
+      `${NEXT_EVENT.name} · ${NEXT_EVENT.datesLabel}`,
       11.5,
       600,
       "start",
