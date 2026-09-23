@@ -95,7 +95,7 @@ async function callAnthropicDirect(
   opts?: { maxTokens?: number; temperature?: number },
 ): Promise<AnthropicResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY!;
-  const res = await fetch(ANTHROPIC_URL, {
+  const res = await aiFetch(ANTHROPIC_URL, {
     method: "POST",
     headers: {
       "x-api-key": apiKey,
@@ -137,7 +137,7 @@ async function callLovableGateway(
   opts?: { maxTokens?: number; temperature?: number },
 ): Promise<AnthropicResult> {
   const apiKey = process.env.LOVABLE_API_KEY!;
-  const res = await fetch(LOVABLE_GATEWAY_URL, {
+  const res = await aiFetch(LOVABLE_GATEWAY_URL, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -244,7 +244,7 @@ async function callAnthropicWithToolsDirect(
       messages: convo,
     };
     if (withTools) body.tools = tools;
-    const res = await fetch(ANTHROPIC_URL, {
+    const res = await aiFetch(ANTHROPIC_URL, {
       method: "POST",
       headers: {
         "x-api-key": apiKey,
@@ -370,7 +370,7 @@ async function callGatewayWithTools(
       messages: convo,
     };
     if (withTools) body.tools = openaiTools;
-    return fetch(LOVABLE_GATEWAY_URL, {
+    return aiFetch(LOVABLE_GATEWAY_URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
