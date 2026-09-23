@@ -1,3 +1,4 @@
+import { QEII_SIGNAGE_GRADIENTS } from "@/lib/next-london-qeii-style";
 // Rendering rules for the natively rebuilt QEII Centre floor plans.
 //
 // The geometry in next-london-qeii-vectors.ts is the issued venue artwork, path
