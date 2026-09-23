@@ -1187,7 +1187,6 @@ function DesignGround({
       ? `linear-gradient(150deg, ${tintRgba(accent, 0.22)} 0%, rgba(3,0,44,0.92) 58%, rgba(3,0,44,0.98) 100%)`
       : `linear-gradient(150deg, ${tintRgba(accent, 0.13)} 0%, rgba(255,255,255,0.86) 46%, ${tintRgba(accent, 0.07)} 100%)`;
   const rule = mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(3,0,44,0.07)";
-  const bricks = wide ? 5 : 6;
 
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
