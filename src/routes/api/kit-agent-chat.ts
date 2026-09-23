@@ -13,6 +13,8 @@ import { repairDanglingToolParts } from "@/lib/agent/repair-tool-parts";
 import {
   SHARED_KNOWLEDGE_PROMPT,
   buildSharedKnowledgeToolSet,
+  buildEventIntakeToolSet,
+  EVENT_INTAKE_PROMPT,
 } from "@/lib/agent/knowledge-tools";
 import { coerceDesignDna, designDnaPromptBlock } from "@/lib/agent/design-dna";
 import { tool, type ToolSet } from "ai";
@@ -103,6 +105,7 @@ export const Route = createFileRoute("/api/kit-agent-chat")({
           model: gateway(MODEL),
           system: [
             kitAgentSystemPrompt(surface),
+            ...(surface === "event" ? [EVENT_INTAKE_PROMPT] : []),
             SHARED_KNOWLEDGE_PROMPT,
             dna ? designDnaPromptBlock(dna) : "",
             scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : "",
@@ -113,6 +116,7 @@ export const Route = createFileRoute("/api/kit-agent-chat")({
           tools: {
             ...buildKitAgentToolSet({ supabase, userId, surface, threadId }),
             ...buildSharedKnowledgeToolSet({ supabase }),
+            ...(surface === "event" ? buildEventIntakeToolSet({ supabase }) : {}),
             ...dnaTools,
           },
           stopWhen: stepCountIs(50),

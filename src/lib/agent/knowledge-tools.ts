@@ -176,6 +176,17 @@ export function buildSharedKnowledgeToolSet(ctx: { supabase: Db }): ToolSet {
       },
     }),
 
+  };
+}
+
+export const EVENT_INTAKE_PROMPT = [
+  "NEW EVENTS — use start_event when the user asks to set up a new event, city or venue. It creates only an empty map set and the venue intake checklist; never invent rooms, capacities or dates.",
+  "- Use event_intake_status to see what has arrived. Research marked 'suggested' came from the web and must be described as 'found online — to confirm with the venue', never as fact.",
+].join("\n");
+
+/** Event-only tools: start an event and read its intake. Events assistant only. */
+export function buildEventIntakeToolSet(ctx: { supabase: Db }): ToolSet {
+  return {
     event_intake_status: tool({
       description:
         "For a started event, list what the venue and organisers have sent (floor plans, room list, programme, logos) and what online research suggested. Suggestions are not facts until confirmed.",
@@ -240,5 +251,6 @@ export function buildSharedKnowledgeToolSet(ctx: { supabase: Db }): ToolSet {
         return { event_id: id, link: `/events/next/intake/${id}`, needs: EVENT_INTAKE_ITEMS.map((i) => i.label) };
       },
     }),
+
   };
 }
