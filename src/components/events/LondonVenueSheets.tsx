@@ -44,6 +44,7 @@ import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { QeiiRoomColourPanel } from "@/components/events/QeiiRoomColourPanel";
 import {
   qeiiColourByDivision,
+  qeiiDefaultRoomColours,
   qeiiSharedShapeNotes,
   type QeiiRoomColours,
 } from "@/lib/next-london-qeii-rooms";
