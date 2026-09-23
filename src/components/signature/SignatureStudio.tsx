@@ -98,6 +98,7 @@ function applyTemplate(signature: SignatureData, templateId: string): SignatureD
 export function SignatureStudio() {
   const isAdmin = useIsAdmin();
   const [brandModeId, setBrandModeId] = useState("bm-enterprise");
+
   const [unlocked, setUnlocked] = useState(false);
   const [lockupWidth, setLockupWidth] = useState(150);
   const [replyShort, setReplyShort] = useState(false);
