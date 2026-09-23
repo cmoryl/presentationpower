@@ -127,18 +127,21 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
       const cut = qeiiCutRoomCell(floor, m.shapeIndex, m.x, m.y, others);
       if (cut && cut.planShare <= QEII_CELL_MAX_PLAN_SHARE) cell = cut.d;
     }
+    // Which later block paints over this room's space. The issued sheets draw
+    // some wings after the room block they sit on top of, so a colour written
+    // into the room's own shape can be hidden by a block drawn later. This is
+    // worked out for every room, not only the cut ones, so a whole-shape room
+    // such as Pickwick shows its colour instead of silently staying pale.
     let cellAfter = m.shapeIndex;
-    if (cell) {
-      const big = floor.w * floor.h * 0.01;
-      floor.shapes.forEach((shape, index) => {
-        if (index <= cellAfter || !shape.fill) return;
-        for (const ring of qeiiRings(shape.d))
-          if (qeiiRingArea(ring) >= big && qeiiInRing(ring, m.x, m.y)) {
-            cellAfter = index;
-            return;
-          }
-      });
-    }
+    const big = floor.w * floor.h * 0.01;
+    floor.shapes.forEach((shape, index) => {
+      if (index <= cellAfter || !shape.fill) return;
+      for (const ring of qeiiRings(shape.d))
+        if (qeiiRingArea(ring) >= big && qeiiInRing(ring, m.x, m.y)) {
+          cellAfter = index;
+          return;
+        }
+    });
     return { room: m.room, shapeIndex: m.shapeIndex, sharedWith, x: m.x, y: m.y, cell, cellAfter };
   });
   shapeCache.set(floor, out);
@@ -206,8 +209,16 @@ export function qeiiColourPaint(floor: QeiiFloorVector, rooms: QeiiRoomColours):
         hex,
       });
     if (!hex) continue;
-    if (qeiiRoomIsExclusive(entry)) fills.set(entry.shapeIndex, hex);
-    else if (!entry.cell) tags.set(entry.room, hex);
+    if (qeiiRoomIsExclusive(entry)) {
+      fills.set(entry.shapeIndex, hex);
+      // A room drawn as its own shape can still sit under a block the sheet
+      // draws later. Re-draw the room's own outline — the identical path, so no
+      // geometry is invented — above that block, or the colour never shows.
+      const after = entry.cellAfter ?? entry.shapeIndex;
+      const own = floor.shapes[entry.shapeIndex];
+      if (after > entry.shapeIndex && own && !entry.cell)
+        cells.push({ room: entry.room, shapeIndex: entry.shapeIndex, after, d: own.d, hex });
+    } else if (!entry.cell) tags.set(entry.room, hex);
   }
   return { fills, tags, cells };
 }
