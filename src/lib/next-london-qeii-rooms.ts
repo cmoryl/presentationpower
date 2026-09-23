@@ -41,6 +41,29 @@ export const QEII_ROOM_PALETTE = [
 
 export type QeiiRoomColours = Record<string, string>;
 
+/**
+ * A room can carry a two-colour gradient. The room's own entry stays its start
+ * colour, so every reader that needs one flat colour (ink, PowerPoint, Word)
+ * still gets an approved hex; the end colour sits under this key alongside it.
+ */
+export const QEII_GRADIENT_KEY = "gradient-to:";
+export const qeiiGradientKey = (room: string): string => `${QEII_GRADIENT_KEY}${room}`;
+
+/** The gradient end colour chosen for a room, if it has one. */
+export function qeiiRoomGradientTo(colours: QeiiRoomColours, room: string): string | undefined {
+  return colours[room] ? colours[qeiiGradientKey(room)] : undefined;
+}
+
+/** Approved two-colour gradients offered in the colour panel. */
+export const QEII_ROOM_GRADIENTS = [
+  { id: "aqua-lavender", label: "Aqua → Lavender", from: "#A1FBF9", to: "#C2A3FF" },
+  { id: "blue-aqua", label: "Blue → Aqua", from: "#003FC7", to: "#A1FBF9" },
+  { id: "lavender-blue", label: "Lavender → Blue", from: "#C2A3FF", to: "#003FC7" },
+  { id: "aqua-green", label: "Aqua → Green", from: "#A1FBF9", to: "#A6FA87" },
+  { id: "yellow-peach", label: "Yellow → Peach", from: "#FFEB66", to: "#FF9B70" },
+  { id: "peach-pink", label: "Peach → Pink", from: "#FF9B70", to: "#EC388A" },
+] as const;
+
 /** Luminance of a hex colour, 0–1. */
 function luminance(hex: string): number {
   const v = hex.replace("#", "");
@@ -249,7 +272,7 @@ export type QeiiColourPaint = {
   /** Room name → tag colour, for rooms sharing a drawn shape. */
   tags: Map<string, string>;
   /** Exact room outlines cut from a shared block, drawn over the plan fill. */
-  cells: { room: string; shapeIndex: number; after: number; d: string; hex?: string }[];
+  cells: { room: string; shapeIndex: number; after: number; d: string; hex?: string; to?: string }[];
 };
 
 export function qeiiColourPaint(floor: QeiiFloorVector, rooms: QeiiRoomColours): QeiiColourPaint {
@@ -258,6 +281,7 @@ export function qeiiColourPaint(floor: QeiiFloorVector, rooms: QeiiRoomColours):
   const cells: QeiiColourPaint["cells"] = [];
   for (const entry of qeiiRoomShapes(floor)) {
     const hex = rooms[entry.room];
+    const to = hex ? qeiiRoomGradientTo(rooms, entry.room) : undefined;
     // Every defensibly cut room is always present as its own path, even before
     // somebody gives it a colour. This is what makes the uncoloured SVG, AI,
     // PowerPoint and Word files expose one selectable room object per room.
@@ -268,11 +292,18 @@ export function qeiiColourPaint(floor: QeiiFloorVector, rooms: QeiiRoomColours):
         after: entry.cellAfter ?? entry.shapeIndex,
         d: entry.cell,
         hex,
+        ...(to ? { to } : {}),
       });
     if (!hex) continue;
     if (qeiiRoomIsExclusive(entry)) {
       // Cut to its walls: the cell carries the colour, the block stays pale.
       if (entry.cell) continue;
+      const own0 = floor.shapes[entry.shapeIndex];
+      // A gradient travels as its own room shape, drawn over the block.
+      if (to && own0) {
+        cells.push({ room: entry.room, shapeIndex: entry.shapeIndex, after: entry.cellAfter ?? entry.shapeIndex, d: own0.d, hex, to });
+        continue;
+      }
       fills.set(entry.shapeIndex, hex);
       // A room drawn as its own shape can still sit under a block the sheet
       // draws later. Re-draw the room's own outline — the identical path, so no
