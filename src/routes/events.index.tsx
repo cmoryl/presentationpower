@@ -35,6 +35,7 @@ import { EVENT_PLAYBOOKS, type EventPlaybook } from "@/lib/event-playbooks";
 import { getPlaybookImagery } from "@/lib/playbook-imagery";
 import { SOCIAL_FORMATS, KIT_PROFILES } from "@/lib/social-formats";
 import { useFavorites } from "@/lib/favorites";
+import { EventHubCards } from "@/components/events/EventHubCards";
 import { SavedKitsSection } from "@/components/campaigns/SavedKitsSection";
 
 export const Route = createFileRoute("/events/")({
@@ -152,6 +153,15 @@ function EventsView() {
         {/* Your saved kits (signed-in, non-empty only) */}
         <SavedKitsSection surface="event" />
 
+        <section id="your-events" className="space-y-5">
+          <SectionHead
+            eyebrow="Your events"
+            title="Every event, one home each"
+            desc="Open an event to find its checklist, maps, schedule, agendas, signage and badges in one place."
+          />
+          <EventHubCards />
+        </section>
+
         {/* Playbook grid */}
         <section id="playbooks" className="space-y-5">
           <SectionHead
@@ -184,89 +194,6 @@ function EventsView() {
                 <span>Hub · City Series · Sponsorship</span>
                 <span className="inline-flex items-center gap-1 font-medium text-[#A1FBF9]">
                   Open hub <ArrowRight size={12} />
-                </span>
-              </div>
-            </Link>
-            <Link
-              to="/events/next/london"
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/10 p-5 transition hover:border-[#003FC7] hover:shadow-[0_10px_30px_-14px_rgba(3,0,44,0.3)]"
-              style={{
-                background:
-                  "radial-gradient(60% 90% at 10% 92%, #C6BCFB 0%, transparent 62%), radial-gradient(60% 90% at 96% 30%, #CFF6F7 0%, transparent 64%), #EDF6F8",
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#03002C]/10 text-[#03002C]">
-                  <Map size={16} />
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-[#03002C]/55">
-                  Location signage
-                </span>
-              </div>
-              <div className="mt-4 text-lg font-semibold text-[#03002C]">
-                NEXT 2026 London · QEII Centre
-              </div>
-              <p className="mt-1 flex-1 text-sm text-[#03002C]/70">
-                Job 2281 — all 54 scenic panels with trim/bleed geometry, gradient grounds, measured
-                banding and vector-first downloads.
-              </p>
-              <div className="mt-4 flex items-center justify-between text-[11px] text-[#03002C]/65">
-                <span>54 panels · 5 floors</span>
-                <span className="inline-flex items-center gap-1 font-medium text-[#003FC7]">
-                  Open kit <ArrowRight size={12} />
-                </span>
-              </div>
-            </Link>
-            <Link
-              to="/events/next/san-francisco"
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/10 p-5 transition hover:border-[#003FC7] hover:shadow-[0_10px_30px_-14px_rgba(3,0,44,0.3)]"
-              style={{
-                background:
-                  "radial-gradient(60% 90% at 10% 92%, #CFF6F7 0%, transparent 62%), radial-gradient(60% 90% at 96% 30%, #C6BCFB 0%, transparent 64%), #EEF1F7",
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#03002C]/10 text-[#03002C]">
-                  <Map size={16} />
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-[#03002C]/55">
-                  Next edition
-                </span>
-              </div>
-              <div className="mt-4 text-lg font-semibold text-[#03002C]">
-                NEXT 2026 San Francisco · InterContinental
-              </div>
-              <p className="mt-1 flex-1 text-sm text-[#03002C]/70">
-                October 27–28, 2026 — partner kiosks, badges and pillars ready to work on now; the
-                programme, floor sheets and panel sizes are still waiting to be issued.
-              </p>
-              <div className="mt-4 flex items-center justify-between text-[11px] text-[#03002C]/65">
-                <span>Oct 27–28 · 15 partner kiosks</span>
-                <span className="inline-flex items-center gap-1 font-medium text-[#003FC7]">
-                  Open kit <ArrowRight size={12} />
-                </span>
-              </div>
-            </Link>
-            <Link
-              to="/events/next/start"
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-dashed border-[#03002C]/25 bg-white p-5 transition hover:border-[#003FC7]"
-            >
-              <div className="flex items-center justify-between">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#003FC7]/10 text-[#003FC7]">
-                  <Map size={16} />
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-[#03002C]/55">
-                  New event
-                </span>
-              </div>
-              <div className="mt-4 text-lg font-semibold text-[#03002C]">Start a new event</div>
-              <p className="mt-1 flex-1 text-sm text-[#03002C]/70">
-                One step sets up the map set, the checklist of what the venue must send, and a web
-                search for the venue's published plans and rooms.
-              </p>
-              <div className="mt-4 flex items-center justify-end text-[11px]">
-                <span className="inline-flex items-center gap-1 font-medium text-[#003FC7]">
-                  Start <ArrowRight size={12} />
                 </span>
               </div>
             </Link>

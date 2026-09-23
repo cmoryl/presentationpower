@@ -942,12 +942,21 @@ function LondonSignagePage() {
     <AppShell bare={!userId}>
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
         {userId && (
+          <>
           <Link
             to="/events/next"
             className="inline-flex items-center gap-2 text-sm font-medium text-[#003FC7] hover:underline"
           >
             <ArrowLeft className="h-4 w-4" /> NEXT 2026 event system
           </Link>
+          <Link
+            to="/events/$eventId"
+            params={{ eventId: "london" }}
+            className="ml-4 inline-flex items-center gap-1 text-[13px] font-semibold text-[#003FC7] hover:underline"
+          >
+            Event home
+          </Link>
+          </>
         )}
 
         {headError && (

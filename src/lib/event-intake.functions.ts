@@ -39,7 +39,15 @@ export const listStartedEvents = createServerFn({ method: "GET" })
       .order("updated_at", { ascending: false })
       .limit(50);
     if (error) throw new Error(error.message);
-    return { events: data ?? [] };
+    const ids = (data ?? []).map((e) => e.event_id);
+    const intake = ids.length
+      ? await context.supabase
+          .from("event_intake_items")
+          .select("event_id,item_key,status")
+          .in("event_id", ids)
+      : { data: [], error: null };
+    if (intake.error) throw new Error(intake.error.message);
+    return { events: data ?? [], intake: intake.data ?? [] };
   });
 
 export const setIntakeStatus = createServerFn({ method: "POST" })
