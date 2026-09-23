@@ -194,8 +194,20 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
   const registerSaver = useUnsavedStore((s) => s.registerSaver);
   const unregisterSaver = useUnsavedStore((s) => s.unregisterSaver);
   useEffect(() => {
-    if (!signedIn) return;
-    registerSaver(deckId, () => flush.current());
+    if (signedIn) {
+      registerSaver(deckId, () => flush.current());
+      return () => unregisterSaver(deckId);
+    }
+    // Signed out there is nowhere to save to, but the editor keeps the deck on
+    // this device. Register a local-only saver so leaving the page records the
+    // deck as settled instead of showing a "couldn't be saved — leave anyway?"
+    // alarm on every single navigation.
+    registerSaver(deckId, async () => {
+      const d = useDeckStore.getState().decks[deckId];
+      const b = d ? useDeckStore.getState().briefs[d.briefId] : undefined;
+      if (d) markDeckSaved(deckId, deckSignature(d, b));
+      return true;
+    });
     return () => unregisterSaver(deckId);
   }, [deckId, signedIn, registerSaver, unregisterSaver]);
 
