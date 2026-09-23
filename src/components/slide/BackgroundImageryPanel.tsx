@@ -1,3 +1,4 @@
+import { checkUploadSize, UPLOAD_IMAGE_MAX_BYTES } from "@/lib/upload-limits";
 // Backgrounds & Imagery inspector panel for the deck editor.
 // Six tabs:
 //   Library  — curated on-brand gradients / patterns
@@ -785,7 +786,7 @@ export function BackgroundImageryPanel({
                   disabled={busy}
                   onChange={(e) => {
                     const f = e.target.files?.[0];
-                    if (f) handleUpload(f);
+                    if (f && checkUploadSize(f, UPLOAD_IMAGE_MAX_BYTES)) handleUpload(f);
                     e.target.value = "";
                   }}
                 />

@@ -1,3 +1,4 @@
+import { checkUploadSize, UPLOAD_ARTWORK_MAX_BYTES } from "@/lib/upload-limits";
 import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -300,7 +301,13 @@ function LogoHubAdmin() {
                 type="file"
                 accept="image/png,image/jpeg,image/svg+xml,image/webp,image/avif"
                 onChange={(e) =>
-                  setFiles((prev) => ({ ...prev, [v.key]: e.target.files?.[0] ?? null }))
+                  setFiles((prev) => {
+                    const f = e.target.files?.[0] ?? null;
+                    return {
+                      ...prev,
+                      [v.key]: f && checkUploadSize(f, UPLOAD_ARTWORK_MAX_BYTES) ? f : null,
+                    };
+                  })
                 }
                 className="w-full text-xs"
               />
