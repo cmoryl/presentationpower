@@ -78,6 +78,20 @@ const VIEW_STORAGE_KEY = "tp-element:qeii-plan-view:v1";
 /** The venue these saved map edits belong to. */
 const VENUE_SLUG = "next-2026-london";
 
+/**
+ * The house starting point: on every rebuilt floor, each space the issued event
+ * schedule puts to use is filled with the approved accent. Rooms the schedule
+ * does not mention stay unfilled.
+ */
+function defaultQeiiColourMap(): Record<string, QeiiRoomColours> {
+  const out: Record<string, QeiiRoomColours> = {};
+  for (const sheet of LONDON_VENUE_SHEETS) {
+    const state = qeiiPlanState(sheet.id);
+    if (state?.rebuilt) out[sheet.id] = qeiiDefaultRoomColours(state.floor);
+  }
+  return out;
+}
+
 function download(url: string, filename: string) {
   const a = document.createElement("a");
   a.href = url;
