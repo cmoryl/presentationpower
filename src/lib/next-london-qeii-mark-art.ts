@@ -18,14 +18,17 @@
 import { NEXT_APP_ORIGIN } from "@/lib/next-event";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import {
+  qeiiLabelInk,
   qeiiMarkInk,
   qeiiMarkUrl,
+  qeiiToneUnder,
   QEII_MARK_BLACK,
   QEII_MARK_BLACK_FILTER_ID,
   type QeiiMarkVariant,
   type QeiiPlanOptions,
 } from "@/lib/next-london-qeii-plan";
 import { qeiiColourPaint, qeiiRoomTextInk } from "@/lib/next-london-qeii-rooms";
+import { qeiiRoomTint } from "@/lib/next-london-qeii-style";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 import { parseSvgArtwork, type PlacedArtPath } from "@/lib/next-london-placed-art";
 import { parseSvgPathCmds } from "@/lib/export-clip-geom";
@@ -82,11 +85,20 @@ export function qeiiMarkBoxes(
   const out: QeiiMarkBox[] = [];
   for (const block of layout.blocks) {
     if (!block.marks.length) continue;
-    const tag = paint.tags.get(block.room) ?? roomColours[block.room];
-    const ink = tag ? qeiiRoomTextInk(tag) : "#FFFFFF";
+    const face = options.face ?? "issued";
+    const tag = paint.tags.get(block.room);
+    const fill = qeiiRoomTint(roomColours[block.room], face);
+    // The ground under the lockup decides which approved file reads: exactly the
+    // same judgement the plan on screen makes, so no export differs from it.
+    const ink = tag
+      ? qeiiRoomTextInk(tag)
+      : fill
+        ? qeiiRoomTextInk(fill)
+        : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face), face);
     // A light room fill would swallow the reverse lockup, exactly as on screen.
     const variant: QeiiMarkVariant =
-      ink === "#03002C" && (options.markVariant ?? "reverse") === "reverse"
+      ink === "#03002C" &&
+      ["reverse", "white"].includes(options.markVariant ?? "reverse")
         ? "colour"
         : (options.markVariant ?? "reverse");
     const nameTop = block.y - ((block.lines.length - 1) * block.size * 1.05) / 2;
