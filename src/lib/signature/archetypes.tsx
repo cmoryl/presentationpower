@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import type { ArchetypeId, SignatureData } from "@/lib/signature/types";
-import { appendAttribution } from './attribution';
 import {
   buildContext,
   contactLabel,
@@ -13,7 +12,6 @@ import {
   sectionAlign,
   sectionStyle,
   sectionFontSize,
-  socialIconUrls,
   type SignatureContext,
 } from './helpers';
 
