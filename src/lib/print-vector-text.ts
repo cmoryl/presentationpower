@@ -19,21 +19,33 @@
  * SCOPE: print-asset routes only. Decks stay raster.
  */
 
-import {
-  PDFDocument,
-  rgb,
-  setCharacterSpacing,
-  StandardFonts as _Standard,
-  type PDFFont,
-  type PDFPage,
-} from "pdf-lib";
+// pdf-lib and fontkit are only needed while an overlay is being written. They
+// load on first overlay instead of at module scope, so a page that merely
+// measures text (captureVectorText) never pulls the press writer into its
+// first paint.
+import type { PDFDocument, PDFFont, PDFPage } from "pdf-lib";
 
-import fontkit from "@pdf-lib/fontkit";
+type PdfLib = typeof import("pdf-lib");
+
+let pdfLib: PdfLib | null = null;
+let fontkitMod: unknown = null;
+
+/** The loaded press writer. Only reachable after `overlayVectorText` loads it. */
+function pl(): PdfLib {
+  if (!pdfLib) throw new Error("pdf-lib not loaded — overlayVectorText loads it");
+  return pdfLib;
+}
+
+async function loadPdfLib(): Promise<void> {
+  if (pdfLib && fontkitMod) return;
+  const [lib, fk] = await Promise.all([import("pdf-lib"), import("@pdf-lib/fontkit")]);
+  pdfLib = lib;
+  fontkitMod = (fk as { default?: unknown }).default ?? fk;
+}
 
 import { isAuthoringChrome } from "./export-chrome-suppress";
 
 // Silence unused import (kept for symbol table sanity).
-void _Standard;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -456,8 +468,9 @@ export async function overlayVectorText(
 ): Promise<VectorOverlayResult> {
   const source =
     rasterPdfBytes instanceof Uint8Array ? rasterPdfBytes : new Uint8Array(rasterPdfBytes);
-  const pdfDoc = await PDFDocument.load(source, { updateMetadata: false });
-  pdfDoc.registerFontkit(fontkit);
+  await loadPdfLib();
+  const pdfDoc = await pl().PDFDocument.load(source, { updateMetadata: false });
+  pdfDoc.registerFontkit(fontkitMod as Parameters<typeof pdfDoc.registerFontkit>[0]);
 
   const allLines = opts.captures.flatMap((c) => c.lines);
   const { fonts, embeddedKeys } = await embedNeededGeistFonts(pdfDoc, allLines);
@@ -514,7 +527,7 @@ export async function overlayVectorText(
         scaleX,
         xOffsetPt: bleedPt,
         baselineYPt,
-        color: rgb(r, g, b),
+        color: pl().rgb(r, g, b),
         opacity: line.opacity,
         charSpacingPt,
       });
@@ -540,7 +553,7 @@ interface DrawCtx {
   /** Media-box → trim-box x offset in points (i.e. the bleed). */
   xOffsetPt: number;
   baselineYPt: number;
-  color: ReturnType<typeof rgb>;
+  color: ReturnType<PdfLib["rgb"]>;
   opacity: number;
   /** Letter-spacing in PDF points (Tc value). 0 for normal. */
   charSpacingPt: number;
