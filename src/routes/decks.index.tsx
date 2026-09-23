@@ -230,7 +230,20 @@ function DecksIndex() {
   const enriched = useMemo(() => {
     return allDecks.map((d) => {
       const key = d.title.trim().toLowerCase();
-      const s = statsByTitle.get(key);
+      const savedId = savedIdOf(d.id);
+      // Exact match by saved deck first; name matching only as a fallback, and
+      // never when that name is shared with another deck.
+      const nameSafe = !ambiguousTitles.has(key);
+      const s = savedId
+        ? statsById.get(savedId) ?? (nameSafe ? statsByTitle.get(key) : undefined)
+        : nameSafe
+          ? statsByTitle.get(key)
+          : undefined;
+      const review = savedId
+        ? reviewById.get(savedId) ?? (nameSafe ? reviewByTitle.get(key) : undefined)
+        : nameSafe
+          ? reviewByTitle.get(key)
+          : undefined;
       const brief = briefs[d.briefId];
       return {
         deck: d,
@@ -238,10 +251,10 @@ function DecksIndex() {
         shared: s?.shared ?? false,
         client: brief?.prospect ?? "",
         industry: brief?.industry ?? "",
-        reviewStatus: reviewByTitle.get(key) ?? null,
+        reviewStatus: review ?? null,
       };
     });
-  }, [allDecks, statsByTitle, briefs, reviewByTitle]);
+  }, [allDecks, statsById, statsByTitle, briefs, reviewById, reviewByTitle, ambiguousTitles]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
