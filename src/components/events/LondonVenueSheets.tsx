@@ -544,6 +544,13 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
         const zip = new JSZip();
         let made = 0;
         const skipped: string[] = [];
+        // Page 1 of the set is the issued directory, carried as the editable
+        // SVG — Canva imports it with every line still live text.
+        const directoryName = qeiiDirectoryFilename(face, directoryGround);
+        zip.file(
+          `01-${directoryName}`,
+          qeiiDirectorySvg({ face, showMarks, groundId: directoryGround }),
+        );
         for (const sheet of LONDON_EVENT_SHEETS) {
           const state = qeiiPlanState(sheet.id);
           if (!state?.rebuilt) {
@@ -565,9 +572,9 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
         downloadBlob(await zip.generateAsync({ type: "blob" }), name);
         setExportNote(
           [
-            `${name} — one PowerPoint per rebuilt floor (${made} in all).`,
+            `${name} — ${QEII_DIRECTORY_TITLE} as page 1, then one PowerPoint per rebuilt floor (${made} in all).`,
             skipped.length ? `${skipped.join(", ")} ${skipped.length === 1 ? "is" : "are"} not rebuilt yet, so ${skipped.length === 1 ? "it is" : "they are"} not in the pack.` : "",
-            "Unzip it, then import each PowerPoint into Canva one at a time.",
+            "Unzip it, then import each PowerPoint into Canva one at a time; page 1 imports as the SVG, with its copy still live.",
             `Only ${plan.floor.title} carries your current on-screen colours and edits; the other floors are built from the plan as it stands.`,
           ]
             .filter(Boolean)
@@ -575,6 +582,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
         );
         return;
       }
+
       if (kind === "pptx" || kind === "zip") {
 
         const { buildQeiiPlanPptx } = await import("@/lib/next-london-qeii-office");
