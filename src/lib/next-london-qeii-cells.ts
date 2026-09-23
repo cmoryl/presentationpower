@@ -355,20 +355,6 @@ export function qeiiCutCell(
       bands.push([clipped]);
     }
   }
-  // Neighbouring spaces the sheet draws as their own blocks overlapping this one
-  // (a wing drawn on top, a service core) are not part of this room either, so
-  // the colour is trimmed off them rather than showing past the walls.
-  floor.shapes.forEach((shape, index) => {
-    if (index === shapeIndex || !shape.fill || isWallFill(shape.fill)) return;
-    for (const ring of qeiiRings(shape.d)) {
-      if (qeiiInRing(ring, x, y)) continue;
-      const clipped = ringToClip(ring);
-      if (!reaches(clipped)) continue;
-      const area = polyArea(clipped);
-      if (area <= DOT_AREA || area >= blockArea * 0.9) continue;
-      bands.push([clipped]);
-    }
-  });
   for (const run of dottedRuns(dots)) bands.push(...runBand(run, 1.1 + WALL_BITE, bridge));
   // A divider the reviewer asked for cuts the block exactly like a drawn wall.
   for (const run of extraRuns) bands.push(...runBand(run, 1.1 + WALL_BITE, bridge));
