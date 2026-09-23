@@ -64,8 +64,7 @@ function SocialChipRow({ ctx, variant = 'square' }: { ctx: SignatureContext; var
           borderRadius: variant === 'pill' ? 999 : 4,
           fontSize: Math.max(11, infoSizePx - 1), textDecoration: 'none', verticalAlign: 'middle',
         }}>
-          <img src={socialIconUrls[s.platform]} alt={s.platform} width={variant === 'pill' ? 12 : 18} height={variant === 'pill' ? 12 : 18} style={{ display: 'inline-block', verticalAlign: 'middle', border: 0 }} />
-          {variant === 'pill' && <span style={{ marginLeft: 6, verticalAlign: 'middle' }}>{platformLabels[s.platform]}</span>}
+          <span style={{ verticalAlign: 'middle' }}>{platformLabels[s.platform] || s.platform}</span>
         </a>
       ))}
     </div>
