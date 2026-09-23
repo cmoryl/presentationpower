@@ -569,7 +569,7 @@ interface DrawCtx {
  */
 function drawVectorLine(page: PDFPage, line: VectorTextLine, font: PDFFont, ctx: DrawCtx): void {
   if (ctx.charSpacingPt !== 0) {
-    page.pushOperators(setCharacterSpacing(ctx.charSpacingPt));
+    page.pushOperators(pl().setCharacterSpacing(ctx.charSpacingPt));
   }
   page.drawText(line.text, {
     x: ctx.xOffsetPt + line.leftCss * ctx.scaleX,
@@ -580,7 +580,7 @@ function drawVectorLine(page: PDFPage, line: VectorTextLine, font: PDFFont, ctx:
     opacity: ctx.opacity,
   });
   if (ctx.charSpacingPt !== 0) {
-    page.pushOperators(setCharacterSpacing(0));
+    page.pushOperators(pl().setCharacterSpacing(0));
   }
   // Reference to line kept alive for possible future per-glyph fallback.
   void line.glyphLefts;
