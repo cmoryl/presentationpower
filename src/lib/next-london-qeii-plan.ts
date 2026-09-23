@@ -1,3 +1,4 @@
+import { QEII_SIGNAGE_GRADIENTS } from "@/lib/next-london-qeii-style";
 // Rendering rules for the natively rebuilt QEII Centre floor plans.
 //
 // The geometry in next-london-qeii-vectors.ts is the issued venue artwork, path
@@ -422,7 +423,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
                 `x="${block.box.x0 - pad}" y="${block.box.y0 - pad * 0.6}"`,
                 `width="${block.box.x1 - block.box.x0 + pad * 2}"`,
                 `height="${block.box.y1 - block.box.y0 + pad * 1.2}"`,
-                `rx="${block.size * 0.35}" fill="${qeiiRoomPaint(room, tag, face)}"`,
+                `rx="${block.size * 0.35}" fill="${face === "signage" && !QEII_SIGNAGE_GRADIENTS[room] ? tag : qeiiRoomPaint(room, tag, face)}"`,
                 transform ? `transform="${transform}"` : "",
                 "/>",
               ]
@@ -452,7 +453,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
 
   const W = floor.w;
   const H = floor.h + keyH;
-  const defs = `${options.markVariant === "black" ? qeiiMarkBlackFilter() : ""}${qeiiGradientDefs(face)}${qeiiCellGradientDefs(paint.cells)}`;
+  const defs = `${options.markVariant === "black" ? qeiiMarkBlackFilter() : ""}${qeiiGradientDefs(face)}${qeiiCellGradientDefs(paint.cells, face)}`;
   const body = [`<rect width="${W}" height="${H}" fill="${qeiiPlanGround(face)}"/>`, shapes, labels, keySvg].join("");
   const title = `<title>Queen Elizabeth II Centre — ${floor.title}</title>`;
   if (face === "signage") return qeiiSignageSheet(floor, W, H, body, defs, title, options.showText !== false);
@@ -519,13 +520,22 @@ function qeiiSignageSheet(
     const lit = t.id === floor.id;
     return (
       `<rect x="${SW - tabW}" y="${y}" width="${tabW}" height="${tabH}" fill="${lit ? "#003FC7" : "#03002C"}"/>` +
+      (i ? `<rect x="${SW - tabW}" y="${y - SW * 0.0015}" width="${tabW}" height="${SW * 0.003}" fill="#FFFFFF"/>` : "") +
       (showText
         ? `<text x="${SW - tabW / 2}" y="${y + tabH / 2}" text-anchor="middle" dominant-baseline="middle" ${font} font-weight="400" font-size="${tabW * 0.5}" fill="#FFFFFF">${t.label}</text>`
         : "")
     );
   }).join("");
+  // Chevrons fading into the venue bar, as on the issued sheet.
+  const footChevrons = Array.from({ length: 6 }, (_, i) => {
+    const cw = footH * 0.55;
+    const x = SW - tabW - m - (6 - i) * cw * 1.1;
+    const kk = footH * 0.3;
+    const c = qeiiMixToWhite("#003FC7", 0.15 + i * 0.06);
+    return `<path d="M${x} ${footY} L${x + cw * 0.55} ${footY} L${x + cw * 0.55 + kk} ${footY + footH / 2} L${x + cw * 0.55} ${footY + footH} L${x} ${footY + footH} L${x + kk} ${footY + footH / 2} Z" fill="${c}"/>`;
+  }).join("");
   const foot =
-    `<rect x="0" y="${footY}" width="${SW - tabW}" height="${footH}" fill="#003FC7"/>` +
+    `<rect x="0" y="${footY}" width="${SW - tabW}" height="${footH}" fill="#003FC7"/>` + footChevrons +
     (showText
       ? `<text x="${m}" y="${footY + footH / 2}" dominant-baseline="middle" ${font} font-weight="700" font-size="${footH * 0.34}" letter-spacing="${footH * 0.03}" fill="#FFFFFF">QEII CENTRE</text>`
       : "");

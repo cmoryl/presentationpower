@@ -283,8 +283,25 @@ export function qeiiCellGradientId(room: string): string {
 }
 
 /** Gradient definitions for rooms given a gradient in the colour panel. */
-export function qeiiCellGradientDefs(cells: { room: string; hex?: string; to?: string }[]): string {
-  return cells
+/** Signage look: a flat room colour fades from full strength to a pale tint of itself. */
+export const qeiiFadeGradientId = (room: string): string =>
+  `qeii-fade-${room.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+
+export function qeiiCellGradientDefs(
+  cells: { room: string; hex?: string; to?: string }[],
+  face?: QeiiPlanFace,
+): string {
+  const fades =
+    face === "signage"
+      ? cells
+          .filter((c) => c.hex && !c.to && !QEII_SIGNAGE_GRADIENTS[c.room])
+          .map(
+            (c) =>
+              `<linearGradient id="${qeiiFadeGradientId(c.room)}" gradientUnits="objectBoundingBox" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="${c.hex}"/><stop offset="1" stop-color="${c.hex}" stop-opacity="0.35"/></linearGradient>`,
+          )
+          .join("")
+      : "";
+  return fades + cells
     .filter((c) => c.hex && c.to)
     .map(
       (c) =>
@@ -302,5 +319,6 @@ export function qeiiRoomPaint(
 ): string | undefined {
   if (hex && to) return `url(#${qeiiCellGradientId(room)})`;
   if (face === "signage" && hex && QEII_SIGNAGE_GRADIENTS[room]) return `url(#${qeiiGradientId(room)})`;
+  if (face === "signage" && hex) return `url(#${qeiiFadeGradientId(room)})`;
   return hex;
 }
