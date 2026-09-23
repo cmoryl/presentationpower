@@ -247,6 +247,10 @@ export function AgendaStudio({
   // person has already typed.
   const seededRef = useRef<AgendaConfig | undefined>(initialConfig);
   const dirtyRef = useRef(false);
+  // Mirrored in state purely so the browser can warn before the tab closes on
+  // an agenda board that has never been saved.
+  const [dirty, setDirty] = useState(false);
+  useDirtyExitGuard(dirty);
   useEffect(() => {
     if (!initialConfig || seededRef.current === initialConfig) return;
     seededRef.current = initialConfig;
@@ -313,6 +317,7 @@ export function AgendaStudio({
   // arrives later can no longer replace work in progress.
   const editConfig: typeof setConfig = (updater) => {
     dirtyRef.current = true;
+    setDirty(true);
     setConfig(updater);
   };
 

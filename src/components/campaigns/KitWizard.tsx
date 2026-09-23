@@ -9,6 +9,7 @@ import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
+import { useDirtyExitGuard } from "@/hooks/use-dirty-exit-guard";
 import { AssetExportMenu } from "@/components/AssetExportMenu";
 
 import { toast } from "sonner";
@@ -262,6 +263,9 @@ export function KitWizard({
       kitLook,
     });
   const lastSavedSnapshot = useRef<string | null>(null);
+  // A part-built kit lives only in this page until Finish, so closing the tab
+  // half way through used to throw the whole setup away without a word.
+  useDirtyExitGuard(lastSavedSnapshot.current !== snapshotKey());
   const [finishDialogOpen, setFinishDialogOpen] = useState(false);
   const [finishDialogName, setFinishDialogName] = useState("");
 
