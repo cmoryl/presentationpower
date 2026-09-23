@@ -40,10 +40,21 @@ export type QeiiMarkBox = {
   h: number;
   /** Rotation the plan gives the room's label row, in degrees. */
   angle: number;
+  /**
+   * One flat ink the lockup outlines are printed in, for the all-black option.
+   * Undefined keeps the approved file's own colours.
+   */
+  ink?: string;
 };
 
 /** An approved lockup read as outlines, in its own user space (y down). */
 export type QeiiMarkArt = { w: number; h: number; paths: PlacedArtPath[] };
+
+/** The same outlines printed in one flat ink — the all-black one-colour option. */
+export function qeiiInkArt(art: QeiiMarkArt, ink: string): QeiiMarkArt {
+  return { ...art, paths: art.paths.map((path) => ({ ...path, fill: ink })) };
+}
+
 
 /**
  * Where every division lockup sits on this floor.
