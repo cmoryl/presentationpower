@@ -59,12 +59,8 @@ import { MobileDeckExport } from "@/components/export/MobileDeckExport";
 import { ApprovalGate } from "@/components/approvals/ApprovalGate";
 
 import { useCloudDeckGate } from "@/hooks/use-cloud-deck-gate";
+import { formatBytes } from "@/lib/format-bytes";
 
-function formatBytesLabel(n: number): string {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${Math.round(n / 1024)} KB`;
-  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 type ExportSearch = { auto?: "pptx"; fidelity?: ExportFidelityId };
 
@@ -1089,7 +1085,7 @@ function ExportView() {
                 {Object.entries(imageReport.formatCounts)
                   .map(([f, n]) => `${f.toUpperCase()} ${n}`)
                   .join(" · ")}{" "}
-                · {formatBytesLabel(imageReport.totalBytes)} of media
+                · {formatBytes(imageReport.totalBytes)} of media
               </p>
               <p className="mt-1 text-xs text-black/55">
                 {legacyImages
@@ -1130,7 +1126,7 @@ function ExportView() {
                   {imageReport.risky.map((e) => (
                     <li key={e.path}>
                       {e.path.replace("ppt/media/", "")}: {e.format.toUpperCase()} — unsupported
-                      before PowerPoint 2019 ({formatBytesLabel(e.bytes)}).
+                      before PowerPoint 2019 ({formatBytes(e.bytes)}).
                     </li>
                   ))}
                 </ul>

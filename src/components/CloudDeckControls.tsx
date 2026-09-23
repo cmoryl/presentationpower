@@ -21,9 +21,17 @@ import { toast } from "sonner";
 export function useSignedIn() {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSignedIn(!!s));
-    return () => sub.subscription.unsubscribe();
+    let alive = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (alive) setSignedIn(!!data.session);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      if (alive) setSignedIn(!!s);
+    });
+    return () => {
+      alive = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
   return signedIn;
 }
@@ -229,11 +237,19 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
     timer.current = setTimeout(async () => {
       if (!pending.current) return;
       setStatus("saving");
+      // flush reports failure by returning false (it already told the user
+      // what went wrong), so the indicator must read the result — not wait for
+      // a throw that never comes, which used to show "saved" after a refusal.
+      let ok = false;
       try {
-        await flush.current();
+        ok = await flush.current();
+      } catch {
+        ok = false;
+      }
+      if (ok) {
         setSavedAt(new Date().toLocaleTimeString());
         setStatus("saved");
-      } catch {
+      } else {
         setStatus("error");
       }
     }, 1200);

@@ -282,8 +282,21 @@ function AdminImageryPage() {
               )
                 return;
               // Sequential to keep RLS + toast noise sane; small batches expected.
+              // A refused approval used to vanish silently, so the row looked
+              // approved until the next reload. Count failures and say so once.
+              let failed = 0;
               for (const r of pending) {
-                await approveMut.mutateAsync({ id: r.id, approved: true }).catch(() => {});
+                try {
+                  await approveMut.mutateAsync({ id: r.id, approved: true });
+                } catch {
+                  failed += 1;
+                }
+              }
+              if (failed > 0) {
+                toast.error(
+                  `${failed} image${failed === 1 ? "" : "s"} couldn't be approved`,
+                  { description: "The rest went through. Reload and try the remaining ones." },
+                );
               }
             }}
             className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-white hover:bg-[#003FC7]/85"

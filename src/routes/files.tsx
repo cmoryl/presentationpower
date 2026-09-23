@@ -23,6 +23,7 @@ import { AppShell } from "@/components/AppShell";
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { listMyFiles, deleteMyFile, type MyFile, type MyFileKind } from "@/lib/my-files.functions";
 import { getSlideFileUrl } from "@/lib/slide-files.functions";
+import { formatBytes } from "@/lib/format-bytes";
 
 export const Route = createFileRoute("/files")({
   head: () => ({
@@ -621,11 +622,6 @@ function formatWhen(iso: string): string {
   return new Date(iso).toLocaleDateString();
 }
 
-function formatBytes(n: number): string {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${Math.round(n / 1024)} KB`;
-  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 /** Fetches a short-lived signed URL and downloads the attached .pptx. */
 function DownloadFileButton({ file }: { file: MyFile }) {

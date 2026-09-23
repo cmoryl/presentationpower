@@ -928,9 +928,10 @@ registerSlideModule({
                   const end = Math.min(quarters.length, Number(it.end ?? start));
                   const span = end - start + 1;
                   return (
-                    <>
+                    // Each roadmap row emits a label cell plus one cell per
+                    // quarter; the fragment needs the key, not its children.
+                    <React.Fragment key={`row-${i}`}>
                       <div
-                        key={`l-${i}`}
                         className={`${rowPad} pr-6`}
                         style={{
                           fontSize: fillPx(22, "body"),
@@ -979,7 +980,7 @@ registerSlideModule({
                           </div>
                         );
                       })}
-                    </>
+                    </React.Fragment>
                   );
                 })}
               </div>

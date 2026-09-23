@@ -46,11 +46,20 @@ export function LanguageSwitcher({
   const [search, setSearch] = useState("");
   const [restored, setRestored] = useState(false);
 
+  const [loadFailed, setLoadFailed] = useState(false);
+
   useEffect(() => {
     let alive = true;
     listLangs()
-      .then((rows) => alive && setLanguages(rows as LangRow[]))
-      .catch(() => {});
+      .then((rows) => {
+        if (!alive) return;
+        setLanguages(rows as LangRow[]);
+        setLoadFailed(false);
+      })
+      // An empty list used to be indistinguishable from "no languages exist".
+      .catch(() => {
+        if (alive) setLoadFailed(true);
+      });
     return () => {
       alive = false;
     };
@@ -277,11 +286,17 @@ export function LanguageSwitcher({
                   placeholder="Search…"
                   className="w-full border-b border-black/5 bg-transparent px-3 py-2 text-xs outline-none dark:border-white/5"
                 />
-                {filtered.length === 0 && (
-                  <div className="px-3 py-3 text-xs text-black/50 dark:text-white/50">
-                    All active languages already cached.
-                  </div>
-                )}
+                {filtered.length === 0 &&
+                  (loadFailed ? (
+                    <div className="px-3 py-3 text-xs text-[#E53D2E]">
+                      The language list couldn&rsquo;t be loaded. Check your connection and reopen
+                      this menu.
+                    </div>
+                  ) : (
+                    <div className="px-3 py-3 text-xs text-black/50 dark:text-white/50">
+                      All active languages already cached.
+                    </div>
+                  ))}
                 {filtered.map((l) => (
                   <button
                     key={l.id}

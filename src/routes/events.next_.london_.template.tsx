@@ -66,7 +66,8 @@ import {
   LONDON_QR_MAX_CHARS,
   LONDON_QR_SCALE,
 } from "@/lib/next-london-logo-placement";
-import { buildLondonSignagePack } from "@/lib/next-london-pack";
+// next-london-pack pulls JSZip in; it is only needed once the user asks for a
+// pack, so it is imported inside generatePack() rather than on page load.
 import {
   applyLondonBoardSize,
   applyLondonBoardSizes,
@@ -331,6 +332,7 @@ function LondonTemplatePage() {
   async function generatePack() {
     const id = toast.loading(`Building ${panels.length} panels…`);
     try {
+      const { buildLondonSignagePack } = await import("@/lib/next-london-pack");
       const pack = await buildLondonSignagePack(panels, {
         // Stamp the revision actually in force — never a number nobody published.
         revision: packStamp,

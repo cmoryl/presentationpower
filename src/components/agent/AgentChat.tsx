@@ -347,9 +347,17 @@ export function AgentChat({
   }, [messages.length, onMessageCountChange]);
 
   // Quick-start brief from the hero: send it as the first turn, then clear it.
+  // `busy` only flips on a later render, so without this ref the same brief
+  // could be submitted twice (two decks from one click).
+  const sentPendingPrompt = useRef<string | null>(null);
   useEffect(() => {
     const value = pendingPrompt?.trim();
-    if (!value || busy) return;
+    if (!value) {
+      sentPendingPrompt.current = null;
+      return;
+    }
+    if (busy || sentPendingPrompt.current === value) return;
+    sentPendingPrompt.current = value;
     submit(value);
     onPendingPromptConsumed?.();
   }, [pendingPrompt, busy, submit, onPendingPromptConsumed]);
