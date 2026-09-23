@@ -116,7 +116,10 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
   const [showColourPanel, setShowColourPanel] = useState(false);
   const [showPlanOptions, setShowPlanOptions] = useState(false);
   // Colours are held per floor, so one sheet's key never leaks onto another.
-  const [roomColourMap, setRoomColourMap] = useState<Record<string, QeiiRoomColours>>({});
+  // Every space the schedule puts to use starts in the approved accent, on all
+  // floors; a saved colour or this browser's own choice still outranks it.
+  const [roomColourMap, setRoomColourMap] =
+    useState<Record<string, QeiiRoomColours>>(defaultQeiiColourMap);
   const [keyLabelMap, setKeyLabelMap] = useState<Record<string, Record<string, string>>>({});
   const [wallWeight, setWallWeight] = useState(QEII_WALL_WEIGHT);
   const [showAllSymbols, setShowAllSymbols] = useState(false);
