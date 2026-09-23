@@ -403,7 +403,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
       }[] = [
         {
           title: QEII_DIRECTORY_TITLE,
-          svg: qeiiDirectorySvg({ face, showMarks }),
+          svg: qeiiDirectorySvg({ face, showMarks, groundId: directoryGround }),
           note: QEII_DIRECTORY_SOURCE,
         },
       ];
@@ -1073,7 +1073,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
           <div
             className="mx-auto max-w-[520px] [&>svg]:h-auto [&>svg]:w-full"
             dangerouslySetInnerHTML={{
-              __html: qeiiDirectorySvg({ face, showMarks }),
+              __html: qeiiDirectorySvg({ face, showMarks, groundId: directoryGround }),
             }}
           />
           <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[12px] text-[#03002C]/70">
@@ -1085,11 +1085,11 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
               className={btn}
               onClick={() => {
                 const url = URL.createObjectURL(
-                  new Blob([qeiiDirectorySvg({ face, showMarks })], {
+                  new Blob([qeiiDirectorySvg({ face, showMarks, groundId: directoryGround })], {
                     type: "image/svg+xml",
                   }),
                 );
-                download(url, qeiiDirectoryFilename(face));
+                download(url, qeiiDirectoryFilename(face, directoryGround));
                 URL.revokeObjectURL(url);
               }}
             >
