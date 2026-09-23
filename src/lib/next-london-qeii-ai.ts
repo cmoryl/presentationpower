@@ -192,16 +192,23 @@ export async function buildQeiiPlanAi(
       bits.push(ops, fill && stroke ? "B" : stroke ? "S" : "f", "Q");
       // Rooms the artwork draws inside this block, cut out along the issued wall
       // runs: each is its own editable path at the exact angles drawn.
-      const cut = (cellsByShape.get(i) ?? [])
+      const cells = cellsByShape.get(i) ?? [];
+      // Each cell is clipped to its block, and the walls are stroked again on
+      // top, so colour never shows past a wall at a corner.
+      const cut = cells
         .map((c) => {
           const cellOps = svgPathToPdfOps(c.d, { scale: k, x: 0, y: 0, artHeight: artH });
           if (!cellOps) return "";
           const cellFill = c.hex ?? fill;
           if (!cellFill) return "";
-          return `q ${fillOp(cellFill, [0.01, 0, 0.17])} ${cellOps} f Q\n`;
+          return `q ${ops} W n ${fillOp(cellFill, [0.01, 0, 0.17])} ${cellOps} f Q\n`;
         })
         .join("");
-      return `${bits.join(" ")}\n${cut}`;
+      const walls =
+        cut && stroke
+          ? `q ${strokeOp(stroke, [1, 1, 1])} ${f3(Math.max(0.05, qeiiWallWidth(shape, options.wallWeight, qeiiWallGain(floor.id)) * k))} w ${ops} S Q\n`
+          : "";
+      return `${bits.join(" ")}\n${cut}${walls}`;
     })
     .join("");
 

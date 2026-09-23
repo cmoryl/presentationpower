@@ -129,7 +129,8 @@ export function qeiiDrawShapes(
 
     // Rooms drawn inside this block, cut along the issued wall runs, so a colour
     // fills the whole room as its own editable shape in PowerPoint and Word.
-    for (const cell of cellsByShape.get(i) ?? []) {
+    const cells = cellsByShape.get(i) ?? [];
+    for (const cell of cells) {
       const cellSegs = qeiiPathSegs(cell.d);
       if (cellSegs.length)
         out.push({
@@ -139,6 +140,9 @@ export function qeiiDrawShapes(
           name: `Room — ${cell.room}`,
         });
     }
+    // Walls drawn again above the room colours, so no fill shows past a wall.
+    if (cells.length && stroke)
+      out.push({ segs, stroke, strokeW: qeiiWallWidth(s, wall, gain), name: "Walls" });
   });
   return out;
 }

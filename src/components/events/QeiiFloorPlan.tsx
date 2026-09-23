@@ -164,14 +164,32 @@ export function QeiiFloorPlan({
             />
             {/* Rooms the artwork draws inside this block, cut out along the
                 issued wall runs so each colour fills the whole room. */}
-            {(cellsByShape.get(i) ?? []).map((cell) => (
-              <path
-                key={`c-${cell.room}`}
-                d={cell.d}
-                fill={cell.hex ?? chosen ?? qeiiPlanInk(shape.fill, face) ?? "none"}
-                data-room={cell.room}
-              />
-            ))}
+            {(cellsByShape.get(i) ?? []).length ? (
+              <>
+                <clipPath id={`qeii-live-clip-${i}`}>
+                  <path d={shape.d} />
+                </clipPath>
+                <g clipPath={`url(#qeii-live-clip-${i})`}>
+                  {(cellsByShape.get(i) ?? []).map((cell) => (
+                    <path
+                      key={`c-${cell.room}`}
+                      d={cell.d}
+                      fill={cell.hex ?? chosen ?? qeiiPlanInk(shape.fill, face) ?? "none"}
+                      data-room={cell.room}
+                    />
+                  ))}
+                </g>
+                {/* Walls redrawn on top so colour never shows past a wall. */}
+                {stroke ? (
+                  <path
+                    d={shape.d}
+                    fill="none"
+                    stroke={stroke}
+                    strokeWidth={qeiiWallWidth(shape, wall, wallGain)}
+                  />
+                ) : null}
+              </>
+            ) : null}
           </Fragment>
         );
       })}
