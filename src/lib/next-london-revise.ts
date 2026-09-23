@@ -46,7 +46,7 @@ import {
   radialShadingDict,
   stopsFromColors,
 } from "@/lib/pdf-gradient-shading";
-import { patternDictBody, patternFillOps } from "@/lib/pdf-analytic-shading";
+import { patternDictBody, patternFillOps } from "@/lib/pdf-analytic-shading-ops";
 import {
   LONDON_SIGNAGE_FONT,
   londonBrandingPlan,
