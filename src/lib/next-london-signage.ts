@@ -52,6 +52,12 @@ export type LondonPanel = {
   /** Measured worst-case flat-tone run, in mm. */
   bandMm: number;
   rasterMb: number;
+  /**
+   * Division template override: when set, the panel is branded for this
+   * lockup family (white lockup + accent tint) instead of the family read from
+   * its room/name. Only division sign templates set it; London items never do.
+   */
+  division?: string;
 };
 
 export const LONDON_VENUE = {

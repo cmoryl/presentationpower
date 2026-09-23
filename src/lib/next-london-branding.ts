@@ -82,6 +82,7 @@ export function londonCopyRunMm(text: string, sizeMm: number, trackingEm: number
 
 /** Which lockup family an item belongs to, from its note/room/name. */
 export function londonPanelFamily(panel: LondonPanel): string {
+  if (panel.division) return panel.division;
   const haystack = brandingHaystack(panel);
   for (const [re, id] of FAMILY_KEYWORDS) if (re.test(haystack)) return id;
   // Door branding always belongs to a room, and every room belongs to a
