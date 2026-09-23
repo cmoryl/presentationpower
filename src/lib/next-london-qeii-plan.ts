@@ -422,7 +422,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
                 `x="${block.box.x0 - pad}" y="${block.box.y0 - pad * 0.6}"`,
                 `width="${block.box.x1 - block.box.x0 + pad * 2}"`,
                 `height="${block.box.y1 - block.box.y0 + pad * 1.2}"`,
-                `rx="${block.size * 0.35}" fill="${qeiiRoomPaint(room, tag, face)}"`,
+                `rx="${block.size * 0.35}" fill="${face === "signage" && !QEII_SIGNAGE_GRADIENTS[room] ? tag : qeiiRoomPaint(room, tag, face)}"`,
                 transform ? `transform="${transform}"` : "",
                 "/>",
               ]
