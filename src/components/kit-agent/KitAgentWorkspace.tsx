@@ -117,9 +117,15 @@ export function KitAgentWorkspace({
   const onKitDetected = useCallback(
     (id: string) => {
       setKitId(id);
+      // Losing this link means the conversation stops pointing at the kit it
+      // built, so it is worth saying rather than swallowing.
       void setKitThreadKit(threadId, id)
         .then(refreshThreads)
-        .catch(() => undefined);
+        .catch(() =>
+          toast.error("Couldn't link this conversation to the kit", {
+            description: "The kit itself is saved. Reload the page to try linking again.",
+          }),
+        );
     },
     [threadId, refreshThreads],
   );
