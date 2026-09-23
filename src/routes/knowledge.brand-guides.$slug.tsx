@@ -1,4 +1,5 @@
-import { GuideGrounds, guideHasGrounds } from "@/components/brand/GuideGrounds";
+import { GuideGrounds, guideHasGrounds, GUIDE_GROUND_FAMILY } from "@/components/brand/GuideGrounds";
+import { DivisionSignageKit } from "@/components/events/DivisionSignageKit";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
@@ -588,6 +589,24 @@ function BrandGuideView() {
       {guideHasGrounds(guide.slug) && (
         <Section title="Backgrounds & gradients" eyebrow="07a">
           <GuideGrounds slug={guide.slug} />
+        </Section>
+      )}
+
+      {/* Event signage templates for this division, from the London kit */}
+      {GUIDE_GROUND_FAMILY[guide.slug] && (
+        <Section title="Event signage" eyebrow="07b">
+          <p className="mb-4 max-w-2xl text-sm text-muted-foreground">
+            Starter NEXT signs for this division, built from the London 2026 kit. Open the full set for
+            every sign type and the SVG and Illustrator downloads.
+          </p>
+          <DivisionSignageKit divisionId={GUIDE_GROUND_FAMILY[guide.slug]!} compact />
+          <Link
+            to="/events/next/divisions/$divisionId"
+            params={{ divisionId: GUIDE_GROUND_FAMILY[guide.slug]! }}
+            className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
+          >
+            Open the full sign set
+          </Link>
         </Section>
       )}
 
