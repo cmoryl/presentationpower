@@ -279,6 +279,38 @@ export function qeiiColourByDivision(floor: QeiiFloorVector): QeiiRoomColours {
   return out;
 }
 
+/**
+ * The approved accent every space we are using is filled with by default.
+ *
+ * One accent across all seven floors, so the set reads as one system: the rooms
+ * the event schedule records are accent, everything else stays the pale plan
+ * ground. Nothing outside the issued schedule is filled.
+ */
+export const QEII_ROOM_ACCENT = "#003FC7";
+
+/**
+ * Default fills for a floor: every space the issued event schedule puts to use —
+ * sessions, registration, the mart, the café — in the approved accent.
+ *
+ * A room the schedule does not mention is left unfilled rather than guessed.
+ */
+export function qeiiDefaultRoomColours(floor: QeiiFloorVector): QeiiRoomColours {
+  const out: QeiiRoomColours = {};
+  for (const entry of qeiiRoomShapes(floor)) {
+    if (spaceUsesForRoom(entry.room, floor.id).length) out[entry.room] = QEII_ROOM_ACCENT;
+  }
+  return out;
+}
+
+/** The same defaults for a set of floors, keyed by floor id. */
+export function qeiiDefaultRoomColourMap(
+  floors: QeiiFloorVector[],
+): Record<string, QeiiRoomColours> {
+  const out: Record<string, QeiiRoomColours> = {};
+  for (const floor of floors) out[floor.id] = qeiiDefaultRoomColours(floor);
+  return out;
+}
+
 /** The division whose accent fills a room, for the colour key. */
 export function qeiiRoomDivisionName(room: string, sheetId: string): string | undefined {
   return spaceUseMarks(room, sheetId)[0]?.name;
