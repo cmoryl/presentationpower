@@ -31,8 +31,6 @@
 // press writer on first paint.
 import type {
   PDFDocument,
-  PDFName as PDFNameT,
-  PDFRawStream as PDFRawStreamT,
   PDFRef,
 } from "pdf-lib";
 
