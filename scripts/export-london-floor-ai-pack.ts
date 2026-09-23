@@ -4,6 +4,11 @@ import JSZip from "jszip";
 import { mkdir, writeFile } from "node:fs/promises";
 
 import { buildQeiiPlanAi } from "@/lib/next-london-qeii-ai";
+import {
+  QEII_DIRECTORY_SOURCE,
+  qeiiDirectoryFilename,
+  qeiiDirectorySvg,
+} from "@/lib/next-london-qeii-directory";
 import { qeiiPlanState } from "@/lib/next-london-qeii-plan";
 import { LONDON_VENUE_SHEETS } from "@/lib/next-london-venue-sheets";
 
@@ -54,12 +59,22 @@ async function main() {
     console.log("built", res.filename, `${(res.bytes.byteLength / 1024).toFixed(0)} KB`);
   }
 
+  // Page 1 of the set: the issued directory, carried as the editable SVG.
+  const dirName = qeiiDirectoryFilename("issued");
+  const dirSvg = qeiiDirectorySvg({ showMarks: true });
+  zip.file(`01-${dirName}`, dirSvg);
+  rows.push([`01-${dirName}`, '"Find your way (page 1)"', Buffer.byteLength(dirSvg), `"${QEII_DIRECTORY_SOURCE.replace(/"/g, "'")}"`].join(","));
+  console.log("built", `01-${dirName}`);
+
   zip.file("manifest.csv", rows.join("\n"));
   if (skipped.length) zip.file("SKIPPED.txt", skipped.join("\n"));
   zip.file(
     "README.txt",
     [
       "TransPerfect NEXT 2026 — London (QEII Centre) floor plans, Illustrator masters",
+      "",
+      "Page 1 of the set (Find your way) is the editable SVG; Illustrator opens",
+      "it with every line still live text.",
       "",
       "One .ai per natively rebuilt floor. Each file is live vector art: walls,",
       "room fills and venue symbols are real paths, room names / use lines / key",
