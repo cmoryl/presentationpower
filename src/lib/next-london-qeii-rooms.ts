@@ -456,6 +456,7 @@ export function qeiiColourKey(
 ): QeiiKeyEntry[] {
   const byHex = new Map<string, string[]>();
   for (const [room, hex] of Object.entries(rooms)) {
+    if (room.startsWith(QEII_GRADIENT_KEY)) continue;
     byHex.set(hex, [...(byHex.get(hex) ?? []), room]);
   }
   const order: string[] = QEII_ROOM_PALETTE.map((p) => p.hex);
