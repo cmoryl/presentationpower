@@ -77,6 +77,7 @@ import { Route as EventsPresetsRouteImport } from './routes/events.presets'
 import { Route as EventsPillarsRouteImport } from './routes/events.pillars'
 import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
+import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
 import { Route as EventsAgentThreadIdRouteImport } from './routes/events-agent.$threadId'
 import { Route as DevUxDebugRouteImport } from './routes/dev.ux-debug'
 import { Route as DevSocialSweepRouteImport } from './routes/dev.social-sweep'
@@ -540,6 +541,11 @@ const EventsNextRoute = EventsNextRouteImport.update({
 const EventsNewRoute = EventsNewRouteImport.update({
   id: '/new',
   path: '/new',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsEventIdRoute = EventsEventIdRouteImport.update({
+  id: '/$eventId',
+  path: '/$eventId',
   getParentRoute: () => EventsRoute,
 } as any)
 const EventsAgentThreadIdRoute = EventsAgentThreadIdRouteImport.update({
@@ -1262,6 +1268,7 @@ export interface FileRoutesByFullPath {
   '/dev/social-sweep': typeof DevSocialSweepRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
+  '/events/$eventId': typeof EventsEventIdRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/pillars': typeof EventsPillarsRoute
@@ -1451,6 +1458,7 @@ export interface FileRoutesByTo {
   '/dev/social-sweep': typeof DevSocialSweepRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
+  '/events/$eventId': typeof EventsEventIdRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/pillars': typeof EventsPillarsRoute
@@ -1645,6 +1653,7 @@ export interface FileRoutesById {
   '/dev/social-sweep': typeof DevSocialSweepRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
+  '/events/$eventId': typeof EventsEventIdRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/pillars': typeof EventsPillarsRoute
@@ -1840,6 +1849,7 @@ export interface FileRouteTypes {
     | '/dev/social-sweep'
     | '/dev/ux-debug'
     | '/events-agent/$threadId'
+    | '/events/$eventId'
     | '/events/new'
     | '/events/next'
     | '/events/pillars'
@@ -2029,6 +2039,7 @@ export interface FileRouteTypes {
     | '/dev/social-sweep'
     | '/dev/ux-debug'
     | '/events-agent/$threadId'
+    | '/events/$eventId'
     | '/events/new'
     | '/events/next'
     | '/events/pillars'
@@ -2222,6 +2233,7 @@ export interface FileRouteTypes {
     | '/dev/social-sweep'
     | '/dev/ux-debug'
     | '/events-agent/$threadId'
+    | '/events/$eventId'
     | '/events/new'
     | '/events/next'
     | '/events/pillars'
@@ -2907,6 +2919,13 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/events/new'
       preLoaderRoute: typeof EventsNewRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/$eventId': {
+      id: '/events/$eventId'
+      path: '/$eventId'
+      fullPath: '/events/$eventId'
+      preLoaderRoute: typeof EventsEventIdRouteImport
       parentRoute: typeof EventsRoute
     }
     '/events-agent/$threadId': {
@@ -3852,6 +3871,7 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface EventsRouteChildren {
+  EventsEventIdRoute: typeof EventsEventIdRoute
   EventsNewRoute: typeof EventsNewRoute
   EventsNextRoute: typeof EventsNextRoute
   EventsPillarsRoute: typeof EventsPillarsRoute
@@ -3888,6 +3908,7 @@ interface EventsRouteChildren {
 }
 
 const EventsRouteChildren: EventsRouteChildren = {
+  EventsEventIdRoute: EventsEventIdRoute,
   EventsNewRoute: EventsNewRoute,
   EventsNextRoute: EventsNextRoute,
   EventsPillarsRoute: EventsPillarsRoute,

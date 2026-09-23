@@ -948,6 +948,13 @@ function LondonSignagePage() {
           >
             <ArrowLeft className="h-4 w-4" /> NEXT 2026 event system
           </Link>
+          <Link
+            to="/events/$eventId"
+            params={{ eventId: "london" }}
+            className="ml-4 inline-flex items-center gap-1 text-[13px] font-semibold text-[#003FC7] hover:underline"
+          >
+            Event home
+          </Link>
         )}
 
         {headError && (

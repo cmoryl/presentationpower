@@ -57,6 +57,13 @@ function SanFranciscoPage() {
         >
           <ArrowLeft size={13} aria-hidden /> NEXT events
         </Link>
+          <Link
+            to="/events/$eventId"
+            params={{ eventId: "san-francisco" }}
+            className="ml-4 inline-flex items-center gap-1 text-[13px] font-semibold text-[#003FC7] hover:underline"
+          >
+            Event home
+          </Link>
 
         {/* The issued lines, set the way the covers set them. */}
         <header className="mt-4 overflow-hidden rounded-3xl bg-[#03002C] p-8 text-white sm:p-10">
