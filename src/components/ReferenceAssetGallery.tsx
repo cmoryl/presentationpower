@@ -8,12 +8,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { ReferenceAsset } from "@/components/ReferenceAssetUploader";
+import { formatBytes } from "@/lib/format-bytes";
 
-function formatBytes(b: number) {
-  if (b < 1024) return `${b} B`;
-  if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`;
-  return `${(b / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 function isPdf(a: ReferenceAsset) {
   return a.mimeType === "application/pdf";

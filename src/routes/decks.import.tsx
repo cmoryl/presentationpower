@@ -8,6 +8,7 @@ import { importPowerpoint } from "@/lib/pptx-import.functions";
 import type { ParsedDeck } from "@/lib/pptx-import";
 import { mapParsedSlide, type MappedSlide } from "@/lib/pptx-mapping";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, variantsForSection, byId } from "@/lib/taxonomy";
+import { formatBytes } from "@/lib/format-bytes";
 
 export const Route = createFileRoute("/decks/import")({
   head: () => ({
@@ -799,11 +800,6 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary);
 }
 
-function formatBytes(n: number): string {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-  return `${(n / (1024 * 1024)).toFixed(2)} MB`;
-}
 
 function ProgressPanel({
   steps,

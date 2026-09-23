@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { ReferenceAssetGallery } from "@/components/ReferenceAssetGallery";
+import { formatBytes } from "@/lib/format-bytes";
 
 export type ReferenceAsset = {
   id: string;
@@ -39,11 +40,6 @@ export type FileRejection = {
   detail?: string;
 };
 
-function formatBytes(b: number) {
-  if (b < 1024) return `${b} B`;
-  if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`;
-  return `${(b / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 function isAccepted(file: File): boolean {
   // Accept explicit type, or infer from extension when type is empty/ambiguous.

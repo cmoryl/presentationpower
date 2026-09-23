@@ -14,6 +14,7 @@ import {
   LOVABLE_GATEWAY_MODEL,
   getActiveAiProvider,
 } from "@/lib/ai-core";
+import { formatBytes } from "@/lib/format-bytes";
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 const MAX_PDF_PAGES = 20;
@@ -74,11 +75,6 @@ async function countPdfPages(base64: string): Promise<number | null> {
   }
 }
 
-function formatBytes(b: number) {
-  if (b < 1024) return `${b} B`;
-  if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`;
-  return `${(b / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 export const analyzeReferenceAssets = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
