@@ -175,5 +175,82 @@ export function buildSharedKnowledgeToolSet(ctx: { supabase: Db }): ToolSet {
         }
       },
     }),
+
+  };
+}
+
+export const EVENT_INTAKE_PROMPT = [
+  "NEW EVENTS — use start_event when the user asks to set up a new event, city or venue. It creates only an empty map set and the venue intake checklist; never invent rooms, capacities or dates.",
+  "- Use event_intake_status to see what has arrived. Research marked 'suggested' came from the web and must be described as 'found online — to confirm with the venue', never as fact.",
+].join("\n");
+
+/** Event-only tools: start an event and read its intake. Events assistant only. */
+export function buildEventIntakeToolSet(ctx: { supabase: Db }): ToolSet {
+  return {
+    event_intake_status: tool({
+      description:
+        "For a started event, list what the venue and organisers have sent (floor plans, room list, programme, logos) and what online research suggested. Suggestions are not facts until confirmed.",
+      inputSchema: z.object({ event_id: z.string().describe("Event id, e.g. 'next-2027-san-francisco'.") }),
+      execute: async ({ event_id }) => {
+        const { summarizeIntake } = await import("@/lib/event-intake");
+        const [intake, research] = await Promise.all([
+          ctx.supabase.from("event_intake_items").select("item_key,status,note").eq("event_id", event_id),
+          ctx.supabase
+            .from("event_venue_research")
+            .select("item_key,label,value,source_url,status")
+            .eq("event_id", event_id)
+            .neq("status", "rejected")
+            .limit(60),
+        ]);
+        if (intake.error) return `ERROR: ${intake.error.message}`;
+        return {
+          summary: summarizeIntake((intake.data ?? []) as never),
+          items: intake.data ?? [],
+          research: research.data ?? [],
+          note: "Only 'confirmed' research may be used as fact. Link: /events/next/intake/" + event_id,
+        };
+      },
+    }),
+
+    start_event: tool({
+      description:
+        "Start a new event: creates an empty map set waiting on the venue's floor plans and the venue intake checklist. Never invents rooms. Returns the intake page link; the user can run online venue research there.",
+      inputSchema: z.object({
+        name: z.string().describe("Event name, e.g. 'NEXT 2027'."),
+        city: z.string(),
+        venue: z.string(),
+        dates: z.string().describe("Dates as given, or empty if unknown."),
+      }),
+      execute: async ({ name, city, venue, dates }) => {
+        const { EVENT_INTAKE_ITEMS, eventSlug } = await import("@/lib/event-intake");
+        const { blankVenuePlan } = await import("@/lib/venue-plan");
+        const id = eventSlug(name, city);
+        if (id.length < 3) return "ERROR: give the event a name and city.";
+        const { error } = await ctx.supabase.from("venue_plans").upsert(
+          {
+            slug: id,
+            event_id: id,
+            name,
+            city,
+            venue,
+            dates_label: dates,
+            producer: "",
+            surveyed: false,
+            survey_source: "",
+            survey_date: null,
+            caveat: "Waiting on the venue's floor plans — nothing is drawn until they arrive.",
+            floors: blankVenuePlan(id, name).floors,
+          },
+          { onConflict: "slug" },
+        );
+        if (error) return `ERROR: ${error.message}`;
+        await ctx.supabase.from("event_intake_items").upsert(
+          EVENT_INTAKE_ITEMS.map((i) => ({ event_id: id, item_key: i.key, status: "missing" })),
+          { onConflict: "event_id,item_key", ignoreDuplicates: true },
+        );
+        return { event_id: id, link: `/events/next/intake/${id}`, needs: EVENT_INTAKE_ITEMS.map((i) => i.label) };
+      },
+    }),
+
   };
 }
