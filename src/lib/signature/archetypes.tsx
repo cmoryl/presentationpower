@@ -129,7 +129,7 @@ function socialRowHtml(ctx: SignatureContext, opts?: { variant?: 'square' | 'pil
     if (variant === 'pill') {
       return `<td style="padding-right:6px;"><a href="${escapeAttr(s.url)}" target="_blank" style="background:${escapeAttr(ctx.primary)};color:#ffffff;text-decoration:none;font-family:${escapeAttr(ctx.font)};font-size:11px;display:inline-block;padding:5px 10px;border-radius:999px;">${escapeHtml(platformLabels[s.platform] || s.platform)}</a></td>`;
     }
-    return `<td style="padding-right:6px;"><a href="${escapeAttr(s.url)}" target="_blank"><img src="${escapeAttr(socialIconUrls[s.platform])}" alt="${escapeAttr(s.platform)}" width="20" height="20" style="display:block;border:0;" /></a></td>`;
+    return `<td style="padding-right:10px;"><a href="${escapeAttr(s.url)}" target="_blank" style="color:${escapeAttr(ctx.primary)};text-decoration:none;font-family:${escapeAttr(ctx.font)};font-size:11px;font-weight:600;letter-spacing:0.02em;">${escapeHtml(platformLabels[s.platform] || s.platform)}</a></td>`;
   }).join('');
   return `<table cellpadding="0" cellspacing="0" border="0" role="presentation" align="${align}" style="margin-top:10px;border-collapse:collapse;"><tr>${cells}</tr></table>`;
 }
