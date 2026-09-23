@@ -59,6 +59,12 @@ import {
 } from "@/lib/next-london-qeii-plan";
 import { QEII_MAP_LOOKS, QEII_MAP_LOOK_ORDER } from "@/lib/next-london-qeii-style";
 import {
+  QEII_DIRECTORY_SOURCE,
+  QEII_DIRECTORY_TITLE,
+  qeiiDirectoryFilename,
+  qeiiDirectorySvg,
+} from "@/lib/next-london-qeii-directory";
+import {
   LONDON_EVENT_SHEETS,
   VENUE_SHEET_LEGEND,
   VENUE_SHEET_PDF,
