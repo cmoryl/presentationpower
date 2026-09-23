@@ -1,23 +1,20 @@
 import { it } from "vitest";
 import { QEII_FLOOR_VECTORS } from "@/lib/next-london-qeii-vectors";
-import { qeiiRoomShapes, qeiiColourPaint } from "@/lib/next-london-qeii-rooms";
-import { qeiiCutRoomCell, QEII_CELL_MAX_PLAN_SHARE } from "@/lib/next-london-qeii-cells";
+import { qeiiRoomShapes } from "@/lib/next-london-qeii-rooms";
+import { qeiiRings, qeiiRingArea, qeiiInRing } from "@/lib/next-london-qeii-geometry";
 
-it("pickwick", () => {
-  for (const f of QEII_FLOOR_VECTORS) {
-    const entries = qeiiRoomShapes(f);
-    const hit = entries.filter((e) => /pickwick|churchill/i.test(e.room));
-    if (!hit.length) continue;
-    console.log("FLOOR", f.id);
-    for (const e of hit) {
-      console.log(JSON.stringify({ room: e.room, shapeIndex: e.shapeIndex, shared: e.sharedWith, cell: !!e.cell }));
-      if (!e.cell && e.sharedWith.length) {
-        const others = entries.filter((o) => o.shapeIndex === e.shapeIndex && o.room !== e.room).map((o) => ({ x: o.x, y: o.y }));
-        const cut = qeiiCutRoomCell(f, e.shapeIndex, e.x, e.y, others);
-        console.log("  cut:", cut ? { share: cut.share.toFixed(3), planShare: cut.planShare.toFixed(3), max: QEII_CELL_MAX_PLAN_SHARE } : "none");
+it("pickwick cover", () => {
+  const f = QEII_FLOOR_VECTORS.find((v) => v.id === "first")!;
+  const e = qeiiRoomShapes(f).find((r) => r.room === "Pickwick")!;
+  console.log("pickwick shapeIndex", e.shapeIndex, "pt", e.x, e.y, "plan", f.w, f.h);
+  f.shapes.forEach((s, i) => {
+    if (i <= e.shapeIndex || !s.fill) return;
+    for (const ring of qeiiRings(s.d)) {
+      if (qeiiInRing(ring, e.x, e.y)) {
+        console.log("covered by", i, "fill", s.fill, "area", qeiiRingArea(ring).toFixed(0), "planArea", (f.w * f.h).toFixed(0));
+        return;
       }
     }
-    const paint = qeiiColourPaint(f, Object.fromEntries(hit.map((h) => [h.room, "#A6FA87"])));
-    console.log("  fills", [...paint.fills.entries()], "tags", [...paint.tags.entries()], "cells", paint.cells.map((c) => c.room + ":" + (c.hex ?? "none")));
-  }
+  });
+  console.log("own shape fill", f.shapes[e.shapeIndex]!.fill, "rings", qeiiRings(f.shapes[e.shapeIndex]!.d).length);
 });
