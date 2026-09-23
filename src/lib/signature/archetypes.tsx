@@ -565,7 +565,7 @@ export function renderArchetype(signature: SignatureData, archetype: ArchetypeId
 export function exportArchetypeHtml(signature: SignatureData, archetype: ArchetypeId): string {
   const ctx = buildContext(signature);
   const { html } = registry[archetype](ctx);
-  return appendAttribution(html + renderExtrasHtml(ctx));
+  return html + renderExtrasHtml(ctx);
 }
 
 function ExtrasPreview({ ctx }: { ctx: SignatureContext }) {

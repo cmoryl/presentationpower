@@ -12,24 +12,6 @@ export const escapeHtml = (s: string): string =>
 
 export const escapeAttr = escapeHtml;
 
-/** Hosted PNG social icons. PNG so Outlook (Word) renders them. */
-export const socialIconUrls: Record<string, string> = {
-  linkedin: 'https://cdn-icons-png.flaticon.com/512/174/174857.png',
-  twitter: 'https://cdn-icons-png.flaticon.com/512/733/733579.png',
-  facebook: 'https://cdn-icons-png.flaticon.com/512/733/733547.png',
-  instagram: 'https://cdn-icons-png.flaticon.com/512/2111/2111463.png',
-  youtube: 'https://cdn-icons-png.flaticon.com/512/1384/1384060.png',
-  github: 'https://cdn-icons-png.flaticon.com/512/733/733553.png',
-  tiktok: 'https://cdn-icons-png.flaticon.com/512/3046/3046120.png',
-  whatsapp: 'https://cdn-icons-png.flaticon.com/512/733/733585.png',
-  telegram: 'https://cdn-icons-png.flaticon.com/512/2111/2111646.png',
-  discord: 'https://cdn-icons-png.flaticon.com/512/3670/3670157.png',
-  threads: 'https://cdn-icons-png.flaticon.com/512/12105/12105296.png',
-  bluesky: 'https://cdn-icons-png.flaticon.com/512/15047/15047435.png',
-  calendly: 'https://cdn-icons-png.flaticon.com/512/2693/2693560.png',
-  medium: 'https://cdn-icons-png.flaticon.com/512/2111/2111505.png',
-};
-
 export const platformLabels: Record<string, string> = {
   linkedin: 'LinkedIn', twitter: 'Twitter', facebook: 'Facebook', instagram: 'Instagram',
   youtube: 'YouTube', github: 'GitHub', tiktok: 'TikTok', whatsapp: 'WhatsApp',
