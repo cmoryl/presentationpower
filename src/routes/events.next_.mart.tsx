@@ -80,6 +80,24 @@ function MartPage() {
           </dl>
         </div>
 
+        <Link
+          to="/events/next/mart/price-list"
+          className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white p-4 hover:border-[#003FC7]"
+        >
+          <div>
+            <div className="text-sm font-semibold text-[#03002C]">Price list sheet · A4</div>
+            <p className="mt-1 max-w-2xl text-xs text-black/60">
+              The issued price-list sheet as a live template — per-city currency and typed prices,
+              editable SVG, press PDF, Illustrator, PowerPoint and Word.
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#003FC7]">
+            Open price list <ArrowRight size={13} />
+          </span>
+        </Link>
+
+
+
         {/* Pillar signage — live editable files */}
         <section className="mt-10">
           <div className="flex flex-wrap items-center justify-between gap-3">
