@@ -218,7 +218,10 @@ export async function saveDeckToCloudCore(
   };
   // An ordinary content save must not reset the deck's lifecycle status — that
   // silently undid whatever moved it out of draft.
-  let { data: existingDeck } = await sb.from("decks").select("status").eq("id", deckUuid);
+  let { data: existingDeck } = await sb
+    .from("decks")
+    .select("status, updated_at")
+    .eq("id", deckUuid);
   const alreadySaved = Array.isArray(existingDeck) && existingDeck.length > 0;
   if (!alreadySaved) {
     // Land on the draft this is a re-save of rather than stacking up another row.
@@ -231,13 +234,28 @@ export async function saveDeckToCloudCore(
     );
     if (dupId) {
       deckUuid = dupId;
-      existingDeck = (await sb.from("decks").select("status").eq("id", deckUuid)).data;
+      existingDeck = (await sb.from("decks").select("status, updated_at").eq("id", deckUuid)).data;
     }
   }
-  const existingStatus = Array.isArray(existingDeck)
-    ? (existingDeck[0] as { status?: string | null } | undefined)?.status
+  const existingRow = Array.isArray(existingDeck)
+    ? (existingDeck[0] as { status?: string | null; updated_at?: string | null } | undefined)
     : undefined;
+  const existingStatus = existingRow?.status;
   const keepStatus = existingStatus ?? "draft";
+
+  // Concurrency guard. Refuse rather than overwrite when the saved deck has been
+  // written by someone else since this editor read it. Compared as instants, so
+  // clock formatting differences can't be mistaken for a conflict.
+  const serverStamp = existingRow?.updated_at ?? null;
+  if (data.baseUpdatedAt && serverStamp) {
+    const base = Date.parse(data.baseUpdatedAt);
+    const server = Date.parse(serverStamp);
+    // One second of slack absorbs storage rounding; anything beyond it is a
+    // genuine write we would be discarding.
+    if (Number.isFinite(base) && Number.isFinite(server) && server - base > 1000) {
+      throw new DeckConflictError(serverStamp);
+    }
+  }
 
   const { error: deckErr } = await sb.from("decks").upsert({
     id: deckUuid,
