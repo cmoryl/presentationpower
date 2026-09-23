@@ -22,6 +22,30 @@ import {
   type QeiiPlanFace,
 } from "@/lib/next-london-qeii-style";
 import { qeiiMarkUrl, type QeiiMarkVariant } from "@/lib/next-london-qeii-plan";
+import {
+  LONDON_PACK_GROUNDS,
+  londonPackGroundHexes,
+} from "@/lib/next-london-pack-grounds";
+
+/**
+ * Backgrounds this page can sit on: the flat template ground of the chosen look,
+ * or one of the measured event gradient grounds from the supplied signage pack —
+ * the same ink ramps the printed signs carry, drawn as a live gradient. No new
+ * ramp is invented here.
+ */
+export const QEII_DIRECTORY_GROUNDS: { id: string; label: string; note: string }[] = [
+  {
+    id: "token",
+    label: "Template ground",
+    note: "Flat approved token ground of the selected look.",
+  },
+  ...LONDON_PACK_GROUNDS.map((g) => ({ id: g.id, label: g.label, note: g.note })),
+];
+
+export function qeiiDirectoryGroundHexes(groundId: string): string[] {
+  return groundId === "token" ? [] : londonPackGroundHexes(groundId);
+}
+
 
 
 export type QeiiDirectoryRow = {
@@ -108,6 +132,8 @@ export type QeiiDirectoryOptions = {
   markVariant?: QeiiMarkVariant;
   /** Print the approved lockups; false prints the issued track wording instead. */
   showMarks?: boolean;
+  /** "token" (flat look ground) or a measured event gradient ground id. */
+  groundId?: string;
 };
 
 /**
@@ -119,13 +145,31 @@ export function qeiiDirectorySvg(options: QeiiDirectoryOptions = {}): string {
   const face = options.face ?? "studio";
   const showMarks = options.showMarks ?? true;
   const { w, h } = QEII_DIRECTORY_PAGE;
+  const groundId = options.groundId ?? "token";
+  const ramp = qeiiDirectoryGroundHexes(groundId);
   const ground = qeiiPlanGround(face);
-  const ink = qeiiGroundInk(face);
-  const dark = qeiiLuminance(ground) <= 0.55;
+  // A gradient ground is judged on its darkest stop, so the type and lockups are
+  // legible across the whole run rather than only at the pale end.
+  const deepest = ramp.length
+    ? ramp.reduce((a, b) => (qeiiLuminance(b) < qeiiLuminance(a) ? b : a))
+    : ground;
+  const dark = qeiiLuminance(ramp.length ? deepest : ground) <= 0.55;
+  const ink = ramp.length ? (dark ? "#FFFFFF" : "#03002C") : qeiiGroundInk(face);
   // A reversed ground takes the all-white lockup; a light one takes the colour
   // file, so no lockup is ever printed into a ground it cannot be read on.
   const variant: QeiiMarkVariant = options.markVariant ?? (dark ? "white" : "colour");
   const rule = dark ? "#A1FBF9" : "#003FC7";
+  const gradientId = "qeii-directory-ground";
+  const groundPaint = ramp.length ? `url(#${gradientId})` : ground;
+  const defs = ramp.length
+    ? `<defs><linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">${ramp
+        .map(
+          (hex, i) =>
+            `<stop offset="${((i / (ramp.length - 1)) * 100).toFixed(2)}%" stop-color="${hex}"/>`,
+        )
+        .join("")}</linearGradient></defs>`
+    : "";
+
 
   const marginX = 64;
   const colGap = 46;
@@ -208,7 +252,8 @@ export function qeiiDirectorySvg(options: QeiiDirectoryOptions = {}): string {
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`,
     `<title>Queen Elizabeth II Centre — Find your way</title>`,
-    `<rect width="${w}" height="${h}" fill="${ground}"/>`,
+    defs,
+    `<rect width="${w}" height="${h}" fill="${groundPaint}"/>`,
     head,
     body.join(""),
     foot,
@@ -218,6 +263,7 @@ export function qeiiDirectorySvg(options: QeiiDirectoryOptions = {}): string {
 
 export const QEII_DIRECTORY_TITLE = "Find your way";
 
-export function qeiiDirectoryFilename(face: QeiiPlanFace): string {
-  return `TP-NEXT-2026-London-QEII-find-your-way-${face}.svg`;
+export function qeiiDirectoryFilename(face: QeiiPlanFace, groundId = "token"): string {
+  const ground = groundId === "token" ? face : `${face}-${groundId}`;
+  return `TP-NEXT-2026-London-QEII-find-your-way-${ground}.svg`;
 }

@@ -59,6 +59,7 @@ import {
 } from "@/lib/next-london-qeii-plan";
 import { QEII_MAP_LOOKS, QEII_MAP_LOOK_ORDER } from "@/lib/next-london-qeii-style";
 import {
+  QEII_DIRECTORY_GROUNDS,
   QEII_DIRECTORY_SOURCE,
   QEII_DIRECTORY_TITLE,
   qeiiDirectoryFilename,
@@ -126,6 +127,9 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
   const [allFloors, setAllFloors] = useState(false);
   /** Page 1 of the set — the issued "find your way" directory. */
   const [showIndex, setShowIndex] = useState(false);
+  // Background for page 1: the flat look ground, or one of the event's measured
+  // gradient grounds from the supplied signage pack.
+  const [directoryGround, setDirectoryGround] = useState("token");
   const [rebuiltView, setRebuiltView] = useState(true);
   // The house style is the default look for every floor and every download.
   const [face, setFace] = useState<QeiiPlanFace>("studio");
@@ -399,7 +403,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
       }[] = [
         {
           title: QEII_DIRECTORY_TITLE,
-          svg: qeiiDirectorySvg({ face, showMarks }),
+          svg: qeiiDirectorySvg({ face, showMarks, groundId: directoryGround }),
           note: QEII_DIRECTORY_SOURCE,
         },
       ];
@@ -1066,12 +1070,37 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
 
       {showIndex ? (
         <figure className="mt-5 overflow-hidden rounded-2xl border border-black/10 bg-white p-4">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#03002C]/55">
+              Background
+            </span>
+            {QEII_DIRECTORY_GROUNDS.map((g) => (
+              <button
+                key={g.id}
+                type="button"
+                title={g.note}
+                aria-pressed={directoryGround === g.id}
+                className={`${chip} ${
+                  directoryGround === g.id
+                    ? "border-[#003FC7] bg-[#003FC7] text-white"
+                    : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
+                }`}
+                onClick={() => setDirectoryGround(g.id)}
+              >
+                {g.label}
+              </button>
+            ))}
+          </div>
           <div
             className="mx-auto max-w-[520px] [&>svg]:h-auto [&>svg]:w-full"
             dangerouslySetInnerHTML={{
-              __html: qeiiDirectorySvg({ face, showMarks }),
+              __html: qeiiDirectorySvg({ face, showMarks, groundId: directoryGround }),
             }}
           />
+          <p className="mt-2 text-center text-[11px] text-[#03002C]/55">
+            Gradient grounds are the ink ramps measured from the supplied event signage — the same
+            backgrounds the printed signs carry.
+          </p>
           <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[12px] text-[#03002C]/70">
             <span>
               Page 1 of the map set — {QEII_DIRECTORY_TITLE}. {QEII_DIRECTORY_SOURCE}
@@ -1081,11 +1110,11 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
               className={btn}
               onClick={() => {
                 const url = URL.createObjectURL(
-                  new Blob([qeiiDirectorySvg({ face, showMarks })], {
+                  new Blob([qeiiDirectorySvg({ face, showMarks, groundId: directoryGround })], {
                     type: "image/svg+xml",
                   }),
                 );
-                download(url, qeiiDirectoryFilename(face));
+                download(url, qeiiDirectoryFilename(face, directoryGround));
                 URL.revokeObjectURL(url);
               }}
             >
