@@ -286,7 +286,7 @@ export async function saveDeckToCloudCore(
         `This copy of the deck has no slides, but ${existingIds.length} slide(s) are saved in the cloud. Nothing was changed — reload the saved deck before saving again.`,
       );
     }
-    return { deckUuid, briefUuid };
+    return { deckUuid, briefUuid, serverUpdatedAt: await readDeckStamp(sb, deckUuid) };
   }
 
   {
@@ -317,5 +317,5 @@ export async function saveDeckToCloudCore(
     }
   }
 
-  return { deckUuid, briefUuid };
+  return { deckUuid, briefUuid, serverUpdatedAt: await readDeckStamp(sb, deckUuid) };
 }
