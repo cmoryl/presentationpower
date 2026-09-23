@@ -95,6 +95,9 @@ function applyTemplate(signature: SignatureData, templateId: string): SignatureD
   };
 }
 
+/** Where the in-progress signature is kept on this device between visits. */
+const SIGNATURE_DRAFT_KEY = "element.signature.draft.v1";
+
 export function SignatureStudio() {
   const isAdmin = useIsAdmin();
   const [brandModeId, setBrandModeId] = useState("bm-enterprise");
