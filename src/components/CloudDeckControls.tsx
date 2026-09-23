@@ -115,6 +115,9 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
   const pending = useRef<{ deck: Deck; brief: Brief; serialized: string } | null>(null);
   const saveRef = useRef(save);
   saveRef.current = save;
+  // The conflict message already reported, so a stalled editor isn't told the
+  // same thing on every keystroke.
+  const conflict = useRef<string | null>(null);
 
   // Cloud-loaded decks use "cloud-<id>" — treat as pre-linked.
   useEffect(() => {
