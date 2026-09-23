@@ -54,7 +54,7 @@ export type QeiiMarkVariant = "reverse" | "white" | "colour";
  * Only the three issued stacked variants are offered — a lockup is never
  * recoloured on our side.
  */
-export function qeiiMarkUrl(mark: SpaceUseMark, variant: QeiiMarkVariant = "reverse"): string {
+export function qeiiMarkUrl(mark: SpaceUseMark, variant: QeiiMarkVariant = "white"): string {
   if (variant === "white") return mark.urlWhite;
   if (variant === "colour") return mark.url;
   return mark.urlReverse;
