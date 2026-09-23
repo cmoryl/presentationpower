@@ -165,7 +165,7 @@ function ImportRow({
         setOver(false);
         const file = e.dataTransfer.files?.[0];
         if (file) {
-          onFile(file);
+          if (checkUploadSize(file, UPLOAD_ARTWORK_MAX_BYTES)) onFile(file);
           return;
         }
         const url = e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("text/plain");
