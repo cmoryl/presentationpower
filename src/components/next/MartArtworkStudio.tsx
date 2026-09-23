@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Download, Layers, Link2, Pencil, Plus, RotateCcw, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
+import { checkUploadSize, UPLOAD_ARTWORK_MAX_BYTES } from "@/lib/upload-limits";
 
 import { martArtworkPanels, type MartArtwork } from "@/lib/next-mart";
 import {
@@ -189,7 +190,7 @@ function ImportRow({
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
-            if (file) onFile(file);
+            if (file && checkUploadSize(file, UPLOAD_ARTWORK_MAX_BYTES)) onFile(file);
             e.target.value = "";
           }}
         />

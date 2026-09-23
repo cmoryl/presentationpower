@@ -7,6 +7,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { uploadSlideMedia } from "@/lib/slide-media";
 import { ORG_LOGO } from "@/lib/print-library/org-facts";
+import { checkUploadSize } from "@/lib/upload-limits";
 
 export function PrintLogoUploadField({
   label,
@@ -27,6 +28,10 @@ export function PrintLogoUploadField({
 
   async function pick(file: File | undefined) {
     if (!file) return;
+    if (!checkUploadSize(file)) {
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
     setBusy(true);
     try {
       const up = await uploadSlideMedia(file, file.name);
