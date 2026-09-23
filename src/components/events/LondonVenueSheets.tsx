@@ -59,7 +59,7 @@ import {
 } from "@/lib/next-london-qeii-plan";
 import { QEII_MAP_LOOKS, QEII_MAP_LOOK_ORDER } from "@/lib/next-london-qeii-style";
 import {
-  LONDON_VENUE_SHEETS,
+  LONDON_EVENT_SHEETS,
   VENUE_SHEET_LEGEND,
   VENUE_SHEET_PDF,
   searchVenueRooms,
@@ -86,7 +86,7 @@ const VENUE_SLUG = "next-2026-london";
  */
 function defaultQeiiColourMap(): Record<string, QeiiRoomColours> {
   const out: Record<string, QeiiRoomColours> = {};
-  for (const sheet of LONDON_VENUE_SHEETS) {
+  for (const sheet of LONDON_EVENT_SHEETS) {
     const state = qeiiPlanState(sheet.id);
     if (state?.rebuilt) out[sheet.id] = qeiiDefaultRoomColours(state.floor);
   }
@@ -112,7 +112,7 @@ export type LondonVenueSheetsProps = {
 
 export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSheetsProps = {}) {
   const [sheetId, setSheetId] = useState(
-    LONDON_VENUE_SHEETS.find((s) => s.id === initialSheetId)?.id ?? LONDON_VENUE_SHEETS[0]!.id,
+    LONDON_EVENT_SHEETS.find((s) => s.id === initialSheetId)?.id ?? LONDON_EVENT_SHEETS[0]!.id,
   );
   const [query, setQuery] = useState("");
   const [zoom, setZoom] = useState(false);
@@ -158,7 +158,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
 
   // Arriving from the room schedule: open that floor and ring that room.
   useEffect(() => {
-    if (initialSheetId && LONDON_VENUE_SHEETS.some((s) => s.id === initialSheetId))
+    if (initialSheetId && LONDON_EVENT_SHEETS.some((s) => s.id === initialSheetId))
       setSheetId(initialSheetId);
     if (initialRoom) setHighlightRoom(initialRoom);
   }, [initialSheetId, initialRoom]);
@@ -257,7 +257,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
   }, [query, rows]);
 
   const sheet: VenueSheet =
-    LONDON_VENUE_SHEETS.find((s) => s.id === sheetId) ?? LONDON_VENUE_SHEETS[0]!;
+    LONDON_EVENT_SHEETS.find((s) => s.id === sheetId) ?? LONDON_EVENT_SHEETS[0]!;
   const plan = useMemo(() => qeiiPlanState(sheet.id), [sheet.id]);
   const planNotes = useMemo(
     () =>
@@ -382,7 +382,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
     setPrintNote(undefined);
     try {
       const { exportQeiiFloorsPdf } = await import("@/lib/next-london-qeii-pdf");
-      const pages = LONDON_VENUE_SHEETS.map((s) => {
+      const pages = LONDON_EVENT_SHEETS.map((s) => {
         const state = qeiiPlanState(s.id);
         if (state?.rebuilt) {
           return {
@@ -519,7 +519,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
         const zip = new JSZip();
         let made = 0;
         const skipped: string[] = [];
-        for (const sheet of LONDON_VENUE_SHEETS) {
+        for (const sheet of LONDON_EVENT_SHEETS) {
           const state = qeiiPlanState(sheet.id);
           if (!state?.rebuilt) {
             skipped.push(sheet.title);
@@ -667,7 +667,7 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
         >
           All floors together
         </button>
-        {LONDON_VENUE_SHEETS.map((s) => (
+        {LONDON_EVENT_SHEETS.map((s) => (
           <button
             key={s.id}
             type="button"

@@ -17,7 +17,7 @@ import {
   spaceUseDivisionId,
   type SpaceUse,
 } from "@/lib/next-london-space-use";
-import { LONDON_VENUE_SHEETS } from "@/lib/next-london-venue-sheets";
+import { LONDON_EVENT_SHEETS } from "@/lib/next-london-venue-sheets";
 
 export type RoomScheduleDay = {
   /** Day heading exactly as the programme records it. */
@@ -124,7 +124,7 @@ export type RoomScheduleFloor = {
 export function londonRoomScheduleByFloor(
   entries = londonRoomSchedule(),
 ): RoomScheduleFloor[] {
-  const floors: RoomScheduleFloor[] = LONDON_VENUE_SHEETS.filter(
+  const floors: RoomScheduleFloor[] = LONDON_EVENT_SHEETS.filter(
     (s) => s.kind !== "room",
   ).map((s) => ({
     sheetId: s.id,

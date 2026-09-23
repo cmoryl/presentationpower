@@ -7,6 +7,8 @@
 // never quietly "corrected" by a guess.
 
 import { QEII_FLOOR_VECTORS, type QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
+import { LONDON_SHEETS_NOT_IN_USE } from "@/lib/next-london-venue-sheets";
+
 import { qeiiPlanState } from "@/lib/next-london-qeii-plan";
 
 /** Floors the issued design supplies as a picture, rebuilt by tracing it. */
@@ -85,12 +87,15 @@ export function qeiiFloorProfile(floor: QeiiFloorVector): QeiiFloorProfile {
   };
 }
 
-/** Every floor the viewer can draw as native artwork, in issued order. */
+/** Every floor the viewer can draw as native artwork, in issued order.
+ *  Floors the reviewer marked as not needed for the event are left out. */
 export function qeiiAllFloors(): QeiiFloorVector[] {
-  return QEII_FLOOR_VECTORS.map((f) => qeiiPlanState(f.id))
+  return QEII_FLOOR_VECTORS.filter((f) => !LONDON_SHEETS_NOT_IN_USE.includes(f.id))
+    .map((f) => qeiiPlanState(f.id))
     .filter((state): state is { floor: QeiiFloorVector; rebuilt: true } => !!state?.rebuilt)
     .map((state) => state.floor);
 }
+
 
 export function qeiiFloorProfiles(): QeiiFloorProfile[] {
   return qeiiAllFloors().map(qeiiFloorProfile);
