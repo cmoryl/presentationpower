@@ -308,10 +308,18 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
 
       // Rooms the artwork draws inside this block are cut out along the issued
       // wall runs, so a colour fills the whole room in the downloaded file too.
-      const cut = (cellsByShape.get(i) ?? [])
+      const cells = cellsByShape.get(i) ?? [];
+      if (!cells.length) return `<path ${bits.join(" ")}/>`;
+      // Cells are clipped to the block they sit in and the walls are redrawn on
+      // top, so no colour or gradient ever shows outside a room's walls.
+      const clip = `qeii-clip-${i}`;
+      const cut = cells
         .map((c) => `<path d="${c.d}" fill="${qeiiRoomPaint(c.room, c.hex, face) ?? fill ?? "none"}" data-room="${esc(c.room)}" id="room-${esc(c.room).replace(/\s+/g, "-").toLowerCase()}"/>`)
         .join("");
-      return `<path ${bits.join(" ")}/>${cut}`;
+      const walls = stroke
+        ? `<path d="${s.d}" fill="none" stroke="${stroke}" stroke-width="${qeiiWallWidth(s, wall, gain)}"/>`
+        : "";
+      return `<path ${bits.join(" ")}/><clipPath id="${clip}"><path d="${s.d}"/></clipPath><g clip-path="url(#${clip})">${cut}</g>${walls}`;
     })
     .join("");
   const layout = qeiiPlanLayout(floor, {
