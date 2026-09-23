@@ -35,6 +35,7 @@ import { taxonomyQueryOptions } from "@/hooks/use-taxonomy";
 import { QuickCreate } from "@/components/dashboard/QuickCreate";
 import { PersonaHero, type HeroCounter } from "@/components/dashboard/PersonaHero";
 import { personaTheme, type PersonaTheme } from "@/lib/persona-theme";
+import { LoadFailureNotice } from "@/components/LoadFailureNotice";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
