@@ -18,7 +18,10 @@
 import { NEXT_APP_ORIGIN } from "@/lib/next-event";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import {
+  qeiiMarkInk,
   qeiiMarkUrl,
+  QEII_MARK_BLACK,
+  QEII_MARK_BLACK_FILTER_ID,
   type QeiiMarkVariant,
   type QeiiPlanOptions,
 } from "@/lib/next-london-qeii-plan";
@@ -253,12 +256,14 @@ export async function qeiiMarkVectors(
   const placements: QeiiMarkPlacement[] = [];
   const dropped: string[] = [];
   for (const box of boxes) {
-    const art = await qeiiFetchMarkArt(box.url, box.name);
-    if (!art) {
+    const found = await qeiiFetchMarkArt(box.url, box.name);
+    if (!found) {
       dropped.push(box.name);
       continue;
     }
-    placements.push({ ...box, art });
+    // The all-black option prints the approved one-colour outlines in Blue 800 —
+    // the same shapes, one flat ink.
+    placements.push({ ...box, art: box.ink ? qeiiInkArt(found, box.ink) : found });
   }
   return { placements, dropped };
 }
@@ -372,9 +377,13 @@ export async function qeiiVectoriseSvgLockups(
     const h = attr("height");
     const transform = /transform="([^"]+)"/.exec(tag)?.[1];
     const name = href.split("/").pop() ?? "lockup";
-    const art = [x, y, w, h].every((n) => Number.isFinite(n))
+    const found = [x, y, w, h].every((n) => Number.isFinite(n))
       ? await qeiiFetchMarkArt(href, name)
       : null;
+    // A marker the plan set to the all-black option carries the ink filter; the
+    // vector swap inks the outlines instead, so the export needs no filter.
+    const black = tag.includes(`url(#${QEII_MARK_BLACK_FILTER_ID})`);
+    const art = found && black ? qeiiInkArt(found, QEII_MARK_BLACK) : found;
     if (!art) {
       dropped.push(name);
       continue;
