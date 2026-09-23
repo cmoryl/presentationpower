@@ -16,7 +16,6 @@
 // standard logo column) without re-drawing anything.
 
 import { loadLondonSignageFace } from "@/lib/next-london-text-outline";
-import JSZip from "jszip";
 
 import { buildLondonPanelAi } from "./next-london-revise";
 import type { LondonPanel } from "./next-london-signage";
@@ -235,6 +234,9 @@ export async function exportMartBundle(opts?: {
     opts?.onProgress?.({ index: step, total, label });
   };
 
+  // jszip only matters when a pack is actually asked for, so it loads here
+  // instead of riding along in every page that can offer the download.
+  const { default: JSZip } = await import("jszip");
   const zip = new JSZip();
   const entries: MartExportEntry[] = [];
 

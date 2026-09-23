@@ -10,7 +10,6 @@
 // the bytes instead of trusting a download click.
 // -----------------------------------------------------------------------------
 
-import JSZip from "jszip";
 import { toCanvas } from "html-to-image";
 import jsPDF from "jspdf";
 import { exportNodeFilter, withExportChrome } from "@/lib/export-chrome-suppress";
@@ -198,6 +197,9 @@ export async function exportAssetsZip(
   if (targets.length === 0) throw new Error("exportAssetsZip: no assets provided");
   const format = opts.format ?? "png";
   const bundle = assetFileSlug(opts.bundleName, "assets");
+  // jszip only matters when a pack is actually asked for, so it loads here
+  // instead of riding along in every page that can offer the download.
+  const { default: JSZip } = await import("jszip");
   const zip = new JSZip();
   const folder = zip.folder(bundle)!;
   const manifest: Array<Record<string, unknown>> = [];
