@@ -142,6 +142,16 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
     });
     if (best) matched.push({ room: name.room, shapeIndex: best.index, x: name.x, y: name.y });
   }
+  // Reviewer-named spaces the issued sheet draws without a caption.
+  for (const added of QEII_ADDED_ROOMS[floor.id] ?? []) {
+    let best: { index: number; area: number } | undefined;
+    floor.shapes.forEach((shape, index) => {
+      const { held, area } = shapeHolds(shape, added.x, added.y);
+      if (!held || area <= 0) return;
+      if (!best || area < best.area) best = { index, area };
+    });
+    if (best) matched.push({ room: added.room, shapeIndex: best.index, x: added.x, y: added.y });
+  }
   const out = matched.map((m) => {
     const sharedWith = matched
       .filter((o) => o.shapeIndex === m.shapeIndex && o.room !== m.room)
@@ -227,6 +237,22 @@ export function qeiiRoomShapes(floor: QeiiFloorVector): QeiiRoomShape[] {
 const QEII_ROOM_CLOSING_RUNS: Record<string, Record<string, [number, number][][]>> = {
   // Wordsworth's right-hand wall (x≈394) stops short of the lower diagonal.
   fourth: { Wordsworth: [[[394, 286], [394, 305]]] },
+  // Mountbatten ends at the folding partition (the zigzag line, x≈472.6).
+  sixth: {
+    Mountbatten: [[[472.6, 70], [472.6, 300]]],
+    "General area": [[[472.6, 70], [472.6, 300]]],
+  },
+};
+
+/**
+ * Spaces the reviewer named that the issued sheet draws without a caption,
+ * with a point inside each and its default fill (flat start + gradient end).
+ */
+export const QEII_ADDED_ROOMS: Record<
+  string,
+  { room: string; x: number; y: number; hex: string; to?: string }[]
+> = {
+  sixth: [{ room: "General area", x: 520, y: 280, hex: "#A1FBF9", to: "#C2A3FF" }],
 };
 
 /** How far a reviewer divider has to run to cross the block holding a point. */
@@ -419,9 +445,16 @@ export const QEII_DEFAULT_UNFILLED = new Set(["shelley"]);
 export function qeiiDefaultRoomColours(floor: QeiiFloorVector): QeiiRoomColours {
   const out: QeiiRoomColours = {};
   for (const entry of qeiiRoomShapes(floor)) {
-    if (!spaceUsesForRoom(entry.room, floor.id).length) continue;
+    const isAdded = QEII_ADDED_ROOMS[floor.id]?.some((a) => a.room === entry.room);
+    if (!isAdded && !spaceUsesForRoom(entry.room, floor.id).length) continue;
     // Reviewer: these spaces carry no background colour.
     if (QEII_DEFAULT_UNFILLED.has(entry.room.trim().toLowerCase())) continue;
+    const added = QEII_ADDED_ROOMS[floor.id]?.find((a) => a.room === entry.room);
+    if (added) {
+      out[entry.room] = added.hex;
+      if (added.to) out[qeiiGradientKey(entry.room)] = added.to;
+      continue;
+    }
     out[entry.room] =
       QEII_DEFAULT_ROOM_COLOUR_OVERRIDES[entry.room] ??
       qeiiRoomDivisionAccent(entry.room, floor.id) ??
