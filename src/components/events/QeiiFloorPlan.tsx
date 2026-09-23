@@ -19,7 +19,9 @@ import {
   type QeiiPlanFace,
 } from "@/lib/next-london-qeii-plan";
 import {
+  qeiiCellGradientDefs,
   qeiiGroundInk,
+  qeiiRoomPaint,
   qeiiLookWallWeight,
   qeiiPlanGround,
   qeiiRoomTint,
@@ -144,9 +146,11 @@ export function QeiiFloorPlan({
       style={style}
     >
       {/* The all-black option prints the approved one-colour lockup in Blue 800. */}
-      {markVariant === "black" ? (
-        <defs dangerouslySetInnerHTML={{ __html: qeiiMarkBlackFilter() }} />
-      ) : null}
+      <defs
+        dangerouslySetInnerHTML={{
+          __html: `${markVariant === "black" ? qeiiMarkBlackFilter() : ""}${qeiiCellGradientDefs(paint.cells)}`,
+        }}
+      />
       <rect width={floor.w} height={floor.h + keyH} fill={qeiiPlanGround(face)} />
 
       {floor.shapes.map((shape, i) => {
@@ -174,7 +178,7 @@ export function QeiiFloorPlan({
                     <path
                       key={`c-${cell.room}`}
                       d={cell.d}
-                      fill={cell.hex ?? chosen ?? qeiiPlanInk(shape.fill, face) ?? "none"}
+                      fill={qeiiRoomPaint(cell.room, cell.hex, face, cell.to) ?? chosen ?? qeiiPlanInk(shape.fill, face) ?? "none"}
                       data-room={cell.room}
                     />
                   ))}

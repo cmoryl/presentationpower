@@ -28,6 +28,7 @@ import {
   qeiiGroundInk,
   qeiiLookWallWeight,
   qeiiGradientDefs,
+  qeiiCellGradientDefs,
   qeiiMixToWhite,
   qeiiPlanGround,
   qeiiRoomPaint,
@@ -314,7 +315,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
       // top, so no colour or gradient ever shows outside a room's walls.
       const clip = `qeii-clip-${i}`;
       const cut = cells
-        .map((c) => `<path d="${c.d}" fill="${qeiiRoomPaint(c.room, c.hex, face) ?? fill ?? "none"}" data-room="${esc(c.room)}" id="room-${esc(c.room).replace(/\s+/g, "-").toLowerCase()}"/>`)
+        .map((c) => `<path d="${c.d}" fill="${qeiiRoomPaint(c.room, c.hex, face, c.to) ?? fill ?? "none"}" data-room="${esc(c.room)}" id="room-${esc(c.room).replace(/\s+/g, "-").toLowerCase()}"/>`)
         .join("");
       const walls = stroke
         ? `<path d="${s.d}" fill="none" stroke="${stroke}" stroke-width="${qeiiWallWidth(s, wall, gain)}"/>`
@@ -451,7 +452,7 @@ export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {
 
   const W = floor.w;
   const H = floor.h + keyH;
-  const defs = `${options.markVariant === "black" ? qeiiMarkBlackFilter() : ""}${qeiiGradientDefs(face)}`;
+  const defs = `${options.markVariant === "black" ? qeiiMarkBlackFilter() : ""}${qeiiGradientDefs(face)}${qeiiCellGradientDefs(paint.cells)}`;
   const body = [`<rect width="${W}" height="${H}" fill="${qeiiPlanGround(face)}"/>`, shapes, labels, keySvg].join("");
   const title = `<title>Queen Elizabeth II Centre — ${floor.title}</title>`;
   if (face === "signage") return qeiiSignageSheet(floor, W, H, body, defs, title, options.showText !== false);

@@ -223,7 +223,11 @@ export function qeiiStyledPaint(paint: QeiiColourPaint, face: QeiiPlanFace = "is
   return {
     fills: new Map([...paint.fills].map(([i, hex]) => [i, qeiiRoomTint(hex, face)!])),
     tags: new Map([...paint.tags].map(([room, hex]) => [room, qeiiRoomTint(hex, face)!])),
-    cells: paint.cells.map((cell) => ({ ...cell, hex: qeiiRoomTint(cell.hex, face) })),
+    cells: paint.cells.map((cell) => ({
+      ...cell,
+      hex: qeiiRoomTint(cell.hex, face),
+      ...(cell.to ? { to: qeiiRoomTint(cell.to, face) } : {}),
+    })),
   };
 }
 
@@ -273,8 +277,30 @@ export function qeiiGradientDefs(face: QeiiPlanFace): string {
     .join("");
 }
 
+/** Id of the gradient a room carries from its own two chosen colours. */
+export function qeiiCellGradientId(room: string): string {
+  return `qeii-room-grad-${room.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
+}
+
+/** Gradient definitions for rooms given a gradient in the colour panel. */
+export function qeiiCellGradientDefs(cells: { room: string; hex?: string; to?: string }[]): string {
+  return cells
+    .filter((c) => c.hex && c.to)
+    .map(
+      (c) =>
+        `<linearGradient id="${qeiiCellGradientId(c.room)}" gradientUnits="objectBoundingBox" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="${c.hex}"/><stop offset="1" stop-color="${c.to}"/></linearGradient>`,
+    )
+    .join("");
+}
+
 /** Fill for a room in this look: its gradient where one is set, else the colour. */
-export function qeiiRoomPaint(room: string, hex: string | undefined, face: QeiiPlanFace): string | undefined {
+export function qeiiRoomPaint(
+  room: string,
+  hex: string | undefined,
+  face: QeiiPlanFace,
+  to?: string,
+): string | undefined {
+  if (hex && to) return `url(#${qeiiCellGradientId(room)})`;
   if (face === "signage" && hex && QEII_SIGNAGE_GRADIENTS[room]) return `url(#${qeiiGradientId(room)})`;
   return hex;
 }
