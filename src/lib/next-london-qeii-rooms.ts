@@ -289,6 +289,17 @@ export function qeiiColourByDivision(floor: QeiiFloorVector): QeiiRoomColours {
 export const QEII_ROOM_ACCENT = "#003FC7";
 
 /**
+ * Rooms the reviewer asked to open in a different approved colour.
+ *
+ * Churchill is the Innovation Lounge and was marked lilac on the issued proof,
+ * so it opens in approved Lavender. Room fills are one flat approved colour in
+ * every format we write, so a lilac-to-blue gradient is not drawn here.
+ */
+export const QEII_DEFAULT_ROOM_COLOUR_OVERRIDES: Record<string, string> = {
+  Churchill: "#C2A3FF",
+};
+
+/**
  * Default fills for a floor: every space the issued event schedule puts to use —
  * sessions, registration, the mart, the café — in the approved accent.
  *
@@ -297,10 +308,12 @@ export const QEII_ROOM_ACCENT = "#003FC7";
 export function qeiiDefaultRoomColours(floor: QeiiFloorVector): QeiiRoomColours {
   const out: QeiiRoomColours = {};
   for (const entry of qeiiRoomShapes(floor)) {
-    if (spaceUsesForRoom(entry.room, floor.id).length) out[entry.room] = QEII_ROOM_ACCENT;
+    if (!spaceUsesForRoom(entry.room, floor.id).length) continue;
+    out[entry.room] = QEII_DEFAULT_ROOM_COLOUR_OVERRIDES[entry.room] ?? QEII_ROOM_ACCENT;
   }
   return out;
 }
+
 
 /** The same defaults for a set of floors, keyed by floor id. */
 export function qeiiDefaultRoomColourMap(

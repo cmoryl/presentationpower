@@ -8,9 +8,12 @@ import {
 } from "@/lib/next-london-qeii-cohesion";
 
 describe("QEII floor comparison", () => {
-  it("offers every rebuilt floor for the side-by-side view", () => {
+  it("offers every rebuilt floor in use for the side-by-side view", () => {
     const floors = qeiiAllFloors();
-    expect(floors.length).toBeGreaterThanOrEqual(7);
+    // Six floors: the 1st floor is not used by the event, by reviewer instruction.
+    expect(floors.length).toBeGreaterThanOrEqual(6);
+    expect(floors.some((f) => f.id === "first")).toBe(false);
+
     for (const floor of floors) {
       expect(floor.shapes.length).toBeGreaterThan(20);
       expect(floor.w).toBeGreaterThan(0);

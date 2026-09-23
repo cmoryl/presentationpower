@@ -13,16 +13,24 @@ import {
 
 describe("NEXT 2026 London event space use", () => {
   it("holds every space on the issued schedule", () => {
-    expect(LONDON_SPACE_USE.length).toBe(24);
+    expect(LONDON_SPACE_USE.length).toBe(25);
   });
 
   it("pins every space to a real floor sheet", () => {
     const ids = new Set(LONDON_VENUE_SHEETS.map((s) => s.id));
     for (const use of LONDON_SPACE_USE) {
       expect(ids.has(use.sheetId)).toBe(true);
-      expect(use.event.length).toBeGreaterThan(0);
+      // Shelley carries its name only, by reviewer instruction, so its event is
+      // deliberately blank rather than a track it does not hold.
+      if (use.space !== "Shelley") expect(use.event.length).toBeGreaterThan(0);
     }
   });
+
+  it("prints no line under a room the reviewer marked name-only", () => {
+    expect(spaceUseLine("Shelley", "fourth")).toBeUndefined();
+    expect(spaceUseMarks("Shelley", "fourth")).toEqual([]);
+  });
+
 
   it("names the rooms each entry covers, including shared rooms", () => {
     expect(spaceUsesForRoom("Olivier", "second")[0]?.event).toBe("MediaNEXT");
@@ -74,7 +82,8 @@ describe("division marks on the plans", () => {
   });
 
   it("reads the division from the event column, longest name first", () => {
-    expect(spaceUseDivisionId(spaceUsesForRoom("Churchill", "ground")[0]!)).toBe("globallink");
+    expect(spaceUseDivisionId(spaceUsesForRoom("Fleming", "third")[0]!)).toBe("globallink");
     expect(spaceUseDivisionId(spaceUsesForRoom("Cambridge", "fifth")[0]!)).toBe("life-sci");
   });
+
 });

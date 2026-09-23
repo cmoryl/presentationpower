@@ -60,7 +60,16 @@ export const VENUE_SHEET_PDF = {
   paper: "A3",
 };
 
+/**
+ * Floors the reviewer marked as not needed for NEXT 2026 London.
+ *
+ * The issued sheet is kept in the record — it is the venue's artwork — but the
+ * floor is left out of the event plan set, its downloads and the schedule.
+ */
+export const LONDON_SHEETS_NOT_IN_USE = ["first"];
+
 export const LONDON_VENUE_SHEETS: VenueSheet[] = [
+
   {
     id: "ground",
     marker: "G",
@@ -182,7 +191,13 @@ export const LONDON_VENUE_SHEETS: VenueSheet[] = [
 
 ];
 
+/** The floors NEXT 2026 London actually uses, in sheet order. */
+export const LONDON_EVENT_SHEETS: VenueSheet[] = LONDON_VENUE_SHEETS.filter(
+  (s) => !LONDON_SHEETS_NOT_IN_USE.includes(s.id),
+);
+
 /** A sheet by id. */
+
 export function venueSheet(id: string): VenueSheet | undefined {
   return LONDON_VENUE_SHEETS.find((s) => s.id === id);
 }

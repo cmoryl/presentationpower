@@ -27,24 +27,28 @@ export const LONDON_SPACE_USE: SpaceUse[] = [
     space: "Foyer Café Space",
     floor: "Ground Floor",
     sheetId: "ground",
-    fn: "Café",
-    event: "Cafe",
+    event: "NEXTBrew",
     rooms: [],
   },
   {
     space: "Brunel",
     floor: "Ground Floor",
     sheetId: "ground",
-    fn: "Registration",
-    event: "War Room",
+    event: "Registration & Helpdesk",
     rooms: ["Brunel"],
+  },
+  {
+    space: "Cloakroom",
+    floor: "Ground Floor",
+    sheetId: "ground",
+    event: "Cloakroom",
+    rooms: ["Cloakroom"],
   },
   {
     space: "Churchill",
     floor: "Ground Floor",
     sheetId: "ground",
-    fn: "Mart",
-    event: "GlobalLink Space / Innovation Lounge / Mart",
+    event: "Innovation Lounge",
     rooms: ["Churchill"],
   },
   {
@@ -55,6 +59,7 @@ export const LONDON_SPACE_USE: SpaceUse[] = [
     event: "Transformation Evening Event",
     rooms: ["Pickwick"],
   },
+
   {
     space: "Olivier & Burton",
     floor: "2nd Floor",
@@ -87,8 +92,8 @@ export const LONDON_SPACE_USE: SpaceUse[] = [
     space: "Britten",
     floor: "3rd Floor",
     sheetId: "third",
-    fn: "Foyer",
-    event: "Meals, Exhibitions & Networking",
+    event: "Meal & Networking",
+
     rooms: ["Britten"],
   },
   {
@@ -143,8 +148,9 @@ export const LONDON_SPACE_USE: SpaceUse[] = [
     space: "Shelley",
     floor: "4th Floor",
     sheetId: "fourth",
-    fn: "Breakout",
-    event: "LearnNEXT",
+    // Reviewer note on the issued proof: name only on this room — no track.
+    event: "",
+
     rooms: ["Shelley"],
   },
   {
@@ -175,16 +181,16 @@ export const LONDON_SPACE_USE: SpaceUse[] = [
     space: "Cambridge",
     floor: "5th Floor",
     sheetId: "fifth",
-    fn: "Foyer",
-    event: "LifeSciencesNEXT & Optimize Networking",
+    event: "LifeSci & OpTImize Mealspace & Networking",
+
     rooms: ["Cambridge"],
   },
   {
     space: "Darwin",
     floor: "5th Floor",
     sheetId: "fifth",
-    fn: "Meeting Room",
-    event: "Optimize",
+    event: "OpTImize",
+
     rooms: ["Darwin"],
   },
   {
@@ -233,10 +239,15 @@ export function spaceUsesForRoom(room: string, sheetId?: string): SpaceUse[] {
 export function spaceUseLine(room: string, sheetId?: string): string | undefined {
   const uses = spaceUsesForRoom(room, sheetId);
   if (!uses.length) return undefined;
-  return uses
+  // A space the reviewer asked to carry its name only records no function and no
+  // event, so there is nothing to print under the room name.
+  const line = uses
     .map((u) => [u.fn, u.event].filter(Boolean).join(" · "))
-    .filter((line, i, all) => all.indexOf(line) === i)
+    .filter(Boolean)
+    .filter((l, i, all) => all.indexOf(l) === i)
     .join(" / ");
+  return line || undefined;
+
 }
 
 /**
