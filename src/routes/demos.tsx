@@ -61,6 +61,24 @@ function RunCard({ run }: { run: DemoRun }) {
   const first = run.steps[0];
   return (
     <section className="rounded-2xl border border-black/10 bg-white p-5 dark:border-white/15 dark:bg-white/[0.04]">
+      {/* Screen recording of this run on the real pages (public/demos). */}
+      <video
+        className="mb-5 aspect-video w-full rounded-xl border border-black/10 bg-[#EEF1F7] object-cover object-top motion-reduce:hidden dark:border-white/15"
+        src={`/demos/${run.id}.mp4`}
+        poster={`/demos/${run.id}.jpg`}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-label={`Screen recording: ${run.name}`}
+      />
+      <img
+        className="mb-5 hidden aspect-video w-full rounded-xl border border-black/10 object-cover object-top motion-reduce:block"
+        src={`/demos/${run.id}.jpg`}
+        alt={`Screen from ${run.name}`}
+        loading="lazy"
+      />
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-[16rem]">
           <p className="text-[11px] font-semibold tracking-[0.18em] text-[#003FC7] uppercase">
