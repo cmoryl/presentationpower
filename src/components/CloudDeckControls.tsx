@@ -13,6 +13,7 @@ import {
 import { snapshotDeckVersion } from "@/lib/deck-versions.functions";
 import { deckSignature, markDeckSaved, useUnsavedStore } from "@/lib/unsaved-changes";
 import { applySlideExtras, splitSlideContent } from "@/lib/cloud-slide-extras";
+import { getDeckStamp, setDeckStamp } from "@/lib/deck-version-stamp";
 
 import { SaveActionButton } from "@/components/editor/SaveActionButton";
 import { toast } from "sonner";
