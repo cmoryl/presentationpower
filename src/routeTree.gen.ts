@@ -189,6 +189,7 @@ import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns_
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as KnowledgeBrandGuidesSlugEditRouteImport } from './routes/knowledge.brand-guides.$slug_.edit'
+import { Route as EventsNextMartPriceListRouteImport } from './routes/events.next_.mart_.price-list'
 import { Route as EventsNextMartStopIdRouteImport } from './routes/events.next_.mart_.$stopId'
 import { Route as EventsNextLondonTemplateRouteImport } from './routes/events.next_.london_.template'
 import { Route as EventsNextLondonScheduleRouteImport } from './routes/events.next_.london_.schedule'
@@ -1109,6 +1110,11 @@ const KnowledgeBrandGuidesSlugEditRoute =
     path: '/brand-guides/$slug/edit',
     getParentRoute: () => KnowledgeRoute,
   } as any)
+const EventsNextMartPriceListRoute = EventsNextMartPriceListRouteImport.update({
+  id: '/next_/mart_/price-list',
+  path: '/next/mart/price-list',
+  getParentRoute: () => EventsRoute,
+} as any)
 const EventsNextMartStopIdRoute = EventsNextMartStopIdRouteImport.update({
   id: '/next_/mart_/$stopId',
   path: '/next/mart/$stopId',
@@ -1335,6 +1341,7 @@ export interface FileRoutesByFullPath {
   '/events/next/london/schedule': typeof EventsNextLondonScheduleRoute
   '/events/next/london/template': typeof EventsNextLondonTemplateRoute
   '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
+  '/events/next/mart/price-list': typeof EventsNextMartPriceListRoute
   '/knowledge/brand-guides/$slug/edit': typeof KnowledgeBrandGuidesSlugEditRoute
 }
 export interface FileRoutesByTo {
@@ -1520,6 +1527,7 @@ export interface FileRoutesByTo {
   '/events/next/london/schedule': typeof EventsNextLondonScheduleRoute
   '/events/next/london/template': typeof EventsNextLondonTemplateRoute
   '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
+  '/events/next/mart/price-list': typeof EventsNextMartPriceListRoute
   '/knowledge/brand-guides/$slug/edit': typeof KnowledgeBrandGuidesSlugEditRoute
 }
 export interface FileRoutesById {
@@ -1710,6 +1718,7 @@ export interface FileRoutesById {
   '/events/next_/london_/schedule': typeof EventsNextLondonScheduleRoute
   '/events/next_/london_/template': typeof EventsNextLondonTemplateRoute
   '/events/next_/mart_/$stopId': typeof EventsNextMartStopIdRoute
+  '/events/next_/mart_/price-list': typeof EventsNextMartPriceListRoute
   '/knowledge/brand-guides/$slug_/edit': typeof KnowledgeBrandGuidesSlugEditRoute
 }
 export interface FileRouteTypes {
@@ -1901,6 +1910,7 @@ export interface FileRouteTypes {
     | '/events/next/london/schedule'
     | '/events/next/london/template'
     | '/events/next/mart/$stopId'
+    | '/events/next/mart/price-list'
     | '/knowledge/brand-guides/$slug/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -2086,6 +2096,7 @@ export interface FileRouteTypes {
     | '/events/next/london/schedule'
     | '/events/next/london/template'
     | '/events/next/mart/$stopId'
+    | '/events/next/mart/price-list'
     | '/knowledge/brand-guides/$slug/edit'
   id:
     | '__root__'
@@ -2275,6 +2286,7 @@ export interface FileRouteTypes {
     | '/events/next_/london_/schedule'
     | '/events/next_/london_/template'
     | '/events/next_/mart_/$stopId'
+    | '/events/next_/mart_/price-list'
     | '/knowledge/brand-guides/$slug_/edit'
   fileRoutesById: FileRoutesById
 }
@@ -3645,6 +3657,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeBrandGuidesSlugEditRouteImport
       parentRoute: typeof KnowledgeRoute
     }
+    '/events/next_/mart_/price-list': {
+      id: '/events/next_/mart_/price-list'
+      path: '/next/mart/price-list'
+      fullPath: '/events/next/mart/price-list'
+      preLoaderRoute: typeof EventsNextMartPriceListRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/mart_/$stopId': {
       id: '/events/next_/mart_/$stopId'
       path: '/next/mart/$stopId'
@@ -3805,6 +3824,7 @@ interface EventsRouteChildren {
   EventsNextLondonScheduleRoute: typeof EventsNextLondonScheduleRoute
   EventsNextLondonTemplateRoute: typeof EventsNextLondonTemplateRoute
   EventsNextMartStopIdRoute: typeof EventsNextMartStopIdRoute
+  EventsNextMartPriceListRoute: typeof EventsNextMartPriceListRoute
 }
 
 const EventsRouteChildren: EventsRouteChildren = {
@@ -3837,6 +3857,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextLondonScheduleRoute: EventsNextLondonScheduleRoute,
   EventsNextLondonTemplateRoute: EventsNextLondonTemplateRoute,
   EventsNextMartStopIdRoute: EventsNextMartStopIdRoute,
+  EventsNextMartPriceListRoute: EventsNextMartPriceListRoute,
 }
 
 const EventsRouteWithChildren =
