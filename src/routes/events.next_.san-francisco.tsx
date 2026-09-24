@@ -6,13 +6,23 @@
 // remaining piece is waiting on rather than borrowing London's numbers.
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, CalendarDays, CircleDashed, Hotel, MapPin } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarDays,
+  CheckCircle2,
+  CircleDashed,
+  Hotel,
+  Lock,
+  MapPin,
+} from "lucide-react";
 
 import { useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { EditionDivisionTiles } from "@/components/events/EditionDivisionTiles";
-import { SF_READY, SF_VENUE, SF_WAITING, sfLocationStack } from "@/lib/next-sf-event";
+import { CaliforniaKioskBrowser } from "@/components/events/CaliforniaKioskBrowser";
+import { SF_READY, SF_VENUE, sfLocationStack } from "@/lib/next-sf-event";
 
 export const Route = createFileRoute("/events/next_/san-francisco")({
   head: () => ({
@@ -30,7 +40,10 @@ export const Route = createFileRoute("/events/next_/san-francisco")({
           "October 27–28, 2026, InterContinental San Francisco. Partner kiosk artwork, badge and pillar families, and an honest list of what has not been issued yet.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://transperfectelement.lovable.app/events/next/san-francisco" },
+      {
+        property: "og:url",
+        content: "https://transperfectelement.lovable.app/events/next/san-francisco",
+      },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -43,63 +56,176 @@ export const Route = createFileRoute("/events/next_/san-francisco")({
   component: SanFranciscoPage,
 });
 
-const card =
-  "rounded-2xl border border-[#03002C]/12 bg-white p-5 shadow-[0_12px_28px_-24px_rgba(3,0,44,0.35)]";
-const pill =
-  "inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/15 bg-[#F2F2F2] px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/70";
+const card = "rounded-md border border-[#03002C]/12 bg-white p-5";
+
+type Gate = "locked" | "ready" | "pending";
+
+const GATE_STYLE: Record<Gate, { label: string; cls: string; Icon: typeof Lock }> = {
+  locked: { label: "Locked", cls: "border-[#03002C] bg-[#03002C] text-white", Icon: Lock },
+  ready: {
+    label: "Production ready",
+    cls: "border-[#003FC7] bg-[#003FC7] text-white",
+    Icon: CheckCircle2,
+  },
+  pending: {
+    label: "Pending venue intake",
+    cls: "border-dashed border-[#03002C]/40 bg-white text-[#03002C]",
+    Icon: CircleDashed,
+  },
+};
+
+function GateBadge({ gate }: { gate: Gate }) {
+  const { label, cls, Icon } = GATE_STYLE[gate];
+  return (
+    <span
+      className={`inline-flex w-fit items-center gap-1.5 rounded-sm border px-2 py-1 font-mono text-[10.5px] font-semibold uppercase tracking-[0.12em] ${cls}`}
+    >
+      <Icon size={12} aria-hidden />
+      {label}
+    </span>
+  );
+}
+
+const GATES: { id: string; gate: Gate; title: string; detail: string; anchor?: string }[] = [
+  {
+    id: "venue",
+    gate: "locked",
+    title: "Venue & dates",
+    detail: `${SF_VENUE.venue}, ${SF_VENUE.datesLabel}. Printed word for word as issued.`,
+  },
+  {
+    id: "kiosks",
+    gate: "ready",
+    title: "Partner kiosk templates",
+    detail:
+      "45 × 96 in front face with monitor keep-clear and both 4 × 96 in returns. .ai, print .pdf and .svg downloads.",
+    anchor: "#sf-kiosks",
+  },
+  {
+    id: "rooms",
+    gate: "pending",
+    title: "Room signage",
+    detail: "Built once the finalised hotel floor plan and room list are issued.",
+  },
+  {
+    id: "arrows",
+    gate: "pending",
+    title: "Directional arrows",
+    detail: "Needs the finalised hotel floor plan to place routes and arrow faces.",
+  },
+  {
+    id: "agendas",
+    gate: "pending",
+    title: "Division agendas",
+    detail: "Needs the issued programme and the room each track runs in.",
+  },
+];
 
 function SanFranciscoPage() {
   const [locationLine, venueLine] = sfLocationStack();
   const [divisionFocus, setDivisionFocus] = useState<string | null>(null);
+  const alsoReady = SF_READY.filter((r) => r.id !== "kiosks");
 
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-6xl px-6 py-10">
-        <Link
-          to="/events/next"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#03002C]/60 hover:text-[#03002C]"
-        >
-          <ArrowLeft size={13} aria-hidden /> NEXT events
-        </Link>
+        <div className="flex flex-wrap items-center gap-4 text-xs font-semibold">
+          <Link
+            to="/events/next"
+            className="inline-flex items-center gap-1.5 text-[#03002C]/65 hover:text-[#03002C]"
+          >
+            <ArrowLeft size={13} aria-hidden /> NEXT events
+          </Link>
           <Link
             to="/events/$eventId"
             params={{ eventId: "san-francisco" }}
-            className="ml-4 inline-flex items-center gap-1 text-[13px] font-semibold text-[#003FC7] hover:underline"
+            className="text-[#003FC7] hover:underline"
           >
             Event home
           </Link>
+          <Link
+            to="/events/next/california"
+            className="inline-flex items-center gap-1 text-[#003FC7] hover:underline"
+          >
+            California partner kiosks <ArrowRight size={13} aria-hidden />
+          </Link>
+        </div>
 
-        {/* The issued lines, set the way the covers set them. */}
-        <header className="mt-4 overflow-hidden rounded-3xl bg-[#03002C] p-8 text-white sm:p-10">
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/60">
+        <header className="mt-4 overflow-hidden rounded-md bg-[#03002C] p-8 text-white sm:p-10">
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/75">
             TransPerfect NEXT 2026
           </p>
-          <h1 className="mt-4 text-3xl font-semibold leading-[1.05] tracking-[-0.03em] sm:text-5xl">
-            {locationLine}
-          </h1>
+          <h1 className="mt-4 text-3xl font-semibold leading-[1.05] sm:text-5xl">{locationLine}</h1>
           <p className="mt-3 text-base font-semibold uppercase tracking-[0.06em] text-white/85 sm:text-xl">
             {venueLine}
           </p>
-          <div className="mt-7 flex flex-wrap gap-x-8 gap-y-4 text-sm">
-            <span className="inline-flex items-center gap-2 text-white/80">
+          <div className="mt-7 flex flex-wrap gap-x-8 gap-y-4 text-sm text-white/85">
+            <span className="inline-flex items-center gap-2">
               <CalendarDays size={15} aria-hidden /> {SF_VENUE.datesLabel}
             </span>
-            <span className="inline-flex items-center gap-2 text-white/80">
+            <span className="inline-flex items-center gap-2">
               <Hotel size={15} aria-hidden /> {SF_VENUE.venue}
             </span>
-            <span className="inline-flex items-center gap-2 text-white/80">
+            <span className="inline-flex items-center gap-2">
               <MapPin size={15} aria-hidden /> {SF_VENUE.city}
             </span>
           </div>
-          <p className="mt-6 max-w-2xl text-sm leading-[1.6] text-white/65">
-            These two lines are the only San Francisco facts that have been issued. Everything on
-            this page prints them word for word — no street address, floor plan, programme or
-            capacity is stated anywhere until one is sent.
-          </p>
         </header>
 
-        {/* No SF sign schedule or programme has been issued: booth/signage/agenda
-            counts stay 0; only the reusable division collateral kit counts. */}
+        {/* Production stage gates. */}
+        <section className="mt-10" aria-labelledby="sf-gates">
+          <h2 id="sf-gates" className="text-lg font-semibold text-[#03002C]">
+            Production status
+          </h2>
+          <ul className="mt-4 divide-y divide-[#03002C]/10 border-y border-[#03002C]/10">
+            {GATES.map((g) => (
+              <li
+                key={g.id}
+                className="grid gap-2 py-4 sm:grid-cols-[200px_1fr_auto] sm:items-center"
+              >
+                <GateBadge gate={g.gate} />
+                <div>
+                  <p className="text-[15px] font-semibold text-[#03002C]">{g.title}</p>
+                  <p className="mt-0.5 text-sm leading-[1.5] text-[#03002C]/70">{g.detail}</p>
+                </div>
+                {g.anchor ? (
+                  <a
+                    href={g.anchor}
+                    className="text-[13px] font-semibold text-[#003FC7] hover:underline"
+                  >
+                    Open kiosks
+                  </a>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* Partner kiosks, live. */}
+        <section id="sf-kiosks" className="mt-12 scroll-mt-24" aria-labelledby="sf-kiosks-h">
+          <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-[#03002C]/10 pb-3">
+            <div className="flex items-center gap-3">
+              <h2 id="sf-kiosks-h" className="text-lg font-semibold text-[#03002C]">
+                Partner kiosks
+              </h2>
+              <GateBadge gate="ready" />
+            </div>
+            <Link
+              to="/events/next/california"
+              className="text-[13px] font-semibold text-[#003FC7] hover:underline"
+            >
+              Template details and build notes
+            </Link>
+          </div>
+          <p className="mt-3 max-w-3xl text-sm leading-[1.5] text-[#03002C]/70">
+            45 × 96 in front face with the monitor keep-clear plus both 4 × 96 in return strips, at
+            1/8 in bleed. Preview, edit copy and download .ai, print .pdf or .svg per face.
+          </p>
+          <div className="mt-5">
+            <CaliforniaKioskBrowser />
+          </div>
+        </section>
+
         <EditionDivisionTiles
           editionLabel="San Francisco 2026"
           countsFor={() => ({ booths: 0, signage: 0 })}
@@ -109,18 +235,12 @@ function SanFranciscoPage() {
           onSelect={setDivisionFocus}
         />
 
-
-        {/* Ready to use now. */}
-        <section className="mt-10" aria-labelledby="sf-ready">
-          <h2 id="sf-ready" className="text-lg font-semibold tracking-[-0.02em] text-[#03002C]">
-            Ready to work on now
+        <section className="mt-12" aria-labelledby="sf-ready">
+          <h2 id="sf-ready" className="text-lg font-semibold text-[#03002C]">
+            Also available now
           </h2>
-          <p className="mt-1 max-w-3xl text-sm leading-[1.5] text-[#03002C]/65">
-            These families carry over from the flagship build and can be edited and downloaded
-            today.
-          </p>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            {SF_READY.map((item) => (
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {alsoReady.map((item) => (
               <article key={item.id} className={card}>
                 <h3 className="text-[15px] font-semibold text-[#03002C]">{item.label}</h3>
                 <p className="mt-2 text-sm leading-[1.5] text-[#03002C]/70">{item.detail}</p>
@@ -128,7 +248,7 @@ function SanFranciscoPage() {
                   <Link
                     to={item.to}
                     search={item.search ?? {}}
-                    className="group mt-4 inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+                    className="group mt-4 inline-flex items-center gap-2 rounded-md bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white hover:opacity-90"
                   >
                     Open
                     <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
@@ -136,47 +256,6 @@ function SanFranciscoPage() {
                 ) : null}
               </article>
             ))}
-          </div>
-        </section>
-
-        {/* Honest gaps. */}
-        <section className="mt-12" aria-labelledby="sf-waiting">
-          <h2 id="sf-waiting" className="text-lg font-semibold tracking-[-0.02em] text-[#03002C]">
-            Waiting to be issued
-          </h2>
-          <p className="mt-1 max-w-3xl text-sm leading-[1.5] text-[#03002C]/65">
-            Each of these stays blank on purpose. Send the missing piece and it is built the same
-            day.
-          </p>
-          <ul className="mt-5 grid gap-4 sm:grid-cols-2">
-            {SF_WAITING.map((item) => (
-              <li key={item.id} className={`${card} border-dashed`}>
-                <div className="flex items-center gap-2">
-                  <CircleDashed size={15} className="text-[#03002C]/45" aria-hidden />
-                  <h3 className="text-[15px] font-semibold text-[#03002C]">{item.label}</h3>
-                </div>
-                <p className="mt-2 text-sm leading-[1.5] text-[#03002C]/70">{item.detail}</p>
-                {item.blockedOn ? (
-                  <p className="mt-3 text-[13px] leading-[1.5] text-[#03002C]/55">
-                    <span className="font-semibold text-[#03002C]/75">Needs:</span>{" "}
-                    {item.blockedOn}
-                  </p>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="mt-12">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className={pill}>{SF_VENUE.datesLabel}</span>
-            <span className={pill}>House colour space · RGB</span>
-            <Link
-              to="/events/next/london"
-              className="text-[13px] font-semibold text-[#003FC7] hover:underline"
-            >
-              The London flagship kit these families come from
-            </Link>
           </div>
         </section>
       </div>

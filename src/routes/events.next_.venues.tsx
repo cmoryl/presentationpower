@@ -195,7 +195,7 @@ function VenuePlansPage() {
             }}
           >
             <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#03002C]/70">
-              Venue plans · NEXT series
+              Floor plan standards · NEXT series
             </p>
             <h1 className="mt-3 max-w-[30ch] text-3xl font-bold leading-[1.05] tracking-tight text-[#03002C] sm:text-[2.6rem]">
               One venue format, every city

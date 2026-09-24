@@ -14,7 +14,7 @@ import {
  *
  * Mounted once by AppShell for every `/events/next*` route, so no NEXT page can
  * drift out of the structure. It shows the group the current page belongs to
- * (its siblings as pills) plus a "All NEXT pages" panel listing the whole
+ * (its siblings as underlined tabs) plus a "All NEXT pages" panel listing the whole
  * workspace — the single place to find anything.
  */
 export function NextSubnav() {
@@ -27,17 +27,21 @@ export function NextSubnav() {
   const group = NEXT_WORKSPACE_GROUPS.find((g) => g.id === groupId) ?? NEXT_WORKSPACE_GROUPS[0];
   const siblings = nextWorkspaceGroup(group.id);
 
-  const pill =
-    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition ";
+  const tab =
+    "relative inline-flex items-center gap-1.5 border-b-2 px-1 pb-2 pt-1 text-[13px] font-medium transition " +
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] ";
   const idle =
-    "border-black/15 bg-white/70 text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] " +
-    "dark:border-white/15 dark:bg-white/5 dark:text-white/70 dark:hover:border-[#A1FBF9] dark:hover:text-[#A1FBF9]";
-  const active = "border-[#003FC7] bg-[#003FC7] text-white";
+    "border-transparent text-black/70 hover:border-black/30 hover:text-black dark:text-white/75 dark:hover:border-white/40 dark:hover:text-white";
+  const active =
+    "border-[#003FC7] text-[#03002C] font-semibold dark:border-[#A1FBF9] dark:text-white";
 
   return (
     <div className="mb-5">
-      <div className="flex flex-wrap items-center gap-1.5">
-        <span className="mr-1 text-[11px] font-medium tracking-[0.14em] text-black/45 uppercase dark:text-white/50">
+      <nav
+        aria-label={group.label}
+        className="flex flex-wrap items-end gap-x-5 gap-y-1 border-b border-black/10 dark:border-white/15"
+      >
+        <span className="pb-2 text-[11px] font-semibold tracking-[0.14em] text-black/60 uppercase dark:text-white/65">
           {group.label}
         </span>
         {siblings.map((p) => {
@@ -48,11 +52,11 @@ export function NextSubnav() {
               to={p.to}
               title={p.purpose}
               aria-current={isActive ? "page" : undefined}
-              className={pill + (isActive ? active : idle)}
+              className={tab + (isActive ? active : idle)}
             >
               {p.label}
               {p.scope === "london" ? (
-                <span className={isActive ? "text-white/70" : "text-black/35 dark:text-white/40"}>
+                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-black/50 dark:text-white/55">
                   London
                 </span>
               ) : null}
@@ -63,15 +67,15 @@ export function NextSubnav() {
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          className={pill + idle}
+          className={tab + idle + " ml-auto"}
         >
-          {open ? <X size={12} /> : <LayoutGrid size={12} />}
+          {open ? <X size={12} aria-hidden /> : <LayoutGrid size={12} aria-hidden />}
           All NEXT pages
         </button>
-      </div>
+      </nav>
 
       {open ? (
-        <div className="mt-3 rounded-2xl border border-black/10 bg-white/80 p-4 dark:border-white/10 dark:bg-white/5">
+        <div className="mt-3 rounded-md border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/5">
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {NEXT_WORKSPACE_GROUPS.map((g) => (
               <div key={g.id}>
@@ -85,11 +89,11 @@ export function NextSubnav() {
                       <Link
                         to={p.to}
                         onClick={() => setOpen(false)}
-                        className="block rounded-lg px-2 py-1.5 hover:bg-[#003FC7]/8 dark:hover:bg-white/10"
+                        className="block rounded-sm px-2 py-1.5 hover:bg-[#003FC7]/8 dark:hover:bg-white/10"
                       >
                         <span className="text-sm font-medium">{p.label}</span>
                         {p.scope === "london" ? (
-                          <span className="ml-1.5 rounded-full border border-black/15 px-1.5 py-px text-[10px] text-black/50 dark:border-white/15 dark:text-white/50">
+                          <span className="ml-1.5 font-mono text-[10px] uppercase text-black/50 dark:border-white/15 dark:text-white/50">
                             London
                           </span>
                         ) : null}
