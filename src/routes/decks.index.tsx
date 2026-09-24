@@ -419,51 +419,39 @@ function DecksIndex() {
     setSort("recent");
   };
 
+  const hasAny = enriched.length + cloudOnly.length > 0;
+  /** Search/sort/filters only earn their space once there is a list to narrow. */
+  const showFilters = enriched.length + cloudOnly.length >= 4;
+
   return (
     <AppShell>
-      {/* Header */}
-      <header className="full-bleed relative hero-flush mb-8 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#C2A3FF22] py-9 lg:py-12 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
-        <div className="mx-auto max-w-[1400px]">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#003FC7] dark:text-[#A1FBF9]">
-                Workspace
-              </div>
-              <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">All decks</h1>
-              <p className="mt-2 max-w-xl text-sm text-black/60 dark:text-white/60">
-                Every deck and template in your workspace — search by title, client, or industry.
-              </p>
-            </div>
-            <Link
-              to="/brief/new"
-              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white hover:opacity-90 dark:bg-[#A1FBF9] dark:text-[#03002C]"
-            >
-              <Rocket size={14} /> New deck
-            </Link>
-          </div>
-
-          {/* Stats strip */}
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatChip label="Decks" value={totalDecks} accent="#003FC7" />
-            <StatChip label="Templates" value={totalTemplates} accent="#C2A3FF" />
-            <StatChip
-              label="Shared"
-              value={totalShared}
-              accent="#A6FA87"
-              icon={<Share2 size={12} />}
-            />
-            <StatChip
-              label="Never viewed"
-              value={totalUnseen}
-              accent="#FFEB66"
-              icon={<Eye size={12} />}
-            />
-          </div>
+      {/* Header — one job: name the page and offer the single primary action. */}
+      <header className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-black/10 pb-6 pt-4 dark:border-white/10">
+        <div>
+          <h1 className="text-4xl font-semibold leading-tight">
+            {hasAny ? "Your decks" : "Create your first deck"}
+          </h1>
+          <p className="mt-2 max-w-xl text-sm text-black/70 dark:text-white/70">
+            {hasAny
+              ? "Pick up where you left off, or start a new deck from a brief, the library or a PowerPoint."
+              : "Choose how you want to start. Every route opens in the same editor."}
+          </p>
         </div>
+        {hasAny && (
+          <Link
+            to="/brief/new"
+            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#03002C] px-5 text-sm font-semibold text-white hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7] dark:bg-[#A1FBF9] dark:text-[#03002C]"
+          >
+            <Rocket size={14} aria-hidden="true" /> Create a deck
+          </Link>
+        )}
       </header>
 
+      {!hasAny && !loadFailed && <EmptyNew signedIn={signedIn} />}
+
       {/* Filter bar */}
-      <div className="mt-8 rounded-3xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+      {hasAny && (
+      <div className="rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[240px] flex-1">
             <Search
