@@ -258,7 +258,9 @@ function pickPoints(content: Record<string, unknown>): string[] | undefined {
           const value = str(rec.value) ?? str(rec.stat) ?? str(rec.number) ?? str(rec.metric);
           const head = str(rec.title) ?? str(rec.label) ?? str(rec.heading) ?? str(rec.name);
           const tail = str(rec.body) ?? str(rec.text) ?? str(rec.copy) ?? str(rec.role) ?? str(rec.description);
-          const lead = value ? [value + (str(rec.unit) ?? ""), head].filter(Boolean).join(" ") : head;
+          const unit = str(rec.unit) ?? "";
+          const figure = value ? (unit && !/^[%+x×]/.test(unit) ? `${value} ${unit}` : value + unit) : undefined;
+          const lead = figure ? [figure, head].filter(Boolean).join(" ") : head;
           return [lead, tail].filter(Boolean).join(" — ") || undefined;
         }
         return undefined;
