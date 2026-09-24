@@ -11,9 +11,10 @@ import {
   CheckSquare,
   Square,
   Trash2,
+  Upload,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { useSignedIn, MyCloudDecks, useOpenCloudDeck } from "@/components/CloudDeckControls";
+import { useSignedIn, useOpenCloudDeck } from "@/components/CloudDeckControls";
 import { useDeckStore, type Deck } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -30,7 +31,17 @@ export const Route = createFileRoute("/decks/")({
   head: () => ({
     meta: [
       { title: "All decks · TransPerfect Element" },
-      { name: "description", content: "Search, sort, and organize every deck in your workspace." },
+      {
+        name: "description",
+        content: "Start a new on-brand deck or pick up any deck in your workspace.",
+      },
+      { property: "og:title", content: "Your decks · TransPerfect Element" },
+      {
+        property: "og:description",
+        content: "Start a new on-brand deck or pick up any deck in your workspace.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: DecksIndex,
@@ -235,12 +246,12 @@ function DecksIndex() {
       // never when that name is shared with another deck.
       const nameSafe = !ambiguousTitles.has(key);
       const s = savedId
-        ? statsById.get(savedId) ?? (nameSafe ? statsByTitle.get(key) : undefined)
+        ? (statsById.get(savedId) ?? (nameSafe ? statsByTitle.get(key) : undefined))
         : nameSafe
           ? statsByTitle.get(key)
           : undefined;
       const review = savedId
-        ? reviewById.get(savedId) ?? (nameSafe ? reviewByTitle.get(key) : undefined)
+        ? (reviewById.get(savedId) ?? (nameSafe ? reviewByTitle.get(key) : undefined))
         : nameSafe
           ? reviewByTitle.get(key)
           : undefined;
@@ -419,219 +430,219 @@ function DecksIndex() {
     setSort("recent");
   };
 
+  const hasAny = enriched.length + cloudOnly.length > 0;
+  /** Search/sort/filters only earn their space once there is a list to narrow. */
+  const showFilters = enriched.length + cloudOnly.length >= 4;
+
   return (
     <AppShell>
-      {/* Header */}
-      <header className="full-bleed relative hero-flush mb-8 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#C2A3FF22] py-9 lg:py-12 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
-        <div className="mx-auto max-w-[1400px]">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#003FC7] dark:text-[#A1FBF9]">
-                Workspace
-              </div>
-              <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">All decks</h1>
-              <p className="mt-2 max-w-xl text-sm text-black/60 dark:text-white/60">
-                Every deck and template in your workspace — search by title, client, or industry.
-              </p>
-            </div>
-            <Link
-              to="/brief/new"
-              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white hover:opacity-90 dark:bg-[#A1FBF9] dark:text-[#03002C]"
-            >
-              <Rocket size={14} /> New deck
-            </Link>
-          </div>
-
-          {/* Stats strip */}
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatChip label="Decks" value={totalDecks} accent="#003FC7" />
-            <StatChip label="Templates" value={totalTemplates} accent="#C2A3FF" />
-            <StatChip
-              label="Shared"
-              value={totalShared}
-              accent="#A6FA87"
-              icon={<Share2 size={12} />}
-            />
-            <StatChip
-              label="Never viewed"
-              value={totalUnseen}
-              accent="#FFEB66"
-              icon={<Eye size={12} />}
-            />
-          </div>
+      {/* Header — one job: name the page and offer the single primary action. */}
+      <header className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-black/10 pb-6 pt-4 dark:border-white/10">
+        <div>
+          <h1 className="text-4xl font-semibold leading-tight">
+            {hasAny ? "Your decks" : "Create your first deck"}
+          </h1>
+          <p className="mt-2 max-w-xl text-sm text-black/70 dark:text-white/70">
+            {hasAny
+              ? "Pick up where you left off, or start a new deck from a brief, the library or a PowerPoint."
+              : "Choose how you want to start. Every route opens in the same editor."}
+          </p>
         </div>
+        {hasAny && (
+          <Link
+            to="/brief/new"
+            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#03002C] px-5 text-sm font-semibold text-white hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7] dark:bg-[#A1FBF9] dark:text-[#03002C]"
+          >
+            <Rocket size={14} aria-hidden="true" /> Create a deck
+          </Link>
+        )}
       </header>
 
+      {!hasAny && !loadFailed && <EmptyNew signedIn={signedIn} />}
+
       {/* Filter bar */}
-      <div className="mt-8 rounded-3xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative min-w-[240px] flex-1">
-            <Search
-              size={14}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 dark:text-primary-foreground/40"
-            />
-            <input
-              type="text"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search title, client, or industry…"
-              className="w-full rounded-full border border-black/10 bg-white py-2 pl-9 pr-9 text-sm outline-none transition placeholder:text-black/35 focus:border-[#003FC7] dark:border-white/10 dark:bg-white/[0.04] dark:placeholder:text-white/35 dark:focus:border-[#A1FBF9]"
-            />
-            {q && (
-              <button
-                type="button"
-                onClick={() => setQ("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-icon-subtle hover:bg-black/5 dark:hover:bg-white/10"
-                aria-label="Clear search"
-              >
-                <X size={12} />
-              </button>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <label className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
-              Sort
-            </label>
-            <select
-              aria-label="Sort"
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortKey)}
-              className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium outline-none dark:border-white/10 dark:bg-white/[0.04]"
-            >
-              <option value="recent">Recently edited</option>
-              <option value="created">Recently created</option>
-              <option value="alpha">Alphabetical</option>
-              <option value="views">Most viewed</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="mt-3 flex flex-wrap items-center gap-3">
-          <ChipGroup label="Type">
-            <Chip active={kind === "all"} onClick={() => setKind("all")}>
-              All
-            </Chip>
-            <Chip active={kind === "decks"} onClick={() => setKind("decks")}>
-              Decks
-            </Chip>
-            <Chip active={kind === "templates"} onClick={() => setKind("templates")}>
-              Templates
-            </Chip>
-          </ChipGroup>
-          <ChipGroup label="Reach">
-            <Chip active={reach === "all"} onClick={() => setReach("all")}>
-              All
-            </Chip>
-            <Chip
-              active={reach === "unseen"}
-              onClick={() => setReach("unseen")}
-              disabled={!signedIn}
-              title={signedIn ? undefined : "Sign in to sync analytics"}
-            >
-              Never viewed
-            </Chip>
-            <Chip
-              active={reach === "shared"}
-              onClick={() => setReach("shared")}
-              disabled={!signedIn}
-              title={signedIn ? undefined : "Sign in to sync analytics"}
-            >
-              Shared
-            </Chip>
-          </ChipGroup>
-          <ChipGroup label="Older than">
-            <Chip active={age === "any"} onClick={() => setAge("any")}>
-              Any age
-            </Chip>
-            <Chip active={age === "3m"} onClick={() => setAge("3m")}>
-              3 months
-            </Chip>
-            <Chip active={age === "6m"} onClick={() => setAge("6m")}>
-              6 months
-            </Chip>
-            <Chip active={age === "12m"} onClick={() => setAge("12m")}>
-              12 months
-            </Chip>
-          </ChipGroup>
-          {active && (
-            <button
-              type="button"
-              onClick={clearAll}
-              className="ml-auto rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
-
-        {/* Bulk selection — clearing out a long list of old work in one move. */}
-        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3 dark:border-white/10">
-          <button
-            type="button"
-            onClick={() => {
-              setSelectMode((on) => !on);
-              setSelected(new Set());
-            }}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-              selectMode
-                ? "bg-[#03002C] text-white dark:bg-[#A1FBF9] dark:text-[#03002C]"
-                : "border border-black/10 bg-white text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
-            }`}
-          >
-            <CheckSquare size={13} /> {selectMode ? "Done selecting" : "Select"}
-          </button>
-          {selectMode && (
+      {hasAny && (
+        <div className="rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
+          {showFilters && (
             <>
-              <button
-                type="button"
-                onClick={() => setSelected(new Set(shownItems.map((i) => i.id)))}
-                className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
-              >
-                Select all shown ({shownItems.length})
-              </button>
-              {selectedItems.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setSelected(new Set())}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
-                >
-                  Clear selection
-                </button>
-              )}
-              <span className="text-xs text-black/55 dark:text-white/55">
-                {selectedItems.length} selected
-              </span>
-              <button
-                type="button"
-                disabled={selectedItems.length === 0 || bulkBusy}
-                onClick={bulkDelete}
-                className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-red-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
-              >
-                <Trash2 size={13} />
-                {bulkBusy
-                  ? "Deleting…"
-                  : `Delete selected${selectedItems.length ? ` (${selectedItems.length})` : ""}`}
-              </button>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative min-w-[240px] flex-1">
+                  <label htmlFor="deck-search" className="sr-only">
+                    Search decks
+                  </label>
+                  <Search
+                    size={14}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 dark:text-primary-foreground/40"
+                  />
+                  <input
+                    id="deck-search"
+                    type="search"
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    placeholder="Search title, client, or industry"
+                    className="min-h-11 w-full rounded-md border border-black/20 bg-white pl-9 pr-10 text-sm outline-none transition placeholder:text-black/55 focus-visible:border-[#003FC7] focus-visible:ring-2 focus-visible:ring-[#003FC7]/30 dark:border-white/20 dark:bg-white/[0.04] dark:placeholder:text-white/55"
+                  />
+                  {q && (
+                    <button
+                      type="button"
+                      onClick={() => setQ("")}
+                      className="absolute right-1.5 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-black/70 hover:bg-black/5 dark:text-white/70 dark:hover:bg-white/10"
+                      aria-label="Clear search"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <label
+                    htmlFor="deck-sort"
+                    className="text-xs font-medium text-black/70 dark:text-white/70"
+                  >
+                    Sort
+                  </label>
+                  <select
+                    id="deck-sort"
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value as SortKey)}
+                    className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/40 dark:border-white/20 dark:bg-white/[0.04]"
+                  >
+                    <option value="recent">Recently created</option>
+                    <option value="alpha">Alphabetical</option>
+                    <option value="views">Most viewed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <ChipGroup label="Type">
+                  <Chip active={kind === "all"} onClick={() => setKind("all")}>
+                    All
+                  </Chip>
+                  <Chip active={kind === "decks"} onClick={() => setKind("decks")}>
+                    Decks
+                  </Chip>
+                  <Chip active={kind === "templates"} onClick={() => setKind("templates")}>
+                    Templates
+                  </Chip>
+                </ChipGroup>
+                {signedIn && (
+                  <ChipGroup label="Reach">
+                    <Chip active={reach === "all"} onClick={() => setReach("all")}>
+                      All
+                    </Chip>
+                    <Chip active={reach === "unseen"} onClick={() => setReach("unseen")}>
+                      Never viewed
+                    </Chip>
+                    <Chip active={reach === "shared"} onClick={() => setReach("shared")}>
+                      Shared
+                    </Chip>
+                  </ChipGroup>
+                )}
+                <div className="flex items-center gap-2">
+                  <label
+                    htmlFor="deck-age"
+                    className="text-xs font-medium text-black/70 dark:text-white/70"
+                  >
+                    Created
+                  </label>
+                  <select
+                    id="deck-age"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value as Age)}
+                    className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/40 dark:border-white/20 dark:bg-white/[0.04]"
+                  >
+                    <option value="any">Any time</option>
+                    <option value="3m">Over 3 months ago</option>
+                    <option value="6m">Over 6 months ago</option>
+                    <option value="12m">Over 12 months ago</option>
+                  </select>
+                </div>
+                {active && (
+                  <button
+                    type="button"
+                    onClick={clearAll}
+                    className="ml-auto min-h-11 rounded-md px-3 text-sm font-medium text-[#003FC7] underline-offset-2 hover:underline dark:text-[#A1FBF9]"
+                  >
+                    Clear filters
+                  </button>
+                )}
+              </div>
             </>
           )}
-        </div>
-        {selectMode && (
-          <p className="mt-2 text-[11px] text-black/45 dark:text-white/45">
-            Anything in review or approved is left in place, even if you tick it.
-          </p>
-        )}
 
-        <div className="mt-3 flex items-center gap-2 text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
-          <LayoutGrid size={12} />
-          {filtered.length + visibleCloudOnly.length} of {enriched.length + cloudOnly.length}{" "}
-          {enriched.length + cloudOnly.length === 1 ? "deck" : "decks"}
-          {!signedIn && (
-            <span className="text-black/35 dark:text-white/35">
-              · sign in to enable view analytics
-            </span>
+          {/* Bulk selection — clearing out a long list of old work in one move. */}
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3 dark:border-white/10">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectMode((on) => !on);
+                setSelected(new Set());
+              }}
+              className={`inline-flex items-center gap-1.5 min-h-11 rounded-md px-3 text-sm font-semibold transition ${
+                selectMode
+                  ? "bg-[#03002C] text-white dark:bg-[#A1FBF9] dark:text-[#03002C]"
+                  : "border border-black/20 bg-white text-black/80 hover:bg-black/5 dark:border-white/20 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+              }`}
+            >
+              <CheckSquare size={13} /> {selectMode ? "Done selecting" : "Select"}
+            </button>
+            {selectMode && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setSelected(new Set(shownItems.map((i) => i.id)))}
+                  className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+                >
+                  Select all shown ({shownItems.length})
+                </button>
+                {selectedItems.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSelected(new Set())}
+                    className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+                  >
+                    Clear selection
+                  </button>
+                )}
+                <span className="text-sm text-black/70 dark:text-white/70" aria-live="polite">
+                  {selectedItems.length} selected
+                </span>
+                <button
+                  type="button"
+                  disabled={selectedItems.length === 0 || bulkBusy}
+                  onClick={bulkDelete}
+                  className="ml-auto inline-flex items-center gap-1.5 min-h-11 rounded-md bg-red-600 px-4 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+                >
+                  <Trash2 size={13} />
+                  {bulkBusy
+                    ? "Deleting…"
+                    : `Delete selected${selectedItems.length ? ` (${selectedItems.length})` : ""}`}
+                </button>
+              </>
+            )}
+          </div>
+          {selectMode && (
+            <p className="mt-2 text-sm text-black/70 dark:text-white/70">
+              Anything in review or approved is left in place, even if you tick it.
+            </p>
+          )}
+
+          {active && (
+            <p className="mt-3 text-sm text-black/70 dark:text-white/70" aria-live="polite">
+              Showing {filtered.length + visibleCloudOnly.length} of{" "}
+              {enriched.length + cloudOnly.length}
+            </p>
+          )}
+          {signedIn === false && (
+            <p className="mt-3 text-sm text-black/70 dark:text-white/70">
+              <Link to="/auth" className="font-semibold underline">
+                Sign in
+              </Link>{" "}
+              to see decks saved to your account and who has viewed them.
+            </p>
           )}
         </div>
-      </div>
+      )}
 
       {loadFailed && (
         <div
@@ -655,12 +666,9 @@ function DecksIndex() {
         </div>
       )}
 
-      {/* Grid */}
-      {enriched.length === 0 && cloudOnly.length === 0 ? (
-        loadFailed ? null : (
-          <EmptyNew signedIn={signedIn} />
-        )
-      ) : filtered.length === 0 && visibleCloudOnly.length === 0 ? (
+      {/* Grid — account decks not in this browser already appear here as
+          cloud tiles, so there is no separate "saved presentations" list. */}
+      {!hasAny ? null : filtered.length === 0 && visibleCloudOnly.length === 0 ? (
         <EmptyNoMatches onClear={clearAll} />
       ) : (
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -693,10 +701,6 @@ function DecksIndex() {
           ))}
         </div>
       )}
-
-      {/* Real decks saved to the account — this browser's local store can be
-          empty (new device, cleared storage) while the workspace is not. */}
-      <MyCloudDecks />
     </AppShell>
   );
 }
@@ -722,7 +726,9 @@ function SelectCheck({
       type="button"
       disabled={locked}
       aria-pressed={checked}
-      aria-label={locked ? `${title} — in review or approved, cannot be deleted` : `Select ${title}`}
+      aria-label={
+        locked ? `${title} — in review or approved, cannot be deleted` : `Select ${title}`
+      }
       title={locked ? "In review or approved — finish the decision first" : undefined}
       onClick={(e) => {
         e.preventDefault();
@@ -821,33 +827,10 @@ function CloudOnlyTile({
   );
 }
 
-function StatChip({
-  label,
-  value,
-  accent,
-  icon,
-}: {
-  label: string;
-  value: number;
-  accent: string;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <div className="relative overflow-hidden rounded-xl border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
-      <span className="absolute left-0 top-0 h-full w-1" style={{ backgroundColor: accent }} />
-      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-black/50 dark:text-white/50">
-        {icon}
-        <span>{label}</span>
-      </div>
-      <div className="mt-1.5 text-2xl font-semibold tabular-nums">{value}</div>
-    </div>
-  );
-}
-
 function ChipGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
+    <div role="group" aria-label={label} className="flex items-center gap-2">
+      <span aria-hidden="true" className="text-xs font-medium text-black/70 dark:text-white/70">
         {label}
       </span>
       <div className="flex flex-wrap gap-1.5">{children}</div>
@@ -872,13 +855,14 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       disabled={disabled}
       title={title}
       className={
-        "rounded-full border px-3 py-1 text-xs font-medium transition " +
+        "min-h-11 rounded-md border px-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7] " +
         (active
           ? "border-[#05041A] bg-[#05041A] text-white dark:border-[#A1FBF9] dark:bg-[#A1FBF9] dark:text-[#03002C]"
-          : "border-black/10 bg-white text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10") +
+          : "border-black/20 bg-white text-black/80 hover:bg-black/5 dark:border-white/20 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10") +
         (disabled ? " cursor-not-allowed opacity-40" : "")
       }
     >
@@ -1066,7 +1050,7 @@ function EmptyNew({ signedIn }: { signedIn: boolean | null }) {
     },
     {
       to: "/decks/import" as const,
-      icon: Share2,
+      icon: Upload,
       title: "Import a PowerPoint",
       body: "Drop an existing .pptx and we stage it as editable slides on brand.",
       cta: "Import a deck",
@@ -1074,59 +1058,69 @@ function EmptyNew({ signedIn }: { signedIn: boolean | null }) {
     },
   ];
 
+  const [primary, ...rest] = paths;
+  const PrimaryIcon = primary.icon;
   return (
-    <div className="mt-10 rounded-3xl border border-dashed border-black/15 bg-white p-8 dark:border-white/15 dark:bg-white/[0.03] sm:p-10">
-      <div className="mx-auto max-w-md text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#003FC7]/10 text-2xl text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">
-          ✦
-        </div>
-        <h3 className="mt-4 text-xl font-semibold">No decks in this workspace yet</h3>
-        <p className="mt-2 text-sm text-black/60 dark:text-white/60">
-          Three ways to get a first deck on screen — all of them end in the same editor.
-        </p>
-      </div>
-
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
-        {paths.map((p) => {
-          const Icon = p.icon;
-          return (
-            <div
-              key={p.to}
-              className="flex flex-col rounded-2xl border border-black/10 bg-white p-5 text-left shadow-sm transition hover:border-[#003FC7]/40 hover:shadow-md dark:border-white/10 dark:bg-white/[0.04]"
-            >
-              <span className="inline-flex size-9 items-center justify-center rounded-xl bg-[#003FC7]/10 text-[#003FC7]">
-                <Icon size={16} />
-              </span>
-              <div className="mt-3 text-sm font-semibold tracking-[-0.01em]">{p.title}</div>
-              <p className="mt-1 flex-1 text-[12px] leading-relaxed text-black/55 dark:text-white/55">
-                {p.body}
-              </p>
-              <Link
-                to={p.to}
-                className={
-                  "mt-4 inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-medium transition " +
-                  (p.primary
-                    ? "bg-[#0B2A4A] text-white hover:opacity-90"
-                    : "border border-black/15 text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:text-white/70")
-                }
-              >
-                {p.cta}
-              </Link>
+    <section aria-labelledby="start-heading" className="mt-2">
+      <h2 id="start-heading" className="sr-only">
+        Ways to start a deck
+      </h2>
+      <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+        <Link
+          to={primary.to}
+          className="group flex flex-col justify-between rounded-lg bg-[#03002C] p-6 text-white transition hover:bg-[#0a0850] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7] sm:p-8"
+        >
+          <div>
+            <span className="inline-flex size-10 items-center justify-center rounded-md bg-white/10">
+              <PrimaryIcon size={18} aria-hidden="true" />
+            </span>
+            <div className="mt-4 text-xs font-semibold uppercase tracking-widest text-[#A1FBF9]">
+              Recommended · about a minute
             </div>
-          );
-        })}
+            <div className="mt-2 text-2xl font-semibold leading-tight">{primary.title}</div>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-white/85">{primary.body}</p>
+          </div>
+          <span className="mt-6 inline-flex min-h-11 w-fit items-center gap-2 rounded-md bg-white px-5 text-sm font-semibold text-[#03002C]">
+            {primary.cta} <span aria-hidden="true">→</span>
+          </span>
+        </Link>
+        <div className="grid gap-4">
+          {rest.map((p) => {
+            const Icon = p.icon;
+            return (
+              <Link
+                key={p.to}
+                to={p.to}
+                className="flex items-start gap-4 rounded-lg border border-black/15 bg-white p-5 transition hover:border-[#003FC7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7] dark:border-white/15 dark:bg-white/[0.04]"
+              >
+                <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-md bg-[#003FC7]/10 text-[#003FC7] dark:text-[#A1FBF9]">
+                  <Icon size={18} aria-hidden="true" />
+                </span>
+                <span className="flex-1">
+                  <span className="block text-base font-semibold">{p.title}</span>
+                  <span className="mt-1 block text-sm leading-relaxed text-black/70 dark:text-white/70">
+                    {p.body}
+                  </span>
+                  <span className="mt-2 inline-block text-sm font-semibold text-[#003FC7] dark:text-[#A1FBF9]">
+                    {p.cta} <span aria-hidden="true">→</span>
+                  </span>
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       {signedIn === false && (
-        <div className="mt-6 rounded-2xl border border-[#003FC7]/25 bg-[#003FC7]/[0.05] px-4 py-3 text-center text-xs text-[#03002C] dark:text-white/80">
+        <p className="mt-6 text-sm text-black/70 dark:text-white/70">
           Already made decks?{" "}
           <Link to="/auth" className="font-semibold underline">
             Sign in
           </Link>{" "}
-          to pull the ones saved to your account into this browser.
-        </div>
+          to bring the ones saved to your account into this browser.
+        </p>
       )}
-    </div>
+    </section>
   );
 }
 
