@@ -131,6 +131,12 @@ function ConvertPage() {
   const [moduleBrand, setModuleBrand] = useState<string>(BRAND_MODES[0].id);
   const [selection, setSelection] = useState<AdaptSelection>(EMPTY_SELECTION);
   const [view, setView] = useState<"one" | "all">("one");
+  // Coming from the module catalog: bring the chosen module into view in the list.
+  useEffect(() => {
+    if (!search.module) return;
+    const el = document.querySelector<HTMLElement>(`[data-module-id="${CSS.escape(search.module)}"]`);
+    el?.scrollIntoView({ block: "nearest" });
+  }, [search.module]);
   const [draft, setDraft] = useState<{ headline: string; body: string; eyebrow: string }>({
     headline: "",
     body: "",
@@ -292,6 +298,7 @@ function ConvertPage() {
                       <button
                         type="button"
                         aria-pressed={m.id === moduleId}
+                        data-module-id={m.id}
                         onClick={() => setModuleId(m.id)}
                         className={`block w-full border-b border-[color:var(--color-border)] px-3 py-2 text-left last:border-b-0 ${m.id === moduleId ? "bg-[color:var(--color-muted)] shadow-[inset_3px_0_0_var(--color-primary)]" : "hover:bg-[color:var(--color-muted)]/60"}`}
                       >
