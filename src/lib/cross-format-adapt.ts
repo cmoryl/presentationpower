@@ -59,7 +59,31 @@ export type AdaptTargetId =
 
 /** How a print page arranges its blocks. */
 export type PrintLayout = "sheet" | "landscape" | "poster" | "banner";
-...
+
+export type AdaptTypography = {
+  /** Point/pixel steps for the medium, largest first. */
+  eyebrowPx: number;
+  headlinePx: number;
+  bodyPx: number;
+  pointPx: number;
+  statPx: number;
+  /** Body leading multiplier. */
+  bodyLeading: number;
+  /** Headline leading multiplier. */
+  headlineLeading: number;
+};
+
+export type AdaptTarget = {
+  id: AdaptTargetId;
+  label: string;
+  medium: "social" | "print";
+  /** Social targets resolve to a registry format; print targets carry a trim. */
+  formatId?: string;
+  /** Print trim in inches (width × height). */
+  trimIn?: { width: number; height: number };
+  /** Capacity of the layout structure. */
+  caps: { headline: number; body: number; points: number; pointChars: number };
+  type: AdaptTypography;
   /** What the layout structure actually shows, in reading order. */
   structure: string[];
   /** Print page arrangement (defaults to "sheet"). */
