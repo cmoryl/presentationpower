@@ -59,7 +59,7 @@ export const Route = createFileRoute("/convert")({
       {
         property: "og:description",
         content:
-          "One piece of content, every medium: slide to social card, slide to print brief or case study, with high-resolution production proofs.",
+          "One piece of content, every medium: slide to social card, slide to print brief or case study, with high-resolution proofs and press-ready PDF and Illustrator files for every print size.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
