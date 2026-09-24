@@ -10,6 +10,7 @@ import { ArrowLeft, Rocket } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { listStartedEvents, startEvent } from "@/lib/event-intake.functions";
+import { linkEventVenue, listVenues, saveVenue } from "@/lib/venues.functions";
 
 export const Route = createFileRoute("/events/next_/start")({
   head: () => ({
@@ -46,6 +47,12 @@ function StartEventPage() {
   const [form, setForm] = useState({ name: "", city: "", venue: "", dates: "", research: true });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const venuesFn = useServerFn(listVenues);
+  const venues = useQuery({ queryKey: ["venues"], queryFn: () => venuesFn() });
+  const createVenue = useServerFn(saveVenue);
+  const link = useServerFn(linkEventVenue);
+  // "" = add as a new venue from the fields below; otherwise an existing venue slug.
+  const [venueSlug, setVenueSlug] = useState("");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +61,23 @@ function StartEventPage() {
     setError(null);
     try {
       const res = await start({ data: form });
+      // Link the event to a venue in the library, adding the venue when new.
+      let slug = venueSlug;
+      if (!slug) {
+        const made = await createVenue({
+          data: {
+            slug: `${form.venue} ${form.city}`.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80),
+            name: form.venue.trim(),
+            city: form.city.trim(),
+            country: "",
+            address: "",
+            timezone: "",
+            sourceNote: "Added when the event was started. Waiting on the venue's floor sheets.",
+          },
+        });
+        slug = made.slug;
+      }
+      await link({ data: { eventId: res.eventId, slug } });
       navigate({ to: "/events/next/intake/$eventId", params: { eventId: res.eventId } });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't start the event.");
@@ -88,6 +112,29 @@ function StartEventPage() {
           <label className="text-[13px] font-semibold text-[#03002C]">
             City
             <input className={field} required value={form.city} onChange={set("city")} placeholder="San Francisco" />
+          </label>
+          <label className="text-[13px] font-semibold text-[#03002C] sm:col-span-2">
+            Venue library
+            <select
+              className={field}
+              value={venueSlug}
+              onChange={(e) => {
+                const slug = e.target.value;
+                setVenueSlug(slug);
+                const v = venues.data?.find((x) => x.slug === slug);
+                if (v) setForm((f) => ({ ...f, venue: v.name, city: f.city || v.city }));
+              }}
+            >
+              <option value="">Add as a new venue</option>
+              {(venues.data ?? []).map((v) => (
+                <option key={v.slug} value={v.slug}>
+                  {v.name} · {v.city} · {v.floorCount} {v.floorCount === 1 ? "floor" : "floors"}
+                </option>
+              ))}
+            </select>
+            <span className="mt-1 block text-[12px] font-normal text-[#666666]">
+              Pick a saved venue to reuse its floors, or leave it on "Add as a new venue".
+            </span>
           </label>
           <label className="text-[13px] font-semibold text-[#03002C]">
             Venue

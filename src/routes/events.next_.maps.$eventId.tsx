@@ -16,6 +16,7 @@ import {
   saveEventMapFloor,
   updateEventMapRooms,
 } from "@/lib/event-maps.functions";
+import { saveVenueFloor } from "@/lib/venues.functions";
 import { eventFloorId, importSvgFloor } from "@/lib/venue-map-import";
 import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 import { qeiiPlanSvg } from "@/lib/next-london-qeii-plan";
@@ -80,6 +81,7 @@ function MapsPage() {
   const list = useServerFn(listEventMapFloors);
   const save = useServerFn(saveEventMapFloor);
   const saveRooms = useServerFn(updateEventMapRooms);
+  const saveToVenue = useServerFn(saveVenueFloor);
   const remove = useServerFn(deleteEventMapFloor);
   const q = useQuery({ queryKey: ["event-map-floors", eventId], queryFn: () => list({ data: { eventId } }) });
 
@@ -132,7 +134,22 @@ function MapsPage() {
       });
       setNotes(n);
       if (f.kind === "artwork") return;
-      await save({
+      const venue = q.data?.venue;
+      const common = {
+        floorKey: key,
+        marker: f.marker,
+        title: f.title,
+        position: rows.find((r) => r.floor_key === key)?.position ?? rows.length,
+        sourceKind: (scan ? "scan" : "vector") as "scan" | "vector",
+        sourceName: file.name.slice(0, 200),
+        w: f.w,
+        h: f.h,
+        shapes: f.shapes,
+        labels: f.labels,
+      };
+      // Floors belong to the venue, so every event held there shares them.
+      if (venue) await saveToVenue({ data: { slug: venue.slug, ...common, offPlanLabels: [] } });
+      else await save({
         data: {
           eventId,
           floorKey: key,
