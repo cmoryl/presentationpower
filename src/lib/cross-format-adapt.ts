@@ -180,12 +180,15 @@ export function adaptTargetFormat(target: AdaptTarget): SocialFormat | null {
 
 // ── Reading a source ───────────────────────────────────────────────────────
 
-const HEADLINE_KEYS = ["headline", "title", "heading", "statement", "question", "name"];
-const EYEBROW_KEYS = ["eyebrow", "kicker", "label", "sectionLabel", "overline"];
-const BODY_KEYS = ["body", "summary", "copy", "subhead", "standfirst", "intro", "description"];
+const HEADLINE_KEYS = ["headline", "title", "heading", "statement", "question", "quote", "name"];
+const EYEBROW_KEYS = ["eyebrow", "kicker", "label", "sectionLabel", "overline", "industry"];
+const BODY_KEYS = [
+  "body", "summary", "subtitle", "copy", "subhead", "standfirst", "intro", "description",
+  "narrative", "story", "message", "insight", "result", "solution", "challenge", "caption",
+];
 const POINT_KEYS = ["points", "bullets", "cardPoints", "items", "list", "highlights", "cardHighlights"];
-const CTA_KEYS = ["cta", "ctaLabel", "action"];
-const FOOTNOTE_KEYS = ["footnote", "source", "sourceNote", "disclaimer"];
+const CTA_KEYS = ["cta", "ctaLabel", "action", "nextSteps", "followUp"];
+const FOOTNOTE_KEYS = ["footnote", "source", "sourceNote", "disclaimer", "attribution", "reference"];
 const PHOTO_KEYS = ["imageUrl", "image", "photoUrl", "mediaUrl", "heroImage", "backgroundImage"];
 
 function str(v: unknown): string | undefined {
@@ -211,9 +214,16 @@ function pickPoints(content: Record<string, unknown>): string[] | undefined {
         if (typeof item === "string") return str(item);
         if (item && typeof item === "object") {
           const rec = item as Record<string, unknown>;
-          const head = str(rec.title) ?? str(rec.label) ?? str(rec.heading);
-          const tail = str(rec.body) ?? str(rec.text) ?? str(rec.copy);
-          return [head, tail].filter(Boolean).join(" — ") || undefined;
+          // Before/after rows read as "before → after".
+          const before = str(rec.before);
+          const after = str(rec.after);
+          if (before || after) return [before, after].filter(Boolean).join(" → ");
+          // Stat rows: "40% — label".
+          const value = str(rec.value) ?? str(rec.stat) ?? str(rec.number) ?? str(rec.metric);
+          const head = str(rec.title) ?? str(rec.label) ?? str(rec.heading) ?? str(rec.name);
+          const tail = str(rec.body) ?? str(rec.text) ?? str(rec.copy) ?? str(rec.role) ?? str(rec.description);
+          const lead = value ? [value + (str(rec.unit) ?? ""), head].filter(Boolean).join(" ") : head;
+          return [lead, tail].filter(Boolean).join(" — ") || undefined;
         }
         return undefined;
       })
@@ -225,6 +235,16 @@ function pickPoints(content: Record<string, unknown>): string[] | undefined {
 
 function pickStat(content: Record<string, unknown>): { value: string; label: string } | undefined {
   const direct = content.stat;
+  // Flat stat modules: stat "40" + unit "%" (+ label/caption), or metric "38% ↓ time to market".
+  if (typeof direct === "string" || typeof direct === "number") {
+    const value = `${direct}${str(content.unit) ?? ""}`.trim();
+    if (value) return { value, label: str(content.statLabel) ?? str(content.label) ?? str(content.caption) ?? "" };
+  }
+  const metric = str(content.metric);
+  if (metric) {
+    const m = metric.match(/^(\S+(?:\s*[↑↓→]\s*\S+)?)\s+(.*)$/);
+    return m ? { value: m[1], label: m[2] } : { value: metric, label: "" };
+  }
   if (direct && typeof direct === "object") {
     const rec = direct as Record<string, unknown>;
     const value = str(rec.value);
