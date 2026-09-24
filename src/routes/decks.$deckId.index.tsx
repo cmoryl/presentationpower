@@ -3814,3 +3814,28 @@ function Tip({ label, children }: { label: string; children: React.ReactNode }) 
     </span>
   );
 }
+
+/**
+ * Gives every icon-only control in the editor chrome an accessible name,
+ * borrowed from its tooltip (title) or, failing that, its icon's label.
+ * Runs on mount and whenever the editor re-renders new controls.
+ */
+function nameIconButtons(root: HTMLDivElement | null) {
+  if (!root || typeof MutationObserver === "undefined") return;
+  const apply = () => {
+    root.querySelectorAll<HTMLElement>("button, a[href], summary").forEach((el) => {
+      if (el.closest("[data-slide-stage]")) return;
+      if (el.getAttribute("aria-label") || el.getAttribute("aria-labelledby")) return;
+      if ((el.textContent ?? "").trim()) return;
+      const name =
+        el.getAttribute("title") ||
+        el.querySelector("svg")?.getAttribute("aria-label") ||
+        el.querySelector("img")?.getAttribute("alt");
+      if (name) el.setAttribute("aria-label", name);
+    });
+  };
+  apply();
+  const obs = new MutationObserver(apply);
+  obs.observe(root, { childList: true, subtree: true });
+  return () => obs.disconnect();
+}
