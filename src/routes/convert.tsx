@@ -17,6 +17,7 @@ import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { AssetExportMenu } from "@/components/AssetExportMenu";
 import { PrintProofMenu } from "@/components/export/PrintProofMenu";
+import { PressExportMenu } from "@/components/convert/PressExportMenu";
 import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { PrintBriefPreview } from "@/components/convert/PrintBriefPreview";
