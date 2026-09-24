@@ -68,6 +68,7 @@ import { CommentsPanel } from "@/components/CommentsPanel";
 import { ReviewStatusControl } from "@/components/ReviewStatusControl";
 import {
   ChevronDown,
+  FileText,
   Layers,
   LayoutList,
   MessageSquare,
@@ -1758,39 +1759,15 @@ function DeckEditor() {
                 </div>
               )}
 
-              {/* Editable fields */}
-              {active && mv && (
-                <div className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
-                  <div className="text-xs uppercase tracking-widest text-black/50">
-                    Editable fields
-                  </div>
-                  <div className="mt-4 space-y-4">
-                    {mv.editableFields.map((path) => (
-                      <FieldEditor
-                        key={path}
-                        path={path}
-                        content={active.content}
-                        onChange={(concretePath, value) =>
-                          updateField(deck.id, active.id, concretePath, value)
-                        }
-                      />
-                    ))}
-                  </div>
-                  {mv.lockedFields.length > 0 && (
-                    <div className="mt-6 border-t border-black/10 pt-4 text-xs text-black/50">
-                      <span className="font-medium text-black/70">Locked by the module:</span>{" "}
-                      {mv.lockedFields.join(" · ")}
-                    </div>
-                  )}
-                </div>
-              )}
-
+              {/* Slide text and speaker notes live in the "Text" tab of the side panel. */}
               {active && (
-                <SpeakerNotesPanel
-                  key={active.id}
-                  value={active.notes ?? ""}
-                  onChange={(v) => updateSlideNotes(deck.id, active.id, v)}
-                />
+                <button
+                  type="button"
+                  onClick={() => setRailTab("content")}
+                  className="mt-4 min-h-11 rounded-md border border-black/15 bg-white px-4 text-sm font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7]"
+                >
+                  Edit slide text and speaker notes
+                </button>
               )}
 
               {/* Unified media & background panel — Image / Video / Background tabs */}
@@ -1979,7 +1956,7 @@ function DeckEditor() {
                   <button
                     type="button"
                     onClick={() => setPptxPreviewOpen(true)}
-                    className="rounded-full bg-[#003FC7] px-4 py-2 text-[11px] uppercase tracking-widest text-white hover:bg-[#03002C]"
+                    className="min-h-11 rounded-md border border-black/20 bg-white px-4 text-sm font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7]"
                   >
                     Preview in PowerPoint
                   </button>
@@ -2085,6 +2062,54 @@ function DeckEditor() {
                               Turn on ☰ layers in the Objects toolbar to list every object and
                               adopted module section here.
                             </p>
+                          </div>
+                        ),
+                      },
+                    ]
+                  : []),
+                ...(active
+                  ? [
+                      {
+                        id: "content",
+                        label: "Text",
+                        icon: <FileText className="h-4 w-4" />,
+                        content: (
+                          <div className="space-y-4 p-1">
+                            {mv && (
+                              <section aria-labelledby="deck-fields-heading">
+                                <h2
+                                  id="deck-fields-heading"
+                                  className="text-sm font-semibold text-[#03002C]"
+                                >
+                                  Slide text
+                                </h2>
+                                <div className="mt-3 space-y-4">
+                                  {mv.editableFields.map((path) => (
+                                    <FieldEditor
+                                      key={path}
+                                      path={path}
+                                      content={active.content}
+                                      onChange={(concretePath, value) =>
+                                        updateField(deck.id, active.id, concretePath, value)
+                                      }
+                                    />
+                                  ))}
+                                </div>
+                                {mv.lockedFields.length > 0 && (
+                                  <p className="mt-4 border-t border-black/10 pt-3 text-xs text-black/65">
+                                    <span className="font-medium text-black/80">
+                                      Locked by the module:
+                                    </span>{" "}
+                                    {mv.lockedFields.join(" · ")}
+                                  </p>
+                                )}
+                              </section>
+                            )}
+                            <SpeakerNotesPanel
+                              key={active.id}
+                              value={active.notes ?? ""}
+                              onChange={(v) => updateSlideNotes(deck.id, active.id, v)}
+                            />
                           </div>
                         ),
                       },
