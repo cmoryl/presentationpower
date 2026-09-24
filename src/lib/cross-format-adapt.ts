@@ -41,34 +41,29 @@ export type AdaptContent = {
   media?: AdaptMedia;
 };
 
-export type AdaptTargetId = "social-card" | "social-portrait" | "social-story" | "print-brief" | "case-study";
+export type AdaptTargetId =
+  | "social-card"
+  | "social-portrait"
+  | "social-story"
+  | "print-brief"
+  | "case-study"
+  | "print-letter"
+  | "flyer-a5"
+  | "rack-card-dl"
+  | "postcard-a6"
+  | "sell-sheet-landscape"
+  | "poster-a3"
+  | "poster-a2"
+  | "tent-card"
+  | "rollup-banner";
 
-export type AdaptTypography = {
-  /** Point/pixel steps for the medium, largest first. */
-  eyebrowPx: number;
-  headlinePx: number;
-  bodyPx: number;
-  pointPx: number;
-  statPx: number;
-  /** Body leading multiplier. */
-  bodyLeading: number;
-  /** Headline leading multiplier. */
-  headlineLeading: number;
-};
-
-export type AdaptTarget = {
-  id: AdaptTargetId;
-  label: string;
-  medium: "social" | "print";
-  /** Social targets resolve to a registry format; print targets carry a trim. */
-  formatId?: string;
-  /** Print trim in inches (width × height). */
-  trimIn?: { width: number; height: number };
-  /** Capacity of the layout structure. */
-  caps: { headline: number; body: number; points: number; pointChars: number };
-  type: AdaptTypography;
+/** How a print page arranges its blocks. */
+export type PrintLayout = "sheet" | "landscape" | "poster" | "banner";
+...
   /** What the layout structure actually shows, in reading order. */
   structure: string[];
+  /** Print page arrangement (defaults to "sheet"). */
+  layout?: PrintLayout;
 };
 
 export const ADAPT_TARGETS: AdaptTarget[] = [
@@ -166,7 +161,67 @@ export const ADAPT_TARGETS: AdaptTarget[] = [
       "footnote",
     ],
   },
+  ...EXTRA_PRINT_TARGETS(),
 ];
+
+/**
+ * More print sizes. Type steps scale from the A4 brief by page width so the
+ * hierarchy holds at every trim; caps shrink with the page area.
+ */
+function EXTRA_PRINT_TARGETS(): AdaptTarget[] {
+  const mm = (w: number, h: number) => ({ width: w / 25.4, height: h / 25.4 });
+  const make = (
+    id: AdaptTargetId,
+    label: string,
+    trimIn: { width: number; height: number },
+    layout: PrintLayout,
+    caps: AdaptTarget["caps"],
+    structure: string[],
+    headlineBoost = 1,
+  ): AdaptTarget => {
+    const k = Math.min(trimIn.width, trimIn.height) / 8.268;
+    const r = (n: number) => Math.round(n * k * 10) / 10;
+    return {
+      id,
+      label,
+      medium: "print",
+      trimIn,
+      layout,
+      caps,
+      type: {
+        eyebrowPx: r(11),
+        headlinePx: r(40 * headlineBoost),
+        bodyPx: r(11),
+        pointPx: r(11),
+        statPx: r(48 * headlineBoost),
+        bodyLeading: 1.45,
+        headlineLeading: 1.06,
+      },
+      structure,
+    };
+  };
+  const full = ["eyebrow", "headline", "standfirst", "body", "points", "stat", "footnote"];
+  return [
+    make("print-letter", "1-page brief · US Letter", { width: 8.5, height: 11 }, "sheet",
+      { headline: 120, body: 900, points: 6, pointChars: 120 }, full),
+    make("flyer-a5", "Flyer · A5", mm(148, 210), "sheet",
+      { headline: 90, body: 420, points: 4, pointChars: 90 }, full),
+    make("rack-card-dl", "Rack card · DL", mm(99, 210), "sheet",
+      { headline: 70, body: 260, points: 3, pointChars: 70 }, ["eyebrow", "headline", "body", "points", "stat"]),
+    make("postcard-a6", "Postcard · A6 landscape", mm(148, 105), "landscape",
+      { headline: 70, body: 200, points: 3, pointChars: 60 }, ["eyebrow", "headline", "body", "points", "stat"]),
+    make("sell-sheet-landscape", "Sell sheet · A4 landscape", mm(297, 210), "landscape",
+      { headline: 110, body: 700, points: 6, pointChars: 110 }, full),
+    make("poster-a3", "Poster · A3", mm(297, 420), "poster",
+      { headline: 80, body: 260, points: 3, pointChars: 80 }, ["eyebrow", "headline", "body", "points", "stat"], 1.5),
+    make("poster-a2", "Poster · A2", mm(420, 594), "poster",
+      { headline: 80, body: 220, points: 3, pointChars: 70 }, ["eyebrow", "headline", "body", "points", "stat"], 1.6),
+    make("tent-card", "Table tent · A6 portrait", mm(105, 148), "poster",
+      { headline: 60, body: 140, points: 2, pointChars: 50 }, ["eyebrow", "headline", "body", "points", "stat"], 1.2),
+    make("rollup-banner", "Roll-up banner · 850 × 2000 mm", mm(850, 2000), "banner",
+      { headline: 60, body: 160, points: 3, pointChars: 50 }, ["eyebrow", "headline", "body", "points", "stat"], 1.8),
+  ];
+}
 
 export function adaptTarget(id: AdaptTargetId): AdaptTarget {
   const t = ADAPT_TARGETS.find((x) => x.id === id);
