@@ -34,6 +34,10 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
     const t = result.type;
     const { content } = result;
     const caseStudy = result.target.id === "case-study";
+    const layout = result.target.layout ?? "sheet";
+    const k = Math.min(trim.width, trim.height) / 8.268;
+    const u = (n: number) => Math.max(1, Math.round(n * k));
+    const big = layout === "poster" || layout === "banner";
     const photo = content.media?.kind === "photo" ? content.media.url : null;
     const groundToken = content.media?.kind === "token" ? content.media.token : "#FFFFFF";
 
@@ -53,13 +57,17 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
             background: groundToken,
             color: ink,
             fontFamily: "'Geist Variable', 'Geist', system-ui, sans-serif",
-            padding: `${0.6 * CSS_DPI}px`,
+            padding: `${Math.max(0.25, 0.6 * k) * CSS_DPI}px`,
             display: "flex",
             flexDirection: "column",
-            gap: 18,
+            gap: u(18),
+            ...(layout === "landscape"
+              ? { display: "grid", gridTemplateColumns: "1.15fr 1fr", gridAutoRows: "min-content", columnGap: u(28), alignContent: "start" }
+              : {}),
+            ...(big ? { justifyContent: "center" } : {}),
           }}
         >
-          <div style={{ height: 6, width: 96, background: accent }} />
+          <div style={{ height: u(6), width: u(96), background: accent, gridColumn: layout === "landscape" ? "1 / -1" : undefined }} />
 
           {content.eyebrow ? (
             <p
@@ -83,7 +91,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
               letterSpacing: "-0.02em",
               fontWeight: 700,
               margin: 0,
-              maxWidth: "20ch",
+              maxWidth: big ? "14ch" : "20ch",
             }}
           >
             {content.headline}
@@ -120,8 +128,8 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
             <ul
               style={{
                 display: "grid",
-                gridTemplateColumns: caseStudy ? "1fr" : "1fr 1fr",
-                gap: 12,
+                gridTemplateColumns: caseStudy || layout !== "sheet" || k < 0.8 ? "1fr" : "1fr 1fr",
+                gap: u(12),
                 margin: 0,
                 padding: 0,
                 listStyle: "none",
@@ -133,8 +141,8 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
                   style={{
                     fontSize: t.pointPx,
                     lineHeight: t.bodyLeading,
-                    paddingLeft: 12,
-                    borderLeft: `3px solid ${accent}`,
+                    paddingLeft: u(12),
+                    borderLeft: `${u(3)}px solid ${accent}`,
                   }}
                 >
                   {p}
@@ -144,7 +152,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
           ) : null}
 
           {content.stat ? (
-            <div style={{ marginTop: "auto", display: "flex", alignItems: "baseline", gap: 12 }}>
+            <div style={{ marginTop: big ? u(24) : "auto", display: "flex", alignItems: "baseline", gap: u(12) }}>
               <span
                 style={{
                   fontSize: t.statPx,
@@ -164,12 +172,14 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
 
           <div
             style={{
-              marginTop: content.stat ? 0 : "auto",
-              borderTop: `1px solid rgba(3,0,44,0.15)`,
-              paddingTop: 10,
+              marginTop: big ? "auto" : content.stat ? 0 : "auto",
+              gridColumn: layout === "landscape" ? "1 / -1" : undefined,
+              borderTop: `${u(1)}px solid rgba(3,0,44,0.15)`,
+              paddingTop: u(10),
+              flexWrap: "wrap",
               display: "flex",
               justifyContent: "space-between",
-              gap: 16,
+              gap: u(16),
               fontSize: t.eyebrowPx,
               color: "#666666",
             }}
