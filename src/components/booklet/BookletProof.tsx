@@ -93,12 +93,15 @@ export function ProofGuides({ trim, safeInset }: { trim: { w: number; h: number 
   );
 }
 
-function Placeholder({ icon, title, note, compact = false }: { icon: React.ReactNode; title: string; note: string; compact?: boolean }) {
+function Placeholder({ icon, title, note, compact = false, w }: { icon: React.ReactNode; title: string; note: string; compact?: boolean; w: number }) {
+  const s = (f: number) => Math.max(8, Math.round(w * f));
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-[3cqw] overflow-hidden bg-[color:var(--color-muted)] p-[8cqw] text-center">
-      <span className={`text-[color:var(--color-muted-foreground)] ${compact ? "[&_svg]:size-[28cqw]" : "[&_svg]:size-[12cqw]"}`}>{icon}</span>
-      <p className={`${compact ? "text-[11cqw]" : "text-[6cqw]"} font-semibold leading-tight text-[color:var(--color-foreground)]`}>{title}</p>
-      {compact ? null : <p className="text-[3.6cqw] leading-snug text-[color:var(--color-muted-foreground)]">{note}</p>}
+    <div className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden bg-[color:var(--color-muted)] text-center" style={{ gap: w * 0.03, padding: w * 0.08 }}>
+      <span className="text-[color:var(--color-muted-foreground)]" style={{ width: s(compact ? 0.28 : 0.1), height: s(compact ? 0.28 : 0.1) }}>
+        <span className="block size-full [&_svg]:size-full">{icon}</span>
+      </span>
+      <p className="font-semibold leading-tight text-[color:var(--color-foreground)]" style={{ fontSize: s(compact ? 0.11 : 0.045) }}>{title}</p>
+      {compact ? null : <p className="max-w-[80%] leading-snug text-[color:var(--color-muted-foreground)]" style={{ fontSize: s(0.028) }}>{note}</p>}
     </div>
   );
 }
@@ -134,6 +137,7 @@ export function PageProof({
             title={page.label}
             note="The press file prints every agenda page; the proof shows page 1."
             compact={compact}
+            w={widthPx}
           />
         </div>
       );
@@ -176,6 +180,7 @@ export function PageProof({
         title={page.kind === "map" ? page.floorLabel : page.label}
         note="Rendered at 300 ppi when the file is built. Use Render proof to see it now."
         compact={compact}
+        w={widthPx}
       />
     </div>
   );
