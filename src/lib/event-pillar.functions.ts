@@ -44,6 +44,8 @@ const versionInput = z.object({
   eventLabel: z.string().max(160).default(""),
   scope: z.string().max(60).default("events"),
   notes: z.string().max(2000).default(""),
+  /** City edition this file belongs to (e.g. "london"); null = shared division default. */
+  editionId: z.string().max(60).nullable().optional(),
   config: configSchema,
 });
 
@@ -78,6 +80,7 @@ export const savePillarFile = createServerFn({ method: "POST" })
         notes: data.notes,
         config: data.config as never,
         division_id: divisionId,
+        edition_id: data.editionId ?? null,
         user_id: context.userId,
       } as never)
       .select("*")
@@ -110,6 +113,7 @@ export const updatePillarFile = createServerFn({ method: "POST" })
     if (data.eventLabel !== undefined) patch.event_label = data.eventLabel;
     if (data.scope !== undefined) patch.scope = data.scope;
     if (data.notes !== undefined) patch.notes = data.notes;
+    if (data.editionId !== undefined) patch.edition_id = data.editionId;
     if (data.config !== undefined) {
       patch.config = data.config;
       patch.division_id = data.config.divisionId;

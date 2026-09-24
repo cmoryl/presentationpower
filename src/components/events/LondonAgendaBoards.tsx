@@ -36,10 +36,7 @@ function AgendaCard({
     () => (saved && agendaFileIsLive(saved.config) ? saved : undefined),
     [saved],
   );
-  const config: AgendaConfig = useMemo(
-    () => (live ? live.config : agendaDefault(id)),
-    [live, id],
-  );
+  const config: AgendaConfig = useMemo(() => (live ? live.config : agendaDefault(id)), [live, id]);
 
   // Render the card from the board's first printed page, exactly as it comes off
   // the press: when the programme holds on one sheet that is the merged
@@ -49,7 +46,6 @@ function AgendaCard({
   const dayCount = agendaDays(config).length;
   const room = agendaLocationText(config).trim();
   const sessionCount = agendaDays(config).reduce((n, d) => n + (d.sessions?.length ?? 0), 0);
-
 
   return (
     <article className="flex flex-col overflow-hidden rounded-xl border border-black/10 bg-white">
@@ -84,7 +80,7 @@ function AgendaCard({
 
         <Link
           to="/events/next/agendas"
-          search={{ division: id, file: live?.id }}
+          search={{ division: id, file: live?.id, edition: "london" }}
           className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[#003FC7] hover:underline"
         >
           <CalendarDays size={13} /> {live ? "Edit this agenda" : "Create this agenda"}
@@ -93,7 +89,6 @@ function AgendaCard({
     </article>
   );
 }
-
 
 export function LondonAgendaBoards() {
   const savedFiles = useSavedAgendaFiles();
@@ -111,7 +106,7 @@ export function LondonAgendaBoards() {
             key={div.id}
             id={div.id}
             name={div.name}
-            saved={pickAgendaFile(savedFiles.data, div.id)}
+            saved={pickAgendaFile(savedFiles.data, div.id, "london")}
           />
         ))}
       </div>

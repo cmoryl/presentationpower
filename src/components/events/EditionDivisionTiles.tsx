@@ -26,6 +26,8 @@ export type EditionDivisionCounts = {
 export type EditionDivisionTilesProps = {
   /** Edition label for headings, e.g. "London 2026". */
   editionLabel: string;
+  /** Edition id ("london", "san-francisco") so studio links save to this city. */
+  editionId?: string;
   /** Per-division booth / room-signage counts from this edition's schedule. */
   countsFor: (divisionId: string) => { booths: number; signage: number };
   /** True when the edition has an issued programme, so agenda boards exist. */
@@ -51,6 +53,7 @@ export function editionDivisionCounts(
 }
 
 export function EditionDivisionTiles({
+  editionId,
   editionLabel,
   countsFor,
   hasProgramme,
@@ -180,7 +183,7 @@ export function EditionDivisionTiles({
               {focusCounts.agendas > 0 ? (
                 <Link
                   to="/events/next/agendas"
-                  search={{ division: focus.id }}
+                  search={{ division: focus.id, edition: editionId }}
                   className="text-[#003FC7] hover:underline"
                 >
                   Open its track agenda

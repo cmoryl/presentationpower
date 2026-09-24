@@ -1085,6 +1085,7 @@ function LondonSignagePage() {
 
         <EditionDivisionTiles
           editionLabel="London 2026"
+          editionId="london"
           countsFor={(id) => divisionCounts[id] ?? { booths: 0, signage: 0 }}
           hasProgramme
           selected={divisionFocus}

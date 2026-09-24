@@ -228,6 +228,7 @@ function SanFranciscoPage() {
 
         <EditionDivisionTiles
           editionLabel="San Francisco 2026"
+          editionId="san-francisco"
           countsFor={() => ({ booths: 0, signage: 0 })}
           hasProgramme={false}
           signageIssued={false}

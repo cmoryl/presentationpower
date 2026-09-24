@@ -2284,6 +2284,7 @@ export type Database = {
           config: Json
           created_at: string
           division_id: string | null
+          edition_id: string | null
           event_label: string
           id: string
           name: string
@@ -2296,6 +2297,7 @@ export type Database = {
           config: Json
           created_at?: string
           division_id?: string | null
+          edition_id?: string | null
           event_label?: string
           id?: string
           name: string
@@ -2308,6 +2310,7 @@ export type Database = {
           config?: Json
           created_at?: string
           division_id?: string | null
+          edition_id?: string | null
           event_label?: string
           id?: string
           name?: string
@@ -3301,6 +3304,7 @@ export type Database = {
           config: Json
           created_at: string
           division_id: string
+          edition_id: string | null
           event_label: string
           id: string
           name: string
@@ -3312,6 +3316,7 @@ export type Database = {
           config: Json
           created_at?: string
           division_id?: string
+          edition_id?: string | null
           event_label?: string
           id?: string
           name: string
@@ -3323,6 +3328,7 @@ export type Database = {
           config?: Json
           created_at?: string
           division_id?: string
+          edition_id?: string | null
           event_label?: string
           id?: string
           name?: string

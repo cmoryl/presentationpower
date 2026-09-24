@@ -78,6 +78,8 @@ const versionInput = z.object({
   eventLabel: z.string().max(160).default(""),
   divisionId: z.string().max(60).default(""),
   notes: z.string().max(2000).default(""),
+  /** City edition this file belongs to (e.g. "london"); null = shared division default. */
+  editionId: z.string().max(60).nullable().optional(),
   config: configSchema,
 });
 
@@ -110,8 +112,9 @@ export const saveAgendaFile = createServerFn({ method: "POST" })
         division_id: data.divisionId,
         notes: data.notes,
         config: data.config as never,
+        edition_id: data.editionId ?? null,
         user_id: context.userId,
-      })
+      } as never)
       .select("*")
       .single();
     if (error) throw error;
@@ -140,6 +143,7 @@ export const updateAgendaFile = createServerFn({ method: "POST" })
     if (data.eventLabel !== undefined) patch.event_label = data.eventLabel;
     if (data.divisionId !== undefined) patch.division_id = data.divisionId;
     if (data.notes !== undefined) patch.notes = data.notes;
+    if (data.editionId !== undefined) patch.edition_id = data.editionId;
     if (data.config !== undefined) patch.config = data.config;
     const { data: row, error } = await context.supabase
       .from("next_agenda_versions")

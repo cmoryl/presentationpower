@@ -145,6 +145,7 @@ type PillarFileRow = {
   id: string;
   name: string;
   event_label: string;
+  edition_id?: string | null;
   notes: string;
   config: PillarConfig;
   updated_at: string;
@@ -160,7 +161,10 @@ export function PillarStudio({
   configKey,
   initialFileId,
   onConfigChange,
+  editionId = null,
 }: {
+  /** City edition saves are tagged with (e.g. "london"); null = shared division default. */
+  editionId?: string | null;
   scope?: string;
   heading?: string;
   intro?: string;
@@ -319,10 +323,24 @@ export function PillarStudio({
       const name = fileName.trim() || pillarName(config);
       const saved = openFileId
         ? await update({
-            data: { id: openFileId, name, eventLabel: config.eventLabel ?? "", scope, config },
+            data: {
+              id: openFileId,
+              name,
+              eventLabel: config.eventLabel ?? "",
+              scope,
+              editionId,
+              config,
+            },
           })
         : await create({
-            data: { name, eventLabel: config.eventLabel ?? "", scope, notes: "", config },
+            data: {
+              name,
+              eventLabel: config.eventLabel ?? "",
+              scope,
+              notes: "",
+              editionId,
+              config,
+            },
           });
 
       // ── Face pairing ────────────────────────────────────────────────────────
@@ -337,6 +355,7 @@ export function PillarStudio({
         const sibling = rows.find(
           (r) =>
             r.id !== openFileId &&
+            (r.edition_id ?? null) === editionId &&
             r.config?.face === otherFace &&
             r.config?.divisionId === config.divisionId &&
             r.config?.kind === config.kind,
@@ -349,6 +368,7 @@ export function PillarStudio({
               name: twinName,
               eventLabel: config.eventLabel ?? "",
               scope,
+              editionId,
               config: twin,
             },
           });
@@ -359,6 +379,7 @@ export function PillarStudio({
               eventLabel: config.eventLabel ?? "",
               scope,
               notes: "",
+              editionId,
               config: twin,
             },
           });
