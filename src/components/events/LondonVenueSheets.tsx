@@ -1,3 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
+import { getVenueFloors } from "@/lib/venues.functions";
+import { setQeiiVenueFloors, qeiiVenueFloorsVersion, qeiiFloorVectorBundledPage, type QeiiFloorVector as VenueFloorVector } from "@/lib/next-london-qeii-vectors";
 // Interactive viewer for the issued QEII Centre floor sheets.
 //
 // Floor chips switch the sheet, the sheet is shown as framed artwork (never as a
@@ -117,7 +120,7 @@ export type LondonVenueSheetsProps = {
   initialRoom?: string;
 };
 
-export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSheetsProps = {}) {
+function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueSheetsProps = {}) {
   const [sheetId, setSheetId] = useState(
     LONDON_EVENT_SHEETS.find((s) => s.id === initialSheetId)?.id ?? LONDON_EVENT_SHEETS[0]!.id,
   );
@@ -1408,5 +1411,51 @@ export function LondonVenueSheets({ initialSheetId, initialRoom }: LondonVenueSh
         </div>
       ) : null}
     </section>
+  );
+}
+
+
+/** Loads the QEII Centre floors from the venue library, then draws. Any floor
+ *  the library can't supply — signed out, offline, not yet copied — is drawn
+ *  from the built-in copy, and the notice says which is in use. */
+export function LondonVenueSheets(props: LondonVenueSheetsProps = {}) {
+  const fetchFloors = useServerFn(getVenueFloors);
+  const q = useQuery({
+    queryKey: ["venue-floors", "qeii-centre"],
+    queryFn: () => fetchFloors({ data: { slug: "qeii-centre" } }),
+    retry: false,
+    staleTime: 5 * 60_000,
+  });
+  const ready = !q.isLoading;
+  const count = useMemo(() => {
+    if (!ready) return 0;
+    const rows = q.data ?? [];
+    setQeiiVenueFloors(
+      rows.map((r) => ({
+        id: r.floor_key,
+        marker: r.marker,
+        title: r.title,
+        page: (qeiiFloorVectorBundledPage(r.floor_key) ?? r.position + 1),
+        kind: r.source_kind === "scan" ? "artwork" : "vector",
+        w: r.w,
+        h: r.h,
+        shapes: (r.shapes as VenueFloorVector["shapes"]) ?? [],
+        labels: (r.labels as VenueFloorVector["labels"]) ?? [],
+      })),
+    );
+    return rows.length;
+  }, [ready, q.data]);
+  if (!ready) return <p className="text-[13px] text-[#666666]">Loading the venue's floors…</p>;
+  return (
+    <>
+      <p className="mb-2 text-[12px] text-[#666666]" data-export-ignore="true">
+        {count > 0
+          ? `Floors drawn from the venue library (${count} saved for the QEII Centre).`
+          : q.error
+            ? "Venue library unavailable — floors drawn from the built-in copy."
+            : "Floors drawn from the built-in copy — the QEII Centre has no floors saved in the venue library yet."}
+      </p>
+      <LondonVenueSheetsInner key={qeiiVenueFloorsVersion()} {...props} />
+    </>
   );
 }

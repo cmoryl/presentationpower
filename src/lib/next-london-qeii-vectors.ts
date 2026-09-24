@@ -1676,6 +1676,33 @@ export const QEII_FLOOR_VECTORS: QeiiFloorVector[] = [
   },
 ];
 
+// Venue-library copy of the QEII floors. When the library has loaded, its
+// floors win; any floor missing there is drawn from the built-in copy above.
+let venueFloors: Map<string, QeiiFloorVector> | null = null;
+let venueVersion = 0;
+
+export type QeiiFloorSource = "venue-library" | "bundled";
+
+export function setQeiiVenueFloors(floors: QeiiFloorVector[] | null): void {
+  venueFloors = floors && floors.length ? new Map(floors.map((f) => [f.id, f])) : null;
+  venueVersion += 1;
+}
+/** Bumps whenever the venue-library copy changes; use as a memo key. */
+export function qeiiVenueFloorsVersion(): number {
+  return venueVersion;
+}
+export function qeiiFloorSource(id: string): QeiiFloorSource {
+  return venueFloors?.has(id) ? "venue-library" : "bundled";
+}
+/** Every QEII floor in issued order, venue-library copy first. */
+export function qeiiFloorVectors(): QeiiFloorVector[] {
+  return QEII_FLOOR_VECTORS.map((f) => venueFloors?.get(f.id) ?? f);
+}
 export function qeiiFloorVector(id: string): QeiiFloorVector | undefined {
-  return QEII_FLOOR_VECTORS.find((f) => f.id === id);
+  return venueFloors?.get(id) ?? QEII_FLOOR_VECTORS.find((f) => f.id === id);
+}
+
+/** Issued sheet page of a built-in floor (venue rows don't carry it). */
+export function qeiiFloorVectorBundledPage(id: string): number | undefined {
+  return QEII_FLOOR_VECTORS.find((f) => f.id === id)?.page;
 }

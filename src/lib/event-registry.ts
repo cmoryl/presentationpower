@@ -81,6 +81,7 @@ export const RESERVED_EVENT_IDS = new Set([
   "pillars",
   "presets",
   "production",
+  "venues",
 ]);
 
 const knowledge: EventTab = {

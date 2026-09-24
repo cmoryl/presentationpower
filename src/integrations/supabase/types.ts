@@ -2211,7 +2211,7 @@ export type Database = {
           created_by: string | null
           event_id: string
           floor_key: string
-          h: number
+          h: number | null
           id: string
           labels: Json
           marker: string
@@ -2224,14 +2224,15 @@ export type Database = {
           title: string
           updated_at: string
           updated_by: string | null
-          w: number
+          venue_floor_id: string | null
+          w: number | null
         }
         Insert: {
           created_at?: string
           created_by?: string | null
           event_id: string
           floor_key: string
-          h: number
+          h?: number | null
           id?: string
           labels?: Json
           marker?: string
@@ -2244,14 +2245,15 @@ export type Database = {
           title?: string
           updated_at?: string
           updated_by?: string | null
-          w: number
+          venue_floor_id?: string | null
+          w?: number | null
         }
         Update: {
           created_at?: string
           created_by?: string | null
           event_id?: string
           floor_key?: string
-          h?: number
+          h?: number | null
           id?: string
           labels?: Json
           marker?: string
@@ -2264,9 +2266,18 @@ export type Database = {
           title?: string
           updated_at?: string
           updated_by?: string | null
-          w?: number
+          venue_floor_id?: string | null
+          w?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "event_map_floors_venue_floor_id_fkey"
+            columns: ["venue_floor_id"]
+            isOneToOne: false
+            referencedRelation: "venue_floors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       event_pillar_versions: {
         Row: {
@@ -2498,6 +2509,38 @@ export type Database = {
           value?: string
         }
         Relationships: []
+      }
+      event_venues: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          event_id: string
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_venues_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       globallink_config: {
         Row: {
@@ -4537,6 +4580,77 @@ export type Database = {
         }
         Relationships: []
       }
+      venue_floors: {
+        Row: {
+          created_at: string
+          floor_key: string
+          h: number
+          id: string
+          labels: Json
+          marker: string
+          off_plan_labels: string[]
+          position: number
+          shapes: Json
+          source_kind: string
+          source_name: string | null
+          splits: Json
+          title: string
+          updated_at: string
+          updated_by: string | null
+          venue_id: string
+          w: number
+          wall_closures: Json
+        }
+        Insert: {
+          created_at?: string
+          floor_key: string
+          h: number
+          id?: string
+          labels?: Json
+          marker?: string
+          off_plan_labels?: string[]
+          position?: number
+          shapes?: Json
+          source_kind?: string
+          source_name?: string | null
+          splits?: Json
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          venue_id: string
+          w: number
+          wall_closures?: Json
+        }
+        Update: {
+          created_at?: string
+          floor_key?: string
+          h?: number
+          id?: string
+          labels?: Json
+          marker?: string
+          off_plan_labels?: string[]
+          position?: number
+          shapes?: Json
+          source_kind?: string
+          source_name?: string | null
+          splits?: Json
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          venue_id?: string
+          w?: number
+          wall_closures?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_floors_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venue_map_edits: {
         Row: {
           created_at: string
@@ -4672,6 +4786,51 @@ export type Database = {
           surveyed?: boolean
           updated_at?: string
           venue?: string
+        }
+        Relationships: []
+      }
+      venues: {
+        Row: {
+          address: string
+          city: string
+          country: string
+          created_at: string
+          created_by: string | null
+          id: string
+          logo_path: string | null
+          name: string
+          slug: string
+          source_note: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string
+          city?: string
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          logo_path?: string | null
+          name: string
+          slug: string
+          source_note?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          logo_path?: string | null
+          name?: string
+          slug?: string
+          source_note?: string
+          timezone?: string
+          updated_at?: string
         }
         Relationships: []
       }
