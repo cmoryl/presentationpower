@@ -11,6 +11,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Building2, Download, Layers, MapPin } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import { CityTemplateSection } from "@/components/events/CityTemplateSection";
 import { LONDON_PANELS, LONDON_VENUE, type LondonPanel } from "@/lib/next-london-signage";
 import {
   DEFAULT_CITY_BRIEF,
@@ -315,6 +316,8 @@ function NextCityPage() {
             </div>
           </div>
         </div>
+
+        <CityTemplateSection />
       </div>
     </AppShell>
   );
