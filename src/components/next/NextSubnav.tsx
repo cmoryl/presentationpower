@@ -37,11 +37,14 @@ export function NextSubnav() {
 
   return (
     <div className="mb-5">
+      <span className="block pb-1 text-[11px] font-semibold tracking-[0.14em] text-black/60 uppercase md:hidden dark:text-white/65">
+        {group.label}
+      </span>
       <nav
         aria-label={group.label}
-        className="flex flex-wrap items-end gap-x-5 gap-y-1 border-b border-black/10 dark:border-white/15"
+        className="-mx-1 flex flex-nowrap items-end gap-x-5 overflow-x-auto whitespace-nowrap border-b border-black/10 px-1 pt-0.5 [scrollbar-width:none] md:mx-0 md:flex-wrap md:gap-y-1 md:overflow-visible md:px-0 md:whitespace-normal dark:border-white/15"
       >
-        <span className="pb-2 text-[11px] font-semibold tracking-[0.14em] text-black/60 uppercase dark:text-white/65">
+        <span className="hidden pb-2 text-[11px] font-semibold tracking-[0.14em] text-black/60 uppercase md:inline dark:text-white/65">
           {group.label}
         </span>
         {siblings.map((p) => {
