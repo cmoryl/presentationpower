@@ -97,9 +97,10 @@ const CLASSIC_MANIFEST: Record<string, ClassicPresence> = {
   media: { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
   // TransPerfect Digital + DataForce classic marks sourced from
   // transperfectdigital.com and dataforcecommunity.transperfect.com.
-  // Stacked variants derived from the horizontal wordmarks (top/bottom split).
-  digital: { color: "png", white: "png", stackedColor: "png", stackedWhite: "png" },
-  dataforce: { color: "png", white: "png", stackedColor: "png", stackedWhite: "png" },
+  // HARD RULE: no approved stacked lockup exists for these. The wordmark is
+  // never split onto two lines — stacked slots reuse the horizontal lockup.
+  digital: { color: "png", white: "png" },
+  dataforce: { color: "png", white: "png" },
   // GlobalLink classic (BrandHub-supplied G-mark wordmark, horizontal only).
   globallink: { color: "svg", white: "svg" },
   // Trial Interactive (portfolio product under Life Sciences) — official
@@ -125,6 +126,9 @@ function classicSetFor(slug: string): DivisionLogoSet | undefined {
  * horizontal color file still uses NEXT for stacked/white variants until
  * their classic counterparts land on disk.
  */
+/** Divisions whose wordmark must never be split into a stacked form. */
+const HORIZONTAL_ONLY = new Set(["digital", "dataforce"]);
+
 function resolvedSetFor(slug: string): DivisionLogoSet | undefined {
   const next = NEXT[slug];
   const classic = classicSetFor(slug);
@@ -133,8 +137,10 @@ function resolvedSetFor(slug: string): DivisionLogoSet | undefined {
     color: classic?.color ?? next?.color,
     black: next?.black ?? classic?.color,
     white: classic?.white ?? next?.white,
-    stackedColor: classic?.stackedColor ?? next?.stackedColor,
-    stackedWhite: classic?.stackedWhite ?? next?.stackedWhite,
+    stackedColor:
+      classic?.stackedColor ?? (HORIZONTAL_ONLY.has(slug) ? classic?.color : next?.stackedColor),
+    stackedWhite:
+      classic?.stackedWhite ?? (HORIZONTAL_ONLY.has(slug) ? classic?.white : next?.stackedWhite),
   };
 }
 
