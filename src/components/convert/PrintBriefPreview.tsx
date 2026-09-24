@@ -37,7 +37,11 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
     const layout = result.target.layout ?? "sheet";
     const k = Math.min(trim.width, trim.height) / 8.268;
     const u = (n: number) => Math.max(1, Math.round(n * k));
-    const big = layout === "poster" || layout === "banner";
+    const banner = layout === "banner";
+    const big = layout === "poster" || banner;
+    // Tall banners read from 2-3 m away: body/points/stat scale up and the
+    // middle zone stretches so copy fills the full drop, not just the top.
+    const bb = banner ? 2.3 : 1;
     const land = layout === "landscape";
     const pad = Math.round(Math.max(0.25, 0.6 * k) * CSS_DPI);
     const L = land ? { gridColumn: 1 } : {};
@@ -68,7 +72,8 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
             ...(layout === "landscape"
               ? { display: "grid", gridTemplateColumns: "1.15fr 1fr", gridAutoRows: "min-content", gridAutoFlow: "row dense", columnGap: u(28), alignContent: "start" }
               : {}),
-            ...(big ? { justifyContent: "center" } : {}),
+            ...(layout === "poster" ? { justifyContent: "center" } : {}),
+            ...(banner ? { gap: u(34) } : {}),
           }}
         >
           <div style={{ height: u(6), width: u(96), background: accent, gridColumn: layout === "landscape" ? "1 / -1" : undefined }} />
@@ -76,7 +81,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
           {content.eyebrow ? (
             <p
               style={{
-                fontSize: t.eyebrowPx,
+                fontSize: t.eyebrowPx * (banner ? 1.8 : 1),
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 fontWeight: 600,
@@ -119,7 +124,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
           {content.body ? (
             <p
               style={{
-                fontSize: caseStudy ? t.bodyPx * 1.35 : t.bodyPx * 1.55,
+                fontSize: caseStudy ? t.bodyPx * 1.35 : t.bodyPx * 1.55 * bb,
                 lineHeight: t.bodyLeading,
                 margin: 0,
                 maxWidth: "62ch",
@@ -136,8 +141,9 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
               style={{
                 display: "grid",
                 gridTemplateColumns: caseStudy || layout !== "sheet" || k < 0.8 ? "1fr" : "1fr 1fr",
-                gap: u(12),
+                gap: u(banner ? 28 : 12),
                 margin: 0,
+                ...(banner ? { flex: 1, alignContent: "space-evenly" } : {}),
                 padding: 0,
                 listStyle: "none",
                 ...(land ? { gridColumn: 2, gridRow: "2 / span 3", alignContent: "start" } : {}),
@@ -147,23 +153,33 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
                 <li
                   key={`${i}-${p.slice(0, 12)}`}
                   style={{
-                    fontSize: t.pointPx,
+                    fontSize: t.pointPx * bb * (banner ? 1.3 : 1),
                     lineHeight: t.bodyLeading,
-                    paddingLeft: u(12),
-                    borderLeft: `${u(3)}px solid ${accent}`,
+                    paddingLeft: u(banner ? 20 : 12),
+                    borderLeft: `${u(banner ? 6 : 3)}px solid ${accent}`,
+                    fontWeight: banner ? 500 : undefined,
                   }}
                 >
-                  {p}
+                  {banner && p.includes(" — ") ? (
+                    <>
+                      <span style={{ display: "block", fontWeight: 700, fontSize: "1.35em", lineHeight: 1.15, marginBottom: u(10) }}>
+                        {p.split(" — ")[0]}
+                      </span>
+                      <span style={{ fontWeight: 400 }}>{p.split(" — ").slice(1).join(" — ")}</span>
+                    </>
+                  ) : (
+                    p
+                  )}
                 </li>
               ))}
             </ul>
           ) : null}
 
           {content.stat ? (
-            <div style={{ marginTop: big ? u(24) : "auto", display: "flex", alignItems: "baseline", gap: u(12), ...(land ? { gridColumn: 2 } : {}) }}>
+            <div style={{ marginTop: banner ? 0 : big ? u(24) : "auto", ...(banner ? { flexDirection: "column" as const, alignItems: "flex-start" as const, borderTop: `${u(3)}px solid ${accent}`, paddingTop: u(24), ...(content.points?.length ? {} : { flex: 1, justifyContent: "center" as const }) } : {}), display: "flex", alignItems: banner ? "flex-start" : "baseline", gap: u(12), ...(land ? { gridColumn: 2 } : {}) }}>
               <span
                 style={{
-                  fontSize: t.statPx,
+                  fontSize: t.statPx * (banner ? (content.points?.length ? 1.6 : 2.6) : 1),
                   fontWeight: 700,
                   lineHeight: 1,
                   letterSpacing: "-0.03em",
@@ -172,7 +188,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
               >
                 {content.stat.value}
               </span>
-              <span style={{ fontSize: t.bodyPx, color: "#666666", maxWidth: "24ch" }}>
+              <span style={{ fontSize: t.bodyPx * (banner ? 2 : 1), color: "#666666", maxWidth: "24ch" }}>
                 {content.stat.label}
               </span>
             </div>
@@ -188,7 +204,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
               display: "flex",
               justifyContent: "space-between",
               gap: u(16),
-              fontSize: t.eyebrowPx,
+              fontSize: t.eyebrowPx * (banner ? 1.8 : 1),
               color: "#666666",
             }}
           >

@@ -243,7 +243,7 @@ function EXTRA_PRINT_TARGETS(): AdaptTarget[] {
     make("tent-card", "Table tent · A6 portrait", mm(105, 148), "poster",
       { headline: 60, body: 140, points: 2, pointChars: 50 }, ["eyebrow", "headline", "body", "points", "stat"], 1.2),
     make("rollup-banner", "Roll-up banner · 850 × 2000 mm", mm(850, 2000), "banner",
-      { headline: 60, body: 160, points: 3, pointChars: 50 }, ["eyebrow", "headline", "body", "points", "stat"], 1.8),
+      { headline: 80, body: 280, points: 5, pointChars: 90 }, ["eyebrow", "headline", "body", "points", "stat", "footnote"], 1.8),
   ];
 }
 
