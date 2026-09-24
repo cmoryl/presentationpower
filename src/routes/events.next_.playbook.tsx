@@ -147,19 +147,6 @@ function PlaybookPage() {
           </p>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat value={`${NEXT_VENUE_TEMPLATES.length}`} label="Reusable sign families" />
-          <Stat
-            value={`${Math.round(audit.reuse * 100)}%`}
-            label={`Of the ${audit.total} London signs start from a family`}
-          />
-          <Stat value={`${grounds.length}`} label="Approved gradient grounds in use" />
-          <Stat
-            value={`${LONDON_SCENES.length}`}
-            label={`In-event views (${photoScenes.length} event photographs)`}
-          />
-        </div>
-
         <h2 className="mt-10 flex items-center gap-2 text-lg font-semibold tracking-tight text-[#03002C]">
           <ListChecks size={16} /> Sign families
         </h2>

@@ -55,11 +55,7 @@ import {
   downloadFloorMapSvg,
   downloadMapCsv,
 } from "@/lib/next-london-floormap-export";
-import {
-  clearVenuePin,
-  listVenuePins,
-  saveVenuePins,
-} from "@/lib/venue-plan.functions";
+import { clearVenuePin, listVenuePins, saveVenuePins } from "@/lib/venue-plan.functions";
 import { pinsToOverrides, type VenuePin } from "@/lib/venue-plan";
 import {
   DEFAULT_MAP_DESIGN,
@@ -103,8 +99,8 @@ export const Route = createFileRoute("/events/next_/london_/maps")({
   // Arriving from the room schedule may name a floor and a room; both optional.
   validateSearch: (search: Record<string, unknown>): { sheet?: string; room?: string } => {
     const out: { sheet?: string; room?: string } = {};
-    if (typeof search['sheet'] === "string" && search['sheet']) out.sheet = search['sheet'];
-    if (typeof search['room'] === "string" && search['room']) out.room = search['room'];
+    if (typeof search["sheet"] === "string" && search["sheet"]) out.sheet = search["sheet"];
+    if (typeof search["room"] === "string" && search["room"]) out.room = search["room"];
     return out;
   },
   head: () => ({
@@ -257,7 +253,6 @@ function LondonMapsPage() {
     [panels, userId, writePins],
   );
 
-
   useEffect(() => {
     if (!userId) return;
     let live = true;
@@ -354,7 +349,6 @@ function LondonMapsPage() {
     [myEdits, overrides, pins],
   );
 
-
   useEffect(() => {
     if (floors.length && !floors.some((f) => f.id === floor)) setFloor(floors[0]!.id);
   }, [floors, floor]);
@@ -434,7 +428,6 @@ function LondonMapsPage() {
       })
       .catch(() => setPinState("offline"));
   }, [mineToSignOff, overrides, panels, userId, writePins]);
-
 
   // The large window is a modal surface: Escape closes it and the page behind
   // stops scrolling so the plan owns the screen.
@@ -545,24 +538,6 @@ function LondonMapsPage() {
               or booth wall can be packed with its own location card. Plans are schematic — drag any
               pin to the real position and every download follows.
             </p>
-            <dl className="mt-7 flex flex-wrap gap-x-9 gap-y-4">
-              {[
-                { k: "Floors mapped", v: String(floors.length) },
-                {
-                  k: "Assets pinned",
-                  v: String(panels.filter((p) => londonFloorPlan(p.floor)).length),
-                },
-                { k: "Positions marked", v: String(correctedCount) },
-                { k: "Signed off for this venue", v: String(confirmedCount) },
-              ].map((s) => (
-                <div key={s.k}>
-                  <dd className="text-2xl font-semibold tracking-tight text-[#03002C]">{s.v}</dd>
-                  <dt className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/60">
-                    {s.k}
-                  </dt>
-                </div>
-              ))}
-            </dl>
             <div className="mt-7 flex flex-wrap gap-3">
               <button
                 type="button"

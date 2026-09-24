@@ -91,9 +91,8 @@ function LondonSchedulePage() {
             What runs in each room, and when
           </h1>
           <p className="mt-3 max-w-[70ch] text-sm leading-relaxed text-[#03002C]/70">
-            {entries.length} recorded spaces and {totalSessions} sessions, taken from the
-            issued event space schedule and the issued division programmes. Open any
-            room on the floor plan to see exactly where it sits.
+            Every room and session is taken from the issued event space schedule and the issued
+            division programmes. Open any room on the floor plan to see exactly where it sits.
           </p>
 
           <div className="mt-5 flex flex-wrap items-center gap-2">
@@ -119,8 +118,7 @@ function LondonSchedulePage() {
                 className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/20 bg-white px-4 py-2 text-[13px] font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
               >
                 <Clock className="h-4 w-4 text-[#003FC7]" />
-                {showShared ? "Hide" : "Show"} {shared.length} times with more than one room
-                busy
+                {showShared ? "Hide" : "Show"} {shared.length} times with more than one room busy
               </button>
             ) : null}
           </div>
@@ -128,9 +126,7 @@ function LondonSchedulePage() {
 
         {showShared ? (
           <section className="mt-7">
-            <h2 className="text-lg font-semibold text-[#03002C]">
-              Same time, more than one room
-            </h2>
+            <h2 className="text-lg font-semibold text-[#03002C]">Same time, more than one room</h2>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
               {shared.map((slot) => (
                 <div key={`${slot.meta}|${slot.time}`} className={card}>
