@@ -316,9 +316,35 @@ export async function saveDeckToCloudCore(
 
       notes: s.notes ?? null,
     }));
+    // (deck_id, position) is unique, so a reorder or a deleted slide would make
+    // the upsert collide with rows still holding the old positions. Park every
+    // saved row on a unique negative position first, then write the new order.
+    const parked: { id: string; position: number }[] = [];
+    {
+      const { data: posRows } = await sb
+        .from("deck_slides")
+        .select("id, position")
+        .eq("deck_id", deckUuid);
+      const list = Array.isArray(posRows) ? (posRows as { id: string; position: number }[]) : [];
+      for (let i = 0; i < list.length; i++) {
+        const { error } = await sb
+          .from("deck_slides")
+          .update({ position: -(i + 1) })
+          .eq("id", list[i].id);
+        if (error) throw new Error(error.message);
+        parked.push(list[i]);
+      }
+    }
+
     // Ids are deterministic, so an upsert updates in place instead of colliding.
     const { error: slideErr } = await sb.from("deck_slides").upsert(rows);
-    if (slideErr) throw new Error(slideErr.message);
+    if (slideErr) {
+      // Put the saved order back so a failed save changes nothing.
+      for (const r of parked) {
+        await sb.from("deck_slides").update({ position: r.position }).eq("id", r.id);
+      }
+      throw new Error(slideErr.message);
+    }
 
     // Only now remove slides the user actually deleted.
     const keep = new Set(rows.map((r) => r.id));
