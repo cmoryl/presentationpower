@@ -136,7 +136,10 @@ function ConvertPage() {
         body: draft.body || undefined,
       };
     }
-    return contentFromSlide({ content: slide.content, notes: slide.notes });
+    return contentFromSlide(
+      { content: slide.content, notes: slide.notes },
+      byId(MODULE_VARIANTS, slide.variantId)?.name,
+    );
   }, [manual, slide, draft]);
 
   const brandId = deck?.brandModeId ?? BRAND_MODES[0].id;
