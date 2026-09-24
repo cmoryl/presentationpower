@@ -34,6 +34,8 @@ export type EditionDivisionTilesProps = {
   onSelect: (divisionId: string | null) => void;
   /** Where the filtered booth/signage list lives, for the focus summary link. */
   assetsAnchor?: string;
+  /** False when no sign schedule has been issued: tiles say so instead of showing 0. */
+  signageIssued?: boolean;
 };
 
 export function editionDivisionCounts(
@@ -55,6 +57,7 @@ export function EditionDivisionTiles({
   selected,
   onSelect,
   assetsAnchor,
+  signageIssued = true,
 }: EditionDivisionTilesProps) {
   const focus = NEXT_DIVISIONS.find((d) => d.id === selected) ?? null;
   const focusCounts = focus ? editionDivisionCounts(focus, countsFor(focus.id), hasProgramme) : null;
@@ -119,10 +122,17 @@ export function EditionDivisionTiles({
               </span>
               <span className="flex items-baseline justify-between gap-2 border-t border-black/10 px-3 py-2">
                 <span className="truncate text-[12.5px] font-semibold text-[#03002C]">{d.name}</span>
-                <span className="shrink-0 font-mono text-[11px] text-[#03002C]/65">
-                  {total} {total === 1 ? "asset" : "assets"}
-                </span>
+                {signageIssued ? (
+                  <span className="shrink-0 font-mono text-[11px] text-[#03002C]/70">
+                    {total} {total === 1 ? "asset" : "assets"}
+                  </span>
+                ) : null}
               </span>
+              {!signageIssued ? (
+                <span className="border-t border-black/10 px-3 py-1.5 text-[11px] text-[#03002C]/70">
+                  Signage programme not yet issued
+                </span>
+              ) : null}
             </button>
           );
         })}
@@ -141,7 +151,9 @@ export function EditionDivisionTiles({
                 { k: "Room signage", v: focusCounts.signage, icon: Signpost },
                 { k: "Track agenda", v: focusCounts.agendas, icon: CalendarDays },
                 { k: "Collateral kit", v: focusCounts.collateral, icon: Presentation },
-              ].map(({ k, v, icon: Icon }) => (
+              ]
+                .filter((x) => signageIssued || (x.k !== "Booths" && x.k !== "Room signage"))
+                .map(({ k, v, icon: Icon }) => (
                 <div key={k} className="rounded-md border border-black/10 p-3">
                   <dt className="flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#03002C]/60">
                     <Icon className="h-3.5 w-3.5" aria-hidden /> {k}
@@ -150,6 +162,11 @@ export function EditionDivisionTiles({
                 </div>
               ))}
             </dl>
+            {!signageIssued ? (
+              <p className="mt-3 text-[13px] text-[#03002C]/70">
+                Booths and room signage appear here once this edition's signage programme is issued.
+              </p>
+            ) : null}
             <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[13px] font-semibold">
               {assetsAnchor && focusCounts.booths + focusCounts.signage > 0 ? (
                 <a href={`#${assetsAnchor}`} className="text-[#003FC7] hover:underline">
