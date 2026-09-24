@@ -620,7 +620,7 @@ function LondonMapsPage() {
                   ? `Positions are saved against ${LONDON_VENUE.venue} for the whole crew — ${confirmedCount} signed off, and they carry forward to next year.`
                   : "Marks are held in this browser until they are signed off against the venue."}{" "}
               <Link to="/events/next/venues" className="font-semibold underline">
-                Floor plan standards
+                Floor-plan standards
               </Link>{" "}
               <Link to="/events/next/london/schedule" className="font-semibold underline">
                 Room schedule

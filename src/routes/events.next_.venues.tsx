@@ -195,10 +195,10 @@ function VenuePlansPage() {
             }}
           >
             <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#03002C]/70">
-              Floor plan standards · NEXT series
+              Venues &amp; floor-plan standards · NEXT series
             </p>
             <h1 className="mt-3 max-w-[30ch] text-3xl font-bold leading-[1.05] tracking-tight text-[#03002C] sm:text-[2.6rem]">
-              One venue format, every city
+              Floor-plan standards
             </h1>
             <p className="mt-4 max-w-[64ch] text-sm leading-relaxed text-[#03002C]/75 sm:text-base">
               Fill a venue in once — floors, rooms, doors and which way the plan faces — and it

@@ -13,6 +13,7 @@ export type NextWorkspaceGroupId =
   | "programme"
   | "signage"
   | "london"
+  | "san-francisco"
   | "reference";
 
 /** Which cities a page applies to — the second thing people get wrong. */
@@ -38,6 +39,8 @@ export type NextWorkspacePath =
   | "/events/next/london/template"
   | "/events/next/london/revise"
   | "/events/next/london/booklet"
+  | "/events/next/san-francisco"
+  | "/events/next/california"
   | "/knowledge/brand-guides/next-2026"
   | "/knowledge/brand-guides/next-2026-build"
   | "/decks/next-palette";
@@ -52,6 +55,12 @@ export type NextWorkspacePage = {
   scope: NextWorkspaceScope;
   /** Shown in the hub directory only; keeps the pill row short. */
   detail?: string;
+  /**
+   * Pages folded into another menu item: the tab row shows only the parent,
+   * and it stays underlined while you are on this page. Each page still has
+   * its own address so old links keep working.
+   */
+  navAs?: NextWorkspacePath;
 };
 
 export const NEXT_WORKSPACE_GROUPS: Array<{
@@ -62,7 +71,7 @@ export const NEXT_WORKSPACE_GROUPS: Array<{
   {
     id: "plan",
     label: "Plan the event",
-    blurb: "Venue facts, floor plans and the sign schedule a city starts from.",
+    blurb: "Start a city, keep venue records and floor-plan standards, and learn from past venues.",
   },
   {
     id: "programme",
@@ -80,6 +89,11 @@ export const NEXT_WORKSPACE_GROUPS: Array<{
     blurb: "The live QEII Centre job: panel kit, install maps, revisions.",
   },
   {
+    id: "san-francisco",
+    label: "San Francisco 2026",
+    blurb: "InterContinental San Francisco: stage gates and the California partner kiosks.",
+  },
+  {
     id: "reference",
     label: "Reference",
     blurb: "Approved brand guide, build reference and the palette deck.",
@@ -95,38 +109,40 @@ export const NEXT_WORKSPACE_PAGES: NextWorkspacePage[] = [
     scope: "every-city",
   },
   {
+    to: "/events/next/city",
+    label: "Plan a new city",
+    purpose: "The guided start for a city: venue record, floor plans, sign schedule, city templates.",
+    group: "plan",
+    scope: "every-city",
+  },
+  {
     to: "/events/next/locations",
-    label: "Venue directory & records",
-    purpose: "The editable record per location: address, map, opening times, photo.",
+    label: "Venues & floor-plan standards",
+    purpose: "The editable record per location and the one floor-plan format every city uses.",
     group: "plan",
     scope: "every-city",
     detail: "The delegate guide and practical pages read this record.",
   },
   {
     to: "/events/next/venues",
-    label: "Floor plan standards",
+    label: "Floor-plan standards",
     purpose: "One floor-plan format for every city.",
     group: "plan",
     scope: "every-city",
+    navAs: "/events/next/locations",
   },
   {
     to: "/events/next/venue",
-    label: "Provisional venue intake",
-    purpose: "Provisional plans and reissued signage for a venue not yet confirmed.",
+    label: "Provisional floor plans",
+    purpose: "Step 2 of planning a city: provisional plans until the venue is confirmed.",
     group: "plan",
     scope: "every-city",
-  },
-  {
-    to: "/events/next/city",
-    label: "Start a new city",
-    purpose: "Build a new city's sign schedule from the London families.",
-    group: "plan",
-    scope: "every-city",
+    navAs: "/events/next/city",
   },
   {
     to: "/events/next/playbook",
-    label: "Signage & hardware playbook",
-    purpose: "The reusable signage families and how many of each a venue needs.",
+    label: "Playbook & knowledge",
+    purpose: "The reusable signage families, and what previous venues taught us.",
     group: "plan",
     scope: "every-city",
   },
@@ -136,6 +152,7 @@ export const NEXT_WORKSPACE_PAGES: NextWorkspacePage[] = [
     purpose: "Ask what previous venues taught us before you commit.",
     group: "plan",
     scope: "every-city",
+    navAs: "/events/next/playbook",
   },
   {
     to: "/events/next/agendas",
@@ -195,7 +212,7 @@ export const NEXT_WORKSPACE_PAGES: NextWorkspacePage[] = [
   },
   {
     to: "/events/next/london",
-    label: "London kit",
+    label: "London 2026",
     purpose: "The QEII Centre panel kit — every print area and its live file.",
     group: "london",
     scope: "london",
@@ -220,6 +237,20 @@ export const NEXT_WORKSPACE_PAGES: NextWorkspacePage[] = [
     purpose: "Publish a signage revision the print vendor sees as in force.",
     group: "london",
     scope: "london",
+  },
+  {
+    to: "/events/next/san-francisco",
+    label: "San Francisco 2026",
+    purpose: "Stage gates, the partner kiosks and what waits on the venue intake.",
+    group: "san-francisco",
+    scope: "every-city",
+  },
+  {
+    to: "/events/next/california",
+    label: "California partner kiosks",
+    purpose: "The 45 × 96 in partner kiosk templates with .ai, .pdf and .svg downloads.",
+    group: "san-francisco",
+    scope: "every-city",
   },
   {
     to: "/knowledge/brand-guides/next-2026",
@@ -250,6 +281,42 @@ export const NEXT_WORKSPACE_BY_PATH: Record<string, NextWorkspacePage> = Object.
 
 export function nextWorkspaceGroup(id: NextWorkspaceGroupId): NextWorkspacePage[] {
   return NEXT_WORKSPACE_PAGES.filter((p) => p.group === id);
+}
+
+/** The menu items for a group — pages folded into another item are left out. */
+export function nextWorkspaceMenu(id: NextWorkspaceGroupId): NextWorkspacePage[] {
+  return nextWorkspaceGroup(id).filter((p) => !p.navAs);
+}
+
+/** The menu item that stays underlined for a page (itself, or its parent). */
+export function nextWorkspaceMenuPath(page: NextWorkspacePage | null): NextWorkspacePath | null {
+  return page ? (page.navAs ?? page.to) : null;
+}
+
+/**
+ * Breadcrumb trail for a NEXT page: Events / NEXT / group-or-city / page.
+ * The NEXT hub itself stops at "NEXT".
+ */
+export function nextWorkspaceCrumbs(
+  page: NextWorkspacePage | null,
+): Array<{ label: string; to?: NextWorkspacePath | "/events" }> {
+  const crumbs: Array<{ label: string; to?: NextWorkspacePath | "/events" }> = [
+    { label: "Events", to: "/events" },
+    { label: "NEXT", to: "/events/next" },
+  ];
+  if (!page || page.to === "/events/next") return crumbs;
+  const group = NEXT_WORKSPACE_GROUPS.find((g) => g.id === page.group);
+  const cityHome =
+    page.group === "london" ? "/events/next/london" : page.group === "san-francisco" ? "/events/next/san-francisco" : null;
+  if (cityHome && cityHome !== page.to) {
+    crumbs.push({ label: NEXT_WORKSPACE_BY_PATH[cityHome]?.label ?? group?.label ?? "", to: cityHome });
+  } else if (!cityHome && group) {
+    crumbs.push({ label: group.label });
+  }
+  const parent = page.navAs ? NEXT_WORKSPACE_BY_PATH[page.navAs] : null;
+  if (parent) crumbs.push({ label: parent.label, to: parent.to });
+  crumbs.push({ label: page.label });
+  return crumbs;
 }
 
 /**

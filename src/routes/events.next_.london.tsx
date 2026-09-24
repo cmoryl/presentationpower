@@ -116,6 +116,7 @@ import {
 import { nextLogoFamily } from "@/lib/next-logo-vectors";
 import { londonPanelFamily } from "@/lib/next-london-branding";
 import { EditionDivisionTiles } from "@/components/events/EditionDivisionTiles";
+import { CitySectionBar, LONDON_SECTIONS } from "@/components/events/CitySectionBar";
 import logoSetAsset from "@/assets/next-2026-logo-set.zip.asset.json";
 import {
   auditAi,
@@ -975,7 +976,7 @@ function LondonSignagePage() {
               params={{ eventId: "london" }}
               className="ml-4 inline-flex items-center gap-1 text-[13px] font-semibold text-[#003FC7] hover:underline"
             >
-              Event home
+              Readiness checklist
             </Link>
           </>
         )}
@@ -990,7 +991,7 @@ function LondonSignagePage() {
           </p>
         )}
 
-        <header className="mt-5 overflow-hidden rounded-2xl border border-black/10">
+        <header id="city-overview" className="mt-5 scroll-mt-24 overflow-hidden rounded-2xl border border-black/10">
           <div
             className="px-6 py-9 sm:px-10 sm:py-12"
             style={{
@@ -1082,6 +1083,8 @@ function LondonSignagePage() {
             </div>
           </div>
         </header>
+
+        <CitySectionBar sections={LONDON_SECTIONS} />
 
         <EditionDivisionTiles
           editionLabel="London 2026"
@@ -1337,7 +1340,7 @@ function LondonSignagePage() {
           ))}
         </section>
         {/* Reference: spec, grounds and agendas sit below the panels so they never push them down. */}
-        <section aria-label="Reference" className="mt-12 border-t border-black/10">
+        <section id="london-reference" aria-label="Reference" className="mt-12 scroll-mt-24 border-t border-black/10">
           <h2 className="pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/70">
             Reference
           </h2>
