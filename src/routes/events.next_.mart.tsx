@@ -92,8 +92,6 @@ function MartPage() {
           </span>
         </Link>
 
-
-
         {/* Pillar signage — live editable files */}
         <section className="mt-10">
           <div className="flex flex-wrap items-center justify-between gap-3">

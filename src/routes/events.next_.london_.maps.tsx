@@ -55,11 +55,7 @@ import {
   downloadFloorMapSvg,
   downloadMapCsv,
 } from "@/lib/next-london-floormap-export";
-import {
-  clearVenuePin,
-  listVenuePins,
-  saveVenuePins,
-} from "@/lib/venue-plan.functions";
+import { clearVenuePin, listVenuePins, saveVenuePins } from "@/lib/venue-plan.functions";
 import { pinsToOverrides, type VenuePin } from "@/lib/venue-plan";
 import {
   DEFAULT_MAP_DESIGN,
@@ -103,8 +99,8 @@ export const Route = createFileRoute("/events/next_/london_/maps")({
   // Arriving from the room schedule may name a floor and a room; both optional.
   validateSearch: (search: Record<string, unknown>): { sheet?: string; room?: string } => {
     const out: { sheet?: string; room?: string } = {};
-    if (typeof search['sheet'] === "string" && search['sheet']) out.sheet = search['sheet'];
-    if (typeof search['room'] === "string" && search['room']) out.room = search['room'];
+    if (typeof search["sheet"] === "string" && search["sheet"]) out.sheet = search["sheet"];
+    if (typeof search["room"] === "string" && search["room"]) out.room = search["room"];
     return out;
   },
   head: () => ({
@@ -257,7 +253,6 @@ function LondonMapsPage() {
     [panels, userId, writePins],
   );
 
-
   useEffect(() => {
     if (!userId) return;
     let live = true;
@@ -354,7 +349,6 @@ function LondonMapsPage() {
     [myEdits, overrides, pins],
   );
 
-
   useEffect(() => {
     if (floors.length && !floors.some((f) => f.id === floor)) setFloor(floors[0]!.id);
   }, [floors, floor]);
@@ -434,7 +428,6 @@ function LondonMapsPage() {
       })
       .catch(() => setPinState("offline"));
   }, [mineToSignOff, overrides, panels, userId, writePins]);
-
 
   // The large window is a modal surface: Escape closes it and the page behind
   // stops scrolling so the plan owns the screen.

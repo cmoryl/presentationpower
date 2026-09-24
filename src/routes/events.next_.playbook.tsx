@@ -147,7 +147,6 @@ function PlaybookPage() {
           </p>
         </div>
 
-
         <h2 className="mt-10 flex items-center gap-2 text-lg font-semibold tracking-tight text-[#03002C]">
           <ListChecks size={16} /> Sign families
         </h2>
