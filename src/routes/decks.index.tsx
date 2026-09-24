@@ -31,9 +31,15 @@ export const Route = createFileRoute("/decks/")({
   head: () => ({
     meta: [
       { title: "All decks · TransPerfect Element" },
-      { name: "description", content: "Start a new on-brand deck or pick up any deck in your workspace." },
+      {
+        name: "description",
+        content: "Start a new on-brand deck or pick up any deck in your workspace.",
+      },
       { property: "og:title", content: "Your decks · TransPerfect Element" },
-      { property: "og:description", content: "Start a new on-brand deck or pick up any deck in your workspace." },
+      {
+        property: "og:description",
+        content: "Start a new on-brand deck or pick up any deck in your workspace.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -240,12 +246,12 @@ function DecksIndex() {
       // never when that name is shared with another deck.
       const nameSafe = !ambiguousTitles.has(key);
       const s = savedId
-        ? statsById.get(savedId) ?? (nameSafe ? statsByTitle.get(key) : undefined)
+        ? (statsById.get(savedId) ?? (nameSafe ? statsByTitle.get(key) : undefined))
         : nameSafe
           ? statsByTitle.get(key)
           : undefined;
       const review = savedId
-        ? reviewById.get(savedId) ?? (nameSafe ? reviewByTitle.get(key) : undefined)
+        ? (reviewById.get(savedId) ?? (nameSafe ? reviewByTitle.get(key) : undefined))
         : nameSafe
           ? reviewByTitle.get(key)
           : undefined;
@@ -456,180 +462,186 @@ function DecksIndex() {
 
       {/* Filter bar */}
       {hasAny && (
-      <div className="rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
-        {showFilters && (
-        <>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative min-w-[240px] flex-1">
-            <label htmlFor="deck-search" className="sr-only">
-              Search decks
-            </label>
-            <Search
-              size={14}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 dark:text-primary-foreground/40"
-            />
-            <input
-              id="deck-search"
-              type="search"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search title, client, or industry"
-              className="min-h-11 w-full rounded-md border border-black/20 bg-white pl-9 pr-10 text-sm outline-none transition placeholder:text-black/55 focus-visible:border-[#003FC7] focus-visible:ring-2 focus-visible:ring-[#003FC7]/30 dark:border-white/20 dark:bg-white/[0.04] dark:placeholder:text-white/55"
-            />
-            {q && (
-              <button
-                type="button"
-                onClick={() => setQ("")}
-                className="absolute right-1.5 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-black/70 hover:bg-black/5 dark:text-white/70 dark:hover:bg-white/10"
-                aria-label="Clear search"
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <label htmlFor="deck-sort" className="text-xs font-medium text-black/70 dark:text-white/70">
-              Sort
-            </label>
-            <select
-              id="deck-sort"
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortKey)}
-              className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/40 dark:border-white/20 dark:bg-white/[0.04]"
-            >
-              <option value="recent">Recently created</option>
-              <option value="alpha">Alphabetical</option>
-              <option value="views">Most viewed</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="mt-3 flex flex-wrap items-center gap-3">
-          <ChipGroup label="Type">
-            <Chip active={kind === "all"} onClick={() => setKind("all")}>
-              All
-            </Chip>
-            <Chip active={kind === "decks"} onClick={() => setKind("decks")}>
-              Decks
-            </Chip>
-            <Chip active={kind === "templates"} onClick={() => setKind("templates")}>
-              Templates
-            </Chip>
-          </ChipGroup>
-          {signedIn && (
-            <ChipGroup label="Reach">
-              <Chip active={reach === "all"} onClick={() => setReach("all")}>
-                All
-              </Chip>
-              <Chip active={reach === "unseen"} onClick={() => setReach("unseen")}>
-                Never viewed
-              </Chip>
-              <Chip active={reach === "shared"} onClick={() => setReach("shared")}>
-                Shared
-              </Chip>
-            </ChipGroup>
-          )}
-          <div className="flex items-center gap-2">
-            <label htmlFor="deck-age" className="text-xs font-medium text-black/70 dark:text-white/70">
-              Created
-            </label>
-            <select
-              id="deck-age"
-              value={age}
-              onChange={(e) => setAge(e.target.value as Age)}
-              className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/40 dark:border-white/20 dark:bg-white/[0.04]"
-            >
-              <option value="any">Any time</option>
-              <option value="3m">Over 3 months ago</option>
-              <option value="6m">Over 6 months ago</option>
-              <option value="12m">Over 12 months ago</option>
-            </select>
-          </div>
-          {active && (
-            <button
-              type="button"
-              onClick={clearAll}
-              className="ml-auto min-h-11 rounded-md px-3 text-sm font-medium text-[#003FC7] underline-offset-2 hover:underline dark:text-[#A1FBF9]"
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
-        </>
-        )}
-
-        {/* Bulk selection — clearing out a long list of old work in one move. */}
-        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3 dark:border-white/10">
-          <button
-            type="button"
-            onClick={() => {
-              setSelectMode((on) => !on);
-              setSelected(new Set());
-            }}
-            className={`inline-flex items-center gap-1.5 min-h-11 rounded-md px-3 text-sm font-semibold transition ${
-              selectMode
-                ? "bg-[#03002C] text-white dark:bg-[#A1FBF9] dark:text-[#03002C]"
-                : "border border-black/20 bg-white text-black/80 hover:bg-black/5 dark:border-white/20 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
-            }`}
-          >
-            <CheckSquare size={13} /> {selectMode ? "Done selecting" : "Select"}
-          </button>
-          {selectMode && (
+        <div className="rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
+          {showFilters && (
             <>
-              <button
-                type="button"
-                onClick={() => setSelected(new Set(shownItems.map((i) => i.id)))}
-                className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
-              >
-                Select all shown ({shownItems.length})
-              </button>
-              {selectedItems.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setSelected(new Set())}
-                  className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
-                >
-                  Clear selection
-                </button>
-              )}
-              <span className="text-sm text-black/70 dark:text-white/70" aria-live="polite">
-                {selectedItems.length} selected
-              </span>
-              <button
-                type="button"
-                disabled={selectedItems.length === 0 || bulkBusy}
-                onClick={bulkDelete}
-                className="ml-auto inline-flex items-center gap-1.5 min-h-11 rounded-md bg-red-600 px-4 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
-              >
-                <Trash2 size={13} />
-                {bulkBusy
-                  ? "Deleting…"
-                  : `Delete selected${selectedItems.length ? ` (${selectedItems.length})` : ""}`}
-              </button>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative min-w-[240px] flex-1">
+                  <label htmlFor="deck-search" className="sr-only">
+                    Search decks
+                  </label>
+                  <Search
+                    size={14}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 dark:text-primary-foreground/40"
+                  />
+                  <input
+                    id="deck-search"
+                    type="search"
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    placeholder="Search title, client, or industry"
+                    className="min-h-11 w-full rounded-md border border-black/20 bg-white pl-9 pr-10 text-sm outline-none transition placeholder:text-black/55 focus-visible:border-[#003FC7] focus-visible:ring-2 focus-visible:ring-[#003FC7]/30 dark:border-white/20 dark:bg-white/[0.04] dark:placeholder:text-white/55"
+                  />
+                  {q && (
+                    <button
+                      type="button"
+                      onClick={() => setQ("")}
+                      className="absolute right-1.5 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-black/70 hover:bg-black/5 dark:text-white/70 dark:hover:bg-white/10"
+                      aria-label="Clear search"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <label
+                    htmlFor="deck-sort"
+                    className="text-xs font-medium text-black/70 dark:text-white/70"
+                  >
+                    Sort
+                  </label>
+                  <select
+                    id="deck-sort"
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value as SortKey)}
+                    className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/40 dark:border-white/20 dark:bg-white/[0.04]"
+                  >
+                    <option value="recent">Recently created</option>
+                    <option value="alpha">Alphabetical</option>
+                    <option value="views">Most viewed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <ChipGroup label="Type">
+                  <Chip active={kind === "all"} onClick={() => setKind("all")}>
+                    All
+                  </Chip>
+                  <Chip active={kind === "decks"} onClick={() => setKind("decks")}>
+                    Decks
+                  </Chip>
+                  <Chip active={kind === "templates"} onClick={() => setKind("templates")}>
+                    Templates
+                  </Chip>
+                </ChipGroup>
+                {signedIn && (
+                  <ChipGroup label="Reach">
+                    <Chip active={reach === "all"} onClick={() => setReach("all")}>
+                      All
+                    </Chip>
+                    <Chip active={reach === "unseen"} onClick={() => setReach("unseen")}>
+                      Never viewed
+                    </Chip>
+                    <Chip active={reach === "shared"} onClick={() => setReach("shared")}>
+                      Shared
+                    </Chip>
+                  </ChipGroup>
+                )}
+                <div className="flex items-center gap-2">
+                  <label
+                    htmlFor="deck-age"
+                    className="text-xs font-medium text-black/70 dark:text-white/70"
+                  >
+                    Created
+                  </label>
+                  <select
+                    id="deck-age"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value as Age)}
+                    className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/40 dark:border-white/20 dark:bg-white/[0.04]"
+                  >
+                    <option value="any">Any time</option>
+                    <option value="3m">Over 3 months ago</option>
+                    <option value="6m">Over 6 months ago</option>
+                    <option value="12m">Over 12 months ago</option>
+                  </select>
+                </div>
+                {active && (
+                  <button
+                    type="button"
+                    onClick={clearAll}
+                    className="ml-auto min-h-11 rounded-md px-3 text-sm font-medium text-[#003FC7] underline-offset-2 hover:underline dark:text-[#A1FBF9]"
+                  >
+                    Clear filters
+                  </button>
+                )}
+              </div>
             </>
           )}
-        </div>
-        {selectMode && (
-          <p className="mt-2 text-sm text-black/70 dark:text-white/70">
-            Anything in review or approved is left in place, even if you tick it.
-          </p>
-        )}
 
-        {active && (
-          <p className="mt-3 text-sm text-black/70 dark:text-white/70" aria-live="polite">
-            Showing {filtered.length + visibleCloudOnly.length} of{" "}
-            {enriched.length + cloudOnly.length}
-          </p>
-        )}
-        {signedIn === false && (
-          <p className="mt-3 text-sm text-black/70 dark:text-white/70">
-            <Link to="/auth" className="font-semibold underline">
-              Sign in
-            </Link>{" "}
-            to see decks saved to your account and who has viewed them.
-          </p>
-        )}
-      </div>
+          {/* Bulk selection — clearing out a long list of old work in one move. */}
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3 dark:border-white/10">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectMode((on) => !on);
+                setSelected(new Set());
+              }}
+              className={`inline-flex items-center gap-1.5 min-h-11 rounded-md px-3 text-sm font-semibold transition ${
+                selectMode
+                  ? "bg-[#03002C] text-white dark:bg-[#A1FBF9] dark:text-[#03002C]"
+                  : "border border-black/20 bg-white text-black/80 hover:bg-black/5 dark:border-white/20 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+              }`}
+            >
+              <CheckSquare size={13} /> {selectMode ? "Done selecting" : "Select"}
+            </button>
+            {selectMode && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setSelected(new Set(shownItems.map((i) => i.id)))}
+                  className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+                >
+                  Select all shown ({shownItems.length})
+                </button>
+                {selectedItems.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSelected(new Set())}
+                    className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+                  >
+                    Clear selection
+                  </button>
+                )}
+                <span className="text-sm text-black/70 dark:text-white/70" aria-live="polite">
+                  {selectedItems.length} selected
+                </span>
+                <button
+                  type="button"
+                  disabled={selectedItems.length === 0 || bulkBusy}
+                  onClick={bulkDelete}
+                  className="ml-auto inline-flex items-center gap-1.5 min-h-11 rounded-md bg-red-600 px-4 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+                >
+                  <Trash2 size={13} />
+                  {bulkBusy
+                    ? "Deleting…"
+                    : `Delete selected${selectedItems.length ? ` (${selectedItems.length})` : ""}`}
+                </button>
+              </>
+            )}
+          </div>
+          {selectMode && (
+            <p className="mt-2 text-sm text-black/70 dark:text-white/70">
+              Anything in review or approved is left in place, even if you tick it.
+            </p>
+          )}
+
+          {active && (
+            <p className="mt-3 text-sm text-black/70 dark:text-white/70" aria-live="polite">
+              Showing {filtered.length + visibleCloudOnly.length} of{" "}
+              {enriched.length + cloudOnly.length}
+            </p>
+          )}
+          {signedIn === false && (
+            <p className="mt-3 text-sm text-black/70 dark:text-white/70">
+              <Link to="/auth" className="font-semibold underline">
+                Sign in
+              </Link>{" "}
+              to see decks saved to your account and who has viewed them.
+            </p>
+          )}
+        </div>
       )}
 
       {loadFailed && (
@@ -714,7 +726,9 @@ function SelectCheck({
       type="button"
       disabled={locked}
       aria-pressed={checked}
-      aria-label={locked ? `${title} — in review or approved, cannot be deleted` : `Select ${title}`}
+      aria-label={
+        locked ? `${title} — in review or approved, cannot be deleted` : `Select ${title}`
+      }
       title={locked ? "In review or approved — finish the decision first" : undefined}
       onClick={(e) => {
         e.preventDefault();
