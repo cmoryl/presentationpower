@@ -62,7 +62,39 @@ Reference persona for every screen under `/events` (NEXT hub, city editions, div
 - **Print vendor:** opens a shared link. Success: they always get the revision in force, with correct sizes, bleed and editable vector files.
 - **Design admin:** maintains templates, venues and revisions. Success: changes flow to every edition, with lessons and decisions logged.
 
+## Journey persona: Priya, New City Launch Owner ("Plan a new city")
+
+- **Role:** Marketing admin handed a new NEXT city (for example Singapore) with a venue name, rough dates and a vendor deadline, but no floor sheets or programme yet.
+- **Context:** Does the setup in short sessions over several weeks, starting with almost nothing. Venue facts arrive a piece at a time.
+
+### Goals
+1. Enter the city, venue and dates once and see them carried through every step.
+2. Always know which step she's on (Venue record, then Floor plans, then Sign schedule, then City templates) and what comes next.
+3. Start drafting signs and templates from the proven London sign families before the venue intake is locked.
+4. See what's blocking each step, who supplies it, and what she can still do in the meantime.
+
+### Frustrations (seen in the walkthrough)
+- A step that drops her out of the flow into a different menu or page title (Venue record used to land in "Venues & floor-plan standards").
+- No Back or Next buttons, so she has to know where to go on her own.
+- Placeholder text and repeated boxes asking her to type the city again.
+- Two steps sharing one highlight, so she can't tell where she is.
+- Rounded or overlapping labels that look unfinished, and draft work lost when the browser session ends.
+
+### Behaviours
+- Works through the steps in order the first time, then jumps straight to one step on return visits.
+- Moves on before a step is complete and expects a clear "Pending venue intake" label rather than a locked dead end.
+- Checks her new city against London to confirm it matches.
+
+### Success criteria
+1. **One journey:** the four-step bar shows on every step, the current step is highlighted alone, and the heading matches the step name.
+2. **Always a way forward:** every step has Back and Next buttons, and nothing takes her to an `/admin` page.
+3. **Type once:** city, venue and dates carry into every step and are still there when she comes back another day.
+4. **Honest gates:** each locked item names what's missing and who supplies it. Nothing is invented and no count is shown without explanation.
+5. **Draft early:** the sign schedule and city templates can be drafted from shared defaults while the intake is pending, and are kept separate from London's saved files.
+6. **Finished feel:** square corners, no overlapping labels, visible focus outline, and fits the screen on phone, tablet and desktop.
+
 ## Open gaps against this persona
+- Plan a new city: the city and venue carry forward only within one browser session, and the "Add a space" buttons are still rounded.
 - Editions jump/focus and measured contrast are not yet verified.
 - The London panel count shows 168, not 54 scenic panels; this needs a decision.
 - PPTX/Word flatten room gradients.
