@@ -180,7 +180,11 @@ export function adaptTargetFormat(target: AdaptTarget): SocialFormat | null {
 
 // ── Reading a source ───────────────────────────────────────────────────────
 
-const HEADLINE_KEYS = ["headline", "title", "heading", "statement", "question", "quote", "name"];
+const HEADLINE_KEYS = [
+  "headline", "title", "heading", "statement", "question", "quote", "name",
+  // Saved modules that carry their lead line under a module-specific field.
+  "insight", "idea", "message", "ask", "recommendation", "clientName", "client",
+];
 const EYEBROW_KEYS = ["eyebrow", "kicker", "label", "sectionLabel", "overline", "industry"];
 const BODY_KEYS = [
   "body", "summary", "subtitle", "copy", "subhead", "standfirst", "intro", "description",
@@ -312,17 +316,23 @@ export function adaptMediaFrom(content: Record<string, unknown>): AdaptMedia | u
 }
 
 /** Read a deck slide's loose content record into the neutral payload. */
-export function contentFromSlide(slide: {
-  content?: Record<string, unknown> | null;
-  notes?: string | null;
-}): AdaptContent {
+export function contentFromSlide(
+  slide: {
+    content?: Record<string, unknown> | null;
+    notes?: string | null;
+  },
+  /** Used only when the slide holds no headline-like copy at all (e.g. the module name). */
+  fallbackHeadline = "Untitled slide",
+): AdaptContent {
   const c = (slide.content ?? {}) as Record<string, unknown>;
+  const stat = pickStat(c);
+  const statLine = stat ? [stat.value, stat.label].filter(Boolean).join(" ") : undefined;
   return {
     eyebrow: pick(c, EYEBROW_KEYS),
-    headline: pick(c, HEADLINE_KEYS) ?? "Untitled slide",
+    headline: pick(c, HEADLINE_KEYS) ?? statLine ?? fallbackHeadline,
     body: pick(c, BODY_KEYS),
     points: pickPoints(c),
-    stat: pickStat(c),
+    stat,
     cta: pick(c, CTA_KEYS),
     footnote: pick(c, FOOTNOTE_KEYS),
     media: adaptMediaFrom(c),
