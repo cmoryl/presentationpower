@@ -64,7 +64,7 @@ function MartPage() {
               {NEXT_MART.intro}
             </p>
           </div>
-          <dl className="grid grid-cols-3 gap-4 text-right">
+          <dl className="grid grid-cols-2 gap-4 text-right">
             <div>
               <dt className="text-[11px] uppercase tracking-wide text-black/45">Event</dt>
               <dd className="text-sm font-medium text-[#03002C]">{NEXT_MART.venue}</dd>
@@ -72,10 +72,6 @@ function MartPage() {
             <div>
               <dt className="text-[11px] uppercase tracking-wide text-black/45">Dates</dt>
               <dd className="text-sm font-medium text-[#03002C]">{NEXT_MART.dates}</dd>
-            </div>
-            <div>
-              <dt className="text-[11px] uppercase tracking-wide text-black/45">Panels</dt>
-              <dd className="text-sm font-medium text-[#03002C]">{martTotalPanels()}</dd>
             </div>
           </dl>
         </div>

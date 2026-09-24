@@ -545,24 +545,6 @@ function LondonMapsPage() {
               or booth wall can be packed with its own location card. Plans are schematic — drag any
               pin to the real position and every download follows.
             </p>
-            <dl className="mt-7 flex flex-wrap gap-x-9 gap-y-4">
-              {[
-                { k: "Floors mapped", v: String(floors.length) },
-                {
-                  k: "Assets pinned",
-                  v: String(panels.filter((p) => londonFloorPlan(p.floor)).length),
-                },
-                { k: "Positions marked", v: String(correctedCount) },
-                { k: "Signed off for this venue", v: String(confirmedCount) },
-              ].map((s) => (
-                <div key={s.k}>
-                  <dd className="text-2xl font-semibold tracking-tight text-[#03002C]">{s.v}</dd>
-                  <dt className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/60">
-                    {s.k}
-                  </dt>
-                </div>
-              ))}
-            </dl>
             <div className="mt-7 flex flex-wrap gap-3">
               <button
                 type="button"

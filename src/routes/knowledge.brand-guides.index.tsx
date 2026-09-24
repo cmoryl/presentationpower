@@ -106,15 +106,6 @@ function BrandGuidesIndex() {
               }`}
             >
               {b.label}
-              <span
-                className={`rounded-full px-1.5 text-[10px] tabular-nums ${
-                  active
-                    ? "bg-white/20 text-white dark:bg-black/20 dark:text-[#03002C]"
-                    : "bg-black/5 dark:bg-white/10"
-                }`}
-              >
-                {n}
-              </span>
             </button>
           );
         })}
