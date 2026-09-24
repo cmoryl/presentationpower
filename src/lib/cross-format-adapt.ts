@@ -272,8 +272,17 @@ function pickStat(content: Record<string, unknown>): { value: string; label: str
  * and curated assets.
  */
 export function adaptMediaFrom(content: Record<string, unknown>): AdaptMedia | undefined {
-  for (const k of PHOTO_KEYS) {
-    const url = str(content[k]);
+  const urlOf = (v: unknown): string | undefined => {
+    if (typeof v === "string") return str(v);
+    if (Array.isArray(v)) return urlOf(v[0]);
+    if (v && typeof v === "object") {
+      const r = v as Record<string, unknown>;
+      return str(r.url) ?? str(r.src) ?? str(r.imageUrl) ?? str(r.signedUrl);
+    }
+    return undefined;
+  };
+  for (const k of [...PHOTO_KEYS, "photo", "media", "images", "photos"]) {
+    const url = urlOf(content[k]);
     if (!url) continue;
     if (/\.svg($|\?)/i.test(url) || url.startsWith("data:image/svg")) {
       return { kind: "unsupported", reason: "vector background — not carried across formats" };

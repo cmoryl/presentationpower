@@ -20,4 +20,8 @@ describe("adaptor reads the fields saved modules actually use", () => {
   it("case-study narrative fields become body", () => {
     expect(contentFromSlide({ content: { clientName: "Acme", narrative: "What we did." } }).body).toBe("What we did.");
   });
+  it("photos held as objects or lists carry across", () => {
+    expect(contentFromSlide({ content: { title: "x", photo: { url: "/p.jpg" } } }).media).toMatchObject({ kind: "photo", url: "/p.jpg" });
+    expect(contentFromSlide({ content: { title: "x", images: [{ src: "/q.jpg" }] } }).media).toMatchObject({ kind: "photo", url: "/q.jpg" });
+  });
 });
