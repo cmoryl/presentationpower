@@ -11,9 +11,10 @@ import {
   CheckSquare,
   Square,
   Trash2,
+  Upload,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { useSignedIn, MyCloudDecks, useOpenCloudDeck } from "@/components/CloudDeckControls";
+import { useSignedIn, useOpenCloudDeck } from "@/components/CloudDeckControls";
 import { useDeckStore, type Deck } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -30,7 +31,11 @@ export const Route = createFileRoute("/decks/")({
   head: () => ({
     meta: [
       { title: "All decks · TransPerfect Element" },
-      { name: "description", content: "Search, sort, and organize every deck in your workspace." },
+      { name: "description", content: "Start a new on-brand deck or pick up any deck in your workspace." },
+      { property: "og:title", content: "Your decks · TransPerfect Element" },
+      { property: "og:description", content: "Start a new on-brand deck or pick up any deck in your workspace." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: DecksIndex,
@@ -561,10 +566,10 @@ function DecksIndex() {
               setSelectMode((on) => !on);
               setSelected(new Set());
             }}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+            className={`inline-flex items-center gap-1.5 min-h-11 rounded-md px-3 text-sm font-semibold transition ${
               selectMode
                 ? "bg-[#03002C] text-white dark:bg-[#A1FBF9] dark:text-[#03002C]"
-                : "border border-black/10 bg-white text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+                : "border border-black/20 bg-white text-black/80 hover:bg-black/5 dark:border-white/20 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
             }`}
           >
             <CheckSquare size={13} /> {selectMode ? "Done selecting" : "Select"}
@@ -574,7 +579,7 @@ function DecksIndex() {
               <button
                 type="button"
                 onClick={() => setSelected(new Set(shownItems.map((i) => i.id)))}
-                className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+                className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
               >
                 Select all shown ({shownItems.length})
               </button>
@@ -582,19 +587,19 @@ function DecksIndex() {
                 <button
                   type="button"
                   onClick={() => setSelected(new Set())}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+                  className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
                 >
                   Clear selection
                 </button>
               )}
-              <span className="text-xs text-black/55 dark:text-white/55">
+              <span className="text-sm text-black/70 dark:text-white/70" aria-live="polite">
                 {selectedItems.length} selected
               </span>
               <button
                 type="button"
                 disabled={selectedItems.length === 0 || bulkBusy}
                 onClick={bulkDelete}
-                className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-red-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+                className="ml-auto inline-flex items-center gap-1.5 min-h-11 rounded-md bg-red-600 px-4 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
               >
                 <Trash2 size={13} />
                 {bulkBusy
@@ -605,7 +610,7 @@ function DecksIndex() {
           )}
         </div>
         {selectMode && (
-          <p className="mt-2 text-[11px] text-black/45 dark:text-white/45">
+          <p className="mt-2 text-sm text-black/70 dark:text-white/70">
             Anything in review or approved is left in place, even if you tick it.
           </p>
         )}
@@ -808,33 +813,10 @@ function CloudOnlyTile({
   );
 }
 
-function StatChip({
-  label,
-  value,
-  accent,
-  icon,
-}: {
-  label: string;
-  value: number;
-  accent: string;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <div className="relative overflow-hidden rounded-xl border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
-      <span className="absolute left-0 top-0 h-full w-1" style={{ backgroundColor: accent }} />
-      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-black/50 dark:text-white/50">
-        {icon}
-        <span>{label}</span>
-      </div>
-      <div className="mt-1.5 text-2xl font-semibold tabular-nums">{value}</div>
-    </div>
-  );
-}
-
 function ChipGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
+    <div role="group" aria-label={label} className="flex items-center gap-2">
+      <span aria-hidden="true" className="text-xs font-medium text-black/70 dark:text-white/70">
         {label}
       </span>
       <div className="flex flex-wrap gap-1.5">{children}</div>
@@ -859,13 +841,14 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       disabled={disabled}
       title={title}
       className={
-        "rounded-full border px-3 py-1 text-xs font-medium transition " +
+        "min-h-11 rounded-md border px-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7] " +
         (active
           ? "border-[#05041A] bg-[#05041A] text-white dark:border-[#A1FBF9] dark:bg-[#A1FBF9] dark:text-[#03002C]"
-          : "border-black/10 bg-white text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10") +
+          : "border-black/20 bg-white text-black/80 hover:bg-black/5 dark:border-white/20 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10") +
         (disabled ? " cursor-not-allowed opacity-40" : "")
       }
     >
@@ -1053,7 +1036,7 @@ function EmptyNew({ signedIn }: { signedIn: boolean | null }) {
     },
     {
       to: "/decks/import" as const,
-      icon: Share2,
+      icon: Upload,
       title: "Import a PowerPoint",
       body: "Drop an existing .pptx and we stage it as editable slides on brand.",
       cta: "Import a deck",
@@ -1061,59 +1044,69 @@ function EmptyNew({ signedIn }: { signedIn: boolean | null }) {
     },
   ];
 
+  const [primary, ...rest] = paths;
+  const PrimaryIcon = primary.icon;
   return (
-    <div className="mt-10 rounded-3xl border border-dashed border-black/15 bg-white p-8 dark:border-white/15 dark:bg-white/[0.03] sm:p-10">
-      <div className="mx-auto max-w-md text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#003FC7]/10 text-2xl text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">
-          ✦
-        </div>
-        <h3 className="mt-4 text-xl font-semibold">No decks in this workspace yet</h3>
-        <p className="mt-2 text-sm text-black/60 dark:text-white/60">
-          Three ways to get a first deck on screen — all of them end in the same editor.
-        </p>
-      </div>
-
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
-        {paths.map((p) => {
-          const Icon = p.icon;
-          return (
-            <div
-              key={p.to}
-              className="flex flex-col rounded-2xl border border-black/10 bg-white p-5 text-left shadow-sm transition hover:border-[#003FC7]/40 hover:shadow-md dark:border-white/10 dark:bg-white/[0.04]"
-            >
-              <span className="inline-flex size-9 items-center justify-center rounded-xl bg-[#003FC7]/10 text-[#003FC7]">
-                <Icon size={16} />
-              </span>
-              <div className="mt-3 text-sm font-semibold tracking-[-0.01em]">{p.title}</div>
-              <p className="mt-1 flex-1 text-[12px] leading-relaxed text-black/55 dark:text-white/55">
-                {p.body}
-              </p>
-              <Link
-                to={p.to}
-                className={
-                  "mt-4 inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-medium transition " +
-                  (p.primary
-                    ? "bg-[#0B2A4A] text-white hover:opacity-90"
-                    : "border border-black/15 text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:text-white/70")
-                }
-              >
-                {p.cta}
-              </Link>
+    <section aria-labelledby="start-heading" className="mt-2">
+      <h2 id="start-heading" className="sr-only">
+        Ways to start a deck
+      </h2>
+      <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+        <Link
+          to={primary.to}
+          className="group flex flex-col justify-between rounded-lg bg-[#03002C] p-6 text-white transition hover:bg-[#0a0850] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7] sm:p-8"
+        >
+          <div>
+            <span className="inline-flex size-10 items-center justify-center rounded-md bg-white/10">
+              <PrimaryIcon size={18} aria-hidden="true" />
+            </span>
+            <div className="mt-4 text-xs font-semibold uppercase tracking-widest text-[#A1FBF9]">
+              Recommended · about a minute
             </div>
-          );
-        })}
+            <div className="mt-2 text-2xl font-semibold leading-tight">{primary.title}</div>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-white/85">{primary.body}</p>
+          </div>
+          <span className="mt-6 inline-flex min-h-11 w-fit items-center gap-2 rounded-md bg-white px-5 text-sm font-semibold text-[#03002C]">
+            {primary.cta} <span aria-hidden="true">→</span>
+          </span>
+        </Link>
+        <div className="grid gap-4">
+          {rest.map((p) => {
+            const Icon = p.icon;
+            return (
+              <Link
+                key={p.to}
+                to={p.to}
+                className="flex items-start gap-4 rounded-lg border border-black/15 bg-white p-5 transition hover:border-[#003FC7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7] dark:border-white/15 dark:bg-white/[0.04]"
+              >
+                <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-md bg-[#003FC7]/10 text-[#003FC7] dark:text-[#A1FBF9]">
+                  <Icon size={18} aria-hidden="true" />
+                </span>
+                <span className="flex-1">
+                  <span className="block text-base font-semibold">{p.title}</span>
+                  <span className="mt-1 block text-sm leading-relaxed text-black/70 dark:text-white/70">
+                    {p.body}
+                  </span>
+                  <span className="mt-2 inline-block text-sm font-semibold text-[#003FC7] dark:text-[#A1FBF9]">
+                    {p.cta} <span aria-hidden="true">→</span>
+                  </span>
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       {signedIn === false && (
-        <div className="mt-6 rounded-2xl border border-[#003FC7]/25 bg-[#003FC7]/[0.05] px-4 py-3 text-center text-xs text-[#03002C] dark:text-white/80">
+        <p className="mt-6 text-sm text-black/70 dark:text-white/70">
           Already made decks?{" "}
           <Link to="/auth" className="font-semibold underline">
             Sign in
           </Link>{" "}
-          to pull the ones saved to your account into this browser.
-        </div>
+          to bring the ones saved to your account into this browser.
+        </p>
       )}
-    </div>
+    </section>
   );
 }
 
