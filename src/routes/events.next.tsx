@@ -28,7 +28,6 @@ import {
   cityStopLine,
   deckPagesFor,
   isPowerpointDeck,
-  loadNextRegistry,
   nextHeadline,
   type NextDivision,
   type NextFormatGroupId,
@@ -41,7 +40,6 @@ import {
   LONDON_VENUE,
   londonPanelsByFloor,
   isVenueTemplatePanel,
-  londonPanelCount,
   londonVenueItemMeta,
 } from "@/lib/next-london-signage";
 import { CityBadge } from "@/components/next/CityBadge";
