@@ -5,4 +5,4 @@
 
 # Roadmap — print & adaptor
 - [x] Booklet studio: pages/spreads panel, proof canvas, master pages, preflight, Simple/Advanced
-- [ ] Cross-format adaptor: master modules selectable as sources (not just decks), field picker, adapts to every aspect ratio/size
+- [x] Cross-format adaptor: master modules selectable as sources (not just decks), field picker, adapts to every aspect ratio/size
