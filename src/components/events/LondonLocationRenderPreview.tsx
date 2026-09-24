@@ -125,14 +125,23 @@ function Stage({
       )}
       {/* Any working display in this plate runs NEXT 2026 London content. */}
       <SceneEventScreens sceneId={scene.id} />
-      <span
+      <div
         data-export-ignore="true"
-        className="absolute bottom-2 left-2 max-w-[calc(100%-1rem)] rounded bg-black/55 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white"
+        className="pointer-events-none absolute inset-x-2 bottom-2 flex flex-col items-start gap-1"
       >
+      <span className="max-w-full rounded bg-black/55 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white">
         {sceneCaption(scene, panel)}
         {` · ${specFitLabel(sceneSpecFit(panel, scene))}`}
         {sceneScreensCaption(scene.id) ? ` · ${sceneScreensCaption(scene.id)}` : ""}
       </span>
+      <span className="max-w-full rounded bg-black/45 px-2 py-1 font-mono text-[10px] text-white/90">
+        {lightQualityLabel(sceneLightQuality(scene.id))}
+        {" · "}
+        {spaceLabel(sceneSpace(sceneQuad(scene)))}
+        {" · "}
+        {surfaceFinishLabel(sceneSurface(scene.kind, scene.mount))}
+      </span>
+      </div>
       {/* When the render cannot be trusted as a size check, say so on the view
           itself rather than letting a designer read it as a spec proof. */}
       {sceneSpecFit(panel, scene).warnings.length > 0 ? (
@@ -145,16 +154,6 @@ function Stage({
       ) : null}
       {/* The photographer's read of this plate, so the light a design is judged
           under is never a mystery. */}
-      <span
-        data-export-ignore="true"
-        className="absolute bottom-2 right-2 max-w-[calc(100%-1rem)] rounded bg-black/45 px-2 py-1 font-mono text-[10px] text-white/90"
-      >
-        {lightQualityLabel(sceneLightQuality(scene.id))}
-        {" · "}
-        {spaceLabel(sceneSpace(sceneQuad(scene)))}
-        {" · "}
-        {surfaceFinishLabel(sceneSurface(scene.kind, scene.mount))}
-      </span>
       {leaves ? (
         <span
           data-export-ignore="true"
