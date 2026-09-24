@@ -552,3 +552,53 @@ export function toPrintContent(result: AdaptResult): Record<string, unknown> {
     backgroundToken: content.media?.kind === "token" ? content.media.token : null,
   };
 }
+
+// ── Info builder: pick and edit what carries across ────────────────────────
+
+/** A field of the neutral payload the operator can include or leave out. */
+export type AdaptFieldKey = "eyebrow" | "headline" | "body" | "points" | "stat" | "cta" | "footnote" | "media";
+
+export type AdaptSelection = {
+  /** Fields left out on purpose. The headline can never be left out. */
+  exclude: AdaptFieldKey[];
+  /** Point indexes left out (from the source's own list). */
+  excludePoints: number[];
+  /** Operator edits, applied over the source copy. */
+  edits: Partial<Pick<AdaptContent, "eyebrow" | "headline" | "body" | "cta" | "footnote">> & {
+    points?: Record<number, string>;
+    stat?: Partial<{ value: string; label: string }>;
+  };
+};
+
+export const EMPTY_SELECTION: AdaptSelection = { exclude: [], excludePoints: [], edits: {} };
+
+/** Source content after the operator's picks and edits. Pure; source untouched. */
+export function applySelection(source: AdaptContent, sel: AdaptSelection): AdaptContent {
+  const off = new Set(sel.exclude.filter((k) => k !== "headline"));
+  const e = sel.edits;
+  const text = (k: "eyebrow" | "body" | "cta" | "footnote") => {
+    if (off.has(k)) return undefined;
+    const v = e[k] ?? source[k];
+    return v && v.trim() ? v : undefined;
+  };
+  const points = off.has("points")
+    ? undefined
+    : (source.points ?? [])
+        .map((p, i) => ({ p: e.points?.[i] ?? p, i }))
+        .filter(({ p, i }) => !sel.excludePoints.includes(i) && p.trim())
+        .map(({ p }) => p);
+  const stat =
+    off.has("stat") || !source.stat
+      ? undefined
+      : { value: e.stat?.value ?? source.stat.value, label: e.stat?.label ?? source.stat.label };
+  return {
+    eyebrow: text("eyebrow"),
+    headline: (e.headline ?? source.headline).trim() || source.headline,
+    body: text("body"),
+    points: points && points.length ? points : undefined,
+    stat,
+    cta: text("cta"),
+    footnote: text("footnote"),
+    media: off.has("media") ? undefined : source.media,
+  };
+}
