@@ -161,19 +161,26 @@ export function EditorToolbar({
     <div
       role="toolbar"
       aria-label="Deck and slide settings"
-      className="relative z-50 flex flex-wrap items-center gap-2 overflow-visible rounded-lg border border-black/10 bg-white px-3 py-2"
+      className="relative z-50 flex flex-nowrap items-center gap-2 rounded-lg border border-black/10 bg-white px-3 py-2"
     >
-      <ScopeLabel>Deck</ScopeLabel>
-      {deckRow}
-      {slideRow ? (
-        <>
-          <span className="mx-1 h-6 w-px bg-black/15" aria-hidden />
-          <ScopeLabel>{slideLabel ?? "Slide"}</ScopeLabel>
-          {slideRow}
-        </>
-      ) : null}
+      {/* Menus scroll sideways on narrow screens instead of wrapping; their
+          panels are portalled, so the scroll box never clips them. */}
+      <div
+        data-toolbar-menus
+        className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 overflow-x-auto [scrollbar-width:thin] [&>*]:shrink-0"
+      >
+        <ScopeLabel>Deck</ScopeLabel>
+        {deckRow}
+        {slideRow ? (
+          <>
+            <span className="mx-1 h-6 w-px bg-black/15" aria-hidden />
+            <ScopeLabel>{slideLabel ?? "Slide"}</ScopeLabel>
+            {slideRow}
+          </>
+        ) : null}
+      </div>
       {slideRowEnd || deckRowEnd ? (
-        <div className="ml-auto flex shrink-0 items-center gap-1.5">
+        <div className="flex shrink-0 flex-nowrap items-center gap-1.5">
           {slideRowEnd}
           {deckRowEnd}
         </div>
