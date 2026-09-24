@@ -484,7 +484,6 @@ const GUIDES: Array<{ title: string; blurb: string; steps: string[] }> = [
   },
 ];
 
-
 const FAQS: Array<{ section: string; items: QA[] }> = [
   {
     section: "Getting started",
@@ -1037,7 +1036,6 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
   },
 ];
 
-
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
@@ -1111,7 +1109,6 @@ function FAQPage() {
           <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-[#003FC7]">
             Step-by-step basics
           </h2>
-          <span className="text-xs text-black/40">{GUIDES.length} guides</span>
         </div>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {GUIDES.map((g, gi) => (

@@ -239,7 +239,6 @@ function AssetsPage() {
                   <h3 className="text-sm font-semibold tracking-tight">
                     {cat || meta?.label || gid}
                   </h3>
-                  <span className="text-xs text-muted-foreground">{list.length} designs</span>
                 </div>
                 {gid === "pillar-signage" && division && <LivePillars division={division} />}
                 <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

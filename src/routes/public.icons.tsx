@@ -110,11 +110,11 @@ function PublicIconLibrary() {
             Approved icon library
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-black/70">
-            {totalApprovedIcons()} approved glyphs across {BRAND_ICON_SETS.length} brand guides,
-            organised into {GROUPS.map((g) => g.label.toLowerCase()).join(", ")} — then by sub-area.
-            These are the same marks the deck builder draws, so a download can never drift from what
-            ships on a slide. Choose a set, a size and an approved colour, then download a single
-            icon, a sub-area, or the full set.
+            Approved glyphs for every brand guide, organised into{" "}
+            {GROUPS.map((g) => g.label.toLowerCase()).join(", ")} — then by sub-area. These are the
+            same marks the deck builder draws, so a download can never drift from what ships on a
+            slide. Choose a set, a size and an approved colour, then download a single icon, a
+            sub-area, or the full set.
           </p>
 
           {/* Collapsed state: one summary row so the listings sit right under the fold. */}
