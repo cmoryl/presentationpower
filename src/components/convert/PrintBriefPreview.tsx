@@ -39,6 +39,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
     const u = (n: number) => Math.max(1, Math.round(n * k));
     const big = layout === "poster" || layout === "banner";
     const land = layout === "landscape";
+    const pad = Math.round(Math.max(0.25, 0.6 * k) * CSS_DPI);
     const L = land ? { gridColumn: 1 } : {};
     const photo = content.media?.kind === "photo" ? content.media.url : null;
     const groundToken = content.media?.kind === "token" ? content.media.token : "#FFFFFF";
@@ -59,7 +60,8 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
             background: groundToken,
             color: ink,
             fontFamily: "'Geist Variable', 'Geist', system-ui, sans-serif",
-            padding: `${Math.max(0.25, 0.6 * k) * CSS_DPI}px`,
+            padding: pad,
+            position: "relative",
             display: "flex",
             flexDirection: "column",
             gap: u(18),
@@ -179,7 +181,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
           <div
             style={{
               marginTop: big ? "auto" : content.stat ? 0 : "auto",
-              gridColumn: layout === "landscape" ? "1 / -1" : undefined,
+              ...(land ? { position: "absolute" as const, left: pad, right: pad, bottom: pad } : {}),
               borderTop: `${u(1)}px solid rgba(3,0,44,0.15)`,
               paddingTop: u(10),
               flexWrap: "wrap",
