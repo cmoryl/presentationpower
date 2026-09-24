@@ -32,6 +32,7 @@ const CITY_STEPS: Array<{ n: number; label: string; to: NextWorkspacePath; hash?
  */
 export function NextSubnav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const hash = useRouterState({ select: (s) => s.location.hash });
   const [open, setOpen] = useState(false);
 
   if (!isNextWorkspacePath(pathname)) return null;
@@ -45,7 +46,17 @@ export function NextSubnav() {
   const folded = menuPath
     ? NEXT_WORKSPACE_PAGES.filter((p) => p.to === menuPath || p.navAs === menuPath)
     : [];
-  const showSteps = menuPath === "/events/next/city";
+  const cleanPath = pathname.replace(/\/+$/, "");
+  // Step 1 (the venue record) also lives in the venue directory; it still shows
+  // the step bar so the city flow never drops the user.
+  const showSteps = menuPath === "/events/next/city" || cleanPath === "/events/next/locations";
+  const stepIndex = CITY_STEPS.findIndex((st) =>
+    st.hash
+      ? cleanPath === st.to && hash.replace(/^#/, "") === st.hash
+      : cleanPath === st.to && !CITY_STEPS.some((o) => o.hash && o.to === st.to && hash.replace(/^#/, "") === o.hash),
+  );
+  const prevStep = stepIndex > 0 ? CITY_STEPS[stepIndex - 1] : null;
+  const nextStep = stepIndex >= 0 && stepIndex < CITY_STEPS.length - 1 ? CITY_STEPS[stepIndex + 1] : null;
 
   const tab =
     "relative inline-flex items-center gap-1.5 border-b-2 px-1 pb-2 pt-1 text-[13px] font-medium transition " +
@@ -121,7 +132,7 @@ export function NextSubnav() {
       {showSteps ? (
         <ol aria-label="Plan a new city — steps" className="mt-3 flex flex-nowrap gap-2 overflow-x-auto [scrollbar-width:none]">
           {CITY_STEPS.map((st) => {
-            const on = !st.hash && pathname.replace(/\/+$/, "") === st.to;
+            const on = CITY_STEPS[stepIndex]?.n === st.n;
             return (
               <li key={st.n} className="shrink-0">
                 <Link
@@ -139,8 +150,31 @@ export function NextSubnav() {
               </li>
             );
           })}
+          {prevStep || nextStep ? (
+            <li className="ml-auto flex shrink-0 gap-2">
+              {prevStep ? (
+                <Link
+                  to={prevStep.to}
+                  hash={prevStep.hash}
+                  className="inline-flex items-center border border-black/15 bg-white px-3 py-1.5 text-[12.5px] font-medium text-[#03002C] hover:border-[#003FC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] dark:border-white/20 dark:bg-transparent dark:text-white"
+                >
+                  ← Back: {prevStep.label}
+                </Link>
+              ) : null}
+              {nextStep ? (
+                <Link
+                  to={nextStep.to}
+                  hash={nextStep.hash}
+                  className="inline-flex items-center bg-[#03002C] px-3 py-1.5 text-[12.5px] font-semibold text-white hover:bg-[#003FC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2"
+                >
+                  Next: {nextStep.label} →
+                </Link>
+              ) : null}
+            </li>
+          ) : null}
         </ol>
-      ) : folded.length > 1 ? (
+      ) : null}
+      {!showSteps || cleanPath === "/events/next/locations" ? (folded.length > 1 ? (
         <nav aria-label={`${NEXT_WORKSPACE_BY_PATH[menuPath ?? ""]?.label ?? "Section"} pages`} className="mt-3 flex gap-2">
           {folded.map((p) => {
             const on = current?.to === p.to;
@@ -164,7 +198,7 @@ export function NextSubnav() {
             );
           })}
         </nav>
-      ) : null}
+      ) : null) : null}
 
       {open ? (
         <div className="mt-3 rounded-md border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/5">
