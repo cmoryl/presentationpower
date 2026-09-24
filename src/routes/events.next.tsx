@@ -121,7 +121,7 @@ function NextHub() {
   );
 }
 
-function Hero({ division, total }: { division: NextDivision; total: number }) {
+function Hero({ division }: { division: NextDivision }) {
   const goEditions = (e: React.MouseEvent) => {
     e.preventDefault();
     const el = document.getElementById("editions");
