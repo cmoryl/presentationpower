@@ -97,15 +97,17 @@ export const Route = createFileRoute("/events/next")({
 
 function NextHub() {
   const [divisionId, setDivisionId] = useState<string>(NEXT_DIVISIONS[0].id);
-  const [group, setGroup] = useState<NextFormatGroupId | "all">("all");
-  const [query, setQuery] = useState("");
-  const [rows, setRows] = useState<NextRegistryRow[] | null>(null);
-  const [preview, setPreview] = useState<NextRegistryRow | null>(null);
+  const [total, setTotal] = useState(0);
+  const [counts, setCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     let alive = true;
     loadNextRegistry().then((r) => {
-      if (alive) setRows(r);
+      if (!alive) return;
+      setTotal(r.length);
+      const c: Record<string, number> = {};
+      for (const row of r) c[row.divisionId] = (c[row.divisionId] ?? 0) + 1;
+      setCounts(c);
     });
     return () => {
       alive = false;
@@ -114,283 +116,80 @@ function NextHub() {
 
   const division = NEXT_DIVISIONS.find((d) => d.id === divisionId) ?? NEXT_DIVISIONS[0];
 
-  const divisionRows = useMemo(
-    () => (rows ?? []).filter((r) => r.divisionId === divisionId),
-    [rows, divisionId],
-  );
-
-  const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return divisionRows.filter(
-      (r) =>
-        (group === "all" || r.group === group) &&
-        (!q ||
-          r.format.toLowerCase().includes(q) ||
-          r.code.toLowerCase().includes(q) ||
-          (r.category ?? "").toLowerCase().includes(q) ||
-          r.size.toLowerCase().includes(q)),
-    );
-  }, [divisionRows, group, query]);
-
-  const grouped = useMemo(() => {
-    const map = new Map<string, NextRegistryRow[]>();
-    for (const r of visible) {
-      const key = `${r.group}::${r.category ?? ""}`;
-      const list = map.get(key);
-      if (list) list.push(r);
-      else map.set(key, [r]);
-    }
-    const order = NEXT_FORMAT_GROUPS.map((g) => g.id);
-    return [...map.entries()].sort(
-      (a, b) =>
-        order.indexOf(a[0].split("::")[0] as NextFormatGroupId) -
-        order.indexOf(b[0].split("::")[0] as NextFormatGroupId),
-    );
-  }, [visible]);
-
   return (
     <div className="mx-auto w-full max-w-[1200px] px-6 pb-24 pt-8">
-      <Hero division={division} total={rows?.length ?? 0} onSelect={setDivisionId} />
+      <Hero division={division} total={total} />
 
-      <NextEditions />
-
-
-      <WorkspaceDirectory />
-
-      <DivisionDetail division={division} count={divisionRows.length} />
-
-      <Pathways
-        accent={division.accent}
-        onPick={(g) => {
-          setGroup(g);
-          setQuery("");
-          document
-            .getElementById("registry")
-            ?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }}
-      />
-
-      {/* Registry controls */}
-      <div id="registry" className="mt-8 flex scroll-mt-24 flex-wrap items-center gap-2">
-        <FilterChip active={group === "all"} onClick={() => setGroup("all")}>
-          All formats
-        </FilterChip>
-        {NEXT_FORMAT_GROUPS.map((g) => (
-          <FilterChip key={g.id} active={group === g.id} onClick={() => setGroup(g.id)}>
-            {g.label}
-          </FilterChip>
-        ))}
-        <div className="relative ml-auto">
-          <Search
-            size={16}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-icon-muted"
-          />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search formats, codes, sizes…"
-            aria-label="Search NEXT formats"
-            className="h-9 w-64 rounded-full border border-border bg-background pl-9 pr-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </div>
+      <div id="editions" tabIndex={-1} className="scroll-mt-24 outline-none">
+        <NextEditions />
       </div>
 
-      {rows === null ? (
-        <p className="mt-8 text-sm text-muted-foreground">Loading the design registry…</p>
-      ) : visible.length === 0 ? (
-        <p className="mt-8 text-sm text-muted-foreground">
-          No formats match that search for {division.eventName}.
-        </p>
-      ) : (
-        <div className="mt-6 space-y-8">
-          {grouped.map(([key, list]) => {
-            const [gid, cat] = key.split("::");
-            const meta = NEXT_FORMAT_GROUPS.find((g) => g.id === gid);
-            return (
-              <section key={key}>
-                <div className="flex flex-wrap items-baseline gap-2">
-                  <h3 className="text-sm font-semibold tracking-tight">
-                    {cat || meta?.label || gid}
-                  </h3>
-                  <span className="rounded-full border border-border px-2 py-0.5 text-[11px] uppercase tracking-wide text-muted-foreground">
-                    {meta?.badge}
-                  </span>
-                  <span className="text-xs text-muted-foreground">{list.length} designs</span>
-                </div>
+      <LondonStatus />
 
-                {gid === "pillar-signage" && <LivePillars division={division} />}
-
-                <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {list.map((r) => (
-                    <RegistryCard
-                      key={`${r.group}-${r.code}-${r.format}`}
-                      row={r}
-                      accent={division.accent}
-                      onPreview={() => setPreview(r)}
-                    />
-                  ))}
-                </div>
-              </section>
-            );
-          })}
-        </div>
-      )}
-
-      <LondonKit />
+      <MasterDesignSystem
+        division={division}
+        count={counts[division.id] ?? 0}
+        total={total}
+        onSelect={setDivisionId}
+      />
 
       <CitySeries />
 
       <PlaybookCta />
 
-      <Dialog open={!!preview} onOpenChange={(o) => !o && setPreview(null)}>
-        <DialogContent className="max-h-[88vh] max-w-5xl overflow-y-auto">
-          <DialogTitle className="text-sm font-semibold">
-            {preview ? `${preview.code} — ${preview.format}` : ""}
-          </DialogTitle>
-          {preview && deckPagesFor(preview) ? (
-            <DeckPages pages={deckPagesFor(preview)!} label={preview.format} />
-          ) : preview?.badgeSide ? (
-            <div className="flex justify-center rounded-lg border border-border bg-[#03002C] p-4">
-              <CityBadge
-                config={{
-                  ...CITY_BADGE_DEFAULT,
-                  divisionId: cityBadgeDivision(preview.divisionId).id,
-                }}
-                side={preview.badgeSide}
-                ppi={72}
-                guides
-                style={{ borderRadius: 6 }}
-              />
-            </div>
-          ) : preview?.exampleUrl ? (
-            <img
-              src={preview.exampleUrl}
-              alt={`${preview.code} ${preview.format} example render`}
-              className="max-h-[64vh] w-full rounded-lg border border-border bg-muted object-contain"
-              loading="lazy"
-            />
-          ) : (
-            <p className="text-sm text-muted-foreground">No example render available yet.</p>
-          )}
-          {preview?.internalUrl && (
-            <Link
-              to={preview.internalUrl}
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-            >
-              Open badge template <ArrowRight size={14} />
-            </Link>
-          )}
-          {preview?.canvaUrl && (
-            <a
-              href={preview.canvaUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-            >
-              Open in Canva <ExternalLink size={14} />
-            </a>
-          )}
-        </DialogContent>
-      </Dialog>
+      <WorkspaceDirectory />
     </div>
   );
 }
 
-function Hero({
-  division,
-  total,
-  onSelect,
-}: {
-  division: NextDivision;
-  total: number;
-  onSelect: (id: string) => void;
-}) {
+function Hero({ division, total }: { division: NextDivision; total: number }) {
+  const goEditions = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = document.getElementById("editions");
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    el?.focus({ preventScroll: true });
+  };
   return (
     <section className="full-bleed relative -mt-8 overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:-mt-12 sm:py-16 lg:py-20">
       <NextAurora division={division} />
       <NextWatermark accent={division.accent} />
+      {/* Scrim keeps metadata text at AA over the aurora gradients. */}
+      <div aria-hidden className="absolute inset-0 bg-[#03002C]/45" />
 
       <div className="relative">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/75 backdrop-blur">
-            <Sparkles size={12} style={{ color: division.accent }} /> {NEXT_EVENT.subBrandLine}
-          </span>
-          <span className="hidden text-[11px] text-white/50 sm:inline">
-            {NEXT_DIVISIONS.length} divisions · 56 formats · {total || 616} master designs
-          </span>
-        </div>
+        <span className="inline-flex items-center gap-1.5 rounded-md border border-white/20 bg-[#03002C]/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/85">
+          <Sparkles size={12} /> {NEXT_EVENT.subBrandLine}
+        </span>
 
-        {/* Division tabs — same interaction model as the homepage mode picker */}
-        <div className="mt-6">
-          <div
-            role="tablist"
-            aria-label="Choose a NEXT division"
-            className="flex flex-wrap gap-1.5 rounded-2xl border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur"
-          >
-            {NEXT_DIVISIONS.map((d) => {
-              const active = d.id === division.id;
-              return (
-                <button
-                  key={d.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => onSelect(d.id)}
-                  className={`group relative inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-[13px] font-medium transition-all duration-300 ${
-                    active
-                      ? "bg-white text-[#03002C] shadow-lg shadow-black/20"
-                      : "text-white/70 hover:bg-white/[0.06] hover:text-white"
-                  }`}
-                >
-                  <span
-                    aria-hidden
-                    className="size-2 rounded-full"
-                    style={{ background: d.accent }}
-                  />
-                  {d.eventName}
-                  {active && (
-                    <span
-                      aria-hidden
-                      className="absolute -bottom-[7px] left-1/2 h-1 w-8 -translate-x-1/2 rounded-full"
-                      style={{ backgroundColor: d.accent }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div
-          key={division.id}
-          className="mt-8 grid animate-fade-in gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-end"
-        >
+        <div className="mt-8 grid gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-end">
           <div className="min-w-0">
-            <div
-              className="text-[10px] font-semibold uppercase tracking-[0.32em]"
-              style={{ color: division.accent }}
-            >
-              {division.eventName} · {NEXT_EVENT.datesLabel}
-            </div>
-            <h1 className="mt-3 text-[42px] font-semibold leading-[1.02] tracking-tight sm:text-6xl">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.24em] text-white/85">
+              {NEXT_EVENT.datesLabel}
+            </p>
+            <h1 className="mt-3 text-[42px] font-semibold leading-[1.02] sm:text-6xl">
               {NEXT_EVENT.name}
             </h1>
-            <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/70">
-              One system, {NEXT_DIVISIONS.length} divisions, {total || 616} master designs. Every
-              division inherits the same layout grid and swaps only its accent, lockup and headline
-              suffix.
+            <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-white/85">
+              Pick a city for on-site assets, or a division for master brand templates.
             </p>
 
-            <div className="mt-6 flex flex-wrap items-center gap-2">
+            <div className="mt-6 flex flex-wrap items-center gap-3">
               <a
-                href="#registry"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-[#03002C] shadow-lg shadow-black/25 transition hover:-translate-y-0.5 hover:shadow-xl"
+                href="#editions"
+                onClick={goEditions}
+                className="inline-flex items-center gap-2 rounded-md bg-white px-5 py-2.5 text-sm font-semibold text-[#03002C] shadow-lg shadow-black/25 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#03002C]"
               >
-                <Search size={14} style={{ color: division.accent }} /> Browse the registry
+                <MapPin size={14} /> Choose a city edition
+              </a>
+              <a
+                href="#master-system"
+                className="inline-flex items-center gap-2 rounded-md border border-white/40 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                Master brand templates <ArrowRight size={14} />
               </a>
             </div>
 
-            <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-white/85 sm:grid-cols-4">
+            <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-white sm:grid-cols-4">
               <Fact icon={CalendarDays} label="Dates" value={NEXT_EVENT.datesLabel} />
               <Fact
                 icon={MapPin}
@@ -402,62 +201,96 @@ function Hero({
             </dl>
           </div>
 
-          {/* Lockup + stat strip */}
-          <div className="flex flex-col gap-3">
-            <LockupPlate division={division} />
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { k: String(NEXT_DIVISIONS.length), v: "Divisions" },
-                { k: "56", v: "Formats" },
-                { k: String(total || 616), v: "Designs" },
-              ].map((s) => (
-                <div
-                  key={s.v}
-                  className="rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3 text-center backdrop-blur"
-                >
-                  <p className="text-xl font-semibold text-white">{s.k}</p>
-                  <p className="mt-0.5 text-[10px] uppercase tracking-widest text-white/50">
-                    {s.v}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <a
-              href="#cities"
-              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
-            >
-              <span>
-                <span className="font-medium">{NEXT_CITY_SERIES.name}</span> ·{" "}
-                {NEXT_CITY_SERIES.stops.length} stops
-              </span>
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </a>
-            <a
-              href="#next-directory"
-              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
-            >
-              <span>
-                <span className="font-medium">Where everything lives</span> · every NEXT page in one
-                index
-              </span>
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </a>
-
-
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { k: String(NEXT_CITY_SERIES.stops.length), v: "City stops" },
+              { k: String(NEXT_DIVISIONS.length), v: "Divisions" },
+              { k: String(total || 616), v: "Master designs" },
+            ].map((s) => (
+              <div
+                key={s.v}
+                className="rounded-md border border-white/20 bg-[#03002C]/70 px-3 py-3 text-center"
+              >
+                <p className="text-xl font-semibold text-white">{s.k}</p>
+                <p className="mt-0.5 text-[11px] uppercase tracking-widest text-white/80">{s.v}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
+    </section>
+  );
+}
 
-      {/* accent rail */}
-      <div aria-hidden className="absolute inset-x-0 bottom-0 flex h-1.5">
-        {NEXT_DIVISIONS.map((d) => (
-          <span
-            key={d.id}
-            className="flex-1 transition-opacity duration-500"
-            style={{ background: d.accent, opacity: d.id === division.id ? 1 : 0.3 }}
-          />
-        ))}
+/** Master Design System zone — the only place the division selector lives. */
+function MasterDesignSystem({
+  division,
+  count,
+  total,
+  onSelect,
+}: {
+  division: NextDivision;
+  count: number;
+  total: number;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <section id="master-system" className="mt-14 scroll-mt-24" aria-labelledby="next-master">
+      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+        Master Design System
+      </p>
+      <h2 id="next-master" className="mt-1 text-xl font-semibold">
+        Division master brand templates
+      </h2>
+      <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
+        These templates are not tied to a city. Pick a division to see its lockup and jobs; for
+        on-site signage at a venue, open that city edition above.
+      </p>
+
+      <div role="group" aria-label="Choose a division" className="mt-4 flex flex-wrap gap-2">
+        {NEXT_DIVISIONS.map((d) => {
+          const active = d.id === division.id;
+          return (
+            <button
+              key={d.id}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onSelect(d.id)}
+              className={`inline-flex items-center gap-2 rounded-md border px-3 py-2 text-[13px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                active
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border hover:bg-muted"
+              }`}
+            >
+              <span aria-hidden className="h-3 w-1 rounded-sm" style={{ background: d.accent }} />
+              {d.eventName}
+            </button>
+          );
+        })}
       </div>
+
+      <DivisionDetail division={division} count={count} />
+
+      <Pathways accent={division.accent} divisionId={division.id} />
+
+      <Link
+        to="/events/next/assets"
+        search={{ division: division.id }}
+        className="mt-6 flex items-center justify-between gap-3 rounded-md border border-border px-5 py-4 transition hover:border-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <span className="inline-flex items-center gap-3">
+          <Search size={18} className="text-icon-muted" />
+          <span>
+            <span className="block text-sm font-semibold">
+              Search all {total ? `${total}` : "600+"} master templates
+            </span>
+            <span className="block text-xs text-muted-foreground">
+              Filter by division, format family, code or size
+            </span>
+          </span>
+        </span>
+        <ArrowRight size={16} />
+      </Link>
     </section>
   );
 }
@@ -657,7 +490,7 @@ function Fact({
 }) {
   return (
     <div className="min-w-0">
-      <dt className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-white/50">
+      <dt className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-white/80">
         <Icon size={14} /> {label}
       </dt>
       <dd className="mt-0.5 font-medium">{value}</dd>
@@ -665,7 +498,7 @@ function Fact({
   );
 }
 
-/** Role-based entry points into the NEXT system. */
+/** Job-based entry points into the master templates. */
 const NEXT_PATHWAYS: {
   id: string;
   title: string;
@@ -675,26 +508,26 @@ const NEXT_PATHWAYS: {
   cta: string;
 }[] = [
   {
-    id: "sponsorship",
-    title: "Sponsorship & deck",
-    who: "Sales / partnerships",
-    detail: "Digital sponsorship packet, sponsors grid and the 16:9 PowerPoint template.",
-    group: "sponsorship-deck",
-    cta: "Open packet & deck",
-  },
-  {
     id: "social",
-    title: "Campaign & social",
-    who: "Marketing / demand gen",
+    title: "Promote the event",
+    who: "Campaign & social",
     detail:
       "Paid + organic ads, content banners, email headers, advocacy squares and speaker cards.",
     group: "asset-subsection",
     cta: "Open digital formats",
   },
   {
+    id: "sponsorship",
+    title: "Pitch or present",
+    who: "Sponsorship & deck",
+    detail: "Digital sponsorship packet, sponsors grid and the 16:9 PowerPoint template.",
+    group: "sponsorship-deck",
+    cta: "Open packet & deck",
+  },
+  {
     id: "signage",
-    title: "On-site signage",
-    who: "Event producers",
+    title: "Guide attendees on-site",
+    who: "On-site signage",
     detail:
       "G-series printable posters in US Letter and A4 for wayfinding, rooms and registration.",
     group: "event-signage",
@@ -702,72 +535,68 @@ const NEXT_PATHWAYS: {
   },
   {
     id: "screens",
-    title: "Screens & stage",
-    who: "AV / production",
+    title: "Set up stage & displays",
+    who: "Screens & stage",
     detail: "S-series digital screen designs for stage, foyer and breakout displays.",
     group: "event-screens",
     cta: "Open screen set",
   },
   {
     id: "pillars",
-    title: "Large format",
-    who: "Fabrication partners",
+    title: "Print large-format",
+    who: "Large format",
     detail: "P-series pillar wraps at 15.75×78.7 in (40×200 cm), print-ready.",
     group: "pillar-signage",
     cta: "Open pillar set",
   },
 ];
 
-function Pathways({ accent, onPick }: { accent: string; onPick: (g: NextFormatGroupId) => void }) {
+const pathCard =
+  "group relative overflow-hidden rounded-md border border-border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+
+function Pathways({ accent, divisionId }: { accent: string; divisionId: string }) {
   return (
-    <section className="mt-10" aria-labelledby="next-pathways">
+    <div className="mt-8">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="next-pathways" className="text-xl font-semibold tracking-tight">
-          Start where you work
-        </h2>
+        <h3 className="text-base font-semibold">What do you need to do?</h3>
         <a href="#generate" className="text-sm font-medium text-primary hover:underline">
           Or generate a kit →
         </a>
       </div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {NEXT_PATHWAYS.map((p) => (
-          <button
+          <Link
             key={p.id}
-            onClick={() => onPick(p.group)}
-            className="group relative overflow-hidden rounded-2xl border border-border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md"
+            to="/events/next/assets"
+            search={{ division: divisionId, group: p.group }}
+            className={pathCard}
           >
             <span
               aria-hidden
               className="absolute inset-x-0 top-0 h-1"
               style={{ background: accent }}
             />
-            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            <h4 className="text-sm font-semibold">{p.title}</h4>
+            <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               {p.who}
             </p>
-            <h3 className="mt-1 text-sm font-semibold tracking-tight">{p.title}</h3>
             <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{p.detail}</p>
             <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary">
               {p.cta}
               <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
             </span>
-          </button>
+          </Link>
         ))}
-
-        {/* Agendas are their own deliverable — a paper/large-format schedule
-            sheet, not a pillar wrap — so they get their own entry point. */}
-        <Link
-          to="/events/next/agendas"
-          className="group relative overflow-hidden rounded-2xl border border-border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md"
-        >
+        <Link to="/events/next/agendas" search={{ division: divisionId }} className={pathCard}>
           <span
             aria-hidden
             className="absolute inset-x-0 top-0 h-1"
             style={{ background: accent }}
           />
-          <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            Programme / content
+          <h4 className="text-sm font-semibold">Publish the schedule</h4>
+          <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            Agendas &amp; schedules
           </p>
-          <h3 className="mt-1 text-sm font-semibold tracking-tight">Agendas &amp; schedules</h3>
           <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
             Multi-day, multi-page agenda sheets on the approved grounds — editable Word, layered PDF
             and press-ready art.
@@ -778,17 +607,17 @@ function Pathways({ accent, onPick }: { accent: string; onPick: (g: NextFormatGr
           </span>
         </Link>
       </div>
-    </section>
+    </div>
   );
 }
 
 function DivisionDetail({ division, count }: { division: NextDivision; count: number }) {
   return (
-    <section className="mt-6 grid gap-6 rounded-2xl border border-border p-6 md:grid-cols-[240px_1fr]">
+    <div className="mt-6 grid gap-6 rounded-md border border-border p-6 md:grid-cols-[240px_1fr]">
       <LockupPlate division={division} className="self-start" />
 
       <div>
-        <h2 className="text-2xl font-semibold tracking-tight">{nextHeadline(division)}</h2>
+        <h3 className="text-2xl font-semibold">{nextHeadline(division)}</h3>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           {division.body}
         </p>
@@ -840,464 +669,31 @@ function DivisionDetail({ division, count }: { division: NextDivision; count: nu
           </span>
         </div>
       </div>
-    </section>
-  );
-}
-
-function FilterChip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      aria-pressed={active}
-      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-        active ? "border-transparent bg-foreground text-background" : "border-border hover:bg-muted"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-/** Page-by-page viewer for a division's multi-page deck (packet or PowerPoint). */
-function DeckPages({ pages, label }: { pages: string[]; label: string }) {
-  const [index, setIndex] = useState(0);
-  const total = pages.length;
-  const go = (delta: number) => setIndex((i) => (i + delta + total) % total);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") {
-        e.preventDefault();
-        go(1);
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        go(-1);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [total]);
-
-  return (
-    <div>
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-xs text-muted-foreground">
-          Page {index + 1} of {total} — exported from the Canva master. Use ← / → to flip.
-        </p>
-        <div className="flex shrink-0 items-center gap-1">
-          <button
-            type="button"
-            onClick={() => go(-1)}
-            aria-label="Previous page"
-            className="inline-flex size-8 items-center justify-center rounded-full border border-border text-icon transition hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => go(1)}
-            aria-label="Next page"
-            className="inline-flex size-8 items-center justify-center rounded-full border border-border text-icon transition hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
-      </div>
-
-      <div className="relative mt-3 flex items-center justify-center rounded-lg border border-border bg-muted p-2">
-        <img
-          key={pages[index]}
-          src={pages[index]}
-          alt={`${label} page ${index + 1} of ${total}`}
-          className="max-h-[60vh] w-auto max-w-full object-contain"
-        />
-      </div>
-
-      <div className="mt-3 flex flex-wrap gap-2" role="tablist" aria-label={`${label} pages`}>
-        {pages.map((src, i) => (
-          <button
-            key={src}
-            type="button"
-            role="tab"
-            aria-selected={i === index}
-            aria-label={`Go to page ${i + 1}`}
-            onClick={() => setIndex(i)}
-            className={`overflow-hidden rounded-md border transition ${
-              i === index
-                ? "border-primary ring-2 ring-primary/30"
-                : "border-border opacity-70 hover:opacity-100"
-            }`}
-          >
-            <img src={src} alt="" className="h-14 w-auto object-contain" loading="lazy" />
-          </button>
-        ))}
-      </div>
     </div>
   );
 }
 
-function RegistryCard({
-  row,
-  accent,
-  onPreview,
-}: {
-  row: NextRegistryRow;
-  accent: string;
-  onPreview: () => void;
-}) {
-  const packetPages = deckPagesFor(row);
-  const isDeck = isPowerpointDeck(row);
-
-  const thumb = packetPages?.[0] ?? row.exampleUrl;
+/** London is produced on its own edition page; the hub only reports status. */
+function LondonStatus() {
   return (
-    <article className="flex flex-col gap-3 rounded-xl border border-border p-3">
-      <button
-        onClick={onPreview}
-        className="group relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded-lg bg-muted"
-        aria-label={
-          packetPages
-            ? `Preview all ${packetPages.length} pages of ${row.format}`
-            : `Preview ${row.code} ${row.format}`
-        }
+    <section className="mt-8" aria-label="London production status">
+      <Link
+        to="/events/next/london"
+        className="group flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-card px-5 py-4 transition hover:border-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        {row.badgeSide ? (
-          <div className="flex size-full items-center justify-center bg-[#03002C] py-2 transition group-hover:scale-[1.02]">
-            <CityBadge
-              config={{
-                ...CITY_BADGE_DEFAULT,
-                divisionId: cityBadgeDivision(row.divisionId).id,
-              }}
-              side={row.badgeSide}
-              ppi={22}
-              style={{ borderRadius: 4 }}
-            />
-          </div>
-        ) : thumb ? (
-          <img
-            src={thumb}
-            alt={`${row.code} ${row.format}`}
-            className="size-full object-contain transition group-hover:scale-[1.02]"
-            loading="lazy"
-          />
-        ) : (
-          <ImageIcon size={20} className="text-icon-muted" />
-        )}
-        {packetPages ? (
-          <span className="absolute bottom-1.5 right-1.5 rounded-full bg-foreground/85 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-background">
-            {packetPages.length} {isDeck ? "slides" : "pages"}
+        <span>
+          <span className="block font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+            In production · Job {LONDON_VENUE.job}
           </span>
-        ) : null}
-      </button>
-
-      <div className="flex items-start gap-2">
-        <span
-          className="mt-0.5 rounded px-1.5 py-0.5 text-[11px] font-semibold"
-          style={{ background: `${accent}22`, color: "inherit" }}
-        >
-          {row.code}
+          <span className="mt-1 block text-base font-semibold">
+            London · {LONDON_VENUE.venue} — {londonPanelCount()} panels, in production
+          </span>
         </span>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium">{row.format}</p>
-          <p className="text-xs text-muted-foreground">{row.size}</p>
-        </div>
-      </div>
-      <div className="mt-auto flex items-center gap-3 text-xs">
-        {row.internalUrl ? (
-          <Link
-            to={row.internalUrl}
-            className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
-          >
-            Open badge template <ArrowRight size={12} />
-          </Link>
-        ) : row.canvaUrl ? (
-          <a
-            href={row.canvaUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
-          >
-            Open in Canva <ExternalLink size={12} />
-          </a>
-        ) : (
-          <span className="text-muted-foreground">Coming soon</span>
-        )}
-        {row.secondaryUrl && (
-          <a
-            href={row.secondaryUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-muted-foreground hover:underline"
-          >
-            {row.secondaryLabel ?? "Download"}
-          </a>
-        )}
-      </div>
-    </article>
-  );
-}
-
-/**
- * Live editable pillar masters for the selected division — both approved faces.
- * These are studio configs, not flat Canva artwork, so every card opens the
- * pillar editor seeded on that exact master with full editing + press export.
- */
-function LivePillars({ division }: { division: NextDivision }) {
-  const [face, setFace] = useState<"light" | "dark">("light");
-  const savedPillars = useSavedPillarFiles();
-  const savedAgendas = useSavedAgendaFiles();
-
-  // Saved live files win over the shipped defaults, so an update made in the
-  // studio shows on these large-format cards as soon as it is saved.
-  const cards = useMemo(
-    () =>
-      PILLAR_KINDS.map((kind) => {
-        const kindId = kind.id as PillarKindId;
-        const saved = pickPillarFile(savedPillars.data, division.id, kindId, face);
-        const config: PillarConfig = saved
-          ? { ...saved.config, face }
-          : { ...pillarDefault(kindId, division.id), face };
-        return {
-          id: kindId,
-          label: kind.name,
-          config,
-          fileId: saved?.id,
-          fileName: saved?.name,
-          updatedAt: saved?.updated_at,
-        };
-      }),
-    [division.id, face, savedPillars.data],
-  );
-
-  const savedAgenda = useMemo(
-    () => pickAgendaFile(savedAgendas.data, division.id),
-    [savedAgendas.data, division.id],
-  );
-
-  // Every division gets an agenda preview card: the saved live file when there
-  // is one, otherwise the editable division default on the selected face.
-  const agendaCard = useMemo(() => {
-    const config = savedAgenda ? savedAgenda.config : { ...agendaDefault(division.id), face };
-    return { config };
-  }, [savedAgenda, division.id, face]);
-
-  return (
-    <section className="mt-4 scroll-mt-24" aria-labelledby="next-live-pillars">
-      <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <div>
-          <h2 id="next-live-pillars" className="text-xl font-semibold tracking-tight">
-            Live pillar masters · {division.name}
-          </h2>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Welcome, registration, general logo, directional, the {division.name} profile pillar and
-            the blank pillar, on the approved NEXT grounds and carrying the {division.name} lockup.
-            Every one is a live studio file — open it to edit the strapline, copy, footprint, QR
-            codes and lockup scale, then export layered PDF/X-4 and Illustrator art.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Link
-            to="/events/next/agendas"
-            search={{ division: division.id, file: savedAgenda?.id }}
-            className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted"
-          >
-            <CalendarDays size={13} /> {division.name} agenda
-          </Link>
-          <div
-            role="group"
-            aria-label="Pillar face"
-            className="inline-flex rounded-full border border-border p-0.5"
-          >
-            {(["light", "dark"] as const).map((f) => (
-              <button
-                key={f}
-                type="button"
-                onClick={() => setFace(f)}
-                aria-pressed={face === f}
-                className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition ${
-                  face === f ? "bg-primary text-primary-foreground" : "text-muted-foreground"
-                }`}
-              >
-                {f} face
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map((card) => (
-          <article
-            key={card.id}
-            className="group overflow-hidden rounded-2xl border border-border p-3 transition hover:-translate-y-0.5 hover:shadow-md"
-          >
-            <div className="flex justify-center overflow-hidden rounded-xl bg-muted/40 p-2">
-              <PillarSign config={card.config} pxPerMm={0.1} />
-            </div>
-            <h3 className="mt-3 text-sm font-semibold tracking-tight">{card.label} pillar</h3>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {card.config.trimW}×{card.config.trimH} mm · {face} face ·{" "}
-              {card.fileId ? "saved live file" : "editable master"}
-            </p>
-            {card.fileId && (
-              <p className="mt-0.5 truncate text-[11px] text-primary/80">
-                {card.fileName}
-                {card.updatedAt ? ` · updated ${new Date(card.updatedAt).toLocaleString()}` : ""}
-              </p>
-            )}
-            <Link
-              to="/events/next/pillars"
-              search={{ division: division.id, kind: card.id, face, file: card.fileId }}
-              className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-            >
-              Edit this pillar
-              <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
-            </Link>
-          </article>
-        ))}
-      </div>
-
-      {/* Division agenda board — always listed, saved live file or the editable
-          division default, so every division shows an agenda preview card. */}
-      <article className="mt-4 flex flex-col gap-4 rounded-2xl border border-border p-4 sm:flex-row sm:items-center">
-        <div className="flex justify-center overflow-hidden rounded-xl bg-muted/40 p-2">
-          <AgendaSheet config={agendaCard.config} pxPerMm={0.22} />
-        </div>
-        <div className="min-w-0">
-          <h3 className="text-sm font-semibold tracking-tight">
-            {savedAgenda ? "Live agenda board" : "Agenda board master"} · {division.name}
-          </h3>
-          <p className="mt-1 truncate text-xs text-muted-foreground">
-            {savedAgenda
-              ? `${savedAgenda.name} · updated ${new Date(savedAgenda.updated_at).toLocaleString()}`
-              : `${agendaCard.config.trimW}×${agendaCard.config.trimH} mm · ${agendaCard.config.face} face · editable default`}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Multi-day, multi-page programmes · layered PDF/X-4, Illustrator and editable Word
-            export.
-          </p>
-          <Link
-            to="/events/next/agendas"
-            search={{ division: division.id, file: savedAgenda?.id }}
-            className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-          >
-            {savedAgenda ? "Edit this agenda" : "Create this agenda"}
-            <ArrowRight size={12} />
-          </Link>
-        </div>
-      </article>
-    </section>
-  );
-}
-
-/** London location signage — the QEII Centre scenic panel kit, part of the program. */
-function LondonKit() {
-  const floors = londonPanelsByFloor();
-  const styleIds = Object.keys(LONDON_STYLES);
-  return (
-    <section id="london" className="mt-14 scroll-mt-24" aria-labelledby="next-london-kit">
-      <div className="overflow-hidden rounded-2xl border border-border">
-        {/* Header band painted with the venue's own gradient grounds. */}
-        <div className="flex h-2.5" aria-hidden>
-          {styleIds.map((id) => (
-            <span
-              key={id}
-              className="flex-1"
-              style={{
-                background: `linear-gradient(120deg, ${LONDON_STYLES[id].stops.join(", ")})`,
-              }}
-            />
-          ))}
-        </div>
-        <div className="p-6 sm:p-8">
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-            Location signage · Job {LONDON_VENUE.job}
-          </p>
-          <h2 id="next-london-kit" className="mt-2 text-xl font-semibold tracking-tight">
-            London — scenic panel kit
-          </h2>
-          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-            {LONDON_VENUE.venue}, {LONDON_VENUE.city} · {LONDON_VENUE.datesLabel}. All{" "}
-            {londonPanelCount()} scenic panels the location team specified — trim and bleed
-            geometry, gradient treatments and measured banding — with vector-first .ai/.svg and
-            dithered PNG downloads for the RIP. The kit is public: the venue team can pull artwork
-            straight from the link, no sign-in needed.
-          </p>
-
-          <dl className="mt-6 flex flex-wrap gap-x-9 gap-y-4">
-            {[
-              { k: "Panels", v: String(londonPanelCount()) },
-              { k: "Floors", v: String(floors.length) },
-              { k: "Gradient grounds", v: String(styleIds.length) },
-              { k: "Colour space", v: LONDON_VENUE.colourSpace },
-            ].map((s) => (
-              <div key={s.k}>
-                <dd className="text-lg font-semibold tracking-tight">{s.v}</dd>
-                <dt className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
-                  {s.k}
-                </dt>
-              </div>
-            ))}
-          </dl>
-
-          {/* Ground swatches actually in force at the venue. */}
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {styleIds.map((id) => {
-              const style = LONDON_STYLES[id];
-              return (
-                <article key={id} className="overflow-hidden rounded-xl border border-border">
-                  <div
-                    className="h-16 w-full"
-                    style={{ background: `linear-gradient(120deg, ${style.stops.join(", ")})` }}
-                  />
-                  <div className="p-3">
-                    <h3 className="text-[13px] font-semibold">{style.label}</h3>
-                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-                      {style.note}
-                    </p>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Link
-              to="/events/next/london"
-              className="group inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-            >
-              Open the London panel kit
-              <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              to="/events/next/san-francisco"
-              className="group inline-flex items-center gap-2 rounded-full border border-[#03002C]/20 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-[#F2F2F2]"
-            >
-              San Francisco · Oct 27–28
-              <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              to="/events/next/california"
-              className="group inline-flex items-center gap-2 rounded-full border border-[#03002C]/20 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-[#F2F2F2]"
-            >
-              California partner kiosks
-              <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
-            </Link>
-
-            <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-              <MapPin size={13} aria-hidden /> {LONDON_VENUE.address}
-            </span>
-          </div>
-        </div>
-      </div>
+        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+          Open London workbench
+          <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+        </span>
+      </Link>
     </section>
   );
 }

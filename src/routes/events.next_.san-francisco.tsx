@@ -104,6 +104,7 @@ function SanFranciscoPage() {
           editionLabel="San Francisco 2026"
           countsFor={() => ({ booths: 0, signage: 0 })}
           hasProgramme={false}
+          signageIssued={false}
           selected={divisionFocus}
           onSelect={setDivisionFocus}
         />
