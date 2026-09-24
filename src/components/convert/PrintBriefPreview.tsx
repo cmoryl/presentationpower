@@ -38,6 +38,8 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
     const k = Math.min(trim.width, trim.height) / 8.268;
     const u = (n: number) => Math.max(1, Math.round(n * k));
     const big = layout === "poster" || layout === "banner";
+    const land = layout === "landscape";
+    const L = land ? { gridColumn: 1 } : {};
     const photo = content.media?.kind === "photo" ? content.media.url : null;
     const groundToken = content.media?.kind === "token" ? content.media.token : "#FFFFFF";
 
@@ -62,7 +64,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
             flexDirection: "column",
             gap: u(18),
             ...(layout === "landscape"
-              ? { display: "grid", gridTemplateColumns: "1.15fr 1fr", gridAutoRows: "min-content", columnGap: u(28), alignContent: "start" }
+              ? { display: "grid", gridTemplateColumns: "1.15fr 1fr", gridAutoRows: "min-content", gridAutoFlow: "row dense", columnGap: u(28), alignContent: "start" }
               : {}),
             ...(big ? { justifyContent: "center" } : {}),
           }}
@@ -78,6 +80,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
                 fontWeight: 600,
                 color: "#666666",
                 margin: 0,
+                ...L,
               }}
             >
               {content.eyebrow}
@@ -91,6 +94,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
               letterSpacing: "-0.02em",
               fontWeight: 700,
               margin: 0,
+              ...L,
               maxWidth: big ? "14ch" : "20ch",
             }}
           >
@@ -118,6 +122,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
                 margin: 0,
                 maxWidth: "62ch",
                 fontWeight: 500,
+                ...L,
               }}
             >
               {content.body}
@@ -133,6 +138,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
                 margin: 0,
                 padding: 0,
                 listStyle: "none",
+                ...(land ? { gridColumn: 2, gridRow: "2 / span 3", alignContent: "start" } : {}),
               }}
             >
               {content.points.map((p, i) => (
@@ -152,7 +158,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
           ) : null}
 
           {content.stat ? (
-            <div style={{ marginTop: big ? u(24) : "auto", display: "flex", alignItems: "baseline", gap: u(12) }}>
+            <div style={{ marginTop: big ? u(24) : "auto", display: "flex", alignItems: "baseline", gap: u(12), ...(land ? { gridColumn: 2 } : {}) }}>
               <span
                 style={{
                   fontSize: t.statPx,

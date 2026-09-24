@@ -387,7 +387,13 @@ function ConvertPage() {
               Convert to
             </h2>
             <div className="grid gap-1">
-              {ADAPT_TARGETS.map((t) => (
+              {ADAPT_TARGETS.map((t, i) => (
+                <Fragment key={t.id}>
+                {i === 0 || ADAPT_TARGETS[i - 1].medium !== t.medium ? (
+                  <h3 className="pt-2 text-[11px] font-semibold tracking-[0.1em] text-[#666] uppercase">
+                    {t.medium === "print" ? "Print" : "Social"}
+                  </h3>
+                ) : null}
                 <button
                   key={t.id}
                   type="button"
@@ -401,6 +407,7 @@ function ConvertPage() {
                       : `${adaptTargetFormat(t)?.width} × ${adaptTargetFormat(t)?.height} px · headline ${t.type.headlinePx}px`}
                   </span>
                 </button>
+                </Fragment>
               ))}
             </div>
           </section>
