@@ -95,7 +95,7 @@ export function ProofGuides({ trim, safeInset }: { trim: { w: number; h: number 
 
 function Placeholder({ icon, title, note, compact = false }: { icon: React.ReactNode; title: string; note: string; compact?: boolean }) {
   return (
-    <div className="flex size-full flex-col items-center justify-center gap-[3cqw] bg-[color:var(--color-muted)] p-[8cqw] text-center [container-type:inline-size]">
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-[3cqw] overflow-hidden bg-[color:var(--color-muted)] p-[8cqw] text-center">
       <span className={`text-[color:var(--color-muted-foreground)] ${compact ? "[&_svg]:size-[28cqw]" : "[&_svg]:size-[12cqw]"}`}>{icon}</span>
       <p className={`${compact ? "text-[11cqw]" : "text-[6cqw]"} font-semibold leading-tight text-[color:var(--color-foreground)]`}>{title}</p>
       {compact ? null : <p className="text-[3.6cqw] leading-snug text-[color:var(--color-muted-foreground)]">{note}</p>}
@@ -128,7 +128,7 @@ export function PageProof({
   if (page.kind === "agenda") {
     if (page.agendaIndex > 0 || compact) {
       return (
-        <div className="w-full" style={box}>
+        <div className="relative w-full [container-type:inline-size]" style={box}>
           <Placeholder
             icon={<FileImage />}
             title={page.label}
@@ -170,7 +170,7 @@ export function PageProof({
     );
   }
   return (
-    <div className="w-full" style={box}>
+    <div className="relative w-full [container-type:inline-size]" style={box}>
       <Placeholder
         icon={page.kind === "map" ? <MapIcon /> : <BarChart3 />}
         title={page.kind === "map" ? page.floorLabel : page.label}
