@@ -185,13 +185,13 @@ const HEADLINE_KEYS = [
   // Saved modules that carry their lead line under a module-specific field.
   "insight", "idea", "message", "ask", "recommendation", "clientName", "client",
 ];
-const EYEBROW_KEYS = ["eyebrow", "kicker", "label", "sectionLabel", "overline", "industry"];
+const EYEBROW_KEYS = ["eyebrow", "kicker", "label", "sectionLabel", "overline", "industry", "clientName", "client"];
 const BODY_KEYS = [
   "body", "summary", "subtitle", "copy", "subhead", "standfirst", "intro", "description",
-  "narrative", "story", "message", "insight", "result", "solution", "challenge", "caption",
+  "narrative", "story", "message", "insight", "result", "solution", "challenge", "caption", "soWhat",
 ];
 const POINT_KEYS = ["points", "bullets", "cardPoints", "items", "list", "highlights", "cardHighlights"];
-const CTA_KEYS = ["cta", "ctaLabel", "action", "nextSteps", "followUp"];
+const CTA_KEYS = ["cta", "ctaLabel", "action", "nextSteps", "followUp", "nowWhat"];
 const FOOTNOTE_KEYS = ["footnote", "source", "sourceNote", "disclaimer", "attribution", "reference"];
 const PHOTO_KEYS = ["imageUrl", "image", "photoUrl", "mediaUrl", "heroImage", "backgroundImage"];
 
@@ -199,6 +199,38 @@ function str(v: unknown): string | undefined {
   if (typeof v !== "string") return undefined;
   const s = v.trim();
   return s.length > 0 ? s : undefined;
+}
+
+/**
+ * Saved modules sometimes hold their list fields as a string — JSON, or a
+ * Python-style repr ("[{'title': 'A', 'body': 'B'}]") written by an older
+ * generator. Read either back into an array so points and figures carry.
+ */
+export function asList(v: unknown): unknown[] | undefined {
+  if (Array.isArray(v)) return v;
+  if (typeof v !== "string") return undefined;
+  const t = v.trim();
+  if (!t.startsWith("[")) return undefined;
+  try {
+    const j = JSON.parse(t);
+    return Array.isArray(j) ? j : undefined;
+  } catch {
+    /* fall through to the repr reader */
+  }
+  try {
+    const jsonish = t
+      .replace(/\bNone\b/g, "null")
+      .replace(/\bTrue\b/g, "true")
+      .replace(/\bFalse\b/g, "false")
+      // 'text' → "text", keeping apostrophes inside double-quoted strings.
+      .replace(/"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'/g, (_m, dq, sq) =>
+        dq !== undefined ? `"${dq}"` : JSON.stringify(String(sq).replace(/\\'/g, "'")),
+      );
+    const j = JSON.parse(jsonish);
+    return Array.isArray(j) ? j : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 function pick(content: Record<string, unknown>, keys: string[]): string | undefined {
@@ -211,8 +243,8 @@ function pick(content: Record<string, unknown>, keys: string[]): string | undefi
 
 function pickPoints(content: Record<string, unknown>): string[] | undefined {
   for (const k of POINT_KEYS) {
-    const v = content[k];
-    if (!Array.isArray(v)) continue;
+    const v = asList(content[k]);
+    if (!v) continue;
     const out = v
       .map((item) => {
         if (typeof item === "string") return str(item);
@@ -226,7 +258,9 @@ function pickPoints(content: Record<string, unknown>): string[] | undefined {
           const value = str(rec.value) ?? str(rec.stat) ?? str(rec.number) ?? str(rec.metric);
           const head = str(rec.title) ?? str(rec.label) ?? str(rec.heading) ?? str(rec.name);
           const tail = str(rec.body) ?? str(rec.text) ?? str(rec.copy) ?? str(rec.role) ?? str(rec.description);
-          const lead = value ? [value + (str(rec.unit) ?? ""), head].filter(Boolean).join(" ") : head;
+          const unit = str(rec.unit) ?? "";
+          const figure = value ? (unit && !/^[%+x×]/.test(unit) ? `${value} ${unit}` : value + unit) : undefined;
+          const lead = figure ? [figure, head].filter(Boolean).join(" ") : head;
           return [lead, tail].filter(Boolean).join(" — ") || undefined;
         }
         return undefined;
@@ -256,13 +290,19 @@ function pickStat(content: Record<string, unknown>): { value: string; label: str
     const value = str(rec.value);
     if (value) return { value, label: str(rec.label) ?? "" };
   }
-  const stats = content.stats;
-  if (Array.isArray(stats)) {
+  for (const key of ["stats", "items", "metrics", "kpis"]) {
+    const stats = asList(content[key]);
+    if (!stats) continue;
     for (const s of stats) {
       if (s && typeof s === "object") {
         const rec = s as Record<string, unknown>;
-        const value = str(rec.value) ?? str(rec.stat) ?? str(rec.number);
-        if (value) return { value, label: str(rec.label) ?? str(rec.caption) ?? "" };
+        const raw = rec.value ?? rec.stat ?? rec.number;
+        const value = typeof raw === "number" ? String(raw) : str(raw);
+        if (value) {
+          const unit = str(rec.unit) ?? "";
+          const joined = unit && !/^[%+x×]/.test(unit) ? `${value} ${unit}` : `${value}${unit}`;
+          return { value: joined, label: str(rec.label) ?? str(rec.caption) ?? "" };
+        }
       }
     }
   }
@@ -327,10 +367,19 @@ export function contentFromSlide(
   const c = (slide.content ?? {}) as Record<string, unknown>;
   const stat = pickStat(c);
   const statLine = stat ? [stat.value, stat.label].filter(Boolean).join(" ") : undefined;
+  const headline = pick(c, HEADLINE_KEYS) ?? statLine ?? fallbackHeadline;
+  // Never repeat the headline as the eyebrow or body (a cover's client name
+  // can be both the eyebrow source and the headline fallback).
+  const notHeadline = (v: string | undefined) => (v && v !== headline ? v : undefined);
+  // Cover modules: "Prepared by TransPerfect · 9/19/2026" is the standfirst.
+  const coverLine =
+    [str(c.prepared) ? `Prepared by ${str(c.prepared)}` : undefined, str(c.date)]
+      .filter(Boolean)
+      .join(" · ") || undefined;
   return {
-    eyebrow: pick(c, EYEBROW_KEYS),
-    headline: pick(c, HEADLINE_KEYS) ?? statLine ?? fallbackHeadline,
-    body: pick(c, BODY_KEYS),
+    eyebrow: notHeadline(pick(c, EYEBROW_KEYS)),
+    headline,
+    body: notHeadline(pick(c, BODY_KEYS)) ?? coverLine,
     points: pickPoints(c),
     stat,
     cta: pick(c, CTA_KEYS),
