@@ -602,7 +602,11 @@ function DeckEditor() {
                                     type="button"
                                     onClick={(e) => {
                                       setActiveIdx(idx);
-                                      (e.currentTarget.closest("details") as HTMLDetailsElement | null)?.removeAttribute("open");
+                                      (
+                                        e.currentTarget.closest(
+                                          "details",
+                                        ) as HTMLDetailsElement | null
+                                      )?.removeAttribute("open");
                                     }}
                                     className="min-h-9 shrink-0 rounded-md border border-black/20 px-2.5 text-xs font-semibold hover:border-[#003FC7] hover:text-[#003FC7]"
                                   >
@@ -622,9 +626,7 @@ function DeckEditor() {
                 <div className="flex flex-wrap items-center gap-3 text-xs text-black/70">
                   <BrandHealthBadge
                     getRoots={() =>
-                      Array.from(
-                        document.querySelectorAll<HTMLElement>("[data-slide-stage]"),
-                      )
+                      Array.from(document.querySelectorAll<HTMLElement>("[data-slide-stage]"))
                     }
                     divisionId={deck.brandModeId ?? null}
                     surfaceLabel="the slides on screen"
@@ -1322,7 +1324,7 @@ function DeckEditor() {
                               role="menuitem"
                               onClick={(e) => {
                                 e.currentTarget.closest("details")?.removeAttribute("open");
-                                if (confirm(`Delete slide ${i + 1}? You can undo this from History.`))
+                                if (confirm(`Delete slide ${i + 1}?`))
                                   removeSlide(deck.id, slide.id);
                               }}
                               className="block min-h-9 w-full rounded px-2 text-left font-semibold text-red-700 hover:bg-red-50"
