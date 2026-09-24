@@ -156,44 +156,34 @@ export function EditorToolbar({
   slideRow?: ReactNode;
   slideRowEnd?: ReactNode;
 }) {
+  // One toolbar: deck settings, then this slide's settings, then actions.
   return (
-    <div className="relative z-50 overflow-visible rounded-2xl border border-black/[0.07] bg-white/85 shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(3,0,44,0.12)] backdrop-blur">
-      <ToolbarRow scope="Deck" end={deckRowEnd}>
-        {deckRow}
-      </ToolbarRow>
+    <div
+      role="toolbar"
+      aria-label="Deck and slide settings"
+      className="relative z-50 flex flex-wrap items-center gap-2 overflow-visible rounded-lg border border-black/10 bg-white px-3 py-2"
+    >
+      <ScopeLabel>Deck</ScopeLabel>
+      {deckRow}
       {slideRow ? (
-        <ToolbarRow
-          scope={slideLabel ?? "Slide"}
-          end={slideRowEnd}
-          className="border-t border-black/[0.06] bg-black/[0.015]"
-        >
+        <>
+          <span className="mx-1 h-6 w-px bg-black/15" aria-hidden />
+          <ScopeLabel>{slideLabel ?? "Slide"}</ScopeLabel>
           {slideRow}
-        </ToolbarRow>
+        </>
+      ) : null}
+      {slideRowEnd || deckRowEnd ? (
+        <div className="ml-auto flex flex-wrap items-center gap-1.5">
+          {slideRowEnd}
+          {deckRowEnd}
+        </div>
       ) : null}
     </div>
   );
 }
 
-function ToolbarRow({
-  scope,
-  children,
-  end,
-  className,
-}: {
-  scope: string;
-  children: ReactNode;
-  end?: ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={`flex flex-wrap items-center gap-2 px-3 py-2 ${className ?? ""}`}>
-      <span className="mr-1 shrink-0 text-[9px] font-semibold uppercase tracking-[0.18em] text-black/30">
-        {scope}
-      </span>
-      {children}
-      {end ? <div className="ml-auto flex items-center gap-1.5">{end}</div> : null}
-    </div>
-  );
+function ScopeLabel({ children }: { children: ReactNode }) {
+  return <span className="shrink-0 text-xs font-semibold text-black/70">{children}</span>;
 }
 
 /** Vertical hairline between related toolbar clusters. */
