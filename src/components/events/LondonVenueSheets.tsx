@@ -1419,14 +1419,17 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
  *  the library can't supply — signed out, offline, not yet copied — is drawn
  *  from the built-in copy, and the notice says which is in use. */
 export function LondonVenueSheets(props: LondonVenueSheetsProps = {}) {
+  const userId = useSessionUser();
   const fetchFloors = useServerFn(getVenueFloors);
   const q = useQuery({
     queryKey: ["venue-floors", "qeii-centre"],
     queryFn: () => fetchFloors({ data: { slug: "qeii-centre" } }),
     retry: false,
     staleTime: 5 * 60_000,
+    enabled: !!userId,
   });
-  const ready = !q.isLoading;
+  // Signed out: draw the built-in copy straight away rather than wait.
+  const ready = userId !== undefined && !(q.isPending && q.fetchStatus === "fetching");
   const count = useMemo(() => {
     if (!ready) return 0;
     const rows = q.data ?? [];
@@ -1451,7 +1454,7 @@ export function LondonVenueSheets(props: LondonVenueSheetsProps = {}) {
       <p className="mb-2 text-[12px] text-[#666666]" data-export-ignore="true">
         {count > 0
           ? `Floors drawn from the venue library (${count} saved for the QEII Centre).`
-          : q.error
+          : q.error || !userId
             ? "Venue library unavailable — floors drawn from the built-in copy."
             : "Floors drawn from the built-in copy — the QEII Centre has no floors saved in the venue library yet."}
       </p>
