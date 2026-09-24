@@ -6,11 +6,12 @@
 // slots, ground and print note carried, sizes carried and clearly labelled as
 // carried, and the families that still have no build called out as gaps.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Building2, Download, Layers, MapPin } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import { readCityPlanDraft, writeCityPlanDraft } from "@/lib/city-plan-draft";
 import { CityTemplateSection } from "@/components/events/CityTemplateSection";
 import { LONDON_PANELS, LONDON_VENUE, type LondonPanel } from "@/lib/next-london-signage";
 import {
@@ -81,6 +82,21 @@ function mm(n: number | null) {
 
 function NextCityPage() {
   const [brief, setBrief] = useState<CityBrief>(DEFAULT_CITY_BRIEF);
+  // Pick up the city and venue entered in step 1 so nobody types them twice.
+  useEffect(() => {
+    const d = readCityPlanDraft();
+    if (!d) return;
+    setBrief((b) => ({
+      ...b,
+      city: b.city || d.city,
+      venue: b.venue || d.venue,
+      dates: b.dates || d.dates,
+    }));
+  }, []);
+  useEffect(() => {
+    if (brief.city || brief.venue || brief.dates)
+      writeCityPlanDraft({ city: brief.city, venue: brief.venue, dates: brief.dates });
+  }, [brief.city, brief.venue, brief.dates]);
   const starter = useMemo(() => cityStarter<LondonPanel>(brief, LONDON_PANELS), [brief]);
 
   const setCount = (key: keyof CityBrief, raw: string) => {
@@ -102,15 +118,15 @@ function NextCityPage() {
     <AppShell>
       <div className="mx-auto max-w-[1400px] px-6 py-10">
         <Link
-          to="/events/next/playbook"
+          to="/events/next/venue"
           className="inline-flex items-center gap-1.5 text-xs text-black/55 hover:text-[#003FC7]"
         >
-          <ArrowLeft size={13} /> Venue playbook
+          <ArrowLeft size={13} /> Step 2 · Floor plans
         </Link>
 
         <div className="mt-3">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E0E8F5] px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
-            <MapPin size={12} /> Step 3 · Sign schedule
+          <div className="inline-flex items-center gap-1.5 bg-[#E0E8F5] px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
+            <MapPin size={12} /> Steps 3–4 · Sign schedule, then city templates
           </div>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#03002C]">
             Plan a new city

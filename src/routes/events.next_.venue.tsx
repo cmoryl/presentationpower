@@ -18,6 +18,7 @@ import {
   Table2,
 } from "lucide-react";
 
+import { readCityPlanDraft, type CityPlanDraft } from "@/lib/city-plan-draft";
 import { AppShell } from "@/components/AppShell";
 import { LondonFloorMap } from "@/components/events/LondonFloorMap";
 import { LondonMapAreasPanel } from "@/components/events/LondonMapAreasPanel";
@@ -190,18 +191,21 @@ function NextVenuePage() {
     if (selectedAreaId === id) setSelectedAreaId(null);
   };
 
+  const [cityDraft, setCityDraft] = useState<CityPlanDraft | null>(null);
+  useEffect(() => setCityDraft(readCityPlanDraft()), []);
+
   const btn =
-    "inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-4 py-2 text-[13px] font-semibold text-[#03002C] transition-colors hover:bg-white";
-  const chip = "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors";
+    "inline-flex items-center gap-2 border border-[#03002C]/25 bg-white/70 px-4 py-2 text-[13px] font-semibold text-[#03002C] transition-colors hover:bg-white";
+  const chip = "border px-3 py-1.5 text-xs font-medium transition-colors";
 
   return (
     <AppShell bare={!userId}>
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
         <Link
-          to="/events/next/london/maps"
+          to="/events/next/locations"
           className="inline-flex items-center gap-2 text-sm font-medium text-[#003FC7] hover:underline"
         >
-          <ArrowLeft className="h-4 w-4" /> London location maps
+          <ArrowLeft className="h-4 w-4" /> Step 1 · Venue record
         </Link>
 
         <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[#03002C] sm:text-4xl">
@@ -209,18 +213,20 @@ function NextVenuePage() {
         </h1>
         <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-[#03002C]/75">
           The same plan sheets, sectioning tools and signage schedule as the London build, on a
-          stand-in layout for the next NEXT venue. {NEXT_VENUE.venue}, {NEXT_VENUE.city} ·{" "}
-          {NEXT_VENUE.datesLabel}.
+          stand-in layout for the next NEXT venue.{" "}
+          {cityDraft
+            ? `Planning ${[cityDraft.venue, cityDraft.city].filter(Boolean).join(", ")} (from the venue record in step 1)${cityDraft.dates ? ` · ${cityDraft.dates}` : " · Dates to be confirmed"}.`
+            : `${NEXT_VENUE.venue}, ${NEXT_VENUE.city} · ${NEXT_VENUE.datesLabel}.`}
         </p>
 
-        <p className="mt-4 rounded-2xl border border-[#FF9B70] bg-[#FF9B70]/12 px-4 py-3 text-[13px] font-medium leading-relaxed text-[#03002C]">
+        <p className="mt-4 border border-[#FF9B70] bg-[#FF9B70]/12 px-4 py-3 text-[13px] font-medium leading-relaxed text-[#03002C]">
           {NEXT_VENUE.caveat}
         </p>
 
         <p className="mt-3 max-w-3xl text-[13px] leading-relaxed text-[#03002C]/70">
-          This is a study on a stand-in layout. When the real venue is contracted, set it up on{" "}
+          This is a study on a stand-in layout. When the real venue is contracted, load its issued floor sheets into{" "}
           <Link to="/events/next/venues" className="font-semibold underline">
-            Floor-plan standards
+            Venues &amp; floor-plan standards
           </Link>{" "}
           — that record is what every sheet, sign schedule and saved position reads from.
         </p>
@@ -414,7 +420,7 @@ function NextVenuePage() {
               : `All ${schedule.length} panels are clean at this scale.`}
           </p>
 
-          <div className="mt-4 overflow-x-auto rounded-2xl border border-[#03002C]/12 bg-white/70">
+          <div className="mt-4 overflow-x-auto border border-[#03002C]/12 bg-white/70">
             <table className="w-full min-w-[720px] text-left text-[13px]">
               <thead className="bg-[#EEF1F7] text-[12px] uppercase tracking-wide text-[#03002C]/70">
                 <tr>
