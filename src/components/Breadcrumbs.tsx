@@ -1,3 +1,4 @@
+import { nextWorkspacePageFor } from "@/lib/next-workspace";
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useDeckStore } from "@/lib/deck-store";
@@ -194,6 +195,8 @@ export function Breadcrumbs() {
   }, [pathname, decks, routePatterns, catalogVersion, dashboardLabel]);
 
   if (crumbs.length === 0) return null;
+  // NEXT pages carry their own named trail (Events / NEXT / city / page) in NextSubnav.
+  if (nextWorkspacePageFor(pathname)) return null;
 
   return (
     <nav
