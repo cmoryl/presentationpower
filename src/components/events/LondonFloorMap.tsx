@@ -446,7 +446,11 @@ export function LondonFloorMap({
                     over its neighbours or off the plan frame. */}
                 {z.w > 1.8 && z.h > 0.9 ? (
                   <span
-                    className="pointer-events-none absolute left-2.5 right-1.5 top-1 overflow-hidden font-bold uppercase leading-[1.15] tracking-[0.08em] text-[#03002C]/80"
+                    className={`pointer-events-none absolute left-2.5 right-1.5 top-1 overflow-hidden font-bold uppercase leading-[1.15] tracking-[0.08em] text-[#03002C]/80 ${
+                      // A sectioned area sits on top of a venue room; an opaque
+                      // label ground stops its name printing over the room's own.
+                      own ? "bg-white px-0.5" : ""
+                    }`}
                     style={{
                       fontSize: z.w < 4 || z.h < 1.6 ? "8px" : "9.5px",
                       display: "-webkit-box",

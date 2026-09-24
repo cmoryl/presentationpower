@@ -9,6 +9,7 @@
 // missing, and the map is only placed once a real position has been found.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { writeCityPlanDraft } from "@/lib/city-plan-draft";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -137,6 +138,13 @@ function VenuePagesRoute() {
 
   const patch = useCallback((next: Partial<VenuePage>) => {
     setDraft((cur) => ({ ...cur, ...next }));
+    // Carry the city and venue forward to the floor-plan and sign-schedule steps.
+    if (next.city !== undefined || next.venue !== undefined) {
+      writeCityPlanDraft({
+        ...(next.city !== undefined ? { city: next.city } : {}),
+        ...(next.venue !== undefined ? { venue: next.venue } : {}),
+      });
+    }
   }, []);
 
   const save = async () => {
@@ -146,6 +154,7 @@ function VenuePagesRoute() {
     try {
       const res = await writeVenue({ data: { ...draft } });
       setDraft(res.venue);
+      writeCityPlanDraft({ city: res.venue.city, venue: res.venue.venue });
       setVenues((cur) => {
         const rest = cur.filter((v) => v.slug !== res.venue.slug);
         return [res.venue, ...rest];
