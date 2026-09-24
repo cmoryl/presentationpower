@@ -1008,132 +1008,43 @@ function LondonSignagePage() {
               London location team specified, held against the issued print schedule and
               specification, with vector-first downloads for the RIP.
             </p>
-            <dl className="mt-8 flex flex-wrap gap-x-9 gap-y-4">
-              {[
-                { k: "Panels", v: String(londonPanelCount()) },
-                { k: "Rooms", v: String(roomCount) },
-                { k: "Gradient grounds", v: String(styleCount) },
-                { k: "Worst measured band", v: `${worstBand.toFixed(2)} mm` },
-                { k: "Packaged rasters", v: `${londonRasterWeightMb().toFixed(0)} MB` },
-              ].map((s) => (
-                <div key={s.k}>
-                  <dd className="text-2xl font-semibold tracking-tight text-[#03002C]">{s.v}</dd>
-                  <dt className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/60">
-                    {s.k}
-                  </dt>
-                </div>
-              ))}
-            </dl>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={downloadSchedule}
-                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              >
-                <Table2 className="h-4 w-4" /> Print schedule (CSV)
-              </button>
-              <button
-                type="button"
-                onClick={downloadWholeKit}
-                disabled={Boolean(zipProgress)}
-                className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-              >
-                <Download className="h-4 w-4" />
+            <div className="mt-8 flex flex-wrap gap-2.5">
+              <button type="button" onClick={downloadWholeKit} disabled={Boolean(zipProgress)} className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 bg-[#003FC7] text-white disabled:opacity-60">
+                <Download className="h-4 w-4" aria-hidden />
                 {zipProgress ? `Packing — ${zipProgress}` : "Download whole kit (ZIP)"}
               </button>
-              <button
-                type="button"
-                onClick={() => handleLondonDirectoryDownload(panels)}
-                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
-              >
-                <BookOpen className="h-4 w-4" /> Master directory (PDF)
-              </button>
-              <Link
-                to="/events/next/london/maps"
-                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
-              >
-                <MapPin className="h-4 w-4" /> Install location maps
+              <Link to="/events/next/london/maps" className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 bg-[#03002C] text-white">
+                <MapPin className="h-4 w-4" aria-hidden /> Install location maps
               </Link>
-              <Link
-                to="/events/next/london/schedule"
-                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
-              >
-                <MapPin className="h-4 w-4" /> Room schedule
+              <Link to="/events/next/london/schedule" className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 bg-[#03002C] text-white">
+                <CalendarDays className="h-4 w-4" aria-hidden /> Room schedule
               </Link>
-              <Link
-                to="/events/next/london/booklet"
-                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
-              >
-                <BookOpen className="h-4 w-4" /> Booklet builder
-              </Link>
-              <Link
-                to="/events/next/london/template"
-                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
-              >
-                <Layers className="h-4 w-4" /> Event template & pack
-              </Link>
-              <a
-                href={logoSetAsset.url}
-                download="TP-NEXT-2026-Logo-Set.zip"
-                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
-              >
-                <Download className="h-4 w-4" /> Logo set (EPS + SVG)
-              </a>
-
-              {userId ? (
-                <Link
-                  to="/events/next/london/revise"
-                  className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
-                >
-                  <Ruler className="h-4 w-4" /> Revise &amp; regenerate
-                </Link>
-              ) : null}
-              <button
-                type="button"
-                onClick={runKitQa}
-                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
-              >
-                <ShieldCheck className="h-4 w-4" /> Run spec QA (all panels)
+              <button type="button" onClick={() => handleLondonDirectoryDownload(panels)} className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 bg-[#03002C] text-white">
+                <BookOpen className="h-4 w-4" aria-hidden /> Master directory (PDF)
               </button>
             </div>
-
-            {/* Result of the last kit-wide audit. */}
-            {qa ? (
-              <div className="mt-5 max-w-2xl rounded-xl border border-black/10 bg-white/80 p-4">
-                <p className="text-sm font-semibold text-[#03002C]">
-                  {(() => {
-                    const r = rollup(qa);
-                    return `${r.total} files audited — ${r.pass} pass, ${r.warn} warning, ${r.fail} fail`;
-                  })()}
-                </p>
-                {qa.filter((r) => r.status !== "pass").length ? (
-                  <ul className="mt-2 space-y-1.5">
-                    {qa
-                      .filter((r) => r.status !== "pass")
-                      .slice(0, 6)
-                      .map((r) => (
-                        <li key={`${r.file}-${r.kind}`} className="text-[12.5px] leading-relaxed">
-                          <span
-                            className={`mr-2 rounded px-1.5 py-0.5 font-mono text-[10px] uppercase ${
-                              r.status === "fail"
-                                ? "bg-[#E53D2E]/15 text-[#8f1d13]"
-                                : "bg-[#FFEB66] text-[#03002C]"
-                            }`}
-                          >
-                            {r.status}
-                          </span>
-                          <span className="font-medium text-[#03002C]">{r.file}</span>{" "}
-                          <span className="text-[#03002C]/70">{qaSummary(r)}</span>
-                        </li>
-                      ))}
-                  </ul>
-                ) : (
-                  <p className="mt-1 text-[12.5px] text-[#03002C]/70">
-                    Every vector master matches its trim, bleed, ppi tier and banding spec.
-                  </p>
-                )}
+            <div className="mt-5 border-t border-[#03002C]/15 pt-3">
+              <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/70">Tools &amp; assets</p>
+              <div className="mt-1.5 flex flex-wrap gap-x-5 gap-y-1">
+                <button type="button" onClick={downloadSchedule} className="inline-flex items-center gap-1.5 border-b border-transparent py-1 text-[13px] font-medium text-[#03002C] hover:border-[#03002C]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
+                  <Table2 className="h-3.5 w-3.5" aria-hidden /> Print schedule (CSV)
+                </button>
+                <a href={logoSetAsset.url} download="TP-NEXT-2026-Logo-Set.zip" className="inline-flex items-center gap-1.5 border-b border-transparent py-1 text-[13px] font-medium text-[#03002C] hover:border-[#03002C]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
+                  <Download className="h-3.5 w-3.5" aria-hidden /> Logo set (EPS + SVG)
+                </a>
+                <Link to="/events/next/london/booklet" className="inline-flex items-center gap-1.5 border-b border-transparent py-1 text-[13px] font-medium text-[#03002C] hover:border-[#03002C]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
+                  <BookOpen className="h-3.5 w-3.5" aria-hidden /> Booklet builder
+                </Link>
+                <Link to="/events/next/london/template" className="inline-flex items-center gap-1.5 border-b border-transparent py-1 text-[13px] font-medium text-[#03002C] hover:border-[#03002C]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
+                  <Layers className="h-3.5 w-3.5" aria-hidden /> Event template &amp; pack
+                </Link>
+                {userId ? (
+                  <Link to="/events/next/london/revise" className="inline-flex items-center gap-1.5 border-b border-transparent py-1 text-[13px] font-medium text-[#03002C] hover:border-[#03002C]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
+                    <Ruler className="h-3.5 w-3.5" aria-hidden /> Revise &amp; regenerate
+                  </Link>
+                ) : null}
               </div>
-            ) : null}
+            </div>
           </div>
         </header>
 
@@ -1147,60 +1058,6 @@ function LondonSignagePage() {
         />
 
 
-        {/* Print specification */}
-        <details className="group mt-10 rounded-2xl border border-black/10 bg-white/70 p-5">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#03002C]">
-              <Info className="h-4.5 w-4.5 text-[#003FC7]" /> Print specification — London run
-            </h2>
-            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/55">
-              <span className="group-open:hidden">Show</span>
-              <span className="hidden group-open:inline">Hide</span>
-            </span>
-          </summary>
-          <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {LONDON_PRINT_SPEC.map((rule) => (
-              <article key={rule.id} className="rounded-xl border border-black/10 bg-white p-5">
-                <h3 className="text-sm font-semibold text-[#03002C]">{rule.title}</h3>
-                <p className="mt-2 text-[13px] leading-relaxed text-[#03002C]/70">{rule.body}</p>
-              </article>
-            ))}
-          </div>
-          <p className="mt-4 rounded-xl border border-[#003FC7]/25 bg-[#E0E8F5] p-4 text-[13px] leading-relaxed text-[#03002C]/80">
-            Colour space: {LONDON_VENUE.colourSpace}. Production partner: {LONDON_VENUE.producer}.
-            Venue: {LONDON_VENUE.address}.
-          </p>
-        </details>
-
-        {/* Gradient grounds */}
-        <details className="group mt-6 rounded-2xl border border-black/10 bg-white/70 p-5">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#03002C]">
-              <ImageIcon className="h-4.5 w-4.5 text-[#003FC7]" /> Gradient grounds in this location
-              · house and division
-            </h2>
-            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/55">
-              <span className="group-open:hidden">Show</span>
-              <span className="hidden group-open:inline">Hide</span>
-            </span>
-          </summary>
-          <LondonGradientGrounds panels={panels} />
-        </details>
-
-        {/* Division agendas — the London kit's own agenda boards */}
-        <details className="group mt-12 rounded-2xl border border-black/10 bg-white/70 p-5">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#03002C]">
-              <CalendarDays className="h-4.5 w-4.5 text-[#003FC7]" /> Division agendas · editable
-              agenda boards, A4 to A1, every division
-            </h2>
-            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/55">
-              <span className="group-open:hidden">Show</span>
-              <span className="hidden group-open:inline">Hide</span>
-            </span>
-          </summary>
-          <LondonAgendaBoards />
-        </details>
 
 
 
@@ -1446,6 +1303,64 @@ function LondonSignagePage() {
               })()}
             </div>
           ))}
+        </section>
+        {/* Reference: spec, grounds and agendas sit below the panels so they never push them down. */}
+        <section aria-label="Reference" className="mt-12 border-t border-black/10">
+          <h2 className="pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/70">Reference</h2>
+        {/* Print specification */}
+        <details className="group border-b border-black/10 py-3">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-base font-semibold text-[#03002C]">
+              <Info className="h-4.5 w-4.5 text-[#003FC7]" /> Print specification — London run
+            </h2>
+            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/55">
+              <span className="group-open:hidden">Show</span>
+              <span className="hidden group-open:inline">Hide</span>
+            </span>
+          </summary>
+          <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {LONDON_PRINT_SPEC.map((rule) => (
+              <article key={rule.id} className="rounded-xl border border-black/10 bg-white p-5">
+                <h3 className="text-sm font-semibold text-[#03002C]">{rule.title}</h3>
+                <p className="mt-2 text-[13px] leading-relaxed text-[#03002C]/70">{rule.body}</p>
+              </article>
+            ))}
+          </div>
+          <p className="mt-4 rounded-xl border border-[#003FC7]/25 bg-[#E0E8F5] p-4 text-[13px] leading-relaxed text-[#03002C]/80">
+            Colour space: {LONDON_VENUE.colourSpace}. Production partner: {LONDON_VENUE.producer}.
+            Venue: {LONDON_VENUE.address}.
+          </p>
+        </details>
+
+        {/* Gradient grounds */}
+        <details className="group border-b border-black/10 py-3">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-base font-semibold text-[#03002C]">
+              <ImageIcon className="h-4.5 w-4.5 text-[#003FC7]" /> Gradient grounds in this location
+              · house and division
+            </h2>
+            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/55">
+              <span className="group-open:hidden">Show</span>
+              <span className="hidden group-open:inline">Hide</span>
+            </span>
+          </summary>
+          <LondonGradientGrounds panels={panels} />
+        </details>
+
+        {/* Division agendas — the London kit's own agenda boards */}
+        <details className="group border-b border-black/10 py-3">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-base font-semibold text-[#03002C]">
+              <CalendarDays className="h-4.5 w-4.5 text-[#003FC7]" /> Division agendas · editable
+              agenda boards, A4 to A1, every division
+            </h2>
+            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/55">
+              <span className="group-open:hidden">Show</span>
+              <span className="hidden group-open:inline">Hide</span>
+            </span>
+          </summary>
+          <LondonAgendaBoards />
+        </details>
         </section>
       </div>
 
