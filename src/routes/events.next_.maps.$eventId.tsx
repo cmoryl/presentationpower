@@ -216,6 +216,19 @@ function MapsPage() {
         <header>
           <p className="font-mono text-[11px] uppercase tracking-wider text-[#666666]">Venue maps</p>
           <h1 className="mt-1 text-[32px] font-bold leading-tight">{plan?.name ?? eventId}</h1>
+          {q.data?.venue ? (
+            <p className="mt-1 text-[13px] text-[#666666]">
+              Floors come from the venue library:{" "}
+              <Link to="/events/venues/$slug" params={{ slug: q.data.venue.slug }} className="font-semibold text-[#003FC7] underline">
+                {q.data.venue.name}
+              </Link>
+              . Floors you load here are saved to the venue; room colours and uses stay with this event.
+            </p>
+          ) : (
+            <p className="mt-1 text-[13px] text-[#666666]">
+              This event isn't linked to a venue in the library yet, so floors are saved to this event only.
+            </p>
+          )}
           <p className="mt-1 text-[14px] text-[#666666]">
             {[plan?.venue, plan?.city, plan?.dates_label].filter(Boolean).join(" · ") || "Venue details still to come"}
           </p>
