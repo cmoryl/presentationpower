@@ -153,7 +153,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
                 <li
                   key={`${i}-${p.slice(0, 12)}`}
                   style={{
-                    fontSize: t.pointPx * bb,
+                    fontSize: t.pointPx * bb * (banner ? 1.3 : 1),
                     lineHeight: t.bodyLeading,
                     paddingLeft: u(banner ? 20 : 12),
                     borderLeft: `${u(banner ? 6 : 3)}px solid ${accent}`,
@@ -167,7 +167,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
           ) : null}
 
           {content.stat ? (
-            <div style={{ marginTop: banner ? 0 : big ? u(24) : "auto", ...(banner ? { flexDirection: "column" as const, alignItems: "flex-start" as const, borderTop: `${u(3)}px solid ${accent}`, paddingTop: u(24), ...(content.points?.length ? {} : { flex: 1, justifyContent: "center" as const }) } : {}), display: "flex", alignItems: "baseline", gap: u(12), ...(land ? { gridColumn: 2 } : {}) }}>
+            <div style={{ marginTop: banner ? 0 : big ? u(24) : "auto", ...(banner ? { flexDirection: "column" as const, alignItems: "flex-start" as const, borderTop: `${u(3)}px solid ${accent}`, paddingTop: u(24), ...(content.points?.length ? {} : { flex: 1, justifyContent: "center" as const }) } : {}), display: "flex", alignItems: banner ? "flex-start" : "baseline", gap: u(12), ...(land ? { gridColumn: 2 } : {}) }}>
               <span
                 style={{
                   fontSize: t.statPx * (banner ? (content.points?.length ? 1.6 : 2.6) : 1),
