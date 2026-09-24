@@ -134,8 +134,13 @@ function ConvertPage() {
   // Coming from the module catalog: bring the chosen module into view in the list.
   useEffect(() => {
     if (!search.module) return;
-    const el = document.querySelector<HTMLElement>(`[data-module-id="${CSS.escape(search.module)}"]`);
-    el?.scrollIntoView({ block: "nearest" });
+    const id = search.module;
+    const timer = window.setTimeout(() => {
+      const el = document.querySelector<HTMLElement>(`[data-module-id="${CSS.escape(id)}"]`);
+      const list = el?.closest("ul");
+      if (el && list) list.scrollTop = el.offsetTop - 8;
+    }, 150);
+    return () => window.clearTimeout(timer);
   }, [search.module]);
   const [draft, setDraft] = useState<{ headline: string; body: string; eyebrow: string }>({
     headline: "",
@@ -292,7 +297,7 @@ function ConvertPage() {
                     ))}
                   </select>
                 </div>
-                <ul className="max-h-64 overflow-y-auto border border-[color:var(--color-border)]" aria-label="Master modules">
+                <ul className="relative max-h-64 overflow-y-auto border border-[color:var(--color-border)]" aria-label="Master modules">
                   {moduleList.map((m) => (
                     <li key={m.id}>
                       <button
