@@ -957,7 +957,7 @@ function LondonSignagePage() {
       },
     );
 
-  const chip = "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors";
+  const chip = "rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors";
 
   return (
     <AppShell bare={!userId}>
@@ -1136,7 +1136,7 @@ function LondonSignagePage() {
                 Partner booths · {boothPanels.length}
               </button>
             ) : null}
-            <span className="ml-auto inline-flex overflow-hidden rounded-full border border-black/15">
+            <span className="ml-auto inline-flex overflow-hidden rounded-sm border border-black/15">
               <button
                 type="button"
                 onClick={() => setSource("supplied")}
@@ -1164,7 +1164,7 @@ function LondonSignagePage() {
                 Whole kit · {panels.length}
               </button>
             </span>
-            <span className="inline-flex overflow-hidden rounded-full border border-black/15">
+            <span className="inline-flex overflow-hidden rounded-sm border border-black/15">
               {(["flat", "scene"] as const).map((v) => (
                 <button
                   key={v}
