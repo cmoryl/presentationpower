@@ -179,7 +179,6 @@ function Hero({ division }: { division: NextDivision }) {
               <Fact icon={Sparkles} label="CTA" value={NEXT_EVENT.ctaLabel} />
             </dl>
           </div>
-
         </div>
       </div>
     </section>
@@ -241,9 +240,7 @@ function MasterDesignSystem({
         <span className="inline-flex items-center gap-3">
           <Search size={18} className="text-icon-muted" />
           <span>
-            <span className="block text-sm font-semibold">
-              Search master templates
-            </span>
+            <span className="block text-sm font-semibold">Search master templates</span>
             <span className="block text-xs text-muted-foreground">
               Filter by division, format family, code or size
             </span>
@@ -642,9 +639,7 @@ function LondonStatus() {
           <span className="block font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
             In production · Job {LONDON_VENUE.job}
           </span>
-          <span className="mt-1 block text-base font-semibold">
-            London · {LONDON_VENUE.venue}
-          </span>
+          <span className="mt-1 block text-base font-semibold">London · {LONDON_VENUE.venue}</span>
         </span>
         <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
           Open London workbench
