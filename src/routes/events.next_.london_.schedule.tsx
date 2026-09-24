@@ -91,8 +91,8 @@ function LondonSchedulePage() {
             What runs in each room, and when
           </h1>
           <p className="mt-3 max-w-[70ch] text-sm leading-relaxed text-[#03002C]/70">
-            {entries.length} recorded spaces and {totalSessions} sessions, taken from the
-            issued event space schedule and the issued division programmes. Open any
+            Every room and session is taken from the issued event space schedule and the
+            issued division programmes. Open any
             room on the floor plan to see exactly where it sits.
           </p>
 
