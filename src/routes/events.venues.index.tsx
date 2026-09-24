@@ -26,7 +26,9 @@ export const Route = createFileRoute("/events/venues/")({
 const card = "rounded-2xl border border-[#03002C]/12 bg-white p-5";
 
 function VenuesPage() {
-  const { user, ready } = useSessionUser();
+  const userId = useSessionUser();
+  const ready = userId !== undefined;
+  const user = userId;
   const list = useServerFn(listVenues);
   const q = useQuery({ queryKey: ["venues"], queryFn: () => list(), enabled: ready && !!user });
   return (
