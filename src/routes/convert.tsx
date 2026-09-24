@@ -7,7 +7,11 @@
 // own structure and typographic hierarchy. Anything that had to be shortened,
 // left out, or refused is listed under the preview before you export.
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { listMyCloudDecks, loadCloudDeck } from "@/lib/cloud-decks.functions";
+import { useSessionUser } from "@/hooks/use-session-user";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
@@ -67,15 +71,31 @@ const SEVERITY_STYLE: Record<string, string> = {
 function ConvertPage() {
   const search = Route.useSearch();
   const decksMap = useDeckStore((s) => s.decks);
-  const decks = useMemo(
-    () =>
-      Object.values(decksMap)
-        .filter((d) => d.slides.length > 0)
-        .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1)),
-    [decksMap],
-  );
+  const userId = useSessionUser();
+  const listCloud = useServerFn(listMyCloudDecks);
+  const loadCloud = useServerFn(loadCloudDeck);
+  const cloud = useQuery({ queryKey: ["convert-cloud-decks"], queryFn: () => listCloud(), enabled: !!userId });
 
-  const [deckId, setDeckId] = useState<string>(search.deck ?? decks[0]?.id ?? "");
+  // Decks open in this browser plus every deck saved to your account.
+  type Choice = { id: string; title: string; brandModeId?: string; local: boolean };
+  const decks: Choice[] = useMemo(() => {
+    const local = Object.values(decksMap)
+      .filter((d) => d.slides.length > 0)
+      .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+      .map((d) => ({ id: d.id, title: d.title, brandModeId: d.brandModeId, local: true }));
+    const seen = new Set(local.map((d) => d.id));
+    const saved = (cloud.data ?? [])
+      .filter((d) => !seen.has(d.id))
+      .map((d) => ({ id: d.id, title: `${d.title || "Untitled deck"} (saved)`, brandModeId: d.brand_mode_id ?? undefined, local: false }));
+    return [...local, ...saved];
+  }, [decksMap, cloud.data]);
+
+  const [deckId, setDeckId] = useState<string>(search.deck ?? "");
+  // The deck list fills in after the page opens; pick the first deck then.
+  useEffect(() => {
+    if (!decks.length) return;
+    if (!deckId || !decks.some((d) => d.id === deckId)) setDeckId(decks[0].id);
+  }, [decks, deckId]);
   const [slideIndex, setSlideIndex] = useState<number>(search.slide ?? 0);
   const [targetId, setTargetId] = useState<AdaptTargetId>(
     (ADAPT_TARGETS.find((t) => t.id === search.to)?.id as AdaptTargetId) ?? "social-card",
@@ -87,8 +107,26 @@ function ConvertPage() {
     eyebrow: "",
   });
 
-  const deck = decks.find((d) => d.id === deckId) ?? null;
-  const slide = deck?.slides[Math.min(slideIndex, deck.slides.length - 1)] ?? null;
+  const choice = decks.find((d) => d.id === deckId) ?? null;
+  const localDeck = choice?.local ? decksMap[choice.id] : undefined;
+  const saved = useQuery({
+    queryKey: ["convert-cloud-deck", deckId],
+    queryFn: () => loadCloud({ data: { deckId } }),
+    enabled: !!choice && !choice.local,
+  });
+  type SlideLite = { id: string; variantId: string; content: Record<string, unknown>; notes?: string | null; mode?: "light" | "dark" };
+  const slides: SlideLite[] = useMemo(() => {
+    if (localDeck) return localDeck.slides.map((s) => ({ id: s.id, variantId: s.variantId, content: s.content as Record<string, unknown>, notes: s.notes, mode: s.mode }));
+    return (saved.data?.slides ?? []).map((s) => ({
+      id: s.id,
+      variantId: s.variant_id,
+      content: (s.content ?? {}) as Record<string, unknown>,
+      notes: s.notes,
+      mode: ((s.content as Record<string, unknown> | null)?.mode === "dark" ? "dark" : "light") as "light" | "dark",
+    }));
+  }, [localDeck, saved.data]);
+  const deck = choice ? { id: choice.id, title: choice.title, brandModeId: choice.brandModeId, slides } : null;
+  const slide = slides[Math.min(slideIndex, slides.length - 1)] ?? null;
 
   const source: AdaptContent = useMemo(() => {
     if (manual || !slide) {
@@ -98,7 +136,7 @@ function ConvertPage() {
         body: draft.body || undefined,
       };
     }
-    return contentFromSlide({ content: slide.content as Record<string, unknown>, notes: slide.notes });
+    return contentFromSlide({ content: slide.content, notes: slide.notes });
   }, [manual, slide, draft]);
 
   const brandId = deck?.brandModeId ?? BRAND_MODES[0].id;
@@ -174,7 +212,7 @@ function ConvertPage() {
               </div>
             ) : decks.length === 0 ? (
               <p className="rounded-lg border border-black/10 bg-[#F2F2F2] p-3 text-[12.5px] text-[#03002C]">
-                No decks open in this browser yet. Open a deck, or switch to “Type the copy”.
+                {cloud.isLoading ? "Loading your decks…" : "No decks yet — open or save a deck, or switch to “Type the copy”."}
               </p>
             ) : (
               <div className="space-y-2">
@@ -199,6 +237,7 @@ function ConvertPage() {
                   onChange={(e) => setSlideIndex(Number(e.target.value))}
                   className="w-full rounded-lg border border-black/15 px-3 py-2 text-[13px]"
                 >
+                  {saved.isLoading && <option>Loading slides…</option>}
                   {(deck?.slides ?? []).map((s, i) => (
                     <option key={s.id} value={i}>
                       {i + 1}. {byId(MODULE_VARIANTS, s.variantId)?.name ?? s.variantId}
