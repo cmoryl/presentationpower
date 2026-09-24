@@ -13,11 +13,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { listAgendaFiles } from "@/lib/next-agenda.functions";
 import { listPillarFiles } from "@/lib/event-pillar.functions";
-import {
-  agendaFileIsLive,
-  normalizeAgendaConfig,
-  type AgendaConfig,
-} from "@/lib/next-agenda";
+import { agendaFileIsLive, normalizeAgendaConfig, type AgendaConfig } from "@/lib/next-agenda";
 import type { PillarConfig, PillarKindId } from "@/lib/next-pillar-masters";
 
 export const PILLAR_FILES_KEY = ["event-pillar-files"] as const;
@@ -28,6 +24,8 @@ export type PillarFileRecord = {
   id: string;
   name: string;
   division_id: string | null;
+  /** City edition ("london", "san-francisco"…); null = shared division default. */
+  edition_id?: string | null;
   config: PillarConfig;
   updated_at: string;
 };
@@ -36,6 +34,8 @@ export type AgendaFileRecord = {
   id: string;
   name: string;
   division_id: string | null;
+  /** City edition ("london", "san-francisco"…); null = shared division default. */
+  edition_id?: string | null;
   config: AgendaConfig;
   updated_at: string;
 };
@@ -99,18 +99,29 @@ export function useSavedAgendaFiles() {
   });
 }
 
+/**
+ * Saved files are scoped to one city edition. A page for one city only ever
+ * sees that city's files; the shared view (editionId null) only sees files
+ * saved as shared defaults — never another city's work.
+ */
+export function sameEdition(row: { edition_id?: string | null }, editionId: string | null) {
+  return (row.edition_id ?? null) === (editionId ?? null);
+}
+
 /** Newest saved pillar file matching a division + kind + face, if any. */
 export function pickPillarFile(
   rows: PillarFileRecord[] | undefined,
   divisionId: string,
   kind: PillarKindId,
   face: "light" | "dark",
+  editionId: string | null = null,
 ): PillarFileRecord | undefined {
   if (!rows?.length) return undefined;
   const matches = rows.filter((row) => {
     const config = row.config as PillarConfig | null;
     if (!config) return false;
     return (
+      sameEdition(row, editionId) &&
       (config.divisionId ?? row.division_id) === divisionId &&
       config.kind === kind &&
       (config.face ?? "dark") === face
@@ -123,6 +134,7 @@ export function pickPillarFile(
 export function pickAgendaFile(
   rows: AgendaFileRecord[] | undefined,
   divisionId: string,
+  editionId: string | null = null,
 ): AgendaFileRecord | undefined {
   if (!rows?.length) return undefined;
   // An edited board is still a live file. Only a save off an unrelated older
@@ -130,7 +142,7 @@ export function pickAgendaFile(
   const matches = rows
     .filter((row) => {
       const config = row.config as AgendaConfig | null;
-      return (config?.divisionId ?? row.division_id) === divisionId;
+      return sameEdition(row, editionId) && (config?.divisionId ?? row.division_id) === divisionId;
     })
     .map((row) => ({ ...row, config: normalizeAgendaConfig(row.config) }))
     .filter((row) => agendaFileIsLive(row.config));

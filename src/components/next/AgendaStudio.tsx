@@ -103,8 +103,6 @@ import {
   agendaBandLayout,
   agendaLocation,
   type AgendaLocationIconId,
-
-
   type AgendaLocationInkId,
   type AgendaLocationSizeId,
   type AgendaLocationWeightId,
@@ -283,6 +281,7 @@ export function AgendaStudio({
         eventLabel: config.eventLabel ?? "",
         divisionId: config.divisionId,
         notes: "",
+        editionId: edition ?? null,
         config,
       };
       if (openFileId) return update({ data: { id: openFileId, ...payload } });
@@ -370,7 +369,6 @@ export function AgendaStudio({
       ),
     [pages],
   );
-
 
   // Live page-size + overflow read, recomputed on every keystroke so the editor
   // behaves like the other print areas.
@@ -498,9 +496,8 @@ export function AgendaStudio({
     setBusy(true);
     const id = toast.loading("Building the master agenda pack…");
     try {
-      const { agendaMasterConfigs, buildAgendaMasterZip } = await import(
-        "@/lib/next-agenda-master-zip"
-      );
+      const { agendaMasterConfigs, buildAgendaMasterZip } =
+        await import("@/lib/next-agenda-master-zip");
       // Prefer each division's saved live board; fall back to its approved default.
       const savedLive: AgendaConfig[] = [];
       for (const row of files.data ?? []) {
@@ -511,8 +508,7 @@ export function AgendaStudio({
       }
       const result = await buildAgendaMasterZip({
         configs: agendaMasterConfigs(savedLive),
-        onProgress: (p) =>
-          toast.loading(`${p.label} (${p.index} of ${p.total})`, { id }),
+        onProgress: (p) => toast.loading(`${p.label} (${p.index} of ${p.total})`, { id }),
       });
       const url = URL.createObjectURL(result.blob);
       const a = document.createElement("a");
@@ -561,10 +557,7 @@ export function AgendaStudio({
     }
   };
 
-  const programmeIsStock = useMemo(
-    () => agendaProgrammeIsStock(config),
-    [config],
-  );
+  const programmeIsStock = useMemo(() => agendaProgrammeIsStock(config), [config]);
 
   return (
     <div className="space-y-6">
@@ -602,140 +595,140 @@ export function AgendaStudio({
 
       {/* programme days + printed pages */}
       {step === 0 ? (
-      <section
-        aria-labelledby="agenda-days"
-        className="rounded-xl border border-border bg-muted/30 p-4"
-      >
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div className="min-w-0 space-y-2">
-            <h2 id="agenda-days" className="text-sm font-semibold tracking-tight">
-              Programme days
-            </h2>
-            <div className="flex flex-wrap items-center gap-2">
-              {days.map((d, i) => (
-                <div
-                  key={i}
-                  className={`flex items-center gap-1 rounded-full border px-1 py-0.5 text-xs ${
-                    i === dayIndex
-                      ? "border-[#003FC7] bg-background font-medium"
-                      : "border-border bg-background/60"
-                  }`}
-                >
-                  <button
-                    type="button"
-                    className="px-2 py-1"
-                    aria-pressed={i === dayIndex}
-                    onClick={() => {
-                      setActiveDay(i);
-                      const first = pages.findIndex((p) => p.dayIndex === i);
-                      if (first >= 0) setActivePage(first);
-                    }}
+        <section
+          aria-labelledby="agenda-days"
+          className="rounded-xl border border-border bg-muted/30 p-4"
+        >
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="min-w-0 space-y-2">
+              <h2 id="agenda-days" className="text-sm font-semibold tracking-tight">
+                Programme days
+              </h2>
+              <div className="flex flex-wrap items-center gap-2">
+                {days.map((d, i) => (
+                  <div
+                    key={i}
+                    className={`flex items-center gap-1 rounded-full border px-1 py-0.5 text-xs ${
+                      i === dayIndex
+                        ? "border-[#003FC7] bg-background font-medium"
+                        : "border-border bg-background/60"
+                    }`}
                   >
-                    {d.label || `Day ${i + 1}`}
-                    <span className="ml-1.5 text-muted-foreground">{d.sessions.length}</span>
-                  </button>
-                  {days.length > 1 ? (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      aria-label={`Remove ${d.label || `day ${i + 1}`}`}
+                    <button
+                      type="button"
+                      className="px-2 py-1"
+                      aria-pressed={i === dayIndex}
                       onClick={() => {
-                        editConfig((c) => removeAgendaDay(c, i));
-                        setActiveDay(0);
-                        setActivePage(0);
+                        setActiveDay(i);
+                        const first = pages.findIndex((p) => p.dayIndex === i);
+                        if (first >= 0) setActivePage(first);
                       }}
                     >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  ) : null}
-                </div>
-              ))}
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => {
-                  editConfig((c) => addAgendaDay(c));
-                  setActiveDay(days.length);
-                }}
-              >
-                <Plus className="mr-1.5 h-3.5 w-3.5" /> Add day
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="agenda-rows-per-page" className="text-xs">
-              Rows per page
-            </Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="agenda-rows-per-page"
-                type="number"
-                className="w-28"
-                min={0}
-                max={AGENDA_ROWS_PER_PAGE.max}
-                value={rowsPerPage || ""}
-                placeholder={`Auto (${autoCapacity})`}
-                onChange={(e) => set("rowsPerPage", Math.max(0, Number(e.target.value) || 0))}
-              />
-              {rowsPerPage ? (
-                <Button variant="ghost" size="sm" onClick={() => set("rowsPerPage", 0)}>
-                  Auto
-                </Button>
-              ) : null}
-            </div>
-            <p className="max-w-xs text-xs text-muted-foreground">
-              {rowsPerPage
-                ? `Each page carries ${rowsPerPage} rows, then the day continues on a new page.`
-                : `Filling each ${geo.sizeName} automatically — about ${autoCapacity} rows per page.`}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-3">
-          <span className="text-xs text-muted-foreground">
-            {pages.length} printed page{pages.length === 1 ? "" : "s"} · previewing {page.label}
-          </span>
-          {agendaDays(config).length > 1 ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const next = agendaDayLayout(config) === "one-sheet" ? "pages" : "one-sheet";
-                set("dayLayout", next);
-                setActivePage(0);
-                setActiveDay(0);
-              }}
-            >
-              {agendaDayLayout(config) === "one-sheet"
-                ? "Split into a sheet per day"
-                : "Put every day on one sheet"}
-            </Button>
-          ) : null}
-
-          {pages.length > 1
-            ? pages.map((p, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  aria-pressed={i === pageIndex}
-                  className={`rounded-md border px-2 py-1 text-xs ${
-                    i === pageIndex
-                      ? "border-[#003FC7] bg-background font-medium"
-                      : "border-border bg-background/60"
-                  }`}
+                      {d.label || `Day ${i + 1}`}
+                      <span className="ml-1.5 text-muted-foreground">{d.sessions.length}</span>
+                    </button>
+                    {days.length > 1 ? (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        aria-label={`Remove ${d.label || `day ${i + 1}`}`}
+                        onClick={() => {
+                          editConfig((c) => removeAgendaDay(c, i));
+                          setActiveDay(0);
+                          setActivePage(0);
+                        }}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    ) : null}
+                  </div>
+                ))}
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => {
-                    setActivePage(i);
-                    setActiveDay(p.dayIndex);
+                    editConfig((c) => addAgendaDay(c));
+                    setActiveDay(days.length);
                   }}
                 >
-                  {i + 1}
-                </button>
-              ))
-            : null}
-        </div>
-      </section>
+                  <Plus className="mr-1.5 h-3.5 w-3.5" /> Add day
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="agenda-rows-per-page" className="text-xs">
+                Rows per page
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="agenda-rows-per-page"
+                  type="number"
+                  className="w-28"
+                  min={0}
+                  max={AGENDA_ROWS_PER_PAGE.max}
+                  value={rowsPerPage || ""}
+                  placeholder={`Auto (${autoCapacity})`}
+                  onChange={(e) => set("rowsPerPage", Math.max(0, Number(e.target.value) || 0))}
+                />
+                {rowsPerPage ? (
+                  <Button variant="ghost" size="sm" onClick={() => set("rowsPerPage", 0)}>
+                    Auto
+                  </Button>
+                ) : null}
+              </div>
+              <p className="max-w-xs text-xs text-muted-foreground">
+                {rowsPerPage
+                  ? `Each page carries ${rowsPerPage} rows, then the day continues on a new page.`
+                  : `Filling each ${geo.sizeName} automatically — about ${autoCapacity} rows per page.`}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+            <span className="text-xs text-muted-foreground">
+              {pages.length} printed page{pages.length === 1 ? "" : "s"} · previewing {page.label}
+            </span>
+            {agendaDays(config).length > 1 ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const next = agendaDayLayout(config) === "one-sheet" ? "pages" : "one-sheet";
+                  set("dayLayout", next);
+                  setActivePage(0);
+                  setActiveDay(0);
+                }}
+              >
+                {agendaDayLayout(config) === "one-sheet"
+                  ? "Split into a sheet per day"
+                  : "Put every day on one sheet"}
+              </Button>
+            ) : null}
+
+            {pages.length > 1
+              ? pages.map((p, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-pressed={i === pageIndex}
+                    className={`rounded-md border px-2 py-1 text-xs ${
+                      i === pageIndex
+                        ? "border-[#003FC7] bg-background font-medium"
+                        : "border-border bg-background/60"
+                    }`}
+                    onClick={() => {
+                      setActivePage(i);
+                      setActiveDay(p.dayIndex);
+                    }}
+                  >
+                    {i + 1}
+                  </button>
+                ))
+              : null}
+          </div>
+        </section>
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
@@ -887,1061 +880,1080 @@ export function AgendaStudio({
         {/* controls */}
         <div className="space-y-5">
           {step === 0 ? (
-          <div className="space-y-2">
-            <Label htmlFor="agenda-division">Division area</Label>
-            <select
-              id="agenda-division"
-              className={selectClass}
-              value={config.divisionId}
-              onChange={(e) => editConfig((c) => withAgendaDivision(c, e.target.value))}
-            >
-              {AGENDA_DIVISIONS.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-muted-foreground">
-              {programmeIsStock
-                ? "Showing this division's default programme — edit any row below."
-                : "Programme edited: switching divisions keeps your copy and only swaps the lockup."}
-            </p>
-          </div>
-          ) : null}
-
-          {step === 1 ? (
-          <>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-            Board
-          </p>
-          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="agenda-size">Format</Label>
+              <Label htmlFor="agenda-division">Division area</Label>
               <select
-                id="agenda-size"
+                id="agenda-division"
                 className={selectClass}
-                value={config.sizeId}
-                onChange={(e) =>
-                  // A code dragged on one board size means nothing on another, so
-                  // a format switch returns it to its anchored home.
-                  editConfig((c) => ({
-                    ...c,
-                    sizeId: e.target.value as AgendaConfig["sizeId"],
-                    qrOffsetX: null,
-                    qrOffsetY: null,
-                  }))
-                }
-
+                value={config.divisionId}
+                onChange={(e) => editConfig((c) => withAgendaDivision(c, e.target.value))}
               >
-                <optgroup label="Print">
-                  {AGENDA_SIZES.filter((s) => s.medium !== "screen").map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} · {s.trimW} × {s.trimH} mm
-                    </option>
-                  ))}
-                </optgroup>
-                <optgroup label="Screen">
-                  {AGENDA_SIZES.filter((s) => s.medium === "screen").map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} · {s.pxW} × {s.pxH} px
-                    </option>
-                  ))}
-                </optgroup>
-              </select>
-              <p className="text-xs text-muted-foreground">
-                {geo.isScreen
-                  ? `Screen artwork · exports as a ${geo.pxW} × ${geo.pxH} px sRGB PNG at 1:1, plus the vector PDF. No bleed on a display.`
-                  : AGENDA_SIZES.find((s) => s.id === config.sizeId)?.note}
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="agenda-face">Face</Label>
-              <select
-                id="agenda-face"
-                className={selectClass}
-                value={config.face}
-                onChange={(e) => set("face", e.target.value as AgendaConfig["face"])}
-              >
-                {AGENDA_FACES.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.name}
+                {AGENDA_DIVISIONS.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
                   </option>
                 ))}
               </select>
-            </div>
-          </div>
-
-          {config.sizeId === "custom" ? (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="agenda-w">Trim width (mm)</Label>
-                <Input
-                  id="agenda-w"
-                  type="number"
-                  min={AGENDA_CUSTOM_SIZE.w.min}
-                  max={AGENDA_CUSTOM_SIZE.w.max}
-                  step={AGENDA_CUSTOM_SIZE.w.step}
-                  value={config.trimW}
-                  onChange={(e) => set("trimW", Number(e.target.value))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="agenda-h">Trim height (mm)</Label>
-                <Input
-                  id="agenda-h"
-                  type="number"
-                  min={AGENDA_CUSTOM_SIZE.h.min}
-                  max={AGENDA_CUSTOM_SIZE.h.max}
-                  step={AGENDA_CUSTOM_SIZE.h.step}
-                  value={config.trimH}
-                  onChange={(e) => set("trimH", Number(e.target.value))}
-                />
-              </div>
+              <p className="text-xs text-muted-foreground">
+                {programmeIsStock
+                  ? "Showing this division's default programme — edit any row below."
+                  : "Programme edited: switching divisions keeps your copy and only swaps the lockup."}
+              </p>
             </div>
           ) : null}
 
-          <div className="space-y-2">
-            <Label htmlFor="agenda-style">Gradient ground</Label>
-            <select
-              id="agenda-style"
-              className={selectClass}
-              value={config.styleId}
-              onChange={(e) => set("styleId", e.target.value)}
-            >
-              {AGENDA_STYLE_IDS.map((id) => (
-                <option key={id} value={id}>
-                  {agendaStyleLabel(id)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <p className="border-t border-border pt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-            Programme bands
-          </p>
-          <div className="space-y-2">
-            <Label htmlFor="agenda-row-style">Programme look</Label>
-            <select
-              id="agenda-row-style"
-              className={selectClass}
-              value={agendaRowStyle(config)}
-              onChange={(e) => set("rowStyle", e.target.value as AgendaRowStyleId)}
-            >
-              {AGENDA_ROW_STYLES.map((style) => (
-                <option key={style.id} value={style.id}>
-                  {style.name}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-muted-foreground">
-              {AGENDA_ROW_STYLES.find((style) => style.id === agendaRowStyle(config))?.note ?? ""}
-            </p>
-          </div>
-
-          {agendaRowStyle(config) === "card" ? (
+          {step === 1 ? (
             <>
-              <div className="space-y-2">
-                <Label htmlFor="agenda-band-treatment">Band treatment</Label>
-                <select
-                  id="agenda-band-treatment"
-                  className={selectClass}
-                  value={agendaBandTreatment(config)}
-                  onChange={(e) =>
-                    set("bandTreatment", e.target.value as AgendaBandTreatmentId)
-                  }
-                >
-                  {AGENDA_BAND_TREATMENTS.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-xs text-muted-foreground">
-                  {AGENDA_BAND_TREATMENTS.find((t) => t.id === agendaBandTreatment(config))?.note ??
-                    ""}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="agenda-band-layout">Band box layout</Label>
-                <select
-                  id="agenda-band-layout"
-                  className={selectClass}
-                  value={agendaBandLayout(config).id}
-                  onChange={(e) => set("bandLayout", e.target.value as AgendaBandLayoutId)}
-                >
-                  {AGENDA_BAND_LAYOUTS.map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {l.name}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-xs text-muted-foreground">
-                  {AGENDA_BAND_LAYOUTS.find((l) => l.id === agendaBandLayout(config).id)?.note ?? ""}
-                </p>
-              </div>
-
-              <p className="border-t border-border pt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                Room · floor line
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                Board
               </p>
-              <div className="space-y-2">
-                <Label htmlFor="agenda-location">Room · floor line</Label>
-                <Input
-                  id="agenda-location"
-                  value={config.locationLine ?? ""}
-                  onChange={(e) => set("locationLine", e.target.value)}
-                  placeholder="FLEMING 3RD FLOOR"
-                />
-              </div>
-              {/* Room line formatting: the mark, its colour, and how the line sets. */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="agenda-location-icon">Room line · mark</Label>
+                  <Label htmlFor="agenda-size">Format</Label>
                   <select
-                    id="agenda-location-icon"
+                    id="agenda-size"
                     className={selectClass}
-                    value={agendaLocation(config).icon.id}
-                    onChange={(e) => set("locationIcon", e.target.value as AgendaLocationIconId)}
-                  >
-                    {AGENDA_LOCATION_ICONS.map((i) => (
-                      <option key={i.id} value={i.id}>
-                        {i.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="agenda-location-icon-ink">Mark colour</Label>
-                  <select
-                    id="agenda-location-icon-ink"
-                    className={selectClass}
-                    value={config.locationIconInk ?? "auto"}
-                    onChange={(e) => set("locationIconInk", e.target.value as AgendaLocationInkId)}
-                    disabled={agendaLocation(config).icon.id === "none"}
-                  >
-                    {AGENDA_LOCATION_INKS.map((i) => (
-                      <option key={i.id} value={i.id}>
-                        {i.id === "auto" ? "House / board ink" : i.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="agenda-location-ink">Room line colour</Label>
-                  <select
-                    id="agenda-location-ink"
-                    className={selectClass}
-                    value={config.locationInk ?? "auto"}
-                    onChange={(e) => set("locationInk", e.target.value as AgendaLocationInkId)}
-                  >
-                    {AGENDA_LOCATION_INKS.map((i) => (
-                      <option key={i.id} value={i.id}>
-                        {i.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="agenda-location-size">Room line size</Label>
-                  <select
-                    id="agenda-location-size"
-                    className={selectClass}
-                    value={config.locationSize ?? "standard"}
-                    onChange={(e) => set("locationSize", e.target.value as AgendaLocationSizeId)}
-                  >
-                    {AGENDA_LOCATION_SIZES.map((sz) => (
-                      <option key={sz.id} value={sz.id}>
-                        {sz.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="agenda-location-weight">Room line weight</Label>
-                  <select
-                    id="agenda-location-weight"
-                    className={selectClass}
-                    value={config.locationWeight ?? "bold"}
+                    value={config.sizeId}
                     onChange={(e) =>
-                      set("locationWeight", e.target.value as AgendaLocationWeightId)
-                    }
-                  >
-                    <option value="bold">Bold</option>
-                    <option value="medium">Medium</option>
-                    <option value="regular">Regular</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="agenda-location-align">Room line position</Label>
-                  <select
-                    id="agenda-location-align"
-                    className={selectClass}
-                    value={config.locationAlign ?? "right"}
-                    onChange={(e) => set("locationAlign", e.target.value as AgendaLocationAlignId)}
-                  >
-                    <option value="right">Right of the lockup</option>
-                    <option value="left">Left, under the lockup</option>
-                    <option value="centre">Centred, under the lockup</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="agenda-location-caps">Room line case</Label>
-                  <select
-                    id="agenda-location-caps"
-                    className={selectClass}
-                    value={config.locationCaps === false ? "sentence" : "caps"}
-                    onChange={(e) => set("locationCaps", e.target.value === "caps")}
-                  >
-                    <option value="caps">Capitals</option>
-                    <option value="sentence">As typed</option>
-                  </select>
-                </div>
-              </div>
-              <p className="border-t border-border pt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                Footer band
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="agenda-footer-left">Footer band · left</Label>
-                  <Input
-                    id="agenda-footer-left"
-                    value={config.footerLeft ?? ""}
-                    onChange={(e) => set("footerLeft", e.target.value)}
-                    placeholder="WWW.TRANSPERFECTNEXT.COM"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="agenda-footer-right">Footer band · right</Label>
-                  <Input
-                    id="agenda-footer-right"
-                    value={config.footerRight ?? ""}
-                    onChange={(e) => set("footerRight", e.target.value)}
-                    placeholder="24 & 25 SEPTEMBER, 2026"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="agenda-footer-centre">Footer band · centre</Label>
-                <Input
-                  id="agenda-footer-centre"
-                  value={config.footerCentre ?? ""}
-                  onChange={(e) => set("footerCentre", e.target.value)}
-                  placeholder="QEII CENTRE, LONDON"
-                />
-              </div>
-              {agendaRowStyle(config) !== "card" ? (
-                <p className="rounded-lg border border-[#FFEB66] bg-[#FFEB66]/25 px-3 py-2 text-xs leading-relaxed text-[#03002C]">
-                  The ruled list look prints no footer band, so these footer settings won&apos;t
-                  show. Switch the programme look to cards in Look to use the footer.
-                </p>
-              ) : null}
-              <div className="grid grid-cols-2 gap-3">
-
-                <div className="space-y-2">
-                  <Label htmlFor="agenda-footer-style">Footer style</Label>
-                  <select
-                    id="agenda-footer-style"
-                    className={selectClass}
-                    value={agendaFooter(config).style}
-                    onChange={(e) => set("footerStyle", e.target.value as AgendaFooterStyleId)}
-                  >
-                    {AGENDA_FOOTER_STYLES.map((f) => (
-                      <option key={f.id} value={f.id}>
-                        {f.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="agenda-footer-fill">Footer colour</Label>
-                  <select
-                    id="agenda-footer-fill"
-                    className={selectClass}
-                    value={agendaFooter(config).fillId}
-                    disabled={agendaFooter(config).style !== "band"}
-                    onChange={(e) => set("footerFill", e.target.value as AgendaFooterFillId)}
-                  >
-                    {AGENDA_FOOTER_FILLS.map((f) => (
-                      <option key={f.id} value={f.id}>
-                        {f.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="agenda-footer-height">Footer depth</Label>
-                  <select
-                    id="agenda-footer-height"
-                    className={selectClass}
-                    value={config.footerHeight ?? "standard"}
-                    onChange={(e) => set("footerHeight", e.target.value as AgendaFooterHeightId)}
-                  >
-                    {AGENDA_FOOTER_HEIGHTS.map((h) => (
-                      <option key={h.id} value={h.id}>
-                        {h.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="agenda-footer-caps">Footer lettering</Label>
-                  <select
-                    id="agenda-footer-caps"
-                    className={selectClass}
-                    value={config.footerCaps === false ? "sentence" : "caps"}
-                    onChange={(e) => set("footerCaps", e.target.value === "caps")}
-                  >
-                    <option value="caps">All caps</option>
-                    <option value="sentence">As typed</option>
-                  </select>
-                </div>
-              </div>
-            </>
-          ) : null}
-          </>
-          ) : null}
-
-          {step === 0 ? (
-          <>
-          <div className="space-y-2">
-            <Label htmlFor="agenda-eyebrow">Eyebrow</Label>
-            <Input
-              id="agenda-eyebrow"
-              value={config.eyebrow}
-              onChange={(e) => set("eyebrow", e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="agenda-title">Day title</Label>
-            <Input
-              id="agenda-title"
-              value={day.label}
-              onChange={(e) => patchDay({ label: e.target.value })}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="agenda-meta">Date · venue line</Label>
-            <Input
-              id="agenda-meta"
-              value={day.meta}
-              onChange={(e) => patchDay({ meta: e.target.value })}
-            />
-          </div>
-          </>
-          ) : null}
-
-          {step === 1 ? (
-          <>
-          <p className="border-t border-border pt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-            Header type
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="agenda-title-ink">Title ink</Label>
-              <select
-                id="agenda-title-ink"
-                className={selectClass}
-                value={config.titleColor}
-                onChange={(e) => set("titleColor", e.target.value)}
-              >
-                {agendaTitleInkOptions(config).map((o, i) => (
-                  <option key={`${o.hex}-${i}`} value={i === 0 ? "" : o.hex}>
-                    {i === 0 ? "Face default" : o.label} · {o.ratio.toFixed(1)}:1
-                    {o.ok ? "" : " (too low to read)"}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="agenda-lockup">Lockup size</Label>
-              <input
-                id="agenda-lockup"
-                type="range"
-                className="w-full"
-                min={AGENDA_LOCKUP_SCALE.min}
-                max={AGENDA_LOCKUP_SCALE.max}
-                step={AGENDA_LOCKUP_SCALE.step}
-                value={config.lockupScale}
-                onChange={(e) => set("lockupScale", Number(e.target.value))}
-              />
-              <p className="text-xs text-muted-foreground">
-                {Math.round(config.lockupScale * 100)}%
-              </p>
-          </div>
-
-          {/* A printed board has no zoom, so the editor states the contrast every
-              band of copy will be read at, and says when the guard stepped in. */}
-          {(() => {
-            const guard = agendaCopyInk(config);
-            const readouts = agendaCopyReadouts(config);
-            const failing = readouts.filter((r) => !r.ok);
-            return (
-               <details className="group rounded-md border border-border/60 p-3">
-                <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-medium">
-                  {failing.length ? (
-                    <AlertTriangle
-                      size={14}
-                      className="shrink-0 text-destructive"
-                      aria-hidden
-                    />
-                  ) : (
-                    <Check size={14} className="shrink-0 text-[#003FC7]" aria-hidden />
-                  )}
-                  <span>Copy legibility</span>
-                  <span
-                    className={`min-w-0 flex-1 truncate text-xs font-normal ${failing.length ? "text-destructive" : "text-muted-foreground"}`}
-                  >
-                    {failing.length
-                      ? `${failing.length} of ${readouts.length} bands below their floor`
-                      : `All ${readouts.length} bands pass`}
-                  </span>
-                  <ChevronDown
-                    size={14}
-                    aria-hidden
-                    className="shrink-0 text-muted-foreground transition group-open:rotate-180"
-                  />
-                </summary>
-                <div className="mt-2 space-y-2">
-                <p
-                  className={`text-xs ${failing.length ? "text-destructive" : "text-muted-foreground"}`}
-                >
-                  {failing.length === 0
-                    ? `All ${readouts.length} bands clear their contrast floor · copy ink ${guard.hex}${guard.auto ? " (guard applied: the face ink stopped reading on this ground)" : ""}`
-                    : `${failing.length} of ${readouts.length} bands sit below their floor on this ground — pick a different ground or move the copy: ${failing.map((r) => r.label).join(", ")}`}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {AGENDA_GUARD_GAPS.includes(agendaGroundKey(config))
-                    ? "This ground has no approved ink that reads across the whole board in the dark face — use the light face or a different gradient."
-                    : "Floors follow WCAG: 3:1 for display copy, 4.5:1 for body copy."}
-                </p>
-                <ul className="grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
-                  {readouts.map((r) => (
-                    <li key={r.role} className={r.ok ? "" : "text-destructive"}>
-                      {r.label} · {r.ratio.toFixed(1)}:1 (needs {r.floor}:1)
-                    </li>
-                  ))}
-                </ul>
-                </div>
-              </details>
-            );
-          })()}
-
-          </div>
-          </>
-          ) : null}
-
-          {step === 1 ? (
-          <div className="space-y-3 border-t border-border pt-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-              Programme type
-            </p>
-            <p className="text-xs text-muted-foreground">
-              The board fits the programme automatically. These settings size the copy against that
-              fit, so the proportions hold at every format — the fit report still says honestly what
-              will print.
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {([
-                { key: "titleScale", label: "Headline size" },
-                { key: "rowScale", label: "Session title size" },
-                { key: "timeScale", label: "Time size" },
-                { key: "detailScale", label: "Speaker / notes size" },
-              ] as const).map((f) => (
-                <div key={f.key} className="space-y-2">
-                  <Label htmlFor={`agenda-${f.key}`}>{f.label}</Label>
-                  <input
-                    id={`agenda-${f.key}`}
-                    type="range"
-                    className="w-full"
-                    min={AGENDA_TYPE_SCALE.min}
-                    max={AGENDA_TYPE_SCALE.max}
-                    step={AGENDA_TYPE_SCALE.step}
-                    value={agendaTypeScale(config[f.key])}
-                    onChange={(e) => set(f.key, Number(e.target.value))}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {Math.round(agendaTypeScale(config[f.key]) * 100)}% of the fitted size
-                  </p>
-                </div>
-              ))}
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {([
-                { key: "titleWeight", label: "Headline weight" },
-                { key: "rowWeight", label: "Session title weight" },
-                { key: "timeWeight", label: "Time weight" },
-              ] as const).map((f) => (
-                <div key={f.key} className="space-y-2">
-                  <Label htmlFor={`agenda-${f.key}`}>{f.label}</Label>
-                  <select
-                    id={`agenda-${f.key}`}
-                    className={selectClass}
-                    value={config[f.key] ?? "bold"}
-                    onChange={(e) => set(f.key, e.target.value as AgendaTypeWeightId)}
-                  >
-                    {AGENDA_TYPE_WEIGHTS.map((w) => (
-                      <option key={w.id} value={w.id}>
-                        {w.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              ))}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              The press file carries two cut faces, so Medium and Bold both print Bold.
-            </p>
-            {agendaDays(config).length > 1 ? (
-              <div className="space-y-2">
-                <Label htmlFor="agenda-day-layout">Programme days</Label>
-                <select
-                  id="agenda-day-layout"
-                  className={selectClass}
-                  value={agendaDayLayout(config)}
-                  onChange={(e) =>
-                    set("dayLayout", e.target.value === "one-sheet" ? "one-sheet" : "pages")
-                  }
-                >
-                  {AGENDA_DAY_LAYOUTS.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.name}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-xs text-muted-foreground">
-                  {AGENDA_DAY_LAYOUTS.find((d) => d.id === agendaDayLayout(config))?.note}
-                </p>
-              </div>
-            ) : null}
-          </div>
-          ) : null}
-
-          {step === 0 ? (
-          <>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={config.showLockup}
-              onChange={(e) => set("showLockup", e.target.checked)}
-            />
-            Print the division lockup
-          </label>
-
-          <div className="space-y-2">
-            <Label htmlFor="agenda-foot">Footer line</Label>
-            <Textarea
-              id="agenda-foot"
-              rows={2}
-              value={config.footnote}
-              onChange={(e) => set("footnote", e.target.value)}
-            />
-          </div>
-          </>
-          ) : null}
-
-          {step === 2 ? (
-          <div className="space-y-3 rounded-lg border border-border p-3">
-            <div className="space-y-2">
-              <Label htmlFor="agenda-qr">QR payload</Label>
-              <Input
-                id="agenda-qr"
-                placeholder="https://next.transperfect.com/agenda"
-                value={config.qrData}
-                onChange={(e) => set("qrData", e.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="agenda-qr-size">QR size (mm)</Label>
-                <Input
-                  id="agenda-qr-size"
-                  type="number"
-                  min={AGENDA_QR_SIZE.min}
-                  max={AGENDA_QR_SIZE.max}
-                  step={AGENDA_QR_SIZE.step}
-                  value={config.qrSize}
-                  onChange={(e) => set("qrSize", Number(e.target.value))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="agenda-qr-cap">QR caption</Label>
-                <Input
-                  id="agenda-qr-cap"
-                  value={config.qrCaption}
-                  onChange={(e) => set("qrCaption", e.target.value)}
-                />
-              </div>
-            </div>
-
-            {config.qrData.trim() ? (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="agenda-qr-anchor">Position</Label>
-                  <select
-                    id="agenda-qr-anchor"
-                    className={selectClass}
-                    value={agendaQrAnchor(config)}
-                    onChange={(e) =>
+                      // A code dragged on one board size means nothing on another, so
+                      // a format switch returns it to its anchored home.
                       editConfig((c) => ({
                         ...c,
-                        qrAnchor: e.target.value as AgendaQrAnchor,
-                        // A saved drag would win over the new position, so clear it.
+                        sizeId: e.target.value as AgendaConfig["sizeId"],
                         qrOffsetX: null,
                         qrOffsetY: null,
                       }))
                     }
                   >
-                    {AGENDA_QR_ANCHORS.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.name}
+                    <optgroup label="Print">
+                      {AGENDA_SIZES.filter((s) => s.medium !== "screen").map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name} · {s.trimW} × {s.trimH} mm
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Screen">
+                      {AGENDA_SIZES.filter((s) => s.medium === "screen").map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name} · {s.pxW} × {s.pxH} px
+                        </option>
+                      ))}
+                    </optgroup>
+                  </select>
+                  <p className="text-xs text-muted-foreground">
+                    {geo.isScreen
+                      ? `Screen artwork · exports as a ${geo.pxW} × ${geo.pxH} px sRGB PNG at 1:1, plus the vector PDF. No bleed on a display.`
+                      : AGENDA_SIZES.find((s) => s.id === config.sizeId)?.note}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-face">Face</Label>
+                  <select
+                    id="agenda-face"
+                    className={selectClass}
+                    value={config.face}
+                    onChange={(e) => set("face", e.target.value as AgendaConfig["face"])}
+                  >
+                    {AGENDA_FACES.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.name}
                       </option>
                     ))}
                   </select>
-                  <p className="text-xs text-muted-foreground">
-                    {AGENDA_QR_ANCHORS.find((a) => a.id === agendaQrAnchor(config))?.note}
-                  </p>
                 </div>
+              </div>
+
+              {config.sizeId === "custom" ? (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <Label htmlFor="agenda-qr-style">Module shape</Label>
+                    <Label htmlFor="agenda-w">Trim width (mm)</Label>
+                    <Input
+                      id="agenda-w"
+                      type="number"
+                      min={AGENDA_CUSTOM_SIZE.w.min}
+                      max={AGENDA_CUSTOM_SIZE.w.max}
+                      step={AGENDA_CUSTOM_SIZE.w.step}
+                      value={config.trimW}
+                      onChange={(e) => set("trimW", Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="agenda-h">Trim height (mm)</Label>
+                    <Input
+                      id="agenda-h"
+                      type="number"
+                      min={AGENDA_CUSTOM_SIZE.h.min}
+                      max={AGENDA_CUSTOM_SIZE.h.max}
+                      step={AGENDA_CUSTOM_SIZE.h.step}
+                      value={config.trimH}
+                      onChange={(e) => set("trimH", Number(e.target.value))}
+                    />
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="space-y-2">
+                <Label htmlFor="agenda-style">Gradient ground</Label>
+                <select
+                  id="agenda-style"
+                  className={selectClass}
+                  value={config.styleId}
+                  onChange={(e) => set("styleId", e.target.value)}
+                >
+                  {AGENDA_STYLE_IDS.map((id) => (
+                    <option key={id} value={id}>
+                      {agendaStyleLabel(id)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <p className="border-t border-border pt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                Programme bands
+              </p>
+              <div className="space-y-2">
+                <Label htmlFor="agenda-row-style">Programme look</Label>
+                <select
+                  id="agenda-row-style"
+                  className={selectClass}
+                  value={agendaRowStyle(config)}
+                  onChange={(e) => set("rowStyle", e.target.value as AgendaRowStyleId)}
+                >
+                  {AGENDA_ROW_STYLES.map((style) => (
+                    <option key={style.id} value={style.id}>
+                      {style.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground">
+                  {AGENDA_ROW_STYLES.find((style) => style.id === agendaRowStyle(config))?.note ??
+                    ""}
+                </p>
+              </div>
+
+              {agendaRowStyle(config) === "card" ? (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="agenda-band-treatment">Band treatment</Label>
                     <select
-                      id="agenda-qr-style"
+                      id="agenda-band-treatment"
                       className={selectClass}
-                      value={agendaQrStyle(config)}
-                      onChange={(e) => set("qrStyle", e.target.value as AgendaQrStyleId)}
+                      value={agendaBandTreatment(config)}
+                      onChange={(e) =>
+                        set("bandTreatment", e.target.value as AgendaBandTreatmentId)
+                      }
                     >
-                      {AGENDA_QR_STYLES.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.label}
-                          {QR_SCAN_VERIFIED_STYLES.includes(s.id as QrModuleStyle)
-                            ? ""
-                            : " — not scan-verified"}
+                      {AGENDA_BAND_TREATMENTS.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
                         </option>
                       ))}
                     </select>
                     <p className="text-xs text-muted-foreground">
-                      {AGENDA_QR_STYLES.find((s) => s.id === agendaQrStyle(config))?.note}
+                      {AGENDA_BAND_TREATMENTS.find((t) => t.id === agendaBandTreatment(config))
+                        ?.note ?? ""}
                     </p>
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="agenda-qr-ink">Code ink</Label>
+                    <Label htmlFor="agenda-band-layout">Band box layout</Label>
                     <select
-                      id="agenda-qr-ink"
+                      id="agenda-band-layout"
                       className={selectClass}
-                      value={config.qrForeground}
-                      onChange={(e) => set("qrForeground", e.target.value)}
+                      value={agendaBandLayout(config).id}
+                      onChange={(e) => set("bandLayout", e.target.value as AgendaBandLayoutId)}
                     >
-                      <option value="">Blue 800 (default)</option>
-                      {AGENDA_TEXT_COLORS.map((c) => (
-                        <option key={c.id} value={c.hex}>
-                          {c.label}
+                      {AGENDA_BAND_LAYOUTS.map((l) => (
+                        <option key={l.id} value={l.id}>
+                          {l.name}
                         </option>
                       ))}
                     </select>
+                    <p className="text-xs text-muted-foreground">
+                      {AGENDA_BAND_LAYOUTS.find((l) => l.id === agendaBandLayout(config).id)
+                        ?.note ?? ""}
+                    </p>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="agenda-qr-plate">Plate colour</Label>
-                    <select
-                      id="agenda-qr-plate"
-                      className={selectClass}
-                      value={config.qrBackground}
-                      onChange={(e) => set("qrBackground", e.target.value)}
-                      disabled={config.qrTransparent}
-                    >
-                      <option value="">White (default)</option>
-                      {AGENDA_TEXT_COLORS.map((c) => (
-                        <option key={c.id} value={c.hex}>
-                          {c.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="agenda-qr-capsize">Caption size (mm)</Label>
-                    <Input
-                      id="agenda-qr-capsize"
-                      type="number"
-                      min={0}
-                      max={AGENDA_QR_CAPTION_SIZE.max}
-                      step={AGENDA_QR_CAPTION_SIZE.step}
-                      value={config.qrCaptionSize}
-                      onChange={(e) => set("qrCaptionSize", Number(e.target.value))}
-                    />
-                    <p className="text-xs text-muted-foreground">0 follows the footer size.</p>
-                  </div>
-                </div>
-
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={config.qrTransparent}
-                    onChange={(e) => set("qrTransparent", e.target.checked)}
-                  />
-                  Drop the plate — print the code straight on the gradient
-                </label>
-
-                {/* A code phone cameras cannot read is a reprint, so the editor
-                    states the contrast it will actually be scanned at. */}
-                {(() => {
-                  const c = agendaQrContrast(config);
-                  const quality = agendaQrPrintQuality(config);
-                  const blockers = agendaQrBlockers(config);
-                  return (
-                    <div className="space-y-1">
-                      <p
-                        className={`text-xs ${c.ok ? "text-muted-foreground" : "text-destructive"}`}
-                      >
-                        Scan contrast {c.ratio.toFixed(1)}:1{" "}
-                        {c.ok
-                          ? "· comfortably scannable"
-                          : `· below ${AGENDA_QR_MIN_CONTRAST}:1, darken the ink or keep the plate`}
-                      </p>
-                      {quality ? (
-                        <p className="text-xs text-muted-foreground">
-                          {quality.modules} modules · {quality.moduleMm.toFixed(2)}mm each ·{" "}
-                          {quality.quietMm.toFixed(1)}mm quiet zone
-                        </p>
-                      ) : null}
-                      {blockers.map((b) => (
-                        <p key={b} className="text-xs text-destructive">
-                          {b}
-                        </p>
-                      ))}
-                    </div>
-                  );
-                })()}
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="agenda-qr-align">Caption alignment</Label>
-                    <select
-                      id="agenda-qr-align"
-                      className={selectClass}
-                      value={agendaQrCaptionAlign(config)}
-                      onChange={(e) => set("qrCaptionAlign", e.target.value as AgendaCaptionAlign)}
-                    >
-                      <option value="left">Left</option>
-                      <option value="center">Centre</option>
-                      <option value="right">Right</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="agenda-qr-pad">Edge padding (mm)</Label>
-                    <Input
-                      id="agenda-qr-pad"
-                      type="number"
-                      min={AGENDA_QR_CAPTION_PAD.min}
-                      max={AGENDA_QR_CAPTION_PAD.max}
-                      step={AGENDA_QR_CAPTION_PAD.step}
-                      value={config.qrCaptionPad}
-                      onChange={(e) => set("qrCaptionPad", Number(e.target.value))}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2 rounded-md border border-border p-3">
-                  <p className="text-sm font-medium">Position on the page</p>
-                  <p className="text-xs text-muted-foreground">
-                    Drag the code on the sheet, use the nine spots, or type the exact millimetres
-                    from the trim corner. Everything stays inside the safe margin.
+                  <p className="border-t border-border pt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                    Room · floor line
                   </p>
-                  <div className="grid w-fit grid-cols-3 gap-1">
-                    {(
-                      [
-                        ["Top left", 0, 0],
-                        ["Top", 0.5, 0],
-                        ["Top right", 1, 0],
-                        ["Left", 0, 0.5],
-                        ["Centre", 0.5, 0.5],
-                        ["Right", 1, 0.5],
-                        ["Bottom left", 0, 1],
-                        ["Bottom", 0.5, 1],
-                        ["Bottom right", 1, 1],
-                      ] as [string, number, number][]
-                    ).map(([label, fx, fy]) => (
-                      <button
-                        key={label}
-                        type="button"
-                        title={label}
-                        aria-label={label}
-                        className="h-7 w-7 rounded border border-border text-[10px] hover:bg-muted"
-                        onClick={() => {
-                          const b = qrBlock;
-                          if (!b) return;
-                          editConfig((c) => ({
-                            ...c,
-                            qrOffsetX: Math.round(b.minX + (b.maxX - b.minX) * fx),
-                            qrOffsetY: Math.round(b.minY + (b.maxY - b.minY) * fy),
-                          }));
-                        }}
+                  <div className="space-y-2">
+                    <Label htmlFor="agenda-location">Room · floor line</Label>
+                    <Input
+                      id="agenda-location"
+                      value={config.locationLine ?? ""}
+                      onChange={(e) => set("locationLine", e.target.value)}
+                      placeholder="FLEMING 3RD FLOOR"
+                    />
+                  </div>
+                  {/* Room line formatting: the mark, its colour, and how the line sets. */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-location-icon">Room line · mark</Label>
+                      <select
+                        id="agenda-location-icon"
+                        className={selectClass}
+                        value={agendaLocation(config).icon.id}
+                        onChange={(e) =>
+                          set("locationIcon", e.target.value as AgendaLocationIconId)
+                        }
                       >
-                        ·
-                      </button>
-                    ))}
+                        {AGENDA_LOCATION_ICONS.map((i) => (
+                          <option key={i.id} value={i.id}>
+                            {i.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-location-icon-ink">Mark colour</Label>
+                      <select
+                        id="agenda-location-icon-ink"
+                        className={selectClass}
+                        value={config.locationIconInk ?? "auto"}
+                        onChange={(e) =>
+                          set("locationIconInk", e.target.value as AgendaLocationInkId)
+                        }
+                        disabled={agendaLocation(config).icon.id === "none"}
+                      >
+                        {AGENDA_LOCATION_INKS.map((i) => (
+                          <option key={i.id} value={i.id}>
+                            {i.id === "auto" ? "House / board ink" : i.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-location-ink">Room line colour</Label>
+                      <select
+                        id="agenda-location-ink"
+                        className={selectClass}
+                        value={config.locationInk ?? "auto"}
+                        onChange={(e) => set("locationInk", e.target.value as AgendaLocationInkId)}
+                      >
+                        {AGENDA_LOCATION_INKS.map((i) => (
+                          <option key={i.id} value={i.id}>
+                            {i.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-location-size">Room line size</Label>
+                      <select
+                        id="agenda-location-size"
+                        className={selectClass}
+                        value={config.locationSize ?? "standard"}
+                        onChange={(e) =>
+                          set("locationSize", e.target.value as AgendaLocationSizeId)
+                        }
+                      >
+                        {AGENDA_LOCATION_SIZES.map((sz) => (
+                          <option key={sz.id} value={sz.id}>
+                            {sz.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-location-weight">Room line weight</Label>
+                      <select
+                        id="agenda-location-weight"
+                        className={selectClass}
+                        value={config.locationWeight ?? "bold"}
+                        onChange={(e) =>
+                          set("locationWeight", e.target.value as AgendaLocationWeightId)
+                        }
+                      >
+                        <option value="bold">Bold</option>
+                        <option value="medium">Medium</option>
+                        <option value="regular">Regular</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-location-align">Room line position</Label>
+                      <select
+                        id="agenda-location-align"
+                        className={selectClass}
+                        value={config.locationAlign ?? "right"}
+                        onChange={(e) =>
+                          set("locationAlign", e.target.value as AgendaLocationAlignId)
+                        }
+                      >
+                        <option value="right">Right of the lockup</option>
+                        <option value="left">Left, under the lockup</option>
+                        <option value="centre">Centred, under the lockup</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-location-caps">Room line case</Label>
+                      <select
+                        id="agenda-location-caps"
+                        className={selectClass}
+                        value={config.locationCaps === false ? "sentence" : "caps"}
+                        onChange={(e) => set("locationCaps", e.target.value === "caps")}
+                      >
+                        <option value="caps">Capitals</option>
+                        <option value="sentence">As typed</option>
+                      </select>
+                    </div>
+                  </div>
+                  <p className="border-t border-border pt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                    Footer band
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-footer-left">Footer band · left</Label>
+                      <Input
+                        id="agenda-footer-left"
+                        value={config.footerLeft ?? ""}
+                        onChange={(e) => set("footerLeft", e.target.value)}
+                        placeholder="WWW.TRANSPERFECTNEXT.COM"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-footer-right">Footer band · right</Label>
+                      <Input
+                        id="agenda-footer-right"
+                        value={config.footerRight ?? ""}
+                        onChange={(e) => set("footerRight", e.target.value)}
+                        placeholder="24 & 25 SEPTEMBER, 2026"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="agenda-footer-centre">Footer band · centre</Label>
+                    <Input
+                      id="agenda-footer-centre"
+                      value={config.footerCentre ?? ""}
+                      onChange={(e) => set("footerCentre", e.target.value)}
+                      placeholder="QEII CENTRE, LONDON"
+                    />
+                  </div>
+                  {agendaRowStyle(config) !== "card" ? (
+                    <p className="rounded-lg border border-[#FFEB66] bg-[#FFEB66]/25 px-3 py-2 text-xs leading-relaxed text-[#03002C]">
+                      The ruled list look prints no footer band, so these footer settings won&apos;t
+                      show. Switch the programme look to cards in Look to use the footer.
+                    </p>
+                  ) : null}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-footer-style">Footer style</Label>
+                      <select
+                        id="agenda-footer-style"
+                        className={selectClass}
+                        value={agendaFooter(config).style}
+                        onChange={(e) => set("footerStyle", e.target.value as AgendaFooterStyleId)}
+                      >
+                        {AGENDA_FOOTER_STYLES.map((f) => (
+                          <option key={f.id} value={f.id}>
+                            {f.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-footer-fill">Footer colour</Label>
+                      <select
+                        id="agenda-footer-fill"
+                        className={selectClass}
+                        value={agendaFooter(config).fillId}
+                        disabled={agendaFooter(config).style !== "band"}
+                        onChange={(e) => set("footerFill", e.target.value as AgendaFooterFillId)}
+                      >
+                        {AGENDA_FOOTER_FILLS.map((f) => (
+                          <option key={f.id} value={f.id}>
+                            {f.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
-                      <Label htmlFor="agenda-qr-x">X from trim (mm)</Label>
-                      <Input
-                        id="agenda-qr-x"
-                        type="number"
-                        step={AGENDA_QR_NUDGE.fine}
-                        value={Math.round(qrBlock?.x ?? 0)}
+                      <Label htmlFor="agenda-footer-height">Footer depth</Label>
+                      <select
+                        id="agenda-footer-height"
+                        className={selectClass}
+                        value={config.footerHeight ?? "standard"}
                         onChange={(e) =>
-                          editConfig((c) => ({
-                            ...c,
-                            qrOffsetX: Number(e.target.value),
-                            qrOffsetY: c.qrOffsetY ?? Math.round(qrBlock?.y ?? 0),
-                          }))
+                          set("footerHeight", e.target.value as AgendaFooterHeightId)
                         }
-                      />
+                      >
+                        {AGENDA_FOOTER_HEIGHTS.map((h) => (
+                          <option key={h.id} value={h.id}>
+                            {h.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="agenda-qr-y">Y from trim (mm)</Label>
+                      <Label htmlFor="agenda-footer-caps">Footer lettering</Label>
+                      <select
+                        id="agenda-footer-caps"
+                        className={selectClass}
+                        value={config.footerCaps === false ? "sentence" : "caps"}
+                        onChange={(e) => set("footerCaps", e.target.value === "caps")}
+                      >
+                        <option value="caps">All caps</option>
+                        <option value="sentence">As typed</option>
+                      </select>
+                    </div>
+                  </div>
+                </>
+              ) : null}
+            </>
+          ) : null}
+
+          {step === 0 ? (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="agenda-eyebrow">Eyebrow</Label>
+                <Input
+                  id="agenda-eyebrow"
+                  value={config.eyebrow}
+                  onChange={(e) => set("eyebrow", e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="agenda-title">Day title</Label>
+                <Input
+                  id="agenda-title"
+                  value={day.label}
+                  onChange={(e) => patchDay({ label: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="agenda-meta">Date · venue line</Label>
+                <Input
+                  id="agenda-meta"
+                  value={day.meta}
+                  onChange={(e) => patchDay({ meta: e.target.value })}
+                />
+              </div>
+            </>
+          ) : null}
+
+          {step === 1 ? (
+            <>
+              <p className="border-t border-border pt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                Header type
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-title-ink">Title ink</Label>
+                  <select
+                    id="agenda-title-ink"
+                    className={selectClass}
+                    value={config.titleColor}
+                    onChange={(e) => set("titleColor", e.target.value)}
+                  >
+                    {agendaTitleInkOptions(config).map((o, i) => (
+                      <option key={`${o.hex}-${i}`} value={i === 0 ? "" : o.hex}>
+                        {i === 0 ? "Face default" : o.label} · {o.ratio.toFixed(1)}:1
+                        {o.ok ? "" : " (too low to read)"}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-lockup">Lockup size</Label>
+                  <input
+                    id="agenda-lockup"
+                    type="range"
+                    className="w-full"
+                    min={AGENDA_LOCKUP_SCALE.min}
+                    max={AGENDA_LOCKUP_SCALE.max}
+                    step={AGENDA_LOCKUP_SCALE.step}
+                    value={config.lockupScale}
+                    onChange={(e) => set("lockupScale", Number(e.target.value))}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {Math.round(config.lockupScale * 100)}%
+                  </p>
+                </div>
+
+                {/* A printed board has no zoom, so the editor states the contrast every
+              band of copy will be read at, and says when the guard stepped in. */}
+                {(() => {
+                  const guard = agendaCopyInk(config);
+                  const readouts = agendaCopyReadouts(config);
+                  const failing = readouts.filter((r) => !r.ok);
+                  return (
+                    <details className="group rounded-md border border-border/60 p-3">
+                      <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-medium">
+                        {failing.length ? (
+                          <AlertTriangle
+                            size={14}
+                            className="shrink-0 text-destructive"
+                            aria-hidden
+                          />
+                        ) : (
+                          <Check size={14} className="shrink-0 text-[#003FC7]" aria-hidden />
+                        )}
+                        <span>Copy legibility</span>
+                        <span
+                          className={`min-w-0 flex-1 truncate text-xs font-normal ${failing.length ? "text-destructive" : "text-muted-foreground"}`}
+                        >
+                          {failing.length
+                            ? `${failing.length} of ${readouts.length} bands below their floor`
+                            : `All ${readouts.length} bands pass`}
+                        </span>
+                        <ChevronDown
+                          size={14}
+                          aria-hidden
+                          className="shrink-0 text-muted-foreground transition group-open:rotate-180"
+                        />
+                      </summary>
+                      <div className="mt-2 space-y-2">
+                        <p
+                          className={`text-xs ${failing.length ? "text-destructive" : "text-muted-foreground"}`}
+                        >
+                          {failing.length === 0
+                            ? `All ${readouts.length} bands clear their contrast floor · copy ink ${guard.hex}${guard.auto ? " (guard applied: the face ink stopped reading on this ground)" : ""}`
+                            : `${failing.length} of ${readouts.length} bands sit below their floor on this ground — pick a different ground or move the copy: ${failing.map((r) => r.label).join(", ")}`}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {AGENDA_GUARD_GAPS.includes(agendaGroundKey(config))
+                            ? "This ground has no approved ink that reads across the whole board in the dark face — use the light face or a different gradient."
+                            : "Floors follow WCAG: 3:1 for display copy, 4.5:1 for body copy."}
+                        </p>
+                        <ul className="grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
+                          {readouts.map((r) => (
+                            <li key={r.role} className={r.ok ? "" : "text-destructive"}>
+                              {r.label} · {r.ratio.toFixed(1)}:1 (needs {r.floor}:1)
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </details>
+                  );
+                })()}
+              </div>
+            </>
+          ) : null}
+
+          {step === 1 ? (
+            <div className="space-y-3 border-t border-border pt-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                Programme type
+              </p>
+              <p className="text-xs text-muted-foreground">
+                The board fits the programme automatically. These settings size the copy against
+                that fit, so the proportions hold at every format — the fit report still says
+                honestly what will print.
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {(
+                  [
+                    { key: "titleScale", label: "Headline size" },
+                    { key: "rowScale", label: "Session title size" },
+                    { key: "timeScale", label: "Time size" },
+                    { key: "detailScale", label: "Speaker / notes size" },
+                  ] as const
+                ).map((f) => (
+                  <div key={f.key} className="space-y-2">
+                    <Label htmlFor={`agenda-${f.key}`}>{f.label}</Label>
+                    <input
+                      id={`agenda-${f.key}`}
+                      type="range"
+                      className="w-full"
+                      min={AGENDA_TYPE_SCALE.min}
+                      max={AGENDA_TYPE_SCALE.max}
+                      step={AGENDA_TYPE_SCALE.step}
+                      value={agendaTypeScale(config[f.key])}
+                      onChange={(e) => set(f.key, Number(e.target.value))}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {Math.round(agendaTypeScale(config[f.key]) * 100)}% of the fitted size
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {(
+                  [
+                    { key: "titleWeight", label: "Headline weight" },
+                    { key: "rowWeight", label: "Session title weight" },
+                    { key: "timeWeight", label: "Time weight" },
+                  ] as const
+                ).map((f) => (
+                  <div key={f.key} className="space-y-2">
+                    <Label htmlFor={`agenda-${f.key}`}>{f.label}</Label>
+                    <select
+                      id={`agenda-${f.key}`}
+                      className={selectClass}
+                      value={config[f.key] ?? "bold"}
+                      onChange={(e) => set(f.key, e.target.value as AgendaTypeWeightId)}
+                    >
+                      {AGENDA_TYPE_WEIGHTS.map((w) => (
+                        <option key={w.id} value={w.id}>
+                          {w.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                The press file carries two cut faces, so Medium and Bold both print Bold.
+              </p>
+              {agendaDays(config).length > 1 ? (
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-day-layout">Programme days</Label>
+                  <select
+                    id="agenda-day-layout"
+                    className={selectClass}
+                    value={agendaDayLayout(config)}
+                    onChange={(e) =>
+                      set("dayLayout", e.target.value === "one-sheet" ? "one-sheet" : "pages")
+                    }
+                  >
+                    {AGENDA_DAY_LAYOUTS.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-muted-foreground">
+                    {AGENDA_DAY_LAYOUTS.find((d) => d.id === agendaDayLayout(config))?.note}
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {step === 0 ? (
+            <>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={config.showLockup}
+                  onChange={(e) => set("showLockup", e.target.checked)}
+                />
+                Print the division lockup
+              </label>
+
+              <div className="space-y-2">
+                <Label htmlFor="agenda-foot">Footer line</Label>
+                <Textarea
+                  id="agenda-foot"
+                  rows={2}
+                  value={config.footnote}
+                  onChange={(e) => set("footnote", e.target.value)}
+                />
+              </div>
+            </>
+          ) : null}
+
+          {step === 2 ? (
+            <div className="space-y-3 rounded-lg border border-border p-3">
+              <div className="space-y-2">
+                <Label htmlFor="agenda-qr">QR payload</Label>
+                <Input
+                  id="agenda-qr"
+                  placeholder="https://next.transperfect.com/agenda"
+                  value={config.qrData}
+                  onChange={(e) => set("qrData", e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-qr-size">QR size (mm)</Label>
+                  <Input
+                    id="agenda-qr-size"
+                    type="number"
+                    min={AGENDA_QR_SIZE.min}
+                    max={AGENDA_QR_SIZE.max}
+                    step={AGENDA_QR_SIZE.step}
+                    value={config.qrSize}
+                    onChange={(e) => set("qrSize", Number(e.target.value))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="agenda-qr-cap">QR caption</Label>
+                  <Input
+                    id="agenda-qr-cap"
+                    value={config.qrCaption}
+                    onChange={(e) => set("qrCaption", e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {config.qrData.trim() ? (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="agenda-qr-anchor">Position</Label>
+                    <select
+                      id="agenda-qr-anchor"
+                      className={selectClass}
+                      value={agendaQrAnchor(config)}
+                      onChange={(e) =>
+                        editConfig((c) => ({
+                          ...c,
+                          qrAnchor: e.target.value as AgendaQrAnchor,
+                          // A saved drag would win over the new position, so clear it.
+                          qrOffsetX: null,
+                          qrOffsetY: null,
+                        }))
+                      }
+                    >
+                      {AGENDA_QR_ANCHORS.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-muted-foreground">
+                      {AGENDA_QR_ANCHORS.find((a) => a.id === agendaQrAnchor(config))?.note}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-qr-style">Module shape</Label>
+                      <select
+                        id="agenda-qr-style"
+                        className={selectClass}
+                        value={agendaQrStyle(config)}
+                        onChange={(e) => set("qrStyle", e.target.value as AgendaQrStyleId)}
+                      >
+                        {AGENDA_QR_STYLES.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.label}
+                            {QR_SCAN_VERIFIED_STYLES.includes(s.id as QrModuleStyle)
+                              ? ""
+                              : " — not scan-verified"}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-xs text-muted-foreground">
+                        {AGENDA_QR_STYLES.find((s) => s.id === agendaQrStyle(config))?.note}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-qr-ink">Code ink</Label>
+                      <select
+                        id="agenda-qr-ink"
+                        className={selectClass}
+                        value={config.qrForeground}
+                        onChange={(e) => set("qrForeground", e.target.value)}
+                      >
+                        <option value="">Blue 800 (default)</option>
+                        {AGENDA_TEXT_COLORS.map((c) => (
+                          <option key={c.id} value={c.hex}>
+                            {c.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-qr-plate">Plate colour</Label>
+                      <select
+                        id="agenda-qr-plate"
+                        className={selectClass}
+                        value={config.qrBackground}
+                        onChange={(e) => set("qrBackground", e.target.value)}
+                        disabled={config.qrTransparent}
+                      >
+                        <option value="">White (default)</option>
+                        {AGENDA_TEXT_COLORS.map((c) => (
+                          <option key={c.id} value={c.hex}>
+                            {c.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-qr-capsize">Caption size (mm)</Label>
                       <Input
-                        id="agenda-qr-y"
+                        id="agenda-qr-capsize"
                         type="number"
-                        step={AGENDA_QR_NUDGE.fine}
-                        value={Math.round(qrBlock?.y ?? 0)}
+                        min={0}
+                        max={AGENDA_QR_CAPTION_SIZE.max}
+                        step={AGENDA_QR_CAPTION_SIZE.step}
+                        value={config.qrCaptionSize}
+                        onChange={(e) => set("qrCaptionSize", Number(e.target.value))}
+                      />
+                      <p className="text-xs text-muted-foreground">0 follows the footer size.</p>
+                    </div>
+                  </div>
+
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={config.qrTransparent}
+                      onChange={(e) => set("qrTransparent", e.target.checked)}
+                    />
+                    Drop the plate — print the code straight on the gradient
+                  </label>
+
+                  {/* A code phone cameras cannot read is a reprint, so the editor
+                    states the contrast it will actually be scanned at. */}
+                  {(() => {
+                    const c = agendaQrContrast(config);
+                    const quality = agendaQrPrintQuality(config);
+                    const blockers = agendaQrBlockers(config);
+                    return (
+                      <div className="space-y-1">
+                        <p
+                          className={`text-xs ${c.ok ? "text-muted-foreground" : "text-destructive"}`}
+                        >
+                          Scan contrast {c.ratio.toFixed(1)}:1{" "}
+                          {c.ok
+                            ? "· comfortably scannable"
+                            : `· below ${AGENDA_QR_MIN_CONTRAST}:1, darken the ink or keep the plate`}
+                        </p>
+                        {quality ? (
+                          <p className="text-xs text-muted-foreground">
+                            {quality.modules} modules · {quality.moduleMm.toFixed(2)}mm each ·{" "}
+                            {quality.quietMm.toFixed(1)}mm quiet zone
+                          </p>
+                        ) : null}
+                        {blockers.map((b) => (
+                          <p key={b} className="text-xs text-destructive">
+                            {b}
+                          </p>
+                        ))}
+                      </div>
+                    );
+                  })()}
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-qr-align">Caption alignment</Label>
+                      <select
+                        id="agenda-qr-align"
+                        className={selectClass}
+                        value={agendaQrCaptionAlign(config)}
                         onChange={(e) =>
-                          editConfig((c) => ({
-                            ...c,
-                            qrOffsetY: Number(e.target.value),
-                            qrOffsetX: c.qrOffsetX ?? Math.round(qrBlock?.x ?? 0),
-                          }))
+                          set("qrCaptionAlign", e.target.value as AgendaCaptionAlign)
                         }
+                      >
+                        <option value="left">Left</option>
+                        <option value="center">Centre</option>
+                        <option value="right">Right</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="agenda-qr-pad">Edge padding (mm)</Label>
+                      <Input
+                        id="agenda-qr-pad"
+                        type="number"
+                        min={AGENDA_QR_CAPTION_PAD.min}
+                        max={AGENDA_QR_CAPTION_PAD.max}
+                        step={AGENDA_QR_CAPTION_PAD.step}
+                        value={config.qrCaptionPad}
+                        onChange={(e) => set("qrCaptionPad", Number(e.target.value))}
                       />
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {(
-                      [
-                        ["Left", -AGENDA_QR_NUDGE.coarse, 0],
-                        ["Right", AGENDA_QR_NUDGE.coarse, 0],
-                        ["Up", 0, -AGENDA_QR_NUDGE.coarse],
-                        ["Down", 0, AGENDA_QR_NUDGE.coarse],
-                      ] as [string, number, number][]
-                    ).map(([label, dx, dy]) => (
-                      <Button
-                        key={label}
-                        size="sm"
-                        variant="outline"
-                        onClick={() => nudgeQr(dx, dy)}
-                      >
-                        {label}
+
+                  <div className="space-y-2 rounded-md border border-border p-3">
+                    <p className="text-sm font-medium">Position on the page</p>
+                    <p className="text-xs text-muted-foreground">
+                      Drag the code on the sheet, use the nine spots, or type the exact millimetres
+                      from the trim corner. Everything stays inside the safe margin.
+                    </p>
+                    <div className="grid w-fit grid-cols-3 gap-1">
+                      {(
+                        [
+                          ["Top left", 0, 0],
+                          ["Top", 0.5, 0],
+                          ["Top right", 1, 0],
+                          ["Left", 0, 0.5],
+                          ["Centre", 0.5, 0.5],
+                          ["Right", 1, 0.5],
+                          ["Bottom left", 0, 1],
+                          ["Bottom", 0.5, 1],
+                          ["Bottom right", 1, 1],
+                        ] as [string, number, number][]
+                      ).map(([label, fx, fy]) => (
+                        <button
+                          key={label}
+                          type="button"
+                          title={label}
+                          aria-label={label}
+                          className="h-7 w-7 rounded border border-border text-[10px] hover:bg-muted"
+                          onClick={() => {
+                            const b = qrBlock;
+                            if (!b) return;
+                            editConfig((c) => ({
+                              ...c,
+                              qrOffsetX: Math.round(b.minX + (b.maxX - b.minX) * fx),
+                              qrOffsetY: Math.round(b.minY + (b.maxY - b.minY) * fy),
+                            }));
+                          }}
+                        >
+                          ·
+                        </button>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="agenda-qr-x">X from trim (mm)</Label>
+                        <Input
+                          id="agenda-qr-x"
+                          type="number"
+                          step={AGENDA_QR_NUDGE.fine}
+                          value={Math.round(qrBlock?.x ?? 0)}
+                          onChange={(e) =>
+                            editConfig((c) => ({
+                              ...c,
+                              qrOffsetX: Number(e.target.value),
+                              qrOffsetY: c.qrOffsetY ?? Math.round(qrBlock?.y ?? 0),
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="agenda-qr-y">Y from trim (mm)</Label>
+                        <Input
+                          id="agenda-qr-y"
+                          type="number"
+                          step={AGENDA_QR_NUDGE.fine}
+                          value={Math.round(qrBlock?.y ?? 0)}
+                          onChange={(e) =>
+                            editConfig((c) => ({
+                              ...c,
+                              qrOffsetY: Number(e.target.value),
+                              qrOffsetX: c.qrOffsetX ?? Math.round(qrBlock?.x ?? 0),
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {(
+                        [
+                          ["Left", -AGENDA_QR_NUDGE.coarse, 0],
+                          ["Right", AGENDA_QR_NUDGE.coarse, 0],
+                          ["Up", 0, -AGENDA_QR_NUDGE.coarse],
+                          ["Down", 0, AGENDA_QR_NUDGE.coarse],
+                        ] as [string, number, number][]
+                      ).map(([label, dx, dy]) => (
+                        <Button
+                          key={label}
+                          size="sm"
+                          variant="outline"
+                          onClick={() => nudgeQr(dx, dy)}
+                        >
+                          {label}
+                        </Button>
+                      ))}
+                      <Button size="sm" variant="ghost" onClick={() => placeQr(null, null)}>
+                        Back to default spot
                       </Button>
-                    ))}
-                    <Button size="sm" variant="ghost" onClick={() => placeQr(null, null)}>
-                      Back to default spot
-                    </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {qrBlock?.placed ? "Placed by hand" : "Following the default footer flow"}
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {qrBlock?.placed ? "Placed by hand" : "Following the default footer flow"}
-                  </p>
-                </div>
-              </>
-            ) : null}
-          </div>
+                </>
+              ) : null}
+            </div>
           ) : null}
 
           {step === 3 ? (
-          <>
-          <div className="space-y-2">
-            <Label htmlFor="agenda-event">Event</Label>
-            <select
-              id="agenda-event"
-              className={selectClass}
-              value={
-                EVENT_OPTIONS.some((o) => o.value === config.eventLabel)
-                  ? config.eventLabel
-                  : config.eventLabel
-                    ? "__other"
-                    : ""
-              }
-              onChange={(e) => {
-                if (e.target.value === "__other") {
-                  set("eventLabel", customEvent || "");
-                } else {
-                  set("eventLabel", e.target.value);
-                }
-              }}
-            >
-              <option value="">Not assigned</option>
-              {EVENT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-              <option value="__other">Other event…</option>
-            </select>
-            {!EVENT_OPTIONS.some((o) => o.value === config.eventLabel) ? (
-              <Input
-                placeholder="Event name"
-                value={customEvent || config.eventLabel}
-                onChange={(e) => {
-                  setCustomEvent(e.target.value);
-                  set("eventLabel", e.target.value);
-                }}
-              />
-            ) : null}
-          </div>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="agenda-event">Event</Label>
+                <select
+                  id="agenda-event"
+                  className={selectClass}
+                  value={
+                    EVENT_OPTIONS.some((o) => o.value === config.eventLabel)
+                      ? config.eventLabel
+                      : config.eventLabel
+                        ? "__other"
+                        : ""
+                  }
+                  onChange={(e) => {
+                    if (e.target.value === "__other") {
+                      set("eventLabel", customEvent || "");
+                    } else {
+                      set("eventLabel", e.target.value);
+                    }
+                  }}
+                >
+                  <option value="">Not assigned</option>
+                  {EVENT_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                  <option value="__other">Other event…</option>
+                </select>
+                {!EVENT_OPTIONS.some((o) => o.value === config.eventLabel) ? (
+                  <Input
+                    placeholder="Event name"
+                    value={customEvent || config.eventLabel}
+                    onChange={(e) => {
+                      setCustomEvent(e.target.value);
+                      set("eventLabel", e.target.value);
+                    }}
+                  />
+                ) : null}
+              </div>
 
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={runExport} disabled={busy || !hasProgramme}>
-              <Download className="mr-2 h-4 w-4" />
-              {busy ? "Exporting…" : "Export print package"}
-            </Button>
-            <Button variant="outline" onClick={runWordExport} disabled={busy || !hasProgramme}>
-              <FileText className="mr-2 h-4 w-4" />
-              Export editable Word
-            </Button>
-            <Button variant="outline" onClick={runMasterExport} disabled={busy}>
-              <Download className="mr-2 h-4 w-4" />
-              Download all agendas (master zip)
-            </Button>
-            <Button variant="outline" onClick={runDeckExport} disabled={busy || !hasProgramme}>
-              <FileText className="mr-2 h-4 w-4" />
-              Export editable PowerPoint
-            </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={runExport} disabled={busy || !hasProgramme}>
+                  <Download className="mr-2 h-4 w-4" />
+                  {busy ? "Exporting…" : "Export print package"}
+                </Button>
+                <Button variant="outline" onClick={runWordExport} disabled={busy || !hasProgramme}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Export editable Word
+                </Button>
+                <Button variant="outline" onClick={runMasterExport} disabled={busy}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Download all agendas (master zip)
+                </Button>
+                <Button variant="outline" onClick={runDeckExport} disabled={busy || !hasProgramme}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Export editable PowerPoint
+                </Button>
 
+                <Button
+                  variant="secondary"
+                  disabled={
+                    signedIn !== true ||
+                    saveMutation.isPending ||
+                    !canEditDivision ||
+                    canEditLoading
+                  }
+                  onClick={() => saveMutation.mutate()}
+                >
+                  <Save className="mr-2 h-4 w-4" />
+                  {openFileId ? "Update live file" : "Save live file"}
+                </Button>
+              </div>
+              {!hasProgramme ? (
+                <p className="text-xs font-medium text-[#03002C]/80">
+                  Add at least one programme line in Programme before exporting — an empty agenda
+                  would download as a blank board.
+                </p>
+              ) : null}
 
-            <Button
-              variant="secondary"
-              disabled={
-                signedIn !== true || saveMutation.isPending || !canEditDivision || canEditLoading
-              }
-              onClick={() => saveMutation.mutate()}
-            >
-              <Save className="mr-2 h-4 w-4" />
-              {openFileId ? "Update live file" : "Save live file"}
-            </Button>
-          </div>
-          {!hasProgramme ? (
-            <p className="text-xs font-medium text-[#03002C]/80">
-              Add at least one programme line in Programme before exporting — an empty agenda would
-              download as a blank board.
-            </p>
-          ) : null}
-
-          {signedIn !== true ? (
-            <p className="text-xs text-muted-foreground">Sign in to save live agenda files.</p>
-          ) : canEditLoading ? (
-            <p className="text-xs text-muted-foreground">Checking division editing permissions…</p>
-          ) : !canEditDivision ? (
-            <p className="text-xs text-muted-foreground">
-              You are not assigned as an editor for this division. Ask an admin or brand reviewer to
-              add you.
-            </p>
-          ) : null}
-          </>
+              {signedIn !== true ? (
+                <p className="text-xs text-muted-foreground">Sign in to save live agenda files.</p>
+              ) : canEditLoading ? (
+                <p className="text-xs text-muted-foreground">
+                  Checking division editing permissions…
+                </p>
+              ) : !canEditDivision ? (
+                <p className="text-xs text-muted-foreground">
+                  You are not assigned as an editor for this division. Ask an admin or brand
+                  reviewer to add you.
+                </p>
+              ) : null}
+            </>
           ) : null}
 
           {/* Step navigation lives with the controls it applies to. */}
@@ -1965,374 +1977,370 @@ export function AgendaStudio({
 
       {/* live page fit — same page-size + overflow awareness as the other print areas */}
       {step === 0 || step === 1 ? (
-      <section
-        aria-labelledby="agenda-fit"
-        className={`rounded-xl border p-4 ${
-          fit.status === "over"
-            ? "border-destructive/50 bg-destructive/5"
-            : fit.status === "tight"
-              ? "border-amber-500/50 bg-amber-500/5"
-              : "border-border bg-muted/30"
-        }`}
-      >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 id="agenda-fit" className="text-sm font-semibold tracking-tight">
-              Page fit · {geo.sizeName} · {geo.trimW}×{geo.trimH} mm
-            </h2>
-            <p className="mt-1 text-xs text-muted-foreground">{fit.summary}</p>
+        <section
+          aria-labelledby="agenda-fit"
+          className={`rounded-xl border p-4 ${
+            fit.status === "over"
+              ? "border-destructive/50 bg-destructive/5"
+              : fit.status === "tight"
+                ? "border-amber-500/50 bg-amber-500/5"
+                : "border-border bg-muted/30"
+          }`}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 id="agenda-fit" className="text-sm font-semibold tracking-tight">
+                Page fit · {geo.sizeName} · {geo.trimW}×{geo.trimH} mm
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">{fit.summary}</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium">
+                {Math.round(fit.usedFraction * 100)}% of band · {fit.rowH.toFixed(1)} mm rows
+              </span>
+              <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium">
+                capacity {fit.maxRows} rows
+              </span>
+              {fit.suggestSizeId && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => set("sizeId", fit.suggestSizeId as AgendaConfig["sizeId"])}
+                >
+                  Use {fit.suggestSizeName}
+                </Button>
+              )}
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium">
-              {Math.round(fit.usedFraction * 100)}% of band · {fit.rowH.toFixed(1)} mm rows
-            </span>
-            <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium">
-              capacity {fit.maxRows} rows
-            </span>
-            {fit.suggestSizeId && (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => set("sizeId", fit.suggestSizeId as AgendaConfig["sizeId"])}
-              >
-                Use {fit.suggestSizeName}
-              </Button>
-            )}
-          </div>
-        </div>
-        {fit.lines.length > 0 && (
-          <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
-            {fit.lines.slice(0, 6).map((line, i) => (
-              <li key={`${line.index}-${line.field}-${i}`}>
-                Row {line.index + 1} {line.field} runs {line.overMm} mm past its column — trim about{" "}
-                {line.trimChars} character{line.trimChars === 1 ? "" : "s"}.
-              </li>
-            ))}
-            {fit.lines.length > 6 && <li>+{fit.lines.length - 6} more lines past their column.</li>}
-          </ul>
-        )}
-      </section>
+          {fit.lines.length > 0 && (
+            <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
+              {fit.lines.slice(0, 6).map((line, i) => (
+                <li key={`${line.index}-${line.field}-${i}`}>
+                  Row {line.index + 1} {line.field} runs {line.overMm} mm past its column — trim
+                  about {line.trimChars} character{line.trimChars === 1 ? "" : "s"}.
+                </li>
+              ))}
+              {fit.lines.length > 6 && (
+                <li>+{fit.lines.length - 6} more lines past their column.</li>
+              )}
+            </ul>
+          )}
+        </section>
       ) : null}
 
       {/* programme rows */}
       {step === 0 ? (
-      <section
-        className={`space-y-3 ${ready ? "" : "pointer-events-none select-none opacity-60"}`}
-        aria-busy={!ready}
-      >
-        {!ready ? (
-          // The board is heavy: until the page is live, a keystroke here would be
-          // thrown away silently. Say so and hold the rows instead.
-          <p className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-            Preparing the board — the programme opens for editing in a moment.
-          </p>
-        ) : null}
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">
-            {days.length > 1 ? `${day.label || `Day ${dayIndex + 1}`} programme` : "Programme"} —{" "}
-            {day.sessions.length} rows
-            <span className="ml-2 text-xs font-normal text-muted-foreground">
-              of {fit.maxRows} that fit {geo.sizeName}
-            </span>
-          </h2>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() =>
-              patchDay({
-                sessions: [
-                  ...day.sessions,
-                  { time: "", title: "New session", detail: "", track: "", muted: false },
-                ],
-              })
-            }
-          >
-            <Plus className="mr-2 h-4 w-4" /> Add row
-          </Button>
-        </div>
-        {(() => {
-          // Two rows at the same time print stacked, as if they ran one after the
-          // other. Spot that and offer to put them side by side in one slot.
-          const groups = agendaSimultaneousGroups(day.sessions);
-          if (!groups.length) return null;
-          return (
-            <div className="space-y-2 rounded-lg border border-[#B45309]/40 bg-[#FFEB66]/20 p-3">
-              {groups.map((group, gi) => {
-                const label = day.sessions[group[0]!]?.time || "this time";
-                return (
-                  <div
-                    key={gi}
-                    className="flex flex-wrap items-center justify-between gap-2 text-xs"
-                  >
-                    <span className="text-[#7C4A02] dark:text-[#FFEB66]">
-                      {group.length} sessions run at {label} in different rooms, but they print one
-                      under the other.
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const merged = agendaMergeSimultaneous(day.sessions, group);
-                        patchDay({ sessions: merged.sessions });
-                        if (merged.leftInPlace > 0)
-                          toast.warning(
-                            `${merged.leftInPlace} session${merged.leftInPlace === 1 ? "" : "s"} left as its own row — a slot holds at most ${AGENDA_MAX_PARALLEL} side by side.`,
-                          );
-                      }}
-                    >
-                      Put side by side
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })()}
-        <div className="space-y-2">
-
-          {day.sessions.map((session, i) => (
-            <div
-              key={i}
-              className={`grid gap-2 rounded-lg border p-3 md:grid-cols-[90px_1fr_1fr_120px_auto] ${
-                overRows.has(i) ? "border-destructive/60 bg-destructive/5" : "border-border"
-              } ${i >= fit.maxRows ? "opacity-70" : ""}`}
+        <section
+          className={`space-y-3 ${ready ? "" : "pointer-events-none select-none opacity-60"}`}
+          aria-busy={!ready}
+        >
+          {!ready ? (
+            // The board is heavy: until the page is live, a keystroke here would be
+            // thrown away silently. Say so and hold the rows instead.
+            <p className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+              Preparing the board — the programme opens for editing in a moment.
+            </p>
+          ) : null}
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">
+              {days.length > 1 ? `${day.label || `Day ${dayIndex + 1}`} programme` : "Programme"} —{" "}
+              {day.sessions.length} rows
+              <span className="ml-2 text-xs font-normal text-muted-foreground">
+                of {fit.maxRows} that fit {geo.sizeName}
+              </span>
+            </h2>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() =>
+                patchDay({
+                  sessions: [
+                    ...day.sessions,
+                    { time: "", title: "New session", detail: "", track: "", muted: false },
+                  ],
+                })
+              }
             >
-              {/* Caps match what the printed board can physically hold, so a
+              <Plus className="mr-2 h-4 w-4" /> Add row
+            </Button>
+          </div>
+          {(() => {
+            // Two rows at the same time print stacked, as if they ran one after the
+            // other. Spot that and offer to put them side by side in one slot.
+            const groups = agendaSimultaneousGroups(day.sessions);
+            if (!groups.length) return null;
+            return (
+              <div className="space-y-2 rounded-lg border border-[#B45309]/40 bg-[#FFEB66]/20 p-3">
+                {groups.map((group, gi) => {
+                  const label = day.sessions[group[0]!]?.time || "this time";
+                  return (
+                    <div
+                      key={gi}
+                      className="flex flex-wrap items-center justify-between gap-2 text-xs"
+                    >
+                      <span className="text-[#7C4A02] dark:text-[#FFEB66]">
+                        {group.length} sessions run at {label} in different rooms, but they print
+                        one under the other.
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const merged = agendaMergeSimultaneous(day.sessions, group);
+                          patchDay({ sessions: merged.sessions });
+                          if (merged.leftInPlace > 0)
+                            toast.warning(
+                              `${merged.leftInPlace} session${merged.leftInPlace === 1 ? "" : "s"} left as its own row — a slot holds at most ${AGENDA_MAX_PARALLEL} side by side.`,
+                            );
+                        }}
+                      >
+                        Put side by side
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+          <div className="space-y-2">
+            {day.sessions.map((session, i) => (
+              <div
+                key={i}
+                className={`grid gap-2 rounded-lg border p-3 md:grid-cols-[90px_1fr_1fr_120px_auto] ${
+                  overRows.has(i) ? "border-destructive/60 bg-destructive/5" : "border-border"
+                } ${i >= fit.maxRows ? "opacity-70" : ""}`}
+              >
+                {/* Caps match what the printed board can physically hold, so a
                   pasted paragraph is refused at the keyboard rather than
                   silently overflowing or being trimmed at save. */}
-              <Input
-                aria-label={`Row ${i + 1} time`}
-                value={session.time}
-                maxLength={24}
-                placeholder="09:30"
-                onChange={(e) => setSession(i, { time: e.target.value.slice(0, 24) })}
-              />
-              <Input
-                aria-label={`Row ${i + 1} title`}
-                value={session.title}
-                maxLength={160}
-                placeholder="Session title"
-                onChange={(e) => setSession(i, { title: e.target.value.slice(0, 160) })}
-              />
-              <Input
-                aria-label={`Row ${i + 1} detail`}
-                value={session.detail}
-                maxLength={160}
-                placeholder="Speaker or room"
-                onChange={(e) => setSession(i, { detail: e.target.value.slice(0, 160) })}
-              />
-              <Input
-                aria-label={`Row ${i + 1} track`}
-                value={session.track}
-                maxLength={48}
-                placeholder="MAIN STAGE"
-                onChange={(e) => setSession(i, { track: e.target.value.slice(0, 48) })}
-              />
-              {/* Room and mark for this row. Both optional: the row prints
-                  exactly as before until one is filled in. */}
-              <div className="flex items-center gap-2 md:col-span-5">
                 <Input
-                  aria-label={`Row ${i + 1} room`}
-                  className="max-w-[240px]"
-                  value={session.room ?? ""}
-                  maxLength={80}
-                  placeholder="Room / floor (optional)"
-                  onChange={(e) => setSession(i, { room: e.target.value.slice(0, 80) })}
+                  aria-label={`Row ${i + 1} time`}
+                  value={session.time}
+                  maxLength={24}
+                  placeholder="09:30"
+                  onChange={(e) => setSession(i, { time: e.target.value.slice(0, 24) })}
                 />
-                <select
-                  aria-label={`Row ${i + 1} mark`}
-                  className={`${selectClass} max-w-[180px]`}
-                  value={session.icon ?? "none"}
-                  onChange={(e) =>
-                    setSession(i, { icon: e.target.value as AgendaLocationIconId })
-                  }
-                >
-                  {AGENDA_LOCATION_ICONS.map((ic) => (
-                    <option key={ic.id} value={ic.id}>
-                      {ic.id === "none" ? "No mark" : `Mark · ${ic.name}`}
-                    </option>
-                  ))}
-                </select>
-                {/* Mark colour and size. "Follows the row" keeps the band ink. */}
-                <select
-                  aria-label={`Row ${i + 1} mark colour`}
-                  className={`${selectClass} max-w-[170px]`}
-                  value={session.iconInk ?? "auto"}
-                  disabled={(session.icon ?? "none") === "none"}
-                  onChange={(e) =>
-                    setSession(i, { iconInk: e.target.value as AgendaLocationInkId })
-                  }
-                >
-                  {AGENDA_LOCATION_INKS.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  aria-label={`Row ${i + 1} mark size`}
-                  className={`${selectClass} max-w-[150px]`}
-                  value={session.iconSize ?? "standard"}
-                  disabled={(session.icon ?? "none") === "none"}
-                  onChange={(e) =>
-                    setSession(i, { iconSize: e.target.value as AgendaLocationSizeId })
-                  }
-                >
-                  {AGENDA_LOCATION_SIZES.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-
-              <div className="flex items-center gap-1">
-                <label className="flex items-center gap-1 pr-2 text-xs text-muted-foreground">
-                  <input
-                    type="checkbox"
-                    checked={session.muted}
-                    onChange={(e) => setSession(i, { muted: e.target.checked })}
-                    aria-label={`Row ${i + 1} is a break`}
+                <Input
+                  aria-label={`Row ${i + 1} title`}
+                  value={session.title}
+                  maxLength={160}
+                  placeholder="Session title"
+                  onChange={(e) => setSession(i, { title: e.target.value.slice(0, 160) })}
+                />
+                <Input
+                  aria-label={`Row ${i + 1} detail`}
+                  value={session.detail}
+                  maxLength={160}
+                  placeholder="Speaker or room"
+                  onChange={(e) => setSession(i, { detail: e.target.value.slice(0, 160) })}
+                />
+                <Input
+                  aria-label={`Row ${i + 1} track`}
+                  value={session.track}
+                  maxLength={48}
+                  placeholder="MAIN STAGE"
+                  onChange={(e) => setSession(i, { track: e.target.value.slice(0, 48) })}
+                />
+                {/* Room and mark for this row. Both optional: the row prints
+                  exactly as before until one is filled in. */}
+                <div className="flex items-center gap-2 md:col-span-5">
+                  <Input
+                    aria-label={`Row ${i + 1} room`}
+                    className="max-w-[240px]"
+                    value={session.room ?? ""}
+                    maxLength={80}
+                    placeholder="Room / floor (optional)"
+                    onChange={(e) => setSession(i, { room: e.target.value.slice(0, 80) })}
                   />
-                  Break
-                </label>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={`Move row ${i + 1} up`}
-                  onClick={() => moveSession(i, -1)}
-                >
-                  <ArrowUp className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={`Move row ${i + 1} down`}
-                  onClick={() => moveSession(i, 1)}
-                >
-                  <ArrowDown className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={`Delete row ${i + 1}`}
-                  onClick={() => patchDay({ sessions: day.sessions.filter((_, j) => j !== i) })}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+                  <select
+                    aria-label={`Row ${i + 1} mark`}
+                    className={`${selectClass} max-w-[180px]`}
+                    value={session.icon ?? "none"}
+                    onChange={(e) =>
+                      setSession(i, { icon: e.target.value as AgendaLocationIconId })
+                    }
+                  >
+                    {AGENDA_LOCATION_ICONS.map((ic) => (
+                      <option key={ic.id} value={ic.id}>
+                        {ic.id === "none" ? "No mark" : `Mark · ${ic.name}`}
+                      </option>
+                    ))}
+                  </select>
+                  {/* Mark colour and size. "Follows the row" keeps the band ink. */}
+                  <select
+                    aria-label={`Row ${i + 1} mark colour`}
+                    className={`${selectClass} max-w-[170px]`}
+                    value={session.iconInk ?? "auto"}
+                    disabled={(session.icon ?? "none") === "none"}
+                    onChange={(e) =>
+                      setSession(i, { iconInk: e.target.value as AgendaLocationInkId })
+                    }
+                  >
+                    {AGENDA_LOCATION_INKS.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    aria-label={`Row ${i + 1} mark size`}
+                    className={`${selectClass} max-w-[150px]`}
+                    value={session.iconSize ?? "standard"}
+                    disabled={(session.icon ?? "none") === "none"}
+                    onChange={(e) =>
+                      setSession(i, { iconSize: e.target.value as AgendaLocationSizeId })
+                    }
+                  >
+                    {AGENDA_LOCATION_SIZES.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              {agendaRowStyle(config) !== "card" && agendaParallels(session).length ? (
-                // Tracks already typed on this slot must never go quiet just
-                // because the row look changed — say where they print.
-                <p className="text-xs text-[#B45309] md:col-span-5">
-                  {agendaParallels(session).length} parallel track
-                  {agendaParallels(session).length === 1 ? "" : "s"} saved on this slot. They print
-                  on the card row look — choose “Card” under Look · Programme bands to show and edit
-                  them.
-                </p>
-              ) : null}
+                <div className="flex items-center gap-1">
+                  <label className="flex items-center gap-1 pr-2 text-xs text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      checked={session.muted}
+                      onChange={(e) => setSession(i, { muted: e.target.checked })}
+                      aria-label={`Row ${i + 1} is a break`}
+                    />
+                    Break
+                  </label>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={`Move row ${i + 1} up`}
+                    onClick={() => moveSession(i, -1)}
+                  >
+                    <ArrowUp className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={`Move row ${i + 1} down`}
+                    onClick={() => moveSession(i, 1)}
+                  >
+                    <ArrowDown className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={`Delete row ${i + 1}`}
+                    onClick={() => patchDay({ sessions: day.sessions.filter((_, j) => j !== i) })}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
 
-              {agendaRowStyle(config) === "card"
-                ? (() => {
-                    // Up to four tracks can run alongside one slot; each gets its
-                    // own aqua card on the board and in every export.
-                    const pars = agendaParallels(session);
-                    const write = (next: AgendaParallel[]) =>
-                      setSession(i, {
-                        parallels: next,
-                        parallel: next[0] ?? null,
-                        pin: next.length ? true : session.pin,
-                      });
-                    return (
-                      <div className="space-y-2 md:col-span-5">
-                        <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                          <span>
-                            {pars.length
-                              ? `${pars.length} parallel track${pars.length === 1 ? "" : "s"} alongside this slot`
-                              : "No parallel tracks alongside this slot"}
-                          </span>
-                          {pars.length < AGENDA_MAX_PARALLEL ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                write([
-                                  ...pars,
-                                  { time: "", title: "", speaker: "", detail: "" },
-                                ])
-                              }
-                            >
-                              <Plus className="mr-1 h-3.5 w-3.5" /> Add parallel track
-                            </Button>
-                          ) : null}
+                {agendaRowStyle(config) !== "card" && agendaParallels(session).length ? (
+                  // Tracks already typed on this slot must never go quiet just
+                  // because the row look changed — say where they print.
+                  <p className="text-xs text-[#B45309] md:col-span-5">
+                    {agendaParallels(session).length} parallel track
+                    {agendaParallels(session).length === 1 ? "" : "s"} saved on this slot. They
+                    print on the card row look — choose “Card” under Look · Programme bands to show
+                    and edit them.
+                  </p>
+                ) : null}
+
+                {agendaRowStyle(config) === "card"
+                  ? (() => {
+                      // Up to four tracks can run alongside one slot; each gets its
+                      // own aqua card on the board and in every export.
+                      const pars = agendaParallels(session);
+                      const write = (next: AgendaParallel[]) =>
+                        setSession(i, {
+                          parallels: next,
+                          parallel: next[0] ?? null,
+                          pin: next.length ? true : session.pin,
+                        });
+                      return (
+                        <div className="space-y-2 md:col-span-5">
+                          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                            <span>
+                              {pars.length
+                                ? `${pars.length} parallel track${pars.length === 1 ? "" : "s"} alongside this slot`
+                                : "No parallel tracks alongside this slot"}
+                            </span>
+                            {pars.length < AGENDA_MAX_PARALLEL ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                  write([...pars, { time: "", title: "", speaker: "", detail: "" }])
+                                }
+                              >
+                                <Plus className="mr-1 h-3.5 w-3.5" /> Add parallel track
+                              </Button>
+                            ) : null}
+                          </div>
+                          {pars.map((par, pi) => {
+                            const edit = (patch: Partial<AgendaParallel>) =>
+                              write(pars.map((p, j) => (j === pi ? { ...p, ...patch } : p)));
+                            return (
+                              <div
+                                key={pi}
+                                className="rounded-lg border border-black/10 p-2 dark:border-white/15"
+                              >
+                                <div className="mb-2 flex items-center justify-between text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                                  <span>Track {pi + 1}</span>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    aria-label={`Remove row ${i + 1} parallel ${pi + 1}`}
+                                    onClick={() => write(pars.filter((_, j) => j !== pi))}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                                <div className="grid gap-2 md:grid-cols-[120px_1fr_1fr]">
+                                  <Input
+                                    aria-label={`Row ${i + 1} parallel ${pi + 1} time`}
+                                    value={par.time ?? ""}
+                                    placeholder="Time"
+                                    onChange={(e) => edit({ time: e.target.value })}
+                                  />
+                                  <Input
+                                    aria-label={`Row ${i + 1} parallel ${pi + 1} title`}
+                                    value={par.title}
+                                    placeholder={`Parallel session ${pi + 1} title`}
+                                    onChange={(e) => edit({ title: e.target.value })}
+                                  />
+                                  <Input
+                                    aria-label={`Row ${i + 1} parallel ${pi + 1} speaker`}
+                                    value={par.speaker ?? ""}
+                                    placeholder="Speaker"
+                                    onChange={(e) => edit({ speaker: e.target.value })}
+                                  />
+                                </div>
+                                <div className="mt-2 grid gap-2 md:grid-cols-[200px_1fr]">
+                                  <Input
+                                    aria-label={`Row ${i + 1} parallel ${pi + 1} room`}
+                                    value={par.room ?? ""}
+                                    placeholder="Room / floor"
+                                    onChange={(e) => edit({ room: e.target.value })}
+                                  />
+                                  <Input
+                                    aria-label={`Row ${i + 1} parallel ${pi + 1} notes`}
+                                    value={par.detail}
+                                    placeholder="Notes"
+                                    onChange={(e) => edit({ detail: e.target.value })}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                        {pars.map((par, pi) => {
-                          const edit = (patch: Partial<AgendaParallel>) =>
-                            write(pars.map((p, j) => (j === pi ? { ...p, ...patch } : p)));
-                          return (
-                            <div
-                              key={pi}
-                              className="rounded-lg border border-black/10 p-2 dark:border-white/15"
-                            >
-                              <div className="mb-2 flex items-center justify-between text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                                <span>Track {pi + 1}</span>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  aria-label={`Remove row ${i + 1} parallel ${pi + 1}`}
-                                  onClick={() => write(pars.filter((_, j) => j !== pi))}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                              <div className="grid gap-2 md:grid-cols-[120px_1fr_1fr]">
-                                <Input
-                                  aria-label={`Row ${i + 1} parallel ${pi + 1} time`}
-                                  value={par.time ?? ""}
-                                  placeholder="Time"
-                                  onChange={(e) => edit({ time: e.target.value })}
-                                />
-                                <Input
-                                  aria-label={`Row ${i + 1} parallel ${pi + 1} title`}
-                                  value={par.title}
-                                  placeholder={`Parallel session ${pi + 1} title`}
-                                  onChange={(e) => edit({ title: e.target.value })}
-                                />
-                                <Input
-                                  aria-label={`Row ${i + 1} parallel ${pi + 1} speaker`}
-                                  value={par.speaker ?? ""}
-                                  placeholder="Speaker"
-                                  onChange={(e) => edit({ speaker: e.target.value })}
-                                />
-                              </div>
-                              <div className="mt-2 grid gap-2 md:grid-cols-[200px_1fr]">
-                                <Input
-                                  aria-label={`Row ${i + 1} parallel ${pi + 1} room`}
-                                  value={par.room ?? ""}
-                                  placeholder="Room / floor"
-                                  onChange={(e) => edit({ room: e.target.value })}
-                                />
-                                <Input
-                                  aria-label={`Row ${i + 1} parallel ${pi + 1} notes`}
-                                  value={par.detail}
-                                  placeholder="Notes"
-                                  onChange={(e) => edit({ detail: e.target.value })}
-                                />
-                              </div>
-
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })()
-                : null}
-            </div>
-          ))}
-        </div>
-      </section>
+                      );
+                    })()
+                  : null}
+              </div>
+            ))}
+          </div>
+        </section>
       ) : null}
 
       {/* saved live files */}

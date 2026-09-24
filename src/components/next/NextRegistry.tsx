@@ -240,7 +240,14 @@ export function RegistryCard({
  * These are studio configs, not flat Canva artwork, so every card opens the
  * pillar editor seeded on that exact master with full editing + press export.
  */
-export function LivePillars({ division }: { division: NextDivision }) {
+export function LivePillars({
+  division,
+  editionId = null,
+}: {
+  division: NextDivision;
+  /** City edition to show saved files for; null = the shared division defaults. */
+  editionId?: string | null;
+}) {
   const [face, setFace] = useState<"light" | "dark">("light");
   const savedPillars = useSavedPillarFiles();
   const savedAgendas = useSavedAgendaFiles();
@@ -251,7 +258,7 @@ export function LivePillars({ division }: { division: NextDivision }) {
     () =>
       PILLAR_KINDS.map((kind) => {
         const kindId = kind.id as PillarKindId;
-        const saved = pickPillarFile(savedPillars.data, division.id, kindId, face);
+        const saved = pickPillarFile(savedPillars.data, division.id, kindId, face, editionId);
         const config: PillarConfig = saved
           ? { ...saved.config, face }
           : { ...pillarDefault(kindId, division.id), face };
@@ -264,12 +271,12 @@ export function LivePillars({ division }: { division: NextDivision }) {
           updatedAt: saved?.updated_at,
         };
       }),
-    [division.id, face, savedPillars.data],
+    [division.id, face, savedPillars.data, editionId],
   );
 
   const savedAgenda = useMemo(
-    () => pickAgendaFile(savedAgendas.data, division.id),
-    [savedAgendas.data, division.id],
+    () => pickAgendaFile(savedAgendas.data, division.id, editionId),
+    [savedAgendas.data, division.id, editionId],
   );
 
   // Every division gets an agenda preview card: the saved live file when there
@@ -304,7 +311,11 @@ export function LivePillars({ division }: { division: NextDivision }) {
         <div className="flex flex-wrap items-center gap-2">
           <Link
             to="/events/next/agendas"
-            search={{ division: division.id, file: savedAgenda?.id }}
+            search={{
+              division: division.id,
+              file: savedAgenda?.id,
+              edition: editionId ?? undefined,
+            }}
             className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted"
           >
             <CalendarDays size={13} /> {division.name} agenda
@@ -353,7 +364,13 @@ export function LivePillars({ division }: { division: NextDivision }) {
             )}
             <Link
               to="/events/next/pillars"
-              search={{ division: division.id, kind: card.id, face, file: card.fileId }}
+              search={{
+                division: division.id,
+                kind: card.id,
+                face,
+                file: card.fileId,
+                edition: editionId ?? undefined,
+              }}
               className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
             >
               Edit this pillar
@@ -382,7 +399,11 @@ export function LivePillars({ division }: { division: NextDivision }) {
           )}
           <Link
             to="/events/next/agendas"
-            search={{ division: division.id, file: savedAgenda?.id }}
+            search={{
+              division: division.id,
+              file: savedAgenda?.id,
+              edition: editionId ?? undefined,
+            }}
             className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
           >
             {savedAgenda ? "Edit this agenda" : "Create this agenda"}

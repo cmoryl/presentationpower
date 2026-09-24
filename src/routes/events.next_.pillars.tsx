@@ -19,6 +19,8 @@ type PillarSearch = {
   kind?: PillarKindId;
   face?: "dark" | "light";
   file?: string;
+  /** City edition the pillar belongs to (e.g. "london"); absent = shared division default. */
+  edition?: string;
 };
 
 const KINDS: PillarKindId[] = [
@@ -36,6 +38,7 @@ export const Route = createFileRoute("/events/next_/pillars")({
     kind: KINDS.includes(search.kind as PillarKindId) ? (search.kind as PillarKindId) : undefined,
     face: search.face === "light" || search.face === "dark" ? search.face : undefined,
     file: typeof search.file === "string" ? search.file : undefined,
+    edition: typeof search.edition === "string" && search.edition ? search.edition : undefined,
   }),
 
   head: () => ({
@@ -60,7 +63,8 @@ export const Route = createFileRoute("/events/next_/pillars")({
 });
 
 function PillarPage() {
-  const { division, kind, face, file } = Route.useSearch();
+  const { division, kind, face, file, edition } = Route.useSearch();
+  const editionId = edition ?? null;
   const saved = useSavedPillarFiles();
 
   // Prefer the saved live file for this division / kind / face so the editor and
@@ -68,8 +72,14 @@ function PillarPage() {
   const savedRow = useMemo(() => {
     if (file) return saved.data?.find((row) => row.id === file);
     if (!division && !kind && !face) return undefined;
-    return pickPillarFile(saved.data, division ?? "city-series", kind ?? "welcome", face ?? "dark");
-  }, [file, saved.data, division, kind, face]);
+    return pickPillarFile(
+      saved.data,
+      division ?? "city-series",
+      kind ?? "welcome",
+      face ?? "dark",
+      editionId,
+    );
+  }, [file, saved.data, division, kind, face, editionId]);
 
   const seeded = useMemo<PillarConfig | undefined>(() => {
     if (savedRow?.config) {
@@ -103,6 +113,7 @@ function PillarPage() {
           face={activeFace}
           activeKind={activeKind}
           activeFileId={savedRow?.id}
+          editionId={editionId}
         />
 
         <PillarStudio
@@ -110,6 +121,7 @@ function PillarPage() {
           heading="Master pillar signs"
           initialConfig={seeded}
           initialFileId={savedRow?.id ?? null}
+          editionId={editionId}
           configKey={
             seeded
               ? `${savedRow?.id ?? "default"}|${seeded.divisionId}|${seeded.kind}|${seeded.face}`
@@ -133,7 +145,9 @@ function DemoCards({
   face,
   activeKind,
   activeFileId,
+  editionId,
 }: {
+  editionId: string | null;
   divisionId: string;
   face: "dark" | "light";
   activeKind: PillarKindId;
@@ -145,13 +159,13 @@ function DemoCards({
   const cards = useMemo(
     () =>
       KINDS.map((id) => {
-        const row = pickPillarFile(saved.data, divisionId, id, face);
+        const row = pickPillarFile(saved.data, divisionId, id, face, editionId);
         const config: PillarConfig = row
           ? { ...row.config, face }
           : { ...pillarDefault(id, divisionId), face };
         return { id, config, fileId: row?.id, fileName: row?.name, updatedAt: row?.updated_at };
       }),
-    [saved.data, divisionId, face],
+    [saved.data, divisionId, face, editionId],
   );
 
   return (
