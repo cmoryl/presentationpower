@@ -2,7 +2,14 @@
 // the multi-page deck viewer and the live pillar masters. Used by /events/next/assets.
 import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight, ExternalLink, ImageIcon } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  ImageIcon,
+} from "lucide-react";
 import {
   deckPagesFor,
   isPowerpointDeck,
