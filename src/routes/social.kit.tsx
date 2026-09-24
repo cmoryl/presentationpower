@@ -719,7 +719,7 @@ function WizardFlow(p: WizardProps) {
   const isLast = step === WIZARD_STEPS.length - 1;
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-7xl space-y-8 px-6 py-10">
       <AdminPageHeader
         eyebrow="New social kit · Step by step"
         title="Start from a blank kit"
