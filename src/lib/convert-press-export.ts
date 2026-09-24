@@ -98,10 +98,10 @@ function unscaleForCapture(node: HTMLElement): () => void {
   };
 }
 
-function manifestCsv(r: PressExportResult, stamp: string, base: string): string {
+function manifestCsv(r: PressExportResult, label: string, stamp: string, base: string): string {
   const mm = (v: number) => Math.round(v * MM_PER_IN);
   const rows: Array<[string, string | number]> = [
-    ["Item", r.filename.replace(/\.(zip|pdf|ai)$/, "")],
+    ["Item", label],
     ["File", `pdf/${base}.pdf`],
     ["Trim (mm)", `${mm(r.trimIn.width)} × ${mm(r.trimIn.height)}`],
     ["Trim (in)", `${r.trimIn.width.toFixed(2)} × ${r.trimIn.height.toFixed(2)}`],
@@ -114,7 +114,6 @@ function manifestCsv(r: PressExportResult, stamp: string, base: string): string 
     ["File size (bytes)", r.bytes],
     ["Generated", stamp],
   ];
-  for (const [k, v] of Object.entries(r as unknown as Record<string, unknown>)) void k, v;
   const esc = (v: string | number) => {
     const s = String(v);
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
@@ -122,10 +121,16 @@ function manifestCsv(r: PressExportResult, stamp: string, base: string): string 
   return ["Field,Value", ...rows.map(([k, v]) => `${esc(k)},${esc(v)}`)].join("\n") + "\n";
 }
 
-function readme(r: PressExportResult, stamp: string, base: string, includeAi: boolean): string {
+function readme(
+  r: PressExportResult,
+  label: string,
+  stamp: string,
+  base: string,
+  includeAi: boolean,
+): string {
   const mm = (v: number) => Math.round(v * MM_PER_IN);
   return [
-    `${r.label ?? ""}`.trim() || "TransPerfect Element — press artwork",
+    label.trim() || "TransPerfect Element — press artwork",
     `Generated ${stamp} by TransPerfect Element (cross-format adaptor).`,
     "",
     "CONTENTS",
@@ -221,7 +226,7 @@ export async function exportConvertPress(opts: PressExportOptions): Promise<Pres
     throw new Error("The press file came back empty — nothing was written.");
   }
 
-  const result: PressExportResult & { label?: string } = {
+  const result: PressExportResult = {
     blob: pdf,
     filename: `${base}-press-${Math.round(effectiveDpi)}dpi.pdf`,
     bytes: pdf.size,
@@ -233,7 +238,6 @@ export async function exportConvertPress(opts: PressExportOptions): Promise<Pres
     trimIn: opts.trimIn,
     bleedMm,
     pdfX4: !!opts.pdfX4,
-    label: opts.label,
   };
 
   if (deliver === "pdf") return result;
@@ -254,7 +258,7 @@ export async function exportConvertPress(opts: PressExportOptions): Promise<Pres
   zip.folder("pdf")!.file(`${base}.pdf`, bytes);
   zip.folder("ai")!.file(`${base}.ai`, bytes);
   const withContext = [
-    manifestCsv(result, stamp, base),
+    manifestCsv(result, opts.label, stamp, base),
     ...(opts.context
       ? [
           "",
@@ -266,7 +270,7 @@ export async function exportConvertPress(opts: PressExportOptions): Promise<Pres
       : []),
   ].join("\n");
   zip.file("manifest.csv", withContext);
-  zip.file("PRESS-READ-ME.txt", readme(result, stamp, base, true));
+  zip.file("PRESS-READ-ME.txt", readme(result, opts.label, stamp, base, true));
   const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE" });
   return {
     ...result,
