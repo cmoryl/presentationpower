@@ -955,15 +955,16 @@ function DeckEditor() {
                       }`}
                       title="Edit this slide directly: retype module copy and move objects on one canvas"
                     >
-                      {studio ? "● Editing" : "✎ Edit slide"}
+                      {studio ? "● Editing" : "✎ Edit"}
                     </button>
-                    <Tip label="Save this slide to My Files as a personal module">
+                    <Tip label="Save this slide to My Files">
                       <button
                         type="button"
                         onClick={() => setSaveModuleOpen(true)}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-medium text-black/70 transition hover:border-primary hover:text-primary"
+                        aria-label="Save this slide to My Files"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-primary hover:text-primary"
                       >
-                        ⤓ Save to My Files
+                        ⤓
                       </button>
                     </Tip>
 
@@ -1915,6 +1916,7 @@ function DeckEditor() {
                   background={{
                     render: () => (
                       <BackgroundImageryPanel
+                        embedded
                         value={(active.content as Record<string, unknown>).background}
                         onChange={(next) => updateField(deck.id, active.id, "background", next)}
                         activeSlideId={active.id}

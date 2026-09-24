@@ -173,7 +173,7 @@ export function EditorToolbar({
         </>
       ) : null}
       {slideRowEnd || deckRowEnd ? (
-        <div className="ml-auto flex flex-wrap items-center gap-1.5">
+        <div className="ml-auto flex shrink-0 items-center gap-1.5">
           {slideRowEnd}
           {deckRowEnd}
         </div>

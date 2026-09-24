@@ -53,45 +53,37 @@ export function SlideMediaPanel({
   const activeTab = tabs.find((t) => t.key === active) ?? tabs[tabs.length - 1];
 
   return (
-    <section className="mt-4 rounded-3xl border border-black/10 bg-white/70 p-5 shadow-[0_1px_0_rgba(0,0,0,0.04)] backdrop-blur">
-      <header className="flex flex-wrap items-baseline justify-between gap-2">
-        <div>
-          <h3 className="text-[11px] uppercase tracking-[0.18em] text-black/60">
-            Slide media & background
-          </h3>
-          <p className="mt-1 text-xs text-black/55">{activeTab.hint}</p>
-        </div>
-        <div className="text-[10px] uppercase tracking-widest text-black/40">
-          One place for imagery, video, and backdrops
-        </div>
+    <section className="mt-4 rounded-lg border border-black/10 bg-white p-5">
+      <header>
+        <h3 className="text-sm font-semibold text-[#03002C]">Slide media & background</h3>
+        <p className="mt-1 text-sm text-black/65">{activeTab.hint}</p>
       </header>
 
-      <div className="mt-4 inline-flex rounded-full border border-black/10 bg-black/[0.03] p-1">
-        {tabs.map((t) => {
-          const isActive = t.key === active;
-          const disabled = !t.available;
-          return (
-            <button
-              key={t.key}
-              type="button"
-              disabled={disabled}
-              onClick={() => setActive(t.key)}
-              className={[
-                "rounded-full px-4 py-1.5 text-[11px] uppercase tracking-widest transition",
-                isActive
-                  ? "bg-[#03002C] text-white shadow-sm"
-                  : disabled
-                    ? "cursor-not-allowed text-black/25"
-                    : "text-black/60 hover:text-black",
-              ].join(" ")}
-              title={disabled ? "Not available for this module" : t.hint}
-            >
-              {t.label}
-              {disabled && <span className="ml-1 text-[9px] opacity-60">·</span>}
-            </button>
-          );
-        })}
-      </div>
+      {tabs.filter((t) => t.available).length > 1 && (
+        <div role="tablist" aria-label="Slide media" className="mt-4 inline-flex gap-1 rounded-md border border-black/10 bg-black/[0.03] p-1">
+          {tabs
+            .filter((t) => t.available)
+            .map((t) => {
+              const isActive = t.key === active;
+              return (
+                <button
+                  key={t.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActive(t.key)}
+                  className={[
+                    "rounded px-4 text-sm font-medium transition",
+                    isActive ? "bg-[#03002C] text-white" : "text-black/70 hover:text-black",
+                  ].join(" ")}
+                  title={t.hint}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+        </div>
+      )}
 
       <div className="mt-4">{activeTab.render()}</div>
     </section>
