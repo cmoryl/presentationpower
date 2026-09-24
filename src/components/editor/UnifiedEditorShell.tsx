@@ -84,9 +84,6 @@ export function EditorSideRail({
           />
         ))}
         <div className="flex-1" />
-        <div className="px-1 pb-1 text-center text-[9px] leading-tight tracking-[0.14em] text-black/30 dark:text-white/30">
-          RAIL
-        </div>
       </div>
     </div>
   );

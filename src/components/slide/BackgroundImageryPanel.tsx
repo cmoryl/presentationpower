@@ -144,6 +144,7 @@ export function BackgroundImageryPanel({
   activeSlideId,
   onApplyToSlides,
   divisionId,
+  embedded = false,
 }: {
   value: unknown;
   onChange: (next: SlideBackgroundValue | null) => void;
@@ -151,6 +152,8 @@ export function BackgroundImageryPanel({
   activeSlideId?: string;
   onApplyToSlides?: (slideIds: string[], next: SlideBackgroundValue | null) => void;
   divisionId?: string | null;
+  /** Rendered inside another tabbed panel: always open, no own frame or toggle. */
+  embedded?: boolean;
 }) {
   const current = useMemo(() => resolveSlideBackground(value), [value]);
   const [tab, setTab] = useState<Tab>(() => {
@@ -167,7 +170,8 @@ export function BackgroundImageryPanel({
   const [error, setError] = useState<string | null>(null);
   const [aiPrompt, setAiPrompt] = useState("");
   const [applyOpen, setApplyOpen] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [openState, setOpen] = useState(embedded);
+  const open = embedded || openState;
   const [applyMode, setApplyMode] = useState<"section" | "custom">("section");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [applyFlash, setApplyFlash] = useState<string | null>(null);
@@ -325,8 +329,13 @@ export function BackgroundImageryPanel({
   const patternPreview = buildPatternCss(patternId, patFg, patBg, patIntensity, patScale);
 
   return (
-    <div className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
+    <div className={embedded ? "" : "mt-6 rounded-2xl border border-black/10 bg-white p-6"}>
       <div className="flex items-center justify-between gap-2">
+        {embedded ? (
+          <span className="flex-1 text-sm text-black/70">
+            {current ? `Current: ${current.kind}` : "Using the style's default background"}
+          </span>
+        ) : (
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -348,6 +357,7 @@ export function BackgroundImageryPanel({
             </span>
           )}
         </button>
+        )}
         <div className="flex items-center gap-2">
           {open && canApplyMany && (
             <button
