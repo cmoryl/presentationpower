@@ -490,6 +490,27 @@ function ConvertPage() {
                       : null;
                   }}
                 />
+                {!format && result.target.trimIn ? (
+                  <PressExportMenu
+                    context={{
+                      Document: result.target.label,
+                      Source:
+                        sourceKind === "module"
+                          ? `Master module · ${moduleVariant?.name ?? moduleId}`
+                          : manual || !deck
+                            ? "typed copy"
+                            : `${deck.title} · slide ${slideIndex + 1}`,
+                      Division: BRAND_MODES.find((b) => b.id === brandId)?.name ?? "TransPerfect",
+                    }}
+                    resolveTarget={() => {
+                      const node = printPageRef.current;
+                      const trim = result.target.trimIn;
+                      return node && trim
+                        ? { node, trimIn: trim, label: result.target.label }
+                        : null;
+                    }}
+                  />
+                ) : null}
                 <BrandHealthBadge
                   getRoots={() => {
                     const node = format
