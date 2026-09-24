@@ -25,7 +25,7 @@ export const LONDON_SECTIONS: CitySection[] = [
   { label: "Overview", target: { kind: "anchor", id: "city-overview" } },
   { label: "Divisions", target: { kind: "anchor", id: "edition-divisions" } },
   { label: "Rooms & maps", target: { kind: "page", to: "/events/next/london/maps" } },
-  { label: "Schedule & agendas", target: { kind: "page", to: "/events/next/london/schedule" } },
+  { label: "Schedule & agendas", target: { kind: "anchor", id: "london-agendas" } },
   { label: "Signage & panels", target: { kind: "anchor", id: "london-panels" } },
   { label: "Downloads", target: { kind: "anchor", id: "city-overview" } },
   { label: "Reference", target: { kind: "anchor", id: "london-reference" } },

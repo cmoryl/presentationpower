@@ -1093,8 +1093,26 @@ function LondonSignagePage() {
           hasProgramme
           selected={divisionFocus}
           onSelect={setDivisionFocus}
-          assetsAnchor="london-panels"
+          assetsAnchor="london-agendas"
         />
+
+        {/* Track agendas — one card per division, filtered by the division picked above */}
+        <section id="london-agendas" className="mt-12 scroll-mt-24" aria-labelledby="london-agendas-h">
+          <h2 id="london-agendas-h" className="flex items-center gap-2 text-lg font-semibold text-[#03002C]">
+            <CalendarDays className="h-4.5 w-4.5 text-[#003FC7]" />
+            {divisionFocus
+              ? `Track agenda · ${NEXT_DIVISIONS.find((d) => d.id === divisionFocus)?.name ?? "Division"}`
+              : "Track agendas · every division"}
+          </h2>
+          <p className="mt-1 max-w-2xl text-[13px] leading-relaxed text-[#03002C]/65">
+            {divisionFocus
+              ? "This division's agenda board for London. Pick another division above, or All divisions to see every board."
+              : "Pick a division above to see only its track agenda. Editable boards, A4 to A1, with QR codes and vector export for print."}
+          </p>
+          <div className="mt-4">
+            <LondonAgendaBoards divisionId={divisionFocus} />
+          </div>
+        </section>
 
         {/* Floor spine */}
         <section id="london-panels" className="mt-12 scroll-mt-24">
@@ -1384,20 +1402,6 @@ function LondonSignagePage() {
             <LondonGradientGrounds panels={panels} />
           </details>
 
-          {/* Division agendas — the London kit's own agenda boards */}
-          <details className="group border-b border-black/10 py-3">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-              <h2 className="flex items-center gap-2 text-base font-semibold text-[#03002C]">
-                <CalendarDays className="h-4.5 w-4.5 text-[#003FC7]" /> Division agendas · editable
-                agenda boards, A4 to A1, every division
-              </h2>
-              <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/55">
-                <span className="group-open:hidden">Show</span>
-                <span className="hidden group-open:inline">Hide</span>
-              </span>
-            </summary>
-            <LondonAgendaBoards />
-          </details>
         </section>
       </div>
 
