@@ -112,6 +112,8 @@ import {
   londonBrandingPlan,
 } from "@/lib/next-london-branding";
 import { nextLogoFamily } from "@/lib/next-logo-vectors";
+import { londonPanelFamily } from "@/lib/next-london-branding";
+import { EditionDivisionTiles } from "@/components/events/EditionDivisionTiles";
 import logoSetAsset from "@/assets/next-2026-logo-set.zip.asset.json";
 import {
   auditAi,
@@ -532,7 +534,25 @@ function LondonSignagePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- a replaced live file changes coverage
     [panels, liveFileSignature],
   );
-  const listed = source === "supplied" ? suppliedPanels : panels;
+  const listedAll = source === "supplied" ? suppliedPanels : panels;
+  // Division focus: the tile section below the venue overview narrows the
+  // whole schedule (booths + room signage) to one division.
+  const [divisionFocus, setDivisionFocus] = useState<string | null>(null);
+  const listed = useMemo(
+    () =>
+      divisionFocus ? listedAll.filter((p) => londonPanelFamily(p) === divisionFocus) : listedAll,
+    [listedAll, divisionFocus],
+  );
+  const divisionCounts = useMemo(() => {
+    const out: Record<string, { booths: number; signage: number }> = {};
+    for (const p of listedAll) {
+      const id = londonPanelFamily(p);
+      const c = (out[id] ??= { booths: 0, signage: 0 });
+      if (isBoothPanel(p)) c.booths++;
+      else c.signage++;
+    }
+    return out;
+  }, [listedAll]);
   // Booth masters live in the backend: applying them patches the booth specs
   // and panel records in place, so `applied` is what re-renders the cards.
   const boothTemplates = useBoothTemplates();
@@ -1117,6 +1137,16 @@ function LondonSignagePage() {
           </div>
         </header>
 
+        <EditionDivisionTiles
+          editionLabel="London 2026"
+          countsFor={(id) => divisionCounts[id] ?? { booths: 0, signage: 0 }}
+          hasProgramme
+          selected={divisionFocus}
+          onSelect={setDivisionFocus}
+          assetsAnchor="london-panels"
+        />
+
+
         {/* Print specification */}
         <details className="group mt-10 rounded-2xl border border-black/10 bg-white/70 p-5">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
@@ -1175,7 +1205,7 @@ function LondonSignagePage() {
 
 
         {/* Floor spine */}
-        <section className="mt-12">
+        <section id="london-panels" className="mt-12 scroll-mt-24">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="mr-2 flex items-center gap-2 text-lg font-semibold text-[#03002C]">
               <MapPin className="h-4.5 w-4.5 text-[#003FC7]" /> Panels by floor
