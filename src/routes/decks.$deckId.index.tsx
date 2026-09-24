@@ -857,31 +857,17 @@ function DeckEditor() {
                       </div>
                     </EditorMenu>
 
-                    <EditorMenu
-                      label="Motion"
-                      hint={
-                        active.transition?.type ?? deck.context?.defaultTransition?.type ?? "fade"
-                      }
-                    >
+                    <EditorMenu label="Slide options">
+                      <h4 className="mb-2 text-sm font-semibold text-[#03002C]">Motion</h4>
                       <TransitionPicker
                         slide={active}
                         deckDefault={deck.context?.defaultTransition}
                         onSlideChange={(t) => setSlideTransition(deck.id, active.id, t)}
                         onDeckDefaultChange={(t) => setDeckDefaultTransition(deck.id, t)}
                       />
-                    </EditorMenu>
-
-                    <EditorMenu
-                      label="Stats"
-                      hint={
-                        statShapePreset(
-                          resolveStatLayout(
-                            active.variantId,
-                            active.content as Record<string, unknown>,
-                          ).shape,
-                        ).label
-                      }
-                    >
+                      <h4 className="mb-2 mt-4 border-t border-black/10 pt-4 text-sm font-semibold text-[#03002C]">
+                        Stats
+                      </h4>
                       <StatStylePicker
                         moduleLayout={statLayoutForVariant(active.variantId)}
                         value={
