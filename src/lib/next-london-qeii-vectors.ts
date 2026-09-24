@@ -1701,3 +1701,8 @@ export function qeiiFloorVectors(): QeiiFloorVector[] {
 export function qeiiFloorVector(id: string): QeiiFloorVector | undefined {
   return venueFloors?.get(id) ?? QEII_FLOOR_VECTORS.find((f) => f.id === id);
 }
+
+/** Issued sheet page of a built-in floor (venue rows don't carry it). */
+export function qeiiFloorVectorBundledPage(id: string): number | undefined {
+  return QEII_FLOOR_VECTORS.find((f) => f.id === id)?.page;
+}
