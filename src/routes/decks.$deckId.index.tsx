@@ -2102,7 +2102,7 @@ function DeckEditor() {
                         {active && mv && (
                           <InspectorSection id="swap" label="Swap">
                             <Panel label="Current module">
-                              <div className="font-mono text-xs text-black/50">{mv.id}</div>
+                              <div className="sr-only">{mv.id}</div>
                               <div className="mt-1 font-medium">{mv.name}</div>
                               <div className="mt-2 text-sm text-black/60">{mv.description}</div>
                               <div className="mt-4 space-y-2">
@@ -2283,7 +2283,7 @@ function DeckEditor() {
                           )}
                           {mv && (
                             <Panel label="Module variant">
-                              <div className="font-mono text-xs text-black/50">{mv.id}</div>
+                              <div className="sr-only">{mv.id}</div>
                               <div className="mt-1 font-medium">{mv.name}</div>
                               <div className="mt-2 text-sm text-black/60">{mv.description}</div>
                               <p className="mt-2 text-[11px] leading-snug text-black/45">
