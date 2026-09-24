@@ -246,7 +246,7 @@ function KitBuilderInner() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-7xl space-y-8 px-6 py-10">
       <AdminPageHeader
         eyebrow="Social · Kit builder"
         title="Build a social kit from a favorited module"
@@ -270,7 +270,7 @@ function KitBuilderInner() {
             action={
               <Link
                 to="/library"
-                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]"
+                className="inline-flex items-center gap-2 rounded-sm bg-[#03002C] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]"
               >
                 <Star size={14} /> Browse the library →
               </Link>
@@ -360,7 +360,7 @@ function KitBuilderInner() {
                         key={f.id}
                         type="button"
                         onClick={() => toggleFormat(f.id)}
-                        className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] transition ${
+                        className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-sm border px-3 py-1 text-[11px] transition ${
                           on
                             ? "border-[#03002C] bg-[#03002C] text-white"
                             : "border-black/15 bg-white text-black/60 hover:border-black/40"
@@ -403,13 +403,13 @@ function KitBuilderInner() {
             <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
               Mode
             </div>
-            <div className="mt-1 inline-flex rounded-full border border-black/10 bg-black/[0.03] p-0.5 text-[11px] uppercase tracking-widest">
+            <div className="mt-1 inline-flex rounded-sm border border-black/10 bg-black/[0.03] p-0.5 text-[11px] uppercase tracking-widest">
               {(["dark", "light", "both"] as const).map((m) => (
                 <button
                   key={m}
                   type="button"
                   onClick={() => setMode(m)}
-                  className={`rounded-full px-3 py-1 transition ${
+                  className={`rounded-sm px-3 py-1 transition ${
                     mode === m ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"
                   }`}
                 >
@@ -485,7 +485,7 @@ function KitBuilderInner() {
                 setRemoved(new Set());
                 setRegenTick((t) => t + 1);
               }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
+              className="inline-flex items-center gap-1.5 rounded-sm border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
             >
               <RefreshCw size={12} /> Regenerate all
             </button>
@@ -598,7 +598,7 @@ function AssetCard({
             type="button"
             onClick={onRegenerate}
             title="Regenerate this asset"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-white text-icon-muted hover:text-foreground"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-sm border border-black/10 bg-white text-icon-muted hover:text-foreground"
           >
             <RefreshCw size={12} />
           </button>
@@ -606,7 +606,7 @@ function AssetCard({
             type="button"
             onClick={onRemove}
             title="Remove from kit"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-white text-icon-muted hover:text-red-600"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-sm border border-black/10 bg-white text-icon-muted hover:text-red-600"
           >
             <X size={12} />
           </button>
@@ -744,7 +744,7 @@ function WizardFlow(p: WizardProps) {
               key={s.key}
               type="button"
               onClick={() => setStep(i)}
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs transition ${
+              className={`inline-flex items-center gap-2 rounded-sm px-3 py-1.5 text-xs transition ${
                 active
                   ? "bg-[#03002C] text-white"
                   : done
@@ -753,7 +753,7 @@ function WizardFlow(p: WizardProps) {
               }`}
             >
               <span
-                className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold ${
+                className={`inline-flex h-5 w-5 items-center justify-center rounded-sm text-[10px] font-semibold ${
                   active ? "bg-white/20" : done ? "bg-[#003FC7]/20" : "bg-black/10"
                 }`}
               >
@@ -795,13 +795,13 @@ function WizardFlow(p: WizardProps) {
               <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-black/50">
                 Render mode
               </div>
-              <div className="inline-flex rounded-full border border-black/10 bg-black/[0.03] p-0.5 text-[11px] uppercase tracking-widest">
+              <div className="inline-flex rounded-sm border border-black/10 bg-black/[0.03] p-0.5 text-[11px] uppercase tracking-widest">
                 {(["dark", "light", "both"] as const).map((m) => (
                   <button
                     key={m}
                     type="button"
                     onClick={() => setMode(m)}
-                    className={`rounded-full px-3 py-1 transition ${
+                    className={`rounded-sm px-3 py-1 transition ${
                       mode === m ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"
                     }`}
                   >
@@ -926,7 +926,7 @@ function WizardFlow(p: WizardProps) {
                       key={f.id}
                       type="button"
                       onClick={() => toggleFormat(f.id)}
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] transition ${
+                      className={`inline-flex items-center gap-1.5 rounded-sm border px-3 py-1 text-[11px] transition ${
                         on
                           ? "border-[#03002C] bg-[#03002C] text-white"
                           : "border-black/15 bg-white text-black/60 hover:border-black/40"
@@ -1011,7 +1011,7 @@ function WizardFlow(p: WizardProps) {
                     setRemoved(new Set());
                     setRegenTick((n) => n + 1);
                   }}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
+                  className="inline-flex items-center gap-1.5 rounded-sm border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
                 >
                   <RefreshCw size={12} /> Regenerate all
                 </button>
@@ -1031,7 +1031,7 @@ function WizardFlow(p: WizardProps) {
                   <button
                     type="button"
                     onClick={() => setStep(1)}
-                    className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#03002C]"
+                    className="inline-flex items-center gap-2 rounded-sm bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#03002C]"
                   >
                     ← Back to content
                   </button>
@@ -1085,7 +1085,7 @@ function WizardFlow(p: WizardProps) {
           type="button"
           onClick={() => setStep(Math.max(0, step - 1))}
           disabled={step === 0}
-          className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-4 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5 disabled:opacity-40"
+          className="inline-flex items-center gap-1.5 rounded-sm border border-black/15 bg-white px-4 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5 disabled:opacity-40"
         >
           <ArrowLeft size={12} /> Back
         </button>
@@ -1095,7 +1095,7 @@ function WizardFlow(p: WizardProps) {
         {isLast ? (
           <Link
             to="/social"
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]"
+            className="inline-flex items-center gap-1.5 rounded-sm bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]"
           >
             Finish <Check size={12} />
           </Link>
@@ -1104,7 +1104,7 @@ function WizardFlow(p: WizardProps) {
             type="button"
             onClick={() => setStep(Math.min(WIZARD_STEPS.length - 1, step + 1))}
             disabled={!canNext}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#03002C] disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-sm bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#03002C] disabled:opacity-40"
           >
             Next <ArrowRight size={12} />
           </button>
