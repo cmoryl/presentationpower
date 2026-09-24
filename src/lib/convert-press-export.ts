@@ -89,12 +89,45 @@ export function isPressTarget(target: AdaptTarget): boolean {
  * rasterizing the scaled node would bake the preview reduction into the plate.
  */
 function unscaleForCapture(node: HTMLElement): () => void {
-  const saved = { transform: node.style.transform, origin: node.style.transformOrigin };
+  const saved: Array<{ el: HTMLElement; transform: string; origin: string; overflow: string }> = [
+    {
+      el: node,
+      transform: node.style.transform,
+      origin: node.style.transformOrigin,
+      overflow: node.style.overflow,
+    },
+  ];
   node.style.transform = "none";
   node.style.transformOrigin = "top left";
+
+  // The preview wraps the page in a clipping box sized to the SCALED page. At
+  // full size the page overflows that box, and the vector-text pass treats any
+  // line outside a clipping ancestor as trimmed away — which silently dropped
+  // every line below the headline. Open the clips for the duration of the
+  // capture so the whole page is measurable.
+  let el: HTMLElement | null = node.parentElement;
+  let hops = 0;
+  while (el && hops < 12 && el !== document.body) {
+    const cs = getComputedStyle(el);
+    if (cs.overflow !== "visible" || cs.overflowY !== "visible" || cs.overflowX !== "visible") {
+      saved.push({
+        el,
+        transform: el.style.transform,
+        origin: el.style.transformOrigin,
+        overflow: el.style.overflow,
+      });
+      el.style.overflow = "visible";
+    }
+    el = el.parentElement;
+    hops += 1;
+  }
+
   return () => {
-    node.style.transform = saved.transform;
-    node.style.transformOrigin = saved.origin;
+    for (const s of saved) {
+      s.el.style.transform = s.transform;
+      s.el.style.transformOrigin = s.origin;
+      s.el.style.overflow = s.overflow;
+    }
   };
 }
 
@@ -145,7 +178,7 @@ function readme(
     `  Bleed ${r.bleedMm} mm per edge${r.bleedMm > 0 ? " — art runs to the bleed edge" : " — trim only"}`,
     "",
     "WHAT IS VECTOR AND WHAT IS NOT",
-    `  Copy is drawn as embedded Geist vector text (${r.vector.linesDrawn} lines), so it is sharp at`,
+    `  Copy is drawn as embedded Geist vector text (${r.vector.linesDrawn} line${r.vector.linesDrawn === 1 ? "" : "s"}), so it is sharp at`,
     "  any size, selectable and searchable. Backgrounds, photography and gradients are a",
     `  ${Math.round(r.effectiveDpi)} DPI raster composed from the approved layout — not native vector objects.`,
     r.dpiClamped
