@@ -82,7 +82,33 @@ export type BookletConfig = {
   mapFloors: LondonFloorId[];
   charts: BookletChartPage[];
   cover: BookletCover;
+  /** Master page furniture printed on every inside page (press PDF). Optional so
+   *  booklets saved before masters existed still open unchanged. */
+  master?: BookletMaster;
+  /** Ruled notes pages appended at the back, usually to reach a multiple of 4. */
+  notesPages?: number;
 };
+
+/** Inside-page master: folio and running foot, kept inside the safe margin. */
+export type BookletMaster = {
+  folios: boolean;
+  /** Printed number of the first inside page (the cover is never numbered). */
+  startFolio: number;
+  /** Running foot, e.g. "NEXT 2026 London · QEII Centre". Empty = none. */
+  runningFoot: string;
+};
+
+export const BOOKLET_MASTER_DEFAULT: BookletMaster = { folios: false, startFolio: 2, runningFoot: "" };
+
+export function bookletMaster(config: Pick<BookletConfig, "master">): BookletMaster {
+  return { ...BOOKLET_MASTER_DEFAULT, ...(config.master ?? {}) };
+}
+
+/** Clamp the notes-page request to a sane handout range. */
+export function bookletNotesPages(config: Pick<BookletConfig, "notesPages">): number {
+  const n = Math.round(Number(config.notesPages ?? 0));
+  return Number.isFinite(n) ? Math.max(0, Math.min(12, n)) : 0;
+}
 
 /**
  * A rendered page handed to the builders as artwork — the map and chart pages.
@@ -140,7 +166,8 @@ export type BookletPlanPage =
   | { kind: "cover"; label: string }
   | { kind: "agenda"; label: string }
   | { kind: "map"; label: string }
-  | { kind: "chart"; label: string };
+  | { kind: "chart"; label: string }
+  | { kind: "notes"; label: string };
 
 /**
  * The printed running order. `agendaPageCount` comes from the agenda itself
@@ -160,6 +187,8 @@ export function bookletPagePlan(config: BookletConfig, agendaPageCount: number):
   for (const chart of config.charts) {
     plan.push({ kind: "chart", label: chart.title || `Chart · ${chart.kind}` });
   }
+  const notes = bookletNotesPages(config);
+  for (let i = 0; i < notes; i += 1) plan.push({ kind: "notes", label: `Notes page ${i + 1}` });
   return plan;
 }
 

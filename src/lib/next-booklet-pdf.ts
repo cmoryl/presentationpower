@@ -473,6 +473,72 @@ export async function buildBookletPdf(args: {
     notes.push(BOOKLET_ARTWORK_NOTE);
   }
 
+  // ── notes pages ─────────────────────────────────────────────────────────
+  const notesCount = bookletNotesPages(config);
+  const trimLeftPt = SLUG_PT + geo.bleedEdge * MM_TO_PT;
+  const trimBottomPt = SLUG_PT + geo.bleedEdge * MM_TO_PT;
+  const trimWPt = geo.trimW * MM_TO_PT;
+  const trimHPt = geo.trimH * MM_TO_PT;
+  const safePt = geo.safeInset * MM_TO_PT;
+  for (let i = 0; i < notesCount; i += 1) {
+    const page = doc.addPage([pageW, pageH]);
+    const top = trimBottomPt + trimHPt - safePt;
+    page.drawText("NOTES", { x: trimLeftPt + safePt, y: top - 14, size: 14, font: bold, color: hex(INK) });
+    const step = 9 * MM_TO_PT;
+    for (let y = top - 14 - step; y > trimBottomPt + safePt; y -= step) {
+      page.drawLine({
+        start: { x: trimLeftPt + safePt, y },
+        end: { x: trimLeftPt + trimWPt - safePt, y },
+        thickness: 0.4,
+        color: hex(INK),
+        opacity: 0.22,
+      });
+    }
+  }
+  if (notesCount) notes.push(`${notesCount} ruled notes page${notesCount === 1 ? "" : "s"} added at the back`);
+
+  // ── master furniture: folios + running foot on inside pages ─────────────
+  // Set in the lower safe margin, where no page content is allowed, so it can
+  // never collide with the agenda, map or chart artwork.
+  const master = bookletMaster(config);
+  if (master.folios || master.runningFoot.trim()) {
+    const all = doc.getPages();
+    const first = config.includeCover ? 1 : 0;
+    const y = trimBottomPt + safePt * 0.42;
+    const size = 7.5;
+    for (let i = first; i < all.length; i += 1) {
+      const page = all[i]!;
+      const folio = master.startFolio + (i - first);
+      const right = folio % 2 === 1; // odd pages are right-hand pages
+      if (master.folios) {
+        const label = String(folio);
+        const w = bold.widthOfTextAtSize(label, size);
+        page.drawText(label, {
+          x: right ? trimLeftPt + trimWPt - safePt * 0.5 - w : trimLeftPt + safePt * 0.5,
+          y,
+          size,
+          font: bold,
+          color: hex(INK),
+        });
+      }
+      const foot = master.runningFoot.trim();
+      if (foot) {
+        const w = regular.widthOfTextAtSize(foot, size);
+        page.drawText(foot, {
+          x: right ? trimLeftPt + trimWPt - safePt * 0.5 - w - (master.folios ? 18 : 0) : trimLeftPt + safePt * 0.5 + (master.folios ? 18 : 0),
+          y,
+          size,
+          font: regular,
+          color: hex(INK),
+          opacity: 0.72,
+        });
+      }
+    }
+    notes.push(
+      `Master page applied to ${Math.max(0, all.length - first)} inside page${all.length - first === 1 ? "" : "s"}${master.folios ? ` · folios from ${master.startFolio}` : ""}${master.runningFoot.trim() ? " · running foot" : ""}`,
+    );
+  }
+
   const bytes = (await doc.save()) as Uint8Array<ArrayBuffer>;
   const expected = bookletPageCount(config, agendaPageCount);
   const pageCount = doc.getPageCount();
