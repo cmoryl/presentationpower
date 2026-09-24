@@ -242,8 +242,10 @@ function pickStat(content: Record<string, unknown>): { value: string; label: str
   }
   const metric = str(content.metric);
   if (metric) {
-    const m = metric.match(/^(\S+(?:\s*[↑↓→]\s*\S+)?)\s+(.*)$/);
-    return m ? { value: m[1], label: m[2] } : { value: metric, label: "" };
+    // "6 wks → 9 days" is one figure; "38% ↓ time to market" is figure + label.
+    if (metric.includes("→")) return { value: metric, label: str(content.label) ?? str(content.caption) ?? "" };
+    const [value, ...rest] = metric.split(/\s+/);
+    return { value, label: rest.join(" ") };
   }
   if (direct && typeof direct === "object") {
     const rec = direct as Record<string, unknown>;
