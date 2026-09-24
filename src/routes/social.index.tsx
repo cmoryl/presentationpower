@@ -234,7 +234,7 @@ function SocialView() {
             {KIT_PROFILES.map((k) => (
               <Link
                 key={k.id}
-                to="/admin/campaigns/kit"
+                to="/social/kit"
                 search={{ profile: k.id }}
                 className="group flex flex-col rounded-2xl border border-black/10 bg-white/80 p-4 transition hover:border-[#003FC7]/50"
               >
@@ -275,7 +275,7 @@ function SocialView() {
               </p>
             </div>
             <Link
-              to={favoritedVariants.length === 0 ? "/library" : "/admin/campaigns/kit"}
+              to={favoritedVariants.length === 0 ? "/library" : "/social/kit"}
               className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]"
             >
               <Sparkles size={12} />
@@ -288,7 +288,7 @@ function SocialView() {
               {favoritedVariants.slice(0, 9).map((v) => (
                 <Link
                   key={v.id}
-                  to="/admin/campaigns/kit"
+                  to="/social/kit"
                   search={{ source: v.id, profile: "social-essentials" }}
                   className="flex items-start gap-3 rounded-2xl border border-black/10 bg-white p-3 text-sm transition hover:border-[#003FC7]/40"
                 >

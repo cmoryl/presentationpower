@@ -4,7 +4,7 @@
 //   1. Format registry — the typed geometries every renderer agrees on.
 //   2. Demo grid — one renderer × N formats × N divisions, proving the
 //      pipeline shape.
-// The actual builder flow lives at /admin/campaigns/kit (favorites → kit).
+// The actual builder flow lives at /social/kit (favorites → kit).
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
@@ -96,7 +96,7 @@ function CampaignsView() {
               {favorites.size} favorited
             </span>
             <Link
-              to="/admin/campaigns/kit"
+              to="/social/kit"
               className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]"
             >
               <Sparkles size={12} /> Build a kit →
@@ -111,7 +111,7 @@ function CampaignsView() {
           {KIT_PROFILES.map((p) => (
             <Link
               key={p.id}
-              to="/admin/campaigns/kit"
+              to="/social/kit"
               search={{ profile: p.id }}
               className="block rounded-2xl border border-black/10 bg-white/70 p-4 text-sm transition hover:border-[#003FC7]/40"
             >
@@ -140,7 +140,7 @@ function CampaignsView() {
             </span>
           </div>
           <Link
-            to={favorites.size === 0 ? "/library" : "/admin/campaigns/kit"}
+            to={favorites.size === 0 ? "/library" : "/social/kit"}
             className="rounded-full bg-[#03002C] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]"
           >
             {favorites.size === 0 ? "Browse library →" : "Choose from favorites →"}
