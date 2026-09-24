@@ -110,6 +110,7 @@ type QueryResult = { data: unknown; error: { message: string } | null };
 interface QueryBuilder extends PromiseLike<QueryResult> {
   upsert: (row: Record<string, unknown> | Record<string, unknown>[]) => QueryBuilder;
   insert: (rows: unknown) => QueryBuilder;
+  update: (row: Record<string, unknown>) => QueryBuilder;
   select: (cols: string) => QueryBuilder;
   delete: () => QueryBuilder;
   eq: (col: string, val: unknown) => QueryBuilder;
