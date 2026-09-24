@@ -23,6 +23,7 @@ import { overrideFor } from "./template-registry";
 import {
   authoredGround,
   groundIsReplaced,
+  isNeutralOverride,
   resolveGroundLayers,
   withAlpha,
 } from "./template-background";
@@ -53,14 +54,18 @@ export function isBrandSystemDarkPackId(id: string | null | undefined): boolean 
 /** True when an admin has saved a theme/background edit for the default system. */
 export function brandSystemHasEdit(seed: string): boolean {
   if (groundIsReplaced(BRAND_SYSTEM_CODE, seed)) return true;
+  // A saved-but-neutral row (no image, tint, swap or intensity change) is not
+  // an edit — treating it as one hid the approved S01 artwork behind the old
+  // procedural ground on agenda, chart and quote slides.
   const o = overrideFor(BRAND_SYSTEM_CODE, sceneFromSeed(seed));
-  return !!o;
+  return !!o && !isNeutralOverride(o);
 }
 
 /** True when an admin has saved an edit against the master's DARK face. */
 export function brandSystemDarkHasEdit(seed: string): boolean {
   if (groundIsReplaced(BRAND_SYSTEM_DARK_CODE, seed)) return true;
-  return !!overrideFor(BRAND_SYSTEM_DARK_CODE, sceneFromSeed(seed));
+  const o = overrideFor(BRAND_SYSTEM_DARK_CODE, sceneFromSeed(seed));
+  return !!o && !isNeutralOverride(o);
 }
 
 /**
