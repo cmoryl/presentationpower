@@ -577,21 +577,56 @@ function DeckEditor() {
                   {qa.length > 0 && (
                     <>
                       <MetaDot />
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-800">
-                        <span className="h-1.5 w-1.5 rounded-full bg-amber-500" aria-hidden />
-                        {qa.length} QA {qa.length === 1 ? "issue" : "issues"}
-                      </span>
+                      <details className="relative">
+                        <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-1.5 rounded-md border border-amber-300 bg-amber-50 px-2.5 text-xs font-semibold text-amber-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#003FC7]">
+                          <span className="h-2 w-2 rounded-sm bg-amber-500" aria-hidden />
+                          {qa.length} {qa.length === 1 ? "thing" : "things"} to check
+                        </summary>
+                        <ul className="absolute left-0 z-[60] mt-2 max-h-80 w-[min(26rem,90vw)] space-y-1 overflow-auto rounded-lg border border-black/10 bg-white p-2 text-sm text-[#03002C] shadow-lg">
+                          {qa.map((issue, n) => {
+                            const idx = deck.slides.findIndex((s) => s.id === issue.slideId);
+                            return (
+                              <li
+                                key={`${issue.code}-${issue.slideId}-${n}`}
+                                className="flex items-start justify-between gap-3 rounded-md px-2 py-1.5 hover:bg-black/[0.03]"
+                              >
+                                <span>
+                                  <span className="block text-xs font-semibold text-black/70">
+                                    {idx >= 0 ? `Slide ${idx + 1}` : "Deck"}
+                                    {issue.severity === "block" ? " · blocks export" : ""}
+                                  </span>
+                                  {issue.message}
+                                </span>
+                                {idx >= 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      setActiveIdx(idx);
+                                      (
+                                        e.currentTarget.closest(
+                                          "details",
+                                        ) as HTMLDetailsElement | null
+                                      )?.removeAttribute("open");
+                                    }}
+                                    className="min-h-9 shrink-0 rounded-md border border-black/20 px-2.5 text-xs font-semibold hover:border-[#003FC7] hover:text-[#003FC7]"
+                                  >
+                                    Go to slide
+                                  </button>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </details>
                     </>
                   )}
                 </>
               }
               status={
-                <div className="flex flex-wrap items-center gap-3 text-[11px] text-black/50">
+                <div className="flex flex-wrap items-center gap-3 text-xs text-black/70">
                   <BrandHealthBadge
                     getRoots={() =>
-                      Array.from(
-                        document.querySelectorAll<HTMLElement>("[data-slide-stage]"),
-                      )
+                      Array.from(document.querySelectorAll<HTMLElement>("[data-slide-stage]"))
                     }
                     divisionId={deck.brandModeId ?? null}
                     surfaceLabel="the slides on screen"
@@ -600,6 +635,13 @@ function DeckEditor() {
                   <SaveDeckButton deckId={deckId} />
                   <AutosaveIndicator deckId={deckId} />
                   <ReviewStatusControl localDeckId={deckId} />
+                  <Link
+                    to="/decks/$deckId/export"
+                    params={{ deckId }}
+                    className="inline-flex min-h-10 items-center gap-2 rounded-md bg-[#003FC7] px-4 text-sm font-semibold text-white hover:bg-[#0033a3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
+                  >
+                    Download PowerPoint
+                  </Link>
                 </div>
               }
             />
@@ -956,7 +998,7 @@ function DeckEditor() {
               </button>
             </div>
             <div
-              className={`min-w-0 shrink-0 space-y-3 ${slidesRailOpen ? "w-full lg:w-[260px]" : "hidden"}`}
+              className={`min-w-0 shrink-0 space-y-3 ${slidesRailOpen ? "w-full lg:w-[190px]" : "hidden"}`}
               role="group"
               aria-label="Slide list and selection"
               aria-describedby="slide-rail-help"
@@ -1243,31 +1285,54 @@ function DeckEditor() {
                         >
                           ▼
                         </IconBtn>
-                        <IconBtn
-                          title={
-                            slide.hidden ? "Unhide slide" : "Hide slide (skip when presenting)"
-                          }
-                          tabIndex={i === clamped ? 0 : -1}
-                          onClick={() => setSlidesHidden(deck.id, [slide.id], !slide.hidden)}
-                        >
-                          {slide.hidden ? "◌" : "◉"}
-                        </IconBtn>
-                        <IconBtn
-                          title="Duplicate"
-                          tabIndex={i === clamped ? 0 : -1}
-                          onClick={() => duplicateSlide(deck.id, slide.id)}
-                        >
-                          ⎘
-                        </IconBtn>
-                        <IconBtn
-                          title="Remove"
-                          tabIndex={i === clamped ? 0 : -1}
-                          onClick={() => {
-                            if (confirm("Remove this slide?")) removeSlide(deck.id, slide.id);
-                          }}
-                        >
-                          ✕
-                        </IconBtn>
+                        <details className="relative" onClick={(e) => e.stopPropagation()}>
+                          <summary
+                            aria-label={`More actions for slide ${i + 1}`}
+                            title="More actions"
+                            tabIndex={i === clamped ? 0 : -1}
+                            className="inline-flex size-7 cursor-pointer list-none items-center justify-center rounded-md bg-white text-sm font-bold text-[#03002C] shadow ring-1 ring-black/15"
+                          >
+                            ⋯
+                          </summary>
+                          <div
+                            role="menu"
+                            className="absolute right-0 z-30 mt-1 w-44 rounded-md border border-black/10 bg-white p-1 text-sm text-[#03002C] shadow-lg"
+                          >
+                            {[
+                              {
+                                label: slide.hidden ? "Show slide" : "Hide when presenting",
+                                run: () => setSlidesHidden(deck.id, [slide.id], !slide.hidden),
+                              },
+                              { label: "Duplicate", run: () => duplicateSlide(deck.id, slide.id) },
+                            ].map((a) => (
+                              <button
+                                key={a.label}
+                                type="button"
+                                role="menuitem"
+                                onClick={(e) => {
+                                  a.run();
+                                  e.currentTarget.closest("details")?.removeAttribute("open");
+                                }}
+                                className="block min-h-9 w-full rounded px-2 text-left hover:bg-black/5"
+                              >
+                                {a.label}
+                              </button>
+                            ))}
+                            <div className="my-1 h-px bg-black/10" aria-hidden />
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={(e) => {
+                                e.currentTarget.closest("details")?.removeAttribute("open");
+                                if (confirm(`Delete slide ${i + 1}?`))
+                                  removeSlide(deck.id, slide.id);
+                              }}
+                              className="block min-h-9 w-full rounded px-2 text-left font-semibold text-red-700 hover:bg-red-50"
+                            >
+                              Delete slide
+                            </button>
+                          </div>
+                        </details>
                       </div>
                     </div>
                   );
@@ -1354,11 +1419,11 @@ function DeckEditor() {
                 </div>
               )}
 
-              <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-black/55">
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs text-black/70">
                 <span>
                   {variantSupportsImagery(active?.variantId)
                     ? "Drag an image from your computer onto the slide to use it."
-                    : "This module has no image slot — switch to an image-forward layout to drop imagery."}
+                    : null}
                 </span>
                 <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1.5">
                   <SafeAreaGuidesToggle on={guides.on} onToggle={guides.toggle} />
@@ -2037,7 +2102,7 @@ function DeckEditor() {
                         {active && mv && (
                           <InspectorSection id="swap" label="Swap">
                             <Panel label="Current module">
-                              <div className="font-mono text-xs text-black/50">{mv.id}</div>
+                              <div className="sr-only">{mv.id}</div>
                               <div className="mt-1 font-medium">{mv.name}</div>
                               <div className="mt-2 text-sm text-black/60">{mv.description}</div>
                               <div className="mt-4 space-y-2">
@@ -2218,7 +2283,7 @@ function DeckEditor() {
                           )}
                           {mv && (
                             <Panel label="Module variant">
-                              <div className="font-mono text-xs text-black/50">{mv.id}</div>
+                              <div className="sr-only">{mv.id}</div>
                               <div className="mt-1 font-medium">{mv.name}</div>
                               <div className="mt-2 text-sm text-black/60">{mv.description}</div>
                               <p className="mt-2 text-[11px] leading-snug text-black/45">
