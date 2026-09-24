@@ -93,12 +93,12 @@ export function ProofGuides({ trim, safeInset }: { trim: { w: number; h: number 
   );
 }
 
-function Placeholder({ icon, title, note }: { icon: React.ReactNode; title: string; note: string }) {
+function Placeholder({ icon, title, note, compact = false }: { icon: React.ReactNode; title: string; note: string; compact?: boolean }) {
   return (
     <div className="flex size-full flex-col items-center justify-center gap-[3cqw] bg-[color:var(--color-muted)] p-[8cqw] text-center [container-type:inline-size]">
-      <span className="text-[color:var(--color-muted-foreground)] [&_svg]:size-[12cqw]">{icon}</span>
-      <p className="text-[6cqw] font-semibold leading-tight text-[color:var(--color-foreground)]">{title}</p>
-      <p className="text-[3.6cqw] leading-snug text-[color:var(--color-muted-foreground)]">{note}</p>
+      <span className={`text-[color:var(--color-muted-foreground)] ${compact ? "[&_svg]:size-[28cqw]" : "[&_svg]:size-[12cqw]"}`}>{icon}</span>
+      <p className={`${compact ? "text-[11cqw]" : "text-[6cqw]"} font-semibold leading-tight text-[color:var(--color-foreground)]`}>{title}</p>
+      {compact ? null : <p className="text-[3.6cqw] leading-snug text-[color:var(--color-muted-foreground)]">{note}</p>}
     </div>
   );
 }
@@ -132,7 +132,8 @@ export function PageProof({
           <Placeholder
             icon={<FileImage />}
             title={page.label}
-            note={compact ? "Vector agenda" : "The press file prints every agenda page; the proof shows page 1."}
+            note="The press file prints every agenda page; the proof shows page 1."
+            compact={compact}
           />
         </div>
       );
@@ -173,7 +174,8 @@ export function PageProof({
       <Placeholder
         icon={page.kind === "map" ? <MapIcon /> : <BarChart3 />}
         title={page.kind === "map" ? page.floorLabel : page.label}
-        note={compact ? "Rendered page" : "Rendered at 300 ppi when the file is built. Use Render proof to see it now."}
+        note="Rendered at 300 ppi when the file is built. Use Render proof to see it now."
+        compact={compact}
       />
     </div>
   );
