@@ -29,7 +29,6 @@ import {
   LEGAL_ALONGSIDE_TYPE,
   LEGAL_ALONGSIDE_TYPESETS,
   alongsideSceneType,
-
   alongsideTemplateLabel,
   applyAlongsideTypeSet,
   type AlongsideTemplateId,
@@ -79,8 +78,7 @@ function AlongsideView() {
   const zoomScene = zoomIndex >= 0 ? LEGAL_ALONGSIDE_SCENES[zoomIndex] : null;
   const step = (dir: -1 | 1) => {
     if (zoomIndex < 0) return;
-    const next =
-      (zoomIndex + dir + LEGAL_ALONGSIDE_SCENES.length) % LEGAL_ALONGSIDE_SCENES.length;
+    const next = (zoomIndex + dir + LEGAL_ALONGSIDE_SCENES.length) % LEGAL_ALONGSIDE_SCENES.length;
     setZoom(LEGAL_ALONGSIDE_SCENES[next].id);
   };
 
@@ -102,10 +100,13 @@ function AlongsideView() {
         cacheBust: true,
         backgroundColor: "#03002C",
       };
-      const url = dlFormat === "png" ? await toPng(node, opts) : await toJpeg(node, { ...opts, quality: 0.94 });
+      const url =
+        dlFormat === "png"
+          ? await toPng(node, opts)
+          : await toJpeg(node, { ...opts, quality: 0.94 });
       const a = document.createElement("a");
       a.href = url;
-      a.download = `tp-legal-${zoomScene.id}-${(perScene[zoomScene.id] ?? template)}-${size.id}-${dlScale}x.${dlFormat}`;
+      a.download = `tp-legal-${zoomScene.id}-${perScene[zoomScene.id] ?? template}-${size.id}-${dlScale}x.${dlFormat}`;
       a.click();
     } finally {
       setDlBusy(false);
@@ -343,7 +344,6 @@ function AlongsideView() {
                     Emphasis on “{scene.action}”.
                   </p>
 
-
                   <div className="flex flex-wrap items-center gap-2 border-t border-black/10 pt-3">
                     <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-black/40">
                       <Images size={12} /> Layout for this frame
@@ -406,223 +406,225 @@ function AlongsideView() {
         </Link>
       </section>
 
-      {zoomScene && typeof document !== "undefined" ? (
-        createPortal(
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${zoomScene.no} · ${zoomScene.theme} — large view`}
-          className="fixed inset-0 z-[120] flex flex-col bg-[#03002C]/95 p-4 backdrop-blur-sm sm:p-6"
-          onClick={() => setZoom(null)}
-        >
-          <div
-            className="mx-auto flex h-full w-full max-w-[1500px] flex-col gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex flex-wrap items-center justify-between gap-3 text-white">
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">
-                  {zoomScene.no} · {zoomScene.pair}
-                </div>
-                <div className="text-lg font-semibold">{zoomScene.theme}</div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-white/55">
-                  Layout
-                  <select
-                    value={perScene[zoomScene.id] ?? template}
-                    onChange={(e) =>
-                      setPerScene((prev) => ({
-                        ...prev,
-                        [zoomScene.id]: e.target.value as AlongsideTemplateId,
-                      }))
-                    }
-                    className="rounded-lg border border-white/25 bg-transparent px-2 py-1.5 text-xs font-medium normal-case tracking-normal text-white"
-                  >
-                    {LEGAL_ALONGSIDE_TEMPLATE_FAMILIES.map((fam) => (
-                      <optgroup key={fam.label} label={fam.label} className="text-[#03002C]">
-                        {fam.ids.map((id) => (
-                          <option key={id} value={id} className="text-[#03002C]">
-                            {alongsideTemplateLabel(id)}
+      {zoomScene && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={`${zoomScene.no} · ${zoomScene.theme} — large view`}
+              className="fixed inset-0 z-[120] flex flex-col bg-[#03002C]/95 p-4 backdrop-blur-sm sm:p-6"
+              onClick={() => setZoom(null)}
+            >
+              <div
+                className="mx-auto flex h-full w-full max-w-[1500px] flex-col gap-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex flex-wrap items-center justify-between gap-3 text-white">
+                  <div>
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">
+                      {zoomScene.no} · {zoomScene.pair}
+                    </div>
+                    <div className="text-lg font-semibold">{zoomScene.theme}</div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-white/55">
+                      Layout
+                      <select
+                        value={perScene[zoomScene.id] ?? template}
+                        onChange={(e) =>
+                          setPerScene((prev) => ({
+                            ...prev,
+                            [zoomScene.id]: e.target.value as AlongsideTemplateId,
+                          }))
+                        }
+                        className="rounded-lg border border-white/25 bg-transparent px-2 py-1.5 text-xs font-medium normal-case tracking-normal text-white"
+                      >
+                        {LEGAL_ALONGSIDE_TEMPLATE_FAMILIES.map((fam) => (
+                          <optgroup key={fam.label} label={fam.label} className="text-[#03002C]">
+                            {fam.ids.map((id) => (
+                              <option key={id} value={id} className="text-[#03002C]">
+                                {alongsideTemplateLabel(id)}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-white/55">
+                      Size
+                      <select
+                        value={sizeId}
+                        onChange={(e) => setSizeId(e.target.value)}
+                        className="rounded-lg border border-white/25 bg-transparent px-2 py-1.5 text-xs font-medium normal-case tracking-normal text-white"
+                      >
+                        {LEGAL_ALONGSIDE_SIZES.map((s) => (
+                          <option key={s.id} value={s.id} className="text-[#03002C]">
+                            {s.label} · {s.w}×{s.h}
                           </option>
                         ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                </label>
-                <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-white/55">
-                  Size
-                  <select
-                    value={sizeId}
-                    onChange={(e) => setSizeId(e.target.value)}
-                    className="rounded-lg border border-white/25 bg-transparent px-2 py-1.5 text-xs font-medium normal-case tracking-normal text-white"
-                  >
-                    {LEGAL_ALONGSIDE_SIZES.map((s) => (
-                      <option key={s.id} value={s.id} className="text-[#03002C]">
-                        {s.label} · {s.w}×{s.h}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-white/55">
-                  Type
-                  <select
-                    value={typeSet}
-                    onChange={(e) => setTypeSet(e.target.value)}
-                    className="rounded-lg border border-white/25 bg-transparent px-2 py-1.5 text-xs font-medium normal-case tracking-normal text-white"
-                  >
-                    {LEGAL_ALONGSIDE_TYPESETS.map((ts) => (
-                      <option key={ts.id} value={ts.id} className="text-[#03002C]">
-                        {ts.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-white/55">
-                  File
-                  <select
-                    value={dlFormat}
-                    onChange={(e) => setDlFormat(e.target.value as "png" | "jpeg")}
-                    className="rounded-lg border border-white/25 bg-transparent px-2 py-1.5 text-xs font-medium normal-case tracking-normal text-white"
-                  >
-                    <option value="png" className="text-[#03002C]">
-                      PNG
-                    </option>
-                    <option value="jpeg" className="text-[#03002C]">
-                      JPG
-                    </option>
-                  </select>
-                </label>
-                <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-white/55">
-                  Scale
-                  <select
-                    value={dlScale}
-                    onChange={(e) => setDlScale(Number(e.target.value))}
-                    className="rounded-lg border border-white/25 bg-transparent px-2 py-1.5 text-xs font-medium normal-case tracking-normal text-white"
-                  >
-                    {[1, 2, 3].map((n) => (
-                      <option key={n} value={n} className="text-[#03002C]">
-                        {n}x · {size.w * n}×{size.h * n}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <button
-                  type="button"
-                  onClick={download}
-                  disabled={dlBusy}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-white/35 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:border-white/70 disabled:opacity-55"
-                >
-                  <Download size={13} /> {dlBusy ? "Preparing…" : "Download"}
-                </button>
-                <span aria-hidden className="mx-1 text-white/25">
-                  |
-                </span>
-                <button
-                  type="button"
-                  onClick={() => step(-1)}
-                  aria-label="Previous ad"
-                  className="rounded-full border border-white/25 p-2 text-white/80 hover:border-white/60"
-                >
-                  <ChevronLeft size={14} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => step(1)}
-                  aria-label="Next ad"
-                  className="rounded-full border border-white/25 p-2 text-white/80 hover:border-white/60"
-                >
-                  <ChevronRight size={14} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setZoom(null)}
-                  aria-label="Close large view"
-                  className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-white/25 px-3 py-1.5 text-xs font-medium text-white/85 hover:border-white/60"
-                >
-                  <X size={13} /> Close
-                </button>
-              </div>
-            </div>
-
-            <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto">
-              <div
-                className="mx-auto w-full shrink-0 overflow-hidden rounded-2xl shadow-[0_40px_120px_-40px_rgba(0,0,0,0.8)]"
-                style={{
-                  aspectRatio: `${size.w} / ${size.h}`,
-                  maxWidth: `min(100%, ${Math.round((size.w / size.h) * 74)}vh)`,
-                }}
-              >
-                <AlongsideAd
-                  scene={zoomScene}
-                  template={perScene[zoomScene.id] ?? template}
-                  w={size.w}
-                  h={size.h}
-                  typeSet={typeSet}
-                />
-              </div>
-            </div>
-
-            {/* Off-screen, true-pixel copy used for the download. */}
-            <div
-              aria-hidden
-              style={{
-                position: "fixed",
-                left: -100000,
-                top: 0,
-                width: size.w,
-                height: size.h,
-                pointerEvents: "none",
-              }}
-            >
-              <div ref={exportRef} style={{ width: size.w, height: size.h }}>
-                <AlongsideAd
-                  scene={zoomScene}
-                  template={perScene[zoomScene.id] ?? template}
-                  w={size.w}
-                  h={size.h}
-                  typeSet={typeSet}
-                />
-              </div>
-            </div>
-
-            <div className="mx-auto max-w-3xl space-y-1 text-center text-white/80">
-              <p className="text-base font-semibold text-white">{zoomScene.headline}</p>
-              <p className="text-sm">{zoomScene.caption}</p>
-              <div className="mt-3 rounded-lg border border-white/15 bg-white/5 p-3 text-xs text-white/75">
-                <div className="font-semibold uppercase tracking-widest text-white/50">
-                  Industry read · {zoomScene.buyer}
+                      </select>
+                    </label>
+                    <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-white/55">
+                      Type
+                      <select
+                        value={typeSet}
+                        onChange={(e) => setTypeSet(e.target.value)}
+                        className="rounded-lg border border-white/25 bg-transparent px-2 py-1.5 text-xs font-medium normal-case tracking-normal text-white"
+                      >
+                        {LEGAL_ALONGSIDE_TYPESETS.map((ts) => (
+                          <option key={ts.id} value={ts.id} className="text-[#03002C]">
+                            {ts.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-white/55">
+                      File
+                      <select
+                        value={dlFormat}
+                        onChange={(e) => setDlFormat(e.target.value as "png" | "jpeg")}
+                        className="rounded-lg border border-white/25 bg-transparent px-2 py-1.5 text-xs font-medium normal-case tracking-normal text-white"
+                      >
+                        <option value="png" className="text-[#03002C]">
+                          PNG
+                        </option>
+                        <option value="jpeg" className="text-[#03002C]">
+                          JPG
+                        </option>
+                      </select>
+                    </label>
+                    <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-white/55">
+                      Scale
+                      <select
+                        value={dlScale}
+                        onChange={(e) => setDlScale(Number(e.target.value))}
+                        className="rounded-lg border border-white/25 bg-transparent px-2 py-1.5 text-xs font-medium normal-case tracking-normal text-white"
+                      >
+                        {[1, 2, 3].map((n) => (
+                          <option key={n} value={n} className="text-[#03002C]">
+                            {n}x · {size.w * n}×{size.h * n}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={download}
+                      disabled={dlBusy}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-white/35 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:border-white/70 disabled:opacity-55"
+                    >
+                      <Download size={13} /> {dlBusy ? "Preparing…" : "Download"}
+                    </button>
+                    <span aria-hidden className="mx-1 text-white/25">
+                      |
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => step(-1)}
+                      aria-label="Previous ad"
+                      className="rounded-full border border-white/25 p-2 text-white/80 hover:border-white/60"
+                    >
+                      <ChevronLeft size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => step(1)}
+                      aria-label="Next ad"
+                      className="rounded-full border border-white/25 p-2 text-white/80 hover:border-white/60"
+                    >
+                      <ChevronRight size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setZoom(null)}
+                      aria-label="Close large view"
+                      className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-white/25 px-3 py-1.5 text-xs font-medium text-white/85 hover:border-white/60"
+                    >
+                      <X size={13} /> Close
+                    </button>
+                  </div>
                 </div>
-                <p className="mt-1.5">
-                  <span className="font-semibold text-white">Their objection:</span>{" "}
-                  {zoomScene.objection}
-                </p>
-                <p className="mt-1.5">
-                  <span className="font-semibold text-white">What it has to answer:</span>{" "}
-                  {zoomScene.answer}
-                </p>
-                <p className="mt-2 border-t border-white/15 pt-2">
-                  <span className="font-semibold text-white">On the photograph:</span>{" "}
-                  {zoomScene.photoObjection}
-                </p>
-                <p className="mt-1.5">
-                  <span className="font-semibold text-white">Verdict:</span>{" "}
-                  {zoomScene.photoVerdict}
-                </p>
+
+                <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto">
+                  <div
+                    className="mx-auto w-full shrink-0 overflow-hidden rounded-2xl shadow-[0_40px_120px_-40px_rgba(0,0,0,0.8)]"
+                    style={{
+                      aspectRatio: `${size.w} / ${size.h}`,
+                      maxWidth: `min(100%, ${Math.round((size.w / size.h) * 74)}vh)`,
+                    }}
+                  >
+                    <AlongsideAd
+                      scene={zoomScene}
+                      template={perScene[zoomScene.id] ?? template}
+                      w={size.w}
+                      h={size.h}
+                      typeSet={typeSet}
+                    />
+                  </div>
+                </div>
+
+                {/* Off-screen, true-pixel copy used for the download. */}
+                <div
+                  aria-hidden
+                  style={{
+                    position: "fixed",
+                    left: -100000,
+                    top: 0,
+                    width: size.w,
+                    height: size.h,
+                    pointerEvents: "none",
+                  }}
+                >
+                  <div ref={exportRef} style={{ width: size.w, height: size.h }}>
+                    <AlongsideAd
+                      scene={zoomScene}
+                      template={perScene[zoomScene.id] ?? template}
+                      w={size.w}
+                      h={size.h}
+                      typeSet={typeSet}
+                    />
+                  </div>
+                </div>
+
+                <div className="mx-auto max-w-3xl space-y-1 text-center text-white/80">
+                  <p className="text-base font-semibold text-white">{zoomScene.headline}</p>
+                  <p className="text-sm">{zoomScene.caption}</p>
+                  <div className="mt-3 rounded-lg border border-white/15 bg-white/5 p-3 text-xs text-white/75">
+                    <div className="font-semibold uppercase tracking-widest text-white/50">
+                      Industry read · {zoomScene.buyer}
+                    </div>
+                    <p className="mt-1.5">
+                      <span className="font-semibold text-white">Their objection:</span>{" "}
+                      {zoomScene.objection}
+                    </p>
+                    <p className="mt-1.5">
+                      <span className="font-semibold text-white">What it has to answer:</span>{" "}
+                      {zoomScene.answer}
+                    </p>
+                    <p className="mt-2 border-t border-white/15 pt-2">
+                      <span className="font-semibold text-white">On the photograph:</span>{" "}
+                      {zoomScene.photoObjection}
+                    </p>
+                    <p className="mt-1.5">
+                      <span className="font-semibold text-white">Verdict:</span>{" "}
+                      {zoomScene.photoVerdict}
+                    </p>
+                  </div>
+                  <p className="text-xs text-white/50">
+                    {zoomScene.craft} · {size.w}×{size.h} ·{" "}
+                    {
+                      LEGAL_ALONGSIDE_TEMPLATES.find(
+                        (t) => t.id === (perScene[zoomScene.id] ?? template),
+                      )?.label
+                    }{" "}
+                    · Arrow keys move between ads, Esc closes.
+                  </p>
+                </div>
               </div>
-              <p className="text-xs text-white/50">
-                {zoomScene.craft} · {size.w}×{size.h} ·{" "}
-                {LEGAL_ALONGSIDE_TEMPLATES.find(
-                  (t) => t.id === (perScene[zoomScene.id] ?? template),
-                )?.label}{" "}
-                · Arrow keys move between ads, Esc closes.
-              </p>
-            </div>
-          </div>
-        </div>,
-        document.body,
-        )
-      ) : null}
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

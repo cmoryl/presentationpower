@@ -87,7 +87,6 @@ const EXAMPLES = [
   "Which sign families have no template yet?",
 ];
 
-
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className="rounded-xl border border-black/10 bg-white p-4">
@@ -200,13 +199,7 @@ function KnowledgePage() {
   const pending = totals.records - totals.embedded;
   const brief = search.data?.brief;
   const ordered = brief
-    ? [
-        ...brief.decisions,
-        ...brief.specs,
-        ...brief.placement,
-        ...brief.lessons,
-        ...brief.other,
-      ]
+    ? [...brief.decisions, ...brief.specs, ...brief.placement, ...brief.lessons, ...brief.other]
     : [];
 
   function ask(next: string) {
@@ -248,7 +241,9 @@ function KnowledgePage() {
         </div>
 
         {pending > 0 && (
-          <p className="mt-6 text-sm text-black/70">{pending} captured item{pending === 1 ? "" : "s"} waiting to be indexed.</p>
+          <p className="mt-6 text-sm text-black/70">
+            {pending} captured item{pending === 1 ? "" : "s"} waiting to be indexed.
+          </p>
         )}
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -277,9 +272,7 @@ function KnowledgePage() {
               onClick={() => backlog.mutate()}
               disabled={backlog.isPending}
             >
-              {backlog.isPending ? (
-                <Loader2 size={13} className="mr-1.5 animate-spin" />
-              ) : null}
+              {backlog.isPending ? <Loader2 size={13} className="mr-1.5 animate-spin" /> : null}
               Index the {pending} waiting
             </Button>
           ) : null}
@@ -292,7 +285,7 @@ function KnowledgePage() {
         </div>
 
         {/* Failures are shown, never swallowed: an unindexed record cannot be found. */}
-        {(sync.data?.failures.length || backlog.data?.failures.length) ? (
+        {sync.data?.failures.length || backlog.data?.failures.length ? (
           <div className="mt-3 flex items-start gap-2 rounded-xl border border-[#FF9B70] bg-[#FF9B70]/15 p-3 text-[12.5px] text-[#03002C]">
             <TriangleAlert size={14} className="mt-0.5 shrink-0" />
             <div>

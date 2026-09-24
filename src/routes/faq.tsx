@@ -484,7 +484,6 @@ const GUIDES: Array<{ title: string; blurb: string; steps: string[] }> = [
   },
 ];
 
-
 const FAQS: Array<{ section: string; items: QA[] }> = [
   {
     section: "Getting started",
@@ -1036,7 +1035,6 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
     ],
   },
 ];
-
 
 export const Route = createFileRoute("/faq")({
   head: () => ({

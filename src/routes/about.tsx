@@ -72,7 +72,6 @@ const CHANGELOG: Array<{ date: string; title: string; body: string }> = [
     body: "Polygons, insets, circles, ellipses and resolvable drawn outlines export as editable custom shapes, and a photo inside one arrives as a replaceable picture cropped to that shape. Blur, feathering, gradients and stacked masks stay finished artwork rather than being approximated.",
   },
   {
-
     date: "2026-09",
     title: "NEXT London signage kit — outlined masters, gated downloads, live revisions",
     body: "The London hub always shows the revision in force. Headline, caption and wall copy are outlined vector paths in every master, so no font travels with the file; every .svg, .ai and .png passes the signage QA gate before it is written; files are stamped with the published revision, or rdraft- when unpublished; and publishing pushes live to open pages. Step-and-repeat walls, door vinyls, four master pillars, booth artwork, print previews with trim/bleed/safe guides and click-to-enlarge thumbnails are all editable in place. CMYK output stays switched off until every colour stop has an approved press build.",

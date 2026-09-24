@@ -145,10 +145,7 @@ export function SignatureStudio() {
   useEffect(() => {
     if (!restored.current) return;
     try {
-      window.localStorage.setItem(
-        SIGNATURE_DRAFT_KEY,
-        JSON.stringify({ brandModeId, draft }),
-      );
+      window.localStorage.setItem(SIGNATURE_DRAFT_KEY, JSON.stringify({ brandModeId, draft }));
     } catch {
       // Out of space or storage blocked: the signature on screen is unaffected.
     }
@@ -166,7 +163,10 @@ export function SignatureStudio() {
     const base = replyShort ? replyShortSignature(governed) : governed;
     return {
       ...base,
-      sections: base.sections.map((s) => ({ ...s, enabled: s.enabled && s.value.trim().length > 0 })),
+      sections: base.sections.map((s) => ({
+        ...s,
+        enabled: s.enabled && s.value.trim().length > 0,
+      })),
     };
   }, [governed, replyShort]);
 
@@ -211,7 +211,9 @@ export function SignatureStudio() {
         await navigator.clipboard.writeText(text);
       }
       setCopied(label);
-      toast.success(asHtml ? "Signature copied — paste it into your mail signature settings." : "Copied.");
+      toast.success(
+        asHtml ? "Signature copied — paste it into your mail signature settings." : "Copied.",
+      );
       window.setTimeout(() => setCopied(null), 2000);
     } catch {
       toast.error("Your browser blocked the copy. Use the download instead.");
@@ -306,7 +308,9 @@ export function SignatureStudio() {
               {lockup ? (
                 <span>Approved lockup included.</span>
               ) : (
-                <span>No email-safe logo on file for this brand — the signature prints without one.</span>
+                <span>
+                  No email-safe logo on file for this brand — the signature prints without one.
+                </span>
               )}
             </div>
             {lockup && (
@@ -369,7 +373,10 @@ export function SignatureStudio() {
             <Label>Links</Label>
             {["linkedin", "twitter", "youtube", "calendly"].map((platform) => (
               <div key={platform} className="space-y-1">
-                <Label htmlFor={`s-${platform}`} className="text-xs capitalize text-muted-foreground">
+                <Label
+                  htmlFor={`s-${platform}`}
+                  className="text-xs capitalize text-muted-foreground"
+                >
                   {platform}
                 </Label>
                 <Input
@@ -385,8 +392,8 @@ export function SignatureStudio() {
           <section className="space-y-3">
             <Label>Campaign strip</Label>
             <p className="text-xs text-muted-foreground">
-              An approved campaign image under the signature. Paste the address of an approved
-              image — nothing is generated here.
+              An approved campaign image under the signature. Paste the address of an approved image
+              — nothing is generated here.
             </p>
             <Input
               placeholder="Image address (https://…)"
@@ -401,7 +408,9 @@ export function SignatureStudio() {
             <Input
               placeholder="Where it should link to"
               value={draft.banner.link}
-              onChange={(e) => setDraft((d) => ({ ...d, banner: { ...d.banner, link: e.target.value } }))}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, banner: { ...d.banner, link: e.target.value } }))
+              }
             />
           </section>
 
@@ -511,11 +520,12 @@ export function SignatureStudio() {
           <section className="space-y-3">
             <Label>Take it away</Label>
             <div className="flex flex-wrap gap-2">
-              <Button
-                onClick={() => copy("html", html, true)}
-                disabled={check.errors.length > 0}
-              >
-                {copied === "html" ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+              <Button onClick={() => copy("html", html, true)} disabled={check.errors.length > 0}>
+                {copied === "html" ? (
+                  <Check className="mr-2 h-4 w-4" />
+                ) : (
+                  <Copy className="mr-2 h-4 w-4" />
+                )}
                 Copy signature
               </Button>
               <Button
@@ -529,7 +539,11 @@ export function SignatureStudio() {
               <Button
                 variant="outline"
                 onClick={() =>
-                  download(`${signatureFileStem(shown)}.html`, signatureDocument(shown), "text/html")
+                  download(
+                    `${signatureFileStem(shown)}.html`,
+                    signatureDocument(shown),
+                    "text/html",
+                  )
                 }
                 disabled={check.errors.length > 0}
               >
@@ -614,11 +628,11 @@ export function SignatureStudio() {
               </div>
             ))}
             <p className="text-xs text-muted-foreground">
-              Every layout is rendered in the approved palette and face —
-              the layout is the choice, the brand is not.{" "}
-              <Badge variant="secondary">{CATEGORY_LABEL[
-                getTemplateById(draft.templateId)?.category ?? "corporate"
-              ]}</Badge>
+              Every layout is rendered in the approved palette and face — the layout is the choice,
+              the brand is not.{" "}
+              <Badge variant="secondary">
+                {CATEGORY_LABEL[getTemplateById(draft.templateId)?.category ?? "corporate"]}
+              </Badge>
             </p>
           </section>
         </div>

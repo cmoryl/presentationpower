@@ -43,9 +43,8 @@ function IconLibraryPage() {
         <p className="text-xs uppercase tracking-[0.3em] text-foreground/55">Brand system</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-[-0.03em]">Approved icon library</h1>
         <p className="mt-3 max-w-3xl text-foreground/75">
-          Approved glyphs for every brand guide,
-          organised by sub-area. Everything here is the same mark the deck builder draws, so a
-          download can never drift from what ships on a slide.
+          Approved glyphs for every brand guide, organised by sub-area. Everything here is the same
+          mark the deck builder draws, so a download can never drift from what ships on a slide.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-2">
