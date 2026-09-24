@@ -160,7 +160,16 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
                     fontWeight: banner ? 500 : undefined,
                   }}
                 >
-                  {p}
+                  {banner && p.includes(" — ") ? (
+                    <>
+                      <span style={{ display: "block", fontWeight: 700, fontSize: "1.35em", lineHeight: 1.15, marginBottom: u(10) }}>
+                        {p.split(" — ")[0]}
+                      </span>
+                      <span style={{ fontWeight: 400 }}>{p.split(" — ").slice(1).join(" — ")}</span>
+                    </>
+                  ) : (
+                    p
+                  )}
                 </li>
               ))}
             </ul>
