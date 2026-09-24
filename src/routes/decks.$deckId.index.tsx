@@ -567,9 +567,11 @@ function DeckEditor() {
     <AppShell>
       <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
         <SlideMediaRefreshProvider slides={deck.slides}>
+          <div className="deck-editor-ui contents" ref={nameIconButtons}>
           <header className="flex flex-col gap-5">
             <EditorPageHeader
-              backTo="/"
+              backTo="/decks"
+              backLabel="← Your decks"
               title={deck.title}
               meta={
                 <>
@@ -2757,6 +2759,7 @@ function DeckEditor() {
               </div>
             </div>
           )}
+          </div>
         </SlideMediaRefreshProvider>
       </SlideTemplateIndustryProvider>
     </AppShell>
