@@ -23,6 +23,7 @@ import { overrideFor } from "./template-registry";
 import {
   authoredGround,
   groundIsReplaced,
+  isNeutralOverride,
   resolveGroundLayers,
   withAlpha,
 } from "./template-background";
