@@ -5,8 +5,8 @@
 // src/lib/demo-runs.ts so the page never drifts from the story.
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowRight, Check, Copy, ShieldAlert, Clock, Gift, Wand2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { ArrowRight, Check, Copy, ShieldAlert, Clock, Gift, Play, Wand2 } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import {
@@ -55,6 +55,42 @@ function CopyPrompt({ text }: { text: string }) {
   );
 }
 
+/** Demo recording that only starts when the viewer presses play. */
+function DemoVideo({ id, name }: { id: string; name: string }) {
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLVideoElement>(null);
+  return (
+    <div className="relative mb-5 aspect-video w-full overflow-hidden rounded-xl border border-black/10 bg-[#EEF1F7] dark:border-white/15">
+      <video
+        ref={ref}
+        className="h-full w-full object-cover object-top"
+        src={`/demos/${id}.mp4`}
+        poster={`/demos/${id}.jpg`}
+        muted
+        playsInline
+        preload="none"
+        controls={started}
+        aria-label={`Screen recording: ${name}`}
+      />
+      {!started ? (
+        <button
+          type="button"
+          onClick={() => {
+            setStarted(true);
+            void ref.current?.play();
+          }}
+          aria-label={`Play demo: ${name}`}
+          className="group absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#003FC7]"
+        >
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#03002C] text-white shadow-lg transition-transform group-hover:scale-105 motion-reduce:transition-none">
+            <Play className="ml-1 h-7 w-7 fill-current" />
+          </span>
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 function RunCard({ run }: { run: DemoRun }) {
   const [open, setOpen] = useState(false);
   const minutes = demoRunMinutes(run);
@@ -62,23 +98,8 @@ function RunCard({ run }: { run: DemoRun }) {
   return (
     <section className="rounded-2xl border border-black/10 bg-white p-5 dark:border-white/15 dark:bg-white/[0.04]">
       {/* Screen recording of this run on the real pages (public/demos). */}
-      <video
-        className="mb-5 aspect-video w-full rounded-xl border border-black/10 bg-[#EEF1F7] object-cover object-top motion-reduce:hidden dark:border-white/15"
-        src={`/demos/${run.id}.mp4`}
-        poster={`/demos/${run.id}.jpg`}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        aria-label={`Screen recording: ${run.name}`}
-      />
-      <img
-        className="mb-5 hidden aspect-video w-full rounded-xl border border-black/10 object-cover object-top motion-reduce:block"
-        src={`/demos/${run.id}.jpg`}
-        alt={`Screen from ${run.name}`}
-        loading="lazy"
-      />
+      <DemoVideo id={run.id} name={run.name} />
+
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-[16rem]">
           <p className="text-[11px] font-semibold tracking-[0.18em] text-[#003FC7] uppercase">
