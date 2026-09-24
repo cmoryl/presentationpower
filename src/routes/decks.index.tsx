@@ -511,51 +511,47 @@ function DecksIndex() {
               Templates
             </Chip>
           </ChipGroup>
-          <ChipGroup label="Reach">
-            <Chip active={reach === "all"} onClick={() => setReach("all")}>
-              All
-            </Chip>
-            <Chip
-              active={reach === "unseen"}
-              onClick={() => setReach("unseen")}
-              disabled={!signedIn}
-              title={signedIn ? undefined : "Sign in to sync analytics"}
+          {signedIn && (
+            <ChipGroup label="Reach">
+              <Chip active={reach === "all"} onClick={() => setReach("all")}>
+                All
+              </Chip>
+              <Chip active={reach === "unseen"} onClick={() => setReach("unseen")}>
+                Never viewed
+              </Chip>
+              <Chip active={reach === "shared"} onClick={() => setReach("shared")}>
+                Shared
+              </Chip>
+            </ChipGroup>
+          )}
+          <div className="flex items-center gap-2">
+            <label htmlFor="deck-age" className="text-xs font-medium text-black/70 dark:text-white/70">
+              Created
+            </label>
+            <select
+              id="deck-age"
+              value={age}
+              onChange={(e) => setAge(e.target.value as Age)}
+              className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/40 dark:border-white/20 dark:bg-white/[0.04]"
             >
-              Never viewed
-            </Chip>
-            <Chip
-              active={reach === "shared"}
-              onClick={() => setReach("shared")}
-              disabled={!signedIn}
-              title={signedIn ? undefined : "Sign in to sync analytics"}
-            >
-              Shared
-            </Chip>
-          </ChipGroup>
-          <ChipGroup label="Older than">
-            <Chip active={age === "any"} onClick={() => setAge("any")}>
-              Any age
-            </Chip>
-            <Chip active={age === "3m"} onClick={() => setAge("3m")}>
-              3 months
-            </Chip>
-            <Chip active={age === "6m"} onClick={() => setAge("6m")}>
-              6 months
-            </Chip>
-            <Chip active={age === "12m"} onClick={() => setAge("12m")}>
-              12 months
-            </Chip>
-          </ChipGroup>
+              <option value="any">Any time</option>
+              <option value="3m">Over 3 months ago</option>
+              <option value="6m">Over 6 months ago</option>
+              <option value="12m">Over 12 months ago</option>
+            </select>
+          </div>
           {active && (
             <button
               type="button"
               onClick={clearAll}
-              className="ml-auto rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10"
+              className="ml-auto min-h-11 rounded-md px-3 text-sm font-medium text-[#003FC7] underline-offset-2 hover:underline dark:text-[#A1FBF9]"
             >
               Clear filters
             </button>
           )}
         </div>
+        </>
+        )}
 
         {/* Bulk selection — clearing out a long list of old work in one move. */}
         <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-black/5 pt-3 dark:border-white/10">
@@ -614,17 +610,22 @@ function DecksIndex() {
           </p>
         )}
 
-        <div className="mt-3 flex items-center gap-2 text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
-          <LayoutGrid size={12} />
-          {filtered.length + visibleCloudOnly.length} of {enriched.length + cloudOnly.length}{" "}
-          {enriched.length + cloudOnly.length === 1 ? "deck" : "decks"}
-          {!signedIn && (
-            <span className="text-black/35 dark:text-white/35">
-              · sign in to enable view analytics
-            </span>
-          )}
-        </div>
+        {active && (
+          <p className="mt-3 text-sm text-black/70 dark:text-white/70" aria-live="polite">
+            Showing {filtered.length + visibleCloudOnly.length} of{" "}
+            {enriched.length + cloudOnly.length}
+          </p>
+        )}
+        {signedIn === false && (
+          <p className="mt-3 text-sm text-black/70 dark:text-white/70">
+            <Link to="/auth" className="font-semibold underline">
+              Sign in
+            </Link>{" "}
+            to see decks saved to your account and who has viewed them.
+          </p>
+        )}
       </div>
+      )}
 
       {loadFailed && (
         <div
@@ -648,12 +649,9 @@ function DecksIndex() {
         </div>
       )}
 
-      {/* Grid */}
-      {enriched.length === 0 && cloudOnly.length === 0 ? (
-        loadFailed ? null : (
-          <EmptyNew signedIn={signedIn} />
-        )
-      ) : filtered.length === 0 && visibleCloudOnly.length === 0 ? (
+      {/* Grid — account decks not in this browser already appear here as
+          cloud tiles, so there is no separate "saved presentations" list. */}
+      {!hasAny ? null : filtered.length === 0 && visibleCloudOnly.length === 0 ? (
         <EmptyNoMatches onClear={clearAll} />
       ) : (
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -686,10 +684,6 @@ function DecksIndex() {
           ))}
         </div>
       )}
-
-      {/* Real decks saved to the account — this browser's local store can be
-          empty (new device, cleared storage) while the workspace is not. */}
-      <MyCloudDecks />
     </AppShell>
   );
 }
