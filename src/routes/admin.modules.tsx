@@ -377,6 +377,13 @@ function ModuleEditorPage() {
               <article key={v.id} className="rounded-2xl border border-black/10 bg-white p-5">
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-[11px] text-black/45">{v.id}</span>
+                  <Link
+                    to="/convert"
+                    search={{ module: v.id }}
+                    className="text-[11px] font-semibold text-[#003FC7] hover:underline"
+                  >
+                    Use in marketing materials →
+                  </Link>
                   <span className="rounded-full bg-[#E0E8F5] px-2 py-0.5 text-[10px] font-medium text-[#03002C]">
                     {MODULE_FAMILIES.find((f) => f.id === v.familyId)?.name ?? v.familyId}
                   </span>

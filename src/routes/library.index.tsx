@@ -2145,6 +2145,15 @@ const VariantCard = memo(function VariantCard({
           </div>
         )}
       </button>
+      {!videoExample ? (
+        <Link
+          to="/convert"
+          search={{ module: variant.id }}
+          className="mt-1.5 inline-flex items-center gap-1 px-2 py-1 text-[11px] font-semibold text-[#003FC7] hover:underline focus-visible:outline-2 focus-visible:outline-[#003FC7]"
+        >
+          Use in marketing materials →
+        </Link>
+      ) : null}
       {videoExample && onImportExample && (
         <button
           type="button"

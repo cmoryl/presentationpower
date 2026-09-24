@@ -131,6 +131,17 @@ function ConvertPage() {
   const [moduleBrand, setModuleBrand] = useState<string>(BRAND_MODES[0].id);
   const [selection, setSelection] = useState<AdaptSelection>(EMPTY_SELECTION);
   const [view, setView] = useState<"one" | "all">("one");
+  // Coming from the module catalog: bring the chosen module into view in the list.
+  useEffect(() => {
+    if (!search.module) return;
+    const id = search.module;
+    const timer = window.setTimeout(() => {
+      const el = document.querySelector<HTMLElement>(`[data-module-id="${CSS.escape(id)}"]`);
+      const list = el?.closest("ul");
+      if (el && list) list.scrollTop = el.offsetTop - 8;
+    }, 150);
+    return () => window.clearTimeout(timer);
+  }, [search.module]);
   const [draft, setDraft] = useState<{ headline: string; body: string; eyebrow: string }>({
     headline: "",
     body: "",
@@ -286,12 +297,13 @@ function ConvertPage() {
                     ))}
                   </select>
                 </div>
-                <ul className="max-h-64 overflow-y-auto border border-[color:var(--color-border)]" aria-label="Master modules">
+                <ul className="relative max-h-64 overflow-y-auto border border-[color:var(--color-border)]" aria-label="Master modules">
                   {moduleList.map((m) => (
                     <li key={m.id}>
                       <button
                         type="button"
                         aria-pressed={m.id === moduleId}
+                        data-module-id={m.id}
                         onClick={() => setModuleId(m.id)}
                         className={`block w-full border-b border-[color:var(--color-border)] px-3 py-2 text-left last:border-b-0 ${m.id === moduleId ? "bg-[color:var(--color-muted)] shadow-[inset_3px_0_0_var(--color-primary)]" : "hover:bg-[color:var(--color-muted)]/60"}`}
                       >
