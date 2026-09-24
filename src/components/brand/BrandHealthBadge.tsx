@@ -70,11 +70,11 @@ export function BrandHealthBadge({
           run();
           setOpen(true);
         }}
-        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium transition hover:brightness-95 ${tone.chip} ${className ?? ""}`}
+        className={`inline-flex items-center gap-1.5 min-h-9 rounded-md px-2.5 text-xs font-medium transition hover:brightness-95 ${tone.chip} ${className ?? ""}`}
         aria-label="Brand health pre-flight"
       >
         <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} aria-hidden />
-        Brand health {report && report.sampled > 0 ? `${report.score}/100` : "—"}
+        Brand check{report && report.sampled > 0 ? `: ${tone.word}` : ""}
       </button>
 
       {open ? (

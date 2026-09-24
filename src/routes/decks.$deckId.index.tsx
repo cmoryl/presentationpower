@@ -446,6 +446,10 @@ function DeckEditor() {
    * Controlled here so turning live editing on can reveal the Tools tab.
    */
   const [railTab, setRailTab] = useState<string | null>("inspect");
+  // On laptop-width screens start with the side panel closed so the slide gets the room.
+  useEffect(() => {
+    if (window.innerWidth < 1440) setRailTab(null);
+  }, []);
   /** Left slide list collapses so the live stage can take the extra width. */
   const [slidesRailOpen, setSlidesRailOpen] = useState(true);
   const stageDrop = useImageDrop({
@@ -574,6 +578,14 @@ function DeckEditor() {
                   </span>
                   <MetaDot />
                   <span>{brand.name}</span>
+                  <MetaDot />
+                  <BrandHealthBadge
+                    getRoots={() =>
+                      Array.from(document.querySelectorAll<HTMLElement>("[data-slide-stage]"))
+                    }
+                    divisionId={deck.brandModeId ?? null}
+                    surfaceLabel="the slides on screen"
+                  />
                   {qa.length > 0 && (
                     <>
                       <MetaDot />
@@ -624,13 +636,6 @@ function DeckEditor() {
               }
               status={
                 <div className="flex flex-wrap items-center gap-3 text-xs text-black/70">
-                  <BrandHealthBadge
-                    getRoots={() =>
-                      Array.from(document.querySelectorAll<HTMLElement>("[data-slide-stage]"))
-                    }
-                    divisionId={deck.brandModeId ?? null}
-                    surfaceLabel="the slides on screen"
-                  />
                   <SaveDeckToMyFilesButton deckId={deckId} />
                   <SaveDeckButton deckId={deckId} />
                   <AutosaveIndicator deckId={deckId} />
@@ -2041,7 +2046,7 @@ function DeckEditor() {
 
             {/* Inspector — same collapsible rail geometry as Open Canvas Studio */}
             <EditorSideRail
-              width={360}
+              width={300}
               openId={railTab}
               onOpenChange={setRailTab}
               tabs={[
