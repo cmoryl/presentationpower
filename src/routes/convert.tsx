@@ -24,17 +24,22 @@ import {
   ADAPT_TARGETS,
   adaptContent,
   adaptTargetFormat,
+  applySelection,
   contentFromSlide,
+  EMPTY_SELECTION,
+  type AdaptFieldKey,
+  type AdaptSelection,
   toSocialCopy,
   type AdaptContent,
   type AdaptTargetId,
 } from "@/lib/cross-format-adapt";
 import { CSS_DPI } from "@/lib/print-proof-export";
-import { useDeckStore } from "@/lib/deck-store";
-import { BRAND_MODES, byId, MODULE_VARIANTS } from "@/lib/taxonomy";
+import { seedContent, useDeckStore, type Brief } from "@/lib/deck-store";
+import { BRAND_MODES, byId, MODULE_FAMILIES, MODULE_VARIANTS } from "@/lib/taxonomy";
 
 const SearchSchema = z.object({
   deck: z.string().optional(),
+  module: z.string().optional(),
   slide: z.coerce.number().int().min(0).optional(),
   to: z.string().optional(),
 });
@@ -68,6 +73,22 @@ const SEVERITY_STYLE: Record<string, string> = {
   refused: "border-[#E53D2E] bg-[#FDECEA]",
 };
 
+/** Neutral brief the master modules seed their approved sample copy from. */
+const MASTER_BRIEF: Brief = {
+  id: "convert-master",
+  createdAt: "2026-01-01T00:00:00.000Z",
+  prospect: "Your client",
+  industry: "Enterprise",
+  meetingObjective: "Show how TransPerfect scales global content",
+  audience: "Marketing leadership",
+  brandModeId: "bm-enterprise" as Brief["brandModeId"],
+  archetypeId: "arch-pitch",
+  lengthTarget: 10,
+  clientFacts: "",
+};
+
+type SourceKind = "module" | "deck" | "manual";
+
 function ConvertPage() {
   const search = Route.useSearch();
   const decksMap = useDeckStore((s) => s.decks);
@@ -100,7 +121,16 @@ function ConvertPage() {
   const [targetId, setTargetId] = useState<AdaptTargetId>(
     (ADAPT_TARGETS.find((t) => t.id === search.to)?.id as AdaptTargetId) ?? "social-card",
   );
-  const [manual, setManual] = useState(false);
+  const [sourceKind, setSourceKind] = useState<SourceKind>(search.deck ? "deck" : "module");
+  const manual = sourceKind === "manual";
+  const [moduleId, setModuleId] = useState<string>(
+    search.module && MODULE_VARIANTS.some((m) => m.id === search.module) ? search.module : "MV-OP-COVER",
+  );
+  const [moduleQuery, setModuleQuery] = useState("");
+  const [familyId, setFamilyId] = useState<string>("all");
+  const [moduleBrand, setModuleBrand] = useState<string>(BRAND_MODES[0].id);
+  const [selection, setSelection] = useState<AdaptSelection>(EMPTY_SELECTION);
+  const [view, setView] = useState<"one" | "all">("one");
   const [draft, setDraft] = useState<{ headline: string; body: string; eyebrow: string }>({
     headline: "",
     body: "",
@@ -128,7 +158,27 @@ function ConvertPage() {
   const deck = choice ? { id: choice.id, title: choice.title, brandModeId: choice.brandModeId, slides } : null;
   const slide = slides[Math.min(slideIndex, slides.length - 1)] ?? null;
 
-  const source: AdaptContent = useMemo(() => {
+  const moduleVariant = byId(MODULE_VARIANTS, moduleId);
+  const moduleList = useMemo(() => {
+    const q = moduleQuery.trim().toLowerCase();
+    return MODULE_VARIANTS.filter(
+      (m) =>
+        (familyId === "all" || m.familyId === familyId) &&
+        (!q || `${m.name} ${m.description} ${m.id}`.toLowerCase().includes(q)),
+    );
+  }, [moduleQuery, familyId]);
+
+  const rawSource: AdaptContent = useMemo(() => {
+    if (sourceKind === "module") {
+      const fam = MODULE_FAMILIES.find((f) => f.id === moduleVariant?.familyId)?.name ?? "";
+      let content: Record<string, unknown> = {};
+      try {
+        content = seedContent(moduleId, MASTER_BRIEF, fam) as Record<string, unknown>;
+      } catch {
+        content = {};
+      }
+      return contentFromSlide({ content }, moduleVariant?.name);
+    }
     if (manual || !slide) {
       return {
         eyebrow: draft.eyebrow || undefined,
@@ -140,10 +190,15 @@ function ConvertPage() {
       { content: slide.content, notes: slide.notes },
       byId(MODULE_VARIANTS, slide.variantId)?.name,
     );
-  }, [manual, slide, draft]);
+  }, [sourceKind, moduleId, moduleVariant, manual, slide, draft]);
 
-  const brandId = deck?.brandModeId ?? BRAND_MODES[0].id;
-  const mode: "light" | "dark" = slide?.mode ?? "light";
+  // A new source starts with everything included and no edits.
+  const sourceKey = sourceKind === "module" ? `m:${moduleId}` : manual ? "manual" : `d:${deckId}:${slideIndex}`;
+  useEffect(() => setSelection(EMPTY_SELECTION), [sourceKey]);
+  const source = useMemo(() => applySelection(rawSource, selection), [rawSource, selection]);
+
+  const brandId = sourceKind === "module" ? moduleBrand : (deck?.brandModeId ?? BRAND_MODES[0].id);
+  const mode: "light" | "dark" = sourceKind === "deck" ? (slide?.mode ?? "light") : "light";
   const result = useMemo(() => adaptContent(source, targetId), [source, targetId]);
   const format = adaptTargetFormat(result.target);
 
@@ -174,24 +229,88 @@ function ConvertPage() {
               Source content
             </h2>
 
-            <div className="flex gap-1">
-              <button
-                type="button"
-                onClick={() => setManual(false)}
-                className={`flex-1 rounded-lg border px-3 py-2 text-[12px] ${!manual ? "border-[#003FC7] bg-[#003FC7] text-white" : "border-black/15 text-[#03002C]"}`}
-              >
-                A deck slide
-              </button>
-              <button
-                type="button"
-                onClick={() => setManual(true)}
-                className={`flex-1 rounded-lg border px-3 py-2 text-[12px] ${manual ? "border-[#003FC7] bg-[#003FC7] text-white" : "border-black/15 text-[#03002C]"}`}
-              >
-                Type the copy
-              </button>
+            <div role="group" aria-label="Source" className="grid grid-cols-3 gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5">
+              {(
+                [
+                  ["module", "Master module"],
+                  ["deck", "Deck slide"],
+                  ["manual", "Type copy"],
+                ] as const
+              ).map(([k, l]) => (
+                <button
+                  key={k}
+                  type="button"
+                  aria-pressed={sourceKind === k}
+                  onClick={() => setSourceKind(k)}
+                  className={`rounded-sm px-2 py-1.5 text-[12px] font-semibold ${sourceKind === k ? "bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]" : "text-[color:var(--color-foreground)] hover:bg-[color:var(--color-muted)]"}`}
+                >
+                  {l}
+                </button>
+              ))}
             </div>
 
-            {manual ? (
+            {sourceKind === "module" ? (
+              <div className="space-y-2">
+                <label className="sr-only" htmlFor="module-search">Search master modules</label>
+                <input
+                  id="module-search"
+                  value={moduleQuery}
+                  onChange={(e) => setModuleQuery(e.target.value)}
+                  placeholder="Search master modules…"
+                  className="w-full rounded-sm border border-[color:var(--color-border)] px-3 py-2 text-[13px]"
+                />
+                <div className="flex gap-2">
+                  <select
+                    aria-label="Module family"
+                    value={familyId}
+                    onChange={(e) => setFamilyId(e.target.value)}
+                    className="min-w-0 flex-1 rounded-sm border border-[color:var(--color-border)] px-2 py-1.5 text-[12px]"
+                  >
+                    <option value="all">All families</option>
+                    {MODULE_FAMILIES.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.name}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    aria-label="Division"
+                    value={moduleBrand}
+                    onChange={(e) => setModuleBrand(e.target.value)}
+                    className="min-w-0 flex-1 rounded-sm border border-[color:var(--color-border)] px-2 py-1.5 text-[12px]"
+                  >
+                    {BRAND_MODES.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <ul className="max-h-64 overflow-y-auto border border-[color:var(--color-border)]" aria-label="Master modules">
+                  {moduleList.map((m) => (
+                    <li key={m.id}>
+                      <button
+                        type="button"
+                        aria-pressed={m.id === moduleId}
+                        onClick={() => setModuleId(m.id)}
+                        className={`block w-full border-b border-[color:var(--color-border)] px-3 py-2 text-left last:border-b-0 ${m.id === moduleId ? "bg-[color:var(--color-muted)] shadow-[inset_3px_0_0_var(--color-primary)]" : "hover:bg-[color:var(--color-muted)]/60"}`}
+                      >
+                        <span className="block text-[12.5px] font-semibold">{m.name}</span>
+                        <span className="block truncate text-[11px] text-[color:var(--color-muted-foreground)]">{m.description}</span>
+                      </button>
+                    </li>
+                  ))}
+                  {moduleList.length === 0 ? (
+                    <li className="px-3 py-2 text-[12px] text-[color:var(--color-muted-foreground)]">No modules match.</li>
+                  ) : null}
+                </ul>
+                <p className="text-[11px] text-[color:var(--color-muted-foreground)]">
+                  Shows the module's approved sample copy. Edit any field below.
+                </p>
+              </div>
+            ) : null}
+
+            {sourceKind === "module" ? null : manual ? (
               <div className="space-y-2">
                 <input
                   value={draft.eyebrow}
@@ -249,6 +368,8 @@ function ConvertPage() {
                 </select>
               </div>
             )}
+
+            {manual ? null : <InfoBuilder source={rawSource} selection={selection} onChange={setSelection} />}
 
             <h2 className="pt-2 text-[12px] font-semibold tracking-[0.12em] text-[#666] uppercase">
               Convert to
@@ -316,7 +437,12 @@ function ConvertPage() {
                 <PrintProofMenu
                   context={{
                     Document: result.target.label,
-                    Source: manual || !deck ? "typed copy" : `${deck.title} · slide ${slideIndex + 1}`,
+                    Source:
+                      sourceKind === "module"
+                        ? `Master module · ${moduleVariant?.name ?? moduleId}`
+                        : manual || !deck
+                          ? "typed copy"
+                          : `${deck.title} · slide ${slideIndex + 1}`,
                     Division: BRAND_MODES.find((b) => b.id === brandId)?.name ?? "TransPerfect",
                   }}
                   resolveTarget={() => {
@@ -361,7 +487,66 @@ function ConvertPage() {
               </div>
             </div>
 
-            <div className="flex justify-center rounded-2xl border border-black/10 bg-[#F2F2F2] p-6">
+            <div role="group" aria-label="Preview" className="inline-flex gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5">
+              {(
+                [
+                  ["one", "This format"],
+                  ["all", "Every size"],
+                ] as const
+              ).map(([k, l]) => (
+                <button
+                  key={k}
+                  type="button"
+                  aria-pressed={view === k}
+                  onClick={() => setView(k)}
+                  className={`rounded-sm px-3 py-1 text-[12px] font-semibold ${view === k ? "bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]" : "hover:bg-[color:var(--color-muted)]"}`}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+
+            {view === "all" ? (
+              <div className="grid items-end gap-4 border border-[color:var(--color-border)] bg-[color:var(--color-muted)] p-4 sm:grid-cols-2 xl:grid-cols-3">
+                {ADAPT_TARGETS.map((t) => {
+                  const r = adaptContent(source, t.id);
+                  const f = adaptTargetFormat(t);
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        setTargetId(t.id);
+                        setView("one");
+                      }}
+                      className="flex flex-col items-center gap-2 p-2 text-left hover:bg-[color:var(--color-background)]/60 focus-visible:outline-2 focus-visible:outline-[color:var(--color-primary)]"
+                      aria-label={`Open ${t.label}`}
+                    >
+                      <div className="pointer-events-none">
+                        {f ? (
+                          <SocialRenderer
+                            format={f}
+                            brandId={brandId}
+                            mode={mode}
+                            copy={toSocialCopy(r)}
+                            imageUrl={r.content.media?.kind === "photo" ? r.content.media.url : undefined}
+                            displayShortEdge={170}
+                          />
+                        ) : (
+                          <PrintBriefPreview result={r} brandId={brandId} displayWidth={200} />
+                        )}
+                      </div>
+                      <span className="text-[12px] font-semibold">{t.label}</span>
+                      <span className="text-[11px] text-[color:var(--color-muted-foreground)]">
+                        {r.notes.length ? `${r.notes.length} change${r.notes.length === 1 ? "" : "s"} to fit` : "Everything fitted"}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            <div className={`flex justify-center rounded-sm border border-black/10 bg-[#F2F2F2] p-6 ${view === "all" ? "hidden" : ""}`}>
               {format ? (
                 <div ref={socialWrapRef}>
                   <SocialRenderer
@@ -411,5 +596,145 @@ function ConvertPage() {
         </div>
       </main>
     </AppShell>
+  );
+}
+
+// ── info builder ───────────────────────────────────────────────────────────
+
+const FIELD_LABEL: Record<AdaptFieldKey, string> = {
+  eyebrow: "Eyebrow",
+  headline: "Headline",
+  body: "Body",
+  points: "Points",
+  stat: "Figure",
+  cta: "Call to action",
+  footnote: "Source / footnote",
+  media: "Picture",
+};
+
+function InfoBuilder({
+  source,
+  selection,
+  onChange,
+}: {
+  source: AdaptContent;
+  selection: AdaptSelection;
+  onChange: (s: AdaptSelection) => void;
+}) {
+  const on = (k: AdaptFieldKey) => !selection.exclude.includes(k);
+  const toggle = (k: AdaptFieldKey) =>
+    onChange({
+      ...selection,
+      exclude: on(k) ? [...selection.exclude, k] : selection.exclude.filter((x) => x !== k),
+    });
+  const edit = (patch: AdaptSelection["edits"]) => onChange({ ...selection, edits: { ...selection.edits, ...patch } });
+  const input = "w-full rounded-sm border border-[color:var(--color-border)] px-2 py-1 text-[12.5px] disabled:opacity-50";
+  const textKeys = (["eyebrow", "headline", "body", "cta", "footnote"] as const).filter((k) => source[k]);
+  const hasAny = textKeys.length || source.points?.length || source.stat || source.media;
+  if (!hasAny) return null;
+  return (
+    <div className="space-y-3 border-t border-[color:var(--color-border)] pt-4">
+      <div className="flex items-baseline justify-between">
+        <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[color:var(--color-muted-foreground)] uppercase">
+          Info to carry across
+        </h2>
+        <button type="button" className="text-[11px] font-semibold text-[color:var(--color-primary)] hover:underline" onClick={() => onChange(EMPTY_SELECTION)}>
+          Reset
+        </button>
+      </div>
+      {textKeys.map((k) => (
+        <div key={k} className="space-y-1">
+          <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide">
+            <input
+              type="checkbox"
+              className="accent-[color:var(--color-primary)]"
+              checked={on(k)}
+              disabled={k === "headline"}
+              onChange={() => toggle(k)}
+            />
+            {FIELD_LABEL[k]}
+          </label>
+          {k === "body" ? (
+            <textarea
+              rows={3}
+              className={input}
+              disabled={!on(k)}
+              value={selection.edits[k] ?? source[k] ?? ""}
+              onChange={(e) => edit({ [k]: e.target.value })}
+            />
+          ) : (
+            <input className={input} disabled={!on(k)} value={selection.edits[k] ?? source[k] ?? ""} onChange={(e) => edit({ [k]: e.target.value })} />
+          )}
+        </div>
+      ))}
+      {source.stat ? (
+        <div className="space-y-1">
+          <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide">
+            <input type="checkbox" className="accent-[color:var(--color-primary)]" checked={on("stat")} onChange={() => toggle("stat")} />
+            {FIELD_LABEL.stat}
+          </label>
+          <div className="grid grid-cols-[90px_1fr] gap-1">
+            <input
+              aria-label="Figure value"
+              className={input}
+              disabled={!on("stat")}
+              value={selection.edits.stat?.value ?? source.stat.value}
+              onChange={(e) => edit({ stat: { ...selection.edits.stat, value: e.target.value } })}
+            />
+            <input
+              aria-label="Figure label"
+              className={input}
+              disabled={!on("stat")}
+              value={selection.edits.stat?.label ?? source.stat.label}
+              onChange={(e) => edit({ stat: { ...selection.edits.stat, label: e.target.value } })}
+            />
+          </div>
+        </div>
+      ) : null}
+      {source.points?.length ? (
+        <div className="space-y-1">
+          <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide">
+            <input type="checkbox" className="accent-[color:var(--color-primary)]" checked={on("points")} onChange={() => toggle("points")} />
+            {FIELD_LABEL.points}
+          </label>
+          {source.points.map((p, i) => {
+            const pointOn = !selection.excludePoints.includes(i);
+            return (
+              <div key={i} className="flex items-center gap-1.5">
+                <input
+                  type="checkbox"
+                  aria-label={`Include point ${i + 1}`}
+                  className="accent-[color:var(--color-primary)]"
+                  disabled={!on("points")}
+                  checked={pointOn}
+                  onChange={() =>
+                    onChange({
+                      ...selection,
+                      excludePoints: pointOn ? [...selection.excludePoints, i] : selection.excludePoints.filter((x) => x !== i),
+                    })
+                  }
+                />
+                <input
+                  aria-label={`Point ${i + 1}`}
+                  className={input}
+                  disabled={!on("points") || !pointOn}
+                  value={selection.edits.points?.[i] ?? p}
+                  onChange={(e) => edit({ points: { ...selection.edits.points, [i]: e.target.value } })}
+                />
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+      {source.media ? (
+        <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide">
+          <input type="checkbox" className="accent-[color:var(--color-primary)]" checked={on("media")} onChange={() => toggle("media")} />
+          {FIELD_LABEL.media}
+          <span className="font-normal normal-case tracking-normal text-[color:var(--color-muted-foreground)]">
+            {source.media.kind === "photo" ? "photo" : source.media.kind === "token" ? "brand colour fill" : "not supported"}
+          </span>
+        </label>
+      ) : null}
+    </div>
   );
 }
