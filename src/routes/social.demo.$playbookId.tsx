@@ -179,7 +179,7 @@ function SocialDemoView() {
       url: "transperfect.com",
       accent: playbook.accent,
       logoWide: { url: wide, ratio: 4.6 },
-      logoStacked: { url: stacked, ratio: 2.1 },
+      logoStacked: { url: stacked, ratio: stacked === wide ? 4.6 : 2.1 },
       logoNeedsKnockout: needsKnockout,
       lookId: look.id,
       look,
