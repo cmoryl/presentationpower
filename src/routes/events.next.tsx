@@ -28,7 +28,6 @@ import {
   cityStopLine,
   deckPagesFor,
   isPowerpointDeck,
-  loadNextRegistry,
   nextHeadline,
   type NextDivision,
   type NextFormatGroupId,
@@ -41,7 +40,6 @@ import {
   LONDON_VENUE,
   londonPanelsByFloor,
   isVenueTemplatePanel,
-  londonPanelCount,
   londonVenueItemMeta,
 } from "@/lib/next-london-signage";
 import { CityBadge } from "@/components/next/CityBadge";
@@ -97,28 +95,12 @@ export const Route = createFileRoute("/events/next")({
 
 function NextHub() {
   const [divisionId, setDivisionId] = useState<string>(NEXT_DIVISIONS[0].id);
-  const [total, setTotal] = useState(0);
-  const [counts, setCounts] = useState<Record<string, number>>({});
-
-  useEffect(() => {
-    let alive = true;
-    loadNextRegistry().then((r) => {
-      if (!alive) return;
-      setTotal(r.length);
-      const c: Record<string, number> = {};
-      for (const row of r) c[row.divisionId] = (c[row.divisionId] ?? 0) + 1;
-      setCounts(c);
-    });
-    return () => {
-      alive = false;
-    };
-  }, []);
 
   const division = NEXT_DIVISIONS.find((d) => d.id === divisionId) ?? NEXT_DIVISIONS[0];
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-6 pb-24 pt-8">
-      <Hero division={division} total={total} />
+      <Hero division={division} />
 
       <div id="editions" tabIndex={-1} className="scroll-mt-24 outline-none">
         <NextEditions />
@@ -126,12 +108,7 @@ function NextHub() {
 
       <LondonStatus />
 
-      <MasterDesignSystem
-        division={division}
-        count={counts[division.id] ?? 0}
-        total={total}
-        onSelect={setDivisionId}
-      />
+      <MasterDesignSystem division={division} onSelect={setDivisionId} />
 
       <CitySeries />
 
@@ -142,7 +119,7 @@ function NextHub() {
   );
 }
 
-function Hero({ division, total }: { division: NextDivision; total: number }) {
+function Hero({ division }: { division: NextDivision }) {
   const goEditions = (e: React.MouseEvent) => {
     e.preventDefault();
     const el = document.getElementById("editions");
@@ -200,22 +177,6 @@ function Hero({ division, total }: { division: NextDivision; total: number }) {
               <Fact icon={Sparkles} label="CTA" value={NEXT_EVENT.ctaLabel} />
             </dl>
           </div>
-
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { k: String(NEXT_CITY_SERIES.stops.length), v: "City stops" },
-              { k: String(NEXT_DIVISIONS.length), v: "Divisions" },
-              { k: String(total || 616), v: "Master designs" },
-            ].map((s) => (
-              <div
-                key={s.v}
-                className="rounded-md border border-white/20 bg-[#03002C]/70 px-3 py-3 text-center"
-              >
-                <p className="text-xl font-semibold text-white">{s.k}</p>
-                <p className="mt-0.5 text-[11px] uppercase tracking-widest text-white/80">{s.v}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>
@@ -225,13 +186,9 @@ function Hero({ division, total }: { division: NextDivision; total: number }) {
 /** Master Design System zone — the only place the division selector lives. */
 function MasterDesignSystem({
   division,
-  count,
-  total,
   onSelect,
 }: {
   division: NextDivision;
-  count: number;
-  total: number;
   onSelect: (id: string) => void;
 }) {
   return (
@@ -269,7 +226,7 @@ function MasterDesignSystem({
         })}
       </div>
 
-      <DivisionDetail division={division} count={count} />
+      <DivisionDetail division={division} />
 
       <Pathways accent={division.accent} divisionId={division.id} />
 
@@ -281,9 +238,7 @@ function MasterDesignSystem({
         <span className="inline-flex items-center gap-3">
           <Search size={18} className="text-icon-muted" />
           <span>
-            <span className="block text-sm font-semibold">
-              Search all {total ? `${total}` : "600+"} master templates
-            </span>
+            <span className="block text-sm font-semibold">Search master templates</span>
             <span className="block text-xs text-muted-foreground">
               Filter by division, format family, code or size
             </span>
@@ -611,7 +566,7 @@ function Pathways({ accent, divisionId }: { accent: string; divisionId: string }
   );
 }
 
-function DivisionDetail({ division, count }: { division: NextDivision; count: number }) {
+function DivisionDetail({ division }: { division: NextDivision }) {
   return (
     <div className="mt-6 grid gap-6 rounded-md border border-border p-6 md:grid-cols-[240px_1fr]">
       <LockupPlate division={division} className="self-start" />
@@ -635,9 +590,6 @@ function DivisionDetail({ division, count }: { division: NextDivision; count: nu
           </span>
           <span className="rounded-full border border-border px-2.5 py-1 text-muted-foreground">
             Pantone {division.pantone}
-          </span>
-          <span className="rounded-full border border-border px-2.5 py-1 text-muted-foreground">
-            {count} designs
           </span>
           <span className="rounded-full border border-border px-2.5 py-1 text-muted-foreground">
             Brand mode {division.brandModeId}
@@ -685,9 +637,7 @@ function LondonStatus() {
           <span className="block font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
             In production · Job {LONDON_VENUE.job}
           </span>
-          <span className="mt-1 block text-base font-semibold">
-            London · {LONDON_VENUE.venue} — {londonPanelCount()} panels, in production
-          </span>
+          <span className="mt-1 block text-base font-semibold">London · {LONDON_VENUE.venue}</span>
         </span>
         <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
           Open London workbench
@@ -788,9 +738,7 @@ function WorkspaceDirectory() {
         <h2 id="next-directory" className="text-xl font-semibold tracking-tight">
           Where everything lives
         </h2>
-        <span className="text-sm text-black/50 dark:text-white/50">
-          {NEXT_WORKSPACE_PAGES.length} pages · London-only pages are marked
-        </span>
+        <span className="text-sm text-muted-foreground">London-only pages are marked</span>
       </div>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {NEXT_WORKSPACE_GROUPS.map((g) => (
