@@ -123,7 +123,7 @@ function PlaybookPage() {
           to="/events/next/city"
           className="ml-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#003FC7] hover:underline"
         >
-          <MapPin size={13} /> Start the next city
+          <MapPin size={13} /> Plan a new city
         </Link>
         <Link
           to="/events/next/knowledge"
@@ -137,7 +137,7 @@ function PlaybookPage() {
             <Layers size={12} /> Signage &amp; hardware playbook
           </div>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#03002C]">
-            What the NEXT ecosystem carries forward
+            Playbook &amp; knowledge
           </h1>
           <p className="mt-2 max-w-3xl text-[15px] leading-[1.5] text-black/70">
             {LONDON_VENUE.name} is where this look was settled. Everything below is the reusable

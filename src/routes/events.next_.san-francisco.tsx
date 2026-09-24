@@ -21,6 +21,7 @@ import { useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { EditionDivisionTiles } from "@/components/events/EditionDivisionTiles";
+import { CitySectionBar, SAN_FRANCISCO_SECTIONS } from "@/components/events/CitySectionBar";
 import { CaliforniaKioskBrowser } from "@/components/events/CaliforniaKioskBrowser";
 import { SF_READY, SF_VENUE, sfLocationStack } from "@/lib/next-sf-event";
 
@@ -141,7 +142,7 @@ function SanFranciscoPage() {
             params={{ eventId: "san-francisco" }}
             className="text-[#003FC7] hover:underline"
           >
-            Event home
+            Readiness checklist
           </Link>
           <Link
             to="/events/next/california"
@@ -171,6 +172,8 @@ function SanFranciscoPage() {
             </span>
           </div>
         </header>
+
+        <CitySectionBar sections={SAN_FRANCISCO_SECTIONS} />
 
         {/* Production stage gates. */}
         <section className="mt-10" aria-labelledby="sf-gates">

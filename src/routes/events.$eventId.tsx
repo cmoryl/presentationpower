@@ -137,6 +137,17 @@ function EventHome() {
           <ArrowLeft className="h-4 w-4" /> All events
         </Link>
         <header className="mt-4">
+          {eventId === "london" || eventId === "san-francisco" ? (
+            <p className="mb-2 text-[13px] text-[#03002C]/75">
+              Readiness checklist.{" "}
+              <Link
+                to={eventId === "london" ? "/events/next/london" : "/events/next/san-francisco"}
+                className="font-semibold text-[#003FC7] hover:underline"
+              >
+                Open the {eventId === "london" ? "London 2026" : "San Francisco 2026"} page →
+              </Link>
+            </p>
+          ) : null}
           <h1 className="text-3xl font-bold leading-tight text-[#03002C]">{entry.name}</h1>
           <p className="mt-1 text-[15px] text-[#03002C]/75">
             {[entry.venue, entry.city, entry.dates].filter(Boolean).join(" · ")}

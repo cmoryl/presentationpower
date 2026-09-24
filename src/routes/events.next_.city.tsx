@@ -110,15 +110,17 @@ function NextCityPage() {
 
         <div className="mt-3">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E0E8F5] px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
-            <MapPin size={12} /> Next city
+            <MapPin size={12} /> Step 3 · Sign schedule
           </div>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#03002C]">
-            Start the next city from the London families
+            Plan a new city
           </h1>
           <p className="mt-2 max-w-3xl text-[15px] leading-[1.5] text-black/70">
-            Describe the venue in a few numbers and the schedule below builds itself from the{" "}
-            {LONDON_VENUE.name} families. Every line carries its face shape, copy slots, ground and
-            print note. Sizes are carried from the London build as a starting point — they are a
+            Four steps: keep the venue record, add provisional floor plans, build the sign schedule,
+            then set up the city templates. Describe the venue in a few numbers and the schedule
+            below builds itself from the proven sign families (first built for {LONDON_VENUE.name}).
+            Every line carries its face shape, copy slots, ground and print note. Sizes are carried
+            from that first build as a starting point — they are a
             head start, not a measurement of the new venue, so each one is replaced by the site
             survey before anything prints.
           </p>
@@ -271,7 +273,7 @@ function NextCityPage() {
                               {mm(item.trimW)} × {mm(item.trimH)}
                             </div>
                             <div className="mt-0.5 text-[10px] text-black/45">
-                              {mm(item.bleedEdge)} bleed · carried from London, survey to confirm
+                              {mm(item.bleedEdge)} bleed · carried from the first build, survey to confirm
                             </div>
                           </>
                         ) : (
@@ -298,7 +300,7 @@ function NextCityPage() {
               </div>
               <ul className="mt-2 space-y-1.5 text-[13px] text-black/70">
                 <li>
-                  Every carried size is a London size. Walk the venue, measure each surface, and
+                  Every carried size comes from the first build ({LONDON_VENUE.name}). Walk the venue, measure each surface, and
                   replace the trim before any file is built — a carried size is a head start, never
                   a measurement of this venue.
                 </li>
@@ -308,7 +310,7 @@ function NextCityPage() {
                 </li>
                 {starter.gaps.length > 0 ? (
                   <li>
-                    No London build to carry from: {starter.gaps.map((g) => g.name).join(", ")} —
+                    No proven build to carry from: {starter.gaps.map((g) => g.name).join(", ")} —
                     these need a first build at this venue.
                   </li>
                 ) : null}

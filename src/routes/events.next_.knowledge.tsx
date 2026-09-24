@@ -230,7 +230,7 @@ function KnowledgePage() {
             <Brain size={12} /> Event knowledge
           </div>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#03002C]">
-            Ask what past venues taught
+            Event knowledge &amp; retro
           </h1>
           <p className="mt-2 max-w-3xl text-[15px] leading-[1.5] text-black/70">
             Every measured face, template family, approved ground, build lesson and shipped live

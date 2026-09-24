@@ -40,7 +40,15 @@ export function EventHubCards() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {cards.map((c) => (
-        <Link key={c.id} to="/events/$eventId" params={{ eventId: c.id }} className={cardCls}>
+        <Link
+          key={c.id}
+          {...(c.id === "london"
+            ? { to: "/events/next/london" as const }
+            : c.id === "san-francisco"
+              ? { to: "/events/next/san-francisco" as const }
+              : { to: "/events/$eventId" as const, params: { eventId: c.id } })}
+          className={cardCls}
+        >
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#03002C]/10 text-[#03002C]">
             <Map size={16} />
           </span>

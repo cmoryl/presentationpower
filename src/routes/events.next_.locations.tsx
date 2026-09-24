@@ -228,7 +228,7 @@ function VenuePagesRoute() {
           <ArrowLeft className="h-4 w-4" /> Events
         </Link>
 
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#03002C]">Venue directory &amp; records</h1>
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#03002C]">Venues &amp; floor-plan standards</h1>
         <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-[#666]">
           One record per location: address, where it sits on the map, when each area opens, how to
           get there and the photograph of the building. The delegate guide reads its practical page
