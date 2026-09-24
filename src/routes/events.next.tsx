@@ -35,6 +35,7 @@ import {
   type NextRegistryRow,
 } from "@/lib/next-event";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { NextEditions } from "@/components/events/NextEditions";
 import {
   LONDON_STYLES,
   LONDON_VENUE,
@@ -150,6 +151,9 @@ function NextHub() {
   return (
     <div className="mx-auto w-full max-w-[1200px] px-6 pb-24 pt-8">
       <Hero division={division} total={rows?.length ?? 0} onSelect={setDivisionId} />
+
+      <NextEditions />
+
 
       <WorkspaceDirectory />
 
