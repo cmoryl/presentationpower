@@ -81,7 +81,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
           {content.eyebrow ? (
             <p
               style={{
-                fontSize: t.eyebrowPx,
+                fontSize: t.eyebrowPx * (banner ? 1.8 : 1),
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 fontWeight: 600,
@@ -167,10 +167,10 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
           ) : null}
 
           {content.stat ? (
-            <div style={{ marginTop: banner ? 0 : big ? u(24) : "auto", ...(banner ? { flexDirection: "column" as const, alignItems: "flex-start" as const, borderTop: `${u(3)}px solid ${accent}`, paddingTop: u(24) } : {}), display: "flex", alignItems: "baseline", gap: u(12), ...(land ? { gridColumn: 2 } : {}) }}>
+            <div style={{ marginTop: banner ? 0 : big ? u(24) : "auto", ...(banner ? { flexDirection: "column" as const, alignItems: "flex-start" as const, borderTop: `${u(3)}px solid ${accent}`, paddingTop: u(24), ...(content.points?.length ? {} : { flex: 1, justifyContent: "center" as const }) } : {}), display: "flex", alignItems: "baseline", gap: u(12), ...(land ? { gridColumn: 2 } : {}) }}>
               <span
                 style={{
-                  fontSize: t.statPx * (banner ? 1.6 : 1),
+                  fontSize: t.statPx * (banner ? (content.points?.length ? 1.6 : 2.6) : 1),
                   fontWeight: 700,
                   lineHeight: 1,
                   letterSpacing: "-0.03em",
