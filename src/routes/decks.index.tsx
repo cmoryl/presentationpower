@@ -452,42 +452,47 @@ function DecksIndex() {
       {/* Filter bar */}
       {hasAny && (
       <div className="rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
+        {showFilters && (
+        <>
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[240px] flex-1">
+            <label htmlFor="deck-search" className="sr-only">
+              Search decks
+            </label>
             <Search
               size={14}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 dark:text-primary-foreground/40"
             />
             <input
-              type="text"
+              id="deck-search"
+              type="search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search title, client, or industry…"
-              className="w-full rounded-full border border-black/10 bg-white py-2 pl-9 pr-9 text-sm outline-none transition placeholder:text-black/35 focus:border-[#003FC7] dark:border-white/10 dark:bg-white/[0.04] dark:placeholder:text-white/35 dark:focus:border-[#A1FBF9]"
+              placeholder="Search title, client, or industry"
+              className="min-h-11 w-full rounded-md border border-black/20 bg-white pl-9 pr-10 text-sm outline-none transition placeholder:text-black/55 focus-visible:border-[#003FC7] focus-visible:ring-2 focus-visible:ring-[#003FC7]/30 dark:border-white/20 dark:bg-white/[0.04] dark:placeholder:text-white/55"
             />
             {q && (
               <button
                 type="button"
                 onClick={() => setQ("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-icon-subtle hover:bg-black/5 dark:hover:bg-white/10"
+                className="absolute right-1.5 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-black/70 hover:bg-black/5 dark:text-white/70 dark:hover:bg-white/10"
                 aria-label="Clear search"
               >
-                <X size={12} />
+                <X size={14} />
               </button>
             )}
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
+            <label htmlFor="deck-sort" className="text-xs font-medium text-black/70 dark:text-white/70">
               Sort
             </label>
             <select
-              aria-label="Sort"
+              id="deck-sort"
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
-              className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium outline-none dark:border-white/10 dark:bg-white/[0.04]"
+              className="min-h-11 rounded-md border border-black/20 bg-white px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/40 dark:border-white/20 dark:bg-white/[0.04]"
             >
-              <option value="recent">Recently edited</option>
-              <option value="created">Recently created</option>
+              <option value="recent">Recently created</option>
               <option value="alpha">Alphabetical</option>
               <option value="views">Most viewed</option>
             </select>
