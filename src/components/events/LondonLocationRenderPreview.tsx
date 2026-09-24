@@ -294,9 +294,19 @@ export function LondonLocationRenderPreview({
         </button>
       </div>
 
+      <details className="group mt-3 border-t border-black/10">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-2 py-2 text-[12px] font-semibold text-[#03002C] focus-visible:outline-2 focus-visible:outline-[#003FC7] [&::-webkit-details-marker]:hidden">
+          <span>
+            Change location
+            <span className="ml-2 font-normal text-[#03002C]/65">
+              {scene.label} · {scenes.length} locations
+            </span>
+          </span>
+          <span aria-hidden className="text-[#03002C]/60 transition group-open:rotate-180">▾</span>
+        </summary>
       {floorOptions.length ? (
         <div
-          className="mt-3 flex flex-wrap items-center gap-1.5"
+          className="mt-1 flex flex-wrap items-center gap-1.5"
           role="group"
           aria-label="Show locations for one floor"
         >
@@ -321,7 +331,7 @@ export function LondonLocationRenderPreview({
                 type="button"
                 onClick={() => setFloorFilter(f.id)}
                 aria-pressed={floorFilter === f.id}
-                className={`rounded-full px-2.5 py-1 text-[10.5px] font-semibold transition ${
+                className={`rounded-sm px-2.5 py-1 text-[10.5px] font-semibold transition ${
                   floorFilter === f.id
                     ? "bg-[#003FC7] text-white"
                     : "border border-black/15 text-[#03002C] hover:bg-[#F2F2F2]"
@@ -333,7 +343,7 @@ export function LondonLocationRenderPreview({
         </div>
       ) : null}
 
-      <div className="mt-2 flex flex-wrap gap-1.5" role="group" aria-label="Choose a location">
+      <div className="mt-2 grid max-h-72 gap-px overflow-y-auto border border-black/10 bg-black/10 sm:grid-cols-2" role="group" aria-label="Choose a location">
         {visible.map((s) => {
           const here = s.floors?.includes(panel.floor);
           return (
@@ -343,15 +353,15 @@ export function LondonLocationRenderPreview({
               onClick={() => setSceneId(s.id)}
               aria-pressed={s.id === scene.id}
               title={`${s.where} · ${sceneCaption(s, panel)}`}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold transition ${
+              className={`flex items-center gap-1.5 px-3 py-2 text-left text-[11px] font-semibold transition ${
                 s.id === scene.id
                   ? "bg-[#03002C] text-white"
                   : here
-                    ? "border border-[#003FC7]/40 bg-[#E0E8F5] text-[#03002C] hover:bg-[#D5E1F3]"
-                    : "border border-black/15 text-[#03002C] hover:bg-[#F2F2F2]"
+                    ? "bg-[#E0E8F5] text-[#03002C] hover:bg-[#D5E1F3]"
+                    : "bg-white text-[#03002C] hover:bg-[#F2F2F2]"
               }`}
             >
-              <ImageIcon className="h-3 w-3" /> {s.label}
+              <ImageIcon className="h-3 w-3 shrink-0" /> <span className="min-w-0 flex-1 truncate">{s.label}</span>
               {s.photo ? (
                 <span
                   className={`rounded-full px-1.5 py-px font-mono text-[9.5px] uppercase tracking-[0.08em] ${
@@ -383,6 +393,7 @@ export function LondonLocationRenderPreview({
           );
         })}
       </div>
+      </details>
 
       {open ? (
         <div
