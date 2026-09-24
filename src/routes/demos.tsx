@@ -64,7 +64,7 @@ function DemoVideo({ id, name }: { id: string; name: string }) {
       <video
         ref={ref}
         className="h-full w-full object-cover object-top"
-        src={`/demos/${id}.mp4?v=voice3`}
+        src={`/demos/${id}.mp4?v=voice4`}
         poster={`/demos/${id}.jpg`}
         playsInline
         preload="none"
