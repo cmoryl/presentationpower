@@ -145,6 +145,7 @@ import { Route as AdminAiRouteImport } from './routes/admin.ai'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
+import { Route as EventsVenuesIndexRouteImport } from './routes/events.venues.index'
 import { Route as DecksDeckIdIndexRouteImport } from './routes/decks.$deckId.index'
 import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
 import { Route as LibraryPrintModulesRouteImport } from './routes/library.print_.modules'
@@ -889,6 +890,11 @@ const KnowledgeBrandGuidesIndexRoute =
     path: '/brand-guides/',
     getParentRoute: () => KnowledgeRoute,
   } as any)
+const EventsVenuesIndexRoute = EventsVenuesIndexRouteImport.update({
+  id: '/venues/',
+  path: '/venues/',
+  getParentRoute: () => EventsRoute,
+} as any)
 const DecksDeckIdIndexRoute = DecksDeckIdIndexRouteImport.update({
   id: '/decks/$deckId/',
   path: '/decks/$deckId/',
@@ -1373,6 +1379,7 @@ export interface FileRoutesByFullPath {
   '/library/print/modules': typeof LibraryPrintModulesRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
+  '/events/venues/': typeof EventsVenuesIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
@@ -1565,6 +1572,7 @@ export interface FileRoutesByTo {
   '/library/print/modules': typeof LibraryPrintModulesRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId': typeof DecksDeckIdIndexRoute
+  '/events/venues': typeof EventsVenuesIndexRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
@@ -1762,6 +1770,7 @@ export interface FileRoutesById {
   '/library/print_/modules': typeof LibraryPrintModulesRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
+  '/events/venues/': typeof EventsVenuesIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules_/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/events/next_/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
@@ -1960,6 +1969,7 @@ export interface FileRouteTypes {
     | '/library/print/modules'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
+    | '/events/venues/'
     | '/knowledge/brand-guides/'
     | '/admin/modules/print/$moduleId'
     | '/events/next/divisions/$divisionId'
@@ -2152,6 +2162,7 @@ export interface FileRouteTypes {
     | '/library/print/modules'
     | '/social/demo/$playbookId'
     | '/decks/$deckId'
+    | '/events/venues'
     | '/knowledge/brand-guides'
     | '/admin/modules/print/$moduleId'
     | '/events/next/divisions/$divisionId'
@@ -2348,6 +2359,7 @@ export interface FileRouteTypes {
     | '/library/print_/modules'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
+    | '/events/venues/'
     | '/knowledge/brand-guides/'
     | '/admin/modules_/print/$moduleId'
     | '/events/next_/divisions/$divisionId'
@@ -3423,6 +3435,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeBrandGuidesIndexRouteImport
       parentRoute: typeof KnowledgeRoute
     }
+    '/events/venues/': {
+      id: '/events/venues/'
+      path: '/venues'
+      fullPath: '/events/venues/'
+      preLoaderRoute: typeof EventsVenuesIndexRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/decks/$deckId/': {
       id: '/decks/$deckId/'
       path: '/decks/$deckId'
@@ -3936,6 +3955,7 @@ interface EventsRouteChildren {
   EventsNextStartRoute: typeof EventsNextStartRoute
   EventsNextVenueRoute: typeof EventsNextVenueRoute
   EventsNextVenuesRoute: typeof EventsNextVenuesRoute
+  EventsVenuesIndexRoute: typeof EventsVenuesIndexRoute
   EventsNextDivisionsDivisionIdRoute: typeof EventsNextDivisionsDivisionIdRoute
   EventsNextIntakeEventIdRoute: typeof EventsNextIntakeEventIdRoute
   EventsNextLondonBookletRoute: typeof EventsNextLondonBookletRoute
@@ -3975,6 +3995,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextStartRoute: EventsNextStartRoute,
   EventsNextVenueRoute: EventsNextVenueRoute,
   EventsNextVenuesRoute: EventsNextVenuesRoute,
+  EventsVenuesIndexRoute: EventsVenuesIndexRoute,
   EventsNextDivisionsDivisionIdRoute: EventsNextDivisionsDivisionIdRoute,
   EventsNextIntakeEventIdRoute: EventsNextIntakeEventIdRoute,
   EventsNextLondonBookletRoute: EventsNextLondonBookletRoute,
