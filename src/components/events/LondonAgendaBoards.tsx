@@ -48,7 +48,7 @@ function AgendaCard({
   const sessionCount = agendaDays(config).reduce((n, d) => n + (d.sessions?.length ?? 0), 0);
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-xl border border-black/10 bg-white">
+    <article className="flex flex-col overflow-hidden rounded-md border border-black/10 bg-white">
       <div className="flex justify-center bg-[#F2F2F2] p-3">
         <AgendaSheet config={first} pxPerMm={0.2} />
       </div>
@@ -90,18 +90,21 @@ function AgendaCard({
   );
 }
 
-export function LondonAgendaBoards() {
+export function LondonAgendaBoards({ divisionId = null }: { divisionId?: string | null }) {
   const savedFiles = useSavedAgendaFiles();
+  const shown = divisionId ? AGENDA_DIVISIONS.filter((d) => d.id === divisionId) : AGENDA_DIVISIONS;
 
   return (
     <div className="mt-4">
-      <p className="text-[13px] leading-relaxed text-[#03002C]/70">
-        Editable agenda boards, A4 to A1, for every division area at the QEII Centre. Programme
-        rows, approved grounds, dark and light faces, scannable QR codes and layered vector export
-        for print.
-      </p>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {AGENDA_DIVISIONS.map((div) => (
+      {divisionId && shown.length === 0 ? (
+        <p className="border border-dashed border-[#03002C]/20 bg-white p-4 text-[13px] text-[#03002C]/70">
+          This division has no track agenda in the London programme.
+        </p>
+      ) : null}
+      <div
+        className={`grid gap-4 ${divisionId ? "max-w-sm" : "sm:grid-cols-2 xl:grid-cols-4"}`}
+      >
+        {shown.map((div) => (
           <AgendaCard
             key={div.id}
             id={div.id}
