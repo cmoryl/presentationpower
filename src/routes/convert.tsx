@@ -17,6 +17,7 @@ import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { AssetExportMenu } from "@/components/AssetExportMenu";
 import { PrintProofMenu } from "@/components/export/PrintProofMenu";
+import { PressExportMenu } from "@/components/convert/PressExportMenu";
 import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { PrintBriefPreview } from "@/components/convert/PrintBriefPreview";
@@ -58,7 +59,7 @@ export const Route = createFileRoute("/convert")({
       {
         property: "og:description",
         content:
-          "One piece of content, every medium: slide to social card, slide to print brief or case study, with high-resolution production proofs.",
+          "One piece of content, every medium: slide to social card, slide to print brief or case study, with high-resolution proofs and press-ready PDF and Illustrator files for every print size.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -490,6 +491,27 @@ function ConvertPage() {
                       : null;
                   }}
                 />
+                {!format && result.target.trimIn ? (
+                  <PressExportMenu
+                    context={{
+                      Document: result.target.label,
+                      Source:
+                        sourceKind === "module"
+                          ? `Master module · ${moduleVariant?.name ?? moduleId}`
+                          : manual || !deck
+                            ? "typed copy"
+                            : `${deck.title} · slide ${slideIndex + 1}`,
+                      Division: BRAND_MODES.find((b) => b.id === brandId)?.name ?? "TransPerfect",
+                    }}
+                    resolveTarget={() => {
+                      const node = printPageRef.current;
+                      const trim = result.target.trimIn;
+                      return node && trim
+                        ? { node, trimIn: trim, label: result.target.label }
+                        : null;
+                    }}
+                  />
+                ) : null}
                 <BrandHealthBadge
                   getRoots={() => {
                     const node = format
