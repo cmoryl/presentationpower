@@ -60,7 +60,9 @@ export function EditionDivisionTiles({
   signageIssued = true,
 }: EditionDivisionTilesProps) {
   const focus = NEXT_DIVISIONS.find((d) => d.id === selected) ?? null;
-  const focusCounts = focus ? editionDivisionCounts(focus, countsFor(focus.id), hasProgramme) : null;
+  const focusCounts = focus
+    ? editionDivisionCounts(focus, countsFor(focus.id), hasProgramme)
+    : null;
 
   return (
     <section className="mt-10" aria-labelledby="edition-divisions">
@@ -121,7 +123,9 @@ export function EditionDivisionTiles({
                 />
               </span>
               <span className="flex items-baseline justify-between gap-2 border-t border-black/10 px-3 py-2">
-                <span className="truncate text-[12.5px] font-semibold text-[#03002C]">{d.name}</span>
+                <span className="truncate text-[12.5px] font-semibold text-[#03002C]">
+                  {d.name}
+                </span>
                 {signageIssued ? (
                   <span className="shrink-0 font-mono text-[11px] text-[#03002C]/70">
                     {total} {total === 1 ? "asset" : "assets"}
@@ -154,13 +158,13 @@ export function EditionDivisionTiles({
               ]
                 .filter((x) => signageIssued || (x.k !== "Booths" && x.k !== "Room signage"))
                 .map(({ k, v, icon: Icon }) => (
-                <div key={k} className="rounded-md border border-black/10 p-3">
-                  <dt className="flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#03002C]/60">
-                    <Icon className="h-3.5 w-3.5" aria-hidden /> {k}
-                  </dt>
-                  <dd className="mt-1 text-xl font-semibold text-[#03002C]">{v}</dd>
-                </div>
-              ))}
+                  <div key={k} className="rounded-md border border-black/10 p-3">
+                    <dt className="flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#03002C]/60">
+                      <Icon className="h-3.5 w-3.5" aria-hidden /> {k}
+                    </dt>
+                    <dd className="mt-1 text-xl font-semibold text-[#03002C]">{v}</dd>
+                  </div>
+                ))}
             </dl>
             {!signageIssued ? (
               <p className="mt-3 text-[13px] text-[#03002C]/70">

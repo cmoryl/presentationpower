@@ -141,9 +141,8 @@ function AssetsPage() {
       </Link>
       <h1 className="mt-3 text-3xl font-semibold tracking-tight">Master templates</h1>
       <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-        Every division master design for NEXT 2026. Search first, then narrow by division or
-        format family. For on-site assets for a specific city, open that edition from the NEXT
-        page.
+        Every division master design for NEXT 2026. Search first, then narrow by division or format
+        family. For on-site assets for a specific city, open that edition from the NEXT page.
       </p>
 
       <div className="relative mt-6">
@@ -191,7 +190,11 @@ function AssetsPage() {
             All formats
           </FilterChip>
           {NEXT_FORMAT_GROUPS.map((g) => (
-            <FilterChip key={g.id} active={group === g.id} onClick={() => setFilter({ group: g.id })}>
+            <FilterChip
+              key={g.id}
+              active={group === g.id}
+              onClick={() => setFilter({ group: g.id })}
+            >
               {g.label}
             </FilterChip>
           ))}
@@ -268,7 +271,10 @@ function AssetsPage() {
           ) : preview?.badgeSide ? (
             <div className="flex justify-center rounded-lg border border-border bg-[#03002C] p-4">
               <CityBadge
-                config={{ ...CITY_BADGE_DEFAULT, divisionId: cityBadgeDivision(preview.divisionId).id }}
+                config={{
+                  ...CITY_BADGE_DEFAULT,
+                  divisionId: cityBadgeDivision(preview.divisionId).id,
+                }}
                 side={preview.badgeSide}
                 ppi={72}
                 guides

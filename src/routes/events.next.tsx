@@ -191,7 +191,11 @@ function Hero({ division, total }: { division: NextDivision; total: number }) {
 
             <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-white sm:grid-cols-4">
               <Fact icon={CalendarDays} label="Dates" value={NEXT_EVENT.datesLabel} />
-              <Fact icon={MapPin} label="Venue" value={`${NEXT_EVENT.venue} · ${NEXT_EVENT.city}`} />
+              <Fact
+                icon={MapPin}
+                label="Venue"
+                value={`${NEXT_EVENT.venue} · ${NEXT_EVENT.city}`}
+              />
               <Fact icon={Globe2} label="Naming" value={NEXT_EVENT.namePattern} />
               <Fact icon={Sparkles} label="CTA" value={NEXT_EVENT.ctaLabel} />
             </dl>
@@ -253,7 +257,9 @@ function MasterDesignSystem({
               aria-pressed={active}
               onClick={() => onSelect(d.id)}
               className={`inline-flex items-center gap-2 rounded-md border px-3 py-2 text-[13px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                active ? "border-foreground bg-foreground text-background" : "border-border hover:bg-muted"
+                active
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border hover:bg-muted"
               }`}
             >
               <span aria-hidden className="h-3 w-1 rounded-sm" style={{ background: d.accent }} />
@@ -505,7 +511,8 @@ const NEXT_PATHWAYS: {
     id: "social",
     title: "Promote the event",
     who: "Campaign & social",
-    detail: "Paid + organic ads, content banners, email headers, advocacy squares and speaker cards.",
+    detail:
+      "Paid + organic ads, content banners, email headers, advocacy squares and speaker cards.",
     group: "asset-subsection",
     cta: "Open digital formats",
   },
@@ -521,7 +528,8 @@ const NEXT_PATHWAYS: {
     id: "signage",
     title: "Guide attendees on-site",
     who: "On-site signage",
-    detail: "G-series printable posters in US Letter and A4 for wayfinding, rooms and registration.",
+    detail:
+      "G-series printable posters in US Letter and A4 for wayfinding, rooms and registration.",
     group: "event-signage",
     cta: "Open signage set",
   },
@@ -563,7 +571,11 @@ function Pathways({ accent, divisionId }: { accent: string; divisionId: string }
             search={{ division: divisionId, group: p.group }}
             className={pathCard}
           >
-            <span aria-hidden className="absolute inset-x-0 top-0 h-1" style={{ background: accent }} />
+            <span
+              aria-hidden
+              className="absolute inset-x-0 top-0 h-1"
+              style={{ background: accent }}
+            />
             <h4 className="text-sm font-semibold">{p.title}</h4>
             <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               {p.who}
@@ -576,7 +588,11 @@ function Pathways({ accent, divisionId }: { accent: string; divisionId: string }
           </Link>
         ))}
         <Link to="/events/next/agendas" search={{ division: divisionId }} className={pathCard}>
-          <span aria-hidden className="absolute inset-x-0 top-0 h-1" style={{ background: accent }} />
+          <span
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-1"
+            style={{ background: accent }}
+          />
           <h4 className="text-sm font-semibold">Publish the schedule</h4>
           <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
             Agendas &amp; schedules
@@ -656,7 +672,6 @@ function DivisionDetail({ division, count }: { division: NextDivision; count: nu
     </div>
   );
 }
-
 
 /** London is produced on its own edition page; the hub only reports status. */
 function LondonStatus() {
