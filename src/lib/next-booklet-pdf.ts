@@ -23,6 +23,8 @@ import {
 } from "./next-booklet-cover-art";
 import {
   BOOKLET_ARTWORK_NOTE,
+  bookletMaster,
+  bookletNotesPages,
   bookletPageCount,
   type BookletConfig,
   type BookletImagePage,
