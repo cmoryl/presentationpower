@@ -94,7 +94,7 @@ Reference persona for every screen under `/events` (NEXT hub, city editions, div
 6. **Finished feel:** square corners, no overlapping labels, visible focus outline, and fits the screen on phone, tablet and desktop.
 
 ## Open gaps against this persona
-- Plan a new city: the city and venue carry forward only within one browser session, and the "Add a space" buttons are still rounded.
+- Plan a new city: resolved — draft details persist in this browser; areas panel buttons are square.
 - Editions jump/focus and measured contrast are not yet verified.
 - The London panel count shows 168, not 54 scenic panels; this needs a decision.
 - PPTX/Word flatten room gradients.

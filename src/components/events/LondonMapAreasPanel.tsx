@@ -71,7 +71,7 @@ export function LondonMapAreasPanel({
   const inkFor = (kind: MapAreaKind) => zoneStyleFor(kind, design).accent;
 
   return (
-    <div className="rounded-2xl border border-[#C9D5EA] bg-[#F5F8FD] p-4">
+    <div className="rounded-none border border-[#C9D5EA] bg-[#F5F8FD] p-4">
       <div className="flex items-baseline justify-between gap-3">
         <h3 className="text-[13.5px] font-semibold text-[#03002C]">
           Your areas on {plan.label.toLowerCase()}
@@ -89,7 +89,7 @@ export function LondonMapAreasPanel({
             key={k}
             type="button"
             onClick={() => onAdd(k)}
-            className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/20 bg-white px-2.5 py-1 text-[11.5px] font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
+            className="inline-flex items-center gap-1.5 rounded-none border border-[#03002C]/20 bg-white px-2.5 py-1 text-[11.5px] font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
           >
             <Plus className="h-3 w-3" />
             <KindMark kind={k} ink={inkFor(k)} />
@@ -105,7 +105,7 @@ export function LondonMapAreasPanel({
             return (
               <li
                 key={a.id}
-                className={`rounded-xl border bg-white p-2.5 ${
+                className={`rounded-none border bg-white p-2.5 ${
                   active ? "border-[#003FC7] ring-2 ring-[#003FC7]/15" : "border-[#03002C]/12"
                 }`}
               >
@@ -123,7 +123,7 @@ export function LondonMapAreasPanel({
                     onClick={() => onDuplicate(a)}
                     aria-label={`Duplicate ${a.label}`}
                     title="Duplicate"
-                    className="rounded-md border border-[#03002C]/15 p-1 text-[#03002C]/70 hover:bg-[#F2F2F2]"
+                    className="rounded-none border border-[#03002C]/15 p-1 text-[#03002C]/70 hover:bg-[#F2F2F2]"
                   >
                     <Copy className="h-3.5 w-3.5" />
                   </button>
@@ -132,7 +132,7 @@ export function LondonMapAreasPanel({
                     onClick={() => onRemove(a.id)}
                     aria-label={`Delete ${a.label}`}
                     title="Delete"
-                    className="rounded-md border border-[#03002C]/15 p-1 text-[#C4306E] hover:bg-[#FDECF3]"
+                    className="rounded-none border border-[#03002C]/15 p-1 text-[#C4306E] hover:bg-[#FDECF3]"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
