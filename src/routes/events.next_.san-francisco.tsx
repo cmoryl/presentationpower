@@ -8,7 +8,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, CalendarDays, CircleDashed, Hotel, MapPin } from "lucide-react";
 
+import { useState } from "react";
+
 import { AppShell } from "@/components/AppShell";
+import { EditionDivisionTiles } from "@/components/events/EditionDivisionTiles";
 import { SF_READY, SF_VENUE, SF_WAITING, sfLocationStack } from "@/lib/next-sf-event";
 
 export const Route = createFileRoute("/events/next_/san-francisco")({
@@ -47,6 +50,7 @@ const pill =
 
 function SanFranciscoPage() {
   const [locationLine, venueLine] = sfLocationStack();
+  const [divisionFocus, setDivisionFocus] = useState<string | null>(null);
 
   return (
     <AppShell>
@@ -93,6 +97,17 @@ function SanFranciscoPage() {
             capacity is stated anywhere until one is sent.
           </p>
         </header>
+
+        {/* No SF sign schedule or programme has been issued: booth/signage/agenda
+            counts stay 0; only the reusable division collateral kit counts. */}
+        <EditionDivisionTiles
+          editionLabel="San Francisco 2026"
+          countsFor={() => ({ booths: 0, signage: 0 })}
+          hasProgramme={false}
+          selected={divisionFocus}
+          onSelect={setDivisionFocus}
+        />
+
 
         {/* Ready to use now. */}
         <section className="mt-10" aria-labelledby="sf-ready">
