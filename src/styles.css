@@ -1407,3 +1407,23 @@ body.export-mode [data-print-surface] {
     filter: none;
   }
 }
+
+/* Deck editor chrome: 44px square-cornered controls and readable labels.
+   Slide content ([data-slide-stage]) keeps its own authored typography. */
+.deck-editor-ui :is(button, summary, select, a[href].inline-flex):not([data-slide-stage] *) {
+  min-height: 44px;
+}
+.deck-editor-ui :is(button, summary, select, input, a[href]).rounded-full:not([data-slide-stage] *),
+.deck-editor-ui :is(button, summary, select, input, a[href]) .rounded-full:not([data-slide-stage] *):not(:empty) {
+  border-radius: 6px;
+}
+.deck-editor-ui .uppercase:not([data-slide-stage] *) {
+  text-transform: none;
+  letter-spacing: normal;
+}
+.deck-editor-ui :is(.text-\[9px\], .text-\[10px\]):not([data-slide-stage] *) {
+  font-size: 12px;
+}
+.deck-editor-ui :is(.text-black\/30, .text-black\/40, .text-black\/45, .text-black\/50):not([data-slide-stage] *) {
+  color: rgb(0 0 0 / 0.66);
+}
