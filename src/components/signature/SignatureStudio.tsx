@@ -614,7 +614,7 @@ export function SignatureStudio() {
               </div>
             ))}
             <p className="text-xs text-muted-foreground">
-              {signatureTemplates.length} layouts, all rendered in the approved palette and face —
+              Every layout is rendered in the approved palette and face —
               the layout is the choice, the brand is not.{" "}
               <Badge variant="secondary">{CATEGORY_LABEL[
                 getTemplateById(draft.templateId)?.category ?? "corporate"

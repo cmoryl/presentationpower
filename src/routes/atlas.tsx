@@ -395,7 +395,6 @@ function PrintSegment({ ink }: { ink: string }) {
                   <h3 className="text-lg font-semibold" style={{ color: NAVY }}>
                     {meta?.label ?? family}
                   </h3>
-                  <span className="text-xs text-black/45">{modules.length} modules</span>
                 </div>
                 {meta?.desc && <p className="mt-1 max-w-2xl text-sm text-black/55">{meta.desc}</p>}
                 <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">

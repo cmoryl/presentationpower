@@ -281,7 +281,7 @@ function AboutPage() {
       title: "Modular decks from a governed library.",
       body: "Assemble picks module variants across section frameworks — Opening, Context, Solution, Process, Proof, Decision, Close — and each variant declares which layouts, tokens, and icons it permits.",
       bullets: [
-        `${MODULE_VARIANTS.length} variants across ${SECTION_FRAMEWORKS.length} sections`,
+        "Variants mapped to every section",
         "Layout & token constraints enforced at render",
         "Multi-select → new deck from the library",
       ],

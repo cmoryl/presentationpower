@@ -273,7 +273,7 @@ export function SkinCatalogPicker({
               }`}
             >
               <Layers size={12} />
-              {showAll ? "Show recommended six" : `View all ${catalog.length} looks`}
+              {showAll ? "Show recommended six" : "View all looks"}
               <ChevronDown size={12} className={showAll ? "rotate-180 transition" : "transition"} />
             </button>
             {selected && (

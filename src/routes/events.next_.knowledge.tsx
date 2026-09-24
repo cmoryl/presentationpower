@@ -247,12 +247,9 @@ function KnowledgePage() {
           </p>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat value={`${totals.records}`} label="Things the build has learned" />
-          <Stat value={`${totals.embedded}`} label="Searchable right now" />
-          <Stat value={`${pending}`} label="Captured, waiting to be indexed" />
-          <Stat value={`${totals.cities}`} label="Venues contributing" />
-        </div>
+        {pending > 0 && (
+          <p className="mt-6 text-sm text-black/70">{pending} captured item{pending === 1 ? "" : "s"} waiting to be indexed.</p>
+        )}
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <Button

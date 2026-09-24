@@ -167,8 +167,7 @@ function AlongsideView() {
             Design controls
           </div>
           <h2 className="text-2xl font-semibold tracking-tight text-[#03002C]">
-            Sixteen frames, {LEGAL_ALONGSIDE_TEMPLATES.length} layouts,{" "}
-            {LEGAL_ALONGSIDE_SIZES.length} sizing formats
+            Frames, layouts and sizing formats
           </h2>
           <p className="max-w-2xl text-sm text-black/60">
             Set the look for the whole set with the three choices below. Any single card can be

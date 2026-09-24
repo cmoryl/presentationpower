@@ -200,7 +200,7 @@ export function StudioPalette({
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder={`Search all ${MODULE_VARIANTS.length} modules…`}
+              placeholder={"Search modules…"}
               className="w-full rounded-lg border border-black/15 bg-white px-3 py-1.5 text-sm outline-none focus:border-[#003FC7] dark:border-white/15 dark:bg-white/[0.06]"
             />
             <select
