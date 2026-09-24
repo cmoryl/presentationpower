@@ -279,6 +279,14 @@ export function LivePillars({ division }: { division: NextDivision }) {
     return { config };
   }, [savedAgenda, division.id, face]);
 
+  // Fit the board to the same preview height a pillar sign gets (pillars render
+  // at 0.1 px/mm), so the agenda card reads as a peer, not a footnote.
+  const pillarPreviewPx = Math.max(...cards.map((c) => c.config.trimH * 0.1));
+  const agendaPxPerMm = Math.min(
+    pillarPreviewPx / agendaCard.config.trimH,
+    220 / agendaCard.config.trimW,
+  );
+
   return (
     <section className="mt-4 scroll-mt-24" aria-labelledby="next-live-pillars">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
@@ -353,37 +361,35 @@ export function LivePillars({ division }: { division: NextDivision }) {
             </Link>
           </article>
         ))}
-      </div>
-
-      {/* Division agenda board — always listed, saved live file or the editable
-          division default, so every division shows an agenda preview card. */}
-      <article className="mt-4 flex flex-col gap-4 rounded-2xl border border-border p-4 sm:flex-row sm:items-center">
-        <div className="flex justify-center overflow-hidden rounded-xl bg-muted/40 p-2">
-          <AgendaSheet config={agendaCard.config} pxPerMm={0.22} />
-        </div>
-        <div className="min-w-0">
-          <h3 className="text-sm font-semibold tracking-tight">
-            {savedAgenda ? "Live agenda board" : "Agenda board master"} · {division.name}
+        {/* Division agenda board — always listed, saved live file or the editable
+            division default. It sits in the same grid as the pillar masters and is
+            previewed at the same on-screen height as a pillar sign. */}
+        <article className="group overflow-hidden rounded-2xl border border-border p-3 transition hover:-translate-y-0.5 hover:shadow-md">
+          <div className="flex justify-center overflow-hidden rounded-xl bg-muted/40 p-2">
+            <AgendaSheet config={agendaCard.config} pxPerMm={agendaPxPerMm} />
+          </div>
+          <h3 className="mt-3 text-sm font-semibold tracking-tight">
+            {savedAgenda ? "Live agenda board" : "Agenda board master"}
           </h3>
-          <p className="mt-1 truncate text-xs text-muted-foreground">
-            {savedAgenda
-              ? `${savedAgenda.name} · updated ${new Date(savedAgenda.updated_at).toLocaleString()}`
-              : `${agendaCard.config.trimW}×${agendaCard.config.trimH} mm · ${agendaCard.config.face} face · editable default`}
-          </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Multi-day, multi-page programmes · layered PDF/X-4, Illustrator and editable Word
-            export.
+            {agendaCard.config.trimW}×{agendaCard.config.trimH} mm · {agendaCard.config.face} face ·{" "}
+            {savedAgenda ? "saved live file" : "editable default"}
           </p>
+          {savedAgenda && (
+            <p className="mt-0.5 truncate text-[11px] text-primary/80">
+              {savedAgenda.name} · updated {new Date(savedAgenda.updated_at).toLocaleString()}
+            </p>
+          )}
           <Link
             to="/events/next/agendas"
             search={{ division: division.id, file: savedAgenda?.id }}
             className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
           >
             {savedAgenda ? "Edit this agenda" : "Create this agenda"}
-            <ArrowRight size={12} />
+            <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
           </Link>
-        </div>
-      </article>
+        </article>
+      </div>
     </section>
   );
 }
