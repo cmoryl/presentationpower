@@ -57,6 +57,7 @@ import {
 } from "@/lib/next-london-scenes";
 
 import { LondonAgendaBoards } from "@/components/events/LondonAgendaBoards";
+import { NEXT_DIVISIONS } from "@/lib/next-event";
 import { LondonGradientGrounds } from "@/components/events/LondonGradientGrounds";
 import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor";
 import {
