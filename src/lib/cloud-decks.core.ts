@@ -300,10 +300,12 @@ export async function saveDeckToCloudCore(
   }
 
   {
-    const rows = data.deck.slides.map((s) => ({
+    const rows = [...data.deck.slides]
+      .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+      .map((s, i) => ({
       id: toUuid(`slide:${userId}:${data.deck.id}:${s.id}`),
       deck_id: deckUuid,
-      position: s.position,
+      position: i,
       section_id: s.sectionId,
       variant_id: s.variantId,
       layout_id: s.layoutId,
