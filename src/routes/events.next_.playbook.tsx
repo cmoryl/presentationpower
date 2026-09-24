@@ -134,7 +134,7 @@ function PlaybookPage() {
 
         <div className="mt-3">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E0E8F5] px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
-            <Layers size={12} /> Venue playbook
+            <Layers size={12} /> Signage &amp; hardware playbook
           </div>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#03002C]">
             What the NEXT ecosystem carries forward

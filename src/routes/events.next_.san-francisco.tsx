@@ -40,7 +40,10 @@ export const Route = createFileRoute("/events/next_/san-francisco")({
           "October 27–28, 2026, InterContinental San Francisco. Partner kiosk artwork, badge and pillar families, and an honest list of what has not been issued yet.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://transperfectelement.lovable.app/events/next/san-francisco" },
+      {
+        property: "og:url",
+        content: "https://transperfectelement.lovable.app/events/next/san-francisco",
+      },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -94,7 +97,8 @@ const GATES: { id: string; gate: Gate; title: string; detail: string; anchor?: s
     id: "kiosks",
     gate: "ready",
     title: "Partner kiosk templates",
-    detail: "45 × 96 in front face with monitor keep-clear and both 4 × 96 in returns. .ai, print .pdf and .svg downloads.",
+    detail:
+      "45 × 96 in front face with monitor keep-clear and both 4 × 96 in returns. .ai, print .pdf and .svg downloads.",
     anchor: "#sf-kiosks",
   },
   {
@@ -175,7 +179,10 @@ function SanFranciscoPage() {
           </h2>
           <ul className="mt-4 divide-y divide-[#03002C]/10 border-y border-[#03002C]/10">
             {GATES.map((g) => (
-              <li key={g.id} className="grid gap-2 py-4 sm:grid-cols-[200px_1fr_auto] sm:items-center">
+              <li
+                key={g.id}
+                className="grid gap-2 py-4 sm:grid-cols-[200px_1fr_auto] sm:items-center"
+              >
                 <GateBadge gate={g.gate} />
                 <div>
                   <p className="text-[15px] font-semibold text-[#03002C]">{g.title}</p>

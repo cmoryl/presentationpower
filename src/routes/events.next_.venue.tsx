@@ -205,7 +205,7 @@ function NextVenuePage() {
         </Link>
 
         <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[#03002C] sm:text-4xl">
-          Next venue — provisional plans
+          Provisional venue intake
         </h1>
         <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-[#03002C]/75">
           The same plan sheets, sectioning tools and signage schedule as the London build, on a
@@ -220,7 +220,7 @@ function NextVenuePage() {
         <p className="mt-3 max-w-3xl text-[13px] leading-relaxed text-[#03002C]/70">
           This is a study on a stand-in layout. When the real venue is contracted, set it up on{" "}
           <Link to="/events/next/venues" className="font-semibold underline">
-            Venue plans
+            Floor plan standards
           </Link>{" "}
           — that record is what every sheet, sign schedule and saved position reads from.
         </p>

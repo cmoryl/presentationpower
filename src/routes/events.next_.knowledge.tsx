@@ -228,7 +228,7 @@ function KnowledgePage() {
             to="/events/next/playbook"
             className="inline-flex items-center gap-1.5 text-xs font-medium text-[#003FC7] hover:underline"
           >
-            <BookOpen size={13} /> Venue playbook
+            <BookOpen size={13} /> Signage &amp; hardware playbook
           </Link>
         </div>
 

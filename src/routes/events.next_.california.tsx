@@ -68,9 +68,7 @@ function CaliforniaKiosksPage() {
           </Link>
         </div>
 
-        <h1 className="mt-4 text-3xl font-semibold text-[#03002C]">
-          California partner kiosks
-        </h1>
+        <h1 className="mt-4 text-3xl font-semibold text-[#03002C]">California partner kiosks</h1>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[#03002C]/70">
           Every partner stand re-laid on the supplied kiosk template: a{" "}
           <strong>45 × 96 in front face</strong> with the monitor keep-clear, plus both{" "}
@@ -90,8 +88,8 @@ function CaliforniaKiosksPage() {
             </span>
           </div>
           <p className="mt-3 text-sm leading-relaxed text-[#03002C]/70">
-            <strong>Why these are rebuilt, not stretched.</strong> The London walls are
-            1830 × 2440 mm. Scaled to fill the kiosk front they lose{" "}
+            <strong>Why these are rebuilt, not stretched.</strong> The London walls are 1830 × 2440
+            mm. Scaled to fill the kiosk front they lose{" "}
             <strong>{crop.lostWidthPct}% of their width</strong>, which cuts through the lockup and
             the headline on every stand. So each kiosk is built from the partner&rsquo;s own
             template — brand ground, headline, subhead, body, lockup and code laid out from the
@@ -109,7 +107,6 @@ function CaliforniaKiosksPage() {
             . No floor plan, room list or programme has been issued for the venue yet, so nothing on
             these boards states them.
           </p>
-
         </div>
 
         <div className="mt-6">

@@ -64,7 +64,10 @@ export function CaliforniaKioskBrowser() {
                 const meta = londonBoothPanelMeta(panel);
                 const isOpen = openId === panel.id;
                 return (
-                  <div key={panel.id} className="rounded-md border border-[#03002C]/10 bg-[#F7F8FB] p-3">
+                  <div
+                    key={panel.id}
+                    className="rounded-md border border-[#03002C]/10 bg-[#F7F8FB] p-3"
+                  >
                     <div className="flex items-start gap-3">
                       <LondonPanelThumb panel={panel} size={96} />
                       <div className="min-w-0">
