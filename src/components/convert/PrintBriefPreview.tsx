@@ -20,10 +20,12 @@ export type PrintBriefPreviewProps = {
   brandId: string;
   /** Display width in CSS px — the page renders at true trim and scales down. */
   displayWidth?: number;
+  /** Approved light template background (CSS) painted behind the page. */
+  ground?: string;
 };
 
 export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewProps>(
-  function PrintBriefPreview({ result, brandId, displayWidth = 420 }, ref) {
+  function PrintBriefPreview({ result, brandId, displayWidth = 420, ground }, ref) {
     const brand = BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0];
     const accent = brand.tokens.accent;
     const ink = "#03002C";
@@ -46,7 +48,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
     const pad = Math.round(Math.max(0.25, 0.6 * k) * CSS_DPI);
     const L = land ? { gridColumn: 1 } : {};
     const photo = content.media?.kind === "photo" ? content.media.url : null;
-    const groundToken = content.media?.kind === "token" ? content.media.token : "#FFFFFF";
+    const groundToken = content.media?.kind === "token" ? content.media.token : (ground ?? "#FFFFFF");
 
     // Module layout rebuilt natively: steps, before/after, table, matrix, figures.
     const pts = content.points ?? [];
