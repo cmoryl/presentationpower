@@ -10,6 +10,7 @@
 // where the payload actually carries a photograph.
 // -----------------------------------------------------------------------------
 
+import { AdaptIcon, iconFor } from "./AdaptIcon";
 import { Fragment, forwardRef, useCallback, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import type { AdaptResult } from "@/lib/cross-format-adapt";
 import { CSS_DPI } from "@/lib/print-proof-export";
@@ -353,10 +354,15 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
                   {banner && p.includes(" — ") ? (
                     <>
                       <span style={{ display: "block", fontWeight: 700, fontSize: "1.35em", lineHeight: 1.15, marginBottom: u(10) }}>
-                        {p.split(" — ")[0]}
+                        {iconFor(content.pointIcons, p) ? <AdaptIcon name={iconFor(content.pointIcons, p)!} label={p} size={u(40)} color={accent} /> : null}{p.split(" — ")[0]}
                       </span>
                       <span style={{ fontWeight: 400 }}>{p.split(" — ").slice(1).join(" — ")}</span>
                     </>
+                  ) : iconFor(content.pointIcons, p) ? (
+                    <span style={{ display: "flex", gap: u(10), alignItems: "flex-start" }}>
+                      <AdaptIcon name={iconFor(content.pointIcons, p)!} label={p} size={Math.round(t.pointPx * bb * 1.3)} color={accent} />
+                      <span>{p}</span>
+                    </span>
                   ) : (
                     p
                   )}

@@ -1,3 +1,4 @@
+import { AdaptIcon, iconFor } from "./AdaptIcon";
 // -----------------------------------------------------------------------------
 // SocialModuleGrid — "Rebuilt for this size" for social cards when the module
 // carries a set of cells (bento, cards, pillars, figures…).
@@ -117,6 +118,7 @@ export type SocialModuleGridProps = {
   ground?: ConvertGround;
   chart?: AdaptChart;
   images?: AdaptImage[];
+  pointIcons?: Record<string, string>;
 };
 
 export function SocialModuleGrid({
@@ -130,6 +132,7 @@ export function SocialModuleGrid({
   ground = CONVERT_GROUNDS[0],
   chart,
   images = [],
+  pointIcons,
 }: SocialModuleGridProps) {
   const brand = BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0];
   const W = format.width;
@@ -251,6 +254,10 @@ export function SocialModuleGrid({
                       </>
                     ) : (
                       <>
+                        {(() => {
+                          const ic = iconFor(pointIcons, points[i]);
+                          return ic ? <AdaptIcon name={ic} label={t.title} size={Math.round((anchor ? 56 : 40) * f)} color={solid || dark ? "#FFFFFF" : BLUE} /> : null;
+                        })()}
                         <div style={{ fontSize: `calc(${anchor ? 38 : 26}px * ${f} * var(--fit, 1))`, fontWeight: 700, lineHeight: 1.15 }}>{t.title}</div>
                         {t.body ? (
                           <div style={{ fontSize: `calc(${anchor ? 22 : 18}px * ${f} * var(--fit, 1))`, lineHeight: 1.4, opacity: 0.85 }}>{t.body}</div>
