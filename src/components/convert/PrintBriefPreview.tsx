@@ -320,7 +320,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
               <AdaptChartBlock
                 chart={content.chart}
                 width={(land ? (pageW - pad * 2) * 0.5 : pageW - pad * 2)}
-                height={Math.round(pageH * (banner ? 0.2 : land ? 0.38 : content.points?.length ? 0.22 : 0.32))}
+                height={Math.round(pageH * (content.chart.kind === "kpi" && !content.points?.length ? (banner ? 0.42 : land ? 0.5 : 0.42) : banner ? 0.2 : land ? 0.38 : content.points?.length ? 0.22 : 0.32))}
                 fontPx={Math.max(8, t.pointPx * 0.85)}
               />
             </div>
@@ -372,7 +372,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
           ) : null}
 
           {/* A figures layout already shows the key figure — don't print it twice. */}
-          {content.stat && !(shapedBlock && shape?.kind === "stats" && pts.some((p) => p.startsWith(`${content.stat!.value} `))) ? (
+          {content.stat && content.chart?.kind !== "kpi" && !(shapedBlock && shape?.kind === "stats" && pts.some((p) => p.startsWith(`${content.stat!.value} `))) ? (
             <div style={{ marginTop: banner ? 0 : big ? u(24) : "auto", ...(banner ? { flexDirection: "column" as const, alignItems: "flex-start" as const, borderTop: `${u(3)}px solid ${accent}`, paddingTop: u(24), ...(content.points?.length ? {} : { flex: 1, justifyContent: "center" as const }) } : {}), display: "flex", alignItems: banner ? "flex-start" : "baseline", gap: u(12), ...(land ? { gridColumn: 1 } : {}) }}>
               <span
                 style={{

@@ -279,6 +279,50 @@ export function AdaptChartBlock({
     ));
   }
 
+  if (chart.kind === "kpi" && chart.kpis?.length) {
+    const K = chart.kpis;
+    // Grid shape follows the space: pick columns giving tiles nearest 1.6:1.
+    let cols = 1, best = Infinity;
+    for (let c = 1; c <= Math.min(4, K.length); c++) {
+      const rows = Math.ceil(K.length / c);
+      const score = Math.abs(Math.log(width / c / (height / rows) / 1.6)) + (c * rows - K.length) * 0.15;
+      if (score < best) { best = score; cols = c; }
+    }
+    const rows = Math.ceil(K.length / cols);
+    const gap = fontPx * 0.6;
+    const tw = (width - gap * (cols - 1)) / cols;
+    const th = (height - gap * (rows - 1)) / rows;
+    const pad = Math.min(tw, th) * 0.1;
+    const longestK = Math.max(...K.map((k) => Math.min(20, k.label.length)), 1);
+    const lab = Math.max(fontPx * 0.6, Math.min(fontPx, th * 0.16, (tw - pad * 2) / (longestK * CHAR_W)));
+    return svg("kpi", (
+      <>
+        {K.map((k, i) => {
+          const x = (i % cols) * (tw + gap);
+          const y = Math.floor(i / cols) * (th + gap);
+          // Label on top, figure in the middle, change at the bottom — the
+          // figure takes whatever height is left so the three never collide.
+          const vs = Math.max(lab, Math.min((th - pad * 2 - lab * (k.delta ? 2.25 : 1.3)) / 1.2, (tw - pad * 2) / (Math.max(3, k.value.length) * 0.74), th * 0.4));
+          const up = k.trend === "up";
+          const tc = dark ? "#FFFFFF" : INK;
+          return (
+            <g key={i}>
+              <rect x={x} y={y} width={tw} height={th} fill={dark ? "rgba(255,255,255,0.08)" : "#EEF1F7"} />
+              <rect x={x} y={y} width={tw} height={Math.max(2, fontPx * 0.2)} fill={BLUE} />
+              <text x={x + pad} y={y + pad + lab * 0.95} fontSize={lab} fill={muted}>{fitText(k.label, tw - pad * 2, lab)}</text>
+              <text x={x + pad} y={y + pad + lab * 1.3 + vs * 0.95} fontSize={vs} fontWeight={700} fill={tc}>{k.value}</text>
+              {k.delta ? (
+                <text x={x + pad} y={y + th - pad} fontSize={lab} fontWeight={600} fill={tc}>
+                  {`${k.trend ? (up ? "▲ " : "▼ ") : ""}${fitText(k.delta, tw - pad * 2 - lab * 1.4, lab)}`}
+                </text>
+              ) : null}
+            </g>
+          );
+        })}
+      </>
+    ));
+  }
+
   if (chart.kind === "ring") {
     const n = d.length;
     const cell = Math.min(width / n, height - labelH);
