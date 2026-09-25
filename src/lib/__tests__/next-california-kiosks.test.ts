@@ -19,14 +19,26 @@ import {
   londonBoothScreenRect,
 } from "@/lib/next-london-signage";
 
+import { CALIFORNIA_KIOSK_FINALS } from "@/lib/next-california-kiosk-finals";
+
 describe("California TV kiosks", () => {
+  it("carries the 14 London finals, Trial Interactive stays native", () => {
+    expect(Object.keys(CALIFORNIA_KIOSK_FINALS)).toHaveLength(14);
+    expect(CALIFORNIA_KIOSK_FINALS["ti-tradebooth-a"]).toBeUndefined();
+  });
+
   it("re-lays every current partner booth as three kiosk faces", () => {
     expect(CALIFORNIA_KIOSKS).toHaveLength(LONDON_BOOTHS.length);
     expect(CALIFORNIA_KIOSK_PANELS).toHaveLength(LONDON_BOOTHS.length * 3);
     for (const kiosk of CALIFORNIA_KIOSKS) {
       expect(californiaKioskSourceBoothId(kiosk.id)).toBeTruthy();
-      // Native re-lay: no supplied raster ground on any face.
-      expect(kiosk.artboards.every((a) => a.previewUrl === null)).toBe(true);
+      // Partners with a London final carry the re-laid final on every face;
+      // the rest stay a native re-lay with no supplied ground.
+      const src = californiaKioskSourceBoothId(kiosk.id)!;
+      const hasFinal = src in CALIFORNIA_KIOSK_FINALS;
+      expect(kiosk.artboards.every((a) => (a.previewUrl !== null) === hasFinal)).toBe(true);
+      expect(kiosk.aiUrl !== null).toBe(hasFinal);
+      if (hasFinal) expect(kiosk.sourceFile).toMatch(/^rdraft-sf-kiosk-/);
     }
   });
 
