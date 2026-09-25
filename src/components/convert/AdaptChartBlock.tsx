@@ -41,7 +41,7 @@ export function AdaptChartBlock({
               <circle cx={cx} cy={cy} r={r} fill="none" stroke={track} strokeWidth={sw} />
               <circle cx={cx} cy={cy} r={r} fill="none" stroke={BLUE} strokeWidth={sw} strokeDasharray={`${(C * x.value) / 100} ${C}`} transform={`rotate(-90 ${cx} ${cy})`} />
               <text x={cx} y={cy + fontPx * 0.45} textAnchor="middle" fontSize={fontPx * 1.4} fontWeight={700} fill={ink}>{fmt(x.value)}</text>
-              <text x={cx} y={height - fontPx * 0.4} textAnchor="middle" fontSize={fontPx} fill={muted}>{x.label.slice(0, 22)}</text>
+              <text x={cx} y={height - fontPx * 0.4} textAnchor="middle" fontSize={lab} fill={muted}>{x.label.slice(0, 22)}</text>
             </g>
           );
         })}
@@ -74,6 +74,8 @@ export function AdaptChartBlock({
     );
   }
   const bw = step * 0.62;
+  const longest = Math.max(...d.map((x) => Math.min(10, x.label.length)), 1);
+  const lab = Math.min(fontPx, (step * 0.92) / (longest * 0.56));
   return (
     <svg data-adapt-chart="bar" width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Chart">
       <line x1={0} x2={width} y1={top + plotH} y2={top + plotH} stroke={track} strokeWidth={Math.max(1, fontPx * 0.08)} />
