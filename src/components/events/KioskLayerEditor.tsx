@@ -76,6 +76,8 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   const [err, setErr] = useState<string | null>(null);
   const [edits, setEdits] = useState<KioskEdits>({});
   const [history, setHistory] = useState<KioskEdits[]>([]);
+  const [future, setFuture] = useState<KioskEdits[]>([]);
+  const clip = useRef<NonNullable<Sel> | null>(null);
   const [sel, setSel] = useState<Sel>(null);
   /** Canvas height in px (zoom) and whether the canvas takes the full width. */
   const [zoom, setZoom] = useState(640);
@@ -135,7 +137,9 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   const ground = kioskGround(L, edits);
   const symId = `kart-${L.id}`;
 
-  const commit = (next: KioskEdits) => { setHistory((h) => [...h.slice(-49), edits]); setEdits(next); };
+  const commit = (next: KioskEdits) => { setHistory((h) => [...h.slice(-49), edits]); setFuture([]); setEdits(next); };
+  /** The layout with the user's duplicates, for lists and lookups. */
+  const LX = useMemo(() => withCopies(L, edits), [L, edits]);
   const patchBlock = (id: string, p: object, push = true) => {
     const next = { ...edits, blocks: { ...edits.blocks, [id]: { ...edits.blocks?.[id], ...p } } };
     push ? commit(next) : setEdits(next);
@@ -168,6 +172,8 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
       if (e.shiftKey) return;
     } else setPicked([]);
     setSel(s);
+    if ((edits.locked ?? []).includes(s.id)) return;
+    setFuture([]);
     (e.target as Element).setPointerCapture?.(e.pointerId);
     const p = toSvg(e);
     drag.current = { sel: s, x: p.x, y: p.y, start: edits };
@@ -241,7 +247,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
 
   /** Put the selection against the left margin, the centre line or the right margin. */
   const alignKiosk = (where: TextAlign, base: KioskEdits = edits) => {
-    if (!sel) return;
+    if (!sel || (base.locked ?? []).includes(sel.id)) return;
     let b0 = base;
     if (sel.kind === "text") b0 = { ...base, texts: { ...base.texts, [sel.id]: { ...base.texts?.[sel.id], align: where } } };
     const b = selBounds(sel, b0);
@@ -290,11 +296,100 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     push ? commit(next) : setEdits(next);
   };
 
+  // ---- everyday tools: redo, lock, duplicate, copy/paste, delete, stacking ----
+  const undo = () => {
+    if (!history.length) return;
+    setFuture((f) => [edits, ...f].slice(0, 50));
+    setEdits(history[history.length - 1]!); setHistory((h) => h.slice(0, -1));
+  };
+  const redo = () => {
+    if (!future.length) return;
+    setHistory((h) => [...h.slice(-49), edits]);
+    setEdits(future[0]!); setFuture((f) => f.slice(1));
+  };
+  const isLocked = (id: string) => (edits.locked ?? []).includes(id);
+  const toggleLock = (id: string) => {
+    const ids = sel?.kind === "part" ? partGroup(edits, id, L) : [id];
+    const on = isLocked(id);
+    commit({ ...edits, locked: on ? (edits.locked ?? []).filter((x) => !ids.includes(x)) : [...new Set([...(edits.locked ?? []), ...ids])] });
+  };
+  const newId = (p: string) => `${p}-c${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
+  const duplicate = (s: NonNullable<Sel> | null = sel) => {
+    if (!s || s.kind === "block") return;
+    const off = 72;
+    if (s.kind === "divider") {
+      const d = edits.dividers?.find((x) => x.id === s.id);
+      if (!d) return;
+      const id = newId("div");
+      commit({ ...edits, dividers: [...(edits.dividers ?? []), { ...d, id, x: d.x + off, y: d.y + off }] });
+      setSel({ kind: "divider", id }); return;
+    }
+    const root = (id: string) => edits.copies?.find((c) => c.id === id)?.of ?? id;
+    const ids = s.kind === "part" ? partGroup(edits, s.id, L) : [s.id];
+    const key = s.kind === "part" ? "parts" : "texts";
+    const map = { ...(edits[key] as Record<string, { dx?: number; dy?: number }> | undefined) };
+    const copies = [...(edits.copies ?? [])];
+    const made: string[] = [];
+    const topZ = Math.max(0, ...Object.values(edits.z ?? {})) + 1;
+    const z = { ...edits.z };
+    for (const id of ids) {
+      const nid = newId(root(id));
+      copies.push({ id: nid, of: root(id), kind: s.kind });
+      map[nid] = { ...map[id], dx: (map[id]?.dx ?? 0) + off, dy: (map[id]?.dy ?? 0) + off };
+      if (s.kind === "part") z[nid] = topZ;
+      made.push(nid);
+    }
+    const groups = made.length > 1 ? [...(edits.groups ?? defaultPartGroups(L)), made] : edits.groups;
+    commit({ ...edits, copies, [key]: map, z, ...(groups ? { groups } : {}) });
+    if (s.kind === "part") { setPicked(made); setSel({ kind: "part", id: made[0]! }); } else setSel({ kind: "text", id: made[0]! });
+  };
+  const removeSel = () => {
+    if (!sel || sel.kind === "block") return;
+    if (sel.kind === "divider") { commit({ ...edits, dividers: (edits.dividers ?? []).filter((d) => d.id !== sel.id) }); setSel(null); return; }
+    const ids = sel.kind === "part" ? partGroup(edits, sel.id, L) : [sel.id];
+    const key = sel.kind === "part" ? "parts" : "texts";
+    const map = { ...(edits[key] as Record<string, object> | undefined) };
+    // Copies are removed; London originals are hidden (Reset or the eye brings them back).
+    for (const id of ids) if (isCopy(id)) delete map[id]; else map[id] = { ...map[id], hidden: true };
+    commit({ ...edits, [key]: map, copies: (edits.copies ?? []).filter((c) => !ids.includes(c.id)), groups: edits.groups?.map((g) => g.filter((x) => !(ids.includes(x) && isCopy(x)))).filter((g) => g.length > 1) });
+    setSel(null); setPicked([]);
+  };
+  /** Stacking: objects within their piece, dividers among dividers. */
+  const arrange = (dir: "front" | "forward" | "backward" | "back") => {
+    if (!sel) return;
+    if (sel.kind === "divider") {
+      const arr = [...(edits.dividers ?? [])];
+      const i = arr.findIndex((d) => d.id === sel.id);
+      if (i < 0) return;
+      const [d] = arr.splice(i, 1);
+      const j = dir === "front" ? arr.length : dir === "back" ? 0 : Math.max(0, Math.min(arr.length, i + (dir === "forward" ? 1 : -1)));
+      arr.splice(j, 0, d!);
+      commit({ ...edits, dividers: arr }); return;
+    }
+    if (sel.kind !== "part") return;
+    const ids = partGroup(edits, sel.id, L);
+    const zs = Object.values(edits.z ?? {});
+    const cur = edits.z?.[sel.id] ?? 0;
+    const v = dir === "front" ? Math.max(0, ...zs) + 1 : dir === "back" ? Math.min(0, ...zs) - 1 : cur + (dir === "forward" ? 1 : -1);
+    commit({ ...edits, z: { ...edits.z, ...Object.fromEntries(ids.map((id) => [id, v])) } });
+  };
+
   const onKey = (e: React.KeyboardEvent) => {
-    if (!sel || (e.target as HTMLElement).closest("input,textarea,select")) return;
+    if ((e.target as HTMLElement).closest("input,textarea,select")) return;
+    const mod = e.metaKey || e.ctrlKey;
+    const k = e.key.toLowerCase();
+    if (mod && k === "z") { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+    if (mod && k === "y") { e.preventDefault(); redo(); return; }
+    if (mod && k === "v" && clip.current) { e.preventDefault(); duplicate(clip.current); return; }
+    if (!sel) return;
+    if (mod && k === "c") { clip.current = sel; setStatus("Copied — press Ctrl/⌘ V to paste."); return; }
+    if (mod && k === "d") { e.preventDefault(); duplicate(); return; }
+    if (e.key === "]") { e.preventDefault(); arrange(e.shiftKey ? "front" : "forward"); return; }
+    if (e.key === "[") { e.preventDefault(); arrange(e.shiftKey ? "back" : "backward"); return; }
     const step = e.shiftKey ? 36 : 3;
     const m: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
-    if (m[e.key]) { e.preventDefault(); commit(shift(sel, m[e.key]![0], m[e.key]![1])); }
+    if (m[e.key]) { e.preventDefault(); if (!isLocked(sel.id)) commit(shift(sel, m[e.key]![0], m[e.key]![1])); return; }
+    if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); removeSel(); return; }
     else if ((e.key === "Delete" || e.key === "Backspace") && sel.kind === "divider") {
       e.preventDefault(); commit({ ...edits, dividers: (edits.dividers ?? []).filter((d) => d.id !== sel.id) }); setSel(null);
     }
@@ -315,8 +410,25 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
 
   const B = KIOSK_BLEED;
   const selBlock = sel?.kind === "block" ? L.blocks.find((b) => b.id === sel.id) : null;
-  const selPart = sel?.kind === "part" ? L.blocks.flatMap((b) => b.parts ?? []).find((q) => q.id === sel.id) : null;
-  const selText = sel?.kind === "text" ? L.texts.find((t) => t.id === sel.id) : null;
+  const selPart = sel?.kind === "part" ? LX.blocks.flatMap((b) => b.parts ?? []).find((q) => q.id === sel.id) : null;
+  const selText = sel?.kind === "text" ? LX.texts.find((t) => t.id === sel.id) : null;
+  const isCopy = (id: string) => (edits.copies ?? []).some((c) => c.id === id);
+  /** Current opacity / rotation of the selection (text, object or divider). */
+  const selFx = (() => {
+    if (!sel || sel.kind === "block") return null;
+    if (sel.kind === "divider") { const d = edits.dividers?.find((x) => x.id === sel.id); return d ? { opacity: d.opacity ?? 1, rot: d.rot ?? 0 } : null; }
+    const e = (sel.kind === "text" ? edits.texts : edits.parts)?.[sel.id];
+    return { opacity: e?.opacity ?? 1, rot: e?.rot ?? 0 };
+  })();
+  const setFx = (p: { opacity?: number; rot?: number }, push = true) => {
+    if (!sel || sel.kind === "block") return;
+    if (sel.kind === "divider") return patchDivider(sel.id, p, push);
+    if (sel.kind === "text") return patchText(sel.id, p, push);
+    // Objects: apply to the whole group.
+    const ids = partGroup(edits, sel.id, L);
+    const next = { ...edits, parts: { ...edits.parts, ...Object.fromEntries(ids.map((id) => [id, { ...edits.parts?.[id], ...p }])) } };
+    push ? commit(next) : setEdits(next);
+  };
   const selPlaced = selText ? placed.flatMap((p) => p.texts).find((t) => t.id === selText.id) ?? null : null;
   const selDivider = sel?.kind === "divider" ? edits.dividers?.find((d) => d.id === sel.id) ?? null : null;
 
@@ -384,19 +496,23 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
               {placed.flatMap((p) => p.parts).filter((q) => !q.hidden).map((q) => {
                 const [, , vw, vh] = art.viewBox.split(/\s+/).map(Number);
                 const on = picked.includes(q.part.id) || (sel?.kind === "part" && sel.id === q.part.id);
+                const c = partCentre(q);
                 return (
-                  <g key={q.part.id} transform={`translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})`} onPointerDown={startDrag({ kind: "part", id: q.part.id })} className="cursor-move">
-                    <g clipPath={`url(#kc-${L.id}-${q.part.id})`}>
-                      <use href={`#${symId}`} x={-L.originX} y={-L.originY} width={vw} height={vh} />
+                  <g key={q.part.id} opacity={q.opacity < 1 ? q.opacity : undefined} transform={q.rot ? `rotate(${q.rot} ${c.x} ${c.y})` : undefined}>
+                    <g transform={`translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})`} onPointerDown={startDrag({ kind: "part", id: q.part.id })} className={isLocked(q.part.id) ? "cursor-default" : "cursor-move"}>
+                      <g clipPath={`url(#kc-${L.id}-${q.part.id})`}>
+                        <use href={`#${symId}`} x={-L.originX} y={-L.originY} width={vw} height={vh} />
+                      </g>
+                      <rect x={q.src.x0} y={q.src.y0} width={q.src.x1 - q.src.x0} height={q.src.y1 - q.src.y0} fill="transparent" stroke={on ? "#003FC7" : "none"} strokeWidth={10 / q.scale} strokeDasharray={`${30 / q.scale} ${15 / q.scale}`} />
                     </g>
-                    <rect x={q.src.x0} y={q.src.y0} width={q.src.x1 - q.src.x0} height={q.src.y1 - q.src.y0} fill="transparent" stroke={on ? "#003FC7" : "none"} strokeWidth={10 / q.scale} strokeDasharray={`${30 / q.scale} ${15 / q.scale}`} />
                   </g>
                 );
               })}
               {(edits.dividers ?? []).filter((d) => !d.hidden).map((d) => {
                 const on = sel?.kind === "divider" && sel.id === d.id;
                 return (
-                  <g key={d.id} onPointerDown={startDrag({ kind: "divider", id: d.id })} className="cursor-move">
+                  <g key={d.id} onPointerDown={startDrag({ kind: "divider", id: d.id })} className={isLocked(d.id) ? "cursor-default" : "cursor-move"}
+                    opacity={(d.opacity ?? 1) < 1 ? d.opacity : undefined} transform={d.rot ? `rotate(${d.rot} ${d.x + d.w / 2} ${d.y + d.h / 2})` : undefined}>
                     <rect x={d.x} y={d.y - 20} width={d.w} height={d.h + 40} fill="transparent" />
                     <rect x={d.x} y={d.y} width={d.w} height={d.h} rx={d.round ? d.h / 2 : 0} fill={d.color} />
                     {on ? <rect x={d.x - 8} y={d.y - 8} width={d.w + 16} height={d.h + 16} fill="none" stroke="#003FC7" strokeWidth={6} strokeDasharray="24 12" /> : null}
@@ -416,7 +532,9 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                     textLength={t.fixed ? t.kw : undefined}
                     lengthAdjust="spacing"
                     xmlSpace="preserve"
-                    className="cursor-move"
+                    opacity={t.opacity < 1 ? t.opacity : undefined}
+                    transform={t.rot ? `rotate(${t.rot} ${t.ax} ${t.ky})` : undefined}
+                    className={isLocked(t.id) ? "cursor-default" : "cursor-move"}
                     stroke={on ? "#003FC7" : undefined}
                     strokeWidth={on ? 3 : undefined}
                     paintOrder="stroke"
@@ -518,7 +636,8 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
       {/* Inspector */}
       <div className="order-3 space-y-4">
         <div className="flex flex-wrap gap-2">
-          <button type="button" className={btn} disabled={!history.length} onClick={() => { setEdits(history[history.length - 1]!); setHistory((h) => h.slice(0, -1)); }}><Undo2 className="h-3.5 w-3.5" />Undo</button>
+          <button type="button" className={btn} disabled={!history.length} onClick={undo} title="Undo (Ctrl/⌘ Z)"><Undo2 className="h-3.5 w-3.5" />Undo</button>
+          <button type="button" className={btn} disabled={!future.length} onClick={redo} title="Redo (Ctrl/⌘ Shift Z)"><Redo2 className="h-3.5 w-3.5" />Redo</button>
           <button type="button" className={btn} onClick={() => commit({})}><RotateCcw className="h-3.5 w-3.5" />Reset to London</button>
           <button type="button" className={btn} disabled={!userId || busy === "save"} onClick={save} title={userId ? undefined : "Sign in to save"}><Save className="h-3.5 w-3.5" />Save</button>
         </div>
