@@ -4,7 +4,7 @@
 // kiosk. The TV keep-clear is drawn as a guide only (never exported).
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, Eye, EyeOff, RotateCcw, Save, Undo2 } from "lucide-react";
+import { Download, Eye, EyeOff, Maximize2, Minimize2, Minus, Plus, RotateCcw, Save, Undo2 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useSessionUser } from "@/hooks/use-session-user";
