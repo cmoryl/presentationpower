@@ -9,7 +9,7 @@
 // Every file is named rdraft- until the San Francisco revision is published.
 
 import JSZip from "jszip";
-import { PDFDocument, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, PDFName, PDFOperator, PDFOperatorNames } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 
 import {
@@ -104,10 +104,22 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
 
   // Background: the partner's ramp in fine vector steps.
   const g = kioskGround(L, edits);
-  const steps = 240;
-  for (let i = 0; i < steps; i++) {
-    const [r, gg, b] = groundAt(g, (i + 0.5) / steps);
-    page.drawRectangle({ x: 0, y: H - ((i + 1) * H) / steps, width: W, height: H / steps + 0.5, color: rgb(r, gg, b) });
+  // One live axial shading (Type 2, DeviceRGB) — no stepped bands, no seams.
+  {
+    const hex = (c: string) => [1, 3, 5].map((k) => parseInt(c.slice(k, k + 2), 16) / 255);
+    const ctx = doc.context;
+    const fns = g.slice(0, -1).map((a, k) => ctx.obj({ FunctionType: 2, Domain: [0, 1], C0: hex(a.color), C1: hex(g[k + 1]!.color), N: 1 }));
+    const fn = fns.length === 1 ? fns[0]! : ctx.obj({
+      FunctionType: 3,
+      Domain: [0, 1],
+      Functions: fns,
+      Bounds: g.slice(1, -1).map((x) => x.offset),
+      Encode: fns.flatMap(() => [0, 1]),
+    });
+    const sh = ctx.register(ctx.obj({ ShadingType: 2, ColorSpace: "DeviceRGB", Coords: [0, H, 0, 0], Function: fn, Extend: [true, true] }));
+    const res = page.node.Resources()!;
+    res.set(PDFName.of("Shading"), ctx.obj({ KGround: sh }));
+    page.pushOperators(pushGraphicsState(), rectangle(0, 0, W, H), clip(), endPath(), PDFOperator.of("sh" as PDFOperatorNames, [PDFName.of("KGround")]), popGraphicsState());
   }
 
   const src = await PDFDocument.load(await bytes(artUrl));
