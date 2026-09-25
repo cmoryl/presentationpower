@@ -22,7 +22,7 @@ import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { PrintBriefPreview } from "@/components/convert/PrintBriefPreview";
 import { ModuleAsDrawn } from "@/components/convert/ModuleAsDrawn";
-import { SocialModuleGrid, socialGridCapacity } from "@/components/convert/SocialModuleGrid";
+import { SocialModuleGrid, socialGridCapacity, CONVERT_GROUNDS, groundCss } from "@/components/convert/SocialModuleGrid";
 import {
   ADAPT_TARGETS,
   adaptContent,
@@ -236,6 +236,11 @@ function ConvertPage() {
   // Modules with a set of cells (bento, cards, figures) rebuild as a tile grid on social sizes.
   const gridPoints = (source.points ?? []).filter(Boolean);
   const socialGrid = gridPoints.length >= 3 && source.shape?.kind !== "table";
+  const [groundId, setGroundId] = useState(CONVERT_GROUNDS[0].id);
+  const ground = CONVERT_GROUNDS.find((g) => g.id === groundId) ?? CONVERT_GROUNDS[0];
+  const groundVariant = drawnSource?.variantId ?? "custom";
+  // Print pages keep ink text, so they take the light face of the chosen template.
+  const printGround = ground.scene ? groundCss({ ...ground, dark: false }, groundVariant) : undefined;
 
   const socialWrapRef = useRef<HTMLDivElement>(null);
   const printPageRef = useRef<HTMLDivElement>(null);
@@ -590,6 +595,23 @@ function ConvertPage() {
                 ))}
               </div>
             ) : null}
+            {!drawn ? (
+              <label className="ml-2 inline-flex items-center gap-2 text-[12px] font-semibold">
+                Background
+                <select
+                  value={groundId}
+                  onChange={(e) => setGroundId(e.target.value)}
+                  className="h-11 rounded-sm border border-[color:var(--color-border)] bg-[color:var(--color-background)] px-2 text-[12px] font-normal"
+                >
+                  {CONVERT_GROUNDS.map((g) => (
+                    <option key={g.id} value={g.id}>{g.label}</option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
+            {!drawn && ground.dark && !format ? (
+              <p className="text-[12px] text-[color:var(--color-muted-foreground)]">Print pages keep dark text, so they use the light version of this background.</p>
+            ) : null}
             {drawn ? (
               <p className="text-[12px] text-[color:var(--color-muted-foreground)]">
                 Shows the module exactly as it looks on a slide, scaled to fit. Your edits in "Info to carry across" don't apply here, and downloads are pictures (proofs), not editable text.
@@ -624,7 +646,7 @@ function ConvertPage() {
                             displayWidth={f ? Math.round(170 * Math.max(1, f.width / f.height)) : 200}
                           />
                         ) : f && socialGrid ? (
-                          <SocialModuleGrid format={f} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={170} />
+                          <SocialModuleGrid format={f} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={170} variantId={groundVariant} ground={ground} />
                         ) : f ? (
                           <SocialRenderer
                             format={f}
@@ -635,7 +657,7 @@ function ConvertPage() {
                             displayShortEdge={170}
                           />
                         ) : (
-                          <PrintBriefPreview result={r} brandId={brandId} displayWidth={200} />
+                          <PrintBriefPreview result={r} brandId={brandId} displayWidth={200} ground={printGround} />
                         )}
                       </div>
                       <span className="text-[12px] font-semibold">{t.label}</span>
@@ -677,7 +699,7 @@ function ConvertPage() {
                 )
               ) : format && socialGrid ? (
                 <div ref={socialWrapRef}>
-                  <SocialModuleGrid format={format} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={340} />
+                  <SocialModuleGrid format={format} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={340} variantId={groundVariant} ground={ground} />
                 </div>
               ) : format ? (
                 <div ref={socialWrapRef}>
@@ -693,7 +715,7 @@ function ConvertPage() {
                   />
                 </div>
               ) : (
-                <PrintBriefPreview ref={printPageRef} result={result} brandId={brandId} />
+                <PrintBriefPreview ref={printPageRef} result={result} brandId={brandId} ground={printGround} />
               )}
             </div>
 
