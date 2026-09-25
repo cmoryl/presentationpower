@@ -10,7 +10,7 @@
 // where the payload actually carries a photograph.
 // -----------------------------------------------------------------------------
 
-import { Fragment, forwardRef, type ReactNode } from "react";
+import { Fragment, forwardRef, useCallback, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import type { AdaptResult } from "@/lib/cross-format-adapt";
 import { CSS_DPI } from "@/lib/print-proof-export";
 import { BRAND_MODES } from "@/lib/taxonomy";
@@ -33,7 +33,51 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
     const pageW = Math.round(trim.width * CSS_DPI);
     const pageH = Math.round(trim.height * CSS_DPI);
     const scale = displayWidth / pageW;
-    const t = result.type;
+    // Auto-fit: every type size scales by one factor, measured so the copy
+    // fills the page height without overflowing (same idea as the social tiles).
+    const [fit, setFit] = useState(1);
+    const pageRef = useRef<HTMLDivElement | null>(null);
+    const iter = useRef(0);
+    const setRefs = useCallback(
+      (el: HTMLDivElement | null) => {
+        pageRef.current = el;
+        if (typeof ref === "function") ref(el);
+        else if (ref) ref.current = el;
+      },
+      [ref],
+    );
+    const fitKey = JSON.stringify([result.target.id, result.content, displayWidth]);
+    useLayoutEffect(() => {
+      iter.current = 0;
+      setFit(1);
+    }, [fitKey]);
+    useLayoutEffect(() => {
+      const el = pageRef.current;
+      if (!el || iter.current > 10) return;
+      iter.current += 1;
+      const prevH = el.style.height;
+      const autos = Array.from(el.children).filter((c) => (c as HTMLElement).style.marginTop === "auto") as HTMLElement[];
+      autos.forEach((c) => (c.style.marginTop = "0px"));
+      el.style.height = "auto";
+      let natural = el.scrollHeight;
+      const abs = Array.from(el.children).find((c) => (c as HTMLElement).style.position === "absolute") as HTMLElement | undefined;
+      if (abs) natural += abs.offsetHeight + 12;
+      el.style.height = prevH;
+      autos.forEach((c) => (c.style.marginTop = "auto"));
+      const ratio = (pageH * 0.96) / Math.max(1, natural);
+      if (Math.abs(ratio - 1) < 0.03 || (ratio > 1 && fit >= 4.5)) return;
+      const next = Math.min(4.5, Math.max(0.55, fit * Math.pow(ratio, ratio > 1 ? 0.7 : 1)));
+      if (Math.abs(next - fit) > 0.005) setFit(next);
+    });
+    const t0 = result.type;
+    const t = {
+      ...t0,
+      eyebrowPx: t0.eyebrowPx * Math.min(fit, 1.4),
+      headlinePx: t0.headlinePx * Math.min(fit, 2),
+      bodyPx: t0.bodyPx * fit,
+      pointPx: t0.pointPx * fit,
+      statPx: t0.statPx * Math.min(fit, 1.6),
+    };
     const { content } = result;
     const caseStudy = result.target.id === "case-study";
     const layout = result.target.layout ?? "sheet";
@@ -172,8 +216,9 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
         className="relative overflow-hidden"
       >
         <div
-          ref={ref}
+          ref={setRefs}
           data-print-brief-page="true"
+          data-fit={fit.toFixed(2)}
           style={{
             width: pageW,
             height: pageH,
