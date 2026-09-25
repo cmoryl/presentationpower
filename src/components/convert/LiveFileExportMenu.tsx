@@ -56,6 +56,10 @@ export function LiveFileExportMenu({ resolveTarget, title, className }: LiveFile
     const id = toast.loading("Building the PowerPoint file…");
     try {
       const { exportPrintPagesAsPptx } = await import("@/lib/print-pptx-export");
+      const { unscaleForCapture } = await import("@/lib/convert-press-export");
+      // The preview is shrunk to fit the screen; measure the page at true size.
+      const restore = unscaleForCapture(t.node);
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
       const slug = `${assetFileSlug(title, "page")}-${assetFileSlug(t.label, "print")}${fidelity === "flat" ? "-picture" : ""}`;
       await exportPrintPagesAsPptx(t.node, {
         custom: { widthIn: t.trimIn.width, heightIn: t.trimIn.height },
@@ -67,7 +71,7 @@ export function LiveFileExportMenu({ resolveTarget, title, className }: LiveFile
           const pct = Math.round(((p as { progress?: number }).progress ?? 0) * 100);
           toast.loading(`Building the PowerPoint file… ${pct}%`, { id });
         },
-      });
+      }).finally(restore);
       toast.success(
         fidelity === "editable"
           ? "PowerPoint saved — text, boxes and pictures are separate, editable objects."

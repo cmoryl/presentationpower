@@ -88,7 +88,7 @@ export function isPressTarget(target: AdaptTarget): boolean {
  * adaptor renders the page at true trim pixels and scales it down for display;
  * rasterizing the scaled node would bake the preview reduction into the plate.
  */
-function unscaleForCapture(node: HTMLElement): () => void {
+export function unscaleForCapture(node: HTMLElement): () => void {
   const saved: Array<{ el: HTMLElement; transform: string; origin: string; overflow: string }> = [
     {
       el: node,
