@@ -268,8 +268,14 @@ const EYEBROW_KEYS = ["eyebrow", "kicker", "label", "sectionLabel", "overline", 
 const BODY_KEYS = [
   "body", "summary", "subtitle", "copy", "subhead", "standfirst", "intro", "description",
   "narrative", "story", "message", "insight", "result", "solution", "challenge", "caption", "soWhat",
+  "rationale", "promise", "prompt", "statement", "definition", "nextSteps", "hub", "bodyLeft", "signoff", "usage",
 ];
-const POINT_KEYS = ["points", "bullets", "cardPoints", "items", "list", "highlights", "cardHighlights"];
+const POINT_KEYS = [
+  "points", "bullets", "cardPoints", "items", "list", "highlights", "cardHighlights",
+  // Module-specific list fields (process stages, capability cards, pillars, charts…).
+  "stages", "steps", "phases", "milestones", "cards", "above", "below", "segments", "pillars", "tiles", "rows", "options",
+  "benefits", "features", "outcomes", "quotes", "logos", "series", "bars",
+];
 const CTA_KEYS = ["cta", "ctaLabel", "action", "nextSteps", "followUp", "nowWhat"];
 const FOOTNOTE_KEYS = ["footnote", "source", "sourceNote", "disclaimer", "attribution", "reference"];
 const PHOTO_KEYS = ["imageUrl", "image", "photoUrl", "mediaUrl", "heroImage", "backgroundImage"];
@@ -320,6 +326,15 @@ function pick(content: Record<string, unknown>, keys: string[]): string | undefi
   return undefined;
 }
 
+/** First non-empty field that is not a repeat of `except` (the headline). */
+function pickOther(content: Record<string, unknown>, keys: string[], except: string): string | undefined {
+  for (const k of keys) {
+    const s = str(content[k]);
+    if (s && s !== except) return s;
+  }
+  return undefined;
+}
+
 function pickPoints(content: Record<string, unknown>): string[] | undefined {
   for (const k of POINT_KEYS) {
     const v = asList(content[k]);
@@ -335,8 +350,23 @@ function pickPoints(content: Record<string, unknown>): string[] | undefined {
           if (before || after) return [before, after].filter(Boolean).join(" → ");
           // Stat rows: "40% — label".
           const value = str(rec.value) ?? str(rec.stat) ?? str(rec.number) ?? str(rec.metric);
-          const head = str(rec.title) ?? str(rec.label) ?? str(rec.heading) ?? str(rec.name);
-          const tail = str(rec.body) ?? str(rec.text) ?? str(rec.copy) ?? str(rec.role) ?? str(rec.description);
+          const head =
+            str(rec.title) ?? str(rec.label) ?? str(rec.heading) ?? str(rec.name) ??
+            str(rec.criterion) ?? str(rec.risk) ?? str(rec.forum) ?? str(rec.client) ??
+            str(rec.lead) ?? str(rec.phase) ?? str(rec.quote) ?? str(rec.term) ?? str(rec.caption);
+          const listTail = Array.isArray(rec.values)
+            ? rec.values.map((x) => (typeof x === "number" ? String(x) : str(x))).filter(Boolean).join(" · ")
+            : Array.isArray(rec.bullets)
+              ? rec.bullets.map((x) => str(x)).filter(Boolean).slice(0, 3).join("; ")
+              : Array.isArray(rec.items)
+                ? (rec.items as unknown[])
+                    .map((x) => (typeof x === "string" ? str(x) : x && typeof x === "object" ? str((x as Record<string, unknown>).label) ?? str((x as Record<string, unknown>).title) : undefined))
+                    .filter(Boolean).slice(0, 3).join("; ")
+                : undefined;
+          const tail =
+            str(rec.body) ?? str(rec.text) ?? str(rec.copy) ?? str(rec.description) ??
+            str(rec.mitigation) ?? str(rec.purpose) ?? str(rec.touchpoint) ?? str(rec.result) ?? str(rec.leadNote) ??
+            str(rec.definition) ?? str(rec.attribution) ?? str(rec.role) ?? (listTail || undefined);
           const unit = str(rec.unit) ?? "";
           const figure = value ? (unit && !/^[%+x×]/.test(unit) ? `${value} ${unit}` : value + unit) : undefined;
           const lead = figure ? [figure, head].filter(Boolean).join(" ") : head;
@@ -347,6 +377,20 @@ function pickPoints(content: Record<string, unknown>): string[] | undefined {
       .filter((x): x is string => Boolean(x));
     if (out.length > 0) return out;
   }
+  // Paired objects (before / after) and quadrant matrices.
+  const side = (k: string) => {
+    const v = content[k];
+    if (typeof v === "string") return str(v);
+    if (v && typeof v === "object") {
+      const r = v as Record<string, unknown>;
+      return [str(r.title) ?? str(r.label), str(r.body) ?? str(r.text)].filter(Boolean).join(" — ") || undefined;
+    }
+    return undefined;
+  };
+  const pair = [["Before", side("before")], ["After", side("after")]].filter(([, v]) => v);
+  if (pair.length) return pair.map(([k, v]) => `${k}: ${v}`);
+  const quads = ["q1", "q2", "q3", "q4"].map((k) => str(content[k])).filter((x): x is string => !!x);
+  if (quads.length) return quads;
   return undefined;
 }
 
@@ -368,6 +412,14 @@ function pickStat(content: Record<string, unknown>): { value: string; label: str
     const rec = direct as Record<string, unknown>;
     const value = str(rec.value);
     if (value) return { value, label: str(rec.label) ?? "" };
+  }
+  for (const key of ["primary", "balance", "hero"]) {
+    const rec = content[key];
+    if (rec && typeof rec === "object" && !Array.isArray(rec)) {
+      const r = rec as Record<string, unknown>;
+      const value = typeof r.value === "number" ? String(r.value) : str(r.value);
+      if (value) return { value: `${value}${str(r.unit) ?? ""}`, label: str(r.label) ?? "" };
+    }
   }
   for (const key of ["stats", "items", "metrics", "kpis"]) {
     const stats = asList(content[key]);
@@ -455,14 +507,18 @@ export function contentFromSlide(
     [str(c.prepared) ? `Prepared by ${str(c.prepared)}` : undefined, str(c.date)]
       .filter(Boolean)
       .join(" · ") || undefined;
+  // Quote modules: the attribution line is the standfirst.
+  const quoteLine = str(c.quote)
+    ? [str(c.attribution), str(c.role), str(c.org)].filter(Boolean).join(", ") || undefined
+    : undefined;
   return {
     eyebrow: notHeadline(pick(c, EYEBROW_KEYS)),
     headline,
-    body: notHeadline(pick(c, BODY_KEYS)) ?? coverLine,
+    body: pickOther(c, BODY_KEYS, headline) ?? quoteLine ?? coverLine,
     points: pickPoints(c),
     stat,
     cta: pick(c, CTA_KEYS),
-    footnote: pick(c, FOOTNOTE_KEYS),
+    footnote: pickOther(c, quoteLine ? FOOTNOTE_KEYS.filter((k) => k !== "attribution") : FOOTNOTE_KEYS, headline),
     media: adaptMediaFrom(c),
   };
 }
@@ -525,6 +581,18 @@ export function adaptContent(content: AdaptContent, targetId: AdaptTargetId): Ad
       severity: "shortened",
       field: "headline",
       detail: `Headline shortened from ${content.headline.length} to ${headlineTrim.length} characters for ${target.label}.`,
+    });
+  }
+
+  // No body copy and no list block on this target: the points become the body
+  // so a list-only module still says something on a square card.
+  if (!content.body && content.points?.length && !target.structure.includes("points") && target.structure.includes("body")) {
+    content = { ...content, body: content.points.join(". ").replace(/\.\.+/g, ".") };
+    out.body = content.body;
+    notes.push({
+      severity: "shortened",
+      field: "points",
+      detail: `${target.label} has no list block, so the supporting points run as body copy.`,
     });
   }
 
