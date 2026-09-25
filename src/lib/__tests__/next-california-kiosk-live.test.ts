@@ -1,0 +1,50 @@
+import { describe, expect, it } from "vitest";
+
+import {
+  KIOSK_H,
+  KIOSK_LIVE_LAYOUTS,
+  KIOSK_TV,
+  KIOSK_W,
+  buildKioskFrontSvg,
+  layoutKiosk,
+} from "@/lib/next-california-kiosk-live";
+
+const ART = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5754 7483"><rect width="10" height="10"/></svg>';
+
+describe("California kiosks rebuilt from live files", () => {
+  const all = Object.values(KIOSK_LIVE_LAYOUTS);
+
+  it("has a layout with live text for every supplied booth", () => {
+    expect(all).toHaveLength(14);
+    for (const L of all) {
+      expect(L.blocks.length, L.id).toBeGreaterThan(0);
+      if (L.id !== "sterling-2-tradebooth-a") expect(L.texts.length, L.id).toBeGreaterThan(3);
+    }
+  });
+
+  it("keeps every piece inside the trim and out of the TV", () => {
+    for (const L of all) {
+      for (const p of layoutKiosk(L)) {
+        const top = p.y, bot = p.y + (p.clipBottom - p.clipTop) * p.scale;
+        expect(top, `${L.id} ${p.block.id}`).toBeGreaterThanOrEqual(-0.5);
+        expect(bot, `${L.id} ${p.block.id}`).toBeLessThanOrEqual(KIOSK_H + 0.5);
+        expect(p.x).toBeGreaterThanOrEqual(-0.5);
+        expect(p.x + L.trimW * p.scale).toBeLessThanOrEqual(KIOSK_W + 0.5);
+        const overlapsTv = top < KIOSK_TV.y + KIOSK_TV.h - 0.5 && bot > KIOSK_TV.y + 0.5;
+        expect(overlapsTv, `${L.id} ${p.block.id} crosses the TV`).toBe(false);
+      }
+    }
+  });
+
+  it("never stretches: one scale for width and height", () => {
+    for (const L of all) for (const p of layoutKiosk(L)) expect(p.scale).toBeLessThanOrEqual(KIOSK_W / L.trimW + 1e-9);
+  });
+
+  it("exports live text and named layers", () => {
+    const L = KIOSK_LIVE_LAYOUTS["media-tradebooth-a"]!;
+    const svg = buildKioskFrontSvg(L, ART, { texts: { t0: { text: "Edited headline" } } });
+    for (const id of ["Background", "Graphics", "Text", "Cut"]) expect(svg).toContain(`<g id="${id}"`);
+    expect(svg).toContain(">Edited headline</text>");
+    expect(svg).not.toContain("TV keep-clear");
+  });
+});

@@ -2812,6 +2812,27 @@ export type Database = {
         }
         Relationships: []
       }
+      kiosk_layer_edits: {
+        Row: {
+          booth_id: string
+          edits: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          booth_id: string
+          edits?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          booth_id?: string
+          edits?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       kit_qr_downloads: {
         Row: {
           created_at: string
