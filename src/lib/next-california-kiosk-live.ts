@@ -201,10 +201,11 @@ export function splitArtSvg(svg: string): { viewBox: string; inner: string } {
   const vb = open?.[0].match(/viewBox="([^"]+)"/)?.[1] ?? "0 0 100 100";
   const start = (open?.index ?? 0) + (open?.[0].length ?? 0);
   const end = svg.lastIndexOf("</svg>");
-  // The London "Cut" layer marks London's trim, not the kiosk's: keep it, hidden.
+  // Layer groups from the London file are relabelled so they do not read as
+  // the kiosk's own Cut layer in Illustrator.
   const inner = svg
     .slice(start, end > start ? end : undefined)
-    .replace(/inkscape:label="Cut"/g, 'inkscape:label="London cut (hidden)" display="none"');
+    .replace(/inkscape:label="([^"]*)"/g, 'inkscape:label="London $1"');
   return { viewBox: vb, inner };
 }
 
