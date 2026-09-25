@@ -317,6 +317,8 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   const selBlock = sel?.kind === "block" ? L.blocks.find((b) => b.id === sel.id) : null;
   const selPart = sel?.kind === "part" ? L.blocks.flatMap((b) => b.parts ?? []).find((q) => q.id === sel.id) : null;
   const selText = sel?.kind === "text" ? L.texts.find((t) => t.id === sel.id) : null;
+  const selPlaced = selText ? placed.flatMap((p) => p.texts).find((t) => t.id === selText.id) ?? null : null;
+  const selDivider = sel?.kind === "divider" ? edits.dividers?.find((d) => d.id === sel.id) ?? null : null;
 
   return (
     <div className={wide ? "grid gap-5" : "grid gap-5 lg:grid-cols-[minmax(0,300px)_1fr_minmax(0,280px)]"}>
@@ -334,7 +336,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
             {wide ? "Smaller view" : "Big view"}
           </button>
         </div>
-        <div className="max-h-[80vh] overflow-auto rounded-md border border-[#03002C]/12 bg-[#F2F4F9] p-3">
+        <div tabIndex={0} onKeyDown={onKey} aria-label="Kiosk canvas. Arrow keys nudge the selection." className="max-h-[80vh] overflow-auto rounded-md border border-[#03002C]/12 bg-[#F2F4F9] p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
           {err ? <p className="text-sm text-[#E53D2E]">{err}</p> : null}
           {!art && !err ? <p className="text-sm text-[#03002C]/70">Loading the partner's artwork…</p> : null}
           {art ? (
@@ -495,6 +497,22 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
             );
           })}
         </ul>
+        {edits.dividers?.length ? (
+          <>
+            <h4 className="mt-3 text-sm font-semibold text-[#03002C]">Accent dividers</h4>
+            <ul className="mt-1 space-y-1">
+              {edits.dividers.map((d, i) => (
+                <li key={d.id} className="flex items-center gap-1 rounded-md border border-[#03002C]/10 bg-white px-2 py-1">
+                  <span aria-hidden className="h-2 w-6 rounded-sm border border-[#03002C]/20" style={{ background: d.color }} />
+                  <button type="button" className={`flex-1 truncate text-left text-[12px] ${sel?.id === d.id ? "text-[#003FC7]" : "text-[#03002C]"}`} onClick={() => { setSel({ kind: "divider", id: d.id }); setPicked([]); }}>Divider {i + 1}</button>
+                  <button type="button" aria-label={d.hidden ? "Show divider" : "Hide divider"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchDivider(d.id, { hidden: !d.hidden })}>
+                    {d.hidden ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : null}
       </div>
 
       {/* Inspector */}
@@ -505,19 +523,58 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
           <button type="button" className={btn} disabled={!userId || busy === "save"} onClick={save} title={userId ? undefined : "Sign in to save"}><Save className="h-3.5 w-3.5" />Save</button>
         </div>
 
-        {selText ? (
-          <div className="space-y-2">
+        {sel ? (
+          <div className="space-y-1.5">
+            <h4 className="text-sm font-semibold text-[#03002C]">Align on kiosk</h4>
+            <div className="flex flex-wrap gap-1" role="group" aria-label="Align on kiosk">
+              <button type="button" className={ibtn} aria-label="Left margin" title="Left margin (2 in)" onClick={() => alignKiosk("left")}><AlignStartVertical className="h-4 w-4" /></button>
+              <button type="button" className={ibtn} aria-label="Centre of kiosk" title="Centre of kiosk" onClick={() => alignKiosk("center")}><AlignCenterVertical className="h-4 w-4" /></button>
+              <button type="button" className={ibtn} aria-label="Right margin" title="Right margin (2 in)" onClick={() => alignKiosk("right")}><AlignEndVertical className="h-4 w-4" /></button>
+            </div>
+            <p className="text-[11px] text-[#03002C]/65">Dragging snaps to the margins and centre line (hold Alt to move freely). Arrow keys nudge; Shift + arrow moves ½ in.</p>
+          </div>
+        ) : null}
+
+        {selText && selPlaced ? (
+          <div className="space-y-2.5">
             <h4 className="text-sm font-semibold text-[#03002C]">Text</h4>
-            <label className="block text-[12px] text-[#03002C]/80">Words
-              <textarea className="mt-1 w-full rounded-md border border-[#03002C]/15 p-2 text-[13px] text-[#03002C]" rows={2} value={edits.texts?.[selText.id]?.text ?? selText.text} onChange={(e) => patchText(selText.id, { text: e.target.value }, false)} onBlur={() => setHistory((h) => [...h, edits])} />
+            <label className="block text-[12px] text-[#03002C]/80">Words <span className="text-[#03002C]/60">(Enter starts a new line)</span>
+              <textarea className="mt-1 w-full rounded-md border border-[#03002C]/15 p-2 text-[13px] text-[#03002C]" rows={3} value={edits.texts?.[selText.id]?.text ?? selText.text} onChange={(e) => patchText(selText.id, { text: e.target.value }, false)} onBlur={() => setHistory((h) => [...h, edits])} />
             </label>
-            <label className="block text-[12px] text-[#03002C]/80">Size (London pt)
-              <input type="number" min={6} className="mt-1 w-full rounded-md border border-[#03002C]/15 p-1.5 text-[13px]" value={Math.round(edits.texts?.[selText.id]?.size ?? selText.size)} onChange={(e) => patchText(selText.id, { size: Number(e.target.value) || selText.size })} />
+            <div className="space-y-1">
+              <span className="text-[12px] text-[#03002C]/80">Line alignment</span>
+              <div className="flex gap-1" role="group" aria-label="Line alignment">
+                {([["left", AlignLeft, "Align lines left"], ["center", AlignCenter, "Centre lines"], ["right", AlignRight, "Align lines right"]] as const).map(([a, Icon, label]) => (
+                  <button key={a} type="button" className={ibtn} aria-label={label} title={label} aria-pressed={selPlaced.align === a} onClick={() => patchText(selText.id, { align: a })}><Icon className="h-4 w-4" /></button>
+                ))}
+              </div>
+            </div>
+            <label className="block text-[12px] text-[#03002C]/80">Size {Math.round(edits.texts?.[selText.id]?.size ?? selText.size)} pt
+              <div className="mt-1 flex items-center gap-2">
+                <input type="range" min={6} max={Math.max(400, Math.round(selText.size * 3))} className="flex-1" value={Math.round(edits.texts?.[selText.id]?.size ?? selText.size)} onChange={(e) => patchText(selText.id, { size: Number(e.target.value) }, false)} />
+                <input type="number" min={6} aria-label="Size in points" className="w-16 rounded-md border border-[#03002C]/15 p-1 text-[13px]" value={Math.round(edits.texts?.[selText.id]?.size ?? selText.size)} onChange={(e) => patchText(selText.id, { size: Number(e.target.value) || selText.size })} />
+              </div>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className={btn} onClick={() => {
+                const b = selBounds({ kind: "text", id: selText.id });
+                if (!b) return;
+                const cur = edits.texts?.[selText.id]?.size ?? selText.size;
+                const size = Math.max(6, Math.floor(cur * ((KIOSK_W - 2 * KIOSK_MARGIN) / Math.max(1, b.x1 - b.x0))));
+                alignKiosk("center", { ...edits, texts: { ...edits.texts, [selText.id]: { ...edits.texts?.[selText.id], size } } });
+              }}>Fit to kiosk width</button>
+              <button type="button" className={btn} onClick={() => patchText(selText.id, { size: undefined, lead: undefined, track: undefined, align: undefined })}>Original sizing</button>
+            </div>
+            <label className="block text-[12px] text-[#03002C]/80">Line spacing {selPlaced.lead.toFixed(2)}×
+              <input type="range" min={80} max={200} className="mt-1 w-full" value={Math.round(selPlaced.lead * 100)} onChange={(e) => patchText(selText.id, { lead: Number(e.target.value) / 100 }, false)} />
+            </label>
+            <label className="block text-[12px] text-[#03002C]/80">Letter spacing {edits.texts?.[selText.id]?.track ?? 0}
+              <input type="range" min={-50} max={300} step={5} className="mt-1 w-full" value={edits.texts?.[selText.id]?.track ?? 0} onChange={(e) => patchText(selText.id, { track: Number(e.target.value) || undefined }, false)} />
             </label>
             <label className="flex items-center gap-2 text-[12px] text-[#03002C]/80">Colour
               <input type="color" value={edits.texts?.[selText.id]?.color ?? selText.color} onChange={(e) => patchText(selText.id, { color: e.target.value.toUpperCase() })} />
             </label>
-            <p className="text-[11px] text-[#03002C]/65">Font: {selText.font}. Retyped text keeps the font; original letter spacing applies only to the unedited words.</p>
+            <p className="text-[11px] text-[#03002C]/65">Font: {selText.font}. Unedited lines keep the London letter spacing; changing words, size, lines or spacing uses the font's own spacing.</p>
           </div>
         ) : null}
 
@@ -532,6 +589,17 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
               <button type="button" className={btn} onClick={() => commit({ ...edits, parts: { ...edits.parts, ...Object.fromEntries(picked.map((id) => [id, { ...edits.parts?.[id], hidden: !(edits.parts?.[id]?.hidden ?? false) }])) } })}>Hide / show</button>
               <button type="button" className={btn} onClick={() => commit({ ...edits, parts: { ...edits.parts, ...Object.fromEntries(picked.map((id) => [id, { dx: 0, dy: 0, scale: 1, hidden: false }])) } })}>Put back</button>
             </div>
+            {picked.length > 1 ? (
+              <div className="flex flex-wrap gap-1" role="group" aria-label="Align objects to each other">
+                {([
+                  ["left", AlignStartVertical, "Align left edges"], ["hcenter", AlignCenterVertical, "Align centres"], ["right", AlignEndVertical, "Align right edges"],
+                  ["top", AlignStartHorizontal, "Align tops"], ["vmiddle", AlignCenterHorizontal, "Align middles"], ["bottom", AlignEndHorizontal, "Align bottoms"],
+                  ["hspread", AlignHorizontalSpaceAround, "Spread evenly across"], ["vspread", AlignVerticalSpaceAround, "Spread evenly down"],
+                ] as const).map(([m, Icon, label]) => (
+                  <button key={m} type="button" className={ibtn} aria-label={label} title={label} disabled={(m === "hspread" || m === "vspread") && picked.length < 3} onClick={() => alignPicked(m)}><Icon className="h-4 w-4" /></button>
+                ))}
+              </div>
+            ) : null}
             <p className="text-[11px] text-[#03002C]/65">Shift-click objects on the kiosk or in the list to add them. A group moves, hides and resets together; each object keeps its own size.</p>
           </div>
         ) : null}
@@ -556,6 +624,43 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
             <p className="text-[11px] text-[#03002C]/65">Logos, icons and QR codes inside this piece move with it. Pieces never grow past the kiosk width.</p>
           </div>
         ) : null}
+
+        {selDivider ? (
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-[#03002C]">Accent divider</h4>
+            <label className="block text-[12px] text-[#03002C]/80">Length {Math.round(selDivider.w / 72)} in
+              <input type="range" min={36} max={KIOSK_W - 2 * KIOSK_MARGIN} className="mt-1 w-full" value={selDivider.w} onChange={(e) => patchDivider(selDivider.id, { w: Number(e.target.value) }, false)} />
+            </label>
+            <label className="block text-[12px] text-[#03002C]/80">Thickness {(selDivider.h / 72).toFixed(2)} in
+              <input type="range" min={3} max={72} className="mt-1 w-full" value={selDivider.h} onChange={(e) => patchDivider(selDivider.id, { h: Number(e.target.value) }, false)} />
+            </label>
+            <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Divider colour">
+              {ACCENTS.map((a) => (
+                <button key={a.color} type="button" aria-label={a.name} title={a.name} aria-pressed={selDivider.color === a.color}
+                  className="h-7 w-7 rounded-md border border-[#03002C]/25 aria-pressed:ring-2 aria-pressed:ring-[#003FC7] aria-pressed:ring-offset-1"
+                  style={{ background: a.color }} onClick={() => patchDivider(selDivider.id, { color: a.color })} />
+              ))}
+              <input type="color" aria-label="Custom colour" value={selDivider.color} onChange={(e) => patchDivider(selDivider.id, { color: e.target.value.toUpperCase() })} />
+            </div>
+            <label className="flex items-center gap-2 text-[12px] text-[#03002C]/80">
+              <input type="checkbox" checked={!!selDivider.round} onChange={(e) => patchDivider(selDivider.id, { round: e.target.checked })} /> Rounded ends
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className={btn} onClick={() => patchDivider(selDivider.id, { hidden: !selDivider.hidden })}>{selDivider.hidden ? "Show" : "Hide"}</button>
+              <button type="button" className={btn} onClick={() => { commit({ ...edits, dividers: (edits.dividers ?? []).filter((d) => d.id !== selDivider.id) }); setSel(null); }}><Trash2 className="h-3.5 w-3.5" />Delete</button>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold text-[#03002C]">Add accent divider</h4>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" className={btn} onClick={() => addDivider("short")}>Short rule</button>
+            <button type="button" className={btn} onClick={() => addDivider("full")}>Full width</button>
+            <button type="button" className={btn} disabled={!sel || sel.kind === "divider"} onClick={() => addDivider("under")}>Under selection</button>
+          </div>
+          <p className="text-[11px] text-[#03002C]/65">Accent rules use the approved blue, aqua and lavender. They export as live vector shapes on their own Accents layer.</p>
+        </div>
 
         <div className="space-y-2">
           <h4 className="text-sm font-semibold text-[#03002C]">Background</h4>
