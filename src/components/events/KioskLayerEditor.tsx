@@ -4,13 +4,18 @@
 // kiosk. The TV keep-clear is drawn as a guide only (never exported).
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, Eye, EyeOff, Maximize2, Minimize2, Minus, Plus, RotateCcw, Save, Undo2 } from "lucide-react";
+import {
+  AlignCenter, AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignLeft, AlignRight,
+  AlignStartHorizontal, AlignStartVertical, AlignHorizontalSpaceAround, AlignVerticalSpaceAround,
+  Download, Eye, EyeOff, Maximize2, Minimize2, Minus, Plus, RotateCcw, Save, Trash2, Undo2,
+} from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useSessionUser } from "@/hooks/use-session-user";
 import {
   KIOSK_BLEED,
   KIOSK_H,
+  KIOSK_MARGIN,
   KIOSK_TV,
   KIOSK_W,
   kioskFontFaceCss,
@@ -21,15 +26,30 @@ import {
   defaultPartGroups,
   pieceBackdropPath,
   splitArtSvg,
+  textLineBoxes,
+  type KioskDivider,
   type KioskEdits,
   type LiveLayout,
+  type PlacedText,
+  type TextAlign,
 } from "@/lib/next-california-kiosk-live";
 import { downloadKiosk, loadArtSvg, type KioskDownload } from "@/lib/next-california-kiosk-live-export";
 
-type Sel = { kind: "block" | "text" | "part"; id: string } | null;
+type Sel = { kind: "block" | "text" | "part" | "divider"; id: string } | null;
+
+/** Approved TransPerfect accent rules (brand v3.0): Blue 500, Aqua, Lavender, white, Blue 800. */
+const ACCENTS = [
+  { name: "Blue", color: "#003FC7" },
+  { name: "Aqua", color: "#A1FBF9" },
+  { name: "Lavender", color: "#C2A3FF" },
+  { name: "White", color: "#FFFFFF" },
+  { name: "Ink", color: "#03002C" },
+] as const;
 
 const btn =
   "inline-flex items-center gap-1.5 rounded-md border border-[#03002C]/15 bg-white px-2.5 py-1.5 text-[12px] font-semibold text-[#03002C] hover:bg-[#F2F4F9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] disabled:opacity-50";
+const ibtn =
+  "inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#03002C]/15 bg-white text-[#03002C] hover:bg-[#F2F4F9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] aria-pressed:border-[#003FC7] aria-pressed:bg-[#E0E8F5] disabled:opacity-50";
 
 const draftKey = (id: string) => `kiosk-draft:${id}`;
 function readLocalDraft(id: string): { at: number; edits: KioskEdits } | null {
@@ -62,6 +82,8 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   const [wide, setWide] = useState(false);
   /** Objects picked with Shift-click, ready to group. */
   const [picked, setPicked] = useState<string[]>([]);
+  /** Snap guide x (kiosk points) shown while dragging. */
+  const [guide, setGuide] = useState<number | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState<KioskDownload | "save" | null>(null);
   const userId = useSessionUser();
@@ -151,23 +173,132 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     drag.current = { sel: s, x: p.x, y: p.y, start: edits };
     setHistory((h) => [...h.slice(-49), edits]);
   };
+
+  /** Move a selection (and its group) by dx/dy kiosk points. */
+  const shift = (s: NonNullable<Sel>, dx: number, dy: number, base: KioskEdits = edits): KioskEdits => {
+    if (s.kind === "divider")
+      return { ...base, dividers: (base.dividers ?? []).map((d) => (d.id === s.id ? { ...d, x: d.x + dx, y: d.y + dy } : d)) };
+    const key = s.kind === "block" ? "blocks" : s.kind === "part" ? "parts" : "texts";
+    const map = { ...(base[key] as Record<string, { dx?: number; dy?: number }> | undefined) };
+    const ids = s.kind === "part" ? partGroup(base, s.id, L) : [s.id];
+    for (const id of ids) map[id] = { ...map[id], dx: (map[id]?.dx ?? 0) + dx, dy: (map[id]?.dy ?? 0) + dy };
+    return { ...base, [key]: map };
+  };
+
+  const measureCtx = useMemo(() => (typeof document === "undefined" ? null : document.createElement("canvas").getContext("2d")), []);
+  const measure = (t: PlacedText) => (s: string) => {
+    if (!measureCtx) return [...s].length * t.ksize * 0.55;
+    measureCtx.font = `${t.ksize}px ${kioskFontFamily(t.font)}`;
+    return measureCtx.measureText(s).width;
+  };
+  /** Bounds of a selection on the kiosk (kiosk points). */
+  const selBounds = (s: NonNullable<Sel>, base: KioskEdits = edits) => {
+    const pl = layoutKiosk(L, base);
+    if (s.kind === "divider") {
+      const d = base.dividers?.find((x) => x.id === s.id);
+      return d ? { x0: d.x, x1: d.x + d.w, y0: d.y, y1: d.y + d.h } : null;
+    }
+    if (s.kind === "block") {
+      const p = pl.find((x) => x.block.id === s.id);
+      return p ? { x0: p.x, x1: p.x + L.trimW * p.scale, y0: p.y, y1: p.y + (p.clipBottom - p.clipTop) * p.scale } : null;
+    }
+    if (s.kind === "text") {
+      const t = pl.flatMap((p) => p.texts).find((x) => x.id === s.id);
+      if (!t) return null;
+      const bx = t.fixed ? [{ x: t.kx, w: t.kw, y: t.ky }] : textLineBoxes(t, measure(t));
+      return { x0: Math.min(...bx.map((b) => b.x)), x1: Math.max(...bx.map((b) => b.x + b.w)), y0: t.ky - t.ksize * 0.8, y1: bx[bx.length - 1]!.y + t.ksize * 0.2 };
+    }
+    const ids = partGroup(base, s.id, L);
+    const qs = pl.flatMap((p) => p.parts).filter((q) => ids.includes(q.part.id));
+    if (!qs.length) return null;
+    return {
+      x0: Math.min(...qs.map((q) => q.x)), x1: Math.max(...qs.map((q) => q.x + (q.src.x1 - q.src.x0) * q.scale)),
+      y0: Math.min(...qs.map((q) => q.y)), y1: Math.max(...qs.map((q) => q.y + (q.src.y1 - q.src.y0) * q.scale)),
+    };
+  };
+
+  /** Snap a moved selection's edges/centre to the kiosk margins and centre line. */
+  const snap = (s: NonNullable<Sel>, next: KioskEdits) => {
+    const b = selBounds(s, next);
+    if (!b) return { next, g: null as number | null };
+    const tol = 18;
+    const cx = (b.x0 + b.x1) / 2;
+    const tries: [number, number][] = [[KIOSK_W / 2 - cx, KIOSK_W / 2], [KIOSK_MARGIN - b.x0, KIOSK_MARGIN], [KIOSK_W - KIOSK_MARGIN - b.x1, KIOSK_W - KIOSK_MARGIN]];
+    const hit = tries.find(([d]) => Math.abs(d) <= tol);
+    return hit ? { next: shift(s, hit[0], 0, next), g: hit[1] } : { next, g: null };
+  };
+
   const onMove = (e: React.PointerEvent) => {
     const d = drag.current;
     if (!d) return;
     const p = toSvg(e);
-    const dx = p.x - d.x, dy = p.y - d.y;
-    const key = d.sel.kind === "block" ? "blocks" : d.sel.kind === "part" ? "parts" : "texts";
-    const map = d.start[key] as Record<string, { dx?: number; dy?: number }> | undefined;
-    const cur = map?.[d.sel.id] as { dx?: number; dy?: number } | undefined;
-    const v = { dx: (cur?.dx ?? 0) + dx, dy: (cur?.dy ?? 0) + dy };
-    const ids = d.sel.kind === "part" ? partGroup(d.start, d.sel.id, L) : [d.sel.id];
-    const moved = { ...map };
-    for (const id of ids) moved[id] = { ...map?.[id], dx: (map?.[id]?.dx ?? 0) + dx, dy: (map?.[id]?.dy ?? 0) + dy };
-    void v;
-    const next = { ...d.start, [key]: moved };
-    setEdits(next);
+    const moved = shift(d.sel, p.x - d.x, p.y - d.y, d.start);
+    const r = e.altKey ? { next: moved, g: null } : snap(d.sel, moved);
+    setGuide(r.g);
+    setEdits(r.next);
   };
-  const endDrag = () => { drag.current = null; };
+  const endDrag = () => { drag.current = null; setGuide(null); };
+
+  /** Put the selection against the left margin, the centre line or the right margin. */
+  const alignKiosk = (where: TextAlign, base: KioskEdits = edits) => {
+    if (!sel) return;
+    let b0 = base;
+    if (sel.kind === "text") b0 = { ...base, texts: { ...base.texts, [sel.id]: { ...base.texts?.[sel.id], align: where } } };
+    const b = selBounds(sel, b0);
+    if (!b) return;
+    const d = where === "left" ? KIOSK_MARGIN - b.x0 : where === "center" ? KIOSK_W / 2 - (b.x0 + b.x1) / 2 : KIOSK_W - KIOSK_MARGIN - b.x1;
+    commit(shift(sel, d, 0, b0));
+  };
+
+  /** Align or spread the Shift-picked objects relative to each other. */
+  const alignPicked = (mode: "left" | "hcenter" | "right" | "top" | "vmiddle" | "bottom" | "hspread" | "vspread") => {
+    const qs = placed.flatMap((p) => p.parts).filter((q) => picked.includes(q.part.id))
+      .map((q) => ({ id: q.part.id, x0: q.x, y0: q.y, w: (q.src.x1 - q.src.x0) * q.scale, h: (q.src.y1 - q.src.y0) * q.scale }));
+    if (qs.length < 2) return;
+    const U = { x0: Math.min(...qs.map((q) => q.x0)), x1: Math.max(...qs.map((q) => q.x0 + q.w)), y0: Math.min(...qs.map((q) => q.y0)), y1: Math.max(...qs.map((q) => q.y0 + q.h)) };
+    const mv: Record<string, [number, number]> = {};
+    const spread = (axis: "x" | "y") => {
+      const s = [...qs].sort((a, b) => (axis === "x" ? a.x0 - b.x0 : a.y0 - b.y0));
+      const span = axis === "x" ? U.x1 - U.x0 : U.y1 - U.y0;
+      const gap = (span - s.reduce((n, q) => n + (axis === "x" ? q.w : q.h), 0)) / (s.length - 1);
+      let at = axis === "x" ? U.x0 : U.y0;
+      for (const q of s) { mv[q.id] = axis === "x" ? [at - q.x0, 0] : [0, at - q.y0]; at += (axis === "x" ? q.w : q.h) + gap; }
+    };
+    if (mode === "hspread") spread("x");
+    else if (mode === "vspread") spread("y");
+    else for (const q of qs)
+      mv[q.id] = mode === "left" ? [U.x0 - q.x0, 0] : mode === "right" ? [U.x1 - q.x0 - q.w, 0] : mode === "hcenter" ? [(U.x0 + U.x1) / 2 - q.x0 - q.w / 2, 0]
+        : mode === "top" ? [0, U.y0 - q.y0] : mode === "bottom" ? [0, U.y1 - q.y0 - q.h] : [0, (U.y0 + U.y1) / 2 - q.y0 - q.h / 2];
+    const parts = { ...edits.parts };
+    for (const [id, [dx, dy]] of Object.entries(mv)) parts[id] = { ...parts[id], dx: (parts[id]?.dx ?? 0) + dx, dy: (parts[id]?.dy ?? 0) + dy };
+    commit({ ...edits, parts });
+  };
+
+  const addDivider = (preset: "short" | "full" | "under") => {
+    let x = KIOSK_MARGIN, y = KIOSK_TV.y + KIOSK_TV.h + 144, w = 540;
+    if (preset === "full") w = KIOSK_W - 2 * KIOSK_MARGIN;
+    if (preset === "under" && sel) {
+      const b = selBounds(sel);
+      if (b) { x = b.x0; y = b.y1 + 48; w = Math.max(144, Math.min(b.x1 - b.x0, 900)); }
+    }
+    const id = `div-${Date.now().toString(36)}`;
+    commit({ ...edits, dividers: [...(edits.dividers ?? []), { id, x, y, w, h: 18, color: ACCENTS[0]!.color, round: false }] });
+    setSel({ kind: "divider", id }); setPicked([]);
+  };
+  const patchDivider = (id: string, p: Partial<KioskDivider>, push = true) => {
+    const next = { ...edits, dividers: (edits.dividers ?? []).map((d) => (d.id === id ? { ...d, ...p } : d)) };
+    push ? commit(next) : setEdits(next);
+  };
+
+  const onKey = (e: React.KeyboardEvent) => {
+    if (!sel || (e.target as HTMLElement).closest("input,textarea,select")) return;
+    const step = e.shiftKey ? 36 : 3;
+    const m: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
+    if (m[e.key]) { e.preventDefault(); commit(shift(sel, m[e.key]![0], m[e.key]![1])); }
+    else if ((e.key === "Delete" || e.key === "Backspace") && sel.kind === "divider") {
+      e.preventDefault(); commit({ ...edits, dividers: (edits.dividers ?? []).filter((d) => d.id !== sel.id) }); setSel(null);
+    }
+  };
 
   const save = async () => {
     setBusy("save"); setStatus(null);
