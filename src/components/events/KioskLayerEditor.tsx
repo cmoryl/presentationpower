@@ -389,10 +389,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     const step = e.shiftKey ? 36 : 3;
     const m: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
     if (m[e.key]) { e.preventDefault(); if (!isLocked(sel.id)) commit(shift(sel, m[e.key]![0], m[e.key]![1])); return; }
-    if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); removeSel(); return; }
-    else if ((e.key === "Delete" || e.key === "Backspace") && sel.kind === "divider") {
-      e.preventDefault(); commit({ ...edits, dividers: (edits.dividers ?? []).filter((d) => d.id !== sel.id) }); setSel(null);
-    }
+    if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); removeSel(); }
   };
 
   const save = async () => {
@@ -564,9 +561,9 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
       <div className={wide ? "order-2" : "order-2 lg:order-1"}>
         <h4 className="text-sm font-semibold text-[#03002C]">Layers</h4>
         <ul className="mt-2 max-h-[640px] space-y-1 overflow-auto pr-1">
-          {L.blocks.map((b) => {
+          {LX.blocks.map((b) => {
             const hidden = edits.blocks?.[b.id]?.hidden ?? b.screen;
-            const texts = L.texts.filter((t) => { const m = (t.top + t.bottom) / 2; return m >= b.y0 && m < b.y1; });
+            const texts = LX.texts.filter((t) => { const m = (t.top + t.bottom) / 2; return m >= b.y0 && m < b.y1; });
             return (
               <li key={b.id} className="rounded-md border border-[#03002C]/10 bg-white">
                 <div className="flex items-center gap-1 px-2 py-1.5">
@@ -584,7 +581,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                       return (
                         <li key={q.id} className="flex items-center gap-1">
                           <button type="button" className={`flex-1 truncate py-0.5 text-left text-[11.5px] ${sel?.id === q.id ? "text-[#003FC7]" : "text-[#03002C]/80"}`} onClick={(e) => pickPart(q.id, e.shiftKey)}>
-                            Object {i + 1}{(edits.groups ?? defaultPartGroups(L)).some((g) => g.includes(q.id)) ? " · grouped" : ""}
+                            {isCopy(q.id) ? "Copy of object" : `Object ${i + 1}`}{(edits.groups ?? defaultPartGroups(L)).some((g) => g.includes(q.id)) ? " · grouped" : ""}{isLocked(q.id) ? " · locked" : ""}
                           </button>
                           <button type="button" aria-label={ph ? "Show object" : "Hide object"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchPart(q.id, { hidden: !ph })}>
                             {ph ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
@@ -641,6 +638,38 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
           <button type="button" className={btn} onClick={() => commit({})}><RotateCcw className="h-3.5 w-3.5" />Reset to London</button>
           <button type="button" className={btn} disabled={!userId || busy === "save"} onClick={save} title={userId ? undefined : "Sign in to save"}><Save className="h-3.5 w-3.5" />Save</button>
         </div>
+
+        {sel && sel.kind !== "block" && selFx ? (
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-[#03002C]">Arrange</h4>
+            <div className="flex flex-wrap gap-1">
+              <button type="button" className={btn} onClick={() => duplicate()} title="Duplicate (Ctrl/⌘ D)"><CopyPlus className="h-3.5 w-3.5" />Duplicate</button>
+              <button type="button" className={btn} onClick={() => { clip.current = sel; setStatus("Copied — press Ctrl/⌘ V to paste."); }} title="Copy (Ctrl/⌘ C)"><Copy className="h-3.5 w-3.5" />Copy</button>
+              <button type="button" className={btn} disabled={!clip.current} onClick={() => clip.current && duplicate(clip.current)} title="Paste (Ctrl/⌘ V)"><ClipboardPaste className="h-3.5 w-3.5" />Paste</button>
+              <button type="button" className={btn} aria-pressed={isLocked(sel.id)} onClick={() => toggleLock(sel.id)}>{isLocked(sel.id) ? <Lock className="h-3.5 w-3.5" /> : <Unlock className="h-3.5 w-3.5" />}{isLocked(sel.id) ? "Locked" : "Lock"}</button>
+              <button type="button" className={btn} onClick={removeSel} title="Delete (Del)"><Trash2 className="h-3.5 w-3.5" />{sel.kind === "divider" || isCopy(sel.id) ? "Delete" : "Remove"}</button>
+            </div>
+            {sel.kind !== "text" ? (
+              <div className="flex gap-1" role="group" aria-label="Stacking order">
+                <button type="button" className={ibtn} aria-label="Bring to front" title="Bring to front (Shift ])" onClick={() => arrange("front")}><BringToFront className="h-4 w-4" /></button>
+                <button type="button" className={ibtn} aria-label="Bring forward" title="Bring forward (])" onClick={() => arrange("forward")}><ArrowUp className="h-4 w-4" /></button>
+                <button type="button" className={ibtn} aria-label="Send backward" title="Send backward ([)" onClick={() => arrange("backward")}><ArrowDown className="h-4 w-4" /></button>
+                <button type="button" className={ibtn} aria-label="Send to back" title="Send to back (Shift [)" onClick={() => arrange("back")}><SendToBack className="h-4 w-4" /></button>
+              </div>
+            ) : null}
+            <label className="block text-[12px] text-[#03002C]/80">See-through {Math.round(selFx.opacity * 100)}%
+              <input type="range" min={5} max={100} className="mt-1 w-full" value={Math.round(selFx.opacity * 100)} onChange={(e) => setFx({ opacity: Number(e.target.value) / 100 }, false)} onPointerUp={() => setHistory((h) => [...h, edits])} />
+            </label>
+            <label className="block text-[12px] text-[#03002C]/80">Rotate {Math.round(selFx.rot)}°
+              <input type="range" min={-180} max={180} className="mt-1 w-full" value={Math.round(selFx.rot)} onChange={(e) => setFx({ rot: Number(e.target.value) }, false)} onPointerUp={() => setHistory((h) => [...h, edits])} />
+            </label>
+            <div className="flex gap-1">
+              {[-90, 0, 90].map((r) => <button key={r} type="button" className={btn} onClick={() => setFx({ rot: r })}>{r === 0 ? "Straight" : `${r > 0 ? "+" : ""}${r}°`}</button>)}
+            </div>
+            {isLocked(sel.id) ? <p className="text-[11px] text-[#03002C]/65">Locked: it can't be dragged, nudged or aligned until you unlock it.</p> : null}
+            {sel.kind !== "text" && sel.kind !== "divider" ? <p className="text-[11px] text-[#03002C]/65">Stacking changes order among the objects in the same piece. Text always sits on top.</p> : null}
+          </div>
+        ) : null}
 
         {sel ? (
           <div className="space-y-1.5">
