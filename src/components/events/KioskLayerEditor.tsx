@@ -17,6 +17,7 @@ import {
   kioskFontFamily,
   kioskGround,
   layoutKiosk,
+  partGroup,
   pieceBackdropPath,
   splitArtSvg,
   type KioskEdits,
@@ -35,6 +36,8 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   const [edits, setEdits] = useState<KioskEdits>({});
   const [history, setHistory] = useState<KioskEdits[]>([]);
   const [sel, setSel] = useState<Sel>(null);
+  /** Objects picked with Shift-click, ready to group. */
+  const [picked, setPicked] = useState<string[]>([]);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState<KioskDownload | "save" | null>(null);
   const userId = useSessionUser();
@@ -77,8 +80,19 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     if (!m) return { x: 0, y: 0 };
     return { x: (e.clientX - m.e) / m.a, y: (e.clientY - m.f) / m.d };
   };
+  const pickPart = (id: string, add: boolean) => {
+    const members = partGroup(edits, id);
+    if (add) {
+      setPicked((cur) => (cur.includes(id) ? cur.filter((x) => !members.includes(x)) : [...new Set([...cur, ...members])]));
+    } else setPicked(members);
+    setSel({ kind: "part", id });
+  };
   const startDrag = (s: NonNullable<Sel>) => (e: React.PointerEvent) => {
     e.stopPropagation();
+    if (s.kind === "part") {
+      pickPart(s.id, e.shiftKey);
+      if (e.shiftKey) return;
+    } else setPicked([]);
     setSel(s);
     (e.target as Element).setPointerCapture?.(e.pointerId);
     const p = toSvg(e);
@@ -94,7 +108,11 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     const map = d.start[key] as Record<string, { dx?: number; dy?: number }> | undefined;
     const cur = map?.[d.sel.id] as { dx?: number; dy?: number } | undefined;
     const v = { dx: (cur?.dx ?? 0) + dx, dy: (cur?.dy ?? 0) + dy };
-    const next = { ...d.start, [key]: { ...map, [d.sel.id]: { ...map?.[d.sel.id], ...v } } };
+    const ids = d.sel.kind === "part" ? partGroup(d.start, d.sel.id) : [d.sel.id];
+    const moved = { ...map };
+    for (const id of ids) moved[id] = { ...map?.[id], dx: (map?.[id]?.dx ?? 0) + dx, dy: (map?.[id]?.dy ?? 0) + dy };
+    void v;
+    const next = { ...d.start, [key]: moved };
     setEdits(next);
   };
   const endDrag = () => { drag.current = null; };
@@ -134,7 +152,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
               onPointerMove={onMove}
               onPointerUp={endDrag}
               onPointerLeave={endDrag}
-              onPointerDown={() => setSel(null)}
+              onPointerDown={() => { setSel(null); setPicked([]); }}
             >
               <defs>
                 <linearGradient id={`kg-${L.id}`} x1="0" y1="0" x2="0" y2="1">
@@ -167,7 +185,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
               })}
               {placed.flatMap((p) => p.parts).filter((q) => !q.hidden).map((q) => {
                 const [, , vw, vh] = art.viewBox.split(/\s+/).map(Number);
-                const on = sel?.kind === "part" && sel.id === q.part.id;
+                const on = picked.includes(q.part.id) || (sel?.kind === "part" && sel.id === q.part.id);
                 return (
                   <g key={q.part.id} transform={`translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})`} onPointerDown={startDrag({ kind: "part", id: q.part.id })} className="cursor-move">
                     <g clipPath={`url(#kc-${L.id}-${q.part.id})`}>
@@ -234,8 +252,8 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                       const ph = edits.parts?.[q.id]?.hidden ?? false;
                       return (
                         <li key={q.id} className="flex items-center gap-1">
-                          <button type="button" className={`flex-1 truncate py-0.5 text-left text-[11.5px] ${sel?.id === q.id ? "text-[#003FC7]" : "text-[#03002C]/80"}`} onClick={() => setSel({ kind: "part", id: q.id })}>
-                            Object {i + 1}
+                          <button type="button" className={`flex-1 truncate py-0.5 text-left text-[11.5px] ${sel?.id === q.id ? "text-[#003FC7]" : "text-[#03002C]/80"}`} onClick={(e) => pickPart(q.id, e.shiftKey)}>
+                            Object {i + 1}{edits.groups?.some((g) => g.includes(q.id)) ? " · grouped" : ""}
                           </button>
                           <button type="button" aria-label={ph ? "Show object" : "Hide object"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchPart(q.id, { hidden: !ph })}>
                             {ph ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
@@ -289,6 +307,21 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
               <input type="color" value={edits.texts?.[selText.id]?.color ?? selText.color} onChange={(e) => patchText(selText.id, { color: e.target.value.toUpperCase() })} />
             </label>
             <p className="text-[11px] text-[#03002C]/65">Font: {selText.font}. Retyped text keeps the font; original letter spacing applies only to the unedited words.</p>
+          </div>
+        ) : null}
+
+        {picked.length > 1 || (selPart && partGroup(edits, selPart.id).length > 1) ? (
+          <div className="space-y-2 rounded-md border border-[#003FC7]/25 bg-[#F2F4F9] p-2">
+            <h4 className="text-sm font-semibold text-[#03002C]">{picked.length} objects selected</h4>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className={btn} disabled={picked.length < 2 || edits.groups?.some((g) => g.length === picked.length && picked.every((x) => g.includes(x)))}
+                onClick={() => commit({ ...edits, groups: [...(edits.groups ?? []).filter((g) => !g.some((x) => picked.includes(x))), picked] })}>Group</button>
+              <button type="button" className={btn} disabled={!edits.groups?.some((g) => g.some((x) => picked.includes(x)))}
+                onClick={() => { commit({ ...edits, groups: (edits.groups ?? []).filter((g) => !g.some((x) => picked.includes(x))) }); setPicked(sel ? [sel.id] : []); }}>Ungroup</button>
+              <button type="button" className={btn} onClick={() => commit({ ...edits, parts: { ...edits.parts, ...Object.fromEntries(picked.map((id) => [id, { ...edits.parts?.[id], hidden: !(edits.parts?.[id]?.hidden ?? false) }])) } })}>Hide / show</button>
+              <button type="button" className={btn} onClick={() => commit({ ...edits, parts: { ...edits.parts, ...Object.fromEntries(picked.map((id) => [id, { dx: 0, dy: 0, scale: 1, hidden: false }])) } })}>Put back</button>
+            </div>
+            <p className="text-[11px] text-[#03002C]/65">Shift-click objects on the kiosk or in the list to add them. A group moves, hides and resets together; each object keeps its own size.</p>
           </div>
         ) : null}
 

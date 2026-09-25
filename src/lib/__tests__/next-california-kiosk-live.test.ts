@@ -64,3 +64,11 @@ describe("separate objects", () => {
     }
   });
 });
+
+import { partGroup as _pg } from "@/lib/next-california-kiosk-live";
+describe("object groups", () => {
+  it("finds group members", () => {
+    expect(_pg({ groups: [["a", "b"]] }, "b")).toEqual(["a", "b"]);
+    expect(_pg({}, "c")).toEqual(["c"]);
+  });
+});
