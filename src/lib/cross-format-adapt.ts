@@ -45,7 +45,33 @@ export type AdaptContent = {
   details?: { label: string; value: string }[];
   /** The module's chart, rebuilt as a native vector chart on every size. */
   chart?: AdaptChart;
+  /** The module's picture cells (bento media cells, image grids, hero photo). */
+  images?: AdaptImage[];
 };
+
+export type AdaptImage = { seed: string; url?: string; title?: string };
+
+/** Collect every picture a module draws, so it can be placed on each size. */
+export function imagesFrom(c: Record<string, unknown>): AdaptImage[] | undefined {
+  const out: AdaptImage[] = [];
+  const good = (u?: string) => (u && !/\.svg($|\?)/i.test(u) && !u.startsWith("data:image/svg") ? u : undefined);
+  for (const k of POINT_KEYS) {
+    const v = c[k];
+    if (!Array.isArray(v)) continue;
+    v.forEach((it, i) => {
+      if (!it || typeof it !== "object") return;
+      const r = it as Record<string, unknown>;
+      const seed = str(r.mediaSeed) ?? str(r.seed);
+      const url = good(str(r.mediaUrl) ?? str(r.imageUrl));
+      if (r.kind !== "media" && !seed && !url) return;
+      out.push({ seed: seed ?? `${k}-${i}`, url, title: str(r.title) ?? str(r.label) ?? str(r.caption) });
+    });
+    if (out.length) break;
+  }
+  const top = str(c.mediaSeed);
+  if (!out.length && top) out.push({ seed: top, url: good(str(c.mediaUrl)) });
+  return out.length ? out.slice(0, 6) : undefined;
+}
 
 export type AdaptChart = {
   kind: "bar" | "line" | "ring";
@@ -641,6 +667,7 @@ export function contentFromSlide(
     media: adaptMediaFrom(c),
     shape: points?.length ? shapeFrom(c) : undefined,
     chart,
+    images: imagesFrom(c),
     details: detailsFrom(c, [eyebrow, headline, body, cta, footnote, str(c.prepared), str(c.date), str(c.attribution), str(c.role), str(c.org)]),
   };
 }
@@ -881,5 +908,6 @@ export function applySelection(source: AdaptContent, sel: AdaptSelection): Adapt
     shape: points && points.length ? source.shape : undefined,
     details: off.has("details") ? undefined : source.details,
     chart: off.has("media") ? undefined : source.chart,
+    images: off.has("media") ? undefined : source.images,
   };
 }

@@ -41,7 +41,7 @@ export function AdaptChartBlock({
               <circle cx={cx} cy={cy} r={r} fill="none" stroke={track} strokeWidth={sw} />
               <circle cx={cx} cy={cy} r={r} fill="none" stroke={BLUE} strokeWidth={sw} strokeDasharray={`${(C * x.value) / 100} ${C}`} transform={`rotate(-90 ${cx} ${cy})`} />
               <text x={cx} y={cy + fontPx * 0.45} textAnchor="middle" fontSize={fontPx * 1.4} fontWeight={700} fill={ink}>{fmt(x.value)}</text>
-              <text x={cx} y={height - fontPx * 0.4} textAnchor="middle" fontSize={lab} fill={muted}>{x.label.slice(0, 22)}</text>
+              <text x={cx} y={height - fontPx * 0.4} textAnchor="middle" fontSize={fontPx} fill={muted}>{x.label.slice(0, 22)}</text>
             </g>
           );
         })}
