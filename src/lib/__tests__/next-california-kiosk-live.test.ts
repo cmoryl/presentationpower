@@ -48,3 +48,19 @@ describe("California kiosks rebuilt from live files", () => {
     expect(svg).not.toContain("TV keep-clear");
   });
 });
+
+import { layoutKiosk as _lk, buildKioskFrontSvg as _bf, KIOSK_LIVE_LAYOUTS as _L } from "@/lib/next-california-kiosk-live";
+describe("separate objects", () => {
+  it("every kiosk has movable objects and they move on their own", () => {
+    for (const L of Object.values(_L)) {
+      const placed = _lk(L);
+      const parts = placed.flatMap((p) => p.parts);
+      expect(parts.length).toBeGreaterThan(0);
+      const q = parts[0]!;
+      const moved = _lk(L, { parts: { [q.part.id]: { dx: 100, dy: 50 } } }).flatMap((p) => p.parts).find((x) => x.part.id === q.part.id)!;
+      expect(moved.x - q.x).toBeCloseTo(100);
+      expect(moved.y - q.y).toBeCloseTo(50);
+      expect(_bf(L, '<svg viewBox="0 0 10 10"></svg>')).toContain(`id="object-${q.part.id}"`);
+    }
+  });
+});

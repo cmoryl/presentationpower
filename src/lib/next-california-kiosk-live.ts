@@ -34,7 +34,9 @@ export type LiveText = {
   top: number;
   bottom: number;
 };
-export type LiveBlock = { id: string; y0: number; y1: number; c0: number; c1: number; screen: boolean };
+/** One separate object (logo, icon, QR, shape group) inside a piece, in London trim points. */
+export type LivePart = { id: string; x0: number; y0: number; x1: number; y1: number };
+export type LiveBlock = { id: string; y0: number; y1: number; c0: number; c1: number; screen: boolean; parts?: LivePart[] };
 export type LiveLayout = {
   id: string;
   source: string;
@@ -90,6 +92,8 @@ export type KioskEdits = {
   ground?: { top: string; bottom: string } | null;
   blocks?: Record<string, BlockEdit>;
   texts?: Record<string, TextEdit>;
+  /** Per-object edits inside a piece (dx/dy in kiosk points, scale about the object's centre). */
+  parts?: Record<string, BlockEdit>;
 };
 
 // ---- layout -----------------------------------------------------------------
@@ -104,7 +108,11 @@ export type PlacedBlock = {
   y: number;
   scale: number;
   texts: PlacedText[];
+  /** Separate objects, each drawn on its own; the piece backdrop has holes where they sit. */
+  parts: PlacedPart[];
 };
+/** src = London rect (clamped to the clip); x/y = kiosk top-left; scale = London→kiosk. */
+export type PlacedPart = { part: LivePart; src: { x0: number; y0: number; x1: number; y1: number }; x: number; y: number; scale: number; hidden: boolean };
 export type PlacedText = LiveText & { kx: number; ky: number; ksize: number; kw: number; edited: boolean; fill: string };
 
 function isHidden(b: LiveBlock, e?: BlockEdit) {
@@ -165,7 +173,23 @@ export function layoutKiosk(L: LiveLayout, edits: KioskEdits = {}): PlacedBlock[
         };
       })
       .filter((t) => !edits.texts?.[t.id]?.hidden);
-    out.push({ block: b, clipTop: c[0], clipBottom: c[1], x, y: yy, scale: sc, texts });
+    const parts: PlacedPart[] = (b.parts ?? [])
+      .map((pt) => ({ pt, src: { x0: pt.x0, x1: pt.x1, y0: Math.max(pt.y0, c[0]), y1: Math.min(pt.y1, c[1]) } }))
+      .filter(({ src }) => src.y1 - src.y0 > 2)
+      .map(({ pt, src }) => {
+        const pe = edits.parts?.[pt.id] ?? {};
+        const ps = pe.scale ?? 1;
+        const w = (src.x1 - src.x0) * sc, h = (src.y1 - src.y0) * sc;
+        return {
+          part: pt,
+          src,
+          x: x + src.x0 * sc + (pe.dx ?? 0) + ((1 - ps) * w) / 2,
+          y: yy + (src.y0 - c[0]) * sc + (pe.dy ?? 0) + ((1 - ps) * h) / 2,
+          scale: sc * ps,
+          hidden: !!pe.hidden,
+        };
+      });
+    out.push({ block: b, clipTop: c[0], clipBottom: c[1], x, y: yy, scale: sc, texts, parts });
   };
   let y = 0;
   for (const a of above) {
@@ -209,6 +233,17 @@ export function splitArtSvg(svg: string): { viewBox: string; inner: string } {
   return { viewBox: vb, inner };
 }
 
+/**
+ * The piece's clip in its own London coordinates (y relative to clipTop),
+ * with an even-odd hole for every separate object so nothing draws twice.
+ */
+export function pieceBackdropPath(L: LiveLayout, p: PlacedBlock, bleedX: number, top: number, bot: number): string {
+  const r = (x: number, y: number, w: number, h: number) => `M${x} ${y}h${w}v${h}h${-w}Z`;
+  let d = r(-bleedX, top, L.trimW + 2 * bleedX, p.clipBottom - p.clipTop + bot - top);
+  for (const q of p.parts) d += r(q.src.x0, q.src.y0 - p.clipTop, q.src.x1 - q.src.x0, q.src.y1 - q.src.y0);
+  return d;
+}
+
 export type TextPathFn = (t: PlacedText) => string | null;
 
 /**
@@ -240,17 +275,24 @@ export function buildKioskFrontSvg(
     const bleedX = B / p.scale + 1;
     const top = p === placed[0] && p.y <= 0.5 ? -B / p.scale : 0;
     const bot = Math.abs(p.y + (p.clipBottom - p.clipTop) * p.scale - KIOSK_H) < 0.5 ? B / p.scale : 0;
-    parts.push(
-      `<clipPath id="c-${p.block.id}"><rect x="${-bleedX}" y="${top}" width="${L.trimW + 2 * bleedX}" height="${p.clipBottom - p.clipTop + bot - top}"/></clipPath>`,
-    );
+    parts.push(`<clipPath id="c-${p.block.id}"><path clip-rule="evenodd" d="${pieceBackdropPath(L, p, bleedX, top, bot)}"/></clipPath>`);
+    for (const q of p.parts)
+      parts.push(`<clipPath id="c-${q.part.id}"><rect x="${q.src.x0}" y="${q.src.y0}" width="${q.src.x1 - q.src.x0}" height="${q.src.y1 - q.src.y0}"/></clipPath>`);
   });
   parts.push(`</defs>`);
   parts.push(`<g id="Background"><rect x="${-B}" y="${-B}" width="${KIOSK_W + 2 * B}" height="${KIOSK_H + 2 * B}" fill="url(#kg)"/></g>`);
   parts.push(`<g id="Graphics">`);
   for (const p of placed) {
     parts.push(
-      `<g id="piece-${p.block.id}" transform="translate(${p.x} ${p.y}) scale(${p.scale})"><g clip-path="url(#c-${p.block.id})"><use xlink:href="#art" href="#art" x="${-L.originX}" y="${-(L.originY + p.clipTop)}" width="${vw}" height="${vh}"/></g></g>`,
+      `<g id="piece-${p.block.id}" inkscape:label="Piece ${p.block.id}"><g transform="translate(${p.x} ${p.y}) scale(${p.scale})"><g clip-path="url(#c-${p.block.id})"><use xlink:href="#art" href="#art" x="${-L.originX}" y="${-(L.originY + p.clipTop)}" width="${vw}" height="${vh}"/></g></g>`,
     );
+    for (const q of p.parts) {
+      if (q.hidden) continue;
+      parts.push(
+        `<g id="object-${q.part.id}" inkscape:label="Object ${q.part.id}" transform="translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})"><g clip-path="url(#c-${q.part.id})"><use xlink:href="#art" href="#art" x="${-L.originX}" y="${-L.originY}" width="${vw}" height="${vh}"/></g></g>`,
+      );
+    }
+    parts.push(`</g>`);
   }
   parts.push(`</g>`);
   parts.push(`<g id="Text">`);

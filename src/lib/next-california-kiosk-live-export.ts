@@ -9,7 +9,7 @@
 // Every file is named rdraft- until the San Francisco revision is published.
 
 import JSZip from "jszip";
-import { PDFDocument, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 
 import {
@@ -122,12 +122,32 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
       top: L.mediaH - top,
       bottom: L.mediaH - bot,
     });
+    // Backdrop with an even-odd hole for every separate object.
+    page.pushOperators(pushGraphicsState(), rectangle(0, 0, W, H));
+    for (const q of p.parts) {
+      const hx = B + p.x + q.src.x0 * p.scale;
+      const hy = H - (B + p.y + (q.src.y1 - p.clipTop) * p.scale);
+      page.pushOperators(rectangle(hx, hy, (q.src.x1 - q.src.x0) * p.scale, (q.src.y1 - q.src.y0) * p.scale));
+    }
+    page.pushOperators(clipEvenOdd(), endPath());
     page.drawPage(emb, {
       x: B + p.x - bx * p.scale,
       y: H - (B + p.y + (p.clipBottom - p.clipTop) * p.scale),
       xScale: p.scale,
       yScale: p.scale,
     });
+    page.pushOperators(popGraphicsState());
+    // Each object on its own, from the same vector page (effects kept).
+    for (const q of p.parts) {
+      if (q.hidden) continue;
+      const e2 = await doc.embedPage(srcPage, {
+        left: L.originX + q.src.x0,
+        right: L.originX + q.src.x1,
+        top: L.mediaH - (L.originY + q.src.y0),
+        bottom: L.mediaH - (L.originY + q.src.y1),
+      });
+      page.drawPage(e2, { x: B + q.x, y: H - (B + q.y + (q.src.y1 - q.src.y0) * q.scale), xScale: q.scale, yScale: q.scale });
+    }
   }
 
   const fonts = new Map<string, Awaited<ReturnType<typeof doc.embedFont>>>();
