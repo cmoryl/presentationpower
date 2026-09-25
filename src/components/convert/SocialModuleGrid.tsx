@@ -26,7 +26,7 @@ export type SocialModuleGridProps = {
 /** How many tiles each social size can hold legibly. */
 export function socialGridCapacity(format: { width: number; height: number }) {
   const r = format.height / format.width;
-  return r >= 1.6 ? 7 : r >= 1.2 ? 6 : 5;
+  return r >= 1.6 ? 9 : 8;
 }
 
 type Tile = { kind: "stat"; value: string; label: string } | { kind: "text"; title: string; body: string };
