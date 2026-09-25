@@ -230,15 +230,28 @@ export function layoutKiosk(L: LiveLayout, edits: KioskEdits = {}): PlacedBlock[
       })
       .map<PlacedText>((t) => {
         const te = edits.texts?.[t.id] ?? {};
+        const kx = x + t.x * sc + (te.dx ?? 0);
+        const kw = t.w * sc;
+        const ksize = (te.size ?? t.size) * sc;
+        const text = te.text ?? t.text;
+        const lines = text.split(/\r?\n/);
+        const align: TextAlign = te.align ?? "left";
+        const edited = te.text !== undefined && te.text !== t.text;
         return {
           ...t,
-          kx: x + t.x * sc + (te.dx ?? 0),
+          kx,
           ky: yy + (t.y - c[0]) * sc + (te.dy ?? 0),
-          ksize: (te.size ?? t.size) * sc,
-          kw: t.w * sc,
-          edited: te.text !== undefined && te.text !== t.text,
-          text: te.text ?? t.text,
+          ksize,
+          kw,
+          edited,
+          text,
           fill: te.color ?? t.color,
+          lines,
+          align,
+          ax: kx + (align === "center" ? kw / 2 : align === "right" ? kw : 0),
+          lead: te.lead ?? 1.15,
+          trackPt: ((te.track ?? 0) / 1000) * ksize,
+          fixed: !edited && !te.track && lines.length === 1 && te.size === undefined,
         };
       })
       .filter((t) => !edits.texts?.[t.id]?.hidden);
@@ -364,6 +377,9 @@ export function buildKioskFrontSvg(
     parts.push(`</g>`);
   }
   parts.push(`</g>`);
+  parts.push(`<g id="Accents">`);
+  for (const d of edits.dividers ?? []) if (!d.hidden) parts.push(dividerSvg(d));
+  parts.push(`</g>`);
   parts.push(`<g id="Text">`);
   for (const p of placed)
     for (const t of p.texts) {
@@ -372,9 +388,12 @@ export function buildKioskFrontSvg(
         parts.push(`<path id="${t.id}" d="${d}" fill="${t.fill}"/>`);
         continue;
       }
-      const track = t.edited ? "" : ` textLength="${t.kw.toFixed(2)}" lengthAdjust="spacing"`;
+      const fit = t.fixed ? ` textLength="${t.kw.toFixed(2)}" lengthAdjust="spacing"` : "";
+      const anchor = t.align === "center" ? "middle" : t.align === "right" ? "end" : "start";
+      const ls = t.trackPt ? ` letter-spacing="${t.trackPt.toFixed(2)}"` : "";
+      const spans = t.lines.map((s, i) => `<tspan x="${t.ax.toFixed(2)}" y="${(t.ky + i * t.lead * t.ksize).toFixed(2)}">${esc(s)}</tspan>`).join("");
       parts.push(
-        `<text id="${t.id}" x="${t.kx.toFixed(2)}" y="${t.ky.toFixed(2)}" font-family="${esc((opts.family ?? kioskFontFamily)(t.font))}" font-size="${t.ksize.toFixed(2)}" fill="${t.fill}" xml:space="preserve"${track}>${esc(t.text)}</text>`,
+        `<text id="${t.id}" text-anchor="${anchor}" font-family="${esc((opts.family ?? kioskFontFamily)(t.font))}" font-size="${t.ksize.toFixed(2)}" fill="${t.fill}" xml:space="preserve"${ls}${fit}>${spans}</text>`,
       );
     }
   parts.push(`</g>`);
