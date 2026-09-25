@@ -53,7 +53,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
     }, [fitKey]);
     useLayoutEffect(() => {
       const el = pageRef.current;
-      if (!el || iter.current > 7) return;
+      if (!el || iter.current > 10) return;
       iter.current += 1;
       const prevH = el.style.height;
       const autos = Array.from(el.children).filter((c) => (c as HTMLElement).style.marginTop === "auto") as HTMLElement[];
@@ -65,8 +65,8 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
       el.style.height = prevH;
       autos.forEach((c) => (c.style.marginTop = "auto"));
       const ratio = (pageH * 0.96) / Math.max(1, natural);
-      if (Math.abs(ratio - 1) < 0.03 || (ratio > 1 && fit >= 3.2)) return;
-      const next = Math.min(3.2, Math.max(0.55, fit * Math.pow(ratio, ratio > 1 ? 0.7 : 1)));
+      if (Math.abs(ratio - 1) < 0.03 || (ratio > 1 && fit >= 4.5)) return;
+      const next = Math.min(4.5, Math.max(0.55, fit * Math.pow(ratio, ratio > 1 ? 0.7 : 1)));
       if (Math.abs(next - fit) > 0.005) setFit(next);
     });
     const t0 = result.type;
