@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlignCenter, AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignLeft, AlignRight,
   AlignStartHorizontal, AlignStartVertical, AlignHorizontalSpaceAround, AlignVerticalSpaceAround,
-  Download, Eye, EyeOff, Maximize2, Minimize2, Minus, Plus, RotateCcw, Save, Trash2, Undo2,
+  ArrowDown, ArrowUp, BringToFront, ClipboardPaste, Copy, CopyPlus, Download, Eye, EyeOff, Lock, Maximize2, Minimize2, Minus, Plus, Redo2, RotateCcw, Save, SendToBack, Trash2, Undo2, Unlock,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +25,8 @@ import {
   partGroup,
   defaultPartGroups,
   pieceBackdropPath,
+  partCentre,
+  withCopies,
   splitArtSvg,
   textLineBoxes,
   type KioskDivider,
