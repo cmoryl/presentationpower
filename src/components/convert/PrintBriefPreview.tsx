@@ -73,7 +73,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
     const t = {
       ...t0,
       eyebrowPx: t0.eyebrowPx * Math.min(fit, 1.4),
-      headlinePx: t0.headlinePx * Math.min(fit, 1.5),
+      headlinePx: t0.headlinePx * Math.min(fit, 2),
       bodyPx: t0.bodyPx * fit,
       pointPx: t0.pointPx * fit,
       statPx: t0.statPx * Math.min(fit, 1.6),
