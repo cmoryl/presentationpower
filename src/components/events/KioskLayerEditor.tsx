@@ -17,6 +17,7 @@ import {
   kioskFontFamily,
   kioskGround,
   layoutKiosk,
+  pieceBackdropPath,
   splitArtSvg,
   type KioskEdits,
   type LiveLayout,
