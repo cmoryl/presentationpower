@@ -108,8 +108,8 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
         );
       } else if (shape.kind === "table") {
         shapedBlock = (
-          <div style={{ width: "100%", ...(land ? { gridColumn: "1 / -1" } : {}) }}>
-          <table data-shape="table" style={{ width: "100%", borderCollapse: "collapse", fontSize: cellPx * 1.1, lineHeight: 1.3 }}>
+          <div style={{ width: "100%", ...(land ? { gridColumn: "1 / -1", alignSelf: "stretch", display: "flex", flexDirection: "column" } : {}) }}>
+          <table data-shape="table" style={{ width: "100%", borderCollapse: "collapse", fontSize: cellPx * (land ? 1.6 : 1.1), lineHeight: 1.3, ...(land ? { flex: 1, height: "100%" } : {}) }}>
             <thead>
               <tr>
                 <th style={{ textAlign: "left", padding: u(6) }} />
