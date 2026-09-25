@@ -21,6 +21,7 @@ import { PressExportMenu } from "@/components/convert/PressExportMenu";
 import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { PrintBriefPreview } from "@/components/convert/PrintBriefPreview";
+import { ModuleAsDrawn } from "@/components/convert/ModuleAsDrawn";
 import {
   ADAPT_TARGETS,
   adaptContent,
@@ -132,6 +133,7 @@ function ConvertPage() {
   const [moduleBrand, setModuleBrand] = useState<string>(BRAND_MODES[0].id);
   const [selection, setSelection] = useState<AdaptSelection>(EMPTY_SELECTION);
   const [view, setView] = useState<"one" | "all">("one");
+  const [look, setLook] = useState<"rebuilt" | "drawn">("rebuilt");
   // Coming from the module catalog: bring the chosen module into view in the list.
   useEffect(() => {
     if (!search.module) return;
@@ -203,6 +205,23 @@ function ConvertPage() {
       byId(MODULE_VARIANTS, slide.variantId)?.name,
     );
   }, [sourceKind, moduleId, moduleVariant, manual, slide, draft]);
+
+  // The module itself, for "Use the module as drawn".
+  const drawnSource = useMemo(() => {
+    if (sourceKind === "module") {
+      const fam = MODULE_FAMILIES.find((f) => f.id === moduleVariant?.familyId)?.name ?? "";
+      try {
+        return { variantId: moduleId, content: seedContent(moduleId, MASTER_BRIEF, fam) as Record<string, unknown> };
+      } catch {
+        return null;
+      }
+    }
+    if (sourceKind === "deck" && slide) return { variantId: slide.variantId, content: slide.content };
+    return null;
+  }, [sourceKind, moduleId, moduleVariant, slide]);
+  const drawn = look === "drawn" && !!drawnSource;
+  const frameOf = (r: { target: { trimIn?: { width: number; height: number } } }, f: { width: number; height: number } | null) =>
+    f ? { w: f.width, h: f.height } : { w: Math.round((r.target.trimIn?.width ?? 8.268) * CSS_DPI), h: Math.round((r.target.trimIn?.height ?? 11.693) * CSS_DPI) };
 
   // A new source starts with everything included and no edits.
   const sourceKey = sourceKind === "module" ? `m:${moduleId}` : manual ? "manual" : `d:${deckId}:${slideIndex}`;
@@ -547,6 +566,32 @@ function ConvertPage() {
               ))}
             </div>
 
+            {drawnSource ? (
+              <div role="group" aria-label="Layout" className="ml-2 inline-flex gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5">
+                {(
+                  [
+                    ["rebuilt", "Rebuilt for this size"],
+                    ["drawn", "Use the module as drawn"],
+                  ] as const
+                ).map(([k, l]) => (
+                  <button
+                    key={k}
+                    type="button"
+                    aria-pressed={look === k}
+                    onClick={() => setLook(k)}
+                    className={`rounded-sm px-3 py-1 text-[12px] font-semibold ${look === k ? "bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]" : "hover:bg-[color:var(--color-muted)]"}`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            {drawn ? (
+              <p className="text-[12px] text-[color:var(--color-muted-foreground)]">
+                Shows the module exactly as it looks on a slide, scaled to fit. Your edits in "Info to carry across" don't apply here, and downloads are pictures (proofs), not editable text.
+              </p>
+            ) : null}
+
             {view === "all" ? (
               <div className="grid items-end gap-4 border border-[color:var(--color-border)] bg-[color:var(--color-muted)] p-4 sm:grid-cols-2 xl:grid-cols-3">
                 {ADAPT_TARGETS.map((t) => {
@@ -564,7 +609,17 @@ function ConvertPage() {
                       aria-label={`Open ${t.label}`}
                     >
                       <div className="pointer-events-none">
-                        {f ? (
+                        {drawn && drawnSource ? (
+                          <ModuleAsDrawn
+                            variantId={drawnSource.variantId}
+                            content={drawnSource.content}
+                            brandId={brandId}
+                            mode={mode}
+                            frameW={frameOf(r, f).w}
+                            frameH={frameOf(r, f).h}
+                            displayWidth={f ? Math.round(170 * Math.max(1, f.width / f.height)) : 200}
+                          />
+                        ) : f ? (
                           <SocialRenderer
                             format={f}
                             brandId={brandId}
@@ -588,7 +643,33 @@ function ConvertPage() {
             ) : null}
 
             <div className={`flex justify-center rounded-sm border border-black/10 bg-[#F2F2F2] p-6 ${view === "all" ? "hidden" : ""}`}>
-              {format ? (
+              {drawn && drawnSource ? (
+                format ? (
+                  <div ref={socialWrapRef}>
+                    <ModuleAsDrawn
+                      social
+                      variantId={drawnSource.variantId}
+                      content={drawnSource.content}
+                      brandId={brandId}
+                      mode={mode}
+                      frameW={format.width}
+                      frameH={format.height}
+                      displayWidth={Math.round(340 * Math.max(1, format.width / format.height))}
+                    />
+                  </div>
+                ) : (
+                  <ModuleAsDrawn
+                    ref={printPageRef}
+                    variantId={drawnSource.variantId}
+                    content={drawnSource.content}
+                    brandId={brandId}
+                    mode={mode}
+                    frameW={frameOf(result, null).w}
+                    frameH={frameOf(result, null).h}
+                    displayWidth={420}
+                  />
+                )
+              ) : format ? (
                 <div ref={socialWrapRef}>
                   <SocialRenderer
                     format={format}
@@ -659,6 +740,16 @@ const FIELD_LABEL: Record<AdaptFieldKey, string> = {
   cta: "Call to action",
   footnote: "Source / footnote",
   media: "Picture",
+  details: "Other details",
+};
+
+const SHAPE_LABEL: Record<string, string> = {
+  list: "list",
+  steps: "numbered steps",
+  pairs: "before / after columns",
+  stats: "figure grid",
+  quadrants: "2 × 2 matrix",
+  table: "comparison table",
 };
 
 function InfoBuilder({
@@ -679,7 +770,7 @@ function InfoBuilder({
   const edit = (patch: AdaptSelection["edits"]) => onChange({ ...selection, edits: { ...selection.edits, ...patch } });
   const input = "w-full rounded-sm border border-[color:var(--color-border)] px-2 py-1 text-[12.5px] disabled:opacity-50";
   const textKeys = (["eyebrow", "headline", "body", "cta", "footnote"] as const).filter((k) => source[k]);
-  const hasAny = textKeys.length || source.points?.length || source.stat || source.media;
+  const hasAny = textKeys.length || source.points?.length || source.stat || source.media || source.details?.length;
   if (!hasAny) return null;
   return (
     <div className="space-y-3 border-t border-[color:var(--color-border)] pt-4">
@@ -745,6 +836,11 @@ function InfoBuilder({
           <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide">
             <input type="checkbox" className="accent-[color:var(--color-primary)]" checked={on("points")} onChange={() => toggle("points")} />
             {FIELD_LABEL.points}
+            {source.shape && source.shape.kind !== "list" ? (
+              <span className="font-normal normal-case tracking-normal text-[color:var(--color-muted-foreground)]">
+                laid out as {SHAPE_LABEL[source.shape.kind]}
+              </span>
+            ) : null}
           </label>
           {source.points.map((p, i) => {
             const pointOn = !selection.excludePoints.includes(i);
@@ -773,6 +869,22 @@ function InfoBuilder({
               </div>
             );
           })}
+        </div>
+      ) : null}
+      {source.details?.length ? (
+        <div className="space-y-1">
+          <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide">
+            <input type="checkbox" className="accent-[color:var(--color-primary)]" checked={on("details")} onChange={() => toggle("details")} />
+            {FIELD_LABEL.details}
+          </label>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[12px]">
+            {source.details.map((d) => (
+              <Fragment key={d.label}>
+                <dt className="text-[color:var(--color-muted-foreground)]">{d.label}</dt>
+                <dd className="text-[color:var(--color-foreground)]">{d.value}</dd>
+              </Fragment>
+            ))}
+          </dl>
         </div>
       ) : null}
       {source.media ? (
