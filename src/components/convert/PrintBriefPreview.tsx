@@ -125,8 +125,8 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
             {pts.map((p, i) => {
               const [h, b] = split(p);
               return (
-                <li key={i} style={{ display: "grid", gridTemplateColumns: `${u(banner ? 64 : 28)}px 1fr`, gap: u(12), alignItems: "start", fontSize: cellPx, lineHeight: t.bodyLeading }}>
-                  <span style={{ width: u(banner ? 64 : 28), height: u(banner ? 64 : 28), background: accent, color: ink, fontWeight: 700, display: "grid", placeItems: "center", fontSize: "0.9em" }}>{iconFor(content.pointIcons, p) ? <AdaptIcon name={iconFor(content.pointIcons, p)!} label={p} size={u(banner ? 38 : 18)} color={ink} /> : i + 1}</span>
+                <li key={i} style={{ ...printGlass(accent, u(14), u(4)), padding: u(banner ? 24 : 12), display: "grid", gridTemplateColumns: `${u(banner ? 64 : 28)}px 1fr`, gap: u(12), alignItems: "start", fontSize: cellPx, lineHeight: t.bodyLeading }}>
+                  <span style={{ width: u(banner ? 64 : 28), height: u(banner ? 64 : 28), background: accent, color: ink, borderRadius: u(8), fontWeight: 700, display: "grid", placeItems: "center", fontSize: "0.9em" }}>{iconFor(content.pointIcons, p) ? <AdaptIcon name={iconFor(content.pointIcons, p)!} label={p} size={u(banner ? 38 : 18)} color={ink} /> : i + 1}</span>
                   <span><strong style={{ display: "block" }}>{h}</strong>{b ? <span style={{ color: "#3A3A55" }}>{b}</span> : null}</span>
                 </li>
               );
