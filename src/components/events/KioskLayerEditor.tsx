@@ -295,7 +295,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
       </div>
 
       {/* Layers */}
-      <div className="order-2 lg:order-1">
+      <div className={wide ? "order-2" : "order-2 lg:order-1"}>
         <h4 className="text-sm font-semibold text-[#03002C]">Layers</h4>
         <ul className="mt-2 max-h-[640px] space-y-1 overflow-auto pr-1">
           {L.blocks.map((b) => {
