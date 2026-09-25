@@ -36,6 +36,7 @@ import {
   type LondonBoothArtboard,
   type LondonBoothSpec,
 } from "@/lib/next-london-booths";
+import { CALIFORNIA_KIOSK_FINALS, type CaliforniaKioskFinal } from "@/lib/next-california-kiosk-finals";
 
 export {
   CALIFORNIA_KIOSK_BLEED_MM,
@@ -70,7 +71,7 @@ export function isCaliforniaKioskId(id: string | null | undefined): boolean {
   return !!californiaKioskSourceBoothId(id);
 }
 
-function kioskArtboards(): LondonBoothArtboard[] {
+function kioskArtboards(fin?: CaliforniaKioskFinal): LondonBoothArtboard[] {
   return [
     {
       kind: "main",
@@ -81,7 +82,7 @@ function kioskArtboards(): LondonBoothArtboard[] {
       bleedMm: CALIFORNIA_KIOSK_BLEED_MM,
       // Native re-lay: no supplied raster ground, so the app paints the plate
       // and every mark stays editable.
-      previewUrl: null,
+      previewUrl: fin?.front ?? null,
     },
     {
       kind: "return-l",
@@ -90,7 +91,7 @@ function kioskArtboards(): LondonBoothArtboard[] {
       trimW: CALIFORNIA_KIOSK_RETURN_TRIM.w,
       trimH: CALIFORNIA_KIOSK_RETURN_TRIM.h,
       bleedMm: CALIFORNIA_KIOSK_BLEED_MM,
-      previewUrl: null,
+      previewUrl: fin?.returnL ?? null,
     },
     {
       kind: "return-r",
@@ -99,7 +100,7 @@ function kioskArtboards(): LondonBoothArtboard[] {
       trimW: CALIFORNIA_KIOSK_RETURN_TRIM.w,
       trimH: CALIFORNIA_KIOSK_RETURN_TRIM.h,
       bleedMm: CALIFORNIA_KIOSK_BLEED_MM,
-      previewUrl: null,
+      previewUrl: fin?.returnR ?? null,
     },
   ];
 }
@@ -114,12 +115,15 @@ export const CALIFORNIA_KIOSKS: LondonBoothSpec[] = LONDON_BOOTHS.map((booth) =>
   // TV aperture, the returns do not.
   shellId: "tv-kiosk",
   vendor: booth.vendor,
-  sourceFile: CALIFORNIA_KIOSK_TEMPLATE.file,
-  // The deliverable is the app-built kiosk file, not a vendor master, so no
-  // supplied `.ai` is offered here.
-  aiUrl: null,
+  // Partners with a London final get that final re-laid onto the kiosk
+  // (outlined vector art, rdraft until the SF revision is published). The rest
+  // keep the app-built native re-lay.
+  sourceFile: CALIFORNIA_KIOSK_FINALS[booth.id]
+    ? `rdraft-sf-kiosk-${booth.id}.ai`
+    : CALIFORNIA_KIOSK_TEMPLATE.file,
+  aiUrl: CALIFORNIA_KIOSK_FINALS[booth.id]?.aiUrl ?? null,
   style: booth.style,
-  artboards: kioskArtboards(),
+  artboards: kioskArtboards(CALIFORNIA_KIOSK_FINALS[booth.id]),
 }));
 
 /** How much of a London wall would be lost if it were scaled to the kiosk. */
