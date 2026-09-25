@@ -9,7 +9,7 @@
 // Every file is named rdraft- until the San Francisco revision is published.
 
 import JSZip from "jszip";
-import { PDFDocument, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, PDFName, PDFOperator, PDFOperatorNames } from "pdf-lib";
+import { PDFDocument, degrees, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, PDFName, PDFOperator, PDFOperatorNames } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 
 import {
@@ -25,6 +25,7 @@ import {
   kioskGround,
   kioskLiveFileBase,
   layoutKiosk,
+  partCentre,
   textLineBoxes,
   type KioskEdits,
   type LiveLayout,
@@ -164,7 +165,10 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
         top: L.mediaH - (L.originY + q.src.y0),
         bottom: L.mediaH - (L.originY + q.src.y1),
       });
-      page.drawPage(e2, { x: B + q.x, y: H - (B + q.y + (q.src.y1 - q.src.y0) * q.scale), xScale: q.scale, yScale: q.scale });
+      const ox = B + q.x, oy = H - (B + q.y + (q.src.y1 - q.src.y0) * q.scale);
+      const ctr = partCentre(q);
+      const o = pdfRot(ox, oy, B + ctr.x, H - (B + ctr.y), q.rot);
+      page.drawPage(e2, { x: o.x, y: o.y, xScale: q.scale, yScale: q.scale, opacity: q.opacity, rotate: degrees(-q.rot) });
     }
   }
 
@@ -176,7 +180,9 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
     const path = r
       ? `M ${r} 0 H ${d.w - r} A ${r} ${r} 0 0 1 ${d.w - r} ${d.h} H ${r} A ${r} ${r} 0 0 1 ${r} 0 Z`
       : `M 0 0 H ${d.w} V ${d.h} H 0 Z`;
-    page.drawSvgPath(path, { x: B + d.x, y: H - (B + d.y), color: hexRgb(d.color), borderWidth: 0 });
+    const rot = d.rot ?? 0;
+    const o = pdfRot(B + d.x, H - (B + d.y), B + d.x + d.w / 2, H - (B + d.y + d.h / 2), rot);
+    page.drawSvgPath(path, { x: o.x, y: o.y, color: hexRgb(d.color), borderWidth: 0, opacity: d.opacity ?? 1, rotate: degrees(-rot) });
   }
 
   const fonts = new Map<string, Awaited<ReturnType<typeof doc.embedFont>>>();
@@ -197,11 +203,20 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
         : textLineBoxes({ ...t, lines: t.lines.map(clean) }, (s) => f.widthOfTextAtSize(s, t.ksize)).map((l) => ({ ...l, tc: t.trackPt }));
       for (const l of lines) {
         page.pushOperators(pushGraphicsState(), setCharacterSpacing(l.tc));
-        page.drawText(l.text, { x: B + l.x, y: H - (B + l.y), size: t.ksize, font: f, color: hexRgb(t.fill) });
+        const o = pdfRot(B + l.x, H - (B + l.y), B + t.ax, H - (B + t.ky), t.rot);
+        page.drawText(l.text, { x: o.x, y: o.y, size: t.ksize, font: f, color: hexRgb(t.fill), opacity: t.opacity, rotate: degrees(-t.rot) });
         page.pushOperators(setCharacterSpacing(0), popGraphicsState());
       }
     }
   return doc.save();
+}
+
+/** Where a PDF origin lands when its box is turned `rot`° clockwise (as seen) about (cx,cy). */
+function pdfRot(ox: number, oy: number, cx: number, cy: number, rot: number) {
+  if (!rot) return { x: ox, y: oy };
+  const a = (-rot * Math.PI) / 180, c = Math.cos(a), s = Math.sin(a);
+  const dx = ox - cx, dy = oy - cy;
+  return { x: cx + dx * c - dy * s, y: cy + dx * s + dy * c };
 }
 
 function save(blob: Blob, name: string) {
