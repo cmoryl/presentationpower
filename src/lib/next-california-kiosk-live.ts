@@ -144,7 +144,12 @@ export function textLineBoxes(t: PlacedText, width: (s: string) => number) {
 
 /** Accent rule markup for SVG (Accents layer). */
 export function dividerSvg(d: KioskDivider) {
-  return `<rect id="${d.id}" x="${d.x.toFixed(2)}" y="${d.y.toFixed(2)}" width="${d.w.toFixed(2)}" height="${d.h.toFixed(2)}"${d.round ? ` rx="${(d.h / 2).toFixed(2)}"` : ""} fill="${d.color}"/>`;
+  return `<rect id="${d.id}" x="${d.x.toFixed(2)}" y="${d.y.toFixed(2)}" width="${d.w.toFixed(2)}" height="${d.h.toFixed(2)}"${d.round ? ` rx="${(d.h / 2).toFixed(2)}"` : ""} fill="${d.color}"${fx(d.opacity ?? 1, d.rot ?? 0, d.x + d.w / 2, d.y + d.h / 2)}/>`;
+}
+
+/** SVG opacity + rotate attributes (empty when neutral). */
+export function fx(opacity: number, rot: number, cx: number, cy: number) {
+  return `${opacity < 1 ? ` opacity="${opacity.toFixed(3)}"` : ""}${rot ? ` transform="rotate(${rot.toFixed(2)} ${cx.toFixed(2)} ${cy.toFixed(2)})"` : ""}`;
 }
 
 /** Every object id that moves with `id` (itself when ungrouped). */
@@ -424,7 +429,7 @@ export function buildKioskFrontSvg(
     for (const q of p.parts) {
       if (q.hidden) continue;
       parts.push(
-        `<g id="object-${q.part.id}" inkscape:label="Object ${q.part.id}" transform="translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})"><g clip-path="url(#c-${q.part.id})"><use xlink:href="#art" href="#art" x="${-L.originX}" y="${-L.originY}" width="${vw}" height="${vh}"/></g></g>`,
+        `<g id="object-${q.part.id}" inkscape:label="Object ${q.part.id}"${fx(q.opacity, q.rot, partCentre(q).x, partCentre(q).y)}><g transform="translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})"><g clip-path="url(#c-${q.part.id})"><use xlink:href="#art" href="#art" x="${-L.originX}" y="${-L.originY}" width="${vw}" height="${vh}"/></g></g></g>`,
       );
     }
     parts.push(`</g>`);
@@ -438,7 +443,7 @@ export function buildKioskFrontSvg(
     for (const t of p.texts) {
       const d = opts.outline?.(t);
       if (d) {
-        parts.push(`<path id="${t.id}" d="${d}" fill="${t.fill}"/>`);
+        parts.push(`<path id="${t.id}" d="${d}" fill="${t.fill}"${fx(t.opacity, t.rot, t.ax, t.ky)}/>`);
         continue;
       }
       const fit = t.fixed ? ` textLength="${t.kw.toFixed(2)}" lengthAdjust="spacing"` : "";
@@ -446,7 +451,7 @@ export function buildKioskFrontSvg(
       const ls = t.trackPt ? ` letter-spacing="${t.trackPt.toFixed(2)}"` : "";
       const spans = t.lines.map((s, i) => `<tspan x="${t.ax.toFixed(2)}" y="${(t.ky + i * t.lead * t.ksize).toFixed(2)}">${esc(s)}</tspan>`).join("");
       parts.push(
-        `<text id="${t.id}" text-anchor="${anchor}" font-family="${esc((opts.family ?? kioskFontFamily)(t.font))}" font-size="${t.ksize.toFixed(2)}" fill="${t.fill}" xml:space="preserve"${ls}${fit}>${spans}</text>`,
+        `<text id="${t.id}" text-anchor="${anchor}" font-family="${esc((opts.family ?? kioskFontFamily)(t.font))}" font-size="${t.ksize.toFixed(2)}" fill="${t.fill}" xml:space="preserve"${ls}${fit}${fx(t.opacity, t.rot, t.ax, t.ky)}>${spans}</text>`,
       );
     }
   parts.push(`</g>`);
