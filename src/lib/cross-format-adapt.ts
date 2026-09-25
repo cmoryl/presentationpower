@@ -624,7 +624,10 @@ export function contentFromSlide(
     : undefined;
   const eyebrow = notHeadline(pick(c, EYEBROW_KEYS));
   const body = pickOther(c, BODY_KEYS, headline) ?? quoteLine ?? coverLine;
-  const points = pickPoints(c);
+  const chart = chartFrom(c);
+  const chartLabels = new Set((chart?.data ?? []).map((d) => d.label.trim().toLowerCase()));
+  // Points that only repeat a chart label are drawn by the chart itself.
+  const points = pickPoints(c)?.filter((p) => !chartLabels.has(p.trim().toLowerCase()));
   const cta = pick(c, CTA_KEYS);
   const footnote = pickOther(c, quoteLine ? FOOTNOTE_KEYS.filter((k) => k !== "attribution") : FOOTNOTE_KEYS, headline);
   return {
@@ -637,7 +640,7 @@ export function contentFromSlide(
     footnote,
     media: adaptMediaFrom(c),
     shape: points?.length ? shapeFrom(c) : undefined,
-    chart: chartFrom(c),
+    chart,
     details: detailsFrom(c, [eyebrow, headline, body, cta, footnote, str(c.prepared), str(c.date), str(c.attribution), str(c.role), str(c.org)]),
   };
 }
