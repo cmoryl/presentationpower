@@ -87,7 +87,18 @@ export function kioskFontFaceCss(): string {
 // ---- edits ------------------------------------------------------------------
 
 export type BlockEdit = { dx?: number; dy?: number; scale?: number; hidden?: boolean };
-export type TextEdit = { text?: string; dx?: number; dy?: number; size?: number; color?: string; hidden?: boolean };
+export type TextAlign = "left" | "center" | "right";
+export type TextEdit = {
+  text?: string; dx?: number; dy?: number; size?: number; color?: string; hidden?: boolean;
+  /** Line anchor: left edge, centre or right edge of the line. */
+  align?: TextAlign;
+  /** Line spacing as a multiple of the type size (multi-line text). */
+  lead?: number;
+  /** Letter spacing in 1/1000 em, as in design apps. */
+  track?: number;
+};
+/** An accent divider rule placed on the kiosk front (kiosk points, on trim). */
+export type KioskDivider = { id: string; x: number; y: number; w: number; h: number; color: string; round?: boolean; hidden?: boolean };
 export type KioskEdits = {
   ground?: { top: string; bottom: string } | null;
   blocks?: Record<string, BlockEdit>;
@@ -96,7 +107,26 @@ export type KioskEdits = {
   parts?: Record<string, BlockEdit>;
   /** Objects the user grouped: each group moves, hides and resets together. */
   groups?: string[][];
+  /** Accent divider rules added in the editor. */
+  dividers?: KioskDivider[];
 };
+
+/** Safe side margin used by the editor's align tools (2 in). */
+export const KIOSK_MARGIN = 144;
+
+/** Left x of each line of a placed text, given a width measurer. */
+export function textLineBoxes(t: PlacedText, width: (s: string) => number) {
+  return t.lines.map((s, i) => {
+    const w = width(s) + t.trackPt * Math.max(0, [...s].length - 1);
+    const x = t.align === "center" ? t.ax - w / 2 : t.align === "right" ? t.ax - w : t.ax;
+    return { text: s, x, y: t.ky + i * t.lead * t.ksize, w };
+  });
+}
+
+/** Accent rule markup for SVG (Accents layer). */
+export function dividerSvg(d: KioskDivider) {
+  return `<rect id="${d.id}" x="${d.x.toFixed(2)}" y="${d.y.toFixed(2)}" width="${d.w.toFixed(2)}" height="${d.h.toFixed(2)}"${d.round ? ` rx="${(d.h / 2).toFixed(2)}"` : ""} fill="${d.color}"/>`;
+}
 
 /** Every object id that moves with `id` (itself when ungrouped). */
 export function partGroup(edits: KioskEdits, id: string, L?: LiveLayout): string[] {
@@ -146,7 +176,13 @@ export type PlacedBlock = {
 };
 /** src = London rect (clamped to the clip); x/y = kiosk top-left; scale = London→kiosk. */
 export type PlacedPart = { part: LivePart; src: { x0: number; y0: number; x1: number; y1: number }; x: number; y: number; scale: number; hidden: boolean };
-export type PlacedText = LiveText & { kx: number; ky: number; ksize: number; kw: number; edited: boolean; fill: string };
+export type PlacedText = LiveText & {
+  kx: number; ky: number; ksize: number; kw: number; edited: boolean; fill: string;
+  /** Lines (split on newlines), anchor x for the alignment, line spacing, tracking in pt. */
+  lines: string[]; align: TextAlign; ax: number; lead: number; trackPt: number;
+  /** True when the original London spacing (textLength) still applies. */
+  fixed: boolean;
+};
 
 function isHidden(b: LiveBlock, e?: BlockEdit) {
   return e?.hidden ?? b.screen;
