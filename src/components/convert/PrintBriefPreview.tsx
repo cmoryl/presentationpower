@@ -11,12 +11,23 @@
 // -----------------------------------------------------------------------------
 
 import { AdaptIcon, iconFor } from "./AdaptIcon";
+import type { CSSProperties as _CSS } from "react";
 import { Fragment, forwardRef, useCallback, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import type { AdaptResult } from "@/lib/cross-format-adapt";
 import { CSS_DPI } from "@/lib/print-proof-export";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { AdaptChartBlock } from "./AdaptChartBlock";
 import { MediaTile } from "@/components/slide/module-primitives";
+import { moduleCardSurface } from "@/components/slide/flagship";
+
+/** Module glass box for light print pages: top-lit wash fading out, rounded, accent seam. */
+function printGlass(accent: string, radius: number, seam: number): _CSS {
+  return {
+    ...moduleCardSurface(accent, "light", { radius }),
+    backgroundColor: "rgba(255,255,255,0.55)",
+    boxShadow: `inset 0 ${Math.max(2, seam)}px 0 0 ${accent}`,
+  };
+}
 
 export type PrintBriefPreviewProps = {
   result: AdaptResult;
@@ -130,7 +141,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
               const [h, b] = split(m ? p.slice(m[0].length) : p);
               const after = m?.[1] === "After";
               return (
-                <div key={i} style={{ padding: u(16), background: after ? "#EEF1F7" : "#F2F2F2", borderTop: `${u(4)}px solid ${after ? accent : "#666666"}`, fontSize: cellPx, lineHeight: t.bodyLeading }}>
+                <div key={i} style={{ padding: u(16), ...printGlass(after ? accent : "#666666", u(14), u(4)), fontSize: cellPx, lineHeight: t.bodyLeading }}>
                   {m ? <div style={{ fontSize: "0.75em", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#666666", marginBottom: u(6) }}>{m[1]}</div> : null}
                   <strong style={{ display: "block", marginBottom: u(4) }}>{h}</strong>
                   {b ? <span style={{ color: "#3A3A55" }}>{b}</span> : null}
@@ -144,7 +155,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
           <div data-shape="quadrants" style={{ ...place }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: u(6) }}>
               {pts.slice(0, 4).map((p, i) => (
-                <div key={i} style={{ padding: u(14), minHeight: u(banner ? 220 : 70), background: i === 0 ? accent : "#EEF1F7", fontSize: cellPx, fontWeight: 600, lineHeight: 1.25 }}>{p}</div>
+                <div key={i} style={{ padding: u(14), minHeight: u(banner ? 220 : 70), ...(i === 0 ? { background: accent, color: "#FFFFFF", borderRadius: u(14) } : printGlass(accent, u(14), u(4))), fontSize: cellPx, fontWeight: 600, lineHeight: 1.25 }}>{p}</div>
               ))}
             </div>
             {shape.axisX || shape.axisY ? (
@@ -346,8 +357,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
                     fontSize: t.pointPx * bb * (banner ? 1.3 : 1),
                     lineHeight: t.bodyLeading,
                     padding: `${u(banner ? 18 : 10)}px ${u(banner ? 20 : 12)}px`,
-                    background: "rgba(224,232,245,0.7)",
-                    borderTop: `${u(banner ? 6 : 3)}px solid ${accent}`,
+                    ...printGlass(accent, u(banner ? 22 : 12), u(banner ? 6 : 3)),
                     fontWeight: banner ? 500 : undefined,
                   }}
                 >
