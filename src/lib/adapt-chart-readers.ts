@@ -72,13 +72,17 @@ export function richChartFrom(c: R): AdaptChart | undefined {
   if (ser.length) {
     const series = ser.map((x) => ({ name: String(x.label), values: (x.points as unknown[]).map((v) => n(v) ?? 0) }));
     const len = Math.max(...series.map((x) => x.values.length));
-    const labels = Array.isArray(c.labels) ? (c.labels as unknown[]).map(String) : Array.from({ length: len }, (_, i) => String(i + 1));
-    return { kind: /stack|area/i.test(String(c.variant ?? c.kind ?? "")) || ser.length > 2 ? "area" : "line", data: firstData(labels, series), labels, series };
+    const ax = (c.axis as R | undefined)?.x;
+    const labels = Array.isArray(ax) ? ax.map(String) : Array.isArray(c.labels) ? (c.labels as unknown[]).map(String) : Array.from({ length: len }, (_, i) => String(i + 1));
+    const unit = s(c.unit);
+    // Percent curves never stack; volumes do.
+    return { kind: unit === "%" ? "line" : "area", data: firstData(labels, series), labels, series, unit: unit === "%" ? "%" : undefined };
   }
   const cols = recs(c.columns).filter((x) => Array.isArray(x.values));
   if (cols.length && cols.every((x) => (x.values as unknown[]).every((v) => typeof v === "number"))) {
     const k = (cols[0].values as unknown[]).length;
-    const names = Array.isArray(c.legend) ? (c.legend as unknown[]).map(String) : Array.from({ length: k }, (_, i) => `Series ${i + 1}`);
+    const segs = recs(c.segments).map((x) => s(x.label) ?? s(x.name)).filter(Boolean) as string[];
+    const names = segs.length ? segs : Array.isArray(c.legend) ? (c.legend as unknown[]).map(String) : Array.from({ length: k }, (_, i) => `Series ${i + 1}`);
     const labels = cols.map((x) => String(x.label));
     const series = names.slice(0, k).map((name, j) => ({ name, values: cols.map((x) => n((x.values as unknown[])[j]) ?? 0) }));
     return { kind: "stacked", data: firstData(labels, series), labels, series };
