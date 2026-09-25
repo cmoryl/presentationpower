@@ -47,6 +47,8 @@ export type AdaptContent = {
   chart?: AdaptChart;
   /** The module's picture cells (bento media cells, image grids, hero photo). */
   images?: AdaptImage[];
+  /** Icon names per carried point / chart label (point text → icon ref). */
+  pointIcons?: Record<string, string>;
 };
 
 export type AdaptImage = { seed: string; url?: string; title?: string };
@@ -430,12 +432,7 @@ function pickOther(content: Record<string, unknown>, keys: string[], except: str
   return undefined;
 }
 
-function pickPoints(content: Record<string, unknown>): string[] | undefined {
-  for (const k of POINT_KEYS) {
-    const v = asList(content[k]);
-    if (!v) continue;
-    const out = v
-      .map((item) => {
+function pointText(item: unknown): string | undefined {
         if (typeof item === "string") return str(item);
         if (item && typeof item === "object") {
           const rec = item as Record<string, unknown>;
@@ -468,7 +465,33 @@ function pickPoints(content: Record<string, unknown>): string[] | undefined {
           return [lead, tail].filter(Boolean).join(" — ") || undefined;
         }
         return undefined;
-      })
+      }
+
+/** Icon names a module attaches to its points or chart bars, keyed by the carried text. */
+export function pointIconsFrom(c: Record<string, unknown>): Record<string, string> | undefined {
+  const out: Record<string, string> = {};
+  for (const k of [...POINT_KEYS, "bars", "series"]) {
+    const v = asList(c[k]);
+    if (!v) continue;
+    for (const item of v) {
+      if (!item || typeof item !== "object") continue;
+      const icon = str((item as Record<string, unknown>).icon);
+      if (!icon) continue;
+      const t = pointText(item);
+      if (t) out[t] = icon;
+      const lab = str((item as Record<string, unknown>).label);
+      if (lab) out[lab] = icon;
+    }
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
+function pickPoints(content: Record<string, unknown>): string[] | undefined {
+  for (const k of POINT_KEYS) {
+    const v = asList(content[k]);
+    if (!v) continue;
+    const out = v
+      .map(pointText)
       .filter((x): x is string => Boolean(x));
     if (out.length > 0) return out;
   }
@@ -668,6 +691,7 @@ export function contentFromSlide(
     shape: points?.length ? shapeFrom(c) : undefined,
     chart,
     images: imagesFrom(c),
+    pointIcons: pointIconsFrom(c),
     details: detailsFrom(c, [eyebrow, headline, body, cta, footnote, str(c.prepared), str(c.date), str(c.attribution), str(c.role), str(c.org)]),
   };
 }
@@ -886,12 +910,17 @@ export function applySelection(source: AdaptContent, sel: AdaptSelection): Adapt
     const v = e[k] ?? source[k];
     return v && v.trim() ? v : undefined;
   };
-  const points = off.has("points")
+  const pointRows = off.has("points")
     ? undefined
     : (source.points ?? [])
-        .map((p, i) => ({ p: e.points?.[i] ?? p, i }))
-        .filter(({ p, i }) => !sel.excludePoints.includes(i) && p.trim())
-        .map(({ p }) => p);
+        .map((p, i) => ({ p: e.points?.[i] ?? p, i, o: p }))
+        .filter(({ p, i }) => !sel.excludePoints.includes(i) && p.trim());
+  const icons: Record<string, string> = {};
+  if (source.pointIcons) {
+    for (const [k, v] of Object.entries(source.pointIcons)) icons[k] = v;
+    for (const x of pointRows ?? []) if (source.pointIcons[x.o]) icons[x.p] = source.pointIcons[x.o];
+  }
+  const points = pointRows?.map(({ p }) => p);
   const stat =
     off.has("stat") || !source.stat
       ? undefined
@@ -909,5 +938,6 @@ export function applySelection(source: AdaptContent, sel: AdaptSelection): Adapt
     details: off.has("details") ? undefined : source.details,
     chart: off.has("media") ? undefined : source.chart,
     images: off.has("media") ? undefined : source.images,
+    pointIcons: Object.keys(icons).length ? icons : undefined,
   };
 }
