@@ -278,10 +278,12 @@ export function AdaptChartBlock({
         {pts.map(([x, y], i) => (
           <circle key={i} cx={x} cy={y} r={fontPx * 0.28} fill={BLUE} />
         ))}
-        <text x={pts[pts.length - 1][0]} y={pts[pts.length - 1][1] - fontPx * 0.7} textAnchor="end" fontSize={fontPx * 1.1} fontWeight={700} fill={ink}>{fmt(d[d.length - 1].value)}</text>
+        {/* End value never rises above the chart's top edge. */}
+        <text x={pts[pts.length - 1][0]} y={Math.max(fontPx * 1.05, pts[pts.length - 1][1] - fontPx * 0.7)} textAnchor="end" fontSize={fontPx * 1.1} fontWeight={700} fill={ink}>{fmt(d[d.length - 1].value)}</text>
         {d.map((x, i) =>
           d.length <= 8 || i % 2 === 0 ? (
-            <text key={i} x={step * (i + 0.5)} y={height - fontPx * 0.4} textAnchor="middle" fontSize={fontPx} fill={muted}>{x.label.slice(0, 10)}</text>
+            // Edge labels anchor inward so they can't spill past the chart sides.
+            <text key={i} x={i === 0 ? 0 : i === d.length - 1 ? width : step * (i + 0.5)} y={height - fontPx * 0.4} textAnchor={i === 0 ? "start" : i === d.length - 1 ? "end" : "middle"} fontSize={fontPx} fill={muted}>{x.label.slice(0, 10)}</text>
           ) : null,
         )}
       </svg>
