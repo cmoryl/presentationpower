@@ -14,6 +14,7 @@ import { Fragment, forwardRef, useCallback, useLayoutEffect, useRef, useState, t
 import type { AdaptResult } from "@/lib/cross-format-adapt";
 import { CSS_DPI } from "@/lib/print-proof-export";
 import { BRAND_MODES } from "@/lib/taxonomy";
+import { AdaptChartBlock } from "./AdaptChartBlock";
 
 export type PrintBriefPreviewProps = {
   result: AdaptResult;
@@ -299,6 +300,17 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
             </p>
           ) : null}
 
+          {content.chart ? (
+            <div data-adapt-chart-block="true" style={{ ...(land ? { gridColumn: 1 } : {}), ...(banner ? {} : {}) }}>
+              <AdaptChartBlock
+                chart={content.chart}
+                width={(land ? (pageW - pad * 2) * 0.5 : pageW - pad * 2)}
+                height={Math.round(pageH * (banner ? 0.2 : land ? 0.38 : content.points?.length ? 0.22 : 0.32))}
+                fontPx={Math.max(8, t.pointPx * 0.85)}
+              />
+            </div>
+          ) : null}
+
           {shapedBlock ? shapedBlock : content.points?.length ? (
             <ul
               style={{
@@ -318,8 +330,9 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
                   style={{
                     fontSize: t.pointPx * bb * (banner ? 1.3 : 1),
                     lineHeight: t.bodyLeading,
-                    paddingLeft: u(banner ? 20 : 12),
-                    borderLeft: `${u(banner ? 6 : 3)}px solid ${accent}`,
+                    padding: `${u(banner ? 18 : 10)}px ${u(banner ? 20 : 12)}px`,
+                    background: "rgba(224,232,245,0.7)",
+                    borderTop: `${u(banner ? 6 : 3)}px solid ${accent}`,
                     fontWeight: banner ? 500 : undefined,
                   }}
                 >

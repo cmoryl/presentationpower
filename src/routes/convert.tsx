@@ -234,8 +234,10 @@ function ConvertPage() {
   const result = useMemo(() => adaptContent(source, targetId), [source, targetId]);
   const format = adaptTargetFormat(result.target);
   // Modules with a set of cells (bento, cards, figures) rebuild as a tile grid on social sizes.
-  const gridPoints = (source.points ?? []).filter(Boolean);
-  const socialGrid = gridPoints.length >= 3 && source.shape?.kind !== "table";
+  const chartLabels = new Set((source.chart?.data ?? []).map((d) => d.label.trim().toLowerCase()));
+  // Points that only repeat the chart's labels are drawn by the chart itself.
+  const gridPoints = (source.points ?? []).filter((p) => p && !chartLabels.has(p.split(" — ")[0].trim().toLowerCase()));
+  const socialGrid = (gridPoints.length >= 3 || !!source.chart) && source.shape?.kind !== "table";
   const [groundId, setGroundId] = useState(CONVERT_GROUNDS[0].id);
   const ground = CONVERT_GROUNDS.find((g) => g.id === groundId) ?? CONVERT_GROUNDS[0];
   const groundVariant = drawnSource?.variantId ?? "custom";
@@ -646,7 +648,7 @@ function ConvertPage() {
                             displayWidth={f ? Math.round(170 * Math.max(1, f.width / f.height)) : 200}
                           />
                         ) : f && socialGrid ? (
-                          <SocialModuleGrid format={f} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={170} variantId={groundVariant} ground={ground} />
+                          <SocialModuleGrid format={f} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={170} variantId={groundVariant} ground={ground} chart={source.chart} />
                         ) : f ? (
                           <SocialRenderer
                             format={f}
@@ -699,7 +701,7 @@ function ConvertPage() {
                 )
               ) : format && socialGrid ? (
                 <div ref={socialWrapRef}>
-                  <SocialModuleGrid format={format} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={340} variantId={groundVariant} ground={ground} />
+                  <SocialModuleGrid format={format} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={340} variantId={groundVariant} ground={ground} chart={source.chart} />
                 </div>
               ) : format ? (
                 <div ref={socialWrapRef}>

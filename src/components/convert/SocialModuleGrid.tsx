@@ -9,6 +9,8 @@
 // - Background: any approved template background (light or dark face).
 // -----------------------------------------------------------------------------
 
+import type { AdaptChart } from "@/lib/cross-format-adapt";
+import { AdaptChartBlock } from "./AdaptChartBlock";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { BrandLockup } from "@/components/BrandLockup";
 import { BRAND_MODES } from "@/lib/taxonomy";
@@ -112,6 +114,7 @@ export type SocialModuleGridProps = {
   points: string[];
   displayShortEdge: number;
   ground?: ConvertGround;
+  chart?: AdaptChart;
 };
 
 export function SocialModuleGrid({
@@ -123,6 +126,7 @@ export function SocialModuleGrid({
   points,
   displayShortEdge,
   ground = CONVERT_GROUNDS[0],
+  chart,
 }: SocialModuleGridProps) {
   const brand = BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0];
   const W = format.width;
@@ -134,7 +138,7 @@ export function SocialModuleGrid({
   const f = short / 1080;
   const tiles = points.slice(0, socialGridCapacity(format)).map(toTile);
   const headH = H * (H / W >= 1.2 ? 0.2 : 0.24);
-  const g = pickGrid(tiles.length, W - pad * 2, H - pad * 2 - headH);
+  const g = pickGrid(tiles.length, W - pad * 2, (H - pad * 2 - headH) * (chart ? 0.55 : 1));
   const cols = g.cols;
   const dark = ground.dark;
   const text = dark ? "#FFFFFF" : INK;
@@ -176,6 +180,11 @@ export function SocialModuleGrid({
             <BrandLockup brand={brand} color={text} size="sm" showMark showDivision={false} monochromeOfficialLogo />
           </div>
         </div>
+        {chart ? (
+          <div style={{ flexShrink: 0 }}>
+            <AdaptChartBlock chart={chart} width={W - pad * 2} height={Math.round((H - pad * 2 - headH) * (tiles.length ? 0.42 : 0.95))} fontPx={Math.round(22 * f)} dark={dark} />
+          </div>
+        ) : null}
         <div
           style={{
             flex: 1,

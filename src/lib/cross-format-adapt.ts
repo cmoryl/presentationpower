@@ -43,7 +43,64 @@ export type AdaptContent = {
   shape?: AdaptShape;
   /** Every other field the module carries (owner, timeframe, cadence…). */
   details?: { label: string; value: string }[];
+  /** The module's chart, rebuilt as a native vector chart on every size. */
+  chart?: AdaptChart;
 };
+
+export type AdaptChart = {
+  kind: "bar" | "line" | "ring";
+  data: { label: string; value: number }[];
+  unit?: string;
+  highlight?: string;
+};
+
+function numOf(v: unknown): number | undefined {
+  if (typeof v === "number" && Number.isFinite(v)) return v;
+  if (typeof v === "string") {
+    const n = Number.parseFloat(v.replace(/[^0-9.-]/g, ""));
+    return Number.isFinite(n) ? n : undefined;
+  }
+  return undefined;
+}
+
+/** Read a module's chart data (series, bars, gauges, donuts, growth columns). */
+export function chartFrom(c: Record<string, unknown>): AdaptChart | undefined {
+  const pairs = (arr: unknown, labelKeys: string[]) =>
+    Array.isArray(arr)
+      ? arr
+          .map((x, i) => {
+            if (typeof x === "number") return { label: String(i + 1), value: x };
+            if (!x || typeof x !== "object") return undefined;
+            const o = x as Record<string, unknown>;
+            const value = numOf(o.value ?? o.score ?? o.pct);
+            const label = labelKeys.map((k) => o[k]).find((v) => typeof v === "string") as string | undefined;
+            return value === undefined ? undefined : { label: label ?? String(i + 1), value };
+          })
+          .filter((x): x is { label: string; value: number } => !!x)
+      : [];
+  const highlight = typeof c.highlight === "string" ? c.highlight : undefined;
+  const bars = pairs(c.bars, ["label", "name", "year"]);
+  if (bars.length >= 2) return { kind: "bar", data: bars, highlight };
+  const series = pairs(c.series, ["label", "period", "month"]);
+  if (series.length >= 2) return { kind: series.length > 8 ? "line" : "bar", data: series, highlight };
+  const prim = c.primary as Record<string, unknown> | undefined;
+  if (prim && Array.isArray(prim.series)) {
+    const d = pairs(prim.series, []);
+    if (d.length >= 2) return { kind: "line", data: d };
+  }
+  if (Array.isArray(c.items)) {
+    const items = c.items as Record<string, unknown>[];
+    const years = pairs(items, ["year", "label"]);
+    if (items.every((i) => i && typeof i === "object" && "year" in i) && years.length >= 2)
+      return { kind: "bar", data: years, unit: typeof items[0].unit === "string" ? (items[0].unit as string) : undefined };
+    const pct = pairs(items, ["label", "name"]);
+    if (pct.length >= 2 && pct.length === items.length && pct.every((p) => p.value >= 0 && p.value <= 100) && items.every((i) => typeof i.value === "number"))
+      return { kind: "ring", data: pct, unit: "%" };
+    const sp = items.map((i) => (Array.isArray(i?.series) ? pairs(i.series, []) : [])).find((d) => d.length >= 2);
+    if (sp) return { kind: "line", data: sp };
+  }
+  return undefined;
+}
 
 export type AdaptShape =
   | { kind: "list" }
@@ -580,6 +637,7 @@ export function contentFromSlide(
     footnote,
     media: adaptMediaFrom(c),
     shape: points?.length ? shapeFrom(c) : undefined,
+    chart: chartFrom(c),
     details: detailsFrom(c, [eyebrow, headline, body, cta, footnote, str(c.prepared), str(c.date), str(c.attribution), str(c.role), str(c.org)]),
   };
 }
@@ -819,5 +877,6 @@ export function applySelection(source: AdaptContent, sel: AdaptSelection): Adapt
     media: off.has("media") ? undefined : source.media,
     shape: points && points.length ? source.shape : undefined,
     details: off.has("details") ? undefined : source.details,
+    chart: off.has("media") ? undefined : source.chart,
   };
 }
