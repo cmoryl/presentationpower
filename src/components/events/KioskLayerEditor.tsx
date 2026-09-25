@@ -4,7 +4,7 @@
 // kiosk. The TV keep-clear is drawn as a guide only (never exported).
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, Eye, EyeOff, RotateCcw, Save, Undo2 } from "lucide-react";
+import { Download, Eye, EyeOff, Maximize2, Minimize2, Minus, Plus, RotateCcw, Save, Undo2 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useSessionUser } from "@/hooks/use-session-user";
@@ -57,6 +57,9 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   const [edits, setEdits] = useState<KioskEdits>({});
   const [history, setHistory] = useState<KioskEdits[]>([]);
   const [sel, setSel] = useState<Sel>(null);
+  /** Canvas height in px (zoom) and whether the canvas takes the full width. */
+  const [zoom, setZoom] = useState(640);
+  const [wide, setWide] = useState(false);
   /** Objects picked with Shift-click, ready to group. */
   const [picked, setPicked] = useState<string[]>([]);
   const [status, setStatus] = useState<string | null>(null);
@@ -185,18 +188,30 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   const selText = sel?.kind === "text" ? L.texts.find((t) => t.id === sel.id) : null;
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,300px)_1fr_minmax(0,280px)]">
+    <div className={wide ? "grid gap-5" : "grid gap-5 lg:grid-cols-[minmax(0,300px)_1fr_minmax(0,280px)]"}>
       <style>{kioskFontFaceCss()}</style>
       {/* Canvas */}
-      <div className="order-1 lg:order-2">
-        <div className="rounded-md border border-[#03002C]/12 bg-[#F2F4F9] p-3">
+      <div className={wide ? "order-1" : "order-1 lg:order-2"}>
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          <span className="text-[12px] font-semibold text-[#03002C]">View</span>
+          <button type="button" className={btn} aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(400, Math.round(z / 1.25)))} disabled={zoom <= 400}><Minus className="h-3.5 w-3.5" /></button>
+          <span className="min-w-[3.5rem] text-center text-[12px] text-[#03002C]/80">{Math.round((zoom / 640) * 100)}%</span>
+          <button type="button" className={btn} aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(4000, Math.round(z * 1.25)))} disabled={zoom >= 4000}><Plus className="h-3.5 w-3.5" /></button>
+          <button type="button" className={btn} onClick={() => { setZoom(640); setWide(false); }}>Fit</button>
+          <button type="button" className={btn} onClick={() => { setWide((w) => !w); setZoom((z) => (wide ? 640 : Math.max(z, 1100))); }}>
+            {wide ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+            {wide ? "Smaller view" : "Big view"}
+          </button>
+        </div>
+        <div className="max-h-[80vh] overflow-auto rounded-md border border-[#03002C]/12 bg-[#F2F4F9] p-3">
           {err ? <p className="text-sm text-[#E53D2E]">{err}</p> : null}
           {!art && !err ? <p className="text-sm text-[#03002C]/70">Loading the partner's artwork…</p> : null}
           {art ? (
             <svg
               ref={svgRef}
               viewBox={`${-B} ${-B} ${KIOSK_W + 2 * B} ${KIOSK_H + 2 * B}`}
-              className="mx-auto block h-[640px] w-auto touch-none select-none"
+              style={{ height: zoom }}
+              className="mx-auto block w-auto touch-none select-none"
               role="img"
               aria-label={`${vendor} kiosk front, editable`}
               onPointerMove={onMove}
@@ -280,7 +295,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
       </div>
 
       {/* Layers */}
-      <div className="order-2 lg:order-1">
+      <div className={wide ? "order-2" : "order-2 lg:order-1"}>
         <h4 className="text-sm font-semibold text-[#03002C]">Layers</h4>
         <ul className="mt-2 max-h-[640px] space-y-1 overflow-auto pr-1">
           {L.blocks.map((b) => {
