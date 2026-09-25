@@ -260,17 +260,27 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                   </g>
                 );
               })}
+              {(edits.dividers ?? []).filter((d) => !d.hidden).map((d) => {
+                const on = sel?.kind === "divider" && sel.id === d.id;
+                return (
+                  <g key={d.id} onPointerDown={startDrag({ kind: "divider", id: d.id })} className="cursor-move">
+                    <rect x={d.x} y={d.y - 20} width={d.w} height={d.h + 40} fill="transparent" />
+                    <rect x={d.x} y={d.y} width={d.w} height={d.h} rx={d.round ? d.h / 2 : 0} fill={d.color} />
+                    {on ? <rect x={d.x - 8} y={d.y - 8} width={d.w + 16} height={d.h + 16} fill="none" stroke="#003FC7" strokeWidth={6} strokeDasharray="24 12" /> : null}
+                  </g>
+                );
+              })}
               {placed.flatMap((p) => p.texts).map((t) => {
                 const on = sel?.kind === "text" && sel.id === t.id;
                 return (
                   <text
                     key={t.id}
-                    x={t.kx}
-                    y={t.ky}
                     fontSize={t.ksize}
                     fill={t.fill}
                     fontFamily={kioskFontFamily(t.font)}
-                    textLength={t.edited ? undefined : t.kw}
+                    textAnchor={t.align === "center" ? "middle" : t.align === "right" ? "end" : "start"}
+                    letterSpacing={t.trackPt || undefined}
+                    textLength={t.fixed ? t.kw : undefined}
                     lengthAdjust="spacing"
                     xmlSpace="preserve"
                     className="cursor-move"
@@ -279,10 +289,15 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                     paintOrder="stroke"
                     onPointerDown={startDrag({ kind: "text", id: t.id })}
                   >
-                    {t.text}
+                    {t.lines.map((s, i) => (
+                      <tspan key={i} x={t.ax} y={t.ky + i * t.lead * t.ksize}>{s || " "}</tspan>
+                    ))}
                   </text>
                 );
               })}
+              {guide !== null ? (
+                <line data-export-ignore="true" pointerEvents="none" x1={guide} x2={guide} y1={0} y2={KIOSK_H} stroke="#EC388A" strokeWidth={4} strokeDasharray="18 12" />
+              ) : null}
               <g data-export-ignore="true" pointerEvents="none">
                 <rect x={KIOSK_TV.x} y={KIOSK_TV.y} width={KIOSK_TV.w} height={KIOSK_TV.h} fill="#03002C" fillOpacity={0.55} stroke="#FFFFFF" strokeDasharray="30 18" strokeWidth={6} />
                 <text x={KIOSK_TV.x + KIOSK_TV.w / 2} y={KIOSK_TV.y + KIOSK_TV.h / 2} textAnchor="middle" fontSize={90} fill="#FFFFFF" fontFamily="Geist, sans-serif">TV keep-clear (guide, not printed)</text>
