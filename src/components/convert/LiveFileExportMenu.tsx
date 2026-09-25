@@ -56,12 +56,20 @@ export function LiveFileExportMenu({ resolveTarget, title, className }: LiveFile
     const id = toast.loading("Building the PowerPoint file…");
     try {
       const { exportPrintPagesAsPptx } = await import("@/lib/print-pptx-export");
-      const { unscaleForCapture } = await import("@/lib/convert-press-export");
-      // The preview is shrunk to fit the screen; measure the page at true size.
-      const restore = unscaleForCapture(t.node);
+      // The preview is shrunk to fit the screen and React may re-apply that
+      // scale mid-export, so export a detached true-size copy of the page.
+      const host = document.createElement("div");
+      host.setAttribute("aria-hidden", "true");
+      host.style.cssText = "position:fixed;left:-20000px;top:0;pointer-events:none;overflow:visible;";
+      const page = t.node.cloneNode(true) as HTMLElement;
+      page.style.transform = "none";
+      host.appendChild(page);
+      document.body.appendChild(host);
+      const restore = () => host.remove();
+      await document.fonts?.ready;
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
       const slug = `${assetFileSlug(title, "page")}-${assetFileSlug(t.label, "print")}${fidelity === "flat" ? "-picture" : ""}`;
-      await exportPrintPagesAsPptx(t.node, {
+      await exportPrintPagesAsPptx(page, {
         custom: { widthIn: t.trimIn.width, heightIn: t.trimIn.height },
         fidelity,
         dpi: 200,
