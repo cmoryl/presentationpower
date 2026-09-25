@@ -17,6 +17,7 @@
 //    converted.
 // -----------------------------------------------------------------------------
 
+import { richChartFrom } from "./adapt-chart-readers";
 import type { CampaignCopy } from "@/lib/campaigns";
 import { getFormat, type SocialFormat } from "@/lib/social-formats";
 
@@ -76,8 +77,22 @@ export function imagesFrom(c: Record<string, unknown>): AdaptImage[] | undefined
 }
 
 export type AdaptChart = {
-  kind: "bar" | "line" | "ring";
+  kind: "bar" | "line" | "ring" | "grouped" | "stacked" | "area" | "combo" | "waterfall" | "scatter" | "range" | "heatmap";
   data: { label: string; value: number }[];
+  /** Multi-series charts: category labels and one value list per series. */
+  labels?: string[];
+  series?: { name: string; values: number[] }[];
+  /** Rank charts: lower is better, drawn top-down. */
+  invert?: boolean;
+  /** Waterfall: which steps are totals rather than deltas. */
+  totals?: boolean[];
+  /** Scatter / bubble points. */
+  points?: { label: string; x: number; y: number; size?: number }[];
+  /** Range charts (dumbbell, slope, gantt, box plot, roadmap). */
+  ranges?: { label: string; from: number; to: number; mid?: number }[];
+  /** Heatmap cells, rows × labels. */
+  matrix?: number[][];
+  rowLabels?: string[];
   unit?: string;
   highlight?: string;
 };
@@ -127,7 +142,7 @@ export function chartFrom(c: Record<string, unknown>): AdaptChart | undefined {
     const sp = items.map((i) => (Array.isArray(i?.series) ? pairs(i.series, []) : [])).find((d) => d.length >= 2);
     if (sp) return { kind: "line", data: sp };
   }
-  return undefined;
+  return richChartFrom(c);
 }
 
 export type AdaptShape =
