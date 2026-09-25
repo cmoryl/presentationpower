@@ -9,7 +9,8 @@
 // - Background: any approved template background (light or dark face).
 // -----------------------------------------------------------------------------
 
-import type { AdaptChart } from "@/lib/cross-format-adapt";
+import type { AdaptChart, AdaptImage } from "@/lib/cross-format-adapt";
+import { MediaTile } from "@/components/slide/module-primitives";
 import { AdaptChartBlock } from "./AdaptChartBlock";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { BrandLockup } from "@/components/BrandLockup";
@@ -115,6 +116,7 @@ export type SocialModuleGridProps = {
   displayShortEdge: number;
   ground?: ConvertGround;
   chart?: AdaptChart;
+  images?: AdaptImage[];
 };
 
 export function SocialModuleGrid({
@@ -127,6 +129,7 @@ export function SocialModuleGrid({
   displayShortEdge,
   ground = CONVERT_GROUNDS[0],
   chart,
+  images = [],
 }: SocialModuleGridProps) {
   const brand = BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0];
   const W = format.width;
@@ -208,6 +211,15 @@ export function SocialModuleGrid({
             const solid = anchor;
             const tileBg = solid ? (dark ? BLUE : INK) : dark ? "rgba(255,255,255,0.1)" : SURFACE;
             const tileInk = solid || dark ? "#FFFFFF" : INK;
+            const img = t.kind === "text" ? images.find((m) => m.title && m.title.trim().toLowerCase() === t.title.trim().toLowerCase()) : undefined;
+            if (img) {
+              return (
+                <div key={i} data-adapt-image="true" style={{ ...span, position: "relative", overflow: "hidden", minHeight: 0, minWidth: 0, borderTop: `${Math.round(6 * f)}px solid ${BLUE}` }}>
+                  <MediaTile brand={brand} seed={img.seed} overrideUrl={img.url} className="absolute inset-0 h-full w-full rounded-none" />
+                  <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: Math.round(20 * f), background: "linear-gradient(to top, rgba(3,0,44,0.78), rgba(3,0,44,0))", color: "#FFFFFF", fontWeight: 700, fontSize: Math.round(24 * f) }}>{t.title}</div>
+                </div>
+              );
+            }
             return (
               <div
                 key={i}
