@@ -112,9 +112,9 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
           <table data-shape="table" style={{ width: "100%", borderCollapse: "collapse", fontSize: cellPx * (land ? 1.6 : 1.1), lineHeight: 1.3, ...(land ? { flex: 1, height: "100%" } : {}) }}>
             <thead>
               <tr>
-                <th style={{ textAlign: "left", padding: u(6) }} />
+                <th style={{ textAlign: "left", padding: u(land ? 18 : 6) }} />
                 {shape.columns.map((c, i) => (
-                  <th key={i} style={{ textAlign: "left", padding: u(6), borderBottom: `${u(3)}px solid ${i === shape.columns.length - 1 ? accent : "rgba(3,0,44,0.2)"}` }}>{c}</th>
+                  <th key={i} style={{ textAlign: "left", padding: u(land ? 18 : 6), borderBottom: `${u(3)}px solid ${i === shape.columns.length - 1 ? accent : "rgba(3,0,44,0.2)"}` }}>{c}</th>
                 ))}
               </tr>
             </thead>
@@ -124,9 +124,9 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
                 const vals = b.split(" · ");
                 return (
                   <tr key={i} style={{ borderBottom: `${u(1)}px solid rgba(3,0,44,0.12)` }}>
-                    <td style={{ padding: u(6), fontWeight: 600 }}>{h}</td>
+                    <td style={{ padding: u(land ? 18 : 6), fontWeight: 600 }}>{h}</td>
                     {shape.columns.map((_, j) => (
-                      <td key={j} style={{ padding: u(6), fontWeight: j === shape.columns.length - 1 ? 700 : 400 }}>{vals[j] ?? ""}</td>
+                      <td key={j} style={{ padding: u(land ? 18 : 6), fontWeight: j === shape.columns.length - 1 ? 700 : 400 }}>{vals[j] ?? ""}</td>
                     ))}
                   </tr>
                 );
