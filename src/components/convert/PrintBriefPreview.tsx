@@ -15,6 +15,7 @@ import type { AdaptResult } from "@/lib/cross-format-adapt";
 import { CSS_DPI } from "@/lib/print-proof-export";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { AdaptChartBlock } from "./AdaptChartBlock";
+import { MediaTile } from "@/components/slide/module-primitives";
 
 export type PrintBriefPreviewProps = {
   result: AdaptResult;
@@ -283,6 +284,19 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
                 display: "block",
               }}
             />
+          ) : null}
+
+          {!photo && content.images?.length ? (
+            <div data-adapt-images="true" style={{ ...L, display: "grid", gridTemplateColumns: `repeat(${Math.min(3, content.images.length)}, 1fr)`, gap: u(8) }}>
+              {content.images.slice(0, 3).map((m, i) => (
+                <div key={i} style={{ position: "relative", height: Math.round(pageH * (banner ? 0.16 : land ? 0.2 : 0.14)), overflow: "hidden", borderTop: `${u(3)}px solid ${accent}` }}>
+                  <MediaTile brand={brand} seed={m.seed} overrideUrl={m.url} className="absolute inset-0 h-full w-full rounded-none" />
+                  {m.title ? (
+                    <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: u(6), color: "#FFFFFF", fontWeight: 700, fontSize: Math.max(8, t.pointPx * 0.8), background: "linear-gradient(to top, rgba(3,0,44,0.78), rgba(3,0,44,0))" }}>{m.title}</div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
           ) : null}
 
           {content.body ? (

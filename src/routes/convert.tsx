@@ -651,7 +651,7 @@ function ConvertPage() {
                             displayWidth={f ? Math.round(170 * Math.max(1, f.width / f.height)) : 200}
                           />
                         ) : f && socialGrid ? (
-                          <SocialModuleGrid format={f} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={170} variantId={groundVariant} ground={ground} chart={source.chart} />
+                          <SocialModuleGrid format={f} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={170} variantId={groundVariant} ground={ground} chart={source.chart} images={source.images} />
                         ) : f ? (
                           <SocialRenderer
                             format={f}
@@ -711,7 +711,7 @@ function ConvertPage() {
               ) : format && socialGrid ? (
                 <SocialCardDownload width={format.width} height={format.height} name={`${source.headline} ${result.target.label}`}>
                 <div ref={socialWrapRef}>
-                  <SocialModuleGrid format={format} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={340} variantId={groundVariant} ground={ground} chart={source.chart} />
+                  <SocialModuleGrid format={format} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={340} variantId={groundVariant} ground={ground} chart={source.chart} images={source.images} />
                 </div>
                 </SocialCardDownload>
               ) : format ? (
