@@ -13,7 +13,6 @@ import { AdaptIcon, iconFor } from "./AdaptIcon";
 import type { AdaptChart, AdaptImage } from "@/lib/cross-format-adapt";
 import { MediaTile } from "@/components/slide/module-primitives";
 import { moduleCardSurface } from "@/components/slide/flagship";
-import { accentTokens } from "@/lib/accent-tokens";
 import { AdaptChartBlock } from "./AdaptChartBlock";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { BrandLockup } from "@/components/BrandLockup";
