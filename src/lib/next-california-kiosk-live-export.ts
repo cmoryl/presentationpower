@@ -25,6 +25,7 @@ import {
   kioskGround,
   kioskLiveFileBase,
   layoutKiosk,
+  textLineBoxes,
   type KioskEdits,
   type LiveLayout,
   type PlacedText,
