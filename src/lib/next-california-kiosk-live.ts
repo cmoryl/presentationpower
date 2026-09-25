@@ -94,7 +94,14 @@ export type KioskEdits = {
   texts?: Record<string, TextEdit>;
   /** Per-object edits inside a piece (dx/dy in kiosk points, scale about the object's centre). */
   parts?: Record<string, BlockEdit>;
+  /** Objects the user grouped: each group moves, hides and resets together. */
+  groups?: string[][];
 };
+
+/** Every object id that moves with `id` (itself when ungrouped). */
+export function partGroup(edits: KioskEdits, id: string): string[] {
+  return edits.groups?.find((g) => g.includes(id)) ?? [id];
+}
 
 // ---- layout -----------------------------------------------------------------
 
