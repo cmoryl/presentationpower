@@ -611,7 +611,15 @@ function ConvertPage() {
                 What carried across
               </h3>
               <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[#03002C]/80">
-                {result.target.structure.join(" · ")}
+                {result.target.structure
+                  .filter((f) => {
+                    const c = result.content as Record<string, unknown>;
+                    if (f === "lockup") return true;
+                    if (f === "stat") return !!result.content.stat;
+                    if (f === "points") return !!result.content.points?.length;
+                    return !!c[f];
+                  })
+                  .join(" · ") || "headline"}
               </p>
               {result.notes.length === 0 ? (
                 <p className="mt-3 rounded-lg border border-[#A6FA87] bg-[#F1FEEC] p-3 text-[12.5px] text-[#03002C]">
