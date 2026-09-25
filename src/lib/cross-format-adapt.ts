@@ -39,7 +39,19 @@ export type AdaptContent = {
   cta?: string;
   footnote?: string;
   media?: AdaptMedia;
+  /** How the module arranges its points — rebuilt natively on print pages. */
+  shape?: AdaptShape;
+  /** Every other field the module carries (owner, timeframe, cadence…). */
+  details?: { label: string; value: string }[];
 };
+
+export type AdaptShape =
+  | { kind: "list" }
+  | { kind: "steps" }
+  | { kind: "pairs" }
+  | { kind: "stats" }
+  | { kind: "quadrants"; axisX?: string; axisY?: string }
+  | { kind: "table"; columns: string[] };
 
 export type AdaptTargetId =
   | "social-card"
@@ -486,6 +498,48 @@ export function adaptMediaFrom(content: Record<string, unknown>): AdaptMedia | u
   return undefined;
 }
 
+const STEP_KEYS = ["stages", "steps", "phases", "milestones"];
+function shapeFrom(c: Record<string, unknown>): AdaptShape {
+  if (c.before || c.after) return { kind: "pairs" };
+  if (c.q1 || c.q2 || c.q3 || c.q4) return { kind: "quadrants", axisX: str(c.axisX), axisY: str(c.axisY) };
+  const cols = asList(c.columns);
+  const items = asList(c.items) ?? [];
+  const firstItem = items[0] as Record<string, unknown> | undefined;
+  if (cols && firstItem && Array.isArray(firstItem.values) && cols.every((x) => x && typeof x === "object")) {
+    return { kind: "table", columns: cols.map((x) => str((x as Record<string, unknown>).label) ?? "").filter(Boolean) };
+  }
+  if (STEP_KEYS.some((k) => asList(c[k])) || (firstItem && (firstItem.stepNumber || firstItem.phase))) return { kind: "steps" };
+  for (const k of ["stats", "items", "metrics", "kpis"]) {
+    const l = asList(c[k]);
+    const r = l?.[0] as Record<string, unknown> | undefined;
+    if (l && l.length > 1 && r && typeof r === "object" && (r.value ?? r.stat ?? r.number) != null) return { kind: "stats" };
+  }
+  return { kind: "list" };
+}
+
+const DETAIL_SKIP = new Set([
+  "mediaSeed", "seed", "icon", "mode", "id", "variant", "variantId", "layoutId", "imageUrl", "image",
+  "photoUrl", "mediaUrl", "heroImage", "backgroundImage", "background", "backgroundToken", "imageAlt", "alt",
+  "axisX", "axisY", "q1", "q2", "q3", "q4", "unit", "stat", "value", "metric", "label",
+]);
+function humanize(k: string): string {
+  const s = k.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[_-]+/g, " ").toLowerCase();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+/** Top-level text fields no other part of the payload used. */
+function detailsFrom(c: Record<string, unknown>, used: (string | undefined)[]): { label: string; value: string }[] | undefined {
+  const seen = new Set(used.filter(Boolean) as string[]);
+  const out: { label: string; value: string }[] = [];
+  for (const [k, v] of Object.entries(c)) {
+    if (DETAIL_SKIP.has(k)) continue;
+    const s = typeof v === "number" ? String(v) : str(v);
+    if (!s || s.startsWith("[") || seen.has(s) || [...seen].some((u) => u.includes(s))) continue;
+    if (/^(https?:|data:)/.test(s)) continue;
+    out.push({ label: humanize(k), value: s });
+  }
+  return out.length ? out : undefined;
+}
+
 /** Read a deck slide's loose content record into the neutral payload. */
 export function contentFromSlide(
   slide: {
@@ -511,15 +565,22 @@ export function contentFromSlide(
   const quoteLine = str(c.quote)
     ? [str(c.attribution), str(c.role), str(c.org)].filter(Boolean).join(", ") || undefined
     : undefined;
+  const eyebrow = notHeadline(pick(c, EYEBROW_KEYS));
+  const body = pickOther(c, BODY_KEYS, headline) ?? quoteLine ?? coverLine;
+  const points = pickPoints(c);
+  const cta = pick(c, CTA_KEYS);
+  const footnote = pickOther(c, quoteLine ? FOOTNOTE_KEYS.filter((k) => k !== "attribution") : FOOTNOTE_KEYS, headline);
   return {
-    eyebrow: notHeadline(pick(c, EYEBROW_KEYS)),
+    eyebrow,
     headline,
-    body: pickOther(c, BODY_KEYS, headline) ?? quoteLine ?? coverLine,
-    points: pickPoints(c),
+    body,
+    points,
     stat,
-    cta: pick(c, CTA_KEYS),
-    footnote: pickOther(c, quoteLine ? FOOTNOTE_KEYS.filter((k) => k !== "attribution") : FOOTNOTE_KEYS, headline),
+    cta,
+    footnote,
     media: adaptMediaFrom(c),
+    shape: points?.length ? shapeFrom(c) : undefined,
+    details: detailsFrom(c, [eyebrow, headline, body, cta, footnote, str(c.prepared), str(c.date), str(c.attribution), str(c.role), str(c.org)]),
   };
 }
 
@@ -658,6 +719,15 @@ export function adaptContent(content: AdaptContent, targetId: AdaptTargetId): Ad
     });
   }
 
+  if (content.details?.length && !target.trimIn) {
+    out.details = undefined;
+    notes.push({
+      severity: "dropped",
+      field: "details",
+      detail: `${content.details.length} extra detail(s) (${content.details.map((d) => d.label.toLowerCase()).join(", ")}) not shown — ${target.label} has no details row.`,
+    });
+  }
+
   if (content.media?.kind === "unsupported") {
     out.media = undefined;
     notes.push({
@@ -703,7 +773,7 @@ export function toPrintContent(result: AdaptResult): Record<string, unknown> {
 // ── Info builder: pick and edit what carries across ────────────────────────
 
 /** A field of the neutral payload the operator can include or leave out. */
-export type AdaptFieldKey = "eyebrow" | "headline" | "body" | "points" | "stat" | "cta" | "footnote" | "media";
+export type AdaptFieldKey = "eyebrow" | "headline" | "body" | "points" | "stat" | "cta" | "footnote" | "media" | "details";
 
 export type AdaptSelection = {
   /** Fields left out on purpose. The headline can never be left out. */
@@ -747,5 +817,7 @@ export function applySelection(source: AdaptContent, sel: AdaptSelection): Adapt
     cta: text("cta"),
     footnote: text("footnote"),
     media: off.has("media") ? undefined : source.media,
+    shape: points && points.length ? source.shape : undefined,
+    details: off.has("details") ? undefined : source.details,
   };
 }
