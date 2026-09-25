@@ -9,6 +9,9 @@ import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor
 import { LondonPanelThumb } from "@/components/events/LondonPanelThumb";
 import { CALIFORNIA_KIOSK_PANELS, londonBoothPanelMeta } from "@/lib/next-london-signage";
 import type { LondonPanel } from "@/lib/next-london-signage";
+import { californiaKioskSourceBoothId } from "@/lib/next-california-kiosks";
+import { kioskLiveLayout } from "@/lib/next-california-kiosk-live";
+import { KioskLayerEditor, KioskLiveThumb } from "@/components/events/KioskLayerEditor";
 
 type KioskGroup = { boothId: string; vendor: string; panels: LondonPanel[] };
 
@@ -59,6 +62,40 @@ export function CaliforniaKioskBrowser() {
               Re-laid from {group.boothId}
             </p>
 
+            {(() => {
+              const live = kioskLiveLayout(californiaKioskSourceBoothId(group.boothId));
+              if (!live) return null;
+              const isOpen = openId === `live:${group.boothId}`;
+              return (
+                <div className="mt-4">
+                  <div className="flex items-start gap-4 rounded-md border border-[#03002C]/10 bg-[#F7F8FB] p-3">
+                    <KioskLiveThumb layout={live} height={170} />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-[#03002C]">Kiosk front · 45 × 96 in, plus two 4 × 96 in returns</p>
+                      <p className="mt-1 text-[12px] text-[#03002C]/70">
+                        Rebuilt from the live London file ({live.texts.length} text lines, {live.blocks.length} graphic pieces). Draft.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setOpenId(isOpen ? null : `live:${group.boothId}`)}
+                        aria-expanded={isOpen}
+                        className="mt-3 inline-flex items-center gap-2 rounded-md bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+                      >
+                        <Pencil className="h-3 w-3" aria-hidden />
+                        {isOpen ? "Close" : "Edit layers & download"}
+                      </button>
+                    </div>
+                  </div>
+                  {isOpen ? (
+                    <div className="mt-4 rounded-md border border-[#03002C]/10 p-4">
+                      <KioskLayerEditor layout={live} vendor={group.vendor} />
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })()}
+
+            {kioskLiveLayout(californiaKioskSourceBoothId(group.boothId)) ? null : (
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               {group.panels.map((panel) => {
                 const meta = londonBoothPanelMeta(panel);
@@ -95,6 +132,7 @@ export function CaliforniaKioskBrowser() {
                 );
               })}
             </div>
+            )}
 
             {openPanel && group.panels.some((p) => p.id === openPanel.id) ? (
               <div className="mt-4 rounded-md border border-[#03002C]/10 p-4">
