@@ -96,7 +96,15 @@ export function SocialModuleGrid({ format, brandId, headline, eyebrow, points, d
         >
           {tiles.map((t, i) => {
             const anchor = i === 0;
-            const span = anchor ? { gridColumn: tall ? "1 / -1" : "span 2", gridRow: tall ? undefined : "span 2" } : {};
+            // Last tile widens so the grid never ends on an empty cell.
+            const used = (tall ? cols : 4) + tiles.length - 1;
+            const gapCells = (cols - (used % cols)) % cols;
+            const last = i === tiles.length - 1 && !anchor && gapCells > 0;
+            const span = anchor
+              ? { gridColumn: tall ? "1 / -1" : "span 2", gridRow: tall ? undefined : "span 2" }
+              : last
+                ? { gridColumn: `span ${gapCells + 1}` }
+                : {};
             const dark = anchor;
             return (
               <div
