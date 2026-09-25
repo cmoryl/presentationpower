@@ -216,7 +216,7 @@ export function SocialModuleGrid({
               return (
                 <div key={i} data-adapt-image="true" style={{ ...span, position: "relative", overflow: "hidden", minHeight: 0, minWidth: 0, borderTop: `${Math.round(6 * f)}px solid ${BLUE}` }}>
                   <MediaTile brand={brand} seed={img.seed} overrideUrl={img.url} className="absolute inset-0 h-full w-full rounded-none" />
-                  <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: Math.round(20 * f), background: "linear-gradient(to top, rgba(3,0,44,0.78), rgba(3,0,44,0))", color: "#FFFFFF", fontWeight: 700, fontSize: Math.round(24 * f) }}>{t.title}</div>
+                  <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: Math.round(20 * f), background: "linear-gradient(to top, rgba(3,0,44,0.78), rgba(3,0,44,0))", color: "#FFFFFF", fontWeight: 700, fontSize: Math.round(24 * f) }}>{img.title}</div>
                 </div>
               );
             }
