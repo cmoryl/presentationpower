@@ -99,8 +99,34 @@ export type KioskEdits = {
 };
 
 /** Every object id that moves with `id` (itself when ungrouped). */
-export function partGroup(edits: KioskEdits, id: string): string[] {
-  return edits.groups?.find((g) => g.includes(id)) ?? [id];
+export function partGroup(edits: KioskEdits, id: string, L?: LiveLayout): string[] {
+  const groups = edits.groups ?? (L ? defaultPartGroups(L) : []);
+  return groups.find((g) => g.includes(id)) ?? [id];
+}
+
+/**
+ * Starting groups, so a lockup is never pulled apart by accident: objects in
+ * the same piece that share a row (≥50% vertical overlap) and sit within
+ * 60 pt of each other — e.g. the halves of a wordmark — move together.
+ */
+export function defaultPartGroups(L: LiveLayout): string[][] {
+  const out: string[][] = [];
+  for (const b of L.blocks) {
+    const ps = b.parts ?? [];
+    const parent = ps.map((_, i) => i);
+    const find = (i: number): number => (parent[i] === i ? i : (parent[i] = find(parent[i]!)));
+    for (let i = 0; i < ps.length; i++)
+      for (let j = i + 1; j < ps.length; j++) {
+        const a = ps[i]!, c = ps[j]!;
+        const ov = Math.min(a.y1, c.y1) - Math.max(a.y0, c.y0);
+        const gap = Math.max(a.x0, c.x0) - Math.min(a.x1, c.x1);
+        if (ov >= 0.5 * Math.min(a.y1 - a.y0, c.y1 - c.y0) && gap < 60) parent[find(i)] = find(j);
+      }
+    const m = new Map<number, string[]>();
+    ps.forEach((q, i) => { const r = find(i); m.set(r, [...(m.get(r) ?? []), q.id]); });
+    for (const g of m.values()) if (g.length > 1) out.push(g);
+  }
+  return out;
 }
 
 // ---- layout -----------------------------------------------------------------

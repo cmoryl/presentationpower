@@ -18,6 +18,7 @@ import {
   kioskGround,
   layoutKiosk,
   partGroup,
+  defaultPartGroups,
   pieceBackdropPath,
   splitArtSvg,
   type KioskEdits,
@@ -81,7 +82,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     return { x: (e.clientX - m.e) / m.a, y: (e.clientY - m.f) / m.d };
   };
   const pickPart = (id: string, add: boolean) => {
-    const members = partGroup(edits, id);
+    const members = partGroup(edits, id, L);
     if (add) {
       setPicked((cur) => (cur.includes(id) ? cur.filter((x) => !members.includes(x)) : [...new Set([...cur, ...members])]));
     } else setPicked(members);
@@ -108,7 +109,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     const map = d.start[key] as Record<string, { dx?: number; dy?: number }> | undefined;
     const cur = map?.[d.sel.id] as { dx?: number; dy?: number } | undefined;
     const v = { dx: (cur?.dx ?? 0) + dx, dy: (cur?.dy ?? 0) + dy };
-    const ids = d.sel.kind === "part" ? partGroup(d.start, d.sel.id) : [d.sel.id];
+    const ids = d.sel.kind === "part" ? partGroup(d.start, d.sel.id, L) : [d.sel.id];
     const moved = { ...map };
     for (const id of ids) moved[id] = { ...map?.[id], dx: (map?.[id]?.dx ?? 0) + dx, dy: (map?.[id]?.dy ?? 0) + dy };
     void v;
@@ -253,7 +254,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                       return (
                         <li key={q.id} className="flex items-center gap-1">
                           <button type="button" className={`flex-1 truncate py-0.5 text-left text-[11.5px] ${sel?.id === q.id ? "text-[#003FC7]" : "text-[#03002C]/80"}`} onClick={(e) => pickPart(q.id, e.shiftKey)}>
-                            Object {i + 1}{edits.groups?.some((g) => g.includes(q.id)) ? " · grouped" : ""}
+                            Object {i + 1}{(edits.groups ?? defaultPartGroups(L)).some((g) => g.includes(q.id)) ? " · grouped" : ""}
                           </button>
                           <button type="button" aria-label={ph ? "Show object" : "Hide object"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchPart(q.id, { hidden: !ph })}>
                             {ph ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
@@ -310,14 +311,14 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
           </div>
         ) : null}
 
-        {picked.length > 1 || (selPart && partGroup(edits, selPart.id).length > 1) ? (
+        {picked.length > 1 || (selPart && partGroup(edits, selPart.id, L).length > 1) ? (
           <div className="space-y-2 rounded-md border border-[#003FC7]/25 bg-[#F2F4F9] p-2">
             <h4 className="text-sm font-semibold text-[#03002C]">{picked.length} objects selected</h4>
             <div className="flex flex-wrap gap-2">
-              <button type="button" className={btn} disabled={picked.length < 2 || edits.groups?.some((g) => g.length === picked.length && picked.every((x) => g.includes(x)))}
-                onClick={() => commit({ ...edits, groups: [...(edits.groups ?? []).filter((g) => !g.some((x) => picked.includes(x))), picked] })}>Group</button>
-              <button type="button" className={btn} disabled={!edits.groups?.some((g) => g.some((x) => picked.includes(x)))}
-                onClick={() => { commit({ ...edits, groups: (edits.groups ?? []).filter((g) => !g.some((x) => picked.includes(x))) }); setPicked(sel ? [sel.id] : []); }}>Ungroup</button>
+              <button type="button" className={btn} disabled={picked.length < 2 || (edits.groups ?? defaultPartGroups(L)).some((g) => g.length === picked.length && picked.every((x) => g.includes(x)))}
+                onClick={() => commit({ ...edits, groups: [...(edits.groups ?? defaultPartGroups(L)).filter((g) => !g.some((x) => picked.includes(x))), picked] })}>Group</button>
+              <button type="button" className={btn} disabled={!(edits.groups ?? defaultPartGroups(L)).some((g) => g.some((x) => picked.includes(x)))}
+                onClick={() => { commit({ ...edits, groups: (edits.groups ?? defaultPartGroups(L)).filter((g) => !g.some((x) => picked.includes(x))) }); setPicked(sel ? [sel.id] : []); }}>Ungroup</button>
               <button type="button" className={btn} onClick={() => commit({ ...edits, parts: { ...edits.parts, ...Object.fromEntries(picked.map((id) => [id, { ...edits.parts?.[id], hidden: !(edits.parts?.[id]?.hidden ?? false) }])) } })}>Hide / show</button>
               <button type="button" className={btn} onClick={() => commit({ ...edits, parts: { ...edits.parts, ...Object.fromEntries(picked.map((id) => [id, { dx: 0, dy: 0, scale: 1, hidden: false }])) } })}>Put back</button>
             </div>
