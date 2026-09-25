@@ -574,6 +574,20 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
             <label className="flex items-center gap-2 text-[12px] text-[#03002C]/80">Colour
               <input type="color" value={edits.texts?.[selText.id]?.color ?? selText.color} onChange={(e) => patchText(selText.id, { color: e.target.value.toUpperCase() })} />
             </label>
+            {(() => {
+              const me = selBounds({ kind: "text", id: selText.id });
+              if (!me) return null;
+              const hits = placed.flatMap((p) => p.texts).filter((o) => {
+                if (o.id === selText.id) return false;
+                const b = selBounds({ kind: "text", id: o.id });
+                return !!b && b.x0 < me.x1 && b.x1 > me.x0 && b.y0 < me.y1 && b.y1 > me.y0;
+              });
+              return hits.length ? (
+                <p role="alert" className="rounded-md border border-[#E53D2E]/40 bg-[#E53D2E]/5 p-2 text-[12px] text-[#03002C]">
+                  Overlaps {hits.slice(0, 2).map((h) => `“${h.lines[0]}”`).join(", ")}{hits.length > 2 ? ` and ${hits.length - 2} more` : ""}. Move this text or the line it touches, or reduce the size.
+                </p>
+              ) : null;
+            })()}
             <p className="text-[11px] text-[#03002C]/65">Font: {selText.font}. Unedited lines keep the London letter spacing; changing words, size, lines or spacing uses the font's own spacing.</p>
           </div>
         ) : null}
