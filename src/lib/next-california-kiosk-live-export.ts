@@ -67,10 +67,15 @@ export async function pressFrontSvg(L: LiveLayout, edits: KioskEdits) {
   const outline = (t: PlacedText) => {
     const f = faces.get(t.font);
     if (!f) { missing.push(t.text); return null; }
-    const adv = f.getAdvanceWidth(t.text, t.ksize);
-    const n = Math.max(1, [...t.text].length - 1);
-    const ls = t.edited ? 0 : (t.kw - adv) / n / t.ksize;
-    return f.getPath(t.text, t.kx, t.ky, t.ksize, { letterSpacing: ls, kerning: true }).toPathData(2);
+    if (t.fixed) {
+      const adv = f.getAdvanceWidth(t.text, t.ksize);
+      const n = Math.max(1, [...t.text].length - 1);
+      return f.getPath(t.text, t.kx, t.ky, t.ksize, { letterSpacing: (t.kw - adv) / n / t.ksize, kerning: true }).toPathData(2);
+    }
+    const ls = t.trackPt / t.ksize;
+    return textLineBoxes(t, (s) => f.getAdvanceWidth(s, t.ksize))
+      .map((l) => f.getPath(l.text, l.x, l.y, t.ksize, { letterSpacing: ls, kerning: true }).toPathData(2))
+      .join(" ");
   };
   const svg = buildKioskFrontSvg(L, await loadArtSvg(L.id), edits, { outline });
   if (missing.length) throw new Error(`Could not outline ${missing.length} text line(s): no font file on hand.`);
@@ -162,6 +167,17 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
     }
   }
 
+  // Accent divider rules (live vector fills).
+  const hexRgb = (c: string) => rgb(parseInt(c.slice(1, 3), 16) / 255, parseInt(c.slice(3, 5), 16) / 255, parseInt(c.slice(5, 7), 16) / 255);
+  for (const d of edits.dividers ?? []) {
+    if (d.hidden) continue;
+    const r = d.round ? d.h / 2 : 0;
+    const path = r
+      ? `M ${r} 0 H ${d.w - r} A ${r} ${r} 0 0 1 ${d.w - r} ${d.h} H ${r} A ${r} ${r} 0 0 1 ${r} 0 Z`
+      : `M 0 0 H ${d.w} V ${d.h} H 0 Z`;
+    page.drawSvgPath(path, { x: B + d.x, y: H - (B + d.y), color: hexRgb(d.color), borderWidth: 0 });
+  }
+
   const fonts = new Map<string, Awaited<ReturnType<typeof doc.embedFont>>>();
   for (const p of placed)
     for (const t of p.texts) {
@@ -170,21 +186,19 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
         fonts.set(t.font, url ? await doc.embedFont(await bytes(url), { subset: true }) : await doc.embedFont(/times/i.test(t.font) ? StandardFonts.TimesRoman : StandardFonts.Helvetica));
       }
       const f = fonts.get(t.font)!;
-      let text = t.text;
-      try { f.encodeText(text); } catch { text = text.replace(/[^\x20-\x7E]/g, " "); }
-      const adv = f.widthOfTextAtSize(text, t.ksize);
-      const n = Math.max(1, [...text].length - 1);
-      const tc = t.edited ? 0 : (t.kw - adv) / n;
-      const c = t.fill;
-      page.pushOperators(pushGraphicsState(), setCharacterSpacing(tc));
-      page.drawText(text, {
-        x: B + t.kx,
-        y: H - (B + t.ky),
-        size: t.ksize,
-        font: f,
-        color: rgb(parseInt(c.slice(1, 3), 16) / 255, parseInt(c.slice(3, 5), 16) / 255, parseInt(c.slice(5, 7), 16) / 255),
-      });
-      page.pushOperators(setCharacterSpacing(0), popGraphicsState());
+      const clean = (s: string) => { try { f.encodeText(s); return s; } catch { return s.replace(/[^\x20-\x7E]/g, " "); } };
+      const lines = t.fixed
+        ? (() => {
+            const text = clean(t.text);
+            const n = Math.max(1, [...text].length - 1);
+            return [{ text, x: t.kx, y: t.ky, tc: (t.kw - f.widthOfTextAtSize(text, t.ksize)) / n }];
+          })()
+        : textLineBoxes({ ...t, lines: t.lines.map(clean) }, (s) => f.widthOfTextAtSize(s, t.ksize)).map((l) => ({ ...l, tc: t.trackPt }));
+      for (const l of lines) {
+        page.pushOperators(pushGraphicsState(), setCharacterSpacing(l.tc));
+        page.drawText(l.text, { x: B + l.x, y: H - (B + l.y), size: t.ksize, font: f, color: hexRgb(t.fill) });
+        page.pushOperators(setCharacterSpacing(0), popGraphicsState());
+      }
     }
   return doc.save();
 }
