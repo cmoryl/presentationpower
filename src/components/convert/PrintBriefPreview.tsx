@@ -371,7 +371,8 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
             </ul>
           ) : null}
 
-          {content.stat ? (
+          {/* A figures layout already shows the key figure — don't print it twice. */}
+          {content.stat && !(shapedBlock && shape?.kind === "stats" && pts.some((p) => p.startsWith(`${content.stat!.value} `))) ? (
             <div style={{ marginTop: banner ? 0 : big ? u(24) : "auto", ...(banner ? { flexDirection: "column" as const, alignItems: "flex-start" as const, borderTop: `${u(3)}px solid ${accent}`, paddingTop: u(24), ...(content.points?.length ? {} : { flex: 1, justifyContent: "center" as const }) } : {}), display: "flex", alignItems: banner ? "flex-start" : "baseline", gap: u(12), ...(land ? { gridColumn: 1 } : {}) }}>
               <span
                 style={{
