@@ -220,3 +220,8 @@ artboard is a 1:10 proof, scale the trim up ×10 and say so in `dimsSource`.
 - New venues don't need a build job: export each floor from the venue's vector file as SVG and load it at /events/next/maps/<event>. The same map engine (looks, room cuts, approved palette) draws it.
 - Room names must be live text inside closed room shapes, or rooms can't be matched and coloured. Outlined text and picture-only files are reported, never faked.
 - Floor ids are namespaced `<event>:<floor>` so London-only room rules never touch another venue.
+
+## Re-laying finals across aspect ratios (2026-09-25)
+- Several London finals don't carry art into the full 100 mm bleed — never sample return strips from the outer bleed; sample the finished front's edge.
+- Pink/magenta waves false-trigger TV-frame detection; require two thin frame lines with an empty middle row.
+- Textured (wave/dot) grounds can't be stretched without streaks — fill behind-TV gaps with a gradient from the neighbouring rows instead.

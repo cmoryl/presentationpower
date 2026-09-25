@@ -294,3 +294,9 @@ placeholders; leaving the slots blank with a named blocker.
 **Why:** one-colour logos stay legible on every division colour and gradient.
 **Would change if:** approved all-black division artwork is published.
 **Applies to:** every venue.
+
+## SF partner kiosks from the London finals (2026-09-25)
+- Chosen: re-lay each London final (Dropbox, 14 partners) onto the 45 × 96 in TV kiosk from its own outlined vector art — content bands at one scale (trim width → kiosk width), plain background bands stretched, London TV cut-out dropped, returns painted from the front's outer edge colour. Files ship as `rdraft-sf-kiosk-<booth>.ai` (PDF-compatible) until the SF revision is published.
+- Rejected: straight resize (cuts ~38% of width through lockups/headlines); crop-centre (cuts logos); fit-whole-with-extended-background (art too small, clashes with the TV).
+- Trial Interactive has no London final in the pack and keeps the native re-lay.
+- Reopen when: the SF venue confirms kiosk count/sizes differ, or a partner supplies kiosk-native artwork.
