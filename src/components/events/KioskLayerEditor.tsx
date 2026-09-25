@@ -23,7 +23,7 @@ import {
 } from "@/lib/next-california-kiosk-live";
 import { downloadKiosk, loadArtSvg, type KioskDownload } from "@/lib/next-california-kiosk-live-export";
 
-type Sel = { kind: "block" | "text"; id: string } | null;
+type Sel = { kind: "block" | "text" | "part"; id: string } | null;
 
 const btn =
   "inline-flex items-center gap-1.5 rounded-md border border-[#03002C]/15 bg-white px-2.5 py-1.5 text-[12px] font-semibold text-[#03002C] hover:bg-[#F2F4F9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] disabled:opacity-50";
@@ -62,6 +62,10 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     const next = { ...edits, blocks: { ...edits.blocks, [id]: { ...edits.blocks?.[id], ...p } } };
     push ? commit(next) : setEdits(next);
   };
+  const patchPart = (id: string, p: object, push = true) => {
+    const next = { ...edits, parts: { ...edits.parts, [id]: { ...edits.parts?.[id], ...p } } };
+    push ? commit(next) : setEdits(next);
+  };
   const patchText = (id: string, p: object, push = true) => {
     const next = { ...edits, texts: { ...edits.texts, [id]: { ...edits.texts?.[id], ...p } } };
     push ? commit(next) : setEdits(next);
@@ -85,12 +89,11 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     if (!d) return;
     const p = toSvg(e);
     const dx = p.x - d.x, dy = p.y - d.y;
-    const map = d.sel.kind === "block" ? d.start.blocks : d.start.texts;
+    const key = d.sel.kind === "block" ? "blocks" : d.sel.kind === "part" ? "parts" : "texts";
+    const map = d.start[key] as Record<string, { dx?: number; dy?: number }> | undefined;
     const cur = map?.[d.sel.id] as { dx?: number; dy?: number } | undefined;
     const v = { dx: (cur?.dx ?? 0) + dx, dy: (cur?.dy ?? 0) + dy };
-    const next = d.sel.kind === "block"
-      ? { ...d.start, blocks: { ...d.start.blocks, [d.sel.id]: { ...d.start.blocks?.[d.sel.id], ...v } } }
-      : { ...d.start, texts: { ...d.start.texts, [d.sel.id]: { ...d.start.texts?.[d.sel.id], ...v } } };
+    const next = { ...d.start, [key]: { ...map, [d.sel.id]: { ...map?.[d.sel.id], ...v } } };
     setEdits(next);
   };
   const endDrag = () => { drag.current = null; };
@@ -109,6 +112,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
 
   const B = KIOSK_BLEED;
   const selBlock = sel?.kind === "block" ? L.blocks.find((b) => b.id === sel.id) : null;
+  const selPart = sel?.kind === "part" ? L.blocks.flatMap((b) => b.parts ?? []).find((q) => q.id === sel.id) : null;
   const selText = sel?.kind === "text" ? L.texts.find((t) => t.id === sel.id) : null;
 
   return (
@@ -138,7 +142,12 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                 <g dangerouslySetInnerHTML={{ __html: `<symbol id="${symId}" viewBox="${art.viewBox}" overflow="visible">${art.inner}</symbol>` }} />
                 {placed.map((p) => (
                   <clipPath key={p.block.id} id={`kc-${L.id}-${p.block.id}`}>
-                    <rect x={-B / p.scale - 1} y={0} width={L.trimW + 2 * (B / p.scale + 1)} height={p.clipBottom - p.clipTop} />
+                    <path clipRule="evenodd" d={pieceBackdropPath(L, p, B / p.scale + 1, 0, 0)} />
+                  </clipPath>
+                ))}
+                {placed.flatMap((p) => p.parts).map((q) => (
+                  <clipPath key={q.part.id} id={`kc-${L.id}-${q.part.id}`}>
+                    <rect x={q.src.x0} y={q.src.y0} width={q.src.x1 - q.src.x0} height={q.src.y1 - q.src.y0} />
                   </clipPath>
                 ))}
               </defs>
@@ -152,6 +161,18 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                       <use href={`#${symId}`} x={-L.originX} y={-(L.originY + p.clipTop)} width={vw} height={vh} />
                     </g>
                     {on ? <rect x={0} y={0} width={L.trimW} height={p.clipBottom - p.clipTop} fill="none" stroke="#003FC7" strokeWidth={12 / p.scale} strokeDasharray={`${40 / p.scale} ${20 / p.scale}`} /> : null}
+                  </g>
+                );
+              })}
+              {placed.flatMap((p) => p.parts).filter((q) => !q.hidden).map((q) => {
+                const [, , vw, vh] = art.viewBox.split(/\s+/).map(Number);
+                const on = sel?.kind === "part" && sel.id === q.part.id;
+                return (
+                  <g key={q.part.id} transform={`translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})`} onPointerDown={startDrag({ kind: "part", id: q.part.id })} className="cursor-move">
+                    <g clipPath={`url(#kc-${L.id}-${q.part.id})`}>
+                      <use href={`#${symId}`} x={-L.originX} y={-L.originY} width={vw} height={vh} />
+                    </g>
+                    <rect x={q.src.x0} y={q.src.y0} width={q.src.x1 - q.src.x0} height={q.src.y1 - q.src.y0} fill="transparent" stroke={on ? "#003FC7" : "none"} strokeWidth={10 / q.scale} strokeDasharray={`${30 / q.scale} ${15 / q.scale}`} />
                   </g>
                 );
               })}
@@ -186,7 +207,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
             </svg>
           ) : null}
         </div>
-        <p className="mt-2 text-[12px] text-[#03002C]/70">Drag any piece or line of text to move it. Rebuilt from {L.source}. Draft until the San Francisco revision is published.</p>
+        <p className="mt-2 text-[12px] text-[#03002C]/70">Drag any object, piece or line of text to move it. Rebuilt from {L.source}. Draft until the San Francisco revision is published.</p>
       </div>
 
       {/* Layers */}
@@ -206,6 +227,23 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                     {hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                   </button>
                 </div>
+                {b.parts?.length ? (
+                  <ul className="border-t border-[#03002C]/8 px-2 py-1">
+                    {b.parts.map((q, i) => {
+                      const ph = edits.parts?.[q.id]?.hidden ?? false;
+                      return (
+                        <li key={q.id} className="flex items-center gap-1">
+                          <button type="button" className={`flex-1 truncate py-0.5 text-left text-[11.5px] ${sel?.id === q.id ? "text-[#003FC7]" : "text-[#03002C]/80"}`} onClick={() => setSel({ kind: "part", id: q.id })}>
+                            Object {i + 1}
+                          </button>
+                          <button type="button" aria-label={ph ? "Show object" : "Hide object"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchPart(q.id, { hidden: !ph })}>
+                            {ph ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : null}
                 {texts.length ? (
                   <ul className="border-t border-[#03002C]/8 px-2 py-1">
                     {texts.map((t) => {
@@ -250,6 +288,17 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
               <input type="color" value={edits.texts?.[selText.id]?.color ?? selText.color} onChange={(e) => patchText(selText.id, { color: e.target.value.toUpperCase() })} />
             </label>
             <p className="text-[11px] text-[#03002C]/65">Font: {selText.font}. Retyped text keeps the font; original letter spacing applies only to the unedited words.</p>
+          </div>
+        ) : null}
+
+        {selPart ? (
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-[#03002C]">Object</h4>
+            <label className="block text-[12px] text-[#03002C]/80">Size {Math.round((edits.parts?.[selPart.id]?.scale ?? 1) * 100)}%
+              <input type="range" min={30} max={200} className="mt-1 w-full" value={Math.round((edits.parts?.[selPart.id]?.scale ?? 1) * 100)} onChange={(e) => patchPart(selPart.id, { scale: Number(e.target.value) / 100 }, false)} />
+            </label>
+            <button type="button" className={btn} onClick={() => patchPart(selPart.id, { dx: 0, dy: 0, scale: 1, hidden: false })}>Put back</button>
+            <p className="text-[11px] text-[#03002C]/65">A single logo, icon, QR code or shape group from the London file. It moves and scales on its own, keeping its original shapes, gradients and see-through effects. Nearby words are separate text lines.</p>
           </div>
         ) : null}
 
