@@ -10,7 +10,7 @@
 // where the payload actually carries a photograph.
 // -----------------------------------------------------------------------------
 
-import { forwardRef } from "react";
+import { Fragment, forwardRef, type ReactNode } from "react";
 import type { AdaptResult } from "@/lib/cross-format-adapt";
 import { CSS_DPI } from "@/lib/print-proof-export";
 import { BRAND_MODES } from "@/lib/taxonomy";
@@ -47,6 +47,120 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
     const L = land ? { gridColumn: 1 } : {};
     const photo = content.media?.kind === "photo" ? content.media.url : null;
     const groundToken = content.media?.kind === "token" ? content.media.token : "#FFFFFF";
+
+    // Module layout rebuilt natively: steps, before/after, table, matrix, figures.
+    const pts = content.points ?? [];
+    const shape = content.shape;
+    const split = (p: string) => {
+      const i = p.indexOf(" — ");
+      return i < 0 ? [p, ""] : [p.slice(0, i), p.slice(i + 3)];
+    };
+    const cellPx = t.pointPx * bb;
+    const place = land ? { gridColumn: 2, gridRow: "2 / span 3" } : {};
+    let shapedBlock: ReactNode = null;
+    if (pts.length && shape && shape.kind !== "list") {
+      if (shape.kind === "steps") {
+        shapedBlock = (
+          <ol data-shape="steps" style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: u(banner ? 24 : 10), ...(banner ? { flex: 1, alignContent: "space-evenly" } : {}), ...place }}>
+            {pts.map((p, i) => {
+              const [h, b] = split(p);
+              return (
+                <li key={i} style={{ display: "grid", gridTemplateColumns: `${u(banner ? 64 : 28)}px 1fr`, gap: u(12), alignItems: "start", fontSize: cellPx, lineHeight: t.bodyLeading }}>
+                  <span style={{ width: u(banner ? 64 : 28), height: u(banner ? 64 : 28), background: accent, color: ink, fontWeight: 700, display: "grid", placeItems: "center", fontSize: "0.9em" }}>{i + 1}</span>
+                  <span><strong style={{ display: "block" }}>{h}</strong>{b ? <span style={{ color: "#3A3A55" }}>{b}</span> : null}</span>
+                </li>
+              );
+            })}
+          </ol>
+        );
+      } else if (shape.kind === "pairs") {
+        shapedBlock = (
+          <div data-shape="pairs" style={{ display: "grid", gridTemplateColumns: banner || k < 0.7 ? "1fr" : "1fr 1fr", gap: u(14), ...(banner ? { flex: 1, alignContent: "space-evenly" } : {}), ...place }}>
+            {pts.map((p, i) => {
+              const m = /^(Before|After):\s*/.exec(p);
+              const [h, b] = split(m ? p.slice(m[0].length) : p);
+              const after = m?.[1] === "After";
+              return (
+                <div key={i} style={{ padding: u(16), background: after ? "#EEF1F7" : "#F2F2F2", borderTop: `${u(4)}px solid ${after ? accent : "#666666"}`, fontSize: cellPx, lineHeight: t.bodyLeading }}>
+                  {m ? <div style={{ fontSize: "0.75em", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#666666", marginBottom: u(6) }}>{m[1]}</div> : null}
+                  <strong style={{ display: "block", marginBottom: u(4) }}>{h}</strong>
+                  {b ? <span style={{ color: "#3A3A55" }}>{b}</span> : null}
+                </div>
+              );
+            })}
+          </div>
+        );
+      } else if (shape.kind === "quadrants") {
+        shapedBlock = (
+          <div data-shape="quadrants" style={{ ...place }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: u(6) }}>
+              {pts.slice(0, 4).map((p, i) => (
+                <div key={i} style={{ padding: u(14), minHeight: u(banner ? 220 : 70), background: i === 0 ? accent : "#EEF1F7", fontSize: cellPx, fontWeight: 600, lineHeight: 1.25 }}>{p}</div>
+              ))}
+            </div>
+            {shape.axisX || shape.axisY ? (
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: u(6), fontSize: t.eyebrowPx * bb, color: "#666666" }}>
+                <span>{shape.axisY ? `↑ ${shape.axisY}` : ""}</span>
+                <span>{shape.axisX ? `${shape.axisX} →` : ""}</span>
+              </div>
+            ) : null}
+          </div>
+        );
+      } else if (shape.kind === "table") {
+        shapedBlock = (
+          <table data-shape="table" style={{ width: "100%", borderCollapse: "collapse", fontSize: cellPx * 0.95, lineHeight: 1.3, ...place }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: "left", padding: u(6) }} />
+                {shape.columns.map((c, i) => (
+                  <th key={i} style={{ textAlign: "left", padding: u(6), borderBottom: `${u(3)}px solid ${i === shape.columns.length - 1 ? accent : "rgba(3,0,44,0.2)"}` }}>{c}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {pts.map((p, i) => {
+                const [h, b] = split(p);
+                const vals = b.split(" · ");
+                return (
+                  <tr key={i} style={{ borderBottom: `${u(1)}px solid rgba(3,0,44,0.12)` }}>
+                    <td style={{ padding: u(6), fontWeight: 600 }}>{h}</td>
+                    {shape.columns.map((_, j) => (
+                      <td key={j} style={{ padding: u(6), fontWeight: j === shape.columns.length - 1 ? 700 : 400 }}>{vals[j] ?? ""}</td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        );
+      } else if (shape.kind === "stats") {
+        shapedBlock = (
+          <div data-shape="stats" style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(pts.length, banner || k < 0.7 ? 1 : pts.length > 4 ? 3 : 2)}, 1fr)`, gap: u(16), ...(banner ? { flex: 1, alignContent: "space-evenly" } : {}), ...place }}>
+            {pts.map((p, i) => {
+              const [h, b] = split(p);
+              const [fig, ...lab] = h.split(" ");
+              return (
+                <div key={i} style={{ borderTop: `${u(4)}px solid ${accent}`, paddingTop: u(10) }}>
+                  <div style={{ fontSize: t.statPx * 0.7 * bb, fontWeight: 700, lineHeight: 1, letterSpacing: "-0.03em" }}>{fig}</div>
+                  <div style={{ fontSize: cellPx, fontWeight: 600, marginTop: u(6) }}>{lab.join(" ")}</div>
+                  {b ? <div style={{ fontSize: cellPx * 0.9, color: "#3A3A55" }}>{b}</div> : null}
+                </div>
+              );
+            })}
+          </div>
+        );
+      }
+    }
+    const detailsBlock = content.details?.length ? (
+      <dl data-shape="details" style={{ margin: 0, display: "grid", gridTemplateColumns: "auto 1fr", columnGap: u(14), rowGap: u(4), fontSize: t.eyebrowPx * 1.15 * bb, lineHeight: 1.35, ...(land ? { gridColumn: "1 / -1" } : {}) }}>
+        {content.details.map((d) => (
+          <Fragment key={d.label}>
+            <dt style={{ color: "#666666", fontWeight: 600 }}>{d.label}</dt>
+            <dd style={{ margin: 0 }}>{d.value}</dd>
+          </Fragment>
+        ))}
+      </dl>
+    ) : null;
 
     return (
       <div
@@ -136,7 +250,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
             </p>
           ) : null}
 
-          {content.points?.length ? (
+          {shapedBlock ? shapedBlock : content.points?.length ? (
             <ul
               style={{
                 display: "grid",
@@ -193,6 +307,8 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
               </span>
             </div>
           ) : null}
+
+          {detailsBlock}
 
           <div
             style={{
