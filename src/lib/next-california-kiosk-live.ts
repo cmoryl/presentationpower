@@ -86,9 +86,10 @@ export function kioskFontFaceCss(): string {
 
 // ---- edits ------------------------------------------------------------------
 
-export type BlockEdit = { dx?: number; dy?: number; scale?: number; hidden?: boolean };
+export type BlockEdit = { dx?: number; dy?: number; scale?: number; hidden?: boolean; opacity?: number; rot?: number };
 export type TextAlign = "left" | "center" | "right";
 export type TextEdit = {
+  opacity?: number; rot?: number;
   text?: string; dx?: number; dy?: number; size?: number; color?: string; hidden?: boolean;
   /** Line anchor: left edge, centre or right edge of the line. */
   align?: TextAlign;
@@ -98,7 +99,12 @@ export type TextEdit = {
   track?: number;
 };
 /** An accent divider rule placed on the kiosk front (kiosk points, on trim). */
-export type KioskDivider = { id: string; x: number; y: number; w: number; h: number; color: string; round?: boolean; hidden?: boolean };
+export type KioskDivider = {
+  id: string; x: number; y: number; w: number; h: number; color: string; round?: boolean; hidden?: boolean;
+  opacity?: number; rot?: number;
+};
+/** A duplicate of a London text line or object (shares the source's geometry). */
+export type KioskCopy = { id: string; of: string; kind: "text" | "part" };
 export type KioskEdits = {
   ground?: { top: string; bottom: string } | null;
   blocks?: Record<string, BlockEdit>;
@@ -107,9 +113,22 @@ export type KioskEdits = {
   parts?: Record<string, BlockEdit>;
   /** Objects the user grouped: each group moves, hides and resets together. */
   groups?: string[][];
-  /** Accent divider rules added in the editor. */
+  /** Accent divider rules added in the editor (array order = stacking order). */
   dividers?: KioskDivider[];
+  /** Duplicated text lines and objects. */
+  copies?: KioskCopy[];
+  /** Locked items can be selected but not moved. */
+  locked?: string[];
+  /** Stacking order of objects within their piece (higher = in front). */
+  z?: Record<string, number>;
 };
+
+/** Rotate point (px,py) about (cx,cy) by deg clockwise (SVG sense, y down). */
+export function rotateAbout(px: number, py: number, cx: number, cy: number, deg: number) {
+  const a = (deg * Math.PI) / 180, c = Math.cos(a), s = Math.sin(a);
+  const dx = px - cx, dy = py - cy;
+  return { x: cx + dx * c - dy * s, y: cy + dx * s + dy * c };
+}
 
 /** Safe side margin used by the editor's align tools (2 in). */
 export const KIOSK_MARGIN = 144;
@@ -175,21 +194,48 @@ export type PlacedBlock = {
   parts: PlacedPart[];
 };
 /** src = London rect (clamped to the clip); x/y = kiosk top-left; scale = London→kiosk. */
-export type PlacedPart = { part: LivePart; src: { x0: number; y0: number; x1: number; y1: number }; x: number; y: number; scale: number; hidden: boolean };
+export type PlacedPart = {
+  part: LivePart; src: { x0: number; y0: number; x1: number; y1: number }; x: number; y: number; scale: number; hidden: boolean;
+  /** 0–1 see-through amount and clockwise rotation (deg) about the object's centre. */
+  opacity: number; rot: number;
+};
 export type PlacedText = LiveText & {
   kx: number; ky: number; ksize: number; kw: number; edited: boolean; fill: string;
   /** Lines (split on newlines), anchor x for the alignment, line spacing, tracking in pt. */
   lines: string[]; align: TextAlign; ax: number; lead: number; trackPt: number;
   /** True when the original London spacing (textLength) still applies. */
   fixed: boolean;
+  /** 0–1 opacity and clockwise rotation (deg) about the anchor on the first baseline. */
+  opacity: number; rot: number;
 };
+
+/** Centre of a placed object on the kiosk. */
+export const partCentre = (q: PlacedPart) => ({ x: q.x + ((q.src.x1 - q.src.x0) * q.scale) / 2, y: q.y + ((q.src.y1 - q.src.y0) * q.scale) / 2 });
 
 function isHidden(b: LiveBlock, e?: BlockEdit) {
   return e?.hidden ?? b.screen;
 }
 
+/**
+ * The London layout plus any copies the user made (duplicate / paste). A copy
+ * shares its source's geometry and artwork, with its own id, so every editor,
+ * layout and export path treats it as one more text line or object.
+ */
+export function withCopies(L: LiveLayout, edits: KioskEdits = {}): LiveLayout {
+  const cs = edits.copies ?? [];
+  if (!cs.length) return L;
+  const texts = [...L.texts];
+  for (const c of cs) if (c.kind === "text") { const s = L.texts.find((t) => t.id === c.of); if (s) texts.push({ ...s, id: c.id }); }
+  const blocks = L.blocks.map((b) => {
+    const extra = cs.filter((c) => c.kind === "part").flatMap((c) => { const s = b.parts?.find((q) => q.id === c.of); return s ? [{ ...s, id: c.id }] : []; });
+    return extra.length ? { ...b, parts: [...(b.parts ?? []), ...extra] } : b;
+  });
+  return { ...L, texts, blocks };
+}
+
 /** Pure: place every visible piece of a London wall onto the kiosk front. */
-export function layoutKiosk(L: LiveLayout, edits: KioskEdits = {}): PlacedBlock[] {
+export function layoutKiosk(L0: LiveLayout, edits: KioskEdits = {}): PlacedBlock[] {
+  const L = withCopies(L0, edits);
   const base = KIOSK_W / L.trimW;
   const vis = L.blocks.filter((b) => !isHidden(b, edits.blocks?.[b.id]));
   const full = (b: LiveBlock) => [b.y0, b.y1] as const;
@@ -252,6 +298,8 @@ export function layoutKiosk(L: LiveLayout, edits: KioskEdits = {}): PlacedBlock[
           lead: te.lead ?? 1.15,
           trackPt: ((te.track ?? 0) / 1000) * ksize,
           fixed: !edited && !te.track && lines.length === 1 && te.size === undefined,
+          opacity: te.opacity ?? 1,
+          rot: te.rot ?? 0,
         };
       })
       .filter((t) => !edits.texts?.[t.id]?.hidden);
@@ -269,8 +317,13 @@ export function layoutKiosk(L: LiveLayout, edits: KioskEdits = {}): PlacedBlock[
           y: yy + (src.y0 - c[0]) * sc + (pe.dy ?? 0) + ((1 - ps) * h) / 2,
           scale: sc * ps,
           hidden: !!pe.hidden,
+          opacity: pe.opacity ?? 1,
+          rot: pe.rot ?? 0,
         };
-      });
+      })
+      .map((q, i) => ({ q, i, z: edits.z?.[q.part.id] ?? 0 }))
+      .sort((a, b) => a.z - b.z || a.i - b.i)
+      .map(({ q }) => q);
     out.push({ block: b, clipTop: c[0], clipBottom: c[1], x, y: yy, scale: sc, texts, parts });
   };
   let y = 0;
