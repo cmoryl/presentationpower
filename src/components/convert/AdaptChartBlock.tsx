@@ -307,8 +307,22 @@ export function AdaptChartBlock({
           const tc = dark ? "#FFFFFF" : INK;
           return (
             <g key={i}>
-              <rect x={x} y={y} width={tw} height={th} fill={dark ? "rgba(255,255,255,0.08)" : "#EEF1F7"} />
-              <rect x={x} y={y} width={tw} height={Math.max(2, fontPx * 0.2)} fill={BLUE} />
+              {/* Module glass: top-lit accent wash fading out, hairline on top + sides only. */}
+              <defs>
+                <linearGradient id={`kpi-glass-${i}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={dark ? "#FFFFFF" : BLUE} stopOpacity={dark ? 0.16 : 0.16} />
+                  <stop offset="38%" stopColor={dark ? "#FFFFFF" : BLUE} stopOpacity={dark ? 0.07 : 0.06} />
+                  <stop offset="78%" stopColor="#FFFFFF" stopOpacity={dark ? 0.02 : 0.45} />
+                  <stop offset="100%" stopColor="#FFFFFF" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id={`kpi-edge-${i}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={dark ? "#FFFFFF" : BLUE} stopOpacity={dark ? 0.35 : 0.3} />
+                  <stop offset="100%" stopColor={dark ? "#FFFFFF" : BLUE} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <rect x={x} y={y} width={tw} height={th} rx={Math.min(tw, th) * 0.08} fill={`url(#kpi-glass-${i})`} />
+              <rect x={x + 0.5} y={y + 0.5} width={tw - 1} height={th - 1} rx={Math.min(tw, th) * 0.08} fill="none" stroke={`url(#kpi-edge-${i})`} strokeWidth={Math.max(1, fontPx * 0.06)} />
+              <rect x={x + Math.min(tw, th) * 0.08} y={y} width={tw - Math.min(tw, th) * 0.16} height={Math.max(2, fontPx * 0.16)} rx={Math.max(1, fontPx * 0.08)} fill={BLUE} />
               <text x={x + pad} y={y + pad + lab * 0.95} fontSize={lab} fill={muted}>{fitText(k.label, tw - pad * 2, lab)}</text>
               <text x={x + pad} y={y + pad + lab * 1.3 + vs * 0.95} fontSize={vs} fontWeight={700} fill={tc}>{k.value}</text>
               {k.delta ? (

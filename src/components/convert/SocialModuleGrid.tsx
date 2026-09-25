@@ -12,6 +12,7 @@ import { AdaptIcon, iconFor } from "./AdaptIcon";
 
 import type { AdaptChart, AdaptImage } from "@/lib/cross-format-adapt";
 import { MediaTile } from "@/components/slide/module-primitives";
+import { moduleCardSurface } from "@/components/slide/flagship";
 import { AdaptChartBlock } from "./AdaptChartBlock";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { BrandLockup } from "@/components/BrandLockup";
@@ -228,9 +229,14 @@ export function SocialModuleGrid({
                 key={i}
                 style={{
                   ...span,
-                  background: tileBg,
+                  ...(solid
+                    ? { background: tileBg, borderTop: `${Math.round(6 * f)}px solid ${dark ? "#FFFFFF" : BLUE}`, borderRadius: Math.round(22 * f) }
+                    : {
+                        ...moduleCardSurface(BLUE, dark ? "dark" : "light", { radius: Math.round(22 * f) }),
+                        backgroundColor: dark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.55)",
+                        boxShadow: `inset 0 ${Math.max(2, Math.round(4 * f))}px 0 0 ${BLUE}`,
+                      }),
                   color: tileInk,
-                  borderTop: `${Math.round(6 * f)}px solid ${solid && dark ? "#FFFFFF" : BLUE}`,
                   padding: Math.round(26 * f),
                   overflow: "hidden",
                   minHeight: 0,
