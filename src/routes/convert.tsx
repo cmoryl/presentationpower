@@ -22,6 +22,7 @@ import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { PrintBriefPreview } from "@/components/convert/PrintBriefPreview";
 import { ModuleAsDrawn } from "@/components/convert/ModuleAsDrawn";
+import { SocialCardDownload } from "@/components/convert/SocialCardDownload";
 import { SocialModuleGrid, socialGridCapacity, CONVERT_GROUNDS, groundCss } from "@/components/convert/SocialModuleGrid";
 import {
   ADAPT_TARGETS,
@@ -700,10 +701,13 @@ function ConvertPage() {
                   />
                 )
               ) : format && socialGrid ? (
+                <SocialCardDownload width={format.width} height={format.height} name={`${source.headline} ${result.target.label}`}>
                 <div ref={socialWrapRef}>
                   <SocialModuleGrid format={format} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={340} variantId={groundVariant} ground={ground} chart={source.chart} />
                 </div>
+                </SocialCardDownload>
               ) : format ? (
+                <SocialCardDownload width={format.width} height={format.height} name={`${source.headline} ${result.target.label}`}>
                 <div ref={socialWrapRef}>
                   <SocialRenderer
                     format={format}
@@ -716,6 +720,7 @@ function ConvertPage() {
                     displayShortEdge={340}
                   />
                 </div>
+                </SocialCardDownload>
               ) : (
                 <PrintBriefPreview ref={printPageRef} result={result} brandId={brandId} ground={printGround} />
               )}
