@@ -22,6 +22,7 @@ import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { PrintBriefPreview } from "@/components/convert/PrintBriefPreview";
 import { ModuleAsDrawn } from "@/components/convert/ModuleAsDrawn";
+import { SocialModuleGrid, socialGridCapacity } from "@/components/convert/SocialModuleGrid";
 import {
   ADAPT_TARGETS,
   adaptContent,
@@ -232,6 +233,9 @@ function ConvertPage() {
   const mode: "light" | "dark" = sourceKind === "deck" ? (slide?.mode ?? "light") : "light";
   const result = useMemo(() => adaptContent(source, targetId), [source, targetId]);
   const format = adaptTargetFormat(result.target);
+  // Modules with a set of cells (bento, cards, figures) rebuild as a tile grid on social sizes.
+  const gridPoints = (source.points ?? []).filter(Boolean);
+  const socialGrid = gridPoints.length >= 3 && source.shape?.kind !== "table";
 
   const socialWrapRef = useRef<HTMLDivElement>(null);
   const printPageRef = useRef<HTMLDivElement>(null);
@@ -619,6 +623,8 @@ function ConvertPage() {
                             frameH={frameOf(r, f).h}
                             displayWidth={f ? Math.round(170 * Math.max(1, f.width / f.height)) : 200}
                           />
+                        ) : f && socialGrid ? (
+                          <SocialModuleGrid format={f} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={170} />
                         ) : f ? (
                           <SocialRenderer
                             format={f}
@@ -669,6 +675,10 @@ function ConvertPage() {
                     displayWidth={420}
                   />
                 )
+              ) : format && socialGrid ? (
+                <div ref={socialWrapRef}>
+                  <SocialModuleGrid format={format} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={340} />
+                </div>
               ) : format ? (
                 <div ref={socialWrapRef}>
                   <SocialRenderer
@@ -708,7 +718,7 @@ function ConvertPage() {
                 </p>
               ) : (
                 <ul className="mt-3 space-y-1.5">
-                  {result.notes.map((n, i) => (
+                  {(format && socialGrid && !drawn ? [...result.notes.filter((n) => n.field !== "points" && n.field !== "body"), ...(gridPoints.length > socialGridCapacity(format) ? [{ severity: "dropped" as const, field: "points", detail: `${gridPoints.length - socialGridCapacity(format)} tile(s) left out — this size holds ${socialGridCapacity(format)}.` }] : [])] : result.notes).map((n, i) => (
                     <li
                       key={`${n.field}-${i}`}
                       className={`rounded-lg border p-2.5 text-[12.5px] leading-[1.45] text-[#03002C] ${SEVERITY_STYLE[n.severity] ?? "border-black/10 bg-white"}`}
