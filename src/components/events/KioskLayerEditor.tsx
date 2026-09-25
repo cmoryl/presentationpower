@@ -31,6 +31,26 @@ type Sel = { kind: "block" | "text" | "part"; id: string } | null;
 const btn =
   "inline-flex items-center gap-1.5 rounded-md border border-[#03002C]/15 bg-white px-2.5 py-1.5 text-[12px] font-semibold text-[#03002C] hover:bg-[#F2F4F9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] disabled:opacity-50";
 
+const draftKey = (id: string) => `kiosk-draft:${id}`;
+function readLocalDraft(id: string): { at: number; edits: KioskEdits } | null {
+  try { const v = localStorage.getItem(draftKey(id)); return v ? JSON.parse(v) : null; } catch { return null; }
+}
+function writeLocalDraft(id: string, edits: KioskEdits) {
+  try { localStorage.setItem(draftKey(id), JSON.stringify({ at: Date.now(), edits })); } catch { /* storage full or blocked */ }
+}
+function clearLocalDraft(id: string) {
+  try { localStorage.removeItem(draftKey(id)); } catch { /* ignore */ }
+}
+
+/** Saved edits for a kiosk (shared copy, or this device's newer draft). */
+async function loadKioskEdits(id: string): Promise<KioskEdits> {
+  const local = readLocalDraft(id);
+  const { data } = await supabase.from("kiosk_layer_edits").select("edits, updated_at").eq("booth_id", id).maybeSingle();
+  const remoteAt = data?.updated_at ? Date.parse(data.updated_at) : 0;
+  if (local && local.at > remoteAt) return local.edits;
+  return (data?.edits as KioskEdits | undefined) ?? {};
+}
+
 export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; vendor: string }) {
   const [art, setArt] = useState<{ viewBox: string; inner: string } | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -51,12 +71,40 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     return () => { live = false; };
   }, [L.id]);
 
+  // Load: the shared saved copy wins; otherwise this device's unsaved draft.
+  const loaded = useRef(false);
   useEffect(() => {
-    if (!userId) return;
-    supabase.from("kiosk_layer_edits").select("edits").eq("booth_id", L.id).maybeSingle().then(({ data }) => {
-      if (data?.edits) setEdits(data.edits as KioskEdits);
-    });
+    let live = true;
+    loaded.current = false;
+    const local = readLocalDraft(L.id);
+    (async () => {
+      const { data } = userId
+        ? await supabase.from("kiosk_layer_edits").select("edits, updated_at").eq("booth_id", L.id).maybeSingle()
+        : { data: null };
+      if (!live) return;
+      const remote = data?.edits as KioskEdits | undefined;
+      const remoteAt = data?.updated_at ? Date.parse(data.updated_at) : 0;
+      if (local && local.at > remoteAt) setEdits(local.edits);
+      else if (remote) setEdits(remote);
+      loaded.current = true;
+    })();
+    return () => { live = false; };
   }, [L.id, userId]);
+
+  // Autosave: every change is kept on this device at once, and saved to the
+  // shared kiosk a moment after you stop editing.
+  useEffect(() => {
+    if (!loaded.current) return;
+    writeLocalDraft(L.id, edits);
+    if (!userId) { setStatus("Kept on this device. Sign in to save for everyone."); return; }
+    setStatus("Saving…");
+    const t = setTimeout(async () => {
+      const { error } = await supabase.from("kiosk_layer_edits").upsert({ booth_id: L.id, edits: edits as never, updated_by: userId });
+      if (error) setStatus(`Kept on this device only — not saved for everyone: ${error.message}`);
+      else { clearLocalDraft(L.id); setStatus("All changes saved."); window.dispatchEvent(new CustomEvent("kiosk-edits-saved", { detail: L.id })); }
+    }, 1200);
+    return () => clearTimeout(t);
+  }, [edits, L.id, userId]);
 
   const placed = useMemo(() => layoutKiosk(L, edits), [L, edits]);
   const ground = kioskGround(L, edits);
@@ -122,7 +170,8 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     setBusy("save"); setStatus(null);
     const { error } = await supabase.from("kiosk_layer_edits").upsert({ booth_id: L.id, edits: edits as never, updated_by: userId ?? null });
     setBusy(null);
-    setStatus(error ? `Not saved: ${error.message}` : "Saved to this kiosk.");
+    if (!error) { clearLocalDraft(L.id); window.dispatchEvent(new CustomEvent("kiosk-edits-saved", { detail: L.id })); }
+    setStatus(error ? `Not saved: ${error.message}` : "All changes saved.");
   };
   const dl = async (k: KioskDownload) => {
     setBusy(k); setStatus(null);
@@ -375,6 +424,12 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
 export function KioskLiveThumb({ layout, height = 150 }: { layout: LiveLayout; height?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [src, setSrc] = useState<string | null>(null);
+  const [rev, setRev] = useState(0);
+  useEffect(() => {
+    const on = (e: Event) => { if ((e as CustomEvent).detail === layout.id) setRev((r) => r + 1); };
+    window.addEventListener("kiosk-edits-saved", on);
+    return () => window.removeEventListener("kiosk-edits-saved", on);
+  }, [layout.id]);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -383,13 +438,13 @@ export function KioskLiveThumb({ layout, height = 150 }: { layout: LiveLayout; h
       if (!e?.isIntersecting) return;
       io.disconnect();
       const { liveFrontSvg } = await import("@/lib/next-california-kiosk-live-export");
-      const svg = await liveFrontSvg(layout, {});
+      const svg = await liveFrontSvg(layout, await loadKioskEdits(layout.id).catch(() => ({})));
       url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
       setSrc(url);
     });
     io.observe(el);
     return () => { io.disconnect(); if (url) URL.revokeObjectURL(url); };
-  }, [layout]);
+  }, [layout, rev]);
   return (
     <div ref={ref} style={{ height, width: height * (KIOSK_W / KIOSK_H) }} className="shrink-0 overflow-hidden rounded bg-[#E0E8F5]">
       {src ? <img src={src} alt="" className="h-full w-full object-contain" /> : null}
