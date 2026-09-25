@@ -18,6 +18,7 @@ import { AppShell } from "@/components/AppShell";
 import { AssetExportMenu } from "@/components/AssetExportMenu";
 import { PrintProofMenu } from "@/components/export/PrintProofMenu";
 import { PressExportMenu } from "@/components/convert/PressExportMenu";
+import { LiveFileExportMenu } from "@/components/convert/LiveFileExportMenu";
 import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { PrintBriefPreview } from "@/components/convert/PrintBriefPreview";
@@ -522,6 +523,16 @@ function ConvertPage() {
                       : null;
                   }}
                 />
+                {!format && result.target.trimIn ? (
+                  <LiveFileExportMenu
+                    title={result.content?.headline}
+                    resolveTarget={() => {
+                      const node = printPageRef.current;
+                      const trim = result.target.trimIn;
+                      return node && trim ? { node, trimIn: trim, label: result.target.label } : null;
+                    }}
+                  />
+                ) : null}
                 {!format && result.target.trimIn ? (
                   <PressExportMenu
                     context={{
