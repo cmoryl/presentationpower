@@ -191,7 +191,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     <div className={wide ? "grid gap-5" : "grid gap-5 lg:grid-cols-[minmax(0,300px)_1fr_minmax(0,280px)]"}>
       <style>{kioskFontFaceCss()}</style>
       {/* Canvas */}
-      <div className="order-1 lg:order-2">
+      <div className={wide ? "order-1" : "order-1 lg:order-2"}>
         <div className="mb-2 flex flex-wrap items-center gap-2">
           <span className="text-[12px] font-semibold text-[#03002C]">View</span>
           <button type="button" className={btn} aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(400, Math.round(z / 1.25)))} disabled={zoom <= 400}><Minus className="h-3.5 w-3.5" /></button>
