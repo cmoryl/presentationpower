@@ -77,8 +77,10 @@ export function imagesFrom(c: Record<string, unknown>): AdaptImage[] | undefined
 }
 
 export type AdaptChart = {
-  kind: "bar" | "line" | "ring" | "grouped" | "stacked" | "area" | "combo" | "waterfall" | "scatter" | "range" | "heatmap";
+  kind: "bar" | "line" | "ring" | "grouped" | "stacked" | "area" | "combo" | "waterfall" | "scatter" | "range" | "heatmap" | "kpi";
   data: { label: string; value: number }[];
+  /** KPI tiles: display value (with unit) and change indicator, as authored. */
+  kpis?: { label: string; value: string; delta?: string; trend?: "up" | "down" }[];
   /** Multi-series charts: category labels and one value list per series. */
   labels?: string[];
   series?: { name: string; values: number[] }[];
@@ -137,8 +139,22 @@ export function chartFrom(c: Record<string, unknown>): AdaptChart | undefined {
     if (items.every((i) => i && typeof i === "object" && "year" in i) && years.length >= 2)
       return { kind: "bar", data: years, unit: typeof items[0].unit === "string" ? (items[0].unit as string) : undefined };
     const pct = pairs(items, ["label", "name"]);
-    if (pct.length >= 2 && pct.length === items.length && pct.every((p) => p.value >= 0 && p.value <= 100) && items.every((i) => typeof i.value === "number"))
+    // Percent gauges: plain numbers, or numeric strings explicitly marked "%".
+    const isPct = (i: Record<string, unknown>) =>
+      typeof i.value === "number" || (typeof i.value === "string" && i.unit === "%" && numOf(i.value) !== undefined);
+    if (pct.length >= 2 && pct.length === items.length && pct.every((p) => p.value >= 0 && p.value <= 100) && items.every(isPct))
       return { kind: "ring", data: pct, unit: "%" };
+    // KPI dashboards: mixed-unit tiles with a change indicator. Not a chart
+    // with a common scale, so drawn as KPI tiles rather than invented bars.
+    if (items.length >= 3 && items.every((i) => i && typeof i.label === "string" && i.value !== undefined) && items.some((i) => typeof i.delta === "string" || typeof i.trend === "string")) {
+      const kpis = items.slice(0, 8).map((i) => ({
+        label: i.label as string,
+        value: `${String(i.value)}${typeof i.unit === "string" ? i.unit : ""}`,
+        delta: typeof i.delta === "string" ? i.delta : undefined,
+        trend: i.trend === "up" || i.trend === "down" ? (i.trend as "up" | "down") : undefined,
+      }));
+      return { kind: "kpi", data: kpis.map((k) => ({ label: k.label, value: numOf(k.value) ?? 0 })), kpis };
+    }
     const sp = items.map((i) => (Array.isArray(i?.series) ? pairs(i.series, []) : [])).find((d) => d.length >= 2);
     if (sp) return { kind: "line", data: sp };
   }
@@ -691,7 +707,13 @@ export function contentFromSlide(
   const chart = chartFrom(c);
   const chartLabels = new Set((chart?.data ?? []).map((d) => d.label.trim().toLowerCase()));
   // Points that only repeat a chart label are drawn by the chart itself.
-  const points = pickPoints(c)?.filter((p) => !chartLabels.has(p.trim().toLowerCase()));
+  // KPI tiles already carry each figure + label, so their points go too.
+  const points = pickPoints(c)?.filter((p) => {
+    const t = p.trim().toLowerCase();
+    if (chartLabels.has(t)) return false;
+    if (chart?.kind === "kpi") return ![...chartLabels].some((l) => t.endsWith(l));
+    return true;
+  });
   const cta = pick(c, CTA_KEYS);
   const footnote = pickOther(c, quoteLine ? FOOTNOTE_KEYS.filter((k) => k !== "attribution") : FOOTNOTE_KEYS, headline);
   return {
