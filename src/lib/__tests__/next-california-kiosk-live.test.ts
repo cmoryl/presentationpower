@@ -72,3 +72,17 @@ describe("object groups", () => {
     expect(_pg({}, "c")).toEqual(["c"]);
   });
 });
+
+describe("kiosk everyday tools", () => {
+  it("duplicates, fades and rotates into the layered SVG", async () => {
+    const { KIOSK_LIVE_LAYOUTS, buildKioskFrontSvg, layoutKiosk } = await import("@/lib/next-california-kiosk-live");
+    const L = Object.values(KIOSK_LIVE_LAYOUTS)[0]!;
+    const t0 = L.texts[0]!.id;
+    const edits = { copies: [{ id: `${t0}-c1`, of: t0, kind: "text" as const }], texts: { [`${t0}-c1`]: { dx: 72, opacity: 0.5, rot: 90 } } };
+    const texts = layoutKiosk(L, edits).flatMap((p) => p.texts);
+    expect(texts.filter((t) => t.text === L.texts[0]!.text).length).toBeGreaterThanOrEqual(2);
+    const svg = buildKioskFrontSvg(L, '<svg viewBox="0 0 10 10"><rect/></svg>', edits);
+    expect(svg).toContain(`id="${t0}-c1"`);
+    expect(svg).toMatch(/opacity="0\.500" transform="rotate\(90\.00/);
+  });
+});
