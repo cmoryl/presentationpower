@@ -22,6 +22,7 @@ import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { PrintBriefPreview } from "@/components/convert/PrintBriefPreview";
 import { ModuleAsDrawn } from "@/components/convert/ModuleAsDrawn";
+import { SocialCardDownload } from "@/components/convert/SocialCardDownload";
 import { SocialModuleGrid, socialGridCapacity, CONVERT_GROUNDS, groundCss } from "@/components/convert/SocialModuleGrid";
 import {
   ADAPT_TARGETS,
@@ -626,9 +627,11 @@ function ConvertPage() {
                   const r = adaptContent(source, t.id);
                   const f = adaptTargetFormat(t);
                   return (
+                    <Fragment key={t.id}>
+                    {(() => {
+                      const card = (
                     <button
-                      key={t.id}
-                      type="button"
+                                            type="button"
                       onClick={() => {
                         setTargetId(t.id);
                         setView("one");
@@ -667,6 +670,12 @@ function ConvertPage() {
                         {r.notes.length ? `${r.notes.length} change${r.notes.length === 1 ? "" : "s"} to fit` : "Everything fitted"}
                       </span>
                     </button>
+                      );
+                      return f ? (
+                        <SocialCardDownload width={f.width} height={f.height} name={`${source.headline} ${t.label}`}>{card}</SocialCardDownload>
+                      ) : card;
+                    })()}
+                    </Fragment>
                   );
                 })}
               </div>
@@ -700,10 +709,13 @@ function ConvertPage() {
                   />
                 )
               ) : format && socialGrid ? (
+                <SocialCardDownload width={format.width} height={format.height} name={`${source.headline} ${result.target.label}`}>
                 <div ref={socialWrapRef}>
                   <SocialModuleGrid format={format} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={340} variantId={groundVariant} ground={ground} chart={source.chart} />
                 </div>
+                </SocialCardDownload>
               ) : format ? (
+                <SocialCardDownload width={format.width} height={format.height} name={`${source.headline} ${result.target.label}`}>
                 <div ref={socialWrapRef}>
                   <SocialRenderer
                     format={format}
@@ -716,6 +728,7 @@ function ConvertPage() {
                     displayShortEdge={340}
                   />
                 </div>
+                </SocialCardDownload>
               ) : (
                 <PrintBriefPreview ref={printPageRef} result={result} brandId={brandId} ground={printGround} />
               )}
