@@ -44,7 +44,7 @@ describe("California kiosks rebuilt from live files", () => {
     const L = KIOSK_LIVE_LAYOUTS["media-tradebooth-a"]!;
     const svg = buildKioskFrontSvg(L, ART, { texts: { t0: { text: "Edited headline" } } });
     for (const id of ["Background", "Graphics", "Text", "Cut"]) expect(svg).toContain(`<g id="${id}"`);
-    expect(svg).toContain(">Edited headline</text>");
+    expect(svg).toContain(">Edited headline</tspan></text>");
     expect(svg).not.toContain("TV keep-clear");
   });
 });

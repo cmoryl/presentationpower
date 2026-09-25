@@ -4,13 +4,18 @@
 // kiosk. The TV keep-clear is drawn as a guide only (never exported).
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, Eye, EyeOff, Maximize2, Minimize2, Minus, Plus, RotateCcw, Save, Undo2 } from "lucide-react";
+import {
+  AlignCenter, AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignLeft, AlignRight,
+  AlignStartHorizontal, AlignStartVertical, AlignHorizontalSpaceAround, AlignVerticalSpaceAround,
+  Download, Eye, EyeOff, Maximize2, Minimize2, Minus, Plus, RotateCcw, Save, Trash2, Undo2,
+} from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useSessionUser } from "@/hooks/use-session-user";
 import {
   KIOSK_BLEED,
   KIOSK_H,
+  KIOSK_MARGIN,
   KIOSK_TV,
   KIOSK_W,
   kioskFontFaceCss,
@@ -21,15 +26,30 @@ import {
   defaultPartGroups,
   pieceBackdropPath,
   splitArtSvg,
+  textLineBoxes,
+  type KioskDivider,
   type KioskEdits,
   type LiveLayout,
+  type PlacedText,
+  type TextAlign,
 } from "@/lib/next-california-kiosk-live";
 import { downloadKiosk, loadArtSvg, type KioskDownload } from "@/lib/next-california-kiosk-live-export";
 
-type Sel = { kind: "block" | "text" | "part"; id: string } | null;
+type Sel = { kind: "block" | "text" | "part" | "divider"; id: string } | null;
+
+/** Approved TransPerfect accent rules (brand v3.0): Blue 500, Aqua, Lavender, white, Blue 800. */
+const ACCENTS = [
+  { name: "Blue", color: "#003FC7" },
+  { name: "Aqua", color: "#A1FBF9" },
+  { name: "Lavender", color: "#C2A3FF" },
+  { name: "White", color: "#FFFFFF" },
+  { name: "Ink", color: "#03002C" },
+] as const;
 
 const btn =
   "inline-flex items-center gap-1.5 rounded-md border border-[#03002C]/15 bg-white px-2.5 py-1.5 text-[12px] font-semibold text-[#03002C] hover:bg-[#F2F4F9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] disabled:opacity-50";
+const ibtn =
+  "inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#03002C]/15 bg-white text-[#03002C] hover:bg-[#F2F4F9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] aria-pressed:border-[#003FC7] aria-pressed:bg-[#E0E8F5] disabled:opacity-50";
 
 const draftKey = (id: string) => `kiosk-draft:${id}`;
 function readLocalDraft(id: string): { at: number; edits: KioskEdits } | null {
@@ -62,6 +82,8 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   const [wide, setWide] = useState(false);
   /** Objects picked with Shift-click, ready to group. */
   const [picked, setPicked] = useState<string[]>([]);
+  /** Snap guide x (kiosk points) shown while dragging. */
+  const [guide, setGuide] = useState<number | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState<KioskDownload | "save" | null>(null);
   const userId = useSessionUser();
@@ -151,23 +173,132 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     drag.current = { sel: s, x: p.x, y: p.y, start: edits };
     setHistory((h) => [...h.slice(-49), edits]);
   };
+
+  /** Move a selection (and its group) by dx/dy kiosk points. */
+  const shift = (s: NonNullable<Sel>, dx: number, dy: number, base: KioskEdits = edits): KioskEdits => {
+    if (s.kind === "divider")
+      return { ...base, dividers: (base.dividers ?? []).map((d) => (d.id === s.id ? { ...d, x: d.x + dx, y: d.y + dy } : d)) };
+    const key = s.kind === "block" ? "blocks" : s.kind === "part" ? "parts" : "texts";
+    const map = { ...(base[key] as Record<string, { dx?: number; dy?: number }> | undefined) };
+    const ids = s.kind === "part" ? partGroup(base, s.id, L) : [s.id];
+    for (const id of ids) map[id] = { ...map[id], dx: (map[id]?.dx ?? 0) + dx, dy: (map[id]?.dy ?? 0) + dy };
+    return { ...base, [key]: map };
+  };
+
+  const measureCtx = useMemo(() => (typeof document === "undefined" ? null : document.createElement("canvas").getContext("2d")), []);
+  const measure = (t: PlacedText) => (s: string) => {
+    if (!measureCtx) return [...s].length * t.ksize * 0.55;
+    measureCtx.font = `${t.ksize}px ${kioskFontFamily(t.font)}`;
+    return measureCtx.measureText(s).width;
+  };
+  /** Bounds of a selection on the kiosk (kiosk points). */
+  const selBounds = (s: NonNullable<Sel>, base: KioskEdits = edits) => {
+    const pl = layoutKiosk(L, base);
+    if (s.kind === "divider") {
+      const d = base.dividers?.find((x) => x.id === s.id);
+      return d ? { x0: d.x, x1: d.x + d.w, y0: d.y, y1: d.y + d.h } : null;
+    }
+    if (s.kind === "block") {
+      const p = pl.find((x) => x.block.id === s.id);
+      return p ? { x0: p.x, x1: p.x + L.trimW * p.scale, y0: p.y, y1: p.y + (p.clipBottom - p.clipTop) * p.scale } : null;
+    }
+    if (s.kind === "text") {
+      const t = pl.flatMap((p) => p.texts).find((x) => x.id === s.id);
+      if (!t) return null;
+      const bx = t.fixed ? [{ x: t.kx, w: t.kw, y: t.ky }] : textLineBoxes(t, measure(t));
+      return { x0: Math.min(...bx.map((b) => b.x)), x1: Math.max(...bx.map((b) => b.x + b.w)), y0: t.ky - t.ksize * 0.8, y1: bx[bx.length - 1]!.y + t.ksize * 0.2 };
+    }
+    const ids = partGroup(base, s.id, L);
+    const qs = pl.flatMap((p) => p.parts).filter((q) => ids.includes(q.part.id));
+    if (!qs.length) return null;
+    return {
+      x0: Math.min(...qs.map((q) => q.x)), x1: Math.max(...qs.map((q) => q.x + (q.src.x1 - q.src.x0) * q.scale)),
+      y0: Math.min(...qs.map((q) => q.y)), y1: Math.max(...qs.map((q) => q.y + (q.src.y1 - q.src.y0) * q.scale)),
+    };
+  };
+
+  /** Snap a moved selection's edges/centre to the kiosk margins and centre line. */
+  const snap = (s: NonNullable<Sel>, next: KioskEdits) => {
+    const b = selBounds(s, next);
+    if (!b) return { next, g: null as number | null };
+    const tol = 18;
+    const cx = (b.x0 + b.x1) / 2;
+    const tries: [number, number][] = [[KIOSK_W / 2 - cx, KIOSK_W / 2], [KIOSK_MARGIN - b.x0, KIOSK_MARGIN], [KIOSK_W - KIOSK_MARGIN - b.x1, KIOSK_W - KIOSK_MARGIN]];
+    const hit = tries.find(([d]) => Math.abs(d) <= tol);
+    return hit ? { next: shift(s, hit[0], 0, next), g: hit[1] } : { next, g: null };
+  };
+
   const onMove = (e: React.PointerEvent) => {
     const d = drag.current;
     if (!d) return;
     const p = toSvg(e);
-    const dx = p.x - d.x, dy = p.y - d.y;
-    const key = d.sel.kind === "block" ? "blocks" : d.sel.kind === "part" ? "parts" : "texts";
-    const map = d.start[key] as Record<string, { dx?: number; dy?: number }> | undefined;
-    const cur = map?.[d.sel.id] as { dx?: number; dy?: number } | undefined;
-    const v = { dx: (cur?.dx ?? 0) + dx, dy: (cur?.dy ?? 0) + dy };
-    const ids = d.sel.kind === "part" ? partGroup(d.start, d.sel.id, L) : [d.sel.id];
-    const moved = { ...map };
-    for (const id of ids) moved[id] = { ...map?.[id], dx: (map?.[id]?.dx ?? 0) + dx, dy: (map?.[id]?.dy ?? 0) + dy };
-    void v;
-    const next = { ...d.start, [key]: moved };
-    setEdits(next);
+    const moved = shift(d.sel, p.x - d.x, p.y - d.y, d.start);
+    const r = e.altKey ? { next: moved, g: null } : snap(d.sel, moved);
+    setGuide(r.g);
+    setEdits(r.next);
   };
-  const endDrag = () => { drag.current = null; };
+  const endDrag = () => { drag.current = null; setGuide(null); };
+
+  /** Put the selection against the left margin, the centre line or the right margin. */
+  const alignKiosk = (where: TextAlign, base: KioskEdits = edits) => {
+    if (!sel) return;
+    let b0 = base;
+    if (sel.kind === "text") b0 = { ...base, texts: { ...base.texts, [sel.id]: { ...base.texts?.[sel.id], align: where } } };
+    const b = selBounds(sel, b0);
+    if (!b) return;
+    const d = where === "left" ? KIOSK_MARGIN - b.x0 : where === "center" ? KIOSK_W / 2 - (b.x0 + b.x1) / 2 : KIOSK_W - KIOSK_MARGIN - b.x1;
+    commit(shift(sel, d, 0, b0));
+  };
+
+  /** Align or spread the Shift-picked objects relative to each other. */
+  const alignPicked = (mode: "left" | "hcenter" | "right" | "top" | "vmiddle" | "bottom" | "hspread" | "vspread") => {
+    const qs = placed.flatMap((p) => p.parts).filter((q) => picked.includes(q.part.id))
+      .map((q) => ({ id: q.part.id, x0: q.x, y0: q.y, w: (q.src.x1 - q.src.x0) * q.scale, h: (q.src.y1 - q.src.y0) * q.scale }));
+    if (qs.length < 2) return;
+    const U = { x0: Math.min(...qs.map((q) => q.x0)), x1: Math.max(...qs.map((q) => q.x0 + q.w)), y0: Math.min(...qs.map((q) => q.y0)), y1: Math.max(...qs.map((q) => q.y0 + q.h)) };
+    const mv: Record<string, [number, number]> = {};
+    const spread = (axis: "x" | "y") => {
+      const s = [...qs].sort((a, b) => (axis === "x" ? a.x0 - b.x0 : a.y0 - b.y0));
+      const span = axis === "x" ? U.x1 - U.x0 : U.y1 - U.y0;
+      const gap = (span - s.reduce((n, q) => n + (axis === "x" ? q.w : q.h), 0)) / (s.length - 1);
+      let at = axis === "x" ? U.x0 : U.y0;
+      for (const q of s) { mv[q.id] = axis === "x" ? [at - q.x0, 0] : [0, at - q.y0]; at += (axis === "x" ? q.w : q.h) + gap; }
+    };
+    if (mode === "hspread") spread("x");
+    else if (mode === "vspread") spread("y");
+    else for (const q of qs)
+      mv[q.id] = mode === "left" ? [U.x0 - q.x0, 0] : mode === "right" ? [U.x1 - q.x0 - q.w, 0] : mode === "hcenter" ? [(U.x0 + U.x1) / 2 - q.x0 - q.w / 2, 0]
+        : mode === "top" ? [0, U.y0 - q.y0] : mode === "bottom" ? [0, U.y1 - q.y0 - q.h] : [0, (U.y0 + U.y1) / 2 - q.y0 - q.h / 2];
+    const parts = { ...edits.parts };
+    for (const [id, [dx, dy]] of Object.entries(mv)) parts[id] = { ...parts[id], dx: (parts[id]?.dx ?? 0) + dx, dy: (parts[id]?.dy ?? 0) + dy };
+    commit({ ...edits, parts });
+  };
+
+  const addDivider = (preset: "short" | "full" | "under") => {
+    let x = KIOSK_MARGIN, y = KIOSK_TV.y + KIOSK_TV.h + 144, w = 540;
+    if (preset === "full") w = KIOSK_W - 2 * KIOSK_MARGIN;
+    if (preset === "under" && sel) {
+      const b = selBounds(sel);
+      if (b) { x = b.x0; y = b.y1 + 48; w = Math.max(144, Math.min(b.x1 - b.x0, 900)); }
+    }
+    const id = `div-${Date.now().toString(36)}`;
+    commit({ ...edits, dividers: [...(edits.dividers ?? []), { id, x, y, w, h: 18, color: ACCENTS[0]!.color, round: false }] });
+    setSel({ kind: "divider", id }); setPicked([]);
+  };
+  const patchDivider = (id: string, p: Partial<KioskDivider>, push = true) => {
+    const next = { ...edits, dividers: (edits.dividers ?? []).map((d) => (d.id === id ? { ...d, ...p } : d)) };
+    push ? commit(next) : setEdits(next);
+  };
+
+  const onKey = (e: React.KeyboardEvent) => {
+    if (!sel || (e.target as HTMLElement).closest("input,textarea,select")) return;
+    const step = e.shiftKey ? 36 : 3;
+    const m: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
+    if (m[e.key]) { e.preventDefault(); commit(shift(sel, m[e.key]![0], m[e.key]![1])); }
+    else if ((e.key === "Delete" || e.key === "Backspace") && sel.kind === "divider") {
+      e.preventDefault(); commit({ ...edits, dividers: (edits.dividers ?? []).filter((d) => d.id !== sel.id) }); setSel(null);
+    }
+  };
 
   const save = async () => {
     setBusy("save"); setStatus(null);
@@ -186,6 +317,8 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   const selBlock = sel?.kind === "block" ? L.blocks.find((b) => b.id === sel.id) : null;
   const selPart = sel?.kind === "part" ? L.blocks.flatMap((b) => b.parts ?? []).find((q) => q.id === sel.id) : null;
   const selText = sel?.kind === "text" ? L.texts.find((t) => t.id === sel.id) : null;
+  const selPlaced = selText ? placed.flatMap((p) => p.texts).find((t) => t.id === selText.id) ?? null : null;
+  const selDivider = sel?.kind === "divider" ? edits.dividers?.find((d) => d.id === sel.id) ?? null : null;
 
   return (
     <div className={wide ? "grid gap-5" : "grid gap-5 lg:grid-cols-[minmax(0,300px)_1fr_minmax(0,280px)]"}>
@@ -203,7 +336,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
             {wide ? "Smaller view" : "Big view"}
           </button>
         </div>
-        <div className="max-h-[80vh] overflow-auto rounded-md border border-[#03002C]/12 bg-[#F2F4F9] p-3">
+        <div tabIndex={0} onKeyDown={onKey} aria-label="Kiosk canvas. Arrow keys nudge the selection." className="max-h-[80vh] overflow-auto rounded-md border border-[#03002C]/12 bg-[#F2F4F9] p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
           {err ? <p className="text-sm text-[#E53D2E]">{err}</p> : null}
           {!art && !err ? <p className="text-sm text-[#03002C]/70">Loading the partner's artwork…</p> : null}
           {art ? (
@@ -260,17 +393,27 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                   </g>
                 );
               })}
+              {(edits.dividers ?? []).filter((d) => !d.hidden).map((d) => {
+                const on = sel?.kind === "divider" && sel.id === d.id;
+                return (
+                  <g key={d.id} onPointerDown={startDrag({ kind: "divider", id: d.id })} className="cursor-move">
+                    <rect x={d.x} y={d.y - 20} width={d.w} height={d.h + 40} fill="transparent" />
+                    <rect x={d.x} y={d.y} width={d.w} height={d.h} rx={d.round ? d.h / 2 : 0} fill={d.color} />
+                    {on ? <rect x={d.x - 8} y={d.y - 8} width={d.w + 16} height={d.h + 16} fill="none" stroke="#003FC7" strokeWidth={6} strokeDasharray="24 12" /> : null}
+                  </g>
+                );
+              })}
               {placed.flatMap((p) => p.texts).map((t) => {
                 const on = sel?.kind === "text" && sel.id === t.id;
                 return (
                   <text
                     key={t.id}
-                    x={t.kx}
-                    y={t.ky}
                     fontSize={t.ksize}
                     fill={t.fill}
                     fontFamily={kioskFontFamily(t.font)}
-                    textLength={t.edited ? undefined : t.kw}
+                    textAnchor={t.align === "center" ? "middle" : t.align === "right" ? "end" : "start"}
+                    letterSpacing={t.trackPt || undefined}
+                    textLength={t.fixed ? t.kw : undefined}
                     lengthAdjust="spacing"
                     xmlSpace="preserve"
                     className="cursor-move"
@@ -279,10 +422,15 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                     paintOrder="stroke"
                     onPointerDown={startDrag({ kind: "text", id: t.id })}
                   >
-                    {t.text}
+                    {t.lines.map((s, i) => (
+                      <tspan key={i} x={t.ax} y={t.ky + i * t.lead * t.ksize}>{s || " "}</tspan>
+                    ))}
                   </text>
                 );
               })}
+              {guide !== null ? (
+                <line data-export-ignore="true" pointerEvents="none" x1={guide} x2={guide} y1={0} y2={KIOSK_H} stroke="#EC388A" strokeWidth={4} strokeDasharray="18 12" />
+              ) : null}
               <g data-export-ignore="true" pointerEvents="none">
                 <rect x={KIOSK_TV.x} y={KIOSK_TV.y} width={KIOSK_TV.w} height={KIOSK_TV.h} fill="#03002C" fillOpacity={0.55} stroke="#FFFFFF" strokeDasharray="30 18" strokeWidth={6} />
                 <text x={KIOSK_TV.x + KIOSK_TV.w / 2} y={KIOSK_TV.y + KIOSK_TV.h / 2} textAnchor="middle" fontSize={90} fill="#FFFFFF" fontFamily="Geist, sans-serif">TV keep-clear (guide, not printed)</text>
@@ -349,6 +497,22 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
             );
           })}
         </ul>
+        {edits.dividers?.length ? (
+          <>
+            <h4 className="mt-3 text-sm font-semibold text-[#03002C]">Accent dividers</h4>
+            <ul className="mt-1 space-y-1">
+              {edits.dividers.map((d, i) => (
+                <li key={d.id} className="flex items-center gap-1 rounded-md border border-[#03002C]/10 bg-white px-2 py-1">
+                  <span aria-hidden className="h-2 w-6 rounded-sm border border-[#03002C]/20" style={{ background: d.color }} />
+                  <button type="button" className={`flex-1 truncate text-left text-[12px] ${sel?.id === d.id ? "text-[#003FC7]" : "text-[#03002C]"}`} onClick={() => { setSel({ kind: "divider", id: d.id }); setPicked([]); }}>Divider {i + 1}</button>
+                  <button type="button" aria-label={d.hidden ? "Show divider" : "Hide divider"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchDivider(d.id, { hidden: !d.hidden })}>
+                    {d.hidden ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : null}
       </div>
 
       {/* Inspector */}
@@ -359,19 +523,58 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
           <button type="button" className={btn} disabled={!userId || busy === "save"} onClick={save} title={userId ? undefined : "Sign in to save"}><Save className="h-3.5 w-3.5" />Save</button>
         </div>
 
-        {selText ? (
-          <div className="space-y-2">
+        {sel ? (
+          <div className="space-y-1.5">
+            <h4 className="text-sm font-semibold text-[#03002C]">Align on kiosk</h4>
+            <div className="flex flex-wrap gap-1" role="group" aria-label="Align on kiosk">
+              <button type="button" className={ibtn} aria-label="Left margin" title="Left margin (2 in)" onClick={() => alignKiosk("left")}><AlignStartVertical className="h-4 w-4" /></button>
+              <button type="button" className={ibtn} aria-label="Centre of kiosk" title="Centre of kiosk" onClick={() => alignKiosk("center")}><AlignCenterVertical className="h-4 w-4" /></button>
+              <button type="button" className={ibtn} aria-label="Right margin" title="Right margin (2 in)" onClick={() => alignKiosk("right")}><AlignEndVertical className="h-4 w-4" /></button>
+            </div>
+            <p className="text-[11px] text-[#03002C]/65">Dragging snaps to the margins and centre line (hold Alt to move freely). Arrow keys nudge; Shift + arrow moves ½ in.</p>
+          </div>
+        ) : null}
+
+        {selText && selPlaced ? (
+          <div className="space-y-2.5">
             <h4 className="text-sm font-semibold text-[#03002C]">Text</h4>
-            <label className="block text-[12px] text-[#03002C]/80">Words
-              <textarea className="mt-1 w-full rounded-md border border-[#03002C]/15 p-2 text-[13px] text-[#03002C]" rows={2} value={edits.texts?.[selText.id]?.text ?? selText.text} onChange={(e) => patchText(selText.id, { text: e.target.value }, false)} onBlur={() => setHistory((h) => [...h, edits])} />
+            <label className="block text-[12px] text-[#03002C]/80">Words <span className="text-[#03002C]/60">(Enter starts a new line)</span>
+              <textarea className="mt-1 w-full rounded-md border border-[#03002C]/15 p-2 text-[13px] text-[#03002C]" rows={3} value={edits.texts?.[selText.id]?.text ?? selText.text} onChange={(e) => patchText(selText.id, { text: e.target.value }, false)} onBlur={() => setHistory((h) => [...h, edits])} />
             </label>
-            <label className="block text-[12px] text-[#03002C]/80">Size (London pt)
-              <input type="number" min={6} className="mt-1 w-full rounded-md border border-[#03002C]/15 p-1.5 text-[13px]" value={Math.round(edits.texts?.[selText.id]?.size ?? selText.size)} onChange={(e) => patchText(selText.id, { size: Number(e.target.value) || selText.size })} />
+            <div className="space-y-1">
+              <span className="text-[12px] text-[#03002C]/80">Line alignment</span>
+              <div className="flex gap-1" role="group" aria-label="Line alignment">
+                {([["left", AlignLeft, "Align lines left"], ["center", AlignCenter, "Centre lines"], ["right", AlignRight, "Align lines right"]] as const).map(([a, Icon, label]) => (
+                  <button key={a} type="button" className={ibtn} aria-label={label} title={label} aria-pressed={selPlaced.align === a} onClick={() => patchText(selText.id, { align: a })}><Icon className="h-4 w-4" /></button>
+                ))}
+              </div>
+            </div>
+            <label className="block text-[12px] text-[#03002C]/80">Size {Math.round(edits.texts?.[selText.id]?.size ?? selText.size)} pt
+              <div className="mt-1 flex items-center gap-2">
+                <input type="range" min={6} max={Math.max(400, Math.round(selText.size * 3))} className="flex-1" value={Math.round(edits.texts?.[selText.id]?.size ?? selText.size)} onChange={(e) => patchText(selText.id, { size: Number(e.target.value) }, false)} />
+                <input type="number" min={6} aria-label="Size in points" className="w-16 rounded-md border border-[#03002C]/15 p-1 text-[13px]" value={Math.round(edits.texts?.[selText.id]?.size ?? selText.size)} onChange={(e) => patchText(selText.id, { size: Number(e.target.value) || selText.size })} />
+              </div>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className={btn} onClick={() => {
+                const b = selBounds({ kind: "text", id: selText.id });
+                if (!b) return;
+                const cur = edits.texts?.[selText.id]?.size ?? selText.size;
+                const size = Math.max(6, Math.floor(cur * ((KIOSK_W - 2 * KIOSK_MARGIN) / Math.max(1, b.x1 - b.x0))));
+                alignKiosk("center", { ...edits, texts: { ...edits.texts, [selText.id]: { ...edits.texts?.[selText.id], size } } });
+              }}>Fit to kiosk width</button>
+              <button type="button" className={btn} onClick={() => patchText(selText.id, { size: undefined, lead: undefined, track: undefined, align: undefined })}>Original sizing</button>
+            </div>
+            <label className="block text-[12px] text-[#03002C]/80">Line spacing {selPlaced.lead.toFixed(2)}×
+              <input type="range" min={80} max={200} className="mt-1 w-full" value={Math.round(selPlaced.lead * 100)} onChange={(e) => patchText(selText.id, { lead: Number(e.target.value) / 100 }, false)} />
+            </label>
+            <label className="block text-[12px] text-[#03002C]/80">Letter spacing {edits.texts?.[selText.id]?.track ?? 0}
+              <input type="range" min={-50} max={300} step={5} className="mt-1 w-full" value={edits.texts?.[selText.id]?.track ?? 0} onChange={(e) => patchText(selText.id, { track: Number(e.target.value) || undefined }, false)} />
             </label>
             <label className="flex items-center gap-2 text-[12px] text-[#03002C]/80">Colour
               <input type="color" value={edits.texts?.[selText.id]?.color ?? selText.color} onChange={(e) => patchText(selText.id, { color: e.target.value.toUpperCase() })} />
             </label>
-            <p className="text-[11px] text-[#03002C]/65">Font: {selText.font}. Retyped text keeps the font; original letter spacing applies only to the unedited words.</p>
+            <p className="text-[11px] text-[#03002C]/65">Font: {selText.font}. Unedited lines keep the London letter spacing; changing words, size, lines or spacing uses the font's own spacing.</p>
           </div>
         ) : null}
 
@@ -386,6 +589,17 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
               <button type="button" className={btn} onClick={() => commit({ ...edits, parts: { ...edits.parts, ...Object.fromEntries(picked.map((id) => [id, { ...edits.parts?.[id], hidden: !(edits.parts?.[id]?.hidden ?? false) }])) } })}>Hide / show</button>
               <button type="button" className={btn} onClick={() => commit({ ...edits, parts: { ...edits.parts, ...Object.fromEntries(picked.map((id) => [id, { dx: 0, dy: 0, scale: 1, hidden: false }])) } })}>Put back</button>
             </div>
+            {picked.length > 1 ? (
+              <div className="flex flex-wrap gap-1" role="group" aria-label="Align objects to each other">
+                {([
+                  ["left", AlignStartVertical, "Align left edges"], ["hcenter", AlignCenterVertical, "Align centres"], ["right", AlignEndVertical, "Align right edges"],
+                  ["top", AlignStartHorizontal, "Align tops"], ["vmiddle", AlignCenterHorizontal, "Align middles"], ["bottom", AlignEndHorizontal, "Align bottoms"],
+                  ["hspread", AlignHorizontalSpaceAround, "Spread evenly across"], ["vspread", AlignVerticalSpaceAround, "Spread evenly down"],
+                ] as const).map(([m, Icon, label]) => (
+                  <button key={m} type="button" className={ibtn} aria-label={label} title={label} disabled={(m === "hspread" || m === "vspread") && picked.length < 3} onClick={() => alignPicked(m)}><Icon className="h-4 w-4" /></button>
+                ))}
+              </div>
+            ) : null}
             <p className="text-[11px] text-[#03002C]/65">Shift-click objects on the kiosk or in the list to add them. A group moves, hides and resets together; each object keeps its own size.</p>
           </div>
         ) : null}
@@ -410,6 +624,43 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
             <p className="text-[11px] text-[#03002C]/65">Logos, icons and QR codes inside this piece move with it. Pieces never grow past the kiosk width.</p>
           </div>
         ) : null}
+
+        {selDivider ? (
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-[#03002C]">Accent divider</h4>
+            <label className="block text-[12px] text-[#03002C]/80">Length {Math.round(selDivider.w / 72)} in
+              <input type="range" min={36} max={KIOSK_W - 2 * KIOSK_MARGIN} className="mt-1 w-full" value={selDivider.w} onChange={(e) => patchDivider(selDivider.id, { w: Number(e.target.value) }, false)} />
+            </label>
+            <label className="block text-[12px] text-[#03002C]/80">Thickness {(selDivider.h / 72).toFixed(2)} in
+              <input type="range" min={3} max={72} className="mt-1 w-full" value={selDivider.h} onChange={(e) => patchDivider(selDivider.id, { h: Number(e.target.value) }, false)} />
+            </label>
+            <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Divider colour">
+              {ACCENTS.map((a) => (
+                <button key={a.color} type="button" aria-label={a.name} title={a.name} aria-pressed={selDivider.color === a.color}
+                  className="h-7 w-7 rounded-md border border-[#03002C]/25 aria-pressed:ring-2 aria-pressed:ring-[#003FC7] aria-pressed:ring-offset-1"
+                  style={{ background: a.color }} onClick={() => patchDivider(selDivider.id, { color: a.color })} />
+              ))}
+              <input type="color" aria-label="Custom colour" value={selDivider.color} onChange={(e) => patchDivider(selDivider.id, { color: e.target.value.toUpperCase() })} />
+            </div>
+            <label className="flex items-center gap-2 text-[12px] text-[#03002C]/80">
+              <input type="checkbox" checked={!!selDivider.round} onChange={(e) => patchDivider(selDivider.id, { round: e.target.checked })} /> Rounded ends
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className={btn} onClick={() => patchDivider(selDivider.id, { hidden: !selDivider.hidden })}>{selDivider.hidden ? "Show" : "Hide"}</button>
+              <button type="button" className={btn} onClick={() => { commit({ ...edits, dividers: (edits.dividers ?? []).filter((d) => d.id !== selDivider.id) }); setSel(null); }}><Trash2 className="h-3.5 w-3.5" />Delete</button>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold text-[#03002C]">Add accent divider</h4>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" className={btn} onClick={() => addDivider("short")}>Short rule</button>
+            <button type="button" className={btn} onClick={() => addDivider("full")}>Full width</button>
+            <button type="button" className={btn} disabled={!sel || sel.kind === "divider"} onClick={() => addDivider("under")}>Under selection</button>
+          </div>
+          <p className="text-[11px] text-[#03002C]/65">Accent rules use the approved blue, aqua and lavender. They export as live vector shapes on their own Accents layer.</p>
+        </div>
 
         <div className="space-y-2">
           <h4 className="text-sm font-semibold text-[#03002C]">Background</h4>
