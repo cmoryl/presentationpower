@@ -57,6 +57,9 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   const [edits, setEdits] = useState<KioskEdits>({});
   const [history, setHistory] = useState<KioskEdits[]>([]);
   const [sel, setSel] = useState<Sel>(null);
+  /** Canvas height in px (zoom) and whether the canvas takes the full width. */
+  const [zoom, setZoom] = useState(640);
+  const [wide, setWide] = useState(false);
   /** Objects picked with Shift-click, ready to group. */
   const [picked, setPicked] = useState<string[]>([]);
   const [status, setStatus] = useState<string | null>(null);
