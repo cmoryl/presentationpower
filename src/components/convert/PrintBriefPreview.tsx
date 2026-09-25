@@ -24,7 +24,7 @@ import { moduleCardSurface } from "@/components/slide/flagship";
 function printGlass(accent: string, radius: number, seam: number): _CSS {
   return {
     ...moduleCardSurface(accent, "light", { radius }),
-    backgroundColor: "rgba(255,255,255,0.55)",
+    backgroundColor: "transparent",
     boxShadow: `inset 0 ${Math.max(2, seam)}px 0 0 ${accent}`,
   };
 }
@@ -125,8 +125,8 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
             {pts.map((p, i) => {
               const [h, b] = split(p);
               return (
-                <li key={i} style={{ display: "grid", gridTemplateColumns: `${u(banner ? 64 : 28)}px 1fr`, gap: u(12), alignItems: "start", fontSize: cellPx, lineHeight: t.bodyLeading }}>
-                  <span style={{ width: u(banner ? 64 : 28), height: u(banner ? 64 : 28), background: accent, color: ink, fontWeight: 700, display: "grid", placeItems: "center", fontSize: "0.9em" }}>{iconFor(content.pointIcons, p) ? <AdaptIcon name={iconFor(content.pointIcons, p)!} label={p} size={u(banner ? 38 : 18)} color={ink} /> : i + 1}</span>
+                <li key={i} style={{ ...printGlass(accent, u(14), u(4)), padding: u(banner ? 24 : 12), display: "grid", gridTemplateColumns: `${u(banner ? 64 : 28)}px 1fr`, gap: u(12), alignItems: "start", fontSize: cellPx, lineHeight: t.bodyLeading }}>
+                  <span style={{ width: u(banner ? 64 : 28), height: u(banner ? 64 : 28), background: accent, color: ink, borderRadius: u(8), fontWeight: 700, display: "grid", placeItems: "center", fontSize: "0.9em" }}>{iconFor(content.pointIcons, p) ? <AdaptIcon name={iconFor(content.pointIcons, p)!} label={p} size={u(banner ? 38 : 18)} color={ink} /> : i + 1}</span>
                   <span><strong style={{ display: "block" }}>{h}</strong>{b ? <span style={{ color: "#3A3A55" }}>{b}</span> : null}</span>
                 </li>
               );
@@ -202,7 +202,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
               const [h, b] = split(p);
               const [fig, ...lab] = h.split(" ");
               return (
-                <div key={i} style={{ borderTop: `${u(4)}px solid ${accent}`, paddingTop: u(10) }}>
+                <div key={i} style={{ ...printGlass(accent, u(14), u(4)), padding: u(banner ? 28 : 16) }}>
                   <div style={{ fontSize: t.statPx * 0.7 * bb, fontWeight: 700, lineHeight: 1, letterSpacing: "-0.03em" }}>{fig}</div>
                   <div style={{ fontSize: cellPx, fontWeight: 600, marginTop: u(6) }}>{lab.join(" ")}</div>
                   {b ? <div style={{ fontSize: cellPx * 0.9, color: "#3A3A55" }}>{b}</div> : null}
@@ -356,26 +356,29 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
                   style={{
                     fontSize: t.pointPx * bb * (banner ? 1.3 : 1),
                     lineHeight: t.bodyLeading,
-                    padding: `${u(banner ? 18 : 10)}px ${u(banner ? 20 : 12)}px`,
+                    padding: `${u(banner ? 28 : 16)}px ${u(banner ? 28 : 16)}px`,
                     ...printGlass(accent, u(banner ? 22 : 12), u(banner ? 6 : 3)),
                     fontWeight: banner ? 500 : undefined,
                   }}
                 >
-                  {banner && p.includes(" — ") ? (
-                    <>
-                      <span style={{ display: "block", fontWeight: 700, fontSize: "1.35em", lineHeight: 1.15, marginBottom: u(10) }}>
-                        {iconFor(content.pointIcons, p) ? <AdaptIcon name={iconFor(content.pointIcons, p)!} label={p} size={u(40)} color={accent} /> : null}{p.split(" — ")[0]}
+                  {(() => {
+                    const ic = iconFor(content.pointIcons, p);
+                    const [h, ...rest] = p.split(" — ");
+                    const body = rest.join(" — ");
+                    return (
+                      <span style={{ display: "flex", flexDirection: "column", gap: u(banner ? 10 : 5) }}>
+                        {ic ? <AdaptIcon name={ic} label={p} size={Math.round(t.pointPx * bb * (banner ? 1.8 : 1.4))} color={accent} /> : null}
+                        {body ? (
+                          <>
+                            <span style={{ fontWeight: 700, fontSize: "1.15em", lineHeight: 1.15, color: ink }}>{h}</span>
+                            <span style={{ fontWeight: 400, fontSize: "0.82em", color: "#3A3A55" }}>{body}</span>
+                          </>
+                        ) : (
+                          <span style={{ fontWeight: 600 }}>{p}</span>
+                        )}
                       </span>
-                      <span style={{ fontWeight: 400 }}>{p.split(" — ").slice(1).join(" — ")}</span>
-                    </>
-                  ) : iconFor(content.pointIcons, p) ? (
-                    <span style={{ display: "flex", gap: u(10), alignItems: "flex-start" }}>
-                      <AdaptIcon name={iconFor(content.pointIcons, p)!} label={p} size={Math.round(t.pointPx * bb * 1.3)} color={accent} />
-                      <span>{p}</span>
-                    </span>
-                  ) : (
-                    p
-                  )}
+                    );
+                  })()}
                 </li>
               ))}
             </ul>
