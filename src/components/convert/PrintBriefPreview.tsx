@@ -202,7 +202,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
               const [h, b] = split(p);
               const [fig, ...lab] = h.split(" ");
               return (
-                <div key={i} style={{ borderTop: `${u(4)}px solid ${accent}`, paddingTop: u(10) }}>
+                <div key={i} style={{ ...printGlass(accent, u(14), u(4)), padding: u(banner ? 28 : 16) }}>
                   <div style={{ fontSize: t.statPx * 0.7 * bb, fontWeight: 700, lineHeight: 1, letterSpacing: "-0.03em" }}>{fig}</div>
                   <div style={{ fontSize: cellPx, fontWeight: 600, marginTop: u(6) }}>{lab.join(" ")}</div>
                   {b ? <div style={{ fontSize: cellPx * 0.9, color: "#3A3A55" }}>{b}</div> : null}
