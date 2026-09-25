@@ -659,6 +659,16 @@ const FIELD_LABEL: Record<AdaptFieldKey, string> = {
   cta: "Call to action",
   footnote: "Source / footnote",
   media: "Picture",
+  details: "Other details",
+};
+
+const SHAPE_LABEL: Record<string, string> = {
+  list: "list",
+  steps: "numbered steps",
+  pairs: "before / after columns",
+  stats: "figure grid",
+  quadrants: "2 × 2 matrix",
+  table: "comparison table",
 };
 
 function InfoBuilder({
@@ -679,7 +689,7 @@ function InfoBuilder({
   const edit = (patch: AdaptSelection["edits"]) => onChange({ ...selection, edits: { ...selection.edits, ...patch } });
   const input = "w-full rounded-sm border border-[color:var(--color-border)] px-2 py-1 text-[12.5px] disabled:opacity-50";
   const textKeys = (["eyebrow", "headline", "body", "cta", "footnote"] as const).filter((k) => source[k]);
-  const hasAny = textKeys.length || source.points?.length || source.stat || source.media;
+  const hasAny = textKeys.length || source.points?.length || source.stat || source.media || source.details?.length;
   if (!hasAny) return null;
   return (
     <div className="space-y-3 border-t border-[color:var(--color-border)] pt-4">
@@ -745,6 +755,11 @@ function InfoBuilder({
           <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide">
             <input type="checkbox" className="accent-[color:var(--color-primary)]" checked={on("points")} onChange={() => toggle("points")} />
             {FIELD_LABEL.points}
+            {source.shape && source.shape.kind !== "list" ? (
+              <span className="font-normal normal-case tracking-normal text-[color:var(--color-muted-foreground)]">
+                laid out as {SHAPE_LABEL[source.shape.kind]}
+              </span>
+            ) : null}
           </label>
           {source.points.map((p, i) => {
             const pointOn = !selection.excludePoints.includes(i);
@@ -773,6 +788,22 @@ function InfoBuilder({
               </div>
             );
           })}
+        </div>
+      ) : null}
+      {source.details?.length ? (
+        <div className="space-y-1">
+          <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide">
+            <input type="checkbox" className="accent-[color:var(--color-primary)]" checked={on("details")} onChange={() => toggle("details")} />
+            {FIELD_LABEL.details}
+          </label>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[12px]">
+            {source.details.map((d) => (
+              <Fragment key={d.label}>
+                <dt className="text-[color:var(--color-muted-foreground)]">{d.label}</dt>
+                <dd className="text-[color:var(--color-foreground)]">{d.value}</dd>
+              </Fragment>
+            ))}
+          </dl>
         </div>
       ) : null}
       {source.media ? (
