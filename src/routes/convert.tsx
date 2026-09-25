@@ -651,7 +651,7 @@ function ConvertPage() {
                             displayWidth={f ? Math.round(170 * Math.max(1, f.width / f.height)) : 200}
                           />
                         ) : f && socialGrid ? (
-                          <SocialModuleGrid format={f} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={170} variantId={groundVariant} ground={ground} chart={source.chart} images={source.images} />
+                          <SocialModuleGrid format={f} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={170} variantId={groundVariant} ground={ground} chart={source.chart} images={source.images} pointIcons={source.pointIcons} />
                         ) : f ? (
                           <SocialRenderer
                             format={f}
@@ -711,7 +711,7 @@ function ConvertPage() {
               ) : format && socialGrid ? (
                 <SocialCardDownload width={format.width} height={format.height} name={`${source.headline} ${result.target.label}`}>
                 <div ref={socialWrapRef}>
-                  <SocialModuleGrid format={format} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={340} variantId={groundVariant} ground={ground} chart={source.chart} images={source.images} />
+                  <SocialModuleGrid format={format} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={340} variantId={groundVariant} ground={ground} chart={source.chart} images={source.images} pointIcons={source.pointIcons} />
                 </div>
                 </SocialCardDownload>
               ) : format ? (
@@ -749,6 +749,19 @@ function ConvertPage() {
                   })
                   .join(" · ") || "headline"}
               </p>
+              {(() => {
+                const c = result.content;
+                const extras = [
+                  c.chart ? `${c.chart.kind} chart (${c.chart.data.length} values)` : null,
+                  c.images?.length ? `${c.images.length} picture${c.images.length > 1 ? "s" : ""}` : null,
+                  c.pointIcons ? `${Object.values(c.pointIcons).filter((v, i, a) => a.indexOf(v) === i).length} icon(s): ${[...new Set(Object.values(c.pointIcons))].slice(0, 6).join(", ")}` : null,
+                ].filter(Boolean);
+                return extras.length ? (
+                  <p data-carried-visuals="true" className="mt-1 text-[12.5px] leading-[1.5] text-[#03002C]/80">
+                    Visuals: {extras.join(" · ")}
+                  </p>
+                ) : null;
+              })()}
               {result.notes.length === 0 ? (
                 <p className="mt-3 rounded-lg border border-[#A6FA87] bg-[#F1FEEC] p-3 text-[12.5px] text-[#03002C]">
                   Everything fitted — nothing shortened, nothing left out.
