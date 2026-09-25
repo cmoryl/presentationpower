@@ -627,9 +627,11 @@ function ConvertPage() {
                   const r = adaptContent(source, t.id);
                   const f = adaptTargetFormat(t);
                   return (
+                    <Fragment key={t.id}>
+                    {f ? (
+                      <SocialCardDownload width={f.width} height={f.height} name={`${source.headline} ${t.label}`}>
                     <button
-                      key={t.id}
-                      type="button"
+                                            type="button"
                       onClick={() => {
                         setTargetId(t.id);
                         setView("one");
@@ -668,6 +670,50 @@ function ConvertPage() {
                         {r.notes.length ? `${r.notes.length} change${r.notes.length === 1 ? "" : "s"} to fit` : "Everything fitted"}
                       </span>
                     </button>
+                      </SocialCardDownload>
+                    ) : (
+                    <button
+                                            type="button"
+                      onClick={() => {
+                        setTargetId(t.id);
+                        setView("one");
+                      }}
+                      className="flex flex-col items-center gap-2 p-2 text-left hover:bg-[color:var(--color-background)]/60 focus-visible:outline-2 focus-visible:outline-[color:var(--color-primary)]"
+                      aria-label={`Open ${t.label}`}
+                    >
+                      <div className="pointer-events-none">
+                        {drawn && drawnSource ? (
+                          <ModuleAsDrawn
+                            variantId={drawnSource.variantId}
+                            content={drawnSource.content}
+                            brandId={brandId}
+                            mode={mode}
+                            frameW={frameOf(r, f).w}
+                            frameH={frameOf(r, f).h}
+                            displayWidth={f ? Math.round(170 * Math.max(1, f.width / f.height)) : 200}
+                          />
+                        ) : f && socialGrid ? (
+                          <SocialModuleGrid format={f} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={170} variantId={groundVariant} ground={ground} chart={source.chart} />
+                        ) : f ? (
+                          <SocialRenderer
+                            format={f}
+                            brandId={brandId}
+                            mode={mode}
+                            copy={toSocialCopy(r)}
+                            imageUrl={r.content.media?.kind === "photo" ? r.content.media.url : undefined}
+                            displayShortEdge={170}
+                          />
+                        ) : (
+                          <PrintBriefPreview result={r} brandId={brandId} displayWidth={200} ground={printGround} />
+                        )}
+                      </div>
+                      <span className="text-[12px] font-semibold">{t.label}</span>
+                      <span className="text-[11px] text-[color:var(--color-muted-foreground)]">
+                        {r.notes.length ? `${r.notes.length} change${r.notes.length === 1 ? "" : "s"} to fit` : "Everything fitted"}
+                      </span>
+                    </button>
+                    )}
+                    </Fragment>
                   );
                 })}
               </div>
