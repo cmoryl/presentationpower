@@ -22,7 +22,28 @@ import {
   resolveSlideBackground,
   type SlideBackgroundValue,
 } from "@/lib/background-library";
-import { uploadDataUrl, uploadSlideMedia } from "@/lib/slide-media";
+import { refreshSlideMediaUrl, slideMediaPathFromUrl, uploadDataUrl, uploadSlideMedia } from "@/lib/slide-media";
+import { useEffect as useEffectFresh, useState as useStateFresh } from "react";
+
+/** Preview image that re-signs an expired slide-media link once, and says so if it still fails. */
+function FreshImg({ src, ...rest }: React.ImgHTMLAttributes<HTMLImageElement> & { src: string }) {
+  const [url, setUrl] = useStateFresh(src);
+  const [state, setState] = useStateFresh<"ok" | "retried" | "failed">("ok");
+  useEffectFresh(() => { setUrl(src); setState("ok"); }, [src]);
+  if (state === "failed")
+    return <div className="flex aspect-[4/3] w-full items-center justify-center bg-black/5 p-3 text-center text-xs text-black/70">This picture can no longer be loaded. Upload it again or pick another background.</div>;
+  return (
+    <img
+      {...rest}
+      src={url}
+      onError={async () => {
+        const path = state === "ok" ? slideMediaPathFromUrl(src) : null;
+        const fresh = path ? await refreshSlideMediaUrl(path) : null;
+        if (fresh) { setUrl(fresh); setState("retried"); } else setState("failed");
+      }}
+    />
+  );
+}
 import { generateBackgroundImage } from "@/lib/ai-image.functions";
 import { listDivisionImagery } from "@/lib/division-imagery.functions";
 import { logImageryEvent } from "@/lib/admin.functions";
@@ -809,7 +830,7 @@ export function BackgroundImageryPanel({
               </label>
               {current?.kind === "upload" && current.url && (
                 <div className="overflow-hidden rounded-xl border border-black/10">
-                  <img src={current.url} alt="" className="aspect-[4/3] w-full object-cover" />
+                  <FreshImg src={current.url} alt="" className="aspect-[4/3] w-full object-cover" />
                 </div>
               )}
             </div>
@@ -834,7 +855,7 @@ export function BackgroundImageryPanel({
               </button>
               {current?.kind === "ai" && current.url && (
                 <div className="overflow-hidden rounded-xl border border-black/10">
-                  <img src={current.url} alt="" className="aspect-[4/3] w-full object-cover" />
+                  <FreshImg src={current.url} alt="" className="aspect-[4/3] w-full object-cover" />
                 </div>
               )}
             </div>
@@ -846,7 +867,7 @@ export function BackgroundImageryPanel({
               {/* Live preview with position applied */}
               {current.url && (
                 <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-black/10 bg-black">
-                  <img
+                  <FreshImg
                     src={current.url}
                     alt=""
                     className="absolute inset-0 h-full w-full"

@@ -108,3 +108,10 @@ export async function listSlideMedia(limit = 60): Promise<SlideMediaItem[]> {
     }))
     .filter((f) => f.url);
 }
+
+/** Storage path inside a slide-media signed URL, or null for other URLs. */
+export function slideMediaPathFromUrl(url: string | undefined | null): string | null {
+  if (!url) return null;
+  const m = url.match(/\/object\/sign\/slide-media\/([^?]+)/);
+  return m ? decodeURIComponent(m[1]) : null;
+}
