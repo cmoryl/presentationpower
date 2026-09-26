@@ -358,6 +358,25 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     commit({ ...edits, copies, [key]: map, z, ...(groups ? { groups } : {}) });
     if (s.kind === "part") { setPicked(made); setSel({ kind: "part", id: made[0]! }); } else setSel({ kind: "text", id: made[0]! });
   };
+  /**
+   * Partner badges as type: hide the London picture and put an editable text
+   * line in its box. Nothing is invented — the words start empty for retyping.
+   */
+  const badgeOf = (id: string) => (edits.badges ?? []).find((b) => b.of === id) ?? null;
+  const replaceWithText = (partId: string) => {
+    if (badgeOf(partId)) return;
+    const id = `badge-${partId}`;
+    commit({ ...edits, badges: [...(edits.badges ?? []), { of: partId, id, text: "Partner name" }] });
+    setSel({ kind: "text", id }); setPicked([]);
+    setStatus("Badge is now text — retype the words in the Text panel.");
+  };
+  const restorePicture = (partId: string) => {
+    const b = badgeOf(partId);
+    if (!b) return;
+    const texts = { ...edits.texts }; delete texts[b.id];
+    commit({ ...edits, badges: (edits.badges ?? []).filter((x) => x.of !== partId), texts });
+    setSel({ kind: "part", id: partId });
+  };
   const removeSel = () => {
     if (!sel || sel.kind === "block") return;
     if (sel.kind === "divider") { commit({ ...edits, dividers: (edits.dividers ?? []).filter((d) => d.id !== sel.id) }); setSel(null); return; }
