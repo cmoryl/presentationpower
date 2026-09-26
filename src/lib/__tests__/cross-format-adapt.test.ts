@@ -64,7 +64,7 @@ describe("cross-format adapter", () => {
     expect(res.notes.find((n) => n.field === "headline")?.severity).toBe("shortened");
   });
 
-  it("reports points and figures a target has no block for", () => {
+  it("carries points on the story and reports what it has no block for", () => {
     const res = adaptContent(
       {
         headline: "Short",
@@ -74,8 +74,16 @@ describe("cross-format adapter", () => {
       },
       "social-story",
     );
-    expect(res.content.points).toBeUndefined();
-    expect(res.notes.filter((n) => n.severity === "dropped").length).toBeGreaterThanOrEqual(2);
+    expect(res.content.points).toEqual(["a", "b", "c", "d"]);
+    expect(res.notes.some((n) => n.field === "footnote" && n.severity === "dropped")).toBe(true);
+  });
+
+  it("never gives the A2 poster less room than the A3", () => {
+    const a3 = ADAPT_TARGETS.find((t) => t.id === "poster-a3")!;
+    const a2 = ADAPT_TARGETS.find((t) => t.id === "poster-a2")!;
+    for (const k of ["headline", "body", "points", "pointChars"] as const) {
+      expect(a2.caps[k]).toBeGreaterThanOrEqual(a3.caps[k]);
+    }
   });
 
   it("caps points for a target that does carry them", () => {
