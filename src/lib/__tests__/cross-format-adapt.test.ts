@@ -120,3 +120,16 @@ describe("cross-format adapter", () => {
     expect(print.points).toEqual(["One", "Two"]);
   });
 });
+
+import { toSocialCopy as __toSocialCopy } from "../cross-format-adapt";
+describe("social caption line", () => {
+  it("carries up to two extra details as a caption on social cards", () => {
+    const res = adaptContent(
+      { headline: "H", details: [{ label: "Owner", value: "Ops" }, { label: "Timeframe", value: "Q3" }, { label: "Region", value: "EU" }] },
+      "social-card",
+    );
+    expect(res.content.details).toHaveLength(2);
+    expect(__toSocialCopy(res).summary).toContain("Owner: Ops · Timeframe: Q3");
+    expect(res.notes.some((n) => n.field === "details" && n.detail.includes("region"))).toBe(true);
+  });
+});

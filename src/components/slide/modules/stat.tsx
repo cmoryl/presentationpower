@@ -67,8 +67,8 @@ registerSlideModule({
                 <div className="min-w-0">
                   <StatFigure
                     brand={brand}
-                    value={s(stat.value, "68")}
-                    unit={s(stat.unit, "%")}
+                    value={s(stat.value, "—")}
+                    unit={s(stat.unit, "")}
                     size="monumental"
                     shape="auto"
                     icon={s(stat.icon)}
@@ -382,8 +382,8 @@ registerSlideModule({
               <div className="min-w-0">
                 <StatFigure
                   brand={brand}
-                  value={s(stat.value, "71")}
-                  unit={s(stat.unit, "%")}
+                  value={s(stat.value, "—")}
+                  unit={s(stat.unit, "")}
                   label={s(stat.label)}
                   size="monumental"
                   align="start"
@@ -437,7 +437,7 @@ registerSlideModule({
                     <StatFigure
                       brand={brand}
                       value={s(it.value)}
-                      unit={s(it.unit, "%")}
+                      unit={s(it.unit, "")}
                       label={s(it.label)}
                       size="lg"
                       align="center"
@@ -578,7 +578,7 @@ registerSlideModule({
                         color: ink.strong,
                       }}
                     >
-                      {s(stat.value, "24.1")}
+                      {s(stat.value, "—")}
                       <span
                         style={{
                           fontSize: fillPx(Math.round(38 * SVG_SCALE), "figure"),
@@ -886,8 +886,8 @@ registerSlideModule({
                 <AccentTick accent={brand.tokens.accent} />
                 <StatFigure
                   brand={brand}
-                  value={s(lead?.value, "68")}
-                  unit={s(lead?.unit, "%")}
+                  value={s(lead?.value, "—")}
+                  unit={s(lead?.unit, "")}
                   label={s(lead?.label)}
                   size="xl"
                   shape="auto"
@@ -1007,9 +1007,9 @@ registerSlideModule({
                   color: "var(--slide-accent-text)",
                 }}
               >
-                {s(stat.value, "41")}
+                {s(stat.value, "—")}
                 <span style={{ fontSize: fillPx(140, "display"), marginLeft: 8 }}>
-                  {s(stat.unit, "%")}
+                  {s(stat.unit, "")}
                 </span>
               </div>
               <div
