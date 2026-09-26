@@ -130,8 +130,10 @@ export function LondonAutoPublish({ panels, removedIds = [] }: LondonAutoPublish
             },
           });
           setLondonPublishedOverrides(res.revision.overrides);
-          announceLondonRevision(res.revision.rev);
           warned.current = false;
+          // Nothing differed from the revision in force — no new revision.
+          if (res.unchanged) return;
+          announceLondonRevision(res.revision.rev);
           toast.success(`Revision ${res.revision.rev} published`, {
             description: "Hub cards and vendor downloads now show this version.",
           });
