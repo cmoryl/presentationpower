@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ModuleReviewQueue } from "@/components/approvals/ModuleReviewQueue";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -22,13 +23,13 @@ import { describeReasons } from "@/lib/review-reasons";
 export const Route = createFileRoute("/approvals")({
   head: () => ({
     meta: [
-      { title: "Brand approval queue · TransPerfect Element" },
+      { title: "Approvals · TransPerfect Element" },
       {
         name: "description",
         content:
           "Review, comment on and approve brand and compliance checks for decks, print, social and event assets before they are exported.",
       },
-      { property: "og:title", content: "Brand approval queue · TransPerfect Element" },
+      { property: "og:title", content: "Approvals · TransPerfect Element" },
       {
         property: "og:description",
         content: "Reviewer workspace for brand and compliance sign-off before export.",
@@ -37,8 +38,42 @@ export const Route = createFileRoute("/approvals")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: ApprovalQueuePage,
+  validateSearch: (s: Record<string, unknown>): { tab?: "brand" | "modules" } =>
+    s.tab === "modules" ? { tab: "modules" } : {},
+  component: ApprovalsPage,
 });
+
+function ApprovalsPage() {
+  const { tab } = Route.useSearch();
+  const active = tab === "modules" ? "modules" : "brand";
+  const tabCls = (on: boolean) =>
+    `-mb-px border-b-2 px-4 py-2.5 text-sm ${on ? "border-primary font-medium text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`;
+  return (
+    <div>
+      <nav aria-label="Approval queues" className="mx-auto flex w-full max-w-6xl gap-2 border-b border-border px-4 pt-8 sm:px-6">
+        <Link to="/approvals" search={{}} className={tabCls(active === "brand")} aria-current={active === "brand" ? "page" : undefined}>
+          Brand &amp; compliance
+        </Link>
+        <Link to="/approvals" search={{ tab: "modules" }} className={tabCls(active === "modules")} aria-current={active === "modules" ? "page" : undefined}>
+          Modules
+        </Link>
+      </nav>
+      {active === "modules" ? (
+        <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-10 sm:px-6">
+          <header>
+            <h1 className="text-3xl font-semibold">Module review</h1>
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+              Modules built in Module Studio go live in Add slide only after another reviewer approves them.
+            </p>
+          </header>
+          <ModuleReviewQueue />
+        </div>
+      ) : (
+        <ApprovalQueuePage />
+      )}
+    </div>
+  );
+}
 
 type Tab = "pending" | "changes_requested" | "approved";
 
