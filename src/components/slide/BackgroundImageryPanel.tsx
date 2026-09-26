@@ -23,10 +23,10 @@ import {
   type SlideBackgroundValue,
 } from "@/lib/background-library";
 import { refreshSlideMediaUrl, slideMediaPathFromUrl, uploadDataUrl, uploadSlideMedia } from "@/lib/slide-media";
-import { useEffect as useEffectFresh, useState as useStateFresh } from "react";
+import { useEffect as useEffectFresh, useState as useStateFresh, type ImgHTMLAttributes } from "react";
 
 /** Preview image that re-signs an expired slide-media link once, and says so if it still fails. */
-function FreshImg({ src, ...rest }: React.ImgHTMLAttributes<HTMLImageElement> & { src: string }) {
+function FreshImg({ src, ...rest }: ImgHTMLAttributes<HTMLImageElement> & { src: string }) {
   const [url, setUrl] = useStateFresh(src);
   const [state, setState] = useStateFresh<"ok" | "retried" | "failed">("ok");
   useEffectFresh(() => { setUrl(src); setState("ok"); }, [src]);
