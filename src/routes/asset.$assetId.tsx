@@ -1,3 +1,4 @@
+import { ApprovalGate } from "@/components/approvals/ApprovalGate";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -1488,6 +1489,16 @@ function AssetEditor() {
                         : "Download PDF"}
                     </button>
                   </div>
+                  {row?.id ? (
+                    <div className="mt-3 border-t border-border pt-3">
+                      <ApprovalGate
+                        subjectType="print"
+                        subjectId={row.id}
+                        title={String((row as { title?: string | null }).title ?? "Print piece")}
+                        subjectPath={`/asset/${row.id}`}
+                      />
+                    </div>
+                  ) : null}
                 </div>
               )}
             </div>
