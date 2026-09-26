@@ -13,7 +13,7 @@
 - [x] Social caption line for extra details (2 max)
 - [~] Standout layouts — already exist (hero number, full-bleed, split, statement); no duplicates built
 - [x] Deck builder nudges existing bold layouts (max 3 per deck)
-- [x] Stat family: giant hero number now fills its column (on screen); PowerPoint version not yet matched
+- [x] Stat family: giant hero number now fills its column (on screen); PowerPoint version matched by the same size rule (not opened in PowerPoint)
 - [ ] Stat family: remaining 13 stat modules reviewed one by one
 - [ ] Shared type-hierarchy pass across other families
 - [ ] Bolder accent shapes — needs per-family visual review

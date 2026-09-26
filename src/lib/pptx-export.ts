@@ -63,6 +63,7 @@ import {
   addPhotoScrim,
   percentGaugeFraction,
   statRuns,
+  colossalFigurePt,
 } from "./export-card-furniture";
 
 import { getGlassTreatment, gradientTag } from "./export-surface";
@@ -2741,6 +2742,100 @@ function renderAgenda(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   });
 }
 
+/**
+ * MV-STAT-HERO-NUMBER: one colossal figure filling the left column (1.35fr),
+ * narrative + up to 3 supporting rows in the right column (1fr) — the same
+ * split and figure size rule as the on-screen module.
+ */
+function renderHeroNumber(
+  s: PptxGenJS.Slide,
+  c: Record<string, unknown>,
+  stat: Record<string, unknown>,
+  p: Palette,
+) {
+  const left = 0.6;
+  const gap = 0.7;
+  const inner = SLIDE_W - 1.2 - gap;
+  const leftW = (inner * 1.35) / 2.35;
+  const rightW = inner - leftW;
+  const rightX = left + leftW + gap;
+  const value = str(stat.value) || "\u2014";
+  const unit = str(stat.unit ?? "");
+  const pt = colossalFigurePt(value, unit, leftW);
+  const figH = Math.max(1.4, (pt / 72) * 1.05);
+  const figY = Math.max(1.7, 4.3 - figH);
+  const g = groupScope(s, "hero-number", "Hero number");
+  g.addText(statRuns(value, unit, { size: pt, color: p.accent }), {
+    x: left,
+    y: figY,
+    w: leftW,
+    h: figH,
+    valign: "bottom",
+    margin: 0,
+    fit: "none",
+    objectName: "Hero number figure",
+  });
+  if (str(stat.label)) {
+    g.addText(str(stat.label), {
+      x: left,
+      y: figY + figH + 0.15,
+      w: leftW,
+      h: 1.1,
+      fontSize: 20,
+      color: p.ink,
+      fontFace: "Geist",
+      valign: "top",
+      objectName: "Hero number label",
+    });
+  }
+  let y = figY + figH * 0.35;
+  if (str(c.narrative)) {
+    s.addText(str(c.narrative), {
+      x: rightX,
+      y,
+      w: rightW,
+      h: 1.4,
+      fontSize: 16,
+      color: p.ink,
+      fontFace: "Geist",
+      valign: "top",
+      objectName: "Hero number narrative",
+    });
+    y += 1.5;
+  }
+  arr(c.items)
+    .slice(0, 3)
+    .forEach((it, k) => {
+      const rowY = y + k * 0.55;
+      s.addShape("line", {
+        x: rightX,
+        y: rowY,
+        w: rightW,
+        h: 0,
+        line: { color: p.ink, width: 0.5, transparency: 80 },
+        objectName: `Hero row ${k + 1} rule`,
+      });
+      s.addText(
+        [
+          { text: str(it.label ?? "").toUpperCase(), options: { fontSize: 10, bold: true, charSpacing: 2 } },
+        ],
+        { x: rightX, y: rowY + 0.05, w: rightW * 0.6, h: 0.45, color: p.ink, fontFace: "Geist", objectName: `Hero row ${k + 1} label` },
+      );
+      s.addText(str(it.value ?? ""), {
+        x: rightX + rightW * 0.6,
+        y: rowY + 0.05,
+        w: rightW * 0.4,
+        h: 0.45,
+        fontSize: 18,
+        bold: true,
+        align: "right",
+        color: p.ink,
+        fontFace: "Geist",
+        objectName: `Hero row ${k + 1} value`,
+      });
+    });
+}
+
 function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   const c = slide.content as Record<string, unknown>;
   renderTitleZone(s, c, p);
@@ -2764,6 +2859,9 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
       ? [...leadStat, ...arr(c.items)]
       : arr(c.items);
   if (!items.length) return renderContent(s, slide, p);
+  if (slide.variantId === "MV-STAT-HERO-NUMBER" && statObj) {
+    return renderHeroNumber(s, c, statObj, p);
+  }
   const cols = Math.min(items.length, 4);
   const colW = (SLIDE_W - 1.2 - (cols - 1) * 0.3) / cols;
   const y = 2.3;
