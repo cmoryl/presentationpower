@@ -225,3 +225,5 @@ artboard is a 1:10 proof, scale the trim up ×10 and say so in `dimsSource`.
 - Several London finals don't carry art into the full 100 mm bleed — never sample return strips from the outer bleed; sample the finished front's edge.
 - Pink/magenta waves false-trigger TV-frame detection; require two thin frame lines with an empty middle row.
 - Textured (wave/dot) grounds can't be stretched without streaks — fill behind-TV gaps with a gradient from the neighbouring rows instead.
+
+- 2026-09-26 · SF kiosk editor: reopening a saved kiosk wrote an empty edit set back over the saved one (load/autosave race). Autosave now waits for sign-in to resolve and never echoes the value it just loaded; a failed load pauses saving. Always test save → leave → reopen, not just "All changes saved".
