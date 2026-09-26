@@ -178,3 +178,16 @@ export function statRuns(
       : []),
   ];
 }
+
+/**
+ * Point size for the MV-STAT-HERO-NUMBER "colossal" figure, matching the
+ * on-screen StatFigure rule: min(520px, colossalCqw% of the column), where
+ * colossalCqw = min(58, 88 / (glyphs × 0.6 + (unit ? 0.35 : 0))).
+ * The slide canvas is 1920px wide = 960pt, so 1px = 0.5pt.
+ */
+export function colossalFigurePt(value: string, unit: string, columnWidthIn: number): number {
+  const glyphs = Math.max(1, (value || "\u2014").replace(/\s/g, "").length);
+  const cqw = Math.min(58, 88 / (glyphs * 0.6 + (unit ? 0.35 : 0)));
+  const columnPt = columnWidthIn * 72;
+  return Math.round(Math.min(520 * 0.5, (cqw / 100) * columnPt));
+}
