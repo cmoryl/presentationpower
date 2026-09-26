@@ -396,7 +396,7 @@ export function TitleBlock({
 // A single stat, sized like a display headline: huge tabular numeral in
 // primary, unit/suffix in accent, small-caps label beneath. Sizes are named
 // so a stat row baseline-aligns and a single-stat slide can go monumental.
-type StatSize = "sm" | "md" | "lg" | "xl" | "monumental";
+type StatSize = "sm" | "md" | "lg" | "xl" | "monumental" | "colossal";
 /**
  * True when two strings say the same thing once punctuation, spacing and case
  * are ignored. Imported content routinely repeats a stat's label in its unit
@@ -414,6 +414,8 @@ const STAT_SPECS: Record<StatSize, { valuePx: number; unitPx: number; labelPx: n
   lg: { valuePx: 156, unitPx: 54, labelPx: 24 },
   xl: { valuePx: 200, unitPx: 66, labelPx: 26 },
   monumental: { valuePx: 280, unitPx: 84, labelPx: 28 },
+  // Single-figure slides: the number is the slide (~55% of stage height).
+  colossal: { valuePx: 520, unitPx: 150, labelPx: 32 },
 };
 
 /**
