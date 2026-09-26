@@ -102,12 +102,17 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
   if (!artUrl) throw new Error("This kiosk has no lifted artwork PDF on file.");
   const B = KIOSK_BLEED;
   const W = KIOSK_W + 2 * B, H = KIOSK_H + 2 * B;
+  // Slug outside the bleed carries the crop marks (0.5 in each side).
+  const S = 36;
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
   doc.setTitle(`${kioskLiveFileBase(L.id)} — kiosk front (draft)`);
-  const page = doc.addPage([W, H]);
-  page.setTrimBox(B, B, KIOSK_W, KIOSK_H);
-  page.setBleedBox(0, 0, W, H);
+  const page = doc.addPage([W + 2 * S, H + 2 * S]);
+  page.setTrimBox(S + B, S + B, KIOSK_W, KIOSK_H);
+  page.setBleedBox(S, S, W, H);
+  page.setCropBox(0, 0, W + 2 * S, H + 2 * S);
+  // Everything below is drawn in bleed-box space, shifted into the slug.
+  page.pushOperators(pushGraphicsState(), concatTransformationMatrix(1, 0, 0, 1, S, S));
 
   // Background: the partner's ramp in fine vector steps.
   const g = kioskGround(L, edits);
@@ -134,7 +139,11 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
   const placed = layoutKiosk(L, edits);
   for (const p of placed) {
     const bx = B / p.scale + 1;
-    const top = L.originY + p.clipTop, bot = L.originY + p.clipBottom;
+    // A piece touching the top or bottom trim runs on into the bleed, as the SVG does.
+    const ext = (B + 1) / p.scale;
+    const exTop = p === placed[0] && p.y <= 0.5 ? ext : 0;
+    const exBot = Math.abs(p.y + (p.clipBottom - p.clipTop) * p.scale - KIOSK_H) < 0.5 ? ext : 0;
+    const top = L.originY + p.clipTop - exTop, bot = L.originY + p.clipBottom + exBot;
     const emb = await doc.embedPage(srcPage, {
       left: L.originX - bx,
       right: L.originX + L.trimW + bx,
