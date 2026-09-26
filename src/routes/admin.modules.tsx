@@ -37,7 +37,7 @@ import {
 } from "@/lib/module-overrides.functions";
 
 export const Route = createFileRoute("/admin/modules")({
-  head: () => ({ meta: [{ title: "Module editor · Admin" }] }),
+  head: () => ({ meta: [{ title: "Module editor · Admin · TransPerfect Element" }] }),
   component: ModuleEditorPage,
 });
 

@@ -1,9 +1,11 @@
+import type React from "react";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { signOutAndRedirect, loginUrl } from "@/lib/sign-out";
 import { useQueryClient } from "@tanstack/react-query";
+import { ADMIN_NAV_GROUPS } from "@/lib/admin-nav";
 
 type SessionInfo = {
   email: string | null;
@@ -102,85 +104,16 @@ function SessionRoleBanner() {
   );
 }
 
-type NavItem = { to: string; label: string; exact?: boolean };
-type NavGroup = { label: string; items: NavItem[] };
-
-const navGroups: NavGroup[] = [
-  {
-    label: "Overview",
-    items: [
-      { to: "/admin", label: "Command center", exact: true },
-      { to: "/looks", label: "Template Studio" },
-      { to: "/templates", label: "Team templates" },
-      { to: "/admin/print-library", label: "Print library" },
-      { to: "/admin/campaigns", label: "Campaigns (scaffold)" },
-      { to: "/admin/audit", label: "Audit log" },
-    ],
-  },
-  {
-    label: "Analytics",
-    items: [
-      { to: "/admin/analytics", label: "Master analytics" },
-      { to: "/analytics", label: "Deck engagement" },
-      { to: "/admin/ai", label: "AI usage & cost" },
-      { to: "/admin/imagery-analytics", label: "Imagery analytics" },
-      { to: "/admin/qr-downloads", label: "QR downloads" },
-      { to: "/admin/style-learning", label: "Style learning governance" },
-    ],
-  },
-  {
-    label: "Knowledge",
-    items: [
-      { to: "/admin/knowledge-hub", label: "Knowledge hub" },
-      { to: "/knowledge", label: "Browse entries" },
-      { to: "/knowledge/ask", label: "Ask Oracle" },
-      { to: "/admin/oracle", label: "Oracle KB" },
-      { to: "/admin/knowledge", label: "KB manager" },
-      { to: "/admin/approvals", label: "Approvals" },
-    ],
-  },
-  {
-    label: "Brand assets",
-    items: [
-      { to: "/admin/brand-assets", label: "Brand assets" },
-      { to: "/knowledge/brand-guides", label: "Brand guides" },
-      { to: "/admin/logohub", label: "LogoHub" },
-      { to: "/admin/division-seeds", label: "Division seeds" },
-      { to: "/admin/icon-studio", label: "Icon Studio" },
-      { to: "/admin/canvas", label: "Open Canvas Studio" },
-      { to: "/admin/module-studio", label: "Module Studio" },
-      { to: "/admin/modules", label: "Module editor" },
-      { to: "/admin/pdf-ingest", label: "PDF ingestion" },
-      { to: "/admin/imagery", label: "Imagery" },
-    ],
-  },
-  {
-    label: "Translation",
-    items: [
-      { to: "/admin/translation", label: "Translation" },
-      { to: "/admin/globallink", label: "GlobalLink · Translate" },
-      { to: "/admin/globallink-share", label: "GlobalLink · Share" },
-    ],
-  },
-  {
-    label: "Governance",
-    items: [
-      { to: "/admin/users", label: "Users & roles" },
-      { to: "/admin/team", label: "Team workspace" },
-    ],
-  },
-];
-
 export function AdminSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <aside className="w-full shrink-0 md:w-64">
       <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl border border-black/10 bg-white/70 p-3 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
         <div className="px-2 pb-2 pt-1 text-[10px] uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
-          TransPerfect console
+          Admin console
         </div>
         <nav className="space-y-4">
-          {navGroups.map((g) => (
+          {ADMIN_NAV_GROUPS.map((g) => (
             <div key={g.label}>
               <div className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-black/40 dark:text-white/45">
                 {g.label}
@@ -216,7 +149,7 @@ export function AdminSidebar() {
 function useAdminEditMode(): boolean {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   // Deep editors need the full width; the list/listing pages keep the sidebar.
-  return pathname.startsWith("/admin/print-library_/");
+  return /^\/admin\/print-library\/[^/]+/.test(pathname);
 }
 
 export function AdminShell() {
@@ -250,4 +183,47 @@ export function AdminForbidden({ message }: { message?: string }) {
 
 export function isForbidden(err: unknown): boolean {
   return err instanceof Error && /forbidden/i.test(err.message);
+}
+
+/**
+ * Admin-only wrapper for admin pages that live outside the /admin layout
+ * (e.g. full-screen studios). Mirrors the /admin gate: signed-out visitors
+ * are sent to sign in, signed-in non-admins see the access notice.
+ */
+export function RequireAdmin({ children }: { children: React.ReactNode }) {
+  const [state, setState] = useState<"loading" | "admin" | "not-admin" | "anon">("loading");
+  useEffect(() => {
+    let mounted = true;
+    async function check() {
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) {
+        if (mounted) setState("anon");
+        return;
+      }
+      const { data: isAdmin } = await supabase.rpc("has_role", {
+        _user_id: data.user.id,
+        _role: "admin",
+      });
+      if (mounted) setState(isAdmin ? "admin" : "not-admin");
+    }
+    check();
+    const { data: sub } = supabase.auth.onAuthStateChange(() => check());
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+  useEffect(() => {
+    if (state === "anon") window.location.replace(loginUrl());
+  }, [state]);
+  if (state === "admin") return <>{children}</>;
+  return (
+    <AppShell>
+      {state === "loading" ? (
+        <p className="text-sm text-muted-foreground" aria-live="polite">Checking your access…</p>
+      ) : (
+        <AdminForbidden message={state === "anon" ? "Redirecting to sign in…" : undefined} />
+      )}
+    </AppShell>
+  );
 }

@@ -1,3 +1,4 @@
+import { RequireAdmin } from "@/components/AdminShell";
 // Open Canvas Studio — a blank-slide, free-composition builder for admins.
 // Preset modules, text fields, stat blocks, imagery and colour surfaces are all
 // draggable onto one 1920×1080 stage and can be mixed freely.
@@ -58,8 +59,16 @@ export const Route = createFileRoute("/admin_/canvas")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: CanvasStudioPage,
+  component: GatedCanvasStudio,
 });
+
+function GatedCanvasStudio() {
+  return (
+    <RequireAdmin>
+      <CanvasStudioPage />
+    </RequireAdmin>
+  );
+}
 
 function CanvasStudioPage() {
   const {

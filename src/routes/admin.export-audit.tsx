@@ -42,7 +42,7 @@ export const Route = createFileRoute("/admin/export-audit")({
   component: ExportAuditPage,
   head: () => ({
     meta: [
-      { title: "Export audit · TransPerfect Element" },
+      { title: "Export audit · Admin · TransPerfect Element" },
       {
         name: "description",
         content:

@@ -88,7 +88,7 @@ import { usePrintOverflow } from "@/hooks/use-print-overflow";
 import { weightForSection } from "@/lib/print-capacity";
 
 export const Route = createFileRoute("/admin/print-library_/$itemId")({
-  head: () => ({ meta: [{ title: "Print library master editor · Admin" }] }),
+  head: () => ({ meta: [{ title: "Print library master editor · Admin · TransPerfect Element" }] }),
   component: MasterItemEditorPage,
 });
 

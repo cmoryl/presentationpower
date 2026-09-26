@@ -18,7 +18,7 @@ import {
 export const Route = createFileRoute("/admin/logohub")({
   head: () => ({
     meta: [
-      { title: "LogoHub admin · TransPerfect Element" },
+      { title: "LogoHub · Admin · TransPerfect Element" },
       {
         name: "description",
         content:

@@ -11,7 +11,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Copy, Trash2 } from "lucide-react";
 import { retintItemsForMode } from "@/lib/canvas-mode-ink";
-import { AppShell } from "@/components/AppShell";
 import {
   EditorMenu,
   EditorMenuRow,
@@ -389,7 +388,7 @@ function ModuleStudioPage() {
   if (!comp) return null;
 
   return (
-    <AppShell>
+    <>
       <EditorPageHeader
         backTo="/admin"
         backLabel="← Admin console"
@@ -816,7 +815,7 @@ function ModuleStudioPage() {
           }
         />
       </div>
-    </AppShell>
+    </>
   );
 }
 

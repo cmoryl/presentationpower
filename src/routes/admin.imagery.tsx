@@ -39,7 +39,7 @@ const TEMPLATE_LABEL: Record<TemplateKind, string> = {
 };
 
 export const Route = createFileRoute("/admin/imagery")({
-  head: () => ({ meta: [{ title: "Division imagery · Admin" }] }),
+  head: () => ({ meta: [{ title: "Division imagery · Admin · TransPerfect Element" }] }),
   component: AdminImageryPage,
 });
 

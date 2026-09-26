@@ -1,3 +1,4 @@
+import { ADMIN_NAV_GROUPS } from "@/lib/admin-nav";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
@@ -184,70 +185,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
     ),
   }));
 
-  const adminGroups: ReadonlyArray<{
-    label: string;
-    items: ReadonlyArray<{ to: string; label: string }>;
-  }> = [
-    {
-      label: "Overview",
-      items: [
-        { to: "/admin", label: "Command center" },
-        { to: "/atlas", label: "Atlas" },
-        { to: "/looks", label: "Alternate looks" },
-        { to: "/templates", label: "Templates" },
-        { to: "/library/print", label: "Print Studio" },
-        { to: "/admin/audit", label: "Audit log" },
-      ],
-    },
-
-    {
-      label: "Analytics",
-      items: [
-        { to: "/admin/analytics", label: "Master analytics" },
-        { to: "/analytics", label: "Deck engagement" },
-        { to: "/admin/ai", label: "AI usage & cost" },
-        { to: "/admin/imagery-analytics", label: "Imagery analytics" },
-        { to: "/admin/viz-lab", label: "Viz Lab" },
-      ],
-    },
-    {
-      label: "Knowledge",
-      items: [
-        { to: "/admin/knowledge-hub", label: "Knowledge hub" },
-        { to: "/knowledge", label: "Browse entries" },
-        { to: "/knowledge/ask", label: "Ask Oracle" },
-        { to: "/admin/oracle", label: "Oracle KB" },
-        { to: "/admin/knowledge", label: "KB manager" },
-        { to: "/admin/approvals", label: "Module approvals" },
-        { to: "/approvals", label: "Brand approval queue" },
-      ],
-    },
-    {
-      label: "Brand assets",
-      items: [
-        { to: "/admin/brand-assets", label: "Brand assets" },
-        { to: "/knowledge/brand-guides", label: "Brand guides" },
-        { to: "/admin/logohub", label: "LogoHub" },
-        { to: "/admin/icon-studio", label: "Icon Studio" },
-        { to: "/admin/pdf-ingest", label: "PDF ingestion" },
-      ],
-    },
-    {
-      label: "Translation",
-      items: [
-        { to: "/admin/translation", label: "Translation" },
-        { to: "/admin/globallink", label: "GlobalLink · Translate" },
-        { to: "/admin/globallink-share", label: "GlobalLink · Share" },
-      ],
-    },
-    {
-      label: "Governance",
-      items: [
-        { to: "/admin/users", label: "Users & roles" },
-        { to: "/admin/alerts", label: "Send an alert" },
-      ],
-    },
-  ];
+  const adminGroups = ADMIN_NAV_GROUPS;
   const footerNav = [
     { to: "/for/admin", label: "For admins & design" },
     { to: "/for/marketing", label: "For marketing" },

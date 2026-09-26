@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/print-library")({
-  head: () => ({ meta: [{ title: "Print library curator · Admin" }] }),
+  head: () => ({ meta: [{ title: "Print library curator · Admin · TransPerfect Element" }] }),
   component: PrintLibraryCurator,
 });
 
