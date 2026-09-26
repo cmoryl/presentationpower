@@ -1,23 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
+import type { ReactNode } from "react";
+import { ArrowRight, FilePlus2, Printer, Share2, CalendarPlus, AlertTriangle } from "lucide-react";
 import { getAdminOverview } from "@/lib/admin.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
+import { ADMIN_NAV_GROUPS } from "@/lib/admin-nav";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({
     meta: [
-      { title: "Admin overview · TransPerfect Element" },
+      { title: "Command center · Admin · TransPerfect Element" },
       {
         name: "description",
         content:
-          "Control room for Element: brand modes, module libraries, taxonomy, users and generation analytics.",
+          "Admin command center for TransPerfect Element: what needs attention, recent work, content inventory and system health.",
       },
-      { property: "og:title", content: "Admin overview · TransPerfect Element" },
+      { property: "og:title", content: "Command center · Admin · TransPerfect Element" },
       {
         property: "og:description",
         content:
-          "Control room for Element: brand modes, module libraries, taxonomy, users and generation analytics.",
+          "Admin command center for TransPerfect Element: what needs attention, recent work, content inventory and system health.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -26,21 +29,8 @@ export const Route = createFileRoute("/admin/")({
   component: OverviewView,
 });
 
-// TransPerfect brand tokens
-const BRAND = {
-  blue: "#003FC7",
-  blue800: "#03002C",
-  aqua: "#A1FBF9",
-  lavender: "#C2A3FF",
-  yellow: "#FFEB66",
-  green: "#A6FA87",
-  peach: "#FF9B70",
-  pink: "#EC388A",
-  red: "#E53D2E",
-};
-
 // Where each build surface lives in the app. Keys mirror
-// getAdminOverview().buildSurfaces; omit a key to render a non-clickable tile.
+// getAdminOverview().buildSurfaces; omit a key to render a non-clickable row.
 const SURFACE_LINKS: Record<string, string | undefined> = {
   decks: "/atlas",
   briefs: "/brief/new",
@@ -56,946 +46,438 @@ const SURFACE_LINKS: Record<string, string | undefined> = {
   translations: "/admin/translation",
 };
 
+const QUICK_ACTIONS = [
+  { to: "/brief/new", label: "New brief", icon: FilePlus2 },
+  { to: "/asset/new", label: "New print piece", icon: Printer },
+  { to: "/social/new", label: "New social kit", icon: Share2 },
+  { to: "/events/new", label: "New event kit", icon: CalendarPlus },
+] as const;
+
 function OverviewView() {
   const fn = useServerFn(getAdminOverview);
   const q = useQuery({ queryKey: ["admin", "overview"], queryFn: () => fn(), retry: false });
 
   if (q.error && isForbidden(q.error)) return <AdminForbidden />;
   if (q.isLoading) return <LoadingSkeleton />;
-  if (!q.data) return <div className="text-sm text-red-600">Failed to load.</div>;
+  if (!q.data) {
+    return (
+      <div role="alert" className="rounded-lg border border-destructive/40 p-4 text-sm text-destructive">
+        The command center could not load. Refresh the page; if it keeps failing, check the audit log.
+      </div>
+    );
+  }
 
-  const t = q.data.totals;
-  const aiMax = Math.max(1, ...q.data.aiPerDay.map((d) => d.count));
-  const imgMax = Math.max(1, ...q.data.imageryPerDay.map((d) => d.count));
-
+  const d = q.data;
+  const t = d.totals;
   const aiSuccess = t.aiCalls - t.aiErrors;
-  const successRate = t.aiCalls ? (aiSuccess / t.aiCalls) * 100 : 100;
-  const errorRate = t.aiCalls ? (t.aiErrors / t.aiCalls) * 100 : 0;
-  const costPerCall = t.aiCalls ? t.aiCost / t.aiCalls : 0;
-  const tokensPerCall = t.aiCalls ? Math.round(t.aiTokens / t.aiCalls) : 0;
+  const successRate = t.aiCalls ? (aiSuccess / t.aiCalls) * 100 : null;
+  const inReview = (d.decksByStatus ?? [])
+    .filter((r) => /review|pending|qa/i.test(r.label))
+    .reduce((a, r) => a + r.count, 0);
 
-  const heroStats = [
-    {
-      label: "DECKS",
-      value: t.decks.toLocaleString(),
-      delta: `${t.decksInWindow ?? 0} created · 30d`,
-      color: BRAND.blue,
-      trend: q.data.decksPerDay?.slice(-14),
-    },
-    {
-      label: "AI CALLS",
-      value: t.aiCalls.toLocaleString(),
-      delta: `${successRate.toFixed(1)}% success`,
-      color: BRAND.lavender,
-      trend: q.data.aiPerDay.slice(-14),
-    },
-    {
-      label: "IMAGES",
-      value: t.imagesGenerated.toLocaleString(),
-      delta: `${t.imageEvents} total events`,
-      color: BRAND.pink,
-      trend: q.data.imageryPerDay.slice(-14),
-    },
-    {
-      label: "KNOWLEDGE",
-      value: (t.knowledgeEntries + (t.oracleKnowledge ?? 0)).toLocaleString(),
-      delta: `${t.brandIntelligence ?? 0} brand intel`,
-      color: BRAND.aqua,
-    },
-  ];
+  const attention: Array<{ label: string; detail: string; to: string }> = [];
+  if (inReview > 0)
+    attention.push({
+      label: `${inReview} deck${inReview === 1 ? "" : "s"} waiting for review`,
+      detail: "Open Approvals to approve or send back.",
+      to: "/approvals",
+    });
+  if (t.aiErrors > 0)
+    attention.push({
+      label: `${t.aiErrors} failed AI request${t.aiErrors === 1 ? "" : "s"} in 30 days`,
+      detail: "See which feature failed in AI usage.",
+      to: "/admin/ai",
+    });
 
   return (
-    <div className="space-y-10">
-      {/* HEADER */}
-      <header className="grid grid-cols-1 gap-4 border-b border-black/10 pb-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:gap-6">
+    <div className="space-y-8">
+      {/* Header */}
+      <header className="flex flex-col gap-4 border-b border-border pb-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
-          <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">
-            Admin · Overview
-          </div>
-          <h1 className="mt-2 font-[Geist] text-3xl font-semibold tracking-tight text-[#03002C] sm:text-4xl">
-            Operations Console
+          <p className="text-xs font-medium text-muted-foreground">Admin</p>
+          <h1 className="mt-1 text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
+            Command center
           </h1>
-          <p className="mt-2 max-w-xl text-sm text-black/60">
-            Every build surface plus the systems behind them — decks, briefs, print, campaign kits,
-            modules, imagery, logos, knowledge, translation and AI spend, last 30 days.
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            What needs your attention, the latest work, and the health of the system. Figures
+            cover the last 30 days unless marked otherwise.
           </p>
         </div>
-        <div className="flex w-fit shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-black/10 bg-white/70 px-4 py-2 text-xs text-black/60 backdrop-blur">
-          <span
-            className="h-2 w-2 shrink-0 animate-pulse rounded-full"
-            style={{ background: BRAND.green }}
-          />
-          Live · 30-day window
-        </div>
+        <nav aria-label="Quick actions" className="flex flex-wrap gap-2">
+          {QUICK_ACTIONS.map((a, i) => (
+            <Link
+              key={a.to}
+              to={a.to}
+              className={
+                i === 0
+                  ? "inline-flex items-center gap-2 rounded-md bg-primary px-3.5 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  : "inline-flex items-center gap-2 rounded-md border border-border bg-card px-3.5 py-2 text-sm font-medium text-foreground transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              }
+            >
+              <a.icon size={16} aria-hidden />
+              {a.label}
+            </Link>
+          ))}
+        </nav>
       </header>
 
-      {/* HERO KPI ROW */}
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {heroStats.map((s) => (
-          <div
-            key={s.label}
-            className="group relative overflow-hidden rounded-3xl border border-black/10 bg-white p-6 transition hover:-translate-y-0.5 hover:shadow-xl"
-          >
-            <div className="absolute inset-x-0 top-0 h-1" style={{ background: s.color }} />
-            <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-black/40">
-              {s.label}
-            </div>
-            <div className="mt-3 font-[Geist] text-5xl font-semibold tracking-tight text-[#03002C]">
-              {s.value}
-            </div>
-            <div className="mt-2 text-xs text-black/50">{s.delta}</div>
-            {s.trend && s.trend.length > 0 && (
-              <div className="mt-4 flex h-10 items-end gap-0.5">
-                {s.trend.map((d, i) => {
-                  const max = Math.max(1, ...s.trend!.map((x) => x.count));
-                  return (
-                    <div
-                      key={i}
-                      className="flex-1 rounded-sm opacity-60 transition group-hover:opacity-100"
-                      style={{
-                        height: `${Math.max(4, (d.count / max) * 100)}%`,
-                        background: s.color,
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            )}
+      {/* Needs attention */}
+      <section aria-labelledby="attention-h">
+        <h2 id="attention-h" className="sr-only">
+          Needs attention
+        </h2>
+        {attention.length === 0 ? (
+          <div className="rounded-lg border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+            Nothing needs your attention right now.
           </div>
-        ))}
+        ) : (
+          <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
+            {attention.map((a) => (
+              <li key={a.label}>
+                <Link
+                  to={a.to}
+                  className="flex items-center gap-3 px-4 py-3 transition hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
+                >
+                  <AlertTriangle size={16} className="shrink-0 text-primary" aria-hidden />
+                  <span className="text-sm font-medium text-foreground">{a.label}</span>
+                  <span className="hidden text-sm text-muted-foreground sm:inline">{a.detail}</span>
+                  <ArrowRight size={16} className="ml-auto text-muted-foreground" aria-hidden />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
-      {/* BUILD COMMAND CENTER */}
-      <section className="rounded-3xl border border-black/10 bg-white p-5 text-[#03002C] sm:p-8">
-        <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-          <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">Build Studio</div>
-            <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight sm:text-3xl">
-              Build Command Center
-            </h2>
-            <p className="mt-1 max-w-xl text-sm text-black/60">
-              Every creation surface in one place — decks, briefs, print, campaign kits, modules,
-              imagery, logos, knowledge and translation.
-            </p>
+      {/* Key figures */}
+      <section aria-labelledby="kpi-h">
+        <h2 id="kpi-h" className="sr-only">
+          Key figures
+        </h2>
+        <dl className="grid grid-cols-2 divide-border overflow-hidden rounded-lg border border-border bg-card lg:grid-cols-4 lg:divide-x [&>div]:border-border max-lg:[&>div:nth-child(-n+2)]:border-b max-lg:[&>div:nth-child(odd)]:border-r">
+          <Kpi label="Decks" value={t.decks} sub={`${t.decksInWindow ?? 0} new in 30 days`} to="/atlas" />
+          <Kpi
+            label="AI requests"
+            value={t.aiCalls}
+            sub={successRate === null ? "None recorded" : `${successRate.toFixed(1)}% succeeded`}
+            to="/admin/ai"
+          />
+          <Kpi
+            label="Images generated"
+            value={t.imagesGenerated}
+            sub={t.imageEvents ? `${t.imageEvents} image events` : "None recorded"}
+            to="/admin/imagery-analytics"
+          />
+          <Kpi
+            label="Knowledge records"
+            value={t.knowledgeEntries + (t.oracleKnowledge ?? 0)}
+            sub={`${t.brandIntelligence ?? 0} brand guide records`}
+            to="/knowledge"
+          />
+        </dl>
+      </section>
+
+      <div className="grid gap-8 lg:grid-cols-12 [&>*]:min-w-0">
+        {/* Left column */}
+        <div className="space-y-8 lg:col-span-8">
+          <Panel
+            title="Recent decks"
+            action={<PanelLink to="/atlas">All decks</PanelLink>}
+          >
+            {(d.recentDecks ?? []).length === 0 ? (
+              <Empty>No decks yet. Start with a new brief.</Empty>
+            ) : (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-xs text-muted-foreground">
+                    <th scope="col" className="px-4 py-2 font-medium">Title</th>
+                    <th scope="col" className="hidden px-4 py-2 font-medium sm:table-cell">Brand</th>
+                    <th scope="col" className="px-4 py-2 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {(d.recentDecks ?? []).map((row) => (
+                    <tr key={row.id} className="hover:bg-muted/60">
+                      <td className="max-w-0 px-4 py-2.5">
+                        <Link
+                          to="/decks/$deckId"
+                          params={{ deckId: row.id }}
+                          className="block truncate font-medium text-foreground hover:text-primary focus-visible:underline focus-visible:outline-none"
+                        >
+                          {row.title}
+                        </Link>
+                      </td>
+                      <td className="hidden px-4 py-2.5 text-muted-foreground sm:table-cell">
+                        {row.brandMode}
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <StatusBadge status={row.status} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </Panel>
+
+          <Panel
+            title="Deck activity"
+            description="Decks created per day, last 30 days"
+          >
+            <BarSeries data={d.decksPerDay ?? []} emptyText="No decks created in the last 30 days." />
+          </Panel>
+
+          <div className="grid gap-8 md:grid-cols-2 [&>*]:min-w-0">
+            <Panel title="Decks by status">
+              <Breakdown rows={d.decksByStatus ?? []} />
+            </Panel>
+            <Panel title="Decks by brand">
+              <Breakdown rows={d.decksByBrandMode ?? []} />
+            </Panel>
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-            <Link
-              to="/brief/new"
-              className="rounded-full bg-[#03002C] px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-white transition hover:bg-[#03002C]/90 dark:bg-primary dark:text-primary-foreground"
-            >
-              + New brief
-            </Link>
-            <Link
-              to="/asset/new"
-              className="rounded-full border border-black/20 px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-[#03002C] transition hover:bg-black/5"
-            >
-              + Print asset
-            </Link>
-            <Link
-              to="/social/new"
-              className="rounded-full border border-black/20 px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-[#03002C] transition hover:bg-black/5"
-            >
-              + Social kit
-            </Link>
-            <Link
-              to="/events/new"
-              className="rounded-full border border-black/20 px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-[#03002C] transition hover:bg-black/5"
-            >
-              + Event kit
-            </Link>
-          </div>
+
+          <Panel
+            title="Content inventory"
+            description="Everything people have built, with what was added in the last 30 days"
+          >
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-left text-xs text-muted-foreground">
+                  <th scope="col" className="px-4 py-2 font-medium">Area</th>
+                  <th scope="col" className="px-4 py-2 text-right font-medium">Total</th>
+                  <th scope="col" className="px-4 py-2 text-right font-medium">Last 30 days</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {(d.buildSurfaces ?? []).map((s) => {
+                  const href = SURFACE_LINKS[s.key];
+                  return (
+                    <tr key={s.key} className="hover:bg-muted/60">
+                      <td className="px-4 py-2.5">
+                        {href ? (
+                          <Link
+                            to={href}
+                            className="font-medium text-foreground hover:text-primary focus-visible:underline focus-visible:outline-none"
+                          >
+                            {s.label}
+                          </Link>
+                        ) : (
+                          <span className="font-medium text-foreground">{s.label}</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-foreground">
+                        {s.total.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
+                        {s.window > 0 ? `+${s.window.toLocaleString()}` : "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </Panel>
         </div>
 
-        {/* Surface inventory — one tile per build surface */}
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
-          {(q.data.buildSurfaces ?? []).map((s, i) => {
-            const palette = [
-              BRAND.aqua,
-              BRAND.lavender,
-              BRAND.yellow,
-              BRAND.peach,
-              BRAND.pink,
-              BRAND.green,
-            ];
-            const href = SURFACE_LINKS[s.key];
-            // Tiles stretch to the tallest cell in the row; the number block is
-            // pushed to the bottom so figures stay baseline-aligned even when a
-            // label wraps to two or three lines at narrow widths.
-            const body = (
-              <>
-                <div className="flex items-start justify-between gap-2">
-                  <span className="min-w-0 text-[10px] leading-4 uppercase tracking-[0.18em] text-black/50">
-                    {s.label}
-                  </span>
-                  <span
-                    className="mt-1 h-2 w-2 shrink-0 rounded-full"
-                    style={{ background: palette[i % palette.length] }}
-                  />
-                </div>
-                <div className="mt-auto pt-4">
-                  <div className="font-[Geist] text-3xl font-semibold tracking-tight text-[#03002C]">
-                    {s.total.toLocaleString()}
+        {/* Right column */}
+        <aside className="space-y-8 lg:col-span-4">
+          <Panel title="System health" action={<PanelLink to="/admin/ai">Details</PanelLink>}>
+            <dl className="divide-y divide-border text-sm">
+              <HealthRow
+                label="AI success rate"
+                value={successRate === null ? "No requests" : `${successRate.toFixed(1)}%`}
+              />
+              <HealthRow label="Failed AI requests" value={t.aiErrors.toLocaleString()} />
+              <HealthRow
+                label="Average response time"
+                value={t.aiAvgLatencyMs ? `${(t.aiAvgLatencyMs / 1000).toFixed(1)} s` : "No samples"}
+              />
+              <HealthRow label="AI spend" value={`${t.aiCost.toFixed(2)} credits`} />
+              <HealthRow
+                label="Experiments running"
+                value={`${t.runningExperiments} of ${t.experiments}`}
+              />
+            </dl>
+          </Panel>
+
+          <Panel title="Admin areas">
+            <div className="divide-y divide-border">
+              {ADMIN_NAV_GROUPS.filter((g) => g.label !== "Overview" || g.items.length > 1).map(
+                (g) => (
+                  <div key={g.label} className="px-4 py-3">
+                    <h3 className="text-xs font-medium text-muted-foreground">{g.label}</h3>
+                    <ul className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
+                      {g.items
+                        .filter((i) => i.to !== "/admin")
+                        .map((i) => (
+                          <li key={i.to}>
+                            <Link
+                              to={i.to}
+                              className="text-sm text-foreground hover:text-primary hover:underline focus-visible:underline focus-visible:outline-none"
+                            >
+                              {i.label}
+                            </Link>
+                          </li>
+                        ))}
+                    </ul>
                   </div>
-                  <div className="mt-1 text-[11px] text-black/50">+{s.window} in last 30d</div>
-                </div>
-              </>
-            );
-            const tile =
-              "flex h-full flex-col rounded-2xl border border-black/10 bg-black/[0.03] p-4";
-            return href ? (
-              <Link
-                key={s.key}
-                to={href}
-                className={`${tile} transition hover:border-black/25 hover:bg-black/5`}
-              >
-                {body}
-              </Link>
-            ) : (
-              <div key={s.key} className={tile}>
-                {body}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Deck pipeline detail */}
-        <div className="mt-8 mb-4 grid grid-cols-1 gap-3 border-t border-black/10 pt-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-          <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">
-              Deck pipeline
-            </div>
-            <h3 className="mt-1 font-[Geist] text-lg font-semibold tracking-tight sm:text-xl">
-              Deck status, brand modes and archetypes
-            </h3>
-          </div>
-          <Link
-            to="/atlas"
-            className="w-fit shrink-0 rounded-full border border-black/20 px-4 py-2 text-xs font-semibold whitespace-nowrap text-[#03002C] transition hover:bg-black/5"
-          >
-            Open decks →
-          </Link>
-        </div>
-
-        {/* Deck KPI strip */}
-        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-          <DeckMetric
-            label="Total Decks"
-            value={t.decks.toLocaleString()}
-            accent={BRAND.aqua}
-            sub="all time"
-          />
-          <DeckMetric
-            label="Created · 30d"
-            value={(t.decksInWindow ?? 0).toLocaleString()}
-            accent={BRAND.lavender}
-            sub={`peak ${Math.max(0, ...(q.data.decksPerDay ?? []).map((d) => d.count))}/day`}
-          />
-          <DeckMetric
-            label="Brand Modes"
-            value={(q.data.decksByBrandMode?.length ?? 0).toString()}
-            accent={BRAND.yellow}
-            sub="in use"
-          />
-          <DeckMetric
-            label="Archetypes"
-            value={(q.data.decksByArchetype?.length ?? 0).toString()}
-            accent={BRAND.peach}
-            sub="active narratives"
-          />
-        </div>
-
-        {/* Deck body: trend + breakdowns */}
-        <div className="mt-6 grid gap-6 [&>*]:min-w-0 lg:grid-cols-12">
-          {/* Sparkline trend */}
-          <div className="rounded-2xl border border-black/10 bg-black/[0.03] p-5 lg:col-span-7">
-            <div className="flex items-end justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-[10px] uppercase tracking-[0.25em] text-black/40">
-                  Creation Trend · 30d
-                </div>
-                <div className="mt-1 font-[Geist] text-xl font-semibold text-[#03002C]">
-                  Decks per day
-                </div>
-              </div>
-              <div className="shrink-0 text-[10px] whitespace-nowrap uppercase tracking-widest text-black/40">
-                {(q.data.decksPerDay ?? []).reduce((a, d) => a + d.count, 0)} total
-              </div>
-            </div>
-            {q.data.decksPerDay && q.data.decksPerDay.length > 0 ? (
-              <div className="mt-5 flex h-36 items-end gap-1">
-                {q.data.decksPerDay.map((d) => {
-                  const dmax = Math.max(1, ...(q.data.decksPerDay ?? []).map((x) => x.count));
-                  return (
-                    <div
-                      key={d.date}
-                      className="group relative flex-1"
-                      title={`${d.date}: ${d.count}`}
-                    >
-                      <div
-                        className="w-full rounded-t"
-                        style={{
-                          height: `${Math.max(3, (d.count / dmax) * 100)}%`,
-                          background: `linear-gradient(180deg, ${BRAND.aqua}, ${BRAND.blue})`,
-                        }}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="mt-5 flex h-36 items-center justify-center rounded-xl border border-dashed border-black/20 text-xs text-black/50">
-                No decks yet — create your first brief to populate.
-              </div>
-            )}
-          </div>
-
-          {/* Status pipeline */}
-          <div className="rounded-2xl border border-black/10 bg-black/[0.03] p-5 lg:col-span-5">
-            <div className="text-[10px] uppercase tracking-[0.25em] text-black/40">
-              Status Pipeline
-            </div>
-            <div className="mt-1 font-[Geist] text-xl font-semibold text-[#03002C]">
-              By workflow state
-            </div>
-            <div className="mt-5 space-y-3">
-              {(q.data.decksByStatus ?? []).length === 0 ? (
-                <div className="rounded-lg border border-dashed border-black/20 p-4 text-center text-xs text-black/50">
-                  No decks tracked yet.
-                </div>
-              ) : (
-                (q.data.decksByStatus ?? []).map((row, i) => {
-                  const total = (q.data.decksByStatus ?? []).reduce((a, r) => a + r.count, 0) || 1;
-                  const pct = (row.count / total) * 100;
-                  const colors = [
-                    BRAND.aqua,
-                    BRAND.lavender,
-                    BRAND.yellow,
-                    BRAND.peach,
-                    BRAND.pink,
-                    BRAND.green,
-                  ];
-                  const c = colors[i % colors.length];
-                  return (
-                    <div key={row.label}>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="capitalize text-black/80">{row.label}</span>
-                        <span className="text-black/60">
-                          {row.count} <span className="text-black/40">· {pct.toFixed(0)}%</span>
-                        </span>
-                      </div>
-                      <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-black/10">
-                        <div
-                          className="h-full rounded-full"
-                          style={{ width: `${pct}%`, background: c }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })
+                ),
               )}
             </div>
-          </div>
-        </div>
-
-        {/* Brand mode + Archetype + Recent decks */}
-        <div className="mt-6 grid gap-6 [&>*]:min-w-0 lg:grid-cols-12">
-          <BreakdownBlock
-            title="Brand Modes"
-            subtitle="Deck distribution"
-            rows={q.data.decksByBrandMode ?? []}
-            accent={BRAND.lavender}
-            className="lg:col-span-4"
-          />
-          <BreakdownBlock
-            title="Narrative Archetypes"
-            subtitle="Story frameworks in play"
-            rows={q.data.decksByArchetype ?? []}
-            accent={BRAND.yellow}
-            className="lg:col-span-4"
-          />
-
-          {/* Recent decks list */}
-          <div className="rounded-2xl border border-black/10 bg-black/[0.03] p-5 lg:col-span-4">
-            <div className="flex items-end justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-[10px] uppercase tracking-[0.25em] text-black/40">
-                  Recent Activity
-                </div>
-                <div className="mt-1 font-[Geist] text-lg font-semibold text-[#03002C]">
-                  Latest decks
-                </div>
-              </div>
-              <Link
-                to="/atlas"
-                className="shrink-0 text-[11px] whitespace-nowrap text-black/60 hover:text-[#003FC7]"
-              >
-                All →
-              </Link>
-            </div>
-            <div className="mt-4 space-y-2">
-              {(q.data.recentDecks ?? []).length === 0 ? (
-                <div className="rounded-lg border border-dashed border-black/20 p-4 text-center text-xs text-black/50">
-                  No decks yet.
-                </div>
-              ) : (
-                (q.data.recentDecks ?? []).map((d) => (
-                  <Link
-                    key={d.id}
-                    to="/decks/$deckId"
-                    params={{ deckId: d.id }}
-                    className="group flex items-center gap-3 rounded-xl border border-black/10 bg-white p-3 transition hover:border-black/25 hover:bg-black/[0.02]"
-                  >
-                    <span
-                      className="h-8 w-1 rounded-full"
-                      style={{ background: statusColor(d.status) }}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-medium text-[#03002C]">{d.title}</div>
-                      <div className="mt-0.5 flex items-center gap-2 text-[10px] uppercase tracking-wider text-black/50">
-                        <span>{d.brandMode}</span>
-                        <span>·</span>
-                        <span>{d.status}</span>
-                      </div>
-                    </div>
-                    <span className="text-black/30 transition group-hover:translate-x-0.5 group-hover:text-[#003FC7]">
-                      →
-                    </span>
-                  </Link>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* AI PERFORMANCE INFOGRAPHIC */}
-      <section className="rounded-3xl border border-black/10 bg-gradient-to-br from-white to-[#F2F2F2] p-5 sm:p-8">
-        <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:gap-4">
-          <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">Section 01</div>
-            <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight text-[#03002C]">
-              AI Orchestration Health
-            </h2>
-          </div>
-          <div className="shrink-0 text-xs text-black/50">
-            {t.aiCalls.toLocaleString()} calls processed
-          </div>
-        </div>
-
-        <div className="grid gap-6 [&>*]:min-w-0 lg:grid-cols-12">
-          {/* Donut: success/error */}
-          <div className="lg:col-span-4">
-            <Donut
-              segments={[
-                { value: aiSuccess, color: BRAND.blue, label: "Success" },
-                { value: t.aiErrors, color: BRAND.red, label: "Errors" },
-              ]}
-              centerLabel={`${successRate.toFixed(1)}%`}
-              centerSub="success rate"
-            />
-            <div className="mt-4 space-y-2">
-              <LegendRow
-                color={BRAND.blue}
-                label="Success"
-                value={aiSuccess.toLocaleString()}
-                pct={successRate}
-              />
-              <LegendRow
-                color={BRAND.red}
-                label="Errors"
-                value={t.aiErrors.toLocaleString()}
-                pct={errorRate}
-              />
-            </div>
-          </div>
-
-          {/* Metric tiles */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:col-span-8">
-            <MetricTile
-              label="Total Cost"
-              value={`${t.aiCost.toFixed(2)}`}
-              unit="credits"
-              accent={BRAND.blue}
-              hint={`≈ ${costPerCall.toFixed(4)} / call`}
-            />
-            <MetricTile
-              label="Tokens Processed"
-              value={formatCompact(t.aiTokens)}
-              unit="tokens"
-              accent={BRAND.lavender}
-              hint={`${tokensPerCall.toLocaleString()} avg / call`}
-            />
-            <MetricTile
-              label="Avg Latency"
-              value={t.aiAvgLatencyMs.toLocaleString()}
-              unit="ms"
-              accent={BRAND.aqua}
-              hint={latencyLabel(t.aiAvgLatencyMs)}
-            />
-            <MetricTile
-              label="Error Volume"
-              value={t.aiErrors.toLocaleString()}
-              unit={t.aiErrors === 1 ? "event" : "events"}
-              accent={t.aiErrors === 0 ? BRAND.green : BRAND.red}
-              hint={`${errorRate.toFixed(2)}% error rate`}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* TIMESERIES */}
-      <section className="grid gap-6 lg:grid-cols-2">
-        <TimeseriesCard
-          index="02"
-          title="AI Calls · Daily"
-          subtitle="30-day request volume"
-          data={q.data.aiPerDay}
-          max={aiMax}
-          color={BRAND.blue}
-        />
-        <TimeseriesCard
-          index="03"
-          title="Imagery Events · Daily"
-          subtitle="Generation + edit pipeline"
-          data={q.data.imageryPerDay}
-          max={imgMax}
-          color={BRAND.pink}
-        />
-      </section>
-
-      {/* KNOWLEDGE ECOSYSTEM */}
-      <section className="rounded-3xl border border-black/10 bg-[#03002C] p-5 text-white sm:p-8 dark:bg-card">
-        <div className="mb-6 flex items-end justify-between gap-4">
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.3em] text-white/40">Section 04</div>
-            <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight">
-              Knowledge Ecosystem
-            </h2>
-            <p className="mt-1 text-sm text-white/60">
-              Retrieval sources powering brief personalization and Oracle RAG.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <KnowledgeCard
-            label="Knowledge Entries"
-            value={t.knowledgeEntries}
-            total={t.knowledgeEntries + (t.oracleKnowledge ?? 0) + (t.brandIntelligence ?? 0)}
-            color={BRAND.aqua}
-            href="/admin/oracle"
-          />
-          <KnowledgeCard
-            label="Oracle KB"
-            value={t.oracleKnowledge ?? 0}
-            total={t.knowledgeEntries + (t.oracleKnowledge ?? 0) + (t.brandIntelligence ?? 0)}
-            color={BRAND.lavender}
-            href="/admin/oracle"
-          />
-          <KnowledgeCard
-            label="Brand Intelligence"
-            value={t.brandIntelligence ?? 0}
-            total={t.knowledgeEntries + (t.oracleKnowledge ?? 0) + (t.brandIntelligence ?? 0)}
-            color={BRAND.yellow}
-            href="/admin/brand-assets"
-          />
-        </div>
-      </section>
-
-      {/* EXPERIMENTS + QUICK NAV */}
-      <section className="grid gap-6 lg:grid-cols-3">
-        <div className="rounded-3xl border border-black/10 bg-white p-6 lg:col-span-1">
-          <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">Section 05</div>
-          <h3 className="mt-1 font-[Geist] text-xl font-semibold tracking-tight text-[#03002C]">
-            A/B Experiments
-          </h3>
-          <div className="mt-6 flex items-baseline gap-3">
-            <span
-              className="font-[Geist] text-6xl font-semibold tracking-tight"
-              style={{ color: BRAND.blue }}
-            >
-              {t.runningExperiments}
-            </span>
-            <span className="text-sm text-black/50">/ {t.experiments} total</span>
-          </div>
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-black/5">
-            <div
-              className="h-full rounded-full"
-              style={{
-                width: `${t.experiments ? (t.runningExperiments / t.experiments) * 100 : 0}%`,
-                background: `linear-gradient(90deg, ${BRAND.blue}, ${BRAND.lavender})`,
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-black/10 bg-white p-6 lg:col-span-2">
-          <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">
-            Section 06 · Quick Access
-          </div>
-          <h3 className="mt-1 font-[Geist] text-xl font-semibold tracking-tight text-[#03002C]">
-            Console Modules
-          </h3>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-            {[
-              { href: "/admin/users", label: "Users & Roles", color: BRAND.blue },
-              { href: "/admin/ai", label: "AI Analytics", color: BRAND.lavender },
-              { href: "/admin/imagery-analytics", label: "Imagery", color: BRAND.pink },
-              { href: "/admin/oracle", label: "Oracle KB", color: BRAND.aqua },
-              { href: "/admin/brand-assets", label: "Brand Assets", color: BRAND.yellow },
-              { href: "/admin/logohub", label: "LogoHub", color: BRAND.green },
-              { href: "/approvals", label: "Approvals", color: BRAND.peach },
-              { href: "/admin/audit", label: "Audit Log", color: BRAND.red },
-              { href: "/admin/icon-studio", label: "Icon Studio", color: BRAND.blue },
-            ].map((m) => (
-              <Link
-                key={m.href}
-                to={m.href}
-                className="group flex items-center gap-3 rounded-2xl border border-black/10 bg-white p-4 transition hover:-translate-y-0.5 hover:border-black/20 hover:shadow-md"
-              >
-                <span className="h-8 w-1 rounded-full" style={{ background: m.color }} />
-                <span className="text-sm font-medium text-[#03002C]">{m.label}</span>
-                <span className="ml-auto text-black/30 transition group-hover:text-[#003FC7]">
-                  →
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-// ─── Sub-components ──────────────────────────────────────────────
-
-function LoadingSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div className="h-24 animate-pulse rounded-3xl bg-black/5" />
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-        {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="h-40 animate-pulse rounded-3xl bg-black/5" />
-        ))}
-      </div>
-      <div className="h-80 animate-pulse rounded-3xl bg-black/5" />
-    </div>
-  );
-}
-
-function Donut({
-  segments,
-  centerLabel,
-  centerSub,
-}: {
-  segments: Array<{ value: number; color: string; label: string }>;
-  centerLabel: string;
-  centerSub: string;
-}) {
-  const total = Math.max(
-    1,
-    segments.reduce((a, s) => a + s.value, 0),
-  );
-  const R = 60;
-  const C = 2 * Math.PI * R;
-  let offset = 0;
-  return (
-    <div className="relative mx-auto aspect-square w-full max-w-[220px]">
-      <svg viewBox="0 0 160 160" className="h-full w-full -rotate-90">
-        <circle cx="80" cy="80" r={R} fill="none" stroke="#F2F2F2" strokeWidth="18" />
-        {segments.map((s, i) => {
-          const len = (s.value / total) * C;
-          const el = (
-            <circle
-              key={i}
-              cx="80"
-              cy="80"
-              r={R}
-              fill="none"
-              stroke={s.color}
-              strokeWidth="18"
-              strokeDasharray={`${len} ${C - len}`}
-              strokeDashoffset={-offset}
-              strokeLinecap="butt"
-            />
-          );
-          offset += len;
-          return el;
-        })}
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="font-[Geist] text-3xl font-semibold tracking-tight text-[#03002C]">
-          {centerLabel}
-        </div>
-        <div className="mt-0.5 text-[10px] uppercase tracking-widest text-black/50">
-          {centerSub}
-        </div>
+          </Panel>
+        </aside>
       </div>
     </div>
   );
 }
 
-function LegendRow({
-  color,
-  label,
-  value,
-  pct,
-}: {
-  color: string;
-  label: string;
-  value: string;
-  pct: number;
-}) {
-  return (
-    <div className="flex items-center gap-3 text-xs">
-      <span className="h-2.5 w-2.5 rounded-sm" style={{ background: color }} />
-      <span className="text-black/70">{label}</span>
-      <span className="ml-auto font-medium text-[#03002C]">{value}</span>
-      <span className="w-12 text-right text-black/40">{pct.toFixed(1)}%</span>
-    </div>
-  );
-}
+// ─── Building blocks ─────────────────────────────────────────────
 
-function MetricTile({
-  label,
-  value,
-  unit,
-  accent,
-  hint,
-}: {
-  label: string;
-  value: string;
-  unit: string;
-  accent: string;
-  hint: string;
-}) {
-  return (
-    <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-white p-5">
-      <div
-        className="absolute right-0 top-0 h-16 w-16 rounded-bl-full opacity-10"
-        style={{ background: accent }}
-      />
-      <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-black/40">
-        {label}
-      </div>
-      <div className="mt-2 flex items-baseline gap-1.5">
-        <span className="font-[Geist] text-3xl font-semibold tracking-tight text-[#03002C]">
-          {value}
-        </span>
-        <span className="text-xs text-black/50">{unit}</span>
-      </div>
-      <div className="mt-1 text-[11px] text-black/50">{hint}</div>
-    </div>
-  );
-}
-
-function TimeseriesCard({
-  index,
+function Panel({
   title,
-  subtitle,
-  data,
-  max,
-  color,
+  description,
+  action,
+  children,
 }: {
-  index: string;
   title: string;
-  subtitle: string;
-  data: Array<{ date: string; count: number }>;
-  max: number;
-  color: string;
+  description?: string;
+  action?: ReactNode;
+  children: ReactNode;
 }) {
-  const total = data.reduce((a, d) => a + d.count, 0);
-  const avg = data.length ? Math.round(total / data.length) : 0;
   return (
-    <div className="rounded-3xl border border-black/10 bg-white p-6">
-      <div className="mb-5 flex items-start justify-between">
-        <div>
-          <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">
-            Section {index}
-          </div>
-          <h3 className="mt-1 font-[Geist] text-xl font-semibold tracking-tight text-[#03002C]">
-            {title}
-          </h3>
-          <p className="text-xs text-black/50">{subtitle}</p>
+    <section className="overflow-hidden rounded-lg border border-border bg-card">
+      <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-3">
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+          {description ? <p className="mt-0.5 text-xs text-muted-foreground">{description}</p> : null}
         </div>
-        <div className="text-right">
-          <div className="font-[Geist] text-2xl font-semibold tracking-tight text-[#03002C]">
-            {total.toLocaleString()}
-          </div>
-          <div className="text-[10px] uppercase tracking-widest text-black/40">
-            total · avg {avg}/day
-          </div>
-        </div>
+        {action}
       </div>
-      {data.length === 0 ? (
-        <div className="py-10 text-center text-xs text-black/40">
-          No data yet — events will appear here as the app runs.
-        </div>
-      ) : (
-        <>
-          <div className="flex h-40 items-end gap-1">
-            {data.map((d) => (
-              <div key={d.date} className="group relative flex-1" title={`${d.date}: ${d.count}`}>
-                <div
-                  className="w-full rounded-t transition-all group-hover:opacity-100"
-                  style={{
-                    height: `${Math.max(2, (d.count / max) * 100)}%`,
-                    background: `linear-gradient(180deg, ${color}, ${color}90)`,
-                    minHeight: 2,
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-          <div className="mt-3 flex justify-between text-[10px] uppercase tracking-widest text-black/40">
-            <span>{data[0]?.date ?? ""}</span>
-            <span>peak {max}</span>
-            <span>{data[data.length - 1]?.date ?? ""}</span>
-          </div>
-        </>
-      )}
-    </div>
+      {children}
+    </section>
   );
 }
 
-function KnowledgeCard({
-  label,
-  value,
-  total,
-  color,
-  href,
-}: {
-  label: string;
-  value: number;
-  total: number;
-  color: string;
-  href: string;
-}) {
-  const pct = total ? (value / total) * 100 : 0;
+function PanelLink({ to, children }: { to: string; children: ReactNode }) {
   return (
     <Link
-      to={href}
-      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/10"
+      to={to}
+      className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-primary hover:underline focus-visible:underline focus-visible:outline-none"
     >
-      <div className="text-[10px] font-semibold uppercase tracking-[0.25em]" style={{ color }}>
-        {label}
-      </div>
-      <div className="mt-3 flex items-baseline gap-2">
-        <span className="font-[Geist] text-4xl font-semibold tracking-tight text-white">
-          {value.toLocaleString()}
-        </span>
-        <span className="text-xs text-white/50">records</span>
-      </div>
-      <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10">
-        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
-      </div>
-      <div className="mt-2 flex items-center justify-between text-[11px] text-white/50">
-        <span>{pct.toFixed(1)}% of corpus</span>
-        <span className="transition group-hover:translate-x-0.5">→</span>
-      </div>
+      {children}
+      <ArrowRight size={12} aria-hidden />
     </Link>
   );
 }
 
-function formatCompact(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n.toString();
+function Empty({ children }: { children: ReactNode }) {
+  return <p className="px-4 py-8 text-center text-sm text-muted-foreground">{children}</p>;
 }
 
-function latencyLabel(ms: number) {
-  if (ms === 0) return "no samples";
-  if (ms < 500) return "fast";
-  if (ms < 1500) return "healthy";
-  if (ms < 3000) return "elevated";
-  return "slow";
-}
-
-function DeckMetric({
-  label,
-  value,
-  sub,
-  accent,
-}: {
-  label: string;
-  value: string;
-  sub: string;
-  accent: string;
-}) {
+function Kpi({ label, value, sub, to }: { label: string; value: number; sub: string; to: string }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-black/[0.03] p-5">
-      <div
-        className="absolute right-0 top-0 h-14 w-14 rounded-bl-full opacity-20"
-        style={{ background: accent }}
-      />
-      <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-black/40">
-        {label}
-      </div>
-      <div className="mt-2 flex items-baseline gap-2">
-        <span className="font-[Geist] text-4xl font-semibold tracking-tight text-[#03002C]">
-          {value}
-        </span>
-      </div>
-      <div className="mt-1 text-[11px] text-black/50">{sub}</div>
+    <div className="p-4">
+      <Link to={to} className="group block focus-visible:outline-none">
+        <dt className="text-xs font-medium text-muted-foreground group-hover:text-primary group-focus-visible:underline">
+          {label}
+        </dt>
+        <dd className="mt-1 text-2xl font-semibold tabular-nums text-foreground">
+          {value.toLocaleString()}
+        </dd>
+        <dd className="mt-0.5 text-xs text-muted-foreground">{sub}</dd>
+      </Link>
     </div>
   );
 }
 
-function BreakdownBlock({
-  title,
-  subtitle,
-  rows,
-  accent,
-  className = "",
-}: {
-  title: string;
-  subtitle: string;
-  rows: Array<{ label: string; count: number }>;
-  accent: string;
-  className?: string;
-}) {
-  const total = rows.reduce((a, r) => a + r.count, 0) || 1;
-  const top = rows.slice(0, 6);
+function HealthRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className={`min-w-0 rounded-2xl border border-black/10 bg-black/[0.03] p-5 ${className}`}>
-      <div className="text-[10px] uppercase tracking-[0.25em] text-black/40">{subtitle}</div>
-      <div className="mt-1 font-[Geist] text-lg font-semibold text-[#03002C]">{title}</div>
-      <div className="mt-4 space-y-2.5">
-        {top.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-black/20 p-4 text-center text-xs text-black/50">
-            No data yet.
-          </div>
-        ) : (
-          top.map((r) => {
-            const pct = (r.count / total) * 100;
-            return (
-              <div key={r.label} className="min-w-0">
-                <div className="flex min-w-0 items-center justify-between gap-2 text-xs">
-                  <span className="min-w-0 truncate text-black/80">{r.label}</span>
-                  <span className="shrink-0 whitespace-nowrap text-black/60">
-                    {r.count} <span className="text-black/40">· {pct.toFixed(0)}%</span>
-                  </span>
-                </div>
-                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-black/10">
-                  <div
-                    className="h-full rounded-full"
-                    style={{ width: `${pct}%`, background: accent }}
-                  />
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
+    <div className="flex items-center justify-between gap-3 px-4 py-2.5">
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className="font-medium tabular-nums text-foreground">{value}</dd>
     </div>
   );
 }
 
-function statusColor(status: string) {
+function StatusBadge({ status }: { status: string }) {
   const s = status.toLowerCase();
-  if (s.includes("publish") || s.includes("approved") || s.includes("final")) return "#A6FA87";
-  if (s.includes("review") || s.includes("qa")) return "#FFEB66";
-  if (s.includes("error") || s.includes("reject")) return "#E53D2E";
-  if (s.includes("draft")) return "#C2A3FF";
-  return "#A1FBF9";
+  const cls =
+    s.includes("publish") || s.includes("approved") || s.includes("final")
+      ? "border-primary/30 bg-primary/10 text-foreground"
+      : s.includes("error") || s.includes("reject")
+        ? "border-destructive/40 bg-destructive/10 text-destructive"
+        : "border-border bg-muted text-foreground";
+  return (
+    <span className={`inline-flex rounded border px-1.5 py-0.5 text-xs capitalize ${cls}`}>
+      {status}
+    </span>
+  );
+}
+
+function Breakdown({ rows }: { rows: Array<{ label: string; count: number }> }) {
+  if (rows.length === 0) return <Empty>No data yet.</Empty>;
+  const total = rows.reduce((a, r) => a + r.count, 0) || 1;
+  return (
+    <ul className="space-y-3 px-4 py-4">
+      {rows.slice(0, 6).map((r) => {
+        const pct = (r.count / total) * 100;
+        return (
+          <li key={r.label}>
+            <div className="flex items-center justify-between gap-2 text-sm">
+              <span className="min-w-0 truncate capitalize text-foreground">{r.label}</span>
+              <span className="shrink-0 tabular-nums text-muted-foreground">{r.count}</span>
+            </div>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden>
+              <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function BarSeries({
+  data,
+  emptyText,
+}: {
+  data: Array<{ date: string; count: number }>;
+  emptyText: string;
+}) {
+  const total = data.reduce((a, x) => a + x.count, 0);
+  if (data.length === 0 || total === 0) return <Empty>{emptyText}</Empty>;
+  const max = Math.max(1, ...data.map((x) => x.count));
+  return (
+    <div className="px-4 py-4">
+      <div className="flex h-32 items-end gap-1" role="img" aria-label={`${total} in total, peak ${max} per day`}>
+        {data.map((x) => (
+          <div
+            key={x.date}
+            title={`${x.date}: ${x.count}`}
+            className="flex-1 rounded-t-sm bg-primary/80"
+            style={{ height: `${Math.max(2, (x.count / max) * 100)}%` }}
+          />
+        ))}
+      </div>
+      <div className="mt-2 flex justify-between text-xs text-muted-foreground">
+        <span>{data[0]?.date}</span>
+        <span>{total} total · peak {max}/day</span>
+        <span>{data[data.length - 1]?.date}</span>
+      </div>
+    </div>
+  );
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="space-y-6" aria-busy="true" aria-live="polite">
+      <span className="sr-only">Loading command center…</span>
+      <div className="h-20 animate-pulse rounded-lg bg-muted motion-reduce:animate-none" />
+      <div className="h-24 animate-pulse rounded-lg bg-muted motion-reduce:animate-none" />
+      <div className="grid gap-8 lg:grid-cols-12">
+        <div className="h-96 animate-pulse rounded-lg bg-muted lg:col-span-8 motion-reduce:animate-none" />
+        <div className="h-96 animate-pulse rounded-lg bg-muted lg:col-span-4 motion-reduce:animate-none" />
+      </div>
+    </div>
+  );
 }
