@@ -125,6 +125,8 @@ export type KioskEdits = {
   dividers?: KioskDivider[];
   /** Duplicated text lines and objects. */
   copies?: KioskCopy[];
+  /** Partner badges replaced with editable text (the source object is hidden). */
+  badges?: KioskBadge[];
   /** Locked items can be selected but not moved. */
   locked?: string[];
   /** Stacking order of objects within their piece (higher = in front). */
