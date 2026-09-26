@@ -1,3 +1,4 @@
+import { KnowledgeTabs } from "@/components/knowledge/KnowledgeTabs";
 import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -43,7 +44,12 @@ export const Route = createFileRoute("/admin/knowledge")({
       },
     ],
   }),
-  component: AdminKnowledgeBrowser,
+  component: () => (
+    <>
+      <KnowledgeTabs />
+      <AdminKnowledgeBrowser />
+    </>
+  ),
 });
 
 type Tab =

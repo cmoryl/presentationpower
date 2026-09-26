@@ -38,8 +38,10 @@ import {
 } from "@/lib/custom-modules";
 import {
   createCustomModule,
+  decideModuleReview,
   deleteCustomModule,
   listCustomModules,
+  submitModuleForReview,
   updateCustomModule,
 } from "@/lib/custom-modules.functions";
 import { compositionToModuleParts, moduleToItems } from "@/lib/module-studio-bridge";
@@ -123,6 +125,8 @@ function ModuleStudioPage() {
   const create = useServerFn(createCustomModule);
   const update = useServerFn(updateCustomModule);
   const remove = useServerFn(deleteCustomModule);
+  const submitReview = useServerFn(submitModuleForReview);
+  const decideReview = useServerFn(decideModuleReview);
 
   const modules = useQuery({
     queryKey: ["custom-modules"],
@@ -276,7 +280,11 @@ function ModuleStudioPage() {
   const publishable = canPublish(issues);
 
   const save = useMutation({
-    mutationFn: async (status: Meta["status"]) => {
+    // "submit" and "publish" first save the current composition as a draft,
+    // then move it through review — nothing reaches the library unreviewed
+    // except through the logged admin "publish now" override.
+    mutationFn: async (action: "draft" | "submit" | "publish") => {
+      const status: Meta["status"] = "draft";
       if (!comp || !parts) throw new Error("Nothing to save");
       const payload = {
         moduleKey: customModuleKey(comp.name),
@@ -295,24 +303,26 @@ function ModuleStudioPage() {
         notes: meta.notes,
         status,
       };
-      if (meta.id) {
-        return (await update({ data: { id: meta.id, patch: payload } })) as CustomModuleRow;
+      const row = meta.id
+        ? ((await update({ data: { id: meta.id, patch: payload } })) as CustomModuleRow)
+        : ((await create({ data: payload })) as CustomModuleRow);
+      if (action === "submit") await submitReview({ data: { id: row.id } });
+      if (action === "publish") {
+        await decideReview({ data: { id: row.id, decision: "approved", override: true } });
       }
-      return (await create({ data: payload })) as CustomModuleRow;
+      return row;
     },
-    onSuccess: (row, status) => {
-      patchMeta({ id: row.id, status });
+    onSuccess: (row, action) => {
+      patchMeta({ id: row.id, status: action === "publish" ? "published" : "draft" });
       void qc.invalidateQueries({ queryKey: ["custom-modules"] });
       void qc.invalidateQueries({ queryKey: ["custom-modules", "published"] });
-      toast.success(
-        status === "published" ? "Published to the module library" : "Module draft saved",
-        {
-          description:
-            status === "published"
-              ? "Every builder can now insert it from Add slide."
-              : "Keep composing — nothing is published yet.",
-        },
-      );
+      void qc.invalidateQueries({ queryKey: ["module-review-queue"] });
+      const msg = {
+        draft: ["Module draft saved", "Keep composing — nothing is published yet."],
+        submit: ["Sent for review", "It goes live in Add slide once another reviewer approves it."],
+        publish: ["Published without review", "Logged in the audit trail. Every builder can now insert it."],
+      }[action];
+      toast.success(msg[0], { description: msg[1] });
     },
     onError: (e: unknown) =>
       toast.error("Could not save the module", {
@@ -603,14 +613,27 @@ function ModuleStudioPage() {
                   ⤓
                 </StudioMenuBtn>
               </EditorMenuRow>
-              <EditorMenuRow label="Publish to library" hint="Every builder can insert it">
+              <EditorMenuRow label="Submit for review" hint="Goes live once another reviewer approves">
                 <StudioMenuBtn
-                  label="Publish to library"
+                  label="Submit for review"
                   primary
                   disabled={save.isPending || !publishable}
-                  onClick={() => save.mutate("published")}
+                  onClick={() => save.mutate("submit")}
                 >
                   ⇧
+                </StudioMenuBtn>
+              </EditorMenuRow>
+              <EditorMenuRow label="Publish now (admin)" hint="Skips review — logged in the audit trail">
+                <StudioMenuBtn
+                  label="Publish now without review"
+                  disabled={save.isPending || !publishable}
+                  onClick={() => {
+                    if (window.confirm("Publish without a second reviewer? This is logged.")) {
+                      save.mutate("publish");
+                    }
+                  }}
+                >
+                  ⚑
                 </StudioMenuBtn>
               </EditorMenuRow>
               <EditorMenuRow label="Export module slide" hint="Editable layers, native shapes">

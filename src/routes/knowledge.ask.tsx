@@ -1,3 +1,4 @@
+import { KnowledgeTabs } from "@/components/knowledge/KnowledgeTabs";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
@@ -154,6 +155,7 @@ function OracleAskView() {
 
   return (
     <AppShell>
+      <KnowledgeTabs />
       <div className="mx-auto max-w-3xl px-6 py-10">
         <div className="mb-6 flex items-center justify-between gap-4">
           <div>

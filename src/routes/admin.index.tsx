@@ -644,7 +644,7 @@ function OverviewView() {
               { href: "/admin/oracle", label: "Oracle KB", color: BRAND.aqua },
               { href: "/admin/brand-assets", label: "Brand Assets", color: BRAND.yellow },
               { href: "/admin/logohub", label: "LogoHub", color: BRAND.green },
-              { href: "/admin/approvals", label: "Approvals", color: BRAND.peach },
+              { href: "/approvals", label: "Approvals", color: BRAND.peach },
               { href: "/admin/audit", label: "Audit Log", color: BRAND.red },
               { href: "/admin/icon-studio", label: "Icon Studio", color: BRAND.blue },
             ].map((m) => (
