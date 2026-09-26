@@ -47,3 +47,13 @@ export function condenseObjective(raw: string, maxWords = 9): string {
   s = words.slice(0, maxWords).join(" ");
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+/** "Pitch for a mid-size retailer expanding…" → "Mid-size retailer". */
+export function inferProspectLabel(raw: string): string {
+  const m = raw.match(
+    /\b(?:for|with|to)\s+(?:a|an|the)\s+([a-z][\w-]*(?:\s+[a-z][\w-]*){0,3}?)(?=\s+(?:expanding|that|who|which|looking|moving|entering|launching|in|into|with|to|about)\b|[,.;]|$)/i,
+  );
+  if (!m) return "";
+  const s = m[1].trim();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
