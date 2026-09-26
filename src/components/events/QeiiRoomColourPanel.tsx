@@ -139,7 +139,7 @@ export function QeiiRoomColourPanel({
   return (
     <div className="mt-5 rounded-2xl border border-black/10 bg-white p-4">
       {/* Step 1 — pick up a colour. */}
-      <div className="rounded-xl border border-[#003FC7]/20 bg-[#EEF1F7] p-3.5">
+      <div className="rounded-xl border border-[#003FC7]/20 bg-muted p-3.5">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h4 className="text-[13px] font-semibold tracking-tight text-[#03002C]">
             1 · Pick a colour

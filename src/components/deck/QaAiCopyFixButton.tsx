@@ -47,7 +47,7 @@ export function QaAiCopyFixButton({ deckId }: { deckId: string }) {
           setBusy(false);
         }
       }}
-      className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-3.5 py-2 text-xs font-semibold uppercase tracking-widest text-white transition hover:bg-[#03002C] disabled:opacity-60"
+      className="inline-flex items-center gap-2 rounded-full bg-primary px-3.5 py-2 text-xs font-semibold uppercase tracking-widest text-primary-foreground transition hover:bg-[#03002C] disabled:opacity-60"
     >
       {busy ? (
         <Loader2 className="h-3.5 w-3.5 animate-spin" />

@@ -422,7 +422,7 @@ function NextVenuePage() {
 
           <div className="mt-4 overflow-x-auto border border-[#03002C]/12 bg-white/70">
             <table className="w-full min-w-[720px] text-left text-[13px]">
-              <thead className="bg-[#EEF1F7] text-[12px] uppercase tracking-wide text-[#03002C]/70">
+              <thead className="bg-muted text-[12px] uppercase tracking-wide text-[#03002C]/70">
                 <tr>
                   <th className="px-4 py-2.5 font-semibold">Panel</th>
                   <th className="px-4 py-2.5 font-semibold">Room</th>

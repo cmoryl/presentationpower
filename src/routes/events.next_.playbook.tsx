@@ -133,7 +133,7 @@ function PlaybookPage() {
         </Link>
 
         <div className="mt-3">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E0E8F5] px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
             <Layers size={12} /> Signage &amp; hardware playbook
           </div>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#03002C]">
@@ -163,7 +163,7 @@ function PlaybookPage() {
             >
               <div className="flex items-start justify-between gap-3">
                 <h3 className="text-[15px] font-semibold text-[#03002C]">{family.name}</h3>
-                <span className="shrink-0 rounded-full bg-[#F2F2F2] px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-black/60">
+                <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-black/60">
                   {panels.length} sign{panels.length === 1 ? "" : "s"}
                 </span>
               </div>
@@ -205,7 +205,7 @@ function PlaybookPage() {
                 ) : null}
               </dl>
 
-              <p className="mt-3 flex gap-2 rounded-lg bg-[#F2F2F2] p-2.5 text-[12px] leading-[1.45] text-black/70">
+              <p className="mt-3 flex gap-2 rounded-lg bg-muted p-2.5 text-[12px] leading-[1.45] text-black/70">
                 <Ruler size={13} className="mt-0.5 shrink-0 text-[#003FC7]" />
                 <span>{family.printNote}</span>
               </p>
@@ -311,7 +311,7 @@ function PlaybookPage() {
                   {decision.date}
                 </span>
                 {decision.appliesTo ? (
-                  <span className="ml-auto rounded-full bg-[#EEF1F7] px-2 py-0.5 text-[10px] text-[#03002C]">
+                  <span className="ml-auto rounded-full bg-muted px-2 py-0.5 text-[10px] text-[#03002C]">
                     {decision.appliesTo.replace(/\.$/, "")}
                   </span>
                 ) : null}
@@ -424,7 +424,7 @@ function PlaybookPage() {
         <div className="mt-10 flex flex-wrap gap-3">
           <Link
             to="/events/next/london"
-            className="rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-medium text-primary-foreground hover:bg-primary"
+            className="rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-medium text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
           >
             Open the London kit
           </Link>

@@ -167,7 +167,7 @@ function SocialModuleStudio() {
       <div className="mx-auto w-full max-w-[1400px] px-4 py-8 sm:px-6">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 sm:flex sm:justify-between">
           <div className="min-w-0">
-            <p className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7]/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#003FC7]">
+            <p className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#003FC7]">
               <LayoutTemplate size={12} /> Social · module studio
             </p>
             <h1 className="mt-3 text-3xl font-black tracking-tight text-[#03002C] sm:text-4xl">
@@ -194,7 +194,7 @@ function SocialModuleStudio() {
               <button
                 type="button"
                 onClick={() => setPickerOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#0033a3]"
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition hover:bg-[#0033a3]"
               >
                 <LayoutTemplate size={14} /> {layout ? "Swap module" : "Choose module"}
               </button>
@@ -222,7 +222,7 @@ function SocialModuleStudio() {
               </span>
             </div>
 
-            <div className="mt-5 flex min-h-[520px] items-center justify-center rounded-2xl bg-[#F2F2F2] p-6">
+            <div className="mt-5 flex min-h-[520px] items-center justify-center rounded-2xl bg-muted p-6">
               {section ? (
                 <SocialModuleFrame
                   format={format}

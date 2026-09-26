@@ -153,9 +153,9 @@ function EventHome() {
             {[entry.venue, entry.city, entry.dates].filter(Boolean).join(" · ")}
           </p>
           <div className="mt-3 flex items-center gap-3">
-            <div className="h-2 w-48 overflow-hidden rounded-full bg-[#03002C]/10">
+            <div className="h-2 w-48 overflow-hidden rounded-full bg-[#03002C]/10 dark:bg-card">
               <div
-                className="h-full bg-[#003FC7]"
+                className="h-full bg-primary"
                 style={{ width: `${progress.total ? (progress.ready / progress.total) * 100 : 0}%` }}
               />
             </div>

@@ -346,7 +346,7 @@ function MasterItemEditorPage() {
           </h1>
           <p className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-black/55">
             <span className="font-mono">{saved.id}</span>
-            <span className="rounded-full bg-[#E0E8F5] px-2 py-0.5 font-medium text-[#03002C]">
+            <span className="rounded-full bg-secondary px-2 py-0.5 font-medium text-[#03002C]">
               {printTypeMeta(saved.kind).label}
             </span>
             <span className="rounded-full bg-black/[0.06] px-2 py-0.5 font-medium text-black/60">
@@ -1055,7 +1055,7 @@ function MasterItemEditorPage() {
                       setJsonError(e instanceof Error ? e.message : "Invalid JSON");
                     }
                   }}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-[#03002C]"
                 >
                   Apply JSON
                 </button>

@@ -169,7 +169,7 @@ function UsersView() {
             type="button"
             onClick={() => inviteM.mutate({ email, role })}
             disabled={!email || inviteM.isPending}
-            className="rounded-lg bg-[#03002C] px-4 py-2 text-sm text-white disabled:opacity-50"
+            className="rounded-lg bg-[#03002C] px-4 py-2 text-sm text-white disabled:opacity-50 dark:bg-card"
           >
             {inviteM.isPending ? "Inviting…" : "Send invite"}
           </button>

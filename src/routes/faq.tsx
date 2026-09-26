@@ -1117,7 +1117,7 @@ function FAQPage() {
               className="rounded-2xl border border-black/10 bg-white/70 p-5 backdrop-blur"
             >
               <div className="flex items-center gap-3">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#003FC7] text-xs font-semibold text-white">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
                   {String(gi + 1).padStart(2, "0")}
                 </span>
                 <h3 className="text-base font-semibold text-black/90">{g.title}</h3>

@@ -181,7 +181,7 @@ function OverviewView() {
           <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
             <Link
               to="/brief/new"
-              className="rounded-full bg-[#03002C] px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-white transition hover:bg-[#03002C]/90"
+              className="rounded-full bg-[#03002C] px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-white transition hover:bg-[#03002C]/90 dark:bg-primary dark:text-primary-foreground"
             >
               + New brief
             </Link>
@@ -564,7 +564,7 @@ function OverviewView() {
       </section>
 
       {/* KNOWLEDGE ECOSYSTEM */}
-      <section className="rounded-3xl border border-black/10 bg-[#03002C] p-5 text-white sm:p-8">
+      <section className="rounded-3xl border border-black/10 bg-[#03002C] p-5 text-white sm:p-8 dark:bg-card">
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
             <div className="text-[10px] uppercase tracking-[0.3em] text-white/40">Section 04</div>

@@ -105,7 +105,7 @@ function PrintColorPage() {
       </section>
 
       {/* Preflight profile */}
-      <section className="mb-10 rounded-2xl border border-[#003FC7]/20 bg-[#003FC7]/[0.04] p-5">
+      <section className="mb-10 rounded-2xl border border-[#003FC7]/20 bg-primary/[0.04] p-5">
         <h2 className="text-sm font-semibold text-[#03002C]">
           Preflight profile — {profile.label}
         </h2>
@@ -266,7 +266,7 @@ function SlotCard({ slot }: { slot: PrintColorSlot }) {
 function Rule({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex gap-2 rounded-xl border border-black/10 bg-white p-3 text-xs leading-relaxed">
-      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#003FC7]" aria-hidden />
+      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
       <span>{children}</span>
     </li>
   );

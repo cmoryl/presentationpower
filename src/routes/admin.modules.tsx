@@ -238,7 +238,7 @@ function ModuleEditorPage() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-[11px] text-black/45">{m.id}</span>
-                    <span className="rounded-full bg-[#E0E8F5] px-2 py-0.5 text-[10px] font-medium text-[#03002C]">
+                    <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-[#03002C]">
                       {PRINT_MODULE_FAMILIES.find((f) => f.id === m.family)?.label ?? m.family}
                     </span>
                     {ov ? (
@@ -332,7 +332,7 @@ function ModuleEditorPage() {
                     <Link
                       to="/admin/modules/print/$moduleId"
                       params={{ moduleId: m.id }}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#E0E8F5] px-3 py-1.5 text-[11px] font-semibold text-primary transition hover:border-[#003FC7]"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-secondary px-3 py-1.5 text-[11px] font-semibold text-primary transition hover:border-[#003FC7]"
                     >
                       Open in studio editor →
                     </Link>
@@ -384,7 +384,7 @@ function ModuleEditorPage() {
                   >
                     Use in marketing materials →
                   </Link>
-                  <span className="rounded-full bg-[#E0E8F5] px-2 py-0.5 text-[10px] font-medium text-[#03002C]">
+                  <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-[#03002C]">
                     {MODULE_FAMILIES.find((f) => f.id === v.familyId)?.name ?? v.familyId}
                   </span>
                   {ov ? (
@@ -557,7 +557,7 @@ function PageTemplateAdminRow({ template }: { template: PrintPageTemplate }) {
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <span className="font-mono text-[11px] text-black/45">{template.id.slice(0, 8)}</span>
-          <span className="rounded-full bg-[#E0E8F5] px-2 py-0.5 text-[10px] font-medium text-[#03002C]">
+          <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-[#03002C]">
             {template.scope === "shared" ? "Shared" : "Private"}
           </span>
           <span className="text-[10px] text-black/45">{template.kind}</span>
@@ -589,7 +589,7 @@ function PageTemplateAdminRow({ template }: { template: PrintPageTemplate }) {
           type="button"
           onClick={() => save.mutate()}
           disabled={save.isPending}
-          className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+          className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40 dark:bg-card"
         >
           <Save size={12} /> {save.isPending ? "Saving…" : "Save"}
         </button>

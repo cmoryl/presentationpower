@@ -119,7 +119,7 @@ function BriefOutputHub() {
             {savedId ? <FetchSavedBriefButton savedId={savedId} /> : null}
             <Link
               to="/decks"
-              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white"
+              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white dark:bg-primary dark:text-primary-foreground"
             >
               Go to decks <ArrowRight size={15} strokeWidth={1.75} />
             </Link>
@@ -257,7 +257,7 @@ function BriefOutputHub() {
                 params={{ deckId }}
                 className="group block overflow-hidden rounded-2xl border border-black/[0.08] bg-white transition hover:border-[#003FC7]/40 hover:shadow-[0_12px_36px_rgba(3,0,44,0.10)]"
               >
-                <div className="aspect-[16/9] overflow-hidden bg-[#F2F2F2]">
+                <div className="aspect-[16/9] overflow-hidden bg-muted">
                   {cover && coverVariant && brand ? (
                     <ScaledSlide>
                       <VariantRenderer
@@ -457,7 +457,7 @@ function BriefOutputHub() {
           </div>
           <Link
             to="/brief/new"
-            className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-[13px] font-medium text-primary-foreground transition hover:bg-primary"
+            className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-[13px] font-medium text-primary-foreground transition hover:bg-primary dark:bg-primary dark:text-primary-foreground"
           >
             New brief <ArrowRight size={15} strokeWidth={1.75} />
           </Link>
@@ -485,7 +485,7 @@ function Section({
   return (
     <section id={id} className="mt-12 scroll-mt-24">
       <div className="mb-4 flex items-start gap-3">
-        <span className="mt-0.5 flex size-8 items-center justify-center rounded-xl bg-[#03002C]/[0.06] text-[#03002C]">
+        <span className="mt-0.5 flex size-8 items-center justify-center rounded-xl bg-[#03002C]/[0.06] text-[#03002C] dark:bg-card">
           <Icon size={16} strokeWidth={1.75} />
         </span>
         <div>
@@ -520,7 +520,7 @@ function ActionRow({
       params={{ deckId }}
       className="group flex items-start gap-3 rounded-2xl border border-black/[0.08] bg-white px-4 py-3.5 transition hover:border-[#003FC7]/40 hover:shadow-[0_8px_24px_rgba(3,0,44,0.07)]"
     >
-      <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#003FC7]/[0.08] text-[#003FC7]">
+      <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl bg-primary/[0.08] text-[#003FC7]">
         <Icon size={15} strokeWidth={1.75} />
       </span>
       <span className="min-w-0">

@@ -73,7 +73,7 @@ function NextPaletteShowcasePage() {
           <button
             type="button"
             onClick={generate}
-            className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white hover:opacity-90"
+            className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white hover:opacity-90 dark:bg-primary dark:text-primary-foreground"
           >
             <Palette size={14} />
             {existingId ? "Open the showcase deck" : "Generate & open in the editor"}

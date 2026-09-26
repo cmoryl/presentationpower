@@ -648,7 +648,7 @@ function BloomView() {
                 id="bloom-pack-button"
                 onClick={buildPack}
                 disabled={packBusy}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#03002C] px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#03002C] px-4 py-2 text-sm font-medium text-white disabled:opacity-60 dark:bg-primary dark:text-primary-foreground"
               >
                 <Package size={14} />
                 {packBusy
@@ -753,7 +753,7 @@ function BloomView() {
                     />
                   )}
                 </Scaled>
-                <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-[#03002C]/80 px-2.5 py-1 text-[11px] text-white opacity-0 transition group-hover:opacity-100">
+                <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-[#03002C]/80 px-2.5 py-1 text-[11px] text-white opacity-0 transition group-hover:opacity-100 dark:bg-card">
                   <Maximize2 size={11} /> Open & edit
                 </span>
               </button>
@@ -765,7 +765,7 @@ function BloomView() {
                 <span className="font-medium text-[#03002C]">{bloomHeadline(scene)}</span>
                 <span>{scene.shot}</span>
                 {saved(scene.id) ? (
-                  <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] font-medium text-[#003FC7]">
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-[#003FC7]">
                     Arranged for this size
                   </span>
                 ) : null}
@@ -778,7 +778,7 @@ function BloomView() {
       {zoomScene
         ? createPortal(
             <div
-              className="fixed inset-0 z-[100] flex flex-col bg-[#03002C]/92 p-4 backdrop-blur"
+              className="fixed inset-0 z-[100] flex flex-col bg-[#03002C]/92 p-4 backdrop-blur dark:bg-card"
               role="dialog"
               aria-modal="true"
               aria-label={`${bloomHeadline(zoomScene)} — full size`}

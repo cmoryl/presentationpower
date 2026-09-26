@@ -171,7 +171,7 @@ function AuroraBackground() {
 
 export function ModuleLibraryHero() {
   return (
-    <section className="full-bleed relative overflow-hidden bg-[#03002C] py-8 sm:py-10 lg:py-12">
+    <section className="full-bleed relative overflow-hidden bg-[#03002C] py-8 sm:py-10 lg:py-12 dark:bg-card">
       <AuroraBackground />
       <ParallaxWatermark text="MODULES" />
 

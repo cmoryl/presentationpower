@@ -131,7 +131,7 @@ export function AgentVisualPreview({
       ) : null}
 
       <div
-        className="relative w-full overflow-hidden rounded-xl border border-border/50 bg-[#03002C]"
+        className="relative w-full overflow-hidden rounded-xl border border-border/50 bg-[#03002C] dark:bg-card"
         style={{ aspectRatio: "16 / 9", minHeight: 180 }}
       >
         <SlideThumbnailContext.Provider value={true}>
@@ -177,7 +177,7 @@ export function AgentVisualPreview({
               type="button"
               disabled={busy}
               onClick={() => onSubmit("Looks good — save that visual to the deck as previewed.")}
-              className="rounded-lg bg-[#003FC7] px-3 py-1.5 text-[11px] font-semibold text-white transition disabled:opacity-40 hover:brightness-110"
+              className="rounded-lg bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground transition disabled:opacity-40 hover:brightness-110"
             >
               Save to deck
             </button>

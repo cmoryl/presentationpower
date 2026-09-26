@@ -223,7 +223,7 @@ function PrintLibraryCurator() {
                 },
               );
             }}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
           >
             <ArrowUpCircle size={12} /> Publish to library
           </button>
@@ -461,7 +461,7 @@ function PrintKnowledgeSyncCard() {
             type="button"
             onClick={() => sync.mutate(false)}
             disabled={sync.isPending}
-            className="rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white disabled:opacity-50"
+            className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground disabled:opacity-50"
           >
             {sync.isPending ? "Syncing…" : "Sync new & changed"}
           </button>

@@ -90,7 +90,7 @@ function BadgesPage() {
                 key={div.id}
                 className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4"
               >
-                <div className="flex justify-center gap-2 overflow-hidden rounded-xl bg-[#03002C] p-3">
+                <div className="flex justify-center gap-2 overflow-hidden rounded-xl bg-[#03002C] p-3 dark:bg-card">
                   {(["front", "back"] as const).map((side) => (
                     <CityBadge
                       key={side}

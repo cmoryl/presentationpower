@@ -914,7 +914,7 @@ export function KioskLiveThumb({ layout, height = 150 }: { layout: LiveLayout; h
     return () => { io.disconnect(); if (url) URL.revokeObjectURL(url); };
   }, [layout, rev]);
   return (
-    <div ref={ref} style={{ height, width: height * (KIOSK_W / KIOSK_H) }} className="shrink-0 overflow-hidden rounded bg-[#E0E8F5]">
+    <div ref={ref} style={{ height, width: height * (KIOSK_W / KIOSK_H) }} className="shrink-0 overflow-hidden rounded bg-secondary">
       {src ? <img src={src} alt="" className="h-full w-full object-contain" /> : null}
     </div>
   );

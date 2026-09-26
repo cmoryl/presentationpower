@@ -226,7 +226,7 @@ function KnowledgePage() {
         </div>
 
         <div className="mt-3">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E0E8F5] px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
             <Brain size={12} /> Event knowledge
           </div>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#03002C]">
@@ -303,7 +303,7 @@ function KnowledgePage() {
         ) : null}
 
         <form
-          className="mt-8 rounded-2xl border border-black/10 bg-[#EEF1F7] p-4"
+          className="mt-8 rounded-2xl border border-black/10 bg-muted p-4"
           onSubmit={(event) => {
             event.preventDefault();
             if (question.trim().length >= 3) search.mutate({ question, kind });

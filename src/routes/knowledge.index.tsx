@@ -105,7 +105,7 @@ function KnowledgeView() {
           </Link>
           <button
             onClick={() => navigate({ to: "/knowledge/new" as never })}
-            className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#03002C]/90"
+            className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#03002C]/90 dark:bg-card"
           >
             + New entry
           </button>

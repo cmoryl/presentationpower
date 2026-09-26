@@ -253,7 +253,7 @@ function AgentHero({
       <div className="relative px-6 sm:px-8">
         {/* Eyebrow */}
         <div className="flex flex-wrap items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/20 bg-[#003FC7]/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#003FC7] backdrop-blur">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/20 bg-primary/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#003FC7] backdrop-blur">
             <Sparkles size={12} className="text-[#003FC7]" />
             AI-powered deck builder
           </span>
@@ -328,7 +328,7 @@ function AgentHero({
                     key={b.label}
                     type="button"
                     onClick={() => onSeedBrief(b.text)}
-                    className="rounded-full border border-[#003FC7]/15 bg-[#003FC7]/5 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] transition hover:border-[#003FC7]/40 hover:bg-[#003FC7]/10"
+                    className="rounded-full border border-[#003FC7]/15 bg-primary/5 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] transition hover:border-[#003FC7]/40 hover:bg-[#003FC7]/10"
                   >
                     {b.label}
                   </button>

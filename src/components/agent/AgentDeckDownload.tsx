@@ -67,11 +67,11 @@ export function deckDownloadFromToolOutput(output: unknown): DeckDownload | null
 
 export function AgentDeckDownload({ download }: { download: DeckDownload }) {
   return (
-    <div className="rounded-xl border border-[#003FC7]/25 bg-[#003FC7]/[0.04] p-3">
+    <div className="rounded-xl border border-[#003FC7]/25 bg-primary/[0.04] p-3">
       <div className="flex items-start gap-3">
         <span
           aria-hidden
-          className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#003FC7] text-white"
+          className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground"
         >
           <FileDown className="h-4 w-4" />
         </span>

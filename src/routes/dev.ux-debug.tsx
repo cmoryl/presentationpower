@@ -124,7 +124,7 @@ function UxDebugReportPage() {
               uxRecorder.start();
               toast.success("Recording — walk through the flow, then stop from the dock");
             }}
-            className="rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:bg-[#003FC7]/90"
+            className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-[#003FC7]/90"
           >
             Start a new recording
           </button>
@@ -240,7 +240,7 @@ function UxDebugReportPage() {
             {showTimeline ? (
               <div className="mt-3 max-h-[420px] overflow-auto rounded-2xl border border-black/10 bg-white">
                 <table className="w-full text-left text-xs">
-                  <thead className="sticky top-0 bg-[#F2F2F2] text-black/55">
+                  <thead className="sticky top-0 bg-muted text-black/55">
                     <tr>
                       <th className="px-3 py-2 font-medium">Time</th>
                       <th className="px-3 py-2 font-medium">Kind</th>

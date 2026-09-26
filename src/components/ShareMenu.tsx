@@ -589,7 +589,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
                   type="button"
                   onClick={() => void onEnableShare(null)}
                   disabled={shareBusy}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#003FC7] px-3 py-2 text-xs font-medium text-white hover:opacity-90 disabled:opacity-60"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
                 >
                   {shareBusy ? <Loader2 size={12} className="animate-spin" /> : <Link2 size={12} />}
                   {shareBusy ? "Preparing…" : "Create view-only link"}

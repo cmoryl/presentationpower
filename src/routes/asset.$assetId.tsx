@@ -1614,8 +1614,8 @@ function AssetEditor() {
                   className="pointer-events-none absolute inset-x-3 z-30"
                   style={{ top: Math.max(4, canvasDrop.top - 1) }}
                 >
-                  <div className="h-0.5 rounded-full bg-[#003FC7] shadow-[0_0_0_3px_rgba(0,63,199,0.18)]" />
-                  <div className="absolute -top-2.5 left-2 rounded-md bg-[#003FC7] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-white shadow">
+                  <div className="h-0.5 rounded-full bg-primary shadow-[0_0_0_3px_rgba(0,63,199,0.18)]" />
+                  <div className="absolute -top-2.5 left-2 rounded-md bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary-foreground shadow">
                     Drop module here
                   </div>
                 </div>
@@ -1955,7 +1955,7 @@ function AssetEditor() {
                 <div
                   data-export-ignore="true"
                   data-testid="print-content-fit-badge"
-                  className="pointer-events-none absolute left-3 top-3 z-30 rounded-full border border-white/40 bg-[#03002C]/80 px-3 py-1 text-[10px] font-semibold tracking-wide text-white backdrop-blur"
+                  className="pointer-events-none absolute left-3 top-3 z-30 rounded-full border border-white/40 bg-[#03002C]/80 px-3 py-1 text-[10px] font-semibold tracking-wide text-white backdrop-blur dark:bg-card"
                 >
                   Content-fit: {describeFit(fitKnobs)}
                 </div>
@@ -2908,9 +2908,9 @@ function ModulesPanel({
         }
       >
         <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2">
-          <div className="relative h-[3px] rounded-full bg-[#003FC7] shadow-[0_0_0_3px_rgba(0,63,199,0.18)]">
-            <span className="absolute -left-1 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-[#003FC7]" />
-            <span className="absolute -right-1 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-[#003FC7]" />
+          <div className="relative h-[3px] rounded-full bg-primary shadow-[0_0_0_3px_rgba(0,63,199,0.18)]">
+            <span className="absolute -left-1 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-primary" />
+            <span className="absolute -right-1 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-primary" />
           </div>
         </div>
       </div>
@@ -3684,7 +3684,7 @@ function HeroMediaPanel({
         {applyingAll && (
           <div className="space-y-1">
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
-              <div className="h-full w-1/3 animate-pulse rounded-full bg-[#003FC7]" />
+              <div className="h-full w-1/3 animate-pulse rounded-full bg-primary" />
             </div>
             <div className="text-[10px] text-black/50 dark:text-white/50">
               Applying hero to relevant templates…
@@ -3776,7 +3776,7 @@ function HeroMediaPanel({
               <>
                 <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-black/60">
                   <span className="inline-flex items-center gap-1.5">
-                    <span className="inline-block h-2 w-2 rounded-full bg-[#003FC7]" />
+                    <span className="inline-block h-2 w-2 rounded-full bg-primary" />
                     Will update · <strong className="text-black">{preview.toUpdate.length}</strong>
                   </span>
                   <span className="inline-flex items-center gap-1.5">

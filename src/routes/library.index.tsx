@@ -918,7 +918,7 @@ function Library() {
 
             {activePreset && (
               <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[#003FC7]/25 bg-[#003FC7]/5 px-4 py-3 text-sm dark:border-white/15 dark:bg-white/5">
-                <span className="rounded-full bg-[#003FC7] px-2 py-0.5 text-[11px] font-semibold tracking-wide text-white uppercase">
+                <span className="rounded-full bg-primary px-2 py-0.5 text-[11px] font-semibold tracking-wide text-primary-foreground uppercase">
                   Preset view
                 </span>
                 <span className="font-semibold">{activePreset.title}</span>
@@ -1302,7 +1302,7 @@ function Library() {
             </div>
           </summary>
           <div className="border-t border-black/10 px-5 py-5 dark:border-white/10">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#003FC7]/20 bg-[#003FC7]/[0.04] px-3 py-2">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#003FC7]/20 bg-primary/[0.04] px-3 py-2">
               <p className="text-[12px] text-black/60 dark:text-white/60">
                 One master background directory — 28 core languages (S01–S28) + 30 industry systems
                 (R01–R30), 2,552 authored compositions.
@@ -1343,7 +1343,7 @@ function Library() {
         {filtered.length === 0 ? (
           <div className="mt-10 rounded-3xl border border-dashed border-black/15 bg-white/60 px-6 py-10 sm:px-10">
             <div className="mx-auto max-w-2xl text-center">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#03002C]/5 text-2xl">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#03002C]/5 text-2xl dark:bg-card">
                 ⌕
               </div>
               <h3 className="text-lg font-semibold text-[#03002C]">
@@ -1426,7 +1426,7 @@ function Library() {
                       className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm text-[#03002C] transition hover:border-[#003FC7]/50 hover:shadow-sm"
                     >
                       <span>{r.label}</span>
-                      <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-[#003FC7]">
+                      <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-[#003FC7]">
                         {r.count} result{r.count === 1 ? "" : "s"}
                       </span>
                     </button>
@@ -1492,7 +1492,7 @@ function Library() {
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="rounded-full bg-[#03002C] px-4 py-2 text-sm text-primary-foreground hover:bg-primary"
+                  className="rounded-full bg-[#03002C] px-4 py-2 text-sm text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
                 >
                   Clear all filters
                 </button>
@@ -1552,7 +1552,7 @@ function Library() {
         <div className="mt-10">
           <Link
             to="/brief/new"
-            className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm text-white"
+            className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm text-white dark:bg-primary dark:text-primary-foreground"
           >
             Start a brief →
           </Link>
@@ -1560,7 +1560,7 @@ function Library() {
 
         {selectMode && selected.length > 0 && (
           <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
-            <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-white/10 bg-[#03002C] px-4 py-2 text-sm text-white shadow-2xl">
+            <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-white/10 bg-[#03002C] px-4 py-2 text-sm text-white shadow-2xl dark:bg-card">
               <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium">
                 {selected.length} selected
               </span>
@@ -1921,7 +1921,7 @@ const VariantCard = memo(function VariantCard({
             {preset && (
               <div
                 data-ui-chrome=""
-                className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#003FC7]/85 text-white ring-1 ring-white/20 backdrop-blur"
+                className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-primary/85 text-white ring-1 ring-white/20 backdrop-blur"
               >
                 {preset.label}
               </div>
@@ -1960,7 +1960,7 @@ const VariantCard = memo(function VariantCard({
               </ScaledSlide>
 
               {/* Quick-action overlay */}
-              <div className="absolute inset-0 flex items-center justify-center gap-3 bg-[#03002C]/40 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
+              <div className="absolute inset-0 flex items-center justify-center gap-3 bg-[#03002C]/40 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100 dark:bg-card">
                 <span className="translate-y-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#03002C] shadow-lg transition-transform duration-300 group-hover:translate-y-0">
                   Preview
                 </span>
@@ -2001,7 +2001,7 @@ const VariantCard = memo(function VariantCard({
               {preset && (
                 <div
                   data-ui-chrome=""
-                  className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#003FC7]/85 text-white ring-1 ring-white/20 backdrop-blur"
+                  className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-primary/85 text-white ring-1 ring-white/20 backdrop-blur"
                 >
                   {preset.label}
                 </div>
@@ -2162,7 +2162,7 @@ const VariantCard = memo(function VariantCard({
             onImportExample();
           }}
           disabled={importBusy}
-          className="absolute inset-x-6 bottom-6 z-10 inline-flex items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition group-hover:opacity-100 hover:bg-[#003FC7] disabled:opacity-60"
+          className="absolute inset-x-6 bottom-6 z-10 inline-flex items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition group-hover:opacity-100 hover:bg-[#003FC7] disabled:opacity-60 dark:bg-card"
         >
           {importBusy ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
           {importBusy ? "Importing…" : "Import as starter deck"}
@@ -2215,7 +2215,7 @@ const VariantCard = memo(function VariantCard({
         <span
           data-variant-usage-badge=""
           data-ui-chrome=""
-          className="pointer-events-none absolute left-2 bottom-2 z-10 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#03002C]/80 text-white ring-1 ring-white/10 backdrop-blur"
+          className="pointer-events-none absolute left-2 bottom-2 z-10 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#03002C]/80 text-white ring-1 ring-white/10 backdrop-blur dark:bg-card"
           title={`Used in ${usageCount} of your slides`}
         >
           Used · {usageCount}
@@ -3058,7 +3058,7 @@ function VariantDetailModal({
   return (
     <>
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#03002C]/70 p-4 backdrop-blur-md sm:p-6"
+        className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#03002C]/70 p-4 backdrop-blur-md sm:p-6 dark:bg-card"
         onClick={onClose}
       >
         <div
@@ -3131,7 +3131,7 @@ function VariantDetailModal({
               <button
                 type="button"
                 onClick={() => setSaveOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white"
                 title="Save this variant + content as a reusable module"
               >
                 <Star size={12} /> Save
@@ -3140,7 +3140,7 @@ function VariantDetailModal({
               {/* Unified Export control — the primary button downloads the
                   current choice (format + theme); the caret opens the chooser. */}
 
-              <div className="relative inline-flex items-stretch rounded-full border border-[#03002C] bg-[#03002C] text-xs font-medium text-white shadow-sm">
+              <div className="relative inline-flex items-stretch rounded-full border border-[#03002C] bg-[#03002C] text-xs font-medium text-white shadow-sm dark:bg-card">
                 <button
                   type="button"
                   onClick={() => void runExport()}
@@ -3345,7 +3345,7 @@ function VariantDetailModal({
                           type="button"
                           onClick={() => void runExport()}
                           disabled={exportBusy || previewBusy}
-                          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#03002C] px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#003FC7] disabled:opacity-60"
+                          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#03002C] px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#003FC7] disabled:opacity-60 dark:bg-card"
                         >
                           {exportBusy ? (
                             <Loader2 size={14} className="animate-spin" />
@@ -3484,7 +3484,7 @@ function VariantDetailModal({
 
               {usageCount > 0 && (
                 <span
-                  className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white"
+                  className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white dark:bg-card"
                   title={`Used in ${usageCount} of your slides`}
                 >
                   Used · {usageCount}
@@ -3580,7 +3580,7 @@ function VariantDetailModal({
                   <button
                     type="button"
                     onClick={() => setStudioOpen(true)}
-                    className="w-full rounded-xl border border-[#003FC7]/30 bg-[#003FC7] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0034a6]"
+                    className="w-full rounded-xl border border-[#003FC7]/30 bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-[#0034a6]"
                   >
                     ⤢ Open slide studio — full live editor
                   </button>
@@ -3735,7 +3735,7 @@ function VariantDetailModal({
       />
       {previewUrls && (
         <div
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-[#03002C]/85 p-6 backdrop-blur-md"
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-[#03002C]/85 p-6 backdrop-blur-md dark:bg-card"
           onClick={closePdfPreview}
         >
           <div
@@ -3767,7 +3767,7 @@ function VariantDetailModal({
                 <button
                   type="button"
                   onClick={() => downloadPreviewBlob("dark")}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#0050ff]"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-[#0050ff]"
                   title={previewUrls.filenameDark}
                 >
                   <Download size={12} /> Download Dark ({previewUrls.ratio === 3840 ? "4K" : "HD"})
@@ -3805,14 +3805,14 @@ function VariantDetailModal({
                   />
                 </div>
               </div>
-              <div className="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#03002C]">
+              <div className="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#03002C] dark:bg-card">
                 <div className="flex items-center justify-between border-b border-white/10 px-3 py-2 text-xs font-medium text-white/70">
                   <span>☾ Dark</span>
                   <span className="font-mono text-[10px] text-white/40">
                     {previewUrls.filenameDark}
                   </span>
                 </div>
-                <div className="flex flex-1 items-center justify-center overflow-auto bg-[#03002C] p-3">
+                <div className="flex flex-1 items-center justify-center overflow-auto bg-[#03002C] p-3 dark:bg-card">
                   <img
                     src={previewUrls.darkImg}
                     alt="Dark PDF page proof"
@@ -4140,7 +4140,7 @@ function LightboxPortal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[9999] flex flex-col bg-[#03002C]/95 backdrop-blur-xl animate-in fade-in duration-200"
+      className="fixed inset-0 z-[9999] flex flex-col bg-[#03002C]/95 backdrop-blur-xl animate-in fade-in duration-200 dark:bg-card"
       role="dialog"
       aria-modal="true"
       aria-label="Enlarged slide preview"
@@ -4517,7 +4517,7 @@ function AddToDeckPanel({
                 type="button"
                 disabled={busy !== null}
                 onClick={() => addTo(d.id, true)}
-                className="rounded-full bg-[#03002C] px-2.5 py-1 text-[11px] font-medium text-white hover:opacity-90 disabled:opacity-50"
+                className="rounded-full bg-[#03002C] px-2.5 py-1 text-[11px] font-medium text-white hover:opacity-90 disabled:opacity-50 dark:bg-card"
               >
                 Add & open
               </button>
@@ -4586,7 +4586,7 @@ function ModulePresetKitsBlock() {
                   </div>
                   <div className="mt-1 text-lg font-semibold text-[#03002C]">{kit.title}</div>
                 </div>
-                <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-2.5 py-0.5 text-xs font-medium text-[#003FC7]">
+                <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-[#003FC7]">
                   {kit.payload.slides.length} slides
                 </span>
               </div>
@@ -4612,7 +4612,7 @@ function ModulePresetKitsBlock() {
                 type="button"
                 onClick={() => importKit(kit)}
                 disabled={busy !== null}
-                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60 dark:bg-card"
               >
                 {busy === kit.key ? (
                   <Loader2 size={14} className="animate-spin" />
@@ -4710,7 +4710,7 @@ function UserImportedKitsBlock() {
                   </div>
                   <div className="mt-1 text-lg font-semibold text-[#03002C]">{deck.title}</div>
                 </div>
-                <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-2.5 py-0.5 text-xs font-medium text-[#003FC7]">
+                <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-[#003FC7]">
                   {deck.slides.length} slides
                 </span>
               </div>
@@ -4736,7 +4736,7 @@ function UserImportedKitsBlock() {
                   type="button"
                   onClick={() => importAsKit(deck)}
                   disabled={busy !== null}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60 dark:bg-card"
                 >
                   {busy === deck.id ? (
                     <Loader2 size={14} className="animate-spin" />

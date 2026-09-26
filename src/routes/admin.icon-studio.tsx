@@ -735,7 +735,7 @@ function SearchTab() {
           <button
             onClick={runSearch}
             disabled={busy || !query.trim()}
-            className="rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary disabled:opacity-50"
+            className="rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary disabled:opacity-50 dark:bg-primary dark:text-primary-foreground"
           >
             {busy ? "Searching…" : "Search"}
           </button>

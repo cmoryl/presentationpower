@@ -108,7 +108,7 @@ function StyleLearningView() {
           type="button"
           onClick={() => scanM.mutate()}
           disabled={scanM.isPending}
-          className="rounded-lg bg-[#003FC7] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
+          className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"
         >
           {scanM.isPending ? "Scanning…" : "Scan usage for candidates"}
         </button>

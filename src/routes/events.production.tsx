@@ -204,7 +204,7 @@ function EventProductionPage() {
     <AppShell>
       <div className="mx-auto w-full max-w-6xl space-y-8 px-4 py-10 sm:px-6">
         <header>
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7]/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">
             <Ruler size={12} /> Venue production
           </div>
           <h1 className="mt-3 break-words text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
@@ -266,7 +266,7 @@ function EventProductionPage() {
             <button
               type="button"
               onClick={() => parse(sheet)}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#003FC7] px-5 text-xs font-semibold text-white hover:bg-[#0033a3]"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 text-xs font-semibold text-primary-foreground hover:bg-[#0033a3]"
             >
               <Wand2 size={14} /> Read specs
             </button>
@@ -408,7 +408,7 @@ function EventProductionPage() {
                 type="button"
                 onClick={() => void deliver()}
                 disabled={busy}
-                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#03002C] px-5 text-xs font-semibold text-white hover:bg-[#03002C]/90 disabled:opacity-50"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#03002C] px-5 text-xs font-semibold text-white hover:bg-[#03002C]/90 disabled:opacity-50 dark:bg-card"
               >
                 {busy ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
                 {busy

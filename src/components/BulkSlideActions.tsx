@@ -57,7 +57,7 @@ export const BulkSlideActions = forwardRef<
           onClear();
         }
       }}
-      className="outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/40 sticky top-2 z-20 space-y-2 rounded-2xl border border-[#003FC7]/25 bg-[#003FC7]/[0.04] p-2.5 text-[11px] shadow-sm"
+      className="outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/40 sticky top-2 z-20 space-y-2 rounded-2xl border border-[#003FC7]/25 bg-primary/[0.04] p-2.5 text-[11px] shadow-sm"
     >
       <div className="flex items-center justify-between">
         <span aria-live="polite" aria-atomic="true" className="font-semibold text-[#003FC7]">

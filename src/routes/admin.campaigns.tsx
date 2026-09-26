@@ -141,7 +141,7 @@ function CampaignsView() {
           </div>
           <Link
             to={favorites.size === 0 ? "/library" : "/social/kit"}
-            className="rounded-full bg-[#03002C] px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary"
+            className="rounded-full bg-[#03002C] px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
           >
             {favorites.size === 0 ? "Browse library →" : "Choose from favorites →"}
           </Link>
@@ -249,7 +249,7 @@ function CampaignsView() {
 
             console.log("buildCampaignAssets sample →", assets.slice(0, 4))
           }
-          className="mt-4 rounded-full bg-[#003FC7] px-4 py-2 text-[11px] uppercase tracking-widest text-white hover:bg-[#03002C]"
+          className="mt-4 rounded-full bg-primary px-4 py-2 text-[11px] uppercase tracking-widest text-primary-foreground hover:bg-[#03002C]"
         >
           Create campaign from KPI-DASHBOARD slide (log)
         </button>

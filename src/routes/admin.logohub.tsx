@@ -322,7 +322,7 @@ function LogoHubAdmin() {
           <button
             onClick={() => void handleSubmit()}
             disabled={busy !== null}
-            className="rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+            className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-50"
           >
             {busy ? "Uploading…" : "Add client logo"}
           </button>

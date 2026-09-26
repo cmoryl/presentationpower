@@ -607,7 +607,7 @@ function DeckSlides({
             onClick={() => buildEditableDeck(false)}
             disabled={building || deck.slides.length === 0}
             title="Map every slide onto the closest module variant and open it as an editable deck"
-            className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-[#003FC7] px-3 py-1.5 text-xs text-white hover:opacity-90 disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-primary px-3 py-1.5 text-xs text-primary-foreground hover:opacity-90 disabled:opacity-60"
           >
             {building ? <Loader2 size={12} className="animate-spin" /> : <PencilRuler size={12} />}
             {building ? "Building…" : "Build editable deck"}

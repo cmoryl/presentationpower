@@ -320,7 +320,7 @@ function HeroCard({
         {m.bestFor.map((k) => (
           <span
             key={k}
-            className="rounded-full bg-[#E0E8F5] px-2 py-0.5 text-[10px] font-medium text-[#03002C]"
+            className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-[#03002C]"
           >
             {printTypeMeta(k).label}
           </span>

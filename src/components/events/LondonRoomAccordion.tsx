@@ -59,7 +59,7 @@ export function LondonRoomAccordion({ plan, panels, onSelectAsset, selectedId }:
                 />
                 <span className="truncate font-medium">{z.label}</span>
                 {mine.length + zoneBuilds.length ? (
-                  <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-1.5 py-px font-mono text-[10px] text-[#003FC7]">
+                  <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-px font-mono text-[10px] text-[#003FC7]">
                     {mine.length + zoneBuilds.length}
                   </span>
                 ) : null}

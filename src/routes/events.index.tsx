@@ -128,7 +128,7 @@ function EventsView() {
             <div className="flex flex-wrap gap-3 pt-2">
               <a
                 href="#playbooks"
-                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary"
+                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
               >
                 <Sparkles size={14} /> Explore playbooks ↓
               </a>
@@ -285,7 +285,7 @@ function EventsView() {
             ].map((step) => (
               <li key={step.label} className="rounded-2xl border border-black/10 bg-white/85 p-5">
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#003FC7]/10 text-[#003FC7]">
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-[#003FC7]">
                     <step.icon size={14} />
                   </span>
                   <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
@@ -320,7 +320,7 @@ function EventsView() {
                 className="flex flex-col gap-3 rounded-2xl border border-black/10 bg-white/85 p-5"
               >
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#03002C]/5 text-[#03002C]">
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#03002C]/5 text-[#03002C] dark:bg-card">
                     <Icon size={14} />
                   </span>
                   <div className="text-sm font-semibold text-[#03002C]">{key}</div>

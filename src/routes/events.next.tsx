@@ -127,14 +127,14 @@ function Hero({ division }: { division: NextDivision }) {
     el?.focus({ preventScroll: true });
   };
   return (
-    <section className="full-bleed relative -mt-8 overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:-mt-12 sm:py-16 lg:py-20">
+    <section className="full-bleed relative -mt-8 overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:-mt-12 sm:py-16 lg:py-20 dark:bg-card">
       <NextAurora division={division} />
       <NextWatermark accent={division.accent} />
       {/* Scrim keeps metadata text at AA over the aurora gradients. */}
-      <div aria-hidden className="absolute inset-0 bg-[#03002C]/45" />
+      <div aria-hidden className="absolute inset-0 bg-[#03002C]/45 dark:bg-card" />
 
       <div className="relative">
-        <span className="inline-flex items-center gap-1.5 rounded-md border border-white/20 bg-[#03002C]/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/85">
+        <span className="inline-flex items-center gap-1.5 rounded-md border border-white/20 bg-[#03002C]/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/85 dark:bg-card">
           <Sparkles size={12} /> {NEXT_EVENT.subBrandLine}
         </span>
 

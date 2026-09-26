@@ -170,7 +170,7 @@ function CityBadgePage() {
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
           {/* Live plate */}
           <div>
-            <div className="rounded-2xl border border-black/10 bg-[#F2F2F2] p-5">
+            <div className="rounded-2xl border border-black/10 bg-muted p-5">
               <div className="flex flex-wrap items-start justify-center gap-5">
                 <div>
                   <div className="overflow-hidden rounded-xl shadow-lg">
@@ -248,7 +248,7 @@ function CityBadgePage() {
                           : "border-black/10 hover:border-black/25"
                       }`}
                     >
-                      <span className="flex h-9 w-14 shrink-0 items-center justify-center rounded bg-[#03002C] p-1">
+                      <span className="flex h-9 w-14 shrink-0 items-center justify-center rounded bg-[#03002C] p-1 dark:bg-card">
                         <img
                           src={div.whiteUrl || div.colorUrl}
                           alt={div.name}
@@ -317,7 +317,7 @@ function CityBadgePage() {
                   type="button"
                   disabled={busy}
                   onClick={() => runExport(versionName, config)}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#03002C] disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-[#03002C] disabled:opacity-50"
                 >
                   <Download size={15} /> Export PDF + .ai + proof
                 </button>

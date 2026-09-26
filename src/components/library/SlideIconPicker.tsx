@@ -90,7 +90,7 @@ export function SlideIconPicker({
 
   return (
     <div
-      className="fixed inset-0 z-[120] flex items-center justify-center bg-[#03002C]/80 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[120] flex items-center justify-center bg-[#03002C]/80 p-4 backdrop-blur-sm dark:bg-card"
       role="dialog"
       aria-modal="true"
       aria-label={title}
@@ -143,7 +143,7 @@ export function SlideIconPicker({
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search icons…"
-            className="w-full rounded-lg border border-white/15 bg-[#03002C]/70 px-3 py-2 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
+            className="w-full rounded-lg border border-white/15 bg-[#03002C]/70 px-3 py-2 text-xs text-white focus:border-[#A1FBF9] focus:outline-none dark:bg-card"
           />
           <div className="flex flex-wrap gap-1.5">
             {["all", ...ICON_GROUPS].map((g) => (

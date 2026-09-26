@@ -302,7 +302,7 @@ function ImageryView() {
                     <div
                       key={d.date}
                       title={`${d.date} · ${d.count} events`}
-                      className="min-w-[4px] flex-1 rounded-t bg-[#003FC7]/70"
+                      className="min-w-[4px] flex-1 rounded-t bg-primary/70"
                       style={{ height: `${Math.max(6, (d.count / maxDay) * 100)}%` }}
                     />
                   ))}
@@ -340,7 +340,7 @@ function ImageryView() {
                       </div>
                       <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-black/[0.06]">
                         <div
-                          className="h-full rounded-full bg-[#003FC7]/70"
+                          className="h-full rounded-full bg-primary/70"
                           style={{ width: `${(b.total / brandMax) * 100}%` }}
                         />
                       </div>

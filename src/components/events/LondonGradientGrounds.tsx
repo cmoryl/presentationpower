@@ -55,7 +55,7 @@ function GroundCard({ info, onOpen }: { info: LondonGroundInfo; onOpen: () => vo
             />
           ))}
           {info.accent ? (
-            <span className="ml-1 rounded-full bg-[#03002C]/5 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#03002C]/70">
+            <span className="ml-1 rounded-full bg-[#03002C]/5 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#03002C]/70 dark:bg-card">
               {info.accent.hex}
             </span>
           ) : null}
@@ -94,7 +94,7 @@ function GroundDetail({ info, onClose }: { info: LondonGroundInfo; onClose: () =
   const hexList = info.colors.map((c) => c.hex).join(", ");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#03002C]/60 p-4 sm:p-8">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#03002C]/60 p-4 sm:p-8 dark:bg-card">
       <div
         ref={ref}
         role="dialog"
@@ -211,7 +211,7 @@ function GroundDetail({ info, onClose }: { info: LondonGroundInfo; onClose: () =
         ) : null}
 
         <h4 className="mt-5 text-sm font-semibold text-[#03002C]">Gradient definition</h4>
-        <pre className="mt-1 overflow-x-auto rounded-xl bg-[#03002C]/[0.04] p-3 font-mono text-[11.5px] text-[#03002C]">
+        <pre className="mt-1 overflow-x-auto rounded-xl bg-[#03002C]/[0.04] p-3 font-mono text-[11.5px] text-[#03002C] dark:bg-card">
           {info.css}
           {"\n"}SVG axis (objectBoundingBox): x1={info.axis.x1} y1={info.axis.y1} x2={info.axis.x2}{" "}
           y2=

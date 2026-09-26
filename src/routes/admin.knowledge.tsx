@@ -517,7 +517,7 @@ function IntelTab({ slug }: { slug: string }) {
             {tone.map((v) => (
               <span
                 key={"t" + v}
-                className="rounded-full bg-[#003FC7]/10 px-3 py-1 text-xs text-[#003FC7]"
+                className="rounded-full bg-primary/10 px-3 py-1 text-xs text-[#003FC7]"
               >
                 {v}
               </span>
@@ -861,7 +861,7 @@ function ImportedDecksTab({ slug }: { slug: string }) {
           Upload a .pptx to store it against <span className="font-medium">{slug}</span>. We extract
           slide text, notes, and theme colors — pixel-perfect visual thumbnails are a later layer.
         </p>
-        <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#003FC7] bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:opacity-90">
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#003FC7] bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90">
           {uploading ? "Uploading…" : "Choose .pptx"}
           <input
             type="file"
@@ -976,7 +976,7 @@ function ImportedDecksTab({ slug }: { slug: string }) {
           </div>
         )}
         {sendMsg && (
-          <div className="mt-3 rounded-lg bg-[#003FC7]/10 px-3 py-2 text-xs text-[#003FC7]">
+          <div className="mt-3 rounded-lg bg-primary/10 px-3 py-2 text-xs text-[#003FC7]">
             {sendMsg}
           </div>
         )}
@@ -1351,7 +1351,7 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
             className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs outline-none focus:border-black/40"
           />
         </div>
-        <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#003FC7] bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:opacity-90">
+        <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#003FC7] bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90">
           {busy ? "Uploading…" : "Choose images"}
           <input
             ref={fileRef}
@@ -1388,7 +1388,7 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
                     className="h-full w-full object-cover"
                     loading="lazy"
                   />
-                  <span className="absolute left-2 top-2 rounded-full bg-[#003FC7] px-2 py-0.5 text-[9px] uppercase tracking-widest text-white">
+                  <span className="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-[9px] uppercase tracking-widest text-primary-foreground">
                     Built-in
                   </span>
                   <span className="absolute right-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-[9px] uppercase tracking-widest text-white">

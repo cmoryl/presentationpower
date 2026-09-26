@@ -131,7 +131,7 @@ export function VariantSampleEditor({
   }
 
   return (
-    <div className="rounded-xl border border-[#003FC7]/25 bg-[#003FC7]/[0.04] p-4">
+    <div className="rounded-xl border border-[#003FC7]/25 bg-primary/[0.04] p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">

@@ -60,7 +60,7 @@ function DemoVideo({ id, name }: { id: string; name: string }) {
   const [started, setStarted] = useState(false);
   const ref = useRef<HTMLVideoElement>(null);
   return (
-    <div className="relative mb-5 aspect-video w-full overflow-hidden rounded-xl border border-black/10 bg-[#EEF1F7] dark:border-white/15">
+    <div className="relative mb-5 aspect-video w-full overflow-hidden rounded-xl border border-black/10 bg-muted dark:border-white/15">
       <video
         ref={ref}
         className="h-full w-full object-cover object-top"
@@ -81,7 +81,7 @@ function DemoVideo({ id, name }: { id: string; name: string }) {
           aria-label={`Play demo: ${name}`}
           className="group absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#003FC7]"
         >
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#03002C] text-white shadow-lg transition-transform group-hover:scale-105 motion-reduce:transition-none">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#03002C] text-white shadow-lg transition-transform group-hover:scale-105 motion-reduce:transition-none dark:bg-card">
             <Play className="ml-1 h-7 w-7 fill-current" />
           </span>
         </button>
@@ -120,7 +120,7 @@ function RunCard({ run }: { run: DemoRun }) {
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <Link
           to={DEMO_OPENER.to}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-[#03002C] px-3.5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-[#03002C] px-3.5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
         >
           Start with the live build
           <ArrowRight className="h-4 w-4" />
@@ -212,7 +212,7 @@ function DemosPage() {
           </p>
         </header>
 
-        <div className="mt-8 rounded-2xl bg-[#03002C] p-6 text-white">
+        <div className="mt-8 rounded-2xl bg-[#03002C] p-6 text-white dark:bg-card">
           <p className="text-[11px] font-semibold tracking-[0.18em] text-[#A1FBF9] uppercase">
             Always open here
           </p>

@@ -318,7 +318,7 @@ export function AgentDeckPreview({
         <div
           role="status"
           aria-live="polite"
-          className="border-b border-[#003FC7]/25 bg-[#003FC7]/[0.06] px-4 py-3"
+          className="border-b border-[#003FC7]/25 bg-primary/[0.06] px-4 py-3"
         >
           <div className="flex items-center justify-between gap-3">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-[#003FC7]">
@@ -326,7 +326,7 @@ export function AgentDeckPreview({
             </p>
             <span className="flex items-center gap-1.5 text-[10px] font-medium text-foreground/50">
               <span
-                className="inline-block h-2 w-2 animate-pulse rounded-full bg-[#003FC7]"
+                className="inline-block h-2 w-2 animate-pulse rounded-full bg-primary"
                 aria-hidden="true"
               />
               {buildState.currentLabel ? `Now: ${buildState.currentLabel}` : "Finishing up…"}
@@ -341,7 +341,7 @@ export function AgentDeckPreview({
             aria-label="Deck build progress"
           >
             <div
-              className="h-full rounded-full bg-[#003FC7] transition-all duration-500 ease-out"
+              className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
               style={{ width: `${Math.round((buildState.done / buildState.total) * 100)}%` }}
             />
           </div>
@@ -355,7 +355,7 @@ export function AgentDeckPreview({
                   {state === "done" ? (
                     <span
                       aria-hidden="true"
-                      className="flex h-4 w-4 items-center justify-center rounded-full bg-[#003FC7] text-[9px] font-bold text-white"
+                      className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground"
                     >
                       ✓
                     </span>
@@ -510,10 +510,10 @@ export function AgentDeckPreview({
                   className="overflow-hidden rounded-lg border border-dashed border-[#003FC7]/30"
                 >
                   <div
-                    className="flex w-full animate-pulse flex-col items-center justify-center gap-1.5 bg-[#003FC7]/[0.05]"
+                    className="flex w-full animate-pulse flex-col items-center justify-center gap-1.5 bg-primary/[0.05]"
                     style={{ aspectRatio: "16 / 9", minHeight: 60 }}
                   >
-                    <span className="h-2 w-2 animate-ping rounded-full bg-[#003FC7]/60" />
+                    <span className="h-2 w-2 animate-ping rounded-full bg-primary/60" />
                     <span className="text-[9px] font-semibold uppercase tracking-widest text-[#003FC7]/60">
                       Slide {slides.length + k + 1}
                     </span>

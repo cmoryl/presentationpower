@@ -215,7 +215,7 @@ function SpotlightPreview() {
                 type="button"
                 onClick={() => exportPdf("dark")}
                 disabled={busy !== null}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]/85 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]/85 disabled:opacity-50 dark:bg-card"
               >
                 <FileDown size={12} />
                 {busy === "dark" ? "Rendering…" : "Export Dark PDF · 300 DPI"}

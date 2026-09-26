@@ -125,7 +125,7 @@ function QrDownloadsView() {
                         <div className="font-medium text-[#03002C]">{k.label}</div>
                         <div className="mt-1 h-1.5 w-full max-w-[260px] rounded-full bg-black/5">
                           <div
-                            className="h-1.5 rounded-full bg-[#003FC7]"
+                            className="h-1.5 rounded-full bg-primary"
                             style={{ width: `${(k.total / max) * 100}%` }}
                           />
                         </div>

@@ -358,7 +358,7 @@ export function CanvasStage({
               {selected && !it.locked && (
                 <div
                   role="presentation"
-                  className="absolute cursor-nwse-resize rounded-full border-2 border-white bg-[#003FC7] shadow"
+                  className="absolute cursor-nwse-resize rounded-full border-2 border-white bg-primary shadow"
                   style={{
                     width: 20 / scale,
                     height: 20 / scale,
@@ -392,7 +392,7 @@ export function CanvasStage({
       {marquee && (
         <div
           aria-hidden
-          className="pointer-events-none absolute border-2 border-[#003FC7] bg-[#003FC7]/10"
+          className="pointer-events-none absolute border-2 border-[#003FC7] bg-primary/10"
           style={{
             left: `${(Math.min(marquee.x0, marquee.x1) / STAGE_W) * 100}%`,
             top: `${(Math.min(marquee.y0, marquee.y1) / STAGE_H) * 100}%`,

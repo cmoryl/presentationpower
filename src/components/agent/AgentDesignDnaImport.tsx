@@ -114,7 +114,7 @@ export function AgentDesignDnaImport({
             type="button"
             disabled={text.trim().length < 8}
             onClick={() => apply(text)}
-            className="rounded-lg bg-[#003FC7] px-3 py-1.5 text-[11px] font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+            className="rounded-lg bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground transition hover:brightness-110 disabled:opacity-40"
           >
             Use this design DNA
           </button>

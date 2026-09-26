@@ -65,7 +65,7 @@ function SocialSweepHarness() {
   );
 
   return (
-    <main className="min-h-screen bg-[#F2F2F2] p-6">
+    <main className="min-h-screen bg-muted p-6">
       <h1 className="text-sm font-semibold uppercase tracking-widest text-[#03002C]">
         Shape sweep · {format.label} · {layouts.length} modules
       </h1>

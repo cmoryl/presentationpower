@@ -99,7 +99,7 @@ export function BackgroundLightbox({
       aria-modal="true"
       aria-label={`Background preview — ${title} · ${shot.scene} · take ${shot.take + 1}`}
       onClick={onClose}
-      className="fixed inset-0 z-[130] flex items-center justify-center bg-[#03002C]/88 p-4 backdrop-blur-sm sm:p-8"
+      className="fixed inset-0 z-[130] flex items-center justify-center bg-[#03002C]/88 p-4 backdrop-blur-sm sm:p-8 dark:bg-card"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -157,7 +157,7 @@ export function BackgroundLightbox({
                 disabled={busy !== null}
                 onClick={() => void download(s)}
                 title={s.hint}
-                className="inline-flex min-h-8 items-center rounded-full bg-[#003FC7] px-3 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#0033A3] disabled:opacity-50"
+                className="inline-flex min-h-8 items-center rounded-full bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground transition hover:bg-[#0033A3] disabled:opacity-50"
               >
                 {busy === s.id ? "Rendering…" : s.label}
               </button>
@@ -259,7 +259,7 @@ export function BackgroundZoom({
         {children}
         <span
           aria-hidden
-          className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-[#03002C]/70 px-1.5 py-0.5 text-[9px] font-semibold text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100"
+          className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-[#03002C]/70 px-1.5 py-0.5 text-[9px] font-semibold text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100 dark:bg-card"
         >
           ⤢ Enlarge
         </span>

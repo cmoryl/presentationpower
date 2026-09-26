@@ -226,7 +226,7 @@ export function LondonLiveFileBulkUpload({
         <>
           <div className="mt-4 overflow-hidden rounded-xl border border-black/10">
             <table className="w-full text-left text-[12px]">
-              <thead className="bg-[#F2F2F2] font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#03002C]/60">
+              <thead className="bg-muted font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#03002C]/60">
                 <tr>
                   <th className="px-3 py-2">Your file</th>
                   <th className="px-3 py-2">Goes on this sign</th>
@@ -288,7 +288,7 @@ export function LondonLiveFileBulkUpload({
               type="button"
               disabled={busy || ready.length === 0}
               onClick={() => void run()}
-              className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-45"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-45"
             >
               <Upload className="h-3.5 w-3.5" />
               {busy

@@ -49,14 +49,14 @@ export function EventHubCards() {
               : { to: "/events/$eventId" as const, params: { eventId: c.id } })}
           className={cardCls}
         >
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#03002C]/10 text-[#03002C]">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#03002C]/10 text-[#03002C] dark:bg-card">
             <Map size={16} />
           </span>
           <div className="mt-4 text-lg font-semibold text-[#03002C]">{c.name}</div>
           <p className="mt-1 flex-1 text-sm text-[#03002C]/70">{c.line}</p>
           <div className="mt-4">
-            <div className="h-1.5 overflow-hidden rounded-full bg-[#03002C]/10">
-              <div className="h-full bg-[#003FC7]" style={{ width: `${c.total ? (c.ready / c.total) * 100 : 0}%` }} />
+            <div className="h-1.5 overflow-hidden rounded-full bg-[#03002C]/10 dark:bg-card">
+              <div className="h-full bg-primary" style={{ width: `${c.total ? (c.ready / c.total) * 100 : 0}%` }} />
             </div>
             <div className="mt-2 flex items-center justify-between text-[11px] text-[#03002C]/65">
               <span>
@@ -70,7 +70,7 @@ export function EventHubCards() {
         </Link>
       ))}
       <Link to="/events/next/start" className={`${cardCls} border-dashed border-[#03002C]/25`}>
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#003FC7]/10 text-[#003FC7]">
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-[#003FC7]">
           <Plus size={16} />
         </span>
         <div className="mt-4 text-lg font-semibold text-[#03002C]">Start a new event</div>

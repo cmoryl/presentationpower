@@ -1216,7 +1216,7 @@ function DeckEditor() {
                               {(commentCounts.get(i) ?? 0) > 0 && (
                                 <span
                                   title={`${commentCounts.get(i)} open comment${commentCounts.get(i) === 1 ? "" : "s"}`}
-                                  className="inline-flex items-center gap-0.5 rounded-full bg-[#003FC7]/10 px-1.5 text-[10px] font-medium text-[#003FC7]"
+                                  className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 text-[10px] font-medium text-[#003FC7]"
                                 >
                                   💬{commentCounts.get(i)}
                                 </span>
@@ -1400,8 +1400,8 @@ function DeckEditor() {
               aria-busy={stageDrop.busy}
             >
               {(stageDrop.isOver || stageDrop.busy) && (
-                <div className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#003FC7] bg-[#003FC7]/10 text-center backdrop-blur-[1px]">
-                  <div className="rounded-full bg-[#003FC7] px-4 py-2 text-[11px] uppercase tracking-widest text-white">
+                <div className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#003FC7] bg-primary/10 text-center backdrop-blur-[1px]">
+                  <div className="rounded-full bg-primary px-4 py-2 text-[11px] uppercase tracking-widest text-primary-foreground">
                     {stageDrop.busy ? "Uploading…" : "Drop image onto this slide"}
                   </div>
                   {stageDrop.busy && (
@@ -3108,7 +3108,7 @@ function VideoExamplesPicker({
                 onClick={() => onInsert(ex.variantId, ex.content)}
                 className="group overflow-hidden rounded-lg border border-black/10 bg-white text-left transition hover:border-[#0B2A4A]/40 hover:shadow"
               >
-                <div className="relative aspect-[16/10] overflow-hidden bg-[#03002C]">
+                <div className="relative aspect-[16/10] overflow-hidden bg-[#03002C] dark:bg-card">
                   <SlideThumbnailContext.Provider value={true}>
                     <ScaledSlide>
                       <DeckPackScope pack={pack}>

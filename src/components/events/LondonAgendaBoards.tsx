@@ -49,7 +49,7 @@ function AgendaCard({
 
   return (
     <article className="flex flex-col overflow-hidden rounded-md border border-black/10 bg-white">
-      <div className="flex justify-center bg-[#F2F2F2] p-3">
+      <div className="flex justify-center bg-muted p-3">
         <AgendaSheet config={first} pxPerMm={0.2} />
       </div>
       <div className="flex flex-1 flex-col p-4">

@@ -137,7 +137,7 @@ function VenuePage() {
                 <p className="mt-2 text-[14px] text-[#666666]">No floors yet. Nothing is drawn until the venue's plans arrive.</p>
               )}
               {slug === "qeii-centre" && floors.length < 7 && (
-                <div className="mt-3 rounded-lg bg-[#E0E8F5] p-3 text-[13px]">
+                <div className="mt-3 rounded-lg bg-secondary p-3 text-[13px]">
                   The London maps draw from the build's own copy of the QEII floors until they're saved here.
                   <button className={`${btn} ml-3`} disabled={busy} onClick={() => run("QEII floors copied into the venue library", () => copyBundled())}>
                     Copy the built-in QEII floors

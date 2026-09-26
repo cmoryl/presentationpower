@@ -388,7 +388,7 @@ function ExportAuditPage() {
             type="button"
             onClick={() => void runAll()}
             disabled={running}
-            className="rounded-full bg-[#003FC7] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#03002C] disabled:opacity-60"
+            className="rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-[#03002C] disabled:opacity-60"
           >
             {running ? "Verifying exports…" : "Run verification"}
           </button>
@@ -408,7 +408,7 @@ function ExportAuditPage() {
         </h2>
         <div className="overflow-hidden rounded-2xl border border-black/10">
           <table className="w-full border-collapse text-left text-[13px]">
-            <thead className="bg-[#F2F2F2] text-[11px] uppercase tracking-widest text-black/60">
+            <thead className="bg-muted text-[11px] uppercase tracking-widest text-black/60">
               <tr>
                 <th className="px-4 py-3 font-medium">Check</th>
                 <th className="px-4 py-3 font-medium">Area</th>
@@ -456,7 +456,7 @@ function ExportAuditPage() {
               <p className="mb-3 text-[13px] text-black/60">{area.blurb}</p>
               <div className="overflow-hidden rounded-2xl border border-black/10">
                 <table className="w-full border-collapse text-left text-[13px]">
-                  <thead className="bg-[#F2F2F2] text-[11px] uppercase tracking-widest text-black/60">
+                  <thead className="bg-muted text-[11px] uppercase tracking-widest text-black/60">
                     <tr>
                       <th className="px-4 py-3 font-medium">Asset</th>
                       <th className="px-4 py-3 font-medium">User control</th>

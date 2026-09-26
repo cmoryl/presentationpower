@@ -114,7 +114,7 @@ function SocialView() {
             <div className="flex flex-wrap gap-3 pt-2">
               <a
                 href="#playbooks"
-                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary"
+                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
               >
                 <Sparkles size={14} /> Explore playbooks ↓
               </a>
@@ -276,7 +276,7 @@ function SocialView() {
             </div>
             <Link
               to={favoritedVariants.length === 0 ? "/library" : "/social/kit"}
-              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary"
+              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
             >
               <Sparkles size={12} />
               {favoritedVariants.length === 0 ? "Browse the library →" : "Choose from favorites →"}

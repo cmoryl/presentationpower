@@ -309,7 +309,7 @@ function PlaybookDemoView() {
                     className="max-h-full w-auto"
                   />
                 </div>
-                <div className="flex h-32 items-center justify-center bg-[#03002C] p-6">
+                <div className="flex h-32 items-center justify-center bg-[#03002C] p-6 dark:bg-card">
                   <img
                     src={l.white}
                     alt={`${l.label} lockup, all white`}

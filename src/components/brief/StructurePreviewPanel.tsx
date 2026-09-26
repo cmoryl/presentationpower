@@ -165,7 +165,7 @@ export function StructurePreviewPanel({
                 {active.blocks.map((b, i) => (
                   <li
                     key={`${active.id}-${b.index}-${i}`}
-                    className="flex gap-3 rounded-lg border border-black/[0.07] bg-[#F2F2F2]/50 px-3 py-2"
+                    className="flex gap-3 rounded-lg border border-black/[0.07] bg-muted/50 px-3 py-2"
                   >
                     <span
                       className="mt-0.5 shrink-0 font-mono text-[10px] font-semibold tracking-widest"

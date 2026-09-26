@@ -118,7 +118,7 @@ export function LondonLiveLayersPanel({
                   {layers.map((layer) => (
                     <li
                       key={layer.name}
-                      className="flex flex-wrap items-center gap-2 rounded-lg bg-[#F2F2F2] px-2.5 py-1.5"
+                      className="flex flex-wrap items-center gap-2 rounded-lg bg-muted px-2.5 py-1.5"
                     >
                       <span className="min-w-0 flex-1 truncate text-[12px] font-semibold text-[#03002C]">
                         {layer.name}

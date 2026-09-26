@@ -589,7 +589,7 @@ function ImagesTab({
   return (
     <div className="space-y-4">
       {background && (
-        <div className="rounded-lg border border-[#003FC7]/15 bg-[#003FC7]/[0.03] p-3 text-[11px] text-black/65">
+        <div className="rounded-lg border border-[#003FC7]/15 bg-primary/[0.03] p-3 text-[11px] text-black/65">
           <div className="flex items-center justify-between gap-2">
             <div className="font-medium text-[#03002C]">Background · {background.kind}</div>
             {urls[0] && (
@@ -867,7 +867,7 @@ function DiagramsTab({
                 {d.kind}
               </span>
               {d.layoutHint && (
-                <span className="rounded-full bg-[#003FC7]/10 px-1.5 py-0.5 text-[10px] text-[#003FC7]">
+                <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] text-[#003FC7]">
                   {d.layoutHint}
                 </span>
               )}

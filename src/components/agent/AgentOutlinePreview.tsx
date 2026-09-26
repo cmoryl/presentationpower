@@ -33,7 +33,7 @@ export function AgentOutlinePreview({
         : " with a light appearance (Enterprise Light) across the whole deck";
 
   return (
-    <div className="not-prose w-full overflow-hidden rounded-2xl border border-[#003FC7]/25 bg-[#E0E8F5]/40">
+    <div className="not-prose w-full overflow-hidden rounded-2xl border border-[#003FC7]/25 bg-secondary/40">
       <div className="border-b border-[#003FC7]/15 px-4 py-3">
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#003FC7]">
           Proposed outline · {slides.length} slides
@@ -96,7 +96,7 @@ export function AgentOutlinePreview({
                   type="button"
                   disabled={busy || !notes.trim()}
                   onClick={() => onSubmit(`Adjust the outline: ${notes.trim()}`)}
-                  className="rounded-xl bg-[#003FC7] px-3.5 py-2 text-xs font-semibold text-white transition disabled:opacity-40 hover:brightness-110"
+                  className="rounded-xl bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground transition disabled:opacity-40 hover:brightness-110"
                 >
                   Send changes
                 </button>
@@ -150,7 +150,7 @@ export function AgentOutlinePreview({
                       `The outline looks good — build the full presentation from it now${appearanceLine}.`,
                     )
                   }
-                  className="rounded-xl bg-[#003FC7] px-3.5 py-2 text-xs font-semibold text-white transition disabled:opacity-40 hover:brightness-110"
+                  className="rounded-xl bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground transition disabled:opacity-40 hover:brightness-110"
                 >
                   Approve &amp; build deck
                 </button>

@@ -1019,7 +1019,7 @@ function DeckTile({
         <Link
           to="/decks/$deckId"
           params={{ deckId: d.id }}
-          className="rounded-full bg-[#03002C] px-3 py-1 text-xs font-medium text-white shadow"
+          className="rounded-full bg-[#03002C] px-3 py-1 text-xs font-medium text-white shadow dark:bg-primary dark:text-primary-foreground"
         >
           Open
         </Link>
@@ -1068,7 +1068,7 @@ function EmptyNew({ signedIn }: { signedIn: boolean | null }) {
       <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
         <Link
           to={primary.to}
-          className="group flex flex-col justify-between rounded-lg bg-[#03002C] p-6 text-white transition hover:bg-[#0a0850] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7] sm:p-8"
+          className="group flex flex-col justify-between rounded-lg bg-[#03002C] p-6 text-white transition hover:bg-[#0a0850] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7] sm:p-8 dark:bg-primary dark:text-primary-foreground"
         >
           <div>
             <span className="inline-flex size-10 items-center justify-center rounded-md bg-white/10">
@@ -1093,7 +1093,7 @@ function EmptyNew({ signedIn }: { signedIn: boolean | null }) {
                 to={p.to}
                 className="flex items-start gap-4 rounded-lg border border-black/15 bg-white p-5 transition hover:border-[#003FC7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7] dark:border-white/15 dark:bg-white/[0.04]"
               >
-                <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-md bg-[#003FC7]/10 text-[#003FC7] dark:text-[#A1FBF9]">
+                <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-[#003FC7] dark:text-[#A1FBF9]">
                   <Icon size={18} aria-hidden="true" />
                 </span>
                 <span className="flex-1">

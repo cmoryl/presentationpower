@@ -342,7 +342,7 @@ function ModuleCard({
             <Link
               to="/admin/modules/print/$moduleId"
               params={{ moduleId: m.id }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#E0E8F5] px-3 py-1.5 text-xs font-semibold text-primary hover:border-[#003FC7]"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-secondary px-3 py-1.5 text-xs font-semibold text-primary hover:border-[#003FC7]"
             >
               <Pencil size={12} aria-hidden /> Edit master
             </Link>
@@ -413,7 +413,7 @@ function ModuleCard({
         {m.bestFor.map((k) => (
           <span
             key={k}
-            className="rounded-full bg-[#E0E8F5] px-2 py-0.5 text-[10px] font-medium text-[#03002C]"
+            className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-[#03002C]"
           >
             {printTypeMeta(k).label}
           </span>

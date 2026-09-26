@@ -203,7 +203,7 @@ function DivisionSeedsPage() {
               type="button"
               onClick={() => void save()}
               disabled={busy}
-              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-[#003FC7] px-4 text-xs font-semibold text-white hover:bg-[#0033a3] disabled:opacity-50"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground hover:bg-[#0033a3] disabled:opacity-50"
             >
               <Save size={13} /> {busy ? "Saving…" : "Save seed"}
             </button>

@@ -342,7 +342,7 @@ export function CommentsPanel({
                       <button
                         onClick={() => submitReply(c.id, c.slide_index)}
                         disabled={busy || !replyBody.trim()}
-                        className="rounded-lg bg-[#003FC7] px-2 py-1 text-xs font-medium text-white disabled:opacity-50"
+                        className="rounded-lg bg-primary px-2 py-1 text-xs font-medium text-primary-foreground disabled:opacity-50"
                       >
                         <Send size={12} />
                       </button>

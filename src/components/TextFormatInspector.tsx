@@ -223,7 +223,7 @@ export function TextFormatInspector({
   return (
     <div>
       {editable && (
-        <div className="mb-3 space-y-2.5 rounded-xl border border-black/10 bg-[#F2F2F2] p-3">
+        <div className="mb-3 space-y-2.5 rounded-xl border border-black/10 bg-muted p-3">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[10px] uppercase tracking-widest text-black/45">
               Edit typography
@@ -451,7 +451,7 @@ export function TextFormatInspector({
 
           {current && (
             <>
-              <div className="rounded-xl border border-black/10 bg-[#F2F2F2] px-3 py-2 text-sm">
+              <div className="rounded-xl border border-black/10 bg-muted px-3 py-2 text-sm">
                 <span className="line-clamp-3">{current.props.text}</span>
               </div>
               <p className="text-[10px] uppercase tracking-widest text-black/45">

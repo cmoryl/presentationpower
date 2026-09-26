@@ -141,7 +141,7 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
             Version {inForce.version} · issued {inForce.issued}
           </span>
         ) : (
-          <span className="rounded-full bg-[#F2F2F2] px-2.5 py-1 text-[11px] font-semibold text-[#03002C]/70">
+          <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-[#03002C]/70">
             Built-in artwork
           </span>
         )}
@@ -206,7 +206,7 @@ export function LondonLiveFilePanel({ panel, canEdit, onChanged }: LondonLiveFil
               type="button"
               disabled={busy || !master}
               onClick={() => void save()}
-              className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-45"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-45"
             >
               <Upload className="h-3.5 w-3.5" />
               {busy ? "Storing…" : inForce ? "Replace the live file" : "Make this the live file"}

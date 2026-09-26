@@ -130,7 +130,7 @@ export function ReviewStatusControl({ localDeckId }: { localDeckId: string }) {
           <button
             onClick={() => apply(noteFor, note.trim() || undefined)}
             disabled={busy}
-            className="rounded-full bg-[#003FC7] px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50"
+            className="rounded-full bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground disabled:opacity-50"
           >
             {busy ? <Loader2 size={12} className="animate-spin" /> : "Send"}
           </button>

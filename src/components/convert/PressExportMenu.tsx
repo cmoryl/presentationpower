@@ -105,7 +105,7 @@ export function PressExportMenu({ resolveTarget, className, context }: PressExpo
         disabled={busy}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="inline-flex items-center gap-1.5 rounded-sm border border-[#003FC7] bg-[#003FC7] px-3 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#03002C] disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-sm border border-[#003FC7] bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground transition hover:bg-[#03002C] disabled:opacity-60"
       >
         {busy ? "Building…" : "Press-ready export"}
         <span aria-hidden="true" className="text-[9px] opacity-70">
@@ -169,7 +169,7 @@ export function PressExportMenu({ resolveTarget, className, context }: PressExpo
           </label>
 
           {target ? (
-            <p className="mt-3 rounded-sm bg-[#F2F2F2] p-2 text-[10.5px] leading-[1.45] text-[#03002C]">
+            <p className="mt-3 rounded-sm bg-muted p-2 text-[10.5px] leading-[1.45] text-[#03002C]">
               {mm(target.trimIn.width)} × {mm(target.trimIn.height)} mm trim
               {bleedMm > 0 ? `, ${mm(target.trimIn.width) + bleedMm * 2} × ${mm(target.trimIn.height) + bleedMm * 2} mm with bleed` : ""}.
               Copy is embedded Geist vector text; backgrounds and photography are a{" "}

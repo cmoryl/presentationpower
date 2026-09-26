@@ -230,7 +230,7 @@ export function LondonPpiPreview({
       <div className="mt-3 grid gap-4 md:grid-cols-[minmax(0,220px)_minmax(0,1fr)]">
         {/* Whole plate */}
         <figure className="m-0">
-          <div className="flex min-h-[150px] items-center justify-center rounded-xl border border-black/10 bg-[#F2F2F2] p-2">
+          <div className="flex min-h-[150px] items-center justify-center rounded-xl border border-black/10 bg-muted p-2">
             {img ? (
               <canvas
                 ref={fitRef}
@@ -286,7 +286,7 @@ export function LondonPpiPreview({
           </div>
           <div
             ref={cropBoxRef}
-            className="relative mt-1.5 h-[188px] w-full overflow-hidden rounded-xl border border-black/10 bg-[#F2F2F2]"
+            className="relative mt-1.5 h-[188px] w-full overflow-hidden rounded-xl border border-black/10 bg-muted"
           >
             {img ? (
               <canvas
@@ -302,7 +302,7 @@ export function LondonPpiPreview({
             {/* Band ruler: how wide one flat-tone run is on the printed panel. */}
             <div className="absolute bottom-2 left-2 flex items-center gap-1.5 rounded bg-white/85 px-1.5 py-1">
               <span
-                className="block h-1.5 rounded-sm bg-[#03002C]"
+                className="block h-1.5 rounded-sm bg-[#03002C] dark:bg-card"
                 style={{ width: `${Math.max(4, (tier.bandMm / tier.pixelMm) * zoom)}px` }}
                 aria-hidden="true"
               />
@@ -326,7 +326,7 @@ export function LondonPpiPreview({
           { k: "Worst band", v: `${tier.bandMm} mm` },
           { k: "PNG weight", v: `≈ ${tier.mb} MB` },
         ].map((s) => (
-          <div key={s.k} className="rounded-lg bg-[#F2F2F2] px-2.5 py-2">
+          <div key={s.k} className="rounded-lg bg-muted px-2.5 py-2">
             <dd className="text-sm font-semibold text-[#03002C]">{s.v}</dd>
             <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#666]">
               {s.k}

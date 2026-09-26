@@ -100,7 +100,7 @@ export function ShowcasePrintGallery(props: Props) {
             role="dialog"
             aria-modal="true"
             aria-label={`${entries[open].label} preview`}
-            className="fixed inset-0 z-[130] flex items-start justify-center overflow-auto bg-[#03002C]/85 p-4 backdrop-blur-sm sm:p-8"
+            className="fixed inset-0 z-[130] flex items-start justify-center overflow-auto bg-[#03002C]/85 p-4 backdrop-blur-sm sm:p-8 dark:bg-card"
             onClick={() => setOpen(null)}
           >
             <div

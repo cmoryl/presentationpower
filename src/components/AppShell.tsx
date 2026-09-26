@@ -345,7 +345,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
           {(presOpen || adminOpen) && (
             <div
               aria-hidden
-              className="pointer-events-none fixed inset-0 -z-10 hidden bg-[#03002C]/45 lg:block"
+              className="pointer-events-none fixed inset-0 -z-10 hidden bg-[#03002C]/45 lg:block dark:bg-card"
             />
           )}
 

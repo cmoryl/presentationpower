@@ -289,7 +289,7 @@ function Editor({
             type="button"
             onClick={() => saveMutation.mutate()}
             disabled={saveMutation.isPending}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white transition hover:bg-[#0030a0] disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground transition hover:bg-[#0030a0] disabled:opacity-60"
           >
             {saveMutation.isPending ? (
               <Loader2 size={12} className="animate-spin" />
