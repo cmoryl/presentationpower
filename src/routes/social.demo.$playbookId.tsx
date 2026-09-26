@@ -516,7 +516,7 @@ function SocialDemoView() {
             ))}
         </div>
         <div className="mt-4 text-right">
-          <Link to="/social" className="text-xs font-medium text-[#003FC7]">
+          <Link to="/social" className="text-xs font-medium text-primary">
             View all {SOCIAL_PLAYBOOKS.length} playbooks →
           </Link>
         </div>

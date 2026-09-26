@@ -290,7 +290,7 @@ function LogoCard({ row }: { row: ClientLogoRow }) {
           href={activeUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 inline-block text-[11px] text-[#003FC7] hover:underline"
+          className="mt-2 inline-block text-[11px] text-primary hover:underline"
         >
           Open {active} file ↗
         </a>

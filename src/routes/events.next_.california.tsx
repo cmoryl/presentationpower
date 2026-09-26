@@ -61,7 +61,7 @@ function CaliforniaKiosksPage() {
           </Link>
           <Link
             to="/events/next/san-francisco"
-            className="inline-flex items-center gap-1.5 text-[#003FC7] hover:underline"
+            className="inline-flex items-center gap-1.5 text-primary hover:underline"
           >
             San Francisco edition
             <ArrowRight className="h-3.5 w-3.5" aria-hidden />
@@ -100,7 +100,7 @@ function CaliforniaKiosksPage() {
             These kiosks are the partner stands for{" "}
             <Link
               to="/events/next/san-francisco"
-              className="font-semibold text-[#003FC7] hover:underline"
+              className="font-semibold text-primary hover:underline"
             >
               {SF_VENUE.locationLine} · {SF_VENUE.venue}
             </Link>

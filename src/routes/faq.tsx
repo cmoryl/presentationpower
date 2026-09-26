@@ -1088,7 +1088,7 @@ function FAQPage() {
               <p className="mt-3 max-w-2xl text-black/60">
                 Answers about master briefs, presentation decks, print studio, event & social kits,
                 translation, knowledge, and administration. Can't find what you need?{" "}
-                <Link to="/knowledge" className="font-medium text-[#003FC7] hover:underline">
+                <Link to="/knowledge" className="font-medium text-primary hover:underline">
                   Browse the knowledge base
                 </Link>
                 .

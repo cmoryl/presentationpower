@@ -353,7 +353,7 @@ export function BoothTemplatePanel({
                   {canEdit ? (
                     <button
                       type="button"
-                      className="mt-2 rounded-lg border border-[#003FC7]/30 px-2.5 py-1 text-[12px] font-medium text-[#003FC7] disabled:opacity-40"
+                      className="mt-2 rounded-lg border border-[#003FC7]/30 px-2.5 py-1 text-[12px] font-medium text-primary disabled:opacity-40"
                       disabled={saving || active}
                       onClick={() =>
                         void patch(
@@ -534,7 +534,7 @@ export function BoothTemplatePanel({
           {canEdit ? (
             <button
               type="button"
-              className="mt-3 rounded-lg border border-[#003FC7]/30 px-3 py-2 text-[12px] font-medium text-[#003FC7] disabled:opacity-40"
+              className="mt-3 rounded-lg border border-[#003FC7]/30 px-3 py-2 text-[12px] font-medium text-primary disabled:opacity-40"
               disabled={saving}
               onClick={saveCopyLayer}
             >

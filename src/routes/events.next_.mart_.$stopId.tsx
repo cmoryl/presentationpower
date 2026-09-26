@@ -50,7 +50,7 @@ function MartStopPage() {
           </p>
           <Link
             to="/events/next/mart"
-            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#003FC7] hover:underline"
+            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
           >
             <ArrowLeft size={14} /> Back to NEXT MART
           </Link>
@@ -67,7 +67,7 @@ function MartStopPage() {
       <div className="mx-auto max-w-[1400px] px-6 py-10">
         <Link
           to="/events/next/mart"
-          className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#003FC7] hover:underline"
+          className="inline-flex items-center gap-1.5 text-[12px] font-medium text-primary hover:underline"
         >
           <ArrowLeft size={13} /> NEXT MART · London reference kit
         </Link>
@@ -129,7 +129,7 @@ function MartStopPage() {
           </div>
           <Link
             to="/events/pillars"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#E0E8F5]"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-3 py-1.5 text-xs font-medium text-primary hover:bg-[#E0E8F5]"
           >
             Open the pillar editor <ArrowRight size={13} />
           </Link>

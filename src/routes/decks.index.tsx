@@ -561,7 +561,7 @@ function DecksIndex() {
                   <button
                     type="button"
                     onClick={clearAll}
-                    className="ml-auto min-h-11 rounded-md px-3 text-sm font-medium text-[#003FC7] underline-offset-2 hover:underline dark:text-[#A1FBF9]"
+                    className="ml-auto min-h-11 rounded-md px-3 text-sm font-medium text-primary underline-offset-2 hover:underline dark:text-[#A1FBF9]"
                   >
                     Clear filters
                   </button>

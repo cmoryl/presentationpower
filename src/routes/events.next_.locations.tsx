@@ -639,7 +639,7 @@ function VenuePagesRoute() {
                   href={directions}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-3 inline-block text-[13px] font-semibold text-[#003FC7] underline"
+                  className="mt-3 inline-block text-[13px] font-semibold text-primary underline"
                 >
                   Open directions
                 </a>

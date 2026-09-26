@@ -925,7 +925,7 @@ function LinksTab({ items }: { items: NonNullable<SlideAssets["hyperlinks"]> }) 
                 href={h.target}
                 target="_blank"
                 rel="noreferrer"
-                className="truncate text-[#003FC7] hover:underline"
+                className="truncate text-primary hover:underline"
                 title={h.target}
               >
                 {h.target}

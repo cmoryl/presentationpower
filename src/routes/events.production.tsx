@@ -213,7 +213,7 @@ function EventProductionPage() {
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-foreground/70">
             This package is rasterised from the on-screen previews — a quick proof, not a press
             vector master. For NEXT 2026 London use the{" "}
-            <Link to="/events/next/london" className="font-semibold text-[#003FC7] underline">
+            <Link to="/events/next/london" className="font-semibold text-primary underline">
               scenic panel kit
             </Link>
             .

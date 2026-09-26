@@ -449,7 +449,7 @@ export function ProspectPanel({
                       <Link
                         to="/decks/$deckId"
                         params={{ deckId: d.id }}
-                        className="text-[#003FC7] hover:underline"
+                        className="text-primary hover:underline"
                       >
                         {d.title}
                       </Link>
@@ -531,7 +531,7 @@ function EmptyState({
                 <Link
                   key={a.to}
                   to={a.to}
-                  className="rounded-full border border-[#003FC7]/25 bg-primary/[0.06] px-2.5 py-1 text-[10px] font-semibold text-[#003FC7] transition-colors hover:bg-primary/12"
+                  className="rounded-full border border-[#003FC7]/25 bg-primary/[0.06] px-2.5 py-1 text-[10px] font-semibold text-primary transition-colors hover:bg-primary/12"
                 >
                   {a.label}
                 </Link>

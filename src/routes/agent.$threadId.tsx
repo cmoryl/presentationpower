@@ -348,7 +348,7 @@ function AgentHero({
             <button
               type="button"
               onClick={onNewDeck}
-              className="group inline-flex items-center gap-2 rounded-xl border border-[#003FC7]/30 bg-primary/5 px-4 py-2.5 text-sm font-semibold text-[#003FC7] shadow-sm transition hover:bg-primary/10 hover:shadow-md"
+              className="group inline-flex items-center gap-2 rounded-xl border border-[#003FC7]/30 bg-primary/5 px-4 py-2.5 text-sm font-semibold text-primary shadow-sm transition hover:bg-primary/10 hover:shadow-md"
             >
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
               Start a new deck from a brief
@@ -390,7 +390,7 @@ function AgentProgressHero({
           <button
             type="button"
             onClick={onNewDeck}
-            className="rounded-lg border border-white/50 bg-white/25 px-3 py-1.5 text-[11px] font-semibold text-[#003FC7] shadow-sm backdrop-blur-md transition hover:bg-white/40"
+            className="rounded-lg border border-white/50 bg-white/25 px-3 py-1.5 text-[11px] font-semibold text-primary shadow-sm backdrop-blur-md transition hover:bg-white/40"
           >
             New deck
           </button>

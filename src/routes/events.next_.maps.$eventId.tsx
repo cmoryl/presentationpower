@@ -219,7 +219,7 @@ function MapsPage() {
           {q.data?.venue ? (
             <p className="mt-1 text-[13px] text-[#666666]">
               Floors come from the venue library:{" "}
-              <Link to="/events/venues/$slug" params={{ slug: q.data.venue.slug }} className="font-semibold text-[#003FC7] underline">
+              <Link to="/events/venues/$slug" params={{ slug: q.data.venue.slug }} className="font-semibold text-primary underline">
                 {q.data.venue.name}
               </Link>
               . Floors you load here are saved to the venue; room colours and uses stay with this event.

@@ -342,7 +342,7 @@ function ModuleCard({
             <Link
               to="/admin/modules/print/$moduleId"
               params={{ moduleId: m.id }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#E0E8F5] px-3 py-1.5 text-xs font-semibold text-[#003FC7] hover:border-[#003FC7]"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#E0E8F5] px-3 py-1.5 text-xs font-semibold text-primary hover:border-[#003FC7]"
             >
               <Pencil size={12} aria-hidden /> Edit master
             </Link>

@@ -286,7 +286,7 @@ function ImportedLibrary() {
           ) : decks.length === 0 ? (
             <div className="rounded-lg border border-dashed border-black/15 bg-white p-6 text-sm text-black/50">
               No decks imported for this scope yet. Upload a PPTX from{" "}
-              <Link to="/admin/knowledge" className="text-[#003FC7] underline">
+              <Link to="/admin/knowledge" className="text-primary underline">
                 Admin → Knowledge
               </Link>
               .

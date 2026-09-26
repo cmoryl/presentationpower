@@ -131,7 +131,7 @@ function PrintModuleStudioPage() {
         <h1 className="text-2xl font-semibold tracking-[-0.03em] text-[#03002C]">Module studio</h1>
         <p className="mt-3 rounded-2xl border border-dashed border-black/15 bg-white p-6 text-sm text-black/60">
           No print section module with id <span className="font-mono">{moduleId}</span>.{" "}
-          <Link to="/admin/modules" className="text-[#003FC7] underline">
+          <Link to="/admin/modules" className="text-primary underline">
             Back to the module editor
           </Link>
         </p>

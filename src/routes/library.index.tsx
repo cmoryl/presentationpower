@@ -1310,7 +1310,7 @@ function Library() {
               <div className="flex shrink-0 items-center gap-2">
                 <Link
                   to="/library/overrides"
-                  className="rounded-full border border-[#003FC7]/30 px-3 py-1.5 text-[12px] font-semibold text-[#003FC7] transition hover:bg-primary/10"
+                  className="rounded-full border border-[#003FC7]/30 px-3 py-1.5 text-[12px] font-semibold text-primary transition hover:bg-primary/10"
                 >
                   Override inspector
                 </Link>
@@ -2149,7 +2149,7 @@ const VariantCard = memo(function VariantCard({
         <Link
           to="/convert"
           search={{ module: variant.id }}
-          className="mt-1.5 inline-flex items-center gap-1 px-2 py-1 text-[11px] font-semibold text-[#003FC7] hover:underline focus-visible:outline-2 focus-visible:outline-[#003FC7]"
+          className="mt-1.5 inline-flex items-center gap-1 px-2 py-1 text-[11px] font-semibold text-primary hover:underline focus-visible:outline-2 focus-visible:outline-[#003FC7]"
         >
           Use in marketing materials →
         </Link>
@@ -3121,7 +3121,7 @@ function VariantDetailModal({
                 <Link
                   to="/social/kit"
                   search={{ source: variant.id }}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-primary hover:text-primary-foreground"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary transition hover:bg-primary hover:text-primary-foreground"
                   title="Generate a social kit from this favorited module"
                 >
                   <Sparkles size={12} /> Create social kit
@@ -3366,7 +3366,7 @@ function VariantDetailModal({
                           type="button"
                           onClick={openPdfPreview}
                           disabled={previewBusy || exportBusy}
-                          className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#003FC7]/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-primary hover:text-primary-foreground disabled:opacity-60"
+                          className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#003FC7]/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary transition hover:bg-primary hover:text-primary-foreground disabled:opacity-60"
                         >
                           {previewBusy ? (
                             <Loader2 size={12} className="animate-spin" />
@@ -4487,7 +4487,7 @@ function AddToDeckPanel({
             >
               New deck with this module →
             </button>
-            <Link to="/brief/new" className="font-medium text-[#003FC7] hover:underline">
+            <Link to="/brief/new" className="font-medium text-primary hover:underline">
               or start a brief
             </Link>
           </div>

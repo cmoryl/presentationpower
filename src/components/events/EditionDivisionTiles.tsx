@@ -176,7 +176,7 @@ export function EditionDivisionTiles({
             ) : null}
             <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[13px] font-semibold">
               {assetsAnchor && focusCounts.booths + focusCounts.signage > 0 ? (
-                <a href={`#${assetsAnchor}`} className="text-[#003FC7] hover:underline">
+                <a href={`#${assetsAnchor}`} className="text-primary hover:underline">
                   See its booths and signage below
                 </a>
               ) : null}
@@ -184,7 +184,7 @@ export function EditionDivisionTiles({
                 <Link
                   to="/events/next/agendas"
                   search={{ division: focus.id, edition: editionId }}
-                  className="text-[#003FC7] hover:underline"
+                  className="text-primary hover:underline"
                 >
                   Open its track agenda
                 </Link>
@@ -196,7 +196,7 @@ export function EditionDivisionTiles({
               <Link
                 to="/events/next/divisions/$divisionId"
                 params={{ divisionId: focus.id }}
-                className="text-[#003FC7] hover:underline"
+                className="text-primary hover:underline"
               >
                 Division page
               </Link>

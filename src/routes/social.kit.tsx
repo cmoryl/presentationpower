@@ -882,7 +882,7 @@ function WizardFlow(p: WizardProps) {
             </div>
             <p className="mt-3 text-xs text-black/55">
               Prefer starting from an existing module?{" "}
-              <Link to="/social/kit" className="text-[#003FC7] hover:underline">
+              <Link to="/social/kit" className="text-primary hover:underline">
                 Switch to favorited-module flow →
               </Link>
             </p>

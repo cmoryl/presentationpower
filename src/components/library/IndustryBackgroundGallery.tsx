@@ -331,7 +331,7 @@ export function IndustryOverviewCard({
             type="button"
             onClick={onToggle}
             aria-expanded={open}
-            className="text-[11px] font-semibold text-[#003FC7] hover:underline"
+            className="text-[11px] font-semibold text-primary hover:underline"
           >
             {open ? "Hide" : `View all ${count}`} scene × take backgrounds
           </button>
@@ -339,7 +339,7 @@ export function IndustryOverviewCard({
             <button
               type="button"
               onClick={onEdit}
-              className="rounded-full border border-[#003FC7]/40 px-2.5 py-1 text-[11px] font-semibold text-[#003FC7] transition hover:bg-primary/10"
+              className="rounded-full border border-[#003FC7]/40 px-2.5 py-1 text-[11px] font-semibold text-primary transition hover:bg-primary/10"
             >
               Edit / replace backgrounds
             </button>

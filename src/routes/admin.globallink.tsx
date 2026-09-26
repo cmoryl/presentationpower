@@ -184,7 +184,7 @@ function GlobalLinkAdminPage() {
           <button
             onClick={runTest}
             disabled={testing || !status?.connected}
-            className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-primary/20 disabled:opacity-40"
+            className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary hover:bg-primary/20 disabled:opacity-40"
           >
             {testing ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
             Test connection

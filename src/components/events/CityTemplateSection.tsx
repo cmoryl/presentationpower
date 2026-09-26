@@ -116,7 +116,7 @@ export function CityTemplateSection() {
               </p>
               <Link
                 to="/events/next/london/maps"
-                className="mt-3 inline-flex text-[13px] font-medium text-[#003FC7] hover:underline"
+                className="mt-3 inline-flex text-[13px] font-medium text-primary hover:underline"
               >
                 Edit {edition.label} rooms
               </Link>
@@ -141,7 +141,7 @@ export function CityTemplateSection() {
               </p>
               <Link
                 to="/events/next/london/schedule"
-                className="mt-3 inline-flex text-[13px] font-medium text-[#003FC7] hover:underline"
+                className="mt-3 inline-flex text-[13px] font-medium text-primary hover:underline"
               >
                 Edit {edition.label} schedule
               </Link>
@@ -161,7 +161,7 @@ export function CityTemplateSection() {
             <Link
               to="/events/next/agendas"
               search={{ division: divisionId, file: agendaFile?.id, edition: edition.id }}
-              className="mt-2 inline-flex text-[12.5px] font-medium text-[#003FC7] hover:underline"
+              className="mt-2 inline-flex text-[12.5px] font-medium text-primary hover:underline"
             >
               {agendaFile ? "Edit this city's agenda" : `Build ${edition.label} agenda`}
             </Link>
@@ -189,7 +189,7 @@ export function CityTemplateSection() {
                       file: file?.id,
                       edition: edition.id,
                     }}
-                    className="text-[12.5px] font-medium text-[#003FC7] hover:underline"
+                    className="text-[12.5px] font-medium text-primary hover:underline"
                   >
                     {k.name}
                   </Link>

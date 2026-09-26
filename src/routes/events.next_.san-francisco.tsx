@@ -140,13 +140,13 @@ function SanFranciscoPage() {
           <Link
             to="/events/$eventId"
             params={{ eventId: "san-francisco" }}
-            className="text-[#003FC7] hover:underline"
+            className="text-primary hover:underline"
           >
             Readiness checklist
           </Link>
           <Link
             to="/events/next/california"
-            className="inline-flex items-center gap-1 text-[#003FC7] hover:underline"
+            className="inline-flex items-center gap-1 text-primary hover:underline"
           >
             California partner kiosks <ArrowRight size={13} aria-hidden />
           </Link>
@@ -194,7 +194,7 @@ function SanFranciscoPage() {
                 {g.anchor ? (
                   <a
                     href={g.anchor}
-                    className="text-[13px] font-semibold text-[#003FC7] hover:underline"
+                    className="text-[13px] font-semibold text-primary hover:underline"
                   >
                     Open kiosks
                   </a>
@@ -215,7 +215,7 @@ function SanFranciscoPage() {
             </div>
             <Link
               to="/events/next/california"
-              className="text-[13px] font-semibold text-[#003FC7] hover:underline"
+              className="text-[13px] font-semibold text-primary hover:underline"
             >
               Template details and build notes
             </Link>

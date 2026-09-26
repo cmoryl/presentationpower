@@ -81,7 +81,7 @@ function AgendaCard({
         <Link
           to="/events/next/agendas"
           search={{ division: id, file: live?.id, edition: "london" }}
-          className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[#003FC7] hover:underline"
+          className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] font-medium text-primary hover:underline"
         >
           <CalendarDays size={13} /> {live ? "Edit this agenda" : "Create this agenda"}
         </Link>

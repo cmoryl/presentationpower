@@ -466,7 +466,7 @@ function PublicModuleLibrary() {
             <div className="mb-3 flex justify-end">
               <a
                 href="/public/styles"
-                className="text-xs font-medium text-[#003FC7] underline-offset-4 hover:underline"
+                className="text-xs font-medium text-primary underline-offset-4 hover:underline"
               >
                 Open the style directory →
               </a>
