@@ -127,3 +127,41 @@ export async function resignStorageUrl(url: string): Promise<string | null> {
     .createSignedUrl(ref.path, SIGNED_URL_TTL_SECONDS);
   return error ? null : (data?.signedUrl ?? null);
 }
+
+/** True when a storage signed URL's token has expired (or expires within a minute). */
+export function isExpiredSignedUrl(url: string): boolean {
+  if (!/\/object\/sign\//.test(url)) return false;
+  const token = url.match(/[?&]token=([^&]+)/)?.[1];
+  if (!token) return false;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+    return typeof payload.exp === "number" && payload.exp * 1000 < Date.now() + 60_000;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Walks a slide content value and re-signs every expired storage link inside
+ * it. Returns the updated value, or null when nothing needed changing.
+ */
+export async function resignExpiredInValue(value: unknown): Promise<unknown | null> {
+  let changed = false;
+  const walk = async (v: unknown): Promise<unknown> => {
+    if (typeof v === "string") {
+      if (!isExpiredSignedUrl(v)) return v;
+      const fresh = await resignStorageUrl(v);
+      if (fresh) changed = true;
+      return fresh ?? v;
+    }
+    if (Array.isArray(v)) return Promise.all(v.map(walk));
+    if (v && typeof v === "object") {
+      const out: Record<string, unknown> = {};
+      for (const [k, x] of Object.entries(v)) out[k] = await walk(x);
+      return out;
+    }
+    return v;
+  };
+  const next = await walk(value);
+  return changed ? next : null;
+}
