@@ -1145,7 +1145,7 @@ function BriefCommandCenter() {
         </div>
       </section>
 
-      <div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-10 px-6 pb-40 pt-10 font-['Geist'] text-[#03002C] lg:grid-cols-[248px_minmax(0,1fr)] lg:px-10 dark:text-white">
+      <div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-10 px-6 pb-40 pt-10 font-sans text-[#03002C] lg:grid-cols-[248px_minmax(0,1fr)] lg:px-10 dark:text-white">
         {/* Vertical step rail */}
         <aside className="lg:sticky lg:top-6 lg:self-start">
           <nav aria-label="Brief progress">
