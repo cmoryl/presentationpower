@@ -830,17 +830,20 @@ export function adaptContent(content: AdaptContent, targetId: AdaptTargetId): Ad
         detail: `${content.points.length} supporting point(s) not shown — ${target.label} has no list block.`,
       });
     } else {
+      let shortenedCount = 0;
       const kept = content.points.slice(0, target.caps.points).map((p) => {
         const t = trimToWords(p, target.caps.pointChars);
-        if (t) {
-          notes.push({
-            severity: "shortened",
-            field: "points",
-            detail: `Point shortened to ${target.caps.pointChars} characters.`,
-          });
-        }
+        if (t) shortenedCount++;
         return t ?? p;
       });
+      // One note for the whole list, not one per point.
+      if (shortenedCount) {
+        notes.push({
+          severity: "shortened",
+          field: "points",
+          detail: `${shortenedCount} point(s) shortened to ${target.caps.pointChars} characters.`,
+        });
+      }
       out.points = kept;
       if (content.points.length > kept.length) {
         notes.push({
