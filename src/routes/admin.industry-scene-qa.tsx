@@ -6,7 +6,6 @@
  */
 
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "@/components/AppShell";
 import { SceneQaViewer } from "@/components/library/SceneQaViewer";
 
 const TITLE = "Industry Scene QA · Admin · TransPerfect";
@@ -29,7 +28,7 @@ export const Route = createFileRoute("/admin/industry-scene-qa")({
 
 function SceneQaPage() {
   return (
-    <AppShell>
+    <>
       <main className="mx-auto w-full max-w-[1600px] px-6 py-10">
         <header className="mb-6">
           <div className="text-xs uppercase tracking-[0.25em] text-[#003FC7]">Admin</div>
@@ -42,6 +41,6 @@ function SceneQaPage() {
         </header>
         <SceneQaViewer />
       </main>
-    </AppShell>
+    </>
   );
 }

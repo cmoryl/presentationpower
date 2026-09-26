@@ -38,7 +38,7 @@ import { applyPrintOverride, indexOverrides, type ModuleOverrideRow } from "@/li
 import { listModuleOverrides, saveModuleOverride } from "@/lib/module-overrides.functions";
 
 export const Route = createFileRoute("/admin/modules_/print/$moduleId")({
-  head: () => ({ meta: [{ title: "Module studio · Admin" }] }),
+  head: () => ({ meta: [{ title: "Module studio · Admin · TransPerfect Element" }] }),
   component: PrintModuleStudioPage,
 });
 

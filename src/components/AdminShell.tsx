@@ -216,7 +216,7 @@ export function AdminSidebar() {
 function useAdminEditMode(): boolean {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   // Deep editors need the full width; the list/listing pages keep the sidebar.
-  return pathname.startsWith("/admin/print-library_/");
+  return /^\/admin\/print-library\/[^/]+/.test(pathname);
 }
 
 export function AdminShell() {

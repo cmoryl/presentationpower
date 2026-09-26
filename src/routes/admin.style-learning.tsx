@@ -23,7 +23,7 @@ export const Route = createFileRoute("/admin/style-learning")({
   component: StyleLearningView,
   head: () => ({
     meta: [
-      { title: "Style learning governance | OnDeck admin" },
+      { title: "Style learning governance · Admin · TransPerfect Element" },
       {
         name: "description",
         content:

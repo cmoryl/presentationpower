@@ -18,7 +18,7 @@ export const Route = createFileRoute("/admin/team")({
   component: TeamView,
   head: () => ({
     meta: [
-      { title: "Team workspace · Admin" },
+      { title: "Team workspace · Admin · TransPerfect Element" },
       {
         name: "description",
         content:
