@@ -73,9 +73,9 @@ export const Route = createFileRoute("/convert")({
 });
 
 const SEVERITY_STYLE: Record<string, string> = {
-  shortened: "border-[#FFEB66] bg-[#FFFBE6]",
-  dropped: "border-[#FF9B70] bg-[#FFF3EC]",
-  refused: "border-[#E53D2E] bg-[#FDECEA]",
+  shortened: "border-[color:var(--color-border)] bg-[color:var(--color-muted)]",
+  dropped: "border-[color:var(--color-primary)] bg-[color:var(--color-muted)]",
+  refused: "border-[color:var(--color-destructive)] bg-[color:var(--color-muted)]",
 };
 
 /** Neutral brief the master modules seed their approved sample copy from. */
@@ -788,7 +788,7 @@ function ConvertPage() {
                 ) : null;
               })()}
               {sampleMissing ? (
-                <p role="status" className="mt-3 rounded-lg border border-[#FF9B70] bg-[#FFF3EC] p-3 text-[12.5px] text-[#03002C]">
+                <p role="status" className="mt-3 rounded-lg border border-[color:var(--color-primary)] bg-[color:var(--color-muted)] p-3 text-[12.5px] text-[color:var(--color-foreground)]">
                   This module has no sample copy yet, so only its section name carries over. Pick a deck slide that uses it, or type the copy in.
                 </p>
               ) : null}
