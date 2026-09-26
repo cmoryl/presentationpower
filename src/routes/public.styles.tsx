@@ -221,7 +221,7 @@ function PublicStyleDirectory() {
             </label>
             <a
               href="/public/modules"
-              className="text-xs font-medium text-[#003FC7] underline-offset-4 hover:underline"
+              className="text-xs font-medium text-primary underline-offset-4 hover:underline"
             >
               Approved brand library →
             </a>

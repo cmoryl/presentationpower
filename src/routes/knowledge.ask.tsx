@@ -221,7 +221,7 @@ function OracleAskView() {
                 </div>
                 <Link
                   to="/knowledge"
-                  className="text-[11px] text-[#003FC7] hover:underline dark:text-[#A1FBF9]"
+                  className="text-[11px] text-primary hover:underline dark:text-[#A1FBF9]"
                 >
                   Browse all
                 </Link>

@@ -219,7 +219,7 @@ function KnowledgePage() {
           </Link>
           <Link
             to="/events/next/playbook"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#003FC7] hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
           >
             <BookOpen size={13} /> Signage &amp; hardware playbook
           </Link>

@@ -168,7 +168,7 @@ function RunCard({ run }: { run: DemoRun }) {
               ) : null}
               <Link
                 to={step.to}
-                className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold text-[#003FC7] hover:underline"
+                className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
               >
                 Open this page
                 <ArrowRight className="h-3.5 w-3.5" />

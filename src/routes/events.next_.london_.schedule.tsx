@@ -78,7 +78,7 @@ function LondonSchedulePage() {
       <div className="mx-auto max-w-[1180px] px-6 py-10">
         <Link
           to="/events/next/london"
-          className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#003FC7] hover:underline"
+          className="inline-flex items-center gap-2 text-[13px] font-semibold text-primary hover:underline"
         >
           <ArrowLeft className="h-4 w-4" /> NEXT 2026 London
         </Link>
@@ -140,7 +140,7 @@ function LondonSchedulePage() {
                         <Link
                           to="/events/next/london/maps"
                           search={{ sheet: room.sheetId, room: room.space }}
-                          className="font-semibold text-[#003FC7] hover:underline"
+                          className="font-semibold text-primary hover:underline"
                         >
                           {room.space}
                         </Link>{" "}
@@ -161,7 +161,7 @@ function LondonSchedulePage() {
               <Link
                 to="/events/next/london/maps"
                 search={{ sheet: floor.sheetId }}
-                className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#003FC7] hover:underline"
+                className="inline-flex items-center gap-2 text-[13px] font-semibold text-primary hover:underline"
               >
                 <MapIcon className="h-4 w-4" /> Open this floor plan
               </Link>

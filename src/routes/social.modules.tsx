@@ -215,7 +215,7 @@ function SocialModuleStudio() {
                   type="button"
                   onClick={runRefit}
                   disabled={refitting || !section}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/40 px-3 py-1.5 text-[11px] font-semibold text-[#003FC7] transition hover:bg-primary/10 disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/40 px-3 py-1.5 text-[11px] font-semibold text-primary transition hover:bg-primary/10 disabled:opacity-50"
                 >
                   <Wand2 size={13} /> {refitting ? "Refitting…" : "AI refit"}
                 </button>

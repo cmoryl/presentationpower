@@ -203,7 +203,7 @@ function NextVenuePage() {
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
         <Link
           to="/events/next/locations"
-          className="inline-flex items-center gap-2 text-sm font-medium text-[#003FC7] hover:underline"
+          className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
         >
           <ArrowLeft className="h-4 w-4" /> Step 1 · Venue record
         </Link>

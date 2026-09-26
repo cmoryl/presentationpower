@@ -268,7 +268,7 @@ function SocialView() {
               </h2>
               <p className="mt-1 max-w-2xl text-sm text-black/60">
                 Prefer to campaign a specific slide? Star modules in the{" "}
-                <Link to="/library" className="text-[#003FC7] underline underline-offset-2">
+                <Link to="/library" className="text-primary underline underline-offset-2">
                   Presentation library
                 </Link>{" "}
                 and turn any KPI, quote, or cover into a full social run.

@@ -601,7 +601,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
             return (
               <li key={b.id} className="rounded-md border border-[#03002C]/10 bg-white">
                 <div className="flex items-center gap-1 px-2 py-1.5">
-                  <button type="button" className={`flex-1 truncate text-left text-[12px] font-semibold ${sel?.id === b.id ? "text-[#003FC7]" : "text-[#03002C]"}`} onClick={() => setSel({ kind: "block", id: b.id })}>
+                  <button type="button" className={`flex-1 truncate text-left text-[12px] font-semibold ${sel?.id === b.id ? "text-primary" : "text-[#03002C]"}`} onClick={() => setSel({ kind: "block", id: b.id })}>
                     {b.screen ? "London screen area" : `Graphics piece ${Number(b.id.slice(1)) + 1}`}
                   </button>
                   <button type="button" aria-label={hidden ? "Show piece" : "Hide piece"} title={hidden ? "Show" : "Hide"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchBlock(b.id, { hidden: !hidden })}>
@@ -614,7 +614,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                       const ph = edits.parts?.[q.id]?.hidden ?? false;
                       return (
                         <li key={q.id} className="flex items-center gap-1">
-                          <button type="button" className={`flex-1 truncate py-0.5 text-left text-[11.5px] ${sel?.id === q.id ? "text-[#003FC7]" : "text-[#03002C]/80"}`} onClick={(e) => pickPart(q.id, e.shiftKey)}>
+                          <button type="button" className={`flex-1 truncate py-0.5 text-left text-[11.5px] ${sel?.id === q.id ? "text-primary" : "text-[#03002C]/80"}`} onClick={(e) => pickPart(q.id, e.shiftKey)}>
                             {isCopy(q.id) ? "Copy of object" : `Object ${i + 1}`}{badgedPartIds(edits).has(q.id) ? " · as text" : ""}{(edits.groups ?? defaultPartGroups(L)).some((g) => g.includes(q.id)) ? " · grouped" : ""}{isLocked(q.id) ? " · locked" : ""}
                           </button>
                           <button type="button" aria-label={ph ? "Show object" : "Hide object"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchPart(q.id, { hidden: !ph })}>
@@ -631,7 +631,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                       const th = edits.texts?.[t.id]?.hidden ?? false;
                       return (
                         <li key={t.id} className="flex items-center gap-1">
-                          <button type="button" className={`flex-1 truncate py-0.5 text-left text-[11.5px] ${sel?.id === t.id ? "text-[#003FC7]" : "text-[#03002C]/80"}`} onClick={() => setSel({ kind: "text", id: t.id })}>
+                          <button type="button" className={`flex-1 truncate py-0.5 text-left text-[11.5px] ${sel?.id === t.id ? "text-primary" : "text-[#03002C]/80"}`} onClick={() => setSel({ kind: "text", id: t.id })}>
                             “{edits.texts?.[t.id]?.text ?? t.text}”
                           </button>
                           <button type="button" aria-label={th ? "Show text" : "Hide text"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchText(t.id, { hidden: !th })}>
@@ -653,7 +653,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
               {edits.dividers.map((d, i) => (
                 <li key={d.id} className="flex items-center gap-1 rounded-md border border-[#03002C]/10 bg-white px-2 py-1">
                   <span aria-hidden className="h-2 w-6 rounded-sm border border-[#03002C]/20" style={{ background: d.color }} />
-                  <button type="button" className={`flex-1 truncate text-left text-[12px] ${sel?.id === d.id ? "text-[#003FC7]" : "text-[#03002C]"}`} onClick={() => { setSel({ kind: "divider", id: d.id }); setPicked([]); }}>Divider {i + 1}</button>
+                  <button type="button" className={`flex-1 truncate text-left text-[12px] ${sel?.id === d.id ? "text-primary" : "text-[#03002C]"}`} onClick={() => { setSel({ kind: "divider", id: d.id }); setPicked([]); }}>Divider {i + 1}</button>
                   <button type="button" aria-label={d.hidden ? "Show divider" : "Hide divider"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchDivider(d.id, { hidden: !d.hidden })}>
                     {d.hidden ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
                   </button>

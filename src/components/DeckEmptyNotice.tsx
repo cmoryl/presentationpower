@@ -26,7 +26,7 @@ export function DeckEmptyNotice({ deckId, action }: DeckEmptyNoticeProps) {
         <Link
           to="/decks/$deckId"
           params={{ deckId }}
-          className="inline-flex items-center justify-center rounded-xl border border-[#003FC7] px-4 py-2 text-sm font-medium text-[#003FC7]"
+          className="inline-flex items-center justify-center rounded-xl border border-[#003FC7] px-4 py-2 text-sm font-medium text-primary"
         >
           Open the editor
         </Link>

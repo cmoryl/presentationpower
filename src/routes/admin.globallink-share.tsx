@@ -209,7 +209,7 @@ function ShareAdminPage() {
                 ? "Ping GlobalLink Share with the configured credentials"
                 : "Configure credentials first"
             }
-            className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-primary/20 disabled:opacity-40"
+            className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary hover:bg-primary/20 disabled:opacity-40"
           >
             {testing ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
             Test connection
@@ -394,7 +394,7 @@ function ShareAdminPage() {
                             href={a.shareUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 truncate text-[#003FC7] hover:underline"
+                            className="inline-flex items-center gap-1 truncate text-primary hover:underline"
                           >
                             <ExternalLink size={12} />
                             <span className="max-w-[260px] truncate">{a.shareUrl}</span>

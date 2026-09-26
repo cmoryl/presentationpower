@@ -314,7 +314,7 @@ function PrintCenterPage() {
             <p className="text-sm text-black/60">You haven't drafted any print assets yet.</p>
             <Link
               to="/asset/new"
-              className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] px-4 py-2 text-xs font-medium text-[#003FC7] hover:bg-primary hover:text-primary-foreground"
+              className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] px-4 py-2 text-xs font-medium text-primary hover:bg-primary hover:text-primary-foreground"
             >
               Draft your first one <ArrowRight size={12} />
             </Link>

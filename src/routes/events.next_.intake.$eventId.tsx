@@ -193,7 +193,7 @@ function IntakePage() {
                   href={f.source_url}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-[#003FC7] underline"
+                  className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-primary underline"
                 >
                   {f.source_title || f.source_url} <ExternalLink className="h-3 w-3" />
                 </a>

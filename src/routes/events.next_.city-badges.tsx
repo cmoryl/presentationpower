@@ -332,7 +332,7 @@ function CityBadgePage() {
               </div>
               {signedIn === false ? (
                 <p className="mt-3 text-xs text-black/55">
-                  <Link to="/auth" className="text-[#003FC7] hover:underline">
+                  <Link to="/auth" className="text-primary hover:underline">
                     Sign in
                   </Link>{" "}
                   to save print-run versions. Exporting works either way.

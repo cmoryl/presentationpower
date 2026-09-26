@@ -332,7 +332,7 @@ function ModuleEditorPage() {
                     <Link
                       to="/admin/modules/print/$moduleId"
                       params={{ moduleId: m.id }}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#E0E8F5] px-3 py-1.5 text-[11px] font-semibold text-[#003FC7] transition hover:border-[#003FC7]"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#E0E8F5] px-3 py-1.5 text-[11px] font-semibold text-primary transition hover:border-[#003FC7]"
                     >
                       Open in studio editor →
                     </Link>
@@ -380,7 +380,7 @@ function ModuleEditorPage() {
                   <Link
                     to="/convert"
                     search={{ module: v.id }}
-                    className="text-[11px] font-semibold text-[#003FC7] hover:underline"
+                    className="text-[11px] font-semibold text-primary hover:underline"
                   >
                     Use in marketing materials →
                   </Link>

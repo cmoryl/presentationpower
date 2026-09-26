@@ -121,13 +121,13 @@ function PlaybookPage() {
         </Link>
         <Link
           to="/events/next/city"
-          className="ml-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#003FC7] hover:underline"
+          className="ml-4 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
         >
           <MapPin size={13} /> Plan a new city
         </Link>
         <Link
           to="/events/next/knowledge"
-          className="ml-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#003FC7] hover:underline"
+          className="ml-4 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
         >
           <Brain size={13} /> Ask the knowledge store
         </Link>

@@ -240,7 +240,7 @@ function MasterItemEditorPage() {
         </h1>
         <p className="mt-3 rounded-2xl border border-dashed border-black/15 bg-white p-6 text-sm text-black/60">
           No library item with id <span className="font-mono">{itemId}</span>.{" "}
-          <Link to="/library/print" className="text-[#003FC7] underline">
+          <Link to="/library/print" className="text-primary underline">
             Back to the print library
           </Link>
         </p>

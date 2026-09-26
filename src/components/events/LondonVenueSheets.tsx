@@ -1061,7 +1061,7 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
           <span>The ring is a screen aid only — it is not drawn into the download.</span>
           <button
             type="button"
-            className="font-semibold text-[#003FC7] underline"
+            className="font-semibold text-primary underline"
             onClick={() => setHighlightRoom(undefined)}
           >
             Clear

@@ -88,7 +88,7 @@ function AgendaPage() {
             </p>
             <Link
               to="/events/next/san-francisco"
-              className="mt-2 inline-flex text-xs font-semibold text-[#003FC7] hover:underline"
+              className="mt-2 inline-flex text-xs font-semibold text-primary hover:underline"
             >
               San Francisco event page
             </Link>

@@ -115,7 +115,7 @@ function EditSavedModule() {
       <AppShell>
         <div className="p-10">
           <div className="text-sm text-black/70">That saved module no longer exists.</div>
-          <Link to="/library/my" className="mt-3 inline-block text-sm text-[#003FC7] underline">
+          <Link to="/library/my" className="mt-3 inline-block text-sm text-primary underline">
             Back to My library
           </Link>
         </div>

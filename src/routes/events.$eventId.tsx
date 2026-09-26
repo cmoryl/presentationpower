@@ -54,7 +54,7 @@ export const Route = createFileRoute("/events/$eventId")({
     <AppShell>
       <div className="mx-auto max-w-[900px] px-6 py-16 text-[#03002C]">
         <h1 className="text-2xl font-bold">Event not found</h1>
-        <Link to="/events" className="mt-4 inline-block font-semibold text-[#003FC7]">
+        <Link to="/events" className="mt-4 inline-block font-semibold text-primary">
           Back to events
         </Link>
       </div>
@@ -99,7 +99,7 @@ function EventHome() {
           ) : (
             <>
               <h1 className="text-2xl font-bold">Event not found</h1>
-              <Link to="/events/next/start" className="mt-4 inline-block font-semibold text-[#003FC7]">
+              <Link to="/events/next/start" className="mt-4 inline-block font-semibold text-primary">
                 Start a new event
               </Link>
             </>
@@ -142,7 +142,7 @@ function EventHome() {
               Readiness checklist.{" "}
               <Link
                 to={eventId === "london" ? "/events/next/london" : "/events/next/san-francisco"}
-                className="font-semibold text-[#003FC7] hover:underline"
+                className="font-semibold text-primary hover:underline"
               >
                 Open the {eventId === "london" ? "London 2026" : "San Francisco 2026"} page →
               </Link>
@@ -247,7 +247,7 @@ function ReadyList({ title, items }: { title: string; items: ReadyItem[] }) {
                   <p className="mt-0.5 text-sm text-[#03002C]/70">Waiting on {i.blockedOn}</p>
                 )}
                 {i.link && (
-                  <Link {...i.link} className="mt-1 inline-flex items-center gap-1 text-[13px] font-semibold text-[#003FC7]">
+                  <Link {...i.link} className="mt-1 inline-flex items-center gap-1 text-[13px] font-semibold text-primary">
                     {i.state === "ready" ? "Open" : "Next step"} <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 )}

@@ -4703,7 +4703,7 @@ function HeroInlineEditor({
           {stats.length < 4 && (
             <button
               type="button"
-              className="text-[11px] font-medium text-[#003FC7] hover:underline"
+              className="text-[11px] font-medium text-primary hover:underline"
               onClick={() => onPatch({ stats: [...stats, { label: "New metric", value: "0" }] })}
             >
               + Add stat
@@ -4731,7 +4731,7 @@ function HeroInlineEditor({
           {meta.length < 4 && (
             <button
               type="button"
-              className="text-[11px] font-medium text-[#003FC7] hover:underline"
+              className="text-[11px] font-medium text-primary hover:underline"
               onClick={() => onPatch({ meta: [...meta, { label: "Label", value: "Value" }] })}
             >
               + Add meta row

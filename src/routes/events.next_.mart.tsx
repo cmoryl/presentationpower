@@ -100,7 +100,7 @@ function MartPage() {
             </h2>
             <Link
               to="/events/next/pillars"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#E0E8F5]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-3 py-1.5 text-xs font-medium text-primary hover:bg-[#E0E8F5]"
             >
               Open the pillar editor <ArrowRight size={13} />
             </Link>
@@ -163,7 +163,7 @@ function MartPage() {
             </div>
             <Link
               to="/events/next/pillars"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#E0E8F5]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-3 py-1.5 text-xs font-medium text-primary hover:bg-[#E0E8F5]"
             >
               Apply in the editor <ArrowRight size={13} />
             </Link>
@@ -246,7 +246,7 @@ function MartPage() {
                         key={f.label}
                         href={f.url}
                         download
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-2.5 py-1.5 text-[11px] font-medium text-[#003FC7] hover:bg-[#E0E8F5]"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-2.5 py-1.5 text-[11px] font-medium text-primary hover:bg-[#E0E8F5]"
                       >
                         <Download size={12} /> {f.label}
                       </a>
@@ -322,7 +322,7 @@ function MartPage() {
             </div>
             <Link
               to="/events/pillars"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#E0E8F5]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-3 py-1.5 text-xs font-medium text-primary hover:bg-[#E0E8F5]"
             >
               Open the editor <ArrowRight size={13} />
             </Link>

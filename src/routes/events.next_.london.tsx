@@ -972,14 +972,14 @@ function LondonSignagePage() {
           <>
             <Link
               to="/events/next"
-              className="inline-flex items-center gap-2 text-sm font-medium text-[#003FC7] hover:underline"
+              className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
             >
               <ArrowLeft className="h-4 w-4" /> NEXT 2026 event system
             </Link>
             <Link
               to="/events/$eventId"
               params={{ eventId: "london" }}
-              className="ml-4 inline-flex items-center gap-1 text-[13px] font-semibold text-[#003FC7] hover:underline"
+              className="ml-4 inline-flex items-center gap-1 text-[13px] font-semibold text-primary hover:underline"
             >
               Readiness checklist
             </Link>
@@ -1855,7 +1855,7 @@ function LondonSignagePage() {
                     , not finished artwork. It is reference for sizing only, so it is not painted
                     here and is not served as the print file.{" "}
                     <a
-                      className="font-semibold text-[#003FC7] underline"
+                      className="font-semibold text-primary underline"
                       href={londonPackReference(openPanel.id)!.masterUrl}
                       download={londonPackReference(openPanel.id)!.masterFilename}
                     >
