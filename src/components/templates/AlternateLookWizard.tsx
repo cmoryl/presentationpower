@@ -278,7 +278,7 @@ function IntakeRail({
           <button
             type="submit"
             disabled={busy}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#003FC7] px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-60"
           >
             {busy && <Loader2 className="h-4 w-4 animate-spin" />} Start intake
           </button>
@@ -588,7 +588,7 @@ function IntakePanel({
               type="button"
               onClick={doApprove}
               disabled={busy || (!gate.ok && intake.stage !== "review")}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#003FC7] px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
             >
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
               {STAGE_ORDER[idx + 1] === "published" ? "Approve & publish" : "Approve & continue"}

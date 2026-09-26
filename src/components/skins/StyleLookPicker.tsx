@@ -760,8 +760,8 @@ function ApprovedStyleCard({
           onClick={onPick}
           className={`flex-1 py-1.5 text-[9px] font-semibold uppercase tracking-wider transition ${
             active
-              ? "bg-[#003FC7]/[0.06] text-[#003FC7]"
-              : "text-[#03002C]/55 hover:bg-black/[0.03] hover:text-[#003FC7] dark:text-white/55 dark:hover:bg-white/[0.05]"
+              ? "bg-primary/[0.06] text-[#003FC7]"
+              : "text-[#03002C]/55 hover:bg-black/[0.03] hover:text-[#003FC7] dark:text-primary-foreground/55 dark:hover:bg-white/[0.05]"
           }`}
         >
           {active ? "Selected" : "Use"}

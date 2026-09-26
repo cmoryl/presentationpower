@@ -128,7 +128,7 @@ function EventsView() {
             <div className="flex flex-wrap gap-3 pt-2">
               <a
                 href="#playbooks"
-                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-white hover:bg-[#003FC7]"
+                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary"
               >
                 <Sparkles size={14} /> Explore playbooks ↓
               </a>
@@ -393,7 +393,7 @@ function EventsView() {
           </div>
           <Link
             to={favorites.size === 0 ? "/library" : "/events/new"}
-            className="rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]"
+            className="rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-[#03002C]"
           >
             {favorites.size === 0 ? "Browse presentations →" : "Choose favorites →"}
           </Link>

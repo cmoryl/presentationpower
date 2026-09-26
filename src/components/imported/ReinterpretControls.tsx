@@ -126,7 +126,7 @@ export function ReinterpretControls({
             <button
               type="button"
               onClick={commitSave}
-              className="rounded-full border border-[#003FC7] bg-[#003FC7] px-2.5 py-1 text-[11px] text-white"
+              className="rounded-full border border-[#003FC7] bg-primary px-2.5 py-1 text-[11px] text-primary-foreground"
             >
               Save
             </button>

@@ -72,8 +72,8 @@ export function TemplateToggleButton({ deckId }: { deckId: string }) {
       className={
         "inline-flex h-9 w-9 items-center justify-center rounded-full border transition disabled:opacity-60 " +
         (isTemplate
-          ? "border-[#003FC7]/40 bg-[#003FC7]/10 text-[#003FC7] hover:bg-[#003FC7]/15 dark:border-[#A1FBF9]/30 dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]"
-          : "border-black/10 bg-white text-black/70 hover:border-black/25 hover:bg-black/[0.04] hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white")
+          ? "border-[#003FC7]/40 bg-primary/10 text-[#003FC7] hover:bg-primary/15 dark:border-[#A1FBF9]/30 dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]"
+          : "border-black/10 bg-white text-black/70 hover:border-black/25 hover:bg-black/[0.04] hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-primary-foreground/70 dark:hover:text-primary-foreground")
       }
     >
       {busy ? (

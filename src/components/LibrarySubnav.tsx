@@ -56,7 +56,7 @@ export function LibrarySubnav({ active }: { active: Target }) {
             className={
               "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition " +
               (isActive
-                ? "border-[#003FC7] bg-[#003FC7] text-white"
+                ? "border-[#003FC7] bg-primary text-primary-foreground"
                 : "border-black/15 bg-white text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]")
             }
           >

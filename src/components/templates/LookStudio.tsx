@@ -453,7 +453,7 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
             <button
               type="button"
               onClick={startBlank}
-              className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
             >
               <Plus className="h-4 w-4" aria-hidden="true" /> New look from scratch
             </button>

@@ -724,7 +724,7 @@ function ReviewPanel({
         </button>
         <button
           onClick={onConfirm}
-          className="rounded-full bg-[#003FC7] px-6 py-3 text-sm font-medium text-white hover:opacity-90"
+          className="rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:opacity-90"
         >
           Create deck →
         </button>

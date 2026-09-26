@@ -104,7 +104,7 @@ export function AgentDeckDownload({ download }: { download: DeckDownload }) {
           <a
             href={download.url}
             download={download.fileName}
-            className="mt-2 inline-flex items-center gap-2 rounded-lg bg-[#003FC7] px-3 py-2 text-[12px] font-semibold text-white transition-colors hover:bg-[#03002C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
+            className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-[12px] font-semibold text-primary-foreground transition-colors hover:bg-[#03002C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
           >
             <Download className="h-3.5 w-3.5" aria-hidden />
             Download {download.fileName}

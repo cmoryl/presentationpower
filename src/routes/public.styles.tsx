@@ -146,7 +146,7 @@ function PackRow({ pack, brand }: { pack: StylePack; brand: BrandMode }) {
         </div>
         <a
           href={`/public/modules?style=${pack.id}`}
-          className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-xs font-medium text-white transition hover:bg-[#003FC7]"
+          className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-xs font-medium text-primary-foreground transition hover:bg-primary"
         >
           Browse all modules in this look
           <ArrowRight size={13} strokeWidth={1.75} />

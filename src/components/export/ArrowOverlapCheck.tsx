@@ -71,7 +71,7 @@ export function ArrowOverlapCheck({ className = "" }: { className?: string }) {
           <button
             type="button"
             onClick={run}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#03002C] px-4 text-sm font-semibold text-white hover:bg-[#003FC7]"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#03002C] px-4 text-sm font-semibold text-primary-foreground hover:bg-primary"
           >
             <ScanSearch className="h-4 w-4" aria-hidden />
             {report ? "Re-check" : "Check overlap"}

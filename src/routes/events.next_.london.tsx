@@ -1020,7 +1020,7 @@ function LondonSignagePage() {
                 type="button"
                 onClick={downloadWholeKit}
                 disabled={Boolean(zipProgress)}
-                className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 bg-[#003FC7] text-white disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 bg-primary text-primary-foreground disabled:opacity-60"
               >
                 <Download className="h-4 w-4" aria-hidden />
                 {zipProgress ? `Packing — ${zipProgress}` : "Download whole kit (ZIP)"}
@@ -1774,7 +1774,7 @@ function LondonSignagePage() {
                       <a
                         href={londonSuppliedMaster(openPanel)!.aiUrl}
                         download={londonSuppliedMaster(openPanel)!.filename}
-                        className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                        className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
                       >
                         <FileDown className="h-3.5 w-3.5" /> AI · supplied master
                       </a>

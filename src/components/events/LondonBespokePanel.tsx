@@ -127,7 +127,7 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
                   ) : null}
                   <button
                     type="button"
-                    className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-3.5 py-1.5 text-[12.5px] font-semibold text-white transition-opacity hover:opacity-90"
+                    className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-3.5 py-1.5 text-[12.5px] font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                     onClick={() => setView3d(u)}
                   >
                     <Boxes className="h-3.5 w-3.5" /> View in 3D

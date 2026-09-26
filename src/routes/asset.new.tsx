@@ -443,7 +443,7 @@ function NewAssetPage() {
                 type="button"
                 disabled={!canGenerate || busy}
                 onClick={handleGenerate}
-                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#03002C] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#003FC7]/30 transition hover:bg-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-[#03002C]"
+                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#03002C] px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-[#003FC7]/30 transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-[#03002C]"
               >
                 <Rocket size={14} />
                 {busy ? "Generating…" : "Generate print asset"}

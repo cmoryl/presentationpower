@@ -40,7 +40,7 @@ export function LoadFailureNotice({
           type="button"
           onClick={onRetry}
           disabled={retrying}
-          className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#03002C] px-4 text-sm font-semibold text-white hover:bg-[#003FC7] disabled:opacity-60"
+          className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#03002C] px-4 text-sm font-semibold text-primary-foreground hover:bg-primary disabled:opacity-60"
         >
           <RefreshCw className={`h-4 w-4 ${retrying ? "animate-spin" : ""}`} aria-hidden />
           {retrying ? "Trying again…" : "Try again"}

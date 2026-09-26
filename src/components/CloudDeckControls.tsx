@@ -713,7 +713,7 @@ export function SaveDeckToMyFilesButton({ deckId }: { deckId: string }) {
       onClick={onSave}
       disabled={busy}
       title="Store this deck in your workspace so it opens on your other devices"
-      className="inline-flex h-9 items-center gap-1.5 rounded-full bg-[#003FC7] px-3.5 text-[12px] font-semibold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+      className="inline-flex h-9 items-center gap-1.5 rounded-full bg-primary px-3.5 text-[12px] font-semibold text-primary-foreground shadow-sm transition hover:brightness-110 disabled:opacity-60"
     >
       {busy ? <Loader2 size={13} className="animate-spin" /> : <FolderUp size={13} />}
       <span>{busy ? "Saving…" : "Save deck to My Files"}</span>

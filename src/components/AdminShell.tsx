@@ -93,7 +93,7 @@ function SessionRoleBanner() {
       {!signedIn && !loading && (
         <a
           href={loginUrl()}
-          className="ml-auto rounded-lg bg-[#003FC7] px-3 py-1 text-xs font-semibold text-white hover:bg-[#0033a3]"
+          className="ml-auto rounded-lg bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground hover:bg-[#0033a3]"
         >
           Sign in
         </a>

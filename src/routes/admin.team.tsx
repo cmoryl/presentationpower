@@ -140,7 +140,7 @@ function RoleEditor({
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="rounded-lg bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:bg-[#0034a5] disabled:opacity-50"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-[#0034a5] disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save roles"}
           </button>

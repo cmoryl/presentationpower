@@ -649,7 +649,7 @@ function DeckEditor() {
                   <Link
                     to="/decks/$deckId/export"
                     params={{ deckId }}
-                    className="inline-flex min-h-10 items-center gap-2 rounded-md bg-[#003FC7] px-4 text-sm font-semibold text-white hover:bg-[#0033a3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
+                    className="inline-flex min-h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-[#0033a3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
                   >
                     Download PowerPoint
                   </Link>

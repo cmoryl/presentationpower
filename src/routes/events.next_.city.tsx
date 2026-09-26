@@ -231,7 +231,7 @@ function NextCityPage() {
               <button
                 type="button"
                 onClick={downloadCsv}
-                className="inline-flex items-center gap-1.5 rounded-md bg-[#003FC7] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#0034a6] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/40"
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-[12px] font-medium text-primary-foreground hover:bg-[#0034a6] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/40"
               >
                 <Download size={13} /> Download schedule (CSV)
               </button>

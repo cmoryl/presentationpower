@@ -209,7 +209,7 @@ function ShareAdminPage() {
                 ? "Ping GlobalLink Share with the configured credentials"
                 : "Configure credentials first"
             }
-            className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/10 px-4 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/20 disabled:opacity-40"
+            className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-primary/20 disabled:opacity-40"
           >
             {testing ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
             Test connection
@@ -265,7 +265,7 @@ function ShareAdminPage() {
           <button
             onClick={save}
             disabled={saving}
-            className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#03002C] disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-[#03002C] disabled:opacity-50"
           >
             {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
             Save defaults

@@ -241,7 +241,7 @@ function OracleAskView() {
                   <div className="flex flex-wrap gap-2">
                     <Link
                       to="/knowledge/new"
-                      className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-[11px] font-medium text-white hover:bg-[#0033a8]"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground hover:bg-[#0033a8]"
                     >
                       <Plus size={12} /> Add an entry
                     </Link>
@@ -328,7 +328,7 @@ function OracleAskView() {
           <button
             type="submit"
             disabled={busy || !input.trim()}
-            className="flex h-9 items-center gap-1.5 rounded-full bg-[#003FC7] px-4 text-xs font-medium uppercase tracking-widest text-white hover:bg-[#0033a8] disabled:opacity-40 dark:bg-[#A1FBF9] dark:text-[#03002C]"
+            className="flex h-9 items-center gap-1.5 rounded-full bg-primary px-4 text-xs font-medium uppercase tracking-widest text-primary-foreground hover:bg-[#0033a8] disabled:opacity-40 dark:bg-[#A1FBF9] dark:text-[#03002C]"
           >
             <Send size={14} /> Send
           </button>

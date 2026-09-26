@@ -9,7 +9,7 @@ export function AgentSignInGate({ label }: { label: string }) {
       <p>Sign in to use the {label}.</p>
       <Link
         to="/auth"
-        className="rounded-lg bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#0033a3]"
+        className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition hover:bg-[#0033a3]"
       >
         Sign in
       </Link>

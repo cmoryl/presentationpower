@@ -706,7 +706,7 @@ export function LookLookbook({
             <button
               type="button"
               onClick={onUse}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[#003FC7] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#0033a3]"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground transition hover:bg-[#0033a3]"
             >
               {active && <Check size={13} />}
               {active ? "Using this style" : "Use this style"}

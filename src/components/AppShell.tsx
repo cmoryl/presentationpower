@@ -416,8 +416,8 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
                                       search={s.search ?? {}}
                                       className={`block rounded-lg px-2.5 py-2 text-sm font-medium leading-tight transition ${
                                         active
-                                          ? "bg-[#003FC7] text-white dark:!bg-white/15 dark:!text-white"
-                                          : "text-[#03002C]/85 hover:bg-[#E0E8F5] hover:text-[#03002C] dark:text-white/80 dark:hover:!bg-white/10 dark:hover:!text-white"
+                                          ? "bg-primary text-primary-foreground dark:!bg-white/15 dark:!text-primary-foreground"
+                                          : "text-[#03002C]/85 hover:bg-[#E0E8F5] hover:text-[#03002C] dark:text-primary-foreground/80 dark:hover:!bg-white/10 dark:hover:!text-primary-foreground"
                                       }`}
                                       onClick={() => setPresOpen(false)}
                                     >
@@ -477,8 +477,8 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
                                       to={s.to}
                                       className={`block rounded-lg px-2.5 py-2 text-sm font-medium leading-tight transition ${
                                         active
-                                          ? "bg-[#003FC7] text-white dark:!bg-white/15 dark:!text-white"
-                                          : "text-[#03002C]/85 hover:bg-[#E0E8F5] hover:text-[#03002C] dark:text-white/80 dark:hover:!bg-white/10 dark:hover:!text-white"
+                                          ? "bg-primary text-primary-foreground dark:!bg-white/15 dark:!text-primary-foreground"
+                                          : "text-[#03002C]/85 hover:bg-[#E0E8F5] hover:text-[#03002C] dark:text-primary-foreground/80 dark:hover:!bg-white/10 dark:hover:!text-primary-foreground"
                                       }`}
                                       onClick={() => setAdminOpen(false)}
                                     >
@@ -527,7 +527,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
                       to={n.to}
                       className={`flex min-h-11 items-center rounded-xl px-3 text-sm transition ${
                         active
-                          ? "bg-[#003FC7] text-white"
+                          ? "bg-primary text-primary-foreground"
                           : "text-black/75 hover:bg-black/[0.04] hover:text-black"
                       }`}
                     >

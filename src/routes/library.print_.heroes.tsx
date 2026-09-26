@@ -189,7 +189,7 @@ function Toggle({
       className={
         "rounded-full border px-3 py-1.5 text-xs font-medium transition " +
         (active
-          ? "border-transparent bg-[#003FC7] text-white"
+          ? "border-transparent bg-primary text-primary-foreground"
           : "border-black/15 bg-white text-[#03002C] hover:border-black/40")
       }
     >
@@ -252,7 +252,7 @@ function HeroCard({
             className={
               "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition " +
               (picked
-                ? "border-transparent bg-[#003FC7] text-white"
+                ? "border-transparent bg-primary text-primary-foreground"
                 : "border-black/15 text-[#03002C] hover:border-black/40")
             }
           >

@@ -1133,7 +1133,7 @@ function Chip({
       onClick={onClick}
       className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
         on
-          ? "border-[#003FC7] bg-[#003FC7] text-white"
+          ? "border-[#003FC7] bg-primary text-primary-foreground"
           : "border-black/15 bg-white text-[#03002C] hover:border-black/40"
       }`}
     >

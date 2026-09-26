@@ -238,7 +238,7 @@ export function DemoStyleAdmin({
           type="button"
           onClick={apply}
           disabled={!dirty || !validation.ok || publish.isPending}
-          className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#003FC7] px-5 text-sm font-semibold text-white transition hover:bg-[#0035a8] disabled:opacity-50"
+          className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition hover:bg-[#0035a8] disabled:opacity-50"
         >
           <Check size={15} />
           {publish.isPending ? "Publishing…" : "Publish look to live demo"}

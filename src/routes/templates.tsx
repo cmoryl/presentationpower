@@ -260,7 +260,7 @@ function TemplateCard({ row }: { row: TemplateRow }) {
           type="button"
           onClick={onUse}
           disabled={busy}
-          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
         >
           {busy ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
           {busy ? "Cloning…" : "Use template"}
@@ -365,7 +365,7 @@ function DivisionStarterCard({ starter }: { starter: DivisionStarter }) {
           type="button"
           onClick={onUse}
           disabled={busy}
-          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
         >
           {busy ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
           {busy ? "Building…" : "Use starter"}

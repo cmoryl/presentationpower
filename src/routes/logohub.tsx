@@ -123,7 +123,7 @@ function LogoHubBrowse() {
             </p>
             <Link
               to="/auth"
-              className="mt-4 inline-flex items-center rounded-lg bg-[#003FC7] px-4 py-2 text-sm font-medium text-white"
+              className="mt-4 inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
             >
               Sign in
             </Link>
@@ -169,7 +169,7 @@ function LogoHubBrowse() {
             <div className="mt-6 flex flex-wrap justify-center gap-2">
               <Link
                 to="/admin/logohub"
-                className="rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#0033a8]"
+                className="rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-[#0033a8]"
               >
                 Add a client logo
               </Link>

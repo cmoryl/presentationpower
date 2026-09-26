@@ -151,7 +151,7 @@ function AuditRow({
             <div className="mt-3 flex flex-wrap gap-2">
               <Link
                 to="/admin/modules"
-                className="rounded-full bg-[#003FC7] px-3 py-1.5 text-[11px] font-medium text-white hover:bg-[#03002C]"
+                className="rounded-full bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground hover:bg-[#03002C]"
               >
                 Correct in module editor
               </Link>

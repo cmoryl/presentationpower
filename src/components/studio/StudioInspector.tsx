@@ -185,7 +185,7 @@ export function StudioInspector({
               <button
                 type="button"
                 onClick={onExplode}
-                className="w-full rounded-lg bg-[#003FC7] px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-white hover:bg-[#0033a6]"
+                className="w-full rounded-lg bg-primary px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-primary-foreground hover:bg-[#0033a6]"
               >
                 Make editable
               </button>

@@ -735,7 +735,7 @@ function SearchTab() {
           <button
             onClick={runSearch}
             disabled={busy || !query.trim()}
-            className="rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-white transition hover:bg-[#003FC7] disabled:opacity-50"
+            className="rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary disabled:opacity-50"
           >
             {busy ? "Searching…" : "Search"}
           </button>
@@ -944,8 +944,8 @@ function CopyButton({
         active
           ? "bg-[#A6FA87] text-[#03002C]"
           : primary
-            ? "bg-[#003FC7] text-white hover:bg-[#03002C]"
-            : "bg-[#03002C] text-white hover:bg-[#003FC7]"
+            ? "bg-primary text-primary-foreground hover:bg-[#03002C]"
+            : "bg-[#03002C] text-primary-foreground hover:bg-primary"
       }`}
     >
       {active ? "Copied ✓" : label}

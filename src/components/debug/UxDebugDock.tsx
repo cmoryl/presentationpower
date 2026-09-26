@@ -125,7 +125,7 @@ export function UxDebugDock() {
               <button
                 type="button"
                 onClick={start}
-                className="flex-1 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/90"
+                className="flex-1 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
               >
                 Record session
               </button>
