@@ -36,7 +36,7 @@ import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
 export const Route = createFileRoute("/admin/icon-studio")({
   head: () => ({
     meta: [
-      { title: "Icon Studio · Admin · TransPerfect" },
+      { title: "Icon Studio · Admin · TransPerfect Element" },
       {
         name: "description",
         content:

@@ -224,13 +224,9 @@ export function CollateralGrid({
         <span className="inline-flex items-center gap-1 rounded-full border border-[#A6FA87]/40 bg-[#A6FA8722] px-2 py-0.5 font-semibold uppercase tracking-widest text-[#2F6D1B]">
           <CircleCheck size={12} /> {liveItems.length} rendered
         </span>
-        {soonItems.length > 0 ? (
-          <span className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white/85 px-2 py-0.5 font-semibold uppercase tracking-widest text-black/55">
-            <Clock size={12} /> {soonItems.length} coming soon
-          </span>
-        ) : null}
+        {/* Unbuilt pieces are hidden rather than shown as "coming soon". */}
         <span className="text-black/40">
-          · {items.length} total collateral pieces in the full kit scope
+          {soonItems.length > 0 ? `· ${soonItems.length} more pieces not built yet` : null}
         </span>
       </div>
 
@@ -247,17 +243,7 @@ export function CollateralGrid({
         </div>
       ) : null}
 
-      {soonItems.length > 0 ? (
-        <div className="space-y-8 border-t border-dashed border-black/15 pt-8">
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white/85 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-widest text-black/55">
-              <Clock size={12} /> Coming soon · roadmap
-            </span>
-            <div className="h-px flex-1 bg-black/10" />
-          </div>
-          {renderGroups(soonItems, true)}
-        </div>
-      ) : null}
+
     </div>
   );
 }

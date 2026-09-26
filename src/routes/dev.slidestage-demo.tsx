@@ -8,7 +8,7 @@ import {
 } from "@/lib/deck-store";
 
 export const Route = createFileRoute("/dev/slidestage-demo")({
-  head: () => ({ meta: [{ title: "SlideStage demo · TransPerfect" }] }),
+  head: () => ({ meta: [{ title: "SlideStage demo · TransPerfect Element" }] }),
   component: DemoView,
 });
 

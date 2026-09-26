@@ -49,7 +49,7 @@ import { STAGE_H, STAGE_W, makeItem, useCanvasStudio, type CanvasItem } from "@/
 export const Route = createFileRoute("/admin/module-studio")({
   head: () => ({
     meta: [
-      { title: "Module Studio · Admin · TransPerfect" },
+      { title: "Module Studio · Admin · TransPerfect Element" },
       {
         name: "description",
         content:

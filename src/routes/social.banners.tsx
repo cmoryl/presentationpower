@@ -8,7 +8,7 @@ import { LinkedInBannerStudio } from "@/components/social/LinkedInBannerStudio";
 export const Route = createFileRoute("/social/banners")({
   head: () => ({
     meta: [
-      { title: "Social banner studio · TransPerfect" },
+      { title: "Social banner studio · TransPerfect Element" },
       {
         name: "description",
         content:

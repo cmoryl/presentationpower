@@ -8,7 +8,7 @@ import { ElementMark } from "@/components/brand/ElementLogo";
 export const Route = createFileRoute("/knowledge/brand-guides/")({
   head: () => ({
     meta: [
-      { title: "Brand Guides · Knowledge · TransPerfect" },
+      { title: "Brand Guides · Knowledge · TransPerfect Element" },
       {
         name: "description",
         content:
