@@ -9,7 +9,7 @@
 // Every file is named rdraft- until the San Francisco revision is published.
 
 import JSZip from "jszip";
-import { PDFDocument, degrees, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, PDFName, PDFOperator, PDFOperatorNames } from "pdf-lib";
+import { PDFDocument, degrees, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, concatTransformationMatrix, PDFName, PDFOperator, PDFOperatorNames } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 
 import {
@@ -160,7 +160,7 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
     page.pushOperators(clipEvenOdd(), endPath());
     page.drawPage(emb, {
       x: B + p.x - bx * p.scale,
-      y: H - (B + p.y + (p.clipBottom - p.clipTop) * p.scale),
+      y: H - (B + p.y + (p.clipBottom - p.clipTop + exBot) * p.scale),
       xScale: p.scale,
       yScale: p.scale,
     });
@@ -216,6 +216,18 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
         page.drawText(l.text, { x: o.x, y: o.y, size: t.ksize, font: f, color: hexRgb(t.fill), opacity: t.opacity, rotate: degrees(-t.rot) });
         page.pushOperators(setCharacterSpacing(0), popGraphicsState());
       }
+    }
+  page.pushOperators(popGraphicsState());
+
+  // Crop marks in the slug: 0.25 in long, starting 1/8 in outside trim (clear of bleed).
+  const reg = rgb(0, 0, 0);
+  const tx0 = S + B, ty0 = S + B, tx1 = tx0 + KIOSK_W, ty1 = ty0 + KIOSK_H;
+  const off = B, len = 18, lw = 0.25;
+  for (const x of [tx0, tx1])
+    for (const y of [ty0, ty1]) {
+      const sx = x === tx0 ? -1 : 1, sy = y === ty0 ? -1 : 1;
+      page.drawLine({ start: { x: x + sx * off, y }, end: { x: x + sx * (off + len), y }, thickness: lw, color: reg });
+      page.drawLine({ start: { x, y: y + sy * off }, end: { x, y: y + sy * (off + len) }, thickness: lw, color: reg });
     }
   return doc.save();
 }
