@@ -1635,6 +1635,28 @@ function BriefCommandCenter() {
                 </div>
               </div>
 
+              {(() => {
+                const figures =
+                  `${prompt} ${prospectDetails.knownFacts}`.match(/\d[\d.,]*\s*(%|[kKmMbB]\b|x\b|×)?/g) ?? [];
+                return (
+                  <div
+                    role="note"
+                    aria-label="Figures warning"
+                    className="mb-3 rounded-lg border border-[#E53D2E]/40 bg-[#E53D2E]/5 px-4 py-3 text-sm leading-relaxed text-[#03002C] dark:text-white"
+                  >
+                    <p className="font-semibold">
+                      {figures.length === 0
+                        ? "Your brief has no figures — the deck writer may invent some."
+                        : `Your brief gives ${figures.length === 1 ? "1 figure" : `${figures.length} figures`}. The deck writer may still invent others.`}
+                    </p>
+                    <p className="mt-1 text-black/75 dark:text-white/75">
+                      The writer can add statistics with made-up sources. Starter figures you didn't give show as
+                      "—" with "Add figure", and every deck gets a fact check before download. Add real numbers
+                      to the brief now so they're used instead.
+                    </p>
+                  </div>
+                );
+              })()}
               <div className="rounded-2xl border border-black/10 bg-white p-2 transition focus-within:border-[#003FC7]/50 focus-within:shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
                   <textarea
