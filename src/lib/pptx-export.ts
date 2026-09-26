@@ -127,6 +127,7 @@ import {
 } from "@/lib/showcase-cards";
 
 import { laneCornerRadiusIn, laneHeightIn, railBoxIn } from "@/lib/layer-stack-geometry";
+import { groundIsLightAt } from "@/lib/export-ground-luma";
 import {
   auditDeckGeometry,
   geometryRepairWarnings,
