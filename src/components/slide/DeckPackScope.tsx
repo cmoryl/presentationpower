@@ -21,9 +21,16 @@ import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackCo
 import { packToneBrand, type StylePack } from "@/lib/style-packs";
 import { effectivePack } from "@/lib/effective-pack";
 import { useEffectiveStylePack } from "@/hooks/use-template-registry";
+import { packIdForBrandMode } from "@/lib/look-brand";
+
+/** Recorded pack, else the template the deck's brand owns (DataForce → R03). */
+function lightPackId(deck: PackSource): string | null {
+  return deck?.context?.stylePackId ?? packIdForBrandMode(deck?.brandModeId) ?? null;
+}
 
 type PackSource =
   | {
+      brandModeId?: string | null;
       context?:
         | {
             stylePackId?: string | null;
@@ -44,7 +51,7 @@ export function useDeckPack(deck: PackSource): StylePack | null {
   // Resolved through the registry-aware hook so a republished template or an
   // updated background override invalidates the deck's look immediately.
   return useEffectiveStylePack(
-    deck?.context?.stylePackId ?? null,
+    lightPackId(deck),
     deck?.context?.designRecipeId ?? null,
   );
 }
@@ -52,7 +59,7 @@ export function useDeckPack(deck: PackSource): StylePack | null {
 /** Non-hook form for loaders, exports and other non-render call sites. */
 export function deckPack(deck: PackSource): StylePack | null {
   return effectivePack({
-    stylePackId: deck?.context?.stylePackId ?? null,
+    stylePackId: lightPackId(deck),
     designRecipeId: deck?.context?.designRecipeId ?? null,
   });
 }
@@ -73,7 +80,9 @@ export function deckPackResolver(
   deck: PackSource,
 ): (slide?: { mode?: "light" | "dark" | null } | null) => StylePack | null {
   const light = deckPack(deck);
-  const darkId = deck?.context?.darkStylePackId ?? null;
+  const darkId =
+    deck?.context?.darkStylePackId ??
+    (deck?.context?.stylePackId ? null : packIdForBrandMode(deck?.brandModeId));
   const dark = darkId
     ? effectivePack({
         stylePackId: darkId,
