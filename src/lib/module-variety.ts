@@ -48,6 +48,20 @@ const SAME_FAMILY_PENALTY = 46;
 const RECENCY_WINDOW = 4;
 const RECENCY_BONUS_PENALTY = 90;
 
+/** Existing standout layouts that were rarely picked; nudged forward when permitted. */
+export const BOLD_VARIANT_IDS: ReadonlySet<string> = new Set([
+  "MV-STAT-HERO-NUMBER",
+  "MV-IMG-FULL-BLEED",
+  "MV-ED-HERO-BLEED",
+  "MV-SPLIT-MANIFESTO",
+  "MV-OP-COVER-SPLIT",
+  "MV-CLOSE-SPLIT",
+  "MV-CLOSE-STATEMENT",
+  "MV-ED-DIVIDER-XL",
+]);
+const BOLD_BONUS = 24;
+const MAX_BOLD_NUDGES = 3;
+
 /**
  * Pick the module for one slot, preferring layouts the deck has not spent yet.
  *
@@ -68,6 +82,7 @@ export function pickVariedVariant(input: VarietyPick): ModuleVariant | undefined
     if (fam) familyCount.set(fam, (familyCount.get(fam) ?? 0) + 1);
   }
   const recent = usedVariantIds.slice(-RECENCY_WINDOW);
+  const boldUsed = usedVariantIds.filter((id) => BOLD_VARIANT_IDS.has(id)).length;
   const recentFamilies = new Set(
     recent.map((id) => byId(MODULE_VARIANTS, id)?.familyId).filter(Boolean) as string[],
   );
@@ -84,6 +99,9 @@ export function pickVariedVariant(input: VarietyPick): ModuleVariant | undefined
     // out-rank "this exact module is already on screen twice".
     if (v.id === suggestedVariantId && !usedCount.has(v.id)) score -= 200;
     if (preferredVariantIds?.has(v.id)) score -= 30;
+    // Standout layouts get a nudge the first time, capped so a deck carries a
+    // few bold moments rather than becoming all poster.
+    if (BOLD_VARIANT_IDS.has(v.id) && !usedCount.has(v.id) && boldUsed < MAX_BOLD_NUDGES) score -= BOLD_BONUS;
     // Deterministic rotation: same inputs → same deck, different decks → a
     // different first choice among equally good options.
     score += (hash(`${seed}:${v.id}`) % 17) / 2;
