@@ -615,7 +615,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                       return (
                         <li key={q.id} className="flex items-center gap-1">
                           <button type="button" className={`flex-1 truncate py-0.5 text-left text-[11.5px] ${sel?.id === q.id ? "text-[#003FC7]" : "text-[#03002C]/80"}`} onClick={(e) => pickPart(q.id, e.shiftKey)}>
-                            {isCopy(q.id) ? "Copy of object" : `Object ${i + 1}`}{(edits.groups ?? defaultPartGroups(L)).some((g) => g.includes(q.id)) ? " · grouped" : ""}{isLocked(q.id) ? " · locked" : ""}
+                            {isCopy(q.id) ? "Copy of object" : `Object ${i + 1}`}{badgedPartIds(edits).has(q.id) ? " · as text" : ""}{(edits.groups ?? defaultPartGroups(L)).some((g) => g.includes(q.id)) ? " · grouped" : ""}{isLocked(q.id) ? " · locked" : ""}
                           </button>
                           <button type="button" aria-label={ph ? "Show object" : "Hide object"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchPart(q.id, { hidden: !ph })}>
                             {ph ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
