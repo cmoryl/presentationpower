@@ -281,6 +281,7 @@ export function badgedPartIds(edits: KioskEdits = {}): Set<string> {
 /** Pure: place every visible piece of a London wall onto the kiosk front. */
 export function layoutKiosk(L0: LiveLayout, edits: KioskEdits = {}): PlacedBlock[] {
   const L = withCopies(L0, edits);
+  const badged = badgedPartIds(edits);
   const base = KIOSK_W / L.trimW;
   const vis = L.blocks.filter((b) => !isHidden(b, edits.blocks?.[b.id]));
   const full = (b: LiveBlock) => [b.y0, b.y1] as const;
