@@ -1,3 +1,4 @@
+import { condenseObjective, inferIndustry, NEUTRAL_INDUSTRY } from "@/lib/brief-infer";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -381,10 +382,14 @@ function BriefCommandCenter() {
     return {
       prospect: inferredProspect || "New prospect",
       industry:
-        prospectDetails.industry.trim() || brand?.contentScope?.industries?.[0] || "Life sciences",
+        prospectDetails.industry.trim() ||
+        inferIndustry(raw, brand?.contentScope?.industries ?? []) ||
+        NEUTRAL_INDUSTRY,
       audience: prospectDetails.audience.trim() || "Decision makers",
       meetingObjective:
-        prospectDetails.meetingObjective.trim() || raw || "Introduce TransPerfect capabilities",
+        prospectDetails.meetingObjective.trim() ||
+        condenseObjective(raw) ||
+        "Introduce TransPerfect capabilities",
       brandModeId,
       subCompany: "",
       archetypeId: defaultArch,
@@ -1030,12 +1035,12 @@ function BriefCommandCenter() {
           prospect: prospectDetails.prospect.trim() || "New prospect",
           industry:
             prospectDetails.industry.trim() ||
-            brand?.contentScope?.industries?.[0] ||
-            "Life sciences",
+            inferIndustry(prompt, brand?.contentScope?.industries ?? []) ||
+            NEUTRAL_INDUSTRY,
           audience: prospectDetails.audience.trim() || "Decision makers",
           meetingObjective:
             prospectDetails.meetingObjective.trim() ||
-            prompt.trim() ||
+            condenseObjective(prompt) ||
             "Introduce TransPerfect capabilities",
           brandModeId,
           archetypeId:

@@ -24,7 +24,7 @@ import {
   type ReactNode,
 } from "react";
 import { refreshSlideVideoUrl } from "@/lib/slide-videos";
-import { refreshSlideMediaUrl } from "@/lib/slide-media";
+import { refreshSlideMediaUrl, resignStorageUrl } from "@/lib/slide-media";
 import { signClientLogoPaths } from "@/lib/client-logos.functions";
 import type { DeckSlide } from "@/lib/deck-store";
 
@@ -135,6 +135,25 @@ export function SlideMediaRefreshProvider({
   const [imageUrls, setImageUrls] = useState<UrlMap>(() => new Map());
   const [logoUrls, setLogoUrls] = useState<UrlMap>(() => new Map());
   const inflight = useRef<Set<string>>(new Set());
+
+  // Saved slides can carry signed picture links that have since expired (e.g.
+  // division imagery baked into a seeded deck). When any storage-signed <img>
+  // fails, re-sign it once in place so the picture reappears.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const tried = new WeakSet<HTMLImageElement>();
+    const onError = (e: Event) => {
+      const img = e.target;
+      if (!(img instanceof HTMLImageElement) || tried.has(img)) return;
+      if (!/\/object\/sign\//.test(img.currentSrc || img.src)) return;
+      tried.add(img);
+      void resignStorageUrl(img.currentSrc || img.src).then((fresh) => {
+        if (fresh) img.src = fresh;
+      });
+    };
+    document.addEventListener("error", onError, true);
+    return () => document.removeEventListener("error", onError, true);
+  }, []);
 
   const key = useMemo(() => {
     const { videos, posters, images, logos } = collectPaths(slides);
