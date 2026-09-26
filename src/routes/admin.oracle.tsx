@@ -1,3 +1,4 @@
+import { KnowledgeTabs } from "@/components/knowledge/KnowledgeTabs";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -30,7 +31,12 @@ export const Route = createFileRoute("/admin/oracle")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: OracleAdminView,
+  component: () => (
+    <>
+      <KnowledgeTabs />
+      <OracleAdminView />
+    </>
+  ),
 });
 
 type Row = Awaited<ReturnType<typeof listOracleKnowledge>>[number];

@@ -37,13 +37,8 @@ export const ADMIN_NAV_GROUPS: ReadonlyArray<AdminNavGroup> = [
   {
     label: "Knowledge",
     items: [
-      { to: "/admin/knowledge-hub", label: "Knowledge hub" },
-      { to: "/knowledge", label: "Browse entries" },
-      { to: "/knowledge/ask", label: "Ask Oracle" },
-      { to: "/admin/oracle", label: "Oracle KB" },
-      { to: "/admin/knowledge", label: "KB manager" },
-      { to: "/admin/approvals", label: "Module approvals" },
-      { to: "/approvals", label: "Brand approval queue" },
+      { to: "/knowledge", label: "Knowledge" },
+      { to: "/approvals", label: "Approvals" },
     ],
   },
   {

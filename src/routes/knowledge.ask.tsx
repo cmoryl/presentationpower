@@ -1,3 +1,4 @@
+import { KnowledgeTabs } from "@/components/knowledge/KnowledgeTabs";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
@@ -27,7 +28,12 @@ export const Route = createFileRoute("/knowledge/ask")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: OracleAskView,
+  component: () => (
+    <>
+      <KnowledgeTabs />
+      <OracleAskView />
+    </>
+  ),
 });
 
 type ChatMsg = {

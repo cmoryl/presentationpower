@@ -1,3 +1,4 @@
+import { KnowledgeTabs } from "@/components/knowledge/KnowledgeTabs";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -31,7 +32,12 @@ export const Route = createFileRoute("/knowledge/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: KnowledgeView,
+  component: () => (
+    <>
+      <KnowledgeTabs />
+      <KnowledgeView />
+    </>
+  ),
 });
 
 
