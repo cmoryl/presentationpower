@@ -312,8 +312,26 @@ export function extractTextRuns(
     const flat = blendOverBackdrop(el, effective);
     const color = flat.hex;
 
-    const rect = el.getBoundingClientRect();
+    let rect: DOMRect = el.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) continue;
+    // An element that also holds a non-text child (an icon or arrow before the
+    // label) must be placed from where its OWN text starts, not from the
+    // element's left edge — otherwise the label is emitted on top of the icon
+    // ("↑" drawn over "TREND").
+    if (Array.from(el.children).some((c) => c.getBoundingClientRect().width > 0.5)) {
+      const range = document.createRange();
+      const tn = Array.from(el.childNodes).filter(
+        (n) => n.nodeType === Node.TEXT_NODE && (n.textContent ?? "").trim(),
+      );
+      if (tn.length) {
+        range.setStartBefore(tn[0]!);
+        range.setEndAfter(tn[tn.length - 1]!);
+        const tr = range.getBoundingClientRect();
+        if (tr.width >= 2 && tr.height >= 2 && Array.from(range.getClientRects()).length <= 1) {
+          rect = new DOMRect(tr.left, rect.top, tr.width, rect.height);
+        }
+      }
+    }
 
     const padL = parseFloat(cs.paddingLeft) || 0;
     const padR = parseFloat(cs.paddingRight) || 0;
