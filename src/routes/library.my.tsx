@@ -313,7 +313,7 @@ function SavedModuleCard({
         </div>
         <div className="mt-2 flex flex-wrap gap-1">
           {row.role && (
-            <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] font-medium text-[#003FC7]">
+            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-[#003FC7]">
               {row.role}
             </span>
           )}
@@ -442,7 +442,7 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
             type="button"
             onClick={() => activeSupported && addTo(active.id)}
             disabled={!activeSupported}
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#0030a0] disabled:cursor-not-allowed disabled:bg-black/20"
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition hover:bg-[#0030a0] disabled:cursor-not-allowed disabled:bg-black/20"
             title={
               activeSupported
                 ? `Add to ${active.title}`
@@ -456,7 +456,7 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#0030a0]"
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition hover:bg-[#0030a0]"
           >
             <Plus size={12} /> Use on surface…
           </button>

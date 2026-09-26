@@ -676,7 +676,7 @@ export function LookLookbook({
 
   return (
     <div
-      className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-[#03002C]/60 p-4 backdrop-blur-sm sm:p-8"
+      className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-[#03002C]/60 p-4 backdrop-blur-sm sm:p-8 dark:bg-card"
       role="dialog"
       aria-modal="true"
       aria-label={`${meta.name} look and feel gallery`}
@@ -723,7 +723,7 @@ export function LookLookbook({
         </div>
 
         {/* spec strip */}
-        <dl className="grid grid-cols-2 gap-x-4 gap-y-2 border-b border-black/10 bg-[#F2F2F2]/60 px-5 py-3 text-[11px] sm:grid-cols-5">
+        <dl className="grid grid-cols-2 gap-x-4 gap-y-2 border-b border-black/10 bg-muted/60 px-5 py-3 text-[11px] sm:grid-cols-5">
           {[
             ...meta.specs,
             [
@@ -760,7 +760,7 @@ export function LookLookbook({
             ))}
           </div>
           {meta.footer && <p className="mt-4 text-[11px] text-[#03002C]/50">{meta.footer}</p>}
-          {extra && <div className="mt-5 rounded-2xl bg-[#03002C] p-4 sm:p-5">{extra}</div>}
+          {extra && <div className="mt-5 rounded-2xl bg-[#03002C] p-4 sm:p-5 dark:bg-card">{extra}</div>}
         </div>
       </div>
     </div>

@@ -282,7 +282,7 @@ export function ProspectPanel({
         </div>
 
         {/* Context strength + what the generator will actually reuse */}
-        <aside className="flex flex-col gap-4 self-start rounded-xl border border-black/10 bg-[#F2F2F2]/60 p-4">
+        <aside className="flex flex-col gap-4 self-start rounded-xl border border-black/10 bg-muted/60 p-4">
           {/* 1 — Always-visible progress, so the panel is never blank */}
           <div>
             <div className="flex items-baseline justify-between gap-2">
@@ -300,7 +300,7 @@ export function ProspectPanel({
               aria-label="Context strength"
             >
               <div
-                className="h-full rounded-full bg-[#003FC7] transition-all duration-300"
+                className="h-full rounded-full bg-primary transition-all duration-300"
                 style={{ width: `${Math.max(strengthPct, 4)}%` }}
               />
             </div>

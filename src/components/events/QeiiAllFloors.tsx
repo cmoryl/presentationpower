@@ -61,7 +61,7 @@ export function QeiiAllFloors({
 
   return (
     <section className="mt-5">
-      <div className="rounded-2xl border border-[#003FC7]/25 bg-[#E0E8F5] px-4 py-3">
+      <div className="rounded-2xl border border-[#003FC7]/25 bg-secondary px-4 py-3">
         <p className="text-[13px] font-semibold leading-relaxed text-[#03002C]">{summary}</p>
       </div>
 
@@ -76,7 +76,7 @@ export function QeiiAllFloors({
             >
               <div className="flex items-center justify-between gap-2 border-b border-black/10 px-4 py-3">
                 <span className="flex items-center gap-2.5">
-                  <span className="grid h-7 w-7 place-items-center rounded-lg bg-[#03002C] font-mono text-[12px] font-semibold text-white">
+                  <span className="grid h-7 w-7 place-items-center rounded-lg bg-[#03002C] font-mono text-[12px] font-semibold text-white dark:bg-card">
                     {floor.marker}
                   </span>
                   <span className="text-[13px] font-semibold tracking-tight text-[#03002C]">
@@ -92,7 +92,7 @@ export function QeiiAllFloors({
                 </button>
               </div>
 
-              <div className="bg-[#F2F2F2] px-4 py-4">
+              <div className="bg-muted px-4 py-4">
                 {/* A fixed box the size of the largest sheet: each plan sits inside
                     it at its own share of that width, centred. */}
                 <div
@@ -114,7 +114,7 @@ export function QeiiAllFloors({
                     wallWeight={wallWeight}
                     showAllSymbols={showAllSymbols}
                     edits={editsMap[floor.id]}
-                    className="block rounded-xl bg-[#EEF1F7]"
+                    className="block rounded-xl bg-muted"
                     style={{ width: `${(floor.w / maxW) * 100}%` }}
                   />
                 </div>

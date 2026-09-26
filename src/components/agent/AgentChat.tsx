@@ -504,7 +504,7 @@ export function AgentChat({
 function Dot({ delay = "0ms" }: { delay?: string }) {
   return (
     <span
-      className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-[#003FC7]"
+      className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-primary"
       style={{ animationDelay: delay }}
     />
   );

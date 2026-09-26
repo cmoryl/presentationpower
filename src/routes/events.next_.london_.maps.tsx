@@ -541,7 +541,7 @@ function LondonMapsPage() {
             <div className="mt-7 flex flex-wrap gap-3">
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 dark:bg-primary dark:text-primary-foreground"
                 onClick={() =>
                   runWithExportFeedback(
                     {
@@ -894,7 +894,7 @@ function LondonMapsPage() {
               )}
 
               {selected && !attendee ? (
-                <div className="mt-4 rounded-xl border border-[#003FC7]/25 bg-[#E0E8F5] p-4">
+                <div className="mt-4 rounded-xl border border-[#003FC7]/25 bg-secondary p-4">
                   <p className="text-[13px] font-semibold text-[#03002C]">{selected.name}</p>
                   <p className="mt-1 text-[12.5px] leading-relaxed text-[#03002C]/75">
                     {LONDON_ASSET_KIND_LABEL[londonAssetKind(selected)]} · {selected.room} ·{" "}
@@ -920,7 +920,7 @@ function LondonMapsPage() {
                     </button>
                     <button
                       type="button"
-                      className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90 dark:bg-primary dark:text-primary-foreground"
                       onClick={() => downloadAssetMapSvg(selected, exportOpts)}
                     >
                       <Download className="h-4 w-4" /> Location card (SVG)
@@ -962,7 +962,7 @@ function LondonMapsPage() {
           role="dialog"
           aria-modal="true"
           aria-label={`${plan?.label ?? "Floor"} live plan editor`}
-          className="fixed inset-0 z-50 flex flex-col bg-[#03002C]/70 p-3 backdrop-blur-sm sm:p-5"
+          className="fixed inset-0 z-50 flex flex-col bg-[#03002C]/70 p-3 backdrop-blur-sm sm:p-5 dark:bg-card"
         >
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#F7F9FC] shadow-2xl">
             <header className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 bg-white px-4 py-3">

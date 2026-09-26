@@ -175,7 +175,7 @@ export function PrintProofMenu({
           </label>
 
           {preview ? (
-            <p className="mt-3 rounded-lg bg-[#F2F2F2] p-2 text-[10.5px] leading-[1.45] text-[#03002C]">
+            <p className="mt-3 rounded-lg bg-muted p-2 text-[10.5px] leading-[1.45] text-[#03002C]">
               Sheet {Math.round(preview.sheetIn.width * 25.4)} × {Math.round(preview.sheetIn.height * 25.4)} mm ·{" "}
               {preview.sheetPx.width} × {preview.sheetPx.height} px at {preview.dpi} DPI.
               {preview.downscaled

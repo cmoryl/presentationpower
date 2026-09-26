@@ -517,7 +517,7 @@ export function LondonFloorMap({
               <span
                 key={e.label}
                 title={e.label}
-                className="absolute max-w-[42%] truncate rounded-full bg-[#03002C] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-white shadow-sm"
+                className="absolute max-w-[42%] truncate rounded-full bg-[#03002C] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-white shadow-sm dark:bg-card"
                 style={{
                   left: `${rx * 100}%`,
                   top: `${ry * 100}%`,
@@ -604,7 +604,7 @@ export function LondonFloorMap({
                     }}
                     title={`View ${m.name} in 3D`}
                     aria-label={`View ${m.name} in 3D`}
-                    className="absolute z-30 inline-flex items-center gap-1 rounded-full bg-[#003FC7] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-white shadow-sm outline-offset-2 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#03002C]"
+                    className="absolute z-30 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-primary-foreground shadow-sm outline-offset-2 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#03002C]"
                     style={{
                       left: `${(m.x / plan.w) * 100}%`,
                       top: `${(m.y / plan.h) * 100}%`,
@@ -677,7 +677,7 @@ export function LondonFloorMap({
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1 rounded-full bg-[#E0E8F5] px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-[#03002C]/70">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-[#03002C]/70">
                         <Crosshair className="h-3 w-3" />
                         {m.corrected ? "confirmed" : "schematic"}
                       </span>

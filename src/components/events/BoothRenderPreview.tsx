@@ -225,7 +225,7 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
         <div className="flex flex-wrap items-center gap-2">
           {shellOptions.length > 1 ? (
             <div
-              className="inline-flex rounded-full border border-black/10 bg-[#F2F2F2] p-0.5"
+              className="inline-flex rounded-full border border-black/10 bg-muted p-0.5"
               role="group"
               aria-label="Booth wall type"
             >
@@ -246,7 +246,7 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
               ))}
             </div>
           ) : (
-            <span className="rounded-full border border-black/10 bg-[#F2F2F2] px-3 py-1.5 text-[11px] font-semibold text-[#03002C]/70">
+            <span className="rounded-full border border-black/10 bg-muted px-3 py-1.5 text-[11px] font-semibold text-[#03002C]/70">
               No TV on stand
             </span>
           )}
@@ -279,7 +279,7 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
         onClick={() => setZoom(true)}
         title="View this render larger"
         aria-label={`View a larger render of ${panel.name} on the ${shell.label}`}
-        className="mt-3 block w-full cursor-zoom-in overflow-hidden rounded-lg border border-black/10 bg-[#E0E8F5] transition hover:border-[#003FC7]/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
+        className="mt-3 block w-full cursor-zoom-in overflow-hidden rounded-lg border border-black/10 bg-secondary transition hover:border-[#003FC7]/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
       >
         <div ref={cardStage} className="relative">
           {stage(false)}
@@ -306,7 +306,7 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
           role="dialog"
           aria-modal="true"
           aria-label={`${panel.name} — ${shell.label} render`}
-          className="fixed inset-0 z-[130] flex items-center justify-center bg-[#03002C]/85 p-6 backdrop-blur-sm"
+          className="fixed inset-0 z-[130] flex items-center justify-center bg-[#03002C]/85 p-6 backdrop-blur-sm dark:bg-card"
           onClick={() => setZoom(false)}
         >
           <div className="w-full max-w-6xl" onClick={(e) => e.stopPropagation()}>
@@ -335,7 +335,7 @@ export function BoothRenderPreview({ panel }: BoothRenderPreviewProps) {
             </div>
             <div
               ref={zoomStage}
-              className="relative overflow-hidden rounded-2xl border border-white/20 bg-[#E0E8F5] shadow-2xl"
+              className="relative overflow-hidden rounded-2xl border border-white/20 bg-secondary shadow-2xl"
             >
               {stage(true)}
             </div>

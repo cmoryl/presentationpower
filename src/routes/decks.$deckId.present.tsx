@@ -235,7 +235,7 @@ function PresenterView() {
       <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
         <SlideSkinProvider skin={deck.context?.skin}>
           <SlideMediaRefreshProvider slides={visibleSlides}>
-            <div className="fixed inset-0 flex flex-col bg-[#03002C] text-white">
+            <div className="fixed inset-0 flex flex-col bg-[#03002C] text-white dark:bg-card">
               <header className="flex items-center justify-between border-b border-white/15 px-5 py-3">
                 <div className="min-w-0">
                   <div className="text-[10px] font-medium uppercase tracking-widest text-white/50">

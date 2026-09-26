@@ -125,7 +125,7 @@ function NextCityPage() {
         </Link>
 
         <div className="mt-3">
-          <div className="inline-flex items-center gap-1.5 bg-[#E0E8F5] px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
+          <div className="inline-flex items-center gap-1.5 bg-secondary px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
             <MapPin size={12} /> Steps 3–4 · Sign schedule, then city templates
           </div>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#03002C]">
@@ -242,7 +242,7 @@ function NextCityPage() {
                 <caption className="sr-only">
                   Starting sign schedule for the next NEXT city, built from the London families
                 </caption>
-                <thead className="bg-[#F2F2F2] text-[11px] uppercase tracking-wide text-black/55">
+                <thead className="bg-muted text-[11px] uppercase tracking-wide text-black/55">
                   <tr>
                     <th scope="col" className="px-3 py-2 font-medium">
                       Ref

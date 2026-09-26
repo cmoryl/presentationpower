@@ -91,7 +91,7 @@ export function LiveDemoDeckBar({ deckId }: { deckId: string }) {
   }
 
   return (
-    <div className="mb-3 flex flex-wrap items-center gap-3 rounded-2xl border border-[#003FC7]/25 bg-[#003FC7]/[0.06] px-4 py-3">
+    <div className="mb-3 flex flex-wrap items-center gap-3 rounded-2xl border border-[#003FC7]/25 bg-primary/[0.06] px-4 py-3">
       <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#003FC7]">
         <Globe2 size={14} /> Live demo
       </span>
@@ -103,7 +103,7 @@ export function LiveDemoDeckBar({ deckId }: { deckId: string }) {
         type="button"
         onClick={() => void onPublish()}
         disabled={publish.isPending}
-        className="inline-flex min-h-[38px] items-center gap-2 rounded-full bg-[#003FC7] px-4 text-[13px] font-semibold text-white transition hover:bg-[#003FC7]/90 disabled:opacity-60"
+        className="inline-flex min-h-[38px] items-center gap-2 rounded-full bg-primary px-4 text-[13px] font-semibold text-primary-foreground transition hover:bg-[#003FC7]/90 disabled:opacity-60"
       >
         <UploadCloud size={14} />
         {publish.isPending ? "Publishing…" : "Publish to live demo"}

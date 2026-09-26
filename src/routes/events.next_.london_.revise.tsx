@@ -615,7 +615,7 @@ function LondonRevisePage() {
           <div className="mt-7 flex justify-center gap-3">
             <Link
               to="/events/next/london"
-              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 dark:bg-primary dark:text-primary-foreground"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to the panel kit
             </Link>
@@ -666,7 +666,7 @@ function LondonRevisePage() {
         </header>
 
         {/* Change summary + publish */}
-        <section className="mt-6 rounded-2xl border border-black/10 bg-[#F2F2F2] p-4 sm:p-5">
+        <section className="mt-6 rounded-2xl border border-black/10 bg-muted p-4 sm:p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-[#03002C]">
               <Sparkles className="h-4 w-4 text-[#003FC7]" aria-hidden="true" />
@@ -702,7 +702,7 @@ function LondonRevisePage() {
                 type="button"
                 onClick={() => void publishRevision()}
                 disabled={!dirty || saving}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-[#003FC7] px-3.5 py-2 text-sm font-semibold text-white disabled:opacity-40"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-40"
               >
                 {saving ? (
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -771,7 +771,7 @@ function LondonRevisePage() {
                   </span>
                   <span className="font-semibold text-[#003FC7]">{String(c.to)}</span>
                   {c.derived ? (
-                    <span className="rounded bg-[#E0E8F5] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#003FC7]">
+                    <span className="rounded bg-secondary px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#003FC7]">
                       derived
                     </span>
                   ) : null}
@@ -1091,7 +1091,7 @@ function LondonRevisePage() {
                 <button
                   type="button"
                   onClick={() => regenPanel(artPanel)}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#003FC7] px-3 py-2 text-sm font-semibold text-white"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
                 >
                   <RefreshCw className="h-4 w-4" aria-hidden="true" />
                   Rebuild this panel

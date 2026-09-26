@@ -213,7 +213,7 @@ function PdfIngestPage() {
             type="button"
             disabled={ingestMut.isPending}
             onClick={() => ingestMut.mutate()}
-            className="rounded-lg bg-[#03002C] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+            className="rounded-lg bg-[#03002C] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50 dark:bg-card"
           >
             {ingestMut.isPending ? "Running…" : "Run batch"}
           </button>
@@ -285,7 +285,7 @@ function PdfIngestPage() {
             type="button"
             disabled={embedMut.isPending}
             onClick={() => embedMut.mutate()}
-            className="rounded-lg bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
           >
             {embedMut.isPending ? "Embedding…" : "Embed batch"}
           </button>

@@ -146,7 +146,7 @@ function PackRow({ pack, brand }: { pack: StylePack; brand: BrandMode }) {
         </div>
         <a
           href={`/public/modules?style=${pack.id}`}
-          className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-xs font-medium text-primary-foreground transition hover:bg-primary"
+          className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-xs font-medium text-primary-foreground transition hover:bg-primary dark:bg-primary dark:text-primary-foreground"
         >
           Browse all modules in this look
           <ArrowRight size={13} strokeWidth={1.75} />
@@ -185,7 +185,7 @@ function PublicStyleDirectory() {
   const brand = byId(BRAND_MODES, brandId) ?? BRAND_MODES[0]!;
 
   return (
-    <main className="min-h-screen bg-[#F2F2F2] text-[#03002C]">
+    <main className="min-h-screen bg-muted text-[#03002C]">
       <BackToTop />
       <header className="border-b border-black/10 bg-white/80 backdrop-blur">
         <div className="mx-auto max-w-[1500px] px-6 py-10">

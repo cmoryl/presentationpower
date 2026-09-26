@@ -214,7 +214,7 @@ export function SaveModuleDialog({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-[#03002C]/70 p-6 backdrop-blur-md"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-[#03002C]/70 p-6 backdrop-blur-md dark:bg-card"
       onClick={onClose}
     >
       <div
@@ -352,7 +352,7 @@ export function SaveModuleDialog({
                 {tags.map((t) => (
                   <span
                     key={t}
-                    className="inline-flex items-center gap-1 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[11px] text-[#003FC7]"
+                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] text-[#003FC7]"
                   >
                     #{t}
                     <button
@@ -369,7 +369,7 @@ export function SaveModuleDialog({
           </div>
 
           {saveKind === "populated" && (
-            <div className="rounded-lg bg-[#003FC7]/[0.06] px-3 py-2 text-xs text-[#003FC7]">
+            <div className="rounded-lg bg-primary/[0.06] px-3 py-2 text-xs text-[#003FC7]">
               A real single-slide .pptx is generated and stored with this save, so you can download
               and open it in PowerPoint from My files.
             </div>
@@ -404,7 +404,7 @@ export function SaveModuleDialog({
           <button
             onClick={() => mutation.mutate()}
             disabled={mutation.isPending || saved}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-1.5 text-sm text-white transition hover:bg-[#002FA0] disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-sm text-primary-foreground transition hover:bg-[#002FA0] disabled:opacity-60"
           >
             {saved ? (
               <Check size={14} />

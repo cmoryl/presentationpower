@@ -283,7 +283,7 @@ function EditModal({
           </button>
           <button
             onClick={() => onSave({ title, content, tags, category: category || null })}
-            className="rounded-lg bg-[#03002C] px-4 py-2 text-sm font-semibold text-white"
+            className="rounded-lg bg-[#03002C] px-4 py-2 text-sm font-semibold text-white dark:bg-card"
           >
             Save
           </button>

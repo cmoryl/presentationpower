@@ -92,7 +92,7 @@ export function IndustryBackgroundSetPanel({
         <h3 className="text-[10px] font-semibold uppercase tracking-widest text-[#03002C]/55 dark:text-white/55">
           Industry background set
         </h3>
-        <span className="rounded-full bg-[#003FC7]/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#003FC7]">
+        <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#003FC7]">
           {set.recipeId} · {set.name}
         </span>
         <span className="text-[10px] text-[#03002C]/45 dark:text-white/45">

@@ -666,7 +666,7 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
           </button>
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+            className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90 dark:bg-primary dark:text-primary-foreground"
             onClick={() => download(VENUE_SHEET_PDF.url, VENUE_SHEET_PDF.filename)}
           >
             <FileDown className="h-4 w-4" /> All {VENUE_SHEET_PDF.pages} sheets (
@@ -1055,7 +1055,7 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
 
       {showRebuilt && highlightRoom ? (
         <p className="mt-3 flex flex-wrap items-center gap-2 text-[12.5px] text-[#03002C]/75">
-          <span className="rounded-full border border-[#003FC7]/40 bg-[#E0E8F5] px-3 py-1 font-semibold text-[#03002C]">
+          <span className="rounded-full border border-[#003FC7]/40 bg-secondary px-3 py-1 font-semibold text-[#03002C]">
             {highlightRoom} ringed on the plan
           </span>
           <span>The ring is a screen aid only — it is not drawn into the download.</span>
@@ -1167,7 +1167,7 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
           allFloors || showIndex ? "hidden" : ""
         }`}
       >
-        <figure className="overflow-hidden rounded-2xl border border-black/10 bg-[#F2F2F2]">
+        <figure className="overflow-hidden rounded-2xl border border-black/10 bg-muted">
 
           {showRebuilt && plan ? (
             <PlanZoomFrame label={sheet.title}>
@@ -1189,7 +1189,7 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
               editable={editMode}
               onMoveRoom={(room, dx, dy) => setEdits(qeiiApplyRoomEdit(edits, room, { dx, dy }))}
               onPickRoom={(room) => setPicked(room)}
-              className="block w-full bg-[#EEF1F7]"
+              className="block w-full bg-muted"
             />
             </PlanZoomFrame>
           ) : (
@@ -1207,7 +1207,7 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
                 loading="lazy"
                 className="block w-full"
               />
-              <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C]/85 px-3 py-1.5 text-[11px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100">
+              <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C]/85 px-3 py-1.5 text-[11px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 dark:bg-card">
                 <Maximize2 className="h-3.5 w-3.5" /> Enlarge
               </span>
             </button>
@@ -1254,7 +1254,7 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
                 {sheet.rooms.map((r) => (
                   <li
                     key={r}
-                    className="rounded-full border border-[#003FC7]/30 bg-[#E0E8F5] px-2.5 py-1 text-[12px] font-semibold text-[#03002C]"
+                    className="rounded-full border border-[#003FC7]/30 bg-secondary px-2.5 py-1 text-[12px] font-semibold text-[#03002C]"
                   >
                     {r}
                   </li>
@@ -1392,7 +1392,7 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
           role="dialog"
           aria-modal="true"
           aria-label={`${sheet.title} sheet, enlarged`}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#03002C]/90 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#03002C]/90 p-4 dark:bg-card"
           onClick={() => setZoom(false)}
         >
           <button

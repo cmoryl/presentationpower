@@ -259,7 +259,7 @@ function MyFilesPage() {
           </span>
 
           <div className="relative">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/25 bg-[#003FC7]/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#003FC7]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/25 bg-primary/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#003FC7]">
               My files
             </div>
             <h1 className="mt-4 text-4xl font-semibold tracking-[-0.03em] sm:text-5xl">
@@ -495,7 +495,7 @@ function MyFilesPage() {
                       setQ("");
                       setKind("all");
                     }}
-                    className="mt-4 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+                    className="mt-4 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white hover:opacity-90 dark:bg-card"
                   >
                     Clear filters
                   </button>

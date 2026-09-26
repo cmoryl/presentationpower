@@ -171,7 +171,7 @@ export function BoothHub3DViewer({
       role="dialog"
       aria-modal="true"
       aria-label={`${title} in 3D`}
-      className="fixed inset-0 z-[60] flex flex-col bg-[#03002C]/80 p-3 backdrop-blur-sm sm:p-5"
+      className="fixed inset-0 z-[60] flex flex-col bg-[#03002C]/80 p-3 backdrop-blur-sm sm:p-5 dark:bg-card"
     >
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#F7F9FC] shadow-2xl">
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 bg-white px-4 py-3">
@@ -202,14 +202,14 @@ export function BoothHub3DViewer({
             </button>
           </div>
         </header>
-        <div className="relative min-h-0 flex-1 bg-[#03002C]">
+        <div className="relative min-h-0 flex-1 bg-[#03002C] dark:bg-card">
           {!loaded ? (
             <div className="absolute inset-0 flex items-center justify-center gap-2 text-[13px] text-white/80">
               <Loader2 className="h-4 w-4 animate-spin" /> Loading the 3D build…
             </div>
           ) : null}
           {synced ? (
-            <p className="absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-full bg-[#003FC7] px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-lg">
+            <p className="absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-full bg-primary px-3.5 py-1.5 text-[12px] font-semibold text-primary-foreground shadow-lg">
               Updated from your plan edit
             </p>
           ) : null}
@@ -228,7 +228,7 @@ export function BoothHub3DViewer({
                 href={pageUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-3.5 py-1.5 font-semibold text-white hover:opacity-90"
+                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-3.5 py-1.5 font-semibold text-white hover:opacity-90 dark:bg-primary dark:text-primary-foreground"
               >
                 <ExternalLink className="h-4 w-4" /> Open in a new tab
               </a>
@@ -300,7 +300,7 @@ export function BoothHub3DViewer({
             <button
               type="submit"
               onClick={() => setPlan(planDraft.trim())}
-              className="rounded-full bg-[#003FC7] px-3.5 py-2 text-[12.5px] font-semibold text-white hover:bg-[#03002C]"
+              className="rounded-full bg-primary px-3.5 py-2 text-[12.5px] font-semibold text-primary-foreground hover:bg-[#03002C]"
             >
               Show
             </button>

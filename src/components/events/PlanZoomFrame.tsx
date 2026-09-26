@@ -38,7 +38,7 @@ export function PlanZoomFrame({ children, label, className }: PlanZoomFrameProps
           role="dialog"
           aria-modal="true"
           aria-label={`${label} plan, full screen`}
-          className="fixed inset-0 z-50 bg-[#03002C]/95 p-4"
+          className="fixed inset-0 z-50 bg-[#03002C]/95 p-4 dark:bg-card"
         >
           <button
             type="button"

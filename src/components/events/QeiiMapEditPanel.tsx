@@ -93,7 +93,7 @@ export function QeiiMapEditPanel({
                 >
                   {room}
                   {changed ? (
-                    <span className="ml-2 rounded-full bg-[#003FC7] px-2 py-0.5 text-[10px] font-semibold text-white">
+                    <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
                       edited
                     </span>
                   ) : null}

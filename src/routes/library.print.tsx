@@ -295,7 +295,7 @@ function PrintCenterPage() {
           </div>
           <Link
             to="/asset/new"
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]/85"
+            className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]/85 dark:bg-primary dark:text-primary-foreground"
           >
             <Sparkles size={12} /> Start blank
           </Link>
@@ -628,7 +628,7 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
             Curated variants ready to use.
           </h2>
         </div>
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7]/10 px-3 py-1 text-[11px] font-medium text-[#003FC7]">
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-medium text-[#003FC7]">
           <Sparkle size={12} /> Admin-approved
         </div>
       </div>
@@ -684,7 +684,7 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
                         <button
                           type="button"
                           onClick={() => onDuplicate(v)}
-                          className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-[#003FC7]/85"
                         >
                           <Copy size={12} /> Use as draft
                         </button>
@@ -950,7 +950,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
                   (lightbox.template_kinds ?? []).map((k) => (
                     <span
                       key={k}
-                      className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[#003FC7]"
+                      className="rounded-full bg-primary/10 px-2 py-0.5 text-[#003FC7]"
                     >
                       {HERO_TPLS.find((t) => t.id === k)?.label ?? k}
                     </span>
@@ -986,7 +986,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
                 <Link
                   to="/asset/new"
                   onClick={() => track(lightbox, "use")}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-[#003FC7]/85"
                 >
                   <ArrowRight size={12} /> Use in new asset
                 </Link>

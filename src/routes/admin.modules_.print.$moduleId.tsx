@@ -176,7 +176,7 @@ function PrintModuleStudioPage() {
           </h1>
           <p className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-black/55">
             <span className="font-mono">{merged.id}</span>
-            <span className="rounded-full bg-[#E0E8F5] px-2 py-0.5 font-medium text-[#03002C]">
+            <span className="rounded-full bg-secondary px-2 py-0.5 font-medium text-[#03002C]">
               {printModuleFamilyMeta(merged.family).label}
             </span>
             {override?.content ? (
@@ -401,7 +401,7 @@ function PrintModuleStudioPage() {
                         setJsonError(e instanceof Error ? e.message : "Invalid JSON");
                       }
                     }}
-                    className="rounded-full bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white"
+                    className="rounded-full bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white dark:bg-card"
                   >
                     Apply JSON
                   </button>

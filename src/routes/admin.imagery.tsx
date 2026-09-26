@@ -267,7 +267,7 @@ function AdminImageryPage() {
 
       {/* Bulk approve of currently-filtered pending rows */}
       {filtered.some((r) => !r.approved) ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-black/10 bg-[#003FC7]/5 px-4 py-3 text-xs text-black/70">
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-black/10 bg-primary/5 px-4 py-3 text-xs text-black/70">
           <CheckCircle2 size={14} className="text-[#003FC7]" />
           <span>{filtered.filter((r) => !r.approved).length} pending in the current view</span>
           <button
@@ -299,7 +299,7 @@ function AdminImageryPage() {
                 );
               }
             }}
-            className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-white hover:bg-[#003FC7]/85"
+            className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-primary-foreground hover:bg-[#003FC7]/85"
           >
             <CheckCircle2 size={12} /> Approve all pending
           </button>
@@ -736,7 +736,7 @@ function Uploader({ divisionId, onDone }: { divisionId: string; onDone: () => vo
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]/85"
+          className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-[#003FC7]/85"
         >
           <UploadCloud size={12} /> Add files
         </button>
@@ -773,7 +773,7 @@ function Uploader({ divisionId, onDone }: { divisionId: string; onDone: () => vo
           type="button"
           onClick={() => void runQueue()}
           disabled={running || stats.queued === 0}
-          className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white disabled:opacity-60 dark:bg-card"
         >
           {running ? <Loader2 size={12} className="animate-spin" /> : <UploadCloud size={12} />}
           {running ? "Uploading…" : `Start (${stats.queued})`}
@@ -845,7 +845,7 @@ function Uploader({ divisionId, onDone }: { divisionId: string; onDone: () => vo
                   {(it.file.size / 1024).toFixed(0)} KB
                 </span>
                 {rule ? (
-                  <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] text-[#003FC7]">
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] text-[#003FC7]">
                     CSV
                   </span>
                 ) : null}

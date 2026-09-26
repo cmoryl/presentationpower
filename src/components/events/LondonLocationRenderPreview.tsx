@@ -147,7 +147,7 @@ function Stage({
       {sceneSpecFit(panel, scene).warnings.length > 0 ? (
         <span
           data-export-ignore="true"
-          className="absolute left-2 top-2 max-w-[calc(100%-1rem)] rounded bg-[#03002C]/80 px-2 py-1 font-mono text-[10px] text-white"
+          className="absolute left-2 top-2 max-w-[calc(100%-1rem)] rounded bg-[#03002C]/80 px-2 py-1 font-mono text-[10px] text-white dark:bg-card"
         >
           {sceneSpecFit(panel, scene).warnings[0]}
         </span>
@@ -275,7 +275,7 @@ export function LondonLocationRenderPreview({
             type="button"
             onClick={() => void downloadPng(cardStage.current)}
             disabled={busy}
-            className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
           >
             <Download className="h-3.5 w-3.5" /> {busy ? "Saving…" : "Download PNG"}
           </button>
@@ -399,7 +399,7 @@ export function LondonLocationRenderPreview({
           role="dialog"
           aria-modal="true"
           aria-label={`${panel.name} in ${scene.label}`}
-          className="fixed inset-0 z-[70] flex items-center justify-center bg-[#03002C]/85 p-4"
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-[#03002C]/85 p-4 dark:bg-card"
           onClick={() => setOpen(false)}
         >
           <div
@@ -420,7 +420,7 @@ export function LondonLocationRenderPreview({
                   type="button"
                   onClick={() => void downloadPng(modalStage.current)}
                   disabled={busy}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
                 >
                   <Download className="h-3.5 w-3.5" /> {busy ? "Saving…" : "Download PNG"}
                 </button>

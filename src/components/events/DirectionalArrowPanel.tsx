@@ -37,7 +37,7 @@ export function DirectionalArrowPanel() {
       <ul className="mt-4 grid gap-3 md:grid-cols-3">
         {ARROW_FACES.map((face) => (
           <li key={face.id} className="rounded-xl border border-black/10 bg-white p-3">
-            <div className="overflow-hidden rounded-lg border border-black/10 bg-[#F2F2F2]">
+            <div className="overflow-hidden rounded-lg border border-black/10 bg-muted">
               <img
                 src={face.proofUrl}
                 alt={`${face.name} — supplied artwork proof`}

@@ -473,7 +473,7 @@ export function StudioLayoutLayer({
       {/* Selected-layer hint */}
       {enabled && selLayer ? (
         <div
-          className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#03002C]/90 px-3 py-1 text-[10px] text-white/80"
+          className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#03002C]/90 px-3 py-1 text-[10px] text-white/80 dark:bg-card"
           style={{ zIndex: 4 }}
         >
           {selLayer.kind === "text" ? "Double-click to edit text" : "Double-click to swap image"} ·

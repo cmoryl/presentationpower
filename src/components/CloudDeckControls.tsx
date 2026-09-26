@@ -524,7 +524,7 @@ export function MyCloudDecks() {
                 setFailed(false);
                 setReloadKey((n) => n + 1);
               }}
-              className="rounded-full bg-[#03002C] px-3 py-1 text-xs font-semibold text-white hover:opacity-90"
+              className="rounded-full bg-[#03002C] px-3 py-1 text-xs font-semibold text-white hover:opacity-90 dark:bg-card"
             >
               Try again
             </button>

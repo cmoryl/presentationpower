@@ -244,7 +244,7 @@ function GlobalLinkAdminPage() {
         </div>
 
         {status?.endpoint && (
-          <div className="mt-4 rounded-xl border border-black/10 bg-[#F2F2F2] p-3 text-xs">
+          <div className="mt-4 rounded-xl border border-black/10 bg-muted p-3 text-xs">
             <div className="mb-1 text-[10px] uppercase tracking-widest text-black/50">
               Resolved endpoint
             </div>
@@ -293,7 +293,7 @@ function GlobalLinkAdminPage() {
                 value={config.project_code ?? ""}
                 onChange={(e) => setConfig({ ...config, project_code: e.target.value || null })}
                 placeholder="e.g. TP-MODULAR"
-                className="w-full rounded-lg border border-black/15 bg-[#F2F2F2] px-3 py-2 text-sm text-black placeholder:text-black/40 outline-none focus:border-[#003FC7]"
+                className="w-full rounded-lg border border-black/15 bg-muted px-3 py-2 text-sm text-black placeholder:text-black/40 outline-none focus:border-[#003FC7]"
               />
             </Field>
 
@@ -308,7 +308,7 @@ function GlobalLinkAdminPage() {
                     human_review_default: e.target.value !== "mt",
                   })
                 }
-                className="w-full rounded-lg border border-black/15 bg-[#F2F2F2] px-3 py-2 text-sm text-black"
+                className="w-full rounded-lg border border-black/15 bg-muted px-3 py-2 text-sm text-black"
               >
                 <option value="mt">MT only — fastest</option>
                 <option value="mt_pe">MT + Post-Edit — balanced</option>
@@ -321,7 +321,7 @@ function GlobalLinkAdminPage() {
                 aria-label="Default source lang"
                 value={config.default_source_lang}
                 onChange={(e) => setConfig({ ...config, default_source_lang: e.target.value })}
-                className="w-full rounded-lg border border-black/15 bg-[#F2F2F2] px-3 py-2 text-sm text-black"
+                className="w-full rounded-lg border border-black/15 bg-muted px-3 py-2 text-sm text-black"
               >
                 {languages.map((l) => (
                   <option key={l.id} value={l.id}>
@@ -342,7 +342,7 @@ function GlobalLinkAdminPage() {
                   setConfig({ ...config, submitter_override: e.target.value || null })
                 }
                 placeholder="name@transperfect.com"
-                className="w-full rounded-lg border border-black/15 bg-[#F2F2F2] px-3 py-2 text-sm text-black placeholder:text-black/40 outline-none focus:border-[#003FC7]"
+                className="w-full rounded-lg border border-black/15 bg-muted px-3 py-2 text-sm text-black placeholder:text-black/40 outline-none focus:border-[#003FC7]"
               />
             </Field>
           </div>
@@ -377,7 +377,7 @@ function GlobalLinkAdminPage() {
                 onChange={(e) =>
                   setConfig({ ...config, batch_size: Number(e.target.value) || 100 })
                 }
-                className="w-full rounded-lg border border-black/15 bg-[#F2F2F2] px-3 py-2 text-sm text-black outline-none focus:border-[#003FC7]"
+                className="w-full rounded-lg border border-black/15 bg-muted px-3 py-2 text-sm text-black outline-none focus:border-[#003FC7]"
               />
             </Field>
 
@@ -391,7 +391,7 @@ function GlobalLinkAdminPage() {
                 onChange={(e) =>
                   setConfig({ ...config, request_timeout_ms: Number(e.target.value) || 60000 })
                 }
-                className="w-full rounded-lg border border-black/15 bg-[#F2F2F2] px-3 py-2 text-sm text-black outline-none focus:border-[#003FC7]"
+                className="w-full rounded-lg border border-black/15 bg-muted px-3 py-2 text-sm text-black outline-none focus:border-[#003FC7]"
               />
             </Field>
           </div>
@@ -407,7 +407,7 @@ function GlobalLinkAdminPage() {
               value={config.callback_url ?? ""}
               onChange={(e) => setConfig({ ...config, callback_url: e.target.value || null })}
               placeholder="https://yourapp.lovable.app/api/public/globallink/callback"
-              className="w-full rounded-lg border border-black/15 bg-[#F2F2F2] px-3 py-2 text-sm text-black placeholder:text-black/40 outline-none focus:border-[#003FC7]"
+              className="w-full rounded-lg border border-black/15 bg-muted px-3 py-2 text-sm text-black placeholder:text-black/40 outline-none focus:border-[#003FC7]"
             />
           </Field>
 
@@ -416,7 +416,7 @@ function GlobalLinkAdminPage() {
               value={config.notes ?? ""}
               onChange={(e) => setConfig({ ...config, notes: e.target.value || null })}
               rows={3}
-              className="w-full rounded-lg border border-black/15 bg-[#F2F2F2] px-3 py-2 text-sm text-black placeholder:text-black/40 outline-none focus:border-[#003FC7]"
+              className="w-full rounded-lg border border-black/15 bg-muted px-3 py-2 text-sm text-black placeholder:text-black/40 outline-none focus:border-[#003FC7]"
             />
           </Field>
         </div>

@@ -75,7 +75,7 @@ export function SlideMediaPicker({
 
   return (
     <div
-      className="fixed inset-0 z-[120] flex items-center justify-center bg-[#03002C]/80 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[120] flex items-center justify-center bg-[#03002C]/80 p-4 backdrop-blur-sm dark:bg-card"
       role="dialog"
       aria-modal="true"
       aria-label={title}
@@ -143,7 +143,7 @@ export function SlideMediaPicker({
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="…or paste an image URL"
-              className="flex-1 rounded-lg border border-white/15 bg-[#03002C]/70 px-3 py-2 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
+              className="flex-1 rounded-lg border border-white/15 bg-[#03002C]/70 px-3 py-2 text-xs text-white focus:border-[#A1FBF9] focus:outline-none dark:bg-card"
             />
             <button
               type="button"

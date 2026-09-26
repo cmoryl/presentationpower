@@ -141,10 +141,10 @@ export function BoothTemplatePanel({
   };
 
   return (
-    <details className="group mt-8 rounded-2xl border border-black/10 bg-[#F2F2F2] p-5">
+    <details className="group mt-8 rounded-2xl border border-black/10 bg-muted p-5">
       <summary className="flex cursor-pointer list-none flex-wrap items-baseline gap-3 [&::-webkit-details-marker]:hidden">
         <h4 className="text-base font-semibold tracking-tight text-[#03002C]">Booth templates</h4>
-        <span className="rounded border border-[#03002C] bg-[#03002C] px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-white">
+        <span className="rounded border border-[#03002C] bg-[#03002C] px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-white dark:bg-card">
           Admin only
         </span>
         <span className="font-mono text-[11px] text-[#03002C]/55">

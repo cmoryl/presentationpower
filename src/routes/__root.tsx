@@ -24,7 +24,7 @@ import { LOGIN_PATH, isPublicNoLoginPath, loginUrl } from "@/lib/sign-out";
 
 function NotFoundComponent() {
   return (
-    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-[#03002C] px-6 text-white">
+    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-[#03002C] px-6 text-white dark:bg-card">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-60"

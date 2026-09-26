@@ -345,7 +345,7 @@ function PublicModuleLibrary() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F2F2F2] text-[#03002C]">
+    <main className="min-h-screen bg-muted text-[#03002C]">
       <BackToTop />
       <ModuleLibraryHero />
 
@@ -492,7 +492,7 @@ function PublicModuleLibrary() {
                   key={preset ? `${v.id}:${preset.key}` : v.id}
                   className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm"
                 >
-                  <div className="group relative aspect-video w-full overflow-hidden bg-[#E0E8F5]">
+                  <div className="group relative aspect-video w-full overflow-hidden bg-secondary">
                     <div data-ui-chrome="" className="pointer-events-none absolute inset-0">
                       <LazyMount
                         placeholder={
@@ -688,7 +688,7 @@ function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-[#03002C]/90 p-4 backdrop-blur-sm sm:p-8"
+      className="fixed inset-0 z-50 flex flex-col bg-[#03002C]/90 p-4 backdrop-blur-sm sm:p-8 dark:bg-card"
       role="dialog"
       aria-modal="true"
       aria-label={`${variant.id} ${variant.name}`}

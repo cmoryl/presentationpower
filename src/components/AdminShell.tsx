@@ -78,7 +78,7 @@ function SessionRoleBanner() {
             {info?.email}
           </span>
           {isAdmin && (
-            <span className="rounded-full bg-[#003FC7] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+            <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground">
               Admin · Master
             </span>
           )}

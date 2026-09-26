@@ -134,7 +134,7 @@ function ElementsLanding() {
   return (
     <AppShell>
       {/* ================= HERO ================= */}
-      <section className="full-bleed relative hero-flush overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:py-10 lg:py-12">
+      <section className="full-bleed relative hero-flush overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:py-10 lg:py-12 dark:bg-card">
         <ThemedHeroVideo dark={heroElementsDark.url} light={heroElementsLight.url} />
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div
@@ -275,7 +275,7 @@ function ElementsLanding() {
                           <Link
                             to={it.to}
                             search={it.search ?? {}}
-                            className="group/i flex items-center gap-2 rounded-xl border border-black/5 bg-[#F2F2F2]/70 px-3 py-2 text-[13px] font-medium text-black/75 transition hover:border-black/10 hover:bg-white hover:text-[#03002C]"
+                            className="group/i flex items-center gap-2 rounded-xl border border-black/5 bg-muted/70 px-3 py-2 text-[13px] font-medium text-black/75 transition hover:border-black/10 hover:bg-white hover:text-[#03002C]"
                           >
                             <span
                               aria-hidden

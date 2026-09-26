@@ -57,7 +57,7 @@ export function ConnectionBanner() {
       className="fixed inset-x-0 top-0 z-[80] flex justify-center px-3 pt-3 print:hidden"
     >
       {online ? (
-        <div className="pointer-events-none flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-semibold text-white shadow-lg">
+        <div className="pointer-events-none flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-semibold text-white shadow-lg dark:bg-card">
           <Wifi className="h-3.5 w-3.5" aria-hidden />
           Back online — anything unsaved will save on your next change.
         </div>

@@ -101,7 +101,7 @@ function ResetPasswordPage() {
               <button
                 type="button"
                 onClick={() => navigate({ to: "/auth", replace: true })}
-                className="w-full rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white"
+                className="w-full rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white dark:bg-card"
               >
                 Back to sign in
               </button>
@@ -154,7 +154,7 @@ function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={busy}
-                className="w-full rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white disabled:opacity-60"
+                className="w-full rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white disabled:opacity-60 dark:bg-primary dark:text-primary-foreground"
               >
                 {busy ? "Updating…" : "Update password"}
               </button>

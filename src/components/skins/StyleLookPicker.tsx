@@ -704,12 +704,12 @@ function ApprovedStyleCard({
         <div className="relative">
           <ApprovedStyleThumb pack={shown} scene={style.thumbScene} radius={0} />
           {recommended && (
-            <span className="absolute left-1.5 top-1.5 rounded-full bg-[#003FC7] px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-white">
+            <span className="absolute left-1.5 top-1.5 rounded-full bg-primary px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-primary-foreground">
               Recommended
             </span>
           )}
           {active && (
-            <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#003FC7] text-white">
+            <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground">
               <Check size={10} strokeWidth={3} />
             </span>
           )}

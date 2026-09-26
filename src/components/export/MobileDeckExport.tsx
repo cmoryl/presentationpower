@@ -173,7 +173,7 @@ export function MobileDeckExport({ deck, brand, blocked, className }: MobileDeck
           onClick={() => void run("pdf")}
           disabled={busy !== null || empty}
           title={empty ? "This deck has no slides yet — add one first" : ""}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#003FC7] px-4 text-[13px] font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-4 text-[13px] font-semibold text-primary-foreground transition hover:brightness-110 disabled:opacity-60"
         >
           {busy === "pdf" ? <Loader2 size={14} className="animate-spin" /> : <Share2 size={14} />}
           {busy === "pdf" ? "Building…" : "Share PDF"}

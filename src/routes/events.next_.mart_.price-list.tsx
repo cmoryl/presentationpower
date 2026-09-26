@@ -40,7 +40,7 @@ function MartPriceListPage() {
         </Link>
 
         <div className="mt-3">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E0E8F5] px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
             <Receipt size={12} /> Price list
           </div>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#03002C]">

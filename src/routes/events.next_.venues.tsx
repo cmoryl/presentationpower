@@ -221,7 +221,7 @@ function VenuePlansPage() {
         </header>
 
         {!userId ? (
-          <p className="mt-6 rounded-2xl border border-[#003FC7]/25 bg-[#E0E8F5] p-4 text-sm text-[#03002C]">
+          <p className="mt-6 rounded-2xl border border-[#003FC7]/25 bg-secondary p-4 text-sm text-[#03002C]">
             Sign in to save a venue plan so the rest of the crew works from it.
           </p>
         ) : null}
@@ -380,7 +380,7 @@ function VenuePlansPage() {
                 onChange={(e) => setDraft((c) => ({ ...c, caveat: e.target.value }))}
               />
             </label>
-            <p className="mt-3 rounded-lg bg-[#F2F2F2] p-3 text-[11.5px] leading-relaxed text-[#03002C]/75">
+            <p className="mt-3 rounded-lg bg-muted p-3 text-[11.5px] leading-relaxed text-[#03002C]/75">
               {planCaveat(draft)}
             </p>
 

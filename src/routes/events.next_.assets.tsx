@@ -268,7 +268,7 @@ function AssetsPage() {
           {preview && deckPagesFor(preview) ? (
             <DeckPages pages={deckPagesFor(preview)!} label={preview.format} />
           ) : preview?.badgeSide ? (
-            <div className="flex justify-center rounded-lg border border-border bg-[#03002C] p-4">
+            <div className="flex justify-center rounded-lg border border-border bg-[#03002C] p-4 dark:bg-card">
               <CityBadge
                 config={{
                   ...CITY_BADGE_DEFAULT,

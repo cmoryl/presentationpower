@@ -117,7 +117,7 @@ export function UxDebugDock() {
               <button
                 type="button"
                 onClick={stop}
-                className="flex-1 rounded-full bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]/90"
+                className="flex-1 rounded-full bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]/90 dark:bg-primary dark:text-primary-foreground"
               >
                 Stop &amp; analyze
               </button>

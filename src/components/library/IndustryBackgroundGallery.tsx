@@ -345,7 +345,7 @@ export function IndustryOverviewCard({
             </button>
           )}
           {replacedCount > 0 && (
-            <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] font-semibold text-[#003FC7]">
+            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-[#003FC7]">
               {replacedCount} replaced
             </span>
           )}

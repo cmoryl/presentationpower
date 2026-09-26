@@ -99,7 +99,7 @@ function PublicIconLibrary() {
   const activeCount = set ? set.subAreas.reduce((n, a) => n + a.icons.length, 0) : 0;
 
   return (
-    <main className="min-h-screen bg-[#F2F2F2] text-[#03002C]">
+    <main className="min-h-screen bg-muted text-[#03002C]">
       <BackToTop />
       <header className="border-b border-black/10 bg-white/85 backdrop-blur">
         <div className="mx-auto max-w-6xl px-6 py-10">

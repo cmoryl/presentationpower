@@ -403,7 +403,7 @@ export function AgentQuickStart({
         >
           {showFilters ? "Hide design options" : "Design skins & filters"}
           {filterCount > 0 && (
-            <span className="ml-1.5 rounded-full bg-[#003FC7] px-1.5 text-[10px] font-semibold text-white">
+            <span className="ml-1.5 rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground">
               {filterCount}
             </span>
           )}

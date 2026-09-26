@@ -79,7 +79,7 @@ export function CaliforniaKioskBrowser() {
                         type="button"
                         onClick={() => setOpenId(isOpen ? null : `live:${group.boothId}`)}
                         aria-expanded={isOpen}
-                        className="mt-3 inline-flex items-center gap-2 rounded-md bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+                        className="mt-3 inline-flex items-center gap-2 rounded-md bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] dark:bg-card"
                       >
                         <Pencil className="h-3 w-3" aria-hidden />
                         {isOpen ? "Close" : "Edit layers & download"}
@@ -123,7 +123,7 @@ export function CaliforniaKioskBrowser() {
                       type="button"
                       onClick={() => setOpenId(isOpen ? null : panel.id)}
                       aria-expanded={isOpen}
-                      className="mt-3 inline-flex items-center gap-2 rounded-md bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+                      className="mt-3 inline-flex items-center gap-2 rounded-md bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] dark:bg-card"
                     >
                       <Pencil className="h-3 w-3" aria-hidden />
                       {isOpen ? "Close" : "Edit & download"}

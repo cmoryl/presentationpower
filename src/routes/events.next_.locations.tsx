@@ -630,7 +630,7 @@ function VenuePagesRoute() {
                   loading="lazy"
                 />
               ) : (
-                <p className="mt-3 rounded-xl bg-[#F2F2F2] px-4 py-6 text-center text-[13px] text-[#666]">
+                <p className="mt-3 rounded-xl bg-muted px-4 py-6 text-center text-[13px] text-[#666]">
                   No position yet — type the address and press “Find this address on the map”.
                 </p>
               )}
@@ -659,7 +659,7 @@ function VenuePagesRoute() {
                   className="mt-3 h-48 w-full rounded-xl object-cover"
                 />
               ) : (
-                <p className="mt-3 rounded-xl bg-[#F2F2F2] px-4 py-6 text-center text-[13px] text-[#666]">
+                <p className="mt-3 rounded-xl bg-muted px-4 py-6 text-center text-[13px] text-[#666]">
                   No photograph chosen yet.
                 </p>
               )}

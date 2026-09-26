@@ -137,7 +137,7 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
             aria-modal="true"
             aria-labelledby="rebrand-menu-title"
             tabIndex={-1}
-            className="relative flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#03002C] text-white shadow-2xl outline-none"
+            className="relative flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#03002C] text-white shadow-2xl outline-none dark:bg-card"
           >
             <div className="flex items-start justify-between border-b border-white/10 px-8 py-5">
               <div>

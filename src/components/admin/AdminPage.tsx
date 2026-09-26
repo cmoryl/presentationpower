@@ -50,7 +50,7 @@ export function AdminLoading({ label = "Loading…" }: { label?: string }) {
   return (
     <div className="flex items-center gap-3 rounded-2xl border border-dashed border-black/10 bg-white/50 px-5 py-4 text-sm text-black/55 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/55">
       <span
-        className="inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-[#003FC7]"
+        className="inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-primary"
         aria-hidden
       />
       {label}

@@ -378,7 +378,7 @@ function ConvertPage() {
                 />
               </div>
             ) : decks.length === 0 ? (
-              <p className="rounded-lg border border-black/10 bg-[#F2F2F2] p-3 text-[12.5px] text-[#03002C]">
+              <p className="rounded-lg border border-black/10 bg-muted p-3 text-[12.5px] text-[#03002C]">
                 {cloud.isLoading ? "Loading your decks…" : "No decks yet — open or save a deck, or switch to “Type the copy”."}
               </p>
             ) : (

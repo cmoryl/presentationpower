@@ -240,7 +240,7 @@ export function IconPicker({ value, onChange, autoLabel, ai }: Props) {
                           onChange(s.ref);
                           setOpen(false);
                         }}
-                        className="shrink-0 rounded-md bg-[#003FC7] px-2 py-1 text-[10px] uppercase tracking-widest text-white hover:bg-[#0033a8]"
+                        className="shrink-0 rounded-md bg-primary px-2 py-1 text-[10px] uppercase tracking-widest text-primary-foreground hover:bg-[#0033a8]"
                       >
                         Apply
                       </button>

@@ -110,7 +110,7 @@ function OptionCard({
         </span>
         <span className="min-w-0 truncate text-xs font-semibold text-foreground">{label}</span>
         {recommended ? (
-          <span className="rounded-full bg-[#003FC7]/12 px-2 py-0.5 text-[9px] uppercase tracking-widest text-[#003FC7]">
+          <span className="rounded-full bg-primary/12 px-2 py-0.5 text-[9px] uppercase tracking-widest text-[#003FC7]">
             Recommended
           </span>
         ) : null}
@@ -122,7 +122,7 @@ function OptionCard({
       </div>
 
       <div
-        className="relative w-full overflow-hidden rounded-lg border border-border/50 bg-[#03002C]"
+        className="relative w-full overflow-hidden rounded-lg border border-border/50 bg-[#03002C] dark:bg-card"
         style={{ aspectRatio: "16 / 9", minHeight: 130 }}
       >
         <SlideThumbnailContext.Provider value={true}>
@@ -155,7 +155,7 @@ function OptionCard({
                 `Use option ${String.fromCharCode(65 + index)} (${label}) for that slide — save it to the deck as previewed.`,
               )
             }
-            className="rounded-lg bg-[#003FC7] px-2.5 py-1.5 text-[11px] font-semibold text-white transition disabled:opacity-40 hover:brightness-110"
+            className="rounded-lg bg-primary px-2.5 py-1.5 text-[11px] font-semibold text-primary-foreground transition disabled:opacity-40 hover:brightness-110"
           >
             Use this
           </button>

@@ -158,7 +158,7 @@ function LogoHubBrowse() {
                 },
               ].map((s) => (
                 <div key={s.step} className="rounded-2xl border border-black/10 bg-white p-4">
-                  <span className="inline-flex size-7 items-center justify-center rounded-lg bg-[#003FC7]/10 text-xs font-semibold text-[#003FC7]">
+                  <span className="inline-flex size-7 items-center justify-center rounded-lg bg-primary/10 text-xs font-semibold text-[#003FC7]">
                     {s.step}
                   </span>
                   <div className="mt-2 text-sm font-semibold">{s.title}</div>
@@ -196,7 +196,7 @@ function LogoHubBrowse() {
                   setDivision("all");
                   setIndustry("all");
                 }}
-                className="rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+                className="rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white hover:opacity-90 dark:bg-card"
               >
                 Clear filters
               </button>

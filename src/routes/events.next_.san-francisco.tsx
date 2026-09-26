@@ -152,7 +152,7 @@ function SanFranciscoPage() {
           </Link>
         </div>
 
-        <header className="mt-4 overflow-hidden rounded-md bg-[#03002C] p-8 text-white sm:p-10">
+        <header className="mt-4 overflow-hidden rounded-md bg-[#03002C] p-8 text-white sm:p-10 dark:bg-card">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/75">
             TransPerfect NEXT 2026
           </p>
@@ -252,7 +252,7 @@ function SanFranciscoPage() {
                   <Link
                     to={item.to}
                     search={item.search ?? {}}
-                    className="group mt-4 inline-flex items-center gap-2 rounded-md bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white hover:opacity-90"
+                    className="group mt-4 inline-flex items-center gap-2 rounded-md bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white hover:opacity-90 dark:bg-primary dark:text-primary-foreground"
                   >
                     Open
                     <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />

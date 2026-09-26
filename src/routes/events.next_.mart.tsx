@@ -54,7 +54,7 @@ function MartPage() {
 
         <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E0E8F5] px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-medium text-[#003FC7]">
               <Store size={12} /> {NEXT_MART.name}
             </div>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#03002C]">
@@ -111,7 +111,7 @@ function MartPage() {
                 key={p.id}
                 className="overflow-hidden rounded-2xl border border-black/10 bg-white"
               >
-                <div className="flex justify-center bg-[#F2F2F2] p-4">
+                <div className="flex justify-center bg-muted p-4">
                   <PillarSign config={resolvedMartPillarConfig(p)} pxPerMm={0.06} />
                 </div>
                 <div className="px-4 py-3">
@@ -269,7 +269,7 @@ function MartPage() {
           </p>
           <div className="mt-5 overflow-x-auto rounded-2xl border border-black/10">
             <table className="w-full min-w-[860px] text-left text-sm">
-              <thead className="bg-[#F2F2F2] text-[11px] uppercase tracking-wide text-black/50">
+              <thead className="bg-muted text-[11px] uppercase tracking-wide text-black/50">
                 <tr>
                   <th className="px-4 py-2.5 font-medium">Sign</th>
                   <th className="px-4 py-2.5 font-medium">Trim (mm)</th>
@@ -335,7 +335,7 @@ function MartPage() {
                   key={sign.id}
                   className="overflow-hidden rounded-2xl border border-black/10 bg-white"
                 >
-                  <div className="flex items-center justify-center bg-[#F2F2F2] p-4">
+                  <div className="flex items-center justify-center bg-muted p-4">
                     <PillarSign config={config} pxPerMm={0.16} />
                   </div>
                   <div className="border-t border-black/10 px-4 py-3">

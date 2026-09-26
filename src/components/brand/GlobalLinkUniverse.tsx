@@ -74,7 +74,7 @@ export function GlobalLinkUniverse() {
       </p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="rounded-xl border border-black/10 bg-[#EEF1F7] p-4">
+        <div className="rounded-xl border border-black/10 bg-muted p-4">
           <svg
             viewBox={`0 0 ${SIZE} ${SIZE}`}
             className="mx-auto h-auto w-full max-w-[560px]"

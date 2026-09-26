@@ -277,7 +277,7 @@ function Dashboard() {
   return (
     <AppShell>
       {/* ================= HERO ================= */}
-      <section className="full-bleed relative hero-flush overflow-hidden border-b border-white/10 bg-[#03002C] py-8 text-white sm:py-9 lg:py-12">
+      <section className="full-bleed relative hero-flush overflow-hidden border-b border-white/10 bg-[#03002C] py-8 text-white sm:py-9 lg:py-12 dark:bg-card">
         {/* photoreal motion plate per mode (dark/light authored versions) */}
         <HomeHeroVideo mode={mode.id} />
 
@@ -876,7 +876,7 @@ function AgentBar({
         className="pointer-events-none absolute -left-8 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full opacity-40 blur-2xl transition"
         style={{ backgroundColor: accent }}
       />
-      <div className="relative flex flex-col gap-2 rounded-xl bg-[#03002C]/40 p-3 sm:flex-row sm:items-end">
+      <div className="relative flex flex-col gap-2 rounded-xl bg-[#03002C]/40 p-3 sm:flex-row sm:items-end dark:bg-card">
         <div className="flex flex-1 items-start gap-3">
           <span
             className="mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[#03002C]"
@@ -1091,7 +1091,7 @@ function DeckCard({ deck: d, industry }: { deck: Deck; industry?: string }) {
         <Link
           to="/decks/$deckId"
           params={{ deckId: d.id }}
-          className="rounded-full bg-[#03002C] px-3 py-1 text-xs font-medium text-white shadow"
+          className="rounded-full bg-[#03002C] px-3 py-1 text-xs font-medium text-white shadow dark:bg-primary dark:text-primary-foreground"
         >
           Open
         </Link>

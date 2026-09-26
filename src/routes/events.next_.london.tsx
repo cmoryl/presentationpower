@@ -325,7 +325,7 @@ function PanelThumb({
   if (view === "scene") return <SceneThumb panel={panel} art={art} />;
   return (
     <div
-      className="relative w-full overflow-hidden rounded-lg border border-black/10 bg-[#E0E8F5]"
+      className="relative w-full overflow-hidden rounded-lg border border-black/10 bg-secondary"
       style={{ aspectRatio: `${Math.max(ratio, 0.08)}` }}
     >
       {boothArt ? (
@@ -429,7 +429,7 @@ function PanelCard({
           {/* Honest about coverage: an area with no file from the delivery in
               force must not read as current artwork. */}
           {!londonHasSuppliedFile(panel) && !booth ? (
-            <span className="ml-1.5 inline-flex align-middle rounded bg-[#F2F2F2] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#03002C]/70">
+            <span className="ml-1.5 inline-flex align-middle rounded bg-muted px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#03002C]/70">
               No supplied file
             </span>
           ) : null}
@@ -1027,20 +1027,20 @@ function LondonSignagePage() {
               </button>
               <Link
                 to="/events/next/london/maps"
-                className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 bg-[#03002C] text-white"
+                className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 bg-[#03002C] text-white dark:bg-primary dark:text-primary-foreground"
               >
                 <MapPin className="h-4 w-4" aria-hidden /> Install location maps
               </Link>
               <Link
                 to="/events/next/london/schedule"
-                className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 bg-[#03002C] text-white"
+                className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 bg-[#03002C] text-white dark:bg-primary dark:text-primary-foreground"
               >
                 <CalendarDays className="h-4 w-4" aria-hidden /> Room schedule
               </Link>
               <button
                 type="button"
                 onClick={() => handleLondonDirectoryDownload(panels)}
-                className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 bg-[#03002C] text-white"
+                className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 bg-[#03002C] text-white dark:bg-card"
               >
                 <BookOpen className="h-4 w-4" aria-hidden /> Master directory (PDF)
               </button>
@@ -1386,7 +1386,7 @@ function LondonSignagePage() {
                 </article>
               ))}
             </div>
-            <p className="mt-4 rounded-xl border border-[#003FC7]/25 bg-[#E0E8F5] p-4 text-[13px] leading-relaxed text-[#03002C]/80">
+            <p className="mt-4 rounded-xl border border-[#003FC7]/25 bg-secondary p-4 text-[13px] leading-relaxed text-[#03002C]/80">
               Colour space: {LONDON_VENUE.colourSpace}. Production partner: {LONDON_VENUE.producer}.
               Venue: {LONDON_VENUE.address}.
             </p>
@@ -1492,7 +1492,7 @@ function LondonSignagePage() {
                   { k: "Measured banding", v: `${openPanel.bandMm.toFixed(2)} mm` },
                   { k: "Raster weight", v: `${openPanel.rasterMb.toFixed(1)} MB` },
                 ].map((row) => (
-                  <div key={row.k} className="rounded-lg border border-black/10 bg-[#F2F2F2] p-3">
+                  <div key={row.k} className="rounded-lg border border-black/10 bg-muted p-3">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#03002C]/55">
                       {row.k}
                     </dt>
@@ -1578,7 +1578,7 @@ function LondonSignagePage() {
                         setOpenPanel({ ...openPanel, id: made.id, name: made.name });
                         setEditing(true);
                       }}
-                      className="ml-auto inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                      className="ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
                     >
                       <Layers className="h-3.5 w-3.5" />
                       Make another version
@@ -1707,7 +1707,7 @@ function LondonSignagePage() {
                   type="button"
                   onClick={() => setEditing((v) => !v)}
                   aria-expanded={editing}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-semibold text-white hover:opacity-90 dark:bg-card"
                 >
                   <Ruler className="h-3.5 w-3.5" />
                   {editing ? "Hide panel editor" : "Edit this panel"}
@@ -1784,7 +1784,7 @@ function LondonSignagePage() {
                           download={
                             londonSuppliedMaster(openPanel)!.printFilename ?? "print-ready.pdf"
                           }
-                          className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                          className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-semibold text-white hover:opacity-90 dark:bg-primary dark:text-primary-foreground"
                         >
                           <FileDown className="h-3.5 w-3.5" /> PDF · supplied print file
                         </a>
@@ -1801,7 +1801,7 @@ function LondonSignagePage() {
                     <button
                       type="button"
                       onClick={() => void downloadVector(openPanel, "ai")}
-                      className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                      className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
                     >
                       <FileDown className="h-3.5 w-3.5" /> AI
                     </button>
@@ -1845,7 +1845,7 @@ function LondonSignagePage() {
                 ) : null}
 
                 {londonPackReference(openPanel.id) ? (
-                  <p className="mt-3 rounded-lg border border-black/15 bg-[#F2F2F2] p-3 text-[12.5px] leading-relaxed text-[#03002C]">
+                  <p className="mt-3 rounded-lg border border-black/15 bg-muted p-3 text-[12.5px] leading-relaxed text-[#03002C]">
                     The {LONDON_PACK_ISSUE.label} supplied{" "}
                     <strong>{londonPackReference(openPanel.id)!.masterFilename}</strong> for this
                     area — a{" "}
@@ -1934,7 +1934,7 @@ function LondonSignagePage() {
             {Object.entries(removals).map(([id, name]) => (
               <li
                 key={id}
-                className="flex flex-wrap items-center gap-2 rounded-lg border border-black/10 bg-[#F2F2F2] p-2.5"
+                className="flex flex-wrap items-center gap-2 rounded-lg border border-black/10 bg-muted p-2.5"
               >
                 <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-[#03002C]">
                   {name}

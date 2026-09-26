@@ -103,7 +103,7 @@ export function BulkStylePanel({
 
   return (
     <div className="mt-3 space-y-3 text-[11px]">
-      <div className="rounded-lg border border-white/10 bg-[#03002C]/40 p-3">
+      <div className="rounded-lg border border-white/10 bg-[#03002C]/40 p-3 dark:bg-card">
         <div className="font-semibold uppercase tracking-widest text-white/45">Style to push</div>
         <p className="mt-1.5 text-white/60">
           {ruleCount === 0
@@ -116,7 +116,7 @@ export function BulkStylePanel({
         </label>
       </div>
 
-      <div className="rounded-lg border border-white/10 bg-[#03002C]/40 p-3">
+      <div className="rounded-lg border border-white/10 bg-[#03002C]/40 p-3 dark:bg-card">
         <div className="font-semibold uppercase tracking-widest text-white/45">Apply for</div>
         <div className="mt-2 flex gap-1.5">
           <button
@@ -132,7 +132,7 @@ export function BulkStylePanel({
         </div>
       </div>
 
-      <div className="rounded-lg border border-white/10 bg-[#03002C]/40 p-3">
+      <div className="rounded-lg border border-white/10 bg-[#03002C]/40 p-3 dark:bg-card">
         <div className="flex items-center justify-between">
           <div className="font-semibold uppercase tracking-widest text-white/45">Target slides</div>
           <button
@@ -179,7 +179,7 @@ export function BulkStylePanel({
             apply(picked, `${picked.length} selected slide${picked.length === 1 ? "" : "s"}`)
           }
           disabled={bulkStyle.isPending || ruleCount === 0 || picked.length === 0}
-          className="w-full rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white disabled:opacity-40"
+          className="w-full rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground disabled:opacity-40"
         >
           {bulkStyle.isPending ? "Applying…" : `Apply to ${picked.length} selected`}
         </button>

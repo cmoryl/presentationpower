@@ -1105,7 +1105,7 @@ function BriefCommandCenter() {
   return (
     <AppShell>
       {/* Command bar — slim, dark, always-on context */}
-      <section className="full-bleed relative hero-flush overflow-hidden border-b border-white/10 bg-[#03002C] text-white">
+      <section className="full-bleed relative hero-flush overflow-hidden border-b border-white/10 bg-[#03002C] text-white dark:bg-card">
         <div
           aria-hidden
           className="pointer-events-none absolute -left-32 -top-40 h-[380px] w-[380px] rounded-full opacity-40 blur-[130px]"
@@ -1942,7 +1942,7 @@ function BriefCommandCenter() {
 
       {/* Sticky command dock */}
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-3 sm:px-4 sm:pb-4">
-        <div className="pointer-events-auto mx-auto flex w-full max-w-[1100px] items-center gap-3 rounded-2xl border border-white/10 bg-[#03002C]/90 px-4 py-2.5 text-white shadow-2xl shadow-black/40 backdrop-blur-xl sm:py-3">
+        <div className="pointer-events-auto mx-auto flex w-full max-w-[1100px] items-center gap-3 rounded-2xl border border-white/10 bg-[#03002C]/90 px-4 py-2.5 text-white shadow-2xl shadow-black/40 backdrop-blur-xl sm:py-3 dark:bg-card">
           <span className="shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45 sm:tracking-[0.3em]">
             {step}/{STEPS.length}
           </span>

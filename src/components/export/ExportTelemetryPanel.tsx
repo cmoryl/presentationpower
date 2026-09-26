@@ -95,7 +95,7 @@ export function ExportTelemetryPanel({
                   </div>
                   <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-black/5">
                     <div
-                      className="h-full rounded-full bg-[#003FC7]"
+                      className="h-full rounded-full bg-primary"
                       style={{ width: `${Math.min(100, ph.pct)}%` }}
                     />
                   </div>

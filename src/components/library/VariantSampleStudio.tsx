@@ -879,7 +879,7 @@ export function VariantSampleStudio({
     <div
       role="dialog"
       aria-label={`Slide studio · ${variant.name}`}
-      className="fixed inset-0 z-[200] flex flex-col bg-[#03002C]/96 backdrop-blur-xl"
+      className="fixed inset-0 z-[200] flex flex-col bg-[#03002C]/96 backdrop-blur-xl dark:bg-card"
     >
       {/* Always-visible exit, even if the toolbar wraps on small screens */}
       <button
@@ -1252,7 +1252,7 @@ export function VariantSampleStudio({
 
         {/* Inspector */}
         <aside className="min-h-0 w-full shrink-0 overflow-y-auto rounded-xl border border-white/10 bg-white/[0.04] p-4 lg:w-[360px]">
-          <div className="flex gap-1 rounded-full border border-white/15 bg-[#03002C]/50 p-1 text-[11px]">
+          <div className="flex gap-1 rounded-full border border-white/15 bg-[#03002C]/50 p-1 text-[11px] dark:bg-card">
             {(["copy", "structure", "background", "bulk", "history"] as const).map((t) => (
               <button
                 key={t}
@@ -1278,7 +1278,7 @@ export function VariantSampleStudio({
             ))}
           </div>
 
-          <div className="mt-3 rounded-lg border border-white/10 bg-[#03002C]/40 p-3 text-[11px] text-white/60">
+          <div className="mt-3 rounded-lg border border-white/10 bg-[#03002C]/40 p-3 text-[11px] text-white/60 dark:bg-card">
             <div className="font-semibold uppercase tracking-widest text-white/45">Save scope</div>
             <label className="mt-2 flex items-center gap-2 text-white/70">
               <input
@@ -1324,7 +1324,7 @@ export function VariantSampleStudio({
                   canEdit
                 />
               ) : (
-                <p className="rounded-lg border border-white/12 bg-[#03002C]/45 p-3 text-[11px] text-white/60">
+                <p className="rounded-lg border border-white/12 bg-[#03002C]/45 p-3 text-[11px] text-white/60 dark:bg-card">
                   Pick an approved look in the library first — module backgrounds are stored per
                   look, so the studio needs to know which template you are editing.
                 </p>
@@ -1362,7 +1362,7 @@ export function VariantSampleStudio({
                     : "Live edit is off — type here to change copy."}
               </p>
               {isStepChain && stepCount > 0 && (
-                <div className="mt-3 rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5">
+                <div className="mt-3 rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5 dark:bg-card">
                   <div className="text-[10px] uppercase tracking-widest text-white/40">
                     Edit step
                   </div>
@@ -1463,7 +1463,7 @@ export function VariantSampleStudio({
                         value={value}
                         rows={value.length > 70 ? 3 : 1}
                         onChange={(e) => setField(path, e.target.value)}
-                        className="mt-1 w-full resize-y rounded-lg border border-white/15 bg-[#03002C]/60 px-2.5 py-1.5 text-sm text-white focus:border-[#A1FBF9] focus:outline-none"
+                        className="mt-1 w-full resize-y rounded-lg border border-white/15 bg-[#03002C]/60 px-2.5 py-1.5 text-sm text-white focus:border-[#A1FBF9] focus:outline-none dark:bg-card"
                       />
                     </div>
                   );
@@ -1473,7 +1473,7 @@ export function VariantSampleStudio({
           ) : (
             <>
               {logoCells.length > 0 && (
-                <div className="mt-3 rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5">
+                <div className="mt-3 rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5 dark:bg-card">
                   <div className="flex items-center gap-1.5">
                     <span className="text-[10px] uppercase tracking-widest text-white/45">
                       Client logos
@@ -1539,7 +1539,7 @@ export function VariantSampleStudio({
                   {/* Global type scale — one setting per role so numerals, titles
                       and sub-text stay identical at any step count. */}
                   {variant.id === "MV-PROC-STEP-CHAIN" && (
-                    <div className="mt-3 rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5">
+                    <div className="mt-3 rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5 dark:bg-card">
                       <div className="flex items-center justify-between">
                         <div className="text-[10px] uppercase tracking-widest text-white/40">
                           Global type scale
@@ -1596,7 +1596,7 @@ export function VariantSampleStudio({
                       value={newKind}
                       onChange={(e) => setNewKind(e.target.value)}
                       aria-label="New cell type"
-                      className="flex-1 rounded-lg border border-white/15 bg-[#03002C]/60 px-2 py-1.5 text-xs text-white"
+                      className="flex-1 rounded-lg border border-white/15 bg-[#03002C]/60 px-2 py-1.5 text-xs text-white dark:bg-card"
                     >
                       {CELL_KINDS.map((k) => (
                         <option key={k} value={k}>
@@ -1638,7 +1638,7 @@ export function VariantSampleStudio({
                               value={CELL_KINDS.includes(kind as never) ? kind : "body"}
                               onChange={(e) => setItemField(i, "kind", e.target.value)}
                               aria-label={`Cell ${i + 1} type`}
-                              className="rounded border border-white/15 bg-[#03002C] px-1.5 py-0.5 text-[11px] text-white"
+                              className="rounded border border-white/15 bg-[#03002C] px-1.5 py-0.5 text-[11px] text-white dark:bg-card"
                             >
                               {CELL_KINDS.map((k) => (
                                 <option key={k} value={k}>
@@ -1678,7 +1678,7 @@ export function VariantSampleStudio({
                             value={String(it.title ?? "")}
                             onChange={(e) => setItemField(i, "title", e.target.value)}
                             placeholder={isMedia ? "Imagery caption" : "Cell title"}
-                            className="mt-2 w-full rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
+                            className="mt-2 w-full rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none dark:bg-card"
                           />
 
                           {/* Per-row gradient colour — drives this lane / cell's
@@ -1768,7 +1768,7 @@ export function VariantSampleStudio({
                                   value={String(it.mediaSeed ?? "")}
                                   onChange={(e) => setItemField(i, "mediaSeed", e.target.value)}
                                   placeholder="Imagery seed"
-                                  className="flex-1 rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
+                                  className="flex-1 rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none dark:bg-card"
                                 />
                                 <button
                                   type="button"
@@ -1871,7 +1871,7 @@ export function VariantSampleStudio({
                                 <div
                                   role="group"
                                   aria-label={`Cell ${i + 1} crop focus`}
-                                  className="mt-1 grid w-fit grid-cols-3 gap-0.5 rounded-lg border border-white/15 bg-[#03002C]/70 p-0.5"
+                                  className="mt-1 grid w-fit grid-cols-3 gap-0.5 rounded-lg border border-white/15 bg-[#03002C]/70 p-0.5 dark:bg-card"
                                 >
                                   {(
                                     [
@@ -1913,19 +1913,19 @@ export function VariantSampleStudio({
                                 value={String(it.value ?? "")}
                                 onChange={(e) => setItemField(i, "value", e.target.value)}
                                 placeholder="Value"
-                                className="w-20 rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white"
+                                className="w-20 rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white dark:bg-card"
                               />
                               <input
                                 value={String(it.unit ?? "")}
                                 onChange={(e) => setItemField(i, "unit", e.target.value)}
                                 placeholder="Unit"
-                                className="w-16 rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white"
+                                className="w-16 rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white dark:bg-card"
                               />
                               <input
                                 value={String(it.label ?? "")}
                                 onChange={(e) => setItemField(i, "label", e.target.value)}
                                 placeholder="Label"
-                                className="flex-1 rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white"
+                                className="flex-1 rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white dark:bg-card"
                               />
                             </div>
                           ) : (
@@ -1934,7 +1934,7 @@ export function VariantSampleStudio({
                               rows={2}
                               onChange={(e) => setItemField(i, "body", e.target.value)}
                               placeholder="Cell body"
-                              className="mt-1.5 w-full resize-y rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
+                              className="mt-1.5 w-full resize-y rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none dark:bg-card"
                             />
                           )}
 
@@ -1942,7 +1942,7 @@ export function VariantSampleStudio({
                               shown for families that render per-item icons, so
                               the picker never looks broken. */}
                           {!isMedia && cellControls.icons ? (
-                            <div className="mt-2 rounded border border-white/10 bg-[#03002C]/50 p-2">
+                            <div className="mt-2 rounded border border-white/10 bg-[#03002C]/50 p-2 dark:bg-card">
                               <div className="text-[10px] uppercase tracking-widest text-white/40">
                                 Icon
                               </div>
@@ -2189,7 +2189,7 @@ function SampleHistoryPanel({
 
       {loading && <p className="mt-3 text-[11px] text-white/45">Loading history…</p>}
       {!loading && versions.length === 0 && (
-        <p className="mt-3 rounded-lg border border-white/10 bg-[#03002C]/40 p-3 text-[11px] text-white/45">
+        <p className="mt-3 rounded-lg border border-white/10 bg-[#03002C]/40 p-3 text-[11px] text-white/45 dark:bg-card">
           No saved versions yet — the next save becomes your first restore point.
         </p>
       )}
@@ -2199,7 +2199,7 @@ function SampleHistoryPanel({
           const rows = diffSampleContent(v.content as Record<string, unknown>, current);
           const open = openId === v.id;
           return (
-            <div key={v.id} className="rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5">
+            <div key={v.id} className="rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5 dark:bg-card">
               <div className="flex items-center gap-2">
                 <span className="font-mono text-[10px] text-white/40">v{versions.length - i}</span>
                 <span className="text-[11px] text-white/80">{fmt(v.createdAt)}</span>

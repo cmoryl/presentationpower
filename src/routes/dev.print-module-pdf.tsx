@@ -145,7 +145,7 @@ function PrintModulePdfHarness() {
           type="button"
           onClick={() => void exportPdf()}
           data-testid="harness-export-pdf"
-          className="rounded-md bg-[#003FC7] px-4 py-2 text-sm font-medium text-white"
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
         >
           Export PDF
         </button>

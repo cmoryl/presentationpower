@@ -588,7 +588,7 @@ function AboutPage() {
                 <ul className="mt-4 space-y-1.5 text-sm text-black/70">
                   {p.bullets.map((b) => (
                     <li key={b} className="flex gap-2">
-                      <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#003FC7]" />
+                      <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-primary" />
                       <span>{b}</span>
                     </li>
                   ))}
@@ -655,7 +655,7 @@ function AboutPage() {
         </section>
 
         {/* Stack */}
-        <section className="mt-16 mb-8 rounded-2xl border border-black/10 bg-[#03002C] py-8 text-white">
+        <section className="mt-16 mb-8 rounded-2xl border border-black/10 bg-[#03002C] py-8 text-white dark:bg-card">
           <div className="grid gap-8 md:grid-cols-[1fr_1fr]">
             <div>
               <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">

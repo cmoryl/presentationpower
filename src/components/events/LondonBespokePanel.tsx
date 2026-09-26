@@ -103,7 +103,7 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
                       height={800}
                       className="aspect-[16/10] w-full object-cover"
                     />
-                    <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-[#03002C]/80 px-2.5 py-1 text-[11px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100">
+                    <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-[#03002C]/80 px-2.5 py-1 text-[11px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 dark:bg-card">
                       <Maximize2 className="h-3 w-3" /> Enlarge
                     </span>
                   </button>
@@ -139,7 +139,7 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
                     {u.components.map((c) => (
                       <li
                         key={c}
-                        className="rounded-full bg-[#EEF1F7] px-2.5 py-1 text-[11.5px] text-[#03002C]/80"
+                        className="rounded-full bg-muted px-2.5 py-1 text-[11.5px] text-[#03002C]/80"
                       >
                         {c}
                       </li>
@@ -165,7 +165,7 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
                           — {bespokeSizeLabel(p.wMm, p.hMm)}
                           {p.note ? <span className="text-[#03002C]/55"> · {p.note}</span> : null}
                           {facePanel ? (
-                            <span className="ml-1.5 inline-flex items-center rounded-full bg-[#003FC7]/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#003FC7]">
+                            <span className="ml-1.5 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#003FC7]">
                               Editable template · {facePanel.id}
                             </span>
                           ) : null}
@@ -182,7 +182,7 @@ export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProp
 
       {zoom ? (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#03002C]/85 p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#03002C]/85 p-6 dark:bg-card"
           role="dialog"
           aria-modal="true"
           aria-label={`${zoom.label} visualisation`}

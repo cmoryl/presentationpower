@@ -49,7 +49,7 @@ export function DeckImportProgress({
           aria-label="Deck import progress"
         >
           <div
-            className="h-full rounded-full bg-[#003FC7] transition-all duration-500"
+            className="h-full rounded-full bg-primary transition-all duration-500"
             style={{ width: `${pct}%` }}
           />
         </div>

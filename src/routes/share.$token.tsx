@@ -101,7 +101,7 @@ function ShareView() {
 
   if (state.kind === "loading") {
     return (
-      <div className="grid min-h-dvh place-items-center bg-[#03002C] text-white/70 text-sm">
+      <div className="grid min-h-dvh place-items-center bg-[#03002C] text-white/70 text-sm dark:bg-card">
         Loading…
       </div>
     );
@@ -126,7 +126,7 @@ function LinkGate({ variant, message }: { variant: "expired" | "disabled"; messa
           body: "The deck owner disabled sharing or the link is invalid. Reach out to them for an updated link.",
         };
   return (
-    <div className="grid min-h-dvh place-items-center bg-[#03002C] px-6 text-center text-white">
+    <div className="grid min-h-dvh place-items-center bg-[#03002C] px-6 text-center text-white dark:bg-card">
       <div>
         <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">
           TransPerfect · {copy.eyebrow}
@@ -372,9 +372,9 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
 
   return (
     <SlideTemplateIndustryProvider industryId={deck.design_recipe_id ?? null}>
-      <div className="min-h-dvh bg-[#03002C] text-white" dir={isRtl ? "rtl" : undefined}>
+      <div className="min-h-dvh bg-[#03002C] text-white dark:bg-card" dir={isRtl ? "rtl" : undefined}>
         {/* Minimal header */}
-        <header className="sticky top-0 z-20 border-b border-white/10 bg-[#03002C]/85 backdrop-blur-xl">
+        <header className="sticky top-0 z-20 border-b border-white/10 bg-[#03002C]/85 backdrop-blur-xl dark:bg-card">
           <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-6 py-4">
             <div className="min-w-0">
               <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">

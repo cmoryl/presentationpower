@@ -181,7 +181,7 @@ export function StudioInspector({
       {item.type === "module" && (
         <>
           {onExplode && (
-            <div className="rounded-xl border border-[#003FC7]/25 bg-[#003FC7]/[0.06] p-3">
+            <div className="rounded-xl border border-[#003FC7]/25 bg-primary/[0.06] p-3">
               <button
                 type="button"
                 onClick={onExplode}

@@ -111,7 +111,7 @@ function MartStopPage() {
                 key={p.id}
                 className="overflow-hidden rounded-2xl border border-black/10 bg-white"
               >
-                <div className="flex items-center justify-center bg-[#F2F2F2] p-4">
+                <div className="flex items-center justify-center bg-muted p-4">
                   <PillarSign config={martStopPillarConfig(stop, p)} pxPerMm={0.06} />
                 </div>
                 <div className="border-t border-black/10 px-4 py-3">
@@ -151,7 +151,7 @@ function MartStopPage() {
                   key={sign.id}
                   className="overflow-hidden rounded-2xl border border-black/10 bg-white"
                 >
-                  <div className="flex items-center justify-center bg-[#F2F2F2] p-4">
+                  <div className="flex items-center justify-center bg-muted p-4">
                     <PillarSign config={config} pxPerMm={0.16} />
                   </div>
                   <div className="border-t border-black/10 px-4 py-3">

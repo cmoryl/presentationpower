@@ -284,7 +284,7 @@ function AuthPage() {
             <button
               type="submit"
               disabled={busy}
-              className="w-full rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white disabled:opacity-60"
+              className="w-full rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white disabled:opacity-60 dark:bg-primary dark:text-primary-foreground"
             >
               {busy
                 ? "Working…"
@@ -438,7 +438,7 @@ function TeamAccessCard({ onBack, onDone }: { onBack: () => void; onDone: () => 
             <button
               type="submit"
               disabled={busy}
-              className="w-full rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white disabled:opacity-60"
+              className="w-full rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white disabled:opacity-60 dark:bg-primary dark:text-primary-foreground"
             >
               {busy ? "Signing in…" : "Enter the build"}
             </button>

@@ -182,7 +182,7 @@ export function AgentStatsMapping({
                   : "The figures are correct — write them to the slides exactly as mapped.",
               )
             }
-            className="rounded-lg bg-[#003FC7] px-3 py-1.5 text-[11px] font-semibold text-white transition disabled:opacity-40 hover:brightness-110"
+            className="rounded-lg bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground transition disabled:opacity-40 hover:brightness-110"
           >
             Confirm and write
           </button>

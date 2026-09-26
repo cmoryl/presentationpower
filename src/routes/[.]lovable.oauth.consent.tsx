@@ -84,7 +84,7 @@ function Consent() {
     <main className="min-h-screen bg-[#F5F1EA] px-6 py-20 text-[#03002C]">
       <div className="mx-auto max-w-[460px] rounded-[20px] border border-black/10 bg-white/70 p-7">
         <div className="mb-6 flex items-center gap-3">
-          <div className="h-2 w-8 bg-[#003FC7]" />
+          <div className="h-2 w-8 bg-primary" />
           <div className="text-xs font-semibold tracking-[0.25em]">TRANSPERFECT · ELEMENT</div>
         </div>
         <h1 className="text-2xl font-semibold tracking-tight">Connect {clientName}</h1>
@@ -104,7 +104,7 @@ function Consent() {
           <button
             disabled={busy}
             onClick={() => decide(true)}
-            className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+            className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50 dark:bg-card"
           >
             {busy ? "Working…" : "Approve"}
           </button>

@@ -234,7 +234,7 @@ function ImageryPage() {
           {!userId && (
             <Link
               to="/auth"
-              className="mt-3 inline-flex rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white"
+              className="mt-3 inline-flex rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white dark:bg-primary dark:text-primary-foreground"
             >
               Sign in
             </Link>
@@ -571,7 +571,7 @@ function MemoryPanel({
           />
           <button
             onClick={() => onSave(localTags, note)}
-            className="mt-3 rounded-full bg-[#03002C] px-3 py-1.5 text-xs text-white"
+            className="mt-3 rounded-full bg-[#03002C] px-3 py-1.5 text-xs text-white dark:bg-card"
           >
             Save memory
           </button>

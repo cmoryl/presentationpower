@@ -301,7 +301,7 @@ function AlongsideView() {
                       h={size.h}
                       typeSet={typeSet}
                     />
-                    <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C]/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
+                    <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C]/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100 dark:bg-card">
                       <Maximize2 size={11} /> View larger
                     </span>
                   </button>
@@ -394,7 +394,7 @@ function AlongsideView() {
       <section className="flex flex-wrap gap-3">
         <Link
           to="/social/legal-refresh"
-          className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary"
+          className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
         >
           Thorny work directions <ArrowRight size={14} />
         </Link>
@@ -412,7 +412,7 @@ function AlongsideView() {
               role="dialog"
               aria-modal="true"
               aria-label={`${zoomScene.no} · ${zoomScene.theme} — large view`}
-              className="fixed inset-0 z-[120] flex flex-col bg-[#03002C]/95 p-4 backdrop-blur-sm sm:p-6"
+              className="fixed inset-0 z-[120] flex flex-col bg-[#03002C]/95 p-4 backdrop-blur-sm sm:p-6 dark:bg-card"
               onClick={() => setZoom(null)}
             >
               <div

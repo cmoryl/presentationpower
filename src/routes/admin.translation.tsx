@@ -283,7 +283,7 @@ function TranslationAdminPage() {
               <span className="truncate font-medium text-[#03002C]">{l.label}</span>
               <span className="truncate text-black/50">· {l.native}</span>
               {l.rtl && (
-                <span className="shrink-0 rounded bg-[#003FC7]/10 px-1.5 text-[10px] text-[#003FC7]">
+                <span className="shrink-0 rounded bg-primary/10 px-1.5 text-[10px] text-[#003FC7]">
                   RTL
                 </span>
               )}
