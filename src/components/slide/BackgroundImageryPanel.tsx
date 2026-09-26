@@ -22,7 +22,7 @@ import {
   resolveSlideBackground,
   type SlideBackgroundValue,
 } from "@/lib/background-library";
-import { refreshSlideMediaUrl, slideMediaPathFromUrl, uploadDataUrl, uploadSlideMedia } from "@/lib/slide-media";
+import { resignStorageUrl, uploadDataUrl, uploadSlideMedia } from "@/lib/slide-media";
 import { useEffect as useEffectFresh, useState as useStateFresh, type ImgHTMLAttributes } from "react";
 
 /** Preview image that re-signs an expired slide-media link once, and says so if it still fails. */
@@ -37,8 +37,7 @@ function FreshImg({ src, ...rest }: ImgHTMLAttributes<HTMLImageElement> & { src:
       {...rest}
       src={url}
       onError={async () => {
-        const path = state === "ok" ? slideMediaPathFromUrl(src) : null;
-        const fresh = path ? await refreshSlideMediaUrl(path) : null;
+        const fresh = state === "ok" ? await resignStorageUrl(src) : null;
         if (fresh) { setUrl(fresh); setState("retried"); } else setState("failed");
       }}
     />
