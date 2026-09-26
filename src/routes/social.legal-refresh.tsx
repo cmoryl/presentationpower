@@ -250,7 +250,7 @@ function LegalRefreshView() {
         <Link
           to="/social/demo/$playbookId"
           params={{ playbookId: "legal-thorny-work" }}
-          className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-white hover:bg-[#003FC7]"
+          className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary"
         >
           <Sparkles size={14} /> Open the full campaign kit
         </Link>

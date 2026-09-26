@@ -491,7 +491,7 @@ export function AgentChat({
           <button
             type="submit"
             disabled={busy || !input.trim()}
-            className="rounded-xl bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white transition disabled:opacity-40 hover:brightness-110"
+            className="rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition disabled:opacity-40 hover:brightness-110"
           >
             {busy ? "Working…" : "Send"}
           </button>

@@ -396,7 +396,7 @@ export function ReinterpretApprovalDialog({
         onClick={openDialog}
         disabled={disabled || deck.slides.length === 0}
         title="Let AI re-author every slide in our design system, then review and approve slide by slide"
-        className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-white px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/5 disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-white px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-primary/5 disabled:opacity-60"
       >
         <Wand2 size={12} /> AI reinterpret + review
       </button>
@@ -440,7 +440,7 @@ export function ReinterpretApprovalDialog({
                     <button
                       type="button"
                       onClick={applySavedLooks}
-                      className="ml-auto rounded-full border border-[#003FC7] bg-white px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/5"
+                      className="ml-auto rounded-full border border-[#003FC7] bg-white px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-primary/5"
                     >
                       Apply saved looks
                     </button>
@@ -857,7 +857,7 @@ export function ReinterpretApprovalDialog({
                 type="button"
                 onClick={build}
                 disabled={plans.length === 0}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-[#003FC7] px-3 py-1.5 text-xs text-white hover:opacity-90 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-primary px-3 py-1.5 text-xs text-primary-foreground hover:opacity-90 disabled:opacity-50"
               >
                 <Check size={12} /> Build deck with {approved.size} approved
               </button>

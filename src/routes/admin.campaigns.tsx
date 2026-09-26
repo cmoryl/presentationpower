@@ -97,7 +97,7 @@ function CampaignsView() {
             </span>
             <Link
               to="/social/kit"
-              className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-[#03002C]"
             >
               <Sparkles size={12} /> Build a kit →
             </Link>
@@ -141,7 +141,7 @@ function CampaignsView() {
           </div>
           <Link
             to={favorites.size === 0 ? "/library" : "/social/kit"}
-            className="rounded-full bg-[#03002C] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]"
+            className="rounded-full bg-[#03002C] px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary"
           >
             {favorites.size === 0 ? "Browse library →" : "Choose from favorites →"}
           </Link>

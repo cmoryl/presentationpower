@@ -593,7 +593,7 @@ function LondonMapsPage() {
               {mineToSignOff.length ? (
                 <button
                   type="button"
-                  className="inline-flex items-center gap-2 rounded-full border border-[#003FC7] bg-[#003FC7] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#003FC7] bg-primary px-4 py-2 text-[13px] font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                   onClick={confirmAll}
                   title="Sign off the positions you marked, so every sheet reads them"
                 >
@@ -913,7 +913,7 @@ function LondonMapsPage() {
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
                       type="button"
-                      className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+                      className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-[13px] font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                       onClick={() => setViewer3dId(selected.id)}
                     >
                       <Boxes className="h-4 w-4" /> View in 3D

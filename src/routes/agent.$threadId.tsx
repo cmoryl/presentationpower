@@ -348,7 +348,7 @@ function AgentHero({
             <button
               type="button"
               onClick={onNewDeck}
-              className="group inline-flex items-center gap-2 rounded-xl border border-[#003FC7]/30 bg-[#003FC7]/5 px-4 py-2.5 text-sm font-semibold text-[#003FC7] shadow-sm transition hover:bg-[#003FC7]/10 hover:shadow-md"
+              className="group inline-flex items-center gap-2 rounded-xl border border-[#003FC7]/30 bg-primary/5 px-4 py-2.5 text-sm font-semibold text-[#003FC7] shadow-sm transition hover:bg-primary/10 hover:shadow-md"
             >
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
               Start a new deck from a brief
@@ -609,7 +609,7 @@ function AgentThreadPage() {
           Sign in to use the presentation agent.
           <Link
             to="/auth"
-            className="rounded-lg bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white"
+            className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
           >
             Sign in
           </Link>

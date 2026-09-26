@@ -531,7 +531,7 @@ function EmptyState({
                 <Link
                   key={a.to}
                   to={a.to}
-                  className="rounded-full border border-[#003FC7]/25 bg-[#003FC7]/[0.06] px-2.5 py-1 text-[10px] font-semibold text-[#003FC7] transition-colors hover:bg-[#003FC7]/12"
+                  className="rounded-full border border-[#003FC7]/25 bg-primary/[0.06] px-2.5 py-1 text-[10px] font-semibold text-[#003FC7] transition-colors hover:bg-primary/12"
                 >
                   {a.label}
                 </Link>

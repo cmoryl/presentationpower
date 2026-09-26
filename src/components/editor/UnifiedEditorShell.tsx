@@ -110,8 +110,8 @@ function RailTab({
       title={active ? `Close ${label}` : `Open ${label}`}
       className={`relative flex flex-col items-center gap-1.5 rounded-lg py-3 transition ${
         active
-          ? "bg-[#003FC7] text-white"
-          : "text-black/60 hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/10"
+          ? "bg-primary text-primary-foreground"
+          : "text-black/60 hover:bg-black/5 dark:text-primary-foreground/60 dark:hover:bg-white/10"
       }`}
     >
       {icon}

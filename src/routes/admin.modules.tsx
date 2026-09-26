@@ -485,7 +485,7 @@ function RowActions({
         type="button"
         onClick={onSave}
         disabled={busy}
-        className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3.5 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-50"
       >
         <Save size={12} /> {dirty ? "Save changes" : "Save"}
       </button>

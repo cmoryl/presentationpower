@@ -189,7 +189,7 @@ function LayerDiffHarness() {
         <button
           onClick={run}
           disabled={busy}
-          className="rounded-full bg-[#003FC7] px-5 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
         >
           {busy ? "Diffing…" : "Run visual diff"}
         </button>

@@ -339,7 +339,7 @@ export function IndustryOverviewCard({
             <button
               type="button"
               onClick={onEdit}
-              className="rounded-full border border-[#003FC7]/40 px-2.5 py-1 text-[11px] font-semibold text-[#003FC7] transition hover:bg-[#003FC7]/10"
+              className="rounded-full border border-[#003FC7]/40 px-2.5 py-1 text-[11px] font-semibold text-[#003FC7] transition hover:bg-primary/10"
             >
               Edit / replace backgrounds
             </button>

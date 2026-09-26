@@ -1091,8 +1091,8 @@ export function VariantSampleStudio({
           onClick={handleSave}
           disabled={busy}
           title="Save sample (⌘S)"
-          className={`rounded-full px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-100 ${
-            !dirty && justSaved ? "bg-[#0F8A4A]" : "bg-[#003FC7] disabled:opacity-40"
+          className={`rounded-full px-4 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-100 ${
+            !dirty && justSaved ? "bg-[#0F8A4A]" : "bg-primary disabled:opacity-40"
           }`}
         >
           {save.isPending ? "Saving…" : !dirty && justSaved ? "✓ Saved" : "Save sample"}

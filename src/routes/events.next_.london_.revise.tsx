@@ -315,7 +315,7 @@ function AddPanelForm({
         <button
           type="submit"
           disabled={!valid}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[#003FC7] px-3 py-2 text-sm font-semibold text-white disabled:opacity-40"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-40"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
           Add panel

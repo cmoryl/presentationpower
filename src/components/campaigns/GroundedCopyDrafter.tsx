@@ -105,7 +105,7 @@ export function GroundedCopyDrafter({
           type="button"
           onClick={handleDraft}
           disabled={drafting}
-          className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#0033a3] disabled:opacity-60"
+          className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition hover:bg-[#0033a3] disabled:opacity-60"
         >
           {drafting ? (
             <RefreshCw size={13} className="animate-spin" aria-hidden />

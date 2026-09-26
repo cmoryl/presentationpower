@@ -120,7 +120,7 @@ function RunCard({ run }: { run: DemoRun }) {
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <Link
           to={DEMO_OPENER.to}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-[#03002C] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#003FC7]"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-[#03002C] px-3.5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary"
         >
           Start with the live build
           <ArrowRight className="h-4 w-4" />

@@ -148,7 +148,7 @@ export function VariantSampleEditor({
             type="button"
             onClick={handleSave}
             disabled={busy || !dirty}
-            className="rounded-full bg-[#003FC7] px-3 py-1 text-xs font-semibold text-white disabled:opacity-40"
+            className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground disabled:opacity-40"
           >
             {save.isPending ? "Saving…" : "Save sample"}
           </button>

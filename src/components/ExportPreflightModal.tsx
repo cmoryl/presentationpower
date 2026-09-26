@@ -104,7 +104,7 @@ export function ExportPreflightModal({
             type="button"
             onClick={onExportAnyway}
             disabled={busy}
-            className="rounded-full bg-[#003FC7] px-4 py-2 text-xs uppercase tracking-widest text-white hover:bg-[#03002C] disabled:opacity-40"
+            className="rounded-full bg-primary px-4 py-2 text-xs uppercase tracking-widest text-primary-foreground hover:bg-[#03002C] disabled:opacity-40"
           >
             {busy ? "Exporting…" : "Export anyway"}
           </button>

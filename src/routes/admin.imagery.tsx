@@ -974,7 +974,7 @@ function ImageCard({
             />
             <button
               onClick={save}
-              className="rounded-md bg-[#003FC7] px-2 py-1 text-[11px] text-white"
+              className="rounded-md bg-primary px-2 py-1 text-[11px] text-primary-foreground"
             >
               Save
             </button>

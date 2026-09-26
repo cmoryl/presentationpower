@@ -1310,13 +1310,13 @@ function Library() {
               <div className="flex shrink-0 items-center gap-2">
                 <Link
                   to="/library/overrides"
-                  className="rounded-full border border-[#003FC7]/30 px-3 py-1.5 text-[12px] font-semibold text-[#003FC7] transition hover:bg-[#003FC7]/10"
+                  className="rounded-full border border-[#003FC7]/30 px-3 py-1.5 text-[12px] font-semibold text-[#003FC7] transition hover:bg-primary/10"
                 >
                   Override inspector
                 </Link>
                 <Link
                   to="/library/industry-backgrounds"
-                  className="rounded-full bg-[#003FC7] px-3 py-1.5 text-[12px] font-semibold text-white transition hover:bg-[#003FC7]/90"
+                  className="rounded-full bg-primary px-3 py-1.5 text-[12px] font-semibold text-primary-foreground transition hover:bg-primary/90"
                 >
                   Open background directory
                 </Link>
@@ -1492,7 +1492,7 @@ function Library() {
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="rounded-full bg-[#03002C] px-4 py-2 text-sm text-white hover:bg-[#003FC7]"
+                  className="rounded-full bg-[#03002C] px-4 py-2 text-sm text-primary-foreground hover:bg-primary"
                 >
                   Clear all filters
                 </button>
@@ -1575,7 +1575,7 @@ function Library() {
               <button
                 type="button"
                 onClick={createDeckFromSelection}
-                className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium hover:bg-[#0053ff]"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-xs font-medium hover:bg-[#0053ff]"
               >
                 <Plus size={14} /> Create deck from selection →
               </button>
@@ -3121,7 +3121,7 @@ function VariantDetailModal({
                 <Link
                   to="/social/kit"
                   search={{ source: variant.id }}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-primary hover:text-primary-foreground"
                   title="Generate a social kit from this favorited module"
                 >
                   <Sparkles size={12} /> Create social kit
@@ -3366,7 +3366,7 @@ function VariantDetailModal({
                           type="button"
                           onClick={openPdfPreview}
                           disabled={previewBusy || exportBusy}
-                          className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#003FC7]/30 bg-[#003FC7]/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white disabled:opacity-60"
+                          className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#003FC7]/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-primary hover:text-primary-foreground disabled:opacity-60"
                         >
                           {previewBusy ? (
                             <Loader2 size={12} className="animate-spin" />
@@ -4483,7 +4483,7 @@ function AddToDeckPanel({
             <button
               type="button"
               onClick={startDeckHere}
-              className="rounded-full bg-[#003FC7] px-3 py-1 text-[11px] font-medium text-white hover:bg-[#0053ff]"
+              className="rounded-full bg-primary px-3 py-1 text-[11px] font-medium text-primary-foreground hover:bg-[#0053ff]"
             >
               New deck with this module →
             </button>

@@ -77,7 +77,7 @@ export function CanvasSlideStrip({
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#003FC7]/90"
+          className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground transition hover:bg-primary/90"
         >
           <Plus className="h-3.5 w-3.5" /> Add slide
         </button>

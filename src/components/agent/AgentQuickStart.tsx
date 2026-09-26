@@ -411,7 +411,7 @@ export function AgentQuickStart({
         <button
           type="submit"
           disabled={!ready}
-          className="rounded-lg bg-[#003FC7] px-4 py-1.5 text-xs font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+          className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground transition hover:brightness-110 disabled:opacity-40"
         >
           {disabled ? "Working…" : "Generate deck"}
         </button>

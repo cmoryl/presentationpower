@@ -72,7 +72,7 @@ function AnalyticsPage() {
           cta={
             <Link
               to="/auth"
-              className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
             >
               Sign in <ArrowRight size={14} />
             </Link>
@@ -93,7 +93,7 @@ function AnalyticsPage() {
           cta={
             <Link
               to="/brief/new"
-              className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
             >
               <Sparkles size={14} /> Start a brief
             </Link>

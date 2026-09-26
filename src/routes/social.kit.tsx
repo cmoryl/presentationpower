@@ -270,7 +270,7 @@ function KitBuilderInner() {
             action={
               <Link
                 to="/library"
-                className="inline-flex items-center gap-2 rounded-sm bg-[#03002C] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]"
+                className="inline-flex items-center gap-2 rounded-sm bg-[#03002C] px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary"
               >
                 <Star size={14} /> Browse the library →
               </Link>
@@ -1095,7 +1095,7 @@ function WizardFlow(p: WizardProps) {
         {isLast ? (
           <Link
             to="/social"
-            className="inline-flex items-center gap-1.5 rounded-sm bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]"
+            className="inline-flex items-center gap-1.5 rounded-sm bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-[#03002C]"
           >
             Finish <Check size={12} />
           </Link>

@@ -395,7 +395,7 @@ export function CommentsPanel({
           <button
             onClick={submitTop}
             disabled={busy || !body.trim()}
-            className="inline-flex items-center gap-1 rounded-lg bg-[#003FC7] px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
           >
             {busy ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
           </button>

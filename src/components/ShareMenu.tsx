@@ -550,7 +550,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
                       type="button"
                       onClick={onCopyLink}
                       disabled={shareExpired}
-                      className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#003FC7] px-2 py-1 text-[10px] font-medium text-white hover:opacity-90 disabled:opacity-40"
+                      className="inline-flex shrink-0 items-center gap-1 rounded-md bg-primary px-2 py-1 text-[10px] font-medium text-primary-foreground hover:opacity-90 disabled:opacity-40"
                     >
                       {copied ? <Check size={12} /> : <Copy size={12} />}
                       {copied ? "Copied" : "Copy"}

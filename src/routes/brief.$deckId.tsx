@@ -457,7 +457,7 @@ function BriefOutputHub() {
           </div>
           <Link
             to="/brief/new"
-            className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-[13px] font-medium text-white transition hover:bg-[#003FC7]"
+            className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-[13px] font-medium text-primary-foreground transition hover:bg-primary"
           >
             New brief <ArrowRight size={15} strokeWidth={1.75} />
           </Link>

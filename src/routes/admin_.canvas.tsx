@@ -865,7 +865,7 @@ function StudioMenuBtn({
       title={label}
       className={`inline-flex h-9 w-9 items-center justify-center rounded-full transition disabled:opacity-40 ${
         primary
-          ? "bg-[#003FC7] text-white hover:bg-[#003FC7]/90"
+          ? "bg-primary text-primary-foreground hover:bg-primary/90"
           : danger
             ? "text-rose-600 hover:bg-rose-50"
             : "text-black/60 hover:bg-black/[0.04] hover:text-primary"

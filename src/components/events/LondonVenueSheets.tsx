@@ -1099,7 +1099,7 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
                 aria-pressed={directoryGround === g.id}
                 className={`${chip} ${
                   directoryGround === g.id
-                    ? "border-[#003FC7] bg-[#003FC7] text-white"
+                    ? "border-[#003FC7] bg-primary text-primary-foreground"
                     : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
                 }`}
                 onClick={() => setDirectoryGround(g.id)}

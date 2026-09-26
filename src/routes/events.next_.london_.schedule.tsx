@@ -187,7 +187,7 @@ function LondonSchedulePage() {
                       <Link
                         to="/events/next/london/maps"
                         search={{ sheet: entry.sheetId, room: entry.rooms[0] ?? entry.space }}
-                        className="inline-flex items-center gap-2 rounded-full border border-[#003FC7] bg-[#003FC7] px-3.5 py-1.5 text-[12.5px] font-semibold text-white hover:opacity-90"
+                        className="inline-flex items-center gap-2 rounded-full border border-[#003FC7] bg-primary px-3.5 py-1.5 text-[12.5px] font-semibold text-primary-foreground hover:opacity-90"
                       >
                         <MapIcon className="h-3.5 w-3.5" /> Show on the map
                       </Link>

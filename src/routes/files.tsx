@@ -433,7 +433,7 @@ function MyFilesPage() {
                   </p>
                   <Link
                     to="/auth"
-                    className="mt-4 inline-flex items-center rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:bg-[#0033a8]"
+                    className="mt-4 inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-[#0033a8]"
                   >
                     Sign in
                   </Link>
@@ -591,7 +591,7 @@ function FileCard({
         <Link
           to={file.href}
           aria-label={`Open ${file.title}`}
-          className="rounded-lg p-1.5 text-black/40 transition hover:bg-[#003FC7]/10 hover:text-[#003FC7]"
+          className="rounded-lg p-1.5 text-black/40 transition hover:bg-primary/10 hover:text-[#003FC7]"
         >
           <ArrowUpRight size={14} />
         </Link>

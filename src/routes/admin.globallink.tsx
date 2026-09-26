@@ -184,7 +184,7 @@ function GlobalLinkAdminPage() {
           <button
             onClick={runTest}
             disabled={testing || !status?.connected}
-            className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/10 px-4 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/20 disabled:opacity-40"
+            className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-primary/20 disabled:opacity-40"
           >
             {testing ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
             Test connection
@@ -428,7 +428,7 @@ function GlobalLinkAdminPage() {
           <button
             onClick={save}
             disabled={saving}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#003FC7] px-5 py-2 text-sm font-medium text-white hover:bg-[#003FC7]/90 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
             Save settings
@@ -446,7 +446,7 @@ function GlobalLinkAdminPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           <a
             href="/admin/translation"
-            className="group flex items-center justify-between rounded-xl border border-black/10 bg-[#F8F9FB] p-4 text-sm text-black/80 hover:border-[#003FC7]/40 hover:bg-[#003FC7]/5"
+            className="group flex items-center justify-between rounded-xl border border-black/10 bg-[#F8F9FB] p-4 text-sm text-black/80 hover:border-[#003FC7]/40 hover:bg-primary/5"
           >
             <span>
               <span className="block font-semibold text-black">Translation admin</span>
@@ -460,7 +460,7 @@ function GlobalLinkAdminPage() {
             href="https://www.transperfect.com/globallink"
             target="_blank"
             rel="noreferrer"
-            className="group flex items-center justify-between rounded-xl border border-black/10 bg-[#F8F9FB] p-4 text-sm text-black/80 hover:border-[#003FC7]/40 hover:bg-[#003FC7]/5"
+            className="group flex items-center justify-between rounded-xl border border-black/10 bg-[#F8F9FB] p-4 text-sm text-black/80 hover:border-[#003FC7]/40 hover:bg-primary/5"
           >
             <span>
               <span className="block font-semibold text-black">GlobalLink product docs</span>

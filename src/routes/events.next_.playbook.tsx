@@ -424,7 +424,7 @@ function PlaybookPage() {
         <div className="mt-10 flex flex-wrap gap-3">
           <Link
             to="/events/next/london"
-            className="rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#003FC7]"
+            className="rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-medium text-primary-foreground hover:bg-primary"
           >
             Open the London kit
           </Link>
