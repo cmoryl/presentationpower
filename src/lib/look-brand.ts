@@ -92,3 +92,28 @@ export function lookOwnerAccent(
   const code = lookCodeFromPackId(packIdOrCode);
   return LOOK_OWNER_ACCENT[code] ?? LOOK_OWNER_ACCENT[code.replace(/-V\d+$/i, "")] ?? null;
 }
+
+/**
+ * Deck look context after a deck is created in / moved to a brand scope.
+ *
+ * A brand that owns its own template (DataForce → R03 AI · Data Signature)
+ * wears it by default: slides and modules render in that brand's template
+ * unless the author already chose another look. Moving a deck OUT of that
+ * brand drops the owned look, so it never leaks into another division.
+ */
+export function brandOwnedLookContext<
+  C extends { stylePackId?: string | null; darkStylePackId?: string | null },
+>(brandModeId: string | null | undefined, ctx: C | undefined): C | undefined {
+  const owned = packIdForBrandMode(brandModeId);
+  const current = ctx?.stylePackId ?? null;
+  const currentOwner = current ? lookBrandModeId(current) : "bm-enterprise";
+  if (owned) {
+    if (current && currentOwner === brandModeId) return ctx;
+    if (current && currentOwner === "bm-enterprise") return ctx; // author's explicit pick
+    return { ...(ctx ?? ({} as C)), stylePackId: owned, darkStylePackId: owned };
+  }
+  if (current && currentOwner !== "bm-enterprise" && currentOwner !== brandModeId) {
+    return { ...(ctx as C), stylePackId: null, darkStylePackId: null };
+  }
+  return ctx;
+}
