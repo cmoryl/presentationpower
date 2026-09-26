@@ -788,6 +788,7 @@ export function StatFigure({
     >
       {(resolvedShape === "ghost" || resolvedShape === "auto") &&
         !valueIsPhrase &&
+        size !== "colossal" &&
         (() => {
           // The ghost counterform is a single nowrap line inside an
           // `overflow:hidden` container, so a long value ("$220k", "1,240 hrs")
