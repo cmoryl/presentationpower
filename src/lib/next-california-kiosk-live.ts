@@ -238,14 +238,44 @@ function isHidden(b: LiveBlock, e?: BlockEdit) {
  */
 export function withCopies(L: LiveLayout, edits: KioskEdits = {}): LiveLayout {
   const cs = edits.copies ?? [];
-  if (!cs.length) return L;
+  const bs = edits.badges ?? [];
+  if (!cs.length && !bs.length) return L;
   const texts = [...L.texts];
   for (const c of cs) if (c.kind === "text") { const s = L.texts.find((t) => t.id === c.of); if (s) texts.push({ ...s, id: c.id }); }
   const blocks = L.blocks.map((b) => {
     const extra = cs.filter((c) => c.kind === "part").flatMap((c) => { const s = b.parts?.find((q) => q.id === c.of); return s ? [{ ...s, id: c.id }] : []; });
     return extra.length ? { ...b, parts: [...(b.parts ?? []), ...extra] } : b;
   });
+  const all = blocks.flatMap((b) => b.parts ?? []);
+  for (const b of bs) {
+    const q = all.find((p) => p.id === b.of);
+    if (q) texts.push(badgeText(b, q));
+  }
   return { ...L, texts, blocks };
+}
+
+/** The editable text line that stands in for a badge object, in its own box. */
+export function badgeText(b: KioskBadge, q: LivePart): LiveText {
+  const h = q.y1 - q.y0;
+  const size = Math.max(18, Math.min(400, h * 0.55));
+  return {
+    id: b.id,
+    text: b.text,
+    font: b.font ?? "Geist-Bold",
+    size,
+    color: b.color ?? "#FFFFFF",
+    x: q.x0,
+    y: q.y0 + h / 2 + size * 0.35,
+    w: q.x1 - q.x0,
+    top: q.y0,
+    bottom: q.y1,
+    flow: true,
+  };
+}
+
+/** Object ids whose picture is replaced by an editable badge text. */
+export function badgedPartIds(edits: KioskEdits = {}): Set<string> {
+  return new Set((edits.badges ?? []).map((b) => b.of));
 }
 
 /** Pure: place every visible piece of a London wall onto the kiosk front. */
