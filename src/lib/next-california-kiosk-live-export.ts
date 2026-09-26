@@ -136,48 +136,55 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
 
   const src = await PDFDocument.load(await bytes(artUrl));
   const srcPage = src.getPage(0);
+  // Embed the London page ONCE (a single shared form XObject) and cut every
+  // piece and object out of it with a clip. Embedding per object duplicated the
+  // whole page's content streams each time — 100 MB+ files and multi-minute builds.
+  const emb = await doc.embedPage(srcPage, { left: 0, bottom: 0, right: srcPage.getWidth(), top: L.mediaH });
   const placed = layoutKiosk(L, edits);
   for (const p of placed) {
-    const bx = B / p.scale + 1;
+    const s = p.scale;
+    const bx = B / s + 1;
     // A piece touching the top or bottom trim runs on into the bleed, as the SVG does.
-    const ext = (B + 1) / p.scale;
+    const ext = (B + 1) / s;
     const exTop = p === placed[0] && p.y <= 0.5 ? ext : 0;
-    const exBot = Math.abs(p.y + (p.clipBottom - p.clipTop) * p.scale - KIOSK_H) < 0.5 ? ext : 0;
-    const top = L.originY + p.clipTop - exTop, bot = L.originY + p.clipBottom + exBot;
-    const emb = await doc.embedPage(srcPage, {
-      left: L.originX - bx,
-      right: L.originX + L.trimW + bx,
-      top: L.mediaH - top,
-      bottom: L.mediaH - bot,
-    });
-    // Backdrop with an even-odd hole for every separate object.
-    page.pushOperators(pushGraphicsState(), rectangle(0, 0, W, H));
+    const exBot = Math.abs(p.y + (p.clipBottom - p.clipTop) * s - KIOSK_H) < 0.5 ? ext : 0;
+    const rx = B + p.x - bx * s;
+    const ry = H - (B + p.y + (p.clipBottom - p.clipTop + exBot) * s);
+    const rw = (L.trimW + 2 * bx) * s;
+    const rh = (p.clipBottom - p.clipTop + exTop + exBot) * s;
+    // Backdrop region with an even-odd hole for every separate object.
+    page.pushOperators(pushGraphicsState(), rectangle(rx, ry, rw, rh));
     for (const q of p.parts) {
-      const hx = B + p.x + q.src.x0 * p.scale;
-      const hy = H - (B + p.y + (q.src.y1 - p.clipTop) * p.scale);
-      page.pushOperators(rectangle(hx, hy, (q.src.x1 - q.src.x0) * p.scale, (q.src.y1 - q.src.y0) * p.scale));
+      const hx = B + p.x + q.src.x0 * s;
+      const hy = H - (B + p.y + (q.src.y1 - p.clipTop) * s);
+      page.pushOperators(rectangle(hx, hy, (q.src.x1 - q.src.x0) * s, (q.src.y1 - q.src.y0) * s));
     }
     page.pushOperators(clipEvenOdd(), endPath());
     page.drawPage(emb, {
-      x: B + p.x - bx * p.scale,
-      y: H - (B + p.y + (p.clipBottom - p.clipTop + exBot) * p.scale),
-      xScale: p.scale,
-      yScale: p.scale,
+      x: B + p.x - L.originX * s,
+      y: H - B - p.y + (L.originY + p.clipTop - L.mediaH) * s,
+      xScale: s,
+      yScale: s,
     });
     page.pushOperators(popGraphicsState());
     // Each object on its own, from the same vector page (effects kept).
     for (const q of p.parts) {
       if (q.hidden) continue;
-      const e2 = await doc.embedPage(srcPage, {
-        left: L.originX + q.src.x0,
-        right: L.originX + q.src.x1,
-        top: L.mediaH - (L.originY + q.src.y0),
-        bottom: L.mediaH - (L.originY + q.src.y1),
-      });
-      const ox = B + q.x, oy = H - (B + q.y + (q.src.y1 - q.src.y0) * q.scale);
+      const qs = q.scale;
+      const w = (q.src.x1 - q.src.x0) * qs, h = (q.src.y1 - q.src.y0) * qs;
+      const ox = B + q.x, oy = H - (B + q.y + h);
       const ctr = partCentre(q);
       const o = pdfRot(ox, oy, B + ctr.x, H - (B + ctr.y), q.rot);
-      page.drawPage(e2, { x: o.x, y: o.y, xScale: q.scale, yScale: q.scale, opacity: q.opacity, rotate: degrees(-q.rot) });
+      const a = (-q.rot * Math.PI) / 180, c = Math.cos(a), sn = Math.sin(a);
+      page.pushOperators(pushGraphicsState(), concatTransformationMatrix(c, sn, -sn, c, o.x, o.y), rectangle(0, 0, w, h), clip(), endPath());
+      page.drawPage(emb, {
+        x: -(L.originX + q.src.x0) * qs,
+        y: -(L.mediaH - L.originY - q.src.y1) * qs,
+        xScale: qs,
+        yScale: qs,
+        opacity: q.opacity,
+      });
+      page.pushOperators(popGraphicsState());
     }
   }
 
