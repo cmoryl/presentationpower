@@ -40,7 +40,7 @@ export function OracleSourceViewer({
         type="button"
         aria-label="Close source"
         onClick={onClose}
-        className="absolute inset-0 bg-[#03002C]/45 backdrop-blur-sm dark:bg-primary dark:text-primary-foreground"
+        className="absolute inset-0 bg-[#03002C]/45 backdrop-blur-sm"
       />
       <aside className="relative flex h-full w-full max-w-3xl flex-col border-l border-black/10 bg-white shadow-2xl dark:border-white/10 dark:bg-[#07061F]">
         <header className="flex items-start justify-between gap-3 border-b border-black/10 px-5 py-4 dark:border-white/10">

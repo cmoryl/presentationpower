@@ -472,7 +472,7 @@ function DecksIndex() {
                   </label>
                   <Search
                     size={14}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 dark:text-primary-foreground/40"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 dark:text-foreground/40"
                   />
                   <input
                     id="deck-search"

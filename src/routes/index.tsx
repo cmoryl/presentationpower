@@ -1132,7 +1132,7 @@ function ResourceTile({
       </div>
       <ArrowRight
         size={14}
-        className="mt-1 shrink-0 text-foreground/30 transition group-hover:translate-x-0.5 group-hover:text-foreground/60 dark:text-primary-foreground/30 dark:group-hover:text-primary-foreground/60"
+        className="mt-1 shrink-0 text-foreground/30 transition group-hover:translate-x-0.5 group-hover:text-foreground/60 dark:text-foreground/30 dark:group-hover:text-foreground/60"
       />
     </Link>
   );

@@ -761,7 +761,7 @@ function ApprovedStyleCard({
           className={`flex-1 py-1.5 text-[9px] font-semibold uppercase tracking-wider transition ${
             active
               ? "bg-primary/[0.06] text-primary"
-              : "text-[#03002C]/55 hover:bg-black/[0.03] hover:text-[#003FC7] dark:text-primary-foreground/55 dark:hover:bg-white/[0.05]"
+              : "text-[#03002C]/55 hover:bg-black/[0.03] hover:text-[#003FC7] dark:text-foreground/55 dark:hover:bg-white/[0.05]"
           }`}
         >
           {active ? "Selected" : "Use"}

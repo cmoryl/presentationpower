@@ -3140,18 +3140,18 @@ function ModuleCard({
           >
             <GripVertical
               size={14}
-              className="shrink-0 text-foreground/30 dark:text-primary-foreground/30"
+              className="shrink-0 text-foreground/30 dark:text-foreground/30"
               aria-hidden
             />
             {open ? (
               <ChevronDown
                 size={14}
-                className="shrink-0 text-foreground/50 dark:text-primary-foreground/50"
+                className="shrink-0 text-foreground/50 dark:text-foreground/50"
               />
             ) : (
               <ChevronRight
                 size={14}
-                className="shrink-0 text-foreground/50 dark:text-primary-foreground/50"
+                className="shrink-0 text-foreground/50 dark:text-foreground/50"
               />
             )}
             <span className="truncate text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
