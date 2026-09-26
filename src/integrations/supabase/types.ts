@@ -1223,8 +1223,13 @@ export type Database = {
           module_key: string
           name: string
           notes: string | null
+          review_notes: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewer_id: string | null
           section_id: string | null
           status: string
+          submitted_at: string | null
           tags: string[]
           thumbnail_url: string | null
           updated_at: string
@@ -1242,8 +1247,13 @@ export type Database = {
           module_key: string
           name: string
           notes?: string | null
+          review_notes?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
           section_id?: string | null
           status?: string
+          submitted_at?: string | null
           tags?: string[]
           thumbnail_url?: string | null
           updated_at?: string
@@ -1261,8 +1271,13 @@ export type Database = {
           module_key?: string
           name?: string
           notes?: string | null
+          review_notes?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
           section_id?: string | null
           status?: string
+          submitted_at?: string | null
           tags?: string[]
           thumbnail_url?: string | null
           updated_at?: string
