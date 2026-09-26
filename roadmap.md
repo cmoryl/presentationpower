@@ -12,6 +12,9 @@
 - [x] No invented fallback figures in stat/editorial modules (dash instead)
 - [x] Social caption line for extra details (2 max)
 - [~] Standout layouts — already exist (hero number, full-bleed, split, statement); no duplicates built
-- [ ] Shared type-hierarchy pass across modules — needs per-family visual review
+- [x] Deck builder nudges existing bold layouts (max 3 per deck)
+- [x] Stat family: giant hero number now fills its column (on screen); PowerPoint version not yet matched
+- [ ] Stat family: remaining 13 stat modules reviewed one by one
+- [ ] Shared type-hierarchy pass across other families
 - [ ] Bolder accent shapes — needs per-family visual review
 - [ ] Native social/small-print layouts per family

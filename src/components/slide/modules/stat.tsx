@@ -69,7 +69,7 @@ registerSlideModule({
                     brand={brand}
                     value={s(stat.value, "—")}
                     unit={s(stat.unit, "")}
-                    size="monumental"
+                    size="colossal"
                     shape="auto"
                     icon={s(stat.icon)}
                     iconSize={s(stat.iconSize)}

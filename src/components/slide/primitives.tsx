@@ -396,7 +396,7 @@ export function TitleBlock({
 // A single stat, sized like a display headline: huge tabular numeral in
 // primary, unit/suffix in accent, small-caps label beneath. Sizes are named
 // so a stat row baseline-aligns and a single-stat slide can go monumental.
-type StatSize = "sm" | "md" | "lg" | "xl" | "monumental";
+type StatSize = "sm" | "md" | "lg" | "xl" | "monumental" | "colossal";
 /**
  * True when two strings say the same thing once punctuation, spacing and case
  * are ignored. Imported content routinely repeats a stat's label in its unit
@@ -414,6 +414,8 @@ const STAT_SPECS: Record<StatSize, { valuePx: number; unitPx: number; labelPx: n
   lg: { valuePx: 156, unitPx: 54, labelPx: 24 },
   xl: { valuePx: 200, unitPx: 66, labelPx: 26 },
   monumental: { valuePx: 280, unitPx: 84, labelPx: 28 },
+  // Single-figure slides: the number is the slide (~55% of stage height).
+  colossal: { valuePx: 520, unitPx: 150, labelPx: 32 },
 };
 
 /**
@@ -721,12 +723,20 @@ export function StatFigure({
   // Auto-fill grows the figure into an under-filled stat row. The cqw ceilings
   // stay in the min(), so a grown numeral can still never outrun its card.
   const grow = (expr: string) => `calc(${expr} * var(--fill-figure, 1))`;
+  // Colossal figures budget width by character count so a short number can
+  // fill its column (≈0.6em per glyph) without ever overrunning it.
+  const colossalCqw = Math.min(
+    58,
+    88 / (Math.max(1, (value || "\u2014").replace(/\s/g, "").length) * 0.6 + (unit ? 0.35 : 0)),
+  ).toFixed(2);
   const valueFontSize = grow(
     valueIsPhrase
       ? `min(${Math.round(spec.valuePx * 0.5)}px, 9cqw)`
-      : unitIsLong
-        ? `min(${spec.valuePx}px, 18cqw)`
-        : `min(${spec.valuePx}px, 20cqw)`,
+      : size === "colossal" && !unitIsLong
+        ? `min(${spec.valuePx}px, ${colossalCqw}cqw)`
+        : unitIsLong
+          ? `min(${spec.valuePx}px, 18cqw)`
+          : `min(${spec.valuePx}px, 20cqw)`,
   );
   const unitFontSize = grow(
     unitIsLong
@@ -778,6 +788,7 @@ export function StatFigure({
     >
       {(resolvedShape === "ghost" || resolvedShape === "auto") &&
         !valueIsPhrase &&
+        size !== "colossal" &&
         (() => {
           // The ghost counterform is a single nowrap line inside an
           // `overflow:hidden` container, so a long value ("$220k", "1,240 hrs")
