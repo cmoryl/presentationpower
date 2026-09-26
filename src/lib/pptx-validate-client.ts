@@ -11,7 +11,9 @@ import { readExportFidelity } from "./export-quality";
 function slideProbes(content: unknown): string[] {
   const strings = collectStrings(content)
     .map((s) => s.replace(/\s+/g, " ").trim())
-    .filter((s) => s.length >= 8 && s.length <= 160);
+    .filter((s) => s.length >= 8 && s.length <= 160)
+    // Links, ids and colour codes never render as slide copy.
+    .filter((s) => !/^(https?:|data:|\/|#[0-9a-f]{3,8}$)/i.test(s) && /\s/.test(s));
   const unique = Array.from(new Set(strings));
   unique.sort((a, b) => b.length - a.length);
   return unique.slice(0, 3);

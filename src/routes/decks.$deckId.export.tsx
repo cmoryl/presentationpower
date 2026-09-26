@@ -1,3 +1,4 @@
+import { useResignDeckMedia } from "@/hooks/use-resign-deck-media";
 import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { AuthoringNav } from "@/components/editor/EditorChrome";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
@@ -96,6 +97,7 @@ function ExportView() {
   const { auto, fidelity: autoFidelity } = Route.useSearch();
 
   const deck = useDeckStore((s) => s.decks[deckId]);
+  useResignDeckMedia(deck);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const [exporting, setExporting] = useState(false);
   const [override, setOverride] = useState(false);
