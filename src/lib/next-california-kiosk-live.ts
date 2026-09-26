@@ -361,7 +361,7 @@ export function layoutKiosk(L0: LiveLayout, edits: KioskEdits = {}): PlacedBlock
           x: x + src.x0 * sc + (pe.dx ?? 0) + ((1 - ps) * w) / 2,
           y: yy + (src.y0 - c[0]) * sc + (pe.dy ?? 0) + ((1 - ps) * h) / 2,
           scale: sc * ps,
-          hidden: !!pe.hidden,
+          hidden: !!pe.hidden || badged.has(pt.id),
           opacity: pe.opacity ?? 1,
           rot: pe.rot ?? 0,
         };
