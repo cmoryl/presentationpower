@@ -29,6 +29,7 @@ import {
   withCopies,
   splitArtSvg,
   textLineBoxes,
+  badgedPartIds,
   type KioskDivider,
   type KioskEdits,
   type LiveLayout,
