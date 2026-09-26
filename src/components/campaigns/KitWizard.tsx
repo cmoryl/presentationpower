@@ -64,6 +64,7 @@ import { GroundedCopyDrafter } from "@/components/campaigns/GroundedCopyDrafter"
 import { KitQrCreator } from "@/components/campaigns/KitQrCreator";
 
 import { Download } from "lucide-react";
+import { ApprovalGate } from "@/components/approvals/ApprovalGate";
 
 /** Format picker groups — platform families with a small brand-accent marker
  *  each (aqua/lavender stay under the 10% accent rule; blue leads). */
@@ -1095,6 +1096,15 @@ export function KitWizard({
               </div>
             }
           >
+            {savedKitId ? (
+              <div className="mb-5">
+                <ApprovalGate
+                  subjectType="kit"
+                  subjectId={savedKitId}
+                  title={kitName.trim() || "Campaign kit"}
+                />
+              </div>
+            ) : null}
             {/* Save this kit — name + save button, always visible on review. */}
             <div className="mb-5 rounded-2xl border border-[#003FC7]/25 bg-[#003FC7]/[0.04] p-4">
               <div className="flex flex-wrap items-end gap-3">
