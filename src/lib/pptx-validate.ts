@@ -90,6 +90,21 @@ function partText(xml: string): string {
   return normalise(out.join(" "));
 }
 
+/**
+ * A probe counts as found when its exact copy is present, or when most of its
+ * words are (PowerPoint splits runs, fits long copy and swaps punctuation, so
+ * an exact substring match wrongly failed real slides and blocked downloads).
+ */
+export function probeMatches(slideText: string, probe: string): boolean {
+  const want = normalise(probe);
+  if (slideText.includes(want)) return true;
+  const words = (x: string) => x.replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/).filter((w) => w.length >= 3);
+  const need = words(want);
+  if (need.length < 2) return false;
+  const have = new Set(words(slideText));
+  return need.filter((w) => have.has(w)).length / need.length >= 0.7;
+}
+
 export function normalise(s: string): string {
   return s
     .replace(/\s+/g, " ")
@@ -192,7 +207,7 @@ export async function validatePptxBytes(
 
     const xml = await zip.files[part]!.async("string");
     const text = partText(xml);
-    const probesFound = want.probes.filter((p) => p && text.includes(normalise(p))).length;
+    const probesFound = want.probes.filter((p) => p && probeMatches(text, p)).length;
 
     const relsName = `ppt/slides/_rels/${part.split("/").pop()}.rels`;
     const relsFile = zip.files[relsName];
