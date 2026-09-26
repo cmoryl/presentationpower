@@ -354,8 +354,8 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
                                       search={s.search ?? {}}
                                       className={`block rounded-lg px-2.5 py-2 text-sm font-medium leading-tight transition ${
                                         active
-                                          ? "bg-primary text-primary-foreground dark:!bg-white/15 dark:!text-primary-foreground"
-                                          : "text-[#03002C]/85 hover:bg-[#E0E8F5] hover:text-[#03002C] dark:text-primary-foreground/80 dark:hover:!bg-white/10 dark:hover:!text-primary-foreground"
+                                          ? "bg-primary text-primary-foreground dark:!bg-white/15 dark:!text-foreground"
+                                          : "text-[#03002C]/85 hover:bg-[#E0E8F5] hover:text-[#03002C] dark:text-foreground/80 dark:hover:!bg-white/10 dark:hover:!text-foreground"
                                       }`}
                                       onClick={() => setPresOpen(false)}
                                     >
@@ -415,8 +415,8 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
                                       to={s.to}
                                       className={`block rounded-lg px-2.5 py-2 text-sm font-medium leading-tight transition ${
                                         active
-                                          ? "bg-primary text-primary-foreground dark:!bg-white/15 dark:!text-primary-foreground"
-                                          : "text-[#03002C]/85 hover:bg-[#E0E8F5] hover:text-[#03002C] dark:text-primary-foreground/80 dark:hover:!bg-white/10 dark:hover:!text-primary-foreground"
+                                          ? "bg-primary text-primary-foreground dark:!bg-white/15 dark:!text-foreground"
+                                          : "text-[#03002C]/85 hover:bg-[#E0E8F5] hover:text-[#03002C] dark:text-foreground/80 dark:hover:!bg-white/10 dark:hover:!text-foreground"
                                       }`}
                                       onClick={() => setAdminOpen(false)}
                                     >
