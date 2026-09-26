@@ -8,6 +8,8 @@ import { attachAuthWithRefresh } from "@/lib/auth-fn-middleware";
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
+    const { installAiUsageRecorder } = await import("./lib/ai-usage-recorder.server");
+    installAiUsageRecorder();
     return await next();
   } catch (error) {
     if (error != null && typeof error === "object" && "statusCode" in error) {
