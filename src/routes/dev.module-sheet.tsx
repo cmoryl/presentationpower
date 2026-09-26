@@ -34,7 +34,7 @@ export const Route = createFileRoute("/dev/module-sheet")({
   }),
   head: () => ({
     meta: [
-      { title: "Module contact sheet · TransPerfect" },
+      { title: "Module contact sheet · TransPerfect Element" },
       { name: "description", content: "Internal contact sheet of every module variant." },
     ],
   }),

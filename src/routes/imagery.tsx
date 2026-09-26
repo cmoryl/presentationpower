@@ -25,7 +25,7 @@ export const Route = createFileRoute("/imagery")({
   }),
   head: () => ({
     meta: [
-      { title: "Master Imagery · TransPerfect" },
+      { title: "Master Imagery · TransPerfect Element" },
       {
         name: "description",
         content:

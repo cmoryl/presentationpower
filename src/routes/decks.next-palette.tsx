@@ -11,7 +11,7 @@ import {
 export const Route = createFileRoute("/decks/next-palette")({
   head: () => ({
     meta: [
-      { title: "NEXT 2026 palette showcase deck · TransPerfect" },
+      { title: "NEXT 2026 palette showcase deck · TransPerfect Element" },
       {
         name: "description",
         content:

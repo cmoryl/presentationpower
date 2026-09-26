@@ -54,7 +54,7 @@ type SharedDeck = {
 type SharedPayload = { status?: "active" | "expired" } & Partial<SharedDeck>;
 
 export const Route = createFileRoute("/share/$token")({
-  head: () => ({ meta: [{ title: "Shared deck · TransPerfect" }] }),
+  head: () => ({ meta: [{ title: "Shared deck · TransPerfect Element" }] }),
   component: ShareView,
 });
 

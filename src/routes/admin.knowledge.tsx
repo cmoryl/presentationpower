@@ -35,7 +35,7 @@ import { DIVISION_IMAGERY } from "@/assets/backdrops/divisions";
 export const Route = createFileRoute("/admin/knowledge")({
   head: () => ({
     meta: [
-      { title: "Knowledge Browser · Admin · TransPerfect" },
+      { title: "Knowledge Browser · Admin · TransPerfect Element" },
       {
         name: "description",
         content:

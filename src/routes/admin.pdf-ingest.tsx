@@ -14,7 +14,7 @@ import {
 
 export const Route = createFileRoute("/admin/pdf-ingest")({
   head: () => ({
-    meta: [{ title: "PDF Ingestion · Admin · TransPerfect" }],
+    meta: [{ title: "PDF Ingestion · Admin · TransPerfect Element" }],
   }),
   component: PdfIngestPage,
 });

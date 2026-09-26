@@ -43,7 +43,7 @@ import { STAGE_H, STAGE_W, makeItem, useCanvasStudio, type CanvasItem } from "@/
 export const Route = createFileRoute("/admin_/canvas")({
   head: () => ({
     meta: [
-      { title: "Open Canvas Studio · Admin · TransPerfect" },
+      { title: "Open Canvas Studio · Admin · TransPerfect Element" },
       {
         name: "description",
         content:
