@@ -91,7 +91,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     const [ai, imgs, decks, users, kb, exps, oracleKb, brandIntel] = await Promise.all([
       s
         .from("ai_events")
-        .select("cost_credits, tokens_in, tokens_out, latency_ms, status, created_at")
+        .select("cost_credits, tokens_in, tokens_out, latency_ms, status, operation, created_at")
         .gte("created_at", from),
       s.from("imagery_events").select("event_type, brand_id, created_at").gte("created_at", from),
       s
@@ -208,7 +208,10 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         aiAvgLatencyMs: avgLatency,
         aiErrors: errors,
         imageEvents: imgRows.length,
-        imagesGenerated: imgRows.filter((r) => r.event_type === "generate").length,
+        // Successful image-generation calls recorded from the AI gateway.
+        imagesGenerated: (aiRows as Array<{ operation?: string; status?: string }>).filter(
+          (r) => r.operation === "images_generations" && r.status === "success",
+        ).length,
         decks: deckRows.length,
         decksInWindow: decksInWindow.length,
         users: users.count ?? 0,
