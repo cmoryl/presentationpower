@@ -88,10 +88,10 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     const s = context.supabase as unknown as SbClient;
     const now = new Date();
     const from = new Date(now.getTime() - 30 * 24 * 3600 * 1000).toISOString();
-    const [ai, imgs, decks, users, kb, exps, oracleKb, brandIntel] = await Promise.all([
+    const [ai, imgs, decks, users, kb, exps, oracleKb, brandIntel, audit] = await Promise.all([
       s
         .from("ai_events")
-        .select("cost_credits, tokens_in, tokens_out, latency_ms, status, operation, created_at")
+        .select("cost_credits, tokens_in, tokens_out, latency_ms, status, operation, model, surface, error_message, created_at")
         .gte("created_at", from),
       s.from("imagery_events").select("event_type, brand_id, created_at").gte("created_at", from),
       s
@@ -103,6 +103,11 @@ export const getAdminOverview = createServerFn({ method: "GET" })
       s.from("ab_experiments").select("id, status"),
       s.from("oracle_knowledge_base").select("id", { count: "exact", head: true }),
       s.from("brand_intelligence").select("id", { count: "exact", head: true }),
+      s
+        .from("admin_audit_log")
+        .select("id, action, target_type, created_at")
+        .order("created_at", { ascending: false })
+        .limit(12),
     ]);
     const aiRows = (ai.data ?? []) as Array<{
       cost_credits: number;
@@ -222,6 +227,41 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         runningExperiments: expRows.filter((r) => r.status === "running").length,
       },
       aiPerDay: bucket(aiRows),
+      // Zero-filled 30-day series so every chart has a continuous axis.
+      aiDaily: (() => {
+        const days: Array<{ date: string; success: number; error: number }> = [];
+        for (let i = 29; i >= 0; i--) {
+          days.push({
+            date: new Date(now.getTime() - i * 86400000).toISOString().slice(0, 10),
+            success: 0,
+            error: 0,
+          });
+        }
+        const idx = new Map(days.map((d, i) => [d.date, i]));
+        for (const r of aiRows) {
+          const i = idx.get(r.created_at.slice(0, 10));
+          if (i === undefined) continue;
+          if (r.status === "success") days[i].success++;
+          else days[i].error++;
+        }
+        return days;
+      })(),
+      aiByOperation: tally(aiRows as unknown as Array<Record<string, string | null>>, "operation"),
+      aiByModel: tally(aiRows as unknown as Array<Record<string, string | null>>, "model"),
+      recentAiErrors: (aiRows as unknown as Array<Record<string, string | null>>)
+        .filter((r) => r.status !== "success")
+        .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))
+        .slice(0, 5)
+        .map((r) => ({
+          at: String(r.created_at),
+          operation: r.operation ?? "unknown",
+          model: r.model ?? "unknown",
+          message: (r.error_message ?? "").slice(0, 160),
+        })),
+      recentActivity: (
+        (audit.data ?? []) as Array<{ id: string; action: string; target_type: string | null; created_at: string }>
+      ).map((a) => ({ id: a.id, action: a.action, target: a.target_type, at: a.created_at })),
+      generatedAt: now.toISOString(),
       imageryPerDay: bucket(imgRows),
       decksPerDay: bucket(decksInWindow),
       decksByStatus: tally(deckRows as unknown as Array<Record<string, string | null>>, "status"),
