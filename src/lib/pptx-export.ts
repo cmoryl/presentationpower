@@ -1057,8 +1057,10 @@ export async function exportDeckToPptx(
     if (forceMode) return forceMode;
     const own = (deck.slides[i] as { mode?: "light" | "dark" }).mode;
     if (own === "light" || own === "dark") return own;
-    const kind = classifyVariant(deck.slides[i].variantId, i);
-    return kind === "cover" || kind === "divider" ? "dark" : "light";
+    // Unset slides render light in the editor, so the file must too — a dark
+    // cover default here made the export disagree with the preview and the
+    // visual check (rightly) blocked the download.
+    return "light";
   };
 
   // Fallback: when a slide has no explicit Backgrounds & Imagery selection,
@@ -1529,7 +1531,7 @@ export async function exportDeckToPptx(
     const own = (deck.slides[i] as { mode?: "light" | "dark" }).mode;
     if (own === "light" || own === "dark") return own === "dark";
     if (plateLum != null) return plateLum < 0.45;
-    return advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
+    return advancedDark || bgIsImage;
   };
   // Per-slide dark/light decision must match the render loop below so that
   // the prefetched item-logo picks the correct color variant (white marks on
