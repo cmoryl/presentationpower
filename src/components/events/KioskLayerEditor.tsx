@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlignCenter, AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignLeft, AlignRight,
   AlignStartHorizontal, AlignStartVertical, AlignHorizontalSpaceAround, AlignVerticalSpaceAround,
-  ArrowDown, ArrowUp, BringToFront, ClipboardPaste, Copy, CopyPlus, Download, Eye, EyeOff, Lock, Maximize2, Minimize2, Minus, Plus, Redo2, RotateCcw, Save, SendToBack, Trash2, Undo2, Unlock,
+  ArrowDown, ArrowUp, BringToFront, ClipboardPaste, Copy, CopyPlus, Download, Eye, EyeOff, Lock, Maximize2, Minimize2, Minus, Plus, Redo2, RotateCcw, Save, SendToBack, Trash2, Type, Undo2, Unlock,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
