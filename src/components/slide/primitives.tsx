@@ -723,12 +723,20 @@ export function StatFigure({
   // Auto-fill grows the figure into an under-filled stat row. The cqw ceilings
   // stay in the min(), so a grown numeral can still never outrun its card.
   const grow = (expr: string) => `calc(${expr} * var(--fill-figure, 1))`;
+  // Colossal figures budget width by character count so a short number can
+  // fill its column (≈0.6em per glyph) without ever overrunning it.
+  const colossalCqw = Math.min(
+    58,
+    88 / (Math.max(1, (value || "\u2014").replace(/\s/g, "").length) * 0.6 + (unit ? 0.35 : 0)),
+  ).toFixed(2);
   const valueFontSize = grow(
     valueIsPhrase
       ? `min(${Math.round(spec.valuePx * 0.5)}px, 9cqw)`
-      : unitIsLong
-        ? `min(${spec.valuePx}px, 18cqw)`
-        : `min(${spec.valuePx}px, 20cqw)`,
+      : size === "colossal" && !unitIsLong
+        ? `min(${spec.valuePx}px, ${colossalCqw}cqw)`
+        : unitIsLong
+          ? `min(${spec.valuePx}px, 18cqw)`
+          : `min(${spec.valuePx}px, 20cqw)`,
   );
   const unitFontSize = grow(
     unitIsLong
