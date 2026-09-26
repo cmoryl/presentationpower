@@ -297,6 +297,17 @@ export function layoutKiosk(L0: LiveLayout, edits: KioskEdits = {}): PlacedBlock
     above.push({ b, c });
     cum += (c[1] - c[0]) * base;
   }
+  // A headline too tall for the space above the TV is shrunk evenly (never
+  // below 60 %) so it sits above the TV instead of leaving that space empty.
+  let aboveScale = base;
+  if (!above.length && vis[0]) {
+    const c = tight(vis[0]);
+    const kk = KIOSK_TV.y / ((c[1] - c[0]) * base);
+    if (kk >= 0.6) {
+      above.push({ b: vis[0], c });
+      aboveScale = base * kk;
+    }
+  }
   const below = vis.slice(above.length);
   const region = KIOSK_H - (KIOSK_TV.y + KIOSK_TV.h);
   let clips = below.map((b) => ({ b, c: full(b) as readonly [number, number] }));
@@ -374,8 +385,8 @@ export function layoutKiosk(L0: LiveLayout, edits: KioskEdits = {}): PlacedBlock
   };
   let y = 0;
   for (const a of above) {
-    place(a.b, a.c, y, base);
-    y += (a.c[1] - a.c[0]) * base;
+    place(a.b, a.c, y, aboveScale);
+    y += (a.c[1] - a.c[0]) * aboveScale;
   }
   y = KIOSK_TV.y + KIOSK_TV.h + (clips.length > 1 ? gap / 2 : 0);
   clips.forEach((x, i) => {
