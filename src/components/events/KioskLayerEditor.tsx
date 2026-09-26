@@ -806,8 +806,14 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
             <label className="block text-[12px] text-[#03002C]/80">Size {Math.round((edits.parts?.[selPart.id]?.scale ?? 1) * 100)}%
               <input type="range" min={30} max={200} className="mt-1 w-full" value={Math.round((edits.parts?.[selPart.id]?.scale ?? 1) * 100)} onChange={(e) => patchPart(selPart.id, { scale: Number(e.target.value) / 100 }, false)} />
             </label>
-            <button type="button" className={btn} onClick={() => patchPart(selPart.id, { dx: 0, dy: 0, scale: 1, hidden: false })}>Put back</button>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className={btn} onClick={() => patchPart(selPart.id, { dx: 0, dy: 0, scale: 1, hidden: false })}>Put back</button>
+              {badgeOf(selPart.id)
+                ? <button type="button" className={btn} onClick={() => restorePicture(selPart.id)}>Put the picture back</button>
+                : <button type="button" className={btn} onClick={() => replaceWithText(selPart.id)}><Type className="h-3.5 w-3.5" />Replace with text</button>}
+            </div>
             <p className="text-[11px] text-[#03002C]/65">A single logo, icon, QR code or shape group from the London file. It moves and scales on its own, keeping its original shapes, gradients and see-through effects. Nearby words are separate text lines.</p>
+            <p className="text-[11px] text-[#03002C]/65">Badges: <strong>Replace with text</strong> hides the picture and puts an editable line in its place, so you can retype or swap a partner name without uploading an image. It exports as live text.</p>
           </div>
         ) : null}
 
