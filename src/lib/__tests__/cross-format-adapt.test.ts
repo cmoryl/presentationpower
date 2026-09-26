@@ -60,7 +60,7 @@ describe("cross-format adapter", () => {
     expect(trimmed.length).toBeLessThanOrEqual(41);
     expect(trimmed.endsWith("…")).toBe(true);
     const res = adaptContent({ headline: long }, "social-story");
-    expect(res.content.headline.length).toBeLessThanOrEqual(81);
+    expect(res.content.headline.length).toBeLessThanOrEqual(91);
     expect(res.notes.find((n) => n.field === "headline")?.severity).toBe("shortened");
   });
 

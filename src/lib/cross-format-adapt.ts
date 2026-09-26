@@ -251,14 +251,15 @@ export const ADAPT_TARGETS: AdaptTarget[] = [
       bodyLeading: 1.35,
       headlineLeading: 1.05,
     },
-    structure: ["eyebrow", "headline", "body", "points", "cta", "lockup"],
+    structure: ["eyebrow", "headline", "body", "points", "stat", "cta", "lockup"],
   },
   {
     id: "social-story",
     label: "Social card · story",
     medium: "social",
     formatId: "story-1080x1920",
-    caps: { headline: 80, body: 140, points: 3, pointChars: 48 },
+    // The tallest social size: holds at least what the square card holds.
+    caps: { headline: 90, body: 200, points: 4, pointChars: 56 },
     type: {
       eyebrowPx: 28,
       headlinePx: 94,
@@ -268,7 +269,7 @@ export const ADAPT_TARGETS: AdaptTarget[] = [
       bodyLeading: 1.32,
       headlineLeading: 1.04,
     },
-    structure: ["headline", "body", "cta", "lockup"],
+    structure: ["eyebrow", "headline", "body", "stat", "cta", "lockup"],
   },
   {
     id: "print-brief",
@@ -309,6 +310,7 @@ export const ADAPT_TARGETS: AdaptTarget[] = [
       "challenge",
       "approach",
       "result",
+      "points",
       "stat",
       "footnote",
     ],
@@ -388,7 +390,7 @@ export function adaptTargetFormat(target: AdaptTarget): SocialFormat | null {
 // ── Reading a source ───────────────────────────────────────────────────────
 
 const HEADLINE_KEYS = [
-  "headline", "title", "heading", "statement", "question", "quote", "name",
+  "headline", "title", "heading", "statement", "question", "quote", "name", "term", "hero",
   // Saved modules that carry their lead line under a module-specific field.
   "insight", "idea", "message", "ask", "recommendation", "clientName", "client",
 ];
@@ -828,17 +830,20 @@ export function adaptContent(content: AdaptContent, targetId: AdaptTargetId): Ad
         detail: `${content.points.length} supporting point(s) not shown — ${target.label} has no list block.`,
       });
     } else {
+      let shortenedCount = 0;
       const kept = content.points.slice(0, target.caps.points).map((p) => {
         const t = trimToWords(p, target.caps.pointChars);
-        if (t) {
-          notes.push({
-            severity: "shortened",
-            field: "points",
-            detail: `Point shortened to ${target.caps.pointChars} characters.`,
-          });
-        }
+        if (t) shortenedCount++;
         return t ?? p;
       });
+      // One note for the whole list, not one per point.
+      if (shortenedCount) {
+        notes.push({
+          severity: "shortened",
+          field: "points",
+          detail: `${shortenedCount} point(s) shortened to ${target.caps.pointChars} characters.`,
+        });
+      }
       out.points = kept;
       if (content.points.length > kept.length) {
         notes.push({

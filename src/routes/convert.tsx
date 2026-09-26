@@ -185,6 +185,20 @@ function ConvertPage() {
     );
   }, [moduleQuery, familyId]);
 
+  // A module whose sample holds nothing but its section name has no copy to
+  // carry; say so rather than presenting the section name as its headline.
+  const sampleMissing = useMemo(() => {
+    if (sourceKind !== "module") return false;
+    const fam = MODULE_FAMILIES.find((f) => f.id === moduleVariant?.familyId)?.name ?? "";
+    try {
+      const c = seedContent(moduleId, MASTER_BRIEF, fam) as Record<string, unknown>;
+      const keys = Object.keys(c ?? {});
+      return keys.length === 0 || (keys.length === 1 && keys[0] === "title");
+    } catch {
+      return true;
+    }
+  }, [sourceKind, moduleId, moduleVariant?.familyId]);
+
   const rawSource: AdaptContent = useMemo(() => {
     if (sourceKind === "module") {
       const fam = MODULE_FAMILIES.find((f) => f.id === moduleVariant?.familyId)?.name ?? "";
@@ -773,6 +787,11 @@ function ConvertPage() {
                   </p>
                 ) : null;
               })()}
+              {sampleMissing ? (
+                <p role="status" className="mt-3 rounded-lg border border-[#FF9B70] bg-[#FFF3EC] p-3 text-[12.5px] text-[#03002C]">
+                  This module has no sample copy yet, so only its section name carries over. Pick a deck slide that uses it, or type the copy in.
+                </p>
+              ) : null}
               {result.notes.length === 0 ? (
                 <p className="mt-3 rounded-lg border border-[#A6FA87] bg-[#F1FEEC] p-3 text-[12.5px] text-[#03002C]">
                   Everything fitted — nothing shortened, nothing left out.
