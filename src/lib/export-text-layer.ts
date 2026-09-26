@@ -313,6 +313,7 @@ export function extractTextRuns(
     const color = flat.hex;
 
     let rect: DOMRect = el.getBoundingClientRect();
+    let textOnlyX = false;
     if (rect.width < 2 || rect.height < 2) continue;
     // An element that also holds a non-text child (an icon or arrow before the
     // label) must be placed from where its OWN text starts, not from the
@@ -329,12 +330,13 @@ export function extractTextRuns(
         const tr = range.getBoundingClientRect();
         if (tr.width >= 2 && tr.height >= 2 && Array.from(range.getClientRects()).length <= 1) {
           rect = new DOMRect(tr.left, rect.top, tr.width, rect.height);
+          textOnlyX = true;
         }
       }
     }
 
-    const padL = parseFloat(cs.paddingLeft) || 0;
-    const padR = parseFloat(cs.paddingRight) || 0;
+    const padL = textOnlyX ? 0 : parseFloat(cs.paddingLeft) || 0;
+    const padR = textOnlyX ? 0 : parseFloat(cs.paddingRight) || 0;
     const padT = parseFloat(cs.paddingTop) || 0;
     const padB = parseFloat(cs.paddingBottom) || 0;
 
