@@ -103,10 +103,10 @@ export const PERSONAS: readonly Persona[] = [
       },
     ],
     shortcuts: [
-      { label: "Approvals", hint: "Sign off pending content", to: "/admin/approvals" },
+      { label: "Approvals", hint: "Sign off pending content", to: "/approvals" },
       { label: "Brand assets", hint: "Logos, marks, imagery", to: "/admin/brand-assets" },
       { label: "LogoHub", hint: "Client logo repository", to: "/admin/logohub" },
-      { label: "Knowledge hub", hint: "Grounding for every agent", to: "/admin/knowledge-hub" },
+      { label: "Knowledge", hint: "Grounding for every agent", to: "/knowledge" },
       { label: "Users & roles", hint: "Who can do what", to: "/admin/users" },
       { label: "Audit log", hint: "Every change, attributed", to: "/admin/audit" },
       { label: "Canvas creator", hint: "Free-form slide authoring", to: "/admin/canvas" },
