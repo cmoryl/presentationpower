@@ -31,7 +31,7 @@ function SocialLayout() {
                 <li key={t.to}>
                   <Link
                     to={t.to}
-                    aria-current={active ? "page" : undefined}
+                    activeOptions={{ exact: "exact" in t }}
                     className={`inline-block whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                       active
                         ? "border-primary text-foreground"
