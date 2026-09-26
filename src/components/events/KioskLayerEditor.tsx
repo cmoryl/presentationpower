@@ -101,21 +101,32 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   }, [L.id]);
 
   // Load: the shared saved copy wins; otherwise this device's unsaved draft.
+  // Nothing is loaded (and so nothing can be saved) until sign-in has
+  // resolved, and the value we loaded is never written straight back — that
+  // echo used to overwrite a saved kiosk with an empty one on reopen.
   const loaded = useRef(false);
+  const loadedEdits = useRef<KioskEdits | null>(null);
+  const editsNow = useRef(edits);
+  editsNow.current = edits;
   useEffect(() => {
     let live = true;
     loaded.current = false;
+    if (userId === undefined) return () => { live = false; };
     const local = readLocalDraft(L.id);
     (async () => {
-      const { data } = userId
+      const { data, error } = userId
         ? await supabase.from("kiosk_layer_edits").select("edits, updated_at").eq("booth_id", L.id).maybeSingle()
-        : { data: null };
+        : { data: null, error: null };
       if (!live) return;
+      if (error) { setStatus(`Couldn't load saved changes: ${error.message}. Editing is paused so nothing is overwritten.`); return; }
       const remote = data?.edits as KioskEdits | undefined;
       const remoteAt = data?.updated_at ? Date.parse(data.updated_at) : 0;
-      if (local && local.at > remoteAt) setEdits(local.edits);
-      else if (remote) setEdits(remote);
+      const next = local && local.at > remoteAt ? local.edits : remote ?? null;
+      if (next) { loadedEdits.current = next; setEdits(next); }
+      else loadedEdits.current = editsNow.current;
       loaded.current = true;
+      // A newer local draft still needs sending to the shared copy.
+      if (next && next === local?.edits && userId) setTimeout(() => { loadedEdits.current = null; setEdits((e) => ({ ...e })); }, 0);
     })();
     return () => { live = false; };
   }, [L.id, userId]);
@@ -123,12 +134,13 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   // Autosave: every change is kept on this device at once, and saved to the
   // shared kiosk a moment after you stop editing.
   useEffect(() => {
-    if (!loaded.current) return;
+    if (!loaded.current || userId === undefined) return;
+    if (loadedEdits.current === edits) return;
     writeLocalDraft(L.id, edits);
     if (!userId) { setStatus("Kept on this device. Sign in to save for everyone."); return; }
     setStatus("Saving…");
     const t = setTimeout(async () => {
-      const { error } = await supabase.from("kiosk_layer_edits").upsert({ booth_id: L.id, edits: edits as never, updated_by: userId });
+      const { error } = await supabase.from("kiosk_layer_edits").upsert({ booth_id: L.id, edits: edits as never, updated_by: userId, updated_at: new Date().toISOString() });
       if (error) setStatus(`Kept on this device only — not saved for everyone: ${error.message}`);
       else { clearLocalDraft(L.id); setStatus("All changes saved."); window.dispatchEvent(new CustomEvent("kiosk-edits-saved", { detail: L.id })); }
     }, 1200);
