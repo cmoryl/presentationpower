@@ -875,12 +875,17 @@ export function adaptContent(content: AdaptContent, targetId: AdaptTargetId): Ad
   }
 
   if (content.details?.length && !target.trimIn) {
-    out.details = undefined;
-    notes.push({
-      severity: "dropped",
-      field: "details",
-      detail: `${content.details.length} extra detail(s) (${content.details.map((d) => d.label.toLowerCase()).join(", ")}) not shown — ${target.label} has no details row.`,
-    });
+    // Social cards carry up to two details as a short caption line.
+    const kept = content.details.slice(0, 2);
+    out.details = kept;
+    if (content.details.length > kept.length) {
+      const lost = content.details.slice(kept.length);
+      notes.push({
+        severity: "dropped",
+        field: "details",
+        detail: `${lost.length} extra detail(s) (${lost.map((d) => d.label.toLowerCase()).join(", ")}) not shown — ${target.label} caption holds 2.`,
+      });
+    }
   }
 
   if (content.media?.kind === "unsupported") {
@@ -895,12 +900,17 @@ export function adaptContent(content: AdaptContent, targetId: AdaptTargetId): Ad
   return { target, content: out, type: target.type, notes };
 }
 
+/** Caption line for social cards: "Owner: A · Timeframe: B". */
+export function socialCaption(details?: { label: string; value: string }[]): string | undefined {
+  if (!details?.length) return undefined;
+  return details.map((d) => `${d.label}: ${d.value}`).join(" · ");
+}
+
 /** Adapted payload as social card copy for the social renderer. */
 export function toSocialCopy(result: AdaptResult): CampaignCopy {
   const { content } = result;
-  const summary = content.points?.length
-    ? [content.body, ...content.points].filter(Boolean).join(" · ")
-    : content.body;
+  const caption = socialCaption(content.details);
+  const summary = [content.body, ...(content.points ?? []), caption].filter(Boolean).join(" · ") || undefined;
   return {
     eyebrow: content.eyebrow,
     title: content.headline,
