@@ -32,12 +32,7 @@ export const Route = createFileRoute("/knowledge/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: () => (
-    <>
-      <KnowledgeTabs />
-      <KnowledgeView />
-    </>
-  ),
+  component: KnowledgeView,
 });
 
 
@@ -86,6 +81,7 @@ function KnowledgeView() {
 
   return (
     <AppShell>
+      <KnowledgeTabs />
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 sm:flex sm:flex-wrap sm:justify-between sm:gap-6">
         <div className="min-w-0">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50">Knowledge</div>

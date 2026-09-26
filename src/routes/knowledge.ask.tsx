@@ -28,12 +28,7 @@ export const Route = createFileRoute("/knowledge/ask")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: () => (
-    <>
-      <KnowledgeTabs />
-      <OracleAskView />
-    </>
-  ),
+  component: OracleAskView,
 });
 
 type ChatMsg = {
@@ -160,6 +155,7 @@ function OracleAskView() {
 
   return (
     <AppShell>
+      <KnowledgeTabs />
       <div className="mx-auto max-w-3xl px-6 py-10">
         <div className="mb-6 flex items-center justify-between gap-4">
           <div>

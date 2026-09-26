@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { AppShell } from "@/components/AppShell";
 import { ModuleReviewQueue } from "@/components/approvals/ModuleReviewQueue";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -49,7 +50,7 @@ function ApprovalsPage() {
   const tabCls = (on: boolean) =>
     `-mb-px border-b-2 px-4 py-2.5 text-sm ${on ? "border-primary font-medium text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`;
   return (
-    <div>
+    <AppShell>
       <nav aria-label="Approval queues" className="mx-auto flex w-full max-w-6xl gap-2 border-b border-border px-4 pt-8 sm:px-6">
         <Link to="/approvals" search={{}} className={tabCls(active === "brand")} aria-current={active === "brand" ? "page" : undefined}>
           Brand &amp; compliance
@@ -71,7 +72,7 @@ function ApprovalsPage() {
       ) : (
         <ApprovalQueuePage />
       )}
-    </div>
+    </AppShell>
   );
 }
 
