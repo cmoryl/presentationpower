@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { ArrowRight, FilePlus2, Printer, Share2, CalendarPlus, AlertTriangle } from "lucide-react";
+import { ArrowRight, FilePlus2, Printer, Share2, CalendarPlus, AlertTriangle, RefreshCw } from "lucide-react";
 import { getAdminOverview } from "@/lib/admin.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { ADMIN_NAV_GROUPS } from "@/lib/admin-nav";
@@ -55,7 +55,13 @@ const QUICK_ACTIONS = [
 
 function OverviewView() {
   const fn = useServerFn(getAdminOverview);
-  const q = useQuery({ queryKey: ["admin", "overview"], queryFn: () => fn(), retry: false });
+  const q = useQuery({
+    queryKey: ["admin", "overview"],
+    queryFn: () => fn(),
+    retry: false,
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: false,
+  });
 
   if (q.error && isForbidden(q.error)) return <AdminForbidden />;
   if (q.isLoading) return <LoadingSkeleton />;
@@ -102,6 +108,21 @@ function OverviewView() {
             What needs your attention, the latest work, and the health of the system. Figures
             cover the last 30 days unless marked otherwise.
           </p>
+          <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground" aria-live="polite">
+            <span>
+              Updated {new Date(d.generatedAt ?? q.dataUpdatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+              {" · "}refreshes every 30 seconds
+            </span>
+            <button
+              type="button"
+              onClick={() => q.refetch()}
+              disabled={q.isFetching}
+              className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+            >
+              <RefreshCw size={12} aria-hidden className={q.isFetching ? "animate-spin motion-reduce:animate-none" : ""} />
+              {q.isFetching ? "Refreshing" : "Refresh now"}
+            </button>
+          </div>
         </div>
         <nav aria-label="Quick actions" className="flex flex-wrap gap-2">
           {QUICK_ACTIONS.map((a, i) => (
@@ -221,6 +242,23 @@ function OverviewView() {
           </Panel>
 
           <Panel
+            title="AI activity"
+            description="AI requests per day, last 30 days — succeeded and failed"
+            action={<PanelLink to="/admin/ai">AI usage</PanelLink>}
+          >
+            <StackedSeries data={d.aiDaily ?? []} />
+          </Panel>
+
+          <div className="grid gap-8 md:grid-cols-2 [&>*]:min-w-0">
+            <Panel title="AI requests by type">
+              <Breakdown rows={(d.aiByOperation ?? []).map((r) => ({ ...r, label: OP_LABELS[r.label] ?? r.label.replace(/_/g, " ") }))} />
+            </Panel>
+            <Panel title="AI requests by model">
+              <Breakdown rows={d.aiByModel ?? []} plain />
+            </Panel>
+          </div>
+
+          <Panel
             title="Deck activity"
             description="Decks created per day, last 30 days"
           >
@@ -298,6 +336,44 @@ function OverviewView() {
                 value={`${t.runningExperiments} of ${t.experiments}`}
               />
             </dl>
+          </Panel>
+
+          <Panel title="Recent AI failures" action={<PanelLink to="/admin/ai">All</PanelLink>}>
+            {(d.recentAiErrors ?? []).length === 0 ? (
+              <Empty>No failed AI requests recorded.</Empty>
+            ) : (
+              <ul className="divide-y divide-border text-sm">
+                {(d.recentAiErrors ?? []).map((e) => (
+                  <li key={e.at + e.operation} className="px-4 py-2.5">
+                    <div className="flex justify-between gap-2">
+                      <span className="font-medium text-foreground">{OP_LABELS[e.operation] ?? e.operation}</span>
+                      <time className="shrink-0 text-xs text-muted-foreground" dateTime={e.at}>{relTime(e.at)}</time>
+                    </div>
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground" title={e.message}>
+                      {e.model}{e.message ? ` · ${e.message}` : ""}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
+
+          <Panel title="Recent admin activity" action={<PanelLink to="/admin/audit">Audit log</PanelLink>}>
+            {(d.recentActivity ?? []).length === 0 ? (
+              <Empty>No admin actions recorded yet.</Empty>
+            ) : (
+              <ul className="divide-y divide-border text-sm">
+                {(d.recentActivity ?? []).slice(0, 8).map((a) => (
+                  <li key={a.id} className="flex justify-between gap-2 px-4 py-2.5">
+                    <span className="min-w-0 truncate text-foreground">
+                      {a.action.replace(/[._]/g, " ")}
+                      {a.target ? <span className="text-muted-foreground"> · {a.target}</span> : null}
+                    </span>
+                    <time className="shrink-0 text-xs text-muted-foreground" dateTime={a.at}>{relTime(a.at)}</time>
+                  </li>
+                ))}
+              </ul>
+            )}
           </Panel>
 
           <Panel title="Admin areas">
@@ -414,7 +490,52 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function Breakdown({ rows }: { rows: Array<{ label: string; count: number }> }) {
+const OP_LABELS: Record<string, string> = {
+  chat_completions: "Text generation",
+  responses: "Text generation (responses)",
+  messages: "Text generation (messages)",
+  embeddings: "Knowledge search indexing",
+  images_generations: "Image generation",
+  images_edits: "Image editing",
+};
+
+function relTime(iso: string) {
+  const s = Math.round((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return "just now";
+  if (s < 3600) return `${Math.floor(s / 60)} min ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)} h ago`;
+  return new Date(iso).toLocaleDateString([], { day: "numeric", month: "short" });
+}
+
+function StackedSeries({ data }: { data: Array<{ date: string; success: number; error: number }> }) {
+  const ok = data.reduce((a, x) => a + x.success, 0);
+  const bad = data.reduce((a, x) => a + x.error, 0);
+  if (ok + bad === 0)
+    return <Empty>No AI requests recorded yet. Recording started on 26 Sept 2026.</Empty>;
+  const max = Math.max(1, ...data.map((x) => x.success + x.error));
+  return (
+    <div className="px-4 py-4">
+      <div className="flex h-32 items-end gap-1" role="img" aria-label={`${ok} succeeded and ${bad} failed in 30 days`}>
+        {data.map((x) => (
+          <div key={x.date} className="flex h-full flex-1 flex-col justify-end" title={`${x.date}: ${x.success} succeeded, ${x.error} failed`}>
+            {x.error > 0 && <div className="bg-destructive" style={{ height: `${(x.error / max) * 100}%` }} />}
+            {x.success > 0 && <div className="rounded-t-sm bg-primary/80" style={{ height: `${(x.success / max) * 100}%` }} />}
+          </div>
+        ))}
+      </div>
+      <div className="mt-2 flex flex-wrap justify-between gap-2 text-xs text-muted-foreground">
+        <span>{data[0]?.date}</span>
+        <span className="flex gap-3">
+          <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-primary/80" aria-hidden />{ok} succeeded</span>
+          <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-destructive" aria-hidden />{bad} failed</span>
+        </span>
+        <span>{data[data.length - 1]?.date}</span>
+      </div>
+    </div>
+  );
+}
+
+function Breakdown({ rows, plain }: { rows: Array<{ label: string; count: number }>; plain?: boolean }) {
   if (rows.length === 0) return <Empty>No data yet.</Empty>;
   const total = rows.reduce((a, r) => a + r.count, 0) || 1;
   return (
@@ -424,7 +545,7 @@ function Breakdown({ rows }: { rows: Array<{ label: string; count: number }> }) 
         return (
           <li key={r.label}>
             <div className="flex items-center justify-between gap-2 text-sm">
-              <span className="min-w-0 truncate capitalize text-foreground">{r.label}</span>
+              <span className={`min-w-0 truncate text-foreground ${plain ? "" : "capitalize"}`}>{r.label}</span>
               <span className="shrink-0 tabular-nums text-muted-foreground">{r.count}</span>
             </div>
             <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden>
