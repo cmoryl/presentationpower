@@ -1,3 +1,4 @@
+import { packIdForBrandMode } from "./look-brand";
 // Client-side PPTX export using pptxgenjs.
 // Family/variant-aware renderers so exported decks look intentional, not
 // templated. Renderer routing is by variant ID prefix, with a generic
@@ -863,7 +864,7 @@ export async function exportDeckToPptx(
   const activePack: StylePack | null =
     (suppliedPack ??
       effectivePack({
-        stylePackId: deck.context?.stylePackId ?? null,
+        stylePackId: deck.context?.stylePackId ?? packIdForBrandMode(deck.brandModeId) ?? null,
         designRecipeId: deck.context?.designRecipeId ?? null,
       })) ||
     null;

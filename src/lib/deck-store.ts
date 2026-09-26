@@ -26,6 +26,7 @@ import { hasTextFormats } from "./slide-text-format";
 import { mergeTemplateOverride, type SlideTemplateOverride } from "./section-templates";
 import { autoFixQa } from "./qa-autofix";
 import { normalizeLook } from "./look-validate";
+import { brandOwnedLookContext } from "./look-brand";
 import type { SlideTextFormat, SlideTextFormats, SlideTextScope } from "./slide-text-format";
 
 export type BrandModeId = string;
@@ -750,6 +751,10 @@ export function assembleDeck(
     brandModeId: brief.brandModeId,
     subCompany: brief.subCompany,
     archetypeId: brief.archetypeId,
+    ...(() => {
+      const ctx = brandOwnedLookContext<DeckContext>(brief.brandModeId, undefined);
+      return ctx ? { context: ctx } : {};
+    })(),
     slides,
   };
 }
@@ -5309,10 +5314,12 @@ export const useDeckStore = create<DeckState>()(
           const deck = get().decks[deckId];
           if (!deck) return;
           const nextSub = subCompany ?? undefined;
+          const nextContext = brandOwnedLookContext(brandModeId, deck.context);
           const nextDeck: Deck = {
             ...deck,
             brandModeId: brandModeId as BrandModeId,
             subCompany: nextSub,
+            ...(nextContext ? { context: nextContext } : {}),
           };
           set((s) => {
             const brief = s.briefs[deck.briefId];
