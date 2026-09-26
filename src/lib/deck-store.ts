@@ -2,6 +2,7 @@
 // Persists to localStorage until Lovable Cloud is available.
 
 import { sanitizeSeedForBrief } from "./seed-honesty";
+import { coerceAiLists } from "./ai-list-coerce";
 import { create } from "zustand";
 import { repairBlocks } from "./canvas-repair";
 import { persist } from "zustand/middleware";
@@ -4256,8 +4257,9 @@ export const useDeckStore = create<DeckState>()(
               [deckId]: {
                 ...deck,
                 slides: deck.slides.map((sl) => {
-                  const ai = byIdMap.get(sl.id);
-                  if (!ai) return sl;
+                  const rawAi = byIdMap.get(sl.id);
+                  if (!rawAi) return sl;
+                  const ai = coerceAiLists(rawAi as Record<string, unknown>, sl.content as Record<string, unknown>) as SlideContent;
                   const changes: AiChange[] = Object.keys(ai)
                     .filter((k) => JSON.stringify(sl.content[k]) !== JSON.stringify(ai[k]))
                     .map((field) => ({
