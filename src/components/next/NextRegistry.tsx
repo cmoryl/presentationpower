@@ -218,7 +218,7 @@ export function RegistryCard({
             Open in Canva <ExternalLink size={12} />
           </a>
         ) : (
-          <span className="text-muted-foreground">Coming soon</span>
+          <span className="text-muted-foreground">Not yet issued</span>
         )}
         {row.secondaryUrl && (
           <a
