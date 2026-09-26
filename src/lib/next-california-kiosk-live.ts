@@ -107,6 +107,12 @@ export type KioskDivider = {
 };
 /** A duplicate of a London text line or object (shares the source's geometry). */
 export type KioskCopy = { id: string; of: string; kind: "text" | "part" };
+/**
+ * A partner badge turned into editable type: the London object `of` is hidden
+ * and a real text line takes its place, in the object's own box, so it can be
+ * retyped, resized, recoloured and exported as live text — no re-upload.
+ */
+export type KioskBadge = { id: string; of: string; text: string; font?: string; color?: string };
 export type KioskEdits = {
   ground?: { top: string; bottom: string } | null;
   blocks?: Record<string, BlockEdit>;
