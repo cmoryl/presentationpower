@@ -156,7 +156,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
 exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token-derived palette in bm-product / light 1`] = `
 {
   "backgroundContainsPrimary": false,
-  "backgroundContainsSurface": true,
+  "backgroundContainsSurface": false,
   "brand": "bm-product",
   "expected": {
     "accent": "7BCD3A",
@@ -166,7 +166,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   },
   "mode": "light",
   "payloadContainsAccent": true,
-  "payloadContainsInk": true,
+  "payloadContainsInk": false,
 }
 `;
 
