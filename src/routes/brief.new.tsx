@@ -1,3 +1,4 @@
+import { condenseObjective, inferIndustry, NEUTRAL_INDUSTRY } from "@/lib/brief-infer";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
