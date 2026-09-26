@@ -342,7 +342,7 @@ export function layoutKiosk(L0: LiveLayout, edits: KioskEdits = {}): PlacedBlock
           ax: kx + (align === "center" ? kw / 2 : align === "right" ? kw : 0),
           lead: te.lead ?? 1.15,
           trackPt: ((te.track ?? 0) / 1000) * ksize,
-          fixed: !edited && !te.track && lines.length === 1 && te.size === undefined,
+          fixed: !t.flow && !edited && !te.track && lines.length === 1 && te.size === undefined,
           opacity: te.opacity ?? 1,
           rot: te.rot ?? 0,
         };
