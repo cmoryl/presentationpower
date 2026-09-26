@@ -1,3 +1,4 @@
+import type React from "react";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
@@ -182,4 +183,47 @@ export function AdminForbidden({ message }: { message?: string }) {
 
 export function isForbidden(err: unknown): boolean {
   return err instanceof Error && /forbidden/i.test(err.message);
+}
+
+/**
+ * Admin-only wrapper for admin pages that live outside the /admin layout
+ * (e.g. full-screen studios). Mirrors the /admin gate: signed-out visitors
+ * are sent to sign in, signed-in non-admins see the access notice.
+ */
+export function RequireAdmin({ children }: { children: React.ReactNode }) {
+  const [state, setState] = useState<"loading" | "admin" | "not-admin" | "anon">("loading");
+  useEffect(() => {
+    let mounted = true;
+    async function check() {
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) {
+        if (mounted) setState("anon");
+        return;
+      }
+      const { data: isAdmin } = await supabase.rpc("has_role", {
+        _user_id: data.user.id,
+        _role: "admin",
+      });
+      if (mounted) setState(isAdmin ? "admin" : "not-admin");
+    }
+    check();
+    const { data: sub } = supabase.auth.onAuthStateChange(() => check());
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+  useEffect(() => {
+    if (state === "anon") window.location.replace(loginUrl());
+  }, [state]);
+  if (state === "admin") return <>{children}</>;
+  return (
+    <AppShell>
+      {state === "loading" ? (
+        <p className="text-sm text-muted-foreground" aria-live="polite">Checking your access…</p>
+      ) : (
+        <AdminForbidden message={state === "anon" ? "Redirecting to sign in…" : undefined} />
+      )}
+    </AppShell>
+  );
 }
