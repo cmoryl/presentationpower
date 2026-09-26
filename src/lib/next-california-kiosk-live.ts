@@ -33,6 +33,8 @@ export type LiveText = {
   w: number;
   top: number;
   bottom: number;
+  /** Set on text the editor created (badges): use the font's own spacing, not London's. */
+  flow?: boolean;
 };
 /** One separate object (logo, icon, QR, shape group) inside a piece, in London trim points. */
 export type LivePart = { id: string; x0: number; y0: number; x1: number; y1: number };
