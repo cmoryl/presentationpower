@@ -1,4 +1,4 @@
-import { condenseObjective, inferIndustry, NEUTRAL_INDUSTRY } from "@/lib/brief-infer";
+import { condenseObjective, inferIndustry, inferProspectLabel, NEUTRAL_INDUSTRY } from "@/lib/brief-infer";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -358,7 +358,8 @@ function BriefCommandCenter() {
     const raw = [prompt.trim(), requestText?.trim()].filter(Boolean).join(" — ");
     const forMatch = raw.match(/\bfor\s+([A-Z][\w&.\- ]{1,48})/);
     const typed = prospectDetails.prospect.trim();
-    const inferredProspect = typed || (forMatch ? forMatch[1].trim().replace(/[.,]$/, "") : "");
+    const inferredProspect =
+      typed || (forMatch ? forMatch[1].trim().replace(/[.,]$/, "") : "") || inferProspectLabel(raw);
     const defaultArch =
       narrativeArchetypes.find((a) => a.id === "arch-problem-solution")?.id ??
       narrativeArchetypes[0]?.id ??
@@ -1032,7 +1033,7 @@ function BriefCommandCenter() {
     () =>
       buildStructurePreviews({
         seed: {
-          prospect: prospectDetails.prospect.trim() || "New prospect",
+          prospect: prospectDetails.prospect.trim() || inferProspectLabel(prompt) || "New prospect",
           industry:
             prospectDetails.industry.trim() ||
             inferIndustry(prompt, brand?.contentScope?.industries ?? []) ||

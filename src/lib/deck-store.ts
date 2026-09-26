@@ -1,6 +1,8 @@
 // Client-side runtime store for briefs and decks.
 // Persists to localStorage until Lovable Cloud is available.
 
+import { sanitizeSeedForBrief } from "./seed-honesty";
+import { coerceAiLists } from "./ai-list-coerce";
 import { create } from "zustand";
 import { repairBlocks } from "./canvas-repair";
 import { persist } from "zustand/middleware";
@@ -738,7 +740,7 @@ export function assembleDeck(
       sectionId: sfId,
       variantId: variant.id,
       layoutId,
-      content: seedContent(variant.id, brief, sf?.name ?? ""),
+      content: sanitizeSeedForBrief(seedContent(variant.id, brief, sf?.name ?? ""), brief.industry, briefFacts(brief)),
       changes: [],
     };
   });
@@ -757,6 +759,10 @@ export function assembleDeck(
     })(),
     slides,
   };
+}
+
+function briefFacts(b: Brief): string {
+  return Object.values(b as unknown as Record<string, unknown>).filter((x) => typeof x === "string").join(" ");
 }
 
 export function seedContent(variantId: string, brief: Brief, sectionName: string): SlideContent {
@@ -4251,8 +4257,9 @@ export const useDeckStore = create<DeckState>()(
               [deckId]: {
                 ...deck,
                 slides: deck.slides.map((sl) => {
-                  const ai = byIdMap.get(sl.id);
-                  if (!ai) return sl;
+                  const rawAi = byIdMap.get(sl.id);
+                  if (!rawAi) return sl;
+                  const ai = coerceAiLists(rawAi as Record<string, unknown>, sl.content as Record<string, unknown>) as SlideContent;
                   const changes: AiChange[] = Object.keys(ai)
                     .filter((k) => JSON.stringify(sl.content[k]) !== JSON.stringify(ai[k]))
                     .map((field) => ({
@@ -5133,7 +5140,7 @@ export const useDeckStore = create<DeckState>()(
             sectionId,
             variantId: variant.id,
             layoutId: variant.permittedLayoutIds[0],
-            content: seedContent(variant.id, brief, sf?.name ?? ""),
+            content: sanitizeSeedForBrief(seedContent(variant.id, brief, sf?.name ?? ""), brief.industry, briefFacts(brief)),
             changes: [],
           };
           const idx = afterSlideId
@@ -5177,7 +5184,7 @@ export const useDeckStore = create<DeckState>()(
             sectionId: sf.id,
             variantId: variant.id,
             layoutId: variant.permittedLayoutIds[0],
-            content: seedContent(variant.id, brief, sf.name),
+            content: sanitizeSeedForBrief(seedContent(variant.id, brief, sf.name), brief.industry, briefFacts(brief)),
             changes: [],
           };
           const next = [...deck.slides, newSlide].map((sl, i) => ({ ...sl, position: i }));
