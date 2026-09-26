@@ -582,6 +582,16 @@ body.export-mode [data-print-surface] {
   color: color-mix(in oklab, #fff 58%, transparent);
 }
 
+/* Dark mode: faint ink labels (text-black/20…80) flip to the house muted
+   foreground so they stay readable on dark surfaces. Explicit dark:text-*
+   classes on the element still win. */
+.dark :is([class*="text-black/"]):not([class*="dark:text-"]) {
+  color: var(--muted-foreground) !important;
+}
+.dark :is([class*="text-black/"])[class*="dark:text-white/"] {
+  color: var(--muted-foreground) !important;
+}
+
 /* Print canvas icon slots — subtle hover/focus affordance so authors can see
    which glyphs are click-to-swap without cluttering the page. */
 .print-icon-slot:hover,
