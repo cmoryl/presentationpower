@@ -227,3 +227,6 @@ artboard is a 1:10 proof, scale the trim up ×10 and say so in `dimsSource`.
 - Textured (wave/dot) grounds can't be stretched without streaks — fill behind-TV gaps with a gradient from the neighbouring rows instead.
 
 - 2026-09-26 · SF kiosk editor: reopening a saved kiosk wrote an empty edit set back over the saved one (load/autosave race). Autosave now waits for sign-in to resolve and never echoes the value it just loaded; a failed load pauses saving. Always test save → leave → reopen, not just "All changes saved".
+
+## SF kiosks — headline too tall for the space above the TV (Sep 2026)
+When a partner's first piece can't fit above the 45 × 96 in kiosk TV even when cropped tight, it is now shrunk evenly (never below 60 %) to sit above the TV instead of leaving the space empty (COA ≈ 76 %, Global Digital Experience ≈ 68 %). Bands where pieces meet on photographic or gradient London backgrounds (Legal Support, Commercial Life Sciences) are still visible; they need a design decision, not a silent fix.
