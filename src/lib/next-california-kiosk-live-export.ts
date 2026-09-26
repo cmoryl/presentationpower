@@ -9,7 +9,7 @@
 // Every file is named rdraft- until the San Francisco revision is published.
 
 import JSZip from "jszip";
-import { PDFDocument, degrees, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, PDFName, PDFOperator, PDFOperatorNames } from "pdf-lib";
+import { PDFDocument, degrees, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, concatTransformationMatrix, PDFName, PDFOperator, PDFOperatorNames } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 
 import {
@@ -102,12 +102,17 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
   if (!artUrl) throw new Error("This kiosk has no lifted artwork PDF on file.");
   const B = KIOSK_BLEED;
   const W = KIOSK_W + 2 * B, H = KIOSK_H + 2 * B;
+  // Slug outside the bleed carries the crop marks (0.5 in each side).
+  const S = 36;
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
   doc.setTitle(`${kioskLiveFileBase(L.id)} — kiosk front (draft)`);
-  const page = doc.addPage([W, H]);
-  page.setTrimBox(B, B, KIOSK_W, KIOSK_H);
-  page.setBleedBox(0, 0, W, H);
+  const page = doc.addPage([W + 2 * S, H + 2 * S]);
+  page.setTrimBox(S + B, S + B, KIOSK_W, KIOSK_H);
+  page.setBleedBox(S, S, W, H);
+  page.setCropBox(0, 0, W + 2 * S, H + 2 * S);
+  // Everything below is drawn in bleed-box space, shifted into the slug.
+  page.pushOperators(pushGraphicsState(), concatTransformationMatrix(1, 0, 0, 1, S, S));
 
   // Background: the partner's ramp in fine vector steps.
   const g = kioskGround(L, edits);
@@ -134,7 +139,11 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
   const placed = layoutKiosk(L, edits);
   for (const p of placed) {
     const bx = B / p.scale + 1;
-    const top = L.originY + p.clipTop, bot = L.originY + p.clipBottom;
+    // A piece touching the top or bottom trim runs on into the bleed, as the SVG does.
+    const ext = (B + 1) / p.scale;
+    const exTop = p === placed[0] && p.y <= 0.5 ? ext : 0;
+    const exBot = Math.abs(p.y + (p.clipBottom - p.clipTop) * p.scale - KIOSK_H) < 0.5 ? ext : 0;
+    const top = L.originY + p.clipTop - exTop, bot = L.originY + p.clipBottom + exBot;
     const emb = await doc.embedPage(srcPage, {
       left: L.originX - bx,
       right: L.originX + L.trimW + bx,
@@ -151,7 +160,7 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
     page.pushOperators(clipEvenOdd(), endPath());
     page.drawPage(emb, {
       x: B + p.x - bx * p.scale,
-      y: H - (B + p.y + (p.clipBottom - p.clipTop) * p.scale),
+      y: H - (B + p.y + (p.clipBottom - p.clipTop + exBot) * p.scale),
       xScale: p.scale,
       yScale: p.scale,
     });
@@ -207,6 +216,18 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
         page.drawText(l.text, { x: o.x, y: o.y, size: t.ksize, font: f, color: hexRgb(t.fill), opacity: t.opacity, rotate: degrees(-t.rot) });
         page.pushOperators(setCharacterSpacing(0), popGraphicsState());
       }
+    }
+  page.pushOperators(popGraphicsState());
+
+  // Crop marks in the slug: 0.25 in long, starting 1/8 in outside trim (clear of bleed).
+  const reg = rgb(0, 0, 0);
+  const tx0 = S + B, ty0 = S + B, tx1 = tx0 + KIOSK_W, ty1 = ty0 + KIOSK_H;
+  const off = B, len = 18, lw = 0.25;
+  for (const x of [tx0, tx1])
+    for (const y of [ty0, ty1]) {
+      const sx = x === tx0 ? -1 : 1, sy = y === ty0 ? -1 : 1;
+      page.drawLine({ start: { x: x + sx * off, y }, end: { x: x + sx * (off + len), y }, thickness: lw, color: reg });
+      page.drawLine({ start: { x, y: y + sy * off }, end: { x, y: y + sy * (off + len) }, thickness: lw, color: reg });
     }
   return doc.save();
 }
