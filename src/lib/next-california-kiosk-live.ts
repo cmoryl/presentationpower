@@ -33,6 +33,8 @@ export type LiveText = {
   w: number;
   top: number;
   bottom: number;
+  /** Set on text the editor created (badges): use the font's own spacing, not London's. */
+  flow?: boolean;
 };
 /** One separate object (logo, icon, QR, shape group) inside a piece, in London trim points. */
 export type LivePart = { id: string; x0: number; y0: number; x1: number; y1: number };
@@ -105,6 +107,12 @@ export type KioskDivider = {
 };
 /** A duplicate of a London text line or object (shares the source's geometry). */
 export type KioskCopy = { id: string; of: string; kind: "text" | "part" };
+/**
+ * A partner badge turned into editable type: the London object `of` is hidden
+ * and a real text line takes its place, in the object's own box, so it can be
+ * retyped, resized, recoloured and exported as live text — no re-upload.
+ */
+export type KioskBadge = { id: string; of: string; text: string; font?: string; color?: string };
 export type KioskEdits = {
   ground?: { top: string; bottom: string } | null;
   blocks?: Record<string, BlockEdit>;
@@ -117,6 +125,8 @@ export type KioskEdits = {
   dividers?: KioskDivider[];
   /** Duplicated text lines and objects. */
   copies?: KioskCopy[];
+  /** Partner badges replaced with editable text (the source object is hidden). */
+  badges?: KioskBadge[];
   /** Locked items can be selected but not moved. */
   locked?: string[];
   /** Stacking order of objects within their piece (higher = in front). */
@@ -228,19 +238,50 @@ function isHidden(b: LiveBlock, e?: BlockEdit) {
  */
 export function withCopies(L: LiveLayout, edits: KioskEdits = {}): LiveLayout {
   const cs = edits.copies ?? [];
-  if (!cs.length) return L;
+  const bs = edits.badges ?? [];
+  if (!cs.length && !bs.length) return L;
   const texts = [...L.texts];
   for (const c of cs) if (c.kind === "text") { const s = L.texts.find((t) => t.id === c.of); if (s) texts.push({ ...s, id: c.id }); }
   const blocks = L.blocks.map((b) => {
     const extra = cs.filter((c) => c.kind === "part").flatMap((c) => { const s = b.parts?.find((q) => q.id === c.of); return s ? [{ ...s, id: c.id }] : []; });
     return extra.length ? { ...b, parts: [...(b.parts ?? []), ...extra] } : b;
   });
+  const all = blocks.flatMap((b) => b.parts ?? []);
+  for (const b of bs) {
+    const q = all.find((p) => p.id === b.of);
+    if (q) texts.push(badgeText(b, q));
+  }
   return { ...L, texts, blocks };
+}
+
+/** The editable text line that stands in for a badge object, in its own box. */
+export function badgeText(b: KioskBadge, q: LivePart): LiveText {
+  const h = q.y1 - q.y0;
+  const size = Math.max(18, Math.min(400, h * 0.55));
+  return {
+    id: b.id,
+    text: b.text,
+    font: b.font ?? "Geist-Bold",
+    size,
+    color: b.color ?? "#FFFFFF",
+    x: q.x0,
+    y: q.y0 + h / 2 + size * 0.35,
+    w: q.x1 - q.x0,
+    top: q.y0,
+    bottom: q.y1,
+    flow: true,
+  };
+}
+
+/** Object ids whose picture is replaced by an editable badge text. */
+export function badgedPartIds(edits: KioskEdits = {}): Set<string> {
+  return new Set((edits.badges ?? []).map((b) => b.of));
 }
 
 /** Pure: place every visible piece of a London wall onto the kiosk front. */
 export function layoutKiosk(L0: LiveLayout, edits: KioskEdits = {}): PlacedBlock[] {
   const L = withCopies(L0, edits);
+  const badged = badgedPartIds(edits);
   const base = KIOSK_W / L.trimW;
   const vis = L.blocks.filter((b) => !isHidden(b, edits.blocks?.[b.id]));
   const full = (b: LiveBlock) => [b.y0, b.y1] as const;
@@ -302,7 +343,7 @@ export function layoutKiosk(L0: LiveLayout, edits: KioskEdits = {}): PlacedBlock
           ax: kx + (align === "center" ? kw / 2 : align === "right" ? kw : 0),
           lead: te.lead ?? 1.15,
           trackPt: ((te.track ?? 0) / 1000) * ksize,
-          fixed: !edited && !te.track && lines.length === 1 && te.size === undefined,
+          fixed: !t.flow && !edited && !te.track && lines.length === 1 && te.size === undefined,
           opacity: te.opacity ?? 1,
           rot: te.rot ?? 0,
         };
@@ -321,7 +362,7 @@ export function layoutKiosk(L0: LiveLayout, edits: KioskEdits = {}): PlacedBlock
           x: x + src.x0 * sc + (pe.dx ?? 0) + ((1 - ps) * w) / 2,
           y: yy + (src.y0 - c[0]) * sc + (pe.dy ?? 0) + ((1 - ps) * h) / 2,
           scale: sc * ps,
-          hidden: !!pe.hidden,
+          hidden: !!pe.hidden || badged.has(pt.id),
           opacity: pe.opacity ?? 1,
           rot: pe.rot ?? 0,
         };

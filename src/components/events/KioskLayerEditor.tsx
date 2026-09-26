@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlignCenter, AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignLeft, AlignRight,
   AlignStartHorizontal, AlignStartVertical, AlignHorizontalSpaceAround, AlignVerticalSpaceAround,
-  ArrowDown, ArrowUp, BringToFront, ClipboardPaste, Copy, CopyPlus, Download, Eye, EyeOff, Lock, Maximize2, Minimize2, Minus, Plus, Redo2, RotateCcw, Save, SendToBack, Trash2, Undo2, Unlock,
+  ArrowDown, ArrowUp, BringToFront, ClipboardPaste, Copy, CopyPlus, Download, Eye, EyeOff, Lock, Maximize2, Minimize2, Minus, Plus, Redo2, RotateCcw, Save, SendToBack, Trash2, Type, Undo2, Unlock,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +29,7 @@ import {
   withCopies,
   splitArtSvg,
   textLineBoxes,
+  badgedPartIds,
   type KioskDivider,
   type KioskEdits,
   type LiveLayout,
@@ -357,6 +358,25 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     commit({ ...edits, copies, [key]: map, z, ...(groups ? { groups } : {}) });
     if (s.kind === "part") { setPicked(made); setSel({ kind: "part", id: made[0]! }); } else setSel({ kind: "text", id: made[0]! });
   };
+  /**
+   * Partner badges as type: hide the London picture and put an editable text
+   * line in its box. Nothing is invented — the words start empty for retyping.
+   */
+  const badgeOf = (id: string) => (edits.badges ?? []).find((b) => b.of === id) ?? null;
+  const replaceWithText = (partId: string) => {
+    if (badgeOf(partId)) return;
+    const id = `badge-${partId}`;
+    commit({ ...edits, badges: [...(edits.badges ?? []), { of: partId, id, text: "Partner name" }] });
+    setSel({ kind: "text", id }); setPicked([]);
+    setStatus("Badge is now text — retype the words in the Text panel.");
+  };
+  const restorePicture = (partId: string) => {
+    const b = badgeOf(partId);
+    if (!b) return;
+    const texts = { ...edits.texts }; delete texts[b.id];
+    commit({ ...edits, badges: (edits.badges ?? []).filter((x) => x.of !== partId), texts });
+    setSel({ kind: "part", id: partId });
+  };
   const removeSel = () => {
     if (!sel || sel.kind === "block") return;
     if (sel.kind === "divider") { commit({ ...edits, dividers: (edits.dividers ?? []).filter((d) => d.id !== sel.id) }); setSel(null); return; }
@@ -595,7 +615,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                       return (
                         <li key={q.id} className="flex items-center gap-1">
                           <button type="button" className={`flex-1 truncate py-0.5 text-left text-[11.5px] ${sel?.id === q.id ? "text-[#003FC7]" : "text-[#03002C]/80"}`} onClick={(e) => pickPart(q.id, e.shiftKey)}>
-                            {isCopy(q.id) ? "Copy of object" : `Object ${i + 1}`}{(edits.groups ?? defaultPartGroups(L)).some((g) => g.includes(q.id)) ? " · grouped" : ""}{isLocked(q.id) ? " · locked" : ""}
+                            {isCopy(q.id) ? "Copy of object" : `Object ${i + 1}`}{badgedPartIds(edits).has(q.id) ? " · as text" : ""}{(edits.groups ?? defaultPartGroups(L)).some((g) => g.includes(q.id)) ? " · grouped" : ""}{isLocked(q.id) ? " · locked" : ""}
                           </button>
                           <button type="button" aria-label={ph ? "Show object" : "Hide object"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchPart(q.id, { hidden: !ph })}>
                             {ph ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
@@ -786,8 +806,14 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
             <label className="block text-[12px] text-[#03002C]/80">Size {Math.round((edits.parts?.[selPart.id]?.scale ?? 1) * 100)}%
               <input type="range" min={30} max={200} className="mt-1 w-full" value={Math.round((edits.parts?.[selPart.id]?.scale ?? 1) * 100)} onChange={(e) => patchPart(selPart.id, { scale: Number(e.target.value) / 100 }, false)} />
             </label>
-            <button type="button" className={btn} onClick={() => patchPart(selPart.id, { dx: 0, dy: 0, scale: 1, hidden: false })}>Put back</button>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className={btn} onClick={() => patchPart(selPart.id, { dx: 0, dy: 0, scale: 1, hidden: false })}>Put back</button>
+              {badgeOf(selPart.id)
+                ? <button type="button" className={btn} onClick={() => restorePicture(selPart.id)}>Put the picture back</button>
+                : <button type="button" className={btn} onClick={() => replaceWithText(selPart.id)}><Type className="h-3.5 w-3.5" />Replace with text</button>}
+            </div>
             <p className="text-[11px] text-[#03002C]/65">A single logo, icon, QR code or shape group from the London file. It moves and scales on its own, keeping its original shapes, gradients and see-through effects. Nearby words are separate text lines.</p>
+            <p className="text-[11px] text-[#03002C]/65">Badges: <strong>Replace with text</strong> hides the picture and puts an editable line in its place, so you can retype or swap a partner name without uploading an image. It exports as live text.</p>
           </div>
         ) : null}
 
