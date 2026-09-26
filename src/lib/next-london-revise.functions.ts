@@ -165,12 +165,39 @@ export const publishLondonRevision = createServerFn({ method: "POST" })
 
     const { data: head } = await context.supabase
       .from(TABLE)
-      .select("rev")
+      .select(COLUMNS)
       .order("rev", { ascending: false })
       .limit(1)
       .maybeSingle();
 
-    const nextRev = ((head as { rev?: number } | null)?.rev ?? 0) + 1;
+    // Opening the kit must never mint a revision: an auto-publish that carries
+    // exactly what is already in force returns the revision in force unchanged.
+    const stable = (v: unknown): string => {
+      if (Array.isArray(v)) return `[${v.map(stable).join(",")}]`;
+      if (v && typeof v === "object") {
+        const o = v as Record<string, unknown>;
+        return `{${Object.keys(o)
+          .filter((k) => o[k] !== undefined)
+          .sort()
+          .map((k) => `${JSON.stringify(k)}:${stable(o[k])}`)
+          .join(",")}}`;
+      }
+      return JSON.stringify(v ?? null);
+    };
+    const headRow = head as (Row & { rev?: number }) | null;
+    if (
+      headRow &&
+      !data.restoredFrom &&
+      data.changes.length === 0 &&
+      Object.keys(data.regen ?? {}).length === 0 &&
+      stable(headRow.panels) === stable(data.panels) &&
+      stable(headRow.removed_ids ?? []) === stable(data.removedIds ?? []) &&
+      stable(headRow.overrides ?? {}) === stable(data.overrides ?? {})
+    ) {
+      return { revision: toRevision(headRow as Row), unchanged: true as const };
+    }
+
+    const nextRev = (headRow?.rev ?? 0) + 1;
 
     const { data: row, error } = await context.supabase
       .from(TABLE)
@@ -202,5 +229,5 @@ export const publishLondonRevision = createServerFn({ method: "POST" })
       );
     }
 
-    return { revision: toRevision(row as Row) };
+    return { revision: toRevision(row as Row), unchanged: false as const };
   });
