@@ -1172,9 +1172,9 @@ registerSlideModule({
                     color: "var(--slide-accent-text)",
                   }}
                 >
-                  {s(c.stat, "97")}
+                  {s(c.stat, "—")}
                   <span style={{ fontSize: fillPx(130, "display"), marginLeft: 8 }}>
-                    {s(c.unit, "%")}
+                    {s(c.unit, "")}
                   </span>
                 </div>
                 {s(c.label) && (
