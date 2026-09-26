@@ -127,6 +127,7 @@ import {
 } from "@/lib/showcase-cards";
 
 import { laneCornerRadiusIn, laneHeightIn, railBoxIn } from "@/lib/layer-stack-geometry";
+import { groundIsLightAt } from "@/lib/export-ground-luma";
 import {
   auditDeckGeometry,
   geometryRepairWarnings,
@@ -2005,7 +2006,7 @@ export async function exportDeckToPptx(
       // A full-bleed photograph reads as a dark ground even on a light slide, so
       // the lockup switches to the white colourway there — the colour mark went
       // near-invisible over cover mosaics.
-      const whiteLogo =
+      let whiteLogo =
         useWhiteLogo ||
         overDarkPhoto ||
         // Full-bleed photo mosaics tile the whole stage, so `overDarkPhoto`
@@ -2123,6 +2124,13 @@ export async function exportDeckToPptx(
         ? LOGO_POSITION_BY_VARIANT[slide.variantId.toUpperCase()]
         : undefined;
       const placement = resolveLogoPlacement(chrome, slide.layoutId, perSlidePos ?? variantPos);
+      // A photograph only reads dark where it IS dark. On a light slide over a
+      // pale photo ground (the case-study still), the white lockup vanished —
+      // sample the ground where the logo sits and keep the colour mark there.
+      if (whiteLogo && !useWhiteLogo && placement.position !== "hidden") {
+        const ground = photoGround && plan.kind === "image" ? plan.data : imgData;
+        if (ground && (await groundIsLightAt(ground, placement.position))) whiteLogo = false;
+      }
 
       const perSlideOrient =
         slide.logoOrientation && slide.logoOrientation !== "auto"

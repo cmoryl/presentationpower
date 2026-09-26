@@ -153,13 +153,31 @@ export function placeTextRuns(
           lineIdx: number;
         }[] = [];
         const fragUsed = new Set<number>();
+        // Each fragment belongs to the measured line whose vertical centre is
+        // NEAREST its own. A fixed band (±1.5 line heights) mis-assigned tail
+        // words on tight-leading headlines, where the line pitch is smaller than
+        // the line box: "service." landed on line 1 ("…as a service. supply…").
+        const nearestLine = (f: { y: number; h: number }) => {
+          const mid = f.y + f.h / 2;
+          let best = -1;
+          let bestD = Infinity;
+          lines.forEach((l, li) => {
+            const d = Math.abs(mid - (l.y + l.h / 2));
+            if (d < bestD) {
+              bestD = d;
+              best = li;
+            }
+          });
+          const ln = lines[best];
+          return ln && bestD <= Math.max(ln.h, f.h) ? best : -1;
+        };
+        const fragLine = frags.map((f) => nearestLine(f));
         lines.forEach((line, li) => {
           const leadOpts = { ...parts[0]!.options } as Record<string, unknown>;
           lineParts.push({ text: line.text.trim(), options: leadOpts });
           frags.forEach((f, fi) => {
             if (fragUsed.has(fi)) return;
-            const mid = f.y + f.h / 2;
-            if (mid < line.y - line.h * 0.5 || mid > line.y + line.h * 1.5) return;
+            if (fragLine[fi] !== li) return;
             const p = fragParts[fi]!;
             const em = Math.max(lead.fontSizePx, f.fontSizePx);
             const gap = f.x - (line.x + line.w);

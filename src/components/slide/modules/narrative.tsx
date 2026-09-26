@@ -189,12 +189,28 @@ registerSlideModule({
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <div className="flex h-full flex-col justify-center">
               <Kicker brand={brand}>
-                <span
+                {/* Drawn as a shape, not an arrow glyph: a glyph became its own
+                  PowerPoint text box whose fallback-font width ran into
+                  "TREND". A shape stays pinned exactly where the build puts it. */}
+                <svg
+                  aria-hidden
+                  viewBox="0 0 24 24"
                   className="mr-4 inline-block align-[-0.15em]"
-                  style={{ fontSize: fillPx(44, "figure"), letterSpacing: 0 }}
+                  style={{
+                    width: fillPx(34, "figure"),
+                    height: fillPx(34, "figure"),
+                    transform: s(c.direction) === "down" ? "rotate(180deg)" : undefined,
+                  }}
                 >
-                  {s(c.direction) === "down" ? "\u2193" : "\u2191"}
-                </span>
+                  <path
+                    d="M12 3 L12 21 M5 10 L12 3 L19 10"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.6}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
                 Trend
               </Kicker>
               <Hairline
