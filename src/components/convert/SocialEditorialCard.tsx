@@ -50,12 +50,19 @@ export function SocialEditorialCard({ format, brandId, result, displayShortEdge 
   useLayoutEffect(() => {
     const el = bodyRef.current;
     if (!el) return;
-    let s = 1;
-    el.style.setProperty("--fit", "1");
-    while (s > 0.5 && el.scrollHeight > el.clientHeight + 1) {
-      s -= 0.05;
-      el.style.setProperty("--fit", s.toFixed(2));
+    // Grow or shrink the type until the block fills its space without overflow.
+    const fits = (v: number) => {
+      el.style.setProperty("--fit", v.toFixed(3));
+      return el.scrollHeight <= el.clientHeight + 1 && el.scrollWidth <= el.clientWidth + 1;
+    };
+    let lo = 0.5;
+    let hi = 1.6;
+    for (let i = 0; i < 12; i++) {
+      const mid = (lo + hi) / 2;
+      if (fits(mid)) lo = mid;
+      else hi = mid;
     }
+    fits(lo);
   }, [W, H, c.headline, c.body, points.length, stat?.value]);
 
   const px = (n: number) => `calc(${n * f}px * var(--fit, 1))`;
