@@ -1130,9 +1130,13 @@ function AssetEditor() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[1400px] px-2 py-6">
+      {/* Studio: navy pasteboard chrome around a white press sheet. Chrome
+          regions opt into the dark variant; the page itself never does, so
+          the printed artwork renders exactly as it exports. */}
+      <div className="print-studio relative left-1/2 w-screen -translate-x-1/2 bg-[#03002C] text-white [color-scheme:dark]">
+      <div className="mx-auto max-w-[1600px] px-4 pb-10 pt-3">
         {/* HEADER BAR */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="dark sticky top-0 z-40 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#03002C] px-4 py-2.5">
           <div className="flex items-center gap-3">
             <Link
               to="/"
@@ -1514,7 +1518,7 @@ function AssetEditor() {
         </div>
 
         {siblingDeckId ? (
-          <div className="mb-6">
+          <div className="dark mb-4">
             <BriefOutputsBar
               deckId={siblingDeckId}
               deckTitle={siblingDeck?.title ?? "Presentation"}
@@ -1542,7 +1546,7 @@ function AssetEditor() {
         >
           {/* SPINE */}
           {spineOpen ? (
-            <div className="space-y-2">
+            <div className="dark space-y-2">
               <div className="flex items-center justify-between">
                 <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
                   Pages
@@ -1574,7 +1578,7 @@ function AssetEditor() {
               )}
             </div>
           ) : (
-            <div className="flex justify-start">
+            <div className="dark flex justify-start">
               <button
                 type="button"
                 data-testid="print-spine-expand"
@@ -1590,10 +1594,10 @@ function AssetEditor() {
           )}
 
           {/* CANVAS + document inputs */}
-          <div className="min-w-0 space-y-4">
+          <div className="min-w-0 space-y-6 rounded-sm bg-[#0B0A2A] px-8 py-8 ring-1 ring-white/5">
             <div
               ref={canvasRef}
-              className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
+              className="relative overflow-hidden bg-white shadow-[0_28px_70px_rgba(0,0,0,0.6)] ring-1 ring-black/40"
               style={multiDoc ? undefined : { aspectRatio: canvasAspect }}
               onDragOver={(e) => {
                 if (!e.dataTransfer.types.includes(PRINT_SECTION_DND_MIME)) return;
@@ -1974,7 +1978,7 @@ function AssetEditor() {
             </div>
 
             {/* DOCUMENT INPUTS — content entry lives under the document */}
-            <div className="space-y-3">
+            <div className="dark space-y-2">
               <Panel title="Stats" defaultOpen={false}>
                 {(content.stats ?? []).map((s, i) => (
                   <div key={i} className="space-y-1">
@@ -2247,7 +2251,7 @@ function AssetEditor() {
 
           {/* INSPECTOR */}
           {!inspectorOpen ? (
-            <div className="flex justify-end">
+            <div className="dark flex justify-end">
               <button
                 type="button"
                 data-testid="print-inspector-expand"
@@ -2261,7 +2265,7 @@ function AssetEditor() {
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="dark space-y-2">
               <div className="flex justify-end">
                 <button
                   type="button"
@@ -3298,14 +3302,14 @@ function Panel({
     if (openNonce > 0) setOpen(true);
   }, [openNonce]);
   return (
-    <div className="rounded-2xl border border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.03]">
+    <div className="rounded-sm border border-black/10 bg-white dark:border-white/10 dark:bg-[#0B0A2A]">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+        className="flex w-full items-center justify-between gap-3 px-3.5 py-2.5 text-left hover:bg-black/[0.03] focus-visible:outline-2 focus-visible:outline-[#003FC7] dark:hover:bg-white/[0.04]"
       >
-        <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/60 dark:text-white/60">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-black/70 dark:text-white/80">
           {title}
         </span>
         <ChevronDown
