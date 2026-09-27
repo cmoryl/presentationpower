@@ -1437,3 +1437,13 @@ body.export-mode [data-print-surface] {
 .deck-editor-ui :is(.text-black\/30, .text-black\/40, .text-black\/45, .text-black\/50):not([data-slide-stage] *) {
   color: rgb(0 0 0 / 0.66);
 }
+
+/* Print studio — live-edit outlines only on hover/focus, so the page reads
+   as a finished sheet instead of a grid of dashed boxes. */
+.print-studio .live-edit-active [data-live-path] {
+  outline-color: transparent;
+}
+.print-studio .live-edit-active [data-live-path]:hover,
+.print-studio .live-edit-active [data-live-path]:focus-within {
+  outline-color: rgba(0, 63, 199, 0.95);
+}

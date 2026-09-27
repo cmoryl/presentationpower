@@ -2656,6 +2656,7 @@ function AssetEditor() {
           )}
         </div>
       </div>
+      </div>
       <PrintIconSwapModal
         open={!!iconSlot}
         current={iconSlot?.current ?? null}
