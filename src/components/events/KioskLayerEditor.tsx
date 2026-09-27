@@ -678,8 +678,8 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
         <header className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-white/10 bg-[#0B0A2A] px-3">
           <div className="flex min-w-0 items-center gap-3">
             <span className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-white/60">{vendor} · Kiosk front</span>
-            <span className="rounded-sm border border-white/10 bg-black/30 px-1.5 py-0.5 font-mono text-[10px] text-white/60">rdraft</span>
-            {canSave === false ? <span className="rounded-sm border border-[#FFEB66]/40 bg-[#FFEB66]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#FFEB66]" title="Changes stay in this browser. Admins, brand leads and brand reviewers can save kiosks for everyone.">Practice mode · not shared</span> : null}
+            <span className="rounded-sm border border-white/10 bg-black/30 px-1.5 py-0.5 shrink-0 font-mono text-[10px] text-white/60">rdraft</span>
+            {canSave === false ? <span className="shrink-0 whitespace-nowrap rounded-sm border border-[#FFEB66]/40 bg-[#FFEB66]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#FFEB66]" title="Changes stay in this browser. Admins, brand leads and brand reviewers can save kiosks for everyone.">Not shared</span> : null}
             {status ? <span role="status" className="hidden truncate text-[11px] text-white/60 xl:inline">{status}</span> : null}
           </div>
           <div className="flex items-center gap-1.5">
@@ -705,7 +705,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
               <svg
                 ref={svgRef}
                 viewBox={`${vbX} ${vbY} ${vbW} ${vbH}`}
-                style={{ height: zoom + G * k }}
+                style={{ height: zoom + G * k, width: ((zoom + G * k) * vbW) / vbH }}
                 className="block w-auto touch-none select-none shadow-[0_24px_60px_rgba(0,0,0,0.6)]"
                 role="img"
                 aria-label={`${vendor} kiosk front, editable`}
