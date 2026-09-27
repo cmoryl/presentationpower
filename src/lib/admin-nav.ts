@@ -74,6 +74,7 @@ export const ADMIN_NAV_GROUPS: ReadonlyArray<AdminNavGroup> = [
     label: "Governance",
     items: [
       { to: "/admin/users", label: "Users & roles" },
+      { to: "/admin/usage", label: "Usage report" },
       { to: "/admin/team", label: "Team workspace" },
       { to: "/admin/alerts", label: "Send an alert" },
     ],
