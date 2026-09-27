@@ -18,3 +18,4 @@
 - [ ] Shared type-hierarchy pass across other families
 - [ ] Bolder accent shapes — needs per-family visual review
 - [ ] Native social/small-print layouts per family
+- [~] Native social layouts: Editorial layout (square/portrait/story) added on the conversion page; print sizes + other directions not yet

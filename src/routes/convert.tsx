@@ -24,6 +24,7 @@ import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { PrintBriefPreview } from "@/components/convert/PrintBriefPreview";
 import { ModuleAsDrawn } from "@/components/convert/ModuleAsDrawn";
 import { SocialCardDownload } from "@/components/convert/SocialCardDownload";
+import { SocialEditorialCard } from "@/components/convert/SocialEditorialCard";
 import { SocialModuleGrid, socialGridCapacity, CONVERT_GROUNDS, groundCss } from "@/components/convert/SocialModuleGrid";
 import {
   ADAPT_TARGETS,
@@ -136,7 +137,7 @@ function ConvertPage() {
   const [moduleBrand, setModuleBrand] = useState<string>(BRAND_MODES[0].id);
   const [selection, setSelection] = useState<AdaptSelection>(EMPTY_SELECTION);
   const [view, setView] = useState<"one" | "all">("one");
-  const [look, setLook] = useState<"rebuilt" | "drawn">("rebuilt");
+  const [look, setLook] = useState<"rebuilt" | "editorial" | "drawn">("rebuilt");
   // Coming from the module catalog: bring the chosen module into view in the list.
   useEffect(() => {
     if (!search.module) return;
@@ -603,12 +604,13 @@ function ConvertPage() {
               ))}
             </div>
 
-            {drawnSource ? (
+            {drawnSource || format ? (
               <div role="group" aria-label="Layout" className="ml-2 inline-flex gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5">
                 {(
                   [
                     ["rebuilt", "Rebuilt for this size"],
-                    ["drawn", "Use the module as drawn"],
+                    ...(format ? ([["editorial", "Editorial"]] as const) : []),
+                    ...(drawnSource ? ([["drawn", "Use the module as drawn"]] as const) : []),
                   ] as const
                 ).map(([k, l]) => (
                   <button
@@ -675,6 +677,8 @@ function ConvertPage() {
                             frameH={frameOf(r, f).h}
                             displayWidth={f ? Math.round(170 * Math.max(1, f.width / f.height)) : 200}
                           />
+                        ) : f && look === "editorial" ? (
+                          <SocialEditorialCard format={f} brandId={brandId} result={r} displayShortEdge={170} />
                         ) : f && socialGrid ? (
                           <SocialModuleGrid format={f} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={170} variantId={groundVariant} ground={ground} chart={source.chart} images={source.images} pointIcons={source.pointIcons} />
                         ) : f ? (
@@ -733,6 +737,12 @@ function ConvertPage() {
                     displayWidth={420}
                   />
                 )
+              ) : format && look === "editorial" ? (
+                <SocialCardDownload width={format.width} height={format.height} name={`${source.headline} ${result.target.label}`}>
+                <div ref={socialWrapRef}>
+                  <SocialEditorialCard format={format} brandId={brandId} result={result} displayShortEdge={340} />
+                </div>
+                </SocialCardDownload>
               ) : format && socialGrid ? (
                 <SocialCardDownload width={format.width} height={format.height} name={`${source.headline} ${result.target.label}`}>
                 <div ref={socialWrapRef}>
