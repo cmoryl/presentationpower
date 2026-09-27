@@ -9,8 +9,9 @@
 // Every file is named rdraft- until the San Francisco revision is published.
 
 import JSZip from "jszip";
-import { PDFDocument, degrees, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, concatTransformationMatrix, PDFName, PDFOperator, PDFOperatorNames } from "pdf-lib";
+import { PDFDocument, degrees, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, concatTransformationMatrix, PDFName, PDFOperator, PDFOperatorNames, PDFString } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
+import { artRegionPdf, mul, parseArtSvg, rotateAbout, roundRectPdf, scale, translate, type Affine } from "@/lib/next-california-kiosk-vector-pdf";
 
 import {
   KIOSK_BLEED,
@@ -98,6 +99,171 @@ export async function proofPng(svg: string, widthPx = 1400): Promise<Blob> {
 }
 
 export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Array> {
+  const B = KIOSK_BLEED;
+  const W = KIOSK_W + 2 * B, H = KIOSK_H + 2 * B;
+  // Slug outside the bleed carries the crop marks (0.5 in each side).
+  const S = 36;
+  const doc = await PDFDocument.create();
+  doc.registerFontkit(fontkit);
+  doc.setTitle(`${kioskLiveFileBase(L.id)} — kiosk front (draft)`);
+  const page = doc.addPage([W + 2 * S, H + 2 * S]);
+  page.setTrimBox(S + B, S + B, KIOSK_W, KIOSK_H);
+  page.setBleedBox(S, S, W, H);
+  page.setCropBox(0, 0, W + 2 * S, H + 2 * S);
+  // Everything below is drawn in bleed-box space, shifted into the slug.
+  // Named Illustrator layers (PDF optional content).
+  const layerNames = ["Background", "Artwork", "Accents", "Text", "Trim marks"] as const;
+  const ocProps = doc.context.obj({});
+  const ocRefs = layerNames.map((name, i) => {
+    const ref = doc.context.register(doc.context.obj({ Type: "OCG", Name: PDFString.of(name) }));
+    ocProps.set(PDFName.of(`OC${i + 1}`), ref);
+    return ref;
+  });
+  page.node.Resources()!.set(PDFName.of("Properties"), ocProps);
+  doc.catalog.set(PDFName.of("OCProperties"), doc.context.obj({ OCGs: ocRefs, D: doc.context.obj({ Order: ocRefs, ON: ocRefs }) }));
+  const beginLayer = (n: (typeof layerNames)[number]) =>
+    page.pushOperators(PDFOperator.of(PDFOperatorNames.BeginMarkedContentSequence, [PDFName.of("OC"), PDFName.of(`OC${layerNames.indexOf(n) + 1}`)]));
+  const endLayer = () => page.pushOperators(PDFOperator.of(PDFOperatorNames.EndMarkedContent));
+  page.pushOperators(pushGraphicsState(), concatTransformationMatrix(1, 0, 0, 1, S, S));
+  beginLayer("Background");
+
+  // Background: the partner's ramp in fine vector steps.
+  const g = kioskGround(L, edits);
+  // One live axial shading (Type 2, DeviceRGB) — no stepped bands, no seams.
+  {
+    const hex = (c: string) => [1, 3, 5].map((k) => parseInt(c.slice(k, k + 2), 16) / 255);
+    const ctx = doc.context;
+    const fns = g.slice(0, -1).map((a, k) => ctx.obj({ FunctionType: 2, Domain: [0, 1], C0: hex(a.color), C1: hex(g[k + 1]!.color), N: 1 }));
+    const fn = fns.length === 1 ? fns[0]! : ctx.obj({
+      FunctionType: 3,
+      Domain: [0, 1],
+      Functions: fns,
+      Bounds: g.slice(1, -1).map((x) => x.offset),
+      Encode: fns.flatMap(() => [0, 1]),
+    });
+    const sh = ctx.register(ctx.obj({ ShadingType: 2, ColorSpace: "DeviceRGB", Coords: [0, H, 0, 0], Function: fn, Extend: [true, true] }));
+    const res = page.node.Resources()!;
+    res.set(PDFName.of("Shading"), ctx.obj({ KGround: sh }));
+    page.pushOperators(pushGraphicsState(), rectangle(0, 0, W, H), clip(), endPath(), PDFOperator.of("sh" as PDFOperatorNames, [PDFName.of("KGround")]), popGraphicsState());
+  }
+
+  // Partner artwork as native vector paths (no clipped page copies).
+  const art = parseArtSvg(await loadArtSvg(L.id));
+  if (art.unsupported.length) return legacyFrontPdf(L, edits);
+  // Placed photos in the partner art stay as placed images (as in Illustrator).
+  const xo = doc.context.obj({});
+  page.node.Resources()!.set(PDFName.of("XObject"), xo);
+  const imgNames = new Map<string, string>();
+  const imageKey: string[] = [];
+  for (const im of art.images) {
+    if (!imgNames.has(im.href)) {
+      const b64 = im.href.slice(im.href.indexOf(",") + 1);
+      const bin = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+      const ref = /^data:image\/png/.test(im.href) ? await embedPngFast(doc, bin) : (await doc.embedJpg(bin)).ref;
+      const name = `KIm${imgNames.size}`;
+      xo.set(PDFName.of(name), ref);
+      imgNames.set(im.href, name);
+    }
+    imageKey.push(imgNames.get(im.href)!);
+  }
+  const imageName = (i: number) => imageKey[i]!;
+  const BM: Record<string, string> = { multiply: "Multiply", screen: "Screen", overlay: "Overlay", darken: "Darken", lighten: "Lighten", "color-dodge": "ColorDodge", "color-burn": "ColorBurn", "hard-light": "HardLight", "soft-light": "SoftLight", difference: "Difference", exclusion: "Exclusion", hue: "Hue", saturation: "Saturation", color: "Color", luminosity: "Luminosity" };
+  const bmNames = new Map<string, string>();
+  const raw = (s: string) => PDFOperator.of(s as PDFOperatorNames);
+  // Kiosk space (trim origin, y down) → bleed-box PDF space.
+  const F: Affine = [1, 0, 0, -1, B, H - B];
+  const placed = layoutKiosk(L, edits);
+  const gs = doc.context.obj({});
+  page.node.Resources()!.set(PDFName.of("ExtGState"), gs);
+  let gsN = 0;
+  const blendGs = (mode: string) => {
+    if (!bmNames.has(mode)) { const k = `KB${bmNames.size}`; gs.set(PDFName.of(k), doc.context.obj({ Type: "ExtGState", BM: PDFName.of(BM[mode] ?? "Normal") })); bmNames.set(mode, k); }
+    return `/${bmNames.get(mode)} gs`;
+  };
+  const alpha = (o: number) => { const k = `KA${gsN++}`; gs.set(PDFName.of(k), doc.context.obj({ Type: "ExtGState", ca: o, CA: o })); return `/${k} gs`; };
+  endLayer();
+  beginLayer("Artwork");
+  for (const p of placed) {
+    const s = p.scale;
+    const bx = B / s + 1;
+    const top = p === placed[0] && p.y <= 0.5 ? -(B + 1) / s : 0;
+    const bot = Math.abs(p.y + (p.clipBottom - p.clipTop) * s - KIOSK_H) < 0.5 ? (B + 1) / s : 0;
+    // art → kiosk: translate(p.x,p.y)·scale(s)·translate(-originX, -(originY+clipTop))
+    const M = mul(F, mul(translate(p.x, p.y), mul(scale(s), translate(-L.originX, -(L.originY + p.clipTop)))));
+    const oy = L.originY + p.clipTop;
+    const region = { x0: L.originX - bx, y0: oy + top, x1: L.originX + L.trimW + bx, y1: L.originY + p.clipBottom + bot };
+    const holes = p.parts.map((q) => ({ x0: L.originX + q.src.x0, y0: L.originY + q.src.y0, x1: L.originX + q.src.x1, y1: L.originY + q.src.y1 }));
+    page.pushOperators(raw(artRegionPdf(art, region, M, holes, imageName, blendGs).ops));
+    for (const q of p.parts) {
+      if (q.hidden) continue;
+      const c = partCentre(q);
+      const Mq = mul(F, mul(rotateAbout(q.rot, c.x, c.y), mul(translate(q.x - q.src.x0 * q.scale, q.y - q.src.y0 * q.scale), mul(scale(q.scale), translate(-L.originX, -L.originY)))));
+      const r = { x0: L.originX + q.src.x0, y0: L.originY + q.src.y0, x1: L.originX + q.src.x1, y1: L.originY + q.src.y1 };
+      page.pushOperators(raw(`q${q.opacity < 1 ? `\n${alpha(q.opacity)}` : ""}\n${artRegionPdf(art, r, Mq, [], imageName, blendGs).ops}\nQ`));
+    }
+  }
+  endLayer();
+
+  // Accent divider rules (live vector fills).
+  beginLayer("Accents");
+  const hexRgb = (c: string) => rgb(parseInt(c.slice(1, 3), 16) / 255, parseInt(c.slice(3, 5), 16) / 255, parseInt(c.slice(5, 7), 16) / 255);
+  for (const d of edits.dividers ?? []) {
+    if (d.hidden) continue;
+    const c = hexRgb(d.color);
+    const Md = mul(F, mul(rotateAbout(d.rot ?? 0, d.x + d.w / 2, d.y + d.h / 2), translate(d.x, d.y)));
+    const o = d.opacity ?? 1;
+    page.pushOperators(raw(`q\n${o < 1 ? alpha(o) + "\n" : ""}${[c.red, c.green, c.blue].join(" ")} rg\n${roundRectPdf(d.w, d.h, !!d.round, Md)}\nf\nQ`));
+  }
+  endLayer();
+  beginLayer("Text");
+
+  const fonts = new Map<string, Awaited<ReturnType<typeof doc.embedFont>>>();
+  for (const p of placed)
+    for (const t of p.texts) {
+      if (!fonts.has(t.font)) {
+        const url = kioskFontUrl(t.font);
+        fonts.set(t.font, url ? await doc.embedFont(await bytes(url), { subset: true }) : await doc.embedFont(/times/i.test(t.font) ? StandardFonts.TimesRoman : StandardFonts.Helvetica));
+      }
+      const f = fonts.get(t.font)!;
+      const clean = (s: string) => { try { f.encodeText(s); return s; } catch { return s.replace(/[^\x20-\x7E]/g, " "); } };
+      const lines = t.fixed
+        ? (() => {
+            const text = clean(t.text);
+            const n = Math.max(1, [...text].length - 1);
+            return [{ text, x: t.kx, y: t.ky, tc: (t.kw - f.widthOfTextAtSize(text, t.ksize)) / n }];
+          })()
+        : textLineBoxes({ ...t, lines: t.lines.map(clean) }, (s) => f.widthOfTextAtSize(s, t.ksize)).map((l) => ({ ...l, tc: t.trackPt }));
+      for (const l of lines) {
+        page.pushOperators(pushGraphicsState(), setCharacterSpacing(l.tc));
+        const o = pdfRot(B + l.x, H - (B + l.y), B + t.ax, H - (B + t.ky), t.rot);
+        page.drawText(l.text, { x: o.x, y: o.y, size: t.ksize, font: f, color: hexRgb(t.fill), opacity: t.opacity, rotate: degrees(-t.rot) });
+        page.pushOperators(setCharacterSpacing(0), popGraphicsState());
+      }
+    }
+  endLayer();
+  page.pushOperators(popGraphicsState());
+
+  // Crop marks in the slug: 0.25 in long, starting 1/8 in outside trim (clear of bleed).
+  beginLayer("Trim marks");
+  const reg = rgb(0, 0, 0);
+  const tx0 = S + B, ty0 = S + B, tx1 = tx0 + KIOSK_W, ty1 = ty0 + KIOSK_H;
+  const off = B, len = 18, lw = 0.25;
+  for (const x of [tx0, tx1])
+    for (const y of [ty0, ty1]) {
+      const sx = x === tx0 ? -1 : 1, sy = y === ty0 ? -1 : 1;
+      page.drawLine({ start: { x: x + sx * off, y }, end: { x: x + sx * (off + len), y }, thickness: lw, color: reg });
+      page.drawLine({ start: { x, y: y + sy * off }, end: { x, y: y + sy * (off + len) }, thickness: lw, color: reg });
+    }
+  endLayer();
+  return doc.save();
+}
+
+/**
+ * Earlier builder: places the partner page as a clipped form. Kept only for
+ * artwork that uses masks or blend modes, which the native writer cannot yet
+ * reproduce as live vector.
+ */
+async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Array> {
   const artUrl = kioskArtPdfUrl(L.id);
   if (!artUrl) throw new Error("This kiosk has no lifted artwork PDF on file.");
   const B = KIOSK_BLEED;
@@ -237,6 +403,30 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
       page.drawLine({ start: { x, y: y + sy * off }, end: { x, y: y + sy * (off + len) }, thickness: lw, color: reg });
     }
   return doc.save();
+}
+
+/**
+ * Place a PNG as an RGB image with its alpha as a soft mask. The browser
+ * decodes it (pdf-lib's own decoder takes minutes on the partner's
+ * full-width glow layers).
+ */
+async function embedPngFast(doc: PDFDocument, png: Uint8Array) {
+  const bmp = await createImageBitmap(new Blob([png as BlobPart], { type: "image/png" }), { premultiplyAlpha: "none", colorSpaceConversion: "none" });
+  const w = bmp.width, h = bmp.height;
+  const cv = new OffscreenCanvas(w, h);
+  const cx = cv.getContext("2d")!;
+  cx.drawImage(bmp, 0, 0);
+  const px = cx.getImageData(0, 0, w, h).data;
+  const rgbB = new Uint8Array(w * h * 3), a = new Uint8Array(w * h);
+  let opaque = true;
+  for (let i = 0, j = 0, k = 0; i < px.length; i += 4, j += 3, k++) {
+    rgbB[j] = px[i]!; rgbB[j + 1] = px[i + 1]!; rgbB[j + 2] = px[i + 2]!; a[k] = px[i + 3]!;
+    if (px[i + 3] !== 255) opaque = false;
+  }
+  const base = { Type: "XObject", Subtype: "Image", Width: w, Height: h, BitsPerComponent: 8 };
+  const img = doc.context.flateStream(rgbB, { ...base, ColorSpace: "DeviceRGB" });
+  if (!opaque) img.dict.set(PDFName.of("SMask"), doc.context.register(doc.context.flateStream(a, { ...base, ColorSpace: "DeviceGray" })));
+  return doc.context.register(img);
 }
 
 /** Where a PDF origin lands when its box is turned `rot`° clockwise (as seen) about (cx,cy). */
