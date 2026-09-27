@@ -114,6 +114,7 @@ import { Route as AgentThreadIdRouteImport } from './routes/agent.$threadId'
 import { Route as AdminCanvasRouteImport } from './routes/admin_.canvas'
 import { Route as AdminVizLabRouteImport } from './routes/admin.viz-lab'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminUsageRouteImport } from './routes/admin.usage'
 import { Route as AdminTranslationRouteImport } from './routes/admin.translation'
 import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
 import { Route as AdminTeamRouteImport } from './routes/admin.team'
@@ -736,6 +737,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminUsageRoute = AdminUsageRouteImport.update({
+  id: '/usage',
+  path: '/usage',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminTranslationRoute = AdminTranslationRouteImport.update({
   id: '/translation',
   path: '/translation',
@@ -1278,6 +1284,7 @@ export interface FileRoutesByFullPath {
   '/admin/team': typeof AdminTeamRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/translation': typeof AdminTranslationRoute
+  '/admin/usage': typeof AdminUsageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/viz-lab': typeof AdminVizLabRoute
   '/admin/canvas': typeof AdminCanvasRoute
@@ -1475,6 +1482,7 @@ export interface FileRoutesByTo {
   '/admin/team': typeof AdminTeamRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/translation': typeof AdminTranslationRoute
+  '/admin/usage': typeof AdminUsageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/viz-lab': typeof AdminVizLabRoute
   '/admin/canvas': typeof AdminCanvasRoute
@@ -1677,6 +1685,7 @@ export interface FileRoutesById {
   '/admin/team': typeof AdminTeamRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/translation': typeof AdminTranslationRoute
+  '/admin/usage': typeof AdminUsageRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/viz-lab': typeof AdminVizLabRoute
   '/admin_/canvas': typeof AdminCanvasRoute
@@ -1880,6 +1889,7 @@ export interface FileRouteTypes {
     | '/admin/team'
     | '/admin/templates'
     | '/admin/translation'
+    | '/admin/usage'
     | '/admin/users'
     | '/admin/viz-lab'
     | '/admin/canvas'
@@ -2077,6 +2087,7 @@ export interface FileRouteTypes {
     | '/admin/team'
     | '/admin/templates'
     | '/admin/translation'
+    | '/admin/usage'
     | '/admin/users'
     | '/admin/viz-lab'
     | '/admin/canvas'
@@ -2278,6 +2289,7 @@ export interface FileRouteTypes {
     | '/admin/team'
     | '/admin/templates'
     | '/admin/translation'
+    | '/admin/usage'
     | '/admin/users'
     | '/admin/viz-lab'
     | '/admin_/canvas'
@@ -3267,6 +3279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/usage': {
+      id: '/admin/usage'
+      path: '/usage'
+      fullPath: '/admin/usage'
+      preLoaderRoute: typeof AdminUsageRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/translation': {
       id: '/admin/translation'
       path: '/translation'
@@ -3958,6 +3977,7 @@ interface AdminRouteChildren {
   AdminTeamRoute: typeof AdminTeamRoute
   AdminTemplatesRoute: typeof AdminTemplatesRoute
   AdminTranslationRoute: typeof AdminTranslationRoute
+  AdminUsageRoute: typeof AdminUsageRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVizLabRoute: typeof AdminVizLabRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -3996,6 +4016,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminTeamRoute: AdminTeamRoute,
   AdminTemplatesRoute: AdminTemplatesRoute,
   AdminTranslationRoute: AdminTranslationRoute,
+  AdminUsageRoute: AdminUsageRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVizLabRoute: AdminVizLabRoute,
   AdminIndexRoute: AdminIndexRoute,
