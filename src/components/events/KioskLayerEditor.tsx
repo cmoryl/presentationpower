@@ -86,6 +86,13 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
   const [sel, setSel] = useState<Sel>(null);
   /** Canvas height in px (zoom) and whether the canvas takes the full width. */
   const [zoom, setZoom] = useState(640);
+  // "Fit" is smaller on phones so the whole front and both side strips fit the width.
+  const [fitZoom, setFitZoom] = useState(640);
+  useEffect(() => {
+    if (typeof window === "undefined" || window.innerWidth >= 768) return;
+    const z = Math.max(400, Math.min(640, Math.round(((window.innerWidth - 110) / 322) * 640)));
+    setFitZoom(z); setZoom(z);
+  }, []);
   const [wide, setWide] = useState(false);
   /** Objects picked with Shift-click, ready to group. */
   const [picked, setPicked] = useState<string[]>([]);
@@ -689,11 +696,11 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
             <button type="button" className={dibtn} disabled={!future.length} onClick={redo} title="Redo (Ctrl/⌘ Shift Z)" aria-label="Redo"><Redo2 className="h-4 w-4" /></button>
             <span className="mx-1 h-4 w-px bg-white/10" />
             <div className="flex rounded-sm border border-white/10 bg-black/40 p-0.5" role="group" aria-label="View size">
-              {([["Fit", 640], ["Large", 1100], ["Detail", 2200]] as const).map(([l, z]) => (
+              {([["Fit", fitZoom], ["Large", 1100], ["Detail", 2200]] as const).map(([l, z]) => (
                 <button key={l} type="button" aria-pressed={zoom === z} onClick={() => setZoom(z)} className="rounded-[2px] px-2.5 py-1 text-[10.5px] font-medium text-white/55 hover:text-white aria-pressed:bg-white/15 aria-pressed:text-white">{l}</button>
               ))}
             </div>
-            <span className="hidden w-11 text-right font-mono sm:inline text-[10.5px] text-white/60">{Math.round((zoom / 640) * 100)}%</span>
+            <span className="hidden w-11 text-right font-mono sm:inline text-[10.5px] text-white/60">{Math.round((zoom / fitZoom) * 100)}%</span>
           </div>
         </header>
 
