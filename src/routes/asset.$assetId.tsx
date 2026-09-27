@@ -1,6 +1,7 @@
 import { ApprovalGate } from "@/components/approvals/ApprovalGate";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { PrintRulers } from "@/components/print/PrintRulers";
 import {
   exportPrintAssetAsPdf,
   type PrintPageSizeKey,
@@ -278,6 +279,7 @@ function AssetEditor() {
 
   const [row, setRow] = useState<PrintAssetRow | null>(null);
   const [loading, setLoading] = useState(true);
+  const [inspectorTab, setInspectorTab] = useState<"design" | "brief">("design");
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
@@ -1594,7 +1596,8 @@ function AssetEditor() {
           )}
 
           {/* CANVAS + document inputs */}
-          <div className="min-w-0 space-y-6 rounded-sm bg-[#0B0A2A] px-8 py-8 ring-1 ring-white/5">
+          <div className="min-w-0 space-y-6 rounded-sm bg-[#0B0A2A] pb-8 pl-12 pr-8 pt-12 ring-1 ring-white/5">
+            <div className="relative">
             <div
               ref={canvasRef}
               className="relative overflow-hidden bg-white shadow-[0_28px_70px_rgba(0,0,0,0.6)] ring-1 ring-black/40"
@@ -1976,277 +1979,9 @@ function AssetEditor() {
                 </div>
               )}
             </div>
-
-            {/* DOCUMENT INPUTS — content entry lives under the document */}
-            <div className="dark space-y-2">
-              <Panel title="Stats" defaultOpen={false}>
-                {(content.stats ?? []).map((s, i) => (
-                  <div key={i} className="space-y-1">
-                    <div className="grid grid-cols-[1fr_60px] gap-2">
-                      <input
-                        className={
-                          fieldError(`stats.${i}.label`) ? inspectorInputInvalid : inspectorInput
-                        }
-                        value={s.label}
-                        aria-label={`Stat ${i + 1} label`}
-                        aria-invalid={Boolean(fieldError(`stats.${i}.label`))}
-                        onBlur={() => markTouched(`stats.${i}.label`)}
-                        onChange={(e) => updateStat(i, { label: e.target.value })}
-                        placeholder="Label"
-                      />
-                      <input
-                        className={
-                          fieldError(`stats.${i}.value`) ? inspectorInputInvalid : inspectorInput
-                        }
-                        value={s.value}
-                        aria-label={`Stat ${i + 1} value`}
-                        aria-invalid={Boolean(fieldError(`stats.${i}.value`))}
-                        onBlur={() => markTouched(`stats.${i}.value`)}
-                        onChange={(e) => updateStat(i, { value: e.target.value })}
-                        placeholder="0"
-                      />
-                    </div>
-                    <FieldError
-                      id={`err-stats-${i}-label`}
-                      message={fieldError(`stats.${i}.label`)}
-                    />
-                    <FieldError
-                      id={`err-stats-${i}-value`}
-                      message={fieldError(`stats.${i}.value`)}
-                    />
-                  </div>
-                ))}
-                {divisionStats.length > 0 && (
-                  <div className="pt-2">
-                    <div className="text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
-                      From division
-                    </div>
-                    <div className="mt-1 space-y-1">
-                      {divisionStats.slice(0, 5).map((s, i) => (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() => {
-                            const next = [...content.stats];
-                            const idx = next.findIndex((x) => !x.label || !x.value);
-                            const target = idx >= 0 ? idx : 0;
-                            next[target] = { label: s.label, value: s.value, unit: s.unit ?? "" };
-                            patchContent({ stats: next });
-                          }}
-                          className="w-full rounded-md border border-black/10 bg-white px-2 py-1 text-left text-[11px] hover:border-[#003FC7] dark:border-white/10 dark:bg-white/[0.03]"
-                        >
-                          <span className="font-semibold">
-                            {s.value}
-                            {s.unit ?? ""}
-                          </span>{" "}
-                          · {s.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </Panel>
-
-              <Panel title="Shared modules" defaultOpen={false} openNonce={moduleFocus?.nonce ?? 0}>
-                {overflow.clipped && !approvedDemo && (
-                  <div
-                    data-testid="overflow-inspector-note"
-                    className="mb-2 rounded-xl border border-red-400/60 bg-red-50 px-3 py-2 text-[11px] font-semibold leading-snug text-red-700 dark:bg-red-500/10 dark:text-red-300"
-                    role="alert"
-                  >
-                    Page is clipping: {Math.round(overflow.overflowFrac * 100)}% (
-                    {overflow.overflowPx}px) of content sits past the trim edge and will be cut from
-                    the export. Shrink the hero, remove a module, or shorten copy.
-                  </div>
-                )}
-                <LayoutHealthBanner
-                  report={approvedDemo ? null : analyzePrintAsset(kind, content)}
-                  onApplySuggestion={(s) => {
-                    if (s.kind === "reduce-hero") {
-                      const cur =
-                        (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia ??
-                        ({} as PrintHeroMedia);
-                      const prev = cur.heightPct ?? 46;
-                      patchContent({
-                        heroMedia: { ...cur, heightPct: s.targetHeightPct },
-                      } as never);
-                      toast.success(
-                        `Hero reduced to ${s.targetHeightPct}% (was ${Math.round(prev)}%) — freed ${s.frees.toFixed(1)} units`,
-                      );
-                    } else if (s.kind === "swap-variant") {
-                      const modules = content.modules ?? [];
-                      const cur = modules[s.moduleIndex];
-                      if (cur && cur.kind === "stats") {
-                        setPendingSwap({
-                          moduleIndex: s.moduleIndex,
-                          from: cur.variantId,
-                          to: s.to as PrintStatsVariant,
-                          frees: s.frees,
-                        });
-                      }
-                    }
-                  }}
-                />
-                <ModulesPanel
-                  kind="case-study"
-                  modules={content.modules ?? []}
-                  heroMedia={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
-                  hasTitle={!!(rawContent as { title?: string }).title}
-                  hasSummary={!!(rawContent as { summary?: string }).summary}
-                  onAdd={() => {
-                    setReplaceTarget(null);
-                    setPickerOpen(true);
-                  }}
-                  onChange={(next) => patchContent({ modules: next })}
-                  onDropInsert={(section, index) => insertPickedSection(section, index)}
-                  mode={editorMode}
-                />
-
-                {/* Schema-driven Content inspector — the guaranteed safety net. */}
-                <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10">
-                  <ContentInspector
-                    schema={schemaFor(kind)}
-                    content={rawContent}
-                    canvasEditablePaths={new Set(editableFieldPaths)}
-                    onWritePath={(path: string, value: unknown) => patchByPath(path, value)}
-                  />
-                </div>
-              </Panel>
-
-              <Panel title="Quote" defaultOpen={false}>
-                <textarea
-                  rows={3}
-                  className={fieldError("quote.text") ? inspectorInputInvalid : inspectorInput}
-                  placeholder="Pull-quote text"
-                  aria-label="Quote text"
-                  aria-invalid={Boolean(fieldError("quote.text"))}
-                  onBlur={() => markTouched("quote.text")}
-                  value={content.quote?.text ?? ""}
-                  onChange={(e) =>
-                    patchContent({
-                      quote: {
-                        ...(content.quote ?? { author: "" }),
-                        text: e.target.value,
-                        author: content.quote?.author ?? "",
-                      },
-                    })
-                  }
-                />
-                <FieldError id="err-quote-text" message={fieldError("quote.text")} />
-                <input
-                  className={fieldError("quote.author") ? inspectorInputInvalid : inspectorInput}
-                  placeholder="Author"
-                  aria-label="Quote author"
-                  aria-invalid={Boolean(fieldError("quote.author"))}
-                  onBlur={() => markTouched("quote.author")}
-                  value={content.quote?.author ?? ""}
-                  onChange={(e) =>
-                    patchContent({
-                      quote: {
-                        ...(content.quote ?? { text: "" }),
-                        author: e.target.value,
-                        text: content.quote?.text ?? "",
-                      },
-                    })
-                  }
-                />
-                <FieldError id="err-quote-author" message={fieldError("quote.author")} />
-                <input
-                  className={fieldError("quote.role") ? inspectorInputInvalid : inspectorInput}
-                  placeholder="Role, Company"
-                  aria-label="Quote author role"
-                  onBlur={() => markTouched("quote.role")}
-                  value={content.quote?.role ?? ""}
-                  onChange={(e) =>
-                    patchContent({
-                      quote: {
-                        ...(content.quote ?? { text: "", author: "" }),
-                        role: e.target.value,
-                        text: content.quote?.text ?? "",
-                        author: content.quote?.author ?? "",
-                      },
-                    })
-                  }
-                />
-                <FieldError id="err-quote-role" message={fieldError("quote.role")} />
-                {divisionQuotes.length > 0 && (
-                  <div className="pt-2">
-                    <div className="text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
-                      From division
-                    </div>
-                    <div className="mt-1 space-y-1">
-                      {divisionQuotes.slice(0, 3).map((q, i) => (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() =>
-                            patchContent({
-                              quote: { text: q.quote, author: q.author ?? "", role: q.role ?? "" },
-                            })
-                          }
-                          className="w-full rounded-md border border-black/10 bg-white px-2 py-1 text-left text-[11px] hover:border-[#003FC7] dark:border-white/10 dark:bg-white/[0.03]"
-                        >
-                          “{q.quote.slice(0, 90)}
-                          {q.quote.length > 90 ? "…" : ""}”
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </Panel>
-
-              <Panel title="Expert / contact" defaultOpen={false}>
-                <input
-                  className={fieldError("expert.name") ? inspectorInputInvalid : inspectorInput}
-                  placeholder="Name"
-                  aria-label="Contact name"
-                  aria-invalid={Boolean(fieldError("expert.name"))}
-                  onBlur={() => markTouched("expert.name")}
-                  value={content.expert?.name ?? ""}
-                  onChange={(e) =>
-                    patchContent({ expert: { ...(content.expert ?? {}), name: e.target.value } })
-                  }
-                />
-                <FieldError id="err-expert-name" message={fieldError("expert.name")} />
-                <input
-                  className={fieldError("expert.role") ? inspectorInputInvalid : inspectorInput}
-                  placeholder="Role"
-                  aria-label="Contact role"
-                  onBlur={() => markTouched("expert.role")}
-                  value={content.expert?.role ?? ""}
-                  onChange={(e) =>
-                    patchContent({
-                      expert: {
-                        ...(content.expert ?? { name: "" }),
-                        role: e.target.value,
-                        name: content.expert?.name ?? "",
-                      },
-                    })
-                  }
-                />
-                <FieldError id="err-expert-role" message={fieldError("expert.role")} />
-                <input
-                  className={fieldError("expert.email") ? inspectorInputInvalid : inspectorInput}
-                  placeholder="Email"
-                  type="email"
-                  inputMode="email"
-                  aria-label="Contact email"
-                  aria-invalid={Boolean(fieldError("expert.email"))}
-                  onBlur={() => markTouched("expert.email")}
-                  value={content.expert?.email ?? ""}
-                  onChange={(e) =>
-                    patchContent({
-                      expert: {
-                        ...(content.expert ?? { name: "" }),
-                        email: e.target.value,
-                        name: content.expert?.name ?? "",
-                      },
-                    })
-                  }
-                />
-                <FieldError id="err-expert-email" message={fieldError("expert.email")} />
-              </Panel>
+              <PrintRulers targetRef={canvasRef} widthMm={pagePreset(pageSize).widthIn * 25.4} />
             </div>
+
           </div>
 
           {/* INSPECTOR */}
@@ -2280,6 +2015,11 @@ function AssetEditor() {
                 </button>
               </div>
 
+              <div role="tablist" aria-label="Inspector" className="grid grid-cols-2 rounded-sm border border-white/10 bg-[#0B0A2A] p-0.5">
+                <button type="button" role="tab" id="insp-tab-design" aria-selected={inspectorTab === "design"} aria-controls="insp-panel-design" onClick={() => setInspectorTab("design")} className={`rounded-[3px] px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-2 focus-visible:outline-[#003FC7] ${inspectorTab === "design" ? "bg-[#003FC7] text-white" : "text-white/65 hover:text-white"}`}>Design</button>
+                <button type="button" role="tab" id="insp-tab-brief" aria-selected={inspectorTab === "brief"} aria-controls="insp-panel-brief" onClick={() => setInspectorTab("brief")} className={`rounded-[3px] px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-2 focus-visible:outline-[#003FC7] ${inspectorTab === "brief" ? "bg-[#003FC7] text-white" : "text-white/65 hover:text-white"}`}>Brief</button>
+              </div>
+              <div role="tabpanel" id="insp-panel-design" aria-labelledby="insp-tab-design" hidden={inspectorTab !== "design"} className="space-y-2">
               <Panel title="Layout">
                 <Row label="Page size">
                   <select
@@ -2650,6 +2390,276 @@ function AssetEditor() {
                   }
                 />
               </Panel>
+              </div>
+              <div role="tabpanel" id="insp-panel-brief" aria-labelledby="insp-tab-brief" hidden={inspectorTab !== "brief"} className="space-y-2">
+              <Panel title="Stats" defaultOpen={false}>
+                {(content.stats ?? []).map((s, i) => (
+                  <div key={i} className="space-y-1">
+                    <div className="grid grid-cols-[1fr_60px] gap-2">
+                      <input
+                        className={
+                          fieldError(`stats.${i}.label`) ? inspectorInputInvalid : inspectorInput
+                        }
+                        value={s.label}
+                        aria-label={`Stat ${i + 1} label`}
+                        aria-invalid={Boolean(fieldError(`stats.${i}.label`))}
+                        onBlur={() => markTouched(`stats.${i}.label`)}
+                        onChange={(e) => updateStat(i, { label: e.target.value })}
+                        placeholder="Label"
+                      />
+                      <input
+                        className={
+                          fieldError(`stats.${i}.value`) ? inspectorInputInvalid : inspectorInput
+                        }
+                        value={s.value}
+                        aria-label={`Stat ${i + 1} value`}
+                        aria-invalid={Boolean(fieldError(`stats.${i}.value`))}
+                        onBlur={() => markTouched(`stats.${i}.value`)}
+                        onChange={(e) => updateStat(i, { value: e.target.value })}
+                        placeholder="0"
+                      />
+                    </div>
+                    <FieldError
+                      id={`err-stats-${i}-label`}
+                      message={fieldError(`stats.${i}.label`)}
+                    />
+                    <FieldError
+                      id={`err-stats-${i}-value`}
+                      message={fieldError(`stats.${i}.value`)}
+                    />
+                  </div>
+                ))}
+                {divisionStats.length > 0 && (
+                  <div className="pt-2">
+                    <div className="text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
+                      From division
+                    </div>
+                    <div className="mt-1 space-y-1">
+                      {divisionStats.slice(0, 5).map((s, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => {
+                            const next = [...content.stats];
+                            const idx = next.findIndex((x) => !x.label || !x.value);
+                            const target = idx >= 0 ? idx : 0;
+                            next[target] = { label: s.label, value: s.value, unit: s.unit ?? "" };
+                            patchContent({ stats: next });
+                          }}
+                          className="w-full rounded-md border border-black/10 bg-white px-2 py-1 text-left text-[11px] hover:border-[#003FC7] dark:border-white/10 dark:bg-white/[0.03]"
+                        >
+                          <span className="font-semibold">
+                            {s.value}
+                            {s.unit ?? ""}
+                          </span>{" "}
+                          · {s.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </Panel>
+
+              <Panel title="Shared modules" defaultOpen={false} openNonce={moduleFocus?.nonce ?? 0}>
+                {overflow.clipped && !approvedDemo && (
+                  <div
+                    data-testid="overflow-inspector-note"
+                    className="mb-2 rounded-xl border border-red-400/60 bg-red-50 px-3 py-2 text-[11px] font-semibold leading-snug text-red-700 dark:bg-red-500/10 dark:text-red-300"
+                    role="alert"
+                  >
+                    Page is clipping: {Math.round(overflow.overflowFrac * 100)}% (
+                    {overflow.overflowPx}px) of content sits past the trim edge and will be cut from
+                    the export. Shrink the hero, remove a module, or shorten copy.
+                  </div>
+                )}
+                <LayoutHealthBanner
+                  report={approvedDemo ? null : analyzePrintAsset(kind, content)}
+                  onApplySuggestion={(s) => {
+                    if (s.kind === "reduce-hero") {
+                      const cur =
+                        (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia ??
+                        ({} as PrintHeroMedia);
+                      const prev = cur.heightPct ?? 46;
+                      patchContent({
+                        heroMedia: { ...cur, heightPct: s.targetHeightPct },
+                      } as never);
+                      toast.success(
+                        `Hero reduced to ${s.targetHeightPct}% (was ${Math.round(prev)}%) — freed ${s.frees.toFixed(1)} units`,
+                      );
+                    } else if (s.kind === "swap-variant") {
+                      const modules = content.modules ?? [];
+                      const cur = modules[s.moduleIndex];
+                      if (cur && cur.kind === "stats") {
+                        setPendingSwap({
+                          moduleIndex: s.moduleIndex,
+                          from: cur.variantId,
+                          to: s.to as PrintStatsVariant,
+                          frees: s.frees,
+                        });
+                      }
+                    }
+                  }}
+                />
+                <ModulesPanel
+                  kind="case-study"
+                  modules={content.modules ?? []}
+                  heroMedia={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
+                  hasTitle={!!(rawContent as { title?: string }).title}
+                  hasSummary={!!(rawContent as { summary?: string }).summary}
+                  onAdd={() => {
+                    setReplaceTarget(null);
+                    setPickerOpen(true);
+                  }}
+                  onChange={(next) => patchContent({ modules: next })}
+                  onDropInsert={(section, index) => insertPickedSection(section, index)}
+                  mode={editorMode}
+                />
+
+                {/* Schema-driven Content inspector — the guaranteed safety net. */}
+                <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10">
+                  <ContentInspector
+                    schema={schemaFor(kind)}
+                    content={rawContent}
+                    canvasEditablePaths={new Set(editableFieldPaths)}
+                    onWritePath={(path: string, value: unknown) => patchByPath(path, value)}
+                  />
+                </div>
+              </Panel>
+
+              <Panel title="Quote" defaultOpen={false}>
+                <textarea
+                  rows={3}
+                  className={fieldError("quote.text") ? inspectorInputInvalid : inspectorInput}
+                  placeholder="Pull-quote text"
+                  aria-label="Quote text"
+                  aria-invalid={Boolean(fieldError("quote.text"))}
+                  onBlur={() => markTouched("quote.text")}
+                  value={content.quote?.text ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      quote: {
+                        ...(content.quote ?? { author: "" }),
+                        text: e.target.value,
+                        author: content.quote?.author ?? "",
+                      },
+                    })
+                  }
+                />
+                <FieldError id="err-quote-text" message={fieldError("quote.text")} />
+                <input
+                  className={fieldError("quote.author") ? inspectorInputInvalid : inspectorInput}
+                  placeholder="Author"
+                  aria-label="Quote author"
+                  aria-invalid={Boolean(fieldError("quote.author"))}
+                  onBlur={() => markTouched("quote.author")}
+                  value={content.quote?.author ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      quote: {
+                        ...(content.quote ?? { text: "" }),
+                        author: e.target.value,
+                        text: content.quote?.text ?? "",
+                      },
+                    })
+                  }
+                />
+                <FieldError id="err-quote-author" message={fieldError("quote.author")} />
+                <input
+                  className={fieldError("quote.role") ? inspectorInputInvalid : inspectorInput}
+                  placeholder="Role, Company"
+                  aria-label="Quote author role"
+                  onBlur={() => markTouched("quote.role")}
+                  value={content.quote?.role ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      quote: {
+                        ...(content.quote ?? { text: "", author: "" }),
+                        role: e.target.value,
+                        text: content.quote?.text ?? "",
+                        author: content.quote?.author ?? "",
+                      },
+                    })
+                  }
+                />
+                <FieldError id="err-quote-role" message={fieldError("quote.role")} />
+                {divisionQuotes.length > 0 && (
+                  <div className="pt-2">
+                    <div className="text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
+                      From division
+                    </div>
+                    <div className="mt-1 space-y-1">
+                      {divisionQuotes.slice(0, 3).map((q, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() =>
+                            patchContent({
+                              quote: { text: q.quote, author: q.author ?? "", role: q.role ?? "" },
+                            })
+                          }
+                          className="w-full rounded-md border border-black/10 bg-white px-2 py-1 text-left text-[11px] hover:border-[#003FC7] dark:border-white/10 dark:bg-white/[0.03]"
+                        >
+                          “{q.quote.slice(0, 90)}
+                          {q.quote.length > 90 ? "…" : ""}”
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </Panel>
+
+              <Panel title="Expert / contact" defaultOpen={false}>
+                <input
+                  className={fieldError("expert.name") ? inspectorInputInvalid : inspectorInput}
+                  placeholder="Name"
+                  aria-label="Contact name"
+                  aria-invalid={Boolean(fieldError("expert.name"))}
+                  onBlur={() => markTouched("expert.name")}
+                  value={content.expert?.name ?? ""}
+                  onChange={(e) =>
+                    patchContent({ expert: { ...(content.expert ?? {}), name: e.target.value } })
+                  }
+                />
+                <FieldError id="err-expert-name" message={fieldError("expert.name")} />
+                <input
+                  className={fieldError("expert.role") ? inspectorInputInvalid : inspectorInput}
+                  placeholder="Role"
+                  aria-label="Contact role"
+                  onBlur={() => markTouched("expert.role")}
+                  value={content.expert?.role ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      expert: {
+                        ...(content.expert ?? { name: "" }),
+                        role: e.target.value,
+                        name: content.expert?.name ?? "",
+                      },
+                    })
+                  }
+                />
+                <FieldError id="err-expert-role" message={fieldError("expert.role")} />
+                <input
+                  className={fieldError("expert.email") ? inspectorInputInvalid : inspectorInput}
+                  placeholder="Email"
+                  type="email"
+                  inputMode="email"
+                  aria-label="Contact email"
+                  aria-invalid={Boolean(fieldError("expert.email"))}
+                  onBlur={() => markTouched("expert.email")}
+                  value={content.expert?.email ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      expert: {
+                        ...(content.expert ?? { name: "" }),
+                        email: e.target.value,
+                        name: content.expert?.name ?? "",
+                      },
+                    })
+                  }
+                />
+                <FieldError id="err-expert-email" message={fieldError("expert.email")} />
+              </Panel>
+              </div>
 
               {/* Content input panels live under the document — see below. */}
             </div>
