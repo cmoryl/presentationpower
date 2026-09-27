@@ -1,3 +1,4 @@
+import { useRequireSignIn } from "@/hooks/use-require-sign-in";
 import { ApprovalGate } from "@/components/approvals/ApprovalGate";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -268,6 +269,7 @@ function stableRawContent(
 }
 
 function AssetEditor() {
+  useRequireSignIn();
   const { assetId } = Route.useParams();
   const navigate = useNavigate();
   const { brandModes } = useTaxonomy();

@@ -1,3 +1,4 @@
+import { useRequireSignIn } from "@/hooks/use-require-sign-in";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useId, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -107,6 +108,7 @@ const KINDS: Array<{
 ];
 
 function NewAssetPage() {
+  useRequireSignIn();
   const navigate = useNavigate();
   const search = Route.useSearch();
   const { brandModes } = useTaxonomy();

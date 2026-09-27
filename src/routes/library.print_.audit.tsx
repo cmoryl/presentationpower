@@ -1,3 +1,4 @@
+import { useRequireSignIn } from "@/hooks/use-require-sign-in";
 // PRINT MODULE FIT AUDIT
 // ---------------------------------------------------------------------------
 // Renders every print section module at true page width, measures it, and
@@ -170,6 +171,7 @@ function AuditRow({
 }
 
 function PrintModuleAuditPage() {
+  useRequireSignIn();
   const [pageSize, setPageSize] = useState<PrintPageSize>("Letter");
   const [onlyIssues, setOnlyIssues] = useState(false);
   const [runKey, setRunKey] = useState(0);
