@@ -77,12 +77,15 @@ export function CaliforniaKioskBrowser() {
                       </p>
                       <button
                         type="button"
-                        onClick={() => setOpenId(isOpen ? null : `live:${group.boothId}`)}
-                        aria-expanded={isOpen}
+                        onClick={() => {
+                          const w = window.open(`/events/next/kiosk-editor/${encodeURIComponent(group.boothId)}`, `kiosk-${group.boothId}`, "popup,width=1600,height=1000");
+                          // Pop-up blocked: fall back to editing on the page.
+                          if (!w) setOpenId(isOpen ? null : `live:${group.boothId}`);
+                        }}
                         className="mt-3 inline-flex items-center gap-2 rounded-md bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] dark:bg-card"
                       >
                         <Pencil className="h-3 w-3" aria-hidden />
-                        {isOpen ? "Close" : "Edit layers & download"}
+                        {isOpen ? "Close" : "Open editor in new window"}
                       </button>
                     </div>
                   </div>
