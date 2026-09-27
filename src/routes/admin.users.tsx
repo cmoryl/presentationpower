@@ -15,7 +15,15 @@ import {
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminPageHeader, AdminLoading } from "@/components/admin/AdminPage";
 
-const ROLES = ["admin", "editor", "brand_lead", "viewer", "user"] as const;
+const ROLES = [
+  "admin",
+  "editor",
+  "brand_lead",
+  "brand_reviewer",
+  "content_owner",
+  "sales",
+  "viewer",
+] as const;
 type Role = (typeof ROLES)[number];
 
 export const Route = createFileRoute("/admin/users")({
@@ -50,7 +58,7 @@ function UsersView() {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["admin", "users"], queryFn: () => listFn(), retry: false });
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<Role>("user");
+  const [role, setRole] = useState<Role>("viewer");
   const [msg, setMsg] = useState<string | null>(null);
   const [issued, setIssued] = useState<{
     userId: string;

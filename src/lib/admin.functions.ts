@@ -390,9 +390,20 @@ function generateTempPassword() {
   return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
 }
 
+// Must match the app_role enum — a value outside it (the old "user") made the
+// role insert fail silently, leaving invitees with no role at all.
+const ASSIGNABLE_ROLES = [
+  "admin",
+  "editor",
+  "brand_lead",
+  "brand_reviewer",
+  "content_owner",
+  "sales",
+  "viewer",
+] as const;
 const inviteInput = z.object({
   email: z.string().email(),
-  role: z.enum(["admin", "editor", "viewer", "brand_lead", "user"]).default("user"),
+  role: z.enum(ASSIGNABLE_ROLES).default("viewer"),
 });
 export const inviteAdminUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -416,7 +427,7 @@ export const inviteAdminUser = createServerFn({ method: "POST" })
 
 const roleInput = z.object({
   userId: z.string().uuid(),
-  role: z.enum(["admin", "editor", "viewer", "brand_lead", "user"]),
+  role: z.enum(ASSIGNABLE_ROLES),
   grant: z.boolean(),
 });
 export const setUserRole = createServerFn({ method: "POST" })
