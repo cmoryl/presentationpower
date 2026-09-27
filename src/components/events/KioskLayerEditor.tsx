@@ -94,6 +94,16 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState<KioskDownload | "save" | null>(null);
   const userId = useSessionUser();
+  /** Only admins, brand leads and brand reviewers may save a kiosk for everyone (matches the database rule). */
+  const [canSave, setCanSave] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (!userId) { setCanSave(userId === null ? false : null); return; }
+    let live = true;
+    Promise.all((["admin", "brand_lead", "brand_reviewer"] as const).map((r) => supabase.rpc("has_role", { _user_id: userId, _role: r })))
+      .then((rs) => live && setCanSave(rs.some((x) => x.data === true)))
+      .catch(() => live && setCanSave(false));
+    return () => { live = false; };
+  }, [userId]);
   const svgRef = useRef<SVGSVGElement>(null);
   const drag = useRef<{ sel: NonNullable<Sel>; x: number; y: number; start: KioskEdits } | null>(null);
 
@@ -141,6 +151,8 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
     if (loadedEdits.current === edits) return;
     writeLocalDraft(L.id, edits);
     if (!userId) { setStatus("Kept on this device. Sign in to save for everyone."); return; }
+    if (canSave === null) return;
+    if (!canSave) { setStatus("Kept in this browser only — your role can't save kiosks for everyone."); return; }
     setStatus("Saving…");
     const t = setTimeout(async () => {
       const { error } = await supabase.from("kiosk_layer_edits").upsert({ booth_id: L.id, edits: edits as never, updated_by: userId, updated_at: new Date().toISOString() });
@@ -148,7 +160,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
       else { clearLocalDraft(L.id); setStatus("All changes saved."); window.dispatchEvent(new CustomEvent("kiosk-edits-saved", { detail: L.id })); }
     }, 1200);
     return () => clearTimeout(t);
-  }, [edits, L.id, userId]);
+  }, [edits, L.id, userId, canSave]);
 
   const placed = useMemo(() => layoutKiosk(L, edits), [L, edits]);
   const ground = kioskGround(L, edits);
@@ -667,6 +679,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
           <div className="flex min-w-0 items-center gap-3">
             <span className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-white/60">{vendor} · Kiosk front</span>
             <span className="rounded-sm border border-white/10 bg-black/30 px-1.5 py-0.5 font-mono text-[10px] text-white/60">rdraft</span>
+            {canSave === false ? <span className="rounded-sm border border-[#FFEB66]/40 bg-[#FFEB66]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#FFEB66]" title="Changes stay in this browser. Admins, brand leads and brand reviewers can save kiosks for everyone.">Practice mode · not shared</span> : null}
             {status ? <span role="status" className="hidden truncate text-[11px] text-white/60 xl:inline">{status}</span> : null}
           </div>
           <div className="flex items-center gap-1.5">
@@ -1080,7 +1093,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
 
         <div className="flex shrink-0 gap-1.5 border-t border-white/10 p-3">
           <button type="button" className={`${dbtn} flex-1 justify-center`} onClick={() => commit({})}><RotateCcw className="h-3.5 w-3.5" />Reset to London</button>
-          <button type="button" className={`${dbtn} flex-1 justify-center border-[#003FC7] bg-[#003FC7] text-white hover:bg-[#003FC7]/85`} disabled={!userId || busy === "save"} onClick={save} title={userId ? undefined : "Sign in to save"}><Save className="h-3.5 w-3.5" />Save</button>
+          <button type="button" className={`${dbtn} flex-1 justify-center border-[#003FC7] bg-[#003FC7] text-white hover:bg-[#003FC7]/85`} disabled={!userId || !canSave || busy === "save"} onClick={save} title={!userId ? "Sign in to save" : !canSave ? "Your role can't save kiosks for everyone" : undefined}><Save className="h-3.5 w-3.5" />Save</button>
         </div>
         {status ? <p role="status" className="border-t border-white/10 px-3 py-1.5 text-[11px] text-white/60 xl:hidden">{status}</p> : null}
       </aside>
