@@ -84,8 +84,8 @@ export function ApprovalGate(props: ApprovalGateProps) {
   const copy = request ? STATE_COPY[request.status] : null;
 
   return (
-    <div className="rounded-2xl border border-foreground/10 p-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+    <div className="@container rounded-2xl border border-foreground/10 p-4">
+      <div className="flex flex-col gap-3 @md:flex-row @md:items-start">
         <div className="min-w-0 flex-1">
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/50">
             Brand &amp; compliance
@@ -112,7 +112,7 @@ export function ApprovalGate(props: ApprovalGateProps) {
             </p>
           )}
         </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
+        <div className="flex shrink-0 flex-wrap items-center gap-2 @md:justify-end">
           <Link
             to="/approvals"
             className="rounded-full border border-foreground/20 px-3 py-1.5 text-xs hover:bg-foreground/5"
