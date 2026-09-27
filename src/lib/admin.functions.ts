@@ -416,7 +416,10 @@ export const inviteAdminUser = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message ?? "Invite failed");
     const newId = (inv as { user?: { id: string } })?.user?.id;
     if (newId && data.role) {
-      await sa.from("user_roles").insert({ user_id: newId, role: data.role });
+      const { error: roleErr } = await sa
+        .from("user_roles")
+        .insert({ user_id: newId, role: data.role });
+      if (roleErr) throw new Error(`Invite sent, but the role could not be set: ${roleErr.message}`);
     }
     await logAudit(sa, context.userId, "user.invite", "user", newId ?? data.email, {
       email: data.email,
