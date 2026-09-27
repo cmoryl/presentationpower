@@ -264,6 +264,8 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
  * reproduce as live vector.
  */
 async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Array> {
+  const artUrl = kioskArtPdfUrl(L.id);
+  if (!artUrl) throw new Error("This kiosk has no lifted artwork PDF on file.");
   const B = KIOSK_BLEED;
   const W = KIOSK_W + 2 * B, H = KIOSK_H + 2 * B;
   // Slug outside the bleed carries the crop marks (0.5 in each side).
@@ -276,21 +278,7 @@ async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Ar
   page.setBleedBox(S, S, W, H);
   page.setCropBox(0, 0, W + 2 * S, H + 2 * S);
   // Everything below is drawn in bleed-box space, shifted into the slug.
-  // Named Illustrator layers (PDF optional content).
-  const layerNames = ["Background", "Artwork", "Accents", "Text", "Trim marks"] as const;
-  const ocProps = doc.context.obj({});
-  const ocRefs = layerNames.map((name, i) => {
-    const ref = doc.context.register(doc.context.obj({ Type: "OCG", Name: PDFString.of(name) }));
-    ocProps.set(PDFName.of(`OC${i + 1}`), ref);
-    return ref;
-  });
-  page.node.Resources()!.set(PDFName.of("Properties"), ocProps);
-  doc.catalog.set(PDFName.of("OCProperties"), doc.context.obj({ OCGs: ocRefs, D: doc.context.obj({ Order: ocRefs, ON: ocRefs }) }));
-  const beginLayer = (n: (typeof layerNames)[number]) =>
-    page.pushOperators(PDFOperator.of(PDFOperatorNames.BeginMarkedContentSequence, [PDFName.of("OC"), PDFName.of(`OC${layerNames.indexOf(n) + 1}`)]));
-  const endLayer = () => page.pushOperators(PDFOperator.of(PDFOperatorNames.EndMarkedContent));
   page.pushOperators(pushGraphicsState(), concatTransformationMatrix(1, 0, 0, 1, S, S));
-  beginLayer("Background");
 
   // Background: the partner's ramp in fine vector steps.
   const g = kioskGround(L, edits);
@@ -312,75 +300,72 @@ async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Ar
     page.pushOperators(pushGraphicsState(), rectangle(0, 0, W, H), clip(), endPath(), PDFOperator.of("sh" as PDFOperatorNames, [PDFName.of("KGround")]), popGraphicsState());
   }
 
-  // Partner artwork as native vector paths (no clipped page copies).
-  const art = parseArtSvg(await loadArtSvg(L.id));
-  if (art.unsupported.length) return legacyFrontPdf(L, edits);
-  // Placed photos in the partner art stay as placed images (as in Illustrator).
-  const xo = doc.context.obj({});
-  page.node.Resources()!.set(PDFName.of("XObject"), xo);
-  const imgNames = new Map<string, string>();
-  const imageKey: string[] = [];
-  for (const im of art.images) {
-    if (!imgNames.has(im.href)) {
-      const b64 = im.href.slice(im.href.indexOf(",") + 1);
-      const bin = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-      const ref = /^data:image\/png/.test(im.href) ? await embedPngFast(doc, bin) : (await doc.embedJpg(bin)).ref;
-      const name = `KIm${imgNames.size}`;
-      xo.set(PDFName.of(name), ref);
-      imgNames.set(im.href, name);
-    }
-    imageKey.push(imgNames.get(im.href)!);
-  }
-  const imageName = (i: number) => imageKey[i]!;
-  const BM: Record<string, string> = { multiply: "Multiply", screen: "Screen", overlay: "Overlay", darken: "Darken", lighten: "Lighten", "color-dodge": "ColorDodge", "color-burn": "ColorBurn", "hard-light": "HardLight", "soft-light": "SoftLight", difference: "Difference", exclusion: "Exclusion", hue: "Hue", saturation: "Saturation", color: "Color", luminosity: "Luminosity" };
-  const bmNames = new Map<string, string>();
-  const raw = (s: string) => PDFOperator.of(s as PDFOperatorNames);
-  // Kiosk space (trim origin, y down) → bleed-box PDF space.
-  const F: Affine = [1, 0, 0, -1, B, H - B];
+  const src = await PDFDocument.load(await bytes(artUrl));
+  const srcPage = src.getPage(0);
+  // Embed the London page ONCE (a single shared form XObject) and cut every
+  // piece and object out of it with a clip. Embedding per object duplicated the
+  // whole page's content streams each time — 100 MB+ files and multi-minute builds.
+  const emb = await doc.embedPage(srcPage, { left: 0, bottom: 0, right: srcPage.getWidth(), top: L.mediaH });
   const placed = layoutKiosk(L, edits);
-  const gs = doc.context.obj({});
-  page.node.Resources()!.set(PDFName.of("ExtGState"), gs);
-  let gsN = 0;
-  const blendGs = (mode: string) => {
-    if (!bmNames.has(mode)) { const k = `KB${bmNames.size}`; gs.set(PDFName.of(k), doc.context.obj({ Type: "ExtGState", BM: PDFName.of(BM[mode] ?? "Normal") })); bmNames.set(mode, k); }
-    return `/${bmNames.get(mode)} gs`;
-  };
-  const alpha = (o: number) => { const k = `KA${gsN++}`; gs.set(PDFName.of(k), doc.context.obj({ Type: "ExtGState", ca: o, CA: o })); return `/${k} gs`; };
-  endLayer();
-  beginLayer("Artwork");
   for (const p of placed) {
     const s = p.scale;
     const bx = B / s + 1;
-    const top = p === placed[0] && p.y <= 0.5 ? -(B + 1) / s : 0;
-    const bot = Math.abs(p.y + (p.clipBottom - p.clipTop) * s - KIOSK_H) < 0.5 ? (B + 1) / s : 0;
-    // art → kiosk: translate(p.x,p.y)·scale(s)·translate(-originX, -(originY+clipTop))
-    const M = mul(F, mul(translate(p.x, p.y), mul(scale(s), translate(-L.originX, -(L.originY + p.clipTop)))));
-    const oy = L.originY + p.clipTop;
-    const region = { x0: L.originX - bx, y0: oy + top, x1: L.originX + L.trimW + bx, y1: L.originY + p.clipBottom + bot };
-    const holes = p.parts.map((q) => ({ x0: L.originX + q.src.x0, y0: L.originY + q.src.y0, x1: L.originX + q.src.x1, y1: L.originY + q.src.y1 }));
-    page.pushOperators(raw(artRegionPdf(art, region, M, holes, imageName, blendGs).ops));
+    // A piece touching the top or bottom trim runs on into the bleed, as the SVG does.
+    const ext = (B + 1) / s;
+    const exTop = p === placed[0] && p.y <= 0.5 ? ext : 0;
+    const exBot = Math.abs(p.y + (p.clipBottom - p.clipTop) * s - KIOSK_H) < 0.5 ? ext : 0;
+    const rx = B + p.x - bx * s;
+    const ry = H - (B + p.y + (p.clipBottom - p.clipTop + exBot) * s);
+    const rw = (L.trimW + 2 * bx) * s;
+    const rh = (p.clipBottom - p.clipTop + exTop + exBot) * s;
+    // Backdrop region with an even-odd hole for every separate object.
+    page.pushOperators(pushGraphicsState(), rectangle(rx, ry, rw, rh));
+    for (const q of p.parts) {
+      const hx = B + p.x + q.src.x0 * s;
+      const hy = H - (B + p.y + (q.src.y1 - p.clipTop) * s);
+      page.pushOperators(rectangle(hx, hy, (q.src.x1 - q.src.x0) * s, (q.src.y1 - q.src.y0) * s));
+    }
+    page.pushOperators(clipEvenOdd(), endPath());
+    page.drawPage(emb, {
+      x: B + p.x - L.originX * s,
+      y: H - B - p.y + (L.originY + p.clipTop - L.mediaH) * s,
+      xScale: s,
+      yScale: s,
+    });
+    page.pushOperators(popGraphicsState());
+    // Each object on its own, from the same vector page (effects kept).
     for (const q of p.parts) {
       if (q.hidden) continue;
-      const c = partCentre(q);
-      const Mq = mul(F, mul(rotateAbout(q.rot, c.x, c.y), mul(translate(q.x - q.src.x0 * q.scale, q.y - q.src.y0 * q.scale), mul(scale(q.scale), translate(-L.originX, -L.originY)))));
-      const r = { x0: L.originX + q.src.x0, y0: L.originY + q.src.y0, x1: L.originX + q.src.x1, y1: L.originY + q.src.y1 };
-      page.pushOperators(raw(`q${q.opacity < 1 ? `\n${alpha(q.opacity)}` : ""}\n${artRegionPdf(art, r, Mq, [], imageName, blendGs).ops}\nQ`));
+      const qs = q.scale;
+      const w = (q.src.x1 - q.src.x0) * qs, h = (q.src.y1 - q.src.y0) * qs;
+      const ox = B + q.x, oy = H - (B + q.y + h);
+      const ctr = partCentre(q);
+      const o = pdfRot(ox, oy, B + ctr.x, H - (B + ctr.y), q.rot);
+      const a = (-q.rot * Math.PI) / 180, c = Math.cos(a), sn = Math.sin(a);
+      page.pushOperators(pushGraphicsState(), concatTransformationMatrix(c, sn, -sn, c, o.x, o.y), rectangle(0, 0, w, h), clip(), endPath());
+      page.drawPage(emb, {
+        x: -(L.originX + q.src.x0) * qs,
+        y: -(L.mediaH - L.originY - q.src.y1) * qs,
+        xScale: qs,
+        yScale: qs,
+        opacity: q.opacity,
+      });
+      page.pushOperators(popGraphicsState());
     }
   }
-  endLayer();
 
   // Accent divider rules (live vector fills).
-  beginLayer("Accents");
   const hexRgb = (c: string) => rgb(parseInt(c.slice(1, 3), 16) / 255, parseInt(c.slice(3, 5), 16) / 255, parseInt(c.slice(5, 7), 16) / 255);
   for (const d of edits.dividers ?? []) {
     if (d.hidden) continue;
-    const c = hexRgb(d.color);
-    const Md = mul(F, mul(rotateAbout(d.rot ?? 0, d.x + d.w / 2, d.y + d.h / 2), translate(d.x, d.y)));
-    const o = d.opacity ?? 1;
-    page.pushOperators(raw(`q\n${o < 1 ? alpha(o) + "\n" : ""}${[c.red, c.green, c.blue].join(" ")} rg\n${roundRectPdf(d.w, d.h, !!d.round, Md)}\nf\nQ`));
+    const r = d.round ? d.h / 2 : 0;
+    const path = r
+      ? `M ${r} 0 H ${d.w - r} A ${r} ${r} 0 0 1 ${d.w - r} ${d.h} H ${r} A ${r} ${r} 0 0 1 ${r} 0 Z`
+      : `M 0 0 H ${d.w} V ${d.h} H 0 Z`;
+    const rot = d.rot ?? 0;
+    const o = pdfRot(B + d.x, H - (B + d.y), B + d.x + d.w / 2, H - (B + d.y + d.h / 2), rot);
+    page.drawSvgPath(path, { x: o.x, y: o.y, color: hexRgb(d.color), borderWidth: 0, opacity: d.opacity ?? 1, rotate: degrees(-rot) });
   }
-  endLayer();
-  beginLayer("Text");
 
   const fonts = new Map<string, Awaited<ReturnType<typeof doc.embedFont>>>();
   for (const p of placed)
@@ -405,11 +390,9 @@ async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Ar
         page.pushOperators(setCharacterSpacing(0), popGraphicsState());
       }
     }
-  endLayer();
   page.pushOperators(popGraphicsState());
 
   // Crop marks in the slug: 0.25 in long, starting 1/8 in outside trim (clear of bleed).
-  beginLayer("Trim marks");
   const reg = rgb(0, 0, 0);
   const tx0 = S + B, ty0 = S + B, tx1 = tx0 + KIOSK_W, ty1 = ty0 + KIOSK_H;
   const off = B, len = 18, lw = 0.25;
@@ -419,7 +402,6 @@ async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Ar
       page.drawLine({ start: { x: x + sx * off, y }, end: { x: x + sx * (off + len), y }, thickness: lw, color: reg });
       page.drawLine({ start: { x, y: y + sy * off }, end: { x, y: y + sy * (off + len) }, thickness: lw, color: reg });
     }
-  endLayer();
   return doc.save();
 }
 
