@@ -90,7 +90,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
   const [fitZoom, setFitZoom] = useState(640);
   useEffect(() => {
     if (typeof window === "undefined" || window.innerWidth >= 768) return;
-    const z = Math.max(400, Math.min(640, Math.round(((window.innerWidth - 110) / 322) * 640)));
+    const z = Math.max(300, Math.min(640, Math.round((window.innerWidth - 130) * 1.6)));
     setFitZoom(z); setZoom(z);
   }, []);
   const [wide, setWide] = useState(false);
@@ -588,7 +588,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
         <button type="button" className={dibtn} title="Add accent rule" aria-label="Add accent rule" onClick={() => addDivider("short")}><RectangleHorizontal className="h-4 w-4" /></button>
         <span className="my-1 h-px w-6 bg-white/10" />
         <button type="button" className={dibtn} title="Zoom in" aria-label="Zoom in" disabled={zoom >= 4000} onClick={() => setZoom((z) => Math.min(4000, Math.round(z * 1.25)))}><ZoomIn className="h-4 w-4" /></button>
-        <button type="button" className={dibtn} title="Zoom out" aria-label="Zoom out" disabled={zoom <= 400} onClick={() => setZoom((z) => Math.max(400, Math.round(z / 1.25)))}><ZoomOut className="h-4 w-4" /></button>
+        <button type="button" className={dibtn} title="Zoom out" aria-label="Zoom out" disabled={zoom <= 300} onClick={() => setZoom((z) => Math.max(300, Math.round(z / 1.25)))}><ZoomOut className="h-4 w-4" /></button>
         <button type="button" className={dibtn} title="Rulers" aria-label="Rulers" aria-pressed={guides.rulers} onClick={() => setGuides((g) => ({ ...g, rulers: !g.rulers }))}><RulerIcon className="h-4 w-4" /></button>
         <button type="button" className={dibtn} title="Show side strips" aria-label="Show side strips" aria-pressed={showSides} onClick={() => setShowSides((s) => !s)}><Columns3 className="h-4 w-4" /></button>
         <div className="mt-auto" />
