@@ -76,7 +76,7 @@ async function loadKioskEdits(id: string): Promise<KioskEdits> {
   return (data?.edits as KioskEdits | undefined) ?? {};
 }
 
-export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; vendor: string }) {
+export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: LiveLayout; vendor: string; fill?: boolean }) {
   const [art, setArt] = useState<{ viewBox: string; inner: string } | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [edits, setEdits] = useState<KioskEdits>({});
@@ -567,7 +567,7 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   return (
     <div
       className={
-        (wide ? "fixed inset-0 z-[70] h-screen rounded-none " : "relative h-[86vh] min-h-[720px] rounded-md ") +
+        (wide || fill ? "fixed inset-0 z-[70] h-screen rounded-none " : "relative h-[86vh] min-h-[720px] rounded-md ") +
         "flex overflow-hidden border border-white/10 bg-[#0B0A2A] text-white/85 [color-scheme:dark]"
       }
     >
