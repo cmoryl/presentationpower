@@ -1138,7 +1138,7 @@ function AssetEditor() {
       <div className="print-studio relative left-1/2 w-screen -translate-x-1/2 bg-[#03002C] text-white [color-scheme:dark]">
       <div className="mx-auto max-w-[1600px] px-4 pb-10 pt-3">
         {/* HEADER BAR */}
-        <div className="dark sticky top-0 z-40 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#03002C] px-4 py-2.5">
+        <div className="dark sticky top-0 z-50 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#03002C] px-4 py-2.5">
           <div className="flex items-center gap-3">
             <Link
               to="/"
