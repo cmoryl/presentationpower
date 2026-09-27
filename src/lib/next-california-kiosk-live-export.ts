@@ -167,6 +167,8 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
     imageKey.push(imgNames.get(im.href)!);
   }
   const imageName = (i: number) => imageKey[i]!;
+  const BM: Record<string, string> = { multiply: "Multiply", screen: "Screen", overlay: "Overlay", darken: "Darken", lighten: "Lighten", "color-dodge": "ColorDodge", "color-burn": "ColorBurn", "hard-light": "HardLight", "soft-light": "SoftLight", difference: "Difference", exclusion: "Exclusion", hue: "Hue", saturation: "Saturation", color: "Color", luminosity: "Luminosity" };
+  const bmNames = new Map<string, string>();
   const raw = (s: string) => PDFOperator.of(s as PDFOperatorNames);
   // Kiosk space (trim origin, y down) → bleed-box PDF space.
   const F: Affine = [1, 0, 0, -1, B, H - B];
@@ -174,6 +176,10 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
   const gs = doc.context.obj({});
   page.node.Resources()!.set(PDFName.of("ExtGState"), gs);
   let gsN = 0;
+  const blendGs = (mode: string) => {
+    if (!bmNames.has(mode)) { const k = `KB${bmNames.size}`; gs.set(PDFName.of(k), doc.context.obj({ Type: "ExtGState", BM: PDFName.of(BM[mode] ?? "Normal") })); bmNames.set(mode, k); }
+    return `/${bmNames.get(mode)} gs`;
+  };
   const alpha = (o: number) => { const k = `KA${gsN++}`; gs.set(PDFName.of(k), doc.context.obj({ Type: "ExtGState", ca: o, CA: o })); return `/${k} gs`; };
   endLayer();
   beginLayer("Artwork");
@@ -187,13 +193,13 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
     const oy = L.originY + p.clipTop;
     const region = { x0: L.originX - bx, y0: oy + top, x1: L.originX + L.trimW + bx, y1: L.originY + p.clipBottom + bot };
     const holes = p.parts.map((q) => ({ x0: L.originX + q.src.x0, y0: L.originY + q.src.y0, x1: L.originX + q.src.x1, y1: L.originY + q.src.y1 }));
-    page.pushOperators(raw(artRegionPdf(art, region, M, holes, imageName).ops));
+    page.pushOperators(raw(artRegionPdf(art, region, M, holes, imageName, blendGs).ops));
     for (const q of p.parts) {
       if (q.hidden) continue;
       const c = partCentre(q);
       const Mq = mul(F, mul(rotateAbout(q.rot, c.x, c.y), mul(translate(q.x - q.src.x0 * q.scale, q.y - q.src.y0 * q.scale), mul(scale(q.scale), translate(-L.originX, -L.originY)))));
       const r = { x0: L.originX + q.src.x0, y0: L.originY + q.src.y0, x1: L.originX + q.src.x1, y1: L.originY + q.src.y1 };
-      page.pushOperators(raw(`q${q.opacity < 1 ? `\n${alpha(q.opacity)}` : ""}\n${artRegionPdf(art, r, Mq, [], imageName).ops}\nQ`));
+      page.pushOperators(raw(`q${q.opacity < 1 ? `\n${alpha(q.opacity)}` : ""}\n${artRegionPdf(art, r, Mq, [], imageName, blendGs).ops}\nQ`));
     }
   }
   endLayer();
@@ -326,6 +332,8 @@ async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Ar
     imageKey.push(imgNames.get(im.href)!);
   }
   const imageName = (i: number) => imageKey[i]!;
+  const BM: Record<string, string> = { multiply: "Multiply", screen: "Screen", overlay: "Overlay", darken: "Darken", lighten: "Lighten", "color-dodge": "ColorDodge", "color-burn": "ColorBurn", "hard-light": "HardLight", "soft-light": "SoftLight", difference: "Difference", exclusion: "Exclusion", hue: "Hue", saturation: "Saturation", color: "Color", luminosity: "Luminosity" };
+  const bmNames = new Map<string, string>();
   const raw = (s: string) => PDFOperator.of(s as PDFOperatorNames);
   // Kiosk space (trim origin, y down) → bleed-box PDF space.
   const F: Affine = [1, 0, 0, -1, B, H - B];
@@ -333,6 +341,10 @@ async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Ar
   const gs = doc.context.obj({});
   page.node.Resources()!.set(PDFName.of("ExtGState"), gs);
   let gsN = 0;
+  const blendGs = (mode: string) => {
+    if (!bmNames.has(mode)) { const k = `KB${bmNames.size}`; gs.set(PDFName.of(k), doc.context.obj({ Type: "ExtGState", BM: PDFName.of(BM[mode] ?? "Normal") })); bmNames.set(mode, k); }
+    return `/${bmNames.get(mode)} gs`;
+  };
   const alpha = (o: number) => { const k = `KA${gsN++}`; gs.set(PDFName.of(k), doc.context.obj({ Type: "ExtGState", ca: o, CA: o })); return `/${k} gs`; };
   endLayer();
   beginLayer("Artwork");
@@ -346,13 +358,13 @@ async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Ar
     const oy = L.originY + p.clipTop;
     const region = { x0: L.originX - bx, y0: oy + top, x1: L.originX + L.trimW + bx, y1: L.originY + p.clipBottom + bot };
     const holes = p.parts.map((q) => ({ x0: L.originX + q.src.x0, y0: L.originY + q.src.y0, x1: L.originX + q.src.x1, y1: L.originY + q.src.y1 }));
-    page.pushOperators(raw(artRegionPdf(art, region, M, holes, imageName).ops));
+    page.pushOperators(raw(artRegionPdf(art, region, M, holes, imageName, blendGs).ops));
     for (const q of p.parts) {
       if (q.hidden) continue;
       const c = partCentre(q);
       const Mq = mul(F, mul(rotateAbout(q.rot, c.x, c.y), mul(translate(q.x - q.src.x0 * q.scale, q.y - q.src.y0 * q.scale), mul(scale(q.scale), translate(-L.originX, -L.originY)))));
       const r = { x0: L.originX + q.src.x0, y0: L.originY + q.src.y0, x1: L.originX + q.src.x1, y1: L.originY + q.src.y1 };
-      page.pushOperators(raw(`q${q.opacity < 1 ? `\n${alpha(q.opacity)}` : ""}\n${artRegionPdf(art, r, Mq, [], imageName).ops}\nQ`));
+      page.pushOperators(raw(`q${q.opacity < 1 ? `\n${alpha(q.opacity)}` : ""}\n${artRegionPdf(art, r, Mq, [], imageName, blendGs).ops}\nQ`));
     }
   }
   endLayer();

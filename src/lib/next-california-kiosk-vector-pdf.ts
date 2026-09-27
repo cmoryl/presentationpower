@@ -36,9 +36,9 @@ const apply = (m: Affine, x: number, y: number): [number, number] => [m[0] * x +
 
 type Seg = { op: "M" | "L" | "C" | "Z"; p: number[] };
 export type Box = { x0: number; y0: number; x1: number; y1: number };
-export type ArtPath = { segs: Seg[]; subs: { segs: Seg[]; box: Box }[]; fill: [number, number, number]; box: Box; clips: number[]; evenOdd: boolean };
+export type ArtPath = { segs: Seg[]; subs: { segs: Seg[]; box: Box }[]; fill: [number, number, number]; box: Box; clips: number[]; evenOdd: boolean; blend?: string };
 export type ArtClip = { segs: Seg[]; box: Box };
-export type ArtImage = { href: string; m: Affine; box: Box; clips: number[] };
+export type ArtImage = { href: string; m: Affine; box: Box; clips: number[]; blend?: string };
 export type ParsedArt = {
   paths: ArtPath[];
   clips: ArtClip[];
@@ -143,7 +143,6 @@ export function parseArtSvg(svg: string): ParsedArt {
   const clips: ArtClip[] = [];
   const unsupported: string[] = [];
   if (/<mask\b/.test(svg)) unsupported.push("mask");
-  if (/mix-blend-mode/.test(svg)) unsupported.push("blend mode");
   for (const m of svg.matchAll(/<clipPath\b[^>]*id="([^"]+)"[^>]*>([\s\S]*?)<\/clipPath>/g)) {
     const segs: Seg[] = [];
     for (const p of m[2]!.matchAll(/<path\b[^>]*>/g)) segs.push(...parsePath(attr(p[0], "d") ?? "", parseTransform(attr(p[0], "transform"))));
@@ -158,7 +157,8 @@ export function parseArtSvg(svg: string): ParsedArt {
   const paths: ArtPath[] = [];
   const images: ArtImage[] = [];
   const order: ParsedArt["order"] = [];
-  const stack: { clip: number | null; t: Affine; fill?: string }[] = [];
+  const stack: { clip: number | null; t: Affine; fill?: string; blend?: string }[] = [];
+  const blendNow = () => stack[stack.length - 1]?.blend;
   const clipChain = () => stack.map((st) => st.clip).filter((c): c is number => c != null);
   const addPath = (tag: string, t: Affine, fillAttr?: string) => {
     const fill = hexRgb(fillAttr ?? attr(tag, "fill") ?? stack[stack.length - 1]?.fill ?? "#000000");
@@ -172,7 +172,7 @@ export function parseArtSvg(svg: string): ParsedArt {
     }
     for (const sb of subs) sb.box = boxOf(sb.segs);
     order.push({ kind: "path", i: paths.length });
-    paths.push({ segs, subs, fill, box: boxOf(segs), clips: clipChain(), evenOdd: attr(tag, "fill-rule") === "evenodd" });
+    paths.push({ segs, subs, fill, box: boxOf(segs), clips: clipChain(), evenOdd: attr(tag, "fill-rule") === "evenodd", blend: blendNow() });
   };
   const addImage = (tag: string, t: Affine) => {
     const href = attr(tag, "xlink:href") ?? attr(tag, "href");
@@ -184,7 +184,7 @@ export function parseArtSvg(svg: string): ParsedArt {
     const pts = [apply(m, 0, 0), apply(m, 1, 0), apply(m, 0, 1), apply(m, 1, 1)];
     const box = { x0: Math.min(...pts.map((p) => p[0])), x1: Math.max(...pts.map((p) => p[0])), y0: Math.min(...pts.map((p) => p[1])), y1: Math.max(...pts.map((p) => p[1])) };
     order.push({ kind: "image", i: images.length });
-    images.push({ href, m, box, clips: clipChain() });
+    images.push({ href, m, box, clips: clipChain(), blend: blendNow() });
   };
   for (const m of body.matchAll(/<(\/?)(g|path|image|use)\b([^>]*?)(\/?)>/g)) {
     const [, close, tag, rest, self] = m;
@@ -193,7 +193,7 @@ export function parseArtSvg(svg: string): ParsedArt {
       if (close) { stack.pop(); continue; }
       const cid = rest!.match(/clip-path="url\(#([^)]+)\)"/)?.[1];
       const parent = stack[stack.length - 1];
-      stack.push({ clip: cid != null ? clipIndex.get(cid) ?? null : null, t: mul(parent?.t ?? IDENTITY, parseTransform(attr(r, "transform"))), fill: attr(r, "fill") ?? parent?.fill });
+      stack.push({ clip: cid != null ? clipIndex.get(cid) ?? null : null, t: mul(parent?.t ?? IDENTITY, parseTransform(attr(r, "transform"))), fill: attr(r, "fill") ?? parent?.fill, blend: rest!.match(/mix-blend-mode:\s*([a-z-]+)/)?.[1] ?? parent?.blend });
       if (self) stack.pop();
       continue;
     }
@@ -233,7 +233,7 @@ const overlaps = (a: Box, b: Box) => a.x0 <= b.x1 && a.x1 >= b.x0 && a.y0 <= b.y
  * `m` (art → page). `clip` is written first as the group's only mask; `holes`
  * are even-odd cut-outs from it (where separate objects sit).
  */
-export function artRegionPdf(art: ParsedArt, region: Box, m: Affine, holes: Box[] = [], imageName?: (i: number) => string): { ops: string; count: number } {
+export function artRegionPdf(art: ParsedArt, region: Box, m: Affine, holes: Box[] = [], imageName?: (i: number) => string, blendGs?: (mode: string) => string): { ops: string; count: number } {
   const out: string[] = ["q", rectPdf(region, m), ...holes.map((h) => rectPdf(h, m)), holes.length ? "W* n" : "W n"];
   let count = 0;
   let open: string | null = null;
@@ -254,7 +254,8 @@ export function artRegionPdf(art: ParsedArt, region: Box, m: Affine, holes: Box[
       if (!overlaps(im.box, region) || !imageName) continue;
       if (!setClips(im.clips)) continue;
       const k = mul(m, im.m);
-      out.push(`q\n${k.map(f).join(" ")} cm\n/${imageName(o.i)} Do\nQ`);
+      const bl = im.blend && blendGs ? `${blendGs(im.blend)}\n` : "";
+      out.push(`q\n${bl}${k.map(f).join(" ")} cm\n/${imageName(o.i)} Do\nQ`);
       count++;
       continue;
     }
@@ -267,7 +268,10 @@ export function artRegionPdf(art: ParsedArt, region: Box, m: Affine, holes: Box[
     const inside = p.box.x0 >= region.x0 && p.box.x1 <= region.x1 && p.box.y0 >= region.y0 && p.box.y1 <= region.y1;
     const segs = inside ? p.segs : p.subs.filter((sb) => overlaps(sb.box, region)).flatMap((sb) => sb.segs);
     if (!segs.length) continue;
+    const bl = p.blend && blendGs;
+    if (bl) out.push("q", blendGs(p.blend!));
     out.push(`${p.fill.map(f).join(" ")} rg`, segsToPdf(segs, m), p.evenOdd ? "f*" : "f");
+    if (bl) out.push("Q");
     count++;
   }
   if (open !== null) out.push("Q");
