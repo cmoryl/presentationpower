@@ -8,6 +8,7 @@ import {
   AlignCenter, AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignLeft, AlignRight,
   AlignStartHorizontal, AlignStartVertical, AlignHorizontalSpaceAround, AlignVerticalSpaceAround,
   ArrowDown, ArrowUp, BringToFront, ClipboardPaste, Copy, CopyPlus, Download, Eye, EyeOff, Lock, Maximize2, Minimize2, Minus, Plus, Redo2, RotateCcw, Save, SendToBack, Trash2, Type, Undo2, Unlock,
+  MousePointer2, RectangleHorizontal, ZoomIn, ZoomOut, Ruler as RulerIcon, Columns3, Shapes, Group, Ungroup, CheckCircle2, AlertTriangle,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +17,7 @@ import {
   KIOSK_BLEED,
   KIOSK_H,
   KIOSK_MARGIN,
+  KIOSK_RETURN_W,
   KIOSK_TV,
   KIOSK_W,
   kioskFontFaceCss,
@@ -463,96 +465,318 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
   const selPlaced = selText ? placed.flatMap((p) => p.texts).find((t) => t.id === selText.id) ?? null : null;
   const selDivider = sel?.kind === "divider" ? edits.dividers?.find((d) => d.id === sel.id) ?? null : null;
 
+  // ---- workspace view state ----
+  const [unit, setUnit] = useState<"in" | "mm">("in");
+  const [guides, setGuides] = useState({ bleed: true, safe: true, tv: true, rulers: true });
+  const [showSides, setShowSides] = useState(true);
+  const [alignTarget, setAlignTarget] = useState<"trim" | "safe" | "tv">("trim");
+  const [tab, setTab] = useState<"design" | "checks" | "export">("design");
+  useEffect(() => {
+    if (!wide) return;
+    const k = (e: KeyboardEvent) => { if (e.key === "Escape") setWide(false); };
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, [wide]);
+
+  const toU = (pt: number) => (unit === "in" ? pt / 72 : (pt / 72) * 25.4);
+  const fromU = (v: number) => (unit === "in" ? v * 72 : (v / 25.4) * 72);
+  const fmtU = (pt: number) => (unit === "in" ? toU(pt).toFixed(2) : toU(pt).toFixed(1));
+
+  /** Live print checks over every visible object. */
+  const checks = useMemo(() => {
+    type Hit = { sel: NonNullable<Sel>; label: string; issue: string; level: "error" | "warn" };
+    const out: Hit[] = [];
+    const tv = KIOSK_TV;
+    const test = (sel: NonNullable<Sel>, label: string, b: { x0: number; x1: number; y0: number; y1: number }, isText: boolean) => {
+      if (b.x0 < tv.x + tv.w && b.x1 > tv.x && b.y0 < tv.y + tv.h && b.y1 > tv.y) out.push({ sel, label, issue: "Sits over the TV area — it will be hidden by the screen", level: "error" });
+      if (isText && (b.x0 < 0 || b.x1 > KIOSK_W || b.y0 < 0 || b.y1 > KIOSK_H)) out.push({ sel, label, issue: "Crosses the trim edge — words will be cut off", level: "error" });
+      else if (isText && (b.x0 < KIOSK_MARGIN || b.x1 > KIOSK_W - KIOSK_MARGIN || b.y0 < KIOSK_MARGIN || b.y1 > KIOSK_H - KIOSK_MARGIN)) out.push({ sel, label, issue: "Outside the 2 in safe margin", level: "warn" });
+      else if (!isText && (b.x1 < 0 || b.x0 > KIOSK_W || b.y1 < 0 || b.y0 > KIOSK_H)) out.push({ sel, label, issue: "Entirely off the kiosk — it won't print", level: "warn" });
+    };
+    for (const t of placed.flatMap((p) => p.texts)) {
+      const bx = t.fixed ? [{ x: t.kx, w: t.kw, y: t.ky }] : textLineBoxes(t, measure(t));
+      test({ kind: "text", id: t.id }, `“${t.lines[0] ?? ""}”`, { x0: Math.min(...bx.map((b) => b.x)), x1: Math.max(...bx.map((b) => b.x + b.w)), y0: t.ky - t.ksize * 0.8, y1: bx[bx.length - 1]!.y + t.ksize * 0.2 }, true);
+    }
+    for (const q of placed.flatMap((p) => p.parts).filter((q) => !q.hidden))
+      test({ kind: "part", id: q.part.id }, "Graphic object", { x0: q.x, y0: q.y, x1: q.x + (q.src.x1 - q.src.x0) * q.scale, y1: q.y + (q.src.y1 - q.src.y0) * q.scale }, false);
+    for (const d of (edits.dividers ?? []).filter((d) => !d.hidden))
+      test({ kind: "divider", id: d.id }, "Accent rule", { x0: d.x, x1: d.x + d.w, y0: d.y, y1: d.y + d.h }, false);
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placed, edits.dividers]);
+  const errors = checks.filter((c) => c.level === "error").length;
+
+  const target = alignTarget === "tv" ? { x0: KIOSK_TV.x, x1: KIOSK_TV.x + KIOSK_TV.w, y0: KIOSK_TV.y, y1: KIOSK_TV.y + KIOSK_TV.h }
+    : alignTarget === "safe" ? { x0: KIOSK_MARGIN, x1: KIOSK_W - KIOSK_MARGIN, y0: KIOSK_MARGIN, y1: KIOSK_H - KIOSK_MARGIN }
+    : { x0: 0, x1: KIOSK_W, y0: 0, y1: KIOSK_H };
+  const alignTo = (m: "left" | "hcenter" | "right" | "top" | "vmiddle" | "bottom") => {
+    if (!sel || isLocked(sel.id)) return;
+    let base = edits;
+    if (sel.kind === "text" && (m === "left" || m === "hcenter" || m === "right"))
+      base = { ...edits, texts: { ...edits.texts, [sel.id]: { ...edits.texts?.[sel.id], align: m === "hcenter" ? "center" : m } } };
+    const b = selBounds(sel, base);
+    if (!b) return;
+    const R = target;
+    const dx = m === "left" ? R.x0 - b.x0 : m === "right" ? R.x1 - b.x1 : m === "hcenter" ? (R.x0 + R.x1) / 2 - (b.x0 + b.x1) / 2 : 0;
+    const dy = m === "top" ? R.y0 - b.y0 : m === "bottom" ? R.y1 - b.y1 : m === "vmiddle" ? (R.y0 + R.y1) / 2 - (b.y0 + b.y1) / 2 : 0;
+    commit(shift(sel, dx, dy, base));
+  };
+
+  const bounds = sel ? selBounds(sel) : null;
+  const setPos = (axis: "x" | "y", pt: number) => {
+    if (!sel || !bounds || isLocked(sel.id)) return;
+    commit(shift(sel, axis === "x" ? pt - bounds.x0 : 0, axis === "y" ? pt - bounds.y0 : 0));
+  };
+  const setSize = (axis: "w" | "h", pt: number) => {
+    if (!sel || !bounds || isLocked(sel.id) || pt <= 0) return;
+    const cur = axis === "w" ? bounds.x1 - bounds.x0 : bounds.y1 - bounds.y0;
+    const f = pt / Math.max(1, cur);
+    if (sel.kind === "divider") return patchDivider(sel.id, axis === "w" ? { w: pt } : { h: pt });
+    if (sel.kind === "text") { const t = LX.texts.find((x) => x.id === sel.id); if (t) patchText(sel.id, { size: Math.max(6, (edits.texts?.[sel.id]?.size ?? t.size) * f) }); return; }
+    if (sel.kind === "block") return patchBlock(sel.id, { scale: Math.min(1, Math.max(0.5, (edits.blocks?.[sel.id]?.scale ?? 1) * f)) });
+    const ids = partGroup(edits, sel.id, L);
+    commit({ ...edits, parts: { ...edits.parts, ...Object.fromEntries(ids.map((id) => [id, { ...edits.parts?.[id], scale: Math.max(0.1, (edits.parts?.[id]?.scale ?? 1) * f) }])) } });
+  };
+
+  // Rulers live inside the stage SVG, in a gutter left of and above the bleed.
+  const totalH = (KIOSK_H + 2 * B) / (1 - 22 / zoom);
+  const k = zoom / totalH;
+  const G = guides.rulers ? 22 / k : 0;
+  const rs = 1 / k; // one screen px in kiosk units
+  const vbX = -B - G, vbY = -B - G, vbW = KIOSK_W + 2 * B + G, vbH = KIOSK_H + 2 * B + G;
+  const stepIn = zoom < 900 ? 6 : 3;
+  const ticksX = Array.from({ length: Math.floor(45 / stepIn) + 1 }, (_, i) => i * stepIn);
+  const ticksY = Array.from({ length: Math.floor(96 / stepIn) + 1 }, (_, i) => i * stepIn);
+
+  const layerRow = (active: boolean) =>
+    `flex-1 truncate py-1 text-left text-[11.5px] ${active ? "text-white" : "text-white/70 hover:text-white"}`;
+  const eyeBtn = "rounded-sm p-1 text-white/50 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]";
+
   return (
-    <div className={wide ? "grid gap-5" : "grid gap-5 lg:grid-cols-[minmax(0,300px)_1fr_minmax(0,280px)]"}>
+    <div
+      className={
+        (wide ? "fixed inset-0 z-[70] h-screen rounded-none " : "relative h-[86vh] min-h-[720px] rounded-md ") +
+        "flex overflow-hidden border border-white/10 bg-[#0B0A2A] text-white/85 [color-scheme:dark]"
+      }
+    >
       <style>{kioskFontFaceCss()}</style>
-      {/* Canvas */}
-      <div className={wide ? "order-1" : "order-1 lg:order-2"}>
-        <div className="mb-2 flex flex-wrap items-center gap-2">
-          <span className="text-[12px] font-semibold text-[#03002C]">View</span>
-          <button type="button" className={btn} aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(400, Math.round(z / 1.25)))} disabled={zoom <= 400}><Minus className="h-3.5 w-3.5" /></button>
-          <span className="min-w-[3.5rem] text-center text-[12px] text-[#03002C]/80">{Math.round((zoom / 640) * 100)}%</span>
-          <button type="button" className={btn} aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(4000, Math.round(z * 1.25)))} disabled={zoom >= 4000}><Plus className="h-3.5 w-3.5" /></button>
-          <button type="button" className={btn} onClick={() => { setZoom(640); setWide(false); }}>Fit</button>
-          <button type="button" className={btn} onClick={() => { setWide((w) => !w); setZoom((z) => (wide ? 640 : Math.max(z, 1100))); }}>
-            {wide ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
-            {wide ? "Smaller view" : "Big view"}
-          </button>
+
+      {/* Tool strip */}
+      <nav aria-label="Tools" className="flex w-12 shrink-0 flex-col items-center gap-2 border-r border-white/10 bg-[#070620] py-3">
+        <button type="button" className={dibtn} aria-pressed title="Select and move (V)" aria-label="Select and move"><MousePointer2 className="h-4 w-4" /></button>
+        <button type="button" className={dibtn} title="Add accent rule" aria-label="Add accent rule" onClick={() => addDivider("short")}><RectangleHorizontal className="h-4 w-4" /></button>
+        <span className="my-1 h-px w-6 bg-white/10" />
+        <button type="button" className={dibtn} title="Zoom in" aria-label="Zoom in" disabled={zoom >= 4000} onClick={() => setZoom((z) => Math.min(4000, Math.round(z * 1.25)))}><ZoomIn className="h-4 w-4" /></button>
+        <button type="button" className={dibtn} title="Zoom out" aria-label="Zoom out" disabled={zoom <= 400} onClick={() => setZoom((z) => Math.max(400, Math.round(z / 1.25)))}><ZoomOut className="h-4 w-4" /></button>
+        <button type="button" className={dibtn} title="Rulers" aria-label="Rulers" aria-pressed={guides.rulers} onClick={() => setGuides((g) => ({ ...g, rulers: !g.rulers }))}><RulerIcon className="h-4 w-4" /></button>
+        <button type="button" className={dibtn} title="Show side strips" aria-label="Show side strips" aria-pressed={showSides} onClick={() => setShowSides((s) => !s)}><Columns3 className="h-4 w-4" /></button>
+        <div className="mt-auto" />
+        <button type="button" className={dibtn} title={wide ? "Exit full screen (Esc)" : "Full screen"} aria-label={wide ? "Exit full screen" : "Full screen"} onClick={() => setWide((w) => !w)}>{wide ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}</button>
+      </nav>
+
+      {/* Layers */}
+      <aside aria-label="Layers" className="hidden w-60 shrink-0 flex-col border-r border-white/10 bg-[#0B0A2A] lg:flex">
+        <div className="flex h-11 items-center justify-between border-b border-white/10 px-3">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/60">Layers</span>
+          <span className="font-mono text-[10.5px] text-white/45">{LX.texts.length + LX.blocks.reduce((n, b) => n + (b.parts?.length ?? 0), 0)} objects</span>
         </div>
-        <div tabIndex={0} onKeyDown={onKey} aria-label="Kiosk canvas. Arrow keys nudge the selection." className="max-h-[80vh] overflow-auto rounded-md border border-[#03002C]/12 bg-[#F2F4F9] p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
-          {err ? <p className="text-sm text-[#E53D2E]">{err}</p> : null}
-          {!art && !err ? <p className="text-sm text-[#03002C]/70">Loading the partner's artwork…</p> : null}
+        <ul className="flex-1 space-y-1 overflow-auto p-2">
+          {LX.blocks.map((b) => {
+            const hidden = edits.blocks?.[b.id]?.hidden ?? b.screen;
+            const texts = LX.texts.filter((t) => { const m = (t.top + t.bottom) / 2; return m >= b.y0 && m < b.y1; });
+            return (
+              <li key={b.id} className="rounded-sm border border-white/[0.06] bg-white/[0.02]">
+                <div className={`flex items-center gap-1 px-2 ${sel?.id === b.id ? "bg-[#003FC7]/25" : ""}`}>
+                  <button type="button" className={`${layerRow(sel?.id === b.id)} font-semibold`} onClick={() => setSel({ kind: "block", id: b.id })}>
+                    {b.screen ? "London screen area" : `Piece ${Number(b.id.slice(1)) + 1}`}
+                  </button>
+                  <button type="button" aria-label={hidden ? "Show piece" : "Hide piece"} title={hidden ? "Show" : "Hide"} className={eyeBtn} onClick={() => patchBlock(b.id, { hidden: !hidden })}>
+                    {hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
+                {b.parts?.length ? (
+                  <ul className="border-t border-white/[0.06] py-0.5">
+                    {b.parts.map((q, i) => {
+                      const ph = edits.parts?.[q.id]?.hidden ?? false;
+                      const on = sel?.id === q.id || picked.includes(q.id);
+                      return (
+                        <li key={q.id} className={`flex items-center gap-0.5 pl-4 pr-1 ${on ? "bg-[#003FC7]/25" : ""}`}>
+                          <Shapes className="h-3 w-3 shrink-0 text-white/40" aria-hidden />
+                          <button type="button" className={`${layerRow(on)} pl-1.5`} onClick={(e) => pickPart(q.id, e.shiftKey)}>
+                            {isCopy(q.id) ? "Copy of object" : `Object ${i + 1}`}{badgedPartIds(edits).has(q.id) ? " · text" : ""}{(edits.groups ?? defaultPartGroups(L)).some((g) => g.includes(q.id)) ? " · grp" : ""}
+                          </button>
+                          <button type="button" aria-label={isLocked(q.id) ? "Unlock object" : "Lock object"} className={eyeBtn} onClick={() => { setSel({ kind: "part", id: q.id }); commit({ ...edits, locked: isLocked(q.id) ? (edits.locked ?? []).filter((x) => x !== q.id) : [...(edits.locked ?? []), q.id] }); }}>
+                            {isLocked(q.id) ? <Lock className="h-3 w-3" /> : <Unlock className="h-3 w-3 opacity-40" />}
+                          </button>
+                          <button type="button" aria-label={ph ? "Show object" : "Hide object"} className={eyeBtn} onClick={() => patchPart(q.id, { hidden: !ph })}>
+                            {ph ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : null}
+                {texts.length ? (
+                  <ul className="border-t border-white/[0.06] py-0.5">
+                    {texts.map((t) => {
+                      const th = edits.texts?.[t.id]?.hidden ?? false;
+                      const on = sel?.id === t.id;
+                      return (
+                        <li key={t.id} className={`flex items-center gap-0.5 pl-4 pr-1 ${on ? "bg-[#003FC7]/25" : ""}`}>
+                          <Type className="h-3 w-3 shrink-0 text-white/40" aria-hidden />
+                          <button type="button" className={`${layerRow(on)} pl-1.5`} onClick={() => { setSel({ kind: "text", id: t.id }); setPicked([]); }}>
+                            {edits.texts?.[t.id]?.text ?? t.text}
+                          </button>
+                          <button type="button" aria-label={isLocked(t.id) ? "Unlock text" : "Lock text"} className={eyeBtn} onClick={() => commit({ ...edits, locked: isLocked(t.id) ? (edits.locked ?? []).filter((x) => x !== t.id) : [...(edits.locked ?? []), t.id] })}>
+                            {isLocked(t.id) ? <Lock className="h-3 w-3" /> : <Unlock className="h-3 w-3 opacity-40" />}
+                          </button>
+                          <button type="button" aria-label={th ? "Show text" : "Hide text"} className={eyeBtn} onClick={() => patchText(t.id, { hidden: !th })}>
+                            {th ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : null}
+              </li>
+            );
+          })}
+          {edits.dividers?.length ? (
+            <li className="rounded-sm border border-white/[0.06] bg-white/[0.02]">
+              <p className="px-2 py-1 text-[11.5px] font-semibold text-white/70">Accent rules</p>
+              <ul className="border-t border-white/[0.06] py-0.5">
+                {edits.dividers.map((d, i) => (
+                  <li key={d.id} className={`flex items-center gap-1 pl-4 pr-1 ${sel?.id === d.id ? "bg-[#003FC7]/25" : ""}`}>
+                    <span aria-hidden className="h-1.5 w-4 rounded-[1px]" style={{ background: d.color }} />
+                    <button type="button" className={layerRow(sel?.id === d.id)} onClick={() => { setSel({ kind: "divider", id: d.id }); setPicked([]); }}>Rule {i + 1}</button>
+                    <button type="button" aria-label={d.hidden ? "Show rule" : "Hide rule"} className={eyeBtn} onClick={() => patchDivider(d.id, { hidden: !d.hidden })}>
+                      {d.hidden ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ) : null}
+        </ul>
+        <p className="border-t border-white/10 px-3 py-2 text-[10.5px] leading-snug text-white/50">Shift-click to multi-select. Rebuilt from {L.source}.</p>
+      </aside>
+
+      {/* Main column */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-white/10 bg-[#0B0A2A] px-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-white/60">{vendor} · Kiosk front</span>
+            <span className="rounded-sm border border-white/10 bg-black/30 px-1.5 py-0.5 font-mono text-[10px] text-white/60">rdraft</span>
+            {status ? <span role="status" className="hidden truncate text-[11px] text-white/60 xl:inline">{status}</span> : null}
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button type="button" className={dibtn} disabled={!history.length} onClick={undo} title="Undo (Ctrl/⌘ Z)" aria-label="Undo"><Undo2 className="h-4 w-4" /></button>
+            <button type="button" className={dibtn} disabled={!future.length} onClick={redo} title="Redo (Ctrl/⌘ Shift Z)" aria-label="Redo"><Redo2 className="h-4 w-4" /></button>
+            <span className="mx-1 h-4 w-px bg-white/10" />
+            <div className="flex rounded-sm border border-white/10 bg-black/40 p-0.5" role="group" aria-label="View size">
+              {([["Fit", 640], ["Large", 1100], ["Detail", 2200]] as const).map(([l, z]) => (
+                <button key={l} type="button" aria-pressed={zoom === z} onClick={() => setZoom(z)} className="rounded-[2px] px-2.5 py-1 text-[10.5px] font-medium text-white/55 hover:text-white aria-pressed:bg-white/15 aria-pressed:text-white">{l}</button>
+              ))}
+            </div>
+            <span className="w-11 text-right font-mono text-[10.5px] text-white/60">{Math.round((zoom / 640) * 100)}%</span>
+          </div>
+        </header>
+
+        {/* Stage */}
+        <div tabIndex={0} onKeyDown={onKey} aria-label="Kiosk canvas. Arrow keys nudge the selection." className="relative flex-1 overflow-auto bg-[#05041A] p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#003FC7]">
+          {err ? <p className="text-sm text-[#FF9B70]">{err}</p> : null}
+          {!art && !err ? <p className="text-sm text-white/60">Loading the partner's artwork…</p> : null}
           {art ? (
-            <svg
-              ref={svgRef}
-              viewBox={`${-B} ${-B} ${KIOSK_W + 2 * B} ${KIOSK_H + 2 * B}`}
-              style={{ height: zoom }}
-              className="mx-auto block w-auto touch-none select-none"
-              role="img"
-              aria-label={`${vendor} kiosk front, editable`}
-              onPointerMove={onMove}
-              onPointerUp={endDrag}
-              onPointerLeave={endDrag}
-              onPointerDown={() => { setSel(null); setPicked([]); }}
-            >
-              <defs>
-                <linearGradient id={`kg-${L.id}`} x1="0" y1="0" x2="0" y2="1">
-                  {ground.map((s) => <stop key={s.offset} offset={s.offset} stopColor={s.color} />)}
-                </linearGradient>
-                <g dangerouslySetInnerHTML={{ __html: `<symbol id="${symId}" viewBox="${art.viewBox}" overflow="visible">${art.inner}</symbol>` }} />
-                {placed.map((p) => (
-                  <clipPath key={p.block.id} id={`kc-${L.id}-${p.block.id}`}>
-                    <path clipRule="evenodd" d={pieceBackdropPath(L, p, B / p.scale + 1, 0, 0)} />
-                  </clipPath>
-                ))}
-                {placed.flatMap((p) => p.parts).map((q) => (
-                  <clipPath key={q.part.id} id={`kc-${L.id}-${q.part.id}`}>
-                    <rect x={q.src.x0} y={q.src.y0} width={q.src.x1 - q.src.x0} height={q.src.y1 - q.src.y0} />
-                  </clipPath>
-                ))}
-              </defs>
-              <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill={`url(#kg-${L.id})`} />
-              {placed.map((p) => {
-                const [, , vw, vh] = art.viewBox.split(/\s+/).map(Number);
-                const on = sel?.kind === "block" && sel.id === p.block.id;
-                return (
-                  <g key={p.block.id} transform={`translate(${p.x} ${p.y}) scale(${p.scale})`} onPointerDown={startDrag({ kind: "block", id: p.block.id })} className="cursor-move">
-                    <g clipPath={`url(#kc-${L.id}-${p.block.id})`}>
-                      <use href={`#${symId}`} x={-L.originX} y={-(L.originY + p.clipTop)} width={vw} height={vh} />
-                    </g>
-                    {on ? <rect x={0} y={0} width={L.trimW} height={p.clipBottom - p.clipTop} fill="none" stroke="#003FC7" strokeWidth={12 / p.scale} strokeDasharray={`${40 / p.scale} ${20 / p.scale}`} /> : null}
-                  </g>
-                );
-              })}
-              {placed.flatMap((p) => p.parts).filter((q) => !q.hidden).map((q) => {
-                const [, , vw, vh] = art.viewBox.split(/\s+/).map(Number);
-                const on = picked.includes(q.part.id) || (sel?.kind === "part" && sel.id === q.part.id);
-                const c = partCentre(q);
-                return (
-                  <g key={q.part.id} opacity={q.opacity < 1 ? q.opacity : undefined} transform={q.rot ? `rotate(${q.rot} ${c.x} ${c.y})` : undefined}>
-                    <g transform={`translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})`} onPointerDown={startDrag({ kind: "part", id: q.part.id })} className={isLocked(q.part.id) ? "cursor-default" : "cursor-move"}>
-                      <g clipPath={`url(#kc-${L.id}-${q.part.id})`}>
-                        <use href={`#${symId}`} x={-L.originX} y={-L.originY} width={vw} height={vh} />
+            <div className="mx-auto flex w-max items-start gap-4">
+              {showSides ? <ReturnStrip ground={ground} id={`${L.id}-l`} height={zoom} label="Left return · 4 × 96 in" offsetTop={G * k} /> : null}
+              <svg
+                ref={svgRef}
+                viewBox={`${vbX} ${vbY} ${vbW} ${vbH}`}
+                style={{ height: zoom + G * k }}
+                className="block w-auto touch-none select-none shadow-[0_24px_60px_rgba(0,0,0,0.6)]"
+                role="img"
+                aria-label={`${vendor} kiosk front, editable`}
+                onPointerMove={onMove}
+                onPointerUp={endDrag}
+                onPointerLeave={endDrag}
+                onPointerDown={() => { setSel(null); setPicked([]); }}
+              >
+                <defs>
+                  <linearGradient id={`kg-${L.id}`} x1="0" y1="0" x2="0" y2="1">
+                    {ground.map((s) => <stop key={s.offset} offset={s.offset} stopColor={s.color} />)}
+                  </linearGradient>
+                  <g dangerouslySetInnerHTML={{ __html: `<symbol id="${symId}" viewBox="${art.viewBox}" overflow="visible">${art.inner}</symbol>` }} />
+                  {placed.map((p) => (
+                    <clipPath key={p.block.id} id={`kc-${L.id}-${p.block.id}`}>
+                      <path clipRule="evenodd" d={pieceBackdropPath(L, p, B / p.scale + 1, 0, 0)} />
+                    </clipPath>
+                  ))}
+                  {placed.flatMap((p) => p.parts).map((q) => (
+                    <clipPath key={q.part.id} id={`kc-${L.id}-${q.part.id}`}>
+                      <rect x={q.src.x0} y={q.src.y0} width={q.src.x1 - q.src.x0} height={q.src.y1 - q.src.y0} />
+                    </clipPath>
+                  ))}
+                </defs>
+                {guides.rulers ? (
+                  <g data-export-ignore="true" pointerEvents="none" fontFamily="Geist Mono, monospace" fontSize={9.5 * rs}>
+                    <rect x={vbX} y={vbY} width={vbW} height={G} fill="#0B0A2A" />
+                    <rect x={vbX} y={vbY} width={G} height={vbH} fill="#0B0A2A" />
+                    {ticksX.map((i) => (
+                      <g key={`rx${i}`}>
+                        <line x1={i * 72} x2={i * 72} y1={-B - G * 0.45} y2={-B} stroke="#FFFFFF" strokeOpacity={0.45} strokeWidth={rs} />
+                        <text x={i * 72 + 3 * rs} y={-B - G * 0.5} fill="#FFFFFF" fillOpacity={0.6}>{unit === "in" ? i : Math.round(i * 25.4)}</text>
                       </g>
-                      <rect x={q.src.x0} y={q.src.y0} width={q.src.x1 - q.src.x0} height={q.src.y1 - q.src.y0} fill="transparent" stroke={on ? "#003FC7" : "none"} strokeWidth={10 / q.scale} strokeDasharray={`${30 / q.scale} ${15 / q.scale}`} />
-                    </g>
+                    ))}
+                    {ticksY.map((i) => (
+                      <g key={`ry${i}`}>
+                        <line y1={i * 72} y2={i * 72} x1={-B - G * 0.45} x2={-B} stroke="#FFFFFF" strokeOpacity={0.45} strokeWidth={rs} />
+                        <text x={-B - G + 3 * rs} y={i * 72 + 11 * rs} fill="#FFFFFF" fillOpacity={0.6}>{unit === "in" ? i : Math.round(i * 25.4)}</text>
+                      </g>
+                    ))}
+                    {bounds ? (
+                      <>
+                        <rect x={bounds.x0} y={-B - G} width={bounds.x1 - bounds.x0} height={G} fill="#003FC7" fillOpacity={0.45} />
+                        <rect y={bounds.y0} x={-B - G} height={bounds.y1 - bounds.y0} width={G} fill="#003FC7" fillOpacity={0.45} />
+                      </>
+                    ) : null}
                   </g>
-                );
-              })}
-              {(edits.dividers ?? []).filter((d) => !d.hidden).map((d) => {
-                const on = sel?.kind === "divider" && sel.id === d.id;
-                return (
+                ) : null}
+                <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill={`url(#kg-${L.id})`} />
+                {placed.map((p) => {
+                  const [, , vw, vh] = art.viewBox.split(/\s+/).map(Number);
+                  const on = sel?.kind === "block" && sel.id === p.block.id;
+                  return (
+                    <g key={p.block.id} transform={`translate(${p.x} ${p.y}) scale(${p.scale})`} onPointerDown={startDrag({ kind: "block", id: p.block.id })} className="cursor-move">
+                      <g clipPath={`url(#kc-${L.id}-${p.block.id})`}>
+                        <use href={`#${symId}`} x={-L.originX} y={-(L.originY + p.clipTop)} width={vw} height={vh} />
+                      </g>
+                      {on ? <rect x={0} y={0} width={L.trimW} height={p.clipBottom - p.clipTop} fill="none" stroke="#003FC7" strokeWidth={2 * rs / p.scale} /> : null}
+                    </g>
+                  );
+                })}
+                {placed.flatMap((p) => p.parts).filter((q) => !q.hidden).map((q) => {
+                  const [, , vw, vh] = art.viewBox.split(/\s+/).map(Number);
+                  const on = picked.includes(q.part.id) || (sel?.kind === "part" && sel.id === q.part.id);
+                  const c = partCentre(q);
+                  return (
+                    <g key={q.part.id} opacity={q.opacity < 1 ? q.opacity : undefined} transform={q.rot ? `rotate(${q.rot} ${c.x} ${c.y})` : undefined}>
+                      <g transform={`translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})`} onPointerDown={startDrag({ kind: "part", id: q.part.id })} className={isLocked(q.part.id) ? "cursor-default" : "cursor-move"}>
+                        <g clipPath={`url(#kc-${L.id}-${q.part.id})`}>
+                          <use href={`#${symId}`} x={-L.originX} y={-L.originY} width={vw} height={vh} />
+                        </g>
+                        <rect x={q.src.x0} y={q.src.y0} width={q.src.x1 - q.src.x0} height={q.src.y1 - q.src.y0} fill="transparent" stroke={on ? "#003FC7" : "none"} strokeWidth={2 * rs / q.scale} />
+                      </g>
+                    </g>
+                  );
+                })}
+                {(edits.dividers ?? []).filter((d) => !d.hidden).map((d) => (
                   <g key={d.id} onPointerDown={startDrag({ kind: "divider", id: d.id })} className={isLocked(d.id) ? "cursor-default" : "cursor-move"}
                     opacity={(d.opacity ?? 1) < 1 ? d.opacity : undefined} transform={d.rot ? `rotate(${d.rot} ${d.x + d.w / 2} ${d.y + d.h / 2})` : undefined}>
                     <rect x={d.x} y={d.y - 20} width={d.w} height={d.h + 40} fill="transparent" />
                     <rect x={d.x} y={d.y} width={d.w} height={d.h} rx={d.round ? d.h / 2 : 0} fill={d.color} />
-                    {on ? <rect x={d.x - 8} y={d.y - 8} width={d.w + 16} height={d.h + 16} fill="none" stroke="#003FC7" strokeWidth={6} strokeDasharray="24 12" /> : null}
                   </g>
-                );
-              })}
-              {placed.flatMap((p) => p.texts).map((t) => {
-                const on = sel?.kind === "text" && sel.id === t.id;
-                return (
+                ))}
+                {placed.flatMap((p) => p.texts).map((t) => (
                   <text
                     key={t.id}
                     fontSize={t.ksize}
@@ -566,327 +790,356 @@ export function KioskLayerEditor({ layout: L, vendor }: { layout: LiveLayout; ve
                     opacity={t.opacity < 1 ? t.opacity : undefined}
                     transform={t.rot ? `rotate(${t.rot} ${t.ax} ${t.ky})` : undefined}
                     className={isLocked(t.id) ? "cursor-default" : "cursor-move"}
-                    stroke={on ? "#003FC7" : undefined}
-                    strokeWidth={on ? 3 : undefined}
-                    paintOrder="stroke"
                     onPointerDown={startDrag({ kind: "text", id: t.id })}
                   >
                     {t.lines.map((s, i) => (
                       <tspan key={i} x={t.ax} y={t.ky + i * t.lead * t.ksize}>{s || " "}</tspan>
                     ))}
                   </text>
-                );
-              })}
-              {guide !== null ? (
-                <line data-export-ignore="true" pointerEvents="none" x1={guide} x2={guide} y1={0} y2={KIOSK_H} stroke="#EC388A" strokeWidth={4} strokeDasharray="18 12" />
-              ) : null}
-              <g data-export-ignore="true" pointerEvents="none">
-                <rect x={KIOSK_TV.x} y={KIOSK_TV.y} width={KIOSK_TV.w} height={KIOSK_TV.h} fill="#03002C" fillOpacity={0.55} stroke="#FFFFFF" strokeDasharray="30 18" strokeWidth={6} />
-                <text x={KIOSK_TV.x + KIOSK_TV.w / 2} y={KIOSK_TV.y + KIOSK_TV.h / 2} textAnchor="middle" fontSize={90} fill="#FFFFFF" fontFamily="Geist, sans-serif">TV keep-clear (guide, not printed)</text>
-                <rect x={0} y={0} width={KIOSK_W} height={KIOSK_H} fill="none" stroke="#EC008C" strokeWidth={6} />
-              </g>
-            </svg>
+                ))}
+                {/* Selection frame with corner handles (visual) and live size tag. */}
+                {bounds && sel?.kind !== "block" ? (
+                  <g data-export-ignore="true" pointerEvents="none">
+                    <rect x={bounds.x0} y={bounds.y0} width={bounds.x1 - bounds.x0} height={bounds.y1 - bounds.y0} fill="none" stroke="#003FC7" strokeWidth={1.5 * rs} />
+                    {[[bounds.x0, bounds.y0], [bounds.x1, bounds.y0], [bounds.x0, bounds.y1], [bounds.x1, bounds.y1]].map(([x, y], i) => (
+                      <rect key={i} x={x! - 3.5 * rs} y={y! - 3.5 * rs} width={7 * rs} height={7 * rs} fill="#FFFFFF" stroke="#003FC7" strokeWidth={1.5 * rs} />
+                    ))}
+                    <g transform={`translate(${(bounds.x0 + bounds.x1) / 2} ${bounds.y1 + 8 * rs})`}>
+                      <rect x={-46 * rs} y={0} width={92 * rs} height={17 * rs} rx={2 * rs} fill="#003FC7" />
+                      <text x={0} y={12 * rs} textAnchor="middle" fontSize={10 * rs} fill="#FFFFFF" fontFamily="Geist Mono, monospace">{fmtU(bounds.x1 - bounds.x0)} × {fmtU(bounds.y1 - bounds.y0)}</text>
+                    </g>
+                  </g>
+                ) : null}
+                {guide !== null ? (
+                  <line data-export-ignore="true" pointerEvents="none" x1={guide} x2={guide} y1={0} y2={KIOSK_H} stroke="#EC388A" strokeWidth={1.5 * rs} strokeDasharray={`${6 * rs} ${4 * rs}`} />
+                ) : null}
+                <g data-export-ignore="true" pointerEvents="none">
+                  {guides.tv ? (
+                    <>
+                      <rect x={KIOSK_TV.x} y={KIOSK_TV.y} width={KIOSK_TV.w} height={KIOSK_TV.h} fill="#03002C" fillOpacity={0.55} stroke="#FFEB66" strokeDasharray={`${8 * rs} ${5 * rs}`} strokeWidth={1.5 * rs} />
+                      <text x={KIOSK_TV.x + KIOSK_TV.w / 2} y={KIOSK_TV.y + KIOSK_TV.h / 2} textAnchor="middle" fontSize={12 * rs} fill="#FFEB66" fontFamily="Geist Mono, monospace">TV KEEP-CLEAR · NOT PRINTED</text>
+                    </>
+                  ) : null}
+                  {guides.safe ? <rect x={KIOSK_MARGIN} y={KIOSK_MARGIN} width={KIOSK_W - 2 * KIOSK_MARGIN} height={KIOSK_H - 2 * KIOSK_MARGIN} fill="none" stroke="#A1FBF9" strokeOpacity={0.8} strokeDasharray={`${4 * rs} ${4 * rs}`} strokeWidth={rs} /> : null}
+                  {guides.bleed ? <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="none" stroke="#E53D2E" strokeWidth={rs} /> : null}
+                  <rect x={0} y={0} width={KIOSK_W} height={KIOSK_H} fill="none" stroke="#EC008C" strokeWidth={1.5 * rs} />
+                </g>
+              </svg>
+              {showSides ? <ReturnStrip ground={ground} id={`${L.id}-r`} height={zoom} label="Right return · 4 × 96 in" offsetTop={G * k} /> : null}
+            </div>
           ) : null}
         </div>
-        <p className="mt-2 text-[12px] text-[#03002C]/70">Drag any object, piece or line of text to move it. Rebuilt from {L.source}. Draft until the San Francisco revision is published.</p>
-      </div>
 
-      {/* Layers */}
-      <div className={wide ? "order-2" : "order-2 lg:order-1"}>
-        <h4 className="text-sm font-semibold text-[#03002C]">Layers</h4>
-        <ul className="mt-2 max-h-[640px] space-y-1 overflow-auto pr-1">
-          {LX.blocks.map((b) => {
-            const hidden = edits.blocks?.[b.id]?.hidden ?? b.screen;
-            const texts = LX.texts.filter((t) => { const m = (t.top + t.bottom) / 2; return m >= b.y0 && m < b.y1; });
-            return (
-              <li key={b.id} className="rounded-md border border-[#03002C]/10 bg-white">
-                <div className="flex items-center gap-1 px-2 py-1.5">
-                  <button type="button" className={`flex-1 truncate text-left text-[12px] font-semibold ${sel?.id === b.id ? "text-primary" : "text-[#03002C]"}`} onClick={() => setSel({ kind: "block", id: b.id })}>
-                    {b.screen ? "London screen area" : `Graphics piece ${Number(b.id.slice(1)) + 1}`}
-                  </button>
-                  <button type="button" aria-label={hidden ? "Show piece" : "Hide piece"} title={hidden ? "Show" : "Hide"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchBlock(b.id, { hidden: !hidden })}>
-                    {hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                  </button>
-                </div>
-                {b.parts?.length ? (
-                  <ul className="border-t border-[#03002C]/8 px-2 py-1">
-                    {b.parts.map((q, i) => {
-                      const ph = edits.parts?.[q.id]?.hidden ?? false;
-                      return (
-                        <li key={q.id} className="flex items-center gap-1">
-                          <button type="button" className={`flex-1 truncate py-0.5 text-left text-[11.5px] ${sel?.id === q.id ? "text-primary" : "text-[#03002C]/80"}`} onClick={(e) => pickPart(q.id, e.shiftKey)}>
-                            {isCopy(q.id) ? "Copy of object" : `Object ${i + 1}`}{badgedPartIds(edits).has(q.id) ? " · as text" : ""}{(edits.groups ?? defaultPartGroups(L)).some((g) => g.includes(q.id)) ? " · grouped" : ""}{isLocked(q.id) ? " · locked" : ""}
-                          </button>
-                          <button type="button" aria-label={ph ? "Show object" : "Hide object"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchPart(q.id, { hidden: !ph })}>
-                            {ph ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : null}
-                {texts.length ? (
-                  <ul className="border-t border-[#03002C]/8 px-2 py-1">
-                    {texts.map((t) => {
-                      const th = edits.texts?.[t.id]?.hidden ?? false;
-                      return (
-                        <li key={t.id} className="flex items-center gap-1">
-                          <button type="button" className={`flex-1 truncate py-0.5 text-left text-[11.5px] ${sel?.id === t.id ? "text-primary" : "text-[#03002C]/80"}`} onClick={() => setSel({ kind: "text", id: t.id })}>
-                            “{edits.texts?.[t.id]?.text ?? t.text}”
-                          </button>
-                          <button type="button" aria-label={th ? "Show text" : "Hide text"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchText(t.id, { hidden: !th })}>
-                            {th ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
-        {edits.dividers?.length ? (
-          <>
-            <h4 className="mt-3 text-sm font-semibold text-[#03002C]">Accent dividers</h4>
-            <ul className="mt-1 space-y-1">
-              {edits.dividers.map((d, i) => (
-                <li key={d.id} className="flex items-center gap-1 rounded-md border border-[#03002C]/10 bg-white px-2 py-1">
-                  <span aria-hidden className="h-2 w-6 rounded-sm border border-[#03002C]/20" style={{ background: d.color }} />
-                  <button type="button" className={`flex-1 truncate text-left text-[12px] ${sel?.id === d.id ? "text-primary" : "text-[#03002C]"}`} onClick={() => { setSel({ kind: "divider", id: d.id }); setPicked([]); }}>Divider {i + 1}</button>
-                  <button type="button" aria-label={d.hidden ? "Show divider" : "Hide divider"} className="rounded p-1 hover:bg-[#F2F4F9]" onClick={() => patchDivider(d.id, { hidden: !d.hidden })}>
-                    {d.hidden ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : null}
+        <footer className="flex h-7 shrink-0 items-center justify-between gap-4 border-t border-white/10 bg-[#070620] px-3 font-mono text-[10px] text-white/55">
+          <span>{bounds ? `X ${fmtU(bounds.x0)}  Y ${fmtU(bounds.y0)}  W ${fmtU(bounds.x1 - bounds.x0)}  H ${fmtU(bounds.y1 - bounds.y0)} ${unit}` : "Nothing selected"}</span>
+          <button type="button" onClick={() => setTab("checks")} className={errors ? "text-[#FF9B70] hover:underline" : "text-white/55 hover:underline"}>
+            {errors ? `${errors} print issue${errors === 1 ? "" : "s"}` : checks.length ? `${checks.length} note${checks.length === 1 ? "" : "s"}` : "Print checks clear"}
+          </button>
+        </footer>
       </div>
 
       {/* Inspector */}
-      <div className="order-3 space-y-4">
-        <div className="flex flex-wrap gap-2">
-          <button type="button" className={btn} disabled={!history.length} onClick={undo} title="Undo (Ctrl/⌘ Z)"><Undo2 className="h-3.5 w-3.5" />Undo</button>
-          <button type="button" className={btn} disabled={!future.length} onClick={redo} title="Redo (Ctrl/⌘ Shift Z)"><Redo2 className="h-3.5 w-3.5" />Redo</button>
-          <button type="button" className={btn} onClick={() => commit({})}><RotateCcw className="h-3.5 w-3.5" />Reset to London</button>
-          <button type="button" className={btn} disabled={!userId || busy === "save"} onClick={save} title={userId ? undefined : "Sign in to save"}><Save className="h-3.5 w-3.5" />Save</button>
+      <aside aria-label="Properties" className="flex w-[300px] shrink-0 flex-col border-l border-white/10 bg-[#0B0A2A]">
+        <div role="tablist" aria-label="Inspector" className="flex h-11 shrink-0 items-end gap-4 border-b border-white/10 px-3">
+          {([["design", "Design"], ["checks", `Checks${checks.length ? ` · ${checks.length}` : ""}`], ["export", "Export"]] as const).map(([id, label]) => (
+            <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)}
+              className="-mb-px border-b-2 border-transparent pb-2.5 text-[11.5px] font-semibold text-white/55 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] aria-selected:border-[#003FC7] aria-selected:text-white">{label}</button>
+          ))}
         </div>
 
-        {sel && sel.kind !== "block" && selFx ? (
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold text-[#03002C]">Arrange</h4>
-            <div className="flex flex-wrap gap-1">
-              <button type="button" className={btn} onClick={() => duplicate()} title="Duplicate (Ctrl/⌘ D)"><CopyPlus className="h-3.5 w-3.5" />Duplicate</button>
-              <button type="button" className={btn} onClick={() => { clip.current = sel; setStatus("Copied — press Ctrl/⌘ V to paste."); }} title="Copy (Ctrl/⌘ C)"><Copy className="h-3.5 w-3.5" />Copy</button>
-              <button type="button" className={btn} disabled={!clip.current} onClick={() => clip.current && duplicate(clip.current)} title="Paste (Ctrl/⌘ V)"><ClipboardPaste className="h-3.5 w-3.5" />Paste</button>
-              <button type="button" className={btn} aria-pressed={isLocked(sel.id)} onClick={() => toggleLock(sel.id)}>{isLocked(sel.id) ? <Lock className="h-3.5 w-3.5" /> : <Unlock className="h-3.5 w-3.5" />}{isLocked(sel.id) ? "Locked" : "Lock"}</button>
-              <button type="button" className={btn} onClick={removeSel} title="Delete (Del)"><Trash2 className="h-3.5 w-3.5" />{sel.kind === "divider" || isCopy(sel.id) ? "Delete" : "Remove"}</button>
-            </div>
-            {sel.kind !== "text" ? (
-              <div className="flex gap-1" role="group" aria-label="Stacking order">
-                <button type="button" className={ibtn} aria-label="Bring to front" title="Bring to front (Shift ])" onClick={() => arrange("front")}><BringToFront className="h-4 w-4" /></button>
-                <button type="button" className={ibtn} aria-label="Bring forward" title="Bring forward (])" onClick={() => arrange("forward")}><ArrowUp className="h-4 w-4" /></button>
-                <button type="button" className={ibtn} aria-label="Send backward" title="Send backward ([)" onClick={() => arrange("backward")}><ArrowDown className="h-4 w-4" /></button>
-                <button type="button" className={ibtn} aria-label="Send to back" title="Send to back (Shift [)" onClick={() => arrange("back")}><SendToBack className="h-4 w-4" /></button>
-              </div>
-            ) : null}
-            <label className="block text-[12px] text-[#03002C]/80">See-through {Math.round(selFx.opacity * 100)}%
-              <input type="range" min={5} max={100} className="mt-1 w-full" value={Math.round(selFx.opacity * 100)} onChange={(e) => setFx({ opacity: Number(e.target.value) / 100 }, false)} onPointerUp={() => setHistory((h) => [...h, edits])} />
-            </label>
-            <label className="block text-[12px] text-[#03002C]/80">Rotate {Math.round(selFx.rot)}°
-              <input type="range" min={-180} max={180} className="mt-1 w-full" value={Math.round(selFx.rot)} onChange={(e) => setFx({ rot: Number(e.target.value) }, false)} onPointerUp={() => setHistory((h) => [...h, edits])} />
-            </label>
-            <div className="flex gap-1">
-              {[-90, 0, 90].map((r) => <button key={r} type="button" className={btn} onClick={() => setFx({ rot: r })}>{r === 0 ? "Straight" : `${r > 0 ? "+" : ""}${r}°`}</button>)}
-            </div>
-            {isLocked(sel.id) ? <p className="text-[11px] text-[#03002C]/65">Locked: it can't be dragged, nudged or aligned until you unlock it.</p> : null}
-            {sel.kind !== "text" && sel.kind !== "divider" ? <p className="text-[11px] text-[#03002C]/65">Stacking changes order among the objects in the same piece. Text always sits on top.</p> : null}
-          </div>
-        ) : null}
+        <div className="flex-1 space-y-5 overflow-y-auto p-3">
+          {tab === "design" ? (
+            <>
+              {sel && bounds ? (
+                <Sec title="Transform" aside={
+                  <div className="flex rounded-sm border border-white/10 p-0.5" role="group" aria-label="Units">
+                    {(["in", "mm"] as const).map((u) => <button key={u} type="button" aria-pressed={unit === u} onClick={() => setUnit(u)} className="rounded-[2px] px-1.5 font-mono text-[10px] text-white/55 aria-pressed:bg-white/15 aria-pressed:text-white">{u}</button>)}
+                  </div>
+                }>
+                  <div className="grid grid-cols-2 gap-2">
+                    <NumField label="X" value={toU(bounds.x0)} digits={unit === "in" ? 2 : 1} onCommit={(v) => setPos("x", fromU(v))} disabled={isLocked(sel.id)} />
+                    <NumField label="Y" value={toU(bounds.y0)} digits={unit === "in" ? 2 : 1} onCommit={(v) => setPos("y", fromU(v))} disabled={isLocked(sel.id)} />
+                    <NumField label="W" value={toU(bounds.x1 - bounds.x0)} digits={unit === "in" ? 2 : 1} onCommit={(v) => setSize("w", fromU(v))} disabled={isLocked(sel.id)} />
+                    <NumField label="H" value={toU(bounds.y1 - bounds.y0)} digits={unit === "in" ? 2 : 1} onCommit={(v) => setSize("h", fromU(v))} disabled={isLocked(sel.id) || sel.kind !== "divider"} />
+                    {selFx ? <NumField label="Rotate °" value={selFx.rot} digits={0} onCommit={(v) => setFx({ rot: Math.max(-180, Math.min(180, v)) })} disabled={isLocked(sel.id)} /> : null}
+                    {selFx ? <NumField label="Opacity %" value={selFx.opacity * 100} digits={0} onCommit={(v) => setFx({ opacity: Math.max(5, Math.min(100, v)) / 100 })} /> : null}
+                  </div>
+                  <p className="text-[10.5px] text-white/50">Measured from the trim's top-left corner. W scales in proportion; H is editable on rules. Arrow keys nudge, Shift + arrow moves ½ in.</p>
+                </Sec>
+              ) : (
+                <p className="rounded-sm border border-dashed border-white/15 p-3 text-[12px] text-white/60">Select an object on the kiosk or in Layers to edit its position, type and appearance.</p>
+              )}
 
-        {sel ? (
-          <div className="space-y-1.5">
-            <h4 className="text-sm font-semibold text-[#03002C]">Align on kiosk</h4>
-            <div className="flex flex-wrap gap-1" role="group" aria-label="Align on kiosk">
-              <button type="button" className={ibtn} aria-label="Left margin" title="Left margin (2 in)" onClick={() => alignKiosk("left")}><AlignStartVertical className="h-4 w-4" /></button>
-              <button type="button" className={ibtn} aria-label="Centre of kiosk" title="Centre of kiosk" onClick={() => alignKiosk("center")}><AlignCenterVertical className="h-4 w-4" /></button>
-              <button type="button" className={ibtn} aria-label="Right margin" title="Right margin (2 in)" onClick={() => alignKiosk("right")}><AlignEndVertical className="h-4 w-4" /></button>
-            </div>
-            <p className="text-[11px] text-[#03002C]/65">Dragging snaps to the margins and centre line (hold Alt to move freely). Arrow keys nudge; Shift + arrow moves ½ in.</p>
-          </div>
-        ) : null}
+              {sel ? (
+                <Sec title="Align" aside={
+                  <select aria-label="Align to" value={alignTarget} onChange={(e) => setAlignTarget(e.target.value as typeof alignTarget)} className="rounded-sm border border-white/10 bg-black/30 px-1.5 py-0.5 text-[10.5px] text-white">
+                    <option value="trim">To trim</option><option value="safe">To safe margin</option><option value="tv">To TV area</option>
+                  </select>
+                }>
+                  <div className="flex flex-wrap gap-1" role="group" aria-label="Align selection">
+                    {([
+                      ["left", AlignStartVertical, "Align left"], ["hcenter", AlignCenterVertical, "Align horizontal centres"], ["right", AlignEndVertical, "Align right"],
+                      ["top", AlignStartHorizontal, "Align top"], ["vmiddle", AlignCenterHorizontal, "Align vertical middles"], ["bottom", AlignEndHorizontal, "Align bottom"],
+                    ] as const).map(([m, Icon, label]) => (
+                      <button key={m} type="button" className={dibtn} aria-label={label} title={label} disabled={isLocked(sel.id)} onClick={() => (picked.length > 1 ? alignPicked(m) : alignTo(m))}><Icon className="h-4 w-4" /></button>
+                    ))}
+                    <span className="mx-0.5 w-px bg-white/10" />
+                    <button type="button" className={dibtn} aria-label="Distribute horizontally" title="Distribute horizontally (3+ objects)" disabled={picked.length < 3} onClick={() => alignPicked("hspread")}><AlignHorizontalSpaceAround className="h-4 w-4" /></button>
+                    <button type="button" className={dibtn} aria-label="Distribute vertically" title="Distribute vertically (3+ objects)" disabled={picked.length < 3} onClick={() => alignPicked("vspread")}><AlignVerticalSpaceAround className="h-4 w-4" /></button>
+                  </div>
+                  <p className="text-[10.5px] text-white/50">{picked.length > 1 ? `Aligning ${picked.length} objects to each other.` : "Dragging snaps to the margins and centre line; hold Alt to move freely."}</p>
+                </Sec>
+              ) : null}
 
-        {selText && selPlaced ? (
-          <div className="space-y-2.5">
-            <h4 className="text-sm font-semibold text-[#03002C]">Text</h4>
-            <label className="block text-[12px] text-[#03002C]/80">Words <span className="text-[#03002C]/60">(Enter starts a new line)</span>
-              <textarea className="mt-1 w-full rounded-md border border-[#03002C]/15 p-2 text-[13px] text-[#03002C]" rows={3} value={edits.texts?.[selText.id]?.text ?? selText.text} onChange={(e) => patchText(selText.id, { text: e.target.value }, false)} onBlur={() => setHistory((h) => [...h, edits])} />
-            </label>
-            <div className="space-y-1">
-              <span className="text-[12px] text-[#03002C]/80">Line alignment</span>
-              <div className="flex gap-1" role="group" aria-label="Line alignment">
-                {([["left", AlignLeft, "Align lines left"], ["center", AlignCenter, "Centre lines"], ["right", AlignRight, "Align lines right"]] as const).map(([a, Icon, label]) => (
-                  <button key={a} type="button" className={ibtn} aria-label={label} title={label} aria-pressed={selPlaced.align === a} onClick={() => patchText(selText.id, { align: a })}><Icon className="h-4 w-4" /></button>
+              {sel && sel.kind !== "block" && selFx ? (
+                <Sec title="Arrange">
+                  <div className="flex flex-wrap gap-1">
+                    <button type="button" className={dibtn} aria-label="Duplicate" title="Duplicate (Ctrl/⌘ D)" onClick={() => duplicate()}><CopyPlus className="h-4 w-4" /></button>
+                    <button type="button" className={dibtn} aria-label="Copy" title="Copy (Ctrl/⌘ C)" onClick={() => { clip.current = sel; setStatus("Copied — press Ctrl/⌘ V to paste."); }}><Copy className="h-4 w-4" /></button>
+                    <button type="button" className={dibtn} aria-label="Paste" title="Paste (Ctrl/⌘ V)" disabled={!clip.current} onClick={() => clip.current && duplicate(clip.current)}><ClipboardPaste className="h-4 w-4" /></button>
+                    <button type="button" className={dibtn} aria-label={isLocked(sel.id) ? "Unlock" : "Lock"} title={isLocked(sel.id) ? "Unlock" : "Lock"} aria-pressed={isLocked(sel.id)} onClick={() => toggleLock(sel.id)}>{isLocked(sel.id) ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}</button>
+                    <button type="button" className={dibtn} aria-label="Delete" title="Delete (Del)" onClick={removeSel}><Trash2 className="h-4 w-4" /></button>
+                    {sel.kind !== "text" ? (
+                      <>
+                        <span className="mx-0.5 w-px bg-white/10" />
+                        <button type="button" className={dibtn} aria-label="Bring to front" title="Bring to front (Shift ])" onClick={() => arrange("front")}><BringToFront className="h-4 w-4" /></button>
+                        <button type="button" className={dibtn} aria-label="Bring forward" title="Bring forward (])" onClick={() => arrange("forward")}><ArrowUp className="h-4 w-4" /></button>
+                        <button type="button" className={dibtn} aria-label="Send backward" title="Send backward ([)" onClick={() => arrange("backward")}><ArrowDown className="h-4 w-4" /></button>
+                        <button type="button" className={dibtn} aria-label="Send to back" title="Send to back (Shift [)" onClick={() => arrange("back")}><SendToBack className="h-4 w-4" /></button>
+                      </>
+                    ) : null}
+                  </div>
+                  {isLocked(sel.id) ? <p className="text-[10.5px] text-white/50">Locked: it can't be dragged, nudged or aligned until you unlock it.</p> : null}
+                </Sec>
+              ) : null}
+
+              {picked.length > 1 || (selPart && partGroup(edits, selPart.id, L).length > 1) ? (
+                <Sec title={`${picked.length} objects selected`}>
+                  <div className="flex flex-wrap gap-1.5">
+                    <button type="button" className={dbtn} disabled={picked.length < 2 || (edits.groups ?? defaultPartGroups(L)).some((g) => g.length === picked.length && picked.every((x) => g.includes(x)))}
+                      onClick={() => commit({ ...edits, groups: [...(edits.groups ?? defaultPartGroups(L)).filter((g) => !g.some((x) => picked.includes(x))), picked] })}><Group className="h-3.5 w-3.5" />Group</button>
+                    <button type="button" className={dbtn} disabled={!(edits.groups ?? defaultPartGroups(L)).some((g) => g.some((x) => picked.includes(x)))}
+                      onClick={() => { commit({ ...edits, groups: (edits.groups ?? defaultPartGroups(L)).filter((g) => !g.some((x) => picked.includes(x))) }); setPicked(sel ? [sel.id] : []); }}><Ungroup className="h-3.5 w-3.5" />Ungroup</button>
+                    <button type="button" className={dbtn} onClick={() => commit({ ...edits, parts: { ...edits.parts, ...Object.fromEntries(picked.map((id) => [id, { ...edits.parts?.[id], hidden: !(edits.parts?.[id]?.hidden ?? false) }])) } })}>Hide / show</button>
+                    <button type="button" className={dbtn} onClick={() => commit({ ...edits, parts: { ...edits.parts, ...Object.fromEntries(picked.map((id) => [id, { dx: 0, dy: 0, scale: 1, hidden: false }])) } })}>Put back</button>
+                  </div>
+                </Sec>
+              ) : null}
+
+              {selText && selPlaced ? (
+                <Sec title="Type">
+                  <label className="block text-[10.5px] text-white/55">Words <span className="text-white/40">(Enter starts a new line)</span>
+                    <textarea className={`${field} mt-1 font-sans text-[13px]`} rows={3} value={edits.texts?.[selText.id]?.text ?? selText.text} onChange={(e) => patchText(selText.id, { text: e.target.value }, false)} onBlur={() => setHistory((h) => [...h, edits])} />
+                  </label>
+                  <div className="flex items-center justify-between rounded-sm border border-white/10 bg-black/30 px-2 py-1.5 text-[12px]">
+                    <span className="text-white/85">{selText.font}</span>
+                    <span className="text-[10px] text-white/45">as supplied</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <NumField label="Size pt" value={edits.texts?.[selText.id]?.size ?? selText.size} digits={0} onCommit={(v) => patchText(selText.id, { size: Math.max(6, v) })} />
+                    <NumField label="Leading ×" value={selPlaced.lead} digits={2} onCommit={(v) => patchText(selText.id, { lead: Math.max(0.8, Math.min(2, v)) })} />
+                    <NumField label="Tracking" value={edits.texts?.[selText.id]?.track ?? 0} digits={0} onCommit={(v) => patchText(selText.id, { track: Math.max(-50, Math.min(300, v)) || undefined })} />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1" role="group" aria-label="Paragraph alignment">
+                      {([["left", AlignLeft, "Align lines left"], ["center", AlignCenter, "Centre lines"], ["right", AlignRight, "Align lines right"]] as const).map(([a, Icon, label]) => (
+                        <button key={a} type="button" className={dibtn} aria-label={label} title={label} aria-pressed={selPlaced.align === a} onClick={() => patchText(selText.id, { align: a })}><Icon className="h-4 w-4" /></button>
+                      ))}
+                    </div>
+                    <label className="ml-auto flex items-center gap-1.5 text-[10.5px] text-white/55">Colour
+                      <input type="color" className="h-7 w-9 cursor-pointer rounded-sm border border-white/10 bg-transparent" value={edits.texts?.[selText.id]?.color ?? selText.color} onChange={(e) => patchText(selText.id, { color: e.target.value.toUpperCase() })} />
+                    </label>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    <button type="button" className={dbtn} onClick={() => {
+                      const b = selBounds({ kind: "text", id: selText.id });
+                      if (!b) return;
+                      const cur = edits.texts?.[selText.id]?.size ?? selText.size;
+                      const size = Math.max(6, Math.floor(cur * ((KIOSK_W - 2 * KIOSK_MARGIN) / Math.max(1, b.x1 - b.x0))));
+                      alignKiosk("center", { ...edits, texts: { ...edits.texts, [selText.id]: { ...edits.texts?.[selText.id], size } } });
+                    }}>Fit to safe width</button>
+                    <button type="button" className={dbtn} onClick={() => patchText(selText.id, { size: undefined, lead: undefined, track: undefined, align: undefined })}>Original sizing</button>
+                  </div>
+                  {(() => {
+                    const me = selBounds({ kind: "text", id: selText.id });
+                    if (!me) return null;
+                    const hits = placed.flatMap((p) => p.texts).filter((o) => {
+                      if (o.id === selText.id) return false;
+                      const b = selBounds({ kind: "text", id: o.id });
+                      return !!b && b.x0 < me.x1 && b.x1 > me.x0 && b.y0 < me.y1 && b.y1 > me.y0;
+                    });
+                    return hits.length ? (
+                      <p role="alert" className="rounded-sm border border-[#FF9B70]/40 bg-[#FF9B70]/10 p-2 text-[11.5px] text-white">
+                        Overlaps {hits.slice(0, 2).map((h) => `“${h.lines[0]}”`).join(", ")}{hits.length > 2 ? ` and ${hits.length - 2} more` : ""}.
+                      </p>
+                    ) : null;
+                  })()}
+                </Sec>
+              ) : null}
+
+              {selPart ? (
+                <Sec title="Object">
+                  <div className="flex flex-wrap gap-1.5">
+                    <button type="button" className={dbtn} onClick={() => patchPart(selPart.id, { dx: 0, dy: 0, scale: 1, hidden: false })}>Put back</button>
+                    {badgeOf(selPart.id)
+                      ? <button type="button" className={dbtn} onClick={() => restorePicture(selPart.id)}>Put the picture back</button>
+                      : <button type="button" className={dbtn} onClick={() => replaceWithText(selPart.id)}><Type className="h-3.5 w-3.5" />Replace with text</button>}
+                  </div>
+                  <p className="text-[10.5px] text-white/50">A logo, icon, QR code or shape group from the London file, with its own shapes, gradients and effects.</p>
+                </Sec>
+              ) : null}
+
+              {selBlock ? (
+                <Sec title="Graphics piece">
+                  <p className="text-[10.5px] text-white/50">Logos, icons and QR codes inside this piece move with it. Pieces scale between 50 % and 100 %, never past the kiosk width.</p>
+                </Sec>
+              ) : null}
+
+              {selDivider ? (
+                <Sec title="Accent rule">
+                  <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Rule colour">
+                    {ACCENTS.map((a) => (
+                      <button key={a.color} type="button" aria-label={a.name} title={a.name} aria-pressed={selDivider.color === a.color}
+                        className="h-6 w-6 rounded-sm border border-white/20 aria-pressed:ring-2 aria-pressed:ring-[#003FC7] aria-pressed:ring-offset-1 aria-pressed:ring-offset-[#0B0A2A]"
+                        style={{ background: a.color }} onClick={() => patchDivider(selDivider.id, { color: a.color })} />
+                    ))}
+                  </div>
+                  <label className="flex items-center gap-2 text-[11.5px] text-white/70">
+                    <input type="checkbox" className="accent-[#003FC7]" checked={!!selDivider.round} onChange={(e) => patchDivider(selDivider.id, { round: e.target.checked })} /> Rounded ends
+                  </label>
+                </Sec>
+              ) : null}
+
+              <Sec title="Add">
+                <div className="flex flex-wrap gap-1.5">
+                  <button type="button" className={dbtn} onClick={() => addDivider("short")}>Short rule</button>
+                  <button type="button" className={dbtn} onClick={() => addDivider("full")}>Full-width rule</button>
+                  <button type="button" className={dbtn} disabled={!sel || sel.kind === "divider"} onClick={() => addDivider("under")}>Rule under selection</button>
+                </div>
+              </Sec>
+
+              <Sec title="Background">
+                <div className="flex gap-3 text-[10.5px] text-white/55">
+                  <label className="flex items-center gap-1.5">Top <input type="color" className="h-7 w-9 rounded-sm border border-white/10 bg-transparent" value={ground[0]!.color} onChange={(e) => commit({ ...edits, ground: { top: e.target.value.toUpperCase(), bottom: ground[ground.length - 1]!.color } })} /></label>
+                  <label className="flex items-center gap-1.5">Bottom <input type="color" className="h-7 w-9 rounded-sm border border-white/10 bg-transparent" value={ground[ground.length - 1]!.color} onChange={(e) => commit({ ...edits, ground: { top: ground[0]!.color, bottom: e.target.value.toUpperCase() } })} /></label>
+                </div>
+                <p className="text-[10.5px] text-white/50">The side strips carry the same background ramp.</p>
+              </Sec>
+
+              <Sec title="Guides">
+                <div className="grid grid-cols-2 gap-1.5">
+                  {([["bleed", "Bleed"], ["safe", "Safe margin"], ["tv", "TV keep-clear"], ["rulers", "Rulers"]] as const).map(([g, label]) => (
+                    <label key={g} className="flex items-center justify-between rounded-sm border border-white/10 bg-black/20 px-2 py-1.5 text-[11.5px] text-white/75">
+                      {label}
+                      <input type="checkbox" className="accent-[#003FC7]" checked={guides[g]} onChange={(e) => setGuides((s) => ({ ...s, [g]: e.target.checked }))} />
+                    </label>
+                  ))}
+                </div>
+                <p className="text-[10.5px] text-white/50">Guides never print.</p>
+              </Sec>
+            </>
+          ) : null}
+
+          {tab === "checks" ? (
+            <Sec title="Live print checks">
+              {checks.length === 0 ? (
+                <p className="flex items-center gap-2 rounded-sm border border-white/10 bg-black/20 p-2.5 text-[12px] text-white/80"><CheckCircle2 className="h-4 w-4 text-[#A6FA87]" aria-hidden />Nothing over the TV area, past the trim or outside the safe margin.</p>
+              ) : (
+                <ul className="space-y-1.5">
+                  {checks.map((c, i) => (
+                    <li key={i}>
+                      <button type="button" onClick={() => { setSel(c.sel); setPicked(c.sel.kind === "part" ? [c.sel.id] : []); setTab("design"); }}
+                        className="flex w-full items-start gap-2 rounded-sm border border-white/10 bg-black/20 p-2 text-left hover:border-[#003FC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
+                        <AlertTriangle className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${c.level === "error" ? "text-[#FF9B70]" : "text-[#FFEB66]"}`} aria-hidden />
+                        <span className="min-w-0">
+                          <span className="block truncate text-[12px] font-medium text-white">{c.label}</span>
+                          <span className="block text-[11px] text-white/60">{c.issue}</span>
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <p className="text-[10.5px] text-white/50">Checks run as you edit. Click an item to select it. Artwork pieces are allowed to run into the bleed; text is not.</p>
+            </Sec>
+          ) : null}
+
+          {tab === "export" ? (
+            <Sec title="Download · draft">
+              <button type="button" className={`${dbtn} w-full justify-center border-[#003FC7] bg-[#003FC7] text-white hover:bg-[#003FC7]/85`} disabled={!!busy} onClick={() => dl("zip")}><Download className="h-3.5 w-3.5" />{busy === "zip" ? "Building…" : "All files (.zip)"}</button>
+              <div className="grid grid-cols-2 gap-1.5">
+                {([["ai", "Illustrator .ai"], ["pdf", "PDF"], ["svg", "Layered .svg"], ["press", "Press, outlined"], ["png", "PNG proof"]] as const).map(([kk, label]) => (
+                  <button key={kk} type="button" className={`${dbtn} justify-center`} disabled={!!busy} onClick={() => dl(kk)}>{busy === kk ? "…" : label}</button>
                 ))}
               </div>
-            </div>
-            <label className="block text-[12px] text-[#03002C]/80">Size {Math.round(edits.texts?.[selText.id]?.size ?? selText.size)} pt
-              <div className="mt-1 flex items-center gap-2">
-                <input type="range" min={6} max={Math.max(400, Math.round(selText.size * 3))} className="flex-1" value={Math.round(edits.texts?.[selText.id]?.size ?? selText.size)} onChange={(e) => patchText(selText.id, { size: Number(e.target.value) }, false)} />
-                <input type="number" min={6} aria-label="Size in points" className="w-16 rounded-md border border-[#03002C]/15 p-1 text-[13px]" value={Math.round(edits.texts?.[selText.id]?.size ?? selText.size)} onChange={(e) => patchText(selText.id, { size: Number(e.target.value) || selText.size })} />
-              </div>
-            </label>
-            <div className="flex flex-wrap gap-2">
-              <button type="button" className={btn} onClick={() => {
-                const b = selBounds({ kind: "text", id: selText.id });
-                if (!b) return;
-                const cur = edits.texts?.[selText.id]?.size ?? selText.size;
-                const size = Math.max(6, Math.floor(cur * ((KIOSK_W - 2 * KIOSK_MARGIN) / Math.max(1, b.x1 - b.x0))));
-                alignKiosk("center", { ...edits, texts: { ...edits.texts, [selText.id]: { ...edits.texts?.[selText.id], size } } });
-              }}>Fit to kiosk width</button>
-              <button type="button" className={btn} onClick={() => patchText(selText.id, { size: undefined, lead: undefined, track: undefined, align: undefined })}>Original sizing</button>
-            </div>
-            <label className="block text-[12px] text-[#03002C]/80">Line spacing {selPlaced.lead.toFixed(2)}×
-              <input type="range" min={80} max={200} className="mt-1 w-full" value={Math.round(selPlaced.lead * 100)} onChange={(e) => patchText(selText.id, { lead: Number(e.target.value) / 100 }, false)} />
-            </label>
-            <label className="block text-[12px] text-[#03002C]/80">Letter spacing {edits.texts?.[selText.id]?.track ?? 0}
-              <input type="range" min={-50} max={300} step={5} className="mt-1 w-full" value={edits.texts?.[selText.id]?.track ?? 0} onChange={(e) => patchText(selText.id, { track: Number(e.target.value) || undefined }, false)} />
-            </label>
-            <label className="flex items-center gap-2 text-[12px] text-[#03002C]/80">Colour
-              <input type="color" value={edits.texts?.[selText.id]?.color ?? selText.color} onChange={(e) => patchText(selText.id, { color: e.target.value.toUpperCase() })} />
-            </label>
-            {(() => {
-              const me = selBounds({ kind: "text", id: selText.id });
-              if (!me) return null;
-              const hits = placed.flatMap((p) => p.texts).filter((o) => {
-                if (o.id === selText.id) return false;
-                const b = selBounds({ kind: "text", id: o.id });
-                return !!b && b.x0 < me.x1 && b.x1 > me.x0 && b.y0 < me.y1 && b.y1 > me.y0;
-              });
-              return hits.length ? (
-                <p role="alert" className="rounded-md border border-[#E53D2E]/40 bg-[#E53D2E]/5 p-2 text-[12px] text-[#03002C]">
-                  Overlaps {hits.slice(0, 2).map((h) => `“${h.lines[0]}”`).join(", ")}{hits.length > 2 ? ` and ${hits.length - 2} more` : ""}. Move this text or the line it touches, or reduce the size.
-                </p>
-              ) : null;
-            })()}
-            <p className="text-[11px] text-[#03002C]/65">Font: {selText.font}. Unedited lines keep the London letter spacing; changing words, size, lines or spacing uses the font's own spacing.</p>
-          </div>
-        ) : null}
-
-        {picked.length > 1 || (selPart && partGroup(edits, selPart.id, L).length > 1) ? (
-          <div className="space-y-2 rounded-md border border-[#003FC7]/25 bg-[#F2F4F9] p-2">
-            <h4 className="text-sm font-semibold text-[#03002C]">{picked.length} objects selected</h4>
-            <div className="flex flex-wrap gap-2">
-              <button type="button" className={btn} disabled={picked.length < 2 || (edits.groups ?? defaultPartGroups(L)).some((g) => g.length === picked.length && picked.every((x) => g.includes(x)))}
-                onClick={() => commit({ ...edits, groups: [...(edits.groups ?? defaultPartGroups(L)).filter((g) => !g.some((x) => picked.includes(x))), picked] })}>Group</button>
-              <button type="button" className={btn} disabled={!(edits.groups ?? defaultPartGroups(L)).some((g) => g.some((x) => picked.includes(x)))}
-                onClick={() => { commit({ ...edits, groups: (edits.groups ?? defaultPartGroups(L)).filter((g) => !g.some((x) => picked.includes(x))) }); setPicked(sel ? [sel.id] : []); }}>Ungroup</button>
-              <button type="button" className={btn} onClick={() => commit({ ...edits, parts: { ...edits.parts, ...Object.fromEntries(picked.map((id) => [id, { ...edits.parts?.[id], hidden: !(edits.parts?.[id]?.hidden ?? false) }])) } })}>Hide / show</button>
-              <button type="button" className={btn} onClick={() => commit({ ...edits, parts: { ...edits.parts, ...Object.fromEntries(picked.map((id) => [id, { dx: 0, dy: 0, scale: 1, hidden: false }])) } })}>Put back</button>
-            </div>
-            {picked.length > 1 ? (
-              <div className="flex flex-wrap gap-1" role="group" aria-label="Align objects to each other">
-                {([
-                  ["left", AlignStartVertical, "Align left edges"], ["hcenter", AlignCenterVertical, "Align centres"], ["right", AlignEndVertical, "Align right edges"],
-                  ["top", AlignStartHorizontal, "Align tops"], ["vmiddle", AlignCenterHorizontal, "Align middles"], ["bottom", AlignEndHorizontal, "Align bottoms"],
-                  ["hspread", AlignHorizontalSpaceAround, "Spread evenly across"], ["vspread", AlignVerticalSpaceAround, "Spread evenly down"],
-                ] as const).map(([m, Icon, label]) => (
-                  <button key={m} type="button" className={ibtn} aria-label={label} title={label} disabled={(m === "hspread" || m === "vspread") && picked.length < 3} onClick={() => alignPicked(m)}><Icon className="h-4 w-4" /></button>
-                ))}
-              </div>
-            ) : null}
-            <p className="text-[11px] text-[#03002C]/65">Shift-click objects on the kiosk or in the list to add them. A group moves, hides and resets together; each object keeps its own size.</p>
-          </div>
-        ) : null}
-
-        {selPart ? (
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold text-[#03002C]">Object</h4>
-            <label className="block text-[12px] text-[#03002C]/80">Size {Math.round((edits.parts?.[selPart.id]?.scale ?? 1) * 100)}%
-              <input type="range" min={30} max={200} className="mt-1 w-full" value={Math.round((edits.parts?.[selPart.id]?.scale ?? 1) * 100)} onChange={(e) => patchPart(selPart.id, { scale: Number(e.target.value) / 100 }, false)} />
-            </label>
-            <div className="flex flex-wrap gap-2">
-              <button type="button" className={btn} onClick={() => patchPart(selPart.id, { dx: 0, dy: 0, scale: 1, hidden: false })}>Put back</button>
-              {badgeOf(selPart.id)
-                ? <button type="button" className={btn} onClick={() => restorePicture(selPart.id)}>Put the picture back</button>
-                : <button type="button" className={btn} onClick={() => replaceWithText(selPart.id)}><Type className="h-3.5 w-3.5" />Replace with text</button>}
-            </div>
-            <p className="text-[11px] text-[#03002C]/65">A single logo, icon, QR code or shape group from the London file. It moves and scales on its own, keeping its original shapes, gradients and see-through effects. Nearby words are separate text lines.</p>
-            <p className="text-[11px] text-[#03002C]/65">Badges: <strong>Replace with text</strong> hides the picture and puts an editable line in its place, so you can retype or swap a partner name without uploading an image. It exports as live text.</p>
-          </div>
-        ) : null}
-
-        {selBlock ? (
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold text-[#03002C]">Graphics piece</h4>
-            <label className="block text-[12px] text-[#03002C]/80">Size {Math.round((edits.blocks?.[selBlock.id]?.scale ?? 1) * 100)}%
-              <input type="range" min={50} max={100} className="mt-1 w-full" value={Math.round((edits.blocks?.[selBlock.id]?.scale ?? 1) * 100)} onChange={(e) => patchBlock(selBlock.id, { scale: Number(e.target.value) / 100 }, false)} />
-            </label>
-            <p className="text-[11px] text-[#03002C]/65">Logos, icons and QR codes inside this piece move with it. Pieces never grow past the kiosk width.</p>
-          </div>
-        ) : null}
-
-        {selDivider ? (
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold text-[#03002C]">Accent divider</h4>
-            <label className="block text-[12px] text-[#03002C]/80">Length {Math.round(selDivider.w / 72)} in
-              <input type="range" min={36} max={KIOSK_W - 2 * KIOSK_MARGIN} className="mt-1 w-full" value={selDivider.w} onChange={(e) => patchDivider(selDivider.id, { w: Number(e.target.value) }, false)} />
-            </label>
-            <label className="block text-[12px] text-[#03002C]/80">Thickness {(selDivider.h / 72).toFixed(2)} in
-              <input type="range" min={3} max={72} className="mt-1 w-full" value={selDivider.h} onChange={(e) => patchDivider(selDivider.id, { h: Number(e.target.value) }, false)} />
-            </label>
-            <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Divider colour">
-              {ACCENTS.map((a) => (
-                <button key={a.color} type="button" aria-label={a.name} title={a.name} aria-pressed={selDivider.color === a.color}
-                  className="h-7 w-7 rounded-md border border-[#03002C]/25 aria-pressed:ring-2 aria-pressed:ring-[#003FC7] aria-pressed:ring-offset-1"
-                  style={{ background: a.color }} onClick={() => patchDivider(selDivider.id, { color: a.color })} />
-              ))}
-              <input type="color" aria-label="Custom colour" value={selDivider.color} onChange={(e) => patchDivider(selDivider.id, { color: e.target.value.toUpperCase() })} />
-            </div>
-            <label className="flex items-center gap-2 text-[12px] text-[#03002C]/80">
-              <input type="checkbox" checked={!!selDivider.round} onChange={(e) => patchDivider(selDivider.id, { round: e.target.checked })} /> Rounded ends
-            </label>
-            <div className="flex flex-wrap gap-2">
-              <button type="button" className={btn} onClick={() => patchDivider(selDivider.id, { hidden: !selDivider.hidden })}>{selDivider.hidden ? "Show" : "Hide"}</button>
-              <button type="button" className={btn} onClick={() => { commit({ ...edits, dividers: (edits.dividers ?? []).filter((d) => d.id !== selDivider.id) }); setSel(null); }}><Trash2 className="h-3.5 w-3.5" />Delete</button>
-            </div>
-          </div>
-        ) : null}
-
-        <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-[#03002C]">Add accent divider</h4>
-          <div className="flex flex-wrap gap-2">
-            <button type="button" className={btn} onClick={() => addDivider("short")}>Short rule</button>
-            <button type="button" className={btn} onClick={() => addDivider("full")}>Full width</button>
-            <button type="button" className={btn} disabled={!sel || sel.kind === "divider"} onClick={() => addDivider("under")}>Under selection</button>
-          </div>
-          <p className="text-[11px] text-[#03002C]/65">Accent rules use the approved blue, aqua and lavender. They export as live vector shapes on their own Accents layer.</p>
+              {errors ? <p role="alert" className="rounded-sm border border-[#FF9B70]/40 bg-[#FF9B70]/10 p-2 text-[11.5px] text-white">{errors} print issue{errors === 1 ? "" : "s"} still open — see Checks before sending to press.</p> : null}
+              <p className="text-[10.5px] text-white/50">Live files keep editable text and named layers. The PNG is a proof, not a print master. Files stay marked draft until the San Francisco revision is published.</p>
+            </Sec>
+          ) : null}
         </div>
 
-        <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-[#03002C]">Background</h4>
-          <div className="flex gap-3 text-[12px] text-[#03002C]/80">
-            <label className="flex items-center gap-1">Top <input type="color" value={ground[0]!.color} onChange={(e) => commit({ ...edits, ground: { top: e.target.value.toUpperCase(), bottom: ground[ground.length - 1]!.color } })} /></label>
-            <label className="flex items-center gap-1">Bottom <input type="color" value={ground[ground.length - 1]!.color} onChange={(e) => commit({ ...edits, ground: { top: ground[0]!.color, bottom: e.target.value.toUpperCase() } })} /></label>
-          </div>
+        <div className="flex shrink-0 gap-1.5 border-t border-white/10 p-3">
+          <button type="button" className={`${dbtn} flex-1 justify-center`} onClick={() => commit({})}><RotateCcw className="h-3.5 w-3.5" />Reset to London</button>
+          <button type="button" className={`${dbtn} flex-1 justify-center border-[#003FC7] bg-[#003FC7] text-white hover:bg-[#003FC7]/85`} disabled={!userId || busy === "save"} onClick={save} title={userId ? undefined : "Sign in to save"}><Save className="h-3.5 w-3.5" />Save</button>
         </div>
-
-        <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-[#03002C]">Download (draft)</h4>
-          <button type="button" className={`${btn} w-full justify-center bg-[#03002C] text-white hover:bg-[#03002C]/90`} disabled={!!busy} onClick={() => dl("zip")}><Download className="h-3.5 w-3.5" />{busy === "zip" ? "Building…" : "All files (.zip)"}</button>
-          <div className="grid grid-cols-2 gap-2">
-            {([["ai", "Illustrator .ai"], ["pdf", "PDF"], ["svg", "Layered .svg"], ["press", "Press, outlined"], ["png", "PNG proof"]] as const).map(([k, label]) => (
-              <button key={k} type="button" className={btn} disabled={!!busy} onClick={() => dl(k)}>{busy === k ? "…" : label}</button>
-            ))}
-          </div>
-          <p className="text-[11px] text-[#03002C]/65">Live files keep editable text. The .svg opens in Illustrator with Background, Graphics, Text and Cut layers; the PDF/.ai keeps live text but not named layers. The PNG is a proof, not a print master.</p>
-        </div>
-        {status ? <p role="status" className="text-[12px] text-[#03002C]">{status}</p> : null}
-      </div>
+        {status ? <p role="status" className="border-t border-white/10 px-3 py-1.5 text-[11px] text-white/60 xl:hidden">{status}</p> : null}
+      </aside>
     </div>
   );
 }
+
+const dbtn =
+  "inline-flex items-center gap-1.5 rounded-sm border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[11.5px] font-medium text-white/85 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40";
+const dibtn =
+  "inline-flex h-8 w-8 items-center justify-center rounded-sm border border-transparent text-white/70 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] aria-pressed:border-[#003FC7]/60 aria-pressed:bg-[#003FC7]/35 aria-pressed:text-white disabled:cursor-not-allowed disabled:opacity-35";
+const field =
+  "w-full rounded-sm border border-white/10 bg-black/30 px-2 py-1 font-mono text-[12px] text-white outline-none focus:border-[#003FC7] disabled:opacity-40";
+
+function Sec({ title, aside, children }: { title: string; aside?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section className="space-y-2">
+      <div className="flex items-center justify-between">
+        <h4 className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-white/55">{title}</h4>
+        {aside}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+/** Number box that commits on Enter or blur, like a desktop inspector field. */
+function NumField({ label, value, digits, onCommit, disabled }: { label: string; value: number; digits: number; onCommit: (v: number) => void; disabled?: boolean }) {
+  const shown = Number.isFinite(value) ? value.toFixed(digits) : "";
+  const [draft, setDraft] = useState(shown);
+  useEffect(() => setDraft(shown), [shown]);
+  const done = () => { const v = Number(draft); if (Number.isFinite(v) && draft.trim() !== "" && v.toFixed(digits) !== shown) onCommit(v); else setDraft(shown); };
+  return (
+    <label className="block rounded-sm border border-white/10 bg-black/30 px-2 py-1 focus-within:border-[#003FC7]">
+      <span className="block text-[9.5px] uppercase tracking-[0.08em] text-white/45">{label}</span>
+      <input type="number" step={digits ? 1 / 10 ** digits : 1} disabled={disabled} value={draft}
+        onChange={(e) => setDraft(e.target.value)} onBlur={done}
+        onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); if (e.key === "Escape") { setDraft(shown); (e.target as HTMLInputElement).blur(); } }}
+        className="w-full bg-transparent font-mono text-[12px] text-white outline-none disabled:opacity-40" />
+    </label>
+  );
+}
+
+/** A return strip shown beside the front. It carries the background ramp only. */
+function ReturnStrip({ ground, id, height, label, offsetTop }: { ground: { offset: number; color: string }[]; id: string; height: number; label: string; offsetTop: number }) {
+  const w = height * (KIOSK_RETURN_W / KIOSK_H);
+  return (
+    <figure className="m-0 flex flex-col items-center" style={{ paddingTop: offsetTop }}>
+      <svg viewBox={`0 0 ${KIOSK_RETURN_W} ${KIOSK_H}`} style={{ height, width: w }} className="block shadow-[0_24px_60px_rgba(0,0,0,0.6)]" role="img" aria-label={label}>
+        <defs>
+          <linearGradient id={`kr-${id}`} x1="0" y1="0" x2="0" y2="1">{ground.map((s) => <stop key={s.offset} offset={s.offset} stopColor={s.color} />)}</linearGradient>
+        </defs>
+        <rect width={KIOSK_RETURN_W} height={KIOSK_H} fill={`url(#kr-${id})`} />
+      </svg>
+      <figcaption className="mt-2 w-16 text-center font-mono text-[9.5px] leading-tight text-white/50">{label}</figcaption>
+    </figure>
+  );
+}
+
 
 /** Small preview of a live kiosk, rendered on demand. */
 export function KioskLiveThumb({ layout, height = 150 }: { layout: LiveLayout; height?: number }) {
