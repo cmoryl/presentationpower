@@ -483,6 +483,8 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
   const [showSides, setShowSides] = useState(true);
   const [alignTarget, setAlignTarget] = useState<"trim" | "safe" | "tv">("trim");
   const [tab, setTab] = useState<"design" | "checks" | "export">("design");
+  // Phone layout: layers and the inspector open as bottom sheets.
+  const [mPanel, setMPanel] = useState<null | "layers" | "design" | "checks" | "export">(null);
   useEffect(() => {
     if (!wide) return;
     const k = (e: KeyboardEvent) => { if (e.key === "Escape") setWide(false); };
@@ -574,7 +576,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
       <style>{kioskFontFaceCss()}</style>
 
       {/* Tool strip */}
-      <nav aria-label="Tools" className="flex w-12 shrink-0 flex-col items-center gap-2 border-r border-white/10 bg-[#070620] py-3">
+      <nav aria-label="Tools" className="hidden w-12 md:flex shrink-0 flex-col items-center gap-2 border-r border-white/10 bg-[#070620] py-3">
         <button type="button" className={dibtn} aria-pressed title="Select and move (V)" aria-label="Select and move"><MousePointer2 className="h-4 w-4" /></button>
         <button type="button" className={dibtn} title="Add accent rule" aria-label="Add accent rule" onClick={() => addDivider("short")}><RectangleHorizontal className="h-4 w-4" /></button>
         <span className="my-1 h-px w-6 bg-white/10" />
@@ -587,7 +589,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
       </nav>
 
       {/* Layers */}
-      <aside aria-label="Layers" className="hidden w-60 shrink-0 flex-col border-r border-white/10 bg-[#0B0A2A] lg:flex">
+      <aside aria-label="Layers" className={(mPanel === "layers" ? "fixed inset-x-0 bottom-14 z-[80] flex max-h-[60vh] border-t shadow-2xl md:hidden " : "hidden ") + "w-full shrink-0 flex-col border-white/10 bg-[#0B0A2A] lg:static lg:z-auto lg:flex lg:max-h-none lg:w-60 lg:border-r lg:border-t-0 lg:shadow-none"}>
         <div className="flex h-11 items-center justify-between border-b border-white/10 px-3">
           <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/60">Layers</span>
           <span className="font-mono text-[10.5px] text-white/45">{LX.texts.length + LX.blocks.reduce((n, b) => n + (b.parts?.length ?? 0), 0)} objects</span>
@@ -691,12 +693,12 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                 <button key={l} type="button" aria-pressed={zoom === z} onClick={() => setZoom(z)} className="rounded-[2px] px-2.5 py-1 text-[10.5px] font-medium text-white/55 hover:text-white aria-pressed:bg-white/15 aria-pressed:text-white">{l}</button>
               ))}
             </div>
-            <span className="w-11 text-right font-mono text-[10.5px] text-white/60">{Math.round((zoom / 640) * 100)}%</span>
+            <span className="hidden w-11 text-right font-mono sm:inline text-[10.5px] text-white/60">{Math.round((zoom / 640) * 100)}%</span>
           </div>
         </header>
 
         {/* Stage */}
-        <div tabIndex={0} onKeyDown={onKey} aria-label="Kiosk canvas. Arrow keys nudge the selection." className="relative flex-1 overflow-auto bg-[#05041A] p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#003FC7]">
+        <div tabIndex={0} onKeyDown={onKey} aria-label="Kiosk canvas. Arrow keys nudge the selection." className="relative flex-1 overflow-auto bg-[#05041A] p-3 md:p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#003FC7]">
           {err ? <p className="text-sm text-[#FF9B70]">{err}</p> : null}
           {!art && !err ? <p className="text-sm text-white/60">Loading the partner's artwork…</p> : null}
           {art ? (
@@ -849,10 +851,18 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
             {errors ? `${errors} print issue${errors === 1 ? "" : "s"}` : checks.length ? `${checks.length} note${checks.length === 1 ? "" : "s"}` : "Print checks clear"}
           </button>
         </footer>
+        {/* Phone panel bar */}
+        <nav aria-label="Panels" className="grid h-14 shrink-0 grid-cols-4 border-t border-white/10 bg-[#070620] md:hidden">
+          {([["layers", "Layers"], ["design", "Design"], ["checks", `Checks${checks.length ? ` · ${checks.length}` : ""}`], ["export", "Export"]] as const).map(([id, label]) => (
+            <button key={id} type="button" aria-pressed={mPanel === id}
+              onClick={() => { setMPanel((m) => (m === id ? null : id)); if (id !== "layers") setTab(id); }}
+              className="text-[12px] font-semibold text-white/60 aria-pressed:bg-white/10 aria-pressed:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#003FC7]">{label}</button>
+          ))}
+        </nav>
       </div>
 
       {/* Inspector */}
-      <aside aria-label="Properties" className="flex w-[300px] shrink-0 flex-col border-l border-white/10 bg-[#0B0A2A]">
+      <aside aria-label="Properties" className={(mPanel && mPanel !== "layers" ? "fixed inset-x-0 bottom-14 z-[80] flex max-h-[60vh] border-t shadow-2xl " : "hidden ") + "w-full shrink-0 flex-col border-white/10 bg-[#0B0A2A] md:static md:z-auto md:flex md:max-h-none md:w-[300px] md:border-l md:border-t-0 md:shadow-none"}>
         <div role="tablist" aria-label="Inspector" className="flex h-11 shrink-0 items-end gap-4 border-b border-white/10 px-3">
           {([["design", "Design"], ["checks", `Checks${checks.length ? ` · ${checks.length}` : ""}`], ["export", "Export"]] as const).map(([id, label]) => (
             <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)}
