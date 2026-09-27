@@ -1,0 +1,1 @@
+revoke execute on function public.guard_london_signage_revision() from public, anon, authenticated;
