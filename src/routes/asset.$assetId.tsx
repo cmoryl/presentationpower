@@ -366,9 +366,11 @@ function AssetEditor() {
 
   // Undo/redo history for content + context snapshots.
   const historyRef = useRef<{
-    undo: Array<{ content: unknown; context: unknown }>;
-    redo: Array<{ content: unknown; context: unknown }>;
+    undo: Array<{ content: unknown; context: unknown; title?: string }>;
+    redo: Array<{ content: unknown; context: unknown; title?: string }>;
   }>({ undo: [], redo: [] });
+  // One undo step per title-editing session, not one per keystroke.
+  const titleEditPushedRef = useRef(false);
   const [, setHistoryTick] = useState(0);
   const canUndo = historyRef.current.undo.length > 0;
   const canRedo = historyRef.current.redo.length > 0;
@@ -669,7 +671,7 @@ function AssetEditor() {
 
   function pushHistory() {
     if (!row) return;
-    historyRef.current.undo.push({ content: row.content, context: row.context });
+    historyRef.current.undo.push({ content: row.content, context: row.context, title: row.title });
     if (historyRef.current.undo.length > 100) historyRef.current.undo.shift();
     historyRef.current.redo = [];
   }
@@ -705,11 +707,12 @@ function AssetEditor() {
   function undo() {
     if (!row || historyRef.current.undo.length === 0) return;
     const prev = historyRef.current.undo.pop()!;
-    historyRef.current.redo.push({ content: row.content, context: row.context });
+    historyRef.current.redo.push({ content: row.content, context: row.context, title: row.title });
     setRow({
       ...row,
       content: prev.content as CaseStudyContent,
       context: prev.context as PrintAssetContext,
+      title: prev.title ?? row.title,
     });
     setDirty(true);
     setHistoryTick((t) => t + 1);
@@ -717,11 +720,12 @@ function AssetEditor() {
   function redo() {
     if (!row || historyRef.current.redo.length === 0) return;
     const nxt = historyRef.current.redo.pop()!;
-    historyRef.current.undo.push({ content: row.content, context: row.context });
+    historyRef.current.undo.push({ content: row.content, context: row.context, title: row.title });
     setRow({
       ...row,
       content: nxt.content as CaseStudyContent,
       context: nxt.context as PrintAssetContext,
+      title: nxt.title ?? row.title,
     });
     setDirty(true);
     setHistoryTick((t) => t + 1);
@@ -1156,8 +1160,16 @@ function AssetEditor() {
                 aria-label="Document title"
                 aria-invalid={Boolean(fieldError("title"))}
                 aria-describedby={fieldError("title") ? "err-title" : undefined}
+                onFocus={() => {
+                  titleEditPushedRef.current = false;
+                }}
                 onBlur={() => markTouched("title")}
                 onChange={(e) => {
+                  if (!titleEditPushedRef.current) {
+                    pushHistory();
+                    titleEditPushedRef.current = true;
+                    setHistoryTick((t) => t + 1);
+                  }
                   setRow({ ...row, title: e.target.value });
                   setDirty(true);
                 }}
