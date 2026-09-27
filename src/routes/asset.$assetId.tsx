@@ -2392,7 +2392,6 @@ function AssetEditor() {
               </Panel>
               </div>
               <div role="tabpanel" id="insp-panel-brief" aria-labelledby="insp-tab-brief" hidden={inspectorTab !== "brief"} className="space-y-2">
-            <div className="dark space-y-2">
               <Panel title="Stats" defaultOpen={false}>
                 {(content.stats ?? []).map((s, i) => (
                   <div key={i} className="space-y-1">
