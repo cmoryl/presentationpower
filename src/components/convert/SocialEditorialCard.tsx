@@ -93,7 +93,7 @@ export function SocialEditorialCard({ format, brandId, result, displayShortEdge 
         <div ref={bodyRef} style={{ flex: 1, minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
           {stat ? (
             <div style={{ marginBottom: px(36) }}>
-              <div style={{ fontSize: `calc(${figurePx}px * var(--fit, 1))`, fontWeight: 800, lineHeight: 0.9, letterSpacing: "-0.04em" }}>
+              <div style={{ fontSize: figurePx, fontWeight: 800, lineHeight: 0.9, letterSpacing: "-0.04em" }}>
                 {stat.value}
               </div>
               {stat.label ? (
@@ -112,7 +112,7 @@ export function SocialEditorialCard({ format, brandId, result, displayShortEdge 
           ) : null}
 
           {points.length ? (
-            <div style={{ marginTop: px(48), display: "flex", flexDirection: "column", gap: px(28) }}>
+            <div style={{ marginTop: tall ? "auto" : px(48), paddingTop: tall ? px(48) : 0, display: "flex", flexDirection: "column", gap: px(28) }}>
               {points.map((p, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: px(28) }}>
                   <span aria-hidden style={{ flexShrink: 0, width: 56 * f, height: Math.max(2, 4 * f), background: BLUE, marginTop: px(20) }} />
