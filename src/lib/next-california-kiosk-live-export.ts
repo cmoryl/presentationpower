@@ -220,12 +220,16 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
   const fonts = new Map<string, Awaited<ReturnType<typeof doc.embedFont>>>();
   for (const p of placed)
     for (const t of p.texts) {
-      if (!fonts.has(t.font)) {
-        const url = kioskFontUrl(t.font);
-        fonts.set(t.font, url ? await doc.embedFont(await bytes(url), { subset: true }) : await doc.embedFont(/times/i.test(t.font) ? StandardFonts.TimesRoman : StandardFonts.Helvetica));
+      const sq = bulletSquareBox(t);
+      if (sq) {
+        const c = hexRgb(t.fill);
+        const Mb = mul(F, rotateAbout(t.rot, t.ax, t.ky));
+        page.pushOperators(raw(`q\n${t.opacity < 1 ? alpha(t.opacity) + "\n" : ""}${[c.red, c.green, c.blue].join(" ")} rg\n${roundRectPdf(sq.s, sq.s, false, mul(Mb, translate(sq.x, sq.y)))}\nf\nQ`));
+        continue;
       }
+      if (!fonts.has(t.font)) fonts.set(t.font, await embedKioskFont(doc, t.font));
       const f = fonts.get(t.font)!;
-      const clean = (s: string) => { try { f.encodeText(s); return s; } catch { return s.replace(/[^\x20-\x7E]/g, " "); } };
+      const clean = cleanFor(f);
       const lines = t.fixed
         ? (() => {
             const text = clean(t.text);
@@ -403,6 +407,20 @@ async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Ar
       page.drawLine({ start: { x, y: y + sy * off }, end: { x, y: y + sy * (off + len) }, thickness: lw, color: reg });
     }
   return doc.save();
+}
+
+/** Embed the supplied face; a face we hold no file for is set in embedded Geist (never an unembedded base font). */
+async function embedKioskFont(doc: PDFDocument, font: string) {
+  const url = kioskFontUrl(font) ?? kioskFontUrl(KIOSK_FONT_SUBSTITUTE);
+  if (!url) throw new Error(`No font file for ${font} and no Geist fallback on hand.`);
+  return doc.embedFont(await bytes(url), { subset: true });
+}
+/** Drop only the characters the face cannot set (ligatures first become plain letters). */
+function cleanFor(f: { encodeText: (s: string) => unknown }) {
+  return (s: string) => {
+    try { f.encodeText(s); return s; } catch { /* fall through */ }
+    return [...s.normalize("NFKC")].map((ch) => { try { f.encodeText(ch); return ch; } catch { return " "; } }).join("");
+  };
 }
 
 /**
