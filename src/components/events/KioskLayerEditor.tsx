@@ -114,6 +114,9 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
   const [wide, setWide] = useState(false);
   /** Objects picked with Shift-click, ready to group. */
   const [picked, setPicked] = useState<string[]>([]);
+  /** Texts picked with Shift/Ctrl/Cmd-click (multi-select). */
+  const [pickedT, setPickedT] = useState<string[]>([]);
+  const multiRef = useRef<{ parts: string[]; texts: string[] } | null>(null);
   /** Snap guide x (kiosk points) shown while dragging. */
   const [guide, setGuide] = useState<number | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -325,8 +328,8 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
     const d = drag.current;
     if (!d) return;
     const p = toSvg(e);
-    const moved = shift(d.sel, p.x - d.x, p.y - d.y, d.start);
-    const r = e.altKey ? { next: moved, g: null } : snap(d.sel, moved);
+    const moved = move(d.sel, p.x - d.x, p.y - d.y, d.start, multiRef.current);
+    const r = multiRef.current || e.altKey ? { next: moved, g: null } : snap(d.sel, moved);
     setGuide(r.g);
     setEdits(r.next);
   };
@@ -773,7 +776,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                 onPointerMove={onMove}
                 onPointerUp={endDrag}
                 onPointerLeave={endDrag}
-                onPointerDown={() => { setSel(null); setPicked([]); }}
+                onPointerDown={() => { setSel(null); setPicked([]); setPickedT([]); }}
               >
                 <defs>
                   <linearGradient id={`kg-${L.id}`} x1="0" y1="0" x2="0" y2="1">
