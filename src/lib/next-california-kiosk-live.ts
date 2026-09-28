@@ -542,7 +542,7 @@ export function buildKioskFrontSvg(
   const nat = L.native;
   parts.push(
     nat && !edits.ground
-      ? `<g id="Background"><use xlink:href="#art-bg" href="#art-bg" x="${-L.originX}" y="${-L.originY}" width="${vw}" height="${vh}"/></g>`
+      ? `<g id="Background"><rect x="${-B}" y="${-B}" width="${KIOSK_W + 2 * B}" height="${KIOSK_H + 2 * B}" fill="#FFFFFF"/><use xlink:href="#art-bg" href="#art-bg" x="${-L.originX}" y="${-L.originY}" width="${vw}" height="${vh}"/></g>`
       : `<g id="Background"><rect x="${-B}" y="${-B}" width="${KIOSK_W + 2 * B}" height="${KIOSK_H + 2 * B}" fill="url(#kg)"/></g>`,
   );
   parts.push(`<g id="Graphics">`);
