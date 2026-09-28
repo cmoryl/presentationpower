@@ -40,6 +40,7 @@ import {
   type TextAlign,
 } from "@/lib/next-california-kiosk-live";
 import { downloadKiosk, loadArtSvg, type KioskDownload } from "@/lib/next-california-kiosk-live-export";
+import { kioskCmykMaster } from "@/lib/next-california-kiosk-cmyk-masters";
 
 type Sel = { kind: "block" | "text" | "part" | "divider"; id: string } | null;
 
@@ -1125,7 +1126,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
               ))}
               <p className="text-[10.5px] text-white/50">Live files keep editable text and named layers. The PNG is a proof, not a print master. Files stay marked draft until the San Francisco revision is published.</p>
             </Sec>
-          ) : null}
+          </>) : null}
         </div>
 
         <div className="flex shrink-0 gap-1.5 border-t border-white/10 p-3">
