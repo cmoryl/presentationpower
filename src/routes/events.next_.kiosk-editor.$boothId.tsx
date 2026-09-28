@@ -22,13 +22,31 @@ export const Route = createFileRoute("/events/next_/kiosk-editor/$boothId")({
     ],
   }),
   component: KioskEditorWindow,
+  pendingComponent: () => <StatusScreen title="Opening the kiosk editor…" body="Loading the editor. This can take a few seconds." />,
+  pendingMs: 0,
 });
 
+function StatusScreen({ title, body }: { title: string; body: string }) {
+  return (
+    <main className="grid min-h-screen place-items-center bg-[#0B0A2A] p-8 text-white" aria-live="polite">
+      <div className="max-w-md text-center">
+        <div className="mx-auto mb-4 h-6 w-6 animate-spin rounded-full border-2 border-white/25 border-t-white motion-reduce:animate-none" aria-hidden />
+        <h1 className="text-lg font-semibold">{title}</h1>
+        <p className="mt-2 text-sm text-white/70">{body}</p>
+      </div>
+    </main>
+  );
+}
+
 function KioskEditorWindow() {
-  useRequireSignIn();
+  const auth = useRequireSignIn();
   const { boothId } = Route.useParams();
   const layout = kioskLiveLayout(californiaKioskSourceBoothId(boothId));
   const vendor = CALIFORNIA_KIOSKS.find((k) => k.id === boothId)?.vendor ?? "Partner";
+
+  if (auth === "checking") return <StatusScreen title="Opening the kiosk editor…" body={`Checking you're signed in before loading ${vendor}.`} />;
+  if (auth === "signed-out") return <StatusScreen title="Please sign in to edit kiosks" body="Taking you to the sign-in page. You'll come straight back to this editor afterwards." />;
+
 
   if (!layout) {
     return (
