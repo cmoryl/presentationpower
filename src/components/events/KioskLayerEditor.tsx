@@ -1095,7 +1095,21 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
             </Sec>
           ) : null}
 
-          {tab === "export" ? (
+          {tab === "export" ? (<>
+            {(() => {
+              const cm = kioskCmykMaster(L.id);
+              if (!cm) return null;
+              return (
+                <Sec title="Designer CMYK master">
+                  {cm.proofUrl ? <img src={cm.proofUrl} alt={`CMYK master proof for ${L.id}`} className="mx-auto h-40 w-auto rounded-sm border border-white/15" /> : null}
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <a className={`${dbtn} justify-center`} href={cm.aiUrl} download={`${L.id}-cmyk-master.ai`}>CMYK .ai</a>
+                    <a className={`${dbtn} justify-center`} href={cm.pdfUrl} download={`${L.id}-cmyk-master.pdf`}>CMYK PDF</a>
+                  </div>
+                  <p className="text-[10.5px] text-white/60">Your Illustrator file, exactly as supplied ({cm.received}) — {cm.profile}, ⅛ in bleed. Not converted or rebuilt. Editor changes below are not in this file.</p>
+                </Sec>
+              );
+            })()}
             <Sec title="Download · draft">
               <button type="button" className={`${dbtn} w-full justify-center border-[#003FC7] bg-[#003FC7] text-white hover:bg-[#003FC7]/85`} disabled={!!busy} onClick={() => dl("zip")}><Download className="h-3.5 w-3.5" />{busy === "zip" ? "Building…" : "All files (.zip)"}</button>
               <div className="grid grid-cols-2 gap-1.5">
