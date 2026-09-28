@@ -114,6 +114,9 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
   const [wide, setWide] = useState(false);
   /** Objects picked with Shift-click, ready to group. */
   const [picked, setPicked] = useState<string[]>([]);
+  /** Texts picked with Shift/Ctrl/Cmd-click (multi-select). */
+  const [pickedT, setPickedT] = useState<string[]>([]);
+  const multiRef = useRef<{ parts: string[]; texts: string[] } | null>(null);
   /** Snap guide x (kiosk points) shown while dragging. */
   const [guide, setGuide] = useState<number | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -213,24 +216,45 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
     if (!m) return { x: 0, y: 0 };
     return { x: (e.clientX - m.e) / m.a, y: (e.clientY - m.f) / m.d };
   };
+  const isAdd = (e: { shiftKey: boolean; metaKey: boolean; ctrlKey: boolean }) => e.shiftKey || e.metaKey || e.ctrlKey;
   const pickPart = (id: string, add: boolean) => {
     const members = partGroup(edits, id, L);
     if (add) {
       setPicked((cur) => (cur.includes(id) ? cur.filter((x) => !members.includes(x)) : [...new Set([...cur, ...members])]));
-    } else setPicked(members);
+    } else { setPicked(members); setPickedT([]); }
     setSel({ kind: "part", id });
   };
+  const pickText = (id: string, add: boolean) => {
+    if (add) {
+      // Carry the current single text into the multi-selection.
+      setPickedT((cur) => {
+        const base = cur.length === 0 && sel?.kind === "text" && sel.id !== id ? [sel.id] : cur;
+        return base.includes(id) ? base.filter((x) => x !== id) : [...base, id];
+      });
+    } else { setPickedT([id]); setPicked([]); }
+    setSel({ kind: "text", id });
+  };
+  /** Everything currently multi-selected (parts with their groups, and texts). */
+  const multiSet = () => ({ parts: picked, texts: pickedT });
+  const inMulti = (s: NonNullable<Sel>, m: { parts: string[]; texts: string[] }) =>
+    m.parts.length + m.texts.length > 1 && (s.kind === "part" ? m.parts.includes(s.id) : s.kind === "text" ? m.texts.includes(s.id) : false);
   const startDrag = (s: NonNullable<Sel>) => (e: React.PointerEvent) => {
     e.stopPropagation();
+    const add = isAdd(e);
+    const keep = !add && inMulti(s, multiSet());
     if (s.kind === "part") {
-      pickPart(s.id, e.shiftKey);
-      if (e.shiftKey) return;
-    } else setPicked([]);
+      if (!keep) pickPart(s.id, add);
+      if (add) return;
+    } else if (s.kind === "text") {
+      if (!keep) pickText(s.id, add);
+      if (add) return;
+    } else { setPicked([]); setPickedT([]); }
     setSel(s);
     if ((edits.locked ?? []).includes(s.id)) return;
     setFuture([]);
     (e.target as Element).setPointerCapture?.(e.pointerId);
     const p = toSvg(e);
+    multiRef.current = keep ? multiSet() : null;
     drag.current = { sel: s, x: p.x, y: p.y, start: edits };
     setHistory((h) => [...h.slice(-49), edits]);
   };
@@ -244,6 +268,17 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
     const ids = s.kind === "part" ? partGroup(base, s.id, L) : [s.id];
     for (const id of ids) map[id] = { ...map[id], dx: (map[id]?.dx ?? 0) + dx, dy: (map[id]?.dy ?? 0) + dy };
     return { ...base, [key]: map };
+  };
+  /** Move the selection, or every multi-selected object together (locked ones stay put). */
+  const move = (s: NonNullable<Sel>, dx: number, dy: number, base: KioskEdits, m: { parts: string[]; texts: string[] } | null): KioskEdits => {
+    if (!m || !inMulti(s, m)) return shift(s, dx, dy, base);
+    const locked = base.locked ?? [];
+    const parts = { ...base.parts } as Record<string, { dx?: number; dy?: number }>;
+    const texts = { ...base.texts } as Record<string, { dx?: number; dy?: number }>;
+    const pids = new Set(m.parts.flatMap((id) => partGroup(base, id, L)));
+    for (const id of pids) if (!locked.includes(id)) parts[id] = { ...parts[id], dx: (parts[id]?.dx ?? 0) + dx, dy: (parts[id]?.dy ?? 0) + dy };
+    for (const id of m.texts) if (!locked.includes(id)) texts[id] = { ...texts[id], dx: (texts[id]?.dx ?? 0) + dx, dy: (texts[id]?.dy ?? 0) + dy };
+    return { ...base, parts, texts } as KioskEdits;
   };
 
   const measureCtx = useMemo(() => (typeof document === "undefined" ? null : document.createElement("canvas").getContext("2d")), []);
@@ -293,8 +328,8 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
     const d = drag.current;
     if (!d) return;
     const p = toSvg(e);
-    const moved = shift(d.sel, p.x - d.x, p.y - d.y, d.start);
-    const r = e.altKey ? { next: moved, g: null } : snap(d.sel, moved);
+    const moved = move(d.sel, p.x - d.x, p.y - d.y, d.start, multiRef.current);
+    const r = multiRef.current || e.altKey ? { next: moved, g: null } : snap(d.sel, moved);
     setGuide(r.g);
     setEdits(r.next);
   };
@@ -462,7 +497,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
     if (e.key === "[") { e.preventDefault(); arrange(e.shiftKey ? "back" : "backward"); return; }
     const step = e.shiftKey ? 36 : 3;
     const m: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
-    if (m[e.key]) { e.preventDefault(); if (!isLocked(sel.id)) commit(shift(sel, m[e.key]![0], m[e.key]![1])); return; }
+    if (m[e.key]) { e.preventDefault(); if (!isLocked(sel.id)) commit(move(sel, m[e.key]![0], m[e.key]![1], edits, multiSet())); return; }
     if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); removeSel(); }
   };
 
@@ -643,7 +678,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                       return (
                         <li key={q.id} className={`flex items-center gap-0.5 pl-4 pr-1 ${on ? "bg-[#003FC7]/25" : ""}`}>
                           <Shapes className="h-3 w-3 shrink-0 text-white/40" aria-hidden />
-                          <button type="button" className={`${layerRow(on)} pl-1.5`} onClick={(e) => pickPart(q.id, e.shiftKey)}>
+                          <button type="button" className={`${layerRow(on)} pl-1.5`} onClick={(e) => pickPart(q.id, isAdd(e))}>
                             {isCopy(q.id) ? "Copy of object" : `Object ${i + 1}`}{badgedPartIds(edits).has(q.id) ? " · text" : ""}{(edits.groups ?? defaultPartGroups(L)).some((g) => g.includes(q.id)) ? " · grp" : ""}
                           </button>
                           <button type="button" aria-label={isLocked(q.id) ? "Unlock object" : "Lock object"} className={eyeBtn} onClick={() => { setSel({ kind: "part", id: q.id }); commit({ ...edits, locked: isLocked(q.id) ? (edits.locked ?? []).filter((x) => x !== q.id) : [...(edits.locked ?? []), q.id] }); }}>
@@ -661,11 +696,11 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                   <ul className="border-t border-white/[0.06] py-0.5">
                     {texts.map((t) => {
                       const th = edits.texts?.[t.id]?.hidden ?? false;
-                      const on = sel?.id === t.id;
+                      const on = sel?.id === t.id || pickedT.includes(t.id);
                       return (
                         <li key={t.id} className={`flex items-center gap-0.5 pl-4 pr-1 ${on ? "bg-[#003FC7]/25" : ""}`}>
                           <Type className="h-3 w-3 shrink-0 text-white/40" aria-hidden />
-                          <button type="button" className={`${layerRow(on)} pl-1.5`} onClick={() => { setSel({ kind: "text", id: t.id }); setPicked([]); }}>
+                          <button type="button" className={`${layerRow(on)} pl-1.5`} onClick={(e) => pickText(t.id, isAdd(e))}>
                             {edits.texts?.[t.id]?.text ?? t.text}
                           </button>
                           <button type="button" aria-label={isLocked(t.id) ? "Unlock text" : "Lock text"} className={eyeBtn} onClick={() => commit({ ...edits, locked: isLocked(t.id) ? (edits.locked ?? []).filter((x) => x !== t.id) : [...(edits.locked ?? []), t.id] })}>
@@ -741,7 +776,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                 onPointerMove={onMove}
                 onPointerUp={endDrag}
                 onPointerLeave={endDrag}
-                onPointerDown={() => { setSel(null); setPicked([]); }}
+                onPointerDown={() => { setSel(null); setPicked([]); setPickedT([]); }}
               >
                 <defs>
                   <linearGradient id={`kg-${L.id}`} x1="0" y1="0" x2="0" y2="1">
@@ -847,6 +882,10 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                     ))}
                   </text>
                 ))}
+                {pickedT.length + picked.length > 1 ? pickedT.map((id) => {
+                  const b = selBounds({ kind: "text", id });
+                  return b ? <rect key={`pt-${id}`} data-export-ignore="true" pointerEvents="none" x={b.x0} y={b.y0} width={b.x1 - b.x0} height={b.y1 - b.y0} fill="none" stroke="#003FC7" strokeWidth={2 * rs} /> : null;
+                }) : null}
                 {/* Selection frame with corner handles (visual) and live size tag. */}
                 {bounds && sel?.kind !== "block" ? (
                   <g data-export-ignore="true" pointerEvents="none">
