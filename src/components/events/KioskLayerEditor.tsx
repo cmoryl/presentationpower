@@ -766,7 +766,6 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
           {!art && !err ? <p className="text-sm text-white/60">Loading the partner's artwork…</p> : null}
           {art ? (
             <div className="mx-auto flex w-max items-start gap-4">
-              {showSides ? <ReturnStrip ground={ground} nativeSym={L.native ? `${symId}-left` : undefined} id={`${L.id}-l`} height={zoom} label="Left return · 4 × 96 in" offsetTop={G * k} /> : null}
               <svg
                 ref={svgRef}
                 viewBox={`${vbX} ${vbY} ${vbW} ${vbH}`}
@@ -915,7 +914,11 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                   <rect x={0} y={0} width={KIOSK_W} height={KIOSK_H} fill="none" stroke="#EC008C" strokeWidth={1.5 * rs} />
                 </g>
               </svg>
-              {showSides ? <ReturnStrip ground={ground} nativeSym={L.native ? `${symId}-right` : undefined} id={`${L.id}-r`} height={zoom} label="Right return · 4 × 96 in" offsetTop={G * k} /> : null}
+              {/* Left strip is placed AFTER the front in the DOM (shown first via CSS order):
+                  its art uses blend filters whose feImage refs point into the front's
+                  symbol defs, and Chrome paints forward feImage references black. */}
+              {showSides ? <div className="order-first"><ReturnStrip ground={ground} nativeSym={L.native ? `${symId}-left` : undefined} id={`${L.id}-l`} height={zoom} label="Left return · 4 × 96 in" offsetTop={G * k} /></div> : null}
+              {showSides ? <div className="order-last"><ReturnStrip ground={ground} nativeSym={L.native ? `${symId}-right` : undefined} id={`${L.id}-r`} height={zoom} label="Right return · 4 × 96 in" offsetTop={G * k} /></div> : null}
             </div>
           ) : null}
         </div>
