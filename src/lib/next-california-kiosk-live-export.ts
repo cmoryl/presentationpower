@@ -116,7 +116,7 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
   page.setCropBox(0, 0, W + 2 * S, H + 2 * S);
   // Everything below is drawn in bleed-box space, shifted into the slug.
   // Named Illustrator layers (PDF optional content).
-  const layerNames = ["Background", "Artwork", "Accents", "Text", "Trim marks"] as const;
+  const layerNames = ["Background", "Imagery", "Content", "Accents", "Text", "Trim marks"] as const;
   const ocProps = doc.context.obj({});
   const ocRefs = layerNames.map((name, i) => {
     const ref = doc.context.register(doc.context.obj({ Type: "OCG", Name: PDFString.of(name) }));
