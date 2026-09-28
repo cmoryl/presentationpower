@@ -1014,7 +1014,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                         {(["C", "M", "Y", "K"] as const).map((ch, i) => (
                           <NumField key={ch} label={`${ch} %`} value={Math.round(((selPlaced.cmyk ?? [0, 0, 0, 0])[i] ?? 0) * 1000) / 10} digits={1}
                             onCommit={(v) => {
-                              const c = [...(selPlaced.cmyk ?? [0, 0, 0, 1])];
+                              const c = [...(selPlaced.cmyk ?? [0, 0, 0, 0])];
                               c[i] = Math.max(0, Math.min(100, v)) / 100;
                               patchText(selText.id, { cmyk: c, color: cmykPreview(c) });
                             }} />
