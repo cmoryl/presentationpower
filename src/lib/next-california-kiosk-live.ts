@@ -353,7 +353,7 @@ function placeBlock(L: LiveLayout, edits: KioskEdits, badged: Set<string>, b: Li
           kw,
           edited,
           text,
-          fill: te.color ?? t.color,
+          fill: (() => { const ck = te.cmyk ?? (te.color ? undefined : t.cmyk); return ck ? cmykScreen(ck) : te.color ?? t.color; })(),
           lines,
           align,
           ax: kx + (align === "center" ? kw / 2 : align === "right" ? kw : 0),
@@ -650,4 +650,18 @@ export function kioskMissingFonts(L: LiveLayout): { font: string; lines: number 
     if (!kioskFontUrl(t.font)) n.set(t.font, (n.get(t.font) ?? 0) + 1);
   }
   return [...n].map(([font, lines]) => ({ font, lines }));
+}
+
+/**
+ * Screen preview of a CMYK build, approximating US Web Coated (SWOP) v2 inks on
+ * white paper (multiplicative ink model). Display only — exports always write
+ * the CMYK numbers unchanged.
+ */
+export function cmykScreen(c: readonly number[]): string {
+  const [C = 0, M = 0, Y = 0, K = 0] = c;
+  const inks: [number, [number, number, number]][] = [
+    [C, [0, 174, 239]], [M, [236, 0, 140]], [Y, [255, 242, 0]], [K, [35, 31, 32]],
+  ];
+  const rgb = [0, 1, 2].map((i) => inks.reduce((acc, [v, ink]) => acc * (1 - v * (1 - ink[i]! / 255)), 255));
+  return `#${rgb.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, "0")).join("")}`.toUpperCase();
 }
