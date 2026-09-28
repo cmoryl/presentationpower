@@ -14,7 +14,7 @@ export function useRequireSignIn(): SignInStatus {
       if (data.session) setStatus("signed-in");
       else {
         setStatus("signed-out");
-        window.setTimeout(() => window.location.replace(loginUrl()), 900);
+        window.setTimeout(() => window.location.replace(loginUrl()), 350);
       }
     });
     return () => { live = false; };
