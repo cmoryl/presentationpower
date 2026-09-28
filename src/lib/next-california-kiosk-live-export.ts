@@ -9,7 +9,7 @@
 // Every file is named rdraft- until the San Francisco revision is published.
 
 import JSZip from "jszip";
-import { PDFDocument, degrees, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, concatTransformationMatrix, PDFName, PDFOperator, PDFOperatorNames, PDFString } from "pdf-lib";
+import { PDFDocument, degrees, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, concatTransformationMatrix, PDFName, PDFOperator, PDFOperatorNames, PDFString } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import { artRegionPdf, mul, parseArtSvg, rotateAbout, roundRectPdf, scale, translate, type Affine } from "@/lib/next-california-kiosk-vector-pdf";
 
@@ -17,6 +17,8 @@ import {
   KIOSK_BLEED,
   KIOSK_H,
   KIOSK_W,
+  KIOSK_FONT_SUBSTITUTE,
+  bulletSquareBox,
   buildKioskFrontSvg,
   buildKioskReturnSvg,
   groundAt,
@@ -56,7 +58,7 @@ export async function liveFrontSvg(L: LiveLayout, edits: KioskEdits) {
 
 type OT = { getPath: (t: string, x: number, y: number, s: number, o?: object) => { toPathData: (d?: number) => string }; getAdvanceWidth: (t: string, s: number) => number };
 async function otFont(font: string): Promise<OT | null> {
-  const url = kioskFontUrl(font) ?? kioskFontUrl("Geist-Regular");
+  const url = kioskFontUrl(font) ?? kioskFontUrl(KIOSK_FONT_SUBSTITUTE);
   if (!url) return null;
   const { parse } = await import("opentype.js");
   return parse(await bytes(url)) as unknown as OT;
@@ -374,12 +376,15 @@ async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Ar
   const fonts = new Map<string, Awaited<ReturnType<typeof doc.embedFont>>>();
   for (const p of placed)
     for (const t of p.texts) {
-      if (!fonts.has(t.font)) {
-        const url = kioskFontUrl(t.font);
-        fonts.set(t.font, url ? await doc.embedFont(await bytes(url), { subset: true }) : await doc.embedFont(/times/i.test(t.font) ? StandardFonts.TimesRoman : StandardFonts.Helvetica));
+      const sq = bulletSquareBox(t);
+      if (sq) {
+        const o = pdfRot(B + sq.x, H - (B + sq.y + sq.s), B + t.ax, H - (B + t.ky), t.rot);
+        page.drawRectangle({ x: o.x, y: o.y, width: sq.s, height: sq.s, color: hexRgb(t.fill), opacity: t.opacity, rotate: degrees(-t.rot), borderWidth: 0 });
+        continue;
       }
+      if (!fonts.has(t.font)) fonts.set(t.font, await embedKioskFont(doc, t.font));
       const f = fonts.get(t.font)!;
-      const clean = (s: string) => { try { f.encodeText(s); return s; } catch { return s.replace(/[^\x20-\x7E]/g, " "); } };
+      const clean = cleanFor(f);
       const lines = t.fixed
         ? (() => {
             const text = clean(t.text);
