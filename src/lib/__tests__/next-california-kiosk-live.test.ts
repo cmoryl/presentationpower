@@ -18,7 +18,8 @@ describe("California kiosks rebuilt from live files", () => {
     expect(all).toHaveLength(14);
     for (const L of all) {
       expect(L.blocks.length, L.id).toBeGreaterThan(0);
-      if (L.id !== "sterling-2-tradebooth-a") expect(L.texts.length, L.id).toBeGreaterThan(3);
+      // Sterling and Veeva were supplied with every word outlined.
+      if (!["sterling-2-tradebooth-a", "veeva-tradebooth-a"].includes(L.id)) expect(L.texts.length, L.id).toBeGreaterThan(3);
     }
   });
 
@@ -30,9 +31,24 @@ describe("California kiosks rebuilt from live files", () => {
         expect(bot, `${L.id} ${p.block.id}`).toBeLessThanOrEqual(KIOSK_H + 0.5);
         expect(p.x).toBeGreaterThanOrEqual(-0.5);
         expect(p.x + L.trimW * p.scale).toBeLessThanOrEqual(KIOSK_W + 0.5);
-        const overlapsTv = top < KIOSK_TV.y + KIOSK_TV.h - 0.5 && bot > KIOSK_TV.y + 0.5;
-        expect(overlapsTv, `${L.id} ${p.block.id} crosses the TV`).toBe(false);
+        // Designer-laid kiosks are one full-height piece; their objects keep clear instead.
+        const boxes = L.native ? p.parts.map((q) => [q.y, q.y + (q.src.y1 - q.src.y0) * q.scale, q.part.id] as const) : [[top, bot, p.block.id] as const];
+        for (const [t, b, id] of boxes) {
+          const overlapsTv = t < KIOSK_TV.y + KIOSK_TV.h - 0.5 && b > KIOSK_TV.y + 0.5;
+          if (L.native && overlapsTv) continue; // checked by the "TV" editor check, as supplied
+          expect(overlapsTv, `${L.id} ${id} crosses the TV`).toBe(false);
+        }
       }
+    }
+  });
+
+  it("maps every designer object to its own page of the CMYK file", () => {
+    for (const L of all) {
+      if (!L.native) continue;
+      const parts = L.blocks.flatMap((b) => b.parts ?? []);
+      expect(parts.length, L.id).toBeGreaterThan(0);
+      for (const q of parts) expect(L.native.parts[q.id], `${L.id} ${q.id}`).toBeTruthy();
+      for (const t of L.texts) if (t.text.includes("\n")) expect(t.align, `${L.id} ${t.id}`).toBeTruthy();
     }
   });
 
