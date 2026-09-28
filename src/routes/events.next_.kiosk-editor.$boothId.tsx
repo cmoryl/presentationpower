@@ -22,6 +22,8 @@ export const Route = createFileRoute("/events/next_/kiosk-editor/$boothId")({
     ],
   }),
   component: KioskEditorWindow,
+  pendingComponent: () => <StatusScreen title="Opening the kiosk editor…" body="Loading the editor. This can take a few seconds." />,
+  pendingMs: 0,
 });
 
 function StatusScreen({ title, body }: { title: string; body: string }) {
