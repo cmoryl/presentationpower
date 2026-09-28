@@ -19,6 +19,7 @@ import {
   KIOSK_MARGIN,
   KIOSK_RETURN_W,
   KIOSK_TV,
+  kioskHasTv,
   KIOSK_W,
   kioskFontFaceCss,
   kioskFontFamily,
@@ -526,8 +527,9 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
     type Hit = { sel: NonNullable<Sel>; label: string; issue: string; level: "error" | "warn" };
     const out: Hit[] = [];
     const tv = KIOSK_TV;
+    const hasTv = kioskHasTv(L.id);
     const test = (sel: NonNullable<Sel>, label: string, b: { x0: number; x1: number; y0: number; y1: number }, isText: boolean) => {
-      if (b.x0 < tv.x + tv.w && b.x1 > tv.x && b.y0 < tv.y + tv.h && b.y1 > tv.y) out.push({ sel, label, issue: "Sits over the TV area — it will be hidden by the screen", level: "error" });
+      if (hasTv && b.x0 < tv.x + tv.w && b.x1 > tv.x && b.y0 < tv.y + tv.h && b.y1 > tv.y) out.push({ sel, label, issue: "Sits over the TV area — it will be hidden by the screen", level: "error" });
       if (isText && (b.x0 < 0 || b.x1 > KIOSK_W || b.y0 < 0 || b.y1 > KIOSK_H)) out.push({ sel, label, issue: "Crosses the trim edge — words will be cut off", level: "error" });
       else if (isText && (b.x0 < KIOSK_MARGIN || b.x1 > KIOSK_W - KIOSK_MARGIN || b.y0 < KIOSK_MARGIN || b.y1 > KIOSK_H - KIOSK_MARGIN)) out.push({ sel, label, issue: "Outside the 2 in safe margin", level: "warn" });
       else if (!isText && (b.x1 < 0 || b.x0 > KIOSK_W || b.y1 < 0 || b.y0 > KIOSK_H)) out.push({ sel, label, issue: "Entirely off the kiosk — it won't print", level: "warn" });
@@ -545,7 +547,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
   }, [placed, edits.dividers]);
   const errors = checks.filter((c) => c.level === "error").length;
 
-  const target = alignTarget === "tv" ? { x0: KIOSK_TV.x, x1: KIOSK_TV.x + KIOSK_TV.w, y0: KIOSK_TV.y, y1: KIOSK_TV.y + KIOSK_TV.h }
+  const target = alignTarget === "tv" && kioskHasTv(L.id) ? { x0: KIOSK_TV.x, x1: KIOSK_TV.x + KIOSK_TV.w, y0: KIOSK_TV.y, y1: KIOSK_TV.y + KIOSK_TV.h }
     : alignTarget === "safe" ? { x0: KIOSK_MARGIN, x1: KIOSK_W - KIOSK_MARGIN, y0: KIOSK_MARGIN, y1: KIOSK_H - KIOSK_MARGIN }
     : { x0: 0, x1: KIOSK_W, y0: 0, y1: KIOSK_H };
   const alignTo = (m: "left" | "hcenter" | "right" | "top" | "vmiddle" | "bottom") => {
@@ -862,7 +864,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                   <line data-export-ignore="true" pointerEvents="none" x1={guide} x2={guide} y1={0} y2={KIOSK_H} stroke="#EC388A" strokeWidth={1.5 * rs} strokeDasharray={`${6 * rs} ${4 * rs}`} />
                 ) : null}
                 <g data-export-ignore="true" pointerEvents="none">
-                  {guides.tv ? (
+                  {guides.tv && kioskHasTv(L.id) ? (
                     <>
                       <rect x={KIOSK_TV.x} y={KIOSK_TV.y} width={KIOSK_TV.w} height={KIOSK_TV.h} fill="#03002C" fillOpacity={0.55} stroke="#FFEB66" strokeDasharray={`${8 * rs} ${5 * rs}`} strokeWidth={1.5 * rs} />
                       <text x={KIOSK_TV.x + KIOSK_TV.w / 2} y={KIOSK_TV.y + KIOSK_TV.h / 2} textAnchor="middle" fontSize={12 * rs} fill="#FFEB66" fontFamily="Geist Mono, monospace">TV KEEP-CLEAR · NOT PRINTED</text>
@@ -929,7 +931,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
               {sel ? (
                 <Sec title="Align" aside={
                   <select aria-label="Align to" value={alignTarget} onChange={(e) => setAlignTarget(e.target.value as typeof alignTarget)} className="rounded-sm border border-white/10 bg-black/30 px-1.5 py-0.5 text-[10.5px] text-white">
-                    <option value="trim">To trim</option><option value="safe">To safe margin</option><option value="tv">To TV area</option>
+                    <option value="trim">To trim</option><option value="safe">To safe margin</option>{kioskHasTv(L.id) ? <option value="tv">To TV area</option> : null}
                   </select>
                 }>
                   <div className="flex flex-wrap gap-1" role="group" aria-label="Align selection">
@@ -1099,7 +1101,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
 
               <Sec title="Guides">
                 <div className="grid grid-cols-2 gap-1.5">
-                  {([["bleed", "Bleed"], ["safe", "Safe margin"], ["tv", "TV keep-clear"], ["rulers", "Rulers"]] as const).map(([g, label]) => (
+                  {([["bleed", "Bleed"], ["safe", "Safe margin"], ["tv", "TV keep-clear"], ["rulers", "Rulers"]] as const).filter(([g]) => g !== "tv" || kioskHasTv(L.id)).map(([g, label]) => (
                     <label key={g} className="flex items-center justify-between rounded-sm border border-white/10 bg-black/20 px-2 py-1.5 text-[11.5px] text-white/75">
                       {label}
                       <input type="checkbox" className="accent-[#003FC7]" checked={guides[g]} onChange={(e) => setGuides((s) => ({ ...s, [g]: e.target.checked }))} />
@@ -1114,7 +1116,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
           {tab === "checks" ? (
             <Sec title="Live print checks">
               {checks.length === 0 ? (
-                <p className="flex items-center gap-2 rounded-sm border border-white/10 bg-black/20 p-2.5 text-[12px] text-white/80"><CheckCircle2 className="h-4 w-4 text-[#A6FA87]" aria-hidden />Nothing over the TV area, past the trim or outside the safe margin.</p>
+                <p className="flex items-center gap-2 rounded-sm border border-white/10 bg-black/20 p-2.5 text-[12px] text-white/80"><CheckCircle2 className="h-4 w-4 text-[#A6FA87]" aria-hidden />{kioskHasTv(L.id) ? "Nothing over the TV area, past the trim" : "No TV on this kiosk. Nothing past the trim"} or outside the safe margin.</p>
               ) : (
                 <ul className="space-y-1.5">
                   {checks.map((c, i) => (
