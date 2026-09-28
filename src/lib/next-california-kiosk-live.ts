@@ -22,6 +22,13 @@ export const KIOSK_BLEED = 9;
 export const KIOSK_TV = { x: 0, y: 997.5, w: 2756, h: 1604 } as const;
 const GAP_MIN = 60;
 
+/** Kiosks the designer re-supplied with NO TV (2026-09-28): no keep-clear, no TV check. */
+export const KIOSK_NO_TV = new Set(["coa", "gl-live-tradebooth-a", "legal-support-2-tradebooth-b", "medical-writing"]);
+export function kioskHasTv(id: string): boolean {
+  return !KIOSK_NO_TV.has(id);
+}
+
+
 export type LiveText = {
   id: string;
   text: string;

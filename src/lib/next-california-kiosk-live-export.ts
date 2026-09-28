@@ -31,6 +31,7 @@ import {
   kioskFontUrl,
   kioskGround,
   kioskLiveFileBase,
+  kioskHasTv,
   layoutKiosk,
   partCentre,
   textLineBoxes,
@@ -647,7 +648,7 @@ export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: K
   zip.file(
     "README.txt",
     `DRAFT — not published. Rebuilt from ${L.source}.\n` +
-      `Front 45 x 96 in, returns 4 x 96 in (.ai with the same live ramp as the front), 1/8 in bleed. TV keep-clear left clear.\n` +
+      `Front 45 x 96 in, returns 4 x 96 in (.ai with the same live ramp as the front), 1/8 in bleed. ${kioskHasTv(L.id) ? "TV keep-clear left clear." : "No TV on this kiosk."}\n` +
       `.svg/.pdf carry live text; the -press-outlined file has every word outlined.\n` +
       `The PNG is a screen proof, not a print master. Check in Illustrator before print.\n`,
   );
