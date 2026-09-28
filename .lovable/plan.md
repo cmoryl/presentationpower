@@ -34,15 +34,16 @@ Every file: kiosk template, 1/8 in bleed, SWOP v2, a red "TV PLACEMENT" guide on
    - The colour picker shows and saves C, M, Y and K values.
    - The screen shows an approximate on-screen view, and every export writes your CMYK numbers unchanged.
    - Nothing is converted.
-5. **Letter-spaced text fixed properly.** Lines like "S P E C I A L I S E D" or "SU PPORT" become one real word with letter spacing, so retyping works. The look stays the same.
-6. **Exports:**
+5. **Multi-line text as one block.** Stacked lines that belong together are grouped into one text block that keeps its alignment (centred, left or right). Examples: the labels under icons ("MEDICAL / INFORMATION"), paragraphs, and the "SCAN TO EXPLORE" lines. In the editor you retype them in a multi-line box, and each line stays centred on the same point. You can also add or remove lines, and change the line spacing. Right now these get read as separate side-by-side runs, for example "MEDICAL PHARMACOVIGILANCE PATIENT" on one line; they're split into each icon's own column first.
+6. **Letter-spaced text fixed properly.** Lines like "S P E C I A L I S E D" or "SU PPORT" become one real word with letter spacing, so retyping works. The look stays the same.
+7. **Exports:**
    - CMYK .ai/PDF with named layers, live text, bleed and trim.
    - Press copy with outlined text.
    - Side strips.
    - PNG proof, labelled as a proof.
    - Drafts are still marked `rdraft-` until published.
-7. **Checks per kiosk:** a comparison sheet (your file vs the editor's rebuilt export). Any kiosk that doesn't match is flagged, not shipped.
-8. **Saved changes:** London-based edits won't line up with the new layouts. They're kept but set aside, and each kiosk starts clean from your file.
+8. **Checks per kiosk:** a comparison sheet (your file vs the editor's rebuilt export). Any kiosk that doesn't match is flagged, not shipped.
+9. **Saved changes:** London-based edits won't line up with the new layouts. They're kept but set aside, and each kiosk starts clean from your file.
 
 ## Honest limits
 - **No editable words on Sterling and Veeva:** their words are shapes, so each is one movable object. I'd need the words to make them live text.
@@ -54,4 +55,5 @@ Every file: kiosk template, 1/8 in bleed, SWOP v2, a red "TV PLACEMENT" guide on
 - **Extraction script:** runs once over the stored masters and writes a new `kiosk-native-layouts.json` (texts in CMYK, parts with bounding boxes and group ids, layer tags, gradient stops in CMYK). It uses qpdf for decompression and pdfplumber for text, and text is stripped from the art stream before it's re-saved as CMYK PDF form art plus an RGB preview SVG.
 - **Layout model:** `LiveLayout` gains `mode: "native"` (scale 1, no blocks) and colour `{ cmyk: [c,m,y,k] }`. The exporter writes DeviceCMYK/ICC SWOP operators; the RGB path stays for London.
 - **Saved changes:** `kiosk_layer_edits` gets a `layout_version` so old edits are parked.
+- **Multi-line grouping:** lines are split into columns by x-gaps, then grouped into a block when their vertical gap is at most 1.6× the type size, the font and size match, and they share a centre, left or right edge within 2 pt. Blocks are stored as `{ lines[], align, lead, anchorX }` and exported as one live text object.
 - **Tests:** every layout exists, nothing is in the TV area, nothing crosses the trim, CMYK values round-trip unchanged, no guide in exports, live text is present.

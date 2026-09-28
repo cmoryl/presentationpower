@@ -19,3 +19,6 @@
 - [ ] Bolder accent shapes — needs per-family visual review
 - [ ] Native social/small-print layouts per family
 - [~] Native social layouts: Editorial layout (square/portrait/story) added on the conversion page; print sizes + other directions not yet
+
+- [ ] SF kiosks: rebuild editor from designer CMYK files (plan pending approval)
+- [ ] SF kiosks: centred multi-line text blocks (icon labels etc.) editable as one block
