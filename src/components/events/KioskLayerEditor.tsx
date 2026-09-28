@@ -42,6 +42,7 @@ import {
   type LiveLayout,
   type PlacedText,
   type TextAlign,
+  cmykScreen,
 } from "@/lib/next-california-kiosk-live";
 import { downloadKiosk, loadArtSvg, type KioskDownload } from "@/lib/next-california-kiosk-live-export";
 import { kioskCmykMaster } from "@/lib/next-california-kiosk-cmyk-masters";
@@ -1258,9 +1259,7 @@ function NumField({ label, value, digits, onCommit, disabled }: { label: string;
 const pc = (v: number | undefined) => Math.round((v ?? 0) * 100);
 /** Approximate on-screen view of a CMYK build (display only; the CMYK numbers print). */
 function cmykPreview(c: number[]) {
-  const [C = 0, M = 0, Y = 0, K = 0] = c;
-  const h = (v: number) => Math.round(255 * (1 - v) * (1 - K)).toString(16).padStart(2, "0");
-  return `#${h(C)}${h(M)}${h(Y)}`.toUpperCase();
+  return cmykScreen(c);
 }
 
 /** A return strip shown beside the front: the background ramp, or the designer's own strip art. */
