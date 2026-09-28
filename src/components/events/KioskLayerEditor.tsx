@@ -30,6 +30,9 @@ import {
   partCentre,
   withCopies,
   splitArtSvg,
+  nativeSymbols,
+  partSource,
+  KIOSK_LIVE_LAYOUTS,
   textLineBoxes,
   badgedPartIds,
   type KioskDivider,
@@ -69,13 +72,25 @@ function clearLocalDraft(id: string) {
   try { localStorage.removeItem(draftKey(id)); } catch { /* ignore */ }
 }
 
+/**
+ * Saved changes only apply to the layout they were made on. Changes made on
+ * the older London-based kiosk would land in the wrong places on a kiosk read
+ * from the designer's CMYK file, so they are set aside (kept, not applied).
+ */
+function forLayout(L: LiveLayout, e: KioskEdits | null | undefined): KioskEdits | null {
+  if (!e) return null;
+  const want = L.native?.version;
+  if ((e.layoutVersion ?? undefined) === want) return e;
+  return want ? { layoutVersion: want, parked: e } : null;
+}
+
 /** Saved edits for a kiosk (shared copy, or this device's newer draft). */
 async function loadKioskEdits(id: string): Promise<KioskEdits> {
   const local = readLocalDraft(id);
   const { data } = await supabase.from("kiosk_layer_edits").select("edits, updated_at").eq("booth_id", id).maybeSingle();
   const remoteAt = data?.updated_at ? Date.parse(data.updated_at) : 0;
   if (local && local.at > remoteAt) return local.edits;
-  return (data?.edits as KioskEdits | undefined) ?? {};
+  return forLayout(KIOSK_LIVE_LAYOUTS[id] ?? ({} as LiveLayout), data?.edits as KioskEdits | undefined) ?? {};
 }
 
 export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: LiveLayout; vendor: string; fill?: boolean }) {
@@ -141,9 +156,9 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
         : { data: null, error: null };
       if (!live) return;
       if (error) { setStatus(`Couldn't load saved changes: ${error.message}. Editing is paused so nothing is overwritten.`); return; }
-      const remote = data?.edits as KioskEdits | undefined;
+      const remote = forLayout(L, data?.edits as KioskEdits | undefined) ?? undefined;
       const remoteAt = data?.updated_at ? Date.parse(data.updated_at) : 0;
-      const next = local && local.at > remoteAt ? local.edits : remote ?? null;
+      const next = local && local.at > remoteAt ? forLayout(L, local.edits) : remote ?? null;
       if (next) { loadedEdits.current = next; setEdits(next); }
       else loadedEdits.current = editsNow.current;
       loaded.current = true;
@@ -158,13 +173,14 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
   useEffect(() => {
     if (!loaded.current || userId === undefined) return;
     if (loadedEdits.current === edits) return;
-    writeLocalDraft(L.id, edits);
+    writeLocalDraft(L.id, L.native ? { ...edits, layoutVersion: L.native.version } : edits);
     if (!userId) { setStatus("Kept on this device. Sign in to save for everyone."); return; }
     if (canSave === null) return;
     if (!canSave) { setStatus("Kept in this browser only — your role can't save kiosks for everyone."); return; }
     setStatus("Saving…");
     const t = setTimeout(async () => {
-      const { error } = await supabase.from("kiosk_layer_edits").upsert({ booth_id: L.id, edits: edits as never, updated_by: userId, updated_at: new Date().toISOString() });
+      const toSave: KioskEdits = L.native ? { ...edits, layoutVersion: L.native.version } : edits;
+      const { error } = await supabase.from("kiosk_layer_edits").upsert({ booth_id: L.id, edits: toSave as never, updated_by: userId, updated_at: new Date().toISOString() });
       if (error) setStatus(`Kept on this device only — not saved for everyone: ${error.message}`);
       else { clearLocalDraft(L.id); setStatus("All changes saved."); window.dispatchEvent(new CustomEvent("kiosk-edits-saved", { detail: L.id })); }
     }, 1200);
@@ -712,7 +728,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
           {!art && !err ? <p className="text-sm text-white/60">Loading the partner's artwork…</p> : null}
           {art ? (
             <div className="mx-auto flex w-max items-start gap-4">
-              {showSides ? <ReturnStrip ground={ground} id={`${L.id}-l`} height={zoom} label="Left return · 4 × 96 in" offsetTop={G * k} /> : null}
+              {showSides ? <ReturnStrip ground={ground} nativeSym={L.native ? `${symId}-left` : undefined} id={`${L.id}-l`} height={zoom} label="Left return · 4 × 96 in" offsetTop={G * k} /> : null}
               <svg
                 ref={svgRef}
                 viewBox={`${vbX} ${vbY} ${vbW} ${vbH}`}
@@ -729,7 +745,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                   <linearGradient id={`kg-${L.id}`} x1="0" y1="0" x2="0" y2="1">
                     {ground.map((s) => <stop key={s.offset} offset={s.offset} stopColor={s.color} />)}
                   </linearGradient>
-                  <g dangerouslySetInnerHTML={{ __html: `<symbol id="${symId}" viewBox="${art.viewBox}" overflow="visible">${art.inner}</symbol>` }} />
+                  <g dangerouslySetInnerHTML={{ __html: L.native ? nativeSymbols(art.inner, symId) : `<symbol id="${symId}" viewBox="${art.viewBox}" overflow="visible">${art.inner}</symbol>` }} />
                   {placed.map((p) => (
                     <clipPath key={p.block.id} id={`kc-${L.id}-${p.block.id}`}>
                       <path clipRule="evenodd" d={pieceBackdropPath(L, p, B / p.scale + 1, 0, 0)} />
@@ -765,8 +781,12 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                     ) : null}
                   </g>
                 ) : null}
-                <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill={`url(#kg-${L.id})`} />
-                {placed.map((p) => {
+                {L.native && !edits.ground ? (
+                  <use href={`#${symId}-bg`} x={-L.originX} y={-L.originY} width={L.mediaW} height={L.mediaH} pointerEvents="none" />
+                ) : (
+                  <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill={`url(#kg-${L.id})`} />
+                )}
+                {L.native ? null : placed.map((p) => {
                   const [, , vw, vh] = art.viewBox.split(/\s+/).map(Number);
                   const on = sel?.kind === "block" && sel.id === p.block.id;
                   return (
@@ -785,9 +805,13 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                   return (
                     <g key={q.part.id} opacity={q.opacity < 1 ? q.opacity : undefined} transform={q.rot ? `rotate(${q.rot} ${c.x} ${c.y})` : undefined}>
                       <g transform={`translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})`} onPointerDown={startDrag({ kind: "part", id: q.part.id })} className={isLocked(q.part.id) ? "cursor-default" : "cursor-move"}>
-                        <g clipPath={`url(#kc-${L.id}-${q.part.id})`}>
-                          <use href={`#${symId}`} x={-L.originX} y={-L.originY} width={vw} height={vh} />
-                        </g>
+                        {L.native ? (
+                          <use href={`#${symId}-${partSource(edits, q.part.id)}`} x={-L.originX} y={-L.originY} width={L.mediaW} height={L.mediaH} />
+                        ) : (
+                          <g clipPath={`url(#kc-${L.id}-${q.part.id})`}>
+                            <use href={`#${symId}`} x={-L.originX} y={-L.originY} width={vw} height={vh} />
+                          </g>
+                        )}
                         <rect x={q.src.x0} y={q.src.y0} width={q.src.x1 - q.src.x0} height={q.src.y1 - q.src.y0} fill="transparent" stroke={on ? "#003FC7" : "none"} strokeWidth={2 * rs / q.scale} />
                       </g>
                     </g>
@@ -849,7 +873,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                   <rect x={0} y={0} width={KIOSK_W} height={KIOSK_H} fill="none" stroke="#EC008C" strokeWidth={1.5 * rs} />
                 </g>
               </svg>
-              {showSides ? <ReturnStrip ground={ground} id={`${L.id}-r`} height={zoom} label="Right return · 4 × 96 in" offsetTop={G * k} /> : null}
+              {showSides ? <ReturnStrip ground={ground} nativeSym={L.native ? `${symId}-right` : undefined} id={`${L.id}-r`} height={zoom} label="Right return · 4 × 96 in" offsetTop={G * k} /> : null}
             </div>
           ) : null}
         </div>
@@ -970,7 +994,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                   <div className="grid grid-cols-3 gap-2">
                     <NumField label="Size pt" value={edits.texts?.[selText.id]?.size ?? selText.size} digits={0} onCommit={(v) => patchText(selText.id, { size: Math.max(6, v) })} />
                     <NumField label="Leading ×" value={selPlaced.lead} digits={2} onCommit={(v) => patchText(selText.id, { lead: Math.max(0.8, Math.min(2, v)) })} />
-                    <NumField label="Tracking" value={edits.texts?.[selText.id]?.track ?? 0} digits={0} onCommit={(v) => patchText(selText.id, { track: Math.max(-50, Math.min(300, v)) || undefined })} />
+                    <NumField label="Tracking" value={edits.texts?.[selText.id]?.track ?? selText.track ?? 0} digits={0} onCommit={(v) => patchText(selText.id, { track: Math.max(-50, Math.min(300, v)) || undefined })} />
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="flex gap-1" role="group" aria-label="Paragraph alignment">
@@ -979,9 +1003,24 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                       ))}
                     </div>
                     <label className="ml-auto flex items-center gap-1.5 text-[10.5px] text-white/55">Colour
-                      <input type="color" className="h-7 w-9 cursor-pointer rounded-sm border border-white/10 bg-transparent" value={edits.texts?.[selText.id]?.color ?? selText.color} onChange={(e) => patchText(selText.id, { color: e.target.value.toUpperCase() })} />
+                      <input type="color" className="h-7 w-9 cursor-pointer rounded-sm border border-white/10 bg-transparent" value={edits.texts?.[selText.id]?.color ?? selText.color} onChange={(e) => patchText(selText.id, { color: e.target.value.toUpperCase(), cmyk: undefined })} />
                     </label>
                   </div>
+                  {L.native ? (
+                    <div>
+                      <div className="grid grid-cols-4 gap-1.5" role="group" aria-label="Print colour, CMYK percent">
+                        {(["C", "M", "Y", "K"] as const).map((ch, i) => (
+                          <NumField key={ch} label={`${ch} %`} value={Math.round(((selPlaced.cmyk ?? [0, 0, 0, 0])[i] ?? 0) * 1000) / 10} digits={1}
+                            onCommit={(v) => {
+                              const c = [...(selPlaced.cmyk ?? [0, 0, 0, 1])];
+                              c[i] = Math.max(0, Math.min(100, v)) / 100;
+                              patchText(selText.id, { cmyk: c, color: cmykPreview(c) });
+                            }} />
+                        ))}
+                      </div>
+                      <p className="mt-1 text-[10.5px] text-white/50">{selPlaced.cmyk ? `Prints as C${pc(selPlaced.cmyk[0])} M${pc(selPlaced.cmyk[1])} Y${pc(selPlaced.cmyk[2])} K${pc(selPlaced.cmyk[3])} — screen colour is approximate.` : "Picked on screen: prints as RGB until you set CMYK here."}</p>
+                    </div>
+                  ) : null}
                   <div className="flex flex-wrap gap-1.5">
                     <button type="button" className={dbtn} onClick={() => {
                       const b = selBounds({ kind: "text", id: selText.id });
@@ -990,7 +1029,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                       const size = Math.max(6, Math.floor(cur * ((KIOSK_W - 2 * KIOSK_MARGIN) / Math.max(1, b.x1 - b.x0))));
                       alignKiosk("center", { ...edits, texts: { ...edits.texts, [selText.id]: { ...edits.texts?.[selText.id], size } } });
                     }}>Fit to safe width</button>
-                    <button type="button" className={dbtn} onClick={() => patchText(selText.id, { size: undefined, lead: undefined, track: undefined, align: undefined })}>Original sizing</button>
+                    <button type="button" className={dbtn} onClick={() => patchText(selText.id, { size: undefined, lead: undefined, track: undefined, align: undefined, cmyk: undefined, color: undefined })}>Original sizing</button>
                   </div>
                   {(() => {
                     const me = selBounds({ kind: "text", id: selText.id });
@@ -1175,8 +1214,16 @@ function NumField({ label, value, digits, onCommit, disabled }: { label: string;
   );
 }
 
-/** A return strip shown beside the front. It carries the background ramp only. */
-function ReturnStrip({ ground, id, height, label, offsetTop }: { ground: { offset: number; color: string }[]; id: string; height: number; label: string; offsetTop: number }) {
+const pc = (v: number | undefined) => Math.round((v ?? 0) * 100);
+/** Approximate on-screen view of a CMYK build (display only; the CMYK numbers print). */
+function cmykPreview(c: number[]) {
+  const [C = 0, M = 0, Y = 0, K = 0] = c;
+  const h = (v: number) => Math.round(255 * (1 - v) * (1 - K)).toString(16).padStart(2, "0");
+  return `#${h(C)}${h(M)}${h(Y)}`.toUpperCase();
+}
+
+/** A return strip shown beside the front: the background ramp, or the designer's own strip art. */
+function ReturnStrip({ ground, id, height, label, offsetTop, nativeSym }: { ground: { offset: number; color: string }[]; id: string; height: number; label: string; offsetTop: number; nativeSym?: string }) {
   const w = height * (KIOSK_RETURN_W / KIOSK_H);
   return (
     <figure className="m-0 flex flex-col items-center" style={{ paddingTop: offsetTop }}>
@@ -1184,7 +1231,14 @@ function ReturnStrip({ ground, id, height, label, offsetTop }: { ground: { offse
         <defs>
           <linearGradient id={`kr-${id}`} x1="0" y1="0" x2="0" y2="1">{ground.map((s) => <stop key={s.offset} offset={s.offset} stopColor={s.color} />)}</linearGradient>
         </defs>
-        <rect width={KIOSK_RETURN_W} height={KIOSK_H} fill={`url(#kr-${id})`} />
+        {nativeSym ? (
+          <>
+            <use href={`#${nativeSym}-bg`} x={-KIOSK_BLEED} y={-KIOSK_BLEED} width={KIOSK_RETURN_W + 2 * KIOSK_BLEED} height={KIOSK_H + 2 * KIOSK_BLEED} />
+            <use href={`#${nativeSym}-content`} x={-KIOSK_BLEED} y={-KIOSK_BLEED} width={KIOSK_RETURN_W + 2 * KIOSK_BLEED} height={KIOSK_H + 2 * KIOSK_BLEED} />
+          </>
+        ) : (
+          <rect width={KIOSK_RETURN_W} height={KIOSK_H} fill={`url(#kr-${id})`} />
+        )}
       </svg>
       <figcaption className="mt-2 w-16 text-center font-mono text-[9.5px] leading-tight text-white/50">{label}</figcaption>
     </figure>
