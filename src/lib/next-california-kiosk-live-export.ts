@@ -11,6 +11,7 @@
 import JSZip from "jszip";
 import { PDFDocument, degrees, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, concatTransformationMatrix, PDFName, PDFOperator, PDFOperatorNames, PDFString } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
+import { PDFDict } from "pdf-lib";
 import { artRegionPdf, mul, parseArtSvg, rotateAbout, roundRectPdf, scale, translate, type Affine } from "@/lib/next-california-kiosk-vector-pdf";
 
 import {
@@ -262,7 +263,7 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
       page.drawLine({ start: { x, y: y + sy * off }, end: { x, y: y + sy * (off + len) }, thickness: lw, color: reg });
     }
   endLayer();
-  return doc.save();
+  return saveWithRealFontNames(doc);
 }
 
 /**
@@ -412,7 +413,7 @@ async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Ar
       page.drawLine({ start: { x: x + sx * off, y }, end: { x: x + sx * (off + len), y }, thickness: lw, color: reg });
       page.drawLine({ start: { x, y: y + sy * off }, end: { x, y: y + sy * (off + len) }, thickness: lw, color: reg });
     }
-  return doc.save();
+  return saveWithRealFontNames(doc);
 }
 
 /** Embed the supplied face; a face we hold no file for is set in embedded Geist (never an unembedded base font). */
@@ -528,7 +529,7 @@ export async function liveReturnPdf(L: LiveLayout, edits: KioskEdits, side: "lef
       page.drawLine({ start: { x, y: y + sy * off }, end: { x, y: y + sy * (off + len) }, thickness: lw, color: reg });
     }
   endLayer();
-  return doc.save();
+  return saveWithRealFontNames(doc);
 }
 
 export type KioskDownload = "zip" | "svg" | "pdf" | "ai" | "press" | "png" | "returns";
@@ -566,4 +567,37 @@ export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: K
       `The PNG is a screen proof, not a print master. Check in Illustrator before print.\n`,
   );
   save(await zip.generateAsync({ type: "blob" }), `${base}.zip`);
+}
+
+/**
+ * pdf-lib names embedded fonts "Geist-Bold-7592" (random suffix), which
+ * Illustrator can't match to the installed face, so every text object opens
+ * as a missing font. Rewrite them to the standard subset form
+ * "ABCDEF+Geist-Bold": Illustrator drops the tag and picks up the real font.
+ */
+async function saveWithRealFontNames(doc: PDFDocument): Promise<Uint8Array> {
+  await doc.flush();
+  const tagFor = new Map<string, string>();
+  const fix = (name: string) => {
+    const base = name.replace(/^[A-Z]{6}\+/, "").replace(/-\d+$/, "");
+    if (!tagFor.has(base)) {
+      let h = 0;
+      for (const ch of base) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+      let t = "";
+      for (let i = 0; i < 6; i++) { t += String.fromCharCode(65 + (h % 26)); h = Math.floor(h / 26) + 7 * (i + 1); }
+      tagFor.set(base, t);
+    }
+    return `${tagFor.get(base)}+${base}`;
+  };
+  for (const [, obj] of doc.context.enumerateIndirectObjects()) {
+    if (!(obj instanceof PDFDict)) continue;
+    for (const key of ["BaseFont", "FontName"]) {
+      const v = obj.get(PDFName.of(key));
+      if (v instanceof PDFName) {
+        const raw = v.decodeText();
+        if (/-\d+$/.test(raw)) obj.set(PDFName.of(key), PDFName.of(fix(raw)));
+      }
+    }
+  }
+  return doc.save();
 }
