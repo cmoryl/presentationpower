@@ -42,6 +42,7 @@ import {
   type LiveLayout,
   type PlacedText,
   type TextAlign,
+  cmykScreen,
 } from "@/lib/next-california-kiosk-live";
 import { downloadKiosk, loadArtSvg, type KioskDownload } from "@/lib/next-california-kiosk-live-export";
 import { kioskCmykMaster } from "@/lib/next-california-kiosk-cmyk-masters";
