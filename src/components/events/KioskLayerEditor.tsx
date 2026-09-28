@@ -1099,7 +1099,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
             <Sec title="Download · draft">
               <button type="button" className={`${dbtn} w-full justify-center border-[#003FC7] bg-[#003FC7] text-white hover:bg-[#003FC7]/85`} disabled={!!busy} onClick={() => dl("zip")}><Download className="h-3.5 w-3.5" />{busy === "zip" ? "Building…" : "All files (.zip)"}</button>
               <div className="grid grid-cols-2 gap-1.5">
-                {([["ai", "Illustrator .ai"], ["pdf", "PDF"], ["svg", "Layered .svg"], ["press", "Press, outlined"], ["png", "PNG proof"]] as const).map(([kk, label]) => (
+                {([["ai", "Illustrator .ai"], ["pdf", "PDF"], ["svg", "Layered .svg"], ["press", "Press, outlined"], ["png", "PNG proof"], ["returns", "Side strips .ai"]] as const).map(([kk, label]) => (
                   <button key={kk} type="button" className={`${dbtn} justify-center`} disabled={!!busy} onClick={() => dl(kk)}>{busy === kk ? "…" : label}</button>
                 ))}
               </div>
