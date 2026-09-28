@@ -20,7 +20,40 @@ export const Route = createFileRoute("/auth")({
 
   head: () => ({ meta: [{ title: "Sign in · TransPerfect Element" }] }),
   component: AuthPage,
+  // This route is client-rendered, so without a pending screen the window sat
+  // blank while the bundle loaded. Show the branded sign-in frame immediately.
+  pendingComponent: AuthLoading,
+  pendingMs: 0,
 });
+
+/** Instant placeholder that matches the sign-in card's frame. */
+function AuthLoading() {
+  return (
+    <div className="min-h-dvh bg-[#F5F1EA] text-[#03002C] flex items-center justify-center px-6">
+      <div className="w-full max-w-[420px]" aria-live="polite">
+        <div className="mb-6 flex items-center gap-3">
+          <div className="h-2 w-8 bg-[#E85A2C]" />
+          <div className="text-sm font-semibold tracking-[0.25em]">TRANSPERFECT · ELEMENT</div>
+        </div>
+        <div className="glass rounded-[20px] p-7">
+          <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+          <p className="mt-2 flex items-center gap-2 text-sm text-black/60">
+            <span
+              className="h-4 w-4 animate-spin rounded-full border-2 border-black/15 border-t-[#03002C] motion-reduce:animate-none"
+              aria-hidden
+            />
+            Loading the sign-in form…
+          </p>
+          <div className="mt-6 space-y-4" aria-hidden>
+            <div className="h-9 rounded-lg bg-black/5" />
+            <div className="h-9 rounded-lg bg-black/5" />
+            <div className="h-10 rounded-lg bg-black/10" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /** Only same-origin relative paths are allowed as post-login redirects. */
 function safeNext(next: string | undefined): string | null {
