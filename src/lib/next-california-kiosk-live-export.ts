@@ -9,7 +9,7 @@
 // Every file is named rdraft- until the San Francisco revision is published.
 
 import JSZip from "jszip";
-import { PDFDocument, degrees, StandardFonts, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, concatTransformationMatrix, PDFName, PDFOperator, PDFOperatorNames, PDFString } from "pdf-lib";
+import { PDFDocument, degrees, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, concatTransformationMatrix, PDFName, PDFOperator, PDFOperatorNames, PDFString } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import { artRegionPdf, mul, parseArtSvg, rotateAbout, roundRectPdf, scale, translate, type Affine } from "@/lib/next-california-kiosk-vector-pdf";
 
@@ -17,6 +17,8 @@ import {
   KIOSK_BLEED,
   KIOSK_H,
   KIOSK_W,
+  KIOSK_FONT_SUBSTITUTE,
+  bulletSquareBox,
   buildKioskFrontSvg,
   buildKioskReturnSvg,
   groundAt,
@@ -56,7 +58,7 @@ export async function liveFrontSvg(L: LiveLayout, edits: KioskEdits) {
 
 type OT = { getPath: (t: string, x: number, y: number, s: number, o?: object) => { toPathData: (d?: number) => string }; getAdvanceWidth: (t: string, s: number) => number };
 async function otFont(font: string): Promise<OT | null> {
-  const url = kioskFontUrl(font) ?? kioskFontUrl("Geist-Regular");
+  const url = kioskFontUrl(font) ?? kioskFontUrl(KIOSK_FONT_SUBSTITUTE);
   if (!url) return null;
   const { parse } = await import("opentype.js");
   return parse(await bytes(url)) as unknown as OT;
@@ -220,12 +222,16 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
   const fonts = new Map<string, Awaited<ReturnType<typeof doc.embedFont>>>();
   for (const p of placed)
     for (const t of p.texts) {
-      if (!fonts.has(t.font)) {
-        const url = kioskFontUrl(t.font);
-        fonts.set(t.font, url ? await doc.embedFont(await bytes(url), { subset: true }) : await doc.embedFont(/times/i.test(t.font) ? StandardFonts.TimesRoman : StandardFonts.Helvetica));
+      const sq = bulletSquareBox(t);
+      if (sq) {
+        const c = hexRgb(t.fill);
+        const Mb = mul(F, rotateAbout(t.rot, t.ax, t.ky));
+        page.pushOperators(raw(`q\n${t.opacity < 1 ? alpha(t.opacity) + "\n" : ""}${[c.red, c.green, c.blue].join(" ")} rg\n${roundRectPdf(sq.s, sq.s, false, mul(Mb, translate(sq.x, sq.y)))}\nf\nQ`));
+        continue;
       }
+      if (!fonts.has(t.font)) fonts.set(t.font, await embedKioskFont(doc, t.font));
       const f = fonts.get(t.font)!;
-      const clean = (s: string) => { try { f.encodeText(s); return s; } catch { return s.replace(/[^\x20-\x7E]/g, " "); } };
+      const clean = cleanFor(f);
       const lines = t.fixed
         ? (() => {
             const text = clean(t.text);
@@ -370,12 +376,15 @@ async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Ar
   const fonts = new Map<string, Awaited<ReturnType<typeof doc.embedFont>>>();
   for (const p of placed)
     for (const t of p.texts) {
-      if (!fonts.has(t.font)) {
-        const url = kioskFontUrl(t.font);
-        fonts.set(t.font, url ? await doc.embedFont(await bytes(url), { subset: true }) : await doc.embedFont(/times/i.test(t.font) ? StandardFonts.TimesRoman : StandardFonts.Helvetica));
+      const sq = bulletSquareBox(t);
+      if (sq) {
+        const o = pdfRot(B + sq.x, H - (B + sq.y + sq.s), B + t.ax, H - (B + t.ky), t.rot);
+        page.drawRectangle({ x: o.x, y: o.y, width: sq.s, height: sq.s, color: hexRgb(t.fill), opacity: t.opacity, rotate: degrees(-t.rot), borderWidth: 0 });
+        continue;
       }
+      if (!fonts.has(t.font)) fonts.set(t.font, await embedKioskFont(doc, t.font));
       const f = fonts.get(t.font)!;
-      const clean = (s: string) => { try { f.encodeText(s); return s; } catch { return s.replace(/[^\x20-\x7E]/g, " "); } };
+      const clean = cleanFor(f);
       const lines = t.fixed
         ? (() => {
             const text = clean(t.text);
@@ -403,6 +412,20 @@ async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Ar
       page.drawLine({ start: { x, y: y + sy * off }, end: { x, y: y + sy * (off + len) }, thickness: lw, color: reg });
     }
   return doc.save();
+}
+
+/** Embed the supplied face; a face we hold no file for is set in embedded Geist (never an unembedded base font). */
+async function embedKioskFont(doc: PDFDocument, font: string) {
+  const url = kioskFontUrl(font) ?? kioskFontUrl(KIOSK_FONT_SUBSTITUTE);
+  if (!url) throw new Error(`No font file for ${font} and no Geist fallback on hand.`);
+  return doc.embedFont(await bytes(url), { subset: true });
+}
+/** Drop only the characters the face cannot set (ligatures first become plain letters). */
+function cleanFor(f: { encodeText: (s: string) => unknown }) {
+  return (s: string) => {
+    try { f.encodeText(s); return s; } catch { /* fall through */ }
+    return [...s.normalize("NFKC")].map((ch) => { try { f.encodeText(ch); return ch; } catch { return " "; } }).join("");
+  };
 }
 
 /**

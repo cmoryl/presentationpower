@@ -33,6 +33,7 @@ import {
   textLineBoxes,
   badgedPartIds,
   type KioskDivider,
+  kioskMissingFonts,
   type KioskEdits,
   type LiveLayout,
   type PlacedText,
@@ -1103,6 +1104,11 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                 ))}
               </div>
               {errors ? <p role="alert" className="rounded-sm border border-[#FF9B70]/40 bg-[#FF9B70]/10 p-2 text-[11.5px] text-white">{errors} print issue{errors === 1 ? "" : "s"} still open — see Checks before sending to press.</p> : null}
+              {kioskMissingFonts(L).map((m) => (
+                <p key={m.font} role="note" className="rounded-sm border border-[#FF9B70]/40 bg-[#FF9B70]/10 p-2 text-[11.5px] text-white">
+                  Font not on file: {m.font.replace(/-/g, " ")}. {m.lines} line{m.lines === 1 ? " is" : "s are"} set in Geist instead, in every file. Supply the font to match London exactly.
+                </p>
+              ))}
               <p className="text-[10.5px] text-white/50">Live files keep editable text and named layers. The PNG is a proof, not a print master. Files stay marked draft until the San Francisco revision is published.</p>
             </Sec>
           ) : null}
