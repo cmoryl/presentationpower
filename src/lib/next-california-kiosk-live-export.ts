@@ -31,6 +31,7 @@ import {
   kioskFontUrl,
   kioskGround,
   kioskLiveFileBase,
+  kioskHasTv,
   layoutKiosk,
   partCentre,
   textLineBoxes,
