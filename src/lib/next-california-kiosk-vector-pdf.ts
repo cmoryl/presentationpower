@@ -233,7 +233,7 @@ const overlaps = (a: Box, b: Box) => a.x0 <= b.x1 && a.x1 >= b.x0 && a.y0 <= b.y
  * `m` (art → page). `clip` is written first as the group's only mask; `holes`
  * are even-odd cut-outs from it (where separate objects sit).
  */
-export function artRegionPdf(art: ParsedArt, region: Box, m: Affine, holes: Box[] = [], imageName?: (i: number) => string, blendGs?: (mode: string) => string): { ops: string; count: number } {
+export function artRegionPdf(art: ParsedArt, region: Box, m: Affine, holes: Box[] = [], imageName?: (i: number) => string, blendGs?: (mode: string) => string, pick?: (o: { kind: "path" | "image"; i: number }) => boolean): { ops: string; count: number } {
   const out: string[] = ["q", rectPdf(region, m), ...holes.map((h) => rectPdf(h, m)), holes.length ? "W* n" : "W n"];
   let count = 0;
   let open: string | null = null;
@@ -249,6 +249,7 @@ export function artRegionPdf(art: ParsedArt, region: Box, m: Affine, holes: Box[
     return true;
   };
   for (const o of art.order) {
+    if (pick && !pick(o)) continue;
     if (o.kind === "image") {
       const im = art.images[o.i]!;
       if (!overlaps(im.box, region) || !imageName) continue;
