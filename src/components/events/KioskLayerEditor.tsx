@@ -819,7 +819,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                   </g>
                 ) : null}
                 {L.native && !edits.ground ? (
-                  <use href={`#${symId}-bg`} x={-L.originX} y={-L.originY} width={L.mediaW} height={L.mediaH} pointerEvents="none" />
+                  <>{/* Paper is white: unprinted areas of the designer file show as white, not transparent. */}<rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="#FFFFFF" pointerEvents="none" /><use href={`#${symId}-bg`} x={-L.originX} y={-L.originY} width={L.mediaW} height={L.mediaH} pointerEvents="none" /></>
                 ) : (
                   <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill={`url(#kg-${L.id})`} />
                 )}
@@ -1274,7 +1274,7 @@ function ReturnStrip({ ground, id, height, label, offsetTop, nativeSym }: { grou
         </defs>
         {nativeSym ? (
           <>
-            <use href={`#${nativeSym}-bg`} x={-KIOSK_BLEED} y={-KIOSK_BLEED} width={KIOSK_RETURN_W + 2 * KIOSK_BLEED} height={KIOSK_H + 2 * KIOSK_BLEED} />
+            <>{/* White paper under the strip art. */}<rect x={-KIOSK_BLEED} y={-KIOSK_BLEED} width={KIOSK_RETURN_W + 2 * KIOSK_BLEED} height={KIOSK_H + 2 * KIOSK_BLEED} fill="#FFFFFF" /><use href={`#${nativeSym}-bg`} x={-KIOSK_BLEED} y={-KIOSK_BLEED} width={KIOSK_RETURN_W + 2 * KIOSK_BLEED} height={KIOSK_H + 2 * KIOSK_BLEED} /></>
             <use href={`#${nativeSym}-content`} x={-KIOSK_BLEED} y={-KIOSK_BLEED} width={KIOSK_RETURN_W + 2 * KIOSK_BLEED} height={KIOSK_H + 2 * KIOSK_BLEED} />
           </>
         ) : (
