@@ -9,7 +9,7 @@
 // Every file is named rdraft- until the San Francisco revision is published.
 
 import JSZip from "jszip";
-import { PDFDocument, degrees, rgb, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, concatTransformationMatrix, PDFName, PDFOperator, PDFOperatorNames, PDFString } from "pdf-lib";
+import { PDFDocument, degrees, rgb, cmyk, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, concatTransformationMatrix, PDFName, PDFOperator, PDFOperatorNames, PDFString } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import { PDFDict } from "pdf-lib";
 import { artRegionPdf, mul, parseArtSvg, rotateAbout, roundRectPdf, scale, translate, type Affine } from "@/lib/next-california-kiosk-vector-pdf";
@@ -26,6 +26,8 @@ import {
   groundAt,
   kioskArtPdfUrl,
   kioskArtSvgUrl,
+  kioskNativePdfUrl,
+  partSource,
   kioskFontUrl,
   kioskGround,
   kioskLiveFileBase,
@@ -45,6 +47,13 @@ function bytes(url: string) {
   }));
   return cache.get(url)!;
 }
+/** The designer's CMYK file, split one object per page. Fails loudly if missing. */
+function nativeBytes(id: string) {
+  const u = kioskNativePdfUrl(id);
+  if (!u) throw new Error("The designer's CMYK kiosk file is missing for this kiosk.");
+  return bytes(u);
+}
+
 export async function loadArtSvg(id: string): Promise<string> {
   const url = kioskArtSvgUrl(id);
   if (!url) throw new Error("This kiosk has no lifted artwork on file.");
@@ -133,8 +142,50 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
 
   // Background: the partner's ramp in fine vector steps.
   const g = kioskGround(L, edits);
-  // One live axial shading (Type 2, DeviceRGB) — no stepped bands, no seams.
-  {
+  const raw = (s: string) => PDFOperator.of(s as PDFOperatorNames);
+  // Kiosk space (trim origin, y down) → bleed-box PDF space.
+  const F: Affine = [1, 0, 0, -1, B, H - B];
+  const placed = layoutKiosk(L, edits);
+  const gs = doc.context.obj({});
+  page.node.Resources()!.set(PDFName.of("ExtGState"), gs);
+  let gsN = 0;
+  const alpha = (o: number) => { const k = `KA${gsN++}`; gs.set(PDFName.of(k), doc.context.obj({ Type: "ExtGState", ca: o, CA: o })); return `/${k} gs`; };
+  const fmt = (m: Affine) => m.map((v) => +v.toFixed(4)).join(" ");
+  if (L.native) {
+    // The designer's own objects, each copied byte-for-byte from the CMYK
+    // file (their CMYK colour numbers are untouched) and placed where the
+    // editor has it.
+    const N = L.native;
+    const src = await PDFDocument.load(await nativeBytes(L.id));
+    const ids = [...new Set(placed.flatMap((p) => p.parts.filter((q) => !q.hidden).map((q) => partSource(edits, q.part.id))))];
+    const want = [N.bgPage, ...ids.map((id) => N.parts[id]!.page)];
+    const forms = await doc.embedPdf(src, want);
+    const xo = doc.context.obj({});
+    page.node.Resources()!.set(PDFName.of("XObject"), xo);
+    forms.forEach((f, i) => xo.set(PDFName.of(`KN${i}`), f.ref));
+    const formOf = (id: string) => `KN${ids.indexOf(id) + 1}`;
+    // Native page (PDF y-up, bleed-box origin) → kiosk space.
+    const P: Affine = [1, 0, 0, -1, -L.originX, L.mediaH - L.originY];
+    if (edits.ground) groundShading();
+    else page.pushOperators(raw(`q\n${fmt(mul(F, P))} cm\n/KN0 Do\nQ`));
+    for (const layer of ["image", "vector"] as const) {
+      endLayer();
+      beginLayer(layer === "image" ? "Imagery" : "Content");
+      for (const p of placed)
+        for (const q of p.parts) {
+          if (q.hidden) continue;
+          const id = partSource(edits, q.part.id);
+          if ((N.parts[id]?.kind ?? "vector") !== layer) continue;
+          const c = partCentre(q);
+          const Mq = mul(F, mul(rotateAbout(q.rot, c.x, c.y), mul(translate(q.x - q.src.x0 * q.scale, q.y - q.src.y0 * q.scale), mul(scale(q.scale), P))));
+          page.pushOperators(raw(`q${q.opacity < 1 ? `\n${alpha(q.opacity)}` : ""}\n${fmt(Mq)} cm\n/${formOf(id)} Do\nQ`));
+        }
+    }
+    endLayer();
+    return finishFront();
+  }
+  groundShading();
+  function groundShading() {
     const hex = (c: string) => [1, 3, 5].map((k) => parseInt(c.slice(k, k + 2), 16) / 255);
     const ctx = doc.context;
     const fns = g.slice(0, -1).map((a, k) => ctx.obj({ FunctionType: 2, Domain: [0, 1], C0: hex(a.color), C1: hex(g[k + 1]!.color), N: 1 }));
@@ -173,18 +224,10 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
   const imageName = (i: number) => imageKey[i]!;
   const BM: Record<string, string> = { multiply: "Multiply", screen: "Screen", overlay: "Overlay", darken: "Darken", lighten: "Lighten", "color-dodge": "ColorDodge", "color-burn": "ColorBurn", "hard-light": "HardLight", "soft-light": "SoftLight", difference: "Difference", exclusion: "Exclusion", hue: "Hue", saturation: "Saturation", color: "Color", luminosity: "Luminosity" };
   const bmNames = new Map<string, string>();
-  const raw = (s: string) => PDFOperator.of(s as PDFOperatorNames);
-  // Kiosk space (trim origin, y down) → bleed-box PDF space.
-  const F: Affine = [1, 0, 0, -1, B, H - B];
-  const placed = layoutKiosk(L, edits);
-  const gs = doc.context.obj({});
-  page.node.Resources()!.set(PDFName.of("ExtGState"), gs);
-  let gsN = 0;
   const blendGs = (mode: string) => {
     if (!bmNames.has(mode)) { const k = `KB${bmNames.size}`; gs.set(PDFName.of(k), doc.context.obj({ Type: "ExtGState", BM: PDFName.of(BM[mode] ?? "Normal") })); bmNames.set(mode, k); }
     return `/${bmNames.get(mode)} gs`;
   };
-  const alpha = (o: number) => { const k = `KA${gsN++}`; gs.set(PDFName.of(k), doc.context.obj({ Type: "ExtGState", ca: o, CA: o })); return `/${k} gs`; };
   // Split the partner art into its own layers: page grounds with the
   // background, placed photos as imagery, everything else as content.
   const isGround = (o: { kind: "path" | "image"; i: number }) => {
@@ -225,6 +268,9 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
   beginLayer("Content");
   drawArt(layerPick.content);
   endLayer();
+  return finishFront();
+
+  async function finishFront() {
 
   // Accent divider rules (live vector fills).
   beginLayer("Accents");
@@ -245,8 +291,9 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
       const sq = bulletSquareBox(t);
       if (sq) {
         const c = hexRgb(t.fill);
+        const fillOp = t.cmyk ? `${t.cmyk.join(" ")} k` : `${[c.red, c.green, c.blue].join(" ")} rg`;
         const Mb = mul(F, rotateAbout(t.rot, t.ax, t.ky));
-        page.pushOperators(raw(`q\n${t.opacity < 1 ? alpha(t.opacity) + "\n" : ""}${[c.red, c.green, c.blue].join(" ")} rg\n${roundRectPdf(sq.s, sq.s, false, mul(Mb, translate(sq.x, sq.y)))}\nf\nQ`));
+        page.pushOperators(raw(`q\n${t.opacity < 1 ? alpha(t.opacity) + "\n" : ""}${fillOp}\n${roundRectPdf(sq.s, sq.s, false, mul(Mb, translate(sq.x, sq.y)))}\nf\nQ`));
         continue;
       }
       if (!fonts.has(t.font)) fonts.set(t.font, await embedKioskFont(doc, t.font));
@@ -262,7 +309,7 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
       for (const l of lines) {
         page.pushOperators(pushGraphicsState(), setCharacterSpacing(l.tc));
         const o = pdfRot(B + l.x, H - (B + l.y), B + t.ax, H - (B + t.ky), t.rot);
-        page.drawText(l.text, { x: o.x, y: o.y, size: t.ksize, font: f, color: hexRgb(t.fill), opacity: t.opacity, rotate: degrees(-t.rot) });
+        page.drawText(l.text, { x: o.x, y: o.y, size: t.ksize, font: f, color: t.cmyk ? cmyk(t.cmyk[0] ?? 0, t.cmyk[1] ?? 0, t.cmyk[2] ?? 0, t.cmyk[3] ?? 0) : hexRgb(t.fill), opacity: t.opacity, rotate: degrees(-t.rot) });
         page.pushOperators(setCharacterSpacing(0), popGraphicsState());
       }
     }
@@ -282,6 +329,7 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
     }
   endLayer();
   return saveWithRealFontNames(doc);
+  }
 }
 
 /**
@@ -518,6 +566,24 @@ export async function liveReturnPdf(L: LiveLayout, edits: KioskEdits, side: "lef
     page.pushOperators(PDFOperator.of(PDFOperatorNames.BeginMarkedContentSequence, [PDFName.of("OC"), PDFName.of(`OC${layerNames.indexOf(n) + 1}`)]));
   const endLayer = () => page.pushOperators(PDFOperator.of(PDFOperatorNames.EndMarkedContent));
 
+  if (L.native && !edits.ground) {
+    // The designer's own strip, background and content kept apart, CMYK as supplied.
+    const st = L.native.strips[side];
+    const src = await PDFDocument.load(await nativeBytes(L.id));
+    const [bgF, ctF] = await doc.embedPdf(src, [st.bg, st.content]);
+    const xo = ctx.obj({});
+    res.set(PDFName.of("XObject"), xo);
+    xo.set(PDFName.of("KS0"), bgF!.ref);
+    xo.set(PDFName.of("KS1"), ctF!.ref);
+    const ocC = ctx.register(ctx.obj({ Type: "OCG", Name: PDFString.of("Content") }));
+    ocProps.set(PDFName.of("OC9"), ocC);
+    const order = [ocRefs[0]!, ocC, ocRefs[1]!];
+    doc.catalog.set(PDFName.of("OCProperties"), ctx.obj({ OCGs: order, D: ctx.obj({ Order: order, ON: order }) }));
+    const draw = (name: string, oc: string) =>
+      page.pushOperators(PDFOperator.of(`/OC /${oc} BDC\nq\n1 0 0 1 ${S} ${S} cm\n/${name} Do\nQ\nEMC` as PDFOperatorNames));
+    draw("KS0", "OC1");
+    draw("KS1", "OC9");
+  } else {
   beginLayer("Background");
   const g = kioskGround(L, edits);
   const hex = (c: string) => [1, 3, 5].map((k) => parseInt(c.slice(k, k + 2), 16) / 255);
@@ -535,6 +601,7 @@ export async function liveReturnPdf(L: LiveLayout, edits: KioskEdits, side: "lef
     popGraphicsState(),
   );
   endLayer();
+  }
 
   beginLayer("Trim marks");
   const reg = rgb(0, 0, 0);

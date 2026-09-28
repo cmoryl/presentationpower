@@ -35,6 +35,12 @@ export type LiveText = {
   bottom: number;
   /** Set on text the editor created (badges): use the font's own spacing, not London's. */
   flow?: boolean;
+  /** Supplied CMYK build of the colour (0–1 each); `color` is only its on-screen view. */
+  cmyk?: number[];
+  /** Supplied alignment, line spacing (× size) and letter spacing (1/1000 em) for multi-line blocks. */
+  align?: TextAlign;
+  lead?: number;
+  track?: number;
 };
 /** One separate object (logo, icon, QR, shape group) inside a piece, in London trim points. */
 export type LivePart = { id: string; x0: number; y0: number; x1: number; y1: number };
@@ -51,6 +57,22 @@ export type LiveLayout = {
   texts: LiveText[];
   blocks: LiveBlock[];
   ground: { offset: number; color: string }[];
+  /**
+   * Set on kiosks read from the designer's own CMYK kiosk file: every piece
+   * sits 1:1 where the designer put it (no re-lay), and the print files are
+   * built from the file's own CMYK objects.
+   */
+  native?: KioskNative;
+};
+
+export type KioskNative = {
+  version: string;
+  profile: string;
+  /** Page of the native PDF holding the front's background objects. */
+  bgPage: number;
+  /** Page holding each movable object, and whether it is a photo or vector art. */
+  parts: Record<string, { page: number; kind: "image" | "vector" }>;
+  strips: Record<"left" | "right", { bg: number; content: number; w: number }>;
 };
 
 export const KIOSK_LIVE_LAYOUTS = layoutsJson as unknown as Record<string, LiveLayout>;
@@ -69,8 +91,14 @@ function pick(map: Record<string, Ptr>, file: string): string | null {
   const hit = Object.entries(map).find(([k]) => k.endsWith(`/${file}.asset.json`));
   return hit ? hit[1].url : null;
 }
-export const kioskArtSvgUrl = (id: string) => pick(ART, `${id}-art.svg`);
+const NATIVE = import.meta.glob<Ptr>("../assets/california-kiosks/native/*.asset.json", { eager: true, import: "default" });
+export const kioskArtSvgUrl = (id: string) =>
+  KIOSK_LIVE_LAYOUTS[id]?.native ? pick(NATIVE, `${id}-native.svg`) : pick(ART, `${id}-art.svg`);
 export const kioskArtPdfUrl = (id: string) => pick(ART, `${id}-art.pdf`);
+/** The designer file split into one page per object (CMYK, as supplied). */
+export const kioskNativePdfUrl = (id: string) => pick(NATIVE, `${id}-native.pdf`);
+/** Symbol id of a native piece inside the preview SVG ("bg", a part id, "left-bg"…). */
+export const nativeSymbol = (sym: string, piece: string) => `${sym}-${piece}`;
 /** Full font file for a supplied face name (e.g. "Poppins-Regular"). */
 export function kioskFontUrl(font: string): string | null {
   return pick(FONTS, `${font}.ttf`);
@@ -99,6 +127,8 @@ export type TextEdit = {
   lead?: number;
   /** Letter spacing in 1/1000 em, as in design apps. */
   track?: number;
+  /** CMYK build set in the editor (0–1 each); `color` then holds its on-screen view. */
+  cmyk?: number[];
 };
 /** An accent divider rule placed on the kiosk front (kiosk points, on trim). */
 export type KioskDivider = {
@@ -114,6 +144,10 @@ export type KioskCopy = { id: string; of: string; kind: "text" | "part" };
  */
 export type KioskBadge = { id: string; of: string; text: string; font?: string; color?: string };
 export type KioskEdits = {
+  /** Layout these changes were made on (set for kiosks read from the designer's CMYK file). */
+  layoutVersion?: string;
+  /** Changes made on an earlier layout, kept but not applied. */
+  parked?: KioskEdits;
   ground?: { top: string; bottom: string } | null;
   blocks?: Record<string, BlockEdit>;
   texts?: Record<string, TextEdit>;
@@ -222,6 +256,8 @@ export type PlacedText = LiveText & {
   fixed: boolean;
   /** 0–1 opacity and clockwise rotation (deg) about the anchor on the first baseline. */
   opacity: number; rot: number;
+  /** CMYK to print (supplied or set in the editor); absent = print `fill` as RGB. */
+  cmyk?: number[];
 };
 
 /** Centre of a placed object on the kiosk. */
@@ -278,12 +314,87 @@ export function badgedPartIds(edits: KioskEdits = {}): Set<string> {
   return new Set((edits.badges ?? []).map((b) => b.of));
 }
 
+/** Place one piece at kiosk y with scale s (pure). */
+function placeBlock(L: LiveLayout, edits: KioskEdits, badged: Set<string>, b: LiveBlock, c: readonly [number, number], y: number, s: number): PlacedBlock {
+    const e = edits.blocks?.[b.id] ?? {};
+    const us = e.scale ?? 1;
+    const sc = s * us;
+    const w = L.trimW * sc;
+    const h = (c[1] - c[0]) * sc;
+    const hs = (c[1] - c[0]) * s;
+    const x = (KIOSK_W - w) / 2 + (e.dx ?? 0);
+    const yy = y + (hs - h) / 2 + (e.dy ?? 0);
+    const texts = L.texts
+      .filter((t) => {
+        const m = (t.top + t.bottom) / 2;
+        return m >= b.y0 && m < b.y1;
+      })
+      .map<PlacedText>((t) => {
+        const te = edits.texts?.[t.id] ?? {};
+        const kx = x + t.x * sc + (te.dx ?? 0);
+        const kw = t.w * sc;
+        const ksize = (te.size ?? t.size) * sc;
+        const text = te.text ?? t.text;
+        const lines = text.split(/\r?\n/);
+        const align: TextAlign = te.align ?? t.align ?? "left";
+        const edited = te.text !== undefined && te.text !== t.text;
+        return {
+          ...t,
+          kx,
+          ky: yy + (t.y - c[0]) * sc + (te.dy ?? 0),
+          ksize,
+          kw,
+          edited,
+          text,
+          fill: te.color ?? t.color,
+          lines,
+          align,
+          ax: kx + (align === "center" ? kw / 2 : align === "right" ? kw : 0),
+          lead: te.lead ?? t.lead ?? 1.15,
+          trackPt: ((te.track ?? t.track ?? 0) / 1000) * ksize,
+          cmyk: te.cmyk ?? (te.color ? undefined : t.cmyk),
+          fixed: !t.flow && !edited && !te.track && lines.length === 1 && te.size === undefined,
+          opacity: te.opacity ?? 1,
+          rot: te.rot ?? 0,
+        };
+      })
+      .filter((t) => !edits.texts?.[t.id]?.hidden);
+    const parts: PlacedPart[] = (b.parts ?? [])
+      .map((pt) => ({ pt, src: { x0: pt.x0, x1: pt.x1, y0: Math.max(pt.y0, c[0]), y1: Math.min(pt.y1, c[1]) } }))
+      .filter(({ src }) => src.y1 - src.y0 > 2)
+      .map(({ pt, src }) => {
+        const pe = edits.parts?.[pt.id] ?? {};
+        const ps = pe.scale ?? 1;
+        const w = (src.x1 - src.x0) * sc, h = (src.y1 - src.y0) * sc;
+        return {
+          part: pt,
+          src,
+          x: x + src.x0 * sc + (pe.dx ?? 0) + ((1 - ps) * w) / 2,
+          y: yy + (src.y0 - c[0]) * sc + (pe.dy ?? 0) + ((1 - ps) * h) / 2,
+          scale: sc * ps,
+          hidden: !!pe.hidden || badged.has(pt.id),
+          opacity: pe.opacity ?? 1,
+          rot: pe.rot ?? 0,
+        };
+      })
+      .map((q, i) => ({ q, i, z: edits.z?.[q.part.id] ?? 0 }))
+      .sort((a, b) => a.z - b.z || a.i - b.i)
+      .map(({ q }) => q);
+    return { block: b, clipTop: c[0], clipBottom: c[1], x, y: yy, scale: sc, texts, parts };
+}
+
 /** Pure: place every visible piece of a London wall onto the kiosk front. */
 export function layoutKiosk(L0: LiveLayout, edits: KioskEdits = {}): PlacedBlock[] {
   const L = withCopies(L0, edits);
   const badged = badgedPartIds(edits);
   const base = KIOSK_W / L.trimW;
   const vis = L.blocks.filter((b) => !isHidden(b, edits.blocks?.[b.id]));
+  if (L.native) {
+    // The designer already laid the kiosk out: every piece stays where it is.
+    const out: PlacedBlock[] = [];
+    for (const b of vis) out.push(placeBlock(L, edits, badged, b, [b.y0, b.y1], b.y0, 1));
+    return out;
+  }
   const full = (b: LiveBlock) => [b.y0, b.y1] as const;
   const tight = (b: LiveBlock) => [Math.max(b.y0, b.c0 - 60), Math.min(b.y1, b.c1 + 60)] as const;
 
@@ -318,70 +429,7 @@ export function layoutKiosk(L0: LiveLayout, edits: KioskEdits = {}): PlacedBlock
 
   const out: PlacedBlock[] = [];
   const place = (b: LiveBlock, c: readonly [number, number], y: number, s: number) => {
-    const e = edits.blocks?.[b.id] ?? {};
-    const us = e.scale ?? 1;
-    const sc = s * us;
-    const w = L.trimW * sc;
-    const h = (c[1] - c[0]) * sc;
-    const hs = (c[1] - c[0]) * s;
-    const x = (KIOSK_W - w) / 2 + (e.dx ?? 0);
-    const yy = y + (hs - h) / 2 + (e.dy ?? 0);
-    const texts = L.texts
-      .filter((t) => {
-        const m = (t.top + t.bottom) / 2;
-        return m >= b.y0 && m < b.y1;
-      })
-      .map<PlacedText>((t) => {
-        const te = edits.texts?.[t.id] ?? {};
-        const kx = x + t.x * sc + (te.dx ?? 0);
-        const kw = t.w * sc;
-        const ksize = (te.size ?? t.size) * sc;
-        const text = te.text ?? t.text;
-        const lines = text.split(/\r?\n/);
-        const align: TextAlign = te.align ?? "left";
-        const edited = te.text !== undefined && te.text !== t.text;
-        return {
-          ...t,
-          kx,
-          ky: yy + (t.y - c[0]) * sc + (te.dy ?? 0),
-          ksize,
-          kw,
-          edited,
-          text,
-          fill: te.color ?? t.color,
-          lines,
-          align,
-          ax: kx + (align === "center" ? kw / 2 : align === "right" ? kw : 0),
-          lead: te.lead ?? 1.15,
-          trackPt: ((te.track ?? 0) / 1000) * ksize,
-          fixed: !t.flow && !edited && !te.track && lines.length === 1 && te.size === undefined,
-          opacity: te.opacity ?? 1,
-          rot: te.rot ?? 0,
-        };
-      })
-      .filter((t) => !edits.texts?.[t.id]?.hidden);
-    const parts: PlacedPart[] = (b.parts ?? [])
-      .map((pt) => ({ pt, src: { x0: pt.x0, x1: pt.x1, y0: Math.max(pt.y0, c[0]), y1: Math.min(pt.y1, c[1]) } }))
-      .filter(({ src }) => src.y1 - src.y0 > 2)
-      .map(({ pt, src }) => {
-        const pe = edits.parts?.[pt.id] ?? {};
-        const ps = pe.scale ?? 1;
-        const w = (src.x1 - src.x0) * sc, h = (src.y1 - src.y0) * sc;
-        return {
-          part: pt,
-          src,
-          x: x + src.x0 * sc + (pe.dx ?? 0) + ((1 - ps) * w) / 2,
-          y: yy + (src.y0 - c[0]) * sc + (pe.dy ?? 0) + ((1 - ps) * h) / 2,
-          scale: sc * ps,
-          hidden: !!pe.hidden || badged.has(pt.id),
-          opacity: pe.opacity ?? 1,
-          rot: pe.rot ?? 0,
-        };
-      })
-      .map((q, i) => ({ q, i, z: edits.z?.[q.part.id] ?? 0 }))
-      .sort((a, b) => a.z - b.z || a.i - b.i)
-      .map(({ q }) => q);
-    out.push({ block: b, clipTop: c[0], clipBottom: c[1], x, y: yy, scale: sc, texts, parts });
+    out.push(placeBlock(L, edits, badged, b, c, y, s));
   };
   let y = 0;
   for (const a of above) {
@@ -410,6 +458,17 @@ export function kioskGround(L: LiveLayout, edits: KioskEdits = {}) {
 // ---- SVG --------------------------------------------------------------------
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+/** The supplied object a (possibly copied) part draws. */
+export function partSource(edits: KioskEdits, id: string): string {
+  const c = edits.copies?.find((x) => x.id === id && x.kind === "part");
+  return c ? partSource(edits, c.of) : id;
+}
+
+/** Native preview symbols, named for this document. */
+export function nativeSymbols(inner: string, sym: string) {
+  return inner.split("__SYM__").join(sym);
+}
 
 /** Split the supplied art SVG into its viewBox and inner markup. */
 export function splitArtSvg(svg: string): { viewBox: string; inner: string } {
@@ -462,7 +521,8 @@ export function buildKioskFrontSvg(
   parts.push(
     `<linearGradient id="kg" x1="0" y1="0" x2="0" y2="1">${g.map((s) => `<stop offset="${s.offset}" stop-color="${s.color}"/>`).join("")}</linearGradient>`,
   );
-  parts.push(`<symbol id="art" viewBox="${art.viewBox}" overflow="visible">${art.inner}</symbol>`);
+  if (L.native) parts.push(nativeSymbols(art.inner, "art"));
+  else parts.push(`<symbol id="art" viewBox="${art.viewBox}" overflow="visible">${art.inner}</symbol>`);
   placed.forEach((p) => {
     const bleedX = B / p.scale + 1;
     const top = p === placed[0] && p.y <= 0.5 ? -B / p.scale : 0;
@@ -472,9 +532,26 @@ export function buildKioskFrontSvg(
       parts.push(`<clipPath id="c-${q.part.id}"><rect x="${q.src.x0}" y="${q.src.y0}" width="${q.src.x1 - q.src.x0}" height="${q.src.y1 - q.src.y0}"/></clipPath>`);
   });
   parts.push(`</defs>`);
-  parts.push(`<g id="Background"><rect x="${-B}" y="${-B}" width="${KIOSK_W + 2 * B}" height="${KIOSK_H + 2 * B}" fill="url(#kg)"/></g>`);
+  const nat = L.native;
+  parts.push(
+    nat && !edits.ground
+      ? `<g id="Background"><use xlink:href="#art-bg" href="#art-bg" x="${-L.originX}" y="${-L.originY}" width="${vw}" height="${vh}"/></g>`
+      : `<g id="Background"><rect x="${-B}" y="${-B}" width="${KIOSK_W + 2 * B}" height="${KIOSK_H + 2 * B}" fill="url(#kg)"/></g>`,
+  );
   parts.push(`<g id="Graphics">`);
   for (const p of placed) {
+    if (nat) {
+      parts.push(`<g id="piece-${p.block.id}">`);
+      for (const q of p.parts) {
+        if (q.hidden) continue;
+        const ref = `#art-${partSource(edits, q.part.id)}`;
+        parts.push(
+          `<g id="object-${q.part.id}" inkscape:label="Object ${q.part.id}"${fx(q.opacity, q.rot, partCentre(q).x, partCentre(q).y)}><g transform="translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})"><use xlink:href="${ref}" href="${ref}" x="${-L.originX}" y="${-L.originY}" width="${vw}" height="${vh}"/></g></g>`,
+        );
+      }
+      parts.push(`</g>`);
+      continue;
+    }
     parts.push(
       `<g id="piece-${p.block.id}" inkscape:label="Piece ${p.block.id}"><g transform="translate(${p.x} ${p.y}) scale(${p.scale})"><g clip-path="url(#c-${p.block.id})"><use xlink:href="#art" href="#art" x="${-L.originX}" y="${-(L.originY + p.clipTop)}" width="${vw}" height="${vh}"/></g></g>`,
     );
