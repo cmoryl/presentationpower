@@ -5,7 +5,7 @@
 //     piece, live text in the embedded fonts, TrimBox/BleedBox set
 //   • press .svg — the same file with every word outlined
 //   • proof .png — rasterised from the press file (a proof, not a master)
-//   • both return strips as .svg
+//   • both return strips as .ai/.pdf (same live ramp as the front) and .svg
 // Every file is named rdraft- until the San Francisco revision is published.
 
 import JSZip from "jszip";
@@ -17,6 +17,7 @@ import {
   KIOSK_BLEED,
   KIOSK_H,
   KIOSK_W,
+  KIOSK_RETURN_W,
   KIOSK_FONT_SUBSTITUTE,
   bulletSquareBox,
   buildKioskFrontSvg,
@@ -468,7 +469,69 @@ function save(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
 
-export type KioskDownload = "zip" | "svg" | "pdf" | "ai" | "press" | "png";
+/**
+ * Return strip (4 x 96 in) as a PDF-compatible .ai: the same Type 2/3 axial
+ * shading as the front, over the same bleed-box height, so the strips and
+ * the front print one continuous ramp. Layers: Background, Trim marks.
+ */
+export async function liveReturnPdf(L: LiveLayout, edits: KioskEdits, side: "left" | "right"): Promise<Uint8Array> {
+  const B = KIOSK_BLEED;
+  const W = KIOSK_RETURN_W + 2 * B, H = KIOSK_H + 2 * B;
+  const S = 36;
+  const doc = await PDFDocument.create();
+  doc.setTitle(`${kioskLiveFileBase(L.id)} — return ${side} (draft)`);
+  const page = doc.addPage([W + 2 * S, H + 2 * S]);
+  page.setTrimBox(S + B, S + B, KIOSK_RETURN_W, KIOSK_H);
+  page.setBleedBox(S, S, W, H);
+  page.setCropBox(0, 0, W + 2 * S, H + 2 * S);
+  const layerNames = ["Background", "Trim marks"] as const;
+  const ctx = doc.context;
+  const ocProps = ctx.obj({});
+  const ocRefs = layerNames.map((name, i) => {
+    const ref = ctx.register(ctx.obj({ Type: "OCG", Name: PDFString.of(name) }));
+    ocProps.set(PDFName.of(`OC${i + 1}`), ref);
+    return ref;
+  });
+  const res = page.node.Resources()!;
+  res.set(PDFName.of("Properties"), ocProps);
+  doc.catalog.set(PDFName.of("OCProperties"), ctx.obj({ OCGs: ocRefs, D: ctx.obj({ Order: ocRefs, ON: ocRefs }) }));
+  const beginLayer = (n: (typeof layerNames)[number]) =>
+    page.pushOperators(PDFOperator.of(PDFOperatorNames.BeginMarkedContentSequence, [PDFName.of("OC"), PDFName.of(`OC${layerNames.indexOf(n) + 1}`)]));
+  const endLayer = () => page.pushOperators(PDFOperator.of(PDFOperatorNames.EndMarkedContent));
+
+  beginLayer("Background");
+  const g = kioskGround(L, edits);
+  const hex = (c: string) => [1, 3, 5].map((k) => parseInt(c.slice(k, k + 2), 16) / 255);
+  const fns = g.slice(0, -1).map((a, k) => ctx.obj({ FunctionType: 2, Domain: [0, 1], C0: hex(a.color), C1: hex(g[k + 1]!.color), N: 1 }));
+  const fn = fns.length === 1 ? fns[0]! : ctx.obj({
+    FunctionType: 3, Domain: [0, 1], Functions: fns,
+    Bounds: g.slice(1, -1).map((x) => x.offset), Encode: fns.flatMap(() => [0, 1]),
+  });
+  const sh = ctx.register(ctx.obj({ ShadingType: 2, ColorSpace: "DeviceRGB", Coords: [0, H, 0, 0], Function: fn, Extend: [true, true] }));
+  res.set(PDFName.of("Shading"), ctx.obj({ KGround: sh }));
+  page.pushOperators(
+    pushGraphicsState(), concatTransformationMatrix(1, 0, 0, 1, S, S),
+    rectangle(0, 0, W, H), clip(), endPath(),
+    PDFOperator.of("sh" as PDFOperatorNames, [PDFName.of("KGround")]),
+    popGraphicsState(),
+  );
+  endLayer();
+
+  beginLayer("Trim marks");
+  const reg = rgb(0, 0, 0);
+  const tx0 = S + B, ty0 = S + B, tx1 = tx0 + KIOSK_RETURN_W, ty1 = ty0 + KIOSK_H;
+  const off = B, len = 18, lw = 0.25;
+  for (const x of [tx0, tx1])
+    for (const y of [ty0, ty1]) {
+      const sx = x === tx0 ? -1 : 1, sy = y === ty0 ? -1 : 1;
+      page.drawLine({ start: { x: x + sx * off, y }, end: { x: x + sx * (off + len), y }, thickness: lw, color: reg });
+      page.drawLine({ start: { x, y: y + sy * off }, end: { x, y: y + sy * (off + len) }, thickness: lw, color: reg });
+    }
+  endLayer();
+  return doc.save();
+}
+
+export type KioskDownload = "zip" | "svg" | "pdf" | "ai" | "press" | "png" | "returns";
 
 export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: KioskEdits) {
   const base = kioskLiveFileBase(L.id);
@@ -480,6 +543,11 @@ export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: K
   }
   if (kind === "press") return save(svgBlob(await pressFrontSvg(L, edits)), `${base}-front-press-outlined.svg`);
   if (kind === "png") return save(await proofPng(await pressFrontSvg(L, edits)), `${base}-front-PROOF.png`);
+  if (kind === "returns") {
+    const z = new JSZip();
+    for (const side of ["left", "right"] as const) z.file(`${base}-return-${side}.ai`, await liveReturnPdf(L, edits, side));
+    return save(await z.generateAsync({ type: "blob" }), `${base}-returns.zip`);
+  }
   const zip = new JSZip();
   const press = await pressFrontSvg(L, edits);
   zip.file(`${base}-front.svg`, await liveFrontSvg(L, edits));
@@ -489,10 +557,11 @@ export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: K
   const ret = buildKioskReturnSvg(L, edits);
   zip.file(`${base}-return-left.svg`, ret);
   zip.file(`${base}-return-right.svg`, ret);
+  for (const side of ["left", "right"] as const) zip.file(`${base}-return-${side}.ai`, await liveReturnPdf(L, edits, side));
   zip.file(
     "README.txt",
     `DRAFT — not published. Rebuilt from ${L.source}.\n` +
-      `Front 45 x 96 in, returns 4 x 96 in, 1/8 in bleed. TV keep-clear left clear.\n` +
+      `Front 45 x 96 in, returns 4 x 96 in (.ai with the same live ramp as the front), 1/8 in bleed. TV keep-clear left clear.\n` +
       `.svg/.pdf carry live text; the -press-outlined file has every word outlined.\n` +
       `The PNG is a screen proof, not a print master. Check in Illustrator before print.\n`,
   );
