@@ -493,6 +493,11 @@ export function buildKioskFrontSvg(
   parts.push(`<g id="Text">`);
   for (const p of placed)
     for (const t of p.texts) {
+      const sq = bulletSquarePath(t);
+      if (sq) {
+        parts.push(`<path id="${t.id}" d="${sq}" fill="${t.fill}"${fx(t.opacity, t.rot, t.ax, t.ky)}/>`);
+        continue;
+      }
       const d = opts.outline?.(t);
       if (d) {
         parts.push(`<path id="${t.id}" d="${d}" fill="${t.fill}"${fx(t.opacity, t.rot, t.ax, t.ky)}/>`);
@@ -531,3 +536,34 @@ export function groundAt(stops: { offset: number; color: string }[], t: number):
 }
 
 export const kioskLiveFileBase = (id: string) => `rdraft-sf-kiosk-${id}-live`;
+
+/**
+ * The partner's "▪" bullets were set in Times New Roman, which we have no
+ * licence file for (and PDF standard Times cannot encode the glyph, so it
+ * dropped out). They are drawn as the same filled square instead, measured
+ * from the London file: 0.2226 em square, 0.0624 em in from the origin,
+ * bottom edge 0.228 em above the baseline.
+ */
+export const BULLET_SQUARE = { inset: 0.0624, side: 0.2226, lift: 0.228 } as const;
+export function bulletSquareBox(t: Pick<PlacedText, "text" | "kx" | "ky" | "ksize">) {
+  if (t.text.trim() !== "▪") return null;
+  const s = BULLET_SQUARE.side * t.ksize;
+  return { x: t.kx + BULLET_SQUARE.inset * t.ksize, y: t.ky - BULLET_SQUARE.lift * t.ksize - s, s };
+}
+export function bulletSquarePath(t: Pick<PlacedText, "text" | "kx" | "ky" | "ksize">): string | null {
+  const b = bulletSquareBox(t);
+  if (!b) return null;
+  const f = (v: number) => v.toFixed(2);
+  return `M${f(b.x)} ${f(b.y)}H${f(b.x + b.s)}V${f(b.y + b.s)}H${f(b.x)}Z`;
+}
+
+/** Faces the partner used that we hold no font file for, and what they are set in instead. */
+export const KIOSK_FONT_SUBSTITUTE = "Geist-Regular";
+export function kioskMissingFonts(L: LiveLayout): { font: string; lines: number }[] {
+  const n = new Map<string, number>();
+  for (const t of L.texts) {
+    if (t.text.trim() === "▪") continue;
+    if (!kioskFontUrl(t.font)) n.set(t.font, (n.get(t.font) ?? 0) + 1);
+  }
+  return [...n].map(([font, lines]) => ({ font, lines }));
+}
