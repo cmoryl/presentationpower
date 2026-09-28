@@ -1,7 +1,8 @@
 import { test } from "vitest";
 import { PDFDocument } from "pdf-lib";
 import { kioskLiveLayout } from "@/lib/next-california-kiosk-live";
-import { nativeBytes } from "@/lib/next-california-kiosk-live";
+import { kioskNativePdfUrl } from "@/lib/next-california-kiosk-live";
+const nativeBytes = async (id: string) => { let u = kioskNativePdfUrl(id)!; if (u.startsWith("/")) u = "https://transperfectelement.lovable.app" + u; return (await fetch(u)).arrayBuffer(); };
 test("sterling timing", async () => {
   const L = kioskLiveLayout("sterling-2-tradebooth-a")!;
   let t = Date.now();
