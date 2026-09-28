@@ -185,27 +185,45 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
     return `/${bmNames.get(mode)} gs`;
   };
   const alpha = (o: number) => { const k = `KA${gsN++}`; gs.set(PDFName.of(k), doc.context.obj({ Type: "ExtGState", ca: o, CA: o })); return `/${k} gs`; };
-  endLayer();
-  beginLayer("Artwork");
-  for (const p of placed) {
-    const s = p.scale;
-    const bx = B / s + 1;
-    const top = p === placed[0] && p.y <= 0.5 ? -(B + 1) / s : 0;
-    const bot = Math.abs(p.y + (p.clipBottom - p.clipTop) * s - KIOSK_H) < 0.5 ? (B + 1) / s : 0;
-    // art → kiosk: translate(p.x,p.y)·scale(s)·translate(-originX, -(originY+clipTop))
-    const M = mul(F, mul(translate(p.x, p.y), mul(scale(s), translate(-L.originX, -(L.originY + p.clipTop)))));
-    const oy = L.originY + p.clipTop;
-    const region = { x0: L.originX - bx, y0: oy + top, x1: L.originX + L.trimW + bx, y1: L.originY + p.clipBottom + bot };
-    const holes = p.parts.map((q) => ({ x0: L.originX + q.src.x0, y0: L.originY + q.src.y0, x1: L.originX + q.src.x1, y1: L.originY + q.src.y1 }));
-    page.pushOperators(raw(artRegionPdf(art, region, M, holes, imageName, blendGs).ops));
-    for (const q of p.parts) {
-      if (q.hidden) continue;
-      const c = partCentre(q);
-      const Mq = mul(F, mul(rotateAbout(q.rot, c.x, c.y), mul(translate(q.x - q.src.x0 * q.scale, q.y - q.src.y0 * q.scale), mul(scale(q.scale), translate(-L.originX, -L.originY)))));
-      const r = { x0: L.originX + q.src.x0, y0: L.originY + q.src.y0, x1: L.originX + q.src.x1, y1: L.originY + q.src.y1 };
-      page.pushOperators(raw(`q${q.opacity < 1 ? `\n${alpha(q.opacity)}` : ""}\n${artRegionPdf(art, r, Mq, [], imageName, blendGs).ops}\nQ`));
+  // Split the partner art into its own layers: page grounds with the
+  // background, placed photos as imagery, everything else as content.
+  const isGround = (o: { kind: "path" | "image"; i: number }) => {
+    const b = o.kind === "path" ? art.paths[o.i]!.box : art.images[o.i]!.box;
+    return (b.x1 - b.x0) >= 0.95 * L.trimW && (b.y1 - b.y0) >= 0.98 * L.trimH;
+  };
+  const layerPick = {
+    ground: (o: { kind: "path" | "image"; i: number }) => isGround(o),
+    imagery: (o: { kind: "path" | "image"; i: number }) => o.kind === "image" && !isGround(o),
+    content: (o: { kind: "path" | "image"; i: number }) => o.kind === "path" && !isGround(o),
+  };
+  const drawArt = (pick: (o: { kind: "path" | "image"; i: number }) => boolean) => {
+    for (const p of placed) {
+      const s = p.scale;
+      const bx = B / s + 1;
+      const top = p === placed[0] && p.y <= 0.5 ? -(B + 1) / s : 0;
+      const bot = Math.abs(p.y + (p.clipBottom - p.clipTop) * s - KIOSK_H) < 0.5 ? (B + 1) / s : 0;
+      // art → kiosk: translate(p.x,p.y)·scale(s)·translate(-originX, -(originY+clipTop))
+      const M = mul(F, mul(translate(p.x, p.y), mul(scale(s), translate(-L.originX, -(L.originY + p.clipTop)))));
+      const oy = L.originY + p.clipTop;
+      const region = { x0: L.originX - bx, y0: oy + top, x1: L.originX + L.trimW + bx, y1: L.originY + p.clipBottom + bot };
+      const holes = p.parts.map((q) => ({ x0: L.originX + q.src.x0, y0: L.originY + q.src.y0, x1: L.originX + q.src.x1, y1: L.originY + q.src.y1 }));
+      page.pushOperators(raw(artRegionPdf(art, region, M, holes, imageName, blendGs, pick).ops));
+      for (const q of p.parts) {
+        if (q.hidden) continue;
+        const c = partCentre(q);
+        const Mq = mul(F, mul(rotateAbout(q.rot, c.x, c.y), mul(translate(q.x - q.src.x0 * q.scale, q.y - q.src.y0 * q.scale), mul(scale(q.scale), translate(-L.originX, -L.originY)))));
+        const r = { x0: L.originX + q.src.x0, y0: L.originY + q.src.y0, x1: L.originX + q.src.x1, y1: L.originY + q.src.y1 };
+        page.pushOperators(raw(`q${q.opacity < 1 ? `\n${alpha(q.opacity)}` : ""}\n${artRegionPdf(art, r, Mq, [], imageName, blendGs, pick).ops}\nQ`));
+      }
     }
-  }
+  };
+  drawArt(layerPick.ground);
+  endLayer();
+  beginLayer("Imagery");
+  drawArt(layerPick.imagery);
+  endLayer();
+  beginLayer("Content");
+  drawArt(layerPick.content);
   endLayer();
 
   // Accent divider rules (live vector fills).
