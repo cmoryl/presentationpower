@@ -16,3 +16,4 @@
 - Approvals live on one page, `/approvals`, with a Brand tab (`approval_requests`) and a Modules tab (`custom_modules.review_status`). DB triggers enforce reviewer-only decisions. Why: the old module queue read a table nothing wrote to.
 - The Knowledge screens share the `KnowledgeTabs` strip (Entries / Ask Oracle / Oracle KB / Sources); `/admin/knowledge-hub` redirects to `/knowledge`. Why: seven overlapping menu items.
 - Designer-supplied SF kiosk CMYK masters (SWOP v2) live in `src/assets/california-kiosks/cmyk/` and are served byte-for-byte via `next-california-kiosk-cmyk-masters.ts` — why: CMYK must never be re-rendered or converted by the app.
+- SF kiosk side strips are native faces (`native.faces` + `kioskFaceLayout`), split one object per page from the native PDF and edited by the same editor/export path as the front; strip edits save under `<kiosk>--left|right` — why: one editor and one CMYK export path for every face.
