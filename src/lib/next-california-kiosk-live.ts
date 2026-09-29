@@ -169,7 +169,11 @@ export function kioskFontFaceCss(): string {
 
 // ---- edits ------------------------------------------------------------------
 
-export type BlockEdit = { dx?: number; dy?: number; scale?: number; hidden?: boolean; opacity?: number; rot?: number };
+export type BlockEdit = {
+  dx?: number; dy?: number; scale?: number; hidden?: boolean; opacity?: number; rot?: number;
+  /** Objects only: one flat CMYK ink (0–1) that replaces the object's own colours; absent = print as supplied. */
+  cmyk?: number[];
+};
 export type TextAlign = "left" | "center" | "right";
 export type TextEdit = {
   opacity?: number; rot?: number;
@@ -300,6 +304,8 @@ export type PlacedPart = {
   part: LivePart; src: { x0: number; y0: number; x1: number; y1: number }; x: number; y: number; scale: number; hidden: boolean;
   /** 0–1 see-through amount and clockwise rotation (deg) about the object's centre. */
   opacity: number; rot: number;
+  /** Flat CMYK recolour set in the editor (0–1). */
+  cmyk?: number[];
 };
 export type PlacedText = LiveText & {
   kx: number; ky: number; ksize: number; kw: number; edited: boolean; fill: string;
@@ -428,6 +434,7 @@ function placeBlock(L: LiveLayout, edits: KioskEdits, badged: Set<string>, b: Li
           hidden: !!pe.hidden || badged.has(pt.id),
           opacity: pe.opacity ?? 1,
           rot: pe.rot ?? 0,
+          ...(pe.cmyk ? { cmyk: pe.cmyk } : {}),
         };
       })
       .map((q, i) => ({ q, i, z: edits.z?.[q.part.id] ?? 0 }))
@@ -599,8 +606,11 @@ export function buildKioskFrontSvg(
       for (const q of p.parts) {
         if (q.hidden) continue;
         const ref = `#art-${partSource(edits, q.part.id)}`;
+        // Recoloured objects: flood the object's own shape with the chosen ink.
+        const rc = q.cmyk ? `rc-${q.part.id}` : null;
+        if (rc) parts.push(`<filter id="${rc}" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feFlood flood-color="${cmykScreen(q.cmyk!)}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`);
         parts.push(
-          `<g id="object-${q.part.id}" inkscape:label="Object ${q.part.id}"${fx(q.opacity, q.rot, partCentre(q).x, partCentre(q).y)}><g transform="translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})"><use xlink:href="${ref}" href="${ref}" x="${-L.originX}" y="${-L.originY}" width="${L.mediaW}" height="${L.mediaH}"/></g></g>`,
+          `<g id="object-${q.part.id}" inkscape:label="Object ${q.part.id}"${fx(q.opacity, q.rot, partCentre(q).x, partCentre(q).y)}><g transform="translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})"${rc ? ` filter="url(#${rc})"` : ""}><use xlink:href="${ref}" href="${ref}" x="${-L.originX}" y="${-L.originY}" width="${L.mediaW}" height="${L.mediaH}"/></g></g>`,
         );
       }
       parts.push(`</g>`);
