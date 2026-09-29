@@ -70,6 +70,17 @@ export type LiveLayout = {
    * built from the file's own CMYK objects.
    */
   native?: KioskNative;
+  /** Set on a side-strip view of a kiosk: the strip is edited like the front, at 4 in wide. */
+  face?: KioskFace;
+};
+
+export type KioskFace = "left" | "right";
+/** One side strip read from the designer's CMYK file, split one object per page. */
+export type KioskStripFace = {
+  bgPage: number;
+  bgSym: string;
+  parts: Record<string, { page: number; kind: "image" | "vector" }>;
+  blocks: LiveBlock[];
 };
 
 export type KioskNative = {
@@ -80,7 +91,42 @@ export type KioskNative = {
   /** Page holding each movable object, and whether it is a photo or vector art. */
   parts: Record<string, { page: number; kind: "image" | "vector" }>;
   strips: Record<"left" | "right", { bg: number; content: number; w: number }>;
+  /** Preview symbol of the background (front: "bg"; strips: "left-bg" / "right-bg"). */
+  bgSym?: string;
+  /** Each side strip split into separate objects, edited like the front. */
+  faces?: Record<KioskFace, KioskStripFace>;
 };
+
+/** Trim width of the face a layout draws (front 45 in, side strip 4 in). */
+export const kioskFaceW = (L: Pick<LiveLayout, "face">) => (L.face ? KIOSK_RETURN_W : KIOSK_W);
+/** Side safe margin: 2 in on the front, 1/4 in on a 4 in strip. */
+export const kioskMarginX = (L: Pick<LiveLayout, "face">) => (L.face ? 18 : KIOSK_MARGIN);
+/** Where a face's changes are saved (the front keeps the kiosk id). */
+export const kioskEditKey = (L: Pick<LiveLayout, "id" | "face">) => (L.face ? `${L.id}--${L.face}` : L.id);
+/** Split a saved-changes key back into kiosk id and face. */
+export function kioskEditKeyParts(key: string): { id: string; face?: KioskFace } {
+  const m = key.match(/^(.*)--(left|right)$/);
+  return m ? { id: m[1]!, face: m[2] as KioskFace } : { id: key };
+}
+
+/**
+ * A side strip of a native kiosk as its own layout: same designer file, same
+ * CMYK objects, 4 × 96 in trim. Every editor, layout and export path treats it
+ * exactly like the front.
+ */
+export function kioskFaceLayout(L: LiveLayout, face: KioskFace): LiveLayout | null {
+  const F = L.native?.faces?.[face];
+  if (!L.native || !F) return null;
+  return {
+    ...L,
+    face,
+    trimW: KIOSK_RETURN_W,
+    mediaW: KIOSK_RETURN_W + 2 * KIOSK_BLEED,
+    texts: [],
+    blocks: F.blocks,
+    native: { ...L.native, bgPage: F.bgPage, bgSym: F.bgSym, parts: F.parts, faces: undefined },
+  };
+}
 
 export const KIOSK_LIVE_LAYOUTS = layoutsJson as unknown as Record<string, LiveLayout>;
 
@@ -329,7 +375,7 @@ function placeBlock(L: LiveLayout, edits: KioskEdits, badged: Set<string>, b: Li
     const w = L.trimW * sc;
     const h = (c[1] - c[0]) * sc;
     const hs = (c[1] - c[0]) * s;
-    const x = (KIOSK_W - w) / 2 + (e.dx ?? 0);
+    const x = (kioskFaceW(L) - w) / 2 + (e.dx ?? 0);
     const yy = y + (hs - h) / 2 + (e.dy ?? 0);
     const texts = L.texts
       .filter((t) => {
@@ -518,10 +564,11 @@ export function buildKioskFrontSvg(
   const art = splitArtSvg(artSvg);
   const [, , vw, vh] = art.viewBox.split(/\s+/).map(Number);
   const B = KIOSK_BLEED;
+  const KW = kioskFaceW(L);
   const g = kioskGround(L, edits);
   const parts: string[] = [];
   parts.push(
-    `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="${KIOSK_W + 2 * B}pt" height="${KIOSK_H + 2 * B}pt" viewBox="${-B} ${-B} ${KIOSK_W + 2 * B} ${KIOSK_H + 2 * B}">`,
+    `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="${KW + 2 * B}pt" height="${KIOSK_H + 2 * B}pt" viewBox="${-B} ${-B} ${KW + 2 * B} ${KIOSK_H + 2 * B}">`,
   );
   parts.push(`<defs>`);
   if (opts.fontCss) parts.push(`<style>${opts.fontCss}</style>`);
@@ -542,8 +589,8 @@ export function buildKioskFrontSvg(
   const nat = L.native;
   parts.push(
     nat && !edits.ground
-      ? `<g id="Background"><rect x="${-B}" y="${-B}" width="${KIOSK_W + 2 * B}" height="${KIOSK_H + 2 * B}" fill="#FFFFFF"/><use xlink:href="#art-bg" href="#art-bg" x="${-L.originX}" y="${-L.originY}" width="${vw}" height="${vh}"/></g>`
-      : `<g id="Background"><rect x="${-B}" y="${-B}" width="${KIOSK_W + 2 * B}" height="${KIOSK_H + 2 * B}" fill="url(#kg)"/></g>`,
+      ? `<g id="Background"><rect x="${-B}" y="${-B}" width="${KW + 2 * B}" height="${KIOSK_H + 2 * B}" fill="#FFFFFF"/><use xlink:href="#art-${nat.bgSym ?? "bg"}" href="#art-${nat.bgSym ?? "bg"}" x="${-L.originX}" y="${-L.originY}" width="${L.mediaW}" height="${L.mediaH}"/></g>`
+      : `<g id="Background"><rect x="${-B}" y="${-B}" width="${KW + 2 * B}" height="${KIOSK_H + 2 * B}" fill="url(#kg)"/></g>`,
   );
   parts.push(`<g id="Graphics">`);
   for (const p of placed) {
@@ -553,7 +600,7 @@ export function buildKioskFrontSvg(
         if (q.hidden) continue;
         const ref = `#art-${partSource(edits, q.part.id)}`;
         parts.push(
-          `<g id="object-${q.part.id}" inkscape:label="Object ${q.part.id}"${fx(q.opacity, q.rot, partCentre(q).x, partCentre(q).y)}><g transform="translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})"><use xlink:href="${ref}" href="${ref}" x="${-L.originX}" y="${-L.originY}" width="${vw}" height="${vh}"/></g></g>`,
+          `<g id="object-${q.part.id}" inkscape:label="Object ${q.part.id}"${fx(q.opacity, q.rot, partCentre(q).x, partCentre(q).y)}><g transform="translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})"><use xlink:href="${ref}" href="${ref}" x="${-L.originX}" y="${-L.originY}" width="${L.mediaW}" height="${L.mediaH}"/></g></g>`,
         );
       }
       parts.push(`</g>`);
@@ -596,7 +643,7 @@ export function buildKioskFrontSvg(
       );
     }
   parts.push(`</g>`);
-  parts.push(`<g id="Cut"><rect x="0" y="0" width="${KIOSK_W}" height="${KIOSK_H}" fill="none" stroke="#EC008C" stroke-width="0.5"/></g>`);
+  parts.push(`<g id="Cut"><rect x="0" y="0" width="${KW}" height="${KIOSK_H}" fill="none" stroke="#EC008C" stroke-width="0.5"/></g>`);
   parts.push(`</svg>`);
   return parts.join("");
 }

@@ -32,6 +32,9 @@ import {
   kioskGround,
   kioskLiveFileBase,
   kioskHasTv,
+  kioskFaceLayout,
+  kioskFaceW,
+  type KioskFace,
   layoutKiosk,
   partCentre,
   textLineBoxes,
@@ -99,12 +102,12 @@ export async function pressFrontSvg(L: LiveLayout, edits: KioskEdits) {
   return svg;
 }
 
-export async function proofPng(svg: string, widthPx = 1400): Promise<Blob> {
+export async function proofPng(svg: string, widthPx = 1400, faceW: number = KIOSK_W): Promise<Blob> {
   const img = new Image();
   const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
   try {
     await new Promise<void>((res, rej) => { img.onload = () => res(); img.onerror = () => rej(new Error("Proof render failed")); img.src = url; });
-    const h = Math.round(widthPx * ((KIOSK_H + 2 * KIOSK_BLEED) / (KIOSK_W + 2 * KIOSK_BLEED)));
+    const h = Math.round(widthPx * ((KIOSK_H + 2 * KIOSK_BLEED) / (faceW + 2 * KIOSK_BLEED)));
     const c = document.createElement("canvas");
     c.width = widthPx; c.height = h;
     c.getContext("2d")!.drawImage(img, 0, 0, widthPx, h);
@@ -114,14 +117,15 @@ export async function proofPng(svg: string, widthPx = 1400): Promise<Blob> {
 
 export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Array> {
   const B = KIOSK_BLEED;
-  const W = KIOSK_W + 2 * B, H = KIOSK_H + 2 * B;
+  const KW = kioskFaceW(L);
+  const W = KW + 2 * B, H = KIOSK_H + 2 * B;
   // Slug outside the bleed carries the crop marks (0.5 in each side).
   const S = 36;
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
-  doc.setTitle(`${kioskLiveFileBase(L.id)} — kiosk front (draft)`);
+  doc.setTitle(`${kioskLiveFileBase(L.id)} — ${L.face ? `return ${L.face}` : "kiosk front"} (draft)`);
   const page = doc.addPage([W + 2 * S, H + 2 * S]);
-  page.setTrimBox(S + B, S + B, KIOSK_W, KIOSK_H);
+  page.setTrimBox(S + B, S + B, KW, KIOSK_H);
   page.setBleedBox(S, S, W, H);
   page.setCropBox(0, 0, W + 2 * S, H + 2 * S);
   // Everything below is drawn in bleed-box space, shifted into the slug.
@@ -320,7 +324,7 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
   // Crop marks in the slug: 0.25 in long, starting 1/8 in outside trim (clear of bleed).
   beginLayer("Trim marks");
   const reg = rgb(0, 0, 0);
-  const tx0 = S + B, ty0 = S + B, tx1 = tx0 + KIOSK_W, ty1 = ty0 + KIOSK_H;
+  const tx0 = S + B, ty0 = S + B, tx1 = tx0 + KW, ty1 = ty0 + KIOSK_H;
   const off = B, len = 18, lw = 0.25;
   for (const x of [tx0, tx1])
     for (const y of [ty0, ty1]) {
@@ -542,7 +546,11 @@ function save(blob: Blob, name: string) {
  * shading as the front, over the same bleed-box height, so the strips and
  * the front print one continuous ramp. Layers: Background, Trim marks.
  */
-export async function liveReturnPdf(L: LiveLayout, edits: KioskEdits, side: "left" | "right"): Promise<Uint8Array> {
+export async function liveReturnPdf(L: LiveLayout, edits: KioskEdits, side: "left" | "right", stripEdits?: KioskEdits): Promise<Uint8Array> {
+  // Strips split into separate objects are built exactly like the front, with
+  // their own saved changes (layers Background, Imagery, Content, Accents, Text, Trim marks).
+  const FL = kioskFaceLayout(L, side);
+  if (FL) return liveFrontPdf(FL, stripEdits ?? {});
   const B = KIOSK_BLEED;
   const W = KIOSK_RETURN_W + 2 * B, H = KIOSK_H + 2 * B;
   const S = 36;
@@ -620,8 +628,12 @@ export async function liveReturnPdf(L: LiveLayout, edits: KioskEdits, side: "lef
 
 export type KioskDownload = "zip" | "svg" | "pdf" | "ai" | "press" | "png" | "returns";
 
-export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: KioskEdits) {
+export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: KioskEdits, strips: Partial<Record<KioskFace, KioskEdits>> = {}) {
   const base = kioskLiveFileBase(L.id);
+  const returnSvg = async (side: KioskFace) => {
+    const FL = kioskFaceLayout(L, side);
+    return FL ? liveFrontSvg(FL, strips[side] ?? {}) : buildKioskReturnSvg(L, edits);
+  };
   const svgBlob = (s: string) => new Blob([s], { type: "image/svg+xml" });
   if (kind === "svg") return save(svgBlob(await liveFrontSvg(L, edits)), `${base}-front.svg`);
   if (kind === "pdf" || kind === "ai") {
@@ -632,7 +644,7 @@ export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: K
   if (kind === "png") return save(await proofPng(await pressFrontSvg(L, edits)), `${base}-front-PROOF.png`);
   if (kind === "returns") {
     const z = new JSZip();
-    for (const side of ["left", "right"] as const) z.file(`${base}-return-${side}.ai`, await liveReturnPdf(L, edits, side));
+    for (const side of ["left", "right"] as const) z.file(`${base}-return-${side}.ai`, await liveReturnPdf(L, edits, side, strips[side]));
     return save(await z.generateAsync({ type: "blob" }), `${base}-returns.zip`);
   }
   const zip = new JSZip();
@@ -641,10 +653,10 @@ export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: K
   zip.file(`${base}-front.pdf`, await liveFrontPdf(L, edits));
   zip.file(`${base}-front-press-outlined.svg`, press);
   zip.file(`${base}-front-PROOF.png`, await proofPng(press));
-  const ret = buildKioskReturnSvg(L, edits);
-  zip.file(`${base}-return-left.svg`, ret);
-  zip.file(`${base}-return-right.svg`, ret);
-  for (const side of ["left", "right"] as const) zip.file(`${base}-return-${side}.ai`, await liveReturnPdf(L, edits, side));
+  for (const side of ["left", "right"] as const) {
+    zip.file(`${base}-return-${side}.svg`, await returnSvg(side));
+    zip.file(`${base}-return-${side}.ai`, await liveReturnPdf(L, edits, side, strips[side]));
+  }
   zip.file(
     "README.txt",
     `DRAFT — not published. Rebuilt from ${L.source}.\n` +

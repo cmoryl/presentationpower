@@ -16,11 +16,17 @@ import { useSessionUser } from "@/hooks/use-session-user";
 import {
   KIOSK_BLEED,
   KIOSK_H,
-  KIOSK_MARGIN,
+  KIOSK_MARGIN as KIOSK_MARGIN_FRONT,
   KIOSK_RETURN_W,
   KIOSK_TV,
-  kioskHasTv,
-  KIOSK_W,
+  kioskHasTv as kioskHasTvFront,
+  KIOSK_W as KIOSK_W_FRONT,
+  kioskEditKey,
+  kioskEditKeyParts,
+  kioskFaceLayout,
+  kioskFaceW,
+  kioskMarginX,
+  type KioskFace,
   kioskFontFaceCss,
   kioskFontFamily,
   kioskGround,
@@ -86,16 +92,49 @@ function forLayout(L: LiveLayout, e: KioskEdits | null | undefined): KioskEdits 
   return want ? { layoutVersion: want, parked: e } : null;
 }
 
-/** Saved edits for a kiosk (shared copy, or this device's newer draft). */
+/** Saved edits for a kiosk (shared copy, or this device's newer draft). `id` may be a strip key (`<kiosk>--left`). */
 async function loadKioskEdits(id: string): Promise<KioskEdits> {
+  const kp = kioskEditKeyParts(id);
+  const base = KIOSK_LIVE_LAYOUTS[kp.id];
+  const LF = base && kp.face ? kioskFaceLayout(base, kp.face) : base;
   const local = readLocalDraft(id);
   const { data } = await supabase.from("kiosk_layer_edits").select("edits, updated_at").eq("booth_id", id).maybeSingle();
   const remoteAt = data?.updated_at ? Date.parse(data.updated_at) : 0;
   if (local && local.at > remoteAt) return local.edits;
-  return forLayout(KIOSK_LIVE_LAYOUTS[id] ?? ({} as LiveLayout), data?.edits as KioskEdits | undefined) ?? {};
+  return forLayout(LF ?? ({} as LiveLayout), data?.edits as KioskEdits | undefined) ?? {};
 }
 
-export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: LiveLayout; vendor: string; fill?: boolean }) {
+const FACE_LABEL: Record<"front" | KioskFace, string> = { front: "Kiosk front", left: "Left strip", right: "Right strip" };
+
+/**
+ * The kiosk editor: the front and, on kiosks read from the designer's CMYK
+ * file, both side strips — each strip is edited with exactly the same tools.
+ */
+export function KioskLayerEditor({ layout, vendor, fill = false }: { layout: LiveLayout; vendor: string; fill?: boolean }) {
+  const [face, setFace] = useState<"front" | KioskFace>("front");
+  const hasFaces = !!layout.native?.faces;
+  const FL = face === "front" ? layout : kioskFaceLayout(layout, face) ?? layout;
+  return <KioskFaceEditor key={face} layout={FL} front={layout} face={face} onFace={hasFaces ? setFace : undefined} vendor={vendor} fill={fill} />;
+}
+
+function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false }: { layout: LiveLayout; front: LiveLayout; face: "front" | KioskFace; onFace?: (f: "front" | KioskFace) => void; vendor: string; fill?: boolean }) {
+  // Face geometry: the front is 45 in wide, a side strip 4 in.
+  const KIOSK_W = kioskFaceW(L);
+  const KIOSK_MARGIN = L.face ? kioskMarginX(L) : KIOSK_MARGIN_FRONT;
+  const kioskHasTv = (id: string) => !L.face && kioskHasTvFront(id);
+  const EK = kioskEditKey(L);
+  /** Saved changes of the other faces, for the side previews and full downloads. */
+  const [others, setOthers] = useState<Partial<Record<"front" | KioskFace, KioskEdits>>>({});
+  useEffect(() => {
+    if (!front.native?.faces) return;
+    let live = true;
+    const load = () => Promise.all((["front", "left", "right"] as const).filter((f) => f !== face).map(async (f) => [f, await loadKioskEdits(f === "front" ? front.id : `${front.id}--${f}`).catch(() => ({}))] as const))
+      .then((rs) => live && setOthers(Object.fromEntries(rs)));
+    load();
+    const on = (e: Event) => { const d = (e as CustomEvent).detail as string; if (d !== EK && kioskEditKeyParts(d).id === front.id) load(); };
+    window.addEventListener("kiosk-edits-saved", on);
+    return () => { live = false; window.removeEventListener("kiosk-edits-saved", on); };
+  }, [front, face, EK]);
   const [art, setArt] = useState<{ viewBox: string; inner: string } | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [edits, setEdits] = useState<KioskEdits>({});
@@ -154,10 +193,10 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
     let live = true;
     loaded.current = false;
     if (userId === undefined) return () => { live = false; };
-    const local = readLocalDraft(L.id);
+    const local = readLocalDraft(EK);
     (async () => {
       const { data, error } = userId
-        ? await supabase.from("kiosk_layer_edits").select("edits, updated_at").eq("booth_id", L.id).maybeSingle()
+        ? await supabase.from("kiosk_layer_edits").select("edits, updated_at").eq("booth_id", EK).maybeSingle()
         : { data: null, error: null };
       if (!live) return;
       if (error) { setStatus(`Couldn't load saved changes: ${error.message}. Editing is paused so nothing is overwritten.`); return; }
@@ -171,26 +210,26 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
       if (next && next === local?.edits && userId) setTimeout(() => { loadedEdits.current = null; setEdits((e) => ({ ...e })); }, 0);
     })();
     return () => { live = false; };
-  }, [L.id, userId]);
+  }, [EK, userId]);
 
   // Autosave: every change is kept on this device at once, and saved to the
   // shared kiosk a moment after you stop editing.
   useEffect(() => {
     if (!loaded.current || userId === undefined) return;
     if (loadedEdits.current === edits) return;
-    writeLocalDraft(L.id, L.native ? { ...edits, layoutVersion: L.native.version } : edits);
+    writeLocalDraft(EK, L.native ? { ...edits, layoutVersion: L.native.version } : edits);
     if (!userId) { setStatus("Kept on this device. Sign in to save for everyone."); return; }
     if (canSave === null) return;
     if (!canSave) { setStatus("Kept in this browser only — your role can't save kiosks for everyone."); return; }
     setStatus("Saving…");
     const t = setTimeout(async () => {
       const toSave: KioskEdits = L.native ? { ...edits, layoutVersion: L.native.version } : edits;
-      const { error } = await supabase.from("kiosk_layer_edits").upsert({ booth_id: L.id, edits: toSave as never, updated_by: userId, updated_at: new Date().toISOString() });
+      const { error } = await supabase.from("kiosk_layer_edits").upsert({ booth_id: EK, edits: toSave as never, updated_by: userId, updated_at: new Date().toISOString() });
       if (error) setStatus(`Kept on this device only — not saved for everyone: ${error.message}`);
-      else { clearLocalDraft(L.id); setStatus("All changes saved."); window.dispatchEvent(new CustomEvent("kiosk-edits-saved", { detail: L.id })); }
+      else { clearLocalDraft(EK); setStatus("All changes saved."); window.dispatchEvent(new CustomEvent("kiosk-edits-saved", { detail: EK })); }
     }, 1200);
     return () => clearTimeout(t);
-  }, [edits, L.id, userId, canSave]);
+  }, [edits, EK, userId, canSave]);
 
   const placed = useMemo(() => layoutKiosk(L, edits), [L, edits]);
   const ground = kioskGround(L, edits);
@@ -372,7 +411,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
   };
 
   const addDivider = (preset: "short" | "full" | "under") => {
-    let x = KIOSK_MARGIN, y = KIOSK_TV.y + KIOSK_TV.h + 144, w = 540;
+    let x = KIOSK_MARGIN, y = KIOSK_TV.y + KIOSK_TV.h + 144, w = Math.min(540, KIOSK_W - 2 * KIOSK_MARGIN);
     if (preset === "full") w = KIOSK_W - 2 * KIOSK_MARGIN;
     if (preset === "under" && sel) {
       const b = selBounds(sel);
@@ -504,14 +543,17 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
 
   const save = async () => {
     setBusy("save"); setStatus(null);
-    const { error } = await supabase.from("kiosk_layer_edits").upsert({ booth_id: L.id, edits: edits as never, updated_by: userId ?? null });
+    const { error } = await supabase.from("kiosk_layer_edits").upsert({ booth_id: EK, edits: edits as never, updated_by: userId ?? null });
     setBusy(null);
-    if (!error) { clearLocalDraft(L.id); window.dispatchEvent(new CustomEvent("kiosk-edits-saved", { detail: L.id })); }
+    if (!error) { clearLocalDraft(EK); window.dispatchEvent(new CustomEvent("kiosk-edits-saved", { detail: EK })); }
     setStatus(error ? `Not saved: ${error.message}` : "All changes saved.");
   };
   const dl = async (k: KioskDownload) => {
     setBusy(k); setStatus(null);
-    try { await downloadKiosk(k, L, edits); } catch (e) { setStatus(`Download failed: ${(e as Error).message}`); }
+    try {
+      const all = { ...others, [face]: edits };
+      await downloadKiosk(k, front, all.front ?? {}, { left: all.left, right: all.right });
+    } catch (e) { setStatus(`Download failed: ${(e as Error).message}`); }
     setBusy(null);
   };
 
@@ -622,7 +664,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
   const rs = 1 / k; // one screen px in kiosk units
   const vbX = -B - G, vbY = -B - G, vbW = KIOSK_W + 2 * B + G, vbH = KIOSK_H + 2 * B + G;
   const stepIn = zoom < 900 ? 6 : 3;
-  const ticksX = Array.from({ length: Math.floor(45 / stepIn) + 1 }, (_, i) => i * stepIn);
+  const ticksX = Array.from({ length: Math.floor(KIOSK_W / 72 / (L.face ? 1 : stepIn)) + 1 }, (_, i) => i * (L.face ? 1 : stepIn));
   const ticksY = Array.from({ length: Math.floor(96 / stepIn) + 1 }, (_, i) => i * stepIn);
 
   const layerRow = (active: boolean) =>
@@ -665,7 +707,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
               <li key={b.id} className="rounded-sm border border-white/[0.06] bg-white/[0.02]">
                 <div className={`flex items-center gap-1 px-2 ${sel?.id === b.id ? "bg-[#003FC7]/25" : ""}`}>
                   <button type="button" className={`${layerRow(sel?.id === b.id)} font-semibold`} onClick={() => setSel({ kind: "block", id: b.id })}>
-                    {b.screen ? "London screen area" : `Piece ${Number(b.id.slice(1)) + 1}`}
+                    {b.screen ? "London screen area" : L.face ? `${L.face === "left" ? "Left" : "Right"} strip artwork` : `Piece ${Number(b.id.slice(1)) + 1}`}
                   </button>
                   <button type="button" aria-label={hidden ? "Show piece" : "Hide piece"} title={hidden ? "Show" : "Hide"} className={eyeBtn} onClick={() => patchBlock(b.id, { hidden: !hidden })}>
                     {hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
@@ -742,7 +784,14 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-white/10 bg-[#0B0A2A] px-3">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-white/60">{vendor} · Kiosk front</span>
+            <span className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-white/60">{vendor} · {FACE_LABEL[face]}</span>
+            {onFace ? (
+              <div className="flex shrink-0 rounded-sm border border-white/10 bg-black/40 p-0.5" role="group" aria-label="Edit which face">
+                {(["left", "front", "right"] as const).map((f) => (
+                  <button key={f} type="button" aria-pressed={face === f} onClick={() => onFace(f)} className="rounded-[2px] px-2.5 py-1 text-[10.5px] font-medium text-white/55 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A1FBF9] aria-pressed:bg-white/15 aria-pressed:text-white">{f === "front" ? "Front" : f === "left" ? "Left strip" : "Right strip"}</button>
+                ))}
+              </div>
+            ) : null}
             <span className="rounded-sm border border-white/10 bg-black/30 px-1.5 py-0.5 shrink-0 font-mono text-[10px] text-white/60">rdraft</span>
             {canSave === false ? <span className="shrink-0 whitespace-nowrap rounded-sm border border-[#FFEB66]/40 bg-[#FFEB66]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#FFEB66]" title="Changes stay in this browser. Admins, brand leads and brand reviewers can save kiosks for everyone.">Not shared</span> : null}
             {status ? <span role="status" className="hidden truncate text-[11px] text-white/60 xl:inline">{status}</span> : null}
@@ -772,7 +821,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                 style={{ height: zoom + G * k, width: ((zoom + G * k) * vbW) / vbH }}
                 className="block w-auto touch-none select-none shadow-[0_24px_60px_rgba(0,0,0,0.6)]"
                 role="img"
-                aria-label={`${vendor} kiosk front, editable`}
+                aria-label={`${vendor} ${FACE_LABEL[face].toLowerCase()}, editable`}
                 onPointerMove={onMove}
                 onPointerUp={endDrag}
                 onPointerLeave={endDrag}
@@ -819,7 +868,7 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
                   </g>
                 ) : null}
                 {L.native && !edits.ground ? (
-                  <>{/* Paper is white: unprinted areas of the designer file show as white, not transparent. */}<rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="#FFFFFF" pointerEvents="none" /><use href={`#${symId}-bg`} x={-L.originX} y={-L.originY} width={L.mediaW} height={L.mediaH} pointerEvents="none" /></>
+                  <>{/* Paper is white: unprinted areas of the designer file show as white, not transparent. */}<rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="#FFFFFF" pointerEvents="none" /><use href={`#${symId}-${L.native.bgSym ?? "bg"}`} x={-L.originX} y={-L.originY} width={L.mediaW} height={L.mediaH} pointerEvents="none" /></>
                 ) : (
                   <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill={`url(#kg-${L.id})`} />
                 )}
@@ -917,8 +966,13 @@ export function KioskLayerEditor({ layout: L, vendor, fill = false }: { layout: 
               {/* Left strip is placed AFTER the front in the DOM (shown first via CSS order):
                   its art uses blend filters whose feImage refs point into the front's
                   symbol defs, and Chrome paints forward feImage references black. */}
-              {showSides ? <div className="order-first"><ReturnStrip ground={ground} nativeSym={L.native ? `${symId}-left` : undefined} id={`${L.id}-l`} height={zoom} label="Left return · 4 × 96 in" offsetTop={G * k} /></div> : null}
-              {showSides ? <div className="order-last"><ReturnStrip ground={ground} nativeSym={L.native ? `${symId}-right` : undefined} id={`${L.id}-r`} height={zoom} label="Right return · 4 × 96 in" offsetTop={G * k} /></div> : null}
+              {showSides && !L.face ? (["left", "right"] as const).map((sd) => (
+                <div key={sd} className={sd === "left" ? "order-first" : "order-last"}>
+                  <ReturnStrip ground={ground} nativeSym={L.native ? `${symId}-${sd}` : undefined} symId={symId} id={`${L.id}-${sd[0]}`} height={zoom}
+                    label={`${sd === "left" ? "Left" : "Right"} return · 4 × 96 in`} offsetTop={G * k}
+                    faceL={onFace ? kioskFaceLayout(front, sd) : null} faceEdits={others[sd]} onOpen={onFace ? () => onFace(sd) : undefined} />
+                </div>
+              )) : null}
             </div>
           ) : null}
         </div>
@@ -1265,25 +1319,50 @@ function cmykPreview(c: number[]) {
   return cmykScreen(c);
 }
 
-/** A return strip shown beside the front: the background ramp, or the designer's own strip art. */
-function ReturnStrip({ ground, id, height, label, offsetTop, nativeSym }: { ground: { offset: number; color: string }[]; id: string; height: number; label: string; offsetTop: number; nativeSym?: string }) {
+/** A return strip shown beside the front: the background ramp, or the designer's own strip art (with its saved changes). */
+function ReturnStrip({ ground, id, height, label, offsetTop, nativeSym, symId, faceL, faceEdits, onOpen }: { ground: { offset: number; color: string }[]; id: string; height: number; label: string; offsetTop: number; nativeSym?: string; symId?: string; faceL?: LiveLayout | null; faceEdits?: KioskEdits; onOpen?: () => void }) {
   const w = height * (KIOSK_RETURN_W / KIOSK_H);
+  const full = { x: -KIOSK_BLEED, y: -KIOSK_BLEED, width: KIOSK_RETURN_W + 2 * KIOSK_BLEED, height: KIOSK_H + 2 * KIOSK_BLEED };
+  const fe = faceEdits ?? {};
+  const fg = faceL && fe.ground ? kioskGround(faceL, fe) : ground;
+  const art = faceL && symId ? (
+    <>
+      {fe.ground ? <rect {...full} fill={`url(#kr-${id})`} /> : <><rect {...full} fill="#FFFFFF" /><use href={`#${symId}-${faceL.native?.bgSym ?? "bg"}`} {...full} /></>}
+      {layoutKiosk(faceL, fe).flatMap((p) => p.parts).filter((q) => !q.hidden).map((q) => {
+        const c = partCentre(q);
+        return (
+          <g key={q.part.id} opacity={q.opacity < 1 ? q.opacity : undefined} transform={q.rot ? `rotate(${q.rot} ${c.x} ${c.y})` : undefined}>
+            <g transform={`translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})`}>
+              <use href={`#${symId}-${partSource(fe, q.part.id)}`} x={-faceL.originX} y={-faceL.originY} width={faceL.mediaW} height={faceL.mediaH} />
+            </g>
+          </g>
+        );
+      })}
+      {(fe.dividers ?? []).filter((d) => !d.hidden).map((d) => <rect key={d.id} x={d.x} y={d.y} width={d.w} height={d.h} rx={d.round ? d.h / 2 : 0} fill={d.color} opacity={d.opacity} />)}
+    </>
+  ) : nativeSym ? (
+    <>
+      {/* White paper under the strip art. */}
+      <rect {...full} fill="#FFFFFF" /><use href={`#${nativeSym}-bg`} {...full} />
+      <use href={`#${nativeSym}-content`} {...full} />
+    </>
+  ) : (
+    <rect width={KIOSK_RETURN_W} height={KIOSK_H} fill={`url(#kr-${id})`} />
+  );
+  const svg = (
+    <svg viewBox={`0 0 ${KIOSK_RETURN_W} ${KIOSK_H}`} style={{ height, width: w }} className="block shadow-[0_24px_60px_rgba(0,0,0,0.6)]" role="img" aria-label={label}>
+      <defs>
+        <linearGradient id={`kr-${id}`} x1="0" y1="0" x2="0" y2="1">{fg.map((s) => <stop key={s.offset} offset={s.offset} stopColor={s.color} />)}</linearGradient>
+      </defs>
+      {art}
+    </svg>
+  );
   return (
     <figure className="m-0 flex flex-col items-center" style={{ paddingTop: offsetTop }}>
-      <svg viewBox={`0 0 ${KIOSK_RETURN_W} ${KIOSK_H}`} style={{ height, width: w }} className="block shadow-[0_24px_60px_rgba(0,0,0,0.6)]" role="img" aria-label={label}>
-        <defs>
-          <linearGradient id={`kr-${id}`} x1="0" y1="0" x2="0" y2="1">{ground.map((s) => <stop key={s.offset} offset={s.offset} stopColor={s.color} />)}</linearGradient>
-        </defs>
-        {nativeSym ? (
-          <>
-            <>{/* White paper under the strip art. */}<rect x={-KIOSK_BLEED} y={-KIOSK_BLEED} width={KIOSK_RETURN_W + 2 * KIOSK_BLEED} height={KIOSK_H + 2 * KIOSK_BLEED} fill="#FFFFFF" /><use href={`#${nativeSym}-bg`} x={-KIOSK_BLEED} y={-KIOSK_BLEED} width={KIOSK_RETURN_W + 2 * KIOSK_BLEED} height={KIOSK_H + 2 * KIOSK_BLEED} /></>
-            <use href={`#${nativeSym}-content`} x={-KIOSK_BLEED} y={-KIOSK_BLEED} width={KIOSK_RETURN_W + 2 * KIOSK_BLEED} height={KIOSK_H + 2 * KIOSK_BLEED} />
-          </>
-        ) : (
-          <rect width={KIOSK_RETURN_W} height={KIOSK_H} fill={`url(#kr-${id})`} />
-        )}
-      </svg>
-      <figcaption className="mt-2 w-16 text-center font-mono text-[9.5px] leading-tight text-white/50">{label}</figcaption>
+      {onOpen ? (
+        <button type="button" onClick={onOpen} title={`Edit the ${label.split(" ·")[0]!.toLowerCase()}`} aria-label={`Edit the ${label.split(" ·")[0]!.toLowerCase()}`} className="block rounded-sm outline-offset-2 hover:outline hover:outline-1 hover:outline-[#A1FBF9] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#A1FBF9]">{svg}</button>
+      ) : svg}
+      <figcaption className="mt-2 w-16 text-center font-mono text-[9.5px] leading-tight text-white/50">{label}{onOpen ? <span className="mt-0.5 block text-[#A1FBF9]">Click to edit</span> : null}</figcaption>
     </figure>
   );
 }
@@ -1315,7 +1394,7 @@ export function KioskLiveThumb({ layout, height = 150 }: { layout: LiveLayout; h
     return () => { io.disconnect(); if (url) URL.revokeObjectURL(url); };
   }, [layout, rev]);
   return (
-    <div ref={ref} style={{ height, width: height * (KIOSK_W / KIOSK_H) }} className="shrink-0 overflow-hidden rounded bg-secondary">
+    <div ref={ref} style={{ height, width: height * (KIOSK_W_FRONT / KIOSK_H) }} className="shrink-0 overflow-hidden rounded bg-secondary">
       {src ? <img src={src} alt="" className="h-full w-full object-contain" /> : null}
     </div>
   );
