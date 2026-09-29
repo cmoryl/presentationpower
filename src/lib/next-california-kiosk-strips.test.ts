@@ -31,4 +31,13 @@ describe("side strips edited like the front", () => {
     expect(svg).toContain(`width="${KIOSK_RETURN_W + 2 * KIOSK_BLEED}pt"`);
     expect(svg).toContain("#art-left-bg");
   });
+  it("an object can be recoloured to one CMYK ink", () => {
+    const F = kioskFaceLayout(KIOSK_LIVE_LAYOUTS["veeva-tradebooth-a"]!, "left")!;
+    const ids = F.blocks.flatMap((b) => b.parts ?? []).map((p) => p.id);
+    expect(ids.length).toBeGreaterThan(20);
+    const q = layoutKiosk(F, { parts: { [ids[0]!]: { cmyk: [0, 1, 0, 0] } } }).flatMap((p) => p.parts).find((x) => x.part.id === ids[0])!;
+    expect(q.cmyk).toEqual([0, 1, 0, 0]);
+    const svg = buildKioskFrontSvg(F, '<svg viewBox="0 0 306 6930"></svg>', { parts: { [ids[0]!]: { cmyk: [0, 1, 0, 0] } } });
+    expect(svg).toContain(`filter="url(#rc-${ids[0]})"`);
+  });
 });
