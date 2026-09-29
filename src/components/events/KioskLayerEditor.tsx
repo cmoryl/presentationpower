@@ -1155,6 +1155,28 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false 
                       ? <button type="button" className={dbtn} onClick={() => restorePicture(selPart.id)}>Put the picture back</button>
                       : <button type="button" className={dbtn} onClick={() => replaceWithText(selPart.id)}><Type className="h-3.5 w-3.5" />Replace with text</button>}
                   </div>
+                  {L.native ? (() => {
+                    const ck = edits.parts?.[selPart.id]?.cmyk;
+                    return (
+                      <div>
+                        <div className="mb-1 flex items-center justify-between text-[10.5px] text-white/55">
+                          <span>Recolour (one print ink)</span>
+                          {ck ? <button type="button" className="underline" onClick={() => patchPart(selPart.id, { cmyk: undefined })}>Original colours</button> : null}
+                        </div>
+                        <div className="grid grid-cols-4 gap-1.5" role="group" aria-label="Object print colour, CMYK percent">
+                          {(["C", "M", "Y", "K"] as const).map((ch, i) => (
+                            <NumField key={ch} label={`${ch} %`} value={Math.round(((ck ?? [0, 0, 0, 0])[i] ?? 0) * 1000) / 10} digits={1}
+                              onCommit={(v) => {
+                                const c = [...(ck ?? [0, 0, 0, 0])];
+                                c[i] = Math.max(0, Math.min(100, v)) / 100;
+                                patchPart(selPart.id, { cmyk: c });
+                              }} />
+                          ))}
+                        </div>
+                        <p className="mt-1 text-[10.5px] text-white/50">{ck ? `Prints as one flat ink C${pc(ck[0])} M${pc(ck[1])} Y${pc(ck[2])} K${pc(ck[3])}; its own gradients and blends are replaced. Screen colour is approximate.` : "Prints in the designer's own colours. Type a value to recolour this object."}</p>
+                      </div>
+                    );
+                  })() : null}
                   <p className="text-[10.5px] text-white/50">A logo, icon, QR code or shape group from the London file, with its own shapes, gradients and effects.</p>
                 </Sec>
               ) : null}
