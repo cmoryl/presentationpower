@@ -1319,6 +1319,20 @@ function cmykPreview(c: number[]) {
   return cmykScreen(c);
 }
 
+/** An object recoloured to one flat CMYK ink (screen view; the CMYK numbers print). */
+function Inked({ cmyk, fid, children }: { cmyk?: number[]; fid: string; children: React.ReactNode }) {
+  if (!cmyk) return <>{children}</>;
+  return (
+    <>
+      <filter id={fid} x="0" y="0" width="1" height="1" colorInterpolationFilters="sRGB">
+        <feFlood floodColor={cmykScreen(cmyk)} />
+        <feComposite in2="SourceAlpha" operator="in" />
+      </filter>
+      <g filter={`url(#${fid})`}>{children}</g>
+    </>
+  );
+}
+
 /** A return strip shown beside the front: the background ramp, or the designer's own strip art (with its saved changes). */
 function ReturnStrip({ ground, id, height, label, offsetTop, nativeSym, symId, faceL, faceEdits, onOpen }: { ground: { offset: number; color: string }[]; id: string; height: number; label: string; offsetTop: number; nativeSym?: string; symId?: string; faceL?: LiveLayout | null; faceEdits?: KioskEdits; onOpen?: () => void }) {
   const w = height * (KIOSK_RETURN_W / KIOSK_H);
@@ -1333,7 +1347,7 @@ function ReturnStrip({ ground, id, height, label, offsetTop, nativeSym, symId, f
         return (
           <g key={q.part.id} opacity={q.opacity < 1 ? q.opacity : undefined} transform={q.rot ? `rotate(${q.rot} ${c.x} ${c.y})` : undefined}>
             <g transform={`translate(${q.x - q.src.x0 * q.scale} ${q.y - q.src.y0 * q.scale}) scale(${q.scale})`}>
-              <use href={`#${symId}-${partSource(fe, q.part.id)}`} x={-faceL.originX} y={-faceL.originY} width={faceL.mediaW} height={faceL.mediaH} />
+              <Inked cmyk={q.cmyk} fid={`rcs-${id}-${q.part.id}`}><use href={`#${symId}-${partSource(fe, q.part.id)}`} x={-faceL.originX} y={-faceL.originY} width={faceL.mediaW} height={faceL.mediaH} /></Inked>
             </g>
           </g>
         );
