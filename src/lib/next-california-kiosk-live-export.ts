@@ -640,13 +640,24 @@ export async function liveReturnPdf(L: LiveLayout, edits: KioskEdits, side: "lef
 
 export type KioskDownload = "zip" | "svg" | "pdf" | "ai" | "press" | "png" | "returns";
 
-export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: KioskEdits, strips: Partial<Record<KioskFace, KioskEdits>> = {}) {
+export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: KioskEdits, strips: Partial<Record<KioskFace, KioskEdits>> = {}, face?: KioskFace) {
   const base = kioskLiveFileBase(L.id);
   const returnSvg = async (side: KioskFace) => {
     const FL = kioskFaceLayout(L, side);
     return FL ? liveFrontSvg(FL, strips[side] ?? {}) : buildKioskReturnSvg(L, edits);
   };
   const svgBlob = (s: string) => new Blob([s], { type: "image/svg+xml" });
+  // Editing a side strip: single-file downloads give that strip, not the front.
+  if (face && kind !== "zip" && kind !== "returns") {
+    const FL = kioskFaceLayout(L, face);
+    const se = strips[face] ?? {};
+    const sb = `${base}-return-${face}`;
+    if (kind === "pdf" || kind === "ai") return save(new Blob([(await liveReturnPdf(L, edits, face, strips[face])) as BlobPart], { type: "application/pdf" }), `${sb}.${kind}`);
+    if (kind === "svg") return save(svgBlob(await returnSvg(face)), `${sb}.svg`);
+    if (!FL) throw new Error("This strip has no layered layout.");
+    if (kind === "press") return save(svgBlob(await pressFrontSvg(FL, se)), `${sb}-press-outlined.svg`);
+    if (kind === "png") return save(await proofPng(await pressFrontSvg(FL, se)), `${sb}-PROOF.png`);
+  }
   if (kind === "svg") return save(svgBlob(await liveFrontSvg(L, edits)), `${base}-front.svg`);
   if (kind === "pdf" || kind === "ai") {
     const pdf = await liveFrontPdf(L, edits);
