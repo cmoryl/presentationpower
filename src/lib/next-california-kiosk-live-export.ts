@@ -183,7 +183,19 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
           if ((N.parts[id]?.kind ?? "vector") !== layer) continue;
           const c = partCentre(q);
           const Mq = mul(F, mul(rotateAbout(q.rot, c.x, c.y), mul(translate(q.x - q.src.x0 * q.scale, q.y - q.src.y0 * q.scale), mul(scale(q.scale), P))));
-          page.pushOperators(raw(`q${q.opacity < 1 ? `\n${alpha(q.opacity)}` : ""}\n${fmt(Mq)} cm\n/${formOf(id)} Do\nQ`));
+          if (q.cmyk) {
+            // Recoloured: the object's own shape (as an alpha mask) filled with one flat CMYK ink.
+            const ctx = doc.context;
+            const G = ctx.register(ctx.stream(`/F Do`, {
+              Type: "XObject", Subtype: "Form", BBox: [0, 0, L.mediaW, L.mediaH],
+              Group: ctx.obj({ Type: "Group", S: "Transparency" }),
+              Resources: ctx.obj({ XObject: ctx.obj({ F: forms[ids.indexOf(id) + 1]!.ref }) }),
+            }));
+            const k = `KR${gsN++}`;
+            gs.set(PDFName.of(k), ctx.obj({ Type: "ExtGState", ca: q.opacity, CA: q.opacity, SMask: ctx.obj({ Type: "Mask", S: "Alpha", G }) }));
+            const [c0, m0, y0, k0] = q.cmyk.map((v) => +Math.max(0, Math.min(1, v)).toFixed(4));
+            page.pushOperators(raw(`q\n${fmt(Mq)} cm\n/${k} gs\n${c0} ${m0} ${y0} ${k0} k\n0 0 ${L.mediaW} ${L.mediaH} re\nf\nQ`));
+          } else page.pushOperators(raw(`q${q.opacity < 1 ? `\n${alpha(q.opacity)}` : ""}\n${fmt(Mq)} cm\n/${formOf(id)} Do\nQ`));
         }
     }
     endLayer();
