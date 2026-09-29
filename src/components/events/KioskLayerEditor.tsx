@@ -552,7 +552,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false 
     setBusy(k); setStatus(null);
     try {
       const all = { ...others, [face]: edits };
-      await downloadKiosk(k, front, all.front ?? {}, { left: all.left, right: all.right });
+      await downloadKiosk(k, front, all.front ?? {}, { left: all.left, right: all.right }, face === "front" ? undefined : face);
     } catch (e) { setStatus(`Download failed: ${(e as Error).message}`); }
     setBusy(null);
   };
