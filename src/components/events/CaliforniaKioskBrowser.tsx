@@ -73,7 +73,10 @@ export function CaliforniaKioskBrowser() {
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-[#03002C]">Kiosk front · 45 × 96 in, plus two 4 × 96 in returns</p>
                       <p className="mt-1 text-[12px] text-[#03002C]/70">
-                        Rebuilt from the live London file ({live.texts.length} text lines, {live.blocks.length} graphic pieces). Draft.
+                        {live.native
+                          ? "Rebuilt from your supplied print files."
+                          : `Rebuilt from the live London file (${live.texts.length} text lines, ${live.blocks.length} graphic ${live.blocks.length === 1 ? "piece" : "pieces"}).`}{" "}
+                        Draft.
                       </p>
                       <button
                         type="button"
