@@ -165,9 +165,15 @@ function SanFranciscoPage() {
 
         {/* Production stage gates. */}
         <section className="mt-10" aria-labelledby="sf-gates">
-          <h2 id="sf-gates" className="text-lg font-semibold text-[#03002C]">
-            Production status
-          </h2>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="sf-gates" className="text-lg font-semibold text-[#03002C]">
+              Production status
+            </h2>
+            <Link to="/events/next/intake/$eventId" params={{ eventId: "san-francisco" }} className="text-[13px] font-semibold text-primary hover:underline">
+              Add agenda, floor plans or rooms
+            </Link>
+          </div>
+          {assets.data && !assets.data.signedIn ? <p className="mt-1 text-sm text-[#03002C]/65">Sign in to see what's been published.</p> : null}
           <ul className="mt-4 divide-y divide-[#03002C]/10 border-y border-[#03002C]/10">
             {GATES.map((g) => (
               <li
@@ -179,13 +185,12 @@ function SanFranciscoPage() {
                   <p className="text-[15px] font-semibold text-[#03002C]">{g.title}</p>
                   <p className="mt-0.5 text-sm leading-[1.5] text-[#03002C]/70">{g.detail}</p>
                 </div>
-                {g.anchor ? (
-                  <a
-                    href={g.anchor}
-                    className="text-[13px] font-semibold text-primary hover:underline"
-                  >
-                    Open kiosks
-                  </a>
+                {g.action?.to === "kiosks" ? (
+                  <a href="#sf-kiosks" className="text-[13px] font-semibold text-primary hover:underline">{g.action.label}</a>
+                ) : g.action?.to === "maps" ? (
+                  <Link to="/events/next/maps/$eventId" params={{ eventId: "san-francisco" }} className="text-[13px] font-semibold text-primary hover:underline">{g.action.label}</Link>
+                ) : g.action ? (
+                  <Link to="/events/next/intake/$eventId" params={{ eventId: "san-francisco" }} hash={g.action.section} className="text-[13px] font-semibold text-primary hover:underline">{g.action.label}</Link>
                 ) : null}
               </li>
             ))}
