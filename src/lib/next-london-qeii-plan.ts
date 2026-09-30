@@ -9,6 +9,7 @@ import { QEII_SIGNAGE_GRADIENTS } from "@/lib/next-london-qeii-style";
 // The ground behind a plan is a solid brand token — never imported artwork.
 
 import { NEXT_APP_ORIGIN } from "@/lib/next-event";
+import { floorForStyledLook } from "@/lib/venue-floor-normalise";
 import { spaceUseLine, spaceUseMarks, type SpaceUseMark } from "@/lib/next-london-space-use";
 import { qeiiWithCallouts } from "@/lib/next-london-qeii-callouts";
 
@@ -292,8 +293,10 @@ export function qeiiPlanState(id: string): QeiiPlanState | undefined {
 
 
 /** A standalone SVG of the rebuilt plan, for handing on or editing elsewhere. */
-export function qeiiPlanSvg(floor: QeiiFloorVector, options: QeiiPlanOptions = {}): string {
+export function qeiiPlanSvg(sourceFloor: QeiiFloorVector, options: QeiiPlanOptions = {}): string {
   const face = options.face ?? "issued";
+  // Dark-wall venue sheets are tone-flipped for the styled looks; issued keeps the venue's inks.
+  const floor = face === "issued" ? sourceFloor : floorForStyledLook(sourceFloor);
   const scale = options.labelScale ?? 1;
   const showLabels = options.showLabels ?? true;
   const roomColours = options.roomColours ?? {};

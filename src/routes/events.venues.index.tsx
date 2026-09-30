@@ -1,5 +1,6 @@
 // /events/venues — the venue library. Each venue is saved once with its floors;
 // every event held there reads them.
+import { BUILT_IN_FLOOR_VENUES, eventDisplayName } from "@/lib/event-names";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -52,11 +53,13 @@ function VenuesPage() {
               <div className="mt-3 text-[17px] font-bold text-[#03002C]">{v.name}</div>
               <div className="text-[13px] text-[#666666]">{[v.city, v.country].filter(Boolean).join(", ") || "City not set"}</div>
               <div className="mt-3 text-[13px] text-[#03002C]">
-                {v.floorCount === 0 ? "No floors yet — waiting on the venue's sheets" : `${v.floorCount} ${v.floorCount === 1 ? "floor" : "floors"}`}
+                {v.floorCount === 0
+                  ? (BUILT_IN_FLOOR_VENUES[v.slug] ?? "No floors yet — waiting on the venue's sheets")
+                  : `${v.floorCount} ${v.floorCount === 1 ? "floor" : "floors"}`}
                 {v.scans > 0 && ` · ${v.scans} from picture scans (lower quality)`}
               </div>
               <div className="mt-1 text-[12px] text-[#666666]">
-                {v.events.length ? `Used by ${v.events.join(", ")}` : "Not linked to an event yet"}
+                {v.events.length ? `Used by ${v.events.map(eventDisplayName).join(", ")}` : "Not linked to an event yet"}
               </div>
             </Link>
           ))}

@@ -1,0 +1,1 @@
+UPDATE public.venues SET address='888 Howard Street, San Francisco, CA 94103', source_note='Address from OpenStreetMap, not yet confirmed by the hotel (not the InterContinental Mark Hopkins). Floors 3-6 from the hotel''s 2017 meetings fact sheet; confirm current plans with icsfsales@ihg.com.' WHERE slug='intercontinental-san-francisco';

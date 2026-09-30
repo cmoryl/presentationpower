@@ -2,6 +2,8 @@
 // from the venue's own vector files; the London map engine draws, colours and
 // exports them with the same looks, room cuts and approved palette.
 
+import { eventDisplayName } from "@/lib/event-names";
+import { trimFloorToContent } from "@/lib/venue-floor-normalise";
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -60,7 +62,7 @@ type Row = {
   room_uses: unknown;
 };
 
-const toFloor = (eventId: string, r: Row): QeiiFloorVector => ({
+const toFloor = (eventId: string, r: Row): QeiiFloorVector => trimFloorToContent({
   id: eventFloorId(eventId, r.floor_key),
   marker: r.marker,
   title: r.title,
@@ -70,7 +72,7 @@ const toFloor = (eventId: string, r: Row): QeiiFloorVector => ({
   h: r.h,
   shapes: (r.shapes as QeiiFloorVector["shapes"]) ?? [],
   labels: (r.labels as QeiiFloorVector["labels"]) ?? [],
-});
+} as QeiiFloorVector);
 
 const keyFrom = (t: string) =>
   t.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "floor";
@@ -110,10 +112,10 @@ function MapsPage() {
   const plan = q.data?.plan;
   const sheet = useMemo(
     () => ({
-      venueName: plan?.venue || plan?.name || "Venue",
+      venueName: plan?.venue || q.data?.venue?.name || plan?.name || "Venue",
       tabs: rows.map((r) => ({ id: eventFloorId(eventId, r.floor_key), label: r.marker })),
     }),
-    [plan, rows, eventId],
+    [plan, rows, eventId, q.data?.venue],
   );
   const svg = useMemo(
     () => (floor ? qeiiPlanSvg(floor, { face, roomColours, sheet }) : ""),
@@ -215,7 +217,7 @@ function MapsPage() {
         </div>
         <header>
           <p className="font-mono text-[11px] uppercase tracking-wider text-[#666666]">Venue maps</p>
-          <h1 className="mt-1 text-[32px] font-bold leading-tight">{plan?.name ?? eventId}</h1>
+          <h1 className="mt-1 text-[32px] font-bold leading-tight">{plan?.name ?? eventDisplayName(eventId)}</h1>
           {q.data?.venue ? (
             <p className="mt-1 text-[13px] text-[#666666]">
               Floors come from the venue library:{" "}
@@ -230,7 +232,7 @@ function MapsPage() {
             </p>
           )}
           <p className="mt-1 text-[14px] text-[#666666]">
-            {[plan?.venue, plan?.city, plan?.dates_label].filter(Boolean).join(" · ") || "Venue details still to come"}
+            {[plan?.venue || q.data?.venue?.name, plan?.city || q.data?.venue?.city, plan?.dates_label].filter(Boolean).join(" · ") || "Venue details still to come"}
           </p>
         </header>
 

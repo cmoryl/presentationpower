@@ -19,13 +19,20 @@ export async function loadEventAssets(eventId: string) {
   if (ag.error) throw new Error(ag.error.message);
   if (rm.error) throw new Error(rm.error.message);
   const uid = me.data.user?.id;
+  // Floors can come from the venue library as well as from this event's own uploads.
+  const link = await supabase.from("event_venues").select("venue_id").eq("event_id", eventId).maybeSingle();
+  const venueFloors = link.data?.venue_id
+    ? (await supabase.from("venue_floors").select("floor_key").eq("venue_id", link.data.venue_id)).data ?? []
+    : [];
+  const ownFloors = (await supabase.from("event_map_floors").select("floor_key").eq("event_id", eventId)).data ?? [];
+  const floorCount = new Set([...venueFloors, ...ownFloors].map((f) => f.floor_key)).size;
   const canPublish = uid ? !!(await supabase.rpc("can_publish_event_assets", { _user_id: uid })).data : false;
   const agendas: AgendaVersion[] = (ag.data ?? []).map((r) => ({ ...r, status: r.status as AgendaVersion["status"], sessions: cleanSessions(r.sessions) }));
   const rooms: RoomsVersion[] = (rm.data ?? []).map((r) => ({ ...r, status: r.status as RoomsVersion["status"], rooms: cleanRooms(r.rooms) }));
   return {
     agendas,
     rooms,
-    floors: fl.count ?? 0,
+    floors: Math.max(floorCount, fl.count ?? 0),
     canPublish,
     signedIn: !!uid,
     publishedAgenda: agendas.find((a) => a.status === "published") ?? null,

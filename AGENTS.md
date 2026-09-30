@@ -20,3 +20,4 @@
 
 - Legal NEXT signage templates (`legalnext-*` layouts in `src/lib/legal-next-signage-layouts.json`, registry `src/lib/legal-next-signage.ts`) reuse the kiosk layer editor/export via `layout.sign`, kept out of `KIOSK_LIVE_LAYOUTS` (use `liveLayoutById`) — why: one editor/export path, kiosk list stays kiosks only.
 - Event agendas and room lists are added in-app (`event_agendas` / `event_rooms`, versioned; publish = admin or brand_lead, enforced by trigger); agenda boards prefer the newest published agenda over the built-in programme, and the SF production status is computed by `assetGates` — why: build users update events without code changes.
+- Dark-wall venue sheets (e.g. hotel plans) are tone-flipped for styled map looks by `floorForStyledLook` in `src/lib/venue-floor-normalise.ts`; the issued look keeps the venue inks — why: styled looks map tones by lightness and assumed the QEII light-wall convention.
