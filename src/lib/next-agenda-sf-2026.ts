@@ -1,19 +1,14 @@
 // -----------------------------------------------------------------------------
-// NEXT 2026 San Francisco — default agenda boards.
+// NEXT 2026 San Francisco — agenda boards.
 //
-// Only three San Francisco facts have been issued: the location line, the venue
-// and the two dates. No programme, no rooms, no speakers. So these boards carry
-// the approved agenda geometry and the shared house times the London
-// programmes actually kept, and every content slot prints "TO BE CONFIRMED"
-// rather than a session nobody has sent.
+// Programme taken from the issued agenda at transperfectnext.com/usa/agenda
+// (53 sessions, Tue 27 & Wed 28 Oct 2026, times PDT), read 30 Sep 2026.
+// Titles, times and speakers are copied as published. Sessions starting at the
+// same time share a band as parallel cards, each keeping its own time.
 //
-// The point is that a division can pick its board up today, see the right
-// frame, dates and housekeeping, and type the programme in when it arrives —
-// without anyone mistaking a placeholder row for an issued session.
-//
-// House times below are read off the issued London programmes (registration
-// window, welcome, break, lunch, reception, close). They are carried, not
-// measured against a San Francisco run of show, and the footnote says so.
+// The published agenda issues no rooms, tracks or division assignments, so
+// every board carries the same full programme and room lines stay "to be
+// confirmed" rather than guessed. Speaker lines print name + organisation.
 // -----------------------------------------------------------------------------
 
 import type { LondonAgendaProgramme } from "./next-agenda-london-2026";
@@ -24,7 +19,7 @@ export const SF_DAY_ONE_META = "TUESDAY, OCTOBER 27, 2026";
 export const SF_DAY_TWO_META = "WEDNESDAY, OCTOBER 28, 2026";
 export const SF_FOOTER_RIGHT = "27 & 28 OCTOBER, 2026";
 
-/** Printed in every content slot until a programme is issued. */
+/** Kept for saved boards that still carry the old placeholder rows. */
 export const SF_TBC_TITLE = "TO BE CONFIRMED";
 
 const row = (
@@ -34,44 +29,50 @@ const row = (
   extra: Partial<AgendaSession> = {},
 ): AgendaSession => ({ time, title, detail, track: "", muted: false, ...extra });
 
-/** A content slot with no issued session: honest placeholder, never a guess. */
-const tbc = (time: string): AgendaSession =>
-  row(time, SF_TBC_TITLE, "Session not yet issued", { muted: true });
-
-/** Day one, on the London house times. */
+/** Tuesday, October 27, 2026 — as published. */
 const SF_DAY_ONE: AgendaSession[] = [
-  row("11:30 AM-1:30 PM", "Registration & Networking", "", { muted: true }),
-  tbc("1:30-1:45 PM"),
-  tbc("1:45-2:30 PM"),
-  tbc("2:30-3:15 PM"),
-  row("3:15-3:30 PM", "BREAK", "", { muted: true }),
-  tbc("3:30-4:15 PM"),
-  tbc("4:15-5:00 PM"),
-  tbc("5:00-5:45 PM"),
-  row("6:00 PM", "Post-event Cocktail Reception", "", { muted: true }),
+  row("11:00 AM-12:30 PM", "Registration & Networking", "", { muted: true }),
+  row("12:30-12:40 PM", "Opening Remarks", "Pep Rosenfeld, BOOM Chicago"),
+  row("12:40-1:05 PM", "Beyond Intelligence", "Matt Hauser, TransPerfect"),
+  row("1:05-1:45 PM", "GlobalLink Roadmap", "Keith Brazil, TransPerfect; Julien Didier, TransPerfect"),
+  row("1:50-2:15 PM", "Digital Transformation in Banking and Credit Unions", "Liz Castillo, Tinker Federal Credit Union; Harry Thakkar, TransPerfect", { parallels: [{ time: "1:50-2:15 PM", title: "Turning Information into Advantage", speaker: "Mark Lawyer, TransPerfect", detail: "" }, { time: "1:50-2:45 PM", title: "Breaking Down Silos: Centralized Translation from Development to Launch", speaker: "Dr. Madiha Khalid, Larimar Therapeutics; Jennifer Locasto, Sarepta; Alexandria Zieba, AZ Life Sciences Consulting Services", detail: "" }, { time: "1:50-2:45 PM", title: "This is TransPerfect Media", speaker: "Paulette Pantoja, TransPerfect", detail: "" }] }),
+  row("2:20-2:45 PM", "Cleared for Takeoff: Driving Global Visibility & Value with TransPerfect Digital", "Adib Abrahim, American Airlines; Dana Weber, TransPerfect"),
+  row("2:50-3:15 PM", "AI-Powered Content Personalization at Scale", "Harry Thakkar, TransPerfect", { parallels: [{ time: "2:50-3:15 PM", title: "Breaking Language Barriers: Elevating Medical Engagement Worldwide", speaker: "Sheryl Olinsky Borg, Merck", detail: "" }, { time: "2:50-3:15 PM", title: "Scaling Studio Localization with AI", speaker: "Karen Tsai, Lionsgate", detail: "" }, { time: "2:50-3:15 PM", title: "The Future of Mortgage", speaker: "Nora Guerra, Guild Mortgage; George Baker, Talk'uments, LLC; Jennifer Castejon, First American Title", detail: "" }] }),
+  row("3:15-3:30 PM", "Break", "", { muted: true }),
+  row("3:30-3:55 PM", "From Pitch to Platform: How GMS Redefined its Digital Footprint", "Linsey Bricker, GMS", { parallels: [{ time: "3:30-3:55 PM", title: "Marketing to the Hispanic Audience", speaker: "Alicia R. López, U.S. Bank; Jason Riviero", detail: "" }, { time: "3:30-3:55 PM", title: "One Team, One Dossier: Aligning Clinical & RA to Accelerate Approvals", speaker: "Denise Mayes-Gascard, Sanofi; Nat Arlander, Sanofi", detail: "" }, { time: "3:30-4:25 PM", title: "Driving International Growth with Media", speaker: "", detail: "" }] }),
+  row("4:00-4:25 PM", "Enterprise Control, Global Scale: Centralizing Translation Governance", "", { parallels: [{ time: "4:00-4:25 PM", title: "Is Your Brand Still Visible? How to Stay Relevant in an Agentic World", speaker: "Dana Weber, TransPerfect; Leo Rotstein, TransPerfect", detail: "" }] }),
+  row("4:30-4:55 PM", "Beyond the Hype: What it Actually Takes to Deploy AI that Works", "Nicholas Panagopoulos, TransPerfect; Guy Yalif, Webflow; Robert Balmaseda, Verndale; Emilio Di Zazzo, commercetools"),
+  row("5:00-5:25 PM", "Managing Risk and Control in AI-Created Content", "Hilary Wright, TransPerfect"),
+  row("5:25-5:50 PM", "The Catalysts for Evolution: An In-Depth Exploration of Zebra’s AI Journey", "Lisa Cowgill, Zebra Technologies; Ty Trainer, TransPerfect; Amanda Trew, Zebra Technologies"),
+  row("5:50-6:15 PM", "Nexties Awards & Closing Remarks", "Matt Hauser, TransPerfect; Pep Rosenfeld, BOOM Chicago"),
+  row("6:15-7:00 PM", "Cocktails & Networking", "", { muted: true }),
 ];
 
-/** Day two, on the London house times. */
+/** Wednesday, October 28, 2026 — as published. */
 const SF_DAY_TWO: AgendaSession[] = [
-  row("9:00-9:45 AM", "Doors Open, Coffee & Networking", "", { muted: true }),
-  tbc("9:45-10:30 AM"),
-  tbc("10:30-11:45 AM"),
-  row("11:45 AM-12:45 PM", "Lunch", "", { muted: true }),
-  tbc("12:45-1:30 PM"),
-  tbc("1:30-2:15 PM"),
-  tbc("2:15-2:45 PM"),
-  row("2:55 PM", "Event Close & Takedown", "", { muted: true }),
+  row("8:15-9:00 AM", "Registration", "", { muted: true }),
+  row("9:00-9:25 AM", "AI for Gaming Development", "Matt Scott, Little Orbit", { parallels: [{ time: "9:00-9:25 AM", title: "Bridging Tech & Vendors: Seamless CMS Integration for Multi-Vendor Localization", speaker: "Arun Garg, Terumo Medical Corporation", detail: "" }, { time: "9:00-9:25 AM", title: "From Efficiency to Evolution: How AI Can Deliver Strategic Transformation", speaker: "Hilary Wright, TransPerfect; Ty Trainer, TransPerfect", detail: "" }, { time: "9:00-9:55 AM", title: "Panel Discussion: AI & Innovation for Digital Health", speaker: "Joseph Im, Regeneron Pharmaceuticals; Tracey Larrow, Datacubed; Chris Bowen, Clinical Operations Advisor", detail: "" }] }),
+  row("9:30-9:55 AM", "Closing the Competitive Gap: How Pinterest Accelerated Ad Adoption & Monetization", "Jen Faruggio, Pinterest", { parallels: [{ time: "9:30-9:55 AM", title: "Orchestrating the Ecosystem: Multi-Vendor Translation Powered by Advanced Integration", speaker: "Christopher Sause, Cummins Inc.", detail: "" }, { time: "9:30-9:55 AM", title: "Player Trust Beyond Launch", speaker: "Daniel Lafuente, NC America", detail: "" }] }),
+  row("10:00-10:25 AM", "Optimize Gaming Development with Global Partners", "Jimmy Corvan, Riot Games", { parallels: [{ time: "10:00-10:25 AM", title: "Quality at Scale: Combining Engine Training and Modernization for Long-Term Success", speaker: "Scott Spencer, Costco Travel", detail: "" }, { time: "10:00-10:25 AM", title: "Reinventing Marketing Operations: How Leading Brands Are Orchestrating AI", speaker: "Shane Madden, TransPerfect", detail: "" }, { time: "10:00-10:25 AM", title: "The Intelligence Hub: Orchestrating Enterprise AI Strategy with Enterprise TMS", speaker: "Vanessa Halloran, GSK", detail: "" }] }),
+  row("10:30-10:55 AM", "Connected Content: How Agentic AI and Integrations Bridge Organizational Silos", "Greg Cohen, Smurfit Westrock", { parallels: [{ time: "10:30-10:55 AM", title: "From Global Reach to Local Relevance: Winning Players Market by Market", speaker: "Rytis Joseph Jan, Xsolla", detail: "" }, { time: "10:30-10:55 AM", title: "Putting Patients First: Architecting Localized Products for Global Health", speaker: "Harlene Grewal, Verily Life Sciences; Patrick McLoughlin, Localization Manager", detail: "" }, { time: "10:30-10:55 AM", title: "Raising the Bar on Event Accessibility: The AWS Playbook", speaker: "Marisol Jenkins, Amazon Web Services", detail: "" }] }),
+  row("10:55-11:05 AM", "Break", "", { muted: true }),
+  row("11:05-11:30 AM", "Agents: The Third-Party Channel Almost No One Is Ready For", "Diego Bartolome, TransPerfect; Brian Ballard, TransPerfect", { parallels: [{ time: "11:05-11:30 AM", title: "Beyond Human-in-the-Loop: Governing AI for Patient-Facing Content", speaker: "Sara Faye Green, WebMD Ignite", detail: "" }, { time: "11:05-11:30 AM", title: "Centralized Enterprise AI: The Custom Model Blueprint", speaker: "Oswaldo Lopez, Hewlett Packard Enterprise", detail: "" }, { time: "11:05 AM-12:00 PM", title: "Managed Care in Motion: AI Compliance & The Future of Member Engagement", speaker: "", detail: "" }] }),
+  row("11:35 AM-12:00 PM", "Expanding Clinical Trial Accessibility with GlobalLink Web", "Mariah Blevins, Johnson & Johnson; Krista Goedel, Sanofi", { parallels: [{ time: "11:35 AM-12:00 PM", title: "Logistics of Localization: Deploying Enterprise TMS for Global Efficiency", speaker: "Paige W. Miller, UPS; Buddy McGrath, UPS", detail: "" }] }),
+  row("12:00-12:50 PM", "Lunch", "", { muted: true }),
+  row("1:00-2:00 PM", "Keynote", "Will Guidara", { track: "KEYNOTE" }),
+  row("2:05-2:30 PM", "Aura: Building the Marketing Operating System", ""),
+  row("2:30-2:55 PM", "Becoming AI-Forward: Scaling Localization and Content with Agentic AI", "Ajit Manuel, Amazon Web Services"),
+  row("2:55-3:05 PM", "Closing Remarks", "Matt Hauser, TransPerfect; Pep Rosenfeld, BOOM Chicago"),
 ];
 
 const SF_FOOTNOTE =
-  "Default board · no San Francisco programme has been issued. Times carried from the flagship house times; rooms and sessions to be confirmed.";
+  "Programme as published at transperfectnext.com/usa/agenda. All times PDT. Rooms to be confirmed. Subject to change.";
 
 /**
  * The default San Francisco board for any division area.
  *
- * Deliberately identical for every division: nothing division-specific has
- * been issued for San Francisco, so a per-division difference here could only
- * be invented.
+ * Identical for every division: the published agenda assigns no session to a
+ * division, so a per-division split here could only be invented.
  */
 export function sfProgramme(_divisionId?: string): LondonAgendaProgramme {
   return {
