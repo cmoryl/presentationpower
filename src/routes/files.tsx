@@ -45,7 +45,7 @@ export const Route = createFileRoute("/files")({
   }),
   component: MyFilesPage,
   errorComponent: ({ error }) => (
-    <div className="p-10 text-sm text-red-600">My Files failed to load: {error.message}</div>
+    <div className="p-10 text-sm text-red-600">My Files failed to load: {(error as Error).message}</div>
   ),
 });
 

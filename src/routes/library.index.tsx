@@ -311,7 +311,7 @@ export const Route = createFileRoute("/library/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(taxonomyQueryOptions),
   component: Library,
   errorComponent: ({ error }) => (
-    <div className="p-10 text-sm text-red-600">Library failed to load: {error.message}</div>
+    <div className="p-10 text-sm text-red-600">Library failed to load: {(error as Error).message}</div>
   ),
   notFoundComponent: () => <div className="p-10">Not found.</div>,
 });

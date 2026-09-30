@@ -47,7 +47,7 @@ export const Route = createFileRoute("/library/my_/$moduleId")({
   }),
   component: EditSavedModule,
   errorComponent: ({ error }) => (
-    <div className="p-10 text-sm text-red-600">Module failed to load: {error.message}</div>
+    <div className="p-10 text-sm text-red-600">Module failed to load: {(error as Error).message}</div>
   ),
   notFoundComponent: () => <div className="p-10">Saved module not found.</div>,
 });

@@ -106,7 +106,7 @@ export const Route = createFileRoute("/library/print")({
   component: PrintCenterPage,
   errorComponent: ({ error }) => (
     <AppShell>
-      <div className="p-10 text-sm text-red-600">Print center failed to load: {error.message}</div>
+      <div className="p-10 text-sm text-red-600">Print center failed to load: {(error as Error).message}</div>
     </AppShell>
   ),
   notFoundComponent: () => (
