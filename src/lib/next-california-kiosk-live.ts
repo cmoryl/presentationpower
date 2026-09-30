@@ -14,6 +14,7 @@
 // kiosk trim (origin top-left).
 
 import layoutsJson from "@/lib/next-california-kiosk-live-layouts.json";
+import signLayoutsJson from "@/lib/legal-next-signage-layouts.json";
 
 export const KIOSK_W = 3240;
 export const KIOSK_H = 6912;
@@ -25,6 +26,7 @@ const GAP_MIN = 60;
 /** Kiosks the designer re-supplied with NO TV (2026-09-28): no keep-clear, no TV check. */
 export const KIOSK_NO_TV = new Set(["coa", "global-digital-experience-tradebooth-a", "legal-support-2-tradebooth-b", "medical-writing"]);
 export function kioskHasTv(id: string): boolean {
+  if (isSignId(id)) return false;
   return !KIOSK_NO_TV.has(id);
 }
 
@@ -72,7 +74,12 @@ export type LiveLayout = {
   native?: KioskNative;
   /** Set on a side-strip view of a kiosk: the strip is edited like the front, at 4 in wide. */
   face?: KioskFace;
+  /** Set on general signage templates (Legal NEXT): any trim size, own safe margin, no TV. */
+  sign?: { margin: number };
 };
+
+/** Signage templates share the kiosk editor; their ids carry this prefix. */
+export const isSignId = (id: string) => id.startsWith("legalnext-");
 
 export type KioskFace = "left" | "right";
 /** One side strip read from the designer's CMYK file, split one object per page. */
@@ -98,9 +105,12 @@ export type KioskNative = {
 };
 
 /** Trim width of the face a layout draws (front 45 in, side strip 4 in). */
-export const kioskFaceW = (L: Pick<LiveLayout, "face">) => (L.face ? KIOSK_RETURN_W : KIOSK_W);
+export const kioskFaceW = (L: Pick<LiveLayout, "face"> & Partial<Pick<LiveLayout, "sign" | "trimW">>) =>
+  L.face ? KIOSK_RETURN_W : L.sign && L.trimW ? L.trimW : KIOSK_W;
+/** Trim height of the face a layout draws (kiosks 96 in; signs their own). */
+export const kioskFaceH = (L: Partial<Pick<LiveLayout, "sign" | "trimH">>) => (L.sign && L.trimH ? L.trimH : KIOSK_H);
 /** Side safe margin: 2 in on the front, 1/4 in on a 4 in strip. */
-export const kioskMarginX = (L: Pick<LiveLayout, "face">) => (L.face ? 18 : KIOSK_MARGIN);
+export const kioskMarginX = (L: Pick<LiveLayout, "face"> & Partial<Pick<LiveLayout, "sign">>) => (L.face ? 18 : L.sign ? L.sign.margin : KIOSK_MARGIN);
 /** Where a face's changes are saved (the front keeps the kiosk id). */
 export const kioskEditKey = (L: Pick<LiveLayout, "id" | "face">) => (L.face ? `${L.id}--${L.face}` : L.id);
 /** Split a saved-changes key back into kiosk id and face. */
@@ -128,7 +138,10 @@ export function kioskFaceLayout(L: LiveLayout, face: KioskFace): LiveLayout | nu
   };
 }
 
-export const KIOSK_LIVE_LAYOUTS = layoutsJson as unknown as Record<string, LiveLayout>;
+export const KIOSK_LIVE_LAYOUTS = {
+  ...(layoutsJson as unknown as Record<string, LiveLayout>),
+  ...(signLayoutsJson as unknown as Record<string, LiveLayout>),
+} as Record<string, LiveLayout>;
 
 export function kioskLiveLayout(boothId: string | null | undefined): LiveLayout | null {
   return (boothId && KIOSK_LIVE_LAYOUTS[boothId]) || null;
@@ -144,7 +157,7 @@ function pick(map: Record<string, Ptr>, file: string): string | null {
   const hit = Object.entries(map).find(([k]) => k.endsWith(`/${file}.asset.json`));
   return hit ? hit[1].url : null;
 }
-const NATIVE = import.meta.glob<Ptr>("../assets/california-kiosks/native/*.asset.json", { eager: true, import: "default" });
+const NATIVE = import.meta.glob<Ptr>(["../assets/california-kiosks/native/*.asset.json", "../assets/legal-next-signage/native/*.asset.json"], { eager: true, import: "default" });
 export const kioskArtSvgUrl = (id: string) =>
   KIOSK_LIVE_LAYOUTS[id]?.native ? pick(NATIVE, `${id}-native.svg`) : pick(ART, `${id}-art.svg`);
 export const kioskArtPdfUrl = (id: string) => pick(ART, `${id}-art.pdf`);
@@ -572,6 +585,7 @@ export function buildKioskFrontSvg(
   const [, , vw, vh] = art.viewBox.split(/\s+/).map(Number);
   const B = KIOSK_BLEED;
   const KW = kioskFaceW(L);
+  const KIOSK_H = kioskFaceH(L);
   const g = kioskGround(L, edits);
   const parts: string[] = [];
   parts.push(
@@ -676,7 +690,7 @@ export function groundAt(stops: { offset: number; color: string }[], t: number):
   return [0, 1, 2].map((i) => A[i]! + (Bc[i]! - A[i]!) * f) as [number, number, number];
 }
 
-export const kioskLiveFileBase = (id: string) => `rdraft-sf-kiosk-${id}-live`;
+export const kioskLiveFileBase = (id: string) => (isSignId(id) ? `rdraft-${id}-live` : `rdraft-sf-kiosk-${id}-live`);
 
 /**
  * The partner's "▪" bullets were set in Times New Roman, which we have no
