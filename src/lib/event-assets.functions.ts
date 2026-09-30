@@ -65,25 +65,25 @@ export const extractEventAssets = createServerFn({ method: "POST" })
     let parsed: Record<string, unknown> = {};
     try { parsed = JSON.parse(raw.replace(/^```json\s*|```$/g, "")); } catch { throw new Error("The reader returned something unreadable. Try again or use a different file."); }
 
+      const fileText = async (apiKey: string, f: { name: string; mime: string; base64: string }): Promise<string> => {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [{ role: "user", content: [
+          { type: "text", text: "Output all readable text of this document verbatim, in reading order. No commentary." },
+          { type: "file", file: { filename: f.name, file_data: `data:${f.mime};base64,${f.base64}` } },
+        ] }],
+      }),
+    });
+    if (!res.ok) return "";
+    const j = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+    return j.choices?.[0]?.message?.content ?? "";
+  };
+
     // For files, ask once more for the plain text so the page can check titles against it.
     let checkText = sourceText;
     if (!checkText && data.file) checkText = await fileText(apiKey, data.file).catch(() => "");
     return { rows: (data.kind === "agenda" ? parsed.sessions : parsed.rooms) ?? [], sourceText: checkText.slice(0, 200_000) };
   });
-
-async function fileText(apiKey: string, f: { name: string; mime: string; base64: string }): Promise<string> {
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash-lite",
-      messages: [{ role: "user", content: [
-        { type: "text", text: "Output all readable text of this document verbatim, in reading order. No commentary." },
-        { type: "file", file: { filename: f.name, file_data: `data:${f.mime};base64,${f.base64}` } },
-      ] }],
-    }),
-  });
-  if (!res.ok) return "";
-  const j = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-  return j.choices?.[0]?.message?.content ?? "";
-}
