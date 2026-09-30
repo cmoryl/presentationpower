@@ -22,3 +22,11 @@
 
 - [ ] SF kiosks: rebuild editor from designer CMYK files (plan pending approval)
 - [ ] SF kiosks: centred multi-line text blocks (icon labels etc.) editable as one block
+
+# Roadmap — faster venue set-up
+- [x] Save as template (sign + kiosk editors) with approval on /approvals
+- [x] Venue sign list (measured sizes, photos)
+- [x] Build the sign set from published facts
+- [x] Copy template choices from a past event
+- [x] Review sheet + one zip of ready, print-checked signs
+- [x] Set-up checklist on the sign set page

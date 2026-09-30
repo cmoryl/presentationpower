@@ -197,6 +197,8 @@ import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as EventsNextDivisionsIndexRouteImport } from './routes/events.next_.divisions.index'
 import { Route as KnowledgeBrandGuidesSlugEditRouteImport } from './routes/knowledge.brand-guides.$slug_.edit'
+import { Route as EventsNextSignsEventIdRouteImport } from './routes/events.next_.signs.$eventId'
+import { Route as EventsNextSignSetEditorSignIdRouteImport } from './routes/events.next_.sign-set-editor.$signId'
 import { Route as EventsNextSignEditorSignIdRouteImport } from './routes/events.next_.sign-editor.$signId'
 import { Route as EventsNextMartPriceListRouteImport } from './routes/events.next_.mart_.price-list'
 import { Route as EventsNextMartStopIdRouteImport } from './routes/events.next_.mart_.$stopId'
@@ -1164,6 +1166,17 @@ const KnowledgeBrandGuidesSlugEditRoute =
     path: '/brand-guides/$slug/edit',
     getParentRoute: () => KnowledgeRoute,
   } as any)
+const EventsNextSignsEventIdRoute = EventsNextSignsEventIdRouteImport.update({
+  id: '/next_/signs/$eventId',
+  path: '/next/signs/$eventId',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextSignSetEditorSignIdRoute =
+  EventsNextSignSetEditorSignIdRouteImport.update({
+    id: '/next_/sign-set-editor/$signId',
+    path: '/next/sign-set-editor/$signId',
+    getParentRoute: () => EventsRoute,
+  } as any)
 const EventsNextSignEditorSignIdRoute =
   EventsNextSignEditorSignIdRouteImport.update({
     id: '/next_/sign-editor/$signId',
@@ -1436,6 +1449,8 @@ export interface FileRoutesByFullPath {
   '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
   '/events/next/mart/price-list': typeof EventsNextMartPriceListRoute
   '/events/next/sign-editor/$signId': typeof EventsNextSignEditorSignIdRoute
+  '/events/next/sign-set-editor/$signId': typeof EventsNextSignSetEditorSignIdRoute
+  '/events/next/signs/$eventId': typeof EventsNextSignsEventIdRoute
   '/knowledge/brand-guides/$slug/edit': typeof KnowledgeBrandGuidesSlugEditRoute
   '/events/next/divisions/': typeof EventsNextDivisionsIndexRoute
 }
@@ -1635,6 +1650,8 @@ export interface FileRoutesByTo {
   '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
   '/events/next/mart/price-list': typeof EventsNextMartPriceListRoute
   '/events/next/sign-editor/$signId': typeof EventsNextSignEditorSignIdRoute
+  '/events/next/sign-set-editor/$signId': typeof EventsNextSignSetEditorSignIdRoute
+  '/events/next/signs/$eventId': typeof EventsNextSignsEventIdRoute
   '/knowledge/brand-guides/$slug/edit': typeof KnowledgeBrandGuidesSlugEditRoute
   '/events/next/divisions': typeof EventsNextDivisionsIndexRoute
 }
@@ -1839,6 +1856,8 @@ export interface FileRoutesById {
   '/events/next_/mart_/$stopId': typeof EventsNextMartStopIdRoute
   '/events/next_/mart_/price-list': typeof EventsNextMartPriceListRoute
   '/events/next_/sign-editor/$signId': typeof EventsNextSignEditorSignIdRoute
+  '/events/next_/sign-set-editor/$signId': typeof EventsNextSignSetEditorSignIdRoute
+  '/events/next_/signs/$eventId': typeof EventsNextSignsEventIdRoute
   '/knowledge/brand-guides/$slug_/edit': typeof KnowledgeBrandGuidesSlugEditRoute
   '/events/next_/divisions/': typeof EventsNextDivisionsIndexRoute
 }
@@ -2044,6 +2063,8 @@ export interface FileRouteTypes {
     | '/events/next/mart/$stopId'
     | '/events/next/mart/price-list'
     | '/events/next/sign-editor/$signId'
+    | '/events/next/sign-set-editor/$signId'
+    | '/events/next/signs/$eventId'
     | '/knowledge/brand-guides/$slug/edit'
     | '/events/next/divisions/'
   fileRoutesByTo: FileRoutesByTo
@@ -2243,6 +2264,8 @@ export interface FileRouteTypes {
     | '/events/next/mart/$stopId'
     | '/events/next/mart/price-list'
     | '/events/next/sign-editor/$signId'
+    | '/events/next/sign-set-editor/$signId'
+    | '/events/next/signs/$eventId'
     | '/knowledge/brand-guides/$slug/edit'
     | '/events/next/divisions'
   id:
@@ -2446,6 +2469,8 @@ export interface FileRouteTypes {
     | '/events/next_/mart_/$stopId'
     | '/events/next_/mart_/price-list'
     | '/events/next_/sign-editor/$signId'
+    | '/events/next_/sign-set-editor/$signId'
+    | '/events/next_/signs/$eventId'
     | '/knowledge/brand-guides/$slug_/edit'
     | '/events/next_/divisions/'
   fileRoutesById: FileRoutesById
@@ -3873,6 +3898,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeBrandGuidesSlugEditRouteImport
       parentRoute: typeof KnowledgeRoute
     }
+    '/events/next_/signs/$eventId': {
+      id: '/events/next_/signs/$eventId'
+      path: '/next/signs/$eventId'
+      fullPath: '/events/next/signs/$eventId'
+      preLoaderRoute: typeof EventsNextSignsEventIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/sign-set-editor/$signId': {
+      id: '/events/next_/sign-set-editor/$signId'
+      path: '/next/sign-set-editor/$signId'
+      fullPath: '/events/next/sign-set-editor/$signId'
+      preLoaderRoute: typeof EventsNextSignSetEditorSignIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/sign-editor/$signId': {
       id: '/events/next_/sign-editor/$signId'
       path: '/next/sign-editor/$signId'
@@ -4088,6 +4127,8 @@ interface EventsRouteChildren {
   EventsNextMartStopIdRoute: typeof EventsNextMartStopIdRoute
   EventsNextMartPriceListRoute: typeof EventsNextMartPriceListRoute
   EventsNextSignEditorSignIdRoute: typeof EventsNextSignEditorSignIdRoute
+  EventsNextSignSetEditorSignIdRoute: typeof EventsNextSignSetEditorSignIdRoute
+  EventsNextSignsEventIdRoute: typeof EventsNextSignsEventIdRoute
   EventsNextDivisionsIndexRoute: typeof EventsNextDivisionsIndexRoute
 }
 
@@ -4132,6 +4173,8 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextMartStopIdRoute: EventsNextMartStopIdRoute,
   EventsNextMartPriceListRoute: EventsNextMartPriceListRoute,
   EventsNextSignEditorSignIdRoute: EventsNextSignEditorSignIdRoute,
+  EventsNextSignSetEditorSignIdRoute: EventsNextSignSetEditorSignIdRoute,
+  EventsNextSignsEventIdRoute: EventsNextSignsEventIdRoute,
   EventsNextDivisionsIndexRoute: EventsNextDivisionsIndexRoute,
 }
 

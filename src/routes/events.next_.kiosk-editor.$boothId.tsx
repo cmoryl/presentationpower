@@ -4,6 +4,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { KioskLayerEditor } from "@/components/events/KioskLayerEditor";
+import { SaveAsTemplateButton } from "@/components/events/SaveAsTemplateButton";
 import { CALIFORNIA_KIOSKS, californiaKioskSourceBoothId } from "@/lib/next-california-kiosks";
 import { kioskLiveLayout } from "@/lib/next-california-kiosk-live";
 import { useRequireSignIn } from "@/hooks/use-require-sign-in";
@@ -59,5 +60,10 @@ function KioskEditorWindow() {
       </main>
     );
   }
-  return <KioskLayerEditor layout={layout} vendor={vendor} fill />;
+  return (
+    <>
+      <KioskLayerEditor layout={layout} vendor={vendor} fill />
+      <div className="fixed bottom-3 right-3 z-[80]"><SaveAsTemplateButton layout={layout} sourceLabel={`${vendor} kiosk front`} defaultKind="kiosk" className="shadow-lg bg-[#070620]" /></div>
+    </>
+  );
 }

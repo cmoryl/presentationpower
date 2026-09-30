@@ -2435,6 +2435,84 @@ export type Database = {
         }
         Relationships: []
       }
+      event_sign_sets: {
+        Row: {
+          choices: Json
+          copied_from: string | null
+          created_at: string
+          created_by: string | null
+          event_id: string
+          updated_at: string
+        }
+        Insert: {
+          choices?: Json
+          copied_from?: string | null
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          updated_at?: string
+        }
+        Update: {
+          choices?: Json
+          copied_from?: string | null
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      event_signs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          event_id: string
+          fields: Json
+          id: string
+          spot_id: string
+          status: string
+          template_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          fields?: Json
+          id?: string
+          spot_id: string
+          status?: string
+          template_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          fields?: Json
+          id?: string
+          spot_id?: string
+          status?: string
+          template_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_signs_spot_id_fkey"
+            columns: ["spot_id"]
+            isOneToOne: false
+            referencedRelation: "venue_sign_spots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_signs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "sign_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_venue_knowledge: {
         Row: {
           body: string
@@ -4065,6 +4143,63 @@ export type Database = {
         }
         Relationships: []
       }
+      sign_templates: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          created_by: string
+          edits: Json
+          fields: Json
+          h_in: number
+          id: string
+          kind: string
+          layout_id: string
+          name: string
+          review_note: string | null
+          source_label: string | null
+          status: string
+          updated_at: string
+          w_in: number
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          created_by?: string
+          edits?: Json
+          fields?: Json
+          h_in: number
+          id?: string
+          kind: string
+          layout_id: string
+          name: string
+          review_note?: string | null
+          source_label?: string | null
+          status?: string
+          updated_at?: string
+          w_in: number
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          created_by?: string
+          edits?: Json
+          fields?: Json
+          h_in?: number
+          id?: string
+          kind?: string
+          layout_id?: string
+          name?: string
+          review_note?: string | null
+          source_label?: string | null
+          status?: string
+          updated_at?: string
+          w_in?: number
+        }
+        Relationships: []
+      }
       skin_backdrops: {
         Row: {
           created_at: string
@@ -4930,6 +5065,68 @@ export type Database = {
         }
         Relationships: []
       }
+      venue_sign_spots: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          floor_key: string | null
+          h_in: number | null
+          id: string
+          kind: string
+          label: string
+          note: string | null
+          photo_path: string | null
+          position: number
+          room: string | null
+          sides: number
+          updated_at: string
+          venue_id: string
+          w_in: number | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          floor_key?: string | null
+          h_in?: number | null
+          id?: string
+          kind: string
+          label: string
+          note?: string | null
+          photo_path?: string | null
+          position?: number
+          room?: string | null
+          sides?: number
+          updated_at?: string
+          venue_id: string
+          w_in?: number | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          floor_key?: string | null
+          h_in?: number | null
+          id?: string
+          kind?: string
+          label?: string
+          note?: string | null
+          photo_path?: string | null
+          position?: number
+          room?: string | null
+          sides?: number
+          updated_at?: string
+          venue_id?: string
+          w_in?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_sign_spots_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venues: {
         Row: {
           address: string
@@ -4980,6 +5177,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_edit_signs: { Args: { _user_id: string }; Returns: boolean }
       can_edit_venue: { Args: { _user_id: string }; Returns: boolean }
       can_publish_event_assets: { Args: { _user_id: string }; Returns: boolean }
       display_names: {

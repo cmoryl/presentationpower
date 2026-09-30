@@ -6,6 +6,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { KioskLayerEditor } from "@/components/events/KioskLayerEditor";
 import { legalSign, legalSignLayout } from "@/lib/legal-next-signage";
 import { useRequireSignIn } from "@/hooks/use-require-sign-in";
+import { SaveAsTemplateButton } from "@/components/events/SaveAsTemplateButton";
+import type { SignKind } from "@/lib/sign-set";
+
+const SIGN_KIND_FOR: Record<string, SignKind> = { doors: "door", columns: "column", foyer: "wall", stairs: "directional", header: "header" };
 
 export const Route = createFileRoute("/events/next_/sign-editor/$signId")({
   ssr: false,
@@ -47,16 +51,19 @@ function SignEditorWindow() {
   const face = sign.faces.find((f) => f.id === faceId);
   return (
     <div className="fixed inset-0 flex flex-col bg-[#0B0A2A]">
-      {sign.faces.length > 1 ? (
-        <div role="tablist" aria-label="Sign face" className="relative z-[75] flex gap-1 border-b border-white/10 bg-[#070620] px-3 py-1.5">
-          {sign.faces.map((f) => (
-            <button key={f.id} role="tab" type="button" aria-selected={f.id === faceId} onClick={() => setFaceId(f.id)}
-              className="rounded-sm px-3 py-1 text-[12px] font-semibold text-white/60 hover:text-white aria-selected:bg-white/15 aria-selected:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
-              {f.label}
-            </button>
-          ))}
-        </div>
-      ) : null}
+      <div className="relative z-[75] flex items-center gap-1 border-b border-white/10 bg-[#070620] px-3 py-1.5">
+        {sign.faces.length > 1 ? (
+          <div role="tablist" aria-label="Sign face" className="flex gap-1">
+            {sign.faces.map((f) => (
+              <button key={f.id} role="tab" type="button" aria-selected={f.id === faceId} onClick={() => setFaceId(f.id)}
+                className="rounded-sm px-3 py-1 text-[12px] font-semibold text-white/60 hover:text-white aria-selected:bg-white/15 aria-selected:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
+                {f.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        <SaveAsTemplateButton key={faceId} layout={layout} sourceLabel={`${sign.title}${sign.faces.length > 1 ? ` · ${face?.label}` : ""}`} defaultKind={SIGN_KIND_FOR[sign.id] ?? "other"} className="ml-auto" />
+      </div>
       <div className="relative flex-1">
         <KioskLayerEditor key={faceId} layout={layout} vendor={`${sign.title}${sign.faces.length > 1 ? ` · ${face?.label}` : ""}`} embedded />
       </div>
