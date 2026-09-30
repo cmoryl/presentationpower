@@ -3,19 +3,33 @@ import { Download, PenLine } from "lucide-react";
 
 import { KioskLiveThumb } from "@/components/events/KioskLayerEditor";
 import { Button } from "@/components/ui/button";
-import { LEGAL_NEXT_SIGNS, legalSignLayout, legalSignMasterUrl } from "@/lib/legal-next-signage";
+import { LEGAL_NEXT_SIGNS, SF_SCREEN_SURROUNDS, legalSignLayout, legalSignMasterUrl, type LegalSign } from "@/lib/legal-next-signage";
 
 /** Legal NEXT general signage templates: open in the layer editor or take the supplied file. */
 export function LegalNextSignage() {
   return (
-    <section aria-labelledby="legal-next-signs" className="mt-12">
-      <h2 id="legal-next-signs" className="text-xl font-semibold">Legal NEXT signage templates</h2>
+    <SignTemplateList id="legal-next-signs" title="Legal NEXT signage templates" signs={LEGAL_NEXT_SIGNS}
+      intro="General Legal NEXT signs from your Illustrator files, with no city or dates. Open one to retype, move, recolour, hide or lock any piece, then download live files with ⅛ in bleed." />
+  );
+}
+
+/** San Francisco breakout-room screen surrounds (GlobalLink NEXT stage look). */
+export function SfScreenSurrounds() {
+  return (
+    <SignTemplateList id="sf-screen-surrounds" title="Breakout screen surrounds" signs={SF_SCREEN_SURROUNDS} masterLabel="Supplied template"
+      intro="Cut to your templates at the size drawn, in the GlobalLink NEXT stage look. Two rooms use the three-sided surround and one uses the all-sides surround. Open one to move, recolour or hide any piece, then download live files with ⅛ in bleed." />
+  );
+}
+
+function SignTemplateList({ id, title, intro, signs, masterLabel = "Supplied .ai" }: { id: string; title: string; intro: string; signs: LegalSign[]; masterLabel?: string }) {
+  return (
+    <section aria-labelledby={id} className="mt-12">
+      <h2 id={id} className="text-xl font-semibold">{title}</h2>
       <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-        General Legal NEXT signs from your Illustrator files, with no city or dates. Open one to retype, move, recolour,
-        hide or lock any piece, then download live files with ⅛ in bleed. Downloads are named <span className="font-mono">rdraft-</span>.
+        {intro} Downloads are named <span className="font-mono">rdraft-</span>.
       </p>
       <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {LEGAL_NEXT_SIGNS.map((s) => {
+        {signs.map((s) => {
           const L = legalSignLayout(s.faces[0]!.id);
           const master = legalSignMasterUrl(s);
           return (
@@ -32,7 +46,7 @@ export function LegalNextSignage() {
                 </Button>
                 {master ? (
                   <Button asChild size="sm" variant="outline">
-                    <a href={master} download={s.master}><Download className="h-3.5 w-3.5" />Supplied .ai</a>
+                    <a href={master} download={s.master}><Download className="h-3.5 w-3.5" />{masterLabel}</a>
                   </Button>
                 ) : null}
               </div>
