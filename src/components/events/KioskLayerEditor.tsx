@@ -693,7 +693,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
         <button type="button" className={dibtn} title="Zoom in" aria-label="Zoom in" disabled={zoom >= 4000} onClick={() => setZoom((z) => Math.min(4000, Math.round(z * 1.25)))}><ZoomIn className="h-4 w-4" /></button>
         <button type="button" className={dibtn} title="Zoom out" aria-label="Zoom out" disabled={zoom <= minZoom} onClick={() => setZoom((z) => Math.max(minZoom, Math.round(z / 1.25)))}><ZoomOut className="h-4 w-4" /></button>
         <button type="button" className={dibtn} title="Rulers" aria-label="Rulers" aria-pressed={guides.rulers} onClick={() => setGuides((g) => ({ ...g, rulers: !g.rulers }))}><RulerIcon className="h-4 w-4" /></button>
-        <button type="button" className={dibtn} title="Show side strips" aria-label="Show side strips" aria-pressed={showSides} onClick={() => setShowSides((s) => !s)}><Columns3 className="h-4 w-4" /></button>
+        {L.sign ? null : <button type="button" className={dibtn} title="Show side strips" aria-label="Show side strips" aria-pressed={showSides} onClick={() => setShowSides((s) => !s)}><Columns3 className="h-4 w-4" /></button>}
         <div className="mt-auto" />
         <button type="button" className={dibtn} title={wide ? "Exit full screen (Esc)" : "Full screen"} aria-label={wide ? "Exit full screen" : "Full screen"} onClick={() => setWide((w) => !w)}>{wide ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}</button>
       </nav>
@@ -1240,7 +1240,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
           {tab === "checks" ? (
             <Sec title="Live print checks">
               {checks.length === 0 ? (
-                <p className="flex items-center gap-2 rounded-sm border border-white/10 bg-black/20 p-2.5 text-[12px] text-white/80"><CheckCircle2 className="h-4 w-4 text-[#A6FA87]" aria-hidden />{kioskHasTv(L.id) ? "Nothing over the TV area, past the trim" : "No TV on this kiosk. Nothing past the trim"} or outside the safe margin.</p>
+                <p className="flex items-center gap-2 rounded-sm border border-white/10 bg-black/20 p-2.5 text-[12px] text-white/80"><CheckCircle2 className="h-4 w-4 text-[#A6FA87]" aria-hidden />{kioskHasTv(L.id) ? "Nothing over the TV area, past the trim" : L.sign ? "Nothing past the trim" : "No TV on this kiosk. Nothing past the trim"} or outside the safe margin.</p>
               ) : (
                 <ul className="space-y-1.5">
                   {checks.map((c, i) => (
@@ -1289,13 +1289,13 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                   Font not on file: {m.font.replace(/-/g, " ")}. {m.lines} line{m.lines === 1 ? " is" : "s are"} set in Geist instead, in every file. Supply the font to match London exactly.
                 </p>
               ))}
-              <p className="text-[10.5px] text-white/50">Live files keep editable text and named layers. The PNG is a proof, not a print master. Files stay marked draft until the San Francisco revision is published.</p>
+              <p className="text-[10.5px] text-white/50">Live files keep editable text and named layers. The PNG is a proof, not a print master. {L.sign ? "Files are marked draft templates." : "Files stay marked draft until the San Francisco revision is published."}</p>
             </Sec>
           </>) : null}
         </div>
 
         <div className="flex shrink-0 gap-1.5 border-t border-white/10 p-3">
-          <button type="button" className={`${dbtn} flex-1 justify-center`} onClick={() => commit({})}><RotateCcw className="h-3.5 w-3.5" />Reset to London</button>
+          <button type="button" className={`${dbtn} flex-1 justify-center`} onClick={() => commit({})}><RotateCcw className="h-3.5 w-3.5" />{L.sign ? "Reset to supplied" : "Reset to London"}</button>
           <button type="button" className={`${dbtn} flex-1 justify-center border-[#003FC7] bg-[#003FC7] text-white hover:bg-[#003FC7]/85`} disabled={!userId || !canSave || busy === "save"} onClick={save} title={!userId ? "Sign in to save" : !canSave ? "Your role can't save kiosks for everyone" : undefined}><Save className="h-3.5 w-3.5" />Save</button>
         </div>
         {status ? <p role="status" className="border-t border-white/10 px-3 py-1.5 text-[11px] text-white/60 xl:hidden">{status}</p> : null}
