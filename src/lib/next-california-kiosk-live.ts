@@ -160,7 +160,7 @@ function pick(map: Record<string, Ptr>, file: string): string | null {
 }
 const NATIVE = import.meta.glob<Ptr>(["../assets/california-kiosks/native/*.asset.json", "../assets/legal-next-signage/native/*.asset.json", "../assets/sf-screen-surrounds/native/*.asset.json"], { eager: true, import: "default" });
 export const kioskArtSvgUrl = (id: string) =>
-  KIOSK_LIVE_LAYOUTS[id]?.native ? pick(NATIVE, `${id}-native.svg`) : pick(ART, `${id}-art.svg`);
+  liveLayoutById(id)?.native ? pick(NATIVE, `${id}-native.svg`) : pick(ART, `${id}-art.svg`);
 export const kioskArtPdfUrl = (id: string) => pick(ART, `${id}-art.pdf`);
 /** The designer file split into one page per object (CMYK, as supplied). */
 export const kioskNativePdfUrl = (id: string) => pick(NATIVE, `${id}-native.pdf`);
