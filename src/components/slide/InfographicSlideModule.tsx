@@ -15,7 +15,7 @@ import * as React from "react";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import { SlideFrame } from "./module-kit";
 import { TitleBlock } from "./primitives";
-import { AuroraLayer } from "./flagship";
+
 import type { DeckSlide } from "@/lib/deck-store";
 import type { InfographicKind, InfographicSpec, RenderContext } from "@/lib/infographics/spec";
 import { useOpenSpaceFill } from "@/components/slide/OpenSpaceFill";
@@ -78,7 +78,6 @@ export function InfographicSlideModule({ slide, variant, brand, pageNumber, mode
 
   return (
     <SlideFrame brand={brand} pageNumber={pageNumber} variant="content">
-      <AuroraLayer brand={brand} />
       <div className="relative z-10 flex h-full flex-col gap-6 px-16 py-14">
         <div className="flex items-start justify-between gap-6">
           <TitleBlock
