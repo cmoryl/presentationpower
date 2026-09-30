@@ -27,8 +27,8 @@ export const Route = createFileRoute("/events/next_/divisions/$divisionId")({
       ],
     };
   },
-  notFoundComponent: DivisionMissing,
-  errorComponent: DivisionMissing,
+  notFoundComponent: () => <DivisionMissing />,
+  errorComponent: () => <DivisionMissing />,
   component: DivisionSignagePage,
 });
 
