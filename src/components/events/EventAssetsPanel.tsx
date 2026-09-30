@@ -150,7 +150,7 @@ export function EventAssetsPanel({ eventId }: { eventId: string }) {
     v ? `Version ${v.version} published ${v.published_at ? new Date(v.published_at).toLocaleDateString() : ""}` : "Nothing published yet";
 
   return (
-    <div className="grid gap-10">
+    <div className="grid min-w-0 gap-10 [&>*]:min-w-0">
       {!d.canPublish ? (
         <p role="note" className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">You can import and save drafts. An admin or brand lead publishes them.</p>
       ) : null}

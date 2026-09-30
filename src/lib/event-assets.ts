@@ -54,8 +54,13 @@ export function cleanSessions(rows: unknown): AssetSession[] {
   const str = (v: unknown) => (typeof v === "string" ? v.trim() : typeof v === "number" ? String(v) : "");
   return rows.slice(0, 400).map((r) => {
     const o = (r ?? {}) as Record<string, unknown>;
+    let start = str(o.start), end = str(o.end);
+    // "1:50 PM - 2:15 PM" read into start alone: split it so parallel sessions group.
+    const m = !end && start.match(/^(.+?)\s*[-–—]\s*(.+)$/);
+    if (m) { start = m[1]!.trim(); end = m[2]!.trim(); }
+    if (/^\d{1,2}[:.]\d{2}$/.test(start) && /\b(AM|PM)\b/i.test(end)) start = `${start} ${end.match(/\b(AM|PM)\b/i)![1]!.toUpperCase()}`;
     return {
-      day: str(o.day), start: str(o.start), end: str(o.end), title: str(o.title),
+      day: str(o.day), start, end, title: str(o.title),
       speakers: str(o.speakers), room: str(o.room), division: str(o.division),
       kind: o.kind === "break" ? "break" : "session",
     } satisfies AssetSession;

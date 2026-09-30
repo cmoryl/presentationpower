@@ -33,3 +33,8 @@ describe("event assets", () => {
     expect(assetGates({ agenda: { version: 1, sessions: [s({ start: "1", title: "A" })] }, rooms: null, floors: 0 }).find((x) => x.id === "agendas")!.gate).toBe("pending");
   });
 });
+describe("time ranges", () => {
+  it("splits a range typed into start", () => {
+    expect(cleanSessions([{ start: "1:50 - 2:15 PM", title: "A" }])[0]).toMatchObject({ start: "1:50 PM", end: "2:15 PM" });
+  });
+});
