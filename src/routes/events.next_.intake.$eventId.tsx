@@ -8,6 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Check, ExternalLink, Search, X } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import { EventAssetsPanel } from "@/components/events/EventAssetsPanel";
 import {
   getEventIntake,
   researchVenue,
@@ -24,7 +25,7 @@ import {
 export const Route = createFileRoute("/events/next_/intake/$eventId")({
   head: () => ({
     meta: [
-      { title: "Venue intake — what the event still needs" },
+      { title: "Event assets — agenda, floor plans and rooms" },
       {
         name: "description",
         content:
@@ -126,7 +127,11 @@ function IntakePage() {
           </p>
         </div>
 
-        <h2 className="mt-8 text-lg font-bold text-[#03002C]">What we need</h2>
+        <div className="mt-8">
+          <EventAssetsPanel eventId={eventId} />
+        </div>
+
+        <h2 className="mt-12 text-lg font-bold text-[#03002C]">Intake checklist</h2>
         <ul className="mt-3 grid gap-3">
           {EVENT_INTAKE_ITEMS.map((item) => {
             const row = rows.find((r) => r.item_key === item.key);

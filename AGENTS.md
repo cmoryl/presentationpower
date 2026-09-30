@@ -19,3 +19,4 @@
 - SF kiosk side strips are native faces (`native.faces` + `kioskFaceLayout`), split one object per page from the native PDF and edited by the same editor/export path as the front; strip edits save under `<kiosk>--left|right` — why: one editor and one CMYK export path for every face.
 
 - Legal NEXT signage templates (`legalnext-*` layouts in `src/lib/legal-next-signage-layouts.json`, registry `src/lib/legal-next-signage.ts`) reuse the kiosk layer editor/export via `layout.sign`, kept out of `KIOSK_LIVE_LAYOUTS` (use `liveLayoutById`) — why: one editor/export path, kiosk list stays kiosks only.
+- Event agendas and room lists are added in-app (`event_agendas` / `event_rooms`, versioned; publish = admin or brand_lead, enforced by trigger); agenda boards prefer the newest published agenda over the built-in programme, and the SF production status is computed by `assetGates` — why: build users update events without code changes.

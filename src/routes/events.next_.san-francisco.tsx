@@ -19,6 +19,8 @@ import {
 
 import { useState } from "react";
 
+import { assetGates, type Gate as GateKind, type GateRow } from "@/lib/event-assets";
+import { useEventAssets } from "@/lib/event-assets-data";
 import { AppShell } from "@/components/AppShell";
 import { EditionDivisionTiles } from "@/components/events/EditionDivisionTiles";
 import { CitySectionBar, SAN_FRANCISCO_SECTIONS } from "@/components/events/CitySectionBar";
@@ -59,7 +61,7 @@ export const Route = createFileRoute("/events/next_/san-francisco")({
 
 const card = "rounded-md border border-[#03002C]/12 bg-white p-5";
 
-type Gate = "locked" | "ready" | "pending";
+type Gate = GateKind;
 
 const GATE_STYLE: Record<Gate, { label: string; cls: string; Icon: typeof Lock }> = {
   locked: { label: "Locked", cls: "border-[#03002C] bg-[#03002C] text-white", Icon: Lock },
@@ -87,42 +89,28 @@ function GateBadge({ gate }: { gate: Gate }) {
   );
 }
 
-const GATES: { id: string; gate: Gate; title: string; detail: string; anchor?: string }[] = [
-  {
-    id: "venue",
-    gate: "locked",
-    title: "Venue & dates",
-    detail: `${SF_VENUE.venue}, ${SF_VENUE.datesLabel}. Printed word for word as issued.`,
-  },
-  {
-    id: "kiosks",
-    gate: "ready",
-    title: "Partner kiosk templates",
-    detail:
-      "45 × 96 in front face with monitor keep-clear and both 4 × 96 in returns. .ai, print .pdf and .svg downloads.",
-    anchor: "#sf-kiosks",
-  },
-  {
-    id: "rooms",
-    gate: "pending",
-    title: "Room signage",
-    detail: "Built once the finalised hotel floor plan and room list are issued.",
-  },
-  {
-    id: "arrows",
-    gate: "pending",
-    title: "Directional arrows",
-    detail: "Needs the finalised hotel floor plan to place routes and arrow faces.",
-  },
-  {
-    id: "agendas",
-    gate: "pending",
-    title: "Division agendas",
-    detail: "Needs the issued programme and the room each track runs in.",
-  },
-];
+const VENUE_GATE: GateRow = {
+  id: "venue",
+  gate: "locked",
+  title: "Venue & dates",
+  detail: `${SF_VENUE.venue}, ${SF_VENUE.datesLabel}. Issued facts, printed word for word — change them only from the issued source.`,
+};
+const KIOSK_GATE: GateRow = {
+  id: "kiosks",
+  gate: "ready",
+  title: "Partner kiosk templates",
+  detail: "45 × 96 in front face with monitor keep-clear and both 4 × 96 in returns. .ai, print .pdf and .svg downloads.",
+  action: { label: "Open kiosks", to: "kiosks" },
+};
+
 
 function SanFranciscoPage() {
+  const assets = useEventAssets("san-francisco");
+  const GATES: GateRow[] = [VENUE_GATE, KIOSK_GATE, ...assetGates({
+    agenda: assets.data?.publishedAgenda ?? null,
+    rooms: assets.data?.publishedRooms ?? null,
+    floors: assets.data?.floors ?? 0,
+  })];
   const [locationLine, venueLine] = sfLocationStack();
   const [divisionFocus, setDivisionFocus] = useState<string | null>(null);
   const alsoReady = SF_READY.filter((r) => r.id !== "kiosks");
@@ -177,9 +165,15 @@ function SanFranciscoPage() {
 
         {/* Production stage gates. */}
         <section className="mt-10" aria-labelledby="sf-gates">
-          <h2 id="sf-gates" className="text-lg font-semibold text-[#03002C]">
-            Production status
-          </h2>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="sf-gates" className="text-lg font-semibold text-[#03002C]">
+              Production status
+            </h2>
+            <Link to="/events/next/intake/$eventId" params={{ eventId: "san-francisco" }} className="text-[13px] font-semibold text-primary hover:underline">
+              Add agenda, floor plans or rooms
+            </Link>
+          </div>
+          {assets.data && !assets.data.signedIn ? <p className="mt-1 text-sm text-[#03002C]/65">Sign in to see what's been published.</p> : null}
           <ul className="mt-4 divide-y divide-[#03002C]/10 border-y border-[#03002C]/10">
             {GATES.map((g) => (
               <li
@@ -191,13 +185,12 @@ function SanFranciscoPage() {
                   <p className="text-[15px] font-semibold text-[#03002C]">{g.title}</p>
                   <p className="mt-0.5 text-sm leading-[1.5] text-[#03002C]/70">{g.detail}</p>
                 </div>
-                {g.anchor ? (
-                  <a
-                    href={g.anchor}
-                    className="text-[13px] font-semibold text-primary hover:underline"
-                  >
-                    Open kiosks
-                  </a>
+                {g.action?.to === "kiosks" ? (
+                  <a href="#sf-kiosks" className="text-[13px] font-semibold text-primary hover:underline">{g.action.label}</a>
+                ) : g.action?.to === "maps" ? (
+                  <Link to="/events/next/maps/$eventId" params={{ eventId: "san-francisco" }} className="text-[13px] font-semibold text-primary hover:underline">{g.action.label}</Link>
+                ) : g.action ? (
+                  <Link to="/events/next/intake/$eventId" params={{ eventId: "san-francisco" }} hash={g.action.section} className="text-[13px] font-semibold text-primary hover:underline">{g.action.label}</Link>
                 ) : null}
               </li>
             ))}
