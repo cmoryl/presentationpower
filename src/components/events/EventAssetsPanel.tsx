@@ -66,7 +66,7 @@ function ImportBar({ kind, onRows }: { kind: "agenda" | "rooms"; onRows: (rows: 
     <div className="flex flex-wrap items-end gap-2">
       <label className="min-w-[260px] flex-1 text-xs font-semibold text-foreground">
         Web link
-        <Input className="mt-1" type="url" placeholder="https://…/agenda" value={url} onChange={(e) => setUrl(e.target.value)} />
+        <Input className="mt-1" type="url" placeholder={kind === "agenda" ? "https://…/agenda" : "https://…/rooms"} value={url} onChange={(e) => setUrl(e.target.value)} />
       </label>
       <Button type="button" variant="outline" disabled={busy || !/^https?:\/\//.test(url)} onClick={() => go({ url })}>
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}Read link
