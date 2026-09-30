@@ -119,11 +119,11 @@ function IntakePage() {
               : `Maps stay in draft until these arrive: ${summary.blocking.join(", ")}.`}
           </p>
           <p className="mt-1 text-sm text-[#03002C]/65">
-            Once the floor plans arrive, load them into the{" "}
+            Floor plans live in the{" "}
             <Link to="/events/next/maps/$eventId" params={{ eventId }} className="font-semibold underline">
               venue maps
             </Link>
-            .
+            {" "}— open them to check, colour or add a level.
           </p>
         </div>
 

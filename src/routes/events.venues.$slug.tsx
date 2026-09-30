@@ -111,7 +111,7 @@ function VenuePage() {
           <>
             <h1 className="mt-5 text-3xl font-bold leading-tight">{v.name}</h1>
             <p className="mt-1 text-[13px] text-[#666666]">
-              {q.data!.events.length ? `Used by: ${q.data!.events.join(", ")}` : "Not linked to an event yet"}
+              {q.data!.events.length ? `Used by: ${q.data!.events.map(eventDisplayName).join(", ")}` : "Not linked to an event yet"}
             </p>
 
             <section className={`${card} mt-6`}>
@@ -181,15 +181,15 @@ function FloorRow({ fl, busy, onSave, onDelete }: {
   const dirty = m.marker !== fl.marker || m.title !== fl.title || m.position !== fl.position || m.hide !== fl.off_plan_labels.join(", ");
   return (
     <li className="grid gap-3 py-3 sm:grid-cols-[70px_80px_1fr_1.4fr_auto] sm:items-end">
-      <label className="text-[12px] font-semibold">Order<input type="number" min={0} max={99} className={field} value={m.position} onChange={(e) => setM({ ...m, position: Number(e.target.value) || 0 })} /></label>
-      <label className="text-[12px] font-semibold">Tab<input className={field} maxLength={6} value={m.marker} onChange={(e) => setM({ ...m, marker: e.target.value })} /></label>
+      <label className="text-[12px] font-semibold">Position<input type="number" min={1} max={100} className={field} value={m.position + 1} onChange={(e) => setM({ ...m, position: Math.max(0, (Number(e.target.value) || 1) - 1) })} /></label>
+      <label className="text-[12px] font-semibold">Tab label<input className={field} maxLength={6} value={m.marker} onChange={(e) => setM({ ...m, marker: e.target.value })} /></label>
       <label className="text-[12px] font-semibold">Name<input className={field} value={m.title} onChange={(e) => setM({ ...m, title: e.target.value })} />
-        <span className="mt-1 block font-normal text-[#666666]">{fl.roomCount} labels · {fl.source_kind === "scan" ? "picture scan (lower quality)" : "drawn vector"}{fl.source_name ? ` · ${fl.source_name}` : ""}</span>
+        <span className="mt-1 block font-normal text-[#666666]">{fl.roomCount} room names · {fl.source_kind === "scan" ? "picture scan (lower quality)" : "drawn vector"}{fl.source_name ? ` · ${fl.source_name}` : ""}</span>
       </label>
-      <label className="text-[12px] font-semibold">Hide on plan (comma-separated)<input className={field} value={m.hide} onChange={(e) => setM({ ...m, hide: e.target.value })} placeholder="catering lift, void" /></label>
+      <label className="text-[12px] font-semibold">Names to hide on the plan (comma-separated)<input className={field} value={m.hide} onChange={(e) => setM({ ...m, hide: e.target.value })} placeholder="Leave empty to show every name" /></label>
       <div className="flex gap-2">
-        <button className={btn} disabled={busy || !dirty || !m.title.trim()} onClick={() => onSave({ marker: m.marker, title: m.title, position: m.position, offPlanLabels: m.hide.split(",").map((s) => s.trim()).filter(Boolean) })}><Save className="h-4 w-4" /> Save</button>
-        <button className={btn} disabled={busy} onClick={onDelete} aria-label={`Remove ${fl.title}`}><Trash2 className="h-4 w-4" /></button>
+        <button className={btn} disabled={busy || !dirty || !m.title.trim()} onClick={() => onSave({ marker: m.marker, title: m.title, position: m.position, offPlanLabels: m.hide.split(",").map((s) => s.trim()).filter(Boolean) })}><Save className="h-4 w-4" /> {dirty ? "Save changes" : "Saved"}</button>
+        <button className={btn} disabled={busy} onClick={onDelete} aria-label={`Remove ${fl.title}`} title={`Remove ${fl.title}`}><Trash2 className="h-4 w-4" /> Remove</button>
       </div>
     </li>
   );
