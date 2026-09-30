@@ -33,7 +33,9 @@ export const extractEventAssets = createServerFn({ method: "POST" })
         .replace(/<(br|\/p|\/div|\/li|\/h\d|\/tr)>/gi, "\n").replace(/<[^>]+>/g, " ")
         .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&#8217;|&rsquo;/g, "'").replace(/&#8211;|&ndash;/g, "–").replace(/&quot;/g, '"')
         .replace(/[ \t]+/g, " ").replace(/\n\s*\n+/g, "\n").trim().slice(0, 200_000);
-      if (sourceText.length < 40) throw new Error("That page has no readable text (it may load its content later). Save it as a PDF and upload that instead.");
+      const times = (sourceText.match(/\b\d{1,2}[:.]\d{2}\b/g) ?? []).length;
+      if (sourceText.length < 40 || (data.kind === "agenda" && times < 3))
+        throw new Error("That page loads its sessions after it opens, so they can't be read from the link. Open the page, use Print → Save as PDF, and upload the PDF instead.");
     }
 
     const want = data.kind === "agenda"
