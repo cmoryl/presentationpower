@@ -79,7 +79,7 @@ export type LiveLayout = {
 };
 
 /** Signage templates share the kiosk editor; their ids carry this prefix. */
-export const isSignId = (id: string) => id.startsWith("legalnext-");
+export const isSignId = (id: string) => id.startsWith("legalnext-") || id.startsWith("sfsurround-");
 
 export type KioskFace = "left" | "right";
 /** One side strip read from the designer's CMYK file, split one object per page. */
@@ -158,9 +158,9 @@ function pick(map: Record<string, Ptr>, file: string): string | null {
   const hit = Object.entries(map).find(([k]) => k.endsWith(`/${file}.asset.json`));
   return hit ? hit[1].url : null;
 }
-const NATIVE = import.meta.glob<Ptr>(["../assets/california-kiosks/native/*.asset.json", "../assets/legal-next-signage/native/*.asset.json"], { eager: true, import: "default" });
+const NATIVE = import.meta.glob<Ptr>(["../assets/california-kiosks/native/*.asset.json", "../assets/legal-next-signage/native/*.asset.json", "../assets/sf-screen-surrounds/native/*.asset.json"], { eager: true, import: "default" });
 export const kioskArtSvgUrl = (id: string) =>
-  KIOSK_LIVE_LAYOUTS[id]?.native ? pick(NATIVE, `${id}-native.svg`) : pick(ART, `${id}-art.svg`);
+  liveLayoutById(id)?.native ? pick(NATIVE, `${id}-native.svg`) : pick(ART, `${id}-art.svg`);
 export const kioskArtPdfUrl = (id: string) => pick(ART, `${id}-art.pdf`);
 /** The designer file split into one page per object (CMYK, as supplied). */
 export const kioskNativePdfUrl = (id: string) => pick(NATIVE, `${id}-native.pdf`);

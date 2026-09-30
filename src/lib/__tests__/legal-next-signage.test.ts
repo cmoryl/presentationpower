@@ -20,3 +20,16 @@ describe("Legal NEXT signage templates", () => {
     expect(CALIFORNIA_KIOSKS.some((k) => k.id.startsWith("legalnext-"))).toBe(false);
   });
 });
+
+describe("SF screen surrounds", () => {
+  it("match the supplied template trim sizes", async () => {
+    const { SF_SCREEN_SURROUNDS } = await import("@/lib/legal-next-signage");
+    const want: Record<string, [number, number]> = { "sf-surround-three": [18.9, 11.5], "sf-surround-all": [18.9, 12.7] };
+    for (const s of SF_SCREEN_SURROUNDS) {
+      const L = legalSignLayout(s.faces[0]!.id)!;
+      expect(kioskFaceW(L) / 72).toBeCloseTo(want[s.id]![0], 1);
+      expect(kioskFaceH(L) / 72).toBeCloseTo(want[s.id]![1], 1);
+      expect(kioskLiveFileBase(s.faces[0]!.id).startsWith("rdraft-sfsurround-")).toBe(true);
+    }
+  });
+});

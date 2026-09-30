@@ -43,3 +43,9 @@
 - [ ] 22 older backend security warnings — blocked on: user go-ahead
 - [ ] London event page still shows SF "no programme issued" banner — depends on: published SF agenda
 - [ ] Untested: Levels 4–6 rendering, room colouring/saving, map downloads, publish flow
+
+# Roadmap — SF screen surrounds
+- [x] Three-sided + all-sides surrounds, editable, stage look
+- [ ] Assign 3 breakout rooms — blocked on: room confirmation
+- [ ] Confirm templates are real size (screen opening 12.5 × 6.7 in) — blocked on: user
+- [ ] Stage lockup (TRANSPERFECT / GlobalLink / outlined NEXT) — blocked on: supplied lockup file

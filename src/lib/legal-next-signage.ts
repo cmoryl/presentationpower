@@ -5,7 +5,7 @@
 import { SIGN_LIVE_LAYOUTS, isSignId, type LiveLayout } from "@/lib/next-california-kiosk-live";
 
 type Ptr = { url: string };
-const MASTERS = import.meta.glob<Ptr>("../assets/legal-next-signage/masters/*.asset.json", { eager: true, import: "default" });
+const MASTERS = import.meta.glob<Ptr>(["../assets/legal-next-signage/masters/*.asset.json", "../assets/sf-screen-surrounds/masters/*.asset.json"], { eager: true, import: "default" });
 const masterUrl = (file: string) => Object.entries(MASTERS).find(([k]) => k.endsWith(`/${file}.asset.json`))?.[1].url ?? null;
 
 export type LegalSignFace = { id: string; label: string };
@@ -35,6 +35,24 @@ export const LEGAL_NEXT_SIGNS: LegalSign[] = [
   { id: "header", title: "Ballroom door header", size: "25.6 × 0.7 in", master: "5051_F2_MF_MetroBallDoorHeader.ai", faces: [{ id: "legalnext-header", label: "Header" }] },
 ];
 
-export const legalSign = (id: string) => LEGAL_NEXT_SIGNS.find((s) => s.id === id) ?? null;
+/**
+ * San Francisco breakout-room screen surrounds, cut to the supplied templates at
+ * the size drawn. Artwork follows the GlobalLink NEXT stage set (chevrons and
+ * gradient ground); rooms are not assigned until they are confirmed.
+ */
+export const SF_SCREEN_SURROUNDS: LegalSign[] = [
+  {
+    id: "sf-surround-three", title: "Screen surround, three sides", size: "18.9 × 11.5 in", master: "Screen_Surrounds_THREE_SIDES_template.pdf",
+    faces: [{ id: "sfsurround-three", label: "Surround" }],
+    note: "For 2 breakout rooms. Open at the top; the screen opening is 12.5 × 6.7 in. Rooms not confirmed yet.",
+  },
+  {
+    id: "sf-surround-all", title: "Screen surround, all sides", size: "18.9 × 12.7 in", master: "Screen_Surrounds_ALL_SIDES_template.pdf",
+    faces: [{ id: "sfsurround-all", label: "Surround" }],
+    note: "For 1 breakout room. Full frame; the screen opening is 12.5 × 6.7 in. Room not confirmed yet.",
+  },
+];
+
+export const legalSign = (id: string) => [...LEGAL_NEXT_SIGNS, ...SF_SCREEN_SURROUNDS].find((s) => s.id === id) ?? null;
 export const legalSignMasterUrl = (s: LegalSign) => masterUrl(s.master);
 export const legalSignLayout = (faceId: string): LiveLayout | null => (isSignId(faceId) ? SIGN_LIVE_LAYOUTS[faceId] ?? null : null);
