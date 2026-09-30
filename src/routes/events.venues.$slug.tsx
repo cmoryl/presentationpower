@@ -19,6 +19,7 @@ import {
   updateVenueFloorMeta,
 } from "@/lib/venues.functions";
 import { importSvgFloor } from "@/lib/venue-map-import";
+import { VenueSignSpots } from "@/components/events/VenueSignSpots";
 
 export const Route = createFileRoute("/events/venues/$slug")({
   head: ({ params }) => ({
@@ -166,6 +167,8 @@ function VenuePage() {
               </div>
               {notes.length > 0 && <ul className="mt-3 list-disc pl-5 text-[13px] text-[#666666]">{notes.map((n) => <li key={n}>{n}</li>)}</ul>}
             </section>
+
+            <VenueSignSpots venueId={v.id} floors={floors} />
           </>
         )}
       </div>

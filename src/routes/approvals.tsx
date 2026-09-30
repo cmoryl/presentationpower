@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { ModuleReviewQueue } from "@/components/approvals/ModuleReviewQueue";
+import { SignTemplateQueue } from "@/components/approvals/SignTemplateQueue";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -39,14 +40,14 @@ export const Route = createFileRoute("/approvals")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>): { tab?: "brand" | "modules" } =>
-    s.tab === "modules" ? { tab: "modules" } : {},
+  validateSearch: (s: Record<string, unknown>): { tab?: "brand" | "modules" | "signs" } =>
+    s.tab === "modules" ? { tab: "modules" } : s.tab === "signs" ? { tab: "signs" } : {},
   component: ApprovalsPage,
 });
 
 function ApprovalsPage() {
   const { tab } = Route.useSearch();
-  const active = tab === "modules" ? "modules" : "brand";
+  const active = tab === "modules" ? "modules" : tab === "signs" ? "signs" : "brand";
   const tabCls = (on: boolean) =>
     `-mb-px border-b-2 px-4 py-2.5 text-sm ${on ? "border-primary font-medium text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`;
   return (
@@ -58,8 +59,21 @@ function ApprovalsPage() {
         <Link to="/approvals" search={{ tab: "modules" }} className={tabCls(active === "modules")} aria-current={active === "modules" ? "page" : undefined}>
           Modules
         </Link>
+        <Link to="/approvals" search={{ tab: "signs" }} className={tabCls(active === "signs")} aria-current={active === "signs" ? "page" : undefined}>
+          Sign templates
+        </Link>
       </nav>
-      {active === "modules" ? (
+      {active === "signs" ? (
+        <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-10 sm:px-6">
+          <header>
+            <h1 className="text-3xl font-semibold">Sign template review</h1>
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+              Templates saved from the sign and kiosk editors can be used in event sign sets once an admin or brand lead approves them. Approved templates can't be changed; save a new one instead.
+            </p>
+          </header>
+          <SignTemplateQueue />
+        </div>
+      ) : active === "modules" ? (
         <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-10 sm:px-6">
           <header>
             <h1 className="text-3xl font-semibold">Module review</h1>

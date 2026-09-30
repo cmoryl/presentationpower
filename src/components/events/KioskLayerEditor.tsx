@@ -111,14 +111,14 @@ const FACE_LABEL: Record<"front" | KioskFace, string> = { front: "Kiosk front", 
  * The kiosk editor: the front and, on kiosks read from the designer's CMYK
  * file, both side strips — each strip is edited with exactly the same tools.
  */
-export function KioskLayerEditor({ layout, vendor, fill = false, embedded = false }: { layout: LiveLayout; vendor: string; fill?: boolean; embedded?: boolean }) {
+export function KioskLayerEditor({ layout, vendor, fill = false, embedded = false, editKey }: { layout: LiveLayout; vendor: string; fill?: boolean; embedded?: boolean; /** Save changes under this key instead of the layout's own (signs built in a sign set). */ editKey?: string }) {
   const [face, setFace] = useState<"front" | KioskFace>("front");
   const hasFaces = !!layout.native?.faces;
   const FL = face === "front" ? layout : kioskFaceLayout(layout, face) ?? layout;
-  return <KioskFaceEditor key={face} layout={FL} front={layout} face={face} onFace={hasFaces ? setFace : undefined} vendor={vendor} fill={fill} embedded={embedded} />;
+  return <KioskFaceEditor key={face} layout={FL} front={layout} face={face} onFace={hasFaces ? setFace : undefined} vendor={vendor} fill={fill} embedded={embedded} editKey={face === "front" ? editKey : undefined} />;
 }
 
-function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false, embedded = false }: { layout: LiveLayout; front: LiveLayout; face: "front" | KioskFace; onFace?: (f: "front" | KioskFace) => void; vendor: string; fill?: boolean; embedded?: boolean }) {
+function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false, embedded = false, editKey }: { layout: LiveLayout; front: LiveLayout; face: "front" | KioskFace; onFace?: (f: "front" | KioskFace) => void; vendor: string; fill?: boolean; embedded?: boolean; editKey?: string }) {
   // Face geometry: the front is 45 in wide, a side strip 4 in.
   const KIOSK_W = kioskFaceW(L);
   const KIOSK_H = kioskFaceH(L);
@@ -127,7 +127,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
   const signFit = L.sign ? Math.max(120, Math.min(640, Math.round((1100 * KIOSK_H) / KIOSK_W))) : 640;
   const minZoom = L.sign ? Math.min(300, Math.round(signFit / 2)) : 300;
   const kioskHasTv = (id: string) => !L.face && kioskHasTvFront(id);
-  const EK = kioskEditKey(L);
+  const EK = editKey ?? kioskEditKey(L);
   /** Saved changes of the other faces, for the side previews and full downloads. */
   const [others, setOthers] = useState<Partial<Record<"front" | KioskFace, KioskEdits>>>({});
   useEffect(() => {
