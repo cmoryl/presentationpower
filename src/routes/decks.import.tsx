@@ -24,7 +24,7 @@ export const Route = createFileRoute("/decks/import")({
   loader: ({ context }) => context.queryClient.ensureQueryData(taxonomyQueryOptions),
   component: ImportView,
   errorComponent: ({ error }) => (
-    <div className="p-10 text-sm text-red-600">Import failed to load: {error.message}</div>
+    <div className="p-10 text-sm text-red-600">Import failed to load: {(error as Error).message}</div>
   ),
   notFoundComponent: () => <div className="p-10">Not found.</div>,
 });

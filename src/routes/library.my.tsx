@@ -36,7 +36,7 @@ export const Route = createFileRoute("/library/my")({
   }),
   component: MyModules,
   errorComponent: ({ error }) => (
-    <div className="p-10 text-sm text-red-600">My Modules failed to load: {error.message}</div>
+    <div className="p-10 text-sm text-red-600">My Modules failed to load: {(error as Error).message}</div>
   ),
   notFoundComponent: () => <div className="p-10">Not found.</div>,
 });
