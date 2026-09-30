@@ -13,9 +13,9 @@ import "./echarts-adapter";
 
 import * as React from "react";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
-import { SlideFrame } from "./SlideChrome";
+import { SlideFrame } from "./module-kit";
 import { TitleBlock } from "./primitives";
-import { AuroraLayer, GlassTile } from "./flagship";
+
 import type { DeckSlide } from "@/lib/deck-store";
 import type { InfographicKind, InfographicSpec, RenderContext } from "@/lib/infographics/spec";
 import { useOpenSpaceFill } from "@/components/slide/OpenSpaceFill";
@@ -77,8 +77,7 @@ export function InfographicSlideModule({ slide, variant, brand, pageNumber, mode
   };
 
   return (
-    <SlideFrame brand={brand} pageNumber={pageNumber} variant="content">
-      <AuroraLayer brand={brand} />
+    <SlideFrame brand={brand} pageNumber={pageNumber}>
       <div className="relative z-10 flex h-full flex-col gap-6 px-16 py-14">
         <div className="flex items-start justify-between gap-6">
           <TitleBlock
@@ -88,11 +87,7 @@ export function InfographicSlideModule({ slide, variant, brand, pageNumber, mode
           />
           <ChartDataDrawer spec={spec} />
         </div>
-        {/* Charts sit on the house module card, like every other family, so a
-            chart never floats bare on the page ground. */}
-        <GlassTile className="flex-1 min-h-0 flex flex-col" padding="px-8 py-7">
-          <div className="relative z-10 flex-1 min-h-0">{renderInfographic(spec, ctx)}</div>
-        </GlassTile>
+        <div className="flex-1 min-h-0">{renderInfographic(spec, ctx)}</div>
         {spec.data.source ? (
           <p className="text-[11px] opacity-70">Source: {spec.data.source}</p>
         ) : null}
