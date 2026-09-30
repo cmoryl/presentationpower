@@ -12,6 +12,7 @@ import { ArrowLeft, ArrowRight, Monitor, Ruler } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { CaliforniaKioskBrowser } from "@/components/events/CaliforniaKioskBrowser";
+import { SfScreenSurrounds } from "@/components/events/LegalNextSignage";
 import {
   CALIFORNIA_KIOSK_SCREEN_MM,
   CALIFORNIA_KIOSK_TEMPLATE,
@@ -111,6 +112,7 @@ function CaliforniaKiosksPage() {
 
         <div className="mt-6">
           <CaliforniaKioskBrowser />
+          <SfScreenSurrounds />
         </div>
       </div>
     </AppShell>
