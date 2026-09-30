@@ -7,6 +7,7 @@ import type { InfographicSpec, RenderContext } from "@/lib/infographics/spec";
 import { buildEchartsBase } from "@/lib/infographics/echarts-theme";
 import { buildEchartsOption } from "@/lib/infographics/echarts-options";
 import { echarts, registerEchartsModules } from "@/lib/infographics/echarts-register";
+import { SlideThumbnailContext } from "@/lib/slide-media-refresh";
 
 registerEchartsModules();
 
@@ -41,6 +42,7 @@ function deepMerge<T extends Record<string, unknown>>(a: T, b: Record<string, un
 export default function EChartsInfographic({ spec, ctx, className, style }: Props) {
   const hostRef = React.useRef<HTMLDivElement | null>(null);
   const instRef = React.useRef<echarts.ECharts | null>(null);
+  const thumbnail = React.useContext(SlideThumbnailContext);
 
   // A card can mount while its box is still 0×0 (lazily revealed grid cell,
   // closed accordion, off-screen tab). ECharts sizes itself once at init, so
@@ -66,9 +68,10 @@ export default function EChartsInfographic({ spec, ctx, className, style }: Prop
   React.useEffect(() => {
     if (!ready) return;
     if (!hostRef.current) return;
-    // Use SVG renderer whenever we're capturing (exporting) — vector output
-    // survives PPTX/PDF. Canvas is fine for interactive presentation.
-    const renderer = ctx.exporting ? "svg" : "canvas";
+    // SVG when exporting (vector survives PPTX/PDF) and in thumbnails: a grid of
+    // dozens of full-stage canvases blows Safari's total canvas-memory cap, and
+    // Safari then paints every chart blank. SVG has no such budget.
+    const renderer = ctx.exporting || thumbnail ? "svg" : "canvas";
     const host = hostRef.current;
     // Slides render at 1920×1080 inside a CSS `transform: scale()` wrapper
     // (thumbnails, print, present). getBoundingClientRect — which ECharts uses
@@ -95,7 +98,7 @@ export default function EChartsInfographic({ spec, ctx, className, style }: Prop
       instRef.current = null;
     };
     // Full re-init on spec change — cheap for our sizes and avoids stale option shape.
-  }, [ready, spec, ctx.exporting, ctx.width, ctx.height, ctx.fill]);
+  }, [ready, spec, thumbnail, ctx.exporting, ctx.width, ctx.height, ctx.fill]);
 
   return (
     <div
