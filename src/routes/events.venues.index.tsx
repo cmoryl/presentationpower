@@ -1,5 +1,6 @@
 // /events/venues — the venue library. Each venue is saved once with its floors;
 // every event held there reads them.
+import { BUILT_IN_FLOOR_VENUES, eventDisplayName } from "@/lib/event-names";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";

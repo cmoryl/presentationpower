@@ -1,5 +1,6 @@
 // /events/venues/$slug — one venue: its facts and floors. Floors load from the
 // venue's own SVG sheets; tab, title, order and hidden venue clutter are edited here.
+import { eventDisplayName } from "@/lib/event-names";
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
