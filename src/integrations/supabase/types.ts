@@ -2056,6 +2056,57 @@ export type Database = {
         }
         Relationships: []
       }
+      event_agendas: {
+        Row: {
+          created_at: string
+          created_by: string
+          days: Json
+          event_id: string
+          id: string
+          note: string | null
+          published_at: string | null
+          published_by: string | null
+          sessions: Json
+          source_file: string | null
+          source_url: string | null
+          status: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          days?: Json
+          event_id: string
+          id?: string
+          note?: string | null
+          published_at?: string | null
+          published_by?: string | null
+          sessions?: Json
+          source_file?: string | null
+          source_url?: string | null
+          status?: string
+          updated_at?: string
+          version: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          days?: Json
+          event_id?: string
+          id?: string
+          note?: string | null
+          published_at?: string | null
+          published_by?: string | null
+          sessions?: Json
+          source_file?: string | null
+          source_url?: string | null
+          status?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
       event_booklets: {
         Row: {
           agenda: Json | null
@@ -2333,6 +2384,54 @@ export type Database = {
           scope?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      event_rooms: {
+        Row: {
+          created_at: string
+          created_by: string
+          event_id: string
+          id: string
+          note: string | null
+          published_at: string | null
+          published_by: string | null
+          rooms: Json
+          source_file: string | null
+          source_url: string | null
+          status: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          event_id: string
+          id?: string
+          note?: string | null
+          published_at?: string | null
+          published_by?: string | null
+          rooms?: Json
+          source_file?: string | null
+          source_url?: string | null
+          status?: string
+          updated_at?: string
+          version: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          event_id?: string
+          id?: string
+          note?: string | null
+          published_at?: string | null
+          published_by?: string | null
+          rooms?: Json
+          source_file?: string | null
+          source_url?: string | null
+          status?: string
+          updated_at?: string
+          version?: number
         }
         Relationships: []
       }
@@ -4882,6 +4981,7 @@ export type Database = {
     }
     Functions: {
       can_edit_venue: { Args: { _user_id: string }; Returns: boolean }
+      can_publish_event_assets: { Args: { _user_id: string }; Returns: boolean }
       display_names: {
         Args: { _ids: string[] }
         Returns: {
