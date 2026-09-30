@@ -22,7 +22,7 @@ import {
 } from "@/lib/sign-set-data";
 import {
   SIGN_KIND_LABEL, SIGN_STATUS_LABEL, chosenTemplate, copyChoices, eventSignEditKey, fillSignFromEvent, signFileBase, templatesForSpot,
-  type EventFacts, type SignKind,
+  type EventFacts, type SignKind, type SignTemplate,
 } from "@/lib/sign-set";
 import { signPrintChecks, signSetZip } from "@/lib/sign-set-export";
 
@@ -188,7 +188,7 @@ function SignSetPage() {
                 {c.done ? <CheckCircle2 className="h-4 w-4 text-[#003FC7]" aria-hidden /> : <CircleDashed className="h-4 w-4 text-[#666666]" aria-hidden />}
                 <span className={c.done ? "" : "font-semibold"}>{c.label}</span>
                 <span className="sr-only">{c.done ? "done" : "to do"}</span>
-                {!c.done && c.link ? <Link {...(c.link as never)} className="ml-auto text-[13px] font-semibold text-[#003FC7] hover:underline">Fix it</Link> : null}
+                {!c.done && c.link ? <Link to={c.link.to as never} params={("params" in c.link ? c.link.params : undefined) as never} className="ml-auto text-[13px] font-semibold text-[#003FC7] hover:underline">Fix it</Link> : null}
               </li>
             ))}
           </ul>
@@ -273,7 +273,7 @@ function SignThumb({ signId, layoutId }: { signId: string; layoutId: string }) {
   return url ? <img src={url} alt="" className="h-32 w-full rounded bg-[#F2F2F2] object-contain" /> : <div className="h-32 w-full rounded bg-[#F2F2F2]" aria-hidden />;
 }
 
-function SignCard({ spot, sign, template, qa, choice }: { spot: SignSpotRow; sign?: EventSignRow; template?: SignTemplateRow; qa?: { errors: number; notes: string[] }; choice: SignTemplateRow | null }) {
+function SignCard({ spot, sign, template, qa, choice }: { spot: SignSpotRow; sign?: EventSignRow; template?: SignTemplateRow; qa?: { errors: number; notes: string[] }; choice: SignTemplate | null }) {
   const status = !sign ? "no_template" : qa?.errors ? "qa_failed" : sign.status;
   const missing = sign && template ? fillReasons(template, sign) : [];
   const size = spot.w_in != null && spot.h_in != null ? `${spot.w_in} × ${spot.h_in} in` : "Not measured";

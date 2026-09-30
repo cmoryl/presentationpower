@@ -10,9 +10,10 @@ export type SignTemplateRow = SignTemplate & { source_label: string | null; revi
 export type SignSpotRow = SignSpot & { venue_id: string; photo_path: string | null; note: string | null; position: number };
 export type EventSignRow = { id: string; event_id: string; spot_id: string; template_id: string; fields: Record<string, string>; status: SignStatus; updated_at: string };
 
-const must = <T,>(r: { data: T | null; error: { message: string } | null }): T => {
+const must = <T,>(r: { data: T; error: { message: string } | null }): NonNullable<T> => {
   if (r.error) throw new Error(r.error.message);
-  return r.data as T;
+  if (r.data == null) throw new Error("Nothing came back from the database.");
+  return r.data as NonNullable<T>;
 };
 
 export async function listSignTemplates(): Promise<SignTemplateRow[]> {
@@ -112,7 +113,9 @@ export async function loadSignEdits(key: string): Promise<KioskEdits> {
 }
 
 export async function loadEventSign(id: string) {
-  const s = must(await supabase.from("event_signs").select("id,event_id,spot_id,template_id,status").eq("id", id).maybeSingle());
+  const r = await supabase.from("event_signs").select("id,event_id,spot_id,template_id,status").eq("id", id).maybeSingle();
+  if (r.error) throw new Error(r.error.message);
+  const s = r.data;
   if (!s) return null;
   const [t, sp] = await Promise.all([
     supabase.from("sign_templates").select("id,name,layout_id").eq("id", s.template_id).maybeSingle(),
