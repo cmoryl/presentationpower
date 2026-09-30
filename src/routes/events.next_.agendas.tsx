@@ -10,7 +10,9 @@ import { InnovationLoungeInfo } from "@/components/next/InnovationLoungeInfo";
 import { AgendaStudio } from "@/components/next/AgendaStudio";
 
 import { useSavedAgendaFiles } from "@/hooks/use-next-live-masters";
-import { agendaDivision, agendaFileIsLive, normalizeAgendaConfig } from "@/lib/next-agenda";
+import { agendaDefault, agendaDivision, agendaFileIsLive, normalizeAgendaConfig } from "@/lib/next-agenda";
+import { agendaDaysFromSessions } from "@/lib/event-assets";
+import { useEventAssets } from "@/lib/event-assets-data";
 
 const search = z.object({
   division: z.string().optional(),
@@ -66,6 +68,17 @@ function AgendaPage() {
   }, [file, saved.data]);
 
 
+  // A programme published on the Event assets page replaces the built-in one.
+  const assets = useEventAssets(edition ?? "london");
+  const published = assets.data?.publishedAgenda ?? null;
+  const publishedConfig = useMemo(() => {
+    if (!published || openFile) return undefined;
+    const days = agendaDaysFromSessions(published.sessions, resolved.id);
+    if (!days.length) return undefined;
+    const base = agendaDefault(resolved.id, edition);
+    return { ...base, meta: days[0]!.meta, sessions: days[0]!.sessions, days };
+  }, [published, openFile, resolved.id, edition]);
+
   return (
     <AppShell>
       <div className="mx-auto max-w-[1400px] px-6 py-10">
@@ -78,14 +91,16 @@ function AgendaPage() {
         {edition === "san-francisco" ? (
           <div className="mt-4 rounded-2xl border border-dashed border-[#03002C]/25 bg-white/70 p-4">
             <div className="text-sm font-semibold text-[#03002C]">
-              San Francisco default board · October 27–28, 2026
+              San Francisco board · October 27–28, 2026
             </div>
             <p className="mt-1 text-sm leading-relaxed text-[#03002C]/70">
-              No San Francisco programme has been issued, so every session slot reads TO BE
-              CONFIRMED. Registration, break, lunch, reception and close times are carried from the
-              flagship house times, not measured against a San Francisco run of show. Type the
-              programme in when it arrives — the frame, dates and venue line are already right.
+              {published
+                ? `Built from agenda version ${published.version}, published on the Event assets page.`
+                : "Built from the published agenda at transperfectnext.com. Rooms read to be confirmed until they're added."}
             </p>
+            <Link to="/events/next/intake/$eventId" params={{ eventId: "san-francisco" }} hash="agenda" className="mr-4 mt-2 inline-flex text-xs font-semibold text-primary hover:underline">
+              Update the agenda
+            </Link>
             <Link
               to="/events/next/san-francisco"
               className="mt-2 inline-flex text-xs font-semibold text-primary hover:underline"
@@ -98,10 +113,10 @@ function AgendaPage() {
         )}
         <AgendaStudio
 
-          key={`${resolved.id}|${edition ?? "london"}|${openFile?.id ?? "new"}`}
+          key={`${resolved.id}|${edition ?? "london"}|${openFile?.id ?? "new"}|${publishedConfig ? published?.version : "built-in"}`}
           divisionId={resolved.id}
           edition={edition}
-          initialConfig={openFile?.config}
+          initialConfig={openFile?.config ?? publishedConfig}
           initialFileId={openFile?.id ?? null}
           heading={`${resolved.name} — agenda`}
           intro="The approved NEXT agenda master, live for this division area. Edit the programme rows, choose the board format and face, add a scannable QR code, save the live file and export layered vector artwork for print and Illustrator."

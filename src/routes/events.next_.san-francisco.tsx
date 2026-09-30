@@ -19,6 +19,8 @@ import {
 
 import { useState } from "react";
 
+import { assetGates, type Gate as GateKind, type GateRow } from "@/lib/event-assets";
+import { useEventAssets } from "@/lib/event-assets-data";
 import { AppShell } from "@/components/AppShell";
 import { EditionDivisionTiles } from "@/components/events/EditionDivisionTiles";
 import { CitySectionBar, SAN_FRANCISCO_SECTIONS } from "@/components/events/CitySectionBar";
@@ -59,7 +61,7 @@ export const Route = createFileRoute("/events/next_/san-francisco")({
 
 const card = "rounded-md border border-[#03002C]/12 bg-white p-5";
 
-type Gate = "locked" | "ready" | "pending";
+type Gate = GateKind;
 
 const GATE_STYLE: Record<Gate, { label: string; cls: string; Icon: typeof Lock }> = {
   locked: { label: "Locked", cls: "border-[#03002C] bg-[#03002C] text-white", Icon: Lock },
@@ -87,42 +89,28 @@ function GateBadge({ gate }: { gate: Gate }) {
   );
 }
 
-const GATES: { id: string; gate: Gate; title: string; detail: string; anchor?: string }[] = [
-  {
-    id: "venue",
-    gate: "locked",
-    title: "Venue & dates",
-    detail: `${SF_VENUE.venue}, ${SF_VENUE.datesLabel}. Printed word for word as issued.`,
-  },
-  {
-    id: "kiosks",
-    gate: "ready",
-    title: "Partner kiosk templates",
-    detail:
-      "45 × 96 in front face with monitor keep-clear and both 4 × 96 in returns. .ai, print .pdf and .svg downloads.",
-    anchor: "#sf-kiosks",
-  },
-  {
-    id: "rooms",
-    gate: "pending",
-    title: "Room signage",
-    detail: "Built once the finalised hotel floor plan and room list are issued.",
-  },
-  {
-    id: "arrows",
-    gate: "pending",
-    title: "Directional arrows",
-    detail: "Needs the finalised hotel floor plan to place routes and arrow faces.",
-  },
-  {
-    id: "agendas",
-    gate: "pending",
-    title: "Division agendas",
-    detail: "Needs the issued programme and the room each track runs in.",
-  },
-];
+const VENUE_GATE: GateRow = {
+  id: "venue",
+  gate: "locked",
+  title: "Venue & dates",
+  detail: `${SF_VENUE.venue}, ${SF_VENUE.datesLabel}. Issued facts, printed word for word — change them only from the issued source.`,
+};
+const KIOSK_GATE: GateRow = {
+  id: "kiosks",
+  gate: "ready",
+  title: "Partner kiosk templates",
+  detail: "45 × 96 in front face with monitor keep-clear and both 4 × 96 in returns. .ai, print .pdf and .svg downloads.",
+  action: { label: "Open kiosks", to: "kiosks" },
+};
+
 
 function SanFranciscoPage() {
+  const assets = useEventAssets("san-francisco");
+  const GATES: GateRow[] = [VENUE_GATE, KIOSK_GATE, ...assetGates({
+    agenda: assets.data?.publishedAgenda ?? null,
+    rooms: assets.data?.publishedRooms ?? null,
+    floors: assets.data?.floors ?? 0,
+  })];
   const [locationLine, venueLine] = sfLocationStack();
   const [divisionFocus, setDivisionFocus] = useState<string | null>(null);
   const alsoReady = SF_READY.filter((r) => r.id !== "kiosks");

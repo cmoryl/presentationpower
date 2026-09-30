@@ -206,7 +206,7 @@ export function EventAssetsPanel({ eventId }: { eventId: string }) {
         </div>
         {d.publishedAgenda ? (
           <p className="mt-2 text-xs text-muted-foreground">
-            Open the boards: <Link to="/events/next/agendas" search={{ edition: eventId } as never} className="font-semibold text-primary hover:underline">agenda builder</Link>
+            Open the boards: <Link to="/events/next/agendas" search={{ edition: eventId }} className="font-semibold text-primary hover:underline">agenda builder</Link>
           </p>
         ) : null}
         <Versions list={d.agendas} onLoad={(v) => { setSessions(v.sessions); setAgDraftId(null); setAgSrc({ url: v.source_url ?? undefined, file: v.source_file ?? undefined }); toast.message(`Loaded version ${v.version}. Publish to make it current again.`); }} />
