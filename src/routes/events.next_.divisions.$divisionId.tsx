@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { DivisionSignageKit } from "@/components/events/DivisionSignageKit";
+import { LegalNextSignage } from "@/components/events/LegalNextSignage";
 import { LONDON_DIVISION_ACCENTS } from "@/lib/next-london-division";
 
 export const Route = createFileRoute("/events/next_/divisions/$divisionId")({
@@ -62,6 +63,7 @@ function DivisionSignagePage() {
         <div className="mt-8">
           <DivisionSignageKit divisionId={id} />
         </div>
+        {id === "legal" ? <LegalNextSignage /> : null}
       </div>
     </AppShell>
   );

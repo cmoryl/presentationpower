@@ -17,3 +17,5 @@
 - The Knowledge screens share the `KnowledgeTabs` strip (Entries / Ask Oracle / Oracle KB / Sources); `/admin/knowledge-hub` redirects to `/knowledge`. Why: seven overlapping menu items.
 - Designer-supplied SF kiosk CMYK masters (SWOP v2) live in `src/assets/california-kiosks/cmyk/` and are served byte-for-byte via `next-california-kiosk-cmyk-masters.ts` — why: CMYK must never be re-rendered or converted by the app.
 - SF kiosk side strips are native faces (`native.faces` + `kioskFaceLayout`), split one object per page from the native PDF and edited by the same editor/export path as the front; strip edits save under `<kiosk>--left|right` — why: one editor and one CMYK export path for every face.
+
+- Legal NEXT signage templates (`legalnext-*` layouts in `src/lib/legal-next-signage-layouts.json`, registry `src/lib/legal-next-signage.ts`) reuse the kiosk layer editor/export via `layout.sign`, kept out of `KIOSK_LIVE_LAYOUTS` (use `liveLayoutById`) — why: one editor/export path, kiosk list stays kiosks only.

@@ -197,6 +197,7 @@ import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as EventsNextDivisionsIndexRouteImport } from './routes/events.next_.divisions.index'
 import { Route as KnowledgeBrandGuidesSlugEditRouteImport } from './routes/knowledge.brand-guides.$slug_.edit'
+import { Route as EventsNextSignEditorSignIdRouteImport } from './routes/events.next_.sign-editor.$signId'
 import { Route as EventsNextMartPriceListRouteImport } from './routes/events.next_.mart_.price-list'
 import { Route as EventsNextMartStopIdRouteImport } from './routes/events.next_.mart_.$stopId'
 import { Route as EventsNextMapsEventIdRouteImport } from './routes/events.next_.maps.$eventId'
@@ -1163,6 +1164,12 @@ const KnowledgeBrandGuidesSlugEditRoute =
     path: '/brand-guides/$slug/edit',
     getParentRoute: () => KnowledgeRoute,
   } as any)
+const EventsNextSignEditorSignIdRoute =
+  EventsNextSignEditorSignIdRouteImport.update({
+    id: '/next_/sign-editor/$signId',
+    path: '/next/sign-editor/$signId',
+    getParentRoute: () => EventsRoute,
+  } as any)
 const EventsNextMartPriceListRoute = EventsNextMartPriceListRouteImport.update({
   id: '/next_/mart_/price-list',
   path: '/next/mart/price-list',
@@ -1428,6 +1435,7 @@ export interface FileRoutesByFullPath {
   '/events/next/maps/$eventId': typeof EventsNextMapsEventIdRoute
   '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
   '/events/next/mart/price-list': typeof EventsNextMartPriceListRoute
+  '/events/next/sign-editor/$signId': typeof EventsNextSignEditorSignIdRoute
   '/knowledge/brand-guides/$slug/edit': typeof KnowledgeBrandGuidesSlugEditRoute
   '/events/next/divisions/': typeof EventsNextDivisionsIndexRoute
 }
@@ -1626,6 +1634,7 @@ export interface FileRoutesByTo {
   '/events/next/maps/$eventId': typeof EventsNextMapsEventIdRoute
   '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
   '/events/next/mart/price-list': typeof EventsNextMartPriceListRoute
+  '/events/next/sign-editor/$signId': typeof EventsNextSignEditorSignIdRoute
   '/knowledge/brand-guides/$slug/edit': typeof KnowledgeBrandGuidesSlugEditRoute
   '/events/next/divisions': typeof EventsNextDivisionsIndexRoute
 }
@@ -1829,6 +1838,7 @@ export interface FileRoutesById {
   '/events/next_/maps/$eventId': typeof EventsNextMapsEventIdRoute
   '/events/next_/mart_/$stopId': typeof EventsNextMartStopIdRoute
   '/events/next_/mart_/price-list': typeof EventsNextMartPriceListRoute
+  '/events/next_/sign-editor/$signId': typeof EventsNextSignEditorSignIdRoute
   '/knowledge/brand-guides/$slug_/edit': typeof KnowledgeBrandGuidesSlugEditRoute
   '/events/next_/divisions/': typeof EventsNextDivisionsIndexRoute
 }
@@ -2033,6 +2043,7 @@ export interface FileRouteTypes {
     | '/events/next/maps/$eventId'
     | '/events/next/mart/$stopId'
     | '/events/next/mart/price-list'
+    | '/events/next/sign-editor/$signId'
     | '/knowledge/brand-guides/$slug/edit'
     | '/events/next/divisions/'
   fileRoutesByTo: FileRoutesByTo
@@ -2231,6 +2242,7 @@ export interface FileRouteTypes {
     | '/events/next/maps/$eventId'
     | '/events/next/mart/$stopId'
     | '/events/next/mart/price-list'
+    | '/events/next/sign-editor/$signId'
     | '/knowledge/brand-guides/$slug/edit'
     | '/events/next/divisions'
   id:
@@ -2433,6 +2445,7 @@ export interface FileRouteTypes {
     | '/events/next_/maps/$eventId'
     | '/events/next_/mart_/$stopId'
     | '/events/next_/mart_/price-list'
+    | '/events/next_/sign-editor/$signId'
     | '/knowledge/brand-guides/$slug_/edit'
     | '/events/next_/divisions/'
   fileRoutesById: FileRoutesById
@@ -3860,6 +3873,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeBrandGuidesSlugEditRouteImport
       parentRoute: typeof KnowledgeRoute
     }
+    '/events/next_/sign-editor/$signId': {
+      id: '/events/next_/sign-editor/$signId'
+      path: '/next/sign-editor/$signId'
+      fullPath: '/events/next/sign-editor/$signId'
+      preLoaderRoute: typeof EventsNextSignEditorSignIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/mart_/price-list': {
       id: '/events/next_/mart_/price-list'
       path: '/next/mart/price-list'
@@ -4067,6 +4087,7 @@ interface EventsRouteChildren {
   EventsNextMapsEventIdRoute: typeof EventsNextMapsEventIdRoute
   EventsNextMartStopIdRoute: typeof EventsNextMartStopIdRoute
   EventsNextMartPriceListRoute: typeof EventsNextMartPriceListRoute
+  EventsNextSignEditorSignIdRoute: typeof EventsNextSignEditorSignIdRoute
   EventsNextDivisionsIndexRoute: typeof EventsNextDivisionsIndexRoute
 }
 
@@ -4110,6 +4131,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextMapsEventIdRoute: EventsNextMapsEventIdRoute,
   EventsNextMartStopIdRoute: EventsNextMartStopIdRoute,
   EventsNextMartPriceListRoute: EventsNextMartPriceListRoute,
+  EventsNextSignEditorSignIdRoute: EventsNextSignEditorSignIdRoute,
   EventsNextDivisionsIndexRoute: EventsNextDivisionsIndexRoute,
 }
 

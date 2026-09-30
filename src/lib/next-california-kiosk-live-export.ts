@@ -34,6 +34,7 @@ import {
   kioskHasTv,
   kioskFaceLayout,
   kioskFaceW,
+  kioskFaceH,
   type KioskFace,
   layoutKiosk,
   partCentre,
@@ -102,12 +103,12 @@ export async function pressFrontSvg(L: LiveLayout, edits: KioskEdits) {
   return svg;
 }
 
-export async function proofPng(svg: string, widthPx = 1400, faceW: number = KIOSK_W): Promise<Blob> {
+export async function proofPng(svg: string, widthPx = 1400, faceW: number = KIOSK_W, faceH: number = KIOSK_H): Promise<Blob> {
   const img = new Image();
   const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
   try {
     await new Promise<void>((res, rej) => { img.onload = () => res(); img.onerror = () => rej(new Error("Proof render failed")); img.src = url; });
-    const h = Math.round(widthPx * ((KIOSK_H + 2 * KIOSK_BLEED) / (faceW + 2 * KIOSK_BLEED)));
+    const h = Math.max(1, Math.round(widthPx * ((faceH + 2 * KIOSK_BLEED) / (faceW + 2 * KIOSK_BLEED))));
     const c = document.createElement("canvas");
     c.width = widthPx; c.height = h;
     c.getContext("2d")!.drawImage(img, 0, 0, widthPx, h);
@@ -118,12 +119,13 @@ export async function proofPng(svg: string, widthPx = 1400, faceW: number = KIOS
 export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Array> {
   const B = KIOSK_BLEED;
   const KW = kioskFaceW(L);
+  const KIOSK_H = kioskFaceH(L);
   const W = KW + 2 * B, H = KIOSK_H + 2 * B;
   // Slug outside the bleed carries the crop marks (0.5 in each side).
   const S = 36;
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
-  doc.setTitle(`${kioskLiveFileBase(L.id)} — ${L.face ? `return ${L.face}` : "kiosk front"} (draft)`);
+  doc.setTitle(`${kioskLiveFileBase(L.id)} — ${L.face ? `return ${L.face}` : L.sign ? "sign" : "kiosk front"} (draft)`);
   const page = doc.addPage([W + 2 * S, H + 2 * S]);
   page.setTrimBox(S + B, S + B, KW, KIOSK_H);
   page.setBleedBox(S, S, W, H);
@@ -658,6 +660,7 @@ export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: K
     if (kind === "press") return save(svgBlob(await pressFrontSvg(FL, se)), `${sb}-press-outlined.svg`);
     if (kind === "png") return save(await proofPng(await pressFrontSvg(FL, se)), `${sb}-PROOF.png`);
   }
+  if (L.sign) return downloadSign(kind, L, edits);
   if (kind === "svg") return save(svgBlob(await liveFrontSvg(L, edits)), `${base}-front.svg`);
   if (kind === "pdf" || kind === "ai") {
     const pdf = await liveFrontPdf(L, edits);
@@ -685,6 +688,34 @@ export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: K
     `DRAFT — not published. Rebuilt from ${L.source}.\n` +
       `Front 45 x 96 in, returns 4 x 96 in (.ai with the same live ramp as the front), 1/8 in bleed. ${kioskHasTv(L.id) ? "TV keep-clear left clear." : "No TV on this kiosk."}\n` +
       `.svg/.pdf carry live text; the -press-outlined file has every word outlined.\n` +
+      `The PNG is a screen proof, not a print master. Check in Illustrator before print.\n`,
+  );
+  save(await zip.generateAsync({ type: "blob" }), `${base}.zip`);
+}
+
+/** Signage templates: one face per file, no returns, the sign's own size. */
+async function downloadSign(kind: KioskDownload, L: LiveLayout, edits: KioskEdits) {
+  const base = kioskLiveFileBase(L.id);
+  const W = kioskFaceW(L), H = kioskFaceH(L);
+  const proofW = Math.min(2400, Math.max(600, Math.round(1400 * Math.sqrt(W / H))));
+  const svgBlob = (s: string) => new Blob([s], { type: "image/svg+xml" });
+  if (kind === "svg") return save(svgBlob(await liveFrontSvg(L, edits)), `${base}.svg`);
+  if (kind === "pdf" || kind === "ai") return save(new Blob([(await liveFrontPdf(L, edits)) as BlobPart], { type: "application/pdf" }), `${base}.${kind}`);
+  if (kind === "press") return save(svgBlob(await pressFrontSvg(L, edits)), `${base}-press-outlined.svg`);
+  if (kind === "png") return save(await proofPng(await pressFrontSvg(L, edits), proofW, W, H), `${base}-PROOF.png`);
+  if (kind === "returns") throw new Error("Signs have no side strips.");
+  const zip = new JSZip();
+  const press = await pressFrontSvg(L, edits);
+  zip.file(`${base}.svg`, await liveFrontSvg(L, edits));
+  zip.file(`${base}.ai`, await liveFrontPdf(L, edits));
+  zip.file(`${base}-press-outlined.svg`, press);
+  zip.file(`${base}-PROOF.png`, await proofPng(press, proofW, W, H));
+  const inch = (v: number) => +(v / 72).toFixed(2);
+  zip.file(
+    "README.txt",
+    `DRAFT — not published. Rebuilt from ${L.source}.\n` +
+      `Trim ${inch(W)} x ${inch(H)} in, 1/8 in bleed (background extended past trim). CMYK objects as supplied.\n` +
+      `.svg/.ai carry live text; the -press-outlined file has every word outlined.\n` +
       `The PNG is a screen proof, not a print master. Check in Illustrator before print.\n`,
   );
   save(await zip.generateAsync({ type: "blob" }), `${base}.zip`);

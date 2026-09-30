@@ -25,6 +25,7 @@ import {
   kioskEditKeyParts,
   kioskFaceLayout,
   kioskFaceW,
+  kioskFaceH,
   kioskMarginX,
   type KioskFace,
   kioskFontFaceCss,
@@ -39,7 +40,7 @@ import {
   splitArtSvg,
   nativeSymbols,
   partSource,
-  KIOSK_LIVE_LAYOUTS,
+  liveLayoutById,
   textLineBoxes,
   badgedPartIds,
   type KioskDivider,
@@ -95,7 +96,7 @@ function forLayout(L: LiveLayout, e: KioskEdits | null | undefined): KioskEdits 
 /** Saved edits for a kiosk (shared copy, or this device's newer draft). `id` may be a strip key (`<kiosk>--left`). */
 async function loadKioskEdits(id: string): Promise<KioskEdits> {
   const kp = kioskEditKeyParts(id);
-  const base = KIOSK_LIVE_LAYOUTS[kp.id];
+  const base = liveLayoutById(kp.id);
   const LF = base && kp.face ? kioskFaceLayout(base, kp.face) : base;
   const local = readLocalDraft(id);
   const { data } = await supabase.from("kiosk_layer_edits").select("edits, updated_at").eq("booth_id", id).maybeSingle();
@@ -110,17 +111,21 @@ const FACE_LABEL: Record<"front" | KioskFace, string> = { front: "Kiosk front", 
  * The kiosk editor: the front and, on kiosks read from the designer's CMYK
  * file, both side strips — each strip is edited with exactly the same tools.
  */
-export function KioskLayerEditor({ layout, vendor, fill = false }: { layout: LiveLayout; vendor: string; fill?: boolean }) {
+export function KioskLayerEditor({ layout, vendor, fill = false, embedded = false }: { layout: LiveLayout; vendor: string; fill?: boolean; embedded?: boolean }) {
   const [face, setFace] = useState<"front" | KioskFace>("front");
   const hasFaces = !!layout.native?.faces;
   const FL = face === "front" ? layout : kioskFaceLayout(layout, face) ?? layout;
-  return <KioskFaceEditor key={face} layout={FL} front={layout} face={face} onFace={hasFaces ? setFace : undefined} vendor={vendor} fill={fill} />;
+  return <KioskFaceEditor key={face} layout={FL} front={layout} face={face} onFace={hasFaces ? setFace : undefined} vendor={vendor} fill={fill} embedded={embedded} />;
 }
 
-function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false }: { layout: LiveLayout; front: LiveLayout; face: "front" | KioskFace; onFace?: (f: "front" | KioskFace) => void; vendor: string; fill?: boolean }) {
+function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false, embedded = false }: { layout: LiveLayout; front: LiveLayout; face: "front" | KioskFace; onFace?: (f: "front" | KioskFace) => void; vendor: string; fill?: boolean; embedded?: boolean }) {
   // Face geometry: the front is 45 in wide, a side strip 4 in.
   const KIOSK_W = kioskFaceW(L);
-  const KIOSK_MARGIN = L.face ? kioskMarginX(L) : KIOSK_MARGIN_FRONT;
+  const KIOSK_H = kioskFaceH(L);
+  const KIOSK_MARGIN = L.face || L.sign ? kioskMarginX(L) : KIOSK_MARGIN_FRONT;
+  // Signs: "Fit" keeps wide signs on screen (zoom is the canvas height in px).
+  const signFit = L.sign ? Math.max(120, Math.min(640, Math.round((1100 * KIOSK_H) / KIOSK_W))) : 640;
+  const minZoom = L.sign ? Math.min(300, Math.round(signFit / 2)) : 300;
   const kioskHasTv = (id: string) => !L.face && kioskHasTvFront(id);
   const EK = kioskEditKey(L);
   /** Saved changes of the other faces, for the side previews and full downloads. */
@@ -143,11 +148,11 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false 
   const clip = useRef<NonNullable<Sel> | null>(null);
   const [sel, setSel] = useState<Sel>(null);
   /** Canvas height in px (zoom) and whether the canvas takes the full width. */
-  const [zoom, setZoom] = useState(640);
+  const [zoom, setZoom] = useState(signFit);
   // "Fit" is smaller on phones so the whole front and both side strips fit the width.
-  const [fitZoom, setFitZoom] = useState(640);
+  const [fitZoom, setFitZoom] = useState(signFit);
   useEffect(() => {
-    if (typeof window === "undefined" || window.innerWidth >= 768) return;
+    if (typeof window === "undefined" || window.innerWidth >= 768 || L.sign) return;
     const z = Math.max(300, Math.min(640, Math.round((window.innerWidth - 130) * 1.6)));
     setFitZoom(z); setZoom(z);
   }, []);
@@ -665,7 +670,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false 
   const vbX = -B - G, vbY = -B - G, vbW = KIOSK_W + 2 * B + G, vbH = KIOSK_H + 2 * B + G;
   const stepIn = zoom < 900 ? 6 : 3;
   const ticksX = Array.from({ length: Math.floor(KIOSK_W / 72 / (L.face ? 1 : stepIn)) + 1 }, (_, i) => i * (L.face ? 1 : stepIn));
-  const ticksY = Array.from({ length: Math.floor(96 / stepIn) + 1 }, (_, i) => i * stepIn);
+  const ticksY = Array.from({ length: Math.floor(KIOSK_H / 72 / stepIn) + 1 }, (_, i) => i * stepIn);
 
   const layerRow = (active: boolean) =>
     `flex-1 truncate py-1 text-left text-[11.5px] ${active ? "text-white" : "text-white/70 hover:text-white"}`;
@@ -674,7 +679,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false 
   return (
     <div
       className={
-        (wide || fill ? "fixed inset-0 z-[70] h-screen rounded-none " : "relative h-[86vh] min-h-[720px] rounded-md ") +
+        (embedded && !wide ? "absolute inset-0 rounded-none " : wide || fill ? "fixed inset-0 z-[70] h-screen rounded-none " : "relative h-[86vh] min-h-[720px] rounded-md ") +
         "flex overflow-hidden border border-white/10 bg-[#0B0A2A] text-white/85 [color-scheme:dark]"
       }
     >
@@ -686,9 +691,9 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false 
         <button type="button" className={dibtn} title="Add accent rule" aria-label="Add accent rule" onClick={() => addDivider("short")}><RectangleHorizontal className="h-4 w-4" /></button>
         <span className="my-1 h-px w-6 bg-white/10" />
         <button type="button" className={dibtn} title="Zoom in" aria-label="Zoom in" disabled={zoom >= 4000} onClick={() => setZoom((z) => Math.min(4000, Math.round(z * 1.25)))}><ZoomIn className="h-4 w-4" /></button>
-        <button type="button" className={dibtn} title="Zoom out" aria-label="Zoom out" disabled={zoom <= 300} onClick={() => setZoom((z) => Math.max(300, Math.round(z / 1.25)))}><ZoomOut className="h-4 w-4" /></button>
+        <button type="button" className={dibtn} title="Zoom out" aria-label="Zoom out" disabled={zoom <= minZoom} onClick={() => setZoom((z) => Math.max(minZoom, Math.round(z / 1.25)))}><ZoomOut className="h-4 w-4" /></button>
         <button type="button" className={dibtn} title="Rulers" aria-label="Rulers" aria-pressed={guides.rulers} onClick={() => setGuides((g) => ({ ...g, rulers: !g.rulers }))}><RulerIcon className="h-4 w-4" /></button>
-        <button type="button" className={dibtn} title="Show side strips" aria-label="Show side strips" aria-pressed={showSides} onClick={() => setShowSides((s) => !s)}><Columns3 className="h-4 w-4" /></button>
+        {L.sign ? null : <button type="button" className={dibtn} title="Show side strips" aria-label="Show side strips" aria-pressed={showSides} onClick={() => setShowSides((s) => !s)}><Columns3 className="h-4 w-4" /></button>}
         <div className="mt-auto" />
         <button type="button" className={dibtn} title={wide ? "Exit full screen (Esc)" : "Full screen"} aria-label={wide ? "Exit full screen" : "Full screen"} onClick={() => setWide((w) => !w)}>{wide ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}</button>
       </nav>
@@ -801,7 +806,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false 
             <button type="button" className={dibtn} disabled={!future.length} onClick={redo} title="Redo (Ctrl/⌘ Shift Z)" aria-label="Redo"><Redo2 className="h-4 w-4" /></button>
             <span className="mx-1 h-4 w-px bg-white/10" />
             <div className="flex rounded-sm border border-white/10 bg-black/40 p-0.5" role="group" aria-label="View size">
-              {([["Fit", fitZoom], ["Large", 1100], ["Detail", 2200]] as const).map(([l, z]) => (
+              {(L.sign ? [["Fit", fitZoom], ["Large", fitZoom * 2], ["Detail", fitZoom * 4]] as const : [["Fit", fitZoom], ["Large", 1100], ["Detail", 2200]] as const).map(([l, z]) => (
                 <button key={l} type="button" aria-pressed={zoom === z} onClick={() => setZoom(z)} className="rounded-[2px] px-2.5 py-1 text-[10.5px] font-medium text-white/55 hover:text-white aria-pressed:bg-white/15 aria-pressed:text-white">{l}</button>
               ))}
             </div>
@@ -966,7 +971,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false 
               {/* Left strip is placed AFTER the front in the DOM (shown first via CSS order):
                   its art uses blend filters whose feImage refs point into the front's
                   symbol defs, and Chrome paints forward feImage references black. */}
-              {showSides && !L.face ? (["left", "right"] as const).map((sd) => (
+              {showSides && !L.face && !L.sign ? (["left", "right"] as const).map((sd) => (
                 <div key={sd} className={sd === "left" ? "order-first" : "order-last"}>
                   <ReturnStrip ground={ground} nativeSym={L.native ? `${symId}-${sd}` : undefined} symId={symId} id={`${L.id}-${sd[0]}`} height={zoom}
                     label={`${sd === "left" ? "Left" : "Right"} return · 4 × 96 in`} offsetTop={G * k}
@@ -1235,7 +1240,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false 
           {tab === "checks" ? (
             <Sec title="Live print checks">
               {checks.length === 0 ? (
-                <p className="flex items-center gap-2 rounded-sm border border-white/10 bg-black/20 p-2.5 text-[12px] text-white/80"><CheckCircle2 className="h-4 w-4 text-[#A6FA87]" aria-hidden />{kioskHasTv(L.id) ? "Nothing over the TV area, past the trim" : "No TV on this kiosk. Nothing past the trim"} or outside the safe margin.</p>
+                <p className="flex items-center gap-2 rounded-sm border border-white/10 bg-black/20 p-2.5 text-[12px] text-white/80"><CheckCircle2 className="h-4 w-4 text-[#A6FA87]" aria-hidden />{kioskHasTv(L.id) ? "Nothing over the TV area, past the trim" : L.sign ? "Nothing past the trim" : "No TV on this kiosk. Nothing past the trim"} or outside the safe margin.</p>
               ) : (
                 <ul className="space-y-1.5">
                   {checks.map((c, i) => (
@@ -1274,7 +1279,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false 
             <Sec title="Download · draft">
               <button type="button" className={`${dbtn} w-full justify-center border-[#003FC7] bg-[#003FC7] text-white hover:bg-[#003FC7]/85`} disabled={!!busy} onClick={() => dl("zip")}><Download className="h-3.5 w-3.5" />{busy === "zip" ? "Building…" : "All files (.zip)"}</button>
               <div className="grid grid-cols-2 gap-1.5">
-                {([["ai", "Illustrator .ai"], ["pdf", "PDF"], ["svg", "Layered .svg"], ["press", "Press, outlined"], ["png", "PNG proof"], ["returns", "Side strips .ai"]] as const).map(([kk, label]) => (
+                {([["ai", "Illustrator .ai"], ["pdf", "PDF"], ["svg", "Layered .svg"], ["press", "Press, outlined"], ["png", "PNG proof"], ["returns", "Side strips .ai"]] as const).filter(([kk]) => !(L.sign && kk === "returns")).map(([kk, label]) => (
                   <button key={kk} type="button" className={`${dbtn} justify-center`} disabled={!!busy} onClick={() => dl(kk)}>{busy === kk ? "…" : label}</button>
                 ))}
               </div>
@@ -1284,13 +1289,13 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false 
                   Font not on file: {m.font.replace(/-/g, " ")}. {m.lines} line{m.lines === 1 ? " is" : "s are"} set in Geist instead, in every file. Supply the font to match London exactly.
                 </p>
               ))}
-              <p className="text-[10.5px] text-white/50">Live files keep editable text and named layers. The PNG is a proof, not a print master. Files stay marked draft until the San Francisco revision is published.</p>
+              <p className="text-[10.5px] text-white/50">Live files keep editable text and named layers. The PNG is a proof, not a print master. {L.sign ? "Files are marked draft templates." : "Files stay marked draft until the San Francisco revision is published."}</p>
             </Sec>
           </>) : null}
         </div>
 
         <div className="flex shrink-0 gap-1.5 border-t border-white/10 p-3">
-          <button type="button" className={`${dbtn} flex-1 justify-center`} onClick={() => commit({})}><RotateCcw className="h-3.5 w-3.5" />Reset to London</button>
+          <button type="button" className={`${dbtn} flex-1 justify-center`} onClick={() => commit({})}><RotateCcw className="h-3.5 w-3.5" />{L.sign ? "Reset to supplied" : "Reset to London"}</button>
           <button type="button" className={`${dbtn} flex-1 justify-center border-[#003FC7] bg-[#003FC7] text-white hover:bg-[#003FC7]/85`} disabled={!userId || !canSave || busy === "save"} onClick={save} title={!userId ? "Sign in to save" : !canSave ? "Your role can't save kiosks for everyone" : undefined}><Save className="h-3.5 w-3.5" />Save</button>
         </div>
         {status ? <p role="status" className="border-t border-white/10 px-3 py-1.5 text-[11px] text-white/60 xl:hidden">{status}</p> : null}
@@ -1430,7 +1435,7 @@ export function KioskLiveThumb({ layout, height = 150 }: { layout: LiveLayout; h
     return () => { io.disconnect(); if (url) URL.revokeObjectURL(url); };
   }, [layout, rev]);
   return (
-    <div ref={ref} style={{ height, width: height * (KIOSK_W_FRONT / KIOSK_H) }} className="shrink-0 overflow-hidden rounded bg-secondary">
+    <div ref={ref} style={{ height, width: height * (kioskFaceW(layout) / kioskFaceH(layout)) }} className="shrink-0 overflow-hidden rounded bg-secondary">
       {src ? <img src={src} alt="" className="h-full w-full object-contain" /> : null}
     </div>
   );
