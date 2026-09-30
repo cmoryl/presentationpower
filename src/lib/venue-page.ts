@@ -145,6 +145,28 @@ export function londonVenuePage(): VenuePage {
   };
 }
 
+/**
+ * San Francisco 2026 — venue name exactly as issued (SF_VENUE). Street address
+ * and map position come from OpenStreetMap's record for this hotel (888 Howard
+ * Street, 94103), not from an issued brief — confirm with the hotel before
+ * printing. Hours, travel, wifi and entrances are not issued: left blank.
+ */
+export function sanFranciscoVenuePage(): VenuePage {
+  return {
+    ...blankVenuePage("San Francisco", "InterContinental San Francisco"),
+    slug: "san-francisco-intercontinental",
+    address: "888 Howard Street, San Francisco, CA",
+    postcode: "94103",
+    country: "United States",
+    lat: 37.7820689,
+    lng: -122.4048016,
+    mapZoom: 16,
+    supportEmail: "next@transperfect.com",
+    notes:
+      "Venue name as issued (27 Sept 2026 briefing). Address and map position from OpenStreetMap — confirm with the hotel. Not issued yet: entrances, opening times, travel notes, wifi, floor plans, rooms.",
+  };
+}
+
 const str = (v: unknown, fallback = ""): string => (typeof v === "string" ? v : fallback);
 const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
 

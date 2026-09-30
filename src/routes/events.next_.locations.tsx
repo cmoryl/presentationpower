@@ -33,6 +33,7 @@ import { GUIDE_IMAGES, guideImage } from "@/lib/next-guide-theme";
 import {
   blankVenuePage,
   londonVenuePage,
+  sanFranciscoVenuePage,
   newVenueHours,
   newVenueTravelNote,
   venueAddressLine,
@@ -272,6 +273,11 @@ function VenuePagesRoute() {
           {!venues.some((v) => v.slug === "london-qeii-centre") && (
             <button type="button" className={btn} onClick={() => setDraft(londonVenuePage())}>
               Start from London 2026
+            </button>
+          )}
+          {!venues.some((v) => v.slug === "san-francisco-intercontinental") && (
+            <button type="button" className={btn} onClick={() => setDraft(sanFranciscoVenuePage())}>
+              Start from San Francisco 2026
             </button>
           )}
         </div>
