@@ -13,7 +13,7 @@ import "./echarts-adapter";
 
 import * as React from "react";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
-import { SlideFrame } from "./SlideChrome";
+import { SlideFrame } from "./module-kit";
 import { TitleBlock } from "./primitives";
 import { AuroraLayer } from "./flagship";
 import type { DeckSlide } from "@/lib/deck-store";
