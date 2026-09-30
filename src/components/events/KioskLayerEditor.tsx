@@ -40,7 +40,7 @@ import {
   splitArtSvg,
   nativeSymbols,
   partSource,
-  KIOSK_LIVE_LAYOUTS,
+  liveLayoutById,
   textLineBoxes,
   badgedPartIds,
   type KioskDivider,
@@ -96,7 +96,7 @@ function forLayout(L: LiveLayout, e: KioskEdits | null | undefined): KioskEdits 
 /** Saved edits for a kiosk (shared copy, or this device's newer draft). `id` may be a strip key (`<kiosk>--left`). */
 async function loadKioskEdits(id: string): Promise<KioskEdits> {
   const kp = kioskEditKeyParts(id);
-  const base = KIOSK_LIVE_LAYOUTS[kp.id];
+  const base = liveLayoutById(kp.id);
   const LF = base && kp.face ? kioskFaceLayout(base, kp.face) : base;
   const local = readLocalDraft(id);
   const { data } = await supabase.from("kiosk_layer_edits").select("edits, updated_at").eq("booth_id", id).maybeSingle();

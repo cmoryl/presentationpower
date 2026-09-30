@@ -138,10 +138,11 @@ export function kioskFaceLayout(L: LiveLayout, face: KioskFace): LiveLayout | nu
   };
 }
 
-export const KIOSK_LIVE_LAYOUTS = {
-  ...(layoutsJson as unknown as Record<string, LiveLayout>),
-  ...(signLayoutsJson as unknown as Record<string, LiveLayout>),
-} as Record<string, LiveLayout>;
+export const KIOSK_LIVE_LAYOUTS = layoutsJson as unknown as Record<string, LiveLayout>;
+/** Legal NEXT signage layouts (edited with the same editor; not kiosks). */
+export const SIGN_LIVE_LAYOUTS = signLayoutsJson as unknown as Record<string, LiveLayout>;
+/** Any editable layout — kiosk or sign — by id. */
+export const liveLayoutById = (id: string): LiveLayout | undefined => KIOSK_LIVE_LAYOUTS[id] ?? SIGN_LIVE_LAYOUTS[id];
 
 export function kioskLiveLayout(boothId: string | null | undefined): LiveLayout | null {
   return (boothId && KIOSK_LIVE_LAYOUTS[boothId]) || null;

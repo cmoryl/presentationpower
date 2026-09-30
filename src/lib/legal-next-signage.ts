@@ -2,7 +2,7 @@
 // the shared kiosk layer editor. City, date and venue facts are NOT part of
 // these templates; the supplied copy is used exactly as received.
 
-import { KIOSK_LIVE_LAYOUTS, isSignId, type LiveLayout } from "@/lib/next-california-kiosk-live";
+import { SIGN_LIVE_LAYOUTS, isSignId, type LiveLayout } from "@/lib/next-california-kiosk-live";
 
 type Ptr = { url: string };
 const MASTERS = import.meta.glob<Ptr>("../assets/legal-next-signage/masters/*.asset.json", { eager: true, import: "default" });
@@ -37,4 +37,4 @@ export const LEGAL_NEXT_SIGNS: LegalSign[] = [
 
 export const legalSign = (id: string) => LEGAL_NEXT_SIGNS.find((s) => s.id === id) ?? null;
 export const legalSignMasterUrl = (s: LegalSign) => masterUrl(s.master);
-export const legalSignLayout = (faceId: string): LiveLayout | null => (isSignId(faceId) ? KIOSK_LIVE_LAYOUTS[faceId] ?? null : null);
+export const legalSignLayout = (faceId: string): LiveLayout | null => (isSignId(faceId) ? SIGN_LIVE_LAYOUTS[faceId] ?? null : null);
