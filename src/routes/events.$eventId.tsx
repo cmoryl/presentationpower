@@ -191,6 +191,13 @@ function EventHome() {
           <section className="mt-6 grid gap-6 lg:grid-cols-2">
             <ReadyList title="Ready now" items={readiness.filter((r) => r.state === "ready")} />
             <ReadyList title="Waiting" items={readiness.filter((r) => r.state === "waiting")} />
+            <Link to="/events/next/signs/$eventId" params={{ eventId }} className={`${card} flex items-center justify-between gap-3 hover:border-[#003FC7] lg:col-span-2`}>
+              <span>
+                <span className="block text-[15px] font-bold text-[#03002C]">Sign set</span>
+                <span className="block text-[13px] text-[#03002C]/70">Build every sign on the venue's sign list from approved templates, review and download them.</span>
+              </span>
+              <ArrowRight className="h-4 w-4 shrink-0 text-[#003FC7]" aria-hidden />
+            </Link>
             {summary && (
               <p className="text-sm text-[#03002C]/75 lg:col-span-2">
                 {summary.mapsReady
