@@ -576,6 +576,7 @@ export function StatFigure({
   series,
   trend,
   revealIndex = 0,
+  valueStyle = "plain",
 }: {
   brand: BrandMode;
   value: string;
@@ -586,6 +587,8 @@ export function StatFigure({
   align?: "start" | "center";
   valueColor?: string;
   unitColor?: string;
+  /** "gradient" = heaviest weight with a vertical ink→accent fill on the numeral. */
+  valueStyle?: "plain" | "gradient";
   monoLabel?: boolean;
   /**
    * Typographic shape treatment. Omit to inherit the module's intentional
@@ -1566,10 +1569,24 @@ export function StatFigure({
               textOverflow: "clip",
             }}
           >
-            <span>{displayValue || "—"}</span>
+            <span
+              style={
+                valueStyle === "gradient" && !valueIsPhrase
+                  ? {
+                      fontWeight: 900,
+                      backgroundImage: `linear-gradient(180deg, ${vc} 0%, ${vc} 45%, ${accent ?? brand.tokens.accent} 100%)`,
+                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
+                      color: "transparent",
+                    }
+                  : undefined
+              }
+            >
+              {displayValue || "—"}
+            </span>
             {unitText && !unitIsLong && (
               <span
-                className="ml-2 font-medium align-top"
+                className={`ml-2 align-top ${valueStyle === "gradient" ? "font-bold" : "font-medium"}`}
                 style={{ fontSize: unitFontSize, color: uc, letterSpacing: "-0.02em" }}
               >
                 {unitText}

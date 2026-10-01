@@ -71,6 +71,8 @@ registerSlideModule({
                     unit={s(stat.unit, "")}
                     size="colossal"
                     shape="auto"
+                    valueStyle="gradient"
+                    unitColor={isDark ? ink.strong : brand.tokens.accent}
                     icon={s(stat.icon)}
                     iconSize={s(stat.iconSize)}
                   />
