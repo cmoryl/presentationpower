@@ -64,10 +64,7 @@ registerSlideModule({
                 className="mt-8 grid items-end gap-20"
                 style={{ gridTemplateColumns: "1.35fr 1fr" }}
               >
-                <div
-                  className="min-w-0"
-                  style={{ borderLeft: `12px solid ${brand.tokens.accent}`, paddingLeft: 40 }}
-                >
+                <div className="min-w-0">
                   <StatFigure
                     brand={brand}
                     value={s(stat.value, "—")}
