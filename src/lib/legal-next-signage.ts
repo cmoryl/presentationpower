@@ -36,9 +36,9 @@ export const LEGAL_NEXT_SIGNS: LegalSign[] = [
 ];
 
 /**
- * San Francisco breakout-room screen surrounds, cut to the supplied templates at
- * the size drawn. Artwork follows the GlobalLink NEXT stage set (chevrons and
- * gradient ground); rooms are not assigned until they are confirmed.
+ * San Francisco breakout-room screen surrounds, built from the supplied live
+ * .ai files (1 Oct 2026): gradient ground + left and right chevron groups. The
+ * red cut-line guide is dropped from print. Rooms are not assigned yet.
  */
 export const SF_SCREEN_SURROUNDS: LegalSign[] = [
   {
