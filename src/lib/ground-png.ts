@@ -143,6 +143,8 @@ export async function rasterizeGroundPng(
   try {
     const { toPng } = await import("html-to-image");
     const raw = await toPng(frame, {
+      // Proxy URLs differ only by ?path= — keep the query in the cache key.
+      includeQueryParams: true,
       width: W + BLEED * 2,
       height: H + BLEED * 2,
       pixelRatio: ratio,

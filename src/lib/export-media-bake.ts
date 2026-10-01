@@ -72,6 +72,8 @@ export async function bakeMediaTileTreatments(shapes: DomShape[]): Promise<numbe
 
     try {
       const data = await toPng(tile, {
+        // Proxy URLs differ only by ?path= — keep the query in the cache key.
+        includeQueryParams: true,
         pixelRatio: Math.max(1, (shape.w * SCALE) / tr.width),
         cacheBust: true,
         skipFonts: true,

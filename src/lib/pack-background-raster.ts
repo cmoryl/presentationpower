@@ -156,6 +156,8 @@ export async function rasterizePackBackground(
     const pixelRatio = stagePixelRatio(quality ?? null);
     const plate = rasterSize(quality ?? null);
     const raw = await toPng(frame, {
+      // Proxy URLs differ only by ?path= — keep the query in the cache key.
+      includeQueryParams: true,
       width: W + BLEED * 2,
       height: H + BLEED * 2,
       pixelRatio,
