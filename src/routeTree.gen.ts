@@ -125,6 +125,7 @@ import { Route as LibraryIndustryBackgroundsRouteImport } from './routes/library
 import { Route as LibraryMyRouteImport } from './routes/library.my'
 import { Route as LibraryOverridesRouteImport } from './routes/library.overrides'
 import { Route as LibraryPrintRouteImport } from './routes/library.print'
+import { Route as MastersGeneralSlidesRouteImport } from './routes/masters.general-slides'
 import { Route as PrintAgentIndexRouteImport } from './routes/print-agent.index'
 import { Route as PrintAgentThreadIdRouteImport } from './routes/print-agent.$threadId'
 import { Route as PublicIconsRouteImport } from './routes/public.icons'
@@ -798,6 +799,11 @@ const LibraryPrintRoute = LibraryPrintRouteImport.update({
   path: '/library/print',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MastersGeneralSlidesRoute = MastersGeneralSlidesRouteImport.update({
+  id: '/masters/general-slides',
+  path: '/masters/general-slides',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrintAgentIndexRoute = PrintAgentIndexRouteImport.update({
   id: '/print-agent/',
   path: '/print-agent/',
@@ -1365,6 +1371,7 @@ export interface FileRoutesByFullPath {
   '/library/my': typeof LibraryMyRoute
   '/library/overrides': typeof LibraryOverridesRoute
   '/library/print': typeof LibraryPrintRoute
+  '/masters/general-slides': typeof MastersGeneralSlidesRoute
   '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
   '/public/icons': typeof PublicIconsRoute
   '/public/modules': typeof PublicModulesRoute
@@ -1567,6 +1574,7 @@ export interface FileRoutesByTo {
   '/library/my': typeof LibraryMyRoute
   '/library/overrides': typeof LibraryOverridesRoute
   '/library/print': typeof LibraryPrintRoute
+  '/masters/general-slides': typeof MastersGeneralSlidesRoute
   '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
   '/public/icons': typeof PublicIconsRoute
   '/public/modules': typeof PublicModulesRoute
@@ -1774,6 +1782,7 @@ export interface FileRoutesById {
   '/library/my': typeof LibraryMyRoute
   '/library/overrides': typeof LibraryOverridesRoute
   '/library/print': typeof LibraryPrintRoute
+  '/masters/general-slides': typeof MastersGeneralSlidesRoute
   '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
   '/public/icons': typeof PublicIconsRoute
   '/public/modules': typeof PublicModulesRoute
@@ -1982,6 +1991,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/overrides'
     | '/library/print'
+    | '/masters/general-slides'
     | '/print-agent/$threadId'
     | '/public/icons'
     | '/public/modules'
@@ -2184,6 +2194,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/overrides'
     | '/library/print'
+    | '/masters/general-slides'
     | '/print-agent/$threadId'
     | '/public/icons'
     | '/public/modules'
@@ -2390,6 +2401,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/overrides'
     | '/library/print'
+    | '/masters/general-slides'
     | '/print-agent/$threadId'
     | '/public/icons'
     | '/public/modules'
@@ -2554,6 +2566,7 @@ export interface RootRouteChildren {
   LibraryMyRoute: typeof LibraryMyRoute
   LibraryOverridesRoute: typeof LibraryOverridesRoute
   LibraryPrintRoute: typeof LibraryPrintRoute
+  MastersGeneralSlidesRoute: typeof MastersGeneralSlidesRoute
   PrintAgentThreadIdRoute: typeof PrintAgentThreadIdRoute
   PublicIconsRoute: typeof PublicIconsRoute
   PublicModulesRoute: typeof PublicModulesRoute
@@ -3404,6 +3417,13 @@ declare module '@tanstack/react-router' {
       path: '/library/print'
       fullPath: '/library/print'
       preLoaderRoute: typeof LibraryPrintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/masters/general-slides': {
+      id: '/masters/general-slides'
+      path: '/masters/general-slides'
+      fullPath: '/masters/general-slides'
+      preLoaderRoute: typeof MastersGeneralSlidesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/print-agent/': {
@@ -4334,6 +4354,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryMyRoute: LibraryMyRoute,
   LibraryOverridesRoute: LibraryOverridesRoute,
   LibraryPrintRoute: LibraryPrintRoute,
+  MastersGeneralSlidesRoute: MastersGeneralSlidesRoute,
   PrintAgentThreadIdRoute: PrintAgentThreadIdRoute,
   PublicIconsRoute: PublicIconsRoute,
   PublicModulesRoute: PublicModulesRoute,

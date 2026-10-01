@@ -30,7 +30,7 @@ import { notifyPrintToPdf } from "@/lib/deck-feedback";
 
 export const Route = createFileRoute("/decks/$deckId/print")({
   head: () => ({ meta: [{ title: "Print · TransPerfect Element" }] }),
-  validateSearch: (raw) => z.object({ lang: z.string().min(2).max(10).optional() }).parse(raw),
+  validateSearch: (raw) => z.object({ lang: z.string().min(2).max(10).optional(), mode: z.enum(["light", "dark"]).optional() }).parse(raw),
   component: PrintGate,
 });
 
@@ -52,7 +52,7 @@ function PrintGate() {
 
 function PrintView() {
   const { deckId } = Route.useParams();
-  const { lang } = Route.useSearch();
+  const { lang, mode: printMode } = Route.useSearch();
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
 
@@ -197,7 +197,7 @@ function PrintView() {
                           clientLogoUrl={clientLogoUrl}
                           subCompany={deck.subCompany}
                           logoOrientation={deck.context?.logoOrientation}
-                          mode={slide.mode ?? "light"}
+                          mode={printMode ?? slide.mode ?? "light"}
                         />
                       </VizSurfaceProvider>
                     </DeckPackScope>

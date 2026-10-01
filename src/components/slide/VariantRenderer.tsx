@@ -188,6 +188,14 @@ function VariantRendererInner(props: Props) {
   const rawContent = slide.content as Record<string, unknown>;
   const c = React.useMemo(() => {
     if (!logoPool.length) return rawContent;
+    // Author-supplied marks (stored logoPath) or a deliberately empty list
+    // are kept as-is — never swap in roster logos the source deck didn't have.
+    const rawItems = (rawContent as { items?: unknown }).items;
+    if (Array.isArray(rawItems)) {
+      if (rawItems.length === 0) return rawContent;
+      if (rawItems.some((it) => it && typeof it === "object" && (it as { logoPath?: unknown }).logoPath))
+        return rawContent;
+    }
     const json = JSON.stringify(rawContent ?? {});
     const needsClientMarks = /\/brand-logos\//.test(json) || !/logoUrl/.test(json);
     if (!needsClientMarks) return rawContent;

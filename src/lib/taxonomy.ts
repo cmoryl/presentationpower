@@ -5712,7 +5712,7 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     familyId: "MF-05",
     name: "Stat — proof board (hero results + scale rail)",
     description:
-      "Up to four headline results as large gradient figures (percentages get rings) beside a rail of up to eight supporting scale figures — for stat-dense slides",
+      "Up to four headline results with rings for percentages, beside a rail of up to eight scale figures",
     permittedLayoutIds: ["LF-11", "LF-13"],
     capacity: {
       fields: {
@@ -5720,6 +5720,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
         kicker: { kind: "text", chars: 80 },
         brandLabel: { kind: "text", chars: 40 },
         tagline: { kind: "text", chars: 80 },
+        "hero[].value": { kind: "number" },
+        "hero[].unit": { kind: "text", chars: 24 },
+        "hero[].label": { kind: "text", chars: 80 },
       },
       items: {
         min: 2,

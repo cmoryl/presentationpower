@@ -224,7 +224,9 @@ export function SlideMediaRefreshProvider({
       for (const p of pendingLogos) inflight.current.add(`l:${p}`);
       signClientLogoPaths({ data: { paths: pendingLogos } })
         .then((res) => {
-          if (cancelled || !res?.urls) return;
+          // Not gated on `cancelled`: a re-run skips in-flight paths, so a
+          // discarded result here left those logos unsigned for good.
+          if (!res?.urls) return;
           setLogoUrls((prev) => {
             let changed = false;
             const next = new Map(prev);

@@ -43,7 +43,7 @@ registerSlideModule({
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title)} />
-            <div className="mt-14 grid grid-cols-4 gap-6">
+            <div className={`mt-14 grid gap-6 ${arr(c.items).length > 12 ? "grid-cols-5" : "grid-cols-4"}`}>
               {arr(c.items).map((it, i) => {
                 const name = s(it.name ?? it.client);
                 const logoUrl = pickLogoForMode(it, mode);
@@ -336,7 +336,43 @@ registerSlideModule({
       }
 
       case "MV-PROOF-LOGOS-MOSAIC": {
-        const items = arr(c.items).slice(0, 7);
+        const all = arr(c.items);
+        if (all.length > 7) {
+          // Dense roster: every mark stays on the slide in an even grid sized
+          // to the count, rather than dropping everything past the 7th.
+          const cols = Math.min(8, Math.ceil(Math.sqrt(all.length * 1.9)));
+          const rows = Math.ceil(all.length / cols);
+          return (
+            <SlideFrame brand={brand} pageNumber={pageNumber}>
+              {s(c.kicker) && <Kicker brand={brand}>{s(c.kicker)}</Kicker>}
+              <SlideTitle brand={brand} title={s(c.title)} />
+              <div
+                className="mt-12 grid gap-4"
+                style={{ height: 640, gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}
+              >
+                {all.map((it, i) => {
+                  const url = pickLogoForMode(it, mode);
+                  const path = s(it.logoPath);
+                  const name = s(it.name);
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-center justify-center rounded-xl p-4"
+                      style={{ background: isDark ? "#FFFFFF" : "rgba(255,255,255,0.72)", border: `1px solid ${ink.hairline}` }}
+                    >
+                      {url || path ? (
+                        <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-[70%] max-w-[85%] object-contain" />
+                      ) : (
+                        <div className="text-center font-semibold" style={{ color: brand.tokens.primary, fontSize: 18 }}>{name}</div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </SlideFrame>
+          );
+        }
+        const items = all.slice(0, 7);
         const textColor = ink.strong;
         // Mosaic grid template: 4 cols × 3 rows, asymmetric spans.
         const spans = [

@@ -1499,17 +1499,28 @@ registerSlideModule({
                         strokeWidth={current ? 0 : 3}
                       />
                       {current && <circle cx={p.x} cy={p.y} r={5} fill={ink.ringOnDark} />}
-                      <text
-                        x={labelX}
-                        y={p.y - 32}
-                        textAnchor={anchor}
-                        fontSize={28}
-                        fontWeight={700}
-                        fill={ink.strong}
-                        style={{ letterSpacing: "-0.015em" }}
-                      >
-                        {label}
-                      </text>
+                      {(() => {
+                        // Many stages share the width: shrink and wrap each
+                        // label inside its own column band so neighbours never
+                        // print over one another.
+                        const fs = n > 5 ? 22 : 28;
+                        const chars = Math.max(8, Math.floor((noteColWidth * 0.95) / (fs * 0.55)));
+                        const lines = n > 4 ? wrapSvgText(label, chars, 3) : [label];
+                        return lines.map((ln, li) => (
+                          <text
+                            key={li}
+                            x={labelX}
+                            y={p.y - 32 - (lines.length - 1 - li) * (fs + 4)}
+                            textAnchor={anchor}
+                            fontSize={fs}
+                            fontWeight={700}
+                            fill={ink.strong}
+                            style={{ letterSpacing: "-0.015em" }}
+                          >
+                            {ln}
+                          </text>
+                        ));
+                      })()}
                       {noteLines.length > 0 &&
                         noteLines.map((line, li) => (
                           <text
