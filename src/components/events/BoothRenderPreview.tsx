@@ -82,6 +82,8 @@ function bleedFrame(panel: Pick<LondonPanel, "trimW" | "trimH" | "bleedEdge">) {
 async function downloadStagePng(node: HTMLElement, filename: string) {
   const { toPng } = await import("html-to-image");
   const dataUrl = await toPng(node, {
+    // Proxy URLs differ only by ?path= — keep the query in the cache key.
+    includeQueryParams: true,
     pixelRatio: 2,
     cacheBust: true,
     backgroundColor: "#E0E8F5",

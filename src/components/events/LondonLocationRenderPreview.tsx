@@ -232,6 +232,8 @@ export function LondonLocationRenderPreview({
     try {
       const { toPng } = await import("html-to-image");
       const url = await toPng(from, {
+        // Proxy URLs differ only by ?path= — keep the query in the cache key.
+        includeQueryParams: true,
         pixelRatio: 2,
         cacheBust: true,
         filter: (node) => !(node instanceof HTMLElement && node.dataset["exportIgnore"] === "true"),

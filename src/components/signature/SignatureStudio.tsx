@@ -243,7 +243,7 @@ export function SignatureStudio() {
     setBusy("image");
     try {
       const { toPng } = await import("html-to-image");
-      const data = await toPng(previewRef.current, { pixelRatio: 3, backgroundColor: "#FFFFFF" });
+      const data = await toPng(previewRef.current, { pixelRatio: 3, backgroundColor: "#FFFFFF", includeQueryParams: true });
       const a = document.createElement("a");
       a.href = data;
       a.download = `${signatureFileStem(shown)}.png`;

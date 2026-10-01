@@ -95,6 +95,7 @@ function AlongsideView() {
       const { toPng, toJpeg } = await import("html-to-image");
       const opts = {
         pixelRatio: dlScale,
+        includeQueryParams: true,
         width: size.w,
         height: size.h,
         cacheBust: true,

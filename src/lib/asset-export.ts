@@ -95,6 +95,8 @@ export async function captureAssetCanvas(
   const fontEmbedCSS = await getCachedFontEmbedCSS(node).catch(() => "");
   return withExportChrome(() =>
     toCanvas(node, {
+      // Proxy URLs differ only by ?path= — keep the query in the cache key.
+      includeQueryParams: true,
       width,
       height,
       // `pixelRatio` is what actually re-renders the DOM at a larger size;

@@ -738,6 +738,7 @@ export async function captureSlide(
     report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });
     const effectiveRatio = resolvePixelRatio(node, opts);
     const dataUrl = await toPng(node, {
+      includeQueryParams: true,
       pixelRatio: effectiveRatio,
       fontEmbedCSS: await getCachedFontEmbedCSS(node),
       cacheBust: false,
@@ -816,6 +817,7 @@ export async function captureSlideAsDataUrl(
       }
       try {
         const dataUrl = await toPng(node, {
+      includeQueryParams: true,
           pixelRatio: attempt.ratio,
           fontEmbedCSS: attempt.css,
           // cacheBust appends a unique query per asset, which defeats the HTTP

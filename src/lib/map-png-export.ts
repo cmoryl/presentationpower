@@ -11,6 +11,8 @@ export async function exportMapNodeAsPng(
   // Hide the export button itself in the snapshot.
   const dataUrl = await withExportChrome(() =>
     toPng(node, {
+      // Proxy URLs differ only by ?path= — keep the query in the cache key.
+      includeQueryParams: true,
       pixelRatio: 2,
       cacheBust: true,
       backgroundColor,

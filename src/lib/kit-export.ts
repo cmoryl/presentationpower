@@ -26,6 +26,8 @@ async function captureAsset(asset: CampaignAsset): Promise<Blob | null> {
 
   const dataUrl = await withExportChrome(() =>
     toPng(inner, {
+      // Proxy URLs differ only by ?path= — keep the query in the cache key.
+      includeQueryParams: true,
       width: asset.format.width,
       height: asset.format.height,
       canvasWidth: asset.format.width,
