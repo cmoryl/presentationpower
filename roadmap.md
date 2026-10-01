@@ -49,3 +49,5 @@
 - [ ] Assign 3 breakout rooms — blocked on: room confirmation
 - [ ] Confirm templates are real size (screen opening 12.5 × 6.7 in) — blocked on: user
 - [ ] Stage lockup (TRANSPERFECT / GlobalLink / outlined NEXT) — blocked on: supplied lockup file
+
+- [ ] General Slides rebuild: slide-by-slide content analysis + impactful visual treatment per slide, nothing dropped (awaiting plan approval)
