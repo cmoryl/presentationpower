@@ -401,7 +401,7 @@ registerSlideModule({
                 style={{ gridTemplateRows: "1fr 1fr", height: 760 }}
               >
                 <GlassTile radius={26} padding="px-10 py-9" className="row-span-2 overflow-hidden">
-                  <Kicker brand={brand}>Hero</Kicker>
+                  {s(hero.kicker) && <Kicker brand={brand}>{s(hero.kicker)}</Kicker>}
                   <Hairline
                     color={"var(--slide-accent-text)"}
                     widthPx={72}

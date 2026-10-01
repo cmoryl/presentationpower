@@ -5,7 +5,6 @@
 
 import { registerSlideModule } from "../module-registry";
 import { SlideFrame, SlideTitle, arr, s } from "../module-kit";
-import { StatFigure } from "../primitives";
 import { fillPx } from "@/lib/open-space-fill";
 import { hexA } from "@/lib/accent-tokens";
 
@@ -14,7 +13,7 @@ function Ring({ pct, color, track }: { pct: number; color: string; track: string
   const c = 2 * Math.PI * r;
   const p = Math.max(0, Math.min(100, pct));
   return (
-    <svg viewBox="0 0 100 100" width={64} height={64} aria-hidden className="shrink-0">
+    <svg viewBox="0 0 100 100" width={96} height={96} aria-hidden className="shrink-0">
       <circle cx="50" cy="50" r={r} fill="none" stroke={track} strokeWidth="7" />
       <circle
         cx="50"
@@ -31,13 +30,22 @@ function Ring({ pct, color, track }: { pct: number; color: string; track: string
   );
 }
 
+function BigNumber({ value, unit, size, ink, unitColor }: { value: string; unit?: string; size: number; ink: string; unitColor: string }) {
+  return (
+    <div className="tabular-nums" style={{ fontSize: fillPx(size, "display"), fontWeight: 800, lineHeight: 0.95, letterSpacing: "-0.04em", color: ink }}>
+      {value}
+      {unit && <span style={{ color: unitColor, fontSize: "0.6em", marginLeft: "0.04em" }}>{unit}</span>}
+    </div>
+  );
+}
+
 /** Column count + type size for a list of `n` short entries on one slide. */
 export function cityDirectoryPlan(n: number): { cols: number; px: number } {
-  if (n <= 6) return { cols: 1, px: 34 };
-  if (n <= 12) return { cols: 2, px: 30 };
-  if (n <= 30) return { cols: 3, px: 24 };
-  if (n <= 60) return { cols: 4, px: 20 };
-  return { cols: 5, px: 18 };
+  if (n <= 6) return { cols: 1, px: 48 };
+  if (n <= 12) return { cols: 2, px: 40 };
+  if (n <= 30) return { cols: 3, px: 32 };
+  if (n <= 60) return { cols: 4, px: 26 };
+  return { cols: 5, px: 22 };
 }
 
 registerSlideModule({
@@ -79,14 +87,7 @@ registerSlideModule({
                         }}
                       >
                         <div className="flex items-start justify-between gap-4">
-                          <StatFigure
-                            brand={brand}
-                            value={s(it.value)}
-                            unit={s(it.unit)}
-                            size="lg"
-                            valueStyle="gradient"
-                            unitColor={isDark ? ink.strong : accent}
-                          />
+                          <BigNumber value={s(it.value)} unit={s(it.unit)} size={112} ink={ink.strong} unitColor={isDark ? ink.strong : accent} />
                           {Number.isFinite(pct) && (
                             <Ring pct={pct} color={accent} track={ink.hairline} />
                           )}
@@ -146,12 +147,7 @@ registerSlideModule({
               <section className="flex flex-col justify-between">
                 <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
                 <div>
-                  <StatFigure
-                    brand={brand}
-                    value={String(cities.length)}
-                    size="lg"
-                    valueStyle="gradient"
-                  />
+                  <BigNumber value={String(cities.length)} size={150} ink={ink.strong} unitColor={accent} />
                   <div className="mt-2" style={{ fontSize: fillPx(18, "body"), color: ink.muted }}>
                     {s(c.countLabel, "Cities")}
                   </div>

@@ -789,7 +789,7 @@ export function GlassTile({
   return (
     <div
       className={`relative ${padding} ${className}`}
-      style={{ ...surface, border: undefined, borderBottomColor: undefined, ...style }}
+      style={{ ...surface, border: undefined, borderBottomColor: undefined, isolation: "isolate", ...style }}
     >
       {/* Frosting, as its own masked layer so the blur fades out with the wash
           instead of re-drawing a hard rectangle at the bottom edge. */}
@@ -800,6 +800,9 @@ export function GlassTile({
         style={{
           borderRadius: `var(--pack-card-radius, ${r}px)`,
           backdropFilter: isDark ? "blur(20px) saturate(150%)" : "blur(6px)",
+          // Paint beneath in-flow content: an absolute layer otherwise sits on
+          // top of non-positioned children and frosts their text.
+          zIndex: -1,
           ...openBottomMaskStyle(),
         }}
       />
