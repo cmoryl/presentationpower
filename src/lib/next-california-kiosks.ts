@@ -105,11 +105,16 @@ function kioskArtboards(): LondonBoothArtboard[] {
   ];
 }
 
+/** London partners not taking a San Francisco kiosk (Trial Interactive: dropped Oct 2026). */
+export const CALIFORNIA_KIOSK_EXCLUDED = new Set(["ti-tradebooth-a"]);
+
 /**
  * Every current partner booth, re-laid as a California TV kiosk. Order follows
  * the London booth list so the two locations read in the same sequence.
  */
-export const CALIFORNIA_KIOSKS: LondonBoothSpec[] = LONDON_BOOTHS.map((booth) => ({
+export const CALIFORNIA_KIOSKS: LondonBoothSpec[] = LONDON_BOOTHS.filter(
+  (booth) => !CALIFORNIA_KIOSK_EXCLUDED.has(booth.id),
+).map((booth) => ({
   id: `${booth.id}${CALIFORNIA_KIOSK_SUFFIX}`,
   // Shell per artboard is resolved by the signage builder: the front carries the
   // TV aperture, the returns do not.
