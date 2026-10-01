@@ -27,9 +27,10 @@ describe("California TV kiosks", () => {
     expect(KIOSK_LIVE_LAYOUTS["ti-tradebooth-a"]).toBeUndefined();
   });
 
-  it("re-lays every current partner booth as three kiosk faces", () => {
-    expect(CALIFORNIA_KIOSKS).toHaveLength(LONDON_BOOTHS.length);
-    expect(CALIFORNIA_KIOSK_PANELS).toHaveLength(LONDON_BOOTHS.length * 3);
+  it("re-lays every current partner booth except Trial Interactive as three kiosk faces", () => {
+    expect(CALIFORNIA_KIOSKS).toHaveLength(LONDON_BOOTHS.length - 1);
+    expect(CALIFORNIA_KIOSKS.some((k) => k.id.startsWith("ti-tradebooth-a"))).toBe(false);
+    expect(CALIFORNIA_KIOSK_PANELS).toHaveLength((LONDON_BOOTHS.length - 1) * 3);
     for (const kiosk of CALIFORNIA_KIOSKS) {
       expect(californiaKioskSourceBoothId(kiosk.id)).toBeTruthy();
       // Partners with a London final carry the re-laid final on every face;
