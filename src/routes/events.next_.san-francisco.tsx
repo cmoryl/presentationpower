@@ -15,6 +15,7 @@ import {
   Hotel,
   Lock,
   MapPin,
+  RefreshCw,
 } from "lucide-react";
 
 import { useState } from "react";
@@ -62,7 +63,11 @@ export const Route = createFileRoute("/events/next_/san-francisco")({
 
 const card = "rounded-md border border-[#03002C]/12 bg-white p-5";
 
-type Gate = GateKind;
+type Gate = GateKind | "ongoing";
+type Row = Omit<GateRow, "gate" | "action"> & {
+  gate: Gate;
+  action?: GateRow["action"] | { label: string; to: "surrounds" | "signs" };
+};
 
 const GATE_STYLE: Record<Gate, { label: string; cls: string; Icon: typeof Lock }> = {
   locked: { label: "Locked", cls: "border-[#03002C] bg-[#03002C] text-white", Icon: Lock },
@@ -75,6 +80,11 @@ const GATE_STYLE: Record<Gate, { label: string; cls: string; Icon: typeof Lock }
     label: "Pending venue intake",
     cls: "border-dashed border-[#03002C]/40 bg-white text-[#03002C]",
     Icon: CircleDashed,
+  },
+  ongoing: {
+    label: "Ongoing",
+    cls: "border-[#003FC7] bg-white text-[#003FC7]",
+    Icon: RefreshCw,
   },
 };
 
@@ -90,24 +100,37 @@ function GateBadge({ gate }: { gate: Gate }) {
   );
 }
 
-const VENUE_GATE: GateRow = {
+const VENUE_GATE: Row = {
   id: "venue",
   gate: "locked",
   title: "Venue & dates",
   detail: `${SF_VENUE.venue}, ${SF_VENUE.datesLabel}. Issued facts, printed word for word — change them only from the issued source.`,
 };
-const KIOSK_GATE: GateRow = {
+const KIOSK_GATE: Row = {
   id: "kiosks",
   gate: "ready",
   title: "Partner kiosk templates",
   detail: "45 × 96 in front face with monitor keep-clear and both 4 × 96 in returns. .ai, print .pdf and .svg downloads.",
   action: { label: "Open kiosks", to: "kiosks" },
 };
-
+const SURROUNDS_GATE: Row = {
+  id: "surrounds",
+  gate: "ongoing",
+  title: "Breakout screen surrounds",
+  detail: "Three-sided (2 rooms) and all-sides (1 room) built from the live files. Rooms not assigned yet; more added as rooms are requested.",
+  action: { label: "Open surrounds", to: "surrounds" },
+};
+const SIGNAGE_GATE: Row = {
+  id: "signage",
+  gate: "ongoing",
+  title: "Signage & panels",
+  detail: "Added as location requests come in. Each sign needs its spot measured before it can go to print.",
+  action: { label: "Open sign set", to: "signs" },
+};
 
 function SanFranciscoPage() {
   const assets = useEventAssets("san-francisco");
-  const GATES: GateRow[] = [VENUE_GATE, KIOSK_GATE, ...assetGates({
+  const GATES: Row[] = [VENUE_GATE, KIOSK_GATE, SURROUNDS_GATE, SIGNAGE_GATE, ...assetGates({
     agenda: assets.data?.publishedAgenda ?? null,
     rooms: assets.data?.publishedRooms ?? null,
     floors: assets.data?.floors ?? 0,
@@ -188,9 +211,13 @@ function SanFranciscoPage() {
                 </div>
                 {g.action?.to === "kiosks" ? (
                   <a href="#sf-kiosks" className="text-[13px] font-semibold text-primary hover:underline">{g.action.label}</a>
+                ) : g.action?.to === "surrounds" ? (
+                  <a href="#sf-surrounds" className="text-[13px] font-semibold text-primary hover:underline">{g.action.label}</a>
+                ) : g.action?.to === "signs" ? (
+                  <Link to="/events/next/signs/$eventId" params={{ eventId: "san-francisco" }} className="text-[13px] font-semibold text-primary hover:underline">{g.action.label}</Link>
                 ) : g.action?.to === "maps" ? (
                   <Link to="/events/next/maps/$eventId" params={{ eventId: "san-francisco" }} className="text-[13px] font-semibold text-primary hover:underline">{g.action.label}</Link>
-                ) : g.action ? (
+                ) : g.action && "section" in g.action ? (
                   <Link to="/events/next/intake/$eventId" params={{ eventId: "san-francisco" }} hash={g.action.section} className="text-[13px] font-semibold text-primary hover:underline">{g.action.label}</Link>
                 ) : null}
               </li>
