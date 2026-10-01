@@ -272,6 +272,7 @@ function BloomView() {
       const { toPng, toJpeg } = await import("html-to-image");
       const opts = {
         pixelRatio: dlScale,
+        includeQueryParams: true,
         width: size.w,
         height: size.h,
         cacheBust: true,
@@ -375,6 +376,7 @@ function BloomView() {
           if (!node) throw new Error("The staging area was not ready.");
           const opts = {
             pixelRatio: dlScale,
+            includeQueryParams: true,
             width: s.w,
             height: s.h,
             cacheBust: true,
