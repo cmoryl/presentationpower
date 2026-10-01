@@ -10,7 +10,7 @@
 ## What gets built
 
 1. **Re-read the original file in full.** The original PowerPoint is still stored, so I re-read every slide with no line limit and keep each text box together: a figure stays with its label, and a step title stays with its description. Spacing and symbols are fixed.
-2. **A "nothing dropped" check.** Every word on the original slide must appear on the new slide, its speaker notes, or a following continuation slide. If anything is missing, the slide is flagged as "Content missing" with the exact words. This becomes a permanent check for every future import, not only this deck.
+2. **A "nothing dropped" check.** Every word on the original slide must appear on the new slide itself. If anything is missing, the slide is flagged as "Content missing" with the exact words. This becomes a permanent check for every future import, not only this deck.
 3. **Understand the content first, then design it.** For each slide I work out the one message it has to land, what kind of information it is (proof, process, place, comparison, choice), and the visual that makes that message hit hardest. You get this as a slide-by-slide review to approve before anything is built:
 
 | Slides | What the content is really saying | More impactful visual |
@@ -31,7 +31,7 @@
 | 24 Quality commitment | Hard tests and certifications | Big "6% / 12% pass rate" figures plus ISO certification badges |
 | 25–28 Pre-flight, TM, glossary, style | Practical examples that save money and protect the brand | Before/after and side-by-side example cards (fuzzy vs exact match, soda/pop/cola, date and number formats) |
 
-   Where a slide has more content than fits well, it continues onto a second slide instead of shrinking or dropping anything.
+   **Every slide fits on one slide.** Each original slide becomes exactly one new slide holding all of its content. Long content is fitted by choosing a layout built for it (more columns, denser grids, grouped lists such as the city lists) and by sizing the type to the space, never below a readable minimum. Nothing is split onto extra slides or dropped.
 4. **No invented content.** Figures, names and claims come only from the original deck. Nothing is reworded beyond fixing joined words, and no statistics are added.
 5. **Look:** the approved Enterprise sales look (light, with a dark version) and the approved backgrounds, the same as sales decks.
 6. **Delivered as a new deck** in your library, next to the import. The original import stays as it is. I review all 28 slides on screen and fix anything that overflows or looks crowded.
@@ -48,5 +48,5 @@
 
 - `pptx-import.ts`: remove the `.slice(0, 16)` cap, group text by shape (`textGroups`), join runs with correct spacing, decode entities. Re-ingest only this deck from `storage_path` (existing reparse script `scripts/reparse-imported-decks.ts`).
 - New `src/lib/import-coverage.ts`: normalised word-set diff of source shapes vs. mapped slide content + notes, with tests; surfaced in the imported deck audit page.
-- `pptx-mapping.ts`: pair stat values with labels by shape proximity; overflow → continuation slides instead of truncation; lower the faithful-fallback rate for pages whose text was recoverable.
+- `pptx-mapping.ts`: pair stat values with labels by shape proximity; one source slide → one slide; overflow resolved by density-aware variant choice + fit-to-box type scaling with legibility floors, never truncation or splitting; lower the faithful-fallback rate for pages whose text was recoverable.
 - Deck created through the existing `createImportedDeck` path with the Enterprise sales skins; existing approved variants only.

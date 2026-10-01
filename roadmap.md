@@ -50,5 +50,5 @@
 - [ ] Confirm templates are real size (screen opening 12.5 × 6.7 in) — blocked on: user
 - [ ] Stage lockup (TRANSPERFECT / GlobalLink / outlined NEXT) — blocked on: supplied lockup file
 
-- [ ] General Slides rebuild: slide-by-slide content analysis + impactful visual treatment per slide, nothing dropped (awaiting plan approval)
-- [ ] Direct link to the General Slides master deck (find + edit in one click) (awaiting plan approval)
+- [ ] General Slides rebuild: slide-by-slide content analysis + impactful visual treatment per slide, nothing dropped (awaiting plan approval; fit every slide on one slide, no continuation slides)
+- [ ] Direct link to the General Slides master deck (find + edit in one click) (awaiting plan approval; fit every slide on one slide, no continuation slides)
