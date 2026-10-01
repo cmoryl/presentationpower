@@ -35,6 +35,7 @@
 4. **No invented content.** Figures, names and claims come only from the original deck. Nothing is reworded beyond fixing joined words, and no statistics are added.
 5. **Look:** the approved Enterprise sales look (light, with a dark version) and the approved backgrounds, the same as sales decks.
 6. **Delivered as a new deck** in your library, next to the import. The original import stays as it is. I review all 28 slides on screen and fix anything that overflows or looks crowded.
+7. **A direct link to the master.** The rebuilt deck becomes the "TransPerfect General Slides — master", with a short fixed web address (/masters/general-slides) that always opens the newest version straight in the editor. It also gets a "General Slides master" button on the Presentation library page and in the Elements menu. Admins and brand leads can edit it, and everyone else opens a copy, so the master can't be changed by accident.
 
 ## How it's checked
 
