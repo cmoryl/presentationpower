@@ -2345,6 +2345,66 @@ export type Database = {
           },
         ]
       }
+      event_photos: {
+        Row: {
+          album: string
+          created_at: string
+          created_by: string | null
+          division: string | null
+          event_id: string
+          height: number | null
+          id: string
+          original_name: string
+          panel_id: string | null
+          path: string
+          print_note: string | null
+          room: string | null
+          sign_kind: string | null
+          sign_kind_source: string
+          thumb_path: string
+          updated_at: string
+          width: number | null
+        }
+        Insert: {
+          album: string
+          created_at?: string
+          created_by?: string | null
+          division?: string | null
+          event_id: string
+          height?: number | null
+          id?: string
+          original_name: string
+          panel_id?: string | null
+          path: string
+          print_note?: string | null
+          room?: string | null
+          sign_kind?: string | null
+          sign_kind_source?: string
+          thumb_path: string
+          updated_at?: string
+          width?: number | null
+        }
+        Update: {
+          album?: string
+          created_at?: string
+          created_by?: string | null
+          division?: string | null
+          event_id?: string
+          height?: number | null
+          id?: string
+          original_name?: string
+          panel_id?: string | null
+          path?: string
+          print_note?: string | null
+          room?: string | null
+          sign_kind?: string | null
+          sign_kind_source?: string
+          thumb_path?: string
+          updated_at?: string
+          width?: number | null
+        }
+        Relationships: []
+      }
       event_pillar_versions: {
         Row: {
           config: Json
