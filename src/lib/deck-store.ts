@@ -3913,6 +3913,25 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
         source: `${clientName} FY26 planning data`,
       };
+    case "MV-STAT-PROOF-BOARD":
+      return {
+        title: "Results at a glance",
+        kicker: "Replace with your figures",
+        hero: [
+          { value: "00", unit: "%", label: "Headline result" },
+          { value: "00", unit: "+", label: "Headline result" },
+        ],
+        items: [
+          { value: "00", unit: "+", label: "Supporting figure" },
+          { value: "00", unit: "+", label: "Supporting figure" },
+        ],
+      };
+    case "MV-LOC-CITY-DIRECTORY":
+      return {
+        title: "Regional operations",
+        countLabel: "Cities",
+        items: [{ city: "City one" }, { city: "City two" }, { city: "City three" }],
+      };
     case "MV-STAT-TYPE-WALL":
       return {
         title: `${clientName} programme in numbers`,

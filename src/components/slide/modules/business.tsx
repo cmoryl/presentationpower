@@ -212,7 +212,7 @@ registerSlideModule({
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <AuroraOrb x={92} y={28} size={860} />
             <div className="relative flex h-full flex-col">
-              <SlideTitle brand={brand} title={s(c.title)} />
+              <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
               <GlassTile
                 radius={26}
                 padding="px-12 py-10"
@@ -232,7 +232,7 @@ registerSlideModule({
                       borderBottom: `1px solid ${ink.hairlineStrong}`,
                     }}
                   >
-                    Criteria
+                    {s(c.criterionLabel, "Criteria")}
                   </div>
                   {columns.map((col, i) => (
                     <div

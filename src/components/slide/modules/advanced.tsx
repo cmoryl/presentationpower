@@ -1823,10 +1823,16 @@ registerSlideModule({
                 </div>
               </div>
               <div className="flex flex-col justify-center gap-6">
-                <Kicker brand={brand}>Reading</Kicker>
+                <Kicker brand={brand}>{s(c.noteKicker, "Reading")}</Kicker>
                 <div style={{ fontSize: fillPx(22, "body"), lineHeight: 1.45, color: ink.body }}>
-                  Position on <b>{s(c.axisX)}</b> and <b>{s(c.axisY)}</b>. The tinted quadrant is
-                  where the program should live.
+                  {s(c.note) ? (
+                    s(c.note)
+                  ) : (
+                    <>
+                      Position on <b>{s(c.axisX)}</b> and <b>{s(c.axisY)}</b>. The tinted quadrant
+                      is where the program should live.
+                    </>
+                  )}
                 </div>
               </div>
             </div>

@@ -1391,6 +1391,7 @@ export function CardGrid({
   items,
   cols,
   rows,
+  kicker,
 }: {
   brand: BrandMode;
   pageNumber: number;
@@ -1398,11 +1399,12 @@ export function CardGrid({
   items: Item[];
   cols: number;
   rows?: number;
+  kicker?: string;
 }) {
   const gridClass = cols === 2 ? "grid-cols-2" : cols === 3 ? "grid-cols-3" : "grid-cols-4";
   return (
     <SlideFrame brand={brand} pageNumber={pageNumber}>
-      <SlideTitle brand={brand} title={title} />
+      <SlideTitle brand={brand} title={title} kicker={kicker || undefined} />
       <div
         className={`slide-fill-stretch slide-fill-rows mt-14 grid gap-10 ${gridClass}`}
         style={{

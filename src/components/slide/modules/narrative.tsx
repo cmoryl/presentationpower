@@ -75,6 +75,7 @@ registerSlideModule({
             title={s(c.title)}
             items={arr(c.items)}
             cols={3}
+            kicker={s(c.narrative)}
           />
         );
 

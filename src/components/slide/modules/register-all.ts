@@ -25,6 +25,7 @@ import "./editorial";
 import "./locations";
 import "./growth-orbits";
 import "./certifications";
+import "./density";
 import "./showcase-cards";
 
 export {};
