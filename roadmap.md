@@ -51,3 +51,4 @@
 - [ ] Stage lockup (TRANSPERFECT / GlobalLink / outlined NEXT) — blocked on: supplied lockup file
 
 - [ ] General Slides rebuild: slide-by-slide content analysis + impactful visual treatment per slide, nothing dropped (awaiting plan approval)
+- [ ] Direct link to the General Slides master deck (find + edit in one click) (awaiting plan approval)
