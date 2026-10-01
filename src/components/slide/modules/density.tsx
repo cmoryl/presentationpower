@@ -146,7 +146,7 @@ registerSlideModule({
             <div className="grid flex-1 grid-cols-[0.8fr_2.2fr] gap-14">
               <section className="flex flex-col justify-between">
                 <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-                <div>
+                <div className="mt-10">
                   <BigNumber value={String(cities.length)} size={150} ink={ink.strong} unitColor={accent} />
                   <div className="mt-2" style={{ fontSize: fillPx(18, "body"), color: ink.muted }}>
                     {s(c.countLabel, "Cities")}
