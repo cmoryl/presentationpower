@@ -52,3 +52,4 @@
 
 - [ ] General Slides rebuild: slide-by-slide content analysis + impactful visual treatment per slide, nothing dropped (awaiting plan approval; fit every slide on one slide, no continuation slides)
 - [ ] Direct link to the General Slides master deck (find + edit in one click) (awaiting plan approval; fit every slide on one slide, no continuation slides)
+- [ ] General Slides: turn every figure in the deck into data visuals (no invented numbers) (awaiting plan approval)

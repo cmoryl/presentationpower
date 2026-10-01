@@ -32,10 +32,21 @@
 | 25–28 Pre-flight, TM, glossary, style | Practical examples that save money and protect the brand | Before/after and side-by-side example cards (fuzzy vs exact match, soda/pop/cola, date and number formats) |
 
    **Every slide fits on one slide.** Each original slide becomes exactly one new slide holding all of its content. Long content is fitted by choosing a layout built for it (more columns, denser grids, grouped lists such as the city lists) and by sizing the type to the space, never below a readable minimum. Nothing is split onto extra slides or dropped.
-4. **No invented content.** Figures, names and claims come only from the original deck. Nothing is reworded beyond fixing joined words, and no statistics are added.
-5. **Look:** the approved Enterprise sales look (light, with a dark version) and the approved backgrounds, the same as sales decks.
-6. **Delivered as a new deck** in your library, next to the import. The original import stays as it is. I review all 28 slides on screen and fix anything that overflows or looks crowded.
-7. **A direct link to the master.** The rebuilt deck becomes the "TransPerfect General Slides — master", with a short fixed web address (/masters/general-slides) that always opens the newest version straight in the editor. It also gets a "General Slides master" button on the Presentation library page and in the Elements menu. Admins and brand leads can edit it, and everyone else opens a copy, so the master can't be changed by accident.
+4. **Make full use of the deck's own data.** The original has no real charts. Its numbers are typed as text, so today they come out as plain words. Each figure becomes a designed data visual using our stat and chart modules, built only from numbers already in the deck:
+   - **Headline proof** (90% of Fortune 500 run on GlobalLink, 97% of clients achieve ROI in under 12 months, 6,000+ clients, 10,000+ deployments, 10K+ team members, 6+ continents): gradient hero figures, a progress ring for each percentage, and a stat rail for the counts
+   - **Quality pass rates** (6% technical field, 12% overall): two ring gauges showing how few linguists pass
+   - **"Reduce turnaround time by 60%"**: a before/after bar
+   - **20+ acquisitions since 2020, years of growth, 90% of clients cite video**: stat tiles
+   - **G2 grid** (Leaders, Contenders, High Performers, Niche): a real quadrant chart that plots the named vendors in their quadrants, with GlobalLink highlighted
+   - **Quality-to-cost spectrum** (raw AI → full human translation, and MT / MT+APE / selective PE / HPE): a scale chart running along quality and cost
+   - **Translation memory** (fuzzy vs exact match): a match-type comparison table
+   - **Office counts per region**: a count shown for each region and on the summary map, worked out from the city lists in the deck
+   
+   No figure is estimated, rounded or added. Where a chart would need a number the deck doesn't give (for example the exact position of each vendor on the G2 grid), it shows the categories only and doesn't invent a position.
+5. **No invented content.** Figures, names and claims come only from the original deck. Nothing is reworded beyond fixing joined words, and no statistics are added.
+6. **Look:** the approved Enterprise sales look (light, with a dark version) and the approved backgrounds, the same as sales decks.
+7. **Delivered as a new deck** in your library, next to the import. The original import stays as it is. I review all 28 slides on screen and fix anything that overflows or looks crowded.
+8. **A direct link to the master.** The rebuilt deck becomes the "TransPerfect General Slides — master", with a short fixed web address (/masters/general-slides) that always opens the newest version straight in the editor. It also gets a "General Slides master" button on the Presentation library page and in the Elements menu. Admins and brand leads can edit it, and everyone else opens a copy, so the master can't be changed by accident.
 
 ## How it's checked
 
