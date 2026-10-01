@@ -25,6 +25,7 @@ import { AppShell } from "@/components/AppShell";
 import { EditionDivisionTiles } from "@/components/events/EditionDivisionTiles";
 import { CitySectionBar, SAN_FRANCISCO_SECTIONS } from "@/components/events/CitySectionBar";
 import { CaliforniaKioskBrowser } from "@/components/events/CaliforniaKioskBrowser";
+import { SfScreenSurrounds } from "@/components/events/LegalNextSignage";
 import { SF_READY, SF_VENUE, sfLocationStack } from "@/lib/next-sf-event";
 
 export const Route = createFileRoute("/events/next_/san-francisco")({
@@ -221,6 +222,11 @@ function SanFranciscoPage() {
             <CaliforniaKioskBrowser />
           </div>
         </section>
+
+        {/* Breakout screen surrounds, live. */}
+        <div id="sf-surrounds" className="scroll-mt-24">
+          <SfScreenSurrounds />
+        </div>
 
         <EditionDivisionTiles
           editionLabel="San Francisco 2026"
