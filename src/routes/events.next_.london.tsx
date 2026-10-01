@@ -1037,6 +1037,12 @@ function LondonSignagePage() {
               >
                 <CalendarDays className="h-4 w-4" aria-hidden /> Room schedule
               </Link>
+              <Link
+                to="/events/next/london/photos"
+                className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 bg-[#03002C] text-white dark:bg-primary dark:text-primary-foreground"
+              >
+                <BookOpen className="h-4 w-4" aria-hidden /> Event photos
+              </Link>
               <button
                 type="button"
                 onClick={() => handleLondonDirectoryDownload(panels)}
