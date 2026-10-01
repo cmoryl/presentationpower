@@ -186,7 +186,7 @@ function PrintView() {
                   style={{ width: 1280, height: 720 }}
                 >
                   <ScaledSlide>
-                    <DeckPackScope pack={packFor(slide)}>
+                    <DeckPackScope pack={packFor({ mode: printMode ?? slide.mode })}>
                       <VizSurfaceProvider surface="print">
                         <VariantRenderer
                           slide={slide}

@@ -72,7 +72,13 @@ export function useCloudDeckGate(
         hydrateDeck({ brief, deck });
         useDeckStore.getState().markCloudLinked(deck.id, true);
         if (deck.id !== deckId && navigateTo) {
-          void navigate({ to: navigateTo, params: { deckId: deck.id }, replace: true });
+          // Keep the query (e.g. ?mode=dark, ?lang=) across the id rewrite.
+          void navigate({
+            to: navigateTo,
+            params: { deckId: deck.id },
+            search: ((prev: Record<string, unknown>) => prev) as never,
+            replace: true,
+          });
         }
       } catch {
         setFailed(true);
