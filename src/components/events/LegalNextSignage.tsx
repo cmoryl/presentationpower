@@ -13,11 +13,11 @@ export function LegalNextSignage() {
   );
 }
 
-/** San Francisco breakout-room screen surrounds (GlobalLink NEXT stage look). */
+/** San Francisco breakout-room screen surrounds, from the supplied live files. */
 export function SfScreenSurrounds() {
   return (
-    <SignTemplateList id="sf-screen-surrounds" title="Breakout screen surrounds" signs={SF_SCREEN_SURROUNDS} masterLabel="Supplied template"
-      intro="Cut to your templates at the size drawn, in the GlobalLink NEXT stage look. Two rooms use the three-sided surround and one uses the all-sides surround. Open one to move, recolour or hide any piece, then download live files with ⅛ in bleed." />
+    <SignTemplateList id="sf-screen-surrounds" title="Breakout screen surrounds" signs={SF_SCREEN_SURROUNDS} masterLabel="Supplied .ai"
+      intro="Built from your live Illustrator files. Two rooms use the three-sided surround and one uses the all-sides surround. Open one to move, recolour or hide the background or either chevron group, then download live files with ⅛ in bleed. The red cut line is a guide and isn't printed." />
   );
 }
 

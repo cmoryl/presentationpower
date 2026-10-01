@@ -36,18 +36,18 @@ export const LEGAL_NEXT_SIGNS: LegalSign[] = [
 ];
 
 /**
- * San Francisco breakout-room screen surrounds, cut to the supplied templates at
- * the size drawn. Artwork follows the GlobalLink NEXT stage set (chevrons and
- * gradient ground); rooms are not assigned until they are confirmed.
+ * San Francisco breakout-room screen surrounds, built from the supplied live
+ * .ai files (1 Oct 2026): gradient ground + left and right chevron groups. The
+ * red cut-line guide is dropped from print. Rooms are not assigned yet.
  */
 export const SF_SCREEN_SURROUNDS: LegalSign[] = [
   {
-    id: "sf-surround-three", title: "Screen surround, three sides", size: "18.9 × 11.5 in", master: "Screen_Surrounds_THREE_SIDES_template.pdf",
+    id: "sf-surround-three", title: "Screen surround, three sides", size: "18.9 × 11.5 in", master: "Screen_Surrounds_THREE_SIDES_template.ai",
     faces: [{ id: "sfsurround-three", label: "Surround" }],
     note: "For 2 breakout rooms. Open at the top; the screen opening is 12.5 × 6.7 in. Rooms not confirmed yet.",
   },
   {
-    id: "sf-surround-all", title: "Screen surround, all sides", size: "18.9 × 12.7 in", master: "Screen_Surrounds_ALL_SIDES_template.pdf",
+    id: "sf-surround-all", title: "Screen surround, all sides", size: "18.9 × 12.7 in", master: "Screen_Surrounds_ALL_SIDES_template.ai",
     faces: [{ id: "sfsurround-all", label: "Surround" }],
     note: "For 1 breakout room. Full frame; the screen opening is 12.5 × 6.7 in. Room not confirmed yet.",
   },
