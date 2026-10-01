@@ -5708,6 +5708,54 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     lockedFields: ["footer", "logo"],
   },
   {
+    id: "MV-STAT-PROOF-BOARD",
+    familyId: "MF-05",
+    name: "Stat — proof board (hero results + scale rail)",
+    description:
+      "Up to four headline results as large gradient figures (percentages get rings) beside a rail of up to eight supporting scale figures — for stat-dense slides",
+    permittedLayoutIds: ["LF-11", "LF-13"],
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        kicker: { kind: "text", chars: 80 },
+        brandLabel: { kind: "text", chars: 40 },
+        tagline: { kind: "text", chars: 80 },
+      },
+      items: {
+        min: 2,
+        max: 8,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+        },
+      },
+      titleChars: 80,
+    },
+    editableFields: ["title", "kicker", "brandLabel", "tagline", "hero[].value", "hero[].unit", "hero[].label", "items[].value", "items[].unit", "items[].label"],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-LOC-CITY-DIRECTORY",
+    familyId: "MF-05",
+    name: "Locations — city directory",
+    description:
+      "Region title and city-count figure beside a multi-column city list that scales its columns and type to fit up to ~90 cities on one slide",
+    permittedLayoutIds: ["LF-11", "LF-13"],
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        kicker: { kind: "text", chars: 80 },
+        countLabel: { kind: "text", chars: 40 },
+        badge: { kind: "text", chars: 40 },
+      },
+      items: { min: 1, max: 90, fields: { city: { kind: "text", chars: 28 } } },
+      titleChars: 80,
+    },
+    editableFields: ["title", "kicker", "countLabel", "badge", "items[].city"],
+    lockedFields: ["footer", "logo"],
+  },
+  {
     id: "MV-STAT-KPI-RAIL",
     familyId: "MF-05",
     name: "Stat — type-led KPI rail",
