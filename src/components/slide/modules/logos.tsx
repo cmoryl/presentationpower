@@ -48,9 +48,6 @@ registerSlideModule({
                       color: tileText,
                       background: tileBg,
                       border: bareSurfaces ? "none" : `1px solid ${tileRing}`,
-                      backgroundImage: bareSurfaces
-                        ? undefined
-                        : `radial-gradient(120% 80% at 50% 0%, ${accent}${isDark ? "18" : "0C"} 0%, transparent 65%)`,
                     }}
                   >
                     {!bareSurfaces && (
@@ -69,7 +66,6 @@ registerSlideModule({
                           url={logoUrl}
                           alt={name ? `${name} logo` : "Client logo"}
                           className="max-h-[110px] max-w-[80%] object-contain"
-                          style={{ filter: isDark ? "brightness(1.05)" : undefined }}
                         />
                       ) : (
                         <div
