@@ -1736,7 +1736,13 @@ registerSlideModule({
                   // SVG text does not wrap, so an un-wrapped note ran the full
                   // width of the plot and every level's note printed on top of
                   // the next. Each note now wraps inside its own column band.
-                  const noteLines = wrapSvgText(note, noteColChars, 3);
+                  // "A · B · C" lists stack one entry per line so neighbouring
+                  // stages with several content types never run together.
+                  const noteParts = note.split(/\s+·\s+/).filter(Boolean);
+                  const noteLines =
+                    noteParts.length > 1
+                      ? noteParts.flatMap((part) => wrapSvgText(part, noteColChars, 2)).slice(0, 5)
+                      : wrapSvgText(note, noteColChars, 3);
                   return (
                     <g key={i}>
                       {current && <circle cx={p.x} cy={p.y} r={26} fill={accent} opacity={0.18} />}
@@ -1803,9 +1809,12 @@ registerSlideModule({
                   );
                 })}
                 {/* X-axis kicker */}
+                {/* Sits just above the baseline at the right so stacked
+                    stage notes below never collide with it. */}
                 <text
-                  x={PAD_X}
-                  y={H - 14}
+                  x={W - PAD_X - 24}
+                  y={H - PAD_BOT - 16}
+                  textAnchor="end"
                   fontSize={13}
                   letterSpacing="0.32em"
                   fill={ink.faint}
