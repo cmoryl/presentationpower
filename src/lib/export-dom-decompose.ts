@@ -534,6 +534,23 @@ function svgDataUrl(el: SVGSVGElement, w: number, h: number): string | null {
     }
     clone.setAttribute("width", String(Math.max(1, Math.round(w))));
     clone.setAttribute("height", String(Math.max(1, Math.round(h))));
+    // Bake the on-screen "meet" letterbox into the viewBox so the SVG's own
+    // aspect equals the box it is placed in. Rasterizers that size from the
+    // viewBox (not width/height) otherwise produced a picture with the wrong
+    // ratio, which PowerPoint then stretched to the box (location maps).
+    {
+      const vb = clone.getAttribute("viewBox")!.trim().split(/[\s,]+/).map(Number);
+      const par = (clone.getAttribute("preserveAspectRatio") || "xMidYMid meet").trim();
+      if (vb.length === 4 && vb.every(Number.isFinite) && vb[2] > 0 && vb[3] > 0 && w > 0 && h > 0 && par !== "none" && !/slice/.test(par)) {
+        const [vx, vy, vw, vh] = vb;
+        const boxR = w / h;
+        const vbR = vw / vh;
+        let nx = vx, ny = vy, nw = vw, nh = vh;
+        if (vbR < boxR) { nw = vh * boxR; nx = vx - (nw - vw) / 2; }
+        else if (vbR > boxR) { nh = vw / boxR; ny = vy - (nh - vh) / 2; }
+        clone.setAttribute("viewBox", `${nx} ${ny} ${nw} ${nh}`);
+      }
+    }
     // currentColor has no meaning once the SVG leaves the document.
     const ink = getComputedStyle(el).color;
     const walk = (node: Element, live: Element | null) => {
@@ -1027,9 +1044,12 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
       } else if (tag === "SVG") {
         src = svgDataUrl(el as unknown as SVGSVGElement, w, h);
         fit = "contain";
-        const svg = el as unknown as SVGSVGElement;
-        natW = svg.viewBox?.baseVal?.width || w;
-        natH = svg.viewBox?.baseVal?.height || h;
+        // The serialized SVG (and its PNG raster) already carries the on-screen
+        // "meet" letterbox at the element's own box size, so its aspect IS the
+        // box. Using the viewBox aspect here contain-fitted a box-shaped raster
+        // into a viewBox-shaped frame and stretched every location map.
+        natW = w;
+        natH = h;
       } else if (tag === "VIDEO") {
         const v = el as HTMLVideoElement;
         src = v.poster || null;
