@@ -486,22 +486,6 @@ export async function rasterizeObjectPlate(args: ExactPlateArgs): Promise<{
       ),
     );
 
-    {
-      const g = globalThis as unknown as { __tpDecomposeLog?: unknown[] };
-      g.__tpDecomposeLog?.push({
-        why: "pipeline",
-        v: args.variant.id,
-        measured: measured.map((m) => `${m.name}|${m.kind}|${Math.round(m.w)}x${Math.round(m.h)}`),
-        kept: shapes.map((m) => `${m.name}|${m.kind}|${Math.round(m.w)}x${Math.round(m.h)}`),
-        stages: (() => {
-          const f = (a: typeof resolved) => a.map((m) => `${m.name}|${m.kind}|${Math.round(m.w)}x${Math.round(m.h)}`);
-          const a = dom.pruneOccludingPaint(resolved, [...droppedNodes, ...dom.platedPaintRoots(stage)], dom.surfacePaintRoots(stage));
-          const b = dom.keepBackgroundPaintOnPlate(a);
-          const c = dom.collapseMediaOverlays(b);
-          return { resolved: f(resolved), prune: f(a), bg: f(b), media: f(c) };
-        })(),
-      });
-    }
     // A media tile's house treatment (brand duotone, legibility scrim, vignette,
     // grain) uses blend modes OOXML cannot express, so it stays on the flat
     // plate — underneath the very picture it is meant to sit on. Bake it into

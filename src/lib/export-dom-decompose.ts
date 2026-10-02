@@ -1179,20 +1179,6 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
   // Elements carrying a mask we resolved into native custom geometry. Kept so a
   // descendant can be checked against the outline it inherits on screen.
   const clipContexts: Array<ClipBox & { el: Element; cmds: ClipCmd[] }> = [];
-  const dbg = (el: Element, why: string) => {
-    const g = globalThis as unknown as { __tpDecomposeLog?: unknown[] };
-    if (!g.__tpDecomposeLog) return;
-    const r = el.getBoundingClientRect();
-    g.__tpDecomposeLog.push({
-      why,
-      v: stage.closest("[data-variant-id]")?.getAttribute("data-variant-id") ?? stage.getAttribute("data-variant-id"),
-      tag: el.tagName,
-      cls: (el.getAttribute("class") ?? "").slice(0, 160),
-      w: Math.round(r.width * sx),
-      h: Math.round(r.height * sy),
-      st: (() => { const c = getComputedStyle(el); return `bg=${c.backgroundImage.slice(0,80)} f=${c.filter} m=${(c as unknown as {maskImage?:string}).maskImage ?? ""} bd=${(c as unknown as {backdropFilter?:string}).backdropFilter}`; })(),
-    });
-  };
   const insidePlatedSubtree = (el: Element) =>
     platedRoots.some((root) => root === el || root.contains(el)) ||
     effectRoots.some((root) => root === el || root.contains(el));
@@ -1259,7 +1245,7 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           // Two stacked masks intersect on screen; OOXML holds one geometry per
           // object, so the honest outcome is to keep this branch plated.
           if (ancestorClip) {
-            platedRoots.push(el); dbg(el, "plated");
+            platedRoots.push(el);
             continue;
           }
           ownClip = resolved.cmds;
@@ -1285,7 +1271,7 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         } else if (!outlineContainsRect(ancestorClip, rect)) {
           // It crosses the mask edge: exporting it native would spill past the
           // designed cut, so those pixels stay on the plate.
-          platedRoots.push(el); dbg(el, "plated");
+          platedRoots.push(el);
           continue;
         }
       }
@@ -1322,7 +1308,7 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           effectRoots.push(el);
           continue;
         }
-        platedRoots.push(el); dbg(el, "plated");
+        platedRoots.push(el);
         continue;
       }
 
@@ -1358,7 +1344,7 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           shapes.push(box);
           continue;
         }
-        surfaceRoots.push(el); dbg(el, "surface");
+        surfaceRoots.push(el);
         continue;
       }
 
@@ -1479,7 +1465,7 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           shapes.push(box);
           continue;
         }
-        surfaceRoots.push(el); dbg(el, "surface");
+        surfaceRoots.push(el);
         continue;
       }
 
