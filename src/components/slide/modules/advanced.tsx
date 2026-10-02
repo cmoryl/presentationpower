@@ -2005,32 +2005,41 @@ registerSlideModule({
         const target = Number(c.target ?? 0);
         const items = arr(c.items);
         const S = 720;
+        const AQ = "#7FE3F5", LV = "#C2A3FF", BL = "#5B9BFF";
+        const clamp = (v: unknown) => Math.max(0.04, Math.min(0.96, Number(v ?? 0.5)));
+        const heroIdx = items.findIndex((it) => truthy(it.highlight) || /globallink/i.test(s(it.label)));
+        const ranked = items.map((it, i) => ({ it, i })).sort((a, b) => Number(b.it.y ?? 0) - Number(a.it.y ?? 0));
+        const dotCol = isDark ? BL : brand.tokens.accent;
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-            <div className="mt-8 grid gap-10" style={{ gridTemplateColumns: "1fr 320px" }}>
-              <div className="relative" style={{ height: S }}>
-                <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
+            <div className="mt-8 grid gap-12" style={{ gridTemplateColumns: "1fr 340px" }}>
+              <div className="relative ml-14" style={{ height: S }}>
+                <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 overflow-hidden rounded-[22px]" style={{ border: `1px solid ${isDark ? "rgba(255,255,255,0.14)" : ink.hairline}` }}>
                   {[0, 1, 2, 3].map((q) => {
                     const isTarget = q + 1 === target;
                     return (
                       <div
                         key={q}
-                        className="flex items-start justify-start p-6"
+                        className="relative flex items-start justify-start p-6"
                         style={{
-                          border: `1px solid ${ink.hairline}`,
+                          borderRight: q % 2 === 0 ? `1px solid ${isDark ? "rgba(255,255,255,0.12)" : ink.hairline}` : undefined,
+                          borderBottom: q < 2 ? `1px solid ${isDark ? "rgba(255,255,255,0.12)" : ink.hairline}` : undefined,
                           background: isTarget
-                            ? `${hexA(brand.tokens.accent, 0.078)}`
-                            : "transparent",
+                            ? isDark
+                              ? "radial-gradient(120% 120% at 100% 0%, rgba(194,163,255,0.30) 0%, rgba(91,155,255,0.16) 45%, rgba(255,255,255,0.03) 100%)"
+                              : hexA(brand.tokens.accent, 0.09)
+                            : isDark ? "rgba(255,255,255,0.025)" : "transparent",
                         }}
                       >
+                        {isTarget && isDark && <div aria-hidden className="absolute inset-x-0 top-0 h-[2px]" style={{ background: `linear-gradient(90deg, ${BL}00, ${LV}, ${AQ})` }} />}
                         <div
                           className="uppercase"
                           style={{
-                            fontSize: fillPx(16, "body"),
+                            fontSize: fillPx(isTarget ? 18 : 15, "body"),
                             letterSpacing: "0.28em",
-                            color: isTarget ? "var(--slide-accent-text)" : ink.faint,
-                            fontWeight: 600,
+                            color: isTarget ? (isDark ? "#FFFFFF" : "var(--slide-accent-text)") : isDark ? "rgba(255,255,255,0.55)" : ink.faint,
+                            fontWeight: isTarget ? 700 : 600,
                           }}
                         >
                           {quadrants[q] ?? `Q${q + 1}`}
@@ -2040,27 +2049,37 @@ registerSlideModule({
                   })}
                 </div>
                 {items.map((it, i) => {
-                  const x = Math.max(0.05, Math.min(0.95, Number(it.x ?? 0.5))) * S;
-                  const y = (1 - Math.max(0.05, Math.min(0.95, Number(it.y ?? 0.5)))) * S;
+                  const hero = i === heroIdx;
+                  const x = clamp(it.x) * 100;
+                  const y = (1 - clamp(it.y)) * 100;
+                  const d = hero ? 30 : 12;
                   return (
-                    <div
-                      key={i}
-                      className="absolute -translate-x-1/2 -translate-y-1/2"
-                      style={{ left: x, top: y }}
-                    >
+                    <div key={i} className="absolute" style={{ left: `${x}%`, top: `${y}%`, zIndex: hero ? 3 : 2 }}>
+                      {hero ? (
+                        <svg aria-hidden width={120} height={120} viewBox="0 0 120 120" className="absolute" style={{ left: -60, top: -60 }}>
+                          <defs>
+                            <linearGradient id="mx-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={AQ} /><stop offset="1" stopColor={LV} /></linearGradient>
+                            <radialGradient id="mx-glow"><stop offset="0" stopColor={AQ} stopOpacity="0.55" /><stop offset="1" stopColor={AQ} stopOpacity="0" /></radialGradient>
+                          </defs>
+                          <circle cx={60} cy={60} r={58} fill="url(#mx-glow)" />
+                          <circle cx={60} cy={60} r={40} fill="none" stroke="url(#mx-hero)" strokeWidth={1.2} opacity={0.5} />
+                          <circle cx={60} cy={60} r={32} fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth={1} strokeDasharray="0.6 3" />
+                          <path d="M 60 34 A 26 26 0 0 1 86 60" fill="none" stroke="url(#mx-hero)" strokeWidth={3} strokeLinecap="round" />
+                          <path d="M 60 86 A 26 26 0 0 1 34 60" fill="none" stroke="url(#mx-hero)" strokeWidth={3} strokeLinecap="round" />
+                          <circle cx={60} cy={60} r={d / 2} fill="#FFFFFF" />
+                          <circle cx={60} cy={60} r={d / 2 - 6} fill={BL} />
+                        </svg>
+                      ) : (
+                        <div className="absolute rounded-full" style={{ width: d, height: d, left: -d / 2, top: -d / 2, background: dotCol, opacity: 0.85, boxShadow: `0 0 0 4px ${hexA(dotCol, 0.16)}` }} />
+                      )}
                       <div
-                        className="h-4 w-4 rounded-full"
+                        className="absolute whitespace-nowrap"
                         style={{
-                          background: brand.tokens.primary,
-                          boxShadow: `0 0 0 4px ${brand.tokens.primary}22`,
-                        }}
-                      />
-                      <div
-                        className="mt-2 whitespace-nowrap"
-                        style={{
-                          fontSize: fillPx(18, "body"),
-                          fontWeight: 600,
-                          color: ink.strong,
+                          left: hero ? 44 : 12,
+                          top: hero ? -16 : -11,
+                          fontSize: fillPx(hero ? 26 : 17, "body"),
+                          fontWeight: hero ? 800 : 500,
+                          color: hero ? ink.strong : isDark ? "rgba(255,255,255,0.75)" : ink.body,
                           letterSpacing: "-0.01em",
                         }}
                       >
@@ -2069,40 +2088,42 @@ registerSlideModule({
                     </div>
                   );
                 })}
-                <div
-                  className="absolute -left-2 top-1/2 -translate-y-1/2 -rotate-90 uppercase"
-                  style={{
-                    fontSize: fillPx(16, "body"),
-                    letterSpacing: "0.28em",
-                    color: "var(--slide-accent-text)",
-                    fontWeight: 600,
-                  }}
-                >
+                {/* Axes with arrows, outside the grid so they never collide with quadrant labels */}
+                <svg aria-hidden className="absolute" style={{ left: -44, top: 0, height: S, width: 20, overflow: "visible" }}>
+                  <defs><linearGradient id="mx-ay" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stopColor={AQ} stopOpacity="0.15" /><stop offset="1" stopColor={AQ} /></linearGradient></defs>
+                  <line x1={10} y1={S} x2={10} y2={8} stroke="url(#mx-ay)" strokeWidth={2} />
+                  <path d="M 3 16 L 10 4 L 17 16" fill="none" stroke={AQ} strokeWidth={2} strokeLinejoin="round" />
+                </svg>
+                <div className="absolute uppercase whitespace-nowrap" style={{ left: -78, top: "50%", transform: "translate(-50%, -50%) rotate(-90deg)", transformOrigin: "center", fontSize: fillPx(15, "body"), letterSpacing: "0.28em", color: isDark ? "#FFFFFF" : "var(--slide-accent-text)", fontWeight: 600, marginLeft: 0 }}>
                   {s(c.axisY)}
                 </div>
-                <div
-                  className="absolute -bottom-8 left-1/2 -translate-x-1/2 uppercase"
-                  style={{
-                    fontSize: fillPx(16, "body"),
-                    letterSpacing: "0.28em",
-                    color: "var(--slide-accent-text)",
-                    fontWeight: 600,
-                  }}
-                >
+                <svg aria-hidden className="absolute" style={{ left: 0, top: S + 16, width: "100%", height: 20, overflow: "visible" }}>
+                  <defs><linearGradient id="mx-ax" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor={LV} stopOpacity="0.15" /><stop offset="1" stopColor={LV} /></linearGradient></defs>
+                  <line x1="0" y1={10} x2="99.5%" y2={10} stroke="url(#mx-ax)" strokeWidth={2} />
+                </svg>
+                <div className="absolute" style={{ right: -2, top: S + 16 + 3, width: 0, height: 0, borderTop: "7px solid transparent", borderBottom: "7px solid transparent", borderLeft: `12px solid ${LV}` }} />
+                <div className="absolute left-1/2 -translate-x-1/2 uppercase" style={{ top: S + 40, fontSize: fillPx(15, "body"), letterSpacing: "0.28em", color: isDark ? "#FFFFFF" : "var(--slide-accent-text)", fontWeight: 600 }}>
                   {s(c.axisX)}
                 </div>
               </div>
-              <div className="flex flex-col justify-center gap-6">
-                <Kicker brand={brand}>{s(c.noteKicker, "Reading")}</Kicker>
-                <div style={{ fontSize: fillPx(22, "body"), lineHeight: 1.45, color: ink.body }}>
-                  {s(c.note) ? (
-                    s(c.note)
-                  ) : (
-                    <>
-                      Position on <b>{s(c.axisX)}</b> and <b>{s(c.axisY)}</b>. The tinted quadrant
-                      is where the program should live.
-                    </>
-                  )}
+              <div className="flex flex-col justify-center gap-3">
+                <div className="mb-2 uppercase" style={{ fontSize: fillPx(14, "body"), letterSpacing: "0.28em", fontWeight: 600, color: isDark ? "rgba(255,255,255,0.6)" : ink.faint }}>
+                  {s(c.axisY)}
+                </div>
+                {ranked.map(({ it, i }, r) => {
+                  const hero = i === heroIdx;
+                  return (
+                    <div key={i} className="flex items-center gap-4 rounded-xl px-4" style={{ paddingTop: hero ? 12 : 5, paddingBottom: hero ? 12 : 5, background: hero ? (isDark ? "linear-gradient(110deg, rgba(127,227,245,0.18), rgba(194,163,255,0.10))" : hexA(brand.tokens.accent, 0.1)) : "transparent", border: hero ? `1px solid ${isDark ? "rgba(127,227,245,0.45)" : hexA(brand.tokens.accent, 0.4)}` : "1px solid transparent" }}>
+                      <span className="tabular-nums" style={{ width: 28, fontSize: fillPx(15, "body"), fontWeight: 700, color: hero ? AQ : isDark ? "rgba(255,255,255,0.45)" : ink.faint }}>{String(r + 1).padStart(2, "0")}</span>
+                      <span style={{ fontSize: fillPx(hero ? 22 : 17, "body"), fontWeight: hero ? 800 : 500, color: hero ? ink.strong : isDark ? "rgba(255,255,255,0.78)" : ink.body }}>{s(it.label)}</span>
+                    </div>
+                  );
+                })}
+                <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.14)" : ink.hairline}` }}>
+                  <Kicker brand={brand}>{s(c.noteKicker, "Reading")}</Kicker>
+                  <div className="mt-2" style={{ fontSize: fillPx(18, "body"), lineHeight: 1.4, color: ink.body }}>
+                    {s(c.note) || `Position on ${s(c.axisX)} and ${s(c.axisY)}.`}
+                  </div>
                 </div>
               </div>
             </div>
