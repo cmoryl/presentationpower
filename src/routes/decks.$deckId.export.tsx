@@ -608,6 +608,7 @@ function ExportView() {
                     }}
                   />
                   <BrandHealthBadge
+                    approved={!!deck.context?.demoApproved}
                     getRoots={() =>
                       Array.from(document.querySelectorAll<HTMLElement>("[data-slide-stage]"))
                     }

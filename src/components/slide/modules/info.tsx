@@ -82,7 +82,7 @@ registerSlideModule({
               <AuroraOrb x={28} y={58} size={620} />
               <SlideTitle brand={brand} title={s(c.title, variant.name)} />
               <div
-                className="slide-fill-stretch relative mt-6 grid items-center gap-16"
+                className="slide-fill-stretch relative mt-10 grid items-center gap-16"
                 style={{ gridTemplateColumns: `${W}px 1fr` }}
               >
                 <div className="relative" style={{ width: W, height: H }}>

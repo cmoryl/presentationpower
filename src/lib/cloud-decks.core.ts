@@ -264,10 +264,16 @@ export async function saveDeckToCloudCore(
   });
   if (briefErr) throw new Error(briefErr.message);
 
-  const deckContext = {
+  const deckContext: Record<string, unknown> = {
     ...(data.deck.context ?? {}),
     ...(data.deck.subCompany ? { subCompany: data.deck.subCompany } : {}),
   };
+  // A shared master keeps its approved flag even if the editor's copy is stale.
+  if (keepTemplate) {
+    const { data: cur } = await sb.from("decks").select("context").eq("id", deckUuid);
+    const prev = Array.isArray(cur) ? (cur[0] as { context?: Record<string, unknown> } | undefined) : undefined;
+    if (prev?.context?.demoApproved) deckContext.demoApproved = true;
+  }
   // An ordinary content save must not reset the deck's lifecycle status — that
   // silently undid whatever moved it out of draft.
   let { data: existingDeck } = await sb
