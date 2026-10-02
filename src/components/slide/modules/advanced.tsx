@@ -1569,7 +1569,7 @@ registerSlideModule({
           return (
             <SlideFrame brand={brand} pageNumber={pageNumber}>
               <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-              <svg viewBox="0 0 1760 800" className="mt-4 w-full flex-1" style={{ overflow: "visible" }} aria-label={s(c.subtitle)}>
+              <svg data-export-text viewBox="0 0 1760 800" className="mt-4 w-full flex-1" style={{ overflow: "visible" }} aria-label={s(c.subtitle)}>
                 <defs>
                   <linearGradient id={`${uid}-g`} x1="0" y1="1" x2="1" y2="0">
                     <stop offset="0" stopColor={isDark ? DBL : acc} />

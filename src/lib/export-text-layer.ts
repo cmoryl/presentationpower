@@ -513,6 +513,87 @@ export function extractTextRuns(
     nodes.push(el);
   }
 
+  // Opt-in SVG copy: diagrams marked `data-export-text` (e.g. the quality dial)
+  // ship their <text> labels as native, editable text boxes. Each <tspan> with
+  // its own x is a visual line; otherwise the whole <text> is one line.
+  for (const svgText of Array.from(stage.querySelectorAll<SVGTextElement>("svg[data-export-text] text"))) {
+    const content = (svgText.textContent ?? "").replace(/\s+/g, " ").trim();
+    if (!content) continue;
+    const cs = getComputedStyle(svgText);
+    if (cs.visibility === "hidden" || cs.display === "none") continue;
+    const paint = resolveColor(cs.fill);
+    if (!paint) continue;
+    const fillOp = parseFloat(cs.fillOpacity);
+    const alpha = paint.alpha * (Number.isFinite(fillOp) ? fillOp : 1) * cumulativeOpacity(svgText);
+    if (alpha < 0.06) continue;
+    const flat = blendOverBackdrop(svgText, { hex: paint.hex, alpha });
+    const r = svgText.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) continue;
+    const ctm = svgText.getScreenCTM();
+    const scale = ctm ? Math.hypot(ctm.a, ctm.b) : 1;
+    const fontSizePx = (parseFloat(cs.fontSize) || 16) * scale * sy;
+    const tspans = Array.from(svgText.querySelectorAll("tspan")).filter((t) => (t.textContent ?? "").trim());
+    const lineTexts = tspans.length > 1 ? tspans.map((t) => (t.textContent ?? "").trim()) : [content];
+    const anchor = cs.textAnchor || svgText.getAttribute("text-anchor") || "start";
+    const align: TextRun["align"] = anchor === "middle" ? "center" : anchor === "end" ? "right" : "left";
+    const weight = parseInt(cs.fontWeight, 10);
+    const ls = parseFloat(cs.letterSpacing);
+    // Pad the box so PowerPoint's slightly wider metrics never force a re-wrap.
+    const padW = r.width * 0.12 + 6;
+    const x0 = (r.left - stageRect.left) * sx;
+    const xAdj = align === "center" ? x0 - (padW * sx) / 2 : align === "right" ? x0 - padW * sx : x0;
+    const lineH = lineTexts.length > 1 ? (r.height * sy) / lineTexts.length : fontSizePx * 1.2;
+    const lines: MeasuredLine[] | undefined =
+      lineTexts.length > 1
+        ? (lineTexts.map((t, k) => ({
+            text: t,
+            x: xAdj,
+            y: (r.top - stageRect.top) * sy + k * lineH,
+            w: (r.width + padW) * sx,
+            h: lineH,
+          })) as unknown as MeasuredLine[])
+        : undefined;
+    runs.push({
+      x: xAdj,
+      y: (r.top - stageRect.top) * sy,
+      w: (r.width + padW) * sx,
+      h: r.height * sy,
+      text: applyTransform(lineTexts.join(" "), cs.textTransform),
+      leadWs: false,
+      trailWs: false,
+      fontSizePx,
+      fontFamily: firstFamily(cs.fontFamily),
+      bold: Number.isFinite(weight) ? weight >= 600 : /bold/i.test(cs.fontWeight),
+      italic: cs.fontStyle === "italic",
+      underline: false,
+      color: flat.hex,
+      transparency: flat.transparency,
+      align,
+      lineHeightPx: lineH,
+      letterSpacingPx: Number.isFinite(ls) ? ls * scale * sx : 0,
+      singleLine: lineTexts.length === 1,
+      lines,
+      linePitchPx: lines ? lineH : 0,
+      valign: lineTexts.length === 1 ? "middle" : "top",
+      paragraph: {
+        textIndentPx: 0,
+        padLeftPx: 0,
+        padRightPx: 0,
+        spaceBeforePx: 0,
+        spaceAfterPx: 0,
+        whiteSpace: "pre",
+        overflowWrap: "normal",
+        hyphens: "manual",
+        listMarker: null,
+      },
+    });
+    nodes.push(svgText as unknown as HTMLElement);
+    // Hide now: the diagram itself may be inlined as a picture before the
+    // normal hide pass runs, and that picture must not carry the glyphs too.
+    svgText.style.setProperty("fill", "transparent", "important");
+    svgText.style.setProperty("stroke", "transparent", "important");
+  }
+
   return { runs, nodes };
 }
 
@@ -522,6 +603,11 @@ export function extractTextRuns(
  */
 export function hideTextRuns(nodes: HTMLElement[]): void {
   for (const el of nodes) {
+    if (el instanceof SVGElement) {
+      (el as SVGElement).style.setProperty("fill", "transparent", "important");
+      (el as SVGElement).style.setProperty("stroke", "transparent", "important");
+      continue;
+    }
     el.style.setProperty("color", "transparent", "important");
     el.style.setProperty("-webkit-text-fill-color", "transparent", "important");
     el.style.setProperty("text-shadow", "none", "important");

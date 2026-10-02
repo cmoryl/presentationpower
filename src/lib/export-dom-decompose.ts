@@ -563,6 +563,11 @@ function svgDataUrl(el: SVGSVGElement, w: number, h: number): string | null {
       cloneKids.forEach((child, i) => walk(child, liveKids[i] ?? null));
     };
     walk(clone, el);
+    // Diagrams marked `data-export-text` ship their labels as native text
+    // boxes (export-text-layer), so the picture must not carry them as well.
+    if (el.hasAttribute("data-export-text")) {
+      clone.querySelectorAll("text").forEach((t) => t.remove());
+    }
     if (!clone.getAttribute("fill") && !clone.getAttribute("style")) {
       clone.setAttribute("color", ink);
     }
