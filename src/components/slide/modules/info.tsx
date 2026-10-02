@@ -67,71 +67,38 @@ registerSlideModule({
             const large = a1 - a0 > Math.PI ? 1 : 0;
             return `M ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1}`;
           };
-          const gap = 0.2;
           const tone = (k: string) => (k === "ai" ? aiInk : k === "human" ? humanInk : ink.strong);
-          // Phase bands on an outer ring: contiguous runs of the same kind.
-          const runs: { k: string; from: number; to: number }[] = [];
-          steps.forEach((it, i) => {
-            const k = kindOf(it, i);
-            const last = runs[runs.length - 1];
-            if (last && last.k === k) last.to = i;
-            else runs.push({ k, from: i, to: i });
-          });
+          const seg = (Math.PI * 2) / N;
+          const gap = 0.16;
+          const ground = isDark ? "#070B33" : "#FFFFFF";
           return (
             <SlideFrame brand={brand} pageNumber={pageNumber}>
-              <AuroraOrb x={28} y={58} size={620} />
               <SlideTitle brand={brand} title={s(c.title, variant.name)} />
               <div
-                className="slide-fill-stretch relative mt-10 grid items-center gap-16"
+                className="slide-fill-stretch relative mt-6 grid items-center gap-20"
                 style={{ gridTemplateColumns: `${W}px 1fr` }}
               >
                 <div className="relative" style={{ width: W, height: H }}>
                   <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} className="absolute inset-0" aria-hidden>
                     <defs>
-                      <marker id="loopArrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse">
-                        <path d="M0,0 L10,5 L0,10 z" fill={ink.strong} />
-                      </marker>
                       <radialGradient id="loopCore">
-                        <stop offset="0%" stopColor={humanInk} stopOpacity={0.35} />
-                        <stop offset="100%" stopColor={humanInk} stopOpacity={0} />
+                        <stop offset="0%" stopColor={aiInk} stopOpacity={isDark ? 0.14 : 0.08} />
+                        <stop offset="100%" stopColor={aiInk} stopOpacity={0} />
                       </radialGradient>
                     </defs>
-                    <circle cx={CX} cy={CY} r={R + 70} fill="none" stroke={ink.hairline} strokeDasharray="2 10" />
-                    <circle cx={CX} cy={CY} r={R - 120} fill="url(#loopCore)" />
-                    <circle cx={CX} cy={CY} r={R} fill="none" stroke={ink.hairline} strokeWidth={2} />
-                    {runs.map((r, k) => (
-                      <path
-                        key={`band-${k}`}
-                        d={arcPath(ang(r.from) - 0.32, ang(r.to) + 0.32, R + 52)}
-                        fill="none"
-                        stroke={tone(r.k)}
-                        strokeOpacity={r.k === "out" ? 0.5 : 0.85}
-                        strokeWidth={10}
-                        strokeLinecap="round"
-                      />
-                    ))}
+                    <circle cx={CX} cy={CY} r={R - 40} fill="url(#loopCore)" />
+                    <circle cx={CX} cy={CY} r={R} fill="none" stroke={ink.hairline} strokeWidth={1.5} />
                     {steps.map((it, i) => {
                       const k = kindOf(it, i);
-                      const nk = kindOf(steps[(i + 1) % N], (i + 1) % N);
                       const a0 = ang(i) + gap;
-                      const a1 = ang(i) + (Math.PI * 2) / N - gap;
-                      const id = `seg-${i}`;
-                      const [gx0, gy0] = pt(a0);
-                      const [gx1, gy1] = pt(a1);
+                      const a1 = ang(i) + seg - gap;
+                      const [hx, hy] = pt(a1);
+                      const ta = a1 + Math.PI / 2;
+                      const head = `M ${hx + Math.cos(ta - 2.5) * 12} ${hy + Math.sin(ta - 2.5) * 12} L ${hx} ${hy} L ${hx + Math.cos(ta + 2.5) * 12} ${hy + Math.sin(ta + 2.5) * 12}`;
                       return (
-                        <g key={id}>
-                          <linearGradient id={id} gradientUnits="userSpaceOnUse" x1={gx0} y1={gy0} x2={gx1} y2={gy1}>
-                            <stop offset="0%" stopColor={tone(k)} />
-                            <stop offset="100%" stopColor={tone(nk)} />
-                          </linearGradient>
-                          <path
-                            d={arcPath(a0, a1, R)}
-                            fill="none"
-                            stroke={`url(#${id})`}
-                            strokeWidth={8}
-                            strokeLinecap="round"
-                            markerEnd="url(#loopArrow)"
-                          />
+                        <g key={`seg-${i}`}>
+                          <path d={arcPath(a0, a1, R)} fill="none" stroke={tone(k)} strokeWidth={4} strokeLinecap="round" />
+                          <path d={head} fill="none" stroke={tone(k)} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
                         </g>
                       );
                     })}
@@ -139,15 +106,14 @@ registerSlideModule({
                   {/* Centre */}
                   <div
                     className="absolute flex flex-col items-center justify-center text-center"
-                    style={{ left: CX - 150, top: CY - 110, width: 300, height: 220 }}
+                    style={{ left: CX - 140, top: CY - 90, width: 280, height: 180 }}
                   >
-                    <div style={{ fontSize: fillPx(56, "display"), fontWeight: 700, lineHeight: 1, letterSpacing: "-0.03em", color: ink.strong }}>
+                    <div style={{ fontSize: fillPx(52, "display"), fontWeight: 700, lineHeight: 1, letterSpacing: "-0.03em", color: ink.strong }}>
                       {s(hub.title) || s(c.title)}
                     </div>
-                    <div className="mt-4 flex items-center gap-3" style={{ fontSize: 15, letterSpacing: "0.24em", fontWeight: 700 }}>
-                      <span style={{ color: aiInk }}>AI</span>
-                      <span style={{ color: ink.faint }}>+</span>
-                      <span style={{ color: humanInk }}>HUMAN</span>
+                    <div className="mt-5 flex items-center gap-2" aria-hidden>
+                      <span style={{ width: 28, height: 4, borderRadius: 2, background: aiInk }} />
+                      <span style={{ width: 28, height: 4, borderRadius: 2, background: humanInk }} />
                     </div>
                   </div>
                   {/* Nodes */}
@@ -156,10 +122,12 @@ registerSlideModule({
                     const a = ang(i);
                     const [x, y] = pt(a);
                     const Icon = it.icon ? iconByName(s(it.icon)) : null;
-                    const size = k === "out" ? 96 : 80;
+                    const size = 76;
                     const right = Math.cos(a) > 0.2;
                     const left = Math.cos(a) < -0.2;
-                    const [lx, ly] = pt(a, R + 92);
+                    const below = Math.sin(a) > 0.5;
+                    const [lx, ly] = pt(a, R + 66);
+                    const out = k === "out";
                     return (
                       <React.Fragment key={i}>
                         <div
@@ -169,72 +137,46 @@ registerSlideModule({
                             top: y - size / 2,
                             width: size,
                             height: size,
-                            background:
-                              k === "out"
-                                ? humanInk
-                                : `color-mix(in oklab, ${tone(k)} ${isDark ? 22 : 14}%, ${isDark ? "#03002C" : "#FFFFFF"})`,
-                            border: `3px solid ${tone(k)}`,
-                            boxShadow: `0 0 0 10px color-mix(in oklab, ${tone(k)} 12%, transparent), 0 16px 40px -12px ${k === "out" ? humanInk : "rgba(0,0,0,0.5)"}`,
-                            color: k === "out" ? "#FFFFFF" : tone(k),
+                            background: out ? tone(k) : ground,
+                            border: `2px solid ${tone(k)}`,
+                            boxShadow: isDark ? "0 12px 32px -14px rgba(0,0,0,0.7)" : "0 12px 28px -16px rgba(3,0,44,0.35)",
+                            color: out ? ground : tone(k),
                           }}
                         >
-                          {Icon ? <Icon size={size * 0.42} aria-hidden /> : null}
-                          <span
-                            className="absolute flex items-center justify-center rounded-full tabular-nums"
-                            style={{
-                              top: -6,
-                              right: -6,
-                              width: 34,
-                              height: 34,
-                              fontSize: 15,
-                              fontWeight: 700,
-                              background: isDark ? "#FFFFFF" : "#03002C",
-                              color: isDark ? "#03002C" : "#FFFFFF",
-                            }}
-                          >
-                            {i + 1}
-                          </span>
+                          {Icon ? <Icon size={32} strokeWidth={1.75} aria-hidden /> : null}
                         </div>
                         <div
                           className="absolute"
                           style={{
-                            left: right ? lx - 10 : left ? lx - 230 : lx - 120,
-                            top: ly - 22,
-                            width: right || left ? 240 : 240,
+                            left: right ? lx - 8 : left ? lx - 232 : lx - 120,
+                            top: below ? ly - 18 : ly - 40,
+                            width: 240,
                             textAlign: right ? "left" : left ? "right" : "center",
-                            fontSize: fillPx(k === "out" ? 28 : 25, "body"),
-                            fontWeight: 700,
-                            lineHeight: 1.12,
-                            color: ink.strong,
-                            letterSpacing: "-0.01em",
                           }}
                         >
-                          {s(it.label)}
+                          <div className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, letterSpacing: "0.18em", color: tone(k) }}>
+                            {String(i + 1).padStart(2, "0")}
+                          </div>
+                          <div style={{ marginTop: 4, fontSize: fillPx(24, "body"), fontWeight: 600, lineHeight: 1.15, color: ink.strong }}>
+                            {s(it.label)}
+                          </div>
                         </div>
                       </React.Fragment>
                     );
                   })}
                 </div>
-                <div className="flex flex-col justify-center pr-6">
-                  <div style={{ fontSize: fillPx(46, "display"), lineHeight: 1.12, fontWeight: 600, letterSpacing: "-0.02em", color: ink.strong }}>
+                <div className="flex flex-col justify-center pr-8">
+                  <div style={{ fontSize: fillPx(48, "display"), lineHeight: 1.1, fontWeight: 600, letterSpacing: "-0.02em", color: ink.strong }}>
                     {s(summary.lead)}
                   </div>
-                  <div
-                    className="mt-6 pl-6"
-                    style={{
-                      borderLeft: `4px solid ${humanInk}`,
-                      fontSize: fillPx(34, "body"),
-                      lineHeight: 1.25,
-                      fontWeight: 600,
-                      color: ink.strong,
-                      opacity: 0.92,
-                    }}
-                  >
+                  <div className="my-8" style={{ width: 64, height: 3, background: humanInk, borderRadius: 2 }} aria-hidden />
+                  <div style={{ fontSize: fillPx(30, "body"), lineHeight: 1.3, fontWeight: 500, color: ink.strong, opacity: 0.85 }}>
                     {s(summary.emphasis)}
                   </div>
                 </div>
               </div>
             </SlideFrame>
+          );
           );
         }
         // Hub & satellites: one centre disc ringed by icon nodes, each node paired
