@@ -230,9 +230,25 @@ export async function saveDeckToCloudCore(
   if (keepTemplate) {
     const { data: existing } = await sb
       .from("deck_slides")
-      .select("id")
+      .select("id, position, variant_id, content")
       .eq("deck_id", deckUuid);
     const have = Array.isArray(existing) ? existing.length : 0;
+    // Masters keep a fixed page order. A stale tab holding a scrambled order
+    // used to save it straight back over a repaired master.
+    type Ex = { position: number; variant_id: string; content: Record<string, unknown> | null };
+    const was = ((existing ?? []) as Ex[])
+      .slice()
+      .sort((a, b) => a.position - b.position)
+      .map((r) => String(r.content?.["__localId"] ?? ""));
+    const now = [...data.deck.slides]
+      .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+      .map((sl) => String(sl.id));
+    const allPositive = ((existing ?? []) as Ex[]).every((r) => r.position >= 0);
+    if (have > 0 && allPositive && was.every(Boolean) && now.length === was.length && now.join("\n") !== was.join("\n")) {
+      throw new Error(
+        "This master's slide order differs from the saved master. Refused to protect the master — reload the master and try again.",
+      );
+    }
     const incoming = data.deck.slides;
     const split = incoming.some((sl) => /\(cont\.\s*\d+\)/i.test(JSON.stringify(sl)));
     if (have > 0 && (incoming.length !== have || split)) {
