@@ -1408,7 +1408,13 @@ export function CardGrid({
       <div
         className={`slide-fill-stretch slide-fill-rows mt-14 grid gap-10 ${gridClass}`}
         style={{
-          gridTemplateRows: `repeat(${rows ?? Math.max(1, Math.ceil(items.length / cols))}, minmax(0, 1fr))`,
+          // One short row: cards hug their copy and sit centred under the
+          // title instead of stretching into tall, mostly-empty boxes.
+          ...(items.length <= cols && !rows
+            ? { gridTemplateRows: "auto", alignContent: "center" }
+            : {
+                gridTemplateRows: `repeat(${rows ?? Math.max(1, Math.ceil(items.length / cols))}, minmax(0, 1fr))`,
+              }),
         }}
       >
         {items.map((it, i) => (
@@ -1419,6 +1425,7 @@ export function CardGrid({
             body={s(it.body)}
             index={i + 1}
             icon={s(it.icon)}
+            listBody={items.length <= cols}
           />
         ))}
       </div>
@@ -1651,12 +1658,15 @@ export function Card({
   body,
   index,
   icon,
+  listBody = false,
 }: {
   brand: BrandMode;
   title: string;
   body: string;
   index: number;
   icon?: string;
+  /** Render "A · B · C" bodies as ruled rows (single-row grids with spare height). */
+  listBody?: boolean;
 }) {
   const mode = useContext(SlideModeContext);
   const ink = useSlideInk();
@@ -1709,12 +1719,45 @@ export function Card({
       >
         {title}
       </div>
-      <div
-        className="mt-4"
-        style={{ fontSize: fillPx(21, "body"), lineHeight: 1.4, color: bodyColor }}
-      >
-        {body}
-      </div>
+      {(() => {
+        // "A · B · C" bodies are lists in disguise: give each entry its own
+        // ruled row so a short-copy card reads as designed, not empty.
+        const parts = body.split(/\s+·\s+/).map((p) => p.trim()).filter(Boolean);
+        if (!listBody || parts.length < 3) {
+          return (
+            <div
+              className="mt-4"
+              style={{ fontSize: fillPx(listBody ? 27 : 21, "body"), lineHeight: 1.4, color: bodyColor }}
+            >
+              {listBody ? body.split(/\s+·\s+/).join(". ").replace(/\.\.$/, ".") : body}
+            </div>
+          );
+        }
+        return (
+          <ul className="mt-6 flex flex-col">
+            {parts.map((p, i) => (
+              <li
+                key={i}
+                className="flex items-baseline gap-3"
+                style={{
+                  fontSize: fillPx(parts.length > 6 ? 20 : 24, "body"),
+                  lineHeight: 1.3,
+                  color: bodyColor,
+                  paddingBlock: parts.length > 6 ? 6 : 10,
+                  borderTop: i === 0 ? undefined : `1px solid ${ink.hairline}`,
+                }}
+              >
+                <span
+                  aria-hidden
+                  className="shrink-0 rounded-full"
+                  style={{ width: 8, height: 8, background: accentInk(brand.tokens.accent, mode, 3) }}
+                />
+                <span>{p}</span>
+              </li>
+            ))}
+          </ul>
+        );
+      })()}
     </div>
   );
 }

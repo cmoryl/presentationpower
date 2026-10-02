@@ -41,11 +41,11 @@ function BigNumber({ value, unit, size, ink, unitColor }: { value: string; unit?
 
 /** Column count + type size for a list of `n` short entries on one slide. */
 export function cityDirectoryPlan(n: number): { cols: number; px: number } {
-  if (n <= 6) return { cols: 1, px: 48 };
-  if (n <= 12) return { cols: 2, px: 40 };
-  if (n <= 30) return { cols: 3, px: 32 };
-  if (n <= 60) return { cols: 4, px: 26 };
-  return { cols: 5, px: 22 };
+  if (n <= 6) return { cols: 2, px: 60 };
+  if (n <= 12) return { cols: 2, px: 50 };
+  if (n <= 30) return { cols: 3, px: 40 };
+  if (n <= 60) return { cols: 4, px: 31 };
+  return { cols: 5, px: 27 };
 }
 
 registerSlideModule({
@@ -177,12 +177,11 @@ registerSlideModule({
                     key={i}
                     style={{
                       fontSize: px,
-                      lineHeight: 1.45,
                       color: ink.body,
                       fontWeight: 500,
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
+                      lineHeight: 1.25,
+                      paddingBlock: px * 0.14,
+                      borderBottom: `1px solid ${ink.hairline}`,
                     }}
                   >
                     {city}
