@@ -1544,7 +1544,7 @@ registerSlideModule({
           // thicken and brighten as quality (and cost) rises.
           const acc = accentInk(brand.tokens.accent, mode, 4.5);
           const N = items.length;
-          const CX = 880, CY = 380, R0 = 210;
+          const CX = 880, CY = 440, R0 = 210;
           const A0 = 135, SPAN = 270, GAP = 3;
           const rad = (d: number) => ((d - 90) * Math.PI) / 180;
           const pt = (r: number, d: number) => [CX + r * Math.cos(rad(d + 90)), CY + r * Math.sin(rad(d + 90))];
@@ -1569,7 +1569,7 @@ registerSlideModule({
           return (
             <SlideFrame brand={brand} pageNumber={pageNumber}>
               <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-              <svg viewBox="0 0 1760 780" className="mt-4 w-full flex-1" aria-label={s(c.subtitle)}>
+              <svg viewBox="0 0 1760 800" className="mt-4 w-full flex-1" style={{ overflow: "visible" }} aria-label={s(c.subtitle)}>
                 <defs>
                   <linearGradient id={`${uid}-g`} x1="0" y1="1" x2="1" y2="0">
                     <stop offset="0" stopColor={isDark ? DBL : acc} />
