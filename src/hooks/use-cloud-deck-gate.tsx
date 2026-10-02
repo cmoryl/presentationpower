@@ -13,6 +13,9 @@ import { useDeckStore } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { loadCloudDeck } from "@/lib/cloud-decks.functions";
 import { cloudDeckToLocal, type CloudDeckPayload } from "@/lib/cloud-deck-import";
+
+/** Shared master decks — always re-read from the cloud on open. */
+const MASTER_DECK_IDS = new Set(["7a6e1c52-0000-4e5a-9b1d-6e0a51ce0001"]);
 import { DeckImportProgress, DeckImportFailed } from "@/components/DeckImportProgress";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -85,6 +88,25 @@ export function useCloudDeckGate(
       }
     })();
   }, [hydrated, hasDeck, cloudId, deckId, load, hydrateDeck, navigate, navigateTo, attempt]);
+
+  // Master (template) decks are owned by the cloud: a browser copy cached
+  // from an earlier visit must never hide newer published slides.
+  const refreshed = useRef(false);
+  useEffect(() => {
+    if (!hydrated || !hasDeck || !cloudId || refreshed.current) return;
+    if (!MASTER_DECK_IDS.has(cloudId)) return;
+    refreshed.current = true;
+    void (async () => {
+      try {
+        const res = await load({ data: { deckId: cloudId } });
+        const { brief, deck } = cloudDeckToLocal(res as CloudDeckPayload);
+        hydrateDeck({ brief, deck });
+        useDeckStore.getState().markCloudLinked(deck.id, true);
+      } catch {
+        /* keep the cached copy; the full-load path surfaces failures */
+      }
+    })();
+  }, [hydrated, hasDeck, cloudId, load, hydrateDeck]);
 
   if (!hydrated) return { ready: false, fallback: <DeckHydratingFallback label={loadingLabel} /> };
   if (hasDeck) return { ready: true, fallback: null };
