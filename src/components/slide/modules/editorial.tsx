@@ -30,6 +30,7 @@ import { fillPx, statPx, clampLines } from "@/lib/open-space-fill";
 import { useSlideInk } from "../SlideChrome";
 import type { CSSProperties } from "react";
 import { Blend, Target } from "lucide-react";
+import { LoopHalo } from "./process";
 
 registerSlideModule({
   id: "family:editorial",
