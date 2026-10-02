@@ -93,17 +93,25 @@ registerSlideModule({
                         <stop offset="100%" stopColor={aiInk} stopOpacity={0} />
                       </radialGradient>
                     </defs>
-                    <style>{`
-                      @keyframes loopFlow { to { stroke-dashoffset: -32; } }
-                      @keyframes loopOrbit { from { offset-distance: 0%; } to { offset-distance: 100%; } }
-                      @keyframes loopPulse { 0%, 100% { transform: scale(1); opacity: 0; } 8% { opacity: 0.9; } 30% { transform: scale(1.55); opacity: 0; } }
-                      .loop-flow { animation: loopFlow 1.4s linear infinite; }
-                      .loop-comet { offset-path: path("M ${CX} ${CY - R} A ${R} ${R} 0 1 1 ${CX - 0.01} ${CY - R}"); offset-rotate: 0deg; animation: loopOrbit ${N * 1.6}s linear infinite; }
-                      .loop-pulse { animation: loopPulse ${N * 1.6}s ease-out infinite; }
-                      @media (prefers-reduced-motion: reduce) { .loop-flow, .loop-comet, .loop-pulse { animation: none; } .loop-comet { offset-distance: 0%; } }
-                    `}</style>
                     <circle cx={CX} cy={CY} r={R - 40} fill="url(#loopCore)" />
                     <circle cx={CX} cy={CY} r={R} fill="none" stroke={ink.hairline} strokeWidth={1.5} />
+                    <circle cx={CX} cy={CY} r={R - 70} fill="none" stroke={ink.hairline} strokeDasharray="2 8" />
+                    {runs.map((r, k) => {
+                      if (r.k === "out") return null;
+                      const a0 = ang(r.from) - seg * 0.32;
+                      const a1 = ang(r.to) + seg * 0.32;
+                      const id = `phase-${k}`;
+                      return (
+                        <g key={id}>
+                          <path id={id} d={Math.sin((a0 + a1) / 2) > 0.2 ? (() => { const rr = R + 46; const [x0, y0] = pt(a1, rr); const [x1, y1] = pt(a0, rr); return `M ${x0} ${y0} A ${rr} ${rr} 0 ${a1 - a0 > Math.PI ? 1 : 0} 0 ${x1} ${y1}`; })() : arcPath(a0, a1, R + 46)} fill="none" stroke={tone(r.k)} strokeOpacity={0.22} strokeWidth={22} strokeLinecap="round" />
+                          <text fill={tone(r.k)} style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.32em" }} dy={4.5}>
+                            <textPath href={`#${id}`} startOffset="50%" textAnchor="middle">
+                              {r.k === "ai" ? "AI" : "HUMAN"}
+                            </textPath>
+                          </text>
+                        </g>
+                      );
+                    })}
                     {/* Inner tick track: a timeline scale round the loop */}
                     {Array.from({ length: N * 8 }).map((_, j) => {
                       const a = -Math.PI / 2 + (j / (N * 8)) * Math.PI * 2;
@@ -121,16 +129,15 @@ registerSlideModule({
                       const head = `M ${hx + Math.cos(ta - 2.5) * 12} ${hy + Math.sin(ta - 2.5) * 12} L ${hx} ${hy} L ${hx + Math.cos(ta + 2.5) * 12} ${hy + Math.sin(ta + 2.5) * 12}`;
                       return (
                         <g key={`seg-${i}`}>
-                          <path d={arcPath(a0, a1, R)} fill="none" stroke={tone(k)} strokeWidth={4} strokeLinecap="round" />
-                          <path d={head} fill="none" stroke={tone(k)} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
-                          <path className="loop-flow" d={arcPath(a0, a1 - 0.04, R)} fill="none" stroke={isDark ? "#FFFFFF" : "#03002C"} strokeOpacity={0.55} strokeWidth={2} strokeDasharray="3 13" strokeLinecap="round" />
+                          <linearGradient id={`lseg-${i}`} gradientUnits="userSpaceOnUse" x1={pt(a0)[0]} y1={pt(a0)[1]} x2={pt(a1)[0]} y2={pt(a1)[1]}>
+                            <stop offset="0%" stopColor={tone(k)} stopOpacity={0.35} />
+                            <stop offset="100%" stopColor={tone(kindOf(steps[(i + 1) % N], (i + 1) % N))} />
+                          </linearGradient>
+                          <path d={arcPath(a0, a1, R)} fill="none" stroke={`url(#lseg-${i})`} strokeWidth={10} strokeLinecap="round" />
+                          <path d={head} fill="none" stroke={tone(k)} strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" />
                         </g>
                       );
                     })}
-                    <g className="loop-comet">
-                      <circle r={16} fill={aiInk} opacity={0.18} />
-                      <circle r={7} fill={isDark ? "#FFFFFF" : "#03002C"} />
-                    </g>
                   </svg>
                   {/* Centre */}
                   <div
@@ -155,21 +162,21 @@ registerSlideModule({
                     const right = Math.cos(a) > 0.2;
                     const left = Math.cos(a) < -0.2;
                     const below = Math.sin(a) > 0.5;
-                    const [lx, ly] = pt(a, R + 66);
+                    const [lx, ly] = pt(a, R + 84);
                     const out = k === "out";
                     return (
                       <React.Fragment key={i}>
                         <div
                           aria-hidden
-                          className="loop-pulse absolute rounded-full"
+                          className="absolute rounded-full"
                           style={{
-                            left: x - size / 2,
-                            top: y - size / 2,
-                            width: size,
-                            height: size,
-                            border: `2px solid ${tone(k)}`,
-                            opacity: 0,
-                            animationDelay: `${i * 1.6}s`,
+                            left: x - size / 2 - 12,
+                            top: y - size / 2 - 12,
+                            width: size + 24,
+                            height: size + 24,
+                            border: `1px solid ${tone(k)}`,
+                            opacity: 0.35,
+                            background: `color-mix(in oklab, ${tone(k)} 8%, transparent)`,
                           }}
                         />
                         <div
@@ -190,9 +197,9 @@ registerSlideModule({
                         <div
                           className="absolute"
                           style={{
-                            left: right ? lx - 8 : left ? lx - 232 : lx - 120,
-                            top: below ? ly - 18 : ly - 40,
-                            width: 240,
+                            left: right ? lx + 6 : left ? lx - 176 : lx - 90,
+                            top: below ? ly - 10 : ly - 52,
+                            width: 170,
                             textAlign: right ? "left" : left ? "right" : "center",
                           }}
                         >
@@ -200,7 +207,7 @@ registerSlideModule({
                             {String(i + 1).padStart(2, "0")}
                           </div>
                           <div style={{ marginTop: 4, fontSize: fillPx(24, "body"), fontWeight: 600, lineHeight: 1.15, color: ink.strong }}>
-                            {s(it.label)}
+                            {s(it.label).replace(/-/g, "\u2011")}
                           </div>
                         </div>
                       </React.Fragment>
@@ -230,8 +237,8 @@ registerSlideModule({
                             >
                               {i + 1}
                             </div>
-                            <div className="mt-3 px-1" style={{ fontSize: 15, lineHeight: 1.2, fontWeight: 600, color: ink.strong, opacity: 0.85 }}>
-                              {s(it.label)}
+                            <div className="mt-3 px-1" style={{ fontSize: 15, lineHeight: 1.2, fontWeight: 600, color: ink.strong, opacity: 0.85, textWrap: "balance" }}>
+                              {s(it.label).replace(/-/g, "\u2011")}
                             </div>
                           </div>
                         );
