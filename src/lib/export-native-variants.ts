@@ -175,6 +175,10 @@ export const DRIFTED_NATIVE_RENDERER_IDS: readonly string[] = [
   "MV-PROOF-LOGOS",
   "MV-PROOF-LOGOS-MOSAIC",
   "MV-PROOF-CERT-ORBITS",
+  // Capability cards on screen: photo, glass label band, white copy on dark.
+  // The hand-written renderer still draws pale cards with white-on-white
+  // labels (TECHNOLOGY / PRODUCTS failed contrast at 1:1).
+  "MV-SOL-CAP-CARDS",
   // The KPI dashboard on screen is a bento mosaic (hero tile, ring gauge,
   // sparkline, bar tiles); the hand-written renderer still draws a uniform
   // card grid with a bottom gauge, so sizing and layout diverge on export.

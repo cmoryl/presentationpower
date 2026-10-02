@@ -25,7 +25,14 @@
 import { isAuthoringChrome } from "./export-chrome-suppress";
 import { mapFontFamily } from "./pptx-font-map";
 import { STAGE_H, STAGE_W } from "./export-quality";
-import { linePitch, measureLines, type MeasuredLine } from "./export-text-lines";
+import {
+  inlineTextNodes,
+  linePitch,
+  measureInlineLines,
+  measureLines,
+  type InlineLine,
+  type MeasuredLine,
+} from "./export-text-lines";
 
 export interface TextRun {
   /** Content-box geometry in stage pixels (1920×1080 space). */
@@ -66,6 +73,23 @@ export interface TextRun {
   lines?: MeasuredLine[];
   /** Median vertical pitch between measured lines (stage px, 0 when unknown). */
   linePitchPx?: number;
+  /**
+   * Mixed-style paragraph: visual lines of styled segments in reading order.
+   * `segStyles[i]` is the character style of segment owner `i`. When present
+   * the run already contains its inline children's text; they are not
+   * captured as separate runs.
+   */
+  segLines?: InlineLine[];
+  segStyles?: Array<{
+    fontSizePx: number;
+    fontFamily: string;
+    bold: boolean;
+    italic: boolean;
+    underline: boolean;
+    color: string;
+    letterSpacingPx: number;
+    textTransform: string;
+  }>;
   /** Vertical placement inside the box. */
   valign: "top" | "middle";
   /** Paragraph-level metrics (stage px) read off the settled DOM. */
@@ -242,6 +266,8 @@ function isPaintedText(cs: CSSStyleDeclaration): boolean {
   return clip === "text";
 }
 
+const isInlineDisplay = (d: string) => d === "inline" || d === "contents";
+
 function directText(el: Element): string {
   let out = "";
   el.childNodes.forEach((n) => {
@@ -282,6 +308,8 @@ export function extractTextRuns(
 
   const runs: TextRun[] = [];
   const nodes: HTMLElement[] = [];
+  // Inline children already folded into a parent's mixed-style paragraph.
+  const consumed = new WeakSet<Element>();
 
   const walker = document.createTreeWalker(stage, NodeFilter.SHOW_ELEMENT);
   let node = walker.nextNode() as HTMLElement | null;
@@ -293,9 +321,26 @@ export function extractTextRuns(
     if (el.closest("svg")) continue;
     // Authoring-only labels ("Safe area", "Bleed", handle hints) never export.
     if (isAuthoringChrome(el)) continue;
+    if (consumed.has(el)) continue;
 
-    const text = directText(el);
-    if (!text) continue;
+    let text = directText(el);
+    if (!text) {
+      // A paragraph built only from inline styled spans ("<span>Maintain </span>
+      // <span>100%</span><span> accuracy…</span>") has no text of its own, so
+      // each span used to float as its own box. Capture it as one paragraph
+      // when every child is inline and at least two carry text.
+      const kids = Array.from(el.children);
+      const ecs = getComputedStyle(el);
+      if (
+        kids.length >= 2 &&
+        !isInlineDisplay(ecs.display) &&
+        kids.every((k) => isInlineDisplay(getComputedStyle(k).display)) &&
+        kids.filter((k) => (k.textContent ?? "").trim()).length >= 2
+      ) {
+        text = (el.textContent ?? "").replace(/\s+/g, " ").trim();
+      }
+      if (!text) continue;
+    }
 
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none") continue;
@@ -376,6 +421,53 @@ export function extractTextRuns(
       }
     }
 
+    // Mixed-style paragraph: own text interleaved with inline styled children.
+    let segLines: InlineLine[] | undefined;
+    let segStyles: TextRun["segStyles"];
+    const inl = inlineTextNodes(el);
+    if (
+      align !== "justify" &&
+      inl.inlineEls.some((c) => (c.textContent ?? "").trim()) &&
+      !inl.inlineEls.some((c) => {
+        const ccs = getComputedStyle(c);
+        return isPaintedText(ccs) || isRotatedOrSkewed(ccs);
+      })
+    ) {
+      const measured = measureInlineLines(el, { left: stageRect.left, top: stageRect.top }, sx, sy);
+      if (measured.lines.length) {
+        segLines = measured.lines;
+        segStyles = measured.owners.map((o) => {
+          const ocs = getComputedStyle(o);
+          const op = resolveColor(ocs.color) ?? paint;
+          const oflat = blendOverBackdrop(o, { hex: op.hex, alpha: op.alpha * cumulativeOpacity(o) });
+          const ow = parseInt(ocs.fontWeight, 10);
+          const ols = parseFloat(ocs.letterSpacing);
+          return {
+            fontSizePx: (parseFloat(ocs.fontSize) || 16) * sy,
+            fontFamily: firstFamily(ocs.fontFamily),
+            bold: Number.isFinite(ow) ? ow >= 600 : /bold/i.test(ocs.fontWeight),
+            italic: ocs.fontStyle === "italic",
+            underline: ocs.textDecorationLine?.includes("underline") ?? false,
+            color: oflat.hex,
+            letterSpacingPx: Number.isFinite(ols) ? ols * sx : 0,
+            textTransform: ocs.textTransform,
+          };
+        });
+        inl.inlineEls.forEach((c) => {
+          consumed.add(c);
+          if (c instanceof HTMLElement) nodes.push(c);
+        });
+        text = segLines.map((l) => l.text).join(" ");
+        if (segLines.length > 1) {
+          lines = segLines;
+          linePitchPx = linePitch(segLines);
+        } else {
+          lines = undefined;
+          linePitchPx = 0;
+        }
+      }
+    }
+
     const ws = directTextBoundaryWs(el);
     runs.push({
       x,
@@ -395,10 +487,12 @@ export function extractTextRuns(
       align,
       lineHeightPx,
       letterSpacingPx,
-      singleLine,
+      singleLine: segLines ? segLines.length === 1 : singleLine,
       lines,
       linePitchPx,
-      valign: singleLine ? "middle" : "top",
+      segLines,
+      segStyles,
+      valign: (segLines ? segLines.length === 1 : singleLine) ? "middle" : "top",
       paragraph: {
         textIndentPx: (parseFloat(cs.textIndent) || 0) * sx,
         padLeftPx: padL * sx,

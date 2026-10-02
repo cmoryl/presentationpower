@@ -82,6 +82,8 @@ function blockOf(runs: TextRun[], wrap: boolean): MergedTextBlock {
  * gap no wider than a space, are one line with mixed styling.
  */
 function sameLine(a: TextRun, b: TextRun): boolean {
+  // A mixed-style paragraph already carries its inline segments in place.
+  if (a.segLines || b.segLines) return false;
   if (!b.singleLine) return false;
   if (a.align !== b.align) return false;
   const sizeRatio =
@@ -122,12 +124,19 @@ function continuation(a: MergedTextBlock, b: MergedTextBlock): boolean {
   if (a.runs.length !== 1 || b.runs.length !== 1) return false;
   const ra = a.runs[0]!;
   const rb = b.runs[0]!;
+  if (ra.segLines || rb.segLines) return false;
   if (styleKey(ra) !== styleKey(rb)) return false;
+  // List items / directory rows are separate paragraphs: merging them made
+  // PowerPoint re-flow a column of cities or bullets into one run-on blob.
+  if (ra.paragraph.listMarker != null || rb.paragraph.listMarker != null) return false;
   if (hOverlapRatio(a, b) < 0.5) return false;
   const line = ra.lineHeightPx > 0 ? ra.lineHeightPx : ra.fontSizePx * 1.2;
   const gap = b.y - bottom(a);
-  // Directly below (one line feed) or inside the pre-wrapped box's span.
-  return gap <= line * 0.6 && b.y >= a.y - line * 0.2;
+  // A true continuation sits flush on the next line box (or inside the
+  // pre-wrapped box). Any visible gap means a separate stacked paragraph.
+  // A tail fragment under a pre-wrapped box keeps the looser allowance.
+  const allow = ra.singleLine ? Math.max(1.5, line * 0.08) : line * 0.6;
+  return gap <= allow && b.y >= a.y - line * 0.2;
 }
 
 /**
