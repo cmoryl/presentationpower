@@ -38,7 +38,8 @@ registerSlideModule({
               {arr(c.items).map((it, i) => {
                 const name = s(it.name ?? it.client);
                 const logoUrl = pickLogoForMode(it, mode);
-                const logoPath = s(it.logoPath);
+                const whiteLogo = isDark ? s(it.logoWhite) : "";
+                const logoPath = whiteLogo ? "" : s(it.logoPath);
                 const result = s(it.result);
                 return (
                   <div
@@ -68,7 +69,7 @@ registerSlideModule({
                           url={logoUrl}
                           alt={name ? `${name} logo` : "Client logo"}
                           className="max-h-[110px] max-w-[80%] object-contain"
-                          style={isDark ? { filter: "brightness(0) invert(1)" } : undefined}
+                          style={isDark && !whiteLogo ? { filter: "brightness(0) invert(1)" } : undefined}
                         />
                       ) : (
                         <div
@@ -342,7 +343,8 @@ registerSlideModule({
               >
                 {all.map((it, i) => {
                   const url = pickLogoForMode(it, mode);
-                  const path = s(it.logoPath);
+                  const whiteLogo = isDark ? s(it.logoWhite) : "";
+                  const path = whiteLogo ? "" : s(it.logoPath);
                   const name = s(it.name);
                   return (
                     <div
@@ -351,7 +353,7 @@ registerSlideModule({
                       style={isDark ? { background: "linear-gradient(160deg, rgba(127,179,245,0.16) 0%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.02) 100%)", border: "1px solid rgba(255,255,255,0.16)", borderBottom: `2px solid ${["#7FB3F5", "#7FE3F5", "#C2A3FF"][i % 3]}88`, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2)", backdropFilter: "blur(14px)" } : { background: "rgba(255,255,255,0.72)", border: `1px solid ${ink.hairline}` }}
                     >
                       {url || path ? (
-                        <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-[70%] max-w-[85%] object-contain" style={isDark ? { filter: "brightness(0) invert(1)" } : undefined} />
+                        <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-[70%] max-w-[85%] object-contain" style={isDark && !whiteLogo ? { filter: "brightness(0) invert(1)" } : undefined} />
                       ) : (
                         <div className="text-center font-semibold" style={{ color: isDark ? "#FFFFFF" : brand.tokens.primary, fontSize: 18 }}>{name}</div>
                       )}
