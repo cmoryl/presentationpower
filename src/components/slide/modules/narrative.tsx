@@ -450,6 +450,14 @@ registerSlideModule({
                     </div>
                   )}
                   <div className="relative">
+                  {(() => {
+                    // Optional lockup over the hero: white version on dark,
+                    // full-colour version on light (falls back to the other).
+                    const src = isDark ? s(hero.logo) || s(hero.logoLight) : s(hero.logoLight) || s(hero.logo);
+                    return src ? (
+                      <img src={src} alt={s(hero.logoAlt) || ""} className="mb-8 block" style={{ height: 56, width: "auto" }} />
+                    ) : null;
+                  })()}
                   {s(hero.kicker) && <Kicker brand={brand}>{s(hero.kicker)}</Kicker>}
                   <Hairline
                     color={"var(--slide-accent-text)"}
