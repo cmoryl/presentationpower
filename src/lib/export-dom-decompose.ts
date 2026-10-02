@@ -1044,9 +1044,12 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
       } else if (tag === "SVG") {
         src = svgDataUrl(el as unknown as SVGSVGElement, w, h);
         fit = "contain";
-        const svg = el as unknown as SVGSVGElement;
-        natW = svg.viewBox?.baseVal?.width || w;
-        natH = svg.viewBox?.baseVal?.height || h;
+        // The serialized SVG (and its PNG raster) already carries the on-screen
+        // "meet" letterbox at the element's own box size, so its aspect IS the
+        // box. Using the viewBox aspect here contain-fitted a box-shaped raster
+        // into a viewBox-shaped frame and stretched every location map.
+        natW = w;
+        natH = h;
       } else if (tag === "VIDEO") {
         const v = el as HTMLVideoElement;
         src = v.poster || null;
