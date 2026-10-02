@@ -2008,6 +2008,12 @@ export function isGhostPaint(
   const alpha = paintAlpha(s);
   // Effectively unpainted: nothing to lose, everything to gain.
   if (alpha <= 0.035) return true;
+  // A visible rounded card sitting inside the layout (not touching the stage
+  // edges) is a designed box, however faint: keep it selectable.
+  const inside =
+    s.x > space.w * 0.02 && s.y > space.h * 0.02 &&
+    s.x + s.w < space.w * 0.98 && s.y + s.h < space.h * 0.98;
+  if (s.kind === "roundRect" && s.radiusPx >= 4 && inside && s.w < space.w * 0.8) return false;
 
   const wideStrip = s.h >= space.h * 0.55 && s.w <= space.w * 0.16;
   const tallStrip = s.w >= space.w * 0.55 && s.h <= space.h * 0.16;
