@@ -467,24 +467,50 @@ registerSlideModule({
                     thicknessPx={2}
                     className="mt-4 mb-6"
                   />
-                  <div
-                    style={{
-                      fontSize: fillPx(48, "figure"),
-                      fontWeight: 600,
-                      letterSpacing: "-0.02em",
-                      lineHeight: 1.05,
-                      color: ink.strong,
-                    }}
-                  >
-                    {s(hero.title)}
-                  </div>
-                  <SupportingText size="md" opacity={0.78} className="mt-5" maxWidthPx={560}>
-                    {stack
-                      ? s(hero.body).split(/(\d+(?:\.\d+)?%)/).map((part, k) =>
-                          /%$/.test(part) ? <span key={k} style={{ color: "#7FE3F5", fontWeight: 700 }}>{part}</span> : part,
-                        )
-                      : s(hero.body)}
-                  </SupportingText>
+                  {(() => {
+                    const callout = stack && !s(hero.logo) && !s(hero.logoLight);
+                    const parts = s(hero.body).split(/\s+·\s+/).filter(Boolean);
+                    return (
+                      <>
+                        <div
+                          style={{
+                            fontSize: callout ? 78 : fillPx(48, "figure"),
+                            fontWeight: callout ? 700 : 600,
+                            letterSpacing: "-0.02em",
+                            lineHeight: callout ? 1.02 : 1.05,
+                            color: ink.strong,
+                            textShadow: callout && isDark ? "0 0 40px rgba(127,179,245,0.45)" : undefined,
+                          }}
+                        >
+                          {s(hero.title)}
+                        </div>
+                        {callout && (
+                          <div aria-hidden className="mt-7 flex gap-2">
+                            <span style={{ width: 96, height: 4, borderRadius: 2, background: "#7FE3F5", boxShadow: "0 0 14px #7FE3F5" }} />
+                            <span style={{ width: 40, height: 4, borderRadius: 2, background: "#C2A3FF", boxShadow: "0 0 14px #C2A3FF" }} />
+                          </div>
+                        )}
+                        {callout && parts.length > 1 ? (
+                          <ul className="mt-8 space-y-4" style={{ maxWidth: 600 }}>
+                            {parts.map((p, k) => (
+                              <li key={k} className="flex items-start gap-4" style={{ fontSize: 26, lineHeight: 1.3, color: isDark ? "rgba(255,255,255,0.88)" : ink.strong }}>
+                                <span aria-hidden style={{ marginTop: 12, width: 9, height: 9, borderRadius: 9, flexShrink: 0, background: ["#7FB3F5", "#7FE3F5", "#C2A3FF", "#A6C8FF"][k % 4], boxShadow: `0 0 10px ${["#7FB3F5", "#7FE3F5", "#C2A3FF", "#A6C8FF"][k % 4]}` }} />
+                                {p}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <SupportingText size="md" opacity={0.78} className="mt-5" maxWidthPx={560}>
+                            {stack
+                              ? s(hero.body).split(/(\d+(?:\.\d+)?%)/).map((part, k) =>
+                                  /%$/.test(part) ? <span key={k} style={{ color: "#7FE3F5", fontWeight: 700 }}>{part}</span> : part,
+                                )
+                              : s(hero.body)}
+                          </SupportingText>
+                        )}
+                      </>
+                    );
+                  })()}
                   </div>
                 </GlassTile>
                 {stack && (
