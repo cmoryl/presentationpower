@@ -167,6 +167,14 @@ const NATIVE_SET = new Set<string>(NATIVE_EMITTER_VARIANT_IDS);
  * PowerPoint objects. That is both faithful AND editable.
  */
 export const DRIFTED_NATIVE_RENDERER_IDS: readonly string[] = [
+  // General Slides master (Oct 2026): the on-screen builds carry glass tiles,
+  // white logo variants, layered rings, the circular quality dial and glow
+  // badges the hand-written renderers never draw. Layered route: those effects
+  // ship as transparent PNG pictures, copy stays native text.
+  "MV-MATURITY-CURVE",
+  "MV-PROOF-LOGOS",
+  "MV-PROOF-LOGOS-MOSAIC",
+  "MV-PROOF-CERT-ORBITS",
   // The KPI dashboard on screen is a bento mosaic (hero tile, ring gauge,
   // sparkline, bar tiles); the hand-written renderer still draws a uniform
   // card grid with a bottom gauge, so sizing and layout diverge on export.
