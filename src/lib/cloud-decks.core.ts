@@ -379,6 +379,7 @@ export async function saveDeckToCloudCore(
     // Ids are deterministic, so an upsert updates in place instead of colliding.
     const { error: slideErr } = await sb.from("deck_slides").upsert(rows);
     if (slideErr) {
+      console.error("[saveDeck] upsert failed", deckUuid, parked.length, rows.length, JSON.stringify(rows.map((r) => [r.id.slice(0, 8), r.position])));
       // Put the saved order back so a failed save changes nothing.
       for (const r of parked) {
         await sb.from("deck_slides").update({ position: r.position }).eq("id", r.id);
