@@ -886,7 +886,12 @@ function decorativeLayersOf(el: Element): HTMLElement[] | null {
   // Cards only: round discs (step orbs, rings) and media tiles keep their own
   // dedicated export paths; a card must carry copy of its own.
   if (!(el.textContent ?? "").trim()) return null;
-  if (el.querySelector("img,video,canvas")) return null;
+  // Logos and icons inside a panel export natively on top of the box picture;
+  // only a media tile whose picture fills most of the box keeps its own path.
+  for (const m of Array.from(el.querySelectorAll("img,video,canvas"))) {
+    const mr = m.getBoundingClientRect();
+    if (mr.width * mr.height >= r.width * r.height * 0.6) return null;
+  }
   const ecs = getComputedStyle(el);
   const rad = parseFloat(ecs.borderTopLeftRadius) || 0;
   if (rad >= Math.min(r.width, r.height) / 2 - 1 || ecs.borderTopLeftRadius.includes("%")) return null;
