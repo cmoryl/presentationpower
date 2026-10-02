@@ -162,7 +162,7 @@ registerSlideModule({
                     const right = Math.cos(a) > 0.2;
                     const left = Math.cos(a) < -0.2;
                     const below = Math.sin(a) > 0.5;
-                    const [lx, ly] = pt(a, R + 66);
+                    const [lx, ly] = pt(a, R + 84);
                     const out = k === "out";
                     return (
                       <React.Fragment key={i}>
