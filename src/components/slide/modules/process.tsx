@@ -56,6 +56,7 @@ function LoopHalo({ uid, slim = false }: { uid: string; slim?: boolean }) {
           <feGaussianBlur stdDeviation="1.2" />
         </filter>
       </defs>
+      <circle cx="50" cy="50" r="55" fill="none" stroke={`url(#lh-${uid})`} strokeOpacity="0.32" strokeWidth={slim ? 0.35 : 0.5} />
       <circle cx="50" cy="50" r="49" fill="none" stroke={`url(#lh-${uid})`} strokeOpacity="0.28" strokeWidth={slim ? 2.2 : 3.4} filter={`url(#lg-${uid})`} />
       {nodes.map((d, i) => {
         const [x1, y1] = pt(d + 8, 48.5), [x2, y2] = pt(d + 82, 48.5);
