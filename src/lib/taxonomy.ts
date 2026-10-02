@@ -5710,7 +5710,7 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
   {
     id: "MV-STAT-PROOF-BOARD",
     familyId: "MF-05",
-    name: "Stat — proof board (hero results + scale rail)",
+    name: "Stat — proof board (headline results + scale rail)",
     description:
       "Up to four headline results with rings for percentages, beside a rail of up to eight scale figures",
     permittedLayoutIds: ["LF-11", "LF-13"],
