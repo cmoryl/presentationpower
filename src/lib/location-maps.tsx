@@ -1341,6 +1341,7 @@ export function WorldMap({
       (p) => p.lat >= b.latMin && p.lat <= b.latMax && p.lon >= b.lonMin && p.lon <= b.lonMax,
     );
   }, [pins, region, bounds]);
+  const pinScale = visiblePins.length > 100 ? 0.55 : visiblePins.length > 40 ? 0.68 : 1;
 
   // Optionally build spoke arcs from HQ pins to the rest
   const spokes = React.useMemo(() => {
