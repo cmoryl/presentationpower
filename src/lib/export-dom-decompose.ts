@@ -1489,7 +1489,15 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
       // plain boxes fall through and stay native editable shapes.
       {
         const bf = (cs as unknown as { backdropFilter?: string }).backdropFilter || "none";
-        const glass = bf !== "none" && /blur\(/.test(bf);
+        const frosted = bf !== "none" && /blur\(/.test(bf);
+        // Translucent tinted card with a hairline edge = the house glass card.
+        const am = (cs.backgroundColor || "").match(/rgba?\([^)]*?,\s*([\d.]+)\)$/);
+        const tintAlpha = am ? parseFloat(am[1]) : /rgb\(/.test(cs.backgroundColor) ? 1 : 0;
+        const translucent = (tintAlpha > 0 && tintAlpha < 0.5) || /gradient/.test(cs.backgroundImage || "");
+        const edged = ["Top", "Right", "Bottom", "Left"].some(
+          (sd) => (parseFloat((cs as unknown as Record<string, string>)[`border${sd}Width`]) || 0) > 0,
+        );
+        const glass = frosted || (translucent && edged && !!(el.textContent ?? "").trim());
         if (glass && (parseFloat(cs.borderTopLeftRadius) || 0) >= 4) {
           const box = surfaceShapeFor(el, cs, root, sx, sy, spaceW, spaceH);
           if (box) {
