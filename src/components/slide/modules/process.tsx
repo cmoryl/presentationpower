@@ -57,6 +57,16 @@ export function LoopHalo({ uid, slim = false }: { uid: string; slim?: boolean })
         </filter>
       </defs>
       <circle cx="50" cy="50" r="55" fill="none" stroke={`url(#lh-${uid})`} strokeOpacity="0.32" strokeWidth={slim ? 0.35 : 0.5} />
+      {[
+        { r: 59, from: 200, to: 380, o: 0.4 },
+        { r: 62.5, from: -20, to: 70, o: 0.32 },
+        { r: 62.5, from: 110, to: 160, o: 0.22 },
+        { r: 52, from: 20, to: 110, o: 0.3 },
+      ].map((a, i) => {
+        const [x1, y1] = pt(a.from, a.r), [x2, y2] = pt(a.to, a.r);
+        const large = a.to - a.from > 180 ? 1 : 0;
+        return <path key={`pa-${i}`} d={`M${x1} ${y1} A${a.r} ${a.r} 0 ${large} 1 ${x2} ${y2}`} fill="none" stroke={`url(#lh-${uid})`} strokeOpacity={a.o} strokeWidth={slim ? 0.3 : 0.45} strokeLinecap="round" />;
+      })}
       <circle cx="50" cy="50" r="49" fill="none" stroke={`url(#lh-${uid})`} strokeOpacity="0.28" strokeWidth={slim ? 2.2 : 3.4} filter={`url(#lg-${uid})`} />
       {nodes.map((d, i) => {
         const [x1, y1] = pt(d + 8, 48.5), [x2, y2] = pt(d + 82, 48.5);
