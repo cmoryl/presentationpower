@@ -200,6 +200,28 @@ export async function saveDeckToCloudCore(
   const sb = supabase as MinimalSb;
   const briefUuid = toUuid(`brief:${userId}:${data.brief.id}`);
   let deckUuid = toUuid(`deck:${userId}:${data.deck.id}`);
+  // A deck opened straight from the cloud ("cloud-<uuid>") saves back to that
+  // row — a shared template edited by an admin/brand lead must update the
+  // template itself, not a private shadow copy. RLS still decides who may write.
+  let deckOwner = userId;
+  {
+    const m = /^cloud-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i.exec(
+      data.deck.id,
+    );
+    if (m) {
+      const { data: linked } = await sb
+        .from("decks")
+        .select("id, owner_id, is_template")
+        .eq("id", m[1]);
+      const row = Array.isArray(linked)
+        ? (linked[0] as { id: string; owner_id: string; is_template: boolean } | undefined)
+        : undefined;
+      if (row && (row.owner_id === userId || row.is_template)) {
+        deckUuid = row.id;
+        deckOwner = row.owner_id;
+      }
+    }
+  }
 
   // Reference columns are FK-checked in the database; unknown/synthetic ids are
   // stored as NULL rather than failing the whole save.
@@ -270,7 +292,7 @@ export async function saveDeckToCloudCore(
 
   const { error: deckErr } = await sb.from("decks").upsert({
     id: deckUuid,
-    owner_id: userId,
+    owner_id: deckOwner,
     brief_id: briefUuid,
     title: data.deck.title,
     archetype_id: deckArchetype,
