@@ -10,6 +10,22 @@ import { ClientLogoImg, pickLogoForMode } from "../client-logo";
 import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { resolveCertStyle } from "@/lib/cert-style";
+import { LoopHalo } from "./process";
+
+const GLOWS = ["#7FB3F5", "#7FE3F5", "#C2A3FF"];
+
+/** Thin ring whose arc runs exactly to the percentage. */
+function PctRing({ pct, glow, uid }: { pct: number; glow: string; uid: string }) {
+  const r = 40, C = 2 * Math.PI * r, v = Math.max(0, Math.min(100, pct));
+  return (
+    <svg aria-hidden data-decorative viewBox="0 0 100 100" width={104} height={104} style={{ flexShrink: 0, overflow: "visible" }}>
+      <defs><linearGradient id={`pr-${uid}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#7FE3F5" /><stop offset="1" stopColor={glow} /></linearGradient></defs>
+      <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.6" strokeDasharray="0.5 1.6" />
+      <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="7" />
+      <circle cx="50" cy="50" r={r} fill="none" stroke={`url(#pr-${uid})`} strokeWidth="7" strokeLinecap="round" strokeDasharray={`${(v / 100) * C} ${C}`} transform="rotate(-90 50 50)" style={{ filter: `drop-shadow(0 0 4px ${glow})` }} />
+    </svg>
+  );
+}
 
 const MAX_CERTS = 3;
 const MAX_POINTS = 6;
@@ -109,6 +125,19 @@ registerSlideModule({
               >
                 {highlights.map((h, i) => {
                   const { figure, label } = splitStat(h);
+                  const pct = parseFloat(figure);
+                  if (isDark && figure && /%$/.test(figure) && !Number.isNaN(pct)) {
+                    const g = GLOWS[(i * 2) % 3];
+                    return (
+                      <div key={i} className="flex min-w-0 flex-1 items-center" style={{ gap: 20, padding: "18px 22px", borderRadius: 16, background: "linear-gradient(160deg, rgba(255,255,255,0.11), rgba(255,255,255,0.03))", border: "1px solid rgba(255,255,255,0.14)", borderBottom: `2px solid ${g}AA`, boxShadow: `inset 0 1px 0 rgba(255,255,255,0.18), 0 18px 40px -26px ${g}` }}>
+                        <div className="relative flex items-center justify-center" style={{ width: 104, height: 104, flexShrink: 0 }}>
+                          <PctRing pct={pct} glow={g} uid={`cs-${i}`} />
+                          <span className="absolute" style={{ fontSize: fillPx(30, "display"), fontWeight: 800, color: "#FFFFFF" }}>{figure}</span>
+                        </div>
+                        <span style={{ fontSize: fillPx(18, "body"), fontWeight: 700, lineHeight: 1.25, letterSpacing: "0.06em", textTransform: "uppercase", color: "#FFFFFF" }}>{label}</span>
+                      </div>
+                    );
+                  }
                   return (
                     <div
                       key={i}
@@ -208,7 +237,8 @@ registerSlideModule({
                           width: 4,
                           alignSelf: "stretch",
                           borderRadius: 2,
-                          background: decoAccent,
+                          background: isDark ? `linear-gradient(180deg, ${GLOWS[i % 3]}, ${GLOWS[(i + 1) % 3]})` : decoAccent,
+                          boxShadow: isDark ? `0 0 10px ${GLOWS[i % 3]}88` : undefined,
                           flexShrink: 0,
                         }}
                       />
@@ -325,6 +355,7 @@ registerSlideModule({
                 const url = pickLogoForMode(cert, mode);
                 const path = s(cert.logoPath);
                 const indent = st.stagger * i;
+                const g = GLOWS[i % 3];
                 return (
                   <div
                     key={i}
@@ -332,12 +363,14 @@ registerSlideModule({
                     data-intro-step={3 + i}
                     className="relative flex min-w-0 items-start"
                     style={{
-                      background: cardBg,
-                      border: `1px solid ${cardBorder}`,
-                      borderLeft:
-                        st.accentBar > 0 ? `${st.accentBar}px solid ${accent}` : undefined,
-                      borderRadius: st.cardRadius,
-                      boxShadow: cardShadow,
+                      background: isDark ? "linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03))" : cardBg,
+                      border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : cardBorder}`,
+                      borderLeft: isDark ? undefined : st.accentBar > 0 ? `${st.accentBar}px solid ${accent}` : undefined,
+                      borderBottom: isDark ? `2px solid ${g}AA` : undefined,
+                      borderRadius: isDark ? 16 : st.cardRadius,
+                      boxShadow: isDark ? `inset 0 1px 0 rgba(255,255,255,0.2), 0 20px 44px -28px ${g}` : cardShadow,
+                      backdropFilter: isDark ? "blur(16px)" : undefined,
+                      alignItems: isDark ? "center" : undefined,
                       gap: 22,
                       padding: dense ? "20px 26px" : "26px 30px",
                       marginLeft: cardsFirst ? 0 : indent,
@@ -345,7 +378,15 @@ registerSlideModule({
                     }}
                   >
                     {/* ghost index numeral */}
-                    {st.showIndex && (
+                    {isDark && (
+                      <div aria-hidden data-decorative className="relative flex shrink-0 items-center justify-center" style={{ width: 78, height: 78, marginRight: 4 }}>
+                        <LoopHalo uid={`cert-${i}`} slim />
+                        <span className="relative flex items-center justify-center" style={{ width: 58, height: 58, borderRadius: 999, background: `radial-gradient(circle at 35% 30%, ${g}55, rgba(11,16,48,0.92) 70%)`, border: "1px solid rgba(255,255,255,0.3)", color: "#FFFFFF", fontSize: 22, fontWeight: 800 }}>
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                      </div>
+                    )}
+                    {st.showIndex && !isDark && (
                       <span
                         aria-hidden
                         data-decorative
@@ -423,7 +464,7 @@ registerSlideModule({
                                   width: 14,
                                   height: 2,
                                   borderRadius: 1,
-                                  background: accent,
+                                  background: isDark ? g : accent,
                                   flexShrink: 0,
                                   transform: "translateY(-5px)",
                                 }}
