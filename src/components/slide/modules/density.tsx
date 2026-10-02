@@ -39,34 +39,32 @@ function BigNumber({ value, unit, size, ink, unitColor }: { value: string; unit?
   );
 }
 
-/** Data-true dot chart: % → 50 dots filled to the share; counts → one dot per
- * scale unit (scale shown), so every dot is derived from the slide's figure. */
-function DotViz({ value, unit, color, track, caption }: { value: string; unit?: string; color: string; track: string; caption: string }) {
+/** Data-true scale bar: the fill ends exactly at the figure on a labelled
+ * axis (0–100% for shares; 0 → next round step above the count otherwise). */
+function ScaleBar({ value, unit, color, track, caption }: { value: string; unit?: string; color: string; track: string; caption: string }) {
   const raw = value.replace(/,/g, "").trim();
-  const k = /k$/i.test(raw) ? 1000 : 1;
-  const n = parseFloat(raw) * k;
+  const n = parseFloat(raw) * (/k$/i.test(raw) ? 1000 : 1);
   if (!Number.isFinite(n) || n <= 0) return null;
   const isPct = unit === "%";
-  let total: number;
-  let filled: number;
-  let note = "";
-  if (isPct) {
-    total = 50;
-    filled = Math.round(Math.min(100, n) / 2);
-  } else {
-    const scale = Math.pow(10, Math.max(0, Math.ceil(Math.log10(n / 50))));
-    filled = Math.max(1, Math.round(n / scale));
-    total = filled;
-    note = `Each dot = ${scale.toLocaleString("en-US")}`;
+  let max = 100;
+  if (!isPct) {
+    const mag = Math.pow(10, Math.floor(Math.log10(n)));
+    max = Math.ceil((n * 1.2) / mag) * mag;
   }
+  const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => f * max);
+  const frac = Math.min(1, n / max);
+  const fmt = (v: number) => (isPct ? `${v}%` : v >= 1000 ? `${(v / 1000).toLocaleString("en-US")}K` : String(v));
   return (
     <div aria-hidden>
-      <div className="grid gap-[5px]" style={{ gridTemplateColumns: "repeat(25, minmax(0, 1fr))" }}>
-        {Array.from({ length: total }, (_, i) => (
-          <span key={i} className="block aspect-square rounded-full" style={{ background: i < filled ? color : track }} />
+      <div className="relative h-[14px] rounded-full" style={{ background: track }}>
+        <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${frac * 100}%`, background: `linear-gradient(90deg, ${hexA(color, 0.25)}, ${color})` }} />
+        <div className="absolute top-1/2 h-[24px] w-[24px] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ left: `${frac * 100}%`, background: color, boxShadow: `0 0 0 5px ${hexA(color, 0.25)}` }} />
+      </div>
+      <div className="relative mt-3 h-[16px]">
+        {ticks.map((v, i) => (
+          <span key={i} className="absolute tabular-nums" style={{ left: `${(v / max) * 100}%`, transform: i === 0 ? "none" : i === 4 ? "translateX(-100%)" : "translateX(-50%)", fontSize: fillPx(13, "body"), color: caption }}>{fmt(v)}</span>
         ))}
       </div>
-      {note && <div className="mt-2" style={{ fontSize: fillPx(13, "body"), color: caption }}>{note}</div>}
     </div>
   );
 }
@@ -131,7 +129,7 @@ registerSlideModule({
                           {s(it.label)}
                         </div>
                         <div className="mt-auto pt-5">
-                          <DotViz value={s(it.value)} unit={s(it.unit)} color={isDark ? "#FFFFFF" : accent} track={ink.hairline} caption={ink.muted} />
+                          <ScaleBar value={s(it.value)} unit={s(it.unit)} color={isDark ? "#FFFFFF" : accent} track={ink.hairline} caption={ink.muted} />
                         </div>
                       </div>
                     );
