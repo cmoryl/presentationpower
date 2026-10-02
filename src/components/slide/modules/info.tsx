@@ -103,7 +103,7 @@ registerSlideModule({
                       const id = `phase-${k}`;
                       return (
                         <g key={id}>
-                          <path id={id} d={arcPath(a0, a1, R + 46)} fill="none" stroke={tone(r.k)} strokeOpacity={0.22} strokeWidth={22} strokeLinecap="round" />
+                          <path id={id} d={Math.sin((a0 + a1) / 2) > 0.2 ? (() => { const rr = R + 46; const [x0, y0] = pt(a1, rr); const [x1, y1] = pt(a0, rr); return `M ${x0} ${y0} A ${rr} ${rr} 0 ${a1 - a0 > Math.PI ? 1 : 0} 0 ${x1} ${y1}`; })() : arcPath(a0, a1, R + 46)} fill="none" stroke={tone(r.k)} strokeOpacity={0.22} strokeWidth={22} strokeLinecap="round" />
                           <text fill={tone(r.k)} style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.32em" }} dy={4.5}>
                             <textPath href={`#${id}`} startOffset="50%" textAnchor="middle">
                               {r.k === "ai" ? "AI" : "HUMAN"}
@@ -207,7 +207,7 @@ registerSlideModule({
                             {String(i + 1).padStart(2, "0")}
                           </div>
                           <div style={{ marginTop: 4, fontSize: fillPx(24, "body"), fontWeight: 600, lineHeight: 1.15, color: ink.strong }}>
-                            {s(it.label)}
+                            {s(it.label).replace(/-/g, "\u2011")}
                           </div>
                         </div>
                       </React.Fragment>
@@ -237,8 +237,8 @@ registerSlideModule({
                             >
                               {i + 1}
                             </div>
-                            <div className="mt-3 px-1" style={{ fontSize: 15, lineHeight: 1.2, fontWeight: 600, color: ink.strong, opacity: 0.85 }}>
-                              {s(it.label)}
+                            <div className="mt-3 px-1" style={{ fontSize: 15, lineHeight: 1.2, fontWeight: 600, color: ink.strong, opacity: 0.85, textWrap: "balance" }}>
+                              {s(it.label).replace(/-/g, "\u2011")}
                             </div>
                           </div>
                         );
