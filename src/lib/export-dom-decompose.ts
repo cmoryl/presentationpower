@@ -886,7 +886,12 @@ function decorativeLayersOf(el: Element): HTMLElement[] | null {
   // Cards only: round discs (step orbs, rings) and media tiles keep their own
   // dedicated export paths; a card must carry copy of its own.
   if (!(el.textContent ?? "").trim()) return null;
-  if (el.querySelector("img,video,canvas")) return null;
+  // Logos and icons inside a panel export natively on top of the box picture;
+  // only a media tile whose picture fills most of the box keeps its own path.
+  for (const m of Array.from(el.querySelectorAll("img,video,canvas"))) {
+    const mr = m.getBoundingClientRect();
+    if (mr.width * mr.height >= r.width * r.height * 0.6) return null;
+  }
   const ecs = getComputedStyle(el);
   const rad = parseFloat(ecs.borderTopLeftRadius) || 0;
   if (rad >= Math.min(r.width, r.height) / 2 - 1 || ecs.borderTopLeftRadius.includes("%")) return null;
@@ -1476,6 +1481,30 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         }
         surfaceRoots.push(el);
         continue;
+      }
+
+      // ---- glassy boxes ---------------------------------------------------
+      // A rounded frosted-glass box (backdrop blur, glow shadow) ships as ONE
+      // selectable see-through picture of its own surface, like slides 26/28;
+      // plain boxes fall through and stay native editable shapes.
+      {
+        const bf = (cs as unknown as { backdropFilter?: string }).backdropFilter || "none";
+        const frosted = bf !== "none" && /blur\(/.test(bf);
+        // Translucent tinted card with a hairline edge = the house glass card.
+        const am = (cs.backgroundColor || "").match(/rgba?\([^)]*?,\s*([\d.]+)\)$/);
+        const tintAlpha = am ? parseFloat(am[1]) : /rgb\(/.test(cs.backgroundColor) ? 1 : 0;
+        const translucent = (tintAlpha > 0 && tintAlpha < 0.5) || /gradient/.test(cs.backgroundImage || "");
+        const edged = ["Top", "Right", "Bottom", "Left"].some(
+          (sd) => (parseFloat((cs as unknown as Record<string, string>)[`border${sd}Width`]) || 0) > 0,
+        );
+        const glass = frosted || (translucent && edged && !!(el.textContent ?? "").trim());
+        if (glass && (parseFloat(cs.borderTopLeftRadius) || 0) >= 4) {
+          const box = surfaceShapeFor(el, cs, root, sx, sy, spaceW, spaceH);
+          if (box) {
+            shapes.push(box);
+            continue;
+          }
+        }
       }
 
       // ---- painted boxes -------------------------------------------------
