@@ -263,7 +263,11 @@ export function measureInlineLines(
   for (const w of words) {
     const band = groups[groups.length - 1];
     const prev = band?.[band.length - 1];
-    const wrapped = prev && (w.left < prev.left - 1 || w.top >= prev.bottom - 1);
+    // Tight display leading (0.94) makes line boxes overlap vertically, so the
+    // reliable signal is horizontal: a word that starts left of where the
+    // previous one ended has wrapped.
+    const slack = prev ? Math.max(2, (prev.bottom - prev.top) * 0.3) : 0;
+    const wrapped = prev && (w.left < prev.right - slack || w.top >= prev.bottom - 1);
     if (!prev || wrapped) groups.push([w]);
     else band!.push(w);
   }

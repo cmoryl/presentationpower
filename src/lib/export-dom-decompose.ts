@@ -1060,10 +1060,6 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           const fills =
             Math.abs(x - ax) <= 2 && Math.abs(y - ay) <= 2 && Math.abs(w - aw) <= 2 && Math.abs(h - ah) <= 2;
           if (fills) frameRadius = ar0;
-          else {
-            platedRoots.push(el);
-            src = null;
-          }
           break;
         }
       }
