@@ -25,21 +25,12 @@ registerSlideModule({
     switch (variant.id) {
       case "MV-PROOF-LOGOS":
       case "MV-CASE-LOGO-GRID": {
-        const tileText = ink.strong;
-        // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
-        // is too deep to read as text or as a hairline, so lift it onto the
-        // shared accentInk ramp. Light mode is unchanged.
+        // White logo tiles (same as the dense mosaic) so dark marks stay legible
+        // on dark grounds.
+        const tileText = brand.tokens.primary;
         const accent = accentInk(brand.tokens.accent, mode, 4.5);
-        const tileBg = bareSurfaces
-          ? "transparent"
-          : isDark
-            ? "rgba(255,255,255,0.04)"
-            : "rgba(10,15,28,0.02)";
-        const tileRing = bareSurfaces
-          ? "transparent"
-          : isDark
-            ? "rgba(255,255,255,0.08)"
-            : "rgba(10,15,28,0.06)";
+        const tileBg = bareSurfaces ? "transparent" : "#FFFFFF";
+        const tileRing = bareSurfaces ? "transparent" : ink.hairline;
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title)} />
