@@ -1483,6 +1483,22 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         continue;
       }
 
+      // ---- glassy boxes ---------------------------------------------------
+      // A rounded frosted-glass box (backdrop blur, glow shadow) ships as ONE
+      // selectable see-through picture of its own surface, like slides 26/28;
+      // plain boxes fall through and stay native editable shapes.
+      {
+        const bf = (cs as unknown as { backdropFilter?: string }).backdropFilter || "none";
+        const glass = bf !== "none" && /blur\(/.test(bf);
+        if (glass && (parseFloat(cs.borderTopLeftRadius) || 0) >= 4) {
+          const box = surfaceShapeFor(el, cs, root, sx, sy, spaceW, spaceH);
+          if (box) {
+            shapes.push(box);
+            continue;
+          }
+        }
+      }
+
       // ---- painted boxes -------------------------------------------------
       const { fill, gradient } = paintOf(cs);
       const line = borderOf(cs);
