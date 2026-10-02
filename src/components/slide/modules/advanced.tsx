@@ -502,6 +502,132 @@ registerSlideModule({
           </div>
         );
 
+        // Factual mode: only the slide's own figures. No invented sparklines or
+        // trend deltas; rings fill exactly to a stated percentage, and every
+        // tile keeps its body copy. Groups carry their own heading.
+        const groups = arr(c.groups);
+        if (groups.length) {
+          return (
+            <SlideFrame brand={brand} pageNumber={pageNumber}>
+              <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+              {s(c.subtitle) && (
+                <div className="mt-4" style={{ fontSize: fillPx(24, "body"), color: ink.body }}>
+                  {s(c.subtitle)}
+                </div>
+              )}
+              <div className="slide-fill-stretch mt-8 flex flex-col gap-6">
+                {groups.map((g, gi) => {
+                  const tiles = arr(g.items).slice(0, 4);
+                  return (
+                    <div key={gi} className="flex min-h-0 flex-1 flex-col">
+                      <div
+                        className="mb-3 uppercase"
+                        style={{
+                          fontSize: fillPx(16, "kicker"),
+                          letterSpacing: "0.2em",
+                          fontWeight: 700,
+                          color: "var(--slide-accent-text)",
+                        }}
+                      >
+                        {s(g.label)}
+                      </div>
+                      <div
+                        className="grid min-h-0 flex-1 gap-5"
+                        style={{ gridTemplateColumns: `repeat(${tiles.length}, minmax(0,1fr))` }}
+                      >
+                        {tiles.map((it, i) => {
+                          const value = s(it.value);
+                          const isPct = value.trim().endsWith("%");
+                          const pct = Math.max(0, Math.min(100, numeric(value)));
+                          const Icon = pickTileIcon(s(it.label), s(it.icon), gi * 4 + i);
+                          const R = 50;
+                          const C = 2 * Math.PI * R;
+                          return (
+                            <div
+                              key={i}
+                              style={{
+                                ...moduleCardSurface(brand.tokens.accent, isDark ? "dark" : "light", {
+                                  radius: 22,
+                                }),
+                                padding: 28,
+                                position: "relative",
+                                overflow: "hidden",
+                                display: "flex",
+                                gap: 24,
+                                alignItems: "center",
+                                minWidth: 0,
+                              }}
+                            >
+                              <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
+                              {isPct ? (
+                                <svg width={132} height={132} viewBox="-66 -66 132 132" className="shrink-0" aria-hidden>
+                                  <circle r={R} fill="none" stroke={ink.hairline} strokeWidth={10} />
+                                  <circle
+                                    r={R}
+                                    fill="none"
+                                    stroke="var(--slide-accent-text)"
+                                    strokeWidth={10}
+                                    strokeLinecap="round"
+                                    strokeDasharray={`${(pct / 100) * C} ${C}`}
+                                    transform="rotate(-90)"
+                                  />
+                                </svg>
+                              ) : (
+                                <div
+                                  aria-hidden
+                                  className="flex shrink-0 items-center justify-center"
+                                  style={{
+                                    width: 72,
+                                    height: 72,
+                                    borderRadius: 20,
+                                    background: "color-mix(in oklab, var(--slide-accent-text) 11%, transparent)",
+                                    border: "1px solid color-mix(in oklab, var(--slide-accent-text) 30%, transparent)",
+                                    color: "var(--slide-accent-text)",
+                                  }}
+                                >
+                                  <Icon size={34} aria-hidden />
+                                </div>
+                              )}
+                              <div className="min-w-0">
+                                <div
+                                  className="tabular-nums"
+                                  style={{
+                                    fontSize: fillPx(isPct ? 64 : 80, "display"),
+                                    lineHeight: 0.95,
+                                    fontWeight: 700,
+                                    letterSpacing: "-0.04em",
+                                    color: ink.strong,
+                                  }}
+                                >
+                                  {value}
+                                </div>
+                                <div
+                                  className="mt-2"
+                                  style={{ fontSize: fillPx(22, "body"), fontWeight: 600, color: ink.strong }}
+                                >
+                                  {s(it.label)}
+                                </div>
+                                {s(it.body) && (
+                                  <div
+                                    className="mt-1.5"
+                                    style={{ fontSize: fillPx(17, "body"), lineHeight: 1.4, color: ink.body }}
+                                  >
+                                    {s(it.body)}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </SlideFrame>
+          );
+        }
+
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} />
