@@ -1554,17 +1554,63 @@ registerSlideModule({
             return `M${x1} ${y1} A${r2} ${r2} 0 ${lg} 1 ${x2} ${y2} L${x3} ${y3} A${r1} ${r1} 0 ${lg} 0 ${x4} ${y4}Z`;
           };
           const step = SPAN / N;
+          const DAQ = "#7FE3F5", DLV = "#C2A3FF", DBL = "#7FB3F5";
+          const mix = (i: number) => {
+            // blue → aqua → lavender along the dial
+            const t = i / (N - 1);
+            return t < 0.5 ? (t < 0.25 ? DBL : DAQ) : t < 0.75 ? DAQ : DLV;
+          };
+          const arcPath = (r: number, a: number, b: number) => {
+            const [x1, y1] = pt(r, a), [x2, y2] = pt(r, b);
+            return `M${x1} ${y1} A${r} ${r} 0 ${b - a > 180 ? 1 : 0} 1 ${x2} ${y2}`;
+          };
+          const uid = `dial-${variant.id}`;
+          const labelInk = isDark ? "#FFFFFF" : ink.strong;
           return (
             <SlideFrame brand={brand} pageNumber={pageNumber}>
               <SlideTitle brand={brand} title={s(c.title, variant.name)} />
               <svg viewBox="0 0 1760 780" className="mt-4 w-full flex-1" aria-label={s(c.subtitle)}>
+                <defs>
+                  <linearGradient id={`${uid}-g`} x1="0" y1="1" x2="1" y2="0">
+                    <stop offset="0" stopColor={isDark ? DBL : acc} />
+                    <stop offset="0.5" stopColor={isDark ? DAQ : acc} />
+                    <stop offset="1" stopColor={isDark ? DLV : acc} />
+                  </linearGradient>
+                  <radialGradient id={`${uid}-hub`} cx="50%" cy="45%" r="60%">
+                    <stop offset="0" stopColor={isDark ? DLV : acc} stopOpacity={isDark ? 0.28 : 0.14} />
+                    <stop offset="0.6" stopColor={isDark ? DBL : acc} stopOpacity={isDark ? 0.1 : 0.05} />
+                    <stop offset="1" stopColor={isDark ? DBL : acc} stopOpacity={0} />
+                  </radialGradient>
+                  <filter id={`${uid}-glow`} x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="7" result="b" />
+                    <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+                  </filter>
+                </defs>
+                {/* Hub glow + glass disc */}
+                <circle cx={CX} cy={CY} r={R0 + 60} fill={`url(#${uid}-hub)`} />
+                <circle cx={CX} cy={CY} r={R0 - 34} fill={isDark ? "rgba(255,255,255,0.05)" : "rgba(0,63,199,0.04)"} stroke={isDark ? "rgba(255,255,255,0.18)" : ink.axis} strokeWidth={1.5} />
+                <circle cx={CX} cy={CY} r={R0 - 52} fill="none" stroke={`url(#${uid}-g)`} strokeOpacity={0.55} strokeWidth={1.6} strokeDasharray="1 7" strokeLinecap="round" />
+                {/* Outer rings: faint full + partial arcs */}
+                <path d={arcPath(R0 + 124, A0, A0 + SPAN)} fill="none" stroke={`url(#${uid}-g)`} strokeOpacity={0.35} strokeWidth={1.5} />
+                <path d={arcPath(R0 + 140, A0 + 20, A0 + 120)} fill="none" stroke={`url(#${uid}-g)`} strokeOpacity={0.3} strokeWidth={1.2} />
+                <path d={arcPath(R0 + 140, A0 + 170, A0 + 250)} fill="none" stroke={`url(#${uid}-g)`} strokeOpacity={0.3} strokeWidth={1.2} />
+                <path d={arcPath(R0 - 14, A0 + 10, A0 + SPAN - 10)} fill="none" stroke={`url(#${uid}-g)`} strokeOpacity={0.45} strokeWidth={2} />
+                {/* Tick marks */}
+                {Array.from({ length: 55 }, (_, k) => {
+                  const d = A0 + (k / 54) * SPAN;
+                  const [x1, y1] = pt(R0 + 114, d), [x2, y2] = pt(R0 + (k % 9 === 0 ? 104 : 110), d);
+                  return <line key={k} x1={x1} y1={y1} x2={x2} y2={y2} stroke={isDark ? "rgba(255,255,255,0.35)" : ink.axis} strokeWidth={k % 9 === 0 ? 2 : 1} />;
+                })}
                 {items.map((it, i) => {
                   const a = A0 + i * step + GAP / 2, b = A0 + (i + 1) * step - GAP / 2;
                   const t = 34 + (i / (N - 1)) * 70;
                   const mid = (a + b) / 2;
-                  const [lx, ly] = pt(R0 + 104 + 40, mid);
+                  const [lx, ly] = pt(R0 + 104 + 52, mid);
                   const [nx, ny] = pt(R0 + t / 2, mid);
+                  const [dx, dy] = pt(R0 + t + 6, mid);
+                  const [ex, ey] = pt(R0 + 132, mid);
                   const right = lx > CX + 20, left = lx < CX - 20;
+                  const col = isDark ? mix(i) : acc;
                   const words = s(it.label).split(" ");
                   const lines: string[] = [];
                   for (const w of words) {
@@ -1572,13 +1618,18 @@ registerSlideModule({
                     if (l && (l + " " + w).length <= 16) lines[lines.length - 1] = l + " " + w;
                     else lines.push(w);
                   }
+                  const op = 0.35 + (0.65 * i) / (N - 1);
                   return (
                     <g key={i}>
-                      <path d={seg(R0, R0 + t, a, b)} fill={acc} opacity={0.25 + (0.75 * i) / (N - 1)} />
-                      <text x={nx} y={ny + 8} textAnchor="middle" fontSize={24} fontWeight={800} fill={i > N / 2 ? "#FFFFFF" : ink.strong}>
+                      <path d={seg(R0, R0 + t, a, b)} fill={col} opacity={op * 0.55} filter={`url(#${uid}-glow)`} />
+                      <path d={seg(R0, R0 + t, a, b)} fill={col} opacity={op} stroke={isDark ? "rgba(255,255,255,0.35)" : "none"} strokeWidth={1} />
+                      <line x1={dx} y1={dy} x2={ex} y2={ey} stroke={col} strokeOpacity={0.7} strokeWidth={1.5} strokeDasharray="2 4" />
+                      <circle cx={ex} cy={ey} r={5} fill={col} />
+                      <circle cx={ex} cy={ey} r={2} fill={isDark ? "#03002C" : "#FFFFFF"} />
+                      <text x={nx} y={ny + 8} textAnchor="middle" fontSize={24} fontWeight={800} fill={isDark ? "#03002C" : i > N / 2 ? "#FFFFFF" : ink.strong}>
                         {String(i + 1).padStart(2, "0")}
                       </text>
-                      <text x={lx} y={ly - ((lines.length - 1) * 30) / 2 + 10} textAnchor={right ? "start" : left ? "end" : "middle"} fontSize={28} fontWeight={600} fill={ink.strong}>
+                      <text x={lx} y={ly - ((lines.length - 1) * 30) / 2 + 10} textAnchor={right ? "start" : left ? "end" : "middle"} fontSize={28} fontWeight={600} fill={labelInk}>
                         {lines.map((l, k) => (
                           <tspan key={k} x={lx} dy={k ? 32 : 0}>{l}</tspan>
                         ))}
@@ -1586,10 +1637,12 @@ registerSlideModule({
                     </g>
                   );
                 })}
-                <text x={CX} y={CY - 10} textAnchor="middle" fontSize={44} fontWeight={800} fill={ink.strong}>Quality</text>
-                <text x={CX} y={CY + 40} textAnchor="middle" fontSize={26} fill={ink.muted}>{s(c.subtitle)}</text>
-                <text x={pt(R0 + 50, A0)[0] - 10} y={pt(R0 + 50, A0)[1] + 50} textAnchor="middle" fontSize={20} fontWeight={700} letterSpacing="0.2em" fill={ink.muted}>LOW</text>
-                <text x={pt(R0 + 50, A0 + SPAN)[0] + 10} y={pt(R0 + 50, A0 + SPAN)[1] + 50} textAnchor="middle" fontSize={20} fontWeight={700} letterSpacing="0.2em" fill={ink.muted}>HIGH</text>
+                <text x={CX} y={CY - 10} textAnchor="middle" fontSize={48} fontWeight={800} fill={labelInk}>Quality</text>
+                <rect x={CX - 40} y={CY + 8} width={50} height={3} rx={1.5} fill={isDark ? DAQ : acc} />
+                <rect x={CX + 14} y={CY + 8} width={26} height={3} rx={1.5} fill={isDark ? DLV : acc} opacity={isDark ? 1 : 0.5} />
+                <text x={CX} y={CY + 48} textAnchor="middle" fontSize={24} fill={isDark ? "rgba(255,255,255,0.75)" : ink.muted}>{s(c.subtitle)}</text>
+                <text x={pt(R0 + 50, A0)[0] - 10} y={pt(R0 + 50, A0)[1] + 50} textAnchor="middle" fontSize={20} fontWeight={700} letterSpacing="0.2em" fill={isDark ? DBL : ink.muted}>LOW</text>
+                <text x={pt(R0 + 50, A0 + SPAN)[0] + 10} y={pt(R0 + 50, A0 + SPAN)[1] + 50} textAnchor="middle" fontSize={20} fontWeight={700} letterSpacing="0.2em" fill={isDark ? DLV : ink.muted}>HIGH</text>
               </svg>
             </SlideFrame>
           );
