@@ -11,6 +11,7 @@ import { fillPx } from "@/lib/open-space-fill";
 import type { SlideMode } from "../SlideChrome";
 import type { BrandMode } from "@/lib/taxonomy";
 import { exportMapNodeAsPng } from "@/lib/map-png-export";
+import { lookupCity } from "@/lib/city-coords";
 
 // ────────────────────────────────────────────────────────────────────────────
 // Locations family — MV-LOC-* renderer
@@ -37,9 +38,17 @@ function coerceRegion(raw: unknown): LocRegionKey {
     : "world";
 }
 
-function coercePin(raw: Record<string, unknown>, i: number): LocPin | null {
-  const lat = Number(raw.lat);
-  const lon = Number(raw.lon);
+function coercePin(
+  raw: Record<string, unknown>,
+  i: number,
+  bounds?: { latMin: number; latMax: number; lonMin: number; lonMax: number },
+): LocPin | null {
+  let lat = Number(raw.lat);
+  let lon = Number(raw.lon);
+  if ((!Number.isFinite(lat) || !Number.isFinite(lon)) && typeof raw.city === "string") {
+    const hit = lookupCity(raw.city, bounds);
+    if (hit) [lat, lon] = hit;
+  }
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
   const region = (raw.region as string)?.toUpperCase();
   const validRegion = ["AMER", "EMEA", "APAC", "LATAM", "MEA"].includes(region)
@@ -166,6 +175,18 @@ type LocationsInk = {
   accentText: string;
 };
 
+function readBounds(raw: unknown) {
+  const b = raw as Record<string, unknown> | undefined;
+  return b && [b.latMin, b.latMax, b.lonMin, b.lonMax].every((v) => Number.isFinite(Number(v)))
+    ? {
+        latMin: Number(b.latMin),
+        latMax: Number(b.latMax),
+        lonMin: Number(b.lonMin),
+        lonMax: Number(b.lonMax),
+      }
+    : undefined;
+}
+
 function renderLocationsVariant(
   variantId: string,
   brand: { id: string; tokens: { accent: string; primary: string } } & Record<string, unknown>,
@@ -177,10 +198,16 @@ function renderLocationsVariant(
   const seeded = locGetDivisionSet(brand.id);
   const rawItems = Array.isArray(c.items) ? (c.items as Record<string, unknown>[]) : [];
   const pins: LocPin[] =
-    rawItems.length > 0 ? rawItems.map(coercePin).filter((x): x is LocPin => !!x) : seeded.pins;
+    rawItems.length > 0
+      ? rawItems
+          .map((r, i) => coercePin(r, i, readBounds(c.bounds)))
+          .filter((x): x is LocPin => !!x)
+      : seeded.pins;
 
   const title = (c.title as string) || seeded.headline;
-  const subtitle = (c.subtitle as string) || seeded.subhead || "";
+  // Seeded sample copy only fills a slide that has no real locations of its own.
+  const subtitle =
+    typeof c.subtitle === "string" ? c.subtitle : rawItems.length > 0 ? "" : seeded.subhead || "";
   const narrative = (c.narrative as string) || "";
   // Legacy/seeded decks can contain a division name or lowercase region here.
   // Never cast arbitrary content into the map viewport lookup: an unknown key
@@ -471,6 +498,7 @@ function renderLocationsVariant(
           </div>
         )}
       </div>
+      {c.hideHeroStat !== true && (
       <div className="flex flex-col items-end text-right" style={{ minWidth: 220 }}>
         <div className="flex items-baseline gap-2">
           <span
@@ -516,6 +544,7 @@ function renderLocationsVariant(
           ● {totalRegions} regions
         </div>
       </div>
+      )}
     </div>
   );
 
@@ -577,10 +606,53 @@ function renderLocationsVariant(
               />
             </div>
           </div>
-          <div className="mt-5">
-            <RoleLegend />
-          </div>
-          <RegionRail />
+          {hasRegionMetrics ? (
+            <div
+              className="mt-6 grid gap-10 pt-6"
+              style={{
+                borderTop: `1px solid ${ink.hairline}`,
+                gridTemplateColumns: `repeat(${Math.min(regionMetrics.length, 5)}, minmax(0, 1fr))`,
+              }}
+            >
+              {regionMetrics.slice(0, 5).map((it, i) => (
+                <div key={`${it.label}-${i}`}>
+                  <div
+                    className="tabular-nums"
+                    style={{
+                      color: ink.strong,
+                      fontSize: 84,
+                      fontWeight: 600,
+                      letterSpacing: "-0.04em",
+                      lineHeight: 0.95,
+                    }}
+                  >
+                    {it.value}
+                    {it.unit && (
+                      <span style={{ fontSize: 28, color: ink.muted, marginLeft: 6 }}>{it.unit}</span>
+                    )}
+                  </div>
+                  <div
+                    className="mt-3 uppercase"
+                    style={{
+                      fontSize: 14,
+                      letterSpacing: "0.24em",
+                      fontWeight: 700,
+                      color: ink.muted,
+                    }}
+                  >
+                    {it.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="mt-5">
+                <RoleLegend />
+              </div>
+              <RegionRail />
+            </>
+          )}
         </div>
       </SlideFrame>
     );
@@ -964,6 +1036,119 @@ function renderLocationsVariant(
               )}
             </div>
           </div>
+        </div>
+      </SlideFrame>
+    );
+  }
+
+  if (variantId === "MV-LOC-REGION-FOCUS" && c.directory === true) {
+    // Map + full city directory. Every listed city is shown by name (dense
+    // content stays designed); pins mark the ones with known coordinates.
+    const names = rawItems
+      .map((r) => String(r.label ?? r.city ?? "").trim())
+      .filter(Boolean);
+    const n = names.length;
+    const cols = n <= 6 ? 1 : n <= 24 ? 2 : n <= 54 ? 3 : 4;
+    const px = n <= 6 ? 34 : n <= 24 ? 24 : n <= 54 ? 19 : 16;
+    const bounds = readBounds(c.bounds);
+    return (
+      <SlideFrame brand={brand as never} pageNumber={pageNumber}>
+        <div className="relative flex h-full flex-col">
+          <div className="flex items-end justify-between gap-12">
+            <div>
+              {s(c.kicker) && <Kicker brand={brand as never}>{s(c.kicker)}</Kicker>}
+              <div
+                className="mt-4"
+                style={{
+                  fontSize: 56,
+                  fontWeight: 600,
+                  color: ink.strong,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.02,
+                  maxWidth: 1000,
+                }}
+              >
+                {title}
+              </div>
+            </div>
+            <div className="flex items-baseline gap-4">
+              <span
+                className="tabular-nums font-semibold"
+                style={{ fontSize: 96, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}
+              >
+                {n}
+              </span>
+              <span
+                className="uppercase"
+                style={{
+                  fontSize: 14,
+                  letterSpacing: "0.3em",
+                  color: "var(--slide-accent-text)",
+                  fontWeight: 700,
+                }}
+              >
+                {s(c.countLabel) || "Cities"}
+              </span>
+            </div>
+          </div>
+          <div
+            className="mt-8 grid min-h-0 flex-1 gap-12"
+            style={{ gridTemplateColumns: n <= 6 ? "1.9fr 1fr" : "1.25fr 1fr" }}
+          >
+            <div className="relative min-h-0 overflow-hidden">
+              <LocWorldMap
+                mapStyle={mapStyle}
+                pins={pins}
+                region={region}
+                bounds={bounds}
+                mode={mode}
+                accent={accent}
+                primary={primary}
+                showLabels={false}
+                ariaLabel={`${title} — map`}
+              />
+            </div>
+            <div
+              className="min-h-0 pl-10"
+              style={{
+                borderLeft: `1px solid ${ink.hairline}`,
+                display: "grid",
+                gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+                gridAutoFlow: "column",
+                gridTemplateRows: `repeat(${Math.ceil(n / cols)}, auto)`,
+                alignContent: n <= 6 ? "center" : "start",
+                columnGap: 28,
+              }}
+            >
+              {names.map((name, i) => (
+                <div
+                  key={`${name}-${i}`}
+                  style={{
+                    color: ink.strong,
+                    fontSize: px,
+                    lineHeight: 1.25,
+                    padding: `${Math.round(px * 0.22)}px 0`,
+                    borderBottom: `1px solid ${ink.hairline}`,
+                  }}
+                >
+                  {name}
+                </div>
+              ))}
+            </div>
+          </div>
+          {s(c.badge) && s(c.badge) !== s(c.kicker) && (
+            <div
+              className="mt-6 uppercase"
+              style={{
+                fontSize: 13,
+                letterSpacing: "0.28em",
+                fontWeight: 700,
+                color: "var(--slide-accent-text)",
+              }}
+            >
+              ● {s(c.badge)}
+            </div>
+          )}
         </div>
       </SlideFrame>
     );
