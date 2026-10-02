@@ -155,7 +155,7 @@ registerSlideModule({
                     )}
                     <span
                       style={{
-                        fontSize: isDark ? (dense ? 26 : 30) : fillPx(dense ? 26 : 30, "display"),
+                        fontSize: isDark ? (dense ? 36 : 42) : fillPx(dense ? 26 : 30, "display"),
                         fontWeight: 800,
                         lineHeight: 1.05,
                         letterSpacing: st.bandCase === "upper" ? "0.05em" : "-0.02em",
