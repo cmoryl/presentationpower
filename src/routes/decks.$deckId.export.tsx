@@ -560,6 +560,13 @@ function ExportView() {
           @page { size: 1920px 1080px; margin: 0; }
           .no-print { display: none !important; }
           .print-page { break-after: page; page-break-after: always; }
+          /* Fill the 1920x1080 page: the on-screen scale is measured at screen
+             width, so print pins each page and stage to full size. */
+          .print-page { width: 1920px !important; height: 1080px !important; max-width: none !important; margin: 0 !important; overflow: hidden !important; }
+          .print-page > div, .print-page [data-print-surface] { width: 1920px !important; height: 1080px !important; aspect-ratio: auto !important; }
+          .print-page [data-slide-stage] { transform: none !important; visibility: visible !important; --slide-scale: 1 !important; }
+          .print-page:last-of-type { break-after: auto; page-break-after: auto; }
+          html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
           .print-page, .print-page * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
         }
       `}</style>
