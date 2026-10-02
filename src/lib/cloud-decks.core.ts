@@ -224,6 +224,23 @@ export async function saveDeckToCloudCore(
       }
     }
   }
+  // Shared masters are curated one-source-slide → one-slide. A save that would
+  // add or drop slides (auto-split "(cont.)" pages, a stale tab) is refused so
+  // it can never overwrite the master silently.
+  if (keepTemplate) {
+    const { data: existing } = await sb
+      .from("deck_slides")
+      .select("id")
+      .eq("deck_id", deckUuid);
+    const have = Array.isArray(existing) ? existing.length : 0;
+    const incoming = data.deck.slides;
+    const split = incoming.some((sl) => /\(cont\.\s*\d+\)/i.test(JSON.stringify(sl)));
+    if (have > 0 && (incoming.length !== have || split)) {
+      throw new Error(
+        `This master has ${have} slides; the save would change it to ${incoming.length}. Refused to protect the master — reload the master and try again.`,
+      );
+    }
+  }
 
   // Reference columns are FK-checked in the database; unknown/synthetic ids are
   // stored as NULL rather than failing the whole save.
