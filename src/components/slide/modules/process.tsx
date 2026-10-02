@@ -41,7 +41,7 @@ import {
 export function LoopHalo({ uid, slim = false, small = false }: { uid: string; slim?: boolean; small?: boolean }) {
   // Small badges (< ~130px) get thicker, brighter hairlines so the rings
   // survive at size instead of dissolving into the ground.
-  const k = small ? 3.2 : 1, ko = small ? 1.9 : 1;
+  const k = small ? 4.6 : 1, ko = small ? 2.4 : 1;
   const AQ = "#7FE3F5", LV = "#C2A3FF";
   const nodes = [-60, 30, 120, 210];
   const pt = (deg: number, r: number) => {
