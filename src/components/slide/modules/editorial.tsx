@@ -412,6 +412,90 @@ registerSlideModule({
           );
         }
 
+        // Dark concept board: short term lists (e.g. glossary preferences)
+        // become large glass term tiles; the other side becomes numbered
+        // benefit cards with ringed badges. Every word stays the author's.
+        const shortTerms = leftRows.length > 0 && leftRows.length <= 6 &&
+          leftRows.every((it) => s(typeof it === "string" ? it : obj(it).label).split(/\s+/).length <= 3);
+        if (isDark && shortTerms && rightRows.length > 0 && rightRows.length <= 4) {
+          const G = ["#7FB3F5", "#7FE3F5", "#C2A3FF", "#A6C8FF"];
+          const glass = (glow: string): CSSProperties => ({
+            borderRadius: 22,
+            background: `linear-gradient(160deg, ${glow}24 0%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.02) 100%)`,
+            border: "1px solid rgba(255,255,255,0.16)",
+            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.22), 0 24px 60px ${glow}1c`,
+            backdropFilter: "blur(16px)",
+          });
+          const Head = ({ text, glow }: { text: string; glow: string }) => (
+            <div className="flex items-center" style={{ gap: 14, marginBottom: 22 }}>
+              <span style={{ width: 10, height: 10, borderRadius: 999, background: glow, boxShadow: `0 0 12px ${glow}` }} />
+              <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: "0.22em", textTransform: "uppercase", color: "#FFFFFF" }}>{text}</span>
+              <span className="flex-1" style={{ height: 1, background: `linear-gradient(90deg, ${glow}AA, transparent)` }} />
+            </div>
+          );
+          const hiPct = (text: string) =>
+            text.split(/(\d+(?:\.\d+)?%)/).map((part, k) =>
+              /%$/.test(part) ? (
+                <span key={k} style={{ fontSize: "1.45em", fontWeight: 800, color: "#7FE3F5", textShadow: "0 0 18px rgba(127,227,245,0.55)" }}>{part}</span>
+              ) : (
+                <span key={k}>{part}</span>
+              ),
+            );
+          const termCols = leftRows.length > 4 ? 3 : 2;
+          return (
+            <SlideFrame brand={brand} pageNumber={pageNumber}>
+              <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+              {s(c.subtitle) && (
+                <p style={{ marginTop: 18, fontSize: 28, lineHeight: 1.35, color: "#FFFFFF", maxWidth: 1400 }}>{s(c.subtitle)}</p>
+              )}
+              <div className="relative mt-10 flex min-h-0 flex-1 items-stretch" style={{ gap: 110 }}>
+                <div className="flex min-w-0 flex-1 flex-col" style={{ ...glass(G[0]), padding: "30px 32px 34px" }}>
+                  <Head text={s(left.label) || "Option A"} glow={G[0]} />
+                  <div className="grid flex-1" style={{ gridTemplateColumns: `repeat(${termCols}, 1fr)`, gap: 18 }}>
+                    {leftRows.map((it, i) => {
+                      const g = G[i % G.length];
+                      return (
+                        <div key={i} className="relative flex flex-col justify-end overflow-hidden" style={{ borderRadius: 16, padding: "22px 24px", background: "linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.025))", border: "1px solid rgba(255,255,255,0.14)", borderBottom: `3px solid ${g}` , boxShadow: `0 16px 34px -22px ${g}` }}>
+                          <span aria-hidden data-decorative className="absolute" style={{ top: 12, right: 18, fontSize: 64, fontWeight: 800, lineHeight: 1, color: `${g}33` }}>&ldquo;</span>
+                          <span aria-hidden data-decorative style={{ fontSize: 16, fontWeight: 700, letterSpacing: "0.14em", color: g }}>{String(i + 1).padStart(2, "0")}</span>
+                          <span style={{ marginTop: 8, fontSize: leftRows.length > 4 ? 36 : 44, fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.05, color: "#FFFFFF" }}>
+                            {s(typeof it === "string" ? it : obj(it).label)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div aria-hidden className="absolute flex items-center justify-center" style={{ left: "50%", top: "50%", width: 120, height: 120, marginLeft: -60, marginTop: -60, borderRadius: 999, background: "radial-gradient(circle at 35% 30%, rgba(255,255,255,0.28), rgba(11,16,48,0.92) 70%)", border: "1px solid rgba(255,255,255,0.35)", boxShadow: "0 0 40px rgba(127,179,245,0.45)", color: "#FFFFFF", fontSize: 40, fontWeight: 800, zIndex: 2 }}>
+                  <LoopHalo uid="vs2" slim small />
+                  <span className="relative">VS</span>
+                </div>
+                <div className="flex min-w-0 flex-1 flex-col" style={{ ...glass(G[2]), padding: "30px 32px 34px" }}>
+                  <Head text={s(right.label) || "Option B"} glow={G[2]} />
+                  <div className="flex flex-1 flex-col" style={{ gap: 18 }}>
+                    {rightRows.map((it, i) => {
+                      const g = i % 2 ? G[2] : G[1];
+                      return (
+                        <div key={i} className="flex flex-1 items-center" style={{ gap: 26, borderRadius: 16, padding: "20px 26px", background: "linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.025))", border: "1px solid rgba(255,255,255,0.14)", borderBottom: `3px solid ${g}`, boxShadow: `0 16px 34px -22px ${g}` }}>
+                          <div aria-hidden data-decorative className="relative flex shrink-0 items-center justify-center" style={{ width: 84, height: 84 }}>
+                            <LoopHalo uid={`wm-${i}`} slim small />
+                            <span className="relative flex items-center justify-center" style={{ width: 62, height: 62, borderRadius: 999, background: `radial-gradient(circle at 35% 30%, ${g}55, rgba(11,16,48,0.92) 70%)`, border: "1px solid rgba(255,255,255,0.3)", color: "#FFFFFF", fontSize: 22, fontWeight: 800 }}>
+                              {String(i + 1).padStart(2, "0")}
+                            </span>
+                          </div>
+                          <span style={{ fontSize: 30, fontWeight: 700, lineHeight: 1.25, color: "#FFFFFF" }}>
+                            {hiPct(s(typeof it === "string" ? it : obj(it).label))}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </SlideFrame>
+          );
+        }
+
         const VsColumn = ({
           heading,
           rows,
