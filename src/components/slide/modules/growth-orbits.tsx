@@ -113,6 +113,8 @@ registerSlideModule({
     const accent = accentInk(brand.tokens.accent, mode, 4.5);
     const logos = arr(c.items).slice(0, MAX_LOGOS);
     const growth = arr(c.growth).slice(0, MAX_GROWTH);
+    // No acquisitions wall → the growth list inherits its space at a larger scale.
+    const gk = logos.length === 0 ? 1.7 : 1;
     const orbits = arr(c.orbits).slice(0, MAX_ORBITS);
     const wall = resolveLogoWall(c.logoWall);
     // Ring colour, weight and dot treatment are authored per face.
@@ -225,14 +227,14 @@ registerSlideModule({
             {growth.length > 0 && (
               <div className="mt-10" data-intro-item="" data-intro-step={2}>
                 {s(c.growthLabel) && <Kicker brand={brand}>{s(c.growthLabel)}</Kicker>}
-                <div className="mt-4 flex flex-col" style={{ gap: 18 }}>
+                <div className="mt-4 flex flex-col" style={{ gap: 18 * gk }}>
                   {growth.map((g: Item, i) => (
                     <div key={i} className="flex items-baseline" style={{ gap: 22 }}>
                       <div
                         className="shrink-0 text-right"
                         style={{
-                          minWidth: 96,
-                          fontSize: fillPx(50, "display"),
+                          minWidth: 96 * gk,
+                          fontSize: fillPx(Math.round(50 * gk), "display"),
                           fontWeight: 800,
                           lineHeight: 1,
                           letterSpacing: "-0.04em",
@@ -244,7 +246,7 @@ registerSlideModule({
                       <div className="min-w-0">
                         <div
                           style={{
-                            fontSize: fillPx(24, "body"),
+                            fontSize: fillPx(Math.round(24 * (gk > 1 ? 1.35 : 1)), "body"),
                             fontWeight: 700,
                             lineHeight: 1.22,
                             color: ink.strong,
@@ -255,7 +257,7 @@ registerSlideModule({
                         {s(g.body) && (
                           <div
                             style={{
-                              fontSize: fillPx(21, "body"),
+                              fontSize: fillPx(Math.round(21 * (gk > 1 ? 1.3 : 1)), "body"),
                               lineHeight: 1.28,
                               color: ink.body,
                             }}
