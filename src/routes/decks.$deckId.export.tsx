@@ -565,6 +565,7 @@ function ExportView() {
           .print-page { width: 1920px !important; height: 1080px !important; max-width: none !important; margin: 0 !important; overflow: hidden !important; }
           .print-page > div, .print-page [data-print-surface] { width: 1920px !important; height: 1080px !important; aspect-ratio: auto !important; }
           .print-page [data-slide-stage] { transform: none !important; visibility: visible !important; --slide-scale: 1 !important; }
+          .print-page:last-of-type { break-after: auto; page-break-after: auto; }
           html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
           .print-page, .print-page * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
         }
