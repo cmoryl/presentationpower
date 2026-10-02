@@ -109,6 +109,58 @@ export function placeTextRuns(
     const lead = block.runs[0]!;
     const base = describeTextRun(lead);
     if (!base) return;
+
+    // MIXED-STYLE path — each measured line carries its styled segments in
+    // reading order, so a highlighted word stays where it sits on screen.
+    if (block.runs.length === 1 && lead.segLines?.length && lead.segStyles?.length) {
+      type SegPart = { text: string; options: Record<string, unknown> };
+      const segParts: SegPart[] = [];
+      const segLines = lead.segLines;
+      segLines.forEach((line, li) => {
+        line.segments.forEach((seg, si) => {
+          const st = lead.segStyles![seg.owner] ?? lead.segStyles![0]!;
+          const txt =
+            st.textTransform === "uppercase"
+              ? seg.text.toUpperCase()
+              : st.textTransform === "lowercase"
+                ? seg.text.toLowerCase()
+                : seg.text;
+          const p = runProps({ ...lead, ...st, text: txt.trim() || txt });
+          if (!p) return;
+          const lead1 = si > 0 && /^\s/.test(txt) ? " " : "";
+          segParts.push({ text: `${lead1}${p.text}`, options: { ...p.options } });
+        });
+        if (segParts.length) segParts[segParts.length - 1]!.options.breakLine = li < segLines.length - 1;
+      });
+      if (segParts.length) {
+        const big = Math.max(lead.fontSizePx, ...lead.segStyles.map((x) => x.fontSizePx));
+        const sized = { ...lead, fontSizePx: big, lines: segLines };
+        const geo =
+          segLines.length > 1
+            ? bakedGeometry(sized, base.align)
+            : (() => {
+                const g = bakedGeometry({ ...sized, lines: [segLines[0]!, segLines[0]!] }, base.align);
+                return g;
+              })();
+        slide.addText(segParts, {
+          ...geo,
+          align: base.align,
+          valign: "top",
+          lineSpacing:
+            segLines.length > 1 && lead.linePitchPx
+              ? Math.round(pxToPt(lead.linePitchPx) * 10) / 10
+              : base.lineSpacing,
+          margin: 0,
+          inset: 0,
+          wrap: false,
+          shrinkText: false,
+          isTextBox: true,
+          objectName: `${opts?.objectNamePrefix ?? "TP Text"} ${i + 1}`,
+        });
+        placed += 1;
+        return;
+      }
+    }
     // Sibling runs on one visual line: each measured DOM node is trimmed, so a
     // real word gap between two styled fragments ("New" + "prospect") would be
     // lost and PowerPoint would render "Newprospect". Re-insert one space when

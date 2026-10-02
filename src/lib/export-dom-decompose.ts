@@ -1039,6 +1039,34 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           src = null;
         }
       }
+      // Rounded frame mask: a photo inside a `rounded-full overflow-hidden`
+      // ring (process circles) or a rounded card is cut by the PARENT, not its
+      // own radius. Inherit that rounding so the picture is not exported as a
+      // square; a picture that spills past the frame stays on the plate.
+      let frameRadius = radiusOf(cs, w, h);
+      if (src && frameRadius < 1 && tag !== "SVG") {
+        let anc = el.parentElement;
+        for (let depth = 0; anc && depth < 5; depth += 1, anc = anc.parentElement) {
+          const acs = getComputedStyle(anc);
+          const clips = /hidden|clip/.test(acs.overflow) || /hidden|clip/.test(acs.overflowX);
+          if (!clips) continue;
+          const ar = anc.getBoundingClientRect();
+          const aw = ar.width * sx;
+          const ah = ar.height * sy;
+          const ar0 = radiusOf(acs, aw, ah);
+          if (ar0 < 1) break;
+          const ax = (ar.left - root.left) * sx;
+          const ay = (ar.top - root.top) * sy;
+          const fills =
+            Math.abs(x - ax) <= 2 && Math.abs(y - ay) <= 2 && Math.abs(w - aw) <= 2 && Math.abs(h - ah) <= 2;
+          if (fills) frameRadius = ar0;
+          else {
+            platedRoots.push(el);
+            src = null;
+          }
+          break;
+        }
+      }
       if (src) {
         shapes.push({
           kind: "image",
@@ -1046,7 +1074,7 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           y,
           w,
           h,
-          radiusPx: radiusOf(cs, w, h),
+          radiusPx: frameRadius,
           fill: null,
           gradient: null,
           line: null,
