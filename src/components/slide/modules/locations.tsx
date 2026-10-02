@@ -471,6 +471,7 @@ function renderLocationsVariant(
           </div>
         )}
       </div>
+      {c.hideHeroStat !== true && (
       <div className="flex flex-col items-end text-right" style={{ minWidth: 220 }}>
         <div className="flex items-baseline gap-2">
           <span
@@ -516,6 +517,7 @@ function renderLocationsVariant(
           ● {totalRegions} regions
         </div>
       </div>
+      )}
     </div>
   );
 
@@ -577,10 +579,53 @@ function renderLocationsVariant(
               />
             </div>
           </div>
-          <div className="mt-5">
-            <RoleLegend />
-          </div>
-          <RegionRail />
+          {hasRegionMetrics ? (
+            <div
+              className="mt-6 grid gap-10 pt-6"
+              style={{
+                borderTop: `1px solid ${ink.hairline}`,
+                gridTemplateColumns: `repeat(${Math.min(regionMetrics.length, 5)}, minmax(0, 1fr))`,
+              }}
+            >
+              {regionMetrics.slice(0, 5).map((it, i) => (
+                <div key={`${it.label}-${i}`}>
+                  <div
+                    className="tabular-nums"
+                    style={{
+                      color: ink.strong,
+                      fontSize: 84,
+                      fontWeight: 600,
+                      letterSpacing: "-0.04em",
+                      lineHeight: 0.95,
+                    }}
+                  >
+                    {it.value}
+                    {it.unit && (
+                      <span style={{ fontSize: 28, color: ink.muted, marginLeft: 6 }}>{it.unit}</span>
+                    )}
+                  </div>
+                  <div
+                    className="mt-3 uppercase"
+                    style={{
+                      fontSize: 14,
+                      letterSpacing: "0.24em",
+                      fontWeight: 700,
+                      color: ink.muted,
+                    }}
+                  >
+                    {it.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="mt-5">
+                <RoleLegend />
+              </div>
+              <RegionRail />
+            </>
+          )}
         </div>
       </SlideFrame>
     );
