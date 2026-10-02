@@ -37,7 +37,7 @@ registerSlideModule({
   render: ({ variant, brand, pageNumber, c, mode, isDark, ink }) => {
     switch (variant.id) {
       case "MV-INFO-HUB-SATELLITES": {
-        if (c.display === "loop") {
+        if (c.display === "loop" || /in-the-loop/i.test(s(c.title))) {
           // Process loop: the steps run clockwise round one continuous ring.
           // Machine steps and human steps get their own colour band, so the
           // hand-off from AI to people reads at a glance; the last step glows
