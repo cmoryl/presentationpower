@@ -39,6 +39,38 @@ function BigNumber({ value, unit, size, ink, unitColor }: { value: string; unit?
   );
 }
 
+/** Data-true dot chart: % → 50 dots filled to the share; counts → one dot per
+ * scale unit (scale shown), so every dot is derived from the slide's figure. */
+function DotViz({ value, unit, color, track, caption }: { value: string; unit?: string; color: string; track: string; caption: string }) {
+  const raw = value.replace(/,/g, "").trim();
+  const k = /k$/i.test(raw) ? 1000 : 1;
+  const n = parseFloat(raw) * k;
+  if (!Number.isFinite(n) || n <= 0) return null;
+  const isPct = unit === "%";
+  let total: number;
+  let filled: number;
+  let note = "";
+  if (isPct) {
+    total = 50;
+    filled = Math.round(Math.min(100, n) / 2);
+  } else {
+    const scale = Math.pow(10, Math.max(0, Math.ceil(Math.log10(n / 50))));
+    filled = Math.max(1, Math.round(n / scale));
+    total = filled;
+    note = `Each dot = ${scale.toLocaleString("en-US")}`;
+  }
+  return (
+    <div aria-hidden>
+      <div className="grid gap-[5px]" style={{ gridTemplateColumns: "repeat(25, minmax(0, 1fr))" }}>
+        {Array.from({ length: total }, (_, i) => (
+          <span key={i} className="block aspect-square rounded-full" style={{ background: i < filled ? color : track }} />
+        ))}
+      </div>
+      {note && <div className="mt-2" style={{ fontSize: fillPx(13, "body"), color: caption }}>{note}</div>}
+    </div>
+  );
+}
+
 /** Column count + type size for a list of `n` short entries on one slide. */
 export function cityDirectoryPlan(n: number): { cols: number; px: number } {
   if (n <= 6) return { cols: 2, px: 60 };
@@ -80,23 +112,26 @@ registerSlideModule({
                     return (
                       <div
                         key={i}
-                        className="flex flex-col justify-between rounded-2xl p-7"
+                        className="flex flex-col rounded-2xl p-7"
                         style={{
                           background: isDark ? "rgba(255,255,255,0.05)" : hexA(accent, 0.05),
                           border: `1px solid ${ink.hairline}`,
                         }}
                       >
                         <div className="flex items-start justify-between gap-4">
-                          <BigNumber value={s(it.value)} unit={s(it.unit)} size={112} ink={ink.strong} unitColor={isDark ? ink.strong : accent} />
+                          <BigNumber value={s(it.value)} unit={s(it.unit)} size={104} ink={ink.strong} unitColor={isDark ? ink.strong : accent} />
                           {Number.isFinite(pct) && (
                             <Ring pct={pct} color={accent} track={ink.hairline} />
                           )}
                         </div>
                         <div
-                          className="mt-4"
+                          className="mt-3"
                           style={{ fontSize: fillPx(19, "body"), lineHeight: 1.35, color: ink.body, fontWeight: 500 }}
                         >
                           {s(it.label)}
+                        </div>
+                        <div className="mt-auto pt-5">
+                          <DotViz value={s(it.value)} unit={s(it.unit)} color={isDark ? "#FFFFFF" : accent} track={ink.hairline} caption={ink.muted} />
                         </div>
                       </div>
                     );
