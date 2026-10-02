@@ -176,7 +176,7 @@ function _computeBackdrop(
   // plates, so it read darker than its neighbours. Pin it to a violet→aqua
   // plate with the same light scrim the other dark data slides use.
   if (useCorporateDark && id === "MV-STAT-PROOF-BOARD") {
-    return { url: CORPORATE_DARK_BACKDROPS[4]!, scrim: "left", scrimStrength: 0.45, imageDim: 0.05, tint: "#03002C" };
+    return { url: CORPORATE_DARK_BACKDROPS[7]!, scrim: "left", scrimStrength: 0.8, imageDim: 0.1, tint: "#03002C" };
   }
 
   // Full-bleed cover / hero — enterprise photograph, strong side scrim.
