@@ -46,11 +46,11 @@ registerSlideModule({
           const hub = obj(c.hub);
           const summary = obj(c.summary);
           const N = Math.max(steps.length, 1);
-          const W = 1000;
-          const H = 780;
+          const W = 900;
+          const H = 620;
           const CX = W / 2;
           const CY = H / 2;
-          const R = 290;
+          const R = 225;
           const aiInk = isDark ? "#7FE3F5" : "#0E7C9A";
           const humanInk = "var(--slide-accent-text)";
           const kindOf = (it: Record<string, unknown>, i: number) => {
@@ -79,16 +79,16 @@ registerSlideModule({
           });
           return (
             <SlideFrame brand={brand} pageNumber={pageNumber}>
-              <AuroraOrb x={30} y={55} size={900} />
+              <AuroraOrb x={28} y={58} size={620} />
               <SlideTitle brand={brand} title={s(c.title, variant.name)} />
               <div
-                className="slide-fill-stretch relative mt-2 grid items-center gap-10"
+                className="slide-fill-stretch relative mt-6 grid items-center gap-16"
                 style={{ gridTemplateColumns: `${W}px 1fr` }}
               >
                 <div className="relative" style={{ width: W, height: H }}>
                   <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} className="absolute inset-0" aria-hidden>
                     <defs>
-                      <marker id="loopArrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                      <marker id="loopArrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse">
                         <path d="M0,0 L10,5 L0,10 z" fill={ink.strong} />
                       </marker>
                       <radialGradient id="loopCore">
@@ -156,10 +156,10 @@ registerSlideModule({
                     const a = ang(i);
                     const [x, y] = pt(a);
                     const Icon = it.icon ? iconByName(s(it.icon)) : null;
-                    const size = k === "out" ? 112 : 96;
+                    const size = k === "out" ? 96 : 80;
                     const right = Math.cos(a) > 0.2;
                     const left = Math.cos(a) < -0.2;
-                    const [lx, ly] = pt(a, R + 104);
+                    const [lx, ly] = pt(a, R + 92);
                     return (
                       <React.Fragment key={i}>
                         <div
