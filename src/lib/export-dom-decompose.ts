@@ -1044,7 +1044,6 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
       } else if (tag === "SVG") {
         src = svgDataUrl(el as unknown as SVGSVGElement, w, h);
         fit = "contain";
-        if ((el.getAttribute("aria-label") || "").includes("map")) console.log("MAPDBG decompose", w, h, (el as SVGSVGElement).getAttribute("viewBox"), src?.length);
         const svg = el as unknown as SVGSVGElement;
         natW = svg.viewBox?.baseVal?.width || w;
         natH = svg.viewBox?.baseVal?.height || h;
@@ -1832,7 +1831,7 @@ export async function resolveShapeImages(
 
 async function inlineImage(src: string, w: number, h: number): Promise<string | null> {
   try {
-    if (src.startsWith("data:image/svg+xml")) { console.log("MAPDBG svgToPng", w, h); return await svgToPng(src, w, h); }
+    if (src.startsWith("data:image/svg+xml")) return await svgToPng(src, w, h);
     if (src.startsWith("data:")) return src;
     const { retryAsset } = await import("./pptx-integrity");
     const dataUrl = await retryAsset<string>(
