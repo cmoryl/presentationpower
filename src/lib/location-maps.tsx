@@ -1239,7 +1239,7 @@ function regionViewBox(region: RegionKey, custom?: MapBounds): string {
 
   // Runtime deck content can predate the RegionKey contract. Keep the map
   // renderer total even when an old/invalid value reaches this lower layer.
-  const b = custom ?? REGION_BOUNDS[region];
+  const b = custom ?? REGION_BOUNDS[region as Exclude<RegionKey, "world">];
   if (!b) return `0 42 ${WORLD_VIEWBOX.w} 330`;
   const tl = projectLatLon(b.latMax, b.lonMin);
   const br = projectLatLon(b.latMin, b.lonMax);
