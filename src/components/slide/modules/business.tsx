@@ -204,6 +204,8 @@ registerSlideModule({
       case "MV-DEC-COMPARE-TABLE": {
         const columns = arr(c.columns);
         const rows = arr(c.items);
+        // Few rows → bigger type so a short table fills its panel.
+        const cellPx = rows.length <= 4 ? 34 : rows.length <= 7 ? 28 : 24;
         const winnerIdx =
           typeof (c as { winnerIndex?: number }).winnerIndex === "number"
             ? (c as { winnerIndex?: number }).winnerIndex
@@ -220,7 +222,7 @@ registerSlideModule({
               >
                 <div
                   className="slide-fill-stretch slide-fill-rows grid items-center gap-x-8"
-                  style={{ gridTemplateColumns: `2fr ${columns.map(() => "1fr").join(" ")}` }}
+                  style={{ gridTemplateColumns: `${rows.length <= 4 ? "1.1fr" : "2fr"} ${columns.map(() => "1fr").join(" ")}` }}
                 >
                   <div
                     className="pb-4 uppercase"
@@ -254,7 +256,8 @@ registerSlideModule({
                       <div
                         className="py-5"
                         style={{
-                          fontSize: fillPx(24, "body"),
+                          fontSize: fillPx(cellPx, "body"),
+                          fontWeight: 600,
                           letterSpacing: "-0.01em",
                           color: ink.strong,
                           borderBottom: `1px solid ${ink.hairline}`,
@@ -267,7 +270,8 @@ registerSlideModule({
                           key={ci}
                           className="py-5"
                           style={{
-                            fontSize: fillPx(24, "body"),
+                            fontSize: fillPx(cellPx, "body"),
+                            lineHeight: 1.3,
                             color: winnerIdx === ci ? ink.strong : ink.muted,
                             fontWeight: winnerIdx === ci ? 600 : 400,
                             borderBottom: `1px solid ${ink.hairline}`,
