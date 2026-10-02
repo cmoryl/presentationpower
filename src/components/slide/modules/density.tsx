@@ -155,11 +155,11 @@ registerSlideModule({
                       className="relative flex flex-col overflow-hidden rounded-2xl p-6"
                       style={{ background: isDark ? "rgba(255,255,255,0.05)" : hexA(accent, 0.05), border: `1px solid ${ink.hairline}` }}
                     >
-                      <div aria-hidden className="absolute inset-x-0 top-0 h-[3px]" style={{ background: `linear-gradient(90deg, ${accent}, ${hexA(accent, 0)})` }} />
-                      <div className="flex items-center justify-center rounded-full" style={{ width: 52, height: 52, background: hexA(accent, isDark ? 0.35 : 0.12), color: isDark ? "#FFFFFF" : accent }}>
+                      <div aria-hidden className="absolute inset-x-0 top-0 h-[3px]" style={{ background: `linear-gradient(90deg, ${isDark ? "#5B9BFF" : accent}, ${hexA(isDark ? "#5B9BFF" : accent, 0)})` }} />
+                      <div className="absolute right-5 top-5 flex items-center justify-center rounded-full" style={{ width: 52, height: 52, background: isDark ? "linear-gradient(145deg, #5B9BFF, #003FC7)" : hexA(accent, 0.12), color: isDark ? "#FFFFFF" : accent, boxShadow: isDark ? "0 0 0 1px rgba(255,255,255,0.25), 0 8px 22px -8px rgba(91,155,255,0.8)" : undefined }}>
                         <Icon size={26} strokeWidth={1.8} />
                       </div>
-                      <div className="mt-4 tabular-nums" style={{ fontSize: fillPx(48, "body"), fontWeight: 800, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1 }}>
+                      <div className="mt-10 pr-16 tabular-nums" style={{ fontSize: fillPx(48, "body"), fontWeight: 800, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1 }}>
                         {s(it.value)}
                         {s(it.unit) && <span style={{ color: isDark ? ink.strong : accent }}>{s(it.unit)}</span>}
                       </div>
