@@ -4479,6 +4479,8 @@ export const useDeckStore = create<DeckState>()(
             // Stat typography layout (shape + oversized icon + progress),
             // driven by the inspector's Stats picker.
             "statLayout",
+            // Map look, driven by the Map look picker on every location map.
+            "mapStyle",
           ]);
           // A field is editable when: it's a META field, matches an
           // editableFields pattern directly, OR it's an array root ("items",

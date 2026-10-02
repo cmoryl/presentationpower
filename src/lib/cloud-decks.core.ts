@@ -200,6 +200,30 @@ export async function saveDeckToCloudCore(
   const sb = supabase as MinimalSb;
   const briefUuid = toUuid(`brief:${userId}:${data.brief.id}`);
   let deckUuid = toUuid(`deck:${userId}:${data.deck.id}`);
+  // A deck opened straight from the cloud ("cloud-<uuid>") saves back to that
+  // row — a shared template edited by an admin/brand lead must update the
+  // template itself, not a private shadow copy. RLS still decides who may write.
+  let deckOwner = userId;
+  let keepTemplate = false;
+  {
+    const m = /^cloud-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i.exec(
+      data.deck.id,
+    );
+    if (m) {
+      const { data: linked } = await sb
+        .from("decks")
+        .select("id, owner_id, is_template")
+        .eq("id", m[1]);
+      const row = Array.isArray(linked)
+        ? (linked[0] as { id: string; owner_id: string; is_template: boolean } | undefined)
+        : undefined;
+      if (row && (row.owner_id === userId || row.is_template)) {
+        deckUuid = row.id;
+        deckOwner = row.owner_id;
+        keepTemplate = row.is_template === true;
+      }
+    }
+  }
 
   // Reference columns are FK-checked in the database; unknown/synthetic ids are
   // stored as NULL rather than failing the whole save.
@@ -270,7 +294,7 @@ export async function saveDeckToCloudCore(
 
   const { error: deckErr } = await sb.from("decks").upsert({
     id: deckUuid,
-    owner_id: userId,
+    owner_id: deckOwner,
     brief_id: briefUuid,
     title: data.deck.title,
     archetype_id: deckArchetype,
@@ -278,17 +302,30 @@ export async function saveDeckToCloudCore(
 
     status: keepStatus,
     context: deckContext,
-    is_template: data.deck.isTemplate ?? false,
+    is_template: keepTemplate || (data.deck.isTemplate ?? false),
   });
 
   if (deckErr) throw new Error(deckErr.message);
 
   // Replace slides — write first, prune after. Deleting up front meant a failed
   // insert left the deck with no slides at all, i.e. a save that destroyed work.
-  const { data: existingRows } = await sb.from("deck_slides").select("id").eq("deck_id", deckUuid);
-  const existingIds = Array.isArray(existingRows)
-    ? (existingRows as { id: string }[]).map((r) => r.id)
+  const { data: existingRows } = await sb
+    .from("deck_slides")
+    .select("id, content")
+    .eq("deck_id", deckUuid);
+  const existingList = Array.isArray(existingRows)
+    ? (existingRows as { id: string; content: Record<string, unknown> | null }[])
     : [];
+  const existingIds = existingList.map((r) => r.id);
+  // Reuse a saved row's id when the local slide came from it (seeded master
+  // rows have no derived id), so a save updates in place instead of inserting
+  // a duplicate at a position that is already taken.
+  const savedIdFor = new Map<string, string>();
+  for (const r of existingList) {
+    savedIdFor.set(r.id, r.id);
+    const lid = r.content?.["__localId"];
+    if (typeof lid === "string" && lid) savedIdFor.set(lid, r.id);
+  }
 
   if (data.deck.slides.length === 0) {
     // An empty deck overwriting saved slides is almost never what the user meant.
@@ -304,7 +341,7 @@ export async function saveDeckToCloudCore(
     const rows = [...data.deck.slides]
       .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
       .map((s, i) => ({
-      id: toUuid(`slide:${userId}:${data.deck.id}:${s.id}`),
+      id: savedIdFor.get(s.id) ?? toUuid(`slide:${userId}:${data.deck.id}:${s.id}`),
       deck_id: deckUuid,
       position: i,
       section_id: s.sectionId,
@@ -329,10 +366,13 @@ export async function saveDeckToCloudCore(
         .select("id, position")
         .eq("deck_id", deckUuid);
       const list = Array.isArray(posRows) ? (posRows as { id: string; position: number }[]) : [];
+      // Random parking band so two overlapping saves of the same deck never
+      // park different rows on the same negative slot.
+      const band = (1 + Math.floor(Math.random() * 1_000_000)) * 1000;
       for (let i = 0; i < list.length; i++) {
         const { error } = await sb
           .from("deck_slides")
-          .update({ position: -(i + 1) })
+          .update({ position: -(band + i + 1) })
           .eq("id", list[i].id);
         if (error) throw new Error(error.message);
         parked.push(list[i]);
