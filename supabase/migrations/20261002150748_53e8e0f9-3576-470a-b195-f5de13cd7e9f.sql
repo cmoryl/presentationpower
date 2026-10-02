@@ -1,0 +1,1 @@
+update public.deck_slides set content = jsonb_set(content,'{mapStyle}','"duotone"') where deck_id='7a6e1c52-0000-4e5a-9b1d-6e0a51ce0001' and variant_id like 'MV-LOC-%';
