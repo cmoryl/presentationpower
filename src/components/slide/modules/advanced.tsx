@@ -507,122 +507,191 @@ registerSlideModule({
         // tile keeps its body copy. Groups carry their own heading.
         const groups = arr(c.groups);
         if (groups.length) {
+          const gA = arr(groups[0]?.items);
+          const gB = arr(groups[1]?.items);
+          const surf = (extra: React.CSSProperties = {}): React.CSSProperties => ({
+            ...moduleCardSurface(brand.tokens.accent, isDark ? "dark" : "light", { radius: 22 }),
+            position: "relative",
+            overflow: "hidden",
+            minWidth: 0,
+            ...extra,
+          });
+          const kick = (txt: string) => (
+            <div
+              className="uppercase font-mono"
+              style={{
+                fontSize: fillPx(13, "kicker"),
+                letterSpacing: "0.26em",
+                color: "var(--slide-accent-text)",
+                fontWeight: 600,
+              }}
+            >
+              {txt}
+            </div>
+          );
+          const big = (v: string, px: number) => (
+            <div
+              className="tabular-nums"
+              style={{
+                fontSize: fillPx(px, "display"),
+                lineHeight: 0.86,
+                fontWeight: 700,
+                letterSpacing: "-0.05em",
+                color: ink.strong,
+              }}
+            >
+              {v}
+            </div>
+          );
+          const lab = (v: string, px = 22) => (
+            <div style={{ fontSize: fillPx(px, "body"), fontWeight: 600, color: ink.strong }}>{v}</div>
+          );
+          const bod = (v: string) =>
+            v ? (
+              <div style={{ fontSize: fillPx(17, "body"), lineHeight: 1.4, color: ink.body }}>{v}</div>
+            ) : null;
+          // Count glyphs: exactly N marks for a stated whole number (accurate, not a trend).
+          const marks = (n: number, cols: number, size: number, round: boolean) => (
+            <div
+              aria-hidden
+              className="grid"
+              style={{ gridTemplateColumns: `repeat(${cols}, ${size}px)`, gap: Math.round(size * 0.45) }}
+            >
+              {Array.from({ length: n }).map((_, k) => (
+                <span
+                  key={k}
+                  style={{
+                    width: size,
+                    height: size,
+                    borderRadius: round ? size : 3,
+                    background: `color-mix(in oklab, var(--slide-accent-text) ${45 + Math.round((k / Math.max(n - 1, 1)) * 55)}%, transparent)`,
+                  }}
+                />
+              ))}
+            </div>
+          );
+          const hero = gA[0];
+          const sideA = gA.slice(1, 3);
           return (
             <SlideFrame brand={brand} pageNumber={pageNumber}>
               <SlideTitle brand={brand} title={s(c.title, variant.name)} />
               {s(c.subtitle) && (
-                <div className="mt-4" style={{ fontSize: fillPx(24, "body"), color: ink.body }}>
+                <div className="mt-3" style={{ fontSize: fillPx(24, "body"), color: ink.body }}>
                   {s(c.subtitle)}
                 </div>
               )}
-              <div className="slide-fill-stretch mt-8 flex flex-col gap-6">
-                {groups.map((g, gi) => {
-                  const tiles = arr(g.items).slice(0, 4);
-                  return (
-                    <div key={gi} className="flex min-h-0 flex-1 flex-col">
-                      <div
-                        className="mb-3 uppercase"
-                        style={{
-                          fontSize: fillPx(16, "kicker"),
-                          letterSpacing: "0.2em",
-                          fontWeight: 700,
-                          color: "var(--slide-accent-text)",
-                        }}
-                      >
-                        {s(g.label)}
+              <div
+                className="slide-fill-stretch mt-8 grid gap-5"
+                style={{ gridTemplateColumns: "repeat(12, minmax(0,1fr))", gridTemplateRows: "1fr 1fr 1.25fr" }}
+              >
+                {hero && (
+                  <div style={surf({ gridColumn: "span 6", gridRow: "span 2", padding: 36 })}>
+                    <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
+                    <div
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background:
+                          "radial-gradient(110% 90% at 0% 100%, color-mix(in oklab, var(--slide-accent-text) 16%, transparent), transparent 62%)",
+                      }}
+                    />
+                    <div className="relative flex h-full flex-col justify-between">
+                      {kick(s(groups[0]?.label))}
+                      <div>
+                        {big(s(hero.value), 200)}
+                        <div className="mt-4">{lab(s(hero.label), 28)}</div>
                       </div>
-                      <div
-                        className="grid min-h-0 flex-1 gap-5"
-                        style={{ gridTemplateColumns: `repeat(${tiles.length}, minmax(0,1fr))` }}
-                      >
-                        {tiles.map((it, i) => {
-                          const value = s(it.value);
-                          const isPct = value.trim().endsWith("%");
-                          const pct = Math.max(0, Math.min(100, numeric(value)));
-                          const Icon = pickTileIcon(s(it.label), s(it.icon), gi * 4 + i);
-                          const R = 50;
-                          const C = 2 * Math.PI * R;
-                          return (
-                            <div
-                              key={i}
+                      <div>
+                        {/* One tick per year — exactly the stated figure. */}
+                        <div aria-hidden className="flex items-end gap-[5px]" style={{ height: 70 }}>
+                          {Array.from({ length: Math.min(60, Math.round(numeric(s(hero.value)))) }).map((_, k, a) => (
+                            <span
+                              key={k}
                               style={{
-                                ...moduleCardSurface(brand.tokens.accent, isDark ? "dark" : "light", {
-                                  radius: 22,
-                                }),
-                                padding: 28,
-                                position: "relative",
-                                overflow: "hidden",
-                                display: "flex",
-                                gap: 24,
-                                alignItems: "center",
-                                minWidth: 0,
+                                flex: 1,
+                                height: `${30 + (k / Math.max(a.length - 1, 1)) * 70}%`,
+                                borderRadius: 3,
+                                background: `color-mix(in oklab, var(--slide-accent-text) ${35 + Math.round((k / Math.max(a.length - 1, 1)) * 65)}%, transparent)`,
                               }}
-                            >
-                              <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
-                              {isPct ? (
-                                <svg width={132} height={132} viewBox="-66 -66 132 132" className="shrink-0" aria-hidden>
-                                  <circle r={R} fill="none" stroke={ink.hairline} strokeWidth={10} />
-                                  <circle
-                                    r={R}
-                                    fill="none"
-                                    stroke="var(--slide-accent-text)"
-                                    strokeWidth={10}
-                                    strokeLinecap="round"
-                                    strokeDasharray={`${(pct / 100) * C} ${C}`}
-                                    transform="rotate(-90)"
-                                  />
-                                </svg>
-                              ) : (
-                                <div
-                                  aria-hidden
-                                  className="flex shrink-0 items-center justify-center"
-                                  style={{
-                                    width: 72,
-                                    height: 72,
-                                    borderRadius: 20,
-                                    background: "color-mix(in oklab, var(--slide-accent-text) 11%, transparent)",
-                                    border: "1px solid color-mix(in oklab, var(--slide-accent-text) 30%, transparent)",
-                                    color: "var(--slide-accent-text)",
-                                  }}
-                                >
-                                  <Icon size={34} aria-hidden />
-                                </div>
-                              )}
-                              <div className="min-w-0">
-                                <div
-                                  className="tabular-nums"
-                                  style={{
-                                    fontSize: fillPx(isPct ? 64 : 80, "display"),
-                                    lineHeight: 0.95,
-                                    fontWeight: 700,
-                                    letterSpacing: "-0.04em",
-                                    color: ink.strong,
-                                  }}
-                                >
-                                  {value}
-                                </div>
-                                <div
-                                  className="mt-2"
-                                  style={{ fontSize: fillPx(22, "body"), fontWeight: 600, color: ink.strong }}
-                                >
-                                  {s(it.label)}
-                                </div>
-                                {s(it.body) && (
-                                  <div
-                                    className="mt-1.5"
-                                    style={{ fontSize: fillPx(17, "body"), lineHeight: 1.4, color: ink.body }}
-                                  >
-                                    {s(it.body)}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
+                            />
+                          ))}
+                        </div>
+                        {bod(s(hero.body))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {sideA.map((it, i) => {
+                  const n = Math.min(40, Math.round(numeric(s(it.value))));
+                  return (
+                    <div
+                      key={i}
+                      style={surf({
+                        gridColumn: "span 6",
+                        padding: 28,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 28,
+                      })}
+                    >
+                      <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
+                      <div className="shrink-0">{big(s(it.value), 104)}</div>
+                      <div className="flex min-w-0 flex-1 flex-col gap-3">
+                        {lab(s(it.label))}
+                        {bod(s(it.body))}
+                        {marks(n, Math.ceil(n / 2), 14, i === 0)}
                       </div>
                     </div>
                   );
                 })}
+                <div
+                  className="flex flex-col gap-3"
+                  style={{ gridColumn: "span 12", minHeight: 0 }}
+                >
+                  {kick(s(groups[1]?.label))}
+                  <div className="grid min-h-0 flex-1 grid-cols-3 gap-5">
+                    {gB.slice(0, 3).map((it, i) => {
+                      const pct = Math.max(0, Math.min(100, numeric(s(it.value))));
+                      const R = 62;
+                      const C = 2 * Math.PI * R;
+                      return (
+                        <div
+                          key={i}
+                          style={surf({ padding: 26, display: "flex", alignItems: "center", gap: 24 })}
+                        >
+                          <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
+                          <svg width={156} height={156} viewBox="-78 -78 156 156" className="shrink-0" aria-hidden>
+                            <circle r={R} fill="none" stroke={ink.hairline} strokeWidth={14} />
+                            <circle
+                              r={R}
+                              fill="none"
+                              stroke="var(--slide-accent-text)"
+                              strokeWidth={14}
+                              strokeLinecap="round"
+                              strokeDasharray={`${(pct / 100) * C} ${C}`}
+                              transform="rotate(-90)"
+                            />
+                            <text
+                              textAnchor="middle"
+                              dominantBaseline="central"
+                              fontSize={38}
+                              fontWeight={700}
+                              fill={ink.strong}
+                              style={{ letterSpacing: "-0.03em" }}
+                            >
+                              {s(it.value)}
+                            </text>
+                          </svg>
+                          <div className="flex min-w-0 flex-col gap-2">
+                            {lab(s(it.label), 24)}
+                            {bod(s(it.body))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </SlideFrame>
           );
