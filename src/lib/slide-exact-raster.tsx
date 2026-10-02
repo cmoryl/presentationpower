@@ -391,8 +391,10 @@ export async function captureGroundPlates(
         cacheBust: true,
         readyTimeoutMs: 9000,
       });
-      plateCache.set(key, plate || null);
-      return { plate: plate || null, media };
+      const { compressOpaquePlate } = await import("./plate-compress");
+      const small = plate ? await compressOpaquePlate(plate) : null;
+      plateCache.set(key, small);
+      return { plate: small, media };
     });
     out.push(res);
     onProgress?.(i + 1, items.length);
@@ -504,8 +506,9 @@ export async function rasterizeObjectPlate(args: ExactPlateArgs): Promise<{
       readyTimeoutMs: 9000,
     });
     if (!data) return null;
+    const { compressOpaquePlate } = await import("./plate-compress");
     return {
-      plate: data,
+      plate: await compressOpaquePlate(data),
       runs,
       shapes: shapes.map(({ node: _node, nodes: _nodes, ...rest }) => rest),
     };
