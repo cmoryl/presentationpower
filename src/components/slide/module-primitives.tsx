@@ -1709,12 +1709,45 @@ export function Card({
       >
         {title}
       </div>
-      <div
-        className="mt-4"
-        style={{ fontSize: fillPx(21, "body"), lineHeight: 1.4, color: bodyColor }}
-      >
-        {body}
-      </div>
+      {(() => {
+        // "A · B · C" bodies are lists in disguise: give each entry its own
+        // ruled row so a short-copy card reads as designed, not empty.
+        const parts = body.split(/\s+·\s+/).map((p) => p.trim()).filter(Boolean);
+        if (parts.length < 3) {
+          return (
+            <div
+              className="mt-4"
+              style={{ fontSize: fillPx(21, "body"), lineHeight: 1.4, color: bodyColor }}
+            >
+              {body}
+            </div>
+          );
+        }
+        return (
+          <ul className="mt-6 flex flex-col">
+            {parts.map((p, i) => (
+              <li
+                key={i}
+                className="flex items-baseline gap-3"
+                style={{
+                  fontSize: fillPx(parts.length > 6 ? 20 : 24, "body"),
+                  lineHeight: 1.3,
+                  color: bodyColor,
+                  paddingBlock: parts.length > 6 ? 6 : 10,
+                  borderTop: i === 0 ? undefined : `1px solid ${ink.hairline}`,
+                }}
+              >
+                <span
+                  aria-hidden
+                  className="shrink-0 rounded-full"
+                  style={{ width: 8, height: 8, background: accentInk(brand.tokens.accent, mode, 3) }}
+                />
+                <span>{p}</span>
+              </li>
+            ))}
+          </ul>
+        );
+      })()}
     </div>
   );
 }
