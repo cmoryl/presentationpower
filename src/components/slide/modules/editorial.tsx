@@ -29,6 +29,7 @@ import { accentInk, hexA } from "@/lib/accent-tokens";
 import { fillPx, statPx, clampLines } from "@/lib/open-space-fill";
 import { useSlideInk } from "../SlideChrome";
 import type { CSSProperties } from "react";
+import { Blend, Target } from "lucide-react";
 
 registerSlideModule({
   id: "family:editorial",
@@ -521,8 +522,28 @@ registerSlideModule({
                 <Kicker brand={brand} color={strong ? undefined : ink.muted}>
                   {s(side.label)}
                 </Kicker>
+                <div className="mt-4 flex items-center gap-6">
+                  {(() => {
+                    const h = s(side.headline).toLowerCase();
+                    const SideIcon = h.includes("exact") ? Target : h.includes("fuzzy") ? Blend : null;
+                    if (!SideIcon) return null;
+                    return (
+                      <span
+                        aria-hidden
+                        className="flex shrink-0 items-center justify-center rounded-2xl"
+                        style={{
+                          width: 92,
+                          height: 92,
+                          color: strong ? "var(--slide-accent-text)" : ink.body,
+                          background: `color-mix(in oklab, ${strong ? "var(--slide-accent-text)" : ink.muted} 16%, transparent)`,
+                          border: `2px solid color-mix(in oklab, ${strong ? "var(--slide-accent-text)" : ink.muted} 45%, transparent)`,
+                        }}
+                      >
+                        <SideIcon size={50} strokeWidth={1.75} />
+                      </span>
+                    );
+                  })()}
                 <div
-                  className="mt-4"
                   style={{
                     fontSize: fillPx(strong ? 96 : 88, "display"),
                     fontWeight: 700,
@@ -532,6 +553,7 @@ registerSlideModule({
                   }}
                 >
                   {s(side.headline)}
+                </div>
                 </div>
                 <div className="mt-10 flex flex-col gap-6">
                   {rows.map((r, i) => (
