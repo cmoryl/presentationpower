@@ -67,10 +67,16 @@ export function withGradientFills(xml: string): string {
     const frag = gradFillXml(grad);
 
     let out = sp.replace(/<p:spPr>[\s\S]*?<\/p:spPr>/, (spPr) => {
-      if (/<a:solidFill>/.test(spPr)) {
-        return spPr.replace(/<a:solidFill>[\s\S]*?<\/a:solidFill>/, frag);
+      // Only the shape's own fill may be replaced — never a fill nested in the
+      // outline (`<a:ln>`), or the gradient becomes a stroke and the shape
+      // (e.g. a photo scrim) renders unfilled.
+      const lnAt = spPr.search(/<a:ln[\s>]/);
+      const head = lnAt >= 0 ? spPr.slice(0, lnAt) : spPr;
+      const tail = lnAt >= 0 ? spPr.slice(lnAt) : "";
+      if (/<a:solidFill>/.test(head)) {
+        return head.replace(/<a:solidFill>[\s\S]*?<\/a:solidFill>/, frag) + tail;
       }
-      if (/<a:noFill\s*\/>/.test(spPr)) return spPr.replace(/<a:noFill\s*\/>/, frag);
+      if (/<a:noFill\s*\/>/.test(head)) return head.replace(/<a:noFill\s*\/>/, frag) + tail;
       // No fill element at all: drop the gradient in right after the geometry.
       return spPr.replace(/(<\/a:prstGeom>|<a:prstGeom[^>]*\/>)/, `$1${frag}`);
     });

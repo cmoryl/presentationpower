@@ -515,7 +515,6 @@ registerSlideModule({
                 </GlassTile>
                 {stack && (
                   <div className="relative grid gap-5" style={{ gridTemplateRows: "repeat(4, minmax(0, 1fr))" }}>
-                    <div aria-hidden className="absolute bottom-12 top-12" style={{ left: 47, width: 2, background: "linear-gradient(180deg, #7FB3F5, #7FE3F5, #C2A3FF, #A6C8FF)", opacity: 0.55 }} />
                     {arr(c.items).map((it, i) => {
                       const g = GL5[i % 4];
                       const Ico = iconByName(s(it.icon));
