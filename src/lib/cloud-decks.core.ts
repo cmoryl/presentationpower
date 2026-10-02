@@ -392,10 +392,15 @@ export async function saveDeckToCloudCore(
       // Random parking band so two overlapping saves of the same deck never
       // park different rows on the same negative slot.
       const band = (1 + Math.floor(Math.random() * 1_000_000)) * 1000;
+      // Park each row at its NEW index (negated), so an interrupted save
+      // still leaves the deck in the intended order instead of scrambled.
+      const nextPos = new Map(rows.map((r) => [r.id as string, r.position as number]));
+      const spare = rows.length;
       for (let i = 0; i < list.length; i++) {
+        const target = nextPos.get(list[i].id) ?? spare + i;
         const { error } = await sb
           .from("deck_slides")
-          .update({ position: -(band + i + 1) })
+          .update({ position: -band + target })
           .eq("id", list[i].id);
         if (error) throw new Error(error.message);
         parked.push(list[i]);
