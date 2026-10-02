@@ -11,6 +11,7 @@ import { fillPx } from "@/lib/open-space-fill";
 import type { SlideMode } from "../SlideChrome";
 import type { BrandMode } from "@/lib/taxonomy";
 import { exportMapNodeAsPng } from "@/lib/map-png-export";
+import { lookupCity } from "@/lib/city-coords";
 
 // ────────────────────────────────────────────────────────────────────────────
 // Locations family — MV-LOC-* renderer
@@ -37,9 +38,17 @@ function coerceRegion(raw: unknown): LocRegionKey {
     : "world";
 }
 
-function coercePin(raw: Record<string, unknown>, i: number): LocPin | null {
-  const lat = Number(raw.lat);
-  const lon = Number(raw.lon);
+function coercePin(
+  raw: Record<string, unknown>,
+  i: number,
+  bounds?: { latMin: number; latMax: number; lonMin: number; lonMax: number },
+): LocPin | null {
+  let lat = Number(raw.lat);
+  let lon = Number(raw.lon);
+  if ((!Number.isFinite(lat) || !Number.isFinite(lon)) && typeof raw.city === "string") {
+    const hit = lookupCity(raw.city, bounds);
+    if (hit) [lat, lon] = hit;
+  }
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
   const region = (raw.region as string)?.toUpperCase();
   const validRegion = ["AMER", "EMEA", "APAC", "LATAM", "MEA"].includes(region)
@@ -166,6 +175,18 @@ type LocationsInk = {
   accentText: string;
 };
 
+function readBounds(raw: unknown) {
+  const b = raw as Record<string, unknown> | undefined;
+  return b && [b.latMin, b.latMax, b.lonMin, b.lonMax].every((v) => Number.isFinite(Number(v)))
+    ? {
+        latMin: Number(b.latMin),
+        latMax: Number(b.latMax),
+        lonMin: Number(b.lonMin),
+        lonMax: Number(b.lonMax),
+      }
+    : undefined;
+}
+
 function renderLocationsVariant(
   variantId: string,
   brand: { id: string; tokens: { accent: string; primary: string } } & Record<string, unknown>,
@@ -177,7 +198,11 @@ function renderLocationsVariant(
   const seeded = locGetDivisionSet(brand.id);
   const rawItems = Array.isArray(c.items) ? (c.items as Record<string, unknown>[]) : [];
   const pins: LocPin[] =
-    rawItems.length > 0 ? rawItems.map(coercePin).filter((x): x is LocPin => !!x) : seeded.pins;
+    rawItems.length > 0
+      ? rawItems
+          .map((r, i) => coercePin(r, i, readBounds(c.bounds)))
+          .filter((x): x is LocPin => !!x)
+      : seeded.pins;
 
   const title = (c.title as string) || seeded.headline;
   const subtitle = (c.subtitle as string) || seeded.subhead || "";
@@ -1023,16 +1048,7 @@ function renderLocationsVariant(
     const n = names.length;
     const cols = n <= 6 ? 1 : n <= 24 ? 2 : n <= 54 ? 3 : 4;
     const px = n <= 6 ? 34 : n <= 24 ? 24 : n <= 54 ? 19 : 16;
-    const b = c.bounds as Record<string, unknown> | undefined;
-    const bounds =
-      b && [b.latMin, b.latMax, b.lonMin, b.lonMax].every((v) => Number.isFinite(Number(v)))
-        ? {
-            latMin: Number(b.latMin),
-            latMax: Number(b.latMax),
-            lonMin: Number(b.lonMin),
-            lonMax: Number(b.lonMax),
-          }
-        : undefined;
+    const bounds = readBounds(c.bounds);
     return (
       <SlideFrame brand={brand as never} pageNumber={pageNumber}>
         <div className="relative flex h-full flex-col">
