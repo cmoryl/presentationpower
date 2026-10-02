@@ -564,7 +564,16 @@ function iconGlowShapeFor(
     natW: w,
     natH: h,
     fit: "contain",
-    cssFilter: filter,
+    cssFilter: (() => {
+      // Faint watermark icons get their look from ancestor opacity, which a
+      // standalone picture would lose — bake it in.
+      let a = 1;
+      for (let n: Element | null = el; n && n !== document.body; n = n.parentElement) {
+        const o = parseFloat(getComputedStyle(n).opacity);
+        if (Number.isFinite(o)) a *= o;
+      }
+      return a < 0.99 ? `${filter} opacity(${a.toFixed(3)})` : filter;
+    })(),
     rotationDeg: rotationOf(cs.transform),
     name: nameFor(el, "TP Icon"),
     node: el,
