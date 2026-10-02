@@ -68,6 +68,48 @@ registerSlideModule({
     switch (variant.id) {
       case "MV-CTX-CARDS-3":
       case "MV-SOL-PILLARS-3":
+        if (s(c.display) === "rising") {
+          // Ascending pillars: each step stands taller, crowned by its image.
+          const its = arr(c.items).slice(0, 3);
+          const heights = [560, 660, 760];
+          return (
+            <SlideFrame brand={brand} pageNumber={pageNumber}>
+              <AuroraOrb x={90} y={20} size={820} />
+              <div className="relative flex h-full flex-col">
+                <SlideTitle brand={brand} title={s(c.title)} />
+                <div className="mt-auto grid grid-cols-3 items-end gap-10">
+                  {its.map((it, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col overflow-hidden rounded-[26px]"
+                      style={{ height: heights[i] ?? 760, background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.8)", border: `1px solid ${ink.hairline}` }}
+                    >
+                      {s(it.image) && (
+                        <img src={s(it.image)} alt="" className="w-full shrink-0 object-cover" style={{ height: 230 }} />
+                      )}
+                      <div className="flex flex-1 flex-col px-9 py-8">
+                        <div className="tabular-nums" style={{ fontSize: fillPx(26, "figure"), fontWeight: 800, color: "var(--slide-accent-text)" }}>
+                          {String(i + 1).padStart(2, "0")}
+                        </div>
+                        <div className="mt-3" style={{ fontSize: fillPx(34, "figure"), fontWeight: 700, lineHeight: 1.1, color: ink.strong }}>
+                          {s(it.title)}
+                        </div>
+                        <div className="mt-5 flex flex-col gap-3">
+                          {s(it.body).split(/\s+·\s+/).filter(Boolean).map((line, k) => (
+                            <div key={k} className="pt-3" style={{ borderTop: `1px solid ${ink.hairline}`, fontSize: fillPx(22, "body"), lineHeight: 1.35, color: ink.body }}>
+                              {line}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-auto h-[4px] rounded-full" style={{ width: `${40 + i * 30}%`, background: "var(--slide-accent-text)" }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </SlideFrame>
+          );
+        }
         return (
           <CardGrid
             brand={brand}
@@ -400,7 +442,14 @@ registerSlideModule({
                 className="mt-10 grid grid-cols-2 gap-8"
                 style={{ gridTemplateRows: "1fr 1fr", height: 760 }}
               >
-                <GlassTile radius={26} padding="px-10 py-9" className="row-span-2 overflow-hidden">
+                <GlassTile radius={26} padding="px-10 py-9" className="relative row-span-2 overflow-hidden">
+                  {s(hero.image) && (
+                    <div aria-hidden className="pointer-events-none absolute inset-0">
+                      <img src={s(hero.image)} alt="" className="h-full w-full object-cover" style={{ opacity: isDark ? 0.22 : 0.14 }} />
+                      <div className="absolute inset-0" style={{ background: isDark ? "linear-gradient(180deg, rgba(3,0,44,0.55) 0%, rgba(3,0,44,0.2) 100%)" : "linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 100%)" }} />
+                    </div>
+                  )}
+                  <div className="relative">
                   {s(hero.kicker) && <Kicker brand={brand}>{s(hero.kicker)}</Kicker>}
                   <Hairline
                     color={"var(--slide-accent-text)"}
@@ -422,6 +471,7 @@ registerSlideModule({
                   <SupportingText size="md" opacity={0.78} className="mt-5" maxWidthPx={560}>
                     {s(hero.body)}
                   </SupportingText>
+                  </div>
                 </GlassTile>
                 {arr(c.items)
                   .slice(0, 4)

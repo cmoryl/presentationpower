@@ -1,0 +1,2 @@
+UPDATE public.deck_slides SET content = jsonb_set(content, '{hero,image}', '"/masters/general-slides/bg-productivity.jpg"') WHERE deck_id='7a6e1c52-0000-4e5a-9b1d-6e0a51ce0001' AND position=14;
+UPDATE public.deck_slides SET content = jsonb_set(jsonb_set(jsonb_set(content || '{"display":"rising"}'::jsonb, '{items,0,image}', '"/masters/general-slides/pillar-tm.jpg"'), '{items,1,image}', '"/masters/general-slides/pillar-glossary.jpg"'), '{items,2,image}', '"/masters/general-slides/pillar-team.jpg"') WHERE deck_id='7a6e1c52-0000-4e5a-9b1d-6e0a51ce0001' AND position=24;
