@@ -46,8 +46,10 @@ registerSlideModule({
                     className="relative flex aspect-[3/2] flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl px-6 py-8 text-center"
                     style={{
                       color: tileText,
-                      background: tileBg,
-                      border: bareSurfaces ? "none" : `1px solid ${tileRing}`,
+                      background: isDark ? "linear-gradient(160deg, rgba(127,179,245,0.16) 0%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.02) 100%)" : tileBg,
+                      border: isDark ? "1px solid rgba(255,255,255,0.16)" : bareSurfaces ? "none" : `1px solid ${tileRing}`,
+                      boxShadow: isDark ? "inset 0 1px 0 rgba(255,255,255,0.2), 0 18px 40px -26px rgba(127,179,245,0.6)" : undefined,
+                      backdropFilter: isDark ? "blur(14px)" : undefined,
                     }}
                   >
                     {!bareSurfaces && (
@@ -66,6 +68,7 @@ registerSlideModule({
                           url={logoUrl}
                           alt={name ? `${name} logo` : "Client logo"}
                           className="max-h-[110px] max-w-[80%] object-contain"
+                          style={isDark ? { filter: "brightness(0) invert(1)" } : undefined}
                         />
                       ) : (
                         <div
@@ -345,12 +348,12 @@ registerSlideModule({
                     <div
                       key={i}
                       className="flex items-center justify-center rounded-xl p-4"
-                      style={{ background: isDark ? "#FFFFFF" : "rgba(255,255,255,0.72)", border: `1px solid ${ink.hairline}` }}
+                      style={isDark ? { background: "linear-gradient(160deg, rgba(127,179,245,0.16) 0%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.02) 100%)", border: "1px solid rgba(255,255,255,0.16)", borderBottom: `2px solid ${["#7FB3F5", "#7FE3F5", "#C2A3FF"][i % 3]}88`, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2)", backdropFilter: "blur(14px)" } : { background: "rgba(255,255,255,0.72)", border: `1px solid ${ink.hairline}` }}
                     >
                       {url || path ? (
-                        <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-[70%] max-w-[85%] object-contain" />
+                        <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-[70%] max-w-[85%] object-contain" style={isDark ? { filter: "brightness(0) invert(1)" } : undefined} />
                       ) : (
-                        <div className="text-center font-semibold" style={{ color: brand.tokens.primary, fontSize: 18 }}>{name}</div>
+                        <div className="text-center font-semibold" style={{ color: isDark ? "#FFFFFF" : brand.tokens.primary, fontSize: 18 }}>{name}</div>
                       )}
                     </div>
                   );
