@@ -318,6 +318,96 @@ registerSlideModule({
         const rowFont = rowCount > 7 ? 24 : rowCount > 5 ? 26 : 28;
         const rowPad = rowCount > 7 ? 12 : rowCount > 5 ? 16 : 20;
 
+        // Logo marketplace: when rows carry a `logo`, each side becomes a glass
+        // panel of logo tiles (white marks on frosted glass) around a VS disc.
+        const hasLogos = [...leftRows, ...rightRows].some((r) => s(obj(r).logo));
+        if (hasLogos) {
+          const glows = ["#7FB3F5", "#C2A3FF"];
+          const Panel = ({ heading, rows, glow }: { heading: string; rows: ReturnType<typeof arr>; glow: string }) => (
+            <div
+              className="relative flex min-w-0 flex-1 flex-col"
+              style={{
+                borderRadius: 22,
+                padding: "30px 30px 34px",
+                background: `linear-gradient(160deg, ${glow}26 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.02) 100%)`,
+                border: "1px solid rgba(255,255,255,0.16)",
+                boxShadow: `inset 0 1px 0 rgba(255,255,255,0.22), 0 24px 60px ${glow}1f`,
+                backdropFilter: "blur(16px)",
+              }}
+            >
+              <div className="flex items-center" style={{ gap: 14, marginBottom: 24 }}>
+                <span style={{ width: 10, height: 10, borderRadius: 999, background: glow, boxShadow: `0 0 14px ${glow}` }} />
+                <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: "0.22em", textTransform: "uppercase", color: "#FFFFFF" }}>
+                  {heading}
+                </span>
+                <span style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${glow}, transparent)` }} />
+              </div>
+              <div className="grid flex-1" style={{ gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+                {rows.map((raw, i) => {
+                  const r = obj(raw);
+                  const logo = s(r.logo);
+                  const wide = /transperfect/i.test(logo);
+                  return (
+                    <div
+                      key={i}
+                      className="flex flex-col items-center justify-center"
+                      style={{
+                        borderRadius: 16,
+                        padding: "22px 16px",
+                        gap: 16,
+                        background: "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03))",
+                        border: "1px solid rgba(255,255,255,0.14)",
+                        borderBottom: `2px solid ${glow}99`,
+                      }}
+                    >
+                      <div className="flex items-center justify-center" style={{ height: 72 }}>
+                        {logo ? (
+                          <img src={logo} alt="" style={{ height: wide ? 34 : 64, width: "auto", maxWidth: 260 }} />
+                        ) : (
+                          <span
+                            className="flex items-center justify-center"
+                            style={{ width: 64, height: 64, borderRadius: 999, border: "2px dashed rgba(255,255,255,0.7)", color: "#FFFFFF", fontSize: 40, fontWeight: 300 }}
+                          >
+                            +
+                          </span>
+                        )}
+                      </div>
+                      <span style={{ fontSize: 26, fontWeight: 700, color: "#FFFFFF", textAlign: "center", lineHeight: 1.15 }}>
+                        {s(r.label)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+          return (
+            <SlideFrame brand={brand} pageNumber={pageNumber}>
+              <SlideTitle brand={brand} title={s(c.title)} />
+              {s(c.subtitle) && (
+                <p style={{ marginTop: 18, fontSize: 28, lineHeight: 1.35, color: "#FFFFFF", maxWidth: 1400 }}>{s(c.subtitle)}</p>
+              )}
+              <div className="relative mt-10 flex min-h-0 flex-1 items-stretch" style={{ gap: 90 }}>
+                <Panel heading={s(left.label, "Left")} rows={leftRows} glow={glows[0]} />
+                <div
+                  aria-hidden
+                  className="absolute flex items-center justify-center"
+                  style={{
+                    left: "50%", top: "50%", width: 120, height: 120, marginLeft: -60, marginTop: -60, borderRadius: 999,
+                    background: "radial-gradient(circle at 35% 30%, rgba(255,255,255,0.28), rgba(11,16,48,0.92) 70%)",
+                    border: "1px solid rgba(255,255,255,0.35)",
+                    boxShadow: "0 0 0 10px rgba(255,255,255,0.05), 0 0 40px rgba(127,179,245,0.45)",
+                    color: "#FFFFFF", fontSize: 40, fontWeight: 800, zIndex: 2,
+                  }}
+                >
+                  VS
+                </div>
+                <Panel heading={s(right.label, "Right")} rows={rightRows} glow={glows[1]} />
+              </div>
+            </SlideFrame>
+          );
+        }
+
         const VsColumn = ({
           heading,
           rows,
