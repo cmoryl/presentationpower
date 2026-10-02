@@ -177,7 +177,6 @@ registerSlideModule({
               </div>
             </SlideFrame>
           );
-          );
         }
         // Hub & satellites: one centre disc ringed by icon nodes, each node paired
         // with a feature block in the flanking columns. Scales 4-8 features — the
