@@ -29,7 +29,7 @@ import { accentInk, hexA } from "@/lib/accent-tokens";
 import { fillPx, statPx, clampLines } from "@/lib/open-space-fill";
 import { useSlideInk } from "../SlideChrome";
 import type { CSSProperties } from "react";
-import { Blend, Target } from "lucide-react";
+import { Blend, Target, CupSoda, Sparkles, GlassWater, Droplets } from "lucide-react";
 import { LoopHalo } from "./process";
 
 registerSlideModule({
@@ -456,7 +456,14 @@ registerSlideModule({
                       const g = G[i % G.length];
                       return (
                         <div key={i} className="relative flex flex-col justify-end overflow-hidden" style={{ borderRadius: 16, padding: "22px 24px", background: "linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.025))", border: "1px solid rgba(255,255,255,0.14)", borderBottom: `3px solid ${g}` , boxShadow: `0 16px 34px -22px ${g}` }}>
-                          <span aria-hidden data-decorative className="absolute" style={{ top: 12, right: 18, fontSize: 64, fontWeight: 800, lineHeight: 1, color: `${g}33` }}>&ldquo;</span>
+                          {(() => {
+                            const TermIcon = [CupSoda, Sparkles, GlassWater, Droplets][i % 4];
+                            return (
+                              <span aria-hidden data-decorative className="pointer-events-none absolute" style={{ top: -18, right: -14, color: g, opacity: 0.16, transform: "rotate(-8deg)", filter: `drop-shadow(0 0 14px ${g})` }}>
+                                <TermIcon size={150} strokeWidth={1.1} />
+                              </span>
+                            );
+                          })()}
                           <span aria-hidden data-decorative style={{ fontSize: 16, fontWeight: 700, letterSpacing: "0.14em", color: g }}>{String(i + 1).padStart(2, "0")}</span>
                           <span style={{ marginTop: 8, fontSize: leftRows.length > 4 ? 36 : 44, fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.05, color: "#FFFFFF" }}>
                             {s(typeof it === "string" ? it : obj(it).label)}
