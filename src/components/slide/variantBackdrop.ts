@@ -172,6 +172,13 @@ function _computeBackdrop(
   const pickAbstract = (offset = 0) => corporateBg ?? abstracts[(seed + offset) % abstracts.length];
   const pickPortrait = () => corporateBg ?? PORTRAITS[seed % PORTRAITS.length];
 
+  // Proof board (General Slides slide 2) hashed onto one of the flat navy
+  // plates, so it read darker than its neighbours. Pin it to a violet→aqua
+  // plate with the same light scrim the other dark data slides use.
+  if (useCorporateDark && id === "MV-STAT-PROOF-BOARD") {
+    return { url: CORPORATE_DARK_BACKDROPS[7]!, scrim: "left", scrimStrength: 0.8, imageDim: 0.1, tint: "#03002C" };
+  }
+
   // Full-bleed cover / hero — enterprise photograph, strong side scrim.
   if (/^MV-OP-COVER(-MEDIA)?$/.test(id) || id === "MV-CS-HERO" || id === "MV-CTA-CLOSING-HERO") {
     return {
