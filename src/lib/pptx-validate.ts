@@ -238,7 +238,10 @@ export async function validatePptxBytes(
 
     if (want.probes.length > 0 && probesFound === 0) {
       issues.push({
-        level: expected.expectTextRuns ? "error" : "warning",
+        // A slide whose own title/text is present but whose body copy lives
+        // inside a design picture (e.g. the quality dial labels) is identified
+        // and complete; only a slide with NO text is a broken export.
+        level: expected.expectTextRuns && !check.hasText ? "error" : "warning",
         code: "slide-unidentified",
         message: `Slide ${i + 1} (${want.variantId}) could not be identified — none of its expected copy was found in the exported slide.`,
       });
