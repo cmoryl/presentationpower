@@ -204,6 +204,7 @@ export async function saveDeckToCloudCore(
   // row — a shared template edited by an admin/brand lead must update the
   // template itself, not a private shadow copy. RLS still decides who may write.
   let deckOwner = userId;
+  let keepTemplate = false;
   {
     const m = /^cloud-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i.exec(
       data.deck.id,
@@ -219,6 +220,7 @@ export async function saveDeckToCloudCore(
       if (row && (row.owner_id === userId || row.is_template)) {
         deckUuid = row.id;
         deckOwner = row.owner_id;
+        keepTemplate = row.is_template === true;
       }
     }
   }
@@ -300,7 +302,7 @@ export async function saveDeckToCloudCore(
 
     status: keepStatus,
     context: deckContext,
-    is_template: data.deck.isTemplate ?? false,
+    is_template: keepTemplate || (data.deck.isTemplate ?? false),
   });
 
   if (deckErr) throw new Error(deckErr.message);
