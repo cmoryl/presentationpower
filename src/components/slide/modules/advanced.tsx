@@ -548,7 +548,7 @@ registerSlideModule({
           );
           const bod = (v: string) =>
             v ? (
-              <div style={{ fontSize: fillPx(17, "body"), lineHeight: 1.4, color: ink.body }}>{v}</div>
+              <div style={{ fontSize: fillPx(17, "body"), lineHeight: 1.4, color: ink.strong, opacity: 0.85 }}>{v}</div>
             ) : null;
           // Count glyphs: exactly N marks for a stated whole number (accurate, not a trend).
           const marks = (n: number, cols: number, size: number, round: boolean) => (
