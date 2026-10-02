@@ -1721,9 +1721,9 @@ export function Card({
           return (
             <div
               className="mt-4"
-              style={{ fontSize: fillPx(21, "body"), lineHeight: 1.4, color: bodyColor }}
+              style={{ fontSize: fillPx(listBody ? 27 : 21, "body"), lineHeight: 1.4, color: bodyColor }}
             >
-              {body}
+              {listBody ? body.split(/\s+·\s+/).join(". ").replace(/\.\.$/, ".") : body}
             </div>
           );
         }
