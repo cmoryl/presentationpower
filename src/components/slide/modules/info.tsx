@@ -69,6 +69,13 @@ registerSlideModule({
           };
           const tone = (k: string) => (k === "ai" ? aiInk : k === "human" ? humanInk : ink.strong);
           const seg = (Math.PI * 2) / N;
+          const runs: { k: string; from: number; to: number }[] = [];
+          steps.forEach((it, i) => {
+            const k = kindOf(it, i);
+            const last = runs[runs.length - 1];
+            if (last && last.k === k) last.to = i;
+            else runs.push({ k, from: i, to: i });
+          });
           const gap = 0.16;
           const ground = isDark ? "#070B33" : "#FFFFFF";
           return (
@@ -86,8 +93,25 @@ registerSlideModule({
                         <stop offset="100%" stopColor={aiInk} stopOpacity={0} />
                       </radialGradient>
                     </defs>
+                    <style>{`
+                      @keyframes loopFlow { to { stroke-dashoffset: -32; } }
+                      @keyframes loopOrbit { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+                      @keyframes loopPulse { 0%, 100% { transform: scale(1); opacity: 0; } 8% { opacity: 0.9; } 30% { transform: scale(1.55); opacity: 0; } }
+                      .loop-flow { animation: loopFlow 1.4s linear infinite; }
+                      .loop-comet { offset-path: path("M ${CX} ${CY - R} A ${R} ${R} 0 1 1 ${CX - 0.01} ${CY - R}"); offset-rotate: 0deg; animation: loopOrbit ${N * 1.6}s linear infinite; }
+                      .loop-pulse { animation: loopPulse ${N * 1.6}s ease-out infinite; }
+                      @media (prefers-reduced-motion: reduce) { .loop-flow, .loop-comet, .loop-pulse { animation: none; } .loop-comet { offset-distance: 0%; } }
+                    `}</style>
                     <circle cx={CX} cy={CY} r={R - 40} fill="url(#loopCore)" />
                     <circle cx={CX} cy={CY} r={R} fill="none" stroke={ink.hairline} strokeWidth={1.5} />
+                    {/* Inner tick track: a timeline scale round the loop */}
+                    {Array.from({ length: N * 8 }).map((_, j) => {
+                      const a = -Math.PI / 2 + (j / (N * 8)) * Math.PI * 2;
+                      const major = j % 8 === 0;
+                      const [x0, y0] = pt(a, R - 26);
+                      const [x1, y1] = pt(a, R - (major ? 44 : 32));
+                      return <line key={`tk-${j}`} x1={x0} y1={y0} x2={x1} y2={y1} stroke={ink.hairline} strokeWidth={major ? 2 : 1} />;
+                    })}
                     {steps.map((it, i) => {
                       const k = kindOf(it, i);
                       const a0 = ang(i) + gap;
@@ -99,9 +123,14 @@ registerSlideModule({
                         <g key={`seg-${i}`}>
                           <path d={arcPath(a0, a1, R)} fill="none" stroke={tone(k)} strokeWidth={4} strokeLinecap="round" />
                           <path d={head} fill="none" stroke={tone(k)} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
+                          <path className="loop-flow" d={arcPath(a0, a1 - 0.04, R)} fill="none" stroke={isDark ? "#FFFFFF" : "#03002C"} strokeOpacity={0.55} strokeWidth={2} strokeDasharray="3 13" strokeLinecap="round" />
                         </g>
                       );
                     })}
+                    <g className="loop-comet">
+                      <circle r={16} fill={aiInk} opacity={0.18} />
+                      <circle r={7} fill={isDark ? "#FFFFFF" : "#03002C"} />
+                    </g>
                   </svg>
                   {/* Centre */}
                   <div
@@ -130,6 +159,19 @@ registerSlideModule({
                     const out = k === "out";
                     return (
                       <React.Fragment key={i}>
+                        <div
+                          aria-hidden
+                          className="loop-pulse absolute rounded-full"
+                          style={{
+                            left: x - size / 2,
+                            top: y - size / 2,
+                            width: size,
+                            height: size,
+                            border: `2px solid ${tone(k)}`,
+                            opacity: 0,
+                            animationDelay: `${i * 1.6}s`,
+                          }}
+                        />
                         <div
                           className="absolute flex items-center justify-center rounded-full"
                           style={{
@@ -172,6 +214,40 @@ registerSlideModule({
                   <div className="my-8" style={{ width: 64, height: 3, background: humanInk, borderRadius: 2 }} aria-hidden />
                   <div style={{ fontSize: fillPx(30, "body"), lineHeight: 1.3, fontWeight: 500, color: ink.strong, opacity: 0.85 }}>
                     {s(summary.emphasis)}
+                  </div>
+                  {/* Flow strip: the same steps as a left-to-right timeline,
+                      grouped by who does the work. */}
+                  <div className="mt-12">
+                    <div className="relative flex items-start justify-between">
+                      <div aria-hidden className="absolute left-0 right-0" style={{ top: 13, height: 2, background: `linear-gradient(90deg, ${aiInk}, ${humanInk}, ${ink.strong})`, opacity: 0.7 }} />
+                      {steps.map((it, i) => {
+                        const k = kindOf(it, i);
+                        return (
+                          <div key={`fs-${i}`} className="relative flex flex-col items-center text-center" style={{ width: `${100 / N}%` }}>
+                            <div
+                              className="flex items-center justify-center rounded-full tabular-nums"
+                              style={{ width: 28, height: 28, fontSize: 13, fontWeight: 700, background: k === "out" ? tone(k) : ground, color: k === "out" ? ground : tone(k), border: `2px solid ${tone(k)}` }}
+                            >
+                              {i + 1}
+                            </div>
+                            <div className="mt-3 px-1" style={{ fontSize: 15, lineHeight: 1.2, fontWeight: 600, color: ink.strong, opacity: 0.85 }}>
+                              {s(it.label)}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="mt-4 flex" style={{ fontSize: 13, letterSpacing: "0.22em", fontWeight: 700 }}>
+                      {runs.map((r, k) => (
+                        <div
+                          key={`ph-${k}`}
+                          className="pt-2 text-center"
+                          style={{ width: `${((r.to - r.from + 1) / N) * 100}%`, borderTop: `3px solid ${tone(r.k)}`, color: tone(r.k), marginRight: 6 }}
+                        >
+                          {r.k === "ai" ? "AI" : r.k === "human" ? "HUMAN" : ""}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
