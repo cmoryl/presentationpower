@@ -588,6 +588,10 @@ export function extractTextRuns(
       },
     });
     nodes.push(svgText as unknown as HTMLElement);
+    // Hide now: the diagram itself may be inlined as a picture before the
+    // normal hide pass runs, and that picture must not carry the glyphs too.
+    svgText.style.setProperty("fill", "transparent", "important");
+    svgText.style.setProperty("stroke", "transparent", "important");
   }
 
   return { runs, nodes };
