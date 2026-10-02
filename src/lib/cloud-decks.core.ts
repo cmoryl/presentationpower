@@ -366,10 +366,13 @@ export async function saveDeckToCloudCore(
         .select("id, position")
         .eq("deck_id", deckUuid);
       const list = Array.isArray(posRows) ? (posRows as { id: string; position: number }[]) : [];
+      // Random parking band so two overlapping saves of the same deck never
+      // park different rows on the same negative slot.
+      const band = (1 + Math.floor(Math.random() * 1_000_000)) * 1000;
       for (let i = 0; i < list.length; i++) {
         const { error } = await sb
           .from("deck_slides")
-          .update({ position: -(i + 1) })
+          .update({ position: -(band + i + 1) })
           .eq("id", list[i].id);
         if (error) throw new Error(error.message);
         parked.push(list[i]);
@@ -379,7 +382,6 @@ export async function saveDeckToCloudCore(
     // Ids are deterministic, so an upsert updates in place instead of colliding.
     const { error: slideErr } = await sb.from("deck_slides").upsert(rows);
     if (slideErr) {
-      console.error("[saveDeck] upsert failed", deckUuid, parked.length, rows.length, JSON.stringify(rows.map((r) => [r.id.slice(0, 8), r.position])));
       // Put the saved order back so a failed save changes nothing.
       for (const r of parked) {
         await sb.from("deck_slides").update({ position: r.position }).eq("id", r.id);
