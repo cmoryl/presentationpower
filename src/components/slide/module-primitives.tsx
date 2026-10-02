@@ -1419,6 +1419,7 @@ export function CardGrid({
             body={s(it.body)}
             index={i + 1}
             icon={s(it.icon)}
+            listBody={items.length <= cols}
           />
         ))}
       </div>
@@ -1651,12 +1652,15 @@ export function Card({
   body,
   index,
   icon,
+  listBody = false,
 }: {
   brand: BrandMode;
   title: string;
   body: string;
   index: number;
   icon?: string;
+  /** Render "A · B · C" bodies as ruled rows (single-row grids with spare height). */
+  listBody?: boolean;
 }) {
   const mode = useContext(SlideModeContext);
   const ink = useSlideInk();
@@ -1713,7 +1717,7 @@ export function Card({
         // "A · B · C" bodies are lists in disguise: give each entry its own
         // ruled row so a short-copy card reads as designed, not empty.
         const parts = body.split(/\s+·\s+/).map((p) => p.trim()).filter(Boolean);
-        if (parts.length < 3) {
+        if (!listBody || parts.length < 3) {
           return (
             <div
               className="mt-4"
