@@ -35,6 +35,47 @@ import {
   stageMetrics,
 } from "@/lib/stage-phases";
 
+// Slide-22 loop language for step medallions: a thick outer arc that blends
+// aqua (AI) into lavender (human), a soft halo, a fine dotted inner ring and
+// glowing nodes. Pure SVG so it prints and exports still.
+function LoopHalo({ uid, slim = false }: { uid: string; slim?: boolean }) {
+  const AQ = "#7FE3F5", LV = "#C2A3FF";
+  const nodes = [-60, 30, 120, 210];
+  const pt = (deg: number, r: number) => {
+    const a = (deg * Math.PI) / 180;
+    return [50 + r * Math.cos(a), 50 + r * Math.sin(a)];
+  };
+  return (
+    <svg aria-hidden data-decorative viewBox="0 0 100 100" className="pointer-events-none absolute inset-0 h-full w-full" style={{ overflow: "visible" }}>
+      <defs>
+        <linearGradient id={`lh-${uid}`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor={AQ} />
+          <stop offset="1" stopColor={LV} />
+        </linearGradient>
+        <filter id={`lg-${uid}`} x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="1.2" />
+        </filter>
+      </defs>
+      <circle cx="50" cy="50" r="49" fill="none" stroke={`url(#lh-${uid})`} strokeOpacity="0.28" strokeWidth={slim ? 2.2 : 3.4} filter={`url(#lg-${uid})`} />
+      {nodes.map((d, i) => {
+        const [x1, y1] = pt(d + 8, 48.5), [x2, y2] = pt(d + 82, 48.5);
+        return <path key={i} d={`M${x1} ${y1} A48.5 48.5 0 0 1 ${x2} ${y2}`} fill="none" stroke={`url(#lh-${uid})`} strokeWidth={slim ? 0.9 : 1.4} strokeLinecap="round" />;
+      })}
+      <circle cx="50" cy="50" r="45.2" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="0.35" strokeDasharray="0.4 1.4" strokeLinecap="round" />
+      {nodes.map((d, i) => {
+        const [x, y] = pt(d, 48.5);
+        const c = i % 2 ? LV : AQ;
+        return (
+          <g key={i}>
+            <circle cx={x} cy={y} r={slim ? 2.2 : 3} fill={c} opacity="0.25" />
+            <circle cx={x} cy={y} r={slim ? 1.1 : 1.5} fill="#0B1030" stroke={c} strokeWidth="0.6" />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 registerSlideModule({
   id: "family:process",
   cellControls: { tone: true, icons: true, iconSize: true, iconNudge: true },
@@ -440,30 +481,7 @@ registerSlideModule({
                 className="relative mx-auto aspect-square w-full"
                 style={{ maxWidth: 620 }}
               >
-                {/* Outer orbit ring — one continuous hairline, no masked breaks
-                  (the old conic mask read as several stacked arcs). */}
-                <div
-                  aria-hidden
-                  data-decorative
-                  className="absolute inset-0 rounded-full"
-                  style={{ border: `2px solid color-mix(in oklab, ${accent} 40%, transparent)` }}
-                />
-                {/* Orbit nodes centred exactly on the ring. */}
-                {orbitNodePositions(4, 26).map((pos, i) => (
-                  <div
-                    key={i}
-                    aria-hidden
-                    data-decorative
-                    className="absolute rounded-full"
-                    style={{
-                      ...pos,
-                      width: 16,
-                      height: 16,
-                      transform: "translate(-50%, -50%)",
-                      backgroundColor: accent,
-                    }}
-                  />
-                ))}
+                <LoopHalo uid={`sp-${stepNo}`} />
 
                 {/* Photo medallion. */}
                 <div className="absolute overflow-hidden rounded-full" style={{ inset: "7%" }}>
@@ -670,43 +688,7 @@ registerSlideModule({
                           className="relative aspect-square w-full"
                           style={{ maxWidth: m.medallion }}
                         >
-                          {/* Outer orbit ring — one continuous hairline. */}
-                          <div
-                            aria-hidden
-                            data-decorative
-                            className="absolute inset-0 rounded-full"
-                            style={{
-                              border: `${slim ? 1 : 2}px solid color-mix(in oklab, ${accent} ${slim ? 30 : 38}%, transparent)`,
-                            }}
-                          />
-                          {/* Inner containment ring — dropped in the slim tier. */}
-                          {!slim && (
-                            <div
-                              aria-hidden
-                              data-decorative
-                              className="absolute rounded-full"
-                              style={{
-                                inset: "5.5%",
-                                border: `1px solid color-mix(in oklab, ${accent} 26%, transparent)`,
-                              }}
-                            />
-                          )}
-                          {/* Orbit nodes centred exactly on the outer ring. */}
-                          {orbitNodePositions(4, 26).map((pos, i) => (
-                            <div
-                              key={i}
-                              aria-hidden
-                              data-decorative
-                              className="absolute rounded-full"
-                              style={{
-                                ...pos,
-                                width: wide ? 13 : slim ? 7 : 10,
-                                height: wide ? 13 : slim ? 7 : 10,
-                                transform: "translate(-50%, -50%)",
-                                backgroundColor: accent,
-                              }}
-                            />
-                          ))}
+                          <LoopHalo uid={`st-${si}`} slim={slim} />
                           {/* Photo medallion with duotone wash so type clears. */}
                           <div
                             className="absolute overflow-hidden rounded-full"
