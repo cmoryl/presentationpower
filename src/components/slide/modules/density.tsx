@@ -118,9 +118,7 @@ registerSlideModule({
                       >
                         <div className="flex items-start justify-between gap-4">
                           <BigNumber value={s(it.value)} unit={s(it.unit)} size={104} ink={ink.strong} unitColor={isDark ? ink.strong : accent} />
-                          {Number.isFinite(pct) && (
-                            <Ring pct={pct} color={accent} track={ink.hairline} />
-                          )}
+                          {void pct}
                         </div>
                         <div
                           className="mt-3"
