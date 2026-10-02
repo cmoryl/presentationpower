@@ -702,7 +702,19 @@ registerSlideModule({
             const rows = pairRows(side);
             const tone = strong ? "var(--slide-accent-text)" : ink.muted;
             return (
-              <GlassTile radius={26} padding="px-12 py-12" intensity={strong ? 1 : 0.65}>
+              <GlassTile
+                radius={26}
+                padding="px-12 py-12"
+                intensity={strong ? 1 : 0.65}
+                // Baked depth: the on-screen blue comes partly from frosted blur of
+                // the glow behind, which picture exports cannot reproduce. Painting
+                // the tint into the surface keeps the PowerPoint/PDF look identical.
+                style={{
+                  backgroundImage: strong
+                    ? `linear-gradient(135deg, color-mix(in oklab, ${brand.tokens.accent} 70%, transparent) 0%, color-mix(in oklab, ${brand.tokens.accent} 38%, transparent) 45%, transparent 100%)`
+                    : `linear-gradient(160deg, color-mix(in oklab, ${brand.tokens.accent} 34%, transparent) 0%, color-mix(in oklab, ${brand.tokens.accent} 12%, transparent) 60%, transparent 100%)`,
+                }}
+              >
                 <Hairline color={tone} widthPx={96} thicknessPx={2} className="mb-6" />
                 <Kicker brand={brand} color={strong ? undefined : ink.muted}>
                   {s(side.label)}
