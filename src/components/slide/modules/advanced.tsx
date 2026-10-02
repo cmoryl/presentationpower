@@ -1809,9 +1809,12 @@ registerSlideModule({
                   );
                 })}
                 {/* X-axis kicker */}
+                {/* Sits just above the baseline at the right so stacked
+                    stage notes below never collide with it. */}
                 <text
-                  x={PAD_X}
-                  y={H - 14}
+                  x={W - PAD_X - 24}
+                  y={H - PAD_BOT - 16}
+                  textAnchor="end"
                   fontSize={13}
                   letterSpacing="0.32em"
                   fill={ink.faint}
