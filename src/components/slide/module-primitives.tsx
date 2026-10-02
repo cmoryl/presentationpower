@@ -1408,7 +1408,13 @@ export function CardGrid({
       <div
         className={`slide-fill-stretch slide-fill-rows mt-14 grid gap-10 ${gridClass}`}
         style={{
-          gridTemplateRows: `repeat(${rows ?? Math.max(1, Math.ceil(items.length / cols))}, minmax(0, 1fr))`,
+          // One short row: cards hug their copy and sit centred under the
+          // title instead of stretching into tall, mostly-empty boxes.
+          ...(items.length <= cols && !rows
+            ? { gridTemplateRows: "auto", alignContent: "center" }
+            : {
+                gridTemplateRows: `repeat(${rows ?? Math.max(1, Math.ceil(items.length / cols))}, minmax(0, 1fr))`,
+              }),
         }}
       >
         {items.map((it, i) => (
