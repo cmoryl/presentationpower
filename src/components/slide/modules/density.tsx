@@ -7,6 +7,18 @@ import { registerSlideModule } from "../module-registry";
 import { SlideFrame, SlideTitle, arr, s } from "../module-kit";
 import { fillPx } from "@/lib/open-space-fill";
 import { hexA } from "@/lib/accent-tokens";
+import { Rocket, Users, Globe2, Flag, Sparkles, MapPin, BarChart3, type LucideIcon } from "lucide-react";
+
+function statIcon(label: string): LucideIcon {
+  const l = label.toLowerCase();
+  if (/deploy/.test(l)) return Rocket;
+  if (/team|member|people|staff/.test(l)) return Users;
+  if (/continent/.test(l)) return Globe2;
+  if (/countr/.test(l)) return Flag;
+  if (/\bai\b|marketplace/.test(l)) return Sparkles;
+  if (/cit(y|ies)|office/.test(l)) return MapPin;
+  return BarChart3;
+}
 
 function Ring({ pct, color, track }: { pct: number; color: string; track: string }) {
   const r = 46;
@@ -90,7 +102,7 @@ registerSlideModule({
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-            <div className="mt-10 grid flex-1 grid-cols-[1.35fr_1fr] gap-14">
+            <div className="mt-10 grid flex-1 grid-cols-[1.25fr_1fr] gap-10">
               <section className="flex flex-col">
                 {(s(c.brandLabel) || s(c.tagline)) && (
                   <div className="mb-6 flex items-baseline gap-4">
@@ -134,34 +146,27 @@ registerSlideModule({
                   })}
                 </div>
               </section>
-              <section
-                className="flex flex-col justify-center"
-                style={{ borderLeft: `1px solid ${ink.hairline}`, paddingLeft: 40 }}
-              >
-                {items.map((it, i) => (
-                  <div
-                    key={i}
-                    className="flex items-baseline gap-5 py-4"
-                    style={{ borderTop: i ? `1px solid ${ink.hairline}` : undefined }}
-                  >
-                    <span
-                      className="tabular-nums"
-                      style={{
-                        fontSize: fillPx(44, "body"),
-                        fontWeight: 700,
-                        color: ink.strong,
-                        minWidth: 190,
-                        letterSpacing: "-0.02em",
-                      }}
+              <section className="grid grid-cols-2 content-center gap-5">
+                {items.map((it, i) => {
+                  const Icon = statIcon(s(it.label));
+                  return (
+                    <div
+                      key={i}
+                      className="relative flex flex-col overflow-hidden rounded-2xl p-6"
+                      style={{ background: isDark ? "rgba(255,255,255,0.05)" : hexA(accent, 0.05), border: `1px solid ${ink.hairline}` }}
                     >
-                      {s(it.value)}
-                      {s(it.unit) && <span style={{ color: isDark ? ink.strong : accent }}>{s(it.unit)}</span>}
-                    </span>
-                    <span style={{ fontSize: fillPx(18, "body"), color: ink.muted, lineHeight: 1.3 }}>
-                      {s(it.label)}
-                    </span>
-                  </div>
-                ))}
+                      <div aria-hidden className="absolute inset-x-0 top-0 h-[3px]" style={{ background: `linear-gradient(90deg, ${accent}, ${hexA(accent, 0)})` }} />
+                      <div className="flex items-center justify-center rounded-full" style={{ width: 52, height: 52, background: hexA(accent, isDark ? 0.35 : 0.12), color: isDark ? "#FFFFFF" : accent }}>
+                        <Icon size={26} strokeWidth={1.8} />
+                      </div>
+                      <div className="mt-4 tabular-nums" style={{ fontSize: fillPx(48, "body"), fontWeight: 800, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1 }}>
+                        {s(it.value)}
+                        {s(it.unit) && <span style={{ color: isDark ? ink.strong : accent }}>{s(it.unit)}</span>}
+                      </div>
+                      <div className="mt-2" style={{ fontSize: fillPx(17, "body"), color: ink.muted, lineHeight: 1.3 }}>{s(it.label)}</div>
+                    </div>
+                  );
+                })}
               </section>
             </div>
           </SlideFrame>
