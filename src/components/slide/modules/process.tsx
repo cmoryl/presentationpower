@@ -38,7 +38,7 @@ import {
 // Slide-22 loop language for step medallions: a thick outer arc that blends
 // aqua (AI) into lavender (human), a soft halo, a fine dotted inner ring and
 // glowing nodes. Pure SVG so it prints and exports still.
-function LoopHalo({ uid, slim = false }: { uid: string; slim?: boolean }) {
+export function LoopHalo({ uid, slim = false }: { uid: string; slim?: boolean }) {
   const AQ = "#7FE3F5", LV = "#C2A3FF";
   const nodes = [-60, 30, 120, 210];
   const pt = (deg: number, r: number) => {

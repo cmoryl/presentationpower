@@ -372,9 +372,11 @@ registerSlideModule({
                           </span>
                         )}
                       </div>
-                      <span style={{ fontSize: 26, fontWeight: 700, color: "#FFFFFF", textAlign: "center", lineHeight: 1.15 }}>
-                        {s(r.label)}
-                      </span>
+                      {!wide && (
+                        <span style={{ fontSize: 26, fontWeight: 700, color: "#FFFFFF", textAlign: "center", lineHeight: 1.15 }}>
+                          {s(r.label)}
+                        </span>
+                      )}
                     </div>
                   );
                 })}
@@ -396,11 +398,12 @@ registerSlideModule({
                     left: "50%", top: "50%", width: 120, height: 120, marginLeft: -60, marginTop: -60, borderRadius: 999,
                     background: "radial-gradient(circle at 35% 30%, rgba(255,255,255,0.28), rgba(11,16,48,0.92) 70%)",
                     border: "1px solid rgba(255,255,255,0.35)",
-                    boxShadow: "0 0 0 10px rgba(255,255,255,0.05), 0 0 40px rgba(127,179,245,0.45)",
+                    boxShadow: "0 0 40px rgba(127,179,245,0.45)",
                     color: "#FFFFFF", fontSize: 40, fontWeight: 800, zIndex: 2,
                   }}
                 >
-                  VS
+                  <LoopHalo uid="vs" slim />
+                  <span className="relative">VS</span>
                 </div>
                 <Panel heading={s(right.label, "Right")} rows={rightRows} glow={glows[1]} />
               </div>
