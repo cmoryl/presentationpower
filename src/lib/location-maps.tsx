@@ -1750,11 +1750,12 @@ export function WorldMap({
         </g>
       )}
 
-      {/* Pin glows — scale radius by metric when active */}
+      {/* Pin glows — scale radius by metric when active. Crowded maps
+          (many offices) get smaller pins so they don't merge into blobs. */}
       <g>
         {visiblePins.map((p) => {
           const { x, y } = projectLatLon(p.lat, p.lon);
-          const baseR = p.role === "HQ" ? 26 : p.role === "hub" ? 20 : 14;
+          const baseR = (p.role === "HQ" ? 26 : p.role === "hub" ? 20 : 14) * pinScale;
           const t = activeMetricId ? scaleFor(p.id) : null;
           const r = t == null ? baseR : 14 + t * 22;
           return (
@@ -1777,7 +1778,7 @@ export function WorldMap({
           const isHq = p.role === "HQ";
           const isHub = p.role === "hub";
           const t = activeMetricId ? scaleFor(p.id) : null;
-          const baseCore = isHq ? 5.4 : isHub ? 4.4 : 3.2;
+          const baseCore = (isHq ? 5.4 : isHub ? 4.4 : 3.2) * pinScale;
           const core = t == null ? baseCore : 3.2 + t * 5.8;
           const fill = t == null ? pinCore : accent;
           const fillOpacity = t == null ? 1 : 0.35 + t * 0.65;
