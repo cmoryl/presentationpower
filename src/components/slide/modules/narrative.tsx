@@ -447,8 +447,8 @@ registerSlideModule({
                 <GlassTile radius={26} padding="px-10 py-9" className="relative row-span-2 overflow-hidden" style={stack ? { borderBottom: "2px solid rgba(127,227,245,0.55)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.22), 0 30px 70px -40px rgba(91,155,255,0.7)" } : undefined}>
                   {s(hero.image) && (
                     <div aria-hidden className="pointer-events-none absolute inset-0">
-                      <img src={s(hero.image)} alt="" className="h-full w-full object-cover" style={{ opacity: isDark ? 0.22 : 0.14 }} />
-                      <div className="absolute inset-0" style={{ background: isDark ? "linear-gradient(180deg, rgba(3,0,44,0.55) 0%, rgba(3,0,44,0.2) 100%)" : "linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 100%)" }} />
+                      <img src={s(hero.image)} alt="" className="h-full w-full object-cover" style={{ opacity: isDark ? (stack ? 0.75 : 0.22) : 0.14 }} />
+                      <div className="absolute inset-0" style={{ background: isDark ? (stack ? "linear-gradient(180deg, rgba(3,0,44,0.92) 0%, rgba(3,0,44,0.6) 38%, rgba(3,0,44,0.05) 70%, rgba(3,0,44,0.35) 100%)" : "linear-gradient(180deg, rgba(3,0,44,0.55) 0%, rgba(3,0,44,0.2) 100%)") : "linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 100%)" }} />
                     </div>
                   )}
                   <div className="relative">
@@ -486,28 +486,6 @@ registerSlideModule({
                       : s(hero.body)}
                   </SupportingText>
                   </div>
-                  {stack && (() => {
-                    const m = s(hero.body).match(/(\d+(?:\.\d+)?)%/);
-                    if (!m) return null;
-                    const pct = Math.min(100, Number(m[1]));
-                    const R = 92, C = 2 * Math.PI * R;
-                    return (
-                      <div aria-hidden className="absolute bottom-10 left-10 flex items-center gap-7">
-                        <svg width={220} height={220} viewBox="0 0 220 220">
-                          <defs>
-                            <linearGradient id="gl5-ring" x1="0" y1="0" x2="1" y2="1">
-                              <stop offset="0" stopColor="#7FE3F5" />
-                              <stop offset="1" stopColor="#C2A3FF" />
-                            </linearGradient>
-                          </defs>
-                          <circle cx={110} cy={110} r={106} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth={1} strokeDasharray="1 5" />
-                          <circle cx={110} cy={110} r={R} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth={12} />
-                          <circle cx={110} cy={110} r={R} fill="none" stroke="url(#gl5-ring)" strokeWidth={12} strokeLinecap="round" strokeDasharray={`${(C * pct) / 100} ${C}`} transform="rotate(-90 110 110)" />
-                          <text x={110} y={124} textAnchor="middle" fill="#FFFFFF" fontSize={46} fontWeight={800} letterSpacing="-0.03em">{m[1]}%</text>
-                        </svg>
-                      </div>
-                    );
-                  })()}
                 </GlassTile>
                 {stack && (
                   <div className="relative grid gap-5" style={{ gridTemplateRows: "repeat(4, minmax(0, 1fr))" }}>
