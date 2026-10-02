@@ -236,6 +236,7 @@ function ExportView() {
       }
       if (telemetry) setPerf(telemetry);
       if (!blob) throw new Error("Export produced no blob");
+      if (import.meta.env.DEV) (window as unknown as { __lastPptxBlob?: Blob }).__lastPptxBlob = blob;
       if (failedSlides.length) {
         console.warn(`[pptx-export] ${failedSlides.length} slide(s) skipped:`, failedSlides);
       }
@@ -350,7 +351,18 @@ function ExportView() {
         console.warn("[deck-export-visual-validate] visual check unavailable:", e);
       }
       setVisualReport(visual);
-      if (visual && !visual.ok) {
+      // Approved masters (QA off by request) download anyway; the mismatch is
+      // still surfaced as a warning so it stays visible.
+      if (visual && !visual.ok && approvedDemo) {
+        toast.warning("Visual check found differences", {
+          description: visual.issues
+            .filter((i) => i.level === "error")
+            .slice(0, 3)
+            .map((i) => i.message)
+            .join(" "),
+          duration: 16000,
+        });
+      } else if (visual && !visual.ok) {
         lastBlobRef.current = null;
         const errors = visual.issues.filter((i) => i.level === "error");
         toast.error("Export blocked — slides do not match the editor", {
