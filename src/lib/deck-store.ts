@@ -27,6 +27,7 @@ import type { SlideSkin } from "./slide-skin";
 import { hasTextFormats } from "./slide-text-format";
 import { mergeTemplateOverride, type SlideTemplateOverride } from "./section-templates";
 import { autoFixQa } from "./qa-autofix";
+import { isApprovedDemo } from "./demo-approved";
 import { normalizeLook } from "./look-validate";
 import { brandOwnedLookContext } from "./look-brand";
 import type { SlideTextFormat, SlideTextFormats, SlideTextScope } from "./slide-text-format";
@@ -4930,6 +4931,8 @@ export const useDeckStore = create<DeckState>()(
         applyQaFixes: (deckId, opts) => {
           const deck = get().decks[deckId];
           if (!deck) return null;
+          // Approved masters/demos are curated: never rewrite their copy.
+          if (isApprovedDemo(deck.context)) return null;
           const report = autoFixQa(deck.slides, {
             // Fall back to the Enterprise master profile so accent-legibility
             // and brand-variant fixes still run on decks with no explicit
@@ -5454,11 +5457,13 @@ export const useDeckStore = create<DeckState>()(
           // Template-instantiated decks get the same QA-clean guarantee as
           // agent-built ones: fix empty fields, overflow and brand-variant
           // drift before the copy is ever shown.
-          deck.slides = autoFixQa(deck.slides, {
+          deck.slides = (isApprovedDemo(payload.context as DeckContext | undefined)
+            ? { slides: deck.slides }
+            : autoFixQa(deck.slides, {
             brandModeId: payload.brandModeId ?? "bm-enterprise",
             industryId: (payload.context as DeckContext | undefined)?.designRecipeId ?? null,
             includeWarnings: true,
-          }).slides.map((sl, i) => ({ ...sl, position: i }));
+          })).slides.map((sl, i) => ({ ...sl, position: i }));
           set((s) => ({
             briefs: { ...s.briefs, [briefId]: brief },
             decks: { ...s.decks, [deckId]: deck },

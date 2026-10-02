@@ -23,6 +23,8 @@ export type BrandHealthBadgeProps = {
   /** Which render surface this is, so the logo matrix uses the right minimums. */
   medium?: LogoMedium;
   className?: string;
+  /** Approved/curated decks skip the brand check entirely. */
+  approved?: boolean;
 };
 
 const TONE: Record<BrandHealthReport["grade"], { chip: string; dot: string; word: string }> = {
@@ -38,6 +40,7 @@ export function BrandHealthBadge({
   surfaceLabel = "this deck",
   medium = "slide",
   className,
+  approved,
 }: BrandHealthBadgeProps) {
   const [report, setReport] = useState<BrandHealthReport | null>(null);
   const [open, setOpen] = useState(false);
@@ -61,6 +64,7 @@ export function BrandHealthBadge({
   }, [run]);
 
   const tone = TONE[report?.grade ?? "pass"];
+  if (approved) return null;
 
   return (
     <>

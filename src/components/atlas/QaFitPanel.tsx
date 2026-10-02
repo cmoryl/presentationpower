@@ -1,3 +1,4 @@
+import { gateQaIssues } from "@/lib/demo-approved";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useDeckStore } from "@/lib/deck-store";
@@ -26,7 +27,7 @@ export function QaFitPanel({ deckId, ink }: { deckId: string; ink: string }) {
   const [log, setLog] = useState<string[]>([]);
 
   const counts = useMemo(() => (deck ? summarizeQa(deck) : null), [deck]);
-  const issues = useMemo(() => (deck ? runQa(deck.slides, deck.brandModeId) : []), [deck]);
+  const issues = useMemo(() => (deck ? gateQaIssues(runQa(deck.slides, deck.brandModeId), deck.context) : []), [deck]);
   const tunes = useMemo(() => (deck ? planFitTuning(deck) : []), [deck]);
 
   const bySlide = useMemo(() => {

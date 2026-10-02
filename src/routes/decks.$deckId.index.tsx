@@ -586,6 +586,7 @@ function DeckEditor() {
                   <span>{brand.name}</span>
                   <MetaDot />
                   <BrandHealthBadge
+                    approved={!!deck.context?.demoApproved}
                     getRoots={() =>
                       Array.from(document.querySelectorAll<HTMLElement>("[data-slide-stage]"))
                     }
