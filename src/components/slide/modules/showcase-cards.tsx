@@ -83,6 +83,11 @@ registerSlideModule({
               const leadColor =
                 st.leadColor === "accent" ? accent : st.leadColor === "ink" ? ink.strong : fill;
               const frameLine = card.tone === "ink" ? hairline : fill;
+              // Dark look: every word is white and each title sits on a glass
+              // band lit by its own brand glow (blue / aqua / lavender).
+              const glow = [accent, AQUA, LAVENDER][i % 3];
+              const textInk = isDark ? "#FFFFFF" : ink.strong;
+              const markFill = isDark ? glow : fill;
               return (
                 <div
                   key={i}
@@ -120,12 +125,32 @@ registerSlideModule({
 
                   {/* Label band */}
                   <div
-                    className="flex items-center justify-center"
-                    style={{
-                      background: fill,
-                      padding: dense ? "16px 18px" : "22px 22px",
-                    }}
+                    className="relative flex items-center justify-center overflow-hidden"
+                    style={
+                      isDark
+                        ? {
+                            background: `linear-gradient(135deg, ${glow}55 0%, rgba(255,255,255,0.10) 45%, ${glow}22 100%)`,
+                            backdropFilter: "blur(18px) saturate(140%)",
+                            borderTop: "1px solid rgba(255,255,255,0.35)",
+                            borderBottom: `2px solid ${glow}`,
+                            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.25), 0 10px 28px ${glow}33`,
+                            padding: dense ? "16px 18px" : "22px 22px",
+                          }
+                        : { background: fill, padding: dense ? "16px 18px" : "22px 22px" }
+                    }
                   >
+                    {isDark && (
+                      <span
+                        aria-hidden
+                        data-decorative
+                        style={{
+                          position: "absolute",
+                          inset: "0 0 50% 0",
+                          background: "linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0))",
+                          pointerEvents: "none",
+                        }}
+                      />
+                    )}
                     <span
                       style={{
                         fontSize: fillPx(dense ? 26 : 30, "display"),
@@ -133,8 +158,10 @@ registerSlideModule({
                         lineHeight: 1.05,
                         letterSpacing: st.bandCase === "upper" ? "0.05em" : "-0.02em",
                         textTransform: st.bandCase === "upper" ? "uppercase" : "none",
-                        color: bandInk,
+                        color: isDark ? "#FFFFFF" : bandInk,
                         textAlign: "center",
+                        position: "relative",
+                        textShadow: isDark ? `0 0 18px ${glow}88` : undefined,
                       }}
                     >
                       {card.label}
@@ -154,7 +181,7 @@ registerSlideModule({
                       <div
                         aria-hidden
                         data-decorative
-                        style={{ height: 3, width: 56, background: fill, marginBottom: 16 }}
+                        style={{ height: 3, width: 56, background: markFill, marginBottom: 16 }}
                       />
                     )}
                     {card.lead && (
@@ -164,7 +191,7 @@ registerSlideModule({
                           fontWeight: 800,
                           lineHeight: 1.2,
                           letterSpacing: "-0.01em",
-                          color: leadColor,
+                          color: isDark ? "#FFFFFF" : leadColor,
                         }}
                       >
                         {card.lead}
@@ -177,7 +204,7 @@ registerSlideModule({
                           fontSize: fillPx(dense ? 21 : 24, "body"),
                           fontWeight: 500,
                           lineHeight: 1.28,
-                          color: ink.strong,
+                          color: textInk,
                         }}
                       >
                         {card.leadNote}
@@ -199,8 +226,8 @@ registerSlideModule({
                                 width: st.bulletMark === "dot" ? 7 : undefined,
                                 height: st.bulletMark === "dot" ? 7 : undefined,
                                 borderRadius: st.bulletMark === "dot" ? 999 : undefined,
-                                background: st.bulletMark === "dot" ? fill : undefined,
-                                color: fill,
+                                background: st.bulletMark === "dot" ? markFill : undefined,
+                                color: markFill,
                                 fontSize: st.bulletMark === "dot" ? undefined : fillPx(19, "body"),
                                 fontWeight: 800,
                               }}
@@ -215,7 +242,7 @@ registerSlideModule({
                               style={{
                                 fontSize: fillPx(dense ? 19 : 21, "body"),
                                 lineHeight: 1.32,
-                                color: ink.strong,
+                                color: textInk,
                               }}
                             >
                               {b}
