@@ -1230,14 +1230,16 @@ const REGION_BOUNDS: Record<
   APAC: { latMin: -40, latMax: 55, lonMin: 60, lonMax: 180 },
 };
 
-function regionViewBox(region: RegionKey): string {
+export type MapBounds = { latMin: number; latMax: number; lonMin: number; lonMax: number };
+
+function regionViewBox(region: RegionKey, custom?: MapBounds): string {
   // Trim the empty polar bands (above ~82°N, below ~58°S) so the world view
   // fills wide slide areas instead of floating in dead space.
-  if (region === "world") return `0 42 ${WORLD_VIEWBOX.w} 330`;
+  if (region === "world" && !custom) return `0 42 ${WORLD_VIEWBOX.w} 330`;
 
   // Runtime deck content can predate the RegionKey contract. Keep the map
   // renderer total even when an old/invalid value reaches this lower layer.
-  const b = REGION_BOUNDS[region];
+  const b = custom ?? REGION_BOUNDS[region];
   if (!b) return `0 42 ${WORLD_VIEWBOX.w} 330`;
   const tl = projectLatLon(b.latMax, b.lonMin);
   const br = projectLatLon(b.latMin, b.lonMax);
@@ -1282,6 +1284,8 @@ export type WorldMapProps = {
 
   /** Animated pulse rings on HQ/hub pins (auto-disabled under reduced motion). */
   animate?: boolean;
+  /** Optional custom frame (overrides the region viewport; pins outside are hidden). */
+  bounds?: MapBounds;
 };
 
 /**
@@ -1307,6 +1311,7 @@ export function WorldMap({
   mapStyle,
   showNetwork = true,
   animate = true,
+  bounds,
 }: WorldMapProps) {
   const activeStyle: MapStyle = coerceMapStyle(mapStyle ?? texture, "halftone");
 
@@ -1321,7 +1326,7 @@ export function WorldMap({
   const labelHalo = isDark ? "rgba(3,0,44,0.6)" : "rgba(255,255,255,0.85)";
   const uid = React.useId().replace(/[^a-zA-Z0-9]/g, "");
 
-  const vb = regionViewBox(region);
+  const vb = regionViewBox(region, bounds);
 
   // Longitude/latitude graticule lines (subtle)
   const meridians: number[] = [-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150];
@@ -1329,12 +1334,13 @@ export function WorldMap({
 
   // Filter pins to region viewport if not world
   const visiblePins = React.useMemo(() => {
-    if (region === "world") return pins;
-    const b = REGION_BOUNDS[region];
+    if (region === "world" && !bounds) return pins;
+    const b = bounds ?? REGION_BOUNDS[region as Exclude<RegionKey, "world">];
+    if (!b) return pins;
     return pins.filter(
       (p) => p.lat >= b.latMin && p.lat <= b.latMax && p.lon >= b.lonMin && p.lon <= b.lonMax,
     );
-  }, [pins, region]);
+  }, [pins, region, bounds]);
 
   // Optionally build spoke arcs from HQ pins to the rest
   const spokes = React.useMemo(() => {
