@@ -9,315 +9,215 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TemplatesRouteImport } from './routes/templates'
-import { Route as SocialRouteImport } from './routes/social'
-import { Route as SignaturesRouteImport } from './routes/signatures'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as McpRouteImport } from './routes/mcp'
-import { Route as LooksRouteImport } from './routes/looks'
-import { Route as LogohubRouteImport } from './routes/logohub'
-import { Route as KnowledgeRouteImport } from './routes/knowledge'
-import { Route as ImageryRouteImport } from './routes/imagery'
-import { Route as FilesRouteImport } from './routes/files'
-import { Route as FaqRouteImport } from './routes/faq'
-import { Route as EventsRouteImport } from './routes/events'
-import { Route as ElementsRouteImport } from './routes/elements'
-import { Route as DemosRouteImport } from './routes/demos'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as ConvertRouteImport } from './routes/convert'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AtlasRouteImport } from './routes/atlas'
-import { Route as ApprovalsRouteImport } from './routes/approvals'
-import { Route as AnalyticsRouteImport } from './routes/analytics'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SocialIndexRouteImport } from './routes/social.index'
-import { Route as SocialAgentIndexRouteImport } from './routes/social-agent.index'
-import { Route as ShowcaseIndexRouteImport } from './routes/showcase.index'
-import { Route as PrintAgentIndexRouteImport } from './routes/print-agent.index'
-import { Route as LibraryIndexRouteImport } from './routes/library.index'
-import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
-import { Route as EventsIndexRouteImport } from './routes/events.index'
-import { Route as EventsAgentIndexRouteImport } from './routes/events-agent.index'
-import { Route as DecksIndexRouteImport } from './routes/decks.index'
-import { Route as AgentIndexRouteImport } from './routes/agent.index'
-import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as TestPrintHeroRouteImport } from './routes/test.print-hero'
-import { Route as TestPrintDndRouteImport } from './routes/test.print-dnd'
-import { Route as SocialPresetsRouteImport } from './routes/social.presets'
-import { Route as SocialNewRouteImport } from './routes/social.new'
-import { Route as SocialModulesRouteImport } from './routes/social.modules'
-import { Route as SocialLegalRefreshRouteImport } from './routes/social.legal-refresh'
-import { Route as SocialLegalBloomRouteImport } from './routes/social.legal-bloom'
-import { Route as SocialLegalAlongsideRouteImport } from './routes/social.legal-alongside'
-import { Route as SocialKitRouteImport } from './routes/social.kit'
-import { Route as SocialBannersRouteImport } from './routes/social.banners'
-import { Route as SocialAgentThreadIdRouteImport } from './routes/social-agent.$threadId'
-import { Route as ShowcasePresetIdRouteImport } from './routes/showcase.$presetId'
-import { Route as ShareTokenRouteImport } from './routes/share.$token'
-import { Route as PublicStylesRouteImport } from './routes/public.styles'
-import { Route as PublicModulesRouteImport } from './routes/public.modules'
-import { Route as PublicIconsRouteImport } from './routes/public.icons'
-import { Route as PrintAgentThreadIdRouteImport } from './routes/print-agent.$threadId'
-import { Route as MastersGeneralSlidesRouteImport } from './routes/masters.general-slides'
-import { Route as LibraryPrintRouteImport } from './routes/library.print'
-import { Route as LibraryOverridesRouteImport } from './routes/library.overrides'
-import { Route as LibraryMyRouteImport } from './routes/library.my'
-import { Route as LibraryIndustryBackgroundsRouteImport } from './routes/library.industry-backgrounds'
-import { Route as LibraryImportedRouteImport } from './routes/library.imported'
-import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
-import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
-import { Route as KnowledgeIconLibraryRouteImport } from './routes/knowledge.icon-library'
-import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
-import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
-import { Route as ForSalesRouteImport } from './routes/for.sales'
-import { Route as ForMarketingRouteImport } from './routes/for.marketing'
-import { Route as ForAdminRouteImport } from './routes/for.admin'
-import { Route as EventsProductionRouteImport } from './routes/events.production'
-import { Route as EventsPresetsRouteImport } from './routes/events.presets'
-import { Route as EventsPillarsRouteImport } from './routes/events.pillars'
-import { Route as EventsNextRouteImport } from './routes/events.next'
-import { Route as EventsNewRouteImport } from './routes/events.new'
-import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
-import { Route as EventsAgentThreadIdRouteImport } from './routes/events-agent.$threadId'
-import { Route as DevUxDebugRouteImport } from './routes/dev.ux-debug'
-import { Route as DevSocialSweepRouteImport } from './routes/dev.social-sweep'
-import { Route as DevSocialCornersRouteImport } from './routes/dev.social-corners'
-import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
-import { Route as DevProposalQaRouteImport } from './routes/dev.proposal-qa'
-import { Route as DevPrintModulePdfRouteImport } from './routes/dev.print-module-pdf'
-import { Route as DevPlacementVerifyRouteImport } from './routes/dev.placement-verify'
-import { Route as DevModuleSheetRouteImport } from './routes/dev.module-sheet'
-import { Route as DevModuleCatalogRouteImport } from './routes/dev.module-catalog'
-import { Route as DevMapExportParityRouteImport } from './routes/dev.map-export-parity'
-import { Route as DevLibraryShowcaseRouteImport } from './routes/dev.library-showcase'
-import { Route as DevLayerDiffRouteImport } from './routes/dev.layer-diff'
-import { Route as DevImageFormatVerifyRouteImport } from './routes/dev.image-format-verify'
-import { Route as DevImageBenchRouteImport } from './routes/dev.image-bench'
-import { Route as DevFormatVerifyRouteImport } from './routes/dev.format-verify'
-import { Route as DevExportVerifyRouteImport } from './routes/dev.export-verify'
-import { Route as DemoJudgingRouteImport } from './routes/demo.judging'
-import { Route as DecksNextPaletteRouteImport } from './routes/decks.next-palette'
-import { Route as DecksImportRouteImport } from './routes/decks.import'
-import { Route as BriefNewRouteImport } from './routes/brief.new'
-import { Route as BriefDeckIdRouteImport } from './routes/brief.$deckId'
-import { Route as AssetSpotlightPreviewRouteImport } from './routes/asset.spotlight-preview'
-import { Route as AssetNewRouteImport } from './routes/asset.new'
-import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
-import { Route as ApiPrintAgentChatRouteImport } from './routes/api/print-agent-chat'
-import { Route as ApiKitAgentChatRouteImport } from './routes/api/kit-agent-chat'
-import { Route as ApiDeckExportVisualValidateRouteImport } from './routes/api/deck-export-visual-validate'
-import { Route as ApiDeckExportValidateRouteImport } from './routes/api/deck-export-validate'
-import { Route as ApiChatRouteImport } from './routes/api.chat'
-import { Route as ApiAgentChatRouteImport } from './routes/api/agent-chat'
-import { Route as AgentThreadIdRouteImport } from './routes/agent.$threadId'
-import { Route as AdminCanvasRouteImport } from './routes/admin_.canvas'
-import { Route as AdminVizLabRouteImport } from './routes/admin.viz-lab'
-import { Route as AdminUsersRouteImport } from './routes/admin.users'
-import { Route as AdminUsageRouteImport } from './routes/admin.usage'
-import { Route as AdminTranslationRouteImport } from './routes/admin.translation'
-import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
-import { Route as AdminTeamRouteImport } from './routes/admin.team'
-import { Route as AdminStyleLearningRouteImport } from './routes/admin.style-learning'
-import { Route as AdminQrDownloadsRouteImport } from './routes/admin.qr-downloads'
-import { Route as AdminPrintLibraryRouteImport } from './routes/admin.print-library'
-import { Route as AdminPrintColorRouteImport } from './routes/admin.print-color'
-import { Route as AdminPdfIngestRouteImport } from './routes/admin.pdf-ingest'
-import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
-import { Route as AdminModulesRouteImport } from './routes/admin.modules'
-import { Route as AdminModuleStudioRouteImport } from './routes/admin.module-studio'
-import { Route as AdminLogohubRouteImport } from './routes/admin.logohub'
-import { Route as AdminKnowledgeHubRouteImport } from './routes/admin.knowledge-hub'
-import { Route as AdminKnowledgeRouteImport } from './routes/admin.knowledge'
-import { Route as AdminIndustrySceneQaRouteImport } from './routes/admin.industry-scene-qa'
-import { Route as AdminImageryAnalyticsRouteImport } from './routes/admin.imagery-analytics'
-import { Route as AdminImageryRouteImport } from './routes/admin.imagery'
-import { Route as AdminIconStudioRouteImport } from './routes/admin.icon-studio'
-import { Route as AdminGloballinkShareRouteImport } from './routes/admin.globallink-share'
-import { Route as AdminGloballinkRouteImport } from './routes/admin.globallink'
-import { Route as AdminExportAuditRouteImport } from './routes/admin.export-audit'
-import { Route as AdminDivisionSeedsRouteImport } from './routes/admin.division-seeds'
-import { Route as AdminCampaignsRouteImport } from './routes/admin.campaigns'
-import { Route as AdminBrandAssetsRouteImport } from './routes/admin.brand-assets'
-import { Route as AdminAuditRouteImport } from './routes/admin.audit'
-import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
-import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
-import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
-import { Route as AdminAiRouteImport } from './routes/admin.ai'
-import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as ApprovalsRouteImport } from './routes/approvals'
+import { Route as AtlasRouteImport } from './routes/atlas'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ConvertRouteImport } from './routes/convert'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as DemosRouteImport } from './routes/demos'
+import { Route as ElementsRouteImport } from './routes/elements'
+import { Route as EventsRouteImport } from './routes/events'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as FilesRouteImport } from './routes/files'
+import { Route as ImageryRouteImport } from './routes/imagery'
+import { Route as KnowledgeRouteImport } from './routes/knowledge'
+import { Route as LogohubRouteImport } from './routes/logohub'
+import { Route as LooksRouteImport } from './routes/looks'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SignaturesRouteImport } from './routes/signatures'
+import { Route as SocialRouteImport } from './routes/social'
+import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
-import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
-import { Route as EventsVenuesIndexRouteImport } from './routes/events.venues.index'
-import { Route as DecksDeckIdIndexRouteImport } from './routes/decks.$deckId.index'
-import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
-import { Route as LibraryPrintModulesRouteImport } from './routes/library.print_.modules'
-import { Route as LibraryPrintHeroesRouteImport } from './routes/library.print_.heroes'
-import { Route as LibraryPrintAuditRouteImport } from './routes/library.print_.audit'
-import { Route as LibraryMyModuleIdRouteImport } from './routes/library.my_.$moduleId'
-import { Route as LibraryImportedMastersRouteImport } from './routes/library.imported_.masters'
-import { Route as LibraryImportedAuditRouteImport } from './routes/library.imported_.audit'
-import { Route as KnowledgeBrandGuidesNext2026BuildRouteImport } from './routes/knowledge.brand-guides.next-2026-build'
-import { Route as KnowledgeBrandGuidesNext2026RouteImport } from './routes/knowledge.brand-guides.next-2026'
-import { Route as KnowledgeBrandGuidesElementRouteImport } from './routes/knowledge.brand-guides.element'
-import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
-import { Route as EventsVenuesSlugRouteImport } from './routes/events.venues.$slug'
-import { Route as EventsNextVenuesRouteImport } from './routes/events.next_.venues'
-import { Route as EventsNextVenueRouteImport } from './routes/events.next_.venue'
-import { Route as EventsNextStartRouteImport } from './routes/events.next_.start'
-import { Route as EventsNextSanFranciscoRouteImport } from './routes/events.next_.san-francisco'
-import { Route as EventsNextPlaybookRouteImport } from './routes/events.next_.playbook'
-import { Route as EventsNextPillarsRouteImport } from './routes/events.next_.pillars'
-import { Route as EventsNextMartRouteImport } from './routes/events.next_.mart'
-import { Route as EventsNextLondonRouteImport } from './routes/events.next_.london'
-import { Route as EventsNextLocationsRouteImport } from './routes/events.next_.locations'
-import { Route as EventsNextKnowledgeRouteImport } from './routes/events.next_.knowledge'
-import { Route as EventsNextGuideRouteImport } from './routes/events.next_.guide'
-import { Route as EventsNextCitySeriesRouteImport } from './routes/events.next_.city-series'
-import { Route as EventsNextCityBadgesRouteImport } from './routes/events.next_.city-badges'
-import { Route as EventsNextCityRouteImport } from './routes/events.next_.city'
-import { Route as EventsNextCaliforniaRouteImport } from './routes/events.next_.california'
-import { Route as EventsNextBadgesRouteImport } from './routes/events.next_.badges'
-import { Route as EventsNextAssetsRouteImport } from './routes/events.next_.assets'
-import { Route as EventsNextAgendasRouteImport } from './routes/events.next_.agendas'
-import { Route as EventsDemoPlaybookIdRouteImport } from './routes/events.demo.$playbookId'
-import { Route as DemoPrintDemoIdRouteImport } from './routes/demo.print.$demoId'
-import { Route as DemoDeckDemoIdRouteImport } from './routes/demo.deck.$demoId'
-import { Route as DecksDeckIdPrintRouteImport } from './routes/decks.$deckId.print'
-import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
-import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
-import { Route as DecksDeckIdDocumentRouteImport } from './routes/decks.$deckId.document'
-import { Route as ApiPublicSkinBackdropRouteImport } from './routes/api/public/skin-backdrop'
-import { Route as ApiPublicPdfIndexProxyRouteImport } from './routes/api/public/pdf-index-proxy'
-import { Route as ApiPublicDivisionImageRouteImport } from './routes/api/public/division-image'
-import { Route as ApiPublicCanvaAdRouteImport } from './routes/api/public/canva-ad'
-import { Route as ApiPublicBrandhubSeedProxyRouteImport } from './routes/api/public/brandhub-seed-proxy'
-import { Route as AdminPrintLibraryItemIdRouteImport } from './routes/admin.print-library_.$itemId'
-import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns_.kit'
-import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAiRouteImport } from './routes/admin.ai'
+import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
+import { Route as AdminBrandAssetsRouteImport } from './routes/admin.brand-assets'
+import { Route as AdminCampaignsRouteImport } from './routes/admin.campaigns'
+import { Route as AdminDivisionSeedsRouteImport } from './routes/admin.division-seeds'
+import { Route as AdminExportAuditRouteImport } from './routes/admin.export-audit'
+import { Route as AdminGloballinkRouteImport } from './routes/admin.globallink'
+import { Route as AdminGloballinkShareRouteImport } from './routes/admin.globallink-share'
+import { Route as AdminIconStudioRouteImport } from './routes/admin.icon-studio'
+import { Route as AdminImageryRouteImport } from './routes/admin.imagery'
+import { Route as AdminImageryAnalyticsRouteImport } from './routes/admin.imagery-analytics'
+import { Route as AdminIndustrySceneQaRouteImport } from './routes/admin.industry-scene-qa'
+import { Route as AdminKnowledgeRouteImport } from './routes/admin.knowledge'
+import { Route as AdminKnowledgeHubRouteImport } from './routes/admin.knowledge-hub'
+import { Route as AdminLogohubRouteImport } from './routes/admin.logohub'
+import { Route as AdminModuleStudioRouteImport } from './routes/admin.module-studio'
+import { Route as AdminModulesRouteImport } from './routes/admin.modules'
+import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
+import { Route as AdminPdfIngestRouteImport } from './routes/admin.pdf-ingest'
+import { Route as AdminPrintColorRouteImport } from './routes/admin.print-color'
+import { Route as AdminPrintLibraryRouteImport } from './routes/admin.print-library'
+import { Route as AdminQrDownloadsRouteImport } from './routes/admin.qr-downloads'
+import { Route as AdminStyleLearningRouteImport } from './routes/admin.style-learning'
+import { Route as AdminTeamRouteImport } from './routes/admin.team'
+import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
+import { Route as AdminTranslationRouteImport } from './routes/admin.translation'
+import { Route as AdminUsageRouteImport } from './routes/admin.usage'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminVizLabRouteImport } from './routes/admin.viz-lab'
+import { Route as AdminCanvasRouteImport } from './routes/admin_.canvas'
+import { Route as AgentIndexRouteImport } from './routes/agent.index'
+import { Route as AgentThreadIdRouteImport } from './routes/agent.$threadId'
+import { Route as ApiAgentChatRouteImport } from './routes/api/agent-chat'
+import { Route as ApiChatRouteImport } from './routes/api.chat'
+import { Route as ApiDeckExportValidateRouteImport } from './routes/api/deck-export-validate'
+import { Route as ApiDeckExportVisualValidateRouteImport } from './routes/api/deck-export-visual-validate'
+import { Route as ApiKitAgentChatRouteImport } from './routes/api/kit-agent-chat'
+import { Route as ApiPrintAgentChatRouteImport } from './routes/api/print-agent-chat'
+import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
+import { Route as AssetNewRouteImport } from './routes/asset.new'
+import { Route as AssetSpotlightPreviewRouteImport } from './routes/asset.spotlight-preview'
+import { Route as BriefDeckIdRouteImport } from './routes/brief.$deckId'
+import { Route as BriefNewRouteImport } from './routes/brief.new'
+import { Route as DecksIndexRouteImport } from './routes/decks.index'
+import { Route as DecksImportRouteImport } from './routes/decks.import'
+import { Route as DecksNextPaletteRouteImport } from './routes/decks.next-palette'
+import { Route as DemoJudgingRouteImport } from './routes/demo.judging'
+import { Route as DevExportVerifyRouteImport } from './routes/dev.export-verify'
+import { Route as DevFormatVerifyRouteImport } from './routes/dev.format-verify'
+import { Route as DevImageBenchRouteImport } from './routes/dev.image-bench'
+import { Route as DevImageFormatVerifyRouteImport } from './routes/dev.image-format-verify'
+import { Route as DevLayerDiffRouteImport } from './routes/dev.layer-diff'
+import { Route as DevLibraryShowcaseRouteImport } from './routes/dev.library-showcase'
+import { Route as DevMapExportParityRouteImport } from './routes/dev.map-export-parity'
+import { Route as DevModuleCatalogRouteImport } from './routes/dev.module-catalog'
+import { Route as DevModuleSheetRouteImport } from './routes/dev.module-sheet'
+import { Route as DevPlacementVerifyRouteImport } from './routes/dev.placement-verify'
+import { Route as DevPrintModulePdfRouteImport } from './routes/dev.print-module-pdf'
+import { Route as DevProposalQaRouteImport } from './routes/dev.proposal-qa'
+import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
+import { Route as DevSocialCornersRouteImport } from './routes/dev.social-corners'
+import { Route as DevSocialSweepRouteImport } from './routes/dev.social-sweep'
+import { Route as DevUxDebugRouteImport } from './routes/dev.ux-debug'
+import { Route as EventsAgentIndexRouteImport } from './routes/events-agent.index'
+import { Route as EventsAgentThreadIdRouteImport } from './routes/events-agent.$threadId'
+import { Route as EventsIndexRouteImport } from './routes/events.index'
+import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
+import { Route as EventsNewRouteImport } from './routes/events.new'
+import { Route as EventsNextRouteImport } from './routes/events.next'
+import { Route as EventsPillarsRouteImport } from './routes/events.pillars'
+import { Route as EventsPresetsRouteImport } from './routes/events.presets'
+import { Route as EventsProductionRouteImport } from './routes/events.production'
+import { Route as ForAdminRouteImport } from './routes/for.admin'
+import { Route as ForMarketingRouteImport } from './routes/for.marketing'
+import { Route as ForSalesRouteImport } from './routes/for.sales'
+import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
+import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
+import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
+import { Route as KnowledgeIconLibraryRouteImport } from './routes/knowledge.icon-library'
+import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
+import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
+import { Route as LibraryIndexRouteImport } from './routes/library.index'
+import { Route as LibraryImportedRouteImport } from './routes/library.imported'
+import { Route as LibraryIndustryBackgroundsRouteImport } from './routes/library.industry-backgrounds'
+import { Route as LibraryMyRouteImport } from './routes/library.my'
+import { Route as LibraryOverridesRouteImport } from './routes/library.overrides'
+import { Route as LibraryPrintRouteImport } from './routes/library.print'
+import { Route as MastersGeneralSlidesRouteImport } from './routes/masters.general-slides'
+import { Route as PrintAgentIndexRouteImport } from './routes/print-agent.index'
+import { Route as PrintAgentThreadIdRouteImport } from './routes/print-agent.$threadId'
+import { Route as PublicIconsRouteImport } from './routes/public.icons'
+import { Route as PublicModulesRouteImport } from './routes/public.modules'
+import { Route as PublicStylesRouteImport } from './routes/public.styles'
+import { Route as ShareTokenRouteImport } from './routes/share.$token'
+import { Route as ShowcaseIndexRouteImport } from './routes/showcase.index'
+import { Route as ShowcasePresetIdRouteImport } from './routes/showcase.$presetId'
+import { Route as SocialAgentIndexRouteImport } from './routes/social-agent.index'
+import { Route as SocialAgentThreadIdRouteImport } from './routes/social-agent.$threadId'
+import { Route as SocialIndexRouteImport } from './routes/social.index'
+import { Route as SocialBannersRouteImport } from './routes/social.banners'
+import { Route as SocialKitRouteImport } from './routes/social.kit'
+import { Route as SocialLegalAlongsideRouteImport } from './routes/social.legal-alongside'
+import { Route as SocialLegalBloomRouteImport } from './routes/social.legal-bloom'
+import { Route as SocialLegalRefreshRouteImport } from './routes/social.legal-refresh'
+import { Route as SocialModulesRouteImport } from './routes/social.modules'
+import { Route as SocialNewRouteImport } from './routes/social.new'
+import { Route as SocialPresetsRouteImport } from './routes/social.presets'
+import { Route as TestPrintDndRouteImport } from './routes/test.print-dnd'
+import { Route as TestPrintHeroRouteImport } from './routes/test.print-hero'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
-import { Route as EventsNextDivisionsIndexRouteImport } from './routes/events.next_.divisions.index'
-import { Route as KnowledgeBrandGuidesSlugEditRouteImport } from './routes/knowledge.brand-guides.$slug_.edit'
-import { Route as EventsNextSignsEventIdRouteImport } from './routes/events.next_.signs.$eventId'
-import { Route as EventsNextSignSetEditorSignIdRouteImport } from './routes/events.next_.sign-set-editor.$signId'
-import { Route as EventsNextSignEditorSignIdRouteImport } from './routes/events.next_.sign-editor.$signId'
-import { Route as EventsNextMartPriceListRouteImport } from './routes/events.next_.mart_.price-list'
-import { Route as EventsNextMartStopIdRouteImport } from './routes/events.next_.mart_.$stopId'
-import { Route as EventsNextMapsEventIdRouteImport } from './routes/events.next_.maps.$eventId'
-import { Route as EventsNextLondonTemplateRouteImport } from './routes/events.next_.london_.template'
-import { Route as EventsNextLondonScheduleRouteImport } from './routes/events.next_.london_.schedule'
-import { Route as EventsNextLondonReviseRouteImport } from './routes/events.next_.london_.revise'
-import { Route as EventsNextLondonPhotosRouteImport } from './routes/events.next_.london_.photos'
-import { Route as EventsNextLondonMapsRouteImport } from './routes/events.next_.london_.maps'
-import { Route as EventsNextLondonBookletRouteImport } from './routes/events.next_.london_.booklet'
-import { Route as EventsNextKioskEditorBoothIdRouteImport } from './routes/events.next_.kiosk-editor.$boothId'
-import { Route as EventsNextIntakeEventIdRouteImport } from './routes/events.next_.intake.$eventId'
-import { Route as EventsNextDivisionsDivisionIdRouteImport } from './routes/events.next_.divisions.$divisionId'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns_.kit'
+import { Route as AdminPrintLibraryItemIdRouteImport } from './routes/admin.print-library_.$itemId'
+import { Route as ApiPublicBrandhubSeedProxyRouteImport } from './routes/api/public/brandhub-seed-proxy'
+import { Route as ApiPublicCanvaAdRouteImport } from './routes/api/public/canva-ad'
+import { Route as ApiPublicDivisionImageRouteImport } from './routes/api/public/division-image'
+import { Route as ApiPublicPdfIndexProxyRouteImport } from './routes/api/public/pdf-index-proxy'
+import { Route as ApiPublicSkinBackdropRouteImport } from './routes/api/public/skin-backdrop'
+import { Route as DecksDeckIdIndexRouteImport } from './routes/decks.$deckId.index'
+import { Route as DecksDeckIdDocumentRouteImport } from './routes/decks.$deckId.document'
+import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
+import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
+import { Route as DecksDeckIdPrintRouteImport } from './routes/decks.$deckId.print'
+import { Route as DemoDeckDemoIdRouteImport } from './routes/demo.deck.$demoId'
+import { Route as DemoPrintDemoIdRouteImport } from './routes/demo.print.$demoId'
+import { Route as EventsDemoPlaybookIdRouteImport } from './routes/events.demo.$playbookId'
+import { Route as EventsNextAgendasRouteImport } from './routes/events.next_.agendas'
+import { Route as EventsNextAssetsRouteImport } from './routes/events.next_.assets'
+import { Route as EventsNextBadgesRouteImport } from './routes/events.next_.badges'
+import { Route as EventsNextCaliforniaRouteImport } from './routes/events.next_.california'
+import { Route as EventsNextCityRouteImport } from './routes/events.next_.city'
+import { Route as EventsNextCityBadgesRouteImport } from './routes/events.next_.city-badges'
+import { Route as EventsNextCitySeriesRouteImport } from './routes/events.next_.city-series'
+import { Route as EventsNextGuideRouteImport } from './routes/events.next_.guide'
+import { Route as EventsNextKnowledgeRouteImport } from './routes/events.next_.knowledge'
+import { Route as EventsNextLocationsRouteImport } from './routes/events.next_.locations'
+import { Route as EventsNextLondonRouteImport } from './routes/events.next_.london'
+import { Route as EventsNextMartRouteImport } from './routes/events.next_.mart'
+import { Route as EventsNextPillarsRouteImport } from './routes/events.next_.pillars'
+import { Route as EventsNextPlaybookRouteImport } from './routes/events.next_.playbook'
+import { Route as EventsNextSanFranciscoRouteImport } from './routes/events.next_.san-francisco'
+import { Route as EventsNextStartRouteImport } from './routes/events.next_.start'
+import { Route as EventsNextVenueRouteImport } from './routes/events.next_.venue'
+import { Route as EventsNextVenuesRouteImport } from './routes/events.next_.venues'
+import { Route as EventsVenuesIndexRouteImport } from './routes/events.venues.index'
+import { Route as EventsVenuesSlugRouteImport } from './routes/events.venues.$slug'
+import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
+import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
+import { Route as KnowledgeBrandGuidesElementRouteImport } from './routes/knowledge.brand-guides.element'
+import { Route as KnowledgeBrandGuidesNext2026RouteImport } from './routes/knowledge.brand-guides.next-2026'
+import { Route as KnowledgeBrandGuidesNext2026BuildRouteImport } from './routes/knowledge.brand-guides.next-2026-build'
+import { Route as LibraryImportedAuditRouteImport } from './routes/library.imported_.audit'
+import { Route as LibraryImportedMastersRouteImport } from './routes/library.imported_.masters'
+import { Route as LibraryMyModuleIdRouteImport } from './routes/library.my_.$moduleId'
+import { Route as LibraryPrintAuditRouteImport } from './routes/library.print_.audit'
+import { Route as LibraryPrintHeroesRouteImport } from './routes/library.print_.heroes'
+import { Route as LibraryPrintModulesRouteImport } from './routes/library.print_.modules'
+import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
 import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
+import { Route as EventsNextDivisionsIndexRouteImport } from './routes/events.next_.divisions.index'
+import { Route as EventsNextDivisionsDivisionIdRouteImport } from './routes/events.next_.divisions.$divisionId'
+import { Route as EventsNextIntakeEventIdRouteImport } from './routes/events.next_.intake.$eventId'
+import { Route as EventsNextKioskEditorBoothIdRouteImport } from './routes/events.next_.kiosk-editor.$boothId'
+import { Route as EventsNextLondonBookletRouteImport } from './routes/events.next_.london_.booklet'
+import { Route as EventsNextLondonMapsRouteImport } from './routes/events.next_.london_.maps'
+import { Route as EventsNextLondonPhotosRouteImport } from './routes/events.next_.london_.photos'
+import { Route as EventsNextLondonReviseRouteImport } from './routes/events.next_.london_.revise'
+import { Route as EventsNextLondonScheduleRouteImport } from './routes/events.next_.london_.schedule'
+import { Route as EventsNextLondonTemplateRouteImport } from './routes/events.next_.london_.template'
+import { Route as EventsNextMapsEventIdRouteImport } from './routes/events.next_.maps.$eventId'
+import { Route as EventsNextMartStopIdRouteImport } from './routes/events.next_.mart_.$stopId'
+import { Route as EventsNextMartPriceListRouteImport } from './routes/events.next_.mart_.price-list'
+import { Route as EventsNextSignEditorSignIdRouteImport } from './routes/events.next_.sign-editor.$signId'
+import { Route as EventsNextSignSetEditorSignIdRouteImport } from './routes/events.next_.sign-set-editor.$signId'
+import { Route as EventsNextSignsEventIdRouteImport } from './routes/events.next_.signs.$eventId'
+import { Route as KnowledgeBrandGuidesSlugEditRouteImport } from './routes/knowledge.brand-guides.$slug_.edit'
 
-const TemplatesRoute = TemplatesRouteImport.update({
-  id: '/templates',
-  path: '/templates',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SocialRoute = SocialRouteImport.update({
-  id: '/social',
-  path: '/social',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignaturesRoute = SignaturesRouteImport.update({
-  id: '/signatures',
-  path: '/signatures',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LooksRoute = LooksRouteImport.update({
-  id: '/looks',
-  path: '/looks',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LogohubRoute = LogohubRouteImport.update({
-  id: '/logohub',
-  path: '/logohub',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KnowledgeRoute = KnowledgeRouteImport.update({
-  id: '/knowledge',
-  path: '/knowledge',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ImageryRoute = ImageryRouteImport.update({
-  id: '/imagery',
-  path: '/imagery',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FilesRoute = FilesRouteImport.update({
-  id: '/files',
-  path: '/files',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FaqRoute = FaqRouteImport.update({
-  id: '/faq',
-  path: '/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EventsRoute = EventsRouteImport.update({
-  id: '/events',
-  path: '/events',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ElementsRoute = ElementsRouteImport.update({
-  id: '/elements',
-  path: '/elements',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemosRoute = DemosRouteImport.update({
-  id: '/demos',
-  path: '/demos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConvertRoute = ConvertRouteImport.update({
-  id: '/convert',
-  path: '/convert',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AtlasRoute = AtlasRouteImport.update({
-  id: '/atlas',
-  path: '/atlas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApprovalsRoute = ApprovalsRouteImport.update({
-  id: '/approvals',
-  path: '/approvals',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnalyticsRoute = AnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -325,54 +225,291 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApprovalsRoute = ApprovalsRouteImport.update({
+  id: '/approvals',
+  path: '/approvals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AtlasRoute = AtlasRouteImport.update({
+  id: '/atlas',
+  path: '/atlas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConvertRoute = ConvertRouteImport.update({
+  id: '/convert',
+  path: '/convert',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemosRoute = DemosRouteImport.update({
+  id: '/demos',
+  path: '/demos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ElementsRoute = ElementsRouteImport.update({
+  id: '/elements',
+  path: '/elements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FilesRoute = FilesRouteImport.update({
+  id: '/files',
+  path: '/files',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImageryRoute = ImageryRouteImport.update({
+  id: '/imagery',
+  path: '/imagery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KnowledgeRoute = KnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogohubRoute = LogohubRouteImport.update({
+  id: '/logohub',
+  path: '/logohub',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LooksRoute = LooksRouteImport.update({
+  id: '/looks',
+  path: '/looks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignaturesRoute = SignaturesRouteImport.update({
+  id: '/signatures',
+  path: '/signatures',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocialRoute = SocialRouteImport.update({
+  id: '/social',
+  path: '/social',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AdminRoute,
 } as any)
-const SocialIndexRoute = SocialIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => SocialRoute,
+const AdminAiRoute = AdminAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => AdminRoute,
 } as any)
-const SocialAgentIndexRoute = SocialAgentIndexRouteImport.update({
-  id: '/social-agent/',
-  path: '/social-agent/',
-  getParentRoute: () => rootRouteImport,
+const AdminAlertsRoute = AdminAlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
+  getParentRoute: () => AdminRoute,
 } as any)
-const ShowcaseIndexRoute = ShowcaseIndexRouteImport.update({
-  id: '/showcase/',
-  path: '/showcase/',
-  getParentRoute: () => rootRouteImport,
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRoute,
 } as any)
-const PrintAgentIndexRoute = PrintAgentIndexRouteImport.update({
-  id: '/print-agent/',
-  path: '/print-agent/',
-  getParentRoute: () => rootRouteImport,
+const AdminApprovalsRoute = AdminApprovalsRouteImport.update({
+  id: '/approvals',
+  path: '/approvals',
+  getParentRoute: () => AdminRoute,
 } as any)
-const LibraryIndexRoute = LibraryIndexRouteImport.update({
-  id: '/library/',
-  path: '/library/',
-  getParentRoute: () => rootRouteImport,
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminRoute,
 } as any)
-const KnowledgeIndexRoute = KnowledgeIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => KnowledgeRoute,
+const AdminBrandAssetsRoute = AdminBrandAssetsRouteImport.update({
+  id: '/brand-assets',
+  path: '/brand-assets',
+  getParentRoute: () => AdminRoute,
 } as any)
-const EventsIndexRoute = EventsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => EventsRoute,
+const AdminCampaignsRoute = AdminCampaignsRouteImport.update({
+  id: '/campaigns',
+  path: '/campaigns',
+  getParentRoute: () => AdminRoute,
 } as any)
-const EventsAgentIndexRoute = EventsAgentIndexRouteImport.update({
-  id: '/events-agent/',
-  path: '/events-agent/',
-  getParentRoute: () => rootRouteImport,
+const AdminDivisionSeedsRoute = AdminDivisionSeedsRouteImport.update({
+  id: '/division-seeds',
+  path: '/division-seeds',
+  getParentRoute: () => AdminRoute,
 } as any)
-const DecksIndexRoute = DecksIndexRouteImport.update({
-  id: '/decks/',
-  path: '/decks/',
+const AdminExportAuditRoute = AdminExportAuditRouteImport.update({
+  id: '/export-audit',
+  path: '/export-audit',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGloballinkRoute = AdminGloballinkRouteImport.update({
+  id: '/globallink',
+  path: '/globallink',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGloballinkShareRoute = AdminGloballinkShareRouteImport.update({
+  id: '/globallink-share',
+  path: '/globallink-share',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminIconStudioRoute = AdminIconStudioRouteImport.update({
+  id: '/icon-studio',
+  path: '/icon-studio',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminImageryRoute = AdminImageryRouteImport.update({
+  id: '/imagery',
+  path: '/imagery',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminImageryAnalyticsRoute = AdminImageryAnalyticsRouteImport.update({
+  id: '/imagery-analytics',
+  path: '/imagery-analytics',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminIndustrySceneQaRoute = AdminIndustrySceneQaRouteImport.update({
+  id: '/industry-scene-qa',
+  path: '/industry-scene-qa',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminKnowledgeRoute = AdminKnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminKnowledgeHubRoute = AdminKnowledgeHubRouteImport.update({
+  id: '/knowledge-hub',
+  path: '/knowledge-hub',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLogohubRoute = AdminLogohubRouteImport.update({
+  id: '/logohub',
+  path: '/logohub',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminModuleStudioRoute = AdminModuleStudioRouteImport.update({
+  id: '/module-studio',
+  path: '/module-studio',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminModulesRoute = AdminModulesRouteImport.update({
+  id: '/modules',
+  path: '/modules',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOracleRoute = AdminOracleRouteImport.update({
+  id: '/oracle',
+  path: '/oracle',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPdfIngestRoute = AdminPdfIngestRouteImport.update({
+  id: '/pdf-ingest',
+  path: '/pdf-ingest',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPrintColorRoute = AdminPrintColorRouteImport.update({
+  id: '/print-color',
+  path: '/print-color',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPrintLibraryRoute = AdminPrintLibraryRouteImport.update({
+  id: '/print-library',
+  path: '/print-library',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminQrDownloadsRoute = AdminQrDownloadsRouteImport.update({
+  id: '/qr-downloads',
+  path: '/qr-downloads',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminStyleLearningRoute = AdminStyleLearningRouteImport.update({
+  id: '/style-learning',
+  path: '/style-learning',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTeamRoute = AdminTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTemplatesRoute = AdminTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTranslationRoute = AdminTranslationRouteImport.update({
+  id: '/translation',
+  path: '/translation',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsageRoute = AdminUsageRouteImport.update({
+  id: '/usage',
+  path: '/usage',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminVizLabRoute = AdminVizLabRouteImport.update({
+  id: '/viz-lab',
+  path: '/viz-lab',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCanvasRoute = AdminCanvasRouteImport.update({
+  id: '/admin_/canvas',
+  path: '/admin/canvas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AgentIndexRoute = AgentIndexRouteImport.update({
@@ -380,330 +517,24 @@ const AgentIndexRoute = AgentIndexRouteImport.update({
   path: '/agent/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const TestPrintHeroRoute = TestPrintHeroRouteImport.update({
-  id: '/test/print-hero',
-  path: '/test/print-hero',
+const AgentThreadIdRoute = AgentThreadIdRouteImport.update({
+  id: '/agent/$threadId',
+  path: '/agent/$threadId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TestPrintDndRoute = TestPrintDndRouteImport.update({
-  id: '/test/print-dnd',
-  path: '/test/print-dnd',
+const ApiAgentChatRoute = ApiAgentChatRouteImport.update({
+  id: '/api/agent-chat',
+  path: '/api/agent-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SocialPresetsRoute = SocialPresetsRouteImport.update({
-  id: '/presets',
-  path: '/presets',
-  getParentRoute: () => SocialRoute,
-} as any)
-const SocialNewRoute = SocialNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => SocialRoute,
-} as any)
-const SocialModulesRoute = SocialModulesRouteImport.update({
-  id: '/modules',
-  path: '/modules',
-  getParentRoute: () => SocialRoute,
-} as any)
-const SocialLegalRefreshRoute = SocialLegalRefreshRouteImport.update({
-  id: '/legal-refresh',
-  path: '/legal-refresh',
-  getParentRoute: () => SocialRoute,
-} as any)
-const SocialLegalBloomRoute = SocialLegalBloomRouteImport.update({
-  id: '/legal-bloom',
-  path: '/legal-bloom',
-  getParentRoute: () => SocialRoute,
-} as any)
-const SocialLegalAlongsideRoute = SocialLegalAlongsideRouteImport.update({
-  id: '/legal-alongside',
-  path: '/legal-alongside',
-  getParentRoute: () => SocialRoute,
-} as any)
-const SocialKitRoute = SocialKitRouteImport.update({
-  id: '/kit',
-  path: '/kit',
-  getParentRoute: () => SocialRoute,
-} as any)
-const SocialBannersRoute = SocialBannersRouteImport.update({
-  id: '/banners',
-  path: '/banners',
-  getParentRoute: () => SocialRoute,
-} as any)
-const SocialAgentThreadIdRoute = SocialAgentThreadIdRouteImport.update({
-  id: '/social-agent/$threadId',
-  path: '/social-agent/$threadId',
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ShowcasePresetIdRoute = ShowcasePresetIdRouteImport.update({
-  id: '/showcase/$presetId',
-  path: '/showcase/$presetId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShareTokenRoute = ShareTokenRouteImport.update({
-  id: '/share/$token',
-  path: '/share/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PublicStylesRoute = PublicStylesRouteImport.update({
-  id: '/public/styles',
-  path: '/public/styles',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PublicModulesRoute = PublicModulesRouteImport.update({
-  id: '/public/modules',
-  path: '/public/modules',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PublicIconsRoute = PublicIconsRouteImport.update({
-  id: '/public/icons',
-  path: '/public/icons',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrintAgentThreadIdRoute = PrintAgentThreadIdRouteImport.update({
-  id: '/print-agent/$threadId',
-  path: '/print-agent/$threadId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MastersGeneralSlidesRoute = MastersGeneralSlidesRouteImport.update({
-  id: '/masters/general-slides',
-  path: '/masters/general-slides',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LibraryPrintRoute = LibraryPrintRouteImport.update({
-  id: '/library/print',
-  path: '/library/print',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LibraryOverridesRoute = LibraryOverridesRouteImport.update({
-  id: '/library/overrides',
-  path: '/library/overrides',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LibraryMyRoute = LibraryMyRouteImport.update({
-  id: '/library/my',
-  path: '/library/my',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LibraryIndustryBackgroundsRoute =
-  LibraryIndustryBackgroundsRouteImport.update({
-    id: '/library/industry-backgrounds',
-    path: '/library/industry-backgrounds',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LibraryImportedRoute = LibraryImportedRouteImport.update({
-  id: '/library/imported',
-  path: '/library/imported',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KnowledgeOracleRoute = KnowledgeOracleRouteImport.update({
-  id: '/oracle',
-  path: '/oracle',
-  getParentRoute: () => KnowledgeRoute,
-} as any)
-const KnowledgeNewRoute = KnowledgeNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => KnowledgeRoute,
-} as any)
-const KnowledgeIconLibraryRoute = KnowledgeIconLibraryRouteImport.update({
-  id: '/icon-library',
-  path: '/icon-library',
-  getParentRoute: () => KnowledgeRoute,
-} as any)
-const KnowledgeAskRoute = KnowledgeAskRouteImport.update({
-  id: '/ask',
-  path: '/ask',
-  getParentRoute: () => KnowledgeRoute,
-} as any)
-const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
-  id: '/$entryId',
-  path: '/$entryId',
-  getParentRoute: () => KnowledgeRoute,
-} as any)
-const ForSalesRoute = ForSalesRouteImport.update({
-  id: '/for/sales',
-  path: '/for/sales',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForMarketingRoute = ForMarketingRouteImport.update({
-  id: '/for/marketing',
-  path: '/for/marketing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForAdminRoute = ForAdminRouteImport.update({
-  id: '/for/admin',
-  path: '/for/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EventsProductionRoute = EventsProductionRouteImport.update({
-  id: '/production',
-  path: '/production',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsPresetsRoute = EventsPresetsRouteImport.update({
-  id: '/presets',
-  path: '/presets',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsPillarsRoute = EventsPillarsRouteImport.update({
-  id: '/pillars',
-  path: '/pillars',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextRoute = EventsNextRouteImport.update({
-  id: '/next',
-  path: '/next',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNewRoute = EventsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsEventIdRoute = EventsEventIdRouteImport.update({
-  id: '/$eventId',
-  path: '/$eventId',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsAgentThreadIdRoute = EventsAgentThreadIdRouteImport.update({
-  id: '/events-agent/$threadId',
-  path: '/events-agent/$threadId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevUxDebugRoute = DevUxDebugRouteImport.update({
-  id: '/dev/ux-debug',
-  path: '/dev/ux-debug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevSocialSweepRoute = DevSocialSweepRouteImport.update({
-  id: '/dev/social-sweep',
-  path: '/dev/social-sweep',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevSocialCornersRoute = DevSocialCornersRouteImport.update({
-  id: '/dev/social-corners',
-  path: '/dev/social-corners',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevSlidestageDemoRoute = DevSlidestageDemoRouteImport.update({
-  id: '/dev/slidestage-demo',
-  path: '/dev/slidestage-demo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevProposalQaRoute = DevProposalQaRouteImport.update({
-  id: '/dev/proposal-qa',
-  path: '/dev/proposal-qa',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevPrintModulePdfRoute = DevPrintModulePdfRouteImport.update({
-  id: '/dev/print-module-pdf',
-  path: '/dev/print-module-pdf',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevPlacementVerifyRoute = DevPlacementVerifyRouteImport.update({
-  id: '/dev/placement-verify',
-  path: '/dev/placement-verify',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevModuleSheetRoute = DevModuleSheetRouteImport.update({
-  id: '/dev/module-sheet',
-  path: '/dev/module-sheet',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevModuleCatalogRoute = DevModuleCatalogRouteImport.update({
-  id: '/dev/module-catalog',
-  path: '/dev/module-catalog',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevMapExportParityRoute = DevMapExportParityRouteImport.update({
-  id: '/dev/map-export-parity',
-  path: '/dev/map-export-parity',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevLibraryShowcaseRoute = DevLibraryShowcaseRouteImport.update({
-  id: '/dev/library-showcase',
-  path: '/dev/library-showcase',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevLayerDiffRoute = DevLayerDiffRouteImport.update({
-  id: '/dev/layer-diff',
-  path: '/dev/layer-diff',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevImageFormatVerifyRoute = DevImageFormatVerifyRouteImport.update({
-  id: '/dev/image-format-verify',
-  path: '/dev/image-format-verify',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevImageBenchRoute = DevImageBenchRouteImport.update({
-  id: '/dev/image-bench',
-  path: '/dev/image-bench',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevFormatVerifyRoute = DevFormatVerifyRouteImport.update({
-  id: '/dev/format-verify',
-  path: '/dev/format-verify',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevExportVerifyRoute = DevExportVerifyRouteImport.update({
-  id: '/dev/export-verify',
-  path: '/dev/export-verify',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoJudgingRoute = DemoJudgingRouteImport.update({
-  id: '/demo/judging',
-  path: '/demo/judging',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DecksNextPaletteRoute = DecksNextPaletteRouteImport.update({
-  id: '/decks/next-palette',
-  path: '/decks/next-palette',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DecksImportRoute = DecksImportRouteImport.update({
-  id: '/decks/import',
-  path: '/decks/import',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BriefNewRoute = BriefNewRouteImport.update({
-  id: '/brief/new',
-  path: '/brief/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BriefDeckIdRoute = BriefDeckIdRouteImport.update({
-  id: '/brief/$deckId',
-  path: '/brief/$deckId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AssetSpotlightPreviewRoute = AssetSpotlightPreviewRouteImport.update({
-  id: '/asset/spotlight-preview',
-  path: '/asset/spotlight-preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AssetNewRoute = AssetNewRouteImport.update({
-  id: '/asset/new',
-  path: '/asset/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AssetAssetIdRoute = AssetAssetIdRouteImport.update({
-  id: '/asset/$assetId',
-  path: '/asset/$assetId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPrintAgentChatRoute = ApiPrintAgentChatRouteImport.update({
-  id: '/api/print-agent-chat',
-  path: '/api/print-agent-chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiKitAgentChatRoute = ApiKitAgentChatRouteImport.update({
-  id: '/api/kit-agent-chat',
-  path: '/api/kit-agent-chat',
+const ApiDeckExportValidateRoute = ApiDeckExportValidateRouteImport.update({
+  id: '/api/deck-export-validate',
+  path: '/api/deck-export-validate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiDeckExportVisualValidateRoute =
@@ -712,270 +543,563 @@ const ApiDeckExportVisualValidateRoute =
     path: '/api/deck-export-visual-validate',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiDeckExportValidateRoute = ApiDeckExportValidateRouteImport.update({
-  id: '/api/deck-export-validate',
-  path: '/api/deck-export-validate',
+const ApiKitAgentChatRoute = ApiKitAgentChatRouteImport.update({
+  id: '/api/kit-agent-chat',
+  path: '/api/kit-agent-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiChatRoute = ApiChatRouteImport.update({
-  id: '/api/chat',
-  path: '/api/chat',
+const ApiPrintAgentChatRoute = ApiPrintAgentChatRouteImport.update({
+  id: '/api/print-agent-chat',
+  path: '/api/print-agent-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAgentChatRoute = ApiAgentChatRouteImport.update({
-  id: '/api/agent-chat',
-  path: '/api/agent-chat',
+const AssetAssetIdRoute = AssetAssetIdRouteImport.update({
+  id: '/asset/$assetId',
+  path: '/asset/$assetId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AgentThreadIdRoute = AgentThreadIdRouteImport.update({
-  id: '/agent/$threadId',
-  path: '/agent/$threadId',
+const AssetNewRoute = AssetNewRouteImport.update({
+  id: '/asset/new',
+  path: '/asset/new',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminCanvasRoute = AdminCanvasRouteImport.update({
-  id: '/admin_/canvas',
-  path: '/admin/canvas',
+const AssetSpotlightPreviewRoute = AssetSpotlightPreviewRouteImport.update({
+  id: '/asset/spotlight-preview',
+  path: '/asset/spotlight-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminVizLabRoute = AdminVizLabRouteImport.update({
-  id: '/viz-lab',
-  path: '/viz-lab',
-  getParentRoute: () => AdminRoute,
+const BriefDeckIdRoute = BriefDeckIdRouteImport.update({
+  id: '/brief/$deckId',
+  path: '/brief/$deckId',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AdminRoute,
+const BriefNewRoute = BriefNewRouteImport.update({
+  id: '/brief/new',
+  path: '/brief/new',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminUsageRoute = AdminUsageRouteImport.update({
-  id: '/usage',
-  path: '/usage',
-  getParentRoute: () => AdminRoute,
+const DecksIndexRoute = DecksIndexRouteImport.update({
+  id: '/decks/',
+  path: '/decks/',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminTranslationRoute = AdminTranslationRouteImport.update({
-  id: '/translation',
-  path: '/translation',
-  getParentRoute: () => AdminRoute,
+const DecksImportRoute = DecksImportRouteImport.update({
+  id: '/decks/import',
+  path: '/decks/import',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminTemplatesRoute = AdminTemplatesRouteImport.update({
-  id: '/templates',
-  path: '/templates',
-  getParentRoute: () => AdminRoute,
+const DecksNextPaletteRoute = DecksNextPaletteRouteImport.update({
+  id: '/decks/next-palette',
+  path: '/decks/next-palette',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminTeamRoute = AdminTeamRouteImport.update({
-  id: '/team',
-  path: '/team',
-  getParentRoute: () => AdminRoute,
+const DemoJudgingRoute = DemoJudgingRouteImport.update({
+  id: '/demo/judging',
+  path: '/demo/judging',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminStyleLearningRoute = AdminStyleLearningRouteImport.update({
-  id: '/style-learning',
-  path: '/style-learning',
-  getParentRoute: () => AdminRoute,
+const DevExportVerifyRoute = DevExportVerifyRouteImport.update({
+  id: '/dev/export-verify',
+  path: '/dev/export-verify',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminQrDownloadsRoute = AdminQrDownloadsRouteImport.update({
-  id: '/qr-downloads',
-  path: '/qr-downloads',
-  getParentRoute: () => AdminRoute,
+const DevFormatVerifyRoute = DevFormatVerifyRouteImport.update({
+  id: '/dev/format-verify',
+  path: '/dev/format-verify',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminPrintLibraryRoute = AdminPrintLibraryRouteImport.update({
-  id: '/print-library',
-  path: '/print-library',
-  getParentRoute: () => AdminRoute,
+const DevImageBenchRoute = DevImageBenchRouteImport.update({
+  id: '/dev/image-bench',
+  path: '/dev/image-bench',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminPrintColorRoute = AdminPrintColorRouteImport.update({
-  id: '/print-color',
-  path: '/print-color',
-  getParentRoute: () => AdminRoute,
+const DevImageFormatVerifyRoute = DevImageFormatVerifyRouteImport.update({
+  id: '/dev/image-format-verify',
+  path: '/dev/image-format-verify',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminPdfIngestRoute = AdminPdfIngestRouteImport.update({
-  id: '/pdf-ingest',
-  path: '/pdf-ingest',
-  getParentRoute: () => AdminRoute,
+const DevLayerDiffRoute = DevLayerDiffRouteImport.update({
+  id: '/dev/layer-diff',
+  path: '/dev/layer-diff',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminOracleRoute = AdminOracleRouteImport.update({
+const DevLibraryShowcaseRoute = DevLibraryShowcaseRouteImport.update({
+  id: '/dev/library-showcase',
+  path: '/dev/library-showcase',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevMapExportParityRoute = DevMapExportParityRouteImport.update({
+  id: '/dev/map-export-parity',
+  path: '/dev/map-export-parity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevModuleCatalogRoute = DevModuleCatalogRouteImport.update({
+  id: '/dev/module-catalog',
+  path: '/dev/module-catalog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevModuleSheetRoute = DevModuleSheetRouteImport.update({
+  id: '/dev/module-sheet',
+  path: '/dev/module-sheet',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevPlacementVerifyRoute = DevPlacementVerifyRouteImport.update({
+  id: '/dev/placement-verify',
+  path: '/dev/placement-verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevPrintModulePdfRoute = DevPrintModulePdfRouteImport.update({
+  id: '/dev/print-module-pdf',
+  path: '/dev/print-module-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevProposalQaRoute = DevProposalQaRouteImport.update({
+  id: '/dev/proposal-qa',
+  path: '/dev/proposal-qa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevSlidestageDemoRoute = DevSlidestageDemoRouteImport.update({
+  id: '/dev/slidestage-demo',
+  path: '/dev/slidestage-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevSocialCornersRoute = DevSocialCornersRouteImport.update({
+  id: '/dev/social-corners',
+  path: '/dev/social-corners',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevSocialSweepRoute = DevSocialSweepRouteImport.update({
+  id: '/dev/social-sweep',
+  path: '/dev/social-sweep',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevUxDebugRoute = DevUxDebugRouteImport.update({
+  id: '/dev/ux-debug',
+  path: '/dev/ux-debug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsAgentIndexRoute = EventsAgentIndexRouteImport.update({
+  id: '/events-agent/',
+  path: '/events-agent/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsAgentThreadIdRoute = EventsAgentThreadIdRouteImport.update({
+  id: '/events-agent/$threadId',
+  path: '/events-agent/$threadId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsIndexRoute = EventsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsEventIdRoute = EventsEventIdRouteImport.update({
+  id: '/$eventId',
+  path: '/$eventId',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNewRoute = EventsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextRoute = EventsNextRouteImport.update({
+  id: '/next',
+  path: '/next',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsPillarsRoute = EventsPillarsRouteImport.update({
+  id: '/pillars',
+  path: '/pillars',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsPresetsRoute = EventsPresetsRouteImport.update({
+  id: '/presets',
+  path: '/presets',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsProductionRoute = EventsProductionRouteImport.update({
+  id: '/production',
+  path: '/production',
+  getParentRoute: () => EventsRoute,
+} as any)
+const ForAdminRoute = ForAdminRouteImport.update({
+  id: '/for/admin',
+  path: '/for/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForMarketingRoute = ForMarketingRouteImport.update({
+  id: '/for/marketing',
+  path: '/for/marketing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForSalesRoute = ForSalesRouteImport.update({
+  id: '/for/sales',
+  path: '/for/sales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KnowledgeIndexRoute = KnowledgeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => KnowledgeRoute,
+} as any)
+const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
+  id: '/$entryId',
+  path: '/$entryId',
+  getParentRoute: () => KnowledgeRoute,
+} as any)
+const KnowledgeAskRoute = KnowledgeAskRouteImport.update({
+  id: '/ask',
+  path: '/ask',
+  getParentRoute: () => KnowledgeRoute,
+} as any)
+const KnowledgeIconLibraryRoute = KnowledgeIconLibraryRouteImport.update({
+  id: '/icon-library',
+  path: '/icon-library',
+  getParentRoute: () => KnowledgeRoute,
+} as any)
+const KnowledgeNewRoute = KnowledgeNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => KnowledgeRoute,
+} as any)
+const KnowledgeOracleRoute = KnowledgeOracleRouteImport.update({
   id: '/oracle',
   path: '/oracle',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => KnowledgeRoute,
 } as any)
-const AdminModulesRoute = AdminModulesRouteImport.update({
+const LibraryIndexRoute = LibraryIndexRouteImport.update({
+  id: '/library/',
+  path: '/library/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryImportedRoute = LibraryImportedRouteImport.update({
+  id: '/library/imported',
+  path: '/library/imported',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryIndustryBackgroundsRoute =
+  LibraryIndustryBackgroundsRouteImport.update({
+    id: '/library/industry-backgrounds',
+    path: '/library/industry-backgrounds',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LibraryMyRoute = LibraryMyRouteImport.update({
+  id: '/library/my',
+  path: '/library/my',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryOverridesRoute = LibraryOverridesRouteImport.update({
+  id: '/library/overrides',
+  path: '/library/overrides',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryPrintRoute = LibraryPrintRouteImport.update({
+  id: '/library/print',
+  path: '/library/print',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MastersGeneralSlidesRoute = MastersGeneralSlidesRouteImport.update({
+  id: '/masters/general-slides',
+  path: '/masters/general-slides',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrintAgentIndexRoute = PrintAgentIndexRouteImport.update({
+  id: '/print-agent/',
+  path: '/print-agent/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrintAgentThreadIdRoute = PrintAgentThreadIdRouteImport.update({
+  id: '/print-agent/$threadId',
+  path: '/print-agent/$threadId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicIconsRoute = PublicIconsRouteImport.update({
+  id: '/public/icons',
+  path: '/public/icons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicModulesRoute = PublicModulesRouteImport.update({
+  id: '/public/modules',
+  path: '/public/modules',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicStylesRoute = PublicStylesRouteImport.update({
+  id: '/public/styles',
+  path: '/public/styles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShareTokenRoute = ShareTokenRouteImport.update({
+  id: '/share/$token',
+  path: '/share/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShowcaseIndexRoute = ShowcaseIndexRouteImport.update({
+  id: '/showcase/',
+  path: '/showcase/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShowcasePresetIdRoute = ShowcasePresetIdRouteImport.update({
+  id: '/showcase/$presetId',
+  path: '/showcase/$presetId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocialAgentIndexRoute = SocialAgentIndexRouteImport.update({
+  id: '/social-agent/',
+  path: '/social-agent/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocialAgentThreadIdRoute = SocialAgentThreadIdRouteImport.update({
+  id: '/social-agent/$threadId',
+  path: '/social-agent/$threadId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocialIndexRoute = SocialIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SocialRoute,
+} as any)
+const SocialBannersRoute = SocialBannersRouteImport.update({
+  id: '/banners',
+  path: '/banners',
+  getParentRoute: () => SocialRoute,
+} as any)
+const SocialKitRoute = SocialKitRouteImport.update({
+  id: '/kit',
+  path: '/kit',
+  getParentRoute: () => SocialRoute,
+} as any)
+const SocialLegalAlongsideRoute = SocialLegalAlongsideRouteImport.update({
+  id: '/legal-alongside',
+  path: '/legal-alongside',
+  getParentRoute: () => SocialRoute,
+} as any)
+const SocialLegalBloomRoute = SocialLegalBloomRouteImport.update({
+  id: '/legal-bloom',
+  path: '/legal-bloom',
+  getParentRoute: () => SocialRoute,
+} as any)
+const SocialLegalRefreshRoute = SocialLegalRefreshRouteImport.update({
+  id: '/legal-refresh',
+  path: '/legal-refresh',
+  getParentRoute: () => SocialRoute,
+} as any)
+const SocialModulesRoute = SocialModulesRouteImport.update({
   id: '/modules',
   path: '/modules',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => SocialRoute,
 } as any)
-const AdminModuleStudioRoute = AdminModuleStudioRouteImport.update({
-  id: '/module-studio',
-  path: '/module-studio',
-  getParentRoute: () => AdminRoute,
+const SocialNewRoute = SocialNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => SocialRoute,
 } as any)
-const AdminLogohubRoute = AdminLogohubRouteImport.update({
-  id: '/logohub',
-  path: '/logohub',
-  getParentRoute: () => AdminRoute,
+const SocialPresetsRoute = SocialPresetsRouteImport.update({
+  id: '/presets',
+  path: '/presets',
+  getParentRoute: () => SocialRoute,
 } as any)
-const AdminKnowledgeHubRoute = AdminKnowledgeHubRouteImport.update({
-  id: '/knowledge-hub',
-  path: '/knowledge-hub',
-  getParentRoute: () => AdminRoute,
+const TestPrintDndRoute = TestPrintDndRouteImport.update({
+  id: '/test/print-dnd',
+  path: '/test/print-dnd',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminKnowledgeRoute = AdminKnowledgeRouteImport.update({
-  id: '/knowledge',
-  path: '/knowledge',
-  getParentRoute: () => AdminRoute,
+const TestPrintHeroRoute = TestPrintHeroRouteImport.update({
+  id: '/test/print-hero',
+  path: '/test/print-hero',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndustrySceneQaRoute = AdminIndustrySceneQaRouteImport.update({
-  id: '/industry-scene-qa',
-  path: '/industry-scene-qa',
-  getParentRoute: () => AdminRoute,
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminImageryAnalyticsRoute = AdminImageryAnalyticsRouteImport.update({
-  id: '/imagery-analytics',
-  path: '/imagery-analytics',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminImageryRoute = AdminImageryRouteImport.update({
-  id: '/imagery',
-  path: '/imagery',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminIconStudioRoute = AdminIconStudioRouteImport.update({
-  id: '/icon-studio',
-  path: '/icon-studio',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminGloballinkShareRoute = AdminGloballinkShareRouteImport.update({
-  id: '/globallink-share',
-  path: '/globallink-share',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminGloballinkRoute = AdminGloballinkRouteImport.update({
-  id: '/globallink',
-  path: '/globallink',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminExportAuditRoute = AdminExportAuditRouteImport.update({
-  id: '/export-audit',
-  path: '/export-audit',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminDivisionSeedsRoute = AdminDivisionSeedsRouteImport.update({
-  id: '/division-seeds',
-  path: '/division-seeds',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCampaignsRoute = AdminCampaignsRouteImport.update({
-  id: '/campaigns',
-  path: '/campaigns',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminBrandAssetsRoute = AdminBrandAssetsRouteImport.update({
-  id: '/brand-assets',
-  path: '/brand-assets',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAuditRoute = AdminAuditRouteImport.update({
-  id: '/audit',
-  path: '/audit',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminApprovalsRoute = AdminApprovalsRouteImport.update({
-  id: '/approvals',
-  path: '/approvals',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAlertsRoute = AdminAlertsRouteImport.update({
-  id: '/alerts',
-  path: '/alerts',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAiRoute = AdminAiRouteImport.update({
-  id: '/ai',
-  path: '/ai',
-  getParentRoute: () => AdminRoute,
-} as any)
-const Char91DotwellKnownChar93OauthProtectedResourceRoute =
-  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
-    id: '/.well-known/oauth-protected-resource',
-    path: '/.well-known/oauth-protected-resource',
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
-const Char91DotmcpChar93ListToolsRoute =
-  Char91DotmcpChar93ListToolsRouteImport.update({
-    id: '/.mcp/list-tools',
-    path: '/.mcp/list-tools',
+const AdminCampaignsKitRoute = AdminCampaignsKitRouteImport.update({
+  id: '/campaigns_/kit',
+  path: '/campaigns/kit',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPrintLibraryItemIdRoute = AdminPrintLibraryItemIdRouteImport.update({
+  id: '/print-library_/$itemId',
+  path: '/print-library/$itemId',
+  getParentRoute: () => AdminRoute,
+} as any)
+const ApiPublicBrandhubSeedProxyRoute =
+  ApiPublicBrandhubSeedProxyRouteImport.update({
+    id: '/api/public/brandhub-seed-proxy',
+    path: '/api/public/brandhub-seed-proxy',
     getParentRoute: () => rootRouteImport,
   } as any)
-const KnowledgeBrandGuidesIndexRoute =
-  KnowledgeBrandGuidesIndexRouteImport.update({
-    id: '/brand-guides/',
-    path: '/brand-guides/',
-    getParentRoute: () => KnowledgeRoute,
-  } as any)
-const EventsVenuesIndexRoute = EventsVenuesIndexRouteImport.update({
-  id: '/venues/',
-  path: '/venues/',
-  getParentRoute: () => EventsRoute,
+const ApiPublicCanvaAdRoute = ApiPublicCanvaAdRouteImport.update({
+  id: '/api/public/canva-ad',
+  path: '/api/public/canva-ad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicDivisionImageRoute = ApiPublicDivisionImageRouteImport.update({
+  id: '/api/public/division-image',
+  path: '/api/public/division-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPdfIndexProxyRoute = ApiPublicPdfIndexProxyRouteImport.update({
+  id: '/api/public/pdf-index-proxy',
+  path: '/api/public/pdf-index-proxy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSkinBackdropRoute = ApiPublicSkinBackdropRouteImport.update({
+  id: '/api/public/skin-backdrop',
+  path: '/api/public/skin-backdrop',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksDeckIdIndexRoute = DecksDeckIdIndexRouteImport.update({
   id: '/decks/$deckId/',
   path: '/decks/$deckId/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SocialDemoPlaybookIdRoute = SocialDemoPlaybookIdRouteImport.update({
+const DecksDeckIdDocumentRoute = DecksDeckIdDocumentRouteImport.update({
+  id: '/decks/$deckId/document',
+  path: '/decks/$deckId/document',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DecksDeckIdExportRoute = DecksDeckIdExportRouteImport.update({
+  id: '/decks/$deckId/export',
+  path: '/decks/$deckId/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DecksDeckIdPresentRoute = DecksDeckIdPresentRouteImport.update({
+  id: '/decks/$deckId/present',
+  path: '/decks/$deckId/present',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DecksDeckIdPrintRoute = DecksDeckIdPrintRouteImport.update({
+  id: '/decks/$deckId/print',
+  path: '/decks/$deckId/print',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoDeckDemoIdRoute = DemoDeckDemoIdRouteImport.update({
+  id: '/demo/deck/$demoId',
+  path: '/demo/deck/$demoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoPrintDemoIdRoute = DemoPrintDemoIdRouteImport.update({
+  id: '/demo/print/$demoId',
+  path: '/demo/print/$demoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsDemoPlaybookIdRoute = EventsDemoPlaybookIdRouteImport.update({
   id: '/demo/$playbookId',
   path: '/demo/$playbookId',
-  getParentRoute: () => SocialRoute,
+  getParentRoute: () => EventsRoute,
 } as any)
-const LibraryPrintModulesRoute = LibraryPrintModulesRouteImport.update({
-  id: '/library/print_/modules',
-  path: '/library/print/modules',
-  getParentRoute: () => rootRouteImport,
+const EventsNextAgendasRoute = EventsNextAgendasRouteImport.update({
+  id: '/next_/agendas',
+  path: '/next/agendas',
+  getParentRoute: () => EventsRoute,
 } as any)
-const LibraryPrintHeroesRoute = LibraryPrintHeroesRouteImport.update({
-  id: '/library/print_/heroes',
-  path: '/library/print/heroes',
-  getParentRoute: () => rootRouteImport,
+const EventsNextAssetsRoute = EventsNextAssetsRouteImport.update({
+  id: '/next_/assets',
+  path: '/next/assets',
+  getParentRoute: () => EventsRoute,
 } as any)
-const LibraryPrintAuditRoute = LibraryPrintAuditRouteImport.update({
-  id: '/library/print_/audit',
-  path: '/library/print/audit',
-  getParentRoute: () => rootRouteImport,
+const EventsNextBadgesRoute = EventsNextBadgesRouteImport.update({
+  id: '/next_/badges',
+  path: '/next/badges',
+  getParentRoute: () => EventsRoute,
 } as any)
-const LibraryMyModuleIdRoute = LibraryMyModuleIdRouteImport.update({
-  id: '/library/my_/$moduleId',
-  path: '/library/my/$moduleId',
-  getParentRoute: () => rootRouteImport,
+const EventsNextCaliforniaRoute = EventsNextCaliforniaRouteImport.update({
+  id: '/next_/california',
+  path: '/next/california',
+  getParentRoute: () => EventsRoute,
 } as any)
-const LibraryImportedMastersRoute = LibraryImportedMastersRouteImport.update({
-  id: '/library/imported_/masters',
-  path: '/library/imported/masters',
-  getParentRoute: () => rootRouteImport,
+const EventsNextCityRoute = EventsNextCityRouteImport.update({
+  id: '/next_/city',
+  path: '/next/city',
+  getParentRoute: () => EventsRoute,
 } as any)
-const LibraryImportedAuditRoute = LibraryImportedAuditRouteImport.update({
-  id: '/library/imported_/audit',
-  path: '/library/imported/audit',
-  getParentRoute: () => rootRouteImport,
+const EventsNextCityBadgesRoute = EventsNextCityBadgesRouteImport.update({
+  id: '/next_/city-badges',
+  path: '/next/city-badges',
+  getParentRoute: () => EventsRoute,
 } as any)
-const KnowledgeBrandGuidesNext2026BuildRoute =
-  KnowledgeBrandGuidesNext2026BuildRouteImport.update({
-    id: '/brand-guides/next-2026-build',
-    path: '/brand-guides/next-2026-build',
-    getParentRoute: () => KnowledgeRoute,
-  } as any)
-const KnowledgeBrandGuidesNext2026Route =
-  KnowledgeBrandGuidesNext2026RouteImport.update({
-    id: '/brand-guides/next-2026',
-    path: '/brand-guides/next-2026',
-    getParentRoute: () => KnowledgeRoute,
-  } as any)
-const KnowledgeBrandGuidesElementRoute =
-  KnowledgeBrandGuidesElementRouteImport.update({
-    id: '/brand-guides/element',
-    path: '/brand-guides/element',
+const EventsNextCitySeriesRoute = EventsNextCitySeriesRouteImport.update({
+  id: '/next_/city-series',
+  path: '/next/city-series',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextGuideRoute = EventsNextGuideRouteImport.update({
+  id: '/next_/guide',
+  path: '/next/guide',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextKnowledgeRoute = EventsNextKnowledgeRouteImport.update({
+  id: '/next_/knowledge',
+  path: '/next/knowledge',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextLocationsRoute = EventsNextLocationsRouteImport.update({
+  id: '/next_/locations',
+  path: '/next/locations',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextLondonRoute = EventsNextLondonRouteImport.update({
+  id: '/next_/london',
+  path: '/next/london',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextMartRoute = EventsNextMartRouteImport.update({
+  id: '/next_/mart',
+  path: '/next/mart',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextPillarsRoute = EventsNextPillarsRouteImport.update({
+  id: '/next_/pillars',
+  path: '/next/pillars',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextPlaybookRoute = EventsNextPlaybookRouteImport.update({
+  id: '/next_/playbook',
+  path: '/next/playbook',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextSanFranciscoRoute = EventsNextSanFranciscoRouteImport.update({
+  id: '/next_/san-francisco',
+  path: '/next/san-francisco',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextStartRoute = EventsNextStartRouteImport.update({
+  id: '/next_/start',
+  path: '/next/start',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextVenueRoute = EventsNextVenueRouteImport.update({
+  id: '/next_/venue',
+  path: '/next/venue',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextVenuesRoute = EventsNextVenuesRouteImport.update({
+  id: '/next_/venues',
+  path: '/next/venues',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsVenuesIndexRoute = EventsVenuesIndexRouteImport.update({
+  id: '/venues/',
+  path: '/venues/',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsVenuesSlugRoute = EventsVenuesSlugRouteImport.update({
+  id: '/venues/$slug',
+  path: '/venues/$slug',
+  getParentRoute: () => EventsRoute,
+} as any)
+const KnowledgeBrandGuidesIndexRoute =
+  KnowledgeBrandGuidesIndexRouteImport.update({
+    id: '/brand-guides/',
+    path: '/brand-guides/',
     getParentRoute: () => KnowledgeRoute,
   } as any)
 const KnowledgeBrandGuidesSlugRoute =
@@ -984,257 +1108,80 @@ const KnowledgeBrandGuidesSlugRoute =
     path: '/brand-guides/$slug',
     getParentRoute: () => KnowledgeRoute,
   } as any)
-const EventsVenuesSlugRoute = EventsVenuesSlugRouteImport.update({
-  id: '/venues/$slug',
-  path: '/venues/$slug',
-  getParentRoute: () => EventsRoute,
+const KnowledgeBrandGuidesElementRoute =
+  KnowledgeBrandGuidesElementRouteImport.update({
+    id: '/brand-guides/element',
+    path: '/brand-guides/element',
+    getParentRoute: () => KnowledgeRoute,
+  } as any)
+const KnowledgeBrandGuidesNext2026Route =
+  KnowledgeBrandGuidesNext2026RouteImport.update({
+    id: '/brand-guides/next-2026',
+    path: '/brand-guides/next-2026',
+    getParentRoute: () => KnowledgeRoute,
+  } as any)
+const KnowledgeBrandGuidesNext2026BuildRoute =
+  KnowledgeBrandGuidesNext2026BuildRouteImport.update({
+    id: '/brand-guides/next-2026-build',
+    path: '/brand-guides/next-2026-build',
+    getParentRoute: () => KnowledgeRoute,
+  } as any)
+const LibraryImportedAuditRoute = LibraryImportedAuditRouteImport.update({
+  id: '/library/imported_/audit',
+  path: '/library/imported/audit',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const EventsNextVenuesRoute = EventsNextVenuesRouteImport.update({
-  id: '/next_/venues',
-  path: '/next/venues',
-  getParentRoute: () => EventsRoute,
+const LibraryImportedMastersRoute = LibraryImportedMastersRouteImport.update({
+  id: '/library/imported_/masters',
+  path: '/library/imported/masters',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const EventsNextVenueRoute = EventsNextVenueRouteImport.update({
-  id: '/next_/venue',
-  path: '/next/venue',
-  getParentRoute: () => EventsRoute,
+const LibraryMyModuleIdRoute = LibraryMyModuleIdRouteImport.update({
+  id: '/library/my_/$moduleId',
+  path: '/library/my/$moduleId',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const EventsNextStartRoute = EventsNextStartRouteImport.update({
-  id: '/next_/start',
-  path: '/next/start',
-  getParentRoute: () => EventsRoute,
+const LibraryPrintAuditRoute = LibraryPrintAuditRouteImport.update({
+  id: '/library/print_/audit',
+  path: '/library/print/audit',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const EventsNextSanFranciscoRoute = EventsNextSanFranciscoRouteImport.update({
-  id: '/next_/san-francisco',
-  path: '/next/san-francisco',
-  getParentRoute: () => EventsRoute,
+const LibraryPrintHeroesRoute = LibraryPrintHeroesRouteImport.update({
+  id: '/library/print_/heroes',
+  path: '/library/print/heroes',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const EventsNextPlaybookRoute = EventsNextPlaybookRouteImport.update({
-  id: '/next_/playbook',
-  path: '/next/playbook',
-  getParentRoute: () => EventsRoute,
+const LibraryPrintModulesRoute = LibraryPrintModulesRouteImport.update({
+  id: '/library/print_/modules',
+  path: '/library/print/modules',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const EventsNextPillarsRoute = EventsNextPillarsRouteImport.update({
-  id: '/next_/pillars',
-  path: '/next/pillars',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextMartRoute = EventsNextMartRouteImport.update({
-  id: '/next_/mart',
-  path: '/next/mart',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextLondonRoute = EventsNextLondonRouteImport.update({
-  id: '/next_/london',
-  path: '/next/london',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextLocationsRoute = EventsNextLocationsRouteImport.update({
-  id: '/next_/locations',
-  path: '/next/locations',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextKnowledgeRoute = EventsNextKnowledgeRouteImport.update({
-  id: '/next_/knowledge',
-  path: '/next/knowledge',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextGuideRoute = EventsNextGuideRouteImport.update({
-  id: '/next_/guide',
-  path: '/next/guide',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextCitySeriesRoute = EventsNextCitySeriesRouteImport.update({
-  id: '/next_/city-series',
-  path: '/next/city-series',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextCityBadgesRoute = EventsNextCityBadgesRouteImport.update({
-  id: '/next_/city-badges',
-  path: '/next/city-badges',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextCityRoute = EventsNextCityRouteImport.update({
-  id: '/next_/city',
-  path: '/next/city',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextCaliforniaRoute = EventsNextCaliforniaRouteImport.update({
-  id: '/next_/california',
-  path: '/next/california',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextBadgesRoute = EventsNextBadgesRouteImport.update({
-  id: '/next_/badges',
-  path: '/next/badges',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextAssetsRoute = EventsNextAssetsRouteImport.update({
-  id: '/next_/assets',
-  path: '/next/assets',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextAgendasRoute = EventsNextAgendasRouteImport.update({
-  id: '/next_/agendas',
-  path: '/next/agendas',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsDemoPlaybookIdRoute = EventsDemoPlaybookIdRouteImport.update({
+const SocialDemoPlaybookIdRoute = SocialDemoPlaybookIdRouteImport.update({
   id: '/demo/$playbookId',
   path: '/demo/$playbookId',
-  getParentRoute: () => EventsRoute,
+  getParentRoute: () => SocialRoute,
 } as any)
-const DemoPrintDemoIdRoute = DemoPrintDemoIdRouteImport.update({
-  id: '/demo/print/$demoId',
-  path: '/demo/print/$demoId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoDeckDemoIdRoute = DemoDeckDemoIdRouteImport.update({
-  id: '/demo/deck/$demoId',
-  path: '/demo/deck/$demoId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DecksDeckIdPrintRoute = DecksDeckIdPrintRouteImport.update({
-  id: '/decks/$deckId/print',
-  path: '/decks/$deckId/print',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DecksDeckIdPresentRoute = DecksDeckIdPresentRouteImport.update({
-  id: '/decks/$deckId/present',
-  path: '/decks/$deckId/present',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DecksDeckIdExportRoute = DecksDeckIdExportRouteImport.update({
-  id: '/decks/$deckId/export',
-  path: '/decks/$deckId/export',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DecksDeckIdDocumentRoute = DecksDeckIdDocumentRouteImport.update({
-  id: '/decks/$deckId/document',
-  path: '/decks/$deckId/document',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicSkinBackdropRoute = ApiPublicSkinBackdropRouteImport.update({
-  id: '/api/public/skin-backdrop',
-  path: '/api/public/skin-backdrop',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicPdfIndexProxyRoute = ApiPublicPdfIndexProxyRouteImport.update({
-  id: '/api/public/pdf-index-proxy',
-  path: '/api/public/pdf-index-proxy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicDivisionImageRoute = ApiPublicDivisionImageRouteImport.update({
-  id: '/api/public/division-image',
-  path: '/api/public/division-image',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicCanvaAdRoute = ApiPublicCanvaAdRouteImport.update({
-  id: '/api/public/canva-ad',
-  path: '/api/public/canva-ad',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicBrandhubSeedProxyRoute =
-  ApiPublicBrandhubSeedProxyRouteImport.update({
-    id: '/api/public/brandhub-seed-proxy',
-    path: '/api/public/brandhub-seed-proxy',
-    getParentRoute: () => rootRouteImport,
+const AdminModulesPrintModuleIdRoute =
+  AdminModulesPrintModuleIdRouteImport.update({
+    id: '/modules_/print/$moduleId',
+    path: '/modules/print/$moduleId',
+    getParentRoute: () => AdminRoute,
   } as any)
-const AdminPrintLibraryItemIdRoute = AdminPrintLibraryItemIdRouteImport.update({
-  id: '/print-library_/$itemId',
-  path: '/print-library/$itemId',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCampaignsKitRoute = AdminCampaignsKitRouteImport.update({
-  id: '/campaigns_/kit',
-  path: '/campaigns/kit',
-  getParentRoute: () => AdminRoute,
-} as any)
-const Char91DotmcpChar93InvokeToolToolRoute =
-  Char91DotmcpChar93InvokeToolToolRouteImport.update({
-    id: '/.mcp/invoke-tool/$tool',
-    path: '/.mcp/invoke-tool/$tool',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
-  id: '/.lovable/oauth/consent',
-  path: '/.lovable/oauth/consent',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EventsNextDivisionsIndexRoute =
   EventsNextDivisionsIndexRouteImport.update({
     id: '/next_/divisions/',
     path: '/next/divisions/',
     getParentRoute: () => EventsRoute,
   } as any)
-const KnowledgeBrandGuidesSlugEditRoute =
-  KnowledgeBrandGuidesSlugEditRouteImport.update({
-    id: '/brand-guides/$slug_/edit',
-    path: '/brand-guides/$slug/edit',
-    getParentRoute: () => KnowledgeRoute,
-  } as any)
-const EventsNextSignsEventIdRoute = EventsNextSignsEventIdRouteImport.update({
-  id: '/next_/signs/$eventId',
-  path: '/next/signs/$eventId',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextSignSetEditorSignIdRoute =
-  EventsNextSignSetEditorSignIdRouteImport.update({
-    id: '/next_/sign-set-editor/$signId',
-    path: '/next/sign-set-editor/$signId',
+const EventsNextDivisionsDivisionIdRoute =
+  EventsNextDivisionsDivisionIdRouteImport.update({
+    id: '/next_/divisions/$divisionId',
+    path: '/next/divisions/$divisionId',
     getParentRoute: () => EventsRoute,
   } as any)
-const EventsNextSignEditorSignIdRoute =
-  EventsNextSignEditorSignIdRouteImport.update({
-    id: '/next_/sign-editor/$signId',
-    path: '/next/sign-editor/$signId',
-    getParentRoute: () => EventsRoute,
-  } as any)
-const EventsNextMartPriceListRoute = EventsNextMartPriceListRouteImport.update({
-  id: '/next_/mart_/price-list',
-  path: '/next/mart/price-list',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextMartStopIdRoute = EventsNextMartStopIdRouteImport.update({
-  id: '/next_/mart_/$stopId',
-  path: '/next/mart/$stopId',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextMapsEventIdRoute = EventsNextMapsEventIdRouteImport.update({
-  id: '/next_/maps/$eventId',
-  path: '/next/maps/$eventId',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextLondonTemplateRoute =
-  EventsNextLondonTemplateRouteImport.update({
-    id: '/next_/london_/template',
-    path: '/next/london/template',
-    getParentRoute: () => EventsRoute,
-  } as any)
-const EventsNextLondonScheduleRoute =
-  EventsNextLondonScheduleRouteImport.update({
-    id: '/next_/london_/schedule',
-    path: '/next/london/schedule',
-    getParentRoute: () => EventsRoute,
-  } as any)
-const EventsNextLondonReviseRoute = EventsNextLondonReviseRouteImport.update({
-  id: '/next_/london_/revise',
-  path: '/next/london/revise',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextLondonPhotosRoute = EventsNextLondonPhotosRouteImport.update({
-  id: '/next_/london_/photos',
-  path: '/next/london/photos',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextLondonMapsRoute = EventsNextLondonMapsRouteImport.update({
-  id: '/next_/london_/maps',
-  path: '/next/london/maps',
-  getParentRoute: () => EventsRoute,
-} as any)
-const EventsNextLondonBookletRoute = EventsNextLondonBookletRouteImport.update({
-  id: '/next_/london_/booklet',
-  path: '/next/london/booklet',
+const EventsNextIntakeEventIdRoute = EventsNextIntakeEventIdRouteImport.update({
+  id: '/next_/intake/$eventId',
+  path: '/next/intake/$eventId',
   getParentRoute: () => EventsRoute,
 } as any)
 const EventsNextKioskEditorBoothIdRoute =
@@ -1243,22 +1190,75 @@ const EventsNextKioskEditorBoothIdRoute =
     path: '/next/kiosk-editor/$boothId',
     getParentRoute: () => EventsRoute,
   } as any)
-const EventsNextIntakeEventIdRoute = EventsNextIntakeEventIdRouteImport.update({
-  id: '/next_/intake/$eventId',
-  path: '/next/intake/$eventId',
+const EventsNextLondonBookletRoute = EventsNextLondonBookletRouteImport.update({
+  id: '/next_/london_/booklet',
+  path: '/next/london/booklet',
   getParentRoute: () => EventsRoute,
 } as any)
-const EventsNextDivisionsDivisionIdRoute =
-  EventsNextDivisionsDivisionIdRouteImport.update({
-    id: '/next_/divisions/$divisionId',
-    path: '/next/divisions/$divisionId',
+const EventsNextLondonMapsRoute = EventsNextLondonMapsRouteImport.update({
+  id: '/next_/london_/maps',
+  path: '/next/london/maps',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextLondonPhotosRoute = EventsNextLondonPhotosRouteImport.update({
+  id: '/next_/london_/photos',
+  path: '/next/london/photos',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextLondonReviseRoute = EventsNextLondonReviseRouteImport.update({
+  id: '/next_/london_/revise',
+  path: '/next/london/revise',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextLondonScheduleRoute =
+  EventsNextLondonScheduleRouteImport.update({
+    id: '/next_/london_/schedule',
+    path: '/next/london/schedule',
     getParentRoute: () => EventsRoute,
   } as any)
-const AdminModulesPrintModuleIdRoute =
-  AdminModulesPrintModuleIdRouteImport.update({
-    id: '/modules_/print/$moduleId',
-    path: '/modules/print/$moduleId',
-    getParentRoute: () => AdminRoute,
+const EventsNextLondonTemplateRoute =
+  EventsNextLondonTemplateRouteImport.update({
+    id: '/next_/london_/template',
+    path: '/next/london/template',
+    getParentRoute: () => EventsRoute,
+  } as any)
+const EventsNextMapsEventIdRoute = EventsNextMapsEventIdRouteImport.update({
+  id: '/next_/maps/$eventId',
+  path: '/next/maps/$eventId',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextMartStopIdRoute = EventsNextMartStopIdRouteImport.update({
+  id: '/next_/mart_/$stopId',
+  path: '/next/mart/$stopId',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextMartPriceListRoute = EventsNextMartPriceListRouteImport.update({
+  id: '/next_/mart_/price-list',
+  path: '/next/mart/price-list',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextSignEditorSignIdRoute =
+  EventsNextSignEditorSignIdRouteImport.update({
+    id: '/next_/sign-editor/$signId',
+    path: '/next/sign-editor/$signId',
+    getParentRoute: () => EventsRoute,
+  } as any)
+const EventsNextSignSetEditorSignIdRoute =
+  EventsNextSignSetEditorSignIdRouteImport.update({
+    id: '/next_/sign-set-editor/$signId',
+    path: '/next/sign-set-editor/$signId',
+    getParentRoute: () => EventsRoute,
+  } as any)
+const EventsNextSignsEventIdRoute = EventsNextSignsEventIdRouteImport.update({
+  id: '/next_/signs/$eventId',
+  path: '/next/signs/$eventId',
+  getParentRoute: () => EventsRoute,
+} as any)
+const KnowledgeBrandGuidesSlugEditRoute =
+  KnowledgeBrandGuidesSlugEditRouteImport.update({
+    id: '/brand-guides/$slug_/edit',
+    path: '/brand-guides/$slug/edit',
+    getParentRoute: () => KnowledgeRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -2607,151 +2607,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/templates': {
-      id: '/templates'
-      path: '/templates'
-      fullPath: '/templates'
-      preLoaderRoute: typeof TemplatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/social': {
-      id: '/social'
-      path: '/social'
-      fullPath: '/social'
-      preLoaderRoute: typeof SocialRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signatures': {
-      id: '/signatures'
-      path: '/signatures'
-      fullPath: '/signatures'
-      preLoaderRoute: typeof SignaturesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/looks': {
-      id: '/looks'
-      path: '/looks'
-      fullPath: '/looks'
-      preLoaderRoute: typeof LooksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/logohub': {
-      id: '/logohub'
-      path: '/logohub'
-      fullPath: '/logohub'
-      preLoaderRoute: typeof LogohubRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/knowledge': {
-      id: '/knowledge'
-      path: '/knowledge'
-      fullPath: '/knowledge'
-      preLoaderRoute: typeof KnowledgeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/imagery': {
-      id: '/imagery'
-      path: '/imagery'
-      fullPath: '/imagery'
-      preLoaderRoute: typeof ImageryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/files': {
-      id: '/files'
-      path: '/files'
-      fullPath: '/files'
-      preLoaderRoute: typeof FilesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/faq': {
-      id: '/faq'
-      path: '/faq'
-      fullPath: '/faq'
-      preLoaderRoute: typeof FaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/events': {
-      id: '/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof EventsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/elements': {
-      id: '/elements'
-      path: '/elements'
-      fullPath: '/elements'
-      preLoaderRoute: typeof ElementsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demos': {
-      id: '/demos'
-      path: '/demos'
-      fullPath: '/demos'
-      preLoaderRoute: typeof DemosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/convert': {
-      id: '/convert'
-      path: '/convert'
-      fullPath: '/convert'
-      preLoaderRoute: typeof ConvertRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/atlas': {
-      id: '/atlas'
-      path: '/atlas'
-      fullPath: '/atlas'
-      preLoaderRoute: typeof AtlasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/approvals': {
-      id: '/approvals'
-      path: '/approvals'
-      fullPath: '/approvals'
-      preLoaderRoute: typeof ApprovalsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/analytics': {
-      id: '/analytics'
-      path: '/analytics'
-      fullPath: '/analytics'
-      preLoaderRoute: typeof AnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -2761,809 +2621,151 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/social/': {
-      id: '/social/'
-      path: '/'
-      fullPath: '/social/'
-      preLoaderRoute: typeof SocialIndexRouteImport
-      parentRoute: typeof SocialRoute
-    }
-    '/social-agent/': {
-      id: '/social-agent/'
-      path: '/social-agent'
-      fullPath: '/social-agent/'
-      preLoaderRoute: typeof SocialAgentIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/showcase/': {
-      id: '/showcase/'
-      path: '/showcase'
-      fullPath: '/showcase/'
-      preLoaderRoute: typeof ShowcaseIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/print-agent/': {
-      id: '/print-agent/'
-      path: '/print-agent'
-      fullPath: '/print-agent/'
-      preLoaderRoute: typeof PrintAgentIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/library/': {
-      id: '/library/'
-      path: '/library'
-      fullPath: '/library/'
-      preLoaderRoute: typeof LibraryIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/knowledge/': {
-      id: '/knowledge/'
-      path: '/'
-      fullPath: '/knowledge/'
-      preLoaderRoute: typeof KnowledgeIndexRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/events/': {
-      id: '/events/'
-      path: '/'
-      fullPath: '/events/'
-      preLoaderRoute: typeof EventsIndexRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events-agent/': {
-      id: '/events-agent/'
-      path: '/events-agent'
-      fullPath: '/events-agent/'
-      preLoaderRoute: typeof EventsAgentIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/decks/': {
-      id: '/decks/'
-      path: '/decks'
-      fullPath: '/decks/'
-      preLoaderRoute: typeof DecksIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/agent/': {
-      id: '/agent/'
-      path: '/agent'
-      fullPath: '/agent/'
-      preLoaderRoute: typeof AgentIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/test/print-hero': {
-      id: '/test/print-hero'
-      path: '/test/print-hero'
-      fullPath: '/test/print-hero'
-      preLoaderRoute: typeof TestPrintHeroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/test/print-dnd': {
-      id: '/test/print-dnd'
-      path: '/test/print-dnd'
-      fullPath: '/test/print-dnd'
-      preLoaderRoute: typeof TestPrintDndRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/social/presets': {
-      id: '/social/presets'
-      path: '/presets'
-      fullPath: '/social/presets'
-      preLoaderRoute: typeof SocialPresetsRouteImport
-      parentRoute: typeof SocialRoute
-    }
-    '/social/new': {
-      id: '/social/new'
-      path: '/new'
-      fullPath: '/social/new'
-      preLoaderRoute: typeof SocialNewRouteImport
-      parentRoute: typeof SocialRoute
-    }
-    '/social/modules': {
-      id: '/social/modules'
-      path: '/modules'
-      fullPath: '/social/modules'
-      preLoaderRoute: typeof SocialModulesRouteImport
-      parentRoute: typeof SocialRoute
-    }
-    '/social/legal-refresh': {
-      id: '/social/legal-refresh'
-      path: '/legal-refresh'
-      fullPath: '/social/legal-refresh'
-      preLoaderRoute: typeof SocialLegalRefreshRouteImport
-      parentRoute: typeof SocialRoute
-    }
-    '/social/legal-bloom': {
-      id: '/social/legal-bloom'
-      path: '/legal-bloom'
-      fullPath: '/social/legal-bloom'
-      preLoaderRoute: typeof SocialLegalBloomRouteImport
-      parentRoute: typeof SocialRoute
-    }
-    '/social/legal-alongside': {
-      id: '/social/legal-alongside'
-      path: '/legal-alongside'
-      fullPath: '/social/legal-alongside'
-      preLoaderRoute: typeof SocialLegalAlongsideRouteImport
-      parentRoute: typeof SocialRoute
-    }
-    '/social/kit': {
-      id: '/social/kit'
-      path: '/kit'
-      fullPath: '/social/kit'
-      preLoaderRoute: typeof SocialKitRouteImport
-      parentRoute: typeof SocialRoute
-    }
-    '/social/banners': {
-      id: '/social/banners'
-      path: '/banners'
-      fullPath: '/social/banners'
-      preLoaderRoute: typeof SocialBannersRouteImport
-      parentRoute: typeof SocialRoute
-    }
-    '/social-agent/$threadId': {
-      id: '/social-agent/$threadId'
-      path: '/social-agent/$threadId'
-      fullPath: '/social-agent/$threadId'
-      preLoaderRoute: typeof SocialAgentThreadIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/showcase/$presetId': {
-      id: '/showcase/$presetId'
-      path: '/showcase/$presetId'
-      fullPath: '/showcase/$presetId'
-      preLoaderRoute: typeof ShowcasePresetIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/share/$token': {
-      id: '/share/$token'
-      path: '/share/$token'
-      fullPath: '/share/$token'
-      preLoaderRoute: typeof ShareTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/public/styles': {
-      id: '/public/styles'
-      path: '/public/styles'
-      fullPath: '/public/styles'
-      preLoaderRoute: typeof PublicStylesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/public/modules': {
-      id: '/public/modules'
-      path: '/public/modules'
-      fullPath: '/public/modules'
-      preLoaderRoute: typeof PublicModulesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/public/icons': {
-      id: '/public/icons'
-      path: '/public/icons'
-      fullPath: '/public/icons'
-      preLoaderRoute: typeof PublicIconsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/print-agent/$threadId': {
-      id: '/print-agent/$threadId'
-      path: '/print-agent/$threadId'
-      fullPath: '/print-agent/$threadId'
-      preLoaderRoute: typeof PrintAgentThreadIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/masters/general-slides': {
-      id: '/masters/general-slides'
-      path: '/masters/general-slides'
-      fullPath: '/masters/general-slides'
-      preLoaderRoute: typeof MastersGeneralSlidesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/library/print': {
-      id: '/library/print'
-      path: '/library/print'
-      fullPath: '/library/print'
-      preLoaderRoute: typeof LibraryPrintRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/library/overrides': {
-      id: '/library/overrides'
-      path: '/library/overrides'
-      fullPath: '/library/overrides'
-      preLoaderRoute: typeof LibraryOverridesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/library/my': {
-      id: '/library/my'
-      path: '/library/my'
-      fullPath: '/library/my'
-      preLoaderRoute: typeof LibraryMyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/library/industry-backgrounds': {
-      id: '/library/industry-backgrounds'
-      path: '/library/industry-backgrounds'
-      fullPath: '/library/industry-backgrounds'
-      preLoaderRoute: typeof LibraryIndustryBackgroundsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/library/imported': {
-      id: '/library/imported'
-      path: '/library/imported'
-      fullPath: '/library/imported'
-      preLoaderRoute: typeof LibraryImportedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/knowledge/oracle': {
-      id: '/knowledge/oracle'
-      path: '/oracle'
-      fullPath: '/knowledge/oracle'
-      preLoaderRoute: typeof KnowledgeOracleRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/knowledge/new': {
-      id: '/knowledge/new'
-      path: '/new'
-      fullPath: '/knowledge/new'
-      preLoaderRoute: typeof KnowledgeNewRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/knowledge/icon-library': {
-      id: '/knowledge/icon-library'
-      path: '/icon-library'
-      fullPath: '/knowledge/icon-library'
-      preLoaderRoute: typeof KnowledgeIconLibraryRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/knowledge/ask': {
-      id: '/knowledge/ask'
-      path: '/ask'
-      fullPath: '/knowledge/ask'
-      preLoaderRoute: typeof KnowledgeAskRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/knowledge/$entryId': {
-      id: '/knowledge/$entryId'
-      path: '/$entryId'
-      fullPath: '/knowledge/$entryId'
-      preLoaderRoute: typeof KnowledgeEntryIdRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/for/sales': {
-      id: '/for/sales'
-      path: '/for/sales'
-      fullPath: '/for/sales'
-      preLoaderRoute: typeof ForSalesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for/marketing': {
-      id: '/for/marketing'
-      path: '/for/marketing'
-      fullPath: '/for/marketing'
-      preLoaderRoute: typeof ForMarketingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for/admin': {
-      id: '/for/admin'
-      path: '/for/admin'
-      fullPath: '/for/admin'
-      preLoaderRoute: typeof ForAdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/events/production': {
-      id: '/events/production'
-      path: '/production'
-      fullPath: '/events/production'
-      preLoaderRoute: typeof EventsProductionRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/presets': {
-      id: '/events/presets'
-      path: '/presets'
-      fullPath: '/events/presets'
-      preLoaderRoute: typeof EventsPresetsRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/pillars': {
-      id: '/events/pillars'
-      path: '/pillars'
-      fullPath: '/events/pillars'
-      preLoaderRoute: typeof EventsPillarsRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next': {
-      id: '/events/next'
-      path: '/next'
-      fullPath: '/events/next'
-      preLoaderRoute: typeof EventsNextRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/new': {
-      id: '/events/new'
-      path: '/new'
-      fullPath: '/events/new'
-      preLoaderRoute: typeof EventsNewRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/$eventId': {
-      id: '/events/$eventId'
-      path: '/$eventId'
-      fullPath: '/events/$eventId'
-      preLoaderRoute: typeof EventsEventIdRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events-agent/$threadId': {
-      id: '/events-agent/$threadId'
-      path: '/events-agent/$threadId'
-      fullPath: '/events-agent/$threadId'
-      preLoaderRoute: typeof EventsAgentThreadIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/ux-debug': {
-      id: '/dev/ux-debug'
-      path: '/dev/ux-debug'
-      fullPath: '/dev/ux-debug'
-      preLoaderRoute: typeof DevUxDebugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/social-sweep': {
-      id: '/dev/social-sweep'
-      path: '/dev/social-sweep'
-      fullPath: '/dev/social-sweep'
-      preLoaderRoute: typeof DevSocialSweepRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/social-corners': {
-      id: '/dev/social-corners'
-      path: '/dev/social-corners'
-      fullPath: '/dev/social-corners'
-      preLoaderRoute: typeof DevSocialCornersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/slidestage-demo': {
-      id: '/dev/slidestage-demo'
-      path: '/dev/slidestage-demo'
-      fullPath: '/dev/slidestage-demo'
-      preLoaderRoute: typeof DevSlidestageDemoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/proposal-qa': {
-      id: '/dev/proposal-qa'
-      path: '/dev/proposal-qa'
-      fullPath: '/dev/proposal-qa'
-      preLoaderRoute: typeof DevProposalQaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/print-module-pdf': {
-      id: '/dev/print-module-pdf'
-      path: '/dev/print-module-pdf'
-      fullPath: '/dev/print-module-pdf'
-      preLoaderRoute: typeof DevPrintModulePdfRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/placement-verify': {
-      id: '/dev/placement-verify'
-      path: '/dev/placement-verify'
-      fullPath: '/dev/placement-verify'
-      preLoaderRoute: typeof DevPlacementVerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/module-sheet': {
-      id: '/dev/module-sheet'
-      path: '/dev/module-sheet'
-      fullPath: '/dev/module-sheet'
-      preLoaderRoute: typeof DevModuleSheetRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/module-catalog': {
-      id: '/dev/module-catalog'
-      path: '/dev/module-catalog'
-      fullPath: '/dev/module-catalog'
-      preLoaderRoute: typeof DevModuleCatalogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/map-export-parity': {
-      id: '/dev/map-export-parity'
-      path: '/dev/map-export-parity'
-      fullPath: '/dev/map-export-parity'
-      preLoaderRoute: typeof DevMapExportParityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/library-showcase': {
-      id: '/dev/library-showcase'
-      path: '/dev/library-showcase'
-      fullPath: '/dev/library-showcase'
-      preLoaderRoute: typeof DevLibraryShowcaseRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/layer-diff': {
-      id: '/dev/layer-diff'
-      path: '/dev/layer-diff'
-      fullPath: '/dev/layer-diff'
-      preLoaderRoute: typeof DevLayerDiffRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/image-format-verify': {
-      id: '/dev/image-format-verify'
-      path: '/dev/image-format-verify'
-      fullPath: '/dev/image-format-verify'
-      preLoaderRoute: typeof DevImageFormatVerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/image-bench': {
-      id: '/dev/image-bench'
-      path: '/dev/image-bench'
-      fullPath: '/dev/image-bench'
-      preLoaderRoute: typeof DevImageBenchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/format-verify': {
-      id: '/dev/format-verify'
-      path: '/dev/format-verify'
-      fullPath: '/dev/format-verify'
-      preLoaderRoute: typeof DevFormatVerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/export-verify': {
-      id: '/dev/export-verify'
-      path: '/dev/export-verify'
-      fullPath: '/dev/export-verify'
-      preLoaderRoute: typeof DevExportVerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/judging': {
-      id: '/demo/judging'
-      path: '/demo/judging'
-      fullPath: '/demo/judging'
-      preLoaderRoute: typeof DemoJudgingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/decks/next-palette': {
-      id: '/decks/next-palette'
-      path: '/decks/next-palette'
-      fullPath: '/decks/next-palette'
-      preLoaderRoute: typeof DecksNextPaletteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/decks/import': {
-      id: '/decks/import'
-      path: '/decks/import'
-      fullPath: '/decks/import'
-      preLoaderRoute: typeof DecksImportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/brief/new': {
-      id: '/brief/new'
-      path: '/brief/new'
-      fullPath: '/brief/new'
-      preLoaderRoute: typeof BriefNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/brief/$deckId': {
-      id: '/brief/$deckId'
-      path: '/brief/$deckId'
-      fullPath: '/brief/$deckId'
-      preLoaderRoute: typeof BriefDeckIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/asset/spotlight-preview': {
-      id: '/asset/spotlight-preview'
-      path: '/asset/spotlight-preview'
-      fullPath: '/asset/spotlight-preview'
-      preLoaderRoute: typeof AssetSpotlightPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/asset/new': {
-      id: '/asset/new'
-      path: '/asset/new'
-      fullPath: '/asset/new'
-      preLoaderRoute: typeof AssetNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/asset/$assetId': {
-      id: '/asset/$assetId'
-      path: '/asset/$assetId'
-      fullPath: '/asset/$assetId'
-      preLoaderRoute: typeof AssetAssetIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/print-agent-chat': {
-      id: '/api/print-agent-chat'
-      path: '/api/print-agent-chat'
-      fullPath: '/api/print-agent-chat'
-      preLoaderRoute: typeof ApiPrintAgentChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/kit-agent-chat': {
-      id: '/api/kit-agent-chat'
-      path: '/api/kit-agent-chat'
-      fullPath: '/api/kit-agent-chat'
-      preLoaderRoute: typeof ApiKitAgentChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/deck-export-visual-validate': {
-      id: '/api/deck-export-visual-validate'
-      path: '/api/deck-export-visual-validate'
-      fullPath: '/api/deck-export-visual-validate'
-      preLoaderRoute: typeof ApiDeckExportVisualValidateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/deck-export-validate': {
-      id: '/api/deck-export-validate'
-      path: '/api/deck-export-validate'
-      fullPath: '/api/deck-export-validate'
-      preLoaderRoute: typeof ApiDeckExportValidateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/agent-chat': {
-      id: '/api/agent-chat'
-      path: '/api/agent-chat'
-      fullPath: '/api/agent-chat'
-      preLoaderRoute: typeof ApiAgentChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/agent/$threadId': {
-      id: '/agent/$threadId'
-      path: '/agent/$threadId'
-      fullPath: '/agent/$threadId'
-      preLoaderRoute: typeof AgentThreadIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin_/canvas': {
-      id: '/admin_/canvas'
-      path: '/admin/canvas'
-      fullPath: '/admin/canvas'
-      preLoaderRoute: typeof AdminCanvasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/viz-lab': {
-      id: '/admin/viz-lab'
-      path: '/viz-lab'
-      fullPath: '/admin/viz-lab'
-      preLoaderRoute: typeof AdminVizLabRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/usage': {
-      id: '/admin/usage'
-      path: '/usage'
-      fullPath: '/admin/usage'
-      preLoaderRoute: typeof AdminUsageRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/translation': {
-      id: '/admin/translation'
-      path: '/translation'
-      fullPath: '/admin/translation'
-      preLoaderRoute: typeof AdminTranslationRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/templates': {
-      id: '/admin/templates'
-      path: '/templates'
-      fullPath: '/admin/templates'
-      preLoaderRoute: typeof AdminTemplatesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/team': {
-      id: '/admin/team'
-      path: '/team'
-      fullPath: '/admin/team'
-      preLoaderRoute: typeof AdminTeamRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/style-learning': {
-      id: '/admin/style-learning'
-      path: '/style-learning'
-      fullPath: '/admin/style-learning'
-      preLoaderRoute: typeof AdminStyleLearningRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/qr-downloads': {
-      id: '/admin/qr-downloads'
-      path: '/qr-downloads'
-      fullPath: '/admin/qr-downloads'
-      preLoaderRoute: typeof AdminQrDownloadsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/print-library': {
-      id: '/admin/print-library'
-      path: '/print-library'
-      fullPath: '/admin/print-library'
-      preLoaderRoute: typeof AdminPrintLibraryRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/print-color': {
-      id: '/admin/print-color'
-      path: '/print-color'
-      fullPath: '/admin/print-color'
-      preLoaderRoute: typeof AdminPrintColorRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/pdf-ingest': {
-      id: '/admin/pdf-ingest'
-      path: '/pdf-ingest'
-      fullPath: '/admin/pdf-ingest'
-      preLoaderRoute: typeof AdminPdfIngestRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/oracle': {
-      id: '/admin/oracle'
-      path: '/oracle'
-      fullPath: '/admin/oracle'
-      preLoaderRoute: typeof AdminOracleRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/modules': {
-      id: '/admin/modules'
-      path: '/modules'
-      fullPath: '/admin/modules'
-      preLoaderRoute: typeof AdminModulesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/module-studio': {
-      id: '/admin/module-studio'
-      path: '/module-studio'
-      fullPath: '/admin/module-studio'
-      preLoaderRoute: typeof AdminModuleStudioRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/logohub': {
-      id: '/admin/logohub'
-      path: '/logohub'
-      fullPath: '/admin/logohub'
-      preLoaderRoute: typeof AdminLogohubRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/knowledge-hub': {
-      id: '/admin/knowledge-hub'
-      path: '/knowledge-hub'
-      fullPath: '/admin/knowledge-hub'
-      preLoaderRoute: typeof AdminKnowledgeHubRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/knowledge': {
-      id: '/admin/knowledge'
-      path: '/knowledge'
-      fullPath: '/admin/knowledge'
-      preLoaderRoute: typeof AdminKnowledgeRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/industry-scene-qa': {
-      id: '/admin/industry-scene-qa'
-      path: '/industry-scene-qa'
-      fullPath: '/admin/industry-scene-qa'
-      preLoaderRoute: typeof AdminIndustrySceneQaRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/imagery-analytics': {
-      id: '/admin/imagery-analytics'
-      path: '/imagery-analytics'
-      fullPath: '/admin/imagery-analytics'
-      preLoaderRoute: typeof AdminImageryAnalyticsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/imagery': {
-      id: '/admin/imagery'
-      path: '/imagery'
-      fullPath: '/admin/imagery'
-      preLoaderRoute: typeof AdminImageryRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/icon-studio': {
-      id: '/admin/icon-studio'
-      path: '/icon-studio'
-      fullPath: '/admin/icon-studio'
-      preLoaderRoute: typeof AdminIconStudioRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/globallink-share': {
-      id: '/admin/globallink-share'
-      path: '/globallink-share'
-      fullPath: '/admin/globallink-share'
-      preLoaderRoute: typeof AdminGloballinkShareRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/globallink': {
-      id: '/admin/globallink'
-      path: '/globallink'
-      fullPath: '/admin/globallink'
-      preLoaderRoute: typeof AdminGloballinkRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/export-audit': {
-      id: '/admin/export-audit'
-      path: '/export-audit'
-      fullPath: '/admin/export-audit'
-      preLoaderRoute: typeof AdminExportAuditRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/division-seeds': {
-      id: '/admin/division-seeds'
-      path: '/division-seeds'
-      fullPath: '/admin/division-seeds'
-      preLoaderRoute: typeof AdminDivisionSeedsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/campaigns': {
-      id: '/admin/campaigns'
-      path: '/campaigns'
-      fullPath: '/admin/campaigns'
-      preLoaderRoute: typeof AdminCampaignsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/brand-assets': {
-      id: '/admin/brand-assets'
-      path: '/brand-assets'
-      fullPath: '/admin/brand-assets'
-      preLoaderRoute: typeof AdminBrandAssetsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/audit': {
-      id: '/admin/audit'
-      path: '/audit'
-      fullPath: '/admin/audit'
-      preLoaderRoute: typeof AdminAuditRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/approvals': {
-      id: '/admin/approvals'
-      path: '/approvals'
-      fullPath: '/admin/approvals'
-      preLoaderRoute: typeof AdminApprovalsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/analytics': {
-      id: '/admin/analytics'
+    '/analytics': {
+      id: '/analytics'
       path: '/analytics'
-      fullPath: '/admin/analytics'
-      preLoaderRoute: typeof AdminAnalyticsRouteImport
-      parentRoute: typeof AdminRoute
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/admin/alerts': {
-      id: '/admin/alerts'
-      path: '/alerts'
-      fullPath: '/admin/alerts'
-      preLoaderRoute: typeof AdminAlertsRouteImport
-      parentRoute: typeof AdminRoute
+    '/approvals': {
+      id: '/approvals'
+      path: '/approvals'
+      fullPath: '/approvals'
+      preLoaderRoute: typeof ApprovalsRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/admin/ai': {
-      id: '/admin/ai'
-      path: '/ai'
-      fullPath: '/admin/ai'
-      preLoaderRoute: typeof AdminAiRouteImport
-      parentRoute: typeof AdminRoute
+    '/atlas': {
+      id: '/atlas'
+      path: '/atlas'
+      fullPath: '/atlas'
+      preLoaderRoute: typeof AtlasRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/.well-known/oauth-protected-resource': {
-      id: '/.well-known/oauth-protected-resource'
-      path: '/.well-known/oauth-protected-resource'
-      fullPath: '/.well-known/oauth-protected-resource'
-      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/convert': {
+      id: '/convert'
+      path: '/convert'
+      fullPath: '/convert'
+      preLoaderRoute: typeof ConvertRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demos': {
+      id: '/demos'
+      path: '/demos'
+      fullPath: '/demos'
+      preLoaderRoute: typeof DemosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/elements': {
+      id: '/elements'
+      path: '/elements'
+      fullPath: '/elements'
+      preLoaderRoute: typeof ElementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/files': {
+      id: '/files'
+      path: '/files'
+      fullPath: '/files'
+      preLoaderRoute: typeof FilesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/imagery': {
+      id: '/imagery'
+      path: '/imagery'
+      fullPath: '/imagery'
+      preLoaderRoute: typeof ImageryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge': {
+      id: '/knowledge'
+      path: '/knowledge'
+      fullPath: '/knowledge'
+      preLoaderRoute: typeof KnowledgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/logohub': {
+      id: '/logohub'
+      path: '/logohub'
+      fullPath: '/logohub'
+      preLoaderRoute: typeof LogohubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/looks': {
+      id: '/looks'
+      path: '/looks'
+      fullPath: '/looks'
+      preLoaderRoute: typeof LooksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signatures': {
+      id: '/signatures'
+      path: '/signatures'
+      fullPath: '/signatures'
+      preLoaderRoute: typeof SignaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/social': {
+      id: '/social'
+      path: '/social'
+      fullPath: '/social'
+      preLoaderRoute: typeof SocialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.mcp/list-tools': {
@@ -3573,340 +2775,802 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/knowledge/brand-guides/': {
-      id: '/knowledge/brand-guides/'
-      path: '/brand-guides'
-      fullPath: '/knowledge/brand-guides/'
-      preLoaderRoute: typeof KnowledgeBrandGuidesIndexRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/events/venues/': {
-      id: '/events/venues/'
-      path: '/venues'
-      fullPath: '/events/venues/'
-      preLoaderRoute: typeof EventsVenuesIndexRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/decks/$deckId/': {
-      id: '/decks/$deckId/'
-      path: '/decks/$deckId'
-      fullPath: '/decks/$deckId/'
-      preLoaderRoute: typeof DecksDeckIdIndexRouteImport
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/social/demo/$playbookId': {
-      id: '/social/demo/$playbookId'
-      path: '/demo/$playbookId'
-      fullPath: '/social/demo/$playbookId'
-      preLoaderRoute: typeof SocialDemoPlaybookIdRouteImport
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ai': {
+      id: '/admin/ai'
+      path: '/ai'
+      fullPath: '/admin/ai'
+      preLoaderRoute: typeof AdminAiRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/alerts': {
+      id: '/admin/alerts'
+      path: '/alerts'
+      fullPath: '/admin/alerts'
+      preLoaderRoute: typeof AdminAlertsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/approvals': {
+      id: '/admin/approvals'
+      path: '/approvals'
+      fullPath: '/admin/approvals'
+      preLoaderRoute: typeof AdminApprovalsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/brand-assets': {
+      id: '/admin/brand-assets'
+      path: '/brand-assets'
+      fullPath: '/admin/brand-assets'
+      preLoaderRoute: typeof AdminBrandAssetsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/campaigns': {
+      id: '/admin/campaigns'
+      path: '/campaigns'
+      fullPath: '/admin/campaigns'
+      preLoaderRoute: typeof AdminCampaignsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/division-seeds': {
+      id: '/admin/division-seeds'
+      path: '/division-seeds'
+      fullPath: '/admin/division-seeds'
+      preLoaderRoute: typeof AdminDivisionSeedsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/export-audit': {
+      id: '/admin/export-audit'
+      path: '/export-audit'
+      fullPath: '/admin/export-audit'
+      preLoaderRoute: typeof AdminExportAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/globallink': {
+      id: '/admin/globallink'
+      path: '/globallink'
+      fullPath: '/admin/globallink'
+      preLoaderRoute: typeof AdminGloballinkRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/globallink-share': {
+      id: '/admin/globallink-share'
+      path: '/globallink-share'
+      fullPath: '/admin/globallink-share'
+      preLoaderRoute: typeof AdminGloballinkShareRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/icon-studio': {
+      id: '/admin/icon-studio'
+      path: '/icon-studio'
+      fullPath: '/admin/icon-studio'
+      preLoaderRoute: typeof AdminIconStudioRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/imagery': {
+      id: '/admin/imagery'
+      path: '/imagery'
+      fullPath: '/admin/imagery'
+      preLoaderRoute: typeof AdminImageryRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/imagery-analytics': {
+      id: '/admin/imagery-analytics'
+      path: '/imagery-analytics'
+      fullPath: '/admin/imagery-analytics'
+      preLoaderRoute: typeof AdminImageryAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/industry-scene-qa': {
+      id: '/admin/industry-scene-qa'
+      path: '/industry-scene-qa'
+      fullPath: '/admin/industry-scene-qa'
+      preLoaderRoute: typeof AdminIndustrySceneQaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/knowledge': {
+      id: '/admin/knowledge'
+      path: '/knowledge'
+      fullPath: '/admin/knowledge'
+      preLoaderRoute: typeof AdminKnowledgeRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/knowledge-hub': {
+      id: '/admin/knowledge-hub'
+      path: '/knowledge-hub'
+      fullPath: '/admin/knowledge-hub'
+      preLoaderRoute: typeof AdminKnowledgeHubRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/logohub': {
+      id: '/admin/logohub'
+      path: '/logohub'
+      fullPath: '/admin/logohub'
+      preLoaderRoute: typeof AdminLogohubRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/module-studio': {
+      id: '/admin/module-studio'
+      path: '/module-studio'
+      fullPath: '/admin/module-studio'
+      preLoaderRoute: typeof AdminModuleStudioRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/modules': {
+      id: '/admin/modules'
+      path: '/modules'
+      fullPath: '/admin/modules'
+      preLoaderRoute: typeof AdminModulesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/oracle': {
+      id: '/admin/oracle'
+      path: '/oracle'
+      fullPath: '/admin/oracle'
+      preLoaderRoute: typeof AdminOracleRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/pdf-ingest': {
+      id: '/admin/pdf-ingest'
+      path: '/pdf-ingest'
+      fullPath: '/admin/pdf-ingest'
+      preLoaderRoute: typeof AdminPdfIngestRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/print-color': {
+      id: '/admin/print-color'
+      path: '/print-color'
+      fullPath: '/admin/print-color'
+      preLoaderRoute: typeof AdminPrintColorRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/print-library': {
+      id: '/admin/print-library'
+      path: '/print-library'
+      fullPath: '/admin/print-library'
+      preLoaderRoute: typeof AdminPrintLibraryRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/qr-downloads': {
+      id: '/admin/qr-downloads'
+      path: '/qr-downloads'
+      fullPath: '/admin/qr-downloads'
+      preLoaderRoute: typeof AdminQrDownloadsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/style-learning': {
+      id: '/admin/style-learning'
+      path: '/style-learning'
+      fullPath: '/admin/style-learning'
+      preLoaderRoute: typeof AdminStyleLearningRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/team': {
+      id: '/admin/team'
+      path: '/team'
+      fullPath: '/admin/team'
+      preLoaderRoute: typeof AdminTeamRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/templates': {
+      id: '/admin/templates'
+      path: '/templates'
+      fullPath: '/admin/templates'
+      preLoaderRoute: typeof AdminTemplatesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/translation': {
+      id: '/admin/translation'
+      path: '/translation'
+      fullPath: '/admin/translation'
+      preLoaderRoute: typeof AdminTranslationRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/usage': {
+      id: '/admin/usage'
+      path: '/usage'
+      fullPath: '/admin/usage'
+      preLoaderRoute: typeof AdminUsageRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/viz-lab': {
+      id: '/admin/viz-lab'
+      path: '/viz-lab'
+      fullPath: '/admin/viz-lab'
+      preLoaderRoute: typeof AdminVizLabRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin_/canvas': {
+      id: '/admin_/canvas'
+      path: '/admin/canvas'
+      fullPath: '/admin/canvas'
+      preLoaderRoute: typeof AdminCanvasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/': {
+      id: '/agent/'
+      path: '/agent'
+      fullPath: '/agent/'
+      preLoaderRoute: typeof AgentIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/$threadId': {
+      id: '/agent/$threadId'
+      path: '/agent/$threadId'
+      fullPath: '/agent/$threadId'
+      preLoaderRoute: typeof AgentThreadIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/agent-chat': {
+      id: '/api/agent-chat'
+      path: '/api/agent-chat'
+      fullPath: '/api/agent-chat'
+      preLoaderRoute: typeof ApiAgentChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/deck-export-validate': {
+      id: '/api/deck-export-validate'
+      path: '/api/deck-export-validate'
+      fullPath: '/api/deck-export-validate'
+      preLoaderRoute: typeof ApiDeckExportValidateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/deck-export-visual-validate': {
+      id: '/api/deck-export-visual-validate'
+      path: '/api/deck-export-visual-validate'
+      fullPath: '/api/deck-export-visual-validate'
+      preLoaderRoute: typeof ApiDeckExportVisualValidateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/kit-agent-chat': {
+      id: '/api/kit-agent-chat'
+      path: '/api/kit-agent-chat'
+      fullPath: '/api/kit-agent-chat'
+      preLoaderRoute: typeof ApiKitAgentChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/print-agent-chat': {
+      id: '/api/print-agent-chat'
+      path: '/api/print-agent-chat'
+      fullPath: '/api/print-agent-chat'
+      preLoaderRoute: typeof ApiPrintAgentChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/asset/$assetId': {
+      id: '/asset/$assetId'
+      path: '/asset/$assetId'
+      fullPath: '/asset/$assetId'
+      preLoaderRoute: typeof AssetAssetIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/asset/new': {
+      id: '/asset/new'
+      path: '/asset/new'
+      fullPath: '/asset/new'
+      preLoaderRoute: typeof AssetNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/asset/spotlight-preview': {
+      id: '/asset/spotlight-preview'
+      path: '/asset/spotlight-preview'
+      fullPath: '/asset/spotlight-preview'
+      preLoaderRoute: typeof AssetSpotlightPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brief/$deckId': {
+      id: '/brief/$deckId'
+      path: '/brief/$deckId'
+      fullPath: '/brief/$deckId'
+      preLoaderRoute: typeof BriefDeckIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brief/new': {
+      id: '/brief/new'
+      path: '/brief/new'
+      fullPath: '/brief/new'
+      preLoaderRoute: typeof BriefNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/decks/': {
+      id: '/decks/'
+      path: '/decks'
+      fullPath: '/decks/'
+      preLoaderRoute: typeof DecksIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/decks/import': {
+      id: '/decks/import'
+      path: '/decks/import'
+      fullPath: '/decks/import'
+      preLoaderRoute: typeof DecksImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/decks/next-palette': {
+      id: '/decks/next-palette'
+      path: '/decks/next-palette'
+      fullPath: '/decks/next-palette'
+      preLoaderRoute: typeof DecksNextPaletteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/judging': {
+      id: '/demo/judging'
+      path: '/demo/judging'
+      fullPath: '/demo/judging'
+      preLoaderRoute: typeof DemoJudgingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/export-verify': {
+      id: '/dev/export-verify'
+      path: '/dev/export-verify'
+      fullPath: '/dev/export-verify'
+      preLoaderRoute: typeof DevExportVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/format-verify': {
+      id: '/dev/format-verify'
+      path: '/dev/format-verify'
+      fullPath: '/dev/format-verify'
+      preLoaderRoute: typeof DevFormatVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/image-bench': {
+      id: '/dev/image-bench'
+      path: '/dev/image-bench'
+      fullPath: '/dev/image-bench'
+      preLoaderRoute: typeof DevImageBenchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/image-format-verify': {
+      id: '/dev/image-format-verify'
+      path: '/dev/image-format-verify'
+      fullPath: '/dev/image-format-verify'
+      preLoaderRoute: typeof DevImageFormatVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/layer-diff': {
+      id: '/dev/layer-diff'
+      path: '/dev/layer-diff'
+      fullPath: '/dev/layer-diff'
+      preLoaderRoute: typeof DevLayerDiffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/library-showcase': {
+      id: '/dev/library-showcase'
+      path: '/dev/library-showcase'
+      fullPath: '/dev/library-showcase'
+      preLoaderRoute: typeof DevLibraryShowcaseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/map-export-parity': {
+      id: '/dev/map-export-parity'
+      path: '/dev/map-export-parity'
+      fullPath: '/dev/map-export-parity'
+      preLoaderRoute: typeof DevMapExportParityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/module-catalog': {
+      id: '/dev/module-catalog'
+      path: '/dev/module-catalog'
+      fullPath: '/dev/module-catalog'
+      preLoaderRoute: typeof DevModuleCatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/module-sheet': {
+      id: '/dev/module-sheet'
+      path: '/dev/module-sheet'
+      fullPath: '/dev/module-sheet'
+      preLoaderRoute: typeof DevModuleSheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/placement-verify': {
+      id: '/dev/placement-verify'
+      path: '/dev/placement-verify'
+      fullPath: '/dev/placement-verify'
+      preLoaderRoute: typeof DevPlacementVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/print-module-pdf': {
+      id: '/dev/print-module-pdf'
+      path: '/dev/print-module-pdf'
+      fullPath: '/dev/print-module-pdf'
+      preLoaderRoute: typeof DevPrintModulePdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/proposal-qa': {
+      id: '/dev/proposal-qa'
+      path: '/dev/proposal-qa'
+      fullPath: '/dev/proposal-qa'
+      preLoaderRoute: typeof DevProposalQaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/slidestage-demo': {
+      id: '/dev/slidestage-demo'
+      path: '/dev/slidestage-demo'
+      fullPath: '/dev/slidestage-demo'
+      preLoaderRoute: typeof DevSlidestageDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/social-corners': {
+      id: '/dev/social-corners'
+      path: '/dev/social-corners'
+      fullPath: '/dev/social-corners'
+      preLoaderRoute: typeof DevSocialCornersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/social-sweep': {
+      id: '/dev/social-sweep'
+      path: '/dev/social-sweep'
+      fullPath: '/dev/social-sweep'
+      preLoaderRoute: typeof DevSocialSweepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/ux-debug': {
+      id: '/dev/ux-debug'
+      path: '/dev/ux-debug'
+      fullPath: '/dev/ux-debug'
+      preLoaderRoute: typeof DevUxDebugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events-agent/': {
+      id: '/events-agent/'
+      path: '/events-agent'
+      fullPath: '/events-agent/'
+      preLoaderRoute: typeof EventsAgentIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events-agent/$threadId': {
+      id: '/events-agent/$threadId'
+      path: '/events-agent/$threadId'
+      fullPath: '/events-agent/$threadId'
+      preLoaderRoute: typeof EventsAgentThreadIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/': {
+      id: '/events/'
+      path: '/'
+      fullPath: '/events/'
+      preLoaderRoute: typeof EventsIndexRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/$eventId': {
+      id: '/events/$eventId'
+      path: '/$eventId'
+      fullPath: '/events/$eventId'
+      preLoaderRoute: typeof EventsEventIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/new': {
+      id: '/events/new'
+      path: '/new'
+      fullPath: '/events/new'
+      preLoaderRoute: typeof EventsNewRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next': {
+      id: '/events/next'
+      path: '/next'
+      fullPath: '/events/next'
+      preLoaderRoute: typeof EventsNextRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/pillars': {
+      id: '/events/pillars'
+      path: '/pillars'
+      fullPath: '/events/pillars'
+      preLoaderRoute: typeof EventsPillarsRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/presets': {
+      id: '/events/presets'
+      path: '/presets'
+      fullPath: '/events/presets'
+      preLoaderRoute: typeof EventsPresetsRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/production': {
+      id: '/events/production'
+      path: '/production'
+      fullPath: '/events/production'
+      preLoaderRoute: typeof EventsProductionRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/for/admin': {
+      id: '/for/admin'
+      path: '/for/admin'
+      fullPath: '/for/admin'
+      preLoaderRoute: typeof ForAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/marketing': {
+      id: '/for/marketing'
+      path: '/for/marketing'
+      fullPath: '/for/marketing'
+      preLoaderRoute: typeof ForMarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/sales': {
+      id: '/for/sales'
+      path: '/for/sales'
+      fullPath: '/for/sales'
+      preLoaderRoute: typeof ForSalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge/': {
+      id: '/knowledge/'
+      path: '/'
+      fullPath: '/knowledge/'
+      preLoaderRoute: typeof KnowledgeIndexRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/knowledge/$entryId': {
+      id: '/knowledge/$entryId'
+      path: '/$entryId'
+      fullPath: '/knowledge/$entryId'
+      preLoaderRoute: typeof KnowledgeEntryIdRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/knowledge/ask': {
+      id: '/knowledge/ask'
+      path: '/ask'
+      fullPath: '/knowledge/ask'
+      preLoaderRoute: typeof KnowledgeAskRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/knowledge/icon-library': {
+      id: '/knowledge/icon-library'
+      path: '/icon-library'
+      fullPath: '/knowledge/icon-library'
+      preLoaderRoute: typeof KnowledgeIconLibraryRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/knowledge/new': {
+      id: '/knowledge/new'
+      path: '/new'
+      fullPath: '/knowledge/new'
+      preLoaderRoute: typeof KnowledgeNewRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/knowledge/oracle': {
+      id: '/knowledge/oracle'
+      path: '/oracle'
+      fullPath: '/knowledge/oracle'
+      preLoaderRoute: typeof KnowledgeOracleRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/library/': {
+      id: '/library/'
+      path: '/library'
+      fullPath: '/library/'
+      preLoaderRoute: typeof LibraryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/imported': {
+      id: '/library/imported'
+      path: '/library/imported'
+      fullPath: '/library/imported'
+      preLoaderRoute: typeof LibraryImportedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/industry-backgrounds': {
+      id: '/library/industry-backgrounds'
+      path: '/library/industry-backgrounds'
+      fullPath: '/library/industry-backgrounds'
+      preLoaderRoute: typeof LibraryIndustryBackgroundsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/my': {
+      id: '/library/my'
+      path: '/library/my'
+      fullPath: '/library/my'
+      preLoaderRoute: typeof LibraryMyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/overrides': {
+      id: '/library/overrides'
+      path: '/library/overrides'
+      fullPath: '/library/overrides'
+      preLoaderRoute: typeof LibraryOverridesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/print': {
+      id: '/library/print'
+      path: '/library/print'
+      fullPath: '/library/print'
+      preLoaderRoute: typeof LibraryPrintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/masters/general-slides': {
+      id: '/masters/general-slides'
+      path: '/masters/general-slides'
+      fullPath: '/masters/general-slides'
+      preLoaderRoute: typeof MastersGeneralSlidesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/print-agent/': {
+      id: '/print-agent/'
+      path: '/print-agent'
+      fullPath: '/print-agent/'
+      preLoaderRoute: typeof PrintAgentIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/print-agent/$threadId': {
+      id: '/print-agent/$threadId'
+      path: '/print-agent/$threadId'
+      fullPath: '/print-agent/$threadId'
+      preLoaderRoute: typeof PrintAgentThreadIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public/icons': {
+      id: '/public/icons'
+      path: '/public/icons'
+      fullPath: '/public/icons'
+      preLoaderRoute: typeof PublicIconsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public/modules': {
+      id: '/public/modules'
+      path: '/public/modules'
+      fullPath: '/public/modules'
+      preLoaderRoute: typeof PublicModulesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public/styles': {
+      id: '/public/styles'
+      path: '/public/styles'
+      fullPath: '/public/styles'
+      preLoaderRoute: typeof PublicStylesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share/$token': {
+      id: '/share/$token'
+      path: '/share/$token'
+      fullPath: '/share/$token'
+      preLoaderRoute: typeof ShareTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/showcase/': {
+      id: '/showcase/'
+      path: '/showcase'
+      fullPath: '/showcase/'
+      preLoaderRoute: typeof ShowcaseIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/showcase/$presetId': {
+      id: '/showcase/$presetId'
+      path: '/showcase/$presetId'
+      fullPath: '/showcase/$presetId'
+      preLoaderRoute: typeof ShowcasePresetIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/social-agent/': {
+      id: '/social-agent/'
+      path: '/social-agent'
+      fullPath: '/social-agent/'
+      preLoaderRoute: typeof SocialAgentIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/social-agent/$threadId': {
+      id: '/social-agent/$threadId'
+      path: '/social-agent/$threadId'
+      fullPath: '/social-agent/$threadId'
+      preLoaderRoute: typeof SocialAgentThreadIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/social/': {
+      id: '/social/'
+      path: '/'
+      fullPath: '/social/'
+      preLoaderRoute: typeof SocialIndexRouteImport
       parentRoute: typeof SocialRoute
     }
-    '/library/print_/modules': {
-      id: '/library/print_/modules'
-      path: '/library/print/modules'
-      fullPath: '/library/print/modules'
-      preLoaderRoute: typeof LibraryPrintModulesRouteImport
+    '/social/banners': {
+      id: '/social/banners'
+      path: '/banners'
+      fullPath: '/social/banners'
+      preLoaderRoute: typeof SocialBannersRouteImport
+      parentRoute: typeof SocialRoute
+    }
+    '/social/kit': {
+      id: '/social/kit'
+      path: '/kit'
+      fullPath: '/social/kit'
+      preLoaderRoute: typeof SocialKitRouteImport
+      parentRoute: typeof SocialRoute
+    }
+    '/social/legal-alongside': {
+      id: '/social/legal-alongside'
+      path: '/legal-alongside'
+      fullPath: '/social/legal-alongside'
+      preLoaderRoute: typeof SocialLegalAlongsideRouteImport
+      parentRoute: typeof SocialRoute
+    }
+    '/social/legal-bloom': {
+      id: '/social/legal-bloom'
+      path: '/legal-bloom'
+      fullPath: '/social/legal-bloom'
+      preLoaderRoute: typeof SocialLegalBloomRouteImport
+      parentRoute: typeof SocialRoute
+    }
+    '/social/legal-refresh': {
+      id: '/social/legal-refresh'
+      path: '/legal-refresh'
+      fullPath: '/social/legal-refresh'
+      preLoaderRoute: typeof SocialLegalRefreshRouteImport
+      parentRoute: typeof SocialRoute
+    }
+    '/social/modules': {
+      id: '/social/modules'
+      path: '/modules'
+      fullPath: '/social/modules'
+      preLoaderRoute: typeof SocialModulesRouteImport
+      parentRoute: typeof SocialRoute
+    }
+    '/social/new': {
+      id: '/social/new'
+      path: '/new'
+      fullPath: '/social/new'
+      preLoaderRoute: typeof SocialNewRouteImport
+      parentRoute: typeof SocialRoute
+    }
+    '/social/presets': {
+      id: '/social/presets'
+      path: '/presets'
+      fullPath: '/social/presets'
+      preLoaderRoute: typeof SocialPresetsRouteImport
+      parentRoute: typeof SocialRoute
+    }
+    '/test/print-dnd': {
+      id: '/test/print-dnd'
+      path: '/test/print-dnd'
+      fullPath: '/test/print-dnd'
+      preLoaderRoute: typeof TestPrintDndRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/library/print_/heroes': {
-      id: '/library/print_/heroes'
-      path: '/library/print/heroes'
-      fullPath: '/library/print/heroes'
-      preLoaderRoute: typeof LibraryPrintHeroesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/library/print_/audit': {
-      id: '/library/print_/audit'
-      path: '/library/print/audit'
-      fullPath: '/library/print/audit'
-      preLoaderRoute: typeof LibraryPrintAuditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/library/my_/$moduleId': {
-      id: '/library/my_/$moduleId'
-      path: '/library/my/$moduleId'
-      fullPath: '/library/my/$moduleId'
-      preLoaderRoute: typeof LibraryMyModuleIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/library/imported_/masters': {
-      id: '/library/imported_/masters'
-      path: '/library/imported/masters'
-      fullPath: '/library/imported/masters'
-      preLoaderRoute: typeof LibraryImportedMastersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/library/imported_/audit': {
-      id: '/library/imported_/audit'
-      path: '/library/imported/audit'
-      fullPath: '/library/imported/audit'
-      preLoaderRoute: typeof LibraryImportedAuditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/knowledge/brand-guides/next-2026-build': {
-      id: '/knowledge/brand-guides/next-2026-build'
-      path: '/brand-guides/next-2026-build'
-      fullPath: '/knowledge/brand-guides/next-2026-build'
-      preLoaderRoute: typeof KnowledgeBrandGuidesNext2026BuildRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/knowledge/brand-guides/next-2026': {
-      id: '/knowledge/brand-guides/next-2026'
-      path: '/brand-guides/next-2026'
-      fullPath: '/knowledge/brand-guides/next-2026'
-      preLoaderRoute: typeof KnowledgeBrandGuidesNext2026RouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/knowledge/brand-guides/element': {
-      id: '/knowledge/brand-guides/element'
-      path: '/brand-guides/element'
-      fullPath: '/knowledge/brand-guides/element'
-      preLoaderRoute: typeof KnowledgeBrandGuidesElementRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/knowledge/brand-guides/$slug': {
-      id: '/knowledge/brand-guides/$slug'
-      path: '/brand-guides/$slug'
-      fullPath: '/knowledge/brand-guides/$slug'
-      preLoaderRoute: typeof KnowledgeBrandGuidesSlugRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/events/venues/$slug': {
-      id: '/events/venues/$slug'
-      path: '/venues/$slug'
-      fullPath: '/events/venues/$slug'
-      preLoaderRoute: typeof EventsVenuesSlugRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/venues': {
-      id: '/events/next_/venues'
-      path: '/next/venues'
-      fullPath: '/events/next/venues'
-      preLoaderRoute: typeof EventsNextVenuesRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/venue': {
-      id: '/events/next_/venue'
-      path: '/next/venue'
-      fullPath: '/events/next/venue'
-      preLoaderRoute: typeof EventsNextVenueRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/start': {
-      id: '/events/next_/start'
-      path: '/next/start'
-      fullPath: '/events/next/start'
-      preLoaderRoute: typeof EventsNextStartRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/san-francisco': {
-      id: '/events/next_/san-francisco'
-      path: '/next/san-francisco'
-      fullPath: '/events/next/san-francisco'
-      preLoaderRoute: typeof EventsNextSanFranciscoRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/playbook': {
-      id: '/events/next_/playbook'
-      path: '/next/playbook'
-      fullPath: '/events/next/playbook'
-      preLoaderRoute: typeof EventsNextPlaybookRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/pillars': {
-      id: '/events/next_/pillars'
-      path: '/next/pillars'
-      fullPath: '/events/next/pillars'
-      preLoaderRoute: typeof EventsNextPillarsRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/mart': {
-      id: '/events/next_/mart'
-      path: '/next/mart'
-      fullPath: '/events/next/mart'
-      preLoaderRoute: typeof EventsNextMartRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/london': {
-      id: '/events/next_/london'
-      path: '/next/london'
-      fullPath: '/events/next/london'
-      preLoaderRoute: typeof EventsNextLondonRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/locations': {
-      id: '/events/next_/locations'
-      path: '/next/locations'
-      fullPath: '/events/next/locations'
-      preLoaderRoute: typeof EventsNextLocationsRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/knowledge': {
-      id: '/events/next_/knowledge'
-      path: '/next/knowledge'
-      fullPath: '/events/next/knowledge'
-      preLoaderRoute: typeof EventsNextKnowledgeRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/guide': {
-      id: '/events/next_/guide'
-      path: '/next/guide'
-      fullPath: '/events/next/guide'
-      preLoaderRoute: typeof EventsNextGuideRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/city-series': {
-      id: '/events/next_/city-series'
-      path: '/next/city-series'
-      fullPath: '/events/next/city-series'
-      preLoaderRoute: typeof EventsNextCitySeriesRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/city-badges': {
-      id: '/events/next_/city-badges'
-      path: '/next/city-badges'
-      fullPath: '/events/next/city-badges'
-      preLoaderRoute: typeof EventsNextCityBadgesRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/city': {
-      id: '/events/next_/city'
-      path: '/next/city'
-      fullPath: '/events/next/city'
-      preLoaderRoute: typeof EventsNextCityRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/california': {
-      id: '/events/next_/california'
-      path: '/next/california'
-      fullPath: '/events/next/california'
-      preLoaderRoute: typeof EventsNextCaliforniaRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/badges': {
-      id: '/events/next_/badges'
-      path: '/next/badges'
-      fullPath: '/events/next/badges'
-      preLoaderRoute: typeof EventsNextBadgesRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/assets': {
-      id: '/events/next_/assets'
-      path: '/next/assets'
-      fullPath: '/events/next/assets'
-      preLoaderRoute: typeof EventsNextAssetsRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/agendas': {
-      id: '/events/next_/agendas'
-      path: '/next/agendas'
-      fullPath: '/events/next/agendas'
-      preLoaderRoute: typeof EventsNextAgendasRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/demo/$playbookId': {
-      id: '/events/demo/$playbookId'
-      path: '/demo/$playbookId'
-      fullPath: '/events/demo/$playbookId'
-      preLoaderRoute: typeof EventsDemoPlaybookIdRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/demo/print/$demoId': {
-      id: '/demo/print/$demoId'
-      path: '/demo/print/$demoId'
-      fullPath: '/demo/print/$demoId'
-      preLoaderRoute: typeof DemoPrintDemoIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/deck/$demoId': {
-      id: '/demo/deck/$demoId'
-      path: '/demo/deck/$demoId'
-      fullPath: '/demo/deck/$demoId'
-      preLoaderRoute: typeof DemoDeckDemoIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/decks/$deckId/print': {
-      id: '/decks/$deckId/print'
-      path: '/decks/$deckId/print'
-      fullPath: '/decks/$deckId/print'
-      preLoaderRoute: typeof DecksDeckIdPrintRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/decks/$deckId/present': {
-      id: '/decks/$deckId/present'
-      path: '/decks/$deckId/present'
-      fullPath: '/decks/$deckId/present'
-      preLoaderRoute: typeof DecksDeckIdPresentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/decks/$deckId/export': {
-      id: '/decks/$deckId/export'
-      path: '/decks/$deckId/export'
-      fullPath: '/decks/$deckId/export'
-      preLoaderRoute: typeof DecksDeckIdExportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/decks/$deckId/document': {
-      id: '/decks/$deckId/document'
-      path: '/decks/$deckId/document'
-      fullPath: '/decks/$deckId/document'
-      preLoaderRoute: typeof DecksDeckIdDocumentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/skin-backdrop': {
-      id: '/api/public/skin-backdrop'
-      path: '/api/public/skin-backdrop'
-      fullPath: '/api/public/skin-backdrop'
-      preLoaderRoute: typeof ApiPublicSkinBackdropRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/pdf-index-proxy': {
-      id: '/api/public/pdf-index-proxy'
-      path: '/api/public/pdf-index-proxy'
-      fullPath: '/api/public/pdf-index-proxy'
-      preLoaderRoute: typeof ApiPublicPdfIndexProxyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/division-image': {
-      id: '/api/public/division-image'
-      path: '/api/public/division-image'
-      fullPath: '/api/public/division-image'
-      preLoaderRoute: typeof ApiPublicDivisionImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/canva-ad': {
-      id: '/api/public/canva-ad'
-      path: '/api/public/canva-ad'
-      fullPath: '/api/public/canva-ad'
-      preLoaderRoute: typeof ApiPublicCanvaAdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/brandhub-seed-proxy': {
-      id: '/api/public/brandhub-seed-proxy'
-      path: '/api/public/brandhub-seed-proxy'
-      fullPath: '/api/public/brandhub-seed-proxy'
-      preLoaderRoute: typeof ApiPublicBrandhubSeedProxyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/print-library_/$itemId': {
-      id: '/admin/print-library_/$itemId'
-      path: '/print-library/$itemId'
-      fullPath: '/admin/print-library/$itemId'
-      preLoaderRoute: typeof AdminPrintLibraryItemIdRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/campaigns_/kit': {
-      id: '/admin/campaigns_/kit'
-      path: '/campaigns/kit'
-      fullPath: '/admin/campaigns/kit'
-      preLoaderRoute: typeof AdminCampaignsKitRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/.mcp/invoke-tool/$tool': {
-      id: '/.mcp/invoke-tool/$tool'
-      path: '/.mcp/invoke-tool/$tool'
-      fullPath: '/.mcp/invoke-tool/$tool'
-      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+    '/test/print-hero': {
+      id: '/test/print-hero'
+      path: '/test/print-hero'
+      fullPath: '/test/print-hero'
+      preLoaderRoute: typeof TestPrintHeroRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.lovable/oauth/consent': {
@@ -3916,116 +3580,354 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/campaigns_/kit': {
+      id: '/admin/campaigns_/kit'
+      path: '/campaigns/kit'
+      fullPath: '/admin/campaigns/kit'
+      preLoaderRoute: typeof AdminCampaignsKitRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/print-library_/$itemId': {
+      id: '/admin/print-library_/$itemId'
+      path: '/print-library/$itemId'
+      fullPath: '/admin/print-library/$itemId'
+      preLoaderRoute: typeof AdminPrintLibraryItemIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/api/public/brandhub-seed-proxy': {
+      id: '/api/public/brandhub-seed-proxy'
+      path: '/api/public/brandhub-seed-proxy'
+      fullPath: '/api/public/brandhub-seed-proxy'
+      preLoaderRoute: typeof ApiPublicBrandhubSeedProxyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/canva-ad': {
+      id: '/api/public/canva-ad'
+      path: '/api/public/canva-ad'
+      fullPath: '/api/public/canva-ad'
+      preLoaderRoute: typeof ApiPublicCanvaAdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/division-image': {
+      id: '/api/public/division-image'
+      path: '/api/public/division-image'
+      fullPath: '/api/public/division-image'
+      preLoaderRoute: typeof ApiPublicDivisionImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/pdf-index-proxy': {
+      id: '/api/public/pdf-index-proxy'
+      path: '/api/public/pdf-index-proxy'
+      fullPath: '/api/public/pdf-index-proxy'
+      preLoaderRoute: typeof ApiPublicPdfIndexProxyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/skin-backdrop': {
+      id: '/api/public/skin-backdrop'
+      path: '/api/public/skin-backdrop'
+      fullPath: '/api/public/skin-backdrop'
+      preLoaderRoute: typeof ApiPublicSkinBackdropRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/decks/$deckId/': {
+      id: '/decks/$deckId/'
+      path: '/decks/$deckId'
+      fullPath: '/decks/$deckId/'
+      preLoaderRoute: typeof DecksDeckIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/decks/$deckId/document': {
+      id: '/decks/$deckId/document'
+      path: '/decks/$deckId/document'
+      fullPath: '/decks/$deckId/document'
+      preLoaderRoute: typeof DecksDeckIdDocumentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/decks/$deckId/export': {
+      id: '/decks/$deckId/export'
+      path: '/decks/$deckId/export'
+      fullPath: '/decks/$deckId/export'
+      preLoaderRoute: typeof DecksDeckIdExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/decks/$deckId/present': {
+      id: '/decks/$deckId/present'
+      path: '/decks/$deckId/present'
+      fullPath: '/decks/$deckId/present'
+      preLoaderRoute: typeof DecksDeckIdPresentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/decks/$deckId/print': {
+      id: '/decks/$deckId/print'
+      path: '/decks/$deckId/print'
+      fullPath: '/decks/$deckId/print'
+      preLoaderRoute: typeof DecksDeckIdPrintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/deck/$demoId': {
+      id: '/demo/deck/$demoId'
+      path: '/demo/deck/$demoId'
+      fullPath: '/demo/deck/$demoId'
+      preLoaderRoute: typeof DemoDeckDemoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/print/$demoId': {
+      id: '/demo/print/$demoId'
+      path: '/demo/print/$demoId'
+      fullPath: '/demo/print/$demoId'
+      preLoaderRoute: typeof DemoPrintDemoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/demo/$playbookId': {
+      id: '/events/demo/$playbookId'
+      path: '/demo/$playbookId'
+      fullPath: '/events/demo/$playbookId'
+      preLoaderRoute: typeof EventsDemoPlaybookIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/agendas': {
+      id: '/events/next_/agendas'
+      path: '/next/agendas'
+      fullPath: '/events/next/agendas'
+      preLoaderRoute: typeof EventsNextAgendasRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/assets': {
+      id: '/events/next_/assets'
+      path: '/next/assets'
+      fullPath: '/events/next/assets'
+      preLoaderRoute: typeof EventsNextAssetsRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/badges': {
+      id: '/events/next_/badges'
+      path: '/next/badges'
+      fullPath: '/events/next/badges'
+      preLoaderRoute: typeof EventsNextBadgesRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/california': {
+      id: '/events/next_/california'
+      path: '/next/california'
+      fullPath: '/events/next/california'
+      preLoaderRoute: typeof EventsNextCaliforniaRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/city': {
+      id: '/events/next_/city'
+      path: '/next/city'
+      fullPath: '/events/next/city'
+      preLoaderRoute: typeof EventsNextCityRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/city-badges': {
+      id: '/events/next_/city-badges'
+      path: '/next/city-badges'
+      fullPath: '/events/next/city-badges'
+      preLoaderRoute: typeof EventsNextCityBadgesRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/city-series': {
+      id: '/events/next_/city-series'
+      path: '/next/city-series'
+      fullPath: '/events/next/city-series'
+      preLoaderRoute: typeof EventsNextCitySeriesRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/guide': {
+      id: '/events/next_/guide'
+      path: '/next/guide'
+      fullPath: '/events/next/guide'
+      preLoaderRoute: typeof EventsNextGuideRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/knowledge': {
+      id: '/events/next_/knowledge'
+      path: '/next/knowledge'
+      fullPath: '/events/next/knowledge'
+      preLoaderRoute: typeof EventsNextKnowledgeRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/locations': {
+      id: '/events/next_/locations'
+      path: '/next/locations'
+      fullPath: '/events/next/locations'
+      preLoaderRoute: typeof EventsNextLocationsRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/london': {
+      id: '/events/next_/london'
+      path: '/next/london'
+      fullPath: '/events/next/london'
+      preLoaderRoute: typeof EventsNextLondonRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/mart': {
+      id: '/events/next_/mart'
+      path: '/next/mart'
+      fullPath: '/events/next/mart'
+      preLoaderRoute: typeof EventsNextMartRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/pillars': {
+      id: '/events/next_/pillars'
+      path: '/next/pillars'
+      fullPath: '/events/next/pillars'
+      preLoaderRoute: typeof EventsNextPillarsRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/playbook': {
+      id: '/events/next_/playbook'
+      path: '/next/playbook'
+      fullPath: '/events/next/playbook'
+      preLoaderRoute: typeof EventsNextPlaybookRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/san-francisco': {
+      id: '/events/next_/san-francisco'
+      path: '/next/san-francisco'
+      fullPath: '/events/next/san-francisco'
+      preLoaderRoute: typeof EventsNextSanFranciscoRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/start': {
+      id: '/events/next_/start'
+      path: '/next/start'
+      fullPath: '/events/next/start'
+      preLoaderRoute: typeof EventsNextStartRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/venue': {
+      id: '/events/next_/venue'
+      path: '/next/venue'
+      fullPath: '/events/next/venue'
+      preLoaderRoute: typeof EventsNextVenueRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/venues': {
+      id: '/events/next_/venues'
+      path: '/next/venues'
+      fullPath: '/events/next/venues'
+      preLoaderRoute: typeof EventsNextVenuesRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/venues/': {
+      id: '/events/venues/'
+      path: '/venues'
+      fullPath: '/events/venues/'
+      preLoaderRoute: typeof EventsVenuesIndexRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/venues/$slug': {
+      id: '/events/venues/$slug'
+      path: '/venues/$slug'
+      fullPath: '/events/venues/$slug'
+      preLoaderRoute: typeof EventsVenuesSlugRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/knowledge/brand-guides/': {
+      id: '/knowledge/brand-guides/'
+      path: '/brand-guides'
+      fullPath: '/knowledge/brand-guides/'
+      preLoaderRoute: typeof KnowledgeBrandGuidesIndexRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/knowledge/brand-guides/$slug': {
+      id: '/knowledge/brand-guides/$slug'
+      path: '/brand-guides/$slug'
+      fullPath: '/knowledge/brand-guides/$slug'
+      preLoaderRoute: typeof KnowledgeBrandGuidesSlugRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/knowledge/brand-guides/element': {
+      id: '/knowledge/brand-guides/element'
+      path: '/brand-guides/element'
+      fullPath: '/knowledge/brand-guides/element'
+      preLoaderRoute: typeof KnowledgeBrandGuidesElementRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/knowledge/brand-guides/next-2026': {
+      id: '/knowledge/brand-guides/next-2026'
+      path: '/brand-guides/next-2026'
+      fullPath: '/knowledge/brand-guides/next-2026'
+      preLoaderRoute: typeof KnowledgeBrandGuidesNext2026RouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/knowledge/brand-guides/next-2026-build': {
+      id: '/knowledge/brand-guides/next-2026-build'
+      path: '/brand-guides/next-2026-build'
+      fullPath: '/knowledge/brand-guides/next-2026-build'
+      preLoaderRoute: typeof KnowledgeBrandGuidesNext2026BuildRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/library/imported_/audit': {
+      id: '/library/imported_/audit'
+      path: '/library/imported/audit'
+      fullPath: '/library/imported/audit'
+      preLoaderRoute: typeof LibraryImportedAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/imported_/masters': {
+      id: '/library/imported_/masters'
+      path: '/library/imported/masters'
+      fullPath: '/library/imported/masters'
+      preLoaderRoute: typeof LibraryImportedMastersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/my_/$moduleId': {
+      id: '/library/my_/$moduleId'
+      path: '/library/my/$moduleId'
+      fullPath: '/library/my/$moduleId'
+      preLoaderRoute: typeof LibraryMyModuleIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/print_/audit': {
+      id: '/library/print_/audit'
+      path: '/library/print/audit'
+      fullPath: '/library/print/audit'
+      preLoaderRoute: typeof LibraryPrintAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/print_/heroes': {
+      id: '/library/print_/heroes'
+      path: '/library/print/heroes'
+      fullPath: '/library/print/heroes'
+      preLoaderRoute: typeof LibraryPrintHeroesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/print_/modules': {
+      id: '/library/print_/modules'
+      path: '/library/print/modules'
+      fullPath: '/library/print/modules'
+      preLoaderRoute: typeof LibraryPrintModulesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/social/demo/$playbookId': {
+      id: '/social/demo/$playbookId'
+      path: '/demo/$playbookId'
+      fullPath: '/social/demo/$playbookId'
+      preLoaderRoute: typeof SocialDemoPlaybookIdRouteImport
+      parentRoute: typeof SocialRoute
+    }
+    '/admin/modules_/print/$moduleId': {
+      id: '/admin/modules_/print/$moduleId'
+      path: '/modules/print/$moduleId'
+      fullPath: '/admin/modules/print/$moduleId'
+      preLoaderRoute: typeof AdminModulesPrintModuleIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/events/next_/divisions/': {
       id: '/events/next_/divisions/'
       path: '/next/divisions'
       fullPath: '/events/next/divisions/'
       preLoaderRoute: typeof EventsNextDivisionsIndexRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/knowledge/brand-guides/$slug_/edit': {
-      id: '/knowledge/brand-guides/$slug_/edit'
-      path: '/brand-guides/$slug/edit'
-      fullPath: '/knowledge/brand-guides/$slug/edit'
-      preLoaderRoute: typeof KnowledgeBrandGuidesSlugEditRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/events/next_/signs/$eventId': {
-      id: '/events/next_/signs/$eventId'
-      path: '/next/signs/$eventId'
-      fullPath: '/events/next/signs/$eventId'
-      preLoaderRoute: typeof EventsNextSignsEventIdRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/sign-set-editor/$signId': {
-      id: '/events/next_/sign-set-editor/$signId'
-      path: '/next/sign-set-editor/$signId'
-      fullPath: '/events/next/sign-set-editor/$signId'
-      preLoaderRoute: typeof EventsNextSignSetEditorSignIdRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/sign-editor/$signId': {
-      id: '/events/next_/sign-editor/$signId'
-      path: '/next/sign-editor/$signId'
-      fullPath: '/events/next/sign-editor/$signId'
-      preLoaderRoute: typeof EventsNextSignEditorSignIdRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/mart_/price-list': {
-      id: '/events/next_/mart_/price-list'
-      path: '/next/mart/price-list'
-      fullPath: '/events/next/mart/price-list'
-      preLoaderRoute: typeof EventsNextMartPriceListRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/mart_/$stopId': {
-      id: '/events/next_/mart_/$stopId'
-      path: '/next/mart/$stopId'
-      fullPath: '/events/next/mart/$stopId'
-      preLoaderRoute: typeof EventsNextMartStopIdRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/maps/$eventId': {
-      id: '/events/next_/maps/$eventId'
-      path: '/next/maps/$eventId'
-      fullPath: '/events/next/maps/$eventId'
-      preLoaderRoute: typeof EventsNextMapsEventIdRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/london_/template': {
-      id: '/events/next_/london_/template'
-      path: '/next/london/template'
-      fullPath: '/events/next/london/template'
-      preLoaderRoute: typeof EventsNextLondonTemplateRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/london_/schedule': {
-      id: '/events/next_/london_/schedule'
-      path: '/next/london/schedule'
-      fullPath: '/events/next/london/schedule'
-      preLoaderRoute: typeof EventsNextLondonScheduleRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/london_/revise': {
-      id: '/events/next_/london_/revise'
-      path: '/next/london/revise'
-      fullPath: '/events/next/london/revise'
-      preLoaderRoute: typeof EventsNextLondonReviseRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/london_/photos': {
-      id: '/events/next_/london_/photos'
-      path: '/next/london/photos'
-      fullPath: '/events/next/london/photos'
-      preLoaderRoute: typeof EventsNextLondonPhotosRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/london_/maps': {
-      id: '/events/next_/london_/maps'
-      path: '/next/london/maps'
-      fullPath: '/events/next/london/maps'
-      preLoaderRoute: typeof EventsNextLondonMapsRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/london_/booklet': {
-      id: '/events/next_/london_/booklet'
-      path: '/next/london/booklet'
-      fullPath: '/events/next/london/booklet'
-      preLoaderRoute: typeof EventsNextLondonBookletRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/kiosk-editor/$boothId': {
-      id: '/events/next_/kiosk-editor/$boothId'
-      path: '/next/kiosk-editor/$boothId'
-      fullPath: '/events/next/kiosk-editor/$boothId'
-      preLoaderRoute: typeof EventsNextKioskEditorBoothIdRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/events/next_/intake/$eventId': {
-      id: '/events/next_/intake/$eventId'
-      path: '/next/intake/$eventId'
-      fullPath: '/events/next/intake/$eventId'
-      preLoaderRoute: typeof EventsNextIntakeEventIdRouteImport
       parentRoute: typeof EventsRoute
     }
     '/events/next_/divisions/$divisionId': {
@@ -4035,12 +3937,110 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsNextDivisionsDivisionIdRouteImport
       parentRoute: typeof EventsRoute
     }
-    '/admin/modules_/print/$moduleId': {
-      id: '/admin/modules_/print/$moduleId'
-      path: '/modules/print/$moduleId'
-      fullPath: '/admin/modules/print/$moduleId'
-      preLoaderRoute: typeof AdminModulesPrintModuleIdRouteImport
-      parentRoute: typeof AdminRoute
+    '/events/next_/intake/$eventId': {
+      id: '/events/next_/intake/$eventId'
+      path: '/next/intake/$eventId'
+      fullPath: '/events/next/intake/$eventId'
+      preLoaderRoute: typeof EventsNextIntakeEventIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/kiosk-editor/$boothId': {
+      id: '/events/next_/kiosk-editor/$boothId'
+      path: '/next/kiosk-editor/$boothId'
+      fullPath: '/events/next/kiosk-editor/$boothId'
+      preLoaderRoute: typeof EventsNextKioskEditorBoothIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/london_/booklet': {
+      id: '/events/next_/london_/booklet'
+      path: '/next/london/booklet'
+      fullPath: '/events/next/london/booklet'
+      preLoaderRoute: typeof EventsNextLondonBookletRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/london_/maps': {
+      id: '/events/next_/london_/maps'
+      path: '/next/london/maps'
+      fullPath: '/events/next/london/maps'
+      preLoaderRoute: typeof EventsNextLondonMapsRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/london_/photos': {
+      id: '/events/next_/london_/photos'
+      path: '/next/london/photos'
+      fullPath: '/events/next/london/photos'
+      preLoaderRoute: typeof EventsNextLondonPhotosRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/london_/revise': {
+      id: '/events/next_/london_/revise'
+      path: '/next/london/revise'
+      fullPath: '/events/next/london/revise'
+      preLoaderRoute: typeof EventsNextLondonReviseRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/london_/schedule': {
+      id: '/events/next_/london_/schedule'
+      path: '/next/london/schedule'
+      fullPath: '/events/next/london/schedule'
+      preLoaderRoute: typeof EventsNextLondonScheduleRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/london_/template': {
+      id: '/events/next_/london_/template'
+      path: '/next/london/template'
+      fullPath: '/events/next/london/template'
+      preLoaderRoute: typeof EventsNextLondonTemplateRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/maps/$eventId': {
+      id: '/events/next_/maps/$eventId'
+      path: '/next/maps/$eventId'
+      fullPath: '/events/next/maps/$eventId'
+      preLoaderRoute: typeof EventsNextMapsEventIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/mart_/$stopId': {
+      id: '/events/next_/mart_/$stopId'
+      path: '/next/mart/$stopId'
+      fullPath: '/events/next/mart/$stopId'
+      preLoaderRoute: typeof EventsNextMartStopIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/mart_/price-list': {
+      id: '/events/next_/mart_/price-list'
+      path: '/next/mart/price-list'
+      fullPath: '/events/next/mart/price-list'
+      preLoaderRoute: typeof EventsNextMartPriceListRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/sign-editor/$signId': {
+      id: '/events/next_/sign-editor/$signId'
+      path: '/next/sign-editor/$signId'
+      fullPath: '/events/next/sign-editor/$signId'
+      preLoaderRoute: typeof EventsNextSignEditorSignIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/sign-set-editor/$signId': {
+      id: '/events/next_/sign-set-editor/$signId'
+      path: '/next/sign-set-editor/$signId'
+      fullPath: '/events/next/sign-set-editor/$signId'
+      preLoaderRoute: typeof EventsNextSignSetEditorSignIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/signs/$eventId': {
+      id: '/events/next_/signs/$eventId'
+      path: '/next/signs/$eventId'
+      fullPath: '/events/next/signs/$eventId'
+      preLoaderRoute: typeof EventsNextSignsEventIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/knowledge/brand-guides/$slug_/edit': {
+      id: '/knowledge/brand-guides/$slug_/edit'
+      path: '/brand-guides/$slug/edit'
+      fullPath: '/knowledge/brand-guides/$slug/edit'
+      preLoaderRoute: typeof KnowledgeBrandGuidesSlugEditRouteImport
+      parentRoute: typeof KnowledgeRoute
     }
   }
 }
