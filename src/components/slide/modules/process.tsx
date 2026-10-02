@@ -49,7 +49,11 @@ export function LoopHalo({ uid, slim = false, small = false }: { uid: string; sl
     return [50 + r * Math.cos(a), 50 + r * Math.sin(a)];
   };
   return (
-    <svg aria-hidden data-decorative viewBox="0 0 100 100" className="pointer-events-none absolute inset-0 h-full w-full" style={{ overflow: "visible" }}>
+    // The outer partial arcs reach r≈67 and the glow bleeds further, so the SVG
+    // box itself is grown to 140% (viewBox -20…120). Exports rasterize the SVG
+    // at its own box; drawing outside it relied on overflow:visible and came
+    // out clipped square in PowerPoint and PDF.
+    <svg aria-hidden data-decorative viewBox="-20 -20 140 140" className="pointer-events-none absolute" style={{ overflow: "visible", inset: "-20%", width: "140%", height: "140%" }}>
       <defs>
         <linearGradient id={`lh-${uid}`} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor={AQ} />
