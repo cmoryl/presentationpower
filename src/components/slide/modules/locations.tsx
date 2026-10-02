@@ -969,6 +969,128 @@ function renderLocationsVariant(
     );
   }
 
+  if (variantId === "MV-LOC-REGION-FOCUS" && c.directory === true) {
+    // Map + full city directory. Every listed city is shown by name (dense
+    // content stays designed); pins mark the ones with known coordinates.
+    const names = rawItems
+      .map((r) => String(r.label ?? r.city ?? "").trim())
+      .filter(Boolean);
+    const n = names.length;
+    const cols = n <= 6 ? 1 : n <= 24 ? 2 : n <= 54 ? 3 : 4;
+    const px = n <= 6 ? 34 : n <= 24 ? 24 : n <= 54 ? 19 : 16;
+    const b = c.bounds as Record<string, unknown> | undefined;
+    const bounds =
+      b && [b.latMin, b.latMax, b.lonMin, b.lonMax].every((v) => Number.isFinite(Number(v)))
+        ? {
+            latMin: Number(b.latMin),
+            latMax: Number(b.latMax),
+            lonMin: Number(b.lonMin),
+            lonMax: Number(b.lonMax),
+          }
+        : undefined;
+    return (
+      <SlideFrame brand={brand as never} pageNumber={pageNumber}>
+        <div className="relative flex h-full flex-col">
+          <div className="flex items-end justify-between gap-12">
+            <div>
+              {s(c.kicker) && <Kicker brand={brand as never}>{s(c.kicker)}</Kicker>}
+              <div
+                className="mt-4"
+                style={{
+                  fontSize: 56,
+                  fontWeight: 600,
+                  color: ink.strong,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.02,
+                  maxWidth: 1000,
+                }}
+              >
+                {title}
+              </div>
+            </div>
+            <div className="flex items-baseline gap-4">
+              <span
+                className="tabular-nums font-semibold"
+                style={{ fontSize: 96, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}
+              >
+                {n}
+              </span>
+              <span
+                className="uppercase"
+                style={{
+                  fontSize: 14,
+                  letterSpacing: "0.3em",
+                  color: "var(--slide-accent-text)",
+                  fontWeight: 700,
+                }}
+              >
+                {s(c.countLabel) || "Cities"}
+              </span>
+            </div>
+          </div>
+          <div
+            className="mt-8 grid min-h-0 flex-1 gap-12"
+            style={{ gridTemplateColumns: n <= 6 ? "1.9fr 1fr" : "1.25fr 1fr" }}
+          >
+            <div className="relative min-h-0 overflow-hidden">
+              <LocWorldMap
+                mapStyle={mapStyle}
+                pins={pins}
+                region={region}
+                bounds={bounds}
+                mode={mode}
+                accent={accent}
+                primary={primary}
+                showLabels={false}
+                ariaLabel={`${title} — map`}
+              />
+            </div>
+            <div
+              className="min-h-0 pl-10"
+              style={{
+                borderLeft: `1px solid ${ink.hairline}`,
+                display: "grid",
+                gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+                gridAutoFlow: "column",
+                gridTemplateRows: `repeat(${Math.ceil(n / cols)}, auto)`,
+                alignContent: n <= 6 ? "center" : "start",
+                columnGap: 28,
+              }}
+            >
+              {names.map((name, i) => (
+                <div
+                  key={`${name}-${i}`}
+                  style={{
+                    color: ink.strong,
+                    fontSize: px,
+                    lineHeight: 1.25,
+                    padding: `${Math.round(px * 0.22)}px 0`,
+                    borderBottom: `1px solid ${ink.hairline}`,
+                  }}
+                >
+                  {name}
+                </div>
+              ))}
+            </div>
+          </div>
+          {s(c.badge) && (
+            <div
+              className="mt-6 uppercase"
+              style={{
+                fontSize: 13,
+                letterSpacing: "0.28em",
+                fontWeight: 700,
+                color: "var(--slide-accent-text)",
+              }}
+            >
+              ● {s(c.badge)}
+            </div>
+          )}
+        </div>
+      </SlideFrame>
+    );
+  }
+
   if (variantId === "MV-LOC-REGION-FOCUS") {
     const regionCount = pins.filter(
       (p) => region === "world" || p.region === region || (region === "MEA" && p.region === "MEA"),
