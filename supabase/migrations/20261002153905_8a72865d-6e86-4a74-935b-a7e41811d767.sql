@@ -1,0 +1,4 @@
+update public.deck_slides set content = jsonb_set(jsonb_set(content,
+ '{left,items}', '[{"label":"TransPerfect","logo":"/masters/general-slides/logos/transperfect.svg"},{"label":"Microsoft","logo":"/masters/general-slides/logos/microsoft.svg"},{"label":"DeepL","logo":"/masters/general-slides/logos/deepl.svg"},{"label":"Amazon","logo":"/masters/general-slides/logos/amazon.svg"}]'::jsonb),
+ '{right,items}', '[{"label":"OpenAI (GPT)","logo":"/masters/general-slides/logos/openai.svg"},{"label":"Anthropic (Claude)","logo":"/masters/general-slides/logos/anthropic.svg"},{"label":"Google (Gemini)","logo":"/masters/general-slides/logos/googlegemini.svg"},{"label":"Bring your own!"}]'::jsonb)
+where deck_id='7a6e1c52-0000-4e5a-9b1d-6e0a51ce0001' and position=20;
