@@ -285,8 +285,8 @@ registerSlideModule({
                     </div>
                   ))}
                 </div>
-              </div>
                 )}
+              </div>
             )}
           </div>
 
