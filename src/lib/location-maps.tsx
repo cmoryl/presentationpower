@@ -1341,7 +1341,7 @@ export function WorldMap({
       (p) => p.lat >= b.latMin && p.lat <= b.latMax && p.lon >= b.lonMin && p.lon <= b.lonMax,
     );
   }, [pins, region, bounds]);
-  const pinScale = visiblePins.length > 100 ? 0.55 : visiblePins.length > 40 ? 0.68 : 1;
+  const pinScale = visiblePins.length > 100 ? 0.5 : visiblePins.length > 40 ? 0.55 : 1;
 
   // Optionally build spoke arcs from HQ pins to the rest
   const spokes = React.useMemo(() => {
@@ -1792,7 +1792,7 @@ export function WorldMap({
           return (
             <g key={`pin-${p.id}`} style={{ cursor: "default" }}>
               <title>{tip}</title>
-              <circle cx={x} cy={y} r={core + 1.6} fill={pinRing} opacity={0.85} />
+              <circle cx={x} cy={y} r={core + 1.6 * pinScale} fill={pinRing} opacity={0.85} />
               <circle cx={x} cy={y} r={core} fill={fill} fillOpacity={fillOpacity} />
               {(isHq || (t != null && t > 0.75)) && (
                 <circle
