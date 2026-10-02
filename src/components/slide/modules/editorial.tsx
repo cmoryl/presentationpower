@@ -482,6 +482,148 @@ registerSlideModule({
       case "MV-COMPARE-SLIDER": {
         const before = obj(c.before);
         const after = obj(c.after);
+        // Text-pair mode: each side shows a word headline (e.g. "Fuzzy" / "Exact")
+        // instead of a number, then labelled text rows. Words that differ between
+        // the two rows are highlighted so the match quality reads at a glance.
+        const pairRows = (side: Record<string, unknown>) =>
+          arr(side.rows).map((r) => ({ label: s(r.label), value: s(r.value) }));
+        if (pairRows(before).length || pairRows(after).length) {
+          const chips = s(c.subtitle)
+            .split(/\s+·\s+/)
+            .map((x) => x.trim())
+            .filter(Boolean);
+          const norm = (w: string) => w.toLowerCase().replace(/[^a-z0-9]/g, "");
+          const renderDiff = (text: string, other: string, tone: string) => {
+            const otherSet = new Set(other.split(/\s+/).map(norm));
+            return text.split(/(\s+)/).map((w, i) =>
+              /^\s+$/.test(w) || !w || otherSet.has(norm(w)) || !other ? (
+                <span key={i}>{w}</span>
+              ) : (
+                <span
+                  key={i}
+                  style={{
+                    color: tone,
+                    fontWeight: 700,
+                    borderBottom: `3px solid ${tone}`,
+                  }}
+                >
+                  {w}
+                </span>
+              ),
+            );
+          };
+          const Side = ({ side, strong }: { side: Record<string, unknown>; strong: boolean }) => {
+            const rows = pairRows(side);
+            const tone = strong ? "var(--slide-accent-text)" : ink.muted;
+            return (
+              <GlassTile radius={26} padding="px-12 py-12" intensity={strong ? 1 : 0.65}>
+                <Hairline color={tone} widthPx={96} thicknessPx={2} className="mb-6" />
+                <Kicker brand={brand} color={strong ? undefined : ink.muted}>
+                  {s(side.label)}
+                </Kicker>
+                <div
+                  className="mt-4"
+                  style={{
+                    fontSize: fillPx(strong ? 96 : 88, "display"),
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    letterSpacing: "-0.03em",
+                    color: strong ? ink.strong : ink.body,
+                  }}
+                >
+                  {s(side.headline)}
+                </div>
+                <div className="mt-10 flex flex-col gap-6">
+                  {rows.map((r, i) => (
+                    <div
+                      key={i}
+                      className="pt-5"
+                      style={{ borderTop: `1px solid ${ink.axis}` }}
+                    >
+                      <div
+                        style={{
+                          fontSize: fillPx(16, "body"),
+                          fontWeight: 700,
+                          letterSpacing: "0.16em",
+                          textTransform: "uppercase",
+                          color: ink.muted,
+                        }}
+                      >
+                        {r.label}
+                      </div>
+                      <div
+                        className="mt-2"
+                        style={{ fontSize: fillPx(30, "body"), lineHeight: 1.35, color: ink.strong }}
+                      >
+                        &ldquo;
+                        {renderDiff(
+                          r.value,
+                          rows[i === 0 ? 1 : 0]?.value ?? "",
+                          "var(--slide-accent-text)",
+                        )}
+                        &rdquo;
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </GlassTile>
+            );
+          };
+          return (
+            <SlideFrame brand={brand} pageNumber={pageNumber}>
+              <AuroraOrb x={92} y={32} size={880} />
+              <div className="relative flex h-full flex-col">
+                <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+                {chips.length > 0 && (
+                  <div className="mt-8 flex flex-wrap gap-3">
+                    {chips.map((ch, i) => (
+                      <span
+                        key={i}
+                        className="rounded-full px-5 py-2"
+                        style={{
+                          fontSize: fillPx(20, "body"),
+                          fontWeight: 600,
+                          color: ink.strong,
+                          border: `1px solid color-mix(in oklab, ${brand.tokens.accent} 45%, transparent)`,
+                          background: `color-mix(in oklab, ${brand.tokens.accent} 12%, transparent)`,
+                        }}
+                      >
+                        {ch}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div
+                  className="slide-fill-stretch relative mt-10 grid items-stretch gap-8"
+                  style={{ gridTemplateColumns: "1fr 1fr" }}
+                >
+                  <Side side={before} strong={false} />
+                  <Side side={after} strong />
+                  <div
+                    aria-hidden
+                    className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
+                    style={{ left: "50%" }}
+                  >
+                    <div
+                      data-accent-glow
+                      className="flex h-16 w-16 items-center justify-center rounded-full"
+                      style={{
+                        background: brand.tokens.accent,
+                        boxShadow: `0 8px 32px -6px ${brand.tokens.accent}`,
+                      }}
+                    >
+                      <FlowArrow
+                        size={26}
+                        color={ink.onSurface(brand.tokens.accent)}
+                        accent={brand.tokens.accent}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </SlideFrame>
+          );
+        }
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <AuroraOrb x={92} y={32} size={880} />
