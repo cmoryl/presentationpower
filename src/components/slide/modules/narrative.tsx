@@ -433,16 +433,18 @@ registerSlideModule({
       // ── Solution & Process ─────────────────────────────────────────────
       case "MV-SOL-PILLARS-5": {
         const hero = obj(c.hero);
+        const stack = isDark && arr(c.items).length === 4;
+        const GL5 = ["#7FB3F5", "#7FE3F5", "#C2A3FF", "#A6C8FF"];
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <AuroraOrb x={92} y={30} size={820} />
             <div className="relative">
               <SlideTitle brand={brand} title={s(c.title)} />
               <div
-                className="mt-10 grid grid-cols-2 gap-8"
-                style={{ gridTemplateRows: "1fr 1fr", height: 760 }}
+                className={`mt-10 grid gap-8 ${stack ? "grid-cols-[1fr_1.15fr]" : "grid-cols-2"}`}
+                style={{ gridTemplateRows: stack ? "1fr" : "1fr 1fr", height: 760 }}
               >
-                <GlassTile radius={26} padding="px-10 py-9" className="relative row-span-2 overflow-hidden">
+                <GlassTile radius={26} padding="px-10 py-9" className="relative row-span-2 overflow-hidden" style={stack ? { borderBottom: "2px solid rgba(127,227,245,0.55)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.22), 0 30px 70px -40px rgba(91,155,255,0.7)" } : undefined}>
                   {s(hero.image) && (
                     <div aria-hidden className="pointer-events-none absolute inset-0">
                       <img src={s(hero.image)} alt="" className="h-full w-full object-cover" style={{ opacity: isDark ? 0.22 : 0.14 }} />
@@ -477,11 +479,63 @@ registerSlideModule({
                     {s(hero.title)}
                   </div>
                   <SupportingText size="md" opacity={0.78} className="mt-5" maxWidthPx={560}>
-                    {s(hero.body)}
+                    {stack
+                      ? s(hero.body).split(/(\d+(?:\.\d+)?%)/).map((part, k) =>
+                          /%$/.test(part) ? <span key={k} style={{ color: "#7FE3F5", fontWeight: 700 }}>{part}</span> : part,
+                        )
+                      : s(hero.body)}
                   </SupportingText>
                   </div>
+                  {stack && (() => {
+                    const m = s(hero.body).match(/(\d+(?:\.\d+)?)%/);
+                    if (!m) return null;
+                    const pct = Math.min(100, Number(m[1]));
+                    const R = 92, C = 2 * Math.PI * R;
+                    return (
+                      <div aria-hidden className="absolute bottom-10 left-10 flex items-center gap-7">
+                        <svg width={220} height={220} viewBox="0 0 220 220">
+                          <defs>
+                            <linearGradient id="gl5-ring" x1="0" y1="0" x2="1" y2="1">
+                              <stop offset="0" stopColor="#7FE3F5" />
+                              <stop offset="1" stopColor="#C2A3FF" />
+                            </linearGradient>
+                          </defs>
+                          <circle cx={110} cy={110} r={106} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth={1} strokeDasharray="1 5" />
+                          <circle cx={110} cy={110} r={R} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth={12} />
+                          <circle cx={110} cy={110} r={R} fill="none" stroke="url(#gl5-ring)" strokeWidth={12} strokeLinecap="round" strokeDasharray={`${(C * pct) / 100} ${C}`} transform="rotate(-90 110 110)" />
+                          <text x={110} y={124} textAnchor="middle" fill="#FFFFFF" fontSize={46} fontWeight={800} letterSpacing="-0.03em">{m[1]}%</text>
+                        </svg>
+                      </div>
+                    );
+                  })()}
                 </GlassTile>
-                {arr(c.items)
+                {stack && (
+                  <div className="relative grid gap-5" style={{ gridTemplateRows: "repeat(4, minmax(0, 1fr))" }}>
+                    <div aria-hidden className="absolute bottom-12 top-12" style={{ left: 47, width: 2, background: "linear-gradient(180deg, #7FB3F5, #7FE3F5, #C2A3FF, #A6C8FF)", opacity: 0.55 }} />
+                    {arr(c.items).map((it, i) => {
+                      const g = GL5[i % 4];
+                      const Ico = iconByName(s(it.icon));
+                      return (
+                        <div key={i} className="relative flex items-center gap-7 overflow-hidden rounded-[22px] py-5 pl-3 pr-8" style={{ background: "linear-gradient(110deg, rgba(255,255,255,0.09), rgba(255,255,255,0.025))", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.18)", backdropFilter: "blur(16px)" }}>
+                          <div aria-hidden className="absolute inset-y-0 left-0 w-[3px]" style={{ background: g, boxShadow: `0 0 18px ${g}` }} />
+                          <div className="relative flex shrink-0 items-center justify-center rounded-full" style={{ width: 70, height: 70, background: "radial-gradient(circle at 35% 30%, rgba(255,255,255,0.22), rgba(3,0,44,0.9) 70%)", border: `2px solid ${g}`, boxShadow: `0 0 0 6px rgba(255,255,255,0.04), 0 0 22px -4px ${g}` }}>
+                            <span className="tabular-nums" style={{ color: "#FFFFFF", fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em" }}>{String(i + 1).padStart(2, "0")}</span>
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div style={{ color: "#FFFFFF", fontSize: fillPx(28, "body"), fontWeight: 650, lineHeight: 1.15, letterSpacing: "-0.01em" }}>{s(it.title)}</div>
+                            <div className="mt-1.5" style={{ color: "rgba(255,255,255,0.72)", fontSize: fillPx(19, "body"), lineHeight: 1.35 }}>{s(it.body)}</div>
+                          </div>
+                          {Ico && (
+                            <div className="flex shrink-0 items-center justify-center rounded-xl" style={{ width: 52, height: 52, background: `${g}22`, border: `1px solid ${g}66`, color: g }}>
+                              <Ico size={26} strokeWidth={1.8} />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                {!stack && arr(c.items)
                   .slice(0, 4)
                   .map((it, i) => (
                     <Card
