@@ -1344,6 +1344,61 @@ registerSlideModule({
 
       case "MV-MATURITY-CURVE": {
         const items = arr(c.items);
+        if (s(c.display) === "dial" && items.length >= 2) {
+          // Circular spectrum: ordered stages wrap a 270° gauge, segments
+          // thicken and brighten as quality (and cost) rises.
+          const acc = accentInk(brand.tokens.accent, mode, 4.5);
+          const N = items.length;
+          const CX = 880, CY = 380, R0 = 210;
+          const A0 = 135, SPAN = 270, GAP = 3;
+          const rad = (d: number) => ((d - 90) * Math.PI) / 180;
+          const pt = (r: number, d: number) => [CX + r * Math.cos(rad(d + 90)), CY + r * Math.sin(rad(d + 90))];
+          const seg = (r1: number, r2: number, a: number, b: number) => {
+            const [x1, y1] = pt(r2, a), [x2, y2] = pt(r2, b), [x3, y3] = pt(r1, b), [x4, y4] = pt(r1, a);
+            const lg = b - a > 180 ? 1 : 0;
+            return `M${x1} ${y1} A${r2} ${r2} 0 ${lg} 1 ${x2} ${y2} L${x3} ${y3} A${r1} ${r1} 0 ${lg} 0 ${x4} ${y4}Z`;
+          };
+          const step = SPAN / N;
+          return (
+            <SlideFrame brand={brand} pageNumber={pageNumber}>
+              <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+              <svg viewBox="0 0 1760 780" className="mt-4 w-full flex-1" aria-label={s(c.subtitle)}>
+                {items.map((it, i) => {
+                  const a = A0 + i * step + GAP / 2, b = A0 + (i + 1) * step - GAP / 2;
+                  const t = 34 + (i / (N - 1)) * 70;
+                  const mid = (a + b) / 2;
+                  const [lx, ly] = pt(R0 + 104 + 40, mid);
+                  const [nx, ny] = pt(R0 + t / 2, mid);
+                  const right = lx > CX + 20, left = lx < CX - 20;
+                  const words = s(it.label).split(" ");
+                  const lines: string[] = [];
+                  for (const w of words) {
+                    const l = lines[lines.length - 1];
+                    if (l && (l + " " + w).length <= 16) lines[lines.length - 1] = l + " " + w;
+                    else lines.push(w);
+                  }
+                  return (
+                    <g key={i}>
+                      <path d={seg(R0, R0 + t, a, b)} fill={acc} opacity={0.25 + (0.75 * i) / (N - 1)} />
+                      <text x={nx} y={ny + 8} textAnchor="middle" fontSize={24} fontWeight={800} fill={i > N / 2 ? "#FFFFFF" : ink.strong}>
+                        {String(i + 1).padStart(2, "0")}
+                      </text>
+                      <text x={lx} y={ly - ((lines.length - 1) * 30) / 2 + 10} textAnchor={right ? "start" : left ? "end" : "middle"} fontSize={28} fontWeight={600} fill={ink.strong}>
+                        {lines.map((l, k) => (
+                          <tspan key={k} x={lx} dy={k ? 32 : 0}>{l}</tspan>
+                        ))}
+                      </text>
+                    </g>
+                  );
+                })}
+                <text x={CX} y={CY - 10} textAnchor="middle" fontSize={44} fontWeight={800} fill={ink.strong}>Quality</text>
+                <text x={CX} y={CY + 40} textAnchor="middle" fontSize={26} fill={ink.muted}>{s(c.subtitle)}</text>
+                <text x={pt(R0 + 50, A0)[0] - 10} y={pt(R0 + 50, A0)[1] + 50} textAnchor="middle" fontSize={20} fontWeight={700} letterSpacing="0.2em" fill={ink.muted}>LOW</text>
+                <text x={pt(R0 + 50, A0 + SPAN)[0] + 10} y={pt(R0 + 50, A0 + SPAN)[1] + 50} textAnchor="middle" fontSize={20} fontWeight={700} letterSpacing="0.2em" fill={ink.muted}>HIGH</text>
+              </svg>
+            </SlideFrame>
+          );
+        }
         const n = Math.max(items.length, 2);
         // Reserve generous horizontal padding so the leftmost/rightmost labels
         // never get clipped, and vertical padding for stage-label + note lines.
