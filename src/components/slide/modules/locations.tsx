@@ -205,7 +205,9 @@ function renderLocationsVariant(
       : seeded.pins;
 
   const title = (c.title as string) || seeded.headline;
-  const subtitle = (c.subtitle as string) || seeded.subhead || "";
+  // Seeded sample copy only fills a slide that has no real locations of its own.
+  const subtitle =
+    typeof c.subtitle === "string" ? c.subtitle : rawItems.length > 0 ? "" : seeded.subhead || "";
   const narrative = (c.narrative as string) || "";
   // Legacy/seeded decks can contain a division name or lowercase region here.
   // Never cast arbitrary content into the map viewport lookup: an unknown key
@@ -1134,7 +1136,7 @@ function renderLocationsVariant(
               ))}
             </div>
           </div>
-          {s(c.badge) && (
+          {s(c.badge) && s(c.badge) !== s(c.kicker) && (
             <div
               className="mt-6 uppercase"
               style={{
