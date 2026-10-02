@@ -403,7 +403,7 @@ registerSlideModule({
                     color: "#FFFFFF", fontSize: 40, fontWeight: 800, zIndex: 2,
                   }}
                 >
-                  <LoopHalo uid="vs" slim />
+                  <LoopHalo uid="vs" slim small />
                   <span className="relative">VS</span>
                 </div>
                 <Panel heading={s(right.label, "Right")} rows={rightRows} glow={glows[1]} />

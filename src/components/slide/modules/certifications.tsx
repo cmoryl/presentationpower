@@ -380,7 +380,7 @@ registerSlideModule({
                     {/* ghost index numeral */}
                     {isDark && (
                       <div aria-hidden data-decorative className="relative flex shrink-0 items-center justify-center" style={{ width: 78, height: 78, marginRight: 4 }}>
-                        <LoopHalo uid={`cert-${i}`} slim />
+                        <LoopHalo uid={`cert-${i}`} slim small />
                         <span className="relative flex items-center justify-center" style={{ width: 58, height: 58, borderRadius: 999, background: `radial-gradient(circle at 35% 30%, ${g}55, rgba(11,16,48,0.92) 70%)`, border: "1px solid rgba(255,255,255,0.3)", color: "#FFFFFF", fontSize: 22, fontWeight: 800 }}>
                           {String(i + 1).padStart(2, "0")}
                         </span>

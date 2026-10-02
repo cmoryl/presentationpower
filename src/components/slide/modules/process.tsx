@@ -38,7 +38,10 @@ import {
 // Slide-22 loop language for step medallions: a thick outer arc that blends
 // aqua (AI) into lavender (human), a soft halo, a fine dotted inner ring and
 // glowing nodes. Pure SVG so it prints and exports still.
-export function LoopHalo({ uid, slim = false }: { uid: string; slim?: boolean }) {
+export function LoopHalo({ uid, slim = false, small = false }: { uid: string; slim?: boolean; small?: boolean }) {
+  // Small badges (< ~130px) get thicker, brighter hairlines so the rings
+  // survive at size instead of dissolving into the ground.
+  const k = small ? 3.2 : 1, ko = small ? 1.9 : 1;
   const AQ = "#7FE3F5", LV = "#C2A3FF";
   const nodes = [-60, 30, 120, 210];
   const pt = (deg: number, r: number) => {
@@ -56,30 +59,30 @@ export function LoopHalo({ uid, slim = false }: { uid: string; slim?: boolean })
           <feGaussianBlur stdDeviation="1.2" />
         </filter>
       </defs>
-      <circle cx="50" cy="50" r="55" fill="none" stroke={`url(#lh-${uid})`} strokeOpacity="0.32" strokeWidth={slim ? 0.35 : 0.5} />
+      <circle cx="50" cy="50" r="55" fill="none" stroke={`url(#lh-${uid})`} strokeOpacity={Math.min(0.9, 0.32 * ko)} strokeWidth={(slim ? 0.35 : 0.5) * k} />
       {[
-        { r: 59, from: 200, to: 380, o: 0.4 },
-        { r: 62.5, from: -20, to: 70, o: 0.32 },
-        { r: 62.5, from: 110, to: 160, o: 0.22 },
+        { r: small ? 61 : 59, from: 200, to: 380, o: 0.4 },
+        { r: small ? 67 : 62.5, from: -20, to: 70, o: 0.32 },
+        { r: small ? 67 : 62.5, from: 110, to: 160, o: 0.22 },
         { r: 52, from: 20, to: 110, o: 0.3 },
       ].map((a, i) => {
         const [x1, y1] = pt(a.from, a.r), [x2, y2] = pt(a.to, a.r);
         const large = a.to - a.from > 180 ? 1 : 0;
-        return <path key={`pa-${i}`} d={`M${x1} ${y1} A${a.r} ${a.r} 0 ${large} 1 ${x2} ${y2}`} fill="none" stroke={`url(#lh-${uid})`} strokeOpacity={a.o} strokeWidth={slim ? 0.3 : 0.45} strokeLinecap="round" />;
+        return <path key={`pa-${i}`} d={`M${x1} ${y1} A${a.r} ${a.r} 0 ${large} 1 ${x2} ${y2}`} fill="none" stroke={`url(#lh-${uid})`} strokeOpacity={Math.min(0.9, a.o * ko)} strokeWidth={(slim ? 0.3 : 0.45) * k} strokeLinecap="round" />;
       })}
       <circle cx="50" cy="50" r="49" fill="none" stroke={`url(#lh-${uid})`} strokeOpacity="0.28" strokeWidth={slim ? 2.2 : 3.4} filter={`url(#lg-${uid})`} />
       {nodes.map((d, i) => {
         const [x1, y1] = pt(d + 8, 48.5), [x2, y2] = pt(d + 82, 48.5);
-        return <path key={i} d={`M${x1} ${y1} A48.5 48.5 0 0 1 ${x2} ${y2}`} fill="none" stroke={`url(#lh-${uid})`} strokeWidth={slim ? 0.9 : 1.4} strokeLinecap="round" />;
+        return <path key={i} d={`M${x1} ${y1} A48.5 48.5 0 0 1 ${x2} ${y2}`} fill="none" stroke={`url(#lh-${uid})`} strokeWidth={(slim ? 0.9 : 1.4) * (small ? 2 : 1)} strokeLinecap="round" />;
       })}
-      <circle cx="50" cy="50" r="45.2" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="0.35" strokeDasharray="0.4 1.4" strokeLinecap="round" />
+      <circle cx="50" cy="50" r="45.2" fill="none" stroke={`rgba(255,255,255,${small ? 0.55 : 0.35})`} strokeWidth={0.35 * (small ? 2.6 : 1)} strokeDasharray={small ? "1 2.6" : "0.4 1.4"} strokeLinecap="round" />
       {nodes.map((d, i) => {
         const [x, y] = pt(d, 48.5);
         const c = i % 2 ? LV : AQ;
         return (
           <g key={i}>
-            <circle cx={x} cy={y} r={slim ? 2.2 : 3} fill={c} opacity="0.25" />
-            <circle cx={x} cy={y} r={slim ? 1.1 : 1.5} fill="#0B1030" stroke={c} strokeWidth="0.6" />
+            <circle cx={x} cy={y} r={(slim ? 2.2 : 3) * (small ? 1.8 : 1)} fill={c} opacity="0.3" />
+            <circle cx={x} cy={y} r={(slim ? 1.1 : 1.5) * (small ? 1.8 : 1)} fill="#0B1030" stroke={c} strokeWidth={0.6 * (small ? 2 : 1)} />
           </g>
         );
       })}
