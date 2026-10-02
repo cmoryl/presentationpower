@@ -106,6 +106,12 @@ export interface DomShape {
    */
   groupId?: string;
   groupLabel?: string;
+  /**
+   * The picture carries ONLY this element's own surface (fill, wash, border,
+   * shadow); its children still export as native objects, so the plate must
+   * strip the box's paint rather than hide the whole subtree.
+   */
+  surfaceOnly?: boolean;
 }
 
 const CONTENT_PLANES = [
@@ -523,6 +529,57 @@ export function serializeSvgForExport(el: SVGSVGElement, w: number, h: number): 
 }
 
 /** Inline an <svg> element as a self-contained data URL (stays vector in PPTX). */
+function iconGlowShapeFor(
+  el: Element,
+  cs: CSSStyleDeclaration,
+  root: DOMRect,
+  sx: number,
+  sy: number,
+): DomShape | null {
+  const filter = (cs.filter || "none").trim();
+  if (!/^(drop-shadow\([^)]*\)\s*)+$/.test(filter.replace(/rgba?\([^)]*\)/g, "c"))) return null;
+  if ((cs.mixBlendMode || "normal") !== "normal") return null;
+  if ((el.textContent ?? "").trim()) return null;
+  const svgs = el.querySelectorAll("svg");
+  if (svgs.length !== 1 || el.querySelector("img,video,canvas")) return null;
+  const svg = svgs[0] as SVGSVGElement;
+  const r = svg.getBoundingClientRect();
+  const w = r.width * sx;
+  const h = r.height * sy;
+  if (w < 4 || h < 4 || w > 400 || h > 400) return null;
+  const src = svgDataUrl(svg, w, h);
+  if (!src) return null;
+  return {
+    kind: "image",
+    x: (r.left - root.left) * sx,
+    y: (r.top - root.top) * sy,
+    w,
+    h,
+    radiusPx: 0,
+    fill: null,
+    gradient: null,
+    line: null,
+    shadow: null,
+    src,
+    natW: w,
+    natH: h,
+    fit: "contain",
+    cssFilter: (() => {
+      // Faint watermark icons get their look from ancestor opacity, which a
+      // standalone picture would lose — bake it in.
+      let a = 1;
+      for (let n: Element | null = el; n && n !== document.body; n = n.parentElement) {
+        const o = parseFloat(getComputedStyle(n).opacity);
+        if (Number.isFinite(o)) a *= o;
+      }
+      return a < 0.99 ? `${filter} opacity(${a.toFixed(3)})` : filter;
+    })(),
+    rotationDeg: rotationOf(cs.transform),
+    name: nameFor(el, "TP Icon"),
+    node: el,
+  };
+}
+
 function svgDataUrl(el: SVGSVGElement, w: number, h: number): string | null {
   try {
     const clone = el.cloneNode(true) as SVGSVGElement;
@@ -814,6 +871,259 @@ function effectShapeFor(
   };
 }
 
+/**
+ * A designed box: an element whose look comes from its own paint PLUS the
+ * aria-hidden decorative layers stacked inside it (frosting, masked hairline,
+ * accent seam, tint, grain). PowerPoint cannot rebuild that stack natively, and
+ * measuring the layers one by one baked the masked ones into the background
+ * plate — so clicking the box in PowerPoint selected nothing. Returns the
+ * decorative layers when `el` qualifies.
+ */
+function decorativeLayersOf(el: Element): HTMLElement[] | null {
+  if (!(el instanceof HTMLElement)) return null;
+  const r = el.getBoundingClientRect();
+  if (r.width < 24 || r.height < 24) return null;
+  // Cards only: round discs (step orbs, rings) and media tiles keep their own
+  // dedicated export paths; a card must carry copy of its own.
+  if (!(el.textContent ?? "").trim()) return null;
+  if (el.querySelector("img,video,canvas")) return null;
+  const ecs = getComputedStyle(el);
+  const rad = parseFloat(ecs.borderTopLeftRadius) || 0;
+  if (rad >= Math.min(r.width, r.height) / 2 - 1 || ecs.borderTopLeftRadius.includes("%")) return null;
+  const layers: HTMLElement[] = [];
+  for (const c of Array.from(el.children)) {
+    if (!(c instanceof HTMLElement)) continue;
+    if (c.getAttribute("aria-hidden") !== "true" && !c.hasAttribute("data-decorative")) continue;
+    // Only empty paint sheets: a layer with its own children (bar rows, rings,
+    // dot fields) is artwork that must keep exporting on its own.
+    if (c.children.length > 0) continue;
+    if ((c.textContent ?? "").trim()) continue;
+    const ccs = getComputedStyle(c);
+    if (ccs.position !== "absolute") continue;
+    const cr = c.getBoundingClientRect();
+    // Only the house glass recipe: frosting, hairline ring, accent seam, flat or
+    // linear tint. Rings, conic/radial art, patterned fills or transformed
+    // layers mean this is an illustration, not a card — leave it alone.
+    const g = ccs as unknown as Record<string, string>;
+    const bgi = ccs.backgroundImage || "none";
+    const transformed = ccs.transform && ccs.transform !== "none";
+    const artFill = /conic|radial|repeating|url\(/.test(bgi);
+    if (transformed || artFill) return null;
+    const frosting = !!g.backdropFilter && g.backdropFilter !== "none";
+    const ring = (parseFloat(ccs.borderTopWidth) || 0) > 0 || (parseFloat(ccs.borderLeftWidth) || 0) > 0;
+    const seam = cr.height <= 8;
+    const tint = bgi === "none" || /^linear-gradient/.test(bgi);
+    if (!(frosting || ring || seam || tint)) return null;
+    // Layers must live inside the box (an inset-0 sheet or an edge seam).
+    if (cr.left < r.left - 2 || cr.top < r.top - 2 || cr.right > r.right + 2 || cr.bottom > r.bottom + 2) continue;
+    layers.push(c);
+  }
+  // At least one layer must be a full-box sheet (frosting / hairline / tint).
+  const full = layers.some((c) => {
+    const cr = c.getBoundingClientRect();
+    const ccs = getComputedStyle(c) as unknown as Record<string, string>;
+    const glassy =
+      (!!ccs.backdropFilter && ccs.backdropFilter !== "none") ||
+      (parseFloat(ccs.borderTopWidth) || 0) > 0;
+    return glassy && Math.abs(cr.width - r.width) <= 2 && Math.abs(cr.height - r.height) <= 2;
+  });
+  return full ? layers : null;
+}
+
+function boxCss(cs: CSSStyleDeclaration, extra: string[]): string {
+  const g = cs as unknown as Record<string, string>;
+  const mask = g.maskImage || g.webkitMaskImage || "none";
+  return [
+    ...extra,
+    `box-sizing:border-box`,
+    `background-color:${cs.backgroundColor}`,
+    `background-image:${/url\(/.test(cs.backgroundImage || "") ? "none" : cs.backgroundImage}`,
+    `background-size:${cs.backgroundSize}`,
+    `background-position:${cs.backgroundPosition}`,
+    `background-repeat:${cs.backgroundRepeat}`,
+    `border-radius:${cs.borderTopLeftRadius} ${cs.borderTopRightRadius} ${cs.borderBottomRightRadius} ${cs.borderBottomLeftRadius}`,
+    ...["Top", "Right", "Bottom", "Left"].map(
+      (sd) => `border-${sd.toLowerCase()}:${g[`border${sd}Width`]} ${g[`border${sd}Style`]} ${g[`border${sd}Color`]}`,
+    ),
+    `box-shadow:${cs.boxShadow}`,
+    `opacity:${cs.opacity}`,
+    mask !== "none" ? `mask-image:${mask};-webkit-mask-image:${mask}` : "",
+    mask !== "none" ? `mask-size:100% 100%;-webkit-mask-size:100% 100%` : "",
+  ]
+    .filter(Boolean)
+    .join(";");
+}
+
+/** One see-through picture of a designed box: its own paint + decorative layers. */
+function designedBoxShapeFor(
+  el: HTMLElement,
+  layers: HTMLElement[],
+  root: DOMRect,
+  sx: number,
+  sy: number,
+  spaceW: number,
+  spaceH: number,
+): DomShape | null {
+  const cs = getComputedStyle(el);
+  const r = el.getBoundingClientRect();
+  const w = r.width * sx;
+  const h = r.height * sy;
+  if (w >= spaceW * 0.92 && h >= spaceH * 0.92) return null;
+  if ((cs.mixBlendMode || "normal") !== "normal") return null;
+  const x = (r.left - root.left) * sx;
+  const y = (r.top - root.top) * sy;
+  if (x > spaceW || y > spaceH || x + w < 0 || y + h < 0) return null;
+  const pad = 40; // CSS px of room for outer glows
+  const esc = (v: string) => v.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  const inner = layers
+    .map((c) => {
+      const ccs = getComputedStyle(c);
+      const cr = c.getBoundingClientRect();
+      return `<div style="${esc(
+        boxCss(ccs, [
+          `position:absolute`,
+          `left:${cr.left - r.left}px`,
+          `top:${cr.top - r.top}px`,
+          `width:${cr.width}px`,
+          `height:${cr.height}px`,
+          ccs.mixBlendMode && ccs.mixBlendMode !== "normal" ? `mix-blend-mode:${ccs.mixBlendMode}` : "",
+        ]),
+      )}"></div>`;
+    })
+    .join("");
+  const rootCss = boxCss(cs, [
+    `position:absolute`,
+    `left:${pad}px`,
+    `top:${pad}px`,
+    `width:${r.width}px`,
+    `height:${r.height}px`,
+    `isolation:isolate`,
+  ]);
+  const fw = r.width + 2 * pad;
+  const fh = r.height + 2 * pad;
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${fw * sx}" height="${fh * sy}" viewBox="0 0 ${fw} ${fh}">` +
+    `<foreignObject x="0" y="0" width="${fw}" height="${fh}">` +
+    `<div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:${fw}px;height:${fh}px">` +
+    `<div style="${esc(rootCss)}">${inner}</div></div>` +
+    `</foreignObject></svg>`;
+  let src: string;
+  try {
+    src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+  } catch {
+    return null;
+  }
+  return {
+    kind: "image",
+    x: x - pad * sx,
+    y: y - pad * sy,
+    w: fw * sx,
+    h: fh * sy,
+    radiusPx: 0,
+    fill: null,
+    gradient: null,
+    line: null,
+    shadow: null,
+    src,
+    natW: fw * sx,
+    natH: fh * sy,
+    fit: "fill",
+    rotationDeg: rotationOf(cs.transform),
+    name: nameFor(el, "TP Box"),
+    node: el,
+    nodes: layers,
+    surfaceOnly: true,
+  };
+}
+
+/**
+ * A box whose surface PowerPoint cannot draw natively (radial / conic / stacked
+ * washes, frosted glass over such a wash) ships as its OWN see-through picture
+ * of just that surface — the same treatment that made slide 4's logo tiles
+ * selectable boxes — instead of being baked into the background plate. Only the
+ * box's own paint is pictured; its text, icons and nested boxes keep exporting
+ * as editable objects on top.
+ */
+function surfaceShapeFor(
+  el: Element,
+  cs: CSSStyleDeclaration,
+  root: DOMRect,
+  sx: number,
+  sy: number,
+  spaceW: number,
+  spaceH: number,
+): DomShape | null {
+  const r = el.getBoundingClientRect();
+  const w = r.width * sx;
+  const h = r.height * sy;
+  if (w < 24 || h < 24) return null;
+  // Grounds and full-width washes stay on the flat background.
+  if (w >= spaceW * 0.9 || h >= spaceH * 0.9 || w * h >= spaceW * spaceH * 0.45) return null;
+  if (isDiffuseDecor(el, cs, w, h)) return null;
+  if ((cs.mixBlendMode || "normal") !== "normal") return null;
+  const x = (r.left - root.left) * sx;
+  const y = (r.top - root.top) * sy;
+  if (x < -2 || y < -2 || x + w > spaceW + 2 || y + h > spaceH + 2) return null;
+  // Shadow room around the box so outer glows are not sliced square.
+  const pad = cs.boxShadow && cs.boxShadow !== "none" ? 48 : 0;
+  const esc = (v: string) => v.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  const bw = (side: string) => (cs as unknown as Record<string, string>)[`border${side}Width`];
+  const bc = (side: string) => (cs as unknown as Record<string, string>)[`border${side}Color`];
+  const bs = (side: string) => (cs as unknown as Record<string, string>)[`border${side}Style`];
+  const css = [
+    `position:absolute`,
+    `left:${pad / sx}px`,
+    `top:${pad / sy}px`,
+    `width:${r.width}px`,
+    `height:${r.height}px`,
+    `box-sizing:border-box`,
+    `background-color:${cs.backgroundColor}`,
+    `background-image:${cs.backgroundImage}`,
+    `background-size:${cs.backgroundSize}`,
+    `background-position:${cs.backgroundPosition}`,
+    `background-repeat:${cs.backgroundRepeat}`,
+    `border-radius:${cs.borderTopLeftRadius} ${cs.borderTopRightRadius} ${cs.borderBottomRightRadius} ${cs.borderBottomLeftRadius}`,
+    ...["Top", "Right", "Bottom", "Left"].map(
+      (sd) => `border-${sd.toLowerCase()}:${bw(sd)} ${bs(sd)} ${bc(sd)}`,
+    ),
+    `box-shadow:${cs.boxShadow}`,
+  ].join(";");
+  if (/url\(/.test(cs.backgroundImage || "")) return null;
+  const fw = r.width + (2 * pad) / sx;
+  const fh = r.height + (2 * pad) / sy;
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${fw * sx}" height="${fh * sy}" viewBox="0 0 ${fw} ${fh}">` +
+    `<foreignObject x="0" y="0" width="${fw}" height="${fh}">` +
+    `<div xmlns="http://www.w3.org/1999/xhtml" style="${esc(css)}"></div>` +
+    `</foreignObject></svg>`;
+  let src: string;
+  try {
+    src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+  } catch {
+    return null;
+  }
+  return {
+    kind: "image",
+    x: x - pad,
+    y: y - pad,
+    w: w + 2 * pad,
+    h: h + 2 * pad,
+    radiusPx: 0,
+    fill: null,
+    gradient: null,
+    line: null,
+    shadow: null,
+    src,
+    natW: w + 2 * pad,
+    natH: h + 2 * pad,
+    fit: "fill",
+    rotationDeg: rotationOf(cs.transform),
+    name: nameFor(el, "TP Box"),
+    node: el,
+    surfaceOnly: true,
+  };
+}
+
 /** A measured box in stage px, used for mask containment checks. */
 interface ClipBox {
   x: number;
@@ -905,6 +1215,21 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
       if (Number.isFinite(opacity) && opacity < MIN_ALPHA) continue;
       if (insidePlatedSubtree(el)) continue;
 
+      // Designed boxes (glass cards, tiles, panels with decorative layers)
+      // ship as ONE selectable see-through box picture, like the slide 4 logo
+      // tiles, with their copy, icons and nested boxes native on top.
+      {
+        const layers = decorativeLayersOf(el);
+        if (layers) {
+          const box = designedBoxShapeFor(el as HTMLElement, layers, root, sx, sy, spaceW, spaceH);
+          if (box) {
+            shapes.push(box);
+            effectRoots.push(...layers);
+            continue;
+          }
+        }
+      }
+
       // ---- shape masking -------------------------------------------------
       // A clip PowerPoint CAN hold (polygon, inset, circle, ellipse, path) is
       // resolved here and travels with the object as custom geometry, instead of
@@ -983,6 +1308,15 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           effectRoots.push(el);
           continue;
         }
+        // A glowing icon (one <svg> under a drop-shadow) ships as its own
+        // picture with the glow baked in. Plating it used to drag the whole
+        // card it sits in onto the background (see pruneOccludingPaint).
+        const glowIcon = iconGlowShapeFor(el, cs, root, sx, sy);
+        if (glowIcon) {
+          shapes.push(glowIcon);
+          effectRoots.push(el);
+          continue;
+        }
         platedRoots.push(el);
         continue;
       }
@@ -1012,6 +1346,11 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         const panel = panelFadeShape(el, cs, root, sx, sy, spaceW, spaceH);
         if (panel) {
           shapes.push(panel);
+          continue;
+        }
+        const box = surfaceShapeFor(el, cs, root, sx, sy, spaceW, spaceH);
+        if (box) {
+          shapes.push(box);
           continue;
         }
         surfaceRoots.push(el);
@@ -1128,6 +1467,11 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         const panel = panelFadeShape(el, cs, root, sx, sy, spaceW, spaceH);
         if (panel) {
           shapes.push(panel);
+          continue;
+        }
+        const box = surfaceShapeFor(el, cs, root, sx, sy, spaceW, spaceH);
+        if (box) {
+          shapes.push(box);
           continue;
         }
         surfaceRoots.push(el);
@@ -1543,7 +1887,7 @@ export function neutralizeCapturedPaint(shapes: DomShape[]): void {
     for (const node of [s.node, ...(s.nodes ?? [])]) {
       const el = node as HTMLElement | undefined;
       if (!el || !el.style) continue;
-      if (s.kind === "image" && node === s.node) {
+      if (s.kind === "image" && node === s.node && !s.surfaceOnly) {
         el.style.setProperty("opacity", "0", "important");
         el.style.setProperty("background-image", "none", "important");
         continue;
@@ -1659,6 +2003,12 @@ export function isGhostPaint(
   const alpha = paintAlpha(s);
   // Effectively unpainted: nothing to lose, everything to gain.
   if (alpha <= 0.035) return true;
+  // A visible rounded card sitting inside the layout (not touching the stage
+  // edges) is a designed box, however faint: keep it selectable.
+  const inside =
+    s.x > space.w * 0.02 && s.y > space.h * 0.02 &&
+    s.x + s.w < space.w * 0.98 && s.y + s.h < space.h * 0.98;
+  if (s.kind === "roundRect" && s.radiusPx >= 4 && inside && s.w < space.w * 0.8) return false;
 
   const wideStrip = s.h >= space.h * 0.55 && s.w <= space.w * 0.16;
   const tallStrip = s.w >= space.w * 0.55 && s.h <= space.h * 0.16;
