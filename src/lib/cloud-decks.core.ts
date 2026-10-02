@@ -285,10 +285,23 @@ export async function saveDeckToCloudCore(
 
   // Replace slides — write first, prune after. Deleting up front meant a failed
   // insert left the deck with no slides at all, i.e. a save that destroyed work.
-  const { data: existingRows } = await sb.from("deck_slides").select("id").eq("deck_id", deckUuid);
-  const existingIds = Array.isArray(existingRows)
-    ? (existingRows as { id: string }[]).map((r) => r.id)
+  const { data: existingRows } = await sb
+    .from("deck_slides")
+    .select("id, content")
+    .eq("deck_id", deckUuid);
+  const existingList = Array.isArray(existingRows)
+    ? (existingRows as { id: string; content: Record<string, unknown> | null }[])
     : [];
+  const existingIds = existingList.map((r) => r.id);
+  // Reuse a saved row's id when the local slide came from it (seeded master
+  // rows have no derived id), so a save updates in place instead of inserting
+  // a duplicate at a position that is already taken.
+  const savedIdFor = new Map<string, string>();
+  for (const r of existingList) {
+    savedIdFor.set(r.id, r.id);
+    const lid = r.content?.["__localId"];
+    if (typeof lid === "string" && lid) savedIdFor.set(lid, r.id);
+  }
 
   if (data.deck.slides.length === 0) {
     // An empty deck overwriting saved slides is almost never what the user meant.
@@ -304,7 +317,7 @@ export async function saveDeckToCloudCore(
     const rows = [...data.deck.slides]
       .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
       .map((s, i) => ({
-      id: toUuid(`slide:${userId}:${data.deck.id}:${s.id}`),
+      id: savedIdFor.get(s.id) ?? toUuid(`slide:${userId}:${data.deck.id}:${s.id}`),
       deck_id: deckUuid,
       position: i,
       section_id: s.sectionId,
