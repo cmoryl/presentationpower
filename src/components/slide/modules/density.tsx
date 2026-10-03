@@ -6,7 +6,7 @@
 import { registerSlideModule } from "../module-registry";
 import { SlideFrame, SlideTitle, arr, s } from "../module-kit";
 import { fillPx } from "@/lib/open-space-fill";
-import { hexA } from "@/lib/accent-tokens";
+import { accentInk, hexA } from "@/lib/accent-tokens";
 import { Rocket, Users, Globe2, Flag, Sparkles, MapPin, BarChart3, type LucideIcon } from "lucide-react";
 
 function statIcon(label: string): LucideIcon {
@@ -155,7 +155,7 @@ registerSlideModule({
                       className="relative flex flex-col overflow-hidden rounded-2xl p-6"
                       style={{ background: isDark ? "rgba(255,255,255,0.05)" : hexA(accent, 0.05), border: `1px solid ${ink.hairline}` }}
                     >
-                      <div aria-hidden className="absolute inset-x-0 top-0 h-[3px]" style={{ background: `linear-gradient(90deg, ${isDark ? "#5B9BFF" : accent}, ${hexA(isDark ? "#5B9BFF" : accent, 0)})` }} />
+                      <div aria-hidden className="absolute inset-x-0 top-0 h-[3px]" style={{ background: isDark ? `linear-gradient(90deg, ${hexA(accentInk(brand.tokens.accent, "dark"), 0)}, ${accentInk(brand.tokens.accent, "dark")}, ${hexA(accentInk(brand.tokens.accent, "dark"), 0)})` : `linear-gradient(90deg, ${accent}, ${hexA(accent, 0)})` }} />
                       <div className="absolute right-6 top-6 flex items-center justify-center" style={{ width: 44, height: 44, color: isDark ? "#FFFFFF" : accent, filter: isDark ? "drop-shadow(0 0 10px rgba(127,227,245,0.55))" : undefined, opacity: isDark ? 0.92 : 1 }}>
                         <Icon size={34} strokeWidth={1.4} />
                       </div>

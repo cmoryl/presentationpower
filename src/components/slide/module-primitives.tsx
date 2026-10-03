@@ -1691,7 +1691,7 @@ export function Card({
           className="absolute inset-x-0 top-0"
           style={{
             height: SEAM_HEIGHT_PX,
-            background: `linear-gradient(90deg, ${accentInk(brand.tokens.accent, mode, 3)} 0%, ${hexA(accentInk(brand.tokens.accent, mode, 3), 0.0)} 80%)`,
+            background: mode === "dark" ? `linear-gradient(90deg, ${hexA(accentInk(brand.tokens.accent, mode), 0)}, ${accentInk(brand.tokens.accent, mode)}, ${hexA(accentInk(brand.tokens.accent, mode), 0)})` : `linear-gradient(90deg, ${accentInk(brand.tokens.accent, mode, 3)} 0%, ${hexA(accentInk(brand.tokens.accent, mode, 3), 0.0)} 80%)`,
           }}
         />
       )}

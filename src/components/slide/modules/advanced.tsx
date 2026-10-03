@@ -2089,7 +2089,7 @@ registerSlideModule({
                             : isDark ? "rgba(255,255,255,0.025)" : "transparent",
                         }}
                       >
-                        {isTarget && isDark && <div aria-hidden className="absolute inset-x-0 top-0 h-[2px]" style={{ background: `linear-gradient(90deg, ${BL}00, ${LV}, ${AQ})` }} />}
+                        {isTarget && isDark && <div aria-hidden className="absolute inset-x-0 top-0 h-[2px]" style={{ background: `linear-gradient(90deg, ${hexA(accentInk(brand.tokens.accent, "dark"), 0)}, ${accentInk(brand.tokens.accent, "dark")}, ${hexA(accentInk(brand.tokens.accent, "dark"), 0)})` }} />}
                         <div
                           className="uppercase"
                           style={{
