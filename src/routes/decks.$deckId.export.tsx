@@ -8,6 +8,7 @@ import { Download, FileText, Loader2, Printer, Share2 } from "lucide-react";
 import { useDeckStore } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
+import { PDF_FORMATS, type PdfFormatId } from "@/lib/pdf-page-formats";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import {
   DeckPackScope,
@@ -100,6 +101,10 @@ function ExportView() {
   useResignDeckMedia(deck);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const [exporting, setExporting] = useState(false);
+  // PDF page size: the slide canvas is re-proportioned to the page so every
+  // layout fills it (taller canvas for paper, narrower canvas for portrait).
+  const [pdfFormat, setPdfFormat] = useState<PdfFormatId>("slide");
+  const pdf = PDF_FORMATS[pdfFormat];
   const [override, setOverride] = useState(false);
   const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
   const [preflightBusy, setPreflightBusy] = useState(false);
@@ -557,14 +562,14 @@ function ExportView() {
         <div className="min-h-screen bg-neutral-100 py-12 print:bg-white print:py-0">
           <style>{`
         @media print {
-          @page { size: 1920px 1080px; margin: 0; }
+          @page { size: ${pdf.wIn}in ${pdf.hIn}in; margin: 0; }
           .no-print { display: none !important; }
           .print-page { break-after: page; page-break-after: always; }
-          /* Fill the 1920x1080 page: the on-screen scale is measured at screen
-             width, so print pins each page and stage to full size. */
-          .print-page { width: 1920px !important; height: 1080px !important; max-width: none !important; margin: 0 !important; overflow: hidden !important; }
-          .print-page > div, .print-page [data-print-surface] { width: 1920px !important; height: 1080px !important; aspect-ratio: auto !important; }
-          .print-page [data-slide-stage] { transform: none !important; visibility: visible !important; --slide-scale: 1 !important; }
+          /* Fill the chosen page exactly: page and stage are pinned to the
+             page size and the stage is scaled from its authored canvas. */
+          .print-page { width: ${pdf.wIn}in !important; height: ${pdf.hIn}in !important; max-width: none !important; margin: 0 !important; overflow: hidden !important; }
+          .print-page > div, .print-page [data-print-surface] { width: ${pdf.wIn}in !important; height: ${pdf.hIn}in !important; aspect-ratio: auto !important; }
+          .print-page [data-slide-stage] { transform: scale(${(pdf.wIn * 96) / pdf.stageW}) !important; visibility: visible !important; --slide-scale: ${(pdf.wIn * 96) / pdf.stageW} !important; }
           .print-page:last-of-type { break-after: auto; page-break-after: auto; }
           html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
           .print-page, .print-page * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
@@ -601,6 +606,20 @@ function ExportView() {
                   >
                     Convert a slide
                   </Link>
+                  <label className="inline-flex items-center gap-2 text-[11px] font-medium text-black/60">
+                    PDF page
+                    <select
+                      value={pdfFormat}
+                      onChange={(e) => setPdfFormat(e.target.value as PdfFormatId)}
+                      className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-[11px] text-[#03002C]"
+                    >
+                      {(Object.keys(PDF_FORMATS) as PdfFormatId[]).map((id) => (
+                        <option key={id} value={id}>
+                          {PDF_FORMATS[id].label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                   <PrintProofMenu
                     label="Print proof"
                     context={{ Document: deck.title, Division: deck.brandModeId ?? null }}
@@ -918,12 +937,13 @@ function ExportView() {
                   className="print-page w-full overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm print:rounded-none print:border-0 print:shadow-none"
                 >
                   <div
-                    className="aspect-[16/9] w-full"
+                    className="w-full"
+                    style={{ aspectRatio: `${pdf.stageW} / ${pdf.stageH}` }}
                     data-arrow-check-slide={slide.id}
                     data-arrow-check-index={i + 1}
                     data-mobile-export-slide={slide.id}
                   >
-                    <ScaledSlide>
+                    <ScaledSlide stageW={pdf.stageW} stageH={pdf.stageH}>
                       <DeckPackScope pack={packFor(slide)}>
                         <VariantRenderer
                           slide={slide}
