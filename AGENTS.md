@@ -18,3 +18,5 @@
 - Event, kiosk, signage and venue-map rules live in `src/lib/AGENTS.md`.
 
 - Every html-to-image capture passes `includeQueryParams: true` — why: proxied images differ only by `?path=`, and without it every download reused the first image fetched.
+
+- Print/PDF pages of another shape (letter, A4, tabloid, A3) render with `pageFit` on ScaledSlide: `PageFitBody` (src/components/slide/PageFit.tsx) picks the largest CSS zoom that keeps text unclipped, non-overlapping and graphics unshrunk — why: one generic relayout instead of per-page hand tuning; module-specific portrait layouts still go in `[data-portrait]` rules.

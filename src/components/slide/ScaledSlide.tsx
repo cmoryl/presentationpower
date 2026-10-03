@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { PageFitContext } from "@/components/slide/PageFit";
 
 /**
  * ScaledSlide renders content at a fixed 1920×1080 stage and scales it to fit.
@@ -9,6 +10,7 @@ export function ScaledSlide({
   className = "",
   stageW = 1920,
   stageH = 1080,
+  pageFit = false,
 }: {
   children: ReactNode;
   className?: string;
@@ -16,6 +18,8 @@ export function ScaledSlide({
    *  visual-regression harness overrides it to exercise 4:3 / 1:1 decks. */
   stageW?: number;
   stageH?: number;
+  /** Print pages of another shape: relayout the content to fill the page. */
+  pageFit?: boolean;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState<number | null>(null);
@@ -63,6 +67,7 @@ export function ScaledSlide({
         /* Tall canvases (portrait pages) switch modules to their portrait
            arrangement via [data-portrait] rules in styles.css. */
         data-page-orient={stageH > stageW ? "portrait" : undefined}
+        data-page-fit={pageFit ? "1" : undefined}
         className="absolute left-0 top-0 origin-top-left text-left"
         style={
           {
@@ -76,7 +81,7 @@ export function ScaledSlide({
           } as CSSProperties
         }
       >
-        {children}
+        <PageFitContext.Provider value={pageFit}>{children}</PageFitContext.Provider>
       </div>
     </div>
   );
