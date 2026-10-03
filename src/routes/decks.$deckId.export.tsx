@@ -8,7 +8,6 @@ import { Download, FileText, Loader2, Printer, Share2 } from "lucide-react";
 import { useDeckStore } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
-import { FIT_WIDTHS, measureFit, pickFit, type FitMeasure } from "@/lib/print-relayout";
 import { PDF_FORMATS, type PdfFormatId } from "@/lib/pdf-page-formats";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import {
@@ -106,43 +105,7 @@ function ExportView() {
   // layout fills it (taller canvas for paper, narrower canvas for portrait).
   const [pdfFormat, setPdfFormat] = useState<PdfFormatId>("slide");
   const pdf = PDF_FORMATS[pdfFormat];
-  // Any page shape other than 16:9: try each canvas width per slide and keep
-  // the one whose own layout fills the page best without clipping.
-  const [fitW, setFitW] = useState<Record<string, number>>({});
-  const [fitTry, setFitTry] = useState<number | null>(null);
-  const ratio = pdf.hIn / pdf.wIn;
-  useEffect(() => {
-    setFitW({});
-    if (pdfFormat === "slide") return;
-    let cancelled = false;
-    (async () => {
-      const results: Record<string, Array<{ w: number; m: FitMeasure }>> = {};
-      for (const w of FIT_WIDTHS) {
-        if (cancelled) return;
-        setFitTry(w);
-        await new Promise((r) => setTimeout(r, 700));
-        for (const el of document.querySelectorAll<HTMLElement>(".print-page[data-slide-id]")) {
-          const stage = el.querySelector<HTMLElement>("[data-slide-stage]");
-          if (!stage) continue;
-          (results[el.dataset.slideId!] ??= []).push({ w, m: measureFit(stage) });
-        }
-      }
-      if (cancelled) return;
-      const pick: Record<string, number> = {};
-      for (const [id, r] of Object.entries(results)) pick[id] = pickFit(r);
-      setFitW(pick);
-      setFitTry(null);
-    })();
-    return () => {
-      cancelled = true;
-      setFitTry(null);
-    };
-  }, [pdfFormat]);
-  const stageFor = (id: string) => {
-    if (pdfFormat === "slide") return { w: 1920, h: 1080 };
-    const w = fitTry ?? fitW[id] ?? pdf.stageW;
-    return { w, h: Math.round(w * ratio) };
-  };
+  const stageFor = (_id: string) => ({ w: pdf.stageW, h: pdf.stageH });
   const [override, setOverride] = useState(false);
   const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
   const [preflightBusy, setPreflightBusy] = useState(false);
