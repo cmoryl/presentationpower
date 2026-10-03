@@ -417,7 +417,7 @@ export function extractTextRuns(
     const weight = parseInt(cs.fontWeight, 10);
     const alignRaw = cs.textAlign;
     const align: TextRun["align"] =
-      alignRaw === "center"
+      flexCentred || alignRaw === "center"
         ? "center"
         : alignRaw === "right" || alignRaw === "end"
           ? "right"
