@@ -16,7 +16,7 @@ export function DeckCoverThumb({ deck }: { deck: Deck }) {
   if (!cover || !variant) return null;
   const brand = packBrand(resolveBrandMode(deck.brandModeId, deck.subCompany), deckPack(deck));
   const packFor = deckPackResolver(deck);
-  const ctx = (deck as { context?: { logoOrientation?: "horizontal" | "vertical" } }).context;
+
   return (
     <SlideThumbnailContext.Provider value={true}>
       <SlideSkinProvider skin={null}>
@@ -28,7 +28,7 @@ export function DeckCoverThumb({ deck }: { deck: Deck }) {
               brand={brand}
               pageNumber={1}
               subCompany={deck.subCompany}
-              logoOrientation={ctx?.logoOrientation ?? "horizontal"}
+              logoOrientation={deck.context?.logoOrientation ?? "horizontal"}
               mode={cover.mode ?? "light"}
             />
           </DeckPackScope>
