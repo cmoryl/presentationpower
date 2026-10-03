@@ -11,6 +11,7 @@ import { SlideIntro } from "@/components/slide/SlideIntro";
 import { SectionCue } from "@/components/slide/SectionCue";
 import { SlideSkinProvider } from "@/components/slide/SlideSkinContext";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import {
   DeckPackScope,
   deckPack,
@@ -84,9 +85,28 @@ function PresenterView() {
   }, [i]);
   const isMobile = useIsMobile();
   const thumbW = isMobile ? 104 : 160;
-  const [stripOpen, setStripOpen] = useState(true);
+  // Live talks start clean: the strip overlaps the slide, so it opens on demand (T).
+  const [stripOpen, setStripOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const [focusedThumb, setFocusedThumb] = useState(0);
+  // The control bar sits over the slide's footer, so it fades out after a
+  // moment without pointer movement and returns on any move or tap.
+  const [idle, setIdle] = useState(false);
+  useEffect(() => {
+    let t = window.setTimeout(() => setIdle(true), 2500);
+    const wake = () => {
+      setIdle(false);
+      window.clearTimeout(t);
+      t = window.setTimeout(() => setIdle(true), 2500);
+    };
+    window.addEventListener("pointermove", wake);
+    window.addEventListener("pointerdown", wake);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener("pointermove", wake);
+      window.removeEventListener("pointerdown", wake);
+    };
+  }, []);
 
   // Phones: the strip would cover a third of an already-small stage, so it
   // starts collapsed and is opened deliberately from the control bar.
@@ -234,7 +254,7 @@ function PresenterView() {
   if (role === "console") {
     return (
       <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
-        <SlideSkinProvider skin={deck.context?.skin}>
+        <SlideSkinProvider skin={null}>
           <SlideMediaRefreshProvider slides={visibleSlides}>
             <div className="fixed inset-0 flex flex-col bg-[#03002C] text-white dark:bg-card">
               <header className="flex items-center justify-between border-b border-white/15 px-5 py-3">
@@ -273,6 +293,7 @@ function PresenterView() {
                 <div className="flex min-h-0 flex-col gap-3">
                   <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-white/15 bg-black">
                     {slide && variant && (
+                      <ScaledSlide>
                       <DeckPackScope pack={packFor(slide)}>
                         <VariantRenderer
                           slide={slide}
@@ -281,9 +302,12 @@ function PresenterView() {
                           pageNumber={i + 1}
                           clientName={brief?.prospect}
                           clientLogoUrl={clientLogo.url}
+                subCompany={deck.subCompany}
+                logoOrientation={deck.context?.logoOrientation ?? "horizontal"}
                           mode={slide.mode ?? "light"}
                         />
                       </DeckPackScope>
+                      </ScaledSlide>
                     )}
                   </div>
                   <div className="flex items-center gap-3 text-sm text-white/80">
@@ -318,15 +342,7 @@ function PresenterView() {
                     <div className="mt-2 aspect-[16/9] overflow-hidden rounded-lg border border-white/15 bg-black">
                       {nextSlide && nextVariant ? (
                         <div className="relative h-full w-full">
-                          <div
-                            className="absolute inset-0"
-                            style={{
-                              transform: "scale(0.2)",
-                              transformOrigin: "top left",
-                              width: 1920,
-                              height: 1080,
-                            }}
-                          >
+<ScaledSlide>
                             <SlideThumbnailContext.Provider value={true}>
                               <DeckPackScope pack={packFor(nextSlide)}>
                                 <VariantRenderer
@@ -336,11 +352,13 @@ function PresenterView() {
                                   pageNumber={i + 2}
                                   clientName={brief?.prospect}
                                   clientLogoUrl={clientLogo.url}
+                subCompany={deck.subCompany}
+                logoOrientation={deck.context?.logoOrientation ?? "horizontal"}
                                   mode={nextSlide.mode ?? "light"}
                                 />
                               </DeckPackScope>
                             </SlideThumbnailContext.Provider>
-                          </div>
+                          </ScaledSlide>
                         </div>
                       ) : (
                         <div className="flex h-full items-center justify-center text-xs text-white/40">
@@ -373,7 +391,7 @@ function PresenterView() {
 
   return (
     <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
-      <SlideSkinProvider skin={deck.context?.skin}>
+      <SlideSkinProvider skin={null}>
         <SlideMediaRefreshProvider slides={visibleSlides}>
           <div
             className="fixed inset-0 flex flex-col items-center justify-center bg-black"
@@ -382,14 +400,14 @@ function PresenterView() {
           >
             <div className={audience ? "w-full" : "w-full max-w-[95vw]"}>
               <div className="relative mx-auto aspect-[16/9] w-full">
-                <SectionCue
+                {!audience && <SectionCue
                   sectionId={slide?.sectionId}
                   label={
                     slide
                       ? (byId(SECTION_FRAMEWORKS, slide.sectionId)?.name ?? undefined)
                       : undefined
                   }
-                />
+                />}
                 {slide && variant && (
                   <SlideStage slideKey={slide.id} direction={direction} transition={transition}>
                     <DeckPackScope pack={packFor(slide)}>
@@ -405,6 +423,8 @@ function PresenterView() {
                         pageNumber={i + 1}
                         clientName={brief?.prospect}
                         clientLogoUrl={clientLogo.url}
+                subCompany={deck.subCompany}
+                logoOrientation={deck.context?.logoOrientation ?? "horizontal"}
                         mode={slide.mode ?? "light"}
                       />
                       </SlideIntro>
@@ -484,6 +504,8 @@ function PresenterView() {
                               pageNumber={idx + 1}
                               clientName={brief?.prospect}
                               clientLogoUrl={clientLogo.url}
+                subCompany={deck.subCompany}
+                logoOrientation={deck.context?.logoOrientation ?? "horizontal"}
                               mode={s.mode ?? "light"}
                             />
                           </DeckPackScope>
@@ -498,7 +520,12 @@ function PresenterView() {
               </SlideThumbnailContext.Provider>
             </div>
 
-            <div className="absolute bottom-4 left-1/2 flex max-w-[calc(100vw-1.5rem)] -translate-x-1/2 items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-xs text-white/80 backdrop-blur sm:gap-4 sm:px-5 sm:py-2">
+            <div
+              className={cn(
+                "absolute bottom-4 left-1/2 flex max-w-[calc(100vw-1.5rem)] -translate-x-1/2 items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-xs text-white/80 backdrop-blur transition-opacity duration-500 focus-within:opacity-100 sm:gap-4 sm:px-5 sm:py-2",
+                idle && !stripOpen && !notesOpen && "pointer-events-none opacity-0",
+              )}
+            >
               <button
                 onClick={() => setI((n) => Math.max(0, n - 1))}
                 className="grid h-11 w-11 shrink-0 place-items-center rounded-full hover:text-white sm:h-auto sm:w-auto"
@@ -588,15 +615,7 @@ function PresenterView() {
                   <div className="mt-3 aspect-[16/9] overflow-hidden rounded-lg border border-white/15 bg-black">
                     {nextSlide && nextVariant ? (
                       <div className="relative h-full w-full">
-                        <div
-                          className="absolute inset-0"
-                          style={{
-                            transform: "scale(0.125)",
-                            transformOrigin: "top left",
-                            width: 1920,
-                            height: 1080,
-                          }}
-                        >
+<ScaledSlide>
                           <SlideThumbnailContext.Provider value={true}>
                             <DeckPackScope pack={packFor(nextSlide)}>
                               <VariantRenderer
@@ -606,11 +625,13 @@ function PresenterView() {
                                 pageNumber={i + 2}
                                 clientName={brief?.prospect}
                                 clientLogoUrl={clientLogo.url}
+                subCompany={deck.subCompany}
+                logoOrientation={deck.context?.logoOrientation ?? "horizontal"}
                                 mode={nextSlide.mode ?? "light"}
                               />
                             </DeckPackScope>
                           </SlideThumbnailContext.Provider>
-                        </div>
+                        </ScaledSlide>
                       </div>
                     ) : (
                       <div className="flex h-full items-center justify-center text-xs text-white/40">
