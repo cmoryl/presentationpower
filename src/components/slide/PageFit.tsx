@@ -96,55 +96,72 @@ function probe(root: HTMLElement): Probe {
   return { texts, leaves, clipOf, graphics, graphicBase };
 }
 
-const outside = (r: DOMRect, R: DOMRect) =>
-  r.bottom > R.bottom + TOL || r.right > R.right + TOL || r.left < R.left - TOL || r.top < R.top - TOL;
+/** How far (px) a rect pokes out of a box; 0 when inside. */
+const spill = (r: DOMRect, R: DOMRect) =>
+  Math.max(0, r.bottom - R.bottom, r.right - R.right, R.left - r.left, R.top - r.top);
 
-/** Every layout defect at the current zoom, as stable keys. */
-function issues(root: HTMLElement, p: Probe, zoom: number): Set<string> {
+const overlapFrac = (a: DOMRect, b: DOMRect) => {
+  const ov =
+    Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) *
+    Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+  const area = a.width * a.height;
+  return area > 0 ? ov / area : 0;
+};
+
+/**
+ * Every layout defect at the current zoom, keyed, with a size. Pixel amounts
+ * are divided by the zoom so a defect the original design already had (a
+ * deliberate ellipsis, a badge overlapping a card edge) only counts against a
+ * zoom when it gets worse.
+ */
+function issues(root: HTMLElement, p: Probe, zoom: number): Map<string, number> {
   const R = root.getBoundingClientRect();
-  const bad = new Set<string>();
+  const bad = new Map<string, number>();
+  const add = (k: string, v: number) => {
+    if (v > 0) bad.set(k, v);
+  };
   const rects = new Map<Element, DOMRect>();
   p.texts.forEach((el, i) => {
     const r = el.getBoundingClientRect();
     rects.set(el, r);
     if (r.width === 0 && r.height === 0) return;
-    if (outside(r, R)) bad.add(`out:${i}`);
+    add(`out:${i}`, spill(r, R) / zoom);
     const c = p.clipOf.get(el);
-    if (c && outside(r, c.getBoundingClientRect())) bad.add(`clip:${i}`);
-    if (el instanceof HTMLElement) {
+    if (c) add(`clip:${i}`, spill(r, c.getBoundingClientRect()) / zoom);
+    if (el instanceof HTMLElement && el.clientWidth > 0) {
       const cs = getComputedStyle(el);
       // A word wider than its own box (e.g. "Productivit|y").
-      if (cs.display !== "inline" && el.clientWidth > 0 && el.scrollWidth > el.clientWidth + TOL)
-        bad.add(`wide:${i}`);
-      if (clips(cs) && (el.scrollHeight > el.clientHeight + TOL || el.scrollWidth > el.clientWidth + TOL))
-        bad.add(`self:${i}`);
+      if (cs.display !== "inline") add(`wide:${i}`, (el.scrollWidth - el.clientWidth) / zoom);
+      if (clips(cs)) add(`self:${i}`, (el.scrollHeight - el.clientHeight) / zoom);
     }
   });
-  // Text blocks running into each other.
   const L = p.leaves;
   for (let i = 0; i < L.length; i++) {
     const a = rects.get(L[i]);
     if (!a || a.width === 0) continue;
+    // Text blocks running into each other.
     for (let j = i + 1; j < L.length; j++) {
       const b = rects.get(L[j]);
       if (!b || b.width === 0) continue;
-      const ov =
-        Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) *
-        Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
-      if (ov > 0.15 * Math.min(a.width * a.height, b.width * b.height)) bad.add(`hit:${i}-${j}`);
+      add(`hit:${i}-${j}`, Math.max(overlapFrac(a, b), overlapFrac(b, a)) * 100);
     }
+    // Text slipping under a disc / badge / picture it wasn't on before.
+    p.graphics.forEach((g, k) => {
+      if (g.contains(L[i]) || L[i].contains(g)) return;
+      add(`under:${i}-${k}`, overlapFrac(a, g.getBoundingClientRect()) * 100);
+    });
   }
   // Graphics must grow with the zoom (allowing 5%) and keep their shape.
-  for (const g of p.graphics) {
+  p.graphics.forEach((g, k) => {
     const base = p.graphicBase.get(g)!;
     const r = g.getBoundingClientRect();
-    if (base.w === 0 || base.h === 0) continue;
+    if (base.w === 0 || base.h === 0) return;
     const grow = Math.min(1, zoom) * 0.95;
-    if (r.width < base.w * grow || r.height < base.h * grow) bad.add(`shrink:${p.graphics.indexOf(g)}`);
+    if (r.width < base.w * grow || r.height < base.h * grow) bad.set(`shrink:${k}`, 100);
     const ar0 = base.w / base.h;
     const ar = r.height > 0 ? r.width / r.height : 0;
-    if (Math.abs(ar - ar0) / ar0 > 0.08) bad.add(`shape:${p.graphics.indexOf(g)}`);
-  }
+    if (Math.abs(ar - ar0) / ar0 > 0.08) bad.set(`shape:${k}`, 100);
+  });
   return bad;
 }
 
@@ -159,7 +176,12 @@ export function fitPage(el: HTMLElement): number {
   const fits = (z: number) => {
     el.style.zoom = String(z);
     if (planeOverflows(el)) return false;
-    for (const b of issues(el, p, z)) if (!baseline.has(b)) return false;
+    for (const [k, v] of issues(el, p, z)) {
+      const b = baseline.get(k) ?? 0;
+      // Overlap scores are percentages; spills are px — both get a small slack.
+      const slack = k.startsWith("hit:") || k.startsWith("under:") ? 3 : TOL;
+      if (v > b + slack) return false;
+    }
     return true;
   };
   let lo: number;
