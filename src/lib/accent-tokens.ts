@@ -188,7 +188,11 @@ export function accentTokens(
     fill: hexA(a, s.fill * e),
     wash: `radial-gradient(120% 90% at 0% 0%, ${hexA(a, s.wash * e)} 0%, transparent 64%)`,
     ring: hexA(a, s.ring * e),
-    seam: `linear-gradient(90deg, ${hexA(a, 0)} 0%, ${hexA(a, s.seam)} 22%, ${a} 50%, ${hexA(a, s.seam)} 78%, ${hexA(a, 0)} 100%)`,
+    // Dark seams use the same light accent ink as the slide 4 logo tiles so
+    // every card's top accent reads as one family across a deck.
+    seam: isDark(mode)
+      ? `linear-gradient(90deg, ${hexA(accentInk(a, mode), 0)}, ${accentInk(a, mode)}, ${hexA(accentInk(a, mode), 0)})`
+      : `linear-gradient(90deg, ${hexA(a, 0)} 0%, ${hexA(a, s.seam)} 22%, ${a} 50%, ${hexA(a, s.seam)} 78%, ${hexA(a, 0)} 100%)`,
     glow: isDark(mode) ? `0 12px 40px -18px ${hexA(a, s.glow)}` : "",
     panelGradient: `linear-gradient(180deg, ${hexA(a, 0.26)} 0%, ${hexA(a, 0.12)} 34%, rgba(255,255,255,0.6) 74%, rgba(255,255,255,0) 100%)`,
     ink: accentInk(a, mode),

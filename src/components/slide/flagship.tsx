@@ -919,6 +919,7 @@ export function AccentTick({
   className?: string;
 }) {
   const ctxAccent = useSlideAccent();
+  const mode = useSlideMode();
   const a = accent ?? ctxAccent;
   if (!a) return null;
   return (
@@ -930,7 +931,7 @@ export function AccentTick({
         height,
         borderTopLeftRadius: radius,
         borderTopRightRadius: radius,
-        background: accentTokens(a, "light").seam,
+        background: accentTokens(a, mode === "dark" ? "dark" : "light").seam,
       }}
     />
   );
