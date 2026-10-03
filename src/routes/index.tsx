@@ -1031,11 +1031,7 @@ function DeckCard({ deck: d, industry }: { deck: Deck; industry?: string }) {
     <div className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/30 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
       <Link to="/decks/$deckId" params={{ deckId: d.id }} className="block">
         <div className="aspect-[16/9] bg-white">
-          {cover && coverVariant && (
-            <ScaledSlide>
-              <VariantRenderer slide={cover} variant={coverVariant} brand={brand} pageNumber={1} />
-            </ScaledSlide>
-          )}
+          {cover && coverVariant && <DeckCoverThumb deck={d} />}
         </div>
         <div className="border-t border-black/10 p-5 dark:border-white/10">
           <div className="flex items-center gap-2">
