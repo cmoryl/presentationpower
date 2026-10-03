@@ -4,6 +4,7 @@
 // switch onto the module registry so this heavier geometry has one owner.
 
 import React from "react";
+import { PageOrientContext } from "@/components/slide/PageFit";
 import { registerSlideModule } from "../module-registry";
 import { SlideFrame, SlideTitle, arr, obj, s, strs, truthy, type Item } from "../module-kit";
 import { IconBadge, MediaTile, Sparkline, pickKitIcon } from "../module-primitives";
@@ -1660,8 +1661,11 @@ registerSlideModule({
         // the axis kicker. 110 put the first note straight through the "Low"
         // frame label and the "You are here" badge.
         const PAD_BOT = 152;
-        const W = 1760;
-        const H = 520;
+        // Tall page: the same curve drawn on a narrower, much taller canvas so
+        // it fills the sheet instead of a thin band across the top.
+        const tall = React.useContext(PageOrientContext) === "portrait";
+        const W = tall ? 1160 : 1760;
+        const H = tall ? 1000 : 520;
         const curveId = `mc-fill-${variant.id}`;
         const glowId = `mc-glow-${variant.id}`;
         const gradId = `mc-line-${variant.id}`;

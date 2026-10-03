@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { PageFitContext } from "@/components/slide/PageFit";
+import { PageFitContext, PageOrientContext } from "@/components/slide/PageFit";
 
 /**
  * ScaledSlide renders content at a fixed 1920×1080 stage and scales it to fit.
@@ -81,7 +81,9 @@ export function ScaledSlide({
           } as CSSProperties
         }
       >
-        <PageFitContext.Provider value={pageFit}>{children}</PageFitContext.Provider>
+        <PageOrientContext.Provider value={stageH > stageW ? "portrait" : "landscape"}>
+          <PageFitContext.Provider value={pageFit}>{children}</PageFitContext.Provider>
+        </PageOrientContext.Provider>
       </div>
     </div>
   );
