@@ -1406,6 +1406,7 @@ export function CardGrid({
     <SlideFrame brand={brand} pageNumber={pageNumber}>
       <SlideTitle brand={brand} title={title} kicker={kicker || undefined} />
       <div
+        data-portrait={items.length <= cols && !rows && cols <= 3 ? "cards-stack" : undefined}
         className={`slide-fill-stretch slide-fill-rows mt-14 grid gap-10 ${gridClass}`}
         style={{
           // One short row: cards hug their copy and sit centred under the
@@ -1734,7 +1735,7 @@ export function Card({
           );
         }
         return (
-          <ul className="mt-6 flex flex-col">
+          <ul data-portrait="list-cols" className="mt-6 flex flex-col">
             {parts.map((p, i) => (
               <li
                 key={i}

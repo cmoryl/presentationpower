@@ -169,8 +169,32 @@ function planeOverflows(el: HTMLElement) {
   return el.scrollHeight > el.clientHeight + TOL || el.scrollWidth > el.clientWidth + TOL;
 }
 
+/**
+ * On a tall page a wide chart drawn on a 16:9 canvas is width-bound and leaves
+ * the lower page empty. Charts marked `data-portrait-crop` get their viewBox
+ * tightened to what they actually draw, so the same art scales up to fill.
+ */
+function cropWideCharts(el: HTMLElement) {
+  if (!el.closest('[data-page-orient="portrait"]')) return;
+  el.querySelectorAll<SVGSVGElement>("svg[data-portrait-crop]").forEach((svg) => {
+    if (!svg.dataset.viewBox0) svg.dataset.viewBox0 = svg.getAttribute("viewBox") ?? "";
+    try {
+      const b = svg.getBBox();
+      if (b.width < 10 || b.height < 10) return;
+      const pad = Math.max(b.width, b.height) * 0.03;
+      svg.setAttribute(
+        "viewBox",
+        `${b.x - pad} ${b.y - pad} ${b.width + pad * 2} ${b.height + pad * 2}`,
+      );
+    } catch {
+      /* not rendered yet */
+    }
+  });
+}
+
 export function fitPage(el: HTMLElement): number {
   el.style.zoom = "1";
+  cropWideCharts(el);
   const p = probe(el);
   const baseline = issues(el, p, 1);
   const fits = (z: number) => {

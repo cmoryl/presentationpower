@@ -1489,3 +1489,34 @@ body.export-mode [data-print-surface] {
 [data-page-orient="portrait"] [data-portrait="vs-stack"] {
   flex-direction: column !important;
 }
+/* One short row of cards → one card per row, sharing the page height. */
+[data-page-orient="portrait"] [data-portrait="cards-stack"] {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: none !important;
+  grid-auto-rows: minmax(min-content, 1fr) !important;
+  align-content: stretch !important;
+  flex: 1 1 auto;
+}
+/* Chart + side list → chart on top, list below. */
+[data-page-orient="portrait"] [data-portrait="stack-one"] {
+  grid-template-columns: minmax(0, 1fr) !important;
+  row-gap: 120px !important;
+}
+/* Photo capability cards → stacked rows, photo left / copy right. */
+[data-page-orient="portrait"] [data-portrait="cap-stack"] {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-auto-rows: minmax(0, 1fr) !important;
+}
+[data-page-orient="portrait"] [data-portrait="cap-stack"] > * {
+  flex-direction: row !important;
+}
+[data-page-orient="portrait"] [data-portrait="cap-stack"] > * > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+/* Stacked wide cards: their ruled lists run in two columns. */
+[data-page-orient="portrait"] [data-portrait="cards-stack"] [data-portrait="list-cols"] {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 48px;
+}

@@ -76,6 +76,7 @@ registerSlideModule({
           <SlideTitle brand={brand} title={s(c.title)} />
 
           <div
+            data-portrait={cards.length <= 3 ? "cap-stack" : undefined}
             className="mt-10 grid min-h-0 flex-1 items-stretch"
             style={{
               gridTemplateColumns: `repeat(${Math.max(1, cards.length)}, minmax(0, 1fr))`,
