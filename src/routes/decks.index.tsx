@@ -16,8 +16,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { useSignedIn, useOpenCloudDeck } from "@/components/CloudDeckControls";
 import { useDeckStore, type Deck } from "@/lib/deck-store";
-import { ScaledSlide } from "@/components/slide/ScaledSlide";
-import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { DeckCoverThumb } from "@/components/slide/DeckCoverThumb";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { getLibraryAnalytics, type DeckAnalyticsSummary } from "@/lib/deck-analytics.functions";
@@ -949,11 +948,7 @@ function DeckTile({
       )}
       <Link to="/decks/$deckId" params={{ deckId: d.id }} className="block">
         <div className="aspect-[16/9] bg-white">
-          {cover && coverVariant && (
-            <ScaledSlide>
-              <VariantRenderer slide={cover} variant={coverVariant} brand={brand} pageNumber={1} />
-            </ScaledSlide>
-          )}
+          {cover && coverVariant && <DeckCoverThumb deck={d} />}
         </div>
         <div className="border-t border-black/10 p-5 dark:border-white/10">
           <div className="flex items-center gap-2">
