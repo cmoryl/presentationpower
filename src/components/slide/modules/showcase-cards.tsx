@@ -23,6 +23,9 @@ import {
   type CapCardTone,
 } from "@/lib/showcase-cards";
 
+import { Cpu, Handshake, LayoutGrid, Sparkles } from "lucide-react";
+
+const cssPx = (v: number | string) => (typeof v === "number" ? `${v}px` : v);
 const AQUA = "#A1FBF9";
 const LAVENDER = "#C2A3FF";
 const DEEP_INK = "#03002C";
@@ -89,7 +92,8 @@ registerSlideModule({
               // band lit by its own brand glow (blue / aqua / lavender).
               const glow = [accent, AQUA, LAVENDER][i % 3];
               const textInk = isDark ? "#FFFFFF" : ink.strong;
-              const markFill = isDark ? glow : fill;
+              void glow;
+              const markFill = isDark ? AQUA : fill;
               return (
                 <div
                   key={i}
@@ -109,7 +113,7 @@ registerSlideModule({
                   <div
                     style={{
                       position: "relative",
-                      flex: `0 0 ${Math.round(st.imageRatio * 100)}%`,
+                      flex: `0 0 ${Math.round(st.imageRatio * (isDark ? 84 : 100))}%`,
                       minHeight: 0,
                       overflow: "hidden",
                     }}
@@ -123,7 +127,44 @@ registerSlideModule({
                       focus={card.mediaFocus}
                       className="absolute inset-0 h-full w-full rounded-none"
                     />
+                    {isDark && (
+                      // Shared navy→violet duotone wash so the three photos read as one set.
+                      <div
+                        aria-hidden
+                        data-decorative
+                        className="pointer-events-none absolute inset-0"
+                        style={{
+                          background:
+                            "linear-gradient(180deg, rgba(3,0,44,0.10) 0%, rgba(3,0,44,0.35) 60%, rgba(3,0,44,0.75) 100%), linear-gradient(135deg, rgba(0,63,199,0.30) 0%, rgba(194,163,255,0.22) 100%)",
+                          mixBlendMode: "normal",
+                        }}
+                      />
+                    )}
                   </div>
+
+                  {isDark && (() => {
+                    const key = s(card.label).toLowerCase();
+                    const Icon = key.includes("tech") ? Cpu : key.includes("serv") ? Handshake : key.includes("prod") ? LayoutGrid : Sparkles;
+                    return (
+                      <div
+                        aria-hidden
+                        className="absolute z-20 flex items-center justify-center"
+                        style={{
+                          top: `calc(${Math.round(st.imageRatio * 84)}% - 34px)`,
+                          left: 24,
+                          width: 68,
+                          height: 68,
+                          borderRadius: 999,
+                          background: "radial-gradient(circle at 35% 30%, rgba(255,255,255,0.28), rgba(11,16,48,0.85) 70%)",
+                          border: "1.5px solid rgba(255,255,255,0.45)",
+                          boxShadow: `0 0 0 6px rgba(161,251,249,0.10), 0 0 24px ${AQUA}66`,
+                          color: "#FFFFFF",
+                        }}
+                      >
+                        <Icon size={30} strokeWidth={1.8} style={{ filter: `drop-shadow(0 0 6px ${AQUA})` }} />
+                      </div>
+                    );
+                  })()}
 
                   {/* Label band */}
                   <div
@@ -131,27 +172,42 @@ registerSlideModule({
                     style={
                       isDark
                         ? {
-                            background: `linear-gradient(135deg, ${glow}55 0%, rgba(255,255,255,0.10) 45%, ${glow}22 100%)`,
+                            background: "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)",
                             backdropFilter: "blur(18px) saturate(140%)",
-                            borderTop: "1px solid rgba(255,255,255,0.35)",
-                            borderBottom: `2px solid ${glow}`,
-                            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.25), 0 10px 28px ${glow}33`,
+                            borderTop: "1px solid rgba(255,255,255,0.30)",
                             padding: dense ? "16px 18px" : "22px 22px",
                           }
                         : { background: fill, padding: dense ? "16px 18px" : "22px 22px" }
                     }
                   >
                     {isDark && (
-                      <span
-                        aria-hidden
-                        data-decorative
-                        style={{
-                          position: "absolute",
-                          inset: "0 0 50% 0",
-                          background: "linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0))",
-                          pointerEvents: "none",
-                        }}
-                      />
+                      <>
+                        <span
+                          aria-hidden
+                          data-decorative
+                          style={{
+                            position: "absolute",
+                            inset: "0 0 50% 0",
+                            background: "linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0))",
+                            pointerEvents: "none",
+                          }}
+                        />
+                        {/* Fine aqua→lavender glow rule — the deck's ring blend. */}
+                        <span
+                          aria-hidden
+                          data-decorative
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            height: 2,
+                            background: `linear-gradient(90deg, ${AQUA}, ${LAVENDER})`,
+                            boxShadow: `0 0 12px ${AQUA}88`,
+                            pointerEvents: "none",
+                          }}
+                        />
+                      </>
                     )}
                     <span
                       style={{
@@ -163,7 +219,7 @@ registerSlideModule({
                         color: isDark ? "#FFFFFF" : bandInk,
                         textAlign: "center",
                         position: "relative",
-                        textShadow: isDark ? `0 0 18px ${glow}88` : undefined,
+                        textShadow: isDark ? `0 0 18px ${AQUA}55` : undefined,
                       }}
                     >
                       {card.label}
@@ -175,8 +231,11 @@ registerSlideModule({
                   <div
                     className="flex min-h-0 flex-1 flex-col"
                     style={{
-                      padding: dense ? "22px 22px 24px" : "28px 28px 30px",
-                      backgroundImage: `${cardWashGradient(fill)}, ${baseTint}`,
+                      padding: dense ? "22px 22px 24px" : isDark ? "34px 28px 30px" : "28px 28px 30px",
+                      backgroundImage: isDark
+                        ? "linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.04) 55%, rgba(255,255,255,0) 100%)"
+                        : `${cardWashGradient(fill)}, ${baseTint}`,
+                      backdropFilter: isDark ? "blur(16px) saturate(130%)" : undefined,
                     }}
                   >
                     {st.showBandRule && (
@@ -186,6 +245,15 @@ registerSlideModule({
                         style={{ height: 3, width: 56, background: markFill, marginBottom: 16 }}
                       />
                     )}
+                    {/* Dark look: reserve a two-line lead + two-line note so every
+                        column's bullets start on the same line. */}
+                    <div
+                      style={
+                        isDark && !dense
+                          ? { minHeight: `calc(${cssPx(fillPx(25, "body"))} * 2.4 + 4px + ${cssPx(fillPx(24, "body"))} * 2.56 + 10px)` }
+                          : undefined
+                      }
+                    >
                     {card.lead && (
                       <div
                         style={{
@@ -212,11 +280,13 @@ registerSlideModule({
                         {card.leadNote}
                       </div>
                     )}
+                    </div>
+
 
                     {card.bullets.length > 0 && (
                       <ul
                         className="mt-6 flex flex-col"
-                        style={{ gap: dense ? 8 : 11, listStyle: "none", padding: 0, margin: 0 }}
+                        style={{ gap: dense ? 8 : 11, listStyle: "none", padding: 0, margin: isDark ? "18px 0 0" : 0 }}
                       >
                         {card.bullets.map((b, bi) => (
                           <li key={bi} className="flex" style={{ gap: 10 }}>
