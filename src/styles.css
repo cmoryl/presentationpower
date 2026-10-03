@@ -1520,3 +1520,35 @@ body.export-mode [data-print-surface] {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: 48px;
 }
+/* Stat board → hero KPIs on top, small stat tiles in one row of four below. */
+[data-page-orient="portrait"] [data-portrait="proof-stack"] {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1.6fr) auto !important;
+}
+[data-page-orient="portrait"] [data-portrait="proof-tiles"] {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+/* Step spotlight → medallion on top, step chain below. */
+[data-page-orient="portrait"] [data-portrait="spot-stack"] {
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-content: center !important;
+  row-gap: 96px !important;
+}
+[data-page-orient="portrait"] [data-portrait="spot-stack"] > :first-child {
+  max-width: 900px !important;
+}
+/* Region map + city list → wide map on top, list across the page below. */
+[data-page-orient="portrait"] [data-portrait="map-stack"] {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1fr) auto !important;
+}
+[data-page-orient="portrait"] [data-portrait="city-list"] {
+  grid-template-columns: repeat(var(--p-cols), minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(var(--p-rows), auto) !important;
+  border-left: 0 !important;
+  padding-left: 0 !important;
+  column-gap: 48px !important;
+}
+[data-page-orient="portrait"] [data-portrait="city-list"] > * {
+  font-size: var(--p-px) !important;
+}

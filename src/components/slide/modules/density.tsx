@@ -102,7 +102,7 @@ registerSlideModule({
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-            <div className="mt-10 grid flex-1 grid-cols-[1.25fr_1fr] gap-10">
+            <div data-portrait="proof-stack" className="mt-10 grid flex-1 grid-cols-[1.25fr_1fr] gap-10">
               <section className="flex flex-col">
                 {(s(c.brandLabel) || s(c.tagline)) && (
                   <div className="mb-6 flex items-baseline gap-4">
@@ -146,7 +146,7 @@ registerSlideModule({
                   })}
                 </div>
               </section>
-              <section className="grid grid-cols-2 content-center gap-5">
+              <section data-portrait="proof-tiles" className="grid grid-cols-2 content-center gap-5">
                 {items.map((it, i) => {
                   const Icon = statIcon(s(it.label));
                   return (

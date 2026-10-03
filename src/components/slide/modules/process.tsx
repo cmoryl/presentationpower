@@ -489,6 +489,7 @@ registerSlideModule({
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <div
+              data-portrait="spot-stack"
               className="grid h-full items-center"
               style={{ gridTemplateColumns: "0.92fr 1.08fr", columnGap: 96 }}
             >
