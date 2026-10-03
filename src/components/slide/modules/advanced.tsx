@@ -1605,11 +1605,9 @@ registerSlideModule({
                   const a = A0 + i * step + GAP / 2, b = A0 + (i + 1) * step - GAP / 2;
                   const t = 34 + (i / (N - 1)) * 70;
                   const mid = (a + b) / 2;
-                  const [lx, ly] = pt(R0 + 104 + 52, mid);
                   const [nx, ny] = pt(R0 + t / 2, mid);
                   const [dx, dy] = pt(R0 + t + 6, mid);
                   const [ex, ey] = pt(R0 + 132, mid);
-                  const right = lx > CX + 20, left = lx < CX - 20;
                   const col = isDark ? mix(i) : acc;
                   const words = s(it.label).split(" ");
                   const lines: string[] = [];
@@ -1618,6 +1616,12 @@ registerSlideModule({
                     if (l && (l + " " + w).length <= 16) lines[lines.length - 1] = l + " " + w;
                     else lines.push(w);
                   }
+                  // Upper call-outs stack their lines toward the hub, so push them
+                  // out by their block height to sit clear of the outer rings.
+                  const [, py] = pt(R0 + 156, mid);
+                  const vert = Math.max(0, (CY - py) / (R0 + 156));
+                  const [lx, ly] = pt(R0 + 156 + vert * (24 + lines.length * 26), mid);
+                  const right = lx > CX + 20, left = lx < CX - 20;
                   const op = 0.35 + (0.65 * i) / (N - 1);
                   return (
                     <g key={i}>
