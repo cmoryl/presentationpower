@@ -658,7 +658,10 @@ export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: K
     if (kind === "svg") return save(svgBlob(await returnSvg(face)), `${sb}.svg`);
     if (!FL) throw new Error("This strip has no layered layout.");
     if (kind === "press") return save(svgBlob(await pressFrontSvg(FL, se)), `${sb}-press-outlined.svg`);
-    if (kind === "png") return save(await proofPng(await pressFrontSvg(FL, se)), `${sb}-PROOF.png`);
+    if (kind === "png") {
+      const sw = kioskFaceW(FL), sh = kioskFaceH(FL);
+      return save(await proofPng(await pressFrontSvg(FL, se), Math.max(200, Math.round((1400 * sw) / KIOSK_W) * 4), sw, sh), `${sb}-PROOF.png`);
+    }
   }
   if (L.sign) return downloadSign(kind, L, edits);
   if (kind === "svg") return save(svgBlob(await liveFrontSvg(L, edits)), `${base}-front.svg`);
