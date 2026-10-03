@@ -146,22 +146,24 @@ registerSlideModule({
                     const key = s(card.label).toLowerCase();
                     const Icon = key.includes("tech") ? Cpu : key.includes("serv") ? Handshake : key.includes("prod") ? LayoutGrid : Sparkles;
                     return (
+                      // One drawing (disc + icon) wrapped in a glow filter, so the
+                      // PowerPoint export lifts it as a single picture above the photo.
                       <div
                         aria-hidden
-                        className="absolute z-20 flex items-center justify-center"
+                        className="absolute z-20"
                         style={{
                           top: `calc(${Math.round(st.imageRatio * 84)}% - 34px)`,
                           left: 24,
                           width: 68,
                           height: 68,
-                          borderRadius: 999,
-                          background: "radial-gradient(circle at 35% 30%, rgba(255,255,255,0.28), rgba(11,16,48,0.85) 70%)",
-                          border: "1.5px solid rgba(255,255,255,0.45)",
-                          boxShadow: `0 0 0 6px rgba(161,251,249,0.10), 0 0 24px ${AQUA}66`,
-                          color: "#FFFFFF",
+                          filter: `drop-shadow(0 0 10px ${AQUA}66)`,
                         }}
                       >
-                        <Icon size={30} strokeWidth={1.8} style={{ filter: `drop-shadow(0 0 6px ${AQUA})` }} />
+                        <svg width={68} height={68} viewBox="0 0 68 68">
+                          <circle cx={34} cy={34} r={33} fill="#A1FBF9" fillOpacity={0.12} />
+                          <circle cx={34} cy={34} r={27} fill="#141A52" stroke="#FFFFFF" strokeOpacity={0.5} strokeWidth={1.5} />
+                          <Icon x={19} y={19} width={30} height={30} strokeWidth={1.8} color={AQUA} />
+                        </svg>
                       </div>
                     );
                   })()}

@@ -541,7 +541,8 @@ function iconGlowShapeFor(
   if ((cs.mixBlendMode || "normal") !== "normal") return null;
   if ((el.textContent ?? "").trim()) return null;
   const svgs = el.querySelectorAll("svg");
-  if (svgs.length !== 1 || el.querySelector("img,video,canvas")) return null;
+  // One drawing — nested <svg>s (an icon placed inside a badge disc) count as part of it.
+  if (!svgs.length || ![...svgs].every((s) => svgs[0].contains(s)) || el.querySelector("img,video,canvas")) return null;
   const svg = svgs[0] as SVGSVGElement;
   const r = svg.getBoundingClientRect();
   const w = r.width * sx;
