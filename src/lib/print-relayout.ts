@@ -1,92 +1,50 @@
 /**
- * Print relayout — adapts a slide authored for 16:9 to a taller page canvas.
+ * Print relayout — fits each slide to a page of any aspect ratio.
  *
- * When a slide's content leaves a large empty band at the bottom of the taller
- * canvas, its main side-by-side row (grid or flex) is restacked into a column
- * so the content uses the page height. Every change is measured: if the
- * restacked slide would overflow the page, it is reverted, so a relayout can
- * never cut content off. Returns a cleanup that restores the authored layout.
+ * Slides are authored on a 1920-wide canvas. For another page shape, each
+ * slide is re-rendered on several candidate canvas widths (height always
+ * follows the page ratio) so its own responsive layout reflows: narrower
+ * canvases stack content taller and print type larger. The candidate that
+ * fills the page best without clipping anything wins, per slide.
  */
 
-type Saved = { el: HTMLElement; style: string | null };
+export const FIT_WIDTHS = [1920, 1600, 1400, 1280, 1120, 1000, 900];
 
 const FOOTER_SHARE = 0.9;
-const FILL_OK = 0.82;
-const OVERFLOW_LIMIT = 0.93;
 
-function contentBottom(stage: HTMLElement): number {
+export type FitMeasure = { fill: number; overflow: boolean };
+
+/** How much of the canvas a slide's content uses, and whether it clips. */
+export function measureFit(stage: HTMLElement): FitMeasure {
+  const W = stage.offsetWidth;
+  const H = stage.offsetHeight;
   const s = stage.getBoundingClientRect();
-  const scale = s.height / stage.offsetHeight || 1;
-  let max = 0;
+  const scale = s.width / W || 1;
+  let bottom = 0;
+  let overflow = stage.scrollWidth > W + 2;
   for (const el of stage.querySelectorAll<HTMLElement>("p, h1, h2, h3, h4, li, img, svg, span")) {
     const r = el.getBoundingClientRect();
     if (r.width <= 0 || r.height <= 0) continue;
-    if (r.height / scale > stage.offsetHeight * 0.85) continue; // backgrounds
-    const bottom = (r.bottom - s.top) / scale;
-    if (bottom > stage.offsetHeight * FOOTER_SHARE) continue; // footer chrome
-    max = Math.max(max, bottom);
+    const h = r.height / scale;
+    if (h > H * 0.85) continue; // backgrounds
+    const top = (r.top - s.top) / scale;
+    const b = (r.bottom - s.top) / scale;
+    const left = (r.left - s.left) / scale;
+    const right = (r.right - s.left) / scale;
+    if (right > W * 1.005 || left < -W * 0.005) overflow = true;
+    if (top > H * FOOTER_SHARE) continue; // footer chrome
+    if (b > H * 0.95) overflow = true;
+    bottom = Math.max(bottom, b);
   }
-  return max;
+  return { fill: bottom / H, overflow };
 }
 
-function mainRow(stage: HTMLElement): HTMLElement | null {
-  const W = stage.offsetWidth;
-  let best: HTMLElement | null = null;
-  let bestArea = 0;
-  for (const el of stage.querySelectorAll<HTMLElement>("div, section")) {
-    const cs = getComputedStyle(el);
-    const rowish =
-      (cs.display.includes("flex") && cs.flexDirection.startsWith("row")) ||
-      (cs.display.includes("grid") && cs.gridTemplateColumns.split(" ").length >= 2);
-    if (!rowish || cs.position === "absolute") continue;
-    const kids = Array.from(el.children).filter(
-      (k) => (k as HTMLElement).offsetWidth > 0,
-    ) as HTMLElement[];
-    if (kids.length < 2 || kids.length > 4) continue;
-    // Children must actually sit side by side.
-    if (Math.abs(kids[0].offsetTop - kids[1].offsetTop) > 8) continue;
-    if (el.offsetWidth < W * 0.7) continue;
-    const area = el.offsetWidth * el.offsetHeight;
-    if (area > bestArea) {
-      best = el;
-      bestArea = area;
-    }
-  }
-  return best;
-}
-
-export function relayoutForPage(stages: HTMLElement[]): () => void {
-  const saved: Saved[] = [];
-  const keep = (el: HTMLElement) => saved.push({ el, style: el.getAttribute("style") });
-  const restore = (from: number) => {
-    for (const s of saved.splice(from).reverse()) {
-      if (s.style === null) s.el.removeAttribute("style");
-      else s.el.setAttribute("style", s.style);
-    }
-  };
-
-  for (const stage of stages) {
-    const H = stage.offsetHeight;
-    if (H <= stage.offsetWidth * 0.6) continue; // 16:9 canvas: nothing to adapt
-    if (contentBottom(stage) / H >= FILL_OK) continue;
-    const row = mainRow(stage);
-    if (!row) continue;
-    const mark = saved.length;
-    keep(row);
-    const cs = getComputedStyle(row);
-    if (cs.display.includes("grid")) {
-      row.style.gridTemplateColumns = "minmax(0, 1fr)";
-    } else {
-      row.style.flexDirection = "column";
-    }
-    row.style.height = "auto";
-    for (const kid of Array.from(row.children) as HTMLElement[]) {
-      keep(kid);
-      kid.style.width = "100%";
-      kid.style.maxWidth = "100%";
-      kid.style.flex = "1 1 auto";
-    }
-    if (contentBottom(stage) > H * OVERFLOW_LIMIT || row.scrollHeight > H) restore(mark);
-  }
-  return () => restore(0);
+/** Pick the best canvas width from the per-candidate measurements. */
+export function pickFit(results: Array<{ w: number; m: FitMeasure }>): number {
+  const ok = results.filter((r) => !r.m.overflow);
+  if (!ok.length) return results[0]?.w ?? 1920;
+  // Fill target ~0.86: full page without crowding the footer.
+  const score = (f: number) => (f > 0.92 ? 1 : Math.abs(0.86 - f));
+  ok.sort((a, b) => score(a.m.fill) - score(b.m.fill) || b.w - a.w);
+  return ok[0].w;
 }

@@ -8,7 +8,7 @@ import { Download, FileText, Loader2, Printer, Share2 } from "lucide-react";
 import { useDeckStore } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
-import { relayoutForPage } from "@/lib/print-relayout";
+import { FIT_WIDTHS, measureFit, pickFit, type FitMeasure } from "@/lib/print-relayout";
 import { PDF_FORMATS, type PdfFormatId } from "@/lib/pdf-page-formats";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import {
@@ -106,20 +106,43 @@ function ExportView() {
   // layout fills it (taller canvas for paper, narrower canvas for portrait).
   const [pdfFormat, setPdfFormat] = useState<PdfFormatId>("slide");
   const pdf = PDF_FORMATS[pdfFormat];
-  // Taller pages: restack each slide's main row so content uses the height.
+  // Any page shape other than 16:9: try each canvas width per slide and keep
+  // the one whose own layout fills the page best without clipping.
+  const [fitW, setFitW] = useState<Record<string, number>>({});
+  const [fitTry, setFitTry] = useState<number | null>(null);
+  const ratio = pdf.hIn / pdf.wIn;
   useEffect(() => {
-    if (pdf.stageH <= pdf.stageW * 0.6) return;
-    let undo: (() => void) | null = null;
-    const t = setTimeout(() => {
-      undo = relayoutForPage(
-        Array.from(document.querySelectorAll<HTMLElement>(".print-page [data-slide-stage]")),
-      );
-    }, 800);
+    setFitW({});
+    if (pdfFormat === "slide") return;
+    let cancelled = false;
+    (async () => {
+      const results: Record<string, Array<{ w: number; m: FitMeasure }>> = {};
+      for (const w of FIT_WIDTHS) {
+        if (cancelled) return;
+        setFitTry(w);
+        await new Promise((r) => setTimeout(r, 700));
+        for (const el of document.querySelectorAll<HTMLElement>(".print-page[data-slide-id]")) {
+          const stage = el.querySelector<HTMLElement>("[data-slide-stage]");
+          if (!stage) continue;
+          (results[el.dataset.slideId!] ??= []).push({ w, m: measureFit(stage) });
+        }
+      }
+      if (cancelled) return;
+      const pick: Record<string, number> = {};
+      for (const [id, r] of Object.entries(results)) pick[id] = pickFit(r);
+      setFitW(pick);
+      setFitTry(null);
+    })();
     return () => {
-      clearTimeout(t);
-      undo?.();
+      cancelled = true;
+      setFitTry(null);
     };
-  }, [pdf]);
+  }, [pdfFormat]);
+  const stageFor = (id: string) => {
+    if (pdfFormat === "slide") return { w: 1920, h: 1080 };
+    const w = fitTry ?? fitW[id] ?? pdf.stageW;
+    return { w, h: Math.round(w * ratio) };
+  };
   const [override, setOverride] = useState(false);
   const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
   const [preflightBusy, setPreflightBusy] = useState(false);
@@ -584,7 +607,7 @@ function ExportView() {
              page size and the stage is scaled from its authored canvas. */
           .print-page { width: ${pdf.wIn}in !important; height: ${pdf.hIn}in !important; max-width: none !important; margin: 0 !important; overflow: hidden !important; }
           .print-page > div, .print-page [data-print-surface] { width: ${pdf.wIn}in !important; height: ${pdf.hIn}in !important; aspect-ratio: auto !important; }
-          .print-page [data-slide-stage] { transform: scale(${(pdf.wIn * 96) / pdf.stageW}) !important; visibility: visible !important; --slide-scale: ${(pdf.wIn * 96) / pdf.stageW} !important; }
+          .print-page [data-slide-stage] { transform: scale(var(--print-scale)) !important; visibility: visible !important; --slide-scale: var(--print-scale) !important; }
           .print-page:last-of-type { break-after: auto; page-break-after: auto; }
           html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
           .print-page, .print-page * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
@@ -946,19 +969,22 @@ function ExportView() {
             {deck.slides.map((slide, i) => {
               const variant = byId(MODULE_VARIANTS, slide.variantId);
               if (!variant) return null;
+              const st = stageFor(slide.id);
               return (
                 <div
                   key={slide.id}
+                  data-slide-id={slide.id}
+                  style={{ "--print-scale": (pdf.wIn * 96) / st.w } as React.CSSProperties}
                   className="print-page w-full overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm print:rounded-none print:border-0 print:shadow-none"
                 >
                   <div
                     className="w-full"
-                    style={{ aspectRatio: `${pdf.stageW} / ${pdf.stageH}` }}
+                    style={{ aspectRatio: `${st.w} / ${st.h}` }}
                     data-arrow-check-slide={slide.id}
                     data-arrow-check-index={i + 1}
                     data-mobile-export-slide={slide.id}
                   >
-                    <ScaledSlide stageW={pdf.stageW} stageH={pdf.stageH}>
+                    <ScaledSlide stageW={st.w} stageH={st.h}>
                       <DeckPackScope pack={packFor(slide)}>
                         <VariantRenderer
                           slide={slide}
