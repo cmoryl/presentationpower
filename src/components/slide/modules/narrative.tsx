@@ -81,27 +81,85 @@ registerSlideModule({
                   {its.map((it, i) => (
                     <div
                       key={i}
-                      className="flex flex-col overflow-hidden rounded-[26px]"
-                      style={{ height: heights[i] ?? 760, background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.8)", border: `1px solid ${ink.hairline}` }}
+                      className="relative flex flex-col overflow-hidden rounded-[26px]"
+                      style={{
+                        height: heights[i] ?? 760,
+                        background: isDark
+                          ? "linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.04) 55%, rgba(255,255,255,0.02) 100%)"
+                          : "linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.72))",
+                        border: `1px solid ${ink.hairline}`,
+                        boxShadow: isDark ? "0 24px 60px rgba(3,0,44,0.45)" : "0 18px 40px rgba(3,0,44,0.12)",
+                      }}
                     >
                       {s(it.image) && (
-                        <img src={s(it.image)} alt="" className="w-full shrink-0 object-cover" style={{ height: 230 }} />
+                        <div
+                          className="relative w-full shrink-0 overflow-hidden"
+                          style={{ height: 230, borderTopLeftRadius: 26, borderTopRightRadius: 26 }}
+                        >
+                          <img
+                            src={s(it.image)}
+                            alt=""
+                            className="absolute inset-0 h-full w-full object-cover"
+                            style={{ borderTopLeftRadius: 26, borderTopRightRadius: 26 }}
+                          />
+                          {isDark && (
+                            <div
+                              aria-hidden
+                              data-decorative
+                              className="pointer-events-none absolute inset-0"
+                              style={{ background: "linear-gradient(180deg, rgba(3,0,44,0.05) 40%, rgba(3,0,44,0.7) 100%)", borderTopLeftRadius: 26, borderTopRightRadius: 26 }}
+                            />
+                          )}
+                          {/* Accent seam across the curved top, fading at both ends. */}
+                          <div
+                            aria-hidden
+                            data-decorative
+                            className="pointer-events-none absolute inset-x-0 top-0 h-[3px]"
+                            style={{ background: "linear-gradient(90deg, transparent, var(--slide-accent-text), transparent)" }}
+                          />
+                          {/* Step badge riding the photo's lower edge. */}
+                          <div
+                            className="absolute bottom-5 right-6 flex items-center justify-center rounded-full tabular-nums"
+                            style={{
+                              width: 64,
+                              height: 64,
+                              background: isDark ? "rgba(3,0,44,0.75)" : "rgba(255,255,255,0.9)",
+                              border: "2px solid var(--slide-accent-text)",
+                              color: isDark ? "#FFFFFF" : ink.strong,
+                              fontSize: fillPx(24, "figure"),
+                              fontWeight: 800,
+                            }}
+                          >
+                            {String(i + 1).padStart(2, "0")}
+                          </div>
+                        </div>
                       )}
                       <div className="flex flex-1 flex-col px-9 py-8">
-                        <div className="tabular-nums" style={{ fontSize: fillPx(26, "figure"), fontWeight: 800, color: "var(--slide-accent-text)" }}>
-                          {String(i + 1).padStart(2, "0")}
+                        <div className="flex items-center gap-3" style={{ fontSize: fillPx(16, "label"), fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--slide-accent-text)" }}>
+                          <span>Pillar {String(i + 1).padStart(2, "0")}</span>
+                          <span className="h-px flex-1" style={{ background: "linear-gradient(90deg, var(--slide-accent-text), transparent)" }} />
                         </div>
                         <div className="mt-3" style={{ fontSize: fillPx(34, "figure"), fontWeight: 700, lineHeight: 1.1, color: ink.strong }}>
                           {s(it.title)}
                         </div>
                         <div className="mt-5 flex flex-col gap-3">
                           {s(it.body).split(/\s+·\s+/).filter(Boolean).map((line, k) => (
-                            <div key={k} className="pt-3" style={{ borderTop: `1px solid ${ink.hairline}`, fontSize: fillPx(22, "body"), lineHeight: 1.35, color: ink.body }}>
-                              {line}
+                            <div key={k} className="flex items-start gap-3" style={{ fontSize: fillPx(22, "body"), lineHeight: 1.35, color: ink.body }}>
+                              <span className="mt-[0.5em] h-2 w-2 shrink-0 rounded-full" style={{ background: "var(--slide-accent-text)" }} />
+                              <span>{line}</span>
                             </div>
                           ))}
                         </div>
-                        <div className="mt-auto h-[4px] rounded-full" style={{ width: `${40 + i * 30}%`, background: "var(--slide-accent-text)" }} />
+                        {/* Pillar base: a level meter that rises with each step. */}
+                        <div className="mt-auto flex items-end gap-2" aria-hidden>
+                          {[0, 1, 2].map((b) => (
+                            <div
+                              key={b}
+                              className="flex-1 rounded-full"
+                              style={{ height: 6 + b * 4, background: "var(--slide-accent-text)", opacity: b <= i ? 0.9 : 0.18 }}
+                            />
+                          ))}
+                        </div>
                       </div>
                     </div>
                   ))}
