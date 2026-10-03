@@ -83,6 +83,7 @@ registerSlideModule({
               <SlideTitle brand={brand} title={s(c.title, variant.name)} />
               <div
                 className="slide-fill-stretch relative mt-8 grid items-center gap-20"
+                data-portrait="stack-center"
                 style={{ gridTemplateColumns: `${W}px 1fr` }}
               >
                 <div className="relative" style={{ width: W, height: H }}>

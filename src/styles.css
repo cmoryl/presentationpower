@@ -1448,3 +1448,27 @@ body.export-mode [data-print-surface] {
 .print-studio .live-edit-active [data-live-path]:focus-within {
   outline-color: rgba(0, 63, 199, 0.95);
 }
+
+/* ── Portrait page arrangements ─────────────────────────────────────────
+   A slide rendered on a tall canvas (portrait PDF page) restacks through
+   these hooks; the 16:9 layout is untouched. */
+[data-page-orient="portrait"] [data-portrait="logo-grid"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 28px !important;
+}
+[data-page-orient="portrait"] [data-portrait="logo-mosaic"] {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-template-rows: none !important;
+  grid-auto-rows: 150px !important;
+  height: auto !important;
+  gap: 22px !important;
+}
+[data-page-orient="portrait"] [data-portrait="stack-center"] {
+  grid-template-columns: minmax(0, 1fr) !important;
+  justify-items: center !important;
+  gap: 56px !important;
+}
+[data-page-orient="portrait"] [data-portrait="stack-center"] > :last-child {
+  max-width: 960px;
+  width: 100%;
+}
