@@ -7,6 +7,7 @@ import { useCloudDeckGate } from "@/hooks/use-cloud-deck-gate";
 
 import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
+import { SlideIntro } from "@/components/slide/SlideIntro";
 import { SectionCue } from "@/components/slide/SectionCue";
 import { SlideSkinProvider } from "@/components/slide/SlideSkinContext";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -392,6 +393,11 @@ function PresenterView() {
                 {slide && variant && (
                   <SlideStage slideKey={slide.id} direction={direction} transition={transition}>
                     <DeckPackScope pack={packFor(slide)}>
+                      <SlideIntro
+                        variantId={slide.variantId}
+                        replayKey={slide.id}
+                        enabled={deck.context?.choreography === "auto"}
+                      >
                       <VariantRenderer
                         slide={slide}
                         variant={variant}
@@ -401,6 +407,7 @@ function PresenterView() {
                         clientLogoUrl={clientLogo.url}
                         mode={slide.mode ?? "light"}
                       />
+                      </SlideIntro>
                     </DeckPackScope>
                   </SlideStage>
                 )}

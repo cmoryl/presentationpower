@@ -109,7 +109,7 @@ export function entranceTimingXml(xml: string, variantId: string): string | null
   let n = 4;
   const effects = ordered
     .map((it, beat) => {
-      const delay = Math.round(recipe.leadMs + introBeatDelay(recipe, beat, ordered.length));
+      const delay = introBeatDelay(recipe, beat, ordered.length);
       const dur = Math.max(200, Math.round(recipe.durationMs));
       const a = (n += 1);
       const b = (n += 1);

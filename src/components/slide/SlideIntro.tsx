@@ -311,6 +311,8 @@ export function SlideIntro({
     // Never animate inside the offscreen export stage: the rasterizer must
     // capture the settled slide, not a frame mid-cascade.
     if (root.closest("[data-exact-slide-stage]")) return;
+    // The outgoing layer of a slide transition must stay settled.
+    if (root.closest('[data-slidestage-layer="previous"]')) return;
     let touched: HTMLElement[] = [];
     let arcs: ArcTarget[] = [];
     let heroes: HTMLElement[] = [];

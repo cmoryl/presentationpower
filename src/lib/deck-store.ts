@@ -1,6 +1,7 @@
 // Client-side runtime store for briefs and decks.
 // Persists to localStorage until Lovable Cloud is available.
 
+import { choreographedTransition } from "./slide-choreography";
 import { sanitizeSeedForBrief } from "./seed-honesty";
 import { coerceAiLists } from "./ai-list-coerce";
 import { create } from "zustand";
@@ -264,9 +265,12 @@ export const DEFAULT_SLIDE_TRANSITION: SlideTransition = { type: "fade", duratio
 
 export function resolveSlideTransition(
   slide: { transition?: SlideTransition } | undefined | null,
-  context: { defaultTransition?: SlideTransition } | undefined | null,
+  context: { defaultTransition?: SlideTransition; choreography?: string } | undefined | null,
 ): SlideTransition {
-  return slide?.transition ?? context?.defaultTransition ?? DEFAULT_SLIDE_TRANSITION;
+  if (slide?.transition) return slide.transition;
+  const v = (slide as { variantId?: string } | null | undefined)?.variantId;
+  if (context?.choreography === "auto" && v) return choreographedTransition(v);
+  return context?.defaultTransition ?? DEFAULT_SLIDE_TRANSITION;
 }
 
 export type DeckSlide = {
@@ -381,6 +385,8 @@ export type DeckContext = {
 
   // Deck-level default transition (Pass 1 — on-screen only).
   defaultTransition?: SlideTransition;
+  /** "auto" = per-module transitions + entrance builds (on screen and in PowerPoint). */
+  choreography?: "auto";
   /** Deck-wide look and feel ("flagship" | "enterprise-white"). */
   skin?: SlideSkin;
   /**

@@ -2374,6 +2374,8 @@ export async function exportDeckToPptx(
   }
   const finalBlob = await applyNativePptxFeatures(fontBlob, {
     transitions: deck.slides.map((sl) => resolveSlideTransition(sl, deck.context)),
+    entrances:
+      deck.context?.choreography === "auto" ? deck.slides.map((sl) => sl.variantId) : undefined,
     // PowerPoint "Hide Slide" parity — hidden slides export but are skipped in
     // the slide show, exactly like the on-screen presenter.
     hidden: deck.slides.map((sl) => sl.hidden === true),
