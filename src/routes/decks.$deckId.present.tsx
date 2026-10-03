@@ -89,6 +89,24 @@ function PresenterView() {
   const [stripOpen, setStripOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const [focusedThumb, setFocusedThumb] = useState(0);
+  // The control bar sits over the slide's footer, so it fades out after a
+  // moment without pointer movement and returns on any move or tap.
+  const [idle, setIdle] = useState(false);
+  useEffect(() => {
+    let t = window.setTimeout(() => setIdle(true), 2500);
+    const wake = () => {
+      setIdle(false);
+      window.clearTimeout(t);
+      t = window.setTimeout(() => setIdle(true), 2500);
+    };
+    window.addEventListener("pointermove", wake);
+    window.addEventListener("pointerdown", wake);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener("pointermove", wake);
+      window.removeEventListener("pointerdown", wake);
+    };
+  }, []);
 
   // Phones: the strip would cover a third of an already-small stage, so it
   // starts collapsed and is opened deliberately from the control bar.
@@ -382,14 +400,14 @@ function PresenterView() {
           >
             <div className={audience ? "w-full" : "w-full max-w-[95vw]"}>
               <div className="relative mx-auto aspect-[16/9] w-full">
-                <SectionCue
+                {!audience && <SectionCue
                   sectionId={slide?.sectionId}
                   label={
                     slide
                       ? (byId(SECTION_FRAMEWORKS, slide.sectionId)?.name ?? undefined)
                       : undefined
                   }
-                />
+                />}
                 {slide && variant && (
                   <SlideStage slideKey={slide.id} direction={direction} transition={transition}>
                     <DeckPackScope pack={packFor(slide)}>
@@ -502,7 +520,12 @@ function PresenterView() {
               </SlideThumbnailContext.Provider>
             </div>
 
-            <div className="absolute bottom-4 left-1/2 flex max-w-[calc(100vw-1.5rem)] -translate-x-1/2 items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-xs text-white/80 backdrop-blur sm:gap-4 sm:px-5 sm:py-2">
+            <div
+              className={cn(
+                "absolute bottom-4 left-1/2 flex max-w-[calc(100vw-1.5rem)] -translate-x-1/2 items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-xs text-white/80 backdrop-blur transition-opacity duration-500 focus-within:opacity-100 sm:gap-4 sm:px-5 sm:py-2",
+                idle && !stripOpen && !notesOpen && "pointer-events-none opacity-0",
+              )}
+            >
               <button
                 onClick={() => setI((n) => Math.max(0, n - 1))}
                 className="grid h-11 w-11 shrink-0 place-items-center rounded-full hover:text-white sm:h-auto sm:w-auto"
