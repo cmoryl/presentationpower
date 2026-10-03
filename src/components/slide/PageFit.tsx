@@ -231,6 +231,22 @@ export function fitPage(el: HTMLElement): number {
     if (fits(mid)) lo = mid;
     else hi = mid;
   }
+  // Record what stops the page growing further (inspection aid only).
+  if (lo < MAX_ZOOM) {
+    const zt = Math.min(MAX_ZOOM, lo + 0.06);
+    el.style.zoom = String(zt);
+    const block: string[] = [];
+    if (planeOverflows(el)) block.push("plane");
+    for (const [k, v] of issues(el, p, zt)) {
+      if (v > (baseline.get(k) ?? 0) + 2) {
+        const idx = Number(k.split(":")[1]?.split("-")[0]);
+        const t = k.startsWith("shrink") || k.startsWith("shape") ? p.graphics[idx] : p.texts[idx];
+        block.push(`${k.split(":")[0]}:${(t?.textContent ?? t?.tagName ?? "").trim().slice(0, 24)}`);
+      }
+      if (block.length > 4) break;
+    }
+    el.dataset.pageFitBlock = block.join(" | ");
+  }
   const z = Math.floor(lo * 100) / 100;
   el.style.zoom = String(z);
   el.dataset.pageFitZoom = String(z);
