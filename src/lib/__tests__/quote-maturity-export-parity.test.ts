@@ -62,10 +62,13 @@ describe("quote family exports natively", () => {
   });
 });
 
-describe("maturity curve exports as real objects", () => {
-  it("is native and no longer plated", () => {
-    expect(hasNativeVariantEmitter("MV-MATURITY-CURVE")).toBe(true);
-    expect(needsGraphicPlate("MV-MATURITY-CURVE")).toBe(false);
+describe("maturity curve export", () => {
+  // Oct 2026 (General Slides master): the on-screen curve carries effects the
+  // hand-written renderer never drew, so it takes the layered route — curve as
+  // a see-through picture, labels as native text.
+  it("takes the layered route", () => {
+    expect(hasNativeVariantEmitter("MV-MATURITY-CURVE")).toBe(false);
+    expect(needsGraphicPlate("MV-MATURITY-CURVE")).toBe(true);
   });
 
   it("carries the subtitle band, area wash and live-milestone halo", () => {
