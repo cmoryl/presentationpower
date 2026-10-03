@@ -19,6 +19,9 @@ import { createContext, useContext, useLayoutEffect, useRef, type ReactNode } fr
  * If the design already overflows at zoom 1, it shrinks (never below 0.75)
  * until it fits. Off by default; only print/export pages enable it.
  */
+/** "portrait" when the slide is drawn on a tall page; modules with a
+ *  dedicated tall arrangement read it. */
+export const PageOrientContext = createContext<"portrait" | "landscape">("landscape");
 export const PageFitContext = createContext(false);
 export const usePageFit = () => useContext(PageFitContext);
 
