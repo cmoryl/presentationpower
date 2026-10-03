@@ -161,6 +161,13 @@ function issues(root: HTMLElement, p: Probe, zoom: number): Map<string, number> 
     if (base.w === 0 || base.h === 0) return;
     const grow = Math.min(1, zoom) * 0.95;
     if (r.width < base.w * grow || r.height < base.h * grow) bad.set(`shrink:${k}`, 100);
+    // A box whose artwork keeps its own proportions (a logo with object-fit
+    // contain, an svg that letterboxes) can change shape without distorting.
+    const tag = g.tagName.toLowerCase();
+    const keepsArt =
+      (tag === "img" && ["contain", "cover", "scale-down"].includes(getComputedStyle(g).objectFit)) ||
+      (tag === "svg" && g.getAttribute("preserveAspectRatio") !== "none");
+    if (keepsArt) return;
     const ar0 = base.w / base.h;
     const ar = r.height > 0 ? r.width / r.height : 0;
     if (Math.abs(ar - ar0) / ar0 > 0.08) bad.set(`shape:${k}`, 100);
