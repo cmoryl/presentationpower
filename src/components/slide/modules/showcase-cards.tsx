@@ -168,27 +168,42 @@ registerSlideModule({
                     style={
                       isDark
                         ? {
-                            background: `linear-gradient(135deg, ${glow}55 0%, rgba(255,255,255,0.10) 45%, ${glow}22 100%)`,
+                            background: "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)",
                             backdropFilter: "blur(18px) saturate(140%)",
-                            borderTop: "1px solid rgba(255,255,255,0.35)",
-                            borderBottom: `2px solid ${glow}`,
-                            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.25), 0 10px 28px ${glow}33`,
+                            borderTop: "1px solid rgba(255,255,255,0.30)",
                             padding: dense ? "16px 18px" : "22px 22px",
                           }
                         : { background: fill, padding: dense ? "16px 18px" : "22px 22px" }
                     }
                   >
                     {isDark && (
-                      <span
-                        aria-hidden
-                        data-decorative
-                        style={{
-                          position: "absolute",
-                          inset: "0 0 50% 0",
-                          background: "linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0))",
-                          pointerEvents: "none",
-                        }}
-                      />
+                      <>
+                        <span
+                          aria-hidden
+                          data-decorative
+                          style={{
+                            position: "absolute",
+                            inset: "0 0 50% 0",
+                            background: "linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0))",
+                            pointerEvents: "none",
+                          }}
+                        />
+                        {/* Fine aqua→lavender glow rule — the deck's ring blend. */}
+                        <span
+                          aria-hidden
+                          data-decorative
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            height: 2,
+                            background: `linear-gradient(90deg, ${AQUA}, ${LAVENDER})`,
+                            boxShadow: `0 0 12px ${AQUA}88`,
+                            pointerEvents: "none",
+                          }}
+                        />
+                      </>
                     )}
                     <span
                       style={{
@@ -200,7 +215,7 @@ registerSlideModule({
                         color: isDark ? "#FFFFFF" : bandInk,
                         textAlign: "center",
                         position: "relative",
-                        textShadow: isDark ? `0 0 18px ${glow}88` : undefined,
+                        textShadow: isDark ? `0 0 18px ${AQUA}55` : undefined,
                       }}
                     >
                       {card.label}
