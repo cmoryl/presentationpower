@@ -161,6 +161,13 @@ function issues(root: HTMLElement, p: Probe, zoom: number): Map<string, number> 
     if (base.w === 0 || base.h === 0) return;
     const grow = Math.min(1, zoom) * 0.95;
     if (r.width < base.w * grow || r.height < base.h * grow) bad.set(`shrink:${k}`, 100);
+    // A box whose artwork keeps its own proportions (a logo with object-fit
+    // contain, an svg that letterboxes) can change shape without distorting.
+    const tag = g.tagName.toLowerCase();
+    const keepsArt =
+      (tag === "img" && ["contain", "cover", "scale-down"].includes(getComputedStyle(g).objectFit)) ||
+      (tag === "svg" && g.getAttribute("preserveAspectRatio") !== "none");
+    if (keepsArt) return;
     const ar0 = base.w / base.h;
     const ar = r.height > 0 ? r.width / r.height : 0;
     if (Math.abs(ar - ar0) / ar0 > 0.08) bad.set(`shape:${k}`, 100);
@@ -230,6 +237,22 @@ export function fitPage(el: HTMLElement): number {
     const mid = (lo + hi) / 2;
     if (fits(mid)) lo = mid;
     else hi = mid;
+  }
+  // Record what stops the page growing further (inspection aid only).
+  if (lo < MAX_ZOOM) {
+    const zt = Math.min(MAX_ZOOM, lo + 0.06);
+    el.style.zoom = String(zt);
+    const block: string[] = [];
+    if (planeOverflows(el)) block.push("plane");
+    for (const [k, v] of issues(el, p, zt)) {
+      if (v > (baseline.get(k) ?? 0) + 2) {
+        const idx = Number(k.split(":")[1]?.split("-")[0]);
+        const t = k.startsWith("shrink") || k.startsWith("shape") ? p.graphics[idx] : p.texts[idx];
+        block.push(`${k.split(":")[0]}:${(t?.textContent ?? t?.tagName ?? "").trim().slice(0, 24)}`);
+      }
+      if (block.length > 4) break;
+    }
+    el.dataset.pageFitBlock = block.join(" | ");
   }
   const z = Math.floor(lo * 100) / 100;
   el.style.zoom = String(z);
