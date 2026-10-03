@@ -34,7 +34,7 @@ registerSlideModule({
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title)} />
-            <div className={`mt-14 grid gap-6 ${arr(c.items).length > 12 ? "grid-cols-5" : "grid-cols-4"}`}>
+            <div data-portrait="logo-grid" className={`mt-14 grid gap-6 ${arr(c.items).length > 12 ? "grid-cols-5" : "grid-cols-4"}`}>
               {arr(c.items).map((it, i) => {
                 const name = s(it.name ?? it.client);
                 const logoUrl = pickLogoForMode(it, mode);
@@ -339,6 +339,7 @@ registerSlideModule({
               <SlideTitle brand={brand} title={s(c.title)} />
               <div
                 className="mt-12 grid gap-4"
+                data-portrait="logo-mosaic"
                 style={{ height: 640, gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}
               >
                 {all.map((it, i) => {

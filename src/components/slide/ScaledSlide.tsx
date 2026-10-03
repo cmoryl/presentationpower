@@ -60,6 +60,9 @@ export function ScaledSlide({
            stroke renders under half a pixel and visually disappears in the
            module library cards. CSS keyed off this flag restores presence. */
         data-thumb={s < 0.45 ? "1" : undefined}
+        /* Tall canvases (portrait pages) switch modules to their portrait
+           arrangement via [data-portrait] rules in styles.css. */
+        data-page-orient={stageH > stageW ? "portrait" : undefined}
         className="absolute left-0 top-0 origin-top-left text-left"
         style={
           {
