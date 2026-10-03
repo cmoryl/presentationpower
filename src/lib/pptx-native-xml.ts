@@ -23,6 +23,7 @@
 // blob untouched, because a missing transition must never break an export.
 // -----------------------------------------------------------------------------
 
+import { withEntranceTiming } from "./slide-choreography";
 import type { SlideTransition, TransitionType } from "./deck-store";
 import {
   GRADIENT_TAG_RE,
@@ -361,6 +362,8 @@ function slideOrder(names: string[]): string[] {
 export interface NativeFeatureOptions {
   /** One entry per slide, in deck order. `null`/`none` = no transition. */
   transitions?: Array<SlideTransition | null>;
+  /** One variant id per slide: emit the matching native entrance build. */
+  entrances?: Array<string | null>;
   /**
    * Brand background (6-char hex, no `#`) painted onto the real slideMaster so
    * PowerPoint's Slide Master view — and any layout that resets to the master
@@ -478,6 +481,7 @@ export async function applyNativePptxFeatures(
         // Effect lists must hold at most one of each effect kind — otherwise
         // PowerPoint (and the Office converter) refuses the package.
         xml = dedupeEffectLists(xml);
+        if (opts.entrances?.[i]) xml = withEntranceTiming(xml, opts.entrances[i]);
 
         if (xml !== before) {
           zip.file(parts[i], xml);
