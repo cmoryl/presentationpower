@@ -46,7 +46,10 @@ describe("credential proof split module", () => {
     }
   });
 
-  it("exports as native PowerPoint objects, not a flattened picture", () => {
-    expect(hasNativeVariantEmitter(ID)).toBe(true);
+  // Oct 2026 (General Slides master): the rings carry glows PowerPoint cannot
+  // draw, so the module takes the layered route — rings as see-through
+  // pictures, copy as native text — instead of the hand-written renderer.
+  it("exports through the layered route (effect pictures + native text)", () => {
+    expect(hasNativeVariantEmitter(ID)).toBe(false);
   });
 });
