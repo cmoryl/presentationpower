@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { withEntranceTiming, choreographedTransition } from "./slide-choreography";
 
 const sp = (id: number, x: number, w: number) =>
-  `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="s"/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="100"/><a:ext cx="${w}" cy="500000"/></a:xfrm></p:spPr></p:sp>`;
+  `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="s"/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${x}" y="2000000"/><a:ext cx="${w}" cy="500000"/></a:xfrm></p:spPr></p:sp>`;
 const slide = `<p:sld><p:cSld><p:spTree><p:nvGrpSpPr/>${sp(2, 0, 12192000).replace("500000", "6858000")}${sp(3, 600000, 900000)}${sp(4, 3000000, 900000)}</p:spTree></p:cSld></p:sld>`;
 
 describe("slide choreography", () => {

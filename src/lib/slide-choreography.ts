@@ -89,40 +89,116 @@ function filterFor(recipe: IntroRecipe): { preset: number; sub: number; filter: 
   }
 }
 
+type Unit = { ids: number[]; x: number; y: number; w: number; h: number };
+
+/** A card (box + its words) builds as one unit: small boxes absorb what sits inside them. */
+function buildUnits(items: Child[]): Unit[] {
+  const area = SLIDE_W_EMU * SLIDE_H_EMU;
+  const units: Unit[] = items.map((c) => ({ ids: [c.id], x: c.x, y: c.y, w: c.w, h: c.h }));
+  const inside = (a: Unit, b: Unit) => {
+    const ix = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
+    const iy = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+    return a.w * a.h > 0 && (ix * iy) / (a.w * a.h) > 0.7;
+  };
+  let merged = true;
+  while (merged) {
+    merged = false;
+    outer: for (let i = 0; i < units.length; i++) {
+      const host = units[i];
+      // Only card-sized hosts absorb children; a map or wide panel stays its own beat.
+      if ((host.w * host.h) / area > 0.08) continue;
+      for (let j = 0; j < units.length; j++) {
+        if (i === j) continue;
+        const g = units[j];
+        if (g.w * g.h <= host.w * host.h && inside(g, host)) {
+          const x = Math.min(host.x, g.x);
+          const y = Math.min(host.y, g.y);
+          host.w = Math.max(host.x + host.w, g.x + g.w) - x;
+          host.h = Math.max(host.y + host.h, g.y + g.h) - y;
+          host.x = x;
+          host.y = y;
+          host.ids.push(...g.ids);
+          units.splice(j, 1);
+          merged = true;
+          break outer;
+        }
+      }
+    }
+  }
+  return units;
+}
+
+/** Rows found by vertical gaps, not fixed bands, so aligned items always share a row. */
+function readingRows(units: Unit[]): Unit[][] {
+  const sorted = [...units].sort((a, b) => a.y - b.y);
+  const rows: Unit[][] = [];
+  for (const u of sorted) {
+    const row = rows[rows.length - 1];
+    if (row) {
+      const top = Math.min(...row.map((r) => r.y));
+      const minH = Math.min(...row.map((r) => r.h), u.h);
+      if (u.y - top < Math.max(minH * 0.5, SLIDE_H_EMU * 0.02)) {
+        row.push(u);
+        continue;
+      }
+    }
+    rows.push([u]);
+  }
+  return rows.map((r) => r.sort((a, b) => a.x - b.x));
+}
+
 /** Build the `<p:timing>` block for a slide, or null when nothing animates. */
 export function entranceTimingXml(xml: string, variantId: string): string | null {
   const recipe = introRecipeFor(variantId);
   const area = SLIDE_W_EMU * SLIDE_H_EMU;
-  const items = topLevelObjects(xml)
+  const objects = topLevelObjects(xml)
     // Backgrounds and ambient full-bleed plates never animate.
     .filter((c) => (c.w * c.h) / area < 0.45)
-    .map((c) => ({
-      ...c,
-      // orderIntroItems works in 1920x1080 slide space.
-      x: (c.x / SLIDE_W_EMU) * 1920,
-      y: (c.y / SLIDE_H_EMU) * 1080,
-      w: (c.w / SLIDE_W_EMU) * 1920,
+    // Header/footer chrome (logo strip, page number) is part of the page, not the story.
+    .filter((c) => c.y + c.h > SLIDE_H_EMU * 0.1 && c.y < SLIDE_H_EMU * 0.92);
+  if (!objects.length) return null;
+  const units = buildUnits(objects);
+  // Groups of units that enter together. Reading-order slides build one row at a
+  // time, so a list or grid descends as an even wave and a row is never split.
+  let groups: Unit[][];
+  if (recipe.order === "top-down" || recipe.order === "grid") {
+    groups = readingRows(units);
+  } else {
+    const keyed = units.map((u) => ({
+      u,
+      x: (u.x / SLIDE_W_EMU) * 1920,
+      y: (u.y / SLIDE_H_EMU) * 1080,
+      w: (u.w / SLIDE_W_EMU) * 1920,
     }));
-  if (!items.length) return null;
-  const ordered = orderIntroItems(items, recipe.order).slice(0, MAX_ANIMATED);
+    groups = orderIntroItems(keyed, recipe.order).map((k) => [k.u]);
+  }
+  // Every object animates: long sequences are split into even consecutive beats
+  // instead of animating the first few and leaving the rest already showing.
+  const beatCount = Math.min(MAX_ANIMATED, groups.length);
+  const beats: number[][] = Array.from({ length: beatCount }, () => []);
+  groups.forEach((g, i) =>
+    beats[Math.floor((i * beatCount) / groups.length)].push(...g.flatMap((u) => u.ids)),
+  );
   const fx = filterFor(recipe);
+  const dur = Math.max(200, Math.round(recipe.durationMs));
   let n = 4;
-  const effects = ordered
-    .map((it, beat) => {
-      const delay = introBeatDelay(recipe, beat, ordered.length);
-      const dur = Math.max(200, Math.round(recipe.durationMs));
-      const a = (n += 1);
-      const b = (n += 1);
-      const c = (n += 1);
-      const tgt = `<p:tgtEl><p:spTgt spid="${it.id}"/></p:tgtEl>`;
-      return (
-        `<p:par><p:cTn id="${a}" presetID="${fx.preset}" presetClass="entr" presetSubtype="${fx.sub}" fill="hold" nodeType="withEffect">` +
-        `<p:stCondLst><p:cond delay="${delay}"/></p:stCondLst><p:childTnLst>` +
-        `<p:set><p:cBhvr><p:cTn id="${b}" dur="1" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst></p:cTn>${tgt}` +
-        `<p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val="visible"/></p:to></p:set>` +
-        `<p:animEffect transition="in" filter="${fx.filter}"><p:cBhvr><p:cTn id="${c}" dur="${dur}"/>${tgt}</p:cBhvr></p:animEffect>` +
-        `</p:childTnLst></p:cTn></p:par>`
-      );
+  const effects = beats
+    .flatMap((ids, beat) => {
+      const delay = introBeatDelay(recipe, beat, beatCount);
+      return ids.map((id) => {
+        const a = (n += 1);
+        const b = (n += 1);
+        const c = (n += 1);
+        const tgt = `<p:tgtEl><p:spTgt spid="${id}"/></p:tgtEl>`;
+        return (
+          `<p:par><p:cTn id="${a}" presetID="${fx.preset}" presetClass="entr" presetSubtype="${fx.sub}" fill="hold" nodeType="withEffect">` +
+          `<p:stCondLst><p:cond delay="${delay}"/></p:stCondLst><p:childTnLst>` +
+          `<p:set><p:cBhvr><p:cTn id="${b}" dur="1" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst></p:cTn>${tgt}` +
+          `<p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val="visible"/></p:to></p:set>` +
+          `<p:animEffect transition="in" filter="${fx.filter}"><p:cBhvr><p:cTn id="${c}" dur="${dur}"/>${tgt}</p:cBhvr></p:animEffect>` +
+          `</p:childTnLst></p:cTn></p:par>`
+        );
+      });
     })
     .join("");
   return (
