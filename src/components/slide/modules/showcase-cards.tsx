@@ -123,7 +123,44 @@ registerSlideModule({
                       focus={card.mediaFocus}
                       className="absolute inset-0 h-full w-full rounded-none"
                     />
+                    {isDark && (
+                      // Shared navy→violet duotone wash so the three photos read as one set.
+                      <div
+                        aria-hidden
+                        data-decorative
+                        className="pointer-events-none absolute inset-0"
+                        style={{
+                          background:
+                            "linear-gradient(180deg, rgba(3,0,44,0.10) 0%, rgba(3,0,44,0.35) 60%, rgba(3,0,44,0.75) 100%), linear-gradient(135deg, rgba(0,63,199,0.30) 0%, rgba(194,163,255,0.22) 100%)",
+                          mixBlendMode: "normal",
+                        }}
+                      />
+                    )}
                   </div>
+
+                  {isDark && (() => {
+                    const key = s(card.label).toLowerCase();
+                    const Icon = key.includes("tech") ? Cpu : key.includes("serv") ? Handshake : key.includes("prod") ? LayoutGrid : Sparkles;
+                    return (
+                      <div
+                        aria-hidden
+                        className="absolute z-20 flex items-center justify-center"
+                        style={{
+                          top: `calc(${Math.round(st.imageRatio * 100)}% - 34px)`,
+                          left: 24,
+                          width: 68,
+                          height: 68,
+                          borderRadius: 999,
+                          background: "radial-gradient(circle at 35% 30%, rgba(255,255,255,0.28), rgba(11,16,48,0.85) 70%)",
+                          border: "1.5px solid rgba(255,255,255,0.45)",
+                          boxShadow: `0 0 0 6px rgba(161,251,249,0.10), 0 0 24px ${AQUA}66`,
+                          color: "#FFFFFF",
+                        }}
+                      >
+                        <Icon size={30} strokeWidth={1.8} style={{ filter: `drop-shadow(0 0 6px ${AQUA})` }} />
+                      </div>
+                    );
+                  })()}
 
                   {/* Label band */}
                   <div
