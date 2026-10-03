@@ -947,7 +947,7 @@ function ExportView() {
                     data-arrow-check-index={i + 1}
                     data-mobile-export-slide={slide.id}
                   >
-                    <ScaledSlide stageW={st.w} stageH={st.h}>
+                    <ScaledSlide stageW={st.w} stageH={st.h} pageFit={pdfFormat !== "slide"}>
                       <DeckPackScope pack={packFor(slide)}>
                         <VariantRenderer
                           slide={slide}

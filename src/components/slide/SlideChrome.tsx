@@ -10,6 +10,7 @@ import {
   type LogoOrientation,
 } from "@/lib/logo-placement";
 import { GRAIN_SVG } from "@/components/slide/grain";
+import { PageFitBody, usePageFit } from "@/components/slide/PageFit";
 import { accentInk, hexA } from "@/lib/accent-tokens";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
@@ -428,6 +429,7 @@ export function SlideFrame({
 }) {
   const mode = useSlideMode();
   const skin = useSlideSkin();
+  const pageFit = usePageFit();
   // Alternate style pack (public taste-testing directory). When active it owns
   // the page ground, ink and accent; it never applies on production surfaces.
   const pack = useStylePack();
@@ -1399,35 +1401,36 @@ export function SlideFrame({
               />
             )}
 
-            {compose && plate ? (
-              <HeroPlate
-                className={heroChrome ? "w-full" : "flex min-h-0 w-full flex-1 flex-col"}
-                cappedMaxWidth={
-                  compose.bias === "wide" || !heroChrome
-                    ? "100%"
-                    : `${Math.round(compose.column * 100)}%`
-                }
-                style={{
-                  // The compose `column` fraction is a *reading measure*, not a
-                  // layout cage: narrowing a grid/mosaic module to 60–80% of the
-                  // stage left a dead band down one side. So it only applies to
-                  // the text-led hero chrome (cover / divider / close), where a
-                  // short measure is the point — and HeroPlate drops even that
-                  // cap when the module itself is multi-column. Content modules
-                  // always run the full plate and fill the sheet.
-                  width: "100%",
-                  paddingLeft: plate.pad.x,
-                  paddingRight: plate.pad.x,
-                  paddingTop: plate.pad.y,
-                  paddingBottom: plate.pad.y,
-                  ...plate.style,
-                }}
-              >
-                {children}
-              </HeroPlate>
-            ) : (
-              children
-            )}
+            {(() => {
+              const body =
+                compose && plate ? (
+                  <HeroPlate
+                    className={heroChrome ? "w-full" : "flex min-h-0 w-full flex-1 flex-col"}
+                    cappedMaxWidth={
+                      compose.bias === "wide" || !heroChrome
+                        ? "100%"
+                        : `${Math.round(compose.column * 100)}%`
+                    }
+                    style={{
+                      // The compose `column` fraction is a *reading measure*, not a
+                      // layout cage: it only applies to the text-led hero chrome
+                      // (cover / divider / close). Content modules run the full plate.
+                      width: "100%",
+                      paddingLeft: plate.pad.x,
+                      paddingRight: plate.pad.x,
+                      paddingTop: plate.pad.y,
+                      paddingBottom: plate.pad.y,
+                      ...plate.style,
+                    }}
+                  >
+                    {children}
+                  </HeroPlate>
+                ) : (
+                  children
+                );
+              // Print pages of another shape relayout the content to fill them.
+              return pageFit ? <PageFitBody>{body}</PageFitBody> : body;
+            })()}
           </div>
         );
       })()}

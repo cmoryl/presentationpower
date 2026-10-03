@@ -27,10 +27,19 @@ import { getDeckSlideTranslations, listLanguages } from "@/lib/translation.funct
 import { toast } from "sonner";
 import { describeExportError } from "@/lib/export-feedback";
 import { notifyPrintToPdf } from "@/lib/deck-feedback";
+import { PDF_FORMATS, PDF_FORMAT_IDS, type PdfFormatId } from "@/lib/pdf-page-formats";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/decks/$deckId/print")({
   head: () => ({ meta: [{ title: "Print · TransPerfect Element" }] }),
-  validateSearch: (raw) => z.object({ lang: z.string().min(2).max(10).optional(), mode: z.enum(["light", "dark"]).optional() }).parse(raw),
+  validateSearch: (raw) =>
+    z
+      .object({
+        lang: z.string().min(2).max(10).optional(),
+        mode: z.enum(["light", "dark"]).optional(),
+        page: z.enum(PDF_FORMAT_IDS).optional(),
+      })
+      .parse(raw),
   component: PrintGate,
 });
 
@@ -52,7 +61,11 @@ function PrintGate() {
 
 function PrintView() {
   const { deckId } = Route.useParams();
-  const { lang, mode: printMode } = Route.useSearch();
+  const { lang, mode: printMode, page } = Route.useSearch();
+  const navigate = useNavigate({ from: "/decks/$deckId/print" });
+  const pageId: PdfFormatId = page ?? "slide";
+  const pdf = PDF_FORMATS[pageId];
+  const pageFit = pageId !== "slide";
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
 
@@ -148,44 +161,76 @@ function PrintView() {
         >
           <style>{`
         @media print {
-          @page { size: 1280px 720px landscape; margin: 0; }
+          @page { size: ${pdf.wIn}in ${pdf.hIn}in; margin: 0; }
           html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
           .print-root { padding: 0 !important; background: #fff !important; }
           .no-print { display: none !important; }
-          .print-slide { break-after: page; page-break-after: always; box-shadow: none !important; border: 0 !important; border-radius: 0 !important; margin: 0 !important; width: 1280px !important; height: 720px !important; }
+          .print-slide { break-after: page; page-break-after: always; box-shadow: none !important; border: 0 !important; border-radius: 0 !important; margin: 0 !important; width: ${pdf.wIn}in !important; height: ${pdf.hIn}in !important; max-width: none !important; overflow: hidden !important; }
+          .print-slide [data-print-surface] { width: ${pdf.wIn}in !important; height: ${pdf.hIn}in !important; aspect-ratio: auto !important; }
+          .print-slide [data-slide-stage] { transform: scale(${(pdf.wIn * 96) / pdf.stageW}) !important; visibility: visible !important; --slide-scale: ${(pdf.wIn * 96) / pdf.stageW} !important; }
           .print-slide:last-child { break-after: auto; page-break-after: auto; }
         }
         .print-slide, .print-slide * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
       `}</style>
           <div className="no-print mx-auto mb-6 max-w-[1280px] space-y-3 px-6 text-xs text-black/60">
             <AuthoringNav deckId={deckId} active="print" />
-            <div className="rounded-lg border border-black/10 bg-white p-3">
-              <strong>{loading ? "Preparing translated slides…" : "Ready to print."}</strong>{" "}
-              {!loading && (
-                <>
-                  If the dialog didn't open,{" "}
-                  <button className="underline" onClick={() => notifyPrintToPdf("deck")}>
-                    click here
-                  </button>
-                  . Select "Save as PDF" for a print-faithful PDF at 16:9.
-                </>
-              )}
-              {lang && !loading && (
-                <span className="ml-1 text-black/40">Language: {lang.toUpperCase()}</span>
-              )}
+            <div className="flex flex-wrap items-center gap-3 rounded-lg border border-black/10 bg-white p-3">
+              <label className="inline-flex items-center gap-2 font-medium text-black/70">
+                Page size
+                <select
+                  value={pageId}
+                  onChange={(e) =>
+                    navigate({
+                      search: (prev) => ({
+                        ...prev,
+                        page: e.target.value === "slide" ? undefined : (e.target.value as PdfFormatId),
+                      }),
+                      replace: true,
+                    })
+                  }
+                  className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-[#03002C]"
+                >
+                  {PDF_FORMAT_IDS.map((id) => (
+                    <option key={id} value={id}>
+                      {PDF_FORMATS[id].label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <span>
+                <strong>{loading ? "Preparing translated slides…" : "Ready to print."}</strong>{" "}
+                {!loading && (
+                  <>
+                    If the dialog didn't open,{" "}
+                    <button className="underline" onClick={() => notifyPrintToPdf("deck")}>
+                      click here
+                    </button>
+                    . Select "Save as PDF"
+                    {pageFit
+                      ? ` — each slide is re-laid out to fill a ${pdf.label} page (${pdf.wIn}×${pdf.hIn} in).`
+                      : " for a print-faithful PDF at 16:9."}
+                  </>
+                )}
+                {lang && !loading && (
+                  <span className="ml-1 text-black/40">Language: {lang.toUpperCase()}</span>
+                )}
+              </span>
             </div>
           </div>
           <div className="mx-auto flex max-w-[1280px] flex-col items-center gap-6 print:max-w-none print:gap-0">
             {overlaidSlides.map((slide, i) => {
               const variant = byId(MODULE_VARIANTS, slide.variantId);
               if (!variant) return null;
+              // Preview width: landscape pages run the full column, portrait
+              // pages a narrower one so a whole page fits on screen.
+              const previewW = pdf.stageH > pdf.stageW ? 820 : 1280;
               return (
                 <div
-                  key={slide.id}
+                  key={`${slide.id}-${pageId}`}
                   className="print-slide overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm"
-                  style={{ width: 1280, height: 720 }}
+                  style={{ width: previewW, maxWidth: "100%" }}
                 >
-                  <ScaledSlide>
+                  <ScaledSlide stageW={pdf.stageW} stageH={pdf.stageH} pageFit={pageFit}>
                     <DeckPackScope pack={packFor({ mode: printMode ?? slide.mode })}>
                       <VizSurfaceProvider surface="print">
                         <VariantRenderer
