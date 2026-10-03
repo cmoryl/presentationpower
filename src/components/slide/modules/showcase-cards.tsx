@@ -286,7 +286,7 @@ registerSlideModule({
                     {card.bullets.length > 0 && (
                       <ul
                         className="mt-6 flex flex-col"
-                        style={{ gap: dense ? 8 : 11, listStyle: "none", padding: 0, margin: 0 }}
+                        style={{ gap: dense ? 8 : 11, listStyle: "none", padding: 0, margin: isDark ? "18px 0 0" : 0 }}
                       >
                         {card.bullets.map((b, bi) => (
                           <li key={bi} className="flex" style={{ gap: 10 }}>
