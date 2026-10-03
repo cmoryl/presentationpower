@@ -1092,6 +1092,7 @@ function renderLocationsVariant(
             </div>
           </div>
           <div
+            data-portrait="map-stack"
             className="mt-8 grid min-h-0 flex-1 gap-12"
             style={{ gridTemplateColumns: n <= 6 ? "1.9fr 1fr" : "1.25fr 1fr" }}
           >
@@ -1109,8 +1110,12 @@ function renderLocationsVariant(
               />
             </div>
             <div
+              data-portrait="city-list"
               className="min-h-0 pl-10"
               style={{
+                ["--p-rows" as string]: Math.ceil(n / Math.min(4, Math.max(2, cols + 1))),
+                ["--p-cols" as string]: Math.min(4, Math.max(2, cols + 1)),
+                ["--p-px" as string]: `${n <= 6 ? 44 : n <= 24 ? 34 : n <= 54 ? 27 : 23}px`,
                 borderLeft: `1px solid ${ink.hairline}`,
                 display: "grid",
                 gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
