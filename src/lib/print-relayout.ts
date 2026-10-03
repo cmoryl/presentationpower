@@ -22,6 +22,16 @@ export function measureFit(stage: HTMLElement): FitMeasure {
   const scale = s.width / W || 1;
   let bottom = 0;
   let overflow = stage.scrollWidth > W + 2;
+  // Text clipped inside its own box (a word cut by the card edge) is a fail too.
+  for (const el of stage.querySelectorAll<HTMLElement>("div, p, h1, h2, h3, span")) {
+    if (el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 2) {
+      const ov = getComputedStyle(el).overflowX;
+      if (ov === "hidden" || ov === "clip") {
+        overflow = true;
+        break;
+      }
+    }
+  }
   for (const el of stage.querySelectorAll<HTMLElement>("p, h1, h2, h3, h4, li, img, svg, span")) {
     const r = el.getBoundingClientRect();
     if (r.width <= 0 || r.height <= 0) continue;
