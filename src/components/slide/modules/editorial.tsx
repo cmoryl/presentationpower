@@ -390,7 +390,7 @@ registerSlideModule({
               {s(c.subtitle) && (
                 <p style={{ marginTop: 18, fontSize: 28, lineHeight: 1.35, color: "#FFFFFF", maxWidth: 1400 }}>{s(c.subtitle)}</p>
               )}
-              <div className="relative mt-10 flex min-h-0 flex-1 items-stretch" style={{ gap: 90 }}>
+              <div data-portrait="vs-stack" className="relative mt-10 flex min-h-0 flex-1 items-stretch" style={{ gap: 90 }}>
                 <Panel heading={s(left.label, "Left")} rows={leftRows} glow={glows[0]} />
                 <div
                   aria-hidden
