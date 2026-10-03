@@ -250,7 +250,7 @@ registerSlideModule({
                     <div
                       style={
                         isDark && !dense
-                          ? { minHeight: `calc(${cssPx(fillPx(25, "body"))} * 2.4 + 4px + ${cssPx(fillPx(24, "body"))} * 2.56)` }
+                          ? { minHeight: `calc(${cssPx(fillPx(25, "body"))} * 2.4 + 4px + ${cssPx(fillPx(24, "body"))} * 2.56 + 18px)` }
                           : undefined
                       }
                     >
