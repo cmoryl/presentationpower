@@ -1469,6 +1469,22 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
       // whatever is painted BEHIND it stays plated too (or a native copy would
       // land on top of the wash), while its children keep exporting natively.
       if (hasUnexpressibleBackground(cs)) {
+        // A framed glass card (hairline border + its own copy) ships as one
+        // see-through picture like the other glass boxes, so its frame and
+        // wash survive; the native fade below drops the frame.
+        const framed =
+          ["Top", "Right", "Bottom", "Left"].some(
+            (sd) => (parseFloat((cs as unknown as Record<string, string>)[`border${sd}Width`]) || 0) > 0,
+          ) &&
+          (parseFloat(cs.borderTopLeftRadius) || 0) >= 4 &&
+          !!(el.textContent ?? "").trim();
+        if (framed) {
+          const glassBox = surfaceShapeFor(el, cs, root, sx, sy, spaceW, spaceH);
+          if (glassBox) {
+            shapes.push(glassBox);
+            continue;
+          }
+        }
         const panel = panelFadeShape(el, cs, root, sx, sy, spaceW, spaceH);
         if (panel) {
           shapes.push(panel);
@@ -2078,7 +2094,9 @@ export function collapseMediaOverlays(
   for (let i = 0; i < shapes.length; i += 1) {
     const media = shapes[i]!;
     if (drop.has(media)) continue;
-    if (media.kind !== "image" || media.w * media.h < MIN_MEDIA) {
+    // A box-surface picture (glass card) is a container, not a photograph:
+    // its contents (bars, dots, chips) stay separate editable shapes.
+    if (media.kind !== "image" || media.w * media.h < MIN_MEDIA || media.surfaceOnly) {
       out.push(media);
       continue;
     }
