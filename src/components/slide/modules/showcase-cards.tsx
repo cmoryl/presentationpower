@@ -23,6 +23,9 @@ import {
   type CapCardTone,
 } from "@/lib/showcase-cards";
 
+import { Cpu, Handshake, LayoutGrid, Sparkles } from "lucide-react";
+
+const cssPx = (v: number | string) => (typeof v === "number" ? `${v}px` : v);
 const AQUA = "#A1FBF9";
 const LAVENDER = "#C2A3FF";
 const DEEP_INK = "#03002C";
@@ -89,7 +92,8 @@ registerSlideModule({
               // band lit by its own brand glow (blue / aqua / lavender).
               const glow = [accent, AQUA, LAVENDER][i % 3];
               const textInk = isDark ? "#FFFFFF" : ink.strong;
-              const markFill = isDark ? glow : fill;
+              void glow;
+              const markFill = isDark ? AQUA : fill;
               return (
                 <div
                   key={i}
@@ -227,8 +231,11 @@ registerSlideModule({
                   <div
                     className="flex min-h-0 flex-1 flex-col"
                     style={{
-                      padding: dense ? "22px 22px 24px" : "28px 28px 30px",
-                      backgroundImage: `${cardWashGradient(fill)}, ${baseTint}`,
+                      padding: dense ? "22px 22px 24px" : isDark ? "34px 28px 30px" : "28px 28px 30px",
+                      backgroundImage: isDark
+                        ? "linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.04) 55%, rgba(255,255,255,0) 100%)"
+                        : `${cardWashGradient(fill)}, ${baseTint}`,
+                      backdropFilter: isDark ? "blur(16px) saturate(130%)" : undefined,
                     }}
                   >
                     {st.showBandRule && (
@@ -238,6 +245,15 @@ registerSlideModule({
                         style={{ height: 3, width: 56, background: markFill, marginBottom: 16 }}
                       />
                     )}
+                    {/* Dark look: reserve a two-line lead + two-line note so every
+                        column's bullets start on the same line. */}
+                    <div
+                      style={
+                        isDark && !dense
+                          ? { minHeight: `calc(${cssPx(fillPx(25, "body"))} * 2.4 + 4px + ${cssPx(fillPx(24, "body"))} * 2.56)` }
+                          : undefined
+                      }
+                    >
                     {card.lead && (
                       <div
                         style={{
@@ -264,6 +280,8 @@ registerSlideModule({
                         {card.leadNote}
                       </div>
                     )}
+                    </div>
+
 
                     {card.bullets.length > 0 && (
                       <ul
