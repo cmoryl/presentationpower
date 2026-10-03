@@ -380,10 +380,28 @@ export function extractTextRuns(
       }
     }
 
+    // Flex/grid boxes centre their text with justify/align, not text-align, so
+    // the element rect is the whole container (e.g. a step numeral filling a
+    // circle). Place from the text's own single-line rect, centred, so
+    // PowerPoint draws it where the browser does instead of top-left.
+    let flexCentred = false;
+    if (!textOnlyX && /flex|grid/.test(cs.display) && el.children.length === 0) {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const rects = Array.from(range.getClientRects()).filter((r) => r.width > 0.5);
+      const tr = range.getBoundingClientRect();
+      if (rects.length === 1 && tr.width >= 2 && tr.height >= 2 && (tr.width < rect.width - 4 || tr.height < rect.height - 4)) {
+        const grow = tr.width * 0.2 + 8;
+        rect = new DOMRect(tr.left - grow / 2, tr.top, tr.width + grow, tr.height);
+        textOnlyX = true;
+        flexCentred = true;
+      }
+    }
+
     const padL = textOnlyX ? 0 : parseFloat(cs.paddingLeft) || 0;
     const padR = textOnlyX ? 0 : parseFloat(cs.paddingRight) || 0;
-    const padT = parseFloat(cs.paddingTop) || 0;
-    const padB = parseFloat(cs.paddingBottom) || 0;
+    const padT = flexCentred ? 0 : parseFloat(cs.paddingTop) || 0;
+    const padB = flexCentred ? 0 : parseFloat(cs.paddingBottom) || 0;
 
     const x = (rect.left - stageRect.left + padL) * sx;
     const y = (rect.top - stageRect.top + padT) * sy;
@@ -399,7 +417,7 @@ export function extractTextRuns(
     const weight = parseInt(cs.fontWeight, 10);
     const alignRaw = cs.textAlign;
     const align: TextRun["align"] =
-      alignRaw === "center"
+      flexCentred || alignRaw === "center"
         ? "center"
         : alignRaw === "right" || alignRaw === "end"
           ? "right"
