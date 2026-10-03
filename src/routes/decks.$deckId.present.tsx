@@ -84,7 +84,8 @@ function PresenterView() {
   }, [i]);
   const isMobile = useIsMobile();
   const thumbW = isMobile ? 104 : 160;
-  const [stripOpen, setStripOpen] = useState(true);
+  // Live talks start clean: the strip overlaps the slide, so it opens on demand (T).
+  const [stripOpen, setStripOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const [focusedThumb, setFocusedThumb] = useState(0);
 
@@ -234,7 +235,7 @@ function PresenterView() {
   if (role === "console") {
     return (
       <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
-        <SlideSkinProvider skin={deck.context?.skin}>
+        <SlideSkinProvider skin={null}>
           <SlideMediaRefreshProvider slides={visibleSlides}>
             <div className="fixed inset-0 flex flex-col bg-[#03002C] text-white dark:bg-card">
               <header className="flex items-center justify-between border-b border-white/15 px-5 py-3">
@@ -373,7 +374,7 @@ function PresenterView() {
 
   return (
     <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
-      <SlideSkinProvider skin={deck.context?.skin}>
+      <SlideSkinProvider skin={null}>
         <SlideMediaRefreshProvider slides={visibleSlides}>
           <div
             className="fixed inset-0 flex flex-col items-center justify-center bg-black"
