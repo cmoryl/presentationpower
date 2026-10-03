@@ -499,12 +499,20 @@ export async function rasterizeObjectPlate(args: ExactPlateArgs): Promise<{
     await nextFrames(2);
     const effMode = args.mode;
     const { width } = rasterSize(args.quality ?? null);
-    const data = await captureSlideAsDataUrl(stage, {
-      mode: effMode,
-      targetWidth: width,
-      cacheBust: true,
-      readyTimeoutMs: 9000,
-    });
+    // Hide `data-plate-hide` subtrees (photo medallions that ship as their own
+    // picture) so their washes don't bake a stray disc into the plate.
+    document.documentElement.classList.add("tp-pptx-plate");
+    let data: string | null;
+    try {
+      data = await captureSlideAsDataUrl(stage, {
+        mode: effMode,
+        targetWidth: width,
+        cacheBust: true,
+        readyTimeoutMs: 9000,
+      });
+    } finally {
+      document.documentElement.classList.remove("tp-pptx-plate");
+    }
     if (!data) return null;
     const { compressOpaquePlate } = await import("./plate-compress");
     return {
