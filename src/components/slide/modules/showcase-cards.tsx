@@ -113,7 +113,7 @@ registerSlideModule({
                   <div
                     style={{
                       position: "relative",
-                      flex: `0 0 ${Math.round(st.imageRatio * 100)}%`,
+                      flex: `0 0 ${Math.round(st.imageRatio * (isDark ? 84 : 100))}%`,
                       minHeight: 0,
                       overflow: "hidden",
                     }}
@@ -150,7 +150,7 @@ registerSlideModule({
                         aria-hidden
                         className="absolute z-20 flex items-center justify-center"
                         style={{
-                          top: `calc(${Math.round(st.imageRatio * 100)}% - 34px)`,
+                          top: `calc(${Math.round(st.imageRatio * 84)}% - 34px)`,
                           left: 24,
                           width: 68,
                           height: 68,
@@ -250,7 +250,7 @@ registerSlideModule({
                     <div
                       style={
                         isDark && !dense
-                          ? { minHeight: `calc(${cssPx(fillPx(25, "body"))} * 2.4 + 4px + ${cssPx(fillPx(24, "body"))} * 2.56 + 18px)` }
+                          ? { minHeight: `calc(${cssPx(fillPx(25, "body"))} * 2.4 + 4px + ${cssPx(fillPx(24, "body"))} * 2.56 + 10px)` }
                           : undefined
                       }
                     >
