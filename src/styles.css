@@ -1472,3 +1472,16 @@ body.export-mode [data-print-surface] {
   max-width: 960px;
   width: 100%;
 }
+/* Hero + list side by side → hero on top, list below, filling the page. */
+[data-page-orient="portrait"] [data-portrait="stack-rows"] {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 0.85fr) minmax(0, 1.15fr) !important;
+  height: 1300px !important;
+}
+[data-page-orient="portrait"] [data-portrait="stack-rows"] > :first-child {
+  grid-row: auto !important;
+}
+/* Ascending pillars stand taller on a tall page. */
+[data-page-orient="portrait"] [data-portrait="rise"] > :nth-child(1) { height: 960px !important; }
+[data-page-orient="portrait"] [data-portrait="rise"] > :nth-child(2) { height: 1120px !important; }
+[data-page-orient="portrait"] [data-portrait="rise"] > :nth-child(3) { height: 1280px !important; }
