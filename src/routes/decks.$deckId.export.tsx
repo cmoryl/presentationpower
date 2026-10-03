@@ -8,6 +8,7 @@ import { Download, FileText, Loader2, Printer, Share2 } from "lucide-react";
 import { useDeckStore } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
+import { relayoutForPage } from "@/lib/print-relayout";
 import { PDF_FORMATS, type PdfFormatId } from "@/lib/pdf-page-formats";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import {
@@ -105,6 +106,20 @@ function ExportView() {
   // layout fills it (taller canvas for paper, narrower canvas for portrait).
   const [pdfFormat, setPdfFormat] = useState<PdfFormatId>("slide");
   const pdf = PDF_FORMATS[pdfFormat];
+  // Taller pages: restack each slide's main row so content uses the height.
+  useEffect(() => {
+    if (pdf.stageH <= pdf.stageW * 0.6) return;
+    let undo: (() => void) | null = null;
+    const t = setTimeout(() => {
+      undo = relayoutForPage(
+        Array.from(document.querySelectorAll<HTMLElement>(".print-page [data-slide-stage]")),
+      );
+    }, 800);
+    return () => {
+      clearTimeout(t);
+      undo?.();
+    };
+  }, [pdf]);
   const [override, setOverride] = useState(false);
   const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
   const [preflightBusy, setPreflightBusy] = useState(false);
