@@ -612,6 +612,7 @@ body.export-mode [data-print-surface] {
    baked into a PNG/PDF export or a printed page. `tp-export-capture` is
    toggled by src/lib/export-chrome-suppress.ts around every rasterization;
    the @media print block covers browser "Save as PDF". */
+.tp-pptx-plate [data-plate-hide],
 .tp-export-capture [data-export-ignore="true"],
 .tp-export-capture [data-editing-chrome],
 .tp-export-capture [data-canvas-guide],

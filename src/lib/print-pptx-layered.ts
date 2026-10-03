@@ -99,14 +99,23 @@ export async function capturePrintPageLayers(
     // Two frames so the browser has settled the neutralised paint before capture.
     await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
 
-    const plate = await withExportChrome(() =>
-      captureSlideAsDataUrl(node, {
-        mode: opts.mode ?? "light",
-        targetWidth: opts.targetWidth,
-        cacheBust: true,
-        readyTimeoutMs: 9000,
-      }),
-    );
+    // `data-plate-hide` subtrees (photo medallions whose photo ships as its own
+    // picture) are hidden only for the PowerPoint plate, so their washes don't
+    // bake a stray disc into the background.
+    document.documentElement.classList.add("tp-pptx-plate");
+    let plate: string | null;
+    try {
+      plate = await withExportChrome(() =>
+        captureSlideAsDataUrl(node, {
+          mode: opts.mode ?? "light",
+          targetWidth: opts.targetWidth,
+          cacheBust: true,
+          readyTimeoutMs: 9000,
+        }),
+      );
+    } finally {
+      document.documentElement.classList.remove("tp-pptx-plate");
+    }
     if (!plate) return null;
 
     const dx = opts.offsetPx?.x ?? 0;

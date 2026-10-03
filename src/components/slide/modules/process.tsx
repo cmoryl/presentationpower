@@ -502,7 +502,7 @@ registerSlideModule({
                 <LoopHalo uid={`sp-${stepNo}`} />
 
                 {/* Photo medallion. */}
-                <div className="absolute overflow-hidden rounded-full" style={{ inset: "7%" }}>
+                <div data-plate-hide className="absolute overflow-hidden rounded-full" style={{ inset: "7%" }}>
                   <MediaTile
                     brand={brand}
                     seed={s(c.mediaSeed, s(c.title, "step-spotlight"))}
@@ -709,6 +709,7 @@ registerSlideModule({
                           <LoopHalo uid={`st-${si}`} slim={slim} />
                           {/* Photo medallion with duotone wash so type clears. */}
                           <div
+                            data-plate-hide
                             className="absolute overflow-hidden rounded-full"
                             style={{ inset: slim ? "8%" : "11%" }}
                           >
