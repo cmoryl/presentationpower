@@ -155,13 +155,13 @@ registerSlideModule({
                           width: 68,
                           height: 68,
                           borderRadius: 999,
-                          background: "radial-gradient(circle at 35% 30%, rgba(255,255,255,0.28), rgba(11,16,48,0.85) 70%)",
+                          background: "#141A52",
                           border: "1.5px solid rgba(255,255,255,0.45)",
                           boxShadow: `0 0 0 6px rgba(161,251,249,0.10), 0 0 24px ${AQUA}66`,
                           color: "#FFFFFF",
                         }}
                       >
-                        <Icon size={30} strokeWidth={1.8} style={{ filter: `drop-shadow(0 0 6px ${AQUA})` }} />
+                        <Icon size={30} strokeWidth={1.8} color={AQUA} />
                       </div>
                     );
                   })()}
