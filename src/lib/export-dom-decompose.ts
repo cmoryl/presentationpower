@@ -2094,7 +2094,9 @@ export function collapseMediaOverlays(
   for (let i = 0; i < shapes.length; i += 1) {
     const media = shapes[i]!;
     if (drop.has(media)) continue;
-    if (media.kind !== "image" || media.w * media.h < MIN_MEDIA) {
+    // A box-surface picture (glass card) is a container, not a photograph:
+    // its contents (bars, dots, chips) stay separate editable shapes.
+    if (media.kind !== "image" || media.w * media.h < MIN_MEDIA || media.surfaceOnly) {
       out.push(media);
       continue;
     }
