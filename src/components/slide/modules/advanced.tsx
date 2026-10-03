@@ -1569,7 +1569,7 @@ registerSlideModule({
           return (
             <SlideFrame brand={brand} pageNumber={pageNumber}>
               <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-              <svg data-export-text viewBox="0 0 1760 800" className="mt-4 w-full flex-1" style={{ overflow: "visible" }} aria-label={s(c.subtitle)}>
+              <svg data-export-text data-portrait-crop viewBox="0 0 1760 800" className="mt-4 w-full flex-1" style={{ overflow: "visible" }} aria-label={s(c.subtitle)}>
                 <defs>
                   <linearGradient id={`${uid}-g`} x1="0" y1="1" x2="1" y2="0">
                     <stop offset="0" stopColor={isDark ? DBL : acc} />
@@ -1704,7 +1704,7 @@ registerSlideModule({
               </div>
             )}
             <div className="mt-10">
-              <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ overflow: "visible" }}>
+              <svg data-portrait-crop viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ overflow: "visible" }}>
                 <defs>
                   <linearGradient id={gradId} x1="0" x2="1" y1="0" y2="0">
                     <stop offset="0%" stopColor={primary} stopOpacity={0.55} />
@@ -2070,7 +2070,7 @@ registerSlideModule({
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-            <div className="mt-8 grid gap-12" style={{ gridTemplateColumns: "1fr 340px" }}>
+            <div data-portrait="stack-one" className="mt-8 grid gap-12" style={{ gridTemplateColumns: "1fr 340px" }}>
               <div className="relative ml-14" style={{ height: S }}>
                 <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 overflow-hidden rounded-[22px]" style={{ border: `1px solid ${isDark ? "rgba(255,255,255,0.14)" : ink.hairline}` }}>
                   {[0, 1, 2, 3].map((q) => {
