@@ -11,6 +11,7 @@ import { SlideIntro } from "@/components/slide/SlideIntro";
 import { SectionCue } from "@/components/slide/SectionCue";
 import { SlideSkinProvider } from "@/components/slide/SlideSkinContext";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import {
   DeckPackScope,
   deckPack,
@@ -274,6 +275,7 @@ function PresenterView() {
                 <div className="flex min-h-0 flex-col gap-3">
                   <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-white/15 bg-black">
                     {slide && variant && (
+                      <ScaledSlide>
                       <DeckPackScope pack={packFor(slide)}>
                         <VariantRenderer
                           slide={slide}
@@ -282,9 +284,12 @@ function PresenterView() {
                           pageNumber={i + 1}
                           clientName={brief?.prospect}
                           clientLogoUrl={clientLogo.url}
+                subCompany={deck.subCompany}
+                logoOrientation={deck.context?.logoOrientation ?? "horizontal"}
                           mode={slide.mode ?? "light"}
                         />
                       </DeckPackScope>
+                      </ScaledSlide>
                     )}
                   </div>
                   <div className="flex items-center gap-3 text-sm text-white/80">
@@ -319,15 +324,7 @@ function PresenterView() {
                     <div className="mt-2 aspect-[16/9] overflow-hidden rounded-lg border border-white/15 bg-black">
                       {nextSlide && nextVariant ? (
                         <div className="relative h-full w-full">
-                          <div
-                            className="absolute inset-0"
-                            style={{
-                              transform: "scale(0.2)",
-                              transformOrigin: "top left",
-                              width: 1920,
-                              height: 1080,
-                            }}
-                          >
+<ScaledSlide>
                             <SlideThumbnailContext.Provider value={true}>
                               <DeckPackScope pack={packFor(nextSlide)}>
                                 <VariantRenderer
@@ -337,6 +334,8 @@ function PresenterView() {
                                   pageNumber={i + 2}
                                   clientName={brief?.prospect}
                                   clientLogoUrl={clientLogo.url}
+                subCompany={deck.subCompany}
+                logoOrientation={deck.context?.logoOrientation ?? "horizontal"}
                                   mode={nextSlide.mode ?? "light"}
                                 />
                               </DeckPackScope>
@@ -406,6 +405,8 @@ function PresenterView() {
                         pageNumber={i + 1}
                         clientName={brief?.prospect}
                         clientLogoUrl={clientLogo.url}
+                subCompany={deck.subCompany}
+                logoOrientation={deck.context?.logoOrientation ?? "horizontal"}
                         mode={slide.mode ?? "light"}
                       />
                       </SlideIntro>
@@ -485,6 +486,8 @@ function PresenterView() {
                               pageNumber={idx + 1}
                               clientName={brief?.prospect}
                               clientLogoUrl={clientLogo.url}
+                subCompany={deck.subCompany}
+                logoOrientation={deck.context?.logoOrientation ?? "horizontal"}
                               mode={s.mode ?? "light"}
                             />
                           </DeckPackScope>
@@ -589,15 +592,7 @@ function PresenterView() {
                   <div className="mt-3 aspect-[16/9] overflow-hidden rounded-lg border border-white/15 bg-black">
                     {nextSlide && nextVariant ? (
                       <div className="relative h-full w-full">
-                        <div
-                          className="absolute inset-0"
-                          style={{
-                            transform: "scale(0.125)",
-                            transformOrigin: "top left",
-                            width: 1920,
-                            height: 1080,
-                          }}
-                        >
+<ScaledSlide>
                           <SlideThumbnailContext.Provider value={true}>
                             <DeckPackScope pack={packFor(nextSlide)}>
                               <VariantRenderer
@@ -607,6 +602,8 @@ function PresenterView() {
                                 pageNumber={i + 2}
                                 clientName={brief?.prospect}
                                 clientLogoUrl={clientLogo.url}
+                subCompany={deck.subCompany}
+                logoOrientation={deck.context?.logoOrientation ?? "horizontal"}
                                 mode={nextSlide.mode ?? "light"}
                               />
                             </DeckPackScope>
