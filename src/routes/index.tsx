@@ -34,6 +34,7 @@ import { useSignedIn } from "@/components/CloudDeckControls";
 import { useDeckStore, type Deck } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { DeckCoverThumb } from "@/components/slide/DeckCoverThumb";
 import {
   BRAND_MODES,
   MODULE_FAMILIES,
