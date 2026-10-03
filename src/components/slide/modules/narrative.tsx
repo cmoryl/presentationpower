@@ -77,7 +77,7 @@ registerSlideModule({
               <AuroraOrb x={90} y={20} size={820} />
               <div className="relative flex h-full flex-col">
                 <SlideTitle brand={brand} title={s(c.title)} />
-                <div className="mt-auto grid grid-cols-3 items-end gap-10">
+                <div data-portrait="rise" className="mt-auto grid grid-cols-3 items-end gap-10">
                   {its.map((it, i) => (
                     <div
                       key={i}
@@ -499,6 +499,7 @@ registerSlideModule({
             <div className="relative">
               <SlideTitle brand={brand} title={s(c.title)} />
               <div
+                data-portrait="stack-rows"
                 className={`mt-10 grid gap-8 ${stack ? "grid-cols-[1fr_1.15fr]" : "grid-cols-2"}`}
                 style={{ gridTemplateRows: stack ? "1fr" : "1fr 1fr", height: 760 }}
               >
