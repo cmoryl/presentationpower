@@ -116,8 +116,16 @@ registerSlideModule({
                       flex: `0 0 ${Math.round(st.imageRatio * (isDark ? 84 : 100))}%`,
                       minHeight: 0,
                       overflow: "hidden",
+                      borderTopLeftRadius: st.cardRadius,
+                      borderTopRightRadius: st.cardRadius,
                     }}
                   >
+                    <div
+                      aria-hidden
+                      data-decorative
+                      className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[3px]"
+                      style={{ background: "linear-gradient(90deg, transparent, var(--slide-accent-text), transparent)" }}
+                    />
                     <MediaTile
                       brand={brand}
                       seed={s(card.mediaSeed, s(card.label, `capability-${i + 1}`))}
