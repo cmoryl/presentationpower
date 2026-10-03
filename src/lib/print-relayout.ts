@@ -8,7 +8,7 @@
  * fills the page best without clipping anything wins, per slide.
  */
 
-export const FIT_WIDTHS = [1920, 1600, 1400, 1280, 1120, 1000, 900];
+export const FIT_WIDTHS = [1920, 1600, 1440, 1280];
 
 const FOOTER_SHARE = 0.9;
 
