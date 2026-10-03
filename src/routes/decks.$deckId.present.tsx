@@ -340,7 +340,7 @@ function PresenterView() {
                                 />
                               </DeckPackScope>
                             </SlideThumbnailContext.Provider>
-                          </div>
+                          </ScaledSlide>
                         </div>
                       ) : (
                         <div className="flex h-full items-center justify-center text-xs text-white/40">
@@ -608,7 +608,7 @@ function PresenterView() {
                               />
                             </DeckPackScope>
                           </SlideThumbnailContext.Provider>
-                        </div>
+                        </ScaledSlide>
                       </div>
                     ) : (
                       <div className="flex h-full items-center justify-center text-xs text-white/40">
