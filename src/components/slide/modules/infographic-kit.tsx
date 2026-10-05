@@ -3,7 +3,7 @@
 // stated percentage, bars are scaled against the largest figure in their own
 // group. Nothing here invents a trend or a series.
 
-import type { CSSProperties, ReactNode } from "react";
+import { useId, type CSSProperties, type ReactNode } from "react";
 import { fillPx } from "@/lib/open-space-fill";
 
 /** Approved brand fills (enterprise palette: primary, secondary accents, ink). */
@@ -46,16 +46,24 @@ export function Donut({
 }) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
+  const gid = useId().replace(/:/g, "");
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden style={{ overflow: "visible" }}>
+        <defs>
+          <linearGradient id={`d${gid}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor={`color-mix(in oklab, ${color} 55%, #FFFFFF)`} />
+            <stop offset="1" stopColor={color} />
+          </linearGradient>
+        </defs>
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={track} strokeWidth={stroke} />
         <circle
           cx={size / 2}
           cy={size / 2}
           r={r}
           fill="none"
-          stroke={color}
+          style={{ filter: `drop-shadow(0 0 ${Math.round(stroke * 0.6)}px color-mix(in oklab, ${color} 60%, transparent))` }}
+          stroke={`url(#d${gid})`}
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={`${(pct / 100) * c} ${c}`}
@@ -74,6 +82,7 @@ export function Figure({
   color,
   unitColor,
   style,
+  gradient,
 }: {
   value: string;
   unit?: string;
@@ -81,7 +90,12 @@ export function Figure({
   color: string;
   unitColor?: string;
   style?: CSSProperties;
+  /** Optional gradient fill for the numerals (dark grounds). */
+  gradient?: string;
 }) {
+  const grad: CSSProperties = gradient
+    ? { backgroundImage: gradient, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }
+    : {};
   return (
     <div
       className="tabular-nums"
@@ -92,6 +106,7 @@ export function Figure({
         letterSpacing: "-0.04em",
         color,
         whiteSpace: "nowrap",
+        ...grad,
         ...style,
       }}
     >
@@ -101,7 +116,35 @@ export function Figure({
   );
 }
 
-/** Solid colour block — the core infographic tile. */
+/** Layered surfaces for each fill: a lit gradient body, a soft glow from one
+ * corner and a fine sheen, so blocks read as dimensional objects, not flat paint. */
+const FILL_SKIN: Record<InfoFill, { body: string; glow: string; shadow: string; edge: string }> = {
+  blue: {
+    body: "linear-gradient(145deg, color-mix(in oklab, #003FC7 82%, #A1FBF9) 0%, #003FC7 42%, color-mix(in oklab, #003FC7 55%, #03002C) 100%)",
+    glow: "radial-gradient(70% 60% at 100% 0%, rgba(161,251,249,0.45), transparent 70%)",
+    shadow: "0 34px 60px -30px rgba(0,63,199,0.85), 0 10px 22px -12px rgba(3,0,44,0.45)",
+    edge: "rgba(255,255,255,0.32)",
+  },
+  navy: {
+    body: "linear-gradient(160deg, color-mix(in oklab, #03002C 78%, #003FC7) 0%, #03002C 55%, #03002C 100%)",
+    glow: "radial-gradient(65% 55% at 92% 6%, rgba(0,63,199,0.9), transparent 70%), radial-gradient(55% 45% at 0% 100%, rgba(194,163,255,0.4), transparent 72%)",
+    shadow: "0 40px 70px -34px rgba(3,0,44,0.9), 0 12px 26px -14px rgba(3,0,44,0.5)",
+    edge: "rgba(255,255,255,0.16)",
+  },
+  aqua: {
+    body: "linear-gradient(150deg, color-mix(in oklab, #A1FBF9 60%, #FFFFFF) 0%, #A1FBF9 45%, color-mix(in oklab, #A1FBF9 70%, #003FC7) 100%)",
+    glow: "radial-gradient(70% 60% at 100% 0%, rgba(255,255,255,0.75), transparent 70%)",
+    shadow: "0 30px 56px -30px rgba(0,63,199,0.55), 0 8px 20px -12px rgba(3,0,44,0.3)",
+    edge: "rgba(255,255,255,0.7)",
+  },
+  lavender: {
+    body: "linear-gradient(150deg, color-mix(in oklab, #C2A3FF 55%, #FFFFFF) 0%, #C2A3FF 48%, color-mix(in oklab, #C2A3FF 72%, #003FC7) 100%)",
+    glow: "radial-gradient(70% 60% at 100% 0%, rgba(255,255,255,0.6), transparent 70%)",
+    shadow: "0 30px 56px -30px rgba(80,40,190,0.6), 0 8px 20px -12px rgba(3,0,44,0.3)",
+    edge: "rgba(255,255,255,0.6)",
+  },
+};
+
 export function FillTile({
   fill,
   className,
@@ -114,10 +157,52 @@ export function FillTile({
   children: ReactNode;
 }) {
   const f = INFO_FILL[fill];
+  const k = FILL_SKIN[fill];
   return (
     <div
-      className={`relative overflow-hidden rounded-[22px] ${className ?? ""}`}
-      style={{ background: f.bg, color: f.fg, minWidth: 0, ...style }}
+      className={`relative overflow-hidden rounded-[26px] ${className ?? ""}`}
+      style={{
+        background: `${k.glow}, ${k.body}`,
+        color: f.fg,
+        minWidth: 0,
+        boxShadow: `${k.shadow}, inset 0 1px 0 ${k.edge}, inset 0 0 0 1px ${k.edge.replace(/[\d.]+\)$/, "0.12)")}`,
+        ...style,
+      }}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(115deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 14px)",
+          maskImage: "linear-gradient(200deg, black, transparent 60%)",
+          WebkitMaskImage: "linear-gradient(200deg, black, transparent 60%)",
+        }}
+      />
+      {children}
+    </div>
+  );
+}
+
+/** Glass panel for light/dark grounds — frosted body, lit top edge, deep shadow. */
+export function GlassPanel({ dark, className, style, children }: { dark: boolean; className?: string; style?: CSSProperties; children: ReactNode }) {
+  return (
+    <div
+      className={`relative overflow-hidden rounded-[26px] ${className ?? ""}`}
+      style={{
+        background: dark
+          ? "linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03))"
+          : "linear-gradient(165deg, rgba(255,255,255,0.96), rgba(238,241,247,0.78))",
+        backdropFilter: "blur(18px) saturate(140%)",
+        WebkitBackdropFilter: "blur(18px) saturate(140%)",
+        border: dark ? "1px solid rgba(255,255,255,0.14)" : "1px solid rgba(255,255,255,0.9)",
+        boxShadow: dark
+          ? "0 30px 60px -30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.18)"
+          : "0 36px 70px -36px rgba(3,0,44,0.5), 0 10px 24px -16px rgba(0,63,199,0.35), inset 0 1px 0 #FFFFFF",
+        minWidth: 0,
+        minHeight: 0,
+        ...style,
+      }}
     >
       {children}
     </div>
@@ -196,15 +281,31 @@ export function RadialBars({
     return `M ${x0} ${y0} A ${r} ${r} 0 ${deg > 180 ? 1 : 0} 1 ${x1} ${y1}`;
   };
   void start;
+  const gid = useId().replace(/:/g, "");
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg width={size} height={size} aria-hidden>
+      <svg width={size} height={size} aria-hidden style={{ overflow: "visible" }}>
+        <defs>
+          {rings.map((g, i) => (
+            <linearGradient key={i} id={`r${gid}${i}`} x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0" stopColor={g.color} />
+              <stop offset="1" stopColor={`color-mix(in oklab, ${g.color} 50%, #FFFFFF)`} />
+            </linearGradient>
+          ))}
+        </defs>
         {rings.map((g, i) => {
           const r = cx - stroke / 2 - i * (stroke + gap);
           return (
             <g key={i}>
               <path d={arc(r, sweep)} fill="none" stroke={track} strokeWidth={stroke} strokeLinecap="round" />
-              <path d={arc(r, Math.max(0.5, (g.pct / 100) * sweep))} fill="none" stroke={g.color} strokeWidth={stroke} strokeLinecap="round" />
+              <path
+                d={arc(r, Math.max(0.5, (g.pct / 100) * sweep))}
+                fill="none"
+                stroke={`url(#r${gid}${i})`}
+                strokeWidth={stroke}
+                strokeLinecap="round"
+                style={{ filter: `drop-shadow(0 0 ${Math.round(stroke * 0.45)}px color-mix(in oklab, ${g.color} 55%, transparent))` }}
+              />
             </g>
           );
         })}
@@ -248,8 +349,8 @@ export function LogLollipop({
             {ticks.map((t) => (
               <span key={t} aria-hidden className="absolute inset-y-0 w-px" style={{ left: `${pos(t)}%`, background: hairline }} />
             ))}
-            <span aria-hidden className="absolute top-1/2 h-[6px] -translate-y-1/2 rounded-full" style={{ left: 0, width: `${pos(r.n)}%`, background: r.color }} />
-            <span aria-hidden className="absolute top-1/2 h-[22px] w-[22px] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ left: `${pos(r.n)}%`, background: r.color, boxShadow: `0 0 0 6px ${hairline}` }} />
+            <span aria-hidden className="absolute top-1/2 h-[6px] -translate-y-1/2 rounded-full" style={{ left: 0, width: `${pos(r.n)}%`, background: `linear-gradient(90deg, color-mix(in oklab, ${r.color} 15%, transparent), ${r.color})`, height: 10, boxShadow: `0 0 14px color-mix(in oklab, ${r.color} 60%, transparent)` }} />
+            <span aria-hidden className="absolute top-1/2 h-[22px] w-[22px] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ left: `${pos(r.n)}%`, background: `radial-gradient(circle at 35% 30%, #FFFFFF, ${r.color} 55%)`, boxShadow: `0 0 0 6px color-mix(in oklab, ${r.color} 25%, transparent), 0 0 18px ${r.color}` }} />
           </div>
         </div>
       ))}
