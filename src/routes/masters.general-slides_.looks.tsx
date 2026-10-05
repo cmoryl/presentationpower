@@ -137,6 +137,19 @@ function LooksPage() {
   );
 }
 
+// Each slide frames the look differently (mirror + zoom into a different
+// area) so the example deck reads as a family of grounds, not one repeated image.
+const VARIATIONS = [
+  { flip: "none", zoom: 1, offsetX: 0, offsetY: 0 },
+  { flip: "x", zoom: 1.35, offsetX: -60, offsetY: -40 },
+  { flip: "y", zoom: 1.6, offsetX: 70, offsetY: 50 },
+  { flip: "xy", zoom: 1.25, offsetX: 40, offsetY: -70 },
+  { flip: "x", zoom: 1.8, offsetX: 80, offsetY: 80 },
+  { flip: "none", zoom: 1.5, offsetX: -80, offsetY: 60 },
+  { flip: "y", zoom: 2.1, offsetX: -40, offsetY: -80 },
+  { flip: "xy", zoom: 1.7, offsetX: 0, offsetY: 90 },
+] as const;
+
 function LookDeck({ masterId, look }: { masterId: string; look: Look }) {
   const routeId = `cloud-${masterId}`;
   const gate = useCloudDeckGate(routeId, "Loading the master deck…");
@@ -159,7 +172,7 @@ function LookDeck({ masterId, look }: { masterId: string; look: Look }) {
       {deck.slides.filter((s) => !s.hidden).map((slide, i) => {
         const variant = byId(MODULE_VARIANTS, slide.variantId);
         if (!variant) return null;
-        const s = bg ? { ...slide, content: { ...(slide.content as object), background: bg } } : slide;
+        const s = bg ? { ...slide, content: { ...(slide.content as object), background: { ...bg, ...VARIATIONS[i % VARIATIONS.length] } } } : slide;
         return (
           <figure key={slide.id} className="overflow-hidden rounded-lg border border-border">
             <SlideSkinProvider skin={null}>
