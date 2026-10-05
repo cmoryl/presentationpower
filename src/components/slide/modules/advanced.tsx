@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 import type { CSSProperties } from "react";
 import { MapPin } from "lucide-react";
-import { Donut, FillTile, Figure, INFO_FILL, Pictogram, numOf, pctOf, type InfoFill } from "./infographic-kit";
+import { Donut, FillTile, Figure, INFO_FILL, Pictogram, RadialBars, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 type IconType = typeof Sparkles;
 
@@ -576,79 +576,88 @@ registerSlideModule({
           void marks;
           void surf;
           void bod;
-          const maxA = Math.max(1, ...gA.map((it) => numOf(s(it.value))));
-          const barFills: InfoFill[] = ["blue", "aqua", "lavender"];
-          const tileFills: InfoFill[] = isDark ? ["blue", "aqua", "lavender"] : ["blue", "navy", "lavender"];
+          const glyphFor = (label: string) => {
+            const L = label.toLowerCase();
+            return (col: string, sz: number) =>
+              /year/.test(L) ? (
+                <span style={{ width: Math.round(sz * 0.3), height: sz, borderRadius: 3, background: col, display: "inline-block" }} />
+              ) : /office|cit/.test(L) ? (
+                <MapPin size={sz} color={col} strokeWidth={2} />
+              ) : (
+                <span style={{ width: sz * 0.78, height: sz * 0.78, borderRadius: 999, background: col, display: "inline-block" }} />
+              );
+          };
+          const ringCols = [INFO_FILL.blue.bg, isDark ? INFO_FILL.aqua.bg : "#03002C", INFO_FILL.lavender.bg];
+          const heroA = gA[0];
+          const restA = gA.slice(1, 3);
           return (
             <SlideFrame brand={brand} pageNumber={pageNumber}>
               <SlideTitle brand={brand} title={s(c.title, variant.name)} />
               {s(c.subtitle) && (
-                <div className="mt-3" style={{ fontSize: fillPx(24, "body"), color: ink.body }}>
-                  {s(c.subtitle)}
-                </div>
+                <div className="mt-3" style={{ fontSize: fillPx(24, "body"), color: ink.body }}>{s(c.subtitle)}</div>
               )}
-              <div className="slide-fill-stretch mt-8 grid gap-6" style={{ gridTemplateRows: "auto 1fr" }}>
-                <section className="flex flex-col gap-4">
-                  {kick(s(groups[0]?.label))}
-                  <div className="grid grid-cols-3 gap-5">
-                  {gA.slice(0, 3).map((it, i) => {
-                    const n = Math.min(40, Math.round(numOf(s(it.value))));
-                    const f = INFO_FILL[barFills[i % 3]!];
-                    const L = s(it.label).toLowerCase();
-                    const glyph = (col: string, sz: number) =>
-                      /year/.test(L) ? (
-                        <span style={{ width: Math.round(sz * 0.32), height: sz, borderRadius: 3, background: col, display: "inline-block" }} />
-                      ) : /office|cit/.test(L) ? (
-                        <MapPin size={sz} color={col} strokeWidth={2} />
-                      ) : (
-                        <span style={{ width: sz * 0.8, height: sz * 0.8, borderRadius: 5, background: col, display: "inline-block" }} />
-                      );
-                    void maxA;
-                    return (
-                      <div
-                        key={i}
-                        className="relative flex flex-col gap-3 overflow-hidden rounded-[20px] p-6"
-                        style={{
-                          background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.8)",
-                          border: `1px solid ${ink.hairline}`,
-                          boxShadow: isDark ? undefined : "0 14px 30px -20px rgba(3,0,44,0.4)",
-                        }}
-                      >
-                        <span aria-hidden className="absolute inset-x-0 top-0 h-[6px]" style={{ background: f.bg }} />
-                        <div className="flex items-end gap-4">
-                          <Figure value={s(it.value)} px={84} color={ink.strong} />
-                          {lab(s(it.label), 20)}
-                        </div>
-                        <Pictogram count={n} size={22} color={isDark && barFills[i % 3] === "blue" ? INFO_FILL.aqua.bg : f.bg} render={glyph} />
-                        {s(it.body) && <span style={{ fontSize: fillPx(15, "body"), color: ink.muted }}>{s(it.body)}</span>}
-                      </div>
-                    );
-                  })}
+              <div className="slide-fill-stretch mt-7 grid min-h-0 gap-5" style={{ gridTemplateColumns: "minmax(0,5fr) minmax(0,7fr)" }}>
+                <FillTile fill="navy" className="flex flex-col gap-6 p-8">
+                  <div aria-hidden className="pointer-events-none absolute -right-28 -top-28 h-[440px] w-[440px] rounded-full" style={{ background: "radial-gradient(circle, rgba(0,63,199,0.8), transparent 68%)" }} />
+                  <div className="relative uppercase font-mono" style={{ fontSize: fillPx(13, "kicker"), letterSpacing: "0.26em", color: INFO_FILL.aqua.bg, fontWeight: 600 }}>
+                    {s(groups[0]?.label)}
                   </div>
-                </section>
-                <section className="flex min-h-0 flex-col gap-4">
+                  {heroA && (
+                    <div className="relative">
+                      <div className="flex items-end gap-5">
+                        <Figure value={s(heroA.value)} px={150} color="#FFFFFF" />
+                        <div style={{ fontSize: fillPx(24, "body"), fontWeight: 650, paddingBottom: 18 }}>{s(heroA.label)}</div>
+                      </div>
+                      <div className="mt-4">
+                        <Pictogram count={Math.min(40, Math.round(numOf(s(heroA.value))))} size={30} color={INFO_FILL.aqua.bg} render={glyphFor(s(heroA.label))} />
+                      </div>
+                    </div>
+                  )}
+                  <div className="relative mt-auto grid grid-cols-2 gap-4">
+                    {restA.map((it, i) => (
+                      <div key={i} className="flex flex-col gap-3 rounded-[18px] p-5" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                        <Figure value={s(it.value)} px={64} color="#FFFFFF" />
+                        <div style={{ fontSize: fillPx(17, "body"), fontWeight: 600 }}>{s(it.label)}</div>
+                        <Pictogram count={Math.min(40, Math.round(numOf(s(it.value))))} size={15} color={i === 0 ? INFO_FILL.lavender.bg : INFO_FILL.aqua.bg} render={glyphFor(s(it.label))} />
+                        {s(it.body) && <div style={{ fontSize: fillPx(14, "body"), opacity: 0.75, lineHeight: 1.35 }}>{s(it.body)}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </FillTile>
+                <div
+                  className="relative flex min-h-0 flex-col gap-4 overflow-hidden p-8"
+                  style={{
+                    background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.84)",
+                    border: `1px solid ${ink.hairline}`,
+                    boxShadow: isDark ? undefined : "0 18px 40px -26px rgba(3,0,44,0.45)",
+                    borderRadius: 24,
+                  }}
+                >
                   {kick(s(groups[1]?.label))}
-                  <div className="grid min-h-0 flex-1 grid-cols-3 gap-5">
-                    {gB.slice(0, 3).map((it, i) => {
-                      const fill = tileFills[i % 3]!;
-                      const f = INFO_FILL[fill];
-                      const pct = pctOf(s(it.value)) ?? Math.max(0, Math.min(100, numeric(s(it.value))));
-                      return (
-                        <FillTile key={i} fill={fill} className="flex items-center gap-6 p-7">
-                          <Donut pct={pct} size={180} stroke={20} color={f.ring} track={f.track}>
-                            <Figure value={s(it.value)} px={46} color={f.fg} />
-                          </Donut>
-                          <div className="flex min-w-0 flex-col gap-2">
-                            <div style={{ fontSize: fillPx(26, "body"), fontWeight: 700 }}>{s(it.label)}</div>
+                  <div className="flex min-h-0 flex-1 items-center gap-10">
+                    <RadialBars
+                      rings={gB.slice(0, 3).map((it, i) => ({ pct: pctOf(s(it.value)) ?? 0, color: ringCols[i]! }))}
+                      size={400}
+                      stroke={40}
+                      gap={12}
+                      track={ink.hairline}
+                    />
+                    <div className="flex min-w-0 flex-1 flex-col gap-6">
+                      {gB.slice(0, 3).map((it, i) => (
+                        <div key={i} className="grid gap-x-5" style={{ gridTemplateColumns: "16px auto 1fr", alignItems: "start" }}>
+                          <span className="mt-[18px] h-[16px] w-[16px] rounded-full" style={{ background: ringCols[i] }} />
+                          <Figure value={s(it.value)} px={60} color={ink.strong} />
+                          <div className="min-w-0 pt-1">
+                            {lab(s(it.label), 22)}
                             {s(it.body) && (
-                              <div style={{ fontSize: fillPx(17, "body"), lineHeight: 1.4, opacity: 0.9 }}>{s(it.body)}</div>
+                              <div style={{ fontSize: fillPx(15, "body"), lineHeight: 1.4, color: ink.body, marginTop: 4 }}>{s(it.body)}</div>
                             )}
                           </div>
-                        </FillTile>
-                      );
-                    })}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </section>
+                </div>
               </div>
             </SlideFrame>
           );
