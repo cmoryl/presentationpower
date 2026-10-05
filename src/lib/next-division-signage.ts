@@ -14,14 +14,16 @@ import {
 import { LONDON_DIVISION_ACCENTS } from "@/lib/next-london-division";
 import { stepRepeatPanelDefault } from "@/lib/next-london-step-repeat";
 import type { LondonArtOptions } from "@/lib/next-london-revise";
+import { londonLogoPlacement } from "@/lib/next-london-logo-placement";
 
-export type DivisionSignGroup = "doors" | "scenic" | "tabletop" | "booth";
+export type DivisionSignGroup = "doors" | "scenic" | "tabletop" | "booth" | "desk";
 
 export const DIVISION_SIGN_GROUP_LABEL: Record<DivisionSignGroup, string> = {
   doors: "Room door signs",
   scenic: "Scenic panels & banners",
   tabletop: "Table-tops",
   booth: "Booth & step-and-repeat",
+  desk: "Registration desk",
 };
 
 type TemplateSpec = {
@@ -45,6 +47,38 @@ export const DIVISION_SIGN_TEMPLATES: TemplateSpec[] = [
   { group: "tabletop", source: "ldn-v10", label: "Table-top round · 900 dia", style: "09-dawn", name: "TABLE TOP ROUND" },
   { group: "booth", source: "ldn-v23", label: "Trade booth front · 1830×2440", name: "TRADE BOOTH FRONT" },
   { group: "booth", source: "ldn-v42", label: "Step & repeat wall · 3000×2400", name: "STEP & REPEAT WALL" },
+];
+
+/**
+ * Division-supplied desk templates: the division's own artboard size, built on
+ * the London registration-desk ground (same style as the London desk fronts).
+ * Only divisions that supplied a template get one — sizes are never guessed.
+ */
+type DeskSpec = {
+  division: string;
+  /** London registration desk item whose ground and wording rule it reuses. */
+  sourceName: RegExp;
+  label: string;
+  name: string;
+  slug: string;
+  trimW: number;
+  trimH: number;
+  bleedEdge: number;
+};
+
+const IN = 25.4;
+export const DIVISION_DESK_TEMPLATES: DeskSpec[] = [
+  {
+    // Supplied: Bar_Front_Tamplate_2026_71.25x40.5.ai — 71.25 × 40.5 in trim, 0.125 in bleed.
+    division: "finance",
+    sourceName: /^REG DESK 1-5 FRONT/,
+    label: "Registration desk front · 71.25×40.5 in",
+    name: "REGISTRATION DESK FRONT - 71.25x40.5in",
+    slug: "reg-desk-front",
+    trimW: 71.25 * IN,
+    trimH: 40.5 * IN,
+    bleedEdge: 0.125 * IN,
+  },
 ];
 
 export const DIVISION_SIGN_DIVISIONS = Object.keys(LONDON_DIVISION_ACCENTS);
@@ -73,6 +107,27 @@ export function divisionSigns(divisionId: string): DivisionSign[] {
       },
     });
   }
+  for (const d of DIVISION_DESK_TEMPLATES) {
+    if (d.division !== divisionId) continue;
+    const src = LONDON_VENUE_ITEM_PANELS.find((p) => d.sourceName.test(p.name));
+    if (!src) continue;
+    out.push({
+      group: "desk",
+      label: d.label,
+      panel: {
+        ...src,
+        id: `div-${divisionId}-${d.slug}`,
+        room: "REGISTRATION",
+        name: `${accent.label.toUpperCase()} ${d.name}`,
+        trimW: d.trimW,
+        trimH: d.trimH,
+        bleedEdge: d.bleedEdge,
+        bleedW: d.trimW + d.bleedEdge * 2,
+        bleedH: d.trimH + d.bleedEdge * 2,
+        division: divisionId,
+      },
+    });
+  }
   return out;
 }
 
@@ -86,6 +141,10 @@ export function divisionSignFile(sign: DivisionSign): string {
  * division's own lockup (the London wall repeats the master mark).
  */
 export function divisionSignArtOptions(sign: DivisionSign): LondonArtOptions {
+  // Desk fronts carry the stacked white lockup over REGISTRATION, as briefed.
+  if (sign.group === "desk") {
+    return { placement: { ...londonLogoPlacement(sign.panel.id), lockupShape: "stacked" } };
+  }
   if (sign.group !== "booth" || !/STEP & REPEAT/.test(sign.panel.name)) return {};
   return {
     stepRepeat: { ...stepRepeatPanelDefault("ldn-v42"), familyId: sign.panel.division ?? "transperfect" },
