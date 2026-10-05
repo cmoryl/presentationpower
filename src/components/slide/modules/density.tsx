@@ -9,7 +9,7 @@ import { fillPx } from "@/lib/open-space-fill";
 import { accentInk, hexA } from "@/lib/accent-tokens";
 import { Rocket, Users, Globe2, Flag, Sparkles, MapPin, BarChart3, Code2, Building2, type LucideIcon } from "lucide-react";
 import * as React from "react";
-import { Donut, FillTile, Figure, INFO_FILL, LogLollipop, Pictogram, RadialBars, numOf, pctOf, type InfoFill } from "./infographic-kit";
+import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, LogLollipop, Pictogram, RadialBars, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 function statIcon(label: string): LucideIcon {
   const l = label.toLowerCase();
@@ -114,7 +114,7 @@ registerSlideModule({
           .map((it) => ({ it, n: numOf(s(it.value)) }))
           .sort((a, b) => b.n - a.n);
         const dots = [INFO_FILL.aqua.bg, INFO_FILL.lavender.bg, "#7FB0FF"];
-        const panel: React.CSSProperties = {
+        const _panel: React.CSSProperties = {
           background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.82)",
           border: `1px solid ${ink.hairline}`,
           boxShadow: isDark ? undefined : "0 18px 40px -26px rgba(3,0,44,0.45)",
@@ -132,11 +132,14 @@ registerSlideModule({
           const Icon = statIcon(s(it.label));
           return (
             <FillTile key={i} fill={fill} className="flex flex-col justify-between p-6" style={{ gridColumn: i === 0 ? "6 / span 4" : "10 / span 3", gridRow: "1" }}>
-              <div className="flex items-start justify-between">
-                <Figure value={s(it.value)} unit={s(it.unit)} px={i === 0 ? 72 : 60} color={f.fg} />
-                <Icon size={30} strokeWidth={1.7} />
+              <Icon aria-hidden size={230} strokeWidth={0.9} className="pointer-events-none absolute -bottom-10 -right-8" style={{ opacity: 0.13 }} />
+              <div className="relative flex items-start justify-between">
+                <Figure value={s(it.value)} unit={s(it.unit)} px={i === 0 ? 80 : 64} color={f.fg} />
+                <span className="flex h-[52px] w-[52px] items-center justify-center rounded-full" style={{ background: f.track, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.4)" }}>
+                  <Icon size={26} strokeWidth={1.7} />
+                </span>
               </div>
-              <div>
+              <div className="relative">
                 <Pictogram count={count} size={i === 0 ? 24 : 20} color={f.fg} render={(col, sz) => <Icon size={sz} color={col} strokeWidth={1.8} />} />
                 <div className="mt-2 flex items-baseline justify-between gap-3">
                   <span style={{ fontSize: fillPx(18, "body"), fontWeight: 650 }}>{s(it.label)}</span>
@@ -174,7 +177,7 @@ registerSlideModule({
                       <div key={i}>
                         <div className="flex items-center gap-3">
                           <span className="h-[14px] w-[14px] rounded-full" style={{ background: ringCol[i % 3] }} />
-                          <Figure value={s(it.value)} unit={s(it.unit)} px={68} color="#FFFFFF" />
+                          <Figure value={s(it.value)} unit={s(it.unit)} px={68} color="#FFFFFF" gradient={`linear-gradient(180deg, #FFFFFF 30%, ${ringCol[i % 3]})`} />
                         </div>
                         <div style={{ fontSize: fillPx(18, "body"), lineHeight: 1.3, opacity: 0.85, marginTop: 6, maxWidth: 260 }}>{s(it.label)}</div>
                       </div>
@@ -183,7 +186,7 @@ registerSlideModule({
                 </div>
               </FillTile>
               {counts.slice(0, 2).map(countTile)}
-              <div data-portrait="proof-tiles" className="relative flex gap-6 p-6" style={{ ...panel, gridColumn: "6 / span 7", gridRow: "2" }}>
+              <GlassPanel dark={isDark} className="flex gap-6 p-6" style={{ gridColumn: "6 / span 7", gridRow: "2" }}>
                 <div className="min-w-0 flex-1">
                   <LogLollipop
                     rows={itemCounts.map(({ it, n }, i) => {
@@ -207,7 +210,7 @@ registerSlideModule({
                     </FillTile>
                   );
                 })}
-              </div>
+              </GlassPanel>
             </div>
           </SlideFrame>
         );

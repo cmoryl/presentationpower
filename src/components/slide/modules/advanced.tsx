@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 import type { CSSProperties } from "react";
 import { MapPin } from "lucide-react";
-import { Donut, FillTile, Figure, INFO_FILL, Pictogram, RadialBars, numOf, pctOf, type InfoFill } from "./infographic-kit";
+import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, Pictogram, RadialBars, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 type IconType = typeof Sparkles;
 
@@ -605,7 +605,7 @@ registerSlideModule({
                   {heroA && (
                     <div className="relative">
                       <div className="flex items-end gap-5">
-                        <Figure value={s(heroA.value)} px={150} color="#FFFFFF" />
+                        <Figure value={s(heroA.value)} px={170} color="#FFFFFF" gradient="linear-gradient(180deg, #FFFFFF 35%, #A1FBF9)" />
                         <div style={{ fontSize: fillPx(24, "body"), fontWeight: 650, paddingBottom: 18 }}>{s(heroA.label)}</div>
                       </div>
                       <div className="mt-4">
@@ -615,8 +615,8 @@ registerSlideModule({
                   )}
                   <div className="relative mt-auto grid grid-cols-2 gap-4">
                     {restA.map((it, i) => (
-                      <div key={i} className="flex flex-col gap-3 rounded-[18px] p-5" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}>
-                        <Figure value={s(it.value)} px={64} color="#FFFFFF" />
+                      <div key={i} className="flex flex-col gap-3 rounded-[18px] p-5" style={{ background: "linear-gradient(160deg, rgba(255,255,255,0.13), rgba(255,255,255,0.03))", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.18), 0 20px 40px -24px rgba(0,0,0,0.6)", backdropFilter: "blur(10px)" }}>
+                        <Figure value={s(it.value)} px={64} color="#FFFFFF" gradient={`linear-gradient(180deg, #FFFFFF 35%, ${i === 0 ? "#C2A3FF" : "#A1FBF9"})`} />
                         <div style={{ fontSize: fillPx(17, "body"), fontWeight: 600 }}>{s(it.label)}</div>
                         <Pictogram count={Math.min(40, Math.round(numOf(s(it.value))))} size={15} color={i === 0 ? INFO_FILL.lavender.bg : INFO_FILL.aqua.bg} render={glyphFor(s(it.label))} />
                         {s(it.body) && <div style={{ fontSize: fillPx(14, "body"), opacity: 0.75, lineHeight: 1.35 }}>{s(it.body)}</div>}
@@ -624,22 +624,15 @@ registerSlideModule({
                     ))}
                   </div>
                 </FillTile>
-                <div
-                  className="relative flex min-h-0 flex-col gap-4 overflow-hidden p-8"
-                  style={{
-                    background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.84)",
-                    border: `1px solid ${ink.hairline}`,
-                    boxShadow: isDark ? undefined : "0 18px 40px -26px rgba(3,0,44,0.45)",
-                    borderRadius: 24,
-                  }}
-                >
+                <GlassPanel dark={isDark} className="flex min-h-0 flex-col gap-4 p-8">
                   {kick(s(groups[1]?.label))}
                   <div className="flex min-h-0 flex-1 items-center gap-10">
                     <RadialBars
                       rings={gB.slice(0, 3).map((it, i) => ({ pct: pctOf(s(it.value)) ?? 0, color: ringCols[i]! }))}
-                      size={400}
-                      stroke={40}
-                      gap={12}
+                      size={430}
+                      stroke={34}
+                      gap={10}
+                      sweep={300}
                       track={ink.hairline}
                     />
                     <div className="flex min-w-0 flex-1 flex-col gap-6">
@@ -657,7 +650,7 @@ registerSlideModule({
                       ))}
                     </div>
                   </div>
-                </div>
+                </GlassPanel>
               </div>
             </SlideFrame>
           );
