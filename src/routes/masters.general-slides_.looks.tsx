@@ -83,6 +83,10 @@ const LOOKS: Look[] = [
   { id: "dawn-lines", name: "Dawn Lines", mode: "light", note: "Peach, lavender and blue blooms with soft line bands.", url: "", urls: lineSet("dawn-lines"), isNew: true },
 ];
 
+// Trimmed: keep only a few orb looks so the line-and-veil families lead.
+const KEEP_ORB = new Set(["neon-bokeh", "tri-aurora", "pearl-holo", "sunrise-veil"]);
+const SHOWN_LOOKS = LOOKS.filter((l) => !l.url || l.urls || KEEP_ORB.has(l.id) || l.id.startsWith("current"));
+
 export const Route = createFileRoute("/masters/general-slides_/looks")({
   head: () => ({
     meta: [
