@@ -9,7 +9,7 @@ import { fillPx } from "@/lib/open-space-fill";
 import { accentInk, hexA } from "@/lib/accent-tokens";
 import { Rocket, Users, Globe2, Flag, Sparkles, MapPin, BarChart3, Code2, Building2, type LucideIcon } from "lucide-react";
 import * as React from "react";
-import { Donut, FillTile, Figure, Gauge, INFO_FILL, Pictogram, Waffle, numOf, pctOf, type InfoFill } from "./infographic-kit";
+import { Donut, FillTile, Figure, INFO_FILL, LogLollipop, Pictogram, RadialBars, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 function statIcon(label: string): LucideIcon {
   const l = label.toLowerCase();
@@ -101,104 +101,113 @@ registerSlideModule({
     const accent = brand.tokens.accent;
     switch (variant.id) {
       case "MV-STAT-PROOF-BOARD": {
+        // Bento proof board: one dominant hero tile (concentric rings for the
+        // two shares), two isotype count tiles, one log-scale scale panel.
         const hero = arr(c.hero).slice(0, 4);
         const items = arr(c.items).slice(0, 8);
-        const fills: InfoFill[] = isDark ? ["blue", "lavender", "aqua", "lavender"] : ["blue", "navy", "aqua", "lavender"];
-        const lbl = (t: string, px = 22) => (
-          <div style={{ fontSize: fillPx(px, "body"), lineHeight: 1.3, fontWeight: 600 }}>{t}</div>
-        );
-        const heroTile = (it: Record<string, unknown>, i: number) => {
-          const fill = fills[i % 4]!;
+        const shares = hero.filter((it) => pctOf(s(it.value), s(it.unit)) !== null);
+        const counts = hero.filter((it) => pctOf(s(it.value), s(it.unit)) === null);
+        const ringCol = [INFO_FILL.aqua.bg, INFO_FILL.lavender.bg, "#FFFFFF"];
+        const itemShares = items.filter((it) => pctOf(s(it.value), s(it.unit)) !== null);
+        const itemCounts = items
+          .filter((it) => pctOf(s(it.value), s(it.unit)) === null)
+          .map((it) => ({ it, n: numOf(s(it.value)) }))
+          .sort((a, b) => b.n - a.n);
+        const dots = [INFO_FILL.aqua.bg, INFO_FILL.lavender.bg, "#7FB0FF"];
+        const panel: React.CSSProperties = {
+          background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.82)",
+          border: `1px solid ${ink.hairline}`,
+          boxShadow: isDark ? undefined : "0 18px 40px -26px rgba(3,0,44,0.45)",
+          borderRadius: 24,
+          minWidth: 0,
+          minHeight: 0,
+        };
+        const countTile = (it: Record<string, unknown>, i: number) => {
+          const fill: InfoFill = i === 0 ? "blue" : "lavender";
           const f = INFO_FILL[fill];
-          const v = s(it.value);
-          const u = s(it.unit);
-          const pct = pctOf(v, u);
+          const n = numOf(s(it.value));
+          const mag = Math.pow(10, Math.floor(Math.log10(Math.max(n, 1))));
+          const step = n / mag > 5 ? mag : (mag / 10) * 2 || 1;
+          const count = Math.min(12, Math.round(n / step));
           const Icon = statIcon(s(it.label));
-          // Visual per figure: share → waffle (first) / gauge (second);
-          // whole count → pictogram, each glyph a stated round share.
-          let visual: React.ReactNode = null;
-          if (pct !== null && i === 0) {
-            visual = <Waffle pct={pct} cell={11} gap={4} on={f.ring} off={f.track} />;
-          } else if (pct !== null) {
-            visual = (
-              <Gauge pct={pct} width={210} stroke={22} color={f.ring} track={f.track}>
-                <Figure value={v} unit={u} px={54} color={f.fg} />
-              </Gauge>
-            );
-          } else {
-            const n = numOf(v);
-            const mag = Math.pow(10, Math.floor(Math.log10(Math.max(n, 1))));
-            const step = n / mag > 5 ? mag : mag / 10 * 2 || 1;
-            const count = Math.min(12, Math.round(n / step));
-            visual = (
-              <div className="flex flex-col gap-2">
-                <Pictogram count={count} size={26} color={f.fg} render={(col, sz) => <Icon size={sz} color={col} strokeWidth={1.8} />} />
-                <span style={{ fontSize: fillPx(14, "body"), opacity: 0.75 }}>
-                  Each icon = {step.toLocaleString("en-US")}
-                </span>
-              </div>
-            );
-          }
           return (
-            <FillTile key={i} fill={fill} className="flex min-h-0 flex-col gap-3 p-6">
-              <div className="flex items-start justify-between gap-4">
-                {!(pct !== null && i !== 0) && <Figure value={v} unit={u} px={64} color={f.fg} />}
-                <span className="ml-auto flex h-[56px] w-[56px] shrink-0 items-center justify-center rounded-full" style={{ background: f.track }}>
-                  <Icon size={28} strokeWidth={1.7} />
-                </span>
+            <FillTile key={i} fill={fill} className="flex flex-col justify-between p-6" style={{ gridColumn: i === 0 ? "6 / span 4" : "10 / span 3", gridRow: "1" }}>
+              <div className="flex items-start justify-between">
+                <Figure value={s(it.value)} unit={s(it.unit)} px={i === 0 ? 72 : 60} color={f.fg} />
+                <Icon size={30} strokeWidth={1.7} />
               </div>
-              <div className="flex flex-1 items-center">{visual}</div>
-              {lbl(s(it.label), 19)}
+              <div>
+                <Pictogram count={count} size={i === 0 ? 24 : 20} color={f.fg} render={(col, sz) => <Icon size={sz} color={col} strokeWidth={1.8} />} />
+                <div className="mt-2 flex items-baseline justify-between gap-3">
+                  <span style={{ fontSize: fillPx(18, "body"), fontWeight: 650 }}>{s(it.label)}</span>
+                  <span style={{ fontSize: fillPx(12, "body"), opacity: 0.75, whiteSpace: "nowrap" }}>1 icon = {step.toLocaleString("en-US")}</span>
+                </div>
+              </div>
             </FillTile>
           );
         };
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-            <div data-portrait="proof-stack" className="mt-6 grid min-h-0 flex-1 grid-cols-[1.35fr_1fr] gap-8">
-              <section className="flex min-h-0 flex-col">
-                {(s(c.brandLabel) || s(c.tagline)) && (
-                  <div className="mb-4 flex items-baseline gap-4">
-                    {s(c.brandLabel) && (
-                      <span style={{ fontSize: fillPx(30, "body"), fontWeight: 700, color: ink.strong }}>{s(c.brandLabel)}</span>
-                    )}
-                    {s(c.tagline) && <span style={{ fontSize: fillPx(18, "body"), color: ink.muted }}>{s(c.tagline)}</span>}
+            <div
+              data-portrait="proof-stack"
+              className="mt-6 grid min-h-0 flex-1 gap-5"
+              style={{ gridTemplateColumns: "repeat(12, minmax(0,1fr))", gridTemplateRows: "minmax(0,0.9fr) minmax(0,1.1fr)" }}
+            >
+              <FillTile fill="navy" className="flex flex-col p-8" style={{ gridColumn: "1 / span 5", gridRow: "1 / span 2" }}>
+                <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full" style={{ background: "radial-gradient(circle, rgba(0,63,199,0.75), transparent 68%)" }} />
+                <div aria-hidden className="pointer-events-none absolute -bottom-32 -left-20 h-[380px] w-[380px] rounded-full" style={{ background: "radial-gradient(circle, rgba(194,163,255,0.35), transparent 70%)" }} />
+                <div className="relative">
+                  {s(c.brandLabel) && <div style={{ fontSize: fillPx(32, "body"), fontWeight: 750 }}>{s(c.brandLabel)}</div>}
+                  {s(c.tagline) && <div style={{ fontSize: fillPx(16, "body"), opacity: 0.75, marginTop: 4 }}>{s(c.tagline)}</div>}
+                </div>
+                <div className="relative flex flex-1 items-center gap-8">
+                  <RadialBars
+                    rings={shares.map((it, i) => ({ pct: pctOf(s(it.value), s(it.unit)) ?? 0, color: ringCol[i % 3]! }))}
+                    size={300}
+                    stroke={30}
+                    gap={10}
+                    track="rgba(255,255,255,0.10)"
+                  />
+                  <div className="flex flex-col gap-7">
+                    {shares.map((it, i) => (
+                      <div key={i}>
+                        <div className="flex items-center gap-3">
+                          <span className="h-[14px] w-[14px] rounded-full" style={{ background: ringCol[i % 3] }} />
+                          <Figure value={s(it.value)} unit={s(it.unit)} px={68} color="#FFFFFF" />
+                        </div>
+                        <div style={{ fontSize: fillPx(18, "body"), lineHeight: 1.3, opacity: 0.85, marginTop: 6, maxWidth: 260 }}>{s(it.label)}</div>
+                      </div>
+                    ))}
                   </div>
-                )}
-                <div className="grid min-h-0 flex-1 grid-cols-2 gap-5" style={{ gridTemplateRows: "minmax(0,1fr) minmax(0,1fr)" }}>{hero.map(heroTile)}</div>
-              </section>
-              <section data-portrait="proof-tiles" className="grid min-h-0 grid-cols-2 gap-4" style={{ gridTemplateRows: "repeat(3, minmax(0,1fr))" }}>
-                {items.map((it, i) => {
-                  const Icon = statIcon(s(it.label));
-                  const dot = [INFO_FILL.blue, INFO_FILL.aqua, INFO_FILL.lavender][i % 3]!;
-                  const pct = pctOf(s(it.value), s(it.unit));
+                </div>
+              </FillTile>
+              {counts.slice(0, 2).map(countTile)}
+              <div data-portrait="proof-tiles" className="relative flex gap-6 p-6" style={{ ...panel, gridColumn: "6 / span 7", gridRow: "2" }}>
+                <div className="min-w-0 flex-1">
+                  <LogLollipop
+                    rows={itemCounts.map(({ it, n }, i) => {
+                      const Icon = statIcon(s(it.label));
+                      return { value: s(it.value), unit: s(it.unit), label: s(it.label), n, color: dots[i % 3]!, icon: <Icon size={22} strokeWidth={1.8} /> };
+                    })}
+                    ink={ink.strong}
+                    muted={ink.muted}
+                    hairline={ink.hairline}
+                    px={(n) => fillPx(n, "body")}
+                  />
+                </div>
+                {itemShares.slice(0, 1).map((it, i) => {
+                  const pct = pctOf(s(it.value), s(it.unit)) ?? 0;
                   return (
-                    <div
-                      key={i}
-                      className="relative flex flex-col justify-between overflow-hidden rounded-[18px] py-4 pl-6 pr-4"
-                      style={{
-                        background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.78)",
-                        border: `1px solid ${ink.hairline}`,
-                        boxShadow: isDark ? undefined : "0 12px 28px -18px rgba(3,0,44,0.35)",
-                      }}
-                    >
-                      <span aria-hidden className="absolute inset-y-0 left-0 w-[6px]" style={{ background: dot.bg }} />
-                      <div className="flex items-center justify-between">
-                        <span className="flex h-[42px] w-[42px] items-center justify-center rounded-[12px]" style={{ background: dot.bg, color: dot.fg }}>
-                          <Icon size={26} strokeWidth={1.7} />
-                        </span>
-                        {pct !== null && (
-                          <Donut pct={pct} size={44} stroke={7} color={isDark ? INFO_FILL.aqua.bg : INFO_FILL.blue.bg} track={ink.hairline} />
-                        )}
-                      </div>
-                      <div>
-                        <Figure value={s(it.value)} unit={s(it.unit)} px={40} color={ink.strong} />
-                        <div className="mt-1" style={{ fontSize: fillPx(17, "body"), color: ink.body, lineHeight: 1.3, fontWeight: 500 }}>{s(it.label)}</div>
-                      </div>
-                    </div>
+                    <FillTile key={i} fill="aqua" className="flex w-[230px] shrink-0 flex-col items-center justify-center gap-3 p-5 text-center">
+                      <Donut pct={pct} size={150} stroke={18} color={INFO_FILL.aqua.ring} track={INFO_FILL.aqua.track}>
+                        <Figure value={s(it.value)} unit={s(it.unit)} px={42} color={INFO_FILL.aqua.fg} />
+                      </Donut>
+                      <div style={{ fontSize: fillPx(17, "body"), fontWeight: 650, lineHeight: 1.25 }}>{s(it.label)}</div>
+                    </FillTile>
                   );
                 })}
-              </section>
+              </div>
             </div>
           </SlideFrame>
         );
