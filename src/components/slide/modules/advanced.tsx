@@ -576,81 +576,73 @@ registerSlideModule({
           void marks;
           void surf;
           void bod;
-          const glyphFor = (label: string) => {
-            const L = label.toLowerCase();
-            return (col: string, sz: number) =>
-              /year/.test(L) ? (
-                <span style={{ width: Math.round(sz * 0.3), height: sz, borderRadius: 3, background: col, display: "inline-block" }} />
-              ) : /office|cit/.test(L) ? (
-                <MapPin size={sz} color={col} strokeWidth={2} />
-              ) : (
-                <span style={{ width: sz * 0.78, height: sz * 0.78, borderRadius: 999, background: col, display: "inline-block" }} />
-              );
-          };
-          const ringCols = [INFO_FILL.blue.bg, isDark ? INFO_FILL.aqua.bg : "#03002C", INFO_FILL.lavender.bg];
+          const blue = isDark ? "#7FB0FF" : INFO_FILL.blue.bg;
+          const ringCols = [blue, isDark ? INFO_FILL.aqua.bg : "#03002C", INFO_FILL.lavender.bg];
           const heroA = gA[0];
           const restA = gA.slice(1, 3);
+          // Thin tick ruler — exactly N ticks for a stated whole number.
+          const ruler = (n: number, h: number, col: string) => (
+            <div aria-hidden className="flex items-end" style={{ gap: 6, height: h }}>
+              {Array.from({ length: Math.min(40, Math.round(n)) }).map((_, k, a) => (
+                <span key={k} style={{ width: 3, height: `${k % 5 === 4 ? 100 : 55}%`, borderRadius: 2, background: col, opacity: 0.35 + (k / Math.max(1, a.length - 1)) * 0.65 }} />
+              ))}
+            </div>
+          );
           return (
             <SlideFrame brand={brand} pageNumber={pageNumber}>
               <SlideTitle brand={brand} title={s(c.title, variant.name)} />
               {s(c.subtitle) && (
                 <div className="mt-3" style={{ fontSize: fillPx(24, "body"), color: ink.body }}>{s(c.subtitle)}</div>
               )}
-              <div className="slide-fill-stretch mt-7 grid min-h-0 gap-5" style={{ gridTemplateColumns: "minmax(0,5fr) minmax(0,7fr)" }}>
-                <FillTile fill="navy" className="flex flex-col gap-6 p-8">
-                  <div aria-hidden className="pointer-events-none absolute -right-28 -top-28 h-[440px] w-[440px] rounded-full" style={{ background: "radial-gradient(circle, rgba(0,63,199,0.8), transparent 68%)" }} />
-                  <div className="relative uppercase font-mono" style={{ fontSize: fillPx(13, "kicker"), letterSpacing: "0.26em", color: INFO_FILL.aqua.bg, fontWeight: 600 }}>
-                    {s(groups[0]?.label)}
-                  </div>
+              <div className="slide-fill-stretch mt-8 grid min-h-0 gap-x-16" style={{ gridTemplateColumns: "minmax(0,1fr) minmax(0,1.2fr)" }}>
+                <section className="flex min-h-0 flex-col justify-center gap-8">
+                  {kick(s(groups[0]?.label))}
                   {heroA && (
-                    <div className="relative">
-                      <div className="flex items-end gap-5">
-                        <Figure value={s(heroA.value)} px={170} color="#FFFFFF" gradient="linear-gradient(180deg, #FFFFFF 35%, #A1FBF9)" />
-                        <div style={{ fontSize: fillPx(24, "body"), fontWeight: 650, paddingBottom: 18 }}>{s(heroA.label)}</div>
+                    <div>
+                      <div className="flex items-end gap-6">
+                        <Figure value={s(heroA.value)} px={190} color={ink.strong} gradient={`linear-gradient(100deg, ${ink.strong} 30%, ${blue} 80%, ${INFO_FILL.lavender.bg})`} />
+                        <div style={{ fontSize: fillPx(26, "body"), fontWeight: 650, color: ink.strong, paddingBottom: 22 }}>{s(heroA.label)}</div>
                       </div>
-                      <div className="mt-4">
-                        <Pictogram count={Math.min(40, Math.round(numOf(s(heroA.value))))} size={30} color={INFO_FILL.aqua.bg} render={glyphFor(s(heroA.label))} />
-                      </div>
+                      <div className="mt-4">{ruler(numOf(s(heroA.value)), 34, blue)}</div>
                     </div>
                   )}
-                  <div className="relative mt-auto grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 pt-7" style={{ borderTop: `1px solid ${ink.hairline}` }}>
                     {restA.map((it, i) => (
-                      <div key={i} className="flex flex-col gap-3 rounded-[18px] p-5" style={{ background: "linear-gradient(160deg, rgba(255,255,255,0.13), rgba(255,255,255,0.03))", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.18), 0 20px 40px -24px rgba(0,0,0,0.6)", backdropFilter: "blur(10px)" }}>
-                        <Figure value={s(it.value)} px={64} color="#FFFFFF" gradient={`linear-gradient(180deg, #FFFFFF 35%, ${i === 0 ? "#C2A3FF" : "#A1FBF9"})`} />
-                        <div style={{ fontSize: fillPx(17, "body"), fontWeight: 600 }}>{s(it.label)}</div>
-                        <Pictogram count={Math.min(40, Math.round(numOf(s(it.value))))} size={15} color={i === 0 ? INFO_FILL.lavender.bg : INFO_FILL.aqua.bg} render={glyphFor(s(it.label))} />
-                        {s(it.body) && <div style={{ fontSize: fillPx(14, "body"), opacity: 0.75, lineHeight: 1.35 }}>{s(it.body)}</div>}
+                      <div key={i} className="flex flex-col gap-2" style={{ paddingLeft: i ? 32 : 0, borderLeft: i ? `1px solid ${ink.hairline}` : undefined }}>
+                        <Figure value={s(it.value)} px={80} color={ink.strong} />
+                        {lab(s(it.label), 20)}
+                        <div className="mt-1">{ruler(numOf(s(it.value)), 20, i === 0 ? INFO_FILL.lavender.bg : blue)}</div>
+                        {s(it.body) && <div style={{ fontSize: fillPx(15, "body"), color: ink.muted, lineHeight: 1.35 }}>{s(it.body)}</div>}
                       </div>
                     ))}
                   </div>
-                </FillTile>
-                <GlassPanel dark={isDark} className="flex min-h-0 flex-col gap-4 p-8">
+                </section>
+                <section className="flex min-h-0 flex-col justify-center gap-6 pl-16" style={{ borderLeft: `1px solid ${ink.hairline}` }}>
                   {kick(s(groups[1]?.label))}
-                  <div className="flex min-h-0 flex-1 items-center gap-10">
+                  <div className="flex items-center gap-12">
                     <RadialBars
                       rings={gB.slice(0, 3).map((it, i) => ({ pct: pctOf(s(it.value)) ?? 0, color: ringCols[i]! }))}
-                      size={430}
-                      stroke={34}
-                      gap={10}
+                      size={400}
+                      stroke={28}
+                      gap={12}
                       sweep={300}
                       track={ink.hairline}
                     />
-                    <div className="flex min-w-0 flex-1 flex-col gap-6">
+                    <div className="flex min-w-0 flex-1 flex-col gap-7">
                       {gB.slice(0, 3).map((it, i) => (
-                        <div key={i} className="grid gap-x-5" style={{ gridTemplateColumns: "16px auto 1fr", alignItems: "start" }}>
-                          <span className="mt-[18px] h-[16px] w-[16px] rounded-full" style={{ background: ringCols[i] }} />
-                          <Figure value={s(it.value)} px={60} color={ink.strong} />
-                          <div className="min-w-0 pt-1">
+                        <div key={i} className="pl-5" style={{ borderLeft: `3px solid ${ringCols[i]}` }}>
+                          <div className="flex items-baseline gap-4">
+                            <Figure value={s(it.value)} px={60} color={ink.strong} />
                             {lab(s(it.label), 22)}
-                            {s(it.body) && (
-                              <div style={{ fontSize: fillPx(15, "body"), lineHeight: 1.4, color: ink.body, marginTop: 4 }}>{s(it.body)}</div>
-                            )}
                           </div>
+                          {s(it.body) && (
+                            <div style={{ fontSize: fillPx(15, "body"), lineHeight: 1.4, color: ink.body, marginTop: 6 }}>{s(it.body)}</div>
+                          )}
                         </div>
                       ))}
                     </div>
                   </div>
-                </GlassPanel>
+                </section>
               </div>
             </SlideFrame>
           );
