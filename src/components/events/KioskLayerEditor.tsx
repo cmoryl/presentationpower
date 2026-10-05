@@ -420,7 +420,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
     setGuide(r.g);
     setEdits(r.next);
   };
-  const endDrag = () => { if (markDrag.current) { const id = markDrag.current.id; markDrag.current = null; void id; } drag.current = null; setGuide(null); };
+  const endDrag = () => { markDrag.current = null; drag.current = null; setGuide(null); };
 
   /** Put the selection against the left margin, the centre line or the right margin. */
   const alignKiosk = (where: TextAlign, base: KioskEdits = edits) => {
@@ -962,7 +962,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                   if (!a) return null;
                   return (
                     <g key={m.id} className="cursor-move" opacity={(m.opacity ?? 1) < 1 ? m.opacity : undefined}
-                      onPointerDown={(e) => { e.stopPropagation(); setMarkSel(m.id); const p = toSvg(e); markDrag.current = { id: m.id, x: p.x, y: p.y, x0: m.x, y0: m.y }; setHistory((h) => [...h.slice(-49), edits]); setFuture([]); (e.currentTarget as Element).ownerSVGElement?.setPointerCapture?.(e.pointerId); }}>
+                      onPointerDown={(e) => { e.stopPropagation(); setMarkSel(m.id); const p = toSvg(e); markDrag.current = { id: m.id, x: p.x, y: p.y, x0: m.x, y0: m.y }; setHistory((h) => [...h.slice(-49), edits]); setFuture([]); svgRef.current?.setPointerCapture?.(e.pointerId); }}>
                       <g transform={markTransform(m, a)}>
                         <rect x={a.ox} y={a.oy} width={a.w} height={a.h} fill="transparent" stroke={markSel === m.id ? "#003FC7" : "none"} strokeWidth={(2 * rs * a.w) / m.w} />
                         {a.paths.map((p, i) => <path key={i} d={p.d} fill={m.kind === "chevrons" && m.color ? m.color : p.fill} fillRule={p.evenOdd ? "evenodd" : undefined} />)}
