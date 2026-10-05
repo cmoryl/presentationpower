@@ -765,7 +765,9 @@ export function SlideFrame({
               transform:
                 backdrop!.zoom && backdrop!.zoom !== 1 ? `scale(${backdrop!.zoom})` : undefined,
               transformOrigin: "center center",
-              filter: lightBackdrop
+              filter: lightBackdrop && backdrop!.softFocus
+                ? undefined
+                : lightBackdrop
                 ? `brightness(${1.16 + (backdrop!.imageDim ?? 0) * 0.16}) saturate(0.62) contrast(0.82)`
                 : backdrop!.imageDim
                   ? `brightness(${1 - backdrop!.imageDim}) saturate(0.95)`
@@ -793,7 +795,7 @@ export function SlideFrame({
               mixBlendMode: lightBackdrop ? "multiply" : "screen",
             }}
           />
-          {lightBackdrop && (
+          {lightBackdrop && !backdrop!.softFocus && (
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0"
