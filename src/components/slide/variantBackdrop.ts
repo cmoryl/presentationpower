@@ -97,6 +97,10 @@ function _computeBackdrop(
     const pool = LIGHT_IMAGERY[family];
     // Logo strips stay clean: a lockup wall needs an even field behind it.
     if (/LOGO-STRIP|LOGOS/.test(id)) return null;
+    // Light classic cover: soft-focus flat ground instead of the old office photo.
+    if (id === "MV-OP-COVER") {
+      return { url: lightCoverGround, scrim: "full", scrimStrength: 0.15, imageDim: 0, tint: "#FFFFFF", softFocus: true, darkChrome: false };
+    }
     // A vignette on full-frame looks, otherwise the light falls in from the side
     // the copy does not occupy.
     const scrim: NonNullable<SlideBackdrop["scrim"]> = /^MV-OP-DIVIDER|CLOSING|THANKS/.test(id)
@@ -184,10 +188,6 @@ function _computeBackdrop(
 
   // Full-bleed cover / hero — enterprise photograph, strong side scrim.
   if (/^MV-OP-COVER(-MEDIA)?$/.test(id) || id === "MV-CS-HERO" || id === "MV-CTA-CLOSING-HERO") {
-    // Light classic cover: soft-focus flat ground instead of the old office photo.
-    if (mode !== "dark" && id === "MV-OP-COVER") {
-      return { url: lightCoverGround, scrim: "full", scrimStrength: 0.15, imageDim: 0, tint: "#FFFFFF", softFocus: true, darkChrome: false };
-    }
     return {
       url: pickPhoto(0),
       scrim: "left",
