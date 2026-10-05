@@ -229,6 +229,8 @@ export type KioskEdits = {
   groups?: string[][];
   /** Accent divider rules added in the editor (array order = stacking order). */
   dividers?: KioskDivider[];
+  /** NEXT chevron arrows and swapped NEXT lockups (official logo geometry). */
+  marks?: import("@/lib/kiosk-marks").KioskMark[];
   /** Duplicated text lines and objects. */
   copies?: KioskCopy[];
   /** Partner badges replaced with editable text (the source object is hidden). */
@@ -259,6 +261,7 @@ export function textLineBoxes(t: PlacedText, width: (s: string) => number) {
 }
 
 /** Accent rule markup for SVG (Accents layer). */
+import { marksSvg } from "@/lib/kiosk-marks";
 export function dividerSvg(d: KioskDivider) {
   return `<rect id="${d.id}" x="${d.x.toFixed(2)}" y="${d.y.toFixed(2)}" width="${d.w.toFixed(2)}" height="${d.h.toFixed(2)}"${d.round ? ` rx="${(d.h / 2).toFixed(2)}"` : ""} fill="${d.color}"${fx(d.opacity ?? 1, d.rot ?? 0, d.x + d.w / 2, d.y + d.h / 2)}/>`;
 }
@@ -648,6 +651,7 @@ export function buildKioskFrontSvg(
   parts.push(`</g>`);
   parts.push(`<g id="Accents">`);
   for (const d of edits.dividers ?? []) if (!d.hidden) parts.push(dividerSvg(d));
+  parts.push(marksSvg(edits.marks));
   parts.push(`</g>`);
   parts.push(`<g id="Text">`);
   for (const p of placed)

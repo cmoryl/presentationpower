@@ -11,6 +11,7 @@
 import JSZip from "jszip";
 import { PDFDocument, degrees, rgb, cmyk, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, concatTransformationMatrix, PDFName, PDFOperator, PDFOperatorNames, PDFString } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
+import { marksPdfOps } from "@/lib/kiosk-marks";
 import { PDFDict } from "pdf-lib";
 import { artRegionPdf, mul, parseArtSvg, rotateAbout, roundRectPdf, scale, translate, type Affine } from "@/lib/next-california-kiosk-vector-pdf";
 
@@ -301,6 +302,7 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
     const o = d.opacity ?? 1;
     page.pushOperators(raw(`q\n${o < 1 ? alpha(o) + "\n" : ""}${[c.red, c.green, c.blue].join(" ")} rg\n${roundRectPdf(d.w, d.h, !!d.round, Md)}\nf\nQ`));
   }
+  if (edits.marks?.length) page.pushOperators(raw(marksPdfOps(edits.marks, F, alpha)));
   endLayer();
   beginLayer("Text");
 
@@ -458,6 +460,14 @@ async function legacyFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Uint8Ar
     const rot = d.rot ?? 0;
     const o = pdfRot(B + d.x, H - (B + d.y), B + d.x + d.w / 2, H - (B + d.y + d.h / 2), rot);
     page.drawSvgPath(path, { x: o.x, y: o.y, color: hexRgb(d.color), borderWidth: 0, opacity: d.opacity ?? 1, rotate: degrees(-rot) });
+  }
+  if (edits.marks?.length) {
+    const res = page.node.Resources()!;
+    let egs = res.lookupMaybe(PDFName.of("ExtGState"), PDFDict);
+    if (!egs) { egs = doc.context.obj({}); res.set(PDFName.of("ExtGState"), egs); }
+    let n = 0;
+    const alphaL = (o: number) => { const k = `MA${n++}`; egs!.set(PDFName.of(k), doc.context.obj({ Type: "ExtGState", ca: o, CA: o })); return `/${k} gs`; };
+    page.pushOperators(PDFOperator.of(marksPdfOps(edits.marks, [1, 0, 0, -1, B, H - B], alphaL) as PDFOperatorNames));
   }
 
   const fonts = new Map<string, Awaited<ReturnType<typeof doc.embedFont>>>();
