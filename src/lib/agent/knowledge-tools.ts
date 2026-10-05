@@ -153,23 +153,49 @@ export function buildSharedKnowledgeToolSet(ctx: { supabase: Db }): ToolSet {
       execute: async ({ query, city, kind, limit }) => {
         try {
           const cap = Math.max(1, Math.min(20, Math.round(limit ?? 8)));
-          const needle = query.trim().slice(0, 120).replace(/[%,]/g, " ");
+          // Match on individual words, not the whole phrase: a sentence-long
+          // question never appears verbatim in a record, so phrase matching
+          // returned nothing for every natural question.
+          const STOP = new Set(["what", "should", "from", "with", "that", "this", "have", "about", "change", "next", "event", "events", "lessons", "lesson", "post"]);
+          const words = Array.from(
+            new Set(
+              query
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, " ")
+                .split(/\s+/)
+                .filter((w) => w.length >= 3 && !STOP.has(w))
+                .map((w) => w.replace(/s$/, "")),
+            ),
+          ).slice(0, 12);
           let q = ctx.supabase
             .from("event_venue_knowledge")
             .select("event_id, city, venue, panel_id, kind, title, body, facts, source");
           if (city) q = q.ilike("city", `%${city}%`);
           if (kind) q = q.eq("kind", kind);
-          if (needle) q = q.or(`title.ilike.%${needle}%,body.ilike.%${needle}%`);
-          const { data, error } = await q
-            .order("updated_at", { ascending: false })
-            .limit(cap);
+          if (words.length) {
+            q = q.or(words.flatMap((w) => [`title.ilike.%${w}%`, `body.ilike.%${w}%`]).join(","));
+          }
+          const { data, error } = await q.order("updated_at", { ascending: false }).limit(200);
           if (error) return `ERROR: event knowledge lookup failed: ${error.message}`;
-          if (!data?.length)
+          const scored = (data ?? [])
+            .map((row) => {
+              const title = String(row.title ?? "").toLowerCase();
+              const body = String(row.body ?? "").toLowerCase();
+              const score = words.reduce(
+                (s, w) => s + (title.includes(w) ? 3 : 0) + (body.includes(w) ? 1 : 0),
+                0,
+              );
+              return { row, score };
+            })
+            .sort((a, b) => b.score - a.score)
+            .slice(0, cap)
+            .map((x) => x.row);
+          if (!scored.length)
             return {
               results: [],
               note: "Nothing recorded for that event or venue — say so and ask, rather than estimating.",
             };
-          return { results: data };
+          return { results: scored };
         } catch (err) {
           return `ERROR: event knowledge lookup failed: ${err instanceof Error ? err.message : String(err)}`;
         }
