@@ -164,3 +164,104 @@ export function Pictogram({ count, size, color, dim, total, render }: { count: n
     </div>
   );
 }
+
+/** Concentric radial bars (activity-ring style). Each arc fills exactly to its pct over `sweep` degrees. */
+export function RadialBars({
+  rings,
+  size,
+  stroke,
+  gap,
+  track,
+  sweep = 270,
+  children,
+}: {
+  rings: { pct: number; color: string }[];
+  size: number;
+  stroke: number;
+  gap: number;
+  track: string;
+  sweep?: number;
+  children?: ReactNode;
+}) {
+  const cx = size / 2;
+  const start = -90 - (sweep - 180) / 2 - 90 + 90; // arc starts at the left of the gap
+  const pt = (r: number, deg: number) => {
+    const a = (deg * Math.PI) / 180;
+    return [cx + r * Math.cos(a), cx + r * Math.sin(a)];
+  };
+  const arc = (r: number, deg: number) => {
+    const s0 = 90 + (360 - sweep) / 2; // gap centred at the bottom
+    const [x0, y0] = pt(r, s0);
+    const [x1, y1] = pt(r, s0 + deg);
+    return `M ${x0} ${y0} A ${r} ${r} 0 ${deg > 180 ? 1 : 0} 1 ${x1} ${y1}`;
+  };
+  void start;
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} aria-hidden>
+        {rings.map((g, i) => {
+          const r = cx - stroke / 2 - i * (stroke + gap);
+          return (
+            <g key={i}>
+              <path d={arc(r, sweep)} fill="none" stroke={track} strokeWidth={stroke} strokeLinecap="round" />
+              <path d={arc(r, Math.max(0.5, (g.pct / 100) * sweep))} fill="none" stroke={g.color} strokeWidth={stroke} strokeLinecap="round" />
+            </g>
+          );
+        })}
+      </svg>
+      {children && <div className="absolute inset-0 flex items-center justify-center">{children}</div>}
+    </div>
+  );
+}
+
+/** Log-scale horizontal lollipop for counts of very different magnitude. */
+export function LogLollipop({
+  rows,
+  ink,
+  muted,
+  hairline,
+  px,
+}: {
+  rows: { value: string; unit?: string; label: string; n: number; color: string; icon?: ReactNode }[];
+  ink: string;
+  muted: string;
+  hairline: string;
+  px: (n: number) => number | string;
+}) {
+  const maxExp = Math.ceil(Math.log10(Math.max(10, ...rows.map((r) => r.n))));
+  const ticks = Array.from({ length: maxExp + 1 }, (_, i) => Math.pow(10, i));
+  const pos = (n: number) => (Math.log10(Math.max(1, n)) / maxExp) * 100;
+  const fmt = (v: number) => (v >= 1000 ? `${v / 1000}K` : String(v));
+  return (
+    <div className="flex h-full flex-col justify-between gap-2">
+      {rows.map((r, i) => (
+        <div key={i} className="grid items-center gap-4" style={{ gridTemplateColumns: "44px 150px 1fr" }}>
+          <span className="flex h-[44px] w-[44px] items-center justify-center rounded-[12px]" style={{ background: r.color, color: "#03002C" }}>{r.icon}</span>
+          <div className="min-w-0">
+            <div className="tabular-nums" style={{ fontSize: px(34), fontWeight: 800, lineHeight: 1, letterSpacing: "-0.03em", color: ink, whiteSpace: "nowrap" }}>
+              {r.value}
+              {r.unit && <span style={{ fontSize: "0.65em" }}>{r.unit}</span>}
+            </div>
+            <div style={{ fontSize: px(14), color: muted, lineHeight: 1.2, marginTop: 4 }}>{r.label}</div>
+          </div>
+          <div className="relative h-[34px]">
+            {ticks.map((t) => (
+              <span key={t} aria-hidden className="absolute inset-y-0 w-px" style={{ left: `${pos(t)}%`, background: hairline }} />
+            ))}
+            <span aria-hidden className="absolute top-1/2 h-[6px] -translate-y-1/2 rounded-full" style={{ left: 0, width: `${pos(r.n)}%`, background: r.color }} />
+            <span aria-hidden className="absolute top-1/2 h-[22px] w-[22px] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ left: `${pos(r.n)}%`, background: r.color, boxShadow: `0 0 0 6px ${hairline}` }} />
+          </div>
+        </div>
+      ))}
+      <div className="grid gap-4" style={{ gridTemplateColumns: "44px 150px 1fr" }}>
+        <span />
+        <span style={{ fontSize: px(12), color: muted }}>Log scale</span>
+        <div className="relative h-[16px]">
+          {ticks.map((t, i) => (
+            <span key={t} className="absolute tabular-nums" style={{ left: `${pos(t)}%`, transform: i === 0 ? "none" : i === ticks.length - 1 ? "translateX(-100%)" : "translateX(-50%)", fontSize: px(12), color: muted }}>{fmt(t)}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
