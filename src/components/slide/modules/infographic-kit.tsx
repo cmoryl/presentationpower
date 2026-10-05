@@ -366,3 +366,36 @@ export function LogLollipop({
     </div>
   );
 }
+
+/** Dot field — exactly `count` dots (each worth `per`), laid out in `cols`
+ * columns with a soft gradient across the field. */
+export function DotField({ count, cols, dot, gap, from, to, total }: { count: number; cols: number; dot: number; gap: number; from: string; to: string; total?: number }) {
+  const t = Math.max(total ?? count, count);
+  return (
+    <div aria-hidden className="grid" style={{ gridTemplateColumns: `repeat(${cols}, ${dot}px)`, gap }}>
+      {Array.from({ length: t }).map((_, i) => {
+        const on = i < count;
+        const f = t > 1 ? i / (t - 1) : 0;
+        return (
+          <span
+            key={i}
+            style={{
+              width: dot,
+              height: dot,
+              borderRadius: dot,
+              background: on ? `color-mix(in oklab, ${from} ${Math.round((1 - f) * 100)}%, ${to})` : "transparent",
+              boxShadow: on ? undefined : `inset 0 0 0 1px color-mix(in oklab, ${from} 30%, transparent)`,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+/** Per-dot unit for a count so the field stays between ~6 and ~150 dots. */
+export function dotUnit(n: number): number {
+  if (n <= 150) return 1;
+  const mag = Math.pow(10, Math.floor(Math.log10(n)) - 1);
+  return n / mag > 150 ? mag * 10 : mag;
+}

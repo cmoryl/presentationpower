@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 import type { CSSProperties } from "react";
 import { MapPin } from "lucide-react";
-import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, Pictogram, RadialBars, numOf, pctOf, type InfoFill } from "./infographic-kit";
+import { Donut, DotField, FillTile, Figure, GlassPanel, INFO_FILL, Pictogram, RadialBars, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 type IconType = typeof Sparkles;
 
@@ -584,7 +584,7 @@ registerSlideModule({
           const ruler = (n: number, h: number, col: string) => (
             <div aria-hidden className="flex items-end" style={{ gap: 6, height: h }}>
               {Array.from({ length: Math.min(40, Math.round(n)) }).map((_, k, a) => (
-                <span key={k} style={{ width: 3, height: `${k % 5 === 4 ? 100 : 55}%`, borderRadius: 2, background: col, opacity: 0.35 + (k / Math.max(1, a.length - 1)) * 0.65 }} />
+                <span key={k} style={{ width: 3, flexShrink: 0, height: `${k % 5 === 4 ? 100 : 55}%`, borderRadius: 2, background: col, opacity: 0.35 + (k / Math.max(1, a.length - 1)) * 0.65 }} />
               ))}
             </div>
           );
@@ -603,7 +603,13 @@ registerSlideModule({
                         <Figure value={s(heroA.value)} px={190} color={ink.strong} gradient={`linear-gradient(100deg, ${ink.strong} 30%, ${blue} 80%, ${INFO_FILL.lavender.bg})`} />
                         <div style={{ fontSize: fillPx(26, "body"), fontWeight: 650, color: ink.strong, paddingBottom: 22 }}>{s(heroA.label)}</div>
                       </div>
-                      <div className="mt-4">{ruler(numOf(s(heroA.value)), 34, blue)}</div>
+                      <div className="mt-5">
+                        {ruler(numOf(s(heroA.value)), 46, blue)}
+                        <div className="mt-2 flex justify-between" style={{ width: Math.min(40, Math.round(numOf(s(heroA.value)))) * 9 - 6, fontSize: fillPx(13, "body"), color: ink.muted }}>
+                          <span>Year 1</span>
+                          <span>Year {s(heroA.value)}</span>
+                        </div>
+                      </div>
                     </div>
                   )}
                   <div className="grid grid-cols-2 pt-7" style={{ borderTop: `1px solid ${ink.hairline}` }}>
@@ -611,7 +617,9 @@ registerSlideModule({
                       <div key={i} className="flex flex-col gap-2" style={{ paddingLeft: i ? 32 : 0, borderLeft: i ? `1px solid ${ink.hairline}` : undefined }}>
                         <Figure value={s(it.value)} px={80} color={ink.strong} />
                         {lab(s(it.label), 20)}
-                        <div className="mt-1">{ruler(numOf(s(it.value)), 20, i === 0 ? INFO_FILL.lavender.bg : blue)}</div>
+                        <div className="mt-2">
+                          <DotField count={Math.round(numOf(s(it.value)))} cols={11} dot={14} gap={7} from={i === 0 ? INFO_FILL.lavender.bg : blue} to={i === 0 ? blue : INFO_FILL.lavender.bg} />
+                        </div>
                         {s(it.body) && <div style={{ fontSize: fillPx(15, "body"), color: ink.muted, lineHeight: 1.35 }}>{s(it.body)}</div>}
                       </div>
                     ))}
@@ -627,7 +635,11 @@ registerSlideModule({
                       gap={12}
                       sweep={300}
                       track={ink.hairline}
-                    />
+                    >
+                      <div className="text-center" style={{ color: ink.muted, fontSize: fillPx(13, "body"), letterSpacing: "0.2em" }}>
+                        0 — 100%
+                      </div>
+                    </RadialBars>
                     <div className="flex min-w-0 flex-1 flex-col gap-7">
                       {gB.slice(0, 3).map((it, i) => (
                         <div key={i} className="pl-5" style={{ borderLeft: `3px solid ${ringCols[i]}` }}>
