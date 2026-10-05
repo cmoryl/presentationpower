@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 
 /** The rebuilt TransPerfect General Slides master deck (28 designed slides). */
 export const GENERAL_SLIDES_MASTER_ID = "7a6e1c52-0000-4e5a-9b1d-6e0a51ce0001";
+/** Light companion: the same 28 slides on the light ground. */
+export const GENERAL_SLIDES_LIGHT_MASTER_ID = "7a6e1c52-0000-4e5a-9b1d-6e0a51ce0002";
 
 export const Route = createFileRoute("/masters/general-slides")({
   head: () => ({
@@ -35,10 +37,18 @@ function GeneralSlidesMaster() {
       </p>
       <div className="mt-8 flex flex-wrap gap-3">
         <Button asChild>
-          <Link to="/decks/$deckId" params={{ deckId: GENERAL_SLIDES_MASTER_ID }}>Open master</Link>
+          <Link to="/decks/$deckId" params={{ deckId: GENERAL_SLIDES_MASTER_ID }}>Open dark master</Link>
         </Button>
         <Button asChild variant="outline">
           <Link to="/decks/$deckId/print" params={{ deckId: GENERAL_SLIDES_MASTER_ID }}>View all slides</Link>
+        </Button>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <Button asChild>
+          <Link to="/decks/$deckId" params={{ deckId: GENERAL_SLIDES_LIGHT_MASTER_ID }}>Open light master</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link to="/decks/$deckId/print" params={{ deckId: GENERAL_SLIDES_LIGHT_MASTER_ID }}>View all light slides</Link>
         </Button>
       </div>
     </main>

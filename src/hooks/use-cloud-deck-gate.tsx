@@ -15,7 +15,7 @@ import { loadCloudDeck } from "@/lib/cloud-decks.functions";
 import { cloudDeckToLocal, type CloudDeckPayload } from "@/lib/cloud-deck-import";
 
 /** Shared master decks — always re-read from the cloud on open. */
-const MASTER_DECK_IDS = new Set(["7a6e1c52-0000-4e5a-9b1d-6e0a51ce0001"]);
+const MASTER_DECK_IDS = new Set(["7a6e1c52-0000-4e5a-9b1d-6e0a51ce0001", "7a6e1c52-0000-4e5a-9b1d-6e0a51ce0002"]);
 import { DeckImportProgress, DeckImportFailed } from "@/components/DeckImportProgress";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
