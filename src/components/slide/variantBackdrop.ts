@@ -42,6 +42,8 @@ const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
 
 /** Returns the deterministic corporate-dark backdrop URL for a variant id. */
 export function pickCorporateDarkBackdrop(variantId: string): string {
+  // The classic cover must not carry bg-10's hard-edged transparent disc.
+  if (variantId === "MV-OP-COVER") return corp02;
   return CORPORATE_DARK_BACKDROPS[hashStr(variantId) % CORPORATE_DARK_BACKDROPS.length];
 }
 
