@@ -3,7 +3,7 @@
 // next-logo-vectors.ts (the chevrons are the accent-coloured paths of the
 // "white + colour chevrons" lockup), so nothing is redrawn by hand.
 
-import { nextLogoFamily, pickNextLogo, type NextLogoColourway } from "@/lib/next-logo-vectors";
+import { NEXT_LOGO_FAMILIES, nextLogoFamily, pickNextLogo, type NextLogoColourway } from "@/lib/next-logo-vectors";
 import { parsePath, mul, rotateAbout, segsToPdf, translate, type Affine } from "@/lib/next-california-kiosk-vector-pdf";
 
 export type KioskMark = {
@@ -23,14 +23,11 @@ export type MarkArt = { ox: number; oy: number; w: number; h: number; paths: { d
 
 const cache = new Map<string, MarkArt>();
 
-/** Family id for a layout ("divsign-finance-reg-desk" → "finance"). */
+/** Family id for a layout ("divsign-finance-reg-desk" → "finance"), when it is a NEXT family. */
 export function markFamilyFor(layoutId: string): string | null {
   const m = /^divsign-([a-z]+)-/.exec(layoutId);
-  return m && nextLogoFamily(m[1]!) && m[1]! in (nextLogoFamilies()) ? m[1]! : null;
+  return m && m[1]! in NEXT_LOGO_FAMILIES ? m[1]! : null;
 }
-function nextLogoFamilies() { return (globalThis as { __nf?: Record<string, unknown> }).__nf ?? FAMILY_IDS; }
-import { NEXT_LOGO_FAMILIES } from "@/lib/next-logo-vectors";
-const FAMILY_IDS = NEXT_LOGO_FAMILIES as Record<string, unknown>;
 
 export function markArt(m: KioskMark): MarkArt | null {
   const key = `${m.kind}|${m.family}|${m.colourway}|${m.shape}`;
