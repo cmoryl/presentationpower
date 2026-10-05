@@ -85,7 +85,7 @@ export function slideGround(
   for (const v of f) busy += v;
   busy /= f.length;
   const dark = mode === "dark";
-  const strength = Math.max(0.55, 1 - busy * 0.8) * (style === "wash" || style === "grid" ? 0.55 : 1);
+  const strength = Math.max(0.8, 1.15 - busy * 0.6) * (style === "wash" || style === "grid" ? 0.55 : 1);
   const pts = anchors(f, busy > 0.6 ? 1 : busy > 0.4 ? 2 : 3);
   const cols = colours.map(hex);
   const bg = hex(base);
@@ -103,7 +103,7 @@ export function slideGround(
     const v = py / H;
     for (let px = 0; px < W; px++) {
       const u = px / W;
-      const free = 1 - Math.min(1, sample(f, u, v) * 0.9);
+      const free = 1 - Math.min(0.8, sample(f, u, v) * 0.9);
       let r = bg[0], gg = bg[1], b = bg[2];
       let field = 0;
       const add = (m: number, c: [number, number, number]) => {
@@ -111,7 +111,7 @@ export function slideGround(
         if (m <= 0.002) return;
         field = Math.max(field, m);
         if (dark) { r += c[0] * m * 0.8; gg += c[1] * m * 0.8; b += c[2] * m * 0.8; }
-        else { const k = m * 0.75; r = r * (1 - k) + c[0] * k; gg = gg * (1 - k) + c[1] * k; b = b * (1 - k) + c[2] * k; }
+        else { const k = Math.min(0.92, m * 1.05); r = r * (1 - k) + c[0] * k; gg = gg * (1 - k) + c[1] * k; b = b * (1 - k) + c[2] * k; }
       };
       pts.forEach(([cx, cy], k) => {
         const c = cols[k % cols.length];
@@ -119,12 +119,12 @@ export function slideGround(
         else if (style === "horizon") add(g(u, v, cx, cy > 0.5 ? 1.05 : -0.05, 0.55, 0.22), c);
         else if (style === "aurora") add((0.5 + 0.5 * Math.sin(u * 18 + Math.sin(u * 5) * 2)) * g(u, v, cx, cy, 0.4, 0.38), c);
         else if (style === "wash") add(g(u, v, cx, cy, 0.6, 0.6) * 0.7, c);
-        else add(g(u, v, cx, cy, 0.32, 0.42), c);
+        else add(g(u, v, cx, cy, 0.42, 0.55), c);
       });
       // halo behind photo panels so the image sits in the light
       for (const [x0, y0, w, h] of photos) {
         const cx = x0 + w / 2, cy = y0 + h / 2;
-        const halo = g(u, v, cx, cy, w * 0.9, h * 0.8) * 0.55 * strength;
+        const halo = g(u, v, cx, cy, w * 0.9, h * 0.8) * 0.9 * strength;
         if (dark) { r += cols[0][0] * halo; gg += cols[0][1] * halo; b += cols[0][2] * halo; }
         else { r = r * (1 - halo * 0.6) + cols[0][0] * halo * 0.6; gg = gg * (1 - halo * 0.6) + cols[0][1] * halo * 0.6; b = b * (1 - halo * 0.6) + cols[0][2] * halo * 0.6; }
       }
