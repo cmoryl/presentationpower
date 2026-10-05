@@ -88,9 +88,21 @@ function SignCard({ sign, compact }: { sign: DivisionSign; compact?: boolean }) 
   );
 }
 
-export function DivisionSignageKit({ divisionId, compact }: { divisionId: string; compact?: boolean }) {
+export function DivisionSignageKit({
+  divisionId,
+  compact,
+  only,
+}: {
+  divisionId: string;
+  compact?: boolean;
+  /** Limit the kit to these groups (e.g. the desk on the master templates page). */
+  only?: DivisionSignGroup[];
+}) {
   const faceReady = useLondonSignageFace();
-  const signs = useMemo(() => divisionSigns(divisionId), [divisionId]);
+  const signs = useMemo(
+    () => divisionSigns(divisionId).filter((s) => !only || only.includes(s.group)),
+    [divisionId, only?.join(",")],
+  );
   if (signs.length === 0) return null;
   if (!faceReady) return <p className="text-sm text-muted-foreground">Loading the signage typeface…</p>;
   const shown = compact ? signs.filter((_, i) => [0, 2, 5, 8].includes(i)) : signs;
