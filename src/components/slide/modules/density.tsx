@@ -118,20 +118,21 @@ registerSlideModule({
           // whole count → pictogram, each glyph a stated round share.
           let visual: React.ReactNode = null;
           if (pct !== null && i === 0) {
-            visual = <Waffle pct={pct} cell={17} gap={5} on={f.ring} off={f.track} />;
+            visual = <Waffle pct={pct} cell={11} gap={4} on={f.ring} off={f.track} />;
           } else if (pct !== null) {
             visual = (
-              <Gauge pct={pct} width={250} stroke={26} color={f.ring} track={f.track}>
-                <Figure value={v} unit={u} px={64} color={f.fg} />
+              <Gauge pct={pct} width={210} stroke={22} color={f.ring} track={f.track}>
+                <Figure value={v} unit={u} px={54} color={f.fg} />
               </Gauge>
             );
           } else {
             const n = numOf(v);
-            const step = n >= 1000 ? Math.pow(10, Math.floor(Math.log10(n))) / 2 : 10;
-            const count = Math.min(24, Math.round(n / step));
+            const mag = Math.pow(10, Math.floor(Math.log10(Math.max(n, 1))));
+            const step = n / mag > 5 ? mag : mag / 10 * 2 || 1;
+            const count = Math.min(12, Math.round(n / step));
             visual = (
               <div className="flex flex-col gap-2">
-                <Pictogram count={count} size={30} color={f.fg} render={(col, sz) => <Icon size={sz} color={col} strokeWidth={1.8} />} />
+                <Pictogram count={count} size={26} color={f.fg} render={(col, sz) => <Icon size={sz} color={col} strokeWidth={1.8} />} />
                 <span style={{ fontSize: fillPx(14, "body"), opacity: 0.75 }}>
                   Each icon = {step.toLocaleString("en-US")}
                 </span>
@@ -139,22 +140,22 @@ registerSlideModule({
             );
           }
           return (
-            <FillTile key={i} fill={fill} className="flex flex-col gap-5 p-7">
+            <FillTile key={i} fill={fill} className="flex min-h-0 flex-col gap-3 p-6">
               <div className="flex items-start justify-between gap-4">
-                {!(pct !== null && i !== 0) && <Figure value={v} unit={u} px={84} color={f.fg} />}
+                {!(pct !== null && i !== 0) && <Figure value={v} unit={u} px={64} color={f.fg} />}
                 <span className="ml-auto flex h-[56px] w-[56px] shrink-0 items-center justify-center rounded-full" style={{ background: f.track }}>
                   <Icon size={28} strokeWidth={1.7} />
                 </span>
               </div>
               <div className="flex flex-1 items-center">{visual}</div>
-              {lbl(s(it.label))}
+              {lbl(s(it.label), 19)}
             </FillTile>
           );
         };
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-            <div data-portrait="proof-stack" className="mt-6 grid flex-1 grid-cols-[1.35fr_1fr] gap-8">
+            <div data-portrait="proof-stack" className="mt-6 grid min-h-0 flex-1 grid-cols-[1.35fr_1fr] gap-8">
               <section className="flex min-h-0 flex-col">
                 {(s(c.brandLabel) || s(c.tagline)) && (
                   <div className="mb-4 flex items-baseline gap-4">
@@ -164,9 +165,9 @@ registerSlideModule({
                     {s(c.tagline) && <span style={{ fontSize: fillPx(18, "body"), color: ink.muted }}>{s(c.tagline)}</span>}
                   </div>
                 )}
-                <div className="grid flex-1 grid-cols-2 grid-rows-2 gap-5">{hero.map(heroTile)}</div>
+                <div className="grid min-h-0 flex-1 grid-cols-2 gap-5" style={{ gridTemplateRows: "minmax(0,1fr) minmax(0,1fr)" }}>{hero.map(heroTile)}</div>
               </section>
-              <section data-portrait="proof-tiles" className="grid grid-cols-2 content-stretch gap-4">
+              <section data-portrait="proof-tiles" className="grid min-h-0 grid-cols-2 gap-4" style={{ gridTemplateRows: "repeat(3, minmax(0,1fr))" }}>
                 {items.map((it, i) => {
                   const Icon = statIcon(s(it.label));
                   const dot = [INFO_FILL.blue, INFO_FILL.aqua, INFO_FILL.lavender][i % 3]!;
@@ -174,7 +175,7 @@ registerSlideModule({
                   return (
                     <div
                       key={i}
-                      className="relative flex flex-col justify-between overflow-hidden rounded-[18px] p-5"
+                      className="relative flex flex-col justify-between overflow-hidden rounded-[18px] py-4 pl-6 pr-4"
                       style={{
                         background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.78)",
                         border: `1px solid ${ink.hairline}`,
@@ -183,15 +184,15 @@ registerSlideModule({
                     >
                       <span aria-hidden className="absolute inset-y-0 left-0 w-[6px]" style={{ background: dot.bg }} />
                       <div className="flex items-center justify-between">
-                        <span className="flex h-[48px] w-[48px] items-center justify-center rounded-[14px]" style={{ background: dot.bg, color: dot.fg }}>
+                        <span className="flex h-[42px] w-[42px] items-center justify-center rounded-[12px]" style={{ background: dot.bg, color: dot.fg }}>
                           <Icon size={26} strokeWidth={1.7} />
                         </span>
                         {pct !== null && (
-                          <Donut pct={pct} size={56} stroke={8} color={isDark ? INFO_FILL.aqua.bg : INFO_FILL.blue.bg} track={ink.hairline} />
+                          <Donut pct={pct} size={44} stroke={7} color={isDark ? INFO_FILL.aqua.bg : INFO_FILL.blue.bg} track={ink.hairline} />
                         )}
                       </div>
                       <div>
-                        <Figure value={s(it.value)} unit={s(it.unit)} px={48} color={ink.strong} />
+                        <Figure value={s(it.value)} unit={s(it.unit)} px={40} color={ink.strong} />
                         <div className="mt-1" style={{ fontSize: fillPx(17, "body"), color: ink.body, lineHeight: 1.3, fontWeight: 500 }}>{s(it.label)}</div>
                       </div>
                     </div>
