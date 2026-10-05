@@ -79,7 +79,7 @@ export type LiveLayout = {
 };
 
 /** Signage templates share the kiosk editor; their ids carry this prefix. */
-export const isSignId = (id: string) => id.startsWith("legalnext-") || id.startsWith("sfsurround-");
+export const isSignId = (id: string) => id.startsWith("legalnext-") || id.startsWith("sfsurround-") || id.startsWith("divsign-");
 
 export type KioskFace = "left" | "right";
 /** One side strip read from the designer's CMYK file, split one object per page. */

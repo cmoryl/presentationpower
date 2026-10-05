@@ -1318,5 +1318,90 @@
   "sign": {
    "margin": 36.0
   }
+ },
+ "divsign-finance-reg-desk": {
+  "id": "divsign-finance-reg-desk",
+  "source": "Bar_Front_Tamplate_2026_71.25x40.5.ai",
+  "trimW": 5130.0,
+  "trimH": 2916.0,
+  "originX": 9.0,
+  "originY": 9.0,
+  "mediaW": 5148.0,
+  "mediaH": 2934.0,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "REGISTRATION",
+    "font": "Geist-Bold",
+    "size": 254.64,
+    "color": "#FFFFFF",
+    "x": 1660.94,
+    "y": 1999.74,
+    "w": 1845.81,
+    "top": 1818.96,
+    "bottom": 2003.82,
+    "cmyk": [
+     0,
+     0,
+     0,
+     0
+    ]
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 2916.0,
+    "c0": 0,
+    "c1": 2916.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 1389.78,
+      "y0": 277.61,
+      "x1": 3740.21,
+      "y1": 1425.71
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#BC7DC5"
+   },
+   {
+    "offset": 1,
+    "color": "#5094BF"
+   }
+  ],
+  "native": {
+   "version": "finance-desk-2026-10-05",
+   "profile": "RGB (house colour space)",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   }
+  },
+  "sign": {
+   "margin": 72.0
+  }
  }
 }

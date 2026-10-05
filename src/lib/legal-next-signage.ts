@@ -53,6 +53,14 @@ export const SF_SCREEN_SURROUNDS: LegalSign[] = [
   },
 ];
 
-export const legalSign = (id: string) => [...LEGAL_NEXT_SIGNS, ...SF_SCREEN_SURROUNDS].find((s) => s.id === id) ?? null;
+/** Division desk fronts drawn by the app on a supplied template, edited live in the sign editor. */
+export const DIVISION_LIVE_SIGNS: LegalSign[] = [
+  {
+    id: "finance-reg-desk", title: "FinanceNEXT registration desk front", size: "71.25 × 40.5 in", master: "Bar_Front_Tamplate_2026_71.25x40.5.ai",
+    faces: [{ id: "divsign-finance-reg-desk", label: "Front" }],
+  },
+];
+
+export const legalSign = (id: string) => [...LEGAL_NEXT_SIGNS, ...SF_SCREEN_SURROUNDS, ...DIVISION_LIVE_SIGNS].find((s) => s.id === id) ?? null;
 export const legalSignMasterUrl = (s: LegalSign) => masterUrl(s.master);
 export const legalSignLayout = (faceId: string): LiveLayout | null => (isSignId(faceId) ? SIGN_LIVE_LAYOUTS[faceId] ?? null : null);
