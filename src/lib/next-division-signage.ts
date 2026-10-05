@@ -64,6 +64,8 @@ type DeskSpec = {
   trimW: number;
   trimH: number;
   bleedEdge: number;
+  /** Sign-editor id of the live, editable version of this desk. */
+  liveSignId?: string;
 };
 
 const IN = 25.4;
@@ -78,12 +80,13 @@ export const DIVISION_DESK_TEMPLATES: DeskSpec[] = [
     trimW: 71.25 * IN,
     trimH: 40.5 * IN,
     bleedEdge: 0.125 * IN,
+    liveSignId: "finance-reg-desk",
   },
 ];
 
 export const DIVISION_SIGN_DIVISIONS = Object.keys(LONDON_DIVISION_ACCENTS);
 
-export type DivisionSign = { group: DivisionSignGroup; label: string; panel: LondonPanel };
+export type DivisionSign = { group: DivisionSignGroup; label: string; panel: LondonPanel; liveSignId?: string };
 
 /** The full starter set for one division, or [] for an unknown division. */
 export function divisionSigns(divisionId: string): DivisionSign[] {
@@ -114,6 +117,7 @@ export function divisionSigns(divisionId: string): DivisionSign[] {
     out.push({
       group: "desk",
       label: d.label,
+      liveSignId: d.liveSignId,
       panel: {
         ...src,
         id: `div-${divisionId}-${d.slug}`,

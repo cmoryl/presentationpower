@@ -5,7 +5,8 @@
  */
 
 import { useMemo, useState } from "react";
-import { Download } from "lucide-react";
+import { Download, Pencil } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -82,6 +83,13 @@ function SignCard({ sign, compact }: { sign: DivisionSign; compact?: boolean }) 
           <Button size="sm" variant="outline" disabled={!!busy} onClick={() => download("ai")}>
             <Download className="h-3.5 w-3.5" /> {busy === "ai" ? "…" : "AI"}
           </Button>
+          {sign.liveSignId ? (
+            <Button size="sm" asChild>
+              <Link to="/events/next/sign-editor/$signId" params={{ signId: sign.liveSignId }}>
+                <Pencil className="h-3.5 w-3.5" /> Edit live file
+              </Link>
+            </Button>
+          ) : null}
         </div>
       )}
     </figure>
