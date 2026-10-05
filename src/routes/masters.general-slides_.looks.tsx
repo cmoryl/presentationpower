@@ -28,6 +28,13 @@ import lightTriPastel from "@/assets/looks/light-tri-pastel.jpg";
 import lightSunriseVeil from "@/assets/looks/light-sunrise-veil.jpg";
 import lightSpringMist from "@/assets/looks/light-spring-mist.jpg";
 import darkTwinGlow from "@/assets/looks/dark-twin-glow.jpg";
+
+// Supplied Aurora Dark set: slideNN.jpg is authored for slide NN of the master.
+const AURORA_DARK: string[] = Object.entries(
+  import.meta.glob("@/assets/looks/aurora-dark/*.jpg", { eager: true, import: "default" }) as Record<string, string>,
+)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([, u]) => u);
 import lightSkyHaze from "@/assets/looks/light-sky-haze.jpg";
 import lightLavenderMist from "@/assets/looks/light-lavender-mist.jpg";
 import lightAquaFloor from "@/assets/looks/light-aqua-floor.jpg";
@@ -60,6 +67,7 @@ type Look = {
 const LOOKS: Look[] = [
   { id: "current-dark", name: "Current dark", mode: "dark", note: "The approved dark master as it is today.", url: null },
   { id: "current-light", name: "Current light", mode: "light", note: "The approved light master as it is today.", url: null },
+  { id: "aurora-dark", name: "Aurora Dark", mode: "dark", note: "Supplied aurora set — one authored background per slide.", url: null, urls: AURORA_DARK, isNew: true },
   { id: "cobalt-rise", name: "Cobalt Rise", mode: "dark", note: "Cobalt light blooms rising from the lower right.", url: darkCobaltRise, isNew: true },
   { id: "lavender-bloom", name: "Lavender Bloom", mode: "dark", note: "Lavender light blooms from the top right.", url: darkLavenderBloom, isNew: true },
   { id: "neon-bokeh", name: "Neon Bokeh", mode: "dark", note: "Soft-focus light blooms in cobalt, violet and magenta.", url: darkMidnightDawn, isNew: true },
