@@ -126,8 +126,8 @@ function LooksPage() {
                 <div
                   className="aspect-video w-full bg-cover bg-center"
                   style={{
-                    backgroundImage: l.url ? `url(${l.url})` : undefined,
-                    background: l.url ? undefined : l.mode === "dark" ? "#03002C" : "#EEF1F7",
+                    backgroundImage: (l.url || l.urls?.[0]) ? `url(${l.url || l.urls?.[0]})` : undefined,
+                    background: (l.url || l.urls?.length) ? undefined : l.mode === "dark" ? "#03002C" : "#EEF1F7",
                   }}
                 />
                 <div className="p-3">
