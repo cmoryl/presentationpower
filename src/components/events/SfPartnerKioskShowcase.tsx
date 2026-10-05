@@ -1,14 +1,11 @@
 import { useRef, useState } from "react";
 import { Box, ExternalLink, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { sfKiosk3dUrl } from "@/lib/sf-kiosk-3d";
 
 const ORIGIN = "https://boothhub.lovable.app/showcase/next-sf";
 const BASE = `${ORIGIN}?chromeless=1`;
 
-/** BoothHub's single-partner 3D view: `?kiosk=<slug>&single=1`. */
-export function sfKiosk3dUrl(slug: string, embed = false): string {
-  return `${ORIGIN}?${embed ? "chromeless=1&" : ""}kiosk=${encodeURIComponent(slug)}&single=1`;
-}
 
 // Slugs and names as BoothHub publishes them (src/data/nextSfKiosks.ts there).
 export const SF_PARTNER_KIOSKS = [
