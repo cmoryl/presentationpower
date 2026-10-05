@@ -277,15 +277,15 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
   };
   const addChevrons = () => {
     const id = `mark-c${Date.now().toString(36)}`;
-    const w = KW * 0.12;
-    commit({ ...edits, marks: [...(edits.marks ?? []), { id, kind: "chevrons", family: markFamily, x: KW * 0.06, y: KH * 0.08, w, opacity: 1 }] });
+    const w = KIOSK_W * 0.12;
+    commit({ ...edits, marks: [...(edits.marks ?? []), { id, kind: "chevrons", family: markFamily, x: KIOSK_W * 0.06, y: KIOSK_H * 0.08, w, opacity: 1 }] });
     setMarkSel(id);
   };
   const logoPart = L.blocks.flatMap((b) => b.parts)[0];
   const swapLogo = (colourway: NextLogoColourway, shape: "stacked" | "side") => {
     const cur = (edits.marks ?? []).find((m) => m.kind === "logo");
     if (cur) { commit({ ...edits, marks: (edits.marks ?? []).map((m) => (m.id === cur.id ? { ...m, colourway, shape } : m)) }); setMarkSel(cur.id); return; }
-    const box = logoPart ?? { x0: KW * 0.3, x1: KW * 0.7, y0: KH * 0.1, y1: KH * 0.5 };
+    const box = logoPart ?? { x0: KIOSK_W * 0.3, x1: KIOSK_W * 0.7, y0: KIOSK_H * 0.1, y1: KIOSK_H * 0.5 };
     const id = `mark-l${Date.now().toString(36)}`;
     const probe: KioskMark = { id, kind: "logo", family: markFamily, colourway, shape, x: 0, y: 0, w: 1 };
     const a = markArt(probe);
@@ -1320,7 +1320,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                         </div>
                       ) : null}
                       <div className="flex flex-wrap gap-1">
-                        <button type="button" className={dbtn} onClick={() => patchMark(m.id, { x: (KW - m.w) / 2 })}>Centre across</button>
+                        <button type="button" className={dbtn} onClick={() => patchMark(m.id, { x: (KIOSK_W - m.w) / 2 })}>Centre across</button>
                         <button type="button" className={dbtn} onClick={() => m.kind === "logo" ? restoreLogo() : (commit({ ...edits, marks: (edits.marks ?? []).filter((x) => x.id !== m.id) }), setMarkSel(null))}><Trash2 className="h-3.5 w-3.5" aria-hidden /> Remove</button>
                       </div>
                     </div>
