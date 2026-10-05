@@ -8,6 +8,7 @@ import { SlideFrame, SlideTitle, arr, s } from "../module-kit";
 import { fillPx } from "@/lib/open-space-fill";
 import { accentInk, hexA } from "@/lib/accent-tokens";
 import { Rocket, Users, Globe2, Flag, Sparkles, MapPin, BarChart3, type LucideIcon } from "lucide-react";
+import { Donut, FillTile, Figure, INFO_FILL, pctOf, type InfoFill } from "./infographic-kit";
 
 function statIcon(label: string): LucideIcon {
   const l = label.toLowerCase();
@@ -99,71 +100,67 @@ registerSlideModule({
       case "MV-STAT-PROOF-BOARD": {
         const hero = arr(c.hero).slice(0, 4);
         const items = arr(c.items).slice(0, 8);
+        const fills: InfoFill[] = ["blue", "navy", "aqua", "lavender"];
+        if (isDark) fills[1] = "lavender", fills[3] = "aqua";
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-            <div data-portrait="proof-stack" className="mt-10 grid flex-1 grid-cols-[1.25fr_1fr] gap-10">
-              <section className="flex flex-col">
+            <div data-portrait="proof-stack" className="mt-8 grid flex-1 grid-cols-[1.3fr_1fr] gap-10">
+              <section className="flex min-h-0 flex-col">
                 {(s(c.brandLabel) || s(c.tagline)) && (
-                  <div className="mb-6 flex items-baseline gap-4">
+                  <div className="mb-5 flex items-baseline gap-4">
                     {s(c.brandLabel) && (
-                      <span style={{ fontSize: fillPx(30, "body"), fontWeight: 700, color: ink.strong }}>
-                        {s(c.brandLabel)}
-                      </span>
+                      <span style={{ fontSize: fillPx(30, "body"), fontWeight: 700, color: ink.strong }}>{s(c.brandLabel)}</span>
                     )}
-                    {s(c.tagline) && (
-                      <span style={{ fontSize: fillPx(18, "body"), color: ink.muted }}>{s(c.tagline)}</span>
-                    )}
+                    {s(c.tagline) && <span style={{ fontSize: fillPx(18, "body"), color: ink.muted }}>{s(c.tagline)}</span>}
                   </div>
                 )}
-                <div className="grid flex-1 grid-cols-2 gap-6">
+                <div className="grid flex-1 grid-cols-2 grid-rows-2 gap-5">
                   {hero.map((it, i) => {
-                    const pct = s(it.unit) === "%" ? Number(s(it.value)) : NaN;
+                    const fill = fills[i % 4]!;
+                    const f = INFO_FILL[fill];
+                    const pct = pctOf(s(it.value), s(it.unit));
+                    const Icon = statIcon(s(it.label));
                     return (
-                      <div
-                        key={i}
-                        className="flex flex-col rounded-2xl p-7"
-                        style={{
-                          background: isDark ? "rgba(255,255,255,0.05)" : hexA(accent, 0.05),
-                          border: `1px solid ${ink.hairline}`,
-                        }}
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <BigNumber value={s(it.value)} unit={s(it.unit)} size={104} ink={ink.strong} unitColor={isDark ? ink.strong : accent} />
-                          {void pct}
-                        </div>
-                        <div
-                          className="mt-3"
-                          style={{ fontSize: fillPx(19, "body"), lineHeight: 1.35, color: ink.body, fontWeight: 500 }}
-                        >
-                          {s(it.label)}
-                        </div>
-                        <div className="mt-auto pt-5">
-                          <ScaleBar value={s(it.value)} unit={s(it.unit)} color={isDark ? "#FFFFFF" : accent} track={ink.hairline} caption={ink.muted} />
-                        </div>
-                      </div>
+                      <FillTile key={i} fill={fill} className="flex flex-col justify-between p-7">
+                        {pct !== null ? (
+                          <div className="flex items-center gap-6">
+                            <Donut pct={pct} size={170} stroke={18} color={f.ring} track={f.track}>
+                              <Figure value={s(it.value)} unit={s(it.unit)} px={50} color={f.fg} />
+                            </Donut>
+                            <div style={{ fontSize: fillPx(22, "body"), lineHeight: 1.3, fontWeight: 600 }}>{s(it.label)}</div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-start justify-between">
+                              <Figure value={s(it.value)} unit={s(it.unit)} px={96} color={f.fg} />
+                              <span className="flex h-[64px] w-[64px] items-center justify-center rounded-full" style={{ background: f.track }}>
+                                <Icon size={32} strokeWidth={1.6} />
+                              </span>
+                            </div>
+                            <div style={{ fontSize: fillPx(22, "body"), lineHeight: 1.3, fontWeight: 600 }}>{s(it.label)}</div>
+                          </>
+                        )}
+                      </FillTile>
                     );
                   })}
                 </div>
               </section>
-              <section data-portrait="proof-tiles" className="grid grid-cols-2 content-center gap-5">
+              <section data-portrait="proof-tiles" className="flex flex-col justify-center">
                 {items.map((it, i) => {
                   const Icon = statIcon(s(it.label));
+                  const dot = [INFO_FILL.blue, INFO_FILL.aqua, INFO_FILL.lavender][i % 3]!;
                   return (
                     <div
                       key={i}
-                      className="relative flex flex-col overflow-hidden rounded-2xl p-6"
-                      style={{ background: isDark ? "rgba(255,255,255,0.05)" : hexA(accent, 0.05), border: `1px solid ${ink.hairline}` }}
+                      className="flex items-center gap-6 py-[14px]"
+                      style={{ borderTop: i ? `1px solid ${ink.hairline}` : undefined }}
                     >
-                      <div aria-hidden className="absolute inset-x-0 top-0 h-[3px]" style={{ background: isDark ? `linear-gradient(90deg, ${hexA(accentInk(brand.tokens.accent, "dark"), 0)}, ${accentInk(brand.tokens.accent, "dark")}, ${hexA(accentInk(brand.tokens.accent, "dark"), 0)})` : `linear-gradient(90deg, ${accent}, ${hexA(accent, 0)})` }} />
-                      <div className="absolute right-6 top-6 flex items-center justify-center" style={{ width: 44, height: 44, color: isDark ? "#FFFFFF" : accent, filter: isDark ? "drop-shadow(0 0 10px rgba(127,227,245,0.55))" : undefined, opacity: isDark ? 0.92 : 1 }}>
-                        <Icon size={34} strokeWidth={1.4} />
-                      </div>
-                      <div className="mt-10 pr-16 tabular-nums" style={{ fontSize: fillPx(48, "body"), fontWeight: 800, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1 }}>
-                        {s(it.value)}
-                        {s(it.unit) && <span style={{ color: isDark ? ink.strong : accent }}>{s(it.unit)}</span>}
-                      </div>
-                      <div className="mt-2" style={{ fontSize: fillPx(17, "body"), color: ink.muted, lineHeight: 1.3 }}>{s(it.label)}</div>
+                      <span className="flex h-[58px] w-[58px] shrink-0 items-center justify-center rounded-full" style={{ background: dot.bg, color: dot.fg }}>
+                        <Icon size={28} strokeWidth={1.7} />
+                      </span>
+                      <Figure value={s(it.value)} unit={s(it.unit)} px={50} color={ink.strong} style={{ minWidth: 190 }} />
+                      <div style={{ fontSize: fillPx(20, "body"), color: ink.body, lineHeight: 1.3, fontWeight: 500 }}>{s(it.label)}</div>
                     </div>
                   );
                 })}
