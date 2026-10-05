@@ -14,6 +14,10 @@ import { resolveBrandMode } from "@/lib/brand-profiles";
 import darkCobaltRise from "@/assets/looks/dark-cobalt-rise.jpg";
 import darkLavenderBloom from "@/assets/looks/dark-lavender-bloom.jpg";
 import darkMidnightDawn from "@/assets/looks/dark-midnight-dawn.jpg";
+import darkHoloFlow from "@/assets/looks/dark-holo-flow.jpg";
+import darkFlutedGlass from "@/assets/looks/dark-fluted-glass.jpg";
+import lightPearlHolo from "@/assets/looks/light-pearl-holo.jpg";
+import lightFlutedFrost from "@/assets/looks/light-fluted-frost.jpg";
 import darkTriAurora from "@/assets/looks/dark-tri-aurora.jpg";
 import darkDuskPrism from "@/assets/looks/dark-dusk-prism.jpg";
 import darkNorthernGlow from "@/assets/looks/dark-northern-glow.jpg";
@@ -44,11 +48,13 @@ const LOOKS: Look[] = [
   { id: "current-light", name: "Current light", mode: "light", note: "The approved light master as it is today.", url: null },
   { id: "cobalt-rise", name: "Cobalt Rise", mode: "dark", note: "Blue glow lifting from the lower right.", url: darkCobaltRise, isNew: true },
   { id: "lavender-bloom", name: "Lavender Bloom", mode: "dark", note: "Lavender light from the top left corner.", url: darkLavenderBloom, isNew: true },
-  { id: "midnight-dawn", name: "Midnight Dawn", mode: "dark", note: "Cobalt glow rising from the bottom centre.", url: darkMidnightDawn, isNew: true },
+  { id: "neon-bokeh", name: "Neon Bokeh", mode: "dark", note: "Soft-focus light blooms in cobalt, violet and magenta.", url: darkMidnightDawn, isNew: true },
   { id: "twin-glow", name: "Twin Glow", mode: "dark", note: "Blue and lavender glows at opposite corners.", url: darkTwinGlow, isNew: true },
   { id: "tri-aurora", name: "Tri Aurora", mode: "dark", note: "Three colours: blue, lavender and aqua glows in three corners.", url: darkTriAurora, isNew: true },
   { id: "dusk-prism", name: "Dusk Prism", mode: "dark", note: "Three colours: blue, lavender and pink sweep on the right.", url: darkDuskPrism, isNew: true },
   { id: "northern-glow", name: "Northern Glow", mode: "dark", note: "Three colours: blue, aqua and green glows.", url: darkNorthernGlow, isNew: true },
+  { id: "holo-flow", name: "Holo Flow", mode: "dark", note: "Soft-focus liquid chrome in aqua, cobalt and lavender.", url: darkHoloFlow, isNew: true },
+  { id: "fluted-glass", name: "Fluted Glass", mode: "dark", note: "Blue, lime and violet light seen through ribbed glass.", url: darkFlutedGlass, isNew: true },
   { id: "sky-haze", name: "Sky Haze", mode: "light", note: "Soft aqua and sky blue blur, top right.", url: lightSkyHaze, isNew: true },
   { id: "lavender-mist", name: "Lavender Mist", mode: "light", note: "Lavender and blush soft focus, bottom right.", url: lightLavenderMist, isNew: true },
   { id: "aqua-floor", name: "Aqua Floor", mode: "light", note: "Bright page with an aqua glow along the bottom.", url: lightAquaFloor, isNew: true },
@@ -56,6 +62,8 @@ const LOOKS: Look[] = [
   { id: "tri-pastel", name: "Tri Pastel", mode: "light", note: "Three colours: sky blue, lavender and aqua soft focus on the right.", url: lightTriPastel, isNew: true },
   { id: "sunrise-veil", name: "Sunrise Veil", mode: "light", note: "Three colours: peach, lavender and blue along the bottom.", url: lightSunriseVeil, isNew: true },
   { id: "spring-mist", name: "Spring Mist", mode: "light", note: "Three colours: aqua, green and blue in two corners.", url: lightSpringMist, isNew: true },
+  { id: "pearl-holo", name: "Pearl Holo", mode: "light", note: "Pearly soft-focus lavender, aqua and coral.", url: lightPearlHolo, isNew: true },
+  { id: "fluted-frost", name: "Fluted Frost", mode: "light", note: "Blue, lavender and yellow through ribbed frosted glass.", url: lightFlutedFrost, isNew: true },
 ];
 
 export const Route = createFileRoute("/masters/general-slides_/looks")({
