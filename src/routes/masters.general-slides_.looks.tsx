@@ -73,7 +73,7 @@ const LOOKS: Look[] = [
   { id: "spring-mist", name: "Spring Mist", mode: "light", note: "Aqua, green and blue light blooms in two corners.", url: lightSpringMist, isNew: true },
   { id: "pearl-holo", name: "Pearl Holo", mode: "light", note: "Pearly soft-focus lavender, aqua and coral.", url: lightPearlHolo, isNew: true },
   { id: "fluted-frost", name: "Golden Hour", mode: "light", note: "Blue, lavender and yellow light blooms.", url: lightFlutedFrost, isNew: true },
-  { id: "prism-lines", name: "Prism Lines", mode: "dark", note: "Blue, lavender and aqua blooms behind fine light lines.", url: "", urls: lineSet("prism-lines"), isNew: true },
+  { id: "prism-lines", name: "Prism Lines", mode: "dark", note: "Six soft layouts: veils, horizon glow, light sweep, aurora, wash and fine grid.", url: "", urls: lineSet("prism-lines"), isNew: true },
   { id: "cobalt-rail", name: "Cobalt Rail", mode: "dark", note: "Cobalt and aqua blooms with straight light rails.", url: "", urls: lineSet("cobalt-rail"), isNew: true },
   { id: "violet-beam", name: "Violet Beam", mode: "dark", note: "Violet, lavender and pink blooms through angled lines.", url: "", urls: lineSet("violet-beam"), isNew: true },
   { id: "aqua-shift", name: "Aqua Shift", mode: "dark", note: "Teal, aqua and blue blooms with soft line bands.", url: "", urls: lineSet("aqua-shift"), isNew: true },
@@ -82,6 +82,10 @@ const LOOKS: Look[] = [
   { id: "mint-beam", name: "Mint Beam", mode: "light", note: "Aqua, mint and blue blooms through light lines.", url: "", urls: lineSet("mint-beam"), isNew: true },
   { id: "dawn-lines", name: "Dawn Lines", mode: "light", note: "Peach, lavender and blue blooms with soft line bands.", url: "", urls: lineSet("dawn-lines"), isNew: true },
 ];
+
+// Trimmed: keep only a few orb looks so the line-and-veil families lead.
+const KEEP_ORB = new Set(["neon-bokeh", "tri-aurora", "pearl-holo", "sunrise-veil"]);
+const SHOWN_LOOKS = LOOKS.filter((l) => !l.url || l.urls || KEEP_ORB.has(l.id) || l.id.startsWith("current"));
 
 export const Route = createFileRoute("/masters/general-slides_/looks")({
   head: () => ({
@@ -112,7 +116,7 @@ function LooksPage() {
         </p>
 
         <div role="radiogroup" aria-label="Deck look" className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {LOOKS.map((l) => {
+          {SHOWN_LOOKS.map((l) => {
             const on = l.id === lookId;
             return (
               <button
