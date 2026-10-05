@@ -62,16 +62,9 @@ registerSlideModule({
               `,
               }}
             />
-            {isDark ? (
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -right-40 top-1/2 h-[820px] w-[820px] -translate-y-1/2 rounded-full"
-                style={{
-                  border: `1px solid ${hexA(brand.tokens.accent, 0.133)}`,
-                  boxShadow: `inset 0 0 0 1px ${hexA(brand.tokens.accent, 0.067)}, inset 0 0 220px ${hexA(brand.tokens.accent, 0.094)}`,
-                }}
-              />
-            ) : (
+            {/* Dark covers no longer draw the transparent ring on the right
+                (retired at the user's request); the ground's glow carries depth. */}
+            {isDark ? null : (
               /* Light covers drop the ringed sphere (it read as a hard white
                disc on white) in favour of our accent aura: two soft, heavily
                blurred accent orbs drifting in from the right edge. */
