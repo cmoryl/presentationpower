@@ -37,6 +37,7 @@ import {
   Zap,
 } from "lucide-react";
 import type { CSSProperties } from "react";
+import { Donut, FillTile, Figure, INFO_FILL, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 type IconType = typeof Sparkles;
 
@@ -571,8 +572,12 @@ registerSlideModule({
               ))}
             </div>
           );
-          const hero = gA[0];
-          const sideA = gA.slice(1, 3);
+          void marks;
+          void surf;
+          void bod;
+          const maxA = Math.max(1, ...gA.map((it) => numOf(s(it.value))));
+          const barFills: InfoFill[] = ["blue", "aqua", "lavender"];
+          const tileFills: InfoFill[] = isDark ? ["blue", "aqua", "lavender"] : ["blue", "navy", "lavender"];
           return (
             <SlideFrame brand={brand} pageNumber={pageNumber}>
               <SlideTitle brand={brand} title={s(c.title, variant.name)} />
@@ -581,118 +586,56 @@ registerSlideModule({
                   {s(c.subtitle)}
                 </div>
               )}
-              <div
-                className="slide-fill-stretch mt-8 grid gap-5"
-                style={{ gridTemplateColumns: "repeat(12, minmax(0,1fr))", gridTemplateRows: "1fr 1fr 1.25fr" }}
-              >
-                {hero && (
-                  <div style={surf({ gridColumn: "span 6", gridRow: "span 2", padding: 36 })}>
-                    <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
-                    <div
-                      aria-hidden
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        background:
-                          "radial-gradient(110% 90% at 0% 100%, color-mix(in oklab, var(--slide-accent-text) 16%, transparent), transparent 62%)",
-                      }}
-                    />
-                    <div className="relative flex h-full flex-col justify-between">
-                      {kick(s(groups[0]?.label))}
-                      <div>
-                        {big(s(hero.value), 200)}
-                        <div className="mt-4">{lab(s(hero.label), 28)}</div>
-                      </div>
-                      <div>
-                        {/* One tick per year — exactly the stated figure. */}
-                        <div aria-hidden className="flex items-end gap-[5px]" style={{ height: 70 }}>
-                          {Array.from({ length: Math.min(60, Math.round(numeric(s(hero.value)))) }).map((_, k, a) => (
-                            <span
-                              key={k}
-                              style={{
-                                flex: 1,
-                                height: `${30 + (k / Math.max(a.length - 1, 1)) * 70}%`,
-                                borderRadius: 3,
-                                background: `color-mix(in oklab, var(--slide-accent-text) ${35 + Math.round((k / Math.max(a.length - 1, 1)) * 65)}%, transparent)`,
-                              }}
+              <div className="slide-fill-stretch mt-8 grid gap-6" style={{ gridTemplateRows: "auto 1fr" }}>
+                <section className="flex flex-col gap-4">
+                  {kick(s(groups[0]?.label))}
+                  {gA.slice(0, 3).map((it, i) => {
+                    const n = numOf(s(it.value));
+                    const f = INFO_FILL[barFills[i % 3]!];
+                    return (
+                      <div key={i} className="grid items-center gap-6" style={{ gridTemplateColumns: "150px 1fr" }}>
+                        <Figure value={s(it.value)} px={72} color={ink.strong} />
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-baseline gap-3">
+                            {lab(s(it.label), 22)}
+                            {s(it.body) && (
+                              <span style={{ fontSize: fillPx(16, "body"), color: ink.muted }}>{s(it.body)}</span>
+                            )}
+                          </div>
+                          <div className="h-[22px] rounded-full" style={{ background: ink.hairline }}>
+                            <div
+                              className="h-full rounded-full"
+                              style={{ width: `${Math.max(4, (n / maxA) * 100)}%`, background: f.bg }}
                             />
-                          ))}
+                          </div>
                         </div>
-                        {bod(s(hero.body))}
                       </div>
-                    </div>
-                  </div>
-                )}
-                {sideA.map((it, i) => {
-                  const n = Math.min(40, Math.round(numeric(s(it.value))));
-                  return (
-                    <div
-                      key={i}
-                      style={surf({
-                        gridColumn: "span 6",
-                        padding: 28,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 28,
-                      })}
-                    >
-                      <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
-                      <div className="shrink-0">{big(s(it.value), 104)}</div>
-                      <div className="flex min-w-0 flex-1 flex-col gap-3">
-                        {lab(s(it.label))}
-                        {bod(s(it.body))}
-                        {marks(n, Math.ceil(n / 2), 14, i === 0)}
-                      </div>
-                    </div>
-                  );
-                })}
-                <div
-                  className="flex flex-col gap-3"
-                  style={{ gridColumn: "span 12", minHeight: 0 }}
-                >
+                    );
+                  })}
+                </section>
+                <section className="flex min-h-0 flex-col gap-4">
                   {kick(s(groups[1]?.label))}
                   <div className="grid min-h-0 flex-1 grid-cols-3 gap-5">
                     {gB.slice(0, 3).map((it, i) => {
-                      const pct = Math.max(0, Math.min(100, numeric(s(it.value))));
-                      const R = 62;
-                      const C = 2 * Math.PI * R;
+                      const fill = tileFills[i % 3]!;
+                      const f = INFO_FILL[fill];
+                      const pct = pctOf(s(it.value)) ?? Math.max(0, Math.min(100, numeric(s(it.value))));
                       return (
-                        <div
-                          key={i}
-                          style={surf({ padding: 26, display: "flex", alignItems: "center", gap: 24 })}
-                        >
-                          <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
-                          <svg width={156} height={156} viewBox="-78 -78 156 156" className="shrink-0" aria-hidden>
-                            <circle r={R} fill="none" stroke={ink.hairline} strokeWidth={14} />
-                            <circle
-                              r={R}
-                              fill="none"
-                              stroke="var(--slide-accent-text)"
-                              strokeWidth={14}
-                              strokeLinecap="round"
-                              strokeDasharray={`${(pct / 100) * C} ${C}`}
-                              transform="rotate(-90)"
-                            />
-                            <text
-                              textAnchor="middle"
-                              dominantBaseline="central"
-                              fontSize={38}
-                              fontWeight={700}
-                              fill={ink.strong}
-                              style={{ letterSpacing: "-0.03em" }}
-                            >
-                              {s(it.value)}
-                            </text>
-                          </svg>
+                        <FillTile key={i} fill={fill} className="flex items-center gap-6 p-7">
+                          <Donut pct={pct} size={180} stroke={20} color={f.ring} track={f.track}>
+                            <Figure value={s(it.value)} px={46} color={f.fg} />
+                          </Donut>
                           <div className="flex min-w-0 flex-col gap-2">
-                            {lab(s(it.label), 24)}
-                            {bod(s(it.body))}
+                            <div style={{ fontSize: fillPx(26, "body"), fontWeight: 700 }}>{s(it.label)}</div>
+                            {s(it.body) && (
+                              <div style={{ fontSize: fillPx(17, "body"), lineHeight: 1.4, opacity: 0.9 }}>{s(it.body)}</div>
+                            )}
                           </div>
-                        </div>
+                        </FillTile>
                       );
                     })}
                   </div>
-                </div>
+                </section>
               </div>
             </SlideFrame>
           );
