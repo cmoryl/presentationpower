@@ -341,6 +341,7 @@ export function withIndustryPhotoArt(pack: StylePack, code: string): StylePack {
       const url = industryPhotoUrl(plateCode, scene, take);
 
       if (!url) return base(seed);
+      if (set.mode === "light" && url === set.hero) console.log("HEROPLATE", code, plateCode, seed);
       if (set.mode === "light" && url === set.hero && !INDUSTRY_PHOTO[code.toUpperCase()]) return base(seed);
       // Every take must READ as a different backdrop. The family pair only
       // yields two plates, so takes beyond the pair re-frame the plate
