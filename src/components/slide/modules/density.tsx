@@ -9,7 +9,7 @@ import { fillPx } from "@/lib/open-space-fill";
 import { accentInk, hexA } from "@/lib/accent-tokens";
 import { Rocket, Users, Globe2, Flag, Sparkles, MapPin, BarChart3, Code2, Building2, type LucideIcon } from "lucide-react";
 import * as React from "react";
-import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, LogLollipop, Pictogram, RadialBars, numOf, pctOf, type InfoFill } from "./infographic-kit";
+import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, LogLollipop, Pictogram, RadialBars, DotField, dotUnit, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 function statIcon(label: string): LucideIcon {
   const l = label.toLowerCase();
@@ -150,20 +150,42 @@ registerSlideModule({
                       gradient={`linear-gradient(100deg, ${ink.strong} 35%, ${blue} 75%, ${INFO_FILL.lavender.bg})`}
                     />
                     <div style={{ fontSize: fillPx(22, "body"), color: ink.body, marginTop: 10, fontWeight: 500 }}>{s(it.label)}</div>
+                    {(() => {
+                      const n = numOf(s(it.value));
+                      const per = i === 0 ? 100 : 10;
+                      return (
+                        <div className="mt-4 flex items-end gap-5">
+                          <DotField count={Math.round(n / per)} cols={i === 0 ? 30 : 20} dot={i === 0 ? 11 : 12} gap={6} from={i === 0 ? blue : INFO_FILL.lavender.bg} to={i === 0 ? INFO_FILL.lavender.bg : blue} />
+                          <span style={{ fontSize: fillPx(13, "body"), color: ink.muted, whiteSpace: "nowrap" }}>1 dot = {per}</span>
+                        </div>
+                      );
+                    })()}
                   </div>
                 ))}
               </section>
               <section className="col-span-2 mt-6 grid pt-6" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0,1fr))`, borderTop: `1px solid ${hair}` }}>
                 {items.map((it, i) => {
                   const pct = pctOf(s(it.value), s(it.unit));
-                  const frac = pct !== null ? pct / 100 : Math.log10(Math.max(1, numOf(s(it.value)))) / maxExp;
+                  void maxExp;
                   return (
-                    <div key={i} className="flex flex-col gap-2 px-5" style={{ borderLeft: i ? `1px solid ${hair}` : undefined }}>
+                    <div key={i} className="flex flex-col justify-start gap-3 px-5" style={{ borderLeft: i ? `1px solid ${hair}` : undefined }}>
                       <Figure value={s(it.value)} unit={s(it.unit)} px={46} color={ink.strong} />
                       <div style={{ fontSize: fillPx(15, "body"), color: ink.muted, lineHeight: 1.3, minHeight: "2.6em" }}>{s(it.label)}</div>
-                      <div aria-hidden className="relative h-[4px] rounded-full" style={{ background: hair }}>
-                        <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${frac * 100}%`, background: `linear-gradient(90deg, ${INFO_FILL.lavender.bg}, ${blue})` }} />
-                      </div>
+                      {pct !== null ? (
+                        <Donut pct={pct} size={92} stroke={11} color={blue} track={hair} />
+                      ) : (
+                        (() => {
+                          const n = numOf(s(it.value));
+                          const per = dotUnit(n);
+                          const cnt = Math.round(n / per);
+                          return (
+                            <div className="flex flex-col gap-2">
+                              <DotField count={cnt} cols={cnt <= 10 ? cnt : 15} dot={cnt <= 10 ? 16 : 8} gap={cnt <= 10 ? 7 : 5} from={blue} to={INFO_FILL.lavender.bg} />
+                              {per > 1 && <span style={{ fontSize: fillPx(12, "body"), color: ink.muted }}>1 dot = {per.toLocaleString("en-US")}</span>}
+                            </div>
+                          );
+                        })()
+                      )}
                     </div>
                   );
                 })}
