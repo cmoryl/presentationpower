@@ -252,6 +252,7 @@ function VariantRendererInner(props: Props) {
         imageDim: resolvedBg.imageDim,
         tint: resolvedBg.tint,
         darkChrome: resolvedBg.darkChrome,
+        softFocus: resolvedBg.softFocus,
         fit: resolvedBg.fit,
         zoom: resolvedBg.zoom,
         offsetX: resolvedBg.offsetX,
