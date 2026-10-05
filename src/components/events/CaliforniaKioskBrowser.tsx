@@ -3,7 +3,8 @@
 // show the same live previews, editor and downloads.
 
 import { useMemo, useState } from "react";
-import { Pencil, Search } from "lucide-react";
+import { Box, ExternalLink, Pencil, Search } from "lucide-react";
+import { sfKiosk3dSlugFor, sfKiosk3dUrl } from "@/lib/sf-kiosk-3d";
 
 import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor";
 import { LondonPanelThumb } from "@/components/events/LondonPanelThumb";
@@ -78,6 +79,7 @@ export function CaliforniaKioskBrowser() {
                           : `Rebuilt from the live London file (${live.texts.length} text lines, ${live.blocks.length} graphic ${live.blocks.length === 1 ? "piece" : "pieces"}).`}{" "}
                         Draft.
                       </p>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
                       <button
                         type="button"
                         onClick={() => {
@@ -85,11 +87,28 @@ export function CaliforniaKioskBrowser() {
                           // Pop-up blocked: fall back to editing on the page.
                           if (!w) setOpenId(isOpen ? null : `live:${group.boothId}`);
                         }}
-                        className="mt-3 inline-flex items-center gap-2 rounded-md bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] dark:bg-card"
+                        className="inline-flex items-center gap-2 rounded-md bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] dark:bg-card"
                       >
                         <Pencil className="h-3 w-3" aria-hidden />
                         {isOpen ? "Close" : "Open editor in new window"}
                       </button>
+                      {(() => {
+                        const slug = sfKiosk3dSlugFor(californiaKioskSourceBoothId(group.boothId));
+                        if (!slug) return null;
+                        return (
+                          <a
+                            href={sfKiosk3dUrl(slug)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-md border border-[#03002C]/25 bg-white px-3 py-1.5 text-[11px] font-semibold text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+                          >
+                            <Box className="h-3 w-3" aria-hidden />
+                            View booth in 3D
+                            <ExternalLink className="h-3 w-3" aria-hidden />
+                          </a>
+                        );
+                      })()}
+                      </div>
                     </div>
                   </div>
                   {isOpen ? (
