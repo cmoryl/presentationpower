@@ -647,6 +647,14 @@ function DeckEditor() {
                   <SaveDeckButton deckId={deckId} />
                   <AutosaveIndicator deckId={deckId} />
                   <ReviewStatusControl localDeckId={deckId} />
+                  {deckId.includes("7a6e1c52-0000-4e5a-9b1d-6e0a51ce000") && (
+                    <Link
+                      to="/masters/general-slides/looks"
+                      className="inline-flex min-h-10 items-center rounded-md border border-black/20 px-4 text-sm font-semibold text-foreground hover:border-[#003FC7] hover:text-[#003FC7]"
+                    >
+                      Explore looks
+                    </Link>
+                  )}
                   <Link
                     to="/decks/$deckId/export"
                     params={{ deckId }}
