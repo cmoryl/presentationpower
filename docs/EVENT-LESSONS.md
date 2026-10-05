@@ -230,3 +230,67 @@ artboard is a 1:10 proof, scale the trim up ×10 and say so in `dimsSource`.
 
 ## SF kiosks — headline too tall for the space above the TV (Sep 2026)
 When a partner's first piece can't fit above the 45 × 96 in kiosk TV even when cropped tight, it is now shrunk evenly (never below 60 %) to sit above the TV instead of leaving the space empty (COA ≈ 76 %, Global Digital Experience ≈ 68 %). Bands where pieces meet on photographic or gradient London backgrounds (Legal Support, Commercial Life Sciences) are still visible; they need a design decision, not a silent fix.
+
+## NEXT 2026 London — post-event design audit (v4, 954 photos, Oct 2026)
+
+Source: `next-london-2026-design-audit-in-depth_v4.pdf`. Grades and blocking figures come from the event photography; AI photo notes are unchecked first guesses. Every entry below was marked "applies to San Francisco" in the audit.
+
+### 2026-10 — Logos and key words belong in the upper two-thirds
+**Context:** London room backdrops (237 photos, grade B), pull-ups, pillars, lecterns, booths.
+**What happened:** lockups sat centre-low, exactly where speakers stand; 54% of backdrop photos showed the branding blocked. Blocking was the single biggest visibility problem.
+**Rule now:** put lockups in the upper third (pull-ups: top 40%), off-centre away from the lectern side; keep the bottom 35% of backdrops and pillars as ground only; booth headlines and logos above 1.5 m.
+**Enforced by:** judgement only (candidate sign-editor check: flag a logo placed in the lower third).
+
+### 2026-10 — Division names must be at least 40% of NEXT cap height
+**Context:** London backdrops and pull-ups.
+**What happened:** the division word (Media, Experience, Learn) was about a fifth of NEXT's height and vanished from the back of the room, so rooms lost their identity.
+**Rule now:** division word at least 40% of the NEXT cap height.
+**Enforced by:** judgement only.
+
+### 2026-10 — Pale gradient ends wash out; use the deep end near white walls and windows
+**Context:** London print colour audit (typical Blue 500 colour gap 37; over 45 on badges and printed items).
+**What happened:** pale lavender ends merged with white walls and window light; purple/blue up-lights tinted pale areas lilac. Navy was the steadiest colour on camera.
+**Rule now:** use the darker ramp end behind lockups in rooms with windows and against white walls; lean on navy grounds with white words for small items (badges, table cards, pillars); print a test strip (Blue 500, Aqua, Lavender, Blue White), hang it under event lighting and photograph it before the full run; ask for neutral white front light on backdrops and pillars.
+**Enforced by:** judgement only — only a lit test print settles colour. Never auto-convert colours to compensate.
+
+### 2026-10 — Speaker slides need a NEXT master with a dark option
+**Context:** London screens and slides (184 photos, grade C — the weakest asset).
+**What happened:** speakers used their own slides; blown-out white slides glowed brighter than the boards beside them, and breakout text was too small.
+**Rule now:** issue a NEXT slide master to every speaker with a navy option and a minimum type size; keep screen surrounds quiet; check screen heights against sightlines on the room plan.
+**Enforced by:** judgement only.
+
+### 2026-10 — Leave 10% clear at each side of boards with something in front
+**Context:** London backdrops and pull-ups.
+**What happened:** blocking clustered where a screen, plant or wall stood in front of a sign.
+**Rule now:** agree sign positions on the room plan away from lecterns and screens; leave 10% clear each side on any board with something in front of it.
+**Enforced by:** judgement only (sign list on the venue plan).
+
+### 2026-10 — Badges: names twice as big, shorter lanyards, print both sides
+**Context:** London badges and lanyards (183 photos, 11% "hard to read").
+**What happened:** names too small to read; badges hung low and flipped.
+**Rule now:** first name at least twice the London size; shorter lanyard so the badge sits at chest height; print the name on both sides; publish what each lanyard colour means.
+**Enforced by:** judgement only.
+
+### 2026-10 — Stage: one lighting state and a darker on-camera ground
+**Context:** London main stage set (170 photos, grade B).
+**What happened:** stage colour shifted with lighting; centre-low lockups were blocked.
+**Rule now:** agree one stage lighting state as the brand default; offer a darker printed ground for areas seen on camera; stage lockups high on side walls, never centre-low.
+**Enforced by:** judgement only.
+
+### 2026-10 — Wayfinding and catering signs above 2 m
+**Context:** London wayfinding, entrance and catering.
+**What happened:** low signs were hidden by crowds.
+**Rule now:** mount catering and direction signs above head height (2 m+).
+**Enforced by:** judgement only.
+
+### 2026-10 — Keep what worked: lectern and tent cards
+**Context:** London lecterns (grade A) and printed collateral (grade A).
+**What happened:** the lectern design and the tent-card pattern (logo, one line, one QR) read well.
+**Rule now:** use the London lectern as the template for every division, logo in the upper half, no fine detail at the base. Keep the tent-card pattern; add a short URL under every QR; give the programme larger type or a two-page fold. Booth panels: no more than three short lines of copy.
+**Enforced by:** judgement only.
+
+### 2026-10 — Brief the photographer for an audit-ready shot list
+**Context:** London audit coverage (only 5 wayfinding and 2 booth photos).
+**What happened:** several asset types could barely be graded.
+**Rule now:** brief the photographer for one straight-on, evenly lit shot of every sign and booth, plus a reference shot of the stage set before doors.
+**Enforced by:** judgement only.
