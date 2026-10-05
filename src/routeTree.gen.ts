@@ -195,6 +195,7 @@ import { Route as LibraryMyModuleIdRouteImport } from './routes/library.my_.$mod
 import { Route as LibraryPrintAuditRouteImport } from './routes/library.print_.audit'
 import { Route as LibraryPrintHeroesRouteImport } from './routes/library.print_.heroes'
 import { Route as LibraryPrintModulesRouteImport } from './routes/library.print_.modules'
+import { Route as MastersGeneralSlidesLooksRouteImport } from './routes/masters.general-slides_.looks'
 import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
 import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
 import { Route as EventsNextDivisionsIndexRouteImport } from './routes/events.next_.divisions.index'
@@ -1156,6 +1157,12 @@ const LibraryPrintModulesRoute = LibraryPrintModulesRouteImport.update({
   path: '/library/print/modules',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MastersGeneralSlidesLooksRoute =
+  MastersGeneralSlidesLooksRouteImport.update({
+    id: '/masters/general-slides_/looks',
+    path: '/masters/general-slides/looks',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SocialDemoPlaybookIdRoute = SocialDemoPlaybookIdRouteImport.update({
   id: '/demo/$playbookId',
   path: '/demo/$playbookId',
@@ -1445,6 +1452,7 @@ export interface FileRoutesByFullPath {
   '/library/print/audit': typeof LibraryPrintAuditRoute
   '/library/print/heroes': typeof LibraryPrintHeroesRoute
   '/library/print/modules': typeof LibraryPrintModulesRoute
+  '/masters/general-slides/looks': typeof MastersGeneralSlidesLooksRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/events/venues/': typeof EventsVenuesIndexRoute
@@ -1648,6 +1656,7 @@ export interface FileRoutesByTo {
   '/library/print/audit': typeof LibraryPrintAuditRoute
   '/library/print/heroes': typeof LibraryPrintHeroesRoute
   '/library/print/modules': typeof LibraryPrintModulesRoute
+  '/masters/general-slides/looks': typeof MastersGeneralSlidesLooksRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId': typeof DecksDeckIdIndexRoute
   '/events/venues': typeof EventsVenuesIndexRoute
@@ -1856,6 +1865,7 @@ export interface FileRoutesById {
   '/library/print_/audit': typeof LibraryPrintAuditRoute
   '/library/print_/heroes': typeof LibraryPrintHeroesRoute
   '/library/print_/modules': typeof LibraryPrintModulesRoute
+  '/masters/general-slides_/looks': typeof MastersGeneralSlidesLooksRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/events/venues/': typeof EventsVenuesIndexRoute
@@ -2065,6 +2075,7 @@ export interface FileRouteTypes {
     | '/library/print/audit'
     | '/library/print/heroes'
     | '/library/print/modules'
+    | '/masters/general-slides/looks'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/events/venues/'
@@ -2268,6 +2279,7 @@ export interface FileRouteTypes {
     | '/library/print/audit'
     | '/library/print/heroes'
     | '/library/print/modules'
+    | '/masters/general-slides/looks'
     | '/social/demo/$playbookId'
     | '/decks/$deckId'
     | '/events/venues'
@@ -2475,6 +2487,7 @@ export interface FileRouteTypes {
     | '/library/print_/audit'
     | '/library/print_/heroes'
     | '/library/print_/modules'
+    | '/masters/general-slides_/looks'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/events/venues/'
@@ -2602,6 +2615,7 @@ export interface RootRouteChildren {
   LibraryPrintAuditRoute: typeof LibraryPrintAuditRoute
   LibraryPrintHeroesRoute: typeof LibraryPrintHeroesRoute
   LibraryPrintModulesRoute: typeof LibraryPrintModulesRoute
+  MastersGeneralSlidesLooksRoute: typeof MastersGeneralSlidesLooksRoute
   DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
 }
 
@@ -3909,6 +3923,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LibraryPrintModulesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/masters/general-slides_/looks': {
+      id: '/masters/general-slides_/looks'
+      path: '/masters/general-slides/looks'
+      fullPath: '/masters/general-slides/looks'
+      preLoaderRoute: typeof MastersGeneralSlidesLooksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/social/demo/$playbookId': {
       id: '/social/demo/$playbookId'
       path: '/demo/$playbookId'
@@ -4390,6 +4411,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryPrintAuditRoute: LibraryPrintAuditRoute,
   LibraryPrintHeroesRoute: LibraryPrintHeroesRoute,
   LibraryPrintModulesRoute: LibraryPrintModulesRoute,
+  MastersGeneralSlidesLooksRoute: MastersGeneralSlidesLooksRoute,
   DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
 }
 export const routeTree = rootRouteImport

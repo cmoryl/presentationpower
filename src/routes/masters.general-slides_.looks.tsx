@@ -46,7 +46,7 @@ const LOOKS: Look[] = [
   { id: "prism-frost", name: "Prism Frost", mode: "light", note: "Frosted blue, lavender and aqua along the right.", url: lightPrismFrost, isNew: true },
 ];
 
-export const Route = createFileRoute("/masters/general-slides/looks")({
+export const Route = createFileRoute("/masters/general-slides_/looks")({
   head: () => ({
     meta: [
       { title: "General Slides look explorer · TransPerfect Element" },
