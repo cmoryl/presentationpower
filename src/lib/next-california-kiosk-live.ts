@@ -15,6 +15,7 @@
 
 import layoutsJson from "@/lib/next-california-kiosk-live-layouts.json";
 import signLayoutsJson from "@/lib/legal-next-signage-layouts.json";
+import { marksSvg } from "@/lib/kiosk-marks";
 
 export const KIOSK_W = 3240;
 export const KIOSK_H = 6912;
@@ -261,7 +262,6 @@ export function textLineBoxes(t: PlacedText, width: (s: string) => number) {
 }
 
 /** Accent rule markup for SVG (Accents layer). */
-import { marksSvg } from "@/lib/kiosk-marks";
 export function dividerSvg(d: KioskDivider) {
   return `<rect id="${d.id}" x="${d.x.toFixed(2)}" y="${d.y.toFixed(2)}" width="${d.w.toFixed(2)}" height="${d.h.toFixed(2)}"${d.round ? ` rx="${(d.h / 2).toFixed(2)}"` : ""} fill="${d.color}"${fx(d.opacity ?? 1, d.rot ?? 0, d.x + d.w / 2, d.y + d.h / 2)}/>`;
 }
