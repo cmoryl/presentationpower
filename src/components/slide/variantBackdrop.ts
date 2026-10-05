@@ -15,6 +15,7 @@ import portrait4 from "@/assets/portraits/portrait-4.webp";
 // given variant always renders with the same backdrop across every surface
 // (library grid, lightbox, editor, present, print, share).
 import corp01 from "@/assets/backdrops/corporate-dark/bg-01.webp";
+import lightCoverGround from "@/assets/looks/lines-glass-sky-1.jpg";
 import corp02 from "@/assets/backdrops/corporate-dark/bg-02.webp";
 import corp03 from "@/assets/backdrops/corporate-dark/bg-03.webp";
 import corp04 from "@/assets/backdrops/corporate-dark/bg-04.webp";
@@ -96,6 +97,10 @@ function _computeBackdrop(
     const pool = LIGHT_IMAGERY[family];
     // Logo strips stay clean: a lockup wall needs an even field behind it.
     if (/LOGO-STRIP|LOGOS/.test(id)) return null;
+    // Light classic cover: soft-focus flat ground instead of the old office photo.
+    if (id === "MV-OP-COVER") {
+      return { url: lightCoverGround, scrim: "full", scrimStrength: 0.15, imageDim: 0, tint: "#FFFFFF", softFocus: true, darkChrome: false };
+    }
     // A vignette on full-frame looks, otherwise the light falls in from the side
     // the copy does not occupy.
     const scrim: NonNullable<SlideBackdrop["scrim"]> = /^MV-OP-DIVIDER|CLOSING|THANKS/.test(id)

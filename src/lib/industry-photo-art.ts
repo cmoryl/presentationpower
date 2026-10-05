@@ -15,6 +15,7 @@
  * still wins, and the Games authored kit still wins for R22.
  */
 
+import lightSoftCover from "@/assets/looks/lines-glass-sky-1.jpg";
 import { sceneFromSeed, type SkinScene } from "./skin-backgrounds";
 import { overrideFor } from "./template-registry";
 import { groundIsReplaced } from "./template-background";
@@ -325,6 +326,9 @@ export function withIndustryPhotoArt(pack: StylePack, code: string): StylePack {
       // A replaced/uploaded picture owns this ground — do not compute or stack
       // the authored plate underneath it.
       if (custom?.imageUrl || groundIsReplaced(code, seed)) return base(seed);
+      // Core skins borrow a hashed industry plate; on LIGHT covers that read as
+      // an unrelated office photo. Keep the skin's own soft ground there.
+
       // FIT BEFORE VARIETY. Each scene names its plate families in preference
       // order, and the FIRST one is the fitted plate for that content type
       // (hero for covers, data for stats/charts, flow for process/timeline,
@@ -338,6 +342,8 @@ export function withIndustryPhotoArt(pack: StylePack, code: string): StylePack {
       const url = industryPhotoUrl(plateCode, scene, take);
 
       if (!url) return base(seed);
+      if (pack.mode !== "dark" && url.includes("-hero") && !INDUSTRY_PHOTO[code.toUpperCase()])
+        return [`url("${lightSoftCover}") center center / cover no-repeat`];
       // Every take must READ as a different backdrop. The family pair only
       // yields two plates, so takes beyond the pair re-frame the plate
       // (different crop anchor + mirrored scrim) instead of repeating take 0 —
