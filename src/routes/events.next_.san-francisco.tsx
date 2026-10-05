@@ -26,6 +26,7 @@ import { AppShell } from "@/components/AppShell";
 import { EditionDivisionTiles } from "@/components/events/EditionDivisionTiles";
 import { CitySectionBar, SAN_FRANCISCO_SECTIONS } from "@/components/events/CitySectionBar";
 import { CaliforniaKioskBrowser } from "@/components/events/CaliforniaKioskBrowser";
+import { SfPartnerKioskShowcase } from "@/components/events/SfPartnerKioskShowcase";
 import { SfScreenSurrounds } from "@/components/events/LegalNextSignage";
 import { SF_READY, SF_VENUE, sfLocationStack } from "@/lib/next-sf-event";
 
@@ -249,6 +250,9 @@ function SanFranciscoPage() {
             <CaliforniaKioskBrowser />
           </div>
         </section>
+
+        <SfPartnerKioskShowcase />
+
 
         {/* Breakout screen surrounds, live. */}
         <div id="sf-surrounds" className="scroll-mt-24">
