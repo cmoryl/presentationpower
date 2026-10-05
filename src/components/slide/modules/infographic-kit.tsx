@@ -123,3 +123,44 @@ export function FillTile({
     </div>
   );
 }
+
+/** 10×10 waffle: exactly `pct` cells filled. */
+export function Waffle({ pct, cell, gap, on, off }: { pct: number; cell: number; gap: number; on: string; off: string }) {
+  const n = Math.round(pct);
+  return (
+    <div aria-hidden className="grid shrink-0" style={{ gridTemplateColumns: `repeat(10, ${cell}px)`, gap }}>
+      {Array.from({ length: 100 }).map((_, i) => (
+        <span key={i} style={{ width: cell, height: cell, borderRadius: cell * 0.28, background: i < n ? on : off }} />
+      ))}
+    </div>
+  );
+}
+
+/** Semi-circle gauge filled exactly to `pct`. */
+export function Gauge({ pct, width, stroke, color, track, children }: { pct: number; width: number; stroke: number; color: string; track: string; children?: ReactNode }) {
+  const r = (width - stroke) / 2;
+  const h = r + stroke;
+  const len = Math.PI * r;
+  const d = `M ${stroke / 2} ${h - stroke / 2} A ${r} ${r} 0 0 1 ${width - stroke / 2} ${h - stroke / 2}`;
+  return (
+    <div className="relative shrink-0" style={{ width, height: h }}>
+      <svg width={width} height={h} aria-hidden>
+        <path d={d} fill="none" stroke={track} strokeWidth={stroke} strokeLinecap="round" />
+        <path d={d} fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${(pct / 100) * len} ${len}`} />
+      </svg>
+      {children && <div className="absolute inset-x-0 bottom-0 flex justify-center">{children}</div>}
+    </div>
+  );
+}
+
+/** Exactly `count` repeated glyphs (capped by caller), for whole-number counts. */
+export function Pictogram({ count, size, color, dim, total, render }: { count: number; size: number; color: string; dim?: string; total?: number; render: (c: string, s: number) => ReactNode }) {
+  const t = Math.max(total ?? count, count);
+  return (
+    <div aria-hidden className="flex flex-wrap" style={{ gap: Math.round(size * 0.3) }}>
+      {Array.from({ length: t }).map((_, i) => (
+        <span key={i} className="inline-flex">{render(i < count ? color : dim ?? color, size)}</span>
+      ))}
+    </div>
+  );
+}

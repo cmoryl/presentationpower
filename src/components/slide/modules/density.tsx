@@ -7,12 +7,15 @@ import { registerSlideModule } from "../module-registry";
 import { SlideFrame, SlideTitle, arr, s } from "../module-kit";
 import { fillPx } from "@/lib/open-space-fill";
 import { accentInk, hexA } from "@/lib/accent-tokens";
-import { Rocket, Users, Globe2, Flag, Sparkles, MapPin, BarChart3, type LucideIcon } from "lucide-react";
-import { Donut, FillTile, Figure, INFO_FILL, pctOf, type InfoFill } from "./infographic-kit";
+import { Rocket, Users, Globe2, Flag, Sparkles, MapPin, BarChart3, Code2, Building2, type LucideIcon } from "lucide-react";
+import * as React from "react";
+import { Donut, FillTile, Figure, Gauge, INFO_FILL, Pictogram, Waffle, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 function statIcon(label: string): LucideIcon {
   const l = label.toLowerCase();
   if (/deploy/.test(l)) return Rocket;
+  if (/develop|engineer/.test(l)) return Code2;
+  if (/client|compan/.test(l)) return Building2;
   if (/team|member|people|staff/.test(l)) return Users;
   if (/continent/.test(l)) return Globe2;
   if (/countr/.test(l)) return Flag;
@@ -100,67 +103,98 @@ registerSlideModule({
       case "MV-STAT-PROOF-BOARD": {
         const hero = arr(c.hero).slice(0, 4);
         const items = arr(c.items).slice(0, 8);
-        const fills: InfoFill[] = ["blue", "navy", "aqua", "lavender"];
-        if (isDark) fills[1] = "lavender", fills[3] = "aqua";
+        const fills: InfoFill[] = isDark ? ["blue", "lavender", "aqua", "lavender"] : ["blue", "navy", "aqua", "lavender"];
+        const lbl = (t: string, px = 22) => (
+          <div style={{ fontSize: fillPx(px, "body"), lineHeight: 1.3, fontWeight: 600 }}>{t}</div>
+        );
+        const heroTile = (it: Record<string, unknown>, i: number) => {
+          const fill = fills[i % 4]!;
+          const f = INFO_FILL[fill];
+          const v = s(it.value);
+          const u = s(it.unit);
+          const pct = pctOf(v, u);
+          const Icon = statIcon(s(it.label));
+          // Visual per figure: share → waffle (first) / gauge (second);
+          // whole count → pictogram, each glyph a stated round share.
+          let visual: React.ReactNode = null;
+          if (pct !== null && i === 0) {
+            visual = <Waffle pct={pct} cell={11} gap={4} on={f.ring} off={f.track} />;
+          } else if (pct !== null) {
+            visual = (
+              <Gauge pct={pct} width={210} stroke={22} color={f.ring} track={f.track}>
+                <Figure value={v} unit={u} px={54} color={f.fg} />
+              </Gauge>
+            );
+          } else {
+            const n = numOf(v);
+            const mag = Math.pow(10, Math.floor(Math.log10(Math.max(n, 1))));
+            const step = n / mag > 5 ? mag : mag / 10 * 2 || 1;
+            const count = Math.min(12, Math.round(n / step));
+            visual = (
+              <div className="flex flex-col gap-2">
+                <Pictogram count={count} size={26} color={f.fg} render={(col, sz) => <Icon size={sz} color={col} strokeWidth={1.8} />} />
+                <span style={{ fontSize: fillPx(14, "body"), opacity: 0.75 }}>
+                  Each icon = {step.toLocaleString("en-US")}
+                </span>
+              </div>
+            );
+          }
+          return (
+            <FillTile key={i} fill={fill} className="flex min-h-0 flex-col gap-3 p-6">
+              <div className="flex items-start justify-between gap-4">
+                {!(pct !== null && i !== 0) && <Figure value={v} unit={u} px={64} color={f.fg} />}
+                <span className="ml-auto flex h-[56px] w-[56px] shrink-0 items-center justify-center rounded-full" style={{ background: f.track }}>
+                  <Icon size={28} strokeWidth={1.7} />
+                </span>
+              </div>
+              <div className="flex flex-1 items-center">{visual}</div>
+              {lbl(s(it.label), 19)}
+            </FillTile>
+          );
+        };
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-            <div data-portrait="proof-stack" className="mt-8 grid flex-1 grid-cols-[1.3fr_1fr] gap-10">
+            <div data-portrait="proof-stack" className="mt-6 grid min-h-0 flex-1 grid-cols-[1.35fr_1fr] gap-8">
               <section className="flex min-h-0 flex-col">
                 {(s(c.brandLabel) || s(c.tagline)) && (
-                  <div className="mb-5 flex items-baseline gap-4">
+                  <div className="mb-4 flex items-baseline gap-4">
                     {s(c.brandLabel) && (
                       <span style={{ fontSize: fillPx(30, "body"), fontWeight: 700, color: ink.strong }}>{s(c.brandLabel)}</span>
                     )}
                     {s(c.tagline) && <span style={{ fontSize: fillPx(18, "body"), color: ink.muted }}>{s(c.tagline)}</span>}
                   </div>
                 )}
-                <div className="grid flex-1 grid-cols-2 grid-rows-2 gap-5">
-                  {hero.map((it, i) => {
-                    const fill = fills[i % 4]!;
-                    const f = INFO_FILL[fill];
-                    const pct = pctOf(s(it.value), s(it.unit));
-                    const Icon = statIcon(s(it.label));
-                    return (
-                      <FillTile key={i} fill={fill} className="flex flex-col justify-between p-7">
-                        {pct !== null ? (
-                          <div className="flex items-center gap-6">
-                            <Donut pct={pct} size={170} stroke={18} color={f.ring} track={f.track}>
-                              <Figure value={s(it.value)} unit={s(it.unit)} px={50} color={f.fg} />
-                            </Donut>
-                            <div style={{ fontSize: fillPx(22, "body"), lineHeight: 1.3, fontWeight: 600 }}>{s(it.label)}</div>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="flex items-start justify-between">
-                              <Figure value={s(it.value)} unit={s(it.unit)} px={96} color={f.fg} />
-                              <span className="flex h-[64px] w-[64px] items-center justify-center rounded-full" style={{ background: f.track }}>
-                                <Icon size={32} strokeWidth={1.6} />
-                              </span>
-                            </div>
-                            <div style={{ fontSize: fillPx(22, "body"), lineHeight: 1.3, fontWeight: 600 }}>{s(it.label)}</div>
-                          </>
-                        )}
-                      </FillTile>
-                    );
-                  })}
-                </div>
+                <div className="grid min-h-0 flex-1 grid-cols-2 gap-5" style={{ gridTemplateRows: "minmax(0,1fr) minmax(0,1fr)" }}>{hero.map(heroTile)}</div>
               </section>
-              <section data-portrait="proof-tiles" className="flex flex-col justify-center">
+              <section data-portrait="proof-tiles" className="grid min-h-0 grid-cols-2 gap-4" style={{ gridTemplateRows: "repeat(3, minmax(0,1fr))" }}>
                 {items.map((it, i) => {
                   const Icon = statIcon(s(it.label));
                   const dot = [INFO_FILL.blue, INFO_FILL.aqua, INFO_FILL.lavender][i % 3]!;
+                  const pct = pctOf(s(it.value), s(it.unit));
                   return (
                     <div
                       key={i}
-                      className="flex items-center gap-6 py-[14px]"
-                      style={{ borderTop: i ? `1px solid ${ink.hairline}` : undefined }}
+                      className="relative flex flex-col justify-between overflow-hidden rounded-[18px] py-4 pl-6 pr-4"
+                      style={{
+                        background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.78)",
+                        border: `1px solid ${ink.hairline}`,
+                        boxShadow: isDark ? undefined : "0 12px 28px -18px rgba(3,0,44,0.35)",
+                      }}
                     >
-                      <span className="flex h-[58px] w-[58px] shrink-0 items-center justify-center rounded-full" style={{ background: dot.bg, color: dot.fg }}>
-                        <Icon size={28} strokeWidth={1.7} />
-                      </span>
-                      <Figure value={s(it.value)} unit={s(it.unit)} px={50} color={ink.strong} style={{ minWidth: 190 }} />
-                      <div style={{ fontSize: fillPx(20, "body"), color: ink.body, lineHeight: 1.3, fontWeight: 500 }}>{s(it.label)}</div>
+                      <span aria-hidden className="absolute inset-y-0 left-0 w-[6px]" style={{ background: dot.bg }} />
+                      <div className="flex items-center justify-between">
+                        <span className="flex h-[42px] w-[42px] items-center justify-center rounded-[12px]" style={{ background: dot.bg, color: dot.fg }}>
+                          <Icon size={26} strokeWidth={1.7} />
+                        </span>
+                        {pct !== null && (
+                          <Donut pct={pct} size={44} stroke={7} color={isDark ? INFO_FILL.aqua.bg : INFO_FILL.blue.bg} track={ink.hairline} />
+                        )}
+                      </div>
+                      <div>
+                        <Figure value={s(it.value)} unit={s(it.unit)} px={40} color={ink.strong} />
+                        <div className="mt-1" style={{ fontSize: fillPx(17, "body"), color: ink.body, lineHeight: 1.3, fontWeight: 500 }}>{s(it.label)}</div>
+                      </div>
                     </div>
                   );
                 })}

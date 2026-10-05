@@ -37,7 +37,8 @@ import {
   Zap,
 } from "lucide-react";
 import type { CSSProperties } from "react";
-import { Donut, FillTile, Figure, INFO_FILL, numOf, pctOf, type InfoFill } from "./infographic-kit";
+import { MapPin } from "lucide-react";
+import { Donut, FillTile, Figure, INFO_FILL, Pictogram, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 type IconType = typeof Sparkles;
 
@@ -589,29 +590,41 @@ registerSlideModule({
               <div className="slide-fill-stretch mt-8 grid gap-6" style={{ gridTemplateRows: "auto 1fr" }}>
                 <section className="flex flex-col gap-4">
                   {kick(s(groups[0]?.label))}
+                  <div className="grid grid-cols-3 gap-5">
                   {gA.slice(0, 3).map((it, i) => {
-                    const n = numOf(s(it.value));
+                    const n = Math.min(40, Math.round(numOf(s(it.value))));
                     const f = INFO_FILL[barFills[i % 3]!];
+                    const L = s(it.label).toLowerCase();
+                    const glyph = (col: string, sz: number) =>
+                      /year/.test(L) ? (
+                        <span style={{ width: Math.round(sz * 0.32), height: sz, borderRadius: 3, background: col, display: "inline-block" }} />
+                      ) : /office|cit/.test(L) ? (
+                        <MapPin size={sz} color={col} strokeWidth={2} />
+                      ) : (
+                        <span style={{ width: sz * 0.8, height: sz * 0.8, borderRadius: 5, background: col, display: "inline-block" }} />
+                      );
+                    void maxA;
                     return (
-                      <div key={i} className="grid items-center gap-6" style={{ gridTemplateColumns: "150px 1fr" }}>
-                        <Figure value={s(it.value)} px={72} color={ink.strong} />
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-baseline gap-3">
-                            {lab(s(it.label), 22)}
-                            {s(it.body) && (
-                              <span style={{ fontSize: fillPx(16, "body"), color: ink.muted }}>{s(it.body)}</span>
-                            )}
-                          </div>
-                          <div className="h-[22px] rounded-full" style={{ background: ink.hairline }}>
-                            <div
-                              className="h-full rounded-full"
-                              style={{ width: `${Math.max(4, (n / maxA) * 100)}%`, background: f.bg }}
-                            />
-                          </div>
+                      <div
+                        key={i}
+                        className="relative flex flex-col gap-3 overflow-hidden rounded-[20px] p-6"
+                        style={{
+                          background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.8)",
+                          border: `1px solid ${ink.hairline}`,
+                          boxShadow: isDark ? undefined : "0 14px 30px -20px rgba(3,0,44,0.4)",
+                        }}
+                      >
+                        <span aria-hidden className="absolute inset-x-0 top-0 h-[6px]" style={{ background: f.bg }} />
+                        <div className="flex items-end gap-4">
+                          <Figure value={s(it.value)} px={84} color={ink.strong} />
+                          {lab(s(it.label), 20)}
                         </div>
+                        <Pictogram count={n} size={22} color={isDark && barFills[i % 3] === "blue" ? INFO_FILL.aqua.bg : f.bg} render={glyph} />
+                        {s(it.body) && <span style={{ fontSize: fillPx(15, "body"), color: ink.muted }}>{s(it.body)}</span>}
                       </div>
                     );
                   })}
+                  </div>
                 </section>
                 <section className="flex min-h-0 flex-col gap-4">
                   {kick(s(groups[1]?.label))}
