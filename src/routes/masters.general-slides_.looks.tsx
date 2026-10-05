@@ -30,6 +30,13 @@ import lightLavenderMist from "@/assets/looks/light-lavender-mist.jpg";
 import lightAquaFloor from "@/assets/looks/light-aqua-floor.jpg";
 import lightPrismFrost from "@/assets/looks/light-prism-frost.jpg";
 
+// Bloom + straight-line families: six compositions per look, each keeping the
+// content zone (left-centre) calm; generated procedurally as flat grounds.
+const LINE_FILES = import.meta.glob("@/assets/looks/lines-*.jpg", { eager: true, import: "default" }) as Record<string, string>;
+function lineSet(id: string): string[] {
+  return [1, 2, 3, 4, 5, 6].map((n) => Object.entries(LINE_FILES).find(([k]) => k.endsWith(`lines-${id}-${n}.jpg`))?.[1]).filter(Boolean) as string[];
+}
+
 const DARK_ID = "7a6e1c52-0000-4e5a-9b1d-6e0a51ce0001";
 const LIGHT_ID = "7a6e1c52-0000-4e5a-9b1d-6e0a51ce0002";
 
@@ -41,6 +48,8 @@ type Look = {
   /** Flat AI background; null keeps the master's current approved ground. */
   url: string | null;
   isNew?: boolean;
+  /** Per-slide compositions; when set, slides cycle these instead of one image. */
+  urls?: string[];
 };
 
 const LOOKS: Look[] = [
@@ -64,6 +73,14 @@ const LOOKS: Look[] = [
   { id: "spring-mist", name: "Spring Mist", mode: "light", note: "Aqua, green and blue light blooms in two corners.", url: lightSpringMist, isNew: true },
   { id: "pearl-holo", name: "Pearl Holo", mode: "light", note: "Pearly soft-focus lavender, aqua and coral.", url: lightPearlHolo, isNew: true },
   { id: "fluted-frost", name: "Golden Hour", mode: "light", note: "Blue, lavender and yellow light blooms.", url: lightFlutedFrost, isNew: true },
+  { id: "prism-lines", name: "Prism Lines", mode: "dark", note: "Blue, lavender and aqua blooms behind fine light lines.", url: "", urls: lineSet("prism-lines"), isNew: true },
+  { id: "cobalt-rail", name: "Cobalt Rail", mode: "dark", note: "Cobalt and aqua blooms with straight light rails.", url: "", urls: lineSet("cobalt-rail"), isNew: true },
+  { id: "violet-beam", name: "Violet Beam", mode: "dark", note: "Violet, lavender and pink blooms through angled lines.", url: "", urls: lineSet("violet-beam"), isNew: true },
+  { id: "aqua-shift", name: "Aqua Shift", mode: "dark", note: "Teal, aqua and blue blooms with soft line bands.", url: "", urls: lineSet("aqua-shift"), isNew: true },
+  { id: "glass-sky", name: "Glass Sky", mode: "light", note: "Sky blue, aqua and lavender blooms behind frosted lines.", url: "", urls: lineSet("glass-sky"), isNew: true },
+  { id: "lilac-rail", name: "Lilac Rail", mode: "light", note: "Lilac, blue and blush blooms with fine rails.", url: "", urls: lineSet("lilac-rail"), isNew: true },
+  { id: "mint-beam", name: "Mint Beam", mode: "light", note: "Aqua, mint and blue blooms through light lines.", url: "", urls: lineSet("mint-beam"), isNew: true },
+  { id: "dawn-lines", name: "Dawn Lines", mode: "light", note: "Peach, lavender and blue blooms with soft line bands.", url: "", urls: lineSet("dawn-lines"), isNew: true },
 ];
 
 export const Route = createFileRoute("/masters/general-slides_/looks")({
@@ -109,8 +126,8 @@ function LooksPage() {
                 <div
                   className="aspect-video w-full bg-cover bg-center"
                   style={{
-                    backgroundImage: l.url ? `url(${l.url})` : undefined,
-                    background: l.url ? undefined : l.mode === "dark" ? "#03002C" : "#EEF1F7",
+                    backgroundImage: (l.url || l.urls?.[0]) ? `url(${l.url || l.urls?.[0]})` : undefined,
+                    background: (l.url || l.urls?.length) ? undefined : l.mode === "dark" ? "#03002C" : "#EEF1F7",
                   }}
                 />
                 <div className="p-3">
@@ -161,7 +178,7 @@ function LookDeck({ masterId, look }: { masterId: string; look: Look }) {
   if (!gate.ready && gate.fallback) return <div className="mt-10">{gate.fallback}</div>;
   if (!deck || !brand) return <p className="mt-10 text-sm text-muted-foreground">The master deck could not be loaded. Sign in and try again.</p>;
   const packFor = deckPackResolver(deck);
-  const bg = look.url
+  const bg = look.url || look.urls?.length
     ? look.mode === "dark"
       ? { kind: "ai", url: look.url, scrim: "full", scrimStrength: 0.15, imageDim: 0, darkChrome: true }
       : { kind: "ai", url: look.url, scrim: "full", scrimStrength: 0.2, imageDim: 0, tint: "#FFFFFF", darkChrome: false, softFocus: true }
@@ -172,7 +189,7 @@ function LookDeck({ masterId, look }: { masterId: string; look: Look }) {
       {deck.slides.filter((s) => !s.hidden).map((slide, i) => {
         const variant = byId(MODULE_VARIANTS, slide.variantId);
         if (!variant) return null;
-        const s = bg ? { ...slide, content: { ...(slide.content as object), background: { ...bg, ...VARIATIONS[i % VARIATIONS.length] } } } : slide;
+        const s = bg ? { ...slide, content: { ...(slide.content as object), background: look.urls?.length ? { ...bg, url: look.urls[i % look.urls.length] } : { ...bg, ...VARIATIONS[i % VARIATIONS.length] } } } : slide;
         return (
           <figure key={slide.id} className="overflow-hidden rounded-lg border border-border">
             <SlideSkinProvider skin={null}>
