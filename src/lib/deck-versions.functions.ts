@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { deckCloudId } from "@/lib/deck-uuid";
+import { MIN_MASTER_VERSIONS } from "@/lib/master-checkpoint";
 
 // Snapshot a deck. Accepts either the local deck id (nanoid) or a cloud UUID.
 // Reads current persisted deck + slides + brief and inserts a version row.
@@ -50,7 +51,7 @@ async function pruneVersions(
   const keep = new Set<string>();
   rows.forEach((r, i) => {
     const ts = r.created_at ? new Date(r.created_at as string).getTime() : 0;
-    if (i < RETENTION_MAX || ts >= sevenDaysAgo) keep.add(r.id as string);
+    if (i < Math.max(RETENTION_MAX, MIN_MASTER_VERSIONS) || ts >= sevenDaysAgo) keep.add(r.id as string);
   });
   const drop = rows.filter((r) => !keep.has(r.id as string)).map((r) => r.id as string);
   if (drop.length > 0) {
