@@ -286,6 +286,8 @@ export type SlideBackdrop = {
   imageDim?: number;
   tint?: string;
   darkChrome?: boolean;
+  /** Light soft-focus ground: honour scrimStrength instead of the 0.8–0.97 white wash. */
+  softFocus?: boolean;
   // Image positioning (only used when `url` is set).
   fit?: "cover" | "contain";
   zoom?: number; // 1..3 — CSS scale on the image
@@ -666,7 +668,9 @@ export function SlideFrame({
   // approved high-key stills entirely. The backdrop's own strength is honoured
   // inside a safe light band instead, so the soft-focus ground reads while copy
   // still clears AA on white.
-  const scrimStrength = lightBackdrop
+  const scrimStrength = lightBackdrop && backdrop?.softFocus
+    ? Math.min(0.97, Math.max(0, backdrop?.scrimStrength ?? 0.97))
+    : lightBackdrop
     ? Math.min(0.97, Math.max(0.8, backdrop?.scrimStrength ?? 0.97))
     : (backdrop?.scrimStrength ?? 0.55);
 
@@ -761,7 +765,9 @@ export function SlideFrame({
               transform:
                 backdrop!.zoom && backdrop!.zoom !== 1 ? `scale(${backdrop!.zoom})` : undefined,
               transformOrigin: "center center",
-              filter: lightBackdrop
+              filter: lightBackdrop && backdrop!.softFocus
+                ? undefined
+                : lightBackdrop
                 ? `brightness(${1.16 + (backdrop!.imageDim ?? 0) * 0.16}) saturate(0.62) contrast(0.82)`
                 : backdrop!.imageDim
                   ? `brightness(${1 - backdrop!.imageDim}) saturate(0.95)`
@@ -789,7 +795,7 @@ export function SlideFrame({
               mixBlendMode: lightBackdrop ? "multiply" : "screen",
             }}
           />
-          {lightBackdrop && (
+          {lightBackdrop && !backdrop!.softFocus && (
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0"
