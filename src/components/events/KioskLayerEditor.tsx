@@ -57,6 +57,8 @@ import {
 } from "@/lib/next-california-kiosk-live";
 import { downloadKiosk, loadArtSvg, type KioskDownload } from "@/lib/next-california-kiosk-live-export";
 import { kioskCmykMaster } from "@/lib/next-california-kiosk-cmyk-masters";
+import { markArt, markFamilyFor, markH, markTransform, type KioskMark } from "@/lib/kiosk-marks";
+import { NEXT_LOGO_COLOURWAY_LABELS, nextLogoColourways, type NextLogoColourway } from "@/lib/next-logo-vectors";
 
 type Sel = { kind: "block" | "text" | "part" | "divider"; id: string } | null;
 
@@ -265,6 +267,40 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
     if (!m) return { x: 0, y: 0 };
     return { x: (e.clientX - m.e) / m.a, y: (e.clientY - m.f) / m.d };
   };
+  // NEXT chevron arrows + swapped lockups.
+  const markFamily = markFamilyFor(L.id) ?? "transperfect";
+  const [markSel, setMarkSel] = useState<string | null>(null);
+  const markDrag = useRef<{ id: string; x: number; y: number; x0: number; y0: number } | null>(null);
+  const patchMark = (id: string, p: Partial<KioskMark>, push = true) => {
+    const next = { ...edits, marks: (edits.marks ?? []).map((m) => (m.id === id ? { ...m, ...p } : m)) };
+    push ? commit(next) : setEdits(next);
+  };
+  const addChevrons = () => {
+    const id = `mark-c${Date.now().toString(36)}`;
+    const w = KIOSK_W * 0.12;
+    commit({ ...edits, marks: [...(edits.marks ?? []), { id, kind: "chevrons", family: markFamily, x: KIOSK_W * 0.06, y: KIOSK_H * 0.08, w, opacity: 1 }] });
+    setMarkSel(id);
+  };
+  const logoPart = L.blocks.flatMap((b) => b.parts)[0];
+  const swapLogo = (colourway: NextLogoColourway, shape: "stacked" | "side") => {
+    const cur = (edits.marks ?? []).find((m) => m.kind === "logo");
+    if (cur) { commit({ ...edits, marks: (edits.marks ?? []).map((m) => (m.id === cur.id ? { ...m, colourway, shape } : m)) }); setMarkSel(cur.id); return; }
+    const box = logoPart ?? { x0: KIOSK_W * 0.3, x1: KIOSK_W * 0.7, y0: KIOSK_H * 0.1, y1: KIOSK_H * 0.5 };
+    const id = `mark-l${Date.now().toString(36)}`;
+    const probe: KioskMark = { id, kind: "logo", family: markFamily, colourway, shape, x: 0, y: 0, w: 1 };
+    const a = markArt(probe);
+    const bw = box.x1 - box.x0, bh = box.y1 - box.y0;
+    const w = a ? Math.min(bw, (bh * a.w) / a.h) : bw;
+    const h = a ? (w * a.h) / a.w : bh;
+    const parts = logoPart ? { ...edits.parts, [logoPart.id]: { ...edits.parts?.[logoPart.id], hidden: true } } : edits.parts;
+    commit({ ...edits, parts, marks: [...(edits.marks ?? []), { ...probe, x: box.x0 + (bw - w) / 2, y: box.y0 + (bh - h) / 2, w }] });
+    setMarkSel(id);
+  };
+  const restoreLogo = () => {
+    const parts = logoPart ? { ...edits.parts, [logoPart.id]: { ...edits.parts?.[logoPart.id], hidden: false } } : edits.parts;
+    commit({ ...edits, parts, marks: (edits.marks ?? []).filter((m) => m.kind !== "logo") });
+    setMarkSel(null);
+  };
   const isAdd = (e: { shiftKey: boolean; metaKey: boolean; ctrlKey: boolean }) => e.shiftKey || e.metaKey || e.ctrlKey;
   const pickPart = (id: string, add: boolean) => {
     const members = partGroup(edits, id, L);
@@ -374,6 +410,8 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
   };
 
   const onMove = (e: React.PointerEvent) => {
+    const md = markDrag.current;
+    if (md) { const p = toSvg(e); patchMark(md.id, { x: md.x0 + p.x - md.x, y: md.y0 + p.y - md.y }, false); return; }
     const d = drag.current;
     if (!d) return;
     const p = toSvg(e);
@@ -382,7 +420,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
     setGuide(r.g);
     setEdits(r.next);
   };
-  const endDrag = () => { drag.current = null; setGuide(null); };
+  const endDrag = () => { markDrag.current = null; drag.current = null; setGuide(null); };
 
   /** Put the selection against the left margin, the centre line or the right margin. */
   const alignKiosk = (where: TextAlign, base: KioskEdits = edits) => {
@@ -919,6 +957,19 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                     <rect x={d.x} y={d.y} width={d.w} height={d.h} rx={d.round ? d.h / 2 : 0} fill={d.color} />
                   </g>
                 ))}
+                {(edits.marks ?? []).filter((m) => !m.hidden).map((m) => {
+                  const a = markArt(m);
+                  if (!a) return null;
+                  return (
+                    <g key={m.id} className="cursor-move" opacity={(m.opacity ?? 1) < 1 ? m.opacity : undefined}
+                      onPointerDown={(e) => { e.stopPropagation(); setMarkSel(m.id); const p = toSvg(e); markDrag.current = { id: m.id, x: p.x, y: p.y, x0: m.x, y0: m.y }; setHistory((h) => [...h.slice(-49), edits]); setFuture([]); svgRef.current?.setPointerCapture?.(e.pointerId); }}>
+                      <g transform={markTransform(m, a)}>
+                        <rect x={a.ox} y={a.oy} width={a.w} height={a.h} fill="transparent" stroke={markSel === m.id ? "#003FC7" : "none"} strokeWidth={(2 * rs * a.w) / m.w} />
+                        {a.paths.map((p, i) => <path key={i} d={p.d} fill={m.kind === "chevrons" && m.color ? m.color : p.fill} fillRule={p.evenOdd ? "evenodd" : undefined} />)}
+                      </g>
+                    </g>
+                  );
+                })}
                 {placed.flatMap((p) => p.texts).map((t) => (
                   <text
                     key={t.id}
@@ -1217,6 +1268,65 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                   <button type="button" className={dbtn} onClick={() => addDivider("full")}>Full-width rule</button>
                   <button type="button" className={dbtn} disabled={!sel || sel.kind === "divider"} onClick={() => addDivider("under")}>Rule under selection</button>
                 </div>
+              </Sec>
+
+              <Sec title="NEXT logo & arrows">
+                <p className="mb-1.5 text-[10.5px] text-white/55">Logo option</p>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {nextLogoColourways(markFamily).flatMap((c) => (["stacked", "side"] as const).map((sh) => {
+                    const cur = (edits.marks ?? []).find((m) => m.kind === "logo");
+                    const on = !!cur && cur.colourway === c && cur.shape === sh;
+                    return <button key={c + sh} type="button" aria-pressed={on} className={dbtn + " aria-pressed:ring-2 aria-pressed:ring-[#A1FBF9]"} onClick={() => swapLogo(c, sh)}>{NEXT_LOGO_COLOURWAY_LABELS[c]} · {sh === "side" ? "side" : "stacked"}</button>;
+                  }))}
+                  <button type="button" className={dbtn} aria-pressed={!(edits.marks ?? []).some((m) => m.kind === "logo")} onClick={restoreLogo}>Supplied logo</button>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  <button type="button" className={dbtn} onClick={addChevrons}><Plus className="h-3.5 w-3.5" aria-hidden /> Add NEXT arrows</button>
+                </div>
+                {(edits.marks ?? []).length ? (
+                  <ul className="mt-2 space-y-1">
+                    {(edits.marks ?? []).map((m, i) => (
+                      <li key={m.id}><button type="button" aria-pressed={markSel === m.id} onClick={() => setMarkSel(m.id)} className="w-full rounded-sm border border-white/10 bg-black/20 px-2 py-1 text-left text-[11.5px] text-white/80 aria-pressed:ring-2 aria-pressed:ring-[#A1FBF9]">{m.kind === "logo" ? "NEXT logo" : `NEXT arrows ${i + 1}`}</button></li>
+                    ))}
+                  </ul>
+                ) : null}
+                {(() => {
+                  const m = (edits.marks ?? []).find((x) => x.id === markSel);
+                  if (!m) return null;
+                  const a = markArt(m);
+                  const num = (label: string, v: number, on: (n: number) => void, step = 0.1) => (
+                    <label className="flex items-center justify-between gap-2 text-[10.5px] text-white/60">{label}
+                      <input type="number" step={step} className="w-20 rounded-sm border border-white/10 bg-black/30 px-1.5 py-1 text-right text-[11.5px] text-white" value={+v.toFixed(2)} onChange={(e) => { const n = parseFloat(e.target.value); if (Number.isFinite(n)) on(n); }} />
+                    </label>
+                  );
+                  return (
+                    <div className="mt-2 space-y-1.5 rounded-sm border border-white/10 p-2">
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {num(`X (${unit})`, toU(m.x), (n) => patchMark(m.id, { x: fromU(n) }))}
+                        {num(`Y (${unit})`, toU(m.y), (n) => patchMark(m.id, { y: fromU(n) }))}
+                        {num(`Width (${unit})`, toU(m.w), (n) => n > 0 && patchMark(m.id, { w: fromU(n) }))}
+                        {num("Rotate °", m.rot ?? 0, (n) => patchMark(m.id, { rot: n }), 1)}
+                      </div>
+                      {a ? <p className="text-[10.5px] text-white/45">Height {fmtU(markH(m, a))} {unit} (keeps proportions)</p> : null}
+                      <label className="flex items-center gap-2 text-[10.5px] text-white/60">Transparency
+                        <input type="range" min={0} max={100} className="flex-1 accent-[#003FC7]" value={Math.round((1 - (m.opacity ?? 1)) * 100)}
+                          onChange={(e) => patchMark(m.id, { opacity: 1 - Number(e.target.value) / 100 }, false)} onPointerUp={() => commit({ ...edits })} />
+                        <span className="w-9 text-right">{Math.round((1 - (m.opacity ?? 1)) * 100)}%</span>
+                      </label>
+                      {m.kind === "chevrons" ? (
+                        <div className="flex flex-wrap gap-1">
+                          <button type="button" className={dbtn} aria-pressed={!m.color} onClick={() => patchMark(m.id, { color: undefined })}>Logo colour</button>
+                          {ACCENTS.map((c) => <button key={c.color} type="button" title={c.name} aria-label={c.name} aria-pressed={m.color === c.color} onClick={() => patchMark(m.id, { color: c.color })} className="h-7 w-7 rounded-sm border border-white/20 aria-pressed:ring-2 aria-pressed:ring-[#A1FBF9]" style={{ background: c.color }} />)}
+                        </div>
+                      ) : null}
+                      <div className="flex flex-wrap gap-1">
+                        <button type="button" className={dbtn} onClick={() => patchMark(m.id, { x: (KIOSK_W - m.w) / 2 })}>Centre across</button>
+                        <button type="button" className={dbtn} onClick={() => m.kind === "logo" ? restoreLogo() : (commit({ ...edits, marks: (edits.marks ?? []).filter((x) => x.id !== m.id) }), setMarkSel(null))}><Trash2 className="h-3.5 w-3.5" aria-hidden /> Remove</button>
+                      </div>
+                    </div>
+                  );
+                })()}
+                <p className="mt-1 text-[10.5px] text-white/50">Drag on the sign to move. Arrows and logos come from the official NEXT logo set and print as vector.</p>
               </Sec>
 
               <Sec title="Background">

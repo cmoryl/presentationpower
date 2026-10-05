@@ -15,6 +15,7 @@
 
 import layoutsJson from "@/lib/next-california-kiosk-live-layouts.json";
 import signLayoutsJson from "@/lib/legal-next-signage-layouts.json";
+import { marksSvg } from "@/lib/kiosk-marks";
 
 export const KIOSK_W = 3240;
 export const KIOSK_H = 6912;
@@ -229,6 +230,8 @@ export type KioskEdits = {
   groups?: string[][];
   /** Accent divider rules added in the editor (array order = stacking order). */
   dividers?: KioskDivider[];
+  /** NEXT chevron arrows and swapped NEXT lockups (official logo geometry). */
+  marks?: import("@/lib/kiosk-marks").KioskMark[];
   /** Duplicated text lines and objects. */
   copies?: KioskCopy[];
   /** Partner badges replaced with editable text (the source object is hidden). */
@@ -648,6 +651,7 @@ export function buildKioskFrontSvg(
   parts.push(`</g>`);
   parts.push(`<g id="Accents">`);
   for (const d of edits.dividers ?? []) if (!d.hidden) parts.push(dividerSvg(d));
+  parts.push(marksSvg(edits.marks));
   parts.push(`</g>`);
   parts.push(`<g id="Text">`);
   for (const p of placed)
