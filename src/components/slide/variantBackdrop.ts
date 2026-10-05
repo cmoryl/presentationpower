@@ -15,6 +15,7 @@ import portrait4 from "@/assets/portraits/portrait-4.webp";
 // given variant always renders with the same backdrop across every surface
 // (library grid, lightbox, editor, present, print, share).
 import corp01 from "@/assets/backdrops/corporate-dark/bg-01.webp";
+import lightCoverGround from "@/assets/looks/lines-glass-sky-1.jpg";
 import corp02 from "@/assets/backdrops/corporate-dark/bg-02.webp";
 import corp03 from "@/assets/backdrops/corporate-dark/bg-03.webp";
 import corp04 from "@/assets/backdrops/corporate-dark/bg-04.webp";
@@ -183,6 +184,10 @@ function _computeBackdrop(
 
   // Full-bleed cover / hero — enterprise photograph, strong side scrim.
   if (/^MV-OP-COVER(-MEDIA)?$/.test(id) || id === "MV-CS-HERO" || id === "MV-CTA-CLOSING-HERO") {
+    // Light classic cover: soft-focus flat ground instead of the old office photo.
+    if (mode !== "dark" && id === "MV-OP-COVER") {
+      return { url: lightCoverGround, scrim: "full", scrimStrength: 0.15, imageDim: 0, tint: "#FFFFFF", softFocus: true, darkChrome: false };
+    }
     return {
       url: pickPhoto(0),
       scrim: "left",

@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import lightCoverThumb from "@/assets/looks/lines-glass-sky-1.jpg";
+import darkCoverThumb from "@/assets/backdrops/corporate-dark/bg-02.webp";
 import { useEffect, useMemo, useState } from "react";
 import { GROUND_STYLES, slideGround } from "@/lib/look-ground";
 import { AppShell } from "@/components/AppShell";
@@ -133,8 +135,8 @@ function LooksPage() {
                 <div
                   className="aspect-video w-full bg-cover bg-center"
                   style={{
-                    backgroundImage: (l.url || l.urls?.[0]) ? `url(${l.url || l.urls?.[0]})` : undefined,
-                    background: (l.url || l.urls?.length) ? undefined : l.mode === "dark" ? "#03002C" : "#EEF1F7",
+                    backgroundImage: `url(${l.url || l.urls?.[0] || (l.id === "current-light" ? lightCoverThumb : darkCoverThumb)})`,
+                    background: undefined,
                   }}
                 />
                 <div className="p-3">
