@@ -77,6 +77,7 @@ export function slideGround(
   base: string,
   colours: string[],
   style: GroundStyle,
+  thick = false,
 ): string | null {
   if (typeof document === "undefined") return null;
   const o = SLIDES[slideIndex] ?? SLIDES[SLIDES.length - 1];
@@ -131,10 +132,10 @@ export function slideGround(
       // straight translucent lines, only where colour is present and content is not
       let line = 0;
       if (style !== "wash") {
-        const sp = style === "grid" ? 48 : style === "horizon" ? 13 : 17;
+        const sp = (style === "grid" ? 48 : style === "horizon" ? 13 : 17) * (thick ? 2.6 : 1);
         const t = style === "horizon" ? py : style === "veil" ? px + py * 0.3 : px;
         const ph = (t % sp) / sp;
-        line = Math.max(0, 1 - Math.abs(ph - 0.5) * 2) ** (style === "grid" ? 30 : 6);
+        line = Math.max(0, 1 - Math.abs(ph - 0.5) * 2) ** (style === "grid" ? 30 : thick ? 2 : 6);
         if (style === "grid") line = Math.max(line, Math.max(0, 1 - Math.abs(((py % sp) / sp) - 0.5) * 2) ** 30);
         const w = Math.min(1, field * 1.6 + (style === "grid" ? 0.2 * free : 0)) * free;
         line *= w;
