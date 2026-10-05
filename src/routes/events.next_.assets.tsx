@@ -246,7 +246,7 @@ function AssetsPage() {
                 {gid === "pillar-signage" && division && <LivePillars division={division} />}
                 {gid === "event-signage" && division && (
                   <div className="mt-3">
-                    <DivisionSignageKit divisionId={division} only={[...DESK_ONLY]} />
+                    <DivisionSignageKit divisionId={division.id} only={[...DESK_ONLY]} />
                   </div>
                 )}
                 <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
