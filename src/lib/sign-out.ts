@@ -20,10 +20,14 @@ export const SESSION_EXPIRED_MESSAGE = "Your session expired. Please sign in aga
 /** Login route for this app. Single source of truth for sign-out redirects. */
 export const LOGIN_PATH = "/auth";
 
-const PUBLIC_NO_LOGIN_PATHS = ["/events/next/london"];
+/** Public sections (the path and everything under it) that never bounce a visitor to sign-in. */
+const PUBLIC_NO_LOGIN_PATHS = ["/events/next/london", "/library"];
+/** Public pages matched exactly (their sub-pages may still need sign-in). */
+const PUBLIC_NO_LOGIN_EXACT = new Set(["/", "/about", "/faq"]);
 
 export function isPublicNoLoginPath(pathname: string): boolean {
-  return PUBLIC_NO_LOGIN_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+  const p = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+  return PUBLIC_NO_LOGIN_EXACT.has(p) || PUBLIC_NO_LOGIN_PATHS.some((path) => p === path || p.startsWith(`${path}/`));
 }
 
 let signingOut = false;
