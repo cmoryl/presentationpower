@@ -327,7 +327,7 @@ export function withIndustryPhotoArt(pack: StylePack, code: string): StylePack {
       if (custom?.imageUrl || groundIsReplaced(code, seed)) return base(seed);
       // Core skins borrow a hashed industry plate; on LIGHT covers that read as
       // an unrelated office photo. Keep the skin's own soft ground there.
-      if (set.mode === "light" && scene === "cover" && !INDUSTRY_PHOTO[code.toUpperCase()]) return base(seed);
+
       // FIT BEFORE VARIETY. Each scene names its plate families in preference
       // order, and the FIRST one is the fitted plate for that content type
       // (hero for covers, data for stats/charts, flow for process/timeline,
@@ -341,6 +341,7 @@ export function withIndustryPhotoArt(pack: StylePack, code: string): StylePack {
       const url = industryPhotoUrl(plateCode, scene, take);
 
       if (!url) return base(seed);
+      if (set.mode === "light" && url === set.hero && !INDUSTRY_PHOTO[code.toUpperCase()]) return base(seed);
       // Every take must READ as a different backdrop. The family pair only
       // yields two plates, so takes beyond the pair re-frame the plate
       // (different crop anchor + mirrored scrim) instead of repeating take 0 —
