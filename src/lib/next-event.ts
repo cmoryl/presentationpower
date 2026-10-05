@@ -393,6 +393,8 @@ export type NextRegistryRow = {
   canvaUrl?: string;
   secondaryUrl?: string;
   secondaryLabel?: string;
+  /** Direct download of a supplied print master (e.g. a designer's .ai). */
+  downloadUrl?: string;
   /** In-app route for designs rendered by this build rather than in Canva. */
   internalUrl?: string;
   /** Set on attendee badge rows so the hub renders the live NEXT badge. */
@@ -442,7 +444,8 @@ export function nextBadgeRows(): NextRegistryRow[] {
 export async function loadNextRegistry(): Promise<NextRegistryRow[]> {
   const mod = await import("./next-registry.json");
   const raw = (mod.default ?? mod) as unknown as NextRegistryRowRaw[];
-  return [...raw.map(normalizeNextRow), ...nextBadgeRows()];
+  const { financePillarRows } = await import("./next-finance-pillars");
+  return [...raw.map(normalizeNextRow), ...financePillarRows(), ...nextBadgeRows()];
 }
 
 // ── City Series ────────────────────────────────────────────────────────────

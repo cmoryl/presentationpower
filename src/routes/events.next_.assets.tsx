@@ -18,6 +18,7 @@ import {
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { CityBadge } from "@/components/next/CityBadge";
 import { CITY_BADGE_DEFAULT, cityBadgeDivision } from "@/lib/next-city-badge";
+import { SUPPLIED_PILLAR_DIVISIONS } from "@/lib/next-finance-pillars";
 import { DivisionSignageKit } from "@/components/events/DivisionSignageKit";
 import { DeckPages, FilterChip, LivePillars, RegistryCard } from "@/components/next/NextRegistry";
 
@@ -243,7 +244,7 @@ function AssetsPage() {
                     {cat || meta?.label || gid}
                   </h3>
                 </div>
-                {gid === "pillar-signage" && division && <LivePillars division={division} />}
+                {gid === "pillar-signage" && division && !SUPPLIED_PILLAR_DIVISIONS.has(division.id) && <LivePillars division={division} />}
                 {gid === "event-signage" && division && (
                   <div className="mt-3">
                     <DivisionSignageKit divisionId={division.id} only={[...DESK_ONLY]} />
