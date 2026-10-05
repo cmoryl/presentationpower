@@ -51,6 +51,11 @@ function GeneralSlidesMaster() {
           <Link to="/decks/$deckId/print" params={{ deckId: GENERAL_SLIDES_LIGHT_MASTER_ID }}>View all light slides</Link>
         </Button>
       </div>
+      <div className="mt-4">
+        <Button asChild variant="outline">
+          <Link to="/masters/general-slides/looks">Explore looks</Link>
+        </Button>
+      </div>
     </main>
   );
 }
