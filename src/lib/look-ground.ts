@@ -24,7 +24,7 @@ function hex(h: string): [number, number, number] {
 /** Content density 0..1 sampled smoothly from the grid (box-blurred). */
 function densityField(o: Occ): Float32Array {
   const raw = new Float32Array(GX * GY);
-  for (let i = 0; i < raw.length; i++) raw[i] = o.grid[i] === "2" ? 1 : o.grid[i] === "1" ? 0.35 : 0;
+  for (let i = 0; i < raw.length; i++) raw[i] = o.grid[i] === "2" ? 1 : o.grid[i] === "1" ? 0.12 : 0;
   // two box-blur passes in grid space
   let a = raw;
   for (let pass = 0; pass < 2; pass++) {
@@ -85,7 +85,7 @@ export function slideGround(
   for (const v of f) busy += v;
   busy /= f.length;
   const dark = mode === "dark";
-  const strength = Math.max(0.25, 1 - busy * 1.1) * (style === "wash" || style === "grid" ? 0.55 : 1);
+  const strength = Math.max(0.55, 1 - busy * 0.8) * (style === "wash" || style === "grid" ? 0.55 : 1);
   const pts = anchors(f, busy > 0.6 ? 1 : busy > 0.4 ? 2 : 3);
   const cols = colours.map(hex);
   const bg = hex(base);
@@ -103,7 +103,7 @@ export function slideGround(
     const v = py / H;
     for (let px = 0; px < W; px++) {
       const u = px / W;
-      const free = 1 - Math.min(1, sample(f, u, v) * 1.25);
+      const free = 1 - Math.min(1, sample(f, u, v) * 0.9);
       let r = bg[0], gg = bg[1], b = bg[2];
       let field = 0;
       const add = (m: number, c: [number, number, number]) => {
