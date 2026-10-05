@@ -1,0 +1,11 @@
+create or replace function public.lock_master_slide_order()
+returns trigger language plpgsql set search_path = public as $$
+begin
+  if new.position is distinct from old.position
+     and coalesce(current_setting('app.allow_master_reorder', true), '') <> 'on'
+     and not public.has_role(auth.uid(), 'admin')
+     and exists (select 1 from public.decks d where d.id = old.deck_id and d.is_template and d.context ? 'master') then
+    new.position := old.position;
+  end if;
+  return new;
+end $$;
