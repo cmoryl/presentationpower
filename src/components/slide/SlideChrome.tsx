@@ -757,6 +757,19 @@ export function SlideFrame({
       )}
       {hasBackdropImage && (
         <>
+          {/* Mirror about the centre (always covers); zoom ≥1 toward the offset
+              point, which also always covers — never leaves a hard gap. */}
+          <div
+            aria-hidden
+            className="absolute inset-0 overflow-hidden"
+            style={{
+              transform:
+                backdrop!.flip === "x" ? "scaleX(-1)"
+                : backdrop!.flip === "y" ? "scaleY(-1)"
+                : backdrop!.flip === "xy" ? "scale(-1,-1)"
+                : undefined,
+            }}
+          >
           <img
             src={backdrop!.url}
             alt=""
@@ -766,13 +779,9 @@ export function SlideFrame({
               objectFit: backdrop!.fit ?? "cover",
               objectPosition: `${50 + (backdrop!.offsetX ?? 0) / 2}% ${50 + (backdrop!.offsetY ?? 0) / 2}%`,
               transform:
-                [
-                  backdrop!.zoom && backdrop!.zoom !== 1 ? `scale(${backdrop!.zoom})` : "",
-                  backdrop!.flip === "x" || backdrop!.flip === "xy" ? "scaleX(-1)" : "",
-                  backdrop!.flip === "y" || backdrop!.flip === "xy" ? "scaleY(-1)" : "",
-                ].join(" ").trim() || undefined,
+                backdrop!.zoom && backdrop!.zoom > 1 ? `scale(${backdrop!.zoom})` : undefined,
               transformOrigin: backdrop!.flip
-                ? `${50 + (backdrop!.offsetX ?? 0) / 2}% ${50 + (backdrop!.offsetY ?? 0) / 2}%`
+                ? `${Math.min(100, Math.max(0, 50 + (backdrop!.offsetX ?? 0) / 2))}% ${Math.min(100, Math.max(0, 50 + (backdrop!.offsetY ?? 0) / 2))}%`
                 : "center center",
               filter: lightBackdrop && backdrop!.softFocus
                 ? undefined
@@ -783,6 +792,7 @@ export function SlideFrame({
                   : undefined,
             }}
           />
+          </div>
           {/* Soft-focus accent haze — tinted from the division's brand tokens.
               On light backdrops we swap to `multiply` so the tint reads as a
               gentle wash rather than a bright screen blend. */}
