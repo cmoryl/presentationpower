@@ -208,6 +208,14 @@ export function RegistryCard({
           >
             Open badge template <ArrowRight size={12} />
           </Link>
+        ) : row.downloadUrl ? (
+          <a
+            href={row.downloadUrl}
+            download
+            className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+          >
+            Download .ai
+          </a>
         ) : row.canvaUrl ? (
           <a
             href={row.canvaUrl}
