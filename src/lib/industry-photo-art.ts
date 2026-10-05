@@ -15,7 +15,7 @@
  * still wins, and the Games authored kit still wins for R22.
  */
 
-import lightSoftCover from "@/assets/looks/lines-glass-sky-1.jpg";
+const lightSoftCover = "/looks/lines-glass-sky-1.jpg";
 import { sceneFromSeed, type SkinScene } from "./skin-backgrounds";
 import { overrideFor } from "./template-registry";
 import { groundIsReplaced } from "./template-background";
