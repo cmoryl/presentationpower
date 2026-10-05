@@ -9,6 +9,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useRouterState,
 } from "@tanstack/react-router";
 import { useEffect, useRef, type ReactNode } from "react";
 
