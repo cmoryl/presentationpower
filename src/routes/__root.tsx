@@ -20,7 +20,7 @@ import { UxDebugDock } from "@/components/debug/UxDebugDock";
 import { BackToTop } from "@/components/BackToTop";
 import { ConnectionBanner } from "@/components/ConnectionBanner";
 import { supabase } from "@/integrations/supabase/client";
-import { LOGIN_PATH, isPublicNoLoginPath, loginUrl } from "@/lib/sign-out";
+import { LOGIN_PATH, isPublicNoLoginPath, loginUrl, requiresSignInPath } from "@/lib/sign-out";
 
 function NotFoundComponent() {
   return (
@@ -234,6 +234,17 @@ function RootComponent() {
     });
     return () => sub.subscription.unsubscribe();
   }, [queryClient, router]);
+
+  // Sections with user-specific content send signed-out visitors to sign-in.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    if (!requiresSignInPath(pathname)) return;
+    let live = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (live && !data.session) window.location.replace(loginUrl());
+    });
+    return () => { live = false; };
+  }, [pathname]);
 
   useEffect(() => {
     installToastA11y();
