@@ -763,8 +763,14 @@ export function SlideFrame({
               objectFit: backdrop!.fit ?? "cover",
               objectPosition: `${50 + (backdrop!.offsetX ?? 0) / 2}% ${50 + (backdrop!.offsetY ?? 0) / 2}%`,
               transform:
-                backdrop!.zoom && backdrop!.zoom !== 1 ? `scale(${backdrop!.zoom})` : undefined,
-              transformOrigin: "center center",
+                [
+                  backdrop!.zoom && backdrop!.zoom !== 1 ? `scale(${backdrop!.zoom})` : "",
+                  backdrop!.flip === "x" || backdrop!.flip === "xy" ? "scaleX(-1)" : "",
+                  backdrop!.flip === "y" || backdrop!.flip === "xy" ? "scaleY(-1)" : "",
+                ].join(" ").trim() || undefined,
+              transformOrigin: backdrop!.flip
+                ? `${50 + (backdrop!.offsetX ?? 0) / 2}% ${50 + (backdrop!.offsetY ?? 0) / 2}%`
+                : "center center",
               filter: lightBackdrop && backdrop!.softFocus
                 ? undefined
                 : lightBackdrop
