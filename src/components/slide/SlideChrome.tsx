@@ -293,6 +293,9 @@ export type SlideBackdrop = {
   zoom?: number; // 1..3 — CSS scale on the image
   offsetX?: number; // -100..100 (percent). 0 = center.
   offsetY?: number; // -100..100 (percent). 0 = center.
+  /** Mirror the image (look explorer variations). With flip set, offsets
+   *  become the zoom origin so each slide frames a different area. */
+  flip?: "none" | "x" | "y" | "xy";
   /** True when an author explicitly picked this background in the editor
    *  (`content.background`). Authored backgrounds outrank the style pack's own
    *  ground planes — otherwise swapping a background in the deck editor looked
@@ -763,8 +766,14 @@ export function SlideFrame({
               objectFit: backdrop!.fit ?? "cover",
               objectPosition: `${50 + (backdrop!.offsetX ?? 0) / 2}% ${50 + (backdrop!.offsetY ?? 0) / 2}%`,
               transform:
-                backdrop!.zoom && backdrop!.zoom !== 1 ? `scale(${backdrop!.zoom})` : undefined,
-              transformOrigin: "center center",
+                [
+                  backdrop!.zoom && backdrop!.zoom !== 1 ? `scale(${backdrop!.zoom})` : "",
+                  backdrop!.flip === "x" || backdrop!.flip === "xy" ? "scaleX(-1)" : "",
+                  backdrop!.flip === "y" || backdrop!.flip === "xy" ? "scaleY(-1)" : "",
+                ].join(" ").trim() || undefined,
+              transformOrigin: backdrop!.flip
+                ? `${50 + (backdrop!.offsetX ?? 0) / 2}% ${50 + (backdrop!.offsetY ?? 0) / 2}%`
+                : "center center",
               filter: lightBackdrop && backdrop!.softFocus
                 ? undefined
                 : lightBackdrop

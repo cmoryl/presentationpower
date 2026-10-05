@@ -24,6 +24,7 @@ export type SlideBackgroundValue = {
   darkChrome?: boolean;
   /** Light soft-focus grounds: honour scrimStrength instead of the near-white light-mode wash. */
   softFocus?: boolean;
+  flip?: "none" | "x" | "y" | "xy";
   // Parametric — round-trip user color / intensity choices.
   color?: string;
   colorB?: string;
@@ -342,6 +343,7 @@ export function resolveSlideBackground(raw: unknown): SlideBackgroundValue | nul
       tint: b.tint ?? NAVY,
       darkChrome: b.darkChrome ?? true,
       softFocus: b.softFocus === true ? true : undefined,
+      flip: b.flip,
       fit: b.fit ?? "cover",
       zoom: typeof b.zoom === "number" ? b.zoom : 1,
       offsetX: typeof b.offsetX === "number" ? b.offsetX : 0,
