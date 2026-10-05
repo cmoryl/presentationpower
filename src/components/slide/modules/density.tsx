@@ -7,13 +7,15 @@ import { registerSlideModule } from "../module-registry";
 import { SlideFrame, SlideTitle, arr, s } from "../module-kit";
 import { fillPx } from "@/lib/open-space-fill";
 import { accentInk, hexA } from "@/lib/accent-tokens";
-import { Rocket, Users, Globe2, Flag, Sparkles, MapPin, BarChart3, type LucideIcon } from "lucide-react";
+import { Rocket, Users, Globe2, Flag, Sparkles, MapPin, BarChart3, Code2, Building2, type LucideIcon } from "lucide-react";
 import * as React from "react";
 import { Donut, FillTile, Figure, Gauge, INFO_FILL, Pictogram, Waffle, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 function statIcon(label: string): LucideIcon {
   const l = label.toLowerCase();
   if (/deploy/.test(l)) return Rocket;
+  if (/develop|engineer/.test(l)) return Code2;
+  if (/client|compan/.test(l)) return Building2;
   if (/team|member|people|staff/.test(l)) return Users;
   if (/continent/.test(l)) return Globe2;
   if (/countr/.test(l)) return Flag;
