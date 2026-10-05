@@ -12,6 +12,10 @@ import {
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { LONDON_STYLES } from "@/lib/next-london-signage";
+
+/** Approved NEXT grounds offered on signs (NEXTBrew-only Brew diagonal excluded). */
+const SIGN_GROUNDS = Object.entries(LONDON_STYLES).filter(([id]) => id !== "11-brew-diagonal");
 import { useSessionUser } from "@/hooks/use-session-user";
 import {
   KIOSK_BLEED,
@@ -1216,6 +1220,22 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
               </Sec>
 
               <Sec title="Background">
+                {L.sign ? (
+                  <div className="mb-3">
+                    <p className="mb-1.5 text-[10.5px] text-white/55">Approved NEXT backgrounds</p>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      <button type="button" title="As supplied" aria-pressed={!edits.ground} onClick={() => commit({ ...edits, ground: null })}
+                        className="flex h-10 items-center justify-center rounded-sm border border-white/15 text-[9.5px] text-white/70 aria-pressed:ring-2 aria-pressed:ring-[#A1FBF9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">Supplied</button>
+                      {SIGN_GROUNDS.map(([id, g]) => (
+                        <button key={id} type="button" title={g.label} aria-label={g.label} aria-pressed={edits.ground?.styleId === id}
+                          onClick={() => commit({ ...edits, ground: { top: g.stops[0]!, bottom: g.stops[g.stops.length - 1]!, stops: g.stops, styleId: id } })}
+                          className="h-10 rounded-sm border border-white/15 aria-pressed:ring-2 aria-pressed:ring-[#A1FBF9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+                          style={{ background: `linear-gradient(180deg, ${g.stops.join(", ")})` }} />
+                      ))}
+                    </div>
+                    <p className="mt-1 text-[10.5px] text-white/50">{edits.ground?.styleId ? LONDON_STYLES[edits.ground.styleId]?.label : edits.ground ? "Custom colours" : "As supplied"}</p>
+                  </div>
+                ) : null}
                 <div className="flex gap-3 text-[10.5px] text-white/55">
                   <label className="flex items-center gap-1.5">Top <input type="color" className="h-7 w-9 rounded-sm border border-white/10 bg-transparent" value={ground[0]!.color} onChange={(e) => commit({ ...edits, ground: { top: e.target.value.toUpperCase(), bottom: ground[ground.length - 1]!.color } })} /></label>
                   <label className="flex items-center gap-1.5">Bottom <input type="color" className="h-7 w-9 rounded-sm border border-white/10 bg-transparent" value={ground[ground.length - 1]!.color} onChange={(e) => commit({ ...edits, ground: { top: ground[0]!.color, bottom: e.target.value.toUpperCase() } })} /></label>
