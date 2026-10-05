@@ -25,6 +25,12 @@ const PUBLIC_NO_LOGIN_PATHS = ["/events/next/london", "/library"];
 /** Public pages matched exactly (their sub-pages may still need sign-in). */
 const PUBLIC_NO_LOGIN_EXACT = new Set(["/", "/about", "/faq"]);
 
+/** Sections holding user-specific content: signed-out visitors go to sign-in. */
+const SIGN_IN_REQUIRED_PATHS = ["/decks", "/admin", "/brief", "/knowledge"];
+export function requiresSignInPath(pathname: string): boolean {
+  return SIGN_IN_REQUIRED_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+}
+
 export function isPublicNoLoginPath(pathname: string): boolean {
   const p = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
   return PUBLIC_NO_LOGIN_EXACT.has(p) || PUBLIC_NO_LOGIN_PATHS.some((path) => p === path || p.startsWith(`${path}/`));
