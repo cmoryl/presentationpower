@@ -219,7 +219,8 @@ export type KioskEdits = {
   layoutVersion?: string;
   /** Changes made on an earlier layout, kept but not applied. */
   parked?: KioskEdits;
-  ground?: { top: string; bottom: string } | null;
+  /** `stops` (top → bottom) set when an approved NEXT ground was picked; `top`/`bottom` stay its ends. */
+  ground?: { top: string; bottom: string; stops?: string[]; styleId?: string } | null;
   blocks?: Record<string, BlockEdit>;
   texts?: Record<string, TextEdit>;
   /** Per-object edits inside a piece (dx/dy in kiosk points, scale about the object's centre). */
@@ -522,6 +523,8 @@ export function layoutKiosk(L0: LiveLayout, edits: KioskEdits = {}): PlacedBlock
 }
 
 export function kioskGround(L: LiveLayout, edits: KioskEdits = {}) {
+  const st = edits.ground?.stops;
+  if (st && st.length >= 2) return st.map((color, k) => ({ offset: k / (st.length - 1), color }));
   if (edits.ground) return [
     { offset: 0, color: edits.ground.top },
     { offset: 1, color: edits.ground.bottom },
