@@ -324,6 +324,8 @@ registerSlideModule({
         const hasLogos = [...leftRows, ...rightRows].some((r) => s(obj(r).logo));
         if (hasLogos) {
           const glows = ["#7FB3F5", "#C2A3FF"];
+          const fg = isDark ? "#FFFFFF" : brand.tokens.ink ?? "#03002C";
+          const hair = isDark ? "rgba(255,255,255,0.16)" : "rgba(3,0,44,0.14)";
           const Panel = ({ heading, rows, glow }: { heading: string; rows: ReturnType<typeof arr>; glow: string }) => (
             <div
               className="relative flex min-w-0 flex-1 flex-col"
@@ -331,14 +333,14 @@ registerSlideModule({
                 borderRadius: 22,
                 padding: "30px 30px 34px",
                 background: `linear-gradient(160deg, ${glow}26 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.02) 100%)`,
-                border: "1px solid rgba(255,255,255,0.16)",
+                border: `1px solid ${hair}`,
                 boxShadow: `inset 0 1px 0 rgba(255,255,255,0.22), 0 24px 60px ${glow}1f`,
                 backdropFilter: "blur(16px)",
               }}
             >
               <div className="flex items-center" style={{ gap: 14, marginBottom: 24 }}>
                 <span style={{ width: 10, height: 10, borderRadius: 999, background: glow, boxShadow: `0 0 14px ${glow}` }} />
-                <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: "0.22em", textTransform: "uppercase", color: "#FFFFFF" }}>
+                <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: "0.22em", textTransform: "uppercase", color: fg }}>
                   {heading}
                 </span>
                 <span style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${glow}, transparent)` }} />
@@ -357,7 +359,7 @@ registerSlideModule({
                         padding: "22px 16px",
                         gap: 16,
                         background: "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03))",
-                        border: "1px solid rgba(255,255,255,0.14)",
+                        border: `1px solid ${hair}`,
                         borderBottom: `2px solid ${glow}99`,
                       }}
                     >
@@ -367,14 +369,14 @@ registerSlideModule({
                         ) : (
                           <span
                             className="flex items-center justify-center"
-                            style={{ width: 64, height: 64, borderRadius: 999, border: "2px dashed rgba(255,255,255,0.7)", color: "#FFFFFF", fontSize: 40, fontWeight: 300 }}
+                            style={{ width: 64, height: 64, borderRadius: 999, border: `2px dashed ${isDark ? "rgba(255,255,255,0.7)" : "rgba(3,0,44,0.5)"}`, color: fg, fontSize: 40, fontWeight: 300 }}
                           >
                             +
                           </span>
                         )}
                       </div>
                       {!wide && (
-                        <span style={{ fontSize: 26, fontWeight: 700, color: "#FFFFFF", textAlign: "center", lineHeight: 1.15 }}>
+                        <span style={{ fontSize: 26, fontWeight: 700, color: fg, textAlign: "center", lineHeight: 1.15 }}>
                           {s(r.label)}
                         </span>
                       )}
@@ -388,7 +390,7 @@ registerSlideModule({
             <SlideFrame brand={brand} pageNumber={pageNumber}>
               <SlideTitle brand={brand} title={s(c.title)} />
               {s(c.subtitle) && (
-                <p style={{ marginTop: 18, fontSize: 28, lineHeight: 1.35, color: "#FFFFFF", maxWidth: 1400 }}>{s(c.subtitle)}</p>
+                <p style={{ marginTop: 18, fontSize: 28, lineHeight: 1.35, color: fg, maxWidth: 1400 }}>{s(c.subtitle)}</p>
               )}
               <div data-portrait="vs-stack" className="relative mt-10 flex min-h-0 flex-1 items-stretch" style={{ gap: 90 }}>
                 <Panel heading={s(left.label, "Left")} rows={leftRows} glow={glows[0]} />
