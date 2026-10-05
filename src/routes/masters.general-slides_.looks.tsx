@@ -13,7 +13,13 @@ import { MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import darkCobaltRise from "@/assets/looks/dark-cobalt-rise.jpg";
 import darkLavenderBloom from "@/assets/looks/dark-lavender-bloom.jpg";
-import darkAquaHorizon from "@/assets/looks/dark-aqua-horizon.jpg";
+import darkMidnightDawn from "@/assets/looks/dark-midnight-dawn.jpg";
+import darkTriAurora from "@/assets/looks/dark-tri-aurora.jpg";
+import darkDuskPrism from "@/assets/looks/dark-dusk-prism.jpg";
+import darkNorthernGlow from "@/assets/looks/dark-northern-glow.jpg";
+import lightTriPastel from "@/assets/looks/light-tri-pastel.jpg";
+import lightSunriseVeil from "@/assets/looks/light-sunrise-veil.jpg";
+import lightSpringMist from "@/assets/looks/light-spring-mist.jpg";
 import darkTwinGlow from "@/assets/looks/dark-twin-glow.jpg";
 import lightSkyHaze from "@/assets/looks/light-sky-haze.jpg";
 import lightLavenderMist from "@/assets/looks/light-lavender-mist.jpg";
@@ -38,12 +44,18 @@ const LOOKS: Look[] = [
   { id: "current-light", name: "Current light", mode: "light", note: "The approved light master as it is today.", url: null },
   { id: "cobalt-rise", name: "Cobalt Rise", mode: "dark", note: "Blue glow lifting from the lower right.", url: darkCobaltRise, isNew: true },
   { id: "lavender-bloom", name: "Lavender Bloom", mode: "dark", note: "Lavender light from the top left corner.", url: darkLavenderBloom, isNew: true },
-  { id: "aqua-horizon", name: "Aqua Horizon", mode: "dark", note: "A single aqua light line across the lower third.", url: darkAquaHorizon, isNew: true },
+  { id: "midnight-dawn", name: "Midnight Dawn", mode: "dark", note: "Cobalt glow rising from the bottom centre.", url: darkMidnightDawn, isNew: true },
   { id: "twin-glow", name: "Twin Glow", mode: "dark", note: "Blue and lavender glows at opposite corners.", url: darkTwinGlow, isNew: true },
+  { id: "tri-aurora", name: "Tri Aurora", mode: "dark", note: "Three colours: blue, lavender and aqua glows in three corners.", url: darkTriAurora, isNew: true },
+  { id: "dusk-prism", name: "Dusk Prism", mode: "dark", note: "Three colours: blue, lavender and pink sweep on the right.", url: darkDuskPrism, isNew: true },
+  { id: "northern-glow", name: "Northern Glow", mode: "dark", note: "Three colours: blue, aqua and green glows.", url: darkNorthernGlow, isNew: true },
   { id: "sky-haze", name: "Sky Haze", mode: "light", note: "Soft aqua and sky blue blur, top right.", url: lightSkyHaze, isNew: true },
   { id: "lavender-mist", name: "Lavender Mist", mode: "light", note: "Lavender and blush soft focus, bottom right.", url: lightLavenderMist, isNew: true },
   { id: "aqua-floor", name: "Aqua Floor", mode: "light", note: "Bright page with an aqua glow along the bottom.", url: lightAquaFloor, isNew: true },
   { id: "prism-frost", name: "Prism Frost", mode: "light", note: "Frosted blue, lavender and aqua along the right.", url: lightPrismFrost, isNew: true },
+  { id: "tri-pastel", name: "Tri Pastel", mode: "light", note: "Three colours: sky blue, lavender and aqua soft focus on the right.", url: lightTriPastel, isNew: true },
+  { id: "sunrise-veil", name: "Sunrise Veil", mode: "light", note: "Three colours: peach, lavender and blue along the bottom.", url: lightSunriseVeil, isNew: true },
+  { id: "spring-mist", name: "Spring Mist", mode: "light", note: "Three colours: aqua, green and blue in two corners.", url: lightSpringMist, isNew: true },
 ];
 
 export const Route = createFileRoute("/masters/general-slides_/looks")({
