@@ -859,6 +859,31 @@ function DeckEditor() {
                           ☾ Dark
                         </button>
                       </div>
+                      <div className="mt-3 border-t border-black/10 pt-3">
+                        <p className="mb-2 text-[11px] font-medium text-[#03002C]/70">
+                          Whole deck ({deck.slides.length} slides)
+                        </p>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              deck.slides.forEach((s) => setSlideMode(deck.id, s.id, "light"))
+                            }
+                            className="rounded-md border border-black/15 px-3 py-1 text-[11px] font-medium text-[#03002C] hover:bg-black/[0.04]"
+                          >
+                            ☀ All light
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              deck.slides.forEach((s) => setSlideMode(deck.id, s.id, "dark"))
+                            }
+                            className="rounded-md border border-black/15 px-3 py-1 text-[11px] font-medium text-[#03002C] hover:bg-black/[0.04]"
+                          >
+                            ☾ All dark
+                          </button>
+                        </div>
+                      </div>
                     </EditorMenu>
 
                     <EditorMenu label="Slide options">
