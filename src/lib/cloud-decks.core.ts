@@ -3,6 +3,8 @@
 
 import { z } from "zod";
 import { pickSlideExtras } from "@/lib/cloud-slide-extras";
+import { checkpointMaster } from "@/lib/master-checkpoint";
+import { isPlatformAdmin } from "@/lib/owner-or-admin";
 
 // Schemas are deliberately forgiving: a deck assembled in the browser may be
 // missing an optional field or carry newer authoring props, and none of that is
@@ -227,7 +229,20 @@ export async function saveDeckToCloudCore(
   // Shared masters are curated one-source-slide → one-slide. A save that would
   // add or drop slides (auto-split "(cont.)" pages, a stale tab) is refused so
   // it can never overwrite the master silently.
+  // Admins may fully restructure a master (add, remove, reorder slides); the
+  // edit is still checkpointed first so it can be rolled back. Auto-split
+  // "(cont.)" pages are refused for everyone — nobody makes those on purpose.
+  const masterAdmin = keepTemplate && (await isPlatformAdmin(supabase, userId));
   if (keepTemplate) {
+    const incomingSplit = data.deck.slides.some((sl) => /\(cont\.\s*\d+\)/i.test(JSON.stringify(sl)));
+    if (incomingSplit) {
+      throw new Error(
+        "This save would split master slides into \"(cont.)\" pages. Refused to protect the master — reload the master and try again.",
+      );
+    }
+    await checkpointMaster(supabase, deckUuid, userId);
+  }
+  if (keepTemplate && !masterAdmin) {
     const { data: existing } = await sb
       .from("deck_slides")
       .select("id, position, variant_id, content")
