@@ -22,3 +22,4 @@
 - Print/PDF pages of another shape (letter, A4, tabloid, A3) render with `pageFit` on ScaledSlide: `PageFitBody` (src/components/slide/PageFit.tsx) picks the largest CSS zoom that keeps text unclipped, non-overlapping and graphics unshrunk — why: one generic relayout instead of per-page hand tuning; module-specific portrait layouts still go in `[data-portrait]` rules.
 
 - Master decks: admins may add/remove/reorder slides (save guard + order trigger skip admins); "(cont.)" splits are refused for everyone; every master save first checkpoints the prior state via `checkpointMaster` (one per 10 min), and pruning keeps at least 3 — why: admins need full editing without losing a way back.
+- Look explorer line looks render per-slide grounds in the browser from `src/lib/look-occupancy.json` (measured content map) via `src/lib/look-ground.ts` — why: backgrounds must avoid each slide's content; re-measure the map if master layouts change.
