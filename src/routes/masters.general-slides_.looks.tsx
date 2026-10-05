@@ -151,7 +151,7 @@ function LookDeck({ masterId, look }: { masterId: string; look: Look }) {
   const bg = look.url
     ? look.mode === "dark"
       ? { kind: "ai", url: look.url, scrim: "full", scrimStrength: 0.15, imageDim: 0, darkChrome: true }
-      : { kind: "ai", url: look.url, scrim: "full", scrimStrength: 0, imageDim: 0, tint: "#FFFFFF", darkChrome: false, softFocus: true }
+      : { kind: "ai", url: look.url, scrim: "full", scrimStrength: 0.2, imageDim: 0, tint: "#FFFFFF", darkChrome: false, softFocus: true }
     : null;
 
   return (
