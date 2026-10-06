@@ -81,10 +81,10 @@ function BoothWorkspace() {
 
   return (
     <main className="flex h-screen flex-col bg-[#0B0A2A] text-white lg:flex-row">
-      <section className="min-h-0 flex-1 overflow-auto" aria-label="Kiosk editor">
+      <section className="relative min-h-[70vh] min-w-0 flex-1 overflow-hidden" aria-label="Kiosk editor">
         <KioskLayerEditor layout={layout} vendor={vendor} embedded />
       </section>
-      <aside className="flex w-full flex-col border-l border-white/10 lg:w-[38%]" aria-label="3D booth">
+      <aside className="flex w-full flex-col border-l border-white/10 lg:w-[34%] lg:shrink-0" aria-label="3D booth">
         <header className="flex flex-wrap items-center gap-2 border-b border-white/10 p-3 text-sm">
           <h1 className="font-semibold">{vendor} · 3D</h1>
           <span className="rounded-sm border border-white/20 px-1.5 py-0.5 text-[11px]">
