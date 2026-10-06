@@ -56,7 +56,7 @@ function BoothWorkspace() {
   const { data: checks } = useQuery({
     queryKey: ["booth-3d-checks", booth?.id],
     enabled: !!booth?.id,
-    queryFn: async () => (await supabase.from("booth_3d_checks").select("id, revision, note, checked_at").eq("booth_id", booth!.id).order("checked_at", { ascending: false }).limit(5)).data ?? [],
+    queryFn: async () => (await supabase.from("booth_3d_checks").select("id, revision, note, checked_at").eq("booth_id", booth!.id!).order("checked_at", { ascending: false }).limit(5)).data ?? [],
   });
   const checkedThis = !!revision && (checks ?? []).some((c) => c.revision === revision);
 
