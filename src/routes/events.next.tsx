@@ -5,7 +5,7 @@
 // feed the existing kit engine.
 
 import { AppShell } from "@/components/AppShell";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -102,13 +102,13 @@ function NextHub() {
     <div className="mx-auto w-full max-w-[1200px] px-6 pb-24 pt-8">
       <Hero division={division} />
 
-      <div id="editions" tabIndex={-1} className="scroll-mt-24 outline-none">
+      <MasterDesignSystem division={division} onSelect={setDivisionId} />
+
+      <div id="editions" tabIndex={-1} className="mt-14 scroll-mt-24 outline-none">
         <NextEditions />
       </div>
 
       <LondonStatus />
-
-      <MasterDesignSystem division={division} onSelect={setDivisionId} />
 
       <CitySeries />
 
@@ -147,22 +147,22 @@ function Hero({ division }: { division: NextDivision }) {
               {NEXT_EVENT.name}
             </h1>
             <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-white/85">
-              Pick a city for on-site assets, or a division for master brand templates.
+              Start with your division to find its master templates, or pick a city for on-site assets.
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <a
-                href="#editions"
-                onClick={goEditions}
+                href="#master-system"
                 className="inline-flex items-center gap-2 rounded-md bg-white px-5 py-2.5 text-sm font-semibold text-[#03002C] shadow-lg shadow-black/25 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#03002C]"
               >
-                <MapPin size={14} /> Choose a city edition
+                <Search size={14} /> Find a division template
               </a>
               <a
-                href="#master-system"
+                href="#editions"
+                onClick={goEditions}
                 className="inline-flex items-center gap-2 rounded-md border border-white/40 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
-                Master brand templates <ArrowRight size={14} />
+                <MapPin size={14} /> Choose a city edition <ArrowRight size={14} />
               </a>
             </div>
 
@@ -191,62 +191,132 @@ function MasterDesignSystem({
   division: NextDivision;
   onSelect: (id: string) => void;
 }) {
+  const counts = useTemplateCounts();
   return (
-    <section id="master-system" className="mt-14 scroll-mt-24" aria-labelledby="next-master">
-      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-        Master Design System
-      </p>
-      <h2 id="next-master" className="mt-1 text-xl font-semibold">
-        Division master brand templates
-      </h2>
-      <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-        These templates are not tied to a city. Pick a division to see its lockup and jobs; for
-        on-site signage at a venue, open that city edition above.
-      </p>
+    <section
+      id="master-system"
+      className="mt-10 scroll-mt-24 rounded-lg border border-border bg-card p-6 shadow-sm sm:p-8"
+      aria-labelledby="next-master"
+    >
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            Step 1 · Master design system
+          </p>
+          <h2 id="next-master" className="mt-1 text-2xl font-semibold sm:text-3xl">
+            Division master brand templates
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Pick your division, then open the template you need. These work for every city; for
+            venue-specific signage, open a city edition below.
+          </p>
+        </div>
+        <TemplateSearch divisionId={division.id} />
+      </div>
 
-      <div role="group" aria-label="Choose a division" className="mt-4 flex flex-wrap gap-2">
+      <div
+        role="group"
+        aria-label="Choose a division"
+        className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6"
+      >
         {NEXT_DIVISIONS.map((d) => {
           const active = d.id === division.id;
+          const count = counts?.[d.id];
           return (
             <button
               key={d.id}
               type="button"
               aria-pressed={active}
               onClick={() => onSelect(d.id)}
-              className={`inline-flex items-center gap-2 rounded-md border px-3 py-2 text-[13px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              className={`relative flex flex-col items-start gap-1 overflow-hidden rounded-md border px-3 pb-3 pt-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 active
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border hover:bg-muted"
+                  ? "border-foreground bg-foreground text-background shadow-md"
+                  : "border-border bg-background hover:-translate-y-0.5 hover:border-foreground/40 hover:shadow-sm"
               }`}
             >
-              <span aria-hidden className="h-3 w-1 rounded-sm" style={{ background: d.accent }} />
-              {d.eventName}
+              <span aria-hidden className="absolute inset-x-0 top-0 h-1" style={{ background: d.accent }} />
+              <span className="text-sm font-semibold">{d.eventName}</span>
+              <span className={`text-[11px] ${active ? "text-background/75" : "text-muted-foreground"}`}>
+                {count == null ? "Templates" : `${count} template${count === 1 ? "" : "s"}`}
+              </span>
             </button>
           );
         })}
       </div>
 
+      <Link
+        to="/events/next/assets"
+        search={{ division: division.id }}
+        className="mt-6 flex items-center justify-between gap-3 rounded-md bg-primary px-5 py-4 text-primary-foreground transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        <span>
+          <span className="block text-base font-semibold">
+            Open all {division.eventName} templates
+          </span>
+          <span className="block text-xs opacity-85">
+            {counts?.[division.id] != null ? `${counts[division.id]} templates · ` : ""}
+            pillars, pedestals, signage, screens, social, badges and decks
+          </span>
+        </span>
+        <ArrowRight size={18} />
+      </Link>
+
       <DivisionDetail division={division} />
 
       <Pathways accent={division.accent} divisionId={division.id} />
 
-      <Link
-        to="/events/next/assets"
-        search={{ division: division.id }}
-        className="mt-6 flex items-center justify-between gap-3 rounded-md border border-border px-5 py-4 transition hover:border-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <span className="inline-flex items-center gap-3">
-          <Search size={18} className="text-icon-muted" />
-          <span>
-            <span className="block text-sm font-semibold">Search master templates</span>
-            <span className="block text-xs text-muted-foreground">
-              Filter by division, format family, code or size
-            </span>
-          </span>
-        </span>
-        <ArrowRight size={16} />
-      </Link>
     </section>
+  );
+}
+
+/** Template count per division, from the lazily loaded registry. */
+function useTemplateCounts(): Record<string, number> | null {
+  const [counts, setCounts] = useState<Record<string, number> | null>(null);
+  useEffect(() => {
+    let live = true;
+    void loadNextRegistry().then((rows) => {
+      if (!live) return;
+      const out: Record<string, number> = {};
+      for (const r of rows) out[r.divisionId] = (out[r.divisionId] ?? 0) + 1;
+      setCounts(out);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+  return counts;
+}
+
+/** Search box that opens the template library filtered to the chosen division. */
+function TemplateSearch({ divisionId }: { divisionId: string }) {
+  const navigate = useNavigate();
+  const [q, setQ] = useState("");
+  return (
+    <form
+      role="search"
+      className="flex w-full max-w-sm items-center gap-2"
+      onSubmit={(e) => {
+        e.preventDefault();
+        void navigate({ to: "/events/next/assets", search: { division: divisionId, q: q.trim() || undefined } });
+      }}
+    >
+      <label htmlFor="next-template-search" className="sr-only">
+        Search templates
+      </label>
+      <div className="relative flex-1">
+        <Search size={15} aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <input
+          id="next-template-search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search templates, e.g. pedestal"
+          className="h-10 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        />
+      </div>
+      <button type="submit" className="h-10 rounded-md border border-border px-4 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        Search
+      </button>
+    </form>
   );
 }
 
