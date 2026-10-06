@@ -26,7 +26,9 @@ export function numOf(value: string): number {
   const raw = value.replace(/,/g, "").trim();
   const n = parseFloat(raw.replace(/[^0-9.]/g, ""));
   if (!Number.isFinite(n)) return 0;
-  return /k\b|k\+?$/i.test(raw) ? n * 1000 : n;
+  const m = raw.match(/[\d.]\s*([kmb])\b|[\d.]\s*([kmb])\+?$/i);
+  const unit = (m?.[1] ?? m?.[2] ?? "").toLowerCase();
+  return unit === "k" ? n * 1e3 : unit === "m" ? n * 1e6 : unit === "b" ? n * 1e9 : n;
 }
 
 export function Donut({
@@ -370,7 +372,11 @@ export function LogLollipop({
 /** Dot field — exactly `count` dots (each worth `per`), laid out in `cols`
  * columns with a soft gradient across the field. */
 export function DotField({ count, cols, dot, gap, from, to, total }: { count: number; cols: number; dot: number; gap: number; from: string; to: string; total?: number }) {
-  const t = Math.max(total ?? count, count);
+  // Hard cap: never more than 8 rows of dots, so a big figure can't overflow the slide.
+  const max = Math.max(1, cols * 8);
+  const rawT = Math.max(total ?? count, count, 0) || 0;
+  const t = Math.min(max, Math.round(rawT));
+  count = rawT > max ? Math.round((count / rawT) * t) : Math.max(0, Math.round(count));
   return (
     <div aria-hidden className="grid" style={{ gridTemplateColumns: `repeat(${cols}, ${dot}px)`, gap }}>
       {Array.from({ length: t }).map((_, i) => {
