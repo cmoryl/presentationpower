@@ -200,14 +200,27 @@ export function resizedSignLayout(L: LiveLayout, wIn: number, hIn: number): Live
     ...b,
     y0: Math.min(b.y0, -KIOSK_BLEED),
     y1: Math.max(b.y1, L.trimH + KIOSK_BLEED, H + KIOSK_BLEED),
-    parts: (b.parts ?? []).map((p) => {
-      const w = p.x1 - p.x0, h = p.y1 - p.y0;
-      // Full-bleed pieces (ground shapes, chevrons) stretch with the trim's short side.
-      const full = w >= 0.9 * L.trimW || h >= 0.9 * L.trimH;
-      const rs = full ? Math.max(sx, sy) : Math.min(1, (W - 2 * margin) / w, (H - 2 * margin) / h);
-      const cx = (p.x0 + p.x1) / 2, cy = (p.y0 + p.y1) / 2;
-      return { ...p, rx: cx * sx - cx, ry: cy * sy - cy, rs: Math.max(0.05, rs) };
-    }),
+    parts: (() => {
+      const all = b.parts ?? [];
+      const isFull = (p: LivePart) => p.x1 - p.x0 >= 0.9 * L.trimW || p.y1 - p.y0 >= 0.9 * L.trimH;
+      return all.map((p) => {
+        const w = p.x1 - p.x0, h = p.y1 - p.y0;
+        // Full-bleed pieces (ground shapes, chevrons) grow with the trim.
+        if (isFull(p)) {
+          const cx = (p.x0 + p.x1) / 2, cy = (p.y0 + p.y1) / 2;
+          return { ...p, rx: cx * sx - cx, ry: cy * sy - cy, rs: Math.max(sx, sy) };
+        }
+        // Words on one line (an outlined tagline) move together: re-place the row, not each word.
+        const row = all.filter((q) => !isFull(q) && q.y0 < p.y1 && q.y1 > p.y0 && Math.abs((q.y1 - q.y0) - h) < 0.5 * h);
+        const ux0 = Math.min(...row.map((q) => q.x0)), ux1 = Math.max(...row.map((q) => q.x1));
+        const rs = Math.max(0.05, Math.min(1, (W - 2 * margin) / (ux1 - ux0), (W - 2 * margin) / w, (H - 2 * margin) / h));
+        const ucx = (ux0 + ux1) / 2, cy = (p.y0 + p.y1) / 2;
+        const pcx = (p.x0 + p.x1) / 2;
+        // Keep this piece's place inside its row (scaled with the row).
+        const ncx = ucx * sx + (pcx - ucx) * rs;
+        return { ...p, rx: ncx - pcx, ry: cy * sy - cy, rs };
+      });
+    })(),
   }));
   const texts = L.texts.map((t) => {
     const dx = (t.x + t.w / 2) * (sx - 1), dy = ((t.top + t.bottom) / 2) * (sy - 1);
