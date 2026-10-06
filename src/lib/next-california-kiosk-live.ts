@@ -220,7 +220,6 @@ export function resizedSignLayout(L: LiveLayout, wIn: number, hIn: number): Live
         groups.set(p.id, [Math.min(...mem.map((q) => q.x0)), Math.min(...mem.map((q) => q.y0)), Math.max(...mem.map((q) => q.x1)), Math.max(...mem.map((q) => q.y1))]);
       });
       return all.map((p) => {
-        const w = p.x1 - p.x0, h = p.y1 - p.y0;
         // Full-bleed pieces (ground shapes, chevrons) grow with the trim.
         if (isFull(p)) {
           const cx = (p.x0 + p.x1) / 2, cy = (p.y0 + p.y1) / 2;
@@ -233,7 +232,6 @@ export function resizedSignLayout(L: LiveLayout, wIn: number, hIn: number): Live
         const ucx = (ux0 + ux1) / 2, ucy = (uy0 + uy1) / 2;
         const pcx = (p.x0 + p.x1) / 2, pcy = (p.y0 + p.y1) / 2;
         const ncx = ucx * sx + (pcx - ucx) * rs, ncy = ucy * sy + (pcy - ucy) * rs;
-        void w;
         return { ...p, rx: ncx - pcx, ry: ncy - pcy, rs };
       });
     })(),
