@@ -1,7 +1,8 @@
 // /events/next/sign-editor/$signId — Legal NEXT signage template in the layer editor.
 
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 
 import { KioskLayerEditor } from "@/components/events/KioskLayerEditor";
 import { legalSign, legalSignLayout } from "@/lib/legal-next-signage";
@@ -43,15 +44,27 @@ function SignEditorWindow() {
   const auth = useRequireSignIn();
   const { signId } = Route.useParams();
   const sign = legalSign(signId);
+  const navigate = useNavigate();
   const [faceId, setFaceId] = useState(sign?.faces[0]?.id ?? "");
   if (auth === "checking") return <Screen title="Opening the sign editor…" body="Checking you're signed in." />;
   if (auth === "signed-out") return <Screen title="Please sign in to edit signs" body="Taking you to the sign-in page." />;
   const layout = legalSignLayout(faceId);
   if (!sign || !layout) return <Screen title="Sign not found" body="This Legal NEXT sign template doesn't exist." />;
   const face = sign.faces.find((f) => f.id === faceId);
+  const homeDivision = sign.id.startsWith("finance-") ? "finance" : "legal";
+  const exit = () => {
+    // Opened as a separate window from a card: close it and return to that tab.
+    if (window.opener && !window.opener.closed) { window.close(); return; }
+    if (window.history.length > 1) { window.history.back(); return; }
+    void navigate({ to: "/events/next/divisions/$divisionId", params: { divisionId: homeDivision } });
+  };
   return (
     <div className="fixed inset-0 flex flex-col bg-[#0B0A2A]">
       <div className="relative z-[75] flex items-center gap-1 border-b border-white/10 bg-[#070620] px-3 py-1.5">
+        <button type="button" onClick={exit} aria-label="Exit editor"
+          className="mr-2 inline-flex items-center gap-1.5 rounded-sm border border-white/15 px-3 py-1 text-[12px] font-semibold text-white/80 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
+          <ArrowLeft className="h-3.5 w-3.5" aria-hidden /> Exit editor
+        </button>
         {sign.faces.length > 1 ? (
           <div role="tablist" aria-label="Sign face" className="flex gap-1">
             {sign.faces.map((f) => (
