@@ -33,7 +33,7 @@ const NEXTMART: NextRegistryRow = {
 };
 
 export function globallinkPedestalRows(): NextRegistryRow[] {
-  return [NEXTMART, ...SET.map((s) => ({
+  return [NEXTMART, ...SET.map((s): NextRegistryRow => ({
     divisionId: "globallink",
     group: "pillar-signage",
     code: s.code,
