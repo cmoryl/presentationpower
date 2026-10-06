@@ -1,0 +1,1 @@
+UPDATE public.event_booths SET published_3d = true WHERE event = 'next-sf' AND boothhub_slug IS NOT NULL;
