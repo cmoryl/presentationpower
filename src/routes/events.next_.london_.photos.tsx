@@ -8,8 +8,8 @@
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Check, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { LondonPanelThumb } from "@/components/events/LondonPanelThumb";
