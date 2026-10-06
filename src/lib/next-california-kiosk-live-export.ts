@@ -175,7 +175,12 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
     // Native page (PDF y-up, bleed-box origin) → kiosk space.
     const P: Affine = [1, 0, 0, -1, -L.originX, L.mediaH - L.originY];
     if (edits.ground) groundShading();
-    else page.pushOperators(raw(`q\n${fmt(mul(F, P))} cm\n/KN0 Do\nQ`));
+    else {
+      // Ground page placed in its trim box (stretched for no-bleed or re-sized signs).
+      const [bx, by, bw, bh] = nativeBgBox(L);
+      const Bx: Affine = [bw / L.mediaW, 0, 0, bh / L.mediaH, bx + L.originX * (bw / L.mediaW), by + L.originY * (bh / L.mediaH)];
+      page.pushOperators(raw(`q\n${fmt(mul(F, mul(Bx, P)))} cm\n/KN0 Do\nQ`));
+    }
     for (const layer of ["image", "vector"] as const) {
       endLayer();
       beginLayer(layer === "image" ? "Imagery" : "Content");

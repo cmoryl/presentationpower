@@ -196,7 +196,6 @@ export function resizedSignLayout(L: LiveLayout, wIn: number, hIn: number): Live
   const sx = W / L.trimW, sy = H / L.trimH;
   const [bx, by, bw, bh] = nativeBgBox(L);
   const margin = Math.round(Math.min(L.sign?.margin ?? 72, Math.min(W, H) * 0.06) * 100) / 100;
-  const fitW = W + 2 * KIOSK_BLEED, fitH = H + 2 * KIOSK_BLEED;
   const blocks = L.blocks.map((b) => ({
     ...b,
     y0: Math.min(b.y0, -KIOSK_BLEED),
@@ -205,7 +204,7 @@ export function resizedSignLayout(L: LiveLayout, wIn: number, hIn: number): Live
       const w = p.x1 - p.x0, h = p.y1 - p.y0;
       // Full-bleed pieces (ground shapes, chevrons) stretch with the trim's short side.
       const full = w >= 0.9 * L.trimW || h >= 0.9 * L.trimH;
-      const rs = full ? Math.min(Math.max(sx, sy), Math.max(Math.min(sx, sy), Math.min(fitW / w, fitH / h))) : Math.min(1, (W - 2 * margin) / w, (H - 2 * margin) / h);
+      const rs = full ? Math.max(sx, sy) : Math.min(1, (W - 2 * margin) / w, (H - 2 * margin) / h);
       const cx = (p.x0 + p.x1) / 2, cy = (p.y0 + p.y1) / 2;
       return { ...p, rx: cx * sx - cx, ry: cy * sy - cy, rs: Math.max(0.05, rs) };
     }),
