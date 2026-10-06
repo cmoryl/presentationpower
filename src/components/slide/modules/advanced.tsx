@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 import type { CSSProperties } from "react";
 import { MapPin } from "lucide-react";
-import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, Pictogram, RadialBars, ScaleBar, numOf, pctOf, type InfoFill } from "./infographic-kit";
+import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, Pictogram, RadialBars, IsoCity, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 type IconType = typeof Sparkles;
 
@@ -603,12 +603,17 @@ registerSlideModule({
                         <Figure value={s(heroA.value)} px={190} color={ink.strong} gradient={`linear-gradient(100deg, ${ink.strong} 30%, ${blue} 80%, ${INFO_FILL.lavender.bg})`} />
                         <div style={{ fontSize: fillPx(26, "body"), fontWeight: 650, color: ink.strong, paddingBottom: 22 }}>{s(heroA.label)}</div>
                       </div>
-                      <div className="mt-5">
-                        {ruler(numOf(s(heroA.value)), 46, blue)}
-                        <div className="mt-2 flex justify-between" style={{ width: Math.min(40, Math.round(numOf(s(heroA.value)))) * 9 - 6, fontSize: fillPx(13, "body"), color: ink.muted }}>
-                          <span>Year 1</span>
-                          <span>Year {s(heroA.value)}</span>
-                        </div>
+                      <div className="mt-4" style={{ height: 150, maxWidth: 560 }}>
+                        <IsoCity
+                          towers={Array.from({ length: Math.max(1, Math.min(40, Math.round(numOf(s(heroA.value))))) }, (_, k, arr) => ({ value: k + 1, color: `color-mix(in oklab, ${blue} ${Math.round(100 - (k / Math.max(1, arr.length - 1)) * 55)}%, ${INFO_FILL.lavender.bg})` }))}
+                          mode="linear"
+                          maxHeight={4}
+                          foot={0.55}
+                          gapTiles={0.12}
+                          unit={20}
+                          ground={blue}
+                          glow={false}
+                        />
                       </div>
                     </div>
                   )}
@@ -617,8 +622,8 @@ registerSlideModule({
                       <div key={i} className="flex flex-col gap-2" style={{ paddingLeft: i ? 32 : 0, borderLeft: i ? `1px solid ${ink.hairline}` : undefined }}>
                         <Figure value={s(it.value)} px={80} color={ink.strong} />
                         {lab(s(it.label), 20)}
-                        <div className="mt-3" style={{ maxWidth: 300 }}>
-                          <ScaleBar mode="linear" value={numOf(s(it.value))} max={Math.max(...restA.map((r) => numOf(s(r.value))))} from={i === 0 ? INFO_FILL.lavender.bg : blue} to={i === 0 ? blue : INFO_FILL.lavender.bg} track={ink.hairline} labelColor={ink.muted} height={14} />
+                        <div className="mt-2" style={{ height: 120, width: 200 }}>
+                          <IsoCity towers={[{ value: numOf(s(it.value)), color: i === 0 ? INFO_FILL.lavender.bg : blue }]} mode="linear" max={Math.max(...restA.map((r) => numOf(s(r.value))))} maxHeight={3} foot={1.6} ground={blue} />
                         </div>
                         {s(it.body) && <div style={{ fontSize: fillPx(15, "body"), color: ink.muted, lineHeight: 1.35 }}>{s(it.body)}</div>}
                       </div>
