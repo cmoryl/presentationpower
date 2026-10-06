@@ -245,26 +245,9 @@ function MasterDesignSystem({
         })}
       </div>
 
-      <Link
-        to="/events/next/assets"
-        search={{ division: division.id }}
-        className="mt-6 flex items-center justify-between gap-3 rounded-md bg-primary px-5 py-4 text-primary-foreground transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      >
-        <span>
-          <span className="block text-base font-semibold">
-            Open all {division.eventName} templates
-          </span>
-          <span className="block text-xs opacity-85">
-            {counts?.[division.id] != null ? `${counts[division.id]} templates · ` : ""}
-            pillars, pedestals, signage, social, badges and decks
-          </span>
-        </span>
-        <ArrowRight size={18} />
-      </Link>
+      <DivisionTemplatePicker division={division} count={counts?.[division.id]} />
 
       <DivisionDetail division={division} />
-
-      <DivisionTemplatePicker division={division} />
 
       <Pathways accent={division.accent} divisionId={division.id} />
 
@@ -272,12 +255,13 @@ function MasterDesignSystem({
   );
 }
 
-/** Dropdown of every template in the selected division, grouped by format. */
-function DivisionTemplatePicker({ division }: { division: NextDivision }) {
-  const navigate = useNavigate();
+/** Blue "Open all" bar: opens an accordion listing every template in the division, grouped by format. */
+function DivisionTemplatePicker({ division, count }: { division: NextDivision; count?: number }) {
+  const [open, setOpen] = useState(false);
   const [rows, setRows] = useState<NextRegistryRow[] | null>(null);
   useEffect(() => {
     let live = true;
+    setRows(null);
     void loadNextRegistry().then((all) => live && setRows(all.filter((r) => r.divisionId === division.id)));
     return () => { live = false; };
   }, [division.id]);
@@ -285,35 +269,59 @@ function DivisionTemplatePicker({ division }: { division: NextDivision }) {
     () => NEXT_FORMAT_GROUPS.map((g) => ({ g, items: (rows ?? []).filter((r) => r.group === g.id) })).filter((x) => x.items.length),
     [rows],
   );
-  const open = (key: string) => {
-    const r = rows?.[Number(key)];
-    if (!r) return;
-    if (r.liveSignId) void navigate({ to: "/events/next/sign-editor/$signId", params: { signId: r.liveSignId } });
-    else void navigate({ to: "/events/next/assets", search: { division: division.id, group: r.group, q: r.format } });
-  };
+  const panelId = `tpl-list-${division.id}`;
   return (
-    <div className="mt-6 flex flex-wrap items-center gap-3 rounded-md border border-border p-4">
-      <label htmlFor={`tpl-pick-${division.id}`} className="text-sm font-semibold">
-        {division.eventName} templates
-      </label>
-      <select
-        id={`tpl-pick-${division.id}`}
-        value=""
-        disabled={!rows}
-        onChange={(e) => open(e.target.value)}
-        className="min-w-[18rem] flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    <div className="mt-6 overflow-hidden rounded-md border border-primary">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 bg-primary px-5 py-4 text-left text-primary-foreground transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
-        <option value="">{rows ? `Choose one of ${rows.length} templates…` : "Loading templates…"}</option>
-        {groups.map(({ g, items }) => (
-          <optgroup key={g.id} label={`${g.label} (${items.length})`}>
-            {items.map((r) => (
-              <option key={`${r.code}-${r.format}`} value={rows!.indexOf(r)}>
-                {r.code} · {r.format}{r.liveSignId ? " · editable" : ""}
-              </option>
-            ))}
-          </optgroup>
-        ))}
-      </select>
+        <span>
+          <span className="block text-base font-semibold">All {division.eventName} templates</span>
+          <span className="block text-xs opacity-85">
+            {count != null ? `${count} templates · ` : ""}pillars, pedestals, signage, social, badges and decks
+          </span>
+        </span>
+        <ChevronRight size={18} className={`transition-transform motion-reduce:transition-none ${open ? "rotate-90" : ""}`} aria-hidden />
+      </button>
+      {open ? (
+        <div id={panelId} className="max-h-[32rem] overflow-y-auto bg-background p-5">
+          {!rows ? (
+            <p className="text-sm text-muted-foreground">Loading templates…</p>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {groups.map(({ g, items }) => (
+                <div key={g.id}>
+                  <Link to="/events/next/assets" search={{ division: division.id, group: g.id }} className="text-xs font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground hover:underline">
+                    {g.label} ({items.length})
+                  </Link>
+                  <ul className="mt-2 space-y-1">
+                    {items.map((r) => (
+                      <li key={`${r.code}-${r.format}`}>
+                        {r.liveSignId ? (
+                          <Link to="/events/next/sign-editor/$signId" params={{ signId: r.liveSignId }} className="text-sm hover:text-primary hover:underline">
+                            <span className="text-muted-foreground">{r.code}</span> {r.format} <span className="text-xs text-primary">· editable</span>
+                          </Link>
+                        ) : (
+                          <Link to="/events/next/assets" search={{ division: division.id, group: r.group, q: r.format }} className="text-sm hover:text-primary hover:underline">
+                            <span className="text-muted-foreground">{r.code}</span> {r.format}
+                          </Link>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+          <Link to="/events/next/assets" search={{ division: division.id }} className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+            Open the full {division.eventName} library <ArrowRight size={14} />
+          </Link>
+        </div>
+      ) : null}
     </div>
   );
 }
