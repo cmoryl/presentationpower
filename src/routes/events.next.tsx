@@ -560,14 +560,6 @@ const NEXT_PATHWAYS: {
     cta: "Open signage set",
   },
   {
-    id: "screens",
-    title: "Set up stage & displays",
-    who: "Screens & stage",
-    detail: "S-series digital screen designs for stage, foyer and breakout displays.",
-    group: "event-screens",
-    cta: "Open screen set",
-  },
-  {
     id: "pillars",
     title: "Print large-format",
     who: "Large format",
