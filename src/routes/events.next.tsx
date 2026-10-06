@@ -34,6 +34,7 @@ import {
   type NextRegistryRow,
 } from "@/lib/next-event";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { loadNextRegistry } from "@/lib/next-event";
 import { NextEditions } from "@/components/events/NextEditions";
 import {
   LONDON_STYLES,
