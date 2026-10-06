@@ -441,3 +441,79 @@ export function ScaleBar({ value, max, mode = "log", from, to, track, labelColor
     </div>
   );
 }
+
+// ============= Isometric world =============
+const C30 = Math.cos(Math.PI / 6);
+const iso = (x: number, y: number, z: number): [number, number] => [(x - y) * C30, (x + y) * 0.5 - z];
+const pts = (p: [number, number, number][], u: number) => p.map(([x, y, z]) => iso(x * u, y * u, z * u).map((n) => n.toFixed(1)).join(",")).join(" ");
+
+export type IsoTower = { value: number; color: string; label?: string };
+
+/**
+ * Isometric scene: a ground plate with one tower per figure, rising in a
+ * diagonal row. Heights are data-true — `log` for counts of different
+ * magnitude, `linear` against `max`. Pure SVG, so it exports as a picture
+ * at any size.
+ */
+export function IsoCity({ towers, mode = "log", max, maxHeight = 6, foot = 1.4, gapTiles = 0.7, unit = 34, ground, glow = true, labels = false, labelColor }: { towers: IsoTower[]; mode?: "log" | "linear"; max?: number; maxHeight?: number; foot?: number; gapTiles?: number; unit?: number; ground: string; glow?: boolean; labels?: boolean; labelColor?: string }) {
+  const vals = towers.map((t) => Math.max(0, t.value));
+  const top = mode === "log" ? Math.max(1, ...vals.map((v) => Math.log10(Math.max(1, v)))) : Math.max(1, max ?? Math.max(...vals));
+  const hOf = (v: number) => Math.max(0.25, ((mode === "log" ? Math.log10(Math.max(1, v)) : v) / top) * maxHeight);
+  const n = towers.length;
+  const span = n * foot + (n - 1) * gapTiles;
+  const pad = 0.8;
+  const W = span + pad * 2;
+  const D = foot + pad * 2;
+  // bounding box of the scene in px
+  const corners: [number, number][] = [iso(0, 0, 0), iso(W * unit, 0, 0), iso(0, D * unit, 0), iso(W * unit, D * unit, 0), iso(0, 0, (maxHeight + 0.6) * unit), iso(W * unit, 0, (maxHeight + 0.6) * unit)];
+  const minX = Math.min(...corners.map((c) => c[0])) - 8;
+  const maxX = Math.max(...corners.map((c) => c[0])) + 8;
+  const minY = Math.min(...corners.map((c) => c[1])) - (labels ? 40 : 8);
+  const maxY = Math.max(...corners.map((c) => c[1])) + 8;
+  const gid = React.useId().replace(/:/g, "");
+  return (
+    <svg aria-hidden viewBox={`${minX} ${minY} ${maxX - minX} ${maxY - minY}`} style={{ width: "100%", height: "100%", overflow: "visible" }}>
+      <defs>
+        <linearGradient id={`g${gid}`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor={ground} stopOpacity="0.55" />
+          <stop offset="1" stopColor={ground} stopOpacity="0.12" />
+        </linearGradient>
+      </defs>
+      {/* ground plate with tile grid */}
+      <polygon points={pts([[0, 0, 0], [W, 0, 0], [W, D, 0], [0, D, 0]], unit)} style={{ fill: `url(#g${gid})` }} />
+      <polygon points={pts([[0, D, 0], [W, D, 0], [W, D, -0.25], [0, D, -0.25]], unit)} style={{ fill: ground, opacity: 0.35 }} />
+      <polygon points={pts([[W, 0, 0], [W, D, 0], [W, D, -0.25], [W, 0, -0.25]], unit)} style={{ fill: ground, opacity: 0.5 }} />
+      {Array.from({ length: Math.floor(W) + 1 }, (_, i) => (
+        <polyline key={`gx${i}`} points={pts([[i, 0, 0], [i, D, 0]], unit)} style={{ fill: "none", stroke: ground, strokeOpacity: 0.35, strokeWidth: 0.8 }} />
+      ))}
+      {Array.from({ length: Math.floor(D) + 1 }, (_, i) => (
+        <polyline key={`gy${i}`} points={pts([[0, i, 0], [W, i, 0]], unit)} style={{ fill: "none", stroke: ground, strokeOpacity: 0.35, strokeWidth: 0.8 }} />
+      ))}
+      {towers.map((t, i) => {
+        const x = pad + i * (foot + gapTiles);
+        const y = pad;
+        const h = hOf(t.value);
+        const s = foot;
+        const topF = `color-mix(in oklab, ${t.color} 55%, white)`;
+        const rightF = `color-mix(in oklab, ${t.color} 70%, black)`;
+        const [lx, ly] = iso((x + s / 2) * unit, (y + s / 2) * unit, (h + 0.35) * unit);
+        return (
+          <g key={i}>
+            {glow && <polygon points={pts([[x - 0.3, y - 0.3, 0], [x + s + 0.3, y - 0.3, 0], [x + s + 0.3, y + s + 0.3, 0], [x - 0.3, y + s + 0.3, 0]], unit)} style={{ fill: t.color, opacity: 0.28, filter: "blur(6px)" }} />}
+            <polygon points={pts([[x, y + s, 0], [x + s, y + s, 0], [x + s, y + s, h], [x, y + s, h]], unit)} style={{ fill: t.color }} />
+            <polygon points={pts([[x + s, y, 0], [x + s, y + s, 0], [x + s, y + s, h], [x + s, y, h]], unit)} style={{ fill: rightF }} />
+            {/* floor lines on the facades */}
+            {Array.from({ length: Math.max(0, Math.floor(h / 0.5) - 1) }, (_, k) => (
+              <polyline key={k} points={pts([[x, y + s, (k + 1) * 0.5], [x + s, y + s, (k + 1) * 0.5], [x + s, y, (k + 1) * 0.5]], unit)} style={{ fill: "none", stroke: "white", strokeOpacity: 0.16, strokeWidth: 0.8 }} />
+            ))}
+            <polygon points={pts([[x, y, h], [x + s, y, h], [x + s, y + s, h], [x, y + s, h]], unit)} style={{ fill: topF }} />
+            <polyline points={pts([[x, y + s, h], [x + s, y + s, h], [x + s, y, h]], unit)} style={{ fill: "none", stroke: "white", strokeOpacity: 0.7, strokeWidth: 1.2 }} />
+            {labels && t.label && (
+              <text x={lx} y={ly} textAnchor="middle" style={{ fontSize: 15, fontWeight: 700, fill: labelColor ?? t.color, fontFamily: "inherit" }}>{t.label}</text>
+            )}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
