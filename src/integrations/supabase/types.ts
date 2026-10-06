@@ -5356,16 +5356,6 @@ export type Database = {
           id: string
         }[]
       }
-      get_event_booths: {
-        Args: { _event: string }
-        Returns: {
-          boothhub_slug: string
-          has_tv: boolean
-          name: string
-          published_3d: boolean
-          sort_order: number
-        }[]
-      }
       get_london_head_revision: { Args: never; Returns: Json }
       get_shared_deck: { Args: { _token: string }; Returns: Json }
       get_shared_deck_locales: {
