@@ -121,7 +121,7 @@ function PhotosPage() {
   const [room, setRoom] = useState("");
   const [onlyIssues, setOnlyIssues] = useState(false);
   const [page, setPage] = useState(0);
-  const [open, setOpen] = useState<Photo | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -142,6 +142,13 @@ function PhotosPage() {
     enabled: shown.length > 0,
     staleTime: 50 * 60 * 1000,
   });
+
+  const openIdx = openId ? filtered.findIndex((p) => p.id === openId) : -1;
+  // Stepping through the large view keeps the grid page in step with the photo shown.
+  const go = (i: number) => {
+    setOpenId(filtered[i].id);
+    setPage(Math.floor(i / PAGE));
+  };
 
   const reset = (f: () => void) => {
     f();
@@ -189,7 +196,7 @@ function PhotosPage() {
         <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
           {shown.map((p) => (
             <li key={p.id}>
-              <button type="button" onClick={() => setOpen(p)} className="group block w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#003FC7]">
+              <button type="button" onClick={() => setOpenId(p.id)} className="group block w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#003FC7]">
                 <div className="aspect-[3/2] overflow-hidden rounded-md bg-[#EEF1F7]">
                   {thumbs.data?.[p.thumb_path] ? (
                     <img src={thumbs.data[p.thumb_path]} alt={`${SIGN_KINDS[p.sign_kind ?? ""] ?? "Photo"} — ${p.album}`} loading="lazy" className="h-full w-full object-cover transition group-hover:opacity-90" />
@@ -213,12 +220,32 @@ function PhotosPage() {
           </div>
         ) : null}
       </div>
-      {open ? <PhotoDialog photo={open} onClose={() => setOpen(null)} /> : null}
+      {openIdx >= 0 ? (
+        <PhotoDialog
+          key={filtered[openIdx].id}
+          photo={filtered[openIdx]}
+          position={`${openIdx + 1} of ${filtered.length}`}
+          onPrev={openIdx > 0 ? () => go(openIdx - 1) : undefined}
+          onNext={openIdx < filtered.length - 1 ? () => go(openIdx + 1) : undefined}
+          onClose={() => setOpenId(null)}
+        />
+      ) : null}
     </AppShell>
   );
 }
 
-function PhotoDialog({ photo, onClose }: { photo: Photo; onClose: () => void }) {
+function PhotoDialog({ photo, onClose, onPrev, onNext, position }: { photo: Photo; onClose: () => void; onPrev?: () => void; onNext?: () => void; position: string }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement;
+      if (t.closest("input, textarea, select")) return;
+      if (e.key === "ArrowLeft" && onPrev) onPrev();
+      else if (e.key === "ArrowRight" && onNext) onNext();
+      else if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onPrev, onNext, onClose]);
   const qc = useQueryClient();
   const full = useQuery({ queryKey: ["event-photo-full", photo.path], queryFn: () => signUrls([photo.path]) });
   const [room, setRoom] = useState(photo.room ?? "");
@@ -246,9 +273,12 @@ function PhotoDialog({ photo, onClose }: { photo: Photo; onClose: () => void }) 
 
   return (
     <div role="dialog" aria-modal="true" aria-label="Photo details" className="fixed inset-0 z-50 flex items-center justify-center bg-[#03002C]/80 p-4" onClick={onClose}>
-      <div className="flex max-h-full w-full max-w-6xl flex-col overflow-auto rounded-md bg-white lg:flex-row" onClick={(e) => e.stopPropagation()}>
-        <div className="flex flex-1 items-center justify-center gap-3 bg-[#03002C] p-3">
-          {full.data?.[photo.path] ? <img src={full.data[photo.path]} alt={`Event photo ${photo.original_name}`} className="max-h-[80vh] max-w-full object-contain" /> : <p className="text-sm text-white/70">Loading…</p>}
+      <div className="flex max-h-full w-full max-w-[96rem] flex-col overflow-auto rounded-md bg-white lg:flex-row" onClick={(e) => e.stopPropagation()}>
+        <div className="relative flex flex-1 items-center justify-center gap-3 bg-[#03002C] p-3 lg:min-h-[80vh]">
+          <span className="absolute left-3 top-3 rounded bg-black/40 px-2 py-0.5 font-mono text-[11px] text-white/85">{position}</span>
+          <button type="button" aria-label="Previous photo" disabled={!onPrev} onClick={onPrev} className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/15 p-2 text-white hover:bg-white/30 disabled:opacity-25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"><ChevronLeft size={22} aria-hidden /></button>
+          <button type="button" aria-label="Next photo" disabled={!onNext} onClick={onNext} className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/15 p-2 text-white hover:bg-white/30 disabled:opacity-25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"><ChevronRight size={22} aria-hidden /></button>
+          {full.data?.[photo.path] ? <img src={full.data[photo.path]} alt={`Event photo ${photo.original_name}`} className="max-h-[88vh] max-w-full object-contain" /> : <p className="text-sm text-white/70">Loading…</p>}
           {panel ? (
             <div className="shrink-0 text-center">
               <LondonPanelThumb panel={panel} size={320} />
