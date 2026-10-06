@@ -1328,26 +1328,7 @@
   "originY": 9.0,
   "mediaW": 5148.0,
   "mediaH": 2934.0,
-  "texts": [
-   {
-    "id": "t0",
-    "text": "REGISTRATION",
-    "font": "Geist-Bold",
-    "size": 254.64,
-    "color": "#FFFFFF",
-    "x": 1660.94,
-    "y": 1999.74,
-    "w": 1845.81,
-    "top": 1818.96,
-    "bottom": 2003.82,
-    "cmyk": [
-     0,
-     0,
-     0,
-     0
-    ]
-   }
-  ],
+  "texts": [],
   "blocks": [
    {
     "id": "b0",
@@ -1359,10 +1340,24 @@
     "parts": [
      {
       "id": "n0",
-      "x0": 1389.78,
-      "y0": 277.61,
-      "x1": 3740.21,
-      "y1": 1425.71
+      "x0": 981.15,
+      "y0": 137.58,
+      "x1": 4141.9,
+      "y1": 227.46
+     },
+     {
+      "id": "n1",
+      "x0": 466.14,
+      "y0": -9.0,
+      "x1": 3199.21,
+      "y1": 2925.0
+     },
+     {
+      "id": "n2",
+      "x0": 1087.45,
+      "y0": 682.01,
+      "x1": 4042.55,
+      "y1": 2125.45
      }
     ]
    }
@@ -1378,12 +1373,20 @@
    }
   ],
   "native": {
-   "version": "finance-desk-2026-10-05",
-   "profile": "RGB (house colour space)",
+   "version": "finance-desk-2026-10-06",
+   "profile": "As supplied (U.S. Web Coated SWOP v2), not converted",
    "bgPage": 0,
    "parts": {
     "n0": {
      "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    },
+    "n2": {
+     "page": 3,
      "kind": "vector"
     }
    },
