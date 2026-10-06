@@ -198,6 +198,7 @@ import { Route as LibraryPrintModulesRouteImport } from './routes/library.print_
 import { Route as MastersGeneralSlidesLooksRouteImport } from './routes/masters.general-slides_.looks'
 import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
 import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
+import { Route as ApiPublicBoothsEventRouteImport } from './routes/api/public/booths.$event'
 import { Route as EventsNextDivisionsIndexRouteImport } from './routes/events.next_.divisions.index'
 import { Route as EventsNextDivisionsDivisionIdRouteImport } from './routes/events.next_.divisions.$divisionId'
 import { Route as EventsNextIntakeEventIdRouteImport } from './routes/events.next_.intake.$eventId'
@@ -1174,6 +1175,11 @@ const AdminModulesPrintModuleIdRoute =
     path: '/modules/print/$moduleId',
     getParentRoute: () => AdminRoute,
   } as any)
+const ApiPublicBoothsEventRoute = ApiPublicBoothsEventRouteImport.update({
+  id: '/api/public/booths/$event',
+  path: '/api/public/booths/$event',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventsNextDivisionsIndexRoute =
   EventsNextDivisionsIndexRouteImport.update({
     id: '/next_/divisions/',
@@ -1458,6 +1464,7 @@ export interface FileRoutesByFullPath {
   '/events/venues/': typeof EventsVenuesIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
+  '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next/intake/$eventId': typeof EventsNextIntakeEventIdRoute
   '/events/next/kiosk-editor/$boothId': typeof EventsNextKioskEditorBoothIdRoute
@@ -1662,6 +1669,7 @@ export interface FileRoutesByTo {
   '/events/venues': typeof EventsVenuesIndexRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
+  '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next/intake/$eventId': typeof EventsNextIntakeEventIdRoute
   '/events/next/kiosk-editor/$boothId': typeof EventsNextKioskEditorBoothIdRoute
@@ -1871,6 +1879,7 @@ export interface FileRoutesById {
   '/events/venues/': typeof EventsVenuesIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules_/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
+  '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/events/next_/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next_/intake/$eventId': typeof EventsNextIntakeEventIdRoute
   '/events/next_/kiosk-editor/$boothId': typeof EventsNextKioskEditorBoothIdRoute
@@ -2081,6 +2090,7 @@ export interface FileRouteTypes {
     | '/events/venues/'
     | '/knowledge/brand-guides/'
     | '/admin/modules/print/$moduleId'
+    | '/api/public/booths/$event'
     | '/events/next/divisions/$divisionId'
     | '/events/next/intake/$eventId'
     | '/events/next/kiosk-editor/$boothId'
@@ -2285,6 +2295,7 @@ export interface FileRouteTypes {
     | '/events/venues'
     | '/knowledge/brand-guides'
     | '/admin/modules/print/$moduleId'
+    | '/api/public/booths/$event'
     | '/events/next/divisions/$divisionId'
     | '/events/next/intake/$eventId'
     | '/events/next/kiosk-editor/$boothId'
@@ -2493,6 +2504,7 @@ export interface FileRouteTypes {
     | '/events/venues/'
     | '/knowledge/brand-guides/'
     | '/admin/modules_/print/$moduleId'
+    | '/api/public/booths/$event'
     | '/events/next_/divisions/$divisionId'
     | '/events/next_/intake/$eventId'
     | '/events/next_/kiosk-editor/$boothId'
@@ -2617,6 +2629,7 @@ export interface RootRouteChildren {
   LibraryPrintModulesRoute: typeof LibraryPrintModulesRoute
   MastersGeneralSlidesLooksRoute: typeof MastersGeneralSlidesLooksRoute
   DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
+  ApiPublicBoothsEventRoute: typeof ApiPublicBoothsEventRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -3944,6 +3957,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminModulesPrintModuleIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/booths/$event': {
+      id: '/api/public/booths/$event'
+      path: '/api/public/booths/$event'
+      fullPath: '/api/public/booths/$event'
+      preLoaderRoute: typeof ApiPublicBoothsEventRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/events/next_/divisions/': {
       id: '/events/next_/divisions/'
       path: '/next/divisions'
@@ -4413,6 +4433,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryPrintModulesRoute: LibraryPrintModulesRoute,
   MastersGeneralSlidesLooksRoute: MastersGeneralSlidesLooksRoute,
   DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
+  ApiPublicBoothsEventRoute: ApiPublicBoothsEventRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
