@@ -79,20 +79,8 @@ export function CaliforniaKioskBrowser() {
                           : `Rebuilt from the live London file (${live.texts.length} text lines, ${live.blocks.length} graphic ${live.blocks.length === 1 ? "piece" : "pieces"}).`}{" "}
                         Draft.
                       </p>
-                      <div className="mt-3 flex flex-wrap items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const w = window.open(`/events/next/kiosk-editor/${encodeURIComponent(group.boothId)}`, `kiosk-${group.boothId}`, "popup,width=1600,height=1000");
-                          // Pop-up blocked: fall back to editing on the page.
-                          if (!w) setOpenId(isOpen ? null : `live:${group.boothId}`);
-                        }}
-                        className="inline-flex items-center gap-2 rounded-md bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] dark:bg-card"
-                      >
-                        <Pencil className="h-3 w-3" aria-hidden />
-                        {isOpen ? "Close" : "Open editor in new window"}
-                      </button>
-                      <Booth3dLinks kioskId={group.boothId} />
+                      <div className="mt-3">
+                      <Booth3dLinks kioskId={group.boothId} onEditInline={() => setOpenId(isOpen ? null : `live:${group.boothId}`)} />
                       </div>
                     </div>
                   </div>
