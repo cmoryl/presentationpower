@@ -116,7 +116,7 @@ function BoothWorkspace() {
             </button>
           ) : null}
         </div>
-        <main className="mt-3 flex h-[calc(100vh-170px)] min-h-[640px] overflow-hidden rounded-md border border-[#03002C]/15 bg-[#0B0A2A] text-white">
+        <main className="relative left-1/2 mt-3 flex h-[calc(100vh-170px)] w-[calc(100vw-24px)] -translate-x-1/2 min-h-[640px] overflow-hidden rounded-md border border-[#03002C]/15 bg-[#0B0A2A] text-white">
           {showEditor ? (
             <section className="relative min-w-0 flex-1 overflow-hidden" aria-label="Kiosk editor">
               <KioskLayerEditor layout={layout} vendor={vendor} embedded />
