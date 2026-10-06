@@ -36,6 +36,7 @@ import {
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { loadNextRegistry } from "@/lib/next-event";
 import { NextEditions } from "@/components/events/NextEditions";
+import { RegistryCard } from "@/components/next/NextRegistry";
 import {
   LONDON_STYLES,
   LONDON_VENUE,
@@ -258,6 +259,7 @@ function MasterDesignSystem({
 /** Blue "Open all" bar: opens an accordion listing every template in the division, grouped by format. */
 function DivisionTemplatePicker({ division, count }: { division: NextDivision; count?: number }) {
   const [open, setOpen] = useState(false);
+  const [preview, setPreview] = useState<NextRegistryRow | null>(null);
   const [rows, setRows] = useState<NextRegistryRow[] | null>(null);
   useEffect(() => {
     let live = true;
@@ -288,32 +290,20 @@ function DivisionTemplatePicker({ division, count }: { division: NextDivision; c
         <ChevronRight size={18} className={`transition-transform motion-reduce:transition-none ${open ? "rotate-90" : ""}`} aria-hidden />
       </button>
       {open ? (
-        <div id={panelId} className="max-h-[32rem] overflow-y-auto bg-background p-5">
+        <div id={panelId} className="bg-background p-5">
           {!rows ? (
             <p className="text-sm text-muted-foreground">Loading templates…</p>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="space-y-8">
               {groups.map(({ g, items }) => (
-                <div key={g.id}>
-                  <Link to="/events/next/assets" search={{ division: division.id, group: g.id }} className="text-xs font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground hover:underline">
-                    {g.label} ({items.length})
-                  </Link>
-                  <ul className="mt-2 space-y-1">
+                <section key={g.id}>
+                  <h3 className="text-sm font-semibold tracking-tight">{g.label} <span className="font-normal text-muted-foreground">({items.length})</span></h3>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {items.map((r) => (
-                      <li key={`${r.code}-${r.format}`}>
-                        {r.liveSignId ? (
-                          <Link to="/events/next/sign-editor/$signId" params={{ signId: r.liveSignId }} className="text-sm hover:text-primary hover:underline">
-                            <span className="text-muted-foreground">{r.code}</span> {r.format} <span className="text-xs text-primary">· editable</span>
-                          </Link>
-                        ) : (
-                          <Link to="/events/next/assets" search={{ division: division.id, group: r.group, q: r.format }} className="text-sm hover:text-primary hover:underline">
-                            <span className="text-muted-foreground">{r.code}</span> {r.format}
-                          </Link>
-                        )}
-                      </li>
+                      <RegistryCard key={`${r.group}-${r.code}-${r.format}`} row={r} accent={division.accent} onPreview={() => setPreview(r)} />
                     ))}
-                  </ul>
-                </div>
+                  </div>
+                </section>
               ))}
             </div>
           )}
@@ -322,6 +312,12 @@ function DivisionTemplatePicker({ division, count }: { division: NextDivision; c
           </Link>
         </div>
       ) : null}
+      <Dialog open={!!preview} onOpenChange={(o) => !o && setPreview(null)}>
+        <DialogContent className="max-h-[88vh] max-w-5xl overflow-y-auto">
+          <DialogTitle className="text-sm font-semibold">{preview ? `${preview.code} — ${preview.format}` : ""}</DialogTitle>
+          {preview?.exampleUrl ? <img src={preview.exampleUrl} alt={`${preview.format} example`} className="mx-auto max-h-[75vh] w-auto rounded-md border border-border" /> : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
