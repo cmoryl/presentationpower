@@ -605,7 +605,7 @@ registerSlideModule({
                       </div>
                       <div className="mt-4" style={{ height: 150, maxWidth: 560 }}>
                         <IsoCity
-                          towers={Array.from({ length: Math.max(1, Math.min(40, Math.round(numOf(s(heroA.value))))) }, (_, k, arr) => ({ value: k + 1, color: `color-mix(in oklab, ${blue} ${Math.round(100 - (k / Math.max(1, arr.length - 1)) * 55)}%, ${INFO_FILL.lavender.bg})` }))}
+                          towers={(() => { const n = Math.max(1, Math.min(40, Math.round(numOf(s(heroA.value))))); return Array.from({ length: n }, (_, k) => ({ value: k + 1, color: `color-mix(in oklab, ${blue} ${Math.round(100 - (k / Math.max(1, n - 1)) * 55)}%, ${INFO_FILL.lavender.bg})` })); })()}
                           mode="linear"
                           maxHeight={4}
                           foot={0.55}
