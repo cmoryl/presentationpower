@@ -47,7 +47,7 @@ function BoothWorkspace() {
   const isAdmin = useIsAdmin();
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [view, setView] = useState<"editor" | "split" | "3d">("split");
-  useEffect(() => { if (window.innerWidth < 1024) setView("editor"); }, []);
+  useEffect(() => { if (window.innerWidth < 1500) setView("editor"); }, []);
 
   useEffect(() => {
     const ok = () => { qc.invalidateQueries({ queryKey: ["booth-art"] }); setFrameKey((k) => k + 1); toast.success("Sent to the 3D booth"); };
@@ -123,7 +123,7 @@ function BoothWorkspace() {
             </section>
           ) : null}
           {show3d ? (
-            <aside className={`flex min-w-0 flex-col border-l border-white/10 ${view === "3d" ? "flex-1" : "w-[30%] max-w-[520px] shrink-0"}`} aria-label="3D booth">
+            <aside className={`flex min-w-0 flex-col border-l border-white/10 ${view === "3d" ? "flex-1" : "w-[360px] shrink-0"}`} aria-label="3D booth">
               <div className="flex flex-wrap items-center gap-2 border-b border-white/10 p-2">
                 <span className="text-[12px] font-semibold">3D booth</span>
                 {booth?.published3d ? (
