@@ -199,6 +199,7 @@ import { Route as MastersGeneralSlidesLooksRouteImport } from './routes/masters.
 import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
 import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
 import { Route as ApiPublicBoothsEventRouteImport } from './routes/api/public/booths.$event'
+import { Route as EventsNextBoothBoothIdRouteImport } from './routes/events.next_.booth.$boothId'
 import { Route as EventsNextDivisionsIndexRouteImport } from './routes/events.next_.divisions.index'
 import { Route as EventsNextDivisionsDivisionIdRouteImport } from './routes/events.next_.divisions.$divisionId'
 import { Route as EventsNextIntakeEventIdRouteImport } from './routes/events.next_.intake.$eventId'
@@ -1180,6 +1181,11 @@ const ApiPublicBoothsEventRoute = ApiPublicBoothsEventRouteImport.update({
   path: '/api/public/booths/$event',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsNextBoothBoothIdRoute = EventsNextBoothBoothIdRouteImport.update({
+  id: '/next_/booth/$boothId',
+  path: '/next/booth/$boothId',
+  getParentRoute: () => EventsRoute,
+} as any)
 const EventsNextDivisionsIndexRoute =
   EventsNextDivisionsIndexRouteImport.update({
     id: '/next_/divisions/',
@@ -1465,6 +1471,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
+  '/events/next/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next/intake/$eventId': typeof EventsNextIntakeEventIdRoute
   '/events/next/kiosk-editor/$boothId': typeof EventsNextKioskEditorBoothIdRoute
@@ -1670,6 +1677,7 @@ export interface FileRoutesByTo {
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
+  '/events/next/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next/intake/$eventId': typeof EventsNextIntakeEventIdRoute
   '/events/next/kiosk-editor/$boothId': typeof EventsNextKioskEditorBoothIdRoute
@@ -1880,6 +1888,7 @@ export interface FileRoutesById {
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules_/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
+  '/events/next_/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next_/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next_/intake/$eventId': typeof EventsNextIntakeEventIdRoute
   '/events/next_/kiosk-editor/$boothId': typeof EventsNextKioskEditorBoothIdRoute
@@ -2091,6 +2100,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides/'
     | '/admin/modules/print/$moduleId'
     | '/api/public/booths/$event'
+    | '/events/next/booth/$boothId'
     | '/events/next/divisions/$divisionId'
     | '/events/next/intake/$eventId'
     | '/events/next/kiosk-editor/$boothId'
@@ -2296,6 +2306,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides'
     | '/admin/modules/print/$moduleId'
     | '/api/public/booths/$event'
+    | '/events/next/booth/$boothId'
     | '/events/next/divisions/$divisionId'
     | '/events/next/intake/$eventId'
     | '/events/next/kiosk-editor/$boothId'
@@ -2505,6 +2516,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides/'
     | '/admin/modules_/print/$moduleId'
     | '/api/public/booths/$event'
+    | '/events/next_/booth/$boothId'
     | '/events/next_/divisions/$divisionId'
     | '/events/next_/intake/$eventId'
     | '/events/next_/kiosk-editor/$boothId'
@@ -3964,6 +3976,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicBoothsEventRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events/next_/booth/$boothId': {
+      id: '/events/next_/booth/$boothId'
+      path: '/next/booth/$boothId'
+      fullPath: '/events/next/booth/$boothId'
+      preLoaderRoute: typeof EventsNextBoothBoothIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/divisions/': {
       id: '/events/next_/divisions/'
       path: '/next/divisions'
@@ -4195,6 +4214,7 @@ interface EventsRouteChildren {
   EventsNextVenuesRoute: typeof EventsNextVenuesRoute
   EventsVenuesSlugRoute: typeof EventsVenuesSlugRoute
   EventsVenuesIndexRoute: typeof EventsVenuesIndexRoute
+  EventsNextBoothBoothIdRoute: typeof EventsNextBoothBoothIdRoute
   EventsNextDivisionsDivisionIdRoute: typeof EventsNextDivisionsDivisionIdRoute
   EventsNextIntakeEventIdRoute: typeof EventsNextIntakeEventIdRoute
   EventsNextKioskEditorBoothIdRoute: typeof EventsNextKioskEditorBoothIdRoute
@@ -4242,6 +4262,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextVenuesRoute: EventsNextVenuesRoute,
   EventsVenuesSlugRoute: EventsVenuesSlugRoute,
   EventsVenuesIndexRoute: EventsVenuesIndexRoute,
+  EventsNextBoothBoothIdRoute: EventsNextBoothBoothIdRoute,
   EventsNextDivisionsDivisionIdRoute: EventsNextDivisionsDivisionIdRoute,
   EventsNextIntakeEventIdRoute: EventsNextIntakeEventIdRoute,
   EventsNextKioskEditorBoothIdRoute: EventsNextKioskEditorBoothIdRoute,
