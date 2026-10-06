@@ -9,7 +9,7 @@ import { fillPx } from "@/lib/open-space-fill";
 import { accentInk, hexA } from "@/lib/accent-tokens";
 import { Rocket, Users, Globe2, Flag, Sparkles, MapPin, BarChart3, Code2, Building2, type LucideIcon } from "lucide-react";
 import * as React from "react";
-import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, LogLollipop, Pictogram, RadialBars, ScaleBar as GlowScale, numOf, pctOf, type InfoFill } from "./infographic-kit";
+import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, LogLollipop, Pictogram, RadialBars, IsoCity, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 function statIcon(label: string): LucideIcon {
   const l = label.toLowerCase();
@@ -139,22 +139,37 @@ registerSlideModule({
                   {s(c.tagline) && <div style={{ fontSize: fillPx(16, "body"), color: ink.muted }}>{s(c.tagline)}</div>}
                 </div>
               </section>
-              <section className="flex min-h-0 flex-col justify-center">
-                {counts.slice(0, 2).map((it, i) => (
-                  <div key={i} className="py-7" style={{ borderTop: i ? `1px solid ${hair}` : undefined }}>
-                    <Figure
-                      value={s(it.value)}
-                      unit={s(it.unit)}
-                      px={i === 0 ? 128 : 104}
-                      color={ink.strong}
-                      gradient={`linear-gradient(100deg, ${ink.strong} 35%, ${blue} 75%, ${INFO_FILL.lavender.bg})`}
-                    />
-                    <div style={{ fontSize: fillPx(22, "body"), color: ink.body, marginTop: 10, fontWeight: 500 }}>{s(it.label)}</div>
-                    <div className="mt-5" style={{ maxWidth: 520 }}>
-                      <GlowScale value={numOf(s(it.value))} from={i === 0 ? blue : INFO_FILL.lavender.bg} to={i === 0 ? INFO_FILL.lavender.bg : blue} track={hair} labelColor={ink.muted} height={i === 0 ? 18 : 14} />
+              <section className="flex min-h-0 flex-col justify-center gap-4">
+                <div className="grid grid-cols-2 gap-8">
+                  {counts.slice(0, 2).map((it, i) => (
+                    <div key={i}>
+                      <Figure
+                        value={s(it.value)}
+                        unit={s(it.unit)}
+                        px={i === 0 ? 108 : 92}
+                        color={ink.strong}
+                        gradient={`linear-gradient(100deg, ${ink.strong} 35%, ${blue} 75%, ${INFO_FILL.lavender.bg})`}
+                      />
+                      <div style={{ fontSize: fillPx(20, "body"), color: ink.body, marginTop: 8, fontWeight: 500 }}>{s(it.label)}</div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                {(() => {
+                  const sky = [...counts.slice(0, 2), ...items.filter((it) => pctOf(s(it.value), s(it.unit)) === null)].slice(0, 7);
+                  const pal = [blue, INFO_FILL.lavender.bg, isDark ? INFO_FILL.aqua.bg : "#1E2A8C"];
+                  return (
+                    <div className="min-h-0 flex-1" style={{ maxHeight: 420 }}>
+                      <IsoCity
+                        towers={sky.map((it, i) => ({ value: numOf(s(it.value)), color: pal[i % pal.length]!, label: `${s(it.value)}${s(it.unit)}` }))}
+                        mode="log"
+                        maxHeight={5.5}
+                        ground={blue}
+                        labels
+                        labelColor={ink.strong}
+                      />
+                    </div>
+                  );
+                })()}
               </section>
               <section className="col-span-2 mt-6 grid pt-6" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0,1fr))`, borderTop: `1px solid ${hair}` }}>
                 {items.map((it, i) => {
@@ -167,7 +182,7 @@ registerSlideModule({
                       {pct !== null ? (
                         <Donut pct={pct} size={92} stroke={11} color={blue} track={hair} />
                       ) : (
-                        <div className="pt-3"><GlowScale value={numOf(s(it.value))} from={blue} to={INFO_FILL.lavender.bg} track={hair} labelColor={ink.muted} height={10} /></div>
+                        <div className="h-[92px] w-[150px]"><IsoCity towers={[{ value: numOf(s(it.value)), color: blue }]} mode="linear" max={numOf(s(it.value))} maxHeight={2.2} foot={1.6} ground={blue} glow={false} /></div>
                       )}
                     </div>
                   );
