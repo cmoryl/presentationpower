@@ -19,3 +19,6 @@ BoothHub should read them and paint them on the 3D booth faces.
 3. Front proof includes 1/8 in bleed on every edge: crop 9 pt of 3258 × 6930 pt (≈0.28 % per side) before mapping.
 4. The booth list (names, slugs, TV flag) is also in the response; use it instead of a hand-kept list.
 5. Artwork is a proof for 3D only, never a print file.
+
+## Embedded view (for the Element booth workspace)
+6. When the URL has `chromeless=1&single=1`, hide BoothHub's own overlay controls (the "Orbit" button and the booth info card) and show only the 3D model on a plain background. Element draws its own Reset view / Fullscreen / Share controls around it.
