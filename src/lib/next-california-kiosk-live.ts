@@ -53,7 +53,11 @@ export type LiveText = {
   track?: number;
 };
 /** One separate object (logo, icon, QR, shape group) inside a piece, in London trim points. */
-export type LivePart = { id: string; x0: number; y0: number; x1: number; y1: number };
+export type LivePart = {
+  id: string; x0: number; y0: number; x1: number; y1: number;
+  /** Re-flow offset (trim pt) and fit scale set when a sign is re-sized; the source box stays the designer's. */
+  rx?: number; ry?: number; rs?: number;
+};
 export type LiveBlock = { id: string; y0: number; y1: number; c0: number; c1: number; screen: boolean; parts?: LivePart[] };
 export type LiveLayout = {
   id: string;
@@ -101,6 +105,12 @@ export type KioskNative = {
   strips: Record<"left" | "right", { bg: number; content: number; w: number }>;
   /** Preview symbol of the background (front: "bg"; strips: "left-bg" / "right-bg"). */
   bgSym?: string;
+  /**
+   * Where the background page is drawn, in trim points [x, y, w, h]. Default:
+   * the native page at its own size. Set to stretch a no-bleed ground over the
+   * bleed, or over a re-sized trim.
+   */
+  bgBox?: [number, number, number, number];
   /** Each side strip split into separate objects, edited like the front. */
   faces?: Record<KioskFace, KioskStripFace>;
 };
@@ -143,7 +153,78 @@ export const KIOSK_LIVE_LAYOUTS = layoutsJson as unknown as Record<string, LiveL
 /** Legal NEXT signage layouts (edited with the same editor; not kiosks). */
 export const SIGN_LIVE_LAYOUTS = signLayoutsJson as unknown as Record<string, LiveLayout>;
 /** Any editable layout — kiosk or sign — by id. */
-export const liveLayoutById = (id: string): LiveLayout | undefined => KIOSK_LIVE_LAYOUTS[id] ?? SIGN_LIVE_LAYOUTS[id];
+export const liveLayoutById = (id: string): LiveLayout | undefined => {
+  const hit = KIOSK_LIVE_LAYOUTS[id] ?? SIGN_LIVE_LAYOUTS[id];
+  if (hit) return hit;
+  const sz = parseSizedId(id);
+  const base = sz && SIGN_LIVE_LAYOUTS[sz.base];
+  return base ? resizedSignLayout(base, sz.w, sz.h) : undefined;
+};
+
+// ---- re-sized versions ------------------------------------------------------
+// A sign at a new trim size is its own layout id: `<base>~<w>x<h>` (inches,
+// up to 3 decimals). Edits, saves and approvals key on that id; the artwork
+// files are the base sign's.
+
+const SIZE_SEP = "~";
+export function sizedSignId(base: string, wIn: number, hIn: number): string {
+  const f = (v: number) => String(+v.toFixed(3));
+  return `${baseLayoutId(base)}${SIZE_SEP}${f(wIn)}x${f(hIn)}`;
+}
+export function parseSizedId(id: string): { base: string; w: number; h: number } | null {
+  const m = id.match(/^(.+)~(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)$/);
+  if (!m) return null;
+  const w = Number(m[2]), h = Number(m[3]);
+  return w >= 1 && h >= 1 && w <= 600 && h <= 600 ? { base: m[1]!, w, h } : null;
+}
+/** The supplied layout an id draws its artwork from. */
+export const baseLayoutId = (id: string) => id.split(SIZE_SEP)[0]!;
+
+/** Background placement in trim points. */
+export function nativeBgBox(L: LiveLayout): [number, number, number, number] {
+  return L.native?.bgBox ?? [-L.originX, -L.originY, L.mediaW, L.mediaH];
+}
+
+/**
+ * Re-flow a sign to a new trim size (inches). The background stretches to
+ * the new trim and bleed; every piece keeps its own size and is re-placed so
+ * its centre sits at the same relative position. A piece wider or taller than
+ * the new safe area is scaled down to fit (never up).
+ */
+export function resizedSignLayout(L: LiveLayout, wIn: number, hIn: number): LiveLayout {
+  const W = wIn * 72, H = hIn * 72;
+  const sx = W / L.trimW, sy = H / L.trimH;
+  const [bx, by, bw, bh] = nativeBgBox(L);
+  const margin = Math.round(Math.min(L.sign?.margin ?? 72, Math.min(W, H) * 0.06) * 100) / 100;
+  const fitW = W + 2 * KIOSK_BLEED, fitH = H + 2 * KIOSK_BLEED;
+  const blocks = L.blocks.map((b) => ({
+    ...b,
+    y0: Math.min(b.y0, -KIOSK_BLEED),
+    y1: Math.max(b.y1, L.trimH + KIOSK_BLEED, H + KIOSK_BLEED),
+    parts: (b.parts ?? []).map((p) => {
+      const w = p.x1 - p.x0, h = p.y1 - p.y0;
+      // Full-bleed pieces (ground shapes, chevrons) stretch with the trim's short side.
+      const full = w >= 0.9 * L.trimW || h >= 0.9 * L.trimH;
+      const rs = full ? Math.min(Math.max(sx, sy), Math.max(Math.min(sx, sy), Math.min(fitW / w, fitH / h))) : Math.min(1, (W - 2 * margin) / w, (H - 2 * margin) / h);
+      const cx = (p.x0 + p.x1) / 2, cy = (p.y0 + p.y1) / 2;
+      return { ...p, rx: cx * sx - cx, ry: cy * sy - cy, rs: Math.max(0.05, rs) };
+    }),
+  }));
+  const texts = L.texts.map((t) => {
+    const dx = (t.x + t.w / 2) * (sx - 1), dy = ((t.top + t.bottom) / 2) * (sy - 1);
+    return { ...t, x: t.x + dx, y: t.y + dy, top: t.top + dy, bottom: t.bottom + dy };
+  });
+  return {
+    ...L,
+    id: sizedSignId(L.id, wIn, hIn),
+    trimW: W,
+    trimH: H,
+    texts,
+    blocks,
+    native: L.native ? { ...L.native, bgBox: [bx * sx, by * sy, bw * sx, bh * sy] } : undefined,
+    sign: { margin },
+  };
+}
 
 export function kioskLiveLayout(boothId: string | null | undefined): LiveLayout | null {
   return (boothId && KIOSK_LIVE_LAYOUTS[boothId]) || null;
@@ -160,11 +241,13 @@ function pick(map: Record<string, Ptr>, file: string): string | null {
   return hit ? hit[1].url : null;
 }
 const NATIVE = import.meta.glob<Ptr>(["../assets/california-kiosks/native/*.asset.json", "../assets/legal-next-signage/native/*.asset.json", "../assets/sf-screen-surrounds/native/*.asset.json"], { eager: true, import: "default" });
-export const kioskArtSvgUrl = (id: string) =>
-  liveLayoutById(id)?.native ? pick(NATIVE, `${id}-native.svg`) : pick(ART, `${id}-art.svg`);
+export const kioskArtSvgUrl = (id0: string) => {
+  const id = baseLayoutId(id0);
+  return liveLayoutById(id)?.native ? pick(NATIVE, `${id}-native.svg`) : pick(ART, `${id}-art.svg`);
+};
 export const kioskArtPdfUrl = (id: string) => pick(ART, `${id}-art.pdf`);
 /** The designer file split into one page per object (CMYK, as supplied). */
-export const kioskNativePdfUrl = (id: string) => pick(NATIVE, `${id}-native.pdf`);
+export const kioskNativePdfUrl = (id: string) => pick(NATIVE, `${baseLayoutId(id)}-native.pdf`);
 /** Symbol id of a native piece inside the preview SVG ("bg", a part id, "left-bg"…). */
 export const nativeSymbol = (sym: string, piece: string) => `${sym}-${piece}`;
 /** Full font file for a supplied face name (e.g. "Poppins-Regular"). */
@@ -441,13 +524,13 @@ function placeBlock(L: LiveLayout, edits: KioskEdits, badged: Set<string>, b: Li
       .filter(({ src }) => src.y1 - src.y0 > 2)
       .map(({ pt, src }) => {
         const pe = edits.parts?.[pt.id] ?? {};
-        const ps = pe.scale ?? 1;
+        const ps = (pe.scale ?? 1) * (pt.rs ?? 1);
         const w = (src.x1 - src.x0) * sc, h = (src.y1 - src.y0) * sc;
         return {
           part: pt,
           src,
-          x: x + src.x0 * sc + (pe.dx ?? 0) + ((1 - ps) * w) / 2,
-          y: yy + (src.y0 - c[0]) * sc + (pe.dy ?? 0) + ((1 - ps) * h) / 2,
+          x: x + src.x0 * sc + (pe.dx ?? 0) + (pt.rx ?? 0) * sc + ((1 - ps) * w) / 2,
+          y: yy + (src.y0 - c[0]) * sc + (pe.dy ?? 0) + (pt.ry ?? 0) * sc + ((1 - ps) * h) / 2,
           scale: sc * ps,
           hidden: !!pe.hidden || badged.has(pt.id),
           opacity: pe.opacity ?? 1,
@@ -547,7 +630,8 @@ export function partSource(edits: KioskEdits, id: string): string {
 
 /** Native preview symbols, named for this document. */
 export function nativeSymbols(inner: string, sym: string) {
-  return inner.split("__SYM__").join(sym);
+  // Grounds may be stretched (no-bleed files, re-sized signs); pieces never are.
+  return inner.split("__SYM__").join(sym).replace(/<symbol id="([^"]*-bg)"/g, '<symbol preserveAspectRatio="none" id="$1"');
 }
 
 /** Split the supplied art SVG into its viewBox and inner markup. */
@@ -617,7 +701,7 @@ export function buildKioskFrontSvg(
   const nat = L.native;
   parts.push(
     nat && !edits.ground
-      ? `<g id="Background"><rect x="${-B}" y="${-B}" width="${KW + 2 * B}" height="${KIOSK_H + 2 * B}" fill="#FFFFFF"/><use xlink:href="#art-${nat.bgSym ?? "bg"}" href="#art-${nat.bgSym ?? "bg"}" x="${-L.originX}" y="${-L.originY}" width="${L.mediaW}" height="${L.mediaH}"/></g>`
+      ? `<g id="Background"><rect x="${-B}" y="${-B}" width="${KW + 2 * B}" height="${KIOSK_H + 2 * B}" fill="#FFFFFF"/><use xlink:href="#art-${nat.bgSym ?? "bg"}" href="#art-${nat.bgSym ?? "bg"}" x="${nativeBgBox(L)[0]}" y="${nativeBgBox(L)[1]}" width="${nativeBgBox(L)[2]}" height="${nativeBgBox(L)[3]}"/></g>`
       : `<g id="Background"><rect x="${-B}" y="${-B}" width="${KW + 2 * B}" height="${KIOSK_H + 2 * B}" fill="url(#kg)"/></g>`,
   );
   parts.push(`<g id="Graphics">`);
