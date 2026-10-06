@@ -36,6 +36,7 @@ export type NextWorkspacePath =
   | "/events/next/city-badges"
   | "/events/next/london"
   | "/events/next/london/maps"
+  | "/events/next/london/photos"
   | "/events/next/london/template"
   | "/events/next/london/revise"
   | "/events/next/london/booklet"
@@ -221,6 +222,13 @@ export const NEXT_WORKSPACE_PAGES: NextWorkspacePage[] = [
     to: "/events/next/london/maps",
     label: "Install maps",
     purpose: "Floor plans marking where each panel is installed.",
+    group: "london",
+    scope: "london",
+  },
+  {
+    to: "/events/next/london/photos",
+    label: "Event photos",
+    purpose: "Staff-only photographs from the day, for checking prints against the room.",
     group: "london",
     scope: "london",
   },
