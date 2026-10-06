@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Box, ExternalLink, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { sfKiosk3dUrl, SF_BOOTH_FALLBACK } from "@/lib/sf-kiosk-3d";
+import { sfKiosk3dUrl } from "@/lib/sf-kiosk-3d";
 
 const ORIGIN = "https://boothhub.lovable.app/showcase/next-sf";
 const BASE = `${ORIGIN}?chromeless=1`;
