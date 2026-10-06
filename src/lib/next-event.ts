@@ -399,6 +399,8 @@ export type NextRegistryRow = {
   internalUrl?: string;
   /** Set on attendee badge rows so the hub renders the live NEXT badge. */
   badgeSide?: "front" | "back";
+  /** Sign-editor id when the supplied file also has an editable live version. */
+  liveSignId?: string;
 };
 
 export function normalizeNextRow(r: NextRegistryRowRaw): NextRegistryRow {

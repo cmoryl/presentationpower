@@ -30,6 +30,7 @@ const NEXTMART: NextRegistryRow = {
   downloadUrl: martAi.url,
   secondaryUrl: martPdf.url,
   secondaryLabel: "PDF",
+  liveSignId: "nextmart-pedestal",
 };
 
 export function globallinkPedestalRows(): NextRegistryRow[] {
@@ -43,5 +44,6 @@ export function globallinkPedestalRows(): NextRegistryRow[] {
     downloadUrl: ai.url,
     secondaryUrl: pdf.url,
     secondaryLabel: "PDF · all three",
+    liveSignId: "globallink-pedestal",
   }))];
 }
