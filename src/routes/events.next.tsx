@@ -256,7 +256,7 @@ function MasterDesignSystem({
           </span>
           <span className="block text-xs opacity-85">
             {counts?.[division.id] != null ? `${counts[division.id]} templates · ` : ""}
-            pillars, pedestals, signage, screens, social, badges and decks
+            pillars, pedestals, signage, social, badges and decks
           </span>
         </span>
         <ArrowRight size={18} />
@@ -264,9 +264,57 @@ function MasterDesignSystem({
 
       <DivisionDetail division={division} />
 
+      <DivisionTemplatePicker division={division} />
+
       <Pathways accent={division.accent} divisionId={division.id} />
 
     </section>
+  );
+}
+
+/** Dropdown of every template in the selected division, grouped by format. */
+function DivisionTemplatePicker({ division }: { division: NextDivision }) {
+  const navigate = useNavigate();
+  const [rows, setRows] = useState<NextRegistryRow[] | null>(null);
+  useEffect(() => {
+    let live = true;
+    void loadNextRegistry().then((all) => live && setRows(all.filter((r) => r.divisionId === division.id)));
+    return () => { live = false; };
+  }, [division.id]);
+  const groups = useMemo(
+    () => NEXT_FORMAT_GROUPS.map((g) => ({ g, items: (rows ?? []).filter((r) => r.group === g.id) })).filter((x) => x.items.length),
+    [rows],
+  );
+  const open = (key: string) => {
+    const r = rows?.[Number(key)];
+    if (!r) return;
+    if (r.liveSignId) void navigate({ to: "/events/next/sign-editor/$signId", params: { signId: r.liveSignId } });
+    else void navigate({ to: "/events/next/assets", search: { division: division.id, group: r.group, q: r.format } });
+  };
+  return (
+    <div className="mt-6 flex flex-wrap items-center gap-3 rounded-md border border-border p-4">
+      <label htmlFor={`tpl-pick-${division.id}`} className="text-sm font-semibold">
+        {division.eventName} templates
+      </label>
+      <select
+        id={`tpl-pick-${division.id}`}
+        value=""
+        disabled={!rows}
+        onChange={(e) => open(e.target.value)}
+        className="min-w-[18rem] flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <option value="">{rows ? `Choose one of ${rows.length} templates…` : "Loading templates…"}</option>
+        {groups.map(({ g, items }) => (
+          <optgroup key={g.id} label={`${g.label} (${items.length})`}>
+            {items.map((r) => (
+              <option key={`${r.code}-${r.format}`} value={rows!.indexOf(r)}>
+                {r.code} · {r.format}{r.liveSignId ? " · editable" : ""}
+              </option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+    </div>
   );
 }
 
