@@ -1373,6 +1373,15 @@ function LondonSignagePage() {
           <h2 className="pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/70">
             Reference
           </h2>
+          <Link
+            to="/events/next/london/photos"
+            className="mt-3 flex items-center justify-between gap-3 border-b border-black/10 py-3 text-base font-semibold text-[#03002C] hover:text-[#003FC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <span className="flex items-center gap-2">
+              <BookOpen className="h-4.5 w-4.5 text-[#003FC7]" aria-hidden /> See all London event photos
+            </span>
+            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/55">Open</span>
+          </Link>
           {/* Print specification */}
           <details className="group border-b border-black/10 py-3">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
