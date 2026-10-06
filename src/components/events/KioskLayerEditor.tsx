@@ -43,6 +43,7 @@ import {
   withCopies,
   splitArtSvg,
   nativeSymbols,
+  nativeBgBox,
   partSource,
   liveLayoutById,
   textLineBoxes,
