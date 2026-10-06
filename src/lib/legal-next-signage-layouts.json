@@ -3224,5 +3224,93 @@
   "sign": {
    "margin": 64.8
   }
+ },
+ "divsign-globallink-reg-desk": {
+  "id": "divsign-globallink-reg-desk",
+  "source": "GLNEXT_Registration_Bar_Front.ai",
+  "trimW": 6912.0,
+  "trimH": 2493.0,
+  "originX": 18.0,
+  "originY": 18.0,
+  "mediaW": 6948.0,
+  "mediaH": 2529.0,
+  "texts": [],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 2493.0,
+    "c0": 0,
+    "c1": 2493.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 5065.2,
+      "y0": 885.6,
+      "x1": 6580.8,
+      "y1": 1710.0
+     },
+     {
+      "id": "n1",
+      "x0": 320.4,
+      "y0": 619.2,
+      "x1": 2815.2,
+      "y1": 1836.0
+     },
+     {
+      "id": "n2",
+      "x0": 2484.0,
+      "y0": -18.0,
+      "x1": 4842.0,
+      "y1": 2511.0
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#B565BE"
+   },
+   {
+    "offset": 1,
+    "color": "#1C6FB5"
+   }
+  ],
+  "native": {
+   "version": "globallink-desk-2026-10-06",
+   "profile": "As supplied, not converted",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    },
+    "n2": {
+     "page": 3,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   }
+  },
+  "sign": {
+   "margin": 72.0
+  }
  }
 }
