@@ -95,7 +95,7 @@ function BoothWorkspace() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-[1800px] px-4 pb-4 pt-4 sm:px-6">
+      <div className="w-full px-3 pb-3 pt-4">
         <nav aria-label="Breadcrumb" className="text-[12px] text-[#03002C]/70">
           <Link to="/events/next/california" className="font-medium text-[#003FC7] hover:underline">San Francisco kiosks</Link>
           <span aria-hidden> / </span>{vendor}
@@ -123,7 +123,7 @@ function BoothWorkspace() {
             </section>
           ) : null}
           {show3d ? (
-            <aside className={`flex min-w-0 flex-col border-l border-white/10 ${view === "3d" ? "flex-1" : "w-[34%] shrink-0"}`} aria-label="3D booth">
+            <aside className={`flex min-w-0 flex-col border-l border-white/10 ${view === "3d" ? "flex-1" : "w-[30%] max-w-[520px] shrink-0"}`} aria-label="3D booth">
               <div className="flex flex-wrap items-center gap-2 border-b border-white/10 p-2">
                 <span className="text-[12px] font-semibold">3D booth</span>
                 {booth?.published3d ? (
