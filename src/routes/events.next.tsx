@@ -202,7 +202,7 @@ function MasterDesignSystem({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-            Step 1 · Master design system
+            Master design system · every city
           </p>
           <h2 id="next-master" className="mt-1 text-2xl font-semibold sm:text-3xl">
             Division master brand templates
