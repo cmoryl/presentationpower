@@ -203,6 +203,22 @@ export function resizedSignLayout(L: LiveLayout, wIn: number, hIn: number): Live
     parts: (() => {
       const all = b.parts ?? [];
       const isFull = (p: LivePart) => p.x1 - p.x0 >= 0.9 * L.trimW || p.y1 - p.y0 >= 0.9 * L.trimH;
+      // Group nearby pieces (gap under 1.5 in) so a composition keeps its spacing.
+      const small = all.filter((p) => !isFull(p));
+      const par = small.map((_, i) => i);
+      const find = (i: number): number => (par[i] === i ? i : (par[i] = find(par[i]!)));
+      const GAP = 108;
+      for (let i = 0; i < small.length; i++)
+        for (let j = i + 1; j < small.length; j++) {
+          const A = small[i]!, C = small[j]!;
+          if (Math.max(A.x0, C.x0) - Math.min(A.x1, C.x1) < GAP && Math.max(A.y0, C.y0) - Math.min(A.y1, C.y1) < GAP) par[find(i)] = find(j);
+        }
+      const groups = new Map<string, [number, number, number, number]>();
+      small.forEach((p, i) => {
+        const r = find(i);
+        const mem = small.filter((_, k) => find(k) === r);
+        groups.set(p.id, [Math.min(...mem.map((q) => q.x0)), Math.min(...mem.map((q) => q.y0)), Math.max(...mem.map((q) => q.x1)), Math.max(...mem.map((q) => q.y1))]);
+      });
       return all.map((p) => {
         const w = p.x1 - p.x0, h = p.y1 - p.y0;
         // Full-bleed pieces (ground shapes, chevrons) grow with the trim.
@@ -210,15 +226,15 @@ export function resizedSignLayout(L: LiveLayout, wIn: number, hIn: number): Live
           const cx = (p.x0 + p.x1) / 2, cy = (p.y0 + p.y1) / 2;
           return { ...p, rx: cx * sx - cx, ry: cy * sy - cy, rs: Math.max(sx, sy) };
         }
-        // Words on one line (an outlined tagline) move together: re-place the row, not each word.
-        const row = all.filter((q) => !isFull(q) && q.y0 < p.y1 && q.y1 > p.y0 && Math.abs((q.y1 - q.y0) - h) < 0.5 * h);
-        const ux0 = Math.min(...row.map((q) => q.x0)), ux1 = Math.max(...row.map((q) => q.x1));
-        const rs = Math.max(0.05, Math.min(1, (W - 2 * margin) / (ux1 - ux0), (W - 2 * margin) / w, (H - 2 * margin) / h));
-        const ucx = (ux0 + ux1) / 2, cy = (p.y0 + p.y1) / 2;
-        const pcx = (p.x0 + p.x1) / 2;
-        // Keep this piece's place inside its row (scaled with the row).
-        const ncx = ucx * sx + (pcx - ucx) * rs;
-        return { ...p, rx: ncx - pcx, ry: cy * sy - cy, rs };
+        // Pieces that sit together (letters of a word, a tagline, a stacked lockup) move as one group.
+        const g = groups.get(p.id)!;
+        const ux0 = g[0], uy0 = g[1], ux1 = g[2], uy1 = g[3];
+        const rs = Math.max(0.05, Math.min(1, (W - 2 * margin) / (ux1 - ux0), (H - 2 * margin) / (uy1 - uy0)));
+        const ucx = (ux0 + ux1) / 2, ucy = (uy0 + uy1) / 2;
+        const pcx = (p.x0 + p.x1) / 2, pcy = (p.y0 + p.y1) / 2;
+        const ncx = ucx * sx + (pcx - ucx) * rs, ncy = ucy * sy + (pcy - ucy) * rs;
+        void w;
+        return { ...p, rx: ncx - pcx, ry: ncy - pcy, rs };
       });
     })(),
   }));
