@@ -470,7 +470,7 @@ export function IsoCity({ towers, mode = "log", max, maxHeight = 6, foot = 1.4, 
   const maxX = Math.max(...corners.map((c) => c[0])) + 8;
   const minY = Math.min(...corners.map((c) => c[1])) - (labels ? 40 : 8);
   const maxY = Math.max(...corners.map((c) => c[1])) + 8;
-  const gid = React.useId().replace(/:/g, "");
+  const gid = useId().replace(/:/g, "");
   return (
     <svg aria-hidden viewBox={`${minX} ${minY} ${maxX - minX} ${maxY - minY}`} style={{ width: "100%", height: "100%", overflow: "visible" }}>
       <defs>
