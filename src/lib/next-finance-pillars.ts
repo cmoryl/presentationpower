@@ -9,6 +9,8 @@ import liftJpg from "@/assets/finance-pillars/finance-pillar.jpg.asset.json";
 import liftAi from "@/assets/finance-pillars/finance-pillar.ai.asset.json";
 import bgJpg from "@/assets/finance-pillars/pillar-background.jpg.asset.json";
 import bgAi from "@/assets/finance-pillars/pillar-background.ai.asset.json";
+import arrowJpg from "@/assets/finance-pillars/arrow-sign.jpg.asset.json";
+import arrowAi from "@/assets/finance-pillars/arrow-sign.ai.asset.json";
 import type { NextRegistryRow } from "@/lib/next-event";
 
 const SIZE = "23.5×72 in · supplied .ai master";
@@ -18,6 +20,8 @@ const SET = [
   { code: "P2", format: "Riverside Ballroom Pillar", jpg: riversideJpg, ai: riversideAi },
   { code: "P3", format: "Lift Your Global Profile Pillar", jpg: liftJpg, ai: liftAi },
   { code: "P4", format: "Pillar Background (blank)", jpg: bgJpg, ai: bgAi },
+  // Supplied 6 Oct 2026: pillar with the arrow artwork on its own second artboard.
+  { code: "P5", format: "Pillar Arrow Sign", jpg: arrowJpg, ai: arrowAi },
 ];
 
 export function financePillarRows(): NextRegistryRow[] {
