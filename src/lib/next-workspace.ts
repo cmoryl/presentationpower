@@ -36,6 +36,7 @@ export type NextWorkspacePath =
   | "/events/next/city-badges"
   | "/events/next/london"
   | "/events/next/london/maps"
+  | "/events/next/london/photos"
   | "/events/next/london/template"
   | "/events/next/london/revise"
   | "/events/next/london/booklet"
