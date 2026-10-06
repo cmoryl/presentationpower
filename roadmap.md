@@ -58,3 +58,5 @@
 - [x] Shared booth list, artwork sent to 3D on save, booth workspace, 3D check + approvals tab, share/thumbnail/not-published
 - [ ] BoothHub reads the artwork feed — blocked on: change applied in BoothHub (docs/BOOTHHUB-INTEGRATION.md)
 - [ ] Live Conference/Events + Commercial for Life Sciences 3D links — blocked on: user naming their BoothHub booths
+
+- [ ] Slides 2 & 3 KPI infographics: refine from direction 2 (Orbital Glass Prism) — waiting on what feels off
