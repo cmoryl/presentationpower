@@ -3,7 +3,7 @@
 // these templates; the supplied copy is used exactly as received.
 
 import financeDeskPreview from "@/assets/finance-pillars/reg-desk.jpg.asset.json";
-import { SIGN_LIVE_LAYOUTS, isSignId, type LiveLayout } from "@/lib/next-california-kiosk-live";
+import { isSignId, liveLayoutById, type LiveLayout } from "@/lib/next-california-kiosk-live";
 
 type Ptr = { url: string };
 const MASTERS = import.meta.glob<Ptr>(["../assets/legal-next-signage/masters/*.asset.json", "../assets/sf-screen-surrounds/masters/*.asset.json"], { eager: true, import: "default" });
@@ -21,7 +21,24 @@ export type LegalSign = {
   note?: string;
   /** Preview of the supplied design, shown on template cards. */
   preview?: string;
+  /** Suggested trim sizes (inches) offered when making a new size; any size can be typed. */
+  sizes?: { w: number; h: number; label: string }[];
+  /** Division the sign belongs to (for the editor's Exit button). */
+  division?: string;
 };
+
+const PILLAR_SIZES_IN = [
+  { w: 23.5, h: 72, label: "Supplied · 23.5 × 72 in" },
+  { w: 23.5, h: 84, label: "Taller · 23.5 × 84 in" },
+  { w: 30, h: 96, label: "Wide · 30 × 96 in" },
+  { w: 18, h: 72, label: "Slim · 18 × 72 in" },
+];
+const PEDESTAL_SIZES_IN = [
+  { w: 15, h: 36, label: "Supplied · 15 × 36 in" },
+  { w: 18, h: 42, label: "18 × 42 in" },
+  { w: 24, h: 48, label: "24 × 48 in" },
+  { w: 12, h: 30, label: "12 × 30 in" },
+];
 
 export const LEGAL_NEXT_SIGNS: LegalSign[] = [
   {
@@ -62,9 +79,35 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
     id: "finance-reg-desk", title: "FinanceNEXT registration desk front", size: "71.25 × 40.5 in", master: "Bar_Front_Tamplate_2026_71.25x40.5.ai",
     faces: [{ id: "divsign-finance-reg-desk", label: "Front" }],
     preview: financeDeskPreview.url,
+    division: "finance",
+  },
+  // Supplied pillar and pedestal finals, split into movable pieces (6 Oct 2026).
+  ...([
+    ["finance-pillar-welcome", "FinanceNEXT Welcome pillar", "welcome.ai"],
+    ["finance-pillar-riverside", "FinanceNEXT Riverside Ballroom pillar", "Riverside_Ballroom.ai"],
+    ["finance-pillar-profile", "FinanceNEXT Lift Your Global Profile pillar", "Finance_Pillar.ai"],
+    ["finance-pillar-background", "FinanceNEXT pillar background (blank)", "Pillar_Background.ai"],
+  ] as const).map(([id, title, master]): LegalSign => ({
+    id, title, size: "23.5 × 72 in", master, faces: [{ id: `divsign-${id}`, label: "Pillar" }], sizes: PILLAR_SIZES_IN, division: "finance",
+    note: "The supplied file has no bleed, so the ground is stretched 1/8 in past the trim.",
+  })),
+  {
+    id: "finance-pillar-arrow", title: "FinanceNEXT pillar arrow sign", size: "23.5 × 72 in + 23.5 × 23.8 in arrow", master: "Finance_Pillar_Arro_Sign.ai",
+    faces: [{ id: "divsign-finance-pillar-arrow-pillar", label: "Pillar" }, { id: "divsign-finance-pillar-arrow-arrow", label: "Arrow" }],
+    sizes: PILLAR_SIZES_IN, division: "finance",
+  },
+  {
+    id: "globallink-pedestal", title: "GlobalLink NEXT pedestals", size: "15 × 36 in", master: "Pedestal_Template_15x36_1.ai",
+    faces: [1, 2, 3].map((n) => ({ id: `divsign-globallink-pedestal-${n}`, label: `Pedestal ${n}` })),
+    sizes: PEDESTAL_SIZES_IN, division: "globallink",
+  },
+  {
+    id: "nextmart-pedestal", title: "NEXT Mart pedestal", size: "15 × 36 in", master: "NEXTMartPedestal_Template_15x36_1.ai",
+    faces: [{ id: "divsign-nextmart-pedestal", label: "Pedestal" }], sizes: PEDESTAL_SIZES_IN, division: "transperfect",
   },
 ];
 
 export const legalSign = (id: string) => [...LEGAL_NEXT_SIGNS, ...SF_SCREEN_SURROUNDS, ...DIVISION_LIVE_SIGNS].find((s) => s.id === id) ?? null;
 export const legalSignMasterUrl = (s: LegalSign) => masterUrl(s.master);
-export const legalSignLayout = (faceId: string): LiveLayout | null => (isSignId(faceId) ? SIGN_LIVE_LAYOUTS[faceId] ?? null : null);
+/** A face's layout; `faceId` may carry a size (`<face>~<w>x<h>`) for a re-sized version. */
+export const legalSignLayout = (faceId: string): LiveLayout | null => (isSignId(faceId) ? liveLayoutById(faceId) ?? null : null);

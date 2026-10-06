@@ -200,7 +200,16 @@ export function RegistryCard({
           <p className="text-xs text-muted-foreground">{row.size}</p>
         </div>
       </div>
-      <div className="mt-auto flex items-center gap-3 text-xs">
+      <div className="mt-auto flex flex-wrap items-center gap-3 text-xs">
+        {row.liveSignId ? (
+          <Link
+            to="/events/next/sign-editor/$signId"
+            params={{ signId: row.liveSignId }}
+            className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+          >
+            Edit live file <ArrowRight size={12} />
+          </Link>
+        ) : null}
         {row.internalUrl ? (
           <Link
             to={row.internalUrl}
