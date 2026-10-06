@@ -53,3 +53,8 @@
 - [ ] General Slides rebuild: slide-by-slide content analysis + impactful visual treatment per slide, nothing dropped (awaiting plan approval; fit every slide on one slide, no continuation slides)
 - [ ] Direct link to the General Slides master deck (find + edit in one click) (awaiting plan approval; fit every slide on one slide, no continuation slides)
 - [ ] General Slides: turn every figure in the deck into data visuals (no invented numbers) (awaiting plan approval)
+
+# Roadmap — booths in 3D
+- [x] Shared booth list, artwork sent to 3D on save, booth workspace, 3D check + approvals tab, share/thumbnail/not-published
+- [ ] BoothHub reads the artwork feed — blocked on: change applied in BoothHub (docs/BOOTHHUB-INTEGRATION.md)
+- [ ] Live Conference/Events + Commercial for Life Sciences 3D links — blocked on: user naming their BoothHub booths

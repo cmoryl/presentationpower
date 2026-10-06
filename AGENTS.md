@@ -23,3 +23,5 @@
 
 - Master decks: admins may add/remove/reorder slides (save guard + order trigger skip admins); "(cont.)" splits are refused for everyone; every master save first checkpoints the prior state via `checkpointMaster` (one per 10 min), and pruning keeps at least 3 — why: admins need full editing without losing a way back.
 - Look explorer line looks render per-slide grounds in the browser from `src/lib/look-occupancy.json` (measured content map) via `src/lib/look-ground.ts` — why: backgrounds must avoid each slide's content; re-measure the map if master layouts change.
+
+- Booth↔BoothHub pairing lives in `event_booths` (bundled `SF_BOOTH_FALLBACK` is offline-only); saved kiosks push PNG proofs to `booth_art`, served to BoothHub by `/api/public/booths/$event` — why: one list, and 3D always shows the latest saved art.
