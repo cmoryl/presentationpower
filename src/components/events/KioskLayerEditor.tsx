@@ -930,7 +930,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                   </g>
                 ) : null}
                 {L.native && !edits.ground ? (
-                  <>{/* Paper is white: unprinted areas of the designer file show as white, not transparent. */}<rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="#FFFFFF" pointerEvents="none" /><use href={`#${symId}-${L.native.bgSym ?? "bg"}`} x={-L.originX} y={-L.originY} width={L.mediaW} height={L.mediaH} pointerEvents="none" /></>
+                  <>{/* Paper is white: unprinted areas of the designer file show as white, not transparent. */}<rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="#FFFFFF" pointerEvents="none" /><use href={`#${symId}-${L.native.bgSym ?? "bg"}`} x={nativeBgBox(L)[0]} y={nativeBgBox(L)[1]} width={nativeBgBox(L)[2]} height={nativeBgBox(L)[3]} pointerEvents="none" /></>
                 ) : (
                   <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill={`url(#kg-${L.id})`} />
                 )}

@@ -28,6 +28,7 @@ import {
   kioskArtPdfUrl,
   kioskArtSvgUrl,
   kioskNativePdfUrl,
+  nativeBgBox,
   partSource,
   kioskFontUrl,
   kioskGround,
