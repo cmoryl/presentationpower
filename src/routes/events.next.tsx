@@ -95,6 +95,15 @@ export const Route = createFileRoute("/events/next")({
   ),
 });
 
+function HubTemplatePicker({ division }: { division: NextDivision }) {
+  const counts = useTemplateCounts();
+  return (
+    <div className="mb-8">
+      <DivisionTemplatePicker division={division} count={counts?.[division.id]} />
+    </div>
+  );
+}
+
 function NextHub() {
   const [divisionId, setDivisionId] = useState<string>(NEXT_DIVISIONS[0].id);
 
@@ -107,6 +116,7 @@ function NextHub() {
       <MasterDesignSystem division={division} onSelect={setDivisionId} />
 
       <div id="editions" tabIndex={-1} className="mt-14 scroll-mt-24 outline-none">
+        <HubTemplatePicker division={division} />
         <NextEditions />
       </div>
 
@@ -246,7 +256,6 @@ function MasterDesignSystem({
         })}
       </div>
 
-      <DivisionTemplatePicker division={division} count={counts?.[division.id]} />
 
       <DivisionDetail division={division} />
 
