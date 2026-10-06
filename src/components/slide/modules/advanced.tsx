@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 import type { CSSProperties } from "react";
 import { MapPin } from "lucide-react";
-import { Donut, DotField, FillTile, Figure, GlassPanel, INFO_FILL, Pictogram, RadialBars, numOf, pctOf, type InfoFill } from "./infographic-kit";
+import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, Pictogram, RadialBars, ScaleBar, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 type IconType = typeof Sparkles;
 
@@ -617,8 +617,8 @@ registerSlideModule({
                       <div key={i} className="flex flex-col gap-2" style={{ paddingLeft: i ? 32 : 0, borderLeft: i ? `1px solid ${ink.hairline}` : undefined }}>
                         <Figure value={s(it.value)} px={80} color={ink.strong} />
                         {lab(s(it.label), 20)}
-                        <div className="mt-2">
-                          <DotField count={Math.round(numOf(s(it.value)))} cols={11} dot={14} gap={7} from={i === 0 ? INFO_FILL.lavender.bg : blue} to={i === 0 ? blue : INFO_FILL.lavender.bg} />
+                        <div className="mt-3" style={{ maxWidth: 300 }}>
+                          <ScaleBar mode="linear" value={numOf(s(it.value))} max={Math.max(...restA.map((r) => numOf(s(r.value))))} from={i === 0 ? INFO_FILL.lavender.bg : blue} to={i === 0 ? blue : INFO_FILL.lavender.bg} track={ink.hairline} labelColor={ink.muted} height={14} />
                         </div>
                         {s(it.body) && <div style={{ fontSize: fillPx(15, "body"), color: ink.muted, lineHeight: 1.35 }}>{s(it.body)}</div>}
                       </div>

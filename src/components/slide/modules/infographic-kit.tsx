@@ -405,3 +405,39 @@ export function dotUnit(n: number): number {
   const mag = Math.pow(10, Math.floor(Math.log10(n)) - 1);
   return n / mag > 150 ? mag * 10 : mag;
 }
+
+/**
+ * Scale capsule: a glowing gradient bar filled to the figure's position on a
+ * stated scale. `log` places counts on order-of-magnitude ticks (10 → 100K);
+ * `linear` fills against `max`. Data-true, never more than one element per tick.
+ */
+export function ScaleBar({ value, max, mode = "log", from, to, track, labelColor, height = 18, width = "100%" }: { value: number; max?: number; mode?: "log" | "linear"; from: string; to: string; track: string; labelColor: string; height?: number; width?: number | string }) {
+  const v = Math.max(0, value);
+  let pct: number;
+  let ticks: { at: number; label: string }[] = [];
+  if (mode === "log") {
+    const top = Math.max(2, Math.ceil(Math.log10(Math.max(10, v)) + 0.0001));
+    pct = v <= 1 ? 0 : Math.min(1, Math.log10(v) / top);
+    const fmt = (e: number) => (e >= 6 ? `${10 ** (e - 6)}M` : e >= 3 ? `${10 ** (e - 3)}K` : String(10 ** e));
+    ticks = Array.from({ length: top }, (_, i) => ({ at: (i + 1) / top, label: fmt(i + 1) }));
+  } else {
+    const m = Math.max(1, max ?? v);
+    pct = Math.min(1, v / m);
+  }
+  const fill = `${Math.max(4, pct * 100)}%`;
+  return (
+    <div aria-hidden style={{ width }}>
+      <div className="relative" style={{ height, borderRadius: height, background: track, overflow: "visible" }}>
+        <div className="absolute inset-y-0 left-0" style={{ width: fill, borderRadius: height, background: `linear-gradient(90deg, ${from}, ${to})`, boxShadow: `0 0 ${height * 1.4}px color-mix(in oklab, ${to} 55%, transparent)` }} />
+        <div className="absolute top-1/2" style={{ left: `calc(${fill} - ${height * 0.7}px)`, width: height * 1.4, height: height * 1.4, marginTop: -height * 0.7, borderRadius: height, background: to, boxShadow: `0 0 0 ${Math.round(height / 3)}px color-mix(in oklab, ${to} 30%, transparent), 0 0 ${height * 2}px ${to}` }} />
+      </div>
+      {ticks.length > 0 && (
+        <div className="relative mt-3" style={{ height: 16 }}>
+          {ticks.map((t) => (
+            <span key={t.label} className="absolute -translate-x-full" style={{ left: `${t.at * 100}%`, fontSize: 13, color: labelColor, letterSpacing: "0.06em", fontVariantNumeric: "tabular-nums" }}>{t.label}</span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

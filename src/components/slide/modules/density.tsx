@@ -9,7 +9,7 @@ import { fillPx } from "@/lib/open-space-fill";
 import { accentInk, hexA } from "@/lib/accent-tokens";
 import { Rocket, Users, Globe2, Flag, Sparkles, MapPin, BarChart3, Code2, Building2, type LucideIcon } from "lucide-react";
 import * as React from "react";
-import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, LogLollipop, Pictogram, RadialBars, DotField, dotUnit, numOf, pctOf, type InfoFill } from "./infographic-kit";
+import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, LogLollipop, Pictogram, RadialBars, ScaleBar as GlowScale, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 function statIcon(label: string): LucideIcon {
   const l = label.toLowerCase();
@@ -150,16 +150,9 @@ registerSlideModule({
                       gradient={`linear-gradient(100deg, ${ink.strong} 35%, ${blue} 75%, ${INFO_FILL.lavender.bg})`}
                     />
                     <div style={{ fontSize: fillPx(22, "body"), color: ink.body, marginTop: 10, fontWeight: 500 }}>{s(it.label)}</div>
-                    {(() => {
-                      const n = numOf(s(it.value));
-                      const per = i === 0 ? 100 : 10;
-                      return (
-                        <div className="mt-4 flex items-end gap-5">
-                          <DotField count={Math.round(n / per)} cols={i === 0 ? 30 : 20} dot={i === 0 ? 11 : 12} gap={6} from={i === 0 ? blue : INFO_FILL.lavender.bg} to={i === 0 ? INFO_FILL.lavender.bg : blue} />
-                          <span style={{ fontSize: fillPx(13, "body"), color: ink.muted, whiteSpace: "nowrap" }}>1 dot = {per}</span>
-                        </div>
-                      );
-                    })()}
+                    <div className="mt-5" style={{ maxWidth: 520 }}>
+                      <GlowScale value={numOf(s(it.value))} from={i === 0 ? blue : INFO_FILL.lavender.bg} to={i === 0 ? INFO_FILL.lavender.bg : blue} track={hair} labelColor={ink.muted} height={i === 0 ? 18 : 14} />
+                    </div>
                   </div>
                 ))}
               </section>
@@ -174,17 +167,7 @@ registerSlideModule({
                       {pct !== null ? (
                         <Donut pct={pct} size={92} stroke={11} color={blue} track={hair} />
                       ) : (
-                        (() => {
-                          const n = numOf(s(it.value));
-                          const per = dotUnit(n);
-                          const cnt = Math.round(n / per);
-                          return (
-                            <div className="flex flex-col gap-2">
-                              <DotField count={cnt} cols={cnt <= 10 ? cnt : 15} dot={cnt <= 10 ? 16 : 8} gap={cnt <= 10 ? 7 : 5} from={blue} to={INFO_FILL.lavender.bg} />
-                              {per > 1 && <span style={{ fontSize: fillPx(12, "body"), color: ink.muted }}>1 dot = {per.toLocaleString("en-US")}</span>}
-                            </div>
-                          );
-                        })()
+                        <div className="pt-3"><GlowScale value={numOf(s(it.value))} from={blue} to={INFO_FILL.lavender.bg} track={hair} labelColor={ink.muted} height={10} /></div>
                       )}
                     </div>
                   );
