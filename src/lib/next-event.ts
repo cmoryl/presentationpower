@@ -330,6 +330,9 @@ export type NextFormatGroup = {
  */
 export const NEXT_SCREENS_ENABLED = false;
 
+/** G-series general posters (Welcome, Restrooms…) withdrawn for every division (Oct 2026). */
+export const NEXT_G_SERIES_ENABLED = false;
+
 export const NEXT_FORMAT_GROUPS: NextFormatGroup[] = [
   {
     id: "sponsorship-deck",
@@ -448,7 +451,11 @@ export async function loadNextRegistry(): Promise<NextRegistryRow[]> {
   const raw = (mod.default ?? mod) as unknown as NextRegistryRowRaw[];
   const { suppliedTemplateRows } = await import("./next-supplied-templates");
   const rows = [...raw.map(normalizeNextRow), ...suppliedTemplateRows(), ...nextBadgeRows()];
-  return NEXT_SCREENS_ENABLED ? rows : rows.filter((r) => r.group !== "event-screens");
+  return rows.filter(
+    (r) =>
+      (NEXT_SCREENS_ENABLED || r.group !== "event-screens") &&
+      (NEXT_G_SERIES_ENABLED || !(r.group === "event-signage" && /^G\d+$/i.test(r.code))),
+  );
 }
 
 // ── City Series ────────────────────────────────────────────────────────────
