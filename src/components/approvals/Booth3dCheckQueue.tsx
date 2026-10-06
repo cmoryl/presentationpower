@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { SF_EVENT } from "@/lib/event-booths";
+import { CALIFORNIA_KIOSK_SUFFIX } from "@/lib/next-california-kiosks";
 
 type Row = { id: string; name: string; source: string; revision: string | null; checkedAt: string | null; note: string | null; snap: string | null };
 
@@ -42,7 +43,7 @@ export function Booth3dCheckQueue() {
               {!r.revision ? "No artwork sent to 3D yet" : r.checkedAt ? `Checked in 3D ${new Date(r.checkedAt).toLocaleString()}${r.note ? ` — ${r.note}` : ""}` : "Waiting for a 3D check"}
             </p>
           </div>
-          <Link to="/events/next/booth/$boothId" params={{ boothId: `${r.source}-california` }} className="text-sm font-medium text-primary hover:underline">
+          <Link to="/events/next/booth/$boothId" params={{ boothId: `${r.source}${CALIFORNIA_KIOSK_SUFFIX}` }} className="text-sm font-medium text-primary hover:underline">
             Open booth workspace
           </Link>
         </li>
