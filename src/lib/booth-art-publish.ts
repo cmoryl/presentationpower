@@ -5,6 +5,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { kioskEditKey, kioskFaceLayout, kioskFaceW, kioskFaceH, KIOSK_RETURN_W, KIOSK_H, buildKioskReturnSvg, type LiveLayout, type KioskEdits } from "@/lib/next-california-kiosk-live";
 import { pressFrontSvg, proofPng } from "@/lib/next-california-kiosk-live-export";
+import { notifyBoothHub } from "@/lib/booth-notify.functions";
 
 async function loadEdits(key: string): Promise<KioskEdits> {
   const { data } = await supabase.from("kiosk_layer_edits").select("edits").eq("booth_id", key).maybeSingle();
@@ -34,5 +35,9 @@ export async function publishBoothArt(front: LiveLayout, userId: string | null):
     if (error) throw new Error(`3D artwork not sent: ${error.message}`);
   }
   window.dispatchEvent(new CustomEvent("booth-art-published", { detail: front.id }));
+  // Tell BoothHUB (server-side; the key stays private). A failure is surfaced, not hidden.
+  notifyBoothHub({ data: { boothId: booth.id, revision } }).catch((e) =>
+    window.dispatchEvent(new CustomEvent("booth-art-failed", { detail: `BoothHUB wasn't notified: ${e instanceof Error ? e.message : e}` })),
+  );
   return revision;
 }

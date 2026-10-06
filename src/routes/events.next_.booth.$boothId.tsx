@@ -15,6 +15,7 @@ import { sfKiosk3dUrl } from "@/lib/sf-kiosk-3d";
 import { useRequireSignIn } from "@/hooks/use-require-sign-in";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
+import { notifyBoothHub } from "@/lib/booth-notify.functions";
 
 export const Route = createFileRoute("/events/next_/booth/$boothId")({
   ssr: false,
@@ -81,7 +82,9 @@ function BoothWorkspace() {
   const togglePublished = async () => {
     if (!booth?.id) return;
     const { error } = await supabase.from("event_booths").update({ published_3d: !booth.published3d }).eq("id", booth.id);
-    if (error) toast.error(error.message); else qc.invalidateQueries({ queryKey: ["event-booths"] });
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["event-booths"] });
+    notifyBoothHub({ data: { boothId: booth.id, revision } }).catch((e) => toast.error(`BoothHUB wasn't notified: ${e instanceof Error ? e.message : e}`));
   };
 
   const ago = (iso: string) => {
