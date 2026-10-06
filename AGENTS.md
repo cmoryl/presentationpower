@@ -26,3 +26,4 @@
 
 - Booth↔BoothHub pairing lives in `event_booths` (bundled `SF_BOOTH_FALLBACK` is offline-only); saved kiosks push PNG proofs to `booth_art`, served to BoothHub by `/api/public/booths/$event` — why: one list, and 3D always shows the latest saved art.
 - Designer-supplied NEXT division templates join the registry only via `src/lib/next-supplied-templates.ts` (live desk files via `DIVISION_LIVE_SIGNS` with a `preview`) — why: the assets listing, division tiles and counts all read `loadNextRegistry()`, so one entry shows everywhere.
+- Re-sized signs are their own layout id `<face>~<w>x<h>` (inches), resolved by `liveLayoutById` via `resizedSignLayout` (ground stretched via `native.bgBox`, pieces re-flowed via `LivePart.rx/ry/rs`); artwork files always come from the base id — why: saves, approvals and exports keep working per size without duplicating supplied files.

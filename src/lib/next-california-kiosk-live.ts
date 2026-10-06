@@ -203,11 +203,11 @@ export function resizedSignLayout(L: LiveLayout, wIn: number, hIn: number): Live
     parts: (() => {
       const all = b.parts ?? [];
       const isFull = (p: LivePart) => p.x1 - p.x0 >= 0.9 * L.trimW || p.y1 - p.y0 >= 0.9 * L.trimH;
-      // Group nearby pieces (gap under 1.5 in) so a composition keeps its spacing.
+      // Group nearby pieces (gap under 2 in) so a composition keeps its spacing.
       const small = all.filter((p) => !isFull(p));
       const par = small.map((_, i) => i);
       const find = (i: number): number => (par[i] === i ? i : (par[i] = find(par[i]!)));
-      const GAP = 108;
+      const GAP = 144;
       for (let i = 0; i < small.length; i++)
         for (let j = i + 1; j < small.length; j++) {
           const A = small[i]!, C = small[j]!;
