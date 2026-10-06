@@ -684,6 +684,76 @@ export type Database = {
           },
         ]
       }
+      booth_3d_checks: {
+        Row: {
+          booth_id: string
+          checked_at: string
+          checked_by: string
+          id: string
+          note: string | null
+          revision: string
+          snapshot_path: string | null
+        }
+        Insert: {
+          booth_id: string
+          checked_at?: string
+          checked_by?: string
+          id?: string
+          note?: string | null
+          revision: string
+          snapshot_path?: string | null
+        }
+        Update: {
+          booth_id?: string
+          checked_at?: string
+          checked_by?: string
+          id?: string
+          note?: string | null
+          revision?: string
+          snapshot_path?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booth_3d_checks_booth_id_fkey"
+            columns: ["booth_id"]
+            isOneToOne: false
+            referencedRelation: "event_booths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booth_art: {
+        Row: {
+          booth_id: string
+          face: string
+          path: string
+          revision: string
+          updated_by: string | null
+        }
+        Insert: {
+          booth_id: string
+          face: string
+          path: string
+          revision?: string
+          updated_by?: string | null
+        }
+        Update: {
+          booth_id?: string
+          face?: string
+          path?: string
+          revision?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booth_art_booth_id_fkey"
+            columns: ["booth_id"]
+            isOneToOne: false
+            referencedRelation: "event_booths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booth_template_versions: {
         Row: {
           created_at: string
@@ -2149,6 +2219,45 @@ export type Database = {
           size_id?: string
           updated_at?: string
           year?: number
+        }
+        Relationships: []
+      }
+      event_booths: {
+        Row: {
+          boothhub_slug: string | null
+          created_at: string
+          event: string
+          has_tv: boolean
+          id: string
+          name: string
+          published_3d: boolean
+          sort_order: number
+          source_booth_id: string
+          updated_at: string
+        }
+        Insert: {
+          boothhub_slug?: string | null
+          created_at?: string
+          event: string
+          has_tv?: boolean
+          id?: string
+          name: string
+          published_3d?: boolean
+          sort_order?: number
+          source_booth_id: string
+          updated_at?: string
+        }
+        Update: {
+          boothhub_slug?: string | null
+          created_at?: string
+          event?: string
+          has_tv?: boolean
+          id?: string
+          name?: string
+          published_3d?: boolean
+          sort_order?: number
+          source_booth_id?: string
+          updated_at?: string
         }
         Relationships: []
       }
