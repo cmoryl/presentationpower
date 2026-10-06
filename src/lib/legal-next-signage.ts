@@ -3,6 +3,7 @@
 // these templates; the supplied copy is used exactly as received.
 
 import financeDeskPreview from "@/assets/finance-pillars/reg-desk.jpg.asset.json";
+import globallinkDeskPreview from "@/assets/globallink-desk/reg-desk.jpg.asset.json";
 import { isSignId, liveLayoutById, type LiveLayout } from "@/lib/next-california-kiosk-live";
 
 type Ptr = { url: string };
@@ -80,6 +81,12 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
     faces: [{ id: "divsign-finance-reg-desk", label: "Front" }],
     preview: financeDeskPreview.url,
     division: "finance",
+  },
+  {
+    id: "globallink-reg-desk", title: "GlobalLinkNEXT registration desk front", size: "96 × 34.625 in", master: "GLNEXT_Registration_Bar_Front.ai",
+    faces: [{ id: "divsign-globallink-reg-desk", label: "Front" }],
+    preview: globallinkDeskPreview.url,
+    division: "globallink",
   },
   // Supplied pillar and pedestal finals, split into movable pieces (6 Oct 2026).
   ...([
