@@ -9,7 +9,7 @@ import { fillPx } from "@/lib/open-space-fill";
 import { accentInk, hexA } from "@/lib/accent-tokens";
 import { Rocket, Users, Globe2, Flag, Sparkles, MapPin, BarChart3, Code2, Building2, type LucideIcon } from "lucide-react";
 import * as React from "react";
-import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, LogLollipop, Pictogram, RadialBars, ScaleBar, numOf, pctOf, type InfoFill } from "./infographic-kit";
+import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, LogLollipop, Pictogram, RadialBars, ScaleBar as GlowScale, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 function statIcon(label: string): LucideIcon {
   const l = label.toLowerCase();
@@ -151,7 +151,7 @@ registerSlideModule({
                     />
                     <div style={{ fontSize: fillPx(22, "body"), color: ink.body, marginTop: 10, fontWeight: 500 }}>{s(it.label)}</div>
                     <div className="mt-5" style={{ maxWidth: 520 }}>
-                      <ScaleBar value={numOf(s(it.value))} from={i === 0 ? blue : INFO_FILL.lavender.bg} to={i === 0 ? INFO_FILL.lavender.bg : blue} track={hair} labelColor={ink.muted} height={i === 0 ? 18 : 14} />
+                      <GlowScale value={numOf(s(it.value))} from={i === 0 ? blue : INFO_FILL.lavender.bg} to={i === 0 ? INFO_FILL.lavender.bg : blue} track={hair} labelColor={ink.muted} height={i === 0 ? 18 : 14} />
                     </div>
                   </div>
                 ))}
@@ -167,7 +167,7 @@ registerSlideModule({
                       {pct !== null ? (
                         <Donut pct={pct} size={92} stroke={11} color={blue} track={hair} />
                       ) : (
-                        <div className="pt-3"><ScaleBar value={numOf(s(it.value))} from={blue} to={INFO_FILL.lavender.bg} track={hair} labelColor={ink.muted} height={10} /></div>
+                        <div className="pt-3"><GlowScale value={numOf(s(it.value))} from={blue} to={INFO_FILL.lavender.bg} track={hair} labelColor={ink.muted} height={10} /></div>
                       )}
                     </div>
                   );
