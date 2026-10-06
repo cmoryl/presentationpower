@@ -324,6 +324,12 @@ export type NextFormatGroup = {
   detail: string;
 };
 
+/**
+ * Event screen imagery is withdrawn until corrected artwork is supplied (Oct 2026).
+ * Flip to true to bring the group and its rows back everywhere.
+ */
+export const NEXT_SCREENS_ENABLED = false;
+
 export const NEXT_FORMAT_GROUPS: NextFormatGroup[] = [
   {
     id: "sponsorship-deck",
@@ -344,12 +350,6 @@ export const NEXT_FORMAT_GROUPS: NextFormatGroup[] = [
     label: "Event general signage",
     badge: "Print",
     detail: "G-series printable posters — US Letter 8.5×11 in and A4 210×297 mm.",
-  },
-  {
-    id: "event-screens",
-    label: "Event screen imagery",
-    badge: "Screen",
-    detail: "S-series digital screen designs for stage, foyer and breakout displays.",
   },
   {
     id: "pillar-signage",
@@ -447,7 +447,8 @@ export async function loadNextRegistry(): Promise<NextRegistryRow[]> {
   const mod = await import("./next-registry.json");
   const raw = (mod.default ?? mod) as unknown as NextRegistryRowRaw[];
   const { suppliedTemplateRows } = await import("./next-supplied-templates");
-  return [...raw.map(normalizeNextRow), ...suppliedTemplateRows(), ...nextBadgeRows()];
+  const rows = [...raw.map(normalizeNextRow), ...suppliedTemplateRows(), ...nextBadgeRows()];
+  return NEXT_SCREENS_ENABLED ? rows : rows.filter((r) => r.group !== "event-screens");
 }
 
 // ── City Series ────────────────────────────────────────────────────────────
