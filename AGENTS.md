@@ -25,3 +25,4 @@
 - Look explorer line looks render per-slide grounds in the browser from `src/lib/look-occupancy.json` (measured content map) via `src/lib/look-ground.ts` — why: backgrounds must avoid each slide's content; re-measure the map if master layouts change.
 
 - Booth↔BoothHub pairing lives in `event_booths` (bundled `SF_BOOTH_FALLBACK` is offline-only); saved kiosks push PNG proofs to `booth_art`, served to BoothHub by `/api/public/booths/$event` — why: one list, and 3D always shows the latest saved art.
+- Designer-supplied NEXT division templates join the registry only via `src/lib/next-supplied-templates.ts` (live desk files via `DIVISION_LIVE_SIGNS` with a `preview`) — why: the assets listing, division tiles and counts all read `loadNextRegistry()`, so one entry shows everywhere.

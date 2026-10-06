@@ -20,6 +20,7 @@ import {
 } from "@/lib/next-division-signage";
 import { buildLondonPanelAiAsync, buildLondonPanelSvg, londonAiBytes } from "@/lib/next-london-revise";
 import { auditAi, auditSvg, gateOnQa } from "@/lib/london-signage-qa";
+import { legalSign, legalSignMasterUrl } from "@/lib/legal-next-signage";
 import { useLondonSignageFace } from "@/hooks/use-london-signage-face";
 
 function dataUrl(svg: string) {
@@ -37,13 +38,17 @@ function save(blob: Blob, name: string) {
 
 function SignCard({ sign, compact }: { sign: DivisionSign; compact?: boolean }) {
   const [busy, setBusy] = useState<string | null>(null);
+  // A desk with a supplied live file shows and downloads that file, not the generated art.
+  const supplied = sign.liveSignId ? legalSign(sign.liveSignId) : null;
+  const suppliedMaster = supplied ? legalSignMasterUrl(supplied) : null;
   const preview = useMemo(() => {
+    if (supplied?.preview) return supplied.preview;
     try {
       return dataUrl(buildLondonPanelSvg(sign.panel, divisionSignArtOptions(sign)));
     } catch {
       return null;
     }
-  }, [sign]);
+  }, [sign, supplied]);
 
   async function download(kind: "svg" | "ai") {
     setBusy(kind);
@@ -76,13 +81,21 @@ function SignCard({ sign, compact }: { sign: DivisionSign; compact?: boolean }) 
       </div>
       <figcaption className="mt-2 text-sm font-medium">{sign.label}</figcaption>
       {!compact && (
-        <div className="mt-2 flex gap-2">
+        <div className="mt-2 flex flex-wrap gap-2">
+          {suppliedMaster ? (
+            <Button size="sm" variant="outline" asChild>
+              <a href={suppliedMaster} download={supplied?.master}>
+                <Download className="h-3.5 w-3.5" /> Supplied .ai
+              </a>
+            </Button>
+          ) : (<>
           <Button size="sm" variant="outline" disabled={!!busy} onClick={() => download("svg")}>
             <Download className="h-3.5 w-3.5" /> {busy === "svg" ? "…" : "SVG"}
           </Button>
           <Button size="sm" variant="outline" disabled={!!busy} onClick={() => download("ai")}>
             <Download className="h-3.5 w-3.5" /> {busy === "ai" ? "…" : "AI"}
           </Button>
+          </>)}
           {sign.liveSignId ? (
             <Button size="sm" asChild>
               <Link to="/events/next/sign-editor/$signId" params={{ signId: sign.liveSignId }}>

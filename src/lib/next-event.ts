@@ -444,9 +444,8 @@ export function nextBadgeRows(): NextRegistryRow[] {
 export async function loadNextRegistry(): Promise<NextRegistryRow[]> {
   const mod = await import("./next-registry.json");
   const raw = (mod.default ?? mod) as unknown as NextRegistryRowRaw[];
-  const { financePillarRows } = await import("./next-finance-pillars");
-  const { globallinkPedestalRows } = await import("./next-globallink-pedestals");
-  return [...raw.map(normalizeNextRow), ...financePillarRows(), ...globallinkPedestalRows(), ...nextBadgeRows()];
+  const { suppliedTemplateRows } = await import("./next-supplied-templates");
+  return [...raw.map(normalizeNextRow), ...suppliedTemplateRows(), ...nextBadgeRows()];
 }
 
 // ── City Series ────────────────────────────────────────────────────────────

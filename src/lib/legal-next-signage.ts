@@ -2,6 +2,7 @@
 // the shared kiosk layer editor. City, date and venue facts are NOT part of
 // these templates; the supplied copy is used exactly as received.
 
+import financeDeskPreview from "@/assets/finance-pillars/reg-desk.jpg.asset.json";
 import { SIGN_LIVE_LAYOUTS, isSignId, type LiveLayout } from "@/lib/next-california-kiosk-live";
 
 type Ptr = { url: string };
@@ -18,6 +19,8 @@ export type LegalSign = {
   master: string;
   faces: LegalSignFace[];
   note?: string;
+  /** Preview of the supplied design, shown on template cards. */
+  preview?: string;
 };
 
 export const LEGAL_NEXT_SIGNS: LegalSign[] = [
@@ -58,6 +61,7 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
   {
     id: "finance-reg-desk", title: "FinanceNEXT registration desk front", size: "71.25 × 40.5 in", master: "Bar_Front_Tamplate_2026_71.25x40.5.ai",
     faces: [{ id: "divsign-finance-reg-desk", label: "Front" }],
+    preview: financeDeskPreview.url,
   },
 ];
 
