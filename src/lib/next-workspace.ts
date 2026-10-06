@@ -225,6 +225,13 @@ export const NEXT_WORKSPACE_PAGES: NextWorkspacePage[] = [
     scope: "london",
   },
   {
+    to: "/events/next/london/photos",
+    label: "Event photos",
+    purpose: "Staff-only photographs from the day, for checking prints against the room.",
+    group: "london",
+    scope: "london",
+  },
+  {
     to: "/events/next/london/template",
     label: "Signage template",
     purpose: "The signage template creator on the approved CMYK grounds.",
