@@ -607,7 +607,7 @@ registerSlideModule({
                         <IsoCity
                           towers={(() => { const n = Math.max(1, Math.min(40, Math.round(numOf(s(heroA.value))))); return Array.from({ length: n }, (_, k) => ({ value: k + 1, color: `color-mix(in oklab, ${blue} ${Math.round(100 - (k / Math.max(1, n - 1)) * 55)}%, ${INFO_FILL.lavender.bg})` })); })()}
                           mode="linear"
-                          maxHeight={4}
+                          maxHeight={9}
                           foot={0.55}
                           gapTiles={0.12}
                           unit={20}
