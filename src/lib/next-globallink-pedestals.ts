@@ -6,6 +6,9 @@ import p2 from "@/assets/globallink-pedestals/pedestal-2.jpg.asset.json";
 import p3 from "@/assets/globallink-pedestals/pedestal-3.jpg.asset.json";
 import ai from "@/assets/globallink-pedestals/pedestals.ai.asset.json";
 import pdf from "@/assets/globallink-pedestals/pedestals.pdf.asset.json";
+import martJpg from "@/assets/globallink-pedestals/nextmart.jpg.asset.json";
+import martAi from "@/assets/globallink-pedestals/nextmart.ai.asset.json";
+import martPdf from "@/assets/globallink-pedestals/nextmart.pdf.asset.json";
 import type { NextRegistryRow } from "@/lib/next-event";
 
 const SIZE = "15×36 in · 1/8 in bleed · supplied .ai master (all three artboards)";
@@ -16,8 +19,21 @@ const SET = [
   { code: "PD3", format: "Pedestal 3 · artboard 3", jpg: p3 },
 ];
 
+/** NEXT Mart pedestal for the main TransPerfect NEXT templates (supplied single-artboard .ai). */
+const NEXTMART: NextRegistryRow = {
+  divisionId: "transperfect",
+  group: "pillar-signage",
+  code: "PD1",
+  format: "NEXT Mart Pedestal",
+  size: "15×36 in · 1/8 in bleed · supplied .ai master",
+  exampleUrl: martJpg.url,
+  downloadUrl: martAi.url,
+  secondaryUrl: martPdf.url,
+  secondaryLabel: "PDF",
+};
+
 export function globallinkPedestalRows(): NextRegistryRow[] {
-  return SET.map((s) => ({
+  return [NEXTMART, ...SET.map((s): NextRegistryRow => ({
     divisionId: "globallink",
     group: "pillar-signage",
     code: s.code,
@@ -27,5 +43,5 @@ export function globallinkPedestalRows(): NextRegistryRow[] {
     downloadUrl: ai.url,
     secondaryUrl: pdf.url,
     secondaryLabel: "PDF · all three",
-  }));
+  }))];
 }
