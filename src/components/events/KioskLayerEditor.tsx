@@ -121,6 +121,21 @@ export function KioskLayerEditor({ layout, vendor, fill = false, embedded = fals
   const [face, setFace] = useState<"front" | KioskFace>("front");
   const hasFaces = !!layout.native?.faces;
   const FL = face === "front" ? layout : kioskFaceLayout(layout, face) ?? layout;
+  // Send the saved kiosk to the 3D booth a few seconds after the last save.
+  useEffect(() => {
+    if (layout.sign || editKey) return;
+    let t: ReturnType<typeof setTimeout> | undefined;
+    const on = () => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        import("@/lib/booth-art-publish")
+          .then(async (m) => m.publishBoothArt(layout, (await supabase.auth.getUser()).data.user?.id ?? null))
+          .catch((e) => window.dispatchEvent(new CustomEvent("booth-art-failed", { detail: String(e?.message ?? e) })));
+      }, 3000);
+    };
+    window.addEventListener("kiosk-edits-saved", on);
+    return () => { clearTimeout(t); window.removeEventListener("kiosk-edits-saved", on); };
+  }, [layout, editKey]);
   return <KioskFaceEditor key={face} layout={FL} front={layout} face={face} onFace={hasFaces ? setFace : undefined} vendor={vendor} fill={fill} embedded={embedded} editKey={face === "front" ? editKey : undefined} />;
 }
 
