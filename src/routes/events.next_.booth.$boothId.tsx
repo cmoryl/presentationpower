@@ -81,7 +81,7 @@ function BoothWorkspace() {
 
   return (
     <main className="flex h-screen flex-col bg-[#0B0A2A] text-white lg:flex-row">
-      <section className="relative min-h-[70vh] flex-1 overflow-hidden" aria-label="Kiosk editor">
+      <section className="relative min-h-[70vh] min-w-0 flex-1 overflow-hidden" aria-label="Kiosk editor">
         <KioskLayerEditor layout={layout} vendor={vendor} embedded />
       </section>
       <aside className="flex w-full flex-col border-l border-white/10 lg:w-[34%] lg:shrink-0" aria-label="3D booth">
