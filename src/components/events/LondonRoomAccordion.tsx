@@ -5,6 +5,7 @@
 // item scheduled inside it — so a visitor knows what a space is, and the crew
 // knows what hangs there.
 
+import { Sign3dLink } from "@/components/events/Sign3dLink";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
@@ -143,6 +144,7 @@ export function LondonRoomAccordion({ plan, panels, onSelectAsset, selectedId }:
                               {p.trimW} × {p.trimH} mm
                             </span>
                           </button>
+                          <Sign3dLink sign={p.name} label={p.name} className="mt-1" />
                         </li>
                       ))}
                     </ul>

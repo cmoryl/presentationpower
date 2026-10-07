@@ -31,3 +31,22 @@ export const SF_BOOTH_FALLBACK = [
 export function sfKiosk3dSlugFor(londonBoothId: string | null | undefined): string | null {
   return (londonBoothId && SF_BOOTH_FALLBACK.find((b) => b.sourceBoothId === londonBoothId)?.slug) || null;
 }
+
+/**
+ * Event signs BoothHub models in its NEXT SF showroom, opened with `?kiosk=sign:<id>`
+ * (BoothHub has no single-sign view; the showroom focuses the sign).
+ * Matched to our signs by live sign id or by name; anything else gets no 3D link.
+ */
+export const SIGN_3D = [
+  { id: "sign:welcome", name: "Finance NEXT — Welcome pillar", ids: ["finance-pillar-welcome"], match: /^$/ },
+  { id: "sign:finance", name: "Finance NEXT — Profile pillar", ids: ["finance-pillar-profile"], match: /^$/ },
+  { id: "sign:step-into", name: "NEXT — Step Into elevator wrap", ids: [], match: /^LIFT DOOR STEP INTO\b/i },
+  { id: "sign:lift-your", name: "NEXT — Lift Your Profile elevator wrap", ids: [], match: /^LIFT DOOR LIFT YOUR\b/i },
+] as const;
+
+export function sign3dUrl(signIdOrName: string | null | undefined): string | null {
+  if (!signIdOrName) return null;
+  const base = signIdOrName.split("~")[0]!;
+  const hit = SIGN_3D.find((s) => (s.ids as readonly string[]).includes(base) || s.match.test(signIdOrName));
+  return hit ? `${ORIGIN}?kiosk=${encodeURIComponent(hit.id)}` : null;
+}
