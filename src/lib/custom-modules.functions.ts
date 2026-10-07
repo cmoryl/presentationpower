@@ -173,6 +173,18 @@ export const submitModuleForReview = createServerFn({ method: "POST" })
       .update({ review_status: "pending", submitted_at: new Date().toISOString(), status: "draft" })
       .eq("id", data.id);
     if (error) throw error;
+    {
+      const { logLearningSignal } = await import("./learning.server");
+      const { data: mod } = await context.supabase.from("custom_modules").select("*").eq("id", data.id).maybeSingle();
+      const m = (mod ?? {}) as Record<string, unknown>;
+      await logLearningSignal(context.supabase, context.userId, {
+        source: "approval",
+        subjectType: "slide-module",
+        subjectId: data.id,
+        summary: `Slide module "${String(m.name ?? m.title ?? data.id)}" ${data.decision === "approved" ? "approved" : "sent back"}${data.notes?.trim() ? ` — ${data.notes.trim()}` : ""}`,
+        detail: { decision: data.decision, notes: data.notes ?? null, family: m.family_id ?? m.family ?? null, override },
+      });
+    }
     await auditModule(context.userId, "module.submit", data.id);
     return { ok: true };
   });
