@@ -646,7 +646,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
 
   // ---- workspace view state ----
   const [unit, setUnit] = useState<"in" | "mm">("in");
-  const [guides, setGuides] = useState({ bleed: true, safe: true, tv: true, rulers: true });
+  const [guides, setGuides] = useState({ bleed: true, safe: true, tv: true, rulers: true, steps: true });
   const [showSides, setShowSides] = useState(true);
   const [alignTarget, setAlignTarget] = useState<"trim" | "safe" | "tv">("trim");
   const [tab, setTab] = useState<"design" | "checks" | "export">("design");
@@ -930,7 +930,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                     ) : null}
                   </g>
                 ) : null}
-                {L.native && !edits.ground ? (
+                {L.native && !edits.ground && !L.groundOnly ? (
                   <>{/* Paper is white: unprinted areas of the designer file show as white, not transparent. */}<rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="#FFFFFF" pointerEvents="none" /><use href={`#${symId}-${L.native.bgSym ?? "bg"}`} x={nativeBgBox(L)[0]} y={nativeBgBox(L)[1]} width={nativeBgBox(L)[2]} height={nativeBgBox(L)[3]} pointerEvents="none" /></>
                 ) : (
                   <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill={`url(#kg-${L.id})`} />
@@ -1035,6 +1035,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                     </>
                   ) : null}
                   {guides.safe ? <rect x={KIOSK_MARGIN} y={KIOSK_MARGIN} width={KIOSK_W - 2 * KIOSK_MARGIN} height={KIOSK_H - 2 * KIOSK_MARGIN} fill="none" stroke="#A1FBF9" strokeOpacity={0.8} strokeDasharray={`${4 * rs} ${4 * rs}`} strokeWidth={rs} /> : null}
+                  {guides.steps && L.stepGuides ? L.stepGuides.map(([x1, y1, x2, y2], i) => <line key={`st${i}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#FFEB66" strokeOpacity={0.9} strokeWidth={1.5 * rs} strokeDasharray={`${6 * rs} ${4 * rs}`} />) : null}
                   {guides.bleed ? <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="none" stroke="#E53D2E" strokeWidth={rs} /> : null}
                   <rect x={0} y={0} width={KIOSK_W} height={KIOSK_H} fill="none" stroke="#EC008C" strokeWidth={1.5 * rs} />
                 </g>
@@ -1371,7 +1372,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
 
               <Sec title="Guides">
                 <div className="grid grid-cols-2 gap-1.5">
-                  {([["bleed", "Bleed"], ["safe", "Safe margin"], ["tv", "TV keep-clear"], ["rulers", "Rulers"]] as const).filter(([g]) => g !== "tv" || kioskHasTv(L.id)).map(([g, label]) => (
+                  {([["bleed", "Bleed"], ["safe", "Safe margin"], ["tv", "TV keep-clear"], ["rulers", "Rulers"], ["steps", "Step lines"]] as const).filter(([g]) => (g !== "tv" || kioskHasTv(L.id)) && (g !== "steps" || !!L.stepGuides?.length)).map(([g, label]) => (
                     <label key={g} className="flex items-center justify-between rounded-sm border border-white/10 bg-black/20 px-2 py-1.5 text-[11.5px] text-white/75">
                       {label}
                       <input type="checkbox" className="accent-[#003FC7]" checked={guides[g]} onChange={(e) => setGuides((s) => ({ ...s, [g]: e.target.checked }))} />

@@ -175,7 +175,7 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
     const formOf = (id: string) => `KN${ids.indexOf(id) + 1}`;
     // Native page (PDF y-up, bleed-box origin) → kiosk space.
     const P: Affine = [1, 0, 0, -1, -L.originX, L.mediaH - L.originY];
-    if (edits.ground) groundShading();
+    if (edits.ground || L.groundOnly) groundShading();
     else {
       // Ground page placed in its trim box (stretched for no-bleed or re-sized signs).
       const [bx, by, bw, bh] = nativeBgBox(L);

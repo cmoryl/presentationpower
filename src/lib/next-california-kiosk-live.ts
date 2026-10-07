@@ -16,6 +16,7 @@
 import layoutsJson from "@/lib/next-california-kiosk-live-layouts.json";
 import signLayoutsJson from "@/lib/legal-next-signage-layouts.json";
 import { marksSvg } from "@/lib/kiosk-marks";
+import { VENUE_STEP_GUIDES } from "@/lib/venue-step-guides";
 
 export const KIOSK_W = 3240;
 export const KIOSK_H = 6912;
@@ -81,6 +82,10 @@ export type LiveLayout = {
   face?: KioskFace;
   /** Set on general signage templates (Legal NEXT): any trim size, own safe margin, no TV. */
   sign?: { margin: number };
+  /** Draw `ground` instead of the native background page (venue staircase tiers). */
+  groundOnly?: boolean;
+  /** On-screen step/cut lines from the submitted file, trim pt [x1,y1,x2,y2]; never printed. */
+  stepGuides?: [number, number, number, number][];
 };
 
 /** Signage templates share the kiosk editor; their ids carry this prefix. */
@@ -161,8 +166,29 @@ export const liveLayoutById = (id: string): LiveLayout | undefined => {
   if (!sz || !base) return undefined;
   const L = resizedSignLayout(base, sz.w, sz.h);
   // Venue first versions keep their own id (one live file per spot artboard).
-  return isVenueFirstId(id) ? { ...L, id: sizedSignId(sz.base, sz.w, sz.h) } : L;
+  return isVenueFirstId(id) ? venueTier({ ...L, id: sizedSignId(sz.base, sz.w, sz.h) }, sz.base, sz.w, sz.h) : L;
 };
+
+/** Staircase ramp: bottom tier → top tier, enterprise palette. */
+const STAIR_RAMP = [{ offset: 0, color: "#03002C" }, { offset: 1, color: "#003FC7" }];
+const toHex = (c: [number, number, number]) => `#${c.map((v) => Math.round(v * 255).toString(16).padStart(2, "0")).join("")}`.toUpperCase();
+
+/** One tier of a multi-artboard venue spot: its slice of the shared ramp, plus the file's step lines. */
+function venueTier(L: LiveLayout, base: string, wIn: number, hIn: number): LiveLayout {
+  const m = base.match(/\.([0-9a-f]{8})-(\d+)of(\d+)$/);
+  if (!m) return L;
+  const n = Number(m[2]), N = Number(m[3]);
+  const g = VENUE_STEP_GUIDES[`${m[1]}-${n}`];
+  const guides = g && Math.abs(g.w - wIn) < 0.01 && Math.abs(g.h - hIn) < 0.01 ? g.lines : undefined;
+  if (N < 2) return { ...L, stepGuides: guides };
+  // Offset 0 is the top edge of the artboard (the higher end of the climb).
+  return {
+    ...L,
+    groundOnly: true,
+    ground: [{ offset: 0, color: toHex(groundAt(STAIR_RAMP, n / N)) }, { offset: 1, color: toHex(groundAt(STAIR_RAMP, (n - 1) / N)) }],
+    stepGuides: guides,
+  };
+}
 
 // ---- re-sized versions ------------------------------------------------------
 // A sign at a new trim size is its own layout id: `<base>~<w>x<h>` (inches,
@@ -171,13 +197,13 @@ export const liveLayoutById = (id: string): LiveLayout | undefined => {
 
 const SIZE_SEP = "~";
 /**
- * Venue spot first versions: `divsign-venue-first.<spot>-<n>~<w>x<h>` — the
- * generic NEXT-look template re-flowed to one artboard of a submitted file.
+ * Venue spot first versions: `divsign-venue-first.<spot>-<n>of<N>~<w>x<h>` — the
+ * generic NEXT-look template re-flowed to one artboard (tier n of N) of a submitted file.
  */
 export const VENUE_FIRST_TEMPLATE = "divsign-venue-first";
 export const isVenueFirstId = (id: string) => id.startsWith(`${VENUE_FIRST_TEMPLATE}.`);
-export const venueFirstFaceId = (spotId: string, n: number, wIn: number, hIn: number) =>
-  sizedSignId(`${VENUE_FIRST_TEMPLATE}.${spotId.slice(0, 8)}-${n}`, wIn, hIn);
+export const venueFirstFaceId = (spotId: string, n: number, N: number, wIn: number, hIn: number) =>
+  sizedSignId(`${VENUE_FIRST_TEMPLATE}.${spotId.slice(0, 8)}-${n}of${N}`, wIn, hIn);
 const templateLayoutId = (base: string) => (isVenueFirstId(base) ? VENUE_FIRST_TEMPLATE : base);
 export function sizedSignId(base: string, wIn: number, hIn: number): string {
   const f = (v: number) => String(+v.toFixed(3));
