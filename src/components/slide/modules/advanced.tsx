@@ -604,6 +604,18 @@ registerSlideModule({
                         <Figure value={s(heroA.value)} px={200} color="#FFFFFF" gradient={`linear-gradient(100deg, #FFFFFF 40%, ${INFO_FILL.aqua.bg} 75%, ${INFO_FILL.lavender.bg})`} />
                         <div style={{ fontSize: fillPx(26, "body"), fontWeight: 650, color: "#FFFFFF", paddingBottom: 22 }}>{s(heroA.label)}</div>
                       </div>
+                      {(() => {
+                        // Data-true year ruler: exactly one tick per stated year.
+                        const yrs = Math.round(Number(String(s(heroA.value)).replace(/[^0-9.]/g, "")));
+                        if (!yrs || yrs > 60) return null;
+                        return (
+                          <div aria-hidden data-decorative className="relative mt-8 flex items-end justify-between" style={{ height: 44 }}>
+                            {Array.from({ length: yrs }).map((_, k) => (
+                              <span key={k} style={{ width: 3, height: `${k % 5 === 4 || k === yrs - 1 ? 100 : 50}%`, borderRadius: 2, background: k === yrs - 1 ? INFO_FILL.aqua.bg : "#FFFFFF", opacity: 0.3 + (k / Math.max(1, yrs - 1)) * 0.7 }} />
+                            ))}
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
                   <div className="relative grid grid-cols-2 pt-7" style={{ borderTop: "1px solid rgba(255,255,255,0.2)", color: "#FFFFFF" }}>

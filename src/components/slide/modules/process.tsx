@@ -475,168 +475,119 @@ registerSlideModule({
         );
 
       case "MV-PROC-STEP-SPOTLIGHT": {
-        // One process step, spotlit. A circular media medallion carries the step
-        // numeral on the left; the right column runs the hero step title over an
-        // icon-led capability chain. House treatment throughout: accentInk tones,
-        // hairline rings with faded tails, cardWashGradient tiles.
+        // Editorial phase spread. A full-height photo panel carries an outsized
+        // phase numeral; the content side runs kicker, title and the tasks as
+        // indexed rows with icon wells. The photo alternates side by step so a
+        // run of phases reads as one series without three identical pages.
         const accent = accentInk(brand.tokens.accent, mode, 4.5);
         const rows = arr(c.items).slice(0, 5);
         const stepNo = s(c.stepNumber, String(Math.max(1, Number(c.stepIndex) || pageNumber || 1)));
-        const rowCount = Math.max(rows.length, 1);
-        const iconBox = rowCount > 4 ? 82 : 96;
-        const labelSize = rowCount > 4 ? 34 : 40;
+        const n = Number(stepNo) || 1;
+        const photoRight = n % 2 === 0;
+        const dense = rows.length > 3;
+        const AQ = "#7FE3F5", LV = "#C2A3FF";
+        const rule = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)";
+
+        const photo = (
+          <div
+            data-intro-item=""
+            data-intro-step={0}
+            className="relative h-full overflow-hidden"
+            style={{ borderRadius: 28, boxShadow: "0 30px 70px -30px rgba(3,0,44,0.55)" }}
+          >
+            <div data-plate-hide className="absolute inset-0">
+              <MediaTile
+                brand={brand}
+                seed={s(c.mediaSeed, s(c.title, "step-spotlight"))}
+                overrideUrl={s(c.mediaUrl)}
+                mediaPath={s(c.mediaPath)}
+                fit={s(c.mediaFit) || undefined}
+                focus={s(c.mediaFocus) || undefined}
+                zoom={Number(c.mediaZoom) || undefined}
+                className="h-full w-full"
+              />
+            </div>
+            <div
+              aria-hidden
+              data-decorative
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `linear-gradient(${photoRight ? 200 : 160}deg, color-mix(in oklab, ${brand.tokens.primary} 25%, transparent) 0%, color-mix(in oklab, ${brand.tokens.primary} 55%, transparent) 55%, color-mix(in oklab, ${brand.tokens.primary} 92%, transparent) 100%)`,
+              }}
+            />
+            <div
+              aria-hidden
+              data-decorative
+              className="absolute"
+              style={{ left: 0, right: 0, bottom: 0, height: 6, background: `linear-gradient(90deg, ${AQ}, ${LV})` }}
+            />
+            <div data-on-media className="absolute" style={{ left: 56, bottom: 44, color: "#FFFFFF" }}>
+              <div style={{ fontSize: fillPx(20, "kicker"), letterSpacing: "0.28em", textTransform: "uppercase", fontWeight: 650, opacity: 0.85 }}>
+                Phase
+              </div>
+              <div style={{ fontSize: fillPx(300, "display"), fontWeight: 750, lineHeight: 0.82, letterSpacing: "-0.06em" }}>
+                {stepNo.padStart(2, "0")}
+              </div>
+            </div>
+          </div>
+        );
+
+        const body = (
+          <div className="flex min-w-0 flex-col justify-center">
+            <div data-intro-item="" data-intro-step={1}>
+              <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
+            </div>
+            <div className="mt-12 flex flex-col" style={{ borderTop: `1px solid ${rule}` }}>
+              {rows.map((raw, i) => {
+                const it = obj(raw);
+                const RowIcon = it.icon ? iconByName(s(it.icon)) : null;
+                const col = cellAccent(it, accent, mode);
+                return (
+                  <div
+                    key={i}
+                    data-intro-item=""
+                    data-intro-step={i + 2}
+                    className="flex items-center"
+                    style={{ gap: 32, paddingBlock: dense ? 22 : 34, borderBottom: `1px solid ${rule}` }}
+                  >
+                    <div style={{ width: 70, fontSize: fillPx(26, "figure"), fontWeight: 650, color: ink.muted, letterSpacing: "0.04em" }}>
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
+                    <div
+                      className="relative flex shrink-0 items-center justify-center"
+                      style={{ width: dense ? 72 : 84, height: dense ? 72 : 84, borderRadius: 20, ...iconWellStyle(it) }}
+                    >
+                      <div aria-hidden data-decorative className="absolute inset-0" style={{ borderRadius: 20, backgroundImage: cellWash(it, col) }} />
+                      <span className="relative" style={{ color: col }}>
+                        {RowIcon ? <RowIcon size={Math.round((dense ? 72 : 84) * 0.46 * cellIconScale(it))} strokeWidth={1.7} /> : null}
+                      </span>
+                    </div>
+                    <div className="min-w-0">
+                      <div style={{ fontSize: dense ? 34 : 40, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.15, color: ink.strong }}>
+                        {s(it.label)}
+                      </div>
+                      {s(it.body) && (
+                        <div className="mt-1.5" style={{ fontSize: fillPx(22, "body"), lineHeight: 1.35, color: ink.body }}>
+                          {s(it.body)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
 
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <div
               data-portrait="spot-stack"
-              className="grid h-full items-center"
-              style={{ gridTemplateColumns: "0.92fr 1.08fr", columnGap: 96 }}
+              className="grid h-full"
+              style={{ gridTemplateColumns: photoRight ? "1.1fr 0.9fr" : "0.9fr 1.1fr", columnGap: 96 }}
             >
-              {/* ── Numbered medallion ───────────────────────────────────── */}
-              <div
-                data-intro-item=""
-                data-intro-step={0}
-                className="relative mx-auto aspect-square w-full"
-                style={{ maxWidth: 620 }}
-              >
-                <LoopHalo uid={`sp-${stepNo}`} />
-
-                {/* Photo medallion. */}
-                <div data-plate-hide className="absolute overflow-hidden rounded-full" style={{ inset: "7%" }}>
-                  <MediaTile
-                    brand={brand}
-                    seed={s(c.mediaSeed, s(c.title, "step-spotlight"))}
-                    overrideUrl={s(c.mediaUrl)}
-                    mediaPath={s(c.mediaPath)}
-                    fit={s(c.mediaFit) || undefined}
-                    focus={s(c.mediaFocus) || undefined}
-                    zoom={Number(c.mediaZoom) || undefined}
-                    className="h-full w-full rounded-full"
-                  />
-                  {/* Accent duotone wash so the numeral always clears contrast. */}
-                  <div
-                    aria-hidden
-                    data-decorative
-                    className="absolute inset-0 rounded-full"
-                    style={{
-                      backgroundImage: `linear-gradient(150deg, color-mix(in oklab, ${brand.tokens.primary} 62%, transparent) 0%, color-mix(in oklab, ${accent} 34%, transparent) 100%)`,
-                    }}
-                  />
-                  <div
-                    data-on-media
-                    className="absolute inset-0 flex items-center justify-center"
-                    style={{
-                      color: "#FFFFFF",
-                      fontSize: fillPx(220, "display"),
-                      fontWeight: 700,
-                      lineHeight: 1,
-                      letterSpacing: "-0.05em",
-                    }}
-                  >
-                    {stepNo}
-                  </div>
-                </div>
-              </div>
-
-              {/* ── Hero title + icon chain ──────────────────────────────── */}
-              <div className="flex flex-col justify-center">
-                <div data-intro-item="" data-intro-step={1}>
-                  <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
-                </div>
-                {/* gap:0 on the stack — the chevron carries equal margins above
-                  and below itself so every row sits on the same rhythm. */}
-                <div className="mt-12 flex flex-col" style={{ gap: 0 }}>
-                  {rows.map((raw, i) => {
-                    const it = obj(raw);
-                    const RowIcon = it.icon ? iconByName(s(it.icon)) : null;
-                    const chainGap = rowCount > 4 ? 10 : 18;
-                    return (
-                      <div key={i} data-intro-item="" data-intro-step={i + 2}>
-                        {i > 0 && (
-                          <div
-                            aria-hidden
-                            data-decorative
-                            className="flex items-center justify-center"
-                            style={{
-                              width: iconBox,
-                              height: rowCount > 4 ? 20 : 30,
-                              marginTop: chainGap,
-                              marginBottom: chainGap,
-                              color: accent,
-                            }}
-                          >
-                            <ChevronsDown size={rowCount > 4 ? 22 : 28} strokeWidth={2.5} />
-                          </div>
-                        )}
-
-                        <div className="flex items-center" style={{ gap: 34 }}>
-                          <div
-                            className="relative flex shrink-0 items-center justify-center"
-                            style={{ width: iconBox, height: iconBox, ...iconWellStyle(it) }}
-                          >
-                            <div
-                              aria-hidden
-                              data-decorative
-                              className="absolute inset-0"
-                              style={{
-                                borderRadius: 20,
-                                backgroundImage: cellWash(it, cellAccent(it, accent, mode)),
-                              }}
-                            />
-                            <div
-                              aria-hidden
-                              data-decorative
-                              className="absolute inset-0"
-                              style={openBottomFrame(cellAccent(it, accent, mode), 20)}
-                            />
-                            <span
-                              className="relative"
-                              style={{ color: cellAccent(it, accent, mode) }}
-                            >
-                              {RowIcon ? (
-                                <RowIcon
-                                  size={Math.round(iconBox * 0.46 * cellIconScale(it))}
-                                  strokeWidth={1.7}
-                                />
-                              ) : (
-                                <span style={{ fontSize: fillPx(30, "figure"), fontWeight: 700 }}>
-                                  {i + 1}
-                                </span>
-                              )}
-                            </span>
-                          </div>
-                          <div className="min-w-0">
-                            <div
-                              style={{
-                                fontSize: labelSize,
-                                fontWeight: 600,
-                                letterSpacing: "-0.02em",
-                                lineHeight: 1.15,
-                                color: ink.strong,
-                              }}
-                            >
-                              {s(it.label)}
-                            </div>
-                            {s(it.body) && (
-                              <div
-                                className="mt-1.5"
-                                style={{
-                                  fontSize: fillPx(22, "body"),
-                                  lineHeight: 1.35,
-                                  color: ink.body,
-                                }}
-                              >
-                                {s(it.body)}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+              {photoRight ? body : photo}
+              {photoRight ? photo : body}
             </div>
           </SlideFrame>
         );
