@@ -10,6 +10,7 @@ import { ArrowLeft, Check, ExternalLink, Search, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EventLearningPanel } from "@/components/events/EventLearningPanel";
 import { EventAssetsPanel } from "@/components/events/EventAssetsPanel";
+import { VenueAssetSubmissions } from "@/components/events/VenueAssetSubmissions";
 import {
   getEventIntake,
   researchVenue,
@@ -131,6 +132,8 @@ function IntakePage() {
         <div className="mt-8">
           <EventAssetsPanel eventId={eventId} />
         </div>
+
+        <VenueAssetSubmissions eventId={eventId} eventLabel={plan?.name ?? "this event"} />
 
         <h2 className="mt-12 text-lg font-bold text-[#03002C]">Intake checklist</h2>
         <ul className="mt-3 grid gap-3">
