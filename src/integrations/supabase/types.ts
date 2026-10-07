@@ -3323,6 +3323,93 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_signals: {
+        Row: {
+          created_at: string
+          created_by: string
+          detail: Json
+          distilled_at: string | null
+          division_id: string | null
+          id: string
+          source: string
+          subject_id: string | null
+          subject_type: string | null
+          summary: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          detail?: Json
+          distilled_at?: string | null
+          division_id?: string | null
+          id?: string
+          source: string
+          subject_id?: string | null
+          subject_type?: string | null
+          summary: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          detail?: Json
+          distilled_at?: string | null
+          division_id?: string | null
+          id?: string
+          source?: string
+          subject_id?: string | null
+          subject_type?: string | null
+          summary?: string
+        }
+        Relationships: []
+      }
+      learning_suggestions: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          division_id: string | null
+          evidence_signal_ids: string[]
+          id: string
+          kind: string
+          knowledge_entry_id: string | null
+          status: string
+          title: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          division_id?: string | null
+          evidence_signal_ids?: string[]
+          id?: string
+          kind: string
+          knowledge_entry_id?: string | null
+          status?: string
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          division_id?: string | null
+          evidence_signal_ids?: string[]
+          id?: string
+          kind?: string
+          knowledge_entry_id?: string | null
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
       library_slide_examples: {
         Row: {
           brand_mode_id: string | null

@@ -391,6 +391,26 @@ export async function saveDeckToCloudCore(
     return { deckUuid, briefUuid, serverUpdatedAt: await readDeckStamp(sb, deckUuid) };
   }
 
+  // Learning loop: remember text people corrected (best-effort, never blocks).
+  try {
+    const { textCorrections, logLearningSignal } = await import("@/lib/learning.server");
+    const prior = new Map(existingList.map((r) => [String(r.content?.["__localId"] ?? r.id), r.content]));
+    const fixes = data.deck.slides
+      .flatMap((s) => (prior.has(s.id) ? textCorrections(prior.get(s.id), s.content).map((f) => ({ ...f, slide: s.variantId })) : []))
+      .slice(0, 12);
+    if (fixes.length > 0) {
+      await logLearningSignal(sb, userId, {
+        source: "edit",
+        subjectType: "deck",
+        subjectId: deckUuid,
+        summary: `${fixes.length} text correction${fixes.length === 1 ? "" : "s"} saved on a deck`,
+        detail: { fixes },
+      });
+    }
+  } catch {
+    /* best-effort */
+  }
+
   {
     const rows = [...data.deck.slides]
       .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
