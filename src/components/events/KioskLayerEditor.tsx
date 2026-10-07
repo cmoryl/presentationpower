@@ -747,8 +747,8 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
     const out: Hit[] = [];
     const tv = TV;
     const hasTv = kioskHasTv(L.id);
-    const test = (sel: NonNullable<Sel>, label: string, b: { x0: number; x1: number; y0: number; y1: number }, isText: boolean) => {
-      if (hasTv && b.x0 < tv.x + tv.w && b.x1 > tv.x && b.y0 < tv.y + tv.h && b.y1 > tv.y) out.push({ sel, label, issue: "Sits over the TV area — it will be hidden by the screen", level: "error" });
+    const test = (sel: NonNullable<Sel>, label: string, b: { x0: number; x1: number; y0: number; y1: number }, isText: boolean, tvCheck = true) => {
+      if (hasTv && tvCheck && b.x0 < tv.x + tv.w && b.x1 > tv.x && b.y0 < tv.y + tv.h && b.y1 > tv.y) out.push({ sel, label, issue: "Sits over the TV area — it will be hidden by the screen", level: "error" });
       if (isText && (b.x0 < 0 || b.x1 > KIOSK_W || b.y0 < 0 || b.y1 > KIOSK_H)) out.push({ sel, label, issue: "Crosses the trim edge — words will be cut off", level: "error" });
       else if (isText && (b.x0 < KIOSK_MARGIN || b.x1 > KIOSK_W - KIOSK_MARGIN || b.y0 < KIOSK_MARGIN || b.y1 > KIOSK_H - KIOSK_MARGIN)) out.push({ sel, label, issue: "Outside the 2 in safe margin", level: "warn" });
       else if (!isText && (b.x1 < 0 || b.x0 > KIOSK_W || b.y1 < 0 || b.y0 > KIOSK_H)) out.push({ sel, label, issue: "Entirely off the kiosk — it won't print", level: "warn" });
@@ -758,7 +758,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
       test({ kind: "text", id: t.id }, `“${t.lines[0] ?? ""}”`, { x0: Math.min(...bx.map((b) => b.x)), x1: Math.max(...bx.map((b) => b.x + b.w)), y0: t.ky - t.ksize * 0.8, y1: bx[bx.length - 1]!.y + t.ksize * 0.2 }, true);
     }
     for (const q of placed.flatMap((p) => p.parts).filter((q) => !q.hidden))
-      test({ kind: "part", id: q.part.id }, "Graphic object", { x0: q.x, y0: q.y, x1: q.x + (q.src.x1 - q.src.x0) * q.scale, y1: q.y + (q.src.y1 - q.src.y0) * q.scale }, false);
+      test({ kind: "part", id: q.part.id }, "Graphic object", { x0: q.x, y0: q.y, x1: q.x + (q.src.x1 - q.src.x0) * q.scale, y1: q.y + (q.src.y1 - q.src.y0) * q.scale }, false, !L.tv);
     for (const d of (edits.dividers ?? []).filter((d) => !d.hidden))
       test({ kind: "divider", id: d.id }, "Accent rule", { x0: d.x, x1: d.x + d.w, y0: d.y, y1: d.y + d.h }, false);
     return out;
