@@ -74,6 +74,17 @@ export const setIntakeStatus = createServerFn({ method: "POST" })
       { onConflict: "event_id,item_key" },
     );
     if (error) throw new Error(error.message);
+    if (data.status !== "missing") {
+      const { logLearningSignal } = await import("./learning.server");
+      await logLearningSignal(context.supabase, context.userId, {
+        source: "outcome",
+        subjectType: "event-intake",
+        subjectId: data.itemKey,
+        eventId: data.eventId,
+        summary: `Event intake: "${data.itemKey}" marked ${data.status.replace("_", " ")}${data.note ? ` — ${data.note}` : ""}`,
+        detail: { itemKey: data.itemKey, status: data.status, note: data.note },
+      });
+    }
     return { ok: true };
   });
 
@@ -88,6 +99,19 @@ export const setResearchStatus = createServerFn({ method: "POST" })
       .update({ status: data.status, confirmed_by: data.status === "confirmed" ? context.userId : null })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+    if (data.status !== "suggested") {
+      const { data: row } = await context.supabase.from("event_venue_research").select("*").eq("id", data.id).maybeSingle();
+      const r = (row ?? {}) as Record<string, unknown>;
+      const { logLearningSignal } = await import("./learning.server");
+      await logLearningSignal(context.supabase, context.userId, {
+        source: "outcome",
+        subjectType: "venue-research",
+        subjectId: data.id,
+        eventId: (r.event_id as string) ?? null,
+        summary: `Online venue research ${data.status}: ${String(r.title ?? r.summary ?? r.item_key ?? "finding").slice(0, 300)}${r.source_url ? ` (${r.source_url})` : ""}`,
+        detail: { status: data.status, finding: r },
+      });
+    }
     return { ok: true };
   });
 
