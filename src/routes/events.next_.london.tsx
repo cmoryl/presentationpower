@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 
 import { AppShell } from "@/components/AppShell";
+import { EventLearningPanel } from "@/components/events/EventLearningPanel";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { useBoothTemplates } from "@/hooks/use-booth-templates";
@@ -1368,6 +1369,11 @@ function LondonSignagePage() {
             </div>
           ))}
         </section>
+        {userId && (
+          <div className="mt-12">
+            <EventLearningPanel eventId="london-2026" city="London" />
+          </div>
+        )}
         {/* Reference: spec, grounds and agendas sit below the panels so they never push them down. */}
         <section id="london-reference" aria-label="Reference" className="mt-12 scroll-mt-24 border-t border-black/10">
           <h2 className="pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-[#03002C]/70">

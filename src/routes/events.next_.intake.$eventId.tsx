@@ -8,6 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Check, ExternalLink, Search, X } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import { EventLearningPanel } from "@/components/events/EventLearningPanel";
 import { EventAssetsPanel } from "@/components/events/EventAssetsPanel";
 import {
   getEventIntake,
@@ -233,6 +234,9 @@ function IntakePage() {
             <li className="text-sm text-[#03002C]/65">No research yet.</li>
           )}
         </ul>
+        <div className="mt-12">
+          <EventLearningPanel eventId={eventId} city={plan?.city ?? undefined} />
+        </div>
       </div>
     </AppShell>
   );

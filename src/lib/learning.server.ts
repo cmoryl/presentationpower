@@ -7,6 +7,8 @@ export type LearningSignalInput = {
   subjectType?: string | null;
   subjectId?: string | null;
   divisionId?: string | null;
+  eventId?: string | null;
+  city?: string | null;
   summary: string;
   detail?: Record<string, unknown>;
 };
@@ -18,6 +20,8 @@ export async function logLearningSignal(sb: Sb, userId: string, s: LearningSigna
       subject_type: s.subjectType ?? null,
       subject_id: s.subjectId ?? null,
       division_id: s.divisionId ?? null,
+      event_id: s.eventId ?? null,
+      city: s.city ?? null,
       summary: s.summary.slice(0, 1000),
       detail: s.detail ?? {},
       created_by: userId,

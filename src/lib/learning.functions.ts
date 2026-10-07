@@ -9,6 +9,9 @@ export const logOutcome = createServerFn({ method: "POST" })
       .object({
         subjectType: z.enum(["event", "print", "deck", "social", "other"]),
         divisionId: z.string().max(80).optional(),
+        eventId: z.string().max(80).optional(),
+        city: z.string().max(120).optional(),
+        phase: z.enum(["planning", "design", "print", "onsite", "post-event"]).optional(),
         whatWorked: z.string().max(2000).optional(),
         whatWentWrong: z.string().max(2000).optional(),
       })
@@ -21,10 +24,12 @@ export const logOutcome = createServerFn({ method: "POST" })
       source: "outcome",
       subjectType: data.subjectType,
       divisionId: data.divisionId ?? null,
-      summary: [data.whatWorked && `Worked: ${data.whatWorked}`, data.whatWentWrong && `Went wrong: ${data.whatWentWrong}`]
+      eventId: data.eventId ?? null,
+      city: data.city ?? null,
+      summary: [data.phase && `[${data.phase}]`, data.eventId && `Event ${data.eventId}${data.city ? ` (${data.city})` : ""}:`, data.whatWorked && `Worked: ${data.whatWorked}`, data.whatWentWrong && `Went wrong: ${data.whatWentWrong}`]
         .filter(Boolean)
-        .join(" | "),
-      detail: { whatWorked: data.whatWorked ?? null, whatWentWrong: data.whatWentWrong ?? null },
+        .join(" "),
+      detail: { phase: data.phase ?? null, whatWorked: data.whatWorked ?? null, whatWentWrong: data.whatWentWrong ?? null },
     });
     return { ok: true };
   });
@@ -50,7 +55,7 @@ export const distillLearning = createServerFn({ method: "POST" })
     if (!(roles ?? []).some((r) => r.role === "admin")) throw new Error("Only admins can run learning.");
     const { data: signals, error } = await sb
       .from("learning_signals")
-      .select("id, source, subject_type, division_id, summary, detail")
+      .select("id, source, subject_type, division_id, event_id, city, summary, detail")
       .is("distilled_at", null)
       .order("created_at")
       .limit(80);
@@ -60,7 +65,7 @@ export const distillLearning = createServerFn({ method: "POST" })
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("AI is not configured.");
     const prompt = signals
-      .map((s) => `[${s.id}] (${s.source}/${s.subject_type ?? "-"}${s.division_id ? `/${s.division_id}` : ""}) ${s.summary}${s.source === "edit" ? ` ${JSON.stringify(s.detail).slice(0, 1200)}` : ""}`)
+      .map((s) => `[${s.id}] (${s.source}/${s.subject_type ?? "-"}${s.division_id ? `/${s.division_id}` : ""}${s.event_id ? ` event=${s.event_id}` : ""}${s.city ? ` city=${s.city}` : ""}) ${s.summary}${s.source === "edit" ? ` ${JSON.stringify(s.detail).slice(0, 1200)}` : ""}`)
       .join("\n");
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -72,7 +77,7 @@ export const distillLearning = createServerFn({ method: "POST" })
           {
             role: "system",
             content:
-              "You turn feedback from a TransPerfect brand content system into reusable learning. Input: people's text corrections, reviewer approvals/rejections with reasons, and event/print outcome reports. Output JSON {\"suggestions\":[{\"kind\":\"rule\"|\"lesson\"|\"knowledge\"|\"template_idea\",\"title\":string,\"body\":string,\"division_id\":string|null,\"evidence\":[signal ids]}]}. rule = a do/don't for future generation drawn from repeated corrections or rejections; lesson = an event/print lesson; knowledge = a reusable fact or wording people consistently prefer; template_idea = repeated custom work worth making a template. Only propose what the evidence supports; never invent facts, numbers, dates or venues. Skip one-off typo fixes. Merge duplicates. Max 12.",
+              "You turn feedback from a TransPerfect brand content system into reusable learning. Input: people's text corrections, reviewer approvals/rejections with reasons, and event/print outcome reports. Output JSON {\"suggestions\":[{\"kind\":\"rule\"|\"lesson\"|\"knowledge\"|\"template_idea\",\"title\":string,\"body\":string,\"division_id\":string|null,\"event_id\":string|null,\"city\":string|null,\"evidence\":[signal ids]}]}. rule = a do/don't for future generation drawn from repeated corrections or rejections; lesson = an event/print lesson; knowledge = a reusable fact or wording people consistently prefer; template_idea = repeated custom work worth making a template. Events matter most: turn venue intake, research confirmations/rejections and event debriefs into lessons that help the NEXT event (what to ask the venue early, what research was wrong, print and onsite issues); set event_id/city when a lesson is specific to one, null when it applies to all events. Only propose what the evidence supports; never invent facts, numbers, dates or venues. Skip one-off typo fixes. Merge duplicates. Max 20.",
           },
           { role: "user", content: prompt },
         ],
@@ -88,10 +93,12 @@ export const distillLearning = createServerFn({ method: "POST" })
             title: z.string().min(3).max(200),
             body: z.string().min(3).max(3000),
             division_id: z.string().max(80).nullable().optional(),
+            event_id: z.string().max(80).nullable().optional(),
+            city: z.string().max(120).nullable().optional(),
             evidence: z.array(z.string()).optional(),
           }),
         )
-        .max(20),
+        .max(30),
     });
     let parsed: z.infer<typeof Out>;
     try {
@@ -105,6 +112,8 @@ export const distillLearning = createServerFn({ method: "POST" })
       title: s.title,
       body: s.body,
       division_id: s.division_id ?? null,
+      event_id: s.event_id ?? null,
+      city: s.city ?? null,
       evidence_signal_ids: (s.evidence ?? []).filter((e) => ids.has(e)),
       created_by: userId,
     }));
@@ -136,6 +145,7 @@ export const decideSuggestion = createServerFn({ method: "POST" })
     if (!s) throw new Error("Suggestion not found (admins only).");
     if (s.status !== "pending") throw new Error("This suggestion was already decided.");
     let entryId: string | null = null;
+    let eventEntryId: string | null = null;
     if (data.status === "approved") {
       const title = data.title ?? s.title;
       const body = data.body ?? s.body;
@@ -155,6 +165,27 @@ export const decideSuggestion = createServerFn({ method: "POST" })
         .single();
       if (kErr) throw new Error(kErr.message);
       entryId = entry.id;
+      // Event lessons also go into the event knowledge the events assistant
+      // searches before any new venue or signage work.
+      if (s.kind === "lesson" || s.event_id || s.city) {
+        const { data: ek, error: eErr } = await sb
+          .from("event_venue_knowledge")
+          .insert({
+            event_id: s.event_id ?? "all-events",
+            city: s.city ?? "All events",
+            kind: "lesson",
+            title,
+            body,
+            source: "learned",
+            fingerprint: `learned:${s.id}`,
+            facts: { evidence_signal_ids: s.evidence_signal_ids, approved_by: userId } as never,
+            created_by: userId,
+          })
+          .select("id")
+          .single();
+        if (eErr) throw new Error(`Saved to knowledge, but couldn't add to event knowledge: ${eErr.message}`);
+        eventEntryId = ek.id;
+      }
     }
     const { error: uErr } = await sb
       .from("learning_suggestions")
@@ -164,10 +195,30 @@ export const decideSuggestion = createServerFn({ method: "POST" })
         decided_by: userId,
         decided_at: new Date().toISOString(),
         knowledge_entry_id: entryId,
+        event_knowledge_id: eventEntryId,
         ...(data.title ? { title: data.title } : {}),
         ...(data.body ? { body: data.body } : {}),
       })
       .eq("id", data.id);
     if (uErr) throw new Error(uErr.message);
     return { ok: true, knowledgeEntryId: entryId };
+  });
+
+export const listEventLessons = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => z.object({ city: z.string().max(120).optional(), eventId: z.string().max(80).optional() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase
+      .from("event_venue_knowledge")
+      .select("id, event_id, city, title, body, kind, source, updated_at")
+      .in("kind", ["lesson"])
+      .order("updated_at", { ascending: false })
+      .limit(300);
+    if (error) throw new Error(error.message);
+    const list = rows ?? [];
+    const city = data.city?.toLowerCase();
+    // This event first, then lessons for all events, then other cities.
+    const rank = (r: (typeof list)[number]) =>
+      r.event_id === data.eventId ? 0 : r.event_id === "all-events" ? 1 : city && r.city?.toLowerCase() === city ? 1 : 2;
+    return list.sort((a, b) => rank(a) - rank(b)).slice(0, 40);
   });

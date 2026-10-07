@@ -3325,11 +3325,13 @@ export type Database = {
       }
       learning_signals: {
         Row: {
+          city: string | null
           created_at: string
           created_by: string
           detail: Json
           distilled_at: string | null
           division_id: string | null
+          event_id: string | null
           id: string
           source: string
           subject_id: string | null
@@ -3337,11 +3339,13 @@ export type Database = {
           summary: string
         }
         Insert: {
+          city?: string | null
           created_at?: string
           created_by: string
           detail?: Json
           distilled_at?: string | null
           division_id?: string | null
+          event_id?: string | null
           id?: string
           source: string
           subject_id?: string | null
@@ -3349,11 +3353,13 @@ export type Database = {
           summary: string
         }
         Update: {
+          city?: string | null
           created_at?: string
           created_by?: string
           detail?: Json
           distilled_at?: string | null
           division_id?: string | null
+          event_id?: string | null
           id?: string
           source?: string
           subject_id?: string | null
@@ -3365,12 +3371,15 @@ export type Database = {
       learning_suggestions: {
         Row: {
           body: string
+          city: string | null
           created_at: string
           created_by: string
           decided_at: string | null
           decided_by: string | null
           decision_note: string | null
           division_id: string | null
+          event_id: string | null
+          event_knowledge_id: string | null
           evidence_signal_ids: string[]
           id: string
           kind: string
@@ -3380,12 +3389,15 @@ export type Database = {
         }
         Insert: {
           body: string
+          city?: string | null
           created_at?: string
           created_by: string
           decided_at?: string | null
           decided_by?: string | null
           decision_note?: string | null
           division_id?: string | null
+          event_id?: string | null
+          event_knowledge_id?: string | null
           evidence_signal_ids?: string[]
           id?: string
           kind: string
@@ -3395,12 +3407,15 @@ export type Database = {
         }
         Update: {
           body?: string
+          city?: string | null
           created_at?: string
           created_by?: string
           decided_at?: string | null
           decided_by?: string | null
           decision_note?: string | null
           division_id?: string | null
+          event_id?: string | null
+          event_knowledge_id?: string | null
           evidence_signal_ids?: string[]
           id?: string
           kind?: string
