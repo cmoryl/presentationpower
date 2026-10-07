@@ -5,6 +5,7 @@
 import type { NextRegistryRow } from "@/lib/next-event";
 import { financePillarRows } from "@/lib/next-finance-pillars";
 import { globallinkPedestalRows } from "@/lib/next-globallink-pedestals";
+import { sfScreenSurroundRows } from "@/lib/next-sf-screen-surrounds";
 import financeDeskPreview from "@/assets/finance-pillars/reg-desk.jpg.asset.json";
 import globallinkDeskPreview from "@/assets/globallink-desk/reg-desk.jpg.asset.json";
 import globallinkDeskAi from "@/assets/globallink-desk/reg-desk.ai.asset.json";
@@ -35,5 +36,5 @@ function deskRows(): NextRegistryRow[] {
 }
 
 export function suppliedTemplateRows(): NextRegistryRow[] {
-  return [...financePillarRows(), ...globallinkPedestalRows(), ...deskRows()];
+  return [...financePillarRows(), ...globallinkPedestalRows(), ...sfScreenSurroundRows(), ...deskRows()];
 }
