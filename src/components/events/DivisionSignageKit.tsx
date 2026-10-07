@@ -104,7 +104,7 @@ function SignCard({ sign, compact }: { sign: DivisionSign; compact?: boolean }) 
               </Link>
             </Button>
           ) : null}
-          <Sign3dLink sign={sign.liveSignId} label={sign.name ?? "sign"} />
+          <Sign3dLink sign={sign.liveSignId} label={sign.label} />
         </div>
       )}
     </figure>
