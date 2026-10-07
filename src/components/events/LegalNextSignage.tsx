@@ -4,7 +4,7 @@ import { Download, PenLine } from "lucide-react";
 
 import { KioskLiveThumb } from "@/components/events/KioskLayerEditor";
 import { Button } from "@/components/ui/button";
-import { LEGAL_NEXT_SIGNS, SF_SCREEN_SURROUNDS, legalSignLayout, legalSignMasterUrl, type LegalSign } from "@/lib/legal-next-signage";
+import { DIVISION_LIVE_SIGNS, LEGAL_NEXT_SIGNS, SF_SCREEN_SURROUNDS, legalSignLayout, legalSignMasterUrl, type LegalSign } from "@/lib/legal-next-signage";
 
 /** Legal NEXT general signage templates: open in the layer editor or take the supplied file. */
 export function LegalNextSignage() {
@@ -19,6 +19,14 @@ export function SfScreenSurrounds() {
   return (
     <SignTemplateList id="sf-screen-surrounds" title="Breakout screen surrounds" signs={SF_SCREEN_SURROUNDS} masterLabel="Supplied .ai"
       intro="Built from your live Illustrator files. Two rooms use the three-sided surround and one uses the all-sides surround. Open one to move, recolour or hide the background or either chevron group, then download live files with ⅛ in bleed. The red cut line is a guide and isn't printed." />
+  );
+}
+
+/** San Francisco demo booths: the shared NEXT demo booth template (more versions to follow). */
+export function SfDemoBooths() {
+  return (
+    <SignTemplateList id="sf-demo-booths" title="Demo booths" signs={DIVISION_LIVE_SIGNS.filter((s) => s.id === "demo-booth")} masterLabel="Supplied .ai"
+      intro="The basic demo booth from the GlobalLink Coach file: a 45 × 96 in front and two 4 × 96 in sides. Open it to swap the top logo, retype the wording or change the background. The TV placement box is a guide and isn't printed." />
   );
 }
 
