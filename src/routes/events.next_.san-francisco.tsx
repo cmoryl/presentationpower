@@ -29,6 +29,7 @@ import { CitySectionBar, SAN_FRANCISCO_SECTIONS } from "@/components/events/City
 import { CaliforniaKioskBrowser } from "@/components/events/CaliforniaKioskBrowser";
 import { SfPartnerKioskShowcase } from "@/components/events/SfPartnerKioskShowcase";
 import { SfScreenSurrounds } from "@/components/events/LegalNextSignage";
+import { VenueAssetSubmissions } from "@/components/events/VenueAssetSubmissions";
 import { SF_READY, SF_VENUE, sfLocationStack } from "@/lib/next-sf-event";
 
 export const Route = createFileRoute("/events/next_/san-francisco")({
@@ -185,6 +186,9 @@ function SanFranciscoPage() {
               <MapPin size={15} aria-hidden /> {SF_VENUE.city}
             </span>
           </div>
+          <a href="#venue-assets" className="mt-7 inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-[13px] font-semibold text-[#03002C] hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A1FBF9]">
+            + Add venue spot & artwork
+          </a>
         </header>
 
         <CitySectionBar sections={SAN_FRANCISCO_SECTIONS} />
@@ -226,6 +230,8 @@ function SanFranciscoPage() {
             ))}
           </ul>
         </section>
+
+        <VenueAssetSubmissions eventId="san-francisco" eventLabel="NEXT San Francisco" />
 
         {/* Partner kiosks, live. */}
         <section id="sf-kiosks" className="mt-12 scroll-mt-24" aria-labelledby="sf-kiosks-h">
