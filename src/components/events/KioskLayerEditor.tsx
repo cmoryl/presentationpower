@@ -260,6 +260,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
   }, [edits, EK, userId, canSave]);
 
   const placed = useMemo(() => layoutKiosk(L, edits), [L, edits]);
+  const bands = useMemo(() => stepBands(L.stepGuides, L.trimH), [L]);
   const ground = kioskGround(L, edits);
   const symId = `kart-${L.id}`;
 
