@@ -41,3 +41,35 @@ export async function publishBoothArt(front: LiveLayout, userId: string | null):
   );
   return revision;
 }
+
+/** Which 3D sign (event_booths source id) and face a saved sign face feeds; null = no 3D model. */
+export function signArtTarget(layoutId: string): { source: string; face: "front" | "left" | "right" } | null {
+  if (layoutId.includes("~")) return null; // re-sized copies are not the 3D sign
+  const d = layoutId.match(/^divsign-transperfect-demobooth-(front|left|right)$/);
+  if (d) return { source: "demo-booth", face: d[1] as "front" | "left" | "right" };
+  const s = layoutId.match(/^sfsurround-(all|three)$/);
+  if (s) return { source: `sf-surround-${s[1]}`, face: "front" };
+  const f = layoutId.match(/^divsign-(finance-pillar-(?:welcome|profile))$/);
+  if (f) return { source: f[1]!, face: "front" };
+  return null;
+}
+
+/** After a sign face is saved, send its PNG proof to the matching 3D sign (Element is the source of truth). */
+export async function publishSignArt(L: LiveLayout, userId: string | null): Promise<string | null> {
+  const t = signArtTarget(L.id);
+  if (!t) return null;
+  const { data: booth } = await supabase.from("event_booths").select("id").eq("source_booth_id", t.source).maybeSingle();
+  if (!booth) return null;
+  const blob = await proofPng(await pressFrontSvg(L, await loadEdits(kioskEditKey(L))), t.face === "front" ? 900 : 160, kioskFaceW(L), kioskFaceH(L));
+  const revision = new Date().toISOString();
+  const path = `${booth.id}/${t.face}.png`;
+  const up = await supabase.storage.from("booth-proofs").upload(path, blob, { upsert: true, contentType: "image/png" });
+  if (up.error) throw new Error(`3D artwork not sent: ${up.error.message}`);
+  const { error } = await supabase.from("booth_art").upsert({ booth_id: booth.id, face: t.face, path, revision, updated_by: userId });
+  if (error) throw new Error(`3D artwork not sent: ${error.message}`);
+  window.dispatchEvent(new CustomEvent("booth-art-published", { detail: L.id }));
+  notifyBoothHub({ data: { boothId: booth.id, revision } }).catch((e) =>
+    window.dispatchEvent(new CustomEvent("booth-art-failed", { detail: `BoothHUB wasn't notified: ${e instanceof Error ? e.message : e}` })),
+  );
+  return revision;
+}
