@@ -351,6 +351,17 @@ export const decideApproval = createServerFn({ method: "POST" })
       changeReasons: data.status === "pending" ? [] : reasons,
     });
 
+    if (decided) {
+      const { logLearningSignal } = await import("./learning.server");
+      await logLearningSignal(supabase, userId, {
+        source: "approval",
+        subjectType: before.subject_type,
+        subjectId: before.subject_id,
+        summary: `${data.status === "approved" ? "Approved" : "Changes requested"} (${before.subject_type})${reasons.length ? `: ${describeReasons(reasons)}` : ""}${data.note?.trim() ? ` — ${data.note.trim()}` : ""}`,
+        detail: { status: data.status, reasons, note: data.note?.trim() || null },
+      });
+    }
+
 
     // Reviewer outcomes are the loop's best evidence: a sign-off says the visual
     // language held up, and a design-fit rejection says it did not. Both are
