@@ -126,7 +126,7 @@ function venueFirstSign(id: string): LegalSign | null {
   if (!boards.length || boards.length > 40) return null;
   return {
     id, title: "Venue spot · first version", size: boards.map(([w, h]) => `${w} × ${h} in`).join(", "), master: "",
-    faces: boards.map(([w, h], i) => ({ id: venueFirstFaceId(m[1]!, i + 1, w!, h!), label: `Artboard ${i + 1}` })),
+    faces: boards.map(([w, h], i) => ({ id: venueFirstFaceId(m[1]!, i + 1, boards.length, w!, h!), label: boards.length > 1 ? `Tier ${i + 1}${i === 0 ? " (bottom)" : i === boards.length - 1 ? " (top)" : ""}` : "Artboard" })),
     note: "First version built by Element in the NEXT look on the submitted file's artboard sizes. Designer sizes, not the site survey.",
   };
 }
