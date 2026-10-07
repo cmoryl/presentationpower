@@ -87,5 +87,5 @@ layout = {
     "sign": {"margin": 72.0},
 }
 L = "src/lib/legal-next-signage-layouts.json"
-d = json.load(open(L)); d[ID] = layout; json.dump(d, open(L, "w"))
+d = json.load(open(L)); d[ID] = layout; json.dump(d, open(L, "w"), indent=1)
 print("ok", parts)
