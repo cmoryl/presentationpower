@@ -149,7 +149,8 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
   // Signs: "Fit" keeps wide signs on screen (zoom is the canvas height in px).
   const signFit = L.sign ? Math.max(120, Math.min(640, Math.round((1100 * KIOSK_H) / KIOSK_W))) : 640;
   const minZoom = L.sign ? Math.min(300, Math.round(signFit / 2)) : 300;
-  const kioskHasTv = (id: string) => !L.face && kioskHasTvFront(id);
+  const kioskHasTv = (id: string) => !!L.tv || (!L.face && kioskHasTvFront(id));
+  const TV = L.tv ?? KIOSK_TV;
   const EK = editKey ?? kioskEditKey(L);
   /** Saved changes of the other faces, for the side previews and full downloads. */
   const [others, setOthers] = useState<Partial<Record<"front" | KioskFace, KioskEdits>>>({});
@@ -744,7 +745,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
   const checks = useMemo(() => {
     type Hit = { sel: NonNullable<Sel>; label: string; issue: string; level: "error" | "warn" };
     const out: Hit[] = [];
-    const tv = KIOSK_TV;
+    const tv = TV;
     const hasTv = kioskHasTv(L.id);
     const test = (sel: NonNullable<Sel>, label: string, b: { x0: number; x1: number; y0: number; y1: number }, isText: boolean) => {
       if (hasTv && b.x0 < tv.x + tv.w && b.x1 > tv.x && b.y0 < tv.y + tv.h && b.y1 > tv.y) out.push({ sel, label, issue: "Sits over the TV area — it will be hidden by the screen", level: "error" });
@@ -765,7 +766,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
   }, [placed, edits.dividers]);
   const errors = checks.filter((c) => c.level === "error").length;
 
-  const target = alignTarget === "tv" && kioskHasTv(L.id) ? { x0: KIOSK_TV.x, x1: KIOSK_TV.x + KIOSK_TV.w, y0: KIOSK_TV.y, y1: KIOSK_TV.y + KIOSK_TV.h }
+  const target = alignTarget === "tv" && kioskHasTv(L.id) ? { x0: TV.x, x1: TV.x + TV.w, y0: TV.y, y1: TV.y + TV.h }
     : alignTarget === "safe" ? { x0: KIOSK_MARGIN, x1: KIOSK_W - KIOSK_MARGIN, y0: KIOSK_MARGIN, y1: KIOSK_H - KIOSK_MARGIN }
     : { x0: 0, x1: KIOSK_W, y0: 0, y1: KIOSK_H };
   const alignTo = (m: "left" | "hcenter" | "right" | "top" | "vmiddle" | "bottom") => {
@@ -1107,8 +1108,8 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                 <g data-export-ignore="true" pointerEvents="none">
                   {guides.tv && kioskHasTv(L.id) ? (
                     <>
-                      <rect x={KIOSK_TV.x} y={KIOSK_TV.y} width={KIOSK_TV.w} height={KIOSK_TV.h} fill="#03002C" fillOpacity={0.55} stroke="#FFEB66" strokeDasharray={`${8 * rs} ${5 * rs}`} strokeWidth={1.5 * rs} />
-                      <text x={KIOSK_TV.x + KIOSK_TV.w / 2} y={KIOSK_TV.y + KIOSK_TV.h / 2} textAnchor="middle" fontSize={12 * rs} fill="#FFEB66" fontFamily="Geist Mono, monospace">TV KEEP-CLEAR · NOT PRINTED</text>
+                      <rect x={TV.x} y={TV.y} width={TV.w} height={TV.h} fill="#03002C" fillOpacity={0.55} stroke="#FFEB66" strokeDasharray={`${8 * rs} ${5 * rs}`} strokeWidth={1.5 * rs} />
+                      <text x={TV.x + TV.w / 2} y={TV.y + TV.h / 2} textAnchor="middle" fontSize={12 * rs} fill="#FFEB66" fontFamily="Geist Mono, monospace">TV KEEP-CLEAR · NOT PRINTED</text>
                     </>
                   ) : null}
                   {guides.safe ? <rect x={KIOSK_MARGIN} y={KIOSK_MARGIN} width={KIOSK_W - 2 * KIOSK_MARGIN} height={KIOSK_H - 2 * KIOSK_MARGIN} fill="none" stroke="#A1FBF9" strokeOpacity={0.8} strokeDasharray={`${4 * rs} ${4 * rs}`} strokeWidth={rs} /> : null}
