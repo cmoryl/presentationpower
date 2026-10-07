@@ -10,6 +10,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import type { GroundingCitation } from "@/lib/grounding-citations";
+import { AI_MODELS } from "@/lib/ai-models";
 
 const InputSchema = z.object({
   /** What the campaign is about — free text from the user. */
@@ -111,7 +112,7 @@ export const draftCampaignCopy = createServerFn({ method: "POST" })
         method: "POST",
         headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: AI_MODELS.quick,
           messages: [
             { role: "system", content: system },
             { role: "user", content: `Campaign topic: ${data.topic}` },

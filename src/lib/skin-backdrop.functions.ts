@@ -15,6 +15,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { SKIN_SCENES, type SkinScene } from "@/lib/skin-backgrounds";
 import { backdropPromptForCode } from "@/lib/skin-backdrop-prompt";
+import { AI_MODELS } from "@/lib/ai-models";
 
 /**
  * A scene is either one of the authored skin scenes or a MODULE-SCOPED scene
@@ -103,7 +104,7 @@ export const generateSkinBackdrop = createServerFn({ method: "POST" })
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-3.1-flash-image",
+        model: AI_MODELS.backdrop,
         messages: [{ role: "user", content: prompt }],
         modalities: ["image", "text"],
       }),

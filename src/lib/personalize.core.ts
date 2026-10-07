@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { AI_MODELS } from "@/lib/ai-models";
 
 // AI personalization pipeline.
 // Given a brief and the deterministically-assembled slide contents,
@@ -146,7 +147,7 @@ export async function personalizeSlidesCore(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: AI_MODELS.quick,
         messages: [
           { role: "system", content: system },
           { role: "user", content: JSON.stringify(user) },

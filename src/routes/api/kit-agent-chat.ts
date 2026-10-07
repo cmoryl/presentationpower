@@ -19,8 +19,9 @@ import {
 import { coerceDesignDna, designDnaPromptBlock } from "@/lib/agent/design-dna";
 import { tool, type ToolSet } from "ai";
 import { z } from "zod";
+import { AI_MODELS } from "@/lib/ai-models";
 
-const MODEL = "google/gemini-3.6-flash";
+const MODEL = AI_MODELS.agent;
 
 type Body = {
   messages?: UIMessage[];

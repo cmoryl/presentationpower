@@ -6,6 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import type { GroundingCitation } from "@/lib/grounding-citations";
+import { AI_MODELS } from "@/lib/ai-models";
 
 const Input = z.object({
   brandId: z.string(),
@@ -98,7 +99,7 @@ export const generateBrandImage = createServerFn({ method: "POST" })
         "Lovable-API-Key": key,
       },
       body: JSON.stringify({
-        model: "openai/gpt-image-2",
+        model: AI_MODELS.image,
         prompt,
         quality: "low",
         size: "1536x1024",

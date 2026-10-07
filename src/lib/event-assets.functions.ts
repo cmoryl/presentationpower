@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { AI_MODELS } from "@/lib/ai-models";
 
 const input = z.object({
   kind: z.enum(["agenda", "rooms"]),
@@ -50,7 +51,7 @@ export const extractEventAssets = createServerFn({ method: "POST" })
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: AI_MODELS.quick,
         response_format: { type: "json_object" },
         messages: [{ role: "system", content: system }, { role: "user", content }],
       }),
@@ -72,7 +73,7 @@ export const extractEventAssets = createServerFn({ method: "POST" })
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: AI_MODELS.lite,
         messages: [{ role: "user", content: [
           { type: "text", text: "Output all readable text of this document verbatim, in reading order. No commentary." },
           { type: "file", file: { filename: f.name, file_data: `data:${f.mime};base64,${f.base64}` } },

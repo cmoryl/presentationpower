@@ -11,6 +11,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { AI_MODELS } from "@/lib/ai-models";
 
 type QueryResult = { data: unknown; error: unknown; count?: number | null };
 interface QueryBuilder extends PromiseLike<QueryResult> {
@@ -597,7 +598,7 @@ export const getMasterAnalytics = createServerFn({ method: "POST" })
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
+            model: AI_MODELS.quick,
             messages: [
               {
                 role: "system",
