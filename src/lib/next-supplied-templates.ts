@@ -1,3 +1,6 @@
+import demoBoothJpg from "@/assets/next-demo-booth/demo-booth.jpg.asset.json";
+import demoBoothPdf from "@/assets/next-demo-booth/demo-booth.pdf.asset.json";
+import demoBoothAi from "@/assets/next-demo-booth/masters/GLCoach_TVTestDrive_Demo_Booth.ai.asset.json";
 // Designer-supplied NEXT templates — the ONE place they join the registry.
 // Add a supplied division file by appending its rows here; the assets listing,
 // division tiles and template counts all read loadNextRegistry(), so nothing
@@ -36,5 +39,21 @@ function deskRows(): NextRegistryRow[] {
 }
 
 export function suppliedTemplateRows(): NextRegistryRow[] {
-  return [...financePillarRows(), ...globallinkPedestalRows(), ...sfScreenSurroundRows(), ...deskRows()];
+  return [...financePillarRows(), ...globallinkPedestalRows(), ...sfScreenSurroundRows(), ...deskRows(), demoBoothRow()];
+}
+
+/** Basic NEXT demo booth (main NEXT templates); later demos swap logo, wording and background in the editor. */
+function demoBoothRow(): NextRegistryRow {
+  return {
+    divisionId: "transperfect",
+    group: "event-signage",
+    code: "DB1",
+    format: "Demo booth",
+    size: "45 × 96 in front + two 4 × 96 in sides · supplied .ai master",
+    exampleUrl: demoBoothJpg.url,
+    downloadUrl: demoBoothAi.url,
+    secondaryUrl: demoBoothPdf.url,
+    secondaryLabel: "PDF",
+    liveSignId: "demo-booth",
+  };
 }

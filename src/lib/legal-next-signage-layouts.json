@@ -3521,5 +3521,660 @@
   "sign": {
    "margin": 72.0
   }
+ },
+ "divsign-transperfect-demobooth-front": {
+  "id": "divsign-transperfect-demobooth-front",
+  "source": "GLCoach_TVTestDrive_Demo_Booth.ai",
+  "trimW": 3240.0,
+  "trimH": 6912.0,
+  "originX": 9.0,
+  "originY": 9.0,
+  "mediaW": 3258.0,
+  "mediaH": 6930.0,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "PUT YOUR CONVERSATION",
+    "font": "Geist-ExtraBold",
+    "size": 191.36,
+    "color": "#FFFFFF",
+    "x": 326.92,
+    "y": 1046.1,
+    "w": 2544.74,
+    "top": 904.15,
+    "bottom": 1095.51,
+    "cmyk": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "id": "t1",
+    "text": "SKILLS TO THE TEST",
+    "font": "Geist-ExtraBold",
+    "size": 191.36,
+    "color": "#FFFFFF",
+    "x": 624.68,
+    "y": 1241.3,
+    "w": 1949.22,
+    "top": 1099.34,
+    "bottom": 1290.7,
+    "cmyk": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "id": "t2",
+    "text": "Try a sales, service, or compliance",
+    "font": "Geist-Regular",
+    "size": 159.31,
+    "color": "#FFFFFF",
+    "x": 368.31,
+    "y": 3462.6,
+    "w": 2462.74,
+    "top": 3341.56,
+    "bottom": 3500.86,
+    "cmyk": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "id": "t3",
+    "text": "conversation with an AI persona",
+    "font": "Geist-Regular",
+    "size": 159.31,
+    "color": "#FFFFFF",
+    "x": 423.91,
+    "y": 3704.8,
+    "w": 2351.55,
+    "top": 3583.71,
+    "bottom": 3743.01,
+    "cmyk": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "id": "t4",
+    "text": "that challenges you in real time.",
+    "font": "Geist-Regular",
+    "size": 159.31,
+    "color": "#FFFFFF",
+    "x": 426.78,
+    "y": 3946.9,
+    "w": 2345.96,
+    "top": 3825.85,
+    "bottom": 3985.16,
+    "cmyk": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "id": "t5",
+    "text": "Get personalized feedback",
+    "font": "Geist-Regular",
+    "size": 159.31,
+    "color": "#FFFFFF",
+    "x": 625.12,
+    "y": 4189.1,
+    "w": 1949.44,
+    "top": 4068.0,
+    "bottom": 4227.31,
+    "cmyk": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "id": "t6",
+    "text": "after every conversation.",
+    "font": "Geist-Regular",
+    "size": 159.31,
+    "color": "#FFFFFF",
+    "x": 686.77,
+    "y": 4431.2,
+    "w": 1825.96,
+    "top": 4310.15,
+    "bottom": 4469.46,
+    "cmyk": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 6912.0,
+    "c0": 0,
+    "c1": 6912.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 0,
+      "y0": 1965.58,
+      "x1": 3240.0,
+      "y1": 6912.0
+     },
+     {
+      "id": "n1",
+      "x0": 0,
+      "y0": 4250.35,
+      "x1": 2161.13,
+      "y1": 6338.99
+     },
+     {
+      "id": "n2",
+      "x0": 0,
+      "y0": 3200.51,
+      "x1": 1711.38,
+      "y1": 5993.99
+     },
+     {
+      "id": "n3",
+      "x0": 0,
+      "y0": 3169.15,
+      "x1": 955.12,
+      "y1": 5188.4
+     },
+     {
+      "id": "n4",
+      "x0": 0,
+      "y0": 219.33,
+      "x1": 3125.95,
+      "y1": 5505.47
+     },
+     {
+      "id": "n5",
+      "x0": 0,
+      "y0": 1905.39,
+      "x1": 2807.97,
+      "y1": 4406.36
+     },
+     {
+      "id": "n6",
+      "x0": 249.15,
+      "y0": 382.1,
+      "x1": 2884.24,
+      "y1": 711.63
+     },
+     {
+      "id": "n7",
+      "x0": -9.0,
+      "y0": -9.0,
+      "x1": 3249.0,
+      "y1": 6921.0
+     },
+     {
+      "id": "n8",
+      "x0": 1023.11,
+      "y0": 5802.53,
+      "x1": 2216.89,
+      "y1": 6384.33
+     },
+     {
+      "id": "n9",
+      "x0": 304.69,
+      "y0": 6588.82,
+      "x1": 359.88,
+      "y1": 6663.31
+     },
+     {
+      "id": "n10",
+      "x0": 463.22,
+      "y0": 6587.15,
+      "x1": 822.14,
+      "y1": 6664.99
+     },
+     {
+      "id": "n11",
+      "x0": 926.95,
+      "y0": 6588.82,
+      "x1": 985.6,
+      "y1": 6663.31
+     },
+     {
+      "id": "n12",
+      "x0": 1091.98,
+      "y0": 6588.82,
+      "x1": 1150.84,
+      "y1": 6663.31
+     },
+     {
+      "id": "n13",
+      "x0": 1369.38,
+      "y0": 6588.82,
+      "x1": 1378.4,
+      "y1": 6663.31
+     },
+     {
+      "id": "n14",
+      "x0": 1484.79,
+      "y0": 6588.82,
+      "x1": 1839.3,
+      "y1": 6663.31
+     },
+     {
+      "id": "n15",
+      "x0": 1944.11,
+      "y0": 6588.82,
+      "x1": 1990.38,
+      "y1": 6663.31
+     },
+     {
+      "id": "n16",
+      "x0": 2091.0,
+      "y0": 6588.82,
+      "x1": 2137.27,
+      "y1": 6663.31
+     },
+     {
+      "id": "n17",
+      "x0": 2235.78,
+      "y0": 6588.82,
+      "x1": 2244.81,
+      "y1": 6663.31
+     },
+     {
+      "id": "n18",
+      "x0": 2346.89,
+      "y0": 6587.15,
+      "x1": 2410.36,
+      "y1": 6664.99
+     },
+     {
+      "id": "n19",
+      "x0": 2514.44,
+      "y0": 6588.82,
+      "x1": 2562.07,
+      "y1": 6663.31
+     },
+     {
+      "id": "n20",
+      "x0": 2665.84,
+      "y0": 6588.82,
+      "x1": 2724.48,
+      "y1": 6663.31
+     },
+     {
+      "id": "n21",
+      "x0": 2826.57,
+      "y0": 6587.15,
+      "x1": 2891.41,
+      "y1": 6664.99
+     },
+     {
+      "id": "n22",
+      "x0": 2994.64,
+      "y0": 6588.82,
+      "x1": 3042.28,
+      "y1": 6663.31
+     },
+     {
+      "id": "n23",
+      "x0": 252.0,
+      "y0": 1522.51,
+      "x1": 2988.0,
+      "y1": 3106.51
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#2B3990"
+   },
+   {
+    "offset": 1,
+    "color": "#6DCFF6"
+   }
+  ],
+  "native": {
+   "version": "demobooth-2026-10-07",
+   "profile": "U.S. Web Coated (SWOP) v2",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    },
+    "n2": {
+     "page": 3,
+     "kind": "vector"
+    },
+    "n3": {
+     "page": 4,
+     "kind": "vector"
+    },
+    "n4": {
+     "page": 5,
+     "kind": "vector"
+    },
+    "n5": {
+     "page": 6,
+     "kind": "vector"
+    },
+    "n6": {
+     "page": 7,
+     "kind": "vector"
+    },
+    "n7": {
+     "page": 8,
+     "kind": "vector"
+    },
+    "n8": {
+     "page": 9,
+     "kind": "vector"
+    },
+    "n9": {
+     "page": 10,
+     "kind": "vector"
+    },
+    "n10": {
+     "page": 11,
+     "kind": "vector"
+    },
+    "n11": {
+     "page": 12,
+     "kind": "vector"
+    },
+    "n12": {
+     "page": 13,
+     "kind": "vector"
+    },
+    "n13": {
+     "page": 14,
+     "kind": "vector"
+    },
+    "n14": {
+     "page": 15,
+     "kind": "vector"
+    },
+    "n15": {
+     "page": 16,
+     "kind": "vector"
+    },
+    "n16": {
+     "page": 17,
+     "kind": "vector"
+    },
+    "n17": {
+     "page": 18,
+     "kind": "vector"
+    },
+    "n18": {
+     "page": 19,
+     "kind": "vector"
+    },
+    "n19": {
+     "page": 20,
+     "kind": "vector"
+    },
+    "n20": {
+     "page": 21,
+     "kind": "vector"
+    },
+    "n21": {
+     "page": 22,
+     "kind": "vector"
+    },
+    "n22": {
+     "page": 23,
+     "kind": "vector"
+    },
+    "n23": {
+     "page": 24,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   }
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-transperfect-demobooth-left": {
+  "id": "divsign-transperfect-demobooth-left",
+  "source": "GLCoach_TVTestDrive_Demo_Booth.ai",
+  "trimW": 288.0,
+  "trimH": 6912.0,
+  "originX": 9.0,
+  "originY": 9.0,
+  "mediaW": 306.0,
+  "mediaH": 6930.0,
+  "texts": [],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 6912.0,
+    "c0": 0,
+    "c1": 6912.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 0,
+      "y0": 2757.13,
+      "x1": 288.0,
+      "y1": 6157.92
+     },
+     {
+      "id": "n1",
+      "x0": -9.0,
+      "y0": -9.0,
+      "x1": 297.0,
+      "y1": 6921.0
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#2B3990"
+   },
+   {
+    "offset": 1,
+    "color": "#6DCFF6"
+   }
+  ],
+  "native": {
+   "version": "demobooth-2026-10-07",
+   "profile": "U.S. Web Coated (SWOP) v2",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   }
+  },
+  "sign": {
+   "margin": 17.28
+  }
+ },
+ "divsign-transperfect-demobooth-right": {
+  "id": "divsign-transperfect-demobooth-right",
+  "source": "GLCoach_TVTestDrive_Demo_Booth.ai",
+  "trimW": 288.0,
+  "trimH": 6912.0,
+  "originX": 9.0,
+  "originY": 9.0,
+  "mediaW": 306.0,
+  "mediaH": 6930.0,
+  "texts": [],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 6912.0,
+    "c0": 0,
+    "c1": 6912.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 0,
+      "y0": 2061.11,
+      "x1": 288.0,
+      "y1": 6912.0
+     },
+     {
+      "id": "n1",
+      "x0": 0,
+      "y0": 4403.72,
+      "x1": 288.0,
+      "y1": 6194.77
+     },
+     {
+      "id": "n2",
+      "x0": 0,
+      "y0": 3160.38,
+      "x1": 288.0,
+      "y1": 6046.82
+     },
+     {
+      "id": "n3",
+      "x0": 0,
+      "y0": 3048.32,
+      "x1": 288.0,
+      "y1": 5322.2
+     },
+     {
+      "id": "n4",
+      "x0": 0,
+      "y0": 162.49,
+      "x1": 288.0,
+      "y1": 5566.19
+     },
+     {
+      "id": "n5",
+      "x0": 0,
+      "y0": 2164.21,
+      "x1": 288.0,
+      "y1": 4157.18
+     },
+     {
+      "id": "n6",
+      "x0": -9.0,
+      "y0": -9.0,
+      "x1": 297.0,
+      "y1": 6921.0
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#2B3990"
+   },
+   {
+    "offset": 1,
+    "color": "#6DCFF6"
+   }
+  ],
+  "native": {
+   "version": "demobooth-2026-10-07",
+   "profile": "U.S. Web Coated (SWOP) v2",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    },
+    "n2": {
+     "page": 3,
+     "kind": "vector"
+    },
+    "n3": {
+     "page": 4,
+     "kind": "vector"
+    },
+    "n4": {
+     "page": 5,
+     "kind": "vector"
+    },
+    "n5": {
+     "page": 6,
+     "kind": "vector"
+    },
+    "n6": {
+     "page": 7,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   }
+  },
+  "sign": {
+   "margin": 17.28
+  }
  }
 }
