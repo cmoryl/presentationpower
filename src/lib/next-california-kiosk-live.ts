@@ -171,7 +171,7 @@ export const liveLayoutById = (id: string): LiveLayout | undefined => {
 
 /** Staircase ramp: bottom tier → top tier, enterprise palette. */
 const STAIR_RAMP = [{ offset: 0, color: "#03002C" }, { offset: 1, color: "#003FC7" }];
-const toHex = (c: [number, number, number]) => `#${c.map((v) => Math.round(v).toString(16).padStart(2, "0")).join("")}`.toUpperCase();
+const toHex = (c: [number, number, number]) => `#${c.map((v) => Math.round(v * 255).toString(16).padStart(2, "0")).join("")}`.toUpperCase();
 
 /** One tier of a multi-artboard venue spot: its slice of the shared ramp, plus the file's step lines. */
 function venueTier(L: LiveLayout, base: string, wIn: number, hIn: number): LiveLayout {
