@@ -19,12 +19,12 @@ export const Route = createFileRoute("/api/public/booths/$event")({
         const event = params.event;
         if (!/^[a-z0-9-]{2,40}$/.test(event)) return new Response("Bad event", { status: 400, headers: CORS });
         const slug = new URL(request.url).searchParams.get("slug");
-        if (slug && !/^[a-z0-9-]{1,60}$/.test(slug)) return new Response("Bad slug", { status: 400, headers: CORS });
+        if (slug && !/^[a-z0-9:-]{1,60}$/.test(slug)) return new Response("Bad slug", { status: 400, headers: CORS });
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         let q = supabaseAdmin
           .from("event_booths")
-          .select("id, boothhub_slug, name, has_tv, published_3d, sort_order")
+          .select("id, boothhub_slug, name, has_tv, published_3d, sort_order, kind")
           .eq("event", event)
           .not("boothhub_slug", "is", null)
           .order("sort_order");
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/api/public/booths/$event")({
             if (s.data?.signedUrl) faces[a.face] = s.data.signedUrl;
             if (!revision || a.revision > revision) revision = a.revision;
           }
-          out.push({ slug: b.boothhub_slug, name: b.name, hasTv: b.has_tv, published3d: b.published_3d, revision, art: faces, kind: "proof" });
+          out.push({ slug: b.boothhub_slug, name: b.name, hasTv: b.has_tv, published3d: b.published_3d, revision, art: faces, kind: "proof", type: b.kind });
         }
         return Response.json(slug ? out[0] : { event, booths: out }, { headers: CORS });
       },

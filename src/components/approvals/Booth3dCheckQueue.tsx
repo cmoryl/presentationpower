@@ -14,7 +14,7 @@ export function Booth3dCheckQueue() {
     queryKey: ["booth-3d-queue"],
     queryFn: async (): Promise<Row[]> => {
       const [{ data: booths, error: e1 }, { data: art }, { data: checks }] = await Promise.all([
-        supabase.from("event_booths").select("id, name, source_booth_id").eq("event", SF_EVENT).order("sort_order"),
+        supabase.from("event_booths").select("id, name, source_booth_id").eq("event", SF_EVENT).eq("kind", "kiosk").order("sort_order"),
         supabase.from("booth_art").select("booth_id, revision").eq("face", "front"),
         supabase.from("booth_3d_checks").select("booth_id, revision, note, snapshot_path, checked_at").order("checked_at", { ascending: false }),
       ]);

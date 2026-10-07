@@ -2229,6 +2229,7 @@ export type Database = {
           event: string
           has_tv: boolean
           id: string
+          kind: string
           name: string
           published_3d: boolean
           sort_order: number
@@ -2241,6 +2242,7 @@ export type Database = {
           event: string
           has_tv?: boolean
           id?: string
+          kind?: string
           name: string
           published_3d?: boolean
           sort_order?: number
@@ -2253,6 +2255,7 @@ export type Database = {
           event?: string
           has_tv?: boolean
           id?: string
+          kind?: string
           name?: string
           published_3d?: boolean
           sort_order?: number
