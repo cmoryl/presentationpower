@@ -174,7 +174,22 @@ const STAIR_RAMP = [{ offset: 0, color: "#03002C" }, { offset: 1, color: "#003FC
 const toHex = (c: [number, number, number]) => `#${c.map((v) => Math.round(v * 255).toString(16).padStart(2, "0")).join("")}`.toUpperCase();
 
 /** One tier of a multi-artboard venue spot: its slice of the shared ramp, plus the file's step lines. */
-function venueTier(L: LiveLayout, base: string, wIn: number, hIn: number): LiveLayout {
+function venueTier(L0: LiveLayout, base: string, wIn: number, hIn: number): LiveLayout {
+  // The generic first version scales as one composition: every piece at the same
+  // scale (the tighter of width/height), centres kept at their relative spots,
+  // so nothing runs off an edge or collides on a narrow or short artboard.
+  const T = SIGN_LIVE_LAYOUTS[VENUE_FIRST_TEMPLATE]!;
+  const sx = L0.trimW / T.trimW, sy = L0.trimH / T.trimH, s = Math.min(sx, sy);
+  const L: LiveLayout = {
+    ...L0,
+    blocks: L0.blocks.map((b) => ({
+      ...b,
+      parts: b.parts?.map((p) => {
+        const cx = (p.x0 + p.x1) / 2, cy = (p.y0 + p.y1) / 2;
+        return { ...p, rx: cx * sx - cx, ry: cy * sy - cy, rs: s };
+      }),
+    })),
+  };
   const m = base.match(/\.([0-9a-f]{8})-(\d+)of(\d+)$/);
   if (!m) return L;
   const n = Number(m[2]), N = Number(m[3]);
