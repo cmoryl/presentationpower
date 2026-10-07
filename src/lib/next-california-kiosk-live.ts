@@ -157,8 +157,11 @@ export const liveLayoutById = (id: string): LiveLayout | undefined => {
   const hit = KIOSK_LIVE_LAYOUTS[id] ?? SIGN_LIVE_LAYOUTS[id];
   if (hit) return hit;
   const sz = parseSizedId(id);
-  const base = sz && SIGN_LIVE_LAYOUTS[sz.base];
-  return base ? resizedSignLayout(base, sz.w, sz.h) : undefined;
+  const base = sz && SIGN_LIVE_LAYOUTS[templateLayoutId(sz.base)];
+  if (!sz || !base) return undefined;
+  const L = resizedSignLayout(base, sz.w, sz.h);
+  // Venue first versions keep their own id (one live file per spot artboard).
+  return isVenueFirstId(id) ? { ...L, id: sizedSignId(sz.base, sz.w, sz.h) } : L;
 };
 
 // ---- re-sized versions ------------------------------------------------------
@@ -167,9 +170,18 @@ export const liveLayoutById = (id: string): LiveLayout | undefined => {
 // files are the base sign's.
 
 const SIZE_SEP = "~";
+/**
+ * Venue spot first versions: `divsign-venue-first.<spot>-<n>~<w>x<h>` — the
+ * generic NEXT-look template re-flowed to one artboard of a submitted file.
+ */
+export const VENUE_FIRST_TEMPLATE = "divsign-venue-first";
+export const isVenueFirstId = (id: string) => id.startsWith(`${VENUE_FIRST_TEMPLATE}.`);
+export const venueFirstFaceId = (spotId: string, n: number, wIn: number, hIn: number) =>
+  sizedSignId(`${VENUE_FIRST_TEMPLATE}.${spotId.slice(0, 8)}-${n}`, wIn, hIn);
+const templateLayoutId = (base: string) => (isVenueFirstId(base) ? VENUE_FIRST_TEMPLATE : base);
 export function sizedSignId(base: string, wIn: number, hIn: number): string {
   const f = (v: number) => String(+v.toFixed(3));
-  return `${baseLayoutId(base)}${SIZE_SEP}${f(wIn)}x${f(hIn)}`;
+  return `${base.split(SIZE_SEP)[0]!}${SIZE_SEP}${f(wIn)}x${f(hIn)}`;
 }
 export function parseSizedId(id: string): { base: string; w: number; h: number } | null {
   const m = id.match(/^(.+)~(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)$/);
@@ -178,7 +190,7 @@ export function parseSizedId(id: string): { base: string; w: number; h: number }
   return w >= 1 && h >= 1 && w <= 600 && h <= 600 ? { base: m[1]!, w, h } : null;
 }
 /** The supplied layout an id draws its artwork from. */
-export const baseLayoutId = (id: string) => id.split(SIZE_SEP)[0]!;
+export const baseLayoutId = (id: string) => templateLayoutId(id.split(SIZE_SEP)[0]!);
 
 /** Background placement in trim points. */
 export function nativeBgBox(L: LiveLayout): [number, number, number, number] {

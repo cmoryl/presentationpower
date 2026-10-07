@@ -4,7 +4,7 @@
 
 import financeDeskPreview from "@/assets/finance-pillars/reg-desk.jpg.asset.json";
 import globallinkDeskPreview from "@/assets/globallink-desk/reg-desk.jpg.asset.json";
-import { isSignId, liveLayoutById, type LiveLayout } from "@/lib/next-california-kiosk-live";
+import { isSignId, liveLayoutById, venueFirstFaceId, type LiveLayout } from "@/lib/next-california-kiosk-live";
 
 type Ptr = { url: string };
 const MASTERS = import.meta.glob<Ptr>(["../assets/legal-next-signage/masters/*.asset.json", "../assets/sf-screen-surrounds/masters/*.asset.json"], { eager: true, import: "default" });
@@ -114,7 +114,24 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
   },
 ];
 
-export const legalSign = (id: string) => [...LEGAL_NEXT_SIGNS, ...SF_SCREEN_SURROUNDS, ...DIVISION_LIVE_SIGNS].find((s) => s.id === id) ?? null;
+/** Editor id for a venue spot's first version: `venue~<spot>~<w>x<h>_<w>x<h>…` (artboard inches). */
+export const venueFirstSignId = (spotId: string, artboards: { w_in: number; h_in: number }[]) =>
+  `venue~${spotId.slice(0, 8)}~${artboards.map((a) => `${+a.w_in.toFixed(3)}x${+a.h_in.toFixed(3)}`).join("_")}`;
+
+/** A submitted venue file's artboards as a first-version sign in the NEXT look (logo + arrows on the event ground). */
+function venueFirstSign(id: string): LegalSign | null {
+  const m = id.match(/^venue~([0-9a-f]{8})~(.+)$/);
+  if (!m) return null;
+  const boards = m[2]!.split("_").map((s) => s.split("x").map(Number)).filter(([w, h]) => w! >= 1 && h! >= 1 && w! <= 600 && h! <= 600);
+  if (!boards.length || boards.length > 40) return null;
+  return {
+    id, title: "Venue spot · first version", size: boards.map(([w, h]) => `${w} × ${h} in`).join(", "), master: "",
+    faces: boards.map(([w, h], i) => ({ id: venueFirstFaceId(m[1]!, i + 1, w!, h!), label: `Artboard ${i + 1}` })),
+    note: "First version built by Element in the NEXT look on the submitted file's artboard sizes. Designer sizes, not the site survey.",
+  };
+}
+
+export const legalSign = (id: string) => [...LEGAL_NEXT_SIGNS, ...SF_SCREEN_SURROUNDS, ...DIVISION_LIVE_SIGNS].find((s) => s.id === id) ?? venueFirstSign(id);
 export const legalSignMasterUrl = (s: LegalSign) => masterUrl(s.master);
 /** A face's layout; `faceId` may carry a size (`<face>~<w>x<h>`) for a re-sized version. */
 export const legalSignLayout = (faceId: string): LiveLayout | null => (isSignId(faceId) ? liveLayoutById(faceId) ?? null : null);

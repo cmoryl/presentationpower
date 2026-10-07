@@ -3312,5 +3312,93 @@
   "sign": {
    "margin": 72.0
   }
+ },
+ "divsign-venue-first": {
+  "id": "divsign-venue-first",
+  "source": "Venue spot first version (built by Element)",
+  "trimW": 8640,
+  "trimH": 4320,
+  "originX": 9,
+  "originY": 9,
+  "mediaW": 8658,
+  "mediaH": 4338,
+  "texts": [],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 4320,
+    "c0": 0,
+    "c1": 4320,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 691.2,
+      "y0": 1955.34,
+      "x1": 4320.0,
+      "y1": 2364.66
+     },
+     {
+      "id": "n1",
+      "x0": 5184.0,
+      "y0": 1166.4,
+      "x1": 6416.06,
+      "y1": 3153.6
+     },
+     {
+      "id": "n2",
+      "x0": 6716.06,
+      "y0": 1166.4,
+      "x1": 7948.13,
+      "y1": 3153.6
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#03002C"
+   },
+   {
+    "offset": 1,
+    "color": "#003FC7"
+   }
+  ],
+  "native": {
+   "version": "venue-first-2026-10-07",
+   "profile": "RGB (house colour space)",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    },
+    "n2": {
+     "page": 3,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   }
+  },
+  "sign": {
+   "margin": 72.0
+  }
  }
 }
