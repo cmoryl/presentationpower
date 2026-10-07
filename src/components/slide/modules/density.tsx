@@ -161,9 +161,9 @@ registerSlideModule({
                   void maxExp;
                   return (
                     <div key={i} className="flex flex-col justify-start gap-3 px-5" style={{ borderLeft: i ? `1px solid ${hair}` : undefined }}>
-                      <Figure value={s(it.value)} unit={s(it.unit)} px={46} color={ink.strong} />
-                      <div style={{ fontSize: fillPx(15, "body"), color: ink.muted, lineHeight: 1.3, minHeight: "2.6em" }}>{s(it.label)}</div>
-                      {pct !== null ? <Donut pct={pct} size={92} stroke={11} color={blue} track={hair} /> : null}
+                      <Figure value={s(it.value)} unit={s(it.unit)} px={64} color={ink.strong} />
+                      <div style={{ fontSize: fillPx(18, "body"), color: ink.muted, lineHeight: 1.3, minHeight: "2.6em" }}>{s(it.label)}</div>
+                      {void pct}
                     </div>
                   );
                 })}
