@@ -377,6 +377,8 @@ export type KioskCopy = { id: string; of: string; kind: "text" | "part" };
  * retyped, resized, recoloured and exported as live text — no re-upload.
  */
 export type KioskBadge = { id: string; of: string; text: string; font?: string; color?: string };
+/** A new line of type added in the editor: centred on (cx, baseline y), Geist Bold. */
+export type KioskNote = { id: string; text: string; cx: number; y: number; size: number; color?: string };
 export type KioskEdits = {
   /** Layout these changes were made on (set for kiosks read from the designer's CMYK file). */
   layoutVersion?: string;
@@ -398,6 +400,8 @@ export type KioskEdits = {
   copies?: KioskCopy[];
   /** Partner badges replaced with editable text (the source object is hidden). */
   badges?: KioskBadge[];
+  /** New text lines typed in the editor (e.g. wording on a stair step), in trim points. */
+  notes?: KioskNote[];
   /** Locked items can be selected but not moved. */
   locked?: string[];
   /** Stacking order of objects within their piece (higher = in front). */
@@ -514,9 +518,10 @@ function isHidden(b: LiveBlock, e?: BlockEdit) {
 export function withCopies(L: LiveLayout, edits: KioskEdits = {}): LiveLayout {
   const cs = edits.copies ?? [];
   const bs = edits.badges ?? [];
-  if (!cs.length && !bs.length) return L;
-  const texts = [...L.texts];
-  for (const c of cs) if (c.kind === "text") { const s = L.texts.find((t) => t.id === c.of); if (s) texts.push({ ...s, id: c.id }); }
+  const ns = edits.notes ?? [];
+  if (!cs.length && !bs.length && !ns.length) return L;
+  const texts = [...L.texts, ...ns.map(noteText)];
+  for (const c of cs) if (c.kind === "text") { const s = texts.find((t) => t.id === c.of); if (s) texts.push({ ...s, id: c.id }); }
   const blocks = L.blocks.map((b) => {
     const extra = cs.filter((c) => c.kind === "part").flatMap((c) => { const s = b.parts?.find((q) => q.id === c.of); return s ? [{ ...s, id: c.id }] : []; });
     return extra.length ? { ...b, parts: [...(b.parts ?? []), ...extra] } : b;
@@ -527,6 +532,25 @@ export function withCopies(L: LiveLayout, edits: KioskEdits = {}): LiveLayout {
     if (q) texts.push(badgeText(b, q));
   }
   return { ...L, texts, blocks };
+}
+
+/** The editable text line for a note added in the editor. */
+export function noteText(n: KioskNote): LiveText {
+  const w = Math.max(n.size, n.size * 0.62 * [...n.text].length);
+  return { id: n.id, text: n.text, font: "Geist-Bold", size: n.size, color: n.color ?? "#FFFFFF", x: n.cx - w / 2, y: n.y, w, top: n.y - n.size, bottom: n.y + n.size * 0.3, flow: true, align: "center" };
+}
+
+/**
+ * Steps on a venue artboard: the bands between its horizontal step lines
+ * (top → bottom of the artboard), in trim points. Empty when the file has none.
+ */
+export function stepBands(lines: [number, number, number, number][] | undefined, H: number): [number, number][] {
+  if (!lines?.length) return [];
+  const ys = [...new Set(lines.filter(([, y1, , y2]) => Math.abs(y1 - y2) < 1).map(([, y]) => Math.round(Math.min(H, Math.max(0, y)))))];
+  const cuts = [...new Set([0, ...ys, Math.round(H)])].sort((a, b) => a - b);
+  const out: [number, number][] = [];
+  for (let i = 1; i < cuts.length; i++) if (cuts[i]! - cuts[i - 1]! > 36) out.push([cuts[i - 1]!, cuts[i]!]);
+  return out.length > 1 ? out : [];
 }
 
 /** The editable text line that stands in for a badge object, in its own box. */
