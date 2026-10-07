@@ -1,5 +1,6 @@
 // Shared NEXT master-template registry pieces: filter chips, registry cards,
 // the multi-page deck viewer and the live pillar masters. Used by /events/next/assets.
+import { Sign3dLink } from "@/components/events/Sign3dLink";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -210,6 +211,7 @@ export function RegistryCard({
             Edit live file <ArrowRight size={12} />
           </Link>
         ) : null}
+        <Sign3dLink sign={row.liveSignId} label={row.format} />
         {row.internalUrl ? (
           <Link
             to={row.internalUrl}

@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Sign3dLink } from "@/components/events/Sign3dLink";
 import { Download, PenLine } from "lucide-react";
 
 import { KioskLiveThumb } from "@/components/events/KioskLayerEditor";
@@ -44,6 +45,7 @@ function SignTemplateList({ id, title, intro, signs, masterLabel = "Supplied .ai
                 <Button asChild size="sm">
                   <Link to="/events/next/sign-editor/$signId" params={{ signId: s.id }}><PenLine className="h-3.5 w-3.5" />Edit</Link>
                 </Button>
+                <Sign3dLink sign={s.id} label={s.title} />
                 {master ? (
                   <Button asChild size="sm" variant="outline">
                     <a href={master} download={s.master}><Download className="h-3.5 w-3.5" />{masterLabel}</a>

@@ -10,6 +10,7 @@ import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Sign3dLink } from "@/components/events/Sign3dLink";
 import {
   DIVISION_SIGN_GROUP_LABEL,
   divisionSignArtOptions,
@@ -103,6 +104,7 @@ function SignCard({ sign, compact }: { sign: DivisionSign; compact?: boolean }) 
               </Link>
             </Button>
           ) : null}
+          <Sign3dLink sign={sign.liveSignId} label={sign.label} />
         </div>
       )}
     </figure>
