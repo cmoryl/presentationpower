@@ -3,7 +3,7 @@ import { CREATE_ONLY_AGENT_PROMPT, fetchAgentScope } from "@/lib/agent-scope";
 // over the app's MCP deck-authoring tools, scoped to the caller's Supabase
 // session, and persists the finished turn to agent_messages.
 import { createFileRoute } from "@tanstack/react-router";
-import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { createOpenAI } from "@ai-sdk/openai";
 import { convertToModelMessages, stepCountIs, streamText, type ToolSet, type UIMessage } from "ai";
 import { createClient } from "@supabase/supabase-js";
 import { buildAgentToolSet, toolContextForToken } from "@/lib/agent/mcp-bridge";
@@ -29,7 +29,7 @@ import { tool } from "ai";
 import { z } from "zod";
 import { AI_MODELS } from "@/lib/ai-models";
 
-const MODEL = AI_MODELS.agent;
+const MODEL = AI_MODELS.deckAgent;
 
 type Body = {
   messages?: UIMessage[];
@@ -91,11 +91,20 @@ export const Route = createFileRoute("/api/agent-chat")({
           if (error) console.error("agent_messages insert (user) failed:", error.message);
         }
 
-        const gateway = createOpenAICompatible({
-          name: "lovable-gateway",
+        // GPT-6 Astra runs on the Responses API; the run-id fetch keeps every
+        // tool step of one turn in the same gateway run.
+        let runId: string | undefined;
+        const gateway = createOpenAI({
           baseURL: "https://ai.gateway.lovable.dev/v1",
           apiKey,
           headers: { "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
+          fetch: async (input, init) => {
+            const headers = new Headers(init?.headers);
+            if (runId && !headers.has("X-Lovable-AIG-Run-ID")) headers.set("X-Lovable-AIG-Run-ID", runId);
+            const res = await fetch(input, { ...init, headers });
+            runId ??= res.headers.get("X-Lovable-AIG-Run-ID")?.trim() || undefined;
+            return res;
+          },
         });
 
         // An imported visual knowledge map ("design DNA") becomes the design
@@ -132,7 +141,16 @@ export const Route = createFileRoute("/api/agent-chat")({
         };
 
         const result = streamText({
-          model: gateway(MODEL),
+          model: gateway.responses(MODEL),
+          providerOptions: {
+            openai: {
+              forceReasoning: true,
+              reasoningEffort: "medium",
+              reasoningSummary: "auto",
+              store: false,
+              include: ["reasoning.encrypted_content"],
+            },
+          },
           system: [
             AGENT_SYSTEM_PROMPT,
             SHARED_KNOWLEDGE_PROMPT,
