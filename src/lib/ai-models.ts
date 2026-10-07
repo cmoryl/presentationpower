@@ -3,7 +3,9 @@
 // production picks; candidates are compared side-by-side before switching
 // (see scripts/model-bakeoff.py).
 export const AI_MODELS = {
-  /** Presentation / kit / print agents: planning, layout picks, writing. */
+  /** Presentation Agent (deck builder). Won the Oct 2026 bake-off: no invented figures. */
+  deckAgent: "openai/gpt-6-astra",
+  /** Kit / print agents: planning, layout picks, writing. */
   agent: "google/gemini-3.6-flash",
   /** Quick one-shot jobs: slide fixes, re-fits, tidy-ups, extraction. */
   quick: "google/gemini-2.5-flash",
