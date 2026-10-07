@@ -86,6 +86,8 @@ export type LiveLayout = {
   groundOnly?: boolean;
   /** On-screen step/cut lines from the submitted file, trim pt [x1,y1,x2,y2]; never printed. */
   stepGuides?: [number, number, number, number][];
+  /** Sign-only TV/screen keep-clear (trim pt, y down): drawn as a non-printing guide; the supplied placeholder box is dropped from print. */
+  tv?: { x: number; y: number; w: number; h: number };
 };
 
 /** Signage templates share the kiosk editor; their ids carry this prefix. */
