@@ -107,13 +107,20 @@ export const distillLearning = createServerFn({ method: "POST" })
       throw new Error("The AI reply couldn't be read. Nothing was changed — try again.");
     }
     const ids = new Set(signals.map((s) => s.id));
+    // If every piece of evidence came from one event, the lesson belongs to it
+    // even when the model forgot to say so.
+    const byId = new Map(signals.map((x) => [x.id, x]));
+    const inherit = (ev: string[] | undefined, key: "event_id" | "city") => {
+      const vals = new Set((ev ?? []).map((e) => byId.get(e)?.[key]).filter(Boolean));
+      return vals.size === 1 ? ([...vals][0] as string) : null;
+    };
     const rows = parsed.suggestions.map((s) => ({
       kind: s.kind,
       title: s.title,
       body: s.body,
       division_id: s.division_id ?? null,
-      event_id: s.event_id ?? null,
-      city: s.city ?? null,
+      event_id: s.event_id ?? inherit(s.evidence, "event_id"),
+      city: s.city ?? inherit(s.evidence, "city"),
       evidence_signal_ids: (s.evidence ?? []).filter((e) => ids.has(e)),
       created_by: userId,
     }));
