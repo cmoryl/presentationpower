@@ -40,6 +40,14 @@ export default defineTool({
       .eq("id", found.slide.id);
     if (error) return errorResult(error.message);
     await touchDeck(supabase, deck_id);
+    {
+      const uid = ctx.getUserId();
+      if (uid) {
+        const { textCorrections, correctionSummary, logLearningSignal } = await import("@/lib/learning.server");
+        const fixes = textCorrections(found.slide.content, fitted.content, 12);
+        if (fixes.length) await logLearningSignal(supabase, uid, { source: "edit", subjectType: "deck-assistant", subjectId: deck_id, summary: `Assistant: ${correctionSummary(`slide ${position + 1}`, fixes)}`, detail: { fixes, variant: found.slide.variant_id } });
+      }
+    }
     const gap = visualDataGap(found.slide.variant_id, fitted.content as Record<string, unknown>);
     return textResult({
       ok: true,

@@ -57,6 +57,15 @@ export const savePrintPageTemplate = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Error(error.message);
+    const { logLearningSignal } = await import("./learning.server");
+    await logLearningSignal(supabase, userId, {
+      source: "edit",
+      subjectType: "print-template",
+      subjectId: (row as { id?: string }).id ?? null,
+      divisionId: data.divisionId ?? null,
+      summary: `Saved a ${data.scope} ${data.kind} page template "${data.title}" with ${Array.isArray(data.sections) ? data.sections.length : "?"} sections`,
+      detail: { kind: data.kind, scope: data.scope, tags: data.tags, fromAsset: data.sourceAssetId ?? null, fromLibrary: data.sourceLibraryItemId ?? null },
+    });
     return row;
   });
 

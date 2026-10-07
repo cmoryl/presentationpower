@@ -35,6 +35,13 @@ export default defineTool({
       .eq("id", found.slide.id);
     if (error) return errorResult(error.message);
     await touchDeck(supabase, deck_id);
+    {
+      const uid = ctx.getUserId();
+      if (uid && found.slide.variant_id !== swap.value.variantId) {
+        const { logLearningSignal } = await import("@/lib/learning.server");
+        await logLearningSignal(supabase, uid, { source: "edit", subjectType: "deck-assistant", subjectId: deck_id, summary: `Assistant switched slide ${position + 1} module ${found.slide.variant_id} → ${swap.value.variantId} (section ${found.slide.section_id})`, detail: { from: found.slide.variant_id, to: swap.value.variantId, section: found.slide.section_id } });
+      }
+    }
     const gap = visualDataGap(swap.value.variantId, found.slide.content as Record<string, unknown>);
     return textResult({
       ok: true,

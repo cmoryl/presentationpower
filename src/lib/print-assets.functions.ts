@@ -147,6 +147,13 @@ export const updatePrintAsset = createServerFn({ method: "POST" })
     if (data.context !== undefined) patch.context = data.context;
     if (data.status !== undefined) patch.status = data.status;
 
+    const { data: prev } = await supabase
+      .from("print_assets")
+      .select("content, status, kind, brand_mode_id")
+      .eq("id", data.assetId)
+      .eq("owner_id", userId)
+      .maybeSingle();
+
     const { data: row, error } = await supabase
       .from("print_assets")
       .update(patch as never)
@@ -155,6 +162,21 @@ export const updatePrintAsset = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Error(error.message);
+    if (prev) {
+      const p = prev as { content?: unknown; status?: string; kind?: string; brand_mode_id?: string };
+      const { textCorrections, correctionSummary, logLearningSignal } = await import("./learning.server");
+      if (data.content !== undefined) {
+        const fixes = textCorrections(p.content, data.content, 12);
+        if (fixes.length) await logLearningSignal(supabase, userId, { source: "edit", subjectType: "print", subjectId: data.assetId, divisionId: p.brand_mode_id ?? null, summary: correctionSummary(`a ${p.kind ?? "print"} piece`, fixes), detail: { fixes, kind: p.kind } });
+        const before = (p.content ?? {}) as Record<string, unknown>;
+        const after = data.content as Record<string, unknown>;
+        const blocks = (c: Record<string, unknown>) => JSON.stringify((c.sections ?? c.blocks ?? c.pages ?? null) as unknown)?.replace(/"(text|body|title|headline)":"[^"]*"/g, "");
+        const layoutChanged = blocks(before) !== blocks(after);
+        const heroChanged = JSON.stringify(before.heroMedia ?? null) !== JSON.stringify(after.heroMedia ?? null);
+        if (layoutChanged || heroChanged) await logLearningSignal(supabase, userId, { source: "edit", subjectType: "print-design", subjectId: data.assetId, divisionId: p.brand_mode_id ?? null, summary: `Design changed on a ${p.kind ?? "print"} piece: ${[layoutChanged && "sections/layout", heroChanged && "hero image"].filter(Boolean).join(", ")}`, detail: { kind: p.kind, layoutChanged, heroChanged } });
+      }
+      if (data.status !== undefined && data.status !== p.status) await logLearningSignal(supabase, userId, { source: "outcome", subjectType: "print", subjectId: data.assetId, divisionId: p.brand_mode_id ?? null, summary: `${p.kind ?? "Print"} piece moved ${p.status ?? "?"} → ${data.status}`, detail: { from: p.status, to: data.status } });
+    }
     return row as unknown as PrintAssetRow;
   });
 

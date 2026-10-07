@@ -365,10 +365,10 @@ export async function saveDeckToCloudCore(
   // insert left the deck with no slides at all, i.e. a save that destroyed work.
   const { data: existingRows } = await sb
     .from("deck_slides")
-    .select("id, content")
+    .select("id, content, variant_id, layout_id")
     .eq("deck_id", deckUuid);
   const existingList = Array.isArray(existingRows)
-    ? (existingRows as { id: string; content: Record<string, unknown> | null }[])
+    ? (existingRows as { id: string; content: Record<string, unknown> | null; variant_id?: string | null; layout_id?: string | null }[])
     : [];
   const existingIds = existingList.map((r) => r.id);
   // Reuse a saved row's id when the local slide came from it (seeded master
@@ -393,18 +393,35 @@ export async function saveDeckToCloudCore(
 
   // Learning loop: remember text people corrected (best-effort, never blocks).
   try {
-    const { textCorrections, logLearningSignal } = await import("@/lib/learning.server");
-    const prior = new Map(existingList.map((r) => [String(r.content?.["__localId"] ?? r.id), r.content]));
+    const { textCorrections, designChanges, correctionSummary, logLearningSignal } = await import("@/lib/learning.server");
+    const prior = new Map(existingList.map((r) => [String(r.content?.["__localId"] ?? r.id), r]));
     const fixes = data.deck.slides
-      .flatMap((s) => (prior.has(s.id) ? textCorrections(prior.get(s.id), s.content).map((f) => ({ ...f, slide: s.variantId })) : []))
+      .flatMap((s) => (prior.has(s.id) ? textCorrections(prior.get(s.id)!.content, s.content).map((f) => ({ ...f, slide: s.variantId })) : []))
       .slice(0, 12);
     if (fixes.length > 0) {
       await logLearningSignal(sb, userId, {
         source: "edit",
         subjectType: "deck",
         subjectId: deckUuid,
-        summary: `${fixes.length} text correction${fixes.length === 1 ? "" : "s"} saved on a deck`,
+        summary: correctionSummary("a deck", fixes),
         detail: { fixes },
+      });
+    }
+    const design = data.deck.slides
+      .flatMap((s) => {
+        const row = prior.get(s.id);
+        if (!row) return [];
+        const ch = designChanges(row, s as unknown as Record<string, unknown>);
+        return ch.length ? [{ slide: s.variantId, section: s.sectionId, changes: ch }] : [];
+      })
+      .slice(0, 12);
+    if (design.length > 0) {
+      await logLearningSignal(sb, userId, {
+        source: "edit",
+        subjectType: "deck-design",
+        subjectId: deckUuid,
+        summary: `Design changes on ${design.length} slide${design.length === 1 ? "" : "s"}: ${design.map((d) => `${d.slide} (${d.changes.join(", ")})`).join("; ").slice(0, 700)}`,
+        detail: { design },
       });
     }
   } catch {
