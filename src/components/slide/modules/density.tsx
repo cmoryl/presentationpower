@@ -111,12 +111,22 @@ registerSlideModule({
         const blue = isDark ? "#7FB0FF" : INFO_FILL.blue.bg;
         const ringCol = [blue, INFO_FILL.lavender.bg];
         const hair = ink.hairline;
+        const panel = isDark ? "rgba(255,255,255,0.045)" : "rgba(3,0,44,0.035)";
+        const tag = (n: string, label: string) => (
+          <div className="mb-6 flex items-center gap-4" style={{ fontSize: fillPx(14, "body"), letterSpacing: "0.18em", textTransform: "uppercase", color: ink.muted, fontWeight: 650 }}>
+            <span style={{ color: ink.strong }}>{n}</span>
+            <span aria-hidden style={{ width: 36, height: 2, background: blue }} />
+            <span>{label}</span>
+          </div>
+        );
         const maxExp = Math.max(1, Math.ceil(Math.log10(Math.max(10, ...items.map((it) => numOf(s(it.value)))))));
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
             <div data-portrait="proof-stack" className="mt-4 grid min-h-0 flex-1 gap-x-16" style={{ gridTemplateColumns: "minmax(0,1.25fr) minmax(0,1fr)", gridTemplateRows: "minmax(0,1fr) auto" }}>
-              <section className="flex min-h-0 items-center gap-12">
+              <section className="relative flex min-h-0 flex-col justify-center rounded-[14px] p-10" style={{ background: panel, borderTop: `3px solid ${blue}` }}>
+                {tag("01", "Share")}
+                <div className="flex min-h-0 items-center gap-12">
                 <RadialBars
                   rings={shares.map((it, i) => ({ pct: pctOf(s(it.value), s(it.unit)) ?? 0, color: ringCol[i % 2]! }))}
                   size={360}
@@ -138,15 +148,17 @@ registerSlideModule({
                   ))}
                   {s(c.tagline) && <div style={{ fontSize: fillPx(16, "body"), color: ink.muted }}>{s(c.tagline)}</div>}
                 </div>
+                </div>
               </section>
-              <section className="flex min-h-0 flex-col justify-center gap-4">
-                <div className="grid grid-cols-1 gap-14">
+              <section className="flex min-h-0 flex-col justify-center gap-4 rounded-[14px] p-10" style={{ background: panel, borderTop: `3px solid ${INFO_FILL.lavender.bg}` }}>
+                {tag("02", "Scale")}
+                <div className="grid grid-cols-1 gap-10">
                   {counts.slice(0, 2).map((it, i) => (
-                    <div key={i}>
+                    <div key={i} style={{ paddingTop: i ? 32 : 0, borderTop: i ? `1px solid ${hair}` : undefined }}>
                       <Figure
                         value={s(it.value)}
                         unit={s(it.unit)}
-                        px={i === 0 ? 150 : 120}
+                        px={i === 0 ? 140 : 110}
                         color={ink.strong}
                         gradient={`linear-gradient(100deg, ${ink.strong} 35%, ${blue} 75%, ${INFO_FILL.lavender.bg})`}
                       />
@@ -155,12 +167,12 @@ registerSlideModule({
                   ))}
                 </div>
               </section>
-              <section className="col-span-2 mt-6 grid pt-6" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0,1fr))`, borderTop: `1px solid ${hair}` }}>
+              <section className="col-span-2 mt-8 grid gap-4" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0,1fr))` }}>
                 {items.map((it, i) => {
                   const pct = pctOf(s(it.value), s(it.unit));
                   void maxExp;
                   return (
-                    <div key={i} className="flex flex-col justify-start gap-3 px-5" style={{ borderLeft: i ? `1px solid ${hair}` : undefined }}>
+                    <div key={i} className="flex flex-col justify-start gap-3 rounded-[10px] px-5 pb-5 pt-4" style={{ background: panel, borderTop: `2px solid ${i % 2 ? INFO_FILL.lavender.bg : blue}` }}>
                       <Figure value={s(it.value)} unit={s(it.unit)} px={64} color={ink.strong} />
                       <div style={{ fontSize: fillPx(18, "body"), color: ink.muted, lineHeight: 1.3, minHeight: "2.6em" }}>{s(it.label)}</div>
                       {void pct}

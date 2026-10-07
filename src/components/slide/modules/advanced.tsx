@@ -594,8 +594,8 @@ registerSlideModule({
               {s(c.subtitle) && (
                 <div className="mt-3" style={{ fontSize: fillPx(24, "body"), color: ink.body }}>{s(c.subtitle)}</div>
               )}
-              <div className="slide-fill-stretch mt-8 grid min-h-0 gap-x-16" style={{ gridTemplateColumns: "minmax(0,1fr) minmax(0,1.2fr)" }}>
-                <section className="flex min-h-0 flex-col justify-center gap-8">
+              <div className="slide-fill-stretch mt-8 grid min-h-0 gap-x-8" style={{ gridTemplateColumns: "minmax(0,1fr) minmax(0,1.2fr)" }}>
+                <section className="flex min-h-0 flex-col justify-center gap-8 rounded-[14px] p-10" style={{ background: isDark ? "rgba(255,255,255,0.045)" : "rgba(3,0,44,0.035)", borderTop: `3px solid ${blue}` }}>
                   {kick(s(groups[0]?.label))}
                   {heroA && (
                     <div>
@@ -615,7 +615,7 @@ registerSlideModule({
                     ))}
                   </div>
                 </section>
-                <section className="flex min-h-0 flex-col justify-center gap-6 pl-16" style={{ borderLeft: `1px solid ${ink.hairline}` }}>
+                <section className="flex min-h-0 flex-col justify-center gap-6 rounded-[14px] p-10" style={{ background: isDark ? "rgba(255,255,255,0.045)" : "rgba(3,0,44,0.035)", borderTop: `3px solid ${INFO_FILL.lavender.bg}` }}>
                   {kick(s(groups[1]?.label))}
                   <div className="flex items-center gap-12">
                     <RadialBars
