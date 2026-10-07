@@ -50,6 +50,7 @@
     "verify:social-corners:update": "node scripts/visual-regression-social-corners.mjs --update"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^4.0.84",
     "@ai-sdk/openai-compatible": "^3.0.30",
     "@ai-sdk/react": "^4.0.67",
     "@fontsource-variable/geist": "^5.2.9",
