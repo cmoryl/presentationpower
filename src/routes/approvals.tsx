@@ -76,7 +76,7 @@ function ApprovalsPage() {
           <header>
             <h1 className="text-3xl font-semibold">What the system is learning</h1>
             <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-              Deck edits, approval decisions and job reports are collected automatically and turned into proposed rules, lessons, knowledge and template ideas. Nothing is used until an admin approves it; approved items join the knowledge every assistant reads.
+              Slide wording and design changes, assistant edits, module reviews, print edits and page templates, approval decisions, event intake and job reports are collected automatically and turned into proposed rules, lessons, knowledge and template ideas. Nothing is used until an admin approves it; approved items join the knowledge every assistant reads.
             </p>
           </header>
           <LearningQueue />

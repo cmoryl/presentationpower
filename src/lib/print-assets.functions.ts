@@ -164,7 +164,7 @@ export const updatePrintAsset = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (prev) {
       const p = prev as { content?: unknown; status?: string; kind?: string; brand_mode_id?: string };
-      const { textCorrections, designChanges, correctionSummary, logLearningSignal } = await import("./learning.server");
+      const { textCorrections, correctionSummary, logLearningSignal } = await import("./learning.server");
       if (data.content !== undefined) {
         const fixes = textCorrections(p.content, data.content, 12);
         if (fixes.length) await logLearningSignal(supabase, userId, { source: "edit", subjectType: "print", subjectId: data.assetId, divisionId: p.brand_mode_id ?? null, summary: correctionSummary(`a ${p.kind ?? "print"} piece`, fixes), detail: { fixes, kind: p.kind } });
@@ -173,7 +173,6 @@ export const updatePrintAsset = createServerFn({ method: "POST" })
         const blocks = (c: Record<string, unknown>) => JSON.stringify((c.sections ?? c.blocks ?? c.pages ?? null) as unknown)?.replace(/"(text|body|title|headline)":"[^"]*"/g, "");
         const layoutChanged = blocks(before) !== blocks(after);
         const heroChanged = JSON.stringify(before.heroMedia ?? null) !== JSON.stringify(after.heroMedia ?? null);
-        void designChanges;
         if (layoutChanged || heroChanged) await logLearningSignal(supabase, userId, { source: "edit", subjectType: "print-design", subjectId: data.assetId, divisionId: p.brand_mode_id ?? null, summary: `Design changed on a ${p.kind ?? "print"} piece: ${[layoutChanged && "sections/layout", heroChanged && "hero image"].filter(Boolean).join(", ")}`, detail: { kind: p.kind, layoutChanged, heroChanged } });
       }
       if (data.status !== undefined && data.status !== p.status) await logLearningSignal(supabase, userId, { source: "outcome", subjectType: "print", subjectId: data.assetId, divisionId: p.brand_mode_id ?? null, summary: `${p.kind ?? "Print"} piece moved ${p.status ?? "?"} → ${data.status}`, detail: { from: p.status, to: data.status } });
