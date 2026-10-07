@@ -21,6 +21,7 @@ export function sfScreenSurroundRows(): NextRegistryRow[] {
       downloadUrl: allAi.url,
       secondaryUrl: allPdf.url,
       secondaryLabel: "PDF",
+      liveSignId: "sf-surround-all",
     },
     {
       divisionId: "globallink",
@@ -32,6 +33,7 @@ export function sfScreenSurroundRows(): NextRegistryRow[] {
       downloadUrl: threeAi.url,
       secondaryUrl: threePdf.url,
       secondaryLabel: "PDF",
+      liveSignId: "sf-surround-three",
     },
   ];
 }
