@@ -49,6 +49,7 @@ export function signArtTarget(layoutId: string): { source: string; face: "front"
   if (d) return { source: "demo-booth", face: d[1] as "front" | "left" | "right" };
   const s = layoutId.match(/^sfsurround-(all|three)$/);
   if (s) return { source: `sf-surround-${s[1]}`, face: "front" };
+  if (layoutId === "divsign-transperfect-lift-liftyour") return { source: "lift-liftyour", face: "front" };
   const f = layoutId.match(/^divsign-(finance-pillar-(?:welcome|profile))$/);
   if (f) return { source: f[1]!, face: "front" };
   return null;

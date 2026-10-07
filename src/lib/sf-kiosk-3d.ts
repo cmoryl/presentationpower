@@ -41,7 +41,7 @@ export const SIGN_3D = [
   { id: "sign:welcome", name: "Finance NEXT — Welcome pillar", ids: ["finance-pillar-welcome"], match: /^$/ },
   { id: "sign:finance", name: "Finance NEXT — Profile pillar", ids: ["finance-pillar-profile"], match: /^$/ },
   { id: "sign:step-into", name: "NEXT — Step Into elevator wrap", ids: [], match: /^LIFT DOOR STEP INTO\b/i },
-  { id: "sign:lift-your", name: "NEXT — Lift Your Profile elevator wrap", ids: [], match: /^LIFT DOOR LIFT YOUR\b/i },
+  { id: "sign:lift-your", name: "NEXT — Lift Your Profile elevator wrap", ids: ["lift-liftyour"], match: /^LIFT DOOR LIFT YOUR\b/i },
   { id: "sign:surround-all", name: "Breakout screen surround — all sides", ids: ["sf-surround-all"], match: /^$/ },
   { id: "sign:surround-three", name: "Breakout screen surround — three sides", ids: ["sf-surround-three"], match: /^$/ },
   { id: "sign:demo-booth", name: "NEXT demo booth — wall-mounted screen", ids: ["demo-booth"], match: /^$/ },
