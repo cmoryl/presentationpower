@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 import type { CSSProperties } from "react";
 import { MapPin } from "lucide-react";
-import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, Pictogram, RadialBars, IsoCity, numOf, pctOf, type InfoFill } from "./infographic-kit";
+import { Donut, FillTile, Figure, GlassPanel, INFO_FILL, Pictogram, RadialBars, numOf, pctOf, type InfoFill } from "./infographic-kit";
 
 type IconType = typeof Sparkles;
 
