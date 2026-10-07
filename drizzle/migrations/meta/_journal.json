@@ -15,6 +15,13 @@
       "when": 1791380287484,
       "tag": "0001_sign_template_floor_kinds",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791407532266,
+      "tag": "0002_event_booths_signs",
+      "breakpoints": true
     }
   ]
 }
