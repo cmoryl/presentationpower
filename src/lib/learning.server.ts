@@ -31,16 +31,21 @@ export async function logLearningSignal(sb: Sb, userId: string, s: LearningSigna
   }
 }
 
-const TEXT_KEYS = /^(title|headline|heading|subtitle|subhead|body|text|caption|quote|label|description|kicker|eyebrow)$/i;
+const TEXT_KEYS = /^(title|headline|heading|subtitle|subhead|body|text|caption|quote|label|description|kicker|eyebrow|value|summary|author)$/i;
+const LIST_KEYS = /^(bullets|items|points|lines|highlights|takeaways|bodyLines)$/i;
 
-function collect(node: unknown, path: string, out: Map<string, string>, depth = 0) {
+function collect(node: unknown, path: string, out: Map<string, string>, depth = 0, listKey = false) {
   if (depth > 6 || node == null) return;
-  if (Array.isArray(node)) return node.forEach((v, i) => collect(v, `${path}[${i}]`, out, depth + 1));
+  if (Array.isArray(node))
+    return node.forEach((v, i) => {
+      if (listKey && typeof v === "string" && v.trim().length > 3) out.set(`${path}[${i}]`, v.trim());
+      else collect(v, `${path}[${i}]`, out, depth + 1);
+    });
   if (typeof node === "object") {
     for (const [k, v] of Object.entries(node as Record<string, unknown>)) {
       if (k.startsWith("__")) continue;
       if (typeof v === "string" && TEXT_KEYS.test(k) && v.trim().length > 3) out.set(`${path}.${k}`, v.trim());
-      else collect(v, `${path}.${k}`, out, depth + 1);
+      else collect(v, `${path}.${k}`, out, depth + 1, LIST_KEYS.test(k));
     }
   }
 }
