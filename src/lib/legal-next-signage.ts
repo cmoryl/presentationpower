@@ -7,7 +7,7 @@ import globallinkDeskPreview from "@/assets/globallink-desk/reg-desk.jpg.asset.j
 import { isSignId, liveLayoutById, venueFirstFaceId, type LiveLayout } from "@/lib/next-california-kiosk-live";
 
 type Ptr = { url: string };
-const MASTERS = import.meta.glob<Ptr>(["../assets/legal-next-signage/masters/*.asset.json", "../assets/sf-screen-surrounds/masters/*.asset.json", "../assets/next-demo-booth/masters/*.asset.json"], { eager: true, import: "default" });
+const MASTERS = import.meta.glob<Ptr>(["../assets/legal-next-signage/masters/*.asset.json", "../assets/sf-screen-surrounds/masters/*.asset.json", "../assets/next-demo-booth/masters/*.asset.json", "../assets/next-lift-door/masters/*.asset.json"], { eager: true, import: "default" });
 const masterUrl = (file: string) => Object.entries(MASTERS).find(([k]) => k.endsWith(`/${file}.asset.json`))?.[1].url ?? null;
 
 export type LegalSignFace = { id: string; label: string };
@@ -118,6 +118,13 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
     faces: [{ id: "divsign-transperfect-demobooth-front", label: "Front" }, { id: "divsign-transperfect-demobooth-left", label: "Left side" }, { id: "divsign-transperfect-demobooth-right", label: "Right side" }],
     division: "transperfect",
     note: "Example built from the GlobalLink Coach demo. The TV placement box marks where the screen mounts.",
+  },
+  {
+    // General NEXT lift-door wrap ("Lift your global profile"), two door leaves on one artboard.
+    id: "lift-liftyour", title: "NEXT lift door wrap — Lift Your Global Profile", size: "43.3 × 82.1 in (both doors)", master: "Lifts_Template_LiftYour.ai",
+    faces: [{ id: "divsign-transperfect-lift-liftyour", label: "Lift doors" }],
+    division: "transperfect",
+    note: "General lift template. The centre line where the doors meet is a guide and isn't printed.",
   },
 ];
 
