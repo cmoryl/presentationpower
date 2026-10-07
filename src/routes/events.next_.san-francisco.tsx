@@ -23,6 +23,7 @@ import { useState } from "react";
 import { assetGates, type Gate as GateKind, type GateRow } from "@/lib/event-assets";
 import { useEventAssets } from "@/lib/event-assets-data";
 import { AppShell } from "@/components/AppShell";
+import { EventLearningPanel } from "@/components/events/EventLearningPanel";
 import { EditionDivisionTiles } from "@/components/events/EditionDivisionTiles";
 import { CitySectionBar, SAN_FRANCISCO_SECTIONS } from "@/components/events/CitySectionBar";
 import { CaliforniaKioskBrowser } from "@/components/events/CaliforniaKioskBrowser";
@@ -292,6 +293,9 @@ function SanFranciscoPage() {
             ))}
           </div>
         </section>
+        <div className="mt-12">
+          <EventLearningPanel eventId="san-francisco" city="San Francisco" />
+        </div>
       </div>
     </AppShell>
   );
