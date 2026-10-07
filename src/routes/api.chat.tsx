@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
+import { AI_MODELS } from "@/lib/ai-models";
 
 // Deck-scoped AI chat proxy.
 // Accepts { messages, deckContext } and streams SSE-style completion
@@ -138,7 +139,7 @@ export const Route = createFileRoute("/api/chat")({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
+            model: AI_MODELS.quick,
             stream: true,
             messages: [{ role: "system", content: system }, ...parsed.messages],
           }),

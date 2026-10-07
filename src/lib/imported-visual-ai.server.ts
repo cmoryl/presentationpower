@@ -15,8 +15,9 @@
 import { visualModules, type VisualModuleDigest } from "@/lib/agent/data-visuals";
 import { plottedFieldsFor, visualDataGap } from "@/lib/agent/visual-data-gaps";
 import { serializeBrandGuide } from "@/lib/ai-core";
+import { AI_MODELS } from "@/lib/ai-models";
 
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = AI_MODELS.quick;
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
 export type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { AI_MODELS } from "@/lib/ai-models";
 
 export const logOutcome = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -71,7 +72,7 @@ export const distillLearning = createServerFn({ method: "POST" })
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: AI_MODELS.quick,
         response_format: { type: "json_object" },
         messages: [
           {

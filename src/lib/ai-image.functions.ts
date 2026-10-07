@@ -10,6 +10,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { AI_MODELS } from "@/lib/ai-models";
 
 const Input = z.object({
   prompt: z.string().min(3).max(2000),
@@ -57,7 +58,7 @@ export const generateBackgroundImage = createServerFn({ method: "POST" })
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-image-2",
+        model: AI_MODELS.image,
         prompt: `Editorial, on-brand slide background. ${data.prompt}.${directionLine} No text, no logos, no watermarks. Wide 16:9 composition, cinematic lighting, plenty of negative space for headline overlay.`,
         size: "1536x1024",
         quality: "low",

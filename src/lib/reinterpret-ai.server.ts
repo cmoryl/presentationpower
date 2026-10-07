@@ -9,6 +9,7 @@ import { DESIGN_CATALOG } from "@/lib/reinterpret-design";
 import { serializeBrandGuide } from "@/lib/ai-core";
 import type { AiSlidePlan } from "@/lib/reinterpret-plan";
 import type { GroundingCitation } from "@/lib/grounding-citations";
+import { AI_MODELS } from "@/lib/ai-models";
 
 export type PlannerSlide = {
   index: number;
@@ -39,7 +40,7 @@ export type PlannerResult = {
   error?: string;
 };
 
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = AI_MODELS.quick;
 
 /** Slides per request — small batches keep every slide's evidence in focus. */
 const BATCH = 5;

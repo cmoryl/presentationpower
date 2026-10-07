@@ -3,6 +3,7 @@
 // automatic synthesis at print-asset creation time.
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { AI_MODELS } from "@/lib/ai-models";
 
 export type SynthBlock = { heading: string; body: string } | null;
 
@@ -94,7 +95,7 @@ that appears in the snippets above.`;
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: AI_MODELS.quick,
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" },
       }),

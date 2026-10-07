@@ -8,6 +8,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
 import { knowledgeDivisionFilter } from "@/lib/knowledge-scope";
 import { z } from "zod";
+import { AI_MODELS } from "@/lib/ai-models";
 
 type SupaCtx = { supabase: unknown; userId: string };
 
@@ -1555,7 +1556,7 @@ export const proposeAbPalettes = createServerFn({ method: "POST" })
           method: "POST",
           headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
+            model: AI_MODELS.quick,
             messages: [
               { role: "system", content: system },
               { role: "user", content: JSON.stringify(user) },

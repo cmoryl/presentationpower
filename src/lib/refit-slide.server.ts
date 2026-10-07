@@ -12,6 +12,7 @@
 
 import { serializeBrandGuide } from "@/lib/ai-core";
 import type { GroundingCitation } from "@/lib/grounding-citations";
+import { AI_MODELS } from "@/lib/ai-models";
 
 export type RefitRequest = {
   supabase: unknown;
@@ -42,7 +43,7 @@ export type RefitResult = {
   error?: string;
 };
 
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = AI_MODELS.quick;
 
 const schema = {
   type: "object",

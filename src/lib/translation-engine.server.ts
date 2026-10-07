@@ -7,6 +7,7 @@
 //      feature is usable before GlobalLink credentials land.
 
 export type EngineId = "globallink" | "ai";
+import { AI_MODELS } from "@/lib/ai-models";
 
 export type EngineStatus = {
   id: EngineId;
@@ -144,7 +145,7 @@ async function translateWithAi(req: TranslationRequest): Promise<TranslationResu
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
+      model: AI_MODELS.quick,
       temperature: 0.1,
       messages: [
         { role: "system", content: system },

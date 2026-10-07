@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { AI_MODELS } from "@/lib/ai-models";
 
 /**
  * Inline fine-tuning: re-run the agent on ONE slide with the user's exact
@@ -136,7 +137,7 @@ export const refineSlideWithInstruction = createServerFn({ method: "POST" })
         method: "POST",
         headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: AI_MODELS.quick,
           messages: [
             { role: "system", content: system },
             {

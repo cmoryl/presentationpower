@@ -13,6 +13,7 @@ import { EMBEDDING_MODEL } from "@/lib/knowledge-scope";
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { AI_MODELS } from "@/lib/ai-models";
 
 const BRANDHUB_ORIGIN = "https://brandhubcreator.lovable.app";
 const INDEX_URL = `${BRANDHUB_ORIGIN}/knowledge-export/pdf-master-index.json`;
@@ -141,7 +142,7 @@ async function extractPdfTextFromBase64(
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
+      model: AI_MODELS.quick,
       messages: [
         {
           role: "user",

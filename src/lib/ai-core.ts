@@ -12,6 +12,7 @@ import {
   TRANSPERFECT_SUBCOMPANIES,
 } from "@/lib/brand-guides";
 import { getBrandhubIntel } from "@/lib/brandhub-intel";
+import { AI_MODELS } from "@/lib/ai-models";
 
 export const ANTHROPIC_MODEL = "claude-sonnet-4-6";
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
@@ -20,7 +21,7 @@ const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 // ANTHROPIC_API_KEY is absent but LOVABLE_API_KEY is present. Gemini 3.6-flash
 // supports tool/function calling, which the Copilot depends on.
 const LOVABLE_GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-export const LOVABLE_GATEWAY_MODEL = "google/gemini-3.6-flash";
+export const LOVABLE_GATEWAY_MODEL = AI_MODELS.agent;
 
 export type AiProvider = "anthropic" | "lovable-gateway" | "none";
 
