@@ -6,7 +6,7 @@
 import type { KioskEdits } from "@/lib/next-california-kiosk-live";
 import type { AssetRoom, AssetSession } from "@/lib/event-assets";
 
-export const SIGN_KINDS = ["door", "column", "wall", "room_sign", "directional", "header", "kiosk", "other"] as const;
+export const SIGN_KINDS = ["door", "column", "wall", "room_sign", "directional", "header", "kiosk", "floor", "stair", "other"] as const;
 export type SignKind = (typeof SIGN_KINDS)[number];
 export const SIGN_KIND_LABEL: Record<SignKind, string> = {
   door: "Door",
@@ -16,6 +16,8 @@ export const SIGN_KIND_LABEL: Record<SignKind, string> = {
   directional: "Directional",
   header: "Header",
   kiosk: "Kiosk",
+  floor: "Floor wrap / vinyl",
+  stair: "Stair wrap / clings",
   other: "Other",
 };
 

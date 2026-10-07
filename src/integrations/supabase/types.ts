@@ -5338,6 +5338,9 @@ export type Database = {
       }
       venue_sign_spots: {
         Row: {
+          artboards: Json
+          artwork_name: string | null
+          artwork_path: string | null
           created_at: string
           created_by: string | null
           floor_key: string | null
@@ -5348,13 +5351,19 @@ export type Database = {
           note: string | null
           photo_path: string | null
           position: number
+          review: Json | null
+          reviewed_at: string | null
           room: string | null
           sides: number
+          submitted_event_id: string | null
           updated_at: string
           venue_id: string
           w_in: number | null
         }
         Insert: {
+          artboards?: Json
+          artwork_name?: string | null
+          artwork_path?: string | null
           created_at?: string
           created_by?: string | null
           floor_key?: string | null
@@ -5365,13 +5374,19 @@ export type Database = {
           note?: string | null
           photo_path?: string | null
           position?: number
+          review?: Json | null
+          reviewed_at?: string | null
           room?: string | null
           sides?: number
+          submitted_event_id?: string | null
           updated_at?: string
           venue_id: string
           w_in?: number | null
         }
         Update: {
+          artboards?: Json
+          artwork_name?: string | null
+          artwork_path?: string | null
           created_at?: string
           created_by?: string | null
           floor_key?: string | null
@@ -5382,8 +5397,11 @@ export type Database = {
           note?: string | null
           photo_path?: string | null
           position?: number
+          review?: Json | null
+          reviewed_at?: string | null
           room?: string | null
           sides?: number
+          submitted_event_id?: string | null
           updated_at?: string
           venue_id?: string
           w_in?: number | null

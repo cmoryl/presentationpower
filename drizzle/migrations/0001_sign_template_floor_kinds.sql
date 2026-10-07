@@ -1,0 +1,2 @@
+ALTER TABLE public.sign_templates DROP CONSTRAINT IF EXISTS sign_templates_kind_check;
+ALTER TABLE public.sign_templates ADD CONSTRAINT sign_templates_kind_check CHECK (kind IN ('door','column','wall','room_sign','directional','header','kiosk','floor','stair','other'));
