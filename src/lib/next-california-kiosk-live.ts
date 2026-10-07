@@ -319,7 +319,7 @@ function pick(map: Record<string, Ptr>, file: string): string | null {
   const hit = Object.entries(map).find(([k]) => k.endsWith(`/${file}.asset.json`));
   return hit ? hit[1].url : null;
 }
-const NATIVE = import.meta.glob<Ptr>(["../assets/california-kiosks/native/*.asset.json", "../assets/legal-next-signage/native/*.asset.json", "../assets/sf-screen-surrounds/native/*.asset.json"], { eager: true, import: "default" });
+const NATIVE = import.meta.glob<Ptr>(["../assets/california-kiosks/native/*.asset.json", "../assets/legal-next-signage/native/*.asset.json", "../assets/sf-screen-surrounds/native/*.asset.json", "../assets/next-demo-booth/native/*.asset.json"], { eager: true, import: "default" });
 export const kioskArtSvgUrl = (id0: string) => {
   const id = baseLayoutId(id0);
   return liveLayoutById(id)?.native ? pick(NATIVE, `${id}-native.svg`) : pick(ART, `${id}-art.svg`);

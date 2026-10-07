@@ -7,7 +7,7 @@ import globallinkDeskPreview from "@/assets/globallink-desk/reg-desk.jpg.asset.j
 import { isSignId, liveLayoutById, venueFirstFaceId, type LiveLayout } from "@/lib/next-california-kiosk-live";
 
 type Ptr = { url: string };
-const MASTERS = import.meta.glob<Ptr>(["../assets/legal-next-signage/masters/*.asset.json", "../assets/sf-screen-surrounds/masters/*.asset.json"], { eager: true, import: "default" });
+const MASTERS = import.meta.glob<Ptr>(["../assets/legal-next-signage/masters/*.asset.json", "../assets/sf-screen-surrounds/masters/*.asset.json", "../assets/next-demo-booth/masters/*.asset.json"], { eager: true, import: "default" });
 const masterUrl = (file: string) => Object.entries(MASTERS).find(([k]) => k.endsWith(`/${file}.asset.json`))?.[1].url ?? null;
 
 export type LegalSignFace = { id: string; label: string };
@@ -111,6 +111,13 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
   {
     id: "nextmart-pedestal", title: "NEXT Mart pedestal", size: "15 × 36 in", master: "NEXTMartPedestal_Template_15x36_1.ai",
     faces: [{ id: "divsign-nextmart-pedestal", label: "Pedestal" }], sizes: PEDESTAL_SIZES_IN, division: "transperfect",
+  },
+  {
+    // Basic demo booth (from the GlobalLink Coach TV test drive file): new demos swap the top logo, wording and background.
+    id: "demo-booth", title: "NEXT demo booth", size: "45 × 96 in front + 4 × 96 in sides", master: "GLCoach_TVTestDrive_Demo_Booth.ai",
+    faces: [{ id: "divsign-transperfect-demobooth-front", label: "Front" }, { id: "divsign-transperfect-demobooth-left", label: "Left side" }, { id: "divsign-transperfect-demobooth-right", label: "Right side" }],
+    division: "transperfect",
+    note: "Example built from the GlobalLink Coach demo. The TV placement box marks where the screen mounts.",
   },
 ];
 
