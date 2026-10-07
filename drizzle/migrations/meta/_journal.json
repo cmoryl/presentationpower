@@ -8,6 +8,13 @@
       "when": 1791380206481,
       "tag": "0000_venue_spot_artwork",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791380287484,
+      "tag": "0001_sign_template_floor_kinds",
+      "breakpoints": true
     }
   ]
 }
