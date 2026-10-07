@@ -4,7 +4,9 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, FileUp, ImagePlus, Plus, Sparkles, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Download, FileUp, ImagePlus, PenTool, Plus, Sparkles, X } from "lucide-react";
+import { venueFirstSignId } from "@/lib/legal-next-signage";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -175,7 +177,12 @@ function AssetCard({ r, busy, onReview }: { r: Row; busy: boolean; onReview: () 
             <p className="text-[15px] font-semibold text-[#03002C]">{r.label}</p>
             <p className="text-[12px] text-[#666]">{SIGN_KIND_LABEL[r.kind as SignKind] ?? r.kind}{r.room ? ` · ${r.room}` : ""} · <span className="font-semibold text-[#03002C]">{size}</span>{r.sides > 1 ? ` · ${r.sides} surfaces` : ""}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            {r.artboards?.length ? (
+              <Link to="/events/next/sign-editor/$signId" params={{ signId: venueFirstSignId(r.id, r.artboards) }} className={primary}>
+                <PenTool className="h-4 w-4" /> Open first version in live editor
+              </Link>
+            ) : null}
             <button type="button" className={btn} onClick={download}><Download className="h-4 w-4" /> {r.artwork_name ?? "Live file"}</button>
             <button type="button" className={btn} disabled={busy} onClick={onReview}><Sparkles className="h-4 w-4" /> {busy ? "Reviewing…" : rv ? "Review again" : "Review design"}</button>
           </div>
