@@ -41,6 +41,7 @@ import {
   pieceBackdropPath,
   partCentre,
   withCopies,
+  stepBands,
   splitArtSvg,
   nativeSymbols,
   nativeBgBox,
@@ -422,7 +423,11 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
     const cx = (b.x0 + b.x1) / 2;
     const tries: [number, number][] = [[KIOSK_W / 2 - cx, KIOSK_W / 2], [KIOSK_MARGIN - b.x0, KIOSK_MARGIN], [KIOSK_W - KIOSK_MARGIN - b.x1, KIOSK_W - KIOSK_MARGIN]];
     const hit = tries.find(([d]) => Math.abs(d) <= tol);
-    return hit ? { next: shift(s, hit[0], 0, next), g: hit[1] } : { next, g: null };
+    // Stair steps: snap the selection's middle to a step's middle, or its edges to a step line.
+    const cy = (b.y0 + b.y1) / 2;
+    const ytries: number[] = bands.flatMap(([t, bt]) => [(t + bt) / 2 - cy, t - b.y0, bt - b.y1]);
+    const yhit = ytries.filter((d) => Math.abs(d) <= tol).sort((a, c) => Math.abs(a) - Math.abs(c))[0] ?? 0;
+    return hit || yhit ? { next: shift(s, hit?.[0] ?? 0, yhit, next), g: hit?.[1] ?? null } : { next, g: null };
   };
 
   const onMove = (e: React.PointerEvent) => {
@@ -507,6 +512,76 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
     commit({ ...edits, locked: on ? (edits.locked ?? []).filter((x) => !ids.includes(x)) : [...new Set([...(edits.locked ?? []), ...ids])] });
   };
   const newId = (p: string) => `${p}-c${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
+  /** Copy the selection `dy` points down (notes, objects, rules); returns the new edits and ids. */
+  const copyBy = (s: NonNullable<Sel>, dy: number, base: KioskEdits): { next: KioskEdits; ids: string[] } => {
+    if (s.kind === "divider") {
+      const d = base.dividers?.find((x) => x.id === s.id);
+      if (!d) return { next: base, ids: [] };
+      const id = newId("div");
+      return { next: { ...base, dividers: [...(base.dividers ?? []), { ...d, id, y: d.y + dy }] }, ids: [id] };
+    }
+    const note = s.kind === "text" ? base.notes?.find((n) => n.id === s.id) : undefined;
+    if (note) {
+      const id = newId("note");
+      return { next: { ...base, notes: [...(base.notes ?? []), { ...note, id, y: note.y + dy }], texts: { ...base.texts, [id]: { ...base.texts?.[note.id] } } }, ids: [id] };
+    }
+    const root = (id: string) => base.copies?.find((c) => c.id === id)?.of ?? id;
+    const ids = s.kind === "part" ? partGroup(base, s.id, L) : [s.id];
+    const key = s.kind === "part" ? "parts" : "texts";
+    const map = { ...(base[key] as Record<string, { dx?: number; dy?: number }> | undefined) };
+    const copies = [...(base.copies ?? [])];
+    const made: string[] = [];
+    for (const id of ids) {
+      const nid = newId(root(id));
+      copies.push({ id: nid, of: root(id), kind: s.kind as "text" | "part" });
+      map[nid] = { ...map[id], dy: (map[id]?.dy ?? 0) + dy };
+      made.push(nid);
+    }
+    const groups = made.length > 1 ? [...(base.groups ?? defaultPartGroups(L)), made] : base.groups;
+    return { next: { ...base, copies, [key]: map, ...(groups ? { groups } : {}) }, ids: made };
+  };
+  /** Which step (band index) the selection's middle sits on. */
+  const stepOf = (s: NonNullable<Sel>) => {
+    const b = selBounds(s);
+    if (!b) return -1;
+    const cy = (b.y0 + b.y1) / 2;
+    return bands.findIndex(([t, bt]) => cy >= t && cy < bt);
+  };
+  /** Put the selection in the middle of step `i` (keeps its left/right position). */
+  const moveToStep = (i: number) => {
+    if (!sel || !bands[i] || isLocked(sel.id)) return;
+    const b = selBounds(sel);
+    if (!b) return;
+    commit(shift(sel, 0, (bands[i]![0] + bands[i]![1]) / 2 - (b.y0 + b.y1) / 2));
+  };
+  /** Repeat the selection on every other step (or only `only`), same spot on each. */
+  const repeatOnSteps = (only?: number[]) => {
+    if (!sel || sel.kind === "block") return;
+    const b = selBounds(sel);
+    if (!b) return;
+    const cy = (b.y0 + b.y1) / 2;
+    const from = stepOf(sel);
+    let next = edits; let n = 0;
+    bands.forEach(([t, bt], i) => {
+      if (i === from || (only && !only.includes(i))) return;
+      const r = copyBy(sel, (t + bt) / 2 - cy, next);
+      next = r.next; n += r.ids.length ? 1 : 0;
+    });
+    if (!n) return;
+    commit(next);
+    setStatus(`Repeated on ${n} more step${n === 1 ? "" : "s"} — each copy can be moved or retyped on its own.`);
+  };
+  /** Type a new line of wording, centred on the chosen step (or the artboard). */
+  const addText = () => {
+    const at = sel ? stepOf(sel) : -1;
+    const band = bands[at >= 0 ? at : 0];
+    const top = band ? band[0] : 0, bot = band ? band[1] : L.trimH;
+    const size = Math.round(Math.max(36, Math.min(288, (bot - top) * 0.45)));
+    const id = newId("note");
+    commit({ ...edits, notes: [...(edits.notes ?? []), { id, text: "Your wording", cx: KIOSK_W / 2, y: (top + bot) / 2 + size * 0.35, size }] });
+    setSel({ kind: "text", id }); setPicked([]);
+    setStatus("New text added — retype it in the Text panel, then drag it or pick a step.");
+  };
   const duplicate = (s: NonNullable<Sel> | null = sel) => {
     if (!s || s.kind === "block") return;
     const off = 72;
@@ -562,8 +637,9 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
     const key = sel.kind === "part" ? "parts" : "texts";
     const map = { ...(edits[key] as Record<string, object> | undefined) };
     // Copies are removed; London originals are hidden (Reset or the eye brings them back).
-    for (const id of ids) if (isCopy(id)) delete map[id]; else map[id] = { ...map[id], hidden: true };
-    commit({ ...edits, [key]: map, copies: (edits.copies ?? []).filter((c) => !ids.includes(c.id)), groups: edits.groups?.map((g) => g.filter((x) => !(ids.includes(x) && isCopy(x)))).filter((g) => g.length > 1) });
+    const isNote = (id: string) => (edits.notes ?? []).some((n) => n.id === id);
+    for (const id of ids) if (isCopy(id) || isNote(id)) delete map[id]; else map[id] = { ...map[id], hidden: true };
+    commit({ ...edits, [key]: map, notes: (edits.notes ?? []).filter((n) => !ids.includes(n.id)), copies: (edits.copies ?? []).filter((c) => !ids.includes(c.id)), groups: edits.groups?.map((g) => g.filter((x) => !(ids.includes(x) && isCopy(x)))).filter((g) => g.length > 1) });
     setSel(null); setPicked([]);
   };
   /** Stacking: objects within their piece, dividers among dividers. */
@@ -1123,6 +1199,18 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                 </Sec>
               ) : null}
 
+              {sel && sel.kind !== "block" && bands.length ? (
+                <Sec title="Stair steps">
+                  <label className="mb-1.5 block text-[10.5px] text-white/55" htmlFor="kle-step">Move to step (1 = top of this artboard)</label>
+                  <select id="kle-step" className="mb-2 w-full rounded bg-white/10 px-2 py-1 text-xs text-white" value={stepOf(sel)} disabled={isLocked(sel.id)} onChange={(e) => moveToStep(Number(e.target.value))}>
+                    {stepOf(sel) < 0 ? <option value={-1}>Between steps</option> : null}
+                    {bands.map((_, i) => <option key={i} value={i}>Step {i + 1}</option>)}
+                  </select>
+                  <button type="button" className={dbtn} onClick={() => repeatOnSteps()}>Repeat on every step</button>
+                  <p className="mt-1.5 text-[10.5px] text-white/50">Copies land in the same spot on each step. Dragging snaps to step middles and step lines.</p>
+                </Sec>
+              ) : null}
+
               {sel && sel.kind !== "block" && selFx ? (
                 <Sec title="Arrange">
                   <div className="flex flex-wrap gap-1">
@@ -1281,6 +1369,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
 
               <Sec title="Add">
                 <div className="flex flex-wrap gap-1.5">
+                  <button type="button" className={dbtn} onClick={addText}>Text</button>
                   <button type="button" className={dbtn} onClick={() => addDivider("short")}>Short rule</button>
                   <button type="button" className={dbtn} onClick={() => addDivider("full")}>Full-width rule</button>
                   <button type="button" className={dbtn} disabled={!sel || sel.kind === "divider"} onClick={() => addDivider("under")}>Rule under selection</button>
