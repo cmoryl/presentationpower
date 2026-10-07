@@ -150,19 +150,25 @@ registerSlideModule({
                 </div>
                 </div>
               </section>
-              <section className="flex min-h-0 flex-col justify-center gap-4 rounded-[14px] p-10" style={{ background: panel, borderTop: `3px solid ${INFO_FILL.lavender.bg}` }}>
-                {tag("02", "Scale")}
-                <div className="grid grid-cols-1 gap-10">
+              <section className="relative flex min-h-0 flex-col justify-center gap-4 overflow-hidden rounded-[18px] p-12" style={{ background: `linear-gradient(140deg, #03002C 0%, #03002C 35%, ${INFO_FILL.blue.bg} 100%)`, color: "#FFFFFF", boxShadow: "0 24px 60px -24px rgba(3,0,44,0.55)" }}>
+                <div aria-hidden className="pointer-events-none absolute" style={{ right: -120, top: -140, width: 520, height: 520, borderRadius: "50%", background: `radial-gradient(circle, ${INFO_FILL.lavender.bg}66 0%, transparent 65%)`, filter: "blur(30px)" }} />
+                <div aria-hidden className="pointer-events-none absolute" style={{ left: -160, bottom: -200, width: 560, height: 560, borderRadius: "50%", background: `radial-gradient(circle, ${INFO_FILL.aqua.bg}40 0%, transparent 65%)`, filter: "blur(40px)" }} />
+                <div className="relative mb-6 flex items-center gap-4" style={{ fontSize: fillPx(14, "body"), letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.75)", fontWeight: 650 }}>
+                  <span style={{ color: "#FFFFFF" }}>02</span>
+                  <span aria-hidden style={{ width: 36, height: 2, background: INFO_FILL.aqua.bg }} />
+                  <span>Scale</span>
+                </div>
+                <div className="relative grid grid-cols-1 gap-10">
                   {counts.slice(0, 2).map((it, i) => (
-                    <div key={i} style={{ paddingTop: i ? 32 : 0, borderTop: i ? `1px solid ${hair}` : undefined }}>
+                    <div key={i} style={{ paddingTop: i ? 32 : 0, borderTop: i ? "1px solid rgba(255,255,255,0.2)" : undefined }}>
                       <Figure
                         value={s(it.value)}
                         unit={s(it.unit)}
-                        px={i === 0 ? 140 : 110}
-                        color={ink.strong}
-                        gradient={`linear-gradient(100deg, ${ink.strong} 35%, ${blue} 75%, ${INFO_FILL.lavender.bg})`}
+                        px={i === 0 ? 150 : 116}
+                        color="#FFFFFF"
+                        gradient={`linear-gradient(100deg, #FFFFFF 40%, ${INFO_FILL.aqua.bg} 75%, ${INFO_FILL.lavender.bg})`}
                       />
-                      <div style={{ fontSize: fillPx(20, "body"), color: ink.body, marginTop: 8, fontWeight: 500 }}>{s(it.label)}</div>
+                      <div style={{ fontSize: fillPx(20, "body"), color: "rgba(255,255,255,0.85)", marginTop: 8, fontWeight: 500 }}>{s(it.label)}</div>
                     </div>
                   ))}
                 </div>

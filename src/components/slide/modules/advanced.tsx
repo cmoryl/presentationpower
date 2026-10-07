@@ -595,22 +595,23 @@ registerSlideModule({
                 <div className="mt-3" style={{ fontSize: fillPx(24, "body"), color: ink.body }}>{s(c.subtitle)}</div>
               )}
               <div className="slide-fill-stretch mt-8 grid min-h-0 gap-x-8" style={{ gridTemplateColumns: "minmax(0,1fr) minmax(0,1.2fr)" }}>
-                <section className="flex min-h-0 flex-col justify-center gap-8 rounded-[14px] p-10" style={{ background: isDark ? "rgba(255,255,255,0.045)" : "rgba(3,0,44,0.035)", borderTop: `3px solid ${blue}` }}>
-                  {kick(s(groups[0]?.label))}
+                <section className="relative flex min-h-0 flex-col justify-center gap-8 overflow-hidden rounded-[18px] p-12" style={{ background: `linear-gradient(140deg, #03002C 0%, #03002C 35%, ${INFO_FILL.blue.bg} 100%)`, boxShadow: "0 24px 60px -24px rgba(3,0,44,0.55)", ["--kpi-ink" as string]: "#FFFFFF" }}>
+                  <div aria-hidden className="pointer-events-none absolute" style={{ right: -140, top: -160, width: 560, height: 560, borderRadius: "50%", background: `radial-gradient(circle, ${INFO_FILL.lavender.bg}66 0%, transparent 65%)`, filter: "blur(30px)" }} />
+                  <div className="relative uppercase font-mono" style={{ fontSize: fillPx(13, "kicker"), letterSpacing: "0.26em", color: INFO_FILL.aqua.bg, fontWeight: 600 }}>{s(groups[0]?.label)}</div>
                   {heroA && (
                     <div>
                       <div className="flex items-end gap-6">
-                        <Figure value={s(heroA.value)} px={190} color={ink.strong} gradient={`linear-gradient(100deg, ${ink.strong} 30%, ${blue} 80%, ${INFO_FILL.lavender.bg})`} />
-                        <div style={{ fontSize: fillPx(26, "body"), fontWeight: 650, color: ink.strong, paddingBottom: 22 }}>{s(heroA.label)}</div>
+                        <Figure value={s(heroA.value)} px={200} color="#FFFFFF" gradient={`linear-gradient(100deg, #FFFFFF 40%, ${INFO_FILL.aqua.bg} 75%, ${INFO_FILL.lavender.bg})`} />
+                        <div style={{ fontSize: fillPx(26, "body"), fontWeight: 650, color: "#FFFFFF", paddingBottom: 22 }}>{s(heroA.label)}</div>
                       </div>
                     </div>
                   )}
-                  <div className="grid grid-cols-2 pt-7" style={{ borderTop: `1px solid ${ink.hairline}` }}>
+                  <div className="relative grid grid-cols-2 pt-7" style={{ borderTop: "1px solid rgba(255,255,255,0.2)", color: "#FFFFFF" }}>
                     {restA.map((it, i) => (
-                      <div key={i} className="flex flex-col gap-2" style={{ paddingLeft: i ? 32 : 0, borderLeft: i ? `1px solid ${ink.hairline}` : undefined }}>
-                        <Figure value={s(it.value)} px={80} color={ink.strong} />
-                        {lab(s(it.label), 20)}
-                        {s(it.body) && <div style={{ fontSize: fillPx(15, "body"), color: ink.muted, lineHeight: 1.35 }}>{s(it.body)}</div>}
+                      <div key={i} className="flex flex-col gap-2" style={{ paddingLeft: i ? 32 : 0, borderLeft: i ? "1px solid rgba(255,255,255,0.2)" : undefined }}>
+                        <Figure value={s(it.value)} px={84} color="#FFFFFF" />
+                        <div style={{ fontSize: fillPx(20, "body"), fontWeight: 600, color: "#FFFFFF" }}>{s(it.label)}</div>
+                        {s(it.body) && <div style={{ fontSize: fillPx(15, "body"), color: "rgba(255,255,255,0.75)", lineHeight: 1.35 }}>{s(it.body)}</div>}
                       </div>
                     ))}
                   </div>
