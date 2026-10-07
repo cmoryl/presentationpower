@@ -140,13 +140,13 @@ registerSlideModule({
                 </div>
               </section>
               <section className="flex min-h-0 flex-col justify-center gap-4">
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 gap-14">
                   {counts.slice(0, 2).map((it, i) => (
                     <div key={i}>
                       <Figure
                         value={s(it.value)}
                         unit={s(it.unit)}
-                        px={i === 0 ? 108 : 92}
+                        px={i === 0 ? 150 : 120}
                         color={ink.strong}
                         gradient={`linear-gradient(100deg, ${ink.strong} 35%, ${blue} 75%, ${INFO_FILL.lavender.bg})`}
                       />
@@ -154,22 +154,6 @@ registerSlideModule({
                     </div>
                   ))}
                 </div>
-                {(() => {
-                  const sky = [...counts.slice(0, 2), ...items.filter((it) => pctOf(s(it.value), s(it.unit)) === null)].slice(0, 7);
-                  const pal = [blue, INFO_FILL.lavender.bg, isDark ? INFO_FILL.aqua.bg : "#1E2A8C"];
-                  return (
-                    <div className="min-h-0 flex-1" style={{ maxHeight: 420 }}>
-                      <IsoCity
-                        towers={sky.map((it, i) => ({ value: numOf(s(it.value)), color: pal[i % pal.length]!, label: `${s(it.value)}${s(it.unit)}` }))}
-                        mode="log"
-                        maxHeight={5.5}
-                        ground={blue}
-                        labels
-                        labelColor={ink.strong}
-                      />
-                    </div>
-                  );
-                })()}
               </section>
               <section className="col-span-2 mt-6 grid pt-6" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0,1fr))`, borderTop: `1px solid ${hair}` }}>
                 {items.map((it, i) => {
@@ -179,11 +163,7 @@ registerSlideModule({
                     <div key={i} className="flex flex-col justify-start gap-3 px-5" style={{ borderLeft: i ? `1px solid ${hair}` : undefined }}>
                       <Figure value={s(it.value)} unit={s(it.unit)} px={46} color={ink.strong} />
                       <div style={{ fontSize: fillPx(15, "body"), color: ink.muted, lineHeight: 1.3, minHeight: "2.6em" }}>{s(it.label)}</div>
-                      {pct !== null ? (
-                        <Donut pct={pct} size={92} stroke={11} color={blue} track={hair} />
-                      ) : (
-                        <div className="h-[92px] w-[150px]"><IsoCity towers={[{ value: numOf(s(it.value)), color: blue }]} mode="linear" max={numOf(s(it.value))} maxHeight={2.2} foot={1.6} ground={blue} glow={false} /></div>
-                      )}
+                      {pct !== null ? <Donut pct={pct} size={92} stroke={11} color={blue} track={hair} /> : null}
                     </div>
                   );
                 })}
