@@ -42,6 +42,9 @@ export const SIGN_3D = [
   { id: "sign:finance", name: "Finance NEXT — Profile pillar", ids: ["finance-pillar-profile"], match: /^$/ },
   { id: "sign:step-into", name: "NEXT — Step Into elevator wrap", ids: [], match: /^LIFT DOOR STEP INTO\b/i },
   { id: "sign:lift-your", name: "NEXT — Lift Your Profile elevator wrap", ids: [], match: /^LIFT DOOR LIFT YOUR\b/i },
+  { id: "sign:surround-all", name: "Breakout screen surround — all sides", ids: ["sf-surround-all"], match: /^$/ },
+  { id: "sign:surround-three", name: "Breakout screen surround — three sides", ids: ["sf-surround-three"], match: /^$/ },
+  { id: "sign:demo-booth", name: "NEXT demo booth — wall-mounted screen", ids: ["demo-booth"], match: /^$/ },
 ] as const;
 
 export function sign3dUrl(signIdOrName: string | null | undefined): string | null {
