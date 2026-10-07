@@ -22,3 +22,6 @@ BoothHub should read them and paint them on the 3D booth faces.
 
 ## Embedded view (for the Element booth workspace)
 6. When the URL has `chromeless=1&single=1`, hide BoothHub's own overlay controls (the "Orbit" button and the booth info card) and show only the 3D model on a plain background. Element draws its own Reset view / Fullscreen / Share controls around it.
+
+## Signs (demo booth, screen surrounds, pillars)
+7. Signs are in the same list with `"type": "sign"` and slugs matching BoothHub's sign ids (`sign:demo-booth`, `sign:surround-all`, `sign:surround-three`, `sign:welcome`, `sign:finance`). Fetch `...?slug=sign:demo-booth` and paint `art.front` (and `left`/`right` for the demo booth) on the model; keep built-in art only when `art` is empty. Element is the source of truth for artwork; BoothHub-side edits are only for users working in BoothHub itself.
