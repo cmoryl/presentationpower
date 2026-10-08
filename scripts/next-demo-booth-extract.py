@@ -274,6 +274,8 @@ def build():
             tp.Contents = tpdf.make_stream(f"q 1 0 0 1 {B} {B} cm\n".encode() + pikepdf.unparse_content_stream(filtered(ops, tkeep)) + b"\nQ\n")
             tpath = f"/tmp/db/{lid}-text.pdf"; tpdf.save(tpath)
             texts = read_texts(tpath, W, H)
+            import importlib.util as _u; _sp = _u.spec_from_file_location('tp', os.path.join(os.path.dirname(__file__), 'text-paragraphs.py')); _tp = _u.module_from_spec(_sp); _sp.loader.exec_module(_tp)
+            texts = _tp.paragraphs(texts)  # supplied lines -> wrapping paragraphs
             npath = f"{OUT}/{lid}-native.pdf"; nat.save(npath)
             syms = [svg_symbol(npath, bg_page, "bg", f"{lid}-bg")]
             for k, pb in enumerate(part_boxes):
