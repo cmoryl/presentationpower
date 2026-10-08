@@ -25,8 +25,25 @@ export const VENUE_SPOT_LIVE_FILES: Record<string, { url: string; name: string }
   "76c01b5b": { url: liveFile.url, name: "Stair_Clings-2.ai" },
 };
 
+/** Photo per artboard (1-based), from the designer's annotated layout (8 Oct 2026):
+ *  AB1 = Section 1 (bottom 3 steps), AB2 = "1b" (upper flight in Section 1),
+ *  AB3 = Section 2, AB4 = Section 3, AB5 = Section 4. Value = index into the spot list. */
+export const VENUE_SPOT_ARTBOARD_PHOTO: Record<string, number[]> = {
+  "76c01b5b": [0, 0, 1, 2, 3],
+};
+
 export function spotPhotosFor(spotIdOrLayoutId: string | null | undefined): SpotPhoto[] {
   if (!spotIdOrLayoutId) return [];
+  const ab = spotIdOrLayoutId.match(/\.([0-9a-f]{8})-(\d+)of\d+/);
+  if (ab) {
+    const all = VENUE_SPOT_PHOTOS[ab[1]!] || [];
+    const idx = VENUE_SPOT_ARTBOARD_PHOTO[ab[1]!]?.[Number(ab[2]) - 1];
+    if (idx != null && all[idx]) {
+      const ph = all[idx]!;
+      return [{ ...ph, label: Number(ab[2]) === 2 ? `${ph.label} (1b — upper flight)` : ph.label }];
+    }
+    return all;
+  }
   const m = spotIdOrLayoutId.match(/([0-9a-f]{8})(?:-|\b)/);
   return (m && VENUE_SPOT_PHOTOS[m[1]!]) || [];
 }
