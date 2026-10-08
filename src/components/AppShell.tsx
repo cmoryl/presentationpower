@@ -1,7 +1,7 @@
 import { ADMIN_NAV_GROUPS } from "@/lib/admin-nav";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AdminSidebar } from "@/components/AdminShell";
 import { NotificationBell } from "@/components/NotificationBell";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
