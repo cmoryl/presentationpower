@@ -4,7 +4,7 @@
 
 import JSZip from "jszip";
 
-import { kioskFaceH, kioskFaceW, kioskFontFaceCss, kioskFontFamily, kioskMarginX, layoutKiosk, textLineBoxes, type KioskEdits, type LiveLayout, type PlacedText } from "@/lib/next-california-kiosk-live";
+import { kioskFaceH, kioskFaceW, kioskFontFaceCss, kioskFontFamily, kioskMarginX, layoutKiosk, rotatedBox, textLineBoxes, type KioskEdits, type LiveLayout, type PlacedText } from "@/lib/next-california-kiosk-live";
 import { liveFrontPdf, pressFrontSvg } from "@/lib/next-california-kiosk-live-export";
 
 export type SignCheck = { label: string; issue: string; level: "error" | "warn" };

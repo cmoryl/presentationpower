@@ -55,7 +55,7 @@ import {
   type LiveLayout,
   type PlacedText,
   type TextAlign,
-  cmykScreen, rotatedBox} from "@/lib/next-california-kiosk-live";
+  cmykScreen, rotatedBox } from "@/lib/next-california-kiosk-live";
 import { downloadKiosk, loadArtSvg, type KioskDownload } from "@/lib/next-california-kiosk-live-export";
 import { kioskCmykMaster } from "@/lib/next-california-kiosk-cmyk-masters";
 import { markArt, markFamilyFor, markH, markTransform, type KioskMark } from "@/lib/kiosk-marks";
