@@ -25,7 +25,7 @@ export function SfScreenSurrounds() {
 /** San Francisco demo booths: the shared NEXT demo booth template (more versions to follow). */
 export function SfDemoBooths() {
   return (
-    <SignTemplateList id="sf-demo-booths" title="Demo booths" signs={DIVISION_LIVE_SIGNS.filter((s) => s.id === "demo-booth")} masterLabel="Supplied .ai"
+    <SignTemplateList id="sf-demo-booths" title="Demo booths" signs={DIVISION_LIVE_SIGNS.filter((s) => s.id === "demo-booth" || s.id.startsWith("demo-booth-"))} masterLabel="Supplied .ai"
       intro="The basic demo booth from the GlobalLink Coach file: a 45 × 96 in front and two 4 × 96 in sides. Open it to swap the top logo, retype the wording or change the background. The TV placement box is a guide and isn't printed." />
   );
 }
