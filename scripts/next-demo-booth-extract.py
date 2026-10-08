@@ -282,6 +282,10 @@ def build():
                 syms.append(svg_symbol(npath, parts[pb["id"]]["page"], pb["id"], f"{lid}-{pb['id']}"))
             open(f"{OUT}/{lid}-native.svg", "w").write(
                 f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 {MW:g} {MH:g}">' + "".join(syms) + "</svg>")
+            # The supplied white "TV PLACEMENT" box is a guide, never printed: drop it (the editor draws the TV keep-clear guide).
+            if face == "front":
+                part_boxes = [q for q in part_boxes if not (abs(q["x0"] - 252) < 20 and abs(q["y0"] - 1522.51) < 20 and abs(q["x1"] - 2988) < 20 and abs(q["y1"] - 3106.51) < 20)]
+                parts = {k: v for k, v in parts.items() if any(q["id"] == k for q in part_boxes)}
             layouts[lid] = {
                 "id": lid, "source": fname, "trimW": W, "trimH": H, "originX": B, "originY": B, "mediaW": MW, "mediaH": MH,
                 "texts": texts,
