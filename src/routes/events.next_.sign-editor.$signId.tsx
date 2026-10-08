@@ -157,7 +157,7 @@ function SignEditorWindow() {
               <span className="font-semibold">3D view</span>
               <button type="button" onClick={() => setFrameKey((k) => k + 1)} className="ml-auto rounded-sm border border-white/20 px-2 py-0.5 text-[11px] hover:bg-white/10">Reload</button>
             </div>
-            <iframe key={frameKey} src={`${url3d}&single=1&chromeless=1&t=${frameKey}`} title={`${sign.title} in 3D`} allow="fullscreen" allowFullScreen className="min-h-0 flex-1 bg-white" />
+            <iframe key={frameKey} src={`${url3d}&chromeless=1&t=${frameKey}`} title={`${sign.title} in 3D`} allow="fullscreen" allowFullScreen className="min-h-0 flex-1 bg-white" />
             <p className="border-t border-white/10 p-2 text-[11px] text-white/60">Saving sends this artwork to BoothHub and reloads the view. If it still shows older artwork, BoothHub hasn't picked up Element's artwork for this model yet.</p>
           </aside>
         ) : null}

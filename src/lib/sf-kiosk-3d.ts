@@ -51,5 +51,5 @@ export function sign3dUrl(signIdOrName: string | null | undefined): string | nul
   if (!signIdOrName) return null;
   const base = signIdOrName.split("~")[0]!;
   const hit = SIGN_3D.find((s) => (s.ids as readonly string[]).includes(base) || s.match.test(signIdOrName));
-  return hit ? `${ORIGIN}?kiosk=${encodeURIComponent(hit.id)}` : null;
+  return hit ? `${ORIGIN}?kiosk=${encodeURIComponent(hit.id)}&single=1` : null;
 }
