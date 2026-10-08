@@ -50,8 +50,13 @@ export function signArtTarget(layoutId: string): { source: string; face: "front"
   const s = layoutId.match(/^sfsurround-(all|three)$/);
   if (s) return { source: `sf-surround-${s[1]}`, face: "front" };
   if (layoutId === "divsign-transperfect-lift-liftyour") return { source: "lift-liftyour", face: "front" };
-  const f = layoutId.match(/^divsign-(finance-pillar-(?:welcome|profile))$/);
+  const f = layoutId.match(/^divsign-(finance-pillar-(?:welcome|profile|riverside|background))$/);
   if (f) return { source: f[1]!, face: "front" };
+  // Arrow pillar: the pillar is the front, the separate arrow panel travels as "left".
+  if (layoutId === "divsign-finance-pillar-arrow-pillar") return { source: "finance-pillar-arrow", face: "front" };
+  if (layoutId === "divsign-finance-pillar-arrow-arrow") return { source: "finance-pillar-arrow", face: "left" };
+  const k = layoutId.match(/^divsign-((?:finance|globallink)-reg-desk|nextmart-pedestal|globallink-pedestal-[123])$/);
+  if (k) return { source: k[1]!, face: "front" };
   return null;
 }
 
@@ -64,7 +69,9 @@ export async function publishSignArt(L: LiveLayout, userId: string | null): Prom
   // Multi-face signs (demo booth) send every face on each save, so 3D never mixes old and new sides.
   const siblings = t.source === "demo-booth"
     ? (["front", "left", "right"] as const).map((f) => ({ face: f, layout: f === t.face ? L : liveLayoutById(`divsign-transperfect-demobooth-${f}`) }))
-    : [{ face: t.face, layout: L }];
+    : t.source === "finance-pillar-arrow"
+      ? ([["front", "pillar"], ["left", "arrow"]] as const).map(([f, id]) => ({ face: f, layout: f === t.face ? L : liveLayoutById(`divsign-finance-pillar-arrow-${id}`) }))
+      : [{ face: t.face, layout: L }];
   const revision = new Date().toISOString();
   for (const { face, layout } of siblings) {
     if (!layout) continue;
