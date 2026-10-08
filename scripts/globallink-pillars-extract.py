@@ -127,6 +127,11 @@ def build(pdf_path):
         lid = f"divsign-globallink-pillar-{slug}"
         page = src.pages[pi]
         ops, paints, W, H = analyse(src, page, set())
+        # Canva offsets the MediaBox (y0 ≈ 7.92 pt); work in trim space from y = 0.
+        oy = float(page.MediaBox[1]); H = H - oy
+        for p in paints:
+            if p["box"]: p["box"] = [p["box"][0], p["box"][1] - oy, p["box"][2], p["box"][3] - oy]
+        shift = f"1 0 0 1 0 {-oy:.6f} cm\n".encode()
         mark_forms(ops, page, paints)
         bg, objs = split(paints, W, H)
         nat = pikepdf.new()
@@ -134,7 +139,7 @@ def build(pdf_path):
         res_nat = nat.copy_foreign(res_ind)
         def add(keep):
             nat.add_blank_page(page_size=(W, H)); np_ = nat.pages[-1]; np_.Resources = res_nat
-            np_.Contents = nat.make_stream(b"q\n" + pikepdf.unparse_content_stream(filtered(ops, keep)) + b"\nQ\n")
+            np_.Contents = nat.make_stream(b"q\n" + shift + pikepdf.unparse_content_stream(filtered(ops, keep)) + b"\nQ\n")
             return len(nat.pages) - 1
         bg_page = add({p["i"] for p in bg})
         parts, boxes = {}, []
@@ -146,7 +151,7 @@ def build(pdf_path):
         tpdf = pikepdf.new(); tpdf.add_blank_page(page_size=(W, H)); tp = tpdf.pages[-1]
         tp.Resources = tpdf.copy_foreign(res_ind)
         tkeep = {p["i"] for p in paints if p["kind"] == "text"}
-        tp.Contents = tpdf.make_stream(b"q\n" + pikepdf.unparse_content_stream(filtered(ops, tkeep)) + b"\nQ\n")
+        tp.Contents = tpdf.make_stream(b"q\n" + shift + pikepdf.unparse_content_stream(filtered(ops, tkeep)) + b"\nQ\n")
         tpath = f"/tmp/ln/{lid}-text.pdf"; tpdf.save(tpath)
         texts = read_texts(tpath, H)
         npath = f"{OUT}/{lid}-native.pdf"; nat.save(npath)
