@@ -5,6 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { Download, ExternalLink, Loader2, PencilRuler } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/design-system/element";
+import { BrandKitGuideSections, GUIDE_SECTIONS } from "@/components/events/brand-kit/BrandKitGuideSections";
 import {
   BRAND_KIT_COLOUR_NOTE,
   BRAND_KIT_PRINT_NOTES,
@@ -27,6 +28,7 @@ const SECTIONS = [
   ["colour", "Colour & type"],
   ["templates", "Sign templates"],
   ["digital", "Digital & slides"],
+  ...GUIDE_SECTIONS,
   ["new-city", "Starting a new city"],
 ] as const;
 
@@ -75,13 +77,15 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
         </Button>
       </header>
 
-      <nav aria-label="Brand kit sections" className="sticky top-0 z-10 -mx-6 flex gap-4 overflow-x-auto bg-background/95 px-6 py-3 text-sm">
+      <div className="lg:grid lg:grid-cols-[200px_1fr] lg:gap-10">
+      <nav aria-label="Brand kit sections" className="sticky top-0 z-10 -mx-6 flex gap-4 overflow-x-auto bg-background/95 px-6 py-3 text-sm lg:top-6 lg:mx-0 lg:h-fit lg:flex-col lg:gap-2 lg:px-0 lg:py-8">
         {SECTIONS.map(([id, label]) => (
           <a key={id} href={`#${id}`} className="whitespace-nowrap font-medium text-muted-foreground hover:text-foreground">
             {label}
           </a>
         ))}
       </nav>
+      <div className="min-w-0">
 
       <section id="logos" className="mt-8 scroll-mt-16">
         <div className="flex items-center justify-between gap-4">
@@ -249,9 +253,11 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
         ) : null}
       </section>
 
+      <BrandKitGuideSections shared={shared} />
+
       <section id="new-city" className="mt-12 scroll-mt-16">
         <h2 className="text-xl font-semibold">Starting a new city</h2>
-        <ol className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <ol className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {NEW_CITY_CHECKLIST.map((c, i) => (
             <li key={c.step}>
               <p className="text-xs font-semibold text-muted-foreground">Step {i + 1}</p>
@@ -261,6 +267,8 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
           ))}
         </ol>
       </section>
+      </div>
+      </div>
     </div>
   );
 }
