@@ -96,6 +96,8 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
     ["finance-pillar-riverside", "FinanceNEXT Riverside Ballroom pillar", "Riverside_Ballroom.ai"],
     ["finance-pillar-profile", "FinanceNEXT Lift Your Global Profile pillar", "Finance_Pillar.ai"],
     ["finance-pillar-background", "FinanceNEXT pillar background (blank)", "Pillar_Background.ai"],
+    ["finance-pillar-library", "FinanceNEXT Library pillar", "Library.ai"],
+    ["finance-pillar-join-library", "FinanceNEXT Join us in the Library pillar", "join_us_in_th_Library.ai"],
   ] as const).map(([id, title, master]): LegalSign => ({
     id, title, size: "23.5 × 72 in", master, faces: [{ id: `divsign-${id}`, label: "Pillar" }], sizes: PILLAR_SIZES_IN, division: "finance",
     note: "The supplied file has no bleed, so the ground is stretched 1/8 in past the trim.",
