@@ -45,11 +45,19 @@ export const SIGN_3D = [
   { id: "sign:surround-all", name: "Breakout screen surround — all sides", ids: ["sf-surround-all"], match: /^$/ },
   { id: "sign:surround-three", name: "Breakout screen surround — three sides", ids: ["sf-surround-three"], match: /^$/ },
   { id: "sign:demo-booth", name: "NEXT demo booth — wall-mounted screen", ids: ["demo-booth"], match: /^$/ },
-] as const;
+  // Requested from BoothHub 8 Oct 2026. Hidden (pending) until BoothHub publishes each model.
+  { id: "sign:riverside", name: "Finance NEXT — Riverside Ballroom pillar", ids: ["finance-pillar-riverside"], match: /^$/, pending: true },
+  { id: "sign:pillar-blank", name: "Finance NEXT — blank pillar", ids: ["finance-pillar-background"], match: /^$/, pending: true },
+  { id: "sign:arrow-pillar", name: "Finance NEXT — pillar arrow sign", ids: ["finance-pillar-arrow"], match: /^$/, pending: true },
+  { id: "sign:finance-desk", name: "FinanceNEXT registration desk", ids: ["finance-reg-desk"], match: /^$/, pending: true },
+  { id: "sign:globallink-desk", name: "GlobalLinkNEXT registration desk", ids: ["globallink-reg-desk"], match: /^$/, pending: true },
+  { id: "sign:gl-pedestal-1", name: "GlobalLink NEXT pedestals", ids: ["globallink-pedestal"], match: /^$/, pending: true },
+  { id: "sign:nextmart-pedestal", name: "NEXT Mart pedestal", ids: ["nextmart-pedestal"], match: /^$/, pending: true },
+] as { id: string; name: string; ids: readonly string[]; match: RegExp; pending?: boolean }[];
 
 export function sign3dUrl(signIdOrName: string | null | undefined): string | null {
   if (!signIdOrName) return null;
   const base = signIdOrName.split("~")[0]!;
-  const hit = SIGN_3D.find((s) => (s.ids as readonly string[]).includes(base) || s.match.test(signIdOrName));
+  const hit = SIGN_3D.find((s) => !s.pending && (s.ids.includes(base) || s.match.test(signIdOrName)));
   return hit ? `${ORIGIN}?kiosk=${encodeURIComponent(hit.id)}&single=1` : null;
 }
