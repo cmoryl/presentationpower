@@ -1,6 +1,7 @@
 // Venue assets on an event page: add a new spot (e.g. a staircase floor wrap)
 // with its location photo and live file in one step, then get a design review
 // in the event's existing look. Sizes come only from the site survey.
+import { spotPhotosFor, VENUE_SPOT_LIVE_FILES } from "@/lib/venue-spot-photos";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -187,6 +188,22 @@ function AssetCard({ r, busy, onReview }: { r: Row; busy: boolean; onReview: () 
             <button type="button" className={btn} disabled={busy} onClick={onReview}><Sparkles className="h-4 w-4" /> {busy ? "Reviewing…" : rv ? "Review again" : "Review design"}</button>
           </div>
         </div>
+        {spotPhotosFor(r.id).length ? (
+          <div className="mt-3">
+            <p className="text-[12px] font-semibold text-[#03002C]">Location photos</p>
+            <div className="mt-1 flex gap-2 overflow-x-auto">
+              {spotPhotosFor(r.id).map((ph) => (
+                <a key={ph.url} href={ph.url} target="_blank" rel="noopener noreferrer" className="shrink-0" aria-label={`Open ${ph.label} photo`}>
+                  <img src={ph.url} alt={`${ph.label} of ${r.label}`} className="h-24 w-[72px] rounded object-cover" />
+                  <span className="block text-center text-[11px] text-[#666]">{ph.label}</span>
+                </a>
+              ))}
+            </div>
+            {VENUE_SPOT_LIVE_FILES[r.id.slice(0, 8)] ? (
+              <a href={VENUE_SPOT_LIVE_FILES[r.id.slice(0, 8)]!.url} download className="mt-1 inline-block text-[12px] font-semibold text-[#003FC7] hover:underline">Latest live file · {VENUE_SPOT_LIVE_FILES[r.id.slice(0, 8)]!.name}</a>
+            ) : null}
+          </div>
+        ) : null}
         {r.artboards?.length ? (
           <p className="mt-2 text-[12px] text-[#03002C]/70">
             Live file has {r.artboards.length} artboard{r.artboards.length === 1 ? "" : "s"}: {r.artboards.map((a) => `${a.w_in} × ${a.h_in}`).join(" · ")} in (designer's sizes, not the survey)
