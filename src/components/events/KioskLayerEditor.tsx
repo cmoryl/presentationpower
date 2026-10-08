@@ -119,6 +119,8 @@ const FACE_LABEL: Record<"front" | KioskFace, string> = { front: "Kiosk front", 
  * The kiosk editor: the front and, on kiosks read from the designer's CMYK
  * file, both side strips — each strip is edited with exactly the same tools.
  */
+import { spotPhotosFor } from "@/lib/venue-spot-photos";
+
 export function KioskLayerEditor({ layout, vendor, fill = false, embedded = false, editKey }: { layout: LiveLayout; vendor: string; fill?: boolean; embedded?: boolean; /** Save changes under this key instead of the layout's own (signs built in a sign set). */ editKey?: string }) {
   const [face, setFace] = useState<"front" | KioskFace>("front");
   const hasFaces = !!layout.native?.faces;
@@ -813,6 +815,8 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
 
   const layerRow = (active: boolean) =>
     `flex-1 truncate py-1 text-left text-[11.5px] ${active ? "text-white" : "text-white/70 hover:text-white"}`;
+  const [photoIx, setPhotoIx] = useState<number | null>(null);
+  const refPhotos = spotPhotosFor(L.id);
   const eyeBtn = "rounded-sm p-1 text-white/50 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]";
 
   return (
@@ -822,6 +826,22 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
         "flex overflow-hidden border border-white/10 bg-[#0B0A2A] text-white/85 [color-scheme:dark]"
       }
     >
+      {photoIx !== null && refPhotos[photoIx] ? (
+        <div role="dialog" aria-modal="true" aria-label={`${refPhotos[photoIx]!.label} of the location`} tabIndex={-1}
+          ref={(el) => el?.focus()}
+          onKeyDown={(e) => { if (e.key === "Escape") setPhotoIx(null); if (e.key === "ArrowRight") setPhotoIx((photoIx + 1) % refPhotos.length); if (e.key === "ArrowLeft") setPhotoIx((photoIx - 1 + refPhotos.length) % refPhotos.length); }}
+          onClick={() => setPhotoIx(null)} className="fixed inset-0 z-[90] grid place-items-center bg-black/85 p-6 outline-none">
+          <figure onClick={(e) => e.stopPropagation()} className="flex max-h-full flex-col items-center gap-2">
+            <img src={refPhotos[photoIx]!.url} alt={`${refPhotos[photoIx]!.label} of the location`} className="max-h-[82vh] w-auto rounded-sm" />
+            <figcaption className="flex items-center gap-3 text-[12px] text-white/80">
+              <button type="button" className="rounded-sm border border-white/20 px-2 py-0.5 hover:bg-white/10" onClick={() => setPhotoIx((photoIx - 1 + refPhotos.length) % refPhotos.length)}>Previous</button>
+              {refPhotos[photoIx]!.label} · {photoIx + 1} of {refPhotos.length} · reference only
+              <button type="button" className="rounded-sm border border-white/20 px-2 py-0.5 hover:bg-white/10" onClick={() => setPhotoIx((photoIx + 1) % refPhotos.length)}>Next</button>
+              <button type="button" className="rounded-sm border border-white/20 px-2 py-0.5 hover:bg-white/10" onClick={() => setPhotoIx(null)}>Close</button>
+            </figcaption>
+          </figure>
+        </div>
+      ) : null}
       <style>{kioskFontFaceCss()}</style>
 
       {/* Tool strip */}
@@ -1475,6 +1495,20 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                 </div>
                 <p className="text-[10.5px] text-white/50">Guides never print.</p>
               </Sec>
+              {spotPhotosFor(L.id).length ? (
+                <Sec title="Location photos">
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {spotPhotosFor(L.id).map((ph, i) => (
+                      <button key={ph.url} type="button" onClick={() => setPhotoIx(i)} aria-label={`View ${ph.label} larger`}
+                        className="overflow-hidden rounded-sm border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
+                        <img src={ph.url} alt={`${ph.label} of the location`} className="aspect-[3/4] w-full object-cover" />
+                        <span className="block bg-black/40 px-1.5 py-0.5 text-left text-[10.5px] text-white/75">{ph.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10.5px] text-white/50">Reference only, never printed.</p>
+                </Sec>
+              ) : null}
             </>
           ) : null}
 
