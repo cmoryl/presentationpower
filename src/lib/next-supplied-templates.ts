@@ -62,6 +62,13 @@ function demoBoothRow(): NextRegistryRow {
   };
 }
 
+
+/** Demo booth variations built from the Coach booth (same ground and sides, new wording; product logos not supplied yet). */
+const DEMO_BOOTH_VARIANTS = [["globallink-now","GlobalLink NOW","DB2"],["globallink-one","GlobalLink ONE","DB3"],["aura","TransPerfect AURA","DB4"],["media","TransPerfect Media","DB5"],["globallink-web","GlobalLink Web","DB6"]] as const;
+function demoBoothVariantRows(): NextRegistryRow[] {
+  return DEMO_BOOTH_VARIANTS.map(([k, n, code]) => ({ ...demoBoothRow(), code, format: `Demo booth — ${n}`, liveSignId: `demo-booth-${k}` }));
+}
+
 /** General NEXT lift-door wrap ("Lift your global profile"). */
 function liftDoorRow(): NextRegistryRow {
   return {

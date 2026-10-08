@@ -129,6 +129,36 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
     note: "Example built from the GlobalLink Coach demo. The TV placement box marks where the screen mounts.",
   },
   {
+    id: "demo-booth-globallink-now", title: "NEXT demo booth — GlobalLink NOW", size: "45 × 96 in front + 4 × 96 in sides", master: "GLCoach_TVTestDrive_Demo_Booth.ai",
+    faces: [{ id: "divsign-transperfect-demobooth-globallink-now-front", label: "Front" }, { id: "divsign-transperfect-demobooth-globallink-now-left", label: "Left side" }, { id: "divsign-transperfect-demobooth-globallink-now-right", label: "Right side" }],
+    division: "transperfect",
+    note: "Variation of the Coach demo booth with GlobalLink NOW wording. The GlobalLink NOW logo hasn't been supplied yet, so the spot below the TV is empty.",
+  },
+  {
+    id: "demo-booth-globallink-one", title: "NEXT demo booth — GlobalLink ONE", size: "45 × 96 in front + 4 × 96 in sides", master: "GLCoach_TVTestDrive_Demo_Booth.ai",
+    faces: [{ id: "divsign-transperfect-demobooth-globallink-one-front", label: "Front" }, { id: "divsign-transperfect-demobooth-globallink-one-left", label: "Left side" }, { id: "divsign-transperfect-demobooth-globallink-one-right", label: "Right side" }],
+    division: "transperfect",
+    note: "Variation of the Coach demo booth with GlobalLink ONE wording. The GlobalLink ONE logo hasn't been supplied yet, so the spot below the TV is empty.",
+  },
+  {
+    id: "demo-booth-aura", title: "NEXT demo booth — TransPerfect AURA", size: "45 × 96 in front + 4 × 96 in sides", master: "GLCoach_TVTestDrive_Demo_Booth.ai",
+    faces: [{ id: "divsign-transperfect-demobooth-aura-front", label: "Front" }, { id: "divsign-transperfect-demobooth-aura-left", label: "Left side" }, { id: "divsign-transperfect-demobooth-aura-right", label: "Right side" }],
+    division: "transperfect",
+    note: "Variation of the Coach demo booth with TransPerfect AURA wording. The TransPerfect AURA logo hasn't been supplied yet, so the spot below the TV is empty.",
+  },
+  {
+    id: "demo-booth-media", title: "NEXT demo booth — TransPerfect Media", size: "45 × 96 in front + 4 × 96 in sides", master: "GLCoach_TVTestDrive_Demo_Booth.ai",
+    faces: [{ id: "divsign-transperfect-demobooth-media-front", label: "Front" }, { id: "divsign-transperfect-demobooth-media-left", label: "Left side" }, { id: "divsign-transperfect-demobooth-media-right", label: "Right side" }],
+    division: "transperfect",
+    note: "Variation of the Coach demo booth with TransPerfect Media wording. The TransPerfect Media logo hasn't been supplied yet, so the spot below the TV is empty.",
+  },
+  {
+    id: "demo-booth-globallink-web", title: "NEXT demo booth — GlobalLink Web", size: "45 × 96 in front + 4 × 96 in sides", master: "GLCoach_TVTestDrive_Demo_Booth.ai",
+    faces: [{ id: "divsign-transperfect-demobooth-globallink-web-front", label: "Front" }, { id: "divsign-transperfect-demobooth-globallink-web-left", label: "Left side" }, { id: "divsign-transperfect-demobooth-globallink-web-right", label: "Right side" }],
+    division: "transperfect",
+    note: "Variation of the Coach demo booth with GlobalLink Web wording. The GlobalLink Web logo hasn't been supplied yet, so the spot below the TV is empty.",
+  },
+  {
     // General NEXT lift-door wrap ("Lift your global profile"), two door leaves on one artboard.
     id: "lift-liftyour", title: "NEXT lift door wrap — Lift Your Global Profile", size: "43.3 × 82.1 in (both doors)", master: "Lifts_Template_LiftYour.ai",
     faces: [{ id: "divsign-transperfect-lift-liftyour", label: "Lift doors" }],
