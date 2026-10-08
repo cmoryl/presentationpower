@@ -150,7 +150,7 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
     id: "demo-booth-media", title: "NEXT demo booth — TransPerfect Media", size: "45 × 96 in front + 4 × 96 in sides", master: "GLCoach_TVTestDrive_Demo_Booth.ai",
     faces: [{ id: "divsign-transperfect-demobooth-media-front", label: "Front" }, { id: "divsign-transperfect-demobooth-media-left", label: "Left side" }, { id: "divsign-transperfect-demobooth-media-right", label: "Right side" }],
     division: "transperfect",
-    note: "Variation of the Coach demo booth with TransPerfect Media wording. The TransPerfect Media logo hasn't been supplied yet, so the spot below the TV is empty.",
+    note: "Variation of the Coach demo booth with TransPerfect Media wording and the TransPerfect Media logo from the logo inventory (movable).",
   },
   {
     id: "demo-booth-globallink-web", title: "NEXT demo booth — GlobalLink Web", size: "45 × 96 in front + 4 × 96 in sides", master: "GLCoach_TVTestDrive_Demo_Booth.ai",

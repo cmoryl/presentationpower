@@ -297,19 +297,19 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
   const [markSel, setMarkSel] = useState<string | null>(null);
   const markDrag = useRef<{ id: string; x: number; y: number; x0: number; y0: number } | null>(null);
   const patchMark = (id: string, p: Partial<KioskMark>, push = true) => {
-    const next = { ...edits, marks: (edits.marks ?? []).map((m) => (m.id === id ? { ...m, ...p } : m)) };
+    const next = { ...edits, marks: (edits.marks ?? L.defaultMarks ?? []).map((m) => (m.id === id ? { ...m, ...p } : m)) };
     push ? commit(next) : setEdits(next);
   };
   const addChevrons = () => {
     const id = `mark-c${Date.now().toString(36)}`;
     const w = KIOSK_W * 0.12;
-    commit({ ...edits, marks: [...(edits.marks ?? []), { id, kind: "chevrons", family: markFamily, x: KIOSK_W * 0.06, y: KIOSK_H * 0.08, w, opacity: 1 }] });
+    commit({ ...edits, marks: [...(edits.marks ?? L.defaultMarks ?? []), { id, kind: "chevrons", family: markFamily, x: KIOSK_W * 0.06, y: KIOSK_H * 0.08, w, opacity: 1 }] });
     setMarkSel(id);
   };
   const logoPart = L.blocks.flatMap((b) => b.parts)[0];
   const swapLogo = (colourway: NextLogoColourway, shape: "stacked" | "side") => {
-    const cur = (edits.marks ?? []).find((m) => m.kind === "logo");
-    if (cur) { commit({ ...edits, marks: (edits.marks ?? []).map((m) => (m.id === cur.id ? { ...m, colourway, shape } : m)) }); setMarkSel(cur.id); return; }
+    const cur = (edits.marks ?? L.defaultMarks ?? []).find((m) => m.kind === "logo");
+    if (cur) { commit({ ...edits, marks: (edits.marks ?? L.defaultMarks ?? []).map((m) => (m.id === cur.id ? { ...m, colourway, shape } : m)) }); setMarkSel(cur.id); return; }
     const box = logoPart ?? { x0: KIOSK_W * 0.3, x1: KIOSK_W * 0.7, y0: KIOSK_H * 0.1, y1: KIOSK_H * 0.5 };
     const id = `mark-l${Date.now().toString(36)}`;
     const probe: KioskMark = { id, kind: "logo", family: markFamily, colourway, shape, x: 0, y: 0, w: 1 };
@@ -318,12 +318,12 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
     const w = a ? Math.min(bw, (bh * a.w) / a.h) : bw;
     const h = a ? (w * a.h) / a.w : bh;
     const parts = logoPart ? { ...edits.parts, [logoPart.id]: { ...edits.parts?.[logoPart.id], hidden: true } } : edits.parts;
-    commit({ ...edits, parts, marks: [...(edits.marks ?? []), { ...probe, x: box.x0 + (bw - w) / 2, y: box.y0 + (bh - h) / 2, w }] });
+    commit({ ...edits, parts, marks: [...(edits.marks ?? L.defaultMarks ?? []), { ...probe, x: box.x0 + (bw - w) / 2, y: box.y0 + (bh - h) / 2, w }] });
     setMarkSel(id);
   };
   const restoreLogo = () => {
     const parts = logoPart ? { ...edits.parts, [logoPart.id]: { ...edits.parts?.[logoPart.id], hidden: false } } : edits.parts;
-    commit({ ...edits, parts, marks: (edits.marks ?? []).filter((m) => m.kind !== "logo") });
+    commit({ ...edits, parts, marks: (edits.marks ?? L.defaultMarks ?? []).filter((m) => m.kind !== "logo") });
     setMarkSel(null);
   };
   const isAdd = (e: { shiftKey: boolean; metaKey: boolean; ctrlKey: boolean }) => e.shiftKey || e.metaKey || e.ctrlKey;
@@ -1081,7 +1081,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                     <rect x={d.x} y={d.y} width={d.w} height={d.h} rx={d.round ? d.h / 2 : 0} fill={d.color} />
                   </g>
                 ))}
-                {(edits.marks ?? []).filter((m) => !m.hidden).map((m) => {
+                {(edits.marks ?? L.defaultMarks ?? []).filter((m) => !m.hidden).map((m) => {
                   const a = markArt(m);
                   if (!a) return null;
                   return (
@@ -1424,24 +1424,24 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                 <p className="mb-1.5 text-[10.5px] text-white/55">Logo option</p>
                 <div className="grid grid-cols-2 gap-1.5">
                   {nextLogoColourways(markFamily).flatMap((c) => (["stacked", "side"] as const).map((sh) => {
-                    const cur = (edits.marks ?? []).find((m) => m.kind === "logo");
+                    const cur = (edits.marks ?? L.defaultMarks ?? []).find((m) => m.kind === "logo");
                     const on = !!cur && cur.colourway === c && cur.shape === sh;
                     return <button key={c + sh} type="button" aria-pressed={on} className={dbtn + " aria-pressed:ring-2 aria-pressed:ring-[#A1FBF9]"} onClick={() => swapLogo(c, sh)}>{NEXT_LOGO_COLOURWAY_LABELS[c]} · {sh === "side" ? "side" : "stacked"}</button>;
                   }))}
-                  <button type="button" className={dbtn} aria-pressed={!(edits.marks ?? []).some((m) => m.kind === "logo")} onClick={restoreLogo}>Supplied logo</button>
+                  <button type="button" className={dbtn} aria-pressed={!(edits.marks ?? L.defaultMarks ?? []).some((m) => m.kind === "logo")} onClick={restoreLogo}>Supplied logo</button>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   <button type="button" className={dbtn} onClick={addChevrons}><Plus className="h-3.5 w-3.5" aria-hidden /> Add NEXT arrows</button>
                 </div>
-                {(edits.marks ?? []).length ? (
+                {(edits.marks ?? L.defaultMarks ?? []).length ? (
                   <ul className="mt-2 space-y-1">
-                    {(edits.marks ?? []).map((m, i) => (
+                    {(edits.marks ?? L.defaultMarks ?? []).map((m, i) => (
                       <li key={m.id}><button type="button" aria-pressed={markSel === m.id} onClick={() => setMarkSel(m.id)} className="w-full rounded-sm border border-white/10 bg-black/20 px-2 py-1 text-left text-[11.5px] text-white/80 aria-pressed:ring-2 aria-pressed:ring-[#A1FBF9]">{m.kind === "logo" ? "NEXT logo" : `NEXT arrows ${i + 1}`}</button></li>
                     ))}
                   </ul>
                 ) : null}
                 {(() => {
-                  const m = (edits.marks ?? []).find((x) => x.id === markSel);
+                  const m = (edits.marks ?? L.defaultMarks ?? []).find((x) => x.id === markSel);
                   if (!m) return null;
                   const a = markArt(m);
                   const num = (label: string, v: number, on: (n: number) => void, step = 0.1) => (
@@ -1471,7 +1471,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                       ) : null}
                       <div className="flex flex-wrap gap-1">
                         <button type="button" className={dbtn} onClick={() => patchMark(m.id, { x: (KIOSK_W - m.w) / 2 })}>Centre across</button>
-                        <button type="button" className={dbtn} onClick={() => m.kind === "logo" ? restoreLogo() : (commit({ ...edits, marks: (edits.marks ?? []).filter((x) => x.id !== m.id) }), setMarkSel(null))}><Trash2 className="h-3.5 w-3.5" aria-hidden /> Remove</button>
+                        <button type="button" className={dbtn} onClick={() => m.kind === "logo" ? restoreLogo() : (commit({ ...edits, marks: (edits.marks ?? L.defaultMarks ?? []).filter((x) => x.id !== m.id) }), setMarkSel(null))}><Trash2 className="h-3.5 w-3.5" aria-hidden /> Remove</button>
                       </div>
                     </div>
                   );
