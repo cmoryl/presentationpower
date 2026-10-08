@@ -285,7 +285,7 @@ def build():
                 "texts": texts,
                 "blocks": [{"id": "b0", "y0": 0, "y1": H, "c0": 0, "c1": H, "screen": False, "parts": part_boxes}],
                 "ground": [{"offset": 0, "color": "#2B3990"}, {"offset": 1, "color": "#6DCFF6"}],
-                "native": {"version": "demobooth-2026-10-07", "profile": profile, "bgPage": bg_page, "parts": parts,
+                "native": {"version": "demobooth-2026-10-08", "profile": profile, "bgPage": bg_page, "parts": parts,
                            "strips": {"left": {"bg": 0, "content": 0, "w": 0}, "right": {"bg": 0, "content": 0, "w": 0}}},
                 "sign": {"margin": round(min(72.0, min(W, H) * 0.06), 2)},
             }
