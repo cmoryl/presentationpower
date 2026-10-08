@@ -1,3 +1,4 @@
+import PRODUCT_LOGOS from "@/lib/product-logo-vectors.json";
 // Vector marks added in the sign editor: the NEXT chevron arrows and swapped
 // NEXT lockups. Both are taken straight from the official logo geometry in
 // next-logo-vectors.ts (the chevrons are the accent-coloured paths of the
@@ -8,7 +9,7 @@ import { parsePath, mul, rotateAbout, segsToPdf, translate, type Affine } from "
 
 export type KioskMark = {
   id: string;
-  kind: "chevrons" | "logo";
+  kind: "chevrons" | "logo" | "brand";
   family: string;
   colourway?: NextLogoColourway;
   shape?: "stacked" | "side";
@@ -34,7 +35,10 @@ export function markArt(m: KioskMark): MarkArt | null {
   const hit = cache.get(key);
   if (hit) return hit;
   let art: MarkArt | null = null;
-  if (m.kind === "logo") {
+  if (m.kind === "brand") {
+    const b = (PRODUCT_LOGOS as Record<string, { w: number; h: number; paths: { d: string; fill: string }[] }>)[m.family];
+    art = b ? { ox: 0, oy: 0, w: b.w, h: b.h, paths: b.paths.map((p) => ({ d: p.d, fill: p.fill, evenOdd: false })) } : null;
+  } else if (m.kind === "logo") {
     const { art: a } = pickNextLogo(m.family, 1, m.colourway ?? "white", m.shape ?? "stacked");
     art = { ox: 0, oy: 0, w: a.w, h: a.h, paths: a.paths.map((p) => ({ d: p.d, fill: p.fill, evenOdd: p.fillRule === "evenodd" })) };
   } else {
