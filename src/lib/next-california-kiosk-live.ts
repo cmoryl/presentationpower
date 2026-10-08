@@ -93,6 +93,8 @@ export type LiveLayout = {
   stepGuides?: [number, number, number, number][];
   /** Sign-only TV/screen keep-clear (trim pt, y down): drawn as a non-printing guide; the supplied placeholder box is dropped from print. */
   tv?: { x: number; y: number; w: number; h: number };
+  /** Marks shown until the user edits marks (e.g. a product logo from the logo inventory on a demo booth variant). */
+  defaultMarks?: import("@/lib/kiosk-marks").KioskMark[];
 };
 
 /** Signage templates share the kiosk editor; their ids carry this prefix. */
@@ -880,7 +882,7 @@ export function buildKioskFrontSvg(
   parts.push(`</g>`);
   parts.push(`<g id="Accents">`);
   for (const d of edits.dividers ?? []) if (!d.hidden) parts.push(dividerSvg(d));
-  parts.push(marksSvg(edits.marks));
+  parts.push(marksSvg(edits.marks ?? L.defaultMarks));
   parts.push(`</g>`);
   parts.push(`<g id="Text">`);
   for (const p of placed)
