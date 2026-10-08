@@ -810,8 +810,9 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
   const G = guides.rulers ? 22 / k : 0;
   const rs = 1 / k; // one screen px in kiosk units
   const vbX = -B - G, vbY = -B - G, vbW = KIOSK_W + 2 * B + G, vbH = KIOSK_H + 2 * B + G;
-  const stepIn = zoom < 900 ? 6 : 3;
-  const ticksX = Array.from({ length: Math.floor(KIOSK_W / 72 / (L.face ? 1 : stepIn)) + 1 }, (_, i) => i * (L.face ? 1 : stepIn));
+  // Label spacing follows the on-screen size so ruler numbers never pile up into a solid band.
+  const stepIn = [1, 2, 3, 6, 12, 24, 48].find((s) => s * 72 * k >= 30) ?? 48;
+  const ticksX = Array.from({ length: Math.floor(KIOSK_W / 72 / stepIn) + 1 }, (_, i) => i * stepIn);
   const ticksY = Array.from({ length: Math.floor(KIOSK_H / 72 / stepIn) + 1 }, (_, i) => i * stepIn);
 
   const layerRow = (active: boolean) =>
