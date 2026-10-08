@@ -3,6 +3,7 @@ import { globallinkPillarRows } from "@/lib/next-globallink-pillars";
 import liftPdf from "@/assets/next-lift-door/lift-liftyour.pdf.asset.json";
 import liftAi from "@/assets/next-lift-door/masters/Lifts_Template_LiftYour.ai.asset.json";
 import demoBoothJpg from "@/assets/next-demo-booth/demo-booth.jpg.asset.json";
+import { demoBoothCardUrl } from "@/lib/demo-booth-cards";
 import demoBoothPdf from "@/assets/next-demo-booth/demo-booth.pdf.asset.json";
 import demoBoothAi from "@/assets/next-demo-booth/masters/GLCoach_TVTestDrive_Demo_Booth.ai.asset.json";
 // Designer-supplied NEXT templates — the ONE place they join the registry.
@@ -54,7 +55,7 @@ function demoBoothRow(): NextRegistryRow {
     code: "DB1",
     format: "Demo booth",
     size: "45 × 96 in front + two 4 × 96 in sides · supplied .ai master",
-    exampleUrl: demoBoothJpg.url,
+    exampleUrl: demoBoothCardUrl("demo-booth") ?? demoBoothJpg.url,
     downloadUrl: demoBoothAi.url,
     secondaryUrl: demoBoothPdf.url,
     secondaryLabel: "PDF",
@@ -66,7 +67,7 @@ function demoBoothRow(): NextRegistryRow {
 /** Demo booth variations built from the Coach booth (same ground and sides, new wording; product logos not supplied yet). */
 const DEMO_BOOTH_VARIANTS = [["globallink-now","GlobalLink NOW","DB2"],["globallink-one","GlobalLink ONE","DB3"],["aura","TransPerfect AURA","DB4"],["media","TransPerfect Media","DB5"],["globallink-web","GlobalLink Web","DB6"]] as const;
 function demoBoothVariantRows(): NextRegistryRow[] {
-  return DEMO_BOOTH_VARIANTS.map(([k, n, code]) => ({ ...demoBoothRow(), code, format: `Demo booth — ${n}`, liveSignId: `demo-booth-${k}` }));
+  return DEMO_BOOTH_VARIANTS.map(([k, n, code]) => ({ ...demoBoothRow(), code, format: `Demo booth — ${n}`, liveSignId: `demo-booth-${k}`, exampleUrl: demoBoothCardUrl(`demo-booth-${k}`) ?? demoBoothJpg.url }));
 }
 
 /** General NEXT lift-door wrap ("Lift your global profile"). */
