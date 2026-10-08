@@ -167,6 +167,7 @@ import { Route as EventsDemoPlaybookIdRouteImport } from './routes/events.demo.$
 import { Route as EventsNextAgendasRouteImport } from './routes/events.next_.agendas'
 import { Route as EventsNextAssetsRouteImport } from './routes/events.next_.assets'
 import { Route as EventsNextBadgesRouteImport } from './routes/events.next_.badges'
+import { Route as EventsNextBrandKitRouteImport } from './routes/events.next_.brand-kit'
 import { Route as EventsNextCaliforniaRouteImport } from './routes/events.next_.california'
 import { Route as EventsNextCityRouteImport } from './routes/events.next_.city'
 import { Route as EventsNextCityBadgesRouteImport } from './routes/events.next_.city-badges'
@@ -196,6 +197,7 @@ import { Route as LibraryPrintAuditRouteImport } from './routes/library.print_.a
 import { Route as LibraryPrintHeroesRouteImport } from './routes/library.print_.heroes'
 import { Route as LibraryPrintModulesRouteImport } from './routes/library.print_.modules'
 import { Route as MastersGeneralSlidesLooksRouteImport } from './routes/masters.general-slides_.looks'
+import { Route as ShareNextBrandKitTokenRouteImport } from './routes/share.next-brand-kit.$token'
 import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
 import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
 import { Route as ApiPublicBoothsEventRouteImport } from './routes/api/public/booths.$event'
@@ -1014,6 +1016,11 @@ const EventsNextBadgesRoute = EventsNextBadgesRouteImport.update({
   path: '/next/badges',
   getParentRoute: () => EventsRoute,
 } as any)
+const EventsNextBrandKitRoute = EventsNextBrandKitRouteImport.update({
+  id: '/next_/brand-kit',
+  path: '/next/brand-kit',
+  getParentRoute: () => EventsRoute,
+} as any)
 const EventsNextCaliforniaRoute = EventsNextCaliforniaRouteImport.update({
   id: '/next_/california',
   path: '/next/california',
@@ -1165,6 +1172,11 @@ const MastersGeneralSlidesLooksRoute =
     path: '/masters/general-slides/looks',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ShareNextBrandKitTokenRoute = ShareNextBrandKitTokenRouteImport.update({
+  id: '/share/next-brand-kit/$token',
+  path: '/share/next-brand-kit/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SocialDemoPlaybookIdRoute = SocialDemoPlaybookIdRouteImport.update({
   id: '/demo/$playbookId',
   path: '/demo/$playbookId',
@@ -1438,6 +1450,7 @@ export interface FileRoutesByFullPath {
   '/events/next/agendas': typeof EventsNextAgendasRoute
   '/events/next/assets': typeof EventsNextAssetsRoute
   '/events/next/badges': typeof EventsNextBadgesRoute
+  '/events/next/brand-kit': typeof EventsNextBrandKitRoute
   '/events/next/california': typeof EventsNextCaliforniaRoute
   '/events/next/city': typeof EventsNextCityRoute
   '/events/next/city-badges': typeof EventsNextCityBadgesRoute
@@ -1465,6 +1478,7 @@ export interface FileRoutesByFullPath {
   '/library/print/heroes': typeof LibraryPrintHeroesRoute
   '/library/print/modules': typeof LibraryPrintModulesRoute
   '/masters/general-slides/looks': typeof MastersGeneralSlidesLooksRoute
+  '/share/next-brand-kit/$token': typeof ShareNextBrandKitTokenRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/events/venues/': typeof EventsVenuesIndexRoute
@@ -1644,6 +1658,7 @@ export interface FileRoutesByTo {
   '/events/next/agendas': typeof EventsNextAgendasRoute
   '/events/next/assets': typeof EventsNextAssetsRoute
   '/events/next/badges': typeof EventsNextBadgesRoute
+  '/events/next/brand-kit': typeof EventsNextBrandKitRoute
   '/events/next/california': typeof EventsNextCaliforniaRoute
   '/events/next/city': typeof EventsNextCityRoute
   '/events/next/city-badges': typeof EventsNextCityBadgesRoute
@@ -1671,6 +1686,7 @@ export interface FileRoutesByTo {
   '/library/print/heroes': typeof LibraryPrintHeroesRoute
   '/library/print/modules': typeof LibraryPrintModulesRoute
   '/masters/general-slides/looks': typeof MastersGeneralSlidesLooksRoute
+  '/share/next-brand-kit/$token': typeof ShareNextBrandKitTokenRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId': typeof DecksDeckIdIndexRoute
   '/events/venues': typeof EventsVenuesIndexRoute
@@ -1855,6 +1871,7 @@ export interface FileRoutesById {
   '/events/next_/agendas': typeof EventsNextAgendasRoute
   '/events/next_/assets': typeof EventsNextAssetsRoute
   '/events/next_/badges': typeof EventsNextBadgesRoute
+  '/events/next_/brand-kit': typeof EventsNextBrandKitRoute
   '/events/next_/california': typeof EventsNextCaliforniaRoute
   '/events/next_/city': typeof EventsNextCityRoute
   '/events/next_/city-badges': typeof EventsNextCityBadgesRoute
@@ -1882,6 +1899,7 @@ export interface FileRoutesById {
   '/library/print_/heroes': typeof LibraryPrintHeroesRoute
   '/library/print_/modules': typeof LibraryPrintModulesRoute
   '/masters/general-slides_/looks': typeof MastersGeneralSlidesLooksRoute
+  '/share/next-brand-kit/$token': typeof ShareNextBrandKitTokenRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/events/venues/': typeof EventsVenuesIndexRoute
@@ -2067,6 +2085,7 @@ export interface FileRouteTypes {
     | '/events/next/agendas'
     | '/events/next/assets'
     | '/events/next/badges'
+    | '/events/next/brand-kit'
     | '/events/next/california'
     | '/events/next/city'
     | '/events/next/city-badges'
@@ -2094,6 +2113,7 @@ export interface FileRouteTypes {
     | '/library/print/heroes'
     | '/library/print/modules'
     | '/masters/general-slides/looks'
+    | '/share/next-brand-kit/$token'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/events/venues/'
@@ -2273,6 +2293,7 @@ export interface FileRouteTypes {
     | '/events/next/agendas'
     | '/events/next/assets'
     | '/events/next/badges'
+    | '/events/next/brand-kit'
     | '/events/next/california'
     | '/events/next/city'
     | '/events/next/city-badges'
@@ -2300,6 +2321,7 @@ export interface FileRouteTypes {
     | '/library/print/heroes'
     | '/library/print/modules'
     | '/masters/general-slides/looks'
+    | '/share/next-brand-kit/$token'
     | '/social/demo/$playbookId'
     | '/decks/$deckId'
     | '/events/venues'
@@ -2483,6 +2505,7 @@ export interface FileRouteTypes {
     | '/events/next_/agendas'
     | '/events/next_/assets'
     | '/events/next_/badges'
+    | '/events/next_/brand-kit'
     | '/events/next_/california'
     | '/events/next_/city'
     | '/events/next_/city-badges'
@@ -2510,6 +2533,7 @@ export interface FileRouteTypes {
     | '/library/print_/heroes'
     | '/library/print_/modules'
     | '/masters/general-slides_/looks'
+    | '/share/next-brand-kit/$token'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/events/venues/'
@@ -2640,6 +2664,7 @@ export interface RootRouteChildren {
   LibraryPrintHeroesRoute: typeof LibraryPrintHeroesRoute
   LibraryPrintModulesRoute: typeof LibraryPrintModulesRoute
   MastersGeneralSlidesLooksRoute: typeof MastersGeneralSlidesLooksRoute
+  ShareNextBrandKitTokenRoute: typeof ShareNextBrandKitTokenRoute
   DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
   ApiPublicBoothsEventRoute: typeof ApiPublicBoothsEventRoute
 }
@@ -3752,6 +3777,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsNextBadgesRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/events/next_/brand-kit': {
+      id: '/events/next_/brand-kit'
+      path: '/next/brand-kit'
+      fullPath: '/events/next/brand-kit'
+      preLoaderRoute: typeof EventsNextBrandKitRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/california': {
       id: '/events/next_/california'
       path: '/next/california'
@@ -3953,6 +3985,13 @@ declare module '@tanstack/react-router' {
       path: '/masters/general-slides/looks'
       fullPath: '/masters/general-slides/looks'
       preLoaderRoute: typeof MastersGeneralSlidesLooksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share/next-brand-kit/$token': {
+      id: '/share/next-brand-kit/$token'
+      path: '/share/next-brand-kit/$token'
+      fullPath: '/share/next-brand-kit/$token'
+      preLoaderRoute: typeof ShareNextBrandKitTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/social/demo/$playbookId': {
@@ -4197,6 +4236,7 @@ interface EventsRouteChildren {
   EventsNextAgendasRoute: typeof EventsNextAgendasRoute
   EventsNextAssetsRoute: typeof EventsNextAssetsRoute
   EventsNextBadgesRoute: typeof EventsNextBadgesRoute
+  EventsNextBrandKitRoute: typeof EventsNextBrandKitRoute
   EventsNextCaliforniaRoute: typeof EventsNextCaliforniaRoute
   EventsNextCityRoute: typeof EventsNextCityRoute
   EventsNextCityBadgesRoute: typeof EventsNextCityBadgesRoute
@@ -4245,6 +4285,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextAgendasRoute: EventsNextAgendasRoute,
   EventsNextAssetsRoute: EventsNextAssetsRoute,
   EventsNextBadgesRoute: EventsNextBadgesRoute,
+  EventsNextBrandKitRoute: EventsNextBrandKitRoute,
   EventsNextCaliforniaRoute: EventsNextCaliforniaRoute,
   EventsNextCityRoute: EventsNextCityRoute,
   EventsNextCityBadgesRoute: EventsNextCityBadgesRoute,
@@ -4453,6 +4494,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryPrintHeroesRoute: LibraryPrintHeroesRoute,
   LibraryPrintModulesRoute: LibraryPrintModulesRoute,
   MastersGeneralSlidesLooksRoute: MastersGeneralSlidesLooksRoute,
+  ShareNextBrandKitTokenRoute: ShareNextBrandKitTokenRoute,
   DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
   ApiPublicBoothsEventRoute: ApiPublicBoothsEventRoute,
 }

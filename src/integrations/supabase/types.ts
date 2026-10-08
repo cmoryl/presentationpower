@@ -3825,6 +3825,36 @@ export type Database = {
         }
         Relationships: []
       }
+      next_brand_kit_shares: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          label: string
+          revoked: boolean
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          expires_at: string
+          id?: string
+          label?: string
+          revoked?: boolean
+          token: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          label?: string
+          revoked?: boolean
+          token?: string
+        }
+        Relationships: []
+      }
       next_city_badge_versions: {
         Row: {
           city_label: string
@@ -5480,6 +5510,7 @@ export type Database = {
         }[]
       }
       get_london_head_revision: { Args: never; Returns: Json }
+      get_next_brand_kit_share: { Args: { _token: string }; Returns: Json }
       get_shared_deck: { Args: { _token: string }; Returns: Json }
       get_shared_deck_locales: {
         Args: { _token: string }

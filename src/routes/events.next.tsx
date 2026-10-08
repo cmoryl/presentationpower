@@ -638,9 +638,14 @@ function Pathways({ accent, divisionId }: { accent: string; divisionId: string }
     <div className="mt-8">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="text-base font-semibold">What do you need to do?</h3>
-        <a href="#generate" className="text-sm font-medium text-primary hover:underline">
-          Or generate a kit →
-        </a>
+        <span className="flex gap-4">
+          <Link to="/events/next/brand-kit" className="text-sm font-medium text-primary hover:underline">
+            Master brand kit →
+          </Link>
+          <a href="#generate" className="text-sm font-medium text-primary hover:underline">
+            Or generate a kit →
+          </a>
+        </span>
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {NEXT_PATHWAYS.map((p) => (
