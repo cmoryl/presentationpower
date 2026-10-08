@@ -30,7 +30,7 @@ export type LegalSign = {
   division?: string;
 };
 
-const PILLAR_SIZES_IN = [
+export const PILLAR_SIZES_IN = [
   { w: 23.5, h: 72, label: "Supplied · 23.5 × 72 in" },
   { w: 23.5, h: 84, label: "Taller · 23.5 × 84 in" },
   { w: 30, h: 96, label: "Wide · 30 × 96 in" },
