@@ -274,18 +274,24 @@ def build():
             tp.Contents = tpdf.make_stream(f"q 1 0 0 1 {B} {B} cm\n".encode() + pikepdf.unparse_content_stream(filtered(ops, tkeep)) + b"\nQ\n")
             tpath = f"/tmp/db/{lid}-text.pdf"; tpdf.save(tpath)
             texts = read_texts(tpath, W, H)
+            import importlib.util as _u; _sp = _u.spec_from_file_location('tp', os.path.join(os.path.dirname(__file__), 'text-paragraphs.py')); _tp = _u.module_from_spec(_sp); _sp.loader.exec_module(_tp)
+            texts = _tp.paragraphs(texts)  # supplied lines -> wrapping paragraphs
             npath = f"{OUT}/{lid}-native.pdf"; nat.save(npath)
             syms = [svg_symbol(npath, bg_page, "bg", f"{lid}-bg")]
             for k, pb in enumerate(part_boxes):
                 syms.append(svg_symbol(npath, parts[pb["id"]]["page"], pb["id"], f"{lid}-{pb['id']}"))
             open(f"{OUT}/{lid}-native.svg", "w").write(
                 f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 {MW:g} {MH:g}">' + "".join(syms) + "</svg>")
+            # The supplied white "TV PLACEMENT" box is a guide, never printed: drop it (the editor draws the TV keep-clear guide).
+            if face == "front":
+                part_boxes = [q for q in part_boxes if not (abs(q["x0"] - 252) < 20 and abs(q["y0"] - 1522.51) < 20 and abs(q["x1"] - 2988) < 20 and abs(q["y1"] - 3106.51) < 20)]
+                parts = {k: v for k, v in parts.items() if any(q["id"] == k for q in part_boxes)}
             layouts[lid] = {
                 "id": lid, "source": fname, "trimW": W, "trimH": H, "originX": B, "originY": B, "mediaW": MW, "mediaH": MH,
                 "texts": texts,
                 "blocks": [{"id": "b0", "y0": 0, "y1": H, "c0": 0, "c1": H, "screen": False, "parts": part_boxes}],
                 "ground": [{"offset": 0, "color": "#2B3990"}, {"offset": 1, "color": "#6DCFF6"}],
-                "native": {"version": "demobooth-2026-10-08", "profile": profile, "bgPage": bg_page, "parts": parts,
+                "native": {"version": "demobooth-2026-10-08b", "profile": profile, "bgPage": bg_page, "parts": parts,
                            "strips": {"left": {"bg": 0, "content": 0, "w": 0}, "right": {"bg": 0, "content": 0, "w": 0}}},
                 "sign": {"margin": round(min(72.0, min(W, H) * 0.06), 2)},
             }

@@ -1280,7 +1280,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
 
               {selText && selPlaced ? (
                 <Sec title="Type">
-                  <label className="block text-[10.5px] text-white/55">Words <span className="text-white/40">(Enter starts a new line)</span>
+                  <label className="block text-[10.5px] text-white/55">Words <span className="text-white/40">(Enter starts a new line; paragraphs wrap to the box width)</span>
                     <textarea className={`${field} mt-1 font-sans text-[13px]`} rows={3} value={edits.texts?.[selText.id]?.text ?? selText.text} onChange={(e) => patchText(selText.id, { text: e.target.value }, false)} onBlur={() => setHistory((h) => [...h, edits])} />
                   </label>
                   <div className="flex items-center justify-between rounded-sm border border-white/10 bg-black/30 px-2 py-1.5 text-[12px]">
@@ -1292,6 +1292,18 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                     <NumField label="Leading ×" value={selPlaced.lead} digits={2} onCommit={(v) => patchText(selText.id, { lead: Math.max(0.8, Math.min(2, v)) })} />
                     <NumField label="Tracking" value={edits.texts?.[selText.id]?.track ?? selText.track ?? 0} digits={0} onCommit={(v) => patchText(selText.id, { track: Math.max(-50, Math.min(300, v)) || undefined })} />
                   </div>
+                  {(() => {
+                    const w = edits.texts?.[selText.id]?.wrap ?? selText.wrap ?? 0;
+                    return (
+                      <div className="flex items-end gap-2">
+                        <label className="flex items-center gap-1.5 pb-1.5 text-[11px] text-white/70">
+                          <input type="checkbox" checked={w > 0} onChange={(e) => patchText(selText.id, { wrap: e.target.checked ? Math.round(selText.wrap || selText.w || 1440) : 0 })} />
+                          Paragraph (words wrap)
+                        </label>
+                        {w > 0 ? <div className="ml-auto w-28"><NumField label="Box width in" value={w / 72} digits={2} onCommit={(v) => patchText(selText.id, { wrap: Math.max(36, v * 72) })} /></div> : null}
+                      </div>
+                    );
+                  })()}
                   <div className="flex items-center gap-2">
                     <div className="flex gap-1" role="group" aria-label="Paragraph alignment">
                       {([["left", AlignLeft, "Align lines left"], ["center", AlignCenter, "Centre lines"], ["right", AlignRight, "Align lines right"]] as const).map(([a, Icon, label]) => (

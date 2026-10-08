@@ -1,3 +1,4 @@
+import GEIST_ADV from "./geist-advances.json";
 // TransPerfect NEXT — CALIFORNIA KIOSKS REBUILT FROM THE LIVE LONDON FILES.
 //
 // Each London trade-booth `.ai` (live, not outlined) was read once
@@ -54,6 +55,8 @@ export type LiveText = {
   align?: TextAlign;
   lead?: number;
   track?: number;
+  /** Paragraph box width (trim pt): words wrap to this width instead of keeping fixed lines. */
+  wrap?: number;
 };
 /** One separate object (logo, icon, QR, shape group) inside a piece, in London trim points. */
 export type LivePart = {
@@ -367,6 +370,8 @@ export type TextEdit = {
   track?: number;
   /** CMYK build set in the editor (0–1 each); `color` then holds its on-screen view. */
   cmyk?: number[];
+  /** Paragraph box width (trim pt); 0 turns wrapping off (fixed lines). */
+  wrap?: number;
 };
 /** An accent divider rule placed on the kiosk front (kiosk points, on trim). */
 export type KioskDivider = {
@@ -424,6 +429,30 @@ export function rotatedBox(b: { x0: number; x1: number; y0: number; y1: number }
   if (!rot) return b;
   const p = [[b.x0, b.y0], [b.x1, b.y0], [b.x0, b.y1], [b.x1, b.y1]].map(([x, y]) => rotateAbout(x!, y!, cx, cy, rot));
   return { x0: Math.min(...p.map((q) => q.x)), x1: Math.max(...p.map((q) => q.x)), y0: Math.min(...p.map((q) => q.y)), y1: Math.max(...p.map((q) => q.y)) };
+}
+
+/** Drawn width of a string in Geist (font's own advances), in pt at `size`, plus tracking (em). */
+export function geistWidth(s: string, font: string, size: number, trackEm = 0) {
+  const tb = (GEIST_ADV as Record<string, Record<string, number>>)[font.replace(/-?(Variable|VF)$/i, "")] ?? GEIST_ADV["Geist-Regular"];
+  let w = 0;
+  for (const ch of s) w += tb[ch] ?? 0.6;
+  return (w + trackEm * Math.max(0, [...s].length - 1)) * size;
+}
+
+/** Wrap paragraph text to `boxW` pt (Enter still forces a new line). Same lines for the editor, checks and exports. */
+export function wrapParagraph(text: string, font: string, size: number, trackEm: number, boxW: number): string[] {
+  const out: string[] = [];
+  for (const para of text.split(/\r?\n/)) {
+    const words = para.split(/ +/).filter(Boolean);
+    if (!words.length) { out.push(""); continue; }
+    let line = words[0]!;
+    for (const w of words.slice(1)) {
+      const next = `${line} ${w}`;
+      if (geistWidth(next, font, size, trackEm) <= boxW + 0.5) line = next; else { out.push(line); line = w; }
+    }
+    out.push(line);
+  }
+  return out;
 }
 
 /** Safe side margin used by the editor's align tools (2 in). */
@@ -606,10 +635,12 @@ function placeBlock(L: LiveLayout, edits: KioskEdits, badged: Set<string>, b: Li
       .map<PlacedText>((t) => {
         const te = edits.texts?.[t.id] ?? {};
         const kx = x + t.x * sc + (te.dx ?? 0);
-        const kw = t.w * sc;
+        const kw = (te.wrap || t.wrap || t.w) * sc;
         const ksize = (te.size ?? t.size) * sc;
         const text = te.text ?? t.text;
-        const lines = text.split(/\r?\n/);
+        const wrapW = te.wrap ?? t.wrap ?? 0;
+        const trackEm = (te.track ?? t.track ?? 0) / 1000;
+        const lines = wrapW > 0 ? wrapParagraph(text, t.font, te.size ?? t.size, trackEm, wrapW) : text.split(/\r?\n/);
         const align: TextAlign = te.align ?? t.align ?? "left";
         const edited = te.text !== undefined && te.text !== t.text;
         return {
@@ -627,7 +658,7 @@ function placeBlock(L: LiveLayout, edits: KioskEdits, badged: Set<string>, b: Li
           lead: te.lead ?? t.lead ?? 1.15,
           trackPt: ((te.track ?? t.track ?? 0) / 1000) * ksize,
           cmyk: te.cmyk ?? (te.color ? undefined : t.cmyk),
-          fixed: !t.flow && !edited && !te.track && lines.length === 1 && te.size === undefined,
+          fixed: !t.flow && !edited && !te.track && lines.length === 1 && te.size === undefined && !(te.wrap ?? t.wrap),
           opacity: te.opacity ?? 1,
           rot: te.rot ?? t.rot ?? 0,
         };
