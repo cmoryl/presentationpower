@@ -3,7 +3,7 @@
 // proofs for the 3D view, never print masters.
 
 import { supabase } from "@/integrations/supabase/client";
-import { kioskEditKey, kioskFaceLayout, kioskFaceW, kioskFaceH, KIOSK_RETURN_W, KIOSK_H, buildKioskReturnSvg, type LiveLayout, type KioskEdits } from "@/lib/next-california-kiosk-live";
+import { liveLayoutById, kioskEditKey, kioskFaceLayout, kioskFaceW, kioskFaceH, KIOSK_RETURN_W, KIOSK_H, buildKioskReturnSvg, type LiveLayout, type KioskEdits } from "@/lib/next-california-kiosk-live";
 import { pressFrontSvg, proofPng } from "@/lib/next-california-kiosk-live-export";
 import { notifyBoothHub } from "@/lib/booth-notify.functions";
 
@@ -61,13 +61,20 @@ export async function publishSignArt(L: LiveLayout, userId: string | null): Prom
   if (!t) return null;
   const { data: booth } = await supabase.from("event_booths").select("id").eq("source_booth_id", t.source).maybeSingle();
   if (!booth) return null;
-  const blob = await proofPng(await pressFrontSvg(L, await loadEdits(kioskEditKey(L))), t.face === "front" ? 900 : 160, kioskFaceW(L), kioskFaceH(L));
+  // Multi-face signs (demo booth) send every face on each save, so 3D never mixes old and new sides.
+  const siblings = t.source === "demo-booth"
+    ? (["front", "left", "right"] as const).map((f) => ({ face: f, layout: f === t.face ? L : liveLayoutById(`divsign-transperfect-demobooth-${f}`) }))
+    : [{ face: t.face, layout: L }];
   const revision = new Date().toISOString();
-  const path = `${booth.id}/${t.face}.png`;
-  const up = await supabase.storage.from("booth-proofs").upload(path, blob, { upsert: true, contentType: "image/png" });
-  if (up.error) throw new Error(`3D artwork not sent: ${up.error.message}`);
-  const { error } = await supabase.from("booth_art").upsert({ booth_id: booth.id, face: t.face, path, revision, updated_by: userId });
-  if (error) throw new Error(`3D artwork not sent: ${error.message}`);
+  for (const { face, layout } of siblings) {
+    if (!layout) continue;
+    const blob = await proofPng(await pressFrontSvg(layout, await loadEdits(kioskEditKey(layout))), face === "front" ? 900 : 160, kioskFaceW(layout), kioskFaceH(layout));
+    const path = `${booth.id}/${face}.png`;
+    const up = await supabase.storage.from("booth-proofs").upload(path, blob, { upsert: true, contentType: "image/png" });
+    if (up.error) throw new Error(`3D artwork not sent: ${up.error.message}`);
+    const { error } = await supabase.from("booth_art").upsert({ booth_id: booth.id, face, path, revision, updated_by: userId });
+    if (error) throw new Error(`3D artwork not sent: ${error.message}`);
+  }
   window.dispatchEvent(new CustomEvent("booth-art-published", { detail: L.id }));
   notifyBoothHub({ data: { boothId: booth.id, revision } }).catch((e) =>
     window.dispatchEvent(new CustomEvent("booth-art-failed", { detail: `BoothHUB wasn't notified: ${e instanceof Error ? e.message : e}` })),

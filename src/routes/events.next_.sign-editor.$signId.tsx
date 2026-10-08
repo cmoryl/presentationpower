@@ -1,8 +1,10 @@
 // /events/next/sign-editor/$signId — Legal NEXT signage template in the layer editor.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Box } from "lucide-react";
+import { toast } from "sonner";
+import { sign3dUrl } from "@/lib/sf-kiosk-3d";
 
 import { KioskLayerEditor } from "@/components/events/KioskLayerEditor";
 import { legalSign, legalSignLayout } from "@/lib/legal-next-signage";
@@ -50,6 +52,18 @@ function SignEditorWindow() {
   // A new size is its own live file (`<face>~<w>x<h>`): pieces re-flow, the ground stretches.
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
   const [custom, setCustom] = useState<{ w: string; h: string } | null>(null);
+  // Signs with a BoothHub model get a 3D panel that reloads after each save.
+  const url3d = sign3dUrl(signId);
+  const [show3d, setShow3d] = useState(false);
+  const [frameKey, setFrameKey] = useState(0);
+  useEffect(() => { if (url3d && window.innerWidth >= 1500) setShow3d(true); }, [url3d]);
+  useEffect(() => {
+    const ok = () => { setFrameKey((k) => k + 1); toast.success("Sent to the 3D view"); };
+    const bad = (e: Event) => toast.error(`Not sent to 3D: ${(e as CustomEvent).detail}`);
+    window.addEventListener("booth-art-published", ok);
+    window.addEventListener("booth-art-failed", bad);
+    return () => { window.removeEventListener("booth-art-published", ok); window.removeEventListener("booth-art-failed", bad); };
+  }, []);
   if (auth === "checking") return <Screen title="Opening the sign editor…" body="Checking you're signed in." />;
   if (auth === "signed-out") return <Screen title="Please sign in to edit signs" body="Taking you to the sign-in page." />;
   const baseLayout = legalSignLayout(faceId);
@@ -123,10 +137,30 @@ function SignEditorWindow() {
             {resized ? <span className="ml-1 text-white/50">New size · pieces re-placed, check before export</span> : null}
           </div>
         ) : null}
-        <SaveAsTemplateButton key={layout.id} layout={layout} sourceLabel={`${sign.title}${sign.faces.length > 1 ? ` · ${face?.label}` : ""}`} defaultKind={SIGN_KIND_FOR[sign.id] ?? "other"} className="ml-auto" />
+        <div className="ml-auto flex items-center gap-2">
+          {url3d ? (
+            <button type="button" aria-pressed={show3d} onClick={() => setShow3d((v) => !v)}
+              className="inline-flex items-center gap-1.5 rounded-sm border border-white/15 px-3 py-1 text-[12px] font-semibold text-white/80 hover:bg-white/10 aria-pressed:bg-white/15 aria-pressed:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
+              <Box className="h-3.5 w-3.5" aria-hidden /> 3D view
+            </button>
+          ) : null}
+          <SaveAsTemplateButton key={layout.id} layout={layout} sourceLabel={`${sign.title}${sign.faces.length > 1 ? ` · ${face?.label}` : ""}`} defaultKind={SIGN_KIND_FOR[sign.id] ?? "other"} />
+        </div>
       </div>
-      <div className="relative flex-1">
-        <KioskLayerEditor key={layout.id} layout={layout} vendor={`${sign.title}${sign.faces.length > 1 ? ` · ${face?.label}` : ""}${resized ? ` · ${size.w}×${size.h} in` : ""}`} embedded />
+      <div className="flex min-h-0 flex-1">
+        <div className="relative min-w-0 flex-1">
+          <KioskLayerEditor key={layout.id} layout={layout} vendor={`${sign.title}${sign.faces.length > 1 ? ` · ${face?.label}` : ""}${resized ? ` · ${size.w}×${size.h} in` : ""}`} embedded />
+        </div>
+        {url3d && show3d ? (
+          <aside aria-label="3D view" className="flex w-[380px] shrink-0 flex-col border-l border-white/10 bg-[#070620] text-white">
+            <div className="flex items-center gap-2 border-b border-white/10 p-2 text-[12px]">
+              <span className="font-semibold">3D view</span>
+              <button type="button" onClick={() => setFrameKey((k) => k + 1)} className="ml-auto rounded-sm border border-white/20 px-2 py-0.5 text-[11px] hover:bg-white/10">Reload</button>
+            </div>
+            <iframe key={frameKey} src={`${url3d}&single=1&chromeless=1&t=${frameKey}`} title={`${sign.title} in 3D`} allow="fullscreen" allowFullScreen className="min-h-0 flex-1 bg-white" />
+            <p className="border-t border-white/10 p-2 text-[11px] text-white/60">Saving sends this artwork to BoothHub and reloads the view. If it still shows older artwork, BoothHub hasn't picked up Element's artwork for this model yet.</p>
+          </aside>
+        ) : null}
       </div>
     </div>
   );
