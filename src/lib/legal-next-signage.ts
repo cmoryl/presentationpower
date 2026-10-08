@@ -4,10 +4,11 @@
 
 import financeDeskPreview from "@/assets/finance-pillars/reg-desk.jpg.asset.json";
 import globallinkDeskPreview from "@/assets/globallink-desk/reg-desk.jpg.asset.json";
+import { GLOBALLINK_PILLARS } from "@/lib/next-globallink-pillars";
 import { isSignId, liveLayoutById, venueFirstFaceId, type LiveLayout } from "@/lib/next-california-kiosk-live";
 
 type Ptr = { url: string };
-const MASTERS = import.meta.glob<Ptr>(["../assets/legal-next-signage/masters/*.asset.json", "../assets/sf-screen-surrounds/masters/*.asset.json", "../assets/next-demo-booth/masters/*.asset.json", "../assets/next-lift-door/masters/*.asset.json"], { eager: true, import: "default" });
+const MASTERS = import.meta.glob<Ptr>(["../assets/legal-next-signage/masters/*.asset.json", "../assets/sf-screen-surrounds/masters/*.asset.json", "../assets/next-demo-booth/masters/*.asset.json", "../assets/next-lift-door/masters/*.asset.json", "../assets/globallink-pillars-sf/*.pdf.asset.json"], { eager: true, import: "default" });
 const masterUrl = (file: string) => Object.entries(MASTERS).find(([k]) => k.endsWith(`/${file}.asset.json`))?.[1].url ?? null;
 
 export type LegalSignFace = { id: string; label: string };
@@ -97,6 +98,14 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
   ] as const).map(([id, title, master]): LegalSign => ({
     id, title, size: "23.5 × 72 in", master, faces: [{ id: `divsign-${id}`, label: "Pillar" }], sizes: PILLAR_SIZES_IN, division: "finance",
     note: "The supplied file has no bleed, so the ground is stretched 1/8 in past the trim.",
+  })),
+  // GlobalLink NEXT pillars, San Francisco — supplied Canva final (8 Oct 2026), one page per pillar.
+  ...GLOBALLINK_PILLARS.map((p): LegalSign => ({
+    id: `globallink-pillar-${p.slug}`, title: `GlobalLinkNEXT ${p.name} pillar`, size: "23.5 × 72 in", master: "gl-pillars-san-fran-26.pdf",
+    faces: [{ id: `divsign-globallink-pillar-${p.slug}`, label: "Pillar" }], sizes: PILLAR_SIZES_IN, division: "globallink", preview: p.jpg.url,
+    note: p.slug === "directional"
+      ? "The supplied page has the arrow and no headline. The file has no bleed, so the ground is stretched 1/8 in past the trim."
+      : "The headline is live text you can retype. The file has no bleed, so the ground is stretched 1/8 in past the trim.",
   })),
   {
     id: "finance-pillar-arrow", title: "FinanceNEXT pillar arrow sign", size: "23.5 × 72 in + 23.5 × 23.8 in arrow", master: "Finance_Pillar_Arro_Sign.ai",

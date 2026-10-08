@@ -4,7 +4,7 @@
 
 import JSZip from "jszip";
 
-import { kioskFaceH, kioskFaceW, kioskFontFaceCss, kioskFontFamily, kioskMarginX, layoutKiosk, textLineBoxes, type KioskEdits, type LiveLayout, type PlacedText } from "@/lib/next-california-kiosk-live";
+import { kioskFaceH, kioskFaceW, kioskFontFaceCss, kioskFontFamily, kioskMarginX, layoutKiosk, rotatedBox, textLineBoxes, type KioskEdits, type LiveLayout, type PlacedText } from "@/lib/next-california-kiosk-live";
 import { liveFrontPdf, pressFrontSvg } from "@/lib/next-california-kiosk-live-export";
 
 export type SignCheck = { label: string; issue: string; level: "error" | "warn" };
@@ -35,7 +35,7 @@ export async function signPrintChecks(L: LiveLayout, edits: KioskEdits): Promise
   for (const t of layoutKiosk(L, edits).flatMap((p) => p.texts)) {
     if (!t.lines.some((l) => l.trim())) continue;
     const bx = t.fixed ? [{ x: t.kx, w: t.kw, y: t.ky }] : textLineBoxes(t, measure(t));
-    const b = { x0: Math.min(...bx.map((q) => q.x)), x1: Math.max(...bx.map((q) => q.x + q.w)), y0: t.ky - t.ksize * 0.8, y1: bx[bx.length - 1]!.y + t.ksize * 0.2 };
+    const b = rotatedBox({ x0: Math.min(...bx.map((q) => q.x)), x1: Math.max(...bx.map((q) => q.x + q.w)), y0: t.ky - t.ksize * 0.8, y1: bx[bx.length - 1]!.y + t.ksize * 0.2 }, t.rot, t.ax, t.ky);
     const label = `“${t.lines[0] ?? ""}”`;
     if (b.x0 < 0 || b.x1 > W || b.y0 < 0 || b.y1 > H) out.push({ label, issue: "Crosses the trim edge — words will be cut off", level: "error" });
     else if (b.x0 < M || b.x1 > W - M || b.y0 < M || b.y1 > H - M) out.push({ label, issue: "Outside the safe margin", level: "warn" });
