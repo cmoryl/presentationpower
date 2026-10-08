@@ -1436,7 +1436,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                 {(edits.marks ?? L.defaultMarks ?? []).length ? (
                   <ul className="mt-2 space-y-1">
                     {(edits.marks ?? L.defaultMarks ?? []).map((m, i) => (
-                      <li key={m.id}><button type="button" aria-pressed={markSel === m.id} onClick={() => setMarkSel(m.id)} className="w-full rounded-sm border border-white/10 bg-black/20 px-2 py-1 text-left text-[11.5px] text-white/80 aria-pressed:ring-2 aria-pressed:ring-[#A1FBF9]">{m.kind === "logo" ? "NEXT logo" : `NEXT arrows ${i + 1}`}</button></li>
+                      <li key={m.id}><button type="button" aria-pressed={markSel === m.id} onClick={() => setMarkSel(m.id)} className="w-full rounded-sm border border-white/10 bg-black/20 px-2 py-1 text-left text-[11.5px] text-white/80 aria-pressed:ring-2 aria-pressed:ring-[#A1FBF9]">{m.kind === "logo" ? "NEXT logo" : m.kind === "brand" ? "Product logo" : `NEXT arrows ${i + 1}`}</button></li>
                     ))}
                   </ul>
                 ) : null}
