@@ -128,7 +128,7 @@ def build(pdf_path):
         page = src.pages[pi]
         ops, paints, W, H = analyse(src, page, set())
         # Canva offsets the MediaBox (y0 ≈ 7.92 pt); work in trim space from y = 0.
-        oy = float(page.MediaBox[1]); H = H - oy
+        oy = float(page.MediaBox[1]); H = round(H - oy, 2)
         for p in paints:
             if p["box"]: p["box"] = [p["box"][0], p["box"][1] - oy, p["box"][2], p["box"][3] - oy]
         shift = f"1 0 0 1 0 {-oy:.6f} cm\n".encode()
