@@ -53,6 +53,12 @@ export const SIGN_3D = [
   { id: "sign:globallink-desk", name: "GlobalLinkNEXT registration desk", ids: ["globallink-reg-desk"], match: /^$/, pending: true },
   { id: "sign:gl-pedestal-1", name: "GlobalLink NEXT pedestals", ids: ["globallink-pedestal"], match: /^$/, pending: true },
   { id: "sign:nextmart-pedestal", name: "NEXT Mart pedestal", ids: ["nextmart-pedestal"], match: /^$/, pending: true },
+  // Demo booth variations (8 Oct 2026): same booth model as sign:demo-booth, own artwork. Hidden until BoothHub publishes each.
+  { id: "sign:demo-booth-globallink-now", name: "NEXT demo booth — GlobalLink NOW", ids: ["demo-booth-globallink-now"], match: /^$/, pending: true },
+  { id: "sign:demo-booth-globallink-one", name: "NEXT demo booth — GlobalLink ONE", ids: ["demo-booth-globallink-one"], match: /^$/, pending: true },
+  { id: "sign:demo-booth-aura", name: "NEXT demo booth — TransPerfect AURA", ids: ["demo-booth-aura"], match: /^$/, pending: true },
+  { id: "sign:demo-booth-media", name: "NEXT demo booth — TransPerfect Media", ids: ["demo-booth-media"], match: /^$/, pending: true },
+  { id: "sign:demo-booth-globallink-web", name: "NEXT demo booth — GlobalLink Web", ids: ["demo-booth-globallink-web"], match: /^$/, pending: true },
 ] as { id: string; name: string; ids: readonly string[]; match: RegExp; pending?: boolean }[];
 
 export function sign3dUrl(signIdOrName: string | null | undefined): string | null {
