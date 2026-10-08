@@ -4,6 +4,7 @@ import { Download, PenLine } from "lucide-react";
 
 import { KioskLiveThumb } from "@/components/events/KioskLayerEditor";
 import { Button } from "@/components/ui/button";
+import { DemoBoothSetActions } from "@/components/events/DemoBoothSetActions";
 import { DIVISION_LIVE_SIGNS, LEGAL_NEXT_SIGNS, SF_SCREEN_SURROUNDS, legalSignLayout, legalSignMasterUrl, type LegalSign } from "@/lib/legal-next-signage";
 
 /** Legal NEXT general signage templates: open in the layer editor or take the supplied file. */
@@ -22,10 +23,12 @@ export function SfScreenSurrounds() {
   );
 }
 
+const DEMO_BOOTHS = DIVISION_LIVE_SIGNS.filter((s) => s.id === "demo-booth" || s.id.startsWith("demo-booth-"));
+
 /** San Francisco demo booths: the shared NEXT demo booth template (more versions to follow). */
 export function SfDemoBooths() {
   return (
-    <SignTemplateList id="sf-demo-booths" title="Demo booths" signs={DIVISION_LIVE_SIGNS.filter((s) => s.id === "demo-booth" || s.id.startsWith("demo-booth-"))} masterLabel="Supplied .ai"
+    <SignTemplateList id="sf-demo-booths" title="Demo booths" signs={DEMO_BOOTHS} masterLabel="Supplied .ai" actions={<DemoBoothSetActions signs={DEMO_BOOTHS} />}
       intro="The basic demo booth from the GlobalLink Coach file: a 45 × 96 in front and two 4 × 96 in sides. Open it to swap the top logo, retype the wording or change the background. The TV placement box is a guide and isn't printed." />
   );
 }
@@ -37,13 +40,14 @@ export function SfGlobalLinkPillars() {
   );
 }
 
-function SignTemplateList({ id, title, intro, signs, masterLabel = "Supplied .ai" }: { id: string; title: string; intro: string; signs: LegalSign[]; masterLabel?: string }) {
+function SignTemplateList({ id, title, intro, signs, masterLabel = "Supplied .ai", actions }: { id: string; title: string; intro: string; signs: LegalSign[]; masterLabel?: string; actions?: React.ReactNode }) {
   return (
     <section aria-labelledby={id} className="mt-12">
       <h2 id={id} className="text-xl font-semibold">{title}</h2>
       <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
         {intro} Downloads are named <span className="font-mono">rdraft-</span>.
       </p>
+      {actions}
       <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {signs.map((s) => {
           const L = legalSignLayout(s.faces[0]!.id);
