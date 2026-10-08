@@ -11,6 +11,10 @@ import bgJpg from "@/assets/finance-pillars/pillar-background.jpg.asset.json";
 import bgAi from "@/assets/finance-pillars/pillar-background.ai.asset.json";
 import arrowJpg from "@/assets/finance-pillars/arrow-sign.jpg.asset.json";
 import arrowAi from "@/assets/finance-pillars/arrow-sign.ai.asset.json";
+import libraryJpg from "@/assets/finance-pillars/library.jpg.asset.json";
+import libraryAi from "@/assets/finance-pillars/library.ai.asset.json";
+import joinLibJpg from "@/assets/finance-pillars/join-library.jpg.asset.json";
+import joinLibAi from "@/assets/finance-pillars/join-library.ai.asset.json";
 import type { NextRegistryRow } from "@/lib/next-event";
 
 const SIZE = "23.5×72 in · supplied .ai master";
@@ -22,6 +26,9 @@ const SET = [
   { code: "P4", format: "Pillar Background (blank)", live: "finance-pillar-background", jpg: bgJpg, ai: bgAi },
   // Supplied 6 Oct 2026: pillar with the arrow artwork on its own second artboard.
   { code: "P5", format: "Pillar Arrow Sign", live: "finance-pillar-arrow", jpg: arrowJpg, ai: arrowAi },
+  // Supplied 8 Oct 2026.
+  { code: "P6", format: "Library Pillar", live: "finance-pillar-library", jpg: libraryJpg, ai: libraryAi },
+  { code: "P7", format: "Join Us in the Library Pillar", live: "finance-pillar-join-library", jpg: joinLibJpg, ai: joinLibAi },
 ];
 
 export function financePillarRows(): NextRegistryRow[] {
