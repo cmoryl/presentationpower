@@ -419,6 +419,13 @@ export function rotateAbout(px: number, py: number, cx: number, cy: number, deg:
   return { x: cx + dx * c - dy * s, y: cy + dx * s + dy * c };
 }
 
+/** A text box turned by the line's rotation about its anchor (unrotated boxes pass through). */
+export function rotatedBox(b: { x0: number; x1: number; y0: number; y1: number }, rot: number, cx: number, cy: number) {
+  if (!rot) return b;
+  const p = [[b.x0, b.y0], [b.x1, b.y0], [b.x0, b.y1], [b.x1, b.y1]].map(([x, y]) => rotateAbout(x!, y!, cx, cy, rot));
+  return { x0: Math.min(...p.map((q) => q.x)), x1: Math.max(...p.map((q) => q.x)), y0: Math.min(...p.map((q) => q.y)), y1: Math.max(...p.map((q) => q.y)) };
+}
+
 /** Safe side margin used by the editor's align tools (2 in). */
 export const KIOSK_MARGIN = 144;
 

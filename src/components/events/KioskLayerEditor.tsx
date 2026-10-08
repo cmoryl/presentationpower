@@ -55,8 +55,7 @@ import {
   type LiveLayout,
   type PlacedText,
   type TextAlign,
-  cmykScreen,
-} from "@/lib/next-california-kiosk-live";
+  cmykScreen, rotatedBox} from "@/lib/next-california-kiosk-live";
 import { downloadKiosk, loadArtSvg, type KioskDownload } from "@/lib/next-california-kiosk-live-export";
 import { kioskCmykMaster } from "@/lib/next-california-kiosk-cmyk-masters";
 import { markArt, markFamilyFor, markH, markTransform, type KioskMark } from "@/lib/kiosk-marks";
@@ -762,7 +761,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
     };
     for (const t of placed.flatMap((p) => p.texts)) {
       const bx = t.fixed ? [{ x: t.kx, w: t.kw, y: t.ky }] : textLineBoxes(t, measure(t));
-      test({ kind: "text", id: t.id }, `“${t.lines[0] ?? ""}”`, { x0: Math.min(...bx.map((b) => b.x)), x1: Math.max(...bx.map((b) => b.x + b.w)), y0: t.ky - t.ksize * 0.8, y1: bx[bx.length - 1]!.y + t.ksize * 0.2 }, true);
+      test({ kind: "text", id: t.id }, `“${t.lines[0] ?? ""}”`, rotatedBox({ x0: Math.min(...bx.map((b) => b.x)), x1: Math.max(...bx.map((b) => b.x + b.w)), y0: t.ky - t.ksize * 0.8, y1: bx[bx.length - 1]!.y + t.ksize * 0.2 }, t.rot, t.ax, t.ky), true);
     }
     for (const q of placed.flatMap((p) => p.parts).filter((q) => !q.hidden))
       test({ kind: "part", id: q.part.id }, "Graphic object", { x0: q.x, y0: q.y, x1: q.x + (q.src.x1 - q.src.x0) * q.scale, y1: q.y + (q.src.y1 - q.src.y0) * q.scale }, false, !L.tv);
