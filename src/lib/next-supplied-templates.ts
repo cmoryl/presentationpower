@@ -43,7 +43,7 @@ function deskRows(): NextRegistryRow[] {
 }
 
 export function suppliedTemplateRows(): NextRegistryRow[] {
-  return [...financePillarRows(), ...globallinkPillarRows(), ...globallinkPedestalRows(), ...sfScreenSurroundRows(), ...deskRows(), demoBoothRow(), liftDoorRow()];
+  return [...financePillarRows(), ...globallinkPillarRows(), ...globallinkPedestalRows(), ...sfScreenSurroundRows(), ...deskRows(), demoBoothRow(), ...demoBoothVariantRows(), liftDoorRow()];
 }
 
 /** Basic NEXT demo booth (main NEXT templates); later demos swap logo, wording and background in the editor. */
