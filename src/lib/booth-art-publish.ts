@@ -45,8 +45,8 @@ export async function publishBoothArt(front: LiveLayout, userId: string | null):
 /** Which 3D sign (event_booths source id) and face a saved sign face feeds; null = no 3D model. */
 export function signArtTarget(layoutId: string): { source: string; face: "front" | "left" | "right" } | null {
   if (layoutId.includes("~")) return null; // re-sized copies are not the 3D sign
-  const d = layoutId.match(/^divsign-transperfect-demobooth-(front|left|right)$/);
-  if (d) return { source: "demo-booth", face: d[1] as "front" | "left" | "right" };
+  const d = layoutId.match(/^divsign-transperfect-demobooth-(?:([a-z-]+)-)?(front|left|right)$/);
+  if (d) return { source: d[1] ? `demo-booth-${d[1]}` : "demo-booth", face: d[2] as "front" | "left" | "right" };
   const s = layoutId.match(/^sfsurround-(all|three)$/);
   if (s) return { source: `sf-surround-${s[1]}`, face: "front" };
   if (layoutId === "divsign-transperfect-lift-liftyour") return { source: "lift-liftyour", face: "front" };
@@ -67,8 +67,8 @@ export async function publishSignArt(L: LiveLayout, userId: string | null): Prom
   const { data: booth } = await supabase.from("event_booths").select("id").eq("source_booth_id", t.source).maybeSingle();
   if (!booth) return null;
   // Multi-face signs (demo booth) send every face on each save, so 3D never mixes old and new sides.
-  const siblings = t.source === "demo-booth"
-    ? (["front", "left", "right"] as const).map((f) => ({ face: f, layout: f === t.face ? L : liveLayoutById(`divsign-transperfect-demobooth-${f}`) }))
+  const siblings = t.source.startsWith("demo-booth")
+    ? (["front", "left", "right"] as const).map((f) => ({ face: f, layout: f === t.face ? L : liveLayoutById(L.id.replace(/(front|left|right)$/, f)) }))
     : t.source === "finance-pillar-arrow"
       ? ([["front", "pillar"], ["left", "arrow"]] as const).map(([f, id]) => ({ face: f, layout: f === t.face ? L : liveLayoutById(`divsign-finance-pillar-arrow-${id}`) }))
       : [{ face: t.face, layout: L }];
