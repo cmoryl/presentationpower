@@ -18,6 +18,19 @@ import {
   paletteJson,
   type KitFamily,
 } from "@/lib/next-brand-kit";
+import {
+  BREW_RULES,
+  GRADIENT_RULES,
+  RESIZE_RULES,
+  REUSE_RULES,
+  digitalFormatsCsv,
+  gradientsCsv,
+  kitEventSections,
+  kitGradients,
+  kitMart,
+  kitSignSizes,
+  signSizesCsv,
+} from "@/lib/next-brand-kit-guide";
 
 async function bytes(url: string): Promise<Uint8Array> {
   const r = await fetch(url);
@@ -91,6 +104,26 @@ export async function buildBrandRulesPdf(): Promise<Uint8Array> {
     para(s.surface, 11);
     for (const r of s.rules) para(`• ${r}`);
   }
+  head("Gradients");
+  for (const g of kitGradients()) para(`${g.label} (${g.family}) — ${g.stops.map((x) => x.hex + (x.cmyk ? ` [CMYK ${x.cmyk}]` : "")).join(" → ")}`, 9);
+  for (const r of GRADIENT_RULES) para(`${r.do ? "Do" : "Don't"} — ${r.text}`);
+  head("Sizes");
+  for (const z of kitSignSizes()) para(`${z.title}: ${z.supplied}${z.presets.length ? ` · ready-made: ${z.presets.join(", ")}` : ""}`, 9);
+  head("Resizing");
+  RESIZE_RULES.forEach((r, i) => para(`${i + 1}. ${r}`));
+  head("Using what we already have");
+  para(`Copy: ${REUSE_RULES.copy}`);
+  para(`Change: ${REUSE_RULES.change}`);
+  para(`Never change: ${REUSE_RULES.never}`);
+  head("Event sections");
+  for (const g of kitEventSections().formatGroups) para(`${g.label} — ${g.detail}`);
+  head("NEXT Mart");
+  const mart = kitMart();
+  para(`Reference price bands: ${mart.reference.priceBands.map((b) => mart.reference.currency + b).join(", ")}. Currencies: ${mart.currencies.map((c) => c.code).join(", ")}.`);
+  for (const p of mart.pillars) para(`Pillar: ${p.name} × ${p.quantity} — ${p.role}`);
+  for (const f of mart.flats) para(`Flat: ${f.name} ${f.trimW}×${f.trimH} mm × ${f.quantity}`);
+  head("NEXTbrew");
+  for (const r of BREW_RULES) para(`• ${r}`);
   head("Starting a new city");
   NEW_CITY_CHECKLIST.forEach((c, i) => para(`${i + 1}. ${c.step}. ${c.body}`));
   return new Uint8Array(doc.output("arraybuffer"));
@@ -145,6 +178,10 @@ export async function buildBrandKitZip(
   root.file("colour/next-division-palette.csv", paletteCsv());
   root.file("colour/next-division-palette.json", paletteJson());
   root.file("colour/canva-brand-kit-values.txt", canvaCopyValues());
+  root.file("gradients/next-gradients.csv", gradientsCsv());
+  root.file("gradients/next-gradients.json", JSON.stringify(kitGradients(), null, 2));
+  root.file("sizes/next-sign-sizes.csv", signSizesCsv());
+  root.file("sizes/next-digital-formats.csv", digitalFormatsCsv());
   tick();
 
   for (const m of masters) {
@@ -171,6 +208,8 @@ export async function buildBrandKitZip(
       "",
       "logos/      every division NEXT lockup (SVG) and the NEXT marks",
       "colour/     division palette (CSV, JSON) and values for the Canva brand kit",
+      "gradients/ every approved ground with its stops (measured CMYK where supplied)",
+      "sizes/     sign sizes and ready-made sizes, digital formats by shape",
       "fonts/      Geist Regular and Bold",
       "templates/  supplied sign masters, exactly as supplied",
       "NEXT-brand-rules.pdf  logo, colour, print and new-city rules",
