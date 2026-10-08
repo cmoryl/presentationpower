@@ -124,10 +124,10 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
   },
   {
     // Basic demo booth (from the GlobalLink Coach TV test drive file): new demos swap the top logo, wording and background.
-    id: "demo-booth", title: "NEXT demo booth", size: "45 × 96 in front + 4 × 96 in sides", master: "NEXT-demo-booth-front-V2.ai",
+    id: "demo-booth", title: "NEXT demo booth", size: "45 × 96 in front + 4 × 96 in sides", master: "NEXT-demo-booth-front-V3.ai",
     faces: [{ id: "divsign-transperfect-demobooth-front", label: "Front" }, { id: "divsign-transperfect-demobooth-left", label: "Left side" }, { id: "divsign-transperfect-demobooth-right", label: "Right side" }],
     division: "transperfect",
-    note: "Built from the supplied V2 GlobalLink Coach front file. The TV guide marks where the screen mounts and is never printed.",
+    note: "Built from the supplied GlobalLink Coach front file (updated 8 Oct). The TV guide marks where the screen mounts and is never printed.",
   },
   {
     id: "demo-booth-globallink-now", title: "NEXT demo booth — GlobalLink NOW", size: "45 × 96 in front + 4 × 96 in sides", master: "NEXT-demo-booth-globallink-now-front-V2.ai",
