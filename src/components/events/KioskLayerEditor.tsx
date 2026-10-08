@@ -412,7 +412,8 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
       const t = pl.flatMap((p) => p.texts).find((x) => x.id === s.id);
       if (!t) return null;
       const bx = t.fixed ? [{ x: t.kx, w: t.kw, y: t.ky }] : textLineBoxes(t, measure(t));
-      return { x0: Math.min(...bx.map((b) => b.x)), x1: Math.max(...bx.map((b) => b.x + b.w)), y0: t.ky - t.ksize * 0.8, y1: bx[bx.length - 1]!.y + t.ksize * 0.2 };
+      // A turned line is selected, snapped and aligned by the box it actually covers.
+      return rotatedBox({ x0: Math.min(...bx.map((b) => b.x)), x1: Math.max(...bx.map((b) => b.x + b.w)), y0: t.ky - t.ksize * 0.8, y1: bx[bx.length - 1]!.y + t.ksize * 0.2 }, t.rot, t.ax, t.ky);
     }
     const ids = partGroup(base, s.id, L);
     const qs = pl.flatMap((p) => p.parts).filter((q) => ids.includes(q.part.id));
@@ -452,10 +453,12 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
   const endDrag = () => { markDrag.current = null; drag.current = null; setGuide(null); };
 
   /** Put the selection against the left margin, the centre line or the right margin. */
+  /** A turned line keeps its own anchor when it is aligned on the sign (changing it would swing the line away). */
+  const isTurned = (id: string) => !!placed.flatMap((p) => p.texts).find((t) => t.id === id)?.rot;
   const alignKiosk = (where: TextAlign, base: KioskEdits = edits) => {
     if (!sel || (base.locked ?? []).includes(sel.id)) return;
     let b0 = base;
-    if (sel.kind === "text") b0 = { ...base, texts: { ...base.texts, [sel.id]: { ...base.texts?.[sel.id], align: where } } };
+    if (sel.kind === "text" && !isTurned(sel.id)) b0 = { ...base, texts: { ...base.texts, [sel.id]: { ...base.texts?.[sel.id], align: where } } };
     const b = selBounds(sel, b0);
     if (!b) return;
     const d = where === "left" ? KIOSK_MARGIN - b.x0 : where === "center" ? KIOSK_W / 2 - (b.x0 + b.x1) / 2 : KIOSK_W - KIOSK_MARGIN - b.x1;
@@ -778,7 +781,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
   const alignTo = (m: "left" | "hcenter" | "right" | "top" | "vmiddle" | "bottom") => {
     if (!sel || isLocked(sel.id)) return;
     let base = edits;
-    if (sel.kind === "text" && (m === "left" || m === "hcenter" || m === "right"))
+    if (sel.kind === "text" && !isTurned(sel.id) && (m === "left" || m === "hcenter" || m === "right"))
       base = { ...edits, texts: { ...edits.texts, [sel.id]: { ...edits.texts?.[sel.id], align: m === "hcenter" ? "center" : m } } };
     const b = selBounds(sel, base);
     if (!b) return;
@@ -1308,7 +1311,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                   <div className="flex items-center gap-2">
                     <div className="flex gap-1" role="group" aria-label="Paragraph alignment">
                       {([["left", AlignLeft, "Align lines left"], ["center", AlignCenter, "Centre lines"], ["right", AlignRight, "Align lines right"]] as const).map(([a, Icon, label]) => (
-                        <button key={a} type="button" className={dibtn} aria-label={label} title={label} aria-pressed={selPlaced.align === a} onClick={() => patchText(selText.id, { align: a })}><Icon className="h-4 w-4" /></button>
+                        <button key={a} type="button" className={dibtn} aria-label={label} title={selPlaced.rot && selPlaced.lines.length === 1 ? "Not available for a turned line." : label} disabled={!!selPlaced.rot && selPlaced.lines.length === 1} aria-pressed={selPlaced.align === a} onClick={() => patchText(selText.id, { align: a })}><Icon className="h-4 w-4" /></button>
                       ))}
                     </div>
                     <label className="ml-auto flex items-center gap-1.5 text-[10.5px] text-white/55">Colour
@@ -1331,7 +1334,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                     </div>
                   ) : null}
                   <div className="flex flex-wrap gap-1.5">
-                    <button type="button" className={dbtn} onClick={() => {
+                    <button type="button" className={dbtn} disabled={!!selPlaced.rot} title={selPlaced.rot ? "Not available for a turned line. Set its size by hand." : undefined} onClick={() => {
                       const b = selBounds({ kind: "text", id: selText.id });
                       if (!b) return;
                       const cur = edits.texts?.[selText.id]?.size ?? selText.size;

@@ -299,7 +299,12 @@ export function resizedSignLayout(L: LiveLayout, wIn: number, hIn: number): Live
     })(),
   }));
   const texts = L.texts.map((t) => {
-    const dx = (t.x + t.w / 2) * (sx - 1), dy = ((t.top + t.bottom) / 2) * (sy - 1);
+    // Re-place a line by where it actually sits: a turned line (layout `rot`) swings about its anchor.
+    const mid = { x: t.x + t.w / 2, y: (t.top + t.bottom) / 2 };
+    const bw = t.wrap || t.w;
+    const ax = t.x + (t.align === "center" ? bw / 2 : t.align === "right" ? bw : 0);
+    const c = t.rot ? rotateAbout(mid.x, mid.y, ax, t.y, t.rot) : mid;
+    const dx = c.x * (sx - 1), dy = c.y * (sy - 1);
     return { ...t, x: t.x + dx, y: t.y + dy, top: t.top + dy, bottom: t.bottom + dy };
   });
   return {

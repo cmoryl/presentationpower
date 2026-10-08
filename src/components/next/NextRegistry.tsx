@@ -225,7 +225,7 @@ export function RegistryCard({
             download
             className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
           >
-            Download .ai
+            {/\.pdf(?:$|[?#])/i.test(row.downloadUrl) ? "Download PDF" : "Download .ai"}
           </a>
         ) : row.canvaUrl ? (
           <a

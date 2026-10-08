@@ -734,7 +734,8 @@ async function downloadSign(kind: KioskDownload, L: LiveLayout, edits: KioskEdit
   zip.file(
     "README.txt",
     `DRAFT — not published. Rebuilt from ${L.source}.\n` +
-      `Trim ${inch(W)} x ${inch(H)} in, 1/8 in bleed (background extended past trim). CMYK objects as supplied.\n` +
+      `Trim ${inch(W)} x ${inch(H)} in, 1/8 in bleed (background extended past trim).\n` +
+      `Colour profile: ${L.native?.profile ?? "not named in the file"}. Objects are placed as supplied, never converted.\n` +
       `.svg/.ai carry live text; the -press-outlined file has every word outlined.\n` +
       `The PNG is a screen proof, not a print master. Check in Illustrator before print.\n`,
   );

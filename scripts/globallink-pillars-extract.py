@@ -68,11 +68,16 @@ def split(paints, W, H):
     return bg, sorted(g.values(), key=lambda x: min(p["i"] for p in x))
 
 
-FONT_DIR = os.environ.get("GEIST_DIR", "/tmp/ln")  # Geist-*.ttf, for em sizes of rotated lines
+FONT_DIR = os.environ.get("GEIST_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "public", "fonts"))  # Geist-*.ttf, for em sizes of rotated lines
 
 
 def em_size(cs, font):
-    """Type size of a rotated line: page advance / font advance (pdfplumber's size is the glyph box)."""
+    """Type size of a rotated line: page advance / font advance (pdfplumber's size is the glyph box).
+
+    The divisor must be a Geist build whose advance widths match the file's embedded font
+    (public/fonts, Geist 1.800 for Canva files), not the fonts-live 1.3.1 build, whose
+    T/X/Y/W/A/V widths differ and skew the size by up to ~2%.
+    """
     from fontTools.ttLib import TTFont
     f = TTFont(os.path.join(FONT_DIR, f"{font}.ttf")); cm = f.getBestCmap(); hm = f["hmtx"]; u = f["head"].unitsPerEm
     page = sum(c["bottom"] - c["top"] for c in cs); em = sum(hm[cm[ord(c["text"])]][0] / u for c in cs if ord(c["text"]) in cm)
@@ -113,9 +118,14 @@ def read_texts(tpath, H):
             ends = [(c["matrix"][4], c["matrix"][5]) for c in cs]
             last = cs[-1]; lm = last["matrix"]
             L = math.hypot(lm[4] - ox, lm[5] - oy) + (last["x1"] - last["x0"] if r["rot"] == 0 else last["bottom"] - last["top"])
+            # Anchor at the middle of the baseline (centre-aligned, as the Canva text box is),
+            # so a retyped name stays centred where the designer centred it.
+            a = math.radians(r["rot"])
+            cx, cy = ox + math.cos(a) * L / 2, oy + math.sin(a) * L / 2
+            y = H - cy
             t = dict(id=f"t{k}", text=text, font=r["font"], size=round(r["size"], 2), color=color,
-                     x=round(ox, 2), y=round(H - oy, 2), w=round(L, 2),
-                     top=round(H - oy - r["size"] * 0.75, 2), bottom=round(H - oy, 2), rot=-r["rot"])
+                     x=round(cx - L / 2, 2), y=round(y, 2), w=round(L, 2),
+                     top=round(y - r["size"] * 0.75, 2), bottom=round(y, 2), align="center", rot=-r["rot"])
             out.append(t)
     return out
 
