@@ -6,6 +6,7 @@ import { Download, ExternalLink, Loader2, PencilRuler } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/design-system/element";
 import { BrandKitGuideSections, GUIDE_SECTIONS } from "@/components/events/brand-kit/BrandKitGuideSections";
+import { BrandKitPillarAreaSections, PILLAR_AREA_SECTIONS } from "@/components/events/brand-kit/BrandKitPillarAreaSections";
 import {
   BRAND_KIT_COLOUR_NOTE,
   BRAND_KIT_PRINT_NOTES,
@@ -29,6 +30,7 @@ const SECTIONS = [
   ["templates", "Sign templates"],
   ["digital", "Digital & slides"],
   ...GUIDE_SECTIONS,
+  ...PILLAR_AREA_SECTIONS,
   ["new-city", "Starting a new city"],
 ] as const;
 
@@ -254,6 +256,7 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
       </section>
 
       <BrandKitGuideSections shared={shared} />
+      <BrandKitPillarAreaSections />
 
       <section id="new-city" className="mt-12 scroll-mt-16">
         <h2 className="text-xl font-semibold">Starting a new city</h2>
