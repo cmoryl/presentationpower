@@ -120,6 +120,8 @@ const FACE_LABEL: Record<"front" | KioskFace, string> = { front: "Kiosk front", 
  * file, both side strips — each strip is edited with exactly the same tools.
  */
 import { spotPhotosFor } from "@/lib/venue-spot-photos";
+import { VENUE_STEP_GUIDES } from "@/lib/venue-step-guides";
+import { StepPhotoPreview } from "./StepPhotoPreview";
 
 export function KioskLayerEditor({ layout, vendor, fill = false, embedded = false, editKey }: { layout: LiveLayout; vendor: string; fill?: boolean; embedded?: boolean; /** Save changes under this key instead of the layout's own (signs built in a sign set). */ editKey?: string }) {
   const [face, setFace] = useState<"front" | KioskFace>("front");
@@ -817,6 +819,9 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
     `flex-1 truncate py-1 text-left text-[11.5px] ${active ? "text-white" : "text-white/70 hover:text-white"}`;
   const [photoIx, setPhotoIx] = useState<number | null>(null);
   const refPhotos = spotPhotosFor(L.id);
+  const [onStepsIx, setOnStepsIx] = useState<number | null>(null);
+  const abm = L.id.match(/\.([0-9a-f]{8})-(\d+)of\d+/);
+  const abGuides = abm ? VENUE_STEP_GUIDES[`${abm[1]}-${abm[2]}`] : undefined;
   const eyeBtn = "rounded-sm p-1 text-white/50 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]";
 
   return (
@@ -826,6 +831,9 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
         "flex overflow-hidden border border-white/10 bg-[#0B0A2A] text-white/85 [color-scheme:dark]"
       }
     >
+      {onStepsIx !== null && refPhotos[onStepsIx] ? (
+        <StepPhotoPreview photoUrl={refPhotos[onStepsIx]!.url} label={refPhotos[onStepsIx]!.label} svg={svgRef.current} guides={abGuides} onClose={() => setOnStepsIx(null)} />
+      ) : null}
       {photoIx !== null && refPhotos[photoIx] ? (
         <div role="dialog" aria-modal="true" aria-label={`${refPhotos[photoIx]!.label} of the location`} tabIndex={-1}
           ref={(el) => el?.focus()}
@@ -1506,6 +1514,12 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                       </button>
                     ))}
                   </div>
+                  {abGuides ? (
+                    <button type="button" onClick={() => setOnStepsIx(0)}
+                      className="w-full rounded-sm border border-[#003FC7] bg-[#003FC7]/20 px-2 py-1.5 text-[11.5px] text-white hover:bg-[#003FC7]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
+                      Preview artwork on the steps
+                    </button>
+                  ) : null}
                   <p className="text-[10.5px] text-white/50">Reference only, never printed.</p>
                 </Sec>
               ) : null}
