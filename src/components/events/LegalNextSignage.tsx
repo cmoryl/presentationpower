@@ -30,6 +30,13 @@ export function SfDemoBooths() {
   );
 }
 
+export function SfGlobalLinkPillars() {
+  return (
+    <SignTemplateList id="sf-globallink-pillars" title="GlobalLink NEXT pillars" signs={DIVISION_LIVE_SIGNS.filter((s) => s.id.startsWith("globallink-pillar-"))} masterLabel="Supplied PDF"
+      intro="The ten GlobalLink NEXT pillars from the designer's Canva final, 23.5 × 72 in each. Open one to retype the headline, move the lockup or make a new size. The room names come from the supplied artwork only." />
+  );
+}
+
 function SignTemplateList({ id, title, intro, signs, masterLabel = "Supplied .ai" }: { id: string; title: string; intro: string; signs: LegalSign[]; masterLabel?: string }) {
   return (
     <section aria-labelledby={id} className="mt-12">

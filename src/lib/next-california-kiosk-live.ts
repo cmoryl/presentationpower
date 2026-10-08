@@ -46,6 +46,8 @@ export type LiveText = {
   bottom: number;
   /** Set on text the editor created (badges): use the font's own spacing, not London's. */
   flow?: boolean;
+  /** Starting rotation in degrees (supplied rotated headlines); an edit's `rot` overrides it. */
+  rot?: number;
   /** Supplied CMYK build of the colour (0–1 each); `color` is only its on-screen view. */
   cmyk?: number[];
   /** Supplied alignment, line spacing (× size) and letter spacing (1/1000 em) for multi-line blocks. */
@@ -620,7 +622,7 @@ function placeBlock(L: LiveLayout, edits: KioskEdits, badged: Set<string>, b: Li
           cmyk: te.cmyk ?? (te.color ? undefined : t.cmyk),
           fixed: !t.flow && !edited && !te.track && lines.length === 1 && te.size === undefined,
           opacity: te.opacity ?? 1,
-          rot: te.rot ?? 0,
+          rot: te.rot ?? t.rot ?? 0,
         };
       })
       .filter((t) => !edits.texts?.[t.id]?.hidden);

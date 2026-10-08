@@ -715,7 +715,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
     if (!sel || sel.kind === "block") return null;
     if (sel.kind === "divider") { const d = edits.dividers?.find((x) => x.id === sel.id); return d ? { opacity: d.opacity ?? 1, rot: d.rot ?? 0 } : null; }
     const e = (sel.kind === "text" ? edits.texts : edits.parts)?.[sel.id];
-    return { opacity: e?.opacity ?? 1, rot: e?.rot ?? 0 };
+    return { opacity: e?.opacity ?? 1, rot: e?.rot ?? (sel.kind === "text" ? selText?.rot : undefined) ?? 0 };
   })();
   const setFx = (p: { opacity?: number; rot?: number }, push = true) => {
     if (!sel || sel.kind === "block") return;

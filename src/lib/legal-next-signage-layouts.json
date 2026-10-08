@@ -118,7 +118,7 @@
   "texts": [
    {
     "id": "t0",
-    "text": "PREPARE FOR WHAT\u2019S",
+    "text": "PREPARE FOR WHAT’S",
     "font": "Geist-Regular",
     "size": 200.0,
     "color": "#FFFFFF",
@@ -422,7 +422,7 @@
    },
    {
     "id": "t1",
-    "text": "PREPARE FOR WHAT\u2019S",
+    "text": "PREPARE FOR WHAT’S",
     "font": "Geist-Regular",
     "size": 185.0,
     "color": "#FFFFFF",
@@ -737,7 +737,7 @@
    },
    {
     "id": "t1",
-    "text": "PREPARE FOR WHAT\u2019S",
+    "text": "PREPARE FOR WHAT’S",
     "font": "Geist-Regular",
     "size": 185.0,
     "color": "#FFFFFF",
@@ -869,7 +869,7 @@
   "texts": [
    {
     "id": "t0",
-    "text": "LEARN WHAT WORKS. PREPARE FOR WHAT\u2019S",
+    "text": "LEARN WHAT WORKS. PREPARE FOR WHAT’S",
     "font": "Geist-Regular",
     "size": 300.0,
     "color": "#FFFFFF",
@@ -4387,6 +4387,984 @@
      "w": 0
     }
    }
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-globallink-pillar-welcome": {
+  "id": "divsign-globallink-pillar-welcome",
+  "source": "GL_PILLARS_SAN_FRAN_26.pdf",
+  "trimW": 1692.0,
+  "trimH": 5191.92,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1692.0,
+  "mediaH": 5191.92,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "BEYOND INTELLIGENCE",
+    "font": "Geist-SemiBold",
+    "size": 54.93,
+    "color": "#FFFFFF",
+    "x": 134.4,
+    "y": 218.63,
+    "w": 1423.09,
+    "top": 179.91,
+    "bottom": 234.84
+   },
+   {
+    "id": "t1",
+    "text": "WELCOME",
+    "font": "Geist-Bold",
+    "size": 616.74,
+    "color": "#FFFFFF",
+    "x": 1033.22,
+    "y": 4602.13,
+    "w": 3189.79,
+    "top": 4139.57,
+    "bottom": 4602.13,
+    "rot": -90
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 5191.92,
+    "c0": 0,
+    "c1": 5191.92,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 135.6,
+      "y0": 312.0,
+      "x1": 1556.33,
+      "y1": 1006.32
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#8B5CF6"
+   },
+   {
+    "offset": 1,
+    "color": "#A1FBF9"
+   }
+  ],
+  "native": {
+   "version": "gl-pillars-sf-2026-10-08",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1701.0,
+    5200.92
+   ]
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-globallink-pillar-telegraph-hill": {
+  "id": "divsign-globallink-pillar-telegraph-hill",
+  "source": "GL_PILLARS_SAN_FRAN_26.pdf",
+  "trimW": 1692.0,
+  "trimH": 5191.92,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1692.0,
+  "mediaH": 5191.92,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "BEYOND INTELLIGENCE",
+    "font": "Geist-SemiBold",
+    "size": 54.93,
+    "color": "#FFFFFF",
+    "x": 134.4,
+    "y": 218.63,
+    "w": 1423.09,
+    "top": 179.91,
+    "bottom": 234.84
+   },
+   {
+    "id": "t1",
+    "text": "TELEGRAPH HILL",
+    "font": "Geist-Bold",
+    "size": 382.38,
+    "color": "#FFFFFF",
+    "x": 955.83,
+    "y": 4586.1,
+    "w": 3163.29,
+    "top": 4299.31,
+    "bottom": 4586.1,
+    "rot": -90
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 5191.92,
+    "c0": 0,
+    "c1": 5191.92,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 135.6,
+      "y0": 312.0,
+      "x1": 1556.33,
+      "y1": 1006.32
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#8B5CF6"
+   },
+   {
+    "offset": 1,
+    "color": "#A1FBF9"
+   }
+  ],
+  "native": {
+   "version": "gl-pillars-sf-2026-10-08",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1701.0,
+    5200.92
+   ]
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-globallink-pillar-grand-ballroom": {
+  "id": "divsign-globallink-pillar-grand-ballroom",
+  "source": "GL_PILLARS_SAN_FRAN_26.pdf",
+  "trimW": 1692.0,
+  "trimH": 5191.92,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1692.0,
+  "mediaH": 5191.92,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "BEYOND INTELLIGENCE",
+    "font": "Geist-SemiBold",
+    "size": 54.93,
+    "color": "#FFFFFF",
+    "x": 134.4,
+    "y": 218.63,
+    "w": 1423.09,
+    "top": 179.91,
+    "bottom": 234.84
+   },
+   {
+    "id": "t1",
+    "text": "GRAND BALLROOM",
+    "font": "Geist-Bold",
+    "size": 336.56,
+    "color": "#FFFFFF",
+    "x": 934.48,
+    "y": 4592.77,
+    "w": 3178.79,
+    "top": 4340.35,
+    "bottom": 4592.77,
+    "rot": -90
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 5191.92,
+    "c0": 0,
+    "c1": 5191.92,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 135.6,
+      "y0": 312.0,
+      "x1": 1556.33,
+      "y1": 1006.32
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#8B5CF6"
+   },
+   {
+    "offset": 1,
+    "color": "#A1FBF9"
+   }
+  ],
+  "native": {
+   "version": "gl-pillars-sf-2026-10-08",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1701.0,
+    5200.92
+   ]
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-globallink-pillar-sutter": {
+  "id": "divsign-globallink-pillar-sutter",
+  "source": "GL_PILLARS_SAN_FRAN_26.pdf",
+  "trimW": 1692.0,
+  "trimH": 5191.92,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1692.0,
+  "mediaH": 5191.92,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "BEYOND INTELLIGENCE",
+    "font": "Geist-SemiBold",
+    "size": 54.93,
+    "color": "#FFFFFF",
+    "x": 134.4,
+    "y": 218.63,
+    "w": 1423.09,
+    "top": 179.91,
+    "bottom": 234.84
+   },
+   {
+    "id": "t1",
+    "text": "SUTTER",
+    "font": "Geist-Bold",
+    "size": 616.74,
+    "color": "#FFFFFF",
+    "x": 1033.22,
+    "y": 4206.68,
+    "w": 2399.12,
+    "top": 3744.13,
+    "bottom": 4206.68,
+    "rot": -90
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 5191.92,
+    "c0": 0,
+    "c1": 5191.92,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 135.6,
+      "y0": 312.0,
+      "x1": 1556.33,
+      "y1": 1006.32
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#8B5CF6"
+   },
+   {
+    "offset": 1,
+    "color": "#A1FBF9"
+   }
+  ],
+  "native": {
+   "version": "gl-pillars-sf-2026-10-08",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1701.0,
+    5200.92
+   ]
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-globallink-pillar-union-square": {
+  "id": "divsign-globallink-pillar-union-square",
+  "source": "GL_PILLARS_SAN_FRAN_26.pdf",
+  "trimW": 1692.0,
+  "trimH": 5191.92,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1692.0,
+  "mediaH": 5191.92,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "BEYOND INTELLIGENCE",
+    "font": "Geist-SemiBold",
+    "size": 54.93,
+    "color": "#FFFFFF",
+    "x": 134.4,
+    "y": 218.63,
+    "w": 1423.09,
+    "top": 179.91,
+    "bottom": 234.84
+   },
+   {
+    "id": "t1",
+    "text": "UNION SQUARE",
+    "font": "Geist-Bold",
+    "size": 417.62,
+    "color": "#FFFFFF",
+    "x": 965.36,
+    "y": 4604.82,
+    "w": 3187.04,
+    "top": 4291.61,
+    "bottom": 4604.82,
+    "rot": -90
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 5191.92,
+    "c0": 0,
+    "c1": 5191.92,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 135.6,
+      "y0": 312.0,
+      "x1": 1556.33,
+      "y1": 1006.32
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#8B5CF6"
+   },
+   {
+    "offset": 1,
+    "color": "#A1FBF9"
+   }
+  ],
+  "native": {
+   "version": "gl-pillars-sf-2026-10-08",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1701.0,
+    5200.92
+   ]
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-globallink-pillar-yerba-buena": {
+  "id": "divsign-globallink-pillar-yerba-buena",
+  "source": "GL_PILLARS_SAN_FRAN_26.pdf",
+  "trimW": 1692.0,
+  "trimH": 5191.92,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1692.0,
+  "mediaH": 5191.92,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "BEYOND INTELLIGENCE",
+    "font": "Geist-SemiBold",
+    "size": 54.93,
+    "color": "#FFFFFF",
+    "x": 134.4,
+    "y": 218.63,
+    "w": 1423.09,
+    "top": 179.91,
+    "bottom": 234.84
+   },
+   {
+    "id": "t1",
+    "text": "YERBA BUENA",
+    "font": "Geist-Bold",
+    "size": 446.03,
+    "color": "#FFFFFF",
+    "x": 974.37,
+    "y": 4578.8,
+    "w": 3150.8,
+    "top": 4244.28,
+    "bottom": 4578.8,
+    "rot": -90
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 5191.92,
+    "c0": 0,
+    "c1": 5191.92,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 135.6,
+      "y0": 312.0,
+      "x1": 1556.33,
+      "y1": 1006.32
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#8B5CF6"
+   },
+   {
+    "offset": 1,
+    "color": "#A1FBF9"
+   }
+  ],
+  "native": {
+   "version": "gl-pillars-sf-2026-10-08",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1701.0,
+    5200.92
+   ]
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-globallink-pillar-directional": {
+  "id": "divsign-globallink-pillar-directional",
+  "source": "GL_PILLARS_SAN_FRAN_26.pdf",
+  "trimW": 1692.0,
+  "trimH": 5191.92,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1692.0,
+  "mediaH": 5191.92,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "BEYOND INTELLIGENCE",
+    "font": "Geist-SemiBold",
+    "size": 54.93,
+    "color": "#FFFFFF",
+    "x": 134.4,
+    "y": 218.63,
+    "w": 1423.09,
+    "top": 179.91,
+    "bottom": 234.84
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 5191.92,
+    "c0": 0,
+    "c1": 5191.92,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 135.6,
+      "y0": 312.0,
+      "x1": 1556.33,
+      "y1": 1006.32
+     },
+     {
+      "id": "n1",
+      "x0": 272.15,
+      "y0": 1600.15,
+      "x1": 1443.29,
+      "y1": 2771.29
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#8B5CF6"
+   },
+   {
+    "offset": 1,
+    "color": "#A1FBF9"
+   }
+  ],
+  "native": {
+   "version": "gl-pillars-sf-2026-10-08",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1701.0,
+    5200.92
+   ]
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-globallink-pillar-discovery-rooms": {
+  "id": "divsign-globallink-pillar-discovery-rooms",
+  "source": "GL_PILLARS_SAN_FRAN_26.pdf",
+  "trimW": 1692.0,
+  "trimH": 5191.92,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1692.0,
+  "mediaH": 5191.92,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "BEYOND INTELLIGENCE",
+    "font": "Geist-SemiBold",
+    "size": 54.93,
+    "color": "#FFFFFF",
+    "x": 134.4,
+    "y": 218.63,
+    "w": 1423.09,
+    "top": 179.91,
+    "bottom": 234.84
+   },
+   {
+    "id": "t1",
+    "text": "DISCOVERY ROOMS",
+    "font": "Geist-Bold",
+    "size": 324.67,
+    "color": "#FFFFFF",
+    "x": 935.36,
+    "y": 4599.19,
+    "w": 3174.09,
+    "top": 4355.69,
+    "bottom": 4599.19,
+    "rot": -90
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 5191.92,
+    "c0": 0,
+    "c1": 5191.92,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 135.6,
+      "y0": 312.0,
+      "x1": 1556.33,
+      "y1": 1006.32
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#8B5CF6"
+   },
+   {
+    "offset": 1,
+    "color": "#A1FBF9"
+   }
+  ],
+  "native": {
+   "version": "gl-pillars-sf-2026-10-08",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1701.0,
+    5200.92
+   ]
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-globallink-pillar-next-mart": {
+  "id": "divsign-globallink-pillar-next-mart",
+  "source": "GL_PILLARS_SAN_FRAN_26.pdf",
+  "trimW": 1692.0,
+  "trimH": 5191.92,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1692.0,
+  "mediaH": 5191.92,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "BEYOND INTELLIGENCE",
+    "font": "Geist-SemiBold",
+    "size": 54.93,
+    "color": "#FFFFFF",
+    "x": 134.4,
+    "y": 218.63,
+    "w": 1423.09,
+    "top": 179.91,
+    "bottom": 234.84
+   },
+   {
+    "id": "t1",
+    "text": "NEXT MART",
+    "font": "Geist-Bold",
+    "size": 554.18,
+    "color": "#FFFFFF",
+    "x": 1011.9,
+    "y": 4622.16,
+    "w": 3190.01,
+    "top": 4206.52,
+    "bottom": 4622.16,
+    "rot": -90
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 5191.92,
+    "c0": 0,
+    "c1": 5191.92,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 135.6,
+      "y0": 312.0,
+      "x1": 1556.33,
+      "y1": 1006.32
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#8B5CF6"
+   },
+   {
+    "offset": 1,
+    "color": "#A1FBF9"
+   }
+  ],
+  "native": {
+   "version": "gl-pillars-sf-2026-10-08",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1701.0,
+    5200.92
+   ]
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-globallink-pillar-g2-review": {
+  "id": "divsign-globallink-pillar-g2-review",
+  "source": "GL_PILLARS_SAN_FRAN_26.pdf",
+  "trimW": 1692.0,
+  "trimH": 5191.92,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1692.0,
+  "mediaH": 5191.92,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "BEYOND INTELLIGENCE",
+    "font": "Geist-SemiBold",
+    "size": 54.93,
+    "color": "#FFFFFF",
+    "x": 134.4,
+    "y": 218.63,
+    "w": 1423.09,
+    "top": 179.91,
+    "bottom": 234.84
+   },
+   {
+    "id": "t1",
+    "text": "G2 REVIEW",
+    "font": "Geist-Bold",
+    "size": 571.36,
+    "color": "#FFFFFF",
+    "x": 1016.96,
+    "y": 4604.47,
+    "w": 3187.97,
+    "top": 4175.95,
+    "bottom": 4604.47,
+    "rot": -90
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 5191.92,
+    "c0": 0,
+    "c1": 5191.92,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 135.6,
+      "y0": 312.0,
+      "x1": 1556.33,
+      "y1": 1006.32
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#8B5CF6"
+   },
+   {
+    "offset": 1,
+    "color": "#A1FBF9"
+   }
+  ],
+  "native": {
+   "version": "gl-pillars-sf-2026-10-08",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1701.0,
+    5200.92
+   ]
   },
   "sign": {
    "margin": 72.0
