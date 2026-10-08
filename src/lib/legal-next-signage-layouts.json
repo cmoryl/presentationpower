@@ -3534,7 +3534,7 @@
   "texts": [
    {
     "id": "t0",
-    "text": "PUT YOUR CONVERSATION SKILLS TO THE TEST",
+    "text": "PUT YOUR CONVERSATION\nSKILLS TO THE TEST",
     "font": "Geist-ExtraBold",
     "size": 276.04,
     "color": "#FFFFFF",
@@ -3555,32 +3555,14 @@
    },
    {
     "id": "t3",
-    "text": "Try a sales, service, or compliance",
+    "text": "Try a sales, service, or compliance conversation with an AI persona\nthat challenges you in real time.\nGet personalized feedback\nafter every conversation.",
     "font": "Geist-Regular",
     "size": 159.31,
     "color": "#FFFFFF",
     "x": 289.57,
     "y": 4104.1,
-    "w": 2462.74,
+    "w": 2567.21,
     "top": 3983.06,
-    "bottom": 4142.37,
-    "cmyk": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ]
-   },
-   {
-    "id": "t4",
-    "text": "conversation with an AI persona that challenges you in real time. Get personalized feedback after every conversation.",
-    "font": "Geist-Regular",
-    "size": 159.31,
-    "color": "#FFFFFF",
-    "x": 289.57,
-    "y": 4346.3,
-    "w": 2418.86,
-    "top": 4225.21,
     "bottom": 5110.97,
     "cmyk": [
      0.0,
@@ -3588,9 +3570,9 @@
      0.0,
      0.0
     ],
-    "wrap": 2418.86,
+    "wrap": 2567.21,
     "align": "left",
-    "lead": 1.5199
+    "lead": 1.52
    }
   ],
   "blocks": [

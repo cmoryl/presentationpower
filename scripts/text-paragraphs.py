@@ -40,10 +40,16 @@ def paragraphs(texts):
         if len(g) > 1:
             lines = [t["text"] for t in g]; track = (g[0].get("track") or 0) / 1000
             box = max(width(s, g[0]["font"], g[0]["size"], track) for s in lines) * 1.01
-            if wrap(" ".join(lines), g[0]["font"], g[0]["size"], track, box) == lines:
+            # Join with spaces where wrapping reproduces the break; keep a hard
+            # break (Enter) where the designer broke the line early on purpose.
+            text = lines[0]
+            for ln in lines[1:]:
+                cand = text + " " + ln
+                text = cand if wrap(cand, g[0]["font"], g[0]["size"], track, box)[-1] == ln and len(wrap(cand, g[0]["font"], g[0]["size"], track, box)) == cand.count("\n") + 1 + len(text.split("\n")[-1:]) else text + "\n" + ln
+            if wrap(text, g[0]["font"], g[0]["size"], track, box) == lines:
                 x0 = min(t["x"] for t in g); x1 = max(t["x"] + t["w"] for t in g)
                 xa = x0 if al == "left" else (x0 + x1) / 2 - box / 2 if al == "center" else x1 - box
-                p = dict(g[0], text=" ".join(lines), x=round(xa, 2), w=round(box, 2), wrap=round(box, 2), align=al,
+                p = dict(g[0], text=text, x=round(xa, 2), w=round(box, 2), wrap=round(box, 2), align=al,
                          lead=round((g[-1]["y"] - g[0]["y"]) / (len(g) - 1) / g[0]["size"], 4), bottom=g[-1]["bottom"])
                 out.append(p); i += len(g); continue
         out.append(texts[i]); i += 1
