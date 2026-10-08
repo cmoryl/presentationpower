@@ -119,6 +119,8 @@ const FACE_LABEL: Record<"front" | KioskFace, string> = { front: "Kiosk front", 
  * The kiosk editor: the front and, on kiosks read from the designer's CMYK
  * file, both side strips — each strip is edited with exactly the same tools.
  */
+import { spotPhotosFor } from "@/lib/venue-spot-photos";
+
 export function KioskLayerEditor({ layout, vendor, fill = false, embedded = false, editKey }: { layout: LiveLayout; vendor: string; fill?: boolean; embedded?: boolean; /** Save changes under this key instead of the layout's own (signs built in a sign set). */ editKey?: string }) {
   const [face, setFace] = useState<"front" | KioskFace>("front");
   const hasFaces = !!layout.native?.faces;
@@ -1475,6 +1477,20 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                 </div>
                 <p className="text-[10.5px] text-white/50">Guides never print.</p>
               </Sec>
+              {spotPhotosFor(L.id).length ? (
+                <Sec title="Location photos">
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {spotPhotosFor(L.id).map((ph, i) => (
+                      <button key={ph.url} type="button" onClick={() => setPhotoIx(i)} aria-label={`View ${ph.label} larger`}
+                        className="overflow-hidden rounded-sm border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
+                        <img src={ph.url} alt={`${ph.label} of the location`} className="aspect-[3/4] w-full object-cover" />
+                        <span className="block bg-black/40 px-1.5 py-0.5 text-left text-[10.5px] text-white/75">{ph.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10.5px] text-white/50">Reference only, never printed.</p>
+                </Sec>
+              ) : null}
             </>
           ) : null}
 
