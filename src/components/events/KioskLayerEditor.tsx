@@ -810,8 +810,9 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
   const G = guides.rulers ? 22 / k : 0;
   const rs = 1 / k; // one screen px in kiosk units
   const vbX = -B - G, vbY = -B - G, vbW = KIOSK_W + 2 * B + G, vbH = KIOSK_H + 2 * B + G;
-  const stepIn = zoom < 900 ? 6 : 3;
-  const ticksX = Array.from({ length: Math.floor(KIOSK_W / 72 / (L.face ? 1 : stepIn)) + 1 }, (_, i) => i * (L.face ? 1 : stepIn));
+  // Label spacing follows the on-screen size so ruler numbers never pile up into a solid band.
+  const stepIn = [1, 2, 3, 6, 12, 24, 48].find((s) => s * 72 * k >= 30) ?? 48;
+  const ticksX = Array.from({ length: Math.floor(KIOSK_W / 72 / stepIn) + 1 }, (_, i) => i * stepIn);
   const ticksY = Array.from({ length: Math.floor(KIOSK_H / 72 / stepIn) + 1 }, (_, i) => i * stepIn);
 
   const layerRow = (active: boolean) =>
@@ -1039,7 +1040,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                   </g>
                 ) : null}
                 {L.native && !edits.ground && !L.groundOnly ? (
-                  <>{/* Paper is white: unprinted areas of the designer file show as white, not transparent. */}<rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="#FFFFFF" pointerEvents="none" /><use href={`#${symId}-${L.native.bgSym ?? "bg"}`} x={nativeBgBox(L)[0]} y={nativeBgBox(L)[1]} width={nativeBgBox(L)[2]} height={nativeBgBox(L)[3]} pointerEvents="none" /></>
+                  <>{/* Paper is white: unprinted areas of the designer file show as white, not transparent. */}<rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="#FFFFFF" pointerEvents="none" /><svg x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} viewBox={`${-B} ${-B} ${KIOSK_W + 2 * B} ${KIOSK_H + 2 * B}`} overflow="hidden" pointerEvents="none">{/* Clip to the bleed: some supplied grounds carry page white beyond it. */}<use href={`#${symId}-${L.native.bgSym ?? "bg"}`} x={nativeBgBox(L)[0]} y={nativeBgBox(L)[1]} width={nativeBgBox(L)[2]} height={nativeBgBox(L)[3]} pointerEvents="none" /></svg></>
                 ) : (
                   <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill={`url(#kg-${L.id})`} />
                 )}
