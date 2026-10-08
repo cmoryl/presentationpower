@@ -1,3 +1,4 @@
+import { demoBoothCardUrl } from "@/lib/demo-booth-cards";
 // Legal NEXT general signage templates — supplied Illustrator files, edited in
 // the shared kiosk layer editor. City, date and venue facts are NOT part of
 // these templates; the supplied copy is used exactly as received.
