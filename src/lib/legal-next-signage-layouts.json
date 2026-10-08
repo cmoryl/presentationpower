@@ -3534,57 +3534,24 @@
   "texts": [
    {
     "id": "t0",
-    "text": "PUT YOUR",
+    "text": "PUT YOUR CONVERSATION SKILLS TO THE TEST",
     "font": "Geist-ExtraBold",
     "size": 276.04,
     "color": "#FFFFFF",
     "x": 247.72,
     "y": 568.5,
-    "w": 1391.8,
+    "w": 2836.79,
     "top": 363.72,
-    "bottom": 639.76,
-    "cmyk": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ]
-   },
-   {
-    "id": "t1",
-    "text": "CONVERSATION",
-    "font": "Geist-ExtraBold",
-    "size": 276.04,
-    "color": "#FFFFFF",
-    "x": 247.72,
-    "y": 850.1,
-    "w": 2217.97,
-    "top": 645.28,
-    "bottom": 921.32,
-    "cmyk": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ]
-   },
-   {
-    "id": "t2",
-    "text": "SKILLS TO THE TEST",
-    "font": "Geist-ExtraBold",
-    "size": 276.04,
-    "color": "#FFFFFF",
-    "x": 247.72,
-    "y": 1131.7,
-    "w": 2811.74,
-    "top": 926.85,
     "bottom": 1202.89,
     "cmyk": [
      0.0,
      0.0,
      0.0,
      0.0
-    ]
+    ],
+    "wrap": 2836.79,
+    "align": "left",
+    "lead": 1.0201
    },
    {
     "id": "t3",
@@ -3606,75 +3573,24 @@
    },
    {
     "id": "t4",
-    "text": "conversation with an AI persona",
+    "text": "conversation with an AI persona that challenges you in real time. Get personalized feedback after every conversation.",
     "font": "Geist-Regular",
     "size": 159.31,
     "color": "#FFFFFF",
     "x": 289.57,
     "y": 4346.3,
-    "w": 2351.55,
+    "w": 2418.86,
     "top": 4225.21,
-    "bottom": 4384.52,
-    "cmyk": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ]
-   },
-   {
-    "id": "t5",
-    "text": "that challenges you in real time.",
-    "font": "Geist-Regular",
-    "size": 159.31,
-    "color": "#FFFFFF",
-    "x": 289.57,
-    "y": 4588.4,
-    "w": 2345.96,
-    "top": 4467.36,
-    "bottom": 4626.67,
-    "cmyk": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ]
-   },
-   {
-    "id": "t6",
-    "text": "Get personalized feedback",
-    "font": "Geist-Regular",
-    "size": 159.31,
-    "color": "#FFFFFF",
-    "x": 289.57,
-    "y": 4830.6,
-    "w": 1949.44,
-    "top": 4709.51,
-    "bottom": 4868.82,
-    "cmyk": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ]
-   },
-   {
-    "id": "t7",
-    "text": "after every conversation.",
-    "font": "Geist-Regular",
-    "size": 159.31,
-    "color": "#FFFFFF",
-    "x": 289.57,
-    "y": 5072.7,
-    "w": 1825.96,
-    "top": 4951.66,
     "bottom": 5110.97,
     "cmyk": [
      0.0,
      0.0,
      0.0,
      0.0
-    ]
+    ],
+    "wrap": 2418.86,
+    "align": "left",
+    "lead": 1.5199
    }
   ],
   "blocks": [
