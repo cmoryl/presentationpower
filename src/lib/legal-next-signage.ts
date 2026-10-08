@@ -1,3 +1,4 @@
+import { demoBoothCardUrl } from "@/lib/demo-booth-cards";
 // Legal NEXT general signage templates — supplied Illustrator files, edited in
 // the shared kiosk layer editor. City, date and venue facts are NOT part of
 // these templates; the supplied copy is used exactly as received.
@@ -166,6 +167,8 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
     note: "General lift template. The centre line where the doors meet is a guide and isn't printed.",
   },
 ];
+// Demo booth cards show the left side, front and right side together.
+for (const s of DIVISION_LIVE_SIGNS) if (s.id.startsWith("demo-booth")) s.preview = demoBoothCardUrl(s.id) ?? s.preview;
 
 /** Editor id for a venue spot's first version: `venue~<spot>~<w>x<h>_<w>x<h>…` (artboard inches). */
 export const venueFirstSignId = (spotId: string, artboards: { w_in: number; h_in: number }[]) =>
