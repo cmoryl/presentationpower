@@ -68,6 +68,17 @@ def split(paints, W, H):
     return bg, sorted(g.values(), key=lambda x: min(p["i"] for p in x))
 
 
+FONT_DIR = os.environ.get("GEIST_DIR", "/tmp/ln")  # Geist-*.ttf, for em sizes of rotated lines
+
+
+def em_size(cs, font):
+    """Type size of a rotated line: page advance / font advance (pdfplumber's size is the glyph box)."""
+    from fontTools.ttLib import TTFont
+    f = TTFont(os.path.join(FONT_DIR, f"{font}.ttf")); cm = f.getBestCmap(); hm = f["hmtx"]; u = f["head"].unitsPerEm
+    page = sum(c["bottom"] - c["top"] for c in cs); em = sum(hm[cm[ord(c["text"])]][0] / u for c in cs if ord(c["text"]) in cm)
+    return page / em
+
+
 def read_texts(tpath, H):
     out = []
     with pdfplumber.open(tpath) as p:
@@ -98,6 +109,7 @@ def read_texts(tpath, H):
         else:
             # Rotated line: anchor at the first glyph origin, length along the baseline.
             ox, oy = m0[4], m0[5]
+            r["size"] = em_size(cs, r["font"])
             ends = [(c["matrix"][4], c["matrix"][5]) for c in cs]
             last = cs[-1]; lm = last["matrix"]
             L = math.hypot(lm[4] - ox, lm[5] - oy) + (last["x1"] - last["x0"] if r["rot"] == 0 else last["bottom"] - last["top"])
