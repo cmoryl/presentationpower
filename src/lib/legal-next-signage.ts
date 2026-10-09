@@ -30,6 +30,8 @@ export type LegalSign = {
   division?: string;
 };
 
+/** San Francisco lift doors, as supplied by the team (41.5 in wide, 84 in high). */
+const SF_LIFT_SIZES_IN = [{ w: 41.5, h: 84, label: "San Francisco · 41.5 × 84 in" }];
 export const PILLAR_SIZES_IN = [
   { w: 23.5, h: 72, label: "Supplied · 23.5 × 72 in" },
   { w: 23.5, h: 84, label: "Taller · 23.5 × 84 in" },
@@ -167,6 +169,14 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
     faces: [{ id: "divsign-transperfect-lift-liftyour", label: "Lift doors" }],
     division: "transperfect",
     note: "General lift template. The centre line where the doors meet is a guide and isn't printed.",
+    sizes: [{ w: 43.3, h: 82.1, label: "Supplied · 43.3 × 82.1 in" }, ...SF_LIFT_SIZES_IN],
+  },
+  {
+    // San Francisco lifts: the general lift wrap re-sized to the SF lift doors (sizes as supplied by the team).
+    id: "sf-lift-liftyour", title: "San Francisco lift door wrap — Lift Your Global Profile", size: "41.5 × 84 in (both doors, ~21.3 in each)", master: "Lifts_Template_LiftYour.ai",
+    faces: [{ id: "divsign-transperfect-lift-liftyour~41.5x84", label: "Lift doors" }],
+    division: "transperfect", sizes: SF_LIFT_SIZES_IN,
+    note: "The general lift wrap re-sized to the San Francisco doors: 41.5 in full width, about 21.3 in per door, 84 in high. The background stretches to the new size; logo and text keep their size. The door centre line is a guide and isn't printed. Confirm the door sizes on site before print.",
   },
 ];
 // Demo booth cards show the left side, front and right side together.

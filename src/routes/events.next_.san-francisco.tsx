@@ -28,7 +28,7 @@ import { EditionDivisionTiles } from "@/components/events/EditionDivisionTiles";
 import { CitySectionBar, SAN_FRANCISCO_SECTIONS } from "@/components/events/CitySectionBar";
 import { CaliforniaKioskBrowser } from "@/components/events/CaliforniaKioskBrowser";
 import { SfPartnerKioskShowcase } from "@/components/events/SfPartnerKioskShowcase";
-import { SfDemoBooths, SfGlobalLinkPillars, SfScreenSurrounds } from "@/components/events/LegalNextSignage";
+import { SfDemoBooths, SfGlobalLinkPillars, SfLiftDoors, SfScreenSurrounds } from "@/components/events/LegalNextSignage";
 import { VenueAssetSubmissions } from "@/components/events/VenueAssetSubmissions";
 import { SF_READY, SF_VENUE, sfLocationStack } from "@/lib/next-sf-event";
 
@@ -266,6 +266,7 @@ function SanFranciscoPage() {
           <SfScreenSurrounds />
           <SfDemoBooths />
           <SfGlobalLinkPillars />
+          <SfLiftDoors />
         </div>
 
         <EditionDivisionTiles
