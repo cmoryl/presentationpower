@@ -126,6 +126,7 @@ export const Route = createFileRoute("/api/kit-agent-chat")({
         });
 
         return result.toUIMessageStreamResponse({
+          generateMessageId: () => crypto.randomUUID(),
           originalMessages: messages,
           onError: (error) => {
             const raw = error instanceof Error ? error.message : String(error);
