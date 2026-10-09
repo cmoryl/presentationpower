@@ -3932,7 +3932,23 @@
   "originY": 9.0,
   "mediaW": 3136.11,
   "mediaH": 5928.24,
-  "texts": [],
+  "texts": [
+   {
+    "id": "headline",
+    "text": "LIFT\nYOUR\nGLOBAL\nPROFILE",
+    "font": "Geist-Bold",
+    "size": 284.51,
+    "color": "#FFFFFF",
+    "x": 142.46,
+    "y": 2473.0,
+    "w": 1248.54,
+    "top": 2271.0,
+    "bottom": 3241.0,
+    "wrap": 1387.54,
+    "align": "left",
+    "lead": 0.9
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -4039,13 +4055,6 @@
       "y0": 3411.49,
       "x1": 1560.44,
       "y1": 4957.52
-     },
-     {
-      "id": "n14",
-      "x0": 151.38,
-      "y0": 2270.94,
-      "x1": 1390.51,
-      "y1": 3239.86
      }
     ]
    }
@@ -7890,7 +7899,23 @@
   "originY": 9.0,
   "mediaW": 3136.11,
   "mediaH": 5928.24,
-  "texts": [],
+  "texts": [
+   {
+    "id": "headline",
+    "text": "STEP\nINTO\nWHAT\u2019S",
+    "font": "Geist-Bold",
+    "size": 329.58,
+    "color": "#FFFFFF",
+    "x": 133.11,
+    "y": 2773.0,
+    "w": 1277.89,
+    "top": 2537.0,
+    "bottom": 3341.0,
+    "wrap": 1396.89,
+    "align": "left",
+    "lead": 0.862
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -7997,13 +8022,6 @@
       "y0": 3411.49,
       "x1": 1560.44,
       "y1": 4957.52
-     },
-     {
-      "id": "n14",
-      "x0": 142.7,
-      "y0": 2537.27,
-      "x1": 1409.51,
-      "y1": 3341.11
      }
     ]
    }
@@ -8110,7 +8128,23 @@
   "originY": 9.0,
   "mediaW": 3136.11,
   "mediaH": 5928.24,
-  "texts": [],
+  "texts": [
+   {
+    "id": "headline",
+    "text": "THINK\nBIGGER.\nGO FURTHER.",
+    "font": "Geist-Bold",
+    "size": 191.55,
+    "color": "#FFFFFF",
+    "x": 113.25,
+    "y": 2785.0,
+    "w": 1315.75,
+    "top": 2649.0,
+    "bottom": 3205.0,
+    "wrap": 1416.75,
+    "align": "left",
+    "lead": 1.096
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -8217,13 +8251,6 @@
       "y0": 3411.49,
       "x1": 1560.44,
       "y1": 4957.52
-     },
-     {
-      "id": "n14",
-      "x0": 119.66,
-      "y0": 2650.41,
-      "x1": 1427.93,
-      "y1": 3203.77
      }
     ]
    }
@@ -8330,7 +8357,23 @@
   "originY": 9.0,
   "mediaW": 3136.11,
   "mediaH": 5928.24,
-  "texts": [],
+  "texts": [
+   {
+    "id": "headline",
+    "text": "WHERE\nIDEAS\nCONNECT",
+    "font": "Geist-Bold",
+    "size": 256.34,
+    "color": "#FFFFFF",
+    "x": 137.31,
+    "y": 2751.0,
+    "w": 1315.69,
+    "top": 2569.0,
+    "bottom": 3215.0,
+    "wrap": 1392.69,
+    "align": "left",
+    "lead": 0.905
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -8437,13 +8480,6 @@
       "y0": 3411.49,
       "x1": 1560.44,
       "y1": 4957.52
-     },
-     {
-      "id": "n14",
-      "x0": 145.03,
-      "y0": 2569.65,
-      "x1": 1452.07,
-      "y1": 3214.71
      }
     ]
    }
@@ -8550,7 +8586,23 @@
   "originY": 9.0,
   "mediaW": 3136.11,
   "mediaH": 5928.24,
-  "texts": [],
+  "texts": [
+   {
+    "id": "headline",
+    "text": "ELEVATE\nYOUR\nGLOBAL\nCUSTOMER\nEXPERIENCE",
+    "font": "Geist-Bold",
+    "size": 191.55,
+    "color": "#FFFFFF",
+    "x": 141.25,
+    "y": 2429.0,
+    "w": 1255.75,
+    "top": 2293.0,
+    "bottom": 3301.0,
+    "wrap": 1388.75,
+    "align": "left",
+    "lead": 1.138
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -8657,13 +8709,6 @@
       "y0": 3411.49,
       "x1": 1560.44,
       "y1": 4957.52
-     },
-     {
-      "id": "n14",
-      "x0": 146.86,
-      "y0": 2293.69,
-      "x1": 1396.08,
-      "y1": 3299.77
      }
     ]
    }
@@ -8770,7 +8815,23 @@
   "originY": 9.0,
   "mediaW": 3136.11,
   "mediaH": 5928.24,
-  "texts": [],
+  "texts": [
+   {
+    "id": "headline",
+    "text": "YOU CAN\u2019T\nSPELL\nGLOBALLINK\nWITHOUT AI",
+    "font": "Geist-Bold",
+    "size": 200.0,
+    "color": "#FFFFFF",
+    "x": 149.0,
+    "y": 2689.0,
+    "w": 1272.0,
+    "top": 2547.0,
+    "bottom": 3341.0,
+    "wrap": 1381.0,
+    "align": "left",
+    "lead": 1.087
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -8877,13 +8938,6 @@
       "y0": 3411.49,
       "x1": 1560.44,
       "y1": 4957.52
-     },
-     {
-      "id": "n14",
-      "x0": 155.9,
-      "y0": 2548.15,
-      "x1": 1420.91,
-      "y1": 3340.28
      }
     ]
    }
