@@ -108,7 +108,9 @@ export async function loadKitThread(
         parts: unknown;
         client_message_id: string | null;
       };
-      const key = r.client_message_id ?? r.id;
+      // Older replies were stored with an empty id; treat that as missing so
+      // they don't collapse into one "duplicate" and vanish.
+      const key = r.client_message_id || r.id;
       if (seen.has(key)) return [];
       seen.add(key);
       return [

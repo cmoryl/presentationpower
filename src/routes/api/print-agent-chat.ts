@@ -116,6 +116,7 @@ export const Route = createFileRoute("/api/print-agent-chat")({
         });
 
         return result.toUIMessageStreamResponse({
+          generateMessageId: () => crypto.randomUUID(),
           originalMessages: messages,
           onError: (error) => {
             const raw = error instanceof Error ? error.message : String(error);

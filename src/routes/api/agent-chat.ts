@@ -170,6 +170,7 @@ export const Route = createFileRoute("/api/agent-chat")({
         });
 
         return result.toUIMessageStreamResponse({
+          generateMessageId: () => crypto.randomUUID(),
           originalMessages: messages,
           onError: (error) => {
             const raw = error instanceof Error ? error.message : String(error);
