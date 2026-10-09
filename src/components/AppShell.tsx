@@ -306,7 +306,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
                 return (
                   <div
                     key={n.to}
-                    className="relative"
+                    className="group/menu relative"
                     onMouseEnter={() => hoverMenu(setPresOpen, true)}
                     onMouseLeave={() => hoverMenu(setPresOpen, false)}
                   >
@@ -323,7 +323,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
                       </span>
                     </Link>
                     {(
-                      <div aria-hidden={!presOpen} className={`absolute left-1/2 top-full z-50 w-[760px] max-w-[94vw] -translate-x-1/2 pt-2 transition-opacity duration-100 motion-reduce:transition-none ${presOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}>
+                      <div aria-hidden={!presOpen} className={`absolute left-1/2 top-full z-50 w-[760px] max-w-[94vw] -translate-x-1/2 pt-2 transition-opacity duration-100 motion-reduce:transition-none ${presOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0 group-hover/menu:visible group-hover/menu:pointer-events-auto group-hover/menu:opacity-100 group-focus-within/menu:visible group-focus-within/menu:pointer-events-auto group-focus-within/menu:opacity-100"}`}>
                         <div className="grid grid-cols-2 gap-2 overflow-hidden rounded-2xl border border-black/10 bg-white p-4 shadow-[0_24px_70px_-18px_rgba(3,0,44,0.45)] sm:grid-cols-4 dark:!border-white/15 dark:!bg-[#0B0A2A] dark:shadow-[0_24px_70px_-18px_rgba(0,0,0,0.9)]">
                           {visibleElementGroups.map((g) => (
                             <div
@@ -386,7 +386,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
                 return (
                   <div
                     key={n.to}
-                    className="relative"
+                    className="group/menu relative"
                     onMouseEnter={() => hoverMenu(setAdminOpen, true)}
                     onMouseLeave={() => hoverMenu(setAdminOpen, false)}
                   >
@@ -403,7 +403,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
                       </span>
                     </Link>
                     {(
-                      <div aria-hidden={!adminOpen} className={`absolute left-1/2 top-full z-50 w-[720px] max-w-[92vw] -translate-x-1/2 pt-2 transition-opacity duration-100 motion-reduce:transition-none ${adminOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}>
+                      <div aria-hidden={!adminOpen} className={`absolute left-1/2 top-full z-50 w-[720px] max-w-[92vw] -translate-x-1/2 pt-2 transition-opacity duration-100 motion-reduce:transition-none ${adminOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0 group-hover/menu:visible group-hover/menu:pointer-events-auto group-hover/menu:opacity-100 group-focus-within/menu:visible group-focus-within/menu:pointer-events-auto group-focus-within/menu:opacity-100"}`}>
                         <div className="grid grid-cols-3 gap-2 overflow-hidden rounded-2xl border border-black/10 bg-white p-4 shadow-[0_24px_70px_-18px_rgba(3,0,44,0.45)] dark:!border-white/15 dark:!bg-[#0B0A2A] dark:shadow-[0_24px_70px_-18px_rgba(0,0,0,0.9)]">
                           {adminGroups.map((g) => (
                             <div
