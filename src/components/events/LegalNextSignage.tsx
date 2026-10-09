@@ -33,6 +33,14 @@ export function SfDemoBooths() {
   );
 }
 
+/** San Francisco lift door wraps: the general lift wrap re-sized to the SF doors. */
+export function SfLiftDoors() {
+  return (
+    <SignTemplateList id="sf-lift-doors" title="Lift door wraps" signs={DIVISION_LIVE_SIGNS.filter((s) => s.id === "sf-lift-liftyour")}
+      intro="The Lift Your Global Profile wrap re-sized for the San Francisco lifts: 41.5 in across both doors (about 21.3 in each), 84 in high. Open it to retype, move the logo or make another size. The door centre line is a guide and isn't printed." />
+  );
+}
+
 export function SfGlobalLinkPillars() {
   return (
     <SignTemplateList id="sf-globallink-pillars" title="GlobalLink NEXT pillars" signs={DIVISION_LIVE_SIGNS.filter((s) => s.id.startsWith("globallink-pillar-"))} masterLabel="Supplied PDF"
