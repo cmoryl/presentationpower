@@ -9,6 +9,7 @@
 // Every file is named rdraft- until the San Francisco revision is published.
 
 import JSZip from "jszip";
+import { liftDoors } from "@/lib/lift-doors";
 import { PDFDocument, degrees, rgb, cmyk, setCharacterSpacing, pushGraphicsState, popGraphicsState, rectangle, clipEvenOdd, endPath, clip, concatTransformationMatrix, PDFName, PDFOperator, PDFOperatorNames, PDFString } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import { marksPdfOps } from "@/lib/kiosk-marks";
@@ -657,7 +658,41 @@ export async function liveReturnPdf(L: LiveLayout, edits: KioskEdits, side: "lef
   return saveWithRealFontNames(doc);
 }
 
-export type KioskDownload = "zip" | "svg" | "pdf" | "ai" | "press" | "png" | "returns";
+export type KioskDownload = "zip" | "svg" | "pdf" | "ai" | "press" | "png" | "returns" | "doors";
+
+/**
+ * Lift wraps: one print PDF per door leaf, cut from the full face so the artwork
+ * runs on exactly as it does across the doors. Each file is that leaf's trim
+ * plus ⅛ in bleed (the bleed at the meeting edge is the real neighbouring art),
+ * with TrimBox/BleedBox set and crop marks in a ½ in slug.
+ */
+export async function liftDoorPdfs(L: LiveLayout, edits: KioskEdits): Promise<{ side: "left" | "right"; bytes: Uint8Array; wIn: number; hIn: number }[]> {
+  const B = KIOSK_BLEED, S = 36;
+  const KW = kioskFaceW(L), KH = kioskFaceH(L);
+  const full = await PDFDocument.load(await liveFrontPdf(L, edits));
+  const out: { side: "left" | "right"; bytes: Uint8Array; wIn: number; hIn: number }[] = [];
+  for (const d of liftDoors(KW, KH)) {
+    const doc = await PDFDocument.create();
+    doc.setTitle(`${kioskLiveFileBase(L.id)} — ${d.side} door (draft)`);
+    const dw = d.x1 - d.x0;
+    // Region in the full page: door trim + bleed, in full-page coordinates.
+    const left = S + B + d.x0 - B, right = S + B + d.x1 + B;
+    const cut = await doc.embedPage(full.getPage(0), { left, right, bottom: S, top: S + KH + 2 * B });
+    const page = doc.addPage([dw + 2 * B + 2 * S, KH + 2 * B + 2 * S]);
+    page.drawPage(cut, { x: S, y: S, width: dw + 2 * B, height: KH + 2 * B });
+    page.setTrimBox(S + B, S + B, dw, KH);
+    page.setBleedBox(S, S, dw + 2 * B, KH + 2 * B);
+    // Crop marks at the trim corners, in the slug only.
+    const k = cmyk(0, 0, 0, 1), t = 0.5, len = 18, gap = B + 3;
+    const x0 = S + B, x1 = S + B + dw, y0 = S + B, y1 = S + B + KH;
+    for (const [x, y, sx, sy] of [[x0, y0, -1, -1], [x1, y0, 1, -1], [x0, y1, -1, 1], [x1, y1, 1, 1]] as const) {
+      page.drawLine({ start: { x: x + sx * gap, y }, end: { x: x + sx * (gap + len), y }, thickness: t, color: k });
+      page.drawLine({ start: { x, y: y + sy * gap }, end: { x, y: y + sy * (gap + len) }, thickness: t, color: k });
+    }
+    out.push({ side: d.side, bytes: await doc.save(), wIn: dw / 72, hIn: KH / 72 });
+  }
+  return out;
+}
 
 export async function downloadKiosk(kind: KioskDownload, L: LiveLayout, edits: KioskEdits, strips: Partial<Record<KioskFace, KioskEdits>> = {}, face?: KioskFace) {
   const base = kioskLiveFileBase(L.id);
@@ -724,6 +759,12 @@ async function downloadSign(kind: KioskDownload, L: LiveLayout, edits: KioskEdit
   if (kind === "press") return save(svgBlob(await pressFrontSvg(L, edits)), `${base}-press-outlined.svg`);
   if (kind === "png") return save(await proofPng(await pressFrontSvg(L, edits), proofW, W, H), `${base}-PROOF.png`);
   if (kind === "returns") throw new Error("Signs have no side strips.");
+  if (kind === "doors") {
+    const z = new JSZip();
+    for (const d of await liftDoorPdfs(L, edits)) z.file(`${base}-${d.side}-door-${+d.wIn.toFixed(2)}x${+d.hIn.toFixed(2)}in.pdf`, d.bytes);
+    z.file("README.txt", `DRAFT — not published. One print PDF per lift door, cut from the full ${+(W / 72).toFixed(2)} x ${+(H / 72).toFixed(2)} in wrap.\nEach file: door trim + 1/8 in bleed, crop marks in the slug. Door lines are guides and never print.\nConfirm door sizes on site and check in Acrobat/Illustrator before print.\n`);
+    return save(await z.generateAsync({ type: "blob" }), `${base}-doors.zip`);
+  }
   const zip = new JSZip();
   const press = await pressFrontSvg(L, edits);
   zip.file(`${base}.svg`, await liveFrontSvg(L, edits));

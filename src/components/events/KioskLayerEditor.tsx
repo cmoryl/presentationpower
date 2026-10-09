@@ -1,4 +1,5 @@
 // Layer editor for a California kiosk rebuilt from the partner's live London
+import { isLiftLayout, liftDoors } from "@/lib/lift-doors";
 // file: every text line and graphic piece is a layer you can retype, move,
 // resize, hide or show; the background ramp can be changed; edits save per
 // kiosk. The TV keep-clear is drawn as a guide only (never exported).
@@ -1148,6 +1149,12 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                   ) : null}
                   {guides.safe ? <rect x={KIOSK_MARGIN} y={KIOSK_MARGIN} width={KIOSK_W - 2 * KIOSK_MARGIN} height={KIOSK_H - 2 * KIOSK_MARGIN} fill="none" stroke="#A1FBF9" strokeOpacity={0.8} strokeDasharray={`${4 * rs} ${4 * rs}`} strokeWidth={rs} /> : null}
                   {guides.steps && L.stepGuides ? L.stepGuides.map(([x1, y1, x2, y2], i) => <line key={`st${i}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#FFEB66" strokeOpacity={0.9} strokeWidth={1.5 * rs} strokeDasharray={`${6 * rs} ${4 * rs}`} />) : null}
+                  {isLiftLayout(L.id) ? liftDoors(KIOSK_W, KIOSK_H).map((d) => (
+                    <g key={d.side}>
+                      <rect x={d.x0} y={0} width={d.x1 - d.x0} height={KIOSK_H} fill="none" stroke={d.side === "left" ? "#A6FA87" : "#FFEB66"} strokeWidth={1.5 * rs} strokeDasharray={`${8 * rs} ${5 * rs}`} />
+                      <text x={(d.x0 + d.x1) / 2} y={KIOSK_H - 24 * rs} textAnchor="middle" fontSize={11 * rs} fill={d.side === "left" ? "#A6FA87" : "#FFEB66"} fontFamily="Geist Mono, monospace">{d.side.toUpperCase()} DOOR {+((d.x1 - d.x0) / 72).toFixed(2)} IN · NOT PRINTED</text>
+                    </g>
+                  )) : null}
                   {guides.bleed ? <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="none" stroke="#E53D2E" strokeWidth={rs} /> : null}
                   <rect x={0} y={0} width={KIOSK_W} height={KIOSK_H} fill="none" stroke="#EC008C" strokeWidth={1.5 * rs} />
                 </g>
@@ -1583,7 +1590,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
             <Sec title="Download · draft">
               <button type="button" className={`${dbtn} w-full justify-center border-[#003FC7] bg-[#003FC7] text-white hover:bg-[#003FC7]/85`} disabled={!!busy} onClick={() => dl("zip")}><Download className="h-3.5 w-3.5" />{busy === "zip" ? "Building…" : "All files (.zip)"}</button>
               <div className="grid grid-cols-2 gap-1.5">
-                {([["ai", "Illustrator .ai"], ["pdf", "PDF"], ["svg", "Layered .svg"], ["press", "Press, outlined"], ["png", "PNG proof"], ["returns", "Side strips .ai"]] as const).filter(([kk]) => !(L.sign && kk === "returns")).map(([kk, label]) => (
+                {([["ai", "Illustrator .ai"], ["pdf", "PDF"], ["svg", "Layered .svg"], ["press", "Press, outlined"], ["png", "PNG proof"], ["returns", "Side strips .ai"], ["doors", "Left + right doors"]] as const).filter(([kk]) => !(L.sign && kk === "returns") && (kk !== "doors" || isLiftLayout(L.id))).map(([kk, label]) => (
                   <button key={kk} type="button" className={`${dbtn} justify-center`} disabled={!!busy} onClick={() => dl(kk)}>{busy === kk ? "…" : label}</button>
                 ))}
               </div>
