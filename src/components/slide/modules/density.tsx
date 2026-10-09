@@ -123,7 +123,7 @@ registerSlideModule({
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-            <div data-portrait="proof-stack" className="mt-4 grid min-h-0 flex-1 gap-x-16" style={{ gridTemplateColumns: "minmax(0,1.25fr) minmax(0,1fr)", gridTemplateRows: "minmax(0,1fr) auto" }}>
+            <div data-portrait="proof-stack" className="mt-12 grid min-h-0 flex-1 gap-x-16" style={{ gridTemplateColumns: "minmax(0,1.25fr) minmax(0,1fr)", gridTemplateRows: "minmax(0,1fr) auto" }}>
               <section className="relative flex min-h-0 flex-col justify-center rounded-[14px] p-10" style={{ background: panel, borderTop: `3px solid ${blue}` }}>
                 {tag("01", "Share")}
                 <div className="flex min-h-0 items-center gap-12">

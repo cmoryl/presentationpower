@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { writeFileSync } from "fs";
 import {
+  DIVISION_DESK_TEMPLATES,
   DIVISION_SIGN_DIVISIONS,
   DIVISION_SIGN_TEMPLATES,
   divisionSigns,
@@ -18,8 +19,8 @@ describe("division signage templates", () => {
     }
     for (const d of DIVISION_SIGN_DIVISIONS) {
       const signs = divisionSigns(d);
-      expect(signs).toHaveLength(DIVISION_SIGN_TEMPLATES.length);
-      for (const s of signs) {
+      expect(signs).toHaveLength(DIVISION_SIGN_TEMPLATES.length + DIVISION_DESK_TEMPLATES.filter((t) => t.division === d).length);
+      for (const s of signs.filter((x) => x.group !== "desk")) {
         const src = LONDON_VENUE_ITEM_PANELS.find((p) => s.panel.id.endsWith(p.id.replace("ldn-", "")))!;
         expect([s.panel.trimW, s.panel.trimH, s.panel.bleedEdge]).toEqual([src.trimW, src.trimH, src.bleedEdge]);
       }
