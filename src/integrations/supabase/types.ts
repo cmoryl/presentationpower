@@ -2466,6 +2466,9 @@ export type Database = {
           event_id: string
           height: number | null
           id: string
+          marketing_at: string | null
+          marketing_by: string | null
+          marketing_ok: boolean
           original_name: string
           panel_id: string | null
           path: string
@@ -2485,6 +2488,9 @@ export type Database = {
           event_id: string
           height?: number | null
           id?: string
+          marketing_at?: string | null
+          marketing_by?: string | null
+          marketing_ok?: boolean
           original_name: string
           panel_id?: string | null
           path: string
@@ -2504,6 +2510,9 @@ export type Database = {
           event_id?: string
           height?: number | null
           id?: string
+          marketing_at?: string | null
+          marketing_by?: string | null
+          marketing_ok?: boolean
           original_name?: string
           panel_id?: string | null
           path?: string
