@@ -39,7 +39,7 @@ export function SfDemoBooths() {
 export function SfLiftDoors() {
   return (
     <SignTemplateList id="sf-lift-doors" title="Lift door wraps" signs={DIVISION_LIVE_SIGNS.filter((s) => s.id.startsWith("sf-lift-"))}
-      intro="All seven San Francisco lift wraps, built from your SF live files: 41.5 in across both doors (about 21.3 in each), 84 in high. Open one to retype the headline, move any piece or change the background, and download left and right door files. \"Supplied .ai\" is your original file. The door lines are guides and aren't printed." />
+      intro="All seven San Francisco lift wraps, built from your SF live files: 41.5 in across both doors (about 21.3 in each), 84 in high. Open one to retype the headline, move any piece or change the background, and download left and right door files. “Supplied .ai” is your original file. The door lines are guides and aren't printed." />
   );
 }
 
