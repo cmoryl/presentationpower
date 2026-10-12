@@ -222,7 +222,7 @@ export function LiveEditOverlay({
     let node: Node | null = walker.nextNode();
     while (node) {
       const parent = node.parentElement;
-      if (parent && !parent.closest("input,textarea,button,select,[data-slide-chrome]")) {
+      if (parent && !parent.closest("input,textarea,button,select,[data-slide-chrome],[data-original-text]")) {
         // Walk up from the text node: renderers often split a single field
         // across inline children (e.g. an emphasised last word inside a
         // heading), so the value only matches on an ancestor's textContent.

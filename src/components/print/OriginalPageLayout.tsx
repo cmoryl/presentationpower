@@ -16,7 +16,13 @@ import {
   type OriginalLayout,
   type OriginalPiece,
   type OriginalText,
+  BULLET,
+  packRuns,
+  withParagraphs,
 } from "@/lib/print-library/original-layout";
+import { canvaSvgString } from "@/lib/icon-export";
+import { iconByName } from "@/lib/icon-library";
+import { brandIconSet, flatIcons } from "@/lib/brand-icon-sets";
 
 export { isOriginalLayout };
 
@@ -46,8 +52,10 @@ function PieceView({ k }: { k: OriginalPiece }) {
           background: k.tint,
           WebkitMaskImage: `url("${k.src}")`,
           maskImage: `url("${k.src}")`,
-          WebkitMaskSize: "100% 100%",
-          maskSize: "100% 100%",
+          WebkitMaskSize: k.icon ? "contain" : "100% 100%",
+          maskSize: k.icon ? "contain" : "100% 100%",
+          WebkitMaskPosition: "center",
+          maskPosition: "center",
           WebkitMaskRepeat: "no-repeat",
           maskRepeat: "no-repeat",
         }}
@@ -60,15 +68,103 @@ function PieceView({ k }: { k: OriginalPiece }) {
       alt=""
       draggable={false}
       crossOrigin="anonymous"
-      style={{ ...base, objectFit: "fill" }}
+      style={{ ...base, objectFit: k.icon ? "contain" : "fill" }}
     />
   );
 }
 
-function TextView({ t }: { t: OriginalText }) {
+const APPROVED_INKS: { label: string; hex: string }[] = [
+  { label: "Ink", hex: "#03002C" },
+  { label: "Blue", hex: "#003FC7" },
+  { label: "White", hex: "#FFFFFF" },
+  { label: "Aqua", hex: "#A1FBF9" },
+  { label: "Lavender", hex: "#C2A3FF" },
+  { label: "Dark gray", hex: "#666666" },
+];
+
+type Run = { text: string; color: string; weight: number };
+
+function toHex(c: string): string {
+  const m = c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (!m) return c.toUpperCase();
+  return "#" + [m[1], m[2], m[3]].map((n) => Number(n).toString(16).padStart(2, "0")).join("").toUpperCase();
+}
+
+/** Read an edited block back into styled runs, one `\n` per paragraph. */
+function readRuns(root: HTMLElement): Run[] {
+  const out: Run[] = [];
+  const push = (text: string, el: Element) => {
+    const cs = getComputedStyle(el);
+    out.push({ text, color: toHex(cs.color), weight: Number(cs.fontWeight) || 400 });
+  };
+  const blocks = Array.from(root.childNodes);
+  blocks.forEach((block, bi) => {
+    if (bi > 0 && (block as HTMLElement).tagName === "DIV") push("\n", root);
+    const walk = (n: Node) => {
+      if (n.nodeType === Node.TEXT_NODE) {
+        if (n.textContent) push(n.textContent.replace(/\u00a0/g, " "), n.parentElement ?? root);
+      } else if ((n as HTMLElement).tagName === "BR") {
+        if (n.nextSibling || n.parentNode === root) push("\n", root);
+      } else n.childNodes.forEach(walk);
+    };
+    walk(block);
+  });
+  const packed = packRuns(out);
+  // Trim a trailing paragraph break left by the editor.
+  const last = packed[packed.length - 1];
+  if (last) last.text = last.text.replace(/\n+$/, "");
+  return packRuns(packed);
+}
+
+function paragraphsOf(t: OriginalText): Run[][] {
+  const runs: Run[] = t.runs?.length ? t.runs : [{ text: t.text, color: t.color, weight: t.weight }];
+  const paras: Run[][] = [[]];
+  for (const r of runs) {
+    r.text.split("\n").forEach((piece, i) => {
+      if (i > 0) paras.push([]);
+      if (piece) paras[paras.length - 1].push({ ...r, text: piece });
+    });
+  }
+  return paras;
+}
+
+function TextView({ t, editable, onCommit, onFocusText }: {
+  t: OriginalText;
+  editable: boolean;
+  onCommit: (runs: Run[]) => void;
+  onFocusText: (id: string | null) => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const paras = paragraphsOf(t);
+  // Re-mount the editable DOM only when the saved copy changes.
+  const key = JSON.stringify(t.runs ?? t.text) + t.color + t.weight;
+  const hang = t.list ? 0.62 : 0;
   return (
     <div
+      key={key}
+      ref={ref}
       data-original-text={t.id}
+      contentEditable={editable || undefined}
+      suppressContentEditableWarning
+      spellCheck={editable || undefined}
+      onFocus={() => onFocusText(t.id)}
+      onBlur={() => {
+        const el = ref.current;
+        if (!el) return;
+        const next = readRuns(el);
+        const before = paras.map((p) => p.map((r) => r.text).join("")).join("\n");
+        const after = next.map((r) => r.text).join("");
+        const styleChanged = JSON.stringify(next) !== JSON.stringify(packRuns(paras.flatMap((p, i) => (i ? [{ text: "\n", color: t.color, weight: t.weight }, ...p] : p))));
+        if (after !== before || styleChanged) onCommit(next);
+      }}
+      onKeyDown={(e) => {
+        // New list item keeps its bullet.
+        if (t.list && e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          document.execCommand("insertParagraph");
+          document.execCommand("insertText", false, `${BULLET} `);
+        }
+      }}
       style={
         {
           position: "absolute",
@@ -84,16 +180,60 @@ function TextView({ t }: { t: OriginalText }) {
           whiteSpace: "pre-wrap",
           letterSpacing: 0,
           margin: 0,
+          outline: "none",
+          cursor: editable ? "text" : undefined,
         } as CSSProperties
       }
     >
-      {t.runs?.length
-        ? t.runs.map((r, ri) => (
+      {paras.map((p, pi) => (
+        <div key={pi} style={hang ? { paddingLeft: `${hang}em`, textIndent: `-${hang}em` } : undefined}>
+          {p.length ? p.map((r, ri) => (
             <span key={ri} style={{ color: r.color, fontWeight: r.weight }}>
               {r.text}
             </span>
-          ))
-        : t.text}
+          )) : <br />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Lucide glyph as a self-contained SVG data URL (recolourable via tint). */
+function iconSrc(name: string): string | null {
+  const svg = canvaSvgString(name, { color: "#03002C", strokeWidth: 1.75 });
+  return svg ? `data:image/svg+xml;utf8,${encodeURIComponent(svg)}` : null;
+}
+
+function IconSwap({ onPick }: { onPick: (name: string) => void }) {
+  const [q, setQ] = useState("");
+  const icons = useMemo(() => {
+    const all = [...flatIcons(brandIconSet("transperfect-life-sciences")), ...flatIcons(brandIconSet("transperfect-master"))];
+    const seen = new Set<string>();
+    const uniq = all.filter((i) => (seen.has(i.name) ? false : (seen.add(i.name), true)));
+    const s = q.trim().toLowerCase();
+    return (s ? uniq.filter((i) => [i.name, i.label, ...(i.keywords ?? [])].some((k) => k.toLowerCase().includes(s))) : uniq).slice(0, 60);
+  }, [q]);
+  return (
+    <div className="flex w-full flex-col gap-1.5 border-t border-black/10 pt-1.5">
+      <label className="flex items-center gap-1.5">
+        Replace with approved icon
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search icons…"
+          className="h-7 w-44 rounded border border-black/15 bg-white px-2"
+        />
+      </label>
+      <div className="flex max-h-28 flex-wrap gap-1 overflow-auto">
+        {icons.map((i) => {
+          const Icon = iconByName(i.name);
+          return Icon ? (
+            <button key={i.name} type="button" className={btn} title={i.label} aria-label={`Use ${i.label} icon`} onClick={() => onPick(i.name)}>
+              <Icon className="h-4 w-4" aria-hidden />
+            </button>
+          ) : null;
+        })}
+      </div>
     </div>
   );
 }
@@ -104,7 +244,7 @@ const btn =
 export function OriginalPageLayout({ layout: rawLayout, pageIndex }: { layout: OriginalLayout; pageIndex?: number }) {
   const edit = usePrintLogoList();
   const editable = !!edit?.active;
-  const layout = useMemo(() => withPieces(rawLayout), [rawLayout]);
+  const layout = useMemo(() => withParagraphs(withPieces(rawLayout)), [rawLayout]);
   const w = layout.widthIn * CSS_DPI;
   const h = layout.heightIn * CSS_DPI;
   const first = typeof pageIndex === "number" ? pageIndex : 0;
@@ -115,6 +255,7 @@ export function OriginalPageLayout({ layout: rawLayout, pageIndex }: { layout: O
   const [scale, setScale] = useState(1);
   const [arrange, setArrange] = useState(false);
   const [sel, setSel] = useState<Sel>(null);
+  const [typing, setTyping] = useState<{ page: number; id: string } | null>(null);
   const drag = useRef<{ mode: "move" | "size"; sx: number; sy: number; orig: { x: number; y: number; w: number; h: number } } | null>(null);
 
   useLayoutEffect(() => {
@@ -194,7 +335,7 @@ export function OriginalPageLayout({ layout: rawLayout, pageIndex }: { layout: O
     if (!sel || sel.kind !== "piece") return;
     const p = layout.pages[sel.page];
     const orig = suppliedPiece(p.ground, sel.id);
-    if (orig) patchItem(sel.page, "piece", sel.id, { ...orig, hidden: false, tint: undefined, opacity: undefined });
+    if (orig) patchItem(sel.page, "piece", sel.id, { ...orig, hidden: false, tint: undefined, opacity: undefined, icon: undefined });
   };
   const hiddenCount = pages.reduce(
     (n, p) => n + (p.pieces ?? []).filter((k) => k.hidden).length + p.texts.filter((t) => t.hidden).length,
@@ -239,6 +380,31 @@ export function OriginalPageLayout({ layout: rawLayout, pageIndex }: { layout: O
             <button type="button" className={btn} onClick={showAll}>
               Show {hiddenCount} hidden
             </button>
+          ) : null}
+          {!arrange ? (
+            <div className="flex w-full flex-wrap items-center gap-1.5 border-t border-black/10 pt-1.5" onMouseDown={(e) => e.preventDefault()}>
+              <strong className="mr-1">{typing ? "Selected text" : "Select words in any paragraph to style them"}</strong>
+              <button type="button" className={btn} disabled={!typing} onClick={() => document.execCommand("bold")}>
+                Bold
+              </button>
+              {APPROVED_INKS.map((c) => (
+                <button
+                  key={c.hex}
+                  type="button"
+                  disabled={!typing}
+                  className={btn}
+                  title={c.label}
+                  aria-label={`Colour ${c.label}`}
+                  onClick={() => {
+                    document.execCommand("styleWithCSS", false, "true");
+                    document.execCommand("foreColor", false, c.hex);
+                  }}
+                >
+                  <span className="inline-block h-3 w-3 rounded-sm border border-black/20 align-middle" style={{ background: c.hex }} />
+                </button>
+              ))}
+              <span className="text-black/50">Enter starts a new paragraph (or bullet); lines wrap on their own.</span>
+            </div>
           ) : null}
           {arrange && sel && selected ? (
             <div className="flex w-full flex-wrap items-center gap-1.5 border-t border-black/10 pt-1.5">
@@ -288,6 +454,14 @@ export function OriginalPageLayout({ layout: rawLayout, pageIndex }: { layout: O
                   <button type="button" className={btn} onClick={reset}>
                     Reset piece
                   </button>
+                  {!(selected as OriginalPiece).raster ? (
+                    <IconSwap
+                      onPick={(name) => {
+                        const src = iconSrc(name);
+                        if (src) patchItem(sel.page, "piece", sel.id, { src, icon: name, tint: (selected as OriginalPiece).tint ?? "#003FC7" });
+                      }}
+                    />
+                  ) : null}
                 </>
               ) : (
                 <label className="flex items-center gap-1">
@@ -338,7 +512,24 @@ export function OriginalPageLayout({ layout: rawLayout, pageIndex }: { layout: O
                   style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "fill", pointerEvents: "none" }}
                 />
                 {order.map(({ k }) => (k.hidden ? null : <PieceView key={k.id} k={k} />))}
-                {p.texts.map((t) => (t.hidden ? null : <TextView key={t.id} t={t} />))}
+                {p.texts.map((t) =>
+                  t.hidden ? null : (
+                    <TextView
+                      key={t.id}
+                      t={t}
+                      editable={editable && !arrange}
+                      onFocusText={(id) => setTyping(id ? { page: pi, id } : null)}
+                      onCommit={(runs) =>
+                        patchItem(pi, "text", t.id, {
+                          runs,
+                          text: runs.map((r) => r.text).join(""),
+                          paragraphs: true,
+                          list: runs.map((r) => r.text).join("").trimStart().startsWith(BULLET) || undefined,
+                        })
+                      }
+                    />
+                  ),
+                )}
                 {arrange ? (
                   <div data-export-ignore="true" style={{ position: "absolute", inset: 0 }}>
                     {[

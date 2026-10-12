@@ -20,6 +20,10 @@ export type OriginalText = {
   /** Mixed colour/weight copy: styled runs (joined, they equal `text`). */
   runs?: { text: string; color: string; weight: number }[];
   hidden?: boolean;
+  /** Soft wraps joined: each line break is a real paragraph / list item. */
+  paragraphs?: boolean;
+  /** Bullet list: each paragraph is one bullet item (hanging indent). */
+  list?: boolean;
 };
 /** One separate piece of the designer's artwork (icon, card, logo, photo…). */
 export type OriginalPiece = {
@@ -38,6 +42,8 @@ export type OriginalPiece = {
   opacity?: number;
   /** Paint-order nudge (higher draws above). */
   z?: number;
+  /** Swapped for an approved library icon (Lucide name). */
+  icon?: string;
 };
 export type OriginalPage = {
   ground: string;
@@ -93,4 +99,92 @@ export function withPieces(layout: OriginalLayout): OriginalLayout {
       return p;
     }),
   };
+}
+
+// -----------------------------------------------------------------------------
+// Paragraphs, not lines. The PDF extract stored every printed line break,
+// including the designer's soft wraps, so bullets and body copy arrived as
+// hard-broken lines. `withParagraphs` joins soft wraps back into flowing
+// paragraphs (one bullet = one item, one body paragraph = one item) while
+// keeping every character's colour/weight, and flags bullet blocks so they
+// render with a hanging indent. Headings (large type) keep their breaks.
+// -----------------------------------------------------------------------------
+
+export const BULLET = "\u2022";
+const BODY_MAX_PT = 11.5;
+
+type Run = { text: string; color: string; weight: number };
+
+function runsOf(t: OriginalText): Run[] {
+  return t.runs?.length ? t.runs : [{ text: t.text, color: t.color, weight: t.weight }];
+}
+
+/** Merge neighbouring runs that share a style. */
+export function packRuns(runs: Run[]): Run[] {
+  const out: Run[] = [];
+  for (const r of runs) {
+    if (!r.text) continue;
+    const last = out[out.length - 1];
+    if (last && last.color === r.color && last.weight === r.weight) last.text += r.text;
+    else out.push({ ...r });
+  }
+  return out;
+}
+
+/** True when every item of the block starts with a bullet. */
+export function isBulletBlock(text: string): boolean {
+  return text.trimStart().startsWith(BULLET);
+}
+
+/** Indices of `\n` that are soft wraps (not paragraph or item breaks). */
+function softBreaks(t: OriginalText): Set<number> {
+  const soft = new Set<number>();
+  if (t.size > BODY_MAX_PT || !t.text.includes("\n")) return soft;
+  const lines = t.text.split("\n");
+  const bullets = isBulletBlock(t.text);
+  const longest = Math.max(...lines.map((l) => l.length));
+  let pos = 0;
+  for (let i = 0; i < lines.length - 1; i++) {
+    pos += lines[i].length;
+    const next = lines[i + 1];
+    const cur = lines[i];
+    const isSoft = bullets
+      ? !next.trimStart().startsWith(BULLET)
+      : lines.length >= 2 && cur.length >= longest * 0.72 && !/[.:!?]$/.test(cur.trim()) && next.trim().length > 0;
+    if (isSoft) soft.add(pos);
+    pos += 1;
+  }
+  return soft;
+}
+
+export function paragraphText(t: OriginalText): OriginalText {
+  if (t.paragraphs) return t;
+  const soft = softBreaks(t);
+  const list = isBulletBlock(t.text);
+  if (!soft.size) return { ...t, paragraphs: true, list: list || undefined };
+  let i = 0;
+  const runs = runsOf(t).map((r) => {
+    let s = "";
+    for (const ch of r.text) {
+      s += ch === "\n" && soft.has(i) ? " " : ch;
+      i += ch.length;
+    }
+    return { ...r, text: s };
+  });
+  const packed = packRuns(runs);
+  return {
+    ...t,
+    text: packed.map((r) => r.text).join(""),
+    runs: t.runs ? packed : undefined,
+    // Reflowed copy needs a hair of room for metric differences.
+    w: Math.round(t.w * 1.04 * 10000) / 10000,
+    paragraphs: true,
+    list: list || undefined,
+  };
+}
+
+/** Apply paragraph joining to every text block on every page. */
+export function withParagraphs(layout: OriginalLayout): OriginalLayout {
+  if (layout.pages.every((p) => p.texts.every((t) => t.paragraphs))) return layout;
+  return { ...layout, pages: layout.pages.map((p) => ({ ...p, texts: p.texts.map(paragraphText) })) };
 }
