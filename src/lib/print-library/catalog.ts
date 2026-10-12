@@ -1,3 +1,4 @@
+import { withOriginalLayout } from "@/lib/print-library/original-layout";
 /**
  * Print library catalog — a two-level folder index over every print asset the
  * library can start from.
@@ -287,7 +288,7 @@ function fromLifeSciEbrochure(seed: LifeSciEbrochureSeed): PrintLibraryItem {
     },
     stats: seed.content.stats?.slice(0, 3),
     tags: seed.tags,
-    content: seed.content as unknown as Record<string, unknown>,
+    content: withOriginalLayout(seed.slug, seed.content) as unknown as Record<string, unknown>,
   };
 }
 
@@ -309,7 +310,7 @@ function fromLifeSci(seed: LifeSciCaseStudySeed): PrintLibraryItem {
     },
     stats: seed.content.stats?.slice(0, 3),
     tags: seed.tags,
-    content: seed.content as unknown as Record<string, unknown>,
+    content: withOriginalLayout(seed.slug, seed.content) as unknown as Record<string, unknown>,
   };
 }
 
