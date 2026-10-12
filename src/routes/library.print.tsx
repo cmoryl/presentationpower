@@ -85,6 +85,8 @@ export const Route = createFileRoute("/library/print")({
     collection: str(search.collection),
     sub: str(search.sub),
     q: str(search.q),
+    company: str(search.company),
+    product: str(search.product),
   }),
 
   head: () => ({
@@ -193,6 +195,8 @@ function PrintCenterPage() {
     collection: search.collection ?? "All",
     query: search.q ?? "",
     subId: search.sub ?? null,
+    company: search.company ?? "All",
+    product: search.product ?? "All",
   };
   const patchBrowserState = (p: Partial<typeof browserState>) => {
     void navigate({
@@ -205,6 +209,8 @@ function PrintCenterPage() {
           : {}),
         ...("query" in p ? { q: p.query || undefined } : {}),
         ...("subId" in p ? { sub: p.subId ?? undefined } : {}),
+        ...("company" in p ? { company: p.company && p.company !== "All" ? p.company : undefined } : {}),
+        ...("product" in p ? { product: p.product && p.product !== "All" ? p.product : undefined } : {}),
       }),
       replace: true,
     });
