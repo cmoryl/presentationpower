@@ -1,3 +1,4 @@
+import { allowAuthBounce } from "@/lib/sign-out";
 import { createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";

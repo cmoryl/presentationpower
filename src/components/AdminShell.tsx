@@ -3,7 +3,7 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
-import { signOutAndRedirect, loginUrl } from "@/lib/sign-out";
+import { signOutAndRedirect, loginUrl, confirmSignedOut } from "@/lib/sign-out";
 import { useQueryClient } from "@tanstack/react-query";
 import { ADMIN_NAV_GROUPS } from "@/lib/admin-nav";
 
