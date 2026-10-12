@@ -71,6 +71,8 @@ type PrintSearch = {
   collection?: string;
   sub?: string;
   q?: string;
+  company?: string;
+  product?: string;
 };
 
 const str = (v: unknown): string | undefined => {
