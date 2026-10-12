@@ -78,7 +78,13 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
       if (abs) natural += abs.offsetHeight + 12;
       el.style.height = prevH;
       autos.forEach((c) => (c.style.marginTop = "auto"));
-      const ratio = (pageH * 0.96) / Math.max(1, natural);
+      // A long word wider than the page (short copy grown on tall signs)
+      // must shrink the type too, not just a page that runs out of height.
+      const wide = Array.from(el.querySelectorAll<HTMLElement>("h1,h2,h3,p,li,span,div")).reduce(
+        (m, n) => (n.clientWidth > 0 && n.scrollWidth > n.clientWidth + 1 ? Math.min(m, n.clientWidth / n.scrollWidth) : m),
+        el.scrollWidth > el.clientWidth + 1 ? el.clientWidth / el.scrollWidth : 1,
+      );
+      const ratio = Math.min((pageH * 0.96) / Math.max(1, natural), wide < 1 ? wide * 0.98 : Infinity);
       if (Math.abs(ratio - 1) < 0.02 || (ratio > 1 && fit >= 4.5)) return;
       const next = Math.min(4.5, Math.max(0.55, fit * Math.pow(ratio, ratio > 1 ? 0.7 : 1)));
       if (Math.abs(next - fit) > 0.005) setFit(next);
