@@ -206,6 +206,7 @@ import { Route as EventsNextDivisionsIndexRouteImport } from './routes/events.ne
 import { Route as EventsNextDivisionsDivisionIdRouteImport } from './routes/events.next_.divisions.$divisionId'
 import { Route as EventsNextIntakeEventIdRouteImport } from './routes/events.next_.intake.$eventId'
 import { Route as EventsNextKioskEditorBoothIdRouteImport } from './routes/events.next_.kiosk-editor.$boothId'
+import { Route as EventsNextLondonAuditRouteImport } from './routes/events.next_.london_.audit'
 import { Route as EventsNextLondonBookletRouteImport } from './routes/events.next_.london_.booklet'
 import { Route as EventsNextLondonMapsRouteImport } from './routes/events.next_.london_.maps'
 import { Route as EventsNextLondonPhotosRouteImport } from './routes/events.next_.london_.photos'
@@ -1221,6 +1222,11 @@ const EventsNextKioskEditorBoothIdRoute =
     path: '/next/kiosk-editor/$boothId',
     getParentRoute: () => EventsRoute,
   } as any)
+const EventsNextLondonAuditRoute = EventsNextLondonAuditRouteImport.update({
+  id: '/next_/london_/audit',
+  path: '/next/london/audit',
+  getParentRoute: () => EventsRoute,
+} as any)
 const EventsNextLondonBookletRoute = EventsNextLondonBookletRouteImport.update({
   id: '/next_/london_/booklet',
   path: '/next/london/booklet',
@@ -1489,6 +1495,7 @@ export interface FileRoutesByFullPath {
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next/intake/$eventId': typeof EventsNextIntakeEventIdRoute
   '/events/next/kiosk-editor/$boothId': typeof EventsNextKioskEditorBoothIdRoute
+  '/events/next/london/audit': typeof EventsNextLondonAuditRoute
   '/events/next/london/booklet': typeof EventsNextLondonBookletRoute
   '/events/next/london/maps': typeof EventsNextLondonMapsRoute
   '/events/next/london/photos': typeof EventsNextLondonPhotosRoute
@@ -1697,6 +1704,7 @@ export interface FileRoutesByTo {
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next/intake/$eventId': typeof EventsNextIntakeEventIdRoute
   '/events/next/kiosk-editor/$boothId': typeof EventsNextKioskEditorBoothIdRoute
+  '/events/next/london/audit': typeof EventsNextLondonAuditRoute
   '/events/next/london/booklet': typeof EventsNextLondonBookletRoute
   '/events/next/london/maps': typeof EventsNextLondonMapsRoute
   '/events/next/london/photos': typeof EventsNextLondonPhotosRoute
@@ -1910,6 +1918,7 @@ export interface FileRoutesById {
   '/events/next_/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next_/intake/$eventId': typeof EventsNextIntakeEventIdRoute
   '/events/next_/kiosk-editor/$boothId': typeof EventsNextKioskEditorBoothIdRoute
+  '/events/next_/london_/audit': typeof EventsNextLondonAuditRoute
   '/events/next_/london_/booklet': typeof EventsNextLondonBookletRoute
   '/events/next_/london_/maps': typeof EventsNextLondonMapsRoute
   '/events/next_/london_/photos': typeof EventsNextLondonPhotosRoute
@@ -2124,6 +2133,7 @@ export interface FileRouteTypes {
     | '/events/next/divisions/$divisionId'
     | '/events/next/intake/$eventId'
     | '/events/next/kiosk-editor/$boothId'
+    | '/events/next/london/audit'
     | '/events/next/london/booklet'
     | '/events/next/london/maps'
     | '/events/next/london/photos'
@@ -2332,6 +2342,7 @@ export interface FileRouteTypes {
     | '/events/next/divisions/$divisionId'
     | '/events/next/intake/$eventId'
     | '/events/next/kiosk-editor/$boothId'
+    | '/events/next/london/audit'
     | '/events/next/london/booklet'
     | '/events/next/london/maps'
     | '/events/next/london/photos'
@@ -2544,6 +2555,7 @@ export interface FileRouteTypes {
     | '/events/next_/divisions/$divisionId'
     | '/events/next_/intake/$eventId'
     | '/events/next_/kiosk-editor/$boothId'
+    | '/events/next_/london_/audit'
     | '/events/next_/london_/booklet'
     | '/events/next_/london_/maps'
     | '/events/next_/london_/photos'
@@ -4050,6 +4062,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsNextKioskEditorBoothIdRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/events/next_/london_/audit': {
+      id: '/events/next_/london_/audit'
+      path: '/next/london/audit'
+      fullPath: '/events/next/london/audit'
+      preLoaderRoute: typeof EventsNextLondonAuditRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/london_/booklet': {
       id: '/events/next_/london_/booklet'
       path: '/next/london/booklet'
@@ -4258,6 +4277,7 @@ interface EventsRouteChildren {
   EventsNextDivisionsDivisionIdRoute: typeof EventsNextDivisionsDivisionIdRoute
   EventsNextIntakeEventIdRoute: typeof EventsNextIntakeEventIdRoute
   EventsNextKioskEditorBoothIdRoute: typeof EventsNextKioskEditorBoothIdRoute
+  EventsNextLondonAuditRoute: typeof EventsNextLondonAuditRoute
   EventsNextLondonBookletRoute: typeof EventsNextLondonBookletRoute
   EventsNextLondonMapsRoute: typeof EventsNextLondonMapsRoute
   EventsNextLondonPhotosRoute: typeof EventsNextLondonPhotosRoute
@@ -4307,6 +4327,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextDivisionsDivisionIdRoute: EventsNextDivisionsDivisionIdRoute,
   EventsNextIntakeEventIdRoute: EventsNextIntakeEventIdRoute,
   EventsNextKioskEditorBoothIdRoute: EventsNextKioskEditorBoothIdRoute,
+  EventsNextLondonAuditRoute: EventsNextLondonAuditRoute,
   EventsNextLondonBookletRoute: EventsNextLondonBookletRoute,
   EventsNextLondonMapsRoute: EventsNextLondonMapsRoute,
   EventsNextLondonPhotosRoute: EventsNextLondonPhotosRoute,
