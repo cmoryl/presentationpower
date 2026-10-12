@@ -126,7 +126,10 @@ function PrintLibraryCurator() {
   const canRender = !(variants.error && isForbidden(variants.error));
   if (!canRender) return <AdminForbidden />;
 
-  const rows = variants.data ?? [];
+  const allRows = variants.data ?? [];
+  const rows = allRows
+    .filter((r) => companyFilter === "all" || companyFromText(r.title ?? "") === companyFilter)
+    .filter((r) => productFilter === "all" || productFromText(r.title ?? "") === productFilter);
   const grouped = new Map<PrintAssetKind, typeof rows>();
   for (const r of rows) {
     const arr = grouped.get(r.template_kind) ?? [];
