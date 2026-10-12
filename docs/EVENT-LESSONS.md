@@ -294,3 +294,42 @@ Source: `next-london-2026-design-audit-in-depth_v4.pdf`. Grades and blocking fig
 **What happened:** several asset types could barely be graded.
 **Rule now:** brief the photographer for one straight-on, evenly lit shot of every sign and booth, plus a reference shot of the stage set before doors.
 **Enforced by:** judgement only.
+
+
+<!-- Round 2: from docs/london-2026-photo-audit-round2.md -->
+
+### 2026-10 — Test all signage under final lighting conditions
+**Context:** London signage (outdoor banner #77, hanging sign #190, backdrops #121, #122).
+**What happened:** Bright sun created glare on an outdoor banner; strong internal lights washed out a hanging sign; coloured lighting reduced the text-to-background contrast on some backdrops.
+**Rule now:** All major signage must be tested in-situ under final event lighting (daylight and artificial). Use matte finishes for outdoor assets. Where coloured show lighting hits a printed wall, agree a neutral light state for it; never keyline the logo.
+**Enforced by:** judgement only.
+
+### 2026-10 — Mount key information above head height; simplify badges
+**Context:** London digital screens (#259) and attendee badges (#28).
+**What happened:** A low-mounted screen displaying the agenda was blocked by attendees. Wayfinding text on badges was too small to be read at a glance.
+**Rule now:** Mount all informational and directional signs/screens above head height (2m+). Badges are for name, company, and track only. Move detailed maps and schedules to the app and large, dedicated print displays.
+**Enforced by:** judgement only.
+
+### 2026-10 — Keep what worked: staff sashes and registration design
+**Context:** London staff sashes (e.g. #14, #66, #73) and registration area (e.g. #29, #40, #100, #162).
+**What happened:** The high-contrast 'ASK ME ANYTHING' sashes were highly effective for identifying staff. The registration desk design (large front-panel branding, clear overhead screens for tracks) was impactful and functional.
+**Rule now:** Replicate the London 'ASK ME ANYTHING' sash design. Use the London registration area as the template for future events.
+**Enforced by:** judgement only.
+
+### 2026-10 — Keep what worked: outdoor wayfinding flags
+**Context:** London outdoor wayfinding (#4, #5, #63, #113, #115, #116).
+**What happened:** Tall, vertical flags with simple, bold 'TransPerfect NEXT' branding were highly effective for marking the venue and guiding attendees from a distance.
+**Rule now:** Use tall (3m+), vertical flags with a simple 'TransPerfect NEXT' or 'TransPerfect' lockup as the primary asset for all major outdoor wayfinding paths.
+**Enforced by:** judgement only.
+
+### 2026-10 — Simplify booth copy; add URL to QR codes
+**Context:** London collateral (tabletop sign #67, badge #28, booth panel #171).
+**What happened:** Simple signs with a clear call-to-action and QR code worked well. Some assets contained too much small text.
+**Rule now:** Booth panels and backdrops: headline and max three short bullet points. Tabletop signs: use the 'Headline, Call-to-Action, QR code' pattern. Add a short URL (e.g., bit.ly) below every QR code for users who cannot scan.
+**Enforced by:** judgement only.
+
+### 2026-10 — Continue using colour-coded lanyards for tracks
+**Context:** London lanyards (#28, #46, #92, #104, #281, #285).
+**What happened:** Different coloured and text-branded lanyards were used effectively to identify attendees by division, track ('Legal NEXT', 'LearnNEXT'), or role ('Speaker').
+**Rule now:** Continue the strategy of using distinct, colour-coded lanyards to segment attendees by track, division, and role.
+**Enforced by:** judgement only.
