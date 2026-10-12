@@ -60,9 +60,11 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
       },
       [ref],
     );
+    const maxFit = useRef(4.5);
     const fitKey = JSON.stringify([result.target.id, result.content, displayWidth]);
     useLayoutEffect(() => {
       iter.current = 0;
+      maxFit.current = 4.5;
       setFit(1);
     }, [fitKey]);
     useLayoutEffect(() => {
@@ -84,9 +86,11 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
         (m, n) => (n.clientWidth > 0 && n.scrollWidth > n.clientWidth + 1 ? Math.min(m, n.clientWidth / n.scrollWidth) : m),
         el.scrollWidth > el.clientWidth + 1 ? el.clientWidth / el.scrollWidth : 1,
       );
-      const ratio = Math.min((pageH * 0.96) / Math.max(1, natural), wide < 1 ? wide * 0.98 : Infinity);
-      if (Math.abs(ratio - 1) < 0.02 || (ratio > 1 && fit >= 4.5)) return;
-      const next = Math.min(4.5, Math.max(0.55, fit * Math.pow(ratio, ratio > 1 ? 0.7 : 1)));
+      // Once a word overflowed at this size, never grow back past it.
+      if (wide < 1) maxFit.current = Math.min(maxFit.current, fit * wide * 0.97);
+      const ratio = Math.min((pageH * 0.96) / Math.max(1, natural), wide < 1 ? wide * 0.97 : Infinity);
+      if (Math.abs(ratio - 1) < 0.02 || (ratio > 1 && fit >= maxFit.current)) return;
+      const next = Math.min(maxFit.current, Math.max(0.55, fit * Math.pow(ratio, ratio > 1 ? 0.7 : 1)));
       if (Math.abs(next - fit) > 0.005) setFit(next);
     });
     const t0 = result.type;
