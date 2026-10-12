@@ -39,7 +39,7 @@ export function SfDemoBooths() {
 export function SfLiftDoors() {
   return (
     <SignTemplateList id="sf-lift-doors" title="Lift door wraps" signs={DIVISION_LIVE_SIGNS.filter((s) => s.id.startsWith("sf-lift-"))}
-      intro="All six NEXT lift wraps re-sized for the San Francisco lifts: 41.5 in across both doors (about 21.3 in each), 84 in high. Open one to move the logo or headline, change the background or make another size, and download left and right door files. The door lines are guides and aren't printed." />
+      intro="All seven San Francisco lift wraps, built from your SF live files: 41.5 in across both doors (about 21.3 in each), 84 in high. Open one to retype the headline, move any piece or change the background, and download left and right door files. \"Supplied .ai\" is your original file. The door lines are guides and aren't printed." />
   );
 }
 
@@ -75,7 +75,8 @@ function SignTemplateList({ id, title, intro, signs, masterLabel = "Supplied .ai
                   <Link to="/events/next/sign-editor/$signId" params={{ signId: s.id }}><PenLine className="h-3.5 w-3.5" />Edit</Link>
                 </Button>
                 <Sign3dLink sign={s.id} label={s.title} />
-                {s.id.startsWith("sf-lift-") ? <SfLiveFileButton faceId={s.faces[0]!.id} /> : master ? (
+                {s.id.startsWith("sf-lift-") ? <SfLiveFileButton faceId={s.faces[0]!.id} /> : null}
+                {master ? (
                   <Button asChild size="sm" variant="outline">
                     <a href={master} download={s.master}><Download className="h-3.5 w-3.5" />{masterLabel}</a>
                   </Button>
