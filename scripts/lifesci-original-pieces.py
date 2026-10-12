@@ -294,6 +294,78 @@ UNIT = 0.04
 JOIN = 2.5
 
 
+COMPOSE_JS = """
+async ({items, w, h, px}) => {
+  const c = document.createElement('canvas'); c.width = Math.round(w*px); c.height = Math.round(h*px);
+  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0,0,c.width,c.height);
+  for (const it of items) {
+    const img = new Image(); img.src = it.src; await img.decode();
+    g.drawImage(img, it.x*px, it.y*px, it.w*px, it.h*px);
+  }
+  return c.toDataURL('image/png');
+}
+"""
+
+
+def text_free(pdf, pn):
+    doc = pymupdf.open(pdf)
+    p = doc[pn]
+    for b in p.get_text("dict")["blocks"]:
+        if b["type"] != 0:
+            continue
+        for l in b["lines"]:
+            for s in l["spans"]:
+                if s["text"].strip():
+                    p.add_redact_annot(pymupdf.Rect(s["bbox"]), fill=False)
+    p.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE, graphics=pymupdf.PDF_REDACT_LINE_ART_NONE, text=pymupdf.PDF_REDACT_TEXT_REMOVE)
+    return doc, p
+
+
+async def flatten_mismatches(pg, pdf, pn, W, H, out, pieces, boxes, groups):
+    """MuPDF's SVG export misses a few effects (knockout / soft-mask groups).
+    Any piece whose browser drawing disagrees with MuPDF's own page render is
+    replaced by MuPDF's render of its area, with the pieces painted above it
+    taken out first, so the page still matches the designer's file."""
+    import io
+    import numpy as np
+    from PIL import Image
+
+    px = 1.0
+    def src(k):
+        f = out / k["file"]
+        mime = "image/svg+xml" if f.suffix == ".svg" else "image/png"
+        return f"data:{mime};base64," + base64.b64encode(f.read_bytes()).decode()
+    items = [{"src": src(k), "x": k["x"] * 72, "y": k["y"] * 72, "w": k["w"] * 72, "h": k["h"] * 72} for k in pieces]
+    url = await pg.evaluate(COMPOSE_JS, {"items": items, "w": W, "h": H, "px": px})
+    comp = np.asarray(Image.open(io.BytesIO(base64.b64decode(url.split(",", 1)[1]))).convert("RGB"), int)
+    _, p = text_free(pdf, pn)
+    pix = p.get_pixmap(dpi=72, alpha=False)
+    ref = np.asarray(Image.frombytes("RGB", (pix.width, pix.height), pix.samples), int)
+    hh, ww = min(comp.shape[0], ref.shape[0]), min(comp.shape[1], ref.shape[1])
+    diff = np.abs(comp[:hh, :ww] - ref[:hh, :ww]).max(2)
+    for gi, k in enumerate(pieces):
+        x0, y0 = int(k["x"] * 72), int(k["y"] * 72)
+        x1, y1 = int((k["x"] + k["w"]) * 72), int((k["y"] + k["h"]) * 72)
+        region = diff[y0:y1, x0:x1]
+        if region.size == 0 or region.mean() < 10:
+            continue
+        doc, p = text_free(pdf, pn)
+        for later in groups[gi + 1:]:
+            for i in later:
+                b = boxes[i]
+                p.add_redact_annot(pymupdf.Rect(b[0] - 0.3, b[1] - 0.3, b[2] + 0.3, b[3] + 0.3), fill=False)
+        p.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE, graphics=pymupdf.PDF_REDACT_LINE_ART_REMOVE_IF_COVERED, text=pymupdf.PDF_REDACT_TEXT_REMOVE)
+        clip = pymupdf.Rect(k["x"] * 72, k["y"] * 72, (k["x"] + k["w"]) * 72, (k["y"] + k["h"]) * 72)
+        old = out / k["file"]
+        old.unlink()
+        f = old.with_suffix(".png")
+        p.get_pixmap(dpi=200, clip=clip, alpha=False, colorspace=pymupdf.csRGB).save(str(f))
+        k["file"] = f.name
+        k["label"] = "Image"
+        k["flattened"] = True
+        print("  flattened", k["file"], "diff", round(float(region.mean()), 1))
+
+
 def save_data_url(url, path):
     path.write_bytes(base64.b64decode(url.split(",", 1)[1]))
 
@@ -315,11 +387,17 @@ async def run(out, jobs):
                 for k in range(0, len(subs), 40):
                     boxes += await pg.evaluate(MEASURE_JS, {"svgs": subs[k:k + 40], "w": W, "h": H, "px": PX})
                 page_area = W * H
-                bg, fg = [], []
+                # Only full-page art painted before everything else is ground;
+                # a large shape painted later stays a piece so stacking holds.
+                bg, fg, lead = [], [], True
                 for i, b in enumerate(boxes):
                     if b is None:
                         continue
-                    (bg if area(b) > page_area * 0.30 else fg).append(i)
+                    if lead and area(b) > page_area * 0.30:
+                        bg.append(i)
+                    else:
+                        lead = False
+                        fg.append(i)
                 groups = units(P, boxes, set(fg), page_area)
                 pieces = []
                 for gi, g in enumerate(groups):
@@ -344,6 +422,7 @@ async def run(out, jobs):
                         "x": round(x0 / 72, 4), "y": round(y0 / 72, 4),
                         "w": round((x1 - x0) / 72, 4), "h": round((y1 - y0) / 72, 4),
                     })
+                await flatten_mismatches(pg, pdf, pn, W, H, out, pieces, boxes, groups)
                 gsvg = P.subset([P.leaves[i] for i in bg])
                 url = await pg.evaluate(RASTER_JS, {"svg": gsvg, "w": W, "h": H, "px": 200 / 72, "type": "image/jpeg"})
                 gpath = out / f"{slug}-p{pn + 1}-ground.jpg"
