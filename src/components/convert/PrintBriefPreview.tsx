@@ -324,7 +324,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
           {content.body ? (
             <p
               style={{
-                fontSize: caseStudy ? t.bodyPx * 1.35 : t.bodyPx * 1.55 * bb,
+                fontSize: caseStudy ? t.bodyPx * 1.35 : Math.min(t.bodyPx * 1.55 * bb, wordCapPx(content.body, (land ? (pageW - pad * 2) * 0.5 : pageW - pad * 2))),
                 lineHeight: t.bodyLeading,
                 margin: 0,
                 maxWidth: "62ch",
@@ -439,3 +439,10 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
     );
   },
 );
+
+
+/** Largest size at which the longest word of `text` still fits `width` (Geist ≈ 0.62 em per char). */
+function wordCapPx(text: string | undefined, width: number): number {
+  const longest = Math.max(1, ...(text ?? "").split(/\s+/).map((w) => w.length));
+  return width / (longest * 0.62);
+}
