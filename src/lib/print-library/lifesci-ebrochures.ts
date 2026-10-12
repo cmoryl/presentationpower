@@ -17,6 +17,10 @@ import heroApplanga from "@/assets/print-heroes/lifesci/lifesci-ebro-applanga-ec
 import heroLitMonitoring from "@/assets/print-heroes/lifesci/lifesci-ebro-literature-monitoring.jpg.asset.json";
 import heroPvSafety from "@/assets/print-heroes/lifesci/lifesci-ebro-pv-safety.jpg.asset.json";
 import heroCommercialAi from "@/assets/print-heroes/lifesci/lifesci-ebro-commercial-ai.jpg.asset.json";
+import heroPatientJourney from "@/assets/print-heroes/lifesci/lifesci-ebro-patient-journey.jpg.asset.json";
+import heroMeddevPms from "@/assets/print-heroes/lifesci/lifesci-ebro-meddev-post-market.jpg.asset.json";
+import heroAiClinReg from "@/assets/print-heroes/lifesci/lifesci-ebro-ai-clinical-regulatory.jpg.asset.json";
+import heroTrialWeb from "@/assets/print-heroes/lifesci/lifesci-ebro-trial-web-localization.jpg.asset.json";
 
 export const LIFESCI_EBRO_DIVISION_ID = "bm-tp-lifesci";
 
@@ -619,6 +623,242 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
         url: "https://lifesciences.transperfect.com",
       },
       heroMedia: hero(heroCommercialAi.url, 38, 50),
+    },
+  },
+  // ---- Dropbox drop, Oct 2026 — rebuilt from the supplied InDesign/Illustrator
+  // live files (copy taken from the files, cover art rendered from them with
+  // the wording removed so it stays editable). Figures are the designer's own.
+  {
+    slug: "patient-engagement-journey",
+    title: "Connect During Your Patient's Journey",
+    teaser:
+      "Services for every step of the clinical trial patient journey — connecting, bringing in, treating and retaining patients, digital and in person.",
+    tags: ["patient engagement", "clinical trials", "recruitment", "retention", "accessibility"],
+    collection: "Clinical & patient engagement",
+    sourceFile: "LifeSci | eBro Update FA_v1.indd",
+    content: {
+      eyebrow: "Patient engagement",
+      logoColor: "white",
+      title: "Connect During Your Patient's Journey",
+      summary:
+        "TransPerfect Life Sciences offers services during each step of your patient's clinical trial journey. From recruiting participants to retaining patients, our team takes care of all your content needs so you can focus on your mission—to save lives.",
+      sections: [
+        {
+          heading: "Connecting to potential patients",
+          body: "Digital/virtual and physical/in-person outreach that reaches patients where they are.",
+          bullets: [
+            "Website localization, digital accessibility and global SEO/SEM",
+            "Multilingual virtual assistants, multicultural apps and global multimedia",
+            "Content management, niche digital ads, social listening & monitoring",
+            "Multilingual collateral, patient-facing education and site-specific information",
+            "Multilingual broadcast/radio ads and localized signage",
+          ],
+        },
+        {
+          heading: "Bringing in patients",
+          body: "Making screening, consent and onboarding accessible in every language.",
+          bullets: [
+            "Translated questionnaires for pre-screeners and app localization",
+            "Over-the-phone interpretation and video e-consent",
+            "Subtitling, closed captioning, multilingual chatbots and localized drug info",
+            "On-site interpreters, sign language and braille",
+            "Translated patient-facing collateral",
+          ],
+        },
+        {
+          heading: "Treating & retaining patients with care",
+          body: "Support that keeps patients engaged through treatment and follow-up.",
+          bullets: [
+            "Continuous app localization, eCOA solutions and social media monitoring",
+            "Call center solutions, custom crowd-based testing and content consistency & reuse",
+            "Translated appointment cards, patient diaries and study updates",
+            "Language proficiency testing for nurses/physicians; interpreters for site or home visits",
+            "Patient survey translation, localized AEs & SAEs, literature & media monitoring",
+            "Localized pharmacovigilance, focus groups and translated physician forms",
+          ],
+        },
+      ],
+      stats: [
+        { label: "Connecting", value: "Step 1", caption: "Reach potential patients" },
+        { label: "Bringing in", value: "Step 2", caption: "Screen and consent" },
+        { label: "Treating", value: "Step 3", caption: "Care in every language" },
+        { label: "Retaining", value: "Step 4", caption: "Engage through follow-up" },
+      ],
+      discover: {
+        body: "Engage your patients:",
+        bullets: ["lifesciences.transperfect.com", "lifesciences@transperfect.com"],
+      },
+      cta: {
+        label: "Engage Your Patients",
+        subhead: "lifesciences.transperfect.com — lifesciences@transperfect.com",
+        url: "https://lifesciences.transperfect.com",
+      },
+      heroMedia: hero(heroPatientJourney.url, 30, 40),
+    },
+  },
+  {
+    slug: "meddev-global-post-market-services",
+    title: "Global Post-Market Services",
+    teaser:
+      "How TransPerfect Medical Device turns multilingual post-market data into a compliance advantage — surveillance, vigilance, labeling and regulatory intelligence.",
+    tags: ["medical device", "post-market surveillance", "vigilance", "PMCF", "labeling", "ISO 13485"],
+    collection: "Medical device",
+    sourceFile: "One-Pager | Medical Device | Amy Racicot | 9031.ai",
+    content: {
+      eyebrow: "TransPerfect Medical Device",
+      logoColor: "white",
+      title: "Global Post-Market Services",
+      summary: "When safety signals cross borders — the gap where patient safety meets operational reality.",
+      sections: [
+        {
+          heading: "When Safety Signals Cross Borders",
+          body: "A global diagnostics manufacturer came to us with a problem. They were late in identifying a pattern in their complaint data because adverse event reports, clustered in three European markets, had all the right signals but were buried across languages, formats, and disconnected systems. They were adding staff and investing in tools but still struggled to harness all the intelligence needed to stay ahead of regulatory requirements. Medical device manufacturers face an unprecedented convergence of pressures: rigorous post-market surveillance requirements, evolving expectations around real-world evidence, and the fundamental challenge of monitoring device performance across dozens of markets and languages.",
+          bullets: [],
+        },
+        {
+          heading: "The Language of Post-Market Excellence",
+          body: "TransPerfect Medical Device exists at this intersection, combining our ISO 13485, 14971, 9001, 18587, and 17100 certified quality and risk management systems with AI-enabled workflows and technology development to reduce compliance costs through automation without sacrificing quality. We focus on the organization, connectivity, traceability, and actioning of global content that scales your team's productivity with quality instead of risk.",
+          bullets: [
+            "Program delivery: language services, content creation, testing & validation, contact center",
+            "Technology & AI development: translation management, eClinical, automation, CCMS, web",
+            "Managed staffing & SMEs: advisory, governance, program management, technical writing",
+          ],
+        },
+        {
+          heading: "Transformation in Practice",
+          body: "When your literature monitoring system surfaces a safety signal in a Japanese publication, the AI-powered screening automation we've co-developed ensures you see it in days, not months. When your PMCF protocol requires patient surveys across 15 countries, our linguistic validation specialists ensure those Clinical Outcome Assessments capture genuine patient experience. When a Field Safety Notice needs simultaneous distribution across the EU, our teams handle the editing, translation, and deployment while your vigilance leaders focus on the clinical decisions that matter.",
+          bullets: [
+            "Post-market clinical follow-up",
+            "PMS system & periodic reporting",
+            "Vigilance & safety",
+            "Labeling & regulated content",
+            "Scientific & regulatory intelligence",
+          ],
+        },
+      ],
+      stats: [
+        { label: "Connectors", value: "70+", caption: "Open APIs into your existing systems" },
+        { label: "Screened SMEs", value: "50,000", caption: "Ready for deployment" },
+        { label: "Certified", value: "ISO 13485", caption: "Plus 14971, 9001, 18587, 17100" },
+      ],
+      discover: {
+        body: "TransPerfect: the services and infrastructure behind transformation — multilingual contact centers, testing and validation hubs, data annotation and labeling, and the world's largest certified language services provider.",
+        bullets: ["transperfect.com/meddev", "meddev@transperfect.com"],
+      },
+      cta: {
+        label: "Talk to TransPerfect Medical Device",
+        subhead: "transperfect.com/meddev — meddev@transperfect.com",
+        url: "https://www.transperfect.com/meddev",
+      },
+      heroMedia: hero(heroMeddevPms.url, 30, 40),
+    },
+  },
+  {
+    slug: "ai-clinical-regulatory-survey-infographic",
+    title: "The State of AI in Clinical & Regulatory Operations",
+    teaser:
+      "Survey results from 100+ medical device manufacturers on the gap between AI adoption and AI readiness.",
+    tags: ["AI", "medical device", "survey", "infographic", "clinical", "regulatory", "Qserve"],
+    collection: "Medical device",
+    sourceFile: "TPMD | Infographic - AI in Clinical and Regulatory 8_5X11.ai",
+    content: {
+      eyebrow: "Survey results",
+      logoColor: "white",
+      title: "The State of AI in Clinical & Regulatory Operations",
+      summary:
+        "Half the medical device industry is already using AI in their processes. Most of them aren't sure how it works, and fewer than 1 in 4 say it's delivering results.",
+      sections: [
+        {
+          heading: "The adoption gap",
+          body: "This survey of 100+ manufacturers uncovers the gap between AI adoption and AI readiness across clinical and regulatory operations.",
+          bullets: [],
+        },
+        {
+          heading: "Readiness falls behind",
+          body: "Teams lack metrics, structured data and regulatory alignment for the AI they already run.",
+          bullets: [
+            "80% rated themselves as unfamiliar with AI, despite many already using it",
+            "75% are not using structured data to support their AI",
+          ],
+        },
+        {
+          heading: "Where does your organization stand?",
+          body: "Take the assessment to benchmark your clinical and regulatory AI readiness.",
+          bullets: [],
+        },
+      ],
+      stats: [
+        { label: "Report AI implementation is not meeting expectations", value: "75", unit: "%" },
+        { label: "Have no defined metrics for measuring AI success", value: ">50", unit: "%" },
+        {
+          label: "Of clinical teams have not evaluated AI alignment with current regulatory requirements",
+          value: ">90",
+          unit: "%",
+        },
+      ],
+      discover: {
+        body: "Source: AI in Clinical and Regulatory Content: Trends, Challenges, and Opportunities — TransPerfect Medical Device & Qserve Webinar.",
+        bullets: ["lifesciences.transperfect.com", "meddev@transperfect.com"],
+      },
+      cta: {
+        label: "Take the Assessment",
+        subhead: "lifesciences.transperfect.com — meddev@transperfect.com",
+        url: "https://lifesciences.transperfect.com",
+      },
+      heroMedia: hero(heroAiClinReg.url, 30, 40),
+    },
+  },
+  {
+    slug: "clinical-trial-website-localization-fact-sheet",
+    title: "Clinical Trial Website Localization Fact Sheet",
+    teaser: "Recruit more patients, faster — trial reality and localization impact, with sourced figures.",
+    tags: ["clinical trials", "website localization", "GlobalLink Web", "recruitment", "fact sheet"],
+    collection: "Clinical & patient engagement",
+    sourceFile: "Web localization fact sheet for clinical trials.ai",
+    content: {
+      eyebrow: "Recruit more patients, faster",
+      logoColor: "white",
+      title: "Clinical Trial Website Localization Fact Sheet",
+      summary: "Recruit more patients, faster.",
+      sections: [
+        {
+          heading: "Trial reality",
+          body: "Recruitment is a leading driver of delays — and language is a barrier for millions of potential participants.",
+          bullets: [
+            "~80% of clinical trials fail to meet initial enrollment targets and timelines (1)",
+            "41% of adults in the US report not knowing anything about clinical trials (2)",
+            "25.7M people age 5+ with limited English proficiency in the US (3)",
+            "31% of clinical research sites said site staffing was their top challenge (4)",
+          ],
+        },
+        {
+          heading: "Localization impact",
+          body: "Localized trial sites enroll faster and more inclusively.",
+          bullets: [
+            "56% faster enrollment than expected after a recruitment site was localized for Latinos in California (5)",
+            "17% increase in underrepresented minority enrollment with localization (6)",
+            "76% of consumers prefer information in their native language (7)",
+            ">600 hours of internal workdays eliminated by a pharmaceutical company through centralizing and automating translation (8)",
+          ],
+        },
+        {
+          heading: "References",
+          body: "1. Brøgger-Mikkelsen M, et al. (2020). Online Patient Recruitment in Clinical Trials. 2. National Cancer Institute (HINTS Brief 48). 3. KFF (2023). Overview of Health Coverage and Care for Individuals with Limited English Proficiency. 4. 2024 Clinical Research Site Challenges Report (WCG). 5. Alzheimers Dement. 2023;19(5):1714-1728. 6. J Clin Transl Sci. 2022;7(1):e9. 7. CSA Research (2020). Consumers Prefer Their Own Language. 8. TransPerfect. Client Panel Intelligent Performance (Webinar).",
+          bullets: [],
+        },
+      ],
+      stats: [
+        { label: "Of trials miss initial enrollment targets", value: "~80", unit: "%" },
+        { label: "Faster enrollment after localization", value: "56", unit: "%" },
+        { label: "Prefer information in their native language", value: "76", unit: "%" },
+        { label: "Internal workday hours eliminated", value: ">600" },
+      ],
+      cta: {
+        label: "Explore Localization with GlobalLink Web",
+        subhead: "Lab to Launch. Practitioner to Patient. — lifesciences@transperfect.com",
+        url: "https://lifesciences.transperfect.com",
+      },
+      heroMedia: hero(heroTrialWeb.url, 30, 40),
     },
   },
 ];

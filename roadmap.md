@@ -60,3 +60,15 @@
 - [ ] Live Conference/Events + Commercial for Life Sciences 3D links — blocked on: user naming their BoothHub booths
 
 - [ ] Slides 2 & 3 KPI infographics: refine from direction 2 (Orbital Glass Prism) — waiting on what feels off
+
+# Roadmap — Life Sciences Dropbox brochures (Oct 2026)
+- [x] 4 e-brochures + Baxter case study rebuilt as editable library pieces
+- [ ] Yakuji Nippo Japanese print ad (240 × 100 mm, wording drawn as shapes) — blocked on: no matching print format; user choice
+
+# Roadmap — workspace request (Oct 12)
+- [ ] General Slides master rebuild per docs/general-slides-redesign-brief.md
+- [ ] Kiosk editor: centred multi-line blocks, designer CMYK files, SF sign-set flow (see SF kiosks)
+- [ ] Cross-surface cascading of assets/case studies/bricks (Deck, Print, Event, Social)
+- [ ] Print + Social agents: full tool-use canvas edits
+- [ ] Live voice pitch coaching — blocked on: conflicts with standing "no voice integration" rule; user must lift it
+- [ ] 22 backend security warnings + learning distillation pipeline

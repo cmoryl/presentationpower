@@ -19,6 +19,7 @@ import heroCareersSite from "@/assets/print-heroes/lifesci/lifesci-cs-careers-si
 import heroAutomation from "@/assets/print-heroes/lifesci/lifesci-cs-pharma-automation.jpg.asset.json";
 import heroUnitedImaging from "@/assets/print-heroes/lifesci/lifesci-cs-united-imaging.jpg.asset.json";
 import heroVivacy from "@/assets/print-heroes/lifesci/lifesci-cs-vivacy.jpg.asset.json";
+import heroBaxter from "@/assets/print-heroes/lifesci/lifesci-cs-baxter-hcp.jpg.asset.json";
 
 export const LIFESCI_DIVISION_ID = "bm-tp-lifesci";
 
@@ -431,6 +432,62 @@ export const LIFESCI_CASE_STUDIES: LifeSciCaseStudySeed[] = [
       cta: CTA,
       footer: FOOTER,
       heroMedia: { imageUrl: heroBlindedAz.url, aspect: "fill", heightPct: 42, focalY: 45 },
+    },
+  },
+  // Dropbox drop, Oct 2026 — rebuilt from the supplied Illustrator live file + PDF.
+  {
+    slug: "baxter-hcp-engagement-apac",
+    title: "Globally Scaling HCP Engagement for Baxter",
+    teaser:
+      "How TransPerfect helped Baxter drive sales through a multilingual, education-led, global digital campaign.",
+    collection: "Commercial & HCP engagement",
+    tags: ["Baxter", "HCP engagement", "webinars", "APAC", "ContentLabs", "simultaneous interpretation"],
+    sourceFile: "Baxter Case Study | ContentLabs | Vicente Torga - Baxter | 9122 - Design.ai",
+    content: {
+      eyebrow: "Case study",
+      client: "Baxter",
+      industry: "Medical technology",
+      audience: "Commercial, medical education and APAC marketing leads",
+      summary:
+        "How TransPerfect helped Baxter drive sales through a multilingual, education-led, global digital campaign.",
+      challenge: {
+        heading: "Challenge",
+        body: "Baxter needed to drive sales growth through scaled HCP engagement and reach a fragmented, multilingual audience across APAC.",
+      },
+      solution: {
+        heading: "Solution",
+        body: "TransPerfect developed a repeatable, multi-market educational webinar campaign spanning promotion, registration, simultaneous interpretation, hybrid event support and post-event on-demand content.",
+      },
+      result: {
+        heading: "One Team, Big Impact",
+        body: "The campaign lifted division sales by more than 20%, generated over 10,000 registrations and delivered more than 5,500 qualified leads at a 60% attendance rate.",
+      },
+      stats: [
+        { label: "Increase in Division Sales", value: "20%+" },
+        { label: "Registrations Generated", value: "10,000+" },
+        { label: "Qualified Leads Delivered", value: "5,500+" },
+        { label: "Attendance Rate", value: "60", unit: "%" },
+      ],
+      engagement: {
+        title: "Services",
+        bullets: [
+          "Live action production",
+          "Event videography",
+          "Multi-market campaign strategy",
+          "Content repurposing",
+          "Collateral design",
+          "On-site and hybrid event planning",
+          "Live-streaming content",
+          "Website design and development",
+        ],
+      },
+      cta: {
+        label: "Transforming Global Performance",
+        subhead: "transperfect.com — contentlabs@transperfect.com",
+        url: "https://www.transperfect.com",
+      },
+      footer: { links: ["transperfect.com", "contentlabs@transperfect.com"] },
+      heroMedia: { imageUrl: heroBaxter.url, aspect: "fill", heightPct: 42, focalY: 50 },
     },
   },
 ];
