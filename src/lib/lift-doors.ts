@@ -10,7 +10,7 @@ export type LiftDoor = { side: "left" | "right"; x0: number; x1: number };
 
 const SF_DOORS: { w: number; h: number; doorW: number }[] = [{ w: 41.5, h: 84, doorW: 21.3 }];
 
-export const isLiftLayout = (id: string) => /-lift-/.test(id);
+export const isLiftLayout = (id: string) => /-(sf)?lift-/.test(id);
 
 /** Door leaves in points across a lift face `wPt` × `hPt`. */
 export function liftDoors(wPt: number, hPt: number): LiftDoor[] {

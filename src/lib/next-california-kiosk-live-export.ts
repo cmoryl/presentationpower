@@ -772,7 +772,7 @@ async function downloadSign(kind: KioskDownload, L: LiveLayout, edits: KioskEdit
   zip.file(`${base}-press-outlined.svg`, press);
   zip.file(`${base}-PROOF.png`, await proofPng(press, proofW, W, H));
   // Lift wraps: the live files also come as one file per door.
-  if (/-lift-/.test(L.id)) for (const d of await liftDoorPdfs(L, edits)) zip.file(`doors/${base}-${d.side}-door-${+d.wIn.toFixed(2)}x${+d.hIn.toFixed(2)}in.ai`, d.bytes);
+  if (/-(sf)?lift-/.test(L.id)) for (const d of await liftDoorPdfs(L, edits)) zip.file(`doors/${base}-${d.side}-door-${+d.wIn.toFixed(2)}x${+d.hIn.toFixed(2)}in.ai`, d.bytes);
   const inch = (v: number) => +(v / 72).toFixed(2);
   zip.file(
     "README.txt",
