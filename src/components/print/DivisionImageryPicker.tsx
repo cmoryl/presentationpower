@@ -8,6 +8,17 @@ import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { X, Search, Loader2 } from "lucide-react";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
+import { EventPhotoBrowser, type PickedEventPhoto } from "@/components/media/EventPhotoBrowser";
+
+function eventPhotoEntry(p: PickedEventPhoto, divisionId: string): DivisionImageryEntry {
+  return {
+    id: `event-photo:${p.id}`, division_id: divisionId, storage_path: p.path, filename: p.name,
+    content_type: "image/jpeg", size_bytes: 0, kind: "photo", tags: ["event", p.eventId, p.album],
+    note: `Event photo · ${p.album}`, prompt: null, uploaded_by: "", approved: true, approved_by: null,
+    approved_at: null, collection: p.eventId, template_kinds: [], is_default_for: [], variants: {},
+    variantUrls: {}, created_at: "", updated_at: "", signedUrl: p.url,
+  };
+}
 
 type Props = {
   open: boolean;
@@ -25,6 +36,7 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
   const [kind, setKind] = useState<"all" | "photo" | "abstract" | "generated" | "upload">("all");
   const [approvedOnly, setApprovedOnly] = useState(true);
   const [activeTags, setActiveTags] = useState<string[]>([]);
+  const [source, setSource] = useState<"division" | "events">("division");
 
   useEffect(() => {
     if (!open || !divisionId) return;
@@ -110,6 +122,20 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
           </button>
         </header>
 
+        <div role="tablist" aria-label="Picture source" className="flex gap-1 border-b border-white/10 px-5 py-2">
+          {([["division", "Division library"], ["events", "Event photos"]] as const).map(([id, label]) => (
+            <button key={id} type="button" role="tab" aria-selected={source === id} onClick={() => setSource(id)}
+              className={`rounded-md px-3 py-1.5 text-xs transition ${source === id ? "bg-white text-[#0b0d18]" : "text-white/70 hover:bg-white/10 hover:text-white"}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {source === "events" ? (
+          <div className="flex-1 overflow-y-auto p-5">
+            <EventPhotoBrowser onPick={(p) => { onPick(eventPhotoEntry(p, divisionId ?? "bm-enterprise")); onClose(); }} />
+          </div>
+        ) : (<>
         <div className="flex items-center gap-2 border-b border-white/10 px-5 py-3">
           <div className="relative flex-1">
             <Search
