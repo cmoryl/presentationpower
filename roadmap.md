@@ -85,4 +85,4 @@
 - [x] Company/sub-brand + Product family tag filters in print library and template catalogue
 
 - [ ] Icon Studio: Canva-ready ZIP pack of division icon sets (clean editable SVGs, folders by division/sub-area, for bulk upload to Canva brand kits)
-- [ ] Life Sciences original layouts: every artwork piece separately movable/resizable/tintable/hideable
+- [x] Life Sciences original layouts: every artwork piece separately movable/resizable/tintable/hideable
