@@ -102,7 +102,7 @@ function SfLiveFileButton({ faceId }: { faceId: string }) {
         import("@/lib/sign-set-data"),
       ]);
       const edits = await loadSignEdits(faceId).catch(() => ({}));
-      await downloadKiosk("ai", L, edits);
+      await downloadKiosk("doors", L, edits);
     } catch (e) {
       toast.error("Couldn't build the live file", { description: e instanceof Error ? e.message : undefined });
     } finally {
@@ -111,7 +111,7 @@ function SfLiveFileButton({ faceId }: { faceId: string }) {
   }
   return (
     <Button size="sm" variant="outline" onClick={() => void go()} disabled={busy}>
-      {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}Live file .ai · 41.5 × 84 in
+      {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}Live files · left + right doors
     </Button>
   );
 }

@@ -761,8 +761,8 @@ async function downloadSign(kind: KioskDownload, L: LiveLayout, edits: KioskEdit
   if (kind === "returns") throw new Error("Signs have no side strips.");
   if (kind === "doors") {
     const z = new JSZip();
-    for (const d of await liftDoorPdfs(L, edits)) z.file(`${base}-${d.side}-door-${+d.wIn.toFixed(2)}x${+d.hIn.toFixed(2)}in.pdf`, d.bytes);
-    z.file("README.txt", `DRAFT — not published. One print PDF per lift door, cut from the full ${+(W / 72).toFixed(2)} x ${+(H / 72).toFixed(2)} in wrap.\nEach file: door trim + 1/8 in bleed, crop marks in the slug. Door lines are guides and never print.\nConfirm door sizes on site and check in Acrobat/Illustrator before print.\n`);
+    for (const d of await liftDoorPdfs(L, edits)) z.file(`${base}-${d.side}-door-${+d.wIn.toFixed(2)}x${+d.hIn.toFixed(2)}in.ai`, d.bytes);
+    z.file("README.txt", `DRAFT — not published. One live file per lift door (PDF-compatible .ai), cut from the full ${+(W / 72).toFixed(2)} x ${+(H / 72).toFixed(2)} in wrap.\nEach file: door trim + 1/8 in bleed, crop marks in the slug. Door lines are guides and never print.\nConfirm door sizes on site and check in Acrobat/Illustrator before print.\n`);
     return save(await z.generateAsync({ type: "blob" }), `${base}-doors.zip`);
   }
   const zip = new JSZip();
@@ -771,6 +771,8 @@ async function downloadSign(kind: KioskDownload, L: LiveLayout, edits: KioskEdit
   zip.file(`${base}.ai`, await liveFrontPdf(L, edits));
   zip.file(`${base}-press-outlined.svg`, press);
   zip.file(`${base}-PROOF.png`, await proofPng(press, proofW, W, H));
+  // Lift wraps: the live files also come as one file per door.
+  if (/-lift-/.test(L.id)) for (const d of await liftDoorPdfs(L, edits)) zip.file(`doors/${base}-${d.side}-door-${+d.wIn.toFixed(2)}x${+d.hIn.toFixed(2)}in.ai`, d.bytes);
   const inch = (v: number) => +(v / 72).toFixed(2);
   zip.file(
     "README.txt",
