@@ -84,6 +84,7 @@ type Photo = {
   sign_kind_source: string;
   panel_id: string | null;
   print_note: string | null;
+  marketing_ok: boolean;
 };
 
 async function loadPhotos(): Promise<Photo[]> {
@@ -91,7 +92,7 @@ async function loadPhotos(): Promise<Photo[]> {
   for (let from = 0; ; from += 1000) {
     const { data, error } = await supabase
       .from("event_photos")
-      .select("id,path,thumb_path,original_name,album,division,room,sign_kind,sign_kind_source,panel_id,print_note")
+      .select("id,path,thumb_path,original_name,album,division,room,sign_kind,sign_kind_source,panel_id,print_note,marketing_ok")
       .eq("event_id", EVENT)
       .order("album")
       .order("original_name")
@@ -120,6 +121,9 @@ function PhotosPage() {
   const [kind, setKind] = useState("");
   const [room, setRoom] = useState("");
   const [onlyIssues, setOnlyIssues] = useState(false);
+  const [onlyMarketing, setOnlyMarketing] = useState(false);
+  const [bulkMsg, setBulkMsg] = useState<string | null>(null);
+  const qcPage = useQueryClient();
   const [page, setPage] = useState(0);
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -130,9 +134,10 @@ function PhotosPage() {
           (!division || (division === "none" ? !p.division : p.division === division)) &&
           (!kind || p.sign_kind === kind) &&
           (!room || (room === "none" ? !p.room : p.room === room)) &&
-          (!onlyIssues || !!p.print_note),
+          (!onlyIssues || !!p.print_note) &&
+          (!onlyMarketing || p.marketing_ok),
       ),
-    [photos.data, division, kind, room, onlyIssues],
+    [photos.data, division, kind, room, onlyIssues, onlyMarketing],
   );
   const shown = filtered.slice(page * PAGE, page * PAGE + PAGE);
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE));
@@ -150,6 +155,20 @@ function PhotosPage() {
     setPage(Math.floor(i / PAGE));
   };
 
+  async function clearShown(ok: boolean) {
+    setBulkMsg(null);
+    const ids = filtered.filter((p) => p.marketing_ok !== ok).map((p) => p.id);
+    for (let i = 0; i < ids.length; i += 200) {
+      const { error } = await supabase.from("event_photos").update({ marketing_ok: ok }).in("id", ids.slice(i, i + 200));
+      if (error) {
+        setBulkMsg("Couldn't change these. Only admins and brand leads can clear photos for marketing.");
+        return;
+      }
+    }
+    await qcPage.invalidateQueries({ queryKey: ["event-photos", EVENT] });
+    setBulkMsg(ok ? `${ids.length} photos cleared for marketing.` : `${ids.length} photos taken out of marketing.`);
+  }
+
   const reset = (f: () => void) => {
     f();
     setPage(0);
@@ -163,7 +182,9 @@ function PhotosPage() {
         </Link>
         <h1 className="mt-3 text-2xl font-semibold text-[#03002C]">London event photos</h1>
         <p className="mt-2 max-w-3xl text-sm leading-[1.5] text-[#03002C]/70">
-          Staff only. Many attendees are recognisable, so these photos are for checking prints, not for anything published.
+          Staff only. Many attendees are recognisable, so photos stay private until an admin or brand lead marks them
+          "Cleared for marketing" (check the people in shot have agreed). Cleared photos appear under "Event photos" in the
+          print, social and slide picture pickers.
           Division comes from the photographer's album. Sign type was tagged automatically and shows "auto" until checked.
           Rooms stay blank until someone picks one.
         </p>
@@ -187,9 +208,20 @@ function PhotosPage() {
             <input type="checkbox" checked={onlyIssues} onChange={(e) => reset(() => setOnlyIssues(e.target.checked))} />
             Only photos with a print note
           </label>
+          <label className="inline-flex items-center gap-2 text-sm text-[#03002C]">
+            <input type="checkbox" checked={onlyMarketing} onChange={(e) => reset(() => setOnlyMarketing(e.target.checked))} />
+            Only cleared for marketing
+          </label>
+          <button type="button" onClick={() => void clearShown(true)} disabled={!filtered.length} className="rounded-md bg-[#003FC7] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40">
+            Clear these {filtered.length} for marketing
+          </button>
+          <button type="button" onClick={() => void clearShown(false)} disabled={!filtered.length} className="rounded-md border border-[#03002C]/20 px-3 py-1.5 text-xs font-semibold text-[#03002C] disabled:opacity-40">
+            Take these out of marketing
+          </button>
           <span className="ml-auto font-mono text-xs text-[#03002C]/60">{filtered.length} of {photos.data?.length ?? 0} photos</span>
         </div>
 
+        {bulkMsg ? <p className="mt-3 text-xs text-[#03002C]/75">{bulkMsg}</p> : null}
         {photos.isLoading ? <p className="mt-8 text-sm text-[#03002C]/65">Loading photos…</p> : null}
         {photos.error ? <p className="mt-8 text-sm text-red-700">Couldn't load the photos. You may need to sign in.</p> : null}
 
@@ -206,7 +238,7 @@ function PhotosPage() {
                   {SIGN_KINDS[p.sign_kind ?? ""] ?? "Untagged"}
                   {p.sign_kind_source === "auto" ? <span className="ml-1 font-mono text-[10px] font-normal text-[#03002C]/55">auto</span> : null}
                 </p>
-                <p className="truncate text-[11px] text-[#03002C]/65">{p.division ? DIVISIONS[p.division] : "General"} · {p.room ?? "room not set"}</p>
+                <p className="truncate text-[11px] text-[#03002C]/65">{p.division ? DIVISIONS[p.division] : "General"} · {p.room ?? "room not set"}{p.marketing_ok ? " · marketing" : ""}</p>
               </button>
             </li>
           ))}
@@ -252,6 +284,7 @@ function PhotoDialog({ photo, onClose, onPrev, onNext, position }: { photo: Phot
   const [kind, setKind] = useState(photo.sign_kind ?? "");
   const [panelId, setPanelId] = useState(photo.panel_id ?? "");
   const [note, setNote] = useState(photo.print_note ?? "");
+  const [marketing, setMarketing] = useState(photo.marketing_ok);
   const [msg, setMsg] = useState<string | null>(null);
   const panels = useMemo(() => LONDON_PANELS.filter((p) => !room || p.room === room), [room]);
   const panel = LONDON_PANELS.find((p) => p.id === panelId) ?? null;
@@ -260,7 +293,7 @@ function PhotoDialog({ photo, onClose, onPrev, onNext, position }: { photo: Phot
     setMsg(null);
     const { error, data } = await supabase
       .from("event_photos")
-      .update({ room: room || null, sign_kind: kind || null, sign_kind_source: "checked", panel_id: panelId || null, print_note: note || null })
+      .update({ room: room || null, sign_kind: kind || null, sign_kind_source: "checked", panel_id: panelId || null, print_note: note || null, ...(marketing !== photo.marketing_ok ? { marketing_ok: marketing } : {}) })
       .eq("id", photo.id)
       .select("id");
     if (error || !data?.length) {
@@ -314,6 +347,10 @@ function PhotoDialog({ photo, onClose, onPrev, onNext, position }: { photo: Phot
           </label>
           <label className="block text-xs font-semibold text-[#03002C]">Print note
             <textarea className="mt-1 w-full rounded-md border border-[#03002C]/20 p-2 text-sm" rows={4} value={note} onChange={(e) => setNote(e.target.value)} />
+          </label>
+          <label className="flex items-start gap-2 text-xs text-[#03002C]">
+            <input type="checkbox" className="mt-0.5" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} />
+            <span><span className="font-semibold">Cleared for marketing</span> — usable in print, social and slides. Admins and brand leads only.</span>
           </label>
           <p className="text-[11px] text-[#03002C]/60">{photo.sign_kind_source === "auto" ? "Sign type and note were tagged automatically — check before relying on them." : "Checked by a person."}</p>
           <button type="button" onClick={save} className="inline-flex items-center gap-1.5 rounded-md bg-[#003FC7] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"><Check size={14} /> Save labels</button>
