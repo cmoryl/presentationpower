@@ -72,3 +72,10 @@
 - [ ] Print + Social agents: full tool-use canvas edits
 - [ ] Live voice pitch coaching — blocked on: conflicts with standing "no voice integration" rule; user must lift it
 - [ ] 22 backend security warnings + learning distillation pipeline
+
+# Roadmap — cross-surface cascade
+- [x] Print pieces -> social, print sizes, decks
+- [x] Event signage sizes (pillar 23.5x72, easel 24x36, roll-up) in the adaptor
+- [x] Content bricks per piece, tagged by surface
+- [ ] Bricks dropped straight into event sign editors (supplied signs are fixed artwork)
+- [ ] Voice pitch coaching - declined (no voice features rule)

@@ -1,7 +1,9 @@
 // Cross-surface cascade — one curated print-library piece (e-brochure or case
 // study) feeds every other surface from the SAME master content and imagery:
 //   • print + social sizes through the cross-format adaptor (`/convert?print=`)
+//   • event signage sizes (pillar, easel, roll-up) through the same adaptor
 //   • a slide deck through `createDeckFromSnapshot`
+//   • reusable content bricks (`contentBricks`) tagged by surface
 // Nothing here writes copy: every string and figure is read from the piece,
 // trimmed to the target's capacity, and the full copy rides in speaker notes.
 // Numeric slides are only built from figures the piece itself prints.
@@ -101,6 +103,42 @@ export function contentFromLibraryPiece(item: PrintLibraryItem): AdaptContent {
       .slice(1, 4)
       .map((r) => ({ label: r.label, value: `${r.value}${r.unit ?? ""}` })),
   };
+}
+
+export type CascadeSurface = "Deck" | "Print" | "Event" | "Social";
+export type ContentBrick = {
+  id: string;
+  kind: "headline" | "summary" | "block" | "stat" | "image";
+  label: string;
+  text: string;
+  surfaces: CascadeSurface[];
+};
+
+/**
+ * The piece split into reusable bricks — each read verbatim from the piece,
+ * tagged with the surfaces whose layouts carry it. No brick is ever written.
+ */
+export function contentBricks(item: PrintLibraryItem): ContentBrick[] {
+  const c = (item.content ?? {}) as Rec;
+  const all: CascadeSurface[] = ["Deck", "Print", "Event", "Social"];
+  const out: ContentBrick[] = [{ id: "headline", kind: "headline", label: "Headline", text: headlineOf(item), surfaces: all }];
+  const summary = s(c.summary);
+  if (summary) out.push({ id: "summary", kind: "summary", label: "Summary", text: summary, surfaces: all });
+  blocksOf(item).forEach((b, i) =>
+    out.push({
+      id: `block-${i}`,
+      kind: "block",
+      label: b.heading || `Section ${i + 1}`,
+      text: [b.body, ...b.bullets.map((x) => `• ${x}`)].filter(Boolean).join("\n"),
+      surfaces: ["Deck", "Print"],
+    }),
+  );
+  numericStats(c).forEach((r, i) =>
+    out.push({ id: `stat-${i}`, kind: "stat", label: "Figure", text: `${r.value}${r.unit ?? ""} — ${r.label}`, surfaces: all }),
+  );
+  const hero = s((c.heroMedia as Rec | undefined)?.imageUrl) ?? item.heroUrl;
+  if (hero) out.push({ id: "image", kind: "image", label: "Cover image", text: hero, surfaces: all });
+  return out;
 }
 
 /** Full piece copy, for speaker notes (nothing is lost when slides trim). */
