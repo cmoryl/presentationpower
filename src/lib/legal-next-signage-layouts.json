@@ -118,7 +118,7 @@
   "texts": [
    {
     "id": "t0",
-    "text": "PREPARE FOR WHAT\u2019S",
+    "text": "PREPARE FOR WHAT’S",
     "font": "Geist-Regular",
     "size": 200.0,
     "color": "#FFFFFF",
@@ -422,7 +422,7 @@
    },
    {
     "id": "t1",
-    "text": "PREPARE FOR WHAT\u2019S",
+    "text": "PREPARE FOR WHAT’S",
     "font": "Geist-Regular",
     "size": 185.0,
     "color": "#FFFFFF",
@@ -737,7 +737,7 @@
    },
    {
     "id": "t1",
-    "text": "PREPARE FOR WHAT\u2019S",
+    "text": "PREPARE FOR WHAT’S",
     "font": "Geist-Regular",
     "size": 185.0,
     "color": "#FFFFFF",
@@ -869,7 +869,7 @@
   "texts": [
    {
     "id": "t0",
-    "text": "LEARN WHAT WORKS. PREPARE FOR WHAT\u2019S",
+    "text": "LEARN WHAT WORKS. PREPARE FOR WHAT’S",
     "font": "Geist-Regular",
     "size": 300.0,
     "color": "#FFFFFF",
@@ -5996,7 +5996,7 @@
    },
    {
     "id": "t3",
-    "text": "The Global Content Operating System\u2122 that enables you\nto create AI-driven content using\nyour brand guidelines and campaign\nrequirements, from idea to publishing.",
+    "text": "The Global Content Operating System™ that enables you\nto create AI-driven content using\nyour brand guidelines and campaign\nrequirements, from idea to publishing.",
     "font": "Geist-Regular",
     "size": 155.01,
     "color": "#FFFFFF",
@@ -7902,7 +7902,7 @@
   "texts": [
    {
     "id": "headline",
-    "text": "STEP\nINTO\nWHAT\u2019S",
+    "text": "STEP\nINTO\nWHAT’S",
     "font": "Geist-Bold",
     "size": 329.58,
     "color": "#FFFFFF",
@@ -8818,7 +8818,7 @@
   "texts": [
    {
     "id": "headline",
-    "text": "YOU CAN\u2019T\nSPELL\nGLOBALLINK\nWITHOUT AI",
+    "text": "YOU CAN’T\nSPELL\nGLOBALLINK\nWITHOUT AI",
     "font": "Geist-Bold",
     "size": 200.0,
     "color": "#FFFFFF",
@@ -8954,6 +8954,1680 @@
   ],
   "native": {
    "version": "lift-cantspell-2026-10-09",
+   "profile": "Not named in file",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    },
+    "n2": {
+     "page": 3,
+     "kind": "vector"
+    },
+    "n3": {
+     "page": 4,
+     "kind": "vector"
+    },
+    "n4": {
+     "page": 5,
+     "kind": "vector"
+    },
+    "n5": {
+     "page": 6,
+     "kind": "vector"
+    },
+    "n6": {
+     "page": 7,
+     "kind": "vector"
+    },
+    "n7": {
+     "page": 8,
+     "kind": "vector"
+    },
+    "n8": {
+     "page": 9,
+     "kind": "vector"
+    },
+    "n9": {
+     "page": 10,
+     "kind": "vector"
+    },
+    "n10": {
+     "page": 11,
+     "kind": "vector"
+    },
+    "n11": {
+     "page": 12,
+     "kind": "vector"
+    },
+    "n12": {
+     "page": 13,
+     "kind": "vector"
+    },
+    "n13": {
+     "page": 14,
+     "kind": "vector"
+    },
+    "n14": {
+     "page": 15,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   }
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-transperfect-sflift-liftyour": {
+  "id": "divsign-transperfect-sflift-liftyour",
+  "source": "Lifts_Template_LiftYour.ai",
+  "trimW": 2988.0,
+  "trimH": 6048.0,
+  "originX": 9.0,
+  "originY": 9.0,
+  "mediaW": 3006.0,
+  "mediaH": 6066.0,
+  "texts": [
+   {
+    "id": "headline",
+    "text": "LIFT\nYOUR\nGLOBAL\nPROFILE",
+    "font": "Geist-ExtraBold",
+    "size": 298.27,
+    "color": "#FFFFFF",
+    "x": 127.56,
+    "y": 2619.2,
+    "w": 1266.18,
+    "top": 2397.9,
+    "bottom": 3521.21,
+    "cmyk": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "lead": 0.922,
+    "wrap": 1405.18,
+    "align": "left"
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 6048.0,
+    "c0": 0,
+    "c1": 6048.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 1792.94,
+      "y0": 2598.75,
+      "x1": 2702.98,
+      "y1": 4027.51
+     },
+     {
+      "id": "n1",
+      "x0": 1792.94,
+      "y0": 4122.91,
+      "x1": 2702.98,
+      "y1": 4870.75
+     },
+     {
+      "id": "n2",
+      "x0": 1796.12,
+      "y0": 1863.67,
+      "x1": 2702.98,
+      "y1": 2500.08
+     },
+     {
+      "id": "n3",
+      "x0": 117.33,
+      "y0": 207.79,
+      "x1": 1238.99,
+      "y1": 375.53
+     },
+     {
+      "id": "n4",
+      "x0": 0.0,
+      "y0": 282.31,
+      "x1": 2988.0,
+      "y1": 2552.7
+     },
+     {
+      "id": "n5",
+      "x0": 0.0,
+      "y0": 4667.14,
+      "x1": 1495.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n6",
+      "x0": 0.0,
+      "y0": 3480.36,
+      "x1": 1495.38,
+      "y1": 5026.4
+     },
+     {
+      "id": "n7",
+      "x0": 1792.94,
+      "y0": 0.0,
+      "x1": 2702.98,
+      "y1": 1676.85
+     },
+     {
+      "id": "n8",
+      "x0": 1792.94,
+      "y0": 5026.1,
+      "x1": 2702.98,
+      "y1": 6048.0
+     },
+     {
+      "id": "n9",
+      "x0": 0.0,
+      "y0": 3753.69,
+      "x1": 2988.0,
+      "y1": 6048.0
+     },
+     {
+      "id": "n10",
+      "x0": 591.79,
+      "y0": 5431.27,
+      "x1": 2279.81,
+      "y1": 6048.0
+     },
+     {
+      "id": "n11",
+      "x0": 0.0,
+      "y0": 4611.4,
+      "x1": 2050.86,
+      "y1": 6048.0
+     },
+     {
+      "id": "n12",
+      "x0": 0.0,
+      "y0": 4517.86,
+      "x1": 1663.95,
+      "y1": 6048.0
+     },
+     {
+      "id": "n13",
+      "x0": 0.0,
+      "y0": 2397.58,
+      "x1": 2808.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n14",
+      "x0": 505.94,
+      "y0": 3711.82,
+      "x1": 2660.3,
+      "y1": 5566.49
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#2B3990"
+   },
+   {
+    "offset": 1,
+    "color": "#6DCFF6"
+   }
+  ],
+  "native": {
+   "version": "sflift-2026-10-12",
+   "profile": "Not named in file",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    },
+    "n2": {
+     "page": 3,
+     "kind": "vector"
+    },
+    "n3": {
+     "page": 4,
+     "kind": "vector"
+    },
+    "n4": {
+     "page": 5,
+     "kind": "vector"
+    },
+    "n5": {
+     "page": 6,
+     "kind": "vector"
+    },
+    "n6": {
+     "page": 7,
+     "kind": "vector"
+    },
+    "n7": {
+     "page": 8,
+     "kind": "vector"
+    },
+    "n8": {
+     "page": 9,
+     "kind": "vector"
+    },
+    "n9": {
+     "page": 10,
+     "kind": "vector"
+    },
+    "n10": {
+     "page": 11,
+     "kind": "vector"
+    },
+    "n11": {
+     "page": 12,
+     "kind": "vector"
+    },
+    "n12": {
+     "page": 13,
+     "kind": "vector"
+    },
+    "n13": {
+     "page": 14,
+     "kind": "vector"
+    },
+    "n14": {
+     "page": 15,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   }
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-transperfect-sflift-nextstop": {
+  "id": "divsign-transperfect-sflift-nextstop",
+  "source": "Lifts_Template_NEXTSTOP.ai",
+  "trimW": 2988.0,
+  "trimH": 6048.0,
+  "originX": 9.0,
+  "originY": 9.0,
+  "mediaW": 3006.0,
+  "mediaH": 6066.0,
+  "texts": [
+   {
+    "id": "headline",
+    "text": "NEXT STOP:",
+    "font": "Geist-ExtraBold",
+    "size": 182.7,
+    "color": "#FFFFFF",
+    "x": 136.59,
+    "y": 2759.8,
+    "w": 1080.82,
+    "top": 2624.28,
+    "bottom": 2806.97,
+    "cmyk": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "lead": 1.0,
+    "wrap": 1219.82,
+    "align": "left"
+   },
+   {
+    "id": "t1",
+    "text": "BEYOND\nINTELLIGENCE",
+    "font": "Geist-Regular",
+    "size": 182.7,
+    "color": "#FFFFFF",
+    "x": 136.59,
+    "y": 2990.8,
+    "w": 1232.11,
+    "top": 2851.92,
+    "bottom": 3265.54,
+    "cmyk": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "lead": 1.264,
+    "wrap": 1371.11,
+    "align": "left"
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 6048.0,
+    "c0": 0,
+    "c1": 6048.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 1792.94,
+      "y0": 2598.75,
+      "x1": 2702.98,
+      "y1": 4027.51
+     },
+     {
+      "id": "n1",
+      "x0": 1792.94,
+      "y0": 4122.91,
+      "x1": 2702.98,
+      "y1": 4870.75
+     },
+     {
+      "id": "n2",
+      "x0": 1796.12,
+      "y0": 1863.67,
+      "x1": 2702.98,
+      "y1": 2500.08
+     },
+     {
+      "id": "n3",
+      "x0": 0.0,
+      "y0": 282.31,
+      "x1": 2988.0,
+      "y1": 2552.7
+     },
+     {
+      "id": "n4",
+      "x0": 0.0,
+      "y0": 4667.14,
+      "x1": 1495.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n5",
+      "x0": 0.0,
+      "y0": 3480.36,
+      "x1": 1495.38,
+      "y1": 5026.4
+     },
+     {
+      "id": "n6",
+      "x0": 1792.94,
+      "y0": 0.0,
+      "x1": 2702.98,
+      "y1": 1676.85
+     },
+     {
+      "id": "n7",
+      "x0": 1792.94,
+      "y0": 5026.1,
+      "x1": 2702.98,
+      "y1": 6048.0
+     },
+     {
+      "id": "n8",
+      "x0": 0.0,
+      "y0": 3753.69,
+      "x1": 2988.0,
+      "y1": 6048.0
+     },
+     {
+      "id": "n9",
+      "x0": 591.79,
+      "y0": 5431.27,
+      "x1": 2279.81,
+      "y1": 6048.0
+     },
+     {
+      "id": "n10",
+      "x0": 0.0,
+      "y0": 4611.4,
+      "x1": 2050.86,
+      "y1": 6048.0
+     },
+     {
+      "id": "n11",
+      "x0": 0.0,
+      "y0": 4517.86,
+      "x1": 1663.95,
+      "y1": 6048.0
+     },
+     {
+      "id": "n12",
+      "x0": 0.0,
+      "y0": 2397.58,
+      "x1": 2808.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n13",
+      "x0": 505.94,
+      "y0": 3711.82,
+      "x1": 2660.3,
+      "y1": 5566.49
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#2B3990"
+   },
+   {
+    "offset": 1,
+    "color": "#6DCFF6"
+   }
+  ],
+  "native": {
+   "version": "sflift-2026-10-12",
+   "profile": "Not named in file",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    },
+    "n2": {
+     "page": 3,
+     "kind": "vector"
+    },
+    "n3": {
+     "page": 4,
+     "kind": "vector"
+    },
+    "n4": {
+     "page": 5,
+     "kind": "vector"
+    },
+    "n5": {
+     "page": 6,
+     "kind": "vector"
+    },
+    "n6": {
+     "page": 7,
+     "kind": "vector"
+    },
+    "n7": {
+     "page": 8,
+     "kind": "vector"
+    },
+    "n8": {
+     "page": 9,
+     "kind": "vector"
+    },
+    "n9": {
+     "page": 10,
+     "kind": "vector"
+    },
+    "n10": {
+     "page": 11,
+     "kind": "vector"
+    },
+    "n11": {
+     "page": 12,
+     "kind": "vector"
+    },
+    "n12": {
+     "page": 13,
+     "kind": "vector"
+    },
+    "n13": {
+     "page": 14,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   }
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-transperfect-sflift-stepinto": {
+  "id": "divsign-transperfect-sflift-stepinto",
+  "source": "Lifts_Template_StepintoWhats.ai",
+  "trimW": 2988.0,
+  "trimH": 6048.0,
+  "originX": 9.0,
+  "originY": 9.0,
+  "mediaW": 3006.0,
+  "mediaH": 6066.0,
+  "texts": [
+   {
+    "id": "headline",
+    "text": "STEP\nINTO\nWHAT’S",
+    "font": "Geist-ExtraBold",
+    "size": 330.24,
+    "color": "#FFFFFF",
+    "x": 130.45,
+    "y": 2806.8,
+    "w": 1266.81,
+    "top": 2572.33,
+    "bottom": 3376.17,
+    "wrap": 1405.81,
+    "align": "left",
+    "lead": 0.862
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 6048.0,
+    "c0": 0,
+    "c1": 6048.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 1792.94,
+      "y0": 2598.75,
+      "x1": 2702.98,
+      "y1": 4027.51
+     },
+     {
+      "id": "n1",
+      "x0": 1792.94,
+      "y0": 4122.91,
+      "x1": 2702.98,
+      "y1": 4870.75
+     },
+     {
+      "id": "n2",
+      "x0": 1796.12,
+      "y0": 1863.67,
+      "x1": 2702.98,
+      "y1": 2500.08
+     },
+     {
+      "id": "n3",
+      "x0": 117.33,
+      "y0": 207.79,
+      "x1": 1238.99,
+      "y1": 375.53
+     },
+     {
+      "id": "n4",
+      "x0": 0.0,
+      "y0": 282.31,
+      "x1": 2988.0,
+      "y1": 2552.7
+     },
+     {
+      "id": "n5",
+      "x0": 0.0,
+      "y0": 4667.14,
+      "x1": 1495.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n6",
+      "x0": 0.0,
+      "y0": 3480.36,
+      "x1": 1495.38,
+      "y1": 5026.4
+     },
+     {
+      "id": "n7",
+      "x0": 1792.94,
+      "y0": 0.0,
+      "x1": 2702.98,
+      "y1": 1676.85
+     },
+     {
+      "id": "n8",
+      "x0": 1792.94,
+      "y0": 5026.1,
+      "x1": 2702.98,
+      "y1": 6048.0
+     },
+     {
+      "id": "n9",
+      "x0": 0.0,
+      "y0": 3753.69,
+      "x1": 2988.0,
+      "y1": 6048.0
+     },
+     {
+      "id": "n10",
+      "x0": 591.79,
+      "y0": 5431.27,
+      "x1": 2279.81,
+      "y1": 6048.0
+     },
+     {
+      "id": "n11",
+      "x0": 0.0,
+      "y0": 4611.4,
+      "x1": 2050.86,
+      "y1": 6048.0
+     },
+     {
+      "id": "n12",
+      "x0": 0.0,
+      "y0": 4517.86,
+      "x1": 1663.95,
+      "y1": 6048.0
+     },
+     {
+      "id": "n13",
+      "x0": 0.0,
+      "y0": 2397.58,
+      "x1": 2808.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n14",
+      "x0": 505.94,
+      "y0": 3711.82,
+      "x1": 2660.3,
+      "y1": 5566.49
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#2B3990"
+   },
+   {
+    "offset": 1,
+    "color": "#6DCFF6"
+   }
+  ],
+  "native": {
+   "version": "sflift-2026-10-12",
+   "profile": "Not named in file",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    },
+    "n2": {
+     "page": 3,
+     "kind": "vector"
+    },
+    "n3": {
+     "page": 4,
+     "kind": "vector"
+    },
+    "n4": {
+     "page": 5,
+     "kind": "vector"
+    },
+    "n5": {
+     "page": 6,
+     "kind": "vector"
+    },
+    "n6": {
+     "page": 7,
+     "kind": "vector"
+    },
+    "n7": {
+     "page": 8,
+     "kind": "vector"
+    },
+    "n8": {
+     "page": 9,
+     "kind": "vector"
+    },
+    "n9": {
+     "page": 10,
+     "kind": "vector"
+    },
+    "n10": {
+     "page": 11,
+     "kind": "vector"
+    },
+    "n11": {
+     "page": 12,
+     "kind": "vector"
+    },
+    "n12": {
+     "page": 13,
+     "kind": "vector"
+    },
+    "n13": {
+     "page": 14,
+     "kind": "vector"
+    },
+    "n14": {
+     "page": 15,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   }
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-transperfect-sflift-thinkbigger": {
+  "id": "divsign-transperfect-sflift-thinkbigger",
+  "source": "Lifts_Template_ThinkBigger.ai",
+  "trimW": 2988.0,
+  "trimH": 6048.0,
+  "originX": 9.0,
+  "originY": 9.0,
+  "mediaW": 3006.0,
+  "mediaH": 6066.0,
+  "texts": [
+   {
+    "id": "headline",
+    "text": "THINK\nBIGGER.\nGO FURTHER.",
+    "font": "Geist-ExtraBold",
+    "size": 197.52,
+    "color": "#FFFFFF",
+    "x": 146.65,
+    "y": 2863.39,
+    "w": 1308.28,
+    "top": 2729.19,
+    "bottom": 3282.56,
+    "wrap": 1447.28,
+    "align": "left",
+    "lead": 1.061
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 6048.0,
+    "c0": 0,
+    "c1": 6048.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 1792.94,
+      "y0": 2598.75,
+      "x1": 2702.98,
+      "y1": 4027.51
+     },
+     {
+      "id": "n1",
+      "x0": 1792.94,
+      "y0": 4122.91,
+      "x1": 2702.98,
+      "y1": 4870.75
+     },
+     {
+      "id": "n2",
+      "x0": 1796.12,
+      "y0": 1863.67,
+      "x1": 2702.98,
+      "y1": 2500.08
+     },
+     {
+      "id": "n3",
+      "x0": 117.33,
+      "y0": 207.79,
+      "x1": 1238.99,
+      "y1": 375.53
+     },
+     {
+      "id": "n4",
+      "x0": 0.0,
+      "y0": 282.31,
+      "x1": 2988.0,
+      "y1": 2552.7
+     },
+     {
+      "id": "n5",
+      "x0": 0.0,
+      "y0": 4667.14,
+      "x1": 1495.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n6",
+      "x0": 0.0,
+      "y0": 3480.36,
+      "x1": 1495.38,
+      "y1": 5026.4
+     },
+     {
+      "id": "n7",
+      "x0": 1792.94,
+      "y0": 0.0,
+      "x1": 2702.98,
+      "y1": 1676.85
+     },
+     {
+      "id": "n8",
+      "x0": 1792.94,
+      "y0": 5026.1,
+      "x1": 2702.98,
+      "y1": 6048.0
+     },
+     {
+      "id": "n9",
+      "x0": 0.0,
+      "y0": 3753.69,
+      "x1": 2988.0,
+      "y1": 6048.0
+     },
+     {
+      "id": "n10",
+      "x0": 591.79,
+      "y0": 5431.27,
+      "x1": 2279.81,
+      "y1": 6048.0
+     },
+     {
+      "id": "n11",
+      "x0": 0.0,
+      "y0": 4611.4,
+      "x1": 2050.86,
+      "y1": 6048.0
+     },
+     {
+      "id": "n12",
+      "x0": 0.0,
+      "y0": 4517.86,
+      "x1": 1663.95,
+      "y1": 6048.0
+     },
+     {
+      "id": "n13",
+      "x0": 0.0,
+      "y0": 2397.58,
+      "x1": 2808.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n14",
+      "x0": 505.94,
+      "y0": 3711.82,
+      "x1": 2660.3,
+      "y1": 5566.49
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#2B3990"
+   },
+   {
+    "offset": 1,
+    "color": "#6DCFF6"
+   }
+  ],
+  "native": {
+   "version": "sflift-2026-10-12",
+   "profile": "Not named in file",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    },
+    "n2": {
+     "page": 3,
+     "kind": "vector"
+    },
+    "n3": {
+     "page": 4,
+     "kind": "vector"
+    },
+    "n4": {
+     "page": 5,
+     "kind": "vector"
+    },
+    "n5": {
+     "page": 6,
+     "kind": "vector"
+    },
+    "n6": {
+     "page": 7,
+     "kind": "vector"
+    },
+    "n7": {
+     "page": 8,
+     "kind": "vector"
+    },
+    "n8": {
+     "page": 9,
+     "kind": "vector"
+    },
+    "n9": {
+     "page": 10,
+     "kind": "vector"
+    },
+    "n10": {
+     "page": 11,
+     "kind": "vector"
+    },
+    "n11": {
+     "page": 12,
+     "kind": "vector"
+    },
+    "n12": {
+     "page": 13,
+     "kind": "vector"
+    },
+    "n13": {
+     "page": 14,
+     "kind": "vector"
+    },
+    "n14": {
+     "page": 15,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   }
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-transperfect-sflift-elevate": {
+  "id": "divsign-transperfect-sflift-elevate",
+  "source": "Lifts_Template_elevateyour.ai",
+  "trimW": 2988.0,
+  "trimH": 6048.0,
+  "originX": 9.0,
+  "originY": 9.0,
+  "mediaW": 3006.0,
+  "mediaH": 6066.0,
+  "texts": [
+   {
+    "id": "headline",
+    "text": "ELEVATE\nYOUR\nGLOBAL\nCUSTOMER\nEXPERIENCE",
+    "font": "Geist-ExtraBold",
+    "size": 198.77,
+    "color": "#FFFFFF",
+    "x": 153.55,
+    "y": 2610.77,
+    "w": 1249.22,
+    "top": 2475.73,
+    "bottom": 3481.81,
+    "wrap": 1388.22,
+    "align": "left",
+    "lead": 1.096
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 6048.0,
+    "c0": 0,
+    "c1": 6048.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 1792.94,
+      "y0": 2598.75,
+      "x1": 2702.98,
+      "y1": 4027.51
+     },
+     {
+      "id": "n1",
+      "x0": 1792.94,
+      "y0": 4122.91,
+      "x1": 2702.98,
+      "y1": 4870.75
+     },
+     {
+      "id": "n2",
+      "x0": 1796.12,
+      "y0": 1863.67,
+      "x1": 2702.98,
+      "y1": 2500.08
+     },
+     {
+      "id": "n3",
+      "x0": 117.33,
+      "y0": 207.79,
+      "x1": 1238.99,
+      "y1": 375.53
+     },
+     {
+      "id": "n4",
+      "x0": 0.0,
+      "y0": 282.31,
+      "x1": 2988.0,
+      "y1": 2552.7
+     },
+     {
+      "id": "n5",
+      "x0": 0.0,
+      "y0": 4667.14,
+      "x1": 1495.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n6",
+      "x0": 0.0,
+      "y0": 3480.36,
+      "x1": 1495.38,
+      "y1": 5026.4
+     },
+     {
+      "id": "n7",
+      "x0": 1792.94,
+      "y0": 0.0,
+      "x1": 2702.98,
+      "y1": 1676.85
+     },
+     {
+      "id": "n8",
+      "x0": 1792.94,
+      "y0": 5026.1,
+      "x1": 2702.98,
+      "y1": 6048.0
+     },
+     {
+      "id": "n9",
+      "x0": 0.0,
+      "y0": 3753.69,
+      "x1": 2988.0,
+      "y1": 6048.0
+     },
+     {
+      "id": "n10",
+      "x0": 591.79,
+      "y0": 5431.27,
+      "x1": 2279.81,
+      "y1": 6048.0
+     },
+     {
+      "id": "n11",
+      "x0": 0.0,
+      "y0": 4611.4,
+      "x1": 2050.86,
+      "y1": 6048.0
+     },
+     {
+      "id": "n12",
+      "x0": 0.0,
+      "y0": 4517.86,
+      "x1": 1663.95,
+      "y1": 6048.0
+     },
+     {
+      "id": "n13",
+      "x0": 0.0,
+      "y0": 2397.58,
+      "x1": 2808.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n14",
+      "x0": 505.94,
+      "y0": 3711.82,
+      "x1": 2660.3,
+      "y1": 5566.49
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#2B3990"
+   },
+   {
+    "offset": 1,
+    "color": "#6DCFF6"
+   }
+  ],
+  "native": {
+   "version": "sflift-2026-10-12",
+   "profile": "Not named in file",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    },
+    "n2": {
+     "page": 3,
+     "kind": "vector"
+    },
+    "n3": {
+     "page": 4,
+     "kind": "vector"
+    },
+    "n4": {
+     "page": 5,
+     "kind": "vector"
+    },
+    "n5": {
+     "page": 6,
+     "kind": "vector"
+    },
+    "n6": {
+     "page": 7,
+     "kind": "vector"
+    },
+    "n7": {
+     "page": 8,
+     "kind": "vector"
+    },
+    "n8": {
+     "page": 9,
+     "kind": "vector"
+    },
+    "n9": {
+     "page": 10,
+     "kind": "vector"
+    },
+    "n10": {
+     "page": 11,
+     "kind": "vector"
+    },
+    "n11": {
+     "page": 12,
+     "kind": "vector"
+    },
+    "n12": {
+     "page": 13,
+     "kind": "vector"
+    },
+    "n13": {
+     "page": 14,
+     "kind": "vector"
+    },
+    "n14": {
+     "page": 15,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   }
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-transperfect-sflift-whereideas": {
+  "id": "divsign-transperfect-sflift-whereideas",
+  "source": "Lifts_Template_whereIdeas.ai",
+  "trimW": 2988.0,
+  "trimH": 6048.0,
+  "originX": 9.0,
+  "originY": 9.0,
+  "mediaW": 3006.0,
+  "mediaH": 6066.0,
+  "texts": [
+   {
+    "id": "headline",
+    "text": "WHERE\nIDEAS\nCONNECT",
+    "font": "Geist-ExtraBold",
+    "size": 266.69,
+    "color": "#FFFFFF",
+    "x": 154.61,
+    "y": 2861.91,
+    "w": 1307.05,
+    "top": 2680.72,
+    "bottom": 3325.79,
+    "wrap": 1446.05,
+    "align": "left",
+    "lead": 0.87
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 6048.0,
+    "c0": 0,
+    "c1": 6048.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 1792.94,
+      "y0": 2598.75,
+      "x1": 2702.98,
+      "y1": 4027.51
+     },
+     {
+      "id": "n1",
+      "x0": 1792.94,
+      "y0": 4122.91,
+      "x1": 2702.98,
+      "y1": 4870.75
+     },
+     {
+      "id": "n2",
+      "x0": 1796.12,
+      "y0": 1863.67,
+      "x1": 2702.98,
+      "y1": 2500.08
+     },
+     {
+      "id": "n3",
+      "x0": 117.33,
+      "y0": 207.79,
+      "x1": 1238.99,
+      "y1": 375.53
+     },
+     {
+      "id": "n4",
+      "x0": 0.0,
+      "y0": 282.31,
+      "x1": 2988.0,
+      "y1": 2552.7
+     },
+     {
+      "id": "n5",
+      "x0": 0.0,
+      "y0": 4667.14,
+      "x1": 1495.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n6",
+      "x0": 0.0,
+      "y0": 3480.36,
+      "x1": 1495.38,
+      "y1": 5026.4
+     },
+     {
+      "id": "n7",
+      "x0": 1792.94,
+      "y0": 0.0,
+      "x1": 2702.98,
+      "y1": 1676.85
+     },
+     {
+      "id": "n8",
+      "x0": 1792.94,
+      "y0": 5026.1,
+      "x1": 2702.98,
+      "y1": 6048.0
+     },
+     {
+      "id": "n9",
+      "x0": 0.0,
+      "y0": 3753.69,
+      "x1": 2988.0,
+      "y1": 6048.0
+     },
+     {
+      "id": "n10",
+      "x0": 591.79,
+      "y0": 5431.27,
+      "x1": 2279.81,
+      "y1": 6048.0
+     },
+     {
+      "id": "n11",
+      "x0": 0.0,
+      "y0": 4611.4,
+      "x1": 2050.86,
+      "y1": 6048.0
+     },
+     {
+      "id": "n12",
+      "x0": 0.0,
+      "y0": 4517.86,
+      "x1": 1663.95,
+      "y1": 6048.0
+     },
+     {
+      "id": "n13",
+      "x0": 0.0,
+      "y0": 2397.58,
+      "x1": 2808.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n14",
+      "x0": 505.94,
+      "y0": 3711.82,
+      "x1": 2660.3,
+      "y1": 5566.49
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#2B3990"
+   },
+   {
+    "offset": 1,
+    "color": "#6DCFF6"
+   }
+  ],
+  "native": {
+   "version": "sflift-2026-10-12",
+   "profile": "Not named in file",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    },
+    "n2": {
+     "page": 3,
+     "kind": "vector"
+    },
+    "n3": {
+     "page": 4,
+     "kind": "vector"
+    },
+    "n4": {
+     "page": 5,
+     "kind": "vector"
+    },
+    "n5": {
+     "page": 6,
+     "kind": "vector"
+    },
+    "n6": {
+     "page": 7,
+     "kind": "vector"
+    },
+    "n7": {
+     "page": 8,
+     "kind": "vector"
+    },
+    "n8": {
+     "page": 9,
+     "kind": "vector"
+    },
+    "n9": {
+     "page": 10,
+     "kind": "vector"
+    },
+    "n10": {
+     "page": 11,
+     "kind": "vector"
+    },
+    "n11": {
+     "page": 12,
+     "kind": "vector"
+    },
+    "n12": {
+     "page": 13,
+     "kind": "vector"
+    },
+    "n13": {
+     "page": 14,
+     "kind": "vector"
+    },
+    "n14": {
+     "page": 15,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   }
+  },
+  "sign": {
+   "margin": 72.0
+  }
+ },
+ "divsign-transperfect-sflift-cantspell": {
+  "id": "divsign-transperfect-sflift-cantspell",
+  "source": "Lifts_Template_youcantspell.ai",
+  "trimW": 2988.0,
+  "trimH": 6048.0,
+  "originX": 9.0,
+  "originY": 9.0,
+  "mediaW": 3006.0,
+  "mediaH": 6066.0,
+  "texts": [
+   {
+    "id": "headline",
+    "text": "YOU CAN’T\nSPELL\nGLOBALLINK\nWITHOUT AI",
+    "font": "Geist-ExtraBold",
+    "size": 198.77,
+    "color": "#FFFFFF",
+    "x": 163.72,
+    "y": 2714.8,
+    "w": 1265.01,
+    "top": 2573.67,
+    "bottom": 3365.8,
+    "wrap": 1404.01,
+    "align": "left",
+    "lead": 1.092
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 6048.0,
+    "c0": 0,
+    "c1": 6048.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 1792.94,
+      "y0": 2598.75,
+      "x1": 2702.98,
+      "y1": 4027.51
+     },
+     {
+      "id": "n1",
+      "x0": 1792.94,
+      "y0": 4122.91,
+      "x1": 2702.98,
+      "y1": 4870.75
+     },
+     {
+      "id": "n2",
+      "x0": 1796.12,
+      "y0": 1863.67,
+      "x1": 2702.98,
+      "y1": 2500.08
+     },
+     {
+      "id": "n3",
+      "x0": 117.33,
+      "y0": 207.79,
+      "x1": 1238.99,
+      "y1": 375.53
+     },
+     {
+      "id": "n4",
+      "x0": 0.0,
+      "y0": 282.31,
+      "x1": 2988.0,
+      "y1": 2552.7
+     },
+     {
+      "id": "n5",
+      "x0": 0.0,
+      "y0": 4667.14,
+      "x1": 1495.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n6",
+      "x0": 0.0,
+      "y0": 3480.36,
+      "x1": 1495.38,
+      "y1": 5026.4
+     },
+     {
+      "id": "n7",
+      "x0": 1792.94,
+      "y0": 0.0,
+      "x1": 2702.98,
+      "y1": 1676.85
+     },
+     {
+      "id": "n8",
+      "x0": 1792.94,
+      "y0": 5026.1,
+      "x1": 2702.98,
+      "y1": 6048.0
+     },
+     {
+      "id": "n9",
+      "x0": 0.0,
+      "y0": 3753.69,
+      "x1": 2988.0,
+      "y1": 6048.0
+     },
+     {
+      "id": "n10",
+      "x0": 591.79,
+      "y0": 5431.27,
+      "x1": 2279.81,
+      "y1": 6048.0
+     },
+     {
+      "id": "n11",
+      "x0": 0.0,
+      "y0": 4611.4,
+      "x1": 2050.86,
+      "y1": 6048.0
+     },
+     {
+      "id": "n12",
+      "x0": 0.0,
+      "y0": 4517.86,
+      "x1": 1663.95,
+      "y1": 6048.0
+     },
+     {
+      "id": "n13",
+      "x0": 0.0,
+      "y0": 2397.58,
+      "x1": 2808.38,
+      "y1": 6048.0
+     },
+     {
+      "id": "n14",
+      "x0": 505.94,
+      "y0": 3711.82,
+      "x1": 2660.3,
+      "y1": 5566.49
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#2B3990"
+   },
+   {
+    "offset": 1,
+    "color": "#6DCFF6"
+   }
+  ],
+  "native": {
+   "version": "sflift-2026-10-12",
    "profile": "Not named in file",
    "bgPage": 0,
    "parts": {
