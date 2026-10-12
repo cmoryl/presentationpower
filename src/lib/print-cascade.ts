@@ -114,9 +114,10 @@ function notesOf(item: PrintLibraryItem): string {
 }
 
 function statSlide(stats: Stat[], title: string) {
+  // Three-up is the brand-preferred proof layout; two-up only when the piece prints two figures.
   const n = stats.length >= 3 ? 3 : 2;
-  const variant = n === 4 ? "MV-PROOF-STATS-4" : n === 3 ? "MV-PROOF-STATS-3" : "MV-PROOF-STATS-2";
-  const layout = n === 4 ? "LF-10" : n === 3 ? "LF-08" : "LF-04";
+  const variant = n === 3 ? "MV-PROOF-STATS-3" : "MV-PROOF-STATS-2";
+  const layout = n === 3 ? "LF-08" : "LF-04";
   return {
     sectionId: "SF-13",
     variantId: variant,
