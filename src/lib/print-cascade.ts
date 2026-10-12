@@ -160,7 +160,7 @@ export function deckSnapshotFromPiece(item: PrintLibraryItem): DeckSnapshot {
   if (item.kind === "case-study") {
     const [ch, so, re] = blocks;
     slides.push({
-      sectionId: "SF-12",
+      sectionId: "SF-09",
       variantId: "MV-CASE-STORY",
       layoutId: "LF-03",
       mode: "light",
@@ -195,7 +195,7 @@ export function deckSnapshotFromPiece(item: PrintLibraryItem): DeckSnapshot {
   return {
     title,
     brandModeId: division,
-    archetypeId: "arch-proof-led",
+    archetypeId: "arch-product-pitch",
     context: { cascadeSource: item.id },
     brief: {
       prospect: item.kind === "case-study" ? (s(c.client) ?? "") : "",
