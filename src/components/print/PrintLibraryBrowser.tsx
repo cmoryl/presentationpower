@@ -860,6 +860,16 @@ function PrintItemCard({
           </button>
           <div className="flex items-center gap-2">
             {canEditMaster ? <EditMasterLink itemId={item.id} /> : null}
+            {!isTemplate && (item.kind === "ebrochure" || item.kind === "case-study") ? (
+              <Link
+                to="/convert"
+                search={{ print: item.id }}
+                title="Use this piece in social posts, other print sizes and a slide deck"
+                className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
+              >
+                Social &amp; slides
+              </Link>
+            ) : null}
             {isTemplate ? (
               <UseTemplateAction item={item} brand={brand} />
             ) : (

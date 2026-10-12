@@ -68,7 +68,7 @@
 # Roadmap — workspace request (Oct 12)
 - [ ] General Slides master rebuild per docs/general-slides-redesign-brief.md
 - [ ] Kiosk editor: centred multi-line blocks, designer CMYK files, SF sign-set flow (see SF kiosks)
-- [ ] Cross-surface cascading of assets/case studies/bricks (Deck, Print, Event, Social)
+- [~] Cross-surface cascading: print pieces → social, print sizes and decks done (Life Sciences tested); event surfaces + content bricks open
 - [ ] Print + Social agents: full tool-use canvas edits
 - [ ] Live voice pitch coaching — blocked on: conflicts with standing "no voice integration" rule; user must lift it
 - [ ] 22 backend security warnings + learning distillation pipeline

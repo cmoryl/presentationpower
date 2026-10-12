@@ -32,3 +32,4 @@
 
 - Every AI model id lives only in `src/lib/ai-models.ts` (AI_MODELS by area); candidates are compared with `scripts/model-bakeoff.py` before switching — why: per-file model strings had drifted behind.
 - The Master NEXT brand kit (`src/lib/next-brand-kit.ts`, `/events/next/brand-kit`, partner view `/share/next-brand-kit/$token` gated by `get_next_brand_kit_share`) is assembled from existing registries only — why: page, share view and download pack must never drift from the templates and brand guide.
+- Cross-surface cascade: curated print-library e-brochures/case studies feed social + print sizes (`/convert?print=<id>`) and slide decks only through `src/lib/print-cascade.ts`, which reads the piece's own copy/figures/hero and never adds numbers — why: one master piece, every surface, no drift or invented figures.

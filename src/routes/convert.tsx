@@ -12,7 +12,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { listMyCloudDecks, loadCloudDeck } from "@/lib/cloud-decks.functions";
 import { useSessionUser } from "@/hooks/use-session-user";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { cascadePiece, cascadePieces, contentFromLibraryPiece, deckSnapshotFromPiece } from "@/lib/print-cascade";
 import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { AssetExportMenu } from "@/components/AssetExportMenu";
@@ -48,6 +49,7 @@ const SearchSchema = z.object({
   module: z.string().optional(),
   slide: z.coerce.number().int().min(0).optional(),
   to: z.string().optional(),
+  print: z.string().optional(),
 });
 
 export const Route = createFileRoute("/convert")({
@@ -93,7 +95,7 @@ const MASTER_BRIEF: Brief = {
   clientFacts: "",
 };
 
-type SourceKind = "module" | "deck" | "manual";
+type SourceKind = "module" | "deck" | "manual" | "print";
 
 function ConvertPage() {
   const search = Route.useSearch();
@@ -127,7 +129,12 @@ function ConvertPage() {
   const [targetId, setTargetId] = useState<AdaptTargetId>(
     (ADAPT_TARGETS.find((t) => t.id === search.to)?.id as AdaptTargetId) ?? "social-card",
   );
-  const [sourceKind, setSourceKind] = useState<SourceKind>(search.deck ? "deck" : "module");
+  const [sourceKind, setSourceKind] = useState<SourceKind>(search.print ? "print" : search.deck ? "deck" : "module");
+  const navigate = useNavigate();
+  const createDeckFromSnapshot = useDeckStore((st) => st.createDeckFromSnapshot);
+  const pieces = useMemo(() => cascadePieces(), []);
+  const [pieceId, setPieceId] = useState<string>(cascadePiece(search.print)?.id ?? pieces[0]?.id ?? "");
+  const piece = cascadePiece(pieceId);
   const manual = sourceKind === "manual";
   const [moduleId, setModuleId] = useState<string>(
     search.module && MODULE_VARIANTS.some((m) => m.id === search.module) ? search.module : "MV-OP-COVER",
@@ -201,6 +208,9 @@ function ConvertPage() {
   }, [sourceKind, moduleId, moduleVariant?.familyId]);
 
   const rawSource: AdaptContent = useMemo(() => {
+    if (sourceKind === "print") {
+      return piece ? contentFromLibraryPiece(piece) : { headline: "Pick a print piece" };
+    }
     if (sourceKind === "module") {
       const fam = MODULE_FAMILIES.find((f) => f.id === moduleVariant?.familyId)?.name ?? "";
       let content: Record<string, unknown> = {};
@@ -222,7 +232,7 @@ function ConvertPage() {
       { content: slide.content, notes: slide.notes },
       byId(MODULE_VARIANTS, slide.variantId)?.name,
     );
-  }, [sourceKind, moduleId, moduleVariant, manual, slide, draft]);
+  }, [sourceKind, moduleId, moduleVariant, manual, slide, draft, piece]);
 
   // The module itself, for "Use the module as drawn".
   const drawnSource = useMemo(() => {
@@ -242,11 +252,11 @@ function ConvertPage() {
     f ? { w: f.width, h: f.height } : { w: Math.round((r.target.trimIn?.width ?? 8.268) * CSS_DPI), h: Math.round((r.target.trimIn?.height ?? 11.693) * CSS_DPI) };
 
   // A new source starts with everything included and no edits.
-  const sourceKey = sourceKind === "module" ? `m:${moduleId}` : manual ? "manual" : `d:${deckId}:${slideIndex}`;
+  const sourceKey = sourceKind === "print" ? `p:${pieceId}` : sourceKind === "module" ? `m:${moduleId}` : manual ? "manual" : `d:${deckId}:${slideIndex}`;
   useEffect(() => setSelection(EMPTY_SELECTION), [sourceKey]);
   const source = useMemo(() => applySelection(rawSource, selection), [rawSource, selection]);
 
-  const brandId = sourceKind === "module" ? moduleBrand : (deck?.brandModeId ?? BRAND_MODES[0].id);
+  const brandId = sourceKind === "print" ? (piece?.divisionId ?? BRAND_MODES[0].id) : sourceKind === "module" ? moduleBrand : (deck?.brandModeId ?? BRAND_MODES[0].id);
   const mode: "light" | "dark" = sourceKind === "deck" ? (slide?.mode ?? "light") : "light";
   const result = useMemo(() => adaptContent(source, targetId), [source, targetId]);
   const format = adaptTargetFormat(result.target);
@@ -288,11 +298,12 @@ function ConvertPage() {
               Source content
             </h2>
 
-            <div role="group" aria-label="Source" className="grid grid-cols-3 gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5">
+            <div role="group" aria-label="Source" className="grid grid-cols-4 gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5">
               {(
                 [
                   ["module", "Master module"],
                   ["deck", "Deck slide"],
+                  ["print", "Print piece"],
                   ["manual", "Type copy"],
                 ] as const
               ).map(([k, l]) => (
@@ -370,7 +381,41 @@ function ConvertPage() {
               </div>
             ) : null}
 
-            {sourceKind === "module" ? null : manual ? (
+            {sourceKind === "print" ? (
+              <div className="space-y-2">
+                <label htmlFor="print-piece" className="block text-[11px] font-medium text-[color:var(--color-muted-foreground)]">
+                  E-brochure or case study
+                </label>
+                <select
+                  id="print-piece"
+                  value={pieceId}
+                  onChange={(e) => setPieceId(e.target.value)}
+                  className="w-full rounded-lg border border-black/15 px-3 py-2 text-[13px]"
+                >
+                  {pieces.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.kind === "case-study" ? "Case study" : "E-brochure"} · {p.title}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  disabled={!piece}
+                  onClick={() => {
+                    if (!piece) return;
+                    const { deckId: id } = createDeckFromSnapshot(deckSnapshotFromPiece(piece));
+                    void navigate({ to: "/decks/$deckId", params: { deckId: id } });
+                  }}
+                  className="w-full rounded-md bg-[color:var(--color-primary)] px-3 py-2 text-[12.5px] font-semibold text-[color:var(--color-primary-foreground)] disabled:opacity-50"
+                >
+                  Make a slide deck from this piece
+                </button>
+                <p className="text-[11px] leading-snug text-[color:var(--color-muted-foreground)]">
+                  Same copy, figures and cover image as the print piece. The full text goes in the speaker notes.
+                </p>
+              </div>
+            ) : null}
+            {sourceKind === "module" || sourceKind === "print" ? null : manual ? (
               <div className="space-y-2">
                 <input
                   value={draft.eyebrow}
