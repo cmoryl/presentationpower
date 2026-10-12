@@ -8,6 +8,7 @@ import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
 import { MsaPartnershipLayout } from "@/components/print/MsaPartnershipLayout";
 import { SolutionProposalLayout } from "@/components/print/SolutionProposalLayout";
 import { MultiProposalLayout, isMultiProposal } from "@/components/print/MultiProposalLayout";
+import { OriginalPageLayout, isOriginalLayout } from "@/components/print/OriginalPageLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import type {
   AdaptorBriefContent,
@@ -43,6 +44,8 @@ export function PrintKindPreview({
 }) {
   const shared = { brand, mode, pageSize, density } as const;
   if (!content) return null;
+  if (isOriginalLayout(content))
+    return <OriginalPageLayout layout={content.original} {...(typeof pageIndex === "number" ? { pageIndex } : {})} />;
   if (kind === "spotlight")
     return <SpotlightLayout content={content as SpotlightContent} {...shared} />;
   if (kind === "ebrochure")

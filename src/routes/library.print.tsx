@@ -42,6 +42,7 @@ import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
 import { MsaPartnershipLayout } from "@/components/print/MsaPartnershipLayout";
 import { SolutionProposalLayout } from "@/components/print/SolutionProposalLayout";
 import { MultiProposalLayout, isMultiProposal } from "@/components/print/MultiProposalLayout";
+import { OriginalPageLayout, isOriginalLayout } from "@/components/print/OriginalPageLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import {
   type SpotlightContent,
@@ -353,6 +354,8 @@ function renderPrintByKind(
   /** Multi-page documents: render only this page (card art renders page 1). */
   pageIndex?: number,
 ): React.ReactElement | null {
+  if (isOriginalLayout(content))
+    return <OriginalPageLayout layout={content.original} {...(typeof pageIndex === "number" ? { pageIndex } : {})} />;
   if (kind === "spotlight")
     return (
       <SpotlightLayout
