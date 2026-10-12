@@ -117,3 +117,39 @@ export async function signOutAndRedirect(options: SignOutOptions = {}): Promise<
 export function handleExpiredSession(next?: string | null): void {
   void signOutAndRedirect({ reason: "expired", next });
 }
+
+/**
+ * True only when the visitor is still signed out after a short grace period.
+ * In the editor preview the session is read through the editor window and can
+ * arrive late; redirecting on the first empty read sent signed-in people to
+ * the sign-in page, which sent them straight back — a reload loop.
+ */
+export async function confirmSignedOut(): Promise<boolean> {
+  for (const wait of [0, 700, 1500]) {
+    if (wait) await new Promise((r) => setTimeout(r, wait));
+    const { data } = await supabase.auth.getSession();
+    if (data.session) return false;
+  }
+  return true;
+}
+
+const BOUNCE_KEY = "tp.authBounces";
+/**
+ * Records a sign-in page → protected page hand-off. Returns false when that has
+ * happened 3+ times in 20 s, so the sign-in page stops bouncing and shows the
+ * form instead of looping.
+ */
+export function allowAuthBounce(): boolean {
+  try {
+    const now = Date.now();
+    const list = (JSON.parse(sessionStorage.getItem(BOUNCE_KEY) ?? "[]") as number[]).filter(
+      (t) => now - t < 20_000,
+    );
+    if (list.length >= 3) return false;
+    list.push(now);
+    sessionStorage.setItem(BOUNCE_KEY, JSON.stringify(list));
+    return true;
+  } catch {
+    return true;
+  }
+}

@@ -214,7 +214,14 @@ export function RequireAdmin({ children }: { children: React.ReactNode }) {
     };
   }, []);
   useEffect(() => {
-    if (state === "anon") window.location.replace(loginUrl());
+    if (state !== "anon") return;
+    let live = true;
+    void confirmSignedOut().then((out) => {
+      if (live && out) window.location.replace(loginUrl());
+    });
+    return () => {
+      live = false;
+    };
   }, [state]);
   if (state === "admin") return <>{children}</>;
   return (

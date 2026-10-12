@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { loginUrl } from "@/lib/sign-out";
+import { confirmSignedOut, loginUrl } from "@/lib/sign-out";
 
 export type SignInStatus = "checking" | "signed-in" | "signed-out";
 
@@ -9,9 +8,9 @@ export function useRequireSignIn(): SignInStatus {
   const [status, setStatus] = useState<SignInStatus>("checking");
   useEffect(() => {
     let live = true;
-    supabase.auth.getSession().then(({ data }) => {
+    void confirmSignedOut().then((out) => {
       if (!live) return;
-      if (data.session) setStatus("signed-in");
+      if (!out) setStatus("signed-in");
       else {
         setStatus("signed-out");
         window.setTimeout(() => window.location.replace(loginUrl()), 350);

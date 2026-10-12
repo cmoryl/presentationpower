@@ -63,7 +63,10 @@ function AdminGate() {
   }
 
   if (state === "anon") {
-    if (typeof window !== "undefined") window.location.replace("/auth");
+    if (typeof window !== "undefined")
+      void confirmSignedOut().then((out) => {
+        if (out) window.location.replace(loginUrl());
+      });
     return (
       <AppShell>
         <AdminForbidden message="Redirecting to sign in…" />

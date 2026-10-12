@@ -241,8 +241,8 @@ function RootComponent() {
   useEffect(() => {
     if (!requiresSignInPath(pathname)) return;
     let live = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (live && !data.session) window.location.replace(loginUrl());
+    void confirmSignedOut().then((out) => {
+      if (live && out) window.location.replace(loginUrl());
     });
     return () => { live = false; };
   }, [pathname]);
