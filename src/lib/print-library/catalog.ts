@@ -170,6 +170,10 @@ export type PrintLibraryItem = {
   content?: Record<string, unknown>;
   /** Master-admin look & feel pinned on this entry (see print-library/look.ts). */
   look?: PrintLibraryLook;
+  /** Company / sub-brand tag (else read from the entry's names — item-tags.ts). */
+  company?: string;
+  /** Product family tag (else read from the entry's names — item-tags.ts). */
+  product?: string;
 };
 
 const TEMPLATE_ITEMS: PrintLibraryItem[] = PRINT_TYPES.map((t) => ({

@@ -9,7 +9,7 @@
 {
 "x": 0.4418,
 "y": 0.3353,
-"w": 2.7878,
+"w": 3.0567,
 "h": 0.3099,
 "size": 17.2,
 "weight": 400,
@@ -23,7 +23,7 @@
 {
 "x": 2.4409,
 "y": 3.02,
-"w": 1.7881,
+"w": 1.9815,
 "h": 1.4868,
 "size": 8.5,
 "weight": 400,
@@ -31,13 +31,105 @@
 "lead": 1.412,
 "align": "left",
 "text": "• Website Localization\n• Digital Accessibility\n• Multilingual Virtual Assistants\n• Multicultural Apps\n• Global Multimedia\n• Content Management\n• Niche Digital Ads\n• Global SEO/SEM\n• Social Listening & Monitoring",
+"runs": [
+{
+"text": "• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Website Localization",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Digital Accessibility",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Multilingual Virtual Assistants",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Multicultural Apps",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Global Multimedia",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Content Management",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Niche Digital Ads",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Global SEO/SEM",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Social Listening & Monitoring",
+"color": "#03002C",
+"weight": 400
+}
+],
 "id": "t1",
 "family": "geist"
 },
 {
 "x": 5.3334,
 "y": 3.3535,
-"w": 2.0081,
+"w": 2.2181,
 "h": 0.82,
 "size": 8.5,
 "weight": 400,
@@ -45,13 +137,65 @@
 "lead": 1.412,
 "align": "left",
 "text": "• Multilingual Collateral\n• Patient-Facing Education\n• Site-Specific Information\n• Multilingual Broadcast/Radio Ads\n• Localized Signage",
+"runs": [
+{
+"text": "• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Multilingual Collateral",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Patient-Facing Education",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Site-Specific Information",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Multilingual Broadcast/Radio Ads",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Localized Signage",
+"color": "#03002C",
+"weight": 400
+}
+],
 "id": "t2",
 "family": "geist"
 },
 {
 "x": 2.4409,
 "y": 4.8299,
-"w": 1.83,
+"w": 2.0266,
 "h": 1.4729,
 "size": 8.5,
 "weight": 400,
@@ -59,13 +203,95 @@
 "lead": 1.397,
 "align": "left",
 "text": "• Translated Questionnaires for\nPre-screeners\n• App Localization\n• Over-the-Phone Interpretation\n• Video E-Consent\n• Subtitling\n• Closed Captioning\n• Multilingual Chatbots\n• Localized Drug Info",
+"runs": [
+{
+"text": "• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Translated Questionnaires for\nPre-screeners",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "App Localization",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Over-the-Phone Interpretation",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Video E-Consent",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Subtitling",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Closed Captioning",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Multilingual Chatbots",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Localized Drug Info",
+"color": "#03002C",
+"weight": 400
+}
+],
 "id": "t3",
 "family": "geist"
 },
 {
 "x": 5.3334,
 "y": 5.2389,
-"w": 2.1301,
+"w": 2.3493,
 "h": 0.6533,
 "size": 8.5,
 "weight": 400,
@@ -73,13 +299,55 @@
 "lead": 1.412,
 "align": "left",
 "text": "• On-Site Interpreters\n• Sign Language\n• Braille\n• Translated Patient-Facing Collateral",
+"runs": [
+{
+"text": "• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "On-Site Interpreters",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Sign Language",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Braille",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Translated Patient-Facing Collateral",
+"color": "#03002C",
+"weight": 400
+}
+],
 "id": "t4",
 "family": "geist"
 },
 {
 "x": 2.4409,
 "y": 6.7155,
-"w": 1.9661,
+"w": 2.173,
 "h": 1.3062,
 "size": 8.5,
 "weight": 400,
@@ -87,13 +355,85 @@
 "lead": 1.395,
 "align": "left",
 "text": "• Continuous App Localization\n• eCOA Solutions\n• Social Media Monitoring\n• Call Center Solutions\n• Custom Crowd-Based Testing\n• Translated Appointment Cards &\nPatient Diaries\n• Content Consistency & Reuse",
+"runs": [
+{
+"text": "• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Continuous App Localization",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "eCOA Solutions",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Social Media Monitoring",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Call Center Solutions",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Custom Crowd-Based Testing",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Translated Appointment Cards &\nPatient Diaries",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Content Consistency & Reuse",
+"color": "#03002C",
+"weight": 400
+}
+],
 "id": "t5",
 "family": "geist"
 },
 {
 "x": 5.3334,
 "y": 6.64,
-"w": 2.0869,
+"w": 2.3029,
 "h": 1.4589,
 "size": 8.5,
 "weight": 400,
@@ -101,13 +441,75 @@
 "lead": 1.383,
 "align": "left",
 "text": "• Language Proficiency Testing for\nNurses/Physicians\n• Alternative Format Requests\n• Print Collateral & Trial Site Displays\n• Translated Appointment Cards &\nPatient Diaries\n• Interpreters for Site or Home Visits\n• Study Updates to Patient-Facing\n\t Information & Collateral",
+"runs": [
+{
+"text": "• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Language Proficiency Testing for\nNurses/Physicians",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Alternative Format Requests",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Print Collateral & Trial Site Displays",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Translated Appointment Cards &\nPatient Diaries",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Interpreters for Site or Home Visits",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Study Updates to Patient-Facing\n\t Information & Collateral",
+"color": "#03002C",
+"weight": 400
+}
+],
 "id": "t6",
 "family": "geist"
 },
 {
 "x": 2.4409,
 "y": 8.6764,
-"w": 1.7697,
+"w": 1.9617,
 "h": 0.9867,
 "size": 8.5,
 "weight": 400,
@@ -115,13 +517,75 @@
 "lead": 1.412,
 "align": "left",
 "text": "• Patient Survey Translation\n• Localized AEs & SAEs\n• Literature & Media Monitoring\n• Localized Pharmacovigilance\n• Social Listening & Monitoring\n• Digital Automation",
+"runs": [
+{
+"text": "• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Patient Survey Translation",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Localized AEs & SAEs",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Literature & Media Monitoring",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Localized Pharmacovigilance",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Social Listening & Monitoring",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#003FC7",
+"weight": 400
+},
+{
+"text": "Digital Automation",
+"color": "#03002C",
+"weight": 400
+}
+],
 "id": "t7",
 "family": "geist"
 },
 {
 "x": 5.3334,
 "y": 8.8525,
-"w": 2.291,
+"w": 2.5224,
 "h": 0.6394,
 "size": 8.5,
 "weight": 400,
@@ -129,13 +593,45 @@
 "lead": 1.373,
 "align": "left",
 "text": "• On-Site & Over-the-Phone Interpreters\n• Focus Groups\n• Translated Physician Forms &\nMedical Information",
+"runs": [
+{
+"text": "• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "On-Site & Over-the-Phone Interpreters",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Focus Groups",
+"color": "#03002C",
+"weight": 400
+},
+{
+"text": "\n• ",
+"color": "#C2A3FF",
+"weight": 400
+},
+{
+"text": "Translated Physician Forms &\nMedical Information",
+"color": "#03002C",
+"weight": 400
+}
+],
 "id": "t8",
 "family": "geist"
 },
 {
 "x": 0.4418,
 "y": 0.6712,
-"w": 4.226,
+"w": 4.6034,
 "h": 0.9244,
 "size": 26.0,
 "weight": 700,
@@ -149,7 +645,7 @@
 {
 "x": 2.4337,
 "y": 2.5836,
-"w": 1.6804,
+"w": 1.8657,
 "h": 0.2953,
 "size": 16.0,
 "weight": 700,
@@ -163,7 +659,7 @@
 {
 "x": 5.3333,
 "y": 2.5836,
-"w": 2.2208,
+"w": 2.4469,
 "h": 0.2953,
 "size": 16.0,
 "weight": 700,
@@ -177,7 +673,7 @@
 {
 "x": 0.4418,
 "y": 1.6316,
-"w": 5.9778,
+"w": 6.4874,
 "h": 0.5414,
 "size": 10.0,
 "weight": 400,
@@ -191,7 +687,7 @@
 {
 "x": 0.6453,
 "y": 3.7201,
-"w": 1.2311,
+"w": 1.3825,
 "h": 0.2584,
 "size": 14.0,
 "weight": 700,
@@ -199,13 +695,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "Connecting",
+"runs": [
+{
+"text": "Connecting",
+"color": "#03002C",
+"weight": 700
+},
+{
+"text": "",
+"color": "#8C52FF",
+"weight": 700
+}
+],
 "id": "t13",
 "family": "geist"
 },
 {
 "x": 0.6453,
 "y": 3.9548,
-"w": 1.1536,
+"w": 1.2992,
 "h": 0.4884,
 "size": 14.0,
 "weight": 400,
@@ -219,7 +727,7 @@
 {
 "x": 0.6453,
 "y": 5.5267,
-"w": 1.1491,
+"w": 1.2943,
 "h": 0.2584,
 "size": 14.0,
 "weight": 700,
@@ -233,7 +741,7 @@
 {
 "x": 0.6453,
 "y": 5.7627,
-"w": 0.7882,
+"w": 0.9062,
 "h": 0.2524,
 "size": 14.0,
 "weight": 400,
@@ -247,7 +755,7 @@
 {
 "x": 0.6453,
 "y": 7.3286,
-"w": 0.9005,
+"w": 1.027,
 "h": 0.2584,
 "size": 14.0,
 "weight": 700,
@@ -261,7 +769,7 @@
 {
 "x": 0.6453,
 "y": 7.5633,
-"w": 0.9199,
+"w": 1.0478,
 "h": 0.4884,
 "size": 14.0,
 "weight": 400,
@@ -275,7 +783,7 @@
 {
 "x": 0.6453,
 "y": 9.1303,
-"w": 1.034,
+"w": 1.1706,
 "h": 0.2584,
 "size": 14.0,
 "weight": 700,
@@ -289,7 +797,7 @@
 {
 "x": 0.6453,
 "y": 9.365,
-"w": 1.1377,
+"w": 1.2821,
 "h": 0.4884,
 "size": 14.0,
 "weight": 400,
@@ -302,22 +810,36 @@
 },
 {
 "x": 4.258,
-"y": 10.6472,
-"w": 4.0076,
+"y": 10.6222,
+"w": 1.9888,
 "h": 0.1622,
 "size": 9.0,
 "weight": 400,
 "color": "#03002C",
-"lead": 0.8,
+"lead": 1.2,
 "align": "left",
-"text": "lifesciences.transperfect.com\nlifesciences@transperfect.com",
+"text": "lifesciences.transperfect.com",
 "id": "t21",
+"family": "geist"
+},
+{
+"x": 6.2574,
+"y": 10.6222,
+"w": 2.0892,
+"h": 0.1622,
+"size": 9.0,
+"weight": 400,
+"color": "#03002C",
+"lead": 1.2,
+"align": "left",
+"text": "lifesciences@transperfect.com",
+"id": "t22",
 "family": "geist"
 },
 {
 "x": 4.0519,
 "y": 10.403,
-"w": 1.6316,
+"w": 1.8133,
 "h": 0.1861,
 "size": 10.0,
 "weight": 800,
@@ -325,7 +847,7 @@
 "lead": 1.2,
 "align": "left",
 "text": "Engage Your Patients:",
-"id": "t22",
+"id": "t23",
 "family": "geist"
 }
 ]
@@ -342,7 +864,7 @@
 {
 "x": 0.5,
 "y": 0.3558,
-"w": 3.8551,
+"w": 4.2045,
 "h": 0.9133,
 "size": 26.0,
 "weight": 700,
@@ -356,7 +878,7 @@
 {
 "x": 5.5971,
 "y": 10.3986,
-"w": 1.4259,
+"w": 1.592,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -370,7 +892,7 @@
 {
 "x": 5.5971,
 "y": 10.6349,
-"w": 1.4797,
+"w": 1.6498,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -384,7 +906,7 @@
 {
 "x": 1.2888,
 "y": 2.3539,
-"w": 3.3383,
+"w": 3.6487,
 "h": 0.24,
 "size": 13.0,
 "weight": 700,
@@ -398,7 +920,7 @@
 {
 "x": 1.2888,
 "y": 2.65,
-"w": 7.1723,
+"w": 7.7721,
 "h": 0.6621,
 "size": 9.0,
 "weight": 400,
@@ -406,13 +928,30 @@
 "lead": 1.333,
 "align": "left",
 "text": "A global diagnostics manufacturer came to us with a problem. They were late in identifying a pattern in their complaint\ndata because adverse event reports, clustered in three European markets, had all the right signals but were buried\nacross languages, formats, and disconnected systems. They were adding staff and investing in tools but still struggled\nto harness all the intelligence needed to stay ahead of regulatory requirements.",
+"runs": [
+{
+"text": "A global diagnostics manufacturer came to us with a problem. They were late in identifying a pattern in their complaint\ndata because ",
+"color": "#003B71",
+"weight": 400
+},
+{
+"text": "adverse event reports",
+"color": "#003B71",
+"weight": 700
+},
+{
+"text": ", clustered in three European markets, had all the right signals but were buried\nacross languages, formats, and disconnected systems. They were adding staff and investing in tools but still struggled\nto harness all the intelligence needed to stay ahead of regulatory requirements.",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t4",
 "family": "geist"
 },
 {
 "x": 1.2888,
 "y": 3.3944,
-"w": 3.8414,
+"w": 4.1898,
 "h": 0.1649,
 "size": 9.0,
 "weight": 600,
@@ -426,7 +965,7 @@
 {
 "x": 1.2888,
 "y": 3.6222,
-"w": 7.1212,
+"w": 7.7171,
 "h": 0.4955,
 "size": 9.0,
 "weight": 400,
@@ -440,7 +979,7 @@
 {
 "x": 1.2888,
 "y": 4.4317,
-"w": 3.8589,
+"w": 4.2086,
 "h": 0.24,
 "size": 13.0,
 "weight": 700,
@@ -454,7 +993,7 @@
 {
 "x": 1.2888,
 "y": 4.7278,
-"w": 7.1494,
+"w": 7.7474,
 "h": 0.9976,
 "size": 9.0,
 "weight": 400,
@@ -462,13 +1001,40 @@
 "lead": 1.333,
 "align": "left",
 "text": "TransPerfect Medical Device exists at this intersection, combining our ISO 13485, 14971, 9001, 18587, and 17100\ncertiﬁed quality and risk management systems with AI-enabled workﬂows and technology development to reduce\ncompliance costs through automation without sacriﬁcing quality. We’re a technical, tactical execution partner with the\nexpertise to transform your global clinical and regulatory data into a competitive advantage across your existing\nplatforms and repositories. We focus on the organization, connectivity, traceability, and actioning of global content\nthat scales your team’s productivity with quality instead of risk.",
+"runs": [
+{
+"text": "TransPerfect Medical Device exists at this intersection, combining our ",
+"color": "#003B71",
+"weight": 400
+},
+{
+"text": "ISO 13485, 14971, 9001, 18587, and 17100",
+"color": "#003B71",
+"weight": 700
+},
+{
+"text": "\ncertiﬁed quality and risk management systems with ",
+"color": "#003B71",
+"weight": 400
+},
+{
+"text": "AI-enabled workﬂows",
+"color": "#003B71",
+"weight": 700
+},
+{
+"text": " and technology development to reduce\ncompliance costs through automation without sacriﬁcing quality. We’re a technical, tactical execution partner with the\nexpertise to transform your global clinical and regulatory data into a competitive advantage across your existing\nplatforms and repositories. We focus on the organization, connectivity, traceability, and actioning of global content\nthat scales your team’s productivity with quality instead of risk.",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t8",
 "family": "geist"
 },
 {
 "x": 1.2888,
 "y": 6.0372,
-"w": 2.4923,
+"w": 2.7389,
 "h": 0.24,
 "size": 13.0,
 "weight": 700,
@@ -482,7 +1048,7 @@
 {
 "x": 1.2888,
 "y": 6.3334,
-"w": 6.9542,
+"w": 7.5376,
 "h": 0.9993,
 "size": 9.0,
 "weight": 400,
@@ -490,41 +1056,76 @@
 "lead": 1.333,
 "align": "left",
 "text": "When your literature monitoring system surfaces a safety signal in a Japanese publication, the AI-powered\nscreening automation we’ve co-developed ensures you see it in days, not months. When your PMCF protocol\nrequires patient surveys across 15 countries, our linguistic validation specialists ensure those Clinical Outcome\nAssessments capture genuine patient experience instead of translation artifacts that skew your data. When a Field\nSafety Notice needs simultaneous distribution across the EU, our teams handle the editing, translation, and\ndeployment while your vigilance leaders focus on the clinical decisions that matter.",
+"runs": [
+{
+"text": "When your literature monitoring system surfaces a safety signal in a Japanese publication, the ",
+"color": "#003B71",
+"weight": 400
+},
+{
+"text": "AI-powered\nscreening automation",
+"color": "#003B71",
+"weight": 700
+},
+{
+"text": " we’ve co-developed ensures you see it in days, not months. When your PMCF protocol\nrequires patient surveys across ",
+"color": "#003B71",
+"weight": 400
+},
+{
+"text": "15 countries",
+"color": "#003B71",
+"weight": 700
+},
+{
+"text": ", our linguistic validation specialists ensure those Clinical Outcome\nAssessments capture genuine patient experience instead of translation artifacts that skew your data. When a Field\nSafety Notice needs simultaneous distribution across the EU, our teams handle the editing, translation, and\ndeployment while your vigilance leaders focus on the ",
+"color": "#003B71",
+"weight": 400
+},
+{
+"text": "clinical decisions that matter",
+"color": "#003B71",
+"weight": 700
+},
+{
+"text": ".",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t10",
 "family": "geist"
 },
 {
 "x": 1.0622,
 "y": 8.0716,
-"w": 1.3367,
-"h": 0.24,
-"size": 13.0,
-"weight": 700,
-"color": "#003B71",
-"lead": 1.2,
-"align": "left",
-"text": "TransPerfect:",
-"id": "t11",
-"family": "geist"
-},
-{
-"x": 1.0622,
-"y": 8.2882,
-"w": 5.1555,
-"h": 0.24,
+"w": 5.6031,
+"h": 0.4566,
 "size": 13.0,
 "weight": 700,
 "color": "#139DD8",
 "lead": 1.2,
 "align": "left",
-"text": "The Services and Infrastructure Behind Transformation",
-"id": "t12",
+"text": "TransPerfect:\nThe Services and Infrastructure Behind Transformation",
+"runs": [
+{
+"text": "TransPerfect:",
+"color": "#003B71",
+"weight": 700
+},
+{
+"text": "\nThe Services and Infrastructure Behind Transformation",
+"color": "#139DD8",
+"weight": 700
+}
+],
+"id": "t11",
 "family": "geist"
 },
 {
 "x": 1.0622,
 "y": 8.6121,
-"w": 6.7474,
+"w": 7.3151,
 "h": 0.6637,
 "size": 9.0,
 "weight": 400,
@@ -532,13 +1133,35 @@
 "lead": 1.333,
 "align": "left",
 "text": "TransPerfect leads with compliance to deliver the services, technology, AI enablement, and specialists to build\nstronger content programs and systems. We can leverage your existing enterprise systems through open APIs\nand 70+ connectors and incorporate your chosen AI models. Our comprehensive global infrastructure includes\nmultilingual contact centers, testing and validation hubs, a data annotation and labeling division, 50,000",
-"id": "t13",
+"runs": [
+{
+"text": "TransPerfect leads with compliance to deliver the services, technology, AI enablement, and specialists to build\nstronger content programs and systems. We can leverage your existing enterprise systems through open APIs\nand ",
+"color": "#003B71",
+"weight": 400
+},
+{
+"text": "70+ connectors",
+"color": "#003B71",
+"weight": 700
+},
+{
+"text": " and incorporate your chosen AI models. Our comprehensive global infrastructure includes\nmultilingual contact centers, testing and validation hubs, a data annotation and labeling division, ",
+"color": "#003B71",
+"weight": 400
+},
+{
+"text": "50,000",
+"color": "#003B71",
+"weight": 700
+}
+],
+"id": "t12",
 "family": "geist"
 },
 {
 "x": 1.0622,
 "y": 9.2869,
-"w": 6.3846,
+"w": 6.9249,
 "h": 0.1661,
 "size": 9.0,
 "weight": 700,
@@ -546,13 +1169,30 @@
 "lead": 1.2,
 "align": "left",
 "text": "rigorously screened SMEs ready for deployment, and the world’s largest certiﬁed language services",
-"id": "t14",
+"runs": [
+{
+"text": "rigorously screened SMEs",
+"color": "#003B71",
+"weight": 700
+},
+{
+"text": " ready for deployment, and the ",
+"color": "#003B71",
+"weight": 400
+},
+{
+"text": "world’s largest certiﬁed language services",
+"color": "#003B71",
+"weight": 700
+}
+],
+"id": "t13",
 "family": "geist"
 },
 {
 "x": 1.0622,
 "y": 9.4453,
-"w": 6.4131,
+"w": 6.9556,
 "h": 0.3311,
 "size": 9.0,
 "weight": 400,
@@ -560,7 +1200,19 @@
 "lead": 1.333,
 "align": "left",
 "text": "provider. TransPerfect is the partner you need to scale global content with the compliance and precision\nyou demand.",
-"id": "t15",
+"runs": [
+{
+"text": "provider",
+"color": "#003B71",
+"weight": 700
+},
+{
+"text": ". TransPerfect is the partner you need to scale global content with the compliance and precision\nyou demand.",
+"color": "#003B71",
+"weight": 400
+}
+],
+"id": "t14",
 "family": "geist"
 }
 ]
@@ -571,7 +1223,7 @@
 {
 "x": 5.5971,
 "y": 10.3986,
-"w": 1.4259,
+"w": 1.592,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -585,7 +1237,7 @@
 {
 "x": 5.5971,
 "y": 10.6349,
-"w": 1.4797,
+"w": 1.6498,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -599,7 +1251,7 @@
 {
 "x": 0.5145,
 "y": 3.9307,
-"w": 4.2911,
+"w": 4.6735,
 "h": 0.24,
 "size": 13.0,
 "weight": 700,
@@ -613,7 +1265,7 @@
 {
 "x": 0.7013,
 "y": 4.8106,
-"w": 1.4564,
+"w": 1.6248,
 "h": 0.342,
 "size": 9.5,
 "weight": 700,
@@ -627,7 +1279,7 @@
 {
 "x": 0.7013,
 "y": 6.1146,
-"w": 1.4217,
+"w": 1.5875,
 "h": 0.342,
 "size": 9.5,
 "weight": 700,
@@ -641,7 +1293,7 @@
 {
 "x": 0.7013,
 "y": 6.8727,
-"w": 1.28,
+"w": 1.4351,
 "h": 0.1754,
 "size": 9.5,
 "weight": 700,
@@ -655,7 +1307,7 @@
 {
 "x": 0.7013,
 "y": 8.1144,
-"w": 1.3095,
+"w": 1.4669,
 "h": 0.342,
 "size": 9.5,
 "weight": 700,
@@ -669,7 +1321,7 @@
 {
 "x": 0.7013,
 "y": 9.1141,
-"w": 1.6191,
+"w": 1.7998,
 "h": 0.342,
 "size": 9.5,
 "weight": 700,
@@ -682,22 +1334,50 @@
 },
 {
 "x": 2.5328,
-"y": 4.4392,
-"w": 5.5543,
+"y": 4.4128,
+"w": 0.7922,
 "h": 0.1754,
 "size": 9.5,
 "weight": 700,
 "color": "#FFFFFF",
-"lead": 0.8,
+"lead": 1.2,
 "align": "left",
-"text": "Programs\nTechnology, AI\nManaged Staffing, SMEs",
+"text": "Programs",
 "id": "t8",
+"family": "geist"
+},
+{
+"x": 4.3683,
+"y": 4.4128,
+"w": 1.1385,
+"h": 0.1754,
+"size": 9.5,
+"weight": 700,
+"color": "#FFFFFF",
+"lead": 1.2,
+"align": "left",
+"text": "Technology, AI",
+"id": "t9",
+"family": "geist"
+},
+{
+"x": 6.1758,
+"y": 4.4128,
+"w": 1.879,
+"h": 0.1754,
+"size": 9.5,
+"weight": 700,
+"color": "#FFFFFF",
+"lead": 1.2,
+"align": "left",
+"text": "Managed Staffing, SMEs",
+"id": "t10",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 4.8397,
-"w": 1.5874,
+"w": 1.7657,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -705,13 +1385,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Certiﬁed Clinical Translation",
-"id": "t9",
+"id": "t11",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 5.0147,
-"w": 1.1615,
+"w": 1.3077,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -719,13 +1399,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Linguistic Validation",
-"id": "t10",
+"id": "t12",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 5.1897,
-"w": 1.4832,
+"w": 1.6536,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -733,13 +1413,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Digital Health Localization",
-"id": "t11",
+"id": "t13",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 5.3647,
-"w": 0.7596,
+"w": 0.8755,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -747,13 +1427,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Accessibility",
-"id": "t12",
+"id": "t14",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 5.5397,
-"w": 0.8135,
+"w": 0.9334,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -761,13 +1441,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Interpretation",
-"id": "t13",
+"id": "t15",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 4.8397,
-"w": 1.265,
+"w": 1.419,
 "h": 0.2776,
 "size": 8.0,
 "weight": 400,
@@ -775,13 +1455,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Registry Automation,\nUpdates",
-"id": "t14",
+"id": "t16",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 5.148,
-"w": 1.0837,
+"w": 1.224,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -789,13 +1469,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Translation AI COE",
-"id": "t15",
+"id": "t17",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 5.323,
-"w": 1.247,
+"w": 1.3996,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -803,13 +1483,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Workﬂow Automation",
-"id": "t16",
+"id": "t18",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 5.498,
-"w": 1.323,
+"w": 1.4813,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -817,13 +1497,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• eClinical, AI Integration",
-"id": "t17",
+"id": "t19",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 4.8397,
-"w": 1.7307,
+"w": 1.9198,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -831,13 +1511,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Content Architecture, Mapping",
-"id": "t18",
+"id": "t20",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 5.0147,
-"w": 1.6659,
+"w": 1.8502,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -845,13 +1525,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Patient Engagement, Support",
-"id": "t19",
+"id": "t21",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 5.1897,
-"w": 1.2403,
+"w": 1.3924,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -859,13 +1539,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• eCOA/ePRO Strategy",
-"id": "t20",
+"id": "t22",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 5.3647,
-"w": 1.484,
+"w": 1.6545,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -873,13 +1553,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Medical Records Retrieval",
-"id": "t21",
+"id": "t23",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 5.5397,
-"w": 1.5432,
+"w": 1.7182,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -887,13 +1567,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Language Access Planning",
-"id": "t22",
+"id": "t24",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 5.7147,
-"w": 1.6839,
+"w": 1.8695,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -901,27 +1581,41 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Registry Automation, Updates",
-"id": "t23",
+"id": "t25",
 "family": "geist"
 },
 {
 "x": 2.5251,
-"y": 6.1866,
-"w": 2.9677,
+"y": 6.1643,
+"w": 1.6697,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
 "color": "#003B71",
-"lead": 0.8,
+"lead": 1.2,
 "align": "left",
-"text": "• On-Demand AI Translation\n• CCMS Integration",
-"id": "t24",
+"text": "• On-Demand AI Translation",
+"id": "t26",
+"family": "geist"
+},
+{
+"x": 4.3443,
+"y": 6.1643,
+"w": 1.1763,
+"h": 0.1442,
+"size": 8.0,
+"weight": 400,
+"color": "#003B71",
+"lead": 1.2,
+"align": "left",
+"text": "• CCMS Integration",
+"id": "t27",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 6.3393,
-"w": 1.4357,
+"w": 1.6025,
 "h": 0.2776,
 "size": 8.0,
 "weight": 400,
@@ -929,13 +1623,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• CER, Report Automation,\nAI-Assist",
-"id": "t25",
+"id": "t28",
 "family": "geist"
 },
 {
 "x": 6.1634,
 "y": 6.1643,
-"w": 1.5735,
+"w": 1.7507,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -943,13 +1637,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• AI/Automation Assessment",
-"id": "t26",
+"id": "t29",
 "family": "geist"
 },
 {
 "x": 6.1634,
 "y": 6.3393,
-"w": 1.4815,
+"w": 1.6518,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -957,13 +1651,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Technical, Medical Writers",
-"id": "t27",
+"id": "t30",
 "family": "geist"
 },
 {
 "x": 2.525,
 "y": 6.8844,
-"w": 0.9958,
+"w": 1.1294,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -971,13 +1665,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Complaint Triage",
-"id": "t28",
+"id": "t31",
 "family": "geist"
 },
 {
 "x": 2.525,
 "y": 7.0594,
-"w": 0.6293,
+"w": 0.7352,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -985,13 +1679,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Redaction",
-"id": "t29",
+"id": "t32",
 "family": "geist"
 },
 {
 "x": 2.525,
 "y": 7.2344,
-"w": 1.6371,
+"w": 1.8191,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -999,13 +1693,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• AE, Safety/Recall Translation",
-"id": "t30",
+"id": "t33",
 "family": "geist"
 },
 {
 "x": 2.525,
 "y": 7.4094,
-"w": 1.5967,
+"w": 1.7757,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1013,13 +1707,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Contact Center Outsourcing",
-"id": "t31",
+"id": "t34",
 "family": "geist"
 },
 {
-"x": 4.3442,
+"x": 4.2279,
 "y": 6.8844,
-"w": 1.1759,
+"w": 1.3231,
 "h": 0.2776,
 "size": 8.0,
 "weight": 400,
@@ -1027,13 +1721,13 @@
 "lead": 1.2,
 "align": "center",
 "text": "• Coding Automation\n(IMDRF, MedDRA)",
-"id": "t32",
+"id": "t35",
 "family": "geist"
 },
 {
 "x": 4.3442,
 "y": 7.1928,
-"w": 1.2702,
+"w": 1.4246,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1041,13 +1735,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Redaction Technology",
-"id": "t33",
+"id": "t36",
 "family": "geist"
 },
 {
-"x": 4.3442,
+"x": 4.2392,
 "y": 7.3678,
-"w": 1.0037,
+"w": 1.1379,
 "h": 0.2776,
 "size": 8.0,
 "weight": 400,
@@ -1055,13 +1749,13 @@
 "lead": 1.2,
 "align": "center",
 "text": "• AI Transcription,\nSummarization",
-"id": "t34",
+"id": "t37",
 "family": "geist"
 },
 {
 "x": 4.3442,
 "y": 7.6761,
-"w": 1.3363,
+"w": 1.4956,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1069,13 +1763,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Chatbot, Virtual Agents",
-"id": "t35",
+"id": "t38",
 "family": "geist"
 },
 {
 "x": 6.1634,
 "y": 6.8844,
-"w": 1.3083,
+"w": 1.4655,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1083,13 +1777,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Inquiry, Service Design",
-"id": "t36",
+"id": "t39",
 "family": "geist"
 },
 {
 "x": 6.1634,
 "y": 7.0594,
-"w": 0.9756,
+"w": 1.1078,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1097,13 +1791,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• BPO, Data Entry",
-"id": "t37",
+"id": "t40",
 "family": "geist"
 },
 {
 "x": 6.1634,
 "y": 7.2344,
-"w": 1.3568,
+"w": 1.5177,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1111,13 +1805,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• PMQA Communications",
-"id": "t38",
+"id": "t41",
 "family": "geist"
 },
 {
 "x": 2.525,
 "y": 8.119,
-"w": 1.7514,
+"w": 1.942,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1125,13 +1819,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Certiﬁed IFU, Label Translation",
-"id": "t39",
+"id": "t42",
 "family": "geist"
 },
 {
 "x": 2.525,
 "y": 8.294,
-"w": 1.3853,
+"w": 1.5483,
 "h": 0.2776,
 "size": 8.0,
 "weight": 400,
@@ -1139,13 +1833,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Media, Training Content\nCreation",
-"id": "t40",
+"id": "t43",
 "family": "geist"
 },
 {
 "x": 2.525,
 "y": 8.6023,
-"w": 1.5949,
+"w": 1.7738,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1153,13 +1847,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• EnCompass Content Design",
-"id": "t41",
+"id": "t44",
 "family": "geist"
 },
 {
 "x": 4.3442,
 "y": 8.119,
-"w": 1.5225,
+"w": 1.6959,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1167,13 +1861,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Structured Content, CCMS",
-"id": "t42",
+"id": "t45",
 "family": "geist"
 },
 {
 "x": 4.3442,
 "y": 8.294,
-"w": 1.5714,
+"w": 1.7485,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1181,13 +1875,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Digital PIM, PLM Integration",
-"id": "t43",
+"id": "t46",
 "family": "geist"
 },
 {
 "x": 4.3442,
 "y": 8.469,
-"w": 1.3031,
+"w": 1.4599,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1195,13 +1889,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• UDI Data Management",
-"id": "t44",
+"id": "t47",
 "family": "geist"
 },
 {
 "x": 4.3442,
 "y": 8.644,
-"w": 0.9474,
+"w": 1.0774,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1209,13 +1903,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• eIFU Ecosystem",
-"id": "t45",
+"id": "t48",
 "family": "geist"
 },
 {
 "x": 6.1634,
 "y": 8.119,
-"w": 1.1673,
+"w": 1.3139,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1223,13 +1917,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Packaging, Labeling",
-"id": "t46",
+"id": "t49",
 "family": "geist"
 },
 {
 "x": 6.1634,
 "y": 8.294,
-"w": 1.2868,
+"w": 1.4424,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1237,13 +1931,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Regulatory Specialists",
-"id": "t47",
+"id": "t50",
 "family": "geist"
 },
 {
 "x": 6.1634,
 "y": 8.469,
-"w": 1.249,
+"w": 1.4018,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1251,13 +1945,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• IFU Authoring, Design",
-"id": "t48",
+"id": "t51",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 9.0962,
-"w": 1.6225,
+"w": 1.8035,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1265,13 +1959,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Digital Performance, Insights",
-"id": "t49",
+"id": "t52",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 9.2712,
-"w": 1.5891,
+"w": 1.7676,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1279,13 +1973,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• AI, LLM Visibility, Reputation",
-"id": "t50",
+"id": "t53",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 9.4462,
-"w": 1.2091,
+"w": 1.3588,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1293,13 +1987,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Search Optimization",
-"id": "t51",
+"id": "t54",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 9.6212,
-"w": 0.8135,
+"w": 0.9334,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1307,13 +2001,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Interpretation",
-"id": "t52",
+"id": "t55",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 9.7962,
-"w": 1.1338,
+"w": 1.2779,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1321,13 +2015,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Event Development",
-"id": "t53",
+"id": "t56",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 9.0962,
-"w": 1.4223,
+"w": 1.5881,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1335,13 +2029,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• AI Multilingual Literature",
-"id": "t54",
+"id": "t57",
 "family": "geist"
 },
 {
 "x": 4.412,
 "y": 9.2309,
-"w": 1.6022,
+"w": 1.7816,
 "h": 0.1442,
 "size": 7.9,
 "weight": 400,
@@ -1349,13 +2043,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "Screening, Systematic Review",
-"id": "t55",
+"id": "t58",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 9.4045,
-"w": 1.3615,
+"w": 1.5227,
 "h": 0.2776,
 "size": 8.0,
 "weight": 400,
@@ -1363,13 +2057,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Social Listening, Digital\nMonitoring",
-"id": "t56",
+"id": "t59",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 9.7129,
-"w": 1.6684,
+"w": 1.8528,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1377,13 +2071,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Patient, HCP, and Competitor",
-"id": "t57",
+"id": "t60",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 9.0962,
-"w": 1.6718,
+"w": 1.8565,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1391,13 +2085,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Regulatory Intelligence Alerts",
-"id": "t58",
+"id": "t61",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 9.2712,
-"w": 1.5757,
+"w": 1.7531,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1405,13 +2099,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• AI Advisory, Implementation",
-"id": "t59",
+"id": "t62",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 9.4462,
-"w": 1.7604,
+"w": 1.9518,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1419,13 +2113,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Multichannel HCP Engagement",
-"id": "t60",
+"id": "t63",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 9.6212,
-"w": 1.4665,
+"w": 1.6357,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1433,13 +2127,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• AI/Automation Integration",
-"id": "t61",
+"id": "t64",
 "family": "geist"
 },
 {
 "x": 0.7013,
 "y": 2.1138,
-"w": 1.4268,
+"w": 1.593,
 "h": 0.5086,
 "size": 9.5,
 "weight": 700,
@@ -1447,13 +2141,13 @@
 "lead": 1.263,
 "align": "left",
 "text": "Comprehensive\nSolutions Through\nThree Service Pillars",
-"id": "t62",
+"id": "t65",
 "family": "geist"
 },
 {
 "x": 2.5328,
 "y": 1.6752,
-"w": 5.5544,
+"w": 6.0321,
 "h": 0.342,
 "size": 9.5,
 "weight": 700,
@@ -1461,13 +2155,13 @@
 "lead": 0.8,
 "align": "left",
 "text": "Program Delivery\nTechnology,\nAI Development\nManaged Staffing, SMEs",
-"id": "t63",
+"id": "t66",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 2.0991,
-"w": 1.1145,
+"w": 1.2571,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1475,13 +2169,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Language Services",
-"id": "t64",
+"id": "t67",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 2.2741,
-"w": 1.6485,
+"w": 1.8314,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1489,13 +2183,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Content Creation, Multimedia",
-"id": "t65",
+"id": "t68",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 2.4491,
-"w": 1.0579,
+"w": 1.1962,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1503,13 +2197,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Testing, Validation",
-"id": "t66",
+"id": "t69",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 2.6241,
-"w": 0.9079,
+"w": 1.0349,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1517,13 +2211,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Contact Center",
-"id": "t67",
+"id": "t70",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 2.799,
-"w": 1.6225,
+"w": 1.8035,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1531,13 +2225,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Digital Performance, Insights",
-"id": "t68",
+"id": "t71",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 2.974,
-"w": 0.7596,
+"w": 0.8755,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1545,13 +2239,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Accessibility",
-"id": "t69",
+"id": "t72",
 "family": "geist"
 },
 {
 "x": 2.5251,
 "y": 3.149,
-"w": 0.9288,
+"w": 1.0574,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1559,13 +2253,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Events, Training",
-"id": "t70",
+"id": "t73",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 2.099,
-"w": 1.5763,
+"w": 1.7538,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1573,13 +2267,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Translation Management, AI",
-"id": "t71",
+"id": "t74",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 2.274,
-"w": 0.5491,
+"w": 0.649,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1587,13 +2281,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• eClinical",
-"id": "t72",
+"id": "t75",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 2.449,
-"w": 1.1028,
+"w": 1.2446,
 "h": 0.2776,
 "size": 8.0,
 "weight": 400,
@@ -1601,13 +2295,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Automation and\nAI Engineering",
-"id": "t73",
+"id": "t76",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 2.7574,
-"w": 1.3933,
+"w": 1.5569,
 "h": 0.2776,
 "size": 8.0,
 "weight": 400,
@@ -1615,13 +2309,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Content and Regulatory\nOperations",
-"id": "t74",
+"id": "t77",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 3.0657,
-"w": 1.5491,
+"w": 1.7245,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1629,13 +2323,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Intelligence and Monitoring",
-"id": "t75",
+"id": "t78",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 3.2407,
-"w": 1.5225,
+"w": 1.6959,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1643,13 +2337,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Structured Content, CCMS",
-"id": "t76",
+"id": "t79",
 "family": "geist"
 },
 {
 "x": 4.3443,
 "y": 3.4157,
-"w": 0.7534,
+"w": 0.8688,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1657,13 +2351,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Web, Digital",
-"id": "t77",
+"id": "t80",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 2.099,
-"w": 1.2395,
+"w": 1.3915,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1671,13 +2365,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Advisory, Governance",
-"id": "t78",
+"id": "t81",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 2.274,
-"w": 1.2035,
+"w": 1.3528,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1685,13 +2379,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• AI, Automation SMEs",
-"id": "t79",
+"id": "t82",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 2.449,
-"w": 1.3335,
+"w": 1.4926,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1699,13 +2393,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Contact Center, Agents",
-"id": "t80",
+"id": "t83",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 2.624,
-"w": 1.72,
+"w": 1.9083,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1713,13 +2407,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Program/Project Management",
-"id": "t81",
+"id": "t84",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 2.799,
-"w": 1.3271,
+"w": 1.4858,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1727,13 +2421,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• IT/Software Specialists",
-"id": "t82",
+"id": "t85",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 2.974,
-"w": 1.3996,
+"w": 1.5638,
 "h": 0.2776,
 "size": 8.0,
 "weight": 400,
@@ -1741,13 +2435,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Change\nManagement/Marketing",
-"id": "t83",
+"id": "t86",
 "family": "geist"
 },
 {
 "x": 6.1635,
 "y": 3.2824,
-"w": 1.0042,
+"w": 1.1384,
 "h": 0.1442,
 "size": 8.0,
 "weight": 400,
@@ -1755,7 +2449,7 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Technical Writing",
-"id": "t84",
+"id": "t87",
 "family": "geist"
 }
 ]
@@ -1772,7 +2466,7 @@
 {
 "x": 0.411,
 "y": 0.5174,
-"w": 4.9461,
+"w": 5.3779,
 "h": 1.0602,
 "size": 26.2,
 "weight": 700,
@@ -1786,7 +2480,7 @@
 {
 "x": 0.411,
 "y": 1.5024,
-"w": 2.4042,
+"w": 2.6441,
 "h": 0.4623,
 "size": 20.1,
 "weight": 500,
@@ -1800,7 +2494,7 @@
 {
 "x": 5.7547,
 "y": 6.9245,
-"w": 2.2267,
+"w": 2.4532,
 "h": 0.3104,
 "size": 5.5,
 "weight": 400,
@@ -1808,27 +2502,53 @@
 "lead": 1.2,
 "align": "left",
 "text": "SOURCE: AI in Clinical and Regulatory Content: Trends,\nChallenges, and Opportunities — TransPerfect Medical\nDevice & Qserve Webinar",
+"runs": [
+{
+"text": "SOURCE:",
+"color": "#183C6C",
+"weight": 600
+},
+{
+"text": " AI in Clinical and Regulatory Content: Trends,\nChallenges, and Opportunities — TransPerfect Medical\nDevice & Qserve Webinar",
+"color": "#183C6C",
+"weight": 400
+}
+],
 "id": "t2",
 "family": "poppins"
 },
 {
 "x": 4.374,
-"y": 10.5942,
-"w": 3.4832,
+"y": 10.5734,
+"w": 1.8175,
 "h": 0.1699,
 "size": 7.5,
 "weight": 400,
 "color": "#FFFFFF",
-"lead": 0.8,
+"lead": 1.2,
 "align": "left",
-"text": "lifesciences.transperfect.com\nmeddev@transperfect.com",
+"text": "lifesciences.transperfect.com",
 "id": "t3",
+"family": "poppins"
+},
+{
+"x": 6.204,
+"y": 10.5734,
+"w": 1.7183,
+"h": 0.1699,
+"size": 7.5,
+"weight": 400,
+"color": "#FFFFFF",
+"lead": 1.2,
+"align": "left",
+"text": "meddev@transperfect.com",
+"id": "t4",
 "family": "poppins"
 },
 {
 "x": 0.4249,
 "y": 8.901,
-"w": 2.7182,
+"w": 2.9819,
 "h": 0.7162,
 "size": 17.6,
 "weight": 800,
@@ -1836,13 +2556,13 @@
 "lead": 1.197,
 "align": "left",
 "text": "Where does your\norganization stand?",
-"id": "t4",
+"id": "t5",
 "family": "poppins"
 },
 {
 "x": 0.8243,
 "y": 9.7955,
-"w": 1.8605,
+"w": 2.0594,
 "h": 0.2612,
 "size": 11.0,
 "weight": 700,
@@ -1850,13 +2570,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "TAKE THE ASSESSMENT",
-"id": "t5",
+"id": "t6",
 "family": "poppins"
 },
 {
 "x": 0.9529,
 "y": 4.0336,
-"w": 7.054,
+"w": 7.6448,
 "h": 0.2659,
 "size": 11.2,
 "weight": 700,
@@ -1864,13 +2584,30 @@
 "lead": 1.2,
 "align": "left",
 "text": "Most of them aren't sure how it works, and fewer than 1 in 4 say it's delivering results.",
-"id": "t6",
+"runs": [
+{
+"text": "Most of them aren't sure how it works, and ",
+"color": "#183C6C",
+"weight": 400
+},
+{
+"text": "fewer than 1 in 4 say it's delivering results",
+"color": "#183C6C",
+"weight": 700
+},
+{
+"text": ".",
+"color": "#183C6C",
+"weight": 400
+}
+],
+"id": "t7",
 "family": "poppins"
 },
 {
 "x": 1.2272,
 "y": 4.2198,
-"w": 6.4724,
+"w": 7.0194,
 "h": 0.254,
 "size": 11.2,
 "weight": 400,
@@ -1878,13 +2615,13 @@
 "lead": 1.2,
 "align": "left",
 "text": "This survey of 100+ manufacturers uncovers the gap between AI adoption and",
-"id": "t7",
+"id": "t8",
 "family": "poppins"
 },
 {
 "x": 2.1523,
 "y": 4.406,
-"w": 4.4671,
+"w": 4.8627,
 "h": 0.254,
 "size": 11.2,
 "weight": 400,
@@ -1892,41 +2629,39 @@
 "lead": 1.2,
 "align": "left",
 "text": "AI readiness across clinical and regulatory operations.",
-"id": "t8",
-"family": "poppins"
-},
-{
-"x": 1.9552,
-"y": 3.3214,
-"w": 4.9352,
-"h": 0.4312,
-"size": 17.9,
-"weight": 800,
-"color": "#183C6C",
-"lead": 1.2,
-"align": "left",
-"text": "HALF THE MEDICAL DEVICE INDUSTRY",
 "id": "t9",
 "family": "poppins"
 },
 {
-"x": 1.6459,
-"y": 3.6192,
-"w": 5.5407,
-"h": 0.4312,
+"x": 1.2413,
+"y": 3.3216,
+"w": 6.0174,
+"h": 0.7291,
 "size": 17.9,
 "weight": 800,
 "color": "#0F9CD8",
-"lead": 1.2,
-"align": "left",
-"text": "IS ALREADY USING AI IN THEIR PROCESSES.",
+"lead": 1.198,
+"align": "center",
+"text": "HALF THE MEDICAL DEVICE INDUSTRY\nIS ALREADY USING AI IN THEIR PROCESSES.",
+"runs": [
+{
+"text": "HALF THE MEDICAL DEVICE INDUSTRY",
+"color": "#183C6C",
+"weight": 800
+},
+{
+"text": "\nIS ALREADY USING AI IN THEIR PROCESSES.",
+"color": "#0F9CD8",
+"weight": 800
+}
+],
 "id": "t10",
 "family": "poppins"
 },
 {
 "x": 1.516,
 "y": 5.9474,
-"w": 0.6494,
+"w": 0.7569,
 "h": 0.4954,
 "size": 20.5,
 "weight": 800,
@@ -1940,7 +2675,7 @@
 {
 "x": 3.7175,
 "y": 6.3231,
-"w": 1.3188,
+"w": 1.4768,
 "h": 0.2758,
 "size": 7.0,
 "weight": 400,
@@ -1954,7 +2689,7 @@
 {
 "x": 3.9364,
 "y": 5.946,
-"w": 0.8468,
+"w": 0.9692,
 "h": 0.4954,
 "size": 20.5,
 "weight": 800,
@@ -1968,7 +2703,7 @@
 {
 "x": 5.9527,
 "y": 6.2486,
-"w": 1.9283,
+"w": 2.1323,
 "h": 0.1592,
 "size": 7.0,
 "weight": 400,
@@ -1982,7 +2717,7 @@
 {
 "x": 5.9936,
 "y": 6.3653,
-"w": 1.8418,
+"w": 2.0393,
 "h": 0.1592,
 "size": 7.0,
 "weight": 400,
@@ -1996,7 +2731,7 @@
 {
 "x": 6.0599,
 "y": 6.4819,
-"w": 1.6736,
+"w": 1.8584,
 "h": 0.1592,
 "size": 7.0,
 "weight": 400,
@@ -2010,7 +2745,7 @@
 {
 "x": 6.4569,
 "y": 5.8732,
-"w": 0.832,
+"w": 0.9532,
 "h": 0.4954,
 "size": 20.5,
 "weight": 800,
@@ -2024,7 +2759,7 @@
 {
 "x": 0.8134,
 "y": 7.8572,
-"w": 2.1684,
+"w": 2.3905,
 "h": 0.1698,
 "size": 7.5,
 "weight": 400,
@@ -2038,7 +2773,7 @@
 {
 "x": 1.0421,
 "y": 7.9816,
-"w": 1.654,
+"w": 1.8374,
 "h": 0.1698,
 "size": 7.5,
 "weight": 400,
@@ -2052,7 +2787,7 @@
 {
 "x": 1.4972,
 "y": 7.4881,
-"w": 0.6893,
+"w": 0.7998,
 "h": 0.4954,
 "size": 20.5,
 "weight": 800,
@@ -2066,7 +2801,7 @@
 {
 "x": 3.5654,
 "y": 7.8577,
-"w": 1.6626,
+"w": 1.8466,
 "h": 0.1698,
 "size": 7.5,
 "weight": 400,
@@ -2080,7 +2815,7 @@
 {
 "x": 3.867,
 "y": 7.9821,
-"w": 0.9938,
+"w": 1.1273,
 "h": 0.1698,
 "size": 7.5,
 "weight": 400,
@@ -2094,7 +2829,7 @@
 {
 "x": 4.0295,
 "y": 7.4881,
-"w": 0.6494,
+"w": 0.7569,
 "h": 0.4954,
 "size": 20.5,
 "weight": 800,
@@ -2108,7 +2843,7 @@
 {
 "x": 1.0814,
 "y": 6.3098,
-"w": 1.5983,
+"w": 1.7774,
 "h": 0.1592,
 "size": 7.0,
 "weight": 400,
@@ -2122,7 +2857,7 @@
 {
 "x": 1.1389,
 "y": 6.4264,
-"w": 1.4486,
+"w": 1.6165,
 "h": 0.1592,
 "size": 7.0,
 "weight": 400,
@@ -2147,7 +2882,7 @@
 {
 "x": 3.4964,
 "y": 2.2236,
-"w": 1.6519,
+"w": 1.8351,
 "h": 0.3809,
 "size": 16.0,
 "weight": 700,
@@ -2161,7 +2896,7 @@
 {
 "x": 0.5,
 "y": 0.2967,
-"w": 3.6567,
+"w": 3.9912,
 "h": 0.8499,
 "size": 21.0,
 "weight": 700,
@@ -2175,7 +2910,7 @@
 {
 "x": 0.5,
 "y": 1.0895,
-"w": 3.6684,
+"w": 4.0037,
 "h": 0.341,
 "size": 15.0,
 "weight": 400,
@@ -2189,7 +2924,7 @@
 {
 "x": 0.5017,
 "y": 8.5929,
-"w": 0.8207,
+"w": 0.9411,
 "h": 0.2105,
 "size": 9.0,
 "weight": 600,
@@ -2203,7 +2938,7 @@
 {
 "x": 0.5017,
 "y": 8.7911,
-"w": 6.3774,
+"w": 6.9172,
 "h": 1.3839,
 "size": 7.0,
 "weight": 400,
@@ -2211,13 +2946,95 @@
 "lead": 1.397,
 "align": "left",
 "text": "1.  Brøgger-Mikkelsen M, et al. (2020). Online Patient Recruitment in Clinical Trials: Systematic Review and Meta-Analysis.\n2.  National Cancer Institute (HINTS Brief 48). Clinical Trial Participation Among US Adults (HINTS 2020).\n3.  KFF (2023). Overview of Health Coverage and Care for Individuals with Limited English Proficiency.\n4. 2024 Clinical Research Site Challenges Report.\nhttps://www.wcgclinical.com/wp-content/uploads/2024/10/WCG_2024_Clinical_Research_Site_Challenges_Report.pdf\n5. Alzheimers Dement. 2023 May;19(5):1714-1728. doi: 10.1002/alz.12805. Epub 2022 Oct 4.\n6. J Clin Transl Sci. 2022 Dec 7;7(1):e9. doi: 10.1017/cts.2022.506.\n7.  CSA Research (2020). Consumers Prefer Their Own Language (Survey: 8,709 consumers, 29 countries).\n8. TransPerfect. Client Panel Intelligent Performance (Webinar).\nhttps://globallink.transperfect.com/resources/webinars/intelligent-performance-client-panel",
+"runs": [
+{
+"text": "1.",
+"color": "#FFFFFF",
+"weight": 600
+},
+{
+"text": "  Brøgger-Mikkelsen M, et al. (2020). Online Patient Recruitment in Clinical Trials: Systematic Review and Meta-Analysis.",
+"color": "#FFFFFF",
+"weight": 400
+},
+{
+"text": "\n2.",
+"color": "#FFFFFF",
+"weight": 600
+},
+{
+"text": "  National Cancer Institute (HINTS Brief 48). Clinical Trial Participation Among US Adults (HINTS 2020).",
+"color": "#FFFFFF",
+"weight": 400
+},
+{
+"text": "\n3.",
+"color": "#FFFFFF",
+"weight": 600
+},
+{
+"text": "  KFF (2023). Overview of Health Coverage and Care for Individuals with Limited English Proficiency.",
+"color": "#FFFFFF",
+"weight": 400
+},
+{
+"text": "\n4.",
+"color": "#FFFFFF",
+"weight": 600
+},
+{
+"text": " 2024 Clinical Research Site Challenges Report.\nhttps://www.wcgclinical.com/wp-content/uploads/2024/10/WCG_2024_Clinical_Research_Site_Challenges_Report.pdf",
+"color": "#FFFFFF",
+"weight": 400
+},
+{
+"text": "\n5.",
+"color": "#FFFFFF",
+"weight": 600
+},
+{
+"text": " Alzheimers Dement. 2023 May;19(5):1714-1728. doi: 10.1002/alz.12805. Epub 2022 Oct 4.",
+"color": "#FFFFFF",
+"weight": 400
+},
+{
+"text": "\n6.",
+"color": "#FFFFFF",
+"weight": 600
+},
+{
+"text": " J Clin Transl Sci. 2022 Dec 7;7(1):e9. doi: 10.1017/cts.2022.506.",
+"color": "#FFFFFF",
+"weight": 400
+},
+{
+"text": "\n7.",
+"color": "#FFFFFF",
+"weight": 600
+},
+{
+"text": "  CSA Research (2020). Consumers Prefer Their Own Language (Survey: 8,709 consumers, 29 countries).",
+"color": "#FFFFFF",
+"weight": 400
+},
+{
+"text": "\n8.",
+"color": "#FFFFFF",
+"weight": 600
+},
+{
+"text": " TransPerfect. Client Panel Intelligent Performance (Webinar).\nhttps://globallink.transperfect.com/resources/webinars/intelligent-performance-client-panel",
+"color": "#FFFFFF",
+"weight": 400
+}
+],
 "id": "t4",
 "family": "poppins"
 },
 {
 "x": 2.9962,
 "y": 5.0276,
-"w": 2.7124,
+"w": 2.9756,
 "h": 0.3809,
 "size": 16.0,
 "weight": 700,
@@ -2231,7 +3048,7 @@
 {
 "x": 1.6373,
 "y": 7.9766,
-"w": 5.5591,
+"w": 6.0371,
 "h": 0.3809,
 "size": 16.0,
 "weight": 700,
@@ -2243,9 +3060,9 @@
 "family": "poppins"
 },
 {
-"x": 0.8701,
+"x": 0.7274,
 "y": 3.7162,
-"w": 1.5761,
+"w": 1.7535,
 "h": 0.3755,
 "size": 9.0,
 "weight": 400,
@@ -2253,13 +3070,25 @@
 "lead": 1.333,
 "align": "center",
 "text": "Of clinical trials fail to\nmeet initial enrollment",
+"runs": [
+{
+"text": "Of clinical trials fail to\nmeet initial ",
+"color": "#071D49",
+"weight": 400
+},
+{
+"text": "enrollment",
+"color": "#2C4BA3",
+"weight": 700
+}
+],
 "id": "t7",
 "family": "poppins"
 },
 {
 "x": 0.9015,
 "y": 4.0577,
-"w": 1.5169,
+"w": 1.6898,
 "h": 0.2142,
 "size": 9.0,
 "weight": 400,
@@ -2267,13 +3096,30 @@
 "lead": 1.2,
 "align": "left",
 "text": "targets and timelines,",
+"runs": [
+{
+"text": "targets",
+"color": "#2C4BA3",
+"weight": 700
+},
+{
+"text": " ",
+"color": "#2C4BA3",
+"weight": 400
+},
+{
+"text": "and timelines,",
+"color": "#071D49",
+"weight": 400
+}
+],
 "id": "t8",
 "family": "poppins"
 },
 {
 "x": 0.9115,
 "y": 4.2244,
-"w": 1.4957,
+"w": 1.667,
 "h": 0.2046,
 "size": 9.0,
 "weight": 400,
@@ -2287,7 +3133,7 @@
 {
 "x": 0.8161,
 "y": 4.391,
-"w": 1.6625,
+"w": 1.8465,
 "h": 0.2142,
 "size": 9.0,
 "weight": 700,
@@ -2295,13 +3141,30 @@
 "lead": 1.2,
 "align": "left",
 "text": "leading driver of delays.1",
+"runs": [
+{
+"text": "leading ",
+"color": "#071D49",
+"weight": 400
+},
+{
+"text": "driver of delays",
+"color": "#2C4BA3",
+"weight": 700
+},
+{
+"text": ".1",
+"color": "#071D49",
+"weight": 400
+}
+],
 "id": "t10",
 "family": "poppins"
 },
 {
 "x": 0.8576,
 "y": 6.5463,
-"w": 1.61,
+"w": 1.79,
 "h": 0.2143,
 "size": 9.0,
 "weight": 700,
@@ -2309,13 +3172,30 @@
 "lead": 1.2,
 "align": "left",
 "text": "Faster enrollment than",
+"runs": [
+{
+"text": "Faster enrollment",
+"color": "#EC398A",
+"weight": 700
+},
+{
+"text": " ",
+"color": "#0F9CD8",
+"weight": 400
+},
+{
+"text": "than",
+"color": "#071D49",
+"weight": 400
+}
+],
 "id": "t11",
 "family": "poppins"
 },
 {
 "x": 0.84,
 "y": 6.7129,
-"w": 1.6474,
+"w": 1.8302,
 "h": 0.2046,
 "size": 9.0,
 "weight": 400,
@@ -2329,7 +3209,7 @@
 {
 "x": 0.9616,
 "y": 6.8795,
-"w": 1.3894,
+"w": 1.5527,
 "h": 0.2046,
 "size": 9.0,
 "weight": 400,
@@ -2343,7 +3223,7 @@
 {
 "x": 0.9551,
 "y": 7.0462,
-"w": 1.3678,
+"w": 1.5295,
 "h": 0.2142,
 "size": 9.0,
 "weight": 700,
@@ -2357,7 +3237,7 @@
 {
 "x": 1.18,
 "y": 7.2128,
-"w": 0.891,
+"w": 1.0168,
 "h": 0.2046,
 "size": 9.0,
 "weight": 400,
@@ -2371,7 +3251,7 @@
 {
 "x": 6.089,
 "y": 3.7245,
-"w": 1.6633,
+"w": 1.8473,
 "h": 0.2046,
 "size": 9.0,
 "weight": 400,
@@ -2383,9 +3263,9 @@
 "family": "poppins"
 },
 {
-"x": 6.07,
+"x": 5.9212,
 "y": 3.8828,
-"w": 1.6682,
+"w": 1.8526,
 "h": 0.3809,
 "size": 9.0,
 "weight": 700,
@@ -2393,13 +3273,40 @@
 "lead": 1.333,
 "align": "center",
 "text": "said that site staffing\nwas their top challenge.4",
+"runs": [
+{
+"text": "said that ",
+"color": "#071D49",
+"weight": 400
+},
+{
+"text": "site staffing",
+"color": "#2C4BA3",
+"weight": 700
+},
+{
+"text": "\nwas their ",
+"color": "#071D49",
+"weight": 400
+},
+{
+"text": "top challenge",
+"color": "#2C4BA3",
+"weight": 700
+},
+{
+"text": ".4",
+"color": "#071D49",
+"weight": 400
+}
+],
 "id": "t17",
 "family": "poppins"
 },
 {
 "x": 6.3081,
 "y": 6.5446,
-"w": 1.2007,
+"w": 1.3498,
 "h": 0.216,
 "size": 9.5,
 "weight": 400,
@@ -2413,7 +3320,7 @@
 {
 "x": 6.0032,
 "y": 6.7181,
-"w": 1.8472,
+"w": 2.0451,
 "h": 0.2163,
 "size": 9.0,
 "weight": 700,
@@ -2421,13 +3328,30 @@
 "lead": 1.2,
 "align": "left",
 "text": "workdays eliminated by a",
+"runs": [
+{
+"text": "workdays eliminated",
+"color": "#EC398A",
+"weight": 700
+},
+{
+"text": " ",
+"color": "#EC398A",
+"weight": 400
+},
+{
+"text": "by a",
+"color": "#071D49",
+"weight": 400
+}
+],
 "id": "t19",
 "family": "poppins"
 },
 {
 "x": 5.9782,
 "y": 6.8779,
-"w": 1.9002,
+"w": 2.1021,
 "h": 0.216,
 "size": 9.5,
 "weight": 400,
@@ -2441,7 +3365,7 @@
 {
 "x": 6.0368,
 "y": 7.0446,
-"w": 1.776,
+"w": 1.9685,
 "h": 0.216,
 "size": 9.5,
 "weight": 400,
@@ -2455,7 +3379,7 @@
 {
 "x": 6.0511,
 "y": 7.2181,
-"w": 1.7456,
+"w": 1.9359,
 "h": 0.2163,
 "size": 9.0,
 "weight": 700,
@@ -2463,13 +3387,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "automating translation.8",
+"runs": [
+{
+"text": "automating translation",
+"color": "#EC398A",
+"weight": 700
+},
+{
+"text": ".8",
+"color": "#071D49",
+"weight": 400
+}
+],
 "id": "t22",
 "family": "poppins"
 },
 {
 "x": 2.7304,
 "y": 3.7228,
-"w": 1.2898,
+"w": 1.4456,
 "h": 0.216,
 "size": 9.5,
 "weight": 400,
@@ -2483,7 +3419,7 @@
 {
 "x": 2.7126,
 "y": 3.8963,
-"w": 1.3557,
+"w": 1.5165,
 "h": 0.2163,
 "size": 9.0,
 "weight": 700,
@@ -2491,13 +3427,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "report not knowing",
+"runs": [
+{
+"text": "report ",
+"color": "#071D49",
+"weight": 400
+},
+{
+"text": "not knowing",
+"color": "#2C4BA3",
+"weight": 700
+}
+],
 "id": "t24",
 "family": "poppins"
 },
 {
 "x": 2.8195,
 "y": 4.0629,
-"w": 1.1382,
+"w": 1.2826,
 "h": 0.2162,
 "size": 9.0,
 "weight": 700,
@@ -2505,13 +3453,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "anything about",
+"runs": [
+{
+"text": "anything",
+"color": "#2C4BA3",
+"weight": 700
+},
+{
+"text": " about",
+"color": "#071D49",
+"weight": 400
+}
+],
 "id": "t25",
 "family": "poppins"
 },
 {
 "x": 2.8838,
 "y": 4.2228,
-"w": 0.9645,
+"w": 1.0958,
 "h": 0.216,
 "size": 9.5,
 "weight": 400,
@@ -2525,7 +3485,7 @@
 {
 "x": 2.9694,
 "y": 6.5446,
-"w": 0.8206,
+"w": 0.941,
 "h": 0.216,
 "size": 9.5,
 "weight": 400,
@@ -2539,7 +3499,7 @@
 {
 "x": 2.7427,
 "y": 6.7181,
-"w": 1.2919,
+"w": 1.4479,
 "h": 0.2143,
 "size": 9.0,
 "weight": 700,
@@ -2553,7 +3513,7 @@
 {
 "x": 2.6777,
 "y": 6.8779,
-"w": 1.439,
+"w": 1.6061,
 "h": 0.2162,
 "size": 9.5,
 "weight": 400,
@@ -2561,13 +3521,30 @@
 "lead": 1.2,
 "align": "left",
 "text": "minority enrollment",
+"runs": [
+{
+"text": "minority",
+"color": "#EC398A",
+"weight": 700
+},
+{
+"text": " ",
+"color": "#EC398A",
+"weight": 400
+},
+{
+"text": "enrollment",
+"color": "#071D49",
+"weight": 400
+}
+],
 "id": "t29",
 "family": "poppins"
 },
 {
 "x": 2.8004,
 "y": 7.0446,
-"w": 1.1789,
+"w": 1.3264,
 "h": 0.216,
 "size": 9.5,
 "weight": 400,
@@ -2581,7 +3558,7 @@
 {
 "x": 2.8149,
 "y": 7.2113,
-"w": 1.1107,
+"w": 1.2531,
 "h": 0.216,
 "size": 9.5,
 "weight": 400,
@@ -2595,7 +3572,7 @@
 {
 "x": 4.5316,
 "y": 3.7245,
-"w": 1.0091,
+"w": 1.1438,
 "h": 0.2046,
 "size": 9.0,
 "weight": 400,
@@ -2607,9 +3584,9 @@
 "family": "poppins"
 },
 {
-"x": 4.2962,
+"x": 4.1578,
 "y": 3.8828,
-"w": 1.5101,
+"w": 1.6826,
 "h": 0.3809,
 "size": 9.0,
 "weight": 700,
@@ -2617,13 +3594,30 @@
 "lead": 1.333,
 "align": "center",
 "text": "with limited English\nproficiency in the US.3",
+"runs": [
+{
+"text": "with ",
+"color": "#071D49",
+"weight": 400
+},
+{
+"text": "limited English\nproficiency",
+"color": "#2C4BA3",
+"weight": 700
+},
+{
+"text": " in the US.3",
+"color": "#071D49",
+"weight": 400
+}
+],
 "id": "t33",
 "family": "poppins"
 },
 {
 "x": 4.3063,
 "y": 6.5446,
-"w": 1.4887,
+"w": 1.6595,
 "h": 0.216,
 "size": 9.5,
 "weight": 400,
@@ -2637,7 +3631,7 @@
 {
 "x": 4.3556,
 "y": 6.7113,
-"w": 1.3842,
+"w": 1.5472,
 "h": 0.216,
 "size": 9.5,
 "weight": 400,
@@ -2651,7 +3645,7 @@
 {
 "x": 4.4164,
 "y": 6.8848,
-"w": 1.2179,
+"w": 1.3684,
 "h": 0.2163,
 "size": 9.0,
 "weight": 700,
@@ -2659,27 +3653,53 @@
 "lead": 1.2,
 "align": "left",
 "text": "native language.7",
+"runs": [
+{
+"text": "native language",
+"color": "#EC398A",
+"weight": 700
+},
+{
+"text": ".7",
+"color": "#071D49",
+"weight": 400
+}
+],
 "id": "t36",
 "family": "poppins"
 },
 {
 "x": 4.2981,
-"y": 10.6413,
-"w": 3.921,
+"y": 10.6191,
+"w": 1.9402,
 "h": 0.1819,
 "size": 8.0,
 "weight": 400,
 "color": "#FFFFFF",
-"lead": 0.8,
+"lead": 1.2,
 "align": "left",
-"text": "lifesciences.transperfect.com\nlifesciences@transperfect.com",
+"text": "lifesciences.transperfect.com",
 "id": "t37",
+"family": "poppins"
+},
+{
+"x": 6.2573,
+"y": 10.6191,
+"w": 2.0419,
+"h": 0.1819,
+"size": 8.0,
+"weight": 400,
+"color": "#FFFFFF",
+"lead": 1.2,
+"align": "left",
+"text": "lifesciences@transperfect.com",
+"id": "t38",
 "family": "poppins"
 },
 {
 "x": 4.0998,
 "y": 10.3909,
-"w": 2.891,
+"w": 3.1677,
 "h": 0.2381,
 "size": 10.0,
 "weight": 700,
@@ -2687,7 +3707,7 @@
 "lead": 1.2,
 "align": "left",
 "text": "Lab to Launch. Practitioner to Patient.",
-"id": "t38",
+"id": "t39",
 "family": "poppins"
 }
 ]
@@ -2704,7 +3724,7 @@
 {
 "x": 4.972,
 "y": 7.1068,
-"w": 1.0921,
+"w": 1.2331,
 "h": 0.3571,
 "size": 15.0,
 "weight": 700,
@@ -2718,7 +3738,7 @@
 {
 "x": 4.972,
 "y": 7.4319,
-"w": 1.8359,
+"w": 2.0329,
 "h": 0.2387,
 "size": 10.5,
 "weight": 400,
@@ -2726,13 +3746,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Live action production",
+"runs": [
+{
+"text": "• ",
+"color": "#139DD8",
+"weight": 400
+},
+{
+"text": "Live action production",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t1",
 "family": "poppins"
 },
 {
 "x": 4.972,
 "y": 7.7097,
-"w": 1.5644,
+"w": 1.741,
 "h": 0.2387,
 "size": 10.5,
 "weight": 400,
@@ -2740,13 +3772,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Event videography",
+"runs": [
+{
+"text": "• ",
+"color": "#139DD8",
+"weight": 400
+},
+{
+"text": "Event videography",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t2",
 "family": "poppins"
 },
 {
 "x": 4.972,
 "y": 7.9875,
-"w": 2.6609,
+"w": 2.9202,
 "h": 0.2387,
 "size": 10.5,
 "weight": 400,
@@ -2754,13 +3798,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Multi-market campaign strategy",
+"runs": [
+{
+"text": "• ",
+"color": "#139DD8",
+"weight": 400
+},
+{
+"text": "Multi-market campaign strategy",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t3",
 "family": "poppins"
 },
 {
 "x": 4.972,
 "y": 8.2654,
-"w": 1.7309,
+"w": 1.9201,
 "h": 0.2387,
 "size": 10.5,
 "weight": 400,
@@ -2768,13 +3824,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Content repurposing",
+"runs": [
+{
+"text": "• ",
+"color": "#139DD8",
+"weight": 400
+},
+{
+"text": "Content repurposing",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t4",
 "family": "poppins"
 },
 {
 "x": 4.972,
 "y": 8.5432,
-"w": 1.4398,
+"w": 1.607,
 "h": 0.2387,
 "size": 10.5,
 "weight": 400,
@@ -2782,13 +3850,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Collateral design",
+"runs": [
+{
+"text": "• ",
+"color": "#139DD8",
+"weight": 400
+},
+{
+"text": "Collateral design",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t5",
 "family": "poppins"
 },
 {
 "x": 4.972,
 "y": 8.821,
-"w": 2.785,
+"w": 3.0537,
 "h": 0.2387,
 "size": 10.5,
 "weight": 400,
@@ -2796,13 +3876,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "• On-site and hybrid event planning",
+"runs": [
+{
+"text": "• ",
+"color": "#139DD8",
+"weight": 400
+},
+{
+"text": "On-site and hybrid event planning",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t6",
 "family": "poppins"
 },
 {
 "x": 4.972,
 "y": 9.0988,
-"w": 1.9334,
+"w": 2.1378,
 "h": 0.2387,
 "size": 10.5,
 "weight": 400,
@@ -2810,13 +3902,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Live-streaming content",
+"runs": [
+{
+"text": "• ",
+"color": "#139DD8",
+"weight": 400
+},
+{
+"text": "Live-streaming content",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t7",
 "family": "poppins"
 },
 {
 "x": 4.972,
 "y": 9.3766,
-"w": 2.7359,
+"w": 3.0008,
 "h": 0.2387,
 "size": 10.5,
 "weight": 400,
@@ -2824,13 +3928,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Website design and development",
+"runs": [
+{
+"text": "• ",
+"color": "#139DD8",
+"weight": 400
+},
+{
+"text": "Website design and development",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t8",
 "family": "poppins"
 },
 {
 "x": 0.9549,
 "y": 5.954,
-"w": 1.2977,
+"w": 1.4542,
 "h": 0.3571,
 "size": 15.0,
 "weight": 700,
@@ -2844,7 +3960,7 @@
 {
 "x": 0.9549,
 "y": 6.2694,
-"w": 2.996,
+"w": 3.2806,
 "h": 0.8219,
 "size": 10.5,
 "weight": 400,
@@ -2858,7 +3974,7 @@
 {
 "x": 0.9549,
 "y": 7.2596,
-"w": 1.0612,
+"w": 1.1998,
 "h": 0.3571,
 "size": 15.0,
 "weight": 700,
@@ -2866,13 +3982,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "Solution:",
+"runs": [
+{
+"text": "Solution:",
+"color": "#139DD8",
+"weight": 700
+},
+{
+"text": "",
+"color": "#003B71",
+"weight": 700
+}
+],
 "id": "t11",
 "family": "poppins"
 },
 {
 "x": 0.9549,
 "y": 7.575,
-"w": 2.9676,
+"w": 3.2501,
 "h": 0.6275,
 "size": 10.5,
 "weight": 400,
@@ -2886,7 +4014,7 @@
 {
 "x": 0.9549,
 "y": 8.2651,
-"w": 0.9214,
+"w": 1.0494,
 "h": 0.2387,
 "size": 10.5,
 "weight": 400,
@@ -2894,13 +4022,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Promotion",
+"runs": [
+{
+"text": "• ",
+"color": "#139DD8",
+"weight": 400
+},
+{
+"text": "Promotion",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t13",
 "family": "poppins"
 },
 {
 "x": 0.9549,
 "y": 8.543,
-"w": 1.0486,
+"w": 1.1862,
 "h": 0.2387,
 "size": 10.5,
 "weight": 400,
@@ -2908,13 +4048,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Registration",
+"runs": [
+{
+"text": "• ",
+"color": "#139DD8",
+"weight": 400
+},
+{
+"text": "Registration",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t14",
 "family": "poppins"
 },
 {
 "x": 0.9549,
 "y": 8.8208,
-"w": 2.2829,
+"w": 2.5137,
 "h": 0.2387,
 "size": 10.5,
 "weight": 400,
@@ -2922,13 +4074,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Simultaneous interpretation",
+"runs": [
+{
+"text": "• ",
+"color": "#139DD8",
+"weight": 400
+},
+{
+"text": "Simultaneous interpretation",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t15",
 "family": "poppins"
 },
 {
 "x": 0.9549,
 "y": 9.0986,
-"w": 1.7413,
+"w": 1.9312,
 "h": 0.2387,
 "size": 10.5,
 "weight": 400,
@@ -2936,13 +4100,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Hybrid event support",
+"runs": [
+{
+"text": "• ",
+"color": "#139DD8",
+"weight": 400
+},
+{
+"text": "Hybrid event support",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t16",
 "family": "poppins"
 },
 {
 "x": 0.9549,
 "y": 9.3764,
-"w": 2.6012,
+"w": 2.856,
 "h": 0.2387,
 "size": 10.5,
 "weight": 400,
@@ -2950,13 +4126,25 @@
 "lead": 1.2,
 "align": "left",
 "text": "• Post-event on-demand content",
+"runs": [
+{
+"text": "• ",
+"color": "#139DD8",
+"weight": 400
+},
+{
+"text": "Post-event on-demand content",
+"color": "#003B71",
+"weight": 400
+}
+],
 "id": "t17",
 "family": "poppins"
 },
 {
 "x": 0.5028,
 "y": 0.3736,
-"w": 3.3929,
+"w": 3.7074,
 "h": 1.4285,
 "size": 25.0,
 "weight": 700,
@@ -2970,7 +4158,7 @@
 {
 "x": 0.5028,
 "y": 1.7991,
-"w": 4.8967,
+"w": 5.3247,
 "h": 0.869,
 "size": 15.0,
 "weight": 400,
@@ -2984,7 +4172,7 @@
 {
 "x": 2.4452,
 "y": 3.8784,
-"w": 3.8463,
+"w": 4.1951,
 "h": 0.5475,
 "size": 23.0,
 "weight": 700,
@@ -2992,13 +4180,30 @@
 "lead": 1.2,
 "align": "left",
 "text": "One Team, Big Impact",
+"runs": [
+{
+"text": "One Team,",
+"color": "#003B71",
+"weight": 700
+},
+{
+"text": " ",
+"color": "#071D49",
+"weight": 700
+},
+{
+"text": "Big Impact",
+"color": "#139DD8",
+"weight": 700
+}
+],
 "id": "t20",
 "family": "poppins"
 },
 {
 "x": 1.4076,
 "y": 4.4249,
-"w": 0.8212,
+"w": 0.9416,
 "h": 0.4761,
 "size": 20.0,
 "weight": 700,
@@ -3010,9 +4215,9 @@
 "family": "poppins"
 },
 {
-"x": 1.2383,
+"x": 1.1217,
 "y": 4.8095,
-"w": 1.18,
+"w": 1.3275,
 "h": 0.4079,
 "size": 10.0,
 "weight": 400,
@@ -3026,7 +4231,7 @@
 {
 "x": 3.0097,
 "y": 4.8164,
-"w": 1.0158,
+"w": 1.151,
 "h": 0.2274,
 "size": 10.0,
 "weight": 400,
@@ -3040,7 +4245,7 @@
 {
 "x": 3.0882,
 "y": 4.997,
-"w": 0.8101,
+"w": 0.9298,
 "h": 0.2274,
 "size": 10.0,
 "weight": 400,
@@ -3054,7 +4259,7 @@
 {
 "x": 2.9194,
 "y": 4.4249,
-"w": 1.168,
+"w": 1.3147,
 "h": 0.4761,
 "size": 20.0,
 "weight": 700,
@@ -3066,9 +4271,9 @@
 "family": "poppins"
 },
 {
-"x": 4.5904,
+"x": 4.4714,
 "y": 4.8122,
-"w": 1.2168,
+"w": 1.3671,
 "h": 0.4079,
 "size": 10.0,
 "weight": 400,
@@ -3082,7 +4287,7 @@
 {
 "x": 4.6476,
 "y": 4.4249,
-"w": 1.0562,
+"w": 1.1944,
 "h": 0.4761,
 "size": 20.0,
 "weight": 700,
@@ -3096,7 +4301,7 @@
 {
 "x": 6.4033,
 "y": 4.8164,
-"w": 0.9251,
+"w": 1.0534,
 "h": 0.2274,
 "size": 10.0,
 "weight": 400,
@@ -3110,7 +4315,7 @@
 {
 "x": 6.6542,
 "y": 4.997,
-"w": 0.3932,
+"w": 0.4814,
 "h": 0.2274,
 "size": 10.0,
 "weight": 400,
@@ -3124,7 +4329,7 @@
 {
 "x": 6.5119,
 "y": 4.4249,
-"w": 0.6557,
+"w": 0.7637,
 "h": 0.4761,
 "size": 20.0,
 "weight": 700,
@@ -3137,22 +4342,36 @@
 },
 {
 "x": 4.5532,
-"y": 10.6187,
-"w": 3.3963,
+"y": 10.5965,
+"w": 1.1758,
 "h": 0.1819,
 "size": 8.0,
 "weight": 400,
 "color": "#003B71",
-"lead": 0.8,
+"lead": 1.2,
 "align": "left",
-"text": "transperfect.com\ncontentlabs@transperfect.com",
+"text": "transperfect.com",
 "id": "t31",
+"family": "poppins"
+},
+{
+"x": 5.9985,
+"y": 10.5965,
+"w": 2.0635,
+"h": 0.1819,
+"size": 8.0,
+"weight": 400,
+"color": "#003B71",
+"lead": 1.2,
+"align": "left",
+"text": "contentlabs@transperfect.com",
+"id": "t32",
 "family": "poppins"
 },
 {
 "x": 4.355,
 "y": 10.3633,
-"w": 2.6492,
+"w": 2.9077,
 "h": 0.2381,
 "size": 10.0,
 "weight": 700,
@@ -3160,7 +4379,7 @@
 "lead": 1.2,
 "align": "left",
 "text": "Transforming Global Performance",
-"id": "t32",
+"id": "t33",
 "family": "poppins"
 }
 ]

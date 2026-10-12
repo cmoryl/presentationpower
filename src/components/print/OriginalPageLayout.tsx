@@ -75,7 +75,13 @@ export function OriginalPageLayout({ layout, pageIndex }: { layout: OriginalLayo
                   } as CSSProperties
                 }
               >
-                {t.text}
+                {t.runs?.length
+                  ? t.runs.map((r, ri) => (
+                      <span key={ri} style={{ color: r.color, fontWeight: r.weight }}>
+                        {r.text}
+                      </span>
+                    ))
+                  : t.text}
               </div>
             ),
           )}

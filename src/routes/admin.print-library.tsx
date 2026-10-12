@@ -1,6 +1,7 @@
 import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { companyFromText, productFromText } from "@/lib/print-library/item-tags";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -52,6 +53,8 @@ function PrintLibraryCurator() {
   const qc = useQueryClient();
 
   const [divisionFilter, setDivisionFilter] = useState<string>("all");
+  const [companyFilter, setCompanyFilter] = useState<string>("all");
+  const [productFilter, setProductFilter] = useState<string>("all");
   const [kindFilter, setKindFilter] = useState<PrintAssetKind | "all">("all");
 
   const variants = useQuery({
@@ -123,7 +126,10 @@ function PrintLibraryCurator() {
   const canRender = !(variants.error && isForbidden(variants.error));
   if (!canRender) return <AdminForbidden />;
 
-  const rows = variants.data ?? [];
+  const allRows = variants.data ?? [];
+  const rows = allRows
+    .filter((r) => companyFilter === "all" || companyFromText(r.title ?? "") === companyFilter)
+    .filter((r) => productFilter === "all" || productFromText(r.title ?? "") === productFilter);
   const grouped = new Map<PrintAssetKind, typeof rows>();
   for (const r of rows) {
     const arr = grouped.get(r.template_kind) ?? [];
@@ -297,6 +303,25 @@ function PrintLibraryCurator() {
             </option>
           ))}
         </select>
+        {([
+          ["Company", companyFilter, setCompanyFilter, companyFromText],
+          ["Product", productFilter, setProductFilter, productFromText],
+        ] as const).map(([label, value, set, of]) => (
+          <select
+            key={label}
+            aria-label={`${label} Filter`}
+            value={value}
+            onChange={(e) => set(e.target.value)}
+            className="rounded-md border border-black/15 bg-white px-2 py-1 text-sm"
+          >
+            <option value="all">All {label === "Company" ? "companies" : "products"}</option>
+            {[...new Set(allRows.map((r) => of(r.title ?? "")))].sort().map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        ))}
         <div className="ml-auto text-xs text-black/50">{rows.length} variants</div>
       </section>
 

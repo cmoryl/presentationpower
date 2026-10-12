@@ -79,3 +79,7 @@
 - [x] Content bricks per piece, tagged by surface
 - [ ] Bricks dropped straight into event sign editors (supplied signs are fixed artwork)
 - [ ] Voice pitch coaching - declined (no voice features rule)
+
+# Roadmap — print library
+- [x] Life Sciences pieces in original designer layout
+- [x] Company/sub-brand + Product family tag filters in print library and template catalogue
