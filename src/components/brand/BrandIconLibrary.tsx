@@ -13,7 +13,14 @@ import {
   iconColorOptions,
   type IconDownloadSize,
 } from "@/lib/brand-icon-sets";
-import { downloadFullSet, downloadIcon, downloadSubArea } from "@/lib/icon-export";
+import {
+  downloadAllCanvaPacks,
+  downloadCanvaPack,
+  downloadFullSet,
+  downloadIcon,
+  downloadSubArea,
+} from "@/lib/icon-export";
+import { BRAND_ICON_SETS } from "@/lib/brand-icon-sets";
 
 interface Props {
   /** Brand guide slug. */
@@ -167,7 +174,26 @@ export function BrandIconLibrary({ slug, hero }: Props) {
           >
             {busy === "set" ? "Zipping…" : `Download full set (.zip · ${format.toUpperCase()})`}
           </button>
+          <button
+            type="button"
+            disabled={busy !== null}
+            onClick={() => run("canva-set", () => downloadCanvaPack(set, colorHex))}
+            className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground hover:bg-muted disabled:opacity-60"
+            title="Every sub-area as Canva-ready SVGs, foldered Brand / Sub-area"
+          >
+            {busy === "canva-set" ? "Zipping…" : "Canva Pack (.zip) · full set"}
+          </button>
+          <button
+            type="button"
+            disabled={busy !== null}
+            onClick={() => run("canva-all", () => downloadAllCanvaPacks(BRAND_ICON_SETS, colorHex))}
+            className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground hover:bg-muted disabled:opacity-60"
+            title={`All ${BRAND_ICON_SETS.length} approved sets in one Canva bundle`}
+          >
+            {busy === "canva-all" ? "Zipping…" : "Export all approved sets for Canva"}
+          </button>
           {area && (
+            <>
             <button
               type="button"
               disabled={busy !== null}
@@ -176,6 +202,16 @@ export function BrandIconLibrary({ slug, hero }: Props) {
             >
               {busy === "area" ? "Zipping…" : `Download “${area.name}”`}
             </button>
+            <button
+              type="button"
+              disabled={busy !== null}
+              onClick={() => run("canva-area", () => downloadCanvaPack(set, colorHex, area))}
+              className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground hover:bg-muted disabled:opacity-60"
+              title="Clean 24 × 24 SVGs for Canva Brand Kits, with upload instructions"
+            >
+              {busy === "canva-area" ? "Zipping…" : `Canva Pack (.zip) · “${area.name}”`}
+            </button>
+            </>
           )}
         </div>
       </div>
