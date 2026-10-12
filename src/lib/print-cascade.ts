@@ -48,7 +48,7 @@ function statsOf(c: Rec): Stat[] {
 }
 /** Only figures the piece prints as numbers (">50", "~80", "20%+", "10,000+"). */
 function numericStats(c: Rec): Stat[] {
-  return statsOf(c).filter((r) => /\d/.test(r.value));
+  return statsOf(c).filter((r) => /^[~<>≈$]*\d/.test(r.value));
 }
 
 type Block = { heading: string; body: string; bullets: string[] };
