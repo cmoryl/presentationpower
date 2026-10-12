@@ -81,5 +81,5 @@
 - [ ] Voice pitch coaching - declined (no voice features rule)
 
 # Roadmap — print library
-- [~] Life Sciences pieces in original designer layout
-- [ ] Company/sub-brand + Product family tag filters in print library and template catalogue
+- [x] Life Sciences pieces in original designer layout
+- [x] Company/sub-brand + Product family tag filters in print library and template catalogue
