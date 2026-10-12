@@ -994,14 +994,23 @@ function MasterItemEditorPage() {
               <div className="max-h-[480px] space-y-2.5 overflow-y-auto pr-1">
                 {textPaths.map((p) => {
                   const value = String(readLeaf(draft.content!, p) ?? "");
-                  const long = value.length > 90;
+                  // Headers and subheads are often set on several lines in the
+                  // masters — an <input> silently flattens the line breaks, so
+                  // any copy with a break, any heading-like field, or long copy
+                  // gets a multi-line box sized to its lines.
+                  const lines = value.split("\n").length;
+                  const headingLike =
+                    /(^|\.)(title|headline|heading|subtitle|subhead|subheadline|deck|strap|strapline|summary|text|body|copy|lede|intro)$/i.test(
+                      p,
+                    );
+                  const long = lines > 1 || value.length > 60 || headingLike;
                   return (
                     <label key={p} className="block">
                       <span className="block font-mono text-[10px] text-black/45">{p}</span>
                       {long ? (
                         <textarea
-                          rows={3}
-                          className={fieldCls}
+                          rows={Math.min(8, Math.max(2, lines, Math.ceil(value.length / 60)))}
+                          className={`${fieldCls} resize-y`}
                           value={value}
                           onChange={(e) => patchPath(p, e.target.value)}
                         />
