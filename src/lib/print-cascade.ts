@@ -114,7 +114,7 @@ function notesOf(item: PrintLibraryItem): string {
 }
 
 function statSlide(stats: Stat[], title: string) {
-  const n = stats.length >= 4 ? 4 : stats.length === 3 ? 3 : 2;
+  const n = stats.length >= 3 ? 3 : 2;
   const variant = n === 4 ? "MV-PROOF-STATS-4" : n === 3 ? "MV-PROOF-STATS-3" : "MV-PROOF-STATS-2";
   const layout = n === 4 ? "LF-10" : n === 3 ? "LF-08" : "LF-04";
   return {
@@ -124,11 +124,14 @@ function statSlide(stats: Stat[], title: string) {
     mode: "dark" as const,
     content: {
       title: fitChars(title, 60),
-      items: stats.slice(0, n).map((r) => ({
-        value: r.value,
-        unit: r.unit ?? "",
-        label: fitChars(r.label, 60),
-      })),
+      items: stats.slice(0, n).map((r) => {
+        const m = r.value.match(/^([~<>≈$]*[\d.,]+)(.*)$/);
+        const value = m ? m[1] : r.value;
+        // Units come only from the printed figure ("20%+" → "%+"); a bare
+        // count keeps a thin space so nothing fills it with other copy.
+        const unit = `${m ? m[2] : ""}${r.unit ?? ""}`.trim() || "\u2009";
+        return { value, unit, label: fitChars(r.label, 60) };
+      }),
     },
   };
 }
@@ -152,23 +155,27 @@ export function deckSnapshotFromPiece(item: PrintLibraryItem): DeckSnapshot {
       clientName: fitChars(item.kind === "case-study" ? s(c.client) : s(c.eyebrow), 60) ?? "",
       title: fitChars(title, 60),
       subtitle: fitChars(s(c.summary), 60) ?? "",
+      date: item.kind === "case-study" ? "Case study" : "eBrochure",
       ...(hero ? { mediaUrl: hero } : {}),
     },
     notes,
   });
 
   if (item.kind === "case-study") {
+    // Case study spread — the Life Sciences brand-preferred case layout.
     const [ch, so, re] = blocks;
+    const lead = stats[0];
     slides.push({
       sectionId: "SF-09",
-      variantId: "MV-CASE-STORY",
-      layoutId: "LF-03",
+      variantId: "MV-CASE-SPREAD",
+      layoutId: "LF-18",
       mode: "light",
       content: {
         client: fitChars(s(c.client), 60),
-        headline: fitChars(title, 60),
-        story: fitChars([ch?.body, so?.body].filter(Boolean).join(" "), 600),
-        result: fitChars(re?.body, 600) ?? "",
+        challenge: fitChars(ch?.body, 160),
+        solution: fitChars(so?.body, 160),
+        result: fitChars(re?.body, 160),
+        metric: lead ? fitChars(`${lead.value}${lead.unit ?? ""} ${lead.label}`, 60) : "",
       },
       notes,
     });
