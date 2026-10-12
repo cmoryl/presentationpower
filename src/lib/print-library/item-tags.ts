@@ -65,3 +65,7 @@ export function tagCounts(items: PrintLibraryItem[], of: (i: PrintLibraryItem) =
     a[0] === UNTAGGED ? 1 : b[0] === UNTAGGED ? -1 : a[0].localeCompare(b[0]),
   );
 }
+
+/** Tag plain text (e.g. a saved template's title). */
+export const companyFromText = (s: string) => COMPANIES.find(([, re]) => re.test(s))?.[0] ?? UNTAGGED;
+export const productFromText = (s: string) => PRODUCTS.find(([, re]) => re.test(s))?.[0] ?? UNTAGGED;
