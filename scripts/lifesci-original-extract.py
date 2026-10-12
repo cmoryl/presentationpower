@@ -27,63 +27,100 @@ def hexcol(c: int) -> str:
     return f"#{c:06X}"
 
 
+def segments(line):
+    """Split one PDF line into pieces where a wide gap separates columns."""
+    segs, cur, last_x1 = [], [], None
+    for s in line["spans"]:
+        if not s["text"]:
+            continue
+        if cur and last_x1 is not None and s["bbox"][0] - last_x1 > max(s["size"] * 1.6, 8):
+            segs.append(cur)
+            cur = []
+        cur.append(s)
+        last_x1 = s["bbox"][2]
+    if cur:
+        segs.append(cur)
+    return [g for g in segs if "".join(s["text"] for s in g).strip()]
+
+
+def item_from(lines):
+    """lines: list of span lists stacked top to bottom -> one text box."""
+    spans = [s for l in lines for s in l]
+    dom = max(spans, key=lambda s: len(s["text"].strip()))
+    size = round(dom["size"], 1)
+    x0 = min(s["bbox"][0] for s in spans)
+    x1 = max(s["bbox"][2] for s in spans)
+    y0 = min(s["bbox"][1] for s in spans)
+    y1 = max(s["bbox"][3] for s in spans)
+    lead = 1.2
+    if len(lines) > 1:
+        gaps = [lines[i + 1][0]["origin"][1] - lines[i][0]["origin"][1] for i in range(len(lines) - 1)]
+        lead = round(max(0.8, min(2.2, (sum(gaps) / len(gaps)) / size)), 3)
+    lefts = [l[0]["bbox"][0] for l in lines]
+    rights = [l[-1]["bbox"][2] for l in lines]
+    centers = [(a + b) / 2 for a, b in zip(lefts, rights)]
+    align = "left"
+    if len(lines) > 1 and max(lefts) - min(lefts) > 3:
+        if max(centers) - min(centers) < 3:
+            align = "center"
+        elif max(rights) - min(rights) < 3:
+            align = "right"
+    # Runs: consecutive spans sharing colour + weight merge; lines join with \n.
+    runs = []
+    for li, l in enumerate(lines):
+        for si, s in enumerate(l):
+            txt = s["text"].rstrip() if si == len(l) - 1 else s["text"]
+            if li > 0 and si == 0:
+                txt = "\n" + txt
+            st = (hexcol(s["color"]), weight_of(s["font"], s["flags"]))
+            if runs and (runs[-1]["color"], runs[-1]["weight"]) == st:
+                runs[-1]["text"] += txt
+            else:
+                runs.append({"text": txt, "color": st[0], "weight": st[1]})
+    base = lines[0][0]["origin"][1]
+    top = base - size * (lead / 2 + 0.38)
+    width = (x1 - x0) / 72
+    slack = width * 0.14 + 0.08
+    x = x0 / 72 - (slack / 2 if align == "center" else slack if align == "right" else 0)
+    item = {
+        "x": round(x, 4), "y": round(top / 72, 4), "w": round(width + slack, 4), "h": round((y1 - y0) / 72, 4),
+        "size": size, "weight": runs[0]["weight"] if len(runs) == 1 else weight_of(dom["font"], dom["flags"]),
+        "color": runs[0]["color"] if len(runs) == 1 else hexcol(dom["color"]),
+        "lead": lead, "align": align, "font": dom["font"],
+        "text": "".join(r["text"] for r in runs),
+    }
+    if len(runs) > 1:
+        item["runs"] = runs
+    return item
+
+
 def page_texts(page: pymupdf.Page):
     out = []
-    d = page.get_text("dict")
-    for b in d["blocks"]:
+    for b in page.get_text("dict")["blocks"]:
         if b["type"] != 0:
             continue
-        lines = [l for l in b["lines"] if "".join(s["text"] for s in l["spans"]).strip()]
-        if not lines:
-            continue
-        # Split a block where size/colour/weight changes between lines.
-        groups, cur, key = [], [], None
-        for l in lines:
-            s0 = max(l["spans"], key=lambda s: len(s["text"].strip()))
-            k = (round(s0["size"], 1), s0["color"], weight_of(s0["font"], s0["flags"]))
-            if cur and k != key:
-                groups.append((key, cur))
-                cur = []
-            cur.append(l)
+        group, key = [], None
+        for l in b["lines"]:
+            segs = segments(l)
+            if not segs:
+                continue
+            if len(segs) > 1:
+                if group:
+                    out.append(item_from(group))
+                group, key = [], None
+                out.extend(item_from([g]) for g in segs)
+                continue
+            seg = segs[0]
+            dom = max(seg, key=lambda s: len(s["text"].strip()))
+            k = (round(dom["size"], 1), weight_of(dom["font"], dom["flags"]) >= 600)
+            same_row = group and abs(seg[0]["origin"][1] - group[-1][0]["origin"][1]) < 1
+            if group and (k != key or same_row):
+                out.append(item_from(group))
+                group = []
+            group.append(seg)
             key = k
-        groups.append((key, cur))
-        for (size, color, weight), ls in groups:
-            x0 = min(l["bbox"][0] for l in ls)
-            y0 = min(l["bbox"][1] for l in ls)
-            x1 = max(l["bbox"][2] for l in ls)
-            y1 = max(l["bbox"][3] for l in ls)
-            text = "\n".join("".join(s["text"] for s in l["spans"]).rstrip() for l in ls)
-            lead = 1.2
-            if len(ls) > 1:
-                gaps = [ls[i + 1]["spans"][0]["origin"][1] - ls[i]["spans"][0]["origin"][1] for i in range(len(ls) - 1)]
-                lead = round(max(0.8, min(2.2, (sum(gaps) / len(gaps)) / size)), 3)
-            centers = [(l["bbox"][0] + l["bbox"][2]) / 2 for l in ls]
-            lefts = [l["bbox"][0] for l in ls]
-            rights = [l["bbox"][2] for l in ls]
-            align = "left"
-            if len(ls) > 1 and max(lefts) - min(lefts) > 3:
-                if max(centers) - min(centers) < 3:
-                    align = "center"
-                elif max(rights) - min(rights) < 3:
-                    align = "right"
-            first = ls[0]["spans"][0]
-            # Top of the box sits at the first baseline minus the ascent the
-            # browser gives the line box: baseline - size * (lead/2 + 0.4).
-            base = first["origin"][1]
-            top = base - size * (lead / 2 + 0.38)
-            out.append({
-                "x": round(x0 / 72, 4),
-                "y": round(top / 72, 4),
-                "w": round((x1 - x0) / 72 * 1.06 + 0.02, 4),
-                "h": round((y1 - y0) / 72, 4),
-                "size": size,
-                "weight": weight,
-                "color": hexcol(color),
-                "lead": lead,
-                "align": align,
-                "text": text,
-                "font": first["font"],
-            })
+        if group:
+            out.append(item_from(group))
     return out
 
 
