@@ -335,20 +335,29 @@ async def flatten_mismatches(pg, pdf, pn, W, H, out, pieces, boxes, groups):
         f = out / k["file"]
         mime = "image/svg+xml" if f.suffix == ".svg" else "image/png"
         return f"data:{mime};base64," + base64.b64encode(f.read_bytes()).decode()
-    items = [{"src": src(k), "x": k["x"] * 72, "y": k["y"] * 72, "w": k["w"] * 72, "h": k["h"] * 72} for k in pieces]
-    url = await pg.evaluate(COMPOSE_JS, {"items": items, "w": W, "h": H, "px": px})
-    comp = np.asarray(Image.open(io.BytesIO(base64.b64decode(url.split(",", 1)[1]))).convert("RGB"), int)
-    _, p = text_free(pdf, pn)
-    pix = p.get_pixmap(dpi=72, alpha=False)
+    _, p0 = text_free(pdf, pn)
+    pix = p0.get_pixmap(dpi=72, alpha=False)
     ref = np.asarray(Image.frombytes("RGB", (pix.width, pix.height), pix.samples), int)
-    hh, ww = min(comp.shape[0], ref.shape[0]), min(comp.shape[1], ref.shape[1])
-    diff = np.abs(comp[:hh, :ww] - ref[:hh, :ww]).max(2)
-    for gi, k in enumerate(pieces):
-        x0, y0 = int(k["x"] * 72), int(k["y"] * 72)
-        x1, y1 = int((k["x"] + k["w"]) * 72), int((k["y"] + k["h"]) * 72)
-        region = diff[y0:y1, x0:x1]
-        if region.size == 0 or region.mean() < 10:
-            continue
+    # Flatten the worst piece, recompose, repeat — an early mismatch can make
+    # pieces painted over it look wrong too, so fix one at a time.
+    for _round in range(10):
+        items = [{"src": src(k), "x": k["x"] * 72, "y": k["y"] * 72, "w": k["w"] * 72, "h": k["h"] * 72} for k in pieces]
+        url = await pg.evaluate(COMPOSE_JS, {"items": items, "w": W, "h": H, "px": px})
+        comp = np.asarray(Image.open(io.BytesIO(base64.b64decode(url.split(",", 1)[1]))).convert("RGB"), int)
+        hh, ww = min(comp.shape[0], ref.shape[0]), min(comp.shape[1], ref.shape[1])
+        diff = np.abs(comp[:hh, :ww] - ref[:hh, :ww]).max(2)
+        worst, wv = None, 10.0
+        for gi, k in enumerate(pieces):
+            if k.get("flattened"):
+                continue
+            x0, y0 = int(k["x"] * 72), int(k["y"] * 72)
+            x1, y1 = int((k["x"] + k["w"]) * 72), int((k["y"] + k["h"]) * 72)
+            region = diff[y0:y1, x0:x1]
+            if region.size and region.mean() > wv:
+                worst, wv = gi, float(region.mean())
+        if worst is None:
+            return
+        gi, k = worst, pieces[worst]
         doc, p = text_free(pdf, pn)
         for later in groups[gi + 1:]:
             for i in later:
@@ -359,11 +368,11 @@ async def flatten_mismatches(pg, pdf, pn, W, H, out, pieces, boxes, groups):
         old = out / k["file"]
         old.unlink()
         f = old.with_suffix(".png")
-        p.get_pixmap(dpi=200, clip=clip, alpha=False, colorspace=pymupdf.csRGB).save(str(f))
+        p.get_pixmap(dpi=200, clip=clip, alpha=True, colorspace=pymupdf.csRGB).save(str(f))
         k["file"] = f.name
         k["label"] = "Image"
         k["flattened"] = True
-        print("  flattened", k["file"], "diff", round(float(region.mean()), 1))
+        print("  flattened", k["file"], "diff", round(wv, 1))
 
 
 def save_data_url(url, path):
