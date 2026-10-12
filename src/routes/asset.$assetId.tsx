@@ -189,6 +189,8 @@ import { MsaPartnershipLayout } from "@/components/print/MsaPartnershipLayout";
 import { MultiProposalLayout, isMultiProposal } from "@/components/print/MultiProposalLayout";
 import { SolutionProposalLayout } from "@/components/print/SolutionProposalLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
+import { OriginalPageLayout, isOriginalLayout } from "@/components/print/OriginalPageLayout";
+import type { OriginalLayout } from "@/lib/print-library/original-layout";
 import { ContentInspector } from "@/components/print/ContentInspector";
 import { schemaFor } from "@/lib/print-content-schema";
 import { CONTENT_SCHEMAS, unreachablePaths } from "@/lib/print-content-schema";
@@ -609,7 +611,7 @@ function AssetEditor() {
   // the export size follows the layout unless the user picks another size
   // themselves. Read from the row directly — this runs before `ctx` exists.
   const authoredPageSize = ((row?.context as PrintAssetContext | null)?.pageSize ??
-    "A4") as PrintPageSize;
+    (isOriginalLayout(row?.content) ? "Letter" : "A4")) as PrintPageSize;
   const sizeTouchedRef = useRef(false);
   useEffect(() => {
     if (sizeTouchedRef.current) return;
@@ -1112,9 +1114,13 @@ function AssetEditor() {
 
   // Multi-page proposals render every page stacked inside the canvas, so the
   // canvas cannot be pinned to a single page aspect ratio.
+  const orig = isOriginalLayout(rawContent);
+  // Supplied pieces may keep a library-layout fallback in the same content.
+  const hasOriginal = !!(rawContent as { original?: unknown }).original;
   const multiDoc =
-    kind === "solution-proposal" && isMultiProposal(rawContent as Partial<SolutionProposalContent>);
-  const pageSize: PrintPageSize = ctx.pageSize ?? "A4";
+    orig ||
+    (kind === "solution-proposal" && isMultiProposal(rawContent as Partial<SolutionProposalContent>));
+  const pageSize: PrintPageSize = ctx.pageSize ?? (orig ? "Letter" : "A4");
   const marginPreset: PrintMarginPreset = ctx.marginPreset ?? "standard";
   const pagePresetInfo = pagePreset(pageSize);
   const marginSideIn = pageSideMarginIn(pageSize, ctx.density ?? "standard", marginPreset);
@@ -1209,6 +1215,30 @@ function AssetEditor() {
                 <Redo2 size={12} /> Redo
               </button>
             </div>
+
+            {hasOriginal ? (
+              <div
+                className="mr-1 inline-flex items-center gap-0 rounded-full border border-black/10 bg-white p-0.5 dark:border-white/10 dark:bg-white/[0.03]"
+                role="group"
+                aria-label="Page layout"
+              >
+                {(["original", "library"] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    aria-pressed={orig === (m === "original")}
+                    onClick={() => patchContent({ layoutMode: m } as unknown as Partial<CaseStudyContent>)}
+                    className={`rounded-full px-2.5 py-1 text-xs font-medium transition ${
+                      orig === (m === "original")
+                        ? "bg-[#03002C] text-white dark:bg-white dark:text-[#03002C]"
+                        : "text-[#03002C] hover:bg-black/5 dark:text-white dark:hover:bg-white/5"
+                    }`}
+                  >
+                    {m === "original" ? "Original layout" : "Library layout"}
+                  </button>
+                ))}
+              </div>
+            ) : null}
 
             {/* Editor mode toggle. Persisted to ctx so it survives reload,
                 and defaults the export panel so downloads are WYSIWYG. */}
@@ -1701,7 +1731,8 @@ function AssetEditor() {
                             onClearInkScopeColor={(sc) => setInkScopeColor(sc, null)}
                           >
                             <PrintClientLogoProvider value={clientLogo}>
-                              {brand && kind === "case-study" && (
+                              {orig ? <OriginalPageLayout layout={(rawContent as { original: OriginalLayout }).original} /> : null}
+                              {brand && !orig && kind === "case-study" && (
                                 <CaseStudyLayout
                                   content={rawContent as unknown as CaseStudyContent}
                                   brand={brand}
@@ -1711,7 +1742,7 @@ function AssetEditor() {
                                   seed={`asset-${row.id}`}
                                 />
                               )}
-                              {brand && kind === "spotlight" && (
+                              {brand && !orig && kind === "spotlight" && (
                                 <SpotlightLayout
                                   content={rawContent as unknown as SpotlightContent}
                                   brand={brand}
@@ -1721,7 +1752,7 @@ function AssetEditor() {
                                   seed={`asset-${row.id}`}
                                 />
                               )}
-                              {brand && kind === "ebrochure" && (
+                              {brand && !orig && kind === "ebrochure" && (
                                 <EBrochureLayout
                                   content={rawContent as unknown as EBrochureContent}
                                   brand={brand}
@@ -1731,7 +1762,7 @@ function AssetEditor() {
                                   seed={`asset-${row.id}`}
                                 />
                               )}
-                              {brand && kind === "msa-partnership" && (
+                              {brand && !orig && kind === "msa-partnership" && (
                                 <MsaPartnershipLayout
                                   content={rawContent as unknown as MsaPartnershipContent}
                                   brand={brand}
@@ -1741,7 +1772,7 @@ function AssetEditor() {
                                   seed={`asset-${row.id}`}
                                 />
                               )}
-                              {brand &&
+                              {brand && !orig &&
                                 kind === "solution-proposal" &&
                                 isMultiProposal(rawContent as Partial<SolutionProposalContent>) && (
                                   <MultiProposalLayout
@@ -1753,7 +1784,7 @@ function AssetEditor() {
                                     seed={`asset-${row.id}`}
                                   />
                                 )}
-                              {brand &&
+                              {brand && !orig &&
                                 kind === "solution-proposal" &&
                                 !isMultiProposal(
                                   rawContent as Partial<SolutionProposalContent>,
@@ -1767,7 +1798,7 @@ function AssetEditor() {
                                     seed={`asset-${row.id}`}
                                   />
                                 )}
-                              {brand && kind === "adaptor-brief" && (
+                              {brand && !orig && kind === "adaptor-brief" && (
                                 <AdaptorBriefLayout
                                   content={rawContent as unknown as AdaptorBriefContent}
                                   brand={brand}
