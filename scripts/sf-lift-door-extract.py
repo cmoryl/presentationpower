@@ -1,4 +1,4 @@
-"""Split the San Francisco NEXT lift-door live files (41.5 x 84 in, Oct 2026) into native editor layouts; the "guides" layer is dropped. Adapted from next-lift-door-extract.py.
+"""Split the San Francisco NEXT lift-door live files (41.5 x 84 in, Oct 2026) into native editor layouts; the designer's "guides" layer carries the headline, which becomes live text. Adapted from next-lift-door-extract.py.
 
 Split the NEXT "Lift Your" lift-door wrap into a native editor layout (adapted from next-demo-booth-extract.py).
 
@@ -236,18 +236,73 @@ def svg_symbol(pdf_path, page_no, sym, prefix):
     return f'<symbol id="__SYM__-{sym}" viewBox="{vb}" overflow="visible">{inner}</symbol>'
 
 
+CAP = 0.71  # Geist ExtraBold cap height / em
+HEADLINES = {
+    "stepinto": "STEP\nINTO\nWHAT’S",
+    "thinkbigger": "THINK\nBIGGER.\nGO FURTHER.",
+    "elevate": "ELEVATE\nYOUR\nGLOBAL\nCUSTOMER\nEXPERIENCE",
+    "whereideas": "WHERE\nIDEAS\nCONNECT",
+    "cantspell": "YOU CAN’T\nSPELL\nGLOBALLINK\nWITHOUT AI",
+}
+
+
+def paragraphs(runs):
+    """Consecutive lines in the same font and size join into one wrapping paragraph (Enter keeps the breaks)."""
+    out = []
+    for r in sorted(runs, key=lambda t: t["y"]):
+        r = dict(r, text=r["text"].replace("YOU R", "YOUR"))
+        p = out[-1] if out else None
+        if p and p["font"] == r["font"] and abs(p["size"] - r["size"]) < 0.3 and r["y"] - p["_last"] < r["size"] * 1.6:
+            p["lead"] = round((r["y"] - p["y"]) / (p["text"].count("\n") + 1) / p["size"], 3)
+            p["text"] += "\n" + r["text"]; p["_last"] = r["y"]
+            p["w"] = max(p["w"], r["w"]); p["bottom"] = r["bottom"]; p["x"] = min(p["x"], r["x"])
+        else:
+            out.append(dict(r, _last=r["y"], lead=1.0))
+    for k, p in enumerate(out):
+        p.pop("_last"); p["id"] = "headline" if k == 0 else f"t{k}"; p["wrap"] = round(p["w"] + 139, 2); p["align"] = "left"
+    return out
+
+
+def outlined_headline(head, H, text):
+    """Live text standing in for an outlined headline, set from the outline lines (cap height -> size)."""
+    if not head: return []
+    bs = sorted([[p["box"][0], H - p["box"][3], p["box"][2], H - p["box"][1]] for p in head], key=lambda b: b[1])
+    lines = []
+    for b in bs:  # glyphs whose vertical middles overlap share a line
+        mid = (b[1] + b[3]) / 2
+        L = next((l for l in lines if l[1] - 2 < mid < l[3] + 2), None)
+        if L: L[0] = min(L[0], b[0]); L[1] = min(L[1], b[1]); L[2] = max(L[2], b[2]); L[3] = max(L[3], b[3])
+        else: lines.append(list(b))
+    lines.sort(key=lambda l: l[1])
+    n = text.count("\n") + 1
+    if len(lines) != n: print("  WARN line count", len(lines), "expected", n)
+    # Baseline = bottom of the line's tallest letters (median bottom across lines is robust to commas).
+    caps = sorted(l[3] - l[1] for l in lines)
+    size = round(caps[len(caps) // 2] / CAP, 2)
+    base0 = lines[0][3]
+    lead = round((lines[-1][3] - base0) / max(1, n - 1) / size, 3) if n > 1 else 1.0
+    x0 = min(l[0] for l in lines); x1 = max(l[2] for l in lines)
+    return [dict(id="headline", text=text, font="Geist-ExtraBold", size=size, color="#FFFFFF",
+                 x=round(x0 - size * 0.04, 2), y=round(base0, 2), w=round(x1 - x0, 2), top=round(lines[0][1], 2), bottom=round(lines[-1][3], 2),
+                 wrap=round(x1 - x0 + 139, 2), align="left", lead=lead)]
+
+
 def build():
     layouts = {}
     for sid, fname, faces in SIGNS:
         src = pikepdf.open(os.path.join(UP, fname))
         oc = src.Root.get("/OCProperties")
-        off = ({str(o.Name) for o in oc.D.get("/OFF", [])} if oc is not None else set()) | {"guides"}
+        off = ({str(o.Name) for o in oc.D.get("/OFF", [])} if oc is not None else set())
         profile = icc_name(src)
         for pi, face in enumerate(faces):
             lid = sid if face is None else f"{sid}-{face}"
             page = src.pages[pi]
             ops, paints, W, H = analyse(src, page, off)
-            paints = [p for p in paints if str(ops[p["i"]].operator) != "S"]  # red cut-line guide, never printed
+            paints = [p for p in paints if str(ops[p["i"]].operator) != "S"]
+            # The "guides" layer holds the headline: outlined paths become live text, never pieces.
+            head = [p for p in paints if p["layer"] == "guides" and p["kind"] == "path" and p["box"]]
+            hi = {p["i"] for p in head}
+            paints = [p for p in paints if p["i"] not in hi]  # red cut-line guide, never printed
             bg, objs = cluster(paints, W, H)
             MW, MH = W + 2 * B, H + 2 * B
             nat = pikepdf.new()
@@ -277,7 +332,7 @@ def build():
             tkeep = {p["i"] for p in paints if p["kind"] == "text" and not p["hidden"]}
             tp.Contents = tpdf.make_stream(f"q 1 0 0 1 {B} {B} cm\n".encode() + pikepdf.unparse_content_stream(filtered(ops, tkeep)) + b"\nQ\n")
             tpath = f"/tmp/db/{lid}-text.pdf"; tpdf.save(tpath)
-            texts = read_texts(tpath, W, H)
+            texts = paragraphs(read_texts(tpath, W, H)) or outlined_headline(head, H, HEADLINES[sid.rsplit("-", 1)[1]])
             npath = f"{OUT}/{lid}-native.pdf"; nat.save(npath)
             syms = [svg_symbol(npath, bg_page, "bg", f"{lid}-bg")]
             for k, pb in enumerate(part_boxes):
