@@ -193,6 +193,7 @@ export function BrandIconLibrary({ slug, hero }: Props) {
             {busy === "canva-all" ? "Zipping…" : "Export all approved sets for Canva"}
           </button>
           {area && (
+            <>
             <button
               type="button"
               disabled={busy !== null}
@@ -210,6 +211,7 @@ export function BrandIconLibrary({ slug, hero }: Props) {
             >
               {busy === "canva-area" ? "Zipping…" : `Canva Pack (.zip) · “${area.name}”`}
             </button>
+            </>
           )}
         </div>
       </div>
