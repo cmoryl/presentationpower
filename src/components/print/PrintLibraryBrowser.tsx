@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { companyOf, productOf, tagCounts } from "@/lib/print-library/item-tags";
 import { safeList } from "@/components/print/sections/shared";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -74,6 +75,10 @@ export type PrintBrowserState = {
   collection: string;
   query: string;
   subId: string | null;
+  /** Company / sub-brand filter ("All" = off). */
+  company?: string;
+  /** Product family filter ("All" = off). */
+  product?: string;
 };
 
 export function PrintLibraryBrowser({
@@ -104,6 +109,8 @@ export function PrintLibraryBrowser({
     else setLocal((prev) => ({ ...prev, ...p }));
   };
   const { typeId, collection, query, subId } = st;
+  const company = st.company ?? "All";
+  const product = st.product ?? "All";
   const setTypeId = (v: PrintTypeId | null) => patch({ typeId: v });
   const setCollection = (v: string) => patch({ collection: v });
   const setQuery = (v: string) => patch({ query: v });
@@ -136,7 +143,7 @@ export function PrintLibraryBrowser({
     [divisionId, typeId],
   );
 
-  const items = useMemo(() => {
+  const pool = useMemo(() => {
     const forDivision = (id: string) =>
       typeId ? itemsForDivisionType(id, typeId) : itemsForDivision(id);
     let base = forDivision(divisionId);
@@ -160,6 +167,17 @@ export function PrintLibraryBrowser({
       .filter((i) => matchesSubsection(i, activeSub))
       .filter((i) => matchesQuery(i, query));
   }, [divisionId, typeId, collection, query, activeSub, overrides, isAdmin]);
+  // Company / product counts are taken before those two filters apply, so
+  // every option shows how many it would leave.
+  const companies = useMemo(() => tagCounts(pool.filter((i) => product === "All" || productOf(i) === product), companyOf), [pool, product]);
+  const products = useMemo(() => tagCounts(pool.filter((i) => company === "All" || companyOf(i) === company), productOf), [pool, company]);
+  const items = useMemo(
+    () =>
+      pool
+        .filter((i) => company === "All" || companyOf(i) === company)
+        .filter((i) => product === "All" || productOf(i) === product),
+    [pool, company, product],
+  );
 
   if (!brand) return null;
 
@@ -300,6 +318,32 @@ export function PrintLibraryBrowser({
             </select>
           </>
         ) : null}
+
+        {/* Company / sub-brand and product family tags */}
+        {([
+          ["Company", company, companies, (v: string) => patch({ company: v })],
+          ["Product", product, products, (v: string) => patch({ product: v })],
+        ] as const).map(([label, value, opts, set]) =>
+          opts.length > 1 || value !== "All" ? (
+            <select
+              key={label}
+              aria-label={`${label} filter`}
+              value={value}
+              onChange={(e) => set(e.target.value)}
+              className={
+                "cursor-pointer rounded-full px-3 py-1 text-xs font-medium outline-none " +
+                (value !== "All" ? "bg-[#03002C] text-white" : "border border-black/10 bg-white text-black/60")
+              }
+            >
+              <option value="All">All {label === "Company" ? "companies" : "products"}</option>
+              {opts.map(([v, n]) => (
+                <option key={v} value={v}>
+                  {v} ({n})
+                </option>
+              ))}
+            </select>
+          ) : null,
+        )}
 
         <span className="ml-auto flex items-center gap-1.5">
           <span className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] font-medium text-black/55">
