@@ -304,6 +304,7 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
             </div>
           )}
         </div>
+        </>)}
       </div>
     </div>
   );
