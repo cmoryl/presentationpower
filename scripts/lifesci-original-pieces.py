@@ -69,7 +69,7 @@ def refs_of(e):
 
 class Page:
     def __init__(self, svg):
-        self.root = etree.fromstring(svg.encode())
+        self.root = etree.fromstring(svg.encode(), etree.XMLParser(huge_tree=True))
         self.defs = {d.get("id"): d for d in self.root.iter(f"{{{NS}}}*") if d.get("id")}
         defs_el = [c for c in self.root if tag(c) == "defs"]
         self.defs_el = defs_el[0] if defs_el else None
