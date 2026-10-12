@@ -3,7 +3,7 @@
 // text run sits back on top as real, editable text at the designer's position,
 // size, weight, colour and line spacing. Text strings live in content, so the
 // editor's in-place text editing (LiveEditOverlay) works on them unchanged.
-import type { CSSProperties } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 
 import { CSS_DPI, isOriginalLayout, type OriginalLayout } from "@/lib/print-library/original-layout";
 
@@ -18,8 +18,27 @@ export function OriginalPageLayout({ layout, pageIndex }: { layout: OriginalLayo
   const w = layout.widthIn * CSS_DPI;
   const h = layout.heightIn * CSS_DPI;
   const pages = typeof pageIndex === "number" ? layout.pages.slice(pageIndex, pageIndex + 1) : layout.pages;
+  const gap = 24;
+  const total = pages.length * h + (pages.length - 1) * gap;
+  // Pages are laid out at true size (96 px/in) and scaled to the column, so
+  // type, positions and exports keep the file's real proportions.
+  const outer = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  useLayoutEffect(() => {
+    const el = outer.current;
+    if (!el) return;
+    const fit = () => {
+      const cw = el.clientWidth;
+      if (cw > 0) setScale(Math.round((cw / w) * 1000) / 1000);
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [w]);
   return (
-    <div data-original-layout style={{ display: "grid", gap: 24 }}>
+    <div ref={outer} style={{ width: "100%", height: total * scale, overflow: "hidden" }}>
+    <div data-original-layout style={{ display: "grid", gap, width: w, transform: `scale(${scale})`, transformOrigin: "top left" }}>
       {pages.map((p, pi) => (
         <div
           key={pi}
@@ -62,6 +81,7 @@ export function OriginalPageLayout({ layout, pageIndex }: { layout: OriginalLayo
           )}
         </div>
       ))}
+    </div>
     </div>
   );
 }
