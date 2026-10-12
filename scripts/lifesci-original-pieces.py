@@ -244,7 +244,14 @@ def units(P, boxes, fg, page_area):
             i, j = small[a], small[b]
             A, B = bx[i], bx[j]
             g = JOIN
-            if A[0] - g < B[2] and B[0] - g < A[2] and A[1] - g < B[3] and B[1] - g < A[3] and not contains(A, B) and not contains(B, A):
+            if A[0] - g < B[2] and B[0] - g < A[2] and A[1] - g < B[3] and B[1] - g < A[3]:
+                parent[find(i)] = find(j)
+    # a frame and its own shadow/fill (same box) are one piece
+    for i in range(len(out)):
+        for j in range(i + 1, len(out)):
+            A, B = bx[i], bx[j]
+            inter = area([max(A[0], B[0]), max(A[1], B[1]), min(A[2], B[2]), min(A[3], B[3])])
+            if inter > 0.85 * max(area(A), area(B)):
                 parent[find(i)] = find(j)
     gs = {}
     for i in range(len(out)):
