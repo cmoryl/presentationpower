@@ -1,3 +1,4 @@
+import { allowAuthBounce } from "@/lib/sign-out";
 import { createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -137,6 +138,14 @@ function AuthPage() {
     let mounted = true;
     supabase.auth.getSession().then(({ data }) => {
       if (mounted && data.session) {
+        // Loop breaker: if we keep handing the visitor back and the page keeps
+        // sending them here, stop and show the form instead of reloading forever.
+        if (!allowAuthBounce()) {
+          setError(
+            "Sign-in kept bouncing between pages. Reload the page once; if it happens again, sign out and back in.",
+          );
+          return;
+        }
         if (returnTo) window.location.href = returnTo;
         else navigate({ to: "/", replace: true });
       }
