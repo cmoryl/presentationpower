@@ -8,6 +8,7 @@ import { checkUploadSize, UPLOAD_IMAGE_MAX_BYTES } from "@/lib/upload-limits";
 
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { EventPhotoBrowser } from "@/components/media/EventPhotoBrowser";
 import { listSlideMedia, uploadSlideMedia, type SlideMediaItem } from "@/lib/slide-media";
 
 export type PickedMedia = { url: string; path?: string };
@@ -30,6 +31,7 @@ export function SlideMediaPicker({
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [url, setUrl] = useState(currentUrl ?? "");
+  const [showEvents, setShowEvents] = useState(false);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -98,6 +100,22 @@ export function SlideMediaPicker({
         </div>
 
         <div className="max-h-[74vh] space-y-4 overflow-y-auto p-4">
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowEvents((v) => !v)}
+              aria-expanded={showEvents}
+              className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/80 hover:text-white"
+            >
+              {showEvents ? "Hide event photos" : "Browse event photos"}
+            </button>
+            {showEvents ? (
+              <div className="mt-3">
+                <EventPhotoBrowser onPick={(p) => { onPick({ url: p.url }); onClose(); }} />
+              </div>
+            ) : null}
+          </div>
+
           {/* Upload / drop zone */}
           <div
             onDragOver={(e) => {
