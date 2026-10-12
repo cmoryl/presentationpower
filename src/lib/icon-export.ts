@@ -195,3 +195,132 @@ export function downloadFullSet(set: BrandIconSet, opts: IconFileOptions): Promi
     readme: readme(set, opts, `Full set (${flatIcons(set).length} glyphs)`),
   });
 }
+
+// -----------------------------------------------------------------------------
+// Canva icon pack — clean, recolourable SVGs foldered `<Set>/<Sub-area>/` for
+// bulk upload into Canva Brand Kits. Same glyph source as every other download.
+// -----------------------------------------------------------------------------
+
+/** Folder/file-safe name: letters, digits, spaces → hyphens, no punctuation. */
+function canvaSlug(s: string): string {
+  return s
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/&/g, " and ")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+/** Folder name that stays readable in Canva's uploads panel. */
+function canvaFolder(s: string): string {
+  return s.replace(/[\\/:*?"<>|]+/g, "-").replace(/\s+/g, " ").trim() || "Icons";
+}
+
+/**
+ * Canva-ready SVG: `viewBox="0 0 24 24"`, explicit width/height, a single
+ * stroke weight in one approved hex on every path (Canva lists that colour as
+ * an editable swatch), no React/ARIA/class attributes, no XML prolog.
+ */
+export function canvaSvgString(name: string, opts: { color?: string; strokeWidth?: number; title?: string } = {}): string | null {
+  const raw = iconSvgString(name, { size: 24, color: opts.color ?? DEFAULTS.color, strokeWidth: opts.strokeWidth ?? 2 });
+  if (!raw) return null;
+  const color = opts.color ?? DEFAULTS.color;
+  const body = raw
+    .replace(/<\?xml[^>]*>\s*/, "")
+    .replace(/\s(class|aria-hidden|data-[\w-]+)="[^"]*"/g, "")
+    .replace(/currentColor/g, color)
+    .trim();
+  const inner = body.replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
+  const sw = opts.strokeWidth ?? 2;
+  const title = opts.title ? `<title>${opts.title.replace(/[<&>]/g, "")}</title>` : "";
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 24 24" ` +
+    `fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">` +
+    `${title}${inner}</svg>\n`
+  );
+}
+
+function canvaReadme(scope: string, count: number, color: string): string {
+  return [
+    `TransPerfect Element — Canva icon pack`,
+    `Scope: ${scope}   Icons: ${count}   Colour: ${color}`,
+    "",
+    "WHAT'S INSIDE",
+    "  <Brand or division>/<Sub-area>/<brand>-<sub-area>-<icon>.svg",
+    "  Every file is a single-weight outline on a 24 x 24 grid (viewBox 0 0 24 24),",
+    "  drawn in one approved colour, so Canva treats it as an editable graphic.",
+    "",
+    "UPLOAD TO A CANVA BRAND KIT",
+    "  1. Unzip this file.",
+    "  2. In Canva open Brand > your Brand Kit > Graphics (or Icons) > Upload.",
+    "  3. Drag a whole sub-area folder (or several) into the upload area.",
+    "     Keep one Brand Kit folder per division so search stays clean.",
+    "  4. Search Canva by the words in the filename, e.g. \"globallink workflow\".",
+    "",
+    "EDITING IN CANVA",
+    "  Select an icon and use the colour swatch to recolour it. Stay inside the",
+    "  approved palette; do not add keylines, fills or third-party glyphs, and",
+    "  never mix weights in one layout.",
+    "",
+    `Generated ${new Date().toISOString().slice(0, 10)} from the TransPerfect brand system.`,
+  ].join("\n");
+}
+
+type CanvaZip = { file: (path: string, data: string) => void };
+
+function addCanvaSet(zip: CanvaZip, set: BrandIconSet, color: string, onlyArea?: IconSubArea): number {
+  const brandDir = canvaFolder(set.title);
+  const brandSlug = canvaSlug(set.slug);
+  let n = 0;
+  for (const area of onlyArea ? [onlyArea] : set.subAreas) {
+    const areaDir = canvaFolder(area.name);
+    const areaSlug = canvaSlug(area.name);
+    const used = new Set<string>();
+    for (const icon of area.icons) {
+      const svg = canvaSvgString(icon.name, { color, title: icon.label });
+      if (!svg) continue;
+      let base = `${brandSlug}-${areaSlug}-${canvaSlug(icon.label || icon.name)}`;
+      if (used.has(base)) base = `${base}-${canvaSlug(icon.name)}`;
+      used.add(base);
+      zip.file(`${brandDir}/${areaDir}/${base}.svg`, svg);
+      n += 1;
+    }
+  }
+  return n;
+}
+
+async function canvaZip(
+  build: (zip: CanvaZip) => number,
+  zipName: string,
+  scope: string,
+  color: string,
+): Promise<number> {
+  const { default: JSZip } = await import("jszip");
+  const zip = new JSZip();
+  const count = build(zip);
+  zip.file("README.txt", canvaReadme(scope, count, color));
+  triggerDownload(await zip.generateAsync({ type: "blob" }), `${zipName}.zip`);
+  return count;
+}
+
+/** Canva pack for one set, or one sub-area of it. */
+export function downloadCanvaPack(set: BrandIconSet, color: string, area?: IconSubArea): Promise<number> {
+  return canvaZip(
+    (zip) => addCanvaSet(zip, set, color, area),
+    `canva-icons-${canvaSlug(set.slug)}${area ? `-${canvaSlug(area.name)}` : ""}`,
+    area ? `${set.title} · ${area.name}` : `${set.title} (all sub-areas)`,
+    color,
+  );
+}
+
+/** Master bundle: every approved set, foldered by brand/division then sub-area. */
+export function downloadAllCanvaPacks(sets: BrandIconSet[], color: string): Promise<number> {
+  return canvaZip(
+    (zip) => sets.reduce((n, s) => n + addCanvaSet(zip, s, color), 0),
+    "canva-icons-all-approved-sets",
+    `All approved sets (${sets.length})`,
+    color,
+  );
+}
