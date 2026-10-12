@@ -13,7 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { listMyCloudDecks, loadCloudDeck } from "@/lib/cloud-decks.functions";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { cascadePiece, cascadePieces, contentFromLibraryPiece, deckSnapshotFromPiece } from "@/lib/print-cascade";
+import { cascadePiece, cascadePieces, contentBricks, type ContentBrick, contentFromLibraryPiece, deckSnapshotFromPiece } from "@/lib/print-cascade";
 import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { AssetExportMenu } from "@/components/AssetExportMenu";
@@ -413,6 +413,7 @@ function ConvertPage() {
                 <p className="text-[11px] leading-snug text-[color:var(--color-muted-foreground)]">
                   Same copy, figures and cover image as the print piece. The full text goes in the speaker notes.
                 </p>
+                {piece ? <BrickList bricks={contentBricks(piece)} /> : null}
               </div>
             ) : null}
             {sourceKind === "module" || sourceKind === "print" ? null : manual ? (
@@ -482,9 +483,9 @@ function ConvertPage() {
             <div className="grid gap-1">
               {ADAPT_TARGETS.map((t, i) => (
                 <Fragment key={t.id}>
-                {i === 0 || ADAPT_TARGETS[i - 1].medium !== t.medium ? (
+                {i === 0 || (ADAPT_TARGETS[i - 1].surface ?? ADAPT_TARGETS[i - 1].medium) !== (t.surface ?? t.medium) ? (
                   <h3 className="pt-2 text-[11px] font-semibold tracking-[0.1em] text-[#666] uppercase">
-                    {t.medium === "print" ? "Print" : "Social"}
+                    {t.surface === "event" ? "Event signage" : t.medium === "print" ? "Print" : "Social"}
                   </h3>
                 ) : null}
                 <button
@@ -1041,6 +1042,39 @@ function InfoBuilder({
           </span>
         </label>
       ) : null}
+    </div>
+  );
+}
+
+
+/** The piece's reusable content bricks and the surfaces each one feeds. */
+function BrickList({ bricks }: { bricks: ContentBrick[] }) {
+  const [copied, setCopied] = useState<string | null>(null);
+  if (!bricks.length) return null;
+  return (
+    <div className="space-y-1.5 pt-2">
+      <h3 className="text-[11px] font-semibold tracking-[0.1em] text-[#666] uppercase">Content bricks</h3>
+      <ul className="space-y-1.5">
+        {bricks.map((b) => (
+          <li key={b.id} className="rounded-md border border-black/10 p-2 text-[12px] text-[#03002C]">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-semibold">{b.label}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  void navigator.clipboard?.writeText(b.text);
+                  setCopied(b.id);
+                }}
+                className="rounded border border-black/15 px-2 py-0.5 text-[11px] hover:border-[#003FC7]"
+              >
+                {copied === b.id ? "Copied" : "Copy"}
+              </button>
+            </div>
+            <p className="mt-0.5 line-clamp-2 text-[11.5px] text-[#666]">{b.text}</p>
+            <p className="mt-1 text-[10.5px] text-[#666]">Feeds: {b.surfaces.join(" · ")}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

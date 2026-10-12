@@ -183,7 +183,9 @@ export type AdaptTargetId =
   | "poster-a3"
   | "poster-a2"
   | "tent-card"
-  | "rollup-banner";
+  | "rollup-banner"
+  | "event-pillar"
+  | "event-easel-poster";
 
 /** How a print page arranges its blocks. */
 export type PrintLayout = "sheet" | "landscape" | "poster" | "banner";
@@ -216,6 +218,8 @@ export type AdaptTarget = {
   structure: string[];
   /** Print page arrangement (defaults to "sheet"). */
   layout?: PrintLayout;
+  /** Event signage sizes print like any print size but list under "Event". */
+  surface?: "event";
 };
 
 export const ADAPT_TARGETS: AdaptTarget[] = [
@@ -373,8 +377,13 @@ function EXTRA_PRINT_TARGETS(): AdaptTarget[] {
       { headline: 100, body: 360, points: 5, pointChars: 90 }, ["eyebrow", "headline", "body", "points", "stat", "footnote"], 1.6),
     make("tent-card", "Table tent · A6 portrait", mm(105, 148), "poster",
       { headline: 60, body: 120, points: 3, pointChars: 56 }, ["eyebrow", "headline", "body", "points", "stat"], 1.2),
-    make("rollup-banner", "Roll-up banner · 850 × 2000 mm", mm(850, 2000), "banner",
-      { headline: 80, body: 280, points: 5, pointChars: 90 }, ["eyebrow", "headline", "body", "points", "stat", "footnote"], 1.8),
+    { ...make("rollup-banner", "Roll-up banner · 850 × 2000 mm", mm(850, 2000), "banner",
+      { headline: 80, body: 280, points: 5, pointChars: 90 }, ["eyebrow", "headline", "body", "points", "stat", "footnote"], 1.8), surface: "event" },
+    // Same trim as the supplied GlobalLink NEXT pillar set (23.5 × 72 in).
+    { ...make("event-pillar", "Event pillar · 23.5 × 72 in", { width: 23.5, height: 72 }, "banner",
+      { headline: 70, body: 220, points: 4, pointChars: 80 }, ["eyebrow", "headline", "body", "points", "stat"], 1.8), surface: "event" },
+    { ...make("event-easel-poster", "Easel poster · 24 × 36 in", { width: 24, height: 36 }, "poster",
+      { headline: 90, body: 320, points: 5, pointChars: 90 }, ["eyebrow", "headline", "body", "points", "stat", "footnote"], 1.6), surface: "event" },
   ];
 }
 
