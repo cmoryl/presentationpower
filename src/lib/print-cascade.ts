@@ -153,7 +153,9 @@ export function deckSnapshotFromPiece(item: PrintLibraryItem): DeckSnapshot {
     layoutId: "LF-05",
     mode: "dark",
     content: {
-      clientName: fitChars(item.kind === "case-study" ? s(c.client) : s(c.eyebrow), 60) ?? "",
+      // The cover prints "Prepared for <clientName>": a case study names its
+      // client; a brochure has no client, so it reads "Prepared for your team".
+      clientName: (item.kind === "case-study" ? fitChars(s(c.client), 60) : undefined) ?? "your team",
       title: fitChars(title, 60),
       subtitle: fitChars(s(c.summary), 60) ?? "",
       date: item.kind === "case-study" ? "Case study" : "eBrochure",
