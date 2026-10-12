@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { HeroVideoLayer } from "@/components/hero/HeroVideoLayer";
 import heroPrintVideo from "@/assets/hero-print.mp4.asset.json";
 import { ApprovedPrintFrame } from "@/components/print/ApprovedPrintFrame";
@@ -917,7 +918,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
       )}
 
       {/* Lightbox */}
-      {lightbox && lightbox.signedUrl ? (
+      {lightbox && lightbox.signedUrl && typeof document !== "undefined" ? createPortal(
         <div
           role="dialog"
           aria-modal="true"
@@ -1005,7 +1006,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
             </div>
           </div>
         </div>
-      ) : null}
+      , document.body) : null}
     </section>
   );
 }

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { companyOf, productOf, tagCounts } from "@/lib/print-library/item-tags";
 import { safeList } from "@/components/print/sections/shared";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -1039,7 +1040,15 @@ function CopyItemButton({ item, label }: { item: PrintLibraryItem; label?: strin
 // ---------------------------------------------------------------------------
 // Preview overlay
 // ---------------------------------------------------------------------------
-function ItemPreviewOverlay({
+// Rendered into <body>: a transformed/filtered ancestor in the page makes
+// `position: fixed` relative to it, which pushed the preview's top under the
+// site header with no way to scroll up.
+function ItemPreviewOverlay(props: Parameters<typeof ItemPreviewOverlayInner>[0]) {
+  if (typeof document === "undefined") return null;
+  return createPortal(<ItemPreviewOverlayInner {...props} />, document.body);
+}
+
+function ItemPreviewOverlayInner({
   item,
   brand,
   renderPreview,
