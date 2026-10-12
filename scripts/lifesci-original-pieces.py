@@ -228,8 +228,6 @@ def units(P, boxes, fg, page_area):
     for c in P.root:
         if tag(c) != "defs":
             visit(c)
-    # join small touching units
-    small = [i for i, u in enumerate(out) if area(box(u)) < page_area * 0.012]
     bx = [box(u) for u in out]
     parent = list(range(len(out)))
 
@@ -239,20 +237,53 @@ def units(P, boxes, fg, page_area):
             i = parent[i]
         return i
 
-    for a in range(len(small)):
-        for b in range(a + 1, len(small)):
-            i, j = small[a], small[b]
-            A, B = bx[i], bx[j]
-            g = JOIN
-            if A[0] - g < B[2] and B[0] - g < A[2] and A[1] - g < B[3] and B[1] - g < A[3]:
-                parent[find(i)] = find(j)
+    def members(r):
+        return [i for i in range(len(out)) if find(i) == r]
+
+    def gbox(ms):
+        return [min(bx[i][0] for i in ms), min(bx[i][1] for i in ms), max(bx[i][2] for i in ms), max(bx[i][3] for i in ms)]
+
+    def overlap(A, B, g=0.0):
+        return A[0] - g < B[2] and B[0] - g < A[2] and A[1] - g < B[3] and B[1] - g < A[3]
+
+    def try_join(i, j):
+        """Join unless another overlapping piece paints between them (that
+        would put it above or below the wrong part once merged)."""
+        ri, rj = find(i), find(j)
+        if ri == rj:
+            return
+        ms = members(ri) + members(rj)
+        idx = [x for m in ms for x in out[m]]
+        lo, hi, B = min(idx), max(idx), gbox(ms)
+        for k in range(len(out)):
+            if find(k) in (ri, rj):
+                continue
+            if overlap(bx[k], B) and any(lo < x < hi for x in out[k]):
+                return
+        parent[ri] = rj
+
+    # Blended art (multiply etc.) only reads right over its own backdrop.
+    blend = [any("mix-blend-mode" in (P.leaves[x].getparent().get("style") or "") + (P.leaves[x].get("style") or "")
+                 or any("mix-blend-mode" in (an.get("style") or "") for an in P.leaves[x].iterancestors())
+                 for x in u) for u in out]
+    for i in range(len(out)):
+        if blend[i]:
+            for j in range(len(out)):
+                if j != i and min(out[j]) < min(out[i]) and overlap(bx[i], bx[j]):
+                    parent[find(j)] = find(i)
     # a frame and its own shadow/fill (same box) are one piece
     for i in range(len(out)):
         for j in range(i + 1, len(out)):
             A, B = bx[i], bx[j]
             inter = area([max(A[0], B[0]), max(A[1], B[1]), min(A[2], B[2]), min(A[3], B[3])])
             if inter > 0.85 * max(area(A), area(B)):
-                parent[find(i)] = find(j)
+                try_join(i, j)
+    # small touching parts (logo letters, icon strokes) join
+    small = [i for i, u in enumerate(out) if area(bx[i]) < page_area * 0.012]
+    for a in range(len(small)):
+        for b in range(a + 1, len(small)):
+            if overlap(bx[small[a]], bx[small[b]], JOIN):
+                try_join(small[a], small[b])
     gs = {}
     for i in range(len(out)):
         gs.setdefault(find(i), []).extend(out[i])
