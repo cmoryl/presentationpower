@@ -196,6 +196,66 @@ def group(boxes):
     return sorted(gs.values(), key=min)
 
 
+def units(P, boxes, fg, page_area):
+    """Split the drawing tree into pieces: a node smaller than UNIT of the
+    page (or with nothing to split) is one piece, larger nodes split into
+    their children; small neighbouring pieces (logo letters, icon parts)
+    then join when they touch."""
+    li = {id(l): i for i, l in enumerate(P.leaves)}
+
+    def leaves_under(e):
+        return [li[id(x)] for x in e.iter() if id(x) in li and li[id(x)] in fg]
+
+    def box(ix):
+        bs = [boxes[i] for i in ix]
+        return [min(b[0] for b in bs), min(b[1] for b in bs), max(b[2] for b in bs), max(b[3] for b in bs)]
+
+    out = []
+
+    def visit(e):
+        ix = leaves_under(e)
+        if not ix:
+            return
+        kids = [k for k in e if isinstance(k.tag, str) and leaves_under(k)]
+        if len(kids) == 1 and tag(kids[0]) not in LEAF:
+            return visit(kids[0])
+        if id(e) in li or area(box(ix)) < page_area * UNIT or not kids:
+            out.append(sorted(ix))
+            return
+        for k in kids:
+            visit(k)
+
+    for c in P.root:
+        if tag(c) != "defs":
+            visit(c)
+    # join small touching units
+    small = [i for i, u in enumerate(out) if area(box(u)) < page_area * 0.012]
+    bx = [box(u) for u in out]
+    parent = list(range(len(out)))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    for a in range(len(small)):
+        for b in range(a + 1, len(small)):
+            i, j = small[a], small[b]
+            A, B = bx[i], bx[j]
+            g = JOIN
+            if A[0] - g < B[2] and B[0] - g < A[2] and A[1] - g < B[3] and B[1] - g < A[3] and not contains(A, B) and not contains(B, A):
+                parent[find(i)] = find(j)
+    gs = {}
+    for i in range(len(out)):
+        gs.setdefault(find(i), []).extend(out[i])
+    return sorted((sorted(v) for v in gs.values()), key=min)
+
+
+UNIT = 0.04
+JOIN = 2.5
+
+
 def save_data_url(url, path):
     path.write_bytes(base64.b64decode(url.split(",", 1)[1]))
 
@@ -222,7 +282,7 @@ async def run(out, jobs):
                     if b is None:
                         continue
                     (bg if area(b) > page_area * 0.30 else fg).append(i)
-                groups = [[fg[i] for i in g] for g in group([boxes[i] for i in fg])]
+                groups = units(P, boxes, set(fg), page_area)
                 pieces = []
                 for gi, g in enumerate(groups):
                     x0 = max(0, min(boxes[i][0] for i in g) - 0.5)
