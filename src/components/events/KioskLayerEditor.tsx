@@ -1152,7 +1152,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                   {isLiftLayout(L.id) ? liftDoors(KIOSK_W, KIOSK_H).map((d) => (
                     <g key={d.side}>
                       <rect x={d.x0} y={0} width={d.x1 - d.x0} height={KIOSK_H} fill="none" stroke={d.side === "left" ? "#A6FA87" : "#FFEB66"} strokeWidth={1.5 * rs} strokeDasharray={`${8 * rs} ${5 * rs}`} />
-                      <text x={(d.x0 + d.x1) / 2} y={KIOSK_H - 24 * rs} textAnchor="middle" fontSize={11 * rs} fill={d.side === "left" ? "#A6FA87" : "#FFEB66"} fontFamily="Geist Mono, monospace">{d.side.toUpperCase()} DOOR {+((d.x1 - d.x0) / 72).toFixed(2)} IN · NOT PRINTED</text>
+                      <text x={(d.x0 + d.x1) / 2} y={KIOSK_H - (d.side === "left" ? 24 : 36) * rs} textAnchor="middle" fontSize={9 * rs} fill={d.side === "left" ? "#A6FA87" : "#FFEB66"} fontFamily="Geist Mono, monospace">{d.side === "left" ? "L" : "R"} {+((d.x1 - d.x0) / 72).toFixed(1)}″</text>
                     </g>
                   )) : null}
                   {guides.bleed ? <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="none" stroke="#E53D2E" strokeWidth={rs} /> : null}

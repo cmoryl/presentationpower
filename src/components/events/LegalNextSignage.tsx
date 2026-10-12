@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Sign3dLink } from "@/components/events/Sign3dLink";
-import { Download, PenLine } from "lucide-react";
+import { Download, Loader2, PenLine } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import { KioskLiveThumb } from "@/components/events/KioskLayerEditor";
 import { Button } from "@/components/ui/button";
@@ -73,7 +75,7 @@ function SignTemplateList({ id, title, intro, signs, masterLabel = "Supplied .ai
                   <Link to="/events/next/sign-editor/$signId" params={{ signId: s.id }}><PenLine className="h-3.5 w-3.5" />Edit</Link>
                 </Button>
                 <Sign3dLink sign={s.id} label={s.title} />
-                {master ? (
+                {s.id.startsWith("sf-lift-") ? <SfLiveFileButton faceId={s.faces[0]!.id} /> : master ? (
                   <Button asChild size="sm" variant="outline">
                     <a href={master} download={s.master}><Download className="h-3.5 w-3.5" />{masterLabel}</a>
                   </Button>
@@ -84,5 +86,32 @@ function SignTemplateList({ id, title, intro, signs, masterLabel = "Supplied .ai
         })}
       </ul>
     </section>
+  );
+}
+
+/** SF lift wraps: the live file is built at the San Francisco size (with saved edits), not the London master. */
+function SfLiveFileButton({ faceId }: { faceId: string }) {
+  const [busy, setBusy] = useState(false);
+  async function go() {
+    const L = legalSignLayout(faceId);
+    if (!L) return;
+    setBusy(true);
+    try {
+      const [{ downloadKiosk }, { loadSignEdits }] = await Promise.all([
+        import("@/lib/next-california-kiosk-live-export"),
+        import("@/lib/sign-set-data"),
+      ]);
+      const edits = await loadSignEdits(faceId).catch(() => ({}));
+      await downloadKiosk("ai", L, edits);
+    } catch (e) {
+      toast.error("Couldn't build the live file", { description: e instanceof Error ? e.message : undefined });
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Button size="sm" variant="outline" onClick={() => void go()} disabled={busy}>
+      {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}Live file .ai · 41.5 × 84 in
+    </Button>
   );
 }
