@@ -89,14 +89,14 @@ export function SfVenueMeetingSpace() {
             <tbody>
               {rooms.map((r) => (
                 <tr key={r.name} className="border-b border-[#03002C]/5">
-                  <th scope="row" className="py-1.5 pr-2 font-medium">{r.name}</th>
+                  <th scope="row" className="py-1.5 pr-2 font-medium min-w-[9rem]">{r.name}</th>
                   <td className="px-1 text-right tabular-nums">{n(r.theater)}</td>
                   <td className="px-1 text-right tabular-nums">{n(r.classroom)}</td>
                   <td className="px-1 text-right tabular-nums">{n(r.reception)}</td>
                   <td className="px-1 text-right tabular-nums">{n(r.banquet)}</td>
                   <td className="px-1 text-right tabular-nums">{n(r.uShape)}</td>
                   <td className="px-1 text-right tabular-nums">{n(r.sqft)}</td>
-                  <td className="px-1 text-right tabular-nums">{r.dims ?? "–"}</td>
+                  <td className="whitespace-nowrap px-1 text-right tabular-nums">{r.dims ?? "–"}</td>
                   <td className="pl-1 text-right tabular-nums">{r.heightFt == null ? "–" : `${r.heightFt}′`}</td>
                 </tr>
               ))}
