@@ -158,7 +158,7 @@ export function QuickCreate({ personaId, signedIn }: { personaId: PersonaId; sig
     <section className="relative mt-10 overflow-hidden rounded-[28px] border border-black/10 bg-white p-5 sm:p-7 dark:border-white/15 dark:bg-white/[0.04]">
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-24 -top-28 size-[22rem] rounded-full blur-3xl"
+        className="hidden pointer-events-none absolute -right-24 -top-28 size-[22rem] rounded-full blur-3xl"
         style={{ background: `${theme.accent}26` }}
       />
       <div className="relative flex flex-wrap items-end justify-between gap-4">

@@ -240,12 +240,12 @@ function MyFilesPage() {
         <section className="relative overflow-hidden rounded-3xl border border-black/10 bg-white px-7 py-9 shadow-sm dark:border-white/10 dark:bg-white/[0.04] sm:px-10 sm:py-12">
           <span
             aria-hidden
-            className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full opacity-25 blur-3xl"
+            className="hidden pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full opacity-25 blur-3xl"
             style={{ backgroundColor: "#003FC7" }}
           />
           <span
             aria-hidden
-            className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full opacity-20 blur-3xl"
+            className="hidden pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full opacity-20 blur-3xl"
             style={{ backgroundColor: "#C2A3FF" }}
           />
           {/* Element brick rail */}

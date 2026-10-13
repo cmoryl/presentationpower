@@ -784,7 +784,7 @@ function DeckEditor() {
                                   `${opt.label} applied to all ${deck.slides.length} slides`,
                                 );
                               }}
-                              className={`inline-flex min-h-8 min-w-0 flex-1 basis-[7rem] items-center justify-center rounded-full px-3 py-1.5 text-center leading-tight transition ${
+                              className={`inline-flex min-h-8 min-w-0 flex-1 basis-[7rem] items-center justify-center rounded-md px-3 py-1.5 text-center leading-tight transition ${
                                 activeSkin
                                   ? "bg-white text-[#03002C] shadow-sm"
                                   : "text-black/50 hover:bg-white/60 hover:text-black"
@@ -846,7 +846,7 @@ function DeckEditor() {
                           type="button"
                           onClick={() => setSlideMode(deck.id, active.id, "light")}
                           aria-pressed={(active.mode ?? "light") === "light"}
-                          className={`rounded-full px-3 py-1 transition ${
+                          className={`rounded-md px-3 py-1 transition ${
                             (active.mode ?? "light") === "light"
                               ? "bg-white text-[#03002C] shadow-sm"
                               : "text-black/50 hover:text-black"
@@ -858,7 +858,7 @@ function DeckEditor() {
                           type="button"
                           onClick={() => setSlideMode(deck.id, active.id, "dark")}
                           aria-pressed={(active.mode ?? "light") === "dark"}
-                          className={`rounded-full px-3 py-1 transition ${
+                          className={`rounded-md px-3 py-1 transition ${
                             (active.mode ?? "light") === "dark"
                               ? "bg-[#03002C] text-white shadow-sm"
                               : "text-black/50 hover:text-black"
@@ -948,7 +948,7 @@ function DeckEditor() {
                         <button
                           type="button"
                           onClick={() => clearSlideInkOverrides(deck.id, active.id)}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-[11px] font-medium text-black/70 transition hover:border-red-500 hover:text-red-600"
+                          className="inline-flex items-center gap-1.5 rounded-md border border-black/10 bg-white px-3 py-1 text-[11px] font-medium text-black/70 transition hover:border-red-500 hover:text-red-600"
                           title={`Clear ${Object.keys(active.inkOverrides ?? {}).length + Object.keys(active.inkScopeOverrides ?? {}).length} text color override(s) on this slide`}
                         >
                           ⟲ Reset colors
@@ -971,7 +971,7 @@ function DeckEditor() {
                         })
                       }
                       aria-pressed={studio}
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
+                      className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-[11px] font-medium transition ${
                         studio
                           ? "border-primary bg-primary text-primary-foreground shadow-sm"
                           : "border-black/10 bg-white text-black/70 hover:border-primary hover:text-primary"
@@ -1297,7 +1297,7 @@ function DeckEditor() {
                       {slide.hidden && (
                         <span
                           title="Hidden slide — skipped when presenting and on export"
-                          className="pointer-events-none absolute left-1/2 top-2 z-10 -translate-x-1/2 rounded-full bg-black/75 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white"
+                          className="pointer-events-none absolute left-1/2 top-2 z-10 -translate-x-1/2 rounded-md bg-black/75 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white"
                         >
                           Hidden
                         </span>
@@ -1435,7 +1435,7 @@ function DeckEditor() {
             >
               {(stageDrop.isOver || stageDrop.busy) && (
                 <div className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#003FC7] bg-primary/10 text-center backdrop-blur-[1px]">
-                  <div className="rounded-full bg-primary px-4 py-2 text-[11px] uppercase tracking-widest text-primary-foreground">
+                  <div className="rounded-md bg-primary px-4 py-2 text-[11px] uppercase tracking-widest text-primary-foreground">
                     {stageDrop.busy ? "Uploading…" : "Drop image onto this slide"}
                   </div>
                   {stageDrop.busy && (
@@ -1551,7 +1551,7 @@ function DeckEditor() {
                     type="button"
                     onClick={() => setZoomedTracked(true)}
                     title="Edit this slide full size"
-                    className="absolute bottom-3 right-3 z-50 rounded-full bg-black/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow hover:bg-black"
+                    className="absolute bottom-3 right-3 z-50 rounded-md bg-black/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow hover:bg-black"
                   >
                     ⤢ Enlarge to edit
                   </button>
@@ -1596,7 +1596,7 @@ function DeckEditor() {
                       </LiveEditOverlay>
                     </SlideVideoPreviewContext.Provider>
                   )}
-                  <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100">
+                  <span className="pointer-events-none absolute right-3 top-3 rounded-md bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100">
                     ⤢ Enlarge
                   </span>
                 </button>
@@ -2018,7 +2018,7 @@ function DeckEditor() {
                             <div className="font-mono text-xs text-black/60">{c.field}</div>
                             <button
                               onClick={() => revertAiChange(deck.id, active.id, c.field)}
-                              className="rounded-full border border-black/15 px-2.5 py-0.5 text-xs hover:bg-black/5"
+                              className="rounded-md border border-black/15 px-2.5 py-0.5 text-xs hover:bg-black/5"
                             >
                               Revert
                             </button>
@@ -2418,7 +2418,7 @@ function DeckEditor() {
                                 {lf.zones.map((z) => (
                                   <span
                                     key={z}
-                                    className="rounded-full bg-black/5 px-2 py-0.5 text-xs"
+                                    className="rounded-md bg-black/5 px-2 py-0.5 text-xs"
                                   >
                                     {z}
                                   </span>
@@ -2802,7 +2802,7 @@ function DeckEditor() {
                 <button
                   type="button"
                   onClick={() => setVideoPreviewUrl(null)}
-                  className="absolute -top-10 right-0 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs text-white hover:bg-white/20"
+                  className="absolute -top-10 right-0 rounded-md border border-white/20 bg-white/10 px-3 py-1 text-xs text-white hover:bg-white/20"
                 >
                   Close ✕
                 </button>
@@ -2962,7 +2962,7 @@ function SlideLightbox({
             onClick={onPrev}
             disabled={!onPrev}
             aria-label="Previous slide"
-            className="rounded-full border border-white/20 px-2.5 py-1 text-sm text-white/80 transition enabled:hover:border-white/60 enabled:hover:text-white disabled:opacity-30"
+            className="rounded-md border border-white/20 px-2.5 py-1 text-sm text-white/80 transition enabled:hover:border-white/60 enabled:hover:text-white disabled:opacity-30"
           >
             ‹
           </button>
@@ -2974,7 +2974,7 @@ function SlideLightbox({
             onClick={onNext}
             disabled={!onNext}
             aria-label="Next slide"
-            className="rounded-full border border-white/20 px-2.5 py-1 text-sm text-white/80 transition enabled:hover:border-white/60 enabled:hover:text-white disabled:opacity-30"
+            className="rounded-md border border-white/20 px-2.5 py-1 text-sm text-white/80 transition enabled:hover:border-white/60 enabled:hover:text-white disabled:opacity-30"
           >
             ›
           </button>
@@ -2999,7 +2999,7 @@ function SlideLightbox({
               aria-checked={mode === m.id}
               title={`${m.hint} (${m.key})`}
               onClick={() => onModeChange(m.id)}
-              className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest transition ${
+              className={`rounded-md px-3 py-1 text-xs font-semibold uppercase tracking-widest transition ${
                 mode === m.id
                   ? "bg-white text-black"
                   : "text-white/70 hover:bg-white/10 hover:text-white"
@@ -3017,7 +3017,7 @@ function SlideLightbox({
             <button
               type="button"
               onClick={() => onModeChange("view")}
-              className="rounded-full border border-white/20 px-3 py-1 text-xs uppercase tracking-widest text-white/80 transition hover:border-white/60 hover:text-white"
+              className="rounded-md border border-white/20 px-3 py-1 text-xs uppercase tracking-widest text-white/80 transition hover:border-white/60 hover:text-white"
             >
               Done editing · Esc
             </button>
@@ -3025,7 +3025,7 @@ function SlideLightbox({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold uppercase tracking-widest text-black transition hover:bg-white/90"
+            className="rounded-md bg-white px-3.5 py-1.5 text-xs font-semibold uppercase tracking-widest text-black transition hover:bg-white/90"
           >
             ← Back to editor
           </button>
@@ -3117,7 +3117,7 @@ function VideoExamplesPicker({
         className="flex w-full items-center justify-between text-left text-xs font-medium uppercase tracking-widest text-[#0B2A4A]/80 hover:text-[#0B2A4A]"
       >
         <span>▶ Video examples</span>
-        <span className="rounded-full bg-[#0B2A4A]/10 px-2 py-0.5 text-[10px]">
+        <span className="rounded-md bg-[#0B2A4A]/10 px-2 py-0.5 text-[10px]">
           {VIDEO_SLIDE_EXAMPLES.length}
         </span>
       </button>
@@ -3319,7 +3319,7 @@ function ClientLogoPanel({
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="rounded-full border border-black/15 px-3 py-1 text-xs font-medium hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+            className="rounded-md border border-black/15 px-3 py-1 text-xs font-medium hover:border-[#003FC7]/40 hover:text-[#003FC7]"
           >
             {current ? "Change" : "Attach from LogoHub"}
           </button>
@@ -3327,14 +3327,14 @@ function ClientLogoPanel({
             <button
               type="button"
               onClick={() => onChange(null)}
-              className="rounded-full border border-red-200 px-3 py-1 text-xs text-red-700 hover:bg-red-50"
+              className="rounded-md border border-red-200 px-3 py-1 text-xs text-red-700 hover:bg-red-50"
             >
               Remove
             </button>
           )}
           <Link
             to="/admin/logohub"
-            className="rounded-full border border-black/10 px-3 py-1 text-xs text-black/60 hover:border-black/30"
+            className="rounded-md border border-black/10 px-3 py-1 text-xs text-black/60 hover:border-black/30"
           >
             Manage LogoHub →
           </Link>
@@ -3361,7 +3361,7 @@ function ClientLogoPanel({
               />
               <button
                 onClick={() => setOpen(false)}
-                className="rounded-full border border-black/10 px-3 py-1 text-xs hover:border-black/30"
+                className="rounded-md border border-black/10 px-3 py-1 text-xs hover:border-black/30"
               >
                 Close
               </button>
@@ -3464,7 +3464,7 @@ function LogoGridItemsPanel({
         <button
           type="button"
           onClick={addItem}
-          className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+          className="rounded-md border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest hover:border-[#003FC7]/40 hover:text-[#003FC7]"
         >
           + Add
         </button>
@@ -3521,7 +3521,7 @@ function LogoGridItemsPanel({
                     setPickIdx(i);
                     setQ("");
                   }}
-                  className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+                  className="rounded-md border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest hover:border-[#003FC7]/40 hover:text-[#003FC7]"
                 >
                   {logoUrl ? "Change" : "Pick"}
                 </button>
@@ -3537,7 +3537,7 @@ function LogoGridItemsPanel({
                         logoPaths: {},
                       })
                     }
-                    className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] text-black/60 hover:border-black/30"
+                    className="rounded-md border border-black/10 px-2 py-0.5 text-[10px] text-black/60 hover:border-black/30"
                   >
                     Clear
                   </button>
@@ -3545,7 +3545,7 @@ function LogoGridItemsPanel({
                 <button
                   type="button"
                   onClick={() => removeItem(i)}
-                  className="rounded-full border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:bg-red-50"
+                  className="rounded-md border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:bg-red-50"
                   title="Remove item"
                 >
                   ×
@@ -3573,7 +3573,7 @@ function LogoGridItemsPanel({
                           })
                         }
                         className={
-                          "rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-widest transition " +
+                          "rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-widest transition " +
                           (isActive
                             ? "border-[#003FC7] bg-[#003FC7] text-white"
                             : has
@@ -3613,7 +3613,7 @@ function LogoGridItemsPanel({
               />
               <button
                 onClick={() => setPickIdx(null)}
-                className="rounded-full border border-black/10 px-3 py-1 text-xs hover:border-black/30"
+                className="rounded-md border border-black/10 px-3 py-1 text-xs hover:border-black/30"
               >
                 Close
               </button>
@@ -3714,7 +3714,7 @@ function SpeakerNotesPanel({ value, onChange }: { value: string; onChange: (v: s
         <span className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-black/70">
           <span className="text-[#0B2A4A]">✎</span> Speaker notes
           {chars > 0 && (
-            <span className="rounded-full bg-[#0B2A4A]/10 px-2 py-0.5 text-[10px] text-[#0B2A4A]">
+            <span className="rounded-md bg-[#0B2A4A]/10 px-2 py-0.5 text-[10px] text-[#0B2A4A]">
               {chars}
             </span>
           )}
@@ -3790,7 +3790,7 @@ function TransitionPicker({
 
   return (
     <div
-      className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white px-2 py-1 text-[11px] font-medium uppercase tracking-widest text-black/70"
+      className="inline-flex items-center gap-2 rounded-md border border-black/15 bg-white px-2 py-1 text-[11px] font-medium uppercase tracking-widest text-black/70"
       title="Slide transition (played on-screen only in Pass 1)"
       data-testid="transition-picker"
     >
@@ -3829,7 +3829,7 @@ function TransitionPicker({
           updateDeck({ type: resolved.type, durationMs: resolved.durationMs });
           onSlideChange(null);
         }}
-        className="rounded-full border border-black/10 px-2 py-0.5 text-[9px] uppercase tracking-widest text-black/50 hover:border-[#003FC7] hover:text-[#003FC7]"
+        className="rounded-md border border-black/10 px-2 py-0.5 text-[9px] uppercase tracking-widest text-black/50 hover:border-[#003FC7] hover:text-[#003FC7]"
         title="Make this the deck-wide default"
       >
         Set default

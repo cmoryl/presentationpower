@@ -1187,7 +1187,7 @@ function AssetEditor() {
               />
               <FieldError id="err-title" message={fieldError("title")} />
             </div>
-            <span className="rounded-full bg-[#A1FBF9]/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#03002C] dark:text-[#A1FBF9]">
+            <span className="rounded-md bg-[#A1FBF9]/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#03002C] dark:text-[#A1FBF9]">
               {row.kind}
             </span>
             {dirty && <span className="text-xs text-amber-600">Unsaved changes</span>}
@@ -1200,7 +1200,7 @@ function AssetEditor() {
                 disabled={!canUndo}
                 title="Undo (⌘/Ctrl+Z)"
                 aria-label="Undo"
-                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium text-[#03002C] hover:bg-black/5 disabled:opacity-30 dark:text-white dark:hover:bg-white/5"
+                className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-[#03002C] hover:bg-black/5 disabled:opacity-30 dark:text-white dark:hover:bg-white/5"
               >
                 <Undo2 size={12} /> Undo
               </button>
@@ -1210,7 +1210,7 @@ function AssetEditor() {
                 disabled={!canRedo}
                 title="Redo (⌘/Ctrl+Shift+Z)"
                 aria-label="Redo"
-                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium text-[#03002C] hover:bg-black/5 disabled:opacity-30 dark:text-white dark:hover:bg-white/5"
+                className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-[#03002C] hover:bg-black/5 disabled:opacity-30 dark:text-white dark:hover:bg-white/5"
               >
                 <Redo2 size={12} /> Redo
               </button>
@@ -1228,7 +1228,7 @@ function AssetEditor() {
                     type="button"
                     aria-pressed={orig === (m === "original")}
                     onClick={() => patchContent({ layoutMode: m } as unknown as Partial<CaseStudyContent>)}
-                    className={`rounded-full px-2.5 py-1 text-xs font-medium transition ${
+                    className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
                       orig === (m === "original")
                         ? "bg-[#03002C] text-white dark:bg-white dark:text-[#03002C]"
                         : "text-[#03002C] hover:bg-black/5 dark:text-white dark:hover:bg-white/5"
@@ -1255,7 +1255,7 @@ function AssetEditor() {
                   patchCtx({ editorMode: "light" });
                   if (exportHydratedRef.current) setExportMode("light");
                 }}
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition ${
+                className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition ${
                   editorMode === "light"
                     ? "bg-[#03002C] text-white dark:bg-white dark:text-[#03002C]"
                     : "text-[#03002C] hover:bg-black/5 dark:text-white dark:hover:bg-white/5"
@@ -1271,7 +1271,7 @@ function AssetEditor() {
                   patchCtx({ editorMode: "dark" });
                   if (exportHydratedRef.current) setExportMode("dark");
                 }}
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition ${
+                className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition ${
                   editorMode === "dark"
                     ? "bg-[#03002C] text-white dark:bg-white dark:text-[#03002C]"
                     : "text-[#03002C] hover:bg-black/5 dark:text-white dark:hover:bg-white/5"
@@ -1285,14 +1285,14 @@ function AssetEditor() {
               type="button"
               onClick={handleSynthesize}
               disabled={synthBusy}
-              className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-40 dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
+              className="inline-flex items-center gap-1.5 rounded-md border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-40 dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
             >
               <Sparkles size={12} /> {synthBusy ? "Drafting…" : "Draft from division knowledge"}
             </button>
             <button
               type="button"
               onClick={() => setPageTemplateOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
+              className="inline-flex items-center gap-1.5 rounded-md border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
             >
               <BookmarkPlus size={12} /> Save as page template
             </button>
@@ -1300,7 +1300,7 @@ function AssetEditor() {
               type="button"
               onClick={handleSave}
               disabled={!dirty || saving}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-[#03002C]"
+              className="inline-flex items-center gap-1.5 rounded-md bg-[#03002C] px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-[#03002C]"
             >
               <Save size={12} /> {saving ? "Saving…" : "Save"}
             </button>
@@ -1308,7 +1308,7 @@ function AssetEditor() {
               <button
                 type="button"
                 onClick={() => setExportOpen((v) => !v)}
-                className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-black/70 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/70"
+                className="inline-flex items-center gap-1.5 rounded-md border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-black/70 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/70"
               >
                 <FileDown size={12} /> Export PDF
               </button>
@@ -1514,7 +1514,7 @@ function AssetEditor() {
                       type="button"
                       onClick={() => setExportOpen(false)}
                       disabled={exportBusy}
-                      className="rounded-full px-3 py-1 text-[11px] text-black/60 hover:text-black disabled:opacity-40 dark:text-white/60 dark:hover:text-white"
+                      className="rounded-md px-3 py-1 text-[11px] text-black/60 hover:text-black disabled:opacity-40 dark:text-white/60 dark:hover:text-white"
                     >
                       Cancel
                     </button>
@@ -1522,7 +1522,7 @@ function AssetEditor() {
                       type="button"
                       onClick={handleExportPptx}
                       disabled={exportBusy}
-                      className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-[11px] font-semibold text-[#03002C] disabled:opacity-40 dark:border-white/20 dark:bg-white/[0.06] dark:text-white"
+                      className="rounded-md border border-black/15 bg-white px-3 py-1.5 text-[11px] font-semibold text-[#03002C] disabled:opacity-40 dark:border-white/20 dark:bg-white/[0.06] dark:text-white"
                     >
                       {exportBusy
                         ? `Rendering… ${Math.round((exportProgress?.pct ?? 0) * 100)}%`
@@ -1532,7 +1532,7 @@ function AssetEditor() {
                       type="button"
                       onClick={handleExportPdf}
                       disabled={exportBusy}
-                      className="rounded-full bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-[#03002C]"
+                      className="rounded-md bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-[#03002C]"
                     >
                       {exportBusy
                         ? `Rendering… ${Math.round((exportProgress?.pct ?? 0) * 100)}%`
@@ -1555,7 +1555,7 @@ function AssetEditor() {
             <button
               type="button"
               onClick={handleDelete}
-              className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:border-red-400 dark:border-red-500/30 dark:bg-white/[0.03]"
+              className="inline-flex items-center gap-1.5 rounded-md border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:border-red-400 dark:border-red-500/30 dark:bg-white/[0.03]"
               aria-label="Delete asset"
             >
               <Trash2 size={12} />
@@ -1987,7 +1987,7 @@ function AssetEditor() {
                                   hiddenSections: withSectionShown(rawContent, key),
                                 } as never)
                               }
-                              className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white px-2.5 py-1 font-medium text-black/60 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
+                              className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-2.5 py-1 font-medium text-black/60 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
                               title={`Restore ${SECTION_DELETE_LABELS[key] ?? key}`}
                             >
                               <RotateCcw size={11} />
@@ -2006,7 +2006,7 @@ function AssetEditor() {
                         onClick={() => setHeroModalOpen(true)}
                         title="Edit hero image"
                         aria-label="Edit hero image"
-                        className="absolute right-3 top-3 z-40 rounded-full border border-white/40 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-black/70"
+                        className="absolute right-3 top-3 z-40 rounded-md border border-white/40 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-black/70"
                       >
                         ✎ Hero
                       </button>
@@ -2018,7 +2018,7 @@ function AssetEditor() {
                 <div
                   data-export-ignore="true"
                   data-testid="print-content-fit-badge"
-                  className="pointer-events-none absolute left-3 top-3 z-30 rounded-full border border-white/40 bg-[#03002C]/80 px-3 py-1 text-[10px] font-semibold tracking-wide text-white backdrop-blur dark:bg-card"
+                  className="pointer-events-none absolute left-3 top-3 z-30 rounded-md border border-white/40 bg-[#03002C]/80 px-3 py-1 text-[10px] font-semibold tracking-wide text-white backdrop-blur dark:bg-card"
                 >
                   Content-fit: {describeFit(fitKnobs)}
                 </div>
@@ -4549,7 +4549,7 @@ function StatsInlineEditor({
                 items: ORG_STATS.slice(0, Math.max(section.items.length, 3)).map((s) => ({ ...s })),
               })
             }
-            className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
+            className="rounded-md border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
           >
             Use {ORG_NAME} numbers
           </button>
@@ -5066,7 +5066,7 @@ function ExpertiseInlineEditor({
               items: ORG_CREDENTIALS.map((label) => ({ label })),
             })
           }
-          className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
+          className="rounded-md border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
         >
           Use our credentials
         </button>
@@ -5079,7 +5079,7 @@ function ExpertiseInlineEditor({
               items: ORG_INCLUDED.map((label) => ({ label })),
             })
           }
-          className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
+          className="rounded-md border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
         >
           Use what's included
         </button>
@@ -5091,7 +5091,7 @@ function ExpertiseInlineEditor({
               items: ORG_EXPERTISE.map((e) => ({ ...e })),
             })
           }
-          className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
+          className="rounded-md border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
         >
           Use our expertise
         </button>

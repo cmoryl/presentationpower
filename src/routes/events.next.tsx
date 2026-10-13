@@ -478,7 +478,7 @@ function NextAurora({ division }: { division: NextDivision }) {
               }}
             />
             <div
-              className="absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
+              className="hidden absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
               style={{
                 backgroundColor: d.accent,
                 opacity: 0.38,
@@ -489,7 +489,7 @@ function NextAurora({ division }: { division: NextDivision }) {
               }}
             />
             <div
-              className="absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
+              className="hidden absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
               style={{
                 backgroundColor: "#003FC7",
                 opacity: 0.34,

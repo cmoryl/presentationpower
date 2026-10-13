@@ -259,7 +259,7 @@ function PrintCenterPage() {
 
   return (
     <AppShell>
-      <header className="full-bleed relative hero-flush mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#EC388A14] via-white/70 to-[#FFEB6626] py-9 lg:py-12">
+      <header className="full-bleed relative hero-flush mb-10 overflow-hidden border-b border-black/5 bg-muted py-9 lg:py-12">
         <HeroVideoLayer src={heroPrintVideo.url} opacity={0.55} tint="#FFFFFF" />
         <div className="relative z-10 mx-auto max-w-[1400px]">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50">Element · Print</div>

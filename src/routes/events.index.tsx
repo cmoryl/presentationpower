@@ -109,7 +109,7 @@ function EventsView() {
   return (
     <>
       {/* Hero */}
-      <header className="full-bleed relative hero-flush overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#A6FA8724] via-white/70 to-[#C2A3FF26] py-9 lg:py-12">
+      <header className="full-bleed relative hero-flush overflow-hidden border-b border-black/5 bg-muted py-9 lg:py-12">
         <HeroVideoLayer src={heroEventsVideo.url} opacity={0.55} tint="#FFFFFF" />
         <div className="relative z-10 mx-auto max-w-7xl">
           <div className="max-w-3xl space-y-4">

@@ -194,7 +194,7 @@ function AgentAuroraHero() {
         }}
       />
       <div
-        className="absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
+        className="hidden absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
         style={{
           backgroundColor: AGENT_GLOW,
           opacity: 0.55,
@@ -205,7 +205,7 @@ function AgentAuroraHero() {
         }}
       />
       <div
-        className="absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
+        className="hidden absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
         style={{
           backgroundColor: AGENT_ACCENT,
           opacity: 0.16,

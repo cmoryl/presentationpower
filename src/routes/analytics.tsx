@@ -50,9 +50,9 @@ function AnalyticsPage() {
 
   return (
     <AppShell>
-      <section className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-[#03002C] via-[#0B2A4A] to-[#003FC7] p-10 text-white">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#A1FBF9]/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-[#C2A3FF]/20 blur-3xl" />
+      <section className="relative overflow-hidden rounded-[32px] border border-white/10 bg-[#03002C] p-10 text-white">
+        <div className="hidden pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#A1FBF9]/20 blur-3xl" />
+        <div className="hidden pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-[#C2A3FF]/20 blur-3xl" />
         <div className="relative">
           <div className="text-xs uppercase tracking-[0.35em] text-[#A1FBF9]">Analytics</div>
           <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight md:text-5xl">

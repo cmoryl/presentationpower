@@ -138,15 +138,15 @@ function ElementsLanding() {
         <ThemedHeroVideo dark={heroElementsDark.url} light={heroElementsLight.url} />
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div
-            className="absolute -left-24 -top-32 h-[420px] w-[420px] rounded-full blur-[110px]"
+            className="hidden absolute -left-24 -top-32 h-[420px] w-[420px] rounded-full blur-[110px]"
             style={{ background: "#003FC7", opacity: 0.55 }}
           />
           <div
-            className="absolute right-[-8%] top-[-10%] h-[360px] w-[360px] rounded-full blur-[120px]"
+            className="hidden absolute right-[-8%] top-[-10%] h-[360px] w-[360px] rounded-full blur-[120px]"
             style={{ background: "#A1FBF9", opacity: 0.22 }}
           />
           <div
-            className="absolute bottom-[-30%] left-[38%] h-[380px] w-[380px] rounded-full blur-[130px]"
+            className="hidden absolute bottom-[-30%] left-[38%] h-[380px] w-[380px] rounded-full blur-[130px]"
             style={{ background: "#C2A3FF", opacity: 0.2 }}
           />
         </div>
