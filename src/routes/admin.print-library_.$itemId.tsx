@@ -68,6 +68,7 @@ import type {
 } from "@/lib/print-assets.types";
 import { PrintPageProvider } from "@/components/print/print-page-context";
 import { PrintDocModeProvider, resolvePrintIconStyle } from "@/components/print/print-doc-mode";
+import { syncCopyFromOriginal, type OriginalLayout } from "@/lib/print-library/original-layout";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import {
   PrintContentFitFrame,
@@ -274,7 +275,13 @@ function MasterItemEditorPage() {
       if (!base.content) return base;
       return {
         ...base,
-        content: contentWritePath(base.content, path, value) as Record<string, unknown>,
+        content: (() => {
+          const written = contentWritePath(base.content, path, value) as Record<string, unknown>;
+          // Original-layout edits flow into the fields social, print sizes and slides read.
+          return path === "original"
+            ? syncCopyFromOriginal(written, base.content.original as OriginalLayout | undefined, value as OriginalLayout)
+            : written;
+        })(),
       };
     });
   };

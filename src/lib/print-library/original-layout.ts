@@ -188,3 +188,76 @@ export function withParagraphs(layout: OriginalLayout): OriginalLayout {
   if (layout.pages.every((p) => p.texts.every((t) => t.paragraphs))) return layout;
   return { ...layout, pages: layout.pages.map((p) => ({ ...p, texts: p.texts.map(paragraphText) })) };
 }
+
+// -----------------------------------------------------------------------------
+// Copy sync. Social, print-size and slide versions read the library-layout
+// fields of the same content (title, summary, sections, bullets…). When a text
+// block is edited in the original layout, carry each changed paragraph / bullet
+// into every library field that printed the old wording, so all formats read
+// the same as the editor. Only wording the piece already carried is replaced.
+// -----------------------------------------------------------------------------
+
+const norm = (s: string) => s.replace(/\s+/g, " ").trim();
+const stripBullet = (s: string) => norm(s.replace(new RegExp(`^\\s*${BULLET}\\s*`), ""));
+const parasOf = (t: OriginalText) => paragraphText(t).text.split("\n").map(stripBullet);
+
+type Swap = { from: string; to: string };
+
+function swapsFor(prev: OriginalLayout, next: OriginalLayout): { swaps: Swap[]; lists: { from: string[]; to: string[] }[] } {
+  const swaps: Swap[] = [];
+  const lists: { from: string[]; to: string[] }[] = [];
+  next.pages.forEach((np, pi) => {
+    const pp = prev.pages[pi];
+    if (!pp) return;
+    for (const nt of np.texts) {
+      const pt = pp.texts.find((t) => t.id === nt.id);
+      if (!pt) continue;
+      const a = parasOf(pt);
+      const b = nt.hidden ? [] : parasOf(nt);
+      if (a.join("\n") === b.join("\n")) continue;
+      const wa = norm(a.join(" "));
+      const wb = norm(b.join(" "));
+      if (wa && wa !== wb) swaps.push({ from: wa, to: wb });
+      if (a.length === b.length) a.forEach((x, i) => x && x !== b[i] && swaps.push({ from: x, to: b[i] }));
+      if (isBulletBlock(pt.text)) lists.push({ from: a, to: b });
+    }
+  });
+  // Longest first so whole blocks win over their own lines.
+  swaps.sort((x, y) => y.from.length - x.from.length);
+  return { swaps, lists };
+}
+
+function rewrite(v: unknown, swaps: Swap[], lists: { from: string[]; to: string[] }[]): unknown {
+  if (typeof v === "string") {
+    const n = norm(v);
+    for (const s of swaps) {
+      if (n === s.from) return s.to;
+      if (s.from.length >= 12 && n.includes(s.from)) return n.split(s.from).join(s.to);
+    }
+    return v;
+  }
+  if (Array.isArray(v)) {
+    if (v.length && v.every((x) => typeof x === "string")) {
+      const items = (v as string[]).map(stripBullet);
+      for (const l of lists) {
+        const hits = items.filter((x) => l.from.includes(x)).length;
+        if (hits >= Math.max(2, Math.ceil(items.length / 2))) return [...l.to];
+      }
+    }
+    return v.map((x) => rewrite(x, swaps, lists));
+  }
+  if (v && typeof v === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, x] of Object.entries(v)) out[k] = k === "original" || k === "layoutMode" ? x : rewrite(x, swaps, lists);
+    return out;
+  }
+  return v;
+}
+
+/** Library-layout fields updated to match an edited original layout. */
+export function syncCopyFromOriginal<T extends Record<string, unknown>>(content: T, prev: OriginalLayout | undefined, next: OriginalLayout): T {
+  if (!prev) return content;
+  const { swaps, lists } = swapsFor(prev, next);
+  if (!swaps.length && !lists.length) return content;
+  return rewrite(content, swaps, lists) as T;
+}
