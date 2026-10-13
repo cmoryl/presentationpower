@@ -321,9 +321,9 @@ export function makePrintTableSection(variantId: PrintTableVariant): PrintSectio
       title: "The reach behind the program",
       rows: [
         { label: "Languages supported", value: "200+" },
-        { label: "In-country linguists", value: "12k" },
-        { label: "Cities worldwide", value: "140" },
-        { label: "Programs live", value: "3.5k" },
+        { label: "Team members", value: "10,000+" },
+        { label: "Cities worldwide", value: "150+" },
+        { label: "Of the Fortune 500", value: "90%" },
       ],
     };
   }
