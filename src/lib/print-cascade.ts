@@ -11,6 +11,7 @@
 import type { AdaptContent } from "@/lib/cross-format-adapt";
 import type { DeckSnapshot } from "@/lib/deck-store";
 import { PRINT_LIBRARY_ITEMS, type PrintLibraryItem } from "@/lib/print-library/catalog";
+import { editorCopyFromOriginal, isOriginalLayout } from "@/lib/print-library/original-layout";
 
 type Rec = Record<string, unknown>;
 const s = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : undefined);
@@ -53,15 +54,41 @@ function numericStats(c: Rec): Stat[] {
   return statsOf(c).filter((r) => /^[~<>≈$]*\d/.test(r.value));
 }
 
+/**
+ * A piece in the original layout reads its wording from the editor's own text
+ * blocks (edits, retyped bullets and hidden blocks included); figures, CTA and
+ * image still come from the piece's fields.
+ */
+const editorCache = new WeakMap<object, Rec>();
+function contentOf(item: PrintLibraryItem): Rec {
+  const c = contentOf(item);
+  if (!isOriginalLayout(c)) return c;
+  const hit = editorCache.get(c);
+  if (hit) return hit;
+  const copy = editorCopyFromOriginal(c.original);
+  const out: Rec = {
+    ...c,
+    title: copy.title ?? c.title,
+    summary: copy.summary ?? c.summary,
+    ...(copy.sections.length ? { sections: copy.sections, __editorCopy: true } : {}),
+  };
+  editorCache.set(c, out);
+  return out;
+}
+
 type Block = { heading: string; body: string; bullets: string[] };
 function blocksOf(item: PrintLibraryItem): Block[] {
-  const c = (item.content ?? {}) as Rec;
+  const c = contentOf(item);
+  if (c.__editorCopy) return sectionsOf(c);
   if (item.kind === "case-study") {
     return (["challenge", "solution", "result"] as const)
       .map((k) => c[k] as Rec | undefined)
       .filter((b): b is Rec => !!b && !!s(b.body))
       .map((b) => ({ heading: s(b.heading) ?? "", body: s(b.body) ?? "", bullets: [] }));
   }
+  return sectionsOf(c);
+}
+function sectionsOf(c: Rec): Block[] {
   return arr(c.sections).map((b) => ({
     heading: s(b.heading) ?? "",
     body: s(b.body) ?? "",
@@ -70,13 +97,13 @@ function blocksOf(item: PrintLibraryItem): Block[] {
 }
 
 function headlineOf(item: PrintLibraryItem): string {
-  const c = (item.content ?? {}) as Rec;
+  const c = contentOf(item);
   return s(c.title) ?? item.title;
 }
 
 /** The neutral adaptor payload for one piece — drives every print/social size. */
 export function contentFromLibraryPiece(item: PrintLibraryItem): AdaptContent {
-  const c = (item.content ?? {}) as Rec;
+  const c = contentOf(item);
   const blocks = blocksOf(item);
   const stat = numericStats(c)[0];
   const hero = s((c.heroMedia as Rec | undefined)?.imageUrl) ?? item.heroUrl;
@@ -119,7 +146,7 @@ export type ContentBrick = {
  * tagged with the surfaces whose layouts carry it. No brick is ever written.
  */
 export function contentBricks(item: PrintLibraryItem): ContentBrick[] {
-  const c = (item.content ?? {}) as Rec;
+  const c = contentOf(item);
   const all: CascadeSurface[] = ["Deck", "Print", "Event", "Social"];
   const out: ContentBrick[] = [{ id: "headline", kind: "headline", label: "Headline", text: headlineOf(item), surfaces: all }];
   const summary = s(c.summary);
@@ -143,7 +170,7 @@ export function contentBricks(item: PrintLibraryItem): ContentBrick[] {
 
 /** Full piece copy, for speaker notes (nothing is lost when slides trim). */
 function notesOf(item: PrintLibraryItem): string {
-  const c = (item.content ?? {}) as Rec;
+  const c = contentOf(item);
   const lines = [headlineOf(item), s(c.summary)];
   for (const b of blocksOf(item)) lines.push(`${b.heading}: ${b.body}`, ...b.bullets.map((x) => `• ${x}`));
   for (const r of statsOf(c)) lines.push(`${r.value}${r.unit ?? ""} — ${r.label}`);
@@ -177,7 +204,7 @@ function statSlide(stats: Stat[], title: string) {
 
 /** A ready deck built only from the piece's own copy, figures and hero image. */
 export function deckSnapshotFromPiece(item: PrintLibraryItem): DeckSnapshot {
-  const c = (item.content ?? {}) as Rec;
+  const c = contentOf(item);
   const title = headlineOf(item);
   const hero = s((c.heroMedia as Rec | undefined)?.imageUrl) ?? item.heroUrl;
   const notes = notesOf(item);

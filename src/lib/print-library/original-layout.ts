@@ -261,3 +261,67 @@ export function syncCopyFromOriginal<T extends Record<string, unknown>>(content:
   if (!swaps.length && !lists.length) return content;
   return rewrite(content, swaps, lists) as T;
 }
+
+// -----------------------------------------------------------------------------
+// Editor copy. For a piece in the original layout, the wording other formats
+// use (headline, summary, sections with their bullets) is read straight from
+// the visible text blocks the editor shows — so social, print sizes and slides
+// always say what the editor says, including edits and hidden blocks.
+// -----------------------------------------------------------------------------
+
+export type EditorCopy = {
+  title?: string;
+  summary?: string;
+  sections: { heading: string; body: string; bullets: string[] }[];
+};
+
+export function editorCopyFromOriginal(layout: OriginalLayout): EditorCopy {
+  const all = withParagraphs(layout).pages.flatMap((p, pi) =>
+    p.texts.filter((t) => !t.hidden && norm(t.text)).map((t) => ({ t, pi })),
+  );
+  if (!all.length) return { sections: [] };
+  // Body size = the size carrying the most characters.
+  const bySize = new Map<number, number>();
+  for (const { t } of all) bySize.set(t.size, (bySize.get(t.size) ?? 0) + t.text.length);
+  const body = [...bySize.entries()].sort((a, b) => b[1] - a[1])[0][0];
+  const first = all.filter((x) => x.pi === 0);
+  const head = first.reduce((a, b) => (b.t.size > a.t.size ? b : a));
+  const title = norm(head.t.text);
+  const isBullets = (t: OriginalText) => isBulletBlock(t.text);
+  const summaryT = first
+    .filter((x) => x !== head && !isBullets(x.t) && x.t.size <= body + 1.5 && norm(x.t.text).length >= 100)
+    .sort((a, b) => a.t.y - b.t.y)[0];
+  const isHeading = (t: OriginalText) =>
+    !isBullets(t) && norm(t.text).length <= 80 && (t.size >= body + 1.5 || (t.weight >= 600 && t.size >= body)) && t.size < head.t.size;
+
+  type H = { pi: number; t: OriginalText; heading: string; body: string[]; bullets: string[] };
+  const heads: H[] = [];
+  const sorted = [...all].sort((a, b) => a.pi - b.pi || a.t.y - b.t.y || a.t.x - b.t.x);
+  for (const x of sorted) {
+    if (x === head || !isHeading(x.t)) continue;
+    // A heading split over two text boxes (bold + regular) reads as one.
+    const prev = heads[heads.length - 1];
+    if (prev && prev.pi === x.pi && !prev.body.length && Math.abs(prev.t.x - x.t.x) < 0.2 && x.t.y - prev.t.y < (prev.t.size / 72) * 2.6) {
+      prev.heading = norm(`${prev.heading} ${x.t.text}`);
+      continue;
+    }
+    heads.push({ pi: x.pi, t: x.t, heading: norm(x.t.text), body: [], bullets: [] });
+  }
+  const owner = (pi: number, t: OriginalText): H | undefined => {
+    const above = heads.filter((h) => h.pi === pi && h.t.y <= t.y + 0.5);
+    const left = above.filter((h) => h.t.x + h.t.w <= t.x + 0.2 && t.y - h.t.y < 1.6);
+    const pool = left.length ? left : above.filter((h) => h.t.y <= t.y);
+    return pool.sort((a, b) => b.t.y - a.t.y)[0];
+  };
+  const loose: H = { pi: -1, t: head.t, heading: "", body: [], bullets: [] };
+  for (const x of sorted) {
+    if (x === head || x === summaryT || isHeading(x.t)) continue;
+    const h = owner(x.pi, x.t) ?? loose;
+    if (isBullets(x.t)) h.bullets.push(...parasOf(x.t).filter(Boolean));
+    else if (x.t.size <= body + 1.5 && norm(x.t.text).length >= 60) h.body.push(norm(x.t.text));
+  }
+  const sections = [...(loose.body.length || loose.bullets.length ? [loose] : []), ...heads]
+    .filter((h) => h.body.length || h.bullets.length)
+    .map((h) => ({ heading: h.heading, body: h.body.join(" "), bullets: h.bullets }));
+  return { title, summary: summaryT ? norm(summaryT.t.text) : undefined, sections };
+}
