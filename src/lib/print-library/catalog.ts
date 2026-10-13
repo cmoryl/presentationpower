@@ -1,4 +1,5 @@
 import { withOriginalLayout } from "@/lib/print-library/original-layout";
+import { TI_CASE_STUDIES, TI_EBROCHURES, TI_PRINT_DIVISION_ID } from "@/lib/print-library/ti-print-library";
 /**
  * Print library catalog — a two-level folder index over every print asset the
  * library can start from.
@@ -529,6 +530,8 @@ export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
   ...GAMES_CASE_STUDIES.map(fromGames),
   ...LIFESCI_CASE_STUDIES.map(fromLifeSci),
   ...LIFESCI_EBROCHURES.map(fromLifeSciEbrochure),
+  ...TI_CASE_STUDIES.map((s) => ({ ...fromLifeSci(s), id: `ti-case-${s.slug.replace(/^ti-/, "")}`, divisionId: TI_PRINT_DIVISION_ID })),
+  ...TI_EBROCHURES.map((s) => ({ ...fromLifeSciEbrochure(s), id: `ti-ebro-${s.slug.replace(/^ti-/, "")}`, divisionId: TI_PRINT_DIVISION_ID })),
   ...LIFESCI_SPOTLIGHTS.map(fromLifeSciSpotlight),
   ...LIFESCI_MSA_PARTNERSHIPS.map(fromLifeSciMsa),
   ...DATAFORCE_CASE_STUDIES.map(fromDataForce),
