@@ -173,7 +173,7 @@ function MasterAnalyticsView() {
             if (!aiSummaryQuery.data)
               toast.loading("Oracle is composing insights…", { id: "ai-summary" });
           }}
-          className="ml-auto inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-xs font-semibold text-white shadow-[0_4px_20px_-6px_rgba(0,63,199,0.55)] transition hover:brightness-110"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white shadow-[0_4px_20px_-6px_rgba(0,63,199,0.55)] transition hover:brightness-110"
         >
           <Sparkles size={12} /> AI insights
         </button>

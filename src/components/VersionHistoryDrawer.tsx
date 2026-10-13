@@ -261,7 +261,7 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/10 bg-[#03002C] px-6 py-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary">
               <History size={16} className="text-[#050B18]" />
             </div>
             <div>
@@ -328,7 +328,7 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
                         onClick={() => setSelectedId(r.id)}
                         className={`block w-full px-5 py-4 text-left transition ${
                           isSel
-                            ? "bg-muted"
+                            ? "bg-white/10"
                             : "hover:bg-white/[0.04]"
                         }`}
                       >
