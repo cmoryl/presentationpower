@@ -68,8 +68,8 @@ function contentOf(item: PrintLibraryItem): Rec {
   const copy = editorCopyFromOriginal(c.original);
   const out: Rec = {
     ...c,
-    title: copy.title ?? c.title,
-    summary: copy.summary ?? c.summary,
+    title: copy.title ?? (c as Rec).title,
+    summary: copy.summary ?? (c as Rec).summary,
     ...(copy.sections.length ? { sections: copy.sections, __editorCopy: true } : {}),
   };
   editorCache.set(c, out);
