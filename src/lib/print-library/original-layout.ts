@@ -317,9 +317,12 @@ export function editorCopyFromOriginal(layout: OriginalLayout): EditorCopy {
   }
   const owner = (pi: number, t: OriginalText): H | undefined => {
     const above = heads.filter((h) => h.pi === pi && h.t.y <= t.y + 0.5);
-    const left = above.filter((h) => h.t.x + h.t.w <= t.x + 0.2 && t.y - h.t.y < 1.6);
-    const pool = left.length ? left : above.filter((h) => h.t.y <= t.y);
-    return pool.sort((a, b) => b.t.y - a.t.y)[0];
+    // Row headings sit to the left, level with some part of the block.
+    const left = heads.filter(
+      (h) => h.pi === pi && h.t.x + h.t.w <= t.x + 0.2 && h.t.y <= t.y + t.h && t.y - h.t.y < 1.6,
+    );
+    if (left.length) return left.sort((a, b) => Math.abs(a.t.y - t.y) - Math.abs(b.t.y - t.y))[0];
+    return above.filter((h) => h.t.y <= t.y).sort((a, b) => b.t.y - a.t.y)[0];
   };
   const loose: H = { pi: -1, t: head.t, heading: "", body: [], bullets: [] };
   for (const x of sorted) {
