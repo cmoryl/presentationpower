@@ -30,6 +30,7 @@ import { CaliforniaKioskBrowser } from "@/components/events/CaliforniaKioskBrows
 import { SfPartnerKioskShowcase } from "@/components/events/SfPartnerKioskShowcase";
 import { SfDemoBooths, SfGlobalLinkPillars, SfLiftDoors, SfScreenSurrounds } from "@/components/events/LegalNextSignage";
 import { VenueAssetSubmissions } from "@/components/events/VenueAssetSubmissions";
+import { SfVenueMeetingSpace } from "@/components/events/SfVenueMeetingSpace";
 import { SF_READY, SF_VENUE, sfLocationStack } from "@/lib/next-sf-event";
 
 export const Route = createFileRoute("/events/next_/san-francisco")({
@@ -230,6 +231,8 @@ function SanFranciscoPage() {
             ))}
           </ul>
         </section>
+
+        <SfVenueMeetingSpace />
 
         <VenueAssetSubmissions eventId="san-francisco" eventLabel="NEXT San Francisco" />
 
