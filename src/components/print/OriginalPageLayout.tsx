@@ -178,7 +178,7 @@ function TextView({ t, editable, onCommit, onFocusText }: {
           lineHeight: t.lead,
           textAlign: t.align,
           whiteSpace: "pre-wrap",
-          letterSpacing: 0,
+          letterSpacing: t.track ? `${t.track}em` : 0,
           margin: 0,
           outline: "none",
           cursor: editable ? "text" : undefined,

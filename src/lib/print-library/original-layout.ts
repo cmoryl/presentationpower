@@ -17,6 +17,8 @@ export type OriginalText = {
   align: "left" | "center" | "right";
   text: string;
   family: "geist" | "poppins";
+  /** Letter-spacing in em, matched to the supplied file's tracking. */
+  track?: number;
   /** Mixed colour/weight copy: styled runs (joined, they equal `text`). */
   runs?: { text: string; color: string; weight: number }[];
   hidden?: boolean;
