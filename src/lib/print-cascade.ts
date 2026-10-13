@@ -70,7 +70,7 @@ function contentOf(item: PrintLibraryItem): Rec {
     ...c,
     title: copy.title ?? (c as Rec).title,
     summary: copy.summary ?? (c as Rec).summary,
-    ...(copy.sections.length ? { sections: copy.sections, __editorCopy: true } : {}),
+    ...(copy.sections.length >= 2 ? { sections: copy.sections, __editorCopy: true } : {}),
   };
   editorCache.set(c, out);
   return out;
@@ -115,7 +115,10 @@ export function contentFromLibraryPiece(item: PrintLibraryItem): AdaptContent {
     ...(Array.isArray(discover?.bullets) ? (discover!.bullets as string[]) : []),
   ];
   const points = blocks.length
-    ? blocks.map((b) => (b.heading ? `${b.heading} — ${fitChars(b.body, 160)}` : (fitChars(b.body, 160) ?? "")))
+    ? blocks.map((b) => {
+        const text = fitChars(b.body || b.bullets.join(", "), 160) ?? "";
+        return b.heading && text ? `${b.heading} — ${text}` : b.heading || text;
+      })
     : extra;
   return {
     eyebrow: s(c.eyebrow),

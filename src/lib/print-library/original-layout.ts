@@ -289,7 +289,15 @@ export function editorCopyFromOriginal(layout: OriginalLayout): EditorCopy {
   const title = norm(head.t.text);
   const isBullets = (t: OriginalText) => isBulletBlock(t.text);
   const summaryT = first
-    .filter((x) => x !== head && !isBullets(x.t) && x.t.size <= body + 1.5 && norm(x.t.text).length >= 100)
+    .filter(
+      (x) =>
+        x !== head &&
+        x.t.y > head.t.y &&
+        !isBullets(x.t) &&
+        x.t.size <= body + 1.5 &&
+        norm(x.t.text).length >= 100 &&
+        !/^(source\b|\d+\.\s)/i.test(norm(x.t.text)),
+    )
     .sort((a, b) => a.t.y - b.t.y)[0];
   const isHeading = (t: OriginalText) =>
     !isBullets(t) && norm(t.text).length <= 80 && (t.size >= body + 1.5 || (t.weight >= 600 && t.size >= body)) && t.size < head.t.size;
