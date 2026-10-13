@@ -415,11 +415,3 @@ function SectionHead({ eyebrow, title, desc }: { eyebrow: string; title: string;
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt className="text-[10px] font-semibold uppercase tracking-widest text-black/45">{label}</dt>
-      <dd className="mt-1 text-3xl font-semibold tracking-tight text-[#03002C]">{value}</dd>
-    </div>
-  );
-}
