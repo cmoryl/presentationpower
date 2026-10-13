@@ -61,7 +61,7 @@ function numericStats(c: Rec): Stat[] {
  */
 const editorCache = new WeakMap<object, Rec>();
 function contentOf(item: PrintLibraryItem): Rec {
-  const c = contentOf(item);
+  const c = (item.content ?? {}) as Rec;
   if (!isOriginalLayout(c)) return c;
   const hit = editorCache.get(c);
   if (hit) return hit;
