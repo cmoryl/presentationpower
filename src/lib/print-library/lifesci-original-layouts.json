@@ -12293,17 +12293,31 @@
       "family": "poppins"
      },
      {
-      "x": 1.1604,
-      "y": 6.6504,
-      "w": 4.6182,
+      "x": 0.96,
+      "y": 6.6227,
+      "w": 1.1,
       "h": 0.394,
       "size": 10.0,
       "weight": 400,
       "color": "#1A3E6F",
-      "lead": 0.8,
-      "align": "left",
-      "text": "Versioned\ndocuments\nClear\nownership",
+      "lead": 1.2,
+      "align": "center",
+      "text": "Clear\nownership",
       "id": "t5",
+      "family": "poppins"
+     },
+     {
+      "x": 4.19,
+      "y": 6.6227,
+      "w": 1.1,
+      "h": 0.394,
+      "size": 10.0,
+      "weight": 400,
+      "color": "#1A3E6F",
+      "lead": 1.2,
+      "align": "center",
+      "text": "Versioned\ndocuments",
+      "id": "t5b",
       "family": "poppins"
      },
      {
