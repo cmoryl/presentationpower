@@ -52,7 +52,7 @@ const COPY = {
   summary:
     "One connected content pipeline across 200+ languages — from clinical trials to gaming to enterprise operations.",
   cta: "See how we work",
-  stat: { value: "200+", label: "Markets supported end-to-end" },
+  stat: { value: "200+", label: "Languages supported" },
 };
 
 function SocialSweepHarness() {
