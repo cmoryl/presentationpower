@@ -15,6 +15,19 @@ import { useSessionUser } from "@/hooks/use-session-user";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { cascadePiece, cascadePieces, contentBricks, type ContentBrick, contentFromLibraryPiece, deckSnapshotFromPiece } from "@/lib/print-cascade";
 import { z } from "zod";
+import { syncCopyFromOriginal, type OriginalLayout } from "@/lib/print-library/original-layout";
+import type { PrintLibraryItem } from "@/lib/print-library/catalog";
+
+/** Masters saved before copy sync: bring library fields in line with the edited original layout. */
+function withEditorCopy(shipped: PrintLibraryItem, saved: PrintLibraryItem): PrintLibraryItem {
+  const c = saved.content as Record<string, unknown> | undefined;
+  const before = (shipped.content as Record<string, unknown> | undefined)?.original as OriginalLayout | undefined;
+  const after = c?.original as OriginalLayout | undefined;
+  if (!c || !before || !after || saved === shipped) return saved;
+  return { ...saved, content: syncCopyFromOriginal(c, before, after) };
+}
+import { listModuleOverrides } from "@/lib/module-overrides.functions";
+import { applyLibraryOverride, indexOverrides, type ModuleOverrideRow } from "@/lib/module-overrides";
 import { AppShell } from "@/components/AppShell";
 import { AssetExportMenu } from "@/components/AssetExportMenu";
 import { PrintProofMenu } from "@/components/export/PrintProofMenu";
@@ -134,7 +147,19 @@ function ConvertPage() {
   const createDeckFromSnapshot = useDeckStore((st) => st.createDeckFromSnapshot);
   const pieces = useMemo(() => cascadePieces(), []);
   const [pieceId, setPieceId] = useState<string>(cascadePiece(search.print)?.id ?? pieces[0]?.id ?? "");
-  const piece = cascadePiece(pieceId);
+  // Read each piece's saved master (wording edited in the print editor), not the shipped copy.
+  const listOverrides = useServerFn(listModuleOverrides);
+  const masters = useQuery({
+    queryKey: ["module-overrides"],
+    queryFn: async () => (await listOverrides()) as unknown as ModuleOverrideRow[],
+    enabled: !!userId,
+  });
+  const shippedPiece = cascadePiece(pieceId);
+  const piece = useMemo(
+    () =>
+      shippedPiece && masters.data ? withEditorCopy(shippedPiece, applyLibraryOverride(shippedPiece, indexOverrides(masters.data, "library").get(shippedPiece.id))) : shippedPiece,
+    [shippedPiece, masters.data],
+  );
   const manual = sourceKind === "manual";
   const [moduleId, setModuleId] = useState<string>(
     search.module && MODULE_VARIANTS.some((m) => m.id === search.module) ? search.module : "MV-OP-COVER",

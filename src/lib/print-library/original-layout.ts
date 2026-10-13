@@ -188,3 +188,151 @@ export function withParagraphs(layout: OriginalLayout): OriginalLayout {
   if (layout.pages.every((p) => p.texts.every((t) => t.paragraphs))) return layout;
   return { ...layout, pages: layout.pages.map((p) => ({ ...p, texts: p.texts.map(paragraphText) })) };
 }
+
+// -----------------------------------------------------------------------------
+// Copy sync. Social, print-size and slide versions read the library-layout
+// fields of the same content (title, summary, sections, bullets…). When a text
+// block is edited in the original layout, carry each changed paragraph / bullet
+// into every library field that printed the old wording, so all formats read
+// the same as the editor. Only wording the piece already carried is replaced.
+// -----------------------------------------------------------------------------
+
+const norm = (s: string) => s.replace(/\s+/g, " ").trim();
+const stripBullet = (s: string) => norm(s.replace(new RegExp(`^\\s*${BULLET}\\s*`), ""));
+const parasOf = (t: OriginalText) => paragraphText(t).text.split("\n").map(stripBullet);
+
+type Swap = { from: string; to: string };
+
+function swapsFor(prev: OriginalLayout, next: OriginalLayout): { swaps: Swap[]; lists: { from: string[]; to: string[] }[] } {
+  const swaps: Swap[] = [];
+  const lists: { from: string[]; to: string[] }[] = [];
+  next.pages.forEach((np, pi) => {
+    const pp = prev.pages[pi];
+    if (!pp) return;
+    for (const nt of np.texts) {
+      const pt = pp.texts.find((t) => t.id === nt.id);
+      if (!pt) continue;
+      const a = parasOf(pt);
+      const b = nt.hidden ? [] : parasOf(nt);
+      if (a.join("\n") === b.join("\n")) continue;
+      const wa = norm(a.join(" "));
+      const wb = norm(b.join(" "));
+      if (wa && wa !== wb) swaps.push({ from: wa, to: wb });
+      if (a.length === b.length) a.forEach((x, i) => x && x !== b[i] && swaps.push({ from: x, to: b[i] }));
+      if (isBulletBlock(pt.text)) lists.push({ from: a, to: b });
+    }
+  });
+  // Longest first so whole blocks win over their own lines.
+  swaps.sort((x, y) => y.from.length - x.from.length);
+  return { swaps, lists };
+}
+
+function rewrite(v: unknown, swaps: Swap[], lists: { from: string[]; to: string[] }[]): unknown {
+  if (typeof v === "string") {
+    const n = norm(v);
+    for (const s of swaps) {
+      if (n === s.from) return s.to;
+      if (s.from.length >= 12 && n.includes(s.from)) return n.split(s.from).join(s.to);
+    }
+    return v;
+  }
+  if (Array.isArray(v)) {
+    if (v.length && v.every((x) => typeof x === "string")) {
+      const items = (v as string[]).map(stripBullet);
+      for (const l of lists) {
+        const hits = items.filter((x) => l.from.includes(x)).length;
+        if (hits >= Math.max(2, Math.ceil(items.length / 2))) return [...l.to];
+      }
+    }
+    return v.map((x) => rewrite(x, swaps, lists));
+  }
+  if (v && typeof v === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, x] of Object.entries(v)) out[k] = k === "original" || k === "layoutMode" ? x : rewrite(x, swaps, lists);
+    return out;
+  }
+  return v;
+}
+
+/** Library-layout fields updated to match an edited original layout. */
+export function syncCopyFromOriginal<T extends Record<string, unknown>>(content: T, prev: OriginalLayout | undefined, next: OriginalLayout): T {
+  if (!prev) return content;
+  const { swaps, lists } = swapsFor(prev, next);
+  if (!swaps.length && !lists.length) return content;
+  return rewrite(content, swaps, lists) as T;
+}
+
+// -----------------------------------------------------------------------------
+// Editor copy. For a piece in the original layout, the wording other formats
+// use (headline, summary, sections with their bullets) is read straight from
+// the visible text blocks the editor shows — so social, print sizes and slides
+// always say what the editor says, including edits and hidden blocks.
+// -----------------------------------------------------------------------------
+
+export type EditorCopy = {
+  title?: string;
+  summary?: string;
+  sections: { heading: string; body: string; bullets: string[] }[];
+};
+
+export function editorCopyFromOriginal(layout: OriginalLayout): EditorCopy {
+  const all = withParagraphs(layout).pages.flatMap((p, pi) =>
+    p.texts.filter((t) => !t.hidden && norm(t.text)).map((t) => ({ t, pi })),
+  );
+  if (!all.length) return { sections: [] };
+  // Body size = the size carrying the most characters.
+  const bySize = new Map<number, number>();
+  for (const { t } of all) bySize.set(t.size, (bySize.get(t.size) ?? 0) + t.text.length);
+  const body = [...bySize.entries()].sort((a, b) => b[1] - a[1])[0][0];
+  const first = all.filter((x) => x.pi === 0);
+  const head = first.reduce((a, b) => (b.t.size > a.t.size ? b : a));
+  const title = norm(head.t.text);
+  const isBullets = (t: OriginalText) => isBulletBlock(t.text);
+  const summaryT = first
+    .filter(
+      (x) =>
+        x !== head &&
+        x.t.y > head.t.y &&
+        !isBullets(x.t) &&
+        x.t.size <= body + 1.5 &&
+        norm(x.t.text).length >= 100 &&
+        !/^(source\b|\d+\.\s)/i.test(norm(x.t.text)),
+    )
+    .sort((a, b) => a.t.y - b.t.y)[0];
+  const isHeading = (t: OriginalText) =>
+    !isBullets(t) && norm(t.text).length <= 80 && (t.size >= body + 1.5 || (t.weight >= 600 && t.size >= body)) && t.size < head.t.size;
+
+  type H = { pi: number; t: OriginalText; heading: string; body: string[]; bullets: string[] };
+  const heads: H[] = [];
+  const sorted = [...all].sort((a, b) => a.pi - b.pi || a.t.y - b.t.y || a.t.x - b.t.x);
+  for (const x of sorted) {
+    if (x === head || !isHeading(x.t)) continue;
+    // A heading split over two text boxes (bold + regular) reads as one.
+    const prev = heads[heads.length - 1];
+    if (prev && prev.pi === x.pi && !prev.body.length && Math.abs(prev.t.x - x.t.x) < 0.2 && x.t.y - prev.t.y < (prev.t.size / 72) * 2.6) {
+      prev.heading = norm(`${prev.heading} ${x.t.text}`);
+      continue;
+    }
+    heads.push({ pi: x.pi, t: x.t, heading: norm(x.t.text), body: [], bullets: [] });
+  }
+  const owner = (pi: number, t: OriginalText): H | undefined => {
+    const above = heads.filter((h) => h.pi === pi && h.t.y <= t.y + 0.5);
+    // Row headings sit to the left, level with some part of the block.
+    const left = heads.filter(
+      (h) => h.pi === pi && h.t.x + h.t.w <= t.x + 0.2 && h.t.y <= t.y + t.h && t.y - h.t.y < 1.6,
+    );
+    if (left.length) return left.sort((a, b) => Math.abs(a.t.y - t.y) - Math.abs(b.t.y - t.y))[0];
+    return above.filter((h) => h.t.y <= t.y).sort((a, b) => b.t.y - a.t.y)[0];
+  };
+  const loose: H = { pi: -1, t: head.t, heading: "", body: [], bullets: [] };
+  for (const x of sorted) {
+    if (x === head || x === summaryT || isHeading(x.t)) continue;
+    const h = owner(x.pi, x.t) ?? loose;
+    if (isBullets(x.t)) h.bullets.push(...parasOf(x.t).filter(Boolean));
+    else if (x.t.size <= body + 1.5 && norm(x.t.text).length >= 60) h.body.push(norm(x.t.text));
+  }
+  const sections = [...(loose.body.length || loose.bullets.length ? [loose] : []), ...heads]
+    .filter((h) => h.body.length || h.bullets.length)
+    .map((h) => ({ heading: h.heading, body: h.body.join(" "), bullets: h.bullets }));
+  return { title, summary: summaryT ? norm(summaryT.t.text) : undefined, sections };
+}
